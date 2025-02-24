@@ -3,4 +3,6 @@ black
 mypy
 numpy
 plotly
-#kaleido
+scipy
+tqdm
+joblib
