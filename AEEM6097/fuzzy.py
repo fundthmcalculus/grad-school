@@ -202,7 +202,7 @@ class FuzzyEquals(FuzzyOperator):
 
 
 class FuzzyRule:
-    def __init__(self, rule_name: str, antecedent: FuzzyOperator, consequent: FuzzySet):
+    def __init__(self, rule_name: str, antecedent: FuzzyOperator, consequent: FuzzySet | NDArray[np.float64]):
         self.rule_name = rule_name
         self.antecedent = antecedent
         self.consequent = consequent
@@ -232,6 +232,28 @@ class MamdaniRule(FuzzyRule):
 
     def __str__(self) -> str:
         return f"{self.rule_name}: IF ({self.antecedent}) THEN {self.consequent.var_name} = {self.consequent_target}"
+
+    def __call__(self, x: NDArray[np.float64] | list[FuzzyVariable]) -> FuzzyInference:
+        return self.evaluate(x)
+
+    def evaluate(self, x: NDArray[np.float64] | list[FuzzyVariable]) -> FuzzyInference:
+        mu_x = self.antecedent(x)
+        return FuzzyInference(self.consequent, self.consequent_target, mu_x)
+
+
+class TSKRule(FuzzyRule):
+    def __init__(
+        self,
+        rule_name: str,
+        antecedent: FuzzyOperator,
+        consequent_var_name: str,
+        consequent: NDArray[np.float64]
+    ):
+        super().__init__(rule_name, antecedent, consequent)
+        self.consequent_var_name = consequent_var_name
+
+    def __str__(self) -> str:
+        return f"{self.rule_name}: IF ({self.antecedent}) THEN {self.consequent_var_name} = {self.consequent}"
 
     def __call__(self, x: NDArray[np.float64] | list[FuzzyVariable]) -> FuzzyInference:
         return self.evaluate(x)
