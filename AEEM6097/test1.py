@@ -78,23 +78,52 @@ def main():
     #     flow_0, flow_1, flow_2, flow_3, flow_4, level_0, level_1, level_2, level_3, level_4, power_0, power_1, power_2,
     #     power_3, power_4)
 
-    all_rules, flow_rate, water_level, power_output = create_system(flow_0, flow_1, flow_2, flow_3, flow_4, level_0, level_1, level_2, level_3, level_4,
-                              power_0, power_1, power_2, power_3, power_4)
+    all_rules, flow_rate, water_level, power_output = create_system(
+        flow_0,
+        flow_1,
+        flow_2,
+        flow_3,
+        flow_4,
+        level_0,
+        level_1,
+        level_2,
+        level_3,
+        level_4,
+        power_0,
+        power_1,
+        power_2,
+        power_3,
+        power_4,
+    )
     plot_membership_functions(flow_rate, water_level, power_output)
 
     # Iterate through all possible steps and evaluate the rules!
     X, Y, Z, Z_ref, rms_err = run_default_simulation(all_rules)
 
-    fig = make_subplots(2,1,subplot_titles=["Fuzzy System Surface Plot", f"Normalized RMS Error: {rms_err:.4f}"],
-                        specs=[[{'type': 'surface'}], [{'type': 'surface'}]],
-                        )
-    fig.add_trace(go.Surface(x=X, y=Y, z=Z, name="Fuzzy System"), row=1, col=1, )
+    fig = make_subplots(
+        2,
+        1,
+        subplot_titles=[
+            "Fuzzy System Surface Plot",
+            f"Normalized RMS Error: {rms_err:.4f}",
+        ],
+        specs=[[{"type": "surface"}], [{"type": "surface"}]],
+    )
+    fig.add_trace(
+        go.Surface(x=X, y=Y, z=Z, name="Fuzzy System"),
+        row=1,
+        col=1,
+    )
     fig.layout.scene.xaxis.title = "Flow Rate"
     fig.layout.scene.yaxis.title = "Water Level"
     fig.layout.scene.zaxis.title = "Power Output"
     fig.layout.scene.camera = dict(eye=dict(x=-1.5, y=-1.5, z=1.0))
 
-    fig.add_trace(go.Surface(x=X, y=Y, z=Z_ref, name="Reference System"),row=2, col=1, )
+    fig.add_trace(
+        go.Surface(x=X, y=Y, z=Z_ref, name="Reference System"),
+        row=2,
+        col=1,
+    )
     fig.layout.scene2.xaxis.title = "Flow Rate"
     fig.layout.scene2.yaxis.title = "Water Level"
     fig.layout.scene2.zaxis.title = "Power Output"
@@ -109,38 +138,97 @@ def main():
     fig.show()
 
 
-def optimize_system(flow_0, flow_1, flow_2, flow_3, flow_4, level_0, level_1, level_2, level_3, level_4, power_0,
-                    power_1, power_2, power_3, power_4):
+def optimize_system(
+    flow_0,
+    flow_1,
+    flow_2,
+    flow_3,
+    flow_4,
+    level_0,
+    level_1,
+    level_2,
+    level_3,
+    level_4,
+    power_0,
+    power_1,
+    power_2,
+    power_3,
+    power_4,
+):
     # Use the ACO solver to optimize the membership functions!
-    best_soln, soln_history = solve_aco(fuzzy_system_aco, [
-        AcoContinuousVariable("flow_0", -200, 4200, flow_0),
-        AcoContinuousVariable("flow_1", -200, 4200, flow_1),
-        AcoContinuousVariable("flow_2", -200, 4200, flow_2),
-        AcoContinuousVariable("flow_3", -200, 4200, flow_3),
-        AcoContinuousVariable("flow_4", -200, 4200, flow_4),
-
-        AcoContinuousVariable("level_0", -50, 200, level_0),
-        AcoContinuousVariable("level_1", -50, 200, level_1),
-        AcoContinuousVariable("level_2", -50, 200, level_2),
-        AcoContinuousVariable("level_3", -50, 200, level_3),
-        AcoContinuousVariable("level_4", -50, 200, level_4),
-
-        AcoContinuousVariable("power_0", 0, 120, power_0),
-        AcoContinuousVariable("power_1", 0, 120, power_1),
-        AcoContinuousVariable("power_2", 0, 120, power_2),
-        AcoContinuousVariable("power_3", 0, 120, power_3),
-        AcoContinuousVariable("power_4", 0, 120, power_4),
-    ])
+    best_soln, soln_history = solve_aco(
+        fuzzy_system_aco,
+        [
+            AcoContinuousVariable("flow_0", -200, 4200, flow_0),
+            AcoContinuousVariable("flow_1", -200, 4200, flow_1),
+            AcoContinuousVariable("flow_2", -200, 4200, flow_2),
+            AcoContinuousVariable("flow_3", -200, 4200, flow_3),
+            AcoContinuousVariable("flow_4", -200, 4200, flow_4),
+            AcoContinuousVariable("level_0", -50, 200, level_0),
+            AcoContinuousVariable("level_1", -50, 200, level_1),
+            AcoContinuousVariable("level_2", -50, 200, level_2),
+            AcoContinuousVariable("level_3", -50, 200, level_3),
+            AcoContinuousVariable("level_4", -50, 200, level_4),
+            AcoContinuousVariable("power_0", 0, 120, power_0),
+            AcoContinuousVariable("power_1", 0, 120, power_1),
+            AcoContinuousVariable("power_2", 0, 120, power_2),
+            AcoContinuousVariable("power_3", 0, 120, power_3),
+            AcoContinuousVariable("power_4", 0, 120, power_4),
+        ],
+    )
     print(f"Solution history: {soln_history}")
     print(f"Best solution: {best_soln} with value: {soln_history[-1]}")
     # Plot solution history
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=np.arange(len(soln_history)), y=soln_history, mode="lines", name="RMS Error"))
-    fig.update_layout(title="RMS Error vs. Generation", xaxis_title="Generation", yaxis_title="RMS Error")
+    fig.add_trace(
+        go.Scatter(
+            x=np.arange(len(soln_history)),
+            y=soln_history,
+            mode="lines",
+            name="RMS Error",
+        )
+    )
+    fig.update_layout(
+        title="RMS Error vs. Generation",
+        xaxis_title="Generation",
+        yaxis_title="RMS Error",
+    )
     fig.show()
     # Destructure the best solution
-    flow_0, flow_1, flow_2, flow_3, flow_4, level_0, level_1, level_2, level_3, level_4, power_0, power_1, power_2, power_3, power_4 = best_soln
-    return flow_0, flow_1, flow_2, flow_3, flow_4, level_0, level_1, level_2, level_3, level_4, power_0, power_1, power_2, power_3, power_4
+    (
+        flow_0,
+        flow_1,
+        flow_2,
+        flow_3,
+        flow_4,
+        level_0,
+        level_1,
+        level_2,
+        level_3,
+        level_4,
+        power_0,
+        power_1,
+        power_2,
+        power_3,
+        power_4,
+    ) = best_soln
+    return (
+        flow_0,
+        flow_1,
+        flow_2,
+        flow_3,
+        flow_4,
+        level_0,
+        level_1,
+        level_2,
+        level_3,
+        level_4,
+        power_0,
+        power_1,
+        power_2,
+        power_3,
+        power_4,
+    )
 
 
 def run_default_simulation(all_rules):
@@ -157,8 +245,23 @@ def run_default_simulation(all_rules):
     return X, Y, Z, Z_ref, rms_err
 
 
-def create_system(flow_0, flow_1, flow_2, flow_3, flow_4, level_0, level_1, level_2, level_3, level_4, power_0, power_1,
-                  power_2, power_3, power_4):
+def create_system(
+    flow_0,
+    flow_1,
+    flow_2,
+    flow_3,
+    flow_4,
+    level_0,
+    level_1,
+    level_2,
+    level_3,
+    level_4,
+    power_0,
+    power_1,
+    power_2,
+    power_3,
+    power_4,
+):
     # Create the relevant membership functions
     flow_rate: FuzzySet = FuzzySet(
         "Flow Rate",
@@ -241,7 +344,8 @@ def create_system(flow_0, flow_1, flow_2, flow_3, flow_4, level_0, level_1, leve
         # Rule: IF flow rate high or very high and water level = almost full, then power output = very high
         MamdaniRule(
             "Rule 7",
-            (flow_rate == ["Medium", "High", "Very High"]) & (water_level == ["Almost Full"]),
+            (flow_rate == ["Medium", "High", "Very High"])
+            & (water_level == ["Almost Full"]),
             power_output,
             "Very High",
         ),
@@ -280,6 +384,7 @@ def get_rms_err(Z):
     rms_err = np.sqrt(np.sum((Z - Z_ref) ** 2))
     return Z_ref, rms_err
 
+
 Z_ref = np.array(
     [
         [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 40, 50, 50],
@@ -299,6 +404,7 @@ Z_ref = np.array(
         [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 75, 110, 100, 110, 110],
     ]
 ).transpose()
+
 
 def get_reference_surface():
     return Z_ref
