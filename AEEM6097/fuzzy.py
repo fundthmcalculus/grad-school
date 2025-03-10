@@ -202,7 +202,12 @@ class FuzzyEquals(FuzzyOperator):
 
 
 class FuzzyRule:
-    def __init__(self, rule_name: str, antecedent: FuzzyOperator, consequent: FuzzySet | NDArray[np.float64]):
+    def __init__(
+        self,
+        rule_name: str,
+        antecedent: FuzzyOperator,
+        consequent: FuzzySet | NDArray[np.float64],
+    ):
         self.rule_name = rule_name
         self.antecedent = antecedent
         self.consequent = consequent
@@ -247,7 +252,7 @@ class TSKRule(FuzzyRule):
         rule_name: str,
         antecedent: FuzzyOperator,
         consequent_var_name: str,
-        consequent: NDArray[np.float64]
+        consequent: NDArray[np.float64],
     ):
         super().__init__(rule_name, antecedent, consequent)
         self.consequent_var_name = consequent_var_name
