@@ -71,9 +71,11 @@ def main():
 
     # Use recursion to find the optimal solution exhaustively, to prove that my ACO solution finds the best on the first try. 8-)
     results: list[tuple[list,int]] = list(recursive_find_best_soln(network_routes))
+    # Sort by length
+    results.sort(key=lambda x: -x[1])
     print("Number of solutions found:", len(results))
-    recur_best_path, recur_best_len = min(results, key=lambda x: x[1])
-    print(f"Recursive best path: {np.array(recur_best_path)+1}. Tour length={recur_best_len}")
+    print("Solutions in order: ", results)
+    # print(f"Recursive best path: {np.array(recur_best_path)+1}. Tour length={recur_best_len}")
 
 
 def plot_convergence(generations, tour_lengths):
