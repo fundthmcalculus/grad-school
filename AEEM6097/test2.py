@@ -2,6 +2,9 @@ from typing import Iterator
 
 import plotly.graph_objects as go
 import numpy as np
+import tqdm
+from numba import njit
+
 
 # Source: https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms#Algorithm_and_formula
 
@@ -22,11 +25,25 @@ def main():
     # Because it's symmetric, we can use upper triangular matrix to define the lower triangular matrix.
     network_routes = network_routes + network_routes.T
     # Anything with distance = 0 is not a valid route
+    optimal_city_order, optimal_tour_length, tour_lengths = aco_tsp_solve(network_routes)
+    # Get the optimal route!
+    print(f"Optimal route: {optimal_city_order + 1}. Tour length={optimal_tour_length}")
+    # Plot the convergence of optimal route length!
+    plot_convergence(tour_lengths)
+
+    # Use recursion to find the optimal solution exhaustively, to prove that my ACO solution finds the best on the first try. 8-)
+    results: list[tuple[list,int]] = list(recursive_find_best_soln(network_routes))
+    print("Number of solutions found:", len(results))
+    recur_best_path, recur_best_len = min(results, key=lambda x: x[1])
+    print(f"Recursive best path: {np.array(recur_best_path)+1}. Tour length={recur_best_len}")
+
+
+def aco_tsp_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
+                  back_to_start=False,
+                  hot_start=None,
+                  hot_start_length=0.0):
+    network_routes = network_routes.copy()
     network_routes[network_routes == 0] = -1
-    # Define the number of ants
-    n_ants = 10
-    # Define the number of iterations
-    n_iter = 10
     # Define the pheromone decay rate
     rho = 0.1
     # Define the pheromone influence
@@ -38,16 +55,22 @@ def main():
     eta = 1 / network_routes
     # Default trail level
     tau = np.ones(network_routes.shape)
+    # If we have a hot start, preload it 4x
     optimal_city_order = None
     tour_lengths = []
     optimal_tour_length = np.inf
-    for generation in range(n_iter):
+    if hot_start is not None:
+        optimal_tour_length = hot_start_length
+        optimal_city_order = hot_start
+        for i in range(len(hot_start) - 1):
+            tau[hot_start[i], hot_start[i + 1]] += 4 #*Q / hot_start_length
+    for generation in tqdm.trange(n_iter, desc="ACO Generation"):
         # Compute the change in pheromone!
         delta_tau = np.zeros(tau.shape)
         optimal_ant_len = np.inf
         optimal_ant_city_order = None
         for ant in range(n_ants):
-            city_order, tour_length = run_ant(network_routes, eta, tau, alpha, beta)
+            city_order, tour_length = run_ant(network_routes, eta, tau, alpha, beta, back_to_start)
             # If a dead-end, skip!
             if tour_length == np.inf:
                 continue
@@ -57,6 +80,8 @@ def main():
                 optimal_ant_city_order = city_order
             for i in range(len(city_order) - 1):
                 delta_tau[city_order[i], city_order[i + 1]] += Q / tour_length
+            if back_to_start:
+                delta_tau[city_order[-1], city_order[0]] += Q / tour_length
         # Update the per-generation information
         if optimal_ant_len < optimal_tour_length:
             optimal_tour_length = optimal_ant_len
@@ -64,26 +89,17 @@ def main():
         tour_lengths.append(optimal_tour_length)
         # Once all ants are done, update the pheromone
         tau = pheromone_update(tau, delta_tau, rho)
-    # Get the optimal route!
-    print(f"Optimal route: {optimal_city_order + 1}. Tour length={optimal_tour_length}")
-    # Plot the convergence of optimal route length!
-    plot_convergence(np.arange(len(tour_lengths))+1, tour_lengths)
-
-    # Use recursion to find the optimal solution exhaustively, to prove that my ACO solution finds the best on the first try. 8-)
-    results: list[tuple[list,int]] = list(recursive_find_best_soln(network_routes))
-    print("Number of solutions found:", len(results))
-    recur_best_path, recur_best_len = min(results, key=lambda x: x[1])
-    print(f"Recursive best path: {np.array(recur_best_path)+1}. Tour length={recur_best_len}")
+    return optimal_city_order, optimal_tour_length, tour_lengths
 
 
-def plot_convergence(generations, tour_lengths):
+def plot_convergence(tour_lengths):
     # Create the figure
     fig = go.Figure()
 
     # Add the line trace
     fig.add_trace(
         go.Scatter(
-            x=generations,
+            x=np.r_[0:len(tour_lengths)],
             y=tour_lengths,
             mode='lines+markers',
             name='Tour Length',
@@ -130,13 +146,18 @@ def recursive_find_best_soln(network_routes, cur_city = 0, used_cities=None, cur
         yield from recursive_find_best_soln(network_routes, i, used_cities.copy(), cur_length)
 
 
-def run_ant(network_routes, eta, tau_xy, alpha, beta):
+def run_ant(network_routes, eta, tau_xy, alpha, beta, back_to_start: bool):
     # Start at city 1, and visit each city exactly once
     cur_city = 0 # Offset by 1, so we start at city 1
-    city_order = np.zeros(eta.shape[0], dtype=int)
+    eta_shape_ = eta.shape[0]
+    order_len = eta_shape_
+    if back_to_start:
+        order_len += 1
+    city_order = np.zeros(order_len, dtype=int)
     idx = 0
     total_length = 0
-    allowed_cities = np.ones(eta.shape[0], dtype=bool)
+    allowed_cities = np.ones(eta_shape_, dtype=bool)
+    choice_indexes = np.arange(eta_shape_) # TODO - Cache!
     while np.any(allowed_cities):
         # Mark off the current city
         allowed_cities[cur_city] = False
@@ -149,9 +170,13 @@ def run_ant(network_routes, eta, tau_xy, alpha, beta):
             if np.sum(allowed_cities) != 0:
                 # Invalid route!
                 total_length = np.inf
+            # IF back-to-start, include that option
+            if back_to_start:
+                city_order.a
+                total_length += network_routes[city_order[-1], 0]
             break
         # Choose the next city
-        cur_city = np.random.choice(np.arange(eta.shape[0]), p=p)
+        cur_city = np.random.choice(choice_indexes, p=p)
         total_length += network_routes[city_order[idx], cur_city]
         idx += 1
 
@@ -171,6 +196,8 @@ def p_xy(eta_xy, tau_xy, allowed_y, alpha, beta, x):
     p[~allowed_y] = 0
     p[p < 0] = 0
     # Normalize the probabilities
+    if np.sum(p) == 0.0:
+        return 0
     p = p / np.sum(p)
     return p
 
