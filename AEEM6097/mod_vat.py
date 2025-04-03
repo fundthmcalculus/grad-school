@@ -83,7 +83,6 @@ def compute_ordered_dis_njit(matrix_of_pairwise_distance: np.ndarray):  # pragma
 
 def compute_ordered_dissimilarity_matrix(x: np.ndarray) -> tuple[np.ndarray, list]:
     matrix_of_pairwise_distance = pairwise_distances(x)
-    # Append a column of the initial ordering
     dis_matrix, observation_path = compute_ordered_dis_njit(matrix_of_pairwise_distance)
     return dis_matrix, observation_path
 
