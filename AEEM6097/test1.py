@@ -43,7 +43,7 @@ def main():
     # Create the relevant membership functions
     # Use Pi Membership Functions for practice with Dr Cohen's symphony!
     b_factor = 2.0
-    N_fcns = 5.0
+    N_fcns = 5
     q_max = 4000
     q_min = 0
     q_spacing = (q_max - q_min) / N_fcns
@@ -79,12 +79,13 @@ def main():
     l_first = l_spacing / 2.0
     water_level: FuzzySet = FuzzySet(
         "Water Level",
-        create_uniform_triangle_memberships(
-            ["Almost Empty", "Low", "Medium", "High", "Almost Full"],
-            l_min,
-            l_max,
-            N_fcns,
-        ),
+        create_triangle_memberships({
+            "Almost Empty": 10,
+            "Low": 50,
+            "Medium": 90,
+            "High": 120,
+            "Almost Full": 140,
+        }),
         # [
         #     PiMF("Almost Empty", l_first, l_width),
         #     PiMF("Low", l_first + l_spacing, l_width),
@@ -129,22 +130,22 @@ def main():
         MamdaniRule(
             "Rule 1",
             (flow_rate == ["Very Low", "Low"])
-            & (water_level == ["Almost Empty", "Low", "Medium", "High"]),
+            & (water_level != ["Almost Full"]),
             power_output,
             "Very Low",
         ),
         # Rule: IF flow rate very low or low and water level = almost full, then power output = medium
         MamdaniRule(
             "Rule 3",
-            (flow_rate == ["Very Low", "Low"]) & (water_level == ["Almost Full"]),
+            (flow_rate == ["Very Low", "Low"]) & (water_level == "Almost Full"),
             power_output,
-            "Low",
+            "Medium",
         ),
         # Rule: IF flow rate medium and water level = almost empty, low, medium, then power output = low
         MamdaniRule(
             "Rule 4",
             (flow_rate == ["Medium"])
-            & (water_level == ["Almost Empty", "Low", "Medium"]),
+            & (water_level == ["Almost Empty", "Low", "Medium", "High"]),
             power_output,
             "Low",
         ),
@@ -167,6 +168,13 @@ def main():
         MamdaniRule(
             "Rule 7",
             (flow_rate == ["High", "Very High"]) & (water_level == ["Almost Full"]),
+            power_output,
+            "Very High",
+        ),
+        # Rule: IF flow rate high or very high and water level = almost full, then power output = very high
+        MamdaniRule(
+            "Rule 7",
+            (flow_rate == ["High", "Very High"]) & (water_level == ["High"]),
             power_output,
             "Very High",
         ),
