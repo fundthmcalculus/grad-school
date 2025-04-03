@@ -3,13 +3,12 @@ import time
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from pyclustertend import compute_ivat_ordered_dissimilarity_matrix, compute_ordered_dissimilarity_matrix
-from pyclustertend.visual_assessment_of_tendency import compute_ordered_dis_njit
 from sklearn.metrics import pairwise_distances
 
+from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix
 from AEEM6097.test2 import aco_tsp_solve, plot_convergence
 
-N_CITIES_CLUSTER = 8
+N_CITIES_CLUSTER = 32
 N_CLUSTERS = N_CITIES_CLUSTER
 
 CLUSTER_DIAMETER = 3
@@ -85,14 +84,14 @@ def main():
     vat_dist_len = vat_dist.diagonal(offset=1).sum() + vat_dist[0, -1]
     print("VAT Distance=", vat_dist_len)
     print("VAT checked Distance=", check_path_distance(distances, vat_path))
-    ivat_dist_len = ivat_dist.diagonal(offset=1).sum() + ivat_dist[0, -1]
-    print("IVAT Distance=", ivat_dist_len)
-    print("IVAT checked Distance=", check_path_distance(distances, ivat_path))
+    # ivat_dist_len = ivat_dist.diagonal(offset=1).sum() + ivat_dist[0, -1]
+    # print("IVAT Distance=", ivat_dist_len)
+    # print("IVAT checked Distance=", check_path_distance(distances, ivat_path))
     print(f"IVAT Time: {t1 - t0:.2f}s")
     # TODO - Compute TSP optimized distance, ignoring to-start route.
     t2 = time.time()
     optimal_city_order, optimal_tour_length, tour_lengths = (
-        aco_tsp_solve(distances,20,20, hot_start=vat_path,
+        aco_tsp_solve(distances,2*N_CITIES_CLUSTER,2*N_CITIES_CLUSTER, hot_start=vat_path,
                       hot_start_length=vat_dist_len,)
     )
     t3 = time.time()

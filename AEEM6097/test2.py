@@ -1,9 +1,10 @@
 from typing import Iterator
 
-import plotly.graph_objects as go
+import joblib
 import numpy as np
+import plotly.graph_objects as go
 import tqdm
-from numba import njit
+from joblib import Parallel, delayed
 
 
 # Source: https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms#Algorithm_and_formula
@@ -63,32 +64,46 @@ def aco_tsp_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
         optimal_tour_length = hot_start_length
         optimal_city_order = hot_start
         for i in range(len(hot_start) - 1):
-            tau[hot_start[i], hot_start[i + 1]] += 4 #*Q / hot_start_length
-    for generation in tqdm.trange(n_iter, desc="ACO Generation"):
-        # Compute the change in pheromone!
-        delta_tau = np.zeros(tau.shape)
-        optimal_ant_len = np.inf
-        optimal_ant_city_order = None
-        for ant in range(n_ants):
-            city_order, tour_length = run_ant(network_routes, eta, tau, alpha, beta, back_to_start)
-            # If a dead-end, skip!
-            if tour_length == np.inf:
-                continue
-            # Update the relative ant pheromone
-            if tour_length <= optimal_ant_len:
-                optimal_ant_len = tour_length
-                optimal_ant_city_order = city_order
-            for i in range(len(city_order) - 1):
-                delta_tau[city_order[i], city_order[i + 1]] += Q / tour_length
-            if back_to_start:
-                delta_tau[city_order[-1], city_order[0]] += Q / tour_length
-        # Update the per-generation information
-        if optimal_ant_len < optimal_tour_length:
-            optimal_tour_length = optimal_ant_len
-            optimal_city_order = optimal_ant_city_order
-        tour_lengths.append(optimal_tour_length)
-        # Once all ants are done, update the pheromone
-        tau = pheromone_update(tau, delta_tau, rho)
+            tau[hot_start[i], hot_start[i + 1]] += 10 #*Q / hot_start_length
+
+    with Parallel(n_jobs=joblib.cpu_count()//2) as parallel:
+        for generation in tqdm.trange(n_iter, desc="ACO Generation"):
+            # Compute the change in pheromone!
+            delta_tau = np.zeros(tau.shape)
+            optimal_ant_len = np.inf
+            optimal_ant_city_order = None
+            all_city_order = [[]]*n_ants
+            all_tour_length = [0]*n_ants
+            def parallel_ant(local_ant):
+                return run_ant(network_routes, eta, tau, alpha, beta, back_to_start)
+            # for ant in range(n_ants):
+            #     all_city_order[ant], all_tour_length[ant] = run_ant(network_routes, eta, tau, alpha, beta, back_to_start)#     all_city_order[ant], all_tour_length[ant] = run_ant(network_routes, eta, tau, alpha, beta, back_to_start)
+            all_results = parallel(delayed(parallel_ant)(i_ant) for i_ant in range(n_ants))
+            # all_city_order[ant], all_tour_length[ant] = run_ant(network_routes, eta, tau, alpha, beta, back_to_start)#     all_city_order[ant], all_tour_length[ant] =
+
+            for ant in range(n_ants):
+                tour_length = all_results[ant][1]
+                city_order = all_results[ant][0]
+                # tour_length = all_tour_length[ant]
+                # city_order = all_city_order[ant]
+                # If a dead-end, skip!
+                if tour_length == np.inf:
+                    continue
+                # Update the relative ant pheromone
+                if tour_length <= optimal_ant_len:
+                    optimal_ant_len = tour_length
+                    optimal_ant_city_order = city_order
+                for i in range(len(city_order) - 1):
+                    delta_tau[city_order[i], city_order[i + 1]] += Q / tour_length
+                if back_to_start:
+                    delta_tau[city_order[-1], city_order[0]] += Q / tour_length
+            # Update the per-generation information
+            if optimal_ant_len < optimal_tour_length:
+                optimal_tour_length = optimal_ant_len
+                optimal_city_order = optimal_ant_city_order
+            tour_lengths.append(optimal_tour_length)
+            # Once all ants are done, update the pheromone
+            tau = pheromone_update(tau, delta_tau, rho)
     return optimal_city_order, optimal_tour_length, tour_lengths
 
 
@@ -172,8 +187,8 @@ def run_ant(network_routes, eta, tau_xy, alpha, beta, back_to_start: bool):
                 total_length = np.inf
             # IF back-to-start, include that option
             if back_to_start:
-                city_order.a
-                total_length += network_routes[city_order[-1], 0]
+                city_order[-1] = 0
+                total_length += network_routes[city_order[-2], city_order[-1]]
             break
         # Choose the next city
         cur_city = np.random.choice(choice_indexes, p=p)
