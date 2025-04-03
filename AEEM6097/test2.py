@@ -64,7 +64,7 @@ def aco_tsp_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
         optimal_tour_length = hot_start_length
         optimal_city_order = hot_start
         for i in range(len(hot_start) - 1):
-            tau[hot_start[i], hot_start[i + 1]] += 10 #*Q / hot_start_length
+            tau[hot_start[i], hot_start[i + 1]] += 4 #*Q / hot_start_length
 
     with Parallel(n_jobs=joblib.cpu_count()//2) as parallel:
         for generation in tqdm.trange(n_iter, desc="ACO Generation"):
