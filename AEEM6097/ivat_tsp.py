@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from sklearn.metrics import pairwise_distances
@@ -8,14 +9,16 @@ from sklearn.metrics import pairwise_distances
 from AEEM6097.mod_vat import compute_ordered_dissimilarity_matrix
 from AEEM6097.test2 import aco_tsp_solve
 
-N_CITIES_CLUSTER = 16
+N_CITIES_CLUSTER = 8
 N_CLUSTERS = N_CITIES_CLUSTER
 
-N_ANTS = 10
-N_GENERATIONS = 20
+N_ANTS = 3*N_CITIES_CLUSTER
+N_GENERATIONS = 3*N_CLUSTERS
 
 CLUSTER_DIAMETER = 3
 CLUSTER_SPACING = 10*CLUSTER_DIAMETER
+
+HALF_CIRCLE = True
 
 
 def random_cities(center_x, center_y) -> np.ndarray:
@@ -29,33 +32,15 @@ def random_cities(center_x, center_y) -> np.ndarray:
 
 def circle_random_clusters() -> np.ndarray:
     city_locations = np.zeros(shape=(0,2))
-    for theta in np.linspace(0, 2 * np.pi, N_CLUSTERS+1):
-        if theta == 2*np.pi:
-            break
+    for theta in np.linspace(0, 2*np.pi, N_CLUSTERS):
+        if HALF_CIRCLE:
+            theta /= 2.0
+        else:
+            theta *= N_CLUSTERS/(N_CLUSTERS+1)
         cx = CLUSTER_SPACING * np.cos(theta)
         cy = CLUSTER_SPACING * np.sin(theta)
         city_locations = np.concatenate((city_locations, random_cities(cx, cy)), axis=0)
     return city_locations
-
-
-def sort_to_principal_diagonals(x: np.ndarray) -> np.ndarray:
-    # Sort the given symmetric, positive-definite array to minimize
-    # the values on the principal diagonals. Permute rows and columns accordingly
-    # TODO - Convert this bubble-sort to merge-sort!
-    for irow in range(1,x.shape[0]):
-        for jrow in range(irow):
-            # Check which row gives a closer to optimal layout
-            if x[irow,irow] - x[irow,jrow] > 0.001:
-                # Swap these rows, and columns.
-                s = x[irow, :]
-                x[irow,:] =x[jrow, :]
-                x[jrow,:] = s
-                # Swap columns
-                t = x[:, irow]
-                x[:, irow] = x[:, jrow]
-                x[:, jrow] = t
-    # TODO - Don't in-place mod?
-    return x
 
 
 def poly_perimeter(n_sides, r):
@@ -86,48 +71,77 @@ def main():
     print("Configuring random")
     all_cities = circle_random_clusters()
     # Compute all distances
-    distances = pairwise_distances(all_cities)
+    distances: np.ndarray = pairwise_distances(all_cities)
     print("Distance-shape",distances.shape)
-    # Use the IVAT technique to organize
+
+    # Create the report dataframe
+    df_rows = []
+    approx_optimal_dist = N_CLUSTERS * poly_perimeter(N_CITIES_CLUSTER, r=CLUSTER_DIAMETER / 2.0) + poly_perimeter(
+        N_CITIES_CLUSTER, r=CLUSTER_SPACING)
+    if HALF_CIRCLE:
+        approx_optimal_dist /= 2.0
+    rand_dist = check_path_distance(distances, np.random.permutation(np.arange(N_CLUSTERS*N_CITIES_CLUSTER)))
+    # Add the optimal and random rows:
+    df_rows.append({"Method": "Approx Optimal", "Time": 0.0, "Distance": approx_optimal_dist,
+         "%Change": approx_optimal_dist / approx_optimal_dist * 100.0})
+    df_rows.append(
+        {"Method": "Random", "Time": 0.0, "Distance": rand_dist,
+         "%Change": rand_dist / approx_optimal_dist * 100.0}
+    )
+    # Use the VAT technique to organize
     t0 = time.time()
     vat_dist, vat_path = compute_ordered_dissimilarity_matrix(all_cities)
     t1 = time.time()
+    # Ensure we start at city-0
     vat_path = start_at_idx(vat_path)
-    print("Min, Max Distances", np.min(distances), np.max(distances))
-    print("Min, Max VAT Distances", np.min(vat_dist), np.max(vat_dist))
-    approx_optimal_dist = N_CLUSTERS * poly_perimeter(N_CITIES_CLUSTER, r=CLUSTER_DIAMETER / 2.0) + poly_perimeter(
-        N_CITIES_CLUSTER, r=CLUSTER_SPACING)
-    print(f"VAT Time: {t1 - t0:.2f}s")
-    vat_dist_len = vat_dist.diagonal(offset=1).sum() + vat_dist[0, -1]
+    vat_dist_len = vat_dist.diagonal(offset=1).sum() + vat_dist[0,-1]
+
+    # Append row for VAT method.
+    vat_time = t1 - t0
+    df_rows.append(
+        {"Method": "VAT", "Time": vat_time, "Distance": vat_dist_len,
+         "%Change": vat_dist_len / approx_optimal_dist * 100.0}
+    )
     # Compute TSP optimized distance
     t2 = time.time()
-    optimal_city_order, optimal_tour_length, tour_lengths = (
+    hs_optimal_city_order, hs_optimal_tour_length, hs_tour_lengths = (
         aco_tsp_solve(distances,n_ants=N_ANTS, n_iter=N_GENERATIONS, hot_start=vat_path,
-                      hot_start_length=vat_dist_len,back_to_start=True)
+                      hot_start_length=vat_dist_len)
     )
     t3 = time.time()
-    print(f"ACO Time:{t3 - t2:.2f}s")
-    print(f"Approx Optimum Distance={approx_optimal_dist:.2f}")
-    rand_dist = distances[0, :].sum()
-    print(f"Random Distance={rand_dist:.2f}")
-    print(f"VAT Distance={vat_dist_len:.2f}")
-    check_vat_dist = check_path_distance(distances, vat_path)
-    print(f"VAT checked Distance={check_vat_dist/approx_optimal_dist:.0%}")
-    print(f"ACO Distance={optimal_tour_length/approx_optimal_dist:.0%}")
-    print("ACO order: ", optimal_city_order[0:20])
+    optimal_city_order, optimal_tour_length, tour_lengths = (
+        aco_tsp_solve(distances,n_ants=N_ANTS, n_iter=N_GENERATIONS)
+    )
+    t4 = time.time()
+
+    df_rows.append(
+        {"Method": "HS-ACO", "Time": t3 - t2 + vat_time, "Distance": hs_optimal_tour_length,
+         "%Change": hs_optimal_tour_length / approx_optimal_dist * 100.0}
+    )
+
+    df_rows.append(
+        {"Method": "ACO", "Time": t4 - t3, "Distance": optimal_tour_length,
+         "%Change": optimal_tour_length / approx_optimal_dist * 100.0}
+    )
+
     print("VAT order: ", vat_path[0:20])
+    print("HS-ACO order: ", hs_optimal_city_order[0:20])
+    print("ACO order: ", optimal_city_order[0:20])
+    print("Report")
+    df = pd.DataFrame(df_rows, columns=["Method", "Time", "Distance", "%Change"])
+    print(df)
 
     # plot_convergence(tour_lengths)
-    plot_results(all_cities, distances, vat_dist, vat_path, optimal_city_order)
+    plot_results(all_cities, distances, vat_dist, vat_path, optimal_city_order, hs_optimal_city_order)
 
 
-def plot_results(all_cities, distances, vat_dist, vat_path, aco_path):
+def plot_results(all_cities: np.ndarray, distances: np.ndarray, vat_dist: np.ndarray, vat_path, aco_path, hs_aco_path):
     # Assuming these variables are defined earlier in your code:
     # distances, ivat_dist, all_cities, ivat_path, aco_path
 
     # Create a subplot with 2x2 grid
     fig = make_subplots(rows=2, cols=2,
-                        subplot_titles=["Cities with Paths", "Random Distances", "VAT Distances"])
+                        subplot_titles=["Cities with Paths", "Random Distances", "VAT Distances","ACO-VAT Distances"])
 
     # Add cities scatter plot (first subplot)
     fig.add_trace(
@@ -148,6 +162,14 @@ def plot_results(all_cities, distances, vat_dist, vat_path, aco_path):
     fig.add_trace(
         go.Scatter(x=aco_path_coords[:, 0], y=aco_path_coords[:, 1],
                    mode='lines', name='ACO Path', line=dict(color='red')),
+        row=1, col=1
+    )
+
+    # Add HS-ACO path
+    aco_path_coords = np.array([all_cities[i] for i in hs_aco_path])
+    fig.add_trace(
+        go.Scatter(x=aco_path_coords[:, 0], y=aco_path_coords[:, 1],
+                   mode='lines', name='HS-ACO Path', line=dict(color='purple')),
         row=1, col=1
     )
 
@@ -175,6 +197,18 @@ def plot_results(all_cities, distances, vat_dist, vat_path, aco_path):
             showscale=True,
         ),
         row=2, col=1
+    )
+
+    fig.add_trace(
+        go.Heatmap(
+            z=distances[:,aco_path],
+            colorscale='Viridis',
+            # Performance optimization settings
+            zsmooth='fast',
+            hoverongaps=False,
+            showscale=True,
+        ),
+        row=2, col=2
     )
 
     # Update layout
