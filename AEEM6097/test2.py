@@ -46,7 +46,7 @@ def aco_tsp_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
     network_routes = network_routes.copy()
     network_routes[network_routes == 0] = -1
     # Define the pheromone decay rate
-    rho = 0.1
+    rho = 0.5
     # Define the pheromone influence
     alpha = 1
     beta = 1
@@ -64,7 +64,7 @@ def aco_tsp_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
         optimal_tour_length = hot_start_length
         optimal_city_order = hot_start
         for i in range(len(hot_start) - 1):
-            tau[hot_start[i], hot_start[i + 1]] += 4 #*Q / hot_start_length
+            tau[hot_start[i], hot_start[i + 1]] += 10*Q / hot_start_length
 
     with Parallel(n_jobs=joblib.cpu_count()//2) as parallel:
         for generation in tqdm.trange(n_iter, desc="ACO Generation"):
@@ -84,8 +84,6 @@ def aco_tsp_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
             for ant in range(n_ants):
                 tour_length = all_results[ant][1]
                 city_order = all_results[ant][0]
-                # tour_length = all_tour_length[ant]
-                # city_order = all_city_order[ant]
                 # If a dead-end, skip!
                 if tour_length == np.inf:
                     continue
@@ -199,7 +197,8 @@ def run_ant(network_routes, eta, tau_xy, alpha, beta, back_to_start: bool):
 
 
 def pheromone_update(tau_xy, delta_tau_xy, rho):
-    return (1 - rho) * tau_xy + delta_tau_xy
+    new_tau_xy =  (1 - rho) * tau_xy + delta_tau_xy
+    return new_tau_xy / new_tau_xy.max()
 
 
 def generated_solutions():
