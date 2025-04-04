@@ -146,6 +146,7 @@ def compute_ivat_ordered_dissimilarity_matrix(x: np.ndarray):
 
 
 def exchange(j, r, re_ordered_observation_path):
-    rt = re_ordered_observation_path[r]
+    op_r = re_ordered_observation_path[r]
     re_ordered_observation_path[r] = re_ordered_observation_path[j]
-    re_ordered_observation_path[j] = rt
+    re_ordered_observation_path[j] = op_r
+    return re_ordered_observation_path

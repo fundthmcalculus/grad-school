@@ -5,14 +5,17 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from sklearn.metrics import pairwise_distances
 
-from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix
-from AEEM6097.test2 import aco_tsp_solve, plot_convergence
+from AEEM6097.mod_vat import compute_ordered_dissimilarity_matrix
+from AEEM6097.test2 import aco_tsp_solve
 
-N_CITIES_CLUSTER = 32
+N_CITIES_CLUSTER = 16
 N_CLUSTERS = N_CITIES_CLUSTER
 
+N_ANTS = 10
+N_GENERATIONS = 20
+
 CLUSTER_DIAMETER = 3
-CLUSTER_SPACING = 8*CLUSTER_DIAMETER
+CLUSTER_SPACING = 10*CLUSTER_DIAMETER
 
 
 def random_cities(center_x, center_y) -> np.ndarray:
@@ -35,9 +38,24 @@ def circle_random_clusters() -> np.ndarray:
     return city_locations
 
 
-def get_permutation(arr1: np.ndarray, arr2: np.ndarray) -> list[int]:
-    # Find on the off-diagonals the correct row exchanges.
-    return []
+def sort_to_principal_diagonals(x: np.ndarray) -> np.ndarray:
+    # Sort the given symmetric, positive-definite array to minimize
+    # the values on the principal diagonals. Permute rows and columns accordingly
+    # TODO - Convert this bubble-sort to merge-sort!
+    for irow in range(1,x.shape[0]):
+        for jrow in range(irow):
+            # Check which row gives a closer to optimal layout
+            if x[irow,irow] - x[irow,jrow] > 0.001:
+                # Swap these rows, and columns.
+                s = x[irow, :]
+                x[irow,:] =x[jrow, :]
+                x[jrow,:] = s
+                # Swap columns
+                t = x[:, irow]
+                x[:, irow] = x[:, jrow]
+                x[:, jrow] = t
+    # TODO - Don't in-place mod?
+    return x
 
 
 def poly_perimeter(n_sides, r):
@@ -72,58 +90,48 @@ def main():
     print("Distance-shape",distances.shape)
     # Use the IVAT technique to organize
     t0 = time.time()
-    ivat_dist, ivat_path, vat_dist, vat_path = compute_ivat_ordered_dissimilarity_matrix(all_cities)
+    vat_dist, vat_path = compute_ordered_dissimilarity_matrix(all_cities)
     t1 = time.time()
     vat_path = start_at_idx(vat_path)
-    ivat_path = start_at_idx(ivat_path)
-    # print("Min, Max Distances", np.min(distances), np.max(distances))
-    # print("Min, Max IVAT Distances", np.min(ivat_dist), np.max(ivat_dist))
-    # print("Min, Max VAT Distances", np.min(vat_dist), np.max(vat_dist))
-    print("Approx Optimum Distance=", N_CLUSTERS*poly_perimeter(N_CITIES_CLUSTER, r=CLUSTER_DIAMETER/2.0)+poly_perimeter(N_CITIES_CLUSTER, r=CLUSTER_SPACING))
-    print("Random Distance=", distances[0, :].sum())
+    print("Min, Max Distances", np.min(distances), np.max(distances))
+    print("Min, Max VAT Distances", np.min(vat_dist), np.max(vat_dist))
+    approx_optimal_dist = N_CLUSTERS * poly_perimeter(N_CITIES_CLUSTER, r=CLUSTER_DIAMETER / 2.0) + poly_perimeter(
+        N_CITIES_CLUSTER, r=CLUSTER_SPACING)
+    print(f"VAT Time: {t1 - t0:.2f}s")
     vat_dist_len = vat_dist.diagonal(offset=1).sum() + vat_dist[0, -1]
-    print("VAT Distance=", vat_dist_len)
-    print("VAT checked Distance=", check_path_distance(distances, vat_path))
-    # ivat_dist_len = ivat_dist.diagonal(offset=1).sum() + ivat_dist[0, -1]
-    # print("IVAT Distance=", ivat_dist_len)
-    # print("IVAT checked Distance=", check_path_distance(distances, ivat_path))
-    print(f"IVAT Time: {t1 - t0:.2f}s")
-    # TODO - Compute TSP optimized distance, ignoring to-start route.
+    # Compute TSP optimized distance
     t2 = time.time()
     optimal_city_order, optimal_tour_length, tour_lengths = (
-        aco_tsp_solve(distances,2*N_CITIES_CLUSTER,2*N_CITIES_CLUSTER, hot_start=vat_path,
-                      hot_start_length=vat_dist_len,)
+        aco_tsp_solve(distances,n_ants=N_ANTS, n_iter=N_GENERATIONS, hot_start=vat_path,
+                      hot_start_length=vat_dist_len,back_to_start=True)
     )
     t3 = time.time()
     print(f"ACO Time:{t3 - t2:.2f}s")
-    print("ACO Distance=", optimal_tour_length)
+    print(f"Approx Optimum Distance={approx_optimal_dist:.2f}")
+    rand_dist = distances[0, :].sum()
+    print(f"Random Distance={rand_dist:.2f}")
+    print(f"VAT Distance={vat_dist_len:.2f}")
+    check_vat_dist = check_path_distance(distances, vat_path)
+    print(f"VAT checked Distance={check_vat_dist/approx_optimal_dist:.0%}")
+    print(f"ACO Distance={optimal_tour_length/approx_optimal_dist:.0%}")
     print("ACO order: ", optimal_city_order[0:20])
     print("VAT order: ", vat_path[0:20])
-    print("IVAT order: ", ivat_path[0:20])
 
-    plot_convergence(tour_lengths)
-    plot_results(all_cities, distances, ivat_dist,ivat_path, vat_dist, vat_path, optimal_city_order)
+    # plot_convergence(tour_lengths)
+    plot_results(all_cities, distances, vat_dist, vat_path, optimal_city_order)
 
 
-def plot_results(all_cities, distances, ivat_dist, ivat_path, vat_dist, vat_path, aco_path):
+def plot_results(all_cities, distances, vat_dist, vat_path, aco_path):
     # Assuming these variables are defined earlier in your code:
     # distances, ivat_dist, all_cities, ivat_path, aco_path
 
     # Create a subplot with 2x2 grid
     fig = make_subplots(rows=2, cols=2,
-                        subplot_titles=["Cities with Paths", "Random Distances", "VAT Distances", "IVAT Distances"])
+                        subplot_titles=["Cities with Paths", "Random Distances", "VAT Distances"])
 
     # Add cities scatter plot (first subplot)
     fig.add_trace(
         go.Scatter(x=all_cities[:, 0], y=all_cities[:, 1], mode='markers', name='Cities'),
-        row=1, col=1
-    )
-
-    # Add IVAT path
-    ivat_path_coords = np.array([all_cities[i] for i in ivat_path])
-    fig.add_trace(
-        go.Scatter(x=ivat_path_coords[:, 0], y=ivat_path_coords[:, 1],
-                   mode='lines', name='IVAT Path', line=dict(color='blue')),
         row=1, col=1
     )
 
@@ -167,18 +175,6 @@ def plot_results(all_cities, distances, ivat_dist, ivat_path, vat_dist, vat_path
             showscale=True,
         ),
         row=2, col=1
-    )
-
-    fig.add_trace(
-        go.Heatmap(
-            z=ivat_dist,
-            colorscale='Viridis',
-            # Performance optimization settings
-            zsmooth='fast',
-            hoverongaps=False,
-            showscale=True,
-        ),
-        row=2, col=2
     )
 
     # Update layout
