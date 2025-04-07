@@ -144,6 +144,9 @@ def solve_aco(
     learning_rate: float = 0.7,
     num_ants: int = -1,
     q: float = 1.0,
+    joblib_prefer: str = "processes",
+    joblib_n_procs: int = -1,
+    step_explore: bool = False
 ) -> tuple[np.array, np.array]:
     if solution_archive_size < 0:
         solution_archive_size = len(variables) * 2
@@ -182,19 +185,21 @@ def solve_aco(
     # Add the progress bar
     generation_pbar = tqdm.trange(num_generations, desc=f"ACO Solver generation")
     n_jobs = min(8, joblib.cpu_count() - 1)
+    if joblib_n_procs > 0:
+        n_jobs = joblib_n_procs
     ants_per_job = max(1, num_ants // n_jobs)
-    parallel = joblib.Parallel(n_jobs=n_jobs, prefer="processes")
+    parallel = joblib.Parallel(n_jobs=n_jobs, prefer=joblib_prefer)
     for generation in generation_pbar:
         job_output = parallel(
             joblib.delayed(run_ants)(
                 ants_per_job,
                 cp_j,
                 fcn,
-                generation,
                 learning_rate,
                 rng,
                 solution_archive,
                 variables,
+                step_explore
             )
             for job in range(n_jobs)
         )
@@ -251,7 +256,6 @@ def run_ants(
     n_ants,
     cp_j,
     fcn,
-    generation,
     learning_rate,
     rng,
     solution_archive,
@@ -284,9 +288,8 @@ def run_ants(
         # Step around and find something better?
         if step_explore:
             x0 = new_solution[cv_selector]
-            new_grad_soln = new_solution.copy()
-
             def cv_only_fcn(x):
+                new_grad_soln = new_solution.copy()
                 new_grad_soln[cv_selector] = x
                 return fcn(new_grad_soln)
 
