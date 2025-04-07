@@ -164,9 +164,6 @@ def pheromone_update(tau_xy, delta_tau_xy, rho):
     return (1 - rho) * tau_xy + delta_tau_xy
 
 
-def generated_solutions():
-    pass
-
 def p_xy(eta_xy, tau_xy, allowed_y, alpha, beta, x):
     p = (tau_xy[x,:] ** alpha) * eta_xy[x,:] ** beta
     # Remove negative probabilities, those are not allowed
