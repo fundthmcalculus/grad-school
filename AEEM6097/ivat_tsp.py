@@ -7,7 +7,7 @@ from plotly.subplots import make_subplots
 from sklearn.metrics import pairwise_distances
 
 from AEEM6097.mod_vat import compute_ordered_dissimilarity_matrix
-from AEEM6097.test2 import aco_tsp_solve
+from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
 N_CITIES_CLUSTER = 8
 N_CLUSTERS = N_CITIES_CLUSTER
@@ -52,19 +52,6 @@ def start_at_idx(v, x=0):
     # Find index of 0, move to front
     x_idx=np.argwhere(v==x)[0][0]
     return np.concatenate((v[x_idx:], v[:x_idx]), axis=0)
-
-
-def check_path_distance(distances, order_path, return_to_start=False):
-    total_dist = 0.0
-    for ij in range(len(order_path)):
-        p0 = order_path[ij]
-        if ij == len(order_path) - 1:
-            if return_to_start:
-                total_dist += distances[p0,0]
-        else:
-            p1 = order_path[ij+1]
-            total_dist += distances[p0,p1]
-    return total_dist
 
 
 def main():
@@ -136,9 +123,6 @@ def main():
 
 
 def plot_results(all_cities: np.ndarray, distances: np.ndarray, vat_dist: np.ndarray, vat_path, aco_path, hs_aco_path):
-    # Assuming these variables are defined earlier in your code:
-    # distances, ivat_dist, all_cities, ivat_path, aco_path
-
     # Create a subplot with 2x2 grid
     fig = make_subplots(rows=2, cols=2,
                         subplot_titles=["Cities with Paths", "Random Distances", "VAT Distances","ACO-VAT Distances"])
