@@ -104,6 +104,13 @@ def aco_tsp_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
             tau = pheromone_update(tau, delta_tau, rho)
     return optimal_city_order, optimal_tour_length, tour_lengths
 
+    # Use recursion to find the optimal solution exhaustively, to prove that my ACO solution finds the best on the first try. 8-)
+    results: list[tuple[list,int]] = list(recursive_find_best_soln(network_routes))
+    # Sort by length
+    results.sort(key=lambda x: -x[1])
+    print("Number of solutions found:", len(results))
+    print("Solutions in order: ", results)
+    # print(f"Recursive best path: {np.array(recur_best_path)+1}. Tour length={recur_best_len}")
 
 def plot_convergence(tour_lengths):
     # Create the figure
