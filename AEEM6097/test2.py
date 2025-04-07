@@ -170,7 +170,7 @@ def run_ant(network_routes, eta, tau_xy, alpha, beta, back_to_start: bool):
     idx = 0
     total_length = 0
     allowed_cities = np.ones(eta_shape_, dtype=bool)
-    choice_indexes = np.arange(eta_shape_) # TODO - Cache!
+    choice_indexes = np.arange(eta_shape_)
     while np.any(allowed_cities):
         # Mark off the current city
         allowed_cities[cur_city] = False
@@ -193,16 +193,40 @@ def run_ant(network_routes, eta, tau_xy, alpha, beta, back_to_start: bool):
         total_length += network_routes[city_order[idx], cur_city]
         idx += 1
 
+    # Randomly permute 2 entries that aren't the first, and see if that's shorter
+    r0 = np.random.randint(low=1,high=eta_shape_)
+    r1 = np.random.randint(low=1,high=eta_shape_)
+    c0 = city_order[r0]
+    c1 = city_order[r1]
+    city_order[r0] = c1
+    city_order[r1] = c0
+    permute_distance = check_path_distance(network_routes, city_order)
+    if permute_distance < total_length:
+        total_length = permute_distance
+    else:
+        city_order[r0] = c0
+        city_order[r1] = c1
+
     return city_order, total_length
+
+
+def check_path_distance(distances, order_path, return_to_start=False):
+    total_dist = 0.0
+    for ij in range(len(order_path)):
+        p0 = order_path[ij]
+        if ij == len(order_path) - 1:
+            if return_to_start:
+                total_dist += distances[p0,0]
+        else:
+            p1 = order_path[ij+1]
+            total_dist += distances[p0,p1]
+    return total_dist
 
 
 def pheromone_update(tau_xy, delta_tau_xy, rho):
     new_tau_xy =  (1 - rho) * tau_xy + delta_tau_xy
     return new_tau_xy / new_tau_xy.max()
 
-
-def generated_solutions():
-    pass
 
 def p_xy(eta_xy, tau_xy, allowed_y, alpha, beta, x):
     p = (tau_xy[x,:] ** alpha) * eta_xy[x,:] ** beta
