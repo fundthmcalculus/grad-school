@@ -1,10 +1,12 @@
 import numpy as np
+from numba import njit
 from sklearn.metrics import pairwise_distances
 
 
-def compute_ordered_dis_njit(matrix_of_pairwise_distance: np.ndarray):  # pragma: no cover
+# @njit(cache=True)
+def compute_ordered_dis_njit2(matrix_of_pairwise_distance: np.ndarray):  # pragma: no cover
     """
-    The ordered dissimilarity matrix is used by visual assessment of tendency. It is a just a a reordering
+    The ordered dissimilarity matrix is used by visual assessment of tendency. It is a just a reordering
     of the dissimilarity matrix.
 
 
@@ -47,9 +49,7 @@ def compute_ordered_dis_njit(matrix_of_pairwise_distance: np.ndarray):  # pragma
     J = np.delete(K, column_index_of_maximum_value)
 
     for r in range(1, distance_shape_):
-
         p, q = (-1, -1)
-
         mini = np.max(matrix_of_pairwise_distance)
 
         for candidate_p in observation_path[0:r]:
@@ -66,10 +66,10 @@ def compute_ordered_dis_njit(matrix_of_pairwise_distance: np.ndarray):  # pragma
 
     # Step 3
 
-    ordered_matrix = np.zeros(matrix_of_pairwise_distance.shape)
+    ordered_matrix = matrix_of_pairwise_distance.copy()
 
-    for column_index_of_maximum_value in range(ordered_matrix.shape[0]):
-        for j in range(ordered_matrix.shape[0]):
+    for column_index_of_maximum_value in range(distance_shape_):
+        for j in range(distance_shape_):
             ordered_matrix[
                 column_index_of_maximum_value, j
             ] = matrix_of_pairwise_distance[
@@ -81,13 +81,51 @@ def compute_ordered_dis_njit(matrix_of_pairwise_distance: np.ndarray):  # pragma
     return ordered_matrix, observation_path
 
 
-def compute_ordered_dissimilarity_matrix(x: np.ndarray) -> tuple[np.ndarray, list]:
+def compute_merge_sort_dissimilarity_matrix(x: np.ndarray) -> tuple[np.ndarray, list]:
+    # Copy the input matrix
+    n = x.shape[0]
+    A = x
+    B = x.copy()
+    top_down_split_merge(A,0, n, B)
+    return A
+
+def top_down_split_merge(B, begin, end, A):
+    if end - begin <= 1:
+        return B[begin:end]
+    mid = (end + begin) // 2
+    top_down_split_merge(A, begin, mid, B)
+    top_down_split_merge(A, mid, end, B)
+    top_down_merge(B, begin, mid, end, A)
+
+def top_down_merge(B, begin, mid, end, A) -> np.ndarray:
+    s = A.shape[0]-1
+    i = begin
+    j = mid
+    for k in range(begin, end):
+        # If left run head exists and is <= right run head
+        if i < mid and (j >= end or A[i,i] < A[j,j]):
+            B[k,:] = A[i,:]
+            B[:,k] = A[:,i]
+            i += 1
+        # Check the first off-diagonal element TODO - Handle out of bounds.
+        elif i < mid and j < end and A[i,i] == A[j,j] and A[i,min(i+1,s)] < A[j,min(s,j+1)]:
+            B[k,:] = A[i,:]
+            B[:,k] = A[:,i]
+            i += 1
+        else:
+            # If right run head exists
+            B[k,:] = A[j,:]
+            B[:,k] = A[:,j]
+            j += 1
+
+
+def compute_ordered_dissimilarity_matrix2(x: np.ndarray) -> tuple[np.ndarray, list]:
     matrix_of_pairwise_distance = pairwise_distances(x)
-    dis_matrix, observation_path = compute_ordered_dis_njit(matrix_of_pairwise_distance)
+    dis_matrix, observation_path = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
     return dis_matrix, observation_path
 
 
-def compute_ivat_ordered_dissimilarity_matrix(x: np.ndarray):
+def compute_ivat_ordered_dissimilarity_matrix2(x: np.ndarray):
     """The ordered dissimilarity matrix is used by ivat. It is a just a reordering of the dissimilarity matrix.
 
 
@@ -104,10 +142,10 @@ def compute_ivat_ordered_dissimilarity_matrix(x: np.ndarray):
         the ordered dissimilarity matrix
 
     """
-    ordered_matrix, observation_path = compute_ordered_dissimilarity_matrix(x)
+    ordered_matrix, observation_path = compute_ordered_dissimilarity_matrix2(x)
     re_ordered_observation_path = observation_path.copy()
     n_features = ordered_matrix.shape[0]
-    re_ordered_matrix = np.zeros((n_features, n_features))
+    re_ordered_matrix = ordered_matrix.copy()
 
     for r in range(1, n_features):
         # Step 1 : find j for which D[r,j] is minimum and j ipn [1:r-1]
