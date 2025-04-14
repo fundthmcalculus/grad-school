@@ -6,3 +6,6 @@ plotly
 scipy
 tqdm
 joblib
+pandas
+scikit-learn
+pyclustertend
