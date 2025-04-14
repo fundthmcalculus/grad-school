@@ -1,16 +1,16 @@
 import typing
 
 import numpy as np
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+from matplotlib import pyplot as plt
 from sklearn.metrics import pairwise_distances
+from matplotlib.gridspec import GridSpec
 from tqdm import tqdm
 
 from AEEM6097.ivat_tsp import circle_random_clusters
 
-N_SOLUTION_DECK = 24
+N_SOLUTION_DECK = 1
 # N_NEW_SOLNS = N_SOLUTION_DECK // 3
-N_GENERATIONS = 4*N_SOLUTION_DECK
+N_GENERATIONS = 10000
 
 def ga_solve_permutation(f: typing.Callable[[np.ndarray], np.float64],
                          x0: np.ndarray) -> tuple[np.float64, np.ndarray, list[np.float64]]:
@@ -38,82 +38,80 @@ def ga_solve_permutation(f: typing.Callable[[np.ndarray], np.float64],
         pick_idx = np.random.choice(choice_idx,p=soln_weights)
         pick_soln = soln_deck[pick_idx,:]
         # Permute the relevant number of variables - TODO exponential decay?
-        for exchange in range(max(1, (N_GENERATIONS - i_generation)//3)):
-            r0 = np.random.randint(low=1,high=len(pick_soln))
-            r1 = np.random.randint(low=1,high=len(pick_soln))
-            p0 = pick_soln[r0]
-            p1 = pick_soln[r1]
-            pick_soln[r0] = p1
-            pick_soln[r1] = p0
+        r0 = np.random.randint(low=1,high=len(pick_soln))
+        r1 = np.random.randint(low=1,high=len(pick_soln))
+        p0 = pick_soln[r0]
+        p1 = pick_soln[r1]
+        pick_soln[r0] = p1
+        pick_soln[r1] = p0
         # Check performance.
-        pick_soln[0] = f(pick_soln[1:])
+        p_new = f(pick_soln[1:])
+        if p_new < pick_soln[0]:
+            pick_soln[0] = p_new
+        else:
+            # If the new solution is worse, then don't change it.
+            pick_soln[r0] = p0
+            pick_soln[r1] = p1
         # Append to the end of the array, sort and chop
         soln_deck = np.vstack([soln_deck,pick_soln])
     return soln_deck[0,0], soln_deck[0,1:], best_soln
 
 
-def plot_ga_results(distances: np.ndarray, rand_order: np.ndarray, optimal_order: np.ndarray, soln_history):
-    rand_order = np.int32(rand_order)
+def plot_ga_results(distances: np.ndarray, permuted_distances: np.ndarray, optimal_order: np.ndarray, soln_history):
     optimal_order = np.int32(optimal_order)
-    # Create a subplot with 2x2 grid
-    fig = make_subplots(rows=2, cols=2,
-                        subplot_titles=["Solution History", "", "Random Distances","GA Distances"])
 
-    # Add cities scatter plot (first subplot)
-    fig.add_trace(
-        go.Scatter(x=np.r_[0:len(soln_history)], y=soln_history, mode='lines', name='Performance'),
-        row=1, col=1
+    # Create figure with customized layout
+    fig = plt.figure(figsize=(10, 8))
+    gs = GridSpec(2, 2, figure=fig)
+
+    # Solution History plot (top left)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax1.plot(np.arange(len(soln_history)), soln_history, '-', label='Performance')
+    ax1.set_title('Solution History')
+    ax1.set_xlabel('Iteration')
+    ax1.set_ylabel('Distance')
+    ax1.legend()
+
+    # True optimal order
+    ax2 = fig.add_subplot(gs[0, 1])
+    random_heatmap = ax2.imshow(
+        distances,
+        cmap='viridis',
+        aspect='auto',
+        interpolation='nearest'
     )
+    ax2.set_title('Ideal Distances')
+    plt.colorbar(random_heatmap, ax=ax2)
 
-    # Add Random Distances heatmap (second subplot)
-    # For large distance matrices, use go.Heatmap with improved performance settings
-    fig.add_trace(
-        go.Heatmap(
-            z=distances[:,rand_order][rand_order,:],
-            colorscale='Viridis',
-            # Performance optimization settings
-            zsmooth='fast',  # 'fast' is another option
-            hoverongaps=False,
-            showscale=True,
-        ),
-        row=2, col=1
+    # Random Distances heatmap (bottom left)
+    ax3 = fig.add_subplot(gs[1, 0])
+    random_heatmap = ax3.imshow(
+        permuted_distances,
+        cmap='viridis',
+        aspect='auto',
+        interpolation='nearest'
     )
+    ax3.set_title('Random Distances')
+    plt.colorbar(random_heatmap, ax=ax3)
 
-    fig.add_trace(
-        go.Heatmap(
-            z=distances[:,optimal_order][optimal_order,:],
-            colorscale='Viridis',
-            # Performance optimization settings
-            zsmooth='fast',
-            hoverongaps=False,
-            showscale=True,
-        ),
-        row=2, col=2
+    # GA Distances heatmap (bottom right)
+    ax4 = fig.add_subplot(gs[1, 1])
+    optimal_heatmap = ax4.imshow(
+        permuted_distances[:, optimal_order][optimal_order, :],
+        cmap='viridis',
+        aspect='auto',
+        interpolation='nearest'
     )
+    ax4.set_title('GA Distances')
+    plt.colorbar(optimal_heatmap, ax=ax4)
 
-    # Update layout
-    fig.update_layout(
-        title_text="Simulated Annealing Ordering",
-        height=600,
-        width=600,
-        showlegend=True,
-        uirevision='constant',
-        hovermode='closest',
-        # Legend configuration
-        legend=dict(
-            orientation="h",  # Horizontal legend
-            yanchor="bottom",
-            y=1.05,  # Position above the plots
-            xanchor="center",
-            x=0.5,  # Center it horizontally
-            bgcolor="rgba(255, 255, 255, 0.8)",  # Semi-transparent background
-            bordercolor="Black",
-            borderwidth=1
-        )
-    )
+    # Update overall layout
+    plt.suptitle("TSP approximation of VAT", fontsize=16)
+    plt.tight_layout()
 
-    # Show the combined figure
     fig.show()
+
+    return fig
 
 
 def main():
@@ -131,11 +129,16 @@ def main():
 
     def f(x0: np.ndarray) -> np.float64:
         x0 = np.int32(x0)
-        return permuted_distances[x0, :][:, x0].diagonal(offset=1).sum()
+        permuted_distances_x_x_ = permuted_distances[x0, :][:, x0]
+        diag_sum = 0.0
+        for ij in range(int(np.sqrt(permuted_distances_x_x_.shape[0]//2))):
+            diag_sum += permuted_distances_x_x_.diagonal(offset=ij).sum()
+        return diag_sum
 
     ga_dist, ga_order, best_distances = ga_solve_permutation(f, cols)
+    ga_order = np.int32(ga_order)
     print(f"Random distance={permuted_distances.diagonal(offset=1).sum():.2f}, "
-          f"GA dist={ga_dist:.2f}")
+          f"GA dist={permuted_distances[ga_order,:][:,ga_order].diagonal(offset=1).sum():.2f}")
     plot_ga_results(distances, permuted_distances, ga_order, best_distances)
 
 if __name__ == "__main__":

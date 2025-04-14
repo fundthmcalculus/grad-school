@@ -2,14 +2,11 @@ import time
 
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from pyclustertend import compute_ivat_ordered_dissimilarity_matrix
+from matplotlib import pyplot as plt
 from pyclustertend.visual_assessment_of_tendency import compute_ordered_dis_njit
 from sklearn.metrics import pairwise_distances
 
-from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_ordered_dis_njit2, \
-    compute_merge_sort_dissimilarity_matrix
+from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_merge_sort_dissimilarity_matrix
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
 N_CITIES_CLUSTER = 16
@@ -71,7 +68,7 @@ def main():
     # Create the report dataframe
     df_rows = []
     approx_optimal_dist = N_CLUSTERS * poly_perimeter(N_CITIES_CLUSTER, r=CLUSTER_DIAMETER / 2.0) + poly_perimeter(
-        N_CITIES_CLUSTER, r=CLUSTER_SPACING)
+        N_CITIES_CLUSTER, r=CLUSTER_SPACING) - N_CLUSTERS*CLUSTER_DIAMETER
     if HALF_CIRCLE:
         approx_optimal_dist /= 2.0
     rand_dist = check_path_distance(distances, np.random.permutation(np.arange(N_CLUSTERS*N_CITIES_CLUSTER)))
@@ -140,101 +137,53 @@ def plot_results(all_cities: np.ndarray, distances: np.ndarray,
                  vat_dist: np.ndarray, vat_path,
                  ivat_dist: np.ndarray, ivat_path,
                  aco_path, hs_aco_path):
-    # Create a subplot with 2x2 grid
-    fig = make_subplots(rows=2, cols=2,
-                        subplot_titles=["Cities with Paths", "Ordered Distances", "VAT Distances", "IVAT Distances"])
+    # Create a figure with 2x2 subplots
+    fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
-    # Add cities scatter plot (first subplot)
-    fig.add_trace(
-        go.Scatter(x=all_cities[:, 0], y=all_cities[:, 1], mode='markers', name='Cities'),
-        row=1, col=1
-    )
+    # Add titles to subplots
+    subplot_titles = ["Cities with Paths", "Ordered Distances", "VAT Distances", "IVAT Distances"]
+    for i, ax in enumerate(axs.flat):
+        ax.set_title(subplot_titles[i])
+
+    # Plot cities scatter plot (first subplot)
+    axs[0, 0].scatter(all_cities[:, 0], all_cities[:, 1], marker='o', label='Cities')
 
     # Add VAT path
     vat_path_coords = np.array([all_cities[i] for i in vat_path])
-    fig.add_trace(
-        go.Scatter(x=vat_path_coords[:, 0], y=vat_path_coords[:, 1],
-                   mode='lines', name='VAT Path', line=dict(color='green')),
-        row=1, col=1
-    )
+    axs[0, 0].plot(vat_path_coords[:, 0], vat_path_coords[:, 1], 'g-', label='VAT Path')
 
     # Add ACO path
     aco_path_coords = np.array([all_cities[i] for i in aco_path])
-    fig.add_trace(
-        go.Scatter(x=aco_path_coords[:, 0], y=aco_path_coords[:, 1],
-                   mode='lines', name='ACO Path', line=dict(color='red')),
-        row=1, col=1
-    )
+    axs[0, 0].plot(aco_path_coords[:, 0], aco_path_coords[:, 1], 'r-', label='ACO Path')
 
-    # Add HS-ACO path
+    # Add IVAT path
     ivat_path_coords = np.array([all_cities[i] for i in ivat_path])
-    fig.add_trace(
-        go.Scatter(x=ivat_path_coords[:, 0], y=ivat_path_coords[:, 1],
-                   mode='lines', name='IVAT Path', line=dict(color='purple')),
-        row=1, col=1
-    )
+    axs[0, 0].plot(ivat_path_coords[:, 0], ivat_path_coords[:, 1], 'purple', label='IVAT Path')
 
     # Add Random Distances heatmap (second subplot)
-    # For large distance matrices, use go.Heatmap with improved performance settings
-    fig.add_trace(
-        go.Heatmap(
-            z=distances,
-            colorscale='Viridis',
-            # Performance optimization settings
-            zsmooth='fast',  # 'fast' is another option
-            hoverongaps=False,
-            showscale=True,
-        ),
-        row=1, col=2
-    )
+    im1 = axs[0, 1].imshow(distances, cmap='viridis', aspect='auto')
+    fig.colorbar(im1, ax=axs[0, 1], shrink=0.8)
 
-    fig.add_trace(
-        go.Heatmap(
-            z=vat_dist,
-            colorscale='Viridis',
-            # Performance optimization settings
-            zsmooth='fast',
-            hoverongaps=False,
-            showscale=True,
-        ),
-        row=2, col=1
-    )
+    # Add VAT distances heatmap (third subplot)
+    im2 = axs[1, 0].imshow(vat_dist, cmap='viridis', aspect='auto')
+    fig.colorbar(im2, ax=axs[1, 0], shrink=0.8)
 
-    fig.add_trace(
-        go.Heatmap(
-            z=ivat_dist,
-            colorscale='Viridis',
-            # Performance optimization settings
-            zsmooth='fast',
-            hoverongaps=False,
-            showscale=True,
-        ),
-        row=2, col=2
-    )
+    # Add IVAT distances heatmap (fourth subplot)
+    im3 = axs[1, 1].imshow(ivat_dist, cmap='viridis', aspect='auto')
+    fig.colorbar(im3, ax=axs[1, 1], shrink=0.8)
 
-    # Update layout
-    fig.update_layout(
-        title_text="City Paths and Distance Matrices",
-        height=600,
-        width=600,
-        showlegend=True,
-        uirevision='constant',
-        hovermode='closest',
-        # Legend configuration
-        legend=dict(
-            orientation="h",  # Horizontal legend
-            yanchor="bottom",
-            y=1.05,  # Position above the plots
-            xanchor="center",
-            x=0.5,  # Center it horizontally
-            bgcolor="rgba(255, 255, 255, 0.8)",  # Semi-transparent background
-            bordercolor="Black",
-            borderwidth=1
-        )
-    )
+    # Add legend to the first subplot
+    axs[0, 0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+                     fancybox=True, shadow=True, ncol=4)
 
-    # Show the combined figure
-    fig.show()
+    # Set overall title
+    fig.suptitle("City Paths and Distance Matrices", fontsize=16)
+
+    # Adjust spacing between subplots
+    plt.tight_layout(rect=[0, 0, 1, 0.96])  # Make room for the overall title
+
+    # Show the plot
+    plt.show()
 
 
 def vat_scaling():
@@ -266,5 +215,5 @@ def vat_scaling():
 
 
 if __name__ == "__main__":
-    # main()
-    vat_scaling()
+    main()
+    # vat_scaling()
