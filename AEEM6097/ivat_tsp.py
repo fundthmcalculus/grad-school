@@ -9,8 +9,8 @@ from sklearn.metrics import pairwise_distances
 from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_merge_sort_dissimilarity_matrix
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
-N_CITIES_CLUSTER = 16
-N_CLUSTERS = N_CITIES_CLUSTER
+N_CITIES_CLUSTER = 32
+N_CLUSTERS = N_CITIES_CLUSTER//4
 
 N_ANTS = 3*N_CITIES_CLUSTER
 N_GENERATIONS = 3*N_CLUSTERS
