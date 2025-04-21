@@ -1,7 +1,7 @@
 import typing
 
+import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import pyplot as plt
 from sklearn.metrics import pairwise_distances
 from matplotlib.gridspec import GridSpec
 from tqdm import tqdm
