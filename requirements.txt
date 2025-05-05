@@ -9,3 +9,5 @@ joblib
 pandas
 scikit-learn
 pyclustertend
+fuzzy-c-means
+xlrd

@@ -1,170 +1,94 @@
+import matplotlib.pyplot as plt
 import numpy as np
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+from numpy.typing import NDArray
 
-from AEEM6097.aco_solver import solve_aco, AcoContinuousVariable, AcoDiscreteVariable
+from AEEM6097.aco_solver import AcoContinuousVariable, solve_gradiant
+
+# Some typing information shorthand!
+f64 = np.float64
+af64 = NDArray[f64]
 
 
 def plot_all_the_things(
-    x, y, Z_true, Z_approx: np.ndarray, x_mu: np.ndarray, y_mu: np.ndarray
+    x, y, z_true: af64, z_approx: af64, x_mu: af64, y_mu: af64
 ):
-    # Create a 2x2 subplot grid with 3D subplots in the top row
-    fig = make_subplots(
-        rows=2,
-        cols=2,
-        specs=[
-            [{"type": "xy"}, {"type": "xy"}],
-            [{"type": "surface"}, {"type": "surface"}],
-        ],
-        subplot_titles=(
-            "Membership Functions-X",
-            "Membership Functions-Y",
-            "True Function",
-            "Approximated Function",
-        ),
-    )
-
-    # Sample 2D functions - replace with your true and approximated functions
-    x_2d = x[0, :].flatten()
-    y_2d = y[:, 0].flatten()
-
-    # Add 2D line plots to the top row
-    for idx_mf in range(x_mu.shape[1]):
-        fig.add_trace(
-            go.Scatter(
-                x=x_2d,
-                y=x_mu[:, idx_mf],
-                mode="lines",
-                name=f"X Membership Function-{idx_mf}",
-            ),
-            row=1,
-            col=1,
-        )
-    for idx_mf in range(y_mu.shape[1]):
-        fig.add_trace(
-            go.Scatter(
-                x=y_2d,
-                y=y_mu[:, idx_mf],
-                mode="lines",
-                name=f"Y Membership Function-{idx_mf}",
-            ),
-            row=1,
-            col=2,
-        )
-
-    # Add 3D surface plots to the bottom row
-    fig.add_trace(
-        go.Surface(z=Z_true, x=x, y=y, colorscale="Viridis", showscale=False),
-        row=2,
-        col=1,
-    )
-
-    fig.add_trace(
-        go.Surface(z=Z_approx, x=x, y=y, colorscale="Viridis", showscale=False),
-        row=2,
-        col=2,
-    )
-
-    # Update layout
-    fig.update_layout(
-        title_text="Membership Functions and Function Approximation",
-        height=800,
-        width=1000,
-        scene=dict(
-            xaxis_title="X",
-            yaxis_title="Y",
-            zaxis_title="Membership Value",
-            camera=dict(
-                eye=dict(x=0, y=0, z=2.5),  # Top-down view (high z, x and y centered)
-                up=dict(x=0, y=1, z=0),
-            ),
-        ),
-        scene2=dict(
-            xaxis_title="X",
-            yaxis_title="Y",
-            zaxis_title="Membership Value",
-            camera=dict(
-                eye=dict(x=0, y=0, z=2.5),  # Top-down view (high z, x and y centered)
-                up=dict(x=0, y=1, z=0),
-            ),
-        ),
-    )
-
-    # Update 2D plot axes
-    fig.update_xaxes(title_text="X", row=2, col=1)
-    fig.update_yaxes(title_text="Y", row=2, col=1)
-    fig.update_xaxes(title_text="X", row=2, col=2)
-    fig.update_yaxes(title_text="Y", row=2, col=2)
-
-    # Show the plot
-    fig.show()
+    # Plot the membership functions
+    fig = plt.figure()
+    plt.subplot(2, 2, 1)
+    for ij in range(x_mu.shape[1]):
+        plt.plot(x[0,:],x_mu[:,ij], label=f'Mu-X-{ij}')
+    plt.title("Membership Functions-X")
+    plt.ylabel("mu")
+    plt.xlabel("x")
+    plt.subplot(2, 2, 2)
+    for ij in range(y_mu.shape[1]):
+        plt.plot(y[:,0],y_mu[:,ij], label=f'Mu-Y-{ij}')
+    plt.title("Membership Functions-Y")
+    plt.ylabel("mu")
+    plt.xlabel("y")
+    plt.subplot(2, 2, 3)
+    im_extents = (np.min(x), np.max(x), np.min(y), np.max(y))
+    plt.imshow(z_true, extent=im_extents)
+    plt.title("True Z")
+    plt.ylabel("y")
+    plt.xlabel("x")
+    plt.subplot(2, 2, 4)
+    plt.imshow(z_approx, extent=im_extents)
+    plt.title("Approx Z")
+    plt.ylabel("y")
+    plt.xlabel("x")
+    plt.tight_layout()
+    plt.show()
 
 
-def f_true(x, y: np.ndarray) -> np.ndarray:
+def f_true(x, y: af64) -> af64:
     return np.sin(x) * np.cos(y)
 
 
-def mu_poly(x: np.ndarray, a: float, b: float) -> np.ndarray:
+def mu_poly(x: af64, a: float, b: float) -> af64:
     return 1.0 / (1.0 + ((x - a) / b) ** 2)
 
 
-def mu_poly_set(x: np.ndarray, p: np.ndarray) -> np.ndarray:
-    p = np.sort(p)
-    mu_x = np.zeros((len(x), len(p)))
-    for i in range(len(p)):
-        if i < len(p) - 1:
-            mu_x[:, i] = mu_poly(x, p[i], np.diff(p[i : i + 2]) / 2.0)
-        else:
-            mu_x[:, i] = mu_poly(x, p[i], np.diff(p[i - 1 : i + 1]) / 2.0)
-    return mu_x
+def expsq(x: af64, a: f64, b: f64) -> af64:
+    """exponential quadratic membership function"""
+    return np.exp(-((x-a)/b)**2.0)
 
 
-def mu_tri(x: np.ndarray, a: float, b: float, c: float) -> np.ndarray:
-    if a == b:
-        return np.maximum(np.minimum(1.0, (c - x) / b), 0.0)
-    if b == c:
-        np.maximum(np.minimum((x - a) / b, 1.0), 0.0)
-    return np.maximum(np.minimum((x - a) / b, (c - x) / b), 0.0)
+def mu_poly_set(s: af64, mu_a: af64, mu_b: af64) -> af64:
+    mu_s = np.zeros((len(s), len(mu_a)))
+    for i in range(len(mu_a)):
+        mu_s[:, i] = mu_poly(s, mu_a[i], mu_b[i])
+    return mu_s
 
 
-def mu_tri_set(x: np.ndarray, p: np.ndarray) -> np.ndarray:
-    p = np.sort(p)
-    mu_x = np.zeros((len(x), len(p)))
-    for i in range(len(p)):
-        mu_x[:, i] = mu_tri(x, p[max(0, i - 1)], p[i], p[min(i + 1, len(p) - 1)])
-    return mu_x
-
-
-def tsk_rule(s: np.ndarray, coeff: np.ndarray) -> np.ndarray:
+def tsk_rule(s: af64, coeff: af64) -> af64:
     # Zeroth order TSK, or Mamdani
     if len(coeff) == 1:
         return coeff[0]
     first_order_size = s.shape[1] + 1
     if len(coeff) == first_order_size:
-        X = np.ones((len(s), first_order_size))
-        X[:, 1:] = s[:, :]
-        return np.dot(X, coeff)
+        fuzzy_s = np.ones((len(s), first_order_size))
+        fuzzy_s[:, 1:] = s[:, :]
+        return np.dot(fuzzy_s, coeff)
     # TODO - 2nd order TSK?
     else:
         raise ValueError(f"TSK rule requires {first_order_size} coefficients")
 
 
-# TODO - Generate derivatives as well?
-def fuzzy_or(x: np.ndarray, y: np.ndarray) -> np.ndarray:
-    return np.max([x, y], axis=0)
-    # return x + y - x * y
+def fuzzy_or(x: af64, y: af64) -> af64:
+    # return np.max([x, y], axis=0)
+    return x + y - x * y
 
-
-def fuzzy_and(x: np.ndarray, y: np.ndarray) -> np.ndarray:
-    return np.min([x, y], axis=0)
-    # return x * y
+def fuzzy_and(x: af64, y: af64) -> af64:
+    # return np.min([x, y], axis=0)
+    return x * y
 
 
 RULE_AND = 1
 RULE_OR = 0
 
 
-def eval_rule(rule: np.ndarray, mu_x: np.ndarray, mu_y: np.ndarray, s: np.ndarray):
+def eval_rule(rule: af64, mu_x: af64, mu_y: af64, s: af64):
     op = rule[1]
     op1_selector = int(rule[0])
     op2_selector = int(rule[2])
@@ -180,8 +104,8 @@ def eval_rule(rule: np.ndarray, mu_x: np.ndarray, mu_y: np.ndarray, s: np.ndarra
 
 
 def eval_rules(
-    rules: np.ndarray, mu_x: np.ndarray, mu_y: np.ndarray, s: np.ndarray
-) -> np.ndarray:
+    rules: af64, mu_x: af64, mu_y: af64, s: af64
+) -> af64:
     n_rules = rules.shape[0]
     sum_R = 0.0
     sum_ZR = 0.0
@@ -192,91 +116,121 @@ def eval_rules(
     return sum_ZR / sum_R
 
 
-def compute_fuzzy_system(
-    x: np.ndarray, pts: np.ndarray, n_mu: int, n_rule_idxs: int = 4
-):
-    mu_xp = np.sort(x[0:n_mu])
-    mu_yp = np.sort(x[n_mu : 2 * n_mu])
-    mu_x = mu_poly_set(pts[:, 0], mu_xp)
-    mu_y = mu_poly_set(pts[:, 1], mu_yp)
-    # Create the fuzzy rules, 0th order TSK
-    rules = np.reshape(x[2 * n_mu :], (-1, n_rule_idxs))
-    Z_defuzzy = eval_rules(rules, mu_x, mu_y, pts[:, 0:2])
+def compute_fuzzy_system(x: af64, pts: af64, n_mu: int)-> tuple[f64, af64]:
+    mu_x, mu_y = extract_mu_from_args(n_mu, pts, x)
+    # Do the rules in order
+    rule_idx = 0
+    sum_R = 0.0
+    sum_ZR = 0.0
+    for ix in range(n_mu):
+        for iy in range(n_mu):
+            arg_rule_idx = 4 * n_mu + 4 * rule_idx
+            and_c = x[arg_rule_idx]
+            # f_a = x[arg_rule_idx+1]
+            # f_b = x[arg_rule_idx+2]
+            # f_c = x[arg_rule_idx+3]
+            # NOTE - This is magic!
+            r_eval_and = fuzzy_and(mu_x[:, ix], mu_y[:, iy])
+            # Exclude the third column we don't include the output.
+            z_eval = tsk_rule(pts[:,0:2], x[arg_rule_idx+1:arg_rule_idx+4])
+            r_eval_or = fuzzy_or(mu_x[:, ix], mu_y[:, iy])
+            r_eval = (1-and_c)*r_eval_or+and_c*r_eval_and
+            # Fuzzify!
+            sum_R += r_eval
+            sum_ZR += r_eval*z_eval
+
+            rule_idx+=1
+
+    # Weighted defuzzy!
+    z_defuzzy = sum_ZR / sum_R
     # Compute the RMS error
-    rms_error = np.sqrt(np.mean((Z_defuzzy - pts[:, 2]) ** 2))
-    return rms_error, Z_defuzzy
+    rms_error = np.sqrt(np.mean((z_defuzzy - pts[:, 2]) ** 2))
+    return rms_error, z_defuzzy
 
 
-def aco_optimize(pts: np.ndarray, n_mu: int, n_rules: int, num_rule_idxs: int = 4):
+def extract_mu_from_args(n_mu, pts, x):
+    mu_x_a = x[0:2 * n_mu:2]
+    mu_x_b = x[1:2 * n_mu:2]
+    mu_y_a = x[2 * n_mu:4 * n_mu:2]
+    mu_y_b = x[2 * n_mu + 1:4 * n_mu:2]
+    mu_x = mu_poly_set(pts[:, 0], mu_x_a, mu_x_b)
+    mu_y = mu_poly_set(pts[:, 1], mu_y_a, mu_y_b)
+    return mu_x, mu_y
+
+
+def aco_optimize(pts: af64, n_mu: int, n_rules: int):
     y_min = -np.pi
     y_max = np.pi
     x_min = -np.pi
     x_max = np.pi
     dy = (y_max - y_min) / n_mu
     dx = (x_max - x_min) / n_mu
-    rule_options = [RULE_AND]
-    mu_options = np.r_[0:n_mu]
-
-    # Here is the goal-seeking function
-    def fuzzy_test2(x: np.ndarray) -> float:
-        rms_err, _ = compute_fuzzy_system(x, pts, n_mu, n_rule_idxs=num_rule_idxs)
-        return rms_err
 
     aco_variables = []
     for i in range(n_mu):
-        aco_variables.append(
+        aco_variables.extend([
             AcoContinuousVariable(
-                f"mu_x{i}", x_min + i * dx, x_min + (i + 1) * dx, x_min + i * dx / 2.0
-            )
+                f"mu_x{i}-a", x_min, x_max, x_min + i * dx / 2.0
+            ),
+            AcoContinuousVariable(
+                f"mu_x{i}-b", 0.01, 2*dx,0.05
+            )]
         )
-    for j in range(n_mu):
-        aco_variables.append(
+    for i in range(n_mu):
+        aco_variables.extend([
             AcoContinuousVariable(
-                f"mu_y{j}", y_min + j * dy, y_min + (j + 1) * dy, y_min + j * dy / 2.0
-            )
+                f"mu_y{i}-a", y_min, y_max, y_min + i * dy / 2.0
+            ),
+            AcoContinuousVariable(
+                f"mu_y{i}-b", 0.01, 2*dy,0.05
+            )]
         )
 
     for k in range(n_rules):
-        # Programmatically add the rules!
         aco_variables.extend(
             [
-                AcoDiscreteVariable(f"rule{k}_A", mu_options),
-                AcoDiscreteVariable(f"rule{k}_op", rule_options),
-                AcoDiscreteVariable(f"rule{k}_B", mu_options),
-                AcoContinuousVariable(f"rule{k}_c0", -1, 1),
+                # NOTE - This is the exploratory magic of degree of or/and
+                AcoContinuousVariable(f"rule{k}-and-op", 0, 1, 1.0),
+                AcoContinuousVariable(f"rule{k}-f-a", -3, 3),
+                AcoContinuousVariable(f"rule{k}-f-b", -3, 3),
+                AcoContinuousVariable(f"rule{k}-f-c", -3, 3, 0.0),
             ]
         )
-        # TODO - Allow more rules?
-    best_soln, soln_history = solve_aco(
-        fuzzy_test2, aco_variables, num_generations=100, num_ants=75
-    )
 
-    print(f"Best solution: {best_soln} with value: {soln_history[-1]}")
-    # Plot solution history
-    fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=np.arange(len(soln_history)),
-            y=soln_history,
-            mode="lines",
-            name="RMS Error",
-        )
-    )
-    fig.update_layout(
-        title="RMS Error vs. Generation",
-        xaxis_title="Generation",
-        yaxis_title="RMS Error",
-    )
-    fig.show()
+    # Here is the goal-seeking function
+    def fuzzy_test2(x: af64) -> f64:
+        rms_err, _ = compute_fuzzy_system(x, pts, n_mu)
+        return rms_err
+
+    best_soln, soln_history = solve_gradiant(fuzzy_test2, aco_variables)
     return best_soln, soln_history
 
 
 def main():
-    print("Test 2!")
+    print("Mid-Term Project!")
+    X, Y, Z, pts, pts_test, pts_train, x, y = setup_dataset()
+    # Solve for the optimal system!
+    n_mu = 2
+    n_vars = 2
+    n_rules = n_mu ** n_vars
+    # NOTE - full-factorial on rules is bad in general!
+
+    best_soln, soln_history = aco_optimize(pts_train, n_mu, n_rules)
+    rms_err, _ = compute_fuzzy_system(best_soln, pts_test, n_mu)
+    print(f"Train error={soln_history[-1]}, Test error={rms_err}")
+
+    rms_error, z_defuzzy = compute_fuzzy_system(best_soln, pts, n_mu)
+    print(f"Overall RMS error: {rms_error}")
+    # Reshape into the 2D array
+    z_defuzzy = z_defuzzy.reshape(X.shape)
+    # Plot using plotly
+    mu_x_plot, mu_y_plot = extract_mu_from_args(n_mu, np.hstack((np.reshape(x,(len(X),1)), np.reshape(y,(len(X),1)))), best_soln)
+    plot_all_the_things(X, Y, Z, z_defuzzy, mu_x_plot, mu_y_plot)
+
+
+def setup_dataset():
     # 1600 datapoints, so 40 in each direction
     n_steps = 40
-    # TODO - Randomly sample the domain
-    # TODO - Allow X and Y to vary domain!
     s_min = -np.pi
     s_max = np.pi
     x = np.linspace(s_min, s_max, n_steps)
@@ -293,32 +247,7 @@ def main():
     n_train = Z.size // 4 * 3
     pts_train = rand_pts[:n_train, :]
     pts_test = rand_pts[n_train:, :]
-
-    # Solve for the optimal system!
-    n_mu = 5
-    num_rule_ = 4
-    n_rules = 6
-    best_soln, soln_history = aco_optimize(
-        pts_train, n_mu, n_rules, num_rule_idxs=num_rule_
-    )
-    rms_err, _ = compute_fuzzy_system(best_soln, pts_test, n_mu, n_rule_idxs=num_rule_)
-    print(f"Train error={soln_history[-1]}, Test error={rms_err}")
-
-    rms_error, Z_defuzzy = compute_fuzzy_system(
-        best_soln, pts, n_mu, n_rule_idxs=num_rule_
-    )
-    print(f"RMS error: {rms_error}")
-    # Reshape into the 2D array
-    Z_defuzzy = Z_defuzzy.reshape(X.shape)
-    # TODO - Train the fuzzy model!
-    # TODO - Test the fuzzy model!
-    # TODO - Plot the model!
-    # Plot using plotly
-    mu_xp = best_soln[0:n_mu]
-    mu_yp = best_soln[n_mu : 2 * n_mu]
-    mu_x_plot = mu_poly_set(x, mu_xp)
-    mu_y_plot = mu_poly_set(y, mu_yp)
-    plot_all_the_things(X, Y, Z, Z_defuzzy, mu_x_plot, mu_y_plot)
+    return X, Y, Z, pts, pts_test, pts_train, x, y
 
 
 if __name__ == "__main__":

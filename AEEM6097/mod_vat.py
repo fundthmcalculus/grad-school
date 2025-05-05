@@ -1,5 +1,8 @@
+from typing import Any
+
 import numpy as np
-from numba import njit
+from numpy import ndarray
+from numpy.typing import NDArray
 from sklearn.metrics import pairwise_distances
 
 
@@ -81,42 +84,45 @@ def compute_ordered_dis_njit2(matrix_of_pairwise_distance: np.ndarray):  # pragm
     return ordered_matrix, observation_path
 
 
-def compute_merge_sort_dissimilarity_matrix(x: np.ndarray) -> tuple[np.ndarray, list]:
+def compute_merge_sort_dissimilarity_matrix(x: np.ndarray) -> tuple[ndarray, list[int] | None]:
     # Copy the input matrix
     n = x.shape[0]
-    A = x
+    A = x.copy()
     B = x.copy()
-    top_down_split_merge(A,0, n, B)
-    return A
+    order = top_down_split_merge(A,0, n, B)
+    C = x.copy()
+    return A[:,order][order,:], order
 
-def top_down_split_merge(B, begin, end, A):
+def top_down_split_merge(B, begin, end, A) -> list[int] | None:
     if end - begin <= 1:
-        return B[begin:end]
+        return [begin]
     mid = (end + begin) // 2
-    top_down_split_merge(A, begin, mid, B)
-    top_down_split_merge(A, mid, end, B)
-    top_down_merge(B, begin, mid, end, A)
+    o1 = top_down_split_merge(A, begin, mid, B)
+    o2 = top_down_split_merge(A, mid, end, B)
+    p1 = top_down_merge(B, begin, mid, end, A)
+    p1.reverse()
+    return p1
 
-def top_down_merge(B, begin, mid, end, A) -> np.ndarray:
-    s = A.shape[0]-1
+
+def top_down_merge(B, begin, mid, end, A) -> list[Any]:
     i = begin
     j = mid
+    order = []
     for k in range(begin, end):
+        # TODO - Handle the off diagonal entries?
         # If left run head exists and is <= right run head
         if i < mid and (j >= end or A[i,i] < A[j,j]):
-            B[k,:] = A[i,:]
-            B[:,k] = A[:,i]
-            i += 1
-        # Check the first off-diagonal element TODO - Handle out of bounds.
-        elif i < mid and j < end and A[i,i] == A[j,j] and A[i,min(i+1,s)] < A[j,min(s,j+1)]:
+            order.append(i)
             B[k,:] = A[i,:]
             B[:,k] = A[:,i]
             i += 1
         else:
             # If right run head exists
+            order.append(j)
             B[k,:] = A[j,:]
             B[:,k] = A[:,j]
             j += 1
+    return order
 
 
 def compute_ordered_dissimilarity_matrix2(x: np.ndarray) -> tuple[np.ndarray, list]:

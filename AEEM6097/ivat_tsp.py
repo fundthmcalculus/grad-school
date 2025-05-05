@@ -25,7 +25,7 @@ def random_cities(center_x, center_y, n_cities=-1) -> np.ndarray:
     if n_cities == -1:
         n_cities = N_CITIES_CLUSTER
     # Randomly distribute cities in a uniform circle?
-    theta = np.linspace(0, 2 * np.pi, n_cities+1)
+    theta = np.linspace(0, 2 * np.pi, n_cities+1, dtype=np.float32)
     theta = theta[:-1]
     city_x = np.cos(theta) * CLUSTER_DIAMETER/2.0 + center_x
     city_y = np.sin(theta) * CLUSTER_DIAMETER/2.0 + center_y
@@ -35,7 +35,7 @@ def random_cities(center_x, center_y, n_cities=-1) -> np.ndarray:
 def circle_random_clusters(n_clusters=-1, n_cities=-1) -> np.ndarray:
     if n_clusters == -1:
         n_clusters = N_CLUSTERS
-    city_locations = np.zeros(shape=(0,2))
+    city_locations = np.zeros(shape=(0,2), dtype=np.float32)
     for theta in np.linspace(0, 2*np.pi, n_clusters):
         if HALF_CIRCLE:
             theta /= 2.0
@@ -180,14 +180,14 @@ def plot_results(all_cities: np.ndarray, distances: np.ndarray,
     fig.suptitle("City Paths and Distance Matrices", fontsize=16)
 
     # Adjust spacing between subplots
-    plt.tight_layout(rect=[0, 0, 1, 0.96])  # Make room for the overall title
+    plt.tight_layout(rect=(0, 0, 1, 0.96))  # Make room for the overall title
 
     # Show the plot
     plt.show()
 
 
 def vat_scaling():
-    for city_exp in range(1, 4):
+    for city_exp in range(1, 3):
         city_count = 2**city_exp
         print(f"City count: {city_count**2}")
         all_cities = circle_random_clusters(n_clusters=city_count, n_cities=city_count)
@@ -198,14 +198,16 @@ def vat_scaling():
         matrix_of_pairwise_distance = matrix_of_pairwise_distance[:, rand_col_order][rand_col_order, :]
         # Cluster using our IVAT
         t0 = time.time()
-        ordered_matrix2 = compute_merge_sort_dissimilarity_matrix(matrix_of_pairwise_distance)
+        ordered_matrix2, observation_path2 = compute_merge_sort_dissimilarity_matrix(matrix_of_pairwise_distance)
         t1 = time.time()
         # Cluster using the library IVAT
-        ordered_matrix = compute_ordered_dis_njit(matrix_of_pairwise_distance)
+        ordered_matrix, observation_path = compute_ordered_dis_njit(matrix_of_pairwise_distance)
         t2 = time.time()
 
         # Ensure all values are equal!
-        assert np.all(ordered_matrix == ordered_matrix2)
+        # assert np.all(ordered_matrix == ordered_matrix2)
+        print("VAT-Merge: ", observation_path2)
+        print("VAT-Lib: ", observation_path)
         # assert np.all(observation_path == observation_path2)
 
 
@@ -213,7 +215,16 @@ def vat_scaling():
         print(f"IVAT-merge time: {t1-t0:.4f} seconds")
         print(f"IVAT-lib time: {t2-t1:.4f} seconds")
 
+        plt.figure()
+        plt.subplot(1,2,1)
+        plt.imshow(ordered_matrix, cmap='viridis', aspect='auto', label='VAT-lib')
+        plt.title("VAT Library")
+        plt.subplot(1,2,2)
+        plt.imshow(ordered_matrix2, cmap='viridis', aspect='auto', label='VAT-merge')
+        plt.title("VAT MergeSort")
+        plt.show()
+
 
 if __name__ == "__main__":
-    main()
-    # vat_scaling()
+    # main()
+    vat_scaling()

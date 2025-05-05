@@ -3,14 +3,15 @@ from typing import Callable
 
 import joblib
 import numpy as np
+from scipy.optimize import minimize, OptimizeResult
 import tqdm
 from numpy.random import Generator
 from scipy.stats import truncnorm
 
 
-def get_truncated_normal(mean=0, stdev=1, low=0, high=10):
-    if stdev == 0:
-        stdev = 1
+def get_truncated_normal(mean=0.0, stdev=1.0, low=0.0, high=10.0) -> float:
+    if stdev == 0.0:
+        stdev = 1.0
     return truncnorm(
         (low - mean) / stdev, (high - mean) / stdev, loc=mean, scale=stdev
     ).rvs()
@@ -134,6 +135,29 @@ def test_ackley(x: np.array) -> np.float64:
         + np.exp(1)
         + 20
     )
+
+
+def print_optimal_solution(x: np.ndarray, variables: list[AcoContinuousVariable]) -> None:
+    print("Optimal solution:")
+    for ij, var in enumerate(variables):
+        print(f"{var.name}: {x[ij]}")
+
+# TODO - Make this an overload / subclasses?
+def solve_gradiant(
+    fcn: Callable[[np.array], np.float64],
+    variables: list[AcoContinuousVariable],
+) -> tuple[np.array, np.array]:
+    x0 = [x.initial_value for x in variables]
+    bounds = [(x.lower_bound, x.upper_bound) for x in variables]
+
+    with tqdm.tqdm(total=len(variables)) as pbar:
+        def callback_fcn(x: OptimizeResult):
+            pbar.update(x.nfev)
+            pbar.set_description(f"err={x.fun}")
+        res: OptimizeResult = minimize(fcn, np.array(x0), bounds=bounds, callback=callback_fcn)
+        print("Result Information:", res)
+        print_optimal_solution(res.x, variables)
+        return res.x, [res.fun]
 
 
 def solve_aco(
