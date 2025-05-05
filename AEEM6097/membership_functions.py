@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 
 
 class FuzzyVariable:
-    def __init__(self, var_name: str, value: np.float64):
+    def __init__(self, var_name: str, value: NDArray[np.float64]):
         self.var_name = var_name
         self.value = value
 
@@ -45,6 +45,15 @@ class MembershipFunction(abc.ABC):
 
     def centroid(self) -> float:
         raise NotImplementedError("centroid() must be implemented in subclass")
+
+    def d_dx(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        raise NotImplementedError("derivative() must be implemented in subclass")
+
+    def gradiant(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        raise NotImplementedError("gradient() must be implemented in subclass")
+
+    def hessian(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        raise NotImplementedError("hessian() must be implemented in subclass")
 
 
 class TriangularMF(MembershipFunction):
@@ -138,7 +147,7 @@ def create_uniform_triangle_memberships(
     if isinstance(name, str):
         name = [f"{name}-{i}" for i in range(n_fcns)]
     spacing = (x1 - x0) / (n_fcns - 1)
-    all_mus = [LeftShoulderMF(name[0], x0, x0 + spacing)]
+    all_mus: list[LeftShoulderMF | TriangularMF | RightShoulderMF] = [LeftShoulderMF(name[0], x0, x0 + spacing)]
     for ij in range(1, n_fcns - 1):
         all_mus.append(
             TriangularMF(
@@ -155,7 +164,7 @@ def create_uniform_triangle_memberships(
 def create_triangle_memberships(
     triangle_data: dict[str, float],
 ) -> list[LeftShoulderMF | TriangularMF | RightShoulderMF]:
-    all_mus = []
+    all_mus: list[LeftShoulderMF | TriangularMF | RightShoulderMF] = []
     items = list(triangle_data.items())
     for idx in range(len(items)):
         name = items[idx][0]
@@ -190,3 +199,32 @@ class PiMF(MembershipFunction):
 
     def inverse_mu(self, y: NDArray[np.float64]) -> NDArray[np.float64]:
         return self.a + self.b * np.sqrt(1 / y - 1)
+
+
+class GuassianMF(MembershipFunction):
+    def __init__(self, name: str, a: float, b: float):
+        super().__init__(name)
+        assert a <= b
+        self.a = a
+        self.b = b
+
+    def mu(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        return np.exp(-((x-self.a) / self.b)**2)
+
+    def domain(self) -> NDArray[np.float64]:
+        # TODO - Handle the long-tail of the distribution, since the domain is technically [-inf, inf]
+        n_sigma = 4.0
+        return np.array([self.a - n_sigma * self.b, self.a + n_sigma * self.b])
+
+    def centroid(self) -> float:
+        return self.a
+
+    def inverse_mu(self, y: NDArray[np.float64]) -> NDArray[np.float64]:
+        # Y = exp(- (x-a)^2 /b^2)
+        # TODO - Handle the other side option.
+        return np.sqrt(-self.b**2 * np.log(y))+self.a
+
+    def d_dx(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        return self.mu(x) * -2.0*(x-self.a)/self.b
+
+    # TODO - Gradient and Hessian!
