@@ -1,19 +1,17 @@
 from dataclasses import dataclass
 from itertools import product
-from typing import Any
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from fcmeans import FCM
 from numpy.typing import NDArray
 from scipy import stats
-from pyclustertend.visual_assessment_of_tendency import ivat
 from scipy.signal import find_peaks, peak_widths, peak_prominences
 from tqdm import tqdm
 
 from AEEM6097.aco_solver import AcoContinuousVariable, solve_gradiant
-from AEEM6097.midterm_project import tsk_rule, mu_poly_set, mu_poly
+from AEEM6097.midterm_project import tsk_rule
 
 # Some typing information shorthand!
 i64 = np.int64
