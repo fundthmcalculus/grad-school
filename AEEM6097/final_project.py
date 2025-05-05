@@ -9,7 +9,7 @@ from fcmeans import FCM
 from numpy.typing import NDArray
 from scipy import stats
 from pyclustertend.visual_assessment_of_tendency import ivat
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks, peak_widths, peak_prominences
 from tqdm import tqdm
 
 from AEEM6097.aco_solver import AcoContinuousVariable, solve_gradiant
@@ -75,28 +75,35 @@ def fuzzy_cluster(data: af64) -> None:
     # plt.ylabel("FPC")
     # plt.show()
 
+@dataclass
+class PeakInfo:
+    x: i64
+    left_base: i64
+    right_base: i64
+    prominence: f64
+    y: f64
+    half_width: f64
+
 # For some reason, no matter how many clusters we pick, we get the same centers. Let's plot the normalized distribution diagrams.
-def kernel_density_partitioning(norm_data: af64, labels: list[str]) -> list[Any]:
+def kernel_density_partitioning(norm_data: af64, labels: list[str]) -> list[list[PeakInfo]]:
     # Colors for different distributions
     colors = ['blue', 'green', 'red', 'purple', 'orange', 'brown', 'pink', 'gray', 'cyan']
     # Create a smooth x-axis for plotting
-    x = np.linspace(0, 1, len(norm_data))
+    n_samples = len(norm_data)
+    x = np.linspace(0, 1, n_samples)
 
     # Plot density for each column as a line plot
-    peak_data = []
+    peak_data: list[list[PeakInfo]] = []
     for i in range(norm_data.shape[1]):
         # Use kernel density estimation for smooth distribution curves
         density = stats.gaussian_kde(norm_data[:, i])
         data_pdf = density(x)
         # Insert a 0 on each end so the prominence calculation works
-        mod_pdf = np.zeros(data_pdf.shape[0]+2)
-        mod_pdf[1:-1] = data_pdf
-        peak_idx, peak_info = find_peaks(mod_pdf, prominence=0.25)
-        peak_data.append((x[peak_idx], mod_pdf[peak_idx]))
+        peak_data.append(get_peak_data(n_samples, data_pdf, x))
         plt.plot(x, data_pdf, color=colors[i], label=labels[i], linewidth=2)
     # Mark the peaks after, so we can legend easily
     for ij, peak_d in enumerate(peak_data):
-        plt.plot(peak_d[0], peak_d[1], "x", color=colors[ij])
+        plt.plot([p.x for p in peak_d], [p.y for p in peak_d], "x", color=colors[ij])
 
     # Adding plot details
     plt.xlabel('Value (Normalized to [0,1])')
@@ -110,9 +117,28 @@ def kernel_density_partitioning(norm_data: af64, labels: list[str]) -> list[Any]
     plt.show()
 
     print("Number of peaks for each variable:")
-    print("\n".join([f"{labels[ij]}:{len(x[0])}" for ij, x in enumerate(peak_data)]))
+    print("\n".join([f"{labels[ij]}:{len(x)}" for ij, x in enumerate(peak_data)]))
 
-    return norm_data, peak_data
+    return peak_data
+
+
+def get_peak_data(n_samples: i64, data_pdf: af64, x: af64) -> list[PeakInfo]:
+    mod_pdf = np.zeros(data_pdf.shape[0] + 2)
+    mod_pdf[1:-1] = data_pdf
+    peak_indexes, peak_info = find_peaks(mod_pdf, prominence=0.3)
+    prominences = peak_prominences(mod_pdf, peak_indexes)
+    results_half = peak_widths(mod_pdf, peak_indexes, prominence_data=prominences)
+    cur_peak_lst = []
+    for ij, peak_idx in enumerate(peak_indexes):
+        peak_obj = PeakInfo(x=x[peak_idx],
+                            y=mod_pdf[peak_idx],
+                            left_base=x[max(0,peak_info['left_bases'][ij])],
+                            right_base=x[min(peak_info['right_bases'][ij],len(x)-1)],
+                            prominence=peak_info['prominences'][ij],
+                            half_width=results_half[2][ij] / n_samples)  # Order is left-half-idx, half-y, width in samples, right-half-idx
+        cur_peak_lst.append(peak_obj)
+    return cur_peak_lst
+
 
 # NOTE - Most of the outputs are uniform distribution (approximately), so having
 # multiple clusters will make little sense. Instead of clustering by sample, we
@@ -197,7 +223,7 @@ def all_rule_permutations(states_per_var: list[int]) -> af64:
         permutations[:,start_col+1:] += state_count
     return permutations
 
-def create_tsk_variables(peak_data: list[Any]) -> VariablesInfo:
+def create_tsk_variables(peak_data: list[list[PeakInfo]]) -> VariablesInfo:
     aco_variables = []
     # The output feature doesn't count.
     n_features = len(peak_data) - 1
@@ -205,20 +231,21 @@ def create_tsk_variables(peak_data: list[Any]) -> VariablesInfo:
     info = VariablesInfo()
     # Create the membership functions
     for i_var, peak_d in enumerate(peak_data):
-        for j_mu in range(len(peak_d[0])):
-            peak_d_j = peak_d[0][j_mu]
+        for j_mu in range(len(peak_d)):
+            peak_d_j = peak_d[j_mu].y
+            width_d_j = peak_d[j_mu].half_width / 2.0
             # TODO - Handle different membership functions on different variables!
             mu_var_params = [
                 AcoContinuousVariable(
-                    f"mu_{i_var + 1}({j_mu + 1})-a",  0.0, 1.0, peak_d_j, # peak_d_j,peak_d_j, peak_d_j
+                    f"mu_{i_var + 1}({j_mu + 1})-a", 0.0, 1.0, peak_d_j,
                 ),
                 AcoContinuousVariable(
-                    f"mu_{i_var + 1}({j_mu + 1})-b", 0.0001, 1, 0.1
+                    f"mu_{i_var + 1}({j_mu + 1})-b", 0.0001, 1, width_d_j
                 )]
             info.append_variable(mu_var_params)
 
     # Generate the cartesian product of rule states
-    info.rule_args = all_rule_permutations([len(x[0]) for x in peak_data])
+    info.rule_args = all_rule_permutations([len(x) for x in peak_data])
 
     print("Number of membership functions:", info.n_membership_fcns)
     print("Number of rules:", info.n_rules)
@@ -226,7 +253,7 @@ def create_tsk_variables(peak_data: list[Any]) -> VariablesInfo:
     for k in range(info.n_rules):
         info.append_variable(
             # NOTE - This is the exploratory magic of degree of or/and
-            AcoContinuousVariable(f"rule-and/or-op-{k+1}", 0, 1, 1.0),
+            AcoContinuousVariable(f"rule-and/or-op-{k+1}", 1.0, 1.0, 1.0),
         )
         info.rule_op_indexes.append(len(aco_variables)-1)
         coeff_max = n_features
@@ -257,29 +284,20 @@ def fuzzy_or(s: af64, axis=0) -> af64:
         raise NotImplementedError("fuzzy_or for 3D arrays")
     if axis == 1:
         s = s.T
-        axis = 0
-    x = s[:,0]
-    y = s[:,1:]
-    if y.shape[1] > 1:
-        # TODO - Convert this from tail-recursion to a for-loop
-        y = fuzzy_or(y, axis=axis)
-    y = y.flatten()
-    return x + y - x * y
+    o = s[:, 0]
+    for col in range(1, s.shape[1]):
+        o = o + s[:, col] - o * s[:, col]
+    return o
 
 def fuzzy_and(s: af64, axis=0) -> af64:
     if axis > 1:
         raise NotImplementedError("fuzzy_and for 3D arrays")
     if axis == 1:
         s = s.T
-        axis = 0
-    x = s[:,0]
-    y = s[:,1:]
-    if y.shape[1] > 1:
-        # TODO - Convert this from tail-recursion to a for-loop
-        y = fuzzy_and(y, axis=axis)
-    # Flatten y
-    y = y.flatten()
-    return x * y
+    a = s[:,0]
+    for col in range(1, s.shape[1]):
+        a *= s[:, col]
+    return a
 
 
 def compute_fuzzy_system(var_args: af64, pts: af64, variables_info: VariablesInfo)-> tuple[f64, af64]:
@@ -311,13 +329,13 @@ def compute_fuzzy_system(var_args: af64, pts: af64, variables_info: VariablesInf
 
 def main():
     train_data, test_data, data_min, data_max, labels = load_data()
-    norm_data, peak_data = kernel_density_partitioning(train_data, labels)
+    peak_data = kernel_density_partitioning(train_data, labels)
     variables_info = create_tsk_variables(peak_data)
     print("Number of domain variables:", len(variables_info.variables))
 
     # Here is the goal-seeking function
     nfev = 0
-    min_err = 1E10
+    min_err = 1.0E10
     with tqdm() as pbar:
         def fuzzy_test2(x: np.ndarray) -> f64:
             nonlocal nfev, min_err
