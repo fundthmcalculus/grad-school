@@ -149,15 +149,10 @@ def solve_gradiant(
 ) -> tuple[np.array, np.array]:
     x0 = [x.initial_value for x in variables]
     bounds = [(x.lower_bound, x.upper_bound) for x in variables]
-
-    with tqdm.tqdm(total=len(variables)) as pbar:
-        def callback_fcn(x: OptimizeResult):
-            pbar.update(x.nfev)
-            pbar.set_description(f"err={x.fun}")
-        res: OptimizeResult = minimize(fcn, np.array(x0), bounds=bounds, callback=callback_fcn)
-        print("Result Information:", res)
-        print_optimal_solution(res.x, variables)
-        return res.x, [res.fun]
+    res: OptimizeResult = minimize(fcn, np.array(x0), bounds=bounds)
+    print("Result Information:", res)
+    print_optimal_solution(res.x, variables)
+    return res.x, [res.fun]
 
 
 def solve_aco(
