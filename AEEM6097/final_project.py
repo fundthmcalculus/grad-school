@@ -10,6 +10,7 @@ from numpy.typing import NDArray
 from scipy import stats
 from pyclustertend.visual_assessment_of_tendency import ivat
 from scipy.signal import find_peaks
+from tqdm import tqdm
 
 from AEEM6097.aco_solver import AcoContinuousVariable, solve_gradiant
 from AEEM6097.midterm_project import tsk_rule, mu_poly_set, mu_poly
@@ -209,7 +210,7 @@ def create_tsk_variables(peak_data: list[Any]) -> VariablesInfo:
             # TODO - Handle different membership functions on different variables!
             mu_var_params = [
                 AcoContinuousVariable(
-                    f"mu_{i_var + 1}({j_mu + 1})-a", 0.0, 1.0, peak_d_j,
+                    f"mu_{i_var + 1}({j_mu + 1})-a",  0.0, 1.0, peak_d_j, # peak_d_j,peak_d_j, peak_d_j
                 ),
                 AcoContinuousVariable(
                     f"mu_{i_var + 1}({j_mu + 1})-b", 0.0001, 1, 0.1
@@ -228,9 +229,9 @@ def create_tsk_variables(peak_data: list[Any]) -> VariablesInfo:
             AcoContinuousVariable(f"rule-and/or-op-{k+1}", 0, 1, 1.0),
         )
         info.rule_op_indexes.append(len(aco_variables)-1)
-        coeff_max = 3 * n_features
-        feat_coeffs = [AcoContinuousVariable(f"rule-coeff-{k+1}-f-a{ij+1}", -coeff_max, coeff_max) for ij in range(n_features)]
-        feat_coeffs.append(AcoContinuousVariable(f"rule-coeff-{k+1}-f-c", -coeff_max, coeff_max, 0.0))
+        coeff_max = n_features
+        feat_coeffs = [AcoContinuousVariable(f"rule-coeff-{k+1}-f-a{ij+1}", -coeff_max, coeff_max, 0.1) for ij in range(n_features)]
+        feat_coeffs.append(AcoContinuousVariable(f"rule-coeff-{k+1}-f-c", -coeff_max, coeff_max, -0.1))
         info.append_variable(feat_coeffs)
 
     return info
@@ -262,6 +263,7 @@ def fuzzy_or(s: af64, axis=0) -> af64:
     if y.shape[1] > 1:
         # TODO - Convert this from tail-recursion to a for-loop
         y = fuzzy_or(y, axis=axis)
+    y = y.flatten()
     return x + y - x * y
 
 def fuzzy_and(s: af64, axis=0) -> af64:
@@ -275,13 +277,14 @@ def fuzzy_and(s: af64, axis=0) -> af64:
     if y.shape[1] > 1:
         # TODO - Convert this from tail-recursion to a for-loop
         y = fuzzy_and(y, axis=axis)
+    # Flatten y
+    y = y.flatten()
     return x * y
 
 
 def compute_fuzzy_system(var_args: af64, pts: af64, variables_info: VariablesInfo)-> tuple[f64, af64]:
     mu_vars = extract_mu_from_args(var_args, pts, variables_info)
     # Do the rules in order
-    rule_idx = 0
     sum_R = 0.0
     sum_ZR = 0.0
     for rule_idx in range(variables_info.n_rules):
@@ -313,13 +316,33 @@ def main():
     print("Number of domain variables:", len(variables_info.variables))
 
     # Here is the goal-seeking function
-    def fuzzy_test2(x: np.ndarray) -> f64:
-        rms_err, _ = compute_fuzzy_system(x,train_data,variables_info)
-        return rms_err
+    nfev = 0
+    min_err = 1E10
+    with tqdm() as pbar:
+        def fuzzy_test2(x: np.ndarray) -> f64:
+            nonlocal nfev, min_err
+            rms_err, _ = compute_fuzzy_system(x,train_data,variables_info)
+            # This is an inversion of control, but `scipy.optimize.minimize` has limitations
+            min_err = min(rms_err, min_err)
+            nfev += 1
+            pbar.update(nfev)
+            pbar.set_description(f"err={min_err}")
 
-    best_soln, soln_history = solve_gradiant(fuzzy_test2, variables_info.variables)
-    rms_err_test, _ = compute_fuzzy_system(best_soln, test_data, variables_info)
-    print(f"Train error={soln_history[-1]}, Test error={rms_err_test}")
+            return rms_err
+
+        best_soln, soln_history = solve_gradiant(fuzzy_test2, variables_info.variables)
+        rms_err_test, test_result = compute_fuzzy_system(best_soln, test_data, variables_info)
+        print(f"Train error={soln_history[-1]}, Test error={rms_err_test}")
+
+        # TODO - Show the plot of test result vs defuzzified test result (ideally they overlap)
+        plt.figure()
+        plt.title("Test Output Comparison")
+        plt.plot(test_data[:,-1],'r',label="test data")
+        plt.plot(test_result,'b',label="predicted data")
+        plt.xlabel("Sample")
+        plt.legend()
+        plt.ylabel("Normalized Value")
+        plt.show()
 
 
 if __name__ == "__main__":
