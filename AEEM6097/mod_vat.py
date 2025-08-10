@@ -91,7 +91,7 @@ def compute_merge_sort_dissimilarity_matrix(x: np.ndarray) -> tuple[ndarray, lis
     B = x.copy()
     order = top_down_split_merge(A,0, n, B)
     C = x.copy()
-    return A[:,order][order,:], order
+    return C[:,order][order,:], order
 
 def top_down_split_merge(B, begin, end, A) -> list[int] | None:
     if end - begin <= 1:
@@ -109,20 +109,44 @@ def top_down_merge(B, begin, mid, end, A) -> list[Any]:
     j = mid
     order = []
     for k in range(begin, end):
-        # TODO - Handle the off diagonal entries?
         # If left run head exists and is <= right run head
-        if i < mid and (j >= end or A[i,i] < A[j,j]):
-            order.append(i)
-            B[k,:] = A[i,:]
-            B[:,k] = A[:,i]
-            i += 1
+        if i < mid and j >= end:
+            i = swap(A, B, i, k, order)
+        elif i >= mid and j < end:
+            j = swap(A, B, j, k, order)
+        elif i < mid and j < end:
+            if A[i, i] < A[j, j]:
+                i = swap(A, B, i, k, order)
+            elif A[i, i] > A[j, j]:
+                j = swap(A, B, j, k, order)
+            else:
+                offset = 1
+                while i+offset < mid and j+offset < end:
+                    if A[i, i+offset] < A[j, j+offset]:
+                        i = swap(A, B, i, k, order)
+                        break
+                    elif A[i, i+offset] > A[j, j+offset]:
+                        j = swap(A, B, j, k, order)
+                        break
+                    else:
+                        offset += 1
+                # Equal down the off-diagonal, just swap the first one
+                i = swap(A, B, i, k, order)
+        elif i == mid and j == end and len(order) == (end-begin):
+            # Both runs are exhausted, we are done.
+            break
         else:
-            # If right run head exists
-            order.append(j)
-            B[k,:] = A[j,:]
-            B[:,k] = A[:,j]
-            j += 1
+            # This should not happen.
+            raise ValueError("Unexpected indices in top_down_merge")
     return order
+
+
+def swap(A, B, i, k, order):
+    order.append(i)
+    B[k, :] = A[i, :]
+    B[:, k] = A[:, i]
+    i += 1
+    return i
 
 
 def compute_ordered_dissimilarity_matrix2(x: np.ndarray) -> tuple[np.ndarray, list]:
