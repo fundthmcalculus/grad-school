@@ -50,7 +50,6 @@ def mu_poly(x: af64, a: float, b: float) -> af64:
 
 
 def expsq(x: af64, a: f64, b: f64) -> af64:
-    """exponential quadratic membership function"""
     return np.exp(-((x-a)/b)**2.0)
 
 

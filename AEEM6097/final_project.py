@@ -1,51 +1,100 @@
-from dataclasses import dataclass
 from itertools import product
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from fcmeans import FCM
-from numpy.typing import NDArray
+from numpy.linalg import LinAlgError
+from pyclustertend import ivat
 from scipy import stats
-from scipy.signal import find_peaks, peak_widths, peak_prominences
 from tqdm import tqdm
 
-from AEEM6097.aco_solver import AcoContinuousVariable, solve_gradiant
+from AEEM6097.aco_solver import AcoContinuousVariable, solve_gradiant, solve_aco
+from AEEM6097.fuzzy_fit import PeakInfo, VariablesInfo, PeakCollection, FuzzyDataSet
+from AEEM6097.fuzzy_types import *
 from AEEM6097.midterm_project import tsk_rule
 
-# Some typing information shorthand!
-i64 = np.int64
-f64 = np.float64
-af64 = NDArray[f64]
-ai64 = NDArray[i64]
 
-def load_data() -> tuple[af64, af64, f64, f64, list[str]]:
-    # Load the `project-data/Concrete_Data.xls`
-    # The columns were renamed for simplicity
-    concrete_df = pd.read_excel('project-data/Concrete_Data.xls')
+def load_concrete_data() -> tuple[af64, list[str]]:
+    concrete_df = pd.read_excel("project-data/Concrete_Data.xls")
     # Convert to numpy array
     all_data = concrete_df.to_numpy()
-    labels = concrete_df.columns.tolist()
+    labels: list[str] = concrete_df.columns.tolist()
+    return all_data, labels
+
+
+def load_sonar_data() -> tuple[af64, list[str]]:
+    # Load the CSV file
+    sonar_data = np.genfromtxt("project-data/sonar.all-data", delimiter=",")
+    # Ignore the last column. Since that is the classification value, we will deal with that later
+    sonar_data = sonar_data[:, :60]
+    sonar_txt_data = np.genfromtxt("project-data/sonar.all-data", delimiter=",", dtype=str)
+    sonar_classification_col = sonar_txt_data[:, 60]
+    # Convert "R" to a 1 in the rock col, "M" to a 1 in the mine col
+    rock_col: np.ndarray = (sonar_classification_col == "R").astype(float)
+    mine_col: np.ndarray = (sonar_classification_col == "M").astype(float) * -1.0
+    # Now that one is "1", and the other is "-1", we can have confidence for each?
+    output_col: np.ndarray = rock_col + mine_col
+
+    # NOTE - There isn't much in the way of clustering, so we can ignore that.
+    sonar_full_data = np.hstack((sonar_data, np.reshape(output_col, (len(output_col), 1))))
+    labels = [f"F-Pow-{ij+1}" for ij in range(sonar_data.shape[1])]
+    labels.append("Class:rock=1,mine=-1")
+    return sonar_full_data, labels
+
+
+def load_data() -> FuzzyDataSet:
+    # Load the `project-data/Concrete_Data.xls`
+    # The columns were renamed for simplicity
+    all_data, labels = load_concrete_data()
+    # all_data, labels = load_sonar_data()
+
+    # Compute the linear spectra
+    lin_spec(all_data)
+
     # Randomly permute the rows
     all_data = np.random.permutation(all_data)
 
-    # Normalize all data
-    data_min = all_data.min(axis=0)
-    data_max = all_data.max(axis=0)
-    all_data = (all_data - data_min)/(data_max-data_min)
-
     # Take 75% of the data for training
-    train_idx = len(all_data) // 4 * 3
-    train_data = all_data[:train_idx]
-    test_data = all_data[train_idx:]
-    return train_data, test_data, data_min, data_max, labels
+    test_pct = 0.75
+
+    return FuzzyDataSet.create_from_data(all_data, test_pct, labels)
+
+
+def lin_spec(x: af64) -> tuple[af64, af64]:
+    X = np.fft.fft(x, axis=0)
+    f = np.fft.fftfreq(x.shape[0])
+    n_freq = len(f) // 2
+    n_x = x.shape[1]
+    n_i = n_x -1
+    n_o = n_x - n_i
+    f = f[:n_freq]
+    X = X[:n_freq, :]
+    X = 2.0*X
+    X[:,0] /= 2.0
+    plt.figure()
+    plt.semilogy(f, np.abs(X))
+    plt.show()
+    plt.title("Linear spectra")
+    G = np.zeros(shape=(n_freq,n_x,n_x))
+    H1 = np.zeros(shape=(n_freq,n_o,n_i))
+    for f_i in range(n_freq):
+        try:
+            G[f_i,:,:] = X[f_i,:].reshape((n_x,1)) @ np.conj(X[f_i,:].reshape(1,n_x))
+            H1[f_i,:,:] = G[f_i,:n_o,:n_i] @  np.linalg.inv(G[f_i,-n_i:,-n_i:])
+        except LinAlgError:
+            pass
+    plt.figure()
+    plt.semilogy(f, np.abs(H1.squeeze()))
+    plt.show()
+
+    return f, X
+
 
 def ivat_vis(data: af64) -> None:
     # Perform IVAT to identify cluster count
-    # data_mat = ivat(data, return_odm=True)
-    # plt.title("IVAT Clustering")
-    # plt.show()
-    pass
+    data_mat = ivat(data, return_odm=True)
+    plt.title("IVAT Clustering")
+    plt.show()
 
 def fuzzy_cluster(data: af64) -> None:
     # Use fuzzy c-means and the Fuzzy Partition Coefficient to identify the total number
@@ -53,55 +102,49 @@ def fuzzy_cluster(data: af64) -> None:
     fuzzy_models = []
     num_clusters = np.r_[2:10]
     for k in num_clusters:
-        fcm = FCM(n_clusters=k,m=4,random_state=37)
+        fcm = FCM(n_clusters=k,m=4)
         fcm.fit(data)
         fuzzy_models.append(fcm)
 
-    # plt.figure()
-    # y_pec = [x.partition_entropy_coefficient for x in fuzzy_models]
-    # y_pc = [x.partition_coefficient for x in fuzzy_models]
-    # plt.plot(num_clusters, y_pec)
-    # plt.title("Fuzzy C-Means Partition Entropy Coefficient")
-    # plt.xlabel("Number of Clusters")
-    # plt.ylabel("FPEC value")
-    # plt.show()
-    #
-    # plt.figure()
-    # plt.plot(y_pec,y_pc)
-    # plt.title("Fuzzy C-Means Partition Coefficient vs Entropy")
-    # plt.xlabel("FPEC")
-    # plt.ylabel("FPC")
-    # plt.show()
+    plt.figure()
+    y_pec = [x.partition_entropy_coefficient for x in fuzzy_models]
+    y_pc = [x.partition_coefficient for x in fuzzy_models]
+    plt.plot(num_clusters, y_pec)
+    plt.title("Fuzzy C-Means Partition Entropy Coefficient")
+    plt.xlabel("Number of Clusters")
+    plt.ylabel("FPEC value")
+    plt.show()
 
-@dataclass
-class PeakInfo:
-    x: i64
-    left_base: i64
-    right_base: i64
-    prominence: f64
-    y: f64
-    half_width: f64
+    plt.figure()
+    plt.plot(y_pec,y_pc)
+    plt.title("Fuzzy C-Means Partition Coefficient vs Entropy")
+    plt.xlabel("FPEC")
+    plt.ylabel("FPC")
+    plt.show()
+
+def get_color(idx: int) -> str:
+    # Colors for different distributions
+    colors = ['blue', 'green', 'red', 'purple', 'orange', 'brown', 'pink', 'gray', 'cyan']
+    return colors[idx % len(colors)]
 
 # For some reason, no matter how many clusters we pick, we get the same centers. Let's plot the normalized distribution diagrams.
 def kernel_density_partitioning(norm_data: af64, labels: list[str]) -> list[list[PeakInfo]]:
-    # Colors for different distributions
-    colors = ['blue', 'green', 'red', 'purple', 'orange', 'brown', 'pink', 'gray', 'cyan']
     # Create a smooth x-axis for plotting
     n_samples = len(norm_data)
     x = np.linspace(0, 1, n_samples)
 
     # Plot density for each column as a line plot
-    peak_data: list[list[PeakInfo]] = []
-    for i in range(norm_data.shape[1]):
+    peak_data: list[PeakCollection] = []
+    for ij in range(norm_data.shape[1]):
         # Use kernel density estimation for smooth distribution curves
-        density = stats.gaussian_kde(norm_data[:, i])
+        density = stats.gaussian_kde(norm_data[:, ij])
         data_pdf = density(x)
         # Insert a 0 on each end so the prominence calculation works
-        peak_data.append(get_peak_data(n_samples, data_pdf, x))
-        plt.plot(x, data_pdf, color=colors[i], label=labels[i], linewidth=2)
+        peak_data.append(PeakCollection(x,data_pdf))
+        plt.plot(x, data_pdf, label=labels[ij], color=get_color(ij), linewidth=2)
     # Mark the peaks after, so we can legend easily
     for ij, peak_d in enumerate(peak_data):
-        plt.plot([p.x for p in peak_d], [p.y for p in peak_d], "x", color=colors[ij])
+        plt.plot([p.x for p in peak_d], [p.y for p in peak_d], "x", color=get_color(ij), )
 
     # Adding plot details
     plt.xlabel('Value (Normalized to [0,1])')
@@ -120,24 +163,6 @@ def kernel_density_partitioning(norm_data: af64, labels: list[str]) -> list[list
     return peak_data
 
 
-def get_peak_data(n_samples: i64, data_pdf: af64, x: af64) -> list[PeakInfo]:
-    mod_pdf = np.zeros(data_pdf.shape[0] + 2)
-    mod_pdf[1:-1] = data_pdf
-    peak_indexes, peak_info = find_peaks(mod_pdf, prominence=0.3)
-    prominences = peak_prominences(mod_pdf, peak_indexes)
-    results_half = peak_widths(mod_pdf, peak_indexes, prominence_data=prominences)
-    cur_peak_lst = []
-    for ij, peak_idx in enumerate(peak_indexes):
-        peak_obj = PeakInfo(x=x[peak_idx],
-                            y=mod_pdf[peak_idx],
-                            left_base=x[max(0,peak_info['left_bases'][ij])],
-                            right_base=x[min(peak_info['right_bases'][ij],len(x)-1)],
-                            prominence=peak_info['prominences'][ij],
-                            half_width=results_half[2][ij] / n_samples)  # Order is left-half-idx, half-y, width in samples, right-half-idx
-        cur_peak_lst.append(peak_obj)
-    return cur_peak_lst
-
-
 # NOTE - Most of the outputs are uniform distribution (approximately), so having
 # multiple clusters will make little sense. Instead of clustering by sample, we
 # should pick out 1-4 clusters along each feature individually, from the normalized
@@ -152,63 +177,7 @@ def get_peak_data(n_samples: i64, data_pdf: af64, x: af64) -> list[PeakInfo]:
 # Age: 2,3?
 # Compressive Strength: 1, but N/A (output)
 
-class VariablesInfo:
-    def __init__(self):
-        # TODO - Refactor this to ACO solver?
-        self.variables: list[AcoContinuousVariable] = []
-        self.mu_indexes: list[list[int]] = []
-        self.rule_op_indexes: list[int] = []
-        self.rule_coeff_indexes: list[list[int,]] = []
-        self.rule_args: ai64 = None
-
-    def find_variable(self, name_prefix: str) -> tuple[int, AcoContinuousVariable | None]:
-        for idx, variable in enumerate(self.variables):
-            if variable.name.startswith(name_prefix):
-                return idx, variable
-        return -1, None
-
-    def append_variable(self, x: AcoContinuousVariable | list[AcoContinuousVariable]) -> None:
-        # Check the name for type information.
-        var_idx: int | list[int] = 0
-        var_name: str = ""
-        if isinstance(x, AcoContinuousVariable):
-            var_idx = len(self.variables)
-            self.variables.append(x)
-            var_name = x.name
-        else:
-            var_idx = list(range(len(self.variables),len(self.variables)+len(x)))
-            self.variables.extend(x)
-            var_name = x[0].name
-        if "and/or-op" in var_name:
-            if isinstance(x, AcoContinuousVariable):
-                self.rule_op_indexes.append(var_idx)
-            else:
-                raise Exception("lists of Operator variables are not supported")
-        elif "mu_" in var_name:
-            if isinstance(x, list):
-                self.mu_indexes.append(var_idx)
-            else:
-                raise Exception("single element membership functions are not supported")
-        elif "rule-coeff" in var_name:
-            if isinstance(x, list):
-                self.rule_coeff_indexes.append(var_idx)
-            else:
-                # TODO - Handle 0th-order and 1st-order
-                raise Exception("single element TSK rules are not supported")
-        else:
-            raise Exception("variable name is not supported")
-
-
-    @property
-    def n_membership_fcns(self) -> int:
-        return len(self.mu_indexes)
-
-    @property
-    def n_rules(self) -> int:
-        return len(self.rule_args)
-
-
-# For now, pick the peaks, and rely on the optimizer to get the width and exact location correct.
+# For now, pick the peaks and find their half-height widths as an initial guess.
 # NOTE - By normalizing all data, we can constrain the solution space on the optimizer and the TSK rules! :)
 
 def all_rule_permutations(states_per_var: list[int]) -> af64:
@@ -231,7 +200,7 @@ def create_tsk_variables(peak_data: list[list[PeakInfo]]) -> VariablesInfo:
     for i_var, peak_d in enumerate(peak_data):
         for j_mu in range(len(peak_d)):
             peak_d_j = peak_d[j_mu].y
-            width_d_j = peak_d[j_mu].half_width / 2.0
+            width_d_j = peak_d[j_mu].half_width / 2.0 # Half power width is full width, we need only one side.
             # TODO - Handle different membership functions on different variables!
             mu_var_params = [
                 AcoContinuousVariable(
@@ -240,7 +209,7 @@ def create_tsk_variables(peak_data: list[list[PeakInfo]]) -> VariablesInfo:
                 AcoContinuousVariable(
                     f"mu_{i_var + 1}({j_mu + 1})-b", 0.0001, 1, width_d_j
                 )]
-            info.append_variable(mu_var_params)
+            info.append_variables(mu_var_params)
 
     # Generate the cartesian product of rule states
     info.rule_args = all_rule_permutations([len(x) for x in peak_data])
@@ -249,15 +218,13 @@ def create_tsk_variables(peak_data: list[list[PeakInfo]]) -> VariablesInfo:
     print("Number of rules:", info.n_rules)
 
     for k in range(info.n_rules):
-        info.append_variable(
-            # NOTE - This is the exploratory magic of degree of or/and
-            AcoContinuousVariable(f"rule-and/or-op-{k+1}", 1.0, 1.0, 1.0),
-        )
+        info.append_variables(AcoContinuousVariable(f"rule-and/or-op-{k + 1}", 0.0, 1.0, 0.5))
         info.rule_op_indexes.append(len(aco_variables)-1)
-        coeff_max = n_features
+        # Because everything is normalized, we can
+        coeff_max = 3.0*n_features
         feat_coeffs = [AcoContinuousVariable(f"rule-coeff-{k+1}-f-a{ij+1}", -coeff_max, coeff_max, 0.1) for ij in range(n_features)]
         feat_coeffs.append(AcoContinuousVariable(f"rule-coeff-{k+1}-f-c", -coeff_max, coeff_max, -0.1))
-        info.append_variable(feat_coeffs)
+        info.append_variables(feat_coeffs)
 
     return info
 
@@ -268,12 +235,20 @@ def mu_poly2(x: af64, mu_ab: af64) -> af64:
     return 1.0 / (1.0 + ((x - a) / b) ** 2)
 
 
+def mu_expsq2(x: af64, mu_ab: af64) -> af64:
+    a = mu_ab[0]
+    b = mu_ab[1]
+    return np.exp(-(((x - a) / b) ** 2.0))
+
+
 def extract_mu_from_args(var_args: af64, pts: af64, variables_info: VariablesInfo) -> af64:
     mu_vars = np.zeros((pts.shape[0],variables_info.n_membership_fcns))
     for col_idx in range(pts.shape[1]):
         for ivar,mu_idxs in enumerate(variables_info.mu_indexes):
             mu_coeff = var_args[mu_idxs]
             mu_vars[:,col_idx] = mu_poly2(pts[:,col_idx], mu_coeff)
+            # TODO - Why doesn't exp work?
+            # mu_vars[:,col_idx] = mu_expsq2(pts[:,col_idx], mu_coeff)
     return mu_vars
 
 
@@ -306,7 +281,6 @@ def compute_fuzzy_system(var_args: af64, pts: af64, variables_info: VariablesInf
     for rule_idx in range(variables_info.n_rules):
         and_c = var_args[variables_info.rule_op_indexes[rule_idx]]
         tsk_coeffs = var_args[variables_info.rule_coeff_indexes[rule_idx]]
-        # TODO - Get membership function indexes for each variable!
         var_idxs = variables_info.rule_args[rule_idx,:]
         # NOTE - This is magic!
         r_eval_and = fuzzy_and(mu_vars[:, var_idxs])
@@ -320,14 +294,16 @@ def compute_fuzzy_system(var_args: af64, pts: af64, variables_info: VariablesInf
 
     # Weighted defuzzy!
     z_defuzzy = sum_ZR / sum_R
+    # If constrained to classifier, round to nearest option
     # Compute the RMS error
-    rms_error = np.sqrt(np.mean((z_defuzzy - pts[:, -1]) ** 2))
+    p = 4.0
+    rms_error = np.power(np.mean((z_defuzzy - pts[:, -1]) ** p),1.0/p)
     return rms_error, z_defuzzy
 
 
 def main():
-    train_data, test_data, data_min, data_max, labels = load_data()
-    peak_data = kernel_density_partitioning(train_data, labels)
+    dataset = load_data()
+    peak_data = kernel_density_partitioning(dataset.train_data, dataset.labels)
     variables_info = create_tsk_variables(peak_data)
     print("Number of domain variables:", len(variables_info.variables))
 
@@ -337,27 +313,46 @@ def main():
     with tqdm() as pbar:
         def fuzzy_test2(x: np.ndarray) -> f64:
             nonlocal nfev, min_err
-            rms_err, _ = compute_fuzzy_system(x,train_data,variables_info)
+            rms_err, _ = compute_fuzzy_system(x, dataset.train_data, variables_info)
             # This is an inversion of control, but `scipy.optimize.minimize` has limitations
             min_err = min(rms_err, min_err)
             nfev += 1
             pbar.update(nfev)
-            pbar.set_description(f"err={min_err}")
+            pbar.set_description(f"err={min_err:.2%}")
 
             return rms_err
 
+        # best_soln, soln_history = solve_aco(fuzzy_test2, variables_info.variables,
+        #                                     joblib_n_procs=1, solution_archive_size=50,num_ants=30)
         best_soln, soln_history = solve_gradiant(fuzzy_test2, variables_info.variables)
-        rms_err_test, test_result = compute_fuzzy_system(best_soln, test_data, variables_info)
-        print(f"Train error={soln_history[-1]}, Test error={rms_err_test}")
 
-        # TODO - Show the plot of test result vs defuzzified test result (ideally they overlap)
+        rms_err_test, test_result = compute_fuzzy_system(best_soln, dataset.test_data, variables_info)
+        print(f"NORMALIZED RMS: Train error={soln_history[-1]:.1%}, Test error={rms_err_test:.1%}")
+
+        # Show the plot of test result vs defuzzified test result (ideally they overlap)
         plt.figure()
         plt.title("Test Output Comparison")
-        plt.plot(test_data[:,-1],'r',label="test data")
+        plt.plot(dataset.test_data[:,-1],'r',label="test data")
         plt.plot(test_result,'b',label="predicted data")
         plt.xlabel("Sample")
         plt.legend()
         plt.ylabel("Normalized Value")
+
+        # Produce the denormalized result and show that!
+        denorm_test_result = dataset.unscale_data(test_result, index=-1)
+        denorm_test_data = dataset.unscale_data(dataset.test_data[:,-1], index=-1)
+
+        # Compute average, max error
+        err = np.abs(denorm_test_result - denorm_test_data) / denorm_test_data
+        print(f"AVERAGE ERROR: {np.mean(err):.1%}")
+        print(f"MAX ERROR: {np.max(err):.1%}")
+
+        plt.figure()
+        plt.title("True Units Comparison")
+        plt.plot(denorm_test_data, 'r', label="test data")
+        plt.plot(denorm_test_result, 'b', label="predicted data")
+        plt.xlabel("Sample")
+        plt.ylabel("True Units Error")
         plt.show()
 
 
