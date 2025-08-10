@@ -1,11 +1,12 @@
 import logging
 
 import numpy as np
+from numpy.typing import NDArray
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from AEEM6097.aco_solver import solve_aco, AcoContinuousVariable
-from AEEM6097.fuzzy import FuzzySet, MamdaniRule, FuzzyVariable, FuzzyInference
+from AEEM6097.fuzzy import FuzzySet, MamdaniRule, FuzzyVariable, FuzzyInference, FuzzyRule
 from AEEM6097.membership_functions import (
     create_triangle_memberships,
 )
@@ -38,7 +39,7 @@ def plot_membership_functions(*varargs: FuzzySet) -> None:
     fig.show()
 
 
-def fuzzy_system_aco(x: np.typing.NDArray) -> np.float64:
+def fuzzy_system_aco(x: NDArray) -> np.float64:
     try:
         # Destructure the input into the arguments - flow, water level, power (in that order)
         all_rules, _, _, _ = create_system(*x)
@@ -353,7 +354,7 @@ def create_system(
     return all_rules, flow_rate, water_level, power_output
 
 
-def simulate_system(all_rules, l_steps, q_steps):
+def simulate_system(all_rules: list[FuzzyRule], l_steps, q_steps):
     Z = np.zeros((len(l_steps), len(q_steps)))
     for iy, q_i in enumerate(q_steps):
         for ix, l_j in enumerate(l_steps):
