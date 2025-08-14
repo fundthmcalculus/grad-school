@@ -1,34 +1,44 @@
-import joblib
+import logging
+
 import numpy as np
 from joblib import Parallel, delayed
 from numpy._typing import NDArray
 from tqdm import trange
 
 
-def run_ant_mst(network_routes: NDArray, eta: NDArray, tau_xy: NDArray, alpha: float, beta: float) -> tuple[NDArray, float]:
+def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: float) -> tuple[list[tuple[int,int]], float]:
     # Start at city 1, and join each city to the ever-growing spanning tree.
-    cur_row = 0 # Offset by 1, so we start at city 1
-    eta_shape_ = eta.shape[0]
-    order_len = eta_shape_
+    cur_row = 1 # Offset by 1, so we start at city 1
+    eta_shape_ = network_routes.shape[0]
     # City pairings - [from, to]
     city_links: list[tuple[int,int]] = []
     city_indices = list(range(eta_shape_))
+    # For performance, permute the city_indices once, since this "random"
     allowed_cities = city_indices.copy()
     total_length = 0
+    # NOTE - We can precompute probabilities
+    p_mat = (tau_xy ** alpha) * (network_routes ** -beta)
     # While cities haven't been allocated
     while cur_row < eta_shape_:
-        # Randomly pick a city off the allow-list
-        new_city = np.random.choice(allowed_cities, replace=False)
+        # Randomly pick a city off the allowlist
+        # new_city = np.random.choice(allowed_cities)
+        new_city = _np_choice(allowed_cities)
         # Do the weighted choice array of where to join to exist
-        p = p_xy(eta, tau_xy,alpha,beta, new_city)
+        p = p_mat[new_city, :]
+        # Remove negatives, which are self-reference
+        p[p < 0] = 0.0
         # Remove the reciprocal pairings.
-        p[[tc for fc,tc in city_links if fc == new_city]] = 0.0
+        for fc, tc in city_links:
+            if fc == new_city:
+                p[tc] = 0.0
+            elif tc == new_city:
+                p[fc] = 0.0
         p = p / p.sum()
-        if p.sum() == 0.0:
-            return city_links, total_length
         # Choose which city to attach
-        from_city = np.random.choice(city_indices, p=p)
-        # Store in the city-links
+        # from_city = np.random.choice(city_indices, p=p)
+        from_city = _np_choice(city_indices, p=p)
+
+        # Store in the city-links in low-high order, since we have a bidirectional graph
         city_links.append((from_city, new_city))
         total_length += network_routes[from_city, new_city]
         cur_row += 1
@@ -37,18 +47,17 @@ def run_ant_mst(network_routes: NDArray, eta: NDArray, tau_xy: NDArray, alpha: f
     return city_links, total_length
 
 
+def _np_choice(options, p = None):
+    if p is None:
+        return options[np.random.randint(len(options))]
 
-def p_xy(eta_xy, tau_xy, alpha, beta, x):
-    # Because this is an MST, any city pairing is allowed.
-    p = (tau_xy[x,:] ** alpha) * eta_xy[x,:] ** beta
-    # Remove negatives, which are self-reference
-    p[p < 0] = 0.0
-    # Normalize the probabilities
-    if np.sum(p) == 0.0:
-        return 0
-    p = p / np.sum(p)
-    return p
-
+    r = np.random.random()
+    c = 0
+    for i, p_i in enumerate(p):
+        c += p_i
+        if c >= r:
+            return options[i]
+    return options[-1]
 
 
 def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
@@ -63,8 +72,6 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
     beta = 1
     # Update constant
     Q = 10
-    # Desirability of a given move.
-    eta = 1 / network_routes
     # Default trail level
     tau = np.ones(network_routes.shape)
     # If we have a hot start, preload it 4x
@@ -77,17 +84,25 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
         for i in range(len(hot_start) - 1):
             tau[hot_start[i], hot_start[i + 1]] += 10*Q / hot_start_length
 
-    with Parallel(n_jobs=1, prefer="threads") as parallel:
+    n_jobs = 1
+    with Parallel(n_jobs=n_jobs, prefer="processes") as parallel:
         for generation in trange(n_iter, desc="ACO Generation"):
             # Compute the change in pheromone!
             delta_tau = np.zeros(tau.shape)
             optimal_ant_len = np.inf
             optimal_ant_city_order = None
-            def parallel_ant(local_ant):
-                return run_ant_mst(network_routes, eta, tau, alpha, beta)
-            all_results = parallel(delayed(parallel_ant)(i_ant) for i_ant in range(n_ants))
+            def parallel_ant(num_ants):
+                best_links = []
+                best_total_length = np.inf
+                for _ in range(num_ants):
+                    ant_links, ant_total_length = run_ant_mst(network_routes, tau, alpha, beta)
+                    if ant_total_length < best_total_length:
+                        best_links = ant_links
+                        best_total_length = ant_total_length
+                return best_links, best_total_length
+            all_results = parallel(delayed(parallel_ant)(n_ants // n_jobs) for i_ant in range(n_jobs))
 
-            for ant in range(n_ants):
+            for ant in range(len(all_results)):
                 tour_length = all_results[ant][1]
                 city_order = all_results[ant][0]
                 # If a dead-end, skip!
@@ -99,11 +114,18 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
                     optimal_ant_city_order = city_order
                 for i in range(len(city_order)):
                     delta_tau[city_order[i][0], city_order[i][1]] += Q / tour_length
+                    # Because this is a bigraph, update the transpose as well.
+                    delta_tau[city_order[i][1], city_order[i][0]] += Q / tour_length
             # Update the per-generation information
             if optimal_ant_len < optimal_tour_length:
                 optimal_tour_length = optimal_ant_len
                 optimal_city_order = optimal_ant_city_order
             tour_lengths.append(optimal_tour_length)
+            # If the last 10 generations are the same, stop early.
+            n_stops = 50
+            if len(tour_lengths) > n_stops and np.all(np.diff(tour_lengths[-n_stops:]) == 0):
+                print("Stopping early due to lack of improvement.")
+                break
             # Once all ants are done, update the pheromone
             tau = pheromone_update(tau, delta_tau, rho)
     return optimal_city_order, optimal_tour_length, tour_lengths

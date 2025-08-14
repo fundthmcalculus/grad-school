@@ -190,28 +190,21 @@ def plot_results(all_cities: np.ndarray, distances: np.ndarray,
 def vat_mst(matrix_of_pairwise_distance):
     # Run the ACO MST solution.
     N = len(matrix_of_pairwise_distance)
-    optimal_links, optimal_length, tour_lengths = aco_mst_solve(matrix_of_pairwise_distance, n_ants=N, n_iter=N)
+    optimal_links, optimal_length, tour_lengths = aco_mst_solve(matrix_of_pairwise_distance, n_ants=N*8, n_iter=N*10)
     # Plot the convergence
     plt.figure()
     plt.plot(tour_lengths)
     plt.xlabel("Iteration")
     plt.ylabel("MST Length")
     new_matrix = np.array(matrix_of_pairwise_distance, copy=True)
-    for link in optimal_links:
-        # Exchange the relevant rows and columns?
-        p = link[0]
-        q = link[1]
-        t = new_matrix[p, :]
-        new_matrix[p, :] = new_matrix[q, :]
-        new_matrix[q, :] = t
-        t = new_matrix[:, p]
-        new_matrix[:, p] = new_matrix[:, q]
-        new_matrix[:, q] = t
-    return new_matrix, optimal_links
+    # Get the unique numbers in order in the list of tuples
+    optimal_order = list(dict.fromkeys([s for p in optimal_links for s in p]))
+    new_matrix = new_matrix[optimal_order,:][:, optimal_order]
+    return new_matrix, optimal_order
 
 
 def vat_scaling():
-    for city_exp in range(1, 4):
+    for city_exp in range(1, 3):
         city_count = 2**city_exp
         print(f"City count: {city_count**2}")
         all_cities = circle_random_clusters(n_clusters=city_count, n_cities=city_count)
@@ -221,8 +214,8 @@ def vat_scaling():
         rand_col_order = np.random.permutation(cols)
         matrix_of_pairwise_distance = matrix_of_pairwise_distance[:, rand_col_order][rand_col_order, :]
         # Cluster using our VAT
-        t0 = time.time()
-        ordered_matrix2, observation_path2 = compute_merge_sort_dissimilarity_matrix(matrix_of_pairwise_distance)
+        # t0 = time.time()
+        # ordered_matrix2, observation_path2 = compute_merge_sort_dissimilarity_matrix(matrix_of_pairwise_distance)
         t1 = time.time()
         # Cluster using the library VAT
         ordered_matrix, observation_path = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
@@ -233,24 +226,25 @@ def vat_scaling():
 
         # Ensure all values are equal!
         # assert np.all(ordered_matrix == ordered_matrix2)
-        print("VAT-Merge: ", observation_path2)
         print("VAT-Lib: ", observation_path)
+        # print("VAT-Merge: ", observation_path2)
+        print("VAT-ACO: ", observation_path3)
         # assert np.all(observation_path == observation_path2)
 
 
         # Print the results
-        print(f"VAT-merge time: {t1-t0:.4f} seconds")
         print(f"VAT-lib time: {t2-t1:.4f} seconds")
+        # print(f"VAT-merge time: {t1-t0:.4f} seconds")
         print(f"VAT-ACO time: {t3-t2:.4f} seconds")
 
         plt.figure()
-        plt.subplot(1,3,1)
+        plt.subplot(1,2,1)
         plt.imshow(ordered_matrix, cmap='viridis', aspect='auto', label='VAT-lib')
         plt.title("VAT Library")
-        plt.subplot(1,3,2)
-        plt.imshow(ordered_matrix2, cmap='viridis', aspect='auto', label='VAT-merge')
-        plt.title("VAT MergeSort")
-        plt.subplot(1,3,3)
+        # plt.subplot(1,2,3)
+        # plt.imshow(ordered_matrix2, cmap='viridis', aspect='auto', label='VAT-merge')
+        # plt.title("VAT MergeSort")
+        plt.subplot(1,2,2)
         plt.imshow(ordered_matrix3, cmap='viridis', aspect='auto', label='VAT-ACO')
         plt.title("VAT ACO")
         plt.show()
