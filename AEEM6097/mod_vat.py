@@ -9,7 +9,7 @@ from sklearn.metrics import pairwise_distances
 # @njit(cache=True)
 def compute_ordered_dis_njit2(matrix_of_pairwise_distance: np.ndarray):  # pragma: no cover
     """
-    The ordered dissimilarity matrix is used by visual assessment of tendency. It is a just a reordering
+    The ordered dissimilarity matrix is used by visual assessment of tendency. It is just a reordering
     of the dissimilarity matrix.
 
 
