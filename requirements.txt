@@ -1,3 +1,4 @@
+numba
 flake8
 black
 mypy
