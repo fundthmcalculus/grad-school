@@ -1,9 +1,11 @@
 import joblib
 import numpy as np
 from joblib import Parallel, delayed
+from numba import njit
 from numpy._typing import NDArray
 from tqdm import trange
 
+@njit
 def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: float, p_mat: NDArray = None) -> tuple[list[tuple[int,int]], float]:
     # Start at city 1, and join each city to the ever-growing spanning tree.
     eta_shape_ = network_routes.shape[0]
@@ -43,6 +45,7 @@ def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: fl
 
     return city_links, total_length
 
+@njit
 def _np_choice(options, p = None):
     if p is None:
         return options[np.random.randint(len(options))]
