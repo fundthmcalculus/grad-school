@@ -9,7 +9,7 @@ from AEEM6097.aco_mst import aco_mst_solve
 from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_ordered_dis_njit2
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
-N_CITIES_CLUSTER = 8
+N_CITIES_CLUSTER = 16
 N_CLUSTERS = N_CITIES_CLUSTER//2
 
 N_ANTS = 5*N_CITIES_CLUSTER
@@ -194,8 +194,9 @@ def get_optimal_order(links):
         # Find all links containing this node
         for link in links:
             other = link[1] if link[0] == node else link[0] if link[1] == node else None
-            if other is not None and link not in seen:
-                seen.add(link)
+            tl = tuple(link)
+            if other is not None and tl not in seen:
+                seen.add(tl)
                 add_connected(other)
 
     add_connected(0)
