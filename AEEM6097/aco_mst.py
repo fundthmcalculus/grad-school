@@ -1,5 +1,3 @@
-import logging
-
 import joblib
 import numpy as np
 from joblib import Parallel, delayed
@@ -82,7 +80,7 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
         for i in range(len(hot_start) - 1):
             tau[hot_start[i], hot_start[i + 1]] += H
 
-    n_jobs = 1 # joblib.cpu_count()//4 * 3
+    n_jobs = joblib.cpu_count()//4 * 3
     with Parallel(n_jobs=n_jobs, prefer="processes") as parallel:
         for generation in trange(n_iter, desc="ACO Generation"):
             def parallel_ant(num_ants):

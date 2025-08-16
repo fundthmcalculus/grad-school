@@ -9,10 +9,10 @@ from AEEM6097.aco_mst import aco_mst_solve
 from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_ordered_dis_njit2
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
-N_CITIES_CLUSTER = 8
+N_CITIES_CLUSTER = 40
 N_CLUSTERS = N_CITIES_CLUSTER//2
 
-N_ANTS = 5*N_CITIES_CLUSTER
+N_ANTS = 10*N_CITIES_CLUSTER
 N_GENERATIONS = 5*N_CLUSTERS
 
 CLUSTER_DIAMETER = 3
