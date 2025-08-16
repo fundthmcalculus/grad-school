@@ -9,11 +9,11 @@ from AEEM6097.aco_mst import aco_mst_solve
 from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_ordered_dis_njit2
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
-N_CITIES_CLUSTER = 32
+N_CITIES_CLUSTER = 8
 N_CLUSTERS = N_CITIES_CLUSTER//2
 
-N_ANTS = 10*N_CITIES_CLUSTER
-N_GENERATIONS = 10*N_CLUSTERS
+N_ANTS = 5*N_CITIES_CLUSTER
+N_GENERATIONS = 5*N_CLUSTERS
 
 CLUSTER_DIAMETER = 3
 CLUSTER_SPACING = 10*CLUSTER_DIAMETER
@@ -236,6 +236,7 @@ def vat_scaling():
     cols = np.arange(len(all_cities), dtype="int")
     rand_col_order = np.random.permutation(cols)
     matrix_of_pairwise_distance = matrix_of_pairwise_distance[:, rand_col_order][rand_col_order, :]
+    print("Solving VAT")
     t1 = time.time()
     # Cluster using the library VAT
     ordered_matrix, observation_path = compute_ordered_dis_njit2(matrix_of_pairwise_distance)

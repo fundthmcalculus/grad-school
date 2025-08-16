@@ -3,10 +3,11 @@ import logging
 import joblib
 import numpy as np
 from joblib import Parallel, delayed
+from numba import njit
 from numpy._typing import NDArray
 from tqdm import trange
 
-
+@njit
 def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: float) -> tuple[list[tuple[int,int]], float]:
     # Start at city 1, and join each city to the ever-growing spanning tree.
     eta_shape_ = network_routes.shape[0]
@@ -19,7 +20,7 @@ def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: fl
     # NOTE - We can precompute probabilities
     p_mat = (tau_xy ** alpha) * (network_routes ** -beta)
     # While cities haven't been allocated
-    from_city = np.random.choice(city_indices)
+    from_city = _np_choice(city_indices)
     visited_cities.append(from_city)
     while len(visited_cities) < eta_shape_:
         # Randomly pick a city off the allowlist
@@ -27,11 +28,13 @@ def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: fl
         p = p_mat[from_city, :]
         # Remove negatives, which are self-reference
         p[p < 0] = 0.0
-        p[visited_cities] = 0.0
+        for vc in visited_cities:
+            p[vc] = 0.0
+        # p[visited_cities] = 0.0
         # Remove anything not in the allowed cities
         p = p / p.sum()
         # Choose which city to attach
-        to_city = np.random.choice(city_indices, p=p)
+        to_city = _np_choice(city_indices, p=p)
         if to_city not in visited_cities:
             # Store in the city-links in low-high order, since we have a bidirectional graph
             city_links.append((from_city, to_city))
@@ -41,7 +44,7 @@ def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: fl
 
     return city_links, total_length
 
-
+@njit
 def _np_choice(options, p = None):
     if p is None:
         return options[np.random.randint(len(options))]
@@ -79,7 +82,7 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
         for i in range(len(hot_start) - 1):
             tau[hot_start[i], hot_start[i + 1]] += H
 
-    n_jobs = joblib.cpu_count()//4 * 3
+    n_jobs = 1 # joblib.cpu_count()//4 * 3
     with Parallel(n_jobs=n_jobs, prefer="processes") as parallel:
         for generation in trange(n_iter, desc="ACO Generation"):
             def parallel_ant(num_ants):
