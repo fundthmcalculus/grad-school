@@ -1,3 +1,5 @@
+import logging
+
 import joblib
 import numpy as np
 from joblib import Parallel, delayed
@@ -6,41 +8,38 @@ from numpy._typing import NDArray
 from tqdm import trange
 
 @njit
-def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: float, p_mat: NDArray = None) -> tuple[list[tuple[int,int]], float]:
+def run_ant_mst(network_routes: NDArray, tau_xy: NDArray, alpha: float, beta: float) -> tuple[list[tuple[int,int]], float]:
     # Start at city 1, and join each city to the ever-growing spanning tree.
     eta_shape_ = network_routes.shape[0]
     # City pairings - [from, to]
-    cur_row = 0
-    city_links = np.zeros((eta_shape_, 2), dtype=np.int64)
+    city_links: list[tuple[int,int]] = []
     city_indices = list(range(eta_shape_))
     # For performance, permute the city_indices once, since this "random"
-    visited_cities = np.zeros(eta_shape_, dtype=np.uint8)
+    visited_cities = list()
     total_length = 0
     # NOTE - We can precompute probabilities
-    if p_mat is None:
-        p_mat = (tau_xy ** alpha) * (network_routes ** -beta)
+    p_mat = (tau_xy ** alpha) * (network_routes ** -beta)
     # While cities haven't been allocated
     from_city = _np_choice(city_indices)
-    visited_cities[from_city] = 1
-    while np.sum(visited_cities) < eta_shape_:
+    visited_cities.append(from_city)
+    while len(visited_cities) < eta_shape_:
         # Randomly pick a city off the allowlist
         # Do the weighted choice array of where to join to exist
         p = p_mat[from_city, :]
         # Remove negatives, which are self-reference
         p[p < 0] = 0.0
-        for idx in range(eta_shape_):
-            p[idx] *= (1-visited_cities[idx])
+        for vc in visited_cities:
+            p[vc] = 0.0
         # p[visited_cities] = 0.0
         # Remove anything not in the allowed cities
         p = p / p.sum()
         # Choose which city to attach
         to_city = _np_choice(city_indices, p=p)
-        if visited_cities[to_city] == 0:
+        if to_city not in visited_cities:
             # Store in the city-links in low-high order, since we have a bidirectional graph
-            city_links[cur_row, :] = [from_city, to_city]
+            city_links.append((from_city, to_city))
             total_length += network_routes[from_city, to_city]
-            visited_cities[to_city] = 1
-            cur_row += 1
+            visited_cities.append(to_city)
         from_city = to_city
 
     return city_links, total_length
@@ -83,15 +82,14 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10,
         for i in range(len(hot_start) - 1):
             tau[hot_start[i], hot_start[i + 1]] += H
 
-    n_jobs = joblib.cpu_count()//4 * 3
+    n_jobs = 1 # joblib.cpu_count()//4 * 3
     with Parallel(n_jobs=n_jobs, prefer="processes") as parallel:
         for generation in trange(n_iter, desc="ACO Generation"):
             def parallel_ant(num_ants):
                 best_links = []
                 best_total_length = np.inf
-                p_mat = (tau ** alpha) * (network_routes ** -beta)
                 for _ in range(num_ants):
-                    ant_links, ant_total_length = run_ant_mst(network_routes, tau, alpha, beta, p_mat)
+                    ant_links, ant_total_length = run_ant_mst(network_routes, tau, alpha, beta)
                     if ant_total_length < best_total_length:
                         best_links = ant_links
                         best_total_length = ant_total_length
