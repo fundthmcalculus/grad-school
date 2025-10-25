@@ -9,11 +9,11 @@ from AEEM6097.aco_mst import aco_mst_solve
 from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_ordered_dis_njit2
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
-N_CITIES_CLUSTER = 40
+N_CITIES_CLUSTER = 64
 N_CLUSTERS = N_CITIES_CLUSTER//2
 
-N_ANTS = 10*N_CITIES_CLUSTER
-N_GENERATIONS = 5*N_CLUSTERS
+N_ANTS = 8192
+N_GENERATIONS = 128
 
 CLUSTER_DIAMETER = 3
 CLUSTER_SPACING = 10*CLUSTER_DIAMETER
@@ -186,19 +186,28 @@ def plot_results(all_cities: np.ndarray, distances: np.ndarray,
 
 def get_optimal_order(links):
     """Get optimal order by recursively following connected nodes starting from node 0"""
-    order = []  # Start with node 0
+    order = []
     seen = set()
+    nodes_to_process = [0]  # Start with node 0
 
-    def add_connected(node):
+    while nodes_to_process:
+        node = nodes_to_process.pop()
         order.append(node)
-        # Find all links containing this node
-        for link in links:
-            other = link[1] if link[0] == node else link[0] if link[1] == node else None
-            if other is not None and link not in seen:
-                seen.add(link)
-                add_connected(other)
 
-    add_connected(0)
+        # Find all links containing this node
+        if isinstance(links, np.ndarray):
+            mask = (links[:, 0] == node) | (links[:, 1] == node)
+            for link in links[mask]:
+                other = link[1] if link[0] == node else link[0] if link[1] == node else None
+                if other is not None and tuple(link) not in seen:
+                    seen.add(tuple(link))
+                    nodes_to_process.append(other)
+        else:
+            for link in links:
+                other = link[1] if link[0] == node else link[0] if link[1] == node else None
+                if other is not None and link not in seen:
+                    seen.add(link)
+                    nodes_to_process.append(other)
 
     return order
 
@@ -238,11 +247,11 @@ def vat_scaling():
     matrix_of_pairwise_distance = matrix_of_pairwise_distance[:, rand_col_order][rand_col_order, :]
     print("Solving VAT")
     t1 = time.time()
-    # Cluster using the library VAT
-    ordered_matrix, observation_path = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
-    t2 = time.time()
     # Cluster using the ACO VAT
     ordered_matrix3, observation_path3 = vat_mst(matrix_of_pairwise_distance)
+    t2 = time.time()
+    # Cluster using the library VAT
+    ordered_matrix, observation_path = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
     t3 = time.time()
 
     # Ensure all values are equal!
@@ -250,8 +259,8 @@ def vat_scaling():
     print("VAT-ACO: ", observation_path3)
 
     # Print the results
-    print(f"VAT-lib time: {t2-t1:.4f} seconds, distance: {ordered_matrix.diagonal(1).sum() + ordered_matrix[0,-1]:.1f}")
-    print(f"VAT-ACO time: {t3-t2:.4f} seconds, distance: {ordered_matrix3.diagonal(1).sum() + ordered_matrix3[0,-1]:.1f}")
+    print(f"VAT-ACO time: {t2-t1:.4f} seconds, distance: {ordered_matrix.diagonal(1).sum() + ordered_matrix[0,-1]:.1f}")
+    print(f"VAT-lib time: {t3-t2:.4f} seconds, distance: {ordered_matrix3.diagonal(1).sum() + ordered_matrix3[0,-1]:.1f}")
 
     plt.figure(figsize=(8, 6))
     plt.subplot(1,2,1)
