@@ -2,6 +2,7 @@ from typing import Callable
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy import fft
 from scipy.optimize import minimize
 from numpy.typing import NDArray
 from fcmeans import FCM
@@ -90,14 +91,14 @@ def main_ackley(min_fcn) -> None:
         (-10,10), # f_a
         (-1000,1000), # f_b
     ]
-    N_args = len(x0)
+    n_args = len(x0)
     # Replicate for each arg set
     x0 = x0 * N_mu
     bounds = bounds * N_mu
     # Locate the membership functions a bit better
     mu_a = np.r_[X_min:X_max:mu_b]
     for ij in range(N_mu):
-        x0[ij*N_args] = mu_a[2*ij+1]
+        x0[ij*n_args] = mu_a[2*ij+1]
 
     res = minimize(min_fcn, np.array(x0), bounds=bounds)
     print("Result Information:",res)
@@ -119,7 +120,7 @@ def main_ackley(min_fcn) -> None:
     axs[0].set_title('Comparison of Defined Function `y_d` and `y_crisp`')
     # Plot the membership functions
     for ij, mu_i in enumerate(mu_lst):
-        axs[1].plot(x_eval, mu_i(x_eval,x1[N_args*ij],x1[N_args*ij+1]), label=f'mu_{ij}')
+        axs[1].plot(x_eval, mu_i(x_eval,x1[n_args*ij],x1[n_args*ij+1]), label=f'mu_{ij}')
     axs[1].legend()
     axs[1].set(xlabel='x', ylabel='mu(x)')
     axs[1].set_title('Membership Functions')
@@ -139,7 +140,7 @@ def main_sonar() -> None:
     # Now that one is "1", and the other is "-1", we can have confidence for each?
     output_col: np.ndarray = rock_col + mine_col
 
-    # NOTE - There isn't much in the way of clustering, so we can ignore that.
+    # NOTE - There is little in the way of clustering, so we can ignore that.
     sonar_full_data = np.hstack((sonar_data, np.reshape(output_col, (len(output_col), 1))))
     # Permute the rows randomly
     sonar_full_data = np.random.permutation(sonar_full_data)
@@ -157,14 +158,44 @@ def main_sonar() -> None:
     # Order the entries so that the cluster-1 are front of dataset, cluster-2 end of the dataset.
     cluster_number = np.argmax(membership_degree, axis=1)
     member_order = np.argsort(cluster_number)
-    sonar_full_data = sonar_full_data[member_order, :]
+    # sonar_full_data = sonar_full_data[member_order, :]
     membership_degree = membership_degree[member_order, :]
     # Plot the membership degree for the clusters
     plot_membership_degree(membership_degree, fcm)
 
+    # Plot the linear spectra
+    plot_lin_spec(sonar_full_data)
     # Use the cluster centers as the two rules?
-
     plt.show()
+
+
+def plot_lin_spec(x: np.ndarray) -> None:
+    x_cat = x[:,60:]
+    x = x[:,:60]
+    x_spec = lin_spec(x)
+    # Normalize along the second axis
+    x_spec = x_spec / np.max(np.abs(x_spec),axis=1, keepdims=True)
+    # Now, plot in two blocks on the same axis: Those which are category == 1.0, those which are category == -1.0
+    rock_indices = x_cat.flatten() == 1.0
+    mine_indices = x_cat.flatten() == -1.0
+    plt.figure()
+    plt.semilogy(np.abs(x_spec[rock_indices]).T, 'b', alpha=0.3, label='Rock')
+    plt.semilogy(np.abs(x_spec[mine_indices]).T, 'r', alpha=0.3, label='Mine')
+    plt.title('Linear Spectra')
+    plt.xlabel('Frequency')
+    plt.ylabel('Amplitude')
+    plt.legend(['Cluster Blue (Rock)', 'Cluster Red (Mine)'])
+    plt.show()
+
+
+def lin_spec(x: np.ndarray) -> np.ndarray:
+    N = x.shape[1]
+    X = fft.fft(x, axis=1)
+    # Take the positive frequencies
+    X = X[:,:N//2]
+    # Double all but the DC term to preserve energy
+    X[1:] *= 2
+    return X
 
 
 def plot_ivat(sonar_full_data):
