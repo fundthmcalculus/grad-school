@@ -3,10 +3,10 @@ import time
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from pyclustertend.visual_assessment_of_tendency import compute_ordered_dis_njit
 from sklearn.metrics import pairwise_distances
 
-from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_merge_sort_dissimilarity_matrix
+from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, \
+    compute_ordered_dis_njit2, compute_ordered_dis_njit_merge
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
 N_CITIES_CLUSTER = 32
@@ -25,6 +25,8 @@ def random_cities(center_x, center_y, n_cities=-1) -> np.ndarray:
     if n_cities == -1:
         n_cities = N_CITIES_CLUSTER
     # Randomly distribute cities in a uniform circle?
+    if n_cities == 1:
+        return np.array([[center_x, center_y]])
     theta = np.linspace(0, 2 * np.pi, n_cities+1)
     theta = theta[:-1]
     city_x = np.cos(theta) * CLUSTER_DIAMETER/2.0 + center_x
@@ -36,7 +38,7 @@ def circle_random_clusters(n_clusters=-1, n_cities=-1) -> np.ndarray:
     if n_clusters == -1:
         n_clusters = N_CLUSTERS
     city_locations = np.zeros(shape=(0,2))
-    for theta in np.linspace(0, 2*np.pi, n_clusters):
+    for theta in np.linspace(0, 2*np.pi, n_clusters, endpoint=False):
         if HALF_CIRCLE:
             theta /= 2.0
         else:
@@ -186,11 +188,14 @@ def plot_results(all_cities: np.ndarray, distances: np.ndarray,
     plt.show()
 
 
-def vat_scaling():
-    for city_exp in range(1, 4):
-        city_count = 2**city_exp
-        print(f"City count: {city_count**2}")
-        all_cities = circle_random_clusters(n_clusters=city_count, n_cities=city_count)
+def test_vat_scaling():
+    city_count = []
+    merge_time = []
+    lib_time = []
+    for group_count in np.logspace(5, 10, 5, base=2, dtype="int"):
+        city_count.append(group_count)
+        # print(f"City count: {group_count}")
+        all_cities = circle_random_clusters(n_clusters=group_count, n_cities=1)
         matrix_of_pairwise_distance = pairwise_distances(all_cities)
         # Scramble the order to ensure we sort it!
         cols = np.arange(len(all_cities), dtype="int")
@@ -198,21 +203,51 @@ def vat_scaling():
         matrix_of_pairwise_distance = matrix_of_pairwise_distance[:, rand_col_order][rand_col_order, :]
         # Cluster using our IVAT
         t0 = time.time()
-        ordered_matrix2 = compute_merge_sort_dissimilarity_matrix(matrix_of_pairwise_distance)
+        ordered_matrix2, path_merge = compute_ordered_dis_njit_merge(matrix_of_pairwise_distance)
         t1 = time.time()
         # Cluster using the library IVAT
-        ordered_matrix = compute_ordered_dis_njit(matrix_of_pairwise_distance)
+        # ordered_matrix, path_vat = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
         t2 = time.time()
 
-        # Ensure all values are equal!
-        assert np.all(ordered_matrix == ordered_matrix2)
-        # assert np.all(observation_path == observation_path2)
-
-
         # Print the results
-        print(f"IVAT-merge time: {t1-t0:.4f} seconds")
-        print(f"IVAT-lib time: {t2-t1:.4f} seconds")
+        # print(f"VAT-merge time: {t1-t0:.4f} seconds")
+        # print(f"VAT-lib time: {t2-t1:.4f} seconds")
+        # print(f"IVAT-merge path: {path_merge}")
+        # print(f"IVAT-lib path: {path_vat}")
+        merge_time.append(t1 - t0)
+        lib_time.append(t2 - t1)
 
+    # Prepare data for regression
+    log_x = np.log(city_count)
+    log_lib = np.log(lib_time)
+    log_merge = np.log(merge_time)
+
+    print("\n")
+    print(f"Merge-VAT O(n)=n^{np.round(np.mean(log_merge/log_x))}")
+    print(f"Lib-VAT O(n)=n^{np.round(np.mean(log_lib/log_x))}")
+
+    plt.figure()
+    plt.loglog(city_count, merge_time, 'o', label="Merge VAT")
+    plt.loglog(city_count, lib_time, 'o', label="Lib VAT")
+    plt.xlabel("Number of Cities")
+    plt.ylabel("Time (seconds)")
+    plt.legend()
+    plt.title("VAT Scaling Test")
+    plt.show()
+
+    # Plot the results
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(4, 10))
+    fig.suptitle(f"VAT Scaling Test (N={group_count})")
+    im1 = ax1.imshow(0*ordered_matrix2, cmap='viridis')
+    ax1.set_title(f'Library VAT Result: {t2-t1:.2f} seconds')
+    plt.colorbar(im1, ax=ax1)
+
+    im2 = ax2.imshow(ordered_matrix2, cmap='viridis')
+    ax2.set_title(f'Merge Sort VAT Result: {t1-t0:.2f} seconds')
+    plt.colorbar(im2, ax=ax2)
+
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     main()
