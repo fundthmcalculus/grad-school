@@ -189,10 +189,13 @@ def plot_results(all_cities: np.ndarray, distances: np.ndarray,
 
 
 def test_vat_scaling():
-    city_count = []
-    merge_time = []
-    lib_time = []
-    for group_count in np.logspace(5, 10, 5, base=2, dtype="int"):
+    city_count: list[int] = []
+    merge_time: list[float] = []
+    lib_time: list[float] = []
+    o1 = 3
+    o2 = 12
+    n = o2-o1+1
+    for group_count in np.logspace(o1, o2, n, base=2, dtype="int"):
         city_count.append(group_count)
         # print(f"City count: {group_count}")
         all_cities = circle_random_clusters(n_clusters=group_count, n_cities=1)
@@ -206,7 +209,7 @@ def test_vat_scaling():
         ordered_matrix2, path_merge = compute_ordered_dis_njit_merge(matrix_of_pairwise_distance)
         t1 = time.time()
         # Cluster using the library IVAT
-        # ordered_matrix, path_vat = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
+        ordered_matrix, path_vat = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
         t2 = time.time()
 
         # Print the results
@@ -238,7 +241,7 @@ def test_vat_scaling():
     # Plot the results
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(4, 10))
     fig.suptitle(f"VAT Scaling Test (N={group_count})")
-    im1 = ax1.imshow(0*ordered_matrix2, cmap='viridis')
+    im1 = ax1.imshow(ordered_matrix, cmap='viridis')
     ax1.set_title(f'Library VAT Result: {t2-t1:.2f} seconds')
     plt.colorbar(im1, ax=ax1)
 

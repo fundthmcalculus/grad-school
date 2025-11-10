@@ -1,9 +1,11 @@
+import numba
 import numpy as np
 from sklearn.metrics import pairwise_distances
 
-from AEEM6097.prim_graph import VATGraph
+from AEEM6097.prim_graph import vat_prim_mst
 
 
+@numba.jit
 def compute_ordered_dis_njit2(matrix_of_pairwise_distance: np.ndarray):
     # Step 1 :
     N = matrix_of_pairwise_distance.shape[0]
@@ -55,11 +57,11 @@ def compute_ordered_dis_njit2(matrix_of_pairwise_distance: np.ndarray):
     return ordered_matrix, list_of_int
 
 
+@numba.jit
 def compute_ordered_dis_njit_merge(matrix_of_pairwise_distance: np.ndarray):
     N = matrix_of_pairwise_distance.shape[0]
     ordered_matrix = np.zeros(matrix_of_pairwise_distance.shape)
-    g = VATGraph(matrix_of_pairwise_distance)
-    p = g.prim_mst()
+    p: list[int] = vat_prim_mst(matrix_of_pairwise_distance)
     # Replace the only "-1" with the index of the maximum value.
     p = np.array(p).astype(np.int32)
     # Step 3:
