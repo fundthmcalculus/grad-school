@@ -194,7 +194,7 @@ def test_vat_scaling():
     lib_time: list[float] = []
     o1 = 3
     o2 = 12
-    n = o2-o1+1
+    n = 5
     for group_count in np.logspace(o1, o2, n, base=2, dtype="int"):
         city_count.append(group_count)
         # print(f"City count: {group_count}")
@@ -210,6 +210,7 @@ def test_vat_scaling():
         t1 = time.time()
         # Cluster using the library IVAT
         ordered_matrix, path_vat = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
+        # ordered_matrix = 0*ordered_matrix2
         t2 = time.time()
 
         # Print the results
