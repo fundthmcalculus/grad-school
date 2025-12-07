@@ -61,10 +61,10 @@ def main():
     dist[8,10] = 14
     dist[9,10] = 9
 
-    # TODO - Dijkstra's algorithm
+    # Dijkstra's algorithm
     passed, min_len, min_path = dijkstra(dist)
     print(f"Dijkstra's={passed}, min_len={min_len}, min_path={min_path}")
-    # TODO - Nearest neighbor algorithm
+    # Nearest neighbor algorithm
     passed, min_len, min_path = nearest_neighbor(dist)
     print(f"Nearest Neighbor={passed}, dist={min_len}, path={min_path}")
 
