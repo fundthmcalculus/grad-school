@@ -42,3 +42,17 @@ For a final scaled example, here is the rl5915 dataset. For this case, the 2-OPT
 ![rl5915.png](rl5915.png)
 
 These tests were all performed on a Surface Laptop 4 with an i7-1165G7 CPU and 16GB RAM.
+
+# Part 2 - M-TSP
+
+Rather than using the MATLAB scripts, I chose to reimplement the algorithms in Python. The code is all available in my optimizers library. I also chose to use ACO methods, given their apparently better performance as indicated in part 1.
+
+For each case, I chose 50 ants/generation, 50 generations, and 15 minimum generations to ensure it did not stop prematurely. I have also excluded the convergence diagrams since they are somewhat redundant.
+
+## 2-UAV
+![uav2.png](uav2.png)
+![uav3.png](uav3.png)
+![uav4.png](uav4.png)
+
+As expected, the clusters converge more and more quickly as the number of clusters increases. For some reason, the 2-UAV situation likes to have a crossover that does not seem to be optimized away. If I added post-ACO optimization with 2-OPT, this would definitely disappear. These clusters do not intersect, which is to be expected with a good clustering algorithm.
+
