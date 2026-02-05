@@ -19,6 +19,7 @@ def load_concrete_data() -> tuple[af64, list[str]]:
     # Convert to numpy array
     all_data = concrete_df.to_numpy()
     labels: list[str] = concrete_df.columns.tolist()
+
     return all_data, labels
 
 
@@ -46,11 +47,6 @@ def load_data() -> FuzzyDataSet:
     # Load the `project-data/Concrete_Data.xls`
     # The columns were renamed for simplicity
     all_data, labels = load_concrete_data()
-    # all_data, labels = load_sonar_data()
-
-    # Compute the linear spectra
-    lin_spec(all_data)
-
     # Randomly permute the rows
     all_data = np.random.permutation(all_data)
 
@@ -60,34 +56,38 @@ def load_data() -> FuzzyDataSet:
     return FuzzyDataSet.create_from_data(all_data, test_pct, labels)
 
 
-def lin_spec(x: af64) -> tuple[af64, af64]:
-    X = np.fft.fft(x, axis=0)
-    f = np.fft.fftfreq(x.shape[0])
-    n_freq = len(f) // 2
-    n_x = x.shape[1]
-    n_i = n_x -1
-    n_o = n_x - n_i
-    f = f[:n_freq]
-    X = X[:n_freq, :]
-    X = 2.0*X
-    X[:,0] /= 2.0
-    plt.figure()
-    plt.semilogy(f, np.abs(X))
-    plt.show()
-    plt.title("Linear spectra")
-    G = np.zeros(shape=(n_freq,n_x,n_x))
-    H1 = np.zeros(shape=(n_freq,n_o,n_i))
-    for f_i in range(n_freq):
-        try:
-            G[f_i,:,:] = X[f_i,:].reshape((n_x,1)) @ np.conj(X[f_i,:].reshape(1,n_x))
-            H1[f_i,:,:] = G[f_i,:n_o,:n_i] @  np.linalg.inv(G[f_i,-n_i:,-n_i:])
-        except LinAlgError:
-            pass
-    plt.figure()
-    plt.semilogy(f, np.abs(H1.squeeze()))
-    plt.show()
+def plot_input_output_correlations(dataset: FuzzyDataSet) -> None:
+    """Create subplots showing correlation of each input variable with the output."""
+    n_inputs = dataset.train_data.shape[1] - 1  # Exclude output column
+    n_cols = 3
+    n_rows = int(np.ceil(n_inputs / n_cols))
 
-    return f, X
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, n_rows * 4))
+    axes = axes.flatten() if n_inputs > 1 else [axes]
+
+    # Use all data (train + test) for correlation visualization
+    all_data = np.vstack([dataset.train_data, dataset.test_data])
+
+    for i in range(n_inputs):
+        ax = axes[i]
+        # Plot scatter of input vs output
+        ax.scatter(all_data[:, i], all_data[:, -1], alpha=0.5, s=10)
+
+        # Calculate correlation coefficient
+        corr = np.corrcoef(all_data[:, i], all_data[:, -1])[0, 1]
+
+        ax.set_xlabel(dataset.labels[i])
+        ax.set_ylabel(dataset.labels[-1])
+        ax.set_title(f'{dataset.labels[i]} vs {dataset.labels[-1]}\nCorr: {corr:.3f}')
+        ax.grid(True, alpha=0.3)
+
+    # Hide unused subplots
+    for i in range(n_inputs, len(axes)):
+        axes[i].set_visible(False)
+
+    plt.tight_layout()
+    plt.suptitle('Input Variables vs Output Correlations', y=1.002, fontsize=14)
+    plt.show()
 
 
 def ivat_vis(data: af64) -> None:
@@ -102,7 +102,7 @@ def fuzzy_cluster(data: af64) -> None:
     fuzzy_models = []
     num_clusters = np.r_[2:10]
     for k in num_clusters:
-        fcm = FCM(n_clusters=k,m=4)
+        fcm = FCM(n_clusters=k,m=4, max_iter=1000)
         fcm.fit(data)
         fuzzy_models.append(fcm)
 
@@ -303,10 +303,11 @@ def compute_fuzzy_system(var_args: af64, pts: af64, variables_info: VariablesInf
 
 def main():
     dataset = load_data()
+    plot_input_output_correlations(dataset)
     peak_data = kernel_density_partitioning(dataset.train_data, dataset.labels)
     variables_info = create_tsk_variables(peak_data)
     print("Number of domain variables:", len(variables_info.variables))
-
+    
     # Here is the goal-seeking function
     nfev = 0
     min_err = 1.0E10
