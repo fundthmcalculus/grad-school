@@ -3,8 +3,10 @@ import time
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from pyclustertend.visual_assessment_of_tendency import compute_ordered_dis_njit
 from sklearn.metrics import pairwise_distances
 
+from AEEM6097.aco_mst import aco_mst_solve
 from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, \
     compute_ordered_dis_njit2, compute_ordered_dis_njit_merge
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
@@ -37,7 +39,7 @@ def random_cities(center_x, center_y, n_cities=-1) -> np.ndarray:
 def circle_random_clusters(n_clusters=-1, n_cities=-1) -> np.ndarray:
     if n_clusters == -1:
         n_clusters = N_CLUSTERS
-    city_locations = np.zeros(shape=(0,2))
+    city_locations = np.zeros(shape=(0,2), dtype=np.float32)
     for theta in np.linspace(0, 2*np.pi, n_clusters, endpoint=False):
         if HALF_CIRCLE:
             theta /= 2.0
