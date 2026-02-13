@@ -327,6 +327,7 @@ def main_wine():
 
 
 if __name__ == "__main__":
+    torch.manual_seed(42)
     # main2d()
     # main_iris()
     main_wine()
