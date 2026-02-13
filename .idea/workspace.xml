@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="" />
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="Add full fuzzy inference system implementation with PyTorch modules&#10;&#10;- Introduce `FuzzificationLayer`, `FuzzyLogicLayer`, and `DefuzzificationLayer` classes&#10;- Refactor `TorchFuzzy` into a modular `nn.Module` using the new layers&#10;- Implement forward passes for fuzzification, rule evaluation (product T‑norm), and weighted defuzzification&#10;- Add example `main()` demonstrating model creation, forward/backward passes, and gradient checks&#10;- Include necessary imports (`torch`, `torch.nn`) and remove placeholder code.">
+      <change beforePath="$PROJECT_DIR$/.idea/grad-school.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/grad-school.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fuzzy_torch/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/fuzzy_torch/main.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,6 +19,10 @@
       <option value="directory" />
     </option>
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="28801" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -23,9 +31,10 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIEW_PUSH_PROTECTED_ONLY" value="true" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feat/fuzzy-symphony" />
+        <entry key="$PROJECT_DIR$" value="feat/t2-fuzzy" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -39,7 +48,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/fundthmcalculus/grad-school.git&quot;,
-    &quot;accountId&quot;: &quot;9147bbf9-17b9-4e36-836e-e99a4379bd10&quot;
+    &quot;accountId&quot;: &quot;0b369885-e417-49f7-9f62-14734a002a84&quot;
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
@@ -47,6 +56,10 @@
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/skfuzzy/cluster/_cmeans.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/sklearn/cluster/_kmeans.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/sklearn_fuzzy/cluster/FuzzyCMeans_.py" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -59,40 +72,51 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor&quot;: &quot;Run&quot;,
-    &quot;Python.final_project.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.fuzzy-and-or.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fuzzy-symphony.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ga.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hw3.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hw4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ivat_tsp.executor&quot;: &quot;Run&quot;,
-    &quot;Python.midterm_project.executor&quot;: &quot;Run&quot;,
-    &quot;Python.project1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tire_selector.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/scott/PycharmProjects/grad-school/AEEM6022&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;Runtime.Targets.Configurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor": "Run",
+    "Python.final_project.executor": "Run",
+    "Python.fuzzy-and-or.executor": "Run",
+    "Python.fuzzy-symphony.executor": "Run",
+    "Python.ga.executor": "Run",
+    "Python.hw3.executor": "Run",
+    "Python.hw4.executor": "Run",
+    "Python.ivat_tsp.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.midterm_project.executor": "Run",
+    "Python.project1.executor": "Run",
+    "Python.test1.executor": "Run",
+    "Python.tire_selector.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "feat/fuzzy-torch",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/scott/PycharmProjects/grad-school/AEEM6022",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySaveCallSignatures" value="true" />
+  </component>
+  <component name="RecapSpentCounter">
+    <option name="endsOfQuotaMs" value="1772319611836" />
+    <option name="spentUsd" value="0.025380598" />
+  </component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="0" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -102,7 +126,7 @@
       <recent name="$PROJECT_DIR$/AEEM6022" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.hw4">
+  <component name="RunManager" selected="Python.main">
     <configuration name="final_project" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="grad-school" />
       <option name="ENV_FILES" value="" />
@@ -151,7 +175,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="hw3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="grad-school" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -160,60 +184,13 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6022" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fuzzy_torch" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw3.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="hw3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="grad-school" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6022" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw3.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="hw4" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="grad-school" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6022" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw4.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fuzzy_torch/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -267,19 +244,19 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.final_project" />
+        <item itemvalue="Python.fuzzy-and-or" />
         <item itemvalue="Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling" />
         <item itemvalue="Python.project1" />
-        <item itemvalue="Python.hw4" />
-        <item itemvalue="Python.hw3" />
-        <item itemvalue="Python.fuzzy-and-or" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.30387.173" />
+        <option value="bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173" />
       </set>
     </attachedChunks>
   </component>
@@ -338,6 +315,14 @@
       <workItem from="1765152697164" duration="14011000" />
       <workItem from="1765244450851" duration="1254000" />
       <workItem from="1765291091396" duration="148000" />
+      <workItem from="1770252280155" duration="7616000" />
+      <workItem from="1770319934430" duration="501000" />
+      <workItem from="1770652415335" duration="1139000" />
+      <workItem from="1770663474575" duration="2228000" />
+      <workItem from="1770690241173" duration="603000" />
+      <workItem from="1770849649606" duration="760000" />
+      <workItem from="1770907327797" duration="1017000" />
+      <workItem from="1770983394224" duration="5263000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -547,7 +532,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765164755782</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="feat: Save plots for HW4 and configure PyCharm project settings">
+      <option name="closed" value="true" />
+      <created>1770252323227</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1770252323227</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Add full fuzzy inference system implementation with PyTorch modules&#10;&#10;- Introduce `FuzzificationLayer`, `FuzzyLogicLayer`, and `DefuzzificationLayer` classes&#10;- Refactor `TorchFuzzy` into a modular `nn.Module` using the new layers&#10;- Implement forward passes for fuzzification, rule evaluation (product T‑norm), and weighted defuzzification&#10;- Add example `main()` demonstrating model creation, forward/backward passes, and gradient checks&#10;- Include necessary imports (`torch`, `torch.nn`) and remove placeholder code.">
+      <option name="closed" value="true" />
+      <created>1770320663486</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1770320663486</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -565,7 +566,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="spike:various changes" />
     <MESSAGE value="fix: merge" />
     <MESSAGE value="feat: VAT-&gt;ACO hot-start" />
     <MESSAGE value="fix: More details" />
@@ -588,15 +588,33 @@
     <MESSAGE value="output figures" />
     <MESSAGE value="fix: P2 notes" />
     <MESSAGE value="fix: Added UAV notes" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: Added UAV notes" />
+    <MESSAGE value="feat: Save plots for HW4 and configure PyCharm project settings" />
+    <MESSAGE value="Add input‑output correlation plots and clean up unused linear spectra code&#10;&#10;- Introduce `plot_input_output_correlations` to visualize scatter and correlation between each input variable and the output using all data (train/test).  &#10;- Call the new plotting function from `main`.  &#10;- Remove obsolete `lin_spec` implementation and related imports.  &#10;- Update FCM initialization to use a higher iteration limit (`max_iter=1000`).  &#10;- Add return type annotation for `morph_and_or` and adjust its docstring.  &#10;- Minor formatting fixes (unused code removal, spacing)." />
+    <MESSAGE value="Add full fuzzy inference system implementation with PyTorch modules&#10;&#10;- Introduce `FuzzificationLayer`, `FuzzyLogicLayer`, and `DefuzzificationLayer` classes&#10;- Refactor `TorchFuzzy` into a modular `nn.Module` using the new layers&#10;- Implement forward passes for fuzzification, rule evaluation (product T‑norm), and weighted defuzzification&#10;- Add example `main()` demonstrating model creation, forward/backward passes, and gradient checks&#10;- Include necessary imports (`torch`, `torch.nn`) and remove placeholder code." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add full fuzzy inference system implementation with PyTorch modules&#10;&#10;- Introduce `FuzzificationLayer`, `FuzzyLogicLayer`, and `DefuzzificationLayer` classes&#10;- Refactor `TorchFuzzy` into a modular `nn.Module` using the new layers&#10;- Implement forward passes for fuzzification, rule evaluation (product T‑norm), and weighted defuzzification&#10;- Add example `main()` demonstrating model creation, forward/backward passes, and gradient checks&#10;- Include necessary imports (`torch`, `torch.nn`) and remove placeholder code." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/AEEM6097/ga.py</url>
+          <line>49</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/AEEM6097/ga.py</url>
+          <line>130</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/pyclustertend/visual_assessment_of_tendency.py</url>
           <line>163</line>
           <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/AEEM6097/midterm_project.py</url>
+          <line>56</line>
+          <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/AEEM6022/hw3.py</url>
@@ -614,19 +632,9 @@
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/AEEM6022/hw4.py</url>
-          <line>29</line>
-          <option name="timeStamp" value="75" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/AEEM6022/hw4.py</url>
-          <line>23</line>
-          <option name="timeStamp" value="82" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/AEEM6022/hw4.py</url>
-          <line>24</line>
-          <option name="timeStamp" value="83" />
+          <url>file://$PROJECT_DIR$/fuzzy_torch/main.py</url>
+          <line>107</line>
+          <option name="timeStamp" value="84" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -639,17 +647,18 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/grad_school$hw4.coverage" NAME="hw4 Coverage Results" MODIFIED="1765161440674" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
-    <SUITE FILE_PATH="coverage/grad_school$test1.coverage" NAME="test1 Coverage Results" MODIFIED="1740001446261" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
-    <SUITE FILE_PATH="coverage/grad_school$fuzzy_symphony.coverage" NAME="fuzzy-symphony Coverage Results" MODIFIED="1745455373930" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
-    <SUITE FILE_PATH="coverage/grad_school$midterm_project.coverage" NAME="midterm_project Coverage Results" MODIFIED="1746390737774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
-    <SUITE FILE_PATH="coverage/grad_school$ga.coverage" NAME="ga Coverage Results" MODIFIED="1745178334342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
-    <SUITE FILE_PATH="coverage/grad_school$project1.coverage" NAME="project1 Coverage Results" MODIFIED="1765160963279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
-    <SUITE FILE_PATH="coverage/grad_school$final_project.coverage" NAME="final_project Coverage Results" MODIFIED="1760274284572" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
-    <SUITE FILE_PATH="coverage/grad_school$pytest_for_AEEM6097_ivat_tsp_test_vat_scaling.coverage" NAME="pytest for AEEM6097.ivat_tsp.test_vat_scaling Coverage Results" MODIFIED="1762743727075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/grad_school$fuzzy_and_or.coverage" NAME="fuzzy-and-or Coverage Results" MODIFIED="1761129123321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
     <SUITE FILE_PATH="coverage/grad_school$tire_selector.coverage" NAME="tire_selector Coverage Results" MODIFIED="1745288579755" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$ga.coverage" NAME="ga Coverage Results" MODIFIED="1745178334342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$hw4.coverage" NAME="hw4 Coverage Results" MODIFIED="1765161440674" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
+    <SUITE FILE_PATH="coverage/grad_school$final_project.coverage" NAME="final_project Coverage Results" MODIFIED="1770253279022" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$fuzzy_symphony.coverage" NAME="fuzzy-symphony Coverage Results" MODIFIED="1745455373930" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
     <SUITE FILE_PATH="coverage/grad_school$hw3.coverage" NAME="hw3 Coverage Results" MODIFIED="1760275819128" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
+    <SUITE FILE_PATH="coverage/grad_school$midterm_project.coverage" NAME="midterm_project Coverage Results" MODIFIED="1746390737774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$project1.coverage" NAME="project1 Coverage Results" MODIFIED="1765160963279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
+    <SUITE FILE_PATH="coverage/grad_school$main.coverage" NAME="main Coverage Results" MODIFIED="1770996024122" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fuzzy_torch" />
+    <SUITE FILE_PATH="coverage/grad_school$test1.coverage" NAME="test1 Coverage Results" MODIFIED="1740001446261" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$pytest_for_AEEM6097_ivat_tsp_test_vat_scaling.coverage" NAME="pytest for AEEM6097.ivat_tsp.test_vat_scaling Coverage Results" MODIFIED="1762743727075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/grad_school$ivat_tsp.coverage" NAME="ivat_tsp Coverage Results" MODIFIED="1754946448778" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$fuzzy_and_or.coverage" NAME="fuzzy-and-or Coverage Results" MODIFIED="1770252683588" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
   </component>
 </project>
