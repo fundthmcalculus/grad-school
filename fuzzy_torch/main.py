@@ -1,8 +1,8 @@
-
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
-
+from torch import Tensor
+from tqdm import tqdm
 
 class GaussianFuzzification(torch.autograd.Function):
     @staticmethod
@@ -163,7 +163,7 @@ class TorchFuzzy(nn.Module):
 
 
     
-def main():
+def main2d():
     # Set seed for reproducibility
     torch.manual_seed(42)
 
@@ -175,8 +175,6 @@ def main():
     n_inputs = 2
     n_memberships = 3  # Increase memberships for better approximation
     n_rules = n_inputs ** n_memberships  # Increase rules for better approximation
-    n_outputs = 1
-
     # Create model
     model = TorchFuzzy(n_inputs, n_memberships, n_rules)
     print("Model created.")
@@ -191,32 +189,30 @@ def main():
 
     z_train = z_train.unsqueeze(-1)  # (n_samples, 1)
 
-    # Normalize inputs
-    x_mean = x_train.mean(dim=0, keepdim=True)
-    x_std = x_train.std(dim=0, keepdim=True) + 1e-8
-    x_train_normalized = (x_train - x_mean) / x_std
+    x_train_normalized = normalize(x_train)
+    z_train_normalized = normalize(z_train)
 
-    # Normalize outputs
-    z_mean = z_train.mean()
-    z_std = z_train.std() + 1e-8
-    z_train_normalized = (z_train - z_mean) / z_std
+    train_torch_fuzzy(model, test_samples, x_train_normalized, z_train_normalized)
 
+    print("\nTraining complete. The fuzzy system now approximates Z = cos(X)*sin(Y).")
+
+
+def train_torch_fuzzy(model: TorchFuzzy, test_samples: int | float, x_train_normalized: Tensor, z_train_normalized: Tensor):
     # TODO - Randomly permute the points?
+    if isinstance(test_samples, float):
+        test_samples = int(test_samples*len(z_train_normalized))
     x_test = x_train_normalized[:test_samples]
     z_target = z_train_normalized[:test_samples]
 
     # Training setup
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
-    # Option 1: Smooth L1 Loss (Huber Loss) - More robust to outliers
     criterion = nn.SmoothL1Loss()
-    # Option 3: Combination loss - MSE + regularization on fuzzy parameters
-    # criterion = nn.MSELoss()  # Use this in training loop with added regularization
 
     # Training loop
-    epochs = 1000
+    epochs = 300
     loss_history = []
-    print(f"Starting training for {epochs} epochs...")
-    for epoch in range(epochs):
+    pbar = tqdm(range(epochs), desc="Training")
+    for epoch in pbar:
         # Forward pass
         predictions = model(x_train_normalized)
         loss = criterion(predictions, z_train_normalized)
@@ -228,8 +224,8 @@ def main():
 
         loss_history.append(loss.item())
 
-        if (epoch + 1) % 100 == 0:
-            print(f"Epoch [{epoch + 1}/{epochs}], Loss: {loss.item():.6f}")
+        # Update the progress bar with the current loss
+        pbar.set_postfix({'loss': f'{loss.item():.6f}'})
 
     # Plot loss function
     plt.figure(figsize=(8, 5))
@@ -247,11 +243,10 @@ def main():
         z_pred_normalized = model(x_test)
         # Denormalize predictions
         z_pred = z_pred_normalized
-        # z_pred = z_pred_normalized * z_std + z_mean
 
     # Plot comparison of target vs predicted values
     plt.figure(figsize=(8, 5))
-    plt.plot(z_target.cpu().numpy(), label='Target (cos·sin)', marker='o')
+    plt.plot(z_target.cpu().numpy(), label='Target', marker='o')
     plt.plot(z_pred.detach().cpu().numpy(), label='Predicted', marker='x')
     plt.title('Target vs Predicted on Test Samples')
     plt.xlabel('Sample Index')
@@ -261,8 +256,77 @@ def main():
     plt.tight_layout()
     plt.show()
 
-    print("\nTraining complete. The fuzzy system now approximates Z = cos(X)*sin(Y).")
+
+def normalize(x_train: Tensor) -> Tensor:
+    x_min = x_train.min(dim=0, keepdim=True)[0]
+    x_max = x_train.max(dim=0, keepdim=True)[0]
+    x_train_normalized = (x_train - x_min) / (x_max - x_min + 1e-8)
+    return x_train_normalized
+
+
+def main_iris():
+    from ucimlrepo import fetch_ucirepo
+    import pandas as pd
+
+    # fetch dataset
+    iris = fetch_ucirepo(id=53)
+
+    # data (as pandas dataframes)
+    X = iris.data.features
+    y = iris.data.targets
+
+    n_inputs = X.shape[1]
+    n_memberships = 3
+    n_rules = n_inputs ** n_memberships  # TODO - Come up with a better one.
+    model = TorchFuzzy(n_inputs, n_memberships, n_rules)
+    x_train = torch.tensor(X.values, dtype=torch.float32)
+    z_train = torch.tensor(pd.Categorical(y.values.ravel()).codes, dtype=torch.float32).unsqueeze(-1)
+
+    # Permute the order of the dataset
+    perm_indices = torch.randperm(x_train.size(0))
+    x_train = x_train[perm_indices]
+    z_train = z_train[perm_indices]
+
+    x_train = normalize(x_train)
+    z_train = normalize(z_train)
+
+    train_torch_fuzzy(model, 1.0, x_train, z_train)
+
+
+def main_wine():
+    from ucimlrepo import fetch_ucirepo
+
+    # fetch dataset
+    wine_quality = fetch_ucirepo(id=186)
+
+    # data (as pandas dataframes)
+    X = wine_quality.data.features
+    y = wine_quality.data.targets
+
+    n_inputs = X.shape[1]
+    n_memberships = 3
+    n_rules = n_inputs * n_memberships # n_inputs ** n_memberships  # TODO - Come up with a better one.
+    print("FIS Size:\n"
+          "---------\n"
+          f"n_inputs: {n_inputs}\n"
+          f"n_memfcn: {n_memberships}\n"
+          f"n_rules : {n_rules}")
+    model = TorchFuzzy(n_inputs, n_memberships, n_rules)
+    x_train = torch.tensor(X.values, dtype=torch.float32)
+    z_train = torch.tensor(y.values, dtype=torch.float32)
+
+    # Permute the order of the dataset
+    perm_indices = torch.randperm(x_train.size(0))
+    x_train = x_train[perm_indices]
+    z_train = z_train[perm_indices]
+
+    x_train = normalize(x_train)
+    z_train = normalize(z_train)
+
+    train_torch_fuzzy(model, 0.1, x_train, z_train)
 
 
 if __name__ == "__main__":
-    main()
+    # main2d()
+    # main_iris()
+    main_wine()
