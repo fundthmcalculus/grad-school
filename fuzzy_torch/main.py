@@ -83,8 +83,7 @@ class FuzzyLogicLayer(nn.Module):
         # Given n_rules, we can have a learnable mapping.
         # Shape: (n_rules, n_inputs)
         # self.input_selectors = nn.Parameter(torch.randint(0,self.n_memberships, (n_inputs, n_rules)), requires_grad=False)
-        self.input_selectors = nn.Parameter(torch.rand((n_inputs, n_rules))) # [N/A] & [0, self.n_memberships) & [N/A]
-        a = 1
+        self.input_selectors = nn.Parameter(torch.rand((n_inputs, n_rules)), requires_grad=False) # [N/A] & [0, self.n_memberships) & [N/A]
 
     def forward(self, fuzzified_x):
         # fuzzified_x shape: (batch_size, n_inputs, n_memberships)
@@ -174,7 +173,7 @@ def main2d():
     test_samples = int(p_test * n_samples)
     n_inputs = 2
     n_memberships = 3  # Increase memberships for better approximation
-    n_rules = n_inputs ** n_memberships  # Increase rules for better approximation
+    n_rules = n_memberships**n_inputs  # Increase rules for better approximation
     # Create model
     model = TorchFuzzy(n_inputs, n_memberships, n_rules)
     print("Model created.")
@@ -198,7 +197,6 @@ def main2d():
 
 
 def train_torch_fuzzy(model: TorchFuzzy, test_samples: int | float, x_train_normalized: Tensor, z_train_normalized: Tensor):
-    # TODO - Randomly permute the points?
     if isinstance(test_samples, float):
         test_samples = int(test_samples*len(z_train_normalized))
     x_test = x_train_normalized[:test_samples]
@@ -206,10 +204,10 @@ def train_torch_fuzzy(model: TorchFuzzy, test_samples: int | float, x_train_norm
 
     # Training setup
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
-    criterion = nn.SmoothL1Loss()
+    criterion = nn.MSELoss()
 
     # Training loop
-    epochs = 300
+    epochs = 100
     loss_history = []
     pbar = tqdm(range(epochs), desc="Training")
     for epoch in pbar:
@@ -277,7 +275,7 @@ def main_iris():
 
     n_inputs = X.shape[1]
     n_memberships = 3
-    n_rules = n_inputs ** n_memberships  # TODO - Come up with a better one.
+    n_rules = n_memberships ** n_inputs  # TODO - Come up with a better one.
     model = TorchFuzzy(n_inputs, n_memberships, n_rules)
     x_train = torch.tensor(X.values, dtype=torch.float32)
     z_train = torch.tensor(pd.Categorical(y.values.ravel()).codes, dtype=torch.float32).unsqueeze(-1)
@@ -304,8 +302,8 @@ def main_wine():
     y = wine_quality.data.targets
 
     n_inputs = X.shape[1]
-    n_memberships = 3
-    n_rules = n_inputs * n_memberships # n_inputs ** n_memberships  # TODO - Come up with a better one.
+    n_memberships = 5
+    n_rules = 15 # n_memberships ** n_inputs  # TODO - Come up with a better one.
     print("FIS Size:\n"
           "---------\n"
           f"n_inputs: {n_inputs}\n"
