@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: Enhance PyTorch-based fuzzy system and configure project settings&#10;&#10;- Add `GaussianFuzzification` with forward/backward methods for custom gradient computation&#10;- Refactor `FuzzificationLayer` to use `GaussianFuzzification`&#10;- Simplify `FuzzyLogicLayer` logic with scalable rule selection&#10;- Update PyCharm configuration files (`iml`, `workspace.xml`) for enhanced project setup and debugging">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="chore: Update PyCharm configuration files and minor code adjustments&#10;&#10;- Modify `workspace.xml` for updated project settings.&#10;- Adjust `main.py` with minor syntax tweaks and remove unnecessary blank lines.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fuzzy_torch/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/fuzzy_torch/main.py" afterDir="false" />
     </list>
@@ -321,7 +321,7 @@
       <workItem from="1770690241173" duration="603000" />
       <workItem from="1770849649606" duration="760000" />
       <workItem from="1770907327797" duration="1017000" />
-      <workItem from="1770983394224" duration="6038000" />
+      <workItem from="1770983394224" duration="7955000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -555,7 +555,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770996178491</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="chore: Update PyCharm configuration files and minor code adjustments&#10;&#10;- Modify `workspace.xml` for updated project settings.&#10;- Adjust `main.py` with minor syntax tweaks and remove unnecessary blank lines.">
+      <option name="closed" value="true" />
+      <created>1770997126331</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1770997126331</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -573,7 +581,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: VAT-&gt;ACO hot-start" />
     <MESSAGE value="fix: More details" />
     <MESSAGE value="fix: Better hot-start ratio" />
     <MESSAGE value="fix: more information" />
@@ -598,7 +605,8 @@
     <MESSAGE value="Add input‑output correlation plots and clean up unused linear spectra code&#10;&#10;- Introduce `plot_input_output_correlations` to visualize scatter and correlation between each input variable and the output using all data (train/test).  &#10;- Call the new plotting function from `main`.  &#10;- Remove obsolete `lin_spec` implementation and related imports.  &#10;- Update FCM initialization to use a higher iteration limit (`max_iter=1000`).  &#10;- Add return type annotation for `morph_and_or` and adjust its docstring.  &#10;- Minor formatting fixes (unused code removal, spacing)." />
     <MESSAGE value="Add full fuzzy inference system implementation with PyTorch modules&#10;&#10;- Introduce `FuzzificationLayer`, `FuzzyLogicLayer`, and `DefuzzificationLayer` classes&#10;- Refactor `TorchFuzzy` into a modular `nn.Module` using the new layers&#10;- Implement forward passes for fuzzification, rule evaluation (product T‑norm), and weighted defuzzification&#10;- Add example `main()` demonstrating model creation, forward/backward passes, and gradient checks&#10;- Include necessary imports (`torch`, `torch.nn`) and remove placeholder code." />
     <MESSAGE value="feat: Enhance PyTorch-based fuzzy system and configure project settings&#10;&#10;- Add `GaussianFuzzification` with forward/backward methods for custom gradient computation&#10;- Refactor `FuzzificationLayer` to use `GaussianFuzzification`&#10;- Simplify `FuzzyLogicLayer` logic with scalable rule selection&#10;- Update PyCharm configuration files (`iml`, `workspace.xml`) for enhanced project setup and debugging" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Enhance PyTorch-based fuzzy system and configure project settings&#10;&#10;- Add `GaussianFuzzification` with forward/backward methods for custom gradient computation&#10;- Refactor `FuzzificationLayer` to use `GaussianFuzzification`&#10;- Simplify `FuzzyLogicLayer` logic with scalable rule selection&#10;- Update PyCharm configuration files (`iml`, `workspace.xml`) for enhanced project setup and debugging" />
+    <MESSAGE value="chore: Update PyCharm configuration files and minor code adjustments&#10;&#10;- Modify `workspace.xml` for updated project settings.&#10;- Adjust `main.py` with minor syntax tweaks and remove unnecessary blank lines." />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: Update PyCharm configuration files and minor code adjustments&#10;&#10;- Modify `workspace.xml` for updated project settings.&#10;- Adjust `main.py` with minor syntax tweaks and remove unnecessary blank lines." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -638,6 +646,11 @@
           <line>84</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fuzzy_torch/main.py</url>
+          <line>318</line>
+          <option name="timeStamp" value="92" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -657,7 +670,7 @@
     <SUITE FILE_PATH="coverage/grad_school$hw3.coverage" NAME="hw3 Coverage Results" MODIFIED="1760275819128" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
     <SUITE FILE_PATH="coverage/grad_school$midterm_project.coverage" NAME="midterm_project Coverage Results" MODIFIED="1746390737774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
     <SUITE FILE_PATH="coverage/grad_school$project1.coverage" NAME="project1 Coverage Results" MODIFIED="1765160963279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
-    <SUITE FILE_PATH="coverage/grad_school$main.coverage" NAME="main Coverage Results" MODIFIED="1770996896475" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fuzzy_torch" />
+    <SUITE FILE_PATH="coverage/grad_school$main.coverage" NAME="main Coverage Results" MODIFIED="1770998814665" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fuzzy_torch" />
     <SUITE FILE_PATH="coverage/grad_school$test1.coverage" NAME="test1 Coverage Results" MODIFIED="1740001446261" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
     <SUITE FILE_PATH="coverage/grad_school$pytest_for_AEEM6097_ivat_tsp_test_vat_scaling.coverage" NAME="pytest for AEEM6097.ivat_tsp.test_vat_scaling Coverage Results" MODIFIED="1762743727075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/grad_school$ivat_tsp.coverage" NAME="ivat_tsp Coverage Results" MODIFIED="1754946448778" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
