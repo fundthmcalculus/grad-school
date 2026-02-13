@@ -83,7 +83,7 @@ class FuzzyLogicLayer(nn.Module):
         # Given n_rules, we can have a learnable mapping.
         # Shape: (n_rules, n_inputs)
         # self.input_selectors = nn.Parameter(torch.randint(0,self.n_memberships, (n_inputs, n_rules)), requires_grad=False)
-        self.input_selectors = nn.Parameter(torch.rand((n_inputs, n_rules)), requires_grad=False) # [N/A] & [0, self.n_memberships) & [N/A]
+        self.input_selectors = nn.Parameter(torch.rand((n_inputs, n_rules))) # [N/A] & [0, self.n_memberships) & [N/A]
 
     def forward(self, fuzzified_x):
         # fuzzified_x shape: (batch_size, n_inputs, n_memberships)
@@ -203,11 +203,11 @@ def train_torch_fuzzy(model: TorchFuzzy, test_samples: int | float, x_train_norm
     z_target = z_train_normalized[:test_samples]
 
     # Training setup
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
+    optimizer = torch.optim.AdamW(model.parameters())
     criterion = nn.MSELoss()
 
     # Training loop
-    epochs = 100
+    epochs = 1000
     loss_history = []
     pbar = tqdm(range(epochs), desc="Training")
     for epoch in pbar:
@@ -303,7 +303,7 @@ def main_wine():
 
     n_inputs = X.shape[1]
     n_memberships = 5
-    n_rules = 15 # n_memberships ** n_inputs  # TODO - Come up with a better one.
+    n_rules = 25 # n_memberships ** n_inputs  # TODO - Come up with a better one.
     print("FIS Size:\n"
           "---------\n"
           f"n_inputs: {n_inputs}\n"
