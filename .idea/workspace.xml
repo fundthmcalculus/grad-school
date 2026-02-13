@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="chore: Update PyCharm configuration files and minor code adjustments&#10;&#10;- Modify `workspace.xml` for updated project settings.&#10;- Adjust `main.py` with minor syntax tweaks and remove unnecessary blank lines.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="refactor: Restructure `main.py` and expand use cases with new dataset handlers&#10;&#10;- Introduce dataset-specific functions (`main_iris`, `main_wine`) for flexible testing.&#10;- Extract and modularize training logic into `train_torch_fuzzy`.&#10;- Simplify and streamline normalization with a reusable `normalize` function.&#10;- Improve training loop with a progress bar and concise logging using `tqdm`.&#10;- Drop unused variables, redundant lines, and adjust method naming for clarity.">
       <change beforePath="$PROJECT_DIR$/fuzzy_torch/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/fuzzy_torch/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -321,7 +320,7 @@
       <workItem from="1770690241173" duration="603000" />
       <workItem from="1770849649606" duration="760000" />
       <workItem from="1770907327797" duration="1017000" />
-      <workItem from="1770983394224" duration="7955000" />
+      <workItem from="1770983394224" duration="8038000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -563,7 +562,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770997126331</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="refactor: Restructure `main.py` and expand use cases with new dataset handlers&#10;&#10;- Introduce dataset-specific functions (`main_iris`, `main_wine`) for flexible testing.&#10;- Extract and modularize training logic into `train_torch_fuzzy`.&#10;- Simplify and streamline normalization with a reusable `normalize` function.&#10;- Improve training loop with a progress bar and concise logging using `tqdm`.&#10;- Drop unused variables, redundant lines, and adjust method naming for clarity.">
+      <option name="closed" value="true" />
+      <created>1770998891642</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1770998891642</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -581,7 +588,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: More details" />
     <MESSAGE value="fix: Better hot-start ratio" />
     <MESSAGE value="fix: more information" />
     <MESSAGE value="feat: ACO-VAT sorting" />
@@ -606,7 +612,8 @@
     <MESSAGE value="Add full fuzzy inference system implementation with PyTorch modules&#10;&#10;- Introduce `FuzzificationLayer`, `FuzzyLogicLayer`, and `DefuzzificationLayer` classes&#10;- Refactor `TorchFuzzy` into a modular `nn.Module` using the new layers&#10;- Implement forward passes for fuzzification, rule evaluation (product T‑norm), and weighted defuzzification&#10;- Add example `main()` demonstrating model creation, forward/backward passes, and gradient checks&#10;- Include necessary imports (`torch`, `torch.nn`) and remove placeholder code." />
     <MESSAGE value="feat: Enhance PyTorch-based fuzzy system and configure project settings&#10;&#10;- Add `GaussianFuzzification` with forward/backward methods for custom gradient computation&#10;- Refactor `FuzzificationLayer` to use `GaussianFuzzification`&#10;- Simplify `FuzzyLogicLayer` logic with scalable rule selection&#10;- Update PyCharm configuration files (`iml`, `workspace.xml`) for enhanced project setup and debugging" />
     <MESSAGE value="chore: Update PyCharm configuration files and minor code adjustments&#10;&#10;- Modify `workspace.xml` for updated project settings.&#10;- Adjust `main.py` with minor syntax tweaks and remove unnecessary blank lines." />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: Update PyCharm configuration files and minor code adjustments&#10;&#10;- Modify `workspace.xml` for updated project settings.&#10;- Adjust `main.py` with minor syntax tweaks and remove unnecessary blank lines." />
+    <MESSAGE value="refactor: Restructure `main.py` and expand use cases with new dataset handlers&#10;&#10;- Introduce dataset-specific functions (`main_iris`, `main_wine`) for flexible testing.&#10;- Extract and modularize training logic into `train_torch_fuzzy`.&#10;- Simplify and streamline normalization with a reusable `normalize` function.&#10;- Improve training loop with a progress bar and concise logging using `tqdm`.&#10;- Drop unused variables, redundant lines, and adjust method naming for clarity." />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: Restructure `main.py` and expand use cases with new dataset handlers&#10;&#10;- Introduce dataset-specific functions (`main_iris`, `main_wine`) for flexible testing.&#10;- Extract and modularize training logic into `train_torch_fuzzy`.&#10;- Simplify and streamline normalization with a reusable `normalize` function.&#10;- Improve training loop with a progress bar and concise logging using `tqdm`.&#10;- Drop unused variables, redundant lines, and adjust method naming for clarity." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
