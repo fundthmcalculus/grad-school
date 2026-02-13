@@ -83,7 +83,8 @@ class FuzzyLogicLayer(nn.Module):
         # Given n_rules, we can have a learnable mapping.
         # Shape: (n_rules, n_inputs)
         # self.input_selectors = nn.Parameter(torch.randint(0,self.n_memberships, (n_inputs, n_rules)), requires_grad=False)
-        self.input_selectors = nn.Parameter(torch.rand((n_inputs, n_rules))) # [0, self.n_memberships) & [N/A]
+        self.input_selectors = nn.Parameter(torch.rand((n_inputs, n_rules))) # [N/A] & [0, self.n_memberships) & [N/A]
+        a = 1
 
     def forward(self, fuzzified_x):
         # fuzzified_x shape: (batch_size, n_inputs, n_memberships)
@@ -94,14 +95,18 @@ class FuzzyLogicLayer(nn.Module):
         # Shape: (1, n_inputs, n_rules)
         selectors_expanded = self.input_selectors.unsqueeze(0)
         # Scale to the actual indexes
-        selectors_expanded = torch.round(selectors_expanded * self.n_memberships).to(torch.int32)
+        # selectors_expanded = torch.round(selectors_expanded * (1+self.n_memberships)).to(torch.int32)
+        selectors_expanded = torch.round(selectors_expanded * (0+self.n_memberships)).to(torch.int32)
 
         # Expand for batch size
         # Shape: (batch_size, n_inputs, n_rules)
         selectors_batched = selectors_expanded.expand(fuzzified_x.size(0), -1, -1)
 
         # Augment fuzzified_x with an additional column of unity, for "membership not used"
-        fuzzified_x = torch.cat([fuzzified_x, torch.ones_like(fuzzified_x[..., :1])], dim=-1)
+        fuzzified_x = torch.cat([
+            # torch.ones_like(fuzzified_x[..., :1]),
+            fuzzified_x,
+            torch.ones_like(fuzzified_x[..., :1])], dim=-1)
 
         # Gather membership values based on selectors
         # Shape: (batch_size, n_inputs, n_rules)
@@ -181,7 +186,7 @@ def main():
     x_train = (torch.rand(n_samples, n_inputs) * 2 - 1) * 3.14159
     z_train = torch.cos(x_train[:, 0])
     if n_inputs == 2:
-        # z_train *= torch.sin(x_train[:, 1])
+        z_train *= torch.sin(x_train[:, 1])
         pass
 
     z_train = z_train.unsqueeze(-1)  # (n_samples, 1)
@@ -257,8 +262,6 @@ def main():
     plt.show()
 
     print("\nTraining complete. The fuzzy system now approximates Z = cos(X)*sin(Y).")
-    
-    
 
 
 if __name__ == "__main__":
