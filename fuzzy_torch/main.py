@@ -1,3 +1,5 @@
+from typing import Literal
+
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
@@ -72,11 +74,12 @@ class FuzzificationLayer(nn.Module):
 
 
 class FuzzyLogicLayer(nn.Module):
-    def __init__(self, n_inputs: int, n_memberships: int, n_rules: int):
+    def __init__(self, n_inputs: int, n_memberships: int, n_rules: int, logic_impl: Literal["product","min"] = "product"):
         super(FuzzyLogicLayer, self).__init__()
         self.n_inputs = n_inputs
         self.n_memberships = n_memberships
         self.n_rules = n_rules
+        self.logic_impl = logic_impl
         # Rule antecedents: which membership function of which input is used in each rule
         # For simplicity, let's use a soft selection / weight matrix for now
         # or a fixed mapping if we want to follow a grid of rules.
@@ -113,18 +116,30 @@ class FuzzyLogicLayer(nn.Module):
 
         # Compute rule strengths by taking product across inputs
         # Shape: (batch_size, n_rules)
-        rule_strengths = torch.prod(selected_memberships, dim=1)
+        if self.logic_impl == "product":
+            rule_strengths = torch.prod(selected_memberships, dim=1)
+        elif self.logic_impl == "min":
+            rule_strengths = torch.min(selected_memberships, dim=1).values
+        else:
+            raise ValueError(f"Unknown logic implementation: {self.logic_impl}")
 
         return rule_strengths
 
 
 class DefuzzificationLayer(nn.Module):
-    def __init__(self, n_rules: int, n_inputs: int):
+    def __init__(self, n_rules: int, n_inputs: int, tsk_order: int):
         super(DefuzzificationLayer, self).__init__()
         self.n_rules = n_rules
         self.n_inputs = n_inputs
+        self.tsk_order = tsk_order
         # Consequent parameters (e.g., Takagi-Sugeno or singleton weights)
-        self.consequents = nn.Parameter(torch.randn(n_inputs+1, n_rules))
+        # TODO - Handle tsk_order > 1
+        if tsk_order == 1:
+            self.consequents = nn.Parameter(torch.rand(n_inputs+1, n_rules))
+        elif tsk_order == 0:
+            self.consequents = nn.Parameter(torch.rand(1, n_rules))
+        else:
+            raise ValueError("tsk_order must be 0 (singleton) or 1 (Takagi-Sugeno)")
 
     def forward(self, rule_strengths, inputs):
         # rule_strengths shape: (batch_size, n_rules)
@@ -135,7 +150,12 @@ class DefuzzificationLayer(nn.Module):
         # Add bias term (constant 1) to inputs
         # Shape: (batch_size, n_inputs+1)
         ones = torch.ones(inputs.size(0), 1, device=inputs.device)
-        inputs_with_bias = torch.cat([ones, inputs], dim=1)
+        if self.tsk_order == 1:
+            inputs_with_bias = torch.cat([ones, inputs], dim=1)
+        elif self.tsk_order == 0:
+            inputs_with_bias = ones
+        else:
+            raise ValueError("tsk_order must be 0 (singleton) or 1 (Takagi-Sugeno)")
 
         # Compute consequent outputs for each rule: z_i = c0_i + c1_i*x1 + c2_i*x2 + ...
         # (batch_size, n_inputs+1) @ (n_inputs+1, n_rules) -> (batch_size, n_rules)
@@ -148,11 +168,13 @@ class DefuzzificationLayer(nn.Module):
 
 
 class TorchFuzzy(nn.Module):
-    def __init__(self, n_inputs: int, n_memberships: int, n_rules: int):
+    def __init__(self, n_inputs: int, n_memberships: int, n_rules: int,
+                 tsk_order: int = 1,
+                 logic_impl: Literal["product","min"] = "product"):
         super(TorchFuzzy, self).__init__()
         self.fuzzification = FuzzificationLayer(n_inputs, n_memberships)
-        self.logic = FuzzyLogicLayer(n_inputs, n_memberships, n_rules)
-        self.defuzzification = DefuzzificationLayer(n_rules, n_inputs)
+        self.logic = FuzzyLogicLayer(n_inputs, n_memberships, n_rules, logic_impl)
+        self.defuzzification = DefuzzificationLayer(n_rules, n_inputs, tsk_order)
 
     def forward(self, x):
         in_fuzzy_x = self.fuzzification(x)
@@ -172,10 +194,10 @@ def main2d():
     p_test = 0.2
     test_samples = int(p_test * n_samples)
     n_inputs = 2
-    n_memberships = 3  # Increase memberships for better approximation
+    n_memberships = 5  # Increase memberships for better approximation
     n_rules = n_memberships**n_inputs  # Increase rules for better approximation
     # Create model
-    model = TorchFuzzy(n_inputs, n_memberships, n_rules)
+    model = TorchFuzzy(n_inputs, n_memberships, n_rules, tsk_order=0, logic_impl="product")
     print("Model created.")
 
     # Generate training data: Z = cos(X) * sin(Y)
@@ -200,11 +222,11 @@ def train_torch_fuzzy(model: TorchFuzzy, test_samples: int | float, x_train_norm
     if isinstance(test_samples, float):
         test_samples = int(test_samples*len(z_train_normalized))
     x_test = x_train_normalized[:test_samples]
-    z_target = z_train_normalized[:test_samples]
+    z_test = z_train_normalized[:test_samples]
 
     # Training setup
     optimizer = torch.optim.AdamW(model.parameters())
-    criterion = nn.MSELoss()
+    criterion = nn.SmoothL1Loss(beta=0.01)
 
     # Training loop
     epochs = 1000
@@ -244,7 +266,7 @@ def train_torch_fuzzy(model: TorchFuzzy, test_samples: int | float, x_train_norm
 
     # Plot comparison of target vs predicted values
     plt.figure(figsize=(8, 5))
-    plt.plot(z_target.cpu().numpy(), label='Target', marker='o')
+    plt.plot(z_test.cpu().numpy(), label='Target', marker='o')
     plt.plot(z_pred.detach().cpu().numpy(), label='Predicted', marker='x')
     plt.title('Target vs Predicted on Test Samples')
     plt.xlabel('Sample Index')
@@ -302,14 +324,25 @@ def main_wine():
     y = wine_quality.data.targets
 
     n_inputs = X.shape[1]
-    n_memberships = 5
-    n_rules = 25 # n_memberships ** n_inputs  # TODO - Come up with a better one.
+    n_memberships = 3
+    max_rules = n_memberships ** n_inputs
+    n_rules = 50 # n_memberships ** n_inputs  # TODO - Come up with a better one.
+    model = TorchFuzzy(n_inputs, n_memberships, n_rules, tsk_order=0, logic_impl="product")
+    n_vars = 0
+    for param in model.parameters(recurse=True):
+        # torch.size product is weird.
+        p = 1
+        for s in param.size():
+            p *= s
+        n_vars += p
     print("FIS Size:\n"
           "---------\n"
-          f"n_inputs: {n_inputs}\n"
-          f"n_memfcn: {n_memberships}\n"
-          f"n_rules : {n_rules}")
-    model = TorchFuzzy(n_inputs, n_memberships, n_rules)
+          f"n_inputs : {n_inputs}\n"
+          f"n_memfcn : {n_memberships}\n"
+          f"n_rules  : {n_rules}\n"
+          f"max_rules: {max_rules}\n"
+          f"n_vars   : {n_vars}\n")
+
     x_train = torch.tensor(X.values, dtype=torch.float32)
     z_train = torch.tensor(y.values, dtype=torch.float32)
 
