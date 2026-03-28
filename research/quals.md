@@ -74,7 +74,6 @@ backgroundSize: contain
 |Optimal|0.00    |289     |100%  |
 |Random |0.00    |10,074  |3500% |
 |VAT    |0.35    |408     |140%  |
-|IVAT   |0.35    |281     |97%   |
 |HS-ACO |4.95    |408     |140%  |
 |ACO    |4.10    |1592    |550%  |
 
@@ -229,16 +228,33 @@ backgroundSize: contain
 * Future Work: InsertionSort for building up to 500K elements
 
 ---
-# Current Research Direction
+# Now: Current Research Direction
 1. Accelerating Fuzzy C Means methods with gradient-descent optimization
+    1. Still subject to initial point selection
 2. Utilizing VAT/IVAT for automatic cluster (and cluster centroid) identification
     1. This guarantees we don't initialize FCM with points which have primary membership in the same cluster.
     2. This also provides the initial steps towards 2-OPT check points identification
-3. Mixture of Gaussians FIS membership function and rule identification
+    3. Automatic cluster counting
+3. Mixture of Gaussians (MoG) FIS membership function and rule identification
     1. This is showing promise for order-of-magnitude speed up in model training
     2. It trains on a phishing dataset with 235K entries to 97% accuracy in 6 seconds
-    3. No GD or GA required.
+    3. No post-training GD or GA required
     4. It does this with 2 rules and a handful of clauses
+4. 2D-rotation AND-rule selection
+    1. Uniformly distributes rules across possible space
+    2. Provides a good initial solution deck for GA/ACO methods 
+
+---
+# Future: Goal
+
+> Make Training of Fuzzy Inference Systems (FIS) models 1000x faster, whether in time, or in usable scale
+
+1. Preliminary Data Review - VAT/IVAT
+2. Initial model skeleton - FCM
+3. Membership function selection - MoG
+4. Rulebase development - MoG
+5. Model refinement - Optimization methods
+6. Any suggestions?
 
 ---
 # Thank You!
