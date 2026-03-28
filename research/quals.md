@@ -62,12 +62,12 @@ $D_{polygon} > D_{city}$
 
 ---
 layout: image-right
-image: ./image.png
+image: ./quals/image.png
 backgroundSize: contain
 
 # Initial Performance Observation - 256
 
-![clusterPaths](quals/image.png)
+![clusterPaths](./quals/image.png)
 
 |Method |Time [s]|Distance|Change|
 |-------|--------|--------|------|
@@ -82,12 +82,12 @@ backgroundSize: contain
 
 ---
 layout: image-right
-image: ./image-1.png
+image: ./quals/image-1.png
 backgroundSize: contain
 
 # Larger Scale - 2048
 
-![largerClusterPaths](quals/image-1.png)
+![largerClusterPaths](./quals/image-1.png)
 
 |Method |Time [s]|Distance|Change |
 |-------|--------|--------|-------|
@@ -98,6 +98,9 @@ backgroundSize: contain
 |ACO    |     258|24,723  |  6300%|
 
 ---
+layout: image-right
+image: quals/image-2.png
+backgroundSize: contain
 
 # Refinement
 
@@ -105,6 +108,9 @@ backgroundSize: contain
 ![alt text](quals/image-2.png)
 
 ---
+layout: image-right
+image: quals/image-3.png
+backgroundSize: contain
 
 # Can ACO approximate VAT? - Somewhat
 
@@ -136,3 +142,107 @@ backgroundSize: contain
 * VAT provides a great initial guess to solving TSP problems with ACO
 * Permutation methods with ACO are not effective
 * ACO MST methods show promise, but need further development
+
+---
+
+# Paper 2: MergeVAT: $58K \times 58K$ in 60 seconds
+
+---
+# Motivation: Go, Fuzzy! - faster!
+* UC Irvine NASA Dataset
+  * Space Shuttle reentry
+  * 80% of data in condition-1
+  * 58,000 rows
+* Can we visualize and confirm that?
+    * This image is 1% linear scale, 1/10,000 in area
+    * 8-bit grey-scale PNG is >400 MB
+
+![alt text](./quals/image-11.png)
+
+---
+# Patient Data
+* 135K rows
+    * 30% clustered
+    * 70% sparse
+    * Mostly binary values
+* Can we visualize and confirm that?
+    * 8 minutes for VAT, 15 minutes for distance matrix calculation
+    * At 32-bit floating point, this is 73GB
+
+![alt text](./quals/image-12.png)
+
+---
+
+# Scaling Time Complexity
+* VAT gets the arg-min of the remainder of the current column
+* This sorting operation is typically BubbleSort, $O(N)=N^2$
+* This is applied on every column, so overall $O(N)=N^3$ 
+
+> At 135K rows, my improved method is 1.6 million times faster
+
+![iamge13](./quals/image-13.png)
+
+---
+
+# The First Insight - Sort Algorithm
+* MergeSort is the asymptotically fastest algorithm which can exist: $O(N)=N \log N$
+* Over $N$ columns, we have $O(N)=N^2 \log N$
+* N-scaling=24 is a 16K element dataset
+* Utilize a priority queue (fibbonacci heap) to extract the remainder index as $O(N)=1$ operation
+> Professor Kreinovich pointed out this method is more akin to HeapSort, which is also $O(N)=N \log N$. The original name came from a failed experiment to implement what amounts to a 2D MergeSort.
+
+![alt text](./quals/image-14.png)
+
+> For a 4096 element dataset, 124 seconds vs 2.56 seconds
+
+![alt text](./quals/image-15.png)
+
+---
+# TSP Optimization
+![alt text](./quals/image-16.png)
+![alt text](./quals/image-17.png)
+![alt text](./quals/image-18.png)
+> Unfortunately, the commonly used 2-OPT local optimization method breaks the MST organization
+---
+# The Second Insight -- Memory
+* VAT often caches the entire dissimilarity matrix $D$
+* This doubles the memory consumption to save on compute costs, but since heapVAT scales so much better, we need to reduce memory consumption
+    * Why not compute only the requested distance $D_{i,j}$ as needed?
+    * This reduces memory to one copy of $D$ plus working space, approximately $O(N) = {{N^2+N}\over{16}}$ vs $O(N)=2N^2$
+
+---
+# The Third Insight - Loop-Walking
+* VAT sequence, paired with the original sequence, creates a collection of loops: _directed, cyclic graphs_
+* We can start at any point on any loop, and follow the loop until we reach our starting point again.
+* If we mask which loop entries have been visited, we can simply increment until we find another loop
+![alt text](./quals/image-19.png)
+
+---
+# Conclusions and Future Work
+* HeapVAT:
+    * Expands the usable size from 5K to 130K+ elements
+    * Provides a good initial guess for TSP applications
+    * Loop-walking cuts the memory requirement in half.
+
+* Future Work: Identify VAT-clusters to change 2-Opt check points
+* Future Work: Distributed heapVAT for 500K elements
+* Future Work: InsertionSort for building up to 500K elements
+
+---
+# Current Research Direction
+1. Accelerating Fuzzy C Means methods with gradient-descent optimization
+2. Utilizing VAT/IVAT for automatic cluster (and cluster centroid) identification
+    1. This guarantees we don't initialize FCM with points which have primary membership in the same cluster.
+    2. This also provides the initial steps towards 2-OPT check points identification
+3. Mixture of Gaussians FIS membership function and rule identification
+    1. This is showing promise for order-of-magnitude speed up in model training
+    2. It trains on a phishing dataset with 235K entries to 97% accuracy in 6 seconds
+    3. No GD or GA required.
+    4. It does this with 2 rules and a handful of clauses
+
+---
+# Thank You!
+* Dr Kelly Cohen - my advisor and mentor, allowing me to explore topics like this which interest me.
+* Jon Salisbury - for support/employment and opening the door for me to do this
+* UC AI / Bio Lab - y'all know what you do. :)
+* Dr Phillips, aka _Dad_
