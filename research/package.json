@@ -1,0 +1,10 @@
+{
+
+	"scripts": {
+		"dev": "slidev quals.md"
+	},
+
+	"dependencies": {
+		"@slidev/cli": "^52.14.1"
+	}
+}
