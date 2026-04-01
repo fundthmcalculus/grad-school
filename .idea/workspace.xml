@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="" />
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/research/quals/image-20.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/research/quals/image-21.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/grad-school.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/grad-school.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/research/quals.md" beforeDir="false" afterPath="$PROJECT_DIR$/research/quals.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,17 +42,21 @@
     &quot;assignee&quot;: &quot;fundthmcalculus&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/fundthmcalculus/grad-school.git&quot;,
-    &quot;accountId&quot;: &quot;9147bbf9-17b9-4e36-836e-e99a4379bd10&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/fundthmcalculus/grad-school.git",
+    "accountId": "40e4aa2a-9b99-4612-b3f4-3918eb37235f"
   }
-}</component>
+}]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/fcmeans/main.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/skfuzzy/cluster/_cmeans.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/sklearn/cluster/_kmeans.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/sklearn_fuzzy/cluster/FuzzyCMeans_.py" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -59,98 +69,52 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor&quot;: &quot;Run&quot;,
-    &quot;Python.final_project.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.fuzzy-and-or.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fuzzy-symphony.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ga.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hw3.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hw4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ivat_tsp.executor&quot;: &quot;Run&quot;,
-    &quot;Python.midterm_project.executor&quot;: &quot;Run&quot;,
-    &quot;Python.project1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tire_selector.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/scott/PycharmProjects/grad-school/AEEM6022&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;Runtime.Targets.Configurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor": "Run",
+    "Python.final_project.executor": "Debug",
+    "Python.fuzzy-and-or.executor": "Run",
+    "Python.fuzzy-symphony.executor": "Run",
+    "Python.ga.executor": "Run",
+    "Python.hw3.executor": "Run",
+    "Python.hw4.executor": "Run",
+    "Python.ivat_tsp.executor": "Run",
+    "Python.midterm_project.executor": "Run",
+    "Python.project1.executor": "Run",
+    "Python.test1.executor": "Run",
+    "Python.tire_selector.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/scott/PycharmProjects/grad-school/AEEM6022",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "Runtime.Targets.Configurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySaveCallSignatures" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\personal\grad-school\research\quals" />
       <recent name="$PROJECT_DIR$/AEEM6097/project-data" />
     </key>
     <key name="ImportExportFile.TargetDir.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/AEEM6022" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.hw4">
-    <configuration name="final_project" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="grad-school" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6097" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6097/final_project.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="fuzzy-and-or" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="grad-school" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6097" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6097/fuzzy-and-or.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="npm.dev">
     <configuration name="hw3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="grad-school" />
       <option name="ENV_FILES" value="" />
@@ -164,6 +128,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw3.py" />
@@ -211,6 +176,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw4.py" />
@@ -235,6 +201,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/project1.py" />
@@ -244,6 +211,16 @@
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/research/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
       <method v="2" />
     </configuration>
     <configuration name="pytest for AEEM6097.ivat_tsp.test_vat_scaling" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
@@ -256,6 +233,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
       <option name="_new_keywords" value="&quot;&quot;" />
@@ -267,11 +245,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.dev" />
         <item itemvalue="Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling" />
         <item itemvalue="Python.project1" />
         <item itemvalue="Python.hw4" />
         <item itemvalue="Python.hw3" />
-        <item itemvalue="Python.fuzzy-and-or" />
       </list>
     </recent_temporary>
   </component>
