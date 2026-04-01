@@ -68,8 +68,6 @@ $T_{optimal} = P_{polygon} + N_{cities}P_{city} - N_{cities}D_{city}$
 $D_{polygon} > D_{city}$
 
 ---
-layout: image-right
-image: ./quals/image-0.png
 
 # Initial Performance Observation - 256
 
@@ -86,8 +84,6 @@ image: ./quals/image-0.png
 | ACO     | 4.10     | 1592     | 550%   |
 
 ---
-layout: image-right
-image: ./quals/image-1.png
 
 # Larger Scale - 2048
 
@@ -102,6 +98,7 @@ image: ./quals/image-1.png
 | ACO     | 258      | 24,723   | 6300%   |
 
 ---
+
 # Refinement
 
 ![alttext](./quals/image-2.png)
