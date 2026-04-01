@@ -1,0 +1,45 @@
+Index: AEEM6022/hw4.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import numpy as np\nimport matplotlib.pyplot as plt\n\n\n# Control function\ndef x_k1_fcn(a, b, dt, x_k, u_k):\n    return (1+a*dt)*x_k + b*dt*u_k\n\n# Performance measure\ndef J_perf(x_N, l, dt, u_k):\n    # Exclude the final control value.\n    return x_N**2.0+l*dt*np.sum(u_k**2.0)\n\n\ndef problem(a,b,l,N,dt):\n    admit_pts = integrate_fcn(a, b, dt, l, N)\n    plot_J_grid(admit_pts, f\"a={a}, lambda={l}, N={N}\")\n\ndef p314():\n    # a\n    problem(0.0,1.0,2.0,2,1.0)\n    problem(0.0,1.0,2.0,3,1.0)\n    problem(0.0,1.0,4.0,2,1.0)\n    problem(0.0,1.0,0.5,2,1.0)\n\ndef p316():\n    # a\n    problem(-0.4,1.0,2.0,2,1.0)\n    problem(-0.4,1.0,2.0,3,1.0)\n    problem(-0.4,1.0,4.0,2,1.0)\n    problem(-0.4,1.0,0.5,2,1.0)\n\n\ndef integrate_fcn(a, b, dt, l, n_stages):\n    # x_k grid values - inclusive endpoints\n    x_kgrid = np.r_[0:1.501:0.02]\n    u_kgrid = np.r_[-1.00:1.001:0.02]\n\n    admit_pts = []\n    # Try each initial condition\n    for k_x, x_k in enumerate(x_kgrid):\n        for k_u, u_k in enumerate(u_kgrid):\n            # Stepwise integrate\n            x = np.zeros(n_stages + 1)\n            u = np.zeros(n_stages)\n            # Initialize the first stage\n            x[0] = x_k\n            u[0] = u_k\n            # Integrate\n            admissable = True\n            minJ = np.inf\n            for stage in range(1,n_stages):\n                x_tst = x_k1_fcn(a, b, dt, x[stage - 1], u[stage - 1])\n                if 0.0 <= x_tst <= 1.5:\n                    x[stage] = x_tst\n                    minJ_step = np.inf\n                    min_u = 0.0\n                    for k_u2, u_k2 in enumerate(u_kgrid):\n                        u[stage] = u_k2\n                        x_tst = x_k1_fcn(a, b, dt, x[stage], u[stage])\n                        if 0.0 <= x_tst <= 1.5:\n                            J_tst = J_perf(x_tst, l, dt, u[:stage])\n                            if J_tst < minJ_step:\n                                minJ_step = J_tst\n                                min_u = u_k2\n                    u[stage] = min_u\n                else:\n                    admissable = False\n                    break\n            if admissable:\n                admit_pts.append([x_k, u_k, J_perf(x[-1], l, dt, u)])\n\n    # Plot the results as a function of x and u\n    return admit_pts\n\n\ndef plot_J_grid(admit_pts, details_str):\n    # Extract data points\n    x_vals = [pt[0] for pt in admit_pts]\n    u_vals = [pt[1] for pt in admit_pts]\n    J_vals = [pt[2] for pt in admit_pts]\n\n    # Create figure with two subplots\n    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))\n\n    # Plot state vs control\n    ax1.scatter(x_vals, u_vals, c='blue', alpha=0.5)\n    ax1.set_xlabel('State (x)')\n    ax1.set_ylabel('Control (u)')\n    ax1.set_title(f'State vs Control\\n{details_str}')\n    ax1.grid(True)\n\n    # Plot state vs cost\n    ax2.scatter(x_vals, J_vals, c='red', alpha=0.5)\n    ax2.set_xlabel('State (x)')\n    ax2.set_ylabel('Cost (J)')\n    ax2.set_title(f'State vs Cost\\n{details_str}')\n    ax2.grid(True)\n\n    plt.tight_layout()\n    plt.show()\n\n\nif __name__ == \"__main__\":\n    p314()\n    p316()
+===================================================================
+diff --git a/AEEM6022/hw4.py b/AEEM6022/hw4.py
+--- a/AEEM6022/hw4.py	(revision 4c357a639a90f2ede2b1e22f48f00e9052a01856)
++++ b/AEEM6022/hw4.py	(date 1765161439808)
+@@ -1,3 +1,5 @@
++import os
++
+ import numpy as np
+ import matplotlib.pyplot as plt
+ 
+@@ -73,8 +75,10 @@
+     # Plot the results as a function of x and u
+     return admit_pts
+ 
++fig_count = 1
+ 
+ def plot_J_grid(admit_pts, details_str):
++    global fig_count
+     # Extract data points
+     x_vals = [pt[0] for pt in admit_pts]
+     u_vals = [pt[1] for pt in admit_pts]
+@@ -98,9 +102,16 @@
+     ax2.grid(True)
+ 
+     plt.tight_layout()
++
++    # Create output directory if it doesn't exist
++    os.makedirs('hw4_output', exist_ok=True)
++    # Save figure with sequential naming
++    plt.savefig(f'hw4_output/fig{fig_count:02d}.png')
++    fig_count += 1
+     plt.show()
+ 
+ 
+ if __name__ == "__main__":
+     p314()
+-    p316()
+\ No newline at end of file
++    p316()
++    
+\ No newline at end of file

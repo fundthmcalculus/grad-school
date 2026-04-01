@@ -14,8 +14,8 @@ or_x1_x2 = x1 + x2 - x1 * x2
 
 
 # Create an animation of the morphology between the two:
-def morph_and_or(c: float):
-    """Morph between AND + OR operations."""
+def morph_and_or(c: float) -> np.ndarray:
+    """Morph between AND / OR operations."""
     return (1 - c) * and_x1_x2 + c * or_x1_x2
 
 
@@ -31,4 +31,5 @@ fig = go.Figure(data=[go.Surface(z=and_x1_x2,x=x1,y=x2, showscale=True)],
                     transition=dict(duration=100), visible=True)]))
 
 fig.frames = frames
+
 fig.show()
