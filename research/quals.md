@@ -28,7 +28,8 @@ Advisor: Dr Kelly Cohen
 # VAT Background & Limitations
 
 * Visual Assessment for Tendency (VAT) is a method for cluster identification pioneered by Bezdek
-* It converts, usually via the _L2-norm_, an $N \times M$ matrix of samples into an $N \times N$ dissimilarity matrix $D$
+* It converts, usually via the _L2-norm_, an $N \times M$ matrix of samples into an $N \times N$ dissimilarity
+  matrix $D$
 * It permutes the matrix to minimize the distances off the principal diagonal – Minimum Spanning Tree (MST)
 * The core algorithm is a greedy one, similar to Prim's Algorithm for MSTs
 * It is computationally expensive, $O(N)=N^3$
@@ -37,12 +38,14 @@ Advisor: Dr Kelly Cohen
 
 # ACO Background & Limitations
 
-* Ant Colony Optimization is a stochastic optimization technique used for combinatorics, commonly with the Traveling Salesperson Problem (TSP)
+* Ant Colony Optimization is a stochastic optimization technique used for combinatorics, commonly with the Traveling
+  Salesperson Problem (TSP)
 * It doesn’t guarantee finding the “best” solution, but often finds a “good enough” solution
 * It is trivially parallelizable – important on multicore processors and GPUs
 
 * It does not require the cost function to continuous, or differentiable, only comparable
-* It is susceptible to initialization issues, since it is not guaranteed to find the local optima on a given attempt (unlike gradient descent)
+* It is susceptible to initialization issues, since it is not guaranteed to find the local optima on a given attempt (
+  unlike gradient descent)
 * Having a good initial guess, a “hot-start” can greatly reduce the convergence time.
 
 ---
@@ -109,11 +112,9 @@ $D_{polygon} > D_{city}$
 
 ![alttext](./quals/image-3.png)
 
-
 * VAT - based on Prim's (greedy) algorithm
 
 * ACO MST - often Broder's algorithm
-
 
 > A naive permutation method which minimizes the primary diagonals tends to produce perpendicular lines
 
@@ -123,24 +124,19 @@ $D_{polygon} > D_{city}$
 
 ---
 
-
 # ACO MST - Scaling
 
-
-| Column 1                          | Column 2  | Column 3                         | Column 4                         |
-|-----------------------------------|-----------|----------------------------------|----------------------------------|
-| ![alt text](./quals/image-10.png) |           | ![alt text](./quals/image-5.png) | ![alt text](./quals/image-6.png) |
-|                                   | 50x    2x | 230x 3x                          |                                  |
-| ![alt text](./quals/image-7.png)  |           | ![alt text](./quals/image-8.png) | ![alt text](./quals/image-9.png) |
-| 128 4x                            | 512       | 6.25x                            | 800                              |
-|                                   |           |                                  |                                  |
-
+| Column 1                          | Column 3                         | Column 4                         |
+|-----------------------------------|----------------------------------|----------------------------------|
+| ![alt text](./quals/image-10.png) | ![alt text](./quals/image-5.png) | ![alt text](./quals/image-6.png) |
+| 50x 2x                            | 230x 3x                          |                                  |
+| ![alt text](./quals/image-7.png)  | ![alt text](./quals/image-8.png) | ![alt text](./quals/image-9.png) |
+| 128 4x       512                  | 6.25x                            | 800                              |
+|                                   |                                  |                                  |
 
 ---
 
-
 # Conclusions and Future Work
-
 
 * VAT provides a great initial guess to solving TSP problems with ACO
 
@@ -148,12 +144,9 @@ $D_{polygon} > D_{city}$
 
 * ACO MST methods show promise, but need further development
 
-
 ---
 
-
 # Paper 2: MergeVAT: $58K \times 58K$ in 60 seconds
-
 
 ---
 
@@ -161,11 +154,11 @@ $D_{polygon} > D_{city}$
 
 * UC Irvine NASA Dataset
 
-  * Space Shuttle reentry
+    * Space Shuttle reentry
 
-  * 80% of data in condition-1
+    * 80% of data in condition-1
 
-  * 58,000 rows
+    * 58,000 rows
 
 * Can we visualize and confirm that?
 
@@ -194,12 +187,10 @@ $D_{polygon} > D_{city}$
 
     * At 32-bit floating point, this is 73GB
 
-
 ![alt text](./quals/image-12.png)
 
 
 ---
-
 
 # Scaling Time Complexity
 
@@ -207,8 +198,7 @@ $D_{polygon} > D_{city}$
 
 * This sorting operation is typically BubbleSort, $O(N)=N^2$
 
-* This is applied on every column, so overall $O(N)=N^3$ 
-
+* This is applied on every column, so overall $O(N)=N^3$
 
 > At 135K rows, my improved method is 1.6 million times faster
 
@@ -216,7 +206,6 @@ $D_{polygon} > D_{city}$
 
 
 ---
-
 
 # The First Insight - Sort Algorithm
 
@@ -228,7 +217,8 @@ $D_{polygon} > D_{city}$
 
 * Utilize a priority queue (fibbonacci heap) to extract the remainder index as $O(N)=1$ operation
 
-> Professor Kreinovich pointed out this method is more akin to HeapSort, which is also $O(N)=N \log N$. The original name came from a failed experiment to implement what amounts to a 2D MergeSort.
+> Professor Kreinovich pointed out this method is more akin to HeapSort, which is also $O(N)=N \log N$. The original
+> name came from a failed experiment to implement what amounts to a 2D MergeSort.
 
 
 ![alt text](./quals/image-14.png)
@@ -241,7 +231,6 @@ $D_{polygon} > D_{city}$
 
 
 ---
-
 
 # Sorting Algorithm details
 
@@ -266,12 +255,13 @@ $D_{polygon} > D_{city}$
 
 * VAT often caches the entire dissimilarity matrix $D$
 
-* This doubles the memory consumption to save on compute costs, but since mergeVAT scales so much better, we need to reduce memory consumption
+* This doubles the memory consumption to save on compute costs, but since mergeVAT scales so much better, we need to
+  reduce memory consumption
 
     * Why not compute only the requested distance $D_{i,j}$ as needed?
 
-    * This reduces memory to one copy of $D$ plus working space, approximately $O(N) = {{N^2+N}\over{16}}$ vs $O(N)=2N^2$
-
+    * This reduces memory to one copy of $D$ plus working space, approximately $O(N) = {{N^2+N}\over{16}}$
+      vs $O(N)=2N^2$
 
 ---
 
@@ -305,39 +295,34 @@ $D_{polygon} > D_{city}$
 
 * Future Work: InsertionSort for building up to 500K elements
 
-
 ---
-
 
 # (Future) Paper 3: Fuzzy C Means and Cluster Detail Extraction
 
 * Centroid equation:
 
-
 $$c_k = {{\sum_x w_k(x)^m x}\over{\sum_x w_k(x)^m}}$$
-
 
 * Objective function:
 
-
 $$J(W,C) = \sum_{i=1}^{n} \sum_{j=1}^{c} w_{ij}^{m} \|\vec{x}_i - \vec{c}_j\|^{2}$$
 
-
 * Weights:
-
 
 $$w_{ij} = \frac{1}{\sum_{k=1}^{c} \left ( {\|\vec{x}_i - \vec{c}_j\|}\over{\|\vec{x}_i - \vec{c}_k\|} \right )^2}$$
 
 
 
-> This method handles points with partial membership in multiple clusters, but it is susceptible to initialization issues.
+> This method handles points with partial membership in multiple clusters, but it is susceptible to initialization
+> issues.
 
 
 ---
 
 # IVAT Initialization
 
-1. Since the VAT provides a permuted list of the rows and columns of $D$, we can use this to identify memberships in clusters
+1. Since the VAT provides a permuted list of the rows and columns of $D$, we can use this to identify memberships in
+   clusters
 
 2. Use the difference of off-by-1 diagonal of the IVAT matrix to identify the boundaries of each cluster.
 
@@ -345,11 +330,9 @@ $$w_{ij} = \frac{1}{\sum_{k=1}^{c} \left ( {\|\vec{x}_i - \vec{c}_j\|}\over{\|\v
 
 4. This is the initial guess for the count of cluster centroids.
 
-5. Look back to the 
-
+5. Look back to the
 
 ![img_1.png](./quals/image-21.png)
-
 
 ![img.png](./quals/image-20.png)
 
@@ -382,22 +365,19 @@ $$w_{ij} = \frac{1}{\sum_{k=1}^{c} \left ( {\|\vec{x}_i - \vec{c}_j\|}\over{\|\v
 
     4. It does this with 2 rules and a handful of clauses
 
-   5. It extends to TSK order-1 and order-2 with linear regression parameter estimation.
+    5. It extends to TSK order-1 and order-2 with linear regression parameter estimation.
 
 4. 2D-rotation AND-rule selection
 
     1. Uniformly distributes rules across possible space
 
-    2. Provides a good initial solution deck for GA/ACO methods 
-
+    2. Provides a good initial solution deck for GA/ACO methods
 
 ---
 
 # Future: Goal
 
-
 > Make Training of Fuzzy Inference Systems (FIS) models 1000x faster, whether in time, or in usable scale
-
 
 1. Preliminary Data Review - VAT/IVAT
 
@@ -411,7 +391,6 @@ $$w_{ij} = \frac{1}{\sum_{k=1}^{c} \left ( {\|\vec{x}_i - \vec{c}_j\|}\over{\|\v
 
 6. Any suggestions?
 
-
 ---
 
 # Thank You!
@@ -423,6 +402,5 @@ $$w_{ij} = \frac{1}{\sum_{k=1}^{c} \left ( {\|\vec{x}_i - \vec{c}_j\|}\over{\|\v
 * UC AI / Bio Lab - y'all know what you do. :)
 
 * Dr Phillips, aka _Dad_
-
 
 ---

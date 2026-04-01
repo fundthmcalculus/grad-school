@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="chore: add `package-lock.json` for dependency tracking in the `research` directory">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="Remove unused image layout metadata in `quals.md` for cleaner formatting">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/research/quals.md" beforeDir="false" afterPath="$PROJECT_DIR$/research/quals.md" afterDir="false" />
     </list>
@@ -320,7 +320,7 @@
       <workItem from="1765152697164" duration="14011000" />
       <workItem from="1765244450851" duration="1254000" />
       <workItem from="1765291091396" duration="148000" />
-      <workItem from="1775073536131" duration="1947000" />
+      <workItem from="1775073536131" duration="2591000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -546,7 +546,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775074889614</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Update `quals.md` to fix layout issues and improve inline image formatting">
+      <option name="closed" value="true" />
+      <created>1775075536898</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1775075536898</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Remove unused image layout metadata in `quals.md` for cleaner formatting">
+      <option name="closed" value="true" />
+      <created>1775076090638</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1775076090638</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -564,8 +580,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="spike:various changes" />
-    <MESSAGE value="fix: merge" />
     <MESSAGE value="feat: VAT-&gt;ACO hot-start" />
     <MESSAGE value="fix: More details" />
     <MESSAGE value="fix: Better hot-start ratio" />
@@ -589,7 +603,9 @@
     <MESSAGE value="fix: Added UAV notes" />
     <MESSAGE value="feat: add version 2 of VAT Prim's MST block diagram" />
     <MESSAGE value="chore: add `package-lock.json` for dependency tracking in the `research` directory" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: add `package-lock.json` for dependency tracking in the `research` directory" />
+    <MESSAGE value="Update `quals.md` to fix layout issues and improve inline image formatting" />
+    <MESSAGE value="Remove unused image layout metadata in `quals.md` for cleaner formatting" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove unused image layout metadata in `quals.md` for cleaner formatting" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
