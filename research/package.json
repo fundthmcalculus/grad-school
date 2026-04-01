@@ -1,6 +1,7 @@
 {
 	"scripts": {
-		"dev": "slidev quals.md"
+		"dev": "slidev quals.md",
+		"format": "slidev format quals.md"
 	},
 	"dependencies": {
 		"@slidev/cli": "^52.14.1",

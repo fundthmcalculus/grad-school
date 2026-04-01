@@ -1,3 +1,9 @@
+---
+theme: seriph
+title: PhD Quals
+
+---
+
 # PhD Quals
 
 _Scott Phillips_
@@ -63,7 +69,7 @@ $D_{polygon} > D_{city}$
 ---
 # Initial Performance Observation - 256
 
-![clusterPaths](./quals/image.png)
+![clusterPaths](quals/image-0.png)
 
 | Method  | Time [s] | Distance | Change |
 |---------|----------|----------|--------|
@@ -78,7 +84,7 @@ $D_{polygon} > D_{city}$
 ---
 # Larger Scale - 2048
 
-![largerClusterPaths](./quals/image-1.png)
+![largerClusterPaths](quals/image-1.png)
 
 | Method  | Time [s] | Distance | Change  |
 |---------|----------|----------|---------|
@@ -171,7 +177,6 @@ $D_{polygon} > D_{city}$
 
     * 8-bit grey-scale PNG is >400 MB
 
-
 ![alt text](./quals/image-11.png)
 
 
@@ -211,8 +216,7 @@ $D_{polygon} > D_{city}$
 
 > At 135K rows, my improved method is 1.6 million times faster
 
-
-![iamge13](./quals/image-13.png)
+![image13](./quals/image-13.png)
 
 
 ---
