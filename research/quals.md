@@ -1,3 +1,9 @@
+---
+theme: seriph
+title: PhD Quals
+
+---
+
 # PhD Quals
 
 _Scott Phillips_
@@ -62,12 +68,11 @@ $D_{polygon} > D_{city}$
 
 ---
 layout: image-right
-image: ./quals/image.png
 backgroundSize: contain
 
 # Initial Performance Observation - 256
 
-![clusterPaths](./quals/image.png)
+![clusterPaths](quals/image-0.png)
 
 |Method |Time [s]|Distance|Change|
 |-------|--------|--------|------|
@@ -81,12 +86,12 @@ backgroundSize: contain
 
 ---
 layout: image-right
-image: ./quals/image-1.png
+image: quals/image-1.png
 backgroundSize: contain
 
 # Larger Scale - 2048
 
-![largerClusterPaths](./quals/image-1.png)
+![largerClusterPaths](quals/image-1.png)
 
 |Method |Time [s]|Distance|Change |
 |-------|--------|--------|-------|
@@ -156,7 +161,7 @@ backgroundSize: contain
     * This image is 1% linear scale, 1/10,000 in area
     * 8-bit grey-scale PNG is >400 MB
 
-![alt text](./quals/image-11.png)
+![alt text](quals/image-11.png)
 
 ---
 # Patient Data
@@ -168,7 +173,7 @@ backgroundSize: contain
     * 8 minutes for VAT, 15 minutes for distance matrix calculation
     * At 32-bit floating point, this is 73GB
 
-![alt text](./quals/image-12.png)
+![alt text](quals/image-12.png)
 
 ---
 
@@ -179,7 +184,7 @@ backgroundSize: contain
 
 > At 135K rows, my improved method is 1.6 million times faster
 
-![iamge13](./quals/image-13.png)
+![iamge13](quals/image-13.png)
 
 ---
 
@@ -190,17 +195,17 @@ backgroundSize: contain
 * Utilize a priority queue (fibbonacci heap) to extract the remainder index as $O(N)=1$ operation
 > Professor Kreinovich pointed out this method is more akin to HeapSort, which is also $O(N)=N \log N$. The original name came from a failed experiment to implement what amounts to a 2D MergeSort.
 
-![alt text](./quals/image-14.png)
+![alt text](quals/image-14.png)
 
 > For a 4096 element dataset, 124 seconds vs 2.56 seconds
 
-![alt text](./quals/image-15.png)
+![alt text](quals/image-15.png)
 
 ---
 # TSP Optimization
-![alt text](./quals/image-16.png)
-![alt text](./quals/image-17.png)
-![alt text](./quals/image-18.png)
+![alt text](quals/image-16.png)
+![alt text](quals/image-17.png)
+![alt text](quals/image-18.png)
 > Unfortunately, the commonly used 2-OPT local optimization method breaks the MST organization
 ---
 # The Second Insight -- Memory
@@ -214,7 +219,7 @@ backgroundSize: contain
 * VAT sequence, paired with the original sequence, creates a collection of loops: _directed, cyclic graphs_
 * We can start at any point on any loop, and follow the loop until we reach our starting point again.
 * If we mask which loop entries have been visited, we can simply increment until we find another loop
-![alt text](./quals/image-19.png)
+![alt text](quals/image-19.png)
 
 ---
 # Conclusions and Future Work
