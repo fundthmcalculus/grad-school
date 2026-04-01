@@ -3,17 +3,19 @@ import time
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from pyclustertend.visual_assessment_of_tendency import compute_ordered_dis_njit
 from sklearn.metrics import pairwise_distances
 
 from AEEM6097.aco_mst import aco_mst_solve
-from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, compute_ordered_dis_njit2
+from AEEM6097.mod_vat import compute_ivat_ordered_dissimilarity_matrix2, \
+    compute_ordered_dis_njit2, compute_ordered_dis_njit_merge
 from AEEM6097.test2 import aco_tsp_solve, check_path_distance
 
-N_CITIES_CLUSTER = 64
-N_CLUSTERS = N_CITIES_CLUSTER//2
+N_CITIES_CLUSTER = 32
+N_CLUSTERS = N_CITIES_CLUSTER//4
 
-N_ANTS = 8192
-N_GENERATIONS = 128
+N_ANTS = 3*N_CITIES_CLUSTER
+N_GENERATIONS = 3*N_CLUSTERS
 
 CLUSTER_DIAMETER = 3
 CLUSTER_SPACING = 10*CLUSTER_DIAMETER
@@ -25,7 +27,9 @@ def random_cities(center_x, center_y, n_cities=-1) -> np.ndarray:
     if n_cities == -1:
         n_cities = N_CITIES_CLUSTER
     # Randomly distribute cities in a uniform circle?
-    theta = np.linspace(0, 2 * np.pi, n_cities+1, dtype=np.float32)
+    if n_cities == 1:
+        return np.array([[center_x, center_y]])
+    theta = np.linspace(0, 2 * np.pi, n_cities+1)
     theta = theta[:-1]
     city_x = np.cos(theta) * CLUSTER_DIAMETER/2.0 + center_x
     city_y = np.sin(theta) * CLUSTER_DIAMETER/2.0 + center_y
@@ -36,7 +40,7 @@ def circle_random_clusters(n_clusters=-1, n_cities=-1) -> np.ndarray:
     if n_clusters == -1:
         n_clusters = N_CLUSTERS
     city_locations = np.zeros(shape=(0,2), dtype=np.float32)
-    for theta in np.linspace(0, 2*np.pi, n_clusters):
+    for theta in np.linspace(0, 2*np.pi, n_clusters, endpoint=False):
         if HALF_CIRCLE:
             theta /= 2.0
         else:
@@ -93,13 +97,11 @@ def main():
     vat_time = t1 - t0
     df_rows.append(
         {"Method": "VAT", "Time": vat_time, "Distance": vat_dist_len,
-         "%Change": vat_dist_len / approx_optimal_dist * 100.0,
-         "Path": vat_path}
+         "%Change": vat_dist_len / approx_optimal_dist * 100.0}
     )
     df_rows.append(
         {"Method": "IVAT", "Time": vat_time, "Distance": ivat_dist_len,
-         "%Change": ivat_dist_len / approx_optimal_dist * 100.0,
-         "Path": ivat_path}
+         "%Change": ivat_dist_len / approx_optimal_dist * 100.0}
     )
     # Compute TSP optimized distance
     t2 = time.time()
@@ -115,13 +117,12 @@ def main():
 
     df_rows.append(
         {"Method": "HS-ACO", "Time": t3 - t2 + vat_time, "Distance": hs_optimal_tour_length,
-         "%Change": hs_optimal_tour_length / approx_optimal_dist * 100.0,
-         "Path": hs_optimal_city_order}
+         "%Change": hs_optimal_tour_length / approx_optimal_dist * 100.0}
     )
 
     df_rows.append(
         {"Method": "ACO", "Time": t4 - t3, "Distance": optimal_tour_length,
-         "%Change": optimal_tour_length / approx_optimal_dist * 100.0, "Path": optimal_city_order}
+         "%Change": optimal_tour_length / approx_optimal_dist * 100.0}
     )
 
     print("VAT order: ", vat_path[0:20])
@@ -129,149 +130,131 @@ def main():
     print("HS-ACO order: ", hs_optimal_city_order[0:20])
     print("ACO order: ", optimal_city_order[0:20])
     print("Report")
-    df = pd.DataFrame(df_rows, columns=["Method", "Time", "Distance", "%Change", "Path"]).set_index("Method")
-    print(df.drop('Path', axis=1))
+    df = pd.DataFrame(df_rows, columns=["Method", "Time", "Distance", "%Change"])
+    print(df)
 
     # plot_convergence(tour_lengths)
-    plot_results(all_cities, distances, vat_dist, vat_path, optimal_city_order, hs_optimal_city_order, df)
+    plot_results(all_cities, distances, vat_dist, vat_path, ivat_dist, ivat_path, optimal_city_order, hs_optimal_city_order)
 
 
 def plot_results(all_cities: np.ndarray, distances: np.ndarray,
                  vat_dist: np.ndarray, vat_path,
-                 aco_path, hs_aco_path, df: pd.DataFrame):
+                 ivat_dist: np.ndarray, ivat_path,
+                 aco_path, hs_aco_path):
     # Create a figure with 2x2 subplots
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
     # Add titles to subplots
-    subplot_titles = [f"ACO Path {df["Distance"]["ACO"]:.0f}",
-                      f"VAT Path {df["Distance"]["VAT"]:.0f}",
-                      "VAT Distances",
-                      "HS-ACO Distances"]
+    subplot_titles = ["Cities with Paths", "Ordered Distances", "VAT Distances", "IVAT Distances"]
     for i, ax in enumerate(axs.flat):
         ax.set_title(subplot_titles[i])
 
-    # Add ACO path
-    aco_path_coords = np.array([all_cities[i] for i in aco_path])
+    # Plot cities scatter plot (first subplot)
     axs[0, 0].scatter(all_cities[:, 0], all_cities[:, 1], marker='o', label='Cities')
-    axs[0, 0].plot(aco_path_coords[:, 0], aco_path_coords[:, 1], 'r--', label='ACO Path')
 
     # Add VAT path
     vat_path_coords = np.array([all_cities[i] for i in vat_path])
-    axs[0, 1].scatter(all_cities[:, 0], all_cities[:, 1], marker='o', label='Cities')
-    axs[0, 1].plot(vat_path_coords[:, 0], vat_path_coords[:, 1], 'g-', label='VAT Path')
+    axs[0, 0].plot(vat_path_coords[:, 0], vat_path_coords[:, 1], 'g-', label='VAT Path')
+
+    # Add ACO path
+    aco_path_coords = np.array([all_cities[i] for i in aco_path])
+    axs[0, 0].plot(aco_path_coords[:, 0], aco_path_coords[:, 1], 'r-', label='ACO Path')
+
+    # Add IVAT path
+    ivat_path_coords = np.array([all_cities[i] for i in ivat_path])
+    axs[0, 0].plot(ivat_path_coords[:, 0], ivat_path_coords[:, 1], 'purple', label='IVAT Path')
+
+    # Add Random Distances heatmap (second subplot)
+    im1 = axs[0, 1].imshow(distances, cmap='viridis', aspect='auto')
+    fig.colorbar(im1, ax=axs[0, 1], shrink=0.8)
 
     # Add VAT distances heatmap (third subplot)
     im2 = axs[1, 0].imshow(vat_dist, cmap='viridis', aspect='auto')
     fig.colorbar(im2, ax=axs[1, 0], shrink=0.8)
 
     # Add IVAT distances heatmap (fourth subplot)
-    im3 = axs[1, 1].imshow(distances[hs_aco_path,:][:,hs_aco_path], cmap='viridis', aspect='auto')
+    im3 = axs[1, 1].imshow(ivat_dist, cmap='viridis', aspect='auto')
     fig.colorbar(im3, ax=axs[1, 1], shrink=0.8)
 
     # Add legend to the first subplot
     axs[0, 0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
                      fancybox=True, shadow=True, ncol=4)
-    axs[0, 1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
-                     fancybox=True, shadow=True, ncol=4)
 
     # Set overall title
-    fig.suptitle(f"City Paths and Distance Matrices {N_CITIES_CLUSTER*N_CLUSTERS}", fontsize=16)
+    fig.suptitle("City Paths and Distance Matrices", fontsize=16)
 
     # Adjust spacing between subplots
-    plt.tight_layout(rect=(0, 0, 1, 0.96))  # Make room for the overall title
+    plt.tight_layout(rect=[0, 0, 1, 0.96])  # Make room for the overall title
 
     # Show the plot
     plt.show()
 
 
-def get_optimal_order(links):
-    """Get optimal order by recursively following connected nodes starting from node 0"""
-    order = []
-    seen = set()
-    nodes_to_process = [0]  # Start with node 0
+def test_vat_scaling():
+    city_count: list[int] = []
+    merge_time: list[float] = []
+    lib_time: list[float] = []
+    o1 = 3
+    o2 = 12
+    n = 5
+    for group_count in np.logspace(o1, o2, n, base=2, dtype="int"):
+        city_count.append(group_count)
+        # print(f"City count: {group_count}")
+        all_cities = circle_random_clusters(n_clusters=group_count, n_cities=1)
+        matrix_of_pairwise_distance = pairwise_distances(all_cities)
+        # Scramble the order to ensure we sort it!
+        cols = np.arange(len(all_cities), dtype="int")
+        rand_col_order = np.random.permutation(cols)
+        matrix_of_pairwise_distance = matrix_of_pairwise_distance[:, rand_col_order][rand_col_order, :]
+        # Cluster using our IVAT
+        t0 = time.time()
+        ordered_matrix2, path_merge = compute_ordered_dis_njit_merge(matrix_of_pairwise_distance)
+        t1 = time.time()
+        # Cluster using the library IVAT
+        ordered_matrix, path_vat = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
+        # ordered_matrix = 0*ordered_matrix2
+        t2 = time.time()
 
-    while nodes_to_process:
-        node = nodes_to_process.pop()
-        order.append(node)
+        # Print the results
+        # print(f"VAT-merge time: {t1-t0:.4f} seconds")
+        # print(f"VAT-lib time: {t2-t1:.4f} seconds")
+        # print(f"IVAT-merge path: {path_merge}")
+        # print(f"IVAT-lib path: {path_vat}")
+        merge_time.append(t1 - t0)
+        lib_time.append(t2 - t1)
 
-        # Find all links containing this node
-        if isinstance(links, np.ndarray):
-            mask = (links[:, 0] == node) | (links[:, 1] == node)
-            for link in links[mask]:
-                other = link[1] if link[0] == node else link[0] if link[1] == node else None
-                if other is not None and tuple(link) not in seen:
-                    seen.add(tuple(link))
-                    nodes_to_process.append(other)
-        else:
-            for link in links:
-                other = link[1] if link[0] == node else link[0] if link[1] == node else None
-                if other is not None and link not in seen:
-                    seen.add(link)
-                    nodes_to_process.append(other)
+    # Prepare data for regression
+    log_x = np.log(city_count)
+    log_lib = np.log(lib_time)
+    log_merge = np.log(merge_time)
 
-    return order
+    print("\n")
+    print(f"Merge-VAT O(n)=n^{np.round(np.mean(log_merge/log_x))}")
+    print(f"Lib-VAT O(n)=n^{np.round(np.mean(log_lib/log_x))}")
 
-
-def vat_mst(matrix_of_pairwise_distance):
-    # Run the ACO MST solution.
-    optimal_links, optimal_length, tour_lengths = aco_mst_solve(matrix_of_pairwise_distance, n_ants=N_ANTS, n_iter=N_GENERATIONS)
-    # Plot the convergence
     plt.figure()
-    plt.plot(tour_lengths)
-    plt.xlabel("Iteration")
-    plt.ylabel("MST Length")
-    plt.title(f"ACO MST Convergence N_ANTS={N_ANTS}, N_ITER={N_GENERATIONS}")
-    new_matrix = np.array(matrix_of_pairwise_distance, copy=True)
-    # Sort further?
-    # optimal_links = np.sort(optimal_links, axis=0)
-    # optimal_links = sorted(optimal_links, key=lambda x: x[1])
-    # Get the unique numbers in order in the list of tuples
-    # optimal_order = list(dict.fromkeys([s for p in optimal_links for s in p]))
-    # Get optimal order by following connected nodes
-    optimal_order = get_optimal_order(optimal_links)
-
-    new_matrix = new_matrix[optimal_order,:][:, optimal_order]
-    return new_matrix, optimal_order
-
-
-def vat_scaling():
-    # for city_exp in range(1, 4):
-    #     city_count = 2**city_exp
-    #     print(f"City count: {city_count**2}")
-    city_count = N_CLUSTERS*N_CITIES_CLUSTER
-    all_cities = circle_random_clusters(n_clusters=N_CLUSTERS, n_cities=N_CITIES_CLUSTER)
-    matrix_of_pairwise_distance = pairwise_distances(all_cities)
-    # Scramble the order to ensure we sort it!
-    cols = np.arange(len(all_cities), dtype="int")
-    rand_col_order = np.random.permutation(cols)
-    matrix_of_pairwise_distance = matrix_of_pairwise_distance[:, rand_col_order][rand_col_order, :]
-    print("Solving VAT")
-    t1 = time.time()
-    # Cluster using the ACO VAT
-    ordered_matrix3, observation_path3 = vat_mst(matrix_of_pairwise_distance)
-    t2 = time.time()
-    # Cluster using the library VAT
-    ordered_matrix, observation_path = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
-    t3 = time.time()
-
-    # Ensure all values are equal!
-    print("VAT-Lib: ", observation_path)
-    print("VAT-ACO: ", observation_path3)
-
-    # Print the results
-    print(f"VAT-ACO time: {t2-t1:.4f} seconds, distance: {ordered_matrix.diagonal(1).sum() + ordered_matrix[0,-1]:.1f}")
-    print(f"VAT-lib time: {t3-t2:.4f} seconds, distance: {ordered_matrix3.diagonal(1).sum() + ordered_matrix3[0,-1]:.1f}")
-
-    plt.figure(figsize=(8, 6))
-    plt.subplot(1,2,1)
-    plt.imshow(ordered_matrix, cmap='viridis', aspect='auto', label='VAT-lib')
-    plt.title(f"VAT Library: {t2-t1:.2f} seconds")
-    plt.subplot(1,2,2)
-    plt.imshow(ordered_matrix3, cmap='viridis', aspect='auto', label='VAT-ACO-MST')
-    plt.title(f"VAT ACO-MST: {t3-t2:.2f} seconds")
+    plt.loglog(city_count, merge_time, 'o', label="Merge VAT")
+    plt.loglog(city_count, lib_time, 'o', label="Lib VAT")
+    plt.xlabel("Number of Cities")
+    plt.ylabel("Time (seconds)")
+    plt.legend()
+    plt.title("VAT Scaling Test")
     plt.show()
 
+    # Plot the results
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(4, 10))
+    fig.suptitle(f"VAT Scaling Test (N={group_count})")
+    im1 = ax1.imshow(ordered_matrix, cmap='viridis')
+    ax1.set_title(f'Library VAT Result: {t2-t1:.2f} seconds')
+    plt.colorbar(im1, ax=ax1)
+
+    im2 = ax2.imshow(ordered_matrix2, cmap='viridis')
+    ax2.set_title(f'Merge Sort VAT Result: {t1-t0:.2f} seconds')
+    plt.colorbar(im2, ax=ax2)
+
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
-    # main()
-    vat_scaling()
+    main()
+    # vat_scaling()
