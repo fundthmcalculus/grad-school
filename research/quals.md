@@ -54,6 +54,7 @@ Advisor: Dr Kelly Cohen
 
 $T_{best} \le 2T_{MST}$
 > An intuitive tour is to visit the permuted cities in $D'$ sequentially, then wrap back from city $N$ to $1$.
+
 ---
 
 # Example - Circular Cities
@@ -67,9 +68,14 @@ $T_{optimal} = P_{polygon} + N_{cities}P_{city} - N_{cities}D_{city}$
 $D_{polygon} > D_{city}$
 
 ---
+layout: image-right
+image: ./quals/image-0.png
+
 # Initial Performance Observation - 256
 
-![clusterPaths](quals/image-0.png)
+> Unfortunately, IVAT mutates the matrix, making it unsuitable for hot-starting
+
+![clusterPaths](./quals/image-0.png)
 
 | Method  | Time [s] | Distance | Change |
 |---------|----------|----------|--------|
@@ -79,12 +85,13 @@ $D_{polygon} > D_{city}$
 | HS-ACO  | 4.95     | 408      | 140%   |
 | ACO     | 4.10     | 1592     | 550%   |
 
-> Unfortunately, IVAT mutates the matrix, making it unsuitable for hot-starting
-
 ---
+layout: image-right
+image: ./quals/image-1.png
+
 # Larger Scale - 2048
 
-![largerClusterPaths](quals/image-1.png)
+![largerClusterPaths](./quals/image-1.png)
 
 | Method  | Time [s] | Distance | Change  |
 |---------|----------|----------|---------|
@@ -96,8 +103,6 @@ $D_{polygon} > D_{city}$
 
 ---
 # Refinement
-
-[//]: # (* The hot start ACO ends up a little cleaner in some cases:)
 
 ![alttext](./quals/image-2.png)
 
@@ -126,17 +131,11 @@ $D_{polygon} > D_{city}$
 
 
 | Column 1                          | Column 2  | Column 3                         | Column 4                         |
-
 |-----------------------------------|-----------|----------------------------------|----------------------------------|
-
 | ![alt text](./quals/image-10.png) |           | ![alt text](./quals/image-5.png) | ![alt text](./quals/image-6.png) |
-
 |                                   | 50x    2x | 230x 3x                          |                                  |
-
 | ![alt text](./quals/image-7.png)  |           | ![alt text](./quals/image-8.png) | ![alt text](./quals/image-9.png) |
-
 | 128 4x                            | 512       | 6.25x                            | 800                              |
-
 |                                   |           |                                  |                                  |
 
 
