@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/research/quals/image-20.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/research/quals/image-21.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/grad-school.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/grad-school.iml" afterDir="false" />
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: add version 2 of VAT Prim's MST block diagram">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/research/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/research/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/research/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/research/pnpm-lock.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/research/quals.md" beforeDir="false" afterPath="$PROJECT_DIR$/research/quals.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -20,6 +19,10 @@
     <option name="groupingKeys">
       <option value="directory" />
     </option>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="115" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -42,12 +45,12 @@
     &quot;assignee&quot;: &quot;fundthmcalculus&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/fundthmcalculus/grad-school.git",
-    "accountId": "40e4aa2a-9b99-4612-b3f4-3918eb37235f"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/fundthmcalculus/grad-school.git&quot;,
+    &quot;accountId&quot;: &quot;40e4aa2a-9b99-4612-b3f4-3918eb37235f&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/fcmeans/main.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.12/site-packages/skfuzzy/cluster/_cmeans.py" root0="SKIP_INSPECTION" />
@@ -83,9 +86,12 @@
     "Python.project1.executor": "Run",
     "Python.test1.executor": "Run",
     "Python.tire_selector.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "main",
@@ -256,8 +262,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-PY-261.22158.340" />
+        <option value="bundled-python-sdk-b63d5a1f7c97-b61e75351b1f-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.22158.340" />
       </set>
     </attachedChunks>
   </component>
@@ -316,6 +322,7 @@
       <workItem from="1765152697164" duration="14011000" />
       <workItem from="1765244450851" duration="1254000" />
       <workItem from="1765291091396" duration="148000" />
+      <workItem from="1775073536131" duration="1288000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -525,7 +532,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765164755782</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="feat: add version 2 of VAT Prim's MST block diagram">
+      <option name="closed" value="true" />
+      <created>1775070622512</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1775070622512</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -566,7 +581,8 @@
     <MESSAGE value="output figures" />
     <MESSAGE value="fix: P2 notes" />
     <MESSAGE value="fix: Added UAV notes" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: Added UAV notes" />
+    <MESSAGE value="feat: add version 2 of VAT Prim's MST block diagram" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add version 2 of VAT Prim's MST block diagram" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -605,6 +621,18 @@
           <url>file://$PROJECT_DIR$/AEEM6022/hw4.py</url>
           <line>24</line>
           <option name="timeStamp" value="83" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/research/node_modules/yaml/dist/nodes/Alias.js</url>
+          <line>54</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="84" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/research/node_modules/.pnpm/yaml@2.8.3/node_modules/yaml/dist/nodes/Alias.js</url>
+          <line>54</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="85" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
