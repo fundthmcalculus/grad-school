@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: add version 2 of VAT Prim's MST block diagram">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="chore: add `package-lock.json` for dependency tracking in the `research` directory">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/research/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/research/pnpm-lock.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/research/quals.md" beforeDir="false" afterPath="$PROJECT_DIR$/research/quals.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -322,7 +320,7 @@
       <workItem from="1765152697164" duration="14011000" />
       <workItem from="1765244450851" duration="1254000" />
       <workItem from="1765291091396" duration="148000" />
-      <workItem from="1775073536131" duration="1288000" />
+      <workItem from="1775073536131" duration="1947000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -540,7 +538,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775070622512</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="chore: add `package-lock.json` for dependency tracking in the `research` directory">
+      <option name="closed" value="true" />
+      <created>1775074889614</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1775074889614</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -582,7 +588,8 @@
     <MESSAGE value="fix: P2 notes" />
     <MESSAGE value="fix: Added UAV notes" />
     <MESSAGE value="feat: add version 2 of VAT Prim's MST block diagram" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add version 2 of VAT Prim's MST block diagram" />
+    <MESSAGE value="chore: add `package-lock.json` for dependency tracking in the `research` directory" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: add `package-lock.json` for dependency tracking in the `research` directory" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
