@@ -1,10 +1,9 @@
 {
-
 	"scripts": {
 		"dev": "slidev quals.md"
 	},
-
 	"dependencies": {
-		"@slidev/cli": "^52.14.1"
+		"@slidev/cli": "^52.14.1",
+		"@slidev/theme-default": "^0.25.0"
 	}
 }
