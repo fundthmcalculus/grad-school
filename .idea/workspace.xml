@@ -4,57 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="chore: update project configuration files and `.gitignore` for improved tooling setup and file management">
-      <change afterPath="$PROJECT_DIR$/presentations/quals.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/presentations/quals/mkslides.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/presentations/quals/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/presentations/quals/slides/about.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/presentations/quals/slides/img/vat_prim_mst_block_diagram_v2.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/presentations/quals/slides/index.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/presentations/quals/slides/paper1.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/presentations/quals/slides/paper2.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Paper 1 presentation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/pnpm-lock.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/.npmrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/components/Counter.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/netlify.toml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/pages/imported-slides.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/pnpm-lock.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/slides.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/snippets/external.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals-combined/vercel.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-10.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-11.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-12.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-13.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-14.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-15.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-17.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-18.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-19.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-20.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-21.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/image-9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals/vat_prim_mst_block_diagram_v2.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/paper2.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/paper2.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -373,7 +325,7 @@
       <workItem from="1765244450851" duration="1254000" />
       <workItem from="1765291091396" duration="148000" />
       <workItem from="1775073536131" duration="3257000" />
-      <workItem from="1775129837254" duration="5352000" />
+      <workItem from="1775129837254" duration="6375000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -631,7 +583,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775130038824</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="build: Paper 1 presentation">
+      <option name="closed" value="true" />
+      <created>1775135522606</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1775135522606</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -649,7 +609,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: Better hot-start ratio" />
     <MESSAGE value="fix: more information" />
     <MESSAGE value="feat: ACO-VAT sorting" />
     <MESSAGE value="fix: More cities!" />
@@ -674,7 +633,8 @@
     <MESSAGE value="Remove unused image layout metadata in `quals.md` for cleaner formatting" />
     <MESSAGE value="Fix formatting issues and adjust text wrapping in `quals.md` for improved readability" />
     <MESSAGE value="chore: update project configuration files and `.gitignore` for improved tooling setup and file management" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: update project configuration files and `.gitignore` for improved tooling setup and file management" />
+    <MESSAGE value="build: Paper 1 presentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: Paper 1 presentation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
