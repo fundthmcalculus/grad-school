@@ -2,3 +2,7 @@
 
 
 research/node_modules/
+/NAFIPS-2025-VAT-ACO*
+/NAFIPS_2026___mergeVAT.pdf
+*.png
+**/*.mat
