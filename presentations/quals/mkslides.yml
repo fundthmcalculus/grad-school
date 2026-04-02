@@ -1,0 +1,71 @@
+# Configuration for the generated index page
+---
+index:
+    # Enables or disables the "Documentation built with MkSlides." footer:
+    # boolean
+#    enable_footer: true
+
+    # Favicon of the generated index page: file path or public url to favicon
+    # file
+    favicon: example-index-favicon.ico
+
+    # Navigation section describing how to structure the slides on the index
+    # page. This is similar to the `nav` option from MkDocs: list[any]
+    nav:
+        - Home: index.md
+        - About: about.md
+        - Paper1: paper1.md
+        - Paper2: paper2.md
+        - Paper3: draft-paper3.md
+
+    # Title of the generated index page: string
+    title: PhD Quals
+
+    # Jinja 2 template to generate index HTML: file path to Jinja2 file
+#    template: example.jinja
+
+    # Theme of the generated index page: file path or public url to CSS file
+#    theme: obsidian
+
+# Configuration for the slides
+slides:
+    # Charset of the slides: string
+    # (see https://revealjs.com/markdown/#external-markdown)
+    charset: utf-8
+
+    # Theme for syntax highlighting of code fragments on the slides: file path
+    # to CSS file, public url to CSS file, or one of the highlight.js built-in
+    # themes such as `monokai`, `obsidian`, `tokyo-night-dark`, `vs`, ...
+    # (see https://highlightjs.org/examples)
+    highlight_theme: obsidian
+
+    # Separator to determine notes of the slide: regexp
+    # (see https://revealjs.com/markdown/#external-markdown)
+    separator_notes: "^Notes?:"
+
+    # Separator to determine end current/begin new vertical slide: regexp
+    # (see https://revealjs.com/markdown/#external-markdown)
+    separator_vertical: ^\s*-v-\s*$
+
+    # Separator to determine end current/begin new slide: regexp
+    # (see https://revealjs.com/markdown/#external-markdown)
+    separator: ^\s*---\s*$
+
+    # Jinja 2 template to generate index HTML: file path to Jinja2 file
+#    template: ./example.jinja
+
+    # Theme of the slides: file path to CSS file, public url to CSS file, or one
+    # of the reveal.js themes such as `black`, `white`, `league`, `solarized`,
+    # `dracula`, ... (see https://revealjs.com/themes/)
+    theme: dracula
+
+    # Title of the slides. If this is set for a slide, it will be used for the
+    # entry in the generated index HTML: string
+#    title: example-title
+
+# Options to be passed to reveal.js: options in yaml format, they will be
+# translated to JSON automatically (see https://revealjs.com/config/)
+revealjs:
+    height: 1080
+    width: 1920
+    transition: fade
