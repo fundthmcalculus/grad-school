@@ -19,10 +19,23 @@ Advisor: Dr Kelly Cohen
 
 ---
 
-# Outline
+# Goal
+
+> Make the training and development of Fuzzy Inference Systems (FIS) models 1000x faster, whether in time, or in usable scale
+
+1. Preliminary Data Review - VAT/IVAT
+2. Initial model skeleton - Fuzzy C Means
+3. Membership function selection - Mixture of Gaussians
+4. Rulebase development - Mixture of Gaussians
+5. Model refinement - Optimization methods
+6. Any suggestions?
+
+---
+
+# Presentations
 
 [Paper 1: VAT for Hot-start of TSP Solutions](paper1.md)
 
 [Paper 2: mergeVAT: 58K x 58K in 60 seconds](paper2.md)
 
-[Paper 3: VAT/IVAT Direct to Clusters](draft-paper3.md)
+[Darft Paper 3: VAT/IVAT Direct to Clusters](draft-paper3.md)

@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Paper 1 presentation">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Paper 2 Presentation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/paper2.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/paper2.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/mkslides.yml" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/mkslides.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/index.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -325,7 +327,7 @@
       <workItem from="1765244450851" duration="1254000" />
       <workItem from="1765291091396" duration="148000" />
       <workItem from="1775073536131" duration="3257000" />
-      <workItem from="1775129837254" duration="6375000" />
+      <workItem from="1775129837254" duration="15733000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -591,7 +593,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775135522606</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="build: Paper 2 Presentation">
+      <option name="closed" value="true" />
+      <created>1775136384020</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1775136384020</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -609,7 +619,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: more information" />
     <MESSAGE value="feat: ACO-VAT sorting" />
     <MESSAGE value="fix: More cities!" />
     <MESSAGE value="feat: Final Project Gaussian Methods" />
@@ -634,7 +643,8 @@
     <MESSAGE value="Fix formatting issues and adjust text wrapping in `quals.md` for improved readability" />
     <MESSAGE value="chore: update project configuration files and `.gitignore` for improved tooling setup and file management" />
     <MESSAGE value="build: Paper 1 presentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: Paper 1 presentation" />
+    <MESSAGE value="build: Paper 2 Presentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: Paper 2 Presentation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
