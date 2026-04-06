@@ -39,3 +39,35 @@ Advisor: Dr Kelly Cohen
 [Paper 2: mergeVAT: 58K x 58K in 60 seconds](paper2.md)
 
 [Darft Paper 3: VAT/IVAT Direct to Clusters](draft-paper3.md)
+
+---
+
+## Now: Current Research Direction
+
+1. Accelerating Fuzzy C Means methods with gradient-descent optimization
+    1. Still subject to initial point selection
+2. Utilizing VAT/IVAT for automatic cluster (and cluster centroid) identification
+    1. This guarantees we don't initialize FCM with points which have primary membership in the same cluster.
+    2. This also provides the initial steps towards 2-OPT check points identification
+    3. Automatic cluster counting
+3. Mixture of Gaussians (MoG) FIS membership function and rule identification
+    1. This is showing promise for orders-of-magnitude speed up in model training
+    2. It trains on a phishing dataset with 235K entries to 97% accuracy in 6 seconds
+    3. No post-training GD or GA required
+    4. It does this with 2 rules and a handful of clauses
+    5. It extends to TSK order-1 and order-2 with linear regression parameter estimation.
+    6. The model can be trained in a semi-supervised manner, making it easy to incorporate future data into the model.
+4. 2D-rotation AND-rule selection
+    1. Uniformly distributes rules across possible space
+    2. Provides a good initial solution deck for GA/ACO methods
+
+---
+
+# Thank You!
+
+* Dr Kelly Cohen - my advisor and mentor, allowing me to explore topics like this which interest me.
+* Jon Salisbury - for support/employment and opening the door for me to do this.
+* UC AI / Bio Lab - y'all know what you do. :)
+* Dr Phillips, aka _Dad_
+
+---

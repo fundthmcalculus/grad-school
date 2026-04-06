@@ -62,38 +62,16 @@ $$w_{k}(\vec x) = \frac{1}{\sum_{j=1}^{c} \left ( {\|\vec x - \vec c_k \|}\over{
 
 ---
 
-## Now: Current Research Direction
-
-1. Accelerating Fuzzy C Means methods with gradient-descent optimization
-    1. Still subject to initial point selection
-2. Utilizing VAT/IVAT for automatic cluster (and cluster centroid) identification
-    1. This guarantees we don't initialize FCM with points which have primary membership in the same cluster.
-    2. This also provides the initial steps towards 2-OPT check points identification
-    3. Automatic cluster counting
-3. Mixture of Gaussians (MoG) FIS membership function and rule identification
-    1. This is showing promise for orders-of-magnitude speed up in model training
-    2. It trains on a phishing dataset with 235K entries to 97% accuracy in 6 seconds
-    3. No post-training GD or GA required
-    4. It does this with 2 rules and a handful of clauses
-    5. It extends to TSK order-1 and order-2 with linear regression parameter estimation.
-4. 2D-rotation AND-rule selection
-    1. Uniformly distributes rules across possible space
-    2. Provides a good initial solution deck for GA/ACO methods
-
----
-
-## Mixture of Gaussians Model Training
+## Mixture of Gaussians Classification Model Training
 
 
 <div style="display: flex;">
 <div style="flex: 1; padding: 10px;">
 
 1. For classification tasks ($N$ samples, $M$ features, $K$ output classes):
-2. Segment the data by output class
-3. Compute statistical differences among the inputs to identify discriminant features ($O(M)=M^2$)
+2. Segment the data by output class and compute statistical differences among the inputs to identify discriminant features ($O(M)=M^2$)
 4. Train a GMM model with the selected feature $m$ for the given output class $k$ (up to $p$ gaussians)
-5. These memberships for feature $m$ are _OR_ d together.
-6. Repeat for all selected features and all output classes
+5. These memberships for feature $m$ are _OR_ d together. Repeat for all selected features and all output classes
 7. Evaluate confusion matrix and identify second-pass correction rules.
 
 > There will be $K$ final rules, each of which is a linear combination of the $M \times p$ Gaussians.
@@ -108,7 +86,30 @@ $$w_{k}(\vec x) = \frac{1}{\sum_{j=1}^{c} \left ( {\|\vec x - \vec c_k \|}\over{
 
 ---
 
-## Mixture of Gaussians Model Inference
+## Mixture of Gaussians Regression Model Training
+
+
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
+1. Make your output centroids uniformly - unless you know otherwise - distributed across the output range.
+2. Put one output centroid at each extrema of the output range.
+3. Use the same approach for the rules, and then apply linear regression to produce the order-1 TSK output rules.
+4. This is the UC Irvine Concrete dataset, it's noisy and has a lot of outliers.
+
+> Higher than order-1 TSK doesn't seem to help. Local optimization also barely improves the accuracy.
+
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![img.png](img/paper3/image-26.png)
+
+</div>
+</div>
+
+---
+
+## Mixture of Gaussians: Model Inference
 
 <div style="display: flex;">
 <div style="flex: 1; padding: 10px;">
@@ -127,7 +128,7 @@ $$w_{k}(\vec x) = \frac{1}{\sum_{j=1}^{c} \left ( {\|\vec x - \vec c_k \|}\over{
 
 ---
 
-## MoG: RT-IOT2022
+## Mixture of Gaussians: RT-IOT2022
 
 > 123K instances, 83 features, 12 output classes, trains in <60 seconds.
 
@@ -145,3 +146,12 @@ $$w_{k}(\vec x) = \frac{1}{\sum_{j=1}^{c} \left ( {\|\vec x - \vec c_k \|}\over{
 </div>
 
 ---
+
+## Mixture of Gaussians: Why it matters
+1. Genetic Algorithms (GAs) are slow to converge (same issue for other gradient-free stochastic methods)
+2. Gradient Descent is much faster than GAs, but requires a - very! - good initial guess.
+3. Rule-base explosion is a major issue for Fuzzy models, as the number of rules can grow exponentially with the number of input features.
+4. Mixture of Gaussians is a fast, accurate, and easy-to-use method for training Fuzzy Models, making it a valuable tool for practitioners.
+5. The simplicity of the model makes it easy to interpret and understand, which is crucial for many applications.
+6. The model can be easily extended to handle more complex problems by adding more features or output classes.
+7. The model can be trained in a semi-supervised manner, making it easy to incorporate future data into the model.
