@@ -48,12 +48,12 @@ $$w_{k}(\vec x) = \frac{1}{\sum_{j=1}^{c} \left ( {\|\vec x - \vec c_k \|}\over{
 </div>
 <div style="flex: 1; padding: 10px;">
 
-![img_1.png](img/paper2/image-21.png)
+![img_1.png](img/paper3/image-21.png)
 
 </div>
 <div style="flex: 1; padding: 10px;">
 
-![img.png](img/paper2/image-20.png)
+![img.png](img/paper3/image-20.png)
 
 > IVAT provides an excellent initial guess for the cluster centroids, whether FCM or K-Means.
 
@@ -82,6 +82,66 @@ $$w_{k}(\vec x) = \frac{1}{\sum_{j=1}^{c} \left ( {\|\vec x - \vec c_k \|}\over{
 
 ---
 
-## TODO: Mixture of Gaussians Model Creation
+## Mixture of Gaussians Model Training
+
+
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
+1. For classification tasks ($N$ samples, $M$ features, $K$ output classes):
+2. Segment the data by output class
+3. Compute statistical differences among the inputs to identify discriminant features ($O(M)=M^2$)
+4. Train a GMM model with the selected feature $m$ for the given output class $k$ (up to $p$ gaussians)
+5. These memberships for feature $m$ are _OR_ d together.
+6. Repeat for all selected features and all output classes
+7. Evaluate confusion matrix and identify second-pass correction rules.
+
+> There will be $K$ final rules, each of which is a linear combination of the $M \times p$ Gaussians.
+
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![img.png](img/paper3/image-23.png)
+
+</div>
+</div>
+
+---
+
+## Mixture of Gaussians Model Inference
+
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
+1. Evaluation is done like any other Fuzzy model, $\arg \max(K)$ for selecting the output class.
+2. This is the UC Irvine ML phishing dataset, running about 97-99% accuracy in 6 seconds.
+3. This methodology prevents rule-base explosion by only the minimum possible number of rules.
+
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![img.png](img/paper3/image-24.png)
+
+</div>
+</div>
+
+---
+
+## MoG: RT-IOT2022
+
+> 123K instances, 83 features, 12 output classes, trains in <60 seconds.
+
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
+![img.png](img/paper3/image-25.png)
+
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![img.png](img/paper3/image-22.png)
+
+</div>
+</div>
 
 ---
