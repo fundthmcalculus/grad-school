@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Remove outdated block diagram for `vat_prim_mst` in Paper 3 presentation">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Move all images to the appropriate locations!">
+      <change afterPath="$PROJECT_DIR$/presentations/quals/slides/img/paper3/image-26.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/index.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -328,7 +331,7 @@
       <workItem from="1765291091396" duration="148000" />
       <workItem from="1775073536131" duration="3257000" />
       <workItem from="1775129837254" duration="15769000" />
-      <workItem from="1775478915300" duration="1760000" />
+      <workItem from="1775478915300" duration="2686000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -626,7 +629,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775480661617</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="build: Move all images to the appropriate locations!">
+      <option name="closed" value="true" />
+      <created>1775480703904</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1775480703904</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -644,7 +655,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: So we use the proper 1D array" />
     <MESSAGE value="feat: Support using peak-width as an initial guess!" />
     <MESSAGE value="fix: More data" />
     <MESSAGE value="fix: 2025-08-10-sl4" />
@@ -669,7 +679,8 @@
     <MESSAGE value="build: Draft Paper 3" />
     <MESSAGE value="build: Add updated block diagram for `vat_prim_mst` in Paper 3 presentation" />
     <MESSAGE value="build: Remove outdated block diagram for `vat_prim_mst` in Paper 3 presentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: Remove outdated block diagram for `vat_prim_mst` in Paper 3 presentation" />
+    <MESSAGE value="build: Move all images to the appropriate locations!" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: Move all images to the appropriate locations!" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
