@@ -19,7 +19,7 @@ Advisor: Dr Kelly Cohen
 
 ---
 
-# Goal
+# Research Goal
 
 > Make the training and development of Fuzzy Inference Systems (FIS) models 1000x faster, whether in time, or in usable scale
 
@@ -68,6 +68,7 @@ Advisor: Dr Kelly Cohen
 * Dr Kelly Cohen - my advisor and mentor, allowing me to explore topics like this which interest me.
 * Jon Salisbury - for support/employment and opening the door for me to do this.
 * UC AI / Bio Lab - y'all know what you do. :)
+* Hannah Phillips - my wife, you support me and take on so much.
 * Dr Phillips, aka _Dad_
 
 ---
