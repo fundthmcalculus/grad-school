@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Add updated block diagram for `vat_prim_mst` in Paper 3 presentation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/presentations/quals/site/img/vat_prim_mst_block_diagram_v2.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" afterDir="false" />
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Remove outdated block diagram for `vat_prim_mst` in Paper 3 presentation">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -330,7 +328,7 @@
       <workItem from="1765291091396" duration="148000" />
       <workItem from="1775073536131" duration="3257000" />
       <workItem from="1775129837254" duration="15769000" />
-      <workItem from="1775478915300" duration="1700000" />
+      <workItem from="1775478915300" duration="1760000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -620,7 +618,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775478987070</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="build: Remove outdated block diagram for `vat_prim_mst` in Paper 3 presentation">
+      <option name="closed" value="true" />
+      <created>1775480661617</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1775480661617</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -638,7 +644,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: Final Project Gaussian Methods" />
     <MESSAGE value="fix: So we use the proper 1D array" />
     <MESSAGE value="feat: Support using peak-width as an initial guess!" />
     <MESSAGE value="fix: More data" />
@@ -663,7 +668,8 @@
     <MESSAGE value="build: Paper 2 Presentation" />
     <MESSAGE value="build: Draft Paper 3" />
     <MESSAGE value="build: Add updated block diagram for `vat_prim_mst` in Paper 3 presentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: Add updated block diagram for `vat_prim_mst` in Paper 3 presentation" />
+    <MESSAGE value="build: Remove outdated block diagram for `vat_prim_mst` in Paper 3 presentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: Remove outdated block diagram for `vat_prim_mst` in Paper 3 presentation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

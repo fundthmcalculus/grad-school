@@ -4,5 +4,7 @@
 presentations/node_modules/
 /NAFIPS-2025-VAT-ACO*
 /NAFIPS_2026___mergeVAT.pdf
-*.png
 **/*.mat
+/ivat-C256-48G.png
+/ivat-paths-256.png
+/N256-10000P.png
