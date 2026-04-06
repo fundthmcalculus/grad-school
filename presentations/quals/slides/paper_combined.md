@@ -1,4 +1,109 @@
-# Paper 2: MergeVAT: $58K \times 58K$ in 60 seconds
+# NAFIPS Papers 1/2: MergeVAT: $58K \times 58K$ in 60 seconds
+
+---
+
+## Motivation
+
+* Improve the starting point for GA/ACO/etc TSP solutions - "hot-starting"
+* Automatic segmentation for MTSP problems
+* Provide additional information to guide local post-optimization
+
+---
+
+## VAT Background & Limitations
+
+* Visual Assessment for Tendency (VAT) is a method for cluster identification pioneered by Bezdek
+* It converts, usually via the _L2-norm_, an $N \times M$ matrix of samples into an $N \times N$ dissimilarity
+  matrix $D$
+* It permutes the matrix to minimize the distances off the principal diagonal – Minimum Spanning Tree (MST)
+* The core algorithm is greedy, similar to Prim's Algorithm for MSTs
+* It was computationally expensive, $O(N)=N^3$ - I have brought down to $O(N)=N^2 \log N$
+
+---
+
+## The Connection
+
+* The dissimilarity matrix $D$, and the optimized VAT matrix $D'$ are symmetric permutations of rows and columns.
+* It has been proven that the MST provides an upper bound on the length of the optimal tour:
+
+$T_{best} \le 2T_{MST}$
+> An intuitive tour is to visit the permuted cities in $D'$ sequentially, then wrap back from city $N$ to $1$.
+
+---
+
+## Example - Circular Cities
+
+* A constructed dataset with obvious structure, clusters, and an analytic nearly optimal tour length
+* A large circle with smaller circular clusters distributed evenly around the perimeter
+* Optimal tour length approximation:
+
+$T_{optimal} = P_{polygon} + N_{cities}P_{city} - N_{cities}D_{city}$
+
+$D_{polygon} > D_{city}$
+
+---
+
+## Larger Scale - 2048
+
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
+| Method  | Time [s] | Distance | Change  |
+|---------|----------|----------|---------|
+| Optimal | 0        | 394      | 100%    |
+| Random  | 0        | 78,104   | 19,829% |
+| VAT     | 196      | 582      | 150%    |
+| HS-ACO  | 543      | 582      | 150%    |
+| ACO     | 258      | 24,723   | 6300%   |
+
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![largerClusterPaths](img/paper1/image-1.png)
+
+</div>
+</div>
+
+---
+
+# Refinement
+
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
+* VAT does not always pick the optimal route, so using ACO to refine is helpful.
+* VAT will struggle if there are equally close neighbors, that is, identical distances.
+* In later work, I add radial "noise" to cities to reduce the chance of identical solutions.
+
+</div>
+
+<div style="flex: 1; padding: 10px;">
+
+![alttext](./img/paper1/image-2.png)
+
+</div>
+</div>
+
+---
+
+## TSP Optimization
+
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
+![alt text](img/paper2/image-17.png)
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![alt text](img/paper2/image-16.png)
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![alt text](img/paper2/image-18.png)
+</div>
+</div>
+
+> Unfortunately, the commonly used 2-OPT local optimization method breaks the cluster organization
 
 ---
 
@@ -8,9 +113,9 @@
 <div style="flex: 1; padding: 10px;">
 
 * UC Irvine NASA Dataset
-    * Space Shuttle reentry
+    * Space Shuttle reentry (statlog)
     * 80% of data in condition-1
-    * 58,000 rows
+    * 58,000 rows, 7 features
 * Can we visualize and confirm that?
     * This image is 1% linear scale, 1/10,000 in area
     * 8-bit grey-scale PNG is >400 MB
@@ -114,27 +219,6 @@
 
 ---
 
-## TSP Optimization
-
-<div style="display: flex;">
-<div style="flex: 1; padding: 10px;">
-
-![alt text](img/paper2/image-17.png)
-</div>
-<div style="flex: 1; padding: 10px;">
-
-![alt text](img/paper2/image-16.png)
-</div>
-<div style="flex: 1; padding: 10px;">
-
-![alt text](img/paper2/image-18.png)
-</div>
-</div>
-
-> Unfortunately, the commonly used 2-OPT local optimization method breaks the cluster organization
-
----
-
 ## The Second Insight -- Memory
 
 * VAT often caches the entire dissimilarity matrix $D$
@@ -167,6 +251,7 @@
 
 ## Conclusions and Future Work
 
+* VAT provides a great initial guess to solving TSP problems with ACO
 * mergeVAT:
     * Expands the usable size from 5K to 130K+ elements
     * Provides a good initial guess for TSP applications
@@ -174,3 +259,18 @@
 * **Active** Work: Identify VAT-clusters to change 2-Opt check points
 * Future Work: Distributed mergeVAT for 500K elements
 * Future Work: InsertionSort for building up to 500K elements
+
+---
+
+## ACO Background & Limitations
+
+* Ant Colony Optimization (ACO) is a stochastic optimization technique used for combinatorics, commonly with the Traveling
+  Salesman Problem (TSP)
+* It doesn’t guarantee to find the “best” solution, but often finds a “good enough” solution
+* It is trivially parallelizable – important on multicore processors and GPUs
+
+* It does not require the cost function to be continuous, or differentiable, only comparable
+* It is susceptible to initialization issues, since it is not guaranteed to find the local optima on a given attempt (unlike gradient descent)
+* Having a good initial guess, a “hot-start” can greatly reduce the convergence time.
+
+---

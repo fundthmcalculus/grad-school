@@ -4,9 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Update Paper 3 slides with refined research details and add new model training visuals">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Refine slide content and update research goals in `index.md`">
+      <change afterPath="$PROJECT_DIR$/presentations/quals/slides/paper_combined.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/about.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/presentations/quals/slides/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/index.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/paper1.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/paper1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/paper2.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/paper2.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +24,7 @@
     </option>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="786" />
+    <option name="cachedIndexableFilesCount" value="125" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -95,7 +100,7 @@
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "exp/mkslides",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/personal/grad-school/presentations/quals/slides/img",
+    "last_opened_file_path": "C:/personal/grad-school/presentations/quals/slides",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -112,6 +117,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\personal\grad-school\presentations\quals\slides" />
       <recent name="C:\personal\grad-school\presentations\quals\slides\img" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -329,7 +335,8 @@
       <workItem from="1765291091396" duration="148000" />
       <workItem from="1775073536131" duration="3257000" />
       <workItem from="1775129837254" duration="15769000" />
-      <workItem from="1775478915300" duration="3085000" />
+      <workItem from="1775478915300" duration="3104000" />
+      <workItem from="1775489252891" duration="4476000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -643,7 +650,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775481644891</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="build: Refine slide content and update research goals in `index.md`">
+      <option name="closed" value="true" />
+      <created>1775482006620</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1775482006620</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -661,7 +676,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: 2025-08-10-sl4" />
     <MESSAGE value="fix: Improve ACO MST algorithm and optimize VAT integration" />
     <MESSAGE value="Micellaneous tests" />
     <MESSAGE value="feat: Add Prim's MST for VAT and enhance VAT scalability testing - N^2*log N down from N^3!" />
@@ -686,7 +700,8 @@
     <MESSAGE value="build: Move all images to the appropriate locations!" />
     <MESSAGE value="build: Update and refine `draft-paper3.md` and `index.md` content" />
     <MESSAGE value="build: Update Paper 3 slides with refined research details and add new model training visuals" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: Update Paper 3 slides with refined research details and add new model training visuals" />
+    <MESSAGE value="build: Refine slide content and update research goals in `index.md`" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: Refine slide content and update research goals in `index.md`" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

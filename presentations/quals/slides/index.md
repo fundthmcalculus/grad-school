@@ -10,7 +10,7 @@ Advisor: Dr Kelly Cohen
 
 ---
 
-# About Me
+## About Me
 
 * BSME 2016 University of Cincinnati
 * First year PhD student under Dr Cohen
@@ -19,26 +19,16 @@ Advisor: Dr Kelly Cohen
 
 ---
 
-# Research Goal
+## Research Goal
 
 > Make the training and development of Fuzzy Inference Systems (FIS) models 1000x faster, whether in time, or in usable scale
 
-1. Preliminary Data Review - VAT/IVAT
-2. Initial model skeleton - Fuzzy C Means
-3. Membership function selection - Mixture of Gaussians
+1. Preliminary Data Review - [Paper 2: mergeVAT: 58K x 58K in 60 seconds](paper_combined.md)
+2. Initial model skeleton - Fuzzy C Means 
+3. Membership function selection - Mixture of Gaussians - [Draft Paper 3: VAT/IVAT Direct to Clusters](draft-paper3.md)
 4. Rulebase development - Mixture of Gaussians
 5. Model refinement - Optimization methods
 6. Any suggestions?
-
----
-
-# Presentations
-
-[Paper 1: VAT for Hot-start of TSP Solutions](paper1.md)
-
-[Paper 2: mergeVAT: 58K x 58K in 60 seconds](paper2.md)
-
-[Darft Paper 3: VAT/IVAT Direct to Clusters](draft-paper3.md)
 
 ---
 
@@ -51,7 +41,7 @@ Advisor: Dr Kelly Cohen
     2. This also provides the initial steps towards 2-OPT check points identification
     3. Automatic cluster counting
 3. Mixture of Gaussians (MoG) FIS membership function and rule identification
-    1. This is showing promise for orders-of-magnitude speed up in model training
+    1. This is showing promise for order-of-magnitude speed-up in model training
     2. It trains on a phishing dataset with 235K entries to 97% accuracy in 6 seconds
     3. No post-training GD or GA required
     4. It does this with 2 rules and a handful of clauses

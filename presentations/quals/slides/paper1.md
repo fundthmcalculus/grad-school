@@ -1,4 +1,4 @@
-# NAFIPS Paper 1: Utilization of VAT for Hot-start of TSP Solutions
+# NAFIPS Paper 1: Utilization of VAT for Hot-start of TSP
 
 ---
 
@@ -9,7 +9,7 @@
   matrix $D$
 * It permutes the matrix to minimize the distances off the principal diagonal – Minimum Spanning Tree (MST)
 * The core algorithm is greedy, similar to Prim's Algorithm for MSTs
-* It is computationally expensive, $O(N)=N^3$
+* It was computationally expensive, $O(N)=N^3$ - I have brought down to $O(N)=N^2 \log N$
 
 ---
 
@@ -112,7 +112,7 @@ $D_{polygon} > D_{city}$
 
 <div style="flex: 1; padding: 10px;">
 
-![alttext](../img/paper1/image-2.png)
+![alttext](./img/paper1/image-2.png)
 
 </div>
 </div>
@@ -129,7 +129,7 @@ $D_{polygon} > D_{city}$
 </div>
 <div style="flex: 1; padding: 10px;">
 
-![alt text](../img/paper1/image-4.png)
+![alt text](./img/paper1/image-4.png)
 
 </div>
 <div style="flex: 1; padding: 10px;">
@@ -148,9 +148,7 @@ $D_{polygon} > D_{city}$
 ## Conclusions and Future Work
 
 * VAT provides a great initial guess to solving TSP problems with ACO
-
 * Permutation methods with ACO are not effective
-
 * ACO MST methods show promise, but need further development
 
 ---
@@ -162,9 +160,9 @@ $D_{polygon} > D_{city}$
 
 | Column 1                          | Column 3                         | Column 4                         |
 |-----------------------------------|----------------------------------|----------------------------------|
-| ![alt text](../img/paper1/image-10.png) | ![alt text](../img/paper1/image-5.png) | ![alt text](../img/paper1/image-6.png) |
+| ![alt text](./img/paper1/image-10.png) | ![alt text](./img/paper1/image-5.png) | ![alt text](./img/paper1/image-6.png) |
 | 50x 2x                            | 230x 3x                          |                                  |
-| ![alt text](../img/paper1/image-7.png)  | ![alt text](../img/paper1/image-8.png) | ![alt text](../img/paper1/image-9.png) |
+| ![alt text](./img/paper1/image-7.png) | ![alt text](./img/paper1/image-8.png) | ![alt text](./img/paper1/image-9.png) |
 | 128 4x       512                  | 6.25x                            | 800                              |
 
 </div>
