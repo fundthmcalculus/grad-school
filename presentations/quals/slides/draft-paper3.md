@@ -4,11 +4,11 @@
 
 ## Mixture of Gaussians: Why it matters
 1. Genetic Algorithms (GAs) are slow to converge (same issue for other gradient-free stochastic methods)
-2. Gradient Descent is much faster than GAs, but requires a - very! - good initial guess.
-3. Rule-base explosion is a major issue for Fuzzy models, as the number of rules can grow exponentially with the number of input features.
-4. Mixture of Gaussians is a fast, accurate, and easy-to-use method for training Fuzzy Models, making it a valuable tool for practitioners.
+2. Gradient Descent (GD) is much faster than GA, but it requires a - very! - good initial guess.
+3. Rule-base explosion is a major issue for Fuzzy models: $ N_{rules} = \prod_{i=1}^{N_{inputs}} N_{\mu_i}$
+4. Gaussian-Mixture-Method (GMM) is a fast, accurate, and easy-to-use method for identifying membership functions.
 5. The simplicity of the model makes it easy to interpret and understand, which is crucial for many applications.
-6. The model can be easily extended to handle more complex problems by adding more features or output classes.
+6. The logic operators can be identified by a post-facto selection approach.
 7. The model can be trained in a semi-supervised manner, making it easy to incorporate future data into the model.
 
 ---
@@ -21,9 +21,9 @@
 
 1. For classification tasks ($N$ samples, $M$ features, $K$ output classes):
 2. Segment the data by output class and compute statistical differences among the inputs to identify discriminant features ($O(M)=M^2$)
-4. Train a GMM model with the selected feature $m$ for the given output class $k$ (up to $p$ gaussians)
-5. These memberships for feature $m$ are _OR_ d together. Repeat for all selected features and all output classes
-7. Evaluate confusion matrix and identify second-pass correction rules.
+3. Train a GMM model with the selected feature $m$ for the given output class $k$ (up to $p$ gaussians)
+4. These memberships for feature $m$ are _OR_ d together. Repeat for all selected features and all output classes
+5. Evaluate confusion matrix and identify second-pass correction rules.
 
 > There will be $K$ final rules, each of which is a linear combination of the $M \times p$ Gaussians.
 
@@ -156,4 +156,3 @@ $$w_{k}(\vec x) = \frac{1}{\sum_{j=1}^{c} \left ( {\|\vec x - \vec c_k \|}\over{
 </div>
 </div>
 
----

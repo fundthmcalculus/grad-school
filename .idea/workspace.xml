@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Add combined slides for Papers 1/2, remove redundant `about.md`, and refine presentation details">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Consolidate slides further">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/presentations/quals/slides/paper_combined.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/paper_combined.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -333,7 +334,7 @@
       <workItem from="1775478915300" duration="3104000" />
       <workItem from="1775489252891" duration="4485000" />
       <workItem from="1775576233371" duration="771000" />
-      <workItem from="1775584943030" duration="386000" />
+      <workItem from="1775584943030" duration="2378000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -663,7 +664,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775503017618</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="build: Consolidate slides further">
+      <option name="closed" value="true" />
+      <created>1775585411646</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1775585411646</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -681,7 +690,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Micellaneous tests" />
     <MESSAGE value="feat: Add Prim's MST for VAT and enhance VAT scalability testing - N^2*log N down from N^3!" />
     <MESSAGE value="fix: numba.jit operations make things a LOT faster!" />
     <MESSAGE value="fix: adjust city count calculation and add debug placeholder for ordered matrix" />
@@ -706,7 +714,8 @@
     <MESSAGE value="build: Update Paper 3 slides with refined research details and add new model training visuals" />
     <MESSAGE value="build: Refine slide content and update research goals in `index.md`" />
     <MESSAGE value="build: Add combined slides for Papers 1/2, remove redundant `about.md`, and refine presentation details" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: Add combined slides for Papers 1/2, remove redundant `about.md`, and refine presentation details" />
+    <MESSAGE value="build: Consolidate slides further" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: Consolidate slides further" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
