@@ -156,36 +156,18 @@ $D_{polygon} > D_{city}$
 
 ---
 
-## Scaling Time Complexity
-
-<div style="display: flex;">
-<div style="flex: 1; padding: 10px;">
-
-* VAT gets the arg-min of the remainder of the current column
-* This sorting operation is typically BubbleSort, $O(N)=N^2$
-* This is applied on every column, so overall $O(N)=N^3$
-> At 135K rows, my improved method is ~8000 times faster
-</div>
-<div style="flex: 1; padding: 10px;">
-
-![image13](img/paper2/image-13.png)
-</div>
-</div>
-
----
-
 ## The First Insight - Sort Algorithm
 
 <div style="display: flex;">
 <div style="flex: 1; padding: 10px;">
 
-* MergeSort is the asymptotically fastest algorithm which can exist: $O(N)=N \log N$
-* Over $N$ columns, we have $O(N)=N^2 \log N$
-* N-scaling=24 is a 16K element dataset
-* Utilize a priority queue (fibbonacci heap) to extract the remainder index as $O(N)=1$ operation
+* This 2d-sorting operation was historically BubbleSort: $O(N)=N^3$
+* Utilize a priority queue (binary heap) to extract the remainder index as $O(N)=1$ operation
+* MergeSort is the asymptotically fastest algorithm which can exist: $O(N)=N^2 \log N$
 
-> Professor Kreinovich pointed out this method is more akin to HeapSort, which is also $O(N)=N \log N$. The original
-> name came from a failed experiment to implement what amounts to a 2D MergeSort.
+> At 135K rows, my improved method is ~8000 times faster
+
+> Professor Kreinovich pointed out this method is more akin to HeapSort, which is also $O(N)=N \log N$.
 
 </div>
 <div style="flex: 1; padding: 10px;">
@@ -194,22 +176,6 @@ $D_{polygon} > D_{city}$
 
 </div>
 </div>
-
----
-
-## Scaling Comparison
-
-<div style="display: flex;">
-<div style="flex: 2; padding: 10px;">
-
-![alt text](img/paper2/image-15.png) 
-
-</div>
-</div>
-
-
-> For a 4096 element dataset, 124 seconds vs 2.56 seconds
-
 
 ---
 
@@ -231,8 +197,9 @@ $D_{polygon} > D_{city}$
 * This doubles the memory consumption to save on compute costs, but since mergeVAT scales so much better, we need to
   reduce memory consumption
     * Why not compute only the requested distance $D_{i,j}$ as needed?
-    * This reduces memory to one copy of $D$ plus working space, approximately $O(N) = {{N^2+N}\over{16}}$
-      vs $O(N)=2N^2$
+    * This reduces memory to one copy of $D$ plus working space
+
+$O(N) = N^2 + {{N^2+N}\over{16}}$ vs $O(N)=2N^2$
 
 ---
 
@@ -262,7 +229,7 @@ $D_{polygon} > D_{city}$
     * Expands the usable size from 5K to 130K+ elements
     * Provides a good initial guess for TSP applications
     * Loop-walking cuts the memory requirement in half
-* **Active** Work: Identify VAT-clusters to change 2-Opt check points
+* **Active** Work: Identify VAT-clusters to change local optimization check points
 * Future Work: Distributed mergeVAT for 500K elements
 * Future Work: InsertionSort for building up to 500K elements
 
@@ -278,5 +245,3 @@ $D_{polygon} > D_{city}$
 * It does not require the cost function to be continuous, or differentiable, only comparable
 * It is susceptible to initialization issues, since it is not guaranteed to find the local optima on a given attempt (unlike gradient descent)
 * Having a good initial guess, a “hot-start” can greatly reduce the convergence time.
-
----
