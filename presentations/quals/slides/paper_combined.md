@@ -4,9 +4,20 @@
 
 ## Motivation
 
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
 * Improve the starting point for GA/ACO/etc TSP solutions - "hot-starting"
 * Automatic segmentation for MTSP problems
 * Provide additional information to guide local post-optimization
+
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![largerClusterPaths](img/paper1/image-0.png)
+
+</div>
+</div>
 
 ---
 
@@ -23,11 +34,22 @@
 
 ## The Connection
 
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
 * The dissimilarity matrix $D$, and the optimized VAT matrix $D'$ are symmetric permutations of rows and columns.
 * It has been proven that the MST provides an upper bound on the length of the optimal tour:
 
 $T_{best} \le 2T_{MST}$
 > An intuitive tour is to visit the permuted cities in $D'$ sequentially, then wrap back from city $N$ to $1$.
+
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![alttext](./img/paper1/image-2.png)
+
+</div>
+</div>
 
 ---
 
@@ -40,6 +62,10 @@ $T_{best} \le 2T_{MST}$
 $T_{optimal} = P_{polygon} + N_{cities}P_{city} - N_{cities}D_{city}$
 
 $D_{polygon} > D_{city}$
+
+* VAT does not always pick the optimal route, so using ACO to refine is helpful.
+* VAT will struggle if there are equally close neighbors, that is, identical distances.
+* In later work, I add radial "noise" to cities to reduce the chance of identical solutions.
 
 ---
 
@@ -60,26 +86,6 @@ $D_{polygon} > D_{city}$
 <div style="flex: 1; padding: 10px;">
 
 ![largerClusterPaths](img/paper1/image-1.png)
-
-</div>
-</div>
-
----
-
-# Refinement
-
-<div style="display: flex;">
-<div style="flex: 1; padding: 10px;">
-
-* VAT does not always pick the optimal route, so using ACO to refine is helpful.
-* VAT will struggle if there are equally close neighbors, that is, identical distances.
-* In later work, I add radial "noise" to cities to reduce the chance of identical solutions.
-
-</div>
-
-<div style="flex: 1; padding: 10px;">
-
-![alttext](./img/paper1/image-2.png)
 
 </div>
 </div>
