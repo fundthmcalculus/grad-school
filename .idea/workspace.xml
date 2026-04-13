@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Consolidate slides further">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/draft-paper3.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/paper_combined.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/paper_combined.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/mkslides.yml" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/mkslides.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/index.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -269,8 +270,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-PY-261.22158.340" />
-        <option value="bundled-python-sdk-b63d5a1f7c97-b61e75351b1f-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.22158.340" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-PY-261.23567.35" />
+        <option value="bundled-python-sdk-4e9d64b24869-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.23567.35" />
       </set>
     </attachedChunks>
   </component>
@@ -334,7 +335,12 @@
       <workItem from="1775478915300" duration="3104000" />
       <workItem from="1775489252891" duration="4485000" />
       <workItem from="1775576233371" duration="771000" />
-      <workItem from="1775584943030" duration="2378000" />
+      <workItem from="1775584943030" duration="2989000" />
+      <workItem from="1775659888818" duration="2730000" />
+      <workItem from="1775753270495" duration="1358000" />
+      <workItem from="1775829937369" duration="5538000" />
+      <workItem from="1776083671088" duration="260000" />
+      <workItem from="1776086490407" duration="497000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -672,7 +678,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775585411646</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements">
+      <option name="closed" value="true" />
+      <created>1775588665728</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1775588665728</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -690,7 +704,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: Add Prim's MST for VAT and enhance VAT scalability testing - N^2*log N down from N^3!" />
     <MESSAGE value="fix: numba.jit operations make things a LOT faster!" />
     <MESSAGE value="fix: adjust city count calculation and add debug placeholder for ordered matrix" />
     <MESSAGE value="Adding various bits" />
@@ -715,7 +728,8 @@
     <MESSAGE value="build: Refine slide content and update research goals in `index.md`" />
     <MESSAGE value="build: Add combined slides for Papers 1/2, remove redundant `about.md`, and refine presentation details" />
     <MESSAGE value="build: Consolidate slides further" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: Consolidate slides further" />
+    <MESSAGE value="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
