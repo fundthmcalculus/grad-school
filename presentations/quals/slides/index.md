@@ -60,5 +60,3 @@ Advisor: Dr Kelly Cohen
 * UC AI / Bio Lab - y'all know what you do. :)
 * Hannah Phillips - my wife, you support me and take on so much.
 * Dr Phillips, aka _Dad_
-
----
