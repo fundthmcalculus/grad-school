@@ -4,7 +4,7 @@
 		"format": "slidev format quals.md"
 	},
 	"dependencies": {
-		"@slidev/cli": "^52.14.1",
+		"@slidev/cli": "^52.16.0",
 		"@slidev/theme-default": "^0.25.0"
 	}
 }
