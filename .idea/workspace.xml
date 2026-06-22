@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/presentations/quals.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/presentations/quals/mkslides.yml" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/mkslides.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/presentations/quals/slides/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/presentations/quals/slides/index.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,7 +18,7 @@
     </option>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="125" />
+    <option name="cachedIndexableFilesCount" value="124" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -340,7 +337,8 @@
       <workItem from="1775753270495" duration="1358000" />
       <workItem from="1775829937369" duration="5538000" />
       <workItem from="1776083671088" duration="260000" />
-      <workItem from="1776086490407" duration="497000" />
+      <workItem from="1776086490407" duration="2134000" />
+      <workItem from="1777555380566" duration="3392000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -686,7 +684,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775588665728</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`">
+      <option name="closed" value="true" />
+      <created>1776087218628</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1776087218628</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -704,7 +710,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: numba.jit operations make things a LOT faster!" />
     <MESSAGE value="fix: adjust city count calculation and add debug placeholder for ordered matrix" />
     <MESSAGE value="Adding various bits" />
     <MESSAGE value="chore: add `.gitignore` entry for large-scale wave energy farm file" />
@@ -729,7 +734,8 @@
     <MESSAGE value="build: Add combined slides for Papers 1/2, remove redundant `about.md`, and refine presentation details" />
     <MESSAGE value="build: Consolidate slides further" />
     <MESSAGE value="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements" />
+    <MESSAGE value="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`" />
+    <option name="LAST_COMMIT_MESSAGE" value="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
