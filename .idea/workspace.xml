@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="Remove unused image layout metadata in `quals.md` for cleaner formatting">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="Assignment 7">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/research/quals.md" beforeDir="false" afterPath="$PROJECT_DIR$/research/quals.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phillips_Assignment7.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Phillips_Assignment7.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +59,65 @@
     <commands />
     <urls />
   </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0000000000007192" />
+      <entry key="S5" value="1.0000154471298983" />
+      <entry key="S10" value="1.0066621124306414" />
+      <entry key="S30" value="1.703159758195001" />
+      <entry key="S60" value="3.48358472289564" />
+      <entry key="M2" value="5.958467835925448" />
+      <entry key="M5" value="11.926459890732737" />
+      <entry key="M10" value="27.215028274948065" />
+      <entry key="M15" value="43.519195395504724" />
+      <entry key="M30" value="77.30353491335916" />
+      <entry key="H1" value="106.64585050195446" />
+      <entry key="H2" value="126.19597355894581" />
+      <entry key="H4" value="137.51024291437537" />
+      <entry key="D1" value="147.83149331059587" />
+      <entry key="W1" value="149.68801356761185" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="2.721372966649653E-197" />
+      <entry key="S5" value="2.3654579194358547E-79" />
+      <entry key="S10" value="4.863597811745201E-40" />
+      <entry key="S30" value="7.900015479734413E-14" />
+      <entry key="S60" value="2.9996585884841506E-7" />
+      <entry key="M2" value="7.291774165066771E-4" />
+      <entry key="M5" value="0.14324300218798033" />
+      <entry key="M10" value="1.0669120852035565" />
+      <entry key="M15" value="2.1450231897434633" />
+      <entry key="M30" value="4.368403892535062" />
+      <entry key="H1" value="6.261672666777371" />
+      <entry key="H2" value="7.504520595246335" />
+      <entry key="H4" value="8.217646122012027" />
+      <entry key="D1" value="8.864518351714592" />
+      <entry key="W1" value="8.980516991906592" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.00567958014578246" />
+      <entry key="MS500" value="0.35551935264681866" />
+      <entry key="S2" value="0.7721751330922183" />
+      <entry key="S5" value="0.9017626898830547" />
+      <entry key="S10" value="0.955414340820077" />
+      <entry key="S30" value="1.6528832509504645" />
+      <entry key="S60" value="3.416279019839268" />
+      <entry key="M2" value="5.897775810215238" />
+      <entry key="M5" value="12.027599520397208" />
+      <entry key="M10" value="28.248904440195368" />
+      <entry key="M15" value="45.63557572969442" />
+      <entry key="M30" value="81.65164781890485" />
+      <entry key="H1" value="112.89501628596742" />
+      <entry key="H2" value="133.69348988431682" />
+      <entry key="H4" value="145.72417465764102" />
+      <entry key="D1" value="156.69536079061345" />
+      <entry key="W1" value="158.66843676665414" />
+    </decayedShown>
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -70,42 +129,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor&quot;: &quot;Run&quot;,
-    &quot;Python.final_project.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.fuzzy-and-or.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fuzzy-symphony.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ga.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hw3.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hw4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ivat_tsp.executor&quot;: &quot;Run&quot;,
-    &quot;Python.midterm_project.executor&quot;: &quot;Run&quot;,
-    &quot;Python.project1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tire_selector.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/scott/PycharmProjects/grad-school/AEEM6022&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;Runtime.Targets.Configurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor": "Run",
+    "Python.final_project.executor": "Debug",
+    "Python.fuzzy-and-or.executor": "Run",
+    "Python.fuzzy-symphony.executor": "Run",
+    "Python.ga.executor": "Run",
+    "Python.hw3.executor": "Run",
+    "Python.hw4.executor": "Run",
+    "Python.ivat_tsp.executor": "Run",
+    "Python.midterm_project.executor": "Run",
+    "Python.project1.executor": "Run",
+    "Python.test1.executor": "Run",
+    "Python.tire_selector.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "feat/assign78",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/scott/PycharmProjects/grad-school/AEEM6022",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "Runtime.Targets.Configurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySaveCallSignatures" value="true" />
   </component>
@@ -562,7 +621,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775076090638</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="Assignment 7">
+      <option name="closed" value="true" />
+      <created>1782606704019</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1782606704019</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -580,7 +647,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: VAT-&gt;ACO hot-start" />
     <MESSAGE value="fix: More details" />
     <MESSAGE value="fix: Better hot-start ratio" />
     <MESSAGE value="fix: more information" />
@@ -605,7 +671,8 @@
     <MESSAGE value="chore: add `package-lock.json` for dependency tracking in the `research` directory" />
     <MESSAGE value="Update `quals.md` to fix layout issues and improve inline image formatting" />
     <MESSAGE value="Remove unused image layout metadata in `quals.md` for cleaner formatting" />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove unused image layout metadata in `quals.md` for cleaner formatting" />
+    <MESSAGE value="Assignment 7" />
+    <option name="LAST_COMMIT_MESSAGE" value="Assignment 7" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -648,13 +715,11 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/research/node_modules/yaml/dist/nodes/Alias.js</url>
           <line>54</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="84" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/research/node_modules/.pnpm/yaml@2.8.3/node_modules/yaml/dist/nodes/Alias.js</url>
           <line>54</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="85" />
         </line-breakpoint>
       </breakpoints>
