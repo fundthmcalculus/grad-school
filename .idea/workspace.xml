@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="Assignment 7">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Phillips_Assignment7.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Phillips_Assignment7.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,60 +61,60 @@
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
       <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0000000000007192" />
-      <entry key="S5" value="1.0000154471298983" />
-      <entry key="S10" value="1.0066621124306414" />
-      <entry key="S30" value="1.703159758195001" />
-      <entry key="S60" value="3.48358472289564" />
-      <entry key="M2" value="5.958467835925448" />
-      <entry key="M5" value="11.926459890732737" />
-      <entry key="M10" value="27.215028274948065" />
-      <entry key="M15" value="43.519195395504724" />
-      <entry key="M30" value="77.30353491335916" />
-      <entry key="H1" value="106.64585050195446" />
-      <entry key="H2" value="126.19597355894581" />
-      <entry key="H4" value="137.51024291437537" />
-      <entry key="D1" value="147.83149331059587" />
-      <entry key="W1" value="149.68801356761185" />
+      <entry key="MS500" value="1.0000079519455065" />
+      <entry key="S2" value="1.1475245417230104" />
+      <entry key="S5" value="2.554003768344761" />
+      <entry key="S10" value="4.782826619890476" />
+      <entry key="S30" value="8.265373057266949" />
+      <entry key="S60" value="10.436833606459537" />
+      <entry key="M2" value="15.125837209222285" />
+      <entry key="M5" value="36.212005535980595" />
+      <entry key="M10" value="71.20927799928509" />
+      <entry key="M15" value="99.26720796617741" />
+      <entry key="M30" value="157.0369110810929" />
+      <entry key="H1" value="213.8222568510783" />
+      <entry key="H2" value="256.1790392074996" />
+      <entry key="H4" value="282.455871211523" />
+      <entry key="D1" value="307.5801784749353" />
+      <entry key="W1" value="312.21721166638474" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="2.721372966649653E-197" />
-      <entry key="S5" value="2.3654579194358547E-79" />
-      <entry key="S10" value="4.863597811745201E-40" />
-      <entry key="S30" value="7.900015479734413E-14" />
-      <entry key="S60" value="2.9996585884841506E-7" />
-      <entry key="M2" value="7.291774165066771E-4" />
-      <entry key="M5" value="0.14324300218798033" />
-      <entry key="M10" value="1.0669120852035565" />
-      <entry key="M15" value="2.1450231897434633" />
-      <entry key="M30" value="4.368403892535062" />
-      <entry key="H1" value="6.261672666777371" />
-      <entry key="H2" value="7.504520595246335" />
-      <entry key="H4" value="8.217646122012027" />
-      <entry key="D1" value="8.864518351714592" />
-      <entry key="W1" value="8.980516991906592" />
+      <entry key="MS500" value="4.0654167785161637E-203" />
+      <entry key="S2" value="2.5250865511417587E-51" />
+      <entry key="S5" value="5.7665301000845216E-21" />
+      <entry key="S10" value="7.625780886411064E-11" />
+      <entry key="S30" value="5.520571304153336E-4" />
+      <entry key="S60" value="0.039876837549795784" />
+      <entry key="M2" value="0.3833526946992159" />
+      <entry key="M5" value="1.5971512510469579" />
+      <entry key="M10" value="2.8297263305847964" />
+      <entry key="M15" value="3.7990511281019277" />
+      <entry key="M30" value="6.182659129832014" />
+      <entry key="H1" value="8.883801854787734" />
+      <entry key="H2" value="11.025921121556177" />
+      <entry key="H4" value="12.389840091484935" />
+      <entry key="D1" value="13.712621123476291" />
+      <entry key="W1" value="13.958452799881725" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.00567958014578246" />
-      <entry key="MS500" value="0.35551935264681866" />
-      <entry key="S2" value="0.7721751330922183" />
-      <entry key="S5" value="0.9017626898830547" />
-      <entry key="S10" value="0.955414340820077" />
-      <entry key="S30" value="1.6528832509504645" />
-      <entry key="S60" value="3.416279019839268" />
-      <entry key="M2" value="5.897775810215238" />
-      <entry key="M5" value="12.027599520397208" />
-      <entry key="M10" value="28.248904440195368" />
-      <entry key="M15" value="45.63557572969442" />
-      <entry key="M30" value="81.65164781890485" />
-      <entry key="H1" value="112.89501628596742" />
-      <entry key="H2" value="133.69348988431682" />
-      <entry key="H4" value="145.72417465764102" />
-      <entry key="D1" value="156.69536079061345" />
-      <entry key="W1" value="158.66843676665414" />
+      <entry key="MS100" value="0.8467453123625271" />
+      <entry key="MS500" value="0.9672841458940917" />
+      <entry key="S2" value="1.1385680296835394" />
+      <entry key="S5" value="2.5477550550220487" />
+      <entry key="S10" value="4.777542346701169" />
+      <entry key="S30" value="8.261611853258197" />
+      <entry key="S60" value="10.467201789872371" />
+      <entry key="M2" value="15.486059233302583" />
+      <entry key="M5" value="37.77502483012703" />
+      <entry key="M10" value="74.00713976205094" />
+      <entry key="M15" value="103.03685225011826" />
+      <entry key="M30" value="163.19587037849783" />
+      <entry key="H1" value="222.68968432053404" />
+      <entry key="H2" value="267.1950924650618" />
+      <entry key="H4" value="294.8402594285209" />
+      <entry key="D1" value="321.2918088692548" />
+      <entry key="W1" value="326.1755207763836" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -629,7 +628,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782606704019</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions.">
+      <option name="closed" value="true" />
+      <created>1782609360495</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1782609360495</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -647,7 +654,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: More details" />
     <MESSAGE value="fix: Better hot-start ratio" />
     <MESSAGE value="fix: more information" />
     <MESSAGE value="feat: ACO-VAT sorting" />
@@ -672,7 +678,8 @@
     <MESSAGE value="Update `quals.md` to fix layout issues and improve inline image formatting" />
     <MESSAGE value="Remove unused image layout metadata in `quals.md` for cleaner formatting" />
     <MESSAGE value="Assignment 7" />
-    <option name="LAST_COMMIT_MESSAGE" value="Assignment 7" />
+    <MESSAGE value="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
