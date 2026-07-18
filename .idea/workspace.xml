@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions.">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: Add Assignment 8 notebook with enhanced workflow, classifier models, and visualizations">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -18,7 +18,7 @@
     </option>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="115" />
+    <option name="cachedIndexableFilesCount" value="127" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -45,7 +45,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/fundthmcalculus/grad-school.git&quot;,
-    &quot;accountId&quot;: &quot;40e4aa2a-9b99-4612-b3f4-3918eb37235f&quot;
+    &quot;accountId&quot;: &quot;c31be3c0-7daf-44bb-b614-489fbede21b8&quot;
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
@@ -61,60 +61,60 @@
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
       <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0000079519455065" />
-      <entry key="S2" value="1.1475245417230104" />
-      <entry key="S5" value="2.554003768344761" />
-      <entry key="S10" value="4.782826619890476" />
-      <entry key="S30" value="8.265373057266949" />
-      <entry key="S60" value="10.436833606459537" />
-      <entry key="M2" value="15.125837209222285" />
-      <entry key="M5" value="36.212005535980595" />
-      <entry key="M10" value="71.20927799928509" />
-      <entry key="M15" value="99.26720796617741" />
-      <entry key="M30" value="157.0369110810929" />
-      <entry key="H1" value="213.8222568510783" />
-      <entry key="H2" value="256.1790392074996" />
-      <entry key="H4" value="282.455871211523" />
-      <entry key="D1" value="307.5801784749353" />
-      <entry key="W1" value="312.21721166638474" />
+      <entry key="MS500" value="1.0000000044977295" />
+      <entry key="S2" value="1.0226944841439245" />
+      <entry key="S5" value="1.7229548744486367" />
+      <entry key="S10" value="4.105026870775502" />
+      <entry key="S30" value="11.840539172122302" />
+      <entry key="S60" value="16.607381940220744" />
+      <entry key="M2" value="19.911316806457805" />
+      <entry key="M5" value="25.045777768606207" />
+      <entry key="M10" value="43.967746017911246" />
+      <entry key="M15" value="69.93174186923909" />
+      <entry key="M30" value="152.00865327430535" />
+      <entry key="H1" value="274.2981258392627" />
+      <entry key="H2" value="396.14776706873033" />
+      <entry key="H4" value="486.0309946331948" />
+      <entry key="D1" value="582.7258753827205" />
+      <entry key="W1" value="601.751508232521" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="4.0654167785161637E-203" />
-      <entry key="S2" value="2.5250865511417587E-51" />
-      <entry key="S5" value="5.7665301000845216E-21" />
-      <entry key="S10" value="7.625780886411064E-11" />
-      <entry key="S30" value="5.520571304153336E-4" />
-      <entry key="S60" value="0.039876837549795784" />
-      <entry key="M2" value="0.3833526946992159" />
-      <entry key="M5" value="1.5971512510469579" />
-      <entry key="M10" value="2.8297263305847964" />
-      <entry key="M15" value="3.7990511281019277" />
-      <entry key="M30" value="6.182659129832014" />
-      <entry key="H1" value="8.883801854787734" />
-      <entry key="H2" value="11.025921121556177" />
-      <entry key="H4" value="12.389840091484935" />
-      <entry key="D1" value="13.712621123476291" />
-      <entry key="W1" value="13.958452799881725" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="8.4122615115E-313" />
+      <entry key="S5" value="1.4789895520539896E-125" />
+      <entry key="S10" value="3.845763337629467E-63" />
+      <entry key="S30" value="1.5692865973397448E-21" />
+      <entry key="S60" value="4.118084971667066E-11" />
+      <entry key="M2" value="7.556169993813333E-6" />
+      <entry key="M5" value="0.013054730334388575" />
+      <entry key="M10" value="0.20816681408695004" />
+      <entry key="M15" value="0.6535599036381377" />
+      <entry key="M30" value="2.758374533703777" />
+      <entry key="H1" value="6.829814621735845" />
+      <entry key="H2" value="11.432244869941673" />
+      <entry key="H4" value="15.037550901623732" />
+      <entry key="D1" value="19.05707920230061" />
+      <entry key="W1" value="19.862124071416197" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.8467453123625271" />
-      <entry key="MS500" value="0.9672841458940917" />
-      <entry key="S2" value="1.1385680296835394" />
-      <entry key="S5" value="2.5477550550220487" />
-      <entry key="S10" value="4.777542346701169" />
-      <entry key="S30" value="8.261611853258197" />
-      <entry key="S60" value="10.467201789872371" />
-      <entry key="M2" value="15.486059233302583" />
-      <entry key="M5" value="37.77502483012703" />
-      <entry key="M10" value="74.00713976205094" />
-      <entry key="M15" value="103.03685225011826" />
-      <entry key="M30" value="163.19587037849783" />
-      <entry key="H1" value="222.68968432053404" />
-      <entry key="H2" value="267.1950924650618" />
-      <entry key="H4" value="294.8402594285209" />
-      <entry key="D1" value="321.2918088692548" />
-      <entry key="W1" value="326.1755207763836" />
+      <entry key="MS100" value="0.8179020585577811" />
+      <entry key="MS500" value="0.9605948683731034" />
+      <entry key="S2" value="1.0126065691317065" />
+      <entry key="S5" value="1.7178044889844695" />
+      <entry key="S10" value="4.100537586111904" />
+      <entry key="S30" value="11.837001836738704" />
+      <entry key="S60" value="16.604994262835266" />
+      <entry key="M2" value="19.909913336233608" />
+      <entry key="M5" value="25.05734821755224" />
+      <entry key="M10" value="44.17056701488215" />
+      <entry key="M15" value="70.5763079750215" />
+      <entry key="M30" value="154.75248932950458" />
+      <entry key="H1" value="281.1124249080355" />
+      <entry key="H2" value="407.56796606249156" />
+      <entry key="H4" value="501.0609123877291" />
+      <entry key="D1" value="601.7813909543455" />
+      <entry key="W1" value="621.6134007008269" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -128,42 +128,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor": "Run",
-    "Python.final_project.executor": "Debug",
-    "Python.fuzzy-and-or.executor": "Run",
-    "Python.fuzzy-symphony.executor": "Run",
-    "Python.ga.executor": "Run",
-    "Python.hw3.executor": "Run",
-    "Python.hw4.executor": "Run",
-    "Python.ivat_tsp.executor": "Run",
-    "Python.midterm_project.executor": "Run",
-    "Python.project1.executor": "Run",
-    "Python.test1.executor": "Run",
-    "Python.tire_selector.executor": "Run",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "feat/assign78",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/scott/PycharmProjects/grad-school/AEEM6022",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "Runtime.Targets.Configurable",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor&quot;: &quot;Run&quot;,
+    &quot;Python.final_project.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.fuzzy-and-or.executor&quot;: &quot;Run&quot;,
+    &quot;Python.fuzzy-symphony.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ga.executor&quot;: &quot;Run&quot;,
+    &quot;Python.hw3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.hw4.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ivat_tsp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.midterm_project.executor&quot;: &quot;Run&quot;,
+    &quot;Python.project1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tire_selector.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat/assign78&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/scott/PycharmProjects/grad-school/AEEM6022&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Runtime.Targets.Configurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySaveCallSignatures" value="true" />
   </component>
@@ -177,6 +177,31 @@
     </key>
   </component>
   <component name="RunManager" selected="npm.dev">
+    <configuration name="hw3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="grad-school" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6022" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw3.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="hw3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="grad-school" />
       <option name="ENV_FILES" value="" />
@@ -242,6 +267,56 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw4.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="hw4" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="grad-school" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6022" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw4.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="project1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="grad-school" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6022" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/project1.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -318,8 +393,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-PY-261.22158.340" />
-        <option value="bundled-python-sdk-b63d5a1f7c97-b61e75351b1f-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.22158.340" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PY-262.8665.186" />
+        <option value="bundled-python-sdk-17dd2e523595-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.8665.186" />
       </set>
     </attachedChunks>
   </component>
@@ -379,6 +454,13 @@
       <workItem from="1765244450851" duration="1254000" />
       <workItem from="1765291091396" duration="148000" />
       <workItem from="1775073536131" duration="2591000" />
+      <workItem from="1783029652143" duration="604000" />
+      <workItem from="1783353165886" duration="1213000" />
+      <workItem from="1783638029650" duration="78000" />
+      <workItem from="1783638271510" duration="2827000" />
+      <workItem from="1783732637674" duration="11000" />
+      <workItem from="1783732755529" duration="61000" />
+      <workItem from="1784400828630" duration="2279000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -636,7 +718,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782609360495</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="feat: Add Assignment 8 notebook with enhanced workflow, classifier models, and visualizations">
+      <option name="closed" value="true" />
+      <created>1782611334830</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1782611334830</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -654,7 +744,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: Better hot-start ratio" />
     <MESSAGE value="fix: more information" />
     <MESSAGE value="feat: ACO-VAT sorting" />
     <MESSAGE value="fix: More cities!" />
@@ -679,7 +768,8 @@
     <MESSAGE value="Remove unused image layout metadata in `quals.md` for cleaner formatting" />
     <MESSAGE value="Assignment 7" />
     <MESSAGE value="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions." />
-    <option name="LAST_COMMIT_MESSAGE" value="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions." />
+    <MESSAGE value="feat: Add Assignment 8 notebook with enhanced workflow, classifier models, and visualizations" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Add Assignment 8 notebook with enhanced workflow, classifier models, and visualizations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
