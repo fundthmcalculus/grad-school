@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: Add Assignment 8 notebook with enhanced workflow, classifier models, and visualizations">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: Assignment 9 + project proposal">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Phillips_Assignment9.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Phillips_Assignment9.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,61 +61,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0000000044977295" />
-      <entry key="S2" value="1.0226944841439245" />
-      <entry key="S5" value="1.7229548744486367" />
-      <entry key="S10" value="4.105026870775502" />
-      <entry key="S30" value="11.840539172122302" />
-      <entry key="S60" value="16.607381940220744" />
-      <entry key="M2" value="19.911316806457805" />
-      <entry key="M5" value="25.045777768606207" />
-      <entry key="M10" value="43.967746017911246" />
-      <entry key="M15" value="69.93174186923909" />
-      <entry key="M30" value="152.00865327430535" />
-      <entry key="H1" value="274.2981258392627" />
-      <entry key="H2" value="396.14776706873033" />
-      <entry key="H4" value="486.0309946331948" />
-      <entry key="D1" value="582.7258753827205" />
-      <entry key="W1" value="601.751508232521" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="4.4937860019562414E-303" />
+      <entry key="S2" value="7.90718311474851E-76" />
+      <entry key="S5" value="2.899719715975815E-30" />
+      <entry key="S10" value="4.737091810905068E-15" />
+      <entry key="S30" value="7.927640040332269E-5" />
+      <entry key="S60" value="0.040110170617685584" />
+      <entry key="M2" value="1.066885015086969" />
+      <entry key="M5" value="8.804447664759278" />
+      <entry key="M10" value="26.544599609380636" />
+      <entry key="M15" value="49.6086518188431" />
+      <entry key="M30" value="127.4199644729198" />
+      <entry key="H1" value="251.8186238885497" />
+      <entry key="H2" value="381.6782666802758" />
+      <entry key="H4" value="480.0936515164257" />
+      <entry key="D1" value="587.913974419257" />
+      <entry key="W1" value="609.3359953053997" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
-      <entry key="S2" value="8.4122615115E-313" />
-      <entry key="S5" value="1.4789895520539896E-125" />
-      <entry key="S10" value="3.845763337629467E-63" />
-      <entry key="S30" value="1.5692865973397448E-21" />
-      <entry key="S60" value="4.118084971667066E-11" />
-      <entry key="M2" value="7.556169993813333E-6" />
-      <entry key="M5" value="0.013054730334388575" />
-      <entry key="M10" value="0.20816681408695004" />
-      <entry key="M15" value="0.6535599036381377" />
-      <entry key="M30" value="2.758374533703777" />
-      <entry key="H1" value="6.829814621735845" />
-      <entry key="H2" value="11.432244869941673" />
-      <entry key="H4" value="15.037550901623732" />
-      <entry key="D1" value="19.05707920230061" />
-      <entry key="W1" value="19.862124071416197" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="1.9448019929137203E-161" />
+      <entry key="S10" value="4.409990940821585E-81" />
+      <entry key="S30" value="1.642557745276943E-27" />
+      <entry key="S60" value="4.213126449648362E-14" />
+      <entry key="M2" value="2.4168868292294497E-7" />
+      <entry key="M5" value="0.003294198334711283" />
+      <entry key="M10" value="0.10456886991632779" />
+      <entry key="M15" value="0.4129961591598048" />
+      <entry key="M30" value="2.1927218331999088" />
+      <entry key="H1" value="6.0893939187182875" />
+      <entry key="H2" value="10.794787431465979" />
+      <entry key="H4" value="14.612293901235157" />
+      <entry key="D1" value="18.966180831070815" />
+      <entry key="W1" value="19.848562284525716" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.8179020585577811" />
-      <entry key="MS500" value="0.9605948683731034" />
-      <entry key="S2" value="1.0126065691317065" />
-      <entry key="S5" value="1.7178044889844695" />
-      <entry key="S10" value="4.100537586111904" />
-      <entry key="S30" value="11.837001836738704" />
-      <entry key="S60" value="16.604994262835266" />
-      <entry key="M2" value="19.909913336233608" />
-      <entry key="M5" value="25.05734821755224" />
-      <entry key="M10" value="44.17056701488215" />
-      <entry key="M15" value="70.5763079750215" />
-      <entry key="M30" value="154.75248932950458" />
-      <entry key="H1" value="281.1124249080355" />
-      <entry key="H2" value="407.56796606249156" />
-      <entry key="H4" value="501.0609123877291" />
-      <entry key="D1" value="601.7813909543455" />
-      <entry key="W1" value="621.6134007008269" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0000000000000047" />
+      <entry key="S30" value="1.0000792666720386" />
+      <entry key="S60" value="1.0401066895829745" />
+      <entry key="M2" value="2.066830484029429" />
+      <entry key="M5" value="9.807345065239122" />
+      <entry key="M10" value="27.6464631400192" />
+      <entry key="M15" value="51.0159484652747" />
+      <entry key="M30" value="130.60111937099532" />
+      <entry key="H1" value="258.89417888169714" />
+      <entry key="H2" value="393.4616770663076" />
+      <entry key="H4" value="495.69852667716725" />
+      <entry key="D1" value="607.8785988301595" />
+      <entry key="W1" value="630.1843261094451" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -460,7 +461,7 @@
       <workItem from="1783638271510" duration="2827000" />
       <workItem from="1783732637674" duration="11000" />
       <workItem from="1783732755529" duration="61000" />
-      <workItem from="1784400828630" duration="2279000" />
+      <workItem from="1784400828630" duration="2828000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -726,7 +727,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782611334830</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="feat: Assignment 9 + project proposal">
+      <option name="closed" value="true" />
+      <created>1784403161057</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1784403161057</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -744,7 +753,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: more information" />
     <MESSAGE value="feat: ACO-VAT sorting" />
     <MESSAGE value="fix: More cities!" />
     <MESSAGE value="feat: Final Project Gaussian Methods" />
@@ -769,7 +777,8 @@
     <MESSAGE value="Assignment 7" />
     <MESSAGE value="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions." />
     <MESSAGE value="feat: Add Assignment 8 notebook with enhanced workflow, classifier models, and visualizations" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Add Assignment 8 notebook with enhanced workflow, classifier models, and visualizations" />
+    <MESSAGE value="feat: Assignment 9 + project proposal" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Assignment 9 + project proposal" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
