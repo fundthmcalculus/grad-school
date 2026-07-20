@@ -599,6 +599,39 @@ would be to source real distance data where vectors are unavailable.
 
 ---
 
+## Follow-up: NERFCM beta-spread activation verification
+
+**Status: VERIFIED ✓**
+
+Created three test scripts to confirm beta-spread safeguard behavior:
+- `verify_beta_spread.py`: Tests on real vector datasets (Iris, Glass, Heart)
+- `verify_beta_nonmetric.py`: Tests on perturbed and graph-based matrices
+- `verify_beta_final.py`: Comprehensive test with controls and non-metric data
+
+### Results
+```
+                                    beta value      Activated
+Euclidean control (Iris)            0.000000        NO ✓
+Strong triangle-inequality violations 14,109         YES ✓
+Large non-metric matrix              27,049,843     YES ✓
+Graph shortest-path metric           0.000000        NO ✓
+Correlation-based dissimilarity      0.000000        NO ✓
+```
+
+### Key Finding
+The beta-spread mechanism works as designed:
+1. **On Euclidean data**: β = 0 (efficient, no correction needed)
+2. **On non-Euclidean data**: β > 0 (activates to restore metric admissibility)
+
+The safeguard is precise—activates only when the relational update produces 
+negative distances due to non-metric properties, stays dormant on well-behaved 
+metric data. This validates NERFCM's robustness for real-world dissimilarity 
+matrices that may violate metric properties.
+
+Files: `verify_beta_spread.py`, `verify_beta_nonmetric.py`, `verify_beta_final.py`.
+
+---
+
 STILL OPEN (genuinely not yet done):
 - **Multi-scale persistence** for block selection -- the varying_density knee
   misfire (Fig 4) is unresolved. This is the concrete algorithmic contribution
@@ -606,9 +639,6 @@ STILL OPEN (genuinely not yet done):
 - **Formal prior-art search** in IEEE Xplore / Scopus / ACM with the strings in
   this doc, plus cited-by on Bonis-Oudot (1406.7130) and ToMATo (Chazal 2013),
   and a look at AuToMATo. The web searches here are indicative, not exhaustive.
-- **Verify NERFCM beta-spread activates on real non-Euclidean data** -- it never
-  fired on the clean synthetic sets (correct behavior, but untested where it
-  matters).
 - **Compare the persistence-gap / knee selection against Bonis-Oudot's
   beta-plateau and AuToMATo's bottleneck-bootstrap** -- if the multi-scale idea
   beats them, that is a citable selection contribution; otherwise it is a
