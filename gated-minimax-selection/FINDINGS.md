@@ -472,38 +472,38 @@ label-derived constraints, mean over 5 seeds (std 0.00 on all rows).
 
 **Figure 1 — the five synthetic datasets (ground truth).**
 
-![Figure 1: synthetic test battery](fig1_datasets.png)
+![Figure 1: synthetic test battery](./outputs/fig1_datasets.png)
 
 **Figure 2 — why the transform matters.** Raw dissimilarity D (left, muddy) vs
 minimax D* (middle, crisp diagonal blocks), VAT-reordered, with scatter for
 reference. The clean blocks in D* are what make non-convex relational clustering
 work.
 
-![Figure 2: minimax transform heatmaps](fig2_transform.png)
+![Figure 2: minimax transform heatmaps](./outputs/fig2_transform.png)
 
 **Figure 3 — headline partition-quality comparison.** ARI by method at true k
 (iVAT-cover discovers k). NERFCM on raw D collapses on the non-convex rings
 (0.02); the minimax transform (D*) rescues it to 1.00.
 
-![Figure 3: ARI by method](fig3_methods_ari.png)
+![Figure 3: ARI by method](./outputs/fig3_methods_ari.png)
 
 **Figure 4 — the selection story (and its failure).** Sorted-persistence curves.
 Clean knee at true k for two_gaussians and rings; the knee MISFIRES on
 varying_density (picks 2, true 3 — diffuse cluster hidden in the taper) and on
 bridged (picks 4). This is the multi-scale open problem, made visible.
 
-![Figure 4: persistence curves](fig4_persistence.png)
+![Figure 4: persistence curves](./outputs/fig4_persistence.png)
 
 **Figure 5 — example generated membership functions**, minimax-derived, projected
 on one feature.
 
-![Figure 5: membership functions](fig5_membership.png)
+![Figure 5: membership functions](./outputs/fig5_membership.png)
 
 **Figure 6 — the decisive ConiVAT result.** Plain iVAT single-linkage chains
 across the noise bridge (ARI 0.00); ConiVAT's metric learning repairs it
 (ARI 1.00).
 
-![Figure 6: ConiVAT bridge repair](fig6_conivat_bridge.png)
+![Figure 6: ConiVAT bridge repair](./outputs/fig6_conivat_bridge.png)
 
 Source files: fig1_datasets.png, fig2_transform.png, fig3_methods_ari.png,
 fig4_persistence.png, fig5_membership.png, fig6_conivat_bridge.png
