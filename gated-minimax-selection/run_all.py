@@ -28,7 +28,7 @@ import ivat_mf as im
 import battery as B
 import selection as S
 from nerfcm import nerfcm
-from conivat import coniv at, sl_labels_from_mtd
+from conivat import conivat, sl_labels_from_mtd
 
 OUT = "/mnt/user-data/outputs"
 SEEDS = [0, 1, 2, 3, 4]
@@ -258,13 +258,15 @@ def fig_persistence():
 def fig_membership():
     """Example generated membership functions projected on x-axis, for
     two_gaussians and concentric_rings, from the coverage-cover blocks."""
-    fig, axes = plt.subplots(2, 1, figsize=(8, 10))
-    for ax, (name, fn, k) in zip(axes, [("two_gaussians", B.two_gaussians, 2),
-                                        ("concentric_rings", B.concentric_rings, 2)]):
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+    # Left column: 1-D membership profiles
+    for row, (name, fn, k) in enumerate([("two_gaussians", B.two_gaussians, 2),
+                                         ("concentric_rings", B.concentric_rings, 2)]):
+        ax = axes[row, 0]
         X, y = fn()
         D = im.dissimilarity(X); Ds = im.minimax_transform(D)
         sel = S.select_coverage_cover(Ds)
-        xs = np.linspace(X[:, 0].min(), X[:, 0].max(), 200)
         for bi, b in enumerate(sel[:4]):
             mem = np.array(sorted(b['members']), int)
             # membership of a probe point = ramp over birth-death of minimax dist to block
@@ -279,8 +281,46 @@ def fig_membership():
         ax.set_title(f"{name}: generated membership vs x-feature", fontsize=11)
         ax.set_xlabel("x feature"); ax.set_ylabel("membership")
         ax.legend(fontsize=8); ax.grid(alpha=0.3); ax.set_ylim(-0.05, 1.05)
+
+    # Top-right: empty
+    axes[0, 1].axis('off')
+
+    # Bottom-right: 2D heatmap for concentric_rings (first block only)
+    ax_hm = axes[1, 1]
+    X_cr, y_cr = B.concentric_rings()
+    D_cr = im.dissimilarity(X_cr); Ds_cr = im.minimax_transform(D_cr)
+    sel_cr = S.select_coverage_cover(Ds_cr)
+
+    from scipy.spatial.distance import cdist
+    b = sel_cr[0]
+    mem_idx = np.array(sorted(b['members']), int)
+
+    # Create a 2D grid for the heatmap
+    x_min, x_max = X_cr[:, 0].min() - 0.5, X_cr[:, 0].max() + 0.5
+    y_min, y_max = X_cr[:, 1].min() - 0.5, X_cr[:, 1].max() + 0.5
+    grid_res = 100
+    x_grid = np.linspace(x_min, x_max, grid_res)
+    y_grid = np.linspace(y_min, y_max, grid_res)
+    XX, YY = np.meshgrid(x_grid, y_grid)
+    grid_points = np.column_stack([XX.ravel(), YY.ravel()])
+
+    # Compute membership for the first block on the grid
+    dist_to_members = cdist(grid_points, X_cr[mem_idx], metric='euclidean').min(1)
+    h_b, h_d = b['birth'], b['death']
+    mu_grid = np.clip((h_d - dist_to_members) / (h_d - h_b + 1e-9), 0, 1)
+    mu_grid = mu_grid.reshape(XX.shape)
+
+    # Plot the heatmap
+    im_hm = ax_hm.contourf(XX, YY, mu_grid, levels=20, cmap='RdYlGn')
+    ax_hm.scatter(X_cr[mem_idx, 0], X_cr[mem_idx, 1], s=20, color='black',
+                  alpha=0.5, edgecolors='white', linewidth=0.5)
+    ax_hm.set_title(f"concentric_rings: membership heatmap (set 0)", fontsize=11)
+    ax_hm.set_xlabel("x feature"); ax_hm.set_ylabel("y feature")
+    cbar = fig.colorbar(im_hm, ax=ax_hm)
+    cbar.set_label("membership", fontsize=9)
+
     fig.suptitle("Figure 5: Example generated membership functions "
-                 "(minimax-derived, projected on one feature)", fontsize=12, y=1.02)
+                 "(minimax-derived, projected on one feature and 2D)", fontsize=12, y=1.00)
     fig.tight_layout()
     fig.savefig(f"{OUT}/fig5_membership.png", dpi=130, bbox_inches='tight')
     plt.close(fig)
