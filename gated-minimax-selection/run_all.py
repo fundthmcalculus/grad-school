@@ -32,6 +32,22 @@ from conivat import conivat, sl_labels_from_mtd
 OUT = "./outputs"
 SEEDS = [0, 1, 2, 3, 4]
 
+# Figure output configuration
+OUTPUT_CONFIG = {
+    "dpi": 96,           # Default: low-res for easy sharing (set to 130+ for high-res)
+    "fmt": "png",        # Format: "png" or "svg"
+}
+
+
+def save_figure(fig, filename, dpi=None, fmt=None):
+    """Save figure with configurable resolution and format."""
+    dpi = dpi or OUTPUT_CONFIG["dpi"]
+    fmt = fmt or OUTPUT_CONFIG["fmt"]
+    full_path = f"{OUT}/{filename}".replace(".png", f".{fmt}").replace(".jpg", f".{fmt}")
+    fig.savefig(full_path, dpi=dpi, bbox_inches='tight', format=fmt)
+    plt.close(fig)
+    return full_path
+
 DATASETS = [
     ("two_gaussians",     B.two_gaussians,     2),
     ("bridged_gaussians", B.bridged_gaussians, 2),
@@ -151,8 +167,7 @@ def fig_datasets():
     axes[-1].axis('off')  # 6th panel unused (5 datasets)
     fig.suptitle("Figure 1: Synthetic test battery (ground truth)", fontsize=14)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig1_datasets.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig1_datasets.png")
 
 
 def fig_transform():
@@ -184,8 +199,7 @@ def fig_transform():
     fig.suptitle("Figure 2: The minimax transform sharpens block structure\n"
                  "(dark diagonal blocks = clusters)", fontsize=13)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig2_transform.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig2_transform.png")
 
 
 def fig_methods_ari(table):
@@ -215,8 +229,7 @@ def fig_methods_ari(table):
     ax.legend(fontsize=9, loc='lower right')
     ax.grid(axis='y', alpha=0.3)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig3_methods_ari.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig3_methods_ari.png")
 
 
 def fig_persistence():
@@ -250,20 +263,19 @@ def fig_persistence():
                  "(k=2, true 3) and bridged (k=4) - the multi-scale hard cases",
                  fontsize=11)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig4_persistence.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig4_persistence.png")
 
 
 def fig_membership():
     """Example generated membership functions projected on x-axis, for
     two_gaussians and concentric_rings, from the coverage-cover blocks."""
-    fig, axes = plt.subplots(2, 1, figsize=(8, 10))
+    fig, axes = plt.subplots(2, 1, figsize=(10, 8))
+    colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12']
     for ax, (name, fn, k) in zip(axes, [("two_gaussians", B.two_gaussians, 2),
                                         ("concentric_rings", B.concentric_rings, 2)]):
         X, y = fn()
         D = im.dissimilarity(X); Ds = im.minimax_transform(D)
         sel = S.select_coverage_cover(Ds)
-        xs = np.linspace(X[:, 0].min(), X[:, 0].max(), 200)
         for bi, b in enumerate(sel[:4]):
             mem = np.array(sorted(b['members']), int)
             # membership of a probe point = ramp over birth-death of minimax dist to block
@@ -273,16 +285,18 @@ def fig_membership():
             mu_pts = np.clip((h_d - d_to_block) / (h_d - h_b + 1e-9), 0, 1)
             # bin by x to get a 1-D profile
             order = np.argsort(X[:, 0])
-            ax.plot(X[order, 0], mu_pts[order], '.', ms=3, alpha=0.5,
-                    label=f'set {bi} (n={b["size"]})')
-        ax.set_title(f"{name}: generated membership vs x-feature", fontsize=11)
+            x_sorted = X[order, 0]
+            mu_sorted = mu_pts[order]
+            ax.fill_between(x_sorted, 0, mu_sorted, alpha=0.4, color=colors[bi],
+                            label=f'set {bi} (n={b["size"]})')
+            ax.plot(x_sorted, mu_sorted, color=colors[bi], linewidth=1.5, alpha=0.8)
+        ax.set_title(f"{name}: generated membership vs x-feature", fontsize=12, fontweight='bold')
         ax.set_xlabel("x feature"); ax.set_ylabel("membership")
-        ax.legend(fontsize=8); ax.grid(alpha=0.3); ax.set_ylim(-0.05, 1.05)
+        ax.legend(fontsize=9, loc='upper right'); ax.grid(alpha=0.2); ax.set_ylim(-0.05, 1.05)
     fig.suptitle("Figure 5: Example generated membership functions "
-                 "(minimax-derived, projected on one feature)", fontsize=12, y=1.02)
+                 "(minimax-derived, projected on one feature)", fontsize=13, y=1.00)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig5_membership.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig5_membership.png")
 
 
 def fig_conivat_bridge():
@@ -324,14 +338,26 @@ def fig_conivat_bridge():
     fig.suptitle("Figure 6: ConiVAT metric learning repairs single-linkage "
                  "chaining across the noise bridge", fontsize=12)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig6_conivat_bridge.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig6_conivat_bridge.png")
     results["bridge_repair"] = {"iVAT_SL_ari": round(float(ari_ivat), 3),
                                 "ConiVAT_ari": round(float(ari_coni), 3)}
 
 
 # ---------------------------------------------------------------------------
-def main():
+def main(high_res=False, svg=False):
+    """Generate analysis, numeric results, and figures.
+
+    Args:
+        high_res (bool): If True, generate figures at 300 dpi for reports (default: 96 dpi for sharing)
+        svg (bool): If True, save as SVG format instead of PNG (for archival)
+    """
+    if high_res:
+        OUTPUT_CONFIG["dpi"] = 300
+        print("Generating high-resolution figures (300 dpi)...")
+    if svg:
+        OUTPUT_CONFIG["fmt"] = "svg"
+        print("Generating figures in SVG format...")
+
     print("Running numeric analysis (deterministic)...")
     table = run_numeric()
     print("Generating figures...")
@@ -353,4 +379,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    use_high_res = '--high-res' in sys.argv or '-hr' in sys.argv
+    use_svg = '--svg' in sys.argv or '-s' in sys.argv
+    main(high_res=use_high_res, svg=use_svg)
