@@ -351,6 +351,9 @@ def main(high_res=False, svg=False):
         high_res (bool): If True, generate figures at 300 dpi for reports (default: 96 dpi for sharing)
         svg (bool): If True, save as SVG format instead of PNG (for archival)
     """
+    import os
+    os.makedirs(OUT, exist_ok=True)
+
     if high_res:
         OUTPUT_CONFIG["dpi"] = 300
         print("Generating high-resolution figures (300 dpi)...")
