@@ -18,7 +18,6 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
 
 from sklearn.metrics import adjusted_rand_score
 from scipy.cluster.hierarchy import linkage, fcluster
@@ -28,9 +27,9 @@ import ivat_mf as im
 import battery as B
 import selection as S
 from nerfcm import nerfcm
-from conivat import coniv at, sl_labels_from_mtd
+from conivat import conivat, sl_labels_from_mtd
 
-OUT = "/mnt/user-data/outputs"
+OUT = "./outputs"
 SEEDS = [0, 1, 2, 3, 4]
 
 DATASETS = [
