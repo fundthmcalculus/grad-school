@@ -12,9 +12,10 @@ prior-art search. Three files:
   defuzzifiers.
 - `battery.py` — five synthetic datasets + metrics (ARI, coverage, univariate
   convexity, cluster-count sensitivity) and a k-means anchor.
-- `run_battery.py` — runs everything and prints the table.
+- `run_all.py` — runs everything (this battery plus every other analysis) and
+  prints the tables; writes `outputs/results.json`.
 
-Run: `python3 run_battery.py`
+Run: `python3 run_all.py`
 
 ## Latest result table
 
@@ -155,7 +156,8 @@ operator earns its keep on genuinely separated same-label populations
 (e.g. "acceptable = cold-storage range OR warm-serve range"), which is exactly
 what `dstar` detects and what a t-conorm should combine.
 
-Files: `disjunct.py` (all detectors + t-conorms), `run_arity.py` (the table).
+Files: `disjunct.py` (all detectors + t-conorms); the table is produced by
+`run_all.py` (`run_arity_numeric`, `results.json` key `arity_detection`).
 
 ---
 
@@ -217,8 +219,9 @@ structure rather than against the tight cluster. This is a concrete, novel,
 tractable-looking centerpiece for the methods chapter -- sharper than the
 earlier vague "scale-adaptive selection."
 
-Files: `selection.py` (three selectors + persistence-gap gate),
-`run_selection.py` (the comparison table).
+Files: `selection.py` (three selectors + persistence-gap gate); the comparison
+table is produced by `run_all.py` (`run_selector_comparison_numeric`,
+`results.json` key `selector_comparison`).
 
 ---
 
@@ -287,7 +290,8 @@ Multi-scale persistence is no longer just the "interesting" open problem -- the
 baseline quantifies that without it, the method trails a standard technique on
 the hard case. It is now the critical path to parity.
 
-Files: `nerfcm.py` (NERFCM + beta-spread), `run_nerfcm.py` (the comparison).
+Files: `nerfcm.py` (NERFCM + beta-spread); the comparison is produced by
+`run_all.py` (`run_numeric` / `run_relational_numeric`).
 Note: beta stayed 0 on all clean synthetic sets - correct behavior (the spread
 fires only when the relational update produces negative distances, which
 well-separated data does not). Verify beta activation on real relational data.
@@ -432,8 +436,8 @@ Two viable paths, and they are not exclusive:
 TRIBBLE could offer both, using constraints when present and falling back to the
 unsupervised persistence path otherwise.
 
-Files: `conivat.py` (metric learning + MTD + SL clustering),
-`run_conivat.py` (the comparison).
+Files: `conivat.py` (metric learning + MTD + SL clustering); the comparison is
+produced by `run_all.py` (`run_numeric`, plus `fig6_conivat_bridge`).
 
 ---
 
@@ -586,9 +590,8 @@ multi_scale_hierarchy   0.285        0.285       +0.000
 ### Files added/modified
 - `relationdata.py`: Dataset generation (tree-based, extensible)
 - `RELATIONDATA.md`: Design documentation, extension patterns, implementation guide
-- `run_relationdata.py`: Standalone relational benchmark (can run independently)
-- `run_all.py`: Updated to import relationdata, analyze all three datasets,
-  generate fig7_* plots, include relational_table in results.json
+- `run_all.py`: imports relationdata, analyzes all three datasets, generates
+  fig7_* plots, and includes `relational_table` in results.json
 
 ### Honest assessment
 These are still synthetic (tree-constructed), not acquired from a real relational

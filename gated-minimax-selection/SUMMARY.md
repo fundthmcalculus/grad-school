@@ -100,14 +100,17 @@ Full write-up, theory, limitations, and dissertation roadmap:
 | `selection.py` | persistence-gated set-cover (`select_coverage_cover`) and baselines |
 | `multiscale_persistence.py` | multi-scale selector (`select_multiscale`), band discovery, shared gate |
 | `battery_hierarchical.py` | nested/multi-level synthetic datasets with per-level ground truth |
-| `run_multiscale.py` | standalone Option D experiment harness (subset of `run_all.py`) |
+
+`run_all.py` is the single entry point: it consolidates what used to be a dozen
+separate `run_*.py` scripts (battery, selectors, persistence-method comparison,
+arity, Ruspini/feature-space membership variants, relational, and Option D).
 
 ## Reproducing
 
 ```bash
 python run_all.py            # all numbers -> outputs/results.json, all figures -> outputs/
 python run_all.py --high-res # 300-dpi figures for reports
-python run_multiscale.py     # just the Option D experiments, verbose
+python run_all.py --svg      # SVG output for archival
 ```
 
 The multi-scale headline figure is `outputs/fig8_multiscale_hierarchy.png`.
