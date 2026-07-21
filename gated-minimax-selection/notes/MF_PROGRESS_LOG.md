@@ -9,6 +9,7 @@ Branch chain (each builds on the one above):
 feat/option-d-multiscale          (base: multi-scale selection + scaling)
   └─ feat/mf-phase1-ramp          Phase 1 — direct ramp MF        [DONE, negative result]
      └─ feat/mf-phase2-kernel     Phase 2 — gaussian-kernel MF    [DONE, works + caveat]
+        └─ feat/mf-phase3-hierarchy  Phase 3 — POU + fuzzy model  [DONE, works]
 ```
 
 ---
@@ -98,3 +99,42 @@ ARI preserved; at `birth` it stays crisp (≈0, non-members sit at d≫birth); `
 **Status:** Phase 2 committed. Gradation achieved and characterized honestly.
 Next: Phase 3 — partition-of-unity across a band's blocks + the cross-scale fuzzy
 model (and decide how normalization interacts with the 0.5 sibling mass).
+
+---
+
+## Phase 3 — partition-of-unity + fuzzy hierarchy (`feat/mf-phase3-hierarchy`)
+
+**Goal:** normalize each band to a Ruspini partition of unity and package the
+per-scale partitions into one multi-scale fuzzy model.
+
+**Implemented:** `normalize_partition` (column-sum-to-1; uncovered points left
+all-zero, deliberately possibilistic), `FuzzyHierarchy` dataclass (per-scale `U`,
+`.level`, `.defuzzify`, `.partition_of_unity_error`, `.coverage`), and
+`build_fuzzy_hierarchy(Dstar, kernel=, normalize=)`.
+
+**What works:**
+- **Partition-of-unity error = ~1e-16** (machine zero) on covered points at every
+  scale of nested / three-level / density; coverage 1.00.
+- Normalization is **argmax-invariant** (verified `argmax_unchanged=True` every
+  band) — positive per-column scaling — so ARI at every level is unchanged from
+  Phase 2 / Option D. We get a valid fuzzy partition for free.
+- The model is now a clean object: `fh.level(i)` = fuzzy partition at scale i,
+  `fh.defuzzify(i)` = its hard labels, fine→coarse.
+
+**Design note (the 0.5-sibling mass):** normalization redistributes the
+ultrametric sibling mass from Phase 2. A fine point that read [1.0, 0.5, 0.5, 0,
+0, 0] becomes [0.5, 0.25, 0.25, 0, 0, 0] — its own cluster now 0.5, each sibling
+0.25, summing to 1. Argmax still its own cluster (correct), but the absolute
+"confidence" is diluted by how many siblings exist. This is inherent to
+partition-of-unity over ultrametric memberships; the possibilistic (unnormalized)
+view keeps own=1.0 and is the better readout of "how core is this point".
+Both are available via `normalize=`.
+
+**Not done here (deferred):** a single cross-scale flat blend (t-conorm over all
+scales) — the per-scale hierarchy is the more honest object and the levels are
+what the evaluation needs, so a flat blend is left as optional.
+
+**Status:** Phase 3 committed. Valid fuzzy partition-of-unity per scale, no
+accuracy cost. Next: Phase 4 — soft band membership (the research-interesting
+piece; also targets the `log_separated` small-n over-segmentation from the
+scaling study).
