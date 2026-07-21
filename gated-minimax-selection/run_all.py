@@ -12,6 +12,9 @@ Runs the entire chain deterministically and writes:
   - fig7_relationdata_distances_*.png : relational data distance matrices (D vs D*)
   - fig7_relationdata_memberships_*.png : relational data membership functions
   - fig7_relationdata_ari.png : relational data ARI comparison
+  - fig8_multiscale_hierarchy.png : Option D multi-scale persistence selection
+                                    (flat cover collapses a hierarchy; band-wise
+                                    selection recovers every level)
 
 All randomness is seeded. Re-running reproduces identical numbers and figures.
 """
@@ -33,6 +36,8 @@ import selection as S
 from nerfcm import nerfcm
 from conivat import conivat, sl_labels_from_mtd
 import relationdata as RD
+import multiscale_persistence as MS
+import battery_hierarchical as BH
 
 OUT = "./outputs"
 SEEDS = [0, 1, 2, 3, 4]
@@ -492,6 +497,179 @@ def fig_relational_ari(relational_table):
 
 
 # ---------------------------------------------------------------------------
+# Option D: multi-scale persistence selection (density-stratified block cover)
+# ---------------------------------------------------------------------------
+
+def run_multiscale_numeric():
+    """Headline: on nested data, flat coverage_cover recovers ONE level while
+    multi-scale recovers EVERY level. Populates results["multiscale_hierarchy"]."""
+    table = {}
+    for name, (gen, level_names) in BH.HIERARCHICAL.items():
+        out = gen()
+        X, levels = out[0], list(out[1:])
+        Ds = im.minimax_transform(im.dissimilarity(X))
+
+        # flat baseline: one hard assignment scored against every level
+        flat = S.select_coverage_cover(Ds)
+        flat_a = MS.assign(flat, Ds)
+        flat_ari = [round(float(adjusted_rand_score(y, flat_a)), 3) for y in levels]
+
+        # multi-scale: one band per scale, each scored against every level
+        msel = MS.select_multiscale(Ds)
+        band_a = [MS.assign_band(b, Ds) for b in msel.bands]
+        best = [round(float(max([adjusted_rand_score(y, a) for a in band_a] or [np.nan])), 3)
+                for y in levels]
+        band_rows = []
+        for b, a in zip(msel.bands, band_a):
+            band_rows.append({
+                "band_id": b.band_id, "k": b.k,
+                "birth_lo": round(float(b.birth_lo), 3),
+                "birth_hi": (None if b.birth_hi == float("inf") else round(float(b.birth_hi), 3)),
+                "coverage": round(float(b.coverage_fraction(msel.n)), 3),
+                "ari_per_level": [round(float(adjusted_rand_score(y, a)), 3) for y in levels],
+            })
+        table[name] = {
+            "level_names": level_names,
+            "n": int(len(levels[0])),
+            "flat_k": len(flat),
+            "flat_ari_per_level": flat_ari,
+            "flat_mean_ari": round(float(np.mean(flat_ari)), 3),
+            "ms_n_scales": msel.n_scales,
+            "ms_granularities": msel.granularities(),
+            "ms_best_ari_per_level": best,
+            "ms_mean_ari": round(float(np.mean(best)), 3),
+            "bands": band_rows,
+        }
+    results["multiscale_hierarchy"] = table
+    return table
+
+
+def run_multiscale_no_regression():
+    """Strict-generalization check: on the single-scale battery, multi-scale
+    discovers ONE band (or zero on noise) reproducing the flat baseline.
+    Populates results["multiscale_no_regression"]."""
+    table = {}
+    for name, fn, k in DATASETS:
+        X, y = fn()
+        Ds = im.minimax_transform(im.dissimilarity(X))
+        m = y >= 0
+        flat = S.select_coverage_cover(Ds)
+        flat_a = MS.assign(flat, Ds)
+        flat_ari = round(float(adjusted_rand_score(y[m], flat_a[m])), 3) if m.sum() else None
+        msel = MS.select_multiscale(Ds)
+        if msel.n_scales:
+            fb = msel.finest()
+            fb_a = MS.assign_band(fb, Ds)
+            fb_ari = round(float(adjusted_rand_score(y[m], fb_a[m])), 3) if m.sum() else None
+            fk = fb.k
+        else:
+            fb_ari, fk = None, 0
+        table[name] = {
+            "flat_k": len(flat), "flat_ari": flat_ari,
+            "ms_n_bands": msel.n_scales, "ms_finest_k": fk, "ms_finest_ari": fb_ari,
+        }
+    results["multiscale_no_regression"] = table
+    return table
+
+
+def run_multiscale_scale_invariance():
+    """Falsification experiment: flat coverage_cover is ALREADY scale-invariant on
+    single-level data (so we make no flat-ARI claim there). Separation is scaled
+    with spread so clusters stay separable; only the scale gap varies.
+    Populates results["multiscale_scale_invariance"]."""
+    def make(contrast, n=180, seed=104, sep=6.0):
+        rng = np.random.default_rng(seed)
+        base = 0.25
+        sig = [base, base * contrast, base * contrast ** 2]
+        xs = [0.0]
+        for j in range(1, 3):
+            xs.append(xs[-1] + sep * (sig[j - 1] + sig[j]) / 2)
+        parts, ys = [], []
+        for j, (x, s) in enumerate(zip(xs, sig)):
+            parts.append(rng.normal([x, 0], s, (n // 3, 2)))
+            ys += [j] * (n // 3)
+        return np.vstack(parts), np.array(ys)
+
+    rows = {}
+    for contrast in [1.5, 2.0, 3.0, 4.0, 6.0, 8.0]:
+        X, y = make(contrast)
+        Ds = im.minimax_transform(im.dissimilarity(X))
+        flat = S.select_coverage_cover(Ds)
+        a = MS.assign(flat, Ds)
+        rows[f"contrast_{contrast}"] = {
+            "spread_ratio": f"1:{contrast:g}:{contrast**2:g}",
+            "flat_k": len(flat),
+            "flat_ari": round(float(adjusted_rand_score(y, a)), 3),
+        }
+    results["multiscale_scale_invariance"] = rows
+    return rows
+
+
+def fig_multiscale_hierarchy():
+    """Visualize Option D on nested_gaussians: data, persistence diagram colored
+    by discovered scale band, and the band x level ARI matrix."""
+    X, y_fine, y_coarse = BH.nested_gaussians()
+    Ds = im.minimax_transform(im.dissimilarity(X))
+    blocks, n = S._all_blocks(Ds)
+    sig = MS.significant_blocks(blocks, n)
+    msel = MS.select_multiscale(Ds)
+    edges = msel.band_edges_log
+
+    def band_of(birth):
+        lb = np.log(birth + 1e-12)
+        return sum(1 for e in edges if lb >= e)
+
+    fig, ax = plt.subplots(1, 3, figsize=(16, 5))
+
+    # (a) data colored by fine truth
+    ax[0].scatter(X[:, 0], X[:, 1], c=y_fine, cmap='tab10', s=18)
+    ax[0].set_title('nested_gaussians\n(6 fine / 2 coarse clusters)')
+    ax[0].set_aspect('equal', 'datalim')
+    ax[0].set_xticks([]); ax[0].set_yticks([])
+
+    # (b) persistence diagram colored by discovered band
+    colors = plt.cm.viridis(np.linspace(0, 0.85, max(1, len(edges) + 1)))
+    for b in blocks:
+        if 3 <= b['size'] <= 0.6 * n:
+            ax[1].scatter(b['birth'], b['persistence'], s=12, color='0.8', zorder=1)
+    for b in sig:
+        bi = band_of(b['birth'])
+        ax[1].scatter(b['birth'], b['persistence'], s=55,
+                      color=colors[min(bi, len(colors) - 1)],
+                      edgecolor='k', linewidth=0.4, zorder=3)
+    for e in edges:
+        ax[1].axvline(np.exp(e), ls='--', color='crimson', lw=1)
+    ax[1].set_xscale('log')
+    ax[1].set_xlabel('birth height (log)')
+    ax[1].set_ylabel('persistence (death - birth)')
+    ax[1].set_title('persistence diagram\n(significant blocks by scale band;\n'
+                    'dashed = discovered band edges)')
+
+    # (c) band x level ARI matrix
+    levels = [y_fine, y_coarse]
+    level_names = ['fine (6)', 'coarse (2)']
+    M = np.array([[adjusted_rand_score(y, MS.assign_band(b, Ds)) for y in levels]
+                  for b in msel.bands])
+    im_ = ax[2].imshow(M, cmap='YlGn', vmin=0, vmax=1, aspect='auto')
+    ax[2].set_xticks(range(len(level_names))); ax[2].set_xticklabels(level_names)
+    ax[2].set_yticks(range(len(msel.bands)))
+    ax[2].set_yticklabels([f'band {b.band_id}\n(k={b.k})' for b in msel.bands])
+    for i in range(M.shape[0]):
+        for j in range(M.shape[1]):
+            ax[2].text(j, i, f'{M[i, j]:.2f}', ha='center', va='center',
+                       color='k' if M[i, j] < 0.6 else 'w')
+    ax[2].set_title('ARI: discovered band vs ground-truth level\n'
+                    '(diagonal ~1 = each level recovered by its own band)')
+    fig.colorbar(im_, ax=ax[2], fraction=0.046)
+
+    fig.suptitle('Figure 8: Option D - multi-scale persistence selection recovers '
+                 'a nested hierarchy\nthat flat set-cover collapses to a single level',
+                 fontsize=12)
+    fig.tight_layout()
+    save_figure(fig, "fig8_multiscale_hierarchy.png")
+
+
+# ---------------------------------------------------------------------------
 def main(high_res=False, svg=False):
     """Generate analysis, numeric results, and figures.
 
@@ -512,6 +690,10 @@ def main(high_res=False, svg=False):
     print("Running numeric analysis (deterministic)...")
     table = run_numeric()
     relational_table = run_relational_numeric()
+    print("Running multi-scale (Option D) analysis...")
+    multiscale_table = run_multiscale_numeric()
+    run_multiscale_no_regression()
+    run_multiscale_scale_invariance()
     print("Generating figures...")
     fig_datasets()
     fig_transform()
@@ -523,6 +705,8 @@ def main(high_res=False, svg=False):
     fig_relational_distances()
     fig_relational_memberships()
     fig_relational_ari(relational_table)
+    print("Generating multi-scale (Option D) figure...")
+    fig_multiscale_hierarchy()
     with open(f"{OUT}/results.json", "w") as f:
         json.dump(results, f, indent=2)
     print("Done. Results and figures written to", OUT)
@@ -539,6 +723,14 @@ def main(high_res=False, svg=False):
         delta = (e['NERFCM_Dstar_ari'] - e['NERFCM_D_ari']) if (e['NERFCM_D_ari'] is not None and e['NERFCM_Dstar_ari'] is not None) else None
         delta_str = f"{delta:+.3f}" if delta is not None else "n/a"
         print(f"  {name}: NERFCM(D)={d_ari} NERFCM(D*)={ds_ari} ΔAI={delta_str} (k={e['k_true']}, n={e['n']})")
+
+    print("\nMULTI-SCALE HIERARCHY TABLE (Option D): mean ARI over ALL "
+          "ground-truth levels")
+    for name, e in multiscale_table.items():
+        print(f"  {name}: flat(k={e['flat_k']})={e['flat_mean_ari']} "
+              f"multi-scale(scales={e['ms_n_scales']}, k={e['ms_granularities']})="
+              f"{e['ms_mean_ari']}  | flat/level={e['flat_ari_per_level']} "
+              f"ms/level={e['ms_best_ari_per_level']}")
 
 
 if __name__ == "__main__":
