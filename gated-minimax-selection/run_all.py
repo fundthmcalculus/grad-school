@@ -619,7 +619,7 @@ def fig_multiscale_hierarchy():
         lb = np.log(birth + 1e-12)
         return sum(1 for e in edges if lb >= e)
 
-    fig, ax = plt.subplots(1, 3, figsize=(16, 5))
+    fig, ax = plt.subplots(3, 1, figsize=(7, 16))
 
     # (a) data colored by fine truth
     ax[0].scatter(X[:, 0], X[:, 1], c=y_fine, cmap='tab10', s=18)
