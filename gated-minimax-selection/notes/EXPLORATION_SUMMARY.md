@@ -123,6 +123,18 @@ All four approaches have been:
 
 **Status**: **✓ FRAMEWORK COMPLETE, SOLUTION OPEN (this is the thesis contribution)**
 
+> **UPDATE (branch `feat/option-d-multiscale`)**: Option D has since been rebuilt
+> from the annotation-only proof-of-concept into a working selector. Key reframe:
+> flat `coverage_cover` is *already* scale-invariant on single-level data (ARI
+> ≈0.98 across a 30× spread ratio), so the real open problem is **nested**
+> structure, which flat set-cover cannot represent. The new
+> `multiscale_persistence.select_multiscale` discovers density-scale bands from
+> gaps in the single-linkage birth-height spectrum and runs the shared gated
+> set-cover within each band, returning a *hierarchy* of partitions. It recovers
+> every level (ARI 1.0 per level) on multi-level data where flat selection scores
+> 0.58–0.75 mean, and reduces to the flat baseline on single-level data. See
+> **`OPTION_D_MULTISCALE.md`** for the full write-up.
+
 ---
 
 ## Comprehensive Results Table
