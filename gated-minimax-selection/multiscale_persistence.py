@@ -318,6 +318,68 @@ def assign_band(band: BandSelection, Dstar: np.ndarray) -> np.ndarray:
 
 
 # ---------------------------------------------------------------------------
+# Phase 1: direct fuzzy membership functions (persistence ramp, per block)
+#
+# A dendrogram block already carries a native graded membership -- the Mapping-2
+# persistence ramp (ivat_mf.mapping2_persistence), built from the block's own
+# birth/death heights with no medoid or Gaussian fit:
+#
+#     d_B(x) = min_{y in B} D*(x, y)                    minimax distance to block
+#     mu_B(x) = clip( (death_B - d_B(x)) / (death_B - birth_B), 0, 1 )
+#             = 1              for x in the core (d_B <= birth_B)
+#
+# So membership generation and selection share the same two numbers. This block
+# turns a discovered scale band into a *fuzzy* partition (U, shape k_band x n)
+# directly, rather than the hard argmin-distance label assign_band returns.
+# ---------------------------------------------------------------------------
+
+def block_membership(block: dict, Dstar: np.ndarray) -> np.ndarray:
+    """Persistence-ramp membership mu_B(x) in [0,1] for one block, length n."""
+    mem = np.fromiter(block['members'], dtype=int)
+    d = Dstar[mem, :].min(axis=0)
+    h_b, h_d = block['birth'], block['death']
+    mu = np.clip((h_d - d) / (h_d - h_b + 1e-12), 0.0, 1.0)
+    mu[d <= h_b + 1e-12] = 1.0
+    return mu
+
+
+def band_memberships(band: BandSelection, Dstar: np.ndarray) -> np.ndarray:
+    """Fuzzy partition (k_band x n) for one scale band: one ramp MF per block."""
+    n = Dstar.shape[0]
+    if not band.blocks:
+        return np.zeros((0, n))
+    return np.vstack([block_membership(b, Dstar) for b in band.blocks])
+
+
+def defuzzify_memberships(U: np.ndarray, band: BandSelection,
+                          Dstar: np.ndarray) -> np.ndarray:
+    """Hard labels from a fuzzy partition: argmax membership, ties (common at the
+    saturated value 1.0, where several block cores overlap a point) broken by
+    minimax proximity to the block -- the ivat_mf.hard_labels_proximity rule."""
+    if U.shape[0] == 0:
+        return np.zeros(U.shape[1], dtype=int)
+    n = U.shape[1]
+    dist = np.vstack([Dstar[np.fromiter(b['members'], dtype=int), :].min(axis=0)
+                      for b in band.blocks])
+    labels = np.empty(n, dtype=int)
+    umax = U.max(axis=0)
+    for i in range(n):
+        top = np.where(U[:, i] >= umax[i] - 1e-9)[0]
+        labels[i] = int(top[np.argmin(dist[top, i])]) if len(top) > 1 else int(top[0])
+    return labels
+
+
+def multiscale_memberships(Dstar: np.ndarray, **kwargs):
+    """Run multi-scale selection and emit a fuzzy partition per scale band.
+
+    Returns (MultiScaleSelection, [U_band, ...]) where each U_band is a
+    (k_band x n) matrix of persistence-ramp memberships, fine -> coarse.
+    """
+    msel = select_multiscale(Dstar, **kwargs)
+    return msel, [band_memberships(b, Dstar) for b in msel.bands]
+
+
+# ---------------------------------------------------------------------------
 # quick self-test
 # ---------------------------------------------------------------------------
 
@@ -331,10 +393,15 @@ if __name__ == '__main__':
     msel = select_multiscale(Dstar)
 
     print(f"discovered {msel.n_scales} scales, granularities {msel.granularities()}")
-    for band in msel.bands:
+    _, Us = multiscale_memberships(Dstar)
+    for band, U in zip(msel.bands, Us):
         a = assign_band(band, Dstar)
+        graded = float(np.mean((U > 1e-6) & (U < 1 - 1e-6)))
         print(f"  band {band.band_id}: k={band.k} "
               f"births[{band.birth_lo:.2f},{band.birth_hi:.2f}] "
               f"cov={band.coverage_fraction(msel.n):.2f} "
               f"ARI_fine={adjusted_rand_score(y_fine, a):.3f} "
-              f"ARI_coarse={adjusted_rand_score(y_coarse, a):.3f}")
+              f"ARI_coarse={adjusted_rand_score(y_coarse, a):.3f} "
+              f"graded_frac={graded:.3f}")
+    print("(Phase 1 finding: graded_frac == 0 -- the birth/death ramp is crisp by "
+          "construction; see notes/MF_PROGRESS_LOG.md)")
