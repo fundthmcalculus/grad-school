@@ -2,7 +2,7 @@
 
 **Status:** implemented, validated, and reframed from the original proof-of-concept.
 **Branch:** `feat/option-d-multiscale`
-**Code:** `multiscale_persistence.py`, `battery_hierarchical.py`, `run_multiscale.py`
+**Code:** `multiscale_persistence.py`, `battery_hierarchical.py`; experiments in `run_all.py`
 **Supersedes:** the annotation-only proof-of-concept in `multi_scale_mf.py` /
 `OPTION_D_FINDINGS.md`.
 
@@ -41,7 +41,7 @@ anyway**. Its own findings were honest: `improvement = +0.0`. The multi-scale
 analysis was informational, not prescriptive.
 
 Before rebuilding it I ran the baseline hard to find where it actually breaks
-(`run_multiscale.flat_is_scale_invariant`). Two findings reoriented the work:
+(`run_all.run_multiscale_scale_invariance`). Two findings reoriented the work:
 
 1. **Density contrast alone does not break flat selection.** With inter-cluster
    separation scaled to spread (so clusters stay separable), `coverage_cover`
@@ -150,7 +150,7 @@ data):
 
 ## 4. Results
 
-### 4.1 Headline — hierarchy recovery (`run_multiscale.hierarchy_recovery`)
+### 4.1 Headline — hierarchy recovery (`run_all.run_multiscale_numeric`)
 
 Mean ARI **averaged over all ground-truth levels** (so a method that nails one
 level and misses another is penalized):
@@ -182,7 +182,7 @@ blocks, persistence ≈ 3.4–4.3) and a high-birth stratum (two super-cluster b
 persistence ≈ 28), with the discovered band edge between them; the band×level ARI
 matrix is diagonal.
 
-### 4.2 No regression on the flat battery (`run_multiscale.no_regression_flat`)
+### 4.2 No regression on the flat battery (`run_all.run_multiscale_no_regression`)
 
 | dataset | flat k / ARI | # bands | finest k / ARI |
 |---|---|---|---|
@@ -198,7 +198,7 @@ multi-scale selector returns **zero** bands — it declines to assert structure
 where the flat gate happened to admit four marginal blocks. This is the intended
 strict-generalization behavior.
 
-### 4.3 Why there is no flat-ARI claim on single-level varying-density (`run_multiscale.flat_is_scale_invariant`)
+### 4.3 Why there is no flat-ARI claim on single-level varying-density (`run_all.run_multiscale_scale_invariance`)
 
 `coverage_cover` ARI on three separable Gaussians as the spread ratio grows:
 
@@ -288,8 +288,10 @@ Three claims make this thesis-defensible rather than a tuned demo:
 multiscale_persistence.py   core module (select_multiscale, band discovery,
                             shared significance gate, defuzzification)
 battery_hierarchical.py     nested/multi-level datasets with per-level ground truth
-run_multiscale.py           experiments 1–4 + figure (outputs/fig8_multiscale_hierarchy.png)
+run_all.py                  experiments (run_multiscale_numeric / _no_regression /
+                            _scale_invariance) + fig8_multiscale_hierarchy.png
 OPTION_D_MULTISCALE.md       this document
 ```
 
-Reproduce everything with `python run_multiscale.py`.
+Reproduce everything with `python run_all.py` (results in `outputs/results.json`
+under the `multiscale_*` keys; figure at `outputs/fig8_multiscale_hierarchy.png`).

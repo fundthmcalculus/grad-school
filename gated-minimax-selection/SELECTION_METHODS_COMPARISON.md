@@ -284,16 +284,16 @@ Notes:  Targets varying_density specifically; may over-fire if scale bands overl
 
 Files created for this comparison:
 - `selection_comparison.py` — Three selection methods in parallel (with docstrings)
-- `run_selection_comparison.py` — Full test harness on battery + figures
-- `outputs/selection_comparison_results.json` — All numeric results (source of truth)
-- `outputs/fig_selection_comparison.png` — Method comparison (k, coverage, ARI)
-- `outputs/fig_persistence_thresholds.png` — Persistence curves with method thresholds
+- `run_all.py` — runs the comparison (`run_persistence_methods_numeric`) + figures
+- `outputs/results.json` — all numeric results under key `persistence_methods`
+- `outputs/fig9_selection_comparison.png` — Method comparison (k, coverage, ARI)
+- `outputs/fig10_persistence_thresholds.png` — Persistence curves with method thresholds
 - `SELECTION_METHODS_COMPARISON.md` — This document
 
 To test a new method:
 1. Add `def select_<method_name>()` to `selection_comparison.py`
 2. Add entry to `compare_all_methods()` 
-3. Re-run `run_selection_comparison.py`
+3. Re-run `run_all.py`
 4. Compare new numeric results against baseline table
 
 ---

@@ -66,7 +66,7 @@ The key idea: raw distances D might conflate elongation with separation, but D* 
 
 ### Current Results
 
-Running `python3 run_nerfcm.py` on these datasets shows:
+Running `python3 run_all.py` on these datasets shows:
 
 ```
 dataset                             NERFCM(D)          NERFCM(D*)
@@ -145,18 +145,15 @@ If you want datasets that are *not* tree-based (e.g., arbitrary metric spaces, n
 # Test just relationdata module
 python3 relationdata.py
 
-# Run NERFCM comparison (Euclidean + relational)
-python3 run_nerfcm.py
-
-# Run standalone relational benchmark
-python3 run_relationdata.py
+# Run the full analysis (Euclidean + relational NERFCM, all figures)
+python3 run_all.py
 ```
 
 ## Files
 
 - `relationdata.py`: Dataset generation code
-- `run_relationdata.py`: Standalone benchmark (NERFCM on relational data only)
-- `run_nerfcm.py`: Extended version with relational datasets added
+- `run_all.py`: the full analysis — the relational NERFCM(D) vs NERFCM(D*)
+  comparison lives in `run_relational_numeric` (+ `fig7_relationdata_*` figures)
 
 ## Integration
 
@@ -164,7 +161,7 @@ The relational datasets integrate seamlessly into your existing test harness:
 - `relationdata` module is importable alongside `battery`
 - D and D* matrices flow through the same NERFCM pipeline
 - ARI scoring reuses existing metrics
-- Extends `run_nerfcm.py` to show gaps (or lack thereof) on relational data
+- `run_all.py` shows gaps (or lack thereof) between D and D* on relational data
 
 ## Next Steps
 
