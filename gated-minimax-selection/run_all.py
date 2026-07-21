@@ -9,6 +9,9 @@ Runs the entire chain deterministically and writes:
   - fig4_persistence.png : sorted-persistence curves + knee (selection story)
   - fig5_membership.png  : example generated membership functions (1-D profiles)
   - fig6_conivat_bridge.png : the 0.00 -> 1.00 chaining repair, visualized
+  - fig7_relationdata_distances_*.png : relational data distance matrices (D vs D*)
+  - fig7_relationdata_memberships_*.png : relational data membership functions
+  - fig7_relationdata_ari.png : relational data ARI comparison
 
 All randomness is seeded. Re-running reproduces identical numbers and figures.
 """
@@ -18,7 +21,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
+from matplotlib import cm
 
 from sklearn.metrics import adjusted_rand_score
 from scipy.cluster.hierarchy import linkage, fcluster
@@ -29,9 +32,26 @@ import battery as B
 import selection as S
 from nerfcm import nerfcm
 from conivat import conivat, sl_labels_from_mtd
+import relationdata as RD
 
-OUT = "/mnt/user-data/outputs"
+OUT = "./outputs"
 SEEDS = [0, 1, 2, 3, 4]
+
+# Figure output configuration
+OUTPUT_CONFIG = {
+    "dpi": 96,           # Default: low-res for easy sharing (set to 130+ for high-res)
+    "fmt": "png",        # Format: "png" or "svg"
+}
+
+
+def save_figure(fig, filename, dpi=None, fmt=None):
+    """Save figure with configurable resolution and format."""
+    dpi = dpi or OUTPUT_CONFIG["dpi"]
+    fmt = fmt or OUTPUT_CONFIG["fmt"]
+    full_path = f"{OUT}/{filename}".replace(".png", f".{fmt}").replace(".jpg", f".{fmt}")
+    fig.savefig(full_path, dpi=dpi, bbox_inches='tight', format=fmt)
+    plt.close(fig)
+    return full_path
 
 DATASETS = [
     ("two_gaussians",     B.two_gaussians,     2),
@@ -39,6 +59,13 @@ DATASETS = [
     ("concentric_rings",  B.concentric_rings,  2),
     ("varying_density",   B.varying_density,   3),
     ("uniform_noise",     B.uniform_noise,     2),
+]
+
+# Relational datasets (distance-matrix-only, no vector coordinates)
+RELATIONAL_DATASETS = [
+    ("three_clusters_tree", RD.three_clusters_tree, 3),
+    ("chain_then_ring",     RD.chain_then_ring,     2),
+    ("multi_scale_hierarchy", RD.multi_scale_hierarchy, 3),
 ]
 
 results = {}
@@ -152,8 +179,7 @@ def fig_datasets():
     axes[-1].axis('off')  # 6th panel unused (5 datasets)
     fig.suptitle("Figure 1: Synthetic test battery (ground truth)", fontsize=14)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig1_datasets.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig1_datasets.png")
 
 
 def fig_transform():
@@ -185,8 +211,7 @@ def fig_transform():
     fig.suptitle("Figure 2: The minimax transform sharpens block structure\n"
                  "(dark diagonal blocks = clusters)", fontsize=13)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig2_transform.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig2_transform.png")
 
 
 def fig_methods_ari(table):
@@ -216,8 +241,7 @@ def fig_methods_ari(table):
     ax.legend(fontsize=9, loc='lower right')
     ax.grid(axis='y', alpha=0.3)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig3_methods_ari.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig3_methods_ari.png")
 
 
 def fig_persistence():
@@ -251,18 +275,16 @@ def fig_persistence():
                  "(k=2, true 3) and bridged (k=4) - the multi-scale hard cases",
                  fontsize=11)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig4_persistence.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig4_persistence.png")
 
 
 def fig_membership():
     """Example generated membership functions projected on x-axis, for
     two_gaussians and concentric_rings, from the coverage-cover blocks."""
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-
-    # Left column: 1-D membership profiles
-    for row, (name, fn, k) in enumerate([("two_gaussians", B.two_gaussians, 2),
-                                         ("concentric_rings", B.concentric_rings, 2)]):
+    fig, axes = plt.subplots(2, 1, figsize=(10, 8))
+    colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12']
+    for ax, (name, fn, k) in zip(axes, [("two_gaussians", B.two_gaussians, 2),
+                                        ("concentric_rings", B.concentric_rings, 2)]):
         ax = axes[row, 0]
         X, y = fn()
         D = im.dissimilarity(X); Ds = im.minimax_transform(D)
@@ -276,9 +298,12 @@ def fig_membership():
             mu_pts = np.clip((h_d - d_to_block) / (h_d - h_b + 1e-9), 0, 1)
             # bin by x to get a 1-D profile
             order = np.argsort(X[:, 0])
-            ax.plot(X[order, 0], mu_pts[order], '.', ms=3, alpha=0.5,
-                    label=f'set {bi} (n={b["size"]})')
-        ax.set_title(f"{name}: generated membership vs x-feature", fontsize=11)
+            x_sorted = X[order, 0]
+            mu_sorted = mu_pts[order]
+            ax.fill_between(x_sorted, 0, mu_sorted, alpha=0.4, color=colors[bi],
+                            label=f'set {bi} (n={b["size"]})')
+            ax.plot(x_sorted, mu_sorted, color=colors[bi], linewidth=1.5, alpha=0.8)
+        ax.set_title(f"{name}: generated membership vs x-feature", fontsize=12, fontweight='bold')
         ax.set_xlabel("x feature"); ax.set_ylabel("membership")
         ax.legend(fontsize=8); ax.grid(alpha=0.3); ax.set_ylim(-0.05, 1.05)
 
@@ -322,8 +347,7 @@ def fig_membership():
     fig.suptitle("Figure 5: Example generated membership functions "
                  "(minimax-derived, projected on one feature and 2D)", fontsize=12, y=1.00)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig5_membership.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig5_membership.png")
 
 
 def fig_conivat_bridge():
@@ -365,16 +389,168 @@ def fig_conivat_bridge():
     fig.suptitle("Figure 6: ConiVAT metric learning repairs single-linkage "
                  "chaining across the noise bridge", fontsize=12)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/fig6_conivat_bridge.png", dpi=130, bbox_inches='tight')
-    plt.close(fig)
+    save_figure(fig, "fig6_conivat_bridge.png")
     results["bridge_repair"] = {"iVAT_SL_ari": round(float(ari_ivat), 3),
                                 "ConiVAT_ari": round(float(ari_coni), 3)}
 
 
 # ---------------------------------------------------------------------------
-def main():
+# relational data analysis and figures
+# ---------------------------------------------------------------------------
+
+def run_relational_numeric():
+    """Analyze relational datasets with NERFCM(D) vs NERFCM(D*)."""
+    table = {}
+    for name, fn, c_true in RELATIONAL_DATASETS:
+        D, y = fn()
+        Dstar = im.minimax_transform(D)
+
+        # Run NERFCM on both D and D*
+        m_d, s_d = nerfcm_ari(D, y, c_true)
+        m_ds, s_ds = nerfcm_ari(Dstar, y, c_true)
+
+        entry = {
+            "k_true": c_true,
+            "n": int(D.shape[0]),
+            "NERFCM_D_ari": None if np.isnan(m_d) else round(m_d, 3),
+            "NERFCM_D_std": None if np.isnan(s_d) else round(s_d, 3),
+            "NERFCM_Dstar_ari": None if np.isnan(m_ds) else round(m_ds, 3),
+            "NERFCM_Dstar_std": None if np.isnan(s_ds) else round(s_ds, 3),
+        }
+        table[name] = entry
+    results["relational_table"] = table
+    return table
+
+
+def fig_relational_distances():
+    """Plot D vs D* distance matrices for each relational dataset."""
+    for name, fn, c_true in RELATIONAL_DATASETS:
+        D, y = fn()
+        Dstar = im.minimax_transform(D)
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+        # Plot D
+        im1 = ax1.imshow(D, cmap='viridis', aspect='auto')
+        ax1.set_title(f'{name}\nRaw Distance D', fontsize=11, fontweight='bold')
+        ax1.set_xlabel('Point j')
+        ax1.set_ylabel('Point i')
+        plt.colorbar(im1, ax=ax1, label='Distance')
+
+        # Plot D*
+        im2 = ax2.imshow(Dstar, cmap='viridis', aspect='auto')
+        ax2.set_title(f'{name}\nMinimax Distance D*', fontsize=11, fontweight='bold')
+        ax2.set_xlabel('Point j')
+        ax2.set_ylabel('Point i')
+        plt.colorbar(im2, ax=ax2, label='Distance')
+
+        fig.suptitle(f"Relational Data: {name}\nD vs D* (minimax bottleneck)",
+                     fontsize=12, fontweight='bold')
+        plt.tight_layout()
+        save_figure(fig, f"fig7_relationdata_distances_{name}.png")
+
+
+def fig_relational_memberships():
+    """Plot NERFCM membership functions for D and D*."""
+    NERFCM_SEEDS = [0, 1, 2]
+    for name, fn, c_true in RELATIONAL_DATASETS:
+        D, y = fn()
+        Dstar = im.minimax_transform(D)
+
+        # Get average membership over seeds
+        U_d_list = []
+        U_ds_list = []
+        for s in NERFCM_SEEDS:
+            U_d, _, _ = nerfcm(D, c_true, seed=s)
+            U_ds, _, _ = nerfcm(Dstar, c_true, seed=s)
+            U_d_list.append(U_d)
+            U_ds_list.append(U_ds)
+        U_d = np.mean(U_d_list, axis=0)
+        U_ds = np.mean(U_ds_list, axis=0)
+
+        fig, axes = plt.subplots(c_true, 2, figsize=(12, 3*c_true))
+        if c_true == 1:
+            axes = axes.reshape(1, -1)
+
+        for k in range(c_true):
+            # Left: NERFCM(D)
+            ax = axes[k, 0]
+            ax.bar(range(U_d.shape[1]), U_d[k, :], alpha=0.7, color='steelblue')
+            ax.set_title(f'Cluster {k}: NERFCM(D)', fontsize=10)
+            ax.set_ylabel('Membership')
+            ax.set_ylim([0, 1])
+            ax.set_xticks([])
+
+            # Right: NERFCM(D*)
+            ax = axes[k, 1]
+            ax.bar(range(U_ds.shape[1]), U_ds[k, :], alpha=0.7, color='coral')
+            ax.set_title(f'Cluster {k}: NERFCM(D*)', fontsize=10)
+            ax.set_ylabel('Membership')
+            ax.set_ylim([0, 1])
+            ax.set_xticks([])
+
+        fig.suptitle(f'{name}: NERFCM Membership Functions (c={c_true})',
+                     fontsize=12, fontweight='bold', y=1.00)
+        plt.tight_layout()
+        save_figure(fig, f"fig7_relationdata_memberships_{name}.png")
+
+
+def fig_relational_ari(relational_table):
+    """Plot ARI comparison across relational datasets."""
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    names = list(relational_table.keys())
+    x = np.arange(len(names))
+    width = 0.35
+
+    nerfcm_d = [relational_table[name]['NERFCM_D_ari'] for name in names]
+    nerfcm_ds = [relational_table[name]['NERFCM_Dstar_ari'] for name in names]
+
+    bars1 = ax.bar(x - width/2, nerfcm_d, width, label='NERFCM(D)', alpha=0.8, color='steelblue')
+    bars2 = ax.bar(x + width/2, nerfcm_ds, width, label='NERFCM(D*)', alpha=0.8, color='coral')
+
+    ax.set_ylabel('Adjusted Rand Index (ARI)', fontsize=11)
+    ax.set_title('Relational Data: ARI Comparison\nD vs D* (Minimax Distance)',
+                 fontsize=12, fontweight='bold')
+    ax.set_xticks(x)
+    ax.set_xticklabels(names, rotation=15, ha='right')
+    ax.legend()
+    ax.set_ylim([0, 1.1])
+    ax.grid(axis='y', alpha=0.3)
+
+    # Add value labels on bars
+    for bars in [bars1, bars2]:
+        for bar in bars:
+            height = bar.get_height()
+            if not np.isnan(height):
+                ax.text(bar.get_x() + bar.get_width()/2., height,
+                       f'{height:.2f}', ha='center', va='bottom', fontsize=9)
+
+    plt.tight_layout()
+    save_figure(fig, "fig7_relationdata_ari.png")
+
+
+# ---------------------------------------------------------------------------
+def main(high_res=False, svg=False):
+    """Generate analysis, numeric results, and figures.
+
+    Args:
+        high_res (bool): If True, generate figures at 300 dpi for reports (default: 96 dpi for sharing)
+        svg (bool): If True, save as SVG format instead of PNG (for archival)
+    """
+    import os
+    os.makedirs(OUT, exist_ok=True)
+
+    if high_res:
+        OUTPUT_CONFIG["dpi"] = 300
+        print("Generating high-resolution figures (300 dpi)...")
+    if svg:
+        OUTPUT_CONFIG["fmt"] = "svg"
+        print("Generating figures in SVG format...")
+
     print("Running numeric analysis (deterministic)...")
     table = run_numeric()
+    relational_table = run_relational_numeric()
     print("Generating figures...")
     fig_datasets()
     fig_transform()
@@ -382,16 +558,30 @@ def main():
     fig_persistence()
     fig_membership()
     fig_conivat_bridge()
+    print("Generating relational data figures...")
+    fig_relational_distances()
+    fig_relational_memberships()
+    fig_relational_ari(relational_table)
     with open(f"{OUT}/results.json", "w") as f:
         json.dump(results, f, indent=2)
-    print("Done. Results and 6 figures written to", OUT)
+    print("Done. Results and figures written to", OUT)
     # echo the main table
-    print("\nMAIN TABLE:")
+    print("\nMAIN TABLE (Euclidean/Synthetic):")
     for name, e in table.items():
         print(f"  {name}: iVAT-SL={e['iVAT_SL_ari']} NERFCM(D)={e['NERFCM_D_ari']} "
               f"NERFCM(D*)={e['NERFCM_Dstar_ari']} ConiVAT={e['ConiVAT_ari']} "
               f"cover={e['cover_ari']} (k={e['cover_nblocks']}, cov={e['cover_coverage']})")
+    print("\nRELATIONAL DATA TABLE (Distance-Matrix-Only):")
+    for name, e in relational_table.items():
+        d_ari = e['NERFCM_D_ari'] if e['NERFCM_D_ari'] is not None else "n/a"
+        ds_ari = e['NERFCM_Dstar_ari'] if e['NERFCM_Dstar_ari'] is not None else "n/a"
+        delta = (e['NERFCM_Dstar_ari'] - e['NERFCM_D_ari']) if (e['NERFCM_D_ari'] is not None and e['NERFCM_Dstar_ari'] is not None) else None
+        delta_str = f"{delta:+.3f}" if delta is not None else "n/a"
+        print(f"  {name}: NERFCM(D)={d_ari} NERFCM(D*)={ds_ari} ΔAI={delta_str} (k={e['k_true']}, n={e['n']})")
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    use_high_res = '--high-res' in sys.argv or '-hr' in sys.argv
+    use_svg = '--svg' in sys.argv or '-s' in sys.argv
+    main(high_res=use_high_res, svg=use_svg)

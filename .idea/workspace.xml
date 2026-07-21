@@ -4,8 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`">
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/grad-school.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/grad-school.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fuzzy_torch/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gated-minimax-selection/run_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/gated-minimax-selection/run_all.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +63,65 @@
     <commands />
     <urls />
   </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.9481758143038161" />
+      <entry key="MS500" value="6.000174011481214" />
+      <entry key="S2" value="15.726522144216572" />
+      <entry key="S5" value="23.22509796760516" />
+      <entry key="S10" value="27.12384918890646" />
+      <entry key="S30" value="32.32696000020712" />
+      <entry key="S60" value="37.07714040112914" />
+      <entry key="M2" value="42.20153996177895" />
+      <entry key="M5" value="48.23797197686045" />
+      <entry key="M10" value="51.51230070488776" />
+      <entry key="M15" value="52.846034155203434" />
+      <entry key="M30" value="54.33361916116931" />
+      <entry key="H1" value="55.14273545996474" />
+      <entry key="H2" value="55.56511774150367" />
+      <entry key="H4" value="55.78096638495843" />
+      <entry key="D1" value="55.96327062283292" />
+      <entry key="W1" value="55.994747431723475" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="2.4243092750316812E-145" />
+      <entry key="S2" value="7.016927765056946E-37" />
+      <entry key="S5" value="3.4550855266646826E-15" />
+      <entry key="S10" value="5.877997555855802E-8" />
+      <entry key="S30" value="0.0038881510975934614" />
+      <entry key="S60" value="0.0623550406751007" />
+      <entry key="M2" value="0.24970991304932327" />
+      <entry key="M5" value="0.5740825067216766" />
+      <entry key="M10" value="0.7576823257287166" />
+      <entry key="M15" value="0.8311092280898904" />
+      <entry key="M30" value="0.9116519226601189" />
+      <entry key="H1" value="0.9548046515702138" />
+      <entry key="H2" value="0.9771410602212014" />
+      <entry key="H4" value="0.9885044563486806" />
+      <entry key="D1" value="0.9980748341488194" />
+      <entry key="W1" value="0.999724749122078" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.8445468447557145" />
+      <entry key="MS500" value="5.936431421710881" />
+      <entry key="S2" value="15.684826105175878" />
+      <entry key="S5" value="23.19983996867097" />
+      <entry key="S10" value="27.108833496230712" />
+      <entry key="S30" value="32.323029153763734" />
+      <entry key="S60" value="37.13267276887087" />
+      <entry key="M2" value="42.44535038773136" />
+      <entry key="M5" value="48.80831007349955" />
+      <entry key="M10" value="52.26774588997304" />
+      <entry key="M15" value="53.67555649050702" />
+      <entry key="M30" value="55.24442572442568" />
+      <entry key="H1" value="56.09710360672709" />
+      <entry key="H2" value="56.542036981275956" />
+      <entry key="H4" value="56.76935902471306" />
+      <entry key="D1" value="56.96132669376092" />
+      <entry key="W1" value="56.99446949725599" />
+    </decayedShown>
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -70,42 +133,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor&quot;: &quot;Run&quot;,
-    &quot;Python.final_project.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.fuzzy-and-or.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fuzzy-symphony.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ga.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hw3.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hw4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ivat_tsp.executor&quot;: &quot;Run&quot;,
-    &quot;Python.midterm_project.executor&quot;: &quot;Run&quot;,
-    &quot;Python.project1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tire_selector.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;exp/mkslides&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/personal/grad-school/presentations/quals/slides&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;Runtime.Targets.Configurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor": "Run",
+    "Python.final_project.executor": "Debug",
+    "Python.fuzzy-and-or.executor": "Run",
+    "Python.fuzzy-symphony.executor": "Run",
+    "Python.ga.executor": "Run",
+    "Python.hw3.executor": "Run",
+    "Python.hw4.executor": "Run",
+    "Python.ivat_tsp.executor": "Run",
+    "Python.midterm_project.executor": "Run",
+    "Python.project1.executor": "Run",
+    "Python.run_all.executor": "Run",
+    "Python.test1.executor": "Run",
+    "Python.tire_selector.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/personal/grad-school/presentations/quals/slides",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "Runtime.Targets.Configurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySaveCallSignatures" value="true" />
   </component>
@@ -125,32 +189,7 @@
       <recent name="$PROJECT_DIR$/AEEM6022" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.dev">
-    <configuration name="hw3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="grad-school" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AEEM6022" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="DEBUG_JUST_MY_CODE" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw3.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.run_all">
     <configuration name="hw3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="grad-school" />
       <option name="ENV_FILES" value="" />
@@ -224,6 +263,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="run_all" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="grad-school" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/gated-minimax-selection" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gated-minimax-selection/run_all.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/research/package.json" />
       <command value="run" />
@@ -256,11 +320,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.run_all" />
         <item itemvalue="npm.dev" />
         <item itemvalue="Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling" />
         <item itemvalue="Python.project1" />
         <item itemvalue="Python.hw4" />
-        <item itemvalue="Python.hw3" />
       </list>
     </recent_temporary>
   </component>
@@ -692,7 +756,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776087218628</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation">
+      <option name="closed" value="true" />
+      <created>1784587833720</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1784587833720</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -710,8 +782,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: adjust city count calculation and add debug placeholder for ordered matrix" />
-    <MESSAGE value="Adding various bits" />
     <MESSAGE value="chore: add `.gitignore` entry for large-scale wave energy farm file" />
     <MESSAGE value="output figures" />
     <MESSAGE value="fix: P2 notes" />
@@ -735,7 +805,9 @@
     <MESSAGE value="build: Consolidate slides further" />
     <MESSAGE value="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements" />
     <MESSAGE value="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`" />
-    <option name="LAST_COMMIT_MESSAGE" value="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`" />
+    <MESSAGE value="fix: Correct variable usage, execution count, and typo in Assignment 9 notebook" />
+    <MESSAGE value="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -796,17 +868,18 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/grad_school$hw4.coverage" NAME="hw4 Coverage Results" MODIFIED="1765161440674" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
     <SUITE FILE_PATH="coverage/grad_school$test1.coverage" NAME="test1 Coverage Results" MODIFIED="1740001446261" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
-    <SUITE FILE_PATH="coverage/grad_school$fuzzy_symphony.coverage" NAME="fuzzy-symphony Coverage Results" MODIFIED="1745455373930" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$project1.coverage" NAME="project1 Coverage Results" MODIFIED="1765160963279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
+    <SUITE FILE_PATH="coverage/grad_school$pytest_for_AEEM6097_ivat_tsp_test_vat_scaling.coverage" NAME="pytest for AEEM6097.ivat_tsp.test_vat_scaling Coverage Results" MODIFIED="1762743727075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/grad_school$midterm_project.coverage" NAME="midterm_project Coverage Results" MODIFIED="1746390737774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
     <SUITE FILE_PATH="coverage/grad_school$ga.coverage" NAME="ga Coverage Results" MODIFIED="1745178334342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
-    <SUITE FILE_PATH="coverage/grad_school$project1.coverage" NAME="project1 Coverage Results" MODIFIED="1765160963279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
-    <SUITE FILE_PATH="coverage/grad_school$final_project.coverage" NAME="final_project Coverage Results" MODIFIED="1760274284572" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
-    <SUITE FILE_PATH="coverage/grad_school$pytest_for_AEEM6097_ivat_tsp_test_vat_scaling.coverage" NAME="pytest for AEEM6097.ivat_tsp.test_vat_scaling Coverage Results" MODIFIED="1762743727075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/grad_school$fuzzy_and_or.coverage" NAME="fuzzy-and-or Coverage Results" MODIFIED="1761129123321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
     <SUITE FILE_PATH="coverage/grad_school$tire_selector.coverage" NAME="tire_selector Coverage Results" MODIFIED="1745288579755" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
     <SUITE FILE_PATH="coverage/grad_school$hw3.coverage" NAME="hw3 Coverage Results" MODIFIED="1760275819128" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
+    <SUITE FILE_PATH="coverage/grad_school$final_project.coverage" NAME="final_project Coverage Results" MODIFIED="1760274284572" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$fuzzy_and_or.coverage" NAME="fuzzy-and-or Coverage Results" MODIFIED="1761129123321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
     <SUITE FILE_PATH="coverage/grad_school$ivat_tsp.coverage" NAME="ivat_tsp Coverage Results" MODIFIED="1754946448778" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$run_all.coverage" NAME="run_all Coverage Results" MODIFIED="1784588015263" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gated-minimax-selection" />
+    <SUITE FILE_PATH="coverage/grad_school$fuzzy_symphony.coverage" NAME="fuzzy-symphony Coverage Results" MODIFIED="1745455373930" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6097" />
+    <SUITE FILE_PATH="coverage/grad_school$hw4.coverage" NAME="hw4 Coverage Results" MODIFIED="1765161440674" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AEEM6022" />
   </component>
 </project>
