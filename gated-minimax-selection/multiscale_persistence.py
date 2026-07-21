@@ -399,6 +399,68 @@ def multiscale_memberships(Dstar: np.ndarray, kernel: str = 'gaussian', **kwargs
 
 
 # ---------------------------------------------------------------------------
+# Phase 3: partition-of-unity per scale + the multi-scale fuzzy model
+# ---------------------------------------------------------------------------
+
+def normalize_partition(U: np.ndarray, eps: float = 1e-9) -> np.ndarray:
+    """Ruspini normalization: scale each point's memberships to sum to 1.
+    Points with ~0 total membership (uncovered at this scale) are left all-zero
+    -- a deliberate possibilistic choice: 'belongs to nothing here' is
+    information, not something to smear into a uniform guess. Column-positive
+    scaling never changes argmax, so hard labels are unaffected."""
+    s = U.sum(axis=0, keepdims=True)
+    return np.where(s > eps, U / np.where(s > eps, s, 1.0), 0.0)
+
+
+@dataclass
+class FuzzyHierarchy:
+    """The multi-scale fuzzy model: one fuzzy partition per discovered scale,
+    fine -> coarse. `U[i]` is a (k_i x n) membership matrix for band i."""
+    bands: List[BandSelection]
+    U: List[np.ndarray]
+    normalized: bool
+    kernel: str
+
+    @property
+    def n_scales(self) -> int:
+        return len(self.bands)
+
+    def granularities(self) -> List[int]:
+        return [u.shape[0] for u in self.U]
+
+    def level(self, i: int) -> np.ndarray:
+        return self.U[i]
+
+    def defuzzify(self, i: int, Dstar: np.ndarray) -> np.ndarray:
+        return defuzzify_memberships(self.U[i], self.bands[i], Dstar)
+
+    def partition_of_unity_error(self, i: int) -> Tuple[float, float]:
+        """(max, mean) |sum_k mu_k(x) - 1| over COVERED points (those with any
+        membership). Uncovered points are excluded -- they are legitimately 0."""
+        s = self.U[i].sum(axis=0)
+        covered = s > 1e-9
+        if not covered.any():
+            return 0.0, 0.0
+        err = np.abs(s[covered] - 1.0)
+        return float(err.max()), float(err.mean())
+
+    def coverage(self, i: int) -> float:
+        return float(np.mean(self.U[i].sum(axis=0) > 1e-9))
+
+
+def build_fuzzy_hierarchy(Dstar: np.ndarray, kernel: str = 'gaussian',
+                          normalize: bool = True, **kwargs) -> FuzzyHierarchy:
+    """Build the multi-scale fuzzy model: discover scale bands, emit a kernel
+    membership partition per band, and (optionally) Ruspini-normalize each to a
+    partition of unity. Hard labels (argmax) are identical with or without
+    normalization."""
+    msel, Us = multiscale_memberships(Dstar, kernel=kernel, **kwargs)
+    if normalize:
+        Us = [normalize_partition(u) for u in Us]
+    return FuzzyHierarchy(bands=msel.bands, U=Us, normalized=normalize, kernel=kernel)
+
+
+# ---------------------------------------------------------------------------
 # quick self-test
 # ---------------------------------------------------------------------------
 
