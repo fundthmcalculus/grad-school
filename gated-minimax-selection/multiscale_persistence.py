@@ -333,22 +333,41 @@ def assign_band(band: BandSelection, Dstar: np.ndarray) -> np.ndarray:
 # directly, rather than the hard argmin-distance label assign_band returns.
 # ---------------------------------------------------------------------------
 
-def block_membership(block: dict, Dstar: np.ndarray) -> np.ndarray:
-    """Persistence-ramp membership mu_B(x) in [0,1] for one block, length n."""
+def block_membership(block: dict, Dstar: np.ndarray,
+                     kernel: str = 'gaussian') -> np.ndarray:
+    """Membership mu_B(x) in [0,1] for one block, length n, from the minimax
+    distance d_B(x) = min_{y in B} D*(x, y).
+
+    kernel:
+      'ramp'     -- Phase 1 persistence ramp clip((death-d)/(death-birth),0,1),
+                    core->1. CRISP by construction (no point has birth<d<death;
+                    see notes/MF_PROGRESS_LOG.md Phase 1). Kept for the record.
+      'gaussian' -- Phase 2 (default): mu = 2**(-(d/death)**2), i.e. a Gaussian in
+                    minimax distance with HALF-MAX at the block's death (escape)
+                    height -- the scale at which the block dissolves into its
+                    parent. Members (d=0) read 1; the non-member skirt (d>=death)
+                    is graded 0.5 -> 0. This is what makes the MF genuinely fuzzy;
+                    argmax still reproduces the crisp labels.
+    """
     mem = np.fromiter(block['members'], dtype=int)
     d = Dstar[mem, :].min(axis=0)
     h_b, h_d = block['birth'], block['death']
-    mu = np.clip((h_d - d) / (h_d - h_b + 1e-12), 0.0, 1.0)
-    mu[d <= h_b + 1e-12] = 1.0
-    return mu
+    if kernel == 'ramp':
+        mu = np.clip((h_d - d) / (h_d - h_b + 1e-12), 0.0, 1.0)
+        mu[d <= h_b + 1e-12] = 1.0
+        return mu
+    if kernel == 'gaussian':
+        return np.exp(-np.log(2.0) * (d / (h_d + 1e-12)) ** 2)
+    raise ValueError(f"unknown kernel {kernel!r}")
 
 
-def band_memberships(band: BandSelection, Dstar: np.ndarray) -> np.ndarray:
-    """Fuzzy partition (k_band x n) for one scale band: one ramp MF per block."""
+def band_memberships(band: BandSelection, Dstar: np.ndarray,
+                     kernel: str = 'gaussian') -> np.ndarray:
+    """Fuzzy partition (k_band x n) for one scale band: one MF per block."""
     n = Dstar.shape[0]
     if not band.blocks:
         return np.zeros((0, n))
-    return np.vstack([block_membership(b, Dstar) for b in band.blocks])
+    return np.vstack([block_membership(b, Dstar, kernel=kernel) for b in band.blocks])
 
 
 def defuzzify_memberships(U: np.ndarray, band: BandSelection,
@@ -369,14 +388,14 @@ def defuzzify_memberships(U: np.ndarray, band: BandSelection,
     return labels
 
 
-def multiscale_memberships(Dstar: np.ndarray, **kwargs):
+def multiscale_memberships(Dstar: np.ndarray, kernel: str = 'gaussian', **kwargs):
     """Run multi-scale selection and emit a fuzzy partition per scale band.
 
     Returns (MultiScaleSelection, [U_band, ...]) where each U_band is a
-    (k_band x n) matrix of persistence-ramp memberships, fine -> coarse.
+    (k_band x n) matrix of memberships (default Gaussian kernel), fine -> coarse.
     """
     msel = select_multiscale(Dstar, **kwargs)
-    return msel, [band_memberships(b, Dstar) for b in msel.bands]
+    return msel, [band_memberships(b, Dstar, kernel=kernel) for b in msel.bands]
 
 
 # ---------------------------------------------------------------------------
