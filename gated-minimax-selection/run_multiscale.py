@@ -192,7 +192,7 @@ def figures():
                 b += 1
         return b
 
-    fig, ax = plt.subplots(1, 3, figsize=(16, 5))
+    fig, ax = plt.subplots(3, 1, figsize=(7, 15))
 
     # (a) data colored by fine truth
     ax[0].scatter(X[:, 0], X[:, 1], c=y_fine, cmap='tab10', s=18)
