@@ -959,12 +959,92 @@ def fig_persistence_thresholds(pm_table):
 
 
 # ---------------------------------------------------------------------------
-def main(high_res=False, svg=False):
+# scaling / performance benchmark (opt-in: run_all.py --scaling)
+# ---------------------------------------------------------------------------
+
+SCALING_SIZES = (100, 250, 500, 1000, 2000, 5000)
+
+
+def run_scaling_benchmark(sizes=SCALING_SIZES):
+    """Time the pipeline (fast minimax transform + multi-scale selection) and
+    confirm structural recovery as n grows, on three fixed-structure families:
+    single-scale, many-scale (nested), and log-magnitude-separated scale.
+    Uses im.minimax_transform_fast (O(n^2)); the O(n^3) reference is infeasible
+    past n~500. Populates results["scaling"]."""
+    import time
+    table = {}
+    for name, (gen, level_names, expected) in BH.SCALABLE.items():
+        print(f"\n  [{name}] expected clusters/level {expected}:")
+        print(f"    {'N':>6}{'n':>7}{'t_transform':>13}{'t_select':>10}"
+              f"{'scales':>8}{'granularities':>18}{'ARI/level':>22}")
+        rows = []
+        for N in sizes:
+            out = gen(N)
+            X, levels = out[0], list(out[1:])
+            t0 = time.perf_counter()
+            Ds = im.minimax_transform_fast(im.dissimilarity(X))
+            t_tx = time.perf_counter() - t0
+            t0 = time.perf_counter()
+            msel = MS.select_multiscale(Ds)
+            t_sel = time.perf_counter() - t0
+            band_a = [MS.assign_band(b, Ds) for b in msel.bands]
+            best = [round(float(max([adjusted_rand_score(y, a) for a in band_a] or [np.nan])), 3)
+                    for y in levels]
+            rows.append({
+                "N": N, "n": int(len(X)),
+                "t_transform": round(t_tx, 4), "t_select": round(t_sel, 4),
+                "n_scales": msel.n_scales, "granularities": msel.granularities(),
+                "best_ari_per_level": best,
+            })
+            print(f"    {N:>6}{len(X):>7}{t_tx:>13.4f}{t_sel:>10.4f}"
+                  f"{msel.n_scales:>8}{str(msel.granularities()):>18}{str(best):>22}")
+        table[name] = {"level_names": level_names, "expected": expected, "rows": rows}
+    results["scaling"] = table
+    return table
+
+
+def fig_scaling(scaling_table):
+    """Two panels: (left) wall-clock vs n log-log with an O(n^2) guide line;
+    (right) recovered ARI (min over levels) vs n -- structure held as n grows."""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.2))
+    colors = {"single_scale": "#e74c3c", "many_scale": "#3498db", "log_separated": "#2ecc71"}
+    for name, entry in scaling_table.items():
+        rows = entry["rows"]
+        ns = np.array([r["n"] for r in rows], float)
+        total = np.array([r["t_transform"] + r["t_select"] for r in rows])
+        ari_min = np.array([min(r["best_ari_per_level"]) for r in rows])
+        c = colors.get(name, None)
+        ax1.plot(ns, total, "o-", color=c, label=name)
+        ax2.plot(ns, ari_min, "o-", color=c, label=name)
+    # O(n^2) reference anchored at the largest single_scale point
+    ref_rows = scaling_table["single_scale"]["rows"]
+    n_hi = ref_rows[-1]["n"]; t_hi = ref_rows[-1]["t_transform"] + ref_rows[-1]["t_select"]
+    ns_ref = np.array([r["n"] for r in ref_rows], float)
+    ax1.plot(ns_ref, t_hi * (ns_ref / n_hi) ** 2, "k--", alpha=0.5, label="O(n^2) guide")
+    ax1.set_xscale("log"); ax1.set_yscale("log")
+    ax1.set_xlabel("n (points)"); ax1.set_ylabel("wall-clock (s)")
+    ax1.set_title("Runtime: fast transform + multi-scale select")
+    ax1.grid(alpha=0.3, which="both"); ax1.legend(fontsize=8)
+    ax2.set_xscale("log"); ax2.set_ylim(0, 1.05)
+    ax2.set_xlabel("n (points)"); ax2.set_ylabel("min ARI over levels")
+    ax2.set_title("Structure recovery vs n (1.0 = every level recovered)")
+    ax2.grid(alpha=0.3); ax2.legend(fontsize=8)
+    fig.suptitle("Figure 11: Multi-scale selection scaling "
+                 "(single / many / log-separated scale families)", fontsize=11)
+    fig.tight_layout()
+    save_figure(fig, "fig11_scaling.png")
+
+
+# ---------------------------------------------------------------------------
+def main(high_res=False, svg=False, scaling=False):
     """Generate analysis, numeric results, and figures.
 
     Args:
         high_res (bool): If True, generate figures at 300 dpi for reports (default: 96 dpi for sharing)
         svg (bool): If True, save as SVG format instead of PNG (for archival)
+        scaling (bool): If True, run ONLY the scaling benchmark (n up to 5000) and
+            write outputs/scaling_results.json + fig11_scaling.png. This is a
+            heavy, opt-in mode; it does not touch results.json.
     """
     import os
     os.makedirs(OUT, exist_ok=True)
@@ -975,6 +1055,16 @@ def main(high_res=False, svg=False):
     if svg:
         OUTPUT_CONFIG["fmt"] = "svg"
         print("Generating figures in SVG format...")
+
+    if scaling:
+        print("Running scaling benchmark (n up to 5000; may take a minute)...")
+        scaling_table = run_scaling_benchmark()
+        fig_scaling(scaling_table)
+        with open(f"{OUT}/scaling_results.json", "w") as f:
+            json.dump({"scaling": scaling_table}, f, indent=2)
+        print("\nScaling results -> outputs/scaling_results.json, "
+              "figure -> outputs/fig11_scaling.png")
+        return
 
     print("Running numeric analysis (deterministic)...")
     table = run_numeric()
@@ -1062,4 +1152,5 @@ if __name__ == "__main__":
     import sys
     use_high_res = '--high-res' in sys.argv or '-hr' in sys.argv
     use_svg = '--svg' in sys.argv or '-s' in sys.argv
-    main(high_res=use_high_res, svg=use_svg)
+    use_scaling = '--scaling' in sys.argv
+    main(high_res=use_high_res, svg=use_svg, scaling=use_scaling)
