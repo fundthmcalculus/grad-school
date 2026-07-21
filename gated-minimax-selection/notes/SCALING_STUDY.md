@@ -99,6 +99,18 @@ Two concrete fixes (deferred — see `MEMBERSHIP_ROADMAP.md` §soft bands):
    adjacent bands by log-birth distance, replacing the hard cut that
    over-reacts to sampling density.
 
+> **Update (Phase 4, `feat/mf-phase4-bands`):** both fixes above were tried plus a
+> containment-aware band merge. Result: single_scale is cleaned up ([5] at n=500)
+> and genuine hierarchies are unregressed, but **log_separated at small n is NOT
+> fixed** (ARI 0 → ~0.57, vs flat cover's 1.0). Root cause, now pinned down: it is
+> *not* under-sampling — single-linkage **chains through the diffuse cluster**, so
+> that one cluster produces ~18 nested significant blocks spanning birth 25→180,
+> which birth-banding shreds and whose internal nesting *fools* the containment
+> test. Birth height is only a clean band coordinate when each cluster occupies a
+> narrow birth range. For single-level, widely-varying-spread data the flat
+> set-cover is correct and multi-scale banding is the wrong tool. See
+> `MF_PROGRESS_LOG.md` Phase 4.
+
 ## 5. Scaling wall (for the record)
 
 `select_multiscale`, `_all_blocks`, and `assign` all consume a **dense n×n
