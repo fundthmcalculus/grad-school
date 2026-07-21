@@ -231,7 +231,9 @@ def select_multiscale(Dstar: np.ndarray,
                       min_size: int = 3,
                       band_gap_factor: float = 3.0,
                       min_log_gap: float = 0.5,
-                      min_band_coverage: float = 0.15) -> MultiScaleSelection:
+                      min_band_coverage: float = 0.15,
+                      merge_antichain: bool = True,
+                      nest_frac_thresh: float = 0.5) -> MultiScaleSelection:
     """Discover the scale hierarchy of `Dstar` (minimax / iVAT distance matrix).
 
     Args:
@@ -255,26 +257,54 @@ def select_multiscale(Dstar: np.ndarray,
                                 min_log_gap=min_log_gap)
     full_edges = [-np.inf] + edges + [np.inf]
 
-    bands: List[BandSelection] = []
-    band_id = 0
+    # Raw candidate bands: the significant blocks whose birth falls in each
+    # birth-gap interval. (Selection/cover happens after the merge pass.)
+    raw = []
     for lo, hi in zip(full_edges[:-1], full_edges[1:]):
-        band_blocks = [b for b in sig
-                       if lo <= np.log(b['birth'] + 1e-12) < hi]
-        if not band_blocks:
-            continue
-        sel = _greedy_cover(band_blocks)
+        cands = [b for b in sig if lo <= np.log(b['birth'] + 1e-12) < hi]
+        if cands:
+            raw.append({'lo': lo, 'hi': hi, 'cands': cands})
+
+    # Containment-aware merge (Phase 4): a birth-gap is only a genuine SCALE
+    # boundary if the coarser band's blocks are ANCESTORS of (contain) the finer
+    # band's blocks. If instead adjacent bands are an antichain (disjoint
+    # siblings -- same level, merely different spreads), the split is spurious;
+    # merge them. This fixes the log-separated over-segmentation from the scaling
+    # study (each cluster was landing in its own 1-block band) without touching
+    # genuine nested hierarchies (where every finer block IS contained coarser).
+    if merge_antichain:
+        changed = True
+        while changed and len(raw) > 1:
+            changed = False
+            for i in range(len(raw) - 1):
+                fine = _greedy_cover(raw[i]['cands'])
+                coarse = _greedy_cover(raw[i + 1]['cands'])
+                if not fine or not coarse:
+                    continue
+                nested = sum(1 for fb in fine
+                             if any(fb['members'] <= cb['members'] for cb in coarse))
+                if nested / len(fine) < nest_frac_thresh:
+                    raw[i] = {'lo': raw[i]['lo'], 'hi': raw[i + 1]['hi'],
+                              'cands': raw[i]['cands'] + raw[i + 1]['cands']}
+                    del raw[i + 1]
+                    changed = True
+                    break
+
+    bands: List[BandSelection] = []
+    for band in raw:
+        lo, hi = band['lo'], band['hi']
+        sel = _greedy_cover(band['cands'])
         bs = BandSelection(
-            band_id=band_id,
+            band_id=len(bands),
             log_birth_lo=lo, log_birth_hi=hi,
             birth_lo=float(np.exp(lo)) if lo > -np.inf else 0.0,
             birth_hi=float(np.exp(hi)) if hi < np.inf else float('inf'),
             blocks=sel,
-            n_candidates=len(band_blocks),
+            n_candidates=len(band['cands']),
         )
         if bs.coverage_fraction(n) >= min_band_coverage and bs.k >= 1:
             bs.band_id = len(bands)
             bands.append(bs)
-        band_id += 1
 
     # Deduplicate consecutive bands that produced the identical block set (can
     # happen when a discovered gap does not actually change the cover).
@@ -287,7 +317,17 @@ def select_multiscale(Dstar: np.ndarray,
         bs.band_id = len(deduped)
         deduped.append(bs)
 
-    return MultiScaleSelection(bands=deduped, n=n, n_significant=len(sig),
+    # Drop single-block bands: a band with one cluster is a no-information
+    # partition (everything -> one label), typically the near-root scale. Keep
+    # multi-cluster bands; if that leaves nothing, keep the finest single band so
+    # the result is never empty when structure exists.
+    informative = [bs for bs in deduped if bs.k >= 2]
+    if not informative and deduped:
+        informative = deduped[:1]
+    for i, bs in enumerate(informative):
+        bs.band_id = i
+
+    return MultiScaleSelection(bands=informative, n=n, n_significant=len(sig),
                                band_edges_log=edges)
 
 
