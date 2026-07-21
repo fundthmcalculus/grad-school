@@ -22,21 +22,21 @@ reproducible: `python run_all.py` regenerates every number and figure from seed.
 
 1. **The minimax (iVAT/bottleneck) transform D\* is the workhorse.** It sharpens
    block structure and rescues methods that fail on raw distances — e.g. NERFCM
-   goes from ARI 0.02 → 1.00 on concentric rings under D\*. (`FINDINGS.md`)
+   goes from ARI 0.02 → 1.00 on concentric rings under D\*. (`notes/FINDINGS.md`)
 
 2. **Selection is reframed as a persistence-gated set-cover.** Instead of "pick
    the top-*k* persistent blocks," `coverage_cover` admits blocks whose absolute
    persistence is a statistical outlier (MAD gate) and greedily covers the data,
    with *k* an **output**. This is scale-invariant for single-level structure:
    ARI holds ≈0.98 across a **30× cluster-spread ratio**.
-   (`SELECTION_METHODS_COMPARISON.md`)
+   (`notes/SELECTION_METHODS_COMPARISON.md`)
 
 3. **Membership-function extraction has three validated variants** (Ruspini
    partition-of-unity, auto-tuned, and interpretable feature-space rules), with
-   honest scope limits. (`EXPLORATION_SUMMARY.md`, `FINDINGS_exploration.md`)
+   honest scope limits. (`notes/EXPLORATION_SUMMARY.md`, `notes/FINDINGS_exploration.md`)
 
 4. **The approach extends to purely relational data** (distance-matrix-only, no
-   coordinates). (`RELATIONDATA.md`)
+   coordinates). (`notes/RELATIONDATA.md`)
 
 ---
 
@@ -76,7 +76,7 @@ returns zero bands.
   linking it to persistent-homology and density-aware directions.
 
 Full write-up, theory, limitations, and dissertation roadmap:
-**`OPTION_D_MULTISCALE.md`**.
+**`notes/OPTION_D_MULTISCALE.md`**.
 
 ---
 
@@ -85,11 +85,13 @@ Full write-up, theory, limitations, and dissertation roadmap:
 | Document | What it covers |
 |---|---|
 | **`SUMMARY.md`** | this page |
-| **`OPTION_D_MULTISCALE.md`** | ⭐ the new multi-scale contribution — theory, results, limits, future work |
-| `SELECTION_METHODS_COMPARISON.md` | how block selection was reframed as a gated set-cover; method bake-off |
-| `FINDINGS.md` | core battery, the two mappings, why D\* matters |
-| `EXPLORATION_SUMMARY.md` | Options A–D at a glance (membership-function variants) |
-| `RELATIONDATA.md` | extension to distance-matrix-only (relational) data |
+| **`notes/OPTION_D_MULTISCALE.md`** | ⭐ the new multi-scale contribution — theory, results, limits, future work |
+| `notes/SELECTION_METHODS_COMPARISON.md` | how block selection was reframed as a gated set-cover; method bake-off |
+| `notes/FINDINGS.md` | core battery, the two mappings, why D\* matters |
+| `notes/EXPLORATION_SUMMARY.md` | Options A–D at a glance (membership-function variants) |
+| `notes/RELATIONDATA.md` | extension to distance-matrix-only (relational) data |
+
+(All detailed notes live under `notes/`; `SUMMARY.md` stays at the repo root.)
 
 ## Code map
 
