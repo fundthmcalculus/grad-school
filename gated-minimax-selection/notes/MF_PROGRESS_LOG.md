@@ -10,6 +10,7 @@ feat/option-d-multiscale          (base: multi-scale selection + scaling)
   └─ feat/mf-phase1-ramp          Phase 1 — direct ramp MF        [DONE, negative result]
      └─ feat/mf-phase2-kernel     Phase 2 — gaussian-kernel MF    [DONE, works + caveat]
         └─ feat/mf-phase3-hierarchy  Phase 3 — POU + fuzzy model  [DONE, works]
+           └─ feat/mf-phase4-bands   Phase 4 — band merge/cleanup [DONE, partial + finding]
 ```
 
 ---
@@ -138,3 +139,62 @@ what the evaluation needs, so a flat blend is left as optional.
 accuracy cost. Next: Phase 4 — soft band membership (the research-interesting
 piece; also targets the `log_separated` small-n over-segmentation from the
 scaling study).
+
+---
+
+## Phase 4 — band discovery fix (`feat/mf-phase4-bands`)
+
+**Goal:** fix the `log_separated` small-n over-segmentation (SCALING_STUDY §4).
+The roadmap guessed "soft bands"; the evidence pointed elsewhere, so I followed
+the evidence (documented pivot).
+
+**Evidence-driven pivot — containment, not soft weighting.** Probed what actually
+distinguishes a genuine scale hierarchy from a spurious birth-gap split: in
+`many_scale`, 8/8 and 4/4 finer blocks are **nested inside** coarser blocks
+(containment). In over-split `log_separated`, adjacent "bands" are **disjoint
+siblings** (antichain), 0/1 nested. So the fix is to **merge adjacent bands not
+related by containment**, plus **drop single-block bands** (a 1-cluster partition
+carries no information — usually the near-root scale).
+
+**Implemented** (`select_multiscale`): `merge_antichain=True`, `nest_frac_thresh`
+— a containment-aware merge pass over the raw birth-gap bands; and a post-filter
+dropping k=1 bands (keeping the finest if that would empty the result).
+
+**What works:**
+- **No regression on genuine hierarchies** (the critical property): `many_scale`
+  stays [8,4,2] @ ARI 1.0 for all n=100..2000; nested/three-level/density all
+  unchanged @ 1.0.
+- **single_scale cleaned up**: n=500 now [5] (was [5,2]); the spurious near-root
+  band is gone at that size. Large-n keeps a defensible k=2 coarser view.
+- **log_separated improved but NOT fixed**: small-n ARI 0.0 → ~0.57 (no more
+  degenerate all-singleton [1,1,1]).
+
+**What does NOT work — birth-banding shreds a chained diffuse cluster (key finding):**
+- Flat `coverage_cover` gets `log_separated` **[3] @ ARI 1.0 even at n=100** — so
+  the 3 clusters DO form clean blocks; this is a **band-logic failure, not
+  sampling**.
+- Root cause: single-linkage **chains through the sparse diffuse cluster**
+  (σ=175), so that ONE cluster produces **18 significant blocks spanning birth
+  25→180** (vs 1 and 2 for the tight/medium clusters). Birth-height banding
+  therefore fragments a single cluster across many bands.
+- Worse, those 18 blocks are internally **nested** (small fragment ⊆ big
+  fragment), so the containment test is **fooled**: it reads one cluster's
+  caterpillar as a genuine multi-level hierarchy and refuses to merge it. The
+  antichain-merge can't undo the shredding.
+- **Lesson:** birth height is a clean band coordinate only when each cluster
+  occupies a *narrow* birth range. A diffuse/chained cluster violates this, and
+  containment cannot distinguish "nested distinct clusters" from "nested
+  fragments of one chained cluster." For single-level data with widely varying
+  spreads, the **flat global set-cover is the right tool and multi-scale banding
+  is the wrong one** — the value of multi-scale is specifically NESTED structure
+  (`many_scale`), which it handles perfectly.
+
+**Net:** Phase 4 is a real improvement (no-regression + cleaner single_scale +
+antichain detection) with an honestly-bounded scope. `log_separated` at small n
+remains a known failure of the birth-banding premise, not closed. A principled
+future fix would gate multi-scale banding on a *global* single-vs-multi-level
+test (e.g. "does flat cover already explain the data as one antichain?") and
+defer to the flat cover when it does.
+
+**Status:** Phase 4 committed with the honest partial result + the birth-banding
+limitation pinned to its mechanism.
