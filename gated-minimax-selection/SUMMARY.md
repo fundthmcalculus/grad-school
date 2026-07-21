@@ -66,6 +66,11 @@ being told the number of levels or clusters*. On single-scale data it discovers
 one band and reproduces the flat baseline (strict generalization); on noise it
 returns zero bands.
 
+**It scales.** With a fast O(n²) minimax transform (`minimax_transform_fast`,
+exact vs the reference), the whole pipeline runs to **n = 5000 in ~5 s**. On a
+nested `many_scale` family it recovers granularities **[8, 4, 2] at ARI 1.0
+across every level, unchanged from n = 100 to 5000** (`notes/SCALING_STUDY.md`).
+
 **Why it is defensible, not a tuned demo:**
 - the significance test is *literally* the flat selector's gate, factored out —
   so this generalizes the existing method with a proved single-band reduction;
@@ -86,6 +91,8 @@ Full write-up, theory, limitations, and dissertation roadmap:
 |---|---|
 | **`SUMMARY.md`** | this page |
 | **`notes/OPTION_D_MULTISCALE.md`** | ⭐ the new multi-scale contribution — theory, results, limits, future work |
+| `notes/MEMBERSHIP_ROADMAP.md` | ⭐ next steps: generating membership functions directly |
+| `notes/SCALING_STUDY.md` | performance + structure recovery, n = 100 … 5000 |
 | `notes/SELECTION_METHODS_COMPARISON.md` | how block selection was reframed as a gated set-cover; method bake-off |
 | `notes/FINDINGS.md` | core battery, the two mappings, why D\* matters |
 | `notes/EXPLORATION_SUMMARY.md` | Options A–D at a glance (membership-function variants) |
@@ -113,6 +120,7 @@ arity, Ruspini/feature-space membership variants, relational, and Option D).
 python run_all.py            # all numbers -> outputs/results.json, all figures -> outputs/
 python run_all.py --high-res # 300-dpi figures for reports
 python run_all.py --svg      # SVG output for archival
+python run_all.py --scaling  # heavy: n=100..5000 benchmark -> scaling_results.json + fig11
 ```
 
 The multi-scale headline figure is `outputs/fig8_multiscale_hierarchy.png`.

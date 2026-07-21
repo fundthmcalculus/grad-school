@@ -94,3 +94,80 @@ HIERARCHICAL = {
     'three_level_hierarchy': (three_level_hierarchy, ['fine(8)', 'medium(4)', 'coarse(2)']),
     'density_hierarchy': (density_hierarchy, ['fine(4)', 'coarse(2)']),
 }
+
+
+# ---------------------------------------------------------------------------
+# Scalable generators for performance/scaling studies.
+#
+# Each takes a total point count `n` and returns (X, *level_labels), so the
+# number of clusters is FIXED (the structure) while the sample size grows -- the
+# right design for asking "does the selector still recover the same structure as
+# n scales, and how does runtime grow?" All three share the same signature so a
+# benchmark can iterate over them uniformly.
+# ---------------------------------------------------------------------------
+
+def scalable_single_scale(n, seed=31, k=5, sep=12.0, sigma=1.0):
+    """SINGLE SCALE: k well-separated Gaussian blobs, all the same spread.
+    One scale band is correct; multi-scale should discover exactly one.
+    Returns (X, y[0..k-1])."""
+    rng = np.random.default_rng(seed)
+    per = n // k
+    centers = np.c_[np.arange(k) * sep, np.zeros(k)]
+    X, y = [], []
+    for c in range(k):
+        m = per if c < k - 1 else n - per * (k - 1)   # last blob absorbs remainder
+        X.append(rng.normal(centers[c], sigma, (m, 2)))
+        y += [c] * m
+    return np.vstack(X), np.array(y)
+
+
+def scalable_many_scale(n, seed=32, l1_sep=400.0, l2_sep=55.0, l3_sep=8.0, sigma=0.6):
+    """MANY SCALE: a balanced 2x2x2 tree (8 fine / 4 medium / 2 coarse) with
+    three genuinely distinct scales, sample size grown to n.
+    Returns (X, y_fine[0..7], y_medium[0..3], y_coarse[0..1])."""
+    rng = np.random.default_rng(seed)
+    per = max(1, n // 8)
+    X, yf, ym, yc = [], [], [], []
+    fine = med = 0
+    total = 0
+    for c in range(2):
+        cx = np.array([c * l1_sep, 0.0])
+        for mlev in range(2):
+            mx = cx + np.array([0.0, mlev * l2_sep])
+            for f in range(2):
+                fx = mx + np.array([f * l3_sep, 0.0])
+                m = per if fine < 7 else n - total   # last leaf absorbs remainder
+                X.append(rng.normal(fx, sigma, (m, 2)))
+                yf += [fine] * m; ym += [med] * m; yc += [c] * m
+                total += m; fine += 1
+            med += 1
+    return np.vstack(X), np.array(yf), np.array(ym), np.array(yc)
+
+
+def scalable_log_separated(n, seed=33, decades=(0, 1.3, 2.6), base_sigma=0.35,
+                           sep_factor=7.0):
+    """SEPARATED LOG-MAGNITUDE SCALE: 3 clusters whose spreads differ by orders
+    of magnitude (sigma = base * 10**decade), with inter-cluster separation
+    scaled to spread so they stay linearly separable. The clusters occupy widely
+    separated birth-height bands -- the regime band discovery keys on.
+    Returns (X, y[0..2]).  Default decades span ~2.6 (>400x spread ratio)."""
+    rng = np.random.default_rng(seed)
+    sigmas = [base_sigma * (10.0 ** d) for d in decades]
+    xs = [0.0]
+    for k in range(1, len(sigmas)):
+        xs.append(xs[-1] + sep_factor * (sigmas[k - 1] + sigmas[k]) / 2)
+    per = n // len(sigmas)
+    X, y = [], []
+    for k, (x, s) in enumerate(zip(xs, sigmas)):
+        m = per if k < len(sigmas) - 1 else n - per * (len(sigmas) - 1)
+        X.append(rng.normal([x, 0.0], s, (m, 2)))
+        y += [k] * m
+    return np.vstack(X), np.array(y)
+
+
+# name -> (generator, [level names], expected #clusters per level fine->coarse)
+SCALABLE = {
+    'single_scale': (scalable_single_scale, ['clusters(5)'], [5]),
+    'many_scale': (scalable_many_scale, ['fine(8)', 'medium(4)', 'coarse(2)'], [8, 4, 2]),
+    'log_separated': (scalable_log_separated, ['clusters(3)'], [3]),
+}
