@@ -11,7 +11,52 @@ feat/option-d-multiscale          (base: multi-scale selection + scaling)
      └─ feat/mf-phase2-kernel     Phase 2 — gaussian-kernel MF    [DONE, works + caveat]
         └─ feat/mf-phase3-hierarchy  Phase 3 — POU + fuzzy model  [DONE, works]
            └─ feat/mf-phase4-bands   Phase 4 — band merge/cleanup [DONE, partial + finding]
+              └─ feat/mf-phase6-validation  Phase 6 — soft metrics [DONE, negative result]
 ```
+(Phase 5, the one-pass refactor, was **not attempted** — it is plumbing, and the
+Phase 6 result below changes what should be built next; see the TL;DR.)
+
+---
+
+## TL;DR (read this first)
+
+**What works.** Membership functions can be generated *directly* from the
+multi-scale persistence structure with **no separate fitting stage** and **no
+accuracy cost**: argmax of the generated fuzzy partition reproduces the hard
+Option-D labels exactly at every scale, and each scale is a valid Ruspini
+partition of unity (error ~1e-16). On genuinely **nested** data (`many_scale`
+8/4/2) the whole fuzzy hierarchy is recovered perfectly. This is a real, working
+capability (Phases 1–3).
+
+**What does NOT work — the two load-bearing negative results.**
+1. **The persistence ramp is crisp by construction** (Phase 1). A block's members
+   are fixed at birth and don't grow until death, so nothing attaches in the
+   (birth, death) interval — μ ∈ {0,1} always. Gradation had to come from a
+   distance *kernel* instead (Phase 2).
+2. **The resulting fuzzy memberships are ultrametric, not calibrated
+   posteriors** (Phases 2 & 6). Minimax distance is constant across a foreign
+   cluster, so membership is a **step function** (own cluster ~0.67, others
+   ~0.33) with no boundary resolution. Measured against true Gaussian posteriors
+   they score **worse than crisp 0/1 labels** (Brier 0.12–0.21 vs 0.02–0.10).
+   → For calibrated *spatial* soft memberships the minimax route is the wrong
+   tool; the feature-space surrogate (Option C, Gaussian/Mahalanobis) is. The
+   minimax MFs are *hierarchy-aware*, good for hard multi-scale partitions, not
+   for smooth uncertainty.
+
+**Also found (Phase 4):** birth-height banding only works when each cluster
+occupies a narrow birth range. A diffuse/chained cluster produces many nested
+sub-blocks (one cluster → 18 blocks spanning birth 25→180), which shreds across
+bands and fools a containment test. For single-level, widely-varying-spread data
+the flat set-cover is correct and multi-scale banding is the wrong tool.
+
+**Net recommendation for tomorrow.** Multi-scale persistence is strong for
+recovering *nested hard* structure (its intended use). Direct MF generation is
+viable and free for that. But "fuzzy" here means *hierarchy-aware ultrametric*,
+not *calibrated spatial* — if the thesis needs the latter, pair the multi-scale
+selector (for structure) with feature-space kernels (for the soft MFs), rather
+than pushing the minimax ramp/kernel further. Next concrete build: a
+single-vs-multi-level gate (defer to flat cover when the data is one antichain),
+then Option-C-style spatial MFs per selected block.
 
 ---
 
@@ -198,3 +243,43 @@ defer to the flat cover when it does.
 
 **Status:** Phase 4 committed with the honest partial result + the birth-banding
 limitation pinned to its mechanism.
+
+---
+
+## Phase 6 — soft-metric validation (`feat/mf-phase6-validation`)
+
+**Goal:** every earlier test scored only argmax (hard labels). Ask the question
+that actually exercises the *graded* MFs: do they match true soft posteriors?
+
+**Experiment:** two equal-variance 2-D Gaussians, separation swept 2→6. Build the
+two (ground-truth) blocks, generate gaussian-kernel memberships, normalize, and
+score the **Brier distance to the analytic posterior** `P(0|x) =
+N0/(N0+N1)`. Baseline: crisp 0/1 labels as a soft prediction.
+
+| sep | Brier fuzzy | Brier hard (0/1) | boundary pts |
+|----:|------------:|-----------------:|-------------:|
+| 2.0 | 0.136 | 0.096 | 0.30 |
+| 3.0 | 0.200 | 0.042 | 0.09 |
+| 4.0 | 0.208 | 0.016 | 0.04 |
+| 6.0 | 0.122 | 0.000 | 0.00 |
+
+**Result — negative, and clear:** the fuzzy MF is a **worse** soft predictor than
+crisp labels at every separation. Mechanism (confirming Phase 2): with two blocks
+the ultrametric distances make the normalized membership a **constant step** —
+cluster-0 points all read ~0.67, cluster-1 points ~0.33 — *independent of
+distance to the boundary*. So it is simultaneously (a) under-confident on easy,
+far-from-boundary points (0.67 where the truth is ~1.0) and (b) devoid of
+boundary resolution (no smooth 0→1 transition). Crisp labels at least nail the
+confident points, hence the lower Brier.
+
+**Interpretation:** `graded_frac = 0.5` earlier was misleading — the "gradation"
+is one constant value per cluster, not resolution of uncertainty. The minimax
+fuzzy MFs encode *hierarchical membership* (which cluster, and its siblings), not
+*spatial confidence*. Calibrated spatial soft memberships require an actual
+spatial kernel in feature space (Option C), which the minimax route deliberately
+avoids (that is what buys it non-convex support).
+
+**Status:** Phase 6 committed as a documented negative result. It redirects the
+roadmap: stop trying to make the minimax ramp/kernel "fuzzy" in the calibrated
+sense; use multi-scale for structure and feature-space kernels for soft MFs.
+Reproduce: `python notes/phase6_soft_validation.py`.
