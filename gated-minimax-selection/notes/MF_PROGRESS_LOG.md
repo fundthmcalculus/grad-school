@@ -8,6 +8,7 @@ Branch chain (each builds on the one above):
 ```
 feat/option-d-multiscale          (base: multi-scale selection + scaling)
   └─ feat/mf-phase1-ramp          Phase 1 — direct ramp MF        [DONE, negative result]
+     └─ feat/mf-phase2-kernel     Phase 2 — gaussian-kernel MF    [DONE, works + caveat]
 ```
 
 ---
@@ -54,3 +55,46 @@ kernel, but driven by the block's own minimax geometry.
 
 **Status:** Phase 1 committed as a faithful-but-crisp baseline + this negative
 result. Proceed to Phase 2 (kernelized membership).
+
+---
+
+## Phase 2 — gaussian-kernel membership (`feat/mf-phase2-kernel`)
+
+**Goal:** recover genuine gradation that Phase 1's ramp cannot, by kerneling the
+minimax distance instead of thresholding it.
+
+**Implemented:** `block_membership(..., kernel=)` now supports `'ramp'` (Phase 1,
+kept) and `'gaussian'` (new default): `mu_B(x) = 2**(-(d_B(x)/death_B)**2)` — a
+Gaussian in minimax distance with **half-max at the block's death (escape)
+height**, the principled scale at which the block dissolves into its parent.
+Threaded through `band_memberships` / `multiscale_memberships` via `kernel=`.
+
+**Scale choice (measured):** half-max at `death` gives graded_frac 0.29–0.42 with
+ARI preserved; at `birth` it stays crisp (≈0, non-members sit at d≫birth); `mid`
+≈ `death`. `death` chosen — principled and best.
+
+**What works:**
+- Genuine gradation: graded_frac = **0.417 / 0.292 / 0.375** on nested /
+  three-level / density (was 0.000 for the ramp).
+- **Labels unchanged:** argmax of the gaussian partition still equals the hard
+  `assign_band` exactly on every band (ARI at every level unchanged from
+  Option D). So we gained fuzziness for free — no accuracy cost.
+
+**Important caveat — the gradation is ULTRAMETRIC, not spatial (key finding):**
+- Minimax distance is piecewise-constant across clusters: every point in a
+  *foreign* cluster has the *same* bottleneck distance to block B (their common
+  merge height). So `mu_B` is **constant within each cluster** and graded only
+  *between* clusters.
+- Concretely (nested, fine block 0): 20 points read μ≈1 (its own sub-cluster),
+  40 read μ≈0.5 (the two *sibling* sub-clusters in the same super-cluster),
+  60 read μ≈0 (the far super-cluster). The 0.5 is the hierarchical-proximity
+  signal — siblings are "half in" — which is meaningful and correct for a
+  hierarchy, but it is NOT a smooth within-cluster spatial gradient.
+- Implication: this route gives **hierarchy-aware (ultrametric) fuzzy
+  memberships**, not RBF-style spatial ones. Smooth within-cluster gradients
+  would require the feature-space surrogate (Option C), which trades away
+  non-convex support. Documented so we don't over-claim "smooth fuzzy MFs".
+
+**Status:** Phase 2 committed. Gradation achieved and characterized honestly.
+Next: Phase 3 — partition-of-unity across a band's blocks + the cross-scale fuzzy
+model (and decide how normalization interacts with the 0.5 sibling mass).
