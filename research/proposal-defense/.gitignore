@@ -1,2 +1,3 @@
 # Reference proposal PDFs — kept locally, not tracked (large binaries)
 *.pdf
+build/
