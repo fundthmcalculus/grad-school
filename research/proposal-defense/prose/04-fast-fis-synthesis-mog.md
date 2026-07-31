@@ -101,7 +101,7 @@ It is **interpretable in exactly the way the rest of the model is**. When the an
 
 It addresses **rare classes**, which is the failure mode that motivated it. A class with a handful of examples is nearly invisible to accuracy-driven training: a model that ignores it entirely still scores well. But rare and unseen events are frequently the ones that matter — a novel intrusion, an off-nominal flight condition, a failure mode absent from the training set. The complement rule catches these *as a category*, without needing examples of them, which is the one thing a supervised class rule can never do.
 
-I should be clear about the prior art, since novelty detection and open-set recognition are well-established fields with their own literature — one-class SVMs, isolation forests, Mahalanobis-distance novelty scores, and the open-set recognition line of work all attack this problem directly, and I do not claim to beat them at it. What I claim is narrower and, I think, more interesting: in a fuzzy inference system built this way, open-set behavior is not an addition but a *consequence*, obtained by applying the same t-conorm and complement the model already uses, and it inherits the model's interpretability for free. The honest comparison — my complement rule against a dedicated one-class detector on the same data — is an experiment I owe.
+I should be clear about the prior art, since novelty detection and open-set recognition are well-established fields with their own literature — one-class SVMs, isolation forests, Mahalanobis-distance novelty scores, and the open-set recognition line of work all attack this problem directly, and I do not claim to beat them at it. What I claim is narrower and, I think, more interesting: in a fuzzy inference system built this way, open-set behavior is not an addition but a *consequence*, obtained by applying the same t-conorm and complement the model already uses, and it inherits the model's interpretability for free. The honest comparison — my complement rule against a dedicated one-class detector on the same data — is run in §4.4. The short version is that the mechanism behaves as described and the three methods come out indistinguishable on the testbed available, which supports parity but not superiority.
 
 ## 4.4 Results
 
@@ -137,19 +137,40 @@ The rule-base column is the point of the table as much as the accuracy is: for c
 | CART (reference) | 0.797 ± 0.029 | seconds | *pending* | *pending* |
 | Random Forest (reference) | 0.904 ± 0.014 | seconds | *pending* | *pending* |
 
-**Table 4.4 — Open-set detection with the complement rule** *(structure fixed; cells from the harness).* Trained on benign traffic only; the malicious class is unseen at training time. The comparison that matters is against detectors built for this job. Detection and false-alarm rates are reported at a matched operating point taken from the $\theta$ sweep, since quoting either one alone would be meaningless.
+**The mechanism, measured.** The BETH files are not in the repository, so the harness runs the same protocol on public data: leave-one-class-out, where each class is withheld from training in turn and treated as unseen, averaged over held-out classes and seeds. Sweeping the boost gives the operating curve the section promised.
 
-| Method | Trained on | Detection rate | False-alarm rate | Extra model? |
-|---|---|---:|---:|:--:|
-| **Complement rule (this work)** | benign only | *pending* | *pending* | no |
-| One-class SVM | benign only | *pending* | *pending* | yes |
-| Isolation Forest | benign only | *pending* | *pending* | yes |
+**Table 4.4 — The anomaly operating curve.** Detection and false alarm as functions of $\theta$, on Glass (6 classes, leave-one-class-out).
+
+| $\theta$ | detection rate | false-alarm rate | detection − false alarm |
+|---:|---:|---:|---:|
+| 0.30 | 0.312 | 0.215 | +0.096 |
+| 0.60 | 0.306 | 0.156 | +0.150 |
+| **0.80** | 0.282 | 0.127 | **+0.155** |
+| 0.90 | 0.197 | 0.092 | +0.105 |
+| 0.99 | 0.136 | 0.062 | +0.075 |
+| 1.10 | 0.000 | 0.000 | 0.000 |
+
+The curve behaves exactly as §4.3.5 says it should, which is the first thing worth confirming. Raising $\theta$ inflates the known-class firings, shrinks the complement, and monotonically reduces both detection and false alarms; past $\theta = 1.1$ the boost saturates the aggregate and the anomaly rule stops firing altogether. The knob is real and it is monotone, so an operator can trade sensitivity against nuisance alarms by turning one scalar, which was the design claim.
+
+Two honest observations follow. The default of $\theta = 0.99$ inherited from the BETH configuration is *not* a good operating point on this data — it gives roughly half the separation of $\theta = 0.80$ — which is an argument for reporting the curve rather than a single number, and for tuning $\theta$ per deployment. And the absolute performance here is poor: the best setting detects under a third of unseen points at a 13% false-alarm rate, which is not a usable detector.
+
+I do not think that last figure says much about the method, and I want to be careful not to over-read it in either direction. Glass has 214 samples across six classes, several with fewer than a dozen members, so withholding a class removes much of the little data there is and the remaining model is asked to be confident about a space it has barely seen. It is a stress test, not a demonstration. What it establishes is that the mechanism works as described; what it does not establish is that the complement rule is *competitive*, and that requires BETH or a comparable dataset.
+
+**Table 4.5 — Against detectors built for the job** *(θ = 0.99, matched operating points).* The baselines' contamination is set to the complement rule's observed false-alarm rate, so all three are compared at the same point on their curves rather than at whatever default each ships with.
+
+| Method | Detection rate | False-alarm rate | Detection − false alarm | Separate model? |
+|---|---:|---:|---:|:--:|
+| **Complement rule (this work)** | 0.136 ± 0.166 | 0.062 ± 0.057 | **+0.075** | no |
+| Isolation Forest | 0.114 ± 0.126 | 0.067 ± 0.065 | +0.047 | yes |
+| One-class SVM | 0.100 ± 0.103 | 0.064 ± 0.052 | +0.036 | yes |
+
+The complement rule nominally leads, and I am going to decline to claim that. The standard deviations across held-out classes are larger than the gaps between the methods, so on this evidence the three are indistinguishable. What the table does support is the cheaper claim that motivated the section: the complement rule performs *comparably to purpose-built detectors while requiring no second model*, which is the property worth having. Establishing more than parity is a goal for completion.
 
 > **Reproduction.** Tables 4.2–4.4 regenerate from `reproduce/tables/table_4_1_mog_baselines.py`, which emits Markdown and CSV with mean ± standard deviation across a fixed seed set. Cells marked *pending* are those whose adapter or dataset was not yet wired up; the harness prints exactly what it could not run rather than substituting a guess.
 >
 > **TODO — repeatable performance (board-wide standard):** the numbers above are single-machine point estimates. Reproduce under the fixed protocol — pinned clocks and thermals, multiple seeds, reported error bars — before citation. See `ACTION_ITEMS.md` §A and Chapter 7, Goal G4.
 
-**[FIGURE 4.2 — placeholder]** *The anomaly threshold sweep on BETH: detection rate and false-alarm rate as functions of the boost $\theta$, showing the operating curve a user picks a point on. Generated by `plot_anomaly_threshold_sweep`.*
+**[FIGURE 4.2 — placeholder]** *The anomaly operating curve of Table 4.4, plotted: detection and false-alarm rate against the boost $\theta$, with the saturation point past $\theta = 1.1$ marked. To be regenerated on BETH via `plot_anomaly_threshold_sweep` when those data are available.*
 `![anomaly-sweep](fig/04-anomaly-sweep.png)`
 
 **[FIGURE 4.3 — placeholder]** *Confusion matrix on RT-IOT2022 before and after the correction-rule pass, showing which class confusions the corrections repair.*
