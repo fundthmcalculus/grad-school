@@ -10,9 +10,12 @@
 % Verification legend:
 %   [V] adversarially verified / confirmed from publisher-index this session
 %   [S] standard well-known DOI for a seminal work; spot-check at proof stage
-%   [?] added this pass from working knowledge; author/title/year believed
-%       correct, but DOI / pages / volume MUST be verified before submission
-%       (tracked in ACTION_ITEMS.md, "consolidate the bibliography").
+%   [?] added from working knowledge, pending verification.
+%       NOTE: all [?] entries were resolved in the 2026-07-31 verification
+%       pass (Crossref / arXiv / DBLP) and promoted to [V]; the marker is
+%       kept in the legend for any future additions. One proof-stage check
+%       remains: confirm the "Kali{\v{s}}nik" accent survives BibTeX encoding
+%       (automato2024).
 % ===========================================================================
 
 
@@ -272,28 +275,28 @@
 
 % ####################  VAT / iVAT / CLUSTER TENDENCY  ######################
 
-@inproceedings{bezdek2002vat,                   % [?] verify DOI/pages
+@inproceedings{bezdek2002vat,                   % [V] verified
   author    = {Bezdek, James C. and Hathaway, Richard J.},
   title     = {{VAT}: A Tool for Visual Assessment of (Cluster) Tendency},
   booktitle = {Proceedings of the 2002 International Joint Conference on Neural Networks (IJCNN)},
   volume    = {3}, pages = {2225--2230}, year = {2002},
   doi       = {10.1109/IJCNN.2002.1007487}}
 
-@inproceedings{wang2010ivat,                    % [?] verify
+@inproceedings{wang2010ivat,                    % [V] verified (LNAI 6118)
   author    = {Wang, Liang and Nguyen, Uyen T. V. and Bezdek, James C. and Leckie, Christopher A. and Ramamohanarao, Kotagiri},
   title     = {{iVAT} and {aVAT}: Enhanced Visual Analysis for Cluster Tendency Assessment},
   booktitle = {Advances in Knowledge Discovery and Data Mining (PAKDD 2010)},
   series    = {Lecture Notes in Computer Science}, volume = {6118}, pages = {16--27},
   publisher = {Springer}, year = {2010}, doi = {10.1007/978-3-642-13657-3_5}}
 
-@article{havens2012efficient,                   % [?] verify
+@article{havens2012efficient,                   % [V] verified
   author  = {Havens, Timothy C. and Bezdek, James C.},
   title   = {An Efficient Formulation of the Improved Visual Assessment of Cluster Tendency ({iVAT}) Algorithm},
   journal = {IEEE Transactions on Knowledge and Data Engineering},
   volume  = {24}, number = {5}, pages = {813--822}, year = {2012},
   doi     = {10.1109/TKDE.2011.33}}
 
-@article{kumar2016clusivat,                     % [?] verify (clusiVAT journal version)
+@article{kumar2016clusivat,                     % [V] verified (clusiVAT journal version)
   author  = {Kumar, Dheeraj and Bezdek, James C. and Palaniswami, Marimuthu and Rajasegarar, Sutharshan
              and Leckie, Christopher and Havens, Timothy C.},
   title   = {A Hybrid Approach to Clustering in Big Data},
@@ -301,7 +304,7 @@
   volume  = {46}, number = {10}, pages = {2372--2385}, year = {2016},
   doi     = {10.1109/TCYB.2015.2477416}}
 
-@article{kumar2020vatsurvey,                    % [?] verify
+@article{kumar2020vatsurvey,                    % [V] verified
   author  = {Kumar, Dheeraj and Bezdek, James C.},
   title   = {Visual Approaches for Exploratory Data Analysis: A Survey of the Visual
              Assessment of Clustering Tendency ({VAT}) Family of Algorithms},
@@ -309,21 +312,23 @@
   volume  = {6}, number = {2}, pages = {10--48}, year = {2020},
   doi     = {10.1109/MSMC.2019.2961163}}
 
-@article{rathore2020conivat,                    % [?] verify authors/venue/DOI
-  author  = {Rathore, Punit and Bezdek, James C. and Santi, Paolo and Ratti, Carlo},
-  title   = {{ConiVAT}: Cluster Tendency Assessment and Clustering with Partial Background Knowledge},
-  journal = {arXiv preprint}, year = {2020}, eprint = {2008.09570}, archivePrefix = {arXiv},
-  note    = {verify final venue}}
+@misc{rathore2020conivat,                       % [V] verified -- arXiv only, no journal DOI found
+  author        = {Rathore, Punit and Bezdek, James C. and Santi, Paolo and Ratti, Carlo},
+  title         = {{ConiVAT}: Cluster Tendency Assessment and Clustering with Partial Background Knowledge},
+  year          = {2020}, eprint = {2008.09570}, archivePrefix = {arXiv}, primaryClass = {cs.LG},
+  note          = {arXiv preprint; not formally published as of verification}}
 
-@inproceedings{meng2018evat,                    % [?] verify full citation (exact GPU VAT)
-  author = {Meng, [given name] and Yuan, [given name]},
-  title  = {{eVAT}: Exact {GPU}-accelerated Visual Assessment of Cluster Tendency},
-  year   = {2018}, note = {PLACEHOLDER -- authors/venue/DOI to be verified}}
+@article{meng2018evat,                          % [V] verified (this is the "eVAT" GPU paper)
+  author  = {Meng, Tao and Yuan, Bo},
+  title   = {Parallel Edge-Based Visual Assessment of Cluster Tendency on {GPU}},
+  journal = {International Journal of Data Science and Analytics},
+  volume  = {6}, number = {4}, pages = {287--295}, year = {2018},
+  doi     = {10.1007/s41060-018-0100-7}}
 
-@misc{avinash2025fastvat,                       % [?] verify
-  author = {Avinash, [given name] and Lachheb, [given name]},
-  title  = {{Fast-VAT}: Accelerated Visual Assessment of Cluster Tendency},
-  year   = {2025}, note = {PLACEHOLDER -- exact citation / arXiv id to be verified}}
+@misc{avinash2025fastvat,                       % [V] verified
+  author        = {Avinash, M. S. R. and Lachheb, Ismael},
+  title         = {Fast-{VAT}: Accelerating Cluster Tendency Visualization using {Cython} and {Numba}},
+  year          = {2025}, eprint = {2507.15904}, archivePrefix = {arXiv}, primaryClass = {cs.LG}}
 
 
 % ####################  MST / SINGLE-LINKAGE / FCM  #########################
@@ -362,14 +367,14 @@
   publisher = {Springer (Plenum Press)}, year = {1981},
   doi       = {10.1007/978-1-4757-0450-1}}
 
-@article{hathaway1994nerf,                       % [?] verify pages/DOI
+@article{hathaway1994nerf,                       % [V] verified (Crossref)
   author  = {Hathaway, Richard J. and Bezdek, James C.},
   title   = {{NERF} c-Means: Non-{E}uclidean Relational Fuzzy Clustering},
   journal = {Pattern Recognition},
   volume  = {27}, number = {3}, pages = {429--437}, year = {1994},
   doi     = {10.1016/0031-3203(94)90119-8}}
 
-@article{bien2011hierarchical,                   % [?] verify
+@article{bien2011hierarchical,                   % [V] verified (Crossref)
   author  = {Bien, Jacob and Tibshirani, Robert},
   title   = {Hierarchical Clustering with Prototypes via Minimax Linkage},
   journal = {Journal of the American Statistical Association},
@@ -383,7 +388,7 @@
   volume  = {63}, number = {2}, pages = {411--423}, year = {2001},
   doi     = {10.1111/1467-9868.00293}}
 
-@article{cate1977insitu,                         % [?] verify (in-place permutation)
+@article{cate1977insitu,                         % [V] verified (Crossref); Esko G. Cate, David W. Twigg
   author  = {Cate, Esko G. and Twigg, David W.},
   title   = {Algorithm 513: Analysis of In-Situ Transposition},
   journal = {ACM Transactions on Mathematical Software},
@@ -393,25 +398,25 @@
 
 % ####################  PERSISTENCE / TDA  ##################################
 
-@article{chazal2013persistence,                 % [?] verify (ToMATo)
-  author  = {Chazal, Fr{\'e}d{\'e}ric and Guibas, Leonidas J. and Oudot, Steve Y. and Skraba, Primoz},
-  title   = {Persistence-Based Clustering in {R}iemannian Manifolds},
-  journal = {Journal of the ACM},
-  volume  = {60}, number = {6}, pages = {41:1--41:38}, year = {2013},
-  doi     = {10.1145/2535927}}
+@article{chazal2013persistence,                 % [V] verified (ToMATo)
+  author    = {Chazal, Fr{\'e}d{\'e}ric and Guibas, Leonidas J. and Oudot, Steve Y. and Skraba, Primoz},
+  title     = {Persistence-Based Clustering in {R}iemannian Manifolds},
+  journal   = {Journal of the ACM},
+  volume    = {60}, number = {6}, articleno = {41}, pages = {41:1--41:38}, year = {2013},
+  doi       = {10.1145/2535927}}
 
-@article{bonis2018fuzzy,                         % [?] verify final venue; the nearest precedent for Ch5
+@article{bonis2018fuzzy,                         % [V] verified; the nearest precedent for Ch5
   author  = {Bonis, Thomas and Oudot, Steve},
   title   = {A Fuzzy Clustering Algorithm for the Mode-Seeking Framework},
-  journal = {Pattern Recognition Letters}, year = {2018},
-  eprint  = {1406.7130}, archivePrefix = {arXiv},
-  note    = {verify PRL volume/pages/DOI}}
+  journal = {Pattern Recognition Letters},
+  volume  = {102}, pages = {37--43}, year = {2018},
+  doi     = {10.1016/j.patrec.2017.11.019}, note = {arXiv:1406.7130}}
 
-@misc{automato2024,                             % [?] verify authors/title
-  title        = {{AuToMATo}: A Parameter-Free Persistence-Based Clustering Algorithm},
-  year         = {2024}, eprint = {2408.06958}, archivePrefix = {arXiv},
-  url          = {https://arxiv.org/abs/2408.06958},
-  note         = {authors to be filled in}}
+@article{automato2024,                           % [V] verified (title + authors corrected; TMLR 2025)
+  author  = {Huber, Marius and Kali{\v{s}}nik, Sara and Schnider, Patrick},
+  title   = {{AuToMATo}: An Out-Of-The-Box Persistence-Based Clustering Algorithm},
+  journal = {Transactions on Machine Learning Research (TMLR)},
+  year    = {2025}, note = {arXiv:2408.06958 (2024)}}
 
 
 % ####################  OPTIMIZATION / TSP / QUALITY-DIVERSITY  ##############
@@ -423,7 +428,7 @@
   volume  = {21}, number = {2}, pages = {498--516}, year = {1973},
   doi     = {10.1287/opre.21.2.498}}
 
-@article{helsgaun2000effective,                  % [?] verify pages
+@article{helsgaun2000effective,                  % [V] verified (Crossref)
   author  = {Helsgaun, Keld},
   title   = {An Effective Implementation of the {Lin--Kernighan} Traveling Salesman Heuristic},
   journal = {European Journal of Operational Research},
@@ -463,7 +468,7 @@
   title  = {Illuminating Search Spaces by Mapping Elites},
   year   = {2015}, eprint = {1504.04909}, archivePrefix = {arXiv}}
 
-@article{vassiliades2018cvt,                      % [?] verify pages
+@article{vassiliades2018cvt,                      % [V] verified (Crossref)
   author  = {Vassiliades, Vassilis and Chatzilygeroudis, Konstantinos and Mouret, Jean-Baptiste},
   title   = {Using Centroidal {V}oronoi Tessellations to Scale Up the Multidimensional
              Archive of Phenotypic Elites Algorithm},
