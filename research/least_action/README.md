@@ -422,15 +422,79 @@ orthogonality conditions is one:
 For $N\ge3$ it still reduces coupling by roughly $20\times$, so it is worth tuning
 even when it cannot be exact.
 
-**Two caveats, both real.** $\lambda^\*$ grows steeply with overlap (0.24 at width
-2, 137.6 at width 10), and $\lambda$ is simultaneously the *physical* slope weight
-from §1 — it sets how much derivative fidelity is worth. Buying decoupling this
-way therefore distorts the very fit the model exists to perform. It is a genuine
-third option, not a free lunch.
-
 The binary-classifier case is where it lands cleanly: §5b shows a classifier
 score *is* an order-0 TSK model, so $N=2$, order 0 is exactly the binary
 classification setting, and there $\lambda^\*$ is exact and in closed form.
+
+### 4d′. Evaluating $\lambda^\*$: closed form, meaning, and price
+
+**Closed form.** For two equal-width Gaussians at $\pm c$ the log-ratio
+$\log(\mu_1/\mu_0)=4cx/b^2$ is *linear in $x$*, so the normalized weights collapse
+to a logistic:
+
+$$\varphi_1=\sigma(kx),\qquad \varphi_0=1-\sigma(kx),\qquad k=\frac{4c}{b^2}.$$
+
+Then $\varphi_0\varphi_1=\sigma(1-\sigma)$ and $\varphi_i'=\pm k\,\sigma(1-\sigma)$, and both
+integrals are elementary. With $u=kx$ and then $s=\sigma(u)$, $ds=s(1-s)\,du$:
+
+$$\int\varphi_0\varphi_1\,dx=\frac1k\int_{\mathbb R}\sigma'(u)\,du=\frac1k,
+\qquad
+\int\varphi_0'\varphi_1'\,dx=-k\int_{\mathbb R}\sigma'(u)^2du=-k\int_0^1 s(1-s)\,ds=-\frac{k}{6}.$$
+
+$$\boxed{\;\lambda^\*=\frac{6}{k^2}=\frac{3\,b^4}{8\,c^2}\;}$$
+
+Verified to all printed digits (`demo_regression.py` §I): e.g. $c=5,b=4\Rightarrow k=1.25$,
+$\int\varphi\varphi=0.800000=1/k$, $\int\varphi'\varphi'=-0.208333=-k/6$, $\lambda^\*=3.84000=6/k^2$.
+
+**Meaning — and the answer to the open question.** Let $w=1/k=b^2/(4c)$, the
+crossover width of the rule handover. Then
+
+$$\ell^\*=\sqrt{\lambda^\*}=\sqrt6\,w$$
+
+confirmed numerically as $2.44949$ in every configuration tested. So $\lambda^\*$ is
+fixed **entirely by the partition geometry**. $y_d$ appears nowhere in it.
+
+> $\lambda^\*$ is **not** a distinguished correlation length of the target. It is the
+> correlation length of the *rule crossover region*. The open question posed in
+> the previous revision is answered, and answered negatively.
+
+**Why $N\ge3$ cannot work — structurally.** Since $\lambda^\*\propto 1/c^2$, on a
+uniform partition of pitch $d$ the adjacent pairs (separation $d$) and the
+next-nearest pairs (separation $2d$) demand values in ratio $(2d/d)^2=4$.
+Measured: 4.0000 in every case. One scalar $\lambda$ cannot satisfy two conditions
+that differ by a fixed factor of 4 — this is sharper than the earlier
+"generically unsatisfiable" and explains exactly *why* the residual coupling
+plateaus around $10^{-2}$ for $N\ge3$.
+
+**Price.** $L^2$ error of the $H^1$-optimal consequents at $\lambda^\*$, against the
+$L^2$-optimal ($\lambda=0$) fit of the same partition, target $\tanh(x/3)$:
+
+| $c$ | $b$ | $w$ | $\lambda^\*$ | $\ell^\*$ | $L^2$ at $\lambda{=}0$ | $L^2$ at $\lambda^\*$ | cost |
+|---|---|---|---|---|---|---|---|
+| 5 | 1 | 0.050 | 0.015 | 0.12 | 3.2540 | 3.2542 | 0.01% |
+| 5 | 2 | 0.200 | 0.240 | 0.49 | 1.0992 | 1.1036 | 0.40% |
+| 5 | 4 | 0.800 | 3.840 | 1.96 | 0.5191 | 0.5394 | 3.91% |
+| 5 | 6 | 1.800 | 19.44 | 4.41 | 0.1799 | 0.1938 | 7.72% |
+| 5 | 8 | 3.200 | 61.44 | 7.84 | 0.7769 | 0.8204 | 5.60% |
+| 3 | 4 | 1.333 | 10.67 | 3.27 | 0.1101 | 0.1174 | 6.59% |
+
+**This corrects the caveat in the previous revision.** I wrote that buying
+decoupling this way "distorts the very fit the model exists to perform." It
+does not, or not much: the price stays under ~8% across the sweep and under 2%
+for sharp crossovers. The reason is now clear from the closed form —
+$\ell^\*=\sqrt6\,b^2/(4c)$ is **sub-rule-scale** for any sensible partition, and
+weighting slopes at a short correlation length barely perturbs the $L^2$
+solution. $\lambda^\*$ is cheaper than I claimed.
+
+The residual caveat is narrower: $\lambda^\*$ grows like $b^4$, so for heavily
+overlapping rules it becomes large ($137.6$ at $b=10$, $c=5$) and then it *is*
+a real modelling constraint rather than a free choice.
+
+**Robustness.** $\lambda^\*$ is not an artifact of the logistic collapse — it exists
+for unequal widths (3.84 → 3.69 → 3.29 as widths go $4,4\to3,5\to2,7$),
+asymmetric centres (4.74), and Cauchy-$\pi$ membership functions, though for
+Cauchy it is enormous ($\approx1258$) because heavy tails make
+$\int\varphi'\varphi'$ tiny. Only the *closed form* is Gaussian-specific.
 
 ### 4e. Recommendation
 
@@ -588,7 +652,11 @@ sufficiency argument of §3c stays valid.
   orthogonality between overlapping, smooth, covering rules. It is exact only
   when there is one independent condition to satisfy — $N=2$, order 0, which is
   precisely the binary-classifier setting — and reduces coupling ~20× otherwise.
-  $\lambda$ is also the physical slope weight, so this trades fit for decoupling.
+- $\lambda^\*$ has the closed form $3b^4/(8c^2)$, equivalently $\ell^\*=\sqrt6\times$ the
+  rule crossover width. It depends only on the partition, never on the target,
+  so it has no variational reading as a target correlation length. Its $1/c^2$
+  scaling forces adjacent and next-nearest rule pairs to demand values in ratio
+  exactly 4, which is why $N\ge3$ cannot be zeroed. Fit cost is under ~8%.
 - Output-side disjointness makes Mamdani $\vee$ equal $+$ exactly, collapses
   centroid defuzzification to an order-0 TSK model, and gives the $[0,1]$ range
   for free.
@@ -609,9 +677,15 @@ sufficiency argument of §3c stays valid.
   action, giving a single unified continuation method.
 - Empirical validation on the sonar dataset already wired up in
   `AEEM6097/fuzzy-symphony.py`.
-- Whether $\lambda^\*$ (§4d) has a variational reading. It falls out as an
-  algebraic cancellation; it is not obvious whether it corresponds to a
-  distinguished correlation length for the target.
+- ~~Whether $\lambda^\*$ has a variational reading.~~ **Answered in §4d′**, negatively:
+  $\lambda^\*=3b^4/(8c^2)$ in closed form, $\ell^\*=\sqrt6\times$ the rule crossover
+  width, and $y_d$ appears nowhere — it is a property of the partition, not of
+  the target. The same scaling explains the $N\ge3$ obstruction (adjacent and
+  next-nearest pairs demand values in ratio exactly 4) and shows the fit cost is
+  under ~8%, correcting the earlier caveat.
+- Whether $\lambda^\*$ generalizes usefully to the *multi-input* case, where the
+  crossover geometry is a hypersurface rather than a point and $w$ becomes
+  direction-dependent.
 
 ---
 
@@ -620,7 +694,7 @@ sufficiency argument of §3c stays valid.
 ```bash
 uv venv .venv && uv pip install --python .venv/bin/python numpy scipy matplotlib
 cd research/least_action
-../../.venv/bin/python demo_regression.py    # ~8 min, sections A-H
+../../.venv/bin/python demo_regression.py    # ~12 min, sections A-I
 ../../.venv/bin/python demo_classifier.py    # ~15 s, sections H-K
 ```
 

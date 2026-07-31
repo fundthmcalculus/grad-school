@@ -29,6 +29,7 @@ from fis_action import (
     fit,
     galerkin_residual,
     h1_gram,
+    h1_project,
     normalized_weights,
     optimality_certificate,
     reduced_action_and_gradient,
@@ -279,9 +280,74 @@ def main() -> None:
                                options={"xatol": 1e-8})
         print(f"{n_r:>4} {wid[0]:7.2f} {off(1.0):20.3e} {best.x:10.3f} {best.fun:17.3e}")
     print("  N=2 reaches machine zero; N>=3 improves the coupling ~20x but cannot")
-    print("  eliminate it.  Caveat: lambda* grows steeply with overlap (0.24 at width 2")
-    print("  to 138 at width 10), and lambda is also the physical slope weight -- so")
-    print("  buying decoupling this way distorts the fit the model was built to do.")
+    print("  eliminate it.  Section I explains why, and evaluates what lambda* costs.")
+
+    rule("I. Evaluating lambda*: closed form, meaning, and price")
+    wide = np.linspace(-300.0, 300.0, 700001)
+
+    def lam_star(c, b, kind="gaussian"):
+        ph, dph, _ = normalized_weights(wide, np.array([-c, c]), np.full(2, b), kind)
+        return -np.trapezoid(ph[0] * ph[1], wide) / np.trapezoid(dph[0] * dph[1], wide)
+
+    print("  For two equal-width Gaussians at +-c the normalized weights collapse to a")
+    print("  logistic: phi_1 = sigmoid(k x) with k = 4c/b^2, because the log-ratio of two")
+    print("  equal-width Gaussians is linear in x.  Both integrals are then elementary,")
+    print("    INT phi_0 phi_1 dx = 1/k        INT phi_0' phi_1' dx = -k/6")
+    print("  (the second by substituting s = sigmoid(u), giving INT_0^1 s(1-s) ds = 1/6),")
+    print("  so lambda* = 6/k^2 = 3 b^4 / (8 c^2).")
+    print()
+    print(f"{'c':>5} {'b':>5} {'k=4c/b^2':>10} {'INT pp':>10} {'1/k':>10} "
+          f"{'INT dd':>11} {'-k/6':>10} {'lam* num':>10} {'6/k^2':>10}")
+    for c, b in ((5.0, 2.0), (5.0, 4.0), (3.0, 2.0), (8.0, 3.0), (6.0, 2.5)):
+        ph, dph, _ = normalized_weights(wide, np.array([-c, c]), np.full(2, b), "gaussian")
+        pp = np.trapezoid(ph[0] * ph[1], wide)
+        dd = np.trapezoid(dph[0] * dph[1], wide)
+        k = 4 * c / b**2
+        print(f"{c:5.1f} {b:5.1f} {k:10.5f} {pp:10.6f} {1 / k:10.6f} {dd:11.6f} "
+              f"{-k / 6:10.6f} {-pp / dd:10.5f} {6 / k**2:10.5f}")
+    print()
+    print("  MEANING.  w = 1/k = b^2/(4c) is the crossover width of the rule handover.")
+    print("  Then ell* = sqrt(lambda*) = sqrt(6) * w exactly:")
+    for c, b in ((5.0, 2.0), (5.0, 4.0), (3.0, 2.0), (8.0, 3.0)):
+        w_c = b**2 / (4 * c)
+        print(f"    c={c:4.1f} b={b:4.1f}  w={w_c:8.5f}  ell*={np.sqrt(lam_star(c, b)):8.5f}"
+              f"  ratio={np.sqrt(lam_star(c, b)) / w_c:8.5f}  (sqrt 6 = {np.sqrt(6):.5f})")
+    print()
+    print("  So lambda* is fixed entirely by the PARTITION GEOMETRY.  y_d appears nowhere")
+    print("  in it.  It is therefore not a distinguished correlation length of the target")
+    print("  -- it is the correlation length of the rule crossover region.")
+    print()
+    print("  WHY N>=3 CANNOT WORK.  lambda* ~ 1/separation^2, so on a uniform partition")
+    print("  of pitch d, adjacent pairs and next-nearest pairs demand lambda* in ratio")
+    print("  (2d/d)^2 = 4.  One lambda cannot serve both:")
+    for d, b in ((6.0, 3.0), (8.0, 4.0), (10.0, 4.0)):
+        la, ln = lam_star(d / 2, b), lam_star(d, b)
+        print(f"    pitch={d:5.1f} b={b:4.1f}  lam*_adjacent={la:9.5f}  "
+              f"lam*_next={ln:9.5f}  ratio={la / ln:7.4f}")
+    print()
+    print("  PRICE.  L2 error of the H1-optimal consequents at lambda*, against the")
+    print("  L2-optimal (lambda=0) fit of the same partition; target tanh(x/3):")
+    q_t = Quadrature.legendre(X_LO, X_HI, 800)
+    yt = np.tanh(q_t.nodes / 3.0)
+    dyt = (1.0 - np.tanh(q_t.nodes / 3.0) ** 2) / 3.0
+    print(f"{'c':>5} {'b':>5} {'w':>8} {'lambda*':>10} {'ell*':>8} {'L2 @ 0':>9} "
+          f"{'L2 @ lam*':>10} {'cost':>8}")
+    for c, b in ((5.0, 1.0), (5.0, 2.0), (5.0, 4.0), (5.0, 6.0), (5.0, 8.0), (3.0, 4.0)):
+        ls = lam_star(c, b)
+        ps, dps, _ = rule_regressors(q_t.nodes, np.array([-c, c]), np.full(2, b),
+                                     0, "gaussian", X_REF)
+        errs = []
+        for lam_v in (0.0, ls):
+            gm = h1_gram(ps, dps, q_t, lam_v)
+            th = np.linalg.solve(gm + 1e-12 * np.trace(gm) / 2 * np.eye(2),
+                                 h1_project(ps, dps, yt, dyt, q_t, lam_v))
+            errs.append(np.sqrt(q_t.integrate((yt - ps.T @ th) ** 2)))
+        print(f"{c:5.1f} {b:5.1f} {b**2 / (4 * c):8.4f} {ls:10.4f} {np.sqrt(ls):8.4f} "
+              f"{errs[0]:9.4f} {errs[1]:10.4f} {100 * (errs[1] / errs[0] - 1):7.2f}%")
+    print("  The price stays under ~8% across the sweep, and is under 2% for sharp")
+    print("  crossovers.  Reason: ell* = sqrt(6) b^2/(4c) is SUB-RULE-SCALE for any")
+    print("  sensible partition, and weighting slopes at a short correlation length")
+    print("  barely perturbs the L2 solution.  lambda* is cheaper than expected.")
 
 
 if __name__ == "__main__":
