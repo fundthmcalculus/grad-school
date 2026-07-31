@@ -70,6 +70,58 @@ def minimax_transform(D):
     return Dstar
 
 
+def minimax_transform_fast(D):
+    """Fast all-pairs minimax (bottleneck) transform. Numerically identical to
+    ``minimax_transform`` but O(n^2) instead of the O(n^3) reference Prim loop,
+    which makes n >= ~1000 tractable (validated exact-equal on small n).
+
+    Bottleneck(i, j) = the largest edge on the MST path between i and j. Build the
+    MST, then add its edges in ascending weight with union-find: when an edge of
+    weight w first joins components A and B, every cross pair (a in A, b in B) has
+    bottleneck w -- all lighter edges are already internal to A or B, so w is the
+    max on their path. Each pair is filled exactly once -> O(n^2) total fill.
+    """
+    from scipy.sparse.csgraph import minimum_spanning_tree
+    from scipy.sparse import csr_matrix
+
+    D = np.asarray(D, dtype=float)
+    n = D.shape[0]
+    if n < 2:
+        return np.zeros((n, n))
+
+    coo = minimum_spanning_tree(csr_matrix(D)).tocoo()
+    ii, jj, ww = coo.row, coo.col, coo.data
+    order = np.argsort(ww, kind='stable')
+
+    Dstar = np.zeros((n, n))
+    parent = np.arange(n)
+    members = {i: [i] for i in range(n)}
+
+    def find(x):
+        root = x
+        while parent[root] != root:
+            root = parent[root]
+        while parent[x] != root:      # path compression
+            parent[x], x = root, parent[x]
+        return root
+
+    for e in order:
+        a, b, w = int(ii[e]), int(jj[e]), ww[e]
+        ra, rb = find(a), find(b)
+        if ra == rb:
+            continue
+        A = np.fromiter(members[ra], dtype=int)
+        B = np.fromiter(members[rb], dtype=int)
+        Dstar[np.ix_(A, B)] = w
+        Dstar[np.ix_(B, A)] = w
+        if len(members[ra]) < len(members[rb]):   # union by size
+            ra, rb = rb, ra
+        members[ra].extend(members[rb])
+        parent[rb] = ra
+        del members[rb]
+    return Dstar
+
+
 def vat_order(D):
     """
     Return the VAT ordering (Prim MST visitation order) of the objects.
