@@ -61,20 +61,81 @@ class Quadrature:
 
 
 # --------------------------------------------------------------------------
-# Membership functions (value and first derivative)
+# Membership functions
+#
+# Every membership function here has the form mu(x) = F(z), z = (x - a) / b, so
+# a single shape triple (F, F', F'') generates every derivative needed anywhere
+# in this module:
+#
+#     d mu / dx      =  F'(z) / b
+#     d mu / da      = -F'(z) / b
+#     d mu / db      = -z F'(z) / b
+#     d2 mu / dx da  = -F''(z) / b^2
+#     d2 mu / dx db  = -(F'(z) + z F''(z)) / b^2
+#
+# Adding a membership function therefore means supplying three scalar functions
+# of z and nothing else -- in particular no hand-differentiated parameter
+# gradients, which is where sign errors would otherwise breed.
 # --------------------------------------------------------------------------
+def _shape_gaussian(z: af64) -> tuple[af64, af64, af64]:
+    e = np.exp(-(z**2))
+    return e, -2.0 * z * e, (4.0 * z**2 - 2.0) * e
+
+
+def _shape_cauchy(z: af64) -> tuple[af64, af64, af64]:
+    d = 1.0 + z**2
+    return 1.0 / d, -2.0 * z / d**2, (6.0 * z**2 - 2.0) / d**3
+
+
+def _shape_bump(z: af64) -> tuple[af64, af64, af64]:
+    inside = np.abs(z) < 1.0
+    zc = np.where(inside, z, 0.0)
+    # Floor u away from zero: F = exp(-1/u) underflows to zero long before the
+    # 1/u^4 factors overflow, but without a floor u -> 0 produces inf * 0 = nan.
+    u = np.maximum(1.0 - zc**2, 1e-8)
+    fv = np.where(inside, np.exp(-1.0 / u), 0.0)
+    fp = fv * (-2.0 * zc / u**2)
+    fpp = fv * (4.0 * zc**2 / u**4 - 2.0 / u**2 - 8.0 * zc**2 / u**3)
+    return fv, np.where(inside, fp, 0.0), np.where(inside, fpp, 0.0)
+
+
+MF_SHAPES: dict[str, Callable[[af64], tuple[af64, af64, af64]]] = {
+    "gaussian": _shape_gaussian,
+    "cauchy": _shape_cauchy,
+    "bump": _shape_bump,
+}
+
+
+def mf_eval(x: af64, a: f64, b: f64, kind: MFKind) -> tuple[af64, af64]:
+    """(mu, d mu / dx)."""
+    fv, fp, _ = MF_SHAPES[kind]((x - a) / b)
+    return fv, fp / b
+
+
+def mf_param_derivatives(
+    x: af64, a: f64, b: f64, kind: MFKind
+) -> tuple[af64, af64, af64, af64, af64, af64]:
+    """(mu, dmu/dx, dmu/da, dmu/db, d2mu/dxda, d2mu/dxdb)."""
+    z = (x - a) / b
+    fv, fp, fpp = MF_SHAPES[kind](z)
+    return (
+        fv,
+        fp / b,
+        -fp / b,
+        -z * fp / b,
+        -fpp / b**2,
+        -(fp + z * fpp) / b**2,
+    )
+
+
 def mf_gaussian(x: af64, a: f64, b: f64) -> tuple[af64, af64]:
     """exp(-((x-a)/b)^2). C^infinity, strictly positive: never exactly disjoint."""
-    z = (x - a) / b
-    v = np.exp(-(z**2))
-    return v, v * (-2.0 * z / b)
+    return mf_eval(x, a, b, "gaussian")
 
 
 def mf_cauchy(x: af64, a: f64, b: f64) -> tuple[af64, af64]:
     """Yen & Langari pi-shaped MF 1/(1+((x-a)/b)^2): mu(a)=1, mu(a +- b)=0.5."""
-    z = (x - a) / b
-    d = 1.0 + z**2
-    return 1.0 / d, -2.0 * z / (b * d**2)
+    return mf_eval(x, a, b, "cauchy")
 
 
 def mf_bump(x: af64, a: f64, b: f64) -> tuple[af64, af64]:
@@ -83,13 +144,7 @@ def mf_bump(x: af64, a: f64, b: f64) -> tuple[af64, af64]:
     The only kind here that can be made *exactly* disjoint while staying
     differentiable, which is what the orthogonality argument needs.
     """
-    z = (x - a) / b
-    inside = np.abs(z) < 1.0
-    zc = np.where(inside, z, 0.0)
-    denom = 1.0 - zc**2
-    v = np.where(inside, np.exp(-1.0 / denom), 0.0)
-    dv = np.where(inside, v * (-2.0 * zc / (denom**2)) / b, 0.0)
-    return v, dv
+    return mf_eval(x, a, b, "bump")
 
 
 MF_TABLE: dict[str, Callable[[af64, f64, f64], tuple[af64, af64]]] = {
@@ -160,6 +215,73 @@ def rule_regressors(
             psi[i * (order + 1) + k] = phi[i] * tk
             dpsi[i * (order + 1) + k] = dphi[i] * tk + phi[i] * dtk
     return psi, dpsi, s
+
+
+def regressor_jacobian(
+    x: af64,
+    centers: af64,
+    widths: af64,
+    order: int = 1,
+    kind: MFKind = "gaussian",
+    x_ref: tuple[float, float] | None = None,
+) -> tuple[af64, af64]:
+    """d psi / d p and d psi' / d p for every antecedent parameter p.
+
+    Returns (jac, djac) each of shape (2N, N*(order+1), len(x)), with the
+    parameter axis ordered [a_0..a_{N-1}, b_0..b_{N-1}] to match `fit`.
+
+    The chain is: for a parameter p belonging to rule j, write g = d mu_j / dp
+    and h = d2 mu_j / dx dp.  Then with Sigma = sum_k mu_k,
+
+        d phi_i / dp  = g (delta_ij - phi_i) / Sigma
+        d phi_i'/ dp  = d/dx of the above
+                      = [h (delta_ij - phi_i) - g phi_i'] / Sigma
+                        - g (delta_ij - phi_i) Sigma' / Sigma^2
+
+    using the fact that x and p are independent, so the x- and p-derivatives
+    commute.  The regressor derivatives then follow from psi_ik = phi_i t^k.
+    """
+    if x_ref is None:
+        lo, hi = float(np.min(x)), float(np.max(x))
+        x_ref = (0.5 * (lo + hi), max(0.5 * (hi - lo), 1e-12))
+    mid, half = x_ref
+    t = (x - mid) / half
+    n = len(centers)
+    w = order + 1
+
+    mu = np.empty((n, x.size))
+    dmu = np.empty((n, x.size))
+    g_a = np.empty((n, x.size))
+    g_b = np.empty((n, x.size))
+    h_a = np.empty((n, x.size))
+    h_b = np.empty((n, x.size))
+    for i in range(n):
+        mu[i], dmu[i], g_a[i], g_b[i], h_a[i], h_b[i] = mf_param_derivatives(
+            x, f64(centers[i]), f64(widths[i]), kind
+        )
+    sigma = np.maximum(mu.sum(axis=0), 1e-12)
+    dsigma = dmu.sum(axis=0)
+    phi = mu / sigma
+    dphi = (dmu * sigma - mu * dsigma) / sigma**2
+
+    jac = np.zeros((2 * n, n * w, x.size))
+    djac = np.zeros((2 * n, n * w, x.size))
+    for slot, (g_all, h_all) in enumerate(((g_a, h_a), (g_b, h_b))):
+        for j in range(n):
+            g, h = g_all[j], h_all[j]
+            p_idx = slot * n + j
+            for i in range(n):
+                delta = 1.0 if i == j else 0.0
+                dphi_i = g * (delta - phi[i]) / sigma
+                ddphi_i = (h * (delta - phi[i]) - g * dphi[i]) / sigma - (
+                    g * (delta - phi[i]) * dsigma / sigma**2
+                )
+                for k in range(w):
+                    tk = t**k
+                    dtk = (k * t ** (k - 1) / half) if k > 0 else np.zeros_like(t)
+                    jac[p_idx, i * w + k] = dphi_i * tk
+                    djac[p_idx, i * w + k] = ddphi_i * tk + dphi_i * dtk
+    return jac, djac
 
 
 # --------------------------------------------------------------------------
@@ -280,6 +402,71 @@ def solve_consequents(
     return theta, float(yy - rhs @ theta), gram
 
 
+def reduced_action_and_gradient(
+    centers: af64,
+    widths: af64,
+    yd: af64,
+    dyd: af64,
+    quad: Quadrature,
+    lam: float,
+    order: int = 1,
+    kind: MFKind = "gaussian",
+    x_ref: tuple[float, float] | None = None,
+    ridge: float = 1e-9,
+) -> tuple[af64, float, af64]:
+    """Reduced action and its exact gradient w.r.t. (centers, widths).
+
+    Returns (theta, action, grad) with grad ordered [a_0..a_{N-1}, b_0..b_{N-1}].
+
+    Derivation.  With M = G + eps I, theta = M^{-1} r and S = <y_d,y_d> - r^T theta,
+
+        dS = -2 (dr)^T theta + theta^T (dM) theta.
+
+    Writing a = (d Psi / dp)^T theta -- which is exactly d y_c / dp holding the
+    consequents fixed -- the first term is -2 <y_d, a> and the second contributes
+    2 <a, y_c>, so they fuse into
+
+        dS/dp = -2 <e, d y_c / dp>_H1 ,   e = y_d - y_c.
+
+    This is the envelope theorem: because theta is already optimal, its implicit
+    dependence on p contributes nothing.  It is also the same H1 pairing that
+    expresses stationarity in `galerkin_residual` -- there against the regressors
+    themselves (where it vanishes by construction), here against the directions
+    the antecedents can move the model.  The trailing term is the derivative of
+    the trace-scaled ridge, which is tiny but included so the gradient is exact
+    for the objective actually being minimized rather than for an idealized one.
+    """
+    if x_ref is None:
+        x_ref = (0.5 * (quad.lo + quad.hi), 0.5 * (quad.hi - quad.lo))
+    psi, dpsi, _ = rule_regressors(quad.nodes, centers, widths, order, kind, x_ref)
+    gram = h1_gram(psi, dpsi, quad, lam)
+    rhs = h1_project(psi, dpsi, yd, dyd, quad, lam)
+    m = gram.shape[0]
+    scale = float(np.trace(gram)) / max(m, 1)
+    theta = np.linalg.solve(gram + ridge * scale * np.eye(m), rhs)
+    yy = quad.integrate(yd**2) + lam * quad.integrate(dyd**2)
+    action = float(yy - rhs @ theta)
+
+    jac, djac = regressor_jacobian(quad.nodes, centers, widths, order, kind, x_ref)
+    yc = psi.T @ theta
+    dyc = dpsi.T @ theta
+    e = yd - yc
+    de = dyd - dyc
+
+    # a[p] = d y_c / d p at fixed consequents; ad[p] its x-derivative.
+    a = np.einsum("pmq,m->pq", jac, theta)
+    ad = np.einsum("pmq,m->pq", djac, theta)
+    grad = -2.0 * (a @ (quad.weights * e) + lam * (ad @ (quad.weights * de)))
+
+    # d/dp of the trace-scaled ridge: eps = ridge * tr(G) / m.
+    tr_dg = 2.0 * (
+        np.einsum("pmq,mq,q->p", jac, psi, quad.weights)
+        + lam * np.einsum("pmq,mq,q->p", djac, dpsi, quad.weights)
+    )
+    grad += (ridge / m) * tr_dg * float(theta @ theta)
+    return theta, action, grad
+
+
 def fit(
     yd_fn: Callable[[af64], af64],
     dyd_fn: Callable[[af64], af64],
@@ -343,28 +530,18 @@ def fit(
             a_mat[i, i + 1] = 1.0
         constraints = [LinearConstraint(a_mat, lb=min_gap, ub=np.inf)]
 
-    # Finite-difference step for the outer search.  The reduced action is only
-    # accurate to ~cond(G) * eps_machine, so scipy's default step (~1e-8 * |x|)
-    # produces a gradient that is pure round-off -- L-BFGS-B then terminates
-    # after zero iterations, silently.  The step has to sit well above that
-    # noise, which for this objective means ~1e-4 of the input span.
-    fd_step = 1e-4 * span
-
     def objective_grad(z: af64) -> af64:
-        """Central-difference gradient at a calibrated step.
+        """Exact gradient of the reduced action (envelope theorem, see
+        `reduced_action_and_gradient`).
 
-        Supplied explicitly because both stock options fail here: scipy's default
-        step is round-off dominated (L-BFGS-B then exits after zero iterations),
-        and the forward differences it falls back on are too inaccurate to make
-        progress even at a hand-set step.  Central differences at ~1e-4 of the
-        span sit in the flat region between round-off and truncation error.
+        Supplying this explicitly is not optional.  SciPy's default
+        finite-difference step is round-off dominated for this objective, so
+        L-BFGS-B exits after zero iterations reporting success, and SLSQP
+        returns points worse than it was handed, also reporting success.
         """
-        g = np.empty_like(z)
-        for i in range(len(z)):
-            e = np.zeros_like(z)
-            e[i] = fd_step
-            g[i] = (objective(z + e) - objective(z - e)) / (2 * fd_step)
-        return g
+        return reduced_action_and_gradient(
+            z[:n_rules], z[n_rules:], yd, dyd, quad, lam, order, kind, x_ref
+        )[2]
 
     usable = max(span - min_gap * (n_rules - 1), 0.0)
     z0 = np.concatenate(
@@ -600,18 +777,9 @@ def optimality_certificate(
     # construction, so it says nothing about (a_i, b_i).  Without this the
     # Hessian test is meaningless: curvature is only informative at a
     # stationary point.
-    # The gradient wants a much smaller step than the Hessian: central-difference
-    # truncation error grows like h^2 for the gradient but the second-order
-    # mixed difference needs a large h to stay above round-off.  One shared step
-    # cannot serve both.
-    g_step = 1e-4 * (quad.hi - quad.lo)
-    reduced_grad = np.array(
-        [
-            (reduced(p0 + np.eye(n)[i] * g_step) - reduced(p0 - np.eye(n)[i] * g_step))
-            / (2 * g_step)
-            for i in range(n)
-        ]
-    )
+    reduced_grad = reduced_action_and_gradient(
+        f.centers, f.widths, yd, dyd, quad, f.lam, f.order, f.kind, f.x_ref
+    )[2]
     hess = np.empty((n, n))
     for i in range(n):
         for j in range(i, n):

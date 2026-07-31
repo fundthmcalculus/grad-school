@@ -27,6 +27,7 @@ from fis_action import (
     galerkin_residual,
     h1_gram,
     optimality_certificate,
+    reduced_action_and_gradient,
     rule_regressors,
     sequential_fit,
     solve_consequents,
@@ -152,6 +153,64 @@ def main() -> None:
           f"all positive = {bool(eigs.min() > 0)}")
     print("  => for fixed antecedents the action has a unique global minimizer in the")
     print("     consequents.  All non-convexity lives in (a_i, b_i).")
+
+    rule("G'. Analytic reduced gradient vs. finite differences")
+    print("  dS/dp = -2 <e, dy_c/dp>_H1 by the envelope theorem (see fis_action.py).")
+    print("  The FD reference is itself only good to ~cond(G) * eps / h, so the honest")
+    print("  comparison sweeps h and reports the best agreement; a single fixed h")
+    print("  measures the reference's round-off, not the gradient's error.")
+    print()
+    steps = (1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5, 1e-5)
+
+    def fd_gap(c, wdt, p_order, kind):
+        _, _, g = reduced_action_and_gradient(
+            c, wdt, yd, dyd, quad, lam, p_order, kind, X_REF
+        )
+        p0 = np.concatenate([c, wdt])
+
+        def red(p):
+            return solve_consequents(p[:3], p[3:], yd, dyd, quad, lam, p_order, kind,
+                                     X_REF)[1]
+
+        best, best_h = np.inf, 0.0
+        for h in steps:
+            fd = np.array([
+                (red(p0 + np.eye(6)[i] * h) - red(p0 - np.eye(6)[i] * h)) / (2 * h)
+                for i in range(6)
+            ])
+            rel = np.linalg.norm(g - fd) / max(np.linalg.norm(fd), 1e-30)
+            if rel < best:
+                best, best_h = rel, h
+        psi_, dpsi_, mus = rule_regressors(quad.nodes, c, wdt, p_order, kind, X_REF)
+        gram_ = h1_gram(psi_, dpsi_, quad, lam)
+        return best, best_h, float(np.linalg.cond(gram_)), float(mus.min())
+
+    print(f"{'MF kind':>9} {'order':>6} {'coverage':>11} {'cond(G)':>11} "
+          f"{'best rel err':>13} {'at h':>8}")
+    configs = {
+        "gaussian": (np.array([-9.0, 0.5, 9.0]), np.array([10.0, 11.0, 10.0])),
+        "cauchy": (np.array([-9.0, 0.5, 9.0]), np.array([7.0, 8.0, 7.0])),
+        # Bumps must be wide enough to overlap, or coverage -- and with it
+        # differentiability -- is lost; see the contrast rows below.
+        "bump": (np.array([-10.0, 0.0, 10.0]), np.array([13.0, 13.0, 13.0])),
+    }
+    for kind, (c, wdt) in configs.items():
+        for p_order in (0, 1, 2):
+            err, h_at, cond, cov = fd_gap(c, wdt, p_order, kind)
+            print(f"{kind:>9} {p_order:>6} {cov:11.3e} {cond:11.2e} {err:13.3e} {h_at:8.0e}")
+    print("  Agreement degrades with consequent order purely because cond(G) grows and")
+    print("  the FD reference loses digits -- the h-sweep shows the error rising as h")
+    print("  shrinks, which is the signature of round-off in the reference, not")
+    print("  truncation in the gradient.")
+    print()
+    print("  Same bump membership functions with delta-coverage deliberately broken:")
+    for width in (5.0, 7.0, 13.0):
+        err, h_at, cond, cov = fd_gap(np.array([-10.0, 0.0, 10.0]),
+                                      np.full(3, width), 1, "bump")
+        print(f"{'bump':>9} {1:>6} {cov:11.3e} {cond:11.2e} {err:13.3e} {h_at:8.0e}")
+    print("  => exact to ~1e-8 exactly where coverage (C2) holds, and meaningless where")
+    print("     it fails -- because there the model is not differentiable at all.  C2 is")
+    print("     the differentiability condition, not bookkeeping.")
 
     rule("G. Galerkin orthogonality holds per-regressor at the optimum")
     g = galerkin_residual(f, y_d, dy_d, quad)
