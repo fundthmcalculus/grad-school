@@ -4,19 +4,27 @@
 
 The first step in the pipeline is to look at the data before modeling it, and to do that at the scale the data actually arrives in. I introduced VAT in Chapter 2 as the tool I use for this: it takes a dissimilarity matrix, reorders it so that similar points sit together, and shows me the cluster structure as dark blocks along the diagonal. It is exactly the right tool, with one problem — in its textbook form it is far too slow and far too memory-hungry to run on the datasets I care about. A 58,000-point matrix is already out of reach for the classical algorithm, and I want to go well past that.
 
-This chapter presents pVAT, an accelerated VAT and iVAT engine, and the collection of implementation ideas that make it work. The contributions are: an $O(N^2 \log N)$ reordering that replaces the classical cubic inner loop; an in-place memory scheme that holds the whole computation in a single matrix; a GPU implementation of the underlying minimum spanning tree that is bit-identical to the serial result; a divide-and-conquer scheme that splits a large problem and stitches the pieces back together at bounded cost; and, importantly, correctness on an *arbitrary* dissimilarity matrix, including non-metric ones. Together these move the feasible problem size from a few thousand points to well over a hundred thousand. A secondary result, which fell out of the same machinery, is that the VAT ordering makes a good hot-start for the Traveling Salesman Problem; I treat that briefly at the end.
+This chapter presents pVAT, an accelerated VAT and iVAT engine, and the collection of implementation ideas that make it work. The contributions are: an $O(N^2 \log N)$ reordering that replaces the classical cubic inner loop (with a caveat about the strongest baseline that I take up in §3.3.1); an in-place memory scheme that holds the whole computation in a single matrix; a GPU implementation of the underlying minimum spanning tree that is bit-identical to the serial result; a divide-and-conquer scheme that splits a large problem and stitches the pieces back together at bounded cost; and, importantly, correctness on an *arbitrary* dissimilarity matrix, including non-metric ones. Together these move the feasible problem size from a few thousand points to well over a hundred thousand. A secondary result, which fell out of the same machinery, is that the VAT ordering makes a good hot-start for the Traveling Salesman Problem; I treat that briefly at the end.
 
 ## 3.2 Background and Prior Art
 
 Recall the one fact that everything here rests on: the VAT ordering depends only on the minimum spanning tree of the points. VAT grows an MST with a modified Prim's algorithm, and the reordering is just the order in which points are added. Any method that builds the same MST — serial Prim, parallel Borůvka, or a GPU kernel — produces the same ordering, bit for bit. So "make VAT fast" is really "make the MST fast," and I am free to choose whichever MST construction suits the hardware.
 
-There is already work on fast VAT, and I want to place pVAT against it plainly, because these are the comparisons a reviewer asks for first. **clusiVAT** [Kumar et al. 2013] samples the data and is therefore approximate — it is fast, but it is not the exact VAT ordering. **eVAT** [Meng and Yuan 2018] is an exact GPU VAT, so I cannot claim to be the first to put VAT on a GPU, and I do not. The kd-tree memory methods [Information Sciences 2024] cut memory below quadratic, but they require Euclidean coordinates and cannot run on a precomputed dissimilarity matrix at all. The regime none of them occupy is the one I target: *exact* VAT and iVAT, on a *large, arbitrary, possibly non-metric* dissimilarity matrix, computed with modest memory on ordinary hardware. That is not a corner case — sequence data under dynamic time warping, strings under edit distance, and graphs under a kernel dissimilarity all land there, and none of them have coordinates.
+There is already work on fast VAT, and I want to place pVAT against it plainly, because these are the comparisons a reviewer asks for first. **clusiVAT** [Kumar et al. 2016] samples the data and is therefore approximate — it is fast, but it is not the exact VAT ordering. The **parallel edge-based GPU VAT** of Meng and Yuan (2018), sometimes called eVAT, already puts an exact VAT on a GPU, so I cannot claim to be the first to do that, and I do not. **Fast-VAT** [Avinash and Lachheb 2025] is concurrent CPU work in the same spirit, accelerating VAT with compiled kernels and reporting speedups of up to 50×; it addresses VAT only, not iVAT, and it appeared alongside this work rather than before it. The kd-tree memory methods [*Information Sciences* 2024] cut memory below quadratic, but they require Euclidean coordinates and cannot run on a precomputed dissimilarity matrix at all.
+
+The regime none of them occupy is the one I target: *exact* VAT **and iVAT**, on a *large, arbitrary, possibly non-metric* dissimilarity matrix, computed with modest memory on ordinary hardware. That is not a corner case — sequence data under dynamic time warping, strings under edit distance, and graphs under a kernel dissimilarity all land there, and none of them have coordinates. I should be candid that the argument for this niche is currently structural rather than empirical: I can show that the competing methods cannot run in this regime, and that mine does, but §3.4 reports that on synthetic non-metric matrices rather than on genuinely coordinate-free data. Closing that is Goal G2.
 
 ## 3.3 Methodology
 
 ### 3.3.1 The reorder, and a note on the name
 
-The classical VAT reorder is slow for a mundane reason. At each step it needs the smallest remaining dissimilarity, and the usual implementation finds it by scanning the remainder of the current column — an $O(N)$ linear search, repeated $N$ times across $N$ columns, which is where the cubic behavior comes from. Replacing that linear scan with a priority queue turns each extraction into an $O(\log N)$ operation, and the whole reorder into $O(N^2 \log N)$. This is the single change that lets the method scale, and it is worth being precise about what it buys: the win is in the argmin, not in some new MST theory, and against a maximally tuned dense-Prim implementation the asymptotic gap is smaller than the raw numbers suggest. The measured speedups below are real regardless, and they come from the priority queue plus the memory scheme in the next section.
+The classical VAT reorder is slow for a mundane reason. At each step it needs the smallest remaining dissimilarity, and the usual implementation finds it by re-scanning, for every unchosen point, its distance to every point already in the tree — an $O(N)$ search per candidate, repeated across $N$ candidates and $N$ steps, which is where the cubic behavior comes from. Replacing that with a priority queue makes each extraction $O(\log N)$ and the whole reorder $O(N^2 \log N)$.
+
+I need to be careful here, because there is an objection that anyone who knows minimum-spanning-tree algorithms will raise immediately, and it is correct. **A properly implemented dense Prim is $O(N^2)$, which is asymptotically better than my $O(N^2 \log N)$.** The standard trick — maintain an array of each unchosen point's current best distance to the tree, and update it in $O(N)$ after each insertion — removes the cubic factor without any heap at all, and it does so with a smaller exponent than the priority-queue version. So I want to state plainly what pVAT is and is not faster than.
+
+What pVAT is faster than is the VAT implementations that actually exist. The cubic re-scan is not a strawman I built; it is what the reference implementations in this literature do, and it is the thing that makes VAT unusable past a few thousand points. Against that, the improvement is a factor of roughly $N/\log_2 N$, and the measured numbers below bear it out.
+
+What pVAT is *not* is asymptotically faster than a competently written dense Prim. Against that baseline the advantage is not in the exponent, and I should not claim it is. Where the heap earns its place is elsewhere: because it never needs a materialized distance array, it composes with the on-demand distance computation of §3.3.2, which is what actually lifts the feasible problem size. That memory property, not the asymptotic one, is the real contribution of this section — and it is why the honest headline for this chapter is the problem sizes it makes reachable rather than the raw speedup ratio. Adding a tuned dense-Prim arm to the benchmark, so the comparison is against the strongest baseline rather than the common one, is an experiment I owe.
 
 A word on the name, because it is a small story I am fond of. I originally called this *mergeVAT*, after a separate idea I was chasing at the time — an attempt to structure the reordering as something like a two-dimensional merge sort. That idea did not pan out, but the name stuck to the code. Dr. Vladik Kreinovich pointed out that what the working method actually does is far closer to a heap sort than a merge sort: it is a priority-queue algorithm. He is right, and so I have renamed it **pVAT**, for priority-queue VAT. The rename is a deliberate nod to his observation, and it has the side benefit of describing the method honestly — the priority queue on the CPU, and the Borůvka construction I use on parallel hardware, are the two things the name should point at.
 
@@ -53,16 +61,22 @@ One more result came out of this, and I include it because it is a neat conseque
 >
 > **TODO — repeatable performance (board-wide standard):** the numbers in this section are single-machine, some taken on a thermally throttled laptop. Before any of them are cited as scalability *or* stability results they must be reproduced under a fixed protocol — pinned clocks/thermals, multiple seeds, reported error bars, and a datacenter GPU with full-rate FP64. This same standard applies to every performance/scaling claim in the dissertation (Ch 5, Ch 6). Tracked as Goal G4 in Chapter 7.
 
-**Scaling.** The reorder speedup is the headline. On a 4,096-point problem the classical method takes 124 seconds and pVAT takes 2.56 seconds — a measured factor of about 48. The advantage grows with $N$, because the two methods differ by a factor of roughly $N/\log N$: at 135,000 points that ratio is on the order of eight thousand, which is the difference between "run it over lunch" and "run it interactively." I want to be careful to distinguish those two statements. The 48× at 4,096 points is measured against a running classical implementation; the eight-thousand-fold figure at 135,000 points is an *asymptotic projection*, because the classical method cannot be run at that size on this hardware to be timed against. The practical claim that does not depend on the projection is the one that matters: the feasible problem size moves from about 5,000 points to over 130,000, and the NASA shuttle set — 58,000 points — orders in about a minute, which is where the paper title comes from.
+**Scaling.** On a 4,096-point problem the classical cubic implementation takes 124 seconds and pVAT takes 2.56 seconds — a measured factor of about 48. The advantage grows with $N$, since the two differ by a factor of roughly $N/\log_2 N$; at $N = 135{,}000$ that ratio is about $135{,}000 / 17 \approx 8{,}000$, which is the difference between running the analysis over lunch and running it interactively.
+
+Two cautions about that pair of numbers, both of which I would rather raise than have raised for me. First, the 48× is a measurement and the 8,000× is not: it is an *asymptotic projection*, because the classical method cannot be run at 135,000 points on this hardware to be timed against, and a projection carries the assumption that constant factors stay put. Second, as §3.3.1 explained, both figures are against the cubic implementations that exist in this literature, not against a tuned $O(N^2)$ dense Prim, which would narrow the gap considerably.
+
+So the claim I actually want to rest on is neither ratio. It is that the feasible problem size moves from roughly 5,000 points to over 130,000 on ordinary hardware — the NASA shuttle set at 58,000 points orders in about a minute, which is where the paper's title comes from — and that this comes from the memory scheme as much as from the reorder. A speedup ratio is a claim about a baseline; a feasible problem size is a claim about what you can actually study.
 
 **Table 3.1 — Reorder time, classical VAT vs. pVAT.** Measured rows are marked; the largest sizes are pVAT-only because the classical method is infeasible there, and the speedup at those sizes is an asymptotic projection rather than a measurement.
 
-| N (points) | classical VAT | pVAT | speedup | basis |
+| N (points) | classical VAT (cubic) | pVAT | speedup | basis |
 |---:|---:|---:|---:|---|
-| 4,096 | 124 s | 2.56 s | ~48× | measured |
-| 58,000 | infeasible on this hardware | ~60 s | — | pVAT measured |
-| 135,000 | infeasible | *(runs)* | ~8,000× | projection from $N/\log N$ |
-| intermediate grid | *pending* | *pending* | *pending* | to be filled by the harness |
+| 4,096 | 124 s | 2.56 s | ~48× | **measured** |
+| 58,000 | infeasible on this hardware | ~60 s | — | pVAT **measured** |
+| 135,000 | infeasible | *(runs)* | ~8,000× | *projection* from $N/\log_2 N$ |
+| tuned dense Prim, $O(N^2)$ | — | — | *pending* | the strongest baseline; owed |
+
+The intermediate grid of $N$ is swept by the harness rather than tabulated here. The last row is the comparison that matters most and does not yet exist: every speedup above is against the cubic implementation, so a tuned $O(N^2)$ dense-Prim arm is required before any of these ratios is quoted as the method's advantage over the state of the practice.
 
 **Memory.** The in-place scheme changes what is possible rather than merely what is fast.
 
@@ -74,11 +88,23 @@ One more result came out of this, and I include it because it is a neat conseque
 | Largest feasible N at 64 GB | ≈ 52,000 | **≈ 89,000** |
 | Permutation buffers | 2 | **1** |
 
-**GPU.** On-device Borůvka MST is ≈5× serial Prim at 32,000 points and growing; the full on-device VAT front end is ≈4.8–6.6× end to end; GPU Fuzzy C-Means is 30–56× across 50,000–500,000 points at >99% label agreement. Pairwise distances win (1.3–2.5×) only at high dimension in float32, and lose below 1× at low dimension or in float64.
+**GPU.** The device results are mixed in an instructive way, and the losses are as informative as the wins.
+
+**Table 3.3 — GPU speedups over the 32-core CPU** (laptop RTX 4080, 12 GB — consumer double precision at a fraction of single-precision throughput).
+
+| Kernel | Speedup | Conditions | Exactness |
+|---|---:|---|---|
+| Borůvka MST (device-resident) | ≈ 5× at N = 32,000, growing with N | any | VAT order match 1.0 |
+| Full VAT front end (device-resident) | ≈ 4.8–6.6× end to end | any | bit-identical |
+| Fuzzy C-Means | **30–56×** at N = 50,000–500,000 | any | same fixed point, > 99% label agreement |
+| Pairwise distances | 1.3–2.5× | **only** high dimension + float32 | exact |
+| Pairwise distances | **< 1× (loses)** | low dimension or float64 | exact |
+
+The pairwise-distance row is the one worth dwelling on. On this hardware the GPU is slower than the CPU for low-dimensional or double-precision distance computation, because a consumer card's double-precision throughput is a small fraction of its single-precision throughput. That is a property of the card and not of the algorithm, which is exactly why the repeatability protocol calls for a datacenter GPU: on a card with full-rate FP64 this row would likely flip, and I would rather flag that as an untested prediction than quietly present laptop numbers as the method's ceiling.
 
 **Clustering quality.** Because pVAT is exact single-linkage, it inherits single-linkage's strengths and weaknesses honestly. On non-convex data where k-means fails — two moons, concentric circles — pVAT and the stitched version both reach an adjusted Rand index of 1.00, against 0.27 and 0.00 for k-means. On bridged or touching-anisotropic clusters, where a single chain of points connects two real groups, pVAT scores 0.00, exactly as single-linkage does; I do not paper over this, and it is precisely the failure mode that Chapter 5's metric-learning and persistence work is meant to repair.
 
-**Table 3.3 — Adversarial clustering quality (adjusted Rand index).** pVAT is exact single-linkage, so it wins where k-means fails and inherits single-linkage's failures honestly.
+**Table 3.4 — Adversarial clustering quality (adjusted Rand index).** pVAT is exact single-linkage, so it wins where k-means fails and inherits single-linkage's failures honestly.
 
 | Dataset | k-means | single-linkage | exact pVAT | naive block | principled stitch |
 |---|---:|---:|---:|---:|---:|
@@ -89,7 +115,7 @@ One more result came out of this, and I include it because it is a neat conseque
 
 **The stitch.** Ablating the divide-and-conquer stitch on two moons across a grid of partitions and sizes: the light stitch (random representatives, one cross-edge) averages ARI 0.51; farthest-point representatives alone or top cross-edges alone are similar or worse; the principled combination of both reaches a mean ARI of 1.00 across every partition tested, at bounded cost. Both ingredients are required together.
 
-**Table 3.4 — Stitch ablation on two moons, over a grid of partitions and sizes.**
+**Table 3.5 — Stitch ablation on two moons, over a grid of partitions and sizes.**
 
 | Stitch variant | mean ARI | min ARI | fraction ≥ 0.9 |
 |---|---:|---:|---:|
@@ -98,7 +124,21 @@ One more result came out of this, and I include it because it is a neat conseque
 | farthest-point reps only | 0.39 | 0.00 | 0.32 |
 | **principled (fps + top-m = 8)** | **1.00** | **1.00** | **1.00** |
 
-**Non-metric robustness.** This is the point of the whole exercise, so I test it directly. On a fractional Minkowski dissimilarity with $p = 0.5$ — which violates the triangle inequality about 14% of the time — and on cosine and on a k-nearest-neighbor geodesic dissimilarity, the stitched pVAT agrees with exact VAT to within a rounding error (agreement 1.0). The method does not quietly assume a metric, which is what lets it run on the data that has no coordinates.
+**Non-metric robustness.** This is the point of the whole exercise, so I test it directly rather than asserting it.
+
+**Table 3.6 — Agreement with exact single-linkage under non-metric dissimilarities.** Agreement is the fraction of the ordering reproduced identically; 1.0 means the divide-and-conquer result is indistinguishable from running exact VAT on the whole matrix.
+
+| Dissimilarity | Metric? | Triangle-inequality violations | Agreement with exact |
+|---|:--:|---:|---:|
+| Euclidean (control) | yes | 0% | 1.0 |
+| Fractional Minkowski, $p = 0.5$ | **no** | ≈ 14% of triples | **1.0** |
+| Cosine | no (not a metric) | — | **1.0** |
+| $k$-nearest-neighbour geodesic | no | — | **1.0** |
+| Real non-coordinate domains (DTW, edit distance, graph kernel) | no | — | *pending* |
+
+The fractional-Minkowski row is the sharp test: it violates the triangle inequality on roughly one triple in seven, and the method still reproduces exact single-linkage. That is the evidence that pVAT does not quietly assume a metric somewhere in its internals, which is the precondition for the regime I claimed in §3.2.
+
+The last row is the honest gap, and it is the one that matters most for the claim. Every dissimilarity above is a synthetic non-metric constructed from coordinate data — I made the matrix non-metric on purpose. What I have not yet done is run the method on data that has *no coordinates in the first place*: time series under dynamic time warping, strings under edit distance, graphs under a kernel. Those are the domains the niche argument is built on, and until the method is demonstrated there, §3.2's regime claim rests on a proxy. This is Goal G2 in Chapter 7 and it is shared with Chapter 5.
 
 ## 3.5 Discussion and Contributions
 
@@ -108,4 +148,4 @@ There is work left before this is airtight as a journal result, and I would rath
 
 ---
 
-*Draft — Chapter 3 prose, in the author's voice. Citations in bracketed shorthand pending the consolidated `references.bib`. One figure and two table placeholders marked inline. Source outline in `../chapters/03-scalable-structure-discovery-pvat.md`.*
+*Draft — Chapter 3 prose, in the author's voice. Citations in bracketed shorthand pending the consolidated `references.bib`. Six tables (3.1–3.6) and one figure placeholder inline. Source outline in `../chapters/03-scalable-structure-discovery-pvat.md`; open items in `../ACTION_ITEMS.md`.*
