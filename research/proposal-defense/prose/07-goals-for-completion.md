@@ -8,7 +8,7 @@ The single most important deliverable is the end-to-end pipeline running as one 
 
 ## 7.2 Proposed studies
 
-I organize the remaining work as six goals.
+I organize the remaining work as seven goals.
 
 **G1 — Direct one-pass membership generation.** Collapse Chapter 5's two-stage select-then-fit pipeline into a single pass, in which each block emits its native membership function, the disjunction recombines them, and the surviving envelope is the model. The research-interesting piece is a soft, kernel-weighted band membership, which I expect to fix the small-sample over-segmentation. This is the differentiator, and it feeds the capstone.
 
@@ -18,9 +18,11 @@ I organize the remaining work as six goals.
 
 **G4 — Scale and hardware credibility.** This is the consolidation point for the board-wide repeatable-performance standard that recurs throughout the document. Every performance and scaling number, for both scalability and stability, is to be re-run under one fixed protocol: pinned clocks and thermals, multiple seeds, reported error bars, and a datacenter GPU with full double-precision throughput. It also includes the head-to-head against eVAT and clusiVAT that Chapter 3 owes, and a push toward a distributed pVAT at half a million points.
 
-**G5 — Interpretability, measured.** The interpretability claim should be measured, not asserted: rule counts, path lengths, and either an established interpretability metric or a small expert-audience study, and an empirical demonstration of the Magdalena condition (hierarchies over named inputs).
+**G5 — Output partitioning, settled.** Resolve the quantile-versus-uniform question from Chapter 4 §4.3.2 empirically instead of by assertion: three arms (uniform, quantile, and a hybrid with pinned extremes) across a sweep of bucket counts and TSK orders, on real datasets spanning a range of output skewness plus a synthetic sweep that varies skewness directly. Scored on per-decile and tail error and on bucket starvation, not aggregate error alone, since aggregate error is exactly what hides the failure mode. The deliverable is a recommendation as a function of skew and bucket count, and a defensible default.
 
-**G6 — Adaptive multi-scale (stretch).** Replace Chapter 5's gap heuristic for band discovery with a model-based criterion — a change-point or barcode-stability test — so that overlapping density scales, which the gap heuristic cannot handle, become tractable. I mark this explicitly as a stretch goal and the first thing I will cut if time runs short.
+**G6 — Interpretability, measured.** The interpretability claim should be measured, not asserted: rule counts, path lengths, and either an established interpretability metric or a small expert-audience study, and an empirical demonstration of the Magdalena condition (hierarchies over named inputs).
+
+**G7 — Adaptive multi-scale (stretch).** Replace Chapter 5's gap heuristic for band discovery with a model-based criterion — a change-point or barcode-stability test — so that overlapping density scales, which the gap heuristic cannot handle, become tractable. I mark this explicitly as a stretch goal and the first thing I will cut if time runs short.
 
 ## 7.3 Application showcases
 
@@ -42,12 +44,13 @@ The floor under all of this is that Chapters 3 and 4 — the accelerated exact V
 |---|---|---|---|---|
 | **G4** repeatable perf + eVAT/clusiVAT head-to-head | Ch 3, 5, 6 | not started | must | 2027 Q1 |
 | **G1** one-pass membership generation | Ch 5, capstone | preliminary done | differentiator | 2027 Q2 |
+| **G5** output partitioning settled (quantile vs uniform) | Ch 4 | not started | should | 2027 Q2 |
 | **G2** real non-coordinate benchmarks (DTW/edit/graph) | Ch 3, 5 | not started | must | 2027 Q3 |
 | **G3** HME EM + full baseline suite | Ch 6 | one-shot done; EM design-only | must | 2027 Q3–Q4 |
 | **capstone** integrated end-to-end pipeline | Ch 3→5→6 | not started | must | 2028 Q1 |
-| **G5** interpretability, measured | Ch 6 | not started | should | 2028 Q1 |
-| **G6** adaptive multi-scale (overlapping scales) | Ch 5 | not started | stretch (first cut) | 2028 Q1 |
+| **G6** interpretability, measured | Ch 6 | not started | should | 2028 Q1 |
+| **G7** adaptive multi-scale (overlapping scales) | Ch 5 | not started | stretch (first cut) | 2028 Q1 |
 
 ---
 
-*Draft — Chapter 7 prose, in the author's voice. One table placeholder. Source outline in `../chapters/07-goals-for-completion.md`; goals G1–G6 tracked in `../ACTION_ITEMS.md` and mapped to the Chapter 10 timeline.*
+*Draft — Chapter 7 prose, in the author's voice. One table placeholder. Source outline in `../chapters/07-goals-for-completion.md`; goals G1–G7 tracked in `../ACTION_ITEMS.md` and mapped to the Chapter 10 timeline.*

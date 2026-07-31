@@ -29,6 +29,18 @@ _Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 ## C. Experiments / results owed (the "make it airtight" list)
 
 - ⬜ **Ch 4 — ANFIS + GA-tuned-FIS baseline table** (train time + accuracy on identical splits). First thing owed to Ch 4's speed claim.
+- ⬜ **Ch 4 — OUTPUT PARTITIONING STUDY: quantile vs uniform (open question, author has gone back and forth). (Goal G5.)** Settle empirically rather than by assertion; §4.3.2 currently presents both without a verdict.
+
+  **The trade-off being tested.** *Uniform* (equal-width buckets across the output range) gives a more natural function approximation — each rule owns an equal span of the output, so TSK consequents interpolate evenly and the extremes stay covered — but on skewed targets some buckets get very few samples, so their antecedents and consequents are poorly estimated (or starve entirely). *Quantile* (equal-frequency buckets) guarantees every rule is statistically well-supported, but bucket centers crowd where the data is dense, under-resolving sparse regions — which for regression are often the extremes, i.e. exactly the values that matter.
+
+  **Hypotheses.** (H1) The two coincide when the output is near-symmetric, so any difference must be driven by output skew. (H2) Quantile wins on aggregate error (R²/RMSE) as skew grows. (H3) Uniform wins on *tail* accuracy — error in the top/bottom deciles — and on max error. (H4) Quantile's advantage grows with bucket count, since starved buckets get likelier under uniform as `n_output_buckets` rises. (H5) A **hybrid** — equal-frequency interior buckets with centroids pinned at both range extremes — dominates both, and is the arm most likely to become the recommended default.
+
+  **Design.** Three arms (uniform / quantile / hybrid-pinned-extremes) × `n_output_buckets` ∈ {2,3,4,5,6,8} × TSK order ∈ {0,1,2} × multi-seed, on (a) real regression sets spanning a range of output skewness — Concrete, turbine, WEC, wine-red, power consumption — and (b) a **synthetic sweep** with a controlled skewness parameter (e.g. lognormal-transformed target) to locate the crossover point directly rather than inferring it.
+
+  **Metrics — aggregate error alone will not answer this.** Report: global R² and RMSE; **per-decile error** (exposes tail failure); error on the extreme deciles specifically; 95th-percentile and max absolute error; **min samples per bucket** and count of starved buckets (the stability diagnostic that explains *why* uniform fails when it does); and rules-to-reach-a-target-R² (the interpretability cost).
+
+  **Deliverable.** A recommendation table — which scheme to use as a function of output skew and bucket count — plus a defensible default with the evidence behind it, and a plot of the crossover from the synthetic sweep. Feeds §4.3.2 and Table 4.1.
+
 - ⬜ **Ch 4 — quantify the correction-rule pass** (§4.3.1): accuracy before vs after the confusion-matrix-driven second pass, with the paired confusion matrices (Fig 4.3). Currently claimed but unmeasured.
 - ⬜ **Ch 4 — semi-supervised / incremental benchmark** (§4.3.3): the per-class-independence → incremental-update property is stated as a structural consequence, not a measured result. Needs a controlled streaming/partial-label experiment to promote it to a claim.
 - ⬜ **Ch 4 — anomaly/open-set head-to-head (Table 4.3):** complement rule vs **one-class SVM** and **isolation forest** on BETH (train on benign only, detect unseen `evil==1`). Report detection rate + false-alarm rate at a matched operating point, plus the θ sweep curve (Fig 4.2, from `plot_anomaly_threshold_sweep`). This is the experiment owed to the §4.3.5 claim.
@@ -36,12 +48,12 @@ _Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 - ⬜ **Ch 3 / Ch 5 — real non-metric domains** (DTW time-series, edit distance, graph/kernel dissimilarity). The core niche is so far only synthetic. (Goal G2.)
 - ⬜ **Ch 6 — HME EM refinement implemented** + full baseline suite (ANFIS, CART/C4.5, M5, flat TSK, Fumanal-Idocin 2025, D-TSK-FC). (Goal G3.)
 - ⬜ **Ch 5 — head-to-head vs Bonis–Oudot beta-plateau & AuToMATo** on identical data; formal prior-art search (IEEE Xplore/Scopus/ACM, cited-by on 1406.7130 / ToMATo).
-- ⬜ **Ch 6 — interpretability evaluation** (rule count, path length, expert/audience study or established metric); empirical Magdalena-2018 rebuttal. (Goal G5.)
+- ⬜ **Ch 6 — interpretability evaluation** (rule count, path length, expert/audience study or established metric); empirical Magdalena-2018 rebuttal. (Goal G6.)
 
 ## D. Proposed builds (Part III deliverables)
 
 - ⬜ **Ch 5 / G1 — direct one-pass MF generation** (`MEMBERSHIP_ROADMAP.md` phases 1–6); phase 4 soft/kernel-weighted band membership is the research-interesting piece (fixes small-n over-segmentation).
-- ⬜ **Ch 5 / G6 (stretch) — adaptive/model-based band discovery** for overlapping scales (change-point / barcode stability), beyond the gap heuristic. Designated first cut if timeline slips.
+- ⬜ **Ch 5 / G7 (stretch) — adaptive/model-based band discovery** for overlapping scales (change-point / barcode stability), beyond the gap heuristic. Designated first cut if timeline slips.
 - ⬜ **Ch 5 — wire output MFs into the tribble-fis FIS** (integration that ties Ch 5 → Ch 6 → capstone).
 - ⬜ **Ch 7 — integrated end-to-end pipeline** capstone + flagship case study.
 
@@ -63,4 +75,4 @@ _Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 ---
 
 ### How this doc is maintained
-Each chapter file carries inline TODO notes; this doc is the roll-up. When a chapter TODO is added or resolved, reflect it here. Goal labels (G1–G6) map to Chapter 7 §7.2.
+Each chapter file carries inline TODO notes; this doc is the roll-up. When a chapter TODO is added or resolved, reflect it here. Goal labels (G1–G7) map to Chapter 7 §7.2.

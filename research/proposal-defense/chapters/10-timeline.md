@@ -18,7 +18,7 @@
 | **Q4 — 2027 Q4** | Hierarchy + baselines + integration | G3 + capstone start | HME EM done; ANFIS/CART/M5/flat-TSK suite (Ch 6); integrated pipeline stood up |
 | **Q5 — 2028 Q1** | Capstone + write-up + **defense (March 2028)** | G1–G4 capstone, G5 | End-to-end flagship case study; interpretability eval; dissertation written; **final defense March 2028** |
 
-*Note: this is deliberately aggressive — G3 (EM) now shares Q3–Q4 with G2, and the capstone overlaps write-up. G6 (adaptive multi-scale, overlapping scales) is an explicit stretch/cut if anything slips (see §10.3).*
+*Note: this is deliberately aggressive — G3 (EM) now shares Q3–Q4 with G2, and the capstone overlaps write-up. G7 (adaptive multi-scale, overlapping scales) is an explicit stretch/cut if anything slips (see §10.3).*
 
 ## 10.2 Dependency notes
 
@@ -29,7 +29,7 @@
 
 ## 10.3 Buffer / risk
 
-- The 15-month runway to March 2028 has little slack — this is intentional per the aggressive-scope directive. **G6 (adaptive multi-scale / overlapping scales) is the designated first cut.** If G3 (EM) or G2 (real non-metric) overruns, fall back to HME one-shot and synthetic-plus-one-real-domain respectively; the completed Part II work (Ch 3, Ch 4) already constitutes a defensible dissertation floor.
+- The 15-month runway to March 2028 has little slack — this is intentional per the aggressive-scope directive. **G7 (adaptive multi-scale / overlapping scales) is the designated first cut.** If G3 (EM) or G2 (real non-metric) overruns, fall back to HME one-shot and synthetic-plus-one-real-domain respectively; the completed Part II work (Ch 3, Ch 4) already constitutes a defensible dissertation floor.
 
 ---
 
