@@ -6,7 +6,7 @@ In *The Hitchhiker's Guide to the Galaxy*, the supercomputer Deep Thought is ask
 
 This chapter is built on the same inversion, and it is the reason it is fast. A fuzzy rule has an antecedent — the IF part, a question about the inputs — and a consequent — the THEN part, the answer. The conventional way to build a fuzzy model is to lay out the questions first: partition every input into fuzzy sets, form a rule for every combination, and then search for consequents that make the whole thing fit. I do the opposite. I commit to the answers first — the output classes, or a set of output values spread across the range — and only then work backward to find the antecedents that select them. Starting from the answer collapses most of the work, because the answers are few and known while the space of possible questions is enormous. And unlike Deep Thought, the method finishes in seconds rather than geological time, which is the entire point: it is fast enough that the Vogons cannot demolish the Earth to make way for a hyperspace bypass before it is done.
 
-The problem I am solving is the one I set up in Chapter 1. A fuzzy model built by gridding the inputs has a rule count that is the product of the per-input set counts, which is exponential, and the usual way to fit it — a genetic algorithm, or gradient descent, or ANFIS — is either slow to converge or dependent on an initial guess it cannot supply for itself. My claim in this chapter is that a Mixture-of-Gaussians construction generates both the membership functions and the rules directly from the data, produces on the order of one rule per output class rather than an exponential blowup, and does so without any post-hoc genetic search or gradient descent at all. The contributions are: an answer-first (consequent-first) construction for both classification and regression; a per-feature, per-class Gaussian-mixture antecedent generator whose parameter count grows linearly rather than exponentially; and a demonstration that this trains competitive models in seconds on datasets with hundreds of thousands of rows.
+The problem I am solving is the one I set up in Chapter 1. A fuzzy model built by gridding the inputs has a rule count that is the product of the per-input set counts, which is exponential, and the usual way to fit it — a genetic algorithm, or gradient descent, or ANFIS — is either slow to converge or dependent on an initial guess it cannot supply for itself. My claim in this chapter is that a Mixture-of-Gaussians construction generates both the membership functions and the rules directly from the data, produces on the order of one rule per output class rather than an exponential blowup, and does so without any post-hoc genetic search or gradient descent at all. The contributions are: an answer-first (consequent-first) construction for both classification and regression; a per-feature, per-class Gaussian-mixture antecedent generator whose parameter count grows linearly rather than exponentially; an automatically synthesized *anomaly* rule — the complement of the t-conorm of every explicit rule — that gives the model open-set behavior and a handle on rare classes at no additional training cost; and a demonstration that this trains competitive models in seconds on datasets with hundreds of thousands of rows.
 
 ## 4.2 Background and Prior Art
 
@@ -49,6 +49,26 @@ $$ N_{rules}^{\text{MoG}} = K, \qquad N_{params} \sim \mathcal{O}(K \cdot M \cdo
 
 one rule per class (or output bucket) $K$, with parameters growing *linearly* in the number of features $M$ and the components per mixture $p$. For a twelve-class problem with eighty-three features — RT-IOT2022, below — the grid form is astronomically large while the factored form is a few thousand parameters and twelve rules. That single choice is what sidesteps the rule-base explosion, and it is the same instinct as the naive-Bayes factorization, traded deliberately for speed and interpretability.
 
+### 4.3.5 The rule for everything else: anomalies and rare classes
+
+There is a property of this construction that I did not design for and that turns out to be one of its most useful features. Because every class rule is an explicit fuzzy membership over the input space, I know not just how strongly each class fires but how strongly *anything* fires. That means I can synthesize one more rule, automatically, that says *none of the above*.
+
+The construction is direct. Let $\mu_k(x)$ be the firing strength of the rule for class $k$. Aggregating the known classes with the t-conorm $S$ gives the degree to which the model recognizes $x$ as something it has seen; the fuzzy complement of that is the degree to which it does not:
+
+$$ \mu_{\text{anom}}(x) = 1 - S\big(\mu_1(x) + \theta,\; \mu_2(x) + \theta,\; \ldots,\; \mu_K(x) + \theta\big). $$
+
+The $\theta$ term is a boost applied to each known-class firing before aggregation, and it is the single knob that sets how eager the anomaly rule is. A large $\theta$ inflates the known classes, shrinks the complement, and makes the model reluctant to cry anomaly; a small $\theta$ makes it suspicious of anything less than a confident match. Inference is unchanged — I take the $\arg\max$ over the $K$ class firings *plus* this one extra — so the anomaly rule simply wins whenever no known rule fires strongly enough to beat it. The choice of t-conorm matters here too, and it is a parameter rather than a fixed decision: the drastic Hamacher conorm is aggressive about treating partial matches as recognition, while min/max is more permissive of novelty.
+
+Three things make this worth a section rather than a footnote.
+
+It is **free**. There is no second model, no separately trained detector, no extra pass over the data. The anomaly rule is an algebraic consequence of the rules I already have, so it costs one t-conorm and one subtraction at inference time. Contrast this with the usual practice of bolting a one-class SVM or an isolation forest alongside a classifier and reconciling two models' disagreements.
+
+It is **interpretable in exactly the way the rest of the model is**. When the anomaly rule fires, the explanation is not an opaque outlier score; it is "none of the known rules matched this, and here is how close each one came." Because the class firings are themselves readable, so is the negative result. That is a genuinely useful property for an operator deciding whether to escalate.
+
+It addresses **rare classes**, which is the failure mode that motivated it. A class with a handful of examples is nearly invisible to accuracy-driven training: a model that ignores it entirely still scores well. But rare and unseen events are frequently the ones that matter — a novel intrusion, an off-nominal flight condition, a failure mode absent from the training set. The complement rule catches these *as a category*, without needing examples of them, which is the one thing a supervised class rule can never do.
+
+I should be clear about the prior art, since novelty detection and open-set recognition are well-established fields with their own literature — one-class SVMs, isolation forests, Mahalanobis-distance novelty scores, and the open-set recognition line of work all attack this problem directly, and I do not claim to beat them at it. What I claim is narrower and, I think, more interesting: in a fuzzy inference system built this way, open-set behavior is not an addition but a *consequence*, obtained by applying the same t-conorm and complement the model already uses, and it inherits the model's interpretability for free. The honest comparison — my complement rule against a dedicated one-class detector on the same data — is an experiment I owe.
+
 ## 4.4 Results
 
 The datasets here are public, so unlike the psychiatric set of Chapter 3 I can name them freely.
@@ -56,6 +76,8 @@ The datasets here are public, so unlike the psychiatric set of Chapter 3 I can n
 On the **PhiUSIIL phishing URL** dataset the model reaches 97–99% accuracy in about six seconds, with two rules and a handful of clauses. That is the headline: a readable, two-rule fuzzy classifier, competitive on accuracy, trained in the time it takes to describe it.
 
 On **RT-IOT2022** — 123,000 instances, 83 features, 12 output classes — the model trains in under a minute. This is the scale point: the answer-first construction does not fall over when the data gets large and multi-class, because the work is proportional to classes times features rather than to any product over inputs.
+
+On the **BETH** host-telemetry set I test the anomaly rule of §4.3.5 in its hardest honest configuration: the model is trained on *benign traffic only* and then shown a test set containing malicious activity it has never seen. Nothing about the malicious class is available at training time — there is no "attack" rule to fire — so detection has to come from the complement rule alone. This is open-set recognition rather than classification, and it is the setting where the construction earns its keep. Because the boost $\theta$ is a single scalar, the operating point is a one-dimensional sweep rather than a retraining problem, and the sensitivity/precision trade-off can be read straight off that curve.
 
 On the **UCI Concrete Compressive Strength** regression set, the flat model's test $R^2$ is about 0.44, 0.77, and 0.87 at TSK orders zero, one, and two respectively — which is both a reasonable result and the launch point for the hierarchical models of Chapter 6, where a tree and a mixture of experts push it further.
 
@@ -82,12 +104,25 @@ On the **UCI Concrete Compressive Strength** regression set, the flat model's te
 >
 > **TODO — repeatable performance (board-wide standard):** the numbers above are single-machine point estimates. Reproduce under the fixed protocol — pinned clocks and thermals, multiple seeds, reported error bars — before citation. See `ACTION_ITEMS.md` §A and Chapter 7, Goal G4.
 
-**[FIGURE 4.2 — placeholder]** *Confusion matrix on RT-IOT2022 before and after the correction-rule pass, showing which class confusions the corrections repair.*
+**Table 4.3 — Open-set detection with the complement rule** *(structure fixed; cells from the harness).* Trained on benign traffic only; the malicious class is unseen at training time. The comparison that matters is against detectors built for this job.
+
+| Method | Trained on | Detection rate | False-alarm rate | Extra model? |
+|---|---|---:|---:|:--:|
+| **Complement rule (this work)** | benign only | *pending* | *pending* | no |
+| One-class SVM | benign only | *pending* | *pending* | yes |
+| Isolation Forest | benign only | *pending* | *pending* | yes |
+
+**[FIGURE 4.2 — placeholder]** *The anomaly threshold sweep on BETH: detection rate and false-alarm rate as functions of the boost $\theta$, showing the operating curve a user picks a point on. Generated by `plot_anomaly_threshold_sweep`.*
+`![anomaly-sweep](fig/04-anomaly-sweep.png)`
+
+**[FIGURE 4.3 — placeholder]** *Confusion matrix on RT-IOT2022 before and after the correction-rule pass, showing which class confusions the corrections repair.*
 `![rtiot-confusion](fig/04-rtiot-confusion.png)`
 
 ## 4.5 Discussion and Contributions
 
 The method is fast for a simple reason: it replaces a global search over a huge space of possible rules with a handful of local density fits keyed to the known answers, and a closed-form solve for the consequents. It stays interpretable for an equally simple reason: there are only a few rules, they are written over named features in linguistic terms, and a person can read and edit them. And because the construction is incremental — new data updates the per-class densities without retraining from scratch — it lends itself to a semi-supervised, keep-learning setting.
+
+The anomaly rule deserves a closing word, because it is the part of this chapter I expect to matter most outside the dissertation. Building the model as explicit fuzzy rules over the input space means the model knows the shape of what it has seen, and therefore knows the shape of what it has not. Taking the complement of the aggregate turns a closed-set classifier into an open-set one for the cost of one operation, and it does so without giving up the property that made the model worth building — when it flags something, it can say why. For the domains where this work is aimed, that combination is the whole point: an unexpected condition is exactly the case where you least want an unexplainable answer.
 
 I want to be clear about what is and is not established. The construction is real and the timing numbers are real, but the speed claim is only fully persuasive against the right baselines, and I have not yet run the head-to-head against ANFIS and a genetic-algorithm-tuned FIS on identical splits; that table is the first thing I owe this chapter, and it is noted as a goal for completion. The performance numbers here are also subject to the board-wide repeatability standard — fixed hardware, multiple seeds, error bars — like every other number in the dissertation. And the honest scope of the accuracy claim is bounded by the naive-Bayes-like factorization: where feature interactions matter a great deal, the flat model will leave accuracy on the table, which is precisely the gap the hierarchical models of Chapter 6 exist to close. The bridge in the other direction — where the membership functions come from when the data has no coordinates and no Gaussian shape to fit — is Chapter 5.
 

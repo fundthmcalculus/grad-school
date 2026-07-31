@@ -36,6 +36,13 @@
 ### 4.3.3 Inference
 - Standard fuzzy evaluation; classification by argmax over class rule activations.
 
+### 4.3.5 Anomaly / "none of the above" rule (author-requested section — DONE in prose)
+- **The construction:** μ_anom(x) = t_complement( t_conorm(μ_1+θ, …, μ_K+θ) ) — the fuzzy complement of the t-conorm of every explicit class rule, with θ a *boost* added before aggregation that sets how eager the anomaly rule is. Inference = argmax over the K class firings **plus** this extra one.
+- **Implemented:** `AnomalyParameters(include_anomaly, threshold, label, norm_conorm, member_function)` in `src/tribblefis/gauss_data.py`; the math in `gauss_math.py` (`tsk_firing_strengths` / `simple_gaussian_predict`); sweep plot `plot_anomaly_threshold_sweep`.
+- **Experiment:** `gaussian_mixture/beth-anomaly.py` — BETH host telemetry, trained on **benign traffic only**, tested against unseen `evil==1` as anomaly (true open-set). Uses `threshold=0.99`, `norm_conorm="hamacher"`. Also see `iot-botnet.py`.
+- **Why it matters:** free (no second model, one conorm + subtraction), interpretable ("no known rule matched, and here's how close each came"), and it addresses **rare classes** — catches novel events *as a category* without needing examples of them.
+- **Concede prior art:** one-class SVM, isolation forest, Mahalanobis novelty, open-set recognition literature. Claim is narrower: open-set behavior is a *consequence* of the fuzzy structure, not an addition, and inherits interpretability. **Owed experiment:** head-to-head vs one-class SVM / isolation forest on identical data (Table 4.3).
+
 ### 4.3.4 Quantile-conditioned factorized antecedents (the scoped novelty)
 - `partition_output` via `pd.qcut` (equal-frequency output buckets) → per-(feature,bucket) 1-D GMM; naive-Bayes-like factorization → **linear** parameters in (#buckets × features).
 
