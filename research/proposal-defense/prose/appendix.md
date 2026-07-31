@@ -2,7 +2,7 @@
 
 ## A.1 Supplementary figures
 
-The figures below support the main text but are not needed to follow the argument; they are collected here to keep the chapters readable. *(To be produced at publication quality; see the figure placeholders in the prose chapters and `ACTION_ITEMS.md`.)*
+A distinction first, because it governs what belongs here. Seventeen figures are called out in the main text and stay there — they carry an argument at the point it is made, and several are load-bearing: Figure 1.2 (the pipeline roadmap) orients the whole document, and Figure 5.2 (band discovery on the log-birth spectrum) is the single figure Chapter 5's contribution rests on. What lands in this appendix is the *supplementary* material: the galleries, the per-fold and per-dataset repetitions, and the diagnostic plots that a reader may want to check but should not have to walk through. None of the figures below are yet produced at publication quality; that is tracked in `ACTION_ITEMS.md`.
 
 - **A.1.1 VAT / iVAT reordered-dissimilarity galleries** — the reordered images for the NASA shuttle set (58K), the psychiatric-evaluation set (135K), and the synthetic circular-cities construction; the Prim/MST block diagram (`vat_prim_mst_block_diagram_v2.svg`).
 - **A.1.2 Selection and multi-scale figures** — the figures `fig1`–`fig11` from `gated-minimax-selection/outputs/`: the synthetic datasets, the minimax-transform heatmaps, the persistence curves, the membership-function plots, the ConiVAT bridge repair, the multi-scale hierarchy, and the selection-method comparison.
@@ -10,11 +10,13 @@ The figures below support the main text but are not needed to follow the argumen
 
 ## A.2 Extended results tables
 
-The main text carries the summary tables (Tables 3.1–3.4, 4.1–4.2, 5.1–5.2, 6.1–6.3); their full, multi-seed versions live here once the repeatability protocol (Goal G4) has been run. All of them regenerate from the harness in `reproduce/tables/`, which emits Markdown and CSV side by side, so the appendix version is the same data at full width rather than a re-transcription.
+The main text carries seventeen summary tables (3.1–3.6, 4.1–4.3, 5.1–5.3, 6.1–6.4, 7.1); their full, multi-seed versions live here once the repeatability protocol (Goal G4) has been run. All of them regenerate from the harness in `reproduce/tables/`, which emits Markdown and CSV side by side, so the appendix version is the same data at full width rather than a re-transcription.
 
 - **A.2.1** Full adversarial-evaluation ARI grids and the complete stitch-ablation grid (all partitions × sizes).
 - **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results.
 - **A.2.3** The broadened fuzzy-model benchmark suite (Concrete, PhiUSIIL, turbine, wave-energy, wine, and the IoT sets) with the baseline methods.
+- **A.2.4** The three-arm reorder timing study behind Chapter 3 §3.3.1 — classical cubic, stage-one priority queue, stage-two compact active set — across the full grid of $N$ and both precisions. This is also the evidence base for the planned complexity note with Dr. Kreinovich (Chapter 9).
+- **A.2.5** The output-partitioning study of Goal G5 (uniform vs. quantile vs. pinned-extreme hybrid), including the per-decile and tail-error breakdowns and the bucket-starvation counts that aggregate error hides.
 
 ## A.3 The optimization engine (`tribble-opt`)
 
@@ -32,7 +34,7 @@ Per the design decision recorded in Chapter 2, the optimization library is suppo
 
 **Handoff to the clustering package.** Two report items — replacing the Fuzzy C-Means BFGS step with closed-form alternating updates, and JIT-compiling the iVAT path-max loop — were deliberately deferred here, because the clustering code (FCM, VAT/iVAT) is being split into its own package. That seam is exactly where this engine hands off to the `tribble-cluster` work of Chapter 3.
 
-**Standalone-paper opportunities** (for Dr. Cohen's consideration, not part of the core dissertation): the performance-engineering study on its own; the quality-diversity-over-legacy-solvers layer (CVT-MAP-Elites + Iso+LineDD); and the exact GPU/parallel VAT engine as a systems paper.
+**Standalone-paper opportunities** (for Dr. Cohen's consideration, not part of the core dissertation): the performance-engineering study on its own; the quality-diversity-over-legacy-solvers layer (CVT-MAP-Elites + Iso+LineDD); and the exact GPU/parallel VAT engine as a systems paper. That last one is distinct from the complexity note planned with Dr. Kreinovich (Chapter 9): the note is about the *right asymptotic cost* of the sequencing and the heap-versus-dense measurement, whereas a systems paper would be about the parallel and GPU engineering envelope. They should not be merged, and neither should absorb the other's claim.
 
 ## A.4 Reproducibility
 
@@ -41,8 +43,10 @@ Per the design decision recorded in Chapter 2, the optimization library is suppo
 - **Drivers.** Beyond the table generators, each original result has a named script — the `gaussian_mixture/*` benchmarks for Chapter 4, `tribble-tree/demo_*.py` for Chapter 6, `gated-minimax-selection/run_all.py` for Chapter 5, and the `experiments/` harnesses for Chapter 3.
 - **Environments.** The submodules carry their own locked environments, so the generators are invoked through them (for example, `uv run --project tribble-fis python reproduce/tables/table_6_1_model_family.py`). Dataset preparation is automatic where licensing permits — the Concrete set is built from the spreadsheet in the repo if the CSV is absent.
 - **Hardware.** Development ran on a 32-core Intel workstation with 64 GB RAM and a laptop-class RTX 4080 (12 GB, reduced double-precision throughput). Final performance numbers are to be re-taken under the fixed protocol of Goal G4 — pinned clocks and thermals, multiple seeds, error bars, and a datacenter GPU with full double-precision throughput.
-- **Commit pins.** The exact commit hashes behind each reported result will be pinned in this section at submission time.
+- **Datasets, and what a third party can actually obtain.** This matters more than it usually does, because the datasets are not uniformly available. Concrete, PhiUSIIL, RT-IOT2022, BETH, and the shuttle set are public and a reader can reproduce those results directly. The 135,000-row psychiatric-evaluation set used for the memory results in Chapter 3 is **not** public and cannot be redistributed; its feature names were anonymized before I ever saw them, which is why Chapter 3 treats it purely as a scaling exercise and draws no conclusion from any individual feature. The consequence for reproducibility should be stated plainly: that specific memory measurement is not independently reproducible, and the fix is to re-take it on a public dataset of comparable size rather than to ask anyone to take it on trust.
+- **Two implementations, cross-validating.** The reorder exists in two forms — the stage-one priority-queue path (`pvat.py`) and the stage-two compact-active-set Cython kernel (`pcvat.pyx`) — and they are required to produce bit-identical orderings. That equality is itself a test: each path validates the other, and the test suite asserts it against the serial reference rather than against permutation-invariant summaries. Chapter 3 §3.3.2 records why that distinction matters, since an earlier bug survived precisely because the tests only checked invariant quantities.
+- **Commit pins.** The exact commit hashes behind each reported result will be pinned in this section at submission time. The permalinks already in Chapter 3 §3.4 are pinned to a specific commit for exactly this reason.
 
 ---
 
-*Draft — Appendix prose. A.3 (optimization engine) is written out; A.1/A.2/A.4 are structured to be completed alongside the figures, the repeatability runs, and final commit pins. Source outline in `../chapters/appendix.md`; open items in `../ACTION_ITEMS.md`.*
+*Draft — Appendix prose. A.3 (optimization engine) and A.4 (reproducibility) are written out; A.1/A.2 are inventories to be filled as the figures and repeatability runs land. Source outline in `../chapters/appendix.md`; open items in `../ACTION_ITEMS.md`.*
