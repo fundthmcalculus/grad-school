@@ -87,6 +87,19 @@ EXPERIMENTS = [
               "operating curve for Fig 4.2.",
     ),
     Experiment(
+        id="table-g5-output-partitioning",
+        title="G5: uniform vs quantile vs hybrid output partitioning",
+        chapter="Ch4", produces="Table 4.2 (Goal G5)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_g5_output_partitioning.py"),
+        hardware="any", datasets=["Concrete"],
+        outputs=["reproduce/outputs/table_g5_output_partitioning.md"],
+        notes="VERIFIED RUNNING. Found the crossover near 4 buckets (starvation-driven) and "
+              "that partition_output's extreme-pinning is inert -- identical to pure quantile "
+              "in all 18 configs, because solve_tsk_consequents re-derives the bucket means. "
+              "Skew axis still untested (Concrete skew is only +0.42).",
+    ),
+    Experiment(
         id="table-4-1-mog-baselines",
         title="MoG FIS vs sklearn baselines (train time + accuracy/R2)",
         chapter="Ch4", produces="Table 4.1",
