@@ -15,7 +15,7 @@ The main text carries seventeen summary tables (3.1–3.6, 4.1–4.3, 5.1–5.3,
 - **A.2.1** Full adversarial-evaluation ARI grids and the complete stitch-ablation grid (all partitions × sizes).
 - **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results.
 - **A.2.3** The broadened fuzzy-model benchmark suite (Concrete, PhiUSIIL, turbine, wave-energy, wine, and the IoT sets) with the baseline methods.
-- **A.2.4** The three-arm reorder timing study behind Chapter 3 §3.3.1 — classical cubic, stage-one priority queue, stage-two compact active set — across the full grid of $N$ and both precisions. This is also the evidence base for the planned complexity note with Dr. Kreinovich (Chapter 9).
+- **A.2.4** The three-arm reorder timing study behind Chapter 3 §3.3.1 — classical cubic, stage-one priority queue, stage-two compact active set — across the full grid of $N$ and both precisions. This is also the evidence base for the possible complexity note discussed in §9.3.
 - **A.2.5** The output-partitioning study of Goal G5 (uniform vs. quantile vs. pinned-extreme hybrid), including the per-decile and tail-error breakdowns and the bucket-starvation counts that aggregate error hides.
 
 ## A.3 The optimization engine (`tribble-opt`)
@@ -34,7 +34,7 @@ Per the design decision recorded in Chapter 2, the optimization library is suppo
 
 **Handoff to the clustering package.** Two report items — replacing the Fuzzy C-Means BFGS step with closed-form alternating updates, and JIT-compiling the iVAT path-max loop — were deliberately deferred here, because the clustering code (FCM, VAT/iVAT) is being split into its own package. That seam is exactly where this engine hands off to the `tribble-cluster` work of Chapter 3.
 
-**Standalone-paper opportunities** (for Dr. Cohen's consideration, not part of the core dissertation): the performance-engineering study on its own; the quality-diversity-over-legacy-solvers layer (CVT-MAP-Elites + Iso+LineDD); and the exact GPU/parallel VAT engine as a systems paper. That last one is distinct from the complexity note planned with Dr. Kreinovich (Chapter 9): the note is about the *right asymptotic cost* of the sequencing and the heap-versus-dense measurement, whereas a systems paper would be about the parallel and GPU engineering envelope. They should not be merged, and neither should absorb the other's claim.
+**Standalone-paper opportunities** (for Dr. Cohen's consideration, not part of the core dissertation): the performance-engineering study on its own; the quality-diversity-over-legacy-solvers layer (CVT-MAP-Elites + Iso+LineDD); and the exact GPU/parallel VAT engine as a systems paper. That last one is distinct from the possible complexity note of §9.3: the note would be about the sequencing's cost and memory bound and the heap-versus-dense measurement, whereas a systems paper would be about the parallel and GPU engineering envelope. They should not be merged, and neither should absorb the other's claim.
 
 ## A.4 Reproducibility
 

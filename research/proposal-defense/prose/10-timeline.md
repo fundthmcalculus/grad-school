@@ -27,7 +27,7 @@ gantt
 
     section Papers & conferences
     Ch3 pVAT journal                          :p3, 2027-01-01, 90d
-    O(N^2) paper w/ Kreinovich                :pk, 2027-02-01, 75d
+    VAT complexity correction note            :pk, 2027-02-01, 75d
     Ch5 membership paper (write/submit)       :p5, 2027-01-15, 105d
     EUSFLAT 2027 (present)                    :milestone, e27, 2027-09-15, 0d
     Ch6 hierarchy paper                       :p6, 2027-10-01, 90d
@@ -56,7 +56,7 @@ G6  interpretability, measured         .       .       .       .       .     ###
 G7  adaptive multi-scale (stretch)     .       .       .       .       .     ~~~
 ------------------------------------------------------------------------------------
     Ch3 pVAT journal                   .     ####      .       .       .       .
-    O(N^2) paper w/ Kreinovich         .     ####      .       .       .       .
+    VAT complexity note (if pursued)   .     ####      .       .       .       .
     Ch5 paper -> EUSFLAT 2027          .     ####    ####    PRES      .       .
     Ch6 hierarchy paper                .       .       .       .     ####      .
     dissertation writing               .       .       .       .     ....    ####
@@ -71,7 +71,7 @@ Legend: `####` scheduled work · `~~~` stretch (first to cut) · `....` ramp-up 
 | Quarter | Focus | Goals | Deliverable |
 |---|---|---|---|
 | **2026 Q4** | Proposal defense (~Dec) | — | Defended proposal; committee feedback folded in |
-| **2027 Q1** | Close credibility gaps | G4 | Fixed-protocol re-timing (error bars); eVAT/clusiVAT head-to-head; one consistent Concrete benchmark so Ch 4 and Ch 6 numbers are comparable; Ch 3 → pVAT journal; **$O(N^2)$ sequencing paper with Dr. Kreinovich**; begin Ch 5 paper |
+| **2027 Q1** | Close credibility gaps | G4 | Fixed-protocol re-timing (error bars); eVAT/clusiVAT head-to-head; one consistent Concrete benchmark so Ch 4 and Ch 6 numbers are comparable; Ch 3 → pVAT journal; VAT complexity correction note (if the blocking reads support it); begin Ch 5 paper |
 | **2027 Q2** | Membership generation | G1, G5 | One-pass MF (roadmap phases 1–4); output-partitioning study; **Ch 5 paper submitted to EUSFLAT 2027** |
 | **2027 Q3** | Real data + hierarchy | G2, G3 (start) | DTW/edit/graph benchmarks; begin HME EM; **present at EUSFLAT 2027 (Sept)** |
 | **2027 Q4** | Hierarchy + baselines | G3 | HME EM done; ANFIS/CART/M5/flat-TSK suite; Ch 6 paper; writing begins |
@@ -83,7 +83,7 @@ Legend: `####` scheduled work · `~~~` stretch (first to cut) · `....` ramp-up 
 - **G1 precedes the capstone** — the one-pass membership generator is what the integrated pipeline consumes, so it must be done (Q2) well before the 2028 Q1 capstone. The capstone is also the first time Chapter 5's membership functions are fed to Chapter 6's models at all, which makes it a genuine experiment rather than an integration chore.
 - **G2 has no upstream dependency** — start it as soon as G4's protocol exists; it is the top credibility item and the riskiest to leave late.
 - **G3's EM is the largest single build**, spanning Q3–Q4; its de-scope path is to keep the one-shot mixture if it slips.
-- **Papers track the work**: Ch 3 journal and the $O(N^2)$ sequencing paper with Dr. Kreinovich (Q1 — both draw on work already implemented, so they are write-ups rather than new builds) → Ch 5 → EUSFLAT 2027 (written Q1–Q2, presented Q3) → Ch 6 (Q4) → the capstone/journal version alongside write-up (2028 Q1).
+- **Papers track the work**: Ch 3 journal and, if the prior-art blockers clear, the VAT complexity correction note (Q1 — both draw on work already implemented, so they are write-ups rather than new builds) → Ch 5 → EUSFLAT 2027 (written Q1–Q2, presented Q3) → Ch 6 (Q4) → the capstone/journal version alongside write-up (2028 Q1).
 
 ## 10.5 Buffer and risk
 

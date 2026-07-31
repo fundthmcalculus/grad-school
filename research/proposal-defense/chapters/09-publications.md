@@ -25,7 +25,7 @@ Papers:
 
 Primary target venue: **EUSFLAT 2027 (September 2027)** (also consider FUZZ-IEEE / Fuzzy Sets & Systems / Information Sciences for journal versions).
 
-- **A correction note on VAT ordering complexity and memory** — *with Dr. Vladik Kreinovich* → Ch 3 §3.3.1. **⚠️ SCOPE CUT after the 2026-07-31 prior-art search; do not write this until the two blocking reads below are done.**
+- **A correction note on VAT ordering complexity and memory** → Ch 3 §3.3.1. **⚠️ SCOPE CUT after the 2026-07-31 prior-art search; do not write this until the two blocking reads below are done.**
 
   **What the search killed.** (a) The claim that the literature is confused about *time* — the Kumar–Bezdek 2020 survey states O(N²) for VAT in four places and correctly credits Havens–Bezdek for iVAT O(N³)→O(N²). (b) The claim that "which MST algorithm should VAT use" is untouched — **Parveen & Sreevalsan-Nair 2013 already published a method called pVAT** that swaps Prim for Borůvka on GPU. (c) The O(N)-workspace/no-full-matrix angle for iVAT — **Deshpande & Kumar 2024** (*Information Sciences* 664:120324) already do this via MST-iVAT, and attack the ordering *sub-quadratically* with k-d trees. (d) Any pretence of distance from the single-linkage literature — Bezdek's own group published *"Is VAT really single linkage in disguise?"* (Havens et al. 2009) printing Prim and the VAT ordering side by side, after which Müllner (2011) supplies the O(N)-memory argument directly.
 
