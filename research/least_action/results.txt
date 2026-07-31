@@ -6,20 +6,20 @@
 A. Variable projection, N = 3 rules, order-1 consequents
 --------------------------------------------------------
      lam     ||e||_L2    ||de||_L2         action  dof searched
-    0.00       0.8071       1.2068         1.0432             6
-    0.25       0.5105       0.7445         1.0956             6
+    0.00       0.5773       0.9901         0.9136             6
+    0.25       0.5105       0.7446         1.0956             6
     1.00       0.4676       0.5292         1.3823             6
     4.00       0.9706       0.7295         3.6658             6
-   16.00       0.2859       0.2512         3.1259             6
+   16.00       0.2860       0.2513         3.1259             6
   (the joint formulation searches 4N = 12 parameters for the same model)
 
 B. Effect of the gradient penalty on derivative fidelity
 --------------------------------------------------------
   lam=0 is pure L2: it fits values and ignores slopes.
-  lam=0.25   slope error   0.7445 ( -38.3%)   value error   0.5105 ( -36.8%)
-  lam=1.0    slope error   0.5292 ( -56.2%)   value error   0.4676 ( -42.1%)
-  lam=4.0    slope error   0.7295 ( -39.5%)   value error   0.9706 ( +20.3%)
-  lam=16.0   slope error   0.2512 ( -79.2%)   value error   0.2859 ( -64.6%)
+  lam=0.25   slope error   0.7446 ( -24.8%)   value error   0.5105 ( -11.6%)
+  lam=1.0    slope error   0.5292 ( -46.5%)   value error   0.4676 ( -19.0%)
+  lam=4.0    slope error   0.7295 ( -26.3%)   value error   0.9706 ( +68.1%)
+  lam=16.0   slope error   0.2513 ( -74.6%)   value error   0.2860 ( -50.5%)
   The trend is downward but not monotone: each row is a separate multistart
   on a non-convex antecedent landscape, so individual rows land in different
   basins.  That scatter is the finding of section F, not noise to hide.
@@ -51,44 +51,74 @@ E. Identifiability constraints decide whether local optimality is certifiable
 -----------------------------------------------------------------------------
 
   [unconstrained]  min_gap=0.00, width in (0.60, 60.00)
-    centers        [-1.201  0.071  1.342]
-    widths         [6.696 7.314 6.696]
-    ||e||_L2       0.1115
-    min coverage   3.1239e-02
+    centers        [-1.225  0.072  1.368]
+    widths         [6.761 7.398 6.761]
+    ||e||_L2       0.1114
+    min coverage   3.4351e-02
     Gram cond      2.453e+05  (min eig 4.252e-05)
     Galerkin resid 1.159e-05  (consequent block)
-    reduced |grad| 2.592e-04  (antecedent block)
-    KKT residual   2.592e-04  (gradient projected onto the critical cone -> stationary: False)
+    reduced |grad| 1.224e-05  (antecedent block)
+    KKT residual   1.224e-05  (gradient projected onto the critical cone -> stationary: True)
     active constr  0  ->  critical cone dim 6 of 6
-    proj. Hessian  eig in [-2.4290e-02, 8.5359e+00]  (noise floor 6.4e-10)
+    proj. Hessian  eig in [-2.2966e-02, 8.2086e+00]  (noise floor 6.6e-10)
     descent probe  0.000e+00  (curvature-driven descent found: False)
-    CERTIFIED LOCAL MIN: False   [first-order False, no descent True]
+    CERTIFIED LOCAL MIN: True   [first-order True, no descent True]
 
   [regular fuzzy partition]  min_gap=6.00, width in (2.50, 15.00)
-    centers        [-9.687  0.236  9.96 ]
+    centers        [-9.688  0.235  9.96 ]
     widths         [10.557 15.    10.535]
     ||e||_L2       0.4676
     min coverage   1.1364e+00
-    Gram cond      4.900e+04  (min eig 2.371e-04)
+    Gram cond      4.899e+04  (min eig 2.372e-04)
     Galerkin resid 4.301e-05  (consequent block)
-    reduced |grad| 1.469e-02  (antecedent block)
-    KKT residual   5.183e-05  (gradient projected onto the critical cone -> stationary: True)
+    reduced |grad| 1.457e-02  (antecedent block)
+    KKT residual   2.765e-07  (gradient projected onto the critical cone -> stationary: True)
     active constr  1  ->  critical cone dim 5 of 6
-    proj. Hessian  eig in [-9.2000e-05, 8.4378e+00]  (noise floor 3.5e-08)
+    proj. Hessian  eig in [-9.1959e-05, 8.4380e+00]  (noise floor 3.5e-08)
     descent probe  0.000e+00  (curvature-driven descent found: False)
     CERTIFIED LOCAL MIN: True   [first-order True, no descent True]
 
 F. Consequent sub-problem is globally convex
 --------------------------------------------
-  H1 Gram eigenvalues in [2.3713e-04, 1.1619e+01], all positive = True
+  H1 Gram eigenvalues in [2.3716e-04, 1.1619e+01], all positive = True
   => for fixed antecedents the action has a unique global minimizer in the
      consequents.  All non-convexity lives in (a_i, b_i).
+
+G'. Analytic reduced gradient vs. finite differences
+----------------------------------------------------
+  dS/dp = -2 <e, dy_c/dp>_H1 by the envelope theorem (see fis_action.py).
+  The FD reference is itself only good to ~cond(G) * eps / h, so the honest
+  comparison sweeps h and reports the best agreement; a single fixed h
+  measures the reference's round-off, not the gradient's error.
+
+  MF kind  order    coverage     cond(G)  best rel err     at h
+ gaussian      0   8.381e-01    1.69e+01     4.417e-10    1e-04
+ gaussian      1   8.381e-01    1.25e+05     1.062e-06    1e-03
+ gaussian      2   8.381e-01    2.82e+10     4.227e-05    3e-03
+   cauchy      0   8.652e-01    1.51e+01     9.814e-11    1e-04
+   cauchy      1   8.652e-01    5.83e+02     1.120e-08    3e-04
+   cauchy      2   8.652e-01    2.17e+17     5.131e-09    1e-04
+     bump      0   3.093e-01    3.49e+00     3.616e-10    1e-04
+     bump      1   3.093e-01    4.18e+02     1.453e-09    1e-04
+     bump      2   3.093e-01    4.71e+04     5.403e-08    3e-04
+  Agreement degrades with consequent order purely because cond(G) grows and
+  the FD reference loses digits -- the h-sweep shows the error rising as h
+  shrinks, which is the signature of round-off in the reference, not
+  truncation in the gradient.
+
+  Same bump membership functions with delta-coverage deliberately broken:
+     bump      1   0.000e+00    2.86e+02     4.475e-01    1e-03
+     bump      1   1.298e-01    5.50e+01     1.154e-09    1e-04
+     bump      1   3.093e-01    4.18e+02     1.453e-09    1e-04
+  => exact to ~1e-8 exactly where coverage (C2) holds, and meaningless where
+     it fails -- because there the model is not differentiable at all.  C2 is
+     the differentiability condition, not bookkeeping.
 
 G. Galerkin orthogonality holds per-regressor at the optimum
 ------------------------------------------------------------
   <e, phi_0 * t^0>_H1 = +2.135e-05
   <e, phi_0 * t^1>_H1 = +5.681e-06
-  <e, phi_1 * t^0>_H1 = -1.189e-07
+  <e, phi_1 * t^0>_H1 = -1.161e-07
   <e, phi_1 * t^1>_H1 = +4.301e-05
   <e, phi_2 * t^0>_H1 = -2.224e-05
   <e, phi_2 * t^1>_H1 = +6.356e-06

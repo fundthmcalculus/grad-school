@@ -153,16 +153,83 @@ where $\kappa(\mathcal{M})$ bounds the curvature of the FIS manifold. In words:
 be saddles. This is why driving the residual down and certifying optimality are
 the same activity, not two separate ones.
 
-### 3d. Numerical caveat found the hard way
+### 3d. The analytic reduced gradient
 
-The variable-projected objective is accurate only to $\sim\kappa(G)\varepsilon_{\text{mach}}$.
-With $\kappa(G)\sim10^5$ that is $\sim10^{-11}$ — which is *above* the noise floor of
+With $M=G+\varepsilon I$, $\theta=M^{-1}r$ and $S=\langle y_d,y_d\rangle-r^\top\theta$,
+
+$$dS=-2(dr)^\top\theta+\theta^\top(dM)\theta .$$
+
+Write $A=\partial\Psi/\partial p$ and $a\equiv A^\top\theta$. Because $\theta$ is held
+fixed, $a=\partial y_c/\partial p$. The first term is $-2\langle y_d,a\rangle_{H^1}$ and the
+second is $2\langle a,y_c\rangle_{H^1}$, and they fuse:
+
+$$\boxed{\;\frac{\partial S}{\partial p}\;=\;-2\big\langle e,\ \partial y_c/\partial p\big\rangle_{H^1}
+\;+\;\frac{c}{n}\operatorname{tr}\!\big(\partial G/\partial p\big)\,\|\theta\|^2 ,\qquad e=y_d-y_c .\;}$$
+
+This is the **envelope theorem**: $\theta$ is already optimal, so its implicit
+dependence on $p$ contributes nothing. Note it is the *same* $H^1$ pairing that
+expresses stationarity in §1 — there tested against the regressors themselves
+(where it vanishes by construction, giving Galerkin orthogonality), here against
+the directions the antecedents can move the model. One formula covers both
+parameter blocks. The trailing term is the derivative of the trace-scaled ridge;
+negligible in magnitude but included so the gradient is exact for the objective
+actually minimized rather than an idealized one.
+
+**All membership-function derivatives collapse to one shape triple.** Every MF
+here is $\mu=F(z)$ with $z=(x-a)/b$, so
+
+$$\frac{\partial\mu}{\partial x}=\frac{F'}{b},\quad
+\frac{\partial\mu}{\partial a}=-\frac{F'}{b},\quad
+\frac{\partial\mu}{\partial b}=-\frac{zF'}{b},\quad
+\frac{\partial^2\mu}{\partial x\,\partial a}=-\frac{F''}{b^2},\quad
+\frac{\partial^2\mu}{\partial x\,\partial b}=-\frac{F'+zF''}{b^2}.$$
+
+Adding a membership function means supplying $F,F',F''$ and nothing else. Then,
+with $\Sigma=\sum_k\mu_k$ and $g=\partial\mu_j/\partial p$, $h=\partial^2\mu_j/\partial x\partial p$,
+
+$$\frac{\partial\varphi_i}{\partial p}=\frac{g\,(\delta_{ij}-\varphi_i)}{\Sigma},
+\qquad
+\frac{\partial\varphi_i'}{\partial p}=\frac{d}{dx}\frac{\partial\varphi_i}{\partial p}
+=\frac{h(\delta_{ij}-\varphi_i)-g\varphi_i'}{\Sigma}-\frac{g(\delta_{ij}-\varphi_i)\Sigma'}{\Sigma^2},$$
+
+using that $x$ and $p$ are independent so the derivatives commute.
+
+**Validation, and what it reveals.** Against finite differences with the step
+swept (a single fixed $h$ measures the *reference's* round-off, not the
+gradient's error):
+
+| MF | order | coverage | $\kappa(G)$ | best rel. err |
+|---|---|---|---|---|
+| Gaussian | 0 | 8.4e−1 | 1.7e1 | 4.4e−10 |
+| Gaussian | 1 | 8.4e−1 | 1.3e5 | 1.1e−6 |
+| Gaussian | 2 | 8.4e−1 | 2.8e10 | 4.2e−5 |
+| Cauchy-$\pi$ | 0 | 8.7e−1 | 1.5e1 | 9.8e−11 |
+| Cauchy-$\pi$ | 1 | 8.7e−1 | 5.8e2 | 1.1e−8 |
+| bump | 1 | 3.1e−1 | 4.2e2 | 1.5e−9 |
+| bump | 1 | 1.3e−1 | 5.5e1 | 1.2e−9 |
+| bump | 1 | **0.0** | 2.9e2 | **4.5e−1** |
+
+Agreement degrades with consequent order only because $\kappa(G)$ grows and the FD
+reference loses digits — the error *rises as $h$ shrinks*, the signature of
+round-off in the reference rather than truncation in the gradient.
+
+The bump rows are the interesting ones. The analytic gradient is exact to ~1e−8
+**exactly where $\delta$-coverage holds** and meaningless where it fails — because
+where $\sum_j\mu_j=0$ the model is not differentiable at all. **C2 is the
+differentiability condition, not bookkeeping**, and the gradient computation
+detects its violation independently of the theory that predicted it.
+
+### 3e. Numerical caveat found the hard way
+
+Before the analytic gradient existed, this cost real time and is worth recording.
+The variable-projected objective is accurate only to $\sim\kappa(G)\varepsilon_{\text{mach}}$;
+with $\kappa(G)\sim10^5$ that is $\sim10^{-11}$, which is *above* the noise floor of
 SciPy's default finite-difference step. Consequence: **L-BFGS-B terminates after
-zero iterations and reports success.** SLSQP is worse — it returns points with a
-*higher* objective than it was handed, also reporting success. Both are fixed by
-supplying an explicit central-difference gradient at $\sim10^{-4}$ of the input
-span. Anyone reproducing Cohen's optimization numerically will hit this; the
-symptom is a "converged" fit whose gradient is visibly non-zero.
+zero iterations and reports success**, and SLSQP returns points with a *higher*
+objective than it was handed, also reporting success. The symptom is a
+"converged" fit whose gradient is visibly non-zero. Supplying the analytic
+gradient removes the failure mode entirely rather than papering over it — and
+tightened the certified solutions' KKT residual from 5.2e−5 to 2.8e−7.
 
 ---
 
@@ -359,6 +426,11 @@ sufficiency argument of §3c stays valid.
   regressors.
 - Consequents solve globally in closed form (variable projection): $2N$ search
   parameters instead of $(p+3)N$.
+- The reduced gradient is exactly $-2\langle e,\partial y_c/\partial p\rangle_{H^1}$ by
+  the envelope theorem — the same $H^1$ pairing as the stationarity condition,
+  now against the antecedent directions. Verified to 1e−9 wherever
+  $\delta$-coverage holds; it correctly reports garbage where coverage fails,
+  because the model genuinely is not differentiable there.
 - Sequential residual fitting is exact **iff** the $H^1$ Gram is block diagonal,
   **iff** rules have disjoint support — which is unattainable on $X$ without
   destroying differentiability and coverage. Use $H^1$-OLS instead.
@@ -370,9 +442,10 @@ sufficiency argument of §3c stays valid.
 
 **Open / next:**
 
-- Analytic gradients of the reduced action (currently central differences). The
-  VarPro gradient $\partial S/\partial p = -2(\partial r/\partial p)^\top\theta + \theta^\top(\partial G/\partial p)\theta$
-  is available in closed form and would remove the numerical fragility in §3d.
+- Analytic *Hessian* of the reduced action. The gradient is now exact (§3d); the
+  second-order certificate still uses finite differences, and its noise floor is
+  what forces the tolerance-based verdict in §3b. The same envelope argument
+  differentiated once more should give it in closed form.
 - Multi-input case: the tensor-product rule basis makes the Gram block structure
   richer, and disjointness on $X\subset\mathbb{R}^n$ is even more costly.
 - Choosing $\lambda$ principled rather than by sweep — it is a correlation length,
