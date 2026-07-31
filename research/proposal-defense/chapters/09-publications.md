@@ -8,10 +8,14 @@
 
 ## 9.1 Published / Presented
 
-**NAFIPS 2025 — El Paso, TX (published 2025):**
-- **NAFIPS paper 1** — "Utilization of VAT for Hot-start of TSP" → Ch 3. *(confirm exact title, co-authors, page/DOI)*
-- **NAFIPS paper 2** — "mergeVAT: 58K×58K in 60 seconds" → Ch 3. *(confirm exact title, co-authors, page/DOI)*
-- *(Note: quals slides also present a "paper_combined" — confirm whether papers 1 & 2 published separately or as one combined NAFIPS 2025 paper.)*
+Two published conference venues, both feeding Chapter 3:
+- **NAFIPS 2025 — Banff, Alberta (July 2025)**
+- **NAFIPS 2026 — El Paso, TX (March 2026)**
+
+Papers:
+- **"Utilization of VAT for Hot-start of TSP"** → Ch 3. *(confirm venue: Banff 2025 or El Paso 2026; exact title, co-authors, page/DOI)*
+- **"mergeVAT: 58K×58K in 60 seconds"** → Ch 3. *(confirm venue; exact title, co-authors, page/DOI)*
+- *(Note: quals slides also present a "paper_combined" — confirm whether the two papers published separately or as one combined paper, and which paper went to which of the two NAFIPS meetings.)*
 
 ## 9.2 Submitted / Under Review
 
@@ -19,9 +23,9 @@
 
 ## 9.3 In Preparation (mapped to chapters)
 
-Primary target venue: **NAFIPS 2026 — Banff, Alberta** (also consider FUZZ-IEEE / Fuzzy Sets & Systems / Information Sciences for journal versions).
+Primary target venue: **EUSFLAT 2027 (September 2027)** (also consider FUZZ-IEEE / Fuzzy Sets & Systems / Information Sciences for journal versions).
 - **Fast interpretable FIS via Mixture-of-Gaussians** ("draft paper 3") → Ch 4.
-- **Topological membership generation for fuzzy inference systems** → Ch 5 (lead differentiator; NAFIPS 2026 Banff target).
+- **Topological membership generation for fuzzy inference systems** → Ch 5 (lead differentiator; EUSFLAT 2027 target).
 - **Hierarchical fuzzy trees & HME with a shared ridge-TSK primitive** → Ch 6.
 
 ## 9.4 Standalone-paper opportunities (flagged for Dr. Cohen — from master outline)
@@ -34,6 +38,6 @@ Primary target venue: **NAFIPS 2026 — Banff, Alberta** (also consider FUZZ-IEE
 ---
 
 ### Open items — NEED FROM AUTHOR
-- ~~Exact venues/years~~ → **RESOLVED: NAFIPS 2025, El Paso TX (published); NAFIPS 2026, Banff Alberta (in-prep target).** Still need exact paper titles, page numbers/DOIs, and whether papers 1 & 2 are separate or combined.
+- ~~Exact venues/years~~ → **RESOLVED: NAFIPS 2025 Banff (July 2025) + NAFIPS 2026 El Paso (March 2026), both published; EUSFLAT 2027 (Sept 2027) is the in-prep target.** Still need exact paper titles, page numbers/DOIs, which paper went to which NAFIPS meeting, and whether the two are separate or combined.
 - Author lists / co-authors.
 - Any awards or invited talks to note.

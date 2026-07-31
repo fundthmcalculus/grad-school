@@ -18,7 +18,8 @@ _Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 
 ## B. Needed from author / advisor
 
-- ⬜ **NAFIPS paper details** (Ch 9): exact titles, page numbers/DOIs, co-author lists; confirm whether papers 1 & 2 are separate or one combined paper.
+- ⬜ **NAFIPS paper details** (Ch 9): both published at **NAFIPS 2025 Banff (July 2025)** and **NAFIPS 2026 El Paso (March 2026)**. Need exact titles, page numbers/DOIs, co-author lists, which paper went to which meeting, and whether they're separate or combined.
+- ⬜ **Confirm EUSFLAT 2027 (Sept 2027) submission deadline** — anchors the Ch 5 (and possibly Ch 4) paper schedule and the Ch 10 timeline.
 - ⬜ **Confirm exact proposal-defense month** (assumed ~Dec 2026). Final defense = March 2028 (✅).
 - ⬜ **Teaching/RA load per semester** (affects timeline throughput, Ch 10).
 - ⬜ **Flagship end-to-end dataset** — author-preferred IoT (RT-IOT2022 / IoT-botnet) or UCI-58 Shuttle; left flexible, confirm later (Ch 7).
