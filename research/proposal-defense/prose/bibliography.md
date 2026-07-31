@@ -2,7 +2,14 @@
 
 The references for this proposal are maintained as a single BibTeX file, [`../references.bib`](../references.bib), and the final document's reference list is generated from it. This page is a reading guide to that file, grouped the way the chapters use it; it is not a second copy of the data.
 
-A note on provenance and verification. The fuzzy-inference, fuzzy-tree, and mixture-of-experts entries were assembled and adversarially verified during the hierarchical-FIS novelty review (they carry `[V]`/`[S]` markers in the `.bib`). The VAT/clustering, persistence, optimization, and interpretability entries were added while drafting this proposal; the seminal ones carry standard DOIs, but every entry marked `[?]` — and in particular the recent and less-common works (eVAT, Fast-VAT, ConiVAT, clusiVAT, ToMATo, Bonis–Oudot, AuToMATo) — must have its DOI, pages, and venue verified before submission. Two entries (`meng2018evat`, `avinash2025fastvat`) are explicit placeholders with author names to fill in. This is tracked in `ACTION_ITEMS.md` under "consolidate the bibliography."
+A note on provenance and verification. The fuzzy-inference, fuzzy-tree, and mixture-of-experts entries were assembled and adversarially verified during the hierarchical-FIS novelty review. The VAT/clustering, persistence, optimization, and interpretability entries were added while drafting this proposal and then verified against Crossref, arXiv, and DBLP in a dedicated pass (2026-07-31). Every entry now carries a `[V]` (verified) or `[S]` (seminal, standard DOI) marker in the `.bib`; there are no unresolved entries. Notable resolutions from that pass:
+
+- The two former placeholders are real papers: **eVAT** is Meng & Yuan, *"Parallel Edge-Based Visual Assessment of Cluster Tendency on GPU"* (Int. J. Data Science and Analytics, 2018); **Fast-VAT** is Avinash & Lachheb, arXiv:2507.15904 (2025).
+- **Bonis–Oudot** (the nearest precedent for Chapter 5) was confirmed as Pattern Recognition Letters vol. 102, pp. 37–43, 2018.
+- **AuToMATo**'s title and authors were corrected (Huber, Kališnik, Schnider; *"An Out-Of-The-Box…"*, TMLR 2025).
+- **ConiVAT** remains an arXiv preprint only (arXiv:2008.09570) — no journal DOI exists, so none is asserted.
+
+One proof-stage item remains: confirm the "Kališnik" accent survives the final BibTeX/LaTeX encoding.
 
 ## Reading guide by area
 
