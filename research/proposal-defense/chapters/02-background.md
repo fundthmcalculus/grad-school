@@ -46,7 +46,7 @@
 
 ## 2.6 Interpretability & the Accuracy–Interpretability Trade-off
 
-- Definitions of interpretability / explainability (lean on Pickering's lenses: scale-, audience-, model-stage-dependent) — cite lightly, secondary framing.
+- Definitions of interpretability / explainability — **the author's own operational view** (readable off the model's structure; short rule base over named variables; hand-editable). NOTE: do NOT attribute this framing to Pickering — the author developed this work independently, without knowledge of her proposal; the reference PDFs are structural templates only. If a multi-lens account is cited, present it as parallel/independent work, not a source.
 - **The trade-off, honestly stated:** hierarchical/tree FIS trade accuracy for readability (Olaru–Wehenkel 2003; Alcalá 2007). Engage **Magdalena 2018** ("Do hierarchical fuzzy systems really improve interpretability?") — the rebuttal is that our hierarchies split only on *named original inputs*, never synthetic intermediates.
 - Post-hoc XAI (SHAP) as contrast to interpretable-by-construction (optional, if committee wants the XAI bridge).
 
