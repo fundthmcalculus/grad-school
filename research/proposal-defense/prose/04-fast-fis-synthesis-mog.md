@@ -49,7 +49,15 @@ On **RT-IOT2022** — 123,000 instances, 83 features, 12 output classes — the 
 
 On the **UCI Concrete Compressive Strength** regression set, the flat model's test $R^2$ is about 0.44, 0.77, and 0.87 at TSK orders zero, one, and two respectively — which is both a reasonable result and the launch point for the hierarchical models of Chapter 6, where a tree and a mixture of experts push it further.
 
-**[TABLE 4.1 — placeholder]** *Training time and accuracy: MoG vs. ANFIS vs. a GA-tuned FIS vs. a decision-tree/random-forest reference, on PhiUSIIL, RT-IOT2022, and Concrete. This is the table that makes the speed claim airtight — see the open item below.*
+**Table 4.1 — Training time and accuracy.** MoG columns are measured; the baseline columns are the experiments owed to this chapter (see the open item below and `ACTION_ITEMS.md` §C) and must be run on identical splits under the G4 protocol.
+
+| Dataset (task) | MoG train time | MoG accuracy / R² | ANFIS | GA-tuned FIS | tree / RF ref |
+|---|---:|---:|:--:|:--:|:--:|
+| PhiUSIIL (classification) | ~6 s | 97–99% | _TODO_ | _TODO_ | _TODO_ |
+| RT-IOT2022 (12-class) | < 60 s | _TODO_ | _TODO_ | _TODO_ | _TODO_ |
+| Concrete (regression) | _TODO_ | R² ≈ 0.87 (order 2) | _TODO_ | _TODO_ | _TODO_ |
+
+> **TODO — repeatable performance (board-wide standard):** the MoG timings/accuracies above are single-machine point estimates; reproduce under the fixed protocol (pinned clocks/thermals, multiple seeds, error bars) with the baseline columns filled before citation. See `ACTION_ITEMS.md` §A and Ch 7 Goal G4.
 
 **[FIGURE 4.2 — placeholder]** *Confusion matrix on RT-IOT2022 before and after the correction-rule pass, showing which class confusions the corrections repair.*
 `![rtiot-confusion](fig/04-rtiot-confusion.png)`
