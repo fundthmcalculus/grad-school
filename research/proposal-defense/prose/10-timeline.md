@@ -69,19 +69,19 @@ Legend: `####` scheduled work · `~~~` stretch (first to cut) · `....` ramp-up 
 | Quarter | Focus | Goals | Deliverable |
 |---|---|---|---|
 | **2026 Q4** | Proposal defense (~Dec) | — | Defended proposal; committee feedback folded in |
-| **2027 Q1** | Close credibility gaps | G4 | Fixed-protocol re-timing (error bars); eVAT/clusiVAT head-to-head; Ch 3 → pVAT journal; begin Ch 5 paper |
+| **2027 Q1** | Close credibility gaps | G4 | Fixed-protocol re-timing (error bars); eVAT/clusiVAT head-to-head; one consistent Concrete benchmark so Ch 4 and Ch 6 numbers are comparable; Ch 3 → pVAT journal; begin Ch 5 paper |
 | **2027 Q2** | Membership generation | G1, G5 | One-pass MF (roadmap phases 1–4); output-partitioning study; **Ch 5 paper submitted to EUSFLAT 2027** |
 | **2027 Q3** | Real data + hierarchy | G2, G3 (start) | DTW/edit/graph benchmarks; begin HME EM; **present at EUSFLAT 2027 (Sept)** |
 | **2027 Q4** | Hierarchy + baselines | G3 | HME EM done; ANFIS/CART/M5/flat-TSK suite; Ch 6 paper; writing begins |
-| **2028 Q1** | Capstone + write-up + **defense (Mar)** | capstone, G6, G7\* | End-to-end flagship case study; interpretability eval; dissertation complete; **final defense March 2028** |
+| **2028 Q1** | Capstone + write-up + **defense (Mar)** | capstone, G6, G7\* | End-to-end flagship case study (Ch 5 → Ch 6 integration); interpretability eval; dissertation complete; **final defense March 2028** |
 
 ## 10.4 Dependencies and critical path
 
 - **G4 is front-loaded** (Q1) because every later number is reported under its protocol; the credibility fixes should land before the new results pile up.
-- **G1 precedes the capstone** — the one-pass membership generator is what the integrated pipeline consumes, so it must be done (Q2) well before the Q5 capstone.
+- **G1 precedes the capstone** — the one-pass membership generator is what the integrated pipeline consumes, so it must be done (Q2) well before the 2028 Q1 capstone. The capstone is also the first time Chapter 5's membership functions are fed to Chapter 6's models at all, which makes it a genuine experiment rather than an integration chore.
 - **G2 has no upstream dependency** — start it as soon as G4's protocol exists; it is the top credibility item and the riskiest to leave late.
 - **G3's EM is the largest single build**, spanning Q3–Q4; its de-scope path is to keep the one-shot mixture if it slips.
-- **Papers track the work**: Ch 3 journal (Q1) → Ch 5 → EUSFLAT 2027 (written Q1–Q2, presented Q3) → Ch 6 (Q4) → the capstone/journal version alongside write-up (Q5).
+- **Papers track the work**: Ch 3 journal (Q1) → Ch 5 → EUSFLAT 2027 (written Q1–Q2, presented Q3) → Ch 6 (Q4) → the capstone/journal version alongside write-up (2028 Q1).
 
 ## 10.5 Buffer and risk
 
