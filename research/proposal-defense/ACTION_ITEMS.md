@@ -36,6 +36,26 @@ _Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 
   Also measured: the transform helps the fuzzy tree (+0.125 R²) but *hurts* the mixture (−0.052) — worth understanding, since both consume the same features.
 
+  ✅ **CONFOUND RESOLVED — it was mostly hyperparameters.** `reproduce/tables/table_hyperparam_normalization.py` crosses model × hyperparameters × normalization (3 seeds, shared splits). R²:
+
+  | Model | Hyperparameters | raw | log+std | Δ |
+  |---|---|---:|---:|---:|
+  | flat MoG-TSK 1st | pipeline | 0.646 | 0.797 | **+0.151** |
+  | flat MoG-TSK 2nd | pipeline | 0.783 | 0.845 | +0.062 |
+  | flat MoG-TSK full-2nd | pipeline | 0.775 | **0.881** | +0.106 |
+  | fuzzy tree | library default | 0.562 | 0.687 | +0.125 |
+  | fuzzy tree | **demo-tuned** | 0.701 | 0.717 | +0.016 |
+  | mixture of experts | library default | 0.690 | 0.638 | −0.052 |
+  | mixture of experts | **demo-tuned** | 0.773 | **0.862** | +0.089 |
+  | CART | sklearn default | 0.797 | 0.797 | −0.000 |
+  | Random Forest | sklearn default | 0.904 | 0.905 | +0.000 |
+
+  **The earlier "Ch6 inversion" was largely an artifact of running the hierarchy at library defaults.** Tuning the mixture per `demo_concrete.py` moves it 0.638 → 0.862 under normalization (+0.224). The dramatic gap closes: flat full-2nd 0.881 vs mixture 0.862 — within roughly one standard deviation of each other, not the 0.881-vs-0.638 chasm the first run suggested.
+
+  **What still holds for Ch6, stated precisely:** the mixture does not *beat* the flat model here (0.862 vs 0.881), so "hierarchy improves accuracy" remains unsupported — but "comparable accuracy, better readability" is well supported, and that is close to what Ch6 already argues. The tree stays clearly behind both (0.717). Ch6's specific figures (flat 0.658 → tree 0.746 → HME 0.791) should be replaced with these; the tree-below-mixture ordering survives, the flat-lowest ordering does not.
+
+  **A clean incidental finding worth putting in the dissertation.** Normalization is worth +0.06 to +0.15 R² to every Gaussian/fuzzy model and *exactly zero* to CART and Random Forest (−0.000 / +0.000). That is textbook-consistent — axis-aligned tree splits are rank-based and therefore invariant to monotone feature transforms, while Gaussian membership functions are scale-dependent — and it is a tidy empirical illustration of why the fuzzy pipeline needs its preprocessing while the baselines do not. It also disposes of any suspicion that the transform is quietly doing the work: it cannot be, since the strongest baseline (RF, 0.905) is untouched by it.
+
   ⏳ Refinement arms (`refine_antecedents_coordinate`) are implemented in the harness but slow (coordinate descent per order per seed); run them separately with `REPRO_REFINE=on` to test the 0.88→0.92 claim.
 
 - ⬜ **Reconcile the Concrete numbers (original note, HIGH PRIORITY — three incomparable figures for "the flat model").** Ch 4: flat MoG-TSK 0.44/0.77/0.87 (orders 0/1/2). Ch 6 Table 6.1: flat baseline 0.658 (tree/HME experiment). Ch 6 §6.3.5: antecedent refinement 0.88→0.92. All real, all different configs (split/preprocessing/order/objective), none comparable. Worst symptom: refinement's 0.92 *appears* to beat the HME's 0.791, which would make Ch 6 pointless — it doesn't, they're different configurations. Both chapters now warn the reader explicitly, but the fix is ONE consistent Concrete benchmark so every model is measured identically.
