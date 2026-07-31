@@ -25,7 +25,19 @@ Papers:
 
 Primary target venue: **EUSFLAT 2027 (September 2027)** (also consider FUZZ-IEEE / Fuzzy Sets & Systems / Information Sciences for journal versions).
 
-- **An $O(N^2)$ formulation of VAT/iVAT sequencing** — *with Dr. Vladik Kreinovich* → Ch 3 §3.3.1 (stage two). The follow-on to the published priority-queue result: removing the heap entirely via a compact active set with fused relax-and-select, taking the reorder from $O(N^2 \log N)$ to $O(N^2)$ with $O(N)$ workspace. Kreinovich's observation that the stage-one method was really a heap algorithm is what prompted the line of thinking; co-authorship is intended. Implementation already exists and is the shipped fast path (`pcvat.pyx::_prim_mst_kernel_64`), so what the paper needs is the write-up plus the timing study against both stage one and the classical implementation. **Scope the novelty tightly** — dense Prim is textbook; the claim is the VAT-sequencing formulation, the fused single pass, the O(N) workspace, and bit-identical verification.
+- **The right complexity for VAT/iVAT sequencing** — *with Dr. Vladik Kreinovich* → Ch 3 §3.3.1 (stage two). Kreinovich's observation that the stage-one method was really a heap algorithm prompted the line of thinking; co-authorship is intended.
+
+  **What the contribution is NOT.** It is not a new MST algorithm. Compact active-set dense Prim — swap-with-last removal, fused relax-and-select — is classical and has been $O(N^2)$ since Prim 1957. The repo's own novelty review says this plainly (`tribble-cluster/docs/performance-novelty.md` §4.4: *"The individual techniques are classical … Claim the composition + the regime + the measured envelope, not the parts."*). Any framing that reads as "we invented a faster MST" will and should be rejected.
+
+  **What the contribution is.** A correction to the VAT literature plus the measurement that settles it:
+  1. **The correction.** VAT operates on a *complete* graph, so heap Prim is $O(E \log V) = O(N^2 \log N)$ — asymptotically *worse* than plain dense Prim's $O(N^2)$. The VAT family has been shipping cubic re-scans and heap variants (mine included, at stage one) when the dense formulation was strictly better all along. That observation does not appear to be in print in this literature; confirming that is the open prior-art question below.
+  2. **The measured envelope.** Heap versus compact-dense across $N$, precision, and cache regime — where does each actually win, and by how much? The repo's own review flags this comparison as *"itself a publishable result."* Three arms: classical cubic, stage-one heap, stage-two dense.
+  3. **iVAT, not just VAT.** Fast-VAT (2025) is the nearest concurrent work and covers VAT only. The $O(N)$-workspace formulation carrying through the iVAT minimax recursion is the part with no direct competitor.
+  4. **The regime.** Exact, arbitrary (non-metric) dissimilarities, $O(N)$ working memory — stated as the constant-factor memory win it is (≈2× peak), not an asymptotic one, since the kd-tree line achieves sub-quadratic memory for Euclidean data.
+
+  Implementation already exists and is the shipped fast path (`pcvat.pyx::_prim_mst_kernel_64/_32`), so the work is the write-up plus the three-arm timing study. **Venue fit:** a short, sharp complexity-correction note suits NAFIPS or a similar short-communication venue; this is not an algorithms-conference paper and should not be aimed at one.
+
+  ⚠️ **Open prior-art question (search in progress):** whether anyone has already published an explicitly $O(N^2)$ VAT/iVAT sequencing bound, or already noted the heap-versus-dense point for VAT. The whole note hinges on that being unsaid. See `ACTION_ITEMS.md`.
 - **Fast interpretable FIS via Mixture-of-Gaussians** ("draft paper 3") → Ch 4.
 - **Topological membership generation for fuzzy inference systems** → Ch 5 (lead differentiator; EUSFLAT 2027 target).
 - **Hierarchical fuzzy trees & HME with a shared ridge-TSK primitive** → Ch 6.
