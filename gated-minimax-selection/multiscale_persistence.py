@@ -231,7 +231,9 @@ def select_multiscale(Dstar: np.ndarray,
                       min_size: int = 3,
                       band_gap_factor: float = 3.0,
                       min_log_gap: float = 0.5,
-                      min_band_coverage: float = 0.15) -> MultiScaleSelection:
+                      min_band_coverage: float = 0.15,
+                      merge_antichain: bool = True,
+                      nest_frac_thresh: float = 0.5) -> MultiScaleSelection:
     """Discover the scale hierarchy of `Dstar` (minimax / iVAT distance matrix).
 
     Args:
@@ -255,26 +257,54 @@ def select_multiscale(Dstar: np.ndarray,
                                 min_log_gap=min_log_gap)
     full_edges = [-np.inf] + edges + [np.inf]
 
-    bands: List[BandSelection] = []
-    band_id = 0
+    # Raw candidate bands: the significant blocks whose birth falls in each
+    # birth-gap interval. (Selection/cover happens after the merge pass.)
+    raw = []
     for lo, hi in zip(full_edges[:-1], full_edges[1:]):
-        band_blocks = [b for b in sig
-                       if lo <= np.log(b['birth'] + 1e-12) < hi]
-        if not band_blocks:
-            continue
-        sel = _greedy_cover(band_blocks)
+        cands = [b for b in sig if lo <= np.log(b['birth'] + 1e-12) < hi]
+        if cands:
+            raw.append({'lo': lo, 'hi': hi, 'cands': cands})
+
+    # Containment-aware merge (Phase 4): a birth-gap is only a genuine SCALE
+    # boundary if the coarser band's blocks are ANCESTORS of (contain) the finer
+    # band's blocks. If instead adjacent bands are an antichain (disjoint
+    # siblings -- same level, merely different spreads), the split is spurious;
+    # merge them. This fixes the log-separated over-segmentation from the scaling
+    # study (each cluster was landing in its own 1-block band) without touching
+    # genuine nested hierarchies (where every finer block IS contained coarser).
+    if merge_antichain:
+        changed = True
+        while changed and len(raw) > 1:
+            changed = False
+            for i in range(len(raw) - 1):
+                fine = _greedy_cover(raw[i]['cands'])
+                coarse = _greedy_cover(raw[i + 1]['cands'])
+                if not fine or not coarse:
+                    continue
+                nested = sum(1 for fb in fine
+                             if any(fb['members'] <= cb['members'] for cb in coarse))
+                if nested / len(fine) < nest_frac_thresh:
+                    raw[i] = {'lo': raw[i]['lo'], 'hi': raw[i + 1]['hi'],
+                              'cands': raw[i]['cands'] + raw[i + 1]['cands']}
+                    del raw[i + 1]
+                    changed = True
+                    break
+
+    bands: List[BandSelection] = []
+    for band in raw:
+        lo, hi = band['lo'], band['hi']
+        sel = _greedy_cover(band['cands'])
         bs = BandSelection(
-            band_id=band_id,
+            band_id=len(bands),
             log_birth_lo=lo, log_birth_hi=hi,
             birth_lo=float(np.exp(lo)) if lo > -np.inf else 0.0,
             birth_hi=float(np.exp(hi)) if hi < np.inf else float('inf'),
             blocks=sel,
-            n_candidates=len(band_blocks),
+            n_candidates=len(band['cands']),
         )
         if bs.coverage_fraction(n) >= min_band_coverage and bs.k >= 1:
             bs.band_id = len(bands)
             bands.append(bs)
-        band_id += 1
 
     # Deduplicate consecutive bands that produced the identical block set (can
     # happen when a discovered gap does not actually change the cover).
@@ -287,7 +317,17 @@ def select_multiscale(Dstar: np.ndarray,
         bs.band_id = len(deduped)
         deduped.append(bs)
 
-    return MultiScaleSelection(bands=deduped, n=n, n_significant=len(sig),
+    # Drop single-block bands: a band with one cluster is a no-information
+    # partition (everything -> one label), typically the near-root scale. Keep
+    # multi-cluster bands; if that leaves nothing, keep the finest single band so
+    # the result is never empty when structure exists.
+    informative = [bs for bs in deduped if bs.k >= 2]
+    if not informative and deduped:
+        informative = deduped[:1]
+    for i, bs in enumerate(informative):
+        bs.band_id = i
+
+    return MultiScaleSelection(bands=informative, n=n, n_significant=len(sig),
                                band_edges_log=edges)
 
 
@@ -333,22 +373,41 @@ def assign_band(band: BandSelection, Dstar: np.ndarray) -> np.ndarray:
 # directly, rather than the hard argmin-distance label assign_band returns.
 # ---------------------------------------------------------------------------
 
-def block_membership(block: dict, Dstar: np.ndarray) -> np.ndarray:
-    """Persistence-ramp membership mu_B(x) in [0,1] for one block, length n."""
+def block_membership(block: dict, Dstar: np.ndarray,
+                     kernel: str = 'gaussian') -> np.ndarray:
+    """Membership mu_B(x) in [0,1] for one block, length n, from the minimax
+    distance d_B(x) = min_{y in B} D*(x, y).
+
+    kernel:
+      'ramp'     -- Phase 1 persistence ramp clip((death-d)/(death-birth),0,1),
+                    core->1. CRISP by construction (no point has birth<d<death;
+                    see notes/MF_PROGRESS_LOG.md Phase 1). Kept for the record.
+      'gaussian' -- Phase 2 (default): mu = 2**(-(d/death)**2), i.e. a Gaussian in
+                    minimax distance with HALF-MAX at the block's death (escape)
+                    height -- the scale at which the block dissolves into its
+                    parent. Members (d=0) read 1; the non-member skirt (d>=death)
+                    is graded 0.5 -> 0. This is what makes the MF genuinely fuzzy;
+                    argmax still reproduces the crisp labels.
+    """
     mem = np.fromiter(block['members'], dtype=int)
     d = Dstar[mem, :].min(axis=0)
     h_b, h_d = block['birth'], block['death']
-    mu = np.clip((h_d - d) / (h_d - h_b + 1e-12), 0.0, 1.0)
-    mu[d <= h_b + 1e-12] = 1.0
-    return mu
+    if kernel == 'ramp':
+        mu = np.clip((h_d - d) / (h_d - h_b + 1e-12), 0.0, 1.0)
+        mu[d <= h_b + 1e-12] = 1.0
+        return mu
+    if kernel == 'gaussian':
+        return np.exp(-np.log(2.0) * (d / (h_d + 1e-12)) ** 2)
+    raise ValueError(f"unknown kernel {kernel!r}")
 
 
-def band_memberships(band: BandSelection, Dstar: np.ndarray) -> np.ndarray:
-    """Fuzzy partition (k_band x n) for one scale band: one ramp MF per block."""
+def band_memberships(band: BandSelection, Dstar: np.ndarray,
+                     kernel: str = 'gaussian') -> np.ndarray:
+    """Fuzzy partition (k_band x n) for one scale band: one MF per block."""
     n = Dstar.shape[0]
     if not band.blocks:
         return np.zeros((0, n))
-    return np.vstack([block_membership(b, Dstar) for b in band.blocks])
+    return np.vstack([block_membership(b, Dstar, kernel=kernel) for b in band.blocks])
 
 
 def defuzzify_memberships(U: np.ndarray, band: BandSelection,
@@ -369,14 +428,76 @@ def defuzzify_memberships(U: np.ndarray, band: BandSelection,
     return labels
 
 
-def multiscale_memberships(Dstar: np.ndarray, **kwargs):
+def multiscale_memberships(Dstar: np.ndarray, kernel: str = 'gaussian', **kwargs):
     """Run multi-scale selection and emit a fuzzy partition per scale band.
 
     Returns (MultiScaleSelection, [U_band, ...]) where each U_band is a
-    (k_band x n) matrix of persistence-ramp memberships, fine -> coarse.
+    (k_band x n) matrix of memberships (default Gaussian kernel), fine -> coarse.
     """
     msel = select_multiscale(Dstar, **kwargs)
-    return msel, [band_memberships(b, Dstar) for b in msel.bands]
+    return msel, [band_memberships(b, Dstar, kernel=kernel) for b in msel.bands]
+
+
+# ---------------------------------------------------------------------------
+# Phase 3: partition-of-unity per scale + the multi-scale fuzzy model
+# ---------------------------------------------------------------------------
+
+def normalize_partition(U: np.ndarray, eps: float = 1e-9) -> np.ndarray:
+    """Ruspini normalization: scale each point's memberships to sum to 1.
+    Points with ~0 total membership (uncovered at this scale) are left all-zero
+    -- a deliberate possibilistic choice: 'belongs to nothing here' is
+    information, not something to smear into a uniform guess. Column-positive
+    scaling never changes argmax, so hard labels are unaffected."""
+    s = U.sum(axis=0, keepdims=True)
+    return np.where(s > eps, U / np.where(s > eps, s, 1.0), 0.0)
+
+
+@dataclass
+class FuzzyHierarchy:
+    """The multi-scale fuzzy model: one fuzzy partition per discovered scale,
+    fine -> coarse. `U[i]` is a (k_i x n) membership matrix for band i."""
+    bands: List[BandSelection]
+    U: List[np.ndarray]
+    normalized: bool
+    kernel: str
+
+    @property
+    def n_scales(self) -> int:
+        return len(self.bands)
+
+    def granularities(self) -> List[int]:
+        return [u.shape[0] for u in self.U]
+
+    def level(self, i: int) -> np.ndarray:
+        return self.U[i]
+
+    def defuzzify(self, i: int, Dstar: np.ndarray) -> np.ndarray:
+        return defuzzify_memberships(self.U[i], self.bands[i], Dstar)
+
+    def partition_of_unity_error(self, i: int) -> Tuple[float, float]:
+        """(max, mean) |sum_k mu_k(x) - 1| over COVERED points (those with any
+        membership). Uncovered points are excluded -- they are legitimately 0."""
+        s = self.U[i].sum(axis=0)
+        covered = s > 1e-9
+        if not covered.any():
+            return 0.0, 0.0
+        err = np.abs(s[covered] - 1.0)
+        return float(err.max()), float(err.mean())
+
+    def coverage(self, i: int) -> float:
+        return float(np.mean(self.U[i].sum(axis=0) > 1e-9))
+
+
+def build_fuzzy_hierarchy(Dstar: np.ndarray, kernel: str = 'gaussian',
+                          normalize: bool = True, **kwargs) -> FuzzyHierarchy:
+    """Build the multi-scale fuzzy model: discover scale bands, emit a kernel
+    membership partition per band, and (optionally) Ruspini-normalize each to a
+    partition of unity. Hard labels (argmax) are identical with or without
+    normalization."""
+    msel, Us = multiscale_memberships(Dstar, kernel=kernel, **kwargs)
+    if normalize:
+        Us = [normalize_partition(u) for u in Us]
+    return FuzzyHierarchy(bands=msel.bands, U=Us, normalized=normalize, kernel=kernel)
 
 
 # ---------------------------------------------------------------------------
