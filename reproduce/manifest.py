@@ -33,14 +33,30 @@ def _uv(*args):
 EXPERIMENTS = [
     # ---- proposal tables (generators live in reproduce/tables, run under a submodule env) ----
     Experiment(
-        id="table-3-1-pvat-scaling",
-        title="pVAT vs classical VAT reorder time across N",
+        id="table-3-1-reorder-three-arm",
+        title="Three-arm reorder timing: classical cubic / stage-one heap / stage-two dense",
         chapter="Ch3", produces="Table 3.1",
         repo="tribble-cluster",
-        command=_uv("../reproduce/tables/table_3_1_pvat_scaling.py"),
+        command=_uv("../reproduce/tables/table_3_1_reorder_three_arm.py"),
         hardware="any",
-        outputs=["reproduce/outputs/table_3_1.md", "reproduce/outputs/table_3_1.csv"],
-        notes="Times exact pVAT reorder vs a naive O(N^3) reference; classical capped at small N.",
+        outputs=["reproduce/outputs/table_3_1_three_arm.md",
+                 "reproduce/outputs/table_3_1_three_arm.csv"],
+        notes="VERIFIED RUNNING. All three arms compiled; JIT warmed; every arm's ordering "
+              "checked bit-identical to stage two. Also the evidence base for the possible "
+              "complexity note (Ch9).",
+    ),
+    Experiment(
+        id="table-concrete-reconciliation",
+        title="Concrete under ONE protocol -- makes Ch4 and Ch6 numbers comparable",
+        chapter="Ch4", produces="Concrete reconciliation (HIGH PRIORITY)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_concrete_reconciliation.py"),
+        hardware="any", datasets=["Concrete"],
+        outputs=["reproduce/outputs/table_concrete_reconciliation.md",
+                 "reproduce/outputs/table_concrete_reconciliation.csv"],
+        notes="VERIFIED RUNNING. Every model on identical splits/seeds/preprocessing. "
+              "First run surfaced that the hierarchy does NOT beat flat under a uniform "
+              "protocol, and that CART/RF beat all fuzzy models -- see ACTION_ITEMS.",
     ),
     Experiment(
         id="table-4-1-mog-baselines",
