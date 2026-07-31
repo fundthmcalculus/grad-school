@@ -4,6 +4,8 @@
 **Repo:** `tribble-fis` (`gaussian_classifier.py`, `gaussian_regressor.py`, `gauss_math.py`; `gaussian_mixture/*`)
 **One-line claim:** a Mixture-of-Gaussians procedure that generates FIS antecedents *and* rules directly from data — no rule-base explosion, no post-hoc GA/GD — training classifiers/regressors orders of magnitude faster than optimization-based FIS while staying interpretable.
 
+> **Planned humor / framing motif (author):** open with *Hitchhiker's Guide to the Galaxy*. The construction is **consequent-first** — we place the output centroids (the *answer*) first and regress back to the antecedents (the *question*), à la Deep Thought computing 42 before anyone knew the question. Punchline: unlike Deep Thought, this runs fast enough that "the Vogons cannot blow the Earth up for a hyperspace bypass" before it finishes. This mirrors Ch 1's tribble motif — keep the light-but-precise register consistent.
+
 ---
 
 ## 4.1 Introduction
