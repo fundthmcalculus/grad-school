@@ -33,22 +33,52 @@ def _first_attr(mod, *names):
 
 
 # --- datasets ----------------------------------------------------------------
-def load_concrete():
-    """UCI Concrete: 8 raw mixture/age features -> compressive strength (MPa).
+CONCRETE_COLS = ["Cement", "Slag", "FlyAsh", "Water", "Superplasticizer",
+                 "CoarseAgg", "FineAgg", "Age", "Strength"]
 
-    Prefers the repo CSV; if absent, builds it from the .xls shipped in AEEM6097
-    (positional column rename, matching the demo's expected 'Strength' column).
+
+def load_concrete():
+    """UCI Concrete: 8 mixture/age features -> compressive strength (MPa).
+
+    Resolution order, so this works on a fresh clone without manual setup:
+      1. the repo CSV, if a previous run already cached it;
+      2. UCI via ``ucimlrepo`` (id 165) -- then cached as that CSV;
+      3. the legacy ``.xls`` in AEEM6097 (needs ``xlrd``, often absent).
+    Returns (X, y) or None, printing which route it took.
     """
     csv_path = os.path.join(FIS, "gaussian_mixture", "Concrete_Data.csv")
+
     if not os.path.exists(csv_path):
-        xls = os.path.join(REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls")
-        if not os.path.exists(xls):
+        df = None
+        try:                                    # 2. authoritative source
+            from ucimlrepo import fetch_ucirepo
+            ds = fetch_ucirepo(id=165)
+            df = ds.data.features.copy()
+            df["Strength"] = np.asarray(ds.data.targets).ravel()
+            df.columns = CONCRETE_COLS[: len(df.columns)]
+            print("  [concrete] fetched from UCI (id 165)")
+        except Exception as exc:                # noqa: BLE001
+            print(f"  [concrete] UCI fetch unavailable ({exc.__class__.__name__})")
+
+        if df is None:                          # 3. local spreadsheet
+            xls = os.path.join(REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls")
+            if os.path.exists(xls):
+                try:
+                    df = pd.read_excel(xls)
+                    df.columns = CONCRETE_COLS[: len(df.columns)]
+                    print("  [concrete] read from the local .xls")
+                except ImportError:
+                    print("  [concrete] the local file is a legacy .xls and needs `xlrd`; "
+                          "either `pip install xlrd` or let the UCI fetch handle it")
+                except Exception as exc:        # noqa: BLE001
+                    print(f"  [concrete] .xls unreadable ({exc.__class__.__name__})")
+
+        if df is None:
             return None
-        df = pd.read_excel(xls)
-        df.columns = ["Cement", "Slag", "FlyAsh", "Water", "Superplasticizer",
-                      "CoarseAgg", "FineAgg", "Age", "Strength"][: len(df.columns)]
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
         df.to_csv(csv_path, index=False)
+        print(f"  [concrete] cached -> {os.path.relpath(csv_path, REPO_ROOT)}")
+
     df = pd.read_csv(csv_path).dropna()
     df.columns = [c.strip() for c in df.columns]
     y = df["Strength"].astype(float).to_numpy()
