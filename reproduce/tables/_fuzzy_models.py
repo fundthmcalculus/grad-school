@@ -81,7 +81,11 @@ def load_concrete():
 
     df = pd.read_csv(csv_path).dropna()
     df.columns = [c.strip() for c in df.columns]
-    y = df["Strength"].astype(float).to_numpy()
+    # y is returned as a *named Series*, matching gaussian_mixture/concrete.py's
+    # loader: the tribblefis transforms index it by column name, so a bare ndarray
+    # raises deep inside standard_transform.
+    y = df["Strength"].astype(float)
+    y.name = "y_value"
     X = df.drop(columns=["Strength"]).select_dtypes(include=[np.number]).astype(float)
     return X, y
 
