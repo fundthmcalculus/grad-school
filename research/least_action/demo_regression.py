@@ -14,11 +14,14 @@ Claims under test
      requiring disjointness.
   E. Identifiability constraints (rule separation, capped widths) are what turn
      a stationary point into a *certifiable* local minimum.
+  H. Because the H1 slope term is negative for adjacent rules, there is a third
+     route to decoupling: tune lambda so the value and slope terms cancel.
 """
 
 from __future__ import annotations
 
 import numpy as np
+from scipy.optimize import minimize_scalar
 
 from fis_action import (
     Quadrature,
@@ -26,6 +29,7 @@ from fis_action import (
     fit,
     galerkin_residual,
     h1_gram,
+    normalized_weights,
     optimality_certificate,
     reduced_action_and_gradient,
     rule_regressors,
@@ -216,6 +220,68 @@ def main() -> None:
     g = galerkin_residual(f, y_d, dy_d, quad)
     for m, v in enumerate(g):
         print(f"  <e, phi_{m // 2} * t^{m % 2}>_H1 = {v:+.3e}")
+
+    rule("H. A third route: lambda-tuned orthogonality without disjointness")
+    print("  <phi_i,phi_j>_H1 = INT phi_i phi_j + lam INT phi_i' phi_j'.  For adjacent")
+    print("  rules the slope term is NEGATIVE (one rises where the other falls), so the")
+    print("  two terms can cancel at a positive lambda* -- giving exact H1 orthogonality")
+    print("  with overlapping, C-infinity, positively-covering membership functions.")
+    print()
+    fine = Quadrature.legendre(X_LO, X_HI, 2000)
+    print("  N=2, order 0.  lambda* = -INT(phi_0 phi_1) / INT(phi_0' phi_1'), closed form:")
+    print(f"{'width':>8} {'INT phi.phi':>13} {'INT dphi.dphi':>15} {'lambda*':>11} "
+          f"{'off-block at lam*':>19}")
+    for width in (2.0, 4.0, 6.0, 10.0):
+        cen = np.array([-5.0, 5.0])
+        wid = np.full(2, width)
+        ph, dph, _ = normalized_weights(fine.nodes, cen, wid, "gaussian")
+        num = fine.integrate(ph[0] * ph[1])
+        den = fine.integrate(dph[0] * dph[1])
+        lam_star = -num / den
+        ps, dps, _ = rule_regressors(fine.nodes, cen, wid, 0, "gaussian", X_REF)
+        obe = decoupling_report(h1_gram(ps, dps, fine, lam_star), 2, 0).off_block_energy
+        print(f"{width:8.1f} {num:13.4e} {den:15.4e} {lam_star:11.4f} {obe:19.2e}")
+    print()
+    print("  Does it actually make greedy fitting exact?  N=2, centers +-5, width 4:")
+    cen = np.array([-5.0, 5.0])
+    wid = np.full(2, 4.0)
+    ph, dph, _ = normalized_weights(fine.nodes, cen, wid, "gaussian")
+    lam_star = -fine.integrate(ph[0] * ph[1]) / fine.integrate(dph[0] * dph[1])
+    yd_f, dyd_f = y_d(fine.nodes), dy_d(fine.nodes)
+    print(f"{'order':>6} {'lambda':>10} {'off-block':>12} {'greedy vs joint':>17}")
+    for p_order in (0, 1):
+        for lam_v in (1.0, lam_star, 10.0):
+            _, j_act, _ = solve_consequents(cen, wid, yd_f, dyd_f, fine, lam_v,
+                                            p_order, "gaussian", X_REF)
+            _, g_act = sequential_fit(cen, wid, yd_f, dyd_f, fine, lam_v,
+                                      p_order, "gaussian", X_REF)
+            ps, dps, _ = rule_regressors(fine.nodes, cen, wid, p_order, "gaussian", X_REF)
+            obe = decoupling_report(h1_gram(ps, dps, fine, lam_v), 2, p_order).off_block_energy
+            tag = "  <-- lambda*" if abs(lam_v - lam_star) < 1e-9 else ""
+            print(f"{p_order:>6} {lam_v:10.4f} {obe:12.3e} "
+                  f"{abs(g_act - j_act) / j_act:17.3e}{tag}")
+    print("  order 0 at lambda*: off-block at machine zero, greedy == joint.")
+    print("  order 1 at lambda*: no good -- (p+1)^2 = 4 conditions, only one lambda.")
+    print()
+    print("  Scope for N > 2 (order 0): N(N-1)/2 pairwise conditions, still one lambda,")
+    print("  so exact cancellation is generically impossible -- but it still helps:")
+    print(f"{'N':>4} {'width':>7} {'off-block at lam=1':>20} {'best lam':>10} "
+          f"{'off-block there':>17}")
+    for n_r in (2, 3, 4, 5):
+        cen = np.linspace(-10.0, 10.0, n_r)
+        wid = np.full(n_r, 20.0 / max(n_r - 1, 1) * 0.6)
+
+        def off(lam_v, c=cen, w_=wid, n_=n_r):
+            ps, dps, _ = rule_regressors(fine.nodes, c, w_, 0, "gaussian", X_REF)
+            return decoupling_report(h1_gram(ps, dps, fine, lam_v), n_, 0).off_block_energy
+
+        best = minimize_scalar(off, bounds=(1e-3, 1e5), method="bounded",
+                               options={"xatol": 1e-8})
+        print(f"{n_r:>4} {wid[0]:7.2f} {off(1.0):20.3e} {best.x:10.3f} {best.fun:17.3e}")
+    print("  N=2 reaches machine zero; N>=3 improves the coupling ~20x but cannot")
+    print("  eliminate it.  Caveat: lambda* grows steeply with overlap (0.24 at width 2")
+    print("  to 138 at width 10), and lambda is also the physical slope weight -- so")
+    print("  buying decoupling this way distorts the fit the model was built to do.")
 
 
 if __name__ == "__main__":
