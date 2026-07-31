@@ -27,7 +27,8 @@
 - Lin & Kernighan 1973; Helsgaun 2000/2009 (LKH); Croes 1958 (2-opt); Johnson & McGeoch 1997; Lenstra 1974 (seriation≡TSP); Climer & Zhang 2006; Hahsler 2008 (seriation); Chisman 1975 (CTSP); Guttmann-Beck et al. 2000 (endpoint stitch); Ding 2007; Dorigo et al. 1996/1997 (ACO/ACS); Dai, Ji & Liu 2009 (MST-seeded ACO); Taillard & Helsgaun 2019 (POPMUSIC); Vassiliades et al. 2018 (CVT-MAP-Elites); Mouret & Clune 2015 (MAP-Elites); Deb et al. 2002 (NSGA-II); Zitzler et al. 2001 (SPEA2).
 
 ## Interpretability / XAI (secondary framing)
-- Lundberg & Lee 2017 (SHAP); Pickering 2024 (interpretability lenses — reference proposal); Molnar (interpretable ML) — optional.
+- Lundberg & Lee 2017 (SHAP); Molnar (interpretable ML) — optional.
+- Pickering 2024 & Arnett 2018: **structural/template references only** (same lab, proposal format). The author's methods and interpretability framing were developed independently, without knowledge of Pickering's work — cite only as parallel work if at all, never as an intellectual source.
 
 ---
 
