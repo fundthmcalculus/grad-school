@@ -100,6 +100,18 @@ EXPERIMENTS = [
               "Skew axis still untested (Concrete skew is only +0.42).",
     ),
     Experiment(
+        id="table-g5b-skew-sweep",
+        title="G5b: partitioning vs target skew (synthetic, skew isolated)",
+        chapter="Ch4", produces="Table 4.3 (Goal G5)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_g5b_skew_sweep.py"),
+        hardware="any",
+        outputs=["reproduce/outputs/table_g5b_skew_sweep.md"],
+        notes="VERIFIED RUNNING. Confirms H2: quantile's advantage grows monotonically with "
+              "skew (+0.003 -> +0.201 in R2). Mechanism is uniform's bucket starvation "
+              "(min occupancy 21 -> 0). Reverses H3: quantile holds the TAILS better too.",
+    ),
+    Experiment(
         id="table-4-1-mog-baselines",
         title="MoG FIS vs sklearn baselines (train time + accuracy/R2)",
         chapter="Ch4", produces="Table 4.1",
