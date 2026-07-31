@@ -35,7 +35,7 @@ _Last updated: 2026-07-31. Proposal defense ~Dec 2026 · final defense March 202
 |---|---|---|
 | **G4** | Repeatable-performance protocol: pinned clocks/thermals, ≥5 seeds, error bars, datacenter GPU with full-rate FP64. Consolidation point for every performance number in the document. Plus the eVAT/clusiVAT head-to-head Ch 3 owes. | 2027 Q1 |
 | **G1** | One-pass membership generation (`MEMBERSHIP_ROADMAP.md` phases 1–6); phase 4 (soft kernel-weighted band membership) is the research-interesting piece. | 2027 Q2 |
-| **G2** | **Real non-coordinate domains** — DTW time series, edit distance, graph kernels. The single most important credibility gap: Ch 3's niche and Ch 5's premise both currently rest on *synthetic* non-metrics built from coordinate data. | 2027 Q3 |
+| **G2** | **Real non-coordinate domains.** The single most important credibility gap: Ch 3's niche and Ch 5's premise both rest on *synthetic* non-metrics built from coordinate data. **Datasets identified and verified — see the G2 appendix below.** | 2027 Q3 |
 | **G3** | HME EM refinement implemented, plus the full baseline suite (ANFIS, CART/C4.5, M5, flat TSK, Fumanal-Idocin 2025, D-TSK-FC). | 2027 Q3–Q4 |
 | **capstone** | The integrated pipeline end to end. **Ch 5's membership functions have never been fed to Ch 6's models** — that link is specified but undemonstrated, which is why the capstone is a real experiment and not an integration chore. | 2028 Q1 |
 | **G6** | Interpretability measured, not asserted: rule counts, path lengths, and either an established metric or a small expert study. Fills Table 6.3's pending row. | 2028 Q1 |
@@ -65,6 +65,47 @@ _Last updated: 2026-07-31. Proposal defense ~Dec 2026 · final defense March 202
 - Ch 6: MIMO temporal memory as its own short chapter vs. a section (recommend section — it is a good aerospace hook either way).
 - Engineering debt: de-duplicate the six caller scripts' predict loops in `tribble-fis`.
 - Build a `run.py --all` pass and fix whatever else it surfaces.
+
+---
+
+## Appendix — G2 datasets, verified 2026-07-31
+
+**Primary: UCR/UEA time series under DTW.** Verified working in this environment.
+
+Access (note the gotcha): `uv pip install` does **not** persist, because `uv run --project` re-syncs from the lockfile and reverts it. Use `--with` instead:
+
+```bash
+uv run --project tribble-cluster --with aeon python your_script.py
+```
+
+```python
+from aeon.datasets import load_classification
+X, y = load_classification("Crop")     # downloads on first call
+```
+
+| Dataset | N | length | classes | note |
+|---|---:|---:|---:|---|
+| **Crop** | **24,000** | 46 | 24 | the scale target; 24k² float64 ≈ **4.6 GB** — squarely in the memory regime Ch 3 exists for |
+| **ElectricDevices** | 16,637 | 96 | 7 | second scale point |
+| **StarLightCurves** | 9,236 | 1,024 | 3 | long series — DTW cost grows with length too |
+| ECG5000 | 5,000 | 140 | 5 | mid-size |
+| FordA | 4,921 | 500 | 2 | mid-size |
+
+128 univariate datasets in the archive, all with ground-truth labels, so ARI is directly scorable.
+
+**DTW is more non-metric than the synthetic proxy, measured here:**
+
+| data | triangle-inequality violations |
+|---|---:|
+| GunPoint (DTW) | **29.3%** of sampled triples |
+| ItalyPowerDemand (DTW) | 16.3% |
+| *fractional Minkowski p=0.5 (the current synthetic stand-in)* | *14%* |
+
+That is the sentence Ch 3 §3.4 wants: the real domain is *harder* than the synthetic case already reported, not a softer substitute for it.
+
+**Why this family fits G2 better than the alternatives.** Warped time series have no fixed vector embedding — that is the entire premise of DTW — so the coordinate requirement is not merely inconvenient for the kd-tree/bounding-box methods, it is unsatisfiable. It therefore demonstrates both halves of the claim at once: non-metric correctness *and* the scaling regime, on the same data, with labels. Crop at 24,000 objects is also the natural place to exercise the on-demand distance computation, since materialising 288M DTW pairs is exactly what one wants to avoid.
+
+**Second family (to confirm):** graph datasets under graph edit distance or a graph kernel — TUDataset (MUTAG, PROTEINS, ENZYMES, NCI1) — and the Duin & Pękalska dissimilarity collection, which is distributed *as distance matrices* and so matches the claim most literally. A verification pass on these is in progress.
 
 ---
 
