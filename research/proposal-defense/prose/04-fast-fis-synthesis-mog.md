@@ -82,7 +82,28 @@ The consequence was worse than a wasted line of code. With a target standardized
 
 I have fixed it upstream. The solve now accepts a `pin_extremes` flag, on by default, implemented as an exact linear equality constraint rather than a penalty: each rule block's intercept column *is* that rule's bucket mean, so the two pinned columns move to the right-hand side and the remaining coefficients are solved against the residual. The constraint holds exactly — the bucket means come back as the intended $0.0$ and $1.0$ — and accuracy is unchanged to within noise, at most about 0.003 against a seed-to-seed deviation of 0.017. The gain is not accuracy. It is that the model can now express the full observed output range by construction, and that its extreme rules say something true.
 
-The working recommendation, then: **quantile boundaries, with the bucket count kept low enough that no bucket starves** — and on this target that means quantile is the right default above about four buckets and uniform is defensible below it. One caveat I will not paper over: Concrete's skew is only +0.42, which is mild. The hypothesis that quantile's advantage grows with skew is untested here and needs a genuinely skewed target, which is a goal for completion.
+That still leaves the question the whole argument started from, because Concrete's skew is only +0.42 and the hypothesis was about skew. No collection of real datasets settles it cleanly either — they differ in dimensionality, noise, and sample size all at once, so a gap between two of them is not attributable to skew in particular. So I isolated it. A fixed linear signal is pushed through the strictly monotone map $y = \mathrm{expm1}(\lambda z)/\lambda$, which changes the *shape* of the target while leaving the information in $X$ untouched. A perfect learner would score identically at every $\lambda$; whatever degrades is precisely what the partitioning fails to absorb.
+
+**Table 4.3 — Partitioning against target skew** (synthetic, skew isolated; 4 buckets, 2nd order, 3 seeds).
+
+| target skew | uniform R² | quantile R² | Q − U | uniform tail RMSE | quantile tail RMSE | uniform min bucket |
+|---:|---:|---:|---:|---:|---:|---:|
+| +0.07 | 0.914 | 0.917 | +0.003 | 0.055 | 0.052 | 21 |
+| +1.87 | 0.882 | 0.891 | +0.009 | 0.074 | 0.063 | 1 |
+| +5.44 | 0.759 | **0.793** | +0.033 | 0.105 | 0.070 | 1 |
+| +11.18 | 0.370 | **0.571** | **+0.201** | 0.137 | 0.072 | 1 |
+| +16.04 | 0.115 | −0.071 | *(both broken)* | 0.178 | 0.074 | 0 |
+| +19.46 | 0.075 | −2.504 | *(both broken)* | 0.176 | 0.076 | 0 |
+
+**The hypothesis holds, and the effect is large.** Across the usable range the two schemes are indistinguishable on a symmetric target (+0.003) and diverge monotonically as skew grows, reaching +0.201 in $R^2$ by skew 11. That is not a tuning detail; it is the difference between a model that works and one that mostly does not.
+
+**The mechanism is starvation, confirmed directly.** The last column is the smallest training bucket under uniform partitioning, and it collapses almost immediately: 21 samples at symmetry, *one* by skew 1.9, and *zero* past skew 16. Equal-width buckets on a skewed target put almost every point in the first bucket and leave the rest to estimate rules from nothing. Quantile partitioning cannot have this failure, because equal frequency is what it guarantees.
+
+**One prediction of mine was wrong, and in an instructive way.** I expected uniform to hold the *tails* better, on the reasoning that it covers the output range evenly. The opposite happens: uniform's tail error grows steadily (0.055 → 0.178) while quantile's stays nearly flat (0.052 → 0.076). The reasoning was right about geometry and wrong about data — an evenly spaced bucket in the sparse tail is useless if nothing lands in it. Coverage of the range is worthless without coverage of the *samples*.
+
+**A caution about the last two rows.** Past skew 16 both schemes fail — quantile's $R^2$ goes negative with a standard deviation near unity — so the apparent uniform "win" there is noise between two broken models, not a result. At that point the target is so compressed that three buckets hold almost nothing and the problem needs a target transform, not a better partition.
+
+The recommendation, then, is unambiguous: **quantile boundaries by default.** On a near-symmetric target it costs nothing; on a skewed one it is worth up to 0.2 in $R^2$; and the failure it avoids — an empty bucket — is one that aggregate error reports only after the model is already broken. Uniform is defensible only at low bucket counts on a near-symmetric target, which is a narrow enough case that the default should not be built around it.
 
 Having fixed the output partition, I use the same per-feature Gaussian-mixture approach for the antecedents and apply linear regression to obtain first-order Takagi–Sugeno–Kang consequents. This is the Deep Thought move made concrete: the answers (the output buckets) are chosen before the questions (the antecedents) are known, and the questions are then fit to them.
 
@@ -140,7 +161,7 @@ On the **BETH** host-telemetry set I test the anomaly rule of §4.3.5 in its har
 
 On the **UCI Concrete Compressive Strength** regression set, the flat model's test $R^2$ is about 0.44, 0.77, and 0.87 at TSK orders zero, one, and two respectively — which is both a reasonable result and the launch point for the hierarchical models of Chapter 6, where a tree and a mixture of experts push it further. One caution for the reader comparing chapters: Chapter 6 quotes a flat-model $R^2$ of 0.658 on the same dataset, which looks like a contradiction and is not. That figure comes from the tree-and-mixture experiment, which uses a different split, preprocessing, and order selection. Running one consistent Concrete benchmark so the flat baseline reads identically in both chapters is a reconciliation I owe.
 
-**Table 4.3 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation; the baseline comparison is Table 4.4.
+**Table 4.4 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation; the baseline comparison is Table 4.5.
 
 | Dataset (task) | Size (N × M) | Train time | Accuracy / R² | Rule base |
 |---|---|---:|---:|---|
@@ -152,7 +173,7 @@ On the **UCI Concrete Compressive Strength** regression set, the flat model's te
 
 The rule-base column is the point of the table as much as the accuracy is: for classification the count is simply the number of classes, and for regression the number of output buckets — never a product over inputs. RT-IOT2022 is the sharpest case, since a grid over 83 features would be beyond enumeration while this model carries twelve rules.
 
-**Table 4.4 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol.
+**Table 4.5 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol.
 
 | Method | Concrete R² | Concrete train time | PhiUSIIL accuracy | PhiUSIIL train time |
 |---|---:|---:|---:|---:|
@@ -164,7 +185,7 @@ The rule-base column is the point of the table as much as the accuracy is: for c
 
 **The mechanism, measured.** The BETH files are not in the repository, so the harness runs the same protocol on public data: leave-one-class-out, where each class is withheld from training in turn and treated as unseen, averaged over held-out classes and seeds. Sweeping the boost gives the operating curve the section promised.
 
-**Table 4.5 — The anomaly operating curve.** Detection and false alarm as functions of $\theta$, on Glass (6 classes, leave-one-class-out).
+**Table 4.6 — The anomaly operating curve.** Detection and false alarm as functions of $\theta$, on Glass (6 classes, leave-one-class-out).
 
 | $\theta$ | detection rate | false-alarm rate | detection − false alarm |
 |---:|---:|---:|---:|
@@ -181,7 +202,7 @@ Two honest observations follow. The default of $\theta = 0.99$ inherited from th
 
 I do not think that last figure says much about the method, and I want to be careful not to over-read it in either direction. Glass has 214 samples across six classes, several with fewer than a dozen members, so withholding a class removes much of the little data there is and the remaining model is asked to be confident about a space it has barely seen. It is a stress test, not a demonstration. What it establishes is that the mechanism works as described; what it does not establish is that the complement rule is *competitive*, and that requires BETH or a comparable dataset.
 
-**Table 4.6 — Against detectors built for the job** *(θ = 0.99, matched operating points).* The baselines' contamination is set to the complement rule's observed false-alarm rate, so all three are compared at the same point on their curves rather than at whatever default each ships with.
+**Table 4.7 — Against detectors built for the job** *(θ = 0.99, matched operating points).* The baselines' contamination is set to the complement rule's observed false-alarm rate, so all three are compared at the same point on their curves rather than at whatever default each ships with.
 
 | Method | Detection rate | False-alarm rate | Detection − false alarm | Separate model? |
 |---|---:|---:|---:|:--:|
@@ -191,7 +212,7 @@ I do not think that last figure says much about the method, and I want to be car
 
 The complement rule nominally leads, and I am going to decline to claim that. The standard deviations across held-out classes are larger than the gaps between the methods, so on this evidence the three are indistinguishable. What the table does support is the cheaper claim that motivated the section: the complement rule performs *comparably to purpose-built detectors while requiring no second model*, which is the property worth having. Establishing more than parity is a goal for completion.
 
-> **Reproduction.** Tables 4.3–4.6 regenerate from `reproduce/tables/table_4_1_mog_baselines.py`, which emits Markdown and CSV with mean ± standard deviation across a fixed seed set. Cells marked *pending* are those whose adapter or dataset was not yet wired up; the harness prints exactly what it could not run rather than substituting a guess.
+> **Reproduction.** Tables 4.4–4.7 regenerate from `reproduce/tables/table_4_1_mog_baselines.py`, which emits Markdown and CSV with mean ± standard deviation across a fixed seed set. Cells marked *pending* are those whose adapter or dataset was not yet wired up; the harness prints exactly what it could not run rather than substituting a guess.
 >
 > **TODO — repeatable performance (board-wide standard):** the numbers above are single-machine point estimates. Reproduce under the fixed protocol — pinned clocks and thermals, multiple seeds, reported error bars — before citation. See `ACTION_ITEMS.md` §A and Chapter 7, Goal G4.
 
