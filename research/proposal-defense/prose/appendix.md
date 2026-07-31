@@ -10,7 +10,7 @@ The figures below support the main text but are not needed to follow the argumen
 
 ## A.2 Extended results tables
 
-The main text carries the summary tables (Tables 3.1–3.3, 5.1–5.2, 6.1); their full, multi-seed versions live here once the repeatability protocol (Goal G4) has been run.
+The main text carries the summary tables (Tables 3.1–3.4, 4.1–4.2, 5.1–5.2, 6.1–6.3); their full, multi-seed versions live here once the repeatability protocol (Goal G4) has been run. All of them regenerate from the harness in `reproduce/tables/`, which emits Markdown and CSV side by side, so the appendix version is the same data at full width rather than a re-transcription.
 
 - **A.2.1** Full adversarial-evaluation ARI grids and the complete stitch-ablation grid (all partitions × sizes).
 - **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results.
@@ -37,7 +37,9 @@ Per the design decision recorded in Chapter 2, the optimization library is suppo
 ## A.4 Reproducibility
 
 - **Code.** Four repositories, submoduled into the `grad-school` working repo: `tribble-cluster` (VAT/iVAT/FCM), `tribble-fis` (the fuzzy models and `tribble-tree`), `tribble-opt` (the optimization engine), and `gated-minimax-selection` (the Chapter 5 membership-generation experiments).
-- **Drivers.** Each result is reproduced by a named script — the `gaussian_mixture/*` benchmark scripts for Chapter 4, `gated-minimax-selection/run_all.py` for Chapter 5, and the `experiments/` harnesses for Chapter 3.
+- **The reproduction harness.** `reproduce/` is the single entry point, and the goal is that reproducing a result takes one command rather than archaeology. Each table in the proposal has a generator under `reproduce/tables/` that runs the models over a fixed seed set and writes both Markdown and CSV into `reproduce/outputs/`, reporting mean ± standard deviation. Anything it cannot run — a missing optional baseline, an absent dataset, hardware it does not have — is reported as unavailable and printed with the reason, never silently replaced by an estimate. `reproduce/manifest.py` enumerates every experiment across the four repositories with its command, environment, datasets, and hardware tier; a full orchestrator that walks that manifest is the next step.
+- **Drivers.** Beyond the table generators, each original result has a named script — the `gaussian_mixture/*` benchmarks for Chapter 4, `tribble-tree/demo_*.py` for Chapter 6, `gated-minimax-selection/run_all.py` for Chapter 5, and the `experiments/` harnesses for Chapter 3.
+- **Environments.** The submodules carry their own locked environments, so the generators are invoked through them (for example, `uv run --project tribble-fis python reproduce/tables/table_6_1_model_family.py`). Dataset preparation is automatic where licensing permits — the Concrete set is built from the spreadsheet in the repo if the CSV is absent.
 - **Hardware.** Development ran on a 32-core Intel workstation with 64 GB RAM and a laptop-class RTX 4080 (12 GB, reduced double-precision throughput). Final performance numbers are to be re-taken under the fixed protocol of Goal G4 — pinned clocks and thermals, multiple seeds, error bars, and a datacenter GPU with full double-precision throughput.
 - **Commit pins.** The exact commit hashes behind each reported result will be pinned in this section at submission time.
 

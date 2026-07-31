@@ -49,25 +49,36 @@ One more result came out of this, and I include it because it is a neat conseque
 
 *Hardware: 32-core Intel CPU, 64 GB RAM, laptop RTX 4080 (12 GB). Every result labeled "exact" is bit-identical to the serial VAT reference.*
 
+> **Reproduction.** Table 3.1 regenerates from `reproduce/tables/table_3_1_pvat_scaling.py`, which times the exact pVAT reorder against a self-contained classical $O(N^3)$ reference across a configurable grid of $N$, multi-seed, emitting Markdown and CSV. Cells marked *pending* are sizes not yet swept.
+>
 > **TODO — repeatable performance (board-wide standard):** the numbers in this section are single-machine, some taken on a thermally throttled laptop. Before any of them are cited as scalability *or* stability results they must be reproduced under a fixed protocol — pinned clocks/thermals, multiple seeds, reported error bars, and a datacenter GPU with full-rate FP64. This same standard applies to every performance/scaling claim in the dissertation (Ch 5, Ch 6). Tracked as Goal G4 in Chapter 7.
 
-**Scaling.** The reorder speedup is the headline. On a 4,096-point problem the classical method takes 124 seconds and pVAT takes 2.56 seconds; at 135,000 points the improvement is roughly eight thousand-fold, which is the difference between "run it over lunch" and "run it interactively." The feasible problem size moves from about 5,000 points to over 130,000, and the NASA shuttle set — 58,000 points — orders in about a minute, which is where the paper title comes from.
+**Scaling.** The reorder speedup is the headline. On a 4,096-point problem the classical method takes 124 seconds and pVAT takes 2.56 seconds — a measured factor of about 48. The advantage grows with $N$, because the two methods differ by a factor of roughly $N/\log N$: at 135,000 points that ratio is on the order of eight thousand, which is the difference between "run it over lunch" and "run it interactively." I want to be careful to distinguish those two statements. The 48× at 4,096 points is measured against a running classical implementation; the eight-thousand-fold figure at 135,000 points is an *asymptotic projection*, because the classical method cannot be run at that size on this hardware to be timed against. The practical claim that does not depend on the projection is the one that matters: the feasible problem size moves from about 5,000 points to over 130,000, and the NASA shuttle set — 58,000 points — orders in about a minute, which is where the paper title comes from.
 
-**Table 3.1 — Reorder time, classical VAT vs. pVAT.** *(Confirmed points below; intermediate rows and the classical 135K figure are extrapolations/estimates to be filled in and error-barred under the G4 protocol.)*
+**Table 3.1 — Reorder time, classical VAT vs. pVAT.** Measured rows are marked; the largest sizes are pVAT-only because the classical method is infeasible there, and the speedup at those sizes is an asymptotic projection rather than a measurement.
 
-| N (points) | classical VAT | pVAT | speedup |
-|---:|---:|---:|---:|
-| 4,096 | 124 s | 2.56 s | ~48× |
-| 58,000 | infeasible on this hardware | ~60 s | — |
-| 135,000 | infeasible (extrapolated) | — | ~8,000× (reported) |
+| N (points) | classical VAT | pVAT | speedup | basis |
+|---:|---:|---:|---:|---|
+| 4,096 | 124 s | 2.56 s | ~48× | measured |
+| 58,000 | infeasible on this hardware | ~60 s | — | pVAT measured |
+| 135,000 | infeasible | *(runs)* | ~8,000× | projection from $N/\log N$ |
+| intermediate grid | *pending* | *pending* | *pending* | to be filled by the harness |
 
-**Memory.** The in-place scheme takes the 64,000-point float64 iVAT from infeasible (≈98 GB) to 33 GB in 25 seconds, and raises the largest feasible problem on 64 GB from ≈52,000 to ≈89,000 points.
+**Memory.** The in-place scheme changes what is possible rather than merely what is fast.
+
+**Table 3.2 — Memory footprint and the largest feasible problem (64 GB host).**
+
+| Quantity | Classical (2–3 matrices) | pVAT (in place) |
+|---|---:|---:|
+| iVAT at N = 64,000, float64 | ≈ 98 GB — does not run | **33 GB, 25 s** |
+| Largest feasible N at 64 GB | ≈ 52,000 | **≈ 89,000** |
+| Permutation buffers | 2 | **1** |
 
 **GPU.** On-device Borůvka MST is ≈5× serial Prim at 32,000 points and growing; the full on-device VAT front end is ≈4.8–6.6× end to end; GPU Fuzzy C-Means is 30–56× across 50,000–500,000 points at >99% label agreement. Pairwise distances win (1.3–2.5×) only at high dimension in float32, and lose below 1× at low dimension or in float64.
 
 **Clustering quality.** Because pVAT is exact single-linkage, it inherits single-linkage's strengths and weaknesses honestly. On non-convex data where k-means fails — two moons, concentric circles — pVAT and the stitched version both reach an adjusted Rand index of 1.00, against 0.27 and 0.00 for k-means. On bridged or touching-anisotropic clusters, where a single chain of points connects two real groups, pVAT scores 0.00, exactly as single-linkage does; I do not paper over this, and it is precisely the failure mode that Chapter 5's metric-learning and persistence work is meant to repair.
 
-**Table 3.2 — Adversarial clustering quality (adjusted Rand index).** pVAT is exact single-linkage, so it wins where k-means fails and inherits single-linkage's failures honestly.
+**Table 3.3 — Adversarial clustering quality (adjusted Rand index).** pVAT is exact single-linkage, so it wins where k-means fails and inherits single-linkage's failures honestly.
 
 | Dataset | k-means | single-linkage | exact pVAT | naive block | principled stitch |
 |---|---:|---:|---:|---:|---:|
@@ -78,7 +89,7 @@ One more result came out of this, and I include it because it is a neat conseque
 
 **The stitch.** Ablating the divide-and-conquer stitch on two moons across a grid of partitions and sizes: the light stitch (random representatives, one cross-edge) averages ARI 0.51; farthest-point representatives alone or top cross-edges alone are similar or worse; the principled combination of both reaches a mean ARI of 1.00 across every partition tested, at bounded cost. Both ingredients are required together.
 
-**Table 3.3 — Stitch ablation on two moons, over a grid of partitions and sizes.**
+**Table 3.4 — Stitch ablation on two moons, over a grid of partitions and sizes.**
 
 | Stitch variant | mean ARI | min ARI | fraction ≥ 0.9 |
 |---|---:|---:|---:|

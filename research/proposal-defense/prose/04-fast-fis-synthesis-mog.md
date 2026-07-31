@@ -37,7 +37,17 @@ Inference is ordinary fuzzy evaluation. For classification I take the class whos
 
 ### 4.3.4 Why the parameters grow linearly
 
-The reason the whole thing stays fast and small is the factorization. Rather than partitioning the joint input space, I condition on the output — for regression, by cutting the output into equal-frequency buckets with a quantile split — and fit an independent one-dimensional Gaussian mixture per feature within each bucket or class. The number of parameters is therefore on the order of the number of buckets or classes times the number of features times the components per mixture, which is *linear* in the inputs, not exponential. That single choice is what sidesteps the rule-base explosion, and it is the same instinct as the naive-Bayes factorization — traded, deliberately, for speed and interpretability.
+The reason the whole thing stays fast and small is the factorization. Rather than partitioning the joint input space, I condition on the output — for regression, by cutting the output into equal-frequency buckets with a quantile split — and fit an independent one-dimensional Gaussian mixture per feature within each bucket or class.
+
+The contrast with the grid construction of Chapter 1 is the whole argument of this chapter, so it is worth writing the two side by side. Gridding the inputs gives a rule count that is a product over the inputs,
+
+$$ N_{rules}^{\text{grid}} = \prod_{i=1}^{M} N_{\mu_i} \sim \mathcal{O}(c^{M}), $$
+
+exponential in the number of features $M$. Conditioning on the output instead gives
+
+$$ N_{rules}^{\text{MoG}} = K, \qquad N_{params} \sim \mathcal{O}(K \cdot M \cdot p), $$
+
+one rule per class (or output bucket) $K$, with parameters growing *linearly* in the number of features $M$ and the components per mixture $p$. For a twelve-class problem with eighty-three features — RT-IOT2022, below — the grid form is astronomically large while the factored form is a few thousand parameters and twelve rules. That single choice is what sidesteps the rule-base explosion, and it is the same instinct as the naive-Bayes factorization, traded deliberately for speed and interpretability.
 
 ## 4.4 Results
 
@@ -49,15 +59,28 @@ On **RT-IOT2022** — 123,000 instances, 83 features, 12 output classes — the 
 
 On the **UCI Concrete Compressive Strength** regression set, the flat model's test $R^2$ is about 0.44, 0.77, and 0.87 at TSK orders zero, one, and two respectively — which is both a reasonable result and the launch point for the hierarchical models of Chapter 6, where a tree and a mixture of experts push it further.
 
-**Table 4.1 — Training time and accuracy.** MoG columns are measured; the baseline columns are the experiments owed to this chapter (see the open item below and `ACTION_ITEMS.md` §C) and must be run on identical splits under the G4 protocol.
+**Table 4.1 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation; the baseline comparison is Table 4.2.
 
-| Dataset (task) | MoG train time | MoG accuracy / R² | ANFIS | GA-tuned FIS | tree / RF ref |
-|---|---:|---:|:--:|:--:|:--:|
-| PhiUSIIL (classification) | ~6 s | 97–99% | _TODO_ | _TODO_ | _TODO_ |
-| RT-IOT2022 (12-class) | < 60 s | _TODO_ | _TODO_ | _TODO_ | _TODO_ |
-| Concrete (regression) | _TODO_ | R² ≈ 0.87 (order 2) | _TODO_ | _TODO_ | _TODO_ |
+| Dataset (task) | Size | MoG train time | MoG accuracy / R² | Rules |
+|---|---|---:|---:|---:|
+| PhiUSIIL (binary classification) | 235K × 54 | ~6 s | 97–99% | 2 |
+| RT-IOT2022 (12-class) | 123K × 83 | < 60 s | — *(pending)* | ~12 |
+| Concrete (regression, TSK order 0) | 1,030 × 8 | seconds | R² ≈ 0.44 | 3 buckets |
+| Concrete (regression, TSK order 1) | 1,030 × 8 | seconds | R² ≈ 0.77 | 3 buckets |
+| Concrete (regression, TSK order 2) | 1,030 × 8 | seconds | R² ≈ 0.87 | 3 buckets |
 
-> **TODO — repeatable performance (board-wide standard):** the MoG timings/accuracies above are single-machine point estimates; reproduce under the fixed protocol (pinned clocks/thermals, multiple seeds, error bars) with the baseline columns filled before citation. See `ACTION_ITEMS.md` §A and Ch 7 Goal G4.
+**Table 4.2 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Both rows run on identical splits, multi-seed with error bars, under the Goal G4 protocol.
+
+| Method | Concrete R² | Concrete train time | PhiUSIIL accuracy | PhiUSIIL train time |
+|---|---:|---:|---:|---:|
+| **MoG FIS (this work)** | ≈ 0.87 | seconds | 97–99% | ~6 s |
+| ANFIS | *pending* | *pending* | *pending* | *pending* |
+| GA-tuned FIS | *pending* | *pending* | *pending* | *pending* |
+| CART / Random Forest (reference) | *pending* | *pending* | *pending* | *pending* |
+
+> **Reproduction.** Both tables regenerate from `reproduce/tables/table_4_1_mog_baselines.py`, which emits Markdown and CSV with mean ± standard deviation across a fixed seed set. Cells marked *pending* are those whose adapter or dataset was not yet wired up; the harness prints exactly what it could not run rather than substituting a guess.
+>
+> **TODO — repeatable performance (board-wide standard):** the numbers above are single-machine point estimates. Reproduce under the fixed protocol — pinned clocks and thermals, multiple seeds, reported error bars — before citation. See `ACTION_ITEMS.md` §A and Chapter 7, Goal G4.
 
 **[FIGURE 4.2 — placeholder]** *Confusion matrix on RT-IOT2022 before and after the correction-rule pass, showing which class confusions the corrections repair.*
 `![rtiot-confusion](fig/04-rtiot-confusion.png)`

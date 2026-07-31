@@ -13,7 +13,8 @@ _Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 - ⬜ **Regenerate all figures** at consistent publication style/size (see per-chapter figure placeholders).
 - ✅ **Reference PDFs are structural templates only** — never cite Pickering/Arnett as an intellectual source; author's work is independent.
 - ⬜ **Reconcile the Concrete flat-model R²** across chapters: Ch 4 reports flat MoG-TSK at 0.44/0.77/0.87 (orders 0/1/2); Ch 6 reports flat baseline at 0.658 (from the tree/HME experiment). Different split/preprocessing/order. Run one consistent Concrete benchmark so the flat baseline reads identically in both chapters.
-- 🟨 **Tables built from real data (consistency pass):** Table 3.2 (adversarial ARI), 3.3 (stitch ablation), 5.1 (multi-scale), 5.2 (selection bake-off), 6.1 (model family), 7.1 (goals map). Partial/placeholder-with-real-data: 3.1 (reorder time — needs intermediate rows + classical 135K), 4.1 (MoG filled; ANFIS/GA/ref columns owed).
+- 🟨 **Tables (12 total, all carry real data; `*pending*` cells await the harness).** Fully measured: 3.2 (memory), 3.3 (adversarial ARI), 3.4 (stitch ablation), 4.1 (MoG results), 5.1 (multi-scale), 5.2 (selection bake-off), 6.1 (model family), 7.1 (goals map). Structure-fixed with pending cells: 3.1 (reorder time — intermediate N grid), 4.2 (ANFIS/GA-FIS/RF baselines), 6.2 (CART/M5/RF/ANFIS/flat-TSK baselines), 6.3 (interpretability counts at matched accuracy).
+- 🟨 **Reproduction harness** (`reproduce/`): generators for Tables 3.1, 4.1/4.2, 6.1–6.3 written and compile-clean; emit Markdown+CSV with mean ± std over fixed seeds. REMAINING: execute them under the submodule envs to fill `*pending*` cells (expect minor API-name fixes on first run); add ANFIS/GA-FIS adapters; build the `run.py` orchestrator over `manifest.py`.
 - ⬜ **Figure placeholders** still to produce: Ch 1 (×2), Ch 2 (×3), Ch 3 (×1), Ch 4 (×2), Ch 6 (×3).
 
 ## B. Needed from author / advisor

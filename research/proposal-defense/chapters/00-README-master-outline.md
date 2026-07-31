@@ -74,6 +74,10 @@ The repo docs are candid adversarial self-reviews; preserve that rigor:
 
 ---
 
+## Reproduction harness
+
+`reproduce/` at the repo root is the single entry point for regenerating results. Each proposal table has a generator in `reproduce/tables/` that runs over a fixed seed set and emits Markdown + CSV to `reproduce/outputs/` with mean ± std; unavailable methods/datasets are reported as such, never estimated. `reproduce/manifest.py` registers every experiment across the four submodules (command, env, datasets, hardware tier) for a future `run.py` orchestrator. Goal: one-command reproduction, with hardware-gated runs skipped cleanly.
+
 ## Source-document map (where the material lives)
 
 - **Ch 3:** `tribble-cluster/` — `docs/performance-novelty.md`, `docs/novel-niche.md`, `docs/novelty-review.md`, `docs/vat-tsp-prior-art.md`, `experiments/findings/{SUMMARY_REPORT,white-paper,ADVERSARIAL_EVAL,STITCHED_VAT,HARDENING,DC_VAT_SCALING,VAT_TSP_*}.md`; `presentations/quals/slides/{paper1,paper2}.md`.
