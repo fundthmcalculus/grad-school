@@ -9,20 +9,25 @@ A note on provenance and verification. The fuzzy-inference, fuzzy-tree, and mixt
 - **AuToMATo**'s title and authors were corrected (Huber, Kališnik, Schnider; *"An Out-Of-The-Box…"*, TMLR 2025).
 - **ConiVAT** remains an arXiv preprint only (arXiv:2008.09570) — no journal DOI exists, so none is asserted.
 
-One proof-stage item remains: confirm the "Kališnik" accent survives the final BibTeX/LaTeX encoding.
+Two items remain open, and one of them is not cosmetic:
+
+- ⚠️ **One citation is still broken.** Chapters 2 and 3 refer to the kd-tree memory methods as "[*Information Sciences* 2024]" — a journal name and a year, with no author, title, or DOI. It sits in the `.bib` as `kdtreevat2024`, flagged `[!]`, and it will not survive review in that state. It also matters more than most: that line is the one achieving *sub-quadratic* memory for Euclidean data, so it is load-bearing for Chapter 3's argument about which regime is unoccupied. Resolving it is tracked in `ACTION_ITEMS.md`.
+- A proof-stage check: confirm the "Kališnik" accent survives the final BibTeX/LaTeX encoding.
 
 ## Reading guide by area
 
-- **Fuzzy inference systems, trees, and mixtures of experts** — the TSK form and ANFIS (`takagi1985fuzzy`, `jang1993anfis`, `wu2020optimize`); rule generation from data (`sugeno1993qualitative`, `wang1992generating`, `chiu1994fuzzy`, `abe1995method`); genetic fuzzy systems (`cordon2001genetic`, `herrera2008genetic`, `alcala2007rule`); fuzzy and soft trees (`janikow1998fuzzy`, `yuan1995induction`, `suarez1999globally`, `olaru2003complete`, `medina2001backpropagation`, `fumanal2025fast`); hierarchical mixtures and TSK-fusion (`jordan1994hierarchical`, `wu2020functional`, `raju1991hierarchical`, `zhou2017deep`, `zhang2023tsk`); Ruspini partitions and interpretable design (`ruspini1969new`, `guillaume2004generating`, `deoliveira1999semantic`, `guillaume2006expert`, `guillaume2011learning`, `nanfack2022constraint`); cascades (`viola2001rapid`, `cavalin2019confusion`); universal approximation and the interpretability caveat (`wang1998universal`, `wang1999analysis`, `joo2002universal`, `magdalena2018do`, `higashi1983measures`).
+- **Fuzzy inference systems, trees, and mixtures of experts** — the TSK form and ANFIS (`takagi1985fuzzy`, `jang1993anfis`, `wu2020optimize`); rule generation from data (`sugeno1993qualitative`, `wang1992generating`, `chiu1994fuzzy`, `abe1995method`, `jang1993functional`); genetic fuzzy systems (`cordon2001genetic`, `herrera2008genetic`, `alcala2007rule`); fuzzy and soft trees (`janikow1998fuzzy`, `yuan1995induction`, `suarez1999globally`, `olaru2003complete`, `medina2001backpropagation`, `fumanal2025fast`); hierarchical mixtures and TSK-fusion (`jordan1994hierarchical`, `wu2020functional`, `raju1991hierarchical`, `zhou2017deep`, `zhang2023tsk`); Ruspini partitions and interpretable design (`ruspini1969new`, `guillaume2004generating`, `deoliveira1999semantic`, `guillaume2006expert`, `guillaume2011learning`, `nanfack2022constraint`); cascades (`viola2001rapid`, `cavalin2019confusion`); universal approximation and the interpretability caveat (`wang1998universal`, `wang1999analysis`, `joo2002universal`, `magdalena2018do`, `higashi1983measures`).
 - **VAT / iVAT / cluster tendency** — `bezdek2002vat`, `wang2010ivat`, `havens2012efficient`, `kumar2016clusivat`, `kumar2020vatsurvey`, `rathore2020conivat`, and the fast-VAT competitors `meng2018evat`, `avinash2025fastvat`.
 - **MST, single-linkage, and Fuzzy C-Means** — `prim1957shortest`, `gower1969mst`, `zahn1971graph`, `dunn1973fuzzy`, `bezdek1981pattern`, `hathaway1994nerf`, `bien2011hierarchical`, `tibshirani2001gap`, `cate1977insitu`.
 - **Persistence and topological data analysis** — `chazal2013persistence` (ToMATo), `bonis2018fuzzy` (the nearest precedent for Chapter 5), `automato2024`.
 - **Optimization, TSP, and quality-diversity** — `lin1973effective`, `helsgaun2000effective`, `croes1958method`, `dorigo1996ant`, `kennedy1995particle`, `deb2002nsga2`, `mouret2015illuminating`, `vassiliades2018cvt`.
 - **Interpretability / XAI** — `lundberg2017shap`.
 
-## Not intellectual sources
+## On the reference proposals
 
-The two reference dissertation proposals in `research/proposal-defense/` (Pickering 2024, Arnett 2018) informed the *document structure and format only*. They are not cited as sources for any method or framing in this work, which was developed independently.
+Two dissertation proposals from this department sit in `research/proposal-defense/` (Pickering 2024, Arnett 2018). They informed the *document structure and format* of this proposal. Neither is a source for any method or framing here; this work was developed independently, and in particular the interpretability position in §2.6 is my own and predates any awareness of Pickering's treatment.
+
+One qualification, so the record is exact. Arnett (2018) *is* cited once, in §2.1, because the FIS constraint set I adopt — triangular membership functions, Ruspini partition, product t-norm, weighted-average defuzzification — appears there in the same combination. That citation marks a parallel in the same department, not a debt: the constraints themselves trace to Ruspini (1969) and de Oliveira (1999), which is what §2.1 cites for them. I would rather note the overlap than have a committee member who has read both documents notice it unremarked.
 
 ---
 
