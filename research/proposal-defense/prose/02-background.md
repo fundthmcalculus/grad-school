@@ -1,6 +1,6 @@
 # Chapter 2 — Background and Preliminaries
 
-Everything in this proposal is built from a small number of standard tools, arranged in a particular order. This chapter introduces those tools so that the later chapters can lean on them without re-deriving them each time. I have tried to keep it to what I actually use downstream: the fuzzy inference machinery I am trying to build faster, the cluster-tendency methods I use to find structure, a little topology to make sense of that structure at multiple scales, the relational clustering that ties the two together, and a short account of why the usual optimization is the thing I am trying to avoid. The chapter closes with interpretability, since that is the property I am unwilling to trade away.
+Everything in this proposal is built from a small number of standard tools, arranged in a particular order. This chapter introduces those tools so that the later chapters can lean on them without re-deriving them each time. Throughout, $N$ is the number of samples, $M$ the number of input features, $K$ the number of output classes or output buckets, and $D$ an $N \times N$ dissimilarity matrix. I have tried to keep it to what I actually use downstream: the fuzzy inference machinery I am trying to build faster, the cluster-tendency methods I use to find structure, a little topology to make sense of that structure at multiple scales, the relational clustering that ties the two together, and a short account of why the usual optimization is the thing I am trying to avoid. The chapter closes with interpretability, since that is the property I am unwilling to trade away.
 
 ## 2.1 Fuzzy Inference Systems
 
@@ -15,7 +15,7 @@ To keep the systems analyzable, I adopt a set of constraints that are standard i
 
 The problem I keep running into is the rule base. If I build a FIS by partitioning each input independently and forming a rule for every combination of sets, the number of rules is the product of the per-input set counts,
 
-$$ N_{rules} = \prod_{i=1}^{N_{inputs}} N_{\mu_i}. $$
+$$ N_{rules} = \prod_{i=1}^{M} N_{\mu_i}. $$
 
 This is exponential in the number of inputs. Even a modest problem — ten inputs, three sets each — is nearly sixty thousand rules, and the whole interpretability argument collapses the moment a human has to read them. Much of this dissertation is about not building the rule base that way. The classical training methods are the other half of the problem, and I take them up in Section 2.5.
 

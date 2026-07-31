@@ -55,19 +55,42 @@ The last piece extends the same machinery to time. I augment each feature with a
 
 ## 6.4 Results and Proposed Experiments
 
+> **Reproduction.** Tables 6.1–6.3 regenerate from `reproduce/tables/table_6_1_model_family.py`, which emits Markdown and CSV with mean ± standard deviation across a fixed seed set and fills the baseline columns from scikit-learn (CART, Random Forest) plus an optional M5 adapter. Cells marked *pending* are those whose adapter was not yet wired up; the harness reports what it could not run rather than substituting a guess.
+>
 > **TODO — repeatable performance (board-wide standard):** the training-time, accuracy, and speedup numbers here need the fixed reproducibility protocol and the full baseline suite before citation (see `ACTION_ITEMS.md` §A/§C and Ch 7 Goal G4/G3).
 
 **What is measured today.** On Concrete regression, the flat model's $R^2$ is 0.658 (RMSE 9.38 MPa), the first-order fuzzy tree improves it to 0.746 (RMSE 8.09), and the hierarchical mixture reaches 0.791 (RMSE 7.34) — the most accurate of the three. On PhiUSIIL classification, the flat model is at 0.998 accuracy and the mixture at 0.996, with the tree splitting on interpretable signals. Antecedent refinement lifts the Concrete $R^2$ from roughly 0.88 to 0.92 (a number I flag for re-verification). And the memory result above.
 
 > *Note on the flat Concrete baseline:* the flat $R^2 = 0.658$ reported here comes from the tree/mixture experiment and is not the same configuration as the flat MoG-TSK figures in Chapter 4 (0.44/0.77/0.87 at orders 0/1/2) — different split, preprocessing, and order selection. A single consistent Concrete benchmark, so the flat baseline reads identically across chapters, is a reconciliation TODO (see `ACTION_ITEMS.md` §A).
 
-**Table 6.1 — Model family on Concrete and PhiUSIIL.** Model-family columns are measured; baselines are proposed (Goal G3) on identical splits.
+**Table 6.1 — The model family, measured.** All three columns are this work; note that the ordering of the winner differs by task, which is the honest result.
 
-| Dataset | metric | flat | fuzzy tree | mixture (HME) | ANFIS / CART / M5 |
-|---|---|---:|---:|---:|:--:|
-| Concrete | R² | 0.658 | 0.746 | **0.791** | _TODO_ |
-| Concrete | RMSE (MPa) | 9.38 | 8.09 | **7.34** | _TODO_ |
-| PhiUSIIL | accuracy | **0.998** | ~0.968 | 0.996 | _TODO_ |
+| Dataset | Metric | Flat FIS | Fuzzy tree | Mixture (HME) |
+|---|---|---:|---:|---:|
+| Concrete | R² | 0.658 | 0.746 | **0.791** |
+| Concrete | RMSE (MPa) | 9.38 | 8.09 | **7.34** |
+| PhiUSIIL | accuracy | **0.998** | ~0.968 | 0.996 |
+
+**Table 6.2 — External baselines** *(structure fixed; cells to be filled by the reproduction harness — Goal G3).* Run on identical splits, multi-seed with error bars.
+
+| Method | Concrete R² | Concrete RMSE | PhiUSIIL accuracy |
+|---|---:|---:|---:|
+| **Fuzzy tree (this work)** | 0.746 | 8.09 | ~0.968 |
+| **Mixture of experts (this work)** | **0.791** | **7.34** | 0.996 |
+| CART | *pending* | *pending* | *pending* |
+| M5 model tree | *pending* | *pending* | — |
+| Random Forest (reference) | *pending* | *pending* | *pending* |
+| ANFIS | *pending* | *pending* | *pending* |
+| Flat TSK | *pending* | *pending* | *pending* |
+
+**Table 6.3 — The interpretability side of the trade** *(partially measured).* This is the table that makes the trade-off legible rather than asserted: the hierarchy's value is the readable decision path, not a smaller rule base.
+
+| Model | Rules / leaves | Variables per rule | Reads as |
+|---|---:|---:|---|
+| Flat FIS (Concrete) | 3 output buckets | all 8 | one weighted rule set |
+| Fuzzy tree (Concrete) | shallow, depth-capped | only the path variables | root→leaf IF–THEN path |
+| Mixture of experts | one sub-FIS per gate leaf | path gates + expert inputs | gated hierarchy |
+| Exact counts at matched accuracy | *pending* | *pending* | — |
 
 **The honest scope.** I want to be plain about what the hierarchy buys and what it does not. On raw accuracy the tree and mixture do *not* beat the flat model in general — on PhiUSIIL the mixture is a hair *behind* the flat model — and they do not shrink the rule count below the already-compact flat model. What they buy is an explicit decision hierarchy over named variables and a readable path structure, and that payoff is real only at shallow depth and few terms, which is why I cap depth and leaf count. This is an interpretability-for-accuracy trade, made deliberately, and I would rather state it than let a reviewer discover it.
 

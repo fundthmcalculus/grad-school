@@ -46,6 +46,8 @@ One small, satisfying consequence: the number of disjoint pieces a concept has �
 
 ## 5.4 Preliminary Results
 
+> **Reproduction.** The whole pipeline behind this section regenerates from a single deterministic driver, `gated-minimax-selection/run_all.py`, which writes the results and every figure referenced below; it is registered in `reproduce/manifest.py`.
+>
 > **TODO — repeatable performance (board-wide standard):** the scaling numbers below are single-machine point estimates and must be reproduced under the fixed protocol (see `ACTION_ITEMS.md` §A and Ch 7 Goal G4) before citation.
 
 The results here are on synthetic data with known ground truth, which is both their strength (I know the right answer) and their limitation (Section 5.5).
