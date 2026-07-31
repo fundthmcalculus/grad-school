@@ -15,21 +15,29 @@ _Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 - ⚠️ **NAME COLLISION — "pVAT" is taken.** Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013 (LNCS 8302:151–170) is a published method of that name that also swaps the MST algorithm for the VAT ordering (Prim → Borůvka). Reading our *p* as parallel/performant collides harder, not less. **A new name is needed**; the draft still says pVAT only because renaming mid-proposal is more confusing than flagging it. Affects the dissertation title-level nomenclature, Ch 3 throughout, and Ch 9.
 - ⬜ **Regenerate all figures** at consistent publication style/size (see per-chapter figure placeholders).
 - ✅ **Reference PDFs are structural templates only** — never cite Pickering/Arnett as an intellectual source; author's work is independent.
-- 🔴 **CRITICAL — the Concrete reconciliation RAN and inverts Ch6's central claim.** First execution of `reproduce/tables/table_concrete_reconciliation.py` (2 seeds, 80/20, default hyperparameters, no target transform):
+- 🟡 **Concrete reconciliation RAN with the real pipeline — Ch4 vindicated, Ch6's relative claim is not.** `reproduce/tables/table_concrete_reconciliation.py` now replicates `gaussian_mixture/concrete.py` (standardized target, quantile output partition, auto log-transform — it selects `Age` — feature standardization, closed-form ridge consequents). 3 seeds, identical splits, RMSE rescaled to MPa:
 
-  | Model | R² | vs. proposal |
-  |---|---:|---|
-  | flat MoG-TSK order 0 | 0.279 | proposal says 0.44 |
-  | flat MoG-TSK order 1 | 0.644 | proposal says 0.77 |
-  | **flat MoG-TSK order 2** | **0.774** | proposal says 0.87 |
-  | fuzzy tree | 0.579 ± 0.117 | proposal says 0.746 |
-  | mixture of experts (HME) | 0.689 | proposal says 0.791 |
-  | CART | 0.810 | was *pending* |
-  | Random Forest | 0.909 | was *pending* |
+  | Model | Preprocessing | R² | RMSE (MPa) | proposal says |
+  |---|---|---:|---:|---|
+  | flat MoG-TSK 0th | log+std | 0.262 | 13.74 | 0.44 ✗ |
+  | flat MoG-TSK 1st | log+std | **0.797** | 7.20 | 0.77 ✓ |
+  | flat MoG-TSK 2nd | log+std | **0.845** | 6.30 | 0.87 ✓ |
+  | flat MoG-TSK full-2nd | log+std | **0.881** | 5.54 | *not quoted* |
+  | fuzzy tree | raw / log+std | 0.562 / 0.687 | 10.52 / 8.92 | 0.746 |
+  | mixture of experts | raw / log+std | 0.690 / 0.638 | 8.91 / 9.54 | 0.791 |
+  | CART | raw | 0.797 | 7.19 | was *pending* |
+  | Random Forest | raw | 0.904 | 4.94 | was *pending* |
 
-  **Two problems, the second worse than the first.** (1) Every fuzzy number comes out lower than the proposal quotes — consistent with the proposal's figures being measured on a transformed target (the Ch4 pipeline applies `standard_transform`/log transforms), which is exactly the incomparability this experiment exists to expose. (2) **The ordering inverts.** Under one protocol the flat order-2 model (0.774) BEATS both the tree (0.579) and the HME (0.689), and CART/RF beat every fuzzy model. Ch6's narrative — hierarchy improves on flat — does not survive this protocol, and Ch6 already concedes the accuracy trade but not this strongly.
+  **Resolved:** preprocessing accounted for essentially the whole flat-model gap. Orders 1 and 2 now reproduce the proposal (0.797 vs 0.77; 0.845 vs 0.87). The earlier alarming 0.774 was an artifact of running the model outside its intended pipeline. **Order 0 is still off** (0.262 vs 0.44) — small, worth one look.
 
-  **Do not rewrite Ch6 from this yet.** Confounds to eliminate first: only 2 seeds; default tree/HME hyperparameters with no tuning (the tree's ±0.117 suggests instability at defaults); no target transform, whereas the proposal's pipeline uses one; one dataset. **Next:** re-run at 5+ seeds, with and without the Ch4 target transform, and with the tree/HME configured as the demos configure them. If the inversion survives that, Ch6's empirical claim must change and the honest framing becomes "the hierarchy buys readability at a real accuracy cost, and does not close the gap to a random forest."
+  **Unadvertised win:** `full-2nd` reaches **0.881**, beating CART (0.797) and approaching Random Forest (0.904). The proposal stops at order 2 and never quotes this. Ch4 is underselling its own best configuration.
+
+  **Still unresolved — Ch6's relative claim.** Under a common protocol the flat model (0.845–0.881) decisively beats the fuzzy tree (0.562–0.687) and the mixture (0.638–0.690). Ch6 currently reads flat 0.658 → tree 0.746 → HME 0.791, i.e. hierarchy improving on flat; that ordering does not survive. Remaining confound: the tree/HME here use **default hyperparameters**, whereas `tribble-tree/demo_concrete.py` may configure them deliberately. **Next:** re-run the tree/HME with the demo's exact configuration before touching Ch6's text. If the inversion survives, Ch6's framing must become "the hierarchy costs accuracy and buys readability," which is a sharper version of what it already concedes.
+
+  Also measured: the transform helps the fuzzy tree (+0.125 R²) but *hurts* the mixture (−0.052) — worth understanding, since both consume the same features.
+
+  ⏳ Refinement arms (`refine_antecedents_coordinate`) are implemented in the harness but slow (coordinate descent per order per seed); run them separately with `REPRO_REFINE=on` to test the 0.88→0.92 claim.
+
 - ⬜ **Reconcile the Concrete numbers (original note, HIGH PRIORITY — three incomparable figures for "the flat model").** Ch 4: flat MoG-TSK 0.44/0.77/0.87 (orders 0/1/2). Ch 6 Table 6.1: flat baseline 0.658 (tree/HME experiment). Ch 6 §6.3.5: antecedent refinement 0.88→0.92. All real, all different configs (split/preprocessing/order/objective), none comparable. Worst symptom: refinement's 0.92 *appears* to beat the HME's 0.791, which would make Ch 6 pointless — it doesn't, they're different configurations. Both chapters now warn the reader explicitly, but the fix is ONE consistent Concrete benchmark so every model is measured identically.
 - 🟨 **Tables (12 total, all carry real data; `*pending*` cells await the harness).** Fully measured: 3.2 (memory), 3.3 (adversarial ARI), 3.4 (stitch ablation), 4.1 (MoG results), 5.1 (multi-scale), 5.2 (selection bake-off), 6.1 (model family), 7.1 (goals map). Structure-fixed with pending cells: 3.1 (reorder time — intermediate N grid), 4.2 (ANFIS/GA-FIS/RF baselines), 6.2 (CART/M5/RF/ANFIS/flat-TSK baselines), 6.3 (interpretability counts at matched accuracy).
 - 🟨 **Reproduction harness** (`reproduce/`): generators for Tables 3.1, 4.1/4.2, 6.1–6.3 written and compile-clean; emit Markdown+CSV with mean ± std over fixed seeds. REMAINING: execute them under the submodule envs to fill `*pending*` cells (expect minor API-name fixes on first run); add ANFIS/GA-FIS adapters; build the `run.py` orchestrator over `manifest.py`.
