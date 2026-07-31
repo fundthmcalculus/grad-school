@@ -31,7 +31,7 @@
 ### G5 — Interpretability evaluation (Ch 6 + Ch 2.6)
 - Quantify interpretability (rule count, path length, expert-audience study or established metric); Magdalena-2018 rebuttal demonstrated empirically; optional SHAP contrast (interpretable-by-construction vs post-hoc).
 
-### G6 — Adaptive multi-scale for overlapping scales (Ch 5, stretch)
+### G7 — Adaptive multi-scale for overlapping scales (Ch 5, stretch)
 - Change-point / barcode-stability band discovery beyond the gap heuristic; density-normalized persistence for a global scale-free test.
 
 ## 7.3 Application Showcase(s)
@@ -54,4 +54,4 @@
 
 ### Open items
 - Flagship dataset: author-preferred IoT (RT-IOT2022 / IoT-botnet) or UCI-58 Shuttle — left flexible; confirm final choice later.
-- Prioritize G1–G6 for the timeline (recommend G2 + G3 + G4 as the "must", G1 as the differentiator, G5/G6 as stretch).
+- Prioritize G1–G7 for the timeline (recommend G2 + G3 + G4 as the "must", G1 as the differentiator, G5 as a Ch4 study, G6/G7 as stretch).
