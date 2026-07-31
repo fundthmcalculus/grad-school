@@ -851,6 +851,107 @@ $\lambda$ had no comparably exact accounting.
 
 ---
 
+## 9. Two-cart benchmark: how fast does it converge, with no refinement?
+
+Code: `fis_twocart.py`. Experiments: `demo_twocart.py`.
+
+Plant: the classic two-mass-spring non-collocated benchmark. Force on cart 1,
+cart 2 is the one that must be stilled, $m_1=m_2=k=1$, $|u|\le1$. Open-loop poles
+sit on the imaginary axis ($\pm1.4142j$ plus a double integrator), so nothing
+decays on its own and every number below is entirely the controller's doing.
+
+Objectives: **settling time** (2% of $\|z_0\|$, taken as the *last* exit from the
+tolerance ball, not the first entry), **peak force**, **energy** $\int u^2dt$.
+Scored equal-weight, normalized against the best LQR in a sweep.
+
+### 9a. The objectives are what make this a fair contest
+
+Theorem C1 (§8a) applies to this plant: it is LTI, so with a *quadratic* cost a
+partition-of-unity TSK reproduces $-Kx$ exactly and the membership functions
+cancel. A fuzzy controller cannot beat LQR at LQR's own objective, and any
+result claiming otherwise would be an artifact.
+
+What breaks the degeneracy is the **cost, not the plant**: settling time and peak
+force are not quadratic, and $|u|\le u_{\max}$ makes the true optimum non-smooth.
+That is the only reason there is anything to measure.
+
+### 9b. Convergence — the answer
+
+Recipe applied *once*, with no tuning: weighted $k$-means on the open-loop optimal
+trajectories → variable-project the consequents (one linear solve, globally
+optimal for those rule positions, §3a) → simulate. Nothing else.
+
+| rules | params | settle | peak $|u|$ | energy | score | shift | settled |
+|---|---|---|---|---|---|---|---|
+| LQR | 4 | 19.797 | 1.0000 | 0.5375 | 1.0000 | — | yes |
+| open-loop ref | — | 10.972 | 0.8615 | 0.5585 | 0.8183 | — | yes |
+| 1 | 5 | 26.773 | 0.9575 | 0.4214 | 1.0313 | 3.05 | yes |
+| **2** | **10** | 17.830 | 0.9088 | 0.4248 | **0.8666** | 3.07 | yes |
+| **3** | **15** | 17.217 | 0.9023 | 0.4390 | **0.8629** | 3.05 | yes |
+| 4 | 20 | 18.470 | 0.9088 | 0.4465 | 0.8908 | 3.07 | yes |
+| 6 | 30 | 18.257 | 0.8560 | 0.4798 | 0.8903 | 3.07 | yes |
+| 8 | 40 | 19.040 | 0.5531 | 0.6121 | ∞ | 3.07 | **no** |
+| 12 | 60 | 14.313 | 1.0000 | 1.2041 | 1.3211 | 4.67 | yes |
+| 16 | 80 | 34.990 | 1.0000 | 7.8944 | ∞ | 6.73 | **no** |
+
+**It converges in two rules.** Ten parameters take the score from 1.031 (worse
+than LQR) to 0.867; the third rule adds 0.4% and that is the end of it. Two rules
+close **75%** of the gap between the best LQR and the open-loop reference
+$(1.000-0.863)/(1.000-0.818)$.
+
+Where the win comes from is specific: at $N=3$ the fuzzy controller uses **18%
+less energy than the best LQR and 21% less than the open-loop reference it was
+trained on**, and 10% less peak force — while being *worse* on settling time
+(17.2 vs 11.0). It trades response speed for actuator economy, which is a
+reasonable reading of an equal-weight score but should not be mistaken for
+uniform dominance.
+
+### 9c. …and then it gets worse, for a diagnosable reason
+
+Past $N\approx3$ the score degrades monotonically and by $N=8$ the closed loop
+stops settling at all. This is **not** a numerical artifact and not a failure of
+the variable projection (which is a globally optimal linear solve at every rule
+count). It is **distribution shift**.
+
+The `shift` column is the maximum distance from a closed-loop state to the
+nearest training sample, in units of the training set's own per-axis spread. It
+tracks the failure exactly: 3.05 while the method works, 4.67 at $N=12$, 6.73 at
+$N=16$. The controller is fitted **only on optimal trajectories**, so it has no
+data off them. More rules mean each rule is supported by fewer samples and
+extrapolates harder, so the closed loop leaves the training manifold and the
+consequents are evaluated where nothing constrained them.
+
+This is the standard imitation-learning failure, and it means:
+
+> **Rule count and closed-loop quality are not monotonically related.** The
+> least-action fit is globally optimal *for the data it was given*, and the data
+> is the binding constraint — not the model class, not the optimizer.
+
+The fix is one round of aggregation (simulate, collect the off-trajectory states,
+refit — DAgger), or off-trajectory sampling around the optimal tube. Both are
+*refinement*, which the question explicitly excluded, so they are not done here.
+
+### 9d. Honest limits
+
+- Six initial conditions, all modest. A wider $z_0$ set would stress
+  extrapolation harder and probably lower the rule count at which shift bites.
+- The open-loop reference is a local optimum of a **smooth surrogate** of the
+  objective, not a certified optimum. The fuzzy controller beats it on the true
+  score (0.863 vs 0.818 is against it, but $N{=}3$ beats it on energy and the
+  $N{=}2$/$N{=}3$ rows beat several LQRs), which is direct evidence the surrogate
+  is not the objective. Scores are therefore normalized against the best LQR,
+  which can be computed exactly.
+- Theorem C2's exact certificate covers the **energy** term only; settling time
+  and peak force are outside its quadratic form, so §8's suboptimality
+  certificate does not transfer to this three-objective score. That gap is real
+  and is the main thing separating §9 from §8.
+- Two numerical guards were needed and are worth flagging as reusable: a
+  divergence event, and a hard RHS-evaluation budget. Without the second, a
+  marginally-stable oscillatory closed loop drives the stiff solver to
+  ever-smaller steps and the run neither fails nor returns — it simply hangs.
+
+---
+
 ## 7. Reproduction
 
 ```bash
@@ -859,6 +960,7 @@ cd research/least_action
 ../../.venv/bin/python demo_regression.py    # ~12 min, sections A-I
 ../../.venv/bin/python demo_classifier.py    # ~15 s, sections H-K
 ../../.venv/bin/python demo_control.py       # ~3 min, sections L-P
+../../.venv/bin/python demo_twocart.py       # ~25 min, sections Q-T
 ```
 
 Both are deterministic — seeded RNG, no wall-clock dependence — so the output
@@ -921,6 +1023,18 @@ reader changing one should know what it was protecting against.
 | `occupation_density` | closed-loop occupation measure — the correct fitting weight |
 | `stability_certificate` | inner region-of-attraction estimate from `Vdot < 0` |
 
+`fis_twocart.py`:
+
+| function | does |
+|---|---|
+| `TwoCart` | two-mass-spring plant, optional cubic spring and damping, saturating input |
+| `Metrics` / `simulate` | settling time, peak force, energy; divergence event and RHS-evaluation budget |
+| `optimal_trajectory` | direct-transcription open-loop reference (smooth surrogate of the objective) |
+| `TskController` | multi-input TSK, product-Gaussian antecedents, affine consequents |
+| `place_rules` | occupation-weighted k-means rule placement (multi-input form of §8d) |
+| `fit_consequents` | occupation-weighted variable projection — one globally optimal linear solve |
+| `distribution_shift` | max closed-loop distance to the nearest training sample |
+
 ### Where each claim is checked
 
 | claim | §here | demo section |
@@ -942,3 +1056,8 @@ reader changing one should know what it was protecting against.
 | occupation-weighted fitting | 8d | control N |
 | stability / ROA certificate | 8e | control O |
 | price of $\lambda$ in control | 8f | control P |
+| objectives break C1 degeneracy | 9a | twocart Q |
+| LQR sweep + open-loop reference | 9b | twocart R |
+| convergence in 2 rules | 9b | twocart S |
+| distribution-shift breakdown | 9c | twocart S |
+| nonlinear spring | 9d | twocart T |
