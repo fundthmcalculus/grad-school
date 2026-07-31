@@ -49,7 +49,7 @@ I use only as much topological data analysis as I need for this. The nearest pri
 
 **Fuzzy C-Means (FCM)** [Dunn 1973; Bezdek 1981] is the standard soft-clustering method and the one I use as a modeling front end. It assigns each point a graded membership in every cluster and minimizes
 
-$$ J(W,C) = \sum_{i=1}^{N} \sum_{j=1}^{c} w_{ij}^{\,m}\, \lVert \vec{x}_i - \vec{c}_j \rVert^2, $$
+$$ J(W,C) = \sum_{i=1}^{N} \sum_{j=1}^{c} w_{ij}^{\,m}\, \| \vec{x}_i - \vec{c}_j \|^2, $$
 
 where $m \in [2,4]$ is a fuzzification parameter, by alternately updating the centroids $\vec c_j$ and the memberships $w_{ij}$. It is a good algorithm with one well-known weakness that matters here: it is sensitive to initialization. Start it from poorly chosen centroids and it converges to a poor local optimum. A recurring theme of this work is that VAT and iVAT can supply that initialization deterministically — the cluster structure I read off the reordered image tells me how many centroids to use and roughly where to put them, which is exactly what FCM needs and cannot find on its own.
 
