@@ -1,0 +1,141 @@
+# Recorded output of demo_regression.py and demo_classifier.py
+# Deterministic (seeded); regenerate with the commands in README.md
+
+===== demo_regression.py =====
+
+A. Variable projection, N = 3 rules, order-1 consequents
+--------------------------------------------------------
+     lam     ||e||_L2    ||de||_L2         action  dof searched
+    0.00       0.8071       1.2068         1.0432             6
+    0.25       0.5105       0.7445         1.0956             6
+    1.00       0.4676       0.5292         1.3823             6
+    4.00       0.9706       0.7295         3.6658             6
+   16.00       0.2859       0.2512         3.1259             6
+  (the joint formulation searches 4N = 12 parameters for the same model)
+
+B. Effect of the gradient penalty on derivative fidelity
+--------------------------------------------------------
+  lam=0 is pure L2: it fits values and ignores slopes.
+  lam=0.25   slope error   0.7445 ( -38.3%)   value error   0.5105 ( -36.8%)
+  lam=1.0    slope error   0.5292 ( -56.2%)   value error   0.4676 ( -42.1%)
+  lam=4.0    slope error   0.7295 ( -39.5%)   value error   0.9706 ( +20.3%)
+  lam=16.0   slope error   0.2512 ( -79.2%)   value error   0.2859 ( -64.6%)
+  The trend is downward but not monotone: each row is a separate multistart
+  on a non-convex antecedent landscape, so individual rows land in different
+  basins.  That scatter is the finding of section F, not noise to hide.
+
+C. Decoupling vs. overlap -- the orthogonality/coverage trade-off
+-----------------------------------------------------------------
+  MF kind   width   coherence   off-block  min cover       joint S  greedy gap
+ gaussian     7.0   4.874e-01   4.075e-01  6.105e-01      18464.24   6.386e+00
+ gaussian     5.0   2.496e-01   1.991e-01  3.680e-01      77917.75   4.180e-01
+ gaussian     3.0   3.082e-02   2.100e-02  6.218e-02     137215.70   1.247e-02
+ gaussian     2.0   7.581e-02   7.075e-02  1.931e-03     152991.48   6.806e-04
+     bump     5.0   0.000e+00   0.000e+00  0.000e+00    3284149.12   3.996e-09
+     bump     6.0   1.126e-01   1.027e-01  3.792e-02     157107.60   4.482e-03
+  bump/5.0 tiles [-15,15] with exactly touching supports: off-block energy is 0
+  and greedy == joint to machine precision -- but min coverage collapses to 0 at
+  the seams and the action is 42x worse than the Gaussian of the same width.
+  Widening to bump/6.0 restores overlap and the action, and immediately brings
+  the off-block coupling back.  Exact input-side orthogonality and a usable
+  differentiable model are mutually exclusive.
+
+D. H1-Gram-Schmidt (orthogonal least squares) decouples without disjointness
+----------------------------------------------------------------------------
+  width=7.0   joint= 18464.2365  naive greedy gap= 6.39e+00  OLS greedy gap= 3.02e+00
+  width=5.0   joint= 77917.7472  naive greedy gap= 4.18e-01  OLS greedy gap= 2.13e-02
+  width=3.0   joint=137215.7024  naive greedy gap= 1.25e-02  OLS greedy gap= 4.64e-05
+  width=2.0   joint=152991.4821  naive greedy gap= 6.81e-04  OLS greedy gap= 1.71e-07
+
+E. Identifiability constraints decide whether local optimality is certifiable
+-----------------------------------------------------------------------------
+
+  [unconstrained]  min_gap=0.00, width in (0.60, 60.00)
+    centers        [-1.201  0.071  1.342]
+    widths         [6.696 7.314 6.696]
+    ||e||_L2       0.1115
+    min coverage   3.1239e-02
+    Gram cond      2.453e+05  (min eig 4.252e-05)
+    Galerkin resid 1.159e-05  (consequent block)
+    reduced |grad| 2.592e-04  (antecedent block)
+    KKT residual   2.592e-04  (gradient projected onto the critical cone -> stationary: False)
+    active constr  0  ->  critical cone dim 6 of 6
+    proj. Hessian  eig in [-2.4290e-02, 8.5359e+00]  (noise floor 6.4e-10)
+    descent probe  0.000e+00  (curvature-driven descent found: False)
+    CERTIFIED LOCAL MIN: False   [first-order False, no descent True]
+
+  [regular fuzzy partition]  min_gap=6.00, width in (2.50, 15.00)
+    centers        [-9.687  0.236  9.96 ]
+    widths         [10.557 15.    10.535]
+    ||e||_L2       0.4676
+    min coverage   1.1364e+00
+    Gram cond      4.900e+04  (min eig 2.371e-04)
+    Galerkin resid 4.301e-05  (consequent block)
+    reduced |grad| 1.469e-02  (antecedent block)
+    KKT residual   5.183e-05  (gradient projected onto the critical cone -> stationary: True)
+    active constr  1  ->  critical cone dim 5 of 6
+    proj. Hessian  eig in [-9.2000e-05, 8.4378e+00]  (noise floor 3.5e-08)
+    descent probe  0.000e+00  (curvature-driven descent found: False)
+    CERTIFIED LOCAL MIN: True   [first-order True, no descent True]
+
+F. Consequent sub-problem is globally convex
+--------------------------------------------
+  H1 Gram eigenvalues in [2.3713e-04, 1.1619e+01], all positive = True
+  => for fixed antecedents the action has a unique global minimizer in the
+     consequents.  All non-convexity lives in (a_i, b_i).
+
+G. Galerkin orthogonality holds per-regressor at the optimum
+------------------------------------------------------------
+  <e, phi_0 * t^0>_H1 = +2.135e-05
+  <e, phi_0 * t^1>_H1 = +5.681e-06
+  <e, phi_1 * t^0>_H1 = -1.189e-07
+  <e, phi_1 * t^1>_H1 = +4.301e-05
+  <e, phi_2 * t^0>_H1 = -2.224e-05
+  <e, phi_2 * t^1>_H1 = +6.356e-06
+
+===== demo_classifier.py =====
+
+H. Disjoint output supports make Mamdani `max` and `sum` identical
+------------------------------------------------------------------
+                 output sets  disjoint    max vs sum sup-norm
+    4 sets, touching (gap=0)      True              0.000e+00
+ 4 sets, separated (gap=0.3)      True              0.000e+00
+         4 sets, overlapping     False              4.773e-01
+  -> the identity is exactly the disjointness condition, nothing weaker.
+
+I. Centroid defuzzification over disjoint sets IS an order-0 TSK model
+----------------------------------------------------------------------
+  sup |numeric centroid - closed-form TSK-0| over 400 random alphas: 6.809e-02
+  (small residual is the alpha-clipping area correction, not a modelling gap;
+   with un-clipped `prod` implication it is exact to machine precision.)
+  with product implication: 2.220e-16   <- exact
+  => the score is sum_i w_i(x) c_i with w >= 0, sum w = 1: a convex
+     combination of the cores, hence automatically inside [0, 1].
+
+J. MOM is discontinuous; the annealed surrogate is not
+------------------------------------------------------
+  MOM across a tie: 0.1250 -> 0.3750 for a 1e-09 change in alpha_2
+  jump = 0.2500 (= the core spacing).  MOM is piecewise constant.
+
+   beta   |annealed - MOM|   margin bound  bound holds
+      1          2.079e-01      5.010e-01         True
+      2          1.204e-01      4.308e-01         True
+      4          4.899e-02      2.833e-01         True
+      8          9.989e-03      8.208e-02         True
+     16          4.188e-04      3.756e-03         True
+     32          7.039e-07      6.335e-06         True
+     64          1.982e-12      1.784e-11         True
+  convergence is geometric in r = alpha_(2)/alpha_(1) = 0.671.
+
+K. Differentiability of the score in the input variable
+-------------------------------------------------------
+     defuzzifier    max |jump| between adjacent x
+             MOM                           0.2500
+    annealed b=1                           0.0010
+    annealed b=4                           0.0037
+   annealed b=16                           0.0149
+
+  central-difference vs. exact derivative of the beta=1 score:
+    sup |analytic - finite difference| = 1.070e-10
+  => the classifier score is C^1 (in fact C^infinity) in x, so the whole
+     H1 action machinery from demo_regression.py applies verbatim to it.
