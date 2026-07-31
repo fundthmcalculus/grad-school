@@ -29,6 +29,7 @@ _Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 ## C. Experiments / results owed (the "make it airtight" list)
 
 - ⬜ **Ch 4 — ANFIS + GA-tuned-FIS baseline table** (train time + accuracy on identical splits). First thing owed to Ch 4's speed claim.
+- ⬜ **Ch 4 — anomaly/open-set head-to-head (Table 4.3):** complement rule vs **one-class SVM** and **isolation forest** on BETH (train on benign only, detect unseen `evil==1`). Report detection rate + false-alarm rate at a matched operating point, plus the θ sweep curve (Fig 4.2, from `plot_anomaly_threshold_sweep`). This is the experiment owed to the §4.3.5 claim.
 - ⬜ **Ch 3 — head-to-head vs eVAT & clusiVAT** on identical datasets. First comparison a reviewer will demand.
 - ⬜ **Ch 3 / Ch 5 — real non-metric domains** (DTW time-series, edit distance, graph/kernel dissimilarity). The core niche is so far only synthetic. (Goal G2.)
 - ⬜ **Ch 6 — HME EM refinement implemented** + full baseline suite (ANFIS, CART/C4.5, M5, flat TSK, Fumanal-Idocin 2025, D-TSK-FC). (Goal G3.)
