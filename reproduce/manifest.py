@@ -59,6 +59,20 @@ EXPERIMENTS = [
               "protocol, and that CART/RF beat all fuzzy models -- see ACTION_ITEMS.",
     ),
     Experiment(
+        id="table-hyperparam-normalization",
+        title="Concrete: model x hyperparameters x normalization",
+        chapter="Ch6", produces="Hyperparameter/normalization matrix",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_hyperparam_normalization.py"),
+        hardware="any", datasets=["Concrete"],
+        outputs=["reproduce/outputs/table_hyperparam_normalization.md",
+                 "reproduce/outputs/table_hyperparam_normalization.csv"],
+        notes="VERIFIED RUNNING. Settled the Ch6 confound: the apparent inversion was "
+              "mostly library-default hyperparameters. Demo-tuned HME recovers +0.224 R2. "
+              "Also shows normalization helps every fuzzy model and is worth exactly zero "
+              "to CART/RF (rank-based splits are transform-invariant).",
+    ),
+    Experiment(
         id="table-4-1-mog-baselines",
         title="MoG FIS vs sklearn baselines (train time + accuracy/R2)",
         chapter="Ch4", produces="Table 4.1",
