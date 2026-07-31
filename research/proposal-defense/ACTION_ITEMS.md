@@ -2,7 +2,7 @@
 
 Consolidated tracker for every open item scattered across the chapter files. Update status here; the chapters point back to this doc. Legend: ⬜ open · 🟨 in progress · ✅ resolved.
 
-_Last updated: 2026-07-31_
+_Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
 
 ---
 
@@ -12,6 +12,9 @@ _Last updated: 2026-07-31_
 - ⬜ **Consolidate the bibliography** — merge `tribble-fis/tribble-tree/hfis_review.bib` + `chapters/bibliography.md` into one `references.bib`; verify every DOI / page number.
 - ⬜ **Regenerate all figures** at consistent publication style/size (see per-chapter figure placeholders).
 - ✅ **Reference PDFs are structural templates only** — never cite Pickering/Arnett as an intellectual source; author's work is independent.
+- ⬜ **Reconcile the Concrete flat-model R²** across chapters: Ch 4 reports flat MoG-TSK at 0.44/0.77/0.87 (orders 0/1/2); Ch 6 reports flat baseline at 0.658 (from the tree/HME experiment). Different split/preprocessing/order. Run one consistent Concrete benchmark so the flat baseline reads identically in both chapters.
+- 🟨 **Tables built from real data (consistency pass):** Table 3.2 (adversarial ARI), 3.3 (stitch ablation), 5.1 (multi-scale), 5.2 (selection bake-off), 6.1 (model family), 7.1 (goals map). Partial/placeholder-with-real-data: 3.1 (reorder time — needs intermediate rows + classical 135K), 4.1 (MoG filled; ANFIS/GA/ref columns owed).
+- ⬜ **Figure placeholders** still to produce: Ch 1 (×2), Ch 2 (×3), Ch 3 (×1), Ch 4 (×2), Ch 6 (×3).
 
 ## B. Needed from author / advisor
 

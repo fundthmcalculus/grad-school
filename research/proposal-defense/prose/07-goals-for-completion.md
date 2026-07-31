@@ -36,7 +36,17 @@ The floor under all of this is that Chapters 3 and 4 — the accelerated exact V
 
 ## 7.5 Goals, mapped
 
-**[TABLE 7.1 — placeholder]** *Goal (G1–G6) × feeds-which-chapter × current status × target quarter, cross-referenced to the Chapter 10 timeline and `ACTION_ITEMS.md`. Recommended priority: G2 + G3 + G4 as the must-haves, G1 as the differentiator, G5/G6 as stretch.*
+**Table 7.1 — Goals for completion, mapped.** Quarters are relative to the ~Dec 2026 proposal; final defense March 2028 (see Chapter 10). Status and items also tracked in `ACTION_ITEMS.md`.
+
+| Goal | Feeds | Current status | Priority | Target |
+|---|---|---|---|---|
+| **G4** repeatable perf + eVAT/clusiVAT head-to-head | Ch 3, 5, 6 | not started | must | 2027 Q1 |
+| **G1** one-pass membership generation | Ch 5, capstone | preliminary done | differentiator | 2027 Q2 |
+| **G2** real non-coordinate benchmarks (DTW/edit/graph) | Ch 3, 5 | not started | must | 2027 Q3 |
+| **G3** HME EM + full baseline suite | Ch 6 | one-shot done; EM design-only | must | 2027 Q3–Q4 |
+| **capstone** integrated end-to-end pipeline | Ch 3→5→6 | not started | must | 2028 Q1 |
+| **G5** interpretability, measured | Ch 6 | not started | should | 2028 Q1 |
+| **G6** adaptive multi-scale (overlapping scales) | Ch 5 | not started | stretch (first cut) | 2028 Q1 |
 
 ---
 

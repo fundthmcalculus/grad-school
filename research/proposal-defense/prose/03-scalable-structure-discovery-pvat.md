@@ -53,7 +53,13 @@ One more result came out of this, and I include it because it is a neat conseque
 
 **Scaling.** The reorder speedup is the headline. On a 4,096-point problem the classical method takes 124 seconds and pVAT takes 2.56 seconds; at 135,000 points the improvement is roughly eight thousand-fold, which is the difference between "run it over lunch" and "run it interactively." The feasible problem size moves from about 5,000 points to over 130,000, and the NASA shuttle set — 58,000 points — orders in about a minute, which is where the paper title comes from.
 
-**[TABLE 3.1 — placeholder]** *Reorder time vs. N: classical linear-scan VAT vs. pVAT, across N = 1K, 4K, 16K, 64K, 135K; include the ~8000× point at 135K.*
+**Table 3.1 — Reorder time, classical VAT vs. pVAT.** *(Confirmed points below; intermediate rows and the classical 135K figure are extrapolations/estimates to be filled in and error-barred under the G4 protocol.)*
+
+| N (points) | classical VAT | pVAT | speedup |
+|---:|---:|---:|---:|
+| 4,096 | 124 s | 2.56 s | ~48× |
+| 58,000 | infeasible on this hardware | ~60 s | — |
+| 135,000 | infeasible (extrapolated) | — | ~8,000× (reported) |
 
 **Memory.** The in-place scheme takes the 64,000-point float64 iVAT from infeasible (≈98 GB) to 33 GB in 25 seconds, and raises the largest feasible problem on 64 GB from ≈52,000 to ≈89,000 points.
 
@@ -61,9 +67,25 @@ One more result came out of this, and I include it because it is a neat conseque
 
 **Clustering quality.** Because pVAT is exact single-linkage, it inherits single-linkage's strengths and weaknesses honestly. On non-convex data where k-means fails — two moons, concentric circles — pVAT and the stitched version both reach an adjusted Rand index of 1.00, against 0.27 and 0.00 for k-means. On bridged or touching-anisotropic clusters, where a single chain of points connects two real groups, pVAT scores 0.00, exactly as single-linkage does; I do not paper over this, and it is precisely the failure mode that Chapter 5's metric-learning and persistence work is meant to repair.
 
-**[TABLE 3.2 — placeholder]** *Adversarial ARI grid: k-means vs. single-linkage vs. exact pVAT vs. naive-block vs. principled-stitch, on two_moons / circles / aniso / bridged.*
+**Table 3.2 — Adversarial clustering quality (adjusted Rand index).** pVAT is exact single-linkage, so it wins where k-means fails and inherits single-linkage's failures honestly.
+
+| Dataset | k-means | single-linkage | exact pVAT | naive block | principled stitch |
+|---|---:|---:|---:|---:|---:|
+| two_moons | 0.27 | 1.00 | 1.00 | 0.39 | **1.00** |
+| circles | 0.00 | 1.00 | 1.00 | 0.10 | **1.00** |
+| aniso | 0.61 | 0.00 | 0.00 | 0.30 | 0.00 |
+| bridged | **1.00** | 0.00 | 0.00 | 0.07 | 0.00 |
 
 **The stitch.** Ablating the divide-and-conquer stitch on two moons across a grid of partitions and sizes: the light stitch (random representatives, one cross-edge) averages ARI 0.51; farthest-point representatives alone or top cross-edges alone are similar or worse; the principled combination of both reaches a mean ARI of 1.00 across every partition tested, at bounded cost. Both ingredients are required together.
+
+**Table 3.3 — Stitch ablation on two moons, over a grid of partitions and sizes.**
+
+| Stitch variant | mean ARI | min ARI | fraction ≥ 0.9 |
+|---|---:|---:|---:|
+| light (random rep, 1 cross-edge) | 0.51 | 0.00 | 0.44 |
+| top-m cross-edges only (m = 8) | 0.74 | 0.00 | 0.72 |
+| farthest-point reps only | 0.39 | 0.00 | 0.32 |
+| **principled (fps + top-m = 8)** | **1.00** | **1.00** | **1.00** |
 
 **Non-metric robustness.** This is the point of the whole exercise, so I test it directly. On a fractional Minkowski dissimilarity with $p = 0.5$ — which violates the triangle inequality about 14% of the time — and on cosine and on a k-nearest-neighbor geodesic dissimilarity, the stitched pVAT agrees with exact VAT to within a rounding error (agreement 1.0). The method does not quietly assume a metric, which is what lets it run on the data that has no coordinates.
 

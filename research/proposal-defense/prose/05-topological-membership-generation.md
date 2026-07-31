@@ -54,11 +54,27 @@ The results here are on synthetic data with known ground truth, which is both th
 
 **Multi-scale, the headline.** Averaged over *all* ground-truth levels, the multi-scale method lifts nested Gaussians from 0.66 to 1.00, a three-level hierarchy from 0.58 to 1.00, and a density hierarchy from 0.75 to 1.00. On the three-level set it recovers granularities of 8, then 4, then 2 clusters — each band landing on exactly one true level at ARI 1.0 — without ever being told there were three levels.
 
+**Table 5.1 — Multi-scale recovery (adjusted Rand index, averaged over all ground-truth levels).**
+
+| Dataset | flat cover | multi-scale | granularities recovered |
+|---|---:|---:|:--:|
+| nested_gaussians | 0.66 | **1.00** | — |
+| three_level_hierarchy | 0.58 | **1.00** | [8, 4, 2] |
+| density_hierarchy | 0.75 | **1.00** | — |
+
 **The falsification experiment.** To keep myself honest, a flat cover holds ARI ≈ 0.983 across a thirty-fold spread in cluster width. This is the result that says the multi-scale method is not solving a single-level varying-density problem, because there is no such problem to solve; it is solving nesting.
 
 **Scaling.** With the exact $O(N^2)$ minimax transform, the full pipeline runs to 5,000 points in about five seconds, and the multi-scale recovery of [8, 4, 2] is unchanged from 100 points up to 5,000.
 
 **The selection bake-off.** Comparing my persistence-gap gate against beta-plateau and bottleneck-bootstrap, there is no universal winner, and I report that as a finding rather than hide it. My gate fails a deliberately adversarial "bridge" case (ARI 0.001) but is conservative on noise; beta-plateau and bottleneck-bootstrap fix the bridge (0.927 and 0.891) but over-fire on noise, reporting seven clusters where there are none. Bridge-robustness and noise-conservatism turn out to be incompatible for any single fixed threshold, which is itself worth stating.
+
+**Table 5.2 — Selection-method comparison.** No universal winner; the two objectives (bridge-robust vs. noise-conservative) are incompatible for a single fixed threshold.
+
+| Selection method | bridge case (ARI) | noise behavior |
+|---|---:|---|
+| persistence-gap gate (ours) | 0.001 | conservative — reports no clusters (correct) |
+| beta-plateau [Bonis–Oudot] | 0.927 | over-fires — k = 7 where there are none |
+| bottleneck-bootstrap [AuToMATo] | 0.891 | over-fires |
 
 **Relational-only data.** On dissimilarity-matrix-only datasets built from trees, the simple cases are already solved by NERFCM, but a genuinely multi-scale relational case leaves both the raw and transformed matrices stuck at ARI ≈ 0.29 — confirming that multi-scale relational structure is the honestly hard, still-open problem.
 
