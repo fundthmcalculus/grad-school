@@ -1,4 +1,4 @@
-# Recorded output of demo_regression.py and demo_classifier.py
+# Recorded output of demo_regression.py, demo_classifier.py, demo_control.py
 # Deterministic (seeded); regenerate with the commands in README.md section 7
 
 ===== demo_regression.py =====
@@ -252,3 +252,98 @@ K. Differentiability of the score in the input variable
     sup |analytic - finite difference| = 1.070e-10
   => the classifier score is C^1 (in fact C^infinity) in x, so the whole
      H1 action machinery from demo_regression.py applies verbatim to it.
+
+===== demo_control.py =====
+
+L. LTI + quadratic cost: the fuzzy controller is EXACTLY optimal
+----------------------------------------------------------------
+  Riccati gain K = [[1.23607 1.67305]]
+  200 random partitions x 4000 states, 2-6 rules, random centres/widths
+  max |u_fuzzy - u_LQR| = 7.105e-15
+  sum_i phi_i(x) (-Kx) = -Kx because sum_i phi_i = 1: the membership
+  functions cancel identically.  Provably globally optimal, and equally
+  provably pointless -- fuzzy structure earns nothing on an LTI/LQR problem.
+  Its value has to come from nonlinearity, which is the rest of this file.
+
+M. Theorem C2: the cost gap IS a weighted control-error integral
+----------------------------------------------------------------
+  Benchmark by inverse optimal control (q defined FROM the HJB, so V* and
+  u* are exact, not numerical):
+    xdot = -x + u,  V* = x^2 + x^4/2,  u* = -(x + x^3),  q = 3x^2+4x^4+x^6
+    q >= 0 on the domain: True
+
+  J(x0) - V*(x0)  vs  INT R (u-u*)^2 dt, for deliberately WRONG controllers:
+            controller     x0            J           V*          gap   INT(u-u*)^2   |residual|
+            optimal u*    1.5     4.781250     4.781250   -1.816e-10     0.000e+00    1.816e-10
+            optimal u*   -2.0    12.000000    12.000000   -4.865e-10     0.000e+00    4.865e-10
+          linear -1.5x    1.5     5.146875     4.781250    3.656e-01     3.656e-01    3.563e-11
+          linear -1.5x   -2.0    14.866667    12.000000    2.867e+00     2.867e+00    1.224e-10
+            linear -3x    1.5     5.115234     4.781250    3.340e-01     3.340e-01    1.880e-11
+            linear -3x   -2.0    12.666667    12.000000    6.667e-01     6.667e-01    1.285e-12
+         u* scaled 0.7    1.5     4.968007     4.781250    1.868e-01     1.868e-01    1.569e-10
+         u* scaled 0.7   -2.0    12.531794    12.000000    5.318e-01     5.318e-01    4.301e-10
+              u* + 0.4    1.5    14.342006     4.781250    9.561e+00     9.600e+00    3.924e-02
+              u* + 0.4   -2.0    21.560756    12.000000    9.561e+00     9.600e+00    3.924e-02
+  The identity holds to integrator tolerance and the gap is >= 0 in every
+  row -- except the last controller, which misses by 3.9e-2.  That is not
+  numerical error, it is the theorem's ADMISSIBILITY hypothesis showing its
+  teeth: u* + 0.4 does not drive x to the origin, so the boundary term
+  V*(x(inf)) that the derivation discards is not zero.  The exact statement is
+
+      J(x0) - V*(x0) + V*(x(inf))  =  INT R (u - u*)^2 dt
+
+    x0      x(inf)    V*(x(inf))      residual   difference
+   1.5    0.196222  3.924448e-02  3.924448e-02     1.92e-10
+  -2.0    0.196222  3.924448e-02  3.924448e-02     4.56e-10
+  The residual IS V*(x(inf)), to 2e-10.  Admissibility is load-bearing, not
+  decoration: a controller with a steady-state offset has no certificate.
+  For admissible controllers the identity is exact -- a certificate, not a
+  bound: no constant to estimate, nothing to be conservative about.
+
+N. The correct fitting weight is the occupation measure
+-------------------------------------------------------
+  Theorem C2 weights the control error by closed-loop occupation time, so
+  fitting u* uniformly over a box optimizes the wrong functional.
+  rho concentrates near the origin: rho(0)/rho(+-3) = 67928.2
+
+ N rules       weight   sup|u-u*|   mean cert. gap   max cert. gap
+       2   uniform L2      4.2274        1.614e+02       1.617e+02   NOT ADMISSIBLE
+       2 occupation rho     12.7794        1.390e-01       3.555e-01
+       3   uniform L2      1.8299        1.603e-01       1.884e-01
+       3 occupation rho      6.5533        1.685e-02       4.381e-02
+       4   uniform L2      1.1050        1.863e-01       1.969e-01
+       4 occupation rho      4.0571        6.162e-03       1.497e-02
+  rho-weighting gives a worse sup-norm fit and a better certified cost --
+  which is the point.  Uniform accuracy is not the control objective.
+  The flagged row is not a certificate: that controller fails to drive x to
+  the origin, so by section M its number carries an unaccounted V*(x(inf)).
+  A gap is only a certificate once admissibility is separately established,
+  which is what section O is for.
+
+O. Certificates for the fitted controllers
+------------------------------------------
+ N rules       weight  ROA radius   V* level   worst Vdot  stable    mean gap
+       2   uniform L2      0.0000     0.0000    0.000e+00   False   1.614e+02
+       2 occupation rho      3.0000    49.5000   -3.036e-07    True   1.390e-01
+       3   uniform L2      3.0000    49.5000   -7.369e-07    True   1.603e-01
+       3 occupation rho      3.0000    49.5000   -3.817e-07    True   1.685e-02
+       4   uniform L2      3.0000    49.5000   -7.132e-08    True   1.863e-01
+       4 occupation rho      3.0000    49.5000   -3.467e-07    True   6.162e-03
+  ROA is an inner estimate from Vdot < 0 using V* as the candidate, so it is
+  conservative by construction.  Combined with the exact gap above, each
+  controller ships with: a region it provably stabilizes, and exactly how
+  much more than optimal it costs inside that region.
+
+P. What the H1 slope term costs in a control setting
+----------------------------------------------------
+  Theorem C2 needs L2(rho) and nothing else -- lambda > 0 is a deliberate
+  deviation from the certified-optimal objective.  Its price:
+   lambda   sup|u-u*|   sup|du-du*|   mean cert. gap
+    0.000      6.5533       15.1011        1.685e-02
+    0.010      2.1942       10.2137        8.179e-02
+    0.100      1.7696        8.1498        1.764e-01
+    1.000      1.3580        7.5132        2.473e-01
+  lambda buys feedback-gain (du/dx) accuracy, which is what sets the
+  closed-loop linearization and hence local pole placement, and pays for it
+  in certified cost.  For pure cost-optimality use lambda = 0; raise it only
+  when the gain profile itself matters.

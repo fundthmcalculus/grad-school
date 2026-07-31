@@ -4,7 +4,8 @@ Working notes on Dr. Cohen's handwritten TSK/least-action derivation
 (`Handwritten_20250217`), extended to cover the classifier case and to answer
 the rule-orthogonality question.
 
-Code: `fis_action.py`. Experiments: `demo_regression.py`, `demo_classifier.py`.
+Code: `fis_action.py` (approximation), `fis_control.py` (control).
+Experiments: `demo_regression.py`, `demo_classifier.py`, `demo_control.py`.
 Recorded output: `results.txt`. Reproduction instructions: §7.
 
 ### Notation
@@ -689,6 +690,167 @@ sufficiency argument of §3c stays valid.
 
 ---
 
+## 8. Control: provably optimal fuzzy control parameters
+
+Code: `fis_control.py`. Experiments: `demo_control.py`.
+
+The original notes framed this as "optimal control via the principle of least
+action." Sections 1–5 built the approximation machinery; this section asks what
+can actually be *proved* about a fuzzy controller.
+
+### 8a. The trivial case, stated so it can be set aside
+
+**Theorem C1.** For $\dot x=Ax+Bu$ with $J=\int(x^\top Qx+u^\top Ru)\,dt$, let
+$K=R^{-1}B^\top P$ from the Riccati equation. Any TSK FIS with **affine
+consequents all set to $f_i(x)=-Kx$** reproduces $u^*$ exactly, for *any*
+partition of unity:
+
+$$u_{\text{fis}}(x)=\sum_i\varphi_i(x)\,(-Kx)=-Kx\sum_i\varphi_i(x)=-Kx .$$
+
+Measured: $\max|u_{\text{fis}}-u_{\text{LQR}}|=7.1\times10^{-15}$ over 200 random
+partitions (2–6 rules, random centres and widths) × 4000 states.
+
+This is a genuinely provable global optimality result, and it is also a warning:
+**the membership functions cancel identically, so fuzzy structure buys nothing
+on an LTI/LQR problem.** Any claimed benefit there is an artifact. The value has
+to come from nonlinearity or constraints, which is what the rest of this section
+uses.
+
+### 8b. The central result: suboptimality is exactly a weighted $L^2$ error
+
+**Theorem C2.** For a control-affine plant $\dot x=f(x)+g(x)u$ with cost
+$\int (q(x)+u^\top Ru)\,dt$, optimal value function $V^*$ and optimal law
+$u^*=-\tfrac12R^{-1}g^\top\nabla V^{*\top}$, **any admissible** $u$ satisfies
+
+$$\boxed{\;J(x_0)-V^*(x_0)\;=\;\int_0^\infty\big(u-u^*\big)^\top R\,\big(u-u^*\big)\,dt\;}$$
+
+the integral taken along the closed loop driven by $u$ itself.
+
+*Proof.* HJB gives $\nabla V^*f=-q+u^{*\top}Ru^*$ and $\nabla V^*g=-2u^{*\top}R$. Along
+the closed loop,
+$\tfrac{d}{dt}V^*=\nabla V^*(f+gu)=-q+u^{*\top}Ru^*-2u^{*\top}Ru$, so
+
+$$q+u^\top Ru+\tfrac{d}{dt}V^*=u^\top Ru-2u^{*\top}Ru+u^{*\top}Ru^*=(u-u^*)^\top R(u-u^*).$$
+
+Integrating on $[0,\infty)$ and using $x(\infty)\to0$, $V^*(0)=0$. $\square$
+
+Three things follow, and they reshape the whole approach:
+
+1. **This is a certificate, not a bound.** There is no constant to estimate and
+   nothing to be conservative about. Fit a controller, integrate once, and you
+   know *exactly* how much more than optimal it costs.
+2. **Fitting the control law is not a surrogate for optimal control.**
+   Minimizing the right weighted approximation error *is* minimizing true excess
+   cost, identically.
+3. **The right weight is the closed-loop occupation measure**, not Lebesgue
+   measure on a box (§8d).
+
+### 8c. Verifying it, including the hypothesis
+
+Ground truth comes from **inverse optimal control**: choose $V$, $f$, $g$, $R$
+first and *define* $q$ from the HJB equation, rather than solving for $V$. Then
+$V$ is the exact value function by construction. The benchmark used is
+
+$$\dot x=-x+u,\quad V^*=x^2+\tfrac12x^4,\quad u^*=-(x+x^3),\quad q=3x^2+4x^4+x^6\ (\ge0),$$
+
+chosen so $u^*$ is genuinely nonlinear — a linear controller cannot represent it.
+
+| controller | $x_0$ | $J$ | $V^*$ | gap | $\int(u-u^*)^2dt$ | residual |
+|---|---|---|---|---|---|---|
+| optimal $u^*$ | 1.5 | 4.781250 | 4.781250 | −1.8e−10 | 0.0 | 1.8e−10 |
+| linear $-1.5x$ | 1.5 | 5.146875 | 4.781250 | 3.656e−1 | 3.656e−1 | 3.6e−11 |
+| linear $-3x$ | −2.0 | 12.666667 | 12.000000 | 6.667e−1 | 6.667e−1 | 1.3e−12 |
+| $0.7\,u^*$ | −2.0 | 12.531794 | 12.000000 | 5.318e−1 | 5.318e−1 | 4.3e−10 |
+| $u^*+0.4$ | 1.5 | 14.342006 | 4.781250 | 9.561e0 | 9.600e0 | **3.9e−2** |
+
+The last row misses by 3.9e−2, and that is not numerical error — it is the
+**admissibility hypothesis showing its teeth**. $u^*+0.4$ settles at
+$x(\infty)=0.196222$ rather than the origin, so the boundary term the proof
+discards is not zero. The exact statement is
+
+$$J(x_0)-V^*(x_0)+V^*\big(x(\infty)\big)=\int_0^\infty(u-u^*)^\top R(u-u^*)\,dt$$
+
+and indeed $V^*(0.196222)=3.924448\times10^{-2}$ against a residual of
+$3.924448\times10^{-2}$ — agreement to 1.9e−10. **A controller with a steady-state
+offset has no certificate at all**; admissibility must be established separately,
+which is what §8e does.
+
+### 8d. Consequence: fit under the occupation measure
+
+Theorem C2 weights control error by closed-loop occupation time, so fitting $u^*$
+uniformly over a box optimizes the wrong functional. On this benchmark the
+occupation density concentrates sharply near the origin
+($\rho(0)/\rho(\pm3)\approx6.8\times10^4$).
+
+| $N$ | weight | $\sup|u-u^*|$ | mean certified gap | max certified gap |
+|---|---|---|---|---|
+| 2 | uniform $L^2$ | 4.23 | 1.61e2 | 1.62e2 (not admissible) |
+| 2 | occupation $\rho$ | 12.78 | **1.39e−1** | 3.56e−1 |
+| 3 | uniform $L^2$ | 1.83 | 1.60e−1 | 1.88e−1 |
+| 3 | occupation $\rho$ | 6.55 | **1.69e−2** | 4.38e−2 |
+| 4 | uniform $L^2$ | 1.11 | 1.86e−1 | 1.97e−1 |
+| 4 | occupation $\rho$ | 4.06 | **6.16e−3** | 1.50e−2 |
+
+$\rho$-weighting produces a **worse** sup-norm fit and a **1–3 orders of magnitude
+better** certified cost, at identical rule count. That inversion is the point:
+uniform accuracy is not the control objective, and optimizing for it is actively
+counterproductive. Note also that the 2-rule uniform fit is not even admissible,
+so its "gap" is not a certificate.
+
+### 8e. What ships with a fitted controller
+
+| $N$ | weight | ROA radius | certified sublevel $V^*$ | worst $\dot V$ | mean gap |
+|---|---|---|---|---|---|
+| 2 | uniform $L^2$ | **0.0** | 0.0 | — | not admissible |
+| 2 | occupation $\rho$ | 3.0 | 49.5 | −3.0e−7 | 1.39e−1 |
+| 3 | occupation $\rho$ | 3.0 | 49.5 | −3.8e−7 | 1.69e−2 |
+| 4 | occupation $\rho$ | 3.0 | 49.5 | −3.5e−7 | 6.16e−3 |
+
+The region of attraction is an inner estimate obtained by testing $\dot V^*<0$
+along the *fuzzy* closed loop, walking outwards from the origin and stopping at
+the first failure — conservative by construction, never optimistic. The 2-rule
+uniform controller correctly reports radius 0: it does not hold the origin, so
+there is nothing to certify.
+
+So each controller ships with **a region it provably stabilizes** and **exactly
+how much more than optimal it costs**. That is the strongest sense of "provably
+optimal fuzzy control parameters" available without exact representation.
+
+### 8f. What $\lambda$ costs here
+
+Theorem C2 needs $L^2(\rho)$ and nothing else, so $\lambda>0$ is a deliberate
+*deviation* from the certified-optimal objective:
+
+| $\lambda$ | $\sup|u-u^*|$ | $\sup|u'-u^{*\prime}|$ | mean certified gap |
+|---|---|---|---|
+| 0 | 6.55 | 15.10 | **1.69e−2** |
+| 0.01 | 2.19 | 10.21 | 8.18e−2 |
+| 0.1 | 1.77 | 8.15 | 1.76e−1 |
+| 1.0 | 1.36 | 7.51 | 2.47e−1 |
+
+$\lambda$ buys feedback-*gain* accuracy — $\partial u/\partial x$ sets the closed-loop
+linearization and hence local pole placement — and pays for it in certified cost,
+roughly $15\times$ over this range. **For pure cost-optimality use $\lambda=0$;
+raise it only when the gain profile itself matters** (robustness, actuator rate
+limits, gain scheduling). This is a cleaner story than the regression case, where
+$\lambda$ had no comparably exact accounting.
+
+### 8g. Honest limits
+
+- The benchmark is scalar and inverse-optimal by construction. That is what makes
+  ground truth exact, but it also means $u^*$ was *chosen* to be representable-ish.
+  A plant with a genuinely awkward $u^*$ would tell more.
+- $\rho$ depends on the controller, so §8d used $\rho$ from the *optimal* closed
+  loop. In practice this must be iterated (fit → simulate → re-weight); the fixed
+  point is what policy iteration converges to, and that is not done here.
+- The ROA uses $V^*$ as the Lyapunov candidate, which is available only because
+  the benchmark is inverse-optimal. For a real plant one must either solve for a
+  candidate (SOS programming) or accept a smaller certified region.
+- No input constraints. Saturation is where fuzzy control usually earns its keep,
+  and $u^*$ under saturation is not smooth, so §1's C3 would need revisiting.
+
+---
+
 ## 7. Reproduction
 
 ```bash
@@ -696,6 +858,7 @@ uv venv .venv && uv pip install --python .venv/bin/python numpy scipy matplotlib
 cd research/least_action
 ../../.venv/bin/python demo_regression.py    # ~12 min, sections A-I
 ../../.venv/bin/python demo_classifier.py    # ~15 s, sections H-K
+../../.venv/bin/python demo_control.py       # ~3 min, sections L-P
 ```
 
 Both are deterministic — seeded RNG, no wall-clock dependence — so the output
@@ -745,6 +908,19 @@ reader changing one should know what it was protecting against.
 | `defuzz_mom` / `defuzz_annealed` | crisp MOM and the $C^\infty$ $\beta$-annealed score |
 | `mom_gap_bound` | the Proposition 5 bound |
 
+`fis_control.py`:
+
+| function | does |
+|---|---|
+| `LqrProblem` | Riccati solve for the LTI benchmark (Theorem C1) |
+| `InverseOptimalScalar` | control-affine plant whose `q` is defined FROM the HJB, making `V*` and `u*` exact |
+| `cubic_benchmark` | the nonlinear benchmark used throughout §8 |
+| `simulate` | closed loop with cost and control-error carried as ODE states |
+| `ClosedLoopResult.gap` | the exact suboptimality certificate |
+| `ClosedLoopResult.identity_residual` | Theorem C2 check |
+| `occupation_density` | closed-loop occupation measure — the correct fitting weight |
+| `stability_certificate` | inner region-of-attraction estimate from `Vdot < 0` |
+
 ### Where each claim is checked
 
 | claim | §here | demo section |
@@ -761,3 +937,8 @@ reader changing one should know what it was protecting against.
 | centroid $=$ order-0 TSK | 5b | classifier I |
 | MOM discontinuous, annealing bound | 5c | classifier J |
 | score is $C^1$ in $x$ | 5c | classifier K |
+| TSK represents LQR exactly | 8a | control L |
+| Theorem C2 + admissibility | 8b, 8c | control M |
+| occupation-weighted fitting | 8d | control N |
+| stability / ROA certificate | 8e | control O |
+| price of $\lambda$ in control | 8f | control P |
