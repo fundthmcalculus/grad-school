@@ -73,6 +73,20 @@ EXPERIMENTS = [
               "to CART/RF (rank-based splits are transform-invariant).",
     ),
     Experiment(
+        id="table-4-4-openset",
+        title="Open-set detection: complement rule vs one-class SVM / isolation forest",
+        chapter="Ch4", produces="Table 4.4 + Fig 4.2 (theta sweep)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_4_openset.py"),
+        hardware="any", datasets=["Glass (BETH if present)"],
+        outputs=["reproduce/outputs/table_4_4_openset.md",
+                 "reproduce/outputs/table_4_4b_theta_sweep.md"],
+        notes="VERIFIED RUNNING. Leave-one-class-out open-set protocol; baselines matched to "
+              "the complement rule's observed false-alarm rate. BETH is not in the repo, so "
+              "the same protocol runs on in-repo Glass. Set REPRO_THETA_SWEEP to emit the "
+              "operating curve for Fig 4.2.",
+    ),
+    Experiment(
         id="table-4-1-mog-baselines",
         title="MoG FIS vs sklearn baselines (train time + accuracy/R2)",
         chapter="Ch4", produces="Table 4.1",
