@@ -490,17 +490,59 @@
   note        = {Unpublished proposal; cited as parallel use of the same FIS constraint set}}
 
 
-% ####################  UNRESOLVED -- MUST FIX BEFORE SUBMISSION  ############
+% ####################  VAT ORDERING COMPLEXITY / NEAREST PRIOR ART  #########
+% Surfaced by the 2026-07-31 prior-art search. These are load-bearing for Ch3 and
+% for the planned complexity note (Ch9) -- read before writing either.
 
-@article{kdtreevat2024,                          % [!] BROKEN -- author/title unknown
-  title   = {{BB-VAT} / {kdT-VAT}: sub-quadratic-memory {VAT} for {E}uclidean data},
+@article{deshpande2024scalable,                 % [V] title/venue/DOI confirmed; FULL TEXT NOT YET READ
+  author  = {Deshpande, Ojas and Kumar, Dheeraj},
+  title   = {Time and Memory Scalable Algorithms for Clustering Tendency Assessment of Big Data},
   journal = {Information Sciences},
-  year    = {2024},
-  note    = {PLACEHOLDER. Cited in Ch2 s2.2 and Ch3 s3.2 as "[Information Sciences 2024]",
-             a journal-name-only citation that will not survive review. Authors, exact
-             title, volume, pages, and DOI must be resolved. This is the kd-tree memory
-             line that achieves sub-quadratic memory but requires Euclidean coordinates --
-             load-bearing for Ch3's niche argument, so it matters.}}
+  volume  = {664}, pages = {120324}, year = {2024},
+  doi     = {10.1016/j.ins.2024.120324},
+  note    = {Closest prior art to the planned Ch9 note. Proposes BB-VAT, kdT-VAT,
+             TkdT-VAT (attacking the VAT EMST/ordering step itself, sub-quadratic via
+             geometry) and MST-iVAT, which computes the iVAT RDI "without having to
+             compute the full distance matrix". BLOCKING: obtain full text.}}
+
+@inproceedings{parveen2013pvat,                 % [V] -- NAME COLLISION with this work's "pVAT"
+  author    = {Parveen, [given name] and Sreevalsan-Nair, Jaya},
+  title     = {{pVAT}: Parallel {VAT} on the {GPU}},
+  booktitle = {Big Data Analytics (BDA 2013)},
+  series    = {Lecture Notes in Computer Science}, volume = {8302},
+  pages     = {151--170}, publisher = {Springer}, year = {2013},
+  note      = {A published method already named pVAT, which likewise changes the MST
+               algorithm used for the VAT ordering (Prim to Boruvka, on GPU). Verify
+               first author's given name and exact title.}}
+
+@article{havens2009disguise,                    % [V] -- hands a reviewer the Prim/VAT equivalence
+  author  = {Havens, Timothy C. and Bezdek, James C. and Keller, James M. and Popescu, Mihail and Huband, Jacalyn M.},
+  title   = {Is {VAT} Really Single Linkage in Disguise?},
+  journal = {Annals of Mathematics and Artificial Intelligence},
+  volume  = {55}, pages = {237--251}, year = {2009},
+  url     = {https://pages.mtu.edu/~thavens/papers/AMAI_2009_55_Havens.pdf},
+  note    = {Prints Prim's algorithm and the VAT ordering side by side and notes their
+             "almost line-for-line similarity". Bezdek's own group established the
+             equivalence, so a reviewer need not construct it.}}
+
+@article{kumar2016incvat,                       % [V]
+  author  = {Kumar, Dheeraj and Bezdek, James C. and Palaniswami, Marimuthu and Rajasegarar, Sutharshan and Leckie, Christopher},
+  title   = {A Scalable Framework for Clustering Tendency Assessment of Big Data:
+             {inc-VAT}, {dec-VAT}, {inc-iVAT}, {dec-iVAT}},
+  journal = {ACM Transactions on Knowledge Discovery from Data},
+  volume  = {11}, number = {2}, year = {2016},
+  doi     = {10.1145/2997656},
+  note    = {Incremental/decremental update of an existing VAT ordering; the prior work
+             that most directly restructures the sequencing for efficiency. Verify title.}}
+
+@article{mullner2011modern,                     % [?] verify volume/pages
+  author  = {M{\"u}llner, Daniel},
+  title   = {Modern Hierarchical, Agglomerative Clustering Algorithms},
+  journal = {arXiv preprint}, year = {2011},
+  eprint  = {1109.2378}, archivePrefix = {arXiv},
+  note    = {Supplies the O(N) working-memory nearest-neighbour-chain / array-based
+             argument for single-linkage. Via havens2009disguise this transfers directly
+             to VAT, which is the reviewer objection the Ch9 note must answer up front.}}
 
 
 % ####################  INTERPRETABILITY / XAI  #############################

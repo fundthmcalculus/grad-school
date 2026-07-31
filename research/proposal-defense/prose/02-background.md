@@ -44,7 +44,7 @@ The single most useful fact about VAT, and the one I exploit repeatedly, is that
 
 **iVAT** [Wang et al. 2010] sharpens the picture by replacing each dissimilarity with a *path-based minimax* value: the distance between two points becomes the largest edge on the lightest path between them, i.e. the bottleneck along the best route. This is an ultrametric, and it turns fuzzy, washed-out blocks into crisp ones. Havens and Bezdek (2012) gave an $O(N^2)$ recurrence for it. The catch, and the reason Chapter 3 exists, is cost: textbook VAT is $O(N^3)$ because of a naive argmin in its inner loop, and even the memory needed to hold $D$ and its reordered copy becomes prohibitive well before the datasets get interesting.
 
-The literature already contains fast VAT variants, and I differentiate against them in Chapter 3: clusiVAT [Kumar et al. 2016] samples and is therefore approximate; eVAT [Meng and Yuan 2018] is an exact GPU VAT; and the kd-tree memory methods [Information Sciences 2024] cut memory but require Euclidean coordinates. The regime none of them occupy — exact, on an arbitrary and possibly non-metric dissimilarity matrix, at scale — is the one I target.
+The literature already contains fast VAT variants, and I differentiate against them in Chapter 3: clusiVAT [Kumar et al. 2016] samples and is therefore approximate; eVAT [Meng and Yuan 2018] is an exact GPU VAT; and Deshpande and Kumar (2024) attack the ordering itself with k-d-tree search and compute the iVAT index without materializing the full matrix — but require Euclidean coordinates. The regime none of them occupy — exact, on an arbitrary and possibly non-metric dissimilarity matrix, at scale — is the one I target.
 
 ## 2.3 Persistence and a Little Topology
 
