@@ -5,6 +5,31 @@ Working notes on Dr. Cohen's handwritten TSK/least-action derivation
 the rule-orthogonality question.
 
 Code: `fis_action.py`. Experiments: `demo_regression.py`, `demo_classifier.py`.
+Recorded output: `results.txt`. Reproduction instructions: §7.
+
+### Notation
+
+| symbol | meaning |
+|---|---|
+| $X=[x_{lo},x_{hi}]$ | input universe (all experiments use $[-15,15]$) |
+| $Y$ | output universe; $[0,1]$ in the classifier case |
+| $N$, $p$ | number of rules, consequent polynomial order |
+| $\mu_i(x)$ | membership function of rule $i$, centre $a_i$, width $b_i$ |
+| $\varphi_i=\mu_i/\sum_j\mu_j$ | normalized firing strength (partition of unity) |
+| $f_i(x)=\sum_kB_{ik}x^k$ | rule consequent |
+| $\psi_{ik}=\varphi_i x^k$ | **rule regressor** — the actual model basis |
+| $\theta$ | flattened consequent coefficients, $B$ raveled |
+| $y_d$, $y_c$, $e=y_d-y_c$ | target, FIS output, error field |
+| $\lambda=\ell^2$ | slope weight; $\ell$ a correlation length, units of $x$ |
+| $\langle u,v\rangle_{H^1}$ | $\int(uv+\lambda u'v')dx$ |
+| $G$, $r$ | $H^1$ Gram matrix $\langle\psi_m,\psi_n\rangle$, and $r_m=\langle y_d,\psi_m\rangle$ |
+| $S$ | the action $\|e\|_{H^1}^2$ |
+| $\alpha_i$ | rule firing strength in the classifier |
+| $\beta$ | defuzzification annealing temperature |
+
+Note the code uses a rescaled monomial $t=(x-\text{mid})/\text{half}$ in place of
+$x^k$. This spans the identical function space — the model is unchanged — but
+keeps $\kappa(G)$ from running to $10^7$ on $[-15,15]$.
 
 ---
 
@@ -115,6 +140,24 @@ $$G\,\theta=r,\qquad r_m=\langle y_d,\psi_m\rangle_{H^1}.$$
 
 This is **variable projection**: eliminate $B$ analytically and search only over
 $(a,b)$. For $N=3$, $p=1$ that is 6 parameters instead of 12. (`demo_regression.py` §A, §F.)
+
+Measured on Cohen's cubic $y_d=0.3x^3+0.2x^2-5x-3$, $N=3$, $p=1$:
+
+| $\lambda$ | $\|e\|_{L^2}$ | $\|e'\|_{L^2}$ | action | dof searched |
+|---|---|---|---|---|
+| 0 | 0.577 | 0.990 | 0.914 | 6 |
+| 0.25 | 0.511 | 0.745 | 1.096 | 6 |
+| 1 | 0.468 | 0.529 | 1.382 | 6 |
+| 4 | 0.971 | 0.730 | 3.666 | 6 |
+| 16 | 0.286 | 0.251 | 3.126 | 6 |
+
+Slope error falls ~75% from $\lambda=0$ to $\lambda=16$, and value error falls too —
+the gradient term regularizes the antecedent search rather than merely trading
+one error for the other. The trend is **not monotone** ($\lambda=4$ is worse on
+both), because each row is an independent multistart on a non-convex antecedent
+landscape and individual rows land in different basins. That scatter is the
+content of §3b, not noise to be smoothed away. Actions at different $\lambda$ are
+not comparable to each other — they are different functionals.
 
 ### 3b. The antecedent block: second-order conditions done properly
 
@@ -254,20 +297,42 @@ functions are $\psi_{ik}=\varphi_i x^k$. Two consequences:
 
 ### 4b. The exact condition for sequential residual fitting
 
-**Claim.** Fitting rules one at a time against the running residual reproduces the
-joint least-action solution *exactly* if and only if the $H^1$ Gram matrix is
-block diagonal across rules:
+**Proposition 1.** Greedy residual fitting reproduces the joint least-action
+solution for *every* target $y_d$ **iff** the $H^1$ Gram matrix is block diagonal
+across rules:
 
-$$\big\langle \varphi_i x^k,\ \varphi_j x^l\big\rangle_{H^1}=0
-\qquad \forall\, i\neq j,\ \ 0\le k,l\le p .$$
+$$G_{ij}=0\ \ (i\neq j),\qquad
+\big(G_{ij}\big)_{kl}=\big\langle \varphi_i x^k,\ \varphi_j x^l\big\rangle_{H^1},
+\qquad 0\le k,l\le p .$$
 
-**Corollary (the sharp form of the user's intuition).** For non-negative
-membership functions this is equivalent to **disjoint supports**. Take $k=l=0$
-and $\lambda=0$: $\int\varphi_i\varphi_j\,dx=0$ with $\varphi_i,\varphi_j\ge0$
-forces $\varphi_i\varphi_j=0$ almost everywhere.
+*The "for every $y_d$" quantifier is not decoration* — for one fixed target the two
+schemes can agree by coincidence.
 
-So: *rule orthogonality $\equiv$ non-overlapping activation domains.* There is no
-weaker condition that buys exactness.
+**Proof.** ($\Leftarrow$) If $G$ is block diagonal the joint normal equations
+$G\theta=r$ decouple into $G_{ii}\theta_i=r_i$. Greedy gives block 1 the same
+equation; block 2 sees residual right-hand side $r_2-G_{21}\theta_1=r_2$ since
+$G_{21}=0$; induction on $i$ closes it.
+
+($\Rightarrow$) Take $N=2$. Joint: $G_{11}\theta_1+G_{12}\theta_2=r_1$. Greedy:
+$G_{11}\tilde\theta_1=r_1$. Agreement for all $y_d$ forces
+$G_{11}^{-1}G_{12}\theta_2=0$ for all attainable $\theta_2$; as $y_d$ ranges over
+$H^1$, $\theta_2$ ranges over all of $\mathbb{R}^{p+1}$, so $G_{12}=0$. Blocks
+$>2$ follow by applying the same argument to consecutive pairs. $\square$
+
+**Proposition 2 ($\lambda=0$).** In the pure-$L^2$ case, block diagonality is
+**equivalent to disjoint supports**. Taking $k=l=0$, $\int\varphi_i\varphi_j\,dx=0$
+with $\varphi_i,\varphi_j\ge0$ forces $\varphi_i\varphi_j=0$ a.e. $\square$
+
+**But Proposition 2 does *not* extend to $\lambda>0$**, and C1 requires $\lambda>0$.
+The $H^1$ pairing is
+
+$$\langle\varphi_i,\varphi_j\rangle_{H^1}=\underbrace{\int\varphi_i\varphi_j\,dx}_{>0\ \text{if supports overlap}}
++\ \lambda\underbrace{\int\varphi_i'\varphi_j'\,dx}_{<0\ \text{for adjacent rules}}$$
+
+and the slope term is **negative** for neighbouring rules — one is rising exactly
+where the other falls. The two can therefore cancel. This is not hypothetical;
+see §4d. Disjoint support remains *sufficient* for block diagonality at any
+$\lambda$ (both integrands vanish identically), but it is no longer necessary.
 
 ### 4c. …and that is exactly why it cannot be imposed on the input
 
@@ -294,8 +359,10 @@ zero at the seams. Widening the bumps to 6.0 restores overlap and recovers the
 action, but immediately reintroduces off-block coupling (1.0e−1) — the trade-off
 is continuous and unavoidable.
 
-> **Exact input-side rule orthogonality and a usable differentiable model are
-> mutually exclusive.** The trade-off is not an artifact; it is the geometry.
+> **At fixed $\lambda$, exact input-side rule orthogonality and a usable
+> differentiable model are mutually exclusive.** The trade-off is not an
+> artifact; it is the geometry. (The qualifier matters — §4d shows that letting
+> $\lambda$ vary opens a narrow third door.)
 
 Two ways out, and they are the practical answer:
 
@@ -317,11 +384,62 @@ interpretable after back-substitution. Measured (§D):
 | 3.0 | 1.2e−2 | 4.6e−5 |
 | 2.0 | 6.8e−4 | 1.7e−7 |
 
-**Recommendation.** Keep Gaussian (or $\pi$-shaped) antecedents with genuine
-overlap for smoothness and coverage; get the decoupling from $H^1$-OLS, not from
-disjointness. Use clustering (FCM, as in `AEEM6097/fuzzy-symphony.py`) to seed
-centers and OLS-with-forward-selection to pick which rules to keep — that is the
-"identify rules from residuals" scheme, made exact.
+### 4d. A third route: $\lambda$-tuned orthogonality
+
+Because the slope term is negative for adjacent rules (§4b), there is a positive
+$\lambda^\*$ at which the value and slope contributions cancel exactly. For $N=2$
+order-0 rules it is available in closed form:
+
+$$\lambda^\*=-\frac{\int\varphi_0\varphi_1\,dx}{\int\varphi_0'\varphi_1'\,dx}\;>\;0 .$$
+
+This gives **exact $H^1$ orthogonality between fully overlapping, $C^\infty$,
+positively-covering membership functions** — all three properties that §4c said
+were incompatible with exactness. Measured (`demo_regression.py` §H), Gaussians
+at $\pm5$:
+
+| width | $\int\varphi_0\varphi_1$ | $\int\varphi_0'\varphi_1'$ | $\lambda^\*$ | off-block at $\lambda^\*$ |
+|---|---|---|---|---|
+| 2.0 | 2.0000e−1 | −8.3333e−1 | 0.2400 | 3.7e−18 |
+| 4.0 | 8.0000e−1 | −2.0833e−1 | 3.8400 | 1.5e−17 |
+| 6.0 | 1.7991e0 | −9.2593e−2 | 19.4307 | 0.0 |
+| 10.0 | 4.5257e0 | −3.2898e−2 | 137.5701 | 5.9e−17 |
+
+and greedy fitting becomes exact there (gap 4.6e−10 at $\lambda^\*$ vs 6.5e−4 at
+$\lambda=1$).
+
+**Scope, stated precisely.** One free parameter $\lambda$ can satisfy one scalar
+condition. So the route is exact only when the number of independent
+orthogonality conditions is one:
+
+| configuration | conditions | exact? | best off-block |
+|---|---|---|---|
+| $N=2$, order 0 | 1 | **yes** | ~1e−17 |
+| $N=2$, order 1 | $(p{+}1)^2=4$ | no | 1.1e−2 |
+| $N=3$, order 0 | 3 | no | 9.7e−3 (from 2.5e−1) |
+| $N=4$, order 0 | 6 | no | 1.2e−2 (from 2.3e−1) |
+| $N=5$, order 0 | 10 | no | 1.3e−2 (from 2.1e−1) |
+
+For $N\ge3$ it still reduces coupling by roughly $20\times$, so it is worth tuning
+even when it cannot be exact.
+
+**Two caveats, both real.** $\lambda^\*$ grows steeply with overlap (0.24 at width
+2, 137.6 at width 10), and $\lambda$ is simultaneously the *physical* slope weight
+from §1 — it sets how much derivative fidelity is worth. Buying decoupling this
+way therefore distorts the very fit the model exists to perform. It is a genuine
+third option, not a free lunch.
+
+The binary-classifier case is where it lands cleanly: §5b shows a classifier
+score *is* an order-0 TSK model, so $N=2$, order 0 is exactly the binary
+classification setting, and there $\lambda^\*$ is exact and in closed form.
+
+### 4e. Recommendation
+
+Keep Gaussian (or $\pi$-shaped) antecedents with genuine overlap for smoothness
+and coverage; get the decoupling from $H^1$-OLS, not from disjointness. Use
+clustering (FCM, as in `AEEM6097/fuzzy-symphony.py`) to seed centers and
+OLS-with-forward-selection to pick which rules to keep — that is the "identify
+rules from residuals" scheme, made exact. Reach for $\lambda^\*$ only in the binary
+order-0 case, where it is exact and costs nothing extra.
 
 ---
 
@@ -343,27 +461,43 @@ output universe $Y$, not the input universe $X$.**
 
 ### 5a. Disjoint output supports make $\vee$ equal $+$
 
-If the $B_i$ have pairwise disjoint supports then at any $y$ at most one term of
-$\bigvee_i(\alpha_i\wedge B_i(y))$ is non-zero, so
+**Proposition 3.** $\max_i(\alpha_i\wedge B_i)=\sum_i(\alpha_i\wedge B_i)$ for all
+firing vectors $\alpha\in[0,1]^N$ **iff** the $B_i$ have pairwise disjoint supports
+(up to null sets).
 
-$$B'(y)=\max_i\big(\alpha_i\wedge B_i(y)\big)=\sum_i\big(\alpha_i\wedge B_i(y)\big).$$
+*Proof.* ($\Leftarrow$) At any $y$ at most one $B_i(y)$ is non-zero, so at most one
+summand is non-zero and $\max=\sum$ trivially.
+($\Rightarrow$) Suppose $\operatorname{supp}B_i\cap\operatorname{supp}B_j$ has
+positive measure for some $i\neq j$. Take $\alpha\equiv1$. On that intersection
+both $B_i(y)>0$ and $B_j(y)>0$, so
+$\sum\ge B_i(y)+B_j(y)>\max(B_i(y),B_j(y))=\max$. $\square$
 
 Measured over 400 random firing vectors (`demo_classifier.py` §H): sup-norm
-difference **0.0** for disjoint sets, **4.8e−1** for overlapping ones. The
-identity is exactly the disjointness condition — nothing weaker works.
+difference **0.0** for disjoint sets, **4.8e−1** for overlapping ones.
 
 This matters because $\max$ is non-differentiable and $+$ is analytic.
 
 ### 5b. The score really is a regression onto $[0,1]$
 
-With disjoint $B_i$ of area $A_i$ and centroid $c_i$, centroid defuzzification
-collapses algebraically:
+**Proposition 4.** With pairwise disjoint $B_i$, areas $A_i=\int B_i$, centroids
+$c_i=A_i^{-1}\int yB_i$, and product implication $B'=\sum_i\alpha_iB_i$, centroid
+defuzzification is *exactly* an order-0 TSK model.
 
-$$y=\frac{\int y\,B'(y)\,dy}{\int B'(y)\,dy}=\frac{\sum_i\alpha_iA_ic_i}{\sum_i\alpha_iA_i}$$
+*Proof.* Disjointness makes the aggregate a plain sum, and both integrals split:
 
-— an **order-0 TSK model**. Verified exact to 2.2e−16 with product implication
-(§I). Because the weights are non-negative and normalized, $y$ is a convex
-combination of the cores, so **the $[0,1]$ range constraint is free** — no
+$$y=\frac{\int y\,B'(y)\,dy}{\int B'(y)\,dy}
+=\frac{\sum_i\alpha_i\int yB_i\,dy}{\sum_i\alpha_i\int B_i\,dy}
+=\frac{\sum_i\alpha_iA_ic_i}{\sum_i\alpha_iA_i}
+=\sum_i w_i c_i,\quad w_i=\frac{\alpha_iA_i}{\sum_j\alpha_jA_j}. \ \square$$
+
+Verified exact to 2.2e−16 (§I). With Gödel implication ($\wedge$ instead of
+product) clipping at $\alpha_i$ rescales each area but leaves each centroid
+unchanged for symmetric $B_i$, so the same form holds with $A_i$ replaced by the
+clipped area; the residual in the measured table (6.8e−2) is precisely that
+area correction.
+
+Since $w_i\ge0$ and $\sum_iw_i=1$, $y$ is a **convex combination of the cores**, so
+$y\in[\min_ic_i,\max_ic_i]\subseteq[0,1]$: **the range constraint is free** — no
 clipping, no sigmoid, nothing non-smooth. This is the precise sense in which
 "a classifier ranking is just a regression model with range $[0,1]$."
 
@@ -386,14 +520,27 @@ $$y_\beta=\frac{\sum_i\alpha_i^\beta c_i}{\sum_i\alpha_i^\beta}$$
 - $\beta\to\infty$: MOM (and FOM/LOM if $c_i$ is replaced by $\inf$/$\sup$ of the core).
 - **$C^\infty$ in $\alpha$ for every finite $\beta$.**
 
-With $r=\alpha_{(2)}/\alpha_{(1)}$ the runner-up ratio and $D$ the output
-diameter,
+**Proposition 5 (annealing error bound).** Let $\alpha_{(1)}\ge\alpha_{(2)}\ge\dots$
+be the sorted firing strengths, $r=\alpha_{(2)}/\alpha_{(1)}<1$ the runner-up ratio
+and $D=\max_ic_i-\min_ic_i$ the output diameter. Then
 
-$$\big|y_\beta-\text{MOM}\big|\;\le\;\frac{(N-1)\,D\,r^\beta}{1+(N-1)r^\beta}$$
+$$\big|y_\beta-\text{MOM}\big|\;\le\;\frac{(N-1)\,D\,r^\beta}{1+(N-1)r^\beta}.$$
 
-— geometric convergence in the classification **margin**. Measured at $r=0.671$
-the bound holds at every $\beta$ tested, with the gap falling from 2.1e−1 at
-$\beta=1$ to 2.0e−12 at $\beta=64$ (§J).
+*Proof.* Write $w_i=\alpha_i^\beta/\sum_j\alpha_j^\beta$ and let $i^\*$ be the
+argmax, so $\text{MOM}=c_{i^\*}$. Then
+$y_\beta-c_{i^\*}=\sum_{i\neq i^\*}w_i(c_i-c_{i^\*})$, giving
+$|y_\beta-\text{MOM}|\le D\sum_{i\neq i^\*}w_i$. Normalising by
+$\alpha_{(1)}^\beta$, each off-peak weight satisfies
+$\alpha_i^\beta/\alpha_{(1)}^\beta\le r^\beta$, so with $K=(N-1)r^\beta$,
+
+$$\sum_{i\neq i^\*}w_i\;=\;\frac{\sum_{i\neq i^\*}(\alpha_i/\alpha_{(1)})^\beta}
+{1+\sum_{i\neq i^\*}(\alpha_i/\alpha_{(1)})^\beta}\;\le\;\frac{K}{1+K},$$
+
+the last step because $t\mapsto t/(1+t)$ is increasing. $\square$
+
+Convergence is therefore **geometric in the classification margin**. Measured at
+$r=0.671$ the bound holds at every $\beta$ tested, with the gap falling from
+2.1e−1 at $\beta=1$ to 2.0e−12 at $\beta=64$ (§J).
 
 So $\beta$ is a **continuation parameter**: optimize the action at small $\beta$
 where the landscape is smooth, then anneal $\beta$ upward to recover crisp
@@ -431,9 +578,17 @@ sufficiency argument of §3c stays valid.
   now against the antecedent directions. Verified to 1e−9 wherever
   $\delta$-coverage holds; it correctly reports garbage where coverage fails,
   because the model genuinely is not differentiable there.
-- Sequential residual fitting is exact **iff** the $H^1$ Gram is block diagonal,
-  **iff** rules have disjoint support — which is unattainable on $X$ without
-  destroying differentiability and coverage. Use $H^1$-OLS instead.
+- Sequential residual fitting is exact (for all targets) **iff** the $H^1$ Gram is
+  block diagonal (Prop. 1). At $\lambda=0$ that is **equivalent** to disjoint
+  support (Prop. 2), which is unattainable on $X$ without destroying
+  differentiability and coverage. Use $H^1$-OLS instead.
+- **Correction to the above for $\lambda>0$**: disjointness is sufficient but *not*
+  necessary. The $H^1$ slope term is negative for adjacent rules, so value and
+  slope contributions can cancel at a positive $\lambda^\*$, giving exact
+  orthogonality between overlapping, smooth, covering rules. It is exact only
+  when there is one independent condition to satisfy — $N=2$, order 0, which is
+  precisely the binary-classifier setting — and reduces coupling ~20× otherwise.
+  $\lambda$ is also the physical slope weight, so this trades fit for decoupling.
 - Output-side disjointness makes Mamdani $\vee$ equal $+$ exactly, collapses
   centroid defuzzification to an order-0 TSK model, and gives the $[0,1]$ range
   for free.
@@ -454,3 +609,81 @@ sufficiency argument of §3c stays valid.
   action, giving a single unified continuation method.
 - Empirical validation on the sonar dataset already wired up in
   `AEEM6097/fuzzy-symphony.py`.
+- Whether $\lambda^\*$ (§4d) has a variational reading. It falls out as an
+  algebraic cancellation; it is not obvious whether it corresponds to a
+  distinguished correlation length for the target.
+
+---
+
+## 7. Reproduction
+
+```bash
+uv venv .venv && uv pip install --python .venv/bin/python numpy scipy matplotlib
+cd research/least_action
+../../.venv/bin/python demo_regression.py    # ~8 min, sections A-H
+../../.venv/bin/python demo_classifier.py    # ~15 s, sections H-K
+```
+
+Both are deterministic — seeded RNG, no wall-clock dependence — so the output
+should match `results.txt` exactly. Only `numpy` and `scipy` are imported by
+`fis_action.py`; `matplotlib` is not required.
+
+### Every numerical constant that matters
+
+Recorded because several of these were tuned against observed failures, and a
+reader changing one should know what it was protecting against.
+
+| quantity | value | why |
+|---|---|---|
+| quadrature | Gauss–Legendre, 400 nodes (2000 in §H) | exact for degree $<2n$; the integrands are smooth so this is far past convergence |
+| consequent ridge | $10^{-9}\cdot\operatorname{tr}(G)/m$ | trace-relative so it scales with the problem; a ridge rather than a truncating pseudo-inverse so the map $(a,b)\mapsto\theta$ stays smooth — a rank-flipping SVD leaves the reduced action non-differentiable and corrupts the FD Hessian |
+| outer optimizer | SLSQP + L-BFGS-B, alternating, up to 8 rounds | they stall in different places; SLSQP handles the gap constraint, L-BFGS-B drives the gradient harder |
+| outer gradient | analytic (§3d) | SciPy's default FD step is round-off dominated here — see §3e |
+| multistart | 24 restarts, seed 0 | the antecedent landscape is multimodal (§3b) |
+| saddle-escape polish | ≤6 rounds along the most-negative eigenvector | first-order methods stall at saddles on this objective |
+| Hessian FD step | $10^{-2}\cdot\max(\lvert p\rvert,\,0.1\,\text{span})$ | large on purpose: the mixed second difference divides by $4h_ih_j$, so a small $h$ is pure round-off |
+| active-constraint tol | $10^{-3}$ relative | loose enough to catch bounds SLSQP only approached to its own tolerance; a missed bound shows up as spurious negative curvature in an infeasible direction |
+| definiteness tol | estimated noise floor $\approx\varepsilon_f/h^2$ | judging against exact zero reads numerical dust as a saddle |
+| default `min_gap` | $0.6\times$ rule pitch | identifiability (C5) |
+| default `width_bounds` | $[0.25,\,1.5]\times$ pitch | identifiability (C5) |
+| bump $u$-floor | $10^{-8}$ | $F=e^{-1/u}$ underflows to 0 long before the $1/u^4$ factors overflow, but without a floor $u\to0$ gives $\infty\cdot0=$ NaN |
+
+### API map
+
+| function | does |
+|---|---|
+| `Quadrature.legendre` | Gauss–Legendre rule on $[lo,hi]$ |
+| `MF_SHAPES` | $(F,F',F'')$ per membership-function family — the only place to add one |
+| `mf_param_derivatives` | $(\mu,\ \partial_x\mu,\ \partial_a\mu,\ \partial_b\mu,\ \partial^2_{xa}\mu,\ \partial^2_{xb}\mu)$ |
+| `normalized_weights` | $\varphi_i$, $\varphi_i'$, and $\sum_j\mu_j$ (the coverage check) |
+| `rule_regressors` | $\psi_{ik}$ and $\psi_{ik}'$ on a grid |
+| `regressor_jacobian` | $\partial\psi/\partial p$, $\partial\psi'/\partial p$ for all $2N$ antecedent parameters |
+| `h1_gram`, `h1_project` | $G$ and $r$ |
+| `decoupling_report` | coherence, off-block energy, $\kappa(G)$, min coverage |
+| `solve_consequents` | closed-form consequents + reduced action |
+| `reduced_action_and_gradient` | the same, plus the exact gradient (§3d) |
+| `fit` | full variable-projected fit with constraints, multistart, saddle escape |
+| `galerkin_residual` | $\langle e,\psi_m\rangle_{H^1}$ — the weak E–L form |
+| `optimality_certificate` | KKT residual on the critical cone, projected Hessian, descent probe |
+| `sequential_fit` | greedy residual fitting, optionally $H^1$-orthogonalized (OLS) |
+| `OutputPartition` | disjoint consequent sets on $Y$ |
+| `aggregate_max` / `aggregate_sum` | Mamdani $\vee$ and its summation surrogate |
+| `defuzz_mom` / `defuzz_annealed` | crisp MOM and the $C^\infty$ $\beta$-annealed score |
+| `mom_gap_bound` | the Proposition 5 bound |
+
+### Where each claim is checked
+
+| claim | §here | demo section |
+|---|---|---|
+| variable projection, $\lambda$ sweep | 3a | regression A, B |
+| decoupling vs. overlap trade-off | 4c | regression C |
+| $H^1$-OLS rescues overlap | 4c(ii) | regression D |
+| identifiability ⇒ certifiability | 3b | regression E |
+| consequent block globally convex | 3a | regression F |
+| analytic gradient exact | 3d | regression G′ |
+| Galerkin orthogonality | 1 | regression G |
+| $\lambda^\*$ orthogonality | 4d | regression H |
+| $\vee=+$ iff disjoint | 5a | classifier H |
+| centroid $=$ order-0 TSK | 5b | classifier I |
+| MOM discontinuous, annealing bound | 5c | classifier J |
+| score is $C^1$ in $x$ | 5c | classifier K |
