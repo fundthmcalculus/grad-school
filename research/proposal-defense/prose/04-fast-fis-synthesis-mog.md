@@ -16,6 +16,32 @@ I also owe the reader an honest caveat up front, because a sharp committee membe
 
 ## 4.3 Methodology
 
+### Preparing the inputs, and why the transform is not optional
+
+Before either construction, the inputs are transformed: features whose dynamic range spans more than a couple of orders of magnitude are log-scaled automatically, and every feature is then standardized. On Concrete the automatic detector selects exactly one feature, `Age`, which is unsurprising — curing time runs from one day to a year while the mixture components all live within a factor of a few.
+
+I used to treat this as housekeeping and leave it out of the description. That was a mistake, because it is worth more than most of the modeling choices in this chapter. Measured across three seeds on identical splits:
+
+**Table 4.1 — What the transform is worth, by model.** The pattern is the point, not any single row.
+
+| Model | raw features | log + standardized | Δ |
+|---|---:|---:|---:|
+| flat MoG-TSK, 1st order | 0.646 | 0.797 | **+0.151** |
+| flat MoG-TSK, 2nd order | 0.783 | 0.845 | +0.062 |
+| flat MoG-TSK, full 2nd | 0.775 | **0.881** | +0.106 |
+| fuzzy tree (Ch. 6) | 0.701 | 0.717 | +0.016 |
+| mixture of experts (Ch. 6) | 0.773 | 0.862 | +0.089 |
+| CART | 0.797 | 0.797 | **−0.000** |
+| Random Forest | 0.904 | 0.905 | **+0.000** |
+
+Two things fall out, and the second matters more than the first.
+
+The first is that the transform is worth up to fifteen points of $R^2$ to the Gaussian models. A first-order model goes from 0.646 to 0.797 on nothing but a log and a rescale. Any comparison that omits it is not measuring the method.
+
+The second is that **the transform is worth exactly nothing to CART and Random Forest** — −0.000 and +0.000, which is not a rounding artifact but the expected result. An axis-aligned decision tree splits on rank: it asks whether a feature exceeds a threshold, and a monotone transform cannot change the answer, so the tree it induces is identical. A Gaussian membership function has no such immunity, because it is defined by a location and a width in the feature's own units; skew the feature and the membership function fits the skew rather than the structure.
+
+That asymmetry is worth stating plainly for two reasons. It explains why my pipeline requires preprocessing that the baselines do not, which would otherwise look like an inconsistency between chapters — the fuzzy tree of Chapter 6 is deliberately fit on *raw* features so its split thresholds stay physically meaningful ("cement ≥ 350", not "cement ≥ 0.42"), and it can afford to be, for exactly the rank-invariance reason above. And it forecloses the natural suspicion that the transform is quietly doing the work that I attribute to the model. It cannot be: the strongest baseline in the table is entirely unmoved by it, so whatever the transform buys, it buys specifically for the Gaussian construction rather than for the problem.
+
 ### 4.3.1 Classification: one rule per answer
 
 For a classification problem with $N$ samples, $M$ features, and $K$ output classes, the construction runs answer-first. I segment the data by output class — the answers — and for each class I ask which features actually distinguish it, by comparing the per-feature statistics across classes; this is an $O(M^2)$ screening step that discards features carrying no discriminative signal. For each retained feature and class I fit a one-dimensional Gaussian mixture, using up to a few components, which becomes the membership function for that feature under that class. I combine the per-feature memberships for a class with a fuzzy OR — a t-conorm — and that combination *is* the rule for that class. Repeating over the $K$ classes gives $K$ rules, each a disjunction over at most $M \times p$ Gaussian terms. There is no grid, so there is no exponential rule base.
@@ -89,28 +115,29 @@ On the **BETH** host-telemetry set I test the anomaly rule of §4.3.5 in its har
 
 On the **UCI Concrete Compressive Strength** regression set, the flat model's test $R^2$ is about 0.44, 0.77, and 0.87 at TSK orders zero, one, and two respectively — which is both a reasonable result and the launch point for the hierarchical models of Chapter 6, where a tree and a mixture of experts push it further. One caution for the reader comparing chapters: Chapter 6 quotes a flat-model $R^2$ of 0.658 on the same dataset, which looks like a contradiction and is not. That figure comes from the tree-and-mixture experiment, which uses a different split, preprocessing, and order selection. Running one consistent Concrete benchmark so the flat baseline reads identically in both chapters is a reconciliation I owe.
 
-**Table 4.1 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation; the baseline comparison is Table 4.2.
+**Table 4.2 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation; the baseline comparison is Table 4.3.
 
 | Dataset (task) | Size (N × M) | Train time | Accuracy / R² | Rule base |
 |---|---|---:|---:|---|
 | PhiUSIIL (binary classification) | 235K × 54 | ~6 s | 97–99% acc. | 2 rules (K = 2) |
 | RT-IOT2022 (12-class) | 123K × 83 | < 60 s | *pending* | ~12 rules (K = 12) |
-| Concrete (regression, TSK order 0) | 1,030 × 8 | seconds | R² ≈ 0.44 | 3 output buckets |
-| Concrete (regression, TSK order 1) | 1,030 × 8 | seconds | R² ≈ 0.77 | 3 output buckets |
-| Concrete (regression, TSK order 2) | 1,030 × 8 | seconds | R² ≈ 0.87 | 3 output buckets |
+| Concrete (regression, TSK order 1) | 1,030 × 8 | seconds | R² = 0.797 ± 0.023 | 3 output buckets |
+| Concrete (regression, TSK order 2) | 1,030 × 8 | seconds | R² = 0.845 ± 0.010 | 3 output buckets |
+| Concrete (regression, full 2nd) | 1,030 × 8 | seconds | **R² = 0.881 ± 0.001** | 3 output buckets |
 
 The rule-base column is the point of the table as much as the accuracy is: for classification the count is simply the number of classes, and for regression the number of output buckets — never a product over inputs. RT-IOT2022 is the sharpest case, since a grid over 83 features would be beyond enumeration while this model carries twelve rules.
 
-**Table 4.2 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol.
+**Table 4.3 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol.
 
 | Method | Concrete R² | Concrete train time | PhiUSIIL accuracy | PhiUSIIL train time |
 |---|---:|---:|---:|---:|
-| **MoG FIS (this work)** | ≈ 0.87 | seconds | 97–99% | ~6 s |
+| **MoG FIS (this work)** | **0.881** (full 2nd) | seconds | 97–99% | ~6 s |
 | ANFIS | *pending* | *pending* | *pending* | *pending* |
 | GA-tuned FIS | *pending* | *pending* | *pending* | *pending* |
-| CART / Random Forest (reference) | *pending* | *pending* | *pending* | *pending* |
+| CART (reference) | 0.797 ± 0.029 | seconds | *pending* | *pending* |
+| Random Forest (reference) | 0.904 ± 0.014 | seconds | *pending* | *pending* |
 
-**Table 4.3 — Open-set detection with the complement rule** *(structure fixed; cells from the harness).* Trained on benign traffic only; the malicious class is unseen at training time. The comparison that matters is against detectors built for this job. Detection and false-alarm rates are reported at a matched operating point taken from the $\theta$ sweep, since quoting either one alone would be meaningless.
+**Table 4.4 — Open-set detection with the complement rule** *(structure fixed; cells from the harness).* Trained on benign traffic only; the malicious class is unseen at training time. The comparison that matters is against detectors built for this job. Detection and false-alarm rates are reported at a matched operating point taken from the $\theta$ sweep, since quoting either one alone would be meaningless.
 
 | Method | Trained on | Detection rate | False-alarm rate | Extra model? |
 |---|---|---:|---:|:--:|
@@ -118,7 +145,7 @@ The rule-base column is the point of the table as much as the accuracy is: for c
 | One-class SVM | benign only | *pending* | *pending* | yes |
 | Isolation Forest | benign only | *pending* | *pending* | yes |
 
-> **Reproduction.** Tables 4.1–4.3 regenerate from `reproduce/tables/table_4_1_mog_baselines.py`, which emits Markdown and CSV with mean ± standard deviation across a fixed seed set. Cells marked *pending* are those whose adapter or dataset was not yet wired up; the harness prints exactly what it could not run rather than substituting a guess.
+> **Reproduction.** Tables 4.2–4.4 regenerate from `reproduce/tables/table_4_1_mog_baselines.py`, which emits Markdown and CSV with mean ± standard deviation across a fixed seed set. Cells marked *pending* are those whose adapter or dataset was not yet wired up; the harness prints exactly what it could not run rather than substituting a guess.
 >
 > **TODO — repeatable performance (board-wide standard):** the numbers above are single-machine point estimates. Reproduce under the fixed protocol — pinned clocks and thermals, multiple seeds, reported error bars — before citation. See `ACTION_ITEMS.md` §A and Chapter 7, Goal G4.
 
