@@ -47,6 +47,8 @@
 
 ## 6.4 Results (current) & Proposed Experiments
 
+> **TODO — repeatable performance (board-wide standard):** any training-time / accuracy / speedup numbers reported here need the fixed reproducibility protocol — pinned clocks/thermals, multiple seeds, error bars — plus the full baseline suite, before citation. See Ch 7 Goal G4 and the master-outline board-wide TODO.
+
 *Current (from `tribble-tree/README.md`, `consequent-plan.md`, `HFIS_NOVELTY_REVIEW.md`):*
 - **UCI Concrete (regression):** flat R²=0.658 → 1st-order tree R²=0.746 → **HME R²=0.791** (RMSE 9.38→8.09→7.34 MPa). Auto-tree recovers domain knowledge (splits on Cement, then Age at the 28-day mark).
 - **PhiUSIIL phishing:** flat acc 0.998 → HME 0.996; trees split on interpretable signals (HasSocialNet, HasCopyrightInfo, URLSimilarityIndex).

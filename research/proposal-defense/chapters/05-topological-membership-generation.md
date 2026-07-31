@@ -47,6 +47,8 @@
 
 ## 5.4 Preliminary Results
 
+> **TODO — repeatable performance (board-wide standard):** the scaling numbers below (e.g. n=5000 in ~5 s) are single-machine point estimates. Reproduce under the fixed protocol — pinned clocks/thermals, multiple seeds, error bars — before citing as scalability/stability results. See Ch 7 Goal G4 and the master-outline board-wide TODO.
+
 *From `FINDINGS.md`, `OPTION_D_MULTISCALE.md`, `SELECTION_METHODS_COMPARISON.md`, `SCALING_STUDY.md`, `RELATIONDATA.md`; figures fig1–fig11.*
 
 - **Master ARI table (5 synthetic sets):** iVAT-cover (k discovered, no constraints) ≈ 0.98–1.00, matching NERFCM-given-k and ConiVAT; declines only on uniform noise (tendency-aware). concentric_rings NERFCM(D)=0.02 → NERFCM(D*)=1.00; bridged_gaussians plain SL=0.00 → ConiVAT=1.00.
