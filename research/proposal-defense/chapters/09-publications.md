@@ -24,6 +24,8 @@ Papers:
 ## 9.3 In Preparation (mapped to chapters)
 
 Primary target venue: **EUSFLAT 2027 (September 2027)** (also consider FUZZ-IEEE / Fuzzy Sets & Systems / Information Sciences for journal versions).
+
+- **An $O(N^2)$ formulation of VAT/iVAT sequencing** — *with Dr. Vladik Kreinovich* → Ch 3 §3.3.1 (stage two). The follow-on to the published priority-queue result: removing the heap entirely via a compact active set with fused relax-and-select, taking the reorder from $O(N^2 \log N)$ to $O(N^2)$ with $O(N)$ workspace. Kreinovich's observation that the stage-one method was really a heap algorithm is what prompted the line of thinking; co-authorship is intended. Implementation already exists and is the shipped fast path (`pcvat.pyx::_prim_mst_kernel_64`), so what the paper needs is the write-up plus the timing study against both stage one and the classical implementation. **Scope the novelty tightly** — dense Prim is textbook; the claim is the VAT-sequencing formulation, the fused single pass, the O(N) workspace, and bit-identical verification.
 - **Fast interpretable FIS via Mixture-of-Gaussians** ("draft paper 3") → Ch 4.
 - **Topological membership generation for fuzzy inference systems** → Ch 5 (lead differentiator; EUSFLAT 2027 target).
 - **Hierarchical fuzzy trees & HME with a shared ridge-TSK primitive** → Ch 6.
