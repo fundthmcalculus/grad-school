@@ -156,9 +156,55 @@ H. A third route: lambda-tuned orthogonality without disjointness
    4    4.00            2.298e-01      9.158         1.178e-02
    5    3.00            2.076e-01      5.206         1.272e-02
   N=2 reaches machine zero; N>=3 improves the coupling ~20x but cannot
-  eliminate it.  Caveat: lambda* grows steeply with overlap (0.24 at width 2
-  to 138 at width 10), and lambda is also the physical slope weight -- so
-  buying decoupling this way distorts the fit the model was built to do.
+  eliminate it.  Section I explains why, and evaluates what lambda* costs.
+
+I. Evaluating lambda*: closed form, meaning, and price
+------------------------------------------------------
+  For two equal-width Gaussians at +-c the normalized weights collapse to a
+  logistic: phi_1 = sigmoid(k x) with k = 4c/b^2, because the log-ratio of two
+  equal-width Gaussians is linear in x.  Both integrals are then elementary,
+    INT phi_0 phi_1 dx = 1/k        INT phi_0' phi_1' dx = -k/6
+  (the second by substituting s = sigmoid(u), giving INT_0^1 s(1-s) ds = 1/6),
+  so lambda* = 6/k^2 = 3 b^4 / (8 c^2).
+
+    c     b   k=4c/b^2     INT pp        1/k      INT dd       -k/6   lam* num      6/k^2
+  5.0   2.0    5.00000   0.200000   0.200000   -0.833333  -0.833333    0.24000    0.24000
+  5.0   4.0    1.25000   0.800000   0.800000   -0.208333  -0.208333    3.84000    3.84000
+  3.0   2.0    3.00000   0.333333   0.333333   -0.500000  -0.500000    0.66667    0.66667
+  8.0   3.0    3.55556   0.281250   0.281250   -0.592593  -0.592593    0.47461    0.47461
+  6.0   2.5    3.84000   0.260417   0.260417   -0.640000  -0.640000    0.40690    0.40690
+
+  MEANING.  w = 1/k = b^2/(4c) is the crossover width of the rule handover.
+  Then ell* = sqrt(lambda*) = sqrt(6) * w exactly:
+    c= 5.0 b= 2.0  w= 0.20000  ell*= 0.48990  ratio= 2.44949  (sqrt 6 = 2.44949)
+    c= 5.0 b= 4.0  w= 0.80000  ell*= 1.95959  ratio= 2.44949  (sqrt 6 = 2.44949)
+    c= 3.0 b= 2.0  w= 0.33333  ell*= 0.81650  ratio= 2.44949  (sqrt 6 = 2.44949)
+    c= 8.0 b= 3.0  w= 0.28125  ell*= 0.68892  ratio= 2.44949  (sqrt 6 = 2.44949)
+
+  So lambda* is fixed entirely by the PARTITION GEOMETRY.  y_d appears nowhere
+  in it.  It is therefore not a distinguished correlation length of the target
+  -- it is the correlation length of the rule crossover region.
+
+  WHY N>=3 CANNOT WORK.  lambda* ~ 1/separation^2, so on a uniform partition
+  of pitch d, adjacent pairs and next-nearest pairs demand lambda* in ratio
+  (2d/d)^2 = 4.  One lambda cannot serve both:
+    pitch=  6.0 b= 3.0  lam*_adjacent=  3.37500  lam*_next=  0.84375  ratio= 4.0000
+    pitch=  8.0 b= 4.0  lam*_adjacent=  6.00000  lam*_next=  1.50000  ratio= 4.0000
+    pitch= 10.0 b= 4.0  lam*_adjacent=  3.84000  lam*_next=  0.96000  ratio= 4.0000
+
+  PRICE.  L2 error of the H1-optimal consequents at lambda*, against the
+  L2-optimal (lambda=0) fit of the same partition; target tanh(x/3):
+    c     b        w    lambda*     ell*    L2 @ 0  L2 @ lam*     cost
+  5.0   1.0   0.0500     0.0150   0.1225    3.2540     3.2542    0.01%
+  5.0   2.0   0.2000     0.2400   0.4899    1.0992     1.1036    0.40%
+  5.0   4.0   0.8000     3.8400   1.9596    0.5191     0.5394    3.91%
+  5.0   6.0   1.8000    19.4400   4.4091    0.1799     0.1938    7.72%
+  5.0   8.0   3.2000    61.4401   7.8384    0.7769     0.8204    5.60%
+  3.0   4.0   1.3333    10.6667   3.2660    0.1101     0.1174    6.59%
+  The price stays under ~8% across the sweep, and is under 2% for sharp
+  crossovers.  Reason: ell* = sqrt(6) b^2/(4c) is SUB-RULE-SCALE for any
+  sensible partition, and weighting slopes at a short correlation length
+  barely perturbs the L2 solution.  lambda* is cheaper than expected.
 
 ===== demo_classifier.py =====
 
