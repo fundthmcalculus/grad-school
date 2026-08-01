@@ -77,15 +77,18 @@ AUROC on the untouched test split, hallucination vs truthful:
 | Mahalanobis (19 stats) | 0.645 | **0.825** |
 | OneClassSVM (hidden, 64 PC) | 0.536 | 0.818 |
 | Mahalanobis (hidden, 64 PC) | 0.580 | 0.763 |
-| **tribble FIS anomaly rule** | **0.643** | **0.812** |
+| **tribble FIS anomaly rule** | **0.643** | **0.819** |
 
-The fuzzy rule is *competitive but consistently ~0.02 behind* the best simple
-baseline on both families. It is not a win as configured.
+The fuzzy rule is *competitive but consistently behind* the best simple baseline
+on both families — by 0.023 on TriviaQA and 0.006 on false-premise. It is not a
+win as configured.
 
-The false-premise 0.812 comes from the matched-budget grid (K=4 modes, 48
-antecedents, product norm); the 8-antecedent configuration used for the operator
-sweep in §3.5 reaches 0.809. Widening the antecedent budget from 8 to 48 buys
-~0.003 — the feature budget is not what is limiting the rule.
+Numbers are post-fix (submodule at `f779a42`; see §4). The false-premise 0.819
+uses K=4 modes, 48 antecedents, Hamacher — a configuration that was **not
+reachable before the fix**, since `norm_conorm` was silently overridden to
+min/max and Hamacher NaN'd 42% of runs. Hamacher is now the best-performing norm
+on both families. Widening the antecedent budget from 8 to 48 buys ~0.017, so
+the feature budget is a minor constraint at most.
 
 This is consistent with the caveat Ch 4.3.5 already concedes: per-feature
 factorized Gaussians are a diagonal-covariance density estimate, strictly weaker
@@ -181,9 +184,13 @@ not a tuning detail.
 
 ---
 
-## 4. Three bugs found in `tribblefis`
+## 4. Four bugs found in `tribblefis` — all fixed
 
-These affect the existing Ch 4.3.5 / BETH results, not just this study.
+Filed as `fundthmcalculus/tribble-fis` issues **#22–#25**; fixed by **PR #26**
+with regression tests. This repo's submodule now pins **`f779a42`** (was
+`c32e896`). Independently verified after the bump — see §4.5.
+
+These affected the existing Ch 4.3.5 / BETH results, not just this study.
 
 **(a) `norm_conorm` is silently ignored when aggregating class firings.**
 The array-reduction branches of both operators recurse without forwarding the
@@ -218,6 +225,39 @@ operators' domain.
 
 `norms.py` provides verified replacements; all 11 families pass boundary,
 range, commutativity, identity, and De Morgan checks.
+
+### 4.5 Post-fix verification
+
+Re-ran the original reproductions against `f779a42`:
+
+| # | check | before | after |
+|---|---|---|---|
+| 22 | `t_conorm(x, None, "probability")` | 0.500 (min/max) | **0.750** ✓ |
+| 22 | `t_norm(x, None, "probability")` | 0.500 (min/max) | **0.250** ✓ |
+| 23 | `S_hamacher(0.5, 0.5)` | 1.333 (out of range) | **0.667** ✓ |
+| 24 | `T_hamacher(0, 0)` | `nan` | **0.0** ✓ |
+| 25 | `μ_anom` at θ=0.5, firing 0.8 | −0.300 | **clipped, in [0,1]** ✓ |
+
+The decisive test is the independent-reimplementation parity check in
+`norm_sweep.py`, which compares our re-aggregation against the library on the
+library's own norms:
+
+| θ | min/max | probability |
+|---|---|---|
+| 0.0 — before fix | 0.00e+00 | up to 2.26e-01 |
+| 0.0 — after fix | 0.00e+00 | **0.00e+00** |
+| 0.5 — before fix | 4.08e-01 | 2.69e-01 |
+| 0.5 — after fix | **0.00e+00** | **0.00e+00** |
+
+Exact agreement across all 12 variant × family × norm combinations at both θ
+values. The θ=0 column confirms #22 (norm now forwarded); the θ=0.5 row confirms
+#25 (clipping now applied on both sides).
+
+Measured effect on results: Hamacher's degeneration rate through the library
+dropped **0.42 → 0.00**, and Hamacher became the best-performing norm on both
+families — an outcome that was unreachable before, because the requested norm
+was being discarded. Conclusions in §3 are unchanged in direction; the
+false-premise gap to the best baseline narrowed from 0.013 to 0.006.
 
 ---
 
