@@ -29,6 +29,11 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
   not a tuning knob. See [`../PROVENANCE_MAP.md`](../PROVENANCE_MAP.md).
 - `REPRO_NORM_FAMILIES="min/max,probability,luk,hamacher,einstein"` — which fuzzy
   operator families the norm/conorm matrix sweeps.
+- `REPRO_THETA_SWEEP="0.5,0.6,0.7,0.8,0.9,0.99,1.1"` — the θ values for the
+  open-set operating curve (Fig 4.2). **A list, not a flag.** `REPRO_THETA_SWEEP=1`
+  is accepted and produces a one-row table at θ = 1.0, where the boost saturates
+  the aggregate and every cell is legitimately zero — a curve that looks like a
+  null result but is really a mis-set knob.
 - `REPRO_PHIUSIIL_N="20000"` — sample cap for PhiUSIIL in the norm/conorm matrix.
 - `REPRO_N_GRID="256,512,1024,2048,4096"` — the N values for Table 3.1.
 - `REPRO_NAIVE_CAP="1024"` — largest N at which the cubic classical VAT is timed.

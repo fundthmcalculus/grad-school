@@ -65,40 +65,48 @@ no in-repo provenance.
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| 4.1 Value of the transform | `table_hyperparam_normalization.py` | `outputs/table_hyperparam_normalization.{md,csv}` | **drifted** — note 2 |
-| 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **drifted** — note 3 |
-| 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **drifted** — note 4 |
-| 4.4 What MoG achieves | `table_4_1_mog_baselines.py` | `outputs/table_4_1.{md,csv}` | **drifted** — note 5 |
-| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` | `outputs/table_4_1.{md,csv}` | **drifted** — note 5 |
-| 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — note 6 |
-| 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — note 6 |
+| 4.1 Value of the transform | `table_hyperparam_normalization.py` | `outputs/table_hyperparam_normalization.{md,csv}` | **reproduced** at 10 seeds |
+| 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** — claim retracted, note 3 |
+| 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
+| 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
+| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent |
+| 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **reproduced** — note 6 |
+| 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **reproduced** — note 6 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
 
-**Note 2.** Prose quotes 1st order 0.646 → 0.797 and 2nd order 0.783 → 0.845. The
-harness reports 0.664 → 0.776 and 0.784 → 0.817. The *direction and rough
-magnitude* of the transform effect survive; the exact cells do not.
+**Note 2.** Re-quoted at 10 seeds: 1st order 0.658 → 0.783 (Δ +0.125), 2nd order
+0.796 → 0.829 (Δ +0.033). The table now also carries the CART and Random Forest
+rows, which are the control that gives it force — both are rank-based, so a
+monotone feature transform is worth exactly +0.001 and +0.000 to them, against
++0.125 for the fuzzy model.
 
-**Note 3 — a conclusion changes here, not just a number.** The prose reads a
-crossover near four buckets off this table: "At three buckets uniform wins
-outright; by six, quantile is ahead." Under the 5-seed harness the spread does
-not support it — at 3 buckets/1st order uniform leads 0.781 to 0.779, at 6
-buckets/2nd order it is 0.839 to 0.840, and both gaps are far inside the ±0.02–0.03
-seed deviation. The `min bucket n` diagnostic column (132/343/75/257/39/171) *does*
-match exactly, so the bucket-starvation mechanism is intact; it is the accuracy
-crossover built on top of it that the reproducible run does not show.
+**Note 3 — the claim was retracted, not just re-quoted.** The prose read a
+crossover near four buckets off this table ("at three buckets uniform wins
+outright; by six, quantile is ahead"). It does not survive. At 10 seeds the
+largest gap anywhere in the 18-configuration sweep is 0.012 in R², against
+seed-to-seed deviations of 0.02–0.03, and the 6-bucket/2nd-order pair agrees to
+three decimals. The `min bucket n` diagnostic (132/343/75/257/39/171) reproduces
+exactly, so the bucket-starvation *mechanism* is intact — Concrete's skew of
++0.42 is simply too mild for it to reach the aggregate error.
 
-**Note 4 — likewise.** The prose claims quantile's advantage "grows monotonically
-with skew (+0.003 → +0.201)". The 5-seed harness gives Q−U of +0.003, −0.001,
-+0.008, +0.270, +0.019, −1.514 across its skew grid: not monotone, and the last
-two rows have standard deviations larger than the effect (±0.749, ±3.483). The
-strong middle result (+0.270 at skew +9.74) is real and larger than the prose's
-+0.201. The monotonicity framing is what fails.
+**Note 4 — the hypothesis was refuted, and Goal G5 is reopened.** The prose
+claimed quantile's advantage "grows monotonically with skew (+0.003 → +0.201)".
+At 10 seeds Q−U is negative in every row past symmetry: +0.000, −0.016, −0.068,
+−0.291, −2.413, −11.811. The right reading is in the spreads, not the means:
+quantile's deviation explodes (±0.208, ±0.990, ±4.448, ±21.155) while uniform's
+stays bounded and its mean decays smoothly toward zero. Quantile under heavy skew
+does not become less accurate, it becomes *unstable* — a few catastrophic splits
+drag the mean — and a 3-seed run simply missed them. Ch 7's G5, previously marked
+"settled (complete)" with "quantile by default", is reopened; the recommendation
+is withdrawn and the diagnosis kept.
 
-**Note 5.** Prose Tables 4.4/4.5 quote flat R² 0.797 / 0.845 / 0.881 and
-references CART 0.797 ± 0.029, RF 0.904 ± 0.014. `table_4_1_mog_baselines.py`
-reports flat R² 0.644 ± 0.015 and RF 0.913 ± 0.014; the reconciliation table
-reports CART 0.816 ± 0.037. No archived run contains 0.797/0.904. Those cells
-come from a 3-seed run that predates every archive under `outputs/`.
+**Note 5.** Re-quoted at 10 seeds. Tables 4.4/4.5 now read flat R² −0.005 / 0.783
+/ 0.829, rising to 0.869 at full second order, with CART 0.825 ± 0.047 and RF
+0.909 ± 0.018. The old 0.797/0.904 pair appears in no archive and came from a
+3-seed run predating every run under `outputs/`. The zeroth-order figure is worth
+keeping visible rather than dropping: with constant consequents the model is no
+better than predicting the mean, which makes first-order consequents a
+requirement here rather than a refinement.
 
 **Note 6.** Tables 4.6 and 4.7 quote the pre-`pin_extremes` code path. Corrected
 values are in `outputs/openset-postfix/` (tribble-fis `23bfdbc`, 5 seeds, hamacher,
@@ -162,24 +170,33 @@ renderer emits both so the choice is visible rather than implicit.
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| 6.1 Model family, one protocol | `table_concrete_reconciliation.py` (+ `table_hyperparam_normalization.py` for the tuned HME row) | `outputs/table_concrete_reconciliation.{md,csv}` | **drifted** — note 7 |
-| 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **drifted** — note 8 |
+| 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7 |
+| 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **reproduced** at 10 seeds — note 8 |
 | 6.3 Interpretability | *none* | — | **ungenerated** — structural by design |
 | 6.4 Memory augmentation | `tribble-fis/tests/test_double_pendulum.py` | none | **ungenerated** — entry point unconfirmed |
 
-**Note 7.** Prose Table 6.1 quotes flat 0.881 ± 0.001 / HME 0.862 ± 0.022 / tree
-0.717 ± 0.039 / CART 0.797 ± 0.029 / RF 0.904 ± 0.014. The reconciliation table
-gives flat-2nd-refined 0.868 ± 0.020, HME 0.813 ± 0.039, tree 0.714 ± 0.046, CART
-0.816 ± 0.037, RF 0.913 ± 0.014. The HME row is the one to watch: 0.862 is the
-*demo-tuned* HME from the hyperparameter table (which reports 0.826 ± 0.026 at
-5 seeds), not the reconciliation's library-default arm. One prose table is
-currently drawing from two generators at two different configurations.
+**Note 7 — one seed in ten destroys this cell, and that is the finding.** Table
+6.1 is re-quoted at 10 seeds: flat 2nd-refined 0.875 ± 0.019, fuzzy tree
+0.688 ± 0.056, CART 0.826 ± 0.047, RF 0.909 ± 0.018. The mixture-of-experts row
+is the exception. Under log+standardized features at library defaults the
+harness reports **R² = −220.9 ± 665.0**, because on seed 9 the model predicts up
+to 10,536 MPa on a target that never exceeds ~82. The other nine seeds give
+0.805 ± 0.059 (RMSE 7.15 ± 0.74) with nothing anomalous about them; the five-seed
+protocol did not contain the offending split and reported a clean 0.813 ± 0.039.
 
-**Note 8.** `table_6_1_model_family.py` runs the fuzzy arms at raw preprocessing
-and library defaults — its flat R² is 0.644, which is not comparable to Table
-6.1's uniform-protocol number. It is usable as an external-baseline source
-(CART/RF/M5) and not much else. The filename predates the prose renumbering; it
-now feeds Table 6.2.
+The prose quotes the nine-seed figure with the divergence disclosed in a
+footnote, on the grounds that a mean of −220.9 describes the failure rather than
+the model and hiding it would be worse than either. Two consequences worth
+carrying: the HME gating solve needs a numerical guard before the hierarchy can
+be recommended for use, and — more broadly — this is the sharpest evidence in the
+proposal that a 5-seed mean cannot establish stability.
+
+**Note 8.** Re-quoted at 10 seeds. This table runs everything at **raw features
+and library defaults**, which is why every cell sits below Table 6.1's; the two
+must not be read as one series. Its PhiUSIIL column is now filled and shows the
+dataset is saturated — CART and RF both reach 1.000, the fuzzy models 0.970–0.997
+— so PhiUSIIL discriminates between these methods hardly at all and should carry
+no weight in the comparison.
 
 ---
 
@@ -205,14 +222,40 @@ trusting a run.
 
 ## The pattern
 
-Two systematic causes account for nearly every **drifted** row:
+Two systematic causes accounted for nearly every drifted row, and both are now
+resolved:
 
-1. **Seed count.** The prose tables were transcribed from 3-seed runs; the harness
-   defaults to 5 (`common.SEEDS`). Several Chapter 4 conclusions are inside the
-   seed-to-seed spread at 5 seeds and only look decisive at 3.
+1. **Seed count.** The prose tables were transcribed from 3-seed runs. Every
+   numbered table is now quoted at ten (`common.SEEDS`), and the difference was
+   not cosmetic — it retracted a crossover (note 3), refuted a hypothesis and
+   reopened a goal (note 4), and exposed a catastrophic failure mode that five
+   seeds never sampled (note 7).
 2. **The `pin_extremes` fix.** Anything quoting the open-set path or the refined
-   consequent solve from before tribble-fis PR #29 is superseded.
+   consequent solve from before tribble-fis PR #29 was superseded; those tables
+   are re-quoted from post-fix runs.
 
-Neither is a defect in the harness. Both mean the same thing: **the prose numbers
-predate the reproducible pipeline, and re-quoting them from it is the outstanding
-work.**
+Neither was a defect in the harness. What remains outstanding is narrow:
+
+- **Table 3.1's headline 4,096-point pair** has no in-repo provenance (note 1).
+- **Tables 3.2 and 3.3** have no generator; 3.3 needs a GPU host.
+- **Table 6.3** is structural by design and 6.4's entry point is unconfirmed.
+- **ANFIS and GA-FIS adapters** are still absent, so those cells stay `N/A`.
+
+## What a reader should distrust
+
+Three lessons from this pass, worth applying to any number added later.
+
+**A five-seed mean does not establish stability.** Note 7 is the clean example: a
+model that is excellent nine times out of ten and catastrophic the tenth reads as
+a solid 0.813 ± 0.039 if the tenth split is not in the sample.
+
+**A conclusion can be reproducible and still wrong.** Notes 3 and 4 came from
+generators that ran correctly and deterministically every time. The harness was
+never broken; the sample was too small to support the story built on it.
+
+**Silence is not success.** Three separate failures in this pass — a submodule on
+the wrong commit, a driver crashing before it wrote its results, and experiments
+dying on import — all produced output that looked plausible or exited zero. So
+did `REPRO_THETA_SWEEP=1`, which is a valid θ list of one and emits a table of
+zeros that reads exactly like a null result. Check the provenance, not the exit
+status.

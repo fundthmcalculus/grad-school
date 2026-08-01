@@ -38,6 +38,26 @@ Knobs:
     REPRO_SEEDS="0,1,2,3,4"    seeds
     REPRO_ORDERS="0th,1st,2nd" which TSK orders to sweep (add full-2nd,3rd for the full set)
     REPRO_REFINE="both"        off | on | both
+    REPRO_JOBS="8"             worker processes for the flat MoG arms; 1 = serial
+
+READING THE LOG. The flat MoG arms run in a process pool, so their stdout is
+interleaved and arrives late -- a worker's buffered output is flushed when the
+pool shuts down, which is *after* the "done:" lines and after the serial
+tree/mixture section. Expect coordinate-descent chatter below the summary lines
+and occasionally spliced mid-line. That is cosmetic. The table itself is
+assembled in job order, never completion order, so it does not depend on
+scheduling: this file's output is byte-identical serial or parallel, and that was
+verified against reproduce/outputs/seeds10-2026-08-01/ before the change landed.
+Set REPRO_JOBS=1 for a readable log.
+
+PERFORMANCE. Two changes took this table from 1301s to 652s at ten seeds on eight
+cores: hoisting the seed-independent preprocessing out of the per-arm function
+(it was recomputed 60 times), and running the arms concurrently. The 2x rather
+than 8x is expected -- the refined arms dominate and are unevenly sized, workers
+each pay the tribblefis import, and BLAS is pinned to one thread per worker to
+avoid oversubscription. The remaining headroom is in
+`refine_antecedents_coordinate` itself, which is library code and out of scope
+here.
 """
 
 from __future__ import annotations
@@ -65,6 +85,12 @@ REFINE_MODE = os.environ.get("REPRO_REFINE", "both").lower()
 N_BUCKETS = 3
 REFINE_L2 = 1e-2
 
+# Flat MoG arms are independent across (refine, order, seed) and the refined ones
+# dominate this table's runtime, so they are farmed out. Results are reassembled
+# in job order, never completion order, so the table does not depend on
+# scheduling. REPRO_JOBS=1 forces the old serial path.
+N_JOBS = int(os.environ.get("REPRO_JOBS", "0")) or min(8, (os.cpu_count() or 1))
+
 
 def _rmse(y, p):
     return float(np.sqrt(mean_squared_error(y, p)))
@@ -73,27 +99,50 @@ def _rmse(y, p):
 # --------------------------------------------------------------------------- #
 # the concrete.py pipeline, faithfully
 # --------------------------------------------------------------------------- #
-def mog_arm(X, y_raw, seed, order, refine):
-    """One flat MoG-TSK measurement, replicating gaussian_mixture/concrete.py.
+def prepare(X, y_raw):
+    """Preprocessing shared by every flat MoG arm -- done once, not 60 times.
 
-    Returns (r2, rmse) or None. The transform sequence, bucket count, ridge
-    strength, basis, and refinement call are all taken from that script rather
-    than chosen here.
+    None of this depends on the seed, the TSK order, or the refinement flag: the
+    target transform, the output partition, the log-transform detection and the
+    feature standardization are all pure functions of the dataset. They used to
+    run inside `mog_arm`, so a 3-order x 2-refinement x 10-seed table recomputed
+    the identical result sixty times. Hoisting changes no number.
     """
-    from tribblefis.gauss_math import (
-        calculate_gaussian_correlation,
-        create_gaussian_membership_dict,
-        detect_and_apply_log_transform,
-        standard_transform,
-        take_top_features,
-    )
-    from tribblefis.regression import partition_output, predict_tsk, solve_tsk_consequents
+    from tribblefis.gauss_math import detect_and_apply_log_transform, standard_transform
+    from tribblefis.regression import partition_output
 
     yt = standard_transform(y_raw)                      # affine: R^2-invariant
     y, y_bucket_mean = partition_output(N_BUCKETS, yt)
 
     Xt, logged = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
     Xt = standard_transform(Xt, column=Xt.columns)
+
+    # The MoG pipeline scores on the TRANSFORMED target. R^2 is invariant under
+    # that affine map, but RMSE is not -- reporting it as-is would put this arm on
+    # a different scale from every other row. Rescale to the original MPa span so
+    # the RMSE column means one thing throughout.
+    yr = np.asarray(y_raw, dtype=float)
+    span = float(yr.max() - yr.min())
+    return {"Xt": Xt, "y": y, "y_bucket_mean": y_bucket_mean, "span": span,
+            "logged": logged}
+
+
+def mog_arm(prep, seed, order, refine):
+    """One flat MoG-TSK measurement, replicating gaussian_mixture/concrete.py.
+
+    Returns (r2, rmse). The transform sequence, bucket count, ridge strength,
+    basis, and refinement call are all taken from that script rather than chosen
+    here. `prep` comes from prepare() above.
+    """
+    from tribblefis.gauss_math import (
+        calculate_gaussian_correlation,
+        create_gaussian_membership_dict,
+        take_top_features,
+    )
+    from tribblefis.regression import predict_tsk, solve_tsk_consequents
+
+    Xt, y = prep["Xt"], prep["y"]
+    y_bucket_mean, span = prep["y_bucket_mean"], prep["span"]
 
     Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
 
@@ -120,12 +169,15 @@ def mog_arm(X, y_raw, seed, order, refine):
     yt_true = np.asarray(yt_true, dtype=float).ravel()
     pred = np.asarray(pred, dtype=float).ravel()
 
-    # The MoG pipeline scores on the TRANSFORMED target. R^2 is invariant under
-    # that affine map, but RMSE is not -- reporting it as-is would put this arm on
-    # a different scale from every other row. Rescale to the original MPa span so
-    # the RMSE column means one thing throughout.
-    span = float(np.asarray(y_raw, dtype=float).max() - np.asarray(y_raw, dtype=float).min())
-    return r2_score(yt_true, pred), _rmse(yt_true, pred) * span, logged
+    return r2_score(yt_true, pred), _rmse(yt_true, pred) * span
+
+
+def _mog_task(prep, seed, order, refine):
+    """Worker wrapper: never raise, so one bad seed cannot kill the whole pool."""
+    try:
+        return mog_arm(prep, seed, order, refine), None
+    except Exception as exc:  # noqa: BLE001 - reported per-seed, same as serial
+        return None, f"{exc.__class__.__name__}: {exc}"
 
 
 def preprocess_for_others(X, y, seed, style):
@@ -177,29 +229,45 @@ def main():
                [["(dataset unavailable)", C.NA, C.NA, C.NA, C.NA]])
         return
     X, y = data
-    print(f"  N={len(X)}  M={X.shape[1]}  seeds={C.SEEDS}  orders={ORDERS}")
+    print(f"  N={len(X)}  M={X.shape[1]}  seeds={C.SEEDS}  orders={ORDERS}  "
+          f"jobs={N_JOBS}")
 
     refine_flags = {"off": [False], "on": [True], "both": [False, True]}[REFINE_MODE]
     store: dict = {}
-    logged_note = ""
+
+    prep = prepare(X, y)
+    logged_note = ", ".join(map(str, prep["logged"])) if prep["logged"] else ""
 
     # --- flat MoG arms, concrete.py pipeline ---
+    # Build the full job list first so results can be zipped back in job order.
+    jobs = [(refine, order, seed)
+            for refine in refine_flags
+            for order in ORDERS
+            for seed in C.SEEDS]
+
+    if N_JOBS > 1 and len(jobs) > 1:
+        from joblib import Parallel, delayed
+        results = Parallel(n_jobs=N_JOBS, backend="loky")(
+            delayed(_mog_task)(prep, seed, order, refine)
+            for refine, order, seed in jobs)
+    else:
+        results = [_mog_task(prep, seed, order, refine)
+                   for refine, order, seed in jobs]
+
+    for (refine, order, seed), (res, err) in zip(jobs, results):
+        key = (f"flat MoG-TSK {order}", "log+standardized",
+               "refined" if refine else "closed-form only")
+        if err is not None:
+            print(f"    [{key[0]} {key[2]}] seed {seed} failed: {err}")
+            continue
+        r2, rmse = res
+        store.setdefault(key, {"r2": [], "rmse": []})
+        store[key]["r2"].append(r2)
+        store[key]["rmse"].append(rmse)
     for refine in refine_flags:
         for order in ORDERS:
-            key = (f"flat MoG-TSK {order}", "log+standardized",
-                   "refined" if refine else "closed-form only")
-            for seed in C.SEEDS:
-                try:
-                    r2, rmse, logged = mog_arm(X, y, seed, order, refine)
-                    store.setdefault(key, {"r2": [], "rmse": []})
-                    store[key]["r2"].append(r2)
-                    store[key]["rmse"].append(rmse)
-                    if logged and not logged_note:
-                        logged_note = ", ".join(map(str, logged))
-                except Exception as exc:  # noqa: BLE001
-                    print(f"    [{key[0]} {key[2]}] seed {seed} failed: "
-                          f"{exc.__class__.__name__}: {exc}")
-            print(f"  done: {key[0]:<22} {key[2]}")
+            print(f"  done: flat MoG-TSK {order:<10} "
+                  f"{'refined' if refine else 'closed-form only'}")
 
     # --- tree / mixture / references, under BOTH preprocessing styles ---
     for style, style_label in (("raw", "raw"), ("transformed", "log+standardized")):
