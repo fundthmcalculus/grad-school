@@ -65,12 +65,20 @@ NORMS = [("product", "product"), ("hamacher", "hamacher"),
 THETA = 0.5
 
 
-def splits(meta, seed):
-    """Grounded -> fit/test. Fabrications -> val (selection) / test (reporting)."""
+# (negative family, negative label, positive family) per capture set.
+TASKS = {
+    "capture_v3":      ("longform_real", "grounded", "longform_fake"),
+    "capture_v3_qwen": ("longform_real", "grounded", "longform_fake"),
+    "capture_v2":      ("template_real", "correct", "template_fake"),
+}
+
+
+def splits(meta, seed, task="capture_v3"):
+    """Known-good -> fit/test. Fabrications -> val (selection) / test (reporting)."""
+    neg_fam, neg_lab, pos_fam = TASKS[task]
     rng = np.random.default_rng(seed)
-    good = np.flatnonzero((meta.family == "longform_real")
-                          & (meta.label == "grounded"))
-    bad = np.flatnonzero((meta.family == "longform_fake")
+    good = np.flatnonzero((meta.family == neg_fam) & (meta.label == neg_lab))
+    bad = np.flatnonzero((meta.family == pos_fam)
                          & (meta.label == "hallucination"))
     rng.shuffle(good)
     rng.shuffle(bad)
@@ -119,14 +127,19 @@ def auroc(y, s):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, default=SEEDS)
+    ap.add_argument("--prefix", default="capture_v3", choices=list(TASKS),
+                    help="which capture set / task to analyse")
     args = ap.parse_args()
 
-    meta = pd.read_parquet(DATA / "capture_v3_meta.parquet")
+    meta = pd.read_parquet(DATA / f"{args.prefix}_meta.parquet")
+    print(f"task={args.prefix}  n={len(meta):,}  "
+          f"known-good={TASKS[args.prefix][0]}/{TASKS[args.prefix][1]}  "
+          f"fabrications={TASKS[args.prefix][2]}")
     ent = meta["ent_mean"].astype(float)
     rows, sel_log = [], []
 
     for seed in range(args.seeds):
-        sp = splits(meta, seed)
+        sp = splits(meta, seed, args.prefix)
         rng = np.random.default_rng(19000 + seed)
         m2 = meta.copy()
         m2["_eb"] = np.digitize(ent, np.quantile(
@@ -219,8 +232,9 @@ def main():
               f"T={nt}/S={ns} (val {val_au:.3f})")
 
     df = pd.DataFrame(rows)
-    df.to_csv(DATA / "fuzzy_stats.csv", index=False)
-    pd.DataFrame(sel_log).to_csv(DATA / "fuzzy_stats_selection.csv", index=False)
+    df.to_csv(DATA / f"fuzzy_stats_{args.prefix}.csv", index=False)
+    pd.DataFrame(sel_log).to_csv(
+        DATA / f"fuzzy_stats_selection_{args.prefix}.csv", index=False)
 
     for cond in ("length+template", "length+template+entropy"):
         s = df[df.condition == cond]

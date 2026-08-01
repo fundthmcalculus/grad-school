@@ -19,11 +19,17 @@ fuzzy inference system with the Ch 4.3.5 "none of the above" anomaly rule —
 **AUROC 0.877 ± 0.022**, beating
 
 * **full-covariance Mahalanobis on identical features** by **+0.036, 8/8 seeds,
-  p = 0.0078**, with **2.2× fewer parameters** (95 vs 209) and better FPR@95TPR
-  (0.551 vs 0.588);
-* a **mean-entropy threshold** by the same margin (0.841);
+  p = 0.008**, with **2.2× fewer parameters** (95 vs 209) and better FPR@95TPR
+  (0.551 vs 0.588) — and this **replicates on Qwen2.5-0.5B**: +0.032, 8/8 seeds,
+  p = 0.008 (§24);
 * **isolation forest** (0.831, 11,649 parameters — 123× more) and **one-class SVM**
   (0.785, 928 parameters).
+
+It does **not** reliably beat a zero-parameter mean-entropy threshold: it wins on
+SmolLM2 long-form (+0.036), ties on Qwen long-form (+0.009, p = 0.383), and
+**loses on the short-factual task** (−0.014, p = 0.016). The argument therefore
+rests on parsimony-and-legibility *versus learned detectors*, not on beating
+entropy — see §3.
 
 On (AUROC, parameters) the Pareto front holds exactly two points: the zero-parameter
 entropy threshold and this rule. Everything else is dominated.
@@ -73,16 +79,23 @@ its own subsection.
   hallucination generally. v3 labels are *groundedness*, not correctness — a
   paragraph cannot be graded automatically. Ordinary factual error is **not**
   detected by this mechanism (TriviaQA ≈ chance, §9/§19).
-* **One model** (`SmolLM2-360M-Instruct`), one probe family, 8 seeds.
+* **The entropy comparison does not generalise** (§24). Two models and two task
+  families were tested; only SmolLM2-on-long-form beats entropy. State this in the
+  abstract, not the discussion.
+* **Two models, two task families, 8 seeds.** Broader than a single checkpoint,
+  still narrow.
+* **"+entropy matched" is not equally strong across tasks.** On the short-factual
+  set entropy scores 0.958 and quartile matching leaves it at 0.839 — when a
+  nuisance separates almost perfectly, coarse bins cannot condition it away.
+  Report the residual nuisance AUROC rather than assuming the control worked.
 * **Hidden-state geometry is a negative result** (§§9, 19, 20). Do not let the
   positive framing imply otherwise.
 
 ## 4. What is missing before drafting
 
-1. **A second model.** `Qwen2.5-0.5B-Instruct`, ~7 min of capture; the harness
-   already parameterises the model id. A model-class claim needs two architectures.
-2. **A second task family.** Currently long-form groundedness only. The short
-   factual v2 set is already captured and could be reported alongside.
+1. ~~A second model~~ — **done (§24)**: Qwen2.5-0.5B replicates the Mahalanobis
+   result and refutes the entropy result.
+2. ~~A second task family~~ — **done (§24)**: v2 short-factual reported alongside.
 3. **The FPR@95 problem, addressed rather than conceded.** θ moves the operating
    point without changing ranking (§3.4), so the high-recall failure is structural,
    not a tuning miss. Candidate: a second-pass specialist with abstention

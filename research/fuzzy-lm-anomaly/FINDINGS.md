@@ -1356,3 +1356,87 @@ Mahalanobis on identical features by **+0.036 on 8/8 seeds (p = 0.0078)** with
 entropy threshold by the same margin. Under additional entropy matching it remains
 ahead but not significantly (p = 0.078), and its FPR@95 degrades badly to 0.961 --
 so the high-recall operating point is a genuine weakness, not a rounding detail.
+
+---
+
+## 24. Second model and second task family — the claim narrows
+
+`four-things.md` item 1. Captured `prompts_v3.jsonl` with **Qwen2.5-0.5B-Instruct**
+(24 layers x 896, different tokenizer, different training data; 2,111 generations,
+3 min 16 s, 8.23 GB peak) and re-ran the analysis on the **v2 short-factual** set
+already on disk. Both use only the 19 output statistics, so the comparison is
+architecture-independent by construction.
+
+One behavioural difference worth recording: **Qwen pushed back on 420 of 1,640
+(25.6%)** invented long-form subjects, against SmolLM2's 13 (0.8%). The surviving
+1,220 fabrications are therefore the ones Qwen was *confident* about, which makes
+its task strictly harder — and explains the lower absolute AUROC throughout.
+
+### Paired comparisons, 8 seeds each
+
+| task / model | condition | rival | FIS | rival | Δ | wins | p |
+|---|---|---|---|---|---|---|---|
+| v3 long-form / SmolLM2 | L+T | Mahalanobis | 0.877 | 0.841 | **+0.036** | 8/8 | **0.008** |
+| v3 long-form / SmolLM2 | L+T | mean entropy | 0.877 | 0.841 | **+0.036** | 8/8 | **0.008** |
+| v3 long-form / **Qwen2.5** | L+T | Mahalanobis | 0.781 | 0.749 | **+0.032** | 8/8 | **0.008** |
+| v3 long-form / **Qwen2.5** | L+T | mean entropy | 0.781 | 0.772 | +0.009 | 5/8 | 0.383 |
+| v2 short-factual / SmolLM2 | L+T | Mahalanobis | 0.945 | 0.936 | +0.009 | 6/8 | 0.109 |
+| v2 short-factual / SmolLM2 | L+T | mean entropy | 0.945 | **0.958** | **−0.014** | 1/8 | **0.016** |
+| v3 long-form / SmolLM2 | +entropy | Mahalanobis | 0.789 | 0.760 | +0.029 | 6/8 | 0.078 |
+| v3 long-form / Qwen2.5 | +entropy | Mahalanobis | 0.718 | 0.693 | +0.025 | 6/8 | 0.078 |
+| v2 short-factual / SmolLM2 | +entropy | Mahalanobis | 0.817 | 0.748 | **+0.069** | 8/8 | **0.008** |
+
+### What replicates, and what does not
+
+**Replicates — the fuzzy rule beats full-covariance Mahalanobis on identical
+features.** The sign is positive in **all six** cells, significant in three
+(p = 0.008), marginal in two (p = 0.078), and non-significant in one (p = 0.109).
+Critically it replicates **across architectures**: SmolLM2 +0.036 and Qwen +0.032,
+both 8/8 seeds, both p = 0.008, on the same task. That is a statement about the
+*density model* -- same 19 inputs, same fit data, same open-set protocol, only the
+model class differs -- and it now has two-architecture support.
+
+**Does not replicate — the fuzzy rule beats a mean-entropy threshold.** This was
+part of the §21/§23 headline and it does not survive:
+
+* SmolLM2 long-form: +0.036, 8/8, p = 0.008 ✓
+* Qwen long-form: +0.009, 5/8, p = 0.383 -- a tie
+* short-factual: **−0.014, 1/8, p = 0.016** -- entropy wins, significantly
+
+So "beats entropy" is **specific to SmolLM2 on the long-form task**, not a property
+of the method. The §23 sentence claiming it "beats a mean entropy threshold by the
+same margin" is retracted; only the Mahalanobis comparison generalises.
+
+The mechanism is consistent with §21's observation that the selected antecedents
+are first-token statistics: a different tokenizer produces a different first token,
+and Qwen's much higher abstention rate changes which fabrications remain. The
+first-token confidence profile is evidently real but not equally exploitable
+across models.
+
+### A limitation of the matching method, exposed here
+
+On the v2 task mean entropy scores **0.958**, and after matching on entropy
+quartiles it still scores **0.839** — matching barely dented it. On v3 the same
+procedure took entropy from 0.841 to 0.601. The reason is mechanical: when a
+nuisance separates the classes almost perfectly, four quartile bins are too coarse
+to neutralise it, because within-bin variation still carries most of the signal.
+
+So "+entropy matched" is **not equally strong across tasks**, and the v2
+entropy-matched row should not be read as conditioning entropy away. Finer bins
+would fix it in principle but there is not enough overlap to support them (§18 hit
+the same wall). Any future use of this control should report the residual
+nuisance AUROC, as here, rather than assume matching worked.
+
+### Revised claim
+
+> On a template- and length-matched open-set task, a fuzzy rule of 4 rules over
+> 6 antecedents (95 parameters) over output-distribution statistics detects
+> ungrounded generation better than full-covariance Mahalanobis on identical
+> features — **+0.036 (SmolLM2) and +0.032 (Qwen2.5), both 8/8 seeds, p = 0.008** —
+> with roughly half the parameters. Against a zero-parameter mean-entropy
+> threshold it wins on one model/task pairing, ties on another, and loses on a
+> third; the parsimony-and-legibility argument therefore rests on the comparison
+> with learned detectors, not on beating entropy.
+
+That is a narrower claim than §23's, and it is the one the evidence supports.
+`four-things.md` item 1 is complete; items 2–4 remain.

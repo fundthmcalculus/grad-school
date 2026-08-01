@@ -1,0 +1,9 @@
+seed,whiten,top_n,K,tnorm,sconorm,val_auroc
+0,True,19,4,product,product,0.9677289354578709
+1,True,19,4,minimum,minimum,0.9474048878810785
+2,True,19,2,minimum,minimum,0.9510059171597633
+3,True,19,2,product,product,0.9791680896113654
+4,True,19,3,product,product,0.9559179118358236
+5,True,6,3,hamacher,hamacher,0.9439697265625
+6,True,19,4,product,product,0.9349999999999999
+7,True,6,4,hamacher,hamacher,0.934228650137741
