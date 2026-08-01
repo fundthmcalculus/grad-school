@@ -33,20 +33,34 @@ CLUSTER_TABLES=(
 
 declare -A STATUS
 
+# A script that exits 0 having written no table is NOT a success -- that is what
+# a missing dataset looks like (table_4_4_openset prints "no dataset available"
+# and returns cleanly). Reporting it as ok would hide the one thing the run is
+# supposed to surface, so the output count is checked, not just the exit code.
+count_tables() {
+  find "$OUT" -maxdepth 1 -type f \( -name '*.md' -o -name '*.csv' \) \
+    -newermt "@$1" 2>/dev/null | wc -l
+}
+
 run_one() {
   local project="$1" name="$2"
   local log="$DEST/logs/$name.log"
   printf '  %-38s ' "$name"
-  local t0 t1
+  local t0 t1 rc
   t0=$(date +%s)
-  if uv run --project "$ROOT/$project" python "$ROOT/reproduce/tables/$name.py" \
-        >"$log" 2>&1; then
-    STATUS[$name]=ok
-  else
-    STATUS[$name]="FAILED"
-  fi
+  # A same-second write would not register as "newer than t0"; step back one.
+  uv run --project "$ROOT/$project" python "$ROOT/reproduce/tables/$name.py" \
+      >"$log" 2>&1
+  rc=$?
   t1=$(date +%s)
-  printf '%-8s %4ss\n' "${STATUS[$name]}" "$((t1 - t0))"
+  if [ $rc -ne 0 ]; then
+    STATUS[$name]="FAILED"
+  elif [ "$(count_tables $((t0 - 1)))" -eq 0 ]; then
+    STATUS[$name]="no-output"
+  else
+    STATUS[$name]=ok
+  fi
+  printf '%-10s %4ss\n' "${STATUS[$name]}" "$((t1 - t0))"
 }
 
 echo "=== $LABEL ==="
