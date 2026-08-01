@@ -26,6 +26,7 @@ FIS_TABLES=(
   table_g5b_skew_sweep
   table_4_1_mog_baselines
   table_6_1_model_family
+  table_norm_conorm_matrix
   table_4_4_openset
 )
 CLUSTER_TABLES=(
