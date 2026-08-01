@@ -1431,11 +1431,10 @@ part is what norm $\varepsilon$ must be measured in.)
 currently forces the tolerance-based verdict in §3b. Same envelope argument
 differentiated once more. (~half a day, low risk.)
 
-**5. Certify the §8h direct-optimized controller.** It is the best performer and
-the only controller in the study with no stability certificate. The machinery now
-exists (§12d) and applies unchanged — the only requirement is that the controller
-be refitted with $\pi$ MFs and the $u(0)=0$ constraint. **This is now the
-highest-value remaining item.** (~1 hour.)
+**5. Certify the §8h direct-optimized controller.** — **DONE, §12e.** Certified
+ball 0.274, Gram PSD to 1.9e−11, with the policy search restricted to the
+$u(0)=0$ subspace. Found a trade the objective never knew about: performance up
+(1.044 → 0.773), certified region down (0.568 → 0.274).
 
 ### 10b. Resolves open questions, but buys no new guarantees
 
@@ -1490,6 +1489,7 @@ cd research/least_action
 ../../.venv/bin/python demo_policyopt.py     # ~50 min, sections AA-AD
 ../../.venv/bin/python demo_holdout.py       # ~12 min, generalization check
 ../../.venv/bin/python demo_sos.py           # ~1 min,  SOS stability certificate
+../../.venv/bin/python demo_certified_policy.py   # ~8 min, certified policy opt
 
 `fis_sos.py` (§12) additionally needs `sympy` and `cvxpy`:
 
@@ -1752,3 +1752,80 @@ $\{z^\top Pz\le1.1144\}$, proved by an explicit SOS decomposition. That closes
 G12, the guarantee §9a listed as computable-but-not-analytic and §9e identified
 as the most valuable thing missing.
 
+### 12e. Certifying the directly-optimized controller
+
+§8h's controller was the best performer in the study and the only one without a
+stability certificate. It now has one. Code: `demo_certified_policy.py`.
+
+**One thing was needed that is not obvious.** `policy_optimize` searches $\theta$
+freely, which destroys the $u(0)=0$ condition the certificate depends on. The
+search is therefore restricted to the null space of $a^\top\theta$ where
+$a=\psi(0)$ — an orthonormal basis of a 9-dimensional subspace of the
+10-dimensional parameter space. The constraint then holds to $10^{-16}$
+throughout, at no cost in the search (one fewer free parameter).
+
+| controller | score | $u(0)$ | $V$ from | certified ball | unsat. radius | rel. |
+|---|---|---|---|---|---|---|
+| imitation $N{=}2$ | 1.0437 | −2.1e−19 | Riccati | **0.568** | 0.773 | 1.8e−11 |
+| imitation $N{=}3$ | 1.2114 | −2.0e−19 | — | **none found** | 0.837 | — |
+| **direct opt $N{=}2$** | **0.7725** | +2.9e−18 | lin | **0.274** | 0.660 | 1.9e−11 |
+
+Two Lyapunov candidates were tried per controller — the Riccati matrix and one
+from the controller's own closed-loop linearization — because neither dominates:
+the imitation controller certifies best under Riccati, the optimized one under
+its own linearization.
+
+**The finding is a trade, and it runs the wrong way for a performance-first
+reading.** Direct optimization improves the score 1.044 → 0.773 and *shrinks*
+the certified region 0.568 → 0.274. It also shrinks the unsaturated radius
+0.773 → 0.660. The optimizer buys performance by acting more aggressively, and
+aggression is exactly what a Lyapunov certificate charges for. Nothing in the
+objective knew that, because the certified radius was never in it.
+
+$N{=}3$ certifies under neither candidate. That is not proof that no certificate
+exists — only these two quadratic $V$ were tried, and the true statement is
+"no certificate with these candidates".
+
+### 12f. Certification does not scale in rule count
+
+Since $\deg Q=2(N-1)$, the SDP grows quickly:
+
+| $N$ | $\deg Q$ | $\deg P$ | SOS degree | Gram |
+|---|---|---|---|---|
+| 2 | 2 | 3 | 6 | 35×35 |
+| 3 | 4 | 5 | 8 | 70×70 |
+| 4 | 6 | 7 | 10 | 126×126 |
+| 6 | 10 | 11 | 14 | 330×330 |
+| 8 | 14 | 15 | 18 | 715×715 |
+
+$N=2$ solves in seconds; $N=8$ is a 715×715 SDP and is out of reach with these
+solvers. This is the §9d/§10d risk, realized: **certification is tractable only
+at low rule count.** It happens to land well here, since §8b found the method
+converges at two or three rules anyway — but it means the $N=8$ controller that
+§12c showed to be the best *imitation* result cannot currently be certified at
+all, and any future move toward more rules trades certifiability for
+performance.
+
+### 12g. A claim I got wrong
+
+I initially wrote that the unconstrained policy search "has no certificate at any
+$\rho$, because the origin is not an equilibrium". Testing it rather than
+asserting it:
+
+| search | $u(0)$ | certified ball |
+|---|---|---|
+| unconstrained | +1.35e−9 | **0.358** |
+| constrained | +2.9e−18 | 0.274 |
+
+The unconstrained optimum **does** certify, and to a *larger* ball. Starting from
+a constrained warm start it drifts only to $u(0)\sim10^{-9}$, which is below what
+the SDP can resolve, so SOS certifies a system that differs from the true one by
+less than its own tolerance.
+
+The correct statement is narrower than what I wrote: the constraint does not
+rescue a certificate that would otherwise fail — it makes the certificate
+**exact** rather than valid only up to a $10^{-9}$ perturbation. The $u(0)=2.9\times10^{-4}$
+of an unconstrained *imitation* fit (§12b) is a different regime; at that
+magnitude the certificate genuinely fails. Whether $10^{-9}$ matters depends on
+whether one wants a proof about this closed loop or about one indistinguishable
+from it.
