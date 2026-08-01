@@ -53,9 +53,13 @@ def fpr_at_tpr(y, s, tpr_target=0.95):
     return float((s[y == 0] >= thresh).mean())
 
 
-def make_splits(meta):
-    """Truthful -> 60/20/20 fit/val/test. Hallucinations -> 50/50 val/test."""
-    rng = np.random.default_rng(SEED)
+def make_splits(meta, seed=SEED):
+    """Truthful -> 60/20/20 fit/val/test. Hallucinations -> 50/50 val/test.
+
+    `seed` selects the split; the seed sweep varies it to put error bars on
+    every headline number.
+    """
+    rng = np.random.default_rng(seed)
     tq = meta["family"] == "triviaqa"
 
     def shuffled(mask):

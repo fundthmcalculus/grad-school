@@ -121,49 +121,55 @@ def panel_a(ax, frames):
 
 
 def panel_b(ax):
-    d = pd.read_csv(DATA / "length_control_falsepremise.csv")
-    style = {
-        "FIS · centroid (PCA-free)": (S1, 2.4, 1.0, "tribble FIS · centroid\n(PCA-free)"),
-        "n_tokens (confound probe)": (S2, 2.0, 1.0, "n_tokens\n(confound probe)"),
-        "Mahalanobis · stats": (INK_MUTED, 1.6, 0.9, "Mahalanobis · stats"),
-        "perplexity": (INK_MUTED, 1.6, 0.9, "Perplexity"),
-        "mean entropy": (INK_MUTED, 1.6, 0.9, "Mean entropy"),
-    }
-    # the CSV round-trips '·' through cp1252 on Windows; match on a prefix
-    def find(row_key):
-        for v in d.detector:
-            if v.split()[0] == row_key.split()[0]:
-                return v
-        return None
+    """Length control with 10-seed error bars.
 
+    Semantic rather than categorical colour: blue = the subject, violet = the
+    same rule on PCA features (whose collapse is the point), orange = the
+    confound control, grey = rival detectors.
+    """
+    sw = pd.read_csv(DATA / "seed_sweep.csv")
+    sw = sw[sw.family == "FalsePremise"]
+    agg = (sw.groupby(["detector", "condition"])["auroc"]
+           .agg(["mean", "std"]).reset_index())
+    n_seeds = sw.seed.nunique()
+
+    # Match on ASCII-only substrings: the '·' in the detector names does not
+    # survive the CSV round-trip on Windows, so never key on it.
+    style = [   # (ascii key, colour, lw, label, dy)
+        ("centroid (PCA-free)", S1, 2.4, "tribble FIS · centroid (PCA-free)", 0.0),
+        ("OneClassSVM", INK_MUTED, 1.5, "One-class SVM · same 8 features", 0.020),
+        ("Mahalanobis", INK_MUTED, 1.5, "Mahalanobis · stats", -0.022),
+        ("perplexity", INK_MUTED, 1.5, "Perplexity", 0.010),
+        ("n_tokens", S2, 1.8, "n_tokens (confound control)", 0.030),
+        ("PCA (64", S3, 1.8, "tribble FIS · PCA — collapses", -0.028),
+    ]
     x = [0, 1]
-    for key, (color, lw, alpha, lab) in style.items():
-        r = d[d.detector.str.startswith(key.split()[0])]
+    for key, color, lw, lab, dy in style:
+        r = agg[agg.detector.str.contains(key, regex=False)]
         if r.empty:
             continue
-        r = r.iloc[0]
-        ys = [r.auroc_raw, r.auroc_matched]
-        ax.plot(x, ys, color=color, lw=lw, alpha=alpha, marker="o", ms=6.5,
-                mec=SURFACE, mew=1.4, zorder=3,
-                solid_capstyle="round")
-        ax.text(1.055, ys[1], f"{lab}  {ys[1]:.3f}", color=color, fontsize=7.8,
-                va="center", ha="left", linespacing=1.3,
-                fontweight="bold" if color is S1 else "normal")
-        ax.text(-0.055, ys[0], f"{ys[0]:.3f}", color=color, fontsize=7.6,
-                va="center", ha="right")
+        ys = [float(r[r.condition == c]["mean"].iloc[0]) for c in ("raw", "matched")]
+        es = [float(r[r.condition == c]["std"].iloc[0]) for c in ("raw", "matched")]
+        ax.errorbar(x, ys, yerr=es, color=color, lw=lw, marker="o", ms=6,
+                    mec=SURFACE, mew=1.3, capsize=3, elinewidth=1.1, zorder=3)
+        ax.text(1.075, ys[1] + dy, f"{lab}\n{ys[1]:.3f} ± {es[1]:.3f}",
+                color=color, fontsize=7.5, va="center", ha="left",
+                linespacing=1.35,
+                fontweight="bold" if color == S1 else "normal")
 
     ax.axhline(0.5, color=INK_MUTED, lw=1, ls=(0, (4, 3)), zorder=2)
-    ax.text(-0.055, 0.5, "chance", fontsize=7.5, color=INK_MUTED, va="center",
-            ha="right")
+    ax.text(-0.055, 0.507, "chance", fontsize=7.5, color=INK_MUTED,
+            va="bottom", ha="left")
 
-    ax.set_xticks(x, ["raw split\n(353 vs 716)", "length-matched\n(170 vs 170)"])
-    ax.set_xlim(-0.42, 1.72)
-    ax.set_ylim(0.47, 0.93)
+    ax.set_xticks(x, ["raw split", "length-matched"])
+    ax.set_xlim(-0.34, 2.05)
+    ax.set_ylim(0.325, 0.955)
     ax.set_ylabel("AUROC — false-premise family\n↑ higher is better")
     ax.yaxis.grid(True, color=GRID, lw=0.8, zorder=0)
     ax.set_axisbelow(True)
     ax.tick_params(length=0)
-    ax.set_title("B · Controlling for answer length", loc="left", fontsize=10.5,
+    ax.set_title(f"B · Controlling for answer length "
+                 f"({n_seeds} seeds, mean ± std)", loc="left", fontsize=10.5,
                  color=INK, fontweight="bold", pad=8)
 
 
@@ -205,7 +211,7 @@ def main():
     OUT.mkdir(exist_ok=True)
     fig = plt.figure(figsize=(13.4, 5.8))
     gs = fig.add_gridspec(1, 2, width_ratios=[1.42, 1], wspace=0.16,
-                          left=0.145, right=0.795, top=0.80, bottom=0.165)
+                          left=0.145, right=0.735, top=0.775, bottom=0.165)
     panel_a(fig.add_subplot(gs[0, 0]), load_panel_a())
     panel_b(fig.add_subplot(gs[0, 1]))
 
@@ -213,10 +219,12 @@ def main():
                  x=0.145, y=0.965, ha="left", fontsize=12.5, color=INK,
                  fontweight="bold")
     fig.text(0.145, 0.915,
-             "Fit on accurate (question, answer) pairs only — no hallucination "
-             "seen during fitting. Answer length alone scores 0.853 on the raw\n"
-             "false-premise split, so it must be controlled: once it is, the "
-             "fuzzy rule leads and the confidence baselines collapse to chance.",
+             "Fit on accurate (question, answer) pairs only — no hallucination seen "
+             "during fitting. Answer length alone scores 0.843 on the raw false-premise\n"
+             "split, so it must be controlled. Once it is, the fuzzy rule leads by "
+             "+0.117 over the same 8 features (10/10 seeds, p = 0.002) while the\n"
+             "confidence baselines fall to near chance — and the same rule on PCA "
+             "features collapses below it, showing PCA was reading length.",
              ha="left", va="top", fontsize=8.6, color=INK_2, linespacing=1.45)
 
     for ext in ("png", "pdf"):

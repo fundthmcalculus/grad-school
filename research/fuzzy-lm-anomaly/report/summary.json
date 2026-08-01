@@ -1,0 +1,26 @@
+{
+  "n_seeds": 10,
+  "FalsePremise": {
+    "fis_matched_mean": 0.9058,
+    "fis_matched_std": 0.0174,
+    "best_rival": "OneClassSVM \u00b7 centroid",
+    "best_rival_matched_mean": 0.7892,
+    "paired_delta_mean": 0.1166,
+    "paired_delta_std": 0.0165,
+    "paired_delta_min": 0.095,
+    "seeds_won": 10,
+    "seeds_total": 10
+  },
+  "TriviaQA": {
+    "fis_matched_mean": 0.4988,
+    "fis_matched_std": 0.0135,
+    "best_rival": "mean entropy",
+    "best_rival_matched_mean": 0.6729,
+    "paired_delta_mean": -0.1741,
+    "paired_delta_std": 0.0242,
+    "paired_delta_min": -0.2132,
+    "seeds_won": 0,
+    "seeds_total": 10
+  },
+  "n_generations": 7500
+}

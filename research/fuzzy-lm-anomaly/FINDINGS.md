@@ -459,3 +459,108 @@ distribution statistics remain the only usable signal.
   scope is "novel-entity fabrication," not "hallucination" in general.
 * Single split, single seed. §8's headline rests on 170 matched pairs per class —
   small enough that a seed sweep is required before publication.
+
+---
+
+## 9. Seed sweep and cost (10 splits)
+
+§8 rested on one split. `seed_sweep.py` re-draws the fit/val/test split 10 times,
+re-fitting *everything* split-dependent each time — the truthful centroid, the PCA
+basis, the KMeans modes, the antecedent ranking, the rule base, and the
+length-matched subsample. Nothing is carried across seeds. The decision rule was
+fixed in `NEXT_STEPS.md` §0 **before** the results were read.
+
+### 9.1 False-premise — the advantage holds
+
+AUROC, mean ± std over 10 seeds:
+
+| detector | raw | **length-matched** |
+|---|---|---|
+| **FIS · centroid (PCA-free)** | 0.883 ± 0.015 | **0.906 ± 0.017** |
+| OneClassSVM · centroid | 0.802 ± 0.020 | 0.789 ± 0.022 |
+| Mahalanobis · stats | 0.815 ± 0.014 | 0.760 ± 0.023 |
+| IsolationForest · stats | 0.767 ± 0.015 | 0.718 ± 0.022 |
+| perplexity | 0.728 ± 0.013 | 0.580 ± 0.045 |
+| mean entropy | 0.703 ± 0.014 | 0.559 ± 0.045 |
+| `n_tokens` (control) | 0.843 ± 0.011 | 0.500 ± 0.000 |
+| FIS · PCA (64 comp) | 0.615 ± 0.072 | 0.454 ± 0.089 |
+
+Paired advantage over the best rival, per seed:
+
+    mean Δ = +0.117 ± 0.016   (min +0.095, max +0.143)
+    wins 10/10 seeds · Wilcoxon p = 0.0020
+
+**STRONG PASS** against the pre-registered rule (Δ ≥ +0.05, ≥9/10 wins,
+std ≤ 0.04). The sign never flips and the worst seed still leads by +0.095.
+
+Three things the sweep settled that the single split could not:
+
+1. **The best rival is now OneClassSVM on the *same* centroid features** (0.789),
+   not a distribution-statistic baseline. That makes the comparison a clean
+   same-representation test: identical 8 features, different density model. The
+   +0.117 is therefore attributable to **the fuzzy rule itself**, not to the
+   representation — the strongest form this claim can take.
+2. **The PCA pipeline was almost entirely the length confound.** FIS · PCA drops
+   from 0.615 raw to **0.454 ± 0.089** matched — below chance and by far the most
+   variable row. §3.1's 0.819 was a length measurement wearing a fuzzy hat.
+   Dropping PCA was not a marginal improvement; it was the difference between a
+   real detector and an artifact.
+3. **`n_tokens` = 0.500 ± 0.000 on every seed**, so the control is exact by
+   construction rather than on average.
+
+### 9.2 TriviaQA — the negative result is equally firm
+
+| detector | raw | length-matched |
+|---|---|---|
+| mean entropy | 0.670 ± 0.012 | **0.673 ± 0.014** |
+| perplexity | 0.670 ± 0.012 | 0.669 ± 0.016 |
+| Mahalanobis · stats | 0.641 ± 0.012 | 0.640 ± 0.019 |
+| FIS · PCA (64 comp) | 0.530 ± 0.020 | 0.517 ± 0.027 |
+| **FIS · centroid (PCA-free)** | 0.497 ± 0.014 | **0.499 ± 0.013** |
+
+    mean Δ = -0.174 ± 0.024, wins 0/10 seeds
+
+Exactly chance, on every seed. **Ordinary factual error is not detectable by this
+mechanism** — the scope limit in §8 is now measured rather than suspected. Note
+also that entropy/perplexity are *not* length-confounded here (raw ≈ matched), so
+the distribution statistics remain the honest choice for in-distribution error.
+
+### 9.3 Training and scoring cost
+
+Mean over seeds. `feat_ms` is one-time feature construction over all 7,500 rows;
+`fit_ms` is split-dependent fitting; scoring is normalised per 1,000 samples.
+
+| detector | feat_ms | fit_ms | **total train** | score / 1k | rules | MFs |
+|---|---|---|---|---|---|---|
+| perplexity / entropy / `n_tokens` | 0 | 0 | **0** | 0.3 ms | — | — |
+| Mahalanobis · stats | 1.1 | 1.6 | **2.7 ms** | 0.7 ms | — | — |
+| IsolationForest · stats | 1.1 | 94.3 | **95 ms** | 7.0 ms | — | — |
+| OneClassSVM · centroid | 1152 | 6.0 | **1,158 ms** | 4.7 ms | — | — |
+| FIS · PCA (64 comp) | 94 | 955 | **1,049 ms** | 1.4 ms | 2 | 24 |
+| **FIS · centroid (PCA-free)** | 1152 | 1066 | **2,218 ms** | **1.8 ms** | **2** | **30** |
+
+Reading:
+
+* The fuzzy detector is the **most expensive to train** — ~2.2 s, roughly 800×
+  Mahalanobis. In absolute terms this is irrelevant: it is two seconds, once,
+  on CPU, against a model that took 6.7 min just to generate the probe set.
+* It is **cheap to score** — 1.8 ms per 1,000 samples, ~4× faster than
+  IsolationForest and ~2.6× faster than OneClassSVM, the two detectors closest to
+  it in accuracy. For a warning system that runs per generation, scoring cost is
+  the one that matters, and the fuzzy rule wins it.
+* Half its training cost (1,152 ms of 2,218) is the centroid feature build, which
+  is **shared** with OneClassSVM · centroid and is a fixed preprocessing cost over
+  all 7,500 rows — ~0.15 ms per generation.
+* The whole detector is **2 rules over 30 membership functions on 8 antecedents**.
+  That is small enough to print, which is the interpretability claim Ch 4.3.5
+  makes and §A5 of `NEXT_STEPS.md` proposes to cash in.
+
+### 9.4 What is now established
+
+* A length-independent, interpretable, open-set detector built from the Ch 4.3.5
+  anomaly rule detects novel-entity fabrication at **AUROC 0.906 ± 0.017**,
+  beating the best rival on identical features by **+0.117, 10/10 seeds**, with
+  no hallucination examples, no second model, no gradient, and ~2 s of training.
+* It does **not** detect ordinary factual error (0.499 ± 0.013).
+* Prompt-template novelty remains uncontrolled and is now the single largest
+  threat to validity — see `NEXT_STEPS.md` §A1, which is blocking.
