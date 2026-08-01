@@ -78,7 +78,7 @@ One more result came out of this, and I include it because it is a neat conseque
 
 *Hardware: 32-core Intel CPU, 64 GB RAM, laptop RTX 4080 (12 GB). Every result labeled "exact" is bit-identical to the serial VAT reference.*
 
-> **Reproduction.** Table 3.1 regenerates from `reproduce/tables/table_3_1_pvat_scaling.py`, which times the exact pVAT reorder against a self-contained classical $O(N^3)$ reference across a configurable grid of $N$, multi-seed, emitting Markdown and CSV. Cells marked *pending* are sizes not yet swept.
+> **Reproduction.** Table 3.1 regenerates from two generators under `reproduce/tables/`: `table_3_1_pvat_scaling.py` times the exact pVAT reorder against a self-contained classical $O(N^3)$ reference across a configurable grid of $N$, and `table_3_1_reorder_three_arm.py` separates the three complexity regimes and verifies every arm's ordering is bit-identical. Both are multi-seed and emit Markdown and CSV. Cells marked *pending* are sizes not yet swept. The remaining tables run in the `tribble-cluster` submodule rather than the table harness: Table 3.4 from `experiments/adversarial_eval.py`, Table 3.5 from `experiments/principled_stitch.py`, and Table 3.6 from `experiments/hardening_eval.py`, each writing a findings file under `experiments/findings/`. Tables 3.2 and 3.3 have no generator yet — the GPU rows need a device host. Per-cell provenance is tracked in `reproduce/PROVENANCE_MAP.md`, which also records that the 4,096-point pair below is an external measurement not yet reproduced in-repo.
 >
 > **TODO — repeatable performance (board-wide standard):** the numbers in this section are single-machine, some taken on a thermally throttled laptop. Before any of them are cited as scalability *or* stability results they must be reproduced under a fixed protocol — pinned clocks/thermals, multiple seeds, reported error bars, and a datacenter GPU with full-rate FP64. This same standard applies to every performance/scaling claim in the dissertation (Ch 5, Ch 6). Tracked as Goal G4 in Chapter 7.
 
@@ -132,19 +132,19 @@ The pairwise-distance row is the one worth dwelling on. On this hardware the GPU
 | Dataset | k-means | single-linkage | exact pVAT | naive block | principled stitch |
 |---|---:|---:|---:|---:|---:|
 | two_moons | 0.27 | 1.00 | 1.00 | 0.39 | **1.00** |
-| circles | 0.00 | 1.00 | 1.00 | 0.10 | **1.00** |
+| circles | 0.00 | 1.00 | 1.00 | 0.00 | **1.00** |
 | aniso | 0.61 | 0.00 | 0.00 | 0.30 | 0.00 |
-| bridged | **1.00** | 0.00 | 0.00 | 0.07 | 0.00 |
+| bridged | **1.00** | 0.00 | 0.00 | 0.08 | 0.00 |
 
-**The stitch.** Ablating the divide-and-conquer stitch on two moons across a grid of partitions and sizes: the light stitch (random representatives, one cross-edge) averages ARI 0.51; farthest-point representatives alone or top cross-edges alone are similar or worse; the principled combination of both reaches a mean ARI of 1.00 across every partition tested, at bounded cost. Both ingredients are required together.
+**The stitch.** Ablating the divide-and-conquer stitch on two moons across a grid of partitions and sizes: the light stitch (random representatives, one cross-edge) averages ARI 0.47; farthest-point representatives alone are worse still at 0.37, and top cross-edges alone reach only 0.61; the principled combination of both reaches a mean ARI of 1.00 across every partition tested, at bounded cost. Both ingredients are required together, and neither alone gets close.
 
 **Table 3.5 — Stitch ablation on two moons, over a grid of partitions and sizes.**
 
 | Stitch variant | mean ARI | min ARI | fraction ≥ 0.9 |
 |---|---:|---:|---:|
-| light (random rep, 1 cross-edge) | 0.51 | 0.00 | 0.44 |
-| top-m cross-edges only (m = 8) | 0.74 | 0.00 | 0.72 |
-| farthest-point reps only | 0.39 | 0.00 | 0.32 |
+| light (random rep, 1 cross-edge) | 0.47 | 0.00 | 0.44 |
+| top-m cross-edges only (m = 8) | 0.61 | 0.00 | 0.60 |
+| farthest-point reps only | 0.37 | 0.00 | 0.32 |
 | **principled (fps + top-m = 8)** | **1.00** | **1.00** | **1.00** |
 
 **Non-metric robustness.** This is the point of the whole exercise, so I test it directly rather than asserting it.

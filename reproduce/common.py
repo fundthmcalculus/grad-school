@@ -14,8 +14,15 @@ import time
 from contextlib import contextmanager
 
 # Fixed seeds -> every reported number is mean +/- std across these.
-# Override with REPRO_SEEDS="0,1,2,3,4,5,6" for a wider run.
-SEEDS = [int(s) for s in os.environ.get("REPRO_SEEDS", "0,1,2,3,4").split(",")]
+#
+# Ten, not five. The proposal's tables were originally transcribed from 3-seed
+# runs, and several Chapter 4 conclusions that looked decisive there turned out
+# to sit inside the seed-to-seed spread once the harness widened it. Ten is the
+# standard the chapters are now quoted at; narrowing it changes what the document
+# can claim, so treat it as part of the protocol rather than a tuning knob.
+# Override with REPRO_SEEDS="0,1,2" for a quick smoke run.
+SEEDS = [int(s) for s in
+         os.environ.get("REPRO_SEEDS", "0,1,2,3,4,5,6,7,8,9").split(",")]
 
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                           "reproduce", "outputs")

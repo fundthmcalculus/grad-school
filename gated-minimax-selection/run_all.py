@@ -302,10 +302,14 @@ def fig_persistence():
 def fig_membership():
     """Example generated membership functions projected on x-axis, for
     two_gaussians and concentric_rings, from the coverage-cover blocks."""
-    fig, axes = plt.subplots(2, 1, figsize=(9, 6.5))
+    # 2x2: left column is the 1-D profile per dataset, right column is the
+    # empty slot above the concentric-rings heatmap built at the end of this
+    # function. Both right-hand cells are addressed as axes[.., 1] below, so
+    # this grid has to stay 2x2.
+    fig, axes = plt.subplots(2, 2, figsize=(13, 6.5))
     colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12']
-    for ax, (name, fn, k) in zip(axes, [("two_gaussians", B.two_gaussians, 2),
-                                        ("concentric_rings", B.concentric_rings, 2)]):
+    for row, (name, fn, k) in enumerate([("two_gaussians", B.two_gaussians, 2),
+                                         ("concentric_rings", B.concentric_rings, 2)]):
         ax = axes[row, 0]
         X, y = fn()
         D = im.dissimilarity(X); Ds = im.minimax_transform(D)

@@ -2,7 +2,7 @@
 
 Each script regenerates one table from the proposal, writing both a Markdown and
 a CSV file into [`../outputs/`](../outputs). Every number is a **mean ± std over
-a fixed set of seeds** (`common.SEEDS`, default `0,1,2,3,4`), so the tables are
+a fixed set of seeds** (`common.SEEDS`, default `0..9`), so the tables are
 reproducible and carry error bars. A cell that reads `N/A` means that method or
 dataset genuinely wasn't available on this machine — nothing is fabricated.
 
@@ -22,7 +22,11 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
 
 ## Knobs (environment variables)
 
-- `REPRO_SEEDS="0,1,2,3,4,5,6"` — widen the seed set (more seeds → tighter CIs).
+- `REPRO_SEEDS="0,1,2"` — narrow the seed set for a quick smoke run. **Do not
+  quote a narrowed run in the proposal.** The chapters were once transcribed from
+  3-seed runs, and several Chapter 4 conclusions that looked decisive at 3 seeds
+  sit inside the seed-to-seed spread at 10; the default is part of the protocol,
+  not a tuning knob. See [`../PROVENANCE_MAP.md`](../PROVENANCE_MAP.md).
 - `REPRO_NORM_FAMILIES="min/max,probability,luk,hamacher,einstein"` — which fuzzy
   operator families the norm/conorm matrix sweeps.
 - `REPRO_PHIUSIIL_N="20000"` — sample cap for PhiUSIIL in the norm/conorm matrix.
