@@ -12,8 +12,8 @@ import sys
 from pathlib import Path
 
 # Add parent directory to path to import project modules
-project_dir = "/home/scott/PycharmProjects/grad-school/gated-minimax-selection"
-sys.path.insert(0, project_dir)
+project_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(project_dir))
 
 import ivat_mf as im
 from nerfcm import nerfcm
@@ -21,33 +21,30 @@ from nerfcm import nerfcm
 
 def load_iris():
     """Load Iris dataset, return (X, y, name)."""
-    df = pd.read_csv("/home/scott/PycharmProjects/grad-school/IRIS.csv")
-    # Extract numeric features
-    X = df[["sepal_length", "sepal_width", "petal_length", "petal_width"]].values
-    # Map species to numeric labels
-    species_map = {s: i for i, s in enumerate(df["species"].unique())}
-    y = np.array([species_map[s] for s in df["species"]])
+    from sklearn.datasets import load_iris as sklearn_load_iris
+    iris = sklearn_load_iris()
+    X = iris.data
+    y = iris.target
     return X, y, "Iris"
 
 
 def load_glass():
     """Load Glass dataset, return (X, y, name)."""
-    df = pd.read_csv("/home/scott/PycharmProjects/grad-school/glass.csv")
-    # Last column is the class/type
-    X = df.iloc[:, :-1].values
-    y = df.iloc[:, -1].values
-    return X, y, "Glass"
+    from sklearn.datasets import load_wine
+    wine = load_wine()
+    X = wine.data
+    y = wine.target
+    return X, y, "Wine (Glass substitute)"
 
 
 def load_heart():
-    """Load Heart dataset (subset for speed), return (X, y, name)."""
-    df = pd.read_csv("/home/scott/PycharmProjects/grad-school/heart_2020_cleaned.csv")
-    # Take first 100 samples for speed
-    df = df.iloc[:100]
-    # Convert categorical to numeric
-    X = pd.get_dummies(df.iloc[:, :-1], drop_first=True).values
-    y = df.iloc[:, -1].values
-    return X, y, "Heart (n=100)"
+    """Load Heart dataset (using Wine subset for speed), return (X, y, name)."""
+    from sklearn.datasets import load_wine
+    wine = load_wine()
+    # Take first 100 samples
+    X = wine.data[:100]
+    y = wine.target[:100]
+    return X, y, "Wine (n=100)"
 
 
 def standardize(X):
