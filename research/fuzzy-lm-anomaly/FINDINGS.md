@@ -1616,3 +1616,94 @@ budget is a **fourth confound**, and it is the one I fell for. It has the same
 signature as the other three — a real-looking effect, stable across seeds, with a
 plausible mechanistic story attached — and it is invisible unless the comparison
 is stated in terms of search budget as well as features and data.
+
+---
+
+## 27. When does the fuzzy rule beat entropy? A measured answer
+
+§26 removed the headline but left one live pattern: across four models the fuzzy
+rule's advantage over mean entropy tracked how badly entropy was doing. Four
+points is an anecdote; this makes it a measurement.
+
+**Design, with both §26 lessons applied.** 4 models x 13 templates = **44 cells**,
+each a self-contained detection problem. Both detectors run at **fixed
+configuration** — `fis_config` defaults, no search — so neither receives a
+supervised budget the other lacks. Template is constant within a cell (so §11's
+confound cannot operate) and length is matched inside each cell. 6 seeds.
+
+### The relationship
+
+    corr(entropy AUROC in a cell, FIS − entropy in that cell)
+      Pearson  r = -0.779   p = 4.8e-10
+      Spearman r = -0.764   p = 1.6e-09
+
+**Checked for the obvious artefact.** `corr(X, Y−X)` is biased negative even for
+independent X and Y, because X appears on both sides. Estimating entropy from one
+half of the seeds and the difference from the disjoint other half removes the
+shared noise:
+
+| estimate | r | p |
+|---|---|---|
+| naive (same seeds both sides) | −0.779 | 4.8e-10 |
+| **split-half A → B** | **−0.776** | 6.2e-10 |
+| **split-half B → A** | **−0.723** | 3.0e-08 |
+| split-half Spearman | −0.792 | 1.5e-10 |
+
+The effect is essentially unchanged, so it is not the artefact. And
+`corr(entropy, FIS) = +0.220 (p = 0.15)` — the two detectors are not simply both
+tracking cell difficulty, which would have produced a strong positive.
+
+### What it says
+
+    linear fit:  (FIS − entropy) = −0.846 · entropy + 0.514
+    crossover:   the fuzzy rule is ahead when entropy AUROC < 0.608
+
+| regime | cells | FIS − entropy |
+|---|---|---|
+| entropy weak (≤ 0.783) | 22 | −0.012 |
+| entropy strong (> 0.783) | 22 | **−0.217** |
+
+Mann–Whitney p = 0.0002. Per model, ordered by entropy strength:
+
+| model | entropy | FIS | FIS − entropy |
+|---|---|---|---|
+| **gemma3-270m** | **0.546** | 0.588 | **+0.042** |
+| qwen2.5-0.5b | 0.774 | 0.575 | −0.199 |
+| lfm2.5-350m | 0.812 | 0.603 | −0.210 |
+| smollm2-360m | 0.838 | 0.747 | −0.091 |
+
+The largest single gains are all in near-chance-entropy cells:
+`gemma/effect` entropy 0.436 → FIS 0.702 (**+0.265**), `gemma/conjecture` 0.492 →
+0.630 (+0.138), `gemma/constant` 0.438 → 0.568 (+0.131).
+
+### The honest claim
+
+> The fuzzy anomaly rule does **not** beat a mean-entropy threshold in general —
+> across 44 cells entropy averages 0.743 against the rule's 0.628, and the rule
+> wins in only 10 of 44. But **its relative advantage is strongly and predictably
+> governed by entropy's own performance** (r ≈ −0.75, p < 1e-7, artefact-checked),
+> crossing over at entropy AUROC ≈ 0.61. Where the output distribution is close to
+> uninformative, a fixed 4-rule fuzzy system over the *same* statistics recovers
+> signal the entropy threshold misses, by up to +0.265.
+
+This is a **complementarity** result, not a superiority one, and it is the first
+claim in this study built with equal search budgets from the start.
+
+### Two things it implies
+
+**Model size may set the regime.** Gemma3-270m is the smallest model here and the
+only one in the winning regime; its entropy is barely above chance (0.546). If
+entropy calibration improves with scale, the fuzzy rule's niche is small or weakly
+calibrated models — which is testable directly with the SmolLM2 family
+(135M / 360M / 1.7B), and is a far better-motivated scaling study than the one
+`four-things.md` shelved.
+
+**Fusion does not work.** A zero-parameter rank-average of the two scores (chosen
+because it fits nothing and so stays budget-fair) reaches 0.735 against entropy's
+0.743 — it beats *both* detectors in 9 of 44 cells and is not significantly
+different from entropy alone (p = 0.51). The two detectors are complementary
+*across* regimes but not *within* a cell, so a per-cell blend gains nothing. If
+this is to be exploited it must be by **switching** on an estimate of entropy's
+reliability, not by blending.
+
+`figures/entropy_regime.png`.
