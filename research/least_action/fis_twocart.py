@@ -288,10 +288,31 @@ class TskController:
     """(N * basis_size,) consequent coefficients, rule-major."""
     order: int = 1
     """Consequent polynomial order. 1 = affine (classic TSK)."""
+    mf: str = "pi"
+    """'pi' (rational, Yen & Langari) or 'gaussian' (transcendental).
+
+    The default is 'pi' because it is *rational*: mu_i = 1 / D_i with
+    D_i = 1 + sum_j ((z_j - c_ij)/w_ij)^2 a degree-2 polynomial, so phi_i and
+    hence the whole control law are rational in the state.  That is what makes
+    the closed loop amenable to a sum-of-squares Lyapunov certificate, which a
+    Gaussian -- being transcendental -- rules out entirely.  It is also the
+    membership function Cohen's notes actually specify.
+
+    Two practical consequences beyond certifiability: pi decays like 1/|z|^2
+    rather than exponentially, so sum_j mu_j never underflows and delta-coverage
+    (constraint C2) holds automatically on any bounded domain; and D_i >= 1
+    means no denominator can approach zero.
+    """
+
+    def _denominators(self, z: af64) -> af64:
+        return 1.0 + np.sum(((z[None, :] - self.centers) / self.widths) ** 2, axis=1)
 
     def phi(self, z: af64) -> af64:
-        d = (z[None, :] - self.centers) / self.widths
-        mu = np.exp(-np.sum(d**2, axis=1))
+        if self.mf == "pi":
+            mu = 1.0 / self._denominators(z)
+        else:
+            mu = np.exp(-np.sum(((z[None, :] - self.centers) / self.widths) ** 2,
+                                axis=1))
         s = mu.sum()
         return mu / s if s > 1e-300 else np.full(len(mu), 1.0 / len(mu))
 
@@ -552,18 +573,39 @@ def distribution_shift(closed_loop_states: af64, training_samples: af64) -> floa
 
 def fit_consequents(
     ctrl: TskController, samples: af64, targets: af64, weights: af64,
-    ridge: float = 1e-8,
+    ridge: float = 1e-8, hold_origin: bool = True,
 ) -> af64:
     """Occupation-weighted variable projection for the consequents.
 
     Linear in theta, so this is a single weighted least-squares solve with a
     positive-semidefinite Gram -- the global optimum for these rule positions, by
     the same argument as README §3a. No iteration, no local minima.
+
+    `hold_origin` adds the single linear equality u(0) = 0.  It is not cosmetic:
+    an unconstrained fit produces u(0) = O(1e-4), so the origin is NOT an
+    equilibrium of the closed loop, the trajectory settles to a nearby offset
+    point instead, and **no Lyapunov function can certify asymptotic stability to
+    a point that is not an equilibrium**.  The same defect voids the Theorem C2
+    certificate via its admissibility hypothesis (README §7c).  Because the
+    constraint is linear in theta it is imposed exactly by a KKT system, so the
+    solve stays a single linear system and the consequents remain the *global*
+    optimum subject to it -- the guarantee of §3a survives intact.
     """
     phi_mat = np.array([ctrl.regressors(z) for z in samples])
     w = weights / weights.sum()
     gram = (phi_mat * w[:, None]).T @ phi_mat
     rhs = (phi_mat * w[:, None]).T @ targets
-    scale = np.trace(gram) / max(gram.shape[0], 1)
-    ctrl.theta = np.linalg.solve(gram + ridge * scale * np.eye(gram.shape[0]), rhs)
+    m = gram.shape[0]
+    scale = np.trace(gram) / max(m, 1)
+    reg = gram + ridge * scale * np.eye(m)
+    if not hold_origin:
+        ctrl.theta = np.linalg.solve(reg, rhs)
+        return ctrl.theta
+    a = ctrl.regressors(np.zeros(samples.shape[1]))
+    kkt = np.zeros((m + 1, m + 1))
+    kkt[:m, :m] = reg
+    kkt[:m, m] = a
+    kkt[m, :m] = a
+    sol = np.linalg.solve(kkt, np.concatenate([rhs, [0.0]]))
+    ctrl.theta = sol[:m]
     return ctrl.theta
