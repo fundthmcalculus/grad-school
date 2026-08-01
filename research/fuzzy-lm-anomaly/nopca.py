@@ -103,6 +103,24 @@ BUILDERS = {"stats": f_stats, "rawdim": f_rawdim,
             "layerstat": f_layerstat, "centroid": f_centroid}
 
 
+def drop_constant(F, fit_idx, tol=1e-8):
+    """Drop features with no variance on the fit split.
+
+    Needed because layer 0 of the `prompt` pooling site is constant by
+    construction: the last prompt token is always the same chat-template token
+    (`assistant\\n`), so its embedding — and hence its distance to any centroid —
+    is identical for every example. `L00_dist` is exactly 0 and `L00_cos`
+    exactly 1.
+
+    Beyond carrying no signal, such a column crashes tribblefis's
+    `calculate_gaussian_correlation`, which histograms each feature over
+    (min, max) and cannot build bins on a degenerate range.
+    """
+    v = F.iloc[fit_idx].var()
+    keep = list(v[v > tol].index)
+    return F[keep]
+
+
 # --------------------------------------------------------------------------
 
 def rank_features(F, fit_idx, labels, top_n):

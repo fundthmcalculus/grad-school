@@ -1,0 +1,73 @@
+truthful_set,seed,detector,auroc,n_neg,n_pos,n_fit
+"triviaqa-truthful (broad, n=5286)",0,FIS · centroid,0.5305220821378007,1724,1724,3171
+"triviaqa-truthful (broad, n=5286)",0,Mahalanobis · stats,0.8082923083962726,1724,1724,3171
+"triviaqa-truthful (broad, n=5286)",0,mean entropy,0.874119836779518,1724,1724,3171
+"triviaqa-truthful (broad, n=5286)",0,n_tokens,0.49999999999999994,1724,1724,3171
+"triviaqa-truthful (broad, n=5286)",1,FIS · centroid,0.5267327506470708,1647,1647,3171
+"triviaqa-truthful (broad, n=5286)",1,Mahalanobis · stats,0.8083678849402918,1647,1647,3171
+"triviaqa-truthful (broad, n=5286)",1,mean entropy,0.8779105282036591,1647,1647,3171
+"triviaqa-truthful (broad, n=5286)",1,n_tokens,0.5,1647,1647,3171
+"triviaqa-truthful (broad, n=5286)",2,FIS · centroid,0.5301780158606927,1668,1668,3171
+"triviaqa-truthful (broad, n=5286)",2,Mahalanobis · stats,0.8066589893552784,1668,1668,3171
+"triviaqa-truthful (broad, n=5286)",2,mean entropy,0.871228556722967,1668,1668,3171
+"triviaqa-truthful (broad, n=5286)",2,n_tokens,0.5,1668,1668,3171
+"triviaqa-truthful (broad, n=5286)",3,FIS · centroid,0.5223940617913831,1680,1680,3171
+"triviaqa-truthful (broad, n=5286)",3,Mahalanobis · stats,0.7939941184807257,1680,1680,3171
+"triviaqa-truthful (broad, n=5286)",3,mean entropy,0.8703500566893425,1680,1680,3171
+"triviaqa-truthful (broad, n=5286)",3,n_tokens,0.5,1680,1680,3171
+"triviaqa-truthful (broad, n=5286)",4,FIS · centroid,0.5299829937556686,1683,1683,3171
+"triviaqa-truthful (broad, n=5286)",4,Mahalanobis · stats,0.7995762737295714,1683,1683,3171
+"triviaqa-truthful (broad, n=5286)",4,mean entropy,0.8737816810586025,1683,1683,3171
+"triviaqa-truthful (broad, n=5286)",4,n_tokens,0.49999999999999994,1683,1683,3171
+"triviaqa-truthful (broad, n=5286)",5,FIS · centroid,0.5332210492859096,1679,1679,3171
+"triviaqa-truthful (broad, n=5286)",5,Mahalanobis · stats,0.8179763969378239,1679,1679,3171
+"triviaqa-truthful (broad, n=5286)",5,mean entropy,0.8662850238786879,1679,1679,3171
+"triviaqa-truthful (broad, n=5286)",5,n_tokens,0.5,1679,1679,3171
+triviaqa-truthful subsampled to 632,0,FIS · centroid,0.4621046469585579,241,241,379
+triviaqa-truthful subsampled to 632,0,Mahalanobis · stats,0.8148620030646855,241,241,379
+triviaqa-truthful subsampled to 632,0,mean entropy,0.8757769322153546,241,241,379
+triviaqa-truthful subsampled to 632,0,n_tokens,0.49999999999999994,241,241,379
+triviaqa-truthful subsampled to 632,1,FIS · centroid,0.49128862590401057,234,234,379
+triviaqa-truthful subsampled to 632,1,Mahalanobis · stats,0.7659434582511504,234,234,379
+triviaqa-truthful subsampled to 632,1,mean entropy,0.8479253415150851,234,234,379
+triviaqa-truthful subsampled to 632,1,n_tokens,0.5,234,234,379
+triviaqa-truthful subsampled to 632,2,FIS · centroid,0.5109177640419242,244,244,379
+triviaqa-truthful subsampled to 632,2,Mahalanobis · stats,0.7648985487772105,244,244,379
+triviaqa-truthful subsampled to 632,2,mean entropy,0.8601518409029829,244,244,379
+triviaqa-truthful subsampled to 632,2,n_tokens,0.49999999999999994,244,244,379
+triviaqa-truthful subsampled to 632,3,FIS · centroid,0.43648787097627073,246,246,379
+triviaqa-truthful subsampled to 632,3,Mahalanobis · stats,0.8060512922202393,246,246,379
+triviaqa-truthful subsampled to 632,3,mean entropy,0.861177209333069,246,246,379
+triviaqa-truthful subsampled to 632,3,n_tokens,0.49999999999999994,246,246,379
+triviaqa-truthful subsampled to 632,4,FIS · centroid,0.5095908357968287,244,244,379
+triviaqa-truthful subsampled to 632,4,Mahalanobis · stats,0.7772608169846816,244,244,379
+triviaqa-truthful subsampled to 632,4,mean entropy,0.8538531308787959,244,244,379
+triviaqa-truthful subsampled to 632,4,n_tokens,0.5,244,244,379
+triviaqa-truthful subsampled to 632,5,FIS · centroid,0.592207019631172,246,246,379
+triviaqa-truthful subsampled to 632,5,Mahalanobis · stats,0.8029446757882213,246,246,379
+triviaqa-truthful subsampled to 632,5,mean entropy,0.8720834159561107,246,246,379
+triviaqa-truthful subsampled to 632,5,n_tokens,0.5,246,246,379
+"template-truthful (narrow, n=632)",0,FIS · centroid,0.627159239367107,166,166,379
+"template-truthful (narrow, n=632)",0,Mahalanobis · stats,0.9308680505153143,166,166,379
+"template-truthful (narrow, n=632)",0,mean entropy,0.9473073014951372,166,166,379
+"template-truthful (narrow, n=632)",0,n_tokens,0.5,166,166,379
+"template-truthful (narrow, n=632)",1,FIS · centroid,0.7536677952190418,171,171,379
+"template-truthful (narrow, n=632)",1,Mahalanobis · stats,0.9131014671180875,171,171,379
+"template-truthful (narrow, n=632)",1,mean entropy,0.9179576621866556,171,171,379
+"template-truthful (narrow, n=632)",1,n_tokens,0.49999999999999994,171,171,379
+"template-truthful (narrow, n=632)",2,FIS · centroid,0.698164548404543,172,172,379
+"template-truthful (narrow, n=632)",2,Mahalanobis · stats,0.9382436452136289,172,172,379
+"template-truthful (narrow, n=632)",2,mean entropy,0.9473025959978366,172,172,379
+"template-truthful (narrow, n=632)",2,n_tokens,0.5,172,172,379
+"template-truthful (narrow, n=632)",3,FIS · centroid,0.5953906250000001,160,160,379
+"template-truthful (narrow, n=632)",3,Mahalanobis · stats,0.9199999999999999,160,160,379
+"template-truthful (narrow, n=632)",3,mean entropy,0.93625,160,160,379
+"template-truthful (narrow, n=632)",3,n_tokens,0.5,160,160,379
+"template-truthful (narrow, n=632)",4,FIS · centroid,0.6897398543184183,155,155,379
+"template-truthful (narrow, n=632)",4,Mahalanobis · stats,0.9155879292403746,155,155,379
+"template-truthful (narrow, n=632)",4,mean entropy,0.94264308012487,155,155,379
+"template-truthful (narrow, n=632)",4,n_tokens,0.5,155,155,379
+"template-truthful (narrow, n=632)",5,FIS · centroid,0.7432500268923231,167,167,379
+"template-truthful (narrow, n=632)",5,Mahalanobis · stats,0.9214744164365879,167,167,379
+"template-truthful (narrow, n=632)",5,mean entropy,0.9483308831438918,167,167,379
+"template-truthful (narrow, n=632)",5,n_tokens,0.5,167,167,379

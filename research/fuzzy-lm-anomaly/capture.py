@@ -205,9 +205,12 @@ def main():
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--max-new-tokens", type=int, default=48)
     ap.add_argument("--limit", type=int, default=0, help="0 = all")
+    ap.add_argument("--prompts", default="prompts.jsonl")
+    ap.add_argument("--prefix", default="capture",
+                    help="output basename; v2 runs use 'capture_v2'")
     args = ap.parse_args()
 
-    rows = [json.loads(l) for l in (DATA / "prompts.jsonl").open(encoding="utf-8")]
+    rows = [json.loads(l) for l in (DATA / args.prompts).open(encoding="utf-8")]
     if args.limit:
         rows = rows[: args.limit]
 
@@ -229,7 +232,8 @@ def main():
         texts, stats, hid = run_batch(model, tok, [r["question"] for r in chunk],
                                       args.max_new_tokens)
         for row, text, st in zip(chunk, texts, stats):
-            metas.append({**{k: row[k] for k in ("id", "family", "subtype", "question")},
+            metas.append({**{k: row.get(k, "") for k in
+                             ("id", "family", "subtype", "template", "question")},
                           "answer": text.strip(),
                           "label": label_row(row, text),
                           **st})
@@ -237,9 +241,9 @@ def main():
             hiddens[k].append(v)
 
     meta = pd.DataFrame(metas)
-    meta.to_parquet(DATA / "capture_meta.parquet", index=False)
+    meta.to_parquet(DATA / f"{args.prefix}_meta.parquet", index=False)
     for k, v in hiddens.items():
-        np.save(DATA / f"capture_hidden_{k}.npy", np.concatenate(v, axis=0))
+        np.save(DATA / f"{args.prefix}_hidden_{k}.npy", np.concatenate(v, axis=0))
     hidden = np.concatenate(hiddens["mean"], axis=0)
 
     print(f"\ncaptured {len(meta)} generations; hidden {hidden.shape} x3 poolings")

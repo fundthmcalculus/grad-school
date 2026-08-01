@@ -6,7 +6,18 @@ flag hallucinated output from a small language model it was never trained on?
 **Status:** single model, single seed, no error bars. Read the caveats before
 quoting any number.
 
-> **Headline (revised after §7–§8).** On the raw split the fuzzy rule *trailed*
+> ## RETRACTION — read §11 and §12 before anything else
+>
+> The §9 headline (**AUROC 0.906 ± 0.017**, beating every baseline 10/10 seeds)
+> **does not survive the template control** and is retracted. On a
+> template-matched probe set the fuzzy rule falls to **0.671 ± 0.068** while mean
+> entropy reaches **0.964 ± 0.009**; and against a *different* family of
+> fabrications with the same broad truthful set — the configuration that produced
+> 0.906 — it sits at **chance (0.529 ± 0.004)**. The §9 advantage was reading
+> prompt-family style, not fabrication. §§7–9 are kept for the record; §§10–17
+> are the current state.
+>
+> **Headline (SUPERSEDED — was revised after §7–§8).** On the raw split the fuzzy rule *trailed*
 > a perplexity baseline, and that was the original conclusion. It was wrong,
 > because the baselines were partly reading **answer length** — `n_tokens` alone
 > scores 0.853 on the raw false-premise split. Dropping PCA/SVD and controlling
@@ -564,3 +575,203 @@ Reading:
 * It does **not** detect ordinary factual error (0.499 ± 0.013).
 * Prompt-template novelty remains uncontrolled and is now the single largest
   threat to validity — see `NEXT_STEPS.md` §A1, which is blocking.
+
+---
+
+## 10. Template-matched probe set (v2)
+
+`build_prompts_v2.py`. The v1 design had fabricated questions templated and the
+truthful comparison set untemplated, so a detector could separate them on surface
+form. v2 removes that at the source: every fabricated question has a **real-entity
+twin in the identical surface form**, from a curated table of checkable facts.
+
+| family | n | role |
+|---|---|---|
+| `triviaqa` | 17,944 | in-distribution control (5,286 correct) |
+| `template_real` | 846 | known-good, gradeable (632 correct) |
+| `template_fake` | 5,000 | necessarily fabricated (4,114 fabrications) |
+| `falsepremise` | 1,500 | the v1 probes, kept for continuity |
+
+Five templates (capital / chemical symbol / novel author / currency / film
+director) x 3 phrasings, applied identically to both sides, over ~200 curated
+facts and index-addressed invented entities. 25,290 generations, 22 min, 4.8 GB
+of activations.
+
+Two construction bugs worth recording: rejection sampling from a hand-written
+entity pool silently delivered 411 of 5,000 fakes (fixed by combinatorial
+index-addressing), and short syllable joins produced **real** place names --
+"Braz"+"or"+"ia" = Brazoria, an actual Texas county -- which would break the
+"necessarily fabricated" label. Infixes were lengthened until unmistakably
+synthetic.
+
+## 11. The template control falsifies section 9
+
+`template_control.py`. Fit on `template_real` correct; test truthful = held-out
+`template_real` correct; positives = `template_fake`. Ten seeds:
+
+| detector | raw | length-matched | **length+template** |
+|---|---|---|---|
+| mean entropy | 0.957 +/- 0.004 | 0.938 +/- 0.012 | **0.965 +/- 0.007** |
+| Mahalanobis - stats | 0.952 +/- 0.004 | 0.924 +/- 0.013 | 0.952 +/- 0.012 |
+| perplexity | 0.944 +/- 0.006 | 0.901 +/- 0.016 | 0.938 +/- 0.010 |
+| **FIS - centroid** | 0.714 +/- 0.080 | 0.696 +/- 0.056 | **0.668 +/- 0.078** |
+| OneClassSVM - centroid | 0.625 +/- 0.095 | 0.611 +/- 0.090 | 0.600 +/- 0.095 |
+| `n_tokens` (control) | 0.884 +/- 0.010 | 0.500 +/- 0.000 | 0.500 +/- 0.000 |
+
+    paired delta (FIS - mean entropy) = -0.297 +/- 0.079, wins 0/10, p = 0.0020
+
+**The ranking inverts back, decisively.** Where truthful and fabricated share a
+template, the confidence baselines are near-ceiling and the fuzzy rule is far
+behind.
+
+## 12. Decomposition -- the template, or the fit set?
+
+Section 11 changed two things at once: the template *and* the truthful
+distribution. `decompose_confound.py` separates them, holding the fabrications
+fixed and length-matching throughout:
+
+| detector | TriviaQA truthful (n=5,286) | subsampled to 632 | template-matched (n=632) |
+|---|---|---|---|
+| mean entropy | 0.872 +/- 0.004 | 0.862 +/- 0.011 | 0.940 +/- 0.012 |
+| Mahalanobis - stats | 0.806 +/- 0.008 | 0.789 +/- 0.022 | 0.923 +/- 0.010 |
+| **FIS - centroid** | **0.529 +/- 0.004** | **0.500 +/- 0.053** | 0.685 +/- 0.063 |
+| `n_tokens` | 0.500 | 0.500 | 0.500 |
+
+    cost of shrinking the fit set : -0.028
+    cost of matching the template : +0.184
+
+The verdict is worse than "the template explains it". **Against `template_fake`
+fabrications with the broad TriviaQA truthful set -- the exact configuration that
+produced 0.906 in section 9 -- the fuzzy rule is at chance (0.529).** Fit-set size
+is not the cause.
+
+The section 9 result was therefore specific to the v1 `falsepremise` family and
+did not transfer to a different family of fabrications, even with the same
+truthful set and with length matched. What it had learned was the prompt/answer
+*family* -- long, discursive probes -- not fabrication. That is exactly the
+confound `NEXT_STEPS.md` A1 flagged as blocking.
+
+## 13. Which statistic should rank the antecedents?
+
+`ranker_compare.py`. Each of the four statistics inside
+`calculate_gaussian_correlation` reimplemented separately, plus four
+non-parametric alternatives, scored by downstream AUROC (6 seeds, top-8):
+
+| ranker | AUROC | note |
+|---|---|---|
+| bhattacharyya | **0.673 +/- 0.081** | best |
+| overlap | 0.673 +/- 0.081 | |
+| jensen_shannon | 0.672 +/- 0.083 | |
+| wasserstein | 0.667 +/- 0.089 | not currently computed |
+| **blend (library)** | 0.658 +/- 0.088 | worse than 3 of its own 4 terms |
+| variance / ks | 0.653 | |
+| auc | 0.647 | |
+| mutual_info | 0.644 | |
+| **hist_corr** | 0.632 +/- 0.042 | worst -- and it is 1/4 of the blend |
+
+The spread is small against a seed std of ~0.08, so **the ranker is not the
+bottleneck**. But the blend is beaten by three of its own components, and its
+weakest term is also the one that crashes on constant features and is scaled to
+[0,2] while the others are [0,1]. Filed as tribble-fis **#30** with a `method=`
+proposal.
+
+Separately: layer 0 of the `prompt` pooling site is **constant by construction**
+-- the last prompt token is always the same chat-template token, so `L00_dist` is
+identically 0. Harmless as signal, but it crashes the post-`f779a42`
+`calculate_gaussian_correlation`; `drop_constant()` now guards it.
+
+## 14. Standing report -- accuracy, parameters, train time, inference
+
+`pareto.py`. Every comparison from here reports all four. Template-matched task,
+6 seeds:
+
+| detector | AUROC | FPR@95 | params | train | inference | structure |
+|---|---|---|---|---|---|---|
+| mean entropy | **0.964 +/- 0.009** | 0.203 | **0** | **0 ms** | 1,473,552/s | threshold only |
+| Mahalanobis - stats | 0.948 +/- 0.009 | 0.317 | 209 | 4 ms | 544,022/s | 19 feat, full cov |
+| perplexity | 0.934 +/- 0.009 | 0.291 | 0 | 0 ms | **1,738,387/s** | threshold only |
+| IsolationForest - stats | 0.923 +/- 0.016 | 0.439 | 12,092 | 101 ms | 73,484/s | 100 trees |
+| **FIS - centroid** | 0.671 +/- 0.068 | 1.000 | **53** | 4,880 ms | 241,733/s | **2 rules, 29 MFs** |
+| OneClassSVM - centroid | 0.619 +/- 0.125 | 0.776 | 398 | 3,894 ms | 266,620/s | 44 SV x 8 dims |
+
+### Pareto verdict -- negative, as measured
+
+**Mean entropy dominates every other detector on every cost axis**: highest
+AUROC, zero fitted parameters, zero training time. The fuzzy rule is dominated on
+parameters, training time and inference speed simultaneously. On this task **the
+FIS is not on the Pareto front**, and no arrangement of these numbers makes it so.
+
+What is true, and is the most that can be claimed:
+
+* Among **learned** detectors the FIS is the most parsimonious -- 53 continuous
+  parameters against 209 for Mahalanobis and 12,092 for IsolationForest, i.e.
+  4x and 228x fewer.
+* Within the **hidden-state-geometry** sub-family it beats OneClassSVM on
+  identical features (0.671 vs 0.619) with 7.5x fewer parameters, so it is on the
+  front *of that sub-family*.
+* It is the only detector here that yields a readable rule base (section 15).
+* But a zero-parameter output-distribution threshold beats all of them, so that
+  sub-family is the wrong place to be for this task.
+
+Training cost is dominated by the centroid feature build (~3.9 s of 4.9 s) over
+all 25,290 rows -- about 0.19 ms per generation amortised.
+
+## 15. The rule base is readable (the one surviving differentiator)
+
+`print_rule.py` prints the fitted FIS and plots its membership functions
+(`figures/membership_functions.png`). On the v1 configuration it recovered two
+interpretable known-good modes:
+
+    RULE 1 (mode0)  IF L26_dist is HIGH AND L26_cos is LOW ...         THEN normal
+    RULE 2 (mode1)  IF L26_dist is LOW/MED AND L26_cos is HIGH/MED ... THEN normal
+    ANOMALY         IF neither fires                                    THEN flag
+
+That is a real finding independent of the accuracy result: known-good behaviour
+has **two** modes, one diffuse and far from the centroid, which is why single-blob
+detectors underperform the FIS *within the centroid representation*. It does not
+rescue the headline, because the representation itself is beaten by entropy.
+
+`operating_points_*.csv` reports precision/recall at fixed warning rates, the
+correct use of theta given section 3.4.
+
+## 16. Abstention regex audit
+
+`audit_abstain.py` cross-checks the refusal regex against an independent
+structural heuristic and surfaces only the disagreements.
+
+    agreement 99.71%   kappa 0.968   22 of 7,500 disagree (0.29%)
+
+Reading all 22: the regex is right in the large majority, and the identified
+errors are fabrications *mislabelled as abstentions* (an invented researcher's
+"research was abandoned ... they were not able to find a suitable collaborator"
+matches "not able to"). That is the **conservative** direction -- it removes true
+positives rather than adding them -- so label leakage is not inflating anything.
+Error budget bounded at 0.29%.
+
+## 17. Where this actually stands
+
+Established:
+
+* The adversarial elicitation works: 95.4% fabrication rate on non-existent
+  entities, from a frozen 360M model.
+* Output-distribution statistics are a strong, cheap, length-robust and
+  template-robust signal for this task: **0.964 AUROC, zero parameters, zero
+  training time**.
+* The fuzzy anomaly rule as constructed does **not** beat them, is not on the
+  Pareto front, and is at chance once the prompt-family confound is removed.
+* Four tribblefis defects found and fixed (#22-#25); a fifth filed (#30).
+* **The methodological result stands on its own and is the durable contribution:
+  two confounds -- answer length and prompt family -- each independently produce
+  a large, entirely spurious "hallucination detection" result (0.843 and ~0.9
+  AUROC).** Any work in this area that does not control both is untrustworthy,
+  and this holds regardless of the detector used.
+
+Not established, and not worth asserting: any advantage for the FIS on this task.
+
+### TODO -- proposal defense
+
+Not yet written into `research/proposal-defense/`. When it is, the honest framing
+is a **methods/negative-results contribution** (the two confounds and the controls
+that expose them), not a detection win. It also still closes Ch 4.3.5's owed
+head-to-head against one-class SVM and isolation forest, in a second domain --
+that part is unaffected by the retraction.
