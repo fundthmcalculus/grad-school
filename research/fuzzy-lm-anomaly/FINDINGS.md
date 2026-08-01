@@ -1157,3 +1157,127 @@ identical features, uses 2.6x-146x fewer parameters, and prints as four rules a
 human can read. That is a defensible interpretability-plus-parsimony claim, and it
 took four failed configurations and three dissolved confounds to find the place
 where it is true.
+
+---
+
+## 22. Against tribble-fis main: metric, membership function, and norm pair
+
+Submodule moved to **`3e49376`** (was `f779a42`), picking up five commits, two of
+them direct responses to what this study filed:
+
+* **#34** (fixes our #30) -- `calculate_gaussian_correlation(X, y, method=...)`.
+  The hard-coded blend is **gone**; `bhattacharyya` is the new default and
+  `wasserstein` was added, both chosen on the numbers section 13 reported.
+  `hist_corr` was removed outright.
+* **#32** -- an `einstein` family plus `resolve_norm_pair` /
+  `AnomalyParameters(t_norm=, t_conorm=, allow_mixed_norms=)`. Mixed-family pairs
+  are now **gated behind an explicit opt-in**, on the correct grounds that they are
+  not De Morgan duals and the anomaly rule's complement `1 - S(...)` depends on
+  that duality for its meaning.
+* `create_trapz_membership_dict` -- a trapezoid analogue of the Gaussian builder
+  returning the same container, so the anomaly rule accepts it directly.
+* Also `ruspini.py` (triangular Ruspini partitions) and `#28`/`#29` on
+  `pin_extremes`.
+
+`norms.py` and the hand-rolled ranker comparison in `ranker_compare.py` are now
+partly redundant -- the library covers Bhattacharyya, Wasserstein, Einstein, and
+decoupled pairs natively. They are kept because they cover families the library
+still lacks (Dombi, Yager, Schweizer-Sklar, drastic, nilpotent) and because
+`norm_sweep.py`'s parity check remains the regression test that caught #22.
+
+### First: section 21 had to be re-verified, and it moved
+
+Section 21 was produced when the default ranker was the blend. The default is now
+`bhattacharyya`, so those numbers do not carry over. Re-run, 8 seeds, same
+protocol (validation-selected configuration, disjoint test half):
+
+| condition | detector | AUROC | FPR@95 | params |
+|---|---|---|---|---|
+| length+template | **FIS - stats** | **0.872 +/- 0.022** | **0.554** | 94 |
+| | mean entropy | 0.841 +/- 0.014 | 0.593 | 0 |
+| | Mahalanobis - stats | 0.841 +/- 0.024 | 0.588 | 209 |
+| +entropy | **FIS - stats** | **0.784 +/- 0.039** | 0.903 | 94 |
+| | Mahalanobis - stats | 0.760 +/- 0.032 | 0.780 | 209 |
+
+    paired FIS vs Mahalanobis, length+template:
+      was  +0.040 +/- 0.017, 8/8 seeds, p = 0.0078   (blend)
+      now  +0.030 +/- 0.023, 7/8 seeds, p = 0.0156   (bhattacharyya)
+
+    paired FIS vs Mahalanobis, +entropy:
+      was  +0.034 +/- 0.043, 7/8 seeds, p = 0.0234
+      now  +0.024 +/- 0.043, 6/8 seeds, p = 0.1484   <- NO LONGER SIGNIFICANT
+
+**The template-matched win survives; the hardest-condition win does not.** Under
+entropy matching the FIS is still directionally ahead (+0.024) but 6/8 seeds and
+p = 0.148 is not a claim. Section 21's text is superseded by these numbers. This is
+the second time a committed number moved under a library change, which is a
+argument for keeping the parity/regression checks wired in.
+
+### The factorial
+
+`compare_variants.py`. Honest task (v3 long-form, template matched), 19 output
+statistics, 6 antecedents, K=4, no whitening -- so only the three factors vary.
+2 metrics x 2 membership functions x 8 norm pairs (5 De Morgan + 3 explicitly
+mixed), 8 seeds.
+
+**Main effects, condition `length+template`:**
+
+| factor | levels | mean AUROC | paired test |
+|---|---|---|---|
+| **membership function** | gaussian **0.850** vs trapezoid **0.588** | | **+0.262 +/- 0.097, 8/8, p = 0.0078** |
+| coefficient metric | wasserstein 0.726 vs bhattacharyya 0.711 | | -0.015 +/- 0.048, 2/8, p = 0.875 |
+| norm pair | mixed 0.720 vs De Morgan 0.718 | | +0.002 +/- 0.001, 8/8, p = 0.0078 |
+
+Three things follow, and they are not the ones I would have predicted:
+
+**1. The membership function dominates everything else, by an order of
+magnitude.** Gaussian beats trapezoid by **+0.262** on every seed. Nothing else in
+this study -- metric, norm, antecedent count, mode count -- has come close to that
+effect size. Trapezoids collapse to 0.556-0.588, barely above chance in the
+entropy-matched condition. The flat top is the likely cause: a trapezoid assigns
+membership exactly 1.0 across an interval, so the conjunction cannot distinguish
+"comfortably inside the known-good region" from "at its edge", and the anomaly
+complement loses precisely the gradation it needs. If any single knob deserves
+attention in the dissertation, it is this one.
+
+**2. The coefficient metric barely matters on average -- but Wasserstein is much
+more stable.** The means are within noise (p = 0.875), yet in the hardest
+condition Wasserstein + Gaussian gives **0.797 +/- 0.025** against Bhattacharyya's
+**0.776 +/- 0.067** -- a 2.7x smaller standard deviation. For a dissertation
+claim, the non-parametric metric is the safer default even though its mean
+advantage is not significant. Worth noting the library's new default is
+Bhattacharyya, chosen on section 13's evidence, which measured means and not
+variances.
+
+**3. Gating mixed norm pairs costs almost nothing.** Mixed pairs beat De Morgan
+pairs by **+0.002** -- consistent across seeds (8/8, p = 0.0078) but practically
+irrelevant. So #32's decision to require `allow_mixed_norms=True` buys back the
+complement's semantic interpretation for a rounding error, which is the right
+trade. It also retires section 3.5's "mismatched pairs are slightly better" as a
+finding worth acting on.
+
+**Łukasiewicz produces zero valid runs** (0 of 32 cells), reconfirming section 3.5:
+nilpotent families saturate to 1 under aggregation and drive the complement to a
+constant 0.
+
+**Best configurations, condition `length+template+entropy`** (Mahalanobis 0.782):
+
+| metric | MF | T | S | AUROC | FPR@95 |
+|---|---|---|---|---|---|
+| wasserstein | gaussian | min/max | hamacher | **0.811 +/- 0.031** | 0.795 |
+| wasserstein | gaussian | min/max | min/max | 0.810 +/- 0.027 | 0.931 |
+| **wasserstein** | **gaussian** | **hamacher** | **hamacher** | **0.802 +/- 0.022** | **0.786** |
+| wasserstein | gaussian | hamacher | einstein | 0.801 +/- 0.022 | 0.783 |
+
+8 of 32 configurations beat Mahalanobis; 24 do not. The win is configuration-
+dependent, and choosing badly (trapezoid) loses badly.
+
+### Recommended configuration
+
+**Wasserstein metric + Gaussian membership functions + Hamacher/Hamacher norms.**
+Not the top AUROC (0.802 vs 0.811) but the best overall: within noise of the best,
+the **lowest variance** of the leaders (+/-0.022), a materially better **FPR@95
+(0.786 vs 0.931** for min/max -- the min/max leader is unusable at high recall),
+and a De Morgan-consistent pair, so the anomaly rule keeps its interpretation as a
+genuine complement. Ranking on AUROC alone would have picked min/max and shipped a
+detector that flags 93% of clean output at 95% recall.
