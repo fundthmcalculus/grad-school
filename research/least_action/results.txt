@@ -1,5 +1,5 @@
 # Recorded output of the least-action demos
-# Deterministic (seeded); regenerate with the commands in README.md section 7
+# Deterministic (seeded); regenerate with the commands in README.md section 10
 
 ===== demo_regression.py =====
 
@@ -547,4 +547,17 @@ AD. Where the gain comes from
   vs open-loop ref:   20.0% better
   The open-loop reference had full knowledge of z0; a feedback law
   beating it is not a contradiction, it is what feedback buys.
+
+===== demo_holdout.py =====
+Held-out initial conditions, including two larger than any in training.
+            controller     train      test  test settled  degradation
+              best LQR    1.0000    1.0000           6/6        +0.0%
+         imitation N=2    0.8666    0.8632           6/6        -0.4%
+         imitation N=3    0.8629    0.8621           6/6        -0.1%
+  optimizing (600 evals, train split only)...
+        direct opt N=2    0.6547    0.6905           6/6        +5.5%
+
+  LQR is the control: it never saw either split, so its train/test
+  difference is pure split-to-split variation and calibrates how much
+  degradation is meaningful.
 
