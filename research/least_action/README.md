@@ -931,10 +931,46 @@ The fix is one round of aggregation (simulate, collect the off-trajectory states
 refit — DAgger), or off-trajectory sampling around the optimal tube. Both are
 *refinement*, which the question explicitly excluded, so they are not done here.
 
-### 9d. Honest limits
+### 9d. The nonlinear case — where the framework predicted a win, and didn't get one
+
+§8a argued that fuzzy structure can only earn its keep through nonlinearity,
+since Theorem C1 makes it vacuous on LTI plants. Adding a hardening cubic spring
+($k_{nl}=2$) voids the exact-representation argument and should therefore be
+where the method shines. It is not.
+
+| controller | settle | peak $|u|$ | energy | score |
+|---|---|---|---|---|
+| best linear LQR | 14.563 | 1.0000 | 1.1887 | 1.0000 |
+| open-loop reference | 9.167 | 0.7998 | 0.4225 | 0.5949 |
+| fuzzy $N=1$ | 49.600 | 0.5386 | 0.1935 | ∞ (doesn't settle) |
+| fuzzy $N=2$ | 33.960 | 0.8140 | 0.3090 | 1.1353 |
+| fuzzy $N=4$ | 31.216 | 0.8976 | 0.4747 | ∞ |
+| fuzzy $N=8$, $N=16$ | — | — | — | ∞ |
+
+**No rule count beats the linear LQR**, and everything past $N=4$ fails outright.
+Meanwhile the open-loop reference scores 0.595, so roughly 40% of the objective
+is genuinely available — the room exists and the method cannot reach it.
+
+This is a negative result for the hypothesis, and it should be read as one. The
+nonlinearity that removes the C1 degeneracy also amplifies the §9c failure mode:
+a hardening spring makes off-trajectory states produce disproportionately large
+restoring forces, so extrapolation error is punished far harder than in the
+linear case. The binding constraint is the same one — training data confined to
+optimal trajectories — but nonlinearity raises the price of leaving them.
+
+So the honest summary is narrower than §8a's framing suggested: nonlinearity is a
+*necessary* condition for fuzzy structure to matter, not a sufficient one. On
+this benchmark, going nonlinear made the problem harder for the method faster
+than it created advantage for it.
+
+### 9e. Honest limits
 
 - Six initial conditions, all modest. A wider $z_0$ set would stress
   extrapolation harder and probably lower the rule count at which shift bites.
+- §9d is a single nonlinear plant at one stiffness. It refutes "nonlinearity is
+  sufficient" but does not establish that fuzzy structure never helps on
+  nonlinear plants — a milder $k_{nl}$, or a nonlinearity the affine consequents
+  are better matched to, could go the other way.
 - The open-loop reference is a local optimum of a **smooth surrogate** of the
   objective, not a certified optimum. The fuzzy controller beats it on the true
   score (0.863 vs 0.818 is against it, but $N{=}3$ beats it on energy and the
@@ -1060,4 +1096,4 @@ reader changing one should know what it was protecting against.
 | LQR sweep + open-loop reference | 9b | twocart R |
 | convergence in 2 rules | 9b | twocart S |
 | distribution-shift breakdown | 9c | twocart S |
-| nonlinear spring | 9d | twocart T |
+| nonlinear case fails | 9d | twocart T |

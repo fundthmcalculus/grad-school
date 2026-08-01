@@ -1,4 +1,4 @@
-# Recorded output of demo_regression.py, demo_classifier.py, demo_control.py
+# Recorded output of the least-action demos
 # Deterministic (seeded); regenerate with the commands in README.md section 7
 
 ===== demo_regression.py =====
@@ -347,3 +347,77 @@ P. What the H1 slope term costs in a control setting
   closed-loop linearization and hence local pole placement, and pays for it
   in certified cost.  For pure cost-optimality use lambda = 0; raise it only
   when the gain profile itself matters.
+
+===== demo_twocart.py =====
+
+Q. Plant, and the degeneracy the objectives have to break
+---------------------------------------------------------
+  m1=m2=1, k=1, |u| <= 1.0.  Force on cart 1, cart 2 is the
+  one that must be stilled -- non-collocated, flexible mode.
+  open-loop poles: [-9.7293e-17+0.j     -2.5750e-17-1.4142j -2.5750e-17+1.4142j
+  1.6769e-16+0.j    ]
+  (undamped oscillatory pair on the imaginary axis: nothing decays
+   on its own, so every metric below is entirely the controller's doing)
+
+  LQR gain K = [ 3.5769 -0.2603  2.8555  3.2267]
+  Theorem C1 (README 8a): on this LINEAR plant with a quadratic cost, any
+  partition-of-unity TSK with affine consequents reproduces -Kx exactly and
+  the membership functions cancel.  A fuzzy controller cannot beat LQR at
+  LQR's own objective.  What follows is only a fair contest because
+  settling time and peak force are NOT quadratic, and |u| <= u_max makes
+  the true optimum non-smooth.
+
+R. Baselines: LQR sweep, and the open-loop training reference
+-------------------------------------------------------------
+            controller    settle  peak |u|    energy  all settled
+             LQR R=0.1     8.617    1.0000    2.8912         True
+             LQR R=0.3     8.687    1.0000    1.9455         True
+             LQR R=1.0    10.347    1.0000    1.3117         True
+             LQR R=3.0    13.100    1.0000    0.8845         True
+            LQR R=10.0    19.797    1.0000    0.5375         True
+
+  Open-loop trajectory optimization (full knowledge of z0):
+   open-loop reference    10.972    0.8615    0.5585          yes
+  training set: 186 occupation-weighted (state, u*) samples
+
+  IMPORTANT: this open-loop reference is a local optimum of a SMOOTH
+  SURROGATE of the objective, not a certified optimum of the objective
+  itself.  Section S beats it, which is proof that it is not a lower
+  bound -- so it is used only as the training target, and all scores
+  below are normalized against the best LQR instead, which is a
+  reference that can actually be computed exactly.
+
+S. Fuzzy least-action convergence vs rule count -- NO refinement
+----------------------------------------------------------------
+  Recipe, applied once with no tuning: weighted k-means on the optimal
+  trajectories -> variable-project the consequents (one linear solve,
+  globally optimal for those rule positions) -> simulate.  Nothing else.
+
+ rules  params    settle  peak |u|    energy    score   shift  settled
+   LQR       4    19.797    1.0000    0.5375   1.0000      --     True
+   ref    open    10.972    0.8615    0.5585   0.8183      --      yes
+     1       5    26.773    0.9575    0.4214   1.0313    3.05     True
+     2      10    17.830    0.9088    0.4248   0.8666    3.07     True
+     3      15    17.217    0.9023    0.4390   0.8629    3.05     True
+     4      20    18.470    0.9088    0.4465   0.8908    3.07     True
+     6      30    18.257    0.8560    0.4798   0.8903    3.07     True
+     8      40    19.040    0.5531    0.6121      inf    3.07    False
+    12      60    14.313    1.0000    1.2041   1.3211    4.67     True
+    16      80    34.990    1.0000    7.8944      inf    6.73    False
+  score < 1 beats the best LQR on the equal-weight three-objective score.
+  'shift' is the max distance from a closed-loop state to the nearest
+  training sample, in units of the training set's own per-axis spread.
+
+T. Nonlinear spring, where Theorem C1 no longer applies
+-------------------------------------------------------
+  Same plant plus a hardening cubic spring (k_nl = 2).  The LQR gain is now
+  only valid to first order, and the exact-representation argument is void.
+            controller    settle  peak |u|    energy    score
+       best linear LQR    14.563    1.0000    1.1887   1.0000
+   open-loop reference     9.167    0.7998    0.4225   0.5949
+             fuzzy N=1    49.600    0.5386    0.1935      inf
+             fuzzy N=2    33.960    0.8140    0.3090   1.1353
+             fuzzy N=4    31.216    0.8976    0.4747      inf
+             fuzzy N=8        --        --        --      inf
+            fuzzy N=16        --        --        --      inf
+
