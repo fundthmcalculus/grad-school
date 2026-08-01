@@ -1,5 +1,5 @@
 # Recorded output of the least-action demos
-# Deterministic (seeded); regenerate with the commands in README.md section 10
+# Deterministic (seeded); regenerate with the commands in README.md section 11
 
 ===== demo_regression.py =====
 
@@ -560,4 +560,19 @@ Held-out initial conditions, including two larger than any in training.
   LQR is the control: it never saw either split, so its train/test
   difference is pure split-to-split variation and calibrates how much
   degradation is meaningful.
+
+===== Theorem C2' : Bregman form of the exact certificate =====
+c(u)=cosh(u)-1   q>=0 on domain: True
+        controller             J          V*            gap     INT D_c dt    residual
+        optimal u*      2.250000    2.250000   1.123412e-11   0.000000e+00   1.123e-11
+            0.5 u*      2.559922    2.250000   3.099216e-01   3.099216e-01   3.190e-12
+            1.7 u*      2.767176    2.250000   5.171762e-01   5.171762e-01   4.048e-11
+             -0.4x      3.003614    2.250000   7.536144e-01   7.536144e-01   2.795e-11
+
+c(u)=u^2+u^4   q>=0 on domain: True
+        controller             J          V*            gap     INT D_c dt    residual
+        optimal u*      2.250000    2.250000  -1.010703e-11   0.000000e+00   1.011e-11
+            0.5 u*      2.435713    2.250000   1.857133e-01   1.857133e-01   1.065e-11
+            1.7 u*      2.640672    2.250000   3.906717e-01   3.906717e-01   8.465e-12
+             -0.4x      2.339553    2.250000   8.955264e-02   8.955264e-02   1.442e-11
 
