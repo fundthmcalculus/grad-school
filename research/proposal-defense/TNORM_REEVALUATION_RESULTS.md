@@ -124,10 +124,11 @@ an sklearn-bundled arm (`wine`, 178×13×3) as a second dataset. The third works
 offline today and is worth having regardless, since `ACTION_ITEMS.md` already
 flags Glass's 214 samples as "a stress test, not a demonstration".
 
-**The norm/conorm comparison table** (plan §4) is also still blocked, for a
-different reason: norm and conorm remain a single coupled knob, and the MoG
-regressor and HME gate do not expose it at all. That needs the library change in
-plan item 5 before the table in item 6 can be built.
+**The norm/conorm comparison table** (plan §4) was also blocked when this was
+written — norm and conorm were a single coupled knob and the MoG regressor could
+not express one at all. `tribble-fis#32` has since landed and the table is built;
+see the addendum below. (The HME *gate* turned out not to need exposing: it is
+fixed by the model's semantics, not by omission.)
 
 ---
 
@@ -145,3 +146,104 @@ plan item 5 before the table in item 6 can be built.
   column only, which silently collapsed the six-row reconciliation table to three
   and dropped 100+ cells from the g5 comparison. Both are fixed; the archived
   provenance files are corrected in place with a note.
+
+---
+
+# Addendum — the norm/conorm sweep (De Morgan diagonal)
+
+_Run 2026-08-01 at `tribble-fis` ba87f5a, five seeds. Table and provenance in
+`reproduce/outputs/norm-matrix-ba87f5a/`; generator
+`reproduce/tables/table_norm_conorm_matrix.py`._
+
+The five De Morgan pairs, across both datasets and all three model families.
+Nine rows, no skipped cells.
+
+| Dataset | Model | Metric | min/max | probability | luk | hamacher | einstein | spread¹ |
+|---|---|---|---|---|---|---|---|---:|
+| Concrete | flat MoG-TSK | R² | 0.644 ± .015 | **0.651** ± .042 | **−3.575** ± .389 | 0.644 ± .017 | 0.634 ± .050 | 0.017 |
+| Concrete | flat MoG-TSK | RMSE | 9.84 ± .35 | **9.71** ± .35 | **35.25** ± 1.22 | 9.85 ± .24 | 9.94 ± .46 | 0.23 |
+| Concrete | fuzzy tree² | R² | 0.719 ± .043 | 0.720 ± .041 | 0.720 ± .043 | 0.719 ± .042 | 0.720 ± .041 | 0.002 |
+| Concrete | fuzzy tree² | RMSE | 8.72 ± .57 | 8.71 ± .55 | 8.69 ± .57 | 8.72 ± .56 | 8.70 ± .56 | 0.03 |
+| Concrete | HME experts³ | R² | 0.754 ± .041 | **0.784** ± .041 | **−3.632** ± .571 | 0.763 ± .044 | 0.767 ± .046 | 0.030 |
+| Concrete | HME experts³ | RMSE | 8.16 ± .83 | **7.65** ± .80 | **35.42** ± 1.64 | 8.01 ± .86 | 7.94 ± .95 | 0.51 |
+| PhiUSIIL | flat MoG | accuracy | 0.997 ± .001 | 0.997 ± .001 | 0.996 ± .002 | 0.997 ± .001 | 0.997 ± .001 | 0.001 |
+| PhiUSIIL | fuzzy tree² | accuracy | 0.967 ± .001 | 0.967 ± .001 | 0.967 ± .001 | 0.967 ± .001 | 0.967 ± .001 | 0.000 |
+| PhiUSIIL | HME experts³ | accuracy | 0.997 ± .001 | **0.999** ± .001 | **0.930** ± .020 | 0.997 ± .001 | **0.999** ± .001 | 0.069 |
+
+¹ Spread between best and worst mean, **excluding Łukasiewicz**, which would
+otherwise swamp every row. ² t-norm only — a tree path is a pure AND, so there is
+no OR for a conorm to act on. ³ The experts' operators. The HME *gate* is a
+product of partition-of-unity weights by construction and is not a free axis.
+
+## 1. Łukasiewicz is unusable for MoG regression, and predictably so
+
+R² of **−3.6** on Concrete for both the flat model and the HME experts — far
+worse than predicting the mean, and an RMSE of 35 MPa against a ~9 MPa baseline.
+This is not a bug; it is the nilpotency of `T(x,y) = max(0, x+y−1)`. Concrete has
+eight features, and ANDing eight memberships under Łukasiewicz drives the firing
+to *exactly* zero for almost every sample. The rules stop firing, the
+normalisation falls back to its zero-firing convention, and the model degenerates.
+
+Classification tolerates it far better (0.996 on PhiUSIIL flat) because argmax
+over a mostly-zero firing vector still lands on the right class often enough,
+while a regression consequent has nothing to interpolate from. The HME experts
+row is the exception that shows the mechanism: 0.930 vs 0.997, the one
+classification row where enough samples lose all firing to matter.
+
+**Practical upshot:** Łukasiewicz should not be offered as a regression option
+without a warning, and it is the one family where the wide-antecedent TSK
+construction genuinely breaks.
+
+## 2. Excluding Łukasiewicz, the axis barely matters
+
+This is the honest headline and it argues *against* the 25-cell version:
+
+- **flat MoG on Concrete**: 0.634 → 0.651, a spread of 0.017 against a
+  seed-to-seed standard deviation of 0.015–0.050. Inside the noise.
+- **fuzzy tree**: 0.002 on Concrete, **0.000** on PhiUSIIL.
+- **PhiUSIIL flat MoG**: 0.001.
+
+The fuzzy tree result is not dead plumbing — I checked, because `build_tree`
+already has one parameter it ignores (`tribble-fis#31`). Individual predictions
+move by up to **3.04 MPa** between families; the aggregate R² simply does not
+care. The tree is genuinely robust to this choice.
+
+## 3. Where it does matter: HME experts, and the default is never best
+
+The largest non-Łukasiewicz effect is **HME experts on Concrete: probability
+0.784 vs min/max 0.754, +0.030 R²** (RMSE 7.65 vs 8.16). That is ~0.7 σ — real
+but not decisive on five seeds. PhiUSIIL agrees in direction: probability and
+einstein both 0.999 against min/max's 0.997.
+
+**`min/max` — the library default — does not win a single Concrete row.**
+`probability` wins all four. The margins are small, but they are consistent
+across two model families and two datasets, which is more than a coin flip.
+A default change to `probability` for the TSK regression path is worth
+considering; it is also the family the Ruspini models and fuzzy trees already
+default to, so it would make the library self-consistent.
+
+## 4. Einstein behaves
+
+Mid-pack throughout, closely tracking probability and hamacher, never
+catastrophic, and — unlike hamacher — with no singularity to guard. It ties for
+best on PhiUSIIL HME. A safe addition rather than a dramatic one.
+
+## Correction to an earlier claim
+
+PR #32's description reports a synthetic sweep where the operator moved R² from
+0.748 (min/max) to 0.888 (probability), implying the pinned default was costing
+~0.14 R². **On real Concrete that gap is 0.007**, and 0.030 for the HME experts.
+The synthetic figure was real but is not representative; the practical effect of
+the regressor plumbing fix is much smaller than that number suggests. What the
+fix genuinely buys is the *ability to ask the question* — and the answer, on this
+evidence, is "not much, except avoid Łukasiewicz."
+
+## What this implies for the 25-cell version
+
+Given that four of nine rows are flat to within 0.002 and the rest are dominated
+by a single pathological family, the 20 mixed pairs are unlikely to pay for
+themselves on *these* datasets and metrics. The place a mixed pair should visibly
+bite is the anomaly rule, whose complement construction assumes duality — and
+that panel is still blocked on Glass. Recommend running the mixed pairs only
+against the open-set harness once a dataset is available, rather than across this
+matrix.
