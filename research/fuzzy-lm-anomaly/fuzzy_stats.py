@@ -48,8 +48,8 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from tribblefis.gauss_math import (calculate_gaussian_correlation,
-                                   create_gaussian_membership_dict,
                                    take_top_features)
+import fis_config as CFG
 from analyze import DATA, SCALAR_COLS, fpr_at_tpr
 from norm_sweep import anomaly_score, membership_tensors
 from seed_sweep import Timer
@@ -96,11 +96,12 @@ def fit_fis(F, fit, top_n, k, seed):
     y_modes = pd.Series([f"mode{c}" for c in labels])
     with contextlib.redirect_stdout(io.StringIO()):
         diff = calculate_gaussian_correlation(
-            F.iloc[fit].reset_index(drop=True), y_modes)
+            F.iloc[fit].reset_index(drop=True), y_modes, method=CFG.METRIC)
         _, feats = take_top_features(diff, top_n=top_n)
-        model = create_gaussian_membership_dict(
-            F.iloc[fit][feats].reset_index(drop=True), y_modes,
-            top_n_var_names=feats)
+        # explicit membership family, verified -- see fis_config for why
+        model = CFG.build_memberships(
+            F.iloc[fit][feats].reset_index(drop=True), y_modes, feats,
+            membership=CFG.MEMBERSHIP)
     return feats, model
 
 

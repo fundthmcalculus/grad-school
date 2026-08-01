@@ -45,9 +45,8 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from tribblefis.gauss_data import AnomalyParameters
 from tribblefis.gauss_math import (calculate_gaussian_correlation,
-                                   create_gaussian_membership_dict,
                                    take_top_features, tsk_firing_strengths)
-from tribblefis.trapz_math import create_trapz_membership_dict
+import fis_config as CFG
 
 from analyze import DATA, SCALAR_COLS, fpr_at_tpr
 from seed_sweep import Timer
@@ -57,8 +56,9 @@ warnings.filterwarnings("ignore")
 
 SEEDS, TOP_N, K = 8, 6, 4
 METRICS = ["bhattacharyya", "wasserstein"]
-MFS = {"gaussian": create_gaussian_membership_dict,
-       "trapezoid": create_trapz_membership_dict}
+# Built via fis_config.build_memberships, which verifies the family actually
+# produced -- section 22 measured this factor at +/-0.262 AUROC.
+MFS = {"gaussian": "gaussian", "trapezoid": "trap"}
 DE_MORGAN = ["min/max", "probability", "luk", "hamacher", "einstein"]
 MIXED = [("hamacher", "einstein"), ("probability", "einstein"),
          ("min/max", "hamacher")]
@@ -87,16 +87,16 @@ def build_model(F, fit, metric, mf_name, seed):
         diff = calculate_gaussian_correlation(
             F.iloc[fit].reset_index(drop=True), y_modes, method=metric)
         _, feats = take_top_features(diff, top_n=TOP_N)
-        model = MFS[mf_name](F.iloc[fit][feats].reset_index(drop=True), y_modes,
-                             top_n_var_names=feats)
+        model = CFG.build_memberships(
+            F.iloc[fit][feats].reset_index(drop=True), y_modes, feats,
+            membership=MFS[mf_name])
     return feats, model
 
 
 def score(F, feats, model, ix, tn, sn):
     """Anomaly column via the library, with the norm pair resolved explicitly."""
-    ap = AnomalyParameters(include_anomaly=True, threshold=THETA, label="anomaly",
-                           t_norm=tn, t_conorm=sn,
-                           allow_mixed_norms=(tn != sn))
+    ap = (CFG.anomaly_params(theta=THETA, norm=tn) if tn == sn
+          else CFG.anomaly_params(theta=THETA, t_norm=tn, t_conorm=sn))
     fs, lab = tsk_firing_strengths(F.iloc[ix][feats].reset_index(drop=True),
                                    model, ap)
     return np.asarray(fs[:, lab.index("anomaly")], float)

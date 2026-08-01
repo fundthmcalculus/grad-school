@@ -1281,3 +1281,78 @@ the **lowest variance** of the leaders (+/-0.022), a materially better **FPR@95
 and a De Morgan-consistent pair, so the anomaly rule keeps its interpretation as a
 genuine complement. Ranking on AUROC alone would have picked min/max and shipped a
 detector that flags 93% of clean output at 95% recall.
+
+---
+
+## 23. The configuration is now declared and enforced
+
+Section 22 showed the membership family is worth **+/-0.262 AUROC** -- an order of
+magnitude more than any other knob -- and that two committed numbers had already
+moved when a library default changed. Leaving the family implicit was therefore
+the largest unguarded risk in the pipeline. `fis_config.py` fixes that.
+
+### Why a keyword was not enough
+
+`AnomalyParameters.member_function` does **not** decide the membership family.
+It is read only by `simple_gaussian_predict` (`gauss_math.py:504`);
+`tsk_firing_strengths` calls `mf.evaluate(...)` on whatever objects the model
+happens to hold. The family is determined entirely by **which builder was
+called** -- `create_gaussian_membership_dict` vs `create_trapz_membership_dict`.
+Setting `member_function="gaussian"` while calling the trapezoid builder would
+produce trapezoid behaviour and report itself as Gaussian.
+
+So `fis_config.build_memberships()` chooses the builder explicitly *and asserts
+the objects it produced are the family requested*:
+
+    membership family mismatch: asked for 'gaussian' (GaussianMembership) but
+    feature 'a' / label 'm0' produced TrapezoidMembership. Section 22: the
+    membership family is worth +/-0.262 AUROC, so this is never a cosmetic
+    difference.
+
+Verified by negative test: monkeypatching the `"gaussian"` slot to the trapezoid
+builder -- simulating a library change or a miswiring -- raises immediately
+instead of silently shifting the headline by a quarter of an AUROC point.
+`anomaly_params()` likewise states every field rather than inheriting any default.
+
+### The declared configuration
+
+| setting | value | evidence |
+|---|---|---|
+| membership | **gaussian** | +0.262 over trapezoid, 8/8 seeds, p = 0.0078 (section 22) |
+| metric | **wasserstein** | mean within noise of Bhattacharyya, but 2.7x lower variance |
+| norm pair | **hamacher / hamacher** | best variance and FPR@95 of the leaders; De Morgan dual |
+| theta | 0.5 | rank-invariant; sets the operating point only (section 3.4) |
+
+`fuzzy_stats.py` and `compare_variants.py` now build through it. Historical
+scripts are left as they were, so previously committed numbers stay reproducible.
+
+### Final numbers under the declared configuration
+
+8 seeds, validation-selected configuration reported on a disjoint test half:
+
+| condition | detector | AUROC | FPR@95 | params |
+|---|---|---|---|---|
+| **length+template** | **FIS - stats** | **0.877 +/- 0.022** | **0.551** | **95** |
+| | mean entropy | 0.841 +/- 0.014 | 0.593 | 0 |
+| | Mahalanobis - stats | 0.841 +/- 0.024 | 0.588 | 209 |
+| **+ entropy** | **FIS - stats** | **0.789 +/- 0.027** | 0.961 | 95 |
+| | Mahalanobis - stats | 0.760 +/- 0.032 | 0.780 | 209 |
+| | mean entropy | 0.601 +/- 0.016 | 0.751 | 0 |
+
+    paired FIS vs Mahalanobis (identical 19 statistics):
+      length+template  +0.036 +/- 0.020, wins 8/8, p = 0.0078
+      + entropy        +0.029 +/- 0.042, wins 6/8, p = 0.0781  (not significant)
+
+Switching the metric to Wasserstein **restored the 8/8 result** on the primary
+condition that the Bhattacharyya default had reduced to 7/8 (p = 0.0156), and it
+improved the hardest condition from p = 0.148 to p = 0.078. The recommendation
+section 22 derived from variance rather than mean therefore paid off, which is a
+small point in favour of reporting variance alongside means.
+
+**The claim that stands:** on a template-matched, length-matched task, a fuzzy
+rule of **4 rules over 6 antecedents (95 parameters)** beats full-covariance
+Mahalanobis on identical features by **+0.036 on 8/8 seeds (p = 0.0078)** with
+**2.2x fewer parameters** and a better FPR@95 (0.551 vs 0.588), and beats a mean
+entropy threshold by the same margin. Under additional entropy matching it remains
+ahead but not significantly (p = 0.078), and its FPR@95 degrades badly to 0.961 --
+so the high-recall operating point is a genuine weakness, not a rounding detail.
