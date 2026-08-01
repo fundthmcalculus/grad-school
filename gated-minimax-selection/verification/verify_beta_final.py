@@ -13,9 +13,10 @@ On non-metric/non-Euclidean data: beta > 0 (activates to restore admissibility)
 import numpy as np
 import pandas as pd
 import sys
+from pathlib import Path
 
-project_dir = "/home/scott/PycharmProjects/grad-school/gated-minimax-selection"
-sys.path.insert(0, project_dir)
+project_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(project_dir))
 
 from nerfcm import nerfcm
 import ivat_mf as im
