@@ -9,7 +9,9 @@
 # finish, so "broken" is never confused with "unchanged".
 set -uo pipefail
 
-LABEL="${1:?usage: run_all_tables.sh <label>}"
+LABEL="${1:?usage: run_all_tables.sh <label> [table_name ...]}"
+shift
+ONLY=("$@")          # optional: run just these tables, e.g. to backfill one
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/reproduce/outputs"
 DEST="$OUT/$LABEL"
@@ -42,15 +44,26 @@ count_tables() {
     -newermt "@$1" 2>/dev/null | wc -l
 }
 
+wanted() {
+  [ ${#ONLY[@]} -eq 0 ] && return 0
+  local t
+  for t in "${ONLY[@]}"; do [ "$t" = "$1" ] && return 0; done
+  return 1
+}
+
 run_one() {
   local project="$1" name="$2"
+  wanted "$name" || return 0
   local log="$DEST/logs/$name.log"
   printf '  %-38s ' "$name"
   local t0 t1 rc
   t0=$(date +%s)
   # A same-second write would not register as "newer than t0"; step back one.
-  uv run --project "$ROOT/$project" python "$ROOT/reproduce/tables/$name.py" \
-      >"$log" 2>&1
+  # EXTRA_DEPS covers packages a table needs that the submodule does not declare
+  # as a base dependency (tribble-cluster keeps scipy under its `dev` extra, so
+  # `uv run --project` alone leaves table_3_1_pvat_scaling unable to import it).
+  uv run --project "$ROOT/$project" ${EXTRA_DEPS:-} python \
+      "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
   rc=$?
   t1=$(date +%s)
   if [ $rc -ne 0 ]; then
@@ -67,16 +80,25 @@ echo "=== $LABEL ==="
 echo "tribble-fis:"
 for t in "${FIS_TABLES[@]}"; do run_one tribble-fis "$t"; done
 echo "tribble-cluster:"
+EXTRA_DEPS="--with scipy"
 for t in "${CLUSTER_TABLES[@]}"; do run_one tribble-cluster "$t"; done
+EXTRA_DEPS=""
 
 # Archive the tables themselves next to the logs.
 find "$OUT" -maxdepth 1 -type f \( -name '*.md' -o -name '*.csv' \) \
   -exec cp {} "$DEST/" \;
 
-# Record exactly what produced these numbers.
+# Record exactly what produced these numbers. A filtered run appends rather than
+# overwrites: backfilling one table must not erase the provenance of the rest.
+PROV="$DEST/PROVENANCE.txt"
 {
-  echo "label:       $LABEL"
-  echo "generated:   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  if [ ${#ONLY[@]} -gt 0 ]; then
+    echo
+    echo "--- backfill $(date -u +%Y-%m-%dT%H:%M:%SZ): ${ONLY[*]} ---"
+  else
+    echo "label:       $LABEL"
+    echo "generated:   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  fi
   echo "tribble-fis: $(git -C "$ROOT/tribble-fis" rev-parse HEAD)"
   echo "tribble-cluster: $(git -C "$ROOT/tribble-cluster" rev-parse HEAD)"
   echo "grad-school: $(git -C "$ROOT" rev-parse HEAD)"
@@ -84,9 +106,10 @@ find "$OUT" -maxdepth 1 -type f \( -name '*.md' -o -name '*.csv' \) \
   echo
   echo "status:"
   for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}"; do
-    printf '  %-38s %s\n' "$t" "${STATUS[$t]}"
+    # Unset means the filter skipped it; say so rather than claiming a result.
+    printf '  %-38s %s\n' "$t" "${STATUS[$t]:-not-run-this-pass}"
   done
-} > "$DEST/PROVENANCE.txt"
+} >> "$PROV"
 
 echo
 cat "$DEST/PROVENANCE.txt"

@@ -1,4 +1,5 @@
-Traceback (most recent call last):
-  File "/home/user/grad-school/reproduce/tables/table_3_1_pvat_scaling.py", line 19, in <module>
-    from scipy.spatial.distance import cdist
-ModuleNotFoundError: No module named 'scipy'
+Installed 2 packages in 25ms
+Table 3.1 -- pVAT vs. classical VAT reorder time
+  using pVAT: tribbleclustering.compute_vat
+  wrote /home/user/grad-school/reproduce/outputs/table_3_1.md
+  wrote /home/user/grad-school/reproduce/outputs/table_3_1.csv
