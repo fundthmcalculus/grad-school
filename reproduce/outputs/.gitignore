@@ -1,3 +1,13 @@
+# Loose files at the top level are scratch -- whatever the last ad-hoc run left.
 *
 !.gitkeep
 !.gitignore
+
+# ...except the cross-run comparison, which is a deliverable, not scratch.
+!FIX_IMPACT.md
+
+# Labelled run archives (reproduce/run_all_tables.sh <label>) ARE tracked: they
+# are the evidence behind the write-ups, and they have to survive the machine
+# that produced them for a diff between two runs to mean anything later.
+!*/
+!*/**
