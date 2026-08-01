@@ -3,15 +3,15 @@
 **Status:** not started. This is a plan of record, not a draft.
 **Source of results:** `research/fuzzy-lm-anomaly/` (see `FINDINGS.md`; all numbers
 below are already produced and committed, with seeds and controls).
-**Provisional title:** *Length, Style, and Confidence: Three Confounds That
-Manufacture Hallucination Detectors*
+**Provisional title:** *Length, Style, Confidence, and Search Budget: Four
+Confounds That Manufacture Hallucination Detectors*
 
 ---
 
 ## 1. Why this is a paper
 
 While testing whether a fuzzy inference system could flag hallucination from a
-frozen 360M language model, **three separate apparent successes were each
+frozen 360M language model, **four separate apparent successes were each
 destroyed by a control** — and each confound, on its own, produced a result that
 would have looked publishable.
 
@@ -20,11 +20,22 @@ would have looked publishable.
 | **answer length** | `n_tokens` alone: **AUROC 0.843** | exact matching on token count |
 | **prompt family / style** | ~0.9 for a detector reading style, not fabrication | real-entity twins in identical surface forms |
 | **confidence** | mean entropy: **0.964** on a templated set | matching on entropy quartile |
+| **unequal search budget** | flips a detector comparison's sign (+0.014 → −0.019) | equal search for all, or fixed configs |
+
+The fourth was found last, in our own protocol: giving one detector a
+120-candidate supervised configuration search on labelled validation data while
+its rivals get none produces a stable, seed-consistent, mechanistically plausible
+advantage that vanishes at fixed configurations (§26). It has the same signature
+as the other three, and it is invisible unless comparisons are stated in terms of
+search budget as well as features and data.
 
 The paper's claim is methodological and negative-leaning, which is exactly why it
 is useful: **a hallucination detector evaluated without these three controls
-cannot be distinguished from a length, style, or confidence detector.** Matching is
-a cheap, general remedy that requires no change to the detector under test.
+cannot be distinguished from a length, style, or confidence detector — and a
+comparison run without an equal search budget cannot be distinguished from a
+tuning artefact.** Matching is a cheap, general remedy for the first three and
+requires no change to the detector under test; the fourth needs only that the
+search budget be stated and equalised.
 
 This is worth writing because the literature reports hidden-state hallucination
 probes with strong AUROC on datasets where truthful and hallucinated examples
@@ -53,10 +64,16 @@ Every number below is in `research/fuzzy-lm-anomaly/FINDINGS.md` with seeds.
   diagonal-vs-off-diagonal gap and several **below-chance** off-diagonal cells.
   Evidence that "hallucination" is not one phenomenon.
 * **§20** — the third dissolution, with stacked controls quantifying each step.
-* **§21** — the positive result: with the confounds controlled, a 4-rule fuzzy
-  system over 19 output statistics reaches **0.881 ± 0.015**, beating
-  full-covariance Mahalanobis on identical features by **+0.040, 8/8 seeds,
-  p = 0.0078**, with 2.6× fewer parameters.
+* **§21 (RETRACTED by §26)** — appeared to show a 4-rule fuzzy system beating
+  full-covariance Mahalanobis by +0.040, 8/8 seeds. The fuzzy rule had received a
+  120-candidate supervised configuration search on labelled validation positives
+  and the rivals none; at fixed configurations the sign flips to −0.019 (1/8
+  seeds). **This is the fourth confound, and the most useful single anecdote in
+  the paper** — it was found in our own protocol, after three others had already
+  taught us to look.
+* **§26** — the search-budget measurement: selected +0.014 vs fixed −0.019 on
+  identical splits, plus a fit-size sweep showing the fixed-configuration gap is
+  negative in 23 of 24 cells across four models.
 
 ### Reusable artefacts the paper can offer
 
@@ -107,8 +124,9 @@ Ordered; (1) and (2) are blocking.
    detector-agnostic, and no retraining.
 4. Case study: three apparent successes, each dissolved, with the decomposition
    isolating cause.
-5. What survives: the late-layer signal (§18) and the fuzzy-over-statistics
-   result (§21) — so the controls are demonstrably not vacuous.
+5. What survives: the late-layer signal (§18), which passes length, template,
+   entropy matching *and* a 200-permutation multiplicity null — so the controls
+   are demonstrably not vacuous.
 6. Hallucination is not one target: the transfer matrix.
 7. Recommendations: a checklist and a reporting convention.
 
@@ -116,11 +134,13 @@ Ordered; (1) and (2) are blocking.
 
 Methods/evaluation venues fit better than a fuzzy-systems venue — the contribution
 is about benchmark validity, and the fuzzy system is the vehicle, not the subject.
-Workshop tracks on evaluation or reproducibility are a natural first target. The
-**fuzzy contribution belongs in the dissertation instead** (§21: fewer parameters,
-readable rule base, competitive accuracy on the representation that survives the
-controls); that is a separate, positive write-up and should not be diluted into
-this one.
+Workshop tracks on evaluation or reproducibility are a natural first target.
+
+Note that §26 removes the companion paper's positive result, so this is currently
+the **only** viable write-up from the study. That is not a weakness: four
+confounds, each measured, each with a cheap remedy, and one of them caught in the
+authors' own protocol after the other three had already trained them to look, is a
+stronger and more honest paper than a marginal detector win would have been.
 
 ## 6. Honesty constraints to carry into the draft
 

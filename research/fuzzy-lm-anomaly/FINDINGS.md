@@ -6,7 +6,17 @@ flag hallucinated output from a small language model it was never trained on?
 **Status:** single model, single seed, no error bars. Read the caveats before
 quoting any number.
 
-> ## RETRACTION — read §11 and §12 before anything else
+> ## RETRACTION 2 — the fuzzy positive result does not stand (§26)
+>
+> §§21/23/24 claimed a 4-rule fuzzy system beats full-covariance Mahalanobis on
+> identical features. **It does not.** That comparison gave the fuzzy rule a
+> 120-candidate supervised configuration search on labelled validation positives
+> and gave its rivals none. With a fixed configuration the sign flips
+> (−0.019, 1/8 seeds) and the fuzzy rule is beaten by both Mahalanobis and a
+> zero-parameter entropy threshold. The confound/controls work (§§8, 11, 12, 20)
+> is unaffected and remains the durable contribution.
+>
+> ## RETRACTION 1 — read §11 and §12 before anything else
 >
 > The §9 headline (**AUROC 0.906 ± 0.017**, beating every baseline 10/10 seeds)
 > **does not survive the template control** and is retracted. On a
@@ -1511,3 +1521,98 @@ the fit-split score distribution (a per-mode rank or p-value rather than a raw
 membership complement), so the tail is shaped by data rather than by the operator
 algebra. That is a different contribution from "tune the FIS", and it should be
 scoped as such rather than bolted on.
+
+---
+
+## 26. RETRACTION — the fuzzy advantage was configuration selection, not model class
+
+The §21/§23/§24 claim ("a 4-rule fuzzy system beats full-covariance Mahalanobis on
+identical features") **does not survive**, for a reason that is my own
+methodological error rather than a property of the data.
+
+### The flaw
+
+`fuzzy_stats.py` selects the FIS configuration — whitening × antecedent count ×
+mode count × norm pair, **120 candidates** — by scoring each against **labelled
+validation positives**, then reports the winner on a disjoint test half. That part
+is fine in isolation.
+
+What is not fine: **Mahalanobis, isolation forest, one-class SVM and entropy
+received no equivalent search.** They were fitted once, with no hyperparameter
+selection against labelled data at all. So the comparison awarded the fuzzy rule a
+120-way supervised search and its rivals nothing, and then attributed the
+difference to the model class.
+
+### The measurement
+
+Identical splits, identical data, the *only* difference being whether the
+configuration is searched or fixed at `fis_config`'s declared defaults
+(`--no-select`), v4 SmolLM2, 8 seeds:
+
+| configuration | FIS − Mahalanobis | wins | p |
+|---|---|---|---|
+| **selected** on validation positives | +0.014 ± 0.017 | 6/8 | 0.078 |
+| **fixed** (no search) | **−0.019 ± 0.033** | **1/8** | 0.109 |
+
+The search is worth ~0.033 and **flips the sign**.
+
+`sample_size.py` says the same thing independently. Sweeping the fit-set size on
+v4 with a fixed configuration, across all four models and 6 sizes (8 seeds each),
+FIS − Mahalanobis is **negative in 23 of 24 cells**, from −0.013 to −0.098:
+
+| n_fit | smollm2 | qwen | gemma | lfm |
+|---|---|---|---|---|
+| 200 | −0.016 | −0.052* | −0.013 | −0.093* |
+| 280 (≈ v3 size) | −0.016 | −0.064* | −0.013 | −0.098* |
+| 550 | −0.017 | −0.083* | −0.019 | −0.084* |
+| 760 | −0.021* | −0.066* | −0.026* | −0.088* |
+
+\* p < 0.05
+
+### Two hypotheses tested and rejected on the way
+
+**Not a small-sample effect.** The natural explanation for the v3 → v4 shrinkage
+was that Mahalanobis's 209 covariance parameters were under-determined at v3's ~280
+fit rows (n/p ≈ 1.3) and better estimated with more data. The size sweep refutes
+this as the *cause*: the fixed-configuration gap is already negative at n=120 and
+stays roughly flat, so the sign was never positive without the search. Mahalanobis
+does improve with data (0.700 → 0.709 absolute) while the FIS is flat (~0.658), so
+the effect is real but second-order — it is not what produced the v3 result.
+
+**Not the representation.** Absolute AUROCs under a fixed configuration, averaged
+over models and seeds: entropy **0.735**, Mahalanobis **0.700–0.709**, FIS
+**0.657–0.664**. The fuzzy rule is last.
+
+### What is retracted, and what stands
+
+**Retracted:** §21, §23, §24's positive claim, and the corresponding sections of
+`papers/fuzzy-anomaly-rule-slm.md`. There is no evidence here that the fuzzy rule
+beats full-covariance Mahalanobis, and with a fixed configuration it is beaten by
+both Mahalanobis and a zero-parameter entropy threshold.
+
+**Stands, and is unaffected:**
+
+* Everything in §§8, 11, 12, 20 — the three confounds (length 0.843, prompt family
+  ~0.9, entropy 0.964) and the matching controls. That work never depended on the
+  fuzzy detector winning, and it is the durable contribution.
+* §22's factorial: the membership family dominates (±0.262), the metric is worth
+  ≤0.015, mixed norm pairs +0.002. Those are *within-FIS* comparisons where every
+  arm had the same search budget, so the fairness flaw does not apply.
+* §25's negative results on the FPR@95 tail.
+* §19's transfer matrix.
+
+### What a fair comparison would require
+
+Either give every detector the same 120-way supervised search on the same
+validation positives (isolation forest and one-class SVM have obvious
+hyperparameters; Mahalanobis has shrinkage and feature subsets), **or** compare all
+of them at fixed, pre-declared configurations. The second is cheaper and is what
+`--no-select` now does. Any future claim in this repo should use one of those, and
+report which.
+
+The general lesson is worth carrying into
+`papers/hallucination-detection-confounds.md`: an unequal hyperparameter-search
+budget is a **fourth confound**, and it is the one I fell for. It has the same
+signature as the other three — a real-looking effect, stable across seeds, with a
+plausible mechanistic story attached — and it is invisible unless the comparison
+is stated in terms of search budget as well as features and data.

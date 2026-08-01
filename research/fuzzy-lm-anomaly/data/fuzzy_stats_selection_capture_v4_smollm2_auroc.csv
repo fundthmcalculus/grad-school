@@ -1,0 +1,9 @@
+seed,whiten,top_n,K,tnorm,sconorm,val_criterion,select_on
+0,False,6,4,hamacher,hamacher,,auroc
+1,False,6,4,hamacher,hamacher,,auroc
+2,False,6,4,hamacher,hamacher,,auroc
+3,False,6,4,hamacher,hamacher,,auroc
+4,False,6,4,hamacher,hamacher,,auroc
+5,False,6,4,hamacher,hamacher,,auroc
+6,False,6,4,hamacher,hamacher,,auroc
+7,False,6,4,hamacher,hamacher,,auroc

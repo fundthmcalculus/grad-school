@@ -50,6 +50,8 @@ if hasattr(sys.stdout, "reconfigure"):
 from tribblefis.gauss_math import (calculate_gaussian_correlation,
                                    take_top_features)
 import fis_config as CFG
+
+CFG_NORM = CFG.NORM
 from analyze import DATA, SCALAR_COLS, fpr_at_tpr
 from norm_sweep import anomaly_score, membership_tensors
 from seed_sweep import Timer
@@ -70,6 +72,12 @@ TASKS = {
     "capture_v3":      ("longform_real", "grounded", "longform_fake"),
     "capture_v3_qwen": ("longform_real", "grounded", "longform_fake"),
     "capture_v2":      ("template_real", "correct", "template_fake"),
+    # v4: the expanded probe set (1,272 real / 4,052 fake), four models,
+    # all captured in bfloat16 so precision is identical across architectures.
+    "capture_v4_smollm2": ("longform_real", "grounded", "longform_fake"),
+    "capture_v4_qwen":    ("longform_real", "grounded", "longform_fake"),
+    "capture_v4_gemma":   ("longform_real", "grounded", "longform_fake"),
+    "capture_v4_lfm":     ("longform_real", "grounded", "longform_fake"),
 }
 
 
@@ -127,6 +135,12 @@ def auroc(y, s):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, default=SEEDS)
+    ap.add_argument("--no-select", action="store_true",
+                    help="skip the validation configuration search and use "
+                         "fis_config's declared defaults. The search scores "
+                         "candidate configurations against LABELLED validation "
+                         "positives, which the rival detectors never receive -- "
+                         "so this flag is the like-for-like comparison.")
     ap.add_argument("--select-on", default="auroc", choices=["auroc", "fpr95"],
                     help="validation criterion. Selecting on AUROC optimises the "
                          "whole ranking and can pick a configuration with a poor "
@@ -161,7 +175,11 @@ def main():
         vy = np.concatenate([np.zeros(len(va)), np.ones(len(vb))])
 
         best, cache = (None, -1), {}
-        for whiten, F in ((False, Fraw), (True, Fwht)):
+        if args.no_select:
+            feats, model = fit_fis(Fraw, sp["fit"], 6, 4, seed)
+            cache[(False, 6, 4)] = (feats, model)
+            best = ((False, 6, 4, CFG_NORM, CFG_NORM), float("nan"))
+        for whiten, F in (() if args.no_select else ((False, Fraw), (True, Fwht))):
             for tn_ in TOP_NS:
                 for k in K_MODES:
                     feats, model = fit_fis(F, sp["fit"], tn_, k, seed)
@@ -242,7 +260,8 @@ def main():
               f"T={nt}/S={ns} (val {args.select_on} {val_au:+.3f})")
 
     df = pd.DataFrame(rows)
-    df.to_csv(DATA / f"fuzzy_stats_{args.prefix}_{args.select_on}.csv", index=False)
+    df.to_csv(DATA / (f"fuzzy_stats_{args.prefix}_"
+                f"{'fixed' if args.no_select else args.select_on}.csv"), index=False)
     pd.DataFrame(sel_log).to_csv(
         DATA / f"fuzzy_stats_selection_{args.prefix}_{args.select_on}.csv", index=False)
 

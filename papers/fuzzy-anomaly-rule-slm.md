@@ -1,6 +1,14 @@
 # Write-up plan — A parsimonious fuzzy anomaly rule for ungrounded LM generation
 
-**Status:** plan of record. Results exist and are committed; prose not written.
+**Status:** ⚠️ **ON HOLD — the central claim was retracted in FINDINGS §26.**
+The comparison that produced it gave the fuzzy rule a 120-candidate supervised
+configuration search on labelled validation positives while its rivals received
+none; with a fixed configuration the sign flips (−0.019, 1/8 seeds) and the fuzzy
+rule is beaten by both Mahalanobis and a zero-parameter entropy threshold. Do not
+draft from §1 below until a like-for-like comparison exists — either an equal
+search budget for every detector, or fixed pre-declared configurations for all
+(`fuzzy_stats.py --no-select`). The §22 factorial findings (membership family
+±0.262 etc.) are unaffected, since every arm there had the same budget.
 **Source:** `research/fuzzy-lm-anomaly/` — see `FINDINGS.md` §§20–23.
 **Companion:** `papers/hallucination-detection-confounds.md` (the methodological
 negative result). **Keep these separate** — one is an evaluation-methods paper

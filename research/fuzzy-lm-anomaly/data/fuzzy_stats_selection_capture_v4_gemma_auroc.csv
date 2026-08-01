@@ -1,0 +1,9 @@
+seed,whiten,top_n,K,tnorm,sconorm,val_criterion,select_on
+0,True,19,3,product,product,0.6379712944398259,auroc
+1,False,12,2,dombi2,einstein,0.6340071641645069,auroc
+2,True,19,4,product,product,0.6720988801408381,auroc
+3,True,6,3,product,product,0.6515355274096534,auroc
+4,True,19,4,product,product,0.6436974301921854,auroc
+5,True,12,4,product,product,0.6600888185241331,auroc
+6,True,6,2,product,product,0.6814086263386963,auroc
+7,True,19,3,product,product,0.659286517678126,auroc
