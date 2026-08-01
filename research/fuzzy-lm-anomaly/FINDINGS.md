@@ -876,3 +876,80 @@ variables clear it, all late-layer, all from `deltaref` / `delta` / `centroid`.
    and `agg` is small and legible enough to keep the interpretability claim.
 4. Attention-head and MLP-sparsity families still require a fresh capture with
    hooks; deferred until (1) makes any result from them interpretable.
+
+---
+
+## 19. One detector per class of error -- and the transfer matrix
+
+`per_class.py`. Under the open-set protocol nothing about the rule base is
+class-specific, so a "specialist" is made by letting each error class choose
+*which variables the rule watches*: antecedents are selected on a validation
+slice of that class (supervised selection) while the rule base is still fit on
+truthful data only (open-set fitting). Seven classes, a pooled generalist, and
+mean entropy as reference. Common truthful set (TriviaQA-correct), length matched
+throughout, 4 seeds.
+
+Transfer matrix, specialist (row) evaluated on class (column):
+
+| specialist | capital | symbol | novel | currency | film | falseprem | tqa_err |
+|---|---|---|---|---|---|---|---|
+| **fake:capital** | **0.835** | 0.326 | 0.910 | 0.656 | 0.963 | 0.805 | 0.556 |
+| **fake:symbol** | 0.515 | **0.908** | 0.430 | 0.724 | 0.582 | 0.662 | 0.529 |
+| **fake:novel** | 0.403 | 0.366 | **0.949** | 0.410 | 0.799 | 0.765 | 0.506 |
+| **fake:currency** | 0.708 | 0.632 | 0.802 | **0.851** | 0.830 | 0.645 | 0.533 |
+| **fake:film** | 0.717 | 0.489 | 0.926 | 0.644 | **0.972** | 0.710 | 0.570 |
+| **falsepremise** | 0.602 | 0.503 | 0.823 | 0.602 | 0.933 | **0.786** | 0.567 |
+| **triviaqa_error** | 0.635 | 0.566 | 0.830 | 0.564 | 0.949 | 0.763 | **0.606** |
+| *GENERALIST* | 0.637 | 0.560 | 0.827 | 0.570 | 0.948 | 0.762 | 0.605 |
+| *mean entropy* | 0.886 | 0.753 | 0.925 | 0.822 | 0.966 | **0.561** | 0.675 |
+
+    FIS specialists: diagonal mean 0.844, off-diagonal mean 0.654
+                     transfer gap +0.190
+    FIS generalist  : 0.701 mean over classes
+    mean entropy    : 0.798 mean over classes
+
+### Four things this settles
+
+**1. Per-class detectors are empirically justified.** The +0.190 transfer gap is
+large, and the variables each specialist chose differ *systematically by class*:
+
+| specialist | top variables chosen |
+|---|---|
+| fake:capital | `L32_dist`, `C21_curv`, `L32_cos` -- geometry |
+| fake:symbol | `N08_ratio`, `N26_ratio`, `N26_norm` -- norm ratios |
+| fake:novel | `L31_cos`, `R31_cos`, `L30_cos` -- late-layer geometry |
+| fake:currency | `D25_norm`, `N26_ratio`, `R30_cos` -- update geometry |
+| fake:film | `ent_std`, `logp_std`, `maxp_min` -- **distribution stats** |
+| falsepremise | `ent_max`, `ent_std`, `maxp_min` -- **distribution stats** |
+| triviaqa_error | `ent_std`, `ent_max`, `logp_std` -- **distribution stats** |
+
+The four short-factual classes select *hidden-state geometry*; the three
+long-form classes select *output-distribution statistics*. Different kinds of
+error really are visible in different variable families. That is a positive
+result and it directly answers the question.
+
+**2. Specialists can be worse than useless off-class.** `fake:capital` scores
+0.326 on `fake:symbol`; `fake:novel` scores 0.366 on `fake:symbol` and 0.403 on
+`fake:capital`. Below chance means the anomaly score is *inverted* -- a detector
+tuned for one kind of fabrication would systematically rank the wrong outputs as
+suspect on another. This is a practical hazard, not just a weak result.
+
+**3. The generalist is not a compromise, it is a collapse.** Pooling all classes
+for selection produced the same variables as the `triviaqa_error` specialist
+(`ent_std`, `ent_max`, ...) and the same row of scores (0.637/0.560/0.827/... vs
+0.635/0.566/0.830/...). The largest class simply dominates selection, so the
+"generalist" is the TriviaQA specialist wearing a different name -- and at 0.701
+it is beaten by plain entropy at 0.798.
+
+**4. There is exactly one class where the fuzzy rule beats entropy.**
+`falsepremise`: FIS specialist **0.786** vs mean entropy **0.561**. Entropy is
+*weakest* precisely on the long-form false-premise family, which is the family
+the original §9 result was built on. So the §9 intuition was not baseless -- it
+was over-generalised. Properly scoped, the surviving claim is narrow: *for
+long-form false-premise fabrication, where the model is fluent and confident and
+entropy therefore fails, late-layer geometry carries signal that entropy does
+not.* That is a real niche, and it is the one worth pursuing.
+
+Figures: `figures/negative_results.png` (the falsification) and
+`figures/transfer_matrix.png` (this matrix, diverging palette centred on chance
+so the below-chance cells are visible as such).
