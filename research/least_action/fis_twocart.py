@@ -415,6 +415,120 @@ def dagger_states(
     return np.vstack(zs_all), np.concatenate(w_all)
 
 
+def shaped_cost(
+    plant: TwoCart,
+    u_fn: Callable[[af64], float],
+    z0s: list[af64],
+    ref: Metrics,
+    t_end: float = 40.0,
+    n_out: int = 801,
+    tol: float = 0.02,
+) -> float:
+    """Smooth, always-finite surrogate of the three-objective score.
+
+    Direct policy optimization cannot use the reported score: settling time is a
+    discontinuous functional of the trajectory, peak force is a max, and a
+    controller that fails to settle scores infinity, which tells an optimizer
+    nothing about which direction is less bad.  This replaces each term with a
+    differentiable-enough analogue on the same normalization as the true score,
+    so the two agree in ranking without the surrogate ever being flat or
+    infinite:
+
+      settling   -> soft time spent outside the tolerance ball
+      peak force -> log-sum-exp over |u|
+      energy     -> unchanged, it was already smooth
+      failure    -> terminal state norm, which is finite and has a gradient
+
+    The terminal term is what makes a non-settling controller improvable rather
+    than merely rejected.
+    """
+    ts = np.linspace(0.0, t_end, n_out)
+    total = 0.0
+    for z0 in z0s:
+        def f(_t, z):
+            return plant.rhs(np.asarray(z), u_fn(np.asarray(z)))
+
+        try:
+            sol = solve_ivp(f, (0.0, t_end), z0, t_eval=ts, rtol=1e-6, atol=1e-8,
+                            method="RK45", max_step=0.5)
+        except Exception:
+            return 1e6
+        if not sol.success or sol.y.shape[1] != len(ts) or \
+                not np.all(np.isfinite(sol.y)):
+            return 1e6
+        zs = sol.y.T
+        us = np.array([float(np.clip(u_fn(z), -plant.u_max, plant.u_max))
+                       for z in zs])
+        norms = np.linalg.norm(zs, axis=1)
+        thresh = tol * max(float(np.linalg.norm(z0)), 1e-12)
+        soft_settle = float(np.trapezoid(
+            1.0 / (1.0 + np.exp(-10.0 * (norms / thresh - 1.0))), ts
+        ))
+        peak = float(np.log(np.sum(np.exp(20.0 * np.abs(us)))) / 20.0)
+        energy = float(np.trapezoid(us**2, ts))
+        terminal = float(norms[-1] / thresh)
+        total += (
+            soft_settle / ref.settling_time
+            + peak / ref.peak_force
+            + energy / ref.energy
+        ) / 3.0 + 2.0 * terminal
+    return total / len(z0s)
+
+
+def policy_optimize(
+    plant: TwoCart,
+    ctrl: TskController,
+    z0s: list[af64],
+    ref: Metrics,
+    maxfev: int = 1500,
+    tune_antecedents: bool = False,
+    seed: int = 0,
+) -> tuple[TskController, float, int]:
+    """Optimize the FIS parameters against the closed-loop objective directly.
+
+    This deliberately gives up the guarantee everything else here relies on: the
+    shaped cost is not quadratic in the consequents, so variable projection no
+    longer applies and there is no globally optimal linear solve -- only a
+    derivative-free search over a non-convex landscape.  That trade is the whole
+    point of the experiment, and the reason it is worth having established first
+    (§9f) that the cheap route genuinely caps out.
+
+    Powell is used rather than a gradient method because the surrogate is still
+    only piecewise smooth through the input saturation.
+    """
+    n_state = ctrl.centers.shape[1]
+
+    def unpack(p: af64) -> TskController:
+        n_theta = len(ctrl.theta)
+        c = TskController(ctrl.centers, ctrl.widths, p[:n_theta].copy(), ctrl.order)
+        if tune_antecedents:
+            n_rules = len(ctrl.centers)
+            rest = p[n_theta:]
+            c.centers = rest[: n_rules * n_state].reshape(n_rules, n_state)
+            c.widths = np.maximum(
+                rest[n_rules * n_state:].reshape(n_rules, n_state), 1e-3
+            )
+        return c
+
+    p0 = ctrl.theta.copy()
+    if tune_antecedents:
+        p0 = np.concatenate([p0, ctrl.centers.ravel(), ctrl.widths.ravel()])
+
+    evals = {"n": 0}
+
+    def obj(p: af64) -> float:
+        evals["n"] += 1
+        return shaped_cost(plant, unpack(p), z0s, ref)
+
+    base = obj(p0)
+    res = minimize(obj, p0, method="Powell",
+                   options={"maxfev": maxfev, "xtol": 1e-3, "ftol": 1e-4})
+    # Never return something worse than the warm start.
+    if res.fun < base:
+        return unpack(res.x), float(res.fun), evals["n"]
+    return unpack(p0), float(base), evals["n"]
+
+
 def distribution_shift(closed_loop_states: af64, training_samples: af64) -> float:
     """How far the closed loop wanders from where the controller was fitted.
 

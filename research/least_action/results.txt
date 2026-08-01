@@ -507,3 +507,44 @@ Z'. Open-loop fit quality vs closed-loop score
      3      3     105           0.004774      inf
      3      8     280           0.003339      inf
 
+===== demo_policyopt.py =====
+reference (best LQR): score 1.0000, settle 19.797, peak 1.0000, energy 0.5375
+best imitation result (§9f): 0.8487   |   open-loop reference: 0.8183
+budget: 600 closed-loop evaluations per optimization
+
+AA. Direct policy optimization, warm-started from the imitation fit
+-------------------------------------------------------------------
+ rules  params  imitation    direct   improve   evals    sec
+     2      10     0.8666    0.6547     24.5%     601    545
+     3      15     0.8629    0.6729     22.0%     601    481
+     4      20     0.8908    0.7565     15.1%     601    431
+
+AB. Does the warm start matter?
+-------------------------------
+  Same 3-rule structure, consequents started from zero instead of the
+  imitation fit.  If a cold start matches, the imitation stage is
+  redundant; if it does not, imitation is a useful initializer even
+  though it caps out on its own.
+  cold start: inf -> inf (601 evals, 696 s)
+
+AC. Tuning the antecedents as well
+----------------------------------
+  Rule centres and widths join the search: 15 + 24 = 39 parameters.
+  consequents only: 0.6547
+  + antecedents:    0.6728  (601 evals, 490 s)
+  (equal evaluation budget over 2.6x the parameters, so a worse result
+   here is a budget statement, not a capacity statement)
+
+AD. Where the gain comes from
+-----------------------------
+                  settle  peak |u|    energy    score
+      best LQR    19.797    1.0000    0.5375   1.0000
+     imitation    17.830    0.9088    0.4248   0.8666
+    direct opt    13.563    0.6481    0.3391   0.6547
+
+  vs best LQR:        34.5% better
+  vs best imitation:  22.9% better
+  vs open-loop ref:   20.0% better
+  The open-loop reference had full knowledge of z0; a feedback law
+  beating it is not a contradiction, it is what feedback buys.
+

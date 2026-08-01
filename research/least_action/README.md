@@ -1118,9 +1118,91 @@ The implied fix is a different algorithm, not a bigger model or more data:
 than fitting sampled targets. That abandons the variable-projection guarantee
 (the objective stops being quadratic in the consequents), which is precisely the
 trade §8b's certificate was designed to avoid — and is why it was worth
-establishing that the cheap route genuinely caps out first.
+establishing that the cheap route genuinely caps out first. §9h does it, and the
+diagnosis holds: 22.9% at ten parameters.
 
-### 9h. Honest limits
+### 9h. Direct policy optimization — the plateau breaks
+
+Code: `demo_policyopt.py`. §9g concluded by elimination that the binding
+constraint was the imitation objective. This tests the implied fix: stop fitting
+sampled targets, and optimize the closed-loop objective directly over the FIS
+parameters.
+
+**The price is paid up front.** The objective is not quadratic in the
+consequents, so variable projection no longer applies — no globally optimal
+linear solve, only derivative-free search (Powell) over a non-convex landscape.
+Every guarantee from §3a and §8b is surrendered. The true score is also unusable
+as a search objective: settling time is discontinuous, peak force is a max, and
+failures score ∞, which tells an optimizer nothing. `shaped_cost` replaces each
+term with an always-finite analogue on the same normalization — soft time outside
+the tolerance ball, log-sum-exp peak, unchanged energy, plus a terminal-norm term
+that makes a non-settling controller *improvable* rather than merely rejected.
+
+**AA — warm-started from the imitation fit, 600 closed-loop evaluations each:**
+
+| rules | params | imitation | direct | improvement |
+|---|---|---|---|---|
+| **2** | **10** | 0.8666 | **0.6547** | **24.5%** |
+| 3 | 15 | 0.8629 | 0.6729 | 22.0% |
+| 4 | 20 | 0.8908 | 0.7565 | 15.1% |
+
+**AD — where the gain comes from** (best configuration, 2 rules / 10 parameters):
+
+| | settle | peak $|u|$ | energy | score |
+|---|---|---|---|---|
+| best LQR | 19.797 | 1.0000 | 0.5375 | 1.0000 |
+| imitation | 17.830 | 0.9088 | 0.4248 | 0.8666 |
+| **direct opt** | **13.563** | **0.6481** | **0.3391** | **0.6547** |
+
+Unlike every earlier result, this improves **all three objectives at once** —
+31% faster settling, 35% less peak force, 37% less energy than the best LQR. The
+imitation controllers had to trade settling time for actuator economy (§9b);
+direct optimization does not.
+
+- **34.5% better than the best LQR**
+- **22.9% better than the best imitation result** (0.8487, which needed 30 parameters)
+- **20.0% better than the open-loop reference** (0.8183)
+
+Beating the open-loop reference is not a contradiction even though that
+reference had full knowledge of $z_0$: it is open-loop, so it cannot correct
+along the way, and it was only a surrogate local optimum (§9f).
+
+**AB — but the warm start is load-bearing.** The same 3-rule structure started
+from zero consequents instead of the imitation fit:
+
+> **cold start: ∞ → ∞** (601 evaluations, no stabilizing controller found)
+
+Direct optimization could not find a stabilizing controller from scratch within
+the same budget. So the two stages are complementary rather than competing:
+
+> **The least-action fit is not the final method — it is the initializer that
+> makes the final method reachable.** On its own it caps out at 0.863; without
+> it, direct optimization does not start. Neither stage reaches 0.655 alone.
+
+That rehabilitates §3a's variable projection in a specific role. Its value here
+is not that it produces the best controller — §9f showed it cannot — but that it
+produces a *stabilizing* one in a single globally optimal linear solve, with no
+search and no initialization problem of its own.
+
+**AC — tuning the antecedents too** (15 + 24 = 39 parameters) gave 0.6728 against
+0.6547 for consequents only, at equal evaluation budget. With 2.6× the
+parameters and the same 600 evaluations that is a statement about budget, not
+capacity; it is not evidence that antecedent tuning cannot help.
+
+### 9i. The plateau, resolved
+
+| candidate | test | verdict |
+|---|---|---|
+| distribution shift / data | §9e | fixes the collapse, plateau unmoved |
+| model class | §9f | 1.6% at 2× params; fit/score inversely related |
+| **imitation objective** | **§9h** | **confirmed — 22.9% once removed** |
+
+The elimination in §9g was correct. Optimizing the objective you actually care
+about, rather than fitting samples from something that optimized it once
+open-loop, is worth more than every other lever tried combined — and it is worth
+it at *ten parameters*, the smallest model in the entire study.
+
+### 9j. Honest limits
 
 - Six initial conditions, all modest. A wider $z_0$ set would stress
   extrapolation harder and probably lower the rule count at which shift bites.
@@ -1138,6 +1220,10 @@ establishing that the cheap route genuinely caps out first.
   and peak force are outside its quadratic form, so §8's suboptimality
   certificate does not transfer to this three-objective score. That gap is real
   and is the main thing separating §9 from §8.
+- §9h used a fixed 600-evaluation budget and one optimizer (Powell). No claim is
+  made that 0.6547 is the best reachable; a larger budget, CMA-ES, or restarts
+  would likely go further. The claim is only that the plateau is not a limit of
+  the model or the data.
 - Two numerical guards were needed and are worth flagging as reusable: a
   divergence event, and a hard RHS-evaluation budget. Without the second, a
   marginally-stable oscillatory closed loop drives the stiff solver to
@@ -1156,6 +1242,7 @@ cd research/least_action
 ../../.venv/bin/python demo_twocart.py       # ~25 min, sections Q-T
 ../../.venv/bin/python demo_augment.py       # ~20 min, sections V-X
 ../../.venv/bin/python demo_order.py         # ~10 min, sections Y-Z'
+../../.venv/bin/python demo_policyopt.py     # ~50 min, sections AA-AD
 ```
 
 Both are deterministic — seeded RNG, no wall-clock dependence — so the output
@@ -1233,6 +1320,8 @@ reader changing one should know what it was protecting against.
 | `augment_tube` | perturb the optimal trajectories and re-label |
 | `dagger_states` | states the current controller actually visits, occupation-weighted |
 | `poly_basis` / `basis_size` | consequent monomials up to a given order (1, 5, 15, 35 for orders 0-3) |
+| `shaped_cost` | always-finite smooth surrogate of the three-objective score |
+| `policy_optimize` | derivative-free search on the FIS parameters against the closed loop |
 
 ### Where each claim is checked
 
@@ -1264,3 +1353,5 @@ reader changing one should know what it was protecting against.
 | plateau survives augmentation | 9e | augment V, W |
 | higher order barely moves it | 9f | order Y, Z |
 | fit accuracy vs score is inverse | 9f | order Z' |
+| direct policy opt breaks plateau | 9h | policyopt AA, AD |
+| warm start is load-bearing | 9h | policyopt AB |
