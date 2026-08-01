@@ -1,0 +1,9 @@
+seed,whiten,top_n,K,tnorm,sconorm,val_criterion,select_on
+0,False,6,4,minimum,minimum,-0.4114583333333333,fpr95
+1,True,19,3,dombi2,einstein,-0.3709677419354839,fpr95
+2,False,6,4,dombi2,einstein,-0.42408376963350786,fpr95
+3,False,8,4,dombi2,einstein,-0.45161290322580644,fpr95
+4,True,12,3,product,product,-0.4739583333333333,fpr95
+5,True,19,3,dombi2,einstein,-0.5489130434782609,fpr95
+6,False,6,4,product,product,-0.5,fpr95
+7,True,19,4,product,product,-0.4947916666666667,fpr95

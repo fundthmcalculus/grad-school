@@ -38,7 +38,14 @@ scope narrows to one checkpoint, which we need to know before drafting, not afte
 
 </details>
 
-## 2. The FPR@95TPR = 0.961 problem — the most substantive fuzzy work left
+## 2. The FPR@95TPR problem — ❌ CLOSED AS NEGATIVE (§25)
+
+**Two structurally different remedies tried, both failed.** The Ch 4.3.1 cascade was neutral on ranking and *worse* on the tail (0/8 seeds improved under entropy matching). Selecting the configuration on FPR@95 instead of AUROC was worse on *both* metrics on the primary condition — it is a single-quantile statistic and overfits validation noise. This points at the tail being a property of the rule class, not the fitting procedure. Report FPR@95 as a standing limitation.
+
+The one route still worth crediting: change the **score construction** — calibrate μ_anom against the fit-split distribution (per-mode rank or p-value rather than a raw membership complement) so the tail is shaped by data rather than operator algebra. Scope it as its own contribution, not a tuning pass.
+
+<details><summary>original plan</summary>
+
 
 Under entropy matching the rule wins on ranking (0.789 vs 0.760) but flags
 essentially everything at 95% recall. This is **structural, not a tuning miss**:
@@ -49,6 +56,8 @@ The natural fuzzy answer is **Ch 4.3.1's confusion-driven second-pass cascade wi
 abstention** — a specialist that fires only in the region where the first rule base
 is uncertain. This both repairs a real defect and adds dissertation-relevant fuzzy
 machinery rather than more measurement.
+
+</details>
 
 ## 3. Measure length/style imbalance in a public benchmark
 
@@ -62,12 +71,19 @@ probe sets we built ourselves. Note the framing constraint already recorded — 
 claim is about *missing controls*, not about known errors in specific published
 work.
 
-## 4. Grow the curated fact tables
+## 4. Grow the curated fact tables — ✅ DONE
+
+Real subjects 165 → 424; with 3 phrasings, real prompts **471 → 1,272 (2.7×)**, fake 1,640 → 4,052, total 5,324 (`prompts_v4.jsonl`). Six new long-form templates (theorem, paradox, reaction, law, constant, experiment). Also fixed a generator defect that capped five templates' fake side at 48.
+
+<details><summary>original plan</summary>
+
 
 Grunt work, but the matched-sample ceiling (147–186 pairs after stacked matching)
 is what leaves the entropy-matched condition non-significant (p = 0.078). Capitals
 and chemical elements are the cheapest to extend; `build_prompts_v2.py` /
 `build_prompts_v3.py` hold the tables.
+
+</details>
 
 ---
 

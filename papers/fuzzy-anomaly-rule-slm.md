@@ -96,10 +96,15 @@ its own subsection.
 1. ~~A second model~~ — **done (§24)**: Qwen2.5-0.5B replicates the Mahalanobis
    result and refutes the entropy result.
 2. ~~A second task family~~ — **done (§24)**: v2 short-factual reported alongside.
-3. **The FPR@95 problem, addressed rather than conceded.** θ moves the operating
-   point without changing ranking (§3.4), so the high-recall failure is structural,
-   not a tuning miss. Candidate: a second-pass specialist with abstention
-   (Ch 4.3.1's confusion-driven cascade), which is the natural fuzzy answer.
+3. ~~The FPR@95 problem, addressed~~ — **tried and failed (§25)**. Two structurally
+   different remedies: Ch 4.3.1's cascade with abstention (neutral on ranking,
+   *worse* on the tail, 0/8 seeds improved under entropy matching) and selecting the
+   configuration on FPR@95 rather than AUROC (worse on both metrics on the primary
+   condition — a single-quantile criterion overfits validation noise). **Report
+   FPR@95 as a standing limitation of the method, and say both remedies were tried.**
+   The one untried route worth crediting is changing the *score construction* —
+   calibrating μ_anom against the fit-split distribution — which is a separate
+   contribution, not a tuning pass.
 4. **An ablation table** in one place: antecedent count, mode count, membership
    family, metric, norm pair. §22's factorial covers the last three; the first two
    are in `fuzzy_stats_selection.csv` but not tabulated.

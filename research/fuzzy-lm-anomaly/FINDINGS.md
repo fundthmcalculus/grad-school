@@ -1440,3 +1440,74 @@ nuisance AUROC, as here, rather than assume matching worked.
 
 That is a narrower claim than §23's, and it is the one the evidence supports.
 `four-things.md` item 1 is complete; items 2–4 remain.
+
+---
+
+## 25. Item 2 — two attempts at the FPR@95 problem, both negative
+
+The defect (§23): under entropy matching the rule base wins on ranking but its
+**FPR@95TPR is 0.903–0.961** — to catch 95% of fabrications it flags nearly
+everything. §3.4 proved θ is rank-invariant, so no threshold search can reach a
+point the ranking does not already offer; only a different *ranking* helps.
+
+### Attempt 1 — Ch 4.3.1's cascade of specialists with abstention
+
+`cascade.py`. Pass 1 defers rows landing in the uncertain band of its own
+known-good score distribution (the band is set from **fit-split quantiles**, so no
+label is consulted and the protocol stays open-set). A pass-2 rule base fitted
+**only on known-good rows inside that band** re-ranks the deferred rows. Ranks are
+composed rather than averaged, so the head of the ranking — where pass 1 is already
+confident — cannot be harmed by construction.
+
+`capture_v3`, 8 seeds, cascade minus single pass:
+
+| condition | ΔAUROC | improves | ΔFPR@95 | improves |
+|---|---|---|---|---|
+| length+template | −0.000 ± 0.010 | 3/8 (p = 0.641) | **+0.050 ± 0.082** | 1/8 |
+| + entropy | −0.007 ± 0.013 | 2/8 (p = 0.195) | +0.005 ± 0.010 | **0/8** |
+
+Neutral on ranking and **worse on the tail it was built to fix**. The extra rule
+base costs ~29 parameters and buys nothing.
+
+### Attempt 2 — select the configuration on FPR@95 instead of AUROC
+
+The cascade run surfaced a cleaner hypothesis: single-pass FPR@95 with a *fixed*
+configuration is 0.694, against 0.961 for the configuration §23 selected on
+validation **AUROC**. Selecting on AUROC optimises the whole ranking and can pick a
+configuration whose high-recall tail is poor — so target the tail directly.
+`fuzzy_stats.py --select-on {auroc,fpr95}`.
+
+| condition | selected on | AUROC | FPR@95 |
+|---|---|---|---|
+| length+template | auroc | **0.877 ± 0.022** | **0.551** |
+| length+template | fpr95 | 0.863 ± 0.022 | 0.572 |
+| + entropy | auroc | **0.789 ± 0.039** | 0.903 |
+| + entropy | fpr95 | 0.774 ± 0.037 | **0.863** |
+
+**Also negative, and instructively so.** On the primary condition, selecting on
+FPR@95 is worse on *both* metrics — including the one it optimises. FPR@95 depends
+on a single quantile of the validation positives, so it is a far noisier statistic
+than AUROC; selecting on it fits validation noise and generalises worse. On the
+harder condition it does trade 0.015 AUROC for 0.040 FPR@95, which is a real but
+small effect and does not survive as a recommendation.
+
+### Reading
+
+Two structurally different interventions — a second rule base, and a different
+selection objective — both fail to move the high-recall tail. That points at the
+tail being a property of the **rule class** rather than of the fitting procedure:
+a handful of axis-aligned Gaussian modes with a complement-of-conorm anomaly score
+produces a score distribution whose extreme quantiles are simply not well
+separated, and adding capacity or re-targeting selection does not change its shape.
+
+Item 2 is therefore **closed as a negative result**. Honest consequence for the
+write-up: FPR@95 should be reported as a **standing limitation of the method**, not
+as an implementation detail awaiting a fix. `papers/fuzzy-anomaly-rule-slm.md` §3
+already lists it; it should now say two remedies were tried and neither worked.
+
+What remains untried, and is the only route I would still credit: change the
+**score construction** rather than the rule base — e.g. calibrate μ_anom against
+the fit-split score distribution (a per-mode rank or p-value rather than a raw
+membership complement), so the tail is shaped by data rather than by the operator
+algebra. That is a different contribution from "tune the FIS", and it should be
+scoped as such rather than bolted on.
