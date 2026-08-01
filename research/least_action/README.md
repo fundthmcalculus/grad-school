@@ -963,7 +963,73 @@ So the honest summary is narrower than §8a's framing suggested: nonlinearity is
 this benchmark, going nonlinear made the problem harder for the method faster
 than it created advantage for it.
 
-### 9e. Honest limits
+### 9e. Does off-trajectory data recover it?
+
+§9c blamed the post-$N{=}3$ breakdown on distribution shift. Testing the fix
+splits that claim in two, and only half of it survives.
+Code: `demo_augment.py`. Expert labels come from a short-horizon re-solve
+(~1.7 s each), so both schemes are affordable at a few hundred labels.
+
+**V — tube augmentation** (perturb the optimal trajectories by 0.35 of the
+per-axis spread, re-label, add; controller-independent, computed once):
+
+| rules | on-traj score | shift | +tube score | shift |
+|---|---|---|---|---|
+| 3 | **0.8629** | 3.05 | 0.9049 | 3.04 |
+| 4 | 0.8908 | 3.07 | 0.8887 | 3.01 |
+| 8 | **∞** | 3.07 | **0.8879** | 2.98 |
+| 12 | 1.3211 | 4.67 | **0.9259** | 3.06 |
+| 16 | **∞** | 6.73 | 1.6630 | 4.48 |
+
+**W — DAgger** (fit → roll out → label the states the controller *actually*
+visits → refit; the fixed-point iteration that makes the training measure equal
+the deployment measure, as §8d requires):
+
+| rules | round 0 | round 1 | round 2 |
+|---|---|---|---|
+| 3 | **0.8629** | 0.9355 | 0.9357 |
+| 8 | ∞ | ∞ | **0.9407** |
+| 16 | ∞ | 1.2228 | ∞ |
+
+Three findings, and the second is the one that matters:
+
+1. **Stability recovers, decisively.** $N=8$ goes from unusable to 0.888 (tube)
+   or 0.941 (DAgger); $N=12$ goes 1.321 → 0.926. The shift metric moves with it
+   — 4.67 → 3.06 at $N=12$, 6.73 → 4.48 at $N=16$ — confirming §9c's diagnosis of
+   *the collapse*.
+2. **The plateau does not move.** The best score anywhere in either experiment is
+   0.8879 (tube, $N=8$, 40 parameters), still worse than **0.8629 from 3 rules /
+   15 parameters on trajectory data alone**. No amount of off-trajectory data,
+   under either scheme, beats what two or three rules already achieved.
+3. **Augmentation actively hurts the controller that was already working.**
+   $N=3$ degrades 0.863 → 0.905 under tube and → 0.936 under DAgger, and DAgger
+   converges to the worse value rather than wandering there.
+
+Finding 3 has a clean explanation, and it is the framework's own: Theorem C2 says
+weight by the deployed closed loop's occupation measure. Tube and DAgger samples
+add mass where the *working* controller spends little time, so they buy support
+at the cost of fidelity where it actually matters. **Robustness and
+occupation-weighted accuracy are in direct tension here**, and for a controller
+that is already stable the trade is a losing one.
+
+So §9c's conclusion needs splitting:
+
+> Distribution shift explains the **collapse at high rule count** — that part is
+> confirmed, and fixable with off-trajectory data. It does **not** explain the
+> **0.863 plateau**, which survives every augmentation tried. Two different
+> limits were conflated; only one of them is a data problem.
+
+What the plateau actually is remains open. The candidates are the affine-consequent
+model class, the training targets (a smooth-surrogate optimum, not a true one —
+§9e), and the mismatch between the three-objective score and the quadratic form
+Theorem C2 can certify. Nothing here distinguishes them.
+
+One caveat on W: this is the $\beta=0$ variant of DAgger, rolling out the learner
+only. The original algorithm mixes in the expert on a decaying schedule, and its
+absence is the likely reason $N=16$ oscillates (∞ → 1.22 → ∞) instead of
+converging.
+
+### 9f. Honest limits
 
 - Six initial conditions, all modest. A wider $z_0$ set would stress
   extrapolation harder and probably lower the rule count at which shift bites.
@@ -997,6 +1063,7 @@ cd research/least_action
 ../../.venv/bin/python demo_classifier.py    # ~15 s, sections H-K
 ../../.venv/bin/python demo_control.py       # ~3 min, sections L-P
 ../../.venv/bin/python demo_twocart.py       # ~25 min, sections Q-T
+../../.venv/bin/python demo_augment.py       # ~20 min, sections V-X
 ```
 
 Both are deterministic — seeded RNG, no wall-clock dependence — so the output
@@ -1070,6 +1137,9 @@ reader changing one should know what it was protecting against.
 | `place_rules` | occupation-weighted k-means rule placement (multi-input form of §8d) |
 | `fit_consequents` | occupation-weighted variable projection — one globally optimal linear solve |
 | `distribution_shift` | max closed-loop distance to the nearest training sample |
+| `label_state` | expert label from a short-horizon re-solve (~1.7 s) |
+| `augment_tube` | perturb the optimal trajectories and re-label |
+| `dagger_states` | states the current controller actually visits, occupation-weighted |
 
 ### Where each claim is checked
 
@@ -1097,3 +1167,5 @@ reader changing one should know what it was protecting against.
 | convergence in 2 rules | 9b | twocart S |
 | distribution-shift breakdown | 9c | twocart S |
 | nonlinear case fails | 9d | twocart T |
+| augmentation recovers stability | 9e | augment V, W |
+| plateau survives augmentation | 9e | augment V, W |
