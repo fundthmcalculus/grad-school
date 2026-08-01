@@ -775,3 +775,104 @@ is a **methods/negative-results contribution** (the two confounds and the contro
 that expose them), not a detection win. It also still closes Ch 4.3.5's owed
 head-to-head against one-class SVM and isolation forest, in a second domain --
 that part is unaffected by the retraction.
+
+---
+
+## 18. Expanded variable families -- and a signal that survives every control
+
+`features_ext.py` + `correlate.py`. Everything is derived from activations
+already on disk; no recapture. Six new families beyond the two used so far:
+
+| family | n | what it measures |
+|---|---|---|
+| `centroid` | 61 | per-layer distance + cosine to the truthful centroid (as before) |
+| `delta` | 64 | the **update** each layer applies: ‖h[L+1]−h[L]‖, cos(h[L+1],h[L]) |
+| `deltaref` | 63 | how unusual that update is vs the **mean truthful update** |
+| `geom` | 64 | per-layer norm and consecutive norm ratio |
+| `curve` | 31 | curvature (2nd difference) of the depth profile |
+| `agg` | 29 | **aggregate shape** of a profile: slope, argmax, early/late contrast, monotonicity, roughness |
+| `stats` | 19 | the output-distribution statistics |
+
+`agg` is the conceptually interesting one: it collapses 33 per-layer numbers into
+a handful of shape descriptors ("the distance profile rises late and peaks near
+the output"), which is the kind of variable a fuzzy rule can actually talk about.
+
+### Screening method -- and one method rejected
+
+Entropy is at 0.968 on this task, so raw correlation is uninformative; the
+question is what separates fabrication **among generations entropy scores the
+same**. Conditioning is done by *matching* (as for length and template), adding
+entropy quartile to the match keys.
+
+> **A rejected method, recorded because the failure mode is instructive.** The
+> first version residualised each variable on (entropy, n_tokens) with a linear
+> model fit on the truthful split, then scored the residual. That is invalid:
+> the nuisance model never sees high-entropy fabrications, so it extrapolates
+> badly on them and the residual *re-encodes* entropy through its own prediction
+> error. The tell was unmissable — residualising **raised** `N03_ratio` from
+> 0.632 to 0.958. Matching conditions without extrapolating.
+
+Entropy overlap is thin by construction: truthful entropy median 0.697,
+fabricated 1.585, with only 36 of 135 fabrications inside the shared range. After
+matching on (template, n_tokens, entropy quartile) just **12–21 pairs per class**
+remain, so a permutation null is mandatory.
+
+### Result: late-layer update geometry, p < 0.005
+
+| family | best raw AUROC | best entropy-matched |
+|---|---|---|
+| **`deltaref`** | 0.900 | **0.942** |
+| `delta` | 0.923 | 0.934 |
+| `centroid` | 0.857 | 0.918 |
+| `geom` | 0.867 | 0.886 |
+| `curve` | 0.846 | 0.876 |
+| `agg` | 0.834 | 0.873 |
+| `stats` | **0.968** | 0.846 |
+
+Top variables, entropy-matched: `R30_cos` 0.942, `D31_cos` 0.934, `R30_dist`
+0.928, `L32_cos` 0.918, `L32_dist` 0.916, `L31_cos` 0.902. **All from layers
+29–32 of 32** — the last few layers.
+
+**Permutation null** (200 label shuffles, max over all 331 variables, same
+matched n):
+
+    median 0.751   95th percentile 0.827   maximum 0.879
+    observed best 0.942  ->  p < 0.005
+
+The observed maximum exceeds all 200 permutations. So this is **not** selection
+noise, and it survives template matching, length matching, entropy matching, and
+multiplicity correction simultaneously — every control that killed the §9 result.
+
+The null also fixes a read-off threshold: **entropy-matched values below ~0.83
+are indistinguishable from selection noise** at this sample size. About nine
+variables clear it, all late-layer, all from `deltaref` / `delta` / `centroid`.
+
+### What this does and does not mean
+
+* It **does** mean there is genuine information about fabrication in the
+  late-layer *update* geometry that mean entropy does not already carry. The
+  best family — `deltaref`, how far each layer's update deviates from the mean
+  truthful update — is new and was not examined before §18.
+* It **does not** resurrect §9, and it is not yet a detector. n = 12–21 matched
+  pairs per class is far too small to fit anything, and the supervised ceiling
+  (nested selection, 2-fold) moves entropy 0.974 → 0.987 with n = 270 against
+  331 candidates, i.e. n < p. That number is an optimistic bound, not a result.
+* The binding constraint is now **matched sample size**, and its cause is
+  specific: only 632 of 846 `template_real` questions are answered correctly, so
+  the truthful side of the matched comparison is small. Expanding the curated
+  fact tables (capitals and elements are the cheap ones to grow) is the direct
+  fix and is worth more than any modelling change.
+
+### Next, in priority order
+
+1. **Grow the curated fact tables** to ~1,000 real instances so the
+   entropy-matched cells hold hundreds rather than tens of pairs. Everything
+   below is underpowered until this is done.
+2. **Re-test the late-layer `deltaref` hypothesis** pre-registered on the larger
+   set, with the permutation null as the acceptance criterion.
+3. **Then, and only then**, ask whether a fuzzy rule over the `agg` shape
+   descriptors of `deltaref` beats an entropy threshold — that is the version of
+   the original hypothesis that the current evidence actually supports testing,
+   and `agg` is small and legible enough to keep the interpretability claim.
+4. Attention-head and MLP-sparsity families still require a fresh capture with
+   hooks; deferred until (1) makes any result from them interpretable.
