@@ -1,0 +1,34 @@
+label:       baseline-d0d6714
+generated:   2026-08-01T17:06:52Z
+tribble-fis: d0d67144f4d084a905f16031c13b6a0301ca85f8
+tribble-cluster: c71171e76fade0bfc3ac9859478dbf45fa9a463e
+grad-school: eabb10587aacb34404eea677468ae49b68b94f97
+seeds:       0,1,2,3,4 (default)
+
+status:
+  table_concrete_reconciliation          ok
+  table_hyperparam_normalization         ok
+  table_g5_output_partitioning           ok
+  table_g5b_skew_sweep                   ok
+  table_4_1_mog_baselines                ok
+  table_6_1_model_family                 ok
+  table_4_4_openset                      no-output (corrected: no glass.csv; script exited 0 having written nothing)
+  table_3_1_pvat_scaling                 FAILED
+  table_3_1_reorder_three_arm            ok
+
+--- backfill 2026-08-01T17:12:04Z: table_3_1_pvat_scaling ---
+tribble-fis: d0d67144f4d084a905f16031c13b6a0301ca85f8
+tribble-cluster: c71171e76fade0bfc3ac9859478dbf45fa9a463e
+grad-school: dceef9daf8e97cc557cd95026f32cb4435808d5a
+seeds:       0,1,2,3,4 (default)
+
+status:
+  table_concrete_reconciliation          not-run-this-pass
+  table_hyperparam_normalization         not-run-this-pass
+  table_g5_output_partitioning           not-run-this-pass
+  table_g5b_skew_sweep                   not-run-this-pass
+  table_4_1_mog_baselines                not-run-this-pass
+  table_6_1_model_family                 not-run-this-pass
+  table_4_4_openset                      not-run-this-pass
+  table_3_1_pvat_scaling                 ok
+  table_3_1_reorder_three_arm            not-run-this-pass

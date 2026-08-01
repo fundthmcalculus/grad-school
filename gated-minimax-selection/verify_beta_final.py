@@ -13,9 +13,41 @@ On non-metric/non-Euclidean data: beta > 0 (activates to restore admissibility)
 import numpy as np
 import pandas as pd
 import sys
+from pathlib import Path
 
-project_dir = "/home/scott/PycharmProjects/grad-school/gated-minimax-selection"
+# Resolve paths relative to this file rather than to one developer's home
+# directory. `project_dir` is wherever this script lives; datasets sit at the
+# grad-school repo root, which is that directory or its parent depending on
+# whether this copy is the root one or the gated-minimax-selection one.
+project_dir = str(Path(__file__).resolve().parent)
 sys.path.insert(0, project_dir)
+
+
+def _dataset(name):
+    """Locate a dataset CSV, or fail with a message that says what to do.
+
+    Checked in order: $GRAD_SCHOOL_DATA, the repo root, this script's directory.
+    These files are gitignored, so a fresh clone genuinely will not have them --
+    an explicit error naming the search path beats a stack trace from read_csv.
+    """
+    import os
+    here = Path(__file__).resolve().parent
+    roots = []
+    if os.environ.get("GRAD_SCHOOL_DATA"):
+        roots.append(Path(os.environ["GRAD_SCHOOL_DATA"]))
+    # This directory first, then its parent. The root copy of this script and
+    # the gated-minimax-selection copy both find the repo root that way, and
+    # neither reaches outside the repo before looking inside it.
+    roots += [here, here.parent]
+    for root in roots:
+        candidate = root / name
+        if candidate.exists():
+            return str(candidate)
+    raise FileNotFoundError(
+        f"{name} not found. Looked in: {', '.join(str(r) for r in roots)}. "
+        f"It is gitignored, so a fresh clone will not have it; place it at the "
+        f"repo root or set GRAD_SCHOOL_DATA to the directory holding it."
+    )
 
 from nerfcm import nerfcm
 import ivat_mf as im
@@ -130,7 +162,7 @@ def main():
     print("-" * 80)
 
     # Iris with Euclidean distance
-    df_iris = pd.read_csv("/home/scott/PycharmProjects/grad-school/IRIS.csv")
+    df_iris = pd.read_csv(_dataset("IRIS.csv"))
     X_iris = df_iris[["sepal_length", "sepal_width", "petal_length", "petal_width"]].values.astype(float)
     X_iris = (X_iris - X_iris.mean(axis=0)) / (X_iris.std(axis=0) + 1e-9)
     D_iris_euclidean = im.dissimilarity(X_iris)

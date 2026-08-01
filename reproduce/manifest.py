@@ -112,6 +112,24 @@ EXPERIMENTS = [
               "(min occupancy 21 -> 0). Reverses H3: quantile holds the TAILS better too.",
     ),
     Experiment(
+        id="table-norm-conorm-matrix",
+        title="Norm/conorm sweep: the five De Morgan pairs x model x dataset",
+        chapter="Ch4", produces="Norm/conorm comparison table",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_norm_conorm_matrix.py"),
+        hardware="any", datasets=["Concrete", "PhiUSIIL"],
+        outputs=["reproduce/outputs/table_norm_conorm_matrix.md",
+                 "reproduce/outputs/table_norm_conorm_matrix.csv"],
+        notes="Answers whether the fuzzy operator choice matters at all -- previously "
+              "an unexamined default. Needs tribble-fis#32: before it, regression could "
+              "not select an operator (tsk_firing_strengths read it off the anomaly "
+              "parameters, which regression never supplies) and every regressor "
+              "silently ran min/max. Columns differ by model: flat MoG uses both "
+              "operators, the fuzzy tree the t-norm only, and the HME row its experts "
+              "only -- the HME gate is a product by construction. Mixed (non-De Morgan) "
+              "pairs are an opt-in advanced setting and are deliberately not swept.",
+    ),
+    Experiment(
         id="table-4-1-mog-baselines",
         title="MoG FIS vs sklearn baselines (train time + accuracy/R2)",
         chapter="Ch4", produces="Table 4.1",
