@@ -1707,3 +1707,88 @@ this is to be exploited it must be by **switching** on an estimate of entropy's
 reliability, not by blending.
 
 `figures/entropy_regime.png`.
+
+---
+
+## 28. Switching between detectors — works with labels, unproven without
+
+`switching.py`, plan item 6. §27 showed blending gains nothing because the two
+detectors are complementary *across* regimes rather than *within* a cell, so the
+value is in **choosing** per deployment. Three rungs, all at fixed configuration
+(§26) so no arm gets a search budget.
+
+44 cells, 264 cell-seeds, four models.
+
+| rule | AUROC | gain vs always-entropy | |
+|---|---|---|---|
+| always FIS | 0.6434 | −0.110 | |
+| **always entropy** | **0.7538** | — | the incumbent |
+| oracle threshold (true AUROC, switch below 0.608) | 0.7694 | **+0.0157** | cheating |
+| oracle per-cell best | 0.7828 | +0.0290 | absolute ceiling |
+
+**Rung 1 sets a modest ceiling.** Even a perfect oracle picking the better
+detector per cell buys **+0.029**, and the realisable threshold rule +0.016. Most
+of the time entropy is already the right choice, so this was never going to be a
+large effect — worth knowing before investing in it.
+
+**Rung 2 works, and cheaply.** Estimating entropy's AUROC from *k* labelled
+examples and switching on the estimate:
+
+| k labelled | net AUROC | gain | agrees with oracle |
+|---|---|---|---|
+| 20 | 0.7675 | +0.0137 | 89.0% |
+| 50 | 0.7663 | +0.0125 | 94.3% |
+| 100 | 0.7697 | +0.0160 | 99.2% |
+| 200 | 0.7698 | +0.0160 | 99.6% |
+
+**20 labelled examples recover 87% of the oracle threshold gain**, and 100 recover
+essentially all of it. The switching decision is a coarse one — above or below
+0.61 — so it tolerates a noisy AUROC estimate far better than a ranking task
+would. That is a genuinely practical result: a deployment can decide which
+detector to trust from a calibration set small enough to label by hand.
+
+**Rung 3 is unproven, and the reason matters.** Predicting entropy's AUROC from
+statistics of the known-good split alone, with the predictor fitted on three
+models and tested on the fourth: r = **−0.492**, net gain **+0.0000**. The
+prediction is *anti*-correlated with truth on held-out models.
+
+But the individual statistics are strongly predictive when cells are pooled:
+
+| known-good statistic | r with entropy AUROC | p |
+|---|---|---|
+| `kg_std` (entropy spread on grounded output) | **−0.725** | <0.001 |
+| `kg_range` | −0.722 | <0.001 |
+| `kg_iqr` | −0.719 | <0.001 |
+| `kg_cv` | −0.695 | <0.001 |
+| `kg_bimod` | −0.663 | <0.001 |
+| `kg_kurt` | +0.616 | <0.001 |
+
+The sign is mechanistically sensible: **the more entropy varies on known-good
+output, the worse it separates** — a wide known-good distribution overlaps the
+fabricated one. Within-model z-scoring does not rescue the transfer (r = −0.470).
+
+So the honest reading is *not* "the label-free proxy fails". It is that **with
+four models, leave-one-model-out cannot test transfer at all**: the fit has three
+models to learn from, between-model offsets dominate the eight features, and the
+held-out prediction inverts. The signal is real in-sample; whether it generalises
+is currently untestable, not tested-and-refuted.
+
+**This is directly unblocked by plan item 5.** The SmolLM2 scaling captures
+(135M, 1.7B) take the model count from four to six, which is the minimum at which
+leave-one-model-out is worth interpreting. Rung 3 should be re-run then, and the
+result reported either way.
+
+### Per model
+
+| model | entropy | FIS | oracle | oracle gain |
+|---|---|---|---|---|
+| gemma3-270m | 0.5719 | 0.5868 | 0.6376 | **+0.0657** |
+| smollm2-360m | 0.8464 | 0.8064 | 0.8826 | +0.0362 |
+| lfm2.5-350m | 0.8262 | 0.6059 | 0.8347 | +0.0085 |
+| qwen2.5-0.5b | 0.7705 | 0.5743 | 0.7762 | +0.0057 |
+
+Gemma has by far the most to gain, consistent with §27 — it is the model whose
+entropy is weakest. SmolLM2's +0.0362 is more interesting: its entropy is the
+*strongest* of the four, yet per-cell switching still finds a real gain, which
+means the regime is set at the level of individual templates and not only at the
+level of the model.

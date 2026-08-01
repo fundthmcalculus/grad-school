@@ -96,3 +96,81 @@ and chemical elements are the cheapest to extend; `build_prompts_v2.py` /
 * **More norm/metric sweeps:** §22 settled these. The membership family dominates
   (±0.262) and is now locked and asserted in `fis_config.py`; metric and norm pair
   are worth ≤0.015 and +0.002 respectively.
+
+---
+
+# Added after §27 — the complementarity result
+
+§27 established, with equal search budgets and an artefact check, that the fuzzy
+rule's advantage over mean entropy is governed by entropy's own performance
+(r ≈ −0.78, crossover at entropy AUROC ≈ 0.61). Two experiments follow directly.
+They are independent and can run in either order.
+
+## 5. Does model scale set the regime?
+
+**The hypothesis.** Gemma3-270m is the smallest model tested and the only one in
+the winning regime (entropy 0.546, barely above chance). If entropy calibration
+improves with scale, then the fuzzy rule's niche is *small or weakly calibrated
+models*, and the crossover is predictable from size alone.
+
+**Design.** The SmolLM2 family holds training data and recipe fixed and varies
+only size: **135M / 360M / 1.7B**. The 360M capture already exists
+(`capture_v4_smollm2`); the other two are ~4 min and ~30 min of capture on the
+same `prompts_v4.jsonl`, in bfloat16 like the rest.
+
+Measure, per (size × template) cell with the §27 protocol — fixed configuration
+for both detectors, template constant, length matched:
+
+* entropy AUROC as a function of size;
+* (FIS − entropy) as a function of size;
+* whether the crossover at ≈0.61 is crossed somewhere in the family.
+
+**What each outcome means.**
+
+* *Entropy improves monotonically with scale and the gap closes* → the method is
+  a **small-model** technique. That is a clean, honest scope statement and it is
+  useful: sub-500M models are exactly where cheap on-device detection matters.
+* *Entropy does not improve with scale* → the regime is set by something else
+  (tokenizer, instruction tuning, abstention behaviour), and Gemma's position is
+  not about size. That redirects the question but is equally publishable.
+* *Non-monotonic* → most interesting, and would need the confound checks run
+  again before believing it.
+
+**Cost:** ~35 min capture + ~10 min analysis. **Blocking risk:** none; the 1.7B
+model is 3.4 GB in bf16 and fits alongside activations in 12 GB.
+
+## 6. Can the detector be switched without labels?
+
+**Why switching and not blending.** §27 showed a zero-parameter rank-average of
+the two scores reaches 0.735 against entropy's 0.743 and beats both in only 9 of
+44 cells. The detectors are complementary **across** regimes but not **within** a
+cell, so a blend gains nothing. The value — if any — is in *choosing* the right
+detector per deployment.
+
+**Three rungs, in increasing realism.**
+
+1. **Oracle ceiling.** Switch using the true per-cell entropy AUROC. This is
+   cheating and is only there to bound what switching could ever be worth. If the
+   oracle gain over always-entropy is small, stop: there is nothing to win.
+2. **Small labelled calibration set.** Estimate entropy's AUROC from *k* labelled
+   examples (k = 20, 50, 100, 200), switch if the estimate is below the crossover.
+   Report net gain against always-entropy **and** the cost in labels. This is the
+   realistic deployment story, and the honest failure mode is that the AUROC
+   estimate at small k is too noisy to switch on — which is testable directly.
+3. **Label-free proxy.** The interesting one, and the only one that keeps the
+   open-set protocol intact. Ask whether entropy's discriminative power in a cell
+   is predicted by statistics computable on the **known-good fit split alone** —
+   e.g. the variance, range, skew or bimodality of entropy over grounded
+   generations. Intuition: if entropy barely varies on known-good output, it has
+   little room to separate anything. Fit that predictor on some models/templates
+   and test it on held-out ones, so the proxy itself is validated out-of-sample.
+
+**Reporting rules, carried from §26.** Every arm gets the same search budget, or
+none. The oracle arm must be labelled as an upper bound wherever it appears.
+
+**Cost:** no new capture — all four v4 captures are on disk. ~20 min.
+
+**What would make this a result:** rung 3 working at all. Rungs 1–2 are
+bookkeeping; a label-free switch that recovers most of the oracle gain would be a
+genuinely useful and, as far as I know, unreported observation about when
+confidence-based hallucination detection can be trusted.
