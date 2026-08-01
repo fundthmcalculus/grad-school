@@ -10,6 +10,12 @@ that moved there is machine noise by construction.
 
 ---
 
+> **SUPERSEDED IN PART — read the second addendum first.** Glass has since been
+> added, `table_4_4_openset` now runs, and the headline below is wrong: the
+> t-norm fix changes the open-set results substantially (Youden's J roughly
+> triples at the default operating point). Everything in sections 1–3 still
+> stands. See "Addendum 2 — the open-set comparison, finally run".
+
 ## Headline
 
 **The t-norm/t-conorm fix (#26) produced no measurable change anywhere in the
@@ -247,3 +253,104 @@ bite is the anomaly rule, whose complement construction assumes duality — and
 that panel is still blocked on Glass. Recommend running the mixed pairs only
 against the open-set harness once a dataset is available, rather than across this
 matrix.
+
+---
+
+# Addendum 2 — the open-set comparison, finally run
+
+_Glass added 2026-08-01. Controlled before/after: identical dataset, identical
+five seeds, identical six held-out classes, identical θ grid; the only variable
+is the library. Archives in `reproduce/outputs/openset-prefix/` (`d0d6714`) and
+`openset-postfix/` (`23bfdbc`)._
+
+**This overturns the headline at the top of this document.** That conclusion was
+correct only in the sense that the experiment could not run; it should not be
+read as evidence the fix does nothing.
+
+## The fix roughly triples the complement rule's separation
+
+| θ | pre det | pre FA | **pre J** | post det | post FA | **post J** | ΔJ |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 0.50 | 0.336 | 0.207 | +0.129 | 0.731 | 0.488 | **+0.243** | +0.114 |
+| 0.60 | 0.327 | 0.186 | +0.141 | 0.685 | 0.428 | **+0.257** | +0.116 |
+| 0.70 | 0.305 | 0.164 | +0.141 | 0.612 | 0.352 | **+0.261** | +0.120 |
+| 0.80 | 0.276 | 0.142 | +0.134 | 0.539 | 0.298 | **+0.242** | +0.108 |
+| 0.90 | 0.209 | 0.104 | +0.104 | 0.457 | 0.258 | **+0.199** | +0.095 |
+| 0.99 *(default)* | 0.121 | 0.064 | +0.057 | 0.360 | 0.190 | **+0.170** | +0.113 |
+| 1.10 | 0.000 | 0.000 | +0.000 | 0.000 | 0.000 | +0.000 | 0.000 |
+
+Detection roughly **doubles at every θ**, and J improves by +0.095 to +0.120
+across the whole usable range — a uniform shift, not a single lucky operating
+point. Peak J moves from +0.141 (θ≈0.6–0.7) to **+0.261 (θ=0.70)**. Saturation
+at θ=1.1 is unchanged: the rule stops firing in both.
+
+The pre-fix θ=0.99 figure (+0.057) is close to the +0.075 recorded in
+`ACTION_ITEMS.md` from an earlier two-seed run, which is a useful cross-check
+that the pre-fix arm really is reproducing the old behaviour.
+
+## Why: the old intermediates were not valid memberships
+
+Probing one split (held-out class 7, seed 0) through the harness's own
+`complement_rule`:
+
+| | flagged unknown | max class firing | NaNs | min anomaly membership |
+|---|---:|---:|---:|---:|
+| pre-fix | **2 / 85** | 1.107 | 128 | **−0.322** |
+| post-fix | **32 / 85** | 0.618 | 0 | ~0 |
+
+Pre-fix, the rule fired almost never, and the values it was deciding on included
+128 NaNs, firing strengths above 1, and *negative* anomaly memberships. Two of
+#26's four defects account for it: **#22** meant the requested `hamacher` conorm
+was silently discarded in the array-reduction branch, and **#25** meant the θ
+boost was aggregated unclipped, pushing inputs outside the `[0,1]` domain the
+operators are defined on. A negative membership can never win an argmax, so the
+anomaly label lost by construction on most samples.
+
+## The important caveat: the baselines moved too
+
+| Method | pre J | post J |
+|---|---:|---:|
+| **Complement rule** | +0.057 | **+0.170** |
+| One-class SVM | +0.037 | +0.062 |
+| Isolation Forest | +0.032 | **+0.208** |
+
+The baselines are scikit-learn and cannot have been affected by a `tribble-fis`
+change. They moved because the protocol **matches each baseline's contamination
+to the complement rule's observed false-alarm rate** — that rate went from 0.064
+to 0.190, so all three arms are now being read at a different, higher-FA
+operating point. The arms remain comparable to each other within a run; they are
+not comparable *across* runs.
+
+That reframes the result. In absolute terms the complement rule improved a lot.
+In relative terms it **lost its nominal lead**: pre-fix it beat both baselines,
+post-fix isolation forest is ahead (+0.208 vs +0.170). The fix made the rule work
+properly; it did not make it the best detector on this data.
+
+And the caution from the earlier run still applies — post-fix detection carries a
+standard deviation of ±0.331 on a mean of 0.360, wider than the gap between any
+two arms. **The three detectors remain statistically indistinguishable.** Glass,
+at 214 samples with three classes under 18 members, is a stress test.
+
+## What to change in the text
+
+- Ch 4 §4.3.5: the complement-rule numbers should be re-quoted from
+  `openset-postfix`. Best operating point **J = +0.261 at θ = 0.70**, not the
+  θ = 0.99 default inherited from `beth-anomaly.py`, which sits well past the
+  useful range.
+- `ACTION_ITEMS.md` line 93–94: the "best J = +0.155 at θ = 0.80" figures are
+  pre-fix and should be retired.
+- The claim that the complement rule leads the dedicated detectors should be
+  dropped. It is behind isolation forest at a matched operating point, and the
+  spread makes all three a tie.
+
+## Methodological note
+
+The first attempt at this comparison silently produced nothing: a stray `cd` into
+the submodule made the script path unresolvable, python exited immediately, and
+the stale post-fix outputs were still on disk — so the "pre-fix" and "post-fix"
+files compared byte-identical and briefly looked like strong evidence that the
+fix changed nothing. It was caught only because a single-split probe disagreed
+with the table. The check that mattered was reading the run's log rather than
+trusting its exit status, and the harness's `no-output` detection (added earlier
+today) exists for exactly this failure mode but does not cover a run whose
+outputs were left behind by a previous invocation.
