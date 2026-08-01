@@ -953,3 +953,100 @@ not.* That is a real niche, and it is the one worth pursuing.
 Figures: `figures/negative_results.png` (the falsification) and
 `figures/transfer_matrix.png` (this matrix, diverging palette centred on chance
 so the below-chance cells are visible as such).
+
+---
+
+## 20. The false-premise niche, properly controlled -- it also dissolves
+
+Section 19's one apparent win (FIS 0.786 vs entropy 0.561 on `falsepremise`) used
+TriviaQA-correct as the truthful set, so it carried the same confound that
+falsified section 9: long discursive fabrications against short factual answers,
+with only length matched. `build_prompts_v3.py` builds the missing control --
+every long-form template gets a **real-subject twin in the identical surface
+form**, so both sides are fluent and discursive.
+
+    real : "Explain how the quicksort algorithm works."
+    fake : "Explain how the Drennick-partition algorithm works."
+
+Seven templates x 3 phrasings, 471 real / 1,640 invented subjects, 96-token
+generations, 2,111 prompts in 3 min 46 s at 3.41 GB. Labels are **groundedness**,
+not correctness: a paragraph cannot be graded reliably, but a real subject anchors
+the answer and an invented one cannot. The model fabricated on **1,627 of 1,640
+(99.2%)** invented long-form subjects -- only 13 pushbacks.
+
+### Stacked controls, 8 seeds
+
+| detector | raw | + length | **+ template** | + entropy |
+|---|---|---|---|---|
+| Mahalanobis - stats | 0.851 | 0.852 | **0.847** | **0.799** |
+| mean entropy | 0.875 | 0.855 | 0.841 | 0.642 |
+| perplexity | 0.852 | 0.830 | 0.826 | 0.624 |
+| **FIS - agg** (best fuzzy) | 0.608 | 0.611 | **0.666** | 0.657 |
+| FIS - centroid | 0.571 | 0.579 | 0.626 | 0.625 |
+| FIS - deltaref | 0.578 | 0.575 | 0.614 | 0.617 |
+| OneClassSVM - deltaref | 0.615 | 0.623 | 0.580 | 0.612 |
+| `n_tokens` (control) | 0.464 | 0.500 | 0.500 | 0.500 |
+
+Under template matching the best fuzzy family reaches **0.666** against **0.847**
+for the distribution statistics. Under the hardest condition the gap narrows only
+because entropy is being matched away, and the paired test is **not significant**:
+
+    FIS - agg vs mean entropy, entropy-matched:
+      mean delta = +0.015 +/- 0.037, wins 6/8 seeds, Wilcoxon p = 0.3125
+
+Per subtype (template-matched), entropy beats the best fuzzy family on **every
+one**: algorithm -0.280, researcher -0.288, conjecture -0.198, effect -0.099,
+element -0.018.
+
+**So the section 19 niche was the same confound a third time.** The pattern is now
+the most reliable finding in this study: *prompt-family style is a very strong
+confound in hallucination detection, and any apparent advantage for a
+hidden-state detector should be assumed to be style until a template-matched
+control says otherwise.* Three separate claimed advantages (section 9, section 19,
+and the raw column above) each dissolved under exactly that control.
+
+### One genuinely new positive result
+
+**Mahalanobis over the 19 output-distribution statistics holds 0.799 even with
+entropy matched**, where mean entropy itself falls to 0.642 by construction. So
+there *is* substantial signal beyond mean entropy -- it lives in the **other
+output statistics** (margin, max-prob, log-prob spread, their min/max/std), not in
+hidden-state geometry. That is directly actionable and cheap: 19 features, 209
+parameters, 1 ms to fit, 749k samples/s.
+
+### Standing report -- condition `length+template+entropy`
+
+| detector | AUROC | FPR@95 | params | train | inference | structure |
+|---|---|---|---|---|---|---|
+| **Mahalanobis - stats** | **0.799 +/- 0.023** | 0.653 | 209 | **1 ms** | 749,343/s | 19 features |
+| FIS - agg | 0.657 +/- 0.028 | 1.000 | **42** | 720 ms | 418,569/s | 2 rules / 24 MFs |
+| mean entropy | 0.642 +/- 0.014 | 0.738 | **0** | **0 ms** | **2,025,765/s** | threshold |
+| FIS - centroid | 0.625 +/- 0.032 | 1.000 | 53 | 923 ms | 317,059/s | 2 rules / 27 MFs |
+| FIS - deltaref | 0.617 +/- 0.019 | 1.000 | 62 | 767 ms | 353,437/s | 2 rules / 31 MFs |
+| OneClassSVM - deltaref | 0.612 +/- 0.026 | 0.788 | 352 | 2 ms | 330,748/s | 37 SV |
+
+Note **FPR@95TPR = 1.000 for every fuzzy variant**: to catch 95% of fabrications
+they flag essentially everything. Even where AUROC looks respectable the operating
+characteristics are unusable, which the AUROC column alone hides -- which is why
+the standing report carries FPR@95.
+
+`figures/falsepremise_control.png`.
+
+### Consequence for the plan
+
+`NEXT_STEPS.md` A2/A3 (second model, scaling) are **not worth running**: they
+would test whether a chance-to-mediocre result generalises. The honest remaining
+directions are:
+
+1. **Follow the output statistics, not the activations.** Mahalanobis over the 19
+   stats is the only thing that has survived every control. Ask which of the 19
+   carry the entropy-independent signal, and whether a *small fuzzy rule over
+   those* is competitive -- that keeps the interpretability claim while betting on
+   the representation that actually works.
+2. **Stop treating "hallucination" as one target.** Section 19's transfer matrix
+   (+0.190 gap, below-chance off-diagonals) says these are different phenomena;
+   pick one narrow, well-controlled class and characterise it properly.
+3. The **methodological contribution is the paper here**: three confounds --
+   length, prompt family, and entropy -- each independently manufacture large
+   spurious results, and matching is a cheap general remedy. That is worth
+   writing up on its own, and it is what this study actually established.

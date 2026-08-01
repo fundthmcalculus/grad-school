@@ -74,6 +74,13 @@ def label_row(row: dict, answer: str) -> str:
     if row["family"] == "falsepremise":
         # Subject does not exist, and the model did not push back.
         return "hallucination" if answer.strip() else "abstain"
+    # v3 long-form probes are labelled by GROUNDEDNESS, not correctness: a
+    # paragraph cannot be graded reliably, but a real subject anchors the answer
+    # to something and an invented subject cannot. See build_prompts_v3.py.
+    if row["family"] == "longform_real":
+        return "grounded" if answer.strip() else "abstain"
+    if row["family"] == "longform_fake":
+        return "hallucination" if answer.strip() else "abstain"
     norm = normalize(answer)
     if not norm:
         return "abstain"

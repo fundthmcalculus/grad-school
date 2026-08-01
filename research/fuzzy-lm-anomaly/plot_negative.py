@@ -207,7 +207,60 @@ def fig_transfer():
     print(f"wrote {OUT / 'transfer_matrix.png'}")
 
 
-if __name__ == "__main__":
+def _main():
     OUT.mkdir(exist_ok=True)
     fig_negative()
     fig_transfer()
+    fig_falsepremise()
+
+
+def fig_falsepremise():
+    """The false-premise niche under stacked controls."""
+    d = pd.read_csv(DATA / "falsepremise_deep.csv")
+    agg = d.groupby(["detector", "condition"])["auroc"].agg(["mean", "std"])
+    order = ["raw", "length", "length+template", "length+template+entropy"]
+    style = [("Mahalanobis · stats", INK_MUTED, 1.7, "Mahalanobis · stats", 0.010),
+             ("mean entropy", S3, 1.7, "Mean entropy", -0.012),
+             ("FIS · agg", S1, 2.4, "tribble FIS · agg (best family)", 0.012),
+             ("FIS · deltaref", S1, 1.3, "FIS · deltaref", -0.014),
+             ("n_tokens (control)", S2, 1.7, "n_tokens (control)", 0.0)]
+    fig, ax = plt.subplots(figsize=(8.4, 5.0))
+    x = np.arange(len(order))
+    for key, c, lw, lab, dy in style:
+        if key not in agg.index.get_level_values(0):
+            continue
+        ys = [agg.loc[(key, o), "mean"] for o in order]
+        es = [agg.loc[(key, o), "std"] for o in order]
+        ax.errorbar(x, ys, yerr=es, color=c, lw=lw, marker="o", ms=5.5,
+                    mec=SURFACE, mew=1.3, capsize=3, elinewidth=1.0, zorder=3,
+                    alpha=1.0 if lw > 1.5 else 0.75)
+        ax.text(x[-1] + 0.08, ys[-1] + dy, f"{lab}\n{ys[-1]:.3f}", color=c,
+                fontsize=7.4, va="center", ha="left", linespacing=1.3,
+                fontweight="bold" if lw > 2 else "normal")
+    ax.axhline(0.5, color=INK_MUTED, lw=1, ls=(0, (4, 3)), zorder=2)
+    ax.text(-0.1, 0.507, "chance", fontsize=7.4, color=INK_MUTED, va="bottom")
+    ax.set_xticks(x, ["raw", "+ length\nmatched", "+ template\nmatched",
+                      "+ entropy\nmatched"])
+    ax.set_xlim(-0.4, 4.55)
+    ax.set_ylim(0.44, 0.94)
+    ax.set_ylabel("AUROC  (↑ higher is better)")
+    ax.yaxis.grid(True, color=GRID, lw=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    ax.tick_params(length=0)
+    fig.suptitle("The false-premise niche does not survive its own control",
+                 x=0.012, y=0.975, ha="left", fontsize=12, color=INK,
+                 fontweight="bold")
+    fig.text(0.012, 0.905,
+             "Long-form probes with real-subject twins in identical surface "
+             "forms, so both sides are fluent and discursive.\nEvery fuzzy family "
+             "stays well below the output-distribution baselines once template is "
+             "matched.",
+             ha="left", va="top", fontsize=8.4, color=INK_2, linespacing=1.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.855))
+    for ext in ("png", "pdf"):
+        fig.savefig(OUT / f"falsepremise_control.{ext}", dpi=200)
+    print(f"wrote {OUT / 'falsepremise_control.png'}")
+
+
+if __name__ == "__main__":
+    _main()
