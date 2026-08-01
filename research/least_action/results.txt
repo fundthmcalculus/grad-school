@@ -615,6 +615,48 @@ C. What the subspace restriction actually buys
    an unconstrained *imitation* fit (§12b) is a different matter -- at
    that magnitude the certificate genuinely fails.
 
+===== verify_symbolic.py =====
+SYMBOLIC VERIFICATION (sympy; identities, not sampled points)
+==============================================================================
+§1  Euler-Lagrange gives lam*e'' - e = 0                          PASS
+§7a Theorem C1: sum_i phi_i(-Kz) = -Kz for ANY membership values  PASS
+§7a partition of unity: sum_i phi_i = 1                           PASS
+§9b Theorem C2': ell + V_x(f+gu) = Bregman divergence D_c(u||u*)  PASS
+§7b Theorem C2 is the c(u)=Ru^2 case: D_c = R(u-u*)^2             PASS
+§9b D_c >= 0 via convexity, c(u)=u^2+u^4                          PASS
+§9b D_c >= 0 via convexity, c(u)=cosh(u)-1                        PASS
+§4d' INT phi0 phi1 dx = 1/k                                       PASS
+§4d' INT phi0' phi1' dx = -k/6                                    PASS
+§4d' lambda* = -INT(pp)/INT(dd) = 6/k^2                           PASS
+§5b centroid = sum_i w_i c_i with w_i = alpha_i A_i / sum         PASS
+§5b weights sum to one (=> output is a convex combination)        PASS
+§5c y_beta - c_(1) = w_2 (c_2 - c_1)                              PASS
+§5c off-peak weight w_2 = r^beta/(1+r^beta), r = alpha2/alpha1    PASS
+§5c t/(1+t) is increasing (d/dt > 0)                              PASS
+§12a phi_i = N_i/Q with N_1 = D_2, Q = D_1 + D_2 (N=2)            PASS
+§12a u = P/Q exactly (P, Q polynomial)                            PASS
+§12a D_i >= 1 for all real z (=> Q >= N > 0)                      PASS
+§3a Hessian of the action in theta equals 2G (constant in theta)  PASS
+§3a stationarity <=> G theta = r                                  PASS
+§3d envelope theorem: dS/dp = -2 theta dr/dp + theta^2 dG/dp      PASS
+==============================================================================
+21/21 identities verified
+
+===== verify_sos_exact.py =====
+1. numerical SDP at rho=1/2: certified=True, Gram min eig +3.474e-03  (strictly positive => room to round)
+2. multiplier rounded to Q (denominator <= 100000000): sigma is SOS over Q = True
+   sigma(0) = 0  (must be 0 or the target cannot be SOS)
+3. exact target over Q: 65 monomials, degrees [2, 3, 4]
+4. projected onto the exact identity: residual = 0  (EXACT)
+5. exact integer minors on the 14x14 Gram: positive definite = True
+   14/14 leading principal minors verified > 0 (largest is a 27737-bit integer)
+
+CONCLUSION -- no floating-point step remains in the chain:
+  W(z)/s - eps||z||^2/s - sigma(z)(rho - V(z))/s'  =  m(z)' G m(z)
+  with G positive definite over Q and sigma SOS over Q.
+  Therefore Vdot < 0 on {z : z'Pz <= 1/2} \ {0} for the
+  rationalized pi-MF controller.  Proved, not measured.
+
 ===== Theorem C2' : Bregman form of the exact certificate =====
 c(u)=cosh(u)-1   q>=0 on domain: True
         controller             J          V*            gap     INT D_c dt    residual

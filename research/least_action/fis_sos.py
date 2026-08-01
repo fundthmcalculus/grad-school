@@ -40,6 +40,16 @@ from numpy.typing import NDArray
 
 af64 = NDArray[np.float64]
 
+# Optional side-channel so `verify_sos_exact` can retrieve the solver's Gram
+# matrices and the exact polynomial data without duplicating the assembly.
+_CAPTURE: dict | None = None
+
+
+def capture(store: dict | None) -> None:
+    """Enable/disable capture of the next certify_roa call's internals."""
+    global _CAPTURE
+    _CAPTURE = store
+
 
 # --------------------------------------------------------------------------
 # Exact rational form of the controller
@@ -110,15 +120,39 @@ def to_rational(ctrl, n_state: int = 4) -> RationalController:
     for i in range(n_rules):
         f_i = sum(sp.Float(theta[i][m]) * b[m] for m in range(len(b)))
         p_poly += n_terms[i] * f_i
-    return RationalController(list(z), sp.expand(p_poly), q_poly)
+    p_poly = sp.expand(p_poly)
+
+    # Zero P's constant term.  fit_consequents enforces u(0) = 0 as an exact
+    # linear constraint, so P(0) = Q(0) u(0) is zero by construction -- but in
+    # floating point it comes out at ~1e-18, and sympy faithfully carries that
+    # as a genuine constant coefficient.  It then propagates into a degree-1
+    # term in the Lyapunov polynomial, which no SOS basis starting at degree 1
+    # can represent, and the SDP is reported infeasible for a quantity that is
+    # numerically zero.  Dropping it makes the symbolic object represent the
+    # constrained controller rather than its float residue.
+    const = p_poly.subs({zi: 0 for zi in z})
+    if const != 0:
+        p_poly = sp.expand(p_poly - const)
+    return RationalController(list(z), p_poly, q_poly)
 
 
 # --------------------------------------------------------------------------
 # SOS feasibility
 # --------------------------------------------------------------------------
-def _monomials(z: list[sp.Symbol], degree: int) -> list[sp.Expr]:
-    out: list[sp.Expr] = [sp.Integer(1)]
-    for d in range(1, degree + 1):
+def _monomials(z: list[sp.Symbol], degree: int, min_degree: int = 0) -> list[sp.Expr]:
+    """Monomials of total degree in [min_degree, degree].
+
+    `min_degree=1` drops the constant term.  That is not an optimization: the
+    S-procedure target W - sigma*(rho - V) evaluates at the origin to
+    -sigma(0)*rho, which is strictly negative whenever sigma(0) > 0, so no such
+    polynomial is ever SOS.  The multiplier must vanish at the origin, and the
+    SOS basis must then also start at degree 1 -- W itself has no constant or
+    linear term because grad V(0) = 0.  Allowing the constant lets the SDP
+    satisfy the constraint only by driving sigma(0) to zero, which it does, and
+    the Gram comes back sitting exactly on the PSD boundary as a result.
+    """
+    out: list[sp.Expr] = [sp.Integer(1)] if min_degree == 0 else []
+    for d in range(max(1, min_degree), degree + 1):
         for combo in combinations_with_replacement(range(len(z)), d):
             term = sp.Integer(1)
             for i in combo:
@@ -337,7 +371,7 @@ def certify_roa(
     gv_g = (grad.T @ sp.Matrix(b_vec.reshape(-1, 1).tolist()))[0, 0]
     w_expr = sp.expand(-(rat.denominator * gv_f + gv_g * rat.numerator))
 
-    sig_mons = _monomials(z, sigma_degree // 2)
+    sig_mons = _monomials(z, sigma_degree // 2, min_degree=1)
     ks = len(sig_mons)
     sig_gram = cp.Variable((ks, ks), symmetric=True)
     sig_exp = [tuple(sp.Poly(m, *z).monoms()[0]) for m in sig_mons]
@@ -366,7 +400,7 @@ def certify_roa(
     deg = max(max((sum(m) for m in w_c), default=0),
               max((sum(m) for m in slack_c), default=0) + sigma_degree)
     half = (deg + 1) // 2
-    mons = _monomials(z, half)
+    mons = _monomials(z, half, min_degree=1)
     mon_exp = [tuple(sp.Poly(m, *z).monoms()[0]) for m in mons]
     k = len(mons)
     gram = cp.Variable((k, k), symmetric=True)
@@ -410,6 +444,11 @@ def certify_roa(
     eg = float(np.linalg.eigvalsh(g).min())
     es = float(np.linalg.eigvalsh(sg).min())
     ok = eg > -1e-8 * scale and es > -1e-8 * max(float(np.max(np.abs(sg))), 1e-12)
+    if _CAPTURE is not None:
+        _CAPTURE.update(gram=g, sigma_gram=sg, monomials=mons,
+                        sigma_monomials=sig_mons, w_scale=w_scale,
+                        slack_scale=slack_scale, w_expr=w_expr, v_expr=v_expr,
+                        epsilon=epsilon, rho=rho)
     return ok, eg, abs(min(eg, 0.0)) / scale
 
 
