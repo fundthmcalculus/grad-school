@@ -23,6 +23,9 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
 ## Knobs (environment variables)
 
 - `REPRO_SEEDS="0,1,2,3,4,5,6"` — widen the seed set (more seeds → tighter CIs).
+- `REPRO_NORM_FAMILIES="min/max,probability,luk,hamacher,einstein"` — which fuzzy
+  operator families the norm/conorm matrix sweeps.
+- `REPRO_PHIUSIIL_N="20000"` — sample cap for PhiUSIIL in the norm/conorm matrix.
 - `REPRO_N_GRID="256,512,1024,2048,4096"` — the N values for Table 3.1.
 - `REPRO_NAIVE_CAP="1024"` — largest N at which the cubic classical VAT is timed.
 
@@ -33,6 +36,7 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
 | `table_3_1_pvat_scaling.py` | Table 3.1 | random 2-D point sets | exact pVAT | in-script classical O(N³) VAT |
 | `table_4_1_mog_baselines.py` | Table 4.1 | Concrete, PhiUSIIL | MoG FIS (time + accuracy) | sklearn RF; ANFIS/GA-FIS optional |
 | `table_6_1_model_family.py` | Table 6.1 | Concrete, PhiUSIIL | flat / fuzzy tree / HME | sklearn CART & RF; M5 optional |
+| `table_norm_conorm_matrix.py` | Norm/conorm comparison | Concrete, PhiUSIIL | flat / fuzzy tree / HME, swept over the 5 De Morgan pairs | — (the families are compared against each other) |
 
 ## Adding the optional baselines (ANFIS, GA-FIS, M5)
 
