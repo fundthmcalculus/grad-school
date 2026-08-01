@@ -9,9 +9,10 @@ explicitly break Euclidean embeddability.
 
 import numpy as np
 import sys
+from pathlib import Path
 
-project_dir = "/home/scott/PycharmProjects/grad-school/gated-minimax-selection"
-sys.path.insert(0, project_dir)
+project_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(project_dir))
 
 from nerfcm import nerfcm
 
