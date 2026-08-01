@@ -293,3 +293,146 @@ def stability_certificate(
         worst_vdot=float(np.max(vdot[inside])) if radius > 0.0 and inside.any() else 0.0,
         level_set=float(prob.v(np.array([radius]))[0]),
     )
+
+
+# --------------------------------------------------------------------------
+# Beyond quadratic cost: the Bregman form of Theorem C2
+# --------------------------------------------------------------------------
+@dataclass(frozen=True)
+class InverseOptimalConvex:
+    """Scalar plant with a general control cost c(u), convex and differentiable.
+
+    Theorem C2 is usually stated for c(u) = R u^2, but nothing in the derivation
+    needs the quadratic -- only that the HJB stationarity condition can be
+    inverted.  Writing u* for the minimizer, for ANY convex differentiable c
+
+        ell(x,u) + V_x (f + g u)  =  c(u) - c(u*) - c'(u*)(u - u*)  =  D_c(u || u*)
+
+    the Bregman divergence of c at u*.  Integrating along the closed loop gives
+    the general certificate
+
+        J(x0) - V*(x0)  =  INT D_c(u || u*) dt                      (Theorem C2')
+
+    which is still exact, still requires no constants, and is still non-negative
+    for free -- D_c >= 0 is precisely convexity of c.  The quadratic case
+    D_c = R (u - u*)^2 is one instance.
+    """
+
+    f: Callable[[af64], af64]
+    g: Callable[[af64], af64]
+    v: Callable[[af64], af64]
+    v_x: Callable[[af64], af64]
+    c: Callable[[af64], af64]
+    """Control cost c(u), convex and differentiable."""
+    c_prime: Callable[[af64], af64]
+    c_prime_inv: Callable[[af64], af64]
+    """Inverse of c', used to solve the HJB stationarity condition for u*."""
+
+    def u_star(self, x: af64) -> af64:
+        return self.c_prime_inv(-self.g(x) * self.v_x(x))
+
+    def q(self, x: af64) -> af64:
+        us = self.u_star(x)
+        return -self.c(us) - self.v_x(x) * (self.f(x) + self.g(x) * us)
+
+    def bregman(self, u: af64, us: af64) -> af64:
+        return self.c(u) - self.c(us) - self.c_prime(us) * (u - us)
+
+    def q_is_valid(self, x: af64) -> bool:
+        return bool(np.all(self.q(x) >= -1e-9))
+
+
+def quartic_benchmark() -> InverseOptimalConvex:
+    """c(u) = u^4: convex, differentiable, and emphatically not quadratic."""
+    return InverseOptimalConvex(
+        f=lambda x: -x,
+        g=lambda x: np.ones_like(x),
+        v=lambda x: x**2,
+        v_x=lambda x: 2.0 * x,
+        c=lambda u: u**4,
+        c_prime=lambda u: 4.0 * u**3,
+        c_prime_inv=lambda y: np.sign(y) * np.abs(y / 4.0) ** (1.0 / 3.0),
+    )
+
+
+def cosh_benchmark() -> InverseOptimalConvex:
+    """c(u) = cosh(u) - 1: convex, and not a polynomial at all."""
+    return InverseOptimalConvex(
+        f=lambda x: -x,
+        g=lambda x: np.ones_like(x),
+        v=lambda x: x**2,
+        v_x=lambda x: 2.0 * x,
+        c=lambda u: np.cosh(u) - 1.0,
+        c_prime=lambda u: np.sinh(u),
+        c_prime_inv=lambda y: np.arcsinh(y),
+    )
+
+
+def simulate_convex(
+    prob: InverseOptimalConvex,
+    u_fn: Callable[[af64], af64],
+    x0: float,
+    t_end: float = 60.0,
+) -> dict[str, float]:
+    """Closed loop with cost and Bregman integral carried as ODE states."""
+
+    def rhs(_t: float, z: af64) -> list[float]:
+        x = np.array([z[0]])
+        u = u_fn(x)
+        us = prob.u_star(x)
+        return [
+            float((prob.f(x) + prob.g(x) * u)[0]),
+            float((prob.q(x) + prob.c(u))[0]),
+            float(prob.bregman(u, us)[0]),
+        ]
+
+    sol = solve_ivp(rhs, (0.0, t_end), [x0, 0.0, 0.0], rtol=1e-11, atol=1e-13,
+                    method="LSODA")
+    j = float(sol.y[1, -1])
+    v0 = float(prob.v(np.array([x0]))[0])
+    breg = float(sol.y[2, -1])
+    return {
+        "cost": j,
+        "optimal_cost": v0,
+        "gap": j - v0,
+        "bregman_integral": breg,
+        "residual": abs((j - v0) - breg),
+        "final_state": float(sol.y[0, -1]),
+    }
+
+
+def _invert_monotone(c_prime: Callable[[af64], af64], y: af64,
+                     u0: af64 | None = None, iters: int = 60) -> af64:
+    """Newton inversion of a strictly increasing c'.
+
+    Used when the stationarity condition c'(u*) = -g V_x has no closed-form
+    inverse.  Strict monotonicity (i.e. strict convexity of c) is what makes the
+    root unique, so this never has to choose between branches.
+    """
+    u = np.zeros_like(y) if u0 is None else u0.copy()
+    for _ in range(iters):
+        h = 1e-7 * np.maximum(np.abs(u), 1.0)
+        d = (c_prime(u + h) - c_prime(u - h)) / (2 * h)
+        u = u - (c_prime(u) - y) / np.where(np.abs(d) < 1e-12, 1e-12, d)
+    return u
+
+
+def quadratic_quartic_benchmark() -> InverseOptimalConvex:
+    """c(u) = u^2 + u^4: the familiar 'penalize large effort harder' cost.
+
+    Unlike a pure quartic this has c''(0) > 0, so u* has bounded slope at the
+    origin and the closed loop is not stiff there -- worth noting, because the
+    pure quartic's cube-root optimal law is numerically nasty for exactly that
+    reason without being any more instructive.
+    """
+    return InverseOptimalConvex(
+        f=lambda x: -x,
+        g=lambda x: np.ones_like(x),
+        v=lambda x: x**2,
+        v_x=lambda x: 2.0 * x,
+        c=lambda u: u**2 + u**4,
+        c_prime=lambda u: 2.0 * u + 4.0 * u**3,
+        c_prime_inv=lambda y: _invert_monotone(
+            lambda u: 2.0 * u + 4.0 * u**3, y, u0=y / 2.0
+        ),
+    )

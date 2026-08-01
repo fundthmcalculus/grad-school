@@ -6,7 +6,7 @@ the rule-orthogonality question.
 
 Code: `fis_action.py` (approximation), `fis_control.py` (control).
 Experiments: `demo_regression.py`, `demo_classifier.py`, `demo_control.py`.
-Recorded output: `results.txt`. Reproduction instructions: §10.
+Recorded output: `results.txt`. Reproduction instructions: §11.
 
 ### Notation
 
@@ -664,7 +664,7 @@ sufficiency argument of §3c stays valid.
 - MOM stays discontinuous; the $\beta$-annealed surrogate is $C^\infty$ and
   converges geometrically in the margin.
 
-**Open / next:** consolidated and prioritized in **§9**, which supersedes the
+**Open / next:** consolidated and prioritized in **§10**, which supersedes the
 list that used to sit here. §8-§9 added substantially to it.
 
 ---
@@ -1239,105 +1239,237 @@ it at *ten parameters*, the smallest model in the entire study.
 
 ---
 
-## 9. Next steps
+## 9. Guarantees: what is proven, what is provably out of reach
 
-Consolidated from the open threads in §6, §7g and §8k, ordered by value per unit
-of work rather than by section. Rough costs assume this machine.
+Written because analytic guarantees, not performance, are the point of this work.
+The short answer is that the framework *can* deliver them, but only inside an
+envelope that is now precisely characterizable — and one of the three objectives
+in §8 provably falls outside it.
 
-### 9a. Do first — cheap, and they close claims already made
+### 9a. Inventory
 
-**1. Certify the direct-optimized controller.** §8h surrendered every guarantee
-in the framework to derivative-free search, and nothing was put back. But §7e's
-machinery is controller-agnostic: a Lyapunov/ROA certificate can be computed
-*post hoc* for the 0.6547 controller exactly as it was for the scalar ones. Right
-now the best-performing controller in the study is the only one with no
-stability certificate at all, which is backwards. (~1 hour; low risk, high value
-— it either certifies or reveals the controller is quietly fragile.)
+| # | Guarantee | Status | Conditions |
+|---|---|---|---|
+| G1 | Consequents are the **global** optimum, in closed form | **Proven** (§3a) | antecedents fixed; regressors independent |
+| G2 | Action is **convex in function space**, no conjugate points | **Proven** (§2) | $\lambda\ge0$ |
+| G3 | Reduced gradient exact, $-2\langle e,\partial y_c/\partial p\rangle_{H^1}$ | **Proven** (§3d) | $\delta$-coverage |
+| G4 | Greedy $=$ joint **iff** $H^1$ Gram block-diagonal | **Proven** (§4b) | for all targets |
+| G5 | $\lambda^\*=3b^4/(8c^2)$ closed form | **Proven** (§4d′) | 2 equal-width Gaussians |
+| G6 | $\vee=+$ **iff** disjoint output supports | **Proven** (§5a) | — |
+| G7 | Centroid defuzz $=$ order-0 TSK, range $[0,1]$ free | **Proven** (§5b) | disjoint, product implication |
+| G8 | Annealing error $\le(N{-}1)Dr^\beta/(1{+}(N{-}1)r^\beta)$ | **Proven** (§5c) | — |
+| G9 | TSK reproduces LQR **exactly** | **Proven** (§7a) | LTI, quadratic cost — and vacuous |
+| G10 | $J-V^*=\int(u-u^*)^\top R(u-u^*)dt$, **exact** | **Proven** (§7b) | control-affine, quadratic in $u$, admissible, $V^*$ known |
+| G11 | Local optimality of antecedents | **Certified numerically only** (§3b) | KKT on critical cone + FD Hessian |
+| G12 | Stability / ROA | **Computable, not analytic** (§7e) | needs a Lyapunov candidate |
+| G13 | Global optimality over antecedents | **Not available** | — |
+| G14 | Certificate for settling time / peak force | **Provably outside G10** | see §9c |
 
-**2. Direct policy optimization on the nonlinear plant.** §8d is the study's
-sharpest negative result: on the cubic-spring plant no imitation controller beat
-a linear LQR, and everything past $N{=}4$ failed. §8h then showed imitation was
-never the right objective. **The obvious question is whether §8h's fix rescues
-§8d**, and it directly tests whether that negative result was about the *method*
-or about the *plant*. If direct optimization wins there, §8d's conclusion —
-"nonlinearity is necessary but not sufficient" — needs revising toward "the
-imitation route cannot exploit nonlinearity, but the direct route can."
-(~30 min; the single highest-information experiment left.)
+### 9b. G10 extends further than stated — Theorem C2′
 
-**3. Widen the state envelope.** All of §8 uses six modest initial conditions
-and §8i bounds overfitting at 5.5% against six more. A substantially wider
-envelope would stress the distribution-shift finding (§8c) and probably lower
-the rule count at which it bites. (~1 hour.)
+C2 is usually tied to $\int u^\top Ru$. Nothing in the derivation needs the
+quadratic, only that HJB stationarity can be inverted. For a running cost
+$\ell(x,u)=q(x)+c(u)$ with $c$ **convex and differentiable**, stationarity gives
+$c'(u^*)=-g^\top\nabla V^{*\top}$, and then
 
-### 9b. Theory gaps that are actually load-bearing
+$$\ell(x,u)+\nabla V^*(f+gu)=c(u)-c(u^*)-c'(u^*)(u-u^*)=D_c(u\,\|\,u^*),$$
 
-**4. Extend the Theorem C2 certificate beyond quadratic cost.** This is the
-largest hole. C2 gives an *exact* suboptimality certificate — no constants, no
-conservatism — but only for $\int u^\top Ru$. Settling time and peak force fall
-outside it, so §8's entire three-objective study is measured rather than
-certified, and that gap is what separates §8 from §7. An $L^\infty$ or
-exit-time functional will not admit the same clean identity, but a one-sided
-bound may be reachable, and would upgrade the whole control half of this work.
-(Days; genuinely open, possibly not achievable in the clean form.)
+the **Bregman divergence** of $c$ at $u^*$. Integrating along the closed loop:
 
-**5. Analytic Hessian of the reduced action.** §3d made the gradient exact and
-that removed a real failure mode. The second-order certificate still uses finite
-differences, and its noise floor is what forces the tolerance-based verdict in
-§3b. The same envelope argument differentiated once more should give it in
-closed form. (~half a day; low risk, mostly algebra already half-done.)
+$$\boxed{\;J(x_0)-V^*(x_0)=\int_0^\infty D_c\big(u(t)\,\|\,u^*(x(t))\big)\,dt\;}\tag{C2$'$}$$
 
-**6. $\lambda^\*$ in the multi-input case.** §4d′ gives $\lambda^\*=3b^4/(8c^2)$ in
-closed form for two scalar Gaussians, with $\ell^\*=\sqrt6\times$ the crossover
-width. In $\mathbb{R}^n$ the crossover is a hypersurface and the width becomes
-direction-dependent, so the scalar formula cannot carry over unchanged. Whether
-a useful anisotropic version exists is unknown. (Open-ended.)
+Still exact. Still no constants. Still **non-negative for free** — $D_c\ge0$ *is*
+convexity of $c$. The quadratic case $D_c=R(u-u^*)^2$ is one instance.
 
-### 9c. Validation the work has not had
+Verified numerically on two non-quadratic convex costs (`fis_control.py`,
+`simulate_convex`):
 
-**7. The classifier side has never met real data.** §5 proves the max-equals-sum
-identity, the order-0 TSK collapse, and the annealing bound, all on synthetic
-partitions. The sonar dataset is already wired up in
-`AEEM6097/fuzzy-symphony.py` and has been the intended target since the start.
-Everything in §5 is untested against anything with real class overlap. (~half a
-day; the most obvious unfinished business in the whole document.)
+| cost | controller | gap | $\int D_c\,dt$ | residual |
+|---|---|---|---|---|
+| $\cosh u-1$ | $0.5u^*$ | 3.099e−1 | 3.099e−1 | 3.2e−12 |
+| $\cosh u-1$ | $1.7u^*$ | 5.172e−1 | 5.172e−1 | 4.0e−11 |
+| $\cosh u-1$ | $-0.4x$ | 7.536e−1 | 7.536e−1 | 2.8e−11 |
+| $u^2+u^4$ | $0.5u^*$ | 1.857133e−1 | 1.857133e−1 | 1.1e−11 |
+| $u^2+u^4$ | $-0.4x$ | 8.955264e−2 | 8.955264e−2 | 1.4e−11 |
 
-**8. Input constraints in §7.** §7g flags this and it remains true: saturation
-is where fuzzy control usually earns its keep, and under saturation $u^*$ is not
-smooth, so constraint C3 would need revisiting. §8 has saturation but no
-certificate; §7 has certificates but no saturation. Closing that gap would join
-the two halves.
+$\cosh u-1$ is not even polynomial. **The certificate is a property of convexity,
+not of quadratics** — which widens the guaranteed envelope considerably.
 
-**9. A second plant.** Every control result rests on two plants, one of them
-inverse-optimal by construction. A cart-pole or a flexible link would test
-whether the two-stage recipe (imitate to stabilize, then optimize directly) is a
-pattern or a coincidence.
+### 9c. Why two of the three §8 objectives are provably outside it
 
-### 9d. Lower priority
+The C2′ derivation is **pointwise in time**: it rewrites the integrand
+$\ell(x,u)+\tfrac{d}{dt}V^*$ and then integrates. That structure requires the
+objective to be an integral $\int\ell(x(t),u(t))\,dt$ of a function of the
+*instantaneous* state and control. Given that:
 
-**10. Better optimizer for §8h.** Powell at 600 evaluations is not a serious
-budget. CMA-ES with restarts would establish how much of the remaining gap is
-algorithmic. Worth doing only after item 1, since a better controller with no
-certificate is not obviously progress.
+- **Energy** $\int u^2dt$ — inside. Convex in $u$, already covered.
+- **Peak force** $\max_t|u(t)|$ — **outside.** It is convex in $u$, but it is an
+  $L^\infty$ norm, not an integral. There is no integrand to rewrite, so the
+  derivation has nothing to act on. This is structural, not a gap in effort.
+- **Settling time** — **outside, and further out.** It is not a function of
+  $(x,u)$ at any instant at all; it is a *functional of the whole trajectory*
+  (an exit time). It is also discontinuous in the trajectory. No Bregman form
+  exists because no integrand exists.
 
-**11. Annealing schedule for $\beta$** (§5c) tied to a trust region on the
-action, giving a single continuation method rather than two separate knobs.
+So the §8 study is measured rather than certified for exactly the reason its
+objectives were chosen: **two of the three are not integral functionals.** That
+is the honest answer to "why can't this be guaranteed."
 
-### 9e. What would change the story
+**But it is recoverable by reformulation, not by more work on the theorem.**
+Both offending objectives have integral surrogates that C2′ *does* cover exactly:
 
-Two results would force real revision:
+- peak force $\to\int u^{2k}dt$ for large $k$, or $\int\phi(u)dt$ with $\phi$ a
+  convex barrier at $\pm u_{\max}$. Both are convex in $u$, so C2′ applies with
+  $D_c$ computed from that $\phi$. As $k\to\infty$ the surrogate converges to the
+  peak constraint.
+- settling time $\to\int w(t)\,\|x\|^2dt$ with increasing $w$. This is a *state*
+  cost $q(x,t)$, which C2′ already permits — it never constrained $q$.
 
-- **If item 2 fails** — direct optimization also loses to linear LQR on the
-  nonlinear plant — then the problem is not the imitation objective but the
-  TSK structure itself on that plant, and §8g's elimination argument would need
-  a fourth candidate.
-- **If item 1 finds no certificate** — the 0.6547 controller has a small or
-  empty region of attraction — then §8h's headline is a performance number
-  bought with fragility, and the honest recommendation flips back toward the
-  imitation fit, which is slower but was never in doubt.
+That is a concrete route to a **fully certified** version of the §8 benchmark:
+restate the objectives as integral costs convex in $u$, and every controller
+then carries an exact suboptimality certificate instead of a measured score.
+It changes the problem being solved, which must be stated plainly — but it
+changes it in a direction the framework can certify, and the reformulated
+problem is a reasonable engineering statement of the same intent.
+
+### 9d. The two obstructions that will not yield
+
+**G13 — global optimality over antecedents.** The normalized-Gaussian TSK is a
+softmax mixture, and fitting mixture parameters to a target is non-convex in a
+way that is not an artifact of this formulation. Expect certified *local*
+optimality (G11) and nothing stronger. §3a already extracts the one convex
+sub-block that exists; there is no second one to find.
+
+**G10/C2′ requires $V^*$.** The certificate is exact but presupposes the optimal
+value function. §7 sidesteps this with inverse-optimal benchmarks, where $V^*$ is
+chosen and $q$ derived. For a plant given in the forward direction, $V^*$ is what
+you did not have in the first place. The usable form is therefore *relative*: for
+any $\hat V$ satisfying the HJB with residual $\varepsilon$, the same algebra
+bounds the gap in terms of $\varepsilon$ — worth deriving, and not yet done.
+
+### 9e. The one structural change that would buy the most
+
+**Stop using Gaussian membership functions.** G12 — stability, the guarantee this
+work most conspicuously lacks — is computable but not analytic, because it needs
+a Lyapunov candidate and a way to verify $\dot V<0$ over a region. For
+**polynomial or rational** closed loops that verification is an SOS program, and
+SOS is exactly the tool that turns a numerical stability check into a certificate.
+
+A normalized Gaussian is transcendental, so the closed loop is not rational and
+SOS does not apply. But **Cohen's own $\pi$-shaped MF is rational**:
+
+$$\pi(x;a,b)=\frac{1}{1+((x-a)/b)^2}$$
+
+so each $\varphi_i$ is rational, and with polynomial consequents $u(x)$ is
+rational and the closed-loop vector field is rational. Multiplying $\nabla V\cdot(f+gu)<0$
+through by the common denominator $\sum_j\pi_j$ — which is **positive exactly
+under $\delta$-coverage, constraint C2** — turns the Lyapunov condition into a
+polynomial inequality, which is an SOS feasibility problem.
+
+Two things about this are worth stating plainly. First, it means the constraint
+C2 that §3d showed to be the *differentiability* condition is the same constraint
+that makes the SOS multiplication valid — one condition doing both jobs. Second,
+I defaulted to Gaussians for smoothness and thereby gave up SOS-certifiability
+without noticing; the notes' original choice was the better one for the stated
+goal of analytic guarantees.
+
+### 9f. Verdict
+
+It can work. The guaranteed envelope is:
+
+> **integral costs, convex in the control, on control-affine plants, with
+> rational membership functions, certified locally in the antecedents and
+> globally in the consequents.**
+
+Inside that envelope the guarantees are exact and constant-free. Outside it —
+$L^\infty$ or exit-time objectives, global antecedent optimality — the
+obstructions are structural, and the answer is to reformulate the objective, not
+to strengthen the theorem.
 
 ---
 
-## 10. Reproduction
+## 10. Next steps
+
+**Re-prioritized around analytic guarantees rather than performance**, per §9.
+Items are ordered by how much certified ground they buy.
+
+### 10a. Buys guarantees — do these first
+
+**1. Switch to rational ($\pi$-shaped) membership functions and set up the SOS
+Lyapunov certificate.** §9e: this is the single change that converts the missing
+guarantee (G12, stability) from a numerical check into an analytic certificate.
+Cohen's notes already specify the $\pi$ MF; `fis_action.py` supports it
+(`mf_cauchy`). The work is (i) refit everything with `kind="cauchy"` and confirm
+nothing else degrades, (ii) clear denominators using $\delta$-coverage, (iii)
+hand the polynomial inequality to an SOS solver. Needs a dependency
+(`SumOfSquares`/`cvxpy` + SDP backend), which is the only real cost. **Highest
+value in this list.**
+
+**2. Restate the §8 objectives as integral costs convex in $u$.** §9c shows peak
+force and settling time are structurally outside C2′ because they are not
+integral functionals. Replacing them with $\int\phi(u)dt$ (convex barrier) and
+$\int w(t)\|x\|^2dt$ puts the whole two-cart study inside the certified envelope:
+every controller would then carry an exact suboptimality certificate rather than
+a measured score. This changes the problem, which must be stated — but in the
+direction the framework can certify. (~1 day.)
+
+**3. Relative form of C2′ for unknown $V^*$.** §9d: the certificate presupposes
+$V^*$, which is exactly what a forward problem lacks. For any $\hat V$ satisfying
+HJB with residual $\varepsilon$, the same algebra should bound the true gap in
+terms of $\varepsilon$ and $\|\hat V-V^*\|$. This is what makes C2′ usable on a
+plant that was not constructed inverse-optimally, and it is probably the second
+most valuable item here. (~1–2 days; the derivation looks routine, the useful
+part is what norm $\varepsilon$ must be measured in.)
+
+**4. Analytic Hessian of the reduced action.** Upgrades G11 from
+"certified numerically" to "certified analytically" — the FD noise floor is what
+currently forces the tolerance-based verdict in §3b. Same envelope argument
+differentiated once more. (~half a day, low risk.)
+
+**5. Certify the §8h direct-optimized controller.** It is the best performer and
+the only controller in the study with no stability certificate. Falls out of
+item 1 once SOS is in place; until then §7e's numerical ROA applies. (~1 hour.)
+
+### 10b. Resolves open questions, but buys no new guarantees
+
+**6. Direct policy optimization on the nonlinear plant.** Tests whether §8d's
+negative result was about the method or the plant. High information, no
+guarantee content. (~30 min.)
+
+**7. The classifier side has never met real data.** §5's proofs (G6–G8) are
+solid but only exercised on synthetic partitions; the sonar dataset in
+`AEEM6097/fuzzy-symphony.py` has been the intended target throughout. Note this
+does not test the *guarantees*, which are already proven — it tests whether they
+bind on anything real. (~half a day.)
+
+**8. Widen the state envelope; second plant.** Generalization evidence, not
+guarantee. (~1–2 hours each.)
+
+### 10c. Lower priority
+
+**9. $\lambda^\*$ in multi-input** (§4d′ is scalar; the crossover becomes a
+hypersurface and the width direction-dependent — may not have a clean form).
+
+**10. Better optimizer for §8h** — only worth doing after item 5, since a better
+controller with no certificate is not progress toward the stated goal.
+
+**11. Annealing schedule for $\beta$** (§5c) tied to a trust region on the action.
+
+### 10d. What would change the story
+
+- **If item 1 fails** — the rational closed loop turns out not to be SOS-tractable
+  at useful rule counts (SDP size grows fast with state dimension and rule count) —
+  then analytic stability certificates are out of reach for this model class, and
+  the honest position is that the framework certifies *optimality* but not
+  *stability*, which is a real limitation to state rather than work around.
+- **If item 3 fails** — no useful bound in terms of the HJB residual — then C2′ is
+  restricted to inverse-optimal benchmarks, i.e. to problems where the answer was
+  known in advance. That would make it a strong theoretical result with a narrow
+  practical reach, and worth saying so.
+
+---
+
+## 11. Reproduction
 
 ```bash
 uv venv .venv && uv pip install --python .venv/bin/python numpy scipy matplotlib
@@ -1414,6 +1546,9 @@ reader changing one should know what it was protecting against.
 | `ClosedLoopResult.identity_residual` | Theorem C2 check |
 | `occupation_density` | closed-loop occupation measure — the correct fitting weight |
 | `stability_certificate` | inner region-of-attraction estimate from `Vdot < 0` |
+| `InverseOptimalConvex` | plant with general convex control cost `c(u)` (Theorem C2′) |
+| `quartic_benchmark` / `cosh_benchmark` / `quadratic_quartic_benchmark` | non-quadratic convex costs |
+| `simulate_convex` | closed loop carrying cost and Bregman integral as ODE states |
 
 `fis_twocart.py`:
 
