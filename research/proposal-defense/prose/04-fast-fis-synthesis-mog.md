@@ -185,38 +185,39 @@ The rule-base column is the point of the table as much as the accuracy is: for c
 
 **The mechanism, measured.** The BETH files are not in the repository, so the harness runs the same protocol on public data: leave-one-class-out, where each class is withheld from training in turn and treated as unseen, averaged over held-out classes and seeds. Sweeping the boost gives the operating curve the section promised.
 
-**Table 4.6 — The anomaly operating curve.** Detection and false alarm as functions of $\theta$, on Glass (6 classes, leave-one-class-out).
+**Table 4.6 — The anomaly operating curve.** Detection and false alarm as functions of $\theta$, on Glass (6 classes, leave-one-class-out); Hamacher conorm, 5 seeds, archived as `reproduce/outputs/openset-postfix/`.
 
 | $\theta$ | detection rate | false-alarm rate | detection − false alarm |
 |---:|---:|---:|---:|
-| 0.30 | 0.312 | 0.215 | +0.096 |
-| 0.60 | 0.306 | 0.156 | +0.150 |
-| **0.80** | 0.282 | 0.127 | **+0.155** |
-| 0.90 | 0.197 | 0.092 | +0.105 |
-| 0.99 | 0.136 | 0.062 | +0.075 |
+| 0.50 | 0.731 | 0.488 | +0.243 |
+| 0.60 | 0.685 | 0.428 | +0.257 |
+| **0.70** | 0.612 | 0.352 | **+0.261** |
+| 0.80 | 0.539 | 0.298 | +0.242 |
+| 0.90 | 0.457 | 0.258 | +0.199 |
+| 0.99 | 0.360 | 0.190 | +0.170 |
 | 1.10 | 0.000 | 0.000 | 0.000 |
 
 The curve behaves exactly as §4.3.5 says it should, which is the first thing worth confirming. Raising $\theta$ inflates the known-class firings, shrinks the complement, and monotonically reduces both detection and false alarms; past $\theta = 1.1$ the boost saturates the aggregate and the anomaly rule stops firing altogether. The knob is real and it is monotone, so an operator can trade sensitivity against nuisance alarms by turning one scalar, which was the design claim.
 
-Two honest observations follow. The default of $\theta = 0.99$ inherited from the BETH configuration is *not* a good operating point on this data — it gives roughly half the separation of $\theta = 0.80$ — which is an argument for reporting the curve rather than a single number, and for tuning $\theta$ per deployment. And the absolute performance here is poor: the best setting detects under a third of unseen points at a 13% false-alarm rate, which is not a usable detector.
+Two honest observations follow. The default of $\theta = 0.99$ inherited from the BETH configuration is *not* a good operating point on this data — it gives about two-thirds the separation of the optimum near $\theta = 0.70$, and sits well down the low-sensitivity end of the curve — which is an argument for reporting the curve rather than a single number, and for tuning $\theta$ per deployment. And the absolute performance, while no longer poor, is not yet strong: at the best setting the rule detects 61% of unseen points at a 35% false-alarm rate, which is a real but noisy signal rather than a deployable detector.
 
-I do not think that last figure says much about the method, and I want to be careful not to over-read it in either direction. Glass has 214 samples across six classes, several with fewer than a dozen members, so withholding a class removes much of the little data there is and the remaining model is asked to be confident about a space it has barely seen. It is a stress test, not a demonstration. What it establishes is that the mechanism works as described; what it does not establish is that the complement rule is *competitive*, and that requires BETH or a comparable dataset.
+I want to be careful not to over-read that in either direction. Glass has 214 samples across six classes, several with fewer than a dozen members, so withholding a class removes much of the little data there is and the remaining model is asked to be confident about a space it has barely seen. It is a stress test, not a demonstration. What it establishes is that the mechanism works as described; what it does not establish is that the complement rule is *competitive*, and that requires BETH or a comparable dataset.
 
 **Table 4.7 — Against detectors built for the job** *(θ = 0.99, matched operating points).* The baselines' contamination is set to the complement rule's observed false-alarm rate, so all three are compared at the same point on their curves rather than at whatever default each ships with.
 
 | Method | Detection rate | False-alarm rate | Detection − false alarm | Separate model? |
 |---|---:|---:|---:|:--:|
-| **Complement rule (this work)** | 0.136 ± 0.166 | 0.062 ± 0.057 | **+0.075** | no |
-| Isolation Forest | 0.114 ± 0.126 | 0.067 ± 0.065 | +0.047 | yes |
-| One-class SVM | 0.100 ± 0.103 | 0.064 ± 0.052 | +0.036 | yes |
+| **Complement rule (this work)** | 0.360 ± 0.331 | 0.190 ± 0.100 | +0.170 | no |
+| Isolation Forest | 0.425 ± 0.345 | 0.217 ± 0.122 | **+0.208** | yes |
+| One-class SVM | 0.258 ± 0.248 | 0.195 ± 0.125 | +0.062 | yes |
 
-The complement rule nominally leads, and I am going to decline to claim that. The standard deviations across held-out classes are larger than the gaps between the methods, so on this evidence the three are indistinguishable. What the table does support is the cheaper claim that motivated the section: the complement rule performs *comparably to purpose-built detectors while requiring no second model*, which is the property worth having. Establishing more than parity is a goal for completion.
+Isolation forest nominally leads here, and I am going to decline to read much into that too. The standard deviations across held-out classes are three to eight times the gaps between the methods, so on this evidence the three are indistinguishable, and an earlier draft of this chapter that put the complement rule on top was reading the same noise in the flattering direction. What the table supports is the cheaper claim that motivated the section: the complement rule performs *comparably to purpose-built detectors while requiring no second model*, which is the property worth having. Establishing more than parity is a goal for completion.
 
-> **Reproduction.** Tables 4.4–4.7 regenerate from `reproduce/tables/table_4_1_mog_baselines.py`, which emits Markdown and CSV with mean ± standard deviation across a fixed seed set. Cells marked *pending* are those whose adapter or dataset was not yet wired up; the harness prints exactly what it could not run rather than substituting a guess.
+> **Reproduction.** Each table in this chapter has its own generator under `reproduce/tables/`, all emitting Markdown and CSV with mean ± standard deviation across a fixed seed set: Table 4.1 from `table_hyperparam_normalization.py`, Table 4.2 from `table_g5_output_partitioning.py`, Table 4.3 from `table_g5b_skew_sweep.py`, Tables 4.4 and 4.5 from `table_4_1_mog_baselines.py`, and Tables 4.6 and 4.7 from `table_4_4_openset.py` (the operating curve requires `REPRO_THETA_SWEEP=1`). Cells marked *pending* are those whose adapter or dataset was not yet wired up; the harness prints exactly what it could not run rather than substituting a guess. Per-cell provenance and the current reconciliation status of each table are tracked in `reproduce/PROVENANCE_MAP.md`.
 >
 > **TODO — repeatable performance (board-wide standard):** the numbers above are single-machine point estimates. Reproduce under the fixed protocol — pinned clocks and thermals, multiple seeds, reported error bars — before citation. See `ACTION_ITEMS.md` §A and Chapter 7, Goal G4.
 
-**[FIGURE 4.2 — placeholder]** *The anomaly operating curve of Table 4.4, plotted: detection and false-alarm rate against the boost $\theta$, with the saturation point past $\theta = 1.1$ marked. To be regenerated on BETH via `plot_anomaly_threshold_sweep` when those data are available.*
+**[FIGURE 4.2 — placeholder]** *The anomaly operating curve of Table 4.6, plotted: detection and false-alarm rate against the boost $\theta$, with the saturation point past $\theta = 1.1$ marked. To be regenerated on BETH via `plot_anomaly_threshold_sweep` when those data are available.*
 `![anomaly-sweep](fig/04-anomaly-sweep.png)`
 
 **[FIGURE 4.3 — placeholder]** *Confusion matrix on RT-IOT2022 before and after the correction-rule pass, showing which class confusions the corrections repair.*

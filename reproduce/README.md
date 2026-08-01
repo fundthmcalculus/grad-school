@@ -19,14 +19,33 @@ Each writes `reproduce/outputs/<table>.{md,csv}` — Markdown ready to drop into
 proposal, CSV for further processing. Numbers are mean ± std over fixed seeds;
 `N/A` marks anything genuinely unavailable on this machine.
 
+To run every table generator at once and archive the result under a label, with
+the submodule SHAs and seed set recorded alongside it:
+
+```bash
+reproduce/run_all_tables.sh my-label
+```
+
+## Which table comes from which script
+
+[`PROVENANCE_MAP.md`](PROVENANCE_MAP.md) is the answer to "where did this number
+come from". It has one row per numbered table in the proposal, naming the
+generator, the output file, and — importantly — whether the prose currently
+matches that output. Several tables predate the harness and do not yet agree with
+it; the map says which, and why, rather than leaving the reader to diff by hand.
+
+Check it before citing any table, and update it when a generator changes.
+
 ## Layout
 
 ```
 reproduce/
-  common.py        shared metrics, seed list, Markdown/CSV emitters
-  manifest.py      registry of ALL experiments (for the full orchestrator; WIP)
-  tables/          the experiment-table generators (current focus)
-  outputs/         generated .md / .csv tables and run logs
+  common.py          shared metrics, seed list, Markdown/CSV emitters
+  manifest.py        registry of ALL experiments (for the full orchestrator; WIP)
+  PROVENANCE_MAP.md  proposal table -> generator -> output file, with drift status
+  run_all_tables.sh  run every generator, archive outputs + provenance under a label
+  tables/            the experiment-table generators (current focus)
+  outputs/           generated .md / .csv tables and run logs
 ```
 
 ## Later: the full pipeline

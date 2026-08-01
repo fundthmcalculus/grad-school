@@ -30,6 +30,19 @@ def _uv(*args):
     return ["uv", "run", "python", *args]
 
 
+def _uvm(module, *args):
+    """Run a script as a module (`python -m pkg.mod`) from the submodule root.
+
+    Most of tribble-cluster's experiments do `from experiments.blockwise_vat
+    import ...`, which needs the submodule ROOT on sys.path. Invoking them by
+    path (`python experiments/foo.py`) puts `experiments/` there instead, and
+    every one of them dies with `ModuleNotFoundError: No module named
+    'experiments'` before doing any work. The module form is the only one that
+    runs, so entries here use it rather than the path.
+    """
+    return ["uv", "run", "python", "-m", module, *args]
+
+
 EXPERIMENTS = [
     # ---- proposal tables (generators live in reproduce/tables, run under a submodule env) ----
     Experiment(
@@ -46,9 +59,23 @@ EXPERIMENTS = [
               "complexity note (Ch9).",
     ),
     Experiment(
+        id="table-3-1-pvat-scaling",
+        title="Exact pVAT reorder vs a self-contained classical O(N^3) reference",
+        chapter="Ch3", produces="Table 3.1 (grid of N)",
+        repo="tribble-cluster",
+        command=_uv("../reproduce/tables/table_3_1_pvat_scaling.py"),
+        hardware="any",
+        outputs=["reproduce/outputs/table_3_1.md", "reproduce/outputs/table_3_1.csv"],
+        notes="Needs scipy, which tribble-cluster keeps under its `dev` extra -- "
+              "run_all_tables.sh supplies it via EXTRA_DEPS='--with scipy'. The cubic "
+              "reference is capped at N<=1024 (REPRO_NAIVE_CAP), so the larger rows are "
+              "pVAT-only. Table 3.1's headline 4,096-point pair is NOT from this script "
+              "-- see reproduce/PROVENANCE_MAP.md.",
+    ),
+    Experiment(
         id="table-concrete-reconciliation",
         title="Concrete under ONE protocol -- makes Ch4 and Ch6 numbers comparable",
-        chapter="Ch4", produces="Concrete reconciliation (HIGH PRIORITY)",
+        chapter="Ch6", produces="Table 6.1",
         repo="tribble-fis",
         command=_uv("../reproduce/tables/table_concrete_reconciliation.py"),
         hardware="any", datasets=["Concrete"],
@@ -61,7 +88,7 @@ EXPERIMENTS = [
     Experiment(
         id="table-hyperparam-normalization",
         title="Concrete: model x hyperparameters x normalization",
-        chapter="Ch6", produces="Hyperparameter/normalization matrix",
+        chapter="Ch4", produces="Table 4.1 (+ the Ch6 hyperparameter caveat)",
         repo="tribble-fis",
         command=_uv("../reproduce/tables/table_hyperparam_normalization.py"),
         hardware="any", datasets=["Concrete"],
@@ -75,7 +102,7 @@ EXPERIMENTS = [
     Experiment(
         id="table-4-4-openset",
         title="Open-set detection: complement rule vs one-class SVM / isolation forest",
-        chapter="Ch4", produces="Table 4.4 + Fig 4.2 (theta sweep)",
+        chapter="Ch4", produces="Table 4.7 + Table 4.6 / Fig 4.2 (theta sweep)",
         repo="tribble-fis",
         command=_uv("../reproduce/tables/table_4_4_openset.py"),
         hardware="any", datasets=["Glass (BETH if present)"],
@@ -114,7 +141,7 @@ EXPERIMENTS = [
     Experiment(
         id="table-norm-conorm-matrix",
         title="Norm/conorm sweep: the five De Morgan pairs x model x dataset",
-        chapter="Ch4", produces="Norm/conorm comparison table",
+        chapter="Ch4", produces="No numbered prose table -- backs TNORM_REEVALUATION_RESULTS.md",
         repo="tribble-fis",
         command=_uv("../reproduce/tables/table_norm_conorm_matrix.py"),
         hardware="any", datasets=["Concrete", "PhiUSIIL"],
@@ -132,7 +159,7 @@ EXPERIMENTS = [
     Experiment(
         id="table-4-1-mog-baselines",
         title="MoG FIS vs sklearn baselines (train time + accuracy/R2)",
-        chapter="Ch4", produces="Table 4.1",
+        chapter="Ch4", produces="Tables 4.4 and 4.5",
         repo="tribble-fis",
         command=_uv("../reproduce/tables/table_4_1_mog_baselines.py"),
         hardware="any",
@@ -143,9 +170,13 @@ EXPERIMENTS = [
     Experiment(
         id="table-6-1-model-family",
         title="Flat / fuzzy-tree / HME vs CART/M5 baselines",
-        chapter="Ch6", produces="Table 6.1",
+        chapter="Ch6", produces="Table 6.2",
         repo="tribble-fis",
         command=_uv("../reproduce/tables/table_6_1_model_family.py"),
+        notes="Runs the fuzzy arms at RAW preprocessing and library defaults, so its "
+              "flat R2 (0.644) is NOT comparable to Table 6.1's uniform-protocol 0.868. "
+              "Kept as the external-baseline (CART/RF/M5) source only; the file name "
+              "predates the prose renumbering.",
         hardware="any",
         datasets=["Concrete", "PhiUSIIL"],
         outputs=["reproduce/outputs/table_6_1.md", "reproduce/outputs/table_6_1.csv"],
@@ -170,7 +201,8 @@ EXPERIMENTS = [
     ),
     Experiment(
         id="ch6-tree-concrete", title="Fuzzy tree + HME vs flat on Concrete",
-        chapter="Ch6", produces="Table 6.1 / Fig 6.1", repo="tribble-fis",
+        chapter="Ch6", produces="Fig 6.1 (and the tuned config Table 6.1 replicates)",
+        repo="tribble-fis",
         command=_uv("tribble-tree/demo_concrete.py"), datasets=["Concrete"],
     ),
     Experiment(
@@ -180,7 +212,7 @@ EXPERIMENTS = [
     ),
     Experiment(
         id="ch6-mimo-pendulum", title="MIMO memory FIS on double pendulum",
-        chapter="Ch6", produces="Fig 6.3", repo="tribble-fis",
+        chapter="Ch6", produces="Table 6.4 / Fig 6.3", repo="tribble-fis",
         command=_uv("tests/test_double_pendulum.py"),
         notes="Confirm exact MIMO-memory entry point; may live under tests/ or gaussian_mixture/.",
     ),
@@ -188,22 +220,57 @@ EXPERIMENTS = [
     # ---- Ch5 topological membership generation ----
     Experiment(
         id="ch5-gated-minimax-all", title="Full gated-minimax selection + MF pipeline",
-        chapter="Ch5", produces="Tables 5.1/5.2, Figs fig1-fig11", repo="gated-minimax-selection",
+        chapter="Ch5", produces="Tables 5.1/5.2/5.3, Figs fig1-fig11", repo="gated-minimax-selection",
         command=["python", "run_all.py"], hardware="any",
         outputs=["gated-minimax-selection/outputs/results.json"],
         notes="Runs on the root .venv (no submodule pyproject). Deterministic.",
     ),
 
+    Experiment(
+        id="table-5-x-ch5-selection",
+        title="Ch5 Tables 5.1/5.2/5.3 rendered from the gated-minimax results of record",
+        chapter="Ch5", produces="Tables 5.1, 5.2, 5.3",
+        repo=".",
+        command=["python3", "reproduce/tables/table_5_x_ch5_selection.py"],
+        hardware="any",
+        outputs=["reproduce/outputs/table_5_1_battery.md",
+                 "reproduce/outputs/table_5_2_multiscale.md",
+                 "reproduce/outputs/table_5_3_selection.md"],
+        notes="Pure renderer -- reads gated-minimax-selection/outputs/results.json and "
+              "does no computation, so run ch5-gated-minimax-all first if the JSON needs "
+              "regenerating. Stdlib only; no submodule environment required. Exists so "
+              "the Ch5 tables stop being hand-transcribed: drift now shows as a diff.",
+    ),
+
     # ---- Ch3 pVAT / clustering experiments ----
     Experiment(
         id="ch3-adversarial-eval", title="Adversarial clustering-quality eval (ARI grid)",
-        chapter="Ch3", produces="Table 3.2", repo="tribble-cluster",
-        command=_uv("experiments/adversarial_eval.py"),
+        chapter="Ch3", produces="Table 3.4", repo="tribble-cluster",
+        command=_uvm("experiments.adversarial_eval"),
+        outputs=["tribble-cluster/experiments/findings/ADVERSARIAL_EVAL_FINDINGS.md"],
+    ),
+    Experiment(
+        id="ch3-principled-stitch",
+        title="Stitch ablation on two moons: fps reps x top-m cross-edges",
+        chapter="Ch3", produces="Table 3.5", repo="tribble-cluster",
+        command=_uvm("experiments.principled_stitch"),
+        outputs=["tribble-cluster/experiments/findings/GAPS_FINDINGS.md"],
+        notes="Table 3.5's four rows are the ablation grid. Numbers currently quoted in "
+              "the prose match GAPS_FINDINGS.md; not yet re-run under this harness.",
+    ),
+    Experiment(
+        id="ch3-hardening-eval",
+        title="Agreement with exact single-linkage under non-metric dissimilarities",
+        chapter="Ch3", produces="Table 3.6", repo="tribble-cluster",
+        command=_uvm("experiments.hardening_eval"),
+        outputs=["tribble-cluster/experiments/findings/HARDENING_FINDINGS.md"],
+        notes="Fractional Minkowski p=0.5 (14.1% triangle violations), cosine, and "
+              "kNN-geodesic all reproduce the exact ordering (agreement 1.0).",
     ),
     Experiment(
         id="ch3-autok-eval", title="Auto-k selection eval", chapter="Ch3",
         produces="Ch3 numbers", repo="tribble-cluster",
-        command=_uv("experiments/autok_eval.py"),
+        command=_uvm("experiments.autok_eval"),
     ),
     Experiment(
         id="ch3-boruvka-gpu", title="GPU Boruvka MST vs serial Prim",

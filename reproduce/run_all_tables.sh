@@ -33,6 +33,10 @@ CLUSTER_TABLES=(
   table_3_1_pvat_scaling
   table_3_1_reorder_three_arm
 )
+# Stdlib-only renderers -- no submodule environment, so they run on the host python.
+PLAIN_TABLES=(
+  table_5_x_ch5_selection
+)
 
 declare -A STATUS
 
@@ -68,11 +72,18 @@ run_one() {
   local t0 t1 rc before after
   before=$(snapshot_tables)
   t0=$(date +%s)
+  # A project of "-" means the script needs no submodule environment (stdlib-only
+  # renderers), so it runs on the host python rather than through uv.
+  #
   # EXTRA_DEPS covers packages a table needs that the submodule does not declare
   # as a base dependency (tribble-cluster keeps scipy under its `dev` extra, so
   # `uv run --project` alone leaves table_3_1_pvat_scaling unable to import it).
-  uv run --project "$ROOT/$project" ${EXTRA_DEPS:-} python \
-      "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
+  if [ "$project" = "-" ]; then
+    python3 "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
+  else
+    uv run --project "$ROOT/$project" ${EXTRA_DEPS:-} python \
+        "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
+  fi
   rc=$?
   t1=$(date +%s)
   after=$(snapshot_tables)
@@ -93,6 +104,8 @@ echo "tribble-cluster:"
 EXTRA_DEPS="--with scipy"
 for t in "${CLUSTER_TABLES[@]}"; do run_one tribble-cluster "$t"; done
 EXTRA_DEPS=""
+echo "no submodule env:"
+for t in "${PLAIN_TABLES[@]}"; do run_one - "$t"; done
 
 # Archive the tables themselves next to the logs.
 find "$OUT" -maxdepth 1 -type f \( -name '*.md' -o -name '*.csv' \) \
@@ -115,7 +128,7 @@ PROV="$DEST/PROVENANCE.txt"
   echo "seeds:       ${REPRO_SEEDS:-0,1,2,3,4 (default)}"
   echo
   echo "status:"
-  for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}"; do
+  for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}"; do
     # Unset means the filter skipped it; say so rather than claiming a result.
     printf '  %-38s %s\n' "$t" "${STATUS[$t]:-not-run-this-pass}"
   done

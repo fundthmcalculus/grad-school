@@ -65,25 +65,27 @@ The reason this matters is that the same question is ill-posed geometrically. As
 
 ## 5.4 Preliminary Results
 
-> **Reproduction.** The whole pipeline behind this section regenerates from a single deterministic driver, `gated-minimax-selection/run_all.py`, which writes the results and every figure referenced below; it is registered in `reproduce/manifest.py`.
+> **Reproduction.** The whole pipeline behind this section regenerates from a single deterministic driver, `gated-minimax-selection/run_all.py`, which writes `outputs/results.json` — the single JSON of record holding every number below — plus every figure referenced; it is registered in `reproduce/manifest.py`. Tables 5.1, 5.2, and 5.3 are then rendered from that JSON by `reproduce/tables/table_5_x_ch5_selection.py`, which does no computation of its own, so a table that drifts from the results of record shows up as a diff rather than going unnoticed.
 >
 > **TODO — repeatable performance (board-wide standard):** the scaling numbers below are single-machine point estimates and must be reproduced under the fixed protocol (see `ACTION_ITEMS.md` §A and Ch 7 Goal G4) before citation.
 
 The results here are on synthetic data with known ground truth, which is both their strength (I know the right answer) and their limitation (Section 5.5).
 
-**The transform.** As above: concentric rings, relational FCM on the raw matrix scores ARI ≈ 0.02; on the minimax-transformed matrix, 1.00. On bridged Gaussians, plain single-linkage scores 0.00 (the chaining failure), and ConiVAT's metric learning repairs it to 1.00. Across a battery of five synthetic sets, the gated set-cover — discovering $k$, with no constraints — matches NERFCM-given-$k$ and ConiVAT at roughly 0.98–1.00, and declines only on uniform noise, which is the correct behavior: there is no structure there to find.
+**The transform.** As above: concentric rings, relational FCM on the raw matrix scores ARI ≈ 0.02; on the minimax-transformed matrix, 1.00. On bridged Gaussians, plain single-linkage scores 0.00 (the chaining failure), and ConiVAT's metric learning repairs it to 1.00. Across a battery of five synthetic sets, the gated set-cover — discovering $k$, with no constraints — matches NERFCM-given-$k$ and ConiVAT at 0.98–1.00 on three of them, abstains on uniform noise, which is the correct behavior since there is no structure there to find, and fails outright on bridged Gaussians, which I take up below.
 
 **Table 5.1 — The battery (adjusted Rand index).** The comparison that matters is the last column against the first two: the baselines are *given* $k$, and mine discovers it. Matching a method that was handed the answer is the result.
 
-| Dataset | NERFCM on raw $D$ | NERFCM on $D^*$ (given $k$) | ConiVAT (constrained) | Gated set-cover (**$k$ discovered**) |
-|---|---:|---:|---:|---:|
-| concentric_rings | 0.02 | **1.00** | 1.00 | **1.00** |
-| bridged_gaussians | — | 0.00 (chaining) | **1.00** | 0.00 |
-| well_separated | ≈ 1.00 | 1.00 | 1.00 | **≈ 0.98–1.00** |
-| varying_density | — | 1.00 | 1.00 | **≈ 0.98** |
-| uniform_noise | — | — | — | **abstains (correct)** |
+| Dataset | single-linkage on $D$ | NERFCM on raw $D$ | NERFCM on $D^*$ (given $k$) | ConiVAT (constrained) | Gated set-cover (**$k$ discovered**) |
+|---|---:|---:|---:|---:|---:|
+| concentric_rings | 1.00 | 0.02 | **1.00** | 1.00 | **1.00** |
+| bridged_gaussians | 0.00 (chaining) | 1.00 | 1.00 | **1.00** | 0.00 |
+| well_separated | 1.00 | 1.00 | 1.00 | 1.00 | **1.00** |
+| varying_density | 0.98 | 0.98 | 0.98 | 0.98 | **0.98** |
+| uniform_noise | — | — | — | — | **abstains: 12.5% coverage** |
 
-Two cells deserve comment rather than a dash. The bridged-Gaussians row is the failure I flagged in §5.3.2 — my conservative gate declines where ConiVAT's metric learning succeeds — and the uniform-noise row is the one where declining *is* the right answer, which no accuracy-style metric rewards. Cells shown as "—" were not run in that configuration rather than being zero.
+Two cells deserve comment. The bridged-Gaussians row is the failure I flagged in §5.3.2 — my conservative gate declines where ConiVAT's metric learning succeeds — and the uniform-noise row is the one where declining *is* the right answer, which no accuracy-style metric rewards. The dashes on that last row are not omissions: uniform noise has no ground-truth partition, so an adjusted Rand index is undefined against it for every method, and the abstention has to be read off the coverage instead — the gate claims 12.5% of the points and leaves the rest unassigned.
+
+One column deserves a word on how it is scored, because the bridged row looks contradictory without it. The set-cover on bridged Gaussians reaches ARI 0.982 *on the points it claims*, but claims only 53% of them; scored over the whole dataset, with everything uncovered counted as unassigned, it is 0.001. Both numbers describe the same cover. The table quotes the all-points figure throughout, which is the conservative reading and the one that makes the row a genuine failure rather than a partial success.
 
 **Multi-scale, the headline.** Averaged over *all* ground-truth levels, the multi-scale method lifts nested Gaussians from 0.66 to 1.00, a three-level hierarchy from 0.58 to 1.00, and a density hierarchy from 0.75 to 1.00. On the three-level set it recovers granularities of 8, then 4, then 2 clusters — each band landing on exactly one true level at ARI 1.0 — without ever being told there were three levels.
 
