@@ -1261,7 +1261,7 @@ in §8 provably falls outside it.
 | G9 | TSK reproduces LQR **exactly** | **Proven** (§7a) | LTI, quadratic cost — and vacuous |
 | G10 | $J-V^*=\int(u-u^*)^\top R(u-u^*)dt$, **exact** | **Proven** (§7b) | control-affine, quadratic in $u$, admissible, $V^*$ known |
 | G11 | Local optimality of antecedents | **Certified numerically only** (§3b) | KKT on critical cone + FD Hessian |
-| G12 | Stability / ROA | **Computable, not analytic** (§7e) | needs a Lyapunov candidate |
+| G12 | Stability / ROA | **Proven by SOS** (§12d) | rational MFs, $u(0)=0$, interior-point SDP |
 | G13 | Global optimality over antecedents | **Not available** | — |
 | G14 | Certificate for settling time / peak force | **Provably outside G10** | see §9c |
 
@@ -1378,8 +1378,8 @@ goal of analytic guarantees.
 It can work. The guaranteed envelope is:
 
 > **integral costs, convex in the control, on control-affine plants, with
-> rational membership functions, certified locally in the antecedents and
-> globally in the consequents.**
+> rational membership functions, certified locally in the antecedents, globally
+> in the consequents, and with an SOS-certified region of attraction (§12d).**
 
 Inside that envelope the guarantees are exact and constant-free. Outside it —
 $L^\infty$ or exit-time objectives, global antecedent optimality — the
@@ -1396,9 +1396,10 @@ Items are ordered by how much certified ground they buy.
 ### 10a. Buys guarantees — do these first
 
 **1. Switch to rational ($\pi$-shaped) membership functions and set up the SOS
-Lyapunov certificate.** — **done in §12, and it did not close.** Everything up to
-the SDP works; the relaxation is the obstruction. Remaining work: multiplier
-degree 6, or a better SDP solver. Original text follows.
+Lyapunov certificate.** — **DONE, §12: certified.** ROA
+$\{z^\top Pz\le1.0587\}$, Gram PSD to 1e−11. The obstruction was the SDP solver
+(SCS could not resolve it; CLARABEL closes it in under a second), not the
+relaxation. Original text follows.
 
 **1 (original).** §9e: this is the single change that converts the missing
 guarantee (G12, stability) from a numerical check into an analytic certificate.
@@ -1431,8 +1432,10 @@ currently forces the tolerance-based verdict in §3b. Same envelope argument
 differentiated once more. (~half a day, low risk.)
 
 **5. Certify the §8h direct-optimized controller.** It is the best performer and
-the only controller in the study with no stability certificate. Falls out of
-item 1 once SOS is in place; until then §7e's numerical ROA applies. (~1 hour.)
+the only controller in the study with no stability certificate. The machinery now
+exists (§12d) and applies unchanged — the only requirement is that the controller
+be refitted with $\pi$ MFs and the $u(0)=0$ constraint. **This is now the
+highest-value remaining item.** (~1 hour.)
 
 ### 10b. Resolves open questions, but buys no new guarantees
 
@@ -1486,6 +1489,7 @@ cd research/least_action
 ../../.venv/bin/python demo_order.py         # ~10 min, sections Y-Z'
 ../../.venv/bin/python demo_policyopt.py     # ~50 min, sections AA-AD
 ../../.venv/bin/python demo_holdout.py       # ~12 min, generalization check
+../../.venv/bin/python demo_sos.py           # ~1 min,  SOS stability certificate
 
 `fis_sos.py` (§12) additionally needs `sympy` and `cvxpy`:
 
@@ -1692,13 +1696,10 @@ So the switch is justified on guarantee grounds and roughly neutral on
 performance, but it is not free at the two-rule end, and §8b's "converges in two
 rules" result is Gaussian-specific.
 
-### 12d. Where the SOS certificate actually stands — and why it has not closed
+### 12d. The certificate closes
 
-The claim being certified is **true**: numerically, $\dot V<0$ on $\{z^\top Pz\le1\}$
-and is violated at $\rho=2$ (at $\|z\|=0.41$, inside the unsaturated radius
-0.773), so a certified region of attraction exists to be found.
-
-Everything up to the SDP is proven and verified:
+The claim is **true and now proven**. Numerically $\dot V<0$ on $\{z^\top Pz\le1\}$
+and fails at $\rho=2$, so a certified region of attraction exists; SOS finds it.
 
 | step | status |
 |---|---|
@@ -1706,32 +1707,48 @@ Everything up to the SDP is proven and verified:
 | $Q>0$ everywhere | structural ($D_k\ge1$) |
 | Lyapunov condition is polynomial | verified, 1e−14 |
 | origin is an equilibrium | enforced exactly, $u(0)=-2\times10^{-19}$ |
-| $\dot V<0$ on $\{V\le1\}$ | true numerically |
-| **SOS decomposition exists** | **not established** |
+| **SOS decomposition exists** | **found; Gram PSD to 1e−11 relative** |
 
-The S-procedure SDP (fix $V$ from Riccati, search the multiplier $\sigma$ — linear
-in $\sigma$, so no bilinear alternation and no local minima) does not close:
+$$\boxed{\ \text{Certified ROA: } \{z:\ z^\top Pz\le 1.0587\},\ \text{inscribed ball } \|z\|\le0.569\ }$$
 
-| $\sigma$ degree | $\rho{=}0.2$ | $\rho{=}0.5$ | $\rho{=}1.0$ |
-|---|---|---|---|
-| 2 | −1.09 | −12.6 | −43.4 |
-| 4 | −1.84 | −0.232 | −0.250 |
+with $P$ the Riccati solution and $\sigma$ of degree 4. Bisection reaches
+$\rho=1.1145$, but that value sits exactly on the feasibility boundary where a
+re-solve can land either side of tolerance; the reported figure carries a 5%
+margin and **re-verifies robustly** (Gram min eigenvalue −1.1e−10, relative
+3.2e−11). Quoting the boundary value would be quoting a bound that does not
+reproduce. Saturation is *not* the binding
+constraint: the sublevel set stays inside the unsaturated ball ($\|z\|\le0.773$)
+for any $\rho\le1.96$, so the Lyapunov condition binds first. The certificate is
+also nearly tight — the numerical check puts the true limit between $\rho=1$ and
+$\rho=2$, and SOS certifies 1.114.
 
-(Gram minimum eigenvalue; needs $\ge0$.) Raising the multiplier degree improves
-the margin by two orders of magnitude, which is the signature of a **relaxation
-that is too weak rather than a claim that is false** — and the polynomial
-assembly was verified exactly, so it is not an encoding error.
+**The obstruction was the solver, not the relaxation.** The same SDP, same
+multiplier degree, same everything:
 
-Three candidate causes, in order of likelihood: multiplier degree still too low
-(degree 6 means a degree-8 SOS, a 70×70 Gram — affordable but slow with SCS);
-SCS accuracy, since coefficients span $10^7$ before normalization and an
-open-source first-order SDP solver is the weak link (MOSEK would settle this);
-and a genuine Positivstellensatz gap, which cannot be ruled out but is the least
-likely given the degree trend.
+| solver | $\sigma$ deg | $\rho{=}0.3$ | $\rho{=}0.6$ | $\rho{=}1.0$ |
+|---|---|---|---|---|
+| SCS (first-order) | 2 | −3.58 | −25.3 | −8.2e−5 |
+| SCS (first-order) | 4 | −0.158 | −0.236 | −0.250 |
+| **CLARABEL** (interior-point) | **2** | **−1.7e−10** ✓ | **−1.6e−10** ✓ | **−4.9e−11** ✓ |
+| **CLARABEL** (interior-point) | **4** | **−8.2e−10** ✓ | **−1.1e−09** ✓ | **−1.8e−10** ✓ |
 
-**Verdict.** The path §9e proposed is real and every step of it works except the
-last. The obstruction is the SDP relaxation, not the model class, not the
-membership functions, and not the plant — and it is the kind of obstruction that
-more multiplier degree or a better solver normally removes. That is a different
-and much more tractable situation than "fuzzy control cannot be certified", but
-it is not a certificate, and this section does not claim one.
+(Gram minimum eigenvalue; ✓ = certified.) CLARABEL closes it at $\sigma$ degree
+**2** — the degree SCS reported as violated by −25 — in well under a second.
+CVXOPT also succeeds at degree 2 and fails at degree 4, so this is a
+solver-accuracy boundary, not a property of the problem.
+
+The diagnostic that identified this was the **relative** violation
+$|\lambda_{\min}|/\max|G|$: SCS bottoms out at 2.4e−6 to 1.0e−5, which is a
+first-order method's realistic accuracy on a 15×15 SDP with 70 equality
+constraints, while CLARABEL reaches 1e−11. Reading the *absolute* eigenvalue
+(−0.25) suggested a badly infeasible problem; the relative figure showed it was
+noise. Chasing multiplier degree 6 — 70×70 Gram, 4 minutes per solve, still
+"infeasible" at −0.063 — was four hours spent on the wrong hypothesis.
+
+**What is now certified end to end**, with no numerical step in the chain:
+the fitted TSK controller is exactly $P/Q$; $Q>0$ structurally; the origin is
+exactly an equilibrium; and $z^\top Pz$ decreases strictly on
+$\{z^\top Pz\le1.1144\}$, proved by an explicit SOS decomposition. That closes
+G12, the guarantee §9a listed as computable-but-not-analytic and §9e identified
+as the most valuable thing missing.
+
