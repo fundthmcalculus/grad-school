@@ -6,7 +6,7 @@ the rule-orthogonality question.
 
 Code: `fis_action.py` (approximation), `fis_control.py` (control).
 Experiments: `demo_regression.py`, `demo_classifier.py`, `demo_control.py`.
-Recorded output: `results.txt`. Reproduction instructions: §7.
+Recorded output: `results.txt`. Reproduction instructions: §10.
 
 ### Notation
 
@@ -664,33 +664,12 @@ sufficiency argument of §3c stays valid.
 - MOM stays discontinuous; the $\beta$-annealed surrogate is $C^\infty$ and
   converges geometrically in the margin.
 
-**Open / next:**
-
-- Analytic *Hessian* of the reduced action. The gradient is now exact (§3d); the
-  second-order certificate still uses finite differences, and its noise floor is
-  what forces the tolerance-based verdict in §3b. The same envelope argument
-  differentiated once more should give it in closed form.
-- Multi-input case: the tensor-product rule basis makes the Gram block structure
-  richer, and disjointness on $X\subset\mathbb{R}^n$ is even more costly.
-- Choosing $\lambda$ principled rather than by sweep — it is a correlation length,
-  so a spectral criterion on $y_d$ should set it.
-- Whether the annealing schedule in $\beta$ can be tied to a trust region on the
-  action, giving a single unified continuation method.
-- Empirical validation on the sonar dataset already wired up in
-  `AEEM6097/fuzzy-symphony.py`.
-- ~~Whether $\lambda^\*$ has a variational reading.~~ **Answered in §4d′**, negatively:
-  $\lambda^\*=3b^4/(8c^2)$ in closed form, $\ell^\*=\sqrt6\times$ the rule crossover
-  width, and $y_d$ appears nowhere — it is a property of the partition, not of
-  the target. The same scaling explains the $N\ge3$ obstruction (adjacent and
-  next-nearest pairs demand values in ratio exactly 4) and shows the fit cost is
-  under ~8%, correcting the earlier caveat.
-- Whether $\lambda^\*$ generalizes usefully to the *multi-input* case, where the
-  crossover geometry is a hypersurface rather than a point and $w$ becomes
-  direction-dependent.
+**Open / next:** consolidated and prioritized in **§9**, which supersedes the
+list that used to sit here. §8-§9 added substantially to it.
 
 ---
 
-## 8. Control: provably optimal fuzzy control parameters
+## 7. Control: provably optimal fuzzy control parameters
 
 Code: `fis_control.py`. Experiments: `demo_control.py`.
 
@@ -698,7 +677,7 @@ The original notes framed this as "optimal control via the principle of least
 action." Sections 1–5 built the approximation machinery; this section asks what
 can actually be *proved* about a fuzzy controller.
 
-### 8a. The trivial case, stated so it can be set aside
+### 7a. The trivial case, stated so it can be set aside
 
 **Theorem C1.** For $\dot x=Ax+Bu$ with $J=\int(x^\top Qx+u^\top Ru)\,dt$, let
 $K=R^{-1}B^\top P$ from the Riccati equation. Any TSK FIS with **affine
@@ -716,7 +695,7 @@ on an LTI/LQR problem.** Any claimed benefit there is an artifact. The value has
 to come from nonlinearity or constraints, which is what the rest of this section
 uses.
 
-### 8b. The central result: suboptimality is exactly a weighted $L^2$ error
+### 7b. The central result: suboptimality is exactly a weighted $L^2$ error
 
 **Theorem C2.** For a control-affine plant $\dot x=f(x)+g(x)u$ with cost
 $\int (q(x)+u^\top Ru)\,dt$, optimal value function $V^*$ and optimal law
@@ -743,9 +722,9 @@ Three things follow, and they reshape the whole approach:
    Minimizing the right weighted approximation error *is* minimizing true excess
    cost, identically.
 3. **The right weight is the closed-loop occupation measure**, not Lebesgue
-   measure on a box (§8d).
+   measure on a box (§7d).
 
-### 8c. Verifying it, including the hypothesis
+### 7c. Verifying it, including the hypothesis
 
 Ground truth comes from **inverse optimal control**: choose $V$, $f$, $g$, $R$
 first and *define* $q$ from the HJB equation, rather than solving for $V$. Then
@@ -773,9 +752,9 @@ $$J(x_0)-V^*(x_0)+V^*\big(x(\infty)\big)=\int_0^\infty(u-u^*)^\top R(u-u^*)\,dt$
 and indeed $V^*(0.196222)=3.924448\times10^{-2}$ against a residual of
 $3.924448\times10^{-2}$ — agreement to 1.9e−10. **A controller with a steady-state
 offset has no certificate at all**; admissibility must be established separately,
-which is what §8e does.
+which is what §7e does.
 
-### 8d. Consequence: fit under the occupation measure
+### 7d. Consequence: fit under the occupation measure
 
 Theorem C2 weights control error by closed-loop occupation time, so fitting $u^*$
 uniformly over a box optimizes the wrong functional. On this benchmark the
@@ -797,7 +776,7 @@ uniform accuracy is not the control objective, and optimizing for it is actively
 counterproductive. Note also that the 2-rule uniform fit is not even admissible,
 so its "gap" is not a certificate.
 
-### 8e. What ships with a fitted controller
+### 7e. What ships with a fitted controller
 
 | $N$ | weight | ROA radius | certified sublevel $V^*$ | worst $\dot V$ | mean gap |
 |---|---|---|---|---|---|
@@ -816,7 +795,7 @@ So each controller ships with **a region it provably stabilizes** and **exactly
 how much more than optimal it costs**. That is the strongest sense of "provably
 optimal fuzzy control parameters" available without exact representation.
 
-### 8f. What $\lambda$ costs here
+### 7f. What $\lambda$ costs here
 
 Theorem C2 needs $L^2(\rho)$ and nothing else, so $\lambda>0$ is a deliberate
 *deviation* from the certified-optimal objective:
@@ -835,12 +814,12 @@ raise it only when the gain profile itself matters** (robustness, actuator rate
 limits, gain scheduling). This is a cleaner story than the regression case, where
 $\lambda$ had no comparably exact accounting.
 
-### 8g. Honest limits
+### 7g. Honest limits
 
 - The benchmark is scalar and inverse-optimal by construction. That is what makes
   ground truth exact, but it also means $u^*$ was *chosen* to be representable-ish.
   A plant with a genuinely awkward $u^*$ would tell more.
-- $\rho$ depends on the controller, so §8d used $\rho$ from the *optimal* closed
+- $\rho$ depends on the controller, so §7d used $\rho$ from the *optimal* closed
   loop. In practice this must be iterated (fit → simulate → re-weight); the fixed
   point is what policy iteration converges to, and that is not done here.
 - The ROA uses $V^*$ as the Lyapunov candidate, which is available only because
@@ -851,7 +830,7 @@ $\lambda$ had no comparably exact accounting.
 
 ---
 
-## 9. Two-cart benchmark: how fast does it converge, with no refinement?
+## 8. Two-cart benchmark: how fast does it converge, with no refinement?
 
 Code: `fis_twocart.py`. Experiments: `demo_twocart.py`.
 
@@ -864,9 +843,9 @@ Objectives: **settling time** (2% of $\|z_0\|$, taken as the *last* exit from th
 tolerance ball, not the first entry), **peak force**, **energy** $\int u^2dt$.
 Scored equal-weight, normalized against the best LQR in a sweep.
 
-### 9a. The objectives are what make this a fair contest
+### 8a. The objectives are what make this a fair contest
 
-Theorem C1 (§8a) applies to this plant: it is LTI, so with a *quadratic* cost a
+Theorem C1 (§7a) applies to this plant: it is LTI, so with a *quadratic* cost a
 partition-of-unity TSK reproduces $-Kx$ exactly and the membership functions
 cancel. A fuzzy controller cannot beat LQR at LQR's own objective, and any
 result claiming otherwise would be an artifact.
@@ -875,7 +854,7 @@ What breaks the degeneracy is the **cost, not the plant**: settling time and pea
 force are not quadratic, and $|u|\le u_{\max}$ makes the true optimum non-smooth.
 That is the only reason there is anything to measure.
 
-### 9b. Convergence — the answer
+### 8b. Convergence — the answer
 
 Recipe applied *once*, with no tuning: weighted $k$-means on the open-loop optimal
 trajectories → variable-project the consequents (one linear solve, globally
@@ -906,7 +885,7 @@ trained on**, and 10% less peak force — while being *worse* on settling time
 reasonable reading of an equal-weight score but should not be mistaken for
 uniform dominance.
 
-### 9c. …and then it gets worse, for a diagnosable reason
+### 8c. …and then it gets worse, for a diagnosable reason
 
 Past $N\approx3$ the score degrades monotonically and by $N=8$ the closed loop
 stops settling at all. This is **not** a numerical artifact and not a failure of
@@ -931,9 +910,9 @@ The fix is one round of aggregation (simulate, collect the off-trajectory states
 refit — DAgger), or off-trajectory sampling around the optimal tube. Both are
 *refinement*, which the question explicitly excluded, so they are not done here.
 
-### 9d. The nonlinear case — where the framework predicted a win, and didn't get one
+### 8d. The nonlinear case — where the framework predicted a win, and didn't get one
 
-§8a argued that fuzzy structure can only earn its keep through nonlinearity,
+§7a argued that fuzzy structure can only earn its keep through nonlinearity,
 since Theorem C1 makes it vacuous on LTI plants. Adding a hardening cubic spring
 ($k_{nl}=2$) voids the exact-representation argument and should therefore be
 where the method shines. It is not.
@@ -952,20 +931,20 @@ Meanwhile the open-loop reference scores 0.595, so roughly 40% of the objective
 is genuinely available — the room exists and the method cannot reach it.
 
 This is a negative result for the hypothesis, and it should be read as one. The
-nonlinearity that removes the C1 degeneracy also amplifies the §9c failure mode:
+nonlinearity that removes the C1 degeneracy also amplifies the §8c failure mode:
 a hardening spring makes off-trajectory states produce disproportionately large
 restoring forces, so extrapolation error is punished far harder than in the
 linear case. The binding constraint is the same one — training data confined to
 optimal trajectories — but nonlinearity raises the price of leaving them.
 
-So the honest summary is narrower than §8a's framing suggested: nonlinearity is a
+So the honest summary is narrower than §7a's framing suggested: nonlinearity is a
 *necessary* condition for fuzzy structure to matter, not a sufficient one. On
 this benchmark, going nonlinear made the problem harder for the method faster
 than it created advantage for it.
 
-### 9e. Does off-trajectory data recover it?
+### 8e. Does off-trajectory data recover it?
 
-§9c blamed the post-$N{=}3$ breakdown on distribution shift. Testing the fix
+§8c blamed the post-$N{=}3$ breakdown on distribution shift. Testing the fix
 splits that claim in two, and only half of it survives.
 Code: `demo_augment.py`. Expert labels come from a short-horizon re-solve
 (~1.7 s each), so both schemes are affordable at a few hundred labels.
@@ -983,7 +962,7 @@ per-axis spread, re-label, add; controller-independent, computed once):
 
 **W — DAgger** (fit → roll out → label the states the controller *actually*
 visits → refit; the fixed-point iteration that makes the training measure equal
-the deployment measure, as §8d requires):
+the deployment measure, as §7d requires):
 
 | rules | round 0 | round 1 | round 2 |
 |---|---|---|---|
@@ -995,7 +974,7 @@ Three findings, and the second is the one that matters:
 
 1. **Stability recovers, decisively.** $N=8$ goes from unusable to 0.888 (tube)
    or 0.941 (DAgger); $N=12$ goes 1.321 → 0.926. The shift metric moves with it
-   — 4.67 → 3.06 at $N=12$, 6.73 → 4.48 at $N=16$ — confirming §9c's diagnosis of
+   — 4.67 → 3.06 at $N=12$, 6.73 → 4.48 at $N=16$ — confirming §8c's diagnosis of
    *the collapse*.
 2. **The plateau does not move.** The best score anywhere in either experiment is
    0.8879 (tube, $N=8$, 40 parameters), still worse than **0.8629 from 3 rules /
@@ -1012,26 +991,24 @@ at the cost of fidelity where it actually matters. **Robustness and
 occupation-weighted accuracy are in direct tension here**, and for a controller
 that is already stable the trade is a losing one.
 
-So §9c's conclusion needs splitting:
+So §8c's conclusion needs splitting:
 
 > Distribution shift explains the **collapse at high rule count** — that part is
 > confirmed, and fixable with off-trajectory data. It does **not** explain the
 > **0.863 plateau**, which survives every augmentation tried. Two different
 > limits were conflated; only one of them is a data problem.
 
-What the plateau actually is remains open. The candidates are the affine-consequent
-model class, the training targets (a smooth-surrogate optimum, not a true one —
-§9e), and the mismatch between the three-objective score and the quadratic form
-Theorem C2 can certify. Nothing here distinguishes them.
+What the plateau actually is is not left open: §8f rules out the model class and
+§8g names the imitation objective, which §8h then confirms by removing it.
 
 One caveat on W: this is the $\beta=0$ variant of DAgger, rolling out the learner
 only. The original algorithm mixes in the expert on a decaying schedule, and its
 absence is the likely reason $N=16$ oscillates (∞ → 1.22 → ∞) instead of
 converging.
 
-### 9f. Does a richer consequent class move the plateau?
+### 8f. Does a richer consequent class move the plateau?
 
-§9e left two candidates for the 0.8629 plateau: the model class and the training
+§8e left two candidates for the 0.8629 plateau: the model class and the training
 targets. This isolates the first. Code: `demo_order.py`.
 
 Raising the consequent polynomial order enlarges the model class while keeping
@@ -1092,14 +1069,14 @@ score gets monotonically *worse*. The best-scoring configuration has nearly the
 > is inverse.** The model class was never the binding constraint — fitting $u^*$
 > more accurately makes the controller worse.
 
-### 9g. What the plateau actually is
+### 8g. What the plateau actually is
 
 Three experiments now bracket it:
 
 | candidate | test | result |
 |---|---|---|
-| distribution shift / data | §9e, tube + DAgger | fixes the collapse, plateau unmoved |
-| model class | §9f, orders 0–3 | 1.6% at 2× params, inverse fit/score relation |
+| distribution shift / data | §8e, tube + DAgger | fixes the collapse, plateau unmoved |
+| model class | §8f, orders 0–3 | 1.6% at 2× params, inverse fit/score relation |
 | training targets | — | **not excluded** |
 
 By elimination, the binding constraint is the **imitation objective itself**. The
@@ -1109,7 +1086,7 @@ more faithful reproduction of an open-loop control *law* is not a better
 begin with. Extra capacity spends itself reproducing trajectory-specific detail
 that does not transfer, which is exactly the inverse relation in Z′.
 
-That also explains why §9b's two-rule result is so good: with 10 parameters the
+That also explains why §8b's two-rule result is so good: with 10 parameters the
 model is too coarse to imitate the open-loop law faithfully, and is forced into
 something closer to a genuine feedback policy.
 
@@ -1117,13 +1094,13 @@ The implied fix is a different algorithm, not a bigger model or more data:
 **optimize the closed-loop objective directly over the FIS parameters** rather
 than fitting sampled targets. That abandons the variable-projection guarantee
 (the objective stops being quadratic in the consequents), which is precisely the
-trade §8b's certificate was designed to avoid — and is why it was worth
-establishing that the cheap route genuinely caps out first. §9h does it, and the
+trade §7b's certificate was designed to avoid — and is why it was worth
+establishing that the cheap route genuinely caps out first. §8h does it, and the
 diagnosis holds: 22.9% at ten parameters.
 
-### 9h. Direct policy optimization — the plateau breaks
+### 8h. Direct policy optimization — the plateau breaks
 
-Code: `demo_policyopt.py`. §9g concluded by elimination that the binding
+Code: `demo_policyopt.py`. §8g concluded by elimination that the binding
 constraint was the imitation objective. This tests the implied fix: stop fitting
 sampled targets, and optimize the closed-loop objective directly over the FIS
 parameters.
@@ -1131,7 +1108,7 @@ parameters.
 **The price is paid up front.** The objective is not quadratic in the
 consequents, so variable projection no longer applies — no globally optimal
 linear solve, only derivative-free search (Powell) over a non-convex landscape.
-Every guarantee from §3a and §8b is surrendered. The true score is also unusable
+Every guarantee from §3a and §7b is surrendered. The true score is also unusable
 as a search objective: settling time is discontinuous, peak force is a max, and
 failures score ∞, which tells an optimizer nothing. `shaped_cost` replaces each
 term with an always-finite analogue on the same normalization — soft time outside
@@ -1156,7 +1133,7 @@ that makes a non-settling controller *improvable* rather than merely rejected.
 
 Unlike every earlier result, this improves **all three objectives at once** —
 31% faster settling, 35% less peak force, 37% less energy than the best LQR. The
-imitation controllers had to trade settling time for actuator economy (§9b);
+imitation controllers had to trade settling time for actuator economy (§8b);
 direct optimization does not.
 
 - **34.5% better than the best LQR**
@@ -1165,7 +1142,7 @@ direct optimization does not.
 
 Beating the open-loop reference is not a contradiction even though that
 reference had full knowledge of $z_0$: it is open-loop, so it cannot correct
-along the way, and it was only a surrogate local optimum (§9f).
+along the way, and it was only a surrogate local optimum (§8b).
 
 **AB — but the warm start is load-bearing.** The same 3-rule structure started
 from zero consequents instead of the imitation fit:
@@ -1180,7 +1157,7 @@ the same budget. So the two stages are complementary rather than competing:
 > it, direct optimization does not start. Neither stage reaches 0.655 alone.
 
 That rehabilitates §3a's variable projection in a specific role. Its value here
-is not that it produces the best controller — §9f showed it cannot — but that it
+is not that it produces the best controller — §8f showed it cannot — but that it
 produces a *stabilizing* one in a single globally optimal linear solve, with no
 search and no initialization problem of its own.
 
@@ -1189,24 +1166,52 @@ search and no initialization problem of its own.
 parameters and the same 600 evaluations that is a statement about budget, not
 capacity; it is not evidence that antecedent tuning cannot help.
 
-### 9i. The plateau, resolved
+### 8i. Held-out check — is 0.6547 real or memorized?
+
+Every score in §8 up to this point is measured on the same six initial
+conditions used for fitting. For the imitation fits that is a mild concern; for
+direct policy optimization it is a real one, since 10 parameters tuned against 6
+trajectories could simply be memorizing them. Code: `demo_holdout.py`. Six
+held-out initial conditions, different directions and magnitudes, two of them
+larger than anything in training. Each split is normalized against LQR *on that
+split*, so the two columns are directly comparable.
+
+| controller | train | test | test settled | degradation |
+|---|---|---|---|---|
+| best LQR | 1.0000 | 1.0000 | 6/6 | +0.0% |
+| imitation $N{=}2$ | 0.8666 | 0.8632 | 6/6 | −0.4% |
+| imitation $N{=}3$ | 0.8629 | 0.8621 | 6/6 | −0.1% |
+| **direct opt $N{=}2$** | **0.6547** | **0.6905** | **6/6** | **+5.5%** |
+
+The imitation fits generalize essentially perfectly — expected, since they have
+few parameters and never see the objective. **Direct optimization does overfit,
+by a measurable 5.5%**, which is the honest cost of tuning against a finite set
+of initial conditions.
+
+But the conclusion survives intact: the held-out score of 0.6905 still beats the
+best imitation result (0.8487) by 19% and the best LQR by **31%**, on initial
+conditions it never saw, including two outside the training envelope, settling
+from all six. The headline in §8h should be read as **34.5% in-sample, 31%
+out-of-sample**.
+
+### 8j. The plateau, resolved
 
 | candidate | test | verdict |
 |---|---|---|
-| distribution shift / data | §9e | fixes the collapse, plateau unmoved |
-| model class | §9f | 1.6% at 2× params; fit/score inversely related |
-| **imitation objective** | **§9h** | **confirmed — 22.9% once removed** |
+| distribution shift / data | §8e | fixes the collapse, plateau unmoved |
+| model class | §8f | 1.6% at 2× params; fit/score inversely related |
+| **imitation objective** | **§8h** | **confirmed — 22.9% once removed** |
 
-The elimination in §9g was correct. Optimizing the objective you actually care
+The elimination in §8g was correct. Optimizing the objective you actually care
 about, rather than fitting samples from something that optimized it once
 open-loop, is worth more than every other lever tried combined — and it is worth
 it at *ten parameters*, the smallest model in the entire study.
 
-### 9j. Honest limits
+### 8k. Honest limits
 
 - Six initial conditions, all modest. A wider $z_0$ set would stress
   extrapolation harder and probably lower the rule count at which shift bites.
-- §9d is a single nonlinear plant at one stiffness. It refutes "nonlinearity is
+- §8d is a single nonlinear plant at one stiffness. It refutes "nonlinearity is
   sufficient" but does not establish that fuzzy structure never helps on
   nonlinear plants — a milder $k_{nl}$, or a nonlinearity the affine consequents
   are better matched to, could go the other way.
@@ -1220,7 +1225,10 @@ it at *ten parameters*, the smallest model in the entire study.
   and peak force are outside its quadratic form, so §8's suboptimality
   certificate does not transfer to this three-objective score. That gap is real
   and is the main thing separating §9 from §8.
-- §9h used a fixed 600-evaluation budget and one optimizer (Powell). No claim is
+- §8i uses six held-out initial conditions from one plant. It bounds the
+  overfitting at 5.5% for this configuration; it does not establish that the
+  recipe generalizes across plants or across much wider state envelopes.
+- §8h used a fixed 600-evaluation budget and one optimizer (Powell). No claim is
   made that 0.6547 is the best reachable; a larger budget, CMA-ES, or restarts
   would likely go further. The claim is only that the plateau is not a limit of
   the model or the data.
@@ -1231,7 +1239,105 @@ it at *ten parameters*, the smallest model in the entire study.
 
 ---
 
-## 7. Reproduction
+## 9. Next steps
+
+Consolidated from the open threads in §6, §7g and §8k, ordered by value per unit
+of work rather than by section. Rough costs assume this machine.
+
+### 9a. Do first — cheap, and they close claims already made
+
+**1. Certify the direct-optimized controller.** §8h surrendered every guarantee
+in the framework to derivative-free search, and nothing was put back. But §7e's
+machinery is controller-agnostic: a Lyapunov/ROA certificate can be computed
+*post hoc* for the 0.6547 controller exactly as it was for the scalar ones. Right
+now the best-performing controller in the study is the only one with no
+stability certificate at all, which is backwards. (~1 hour; low risk, high value
+— it either certifies or reveals the controller is quietly fragile.)
+
+**2. Direct policy optimization on the nonlinear plant.** §8d is the study's
+sharpest negative result: on the cubic-spring plant no imitation controller beat
+a linear LQR, and everything past $N{=}4$ failed. §8h then showed imitation was
+never the right objective. **The obvious question is whether §8h's fix rescues
+§8d**, and it directly tests whether that negative result was about the *method*
+or about the *plant*. If direct optimization wins there, §8d's conclusion —
+"nonlinearity is necessary but not sufficient" — needs revising toward "the
+imitation route cannot exploit nonlinearity, but the direct route can."
+(~30 min; the single highest-information experiment left.)
+
+**3. Widen the state envelope.** All of §8 uses six modest initial conditions
+and §8i bounds overfitting at 5.5% against six more. A substantially wider
+envelope would stress the distribution-shift finding (§8c) and probably lower
+the rule count at which it bites. (~1 hour.)
+
+### 9b. Theory gaps that are actually load-bearing
+
+**4. Extend the Theorem C2 certificate beyond quadratic cost.** This is the
+largest hole. C2 gives an *exact* suboptimality certificate — no constants, no
+conservatism — but only for $\int u^\top Ru$. Settling time and peak force fall
+outside it, so §8's entire three-objective study is measured rather than
+certified, and that gap is what separates §8 from §7. An $L^\infty$ or
+exit-time functional will not admit the same clean identity, but a one-sided
+bound may be reachable, and would upgrade the whole control half of this work.
+(Days; genuinely open, possibly not achievable in the clean form.)
+
+**5. Analytic Hessian of the reduced action.** §3d made the gradient exact and
+that removed a real failure mode. The second-order certificate still uses finite
+differences, and its noise floor is what forces the tolerance-based verdict in
+§3b. The same envelope argument differentiated once more should give it in
+closed form. (~half a day; low risk, mostly algebra already half-done.)
+
+**6. $\lambda^\*$ in the multi-input case.** §4d′ gives $\lambda^\*=3b^4/(8c^2)$ in
+closed form for two scalar Gaussians, with $\ell^\*=\sqrt6\times$ the crossover
+width. In $\mathbb{R}^n$ the crossover is a hypersurface and the width becomes
+direction-dependent, so the scalar formula cannot carry over unchanged. Whether
+a useful anisotropic version exists is unknown. (Open-ended.)
+
+### 9c. Validation the work has not had
+
+**7. The classifier side has never met real data.** §5 proves the max-equals-sum
+identity, the order-0 TSK collapse, and the annealing bound, all on synthetic
+partitions. The sonar dataset is already wired up in
+`AEEM6097/fuzzy-symphony.py` and has been the intended target since the start.
+Everything in §5 is untested against anything with real class overlap. (~half a
+day; the most obvious unfinished business in the whole document.)
+
+**8. Input constraints in §7.** §7g flags this and it remains true: saturation
+is where fuzzy control usually earns its keep, and under saturation $u^*$ is not
+smooth, so constraint C3 would need revisiting. §8 has saturation but no
+certificate; §7 has certificates but no saturation. Closing that gap would join
+the two halves.
+
+**9. A second plant.** Every control result rests on two plants, one of them
+inverse-optimal by construction. A cart-pole or a flexible link would test
+whether the two-stage recipe (imitate to stabilize, then optimize directly) is a
+pattern or a coincidence.
+
+### 9d. Lower priority
+
+**10. Better optimizer for §8h.** Powell at 600 evaluations is not a serious
+budget. CMA-ES with restarts would establish how much of the remaining gap is
+algorithmic. Worth doing only after item 1, since a better controller with no
+certificate is not obviously progress.
+
+**11. Annealing schedule for $\beta$** (§5c) tied to a trust region on the
+action, giving a single continuation method rather than two separate knobs.
+
+### 9e. What would change the story
+
+Two results would force real revision:
+
+- **If item 2 fails** — direct optimization also loses to linear LQR on the
+  nonlinear plant — then the problem is not the imitation objective but the
+  TSK structure itself on that plant, and §8g's elimination argument would need
+  a fourth candidate.
+- **If item 1 finds no certificate** — the 0.6547 controller has a small or
+  empty region of attraction — then §8h's headline is a performance number
+  bought with fragility, and the honest recommendation flips back toward the
+  imitation fit, which is slower but was never in doubt.
+
+---
+
+## 10. Reproduction
 
 ```bash
 uv venv .venv && uv pip install --python .venv/bin/python numpy scipy matplotlib
@@ -1243,6 +1349,10 @@ cd research/least_action
 ../../.venv/bin/python demo_augment.py       # ~20 min, sections V-X
 ../../.venv/bin/python demo_order.py         # ~10 min, sections Y-Z'
 ../../.venv/bin/python demo_policyopt.py     # ~50 min, sections AA-AD
+../../.venv/bin/python demo_holdout.py       # ~12 min, generalization check
+
+Total ~2 hours. `demo_order.py`, `demo_policyopt.py` and `demo_holdout.py` reuse
+a cached training set (`.twocart_train.npz`, gitignored); delete it to rebuild.
 ```
 
 Both are deterministic — seeded RNG, no wall-clock dependence — so the output
@@ -1313,7 +1423,7 @@ reader changing one should know what it was protecting against.
 | `Metrics` / `simulate` | settling time, peak force, energy; divergence event and RHS-evaluation budget |
 | `optimal_trajectory` | direct-transcription open-loop reference (smooth surrogate of the objective) |
 | `TskController` | multi-input TSK, product-Gaussian antecedents, affine consequents |
-| `place_rules` | occupation-weighted k-means rule placement (multi-input form of §8d) |
+| `place_rules` | occupation-weighted k-means rule placement (multi-input form of §7d) |
 | `fit_consequents` | occupation-weighted variable projection — one globally optimal linear solve |
 | `distribution_shift` | max closed-loop distance to the nearest training sample |
 | `label_state` | expert label from a short-horizon re-solve (~1.7 s) |
@@ -1355,3 +1465,4 @@ reader changing one should know what it was protecting against.
 | fit accuracy vs score is inverse | 9f | order Z' |
 | direct policy opt breaks plateau | 9h | policyopt AA, AD |
 | warm start is load-bearing | 9h | policyopt AB |
+| held-out generalization | 9i | holdout |
