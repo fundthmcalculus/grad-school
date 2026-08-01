@@ -20,31 +20,30 @@ from nerfcm import nerfcm
 
 
 def load_iris():
-    """Load Iris dataset, return (X, y, name)."""
-    from sklearn.datasets import load_iris as sklearn_load_iris
-    iris = sklearn_load_iris()
-    X = iris.data
-    y = iris.target
+    """Load Iris dataset from UCI ML Repository, return (X, y, name)."""
+    from ucimlrepo import fetch_ucirepo
+    iris = fetch_ucirepo(id=53)
+    X = iris.data.features.values
+    y = iris.data.targets.values.ravel()
     return X, y, "Iris"
 
 
 def load_glass():
-    """Load Glass dataset, return (X, y, name)."""
-    from sklearn.datasets import load_wine
-    wine = load_wine()
-    X = wine.data
-    y = wine.target
-    return X, y, "Wine (Glass substitute)"
+    """Load Glass dataset from UCI ML Repository, return (X, y, name)."""
+    from ucimlrepo import fetch_ucirepo
+    glass = fetch_ucirepo(id=42)
+    X = glass.data.features.values
+    y = glass.data.targets.values.ravel()
+    return X, y, "Glass"
 
 
 def load_heart():
-    """Load Heart dataset (using Wine subset for speed), return (X, y, name)."""
-    from sklearn.datasets import load_wine
-    wine = load_wine()
-    # Take first 100 samples
-    X = wine.data[:100]
-    y = wine.target[:100]
-    return X, y, "Wine (n=100)"
+    """Load Heart disease dataset from UCI ML Repository, return (X, y, name)."""
+    from ucimlrepo import fetch_ucirepo
+    heart = fetch_ucirepo(id=45)
+    X = heart.data.features.values[:100]  # Take first 100 samples for speed
+    y = heart.data.targets.values.ravel()[:100]
+    return X, y, "Heart Disease (n=100)"
 
 
 def standardize(X):
