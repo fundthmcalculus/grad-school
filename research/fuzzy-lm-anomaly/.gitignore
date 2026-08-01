@@ -1,0 +1,5 @@
+# Captured residual-stream tensors: ~454 MB each, regenerable via capture.py.
+# The labelled generations (capture_meta.parquet) ARE committed, so every
+# analysis except the hidden-state ones reproduces without a GPU.
+*.npy
+__pycache__/
