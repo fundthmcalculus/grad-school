@@ -212,6 +212,7 @@ def _main():
     fig_negative()
     fig_transfer()
     fig_falsepremise()
+    fig_fuzzy_stats()
 
 
 def fig_falsepremise():
@@ -260,6 +261,73 @@ def fig_falsepremise():
     for ext in ("png", "pdf"):
         fig.savefig(OUT / f"falsepremise_control.{ext}", dpi=200)
     print(f"wrote {OUT / 'falsepremise_control.png'}")
+
+
+
+
+
+def fig_fuzzy_stats():
+    """The positive result: fuzzy rule over the output statistics."""
+    d = pd.read_csv(DATA / "fuzzy_stats.csv")
+    fig, axes = plt.subplots(1, 2, figsize=(12.2, 4.8), facecolor=SURFACE)
+    conds = ["length+template", "length+template+entropy"]
+    titles = ["A · Template + length matched", "B · + entropy matched (hardest)"]
+
+    for ax, cond, title in zip(axes, conds, titles):
+        s = d[d.condition == cond]
+        g = (s.groupby("detector")
+             .agg(auroc=("auroc", "mean"), std=("auroc", "std"),
+                  params=("n_params", "mean")))
+        # Pareto front: maximise AUROC, minimise parameters
+        front = [n for n, r in g.iterrows()
+                 if not any((o.auroc >= r.auroc) and (o.params <= r.params)
+                            and (o.auroc > r.auroc or o.params < r.params)
+                            for on, o in g.iterrows() if on != n)]
+        for n, r in g.iterrows():
+            is_fis = n.startswith("FIS")
+            on_front = n in front
+            c = S1 if is_fis else (S2 if "n_tokens" in n else INK_MUTED)
+            x = max(r.params, 0.6)
+            ax.errorbar(x, r.auroc, yerr=r["std"], color=c, marker="o",
+                        ms=11 if is_fis else 7, mec=INK if on_front else SURFACE,
+                        mew=1.6 if on_front else 1.2, capsize=2.5,
+                        elinewidth=1.0, zorder=4, linestyle="none")
+            ax.annotate(f"{n.split(' · ')[0]}\n{r.auroc:.3f}", (x, r.auroc),
+                        textcoords="offset points", xytext=(10, -2),
+                        fontsize=7.2, color=c, linespacing=1.25,
+                        fontweight="bold" if is_fis else "normal")
+        fr = g.loc[front].sort_values("params")
+        ax.plot(np.maximum(fr.params, 0.6), fr.auroc, color=INK, lw=1,
+                ls=(0, (5, 3)), zorder=2, alpha=0.55)
+        ax.set_xscale("symlog", linthresh=1)
+        ax.set_xlim(-0.4, 5e5)
+        ax.set_ylim(0.45, 0.96)
+        ax.axhline(0.5, color=INK_MUTED, lw=1, ls=(0, (4, 3)), zorder=1)
+        ax.set_xlabel("Tunable parameters  (← fewer is better)", fontsize=8.5)
+        ax.set_ylabel("AUROC  (↑ higher is better)", fontsize=8.5)
+        ax.grid(True, color=GRID, lw=0.8)
+        ax.set_axisbelow(True)
+        ax.set_facecolor(SURFACE)
+        for sp_ in ("top", "right"):
+            ax.spines[sp_].set_visible(False)
+        ax.tick_params(labelsize=7.5, colors=INK_2, length=0)
+        ax.set_title(title, loc="left", fontsize=10.2, color=INK,
+                     fontweight="bold", pad=8)
+
+    fig.suptitle("A small fuzzy rule over the OUTPUT statistics is on the "
+                 "Pareto front", x=0.012, y=0.975, ha="left", fontsize=12.5,
+                 color=INK, fontweight="bold")
+    fig.text(0.012, 0.905,
+             "Same 19 output-distribution statistics for every learned detector. "
+             "Dashed line = Pareto front (ringed markers). The fuzzy rule uses "
+             "4 rules over 6 antecedents\n(80 parameters) and beats "
+             "full-covariance Mahalanobis by +0.040 on 8/8 seeds (p = 0.0078) "
+             "with 2.6x fewer parameters.",
+             ha="left", va="top", fontsize=8.4, color=INK_2, linespacing=1.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.855))
+    for ext in ("png", "pdf"):
+        fig.savefig(OUT / f"fuzzy_stats_pareto.{ext}", dpi=200)
+    print(f"wrote {OUT / 'fuzzy_stats_pareto.png'}")
 
 
 if __name__ == "__main__":

@@ -1050,3 +1050,110 @@ directions are:
    length, prompt family, and entropy -- each independently manufacture large
    spurious results, and matching is a cheap general remedy. That is worth
    writing up on its own, and it is what this study actually established.
+
+---
+
+## 21. The fuzzy result that stands: a small rule over the OUTPUT statistics
+
+Section 20 established that the one representation surviving every control is the
+19 output-distribution statistics -- Mahalanobis over them held 0.799 with entropy
+matched, while every hidden-state family failed. So the question changed from
+"can fuzzy beat entropy on activations" (no, repeatedly) to the sharper one:
+
+> Can a small, readable fuzzy rule over the output statistics match the
+> full-covariance detector on that same representation?
+
+**Yes, and it beats it.** `fuzzy_stats.py`. Hyperparameters (antecedent count,
+mode count, norm pair, whitening) selected on a **validation half of the
+positives** and reported on the disjoint test half, so the headline is not the
+maximum of a grid. Rule bases still fit on grounded data only. 8 seeds.
+
+### Condition `length + template` matched
+
+| detector | AUROC | FPR@95 | params | train | inference | structure |
+|---|---|---|---|---|---|---|
+| **FIS - stats** | **0.881 +/- 0.015** | 0.588 | **80** | 1,102 ms | 375,066/s | **4 rules / 39 MFs / 6 antecedents** |
+| mean entropy | 0.841 +/- 0.014 | 0.593 | 0 | 0 ms | 1,962,600/s | threshold |
+| Mahalanobis - stats | 0.841 +/- 0.024 | 0.588 | 209 | 1 ms | 722,354/s | 19f full covariance |
+| IsolationForest - stats | 0.831 +/- 0.027 | 0.637 | 11,649 | 94 ms | 89,297/s | 100 trees |
+| perplexity | 0.828 +/- 0.014 | 0.587 | 0 | 0 ms | 2,266,532/s | threshold |
+| OneClassSVM - stats | 0.785 +/- 0.040 | 0.818 | 928 | 1 ms | 293,906/s | 49 SV |
+| `n_tokens` (control) | 0.500 +/- 0.000 | 0.950 | 0 | 0 ms | 2,508,771/s | threshold |
+
+    paired FIS vs Mahalanobis (identical 19 features):
+      mean delta = +0.040 +/- 0.017 (min +0.014, max +0.068)
+      wins 8/8 seeds, Wilcoxon p = 0.0078, 2.6x fewer parameters
+
+### Condition `length + template + entropy` matched (hardest)
+
+| detector | AUROC | FPR@95 | params |
+|---|---|---|---|
+| **FIS - stats** | **0.794 +/- 0.022** | 0.955 | **80** |
+| Mahalanobis - stats | 0.760 +/- 0.032 | 0.780 | 209 |
+| IsolationForest - stats | 0.691 +/- 0.030 | 0.892 | 11,649 |
+| OneClassSVM - stats | 0.671 +/- 0.039 | 0.913 | 928 |
+| mean entropy | 0.601 +/- 0.016 | 0.751 | 0 |
+| perplexity | 0.580 +/- 0.018 | 0.750 | 0 |
+
+    paired delta = +0.034 +/- 0.033, wins 7/8 seeds, p = 0.0234
+
+### Pareto position
+
+On (AUROC, parameters) the front has exactly **two** points: mean entropy (0 params,
+0.841) and **FIS - stats** (80 params, 0.881). Mahalanobis, IsolationForest and
+OneClassSVM are all dominated -- Mahalanobis by entropy (equal AUROC, fewer
+parameters) and by the FIS (higher AUROC, fewer parameters). Under entropy
+matching the FIS is the single best detector outright. `figures/fuzzy_stats_pareto.png`.
+
+### The rule base
+
+Four rules over six antecedents, all readable:
+
+    RULE 2 (mode1)  IF maxp_first is MEDIUM or LOW  AND ent_first is MEDIUM
+                    AND margin_first is MEDIUM or LOW  AND ent_max is HIGH
+                    AND ent_std is HIGH  AND n_tokens is LOW or VERY LOW
+                    THEN the model is behaving normally
+
+    RULE 4 (mode3)  IF maxp_first is VERY LOW or LOW  AND ent_first is VERY HIGH
+                    AND margin_first is LOW  AND ent_max is HIGH
+                    AND ent_std is VERY HIGH or HIGH  AND n_tokens is VERY LOW
+                    THEN the model is behaving normally
+
+    ANOMALY         IF none of the four fires strongly THEN flag as suspect
+
+The selected antecedents are dominated by **first-token** statistics
+(`maxp_first`, `ent_first`, `margin_first`) plus entropy spread (`ent_max`,
+`ent_std`) and length. Interpretation: grounded generation has a characteristic
+*confidence profile on its very first token*, and the rule base carves that into
+four distinct known-good modes. Mean entropy collapses all of that into one
+number, which is precisely why a 4-rule system beats it by +0.040 and beats it by
++0.193 once mean entropy is matched away.
+
+Whitening was offered as a variant and **never selected** on any seed, so no
+decorrelation is needed -- the raw statistics work directly. Selected
+configurations were stable: 4-8 antecedents, K = 3-4 modes, min/max or
+Dombi-Einstein pairs. `figures/membership_functions_stats.png`.
+
+### Honest limits
+
+* **FPR@95TPR = 0.955 in the entropy-matched condition** -- worse than
+  Mahalanobis's 0.780. The FIS wins on ranking but its high-recall tail is poor,
+  so at a 95%-recall operating point it is not the right choice. In the
+  template-matched condition the two are tied at 0.588.
+* Training is ~1.1 s against 1 ms for Mahalanobis. Irrelevant in absolute terms,
+  but it is not free.
+* One model, one probe family (long-form groundedness), 8 seeds. The claim is
+  scoped to *detecting ungrounded generation about non-existent entities*, which
+  is what the v3 labels support.
+* This does not revive sections 9, 19 or 20. Hidden-state geometry remains a
+  negative result; the win is on the output statistics.
+
+### Why this is the version worth putting in the dissertation
+
+It is the same Ch 4.3.5 construction -- MoG antecedents, the complement-of-conorm
+anomaly rule -- applied to a representation chosen because it survived adversarial
+controls rather than because it was convenient. It beats every learned rival on
+identical features, uses 2.6x-146x fewer parameters, and prints as four rules a
+human can read. That is a defensible interpretability-plus-parsimony claim, and it
+took four failed configurations and three dissolved confounds to find the place
+where it is true.
