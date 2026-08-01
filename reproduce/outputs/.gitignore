@@ -11,3 +11,11 @@
 # that produced them for a diff between two runs to mean anything later.
 !*/
 !*/**
+
+# ...but regenerated figures are not. They used to be committed inside the
+# tribble-cluster submodule; reproduce/experiments/run_cluster_experiment.py now
+# redirects them here so reproducing a Chapter 3 figure no longer dirties a
+# pinned submodule. Ignored for now, matching the policy on
+# gated-minimax-selection/outputs/. This rule must stay AFTER the !*/ pair above
+# to win -- last match wins, and an excluded directory is never descended into.
+figures/

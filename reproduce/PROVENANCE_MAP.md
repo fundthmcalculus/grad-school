@@ -34,8 +34,11 @@ registered tribble-cluster experiments do `from experiments.blockwise_vat import
 experiments/adversarial_eval.py`, the form the manifest used — Python puts
 `experiments/` on the path instead and every one of them dies with
 `ModuleNotFoundError: No module named 'experiments'` before doing any work. The
-manifest now uses `python -m experiments.<name>`, which is the only form that
-runs; see the `_uvm` helper.
+manifest now runs them through `reproduce/experiments/run_cluster_experiment.py`,
+which puts the submodule root on `sys.path` *and* redirects their figures to
+`reproduce/outputs/figures/cluster/` so that reproducing a Chapter 3 figure no
+longer dirties a pinned submodule. (`_uvm` remains for experiments that write
+nothing, such as `autok_eval`.)
 
 With them actually running, Table 3.6 reproduces exactly and Table 3.4 needed two
 cells corrected (circles/naive-block 0.10 → 0.00, bridged/naive-block 0.07 →
