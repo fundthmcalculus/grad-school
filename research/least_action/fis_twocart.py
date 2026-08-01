@@ -24,6 +24,8 @@ one actually asked for.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from itertools import combinations_with_replacement
+from math import comb
 from typing import Callable
 
 import numpy as np
@@ -255,6 +257,27 @@ def optimal_trajectory(
 # --------------------------------------------------------------------------
 # Multi-input TSK controller with variable-projected consequents
 # --------------------------------------------------------------------------
+def poly_basis(z: af64, order: int) -> af64:
+    """Monomials in the state up to `order`, constant term first.
+
+    Sizes for a 4-state plant: 1, 5, 15, 35 for orders 0..3.  Whatever the order,
+    the consequents stay *linear in the parameters*, so variable projection
+    (README §3a) still returns the global optimum -- raising the order enlarges
+    the model class without costing the one theorem the fit relies on.
+    """
+    terms = [1.0]
+    if order >= 1:
+        terms.extend(z)
+    for deg in range(2, order + 1):
+        for combo in combinations_with_replacement(range(len(z)), deg):
+            terms.append(float(np.prod([z[i] for i in combo])))
+    return np.array(terms)
+
+
+def basis_size(n_state: int, order: int) -> int:
+    return sum(comb(n_state + d - 1, d) for d in range(order + 1))
+
+
 @dataclass
 class TskController:
     centers: af64
@@ -262,7 +285,9 @@ class TskController:
     widths: af64
     """(N, 4) per-rule, per-axis widths."""
     theta: af64 = field(default_factory=lambda: np.zeros(0))
-    """(N * 5,) consequent coefficients: per rule, [bias, a1..a4]."""
+    """(N * basis_size,) consequent coefficients, rule-major."""
+    order: int = 1
+    """Consequent polynomial order. 1 = affine (classic TSK)."""
 
     def phi(self, z: af64) -> af64:
         d = (z[None, :] - self.centers) / self.widths
@@ -271,9 +296,10 @@ class TskController:
         return mu / s if s > 1e-300 else np.full(len(mu), 1.0 / len(mu))
 
     def regressors(self, z: af64) -> af64:
-        p = self.phi(z)
-        basis = np.concatenate([[1.0], z])
-        return np.outer(p, basis).ravel()
+        return np.outer(self.phi(z), poly_basis(z, self.order)).ravel()
+
+    def n_params(self) -> int:
+        return len(self.centers) * basis_size(self.centers.shape[1], self.order)
 
     def __call__(self, z: af64) -> float:
         return float(self.regressors(np.asarray(z)) @ self.theta)

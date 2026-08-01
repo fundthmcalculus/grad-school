@@ -1029,7 +1029,98 @@ only. The original algorithm mixes in the expert on a decaying schedule, and its
 absence is the likely reason $N=16$ oscillates (∞ → 1.22 → ∞) instead of
 converging.
 
-### 9f. Honest limits
+### 9f. Does a richer consequent class move the plateau?
+
+§9e left two candidates for the 0.8629 plateau: the model class and the training
+targets. This isolates the first. Code: `demo_order.py`.
+
+Raising the consequent polynomial order enlarges the model class while keeping
+the consequents **linear in the parameters**, so variable projection still
+returns the global optimum per rule placement (§3a). Nothing else changes — same
+rule placement, same occupation weighting, same single linear solve. Basis sizes
+for four states are 1, 5, 15, 35 at orders 0–3.
+
+**Y — score vs rule count, by order:**
+
+| order | basis | N=1 | N=2 | N=3 | N=4 | N=6 | N=8 | N=12 |
+|---|---|---|---|---|---|---|---|---|
+| 0 (constants) | 1 | ∞ | ∞ | ∞ | ∞ | ∞ | ∞ | ∞ |
+| 1 (affine) | 5 | 1.0313 | 0.8666 | **0.8629** | 0.8908 | 0.8903 | ∞ | 1.3211 |
+| 2 (quadratic) | 15 | 0.9756 | **0.8487** | 1.3395 | ∞ | ∞ | ∞ | ∞ |
+| 3 (cubic) | 35 | ∞ | ∞ | ∞ | ∞ | ∞ | ∞ | ∞ |
+
+Order 0 never works: constant consequents cannot produce state-proportional
+feedback, and an undamped oscillator needs it. Order 3 never works either, for
+the opposite reason — 35 parameters per rule against 186 samples.
+
+**Z — the fair comparison, at matched parameter budget:**
+
+| params | order | rules | score |
+|---|---|---|---|
+| 15 | 1 | 3 | **0.8629** |
+| 15 | 2 | 1 | 0.9756 |
+| 30 | 1 | 6 | 0.8903 |
+| 30 | 2 | 2 | **0.8487** |
+| 45 | 2 | 3 | 1.3395 |
+| 60 | 1 | 12 | 1.3211 |
+
+**The plateau moves, and barely: 0.8629 → 0.8487, a 1.6% improvement, bought
+with double the parameters.** At a matched 15-parameter budget affine wins
+decisively (0.8629 vs 0.9756). And richer consequents destabilize *sooner* —
+order 1 survives to $N=6$, order 2 only to $N=2$, order 3 never.
+
+**Z′ — and here is why.** Weighted RMS fit to $u^*$ on the training set, against
+closed-loop score:
+
+| order | rules | params | RMS fit | score |
+|---|---|---|---|---|
+| 0 | 3 | 3 | 0.109721 | ∞ |
+| 0 | 8 | 8 | 0.084124 | ∞ |
+| **1** | **3** | **15** | **0.025332** | **0.8629** |
+| 1 | 8 | 40 | 0.016583 | ∞ |
+| 2 | 3 | 45 | 0.015875 | 1.3395 |
+| 2 | 8 | 120 | 0.003684 | ∞ |
+| 3 | 3 | 105 | 0.004774 | ∞ |
+| 3 | 8 | 280 | 0.003339 | ∞ |
+
+Fit quality improves **monotonically and by 33×** (0.1097 → 0.0033). Closed-loop
+score gets monotonically *worse*. The best-scoring configuration has nearly the
+**worst** fit of any that works, and **every configuration that fits better than
+0.0253 fails to settle at all**.
+
+> **The relationship between open-loop fit accuracy and closed-loop performance
+> is inverse.** The model class was never the binding constraint — fitting $u^*$
+> more accurately makes the controller worse.
+
+### 9g. What the plateau actually is
+
+Three experiments now bracket it:
+
+| candidate | test | result |
+|---|---|---|
+| distribution shift / data | §9e, tube + DAgger | fixes the collapse, plateau unmoved |
+| model class | §9f, orders 0–3 | 1.6% at 2× params, inverse fit/score relation |
+| training targets | — | **not excluded** |
+
+By elimination, the binding constraint is the **imitation objective itself**. The
+targets are an open-loop optimum computed with full knowledge of $z_0$, and a
+more faithful reproduction of an open-loop control *law* is not a better
+*feedback* law — it is a better fit to something that was never a feedback law to
+begin with. Extra capacity spends itself reproducing trajectory-specific detail
+that does not transfer, which is exactly the inverse relation in Z′.
+
+That also explains why §9b's two-rule result is so good: with 10 parameters the
+model is too coarse to imitate the open-loop law faithfully, and is forced into
+something closer to a genuine feedback policy.
+
+The implied fix is a different algorithm, not a bigger model or more data:
+**optimize the closed-loop objective directly over the FIS parameters** rather
+than fitting sampled targets. That abandons the variable-projection guarantee
+(the objective stops being quadratic in the consequents), which is precisely the
+trade §8b's certificate was designed to avoid — and is why it was worth
+establishing that the cheap route genuinely caps out first.
+
+### 9h. Honest limits
 
 - Six initial conditions, all modest. A wider $z_0$ set would stress
   extrapolation harder and probably lower the rule count at which shift bites.
@@ -1064,6 +1155,7 @@ cd research/least_action
 ../../.venv/bin/python demo_control.py       # ~3 min, sections L-P
 ../../.venv/bin/python demo_twocart.py       # ~25 min, sections Q-T
 ../../.venv/bin/python demo_augment.py       # ~20 min, sections V-X
+../../.venv/bin/python demo_order.py         # ~10 min, sections Y-Z'
 ```
 
 Both are deterministic — seeded RNG, no wall-clock dependence — so the output
@@ -1140,6 +1232,7 @@ reader changing one should know what it was protecting against.
 | `label_state` | expert label from a short-horizon re-solve (~1.7 s) |
 | `augment_tube` | perturb the optimal trajectories and re-label |
 | `dagger_states` | states the current controller actually visits, occupation-weighted |
+| `poly_basis` / `basis_size` | consequent monomials up to a given order (1, 5, 15, 35 for orders 0-3) |
 
 ### Where each claim is checked
 
@@ -1169,3 +1262,5 @@ reader changing one should know what it was protecting against.
 | nonlinear case fails | 9d | twocart T |
 | augmentation recovers stability | 9e | augment V, W |
 | plateau survives augmentation | 9e | augment V, W |
+| higher order barely moves it | 9f | order Y, Z |
+| fit accuracy vs score is inverse | 9f | order Z' |
