@@ -89,7 +89,12 @@ REFINE_L2 = 1e-2
 # dominate this table's runtime, so they are farmed out. Results are reassembled
 # in job order, never completion order, so the table does not depend on
 # scheduling. REPRO_JOBS=1 forces the old serial path.
-N_JOBS = int(os.environ.get("REPRO_JOBS", "0")) or min(8, (os.cpu_count() or 1))
+#
+# Four by default, not every core: this table is usually run on a machine someone
+# is still using, and it is a long job. Raise it with REPRO_JOBS on a dedicated
+# host. The 1301s -> 652s figure quoted below was measured at eight workers; the
+# four-worker time is recorded in the manifest entry.
+N_JOBS = int(os.environ.get("REPRO_JOBS", "0")) or min(4, (os.cpu_count() or 1))
 
 
 def _rmse(y, p):
