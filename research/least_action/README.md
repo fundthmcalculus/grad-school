@@ -1396,7 +1396,11 @@ Items are ordered by how much certified ground they buy.
 ### 10a. Buys guarantees — do these first
 
 **1. Switch to rational ($\pi$-shaped) membership functions and set up the SOS
-Lyapunov certificate.** §9e: this is the single change that converts the missing
+Lyapunov certificate.** — **done in §12, and it did not close.** Everything up to
+the SDP works; the relaxation is the obstruction. Remaining work: multiplier
+degree 6, or a better SDP solver. Original text follows.
+
+**1 (original).** §9e: this is the single change that converts the missing
 guarantee (G12, stability) from a numerical check into an analytic certificate.
 Cohen's notes already specify the $\pi$ MF; `fis_action.py` supports it
 (`mf_cauchy`). The work is (i) refit everything with `kind="cauchy"` and confirm
@@ -1483,6 +1487,12 @@ cd research/least_action
 ../../.venv/bin/python demo_policyopt.py     # ~50 min, sections AA-AD
 ../../.venv/bin/python demo_holdout.py       # ~12 min, generalization check
 
+`fis_sos.py` (§12) additionally needs `sympy` and `cvxpy`:
+
+```bash
+uv pip install --python .venv/bin/python sympy cvxpy
+```
+
 Total ~2 hours. `demo_order.py`, `demo_policyopt.py` and `demo_holdout.py` reuse
 a cached training set (`.twocart_train.npz`, gitignored); delete it to rebuild.
 ```
@@ -1561,6 +1571,8 @@ reader changing one should know what it was protecting against.
 | `place_rules` | occupation-weighted k-means rule placement (multi-input form of §7d) |
 | `fit_consequents` | occupation-weighted variable projection — one globally optimal linear solve |
 | `distribution_shift` | max closed-loop distance to the nearest training sample |
+| `TskController(mf="pi")` | rational membership functions (default; see §12) |
+| `fit_consequents(hold_origin=True)` | adds the exact linear constraint u(0)=0 (default) |
 | `label_state` | expert label from a short-horizon re-solve (~1.7 s) |
 | `augment_tube` | perturb the optimal trajectories and re-label |
 | `dagger_states` | states the current controller actually visits, occupation-weighted |
@@ -1601,3 +1613,125 @@ reader changing one should know what it was protecting against.
 | direct policy opt breaks plateau | 9h | policyopt AA, AD |
 | warm start is load-bearing | 9h | policyopt AB |
 | held-out generalization | 9i | holdout |
+
+---
+
+## 12. Switching to rational ($\pi$-shaped) membership functions
+
+§9e argued that Gaussian MFs give up SOS-certifiability for nothing, and that
+Cohen's own $\pi$-shape is the better choice for a guarantee-first agenda. This
+carries that out. Code: `fis_sos.py`; `TskController(mf="pi")`.
+
+### 12a. The rational form is exact
+
+With $\mu_i=1/D_i$, $D_i=1+\sum_j((z_j-c_{ij})/w_{ij})^2$ a degree-2 polynomial,
+
+$$\varphi_i=\frac{\prod_{k\neq i}D_k}{\sum_k\prod_{m\neq k}D_m}=\frac{N_i}{Q},
+\qquad u(z)=\frac{P(z)}{Q(z)},\quad P=\sum_i N_i f_i .$$
+
+Built symbolically and checked against the numerical controller:
+
+- $\deg P=3$, $\deg Q=2$ for $N=2$, order-1 consequents
+- $\max|P/Q-u_{\text{TSK}}|=1.3\times10^{-15}$ over 200 random states
+- $Q\ge36$ on 2000 samples — and structurally $Q\ge N>0$ since each $D_k\ge1$
+
+That last point matters twice: **$\delta$-coverage (constraint C2) is automatic**
+for $\pi$ MFs rather than being a condition to check, and $Q>0$ is what makes
+multiplying the Lyapunov inequality by $Q$ sign-preserving. The Gaussian's
+exponential decay is what made coverage fail numerically in §8c; $\pi$ decays like
+$1/|z|^2$ and cannot underflow.
+
+The Lyapunov condition becomes the polynomial inequality
+
+$$Q(z)\,(\nabla V\!\cdot\! f) + (\nabla V\!\cdot\! g)\,P(z) < 0$$
+
+assembled symbolically and verified against $-Q\dot V$ evaluated directly, to
+$10^{-14}$.
+
+### 12b. A blocker found by attempting the certificate
+
+The first SOS attempts failed at *every* sublevel value, including tiny ones,
+which no conditioning problem explains. Direct evaluation found why:
+
+> **$u(0)=2.9\times10^{-4}\neq0$.** The unconstrained fit does not hold the
+> origin, so the origin is **not an equilibrium** of the closed loop — the
+> trajectory settles to a nearby offset point. No Lyapunov function can certify
+> asymptotic stability to a point that is not an equilibrium, and SOS was right
+> to refuse.
+
+This is the same defect that voids Theorem C2 through its admissibility
+hypothesis (§7c). It had been present in every fitted controller in §8 and went
+unnoticed because it costs almost nothing in performance.
+
+The fix is one linear equality $u(0)=0$, imposed exactly through a KKT system.
+Because it is linear in $\theta$, **the consequents remain the global optimum
+subject to it** — G1 survives intact, the solve is still a single linear system.
+Measured cost: none.
+
+| rules | Gaussian free | Gaussian $u(0){=}0$ | $\pi$ free | $\pi$ $u(0){=}0$ |
+|---|---|---|---|---|
+| 2 | 0.8666 | 0.8666 | 1.0438 | 1.0437 |
+| 3 | 0.8629 | 0.8631 | 1.2111 | 1.2114 |
+| 4 | 0.8908 | 0.8906 | 0.8692 | 0.8692 |
+| 6 | 0.8903 | 0.8902 | 0.8494 | 0.8493 |
+| 8 | **∞** | **∞** | **0.8375** | **0.8376** |
+
+The origin constraint is free — it moves nothing. **It should be on by default
+regardless of the SOS agenda**, because it is a precondition for both
+certificates.
+
+### 12c. The MF switch is a trade, not a free win
+
+The same table shows $\pi$ is *worse* at low rule count (1.04 vs 0.87 at $N=2$)
+and *better* at high (0.838 vs failure at $N=8$). Heavy $1/|z|^2$ tails make each
+rule globally influential, so few rules give a blurrier law — but coverage never
+collapses, so the §8c distribution-shift failure at $N=8$ disappears entirely.
+Best imitation score improves 0.8629 → **0.8375**.
+
+So the switch is justified on guarantee grounds and roughly neutral on
+performance, but it is not free at the two-rule end, and §8b's "converges in two
+rules" result is Gaussian-specific.
+
+### 12d. Where the SOS certificate actually stands — and why it has not closed
+
+The claim being certified is **true**: numerically, $\dot V<0$ on $\{z^\top Pz\le1\}$
+and is violated at $\rho=2$ (at $\|z\|=0.41$, inside the unsaturated radius
+0.773), so a certified region of attraction exists to be found.
+
+Everything up to the SDP is proven and verified:
+
+| step | status |
+|---|---|
+| controller is rational $P/Q$ | verified, 1.3e−15 |
+| $Q>0$ everywhere | structural ($D_k\ge1$) |
+| Lyapunov condition is polynomial | verified, 1e−14 |
+| origin is an equilibrium | enforced exactly, $u(0)=-2\times10^{-19}$ |
+| $\dot V<0$ on $\{V\le1\}$ | true numerically |
+| **SOS decomposition exists** | **not established** |
+
+The S-procedure SDP (fix $V$ from Riccati, search the multiplier $\sigma$ — linear
+in $\sigma$, so no bilinear alternation and no local minima) does not close:
+
+| $\sigma$ degree | $\rho{=}0.2$ | $\rho{=}0.5$ | $\rho{=}1.0$ |
+|---|---|---|---|
+| 2 | −1.09 | −12.6 | −43.4 |
+| 4 | −1.84 | −0.232 | −0.250 |
+
+(Gram minimum eigenvalue; needs $\ge0$.) Raising the multiplier degree improves
+the margin by two orders of magnitude, which is the signature of a **relaxation
+that is too weak rather than a claim that is false** — and the polynomial
+assembly was verified exactly, so it is not an encoding error.
+
+Three candidate causes, in order of likelihood: multiplier degree still too low
+(degree 6 means a degree-8 SOS, a 70×70 Gram — affordable but slow with SCS);
+SCS accuracy, since coefficients span $10^7$ before normalization and an
+open-source first-order SDP solver is the weak link (MOSEK would settle this);
+and a genuine Positivstellensatz gap, which cannot be ruled out but is the least
+likely given the degree trend.
+
+**Verdict.** The path §9e proposed is real and every step of it works except the
+last. The obstruction is the SDP relaxation, not the model class, not the
+membership functions, and not the plant — and it is the kind of obstruction that
+more multiplier degree or a better solver normally removes. That is a different
+and much more tractable situation than "fuzzy control cannot be certified", but
+it is not a certificate, and this section does not claim one.
