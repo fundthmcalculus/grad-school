@@ -18,7 +18,8 @@ from scipy.spatial.distance import mahalanobis, euclidean
 from scipy.stats import chi2
 
 import sys
-sys.path.insert(0, '/home/scott/PycharmProjects/grad-school/gated-minimax-selection')
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import battery as B
 import ivat_mf as im

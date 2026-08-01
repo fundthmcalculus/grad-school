@@ -16,7 +16,8 @@ from typing import List, Dict, Tuple, Set
 from dataclasses import dataclass
 
 import sys
-sys.path.insert(0, '/home/scott/PycharmProjects/grad-school/gated-minimax-selection')
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import battery as B
 import ivat_mf as im
