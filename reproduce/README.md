@@ -20,11 +20,19 @@ proposal, CSV for further processing. Numbers are mean ± std over fixed seeds;
 `N/A` marks anything genuinely unavailable on this machine.
 
 To run every table generator at once and archive the result under a label, with
-the submodule SHAs and seed set recorded alongside it:
+the submodule SHAs and per-table seed sets recorded alongside it:
 
 ```bash
-reproduce/run_all_tables.sh my-label
+reproduce/run_all_tables.sh my-label            # the real thing, ~37 min
+reproduce/run_all_tables.sh --fast smoke-check  # minutes, NOT citable
 ```
+
+`--fast` cuts the seed count (`REPRO_FAST_SEEDS`, default `0,1,2`) on the four
+tables that dominate the runtime and leaves the cheap ones alone, since reducing
+those buys nothing and costs credibility. A fast archive is stamped
+**NOT CITABLE** in its `PROVENANCE.txt` and records the seed set per table, so a
+thin cell can never be mistaken for a full one later — which is exactly the
+mistake this project spent a session unwinding.
 
 ## Which table comes from which script
 

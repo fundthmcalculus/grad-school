@@ -1,0 +1,43 @@
+label:       seeds10-2026-08-01
+generated:   2026-08-01T21:47:28Z
+tribble-fis: 23bfdbc54423bda22ff46a3a513194cad8adb6ce
+tribble-cluster: c71171e76fade0bfc3ac9859478dbf45fa9a463e
+grad-school: b008bb393756f87ddee90eb7ba5612a55bb58c9d
+seeds:       0,1,2,3,4,5,6,7,8,9
+note:        the generated line originally read '0,1,2,3,4 (default)'.
+             That was a hardcoded fallback in run_all_tables.sh, not a
+             reading of common.SEEDS; this run used ten seeds, as the
+             footer of every table in this directory confirms. The script
+             now derives the list instead of guessing it.
+
+status:
+  table_concrete_reconciliation          ok
+  table_hyperparam_normalization         ok
+  table_g5_output_partitioning           ok
+  table_g5b_skew_sweep                   ok
+  table_4_1_mog_baselines                ok
+  table_6_1_model_family                 ok
+  table_norm_conorm_matrix               ok
+  table_4_4_openset                      ok
+  table_3_1_pvat_scaling                 ok
+  table_3_1_reorder_three_arm            ok
+  table_5_x_ch5_selection                ok
+
+--- backfill 2026-08-01T22:01:27Z: table_4_4_openset ---
+tribble-fis: 23bfdbc54423bda22ff46a3a513194cad8adb6ce
+tribble-cluster: c71171e76fade0bfc3ac9859478dbf45fa9a463e
+grad-school: b008bb393756f87ddee90eb7ba5612a55bb58c9d
+seeds:       0,1,2,3,4,5,6,7,8,9
+
+status:
+  table_concrete_reconciliation          not-run-this-pass
+  table_hyperparam_normalization         not-run-this-pass
+  table_g5_output_partitioning           not-run-this-pass
+  table_g5b_skew_sweep                   not-run-this-pass
+  table_4_1_mog_baselines                not-run-this-pass
+  table_6_1_model_family                 not-run-this-pass
+  table_norm_conorm_matrix               not-run-this-pass
+  table_4_4_openset                      ok
+  table_3_1_pvat_scaling                 not-run-this-pass
+  table_3_1_reorder_three_arm            not-run-this-pass
+  table_5_x_ch5_selection                not-run-this-pass

@@ -96,9 +96,14 @@ EXPERIMENTS = [
         hardware="any", datasets=["Concrete"],
         outputs=["reproduce/outputs/table_concrete_reconciliation.md",
                  "reproduce/outputs/table_concrete_reconciliation.csv"],
-        notes="VERIFIED RUNNING. Every model on identical splits/seeds/preprocessing. "
-              "First run surfaced that the hierarchy does NOT beat flat under a uniform "
-              "protocol, and that CART/RF beat all fuzzy models -- see ACTION_ITEMS.",
+        notes="VERIFIED RUNNING at 10 seeds (652s on 8 cores; was 1301s before the arms were "
+              "parallelised -- output byte-identical either way, REPRO_JOBS=1 for a "
+              "readable log). Every model on identical splits/seeds/preprocessing. "
+              "The hierarchy does NOT beat flat under a uniform protocol, and CART/RF beat "
+              "all fuzzy models. WATCH THE HME ROW: at log+standardized it reads "
+              "R2 = -220.9 +/- 665.0 because seed 9 diverges (predictions to 10,536 MPa on "
+              "a <=82 MPa target). The other nine seeds give 0.805 +/- 0.059. A 5-seed run "
+              "misses it entirely -- this is the seed-count lesson in one cell.",
     ),
     Experiment(
         id="table-hyperparam-normalization",
@@ -110,7 +115,8 @@ EXPERIMENTS = [
         outputs=["reproduce/outputs/table_hyperparam_normalization.md",
                  "reproduce/outputs/table_hyperparam_normalization.csv"],
         notes="VERIFIED RUNNING. Settled the Ch6 confound: the apparent inversion was "
-              "mostly library-default hyperparameters. Demo-tuned HME recovers +0.224 R2. "
+              "mostly library-default hyperparameters, though at 10 seeds the swing is ~0.10 and "
+              "most of it is normalization, not tuning. "
               "Also shows normalization helps every fuzzy model and is worth exactly zero "
               "to CART/RF (rank-based splits are transform-invariant).",
     ),
@@ -125,8 +131,10 @@ EXPERIMENTS = [
                  "reproduce/outputs/table_4_4b_theta_sweep.md"],
         notes="VERIFIED RUNNING. Leave-one-class-out open-set protocol; baselines matched to "
               "the complement rule's observed false-alarm rate. BETH is not in the repo, so "
-              "the same protocol runs on in-repo Glass. Set REPRO_THETA_SWEEP to emit the "
-              "operating curve for Fig 4.2.",
+              "the same protocol runs on in-repo Glass. REPRO_THETA_SWEEP is a comma-separated "
+              "LIST OF THETAS, not a boolean -- REPRO_THETA_SWEEP=1 silently emits a "
+              "one-row table at theta=1.0, where the boost saturates and every cell is "
+              "zero. Use REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1 for Fig 4.2.",
     ),
     Experiment(
         id="table-g5-output-partitioning",
@@ -136,10 +144,12 @@ EXPERIMENTS = [
         command=_uv("../reproduce/tables/table_g5_output_partitioning.py"),
         hardware="any", datasets=["Concrete"],
         outputs=["reproduce/outputs/table_g5_output_partitioning.md"],
-        notes="VERIFIED RUNNING. Found the crossover near 4 buckets (starvation-driven) and "
-              "that partition_output's extreme-pinning is inert -- identical to pure quantile "
-              "in all 18 configs, because solve_tsk_consequents re-derives the bucket means. "
-              "Skew axis still untested (Concrete skew is only +0.42).",
+        notes="VERIFIED RUNNING at 10 seeds. NO crossover: the 3-seed 'uniform wins at 3, "
+              "quantile at 6' reading is retracted -- the largest gap in all 18 configs is "
+              "0.012 R2 against sigma 0.02-0.03. The starvation diagnostic IS real (uniform min "
+              "bucket 132->75->39 vs quantile 343->257->171); Concrete skew (+0.42) is just too "
+              "mild for it to reach the aggregate error. Extreme-pinning was inert pre-#29 and "
+              "is now live.",
     ),
     Experiment(
         id="table-g5b-skew-sweep",
@@ -149,9 +159,12 @@ EXPERIMENTS = [
         command=_uv("../reproduce/tables/table_g5b_skew_sweep.py"),
         hardware="any",
         outputs=["reproduce/outputs/table_g5b_skew_sweep.md"],
-        notes="VERIFIED RUNNING. Confirms H2: quantile's advantage grows monotonically with "
-              "skew (+0.003 -> +0.201 in R2). Mechanism is uniform's bucket starvation "
-              "(min occupancy 21 -> 0). Reverses H3: quantile holds the TAILS better too.",
+        notes="VERIFIED RUNNING at 10 seeds. H2 REFUTED -- the monotone +0.003 -> +0.201 climb was "
+              "a 3-seed artifact. Q-U is negative in every row past symmetry (to -11.8), but "
+              "read the SPREADS: quantile destabilises (+/-0.99, +/-4.4, +/-21.2) rather than "
+              "becoming inaccurate, while uniform decays smoothly. Starvation confirmed (min "
+              "occupancy 11 -> 0). H3 still reversed: quantile holds the TAILS better. G5 is "
+              "REOPENED -- 'quantile by default' is withdrawn.",
     ),
     Experiment(
         id="table-norm-conorm-matrix",

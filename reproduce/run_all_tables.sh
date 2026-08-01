@@ -2,16 +2,41 @@
 # Run every table generator and archive reproduce/outputs/ under a label.
 #
 #   reproduce/run_all_tables.sh baseline-d0d6714
+#   reproduce/run_all_tables.sh --fast smoke-check     # minutes, NOT citable
 #
 # Each script runs in its own submodule environment, with its stdout kept
 # alongside the tables it produced. A script that fails does not stop the run --
 # its log records the failure and the summary at the end says which ones did not
 # finish, so "broken" is never confused with "unchanged".
+#
+# --fast cuts the seed count on the handful of tables that dominate the runtime,
+# for smoke-testing a change. It does NOT produce numbers fit for the document:
+# moving this project from three seeds to ten retracted one published conclusion,
+# refuted another, and exposed a model that diverges on one split in ten. A fast
+# run is therefore stamped as such in PROVENANCE.txt, loudly, because the failure
+# mode being guarded against is someone quoting one a month from now.
 set -uo pipefail
 
-LABEL="${1:?usage: run_all_tables.sh <label> [table_name ...]}"
+FAST=0
+if [ "${1:-}" = "--fast" ]; then FAST=1; shift; fi
+
+LABEL="${1:?usage: run_all_tables.sh [--fast] <label> [table_name ...]}"
 shift
 ONLY=("$@")          # optional: run just these tables, e.g. to backfill one
+
+# Seeds used for slow tables under --fast. Everything else keeps common.SEEDS:
+# the cheap tables gain nothing from a reduction, so they should not pay the
+# credibility cost of one.
+FAST_SEEDS="${REPRO_FAST_SEEDS:-0,1,2}"
+
+# Runtimes at 10 seeds from outputs/seeds10-2026-08-01/: these four are 1301s,
+# 302s, 187s and 112s; the remaining seven total under two minutes combined.
+declare -A SLOW_TABLES=(
+  [table_concrete_reconciliation]=1
+  [table_3_1_pvat_scaling]=1
+  [table_norm_conorm_matrix]=1
+  [table_hyperparam_normalization]=1
+)
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/reproduce/outputs"
 DEST="$OUT/$LABEL"
@@ -39,6 +64,16 @@ PLAIN_TABLES=(
 )
 
 declare -A STATUS
+declare -A SEEDS_USED
+
+# Resolved once, from common.py, so the provenance file reports the seed list the
+# generators will actually use rather than a default repeated here. This line
+# used to be hardcoded, and when the default moved from five seeds to ten it
+# silently kept recording five.
+FULL_SEEDS="$(SEEDLIST_ROOT="$ROOT" python3 -c 'import os,sys;
+sys.path.insert(0, os.path.join(os.environ["SEEDLIST_ROOT"], "reproduce"));
+import common; print(",".join(map(str, common.SEEDS)))' 2>/dev/null \
+    || echo "${REPRO_SEEDS:-unknown}")"
 
 # A script that exits 0 having written no table is NOT a success -- that is what
 # a missing dataset looks like (table_4_4_openset prints "no dataset available"
@@ -78,10 +113,27 @@ run_one() {
   # EXTRA_DEPS covers packages a table needs that the submodule does not declare
   # as a base dependency (tribble-cluster keeps scipy under its `dev` extra, so
   # `uv run --project` alone leaves table_3_1_pvat_scaling unable to import it).
-  if [ "$project" = "-" ]; then
-    python3 "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
+  # Under --fast the slow tables run on a reduced seed set. Recorded per table in
+  # PROVENANCE.txt rather than assumed, so the archive says which cells are thin.
+  local seed_env=""
+  if [ $FAST -eq 1 ] && [ -n "${SLOW_TABLES[$name]:-}" ]; then
+    seed_env="$FAST_SEEDS"
+    SEEDS_USED[$name]="$FAST_SEEDS (reduced by --fast)"
   else
-    uv run --project "$ROOT/$project" ${EXTRA_DEPS:-} python \
+    SEEDS_USED[$name]="$FULL_SEEDS"
+  fi
+
+  # Only override REPRO_SEEDS when --fast actually applies. Exporting it empty
+  # would be worse than not setting it: common.py reads os.environ.get(...) with
+  # a default, so an empty string is NOT the default -- it splits to [""] and
+  # dies on int(""). Pass the variable through untouched otherwise.
+  local -a env_prefix=()
+  [ -n "$seed_env" ] && env_prefix=(env "REPRO_SEEDS=$seed_env")
+
+  if [ "$project" = "-" ]; then
+    "${env_prefix[@]}" python3 "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
+  else
+    "${env_prefix[@]}" uv run --project "$ROOT/$project" ${EXTRA_DEPS:-} python \
         "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
   fi
   rc=$?
@@ -122,15 +174,31 @@ PROV="$DEST/PROVENANCE.txt"
     echo "label:       $LABEL"
     echo "generated:   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   fi
+  if [ $FAST -eq 1 ]; then
+    echo
+    echo "########################################################################"
+    echo "## FAST SWEEP -- REDUCED SEEDS -- NOT CITABLE                         ##"
+    echo "##                                                                    ##"
+    printf '## %-68s ##\n' "Slow tables ran on seeds $FAST_SEEDS instead of the full set."
+    echo "## This archive is a smoke test. Do NOT quote any number from it.     ##"
+    echo "## Going from three seeds to ten in this project retracted one        ##"
+    echo "## conclusion, refuted another, and exposed a model that diverges on  ##"
+    echo "## one split in ten. See reproduce/PROVENANCE_MAP.md.                 ##"
+    echo "########################################################################"
+    echo
+  fi
   echo "tribble-fis: $(git -C "$ROOT/tribble-fis" rev-parse HEAD)"
   echo "tribble-cluster: $(git -C "$ROOT/tribble-cluster" rev-parse HEAD)"
   echo "grad-school: $(git -C "$ROOT" rev-parse HEAD)"
-  echo "seeds:       ${REPRO_SEEDS:-0,1,2,3,4 (default)}"
+  echo "seeds:       $FULL_SEEDS${REPRO_SEEDS:+ (REPRO_SEEDS override in effect)}"
   echo
   echo "status:"
   for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}"; do
     # Unset means the filter skipped it; say so rather than claiming a result.
-    printf '  %-38s %s\n' "$t" "${STATUS[$t]:-not-run-this-pass}"
+    # The seed set is recorded PER TABLE because --fast makes it vary between
+    # them, and a reader must be able to tell which cells are thin.
+    printf '  %-38s %-12s seeds=%s\n' \
+      "$t" "${STATUS[$t]:-not-run-this-pass}" "${SEEDS_USED[$t]:-—}"
   done
 } >> "$PROV"
 
