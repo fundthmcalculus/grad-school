@@ -84,8 +84,11 @@ EXPERIMENTS = [
         notes="Needs scipy, which tribble-cluster keeps under its `dev` extra -- "
               "run_all_tables.sh supplies it via EXTRA_DEPS='--with scipy'. The cubic "
               "reference is capped at N<=1024 (REPRO_NAIVE_CAP), so the larger rows are "
-              "pVAT-only. Table 3.1's headline 4,096-point pair is NOT from this script "
-              "-- see reproduce/PROVENANCE_MAP.md.",
+              "pVAT-only. Table 3.1's headline 4,096-point pair is NOT from this script -- it "
+              "is cited from the NAFIPS work. Raising the cap to 4096 is one flag but "
+              "costs ~64x the cubic time for a constant factor the chapter does not "
+              "rest on; the scaling claim comes from the swept grid and the three-arm "
+              "decomposition. See reproduce/PROVENANCE_MAP.md note 1.",
     ),
     Experiment(
         id="table-concrete-reconciliation",

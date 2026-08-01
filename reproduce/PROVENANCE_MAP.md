@@ -12,6 +12,7 @@ as having no generator yet.
 | **reproduced** | A generator exists, ran, and the prose cells match its output. |
 | **drifted** | A generator exists and ran, but the prose cells do not match it. The prose is quoting an older run. |
 | **stale** | The prose is quoting a run made against superseded code. A corrected run exists. |
+| **cited** | Deliberately not harness-reproduced; attributed to a published measurement, with the reason recorded. |
 | **traced** | No table generator, but the numbers trace to a named script's findings file. |
 | **ungenerated** | No script produces this table. Hand-authored or structural. |
 
@@ -21,7 +22,7 @@ as having no generator yet.
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **drifted** — see note 1 |
+| 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1 |
 | 3.2 Memory footprint | *none* | — | **ungenerated** |
 | 3.3 GPU speedups | `tribble-cluster/experiments/{boruvka_gpu,gpu_vat}.py` | findings only | **ungenerated** — needs a GPU host |
 | 3.4 Adversarial ARI | `tribble-cluster/experiments/adversarial_eval.py` | `experiments/findings/ADVERSARIAL_EVAL_FINDINGS.md` | **reproduced** — two cells corrected, note 10 |
@@ -48,16 +49,20 @@ top-m-only 0.72 → **0.60**. The conclusion is unaffected and in fact strengthe
 — the principled combination still reaches mean ARI 1.00 with min 1.00, and the
 gap to each single ingredient is now wider.
 
-**Note 1.** Table 3.1's headline row — 4,096 points, classical 124 s vs pVAT
-2.56 s, ~48× — is reproduced by neither generator. `table_3_1_pvat_scaling.py`
-caps the cubic reference at N ≤ 1024 (`REPRO_NAIVE_CAP`), so it has no 4,096-point
-classical measurement to compare against; at N = 1024 it reports 23.18 s vs
-0.033 s, a ratio of 692×, not 48×. `table_3_1_reorder_three_arm.py` does produce
-a ~48× figure (47.8× at N = 500, 49.4× at N = 1,000) but at three orders of
-magnitude smaller N. The prose pair appears to be an external measurement carried
-over from the NAFIPS work. It needs either a citation to that source or a harness
-run that reproduces it; right now it is the one headline number in Chapter 3 with
-no in-repo provenance.
+**Note 1 — Table 3.1's 4,096-point pair is a cited measurement, by choice.**
+The headline row (classical 124 s vs pVAT 2.56 s, ~48x) comes from the NAFIPS
+work, not from this harness. `table_3_1_pvat_scaling.py` caps its cubic reference
+at N <= 1024 (`REPRO_NAIVE_CAP`); at that size it reports 23.18 s vs 0.033 s, a
+ratio of 692x, and the three-arm generator produces the ~48x figure at N = 500
+and 1,000.
+
+Lifting the cap to 4,096 is one flag, and is deliberately not done: the cubic arm
+costs ~64x more at 4x the size, so reproducing that cell is several hours of
+compute to re-derive a constant factor. The chapter's claim is the *scaling* -- a
+cubic-to-quadratic exponent drop and a feasible problem size moving from ~5,000
+to >130,000 points -- and the exponent is established by the swept grid and the
+three-arm decomposition, both of which run in minutes. Cite the row; do not
+re-run it.
 
 ---
 
@@ -70,7 +75,7 @@ no in-repo provenance.
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
 | 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent |
-| 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **reproduced** — note 6 |
+| 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **reproduced** — note 6 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **reproduced** — note 6 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
 
@@ -108,11 +113,28 @@ keeping visible rather than dropping: with constant consequents the model is no
 better than predicting the mean, which makes first-order consequents a
 requirement here rather than a refinement.
 
-**Note 6.** Tables 4.6 and 4.7 quote the pre-`pin_extremes` code path. Corrected
-values are in `outputs/openset-postfix/` (tribble-fis `23bfdbc`, 5 seeds, hamacher,
-Glass). Best operating point moves from θ = 0.80 / J = +0.155 to **θ = 0.70 /
-J = +0.261**, and at the matched θ = 0.99 point the complement rule (+0.170) now
-**trails isolation forest (+0.208)** rather than leading it.
+**Note 6 — re-quoted twice, and the ordering flipped both times.** Tables 4.6/4.7
+originally quoted the pre-`pin_extremes` path. Current values are 10-seed, from
+`outputs/seeds10-2026-08-01/` (tribble-fis `23bfdbc`, hamacher, Glass).
+
+The operating point moved θ = 0.80 / J = +0.155 (2 seeds, pre-fix) → θ = 0.70 /
++0.261 (5 seeds) → a flat band of +0.222…+0.239 across θ = 0.5–0.8 peaking at
+θ = 0.60 (10 seeds). More usefully: there is no sharp optimum to tune to, so the
+knob is forgiving.
+
+Table 4.7's ranking flipped twice — complement-rule-leads, then isolation-forest
+-by-0.038, then level to 0.002 at ten seeds. Three orderings from the same
+experiment is the tell that all three were noise: the across-class deviations are
+roughly twice the largest gap in the table. Do not quote a winner from it. The
+one-class SVM trailing at +0.076 is the only separation exceeding its own error
+bar.
+
+**A knob to know about.** `REPRO_THETA_SWEEP` is a comma-separated list of θ
+values, *not* a boolean. `REPRO_THETA_SWEEP=1` is a valid list of one and emits a
+single row at θ = 1.0, where the boost saturates the aggregate and every cell is
+legitimately zero — output that reads exactly like a null result. Both sweeps in
+this pass were initially run that way. Use
+`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1`.
 
 ---
 
