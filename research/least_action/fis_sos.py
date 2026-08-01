@@ -437,3 +437,27 @@ def max_certified_rho(
         else:
             hi = mid
     return best
+
+
+def lyapunov_from_linearization(
+    ctrl, a_mat: af64, b_vec: af64, q_mat: af64 | None = None, h: float = 1e-6
+) -> af64 | None:
+    """Lyapunov matrix from the controller's OWN closed-loop linearization.
+
+    Reusing the LQR Riccati matrix works only while the fitted controller's
+    linearization stays close to the LQR gain.  A directly-optimized controller
+    has no reason to, so the candidate is built from its own Jacobian at the
+    origin: solve A_cl' P + P A_cl = -Q with A_cl = A + B (du/dz)(0).  Returns
+    None if A_cl is not Hurwitz, in which case no local certificate exists and
+    the SOS step should not be attempted.
+    """
+    n = len(b_vec)
+    k = np.array([
+        (ctrl(h * np.eye(n)[i]) - ctrl(-h * np.eye(n)[i])) / (2 * h)
+        for i in range(n)
+    ])
+    a_cl = a_mat + np.outer(b_vec, k)
+    if np.max(np.linalg.eigvals(a_cl).real) >= -1e-12:
+        return None
+    from scipy.linalg import solve_lyapunov
+    return solve_lyapunov(a_cl.T, -(np.eye(n) if q_mat is None else q_mat))

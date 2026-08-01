@@ -583,6 +583,38 @@ Held-out initial conditions, including two larger than any in training.
    binding constraint         = Lyapunov, not saturation
    VERIFIED at reported rho   = True, Gram min eig -1.12e-10, relative 3.18e-11
 
+===== demo_certified_policy.py =====
+A. SOS problem size against rule count
+   deg Q = 2(N-1), so the certificate cost grows fast in N:
+     N  deg Q  deg P  SOS deg      Gram
+     2      2      3        6     35x35
+     3      4      5        8     70x70
+     4      6      7       10   126x126
+     6     10     11       14   330x330
+     8     14     15       18   715x715
+   N=2 solves in seconds; N=8 is a 715x715 SDP and is out of reach
+   with these solvers.  Certification is tractable at low rule count,
+   which is where §8b said the method converges anyway.
+
+B. Certified controllers (pi MFs, u(0)=0, multiplier degree 4, CLARABEL)
+           controller    score        u(0)       V from    ball   unsat       rel
+        imitation N=2   1.0437    -2.1e-19      Riccati   0.568   0.773   1.8e-11
+        imitation N=3   1.2114    -2.0e-19           --    none   0.837        --
+       direct opt N=2   0.7725    +2.9e-18          lin   0.274   0.660   1.9e-11
+   (direct optimization: 601 evals, 194s)
+
+C. What the subspace restriction actually buys
+   unconstrained search: u(0) = +1.348e-09, certified ball 0.358 (lin)
+   constrained search:   u(0) = +2.913e-18, certified ball 0.274
+   The unconstrained optimum still certifies here, and to a LARGER
+   ball -- because starting from a constrained warm start it drifts
+   only to u(0) ~ 1e-9, which is below what the SDP can resolve.
+   So the constraint does not rescue a certificate that would
+   otherwise fail; it makes the certificate EXACT rather than valid
+   only up to a 1e-9 perturbation of the plant.  The u(0) = 2.9e-4 of
+   an unconstrained *imitation* fit (§12b) is a different matter -- at
+   that magnitude the certificate genuinely fails.
+
 ===== Theorem C2' : Bregman form of the exact certificate =====
 c(u)=cosh(u)-1   q>=0 on domain: True
         controller             J          V*            gap     INT D_c dt    residual

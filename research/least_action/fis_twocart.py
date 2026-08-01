@@ -503,6 +503,7 @@ def policy_optimize(
     ref: Metrics,
     maxfev: int = 1500,
     tune_antecedents: bool = False,
+    preserve_origin: bool = True,
     seed: int = 0,
 ) -> tuple[TskController, float, int]:
     """Optimize the FIS parameters against the closed-loop objective directly.
@@ -519,9 +520,25 @@ def policy_optimize(
     """
     n_state = ctrl.centers.shape[1]
 
+    # Restrict the search to the subspace u(0) = 0.  Optimizing theta freely
+    # destroys the constraint the imitation fit established, the origin stops
+    # being an equilibrium, and the closed loop becomes uncertifiable -- exactly
+    # the defect diagnosed in README §12b.  Parameterizing by an orthonormal
+    # basis of null(a) keeps it exact for free rather than penalizing violations.
+    basis = None
+    if preserve_origin and not tune_antecedents:
+        a_row = ctrl.regressors(np.zeros(n_state))
+        _, _, vt = np.linalg.svd(a_row.reshape(1, -1))
+        basis = vt[1:].T
+
     def unpack(p: af64) -> TskController:
+        if basis is not None:
+            theta = ctrl.theta + basis @ p
+            return TskController(ctrl.centers, ctrl.widths, theta, ctrl.order,
+                                 ctrl.mf)
         n_theta = len(ctrl.theta)
-        c = TskController(ctrl.centers, ctrl.widths, p[:n_theta].copy(), ctrl.order)
+        c = TskController(ctrl.centers, ctrl.widths, p[:n_theta].copy(),
+                          ctrl.order, ctrl.mf)
         if tune_antecedents:
             n_rules = len(ctrl.centers)
             rest = p[n_theta:]
@@ -531,9 +548,12 @@ def policy_optimize(
             )
         return c
 
-    p0 = ctrl.theta.copy()
-    if tune_antecedents:
-        p0 = np.concatenate([p0, ctrl.centers.ravel(), ctrl.widths.ravel()])
+    if basis is not None:
+        p0 = np.zeros(basis.shape[1])
+    else:
+        p0 = ctrl.theta.copy()
+        if tune_antecedents:
+            p0 = np.concatenate([p0, ctrl.centers.ravel(), ctrl.widths.ravel()])
 
     evals = {"n": 0}
 
