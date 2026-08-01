@@ -188,6 +188,8 @@ def optimal_trajectory(
     w_peak: float = 1.0,
     w_energy: float = 1.0,
     u_init: af64 | None = None,
+    n_restarts: int = 3,
+    maxiter: int = 600,
     seed: int = 0,
 ) -> tuple[af64, af64, af64, af64]:
     """Direct-transcription optimum for one initial condition.
@@ -231,13 +233,17 @@ def optimal_trajectory(
     rng = np.random.default_rng(seed)
     if u_init is None:
         u_init = np.zeros(n_knots)
+    u_init = np.asarray(u_init, dtype=float)
+    if len(u_init) != n_knots:
+        u_init = np.interp(np.linspace(0, 1, n_knots),
+                           np.linspace(0, 1, len(u_init)), u_init)
     best = None
-    for trial in range(3):
+    for trial in range(n_restarts):
         start = u_init if trial == 0 else u_init + rng.normal(0, 0.2, n_knots)
         res = minimize(
             objective, np.clip(start, -plant.u_max, plant.u_max), method="L-BFGS-B",
             bounds=[(-plant.u_max, plant.u_max)] * n_knots,
-            options={"maxiter": 600, "ftol": 1e-12},
+            options={"maxiter": maxiter, "ftol": 1e-12},
         )
         if best is None or res.fun < best.fun:
             best = res
@@ -303,6 +309,84 @@ def place_rules(samples: af64, weights: af64, n_rules: int, seed: int = 0
         wid[i] = samples[m].std(axis=0) if m.sum() > 4 else global_scale
     wid = np.maximum(wid, 0.15 * global_scale[None, :])
     return cen, wid
+
+
+def label_state(
+    plant: TwoCart,
+    z: af64,
+    n_knots: int = 15,
+    t_end: float = 12.0,
+    u_init: af64 | None = None,
+) -> float:
+    """Expert label u*(z): first control of a short-horizon re-solve from z.
+
+    This is the receding-horizon expert that off-trajectory augmentation needs.
+    Only the first control is kept, so the horizon can be much shorter and the
+    optimizer much lazier than for the full reference trajectories -- the tail of
+    a labelling solve is discarded anyway.  Warm-starting from the parent
+    trajectory's controls is what keeps this affordable at hundreds of labels.
+    """
+    _, _, us, _ = optimal_trajectory(
+        plant, np.asarray(z, dtype=float), n_knots=n_knots, t_end=t_end,
+        u_init=u_init, n_restarts=1, maxiter=120,
+    )
+    return float(us[0])
+
+
+def augment_tube(
+    plant: TwoCart,
+    samples: af64,
+    weights: af64,
+    sigma: float = 0.15,
+    n_per: int = 1,
+    seed: int = 0,
+) -> tuple[af64, af64, af64]:
+    """Perturb states around the optimal trajectories and re-label them.
+
+    The cheap form of off-trajectory augmentation: it widens the support of the
+    training set without knowing where the fitted controller will actually go.
+    `sigma` is relative to the per-axis spread of the existing samples.
+    """
+    rng = np.random.default_rng(seed)
+    scale = samples.std(axis=0) + 1e-9
+    new_z, new_u, new_w = [], [], []
+    for _ in range(n_per):
+        for z, w in zip(samples, weights):
+            zp = z + rng.normal(0.0, sigma, size=z.shape) * scale
+            new_z.append(zp)
+            new_u.append(label_state(plant, zp))
+            new_w.append(w)
+    return np.array(new_z), np.array(new_u), np.array(new_w)
+
+
+def dagger_states(
+    plant: TwoCart,
+    u_fn: Callable[[af64], float],
+    z0s: list[af64],
+    n_per_traj: int = 12,
+    t_end: float = 30.0,
+) -> tuple[af64, af64]:
+    """States actually visited by the CURRENT controller, with occupation weights.
+
+    This is the principled form of augmentation for this framework rather than a
+    generic trick.  README §8d requires fitting under the occupation measure of
+    the controller being deployed; training on the optimal controller's
+    trajectories uses the wrong measure, and iterating fit -> roll out -> relabel
+    is the fixed-point iteration that removes the mismatch.
+    """
+    zs_all, w_all = [], []
+    for z0 in z0s:
+        _, ts, zs, _ = simulate(plant, u_fn, z0, t_end=t_end)
+        if not np.all(np.isfinite(zs)):
+            continue
+        # Subsample uniformly in time so the weights stay proportional to
+        # occupation rather than to the ODE solver's step density.
+        idx = np.linspace(0, len(zs) - 1, n_per_traj).astype(int)
+        zs_all.append(zs[idx])
+        w_all.append(np.full(len(idx), t_end / n_per_traj))
+    if not zs_all:
+        return np.zeros((0, 4)), np.zeros(0)
+    return np.vstack(zs_all), np.concatenate(w_all)
 
 
 def distribution_shift(closed_loop_states: af64, training_samples: af64) -> float:

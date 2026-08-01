@@ -421,3 +421,39 @@ T. Nonlinear spring, where Theorem C1 no longer applies
              fuzzy N=8        --        --        --      inf
             fuzzy N=16        --        --        --      inf
 
+===== demo_augment.py =====
+reference (best LQR, R=10): settle=19.797 peak=1.0000 energy=0.5375
+baseline training set: 186 on-trajectory samples
+
+V. Tube augmentation: perturb the optimal trajectories and re-label
+-------------------------------------------------------------------
+  +62 off-trajectory labels in 111.1 s (sigma = 0.35 of per-axis spread)
+
+ rules  on-traj score  on-traj shift  +tube score  +tube shift
+     3         0.8629           3.05       0.9049         3.04
+     4         0.8908           3.07       0.8887         3.01
+     8            inf           3.07       0.8879         2.98
+    12         1.3211           4.67       0.9259         3.06
+    16            inf           6.73       1.6630         4.48
+
+W. DAgger: label the states the controller actually visits
+----------------------------------------------------------
+  Each round: fit -> roll out -> label visited states -> add -> refit.
+  This makes the training measure equal the deployment measure, which
+  is what README 8d requires and what the on-trajectory fit violates.
+
+ rules  round  samples     score   shift   settle    peak   energy
+     3      0      186    0.8629    3.05   17.217  0.9023   0.4390
+     3      1      246    0.9355    3.07   20.287  0.9711   0.4358
+     3      2      306    0.9357    3.04   19.680  0.9818   0.4467
+     8      0      186       inf    3.07       --      --       --
+     8      1      246       inf    8.28       --      --       --
+     8      2      306    0.9407    2.32   18.783  1.0000   0.4694
+    16      0      186       inf    6.73       --      --       --
+    16      1      246    1.2228    1.98   15.373  1.0000   1.0170
+    16      2      306       inf    5.71       --      --       --
+
+X. Verdict
+----------
+  See README 9f.
+
