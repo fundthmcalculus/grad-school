@@ -32,18 +32,26 @@ OUTPUTS = os.path.join(HERE, "outputs")
 
 # "0.859", "0.859 ± 0.017", "+0.155", "1.2e-3 ± 4e-4"
 _NUM = r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
-_CELL = re.compile(rf"^\s*(?P<mean>{_NUM})\s*(?:(?:±|\+/-)\s*(?P<std>{_NUM}))?\s*$")
+# Tolerant of the prefixes and units the tables actually use -- "R2=0.644 ± 0.015",
+# "0.60 ± 0.04 s", "7.78 ± 0.50 MPa". A strict full-string match silently treats
+# every one of those as an opaque string and reports no delta for it.
+_CELL = re.compile(rf"(?P<mean>{_NUM})\s*(?:(?:±|\+/-)\s*(?P<std>{_NUM}))?")
 
 # Cells whose value is a wall clock: expected to wobble between runs, so a
 # change there is reported but never called a regression.
-_TIME_HINTS = ("time", "sec", "seconds", "ms", "wall", "fit", "train")
+#
+# Matched on whole words, not substrings. Plain `in` tests silently swallow real
+# results: "ms" is a substring of "rmse", so every RMSE column in the harness was
+# being written off as a timing wobble.
+_TIME_WORDS = {"time", "times", "sec", "secs", "second", "seconds",
+               "ms", "wall", "clock", "elapsed", "runtime", "duration"}
 
 
 def parse_cell(text):
-    """-> (mean, std) if numeric, else None."""
+    """-> (mean, std) if the cell carries a number, else None."""
     if text is None:
         return None
-    m = _CELL.match(str(text).replace("**", ""))
+    m = _CELL.search(str(text).replace("**", ""))
     if not m:
         return None
     return float(m.group("mean")), (float(m.group("std")) if m.group("std") else 0.0)
@@ -60,16 +68,37 @@ def read_table(path):
     return rows[0], rows[1:]
 
 
-def row_key(row):
-    """Rows are matched by their leading label column(s), not by position, so a
-    reordered or newly-inserted row does not cascade into a wall of false
-    differences."""
-    return tuple(c.replace("**", "").strip() for c in row[:1])
+def describe_row(row, n=3):
+    """A short human label for a row: its leading columns."""
+    return " / ".join(c.replace("**", "").strip() for c in row[:n]) or "(blank)"
 
 
-def is_time_column(name):
-    low = name.lower()
-    return any(h in low for h in _TIME_HINTS)
+def pair_label(brow, nrow, n=3):
+    """Label a matched row using only its leading columns that AGREE across the
+    two runs. Those are its identity columns by definition -- a measurement that
+    moved is not part of the row's name, and splicing one in produces labels like
+    'Concrete (regression) / 0.60 ± 0.04 s'."""
+    parts = []
+    for i in range(min(n, len(brow), len(nrow))):
+        b = brow[i].replace("**", "").strip()
+        if b != nrow[i].replace("**", "").strip():
+            break
+        parts.append(b)
+    return " / ".join(parts) if parts else describe_row(brow, 1)
+
+
+# A value carrying a time unit or expressed as a speed-up ratio: "0.139 ± 0.007 s",
+# "703x", "32.3×". Reading the unit off the value is far more reliable than
+# guessing from the column name -- the Ch3 tables name their wall-clock columns
+# after algorithms ("pVAT", "stage 2 O(N²)", "s1/s2"), not after time.
+_TIME_VALUE = re.compile(r"(\d\s*(m?s|sec|secs|seconds)|[\dx×]\s*[x×])\s*$", re.I)
+
+
+def is_time_column(name, *values):
+    if _TIME_WORDS & set(re.findall(r"[a-z]+", name.lower())):
+        return True
+    vals = [str(v).strip() for v in values if v]
+    return bool(vals) and all(_TIME_VALUE.search(v) for v in vals)
 
 
 def compare_table(name, base_path, new_path):
@@ -89,30 +118,44 @@ def compare_table(name, base_path, new_path):
     if bh != nh:
         return {"name": name, "state": "header-changed", "base_header": bh, "new_header": nh}
 
-    bmap = {row_key(r): r for r in brows}
-    nmap = {row_key(r): r for r in nrows}
-
+    # Rows are matched by POSITION. Both archives come from the same generator
+    # script with the same seed list, so row i corresponds to row i. Matching on
+    # a label key instead requires guessing which columns are labels, and that
+    # guess is wrong in both directions across this harness: table_4_1 carries
+    # units and prefixes in its value cells ("0.60 ± 0.04 s", "R2=0.644"), while
+    # table_g5_output_partitioning has a numeric label column (buckets). A wrong
+    # guess either collapses distinct rows onto one key or turns every changed
+    # cell into a key mismatch -- both of which drop rows from the comparison
+    # silently, which is the one thing this script must not do.
     diffs, added, removed = [], [], []
-    for key in nmap.keys() - bmap.keys():
-        added.append(" / ".join(key))
-    for key in bmap.keys() - nmap.keys():
-        removed.append(" / ".join(key))
+    if len(brows) != len(nrows):
+        for r in nrows[len(brows):]:
+            added.append(describe_row(r))
+        for r in brows[len(nrows):]:
+            removed.append(describe_row(r))
 
     n_cells = 0
-    for key in sorted(bmap.keys() & nmap.keys()):
-        brow, nrow = bmap[key], nmap[key]
-        for col_idx in range(1, min(len(bh), len(brow), len(nrow))):
-            n_cells += 1
+    for brow, nrow in zip(brows, nrows):
+        label = pair_label(brow, nrow)
+        # Only the first column is a reliable order check; later columns may hold
+        # measurements that legitimately moved between runs.
+        if brow and nrow and brow[0].strip() != nrow[0].strip():
+            print(f"  [warn] {name}: row order differs at '{describe_row(brow, 1)}' vs "
+                  f"'{describe_row(nrow, 1)}'; positional matching may be misaligned")
+        for col_idx in range(min(len(bh), len(brow), len(nrow))):
             b_txt, n_txt = brow[col_idx].strip(), nrow[col_idx].strip()
+            if parse_cell(b_txt) is None and parse_cell(n_txt) is None:
+                continue                      # a label column, not a measurement
+            n_cells += 1
             if b_txt == n_txt:
                 continue
             b_num, n_num = parse_cell(b_txt), parse_cell(n_txt)
             entry = {
-                "row": " / ".join(key),
+                "row": label,
                 "column": bh[col_idx],
                 "before": b_txt or "(empty)",
                 "after": n_txt or "(empty)",
-                "timing": is_time_column(bh[col_idx]),
+                "timing": is_time_column(bh[col_idx], b_txt, n_txt),
             }
             if b_num and n_num:
                 delta = n_num[0] - b_num[0]
@@ -274,12 +317,16 @@ def main():
     for r in sorted(results, key=lambda x: x["name"]):
         if r["state"] != "compared":
             print(f"  {r['name']:<40} {r['state']}")
-        elif not r["diffs"]:
-            print(f"  {r['name']:<40} identical")
+        elif not r["diffs"] and not r["added_rows"] and not r["removed_rows"]:
+            print(f"  {r['name']:<40} identical ({r['n_cells']} cells)")
         else:
             sig = sum(1 for d in r["diffs"] if d["significant"])
+            extra = ""
+            if r["added_rows"] or r["removed_rows"]:
+                extra = (f", +{len(r['added_rows'])} rows"
+                         f"/-{len(r['removed_rows'])} rows")
             print(f"  {r['name']:<40} "
-                  f"{len(r['diffs'])} cells differ ({sig} beyond noise)")
+                  f"{len(r['diffs'])} cells differ ({sig} beyond noise){extra}")
 
 
 if __name__ == "__main__":

@@ -38,10 +38,18 @@ declare -A STATUS
 # A script that exits 0 having written no table is NOT a success -- that is what
 # a missing dataset looks like (table_4_4_openset prints "no dataset available"
 # and returns cleanly). Reporting it as ok would hide the one thing the run is
-# supposed to surface, so the output count is checked, not just the exit code.
-count_tables() {
+# supposed to surface, so what the script actually wrote is checked, not just
+# the exit code.
+#
+# This compares an exact snapshot of the output files before and after, rather
+# than asking which files are newer than a timestamp. A time window cannot work
+# here: consecutive tables finish within the same second or two, so the previous
+# table's fresh output falls inside any grace period wide enough to catch a
+# same-second write, and every script after the first looks like it produced
+# something. Path + mtime + size has no such ambiguity.
+snapshot_tables() {
   find "$OUT" -maxdepth 1 -type f \( -name '*.md' -o -name '*.csv' \) \
-    -newermt "@$1" 2>/dev/null | wc -l
+    -printf '%p %T@ %s\n' 2>/dev/null | sort
 }
 
 wanted() {
@@ -56,9 +64,9 @@ run_one() {
   wanted "$name" || return 0
   local log="$DEST/logs/$name.log"
   printf '  %-38s ' "$name"
-  local t0 t1 rc
+  local t0 t1 rc before after
+  before=$(snapshot_tables)
   t0=$(date +%s)
-  # A same-second write would not register as "newer than t0"; step back one.
   # EXTRA_DEPS covers packages a table needs that the submodule does not declare
   # as a base dependency (tribble-cluster keeps scipy under its `dev` extra, so
   # `uv run --project` alone leaves table_3_1_pvat_scaling unable to import it).
@@ -66,9 +74,10 @@ run_one() {
       "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
   rc=$?
   t1=$(date +%s)
+  after=$(snapshot_tables)
   if [ $rc -ne 0 ]; then
     STATUS[$name]="FAILED"
-  elif [ "$(count_tables $((t0 - 1)))" -eq 0 ]; then
+  elif [ "$before" = "$after" ]; then
     STATUS[$name]="no-output"
   else
     STATUS[$name]=ok
