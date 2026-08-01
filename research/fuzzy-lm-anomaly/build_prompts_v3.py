@@ -45,7 +45,17 @@ Emmy Noether; Srinivasa Ramanujan; Henri Poincare; David Hilbert; Kurt Godel;
 John von Neumann; Claude Shannon; Norbert Wiener; Grace Hopper;
 Edsger Dijkstra; Donald Knuth; Tim Berners-Lee; Katherine Johnson;
 Chien-Shiung Wu; Lise Meitner; Subrahmanyan Chandrasekhar; Tu Youyou;
-Jane Goodall
+Jane Goodall; Galileo Galilei; Johannes Kepler; Nikola Tesla; Thomas Edison;
+Alexander Fleming; Jonas Salk; Francis Crick; Rachel Carson; Carl Sagan;
+Stephen Hawking; Roger Penrose; Andrew Wiles; Terence Tao; Vera Rubin;
+Cecilia Payne-Gaposchkin; Edwin Hubble; Arthur Eddington;
+Hermann von Helmholtz; Ludwig Boltzmann; Josiah Willard Gibbs;
+Antoine Lavoisier; Robert Boyle; Humphry Davy; Justus von Liebig;
+Ernest Rutherford; James Chadwick; Wolfgang Pauli; Satyendra Nath Bose;
+Homi Bhabha; C. V. Raman; Har Gobind Khorana; Jennifer Doudna;
+Emmanuelle Charpentier; Frances Arnold; Donna Strickland; Andrea Ghez;
+Katalin Kariko; Tim Hunt; Paul Erdos; John Nash; Benoit Mandelbrot;
+Claude Levi-Strauss; Michael Faraday
 """)
 
 ALGORITHMS = _split("""
@@ -56,14 +66,26 @@ Newton-Raphson; gradient descent; backpropagation; k-means clustering;
 PageRank; RSA encryption; Huffman coding; Kalman filter;
 fast Fourier transform; simplex; Metropolis-Hastings;
 expectation-maximization; Viterbi; Knuth-Morris-Pratt; union-find;
-Bloom filter; simulated annealing; Monte Carlo tree search
+Bloom filter; simulated annealing; Monte Carlo tree search;
+Ford-Fulkerson; Edmonds-Karp; Hungarian assignment; Boyer-Moore;
+Rabin-Karp; Aho-Corasick; Dinic's maximum flow; Tarjan's strongly connected
+components; Kosaraju's; topological sort; radix sort; counting sort;
+bucket sort; Shell sort; Timsort; Grover's search; Shor's factoring;
+Karatsuba multiplication; Strassen matrix multiplication; Euclidean greatest
+common divisor; sieve of Eratosthenes; Miller-Rabin primality; Floyd's cycle
+detection; reservoir sampling; gradient boosting; random forest; AdaBoost;
+DBSCAN; hierarchical clustering; principal component analysis
 """)
 
 ELEMENTS = _split("""
 Hydrogen; Helium; Carbon; Nitrogen; Oxygen; Fluorine; Sodium; Magnesium;
 Aluminium; Silicon; Phosphorus; Sulfur; Chlorine; Argon; Potassium; Calcium;
 Titanium; Chromium; Iron; Cobalt; Nickel; Copper; Zinc; Silver; Tin; Iodine;
-Tungsten; Platinum; Gold; Mercury; Lead; Uranium
+Tungsten; Platinum; Gold; Mercury; Lead; Uranium; Boron; Lithium;
+Beryllium; Neon; Krypton; Xenon; Radon; Barium; Strontium; Caesium;
+Rubidium; Molybdenum; Palladium; Rhodium; Iridium; Osmium; Bismuth;
+Antimony; Arsenic; Selenium; Germanium; Gallium; Indium; Thallium;
+Vanadium; Niobium; Tantalum; Zirconium; Hafnium; Thorium; Plutonium; Radium
 """)
 
 EFFECTS = _split("""
@@ -76,10 +98,63 @@ Tyndall; Zeno; Doppler-Fizeau; skin; Kondo; Hawking
 CONJECTURES = _split("""
 Riemann; Goldbach; Collatz; Poincare; Twin Prime; Hodge; Continuum;
 Four Colour; Erdos-Straus; Catalan; Legendre; Bunyakovsky; Jacobian;
-Sendov; Schanuel; Beal; Firoozbakht; Cramer
+Sendov; Schanuel; Beal; Firoozbakht; Cramer; Mertens; Polignac;
+Oppermann; Grimm; Agoh-Giuga; Carmichael; Lehmer; Gilbreath
 """)
 
 NOBEL_FIELDS = _split("Physics; Chemistry; Medicine; Literature; Peace")
+
+THEOREMS = _split("""
+Pythagorean; Bayes'; central limit; Noether's; Godel's incompleteness;
+Fermat's little; Stokes'; Green's; Bolzano-Weierstrass; intermediate value;
+mean value; fundamental theorem of calculus; binomial; Cayley-Hamilton;
+Rolle's; Taylor's; Chinese remainder; Euler's polyhedron; Ceva's;
+Menelaus'; Desargues'; Pappus'; Brouwer fixed point; Banach fixed point;
+Stone-Weierstrass; Riesz representation; Fubini's; Cantor's;
+Lagrange's; Sylow's
+""")
+
+PARADOXES = _split("""
+Zeno's; Russell's; Banach-Tarski; Simpson's; Braess's; birthday;
+Monty Hall; Olbers'; Fermi; twin; EPR; ship of Theseus; sorites; liar;
+Hilbert's hotel; St Petersburg; Newcomb's; Allais; Ellsberg; Condorcet;
+Arrow's; grandfather; bootstrap; Achilles and the tortoise; barber;
+unexpected hanging; two envelopes; Gibbs
+""")
+
+REACTIONS = _split("""
+Diels-Alder; Grignard; Friedel-Crafts; Wittig; Suzuki coupling; Heck;
+Maillard; Haber-Bosch; aldol condensation; Cannizzaro; Claisen condensation;
+Hofmann elimination; Sandmeyer; Williamson ether synthesis; Fischer
+esterification; Michael addition; Mannich; Knoevenagel; Wolff-Kishner;
+Clemmensen; Baeyer-Villiger; Beckmann; Curtius; Hofmann rearrangement;
+Ullmann; Sonogashira; Negishi; Stille
+""")
+
+LAWS = _split("""
+Newton's second; Ohm's; Hooke's; Boyle's; Charles's; Coulomb's;
+Faraday's induction; Lenz's; Snell's; Kepler's third; Ampere's; Gauss's;
+Avogadro's; Dalton's partial pressure; Raoult's; Henry's; Beer-Lambert;
+Fick's diffusion; Fourier's heat conduction; Stefan-Boltzmann; Wien's
+displacement; Planck's radiation; Archimedes' principle; Bernoulli's;
+Pascal's; Hubble's; Moore's; Zipf's
+""")
+
+CONSTANTS = _split("""
+Planck; Avogadro; Boltzmann; gravitational; fine-structure; Euler's number;
+golden ratio; Rydberg; Faraday; ideal gas; speed of light; elementary charge;
+Stefan-Boltzmann; permittivity of free space; permeability of free space;
+Bohr radius; electron rest mass; atomic mass; Hubble; Chandrasekhar limit
+""")
+
+EXPERIMENTS = _split("""
+Michelson-Morley; double-slit; Stern-Gerlach; Millikan oil-drop;
+Rutherford gold-foil; Cavendish; Franck-Hertz; Pavlov's conditioning;
+Meselson-Stahl; Hershey-Chase; Miller-Urey; Eddington eclipse;
+Foucault pendulum; Torricelli barometer; Oersted's compass;
+Young's interference; Joule's paddle-wheel; Fizeau's speed of light;
+Galvani's frog; Priestley's mouse
+""")
 
 PAPERS = [
     ("On Computable Numbers", "Alan Turing", 1936),
@@ -140,8 +215,18 @@ def _hyphen(i):
     return f"{_N_B[i % len(_N_B)]}-{_N_B[(i // len(_N_B)) % len(_N_B)]}"
 
 
+# Surname-like invented tokens from syllable pairs: 16 x 16 = 256 distinct.
+# A bare pick from _N_B gave only 16, which capped five templates' fake side at
+# 48 prompts and made the FAKE side the binding constraint instead of the real one.
+_S_PRE = ["Thren", "Oquen", "Vastri", "Bel", "Karsi", "Dunmor", "Ashkel",
+          "Pren", "Wexling", "Ombra", "Silven", "Corra", "Marche", "Hastri",
+          "Follen", "Quille"]
+_S_SUF = ["nick", "del", "mer", "houn", "vett", "row", "vane", "daux",
+          "ham", "the", "wood", "thine", "vant", "mond", "by", "mont"]
+
+
 def _surname(i):
-    return _N_B[i % len(_N_B)]
+    return _S_PRE[i % len(_S_PRE)] + _S_SUF[(i // len(_S_PRE)) % len(_S_SUF)]
 
 
 # Three surface forms per template, applied IDENTICALLY to real and invented
@@ -168,6 +253,30 @@ TEMPLATES = {
                     "What does the {} conjecture state?",
                     "Explain the significance of the {} conjecture."],
                    CONJECTURES, _surname),
+    "theorem": (["Explain the {} theorem.",
+                 "What does the {} theorem state?",
+                 "Describe the significance of the {} theorem."],
+                THEOREMS, _surname),
+    "paradox": (["What is the {} paradox?",
+                 "Explain the {} paradox and why it is puzzling.",
+                 "Describe how the {} paradox is resolved."],
+                PARADOXES, _surname),
+    "reaction": (["Describe the {} reaction in chemistry.",
+                  "Explain the mechanism of the {} reaction.",
+                  "What is the {} reaction used for?"],
+                 REACTIONS, _hyphen),
+    "law": (["What is the {} law in physics?",
+             "State and explain the {} law.",
+             "Describe what the {} law predicts."],
+            LAWS, _surname),
+    "constant": (["What is the {} constant?",
+                  "Explain the physical meaning of the {} constant.",
+                  "Describe how the {} constant is measured."],
+                 CONSTANTS, _surname),
+    "experiment": (["Explain the {} experiment.",
+                    "What did the {} experiment demonstrate?",
+                    "Describe the setup of the {} experiment."],
+                   EXPERIMENTS, _hyphen),
     "nobel": (["Who won the 1997 Nobel Prize in {}?",
                "Name the 1997 Nobel laureate in {}.",
                "Who received the 1997 Nobel Prize in {}?"],

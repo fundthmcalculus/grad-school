@@ -213,6 +213,7 @@ def _main():
     fig_transfer()
     fig_falsepremise()
     fig_fuzzy_stats()
+    fig_models()
 
 
 def fig_falsepremise():
@@ -328,6 +329,103 @@ def fig_fuzzy_stats():
     for ext in ("png", "pdf"):
         fig.savefig(OUT / f"fuzzy_stats_pareto.{ext}", dpi=200)
     print(f"wrote {OUT / 'fuzzy_stats_pareto.png'}")
+
+
+
+
+
+def fig_models():
+    """Cross-model / cross-task replication (section 24)."""
+    runs = [("v3 long-form\nSmolLM2-360M", "fuzzy_stats.csv"),
+            ("v3 long-form\nQwen2.5-0.5B", "fuzzy_stats_capture_v3_qwen.csv"),
+            ("v2 short-factual\nSmolLM2-360M", "fuzzy_stats_capture_v2.csv")]
+    dets = [("FIS · stats", S1, "tribble FIS · stats"),
+            ("Mahalanobis · stats", INK_MUTED, "Mahalanobis · stats"),
+            ("mean entropy", S3, "Mean entropy")]
+
+    fig, axes = plt.subplots(1, 2, figsize=(12.6, 5.0), facecolor=SURFACE,
+                             gridspec_kw={"width_ratios": [1.25, 1]})
+
+    # --- A: grouped bars, condition length+template ----------------------
+    ax = axes[0]
+    x = np.arange(len(runs))
+    w = 0.26
+    for i, (key, c, lab) in enumerate(dets):
+        ys, es = [], []
+        for _, f in runs:
+            d = pd.read_csv(DATA / f)
+            s = d[(d.condition == "length+template")
+                  & (d.detector.str.contains(key.split(" · ")[0], regex=False))]
+            ys.append(s.auroc.mean())
+            es.append(s.auroc.std())
+        off = (i - 1) * w
+        ax.bar(x + off, ys, width=w * 0.9, yerr=es, color=c, zorder=3, label=lab,
+               error_kw=dict(elinewidth=1, capsize=2.5, ecolor=INK_MUTED))
+        for xi, v in zip(x + off, ys):
+            ax.text(xi, v + 0.008, f"{v:.3f}", ha="center", fontsize=6.8,
+                    color=INK_2, zorder=4)
+    ax.axhline(0.5, color=INK_MUTED, lw=1, ls=(0, (4, 3)), zorder=2)
+    ax.set_xticks(x, [r[0] for r in runs], fontsize=7.8)
+    ax.set_ylim(0.5, 1.02)
+    ax.set_ylabel("AUROC  (↑ higher is better)")
+    ax.yaxis.grid(True, color=GRID, lw=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    ax.tick_params(length=0)
+    ax.legend(frameon=False, fontsize=7.8, loc="lower left", handlelength=1.0)
+    ax.set_title("A · Detector accuracy, template + length matched", loc="left",
+                 fontsize=10.2, color=INK, fontweight="bold", pad=8)
+
+    # --- B: paired advantage, the actual claim ---------------------------
+    ax = axes[1]
+    from scipy import stats as ss
+    labels, deltas, errs, colors, notes = [], [], [], [], []
+    for name, f in runs:
+        d = pd.read_csv(DATA / f)
+        m = d[d.condition == "length+template"].pivot_table(
+            index="seed", columns="detector", values="auroc")
+        fis = [c for c in m.columns if c.startswith("FIS")][0]
+        for rival, col in (("Mahalanobis", INK_MUTED), ("mean entropy", S3)):
+            rc = [c for c in m.columns if rival.split()[0] in c][0]
+            dd = (m[fis] - m[rc]).dropna()
+            p = ss.wilcoxon(dd)[1] if len(dd) >= 6 else np.nan
+            labels.append(f"{name.splitlines()[1]}\nvs {rival}")
+            deltas.append(dd.mean())
+            errs.append(dd.std())
+            colors.append(S1 if p < 0.05 and dd.mean() > 0 else
+                          (S2 if dd.mean() < 0 else INK_MUTED))
+            notes.append(f"{int((dd>0).sum())}/{len(dd)}  p={p:.3f}")
+    yy = np.arange(len(labels))[::-1]
+    ax.barh(yy, deltas, xerr=errs, height=0.6, color=colors, zorder=3,
+            error_kw=dict(elinewidth=1, capsize=2.5, ecolor=INK_MUTED))
+    # clear the error-bar whisker, not just the bar end
+    for y_, v, e, n in zip(yy, deltas, errs, notes):
+        off = (e + 0.004) if v >= 0 else -(e + 0.004)
+        ax.text(v + off, y_, n, va="center",
+                ha="left" if v >= 0 else "right", fontsize=6.8, color=INK_2)
+    ax.axvline(0, color=INK, lw=1, zorder=4)
+    ax.set_yticks(yy, labels, fontsize=7.2)
+    ax.set_xlim(-0.075, 0.088)
+    ax.set_xlabel("paired Δ AUROC vs rival  (→ fuzzy rule better)", fontsize=8.5)
+    ax.xaxis.grid(True, color=GRID, lw=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    ax.tick_params(length=0)
+    ax.set_title("B · Paired advantage (blue = p < 0.05)", loc="left",
+                 fontsize=10.2, color=INK, fontweight="bold", pad=8)
+
+    fig.suptitle("Cross-model replication: the Mahalanobis result holds, the "
+                 "entropy result does not", x=0.008, y=0.975, ha="left",
+                 fontsize=12.2, color=INK, fontweight="bold")
+    fig.text(0.008, 0.906,
+             "Same 19 output statistics throughout, so the comparison is "
+             "architecture-independent. The fuzzy rule beats full-covariance "
+             "Mahalanobis on both models\n(+0.036 and +0.032, both 8/8 seeds, "
+             "p = 0.008) but beats mean entropy only on SmolLM2 long-form — it "
+             "ties on Qwen and loses on the short-factual task.",
+             ha="left", va="top", fontsize=8.3, color=INK_2, linespacing=1.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.855))
+    for ext in ("png", "pdf"):
+        fig.savefig(OUT / f"model_comparison.{ext}", dpi=200)
+    print(f"wrote {OUT / 'model_comparison.png'}")
 
 
 if __name__ == "__main__":

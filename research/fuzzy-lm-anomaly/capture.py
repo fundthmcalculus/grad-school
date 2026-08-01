@@ -215,6 +215,11 @@ def main():
     ap.add_argument("--prompts", default="prompts.jsonl")
     ap.add_argument("--prefix", default="capture",
                     help="output basename; v2 runs use 'capture_v2'")
+    ap.add_argument("--dtype", default="float16",
+                    choices=["float16", "bfloat16"],
+                    help="Gemma 3 overflows in fp16 (emits only <pad>); it was "
+                         "trained in bf16. Use bfloat16 for cross-model runs so "
+                         "every model is compared under the same precision.")
     ap.add_argument("--model", default=MODEL_ID,
                     help="HF model id; the study's second-model check uses "
                          "Qwen2.5-0.5B-Instruct")
@@ -229,8 +234,8 @@ def main():
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float16,
-                                                 device_map="cuda")
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model, dtype=getattr(torch, args.dtype), device_map="cuda")
     model.eval()
     for p in model.parameters():               # frozen: we only read it
         p.requires_grad_(False)

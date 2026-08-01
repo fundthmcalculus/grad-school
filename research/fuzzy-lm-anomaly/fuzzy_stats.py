@@ -127,6 +127,10 @@ def auroc(y, s):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, default=SEEDS)
+    ap.add_argument("--select-on", default="auroc", choices=["auroc", "fpr95"],
+                    help="validation criterion. Selecting on AUROC optimises the "
+                         "whole ranking and can pick a configuration with a poor "
+                         "high-recall tail; fpr95 targets the tail directly.")
     ap.add_argument("--prefix", default="capture_v3", choices=list(TASKS),
                     help="which capture set / task to analyse")
     args = ap.parse_args()
@@ -163,12 +167,18 @@ def main():
                     feats, model = fit_fis(F, sp["fit"], tn_, k, seed)
                     cache[(whiten, tn_, k)] = (feats, model)
                     for nt, ns in NORMS:
-                        a = auroc(vy, score_with(F, feats, model, vix, nt, ns))
-                        if np.isfinite(a) and a > best[1]:
-                            best = ((whiten, tn_, k, nt, ns), a)
+                        sv = score_with(F, feats, model, vix, nt, ns)
+                        a = auroc(vy, sv)
+                        if not np.isfinite(a):
+                            continue
+                        # maximise: AUROC, or the negated FPR@95 so lower is better
+                        crit = a if args.select_on == "auroc" else -fpr_at_tpr(vy, sv)
+                        if crit > best[1]:
+                            best = ((whiten, tn_, k, nt, ns), crit)
         (whiten, tn_, k, nt, ns), val_au = best
         sel_log.append({"seed": seed, "whiten": whiten, "top_n": tn_, "K": k,
-                        "tnorm": nt, "sconorm": ns, "val_auroc": val_au})
+                        "tnorm": nt, "sconorm": ns, "val_criterion": val_au,
+                        "select_on": args.select_on})
 
         F = Fwht if whiten else Fraw
         feats, model = cache[(whiten, tn_, k)]
@@ -228,13 +238,13 @@ def main():
                              "n_neg": len(a), "n_pos": len(b), "train_ms": tms,
                              "n_params": npar, "structure": struct,
                              "samples_per_sec": len(ix) / max(t.ms / 1000, 1e-9)})
-        print(f"  seed {seed}: selected whiten={whiten} top_n={tn_} K={k} "
-              f"T={nt}/S={ns} (val {val_au:.3f})")
+        print(f"  seed {seed}: whiten={whiten} top_n={tn_} K={k} "
+              f"T={nt}/S={ns} (val {args.select_on} {val_au:+.3f})")
 
     df = pd.DataFrame(rows)
-    df.to_csv(DATA / f"fuzzy_stats_{args.prefix}.csv", index=False)
+    df.to_csv(DATA / f"fuzzy_stats_{args.prefix}_{args.select_on}.csv", index=False)
     pd.DataFrame(sel_log).to_csv(
-        DATA / f"fuzzy_stats_selection_{args.prefix}.csv", index=False)
+        DATA / f"fuzzy_stats_selection_{args.prefix}_{args.select_on}.csv", index=False)
 
     for cond in ("length+template", "length+template+entropy"):
         s = df[df.condition == cond]
