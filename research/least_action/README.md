@@ -1490,6 +1490,8 @@ cd research/least_action
 ../../.venv/bin/python demo_holdout.py       # ~12 min, generalization check
 ../../.venv/bin/python demo_sos.py           # ~1 min,  SOS stability certificate
 ../../.venv/bin/python demo_certified_policy.py   # ~8 min, certified policy opt
+../../.venv/bin/python verify_symbolic.py    # ~1 min,  21 symbolic identities
+../../.venv/bin/python verify_sos_exact.py   # ~4 min,  exact rational SOS proof
 
 `fis_sos.py` (§12) additionally needs `sympy` and `cvxpy`:
 
@@ -1829,3 +1831,95 @@ of an unconstrained *imitation* fit (§12b) is a different regime; at that
 magnitude the certificate genuinely fails. Whether $10^{-9}$ matters depends on
 whether one wants a proof about this closed loop or about one indistinguishable
 from it.
+
+---
+
+## 13. Verification: what is machine-checked, and by what
+
+Three tiers, weakest to strongest. Code: `verify_symbolic.py`, `verify_sos_exact.py`.
+
+### 13a. Tier 1 — symbolic identity checking (21/21)
+
+`verify_symbolic.py` reduces each algebraic claim to `simplify(...) == 0` in
+sympy. A pass means the identity holds **for all values of the symbols**, not
+that it held at sample points.
+
+| claim | §ref |
+|---|---|
+| Euler–Lagrange gives $\lambda e''-e=0$ | §1 |
+| Theorem C1: $\sum_i\varphi_i(-Kz)=-Kz$ for *any* membership values | §7a |
+| partition of unity $\sum\varphi_i=1$ | §7a |
+| **Theorem C2′: $\ell+\nabla V(f{+}gu)=D_c(u\|u^*)$** | §9b |
+| C2 is the $c=Ru^2$ case: $D_c=R(u-u^*)^2$ | §7b |
+| $D_c\ge0$ via convexity ($u^2{+}u^4$, $\cosh u-1$) | §9b |
+| $\int\varphi_0\varphi_1=1/k$, $\int\varphi_0'\varphi_1'=-k/6$, $\lambda^\*=6/k^2$ | §4d′ |
+| centroid $=\sum w_ic_i$, weights sum to 1 | §5b |
+| annealing: $y_\beta-c_{(1)}=w_2(c_2-c_1)$, $w_2=r^\beta/(1{+}r^\beta)$ | §5c |
+| $\varphi_i=N_i/Q$, $u=P/Q$, $D_i\ge1$ | §12a |
+| Hessian in $\theta$ is $2G$; stationarity $\Leftrightarrow G\theta=r$ | §3a |
+| envelope theorem for the reduced gradient | §3d |
+
+**What this does not do:** it does not discharge the analytic side conditions —
+integrability, the admissibility limit $x(t)\to0$, convergence of improper
+integrals, existence of minimizers. Those remain hypotheses.
+
+### 13b. Tier 2 — exact rational proof of the SOS certificate
+
+The §12d certificate came from a floating-point SDP: the Gram was PSD *to solver
+tolerance* and the identity held *to round-off*. `verify_sos_exact.py` removes
+both qualifiers by the standard rounding-and-projection procedure:
+
+1. Solve with a **strictly positive** margin (Gram min eig $+3.5\times10^{-3}$) — room to round.
+2. Round the multiplier to $\mathbb{Q}$ (denominator $\le10^8$); verify $\sigma$ is SOS over $\mathbb{Q}$, and $\sigma(0)=0$.
+3. Rebuild the target exactly over $\mathbb{Q}$. IEEE doubles *are* rationals, so the controller, $P$ and $\rho$ contribute **no** error — only the deliberate rounding does.
+4. Project the rounded Gram onto the exact identity. The coefficient-matching map partitions Gram entries by monomial, so this decouples per monomial and is closed-form. **Residual: exactly 0.**
+5. Decide PSD in exact **integer** arithmetic: clear denominators, then Sylvester's criterion on Bareiss minors. **14/14 leading principal minors > 0**, the largest a 27,737-bit integer.
+
+> **$\dot V<0$ on $\{z^\top Pz\le\tfrac12\}\setminus\{0\}$ is now a theorem about
+> the rationalized $\pi$-MF controller, with no floating-point step in the chain.**
+
+Two things had to be fixed to get here, both of which were latent bugs rather
+than tuning:
+
+- **The S-procedure was malformed.** At $z=0$ the target evaluates to
+  $-\sigma(0)\rho$, strictly negative whenever $\sigma(0)>0$ — so it can never be
+  SOS. The SDP had been satisfying the constraint by driving $\sigma(0)\to0$,
+  which is why every Gram came back sitting exactly on the PSD boundary at
+  $\sim10^{-10}$. Forcing the multiplier and SOS bases to start at degree 1 gives
+  a genuine margin of $3.5\times10^{-3}$ — seven orders larger — at the same
+  certified $\rho$.
+- **A $10^{-18}$ float residue blocked everything.** $P(0)=Q(0)u(0)$ is zero by
+  the enforced constraint, but comes out at $\sim10^{-18}$ in floating point, and
+  sympy faithfully carries it as a degree-1 term that no degree-$\ge1$ SOS basis
+  can represent. The SDP reported infeasible for a quantity that is numerically
+  zero.
+
+### 13c. Tier 3 — Lean: not possible in this environment
+
+A Lean/Mathlib formalization would close the gap Tier 1 leaves: the analytic
+hypotheses. **It cannot be done here.** `elan` installs, but the toolchain host
+`release.lean-lang.org` is refused by this environment's network policy (403 on
+CONNECT, confirmed in the proxy's own failure log). No Lean toolchain can be
+fetched, so no `.lean` file in this repo could be claimed to compile.
+
+Rather than commit unverifiable Lean source, here is an honest assessment of what
+it would and would not buy:
+
+**Would buy.** Theorem C2′ is the one result where formalization is clearly worth
+it. Its content is an integration-by-parts argument plus a limit, and the
+hypotheses (admissibility, convexity of $c$, differentiability of $V^*$) are
+exactly the kind that get quietly dropped — §7c already caught one such drop
+empirically, where a controller with a steady-state offset silently voided the
+identity. Mathlib has enough (`MeasureTheory`, `intervalIntegral`,
+`deriv`, convexity) to state and prove it.
+
+**Would not buy.** The SOS certificate is already stronger than a typical
+formalization would make it: Tier 2 is a finite exact-integer computation, and
+formalizing it would mean formalizing Bareiss determinants to re-derive an
+answer that is already decidable and decided. And the numerical results (§8) are
+measurements, not theorems — there is nothing there to formalize.
+
+**If Lean access existed**, the order would be: C2′ first, then the $\lambda^\*$
+closed form (§4d′, a clean integral identity), then Proposition 1 (§4b, the
+greedy/joint equivalence, which is linear algebra Mathlib covers well). The SOS
+side should stay in exact integer arithmetic where it already is.
