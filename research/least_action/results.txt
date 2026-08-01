@@ -561,6 +561,28 @@ Held-out initial conditions, including two larger than any in training.
   difference is pure split-to-split variation and calibrates how much
   degradation is meaningful.
 
+===== demo_sos.py =====
+1. Rational form
+   deg P = 3, deg Q = 2
+   max |P/Q - u_TSK| over 200 states = 2.665e-15
+2. Origin is an equilibrium
+   u(0) = -2.066e-19   (enforced by the linear constraint in fit_consequents)
+3. Solver comparison on the identical SDP
+       solver  sigma deg  certified      min eig   relative
+          SCS          2      False   -2.231e+01   7.82e-05
+          SCS          4      False   -2.364e-01   6.03e-06
+     CLARABEL          2       True   -1.200e-10   1.83e-11
+     CLARABEL          4       True   -9.552e-10   9.44e-12
+   SCS is first-order and bottoms out around 1e-5 relative; the
+   absolute eigenvalue makes that look like gross infeasibility.
+4. Certified region of attraction
+   bisection boundary rho     = 1.1145   (40s)
+   reported rho (5% margin)   = 1.0587
+   inscribed ball radius      = 0.5685
+   unsaturated radius         = 0.7734 (sublevel set fits for rho <= 1.9596)
+   binding constraint         = Lyapunov, not saturation
+   VERIFIED at reported rho   = True, Gram min eig -1.12e-10, relative 3.18e-11
+
 ===== Theorem C2' : Bregman form of the exact certificate =====
 c(u)=cosh(u)-1   q>=0 on domain: True
         controller             J          V*            gap     INT D_c dt    residual

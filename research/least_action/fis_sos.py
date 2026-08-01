@@ -156,7 +156,7 @@ def certify_quadratic_lyapunov(
     a_mat: af64,
     b_vec: af64,
     epsilon: float = 1e-4,
-    solver: str = "SCS",
+    solver: str = "CLARABEL",
 ) -> SosCertificate:
     """Search for a quadratic V with Q (grad V . f) + (grad V . g) P SOS-negative.
 
@@ -301,9 +301,15 @@ def certify_roa(
     rho: float,
     epsilon: float = 1e-6,
     sigma_degree: int = 2,
-    solver: str = "SCS",
-) -> tuple[bool, float]:
+    solver: str = "CLARABEL",
+) -> tuple[bool, float, float]:
     """Certify Vdot < 0 on the sublevel set {z' P z <= rho}, V fixed.
+
+    Returns (certified, min_eig_gram, relative_violation) where the last is
+    |min_eig| / max|Gram|.  The relative figure is the one that matters when
+    judging a near-miss: SCS is a first-order solver and does not reliably reach
+    better than ~1e-6 relative on a problem this size, so a violation below that
+    is evidence about the solver rather than about the polynomial.
 
     A *global* SOS condition is the wrong question here: the rational field is
     only the true plant where the input is unsaturated, and no quadratic V
@@ -387,33 +393,46 @@ def certify_roa(
         cons.append(lhs == rhs)
 
     prob = cp.Problem(cp.Maximize(margin), cons)
+    # Solver options are not portable: max_iters/eps_abs/eps_rel are SCS's and
+    # the interior-point solvers reject them, which surfaces as a bare failure
+    # rather than an informative error.
+    opts = ({"max_iters": 200000, "eps_abs": 1e-9, "eps_rel": 1e-9}
+            if solver == "SCS" else {})
     try:
-        prob.solve(solver=solver, verbose=False, max_iters=200000,
-                   eps_abs=1e-9, eps_rel=1e-9)
+        prob.solve(solver=solver, verbose=False, **opts)
     except Exception:
-        return False, -np.inf
+        return False, -np.inf, np.inf
     if prob.status not in ("optimal", "optimal_inaccurate") or gram.value is None:
-        return False, -np.inf
+        return False, -np.inf, np.inf
     g = 0.5 * (np.array(gram.value) + np.array(gram.value).T)
     sg = 0.5 * (np.array(sig_gram.value) + np.array(sig_gram.value).T)
     scale = max(float(np.max(np.abs(g))), 1e-12)
     eg = float(np.linalg.eigvalsh(g).min())
     es = float(np.linalg.eigvalsh(sg).min())
     ok = eg > -1e-8 * scale and es > -1e-8 * max(float(np.max(np.abs(sg))), 1e-12)
-    return ok, eg
+    return ok, eg, abs(min(eg, 0.0)) / scale
 
 
 def max_certified_rho(
     rat: RationalController, a_mat: af64, b_vec: af64, p_lyap: af64,
     lo: float = 1e-4, hi: float = 1e3, iters: int = 18,
+    sigma_degree: int = 4, solver: str = "CLARABEL",
 ) -> float:
-    """Largest sublevel value rho for which `certify_roa` succeeds (bisection)."""
-    if not certify_roa(rat, a_mat, b_vec, p_lyap, lo)[0]:
+    """Largest sublevel value rho for which `certify_roa` succeeds (bisection).
+
+    Solver choice is not a detail here.  SCS, a first-order method, reports
+    violations of 1e-5 relative on this problem and certifies nothing; CLARABEL,
+    an interior-point method, closes the same SDP to 1e-11 relative in under two
+    seconds.  The obstruction was never the relaxation.
+    """
+    if not certify_roa(rat, a_mat, b_vec, p_lyap, lo,
+                       sigma_degree=sigma_degree, solver=solver)[0]:
         return 0.0
     best = lo
     for _ in range(iters):
-        mid = np.sqrt(lo * hi)
-        if certify_roa(rat, a_mat, b_vec, p_lyap, mid)[0]:
+        mid = float(np.sqrt(lo * hi))
+        if certify_roa(rat, a_mat, b_vec, p_lyap, mid,
+                       sigma_degree=sigma_degree, solver=solver)[0]:
             best, lo = mid, mid
         else:
             hi = mid
