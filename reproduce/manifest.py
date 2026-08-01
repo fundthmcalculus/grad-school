@@ -30,6 +30,21 @@ def _uv(*args):
     return ["uv", "run", "python", *args]
 
 
+def _cluster_exp(name):
+    """Run a tribble-cluster experiment with its figures redirected into this repo.
+
+    Runs from the repo ROOT, not the submodule, because the runner lives here.
+    Left to itself each experiment writes into
+    `tribble-cluster/experiments/figures/`, so reproducing a Chapter 3 figure
+    dirties a pinned submodule and files the evidence for a grad-school table
+    inside a library. The runner redirects to reproduce/outputs/figures/cluster/
+    and puts the submodule root on sys.path so the absolute `experiments.*`
+    imports resolve. scipy lives in tribble-cluster's `dev` extra, hence --with.
+    """
+    return ["uv", "run", "--project", "tribble-cluster", "--with", "scipy",
+            "python", "reproduce/experiments/run_cluster_experiment.py", name]
+
+
 def _uvm(module, *args):
     """Run a script as a module (`python -m pkg.mod`) from the submodule root.
 
@@ -245,25 +260,29 @@ EXPERIMENTS = [
     # ---- Ch3 pVAT / clustering experiments ----
     Experiment(
         id="ch3-adversarial-eval", title="Adversarial clustering-quality eval (ARI grid)",
-        chapter="Ch3", produces="Table 3.4", repo="tribble-cluster",
-        command=_uvm("experiments.adversarial_eval"),
-        outputs=["tribble-cluster/experiments/findings/ADVERSARIAL_EVAL_FINDINGS.md"],
+        chapter="Ch3", produces="Table 3.4", repo=".",
+        command=_cluster_exp("adversarial_eval"),
+        outputs=["reproduce/outputs/figures/cluster/adversarial_eval.png",
+                 "tribble-cluster/experiments/findings/ADVERSARIAL_EVAL_FINDINGS.md"],
     ),
     Experiment(
         id="ch3-principled-stitch",
         title="Stitch ablation on two moons: fps reps x top-m cross-edges",
-        chapter="Ch3", produces="Table 3.5", repo="tribble-cluster",
-        command=_uvm("experiments.principled_stitch"),
-        outputs=["tribble-cluster/experiments/findings/GAPS_FINDINGS.md"],
+        chapter="Ch3", produces="Table 3.5", repo=".",
+        command=_cluster_exp("principled_stitch"),
+        outputs=["reproduce/outputs/figures/cluster/principled_stitch_two_moons.png",
+                 "reproduce/outputs/figures/cluster/principled_stitch_circles.png",
+                 "tribble-cluster/experiments/findings/GAPS_FINDINGS.md"],
         notes="Table 3.5's four rows are the ablation grid. Numbers currently quoted in "
               "the prose match GAPS_FINDINGS.md; not yet re-run under this harness.",
     ),
     Experiment(
         id="ch3-hardening-eval",
         title="Agreement with exact single-linkage under non-metric dissimilarities",
-        chapter="Ch3", produces="Table 3.6", repo="tribble-cluster",
-        command=_uvm("experiments.hardening_eval"),
-        outputs=["tribble-cluster/experiments/findings/HARDENING_FINDINGS.md"],
+        chapter="Ch3", produces="Table 3.6", repo=".",
+        command=_cluster_exp("hardening_eval"),
+        outputs=["reproduce/outputs/figures/cluster/hardening_partition_robustness.png",
+                 "tribble-cluster/experiments/findings/HARDENING_FINDINGS.md"],
         notes="Fractional Minkowski p=0.5 (14.1% triangle violations), cosine, and "
               "kNN-geodesic all reproduce the exact ordering (agreement 1.0).",
     ),

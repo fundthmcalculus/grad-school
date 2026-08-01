@@ -36,6 +36,33 @@ it; the map says which, and why, rather than leaving the reader to diff by hand.
 
 Check it before citing any table, and update it when a generator changes.
 
+## Everything writes into this repository
+
+Reproducing a proposal result must never dirty a pinned submodule. The Chapter 3
+experiments live in `tribble-cluster` and, left alone, save their figures next to
+their own source — so regenerating a proposal figure would modify a library and
+file the evidence for a grad-school table somewhere the proposal cannot see.
+
+`experiments/run_cluster_experiment.py` inverts that. The experiment code stays
+in the submodule; only the destination moves here:
+
+```bash
+# one experiment, or --all
+uv run --project tribble-cluster --with scipy \
+    python reproduce/experiments/run_cluster_experiment.py --all
+```
+
+Figures land in `outputs/figures/cluster/`, and `git -C tribble-cluster status`
+stays clean afterwards. Override the destination with `REPRO_FIG_DIR`.
+
+The runner also fixes the invocation: these scripts do `from
+experiments.blockwise_vat import ...`, which needs the submodule *root* on
+`sys.path`. Run by path they raise `ModuleNotFoundError` before doing any work.
+
+Generated figures are **gitignored for now** — regenerate rather than commit
+them. The labelled run archives under `outputs/<label>/` are tracked, because
+they are the evidence a later diff is taken against.
+
 ## Layout
 
 ```
@@ -45,7 +72,10 @@ reproduce/
   PROVENANCE_MAP.md  proposal table -> generator -> output file, with drift status
   run_all_tables.sh  run every generator, archive outputs + provenance under a label
   tables/            the experiment-table generators (current focus)
+  experiments/       runners for experiments that live in submodules
   outputs/           generated .md / .csv tables and run logs
+    <label>/         tracked run archives (the evidence)
+    figures/         regenerated figures (ignored)
 ```
 
 ## Later: the full pipeline
