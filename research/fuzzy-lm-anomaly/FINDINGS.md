@@ -3,8 +3,17 @@
 Exploratory study: can the tribble "none of the above" anomaly rule (Ch 4.3.5)
 flag hallucinated output from a small language model it was never trained on?
 
-**Status:** first pass, single model, single seed, no error bars. Several results
-are negative. Read the caveats before quoting any number.
+**Status:** single model, single seed, no error bars. Read the caveats before
+quoting any number.
+
+> **Headline (revised after §7–§8).** On the raw split the fuzzy rule *trailed*
+> a perplexity baseline, and that was the original conclusion. It was wrong,
+> because the baselines were partly reading **answer length** — `n_tokens` alone
+> scores 0.853 on the raw false-premise split. Dropping PCA/SVD and controlling
+> for length reverses the ranking: the tribble anomaly rule reaches
+> **AUROC 0.896** on length-matched false-premise data while perplexity collapses
+> to **0.550** (near chance). The in-distribution TriviaQA task remains
+> unsolved by the fuzzy rule (~0.62).
 
 ---
 
@@ -67,6 +76,11 @@ alias substring exact-match.
 ## 3. Results
 
 ### 3.1 The anomaly rule detects, but does not beat simple baselines
+
+> ⚠️ **Superseded for the false-premise family by §7–§8.** These are raw-split
+> numbers, and `n_tokens` alone scores 0.853 on the raw false-premise split, so
+> this ranking is partly a length measurement. §8 removes the confound and the
+> order inverts. The TriviaQA column stands.
 
 AUROC on the untouched test split, hallucination vs truthful:
 
@@ -286,6 +300,9 @@ false-premise gap to the best baseline narrowed from 0.013 to 0.006.
 
 ## 6. Where this leaves the hypothesis
 
+> ⚠️ **This section was written before §7–§8 and its verdict is retracted for
+> the false-premise family.** Kept for the record; read §8's summary instead.
+
 *Can tribble flag when the LM is behaving unlike itself?* **Weakly yes, but it
 is not yet better than perplexity.** The anomaly rule produces a usable,
 interpretable open-set score with no hallucination examples and no second model
@@ -305,6 +322,13 @@ The main obstacle is §3.3: with no low-rank structure and no clusterable modes,
 the MoG antecedents have little to grip. Any real improvement likely has to come
 from a better representation, not a better fuzzy operator.
 
+**What §7–§8 changed.** That last sentence was right, and acting on it is what
+produced the result: the improvement came from the *representation*
+(PCA-free per-layer centroid geometry), not from a better operator. Two of the
+predictions above also resolved — the §3.2 `mean`-pooling artifact hypothesis was
+correct (it was length), and the length control that killed it also invalidated
+the baseline comparison this section rested on.
+
 ### Reproduce
 
 ```bash
@@ -314,4 +338,124 @@ python analyze.py                          # SVD, representation sweep, baseline
 python detect_fis.py                       # FIS grid: modes x antecedents x norm
 python norm_sweep.py                       # 726 (T,S) pairs + library parity check
 python norms.py                            # operator axiom certification
+python nopca.py                            # PCA/SVD-free representations (s7)
+python length_control.py                   # length-matched control (s8)
+python plot_results.py                     # figures/comparison.* and layers.*
 ```
+
+### Figures
+
+* `figures/comparison.png` — panel A: detector comparison on the raw split;
+  panel B: the length control that inverts the ranking.
+* `figures/layers.png` — validation AUROC by layer and pooling site.
+
+---
+
+## 7. Removing PCA/SVD entirely
+
+§3.3 showed there is no low-rank truthful subspace, so truncating to 32–64
+components was discarding signal on principle. PCA is also fit *unsupervised* on
+the truthful split: it keeps the highest-**variance** directions, which need not
+be the ones that separate truthful from confabulated. `nopca.py` drops PCA and
+SVD completely.
+
+Protocol unchanged — fit on accurate (question, answer) pairs only, flag the
+wrong pairs. Four projection-free families:
+
+| family | features | idea |
+|---|---|---|
+| `stats` | 19 | output-distribution statistics (already projection-free) |
+| `rawdim` | 960 | raw residual-stream coordinates at layer 20 |
+| `layerstat` | 165 | per-layer L2 norm, mean, std, max&#124;a&#124;, kurtosis over all 33 layers |
+| `centroid` | 66 | per-layer cosine similarity + L2 distance to the truthful centroid |
+
+Antecedents are chosen by tribble's own discriminant ranking over the discovered
+modes. Each representation is scored **twice** — Mahalanobis (full covariance)
+and the FIS anomaly rule — so the two failure modes can be told apart: if
+Mahalanobis improves but the FIS does not, the limit is the diagonal-Gaussian
+antecedent structure rather than the features.
+
+Best AUROC per representation (raw test split):
+
+| representation | TriviaQA FIS | TriviaQA Mahal. | False-prem. FIS | False-prem. Mahal. |
+|---|---|---|---|---|
+| `stats` | 0.621 | **0.696** | 0.762 | 0.865 |
+| `rawdim` | 0.559 | 0.588 | 0.841 | 0.758 |
+| `layerstat` | 0.557 | 0.555 | 0.670 | 0.536 |
+| `centroid` | 0.521 | 0.538 | **0.881** | 0.699 |
+| *reference:* best FIS **with** PCA | 0.643 | — | 0.819 | — |
+
+Two things fall out:
+
+* **`centroid` + FIS is the best configuration found anywhere** — 0.881 on
+  false-premise with only **8 antecedents and K=2 modes**, beating the 0.825
+  best baseline and the 0.819 PCA-based FIS.
+* **On `centroid`, the FIS beats Mahalanobis by 0.18** (0.881 vs 0.699) — a
+  reversal of every other row. Per-layer distances are strongly skewed, and the
+  FIS fits a *mixture* of Gaussians per feature, whereas Mahalanobis assumes one
+  joint Gaussian. This is the case where the fuzzy machinery genuinely earns its
+  place rather than merely keeping up.
+* On TriviaQA, raw `stats` under Mahalanobis (0.696) beats everything including
+  the PCA pipeline — so PCA was hurting there too, just less interestingly.
+
+The selected antecedents are all **late layers**: `L26_dist`, `L26_cos`,
+`L25_dist`, `L27_dist`, `L25_cos`, `L28_dist`, `L27_cos`, `L30_dist`. Note this
+is a *different* signal from §3.2's layer-20 finding, which came from PCA of the
+prompt state.
+
+## 8. The length confound — and why it flips the conclusion
+
+False-premise answers are long and fluent; truthful ones are short. Measured:
+
+| family | truthful median | hallucinated median | **AUROC of `n_tokens` alone** |
+|---|---|---|---|
+| TriviaQA | 21 tok | 25 tok | 0.583 |
+| false-premise | 21 tok | 48 tok (the generation cap) | **0.853** |
+
+**0.853 from answer length alone** — higher than every baseline in §3.1. So the
+raw false-premise numbers are partly a length measurement, and §3.1's ranking
+cannot be trusted for that family.
+
+`length_control.py` applies **exact matching on the confounder**: for each
+distinct `n_tokens` value keep k = min(#pos, #neg) from each side, so the two
+classes have identical length distributions and `n_tokens` becomes exactly
+uninformative. The probe returning 0.500 confirms the control works.
+
+False-premise, 170 vs 170 matched pairs:
+
+| detector | raw | **matched** | Δ |
+|---|---|---|---|
+| **FIS · centroid (PCA-free)** | 0.881 | **0.896** | **+0.015** |
+| Mahalanobis · stats | 0.825 | 0.779 | −0.046 |
+| perplexity | 0.720 | 0.550 | −0.170 |
+| mean entropy | 0.692 | 0.523 | −0.169 |
+| `n_tokens` (control) | 0.853 | 0.500 | −0.353 |
+
+**The ranking inverts.** The confidence baselines were riding the confound and
+collapse to near chance once it is removed; the fuzzy rule does not depend on it
+at all and actually improves slightly. On length-matched data the tribble anomaly
+rule leads the best baseline by **+0.117** and beats perplexity by **+0.346**.
+
+This retracts the §3.1/§6 conclusion that the rule "does not beat trivial
+baselines" *for the false-premise family*. The comparison was unfair to the FIS
+in a direction that was not obvious until the confound was measured.
+
+TriviaQA, 353 vs 353 matched: nothing changes much (`n_tokens` is only 0.583 raw
+there), and the fuzzy rule stays at chance (0.508) while entropy/perplexity hold
+~0.65. **The in-distribution task is genuinely unsolved**, and there the
+distribution statistics remain the only usable signal.
+
+### What this does and does not establish
+
+* It **does** establish that a length-independent, interpretable, open-set
+  detector built from tribble's anomaly rule beats standard confidence baselines
+  at catching fabrication about non-existent entities, using 8 antecedents and
+  2 rules, with no hallucination examples and no second model.
+* It **does not** establish detection of ordinary factual error
+  (TriviaQA ≈ chance for the fuzzy rule).
+* Remaining confounds are not all controlled. Length is the one that was
+  measured and removed; prompt-template novelty in the false-premise family
+  (§5) is *not* controlled by length matching and remains open. The honest
+  scope is "novel-entity fabrication," not "hallucination" in general.
+* Single split, single seed. §8's headline rests on 170 matched pairs per class —
+  small enough that a seed sweep is required before publication.
