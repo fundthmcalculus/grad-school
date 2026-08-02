@@ -35,6 +35,14 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_HERE))          # reproduce/ -> `import common`
 import common as C  # noqa: E402
 
+# Matplotlib stamps a %%CreationDate into every EPS, so re-running an unchanged
+# generator produced a diff in fourteen tracked files and told you nothing. The
+# figures are tracked artifacts; a diff should mean the picture changed.
+# Matplotlib honours SOURCE_DATE_EPOCH for its PS/PDF metadata, so pinning it
+# makes the output byte-reproducible. `setdefault`, so a caller that has set it
+# for its own reasons wins.
+os.environ.setdefault("SOURCE_DATE_EPOCH", "1735689600")   # 2025-01-01T00:00:00Z
+
 # --------------------------------------------------------------------------- #
 # palette -- validated categorical slots, light mode (references/palette.md)
 # --------------------------------------------------------------------------- #
