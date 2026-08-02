@@ -115,9 +115,16 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
     `init` chooses where the search begins, and it is the study's central
     contrast:
 
-      "hot"   the antecedent parameters the Gaussian construction produced --
-              the tribble-fis result, structure recovered from the data;
-      "cold"  a uniform random draw inside the same box.
+      "hot"     the antecedent parameters the Gaussian construction produced --
+                the tribble-fis result, structure recovered from the data;
+      "cold"    a uniform random draw inside the same box;
+      "kmeans"  membership functions placed by 1-D k-means per (feature, bucket);
+      "fcm"     the same, by the author's fuzzy c-means.
+
+    The last two are the "old way" -- cluster the data, read the rules off the
+    clusters -- restricted to the placement step so that everything else stays
+    identical. See `clusterinit.py` for what that restriction does and does not
+    license.
 
     Everything else is held identical between the two, including the box, the
     objective, the folds and the test split, so the only difference is where the
@@ -160,11 +167,19 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
     Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=test_size,
                                           random_state=seed)
 
+    # Timed: the construction that every init is compared against. This covers
+    # feature screening and the per-(feature, bucket) mixture fit -- i.e. both
+    # the structure and the placement. The cluster inits reuse the structure, so
+    # their own timer covers placement only and the two are NOT interchangeable;
+    # `clusterinit` says so at more length.
+    import time as _time
+    _t0 = _time.perf_counter()
     diffs = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
     _, top_vars = take_top_features(diffs, top_n=len(Xt.columns))
     model = create_gaussian_membership_dict(Xtr, ytr["y_bucket"],
                                             top_n_var_names=top_vars,
                                             n_gaussians=-1)
+    construction_seconds = _time.perf_counter() - _t0
 
     folds = _make_folds(len(Xtr), n_folds, test_size, seed)
     fitness = _make_kfold_fitness(model, Xtr, ytr, folds, top_vars, n_buckets,
@@ -174,6 +189,7 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
     heuristic = np.clip(extract_gaussian_params(model),
                         [b[0] for b in full_bounds], [b[1] for b in full_bounds])
 
+    init_seconds = 0.0
     if init == "hot":
         x0 = heuristic
     elif init == "cold":
@@ -184,8 +200,12 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
         lo = np.array([b[0] for b in full_bounds])
         hi = np.array([b[1] for b in full_bounds])
         x0 = lo + rng.random(len(lo)) * (hi - lo)
+    elif init in ("kmeans", "fcm"):
+        import clusterinit
+        x0, init_seconds = clusterinit.cluster_params(
+            model, Xtr, ytr, init, seed=seed, bounds=full_bounds)
     else:
-        raise ValueError(f"init must be 'hot' or 'cold', not {init!r}")
+        raise ValueError(f"init must be hot, cold, kmeans or fcm, not {init!r}")
 
     # The trust region is always centred on the point the search starts from.
     # Centring a cold start's box on the heuristic instead would hand it the
@@ -228,6 +248,8 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
         meta={"n_train": len(Xtr), "n_test": len(Xte), "n_folds": n_folds,
               "n_buckets": n_buckets, "l2_reg": l2_reg,
               "heuristic_rmse": heuristic_rmse,
+              "init_seconds": init_seconds,
+              "construction_seconds": construction_seconds,
               "logged": list(prep.get("logged") or [])},
     )
     _CACHE[key] = problem

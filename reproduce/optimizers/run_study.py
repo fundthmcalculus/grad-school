@@ -96,8 +96,18 @@ def run_one(arm, dataset, seed, budget, radius, order, hp, init="hot"):
         "beat_start": obj.beat_start(),
         "r2_0": r2_0, "r2": r2, "rmse_0": rmse_0, "rmse": rmse,
         "evals": obj.n_evals, "seconds": obj.seconds,
+        "init_seconds": prob.meta.get("init_seconds", 0.0),
+        "construction_seconds": prob.meta.get("construction_seconds", 0.0),
         "trace": obj.trace, "error": error,
     }
+
+
+STARTED_FROM = {
+    "hot": "Gaussian construction",
+    "cold": "random point in the box",
+    "kmeans": "1-D k-means per (feature, bucket)",
+    "fcm": "1-D fuzzy c-means",
+}
 
 
 def _agg(records, key):
@@ -115,7 +125,7 @@ def main():
     ap.add_argument("--radius", type=float, default=1.0)
     ap.add_argument("--order", default="2nd")
     ap.add_argument("--init", default="hot",
-                    help="hot, cold, or hot,cold to run both and compare")
+                    help="comma-separated: hot, cold, kmeans, fcm")
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--archive", metavar="LABEL",
                     help="copy the outputs into reproduce/outputs/<LABEL>/ with a "
@@ -173,7 +183,7 @@ def main():
         rows.append([
             init,
             arm,
-            A.HOT_START[arm] if init == "hot" else "random point in the box",
+            STARTED_FROM.get(init, init),
             C.cell([r["cv_mse"] for r in per_arm], fmt="{:.5f}"),
             C.cell([r["r2"] for r in per_arm]),
             C.cell(d_r2, fmt="{:+.3f}") if d_r2 else C.NA,
@@ -182,6 +192,8 @@ def main():
              else f"{len(reached)}/{len(per_arm)} seeds" if reached else "never"),
             f"{beat}/{len(per_arm)}",
             C.cell([r["evals"] for r in per_arm], fmt="{:.0f}"),
+            C.cell([1000 * (r["construction_seconds"] + r["init_seconds"])
+                    for r in per_arm], fmt="{:.0f}"),
         ])
 
     ref = [r for r in records if r["arm"] == arm_names[0]]
@@ -194,7 +206,7 @@ def main():
         f"({args.dataset}, order {args.order})",
         ["init", "arm", "started from", "CV MSE", "test R²",
          "Δ R² vs heuristic (paired)", "R² wins", "evals to reach heuristic",
-         "beat own start", "evals"],
+         "beat own start", "evals", "start-up cost (ms)"],
         rows,
         note=(f"Every arm optimizes the same k-fold held-out MSE inside the same "
               f"box over the same {n_params} antecedent parameters, and is cut off "
@@ -214,7 +226,18 @@ def main():
               f"price of not having it, and the number this study exists to "
               f"produce. Trust-region radius {args.radius} (1.0 = the full box from "
               f"`build_param_bounds`), centred on whichever point that run starts "
-              f"from."))
+              f"from.\n>\n"
+              f"> **`start-up cost` is not a pipeline comparison, and cannot be "
+              f"read as one.** Every init in this table needs the Gaussian "
+              f"construction first: it supplies the structure (which features, how "
+              f"many components per bucket) and the box that `build_param_bounds` "
+              f"derives. The k-means and FCM inits then *replace the placement* "
+              f"inside that structure, so their cost is construction + clustering "
+              f"and they are strictly more expensive than the construction alone. "
+              f"Showing k-means as a cheaper alternative would require the "
+              f"classical joint-space identification, where clustering chooses the "
+              f"rules instead of inheriting them — that changes the structure and "
+              f"belongs with `run_structure_study.py`."))
 
     _write_traces(records)
     _write_seeds(records)
@@ -308,14 +331,16 @@ def _write_seeds(records):
     path = os.path.join(C.OUTPUT_DIR, "table_opt_hotstart_seeds.csv")
     header = ["arm", "init", "seed", "cv_mse_0", "cv_mse", "improvement",
               "beat_start", "r2_0", "r2", "heuristic_r2", "heuristic_cv",
-              "evals_to_heuristic", "rmse_0", "rmse", "evals", "seconds", "error"]
+              "evals_to_heuristic", "rmse_0", "rmse", "evals", "seconds",
+              "init_seconds", "construction_seconds", "error"]
     rows = [[r["arm"], r["init"], r["seed"], f"{r['cv_mse_0']:.6f}", f"{r['cv_mse']:.6f}",
              "" if r["improvement"] is None else f"{r['improvement']:.6f}",
              int(r["beat_start"]), f"{r['r2_0']:.6f}", f"{r['r2']:.6f}",
              f"{r['heuristic_r2']:.6f}", f"{r['heuristic_cv']:.6f}",
              "" if r["evals_to_heuristic"] is None else r["evals_to_heuristic"],
              f"{r['rmse_0']:.4f}", f"{r['rmse']:.4f}", r["evals"],
-             f"{r['seconds']:.2f}", r["error"] or ""]
+             f"{r['seconds']:.2f}", f"{r['init_seconds']:.4f}",
+             f"{r['construction_seconds']:.4f}", r["error"] or ""]
             for r in records]
     C.write_csv(path, header, rows)
     print(f"  wrote {path}")
