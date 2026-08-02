@@ -500,3 +500,80 @@ def lyapunov_from_linearization(
         return None
     from scipy.linalg import solve_lyapunov
     return solve_lyapunov(a_cl.T, -(np.eye(n) if q_mat is None else q_mat))
+
+
+# --------------------------------------------------------------------------
+# Fast proxy for the certified radius, for use inside an optimization loop
+# --------------------------------------------------------------------------
+def certified_radius_proxy(
+    ctrl, plant, p_lyap: af64, samples: af64, rho_cap: float = 50.0
+) -> float:
+    """Sampled estimate of the largest rho with Vdot < 0 on {z'Pz <= rho}.
+
+    A real SOS solve costs ~1.5 s, so putting one inside a 600-evaluation policy
+    search costs hours.  This is the same question asked of a fixed sample set:
+    the smallest sublevel value at which any sampled point has Vdot >= 0.
+
+    It is a NECESSARY condition, and only a sampled one -- a point where
+    Vdot >= 0 proves SOS must fail at that rho, but no finite sample proves the
+    converse.  So it is safe to optimize against and unsafe to report.  Every
+    controller produced with it is put through the real certificate afterwards.
+
+    `samples` is passed in pre-generated so the estimate is deterministic and
+    identical across controllers, which matters when it is an objective term.
+    """
+    u = ctrl.evaluate_batch(samples)
+    x1, x2, v1, v2 = samples.T
+    d = x2 - x1
+    spring = plant.k_lin * d + plant.k_nl * d**3
+    zdot = np.column_stack([
+        v1, v2,
+        (spring - plant.damping * v1 + np.clip(u, -plant.u_max, plant.u_max))
+        / plant.m1,
+        (-spring - plant.damping * v2) / plant.m2,
+    ])
+    vdot = 2.0 * np.einsum("ni,ij,nj->n", samples, p_lyap, zdot)
+    rho = np.einsum("ni,ij,nj->n", samples, p_lyap, samples)
+    bad = rho[vdot >= 0.0]
+    return float(min(bad.min(), rho_cap)) if bad.size else float(rho_cap)
+
+
+def sublevel_samples(p_lyap: af64, n: int = 20000, rho_max: float = 4.0,
+                     seed: int = 0) -> af64:
+    """Points filling {z : z'Pz <= rho_max}, denser near the origin."""
+    rng = np.random.default_rng(seed)
+    d = rng.normal(size=(n, p_lyap.shape[0]))
+    d /= np.linalg.norm(d, axis=1, keepdims=True)
+    scale = np.sqrt(rho_max / np.einsum("ni,ij,nj->n", d, p_lyap, d))
+    frac = rng.uniform(0.02, 1.0, size=n) ** 0.5
+    return d * (scale * frac)[:, None]
+
+
+def ball_samples(n: int = 20000, radius: float = 2.0, dim: int = 4,
+                 seed: int = 0) -> af64:
+    """Points filling the Euclidean ball of the given radius, denser inside.
+
+    A cloud shaped by one particular P cannot be reused for another, and the
+    proxy has to compare Lyapunov candidates against each other on equal terms.
+    A metric-free cloud does that: the SAME points are scored under every P, so
+    the comparison measures the candidates rather than their sampling.
+    """
+    rng = np.random.default_rng(seed)
+    d = rng.normal(size=(n, dim))
+    d /= np.linalg.norm(d, axis=1, keepdims=True)
+    return d * (radius * rng.uniform(0.01, 1.0, size=n) ** 0.5)[:, None]
+
+
+def proxy_ball_radius(ctrl, plant, p_lyap: af64, samples: af64,
+                      radius_cap: float) -> float:
+    """`certified_radius_proxy` reported as a Euclidean ball radius.
+
+    Sublevel values of different Lyapunov candidates are not comparable -- rho
+    is in units of that P.  The inscribed ball sqrt(rho / lambda_min(P)) is the
+    quantity the certificates are actually reported in (README §12d), so it is
+    what a certificate-aware objective must be built from.
+    """
+    lo = float(np.linalg.eigvalsh(p_lyap).min())
+    rho = certified_radius_proxy(ctrl, plant, p_lyap, samples,
+                                 rho_cap=lo * radius_cap**2)
+    return float(np.sqrt(max(rho, 0.0) / lo))
