@@ -36,7 +36,103 @@ Per the design decision recorded in Chapter 2, the optimization library is suppo
 
 **Standalone-paper opportunities** (for Dr. Cohen's consideration, not part of the core dissertation): the performance-engineering study on its own; the quality-diversity-over-legacy-solvers layer (CVT-MAP-Elites + Iso+LineDD); and the exact GPU/parallel VAT engine as a systems paper. That last one is distinct from the possible complexity note of §9.3: the note would be about the sequencing's cost and memory bound and the heap-versus-dense measurement, whereas a systems paper would be about the parallel and GPU engineering envelope. They should not be merged, and neither should absorb the other's claim.
 
-## A.4 Reproducibility
+## A.4 Feature scoring: why the composite metric earned its keep
+
+This section exists because a refactor deleted something whose value nobody had
+measured, and measuring it afterwards produced the clearest single argument in
+the proposal for consensus over a single statistic.
+
+The Mixture-of-Gaussians construction of Chapter 4 begins by scoring each feature
+for how well it separates the output classes, keeping the best few, and building
+membership functions only over those. Everything downstream — rule count, clause
+count, readability, training time — follows from that ranking. It is the least
+glamorous step in the pipeline and, it turns out, the one with the most leverage.
+
+The scorer originally combined four measures of distributional separation:
+Bhattacharyya divergence, Jensen–Shannon distance, histogram overlap, and
+histogram correlation. It reduced them not by averaging but by taking the mean of
+their **arithmetic and geometric** means. That detail is the whole design. A
+geometric mean collapses toward zero if *any* of its terms is near zero, so a
+feature scores well only when **every** measure agrees it separates the classes.
+The composite is a consensus rule, and consensus is insurance against any one
+metric's assumptions failing.
+
+An upstream refactor replaced the composite with a choice of one metric,
+defaulting to Bhattacharyya. On the PhiUSIIL phishing set the effect was severe,
+and it is instructive precisely because the accuracy number understates it.
+
+**Table A.1 — Feature ranking depends on the scorer.** Top five features on
+PhiUSIIL under each rule.
+
+| Rank | Composite (4-metric) | Wasserstein | Bhattacharyya |
+|---|---|---|---|
+| 1 | **URLSimilarityIndex** | **URLSimilarityIndex** | HasSocialNet |
+| 2 | HasSocialNet | HasSocialNet | HasTitle |
+| 3 | HasCopyrightInfo | HasCopyrightInfo | NoOfSelfRef |
+| 4 | NoOfOtherSpecialCharsInURL | HasDescription | NoOfCSS |
+| 5 | NoOfSelfRef | DomainTitleMatchScore | NoOfImage |
+
+`URLSimilarityIndex` ranks first under both the composite and Wasserstein. Under
+Bhattacharyya it does not appear in the top twenty at all.
+
+**Table A.2 — What that costs.** Test accuracy and fit time against the number of
+features retained; 20,000-row sample, two seeds.
+
+| Features kept | Composite | Wasserstein | Bhattacharyya |
+|---:|---:|---:|---:|
+| 1 | **0.9969** (0.23 s) | **0.9969** (0.42 s) | 0.4251 (0.17 s) |
+| 3 | 0.9969 | 0.9969 | 0.8294 |
+| 5 | 0.9969 | 0.9968 | 0.9210 |
+| 7 | 0.9969 | **0.9992** | 0.9174 |
+| 10 | 0.9969 | **0.9995** (0.97 s) | 0.9267 |
+| 20 | 0.9989 | 0.9985 | 0.9471 (2.49 s) |
+
+A single feature and a quarter of a second reaches 99.7% — if the ranking picks
+the right one. Bhattacharyya's top *two* features together score 0.425, below the
+majority-class rate, and it never reaches the composite's one-feature accuracy at
+any size tested; at twenty features and ten times the training cost it is still
+two and a half points short.
+
+**Why the parametric metric fails here.** Of the three rules, Bhattacharyya as
+implemented is the only one carrying a distributional assumption: it fits a
+Gaussian to each class and integrates their overlap. `URLSimilarityIndex` is a
+bounded similarity score, and such quantities are typically spiky or bimodal
+rather than Gaussian, so a Gaussian-fit divergence mismeasures its separation
+badly. Wasserstein makes no such assumption and finds it immediately. The
+composite finds it because three of its four terms agree, and the geometric mean
+will not let a single dissenting metric bury a feature the others rank highly.
+
+**What I take from this, for the thesis rather than the library.** Two things,
+and the second is the one that generalizes.
+
+The narrow conclusion is that Wasserstein is the better default. It matches the
+composite where the composite is strong and exceeds it from seven features
+onward, at no assumption cost.
+
+The broader conclusion concerns *interpretability*, which is this dissertation's
+central claim and not merely its accuracy. Chapter 4 argues that the construction
+yields a readable rule base — a handful of clauses over named features. Table A.2
+shows that claim is not a property of the model architecture at all; it is a
+property of the **feature ranking**. With a ranking that works, the model is
+readable *and* accurate at one feature. With a ranking that does not, recovering
+comparable accuracy takes forty features, and a forty-feature rule base is not
+readable by anyone. The interpretability argument therefore rests on a step the
+pipeline treats as preprocessing, and a change to that step damaged
+interpretability considerably more than it damaged accuracy — which is exactly
+the kind of degradation an accuracy-only evaluation would never surface.
+
+That is the case for keeping the composite available even though a single
+well-chosen metric beats it here. Its value is not the ranking it produces on any
+one dataset; it is that it cannot be silently wrong in the way a single metric
+can, because it requires agreement. On a new dataset, where nobody yet knows
+which assumption fails, that is worth having.
+
+*Reproduced by `reproduce/tables/table_a1_feature_scoring.py`. Upstream:
+tribble-fis issues #49 (the regression) and #50 (`top_p` semantics).*
+
+---
+
+## A.5 Reproducibility
 
 - **Code.** Four repositories, submoduled into the `grad-school` working repo: `tribble-cluster` (VAT/iVAT/FCM), `tribble-fis` (the fuzzy models and `tribble-tree`), `tribble-opt` (the optimization engine), and `gated-minimax-selection` (the Chapter 5 membership-generation experiments).
 - **The reproduction harness.** `reproduce/` is the single entry point, and the goal is that reproducing a result takes one command rather than archaeology. Each table in the proposal has a generator under `reproduce/tables/` that runs the models over a fixed seed set and writes both Markdown and CSV into `reproduce/outputs/`, reporting mean ± standard deviation. Anything it cannot run — a missing optional baseline, an absent dataset, hardware it does not have — is reported as unavailable and printed with the reason, never silently replaced by an estimate. `reproduce/manifest.py` enumerates every experiment across the four repositories with its command, environment, datasets, and hardware tier; a full orchestrator that walks that manifest is the next step.
