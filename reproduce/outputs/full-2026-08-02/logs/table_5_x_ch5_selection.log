@@ -1,0 +1,8 @@
+Chapter 5 tables from the gated-minimax results of record
+  source: /home/scott/PycharmProjects/grad-school/gated-minimax-selection/outputs/results.json
+  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_5_1_battery.md
+  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_5_1_battery.csv
+  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_5_2_multiscale.md
+  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_5_2_multiscale.csv
+  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_5_3_selection.md
+  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_5_3_selection.csv
