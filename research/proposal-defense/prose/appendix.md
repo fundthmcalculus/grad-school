@@ -62,36 +62,48 @@ defaulting to Bhattacharyya. On the PhiUSIIL phishing set the effect was severe,
 and it is instructive precisely because the accuracy number understates it.
 
 **Table A.1 — Feature ranking depends on the scorer.** Top five features on
-PhiUSIIL under each rule.
+PhiUSIIL under each rule, with normalized scores.
 
-| Rank | Composite (4-metric) | Wasserstein | Bhattacharyya |
+| Rank | Wasserstein | Bhattacharyya | Composite |
 |---|---|---|---|
-| 1 | **URLSimilarityIndex** | **URLSimilarityIndex** | HasSocialNet |
-| 2 | HasSocialNet | HasSocialNet | HasTitle |
-| 3 | HasCopyrightInfo | HasCopyrightInfo | NoOfSelfRef |
-| 4 | NoOfOtherSpecialCharsInURL | HasDescription | NoOfCSS |
-| 5 | NoOfSelfRef | DomainTitleMatchScore | NoOfImage |
+| 1 | **URLSimilarityIndex** (1.000) | HasSocialNet (1.000) | HasSocialNet (1.000) |
+| 2 | HasSocialNet (0.867) | HasTitle (0.855) | **URLSimilarityIndex** (0.947) |
+| 3 | HasCopyrightInfo (0.743) | NoOfSelfRef (0.784) | HasTitle (0.848) |
+| 4 | HasDescription (0.629) | NoOfCSS (0.777) | NoOfCSS (0.820) |
+| 5 | DomainTitleMatchScore (0.471) | NoOfImage (0.762) | NoOfSelfRef (0.815) |
 
-`URLSimilarityIndex` ranks first under both the composite and Wasserstein. Under
-Bhattacharyya it does not appear in the top twenty at all.
+One feature, `URLSimilarityIndex`, carries almost the entire signal. Wasserstein
+ranks it first; the composite ranks it second; Bhattacharyya does not place it in
+the top twenty at all.
 
-**Table A.2 — What that costs.** Test accuracy and fit time against the number of
-features retained; 20,000-row sample, two seeds.
+**Table A.2 — What the ranking costs.** Test accuracy and fit time against the
+number of features retained; 20,000-row sample, ten seeds.
 
-| Features kept | Composite | Wasserstein | Bhattacharyya |
+| Features kept | Wasserstein | Bhattacharyya | Composite |
 |---:|---:|---:|---:|
-| 1 | **0.9969** (0.23 s) | **0.9969** (0.42 s) | 0.4251 (0.17 s) |
-| 3 | 0.9969 | 0.9969 | 0.8294 |
-| 5 | 0.9969 | 0.9968 | 0.9210 |
-| 7 | 0.9969 | **0.9992** | 0.9174 |
-| 10 | 0.9969 | **0.9995** (0.97 s) | 0.9267 |
-| 20 | 0.9989 | 0.9985 | 0.9471 (2.49 s) |
+| 1 | **0.9967** (0.41 s) | 0.4267 (0.16 s) | 0.4267 (0.41 s) |
+| 2 | 0.9967 | 0.4527 | **0.9967** (0.48 s) |
+| 3 | 0.9967 | 0.8457 | 0.9967 |
+| 5 | 0.9965 | 0.9131 | 0.9966 |
+| 7 | **0.9997** (0.77 s) | 0.9183 | 0.9966 |
+| 10 | 0.9996 | 0.9274 | 0.9980 |
+| 15 | 0.9957 | 0.9477 | **0.9999** (1.90 s) |
+| 20 | 0.9989 | 0.9477 (2.40 s) | 0.9995 |
 
-A single feature and a quarter of a second reaches 99.7% — if the ranking picks
-the right one. Bhattacharyya's top *two* features together score 0.425, below the
-majority-class rate, and it never reaches the composite's one-feature accuracy at
-any size tested; at twenty features and ten times the training cost it is still
-two and a half points short.
+Wasserstein reaches 99.7% on a **single** feature in 0.41 s. The composite needs
+two, because it ranks `URLSimilarityIndex` second, and thereafter matches or
+leads — it takes the highest score in the table, 0.9999 at fifteen features.
+Bhattacharyya never reaches what the other two achieve on one feature: at twenty
+features and six times the training cost of Wasserstein-at-one it is still five
+points short.
+
+**A note on which composite this is.** The scorer measured here is the one
+restored as `method="composite"`, which is not identical to the four-metric blend
+that was the original default. That earlier blend ranked `URLSimilarityIndex`
+*first* and so reached 0.9969 at a single feature, flat through fifteen. The
+restored composite ranks it second and is fractionally stronger at the top end.
+The distinction matters only for the one-feature row; the argument below is
+unchanged by it.
 
 **Why the parametric metric fails here.** Of the three rules, Bhattacharyya as
 implemented is the only one carrying a distributional assumption: it fits a
@@ -99,24 +111,30 @@ Gaussian to each class and integrates their overlap. `URLSimilarityIndex` is a
 bounded similarity score, and such quantities are typically spiky or bimodal
 rather than Gaussian, so a Gaussian-fit divergence mismeasures its separation
 badly. Wasserstein makes no such assumption and finds it immediately. The
-composite finds it because three of its four terms agree, and the geometric mean
-will not let a single dissenting metric bury a feature the others rank highly.
+composite finds it because the measures that do see it outvote the one that does
+not — its geometric-mean term requires broad agreement before a feature scores
+well, which is what makes it robust to any single metric's blind spot.
 
 **What I take from this, for the thesis rather than the library.** Two things,
 and the second is the one that generalizes.
 
-The narrow conclusion is that Wasserstein is the better default. It matches the
-composite where the composite is strong and exceeds it from seven features
-onward, at no assumption cost.
+The narrow conclusion is that Wasserstein is the better default, and it is now
+the shipped one. It is the only rule that reaches full accuracy on a *single*
+feature, which is the regime this construction is built for, and it makes no
+distributional assumption to get there. The composite edges it out at fifteen
+features (0.9999 against 0.9957), but a fifteen-feature rule base is not the
+thing Chapter 4 is arguing for.
 
 The broader conclusion concerns *interpretability*, which is this dissertation's
 central claim and not merely its accuracy. Chapter 4 argues that the construction
 yields a readable rule base — a handful of clauses over named features. Table A.2
 shows that claim is not a property of the model architecture at all; it is a
 property of the **feature ranking**. With a ranking that works, the model is
-readable *and* accurate at one feature. With a ranking that does not, recovering
-comparable accuracy takes forty features, and a forty-feature rule base is not
-readable by anyone. The interpretability argument therefore rests on a step the
+readable *and* accurate at one feature. With a ranking that does not, accuracy is
+not recovered at any size tested — Bhattacharyya is still five points short at
+twenty features, and reaching even 0.957 takes forty-one. A forty-feature rule
+base is not readable by anyone, so the failure costs the readability outright
+while the accuracy column merely looks disappointing. The interpretability argument therefore rests on a step the
 pipeline treats as preprocessing, and a change to that step damaged
 interpretability considerably more than it damaged accuracy — which is exactly
 the kind of degradation an accuracy-only evaluation would never surface.
