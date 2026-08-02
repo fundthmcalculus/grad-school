@@ -25,7 +25,25 @@ Per author decision, the optimization engine is supporting infrastructure, not c
 - Cross-reference the brief motivating mention in Ch 2 §2.5.
 - These are also the **standalone-paper candidates** listed in the master outline (perf study; QD layer; exact GPU VAT; LK + VAT-blocked TSP).
 
-## A.4 Reproducibility
+## A.4 Feature scoring: why the composite metric earned its keep
+
+- The Chapter 4 construction ranks features before it builds anything; rule
+  count, clause count and readability all follow from that ranking.
+- The original scorer combined four separation measures via the mean of their
+  arithmetic and geometric means — a consensus rule, since the geometric mean
+  collapses unless every measure agrees.
+- An upstream refactor replaced it with a single metric (Bhattacharyya). On
+  PhiUSIIL that metric ranks the most informative feature outside its top 20.
+- Table A.1: rankings by scorer. Table A.2: accuracy and fit time vs features
+  kept. One feature reaches 0.9969 under the composite or Wasserstein; the
+  default's top two score 0.4251.
+- Mechanism: Bhattacharyya is the only one of the three that assumes a
+  distribution (Gaussian fit per class), and the key feature is not Gaussian.
+- The point for the thesis: interpretability is a property of the ranking, not
+  of the architecture. A bad ranking costs readability far more than accuracy.
+- Written from tribble-fis #49/#50.
+
+## A.5 Reproducibility
 
 - Repo/commit pointers: `tribble-cluster`, `tribble-fis`, `tribble-opt`, `gated-minimax-selection`; master drivers (`run_all.py`, benchmark scripts); hardware notes.
 
