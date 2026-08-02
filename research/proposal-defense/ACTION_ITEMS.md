@@ -83,7 +83,7 @@ _Last updated: 2026-08-02 (adversarial review pass; see [`REVIEW_2026-08-02.md`]
 - ✅ **EUSFLAT 2027 submission deadline confirmed: February 2027** (author, 2026-08-02); conference is September 2027. **This conflicts with the Ch 10 schedule as written** — see the Ch 5 paper conflict logged in `CHECKLIST.md` A4.
 - ✅ **Proposal-defense month confirmed: December 2026** (author, 2026-08-02). Final defense = March 2028 (✅).
 - ⬜ **Teaching/RA load per semester** (affects timeline throughput, Ch 10).
-- ⬜ **Flagship end-to-end dataset** — author-preferred IoT (RT-IOT2022 / IoT-botnet) or UCI-58 Shuttle; left flexible, confirm later (Ch 7).
+- ✅ **Flagship end-to-end dataset: the UCI shuttle set (58K)** (author, 2026-08-02) — chosen for continuity with Ch 3, which already uses it to demonstrate scale, and because it is public where the 135K psychiatric set is not. Its ~80%/7-class imbalance also exercises the §4.3.5 complement rule. **Caveat in §7.3:** the set has coordinates, so the capstone does not exercise Ch 5's coordinate-free regime — the capstone and G2 answer different questions. Revisitable at the cost of a re-run.
 - ✅ Title, committee, tribble-opt→appendix, final-defense date — all resolved.
 
 ## C. Experiments / results owed (the "make it airtight" list)
