@@ -1446,6 +1446,16 @@ penalty is *free* — better score, better held-out score, and a larger certifie
 ball than $w=0$. The proxy is 1.18–2.51× optimistic, so $w$ is a dial and not a
 specification; calibrating it is the natural follow-on.
 
+**5c. Calibrate the proxy so the target is a specification.** — **DONE, §15.**
+The optimism was estimator error, not S-procedure conservatism: a ray search
+replaces the cloud's minimum-order statistic, cutting the gap 1.182× → 1.044×
+and the seed spread 11% → 1.5%. The residual is a constant $\kappa=0.962$, of
+which 2.5 of the 3.8 points are the deliberate $0.95$ shrink — so the true
+degree-4 conservatism is ~1.3%. Specified radii 0.35/0.45/0.55 are all achieved
+and SDP-confirmed, and the best controller in the study falls out: certified
+ball **0.6791** at score **0.8469**, dominating the imitation controller on both
+axes.
+
 ### 10b. Resolves open questions, but buys no new guarantees
 
 **6. Direct policy optimization on the nonlinear plant.** Tests whether §8d's
@@ -1501,6 +1511,8 @@ cd research/least_action
 ../../.venv/bin/python demo_sos.py           # ~1 min,  SOS stability certificate
 ../../.venv/bin/python demo_certified_policy.py   # ~8 min, certified policy opt
 ../../.venv/bin/python demo_pareto.py        # ~35 min, certificate-aware Pareto front
+../../.venv/bin/python demo_calibrate.py     # ~45 min, calibrated radius specification
+../../.venv/bin/python verify_proxy.py       # ~5 s,    proxy is a valid necessary condition
 ../../.venv/bin/python verify_symbolic.py    # ~1 min,  21 symbolic identities
 ../../.venv/bin/python verify_sos_exact.py   # ~4 min,  exact rational SOS proof
 
@@ -1610,6 +1622,8 @@ reader changing one should know what it was protecting against.
 | `unsaturated_radius` | largest ball on which $\lvert u\rvert\le u_{\max}$ |
 | `certified_radius_proxy` | sampled *necessary* condition for `certify_roa`, ~2600× faster (§14a) |
 | `ball_samples` / `proxy_ball_radius` | metric-free sample cloud, and the proxy reported as an inscribed ball radius |
+| `ray_radius_proxy` | the same condition by first-crossing along fixed rays — seed-stable and 1.04× tight (§15a) |
+| `sphere_directions` | the fixed direction set the ray proxy scans |
 | `capture` | side-channel exposing the Gram and monomials for exact re-verification (§13b) |
 
 ### Where each claim is checked
@@ -1651,6 +1665,13 @@ reader changing one should know what it was protecting against.
 | proxy is a valid necessary condition | 14a | pareto A |
 | $w$ prices region against performance | 14c, 14d | pareto B, C |
 | the penalty regularizes rather than costs | 14d | pareto C |
+| cloud proxy is a minimum-order statistic | 15a | calibrate A, verify_proxy 1 |
+| descent formulation is degenerate at $z=0$ | 15a | verify_proxy 1 |
+| ray endpoints are genuine witnesses | 15a | verify_proxy 2 |
+| ray proxy is seed-stable and 1.04× tight | 15a | calibrate A, verify_proxy 3 |
+| residual gap is a constant $\kappa=0.962$ | 15b | calibrate B |
+| a specified radius is achieved and certified | 15c | calibrate C |
+| the achievable set is bimodal | 15d | calibrate C |
 
 ---
 
@@ -2079,7 +2100,10 @@ on it out of sample, and recovers about a quarter of the lost certified region.
   asking for $\hat r\ge0.67$ does not deliver a certified 0.67. It moved the
   true ball in the right direction (0.273 → 0.358) but the mapping is not
   calibrated. Tightening it means a denser cloud or a local refinement near the
-  binding point, not a different inequality.
+  binding point, not a different inequality. — **§15 does this, and half of that
+  prescription is wrong**: local refinement is structurally degenerate, because
+  $z=0$ satisfies $\dot V(0)=0\ge0$ and a descent method walks to it. The fix is
+  a ray search, and it removes almost all of the optimism.
 - **The front is not monotone in $w$.** The ball sequence
   0.2729, 0.3452, 0.3354, 0.3498, 0.3579 dips once, at $w=0.3$ — because
   $w=0.1$ sits above the trend through the other four, while its score (0.8155)
@@ -2111,3 +2135,138 @@ worth stating plainly: **on this problem, requiring a certificate did not cost
 performance — it improved out-of-sample performance.** The framing of §12e,
 that certification and performance are opposed, was too pessimistic; they are
 opposed only past the point where the unpenalized search was overfitting.
+
+---
+
+## 15. Calibrating the proxy so a *specified* radius comes out
+
+§14 left the certificate as a dial rather than a specification: asking for a
+proxy radius of 0.67 delivered a certified 0.35. This closes that gap. Code:
+`demo_calibrate.py`.
+
+### 15a. The looseness was the estimator, not the relaxation
+
+I had assumed the 1.18–2.51× optimism was S-procedure conservatism, which would
+have been unfixable without a higher multiplier degree (§12d: degree 6 is a
+70×70 Gram at 4 minutes per solve). It was not. Two separate defects, both in
+the estimator:
+
+**1. A minimum-order statistic.** Violations on this problem are not rare —
+**37% of cloud points have $\dot V\ge0$** — so the sampled minimum depends
+entirely on whether some point happened to land near the inner boundary. Across
+three seeds it reports 0.6718, 0.6744, 0.7484. Fixing the seed (as §14 did) made
+it deterministic, not accurate.
+
+**2. The obvious repair is degenerate.** Sharpening it by locally solving
+$\min\{z^\top Pz:\dot V(z)\ge0\}$ fails structurally, not numerically:
+**$z=0$ is feasible**, since $\dot V(0)=0$ exactly. The program's global solution
+is the origin and a descent method walks straight to it. Measured (`verify_proxy.py`):
+of six local solves from the best sampled starts, **2 collapsed to $\|z\|=0$ and
+all 6 ended infeasible**, on the $\dot V=0$ boundary from below, so a strict
+feasibility recheck discards every one and the "refined" bound never moves.
+
+**Rays fix both.** Along a fixed unit direction $d$,
+
+$$r(d)=\min\{\,r>0:\dot V(rd)\ge0\,\},\qquad
+\hat\rho=\min_d\;r(d)^2\,d^\top Pd ,$$
+
+found by scan-and-bisect: no optimizer, no degenerate solution, and the origin
+excluded by construction since the scan starts at $r>0$. Bisection returns the
+**outer** bracket endpoint, a state that genuinely satisfies $\dot V\ge0$, so the
+necessary-condition property that makes the proxy safe to optimize against is
+preserved exactly.
+
+| estimator | seed 0 | seed 1 | seed 2 | seed 3 | seed 4 | spread | vs SOS |
+|---|---|---|---|---|---|---|---|
+| cloud (§14) | 0.6718 | 0.6744 | 0.7484 | 0.6608 | 0.7369 | 12.5% | 1.182× |
+| **ray** | **0.5937** | **0.5934** | **0.5849** | **0.5937** | **0.5915** | **1.5%** | **1.044×** |
+
+Seed spread falls from 12.5% to 1.5%, and the gap to the real certificate
+(0.5684) from 18% to 4.4%, at 119 ms against the SDP's 45 s.
+
+The necessary-condition property is checked rather than argued: all 973 ray
+endpoints satisfy $\dot V\ge0$ when re-evaluated, and the binding one is an
+explicit state, $z^\*=(+0.0237,+0.0778,+0.0628,-0.2563)$ with
+$\dot V=+2.9\times10^{-9}$ at ball radius 0.5937 — a real point past which no
+certificate can reach.
+
+### 15b. What remains is a constant
+
+Perturbing the imitation fit along the $u(0)=0$ null space gives controllers
+spanning a range of aggressiveness — every one still with an equilibrium at the
+origin, so every one still has something to certify:
+
+| controller | score | ray | SOS | $V$ from | SOS/ray |
+|---|---|---|---|---|---|
+| imitation | 1.0437 | 0.5937 | 0.5684 | Riccati | 0.9574 |
+| perturb 1 | 1.0279 | 0.5612 | 0.5399 | Riccati | 0.9620 |
+| perturb 2 | 1.1456 | 0.6084 | 0.5641 | Riccati | 0.9271 |
+| perturb 3 | 0.9215 | 0.3313 | 0.3226 | lin | 0.9735 |
+| perturb 4 | 1.1343 | 0.2599 | 0.2525 | lin | 0.9716 |
+| perturb 5 | inf | 0.0154 | none | — | — |
+
+$$\kappa=\operatorname{median}(\text{SOS}/\text{ray})=0.9620,\qquad
+\text{range }[0.9271,\,0.9735].$$
+
+Of the 3.8% shortfall, **2.5 points are the deliberate $0.95$ shrink** applied to
+$\rho$ before re-certifying ($\sqrt{0.95}=0.9747$). The genuine degree-4
+S-procedure conservatism is therefore only about **1.3%** — which is why chasing
+multiplier degree would have bought nothing. Perturb 5 destabilizes and is
+excluded: with no certificate there is no ratio to average.
+
+### 15c. A specified radius, confirmed by the SDP
+
+The penalty now hinges on the calibrated estimate $\kappa\hat r$, so the target
+is stated directly in certified-ball units. A pass that misses raises the target
+by exactly the shortfall; a pass that misses *and* fails to improve on the one
+before it is not short of target but stuck, so the target is pushed 50% further.
+
+| spec | pass | score | held out | $\kappa\hat r$ | SOS Ric | SOS lin | best | met? |
+|---|---|---|---|---|---|---|---|---|
+| 0.35 | 1 | 0.7956 | 0.7546 | 0.3478 | 0.0000 | 0.3415 | 0.3415 | no |
+| 0.35 | 2 | 0.7962 | 0.7227 | 0.3577 | 0.0000 | 0.3549 | **0.3549** | **yes** |
+| 0.45 | 1 | 0.7690 | 0.7296 | 0.5277 | 0.0000 | 0.3452 | 0.3452 | no |
+| 0.45 | 2 | 0.7857 | 0.7536 | 0.5865 | 0.0000 | 0.3430 | 0.3430 | no |
+| 0.45 | 3 | 0.8487 | 0.8667 | 0.7269 | 0.6782 | 0.3654 | **0.6782** | **yes** |
+| 0.55 | 1 | 0.7717 | 0.7466 | 0.5503 | 0.1038 | 0.3368 | 0.3368 | no |
+| 0.55 | 2 | 0.8469 | 0.8560 | 0.7278 | 0.6791 | 0.0000 | **0.6791** | **yes** |
+
+**All three specs are met, and every "yes" is a real SDP certificate**, not a
+proxy estimate.
+
+**The best controller in the whole study comes out of this.** At spec 0.55:
+certified ball **0.6791** at score **0.8469**. That **dominates the imitation
+controller on both axes** — larger certified region than 0.5684 *and* a 19%
+better score than 1.0437 — and its certified region is nearly double the best
+§14 produced (0.3579).
+
+### 15d. Two things calibration does not fix
+
+**1. A single $\kappa$ is not always enough, and the per-candidate columns show
+why.** At spec 0.45 pass 1, $\kappa\hat r=0.5277$ while the certificate is
+0.3452 — a ratio of 0.65, far outside $[0.927,0.974]$. The reason is visible in
+the table: `SOS Ric = 0.0000`. The proxy takes a max over Lyapunov candidates
+and it is attained by the Riccati one, where $\dot V<0$ genuinely does hold that
+far out; but the degree-4 S-procedure cannot certify that candidate **at all**.
+The proxy measures where $\dot V<0$ *is true*; SOS measures where it is
+*provable at this degree*, and the argmax of the two differs. Calibration
+handles the gap when both agree on the candidate; the outer loop absorbs it when
+they do not.
+
+**2. The achievable set is effectively bimodal, so the loop is not monotone.**
+Every row lands near either 0.35 or 0.68, according to which Lyapunov function
+certifies — two basins, not a continuum. Spec 0.45 therefore *fails twice and
+then succeeds*, and asking for 0.45 delivers 0.6782: the spec is **met, not
+matched**. You get the basin containing it. This is a property of the landscape,
+not of the calibration, and it is why the loop reports the achieved certificate
+on every pass rather than only the final one.
+
+### 15e. Status of the original question
+
+§14 asked for a dial and got one that was uncalibrated. §15 makes the target a
+specification: **state a certified radius, get a controller the SDP certifies at
+or above it** — subject to the bimodality above, and still only for $N=2$ rules
+with two fixed quadratic $V$. The natural next step is the one both sections
+keep running into: searching $V$ jointly with $\theta$ (a bilinear problem)
+would remove the max-over-two-candidates artifact that produces both the
+calibration outlier and the bimodality.
