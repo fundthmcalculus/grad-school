@@ -59,9 +59,24 @@ LATEX_ENGINES = ["xelatex", "lualatex", "pdflatex", "tectonic"]
 # Map from the harness output names to the prose figure names.
 # Key: basename as output by reproduce/tables via common.save_figure()
 # Value: filename expected in prose/fig/
-FIGURE_COPIES = {
-    "fig_03_complexity_fit": "03-complexity-fit",
-}
+#
+# The figure inventory lives in `reproduce/figures/registry.py` -- one row per
+# figure cited in the prose, naming its generator and the environment it needs.
+# Importing it here means adding a figure is a one-file edit; the fallback keeps
+# this script working if it is ever run somewhere `reproduce/` is not present.
+def _figure_copies():
+    figures_dir = os.path.join(HERE, "..", "..", "reproduce", "figures")
+    try:
+        sys.path.insert(0, os.path.abspath(figures_dir))
+        import registry
+        return registry.figure_copies()
+    except Exception as exc:  # noqa: BLE001 -- report and fall back, never abort a build
+        print(f"  [warn] figure registry unavailable ({exc.__class__.__name__}); "
+              f"copying only the Chapter 3 complexity fit")
+        return {"fig_03_complexity_fit": "03-complexity-fit"}
+
+
+FIGURE_COPIES = _figure_copies()
 
 
 # --------------------------------------------------------------------------- #
@@ -222,10 +237,6 @@ def find_latex_engine():
 
 
 TITLE_BLOCK = rf"""---
-title: "{TITLE}"
-subtitle: "{SUBTITLE}"
-author: "{AUTHOR}"
-date: "Dissertation Proposal · Draft"
 documentclass: article
 papersize: letter
 geometry: margin=1.05in
@@ -233,6 +244,12 @@ fontsize: 11pt
 linestretch: 1.15
 numbersections: false
 colorlinks: true
+header-includes: |
+  \usepackage{{titlesec}}
+  \titleformat{{\section}}{{\Large\bfseries}}{{}}{{0pt}}{{}}
+  \titlespacing{{\section}}{{0pt}}{{0pt}}{{\baselineskip}}
+  \let\oldsection\section
+  \renewcommand\section{{\clearpage\oldsection}}
 ---
 
 """
@@ -244,13 +261,42 @@ def build_with_latex(md_path, pandoc, engine):
     src = os.path.join(BUILD, "proposal-titled.md")
     with open(md_path) as f:
         body = f.read()
+
+    # Construct title page with department and committee info
+    # DEPT has \\\\ which should become \\ (newline) in LaTeX output
+    dept_for_latex = DEPT.replace("\\\\", "\\\\\\par")
+
+    title_page = TITLE_BLOCK + f"""
+```{{=latex}}
+\\begin{{titlepage}}
+\\centering
+\\vspace*{{2.2in}}
+{{\\Large\\bfseries {TITLE}\\par}}
+\\vskip 0.35em
+{{\\normalsize\\color{{gray}} {SUBTITLE}\\par}}
+\\vskip 2.4em
+{{\\normalsize {AUTHOR}\\par}}
+\\vskip 0.6em
+{{\\small {dept_for_latex}\\par}}
+\\vskip 0.6em
+{{\\small {COMMITTEE}\\par}}
+\\vskip 0.6em
+{{\\small Dissertation Proposal · Draft\\par}}
+\\vfil
+\\end{{titlepage}}
+```
+"""
+
     with open(src, "w") as f:
-        f.write(TITLE_BLOCK + body)
+        f.write(title_page + body)
+    prose_dir = os.path.join(HERE, "prose")
     cmd = [pandoc, src, "-o", pdf,
            f"--pdf-engine={engine}",
            "--from", "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks",
            "-V", "linkcolor=blue",
-           "--wrap=preserve"]
+           "--wrap=preserve",
+           "--resource-path", prose_dir,
+           "-V", "titlepage=true"]
     print(f"  pandoc + {engine} ...")
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
@@ -268,9 +314,11 @@ def build_with_weasyprint(md_path, pandoc):
         return None
 
     html_path = os.path.join(BUILD, "proposal.html")
+    prose_dir = os.path.join(HERE, "prose")
     cmd = [pandoc, md_path, "-o", html_path, "--standalone", "--mathml",
            "--from", "markdown+tex_math_dollars+pipe_tables", "--wrap=preserve",
-           "--metadata", f"title={TITLE}"]
+           "--metadata", f"title={TITLE}",
+           "--resource-path", prose_dir]
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         print(res.stderr[-1500:])
@@ -331,11 +379,27 @@ def build_with_weasyprint(md_path, pandoc):
 
 
 def page_count(pdf):
+    """Extract page count from PDF using pdfinfo or fallback parsing."""
+    try:
+        import subprocess
+        result = subprocess.run(["pdfinfo", pdf], capture_output=True, text=True)
+        if result.returncode == 0:
+            for line in result.stdout.split("\n"):
+                if line.startswith("Pages:"):
+                    return int(line.split(":")[1].strip())
+    except Exception:
+        pass
+    # Fallback: try to extract from uncompressed sections
     try:
         with open(pdf, "rb") as f:
-            return len(re.findall(rb"/Type\s*/Page\b", f.read()))
+            content = f.read()
+            # Look for /Count entries which indicate page counts
+            matches = re.findall(rb"/Count\s+(\d+)", content)
+            if matches:
+                return int(matches[0])
     except Exception:
-        return None
+        pass
+    return None
 
 
 def main():
