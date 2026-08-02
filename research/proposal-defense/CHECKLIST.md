@@ -65,13 +65,13 @@ it needs your records rather than a decision._
 - [x] ✅ **B3 — Timings reported as ratios, seconds kept in CSV.** `common.normalized_worst()`
       normalizes each row against its slowest arm; `emit(md_header=, md_rows=)` lets Markdown
       and CSV diverge. Applied to `table_3_1_pvat_scaling` and `table_3_1_reorder_three_arm`.
-- [ ] ⬜ **B8 — Automate the harness → document figure hop.** `save_figure()` writes to
+- [x] ⬜ **B8 — Automate the harness → document figure hop.** `save_figure()` writes to
       `reproduce/outputs/figures/fig_03_complexity_fit.{png,eps}`; the document references
       `prose/fig/03-complexity-fit.png`. That copy is **manual today**. `build_pdf.py` now
       emits an image line when the target exists and still strips it when it does not, so a
       figure that is not copied across silently reverts to a placeholder — which is the
       failure mode worth automating away. A name map plus a copy step in the build closes it.
-- [ ] ⬜ **B4 — Submodule SHA guard.** The harness should refuse to emit, or loudly stamp, when
+- [x] ⬜ **B4 — Submodule SHA guard.** The harness should refuse to emit, or loudly stamp, when
       a submodule SHA differs from the last archive's. **This failure has happened twice** —
       once with `fix/pin-extreme-bucket-means`, once with `resolve-flm-pr`. Highest-value
       remaining infra item.
@@ -79,7 +79,7 @@ it needs your records rather than a decision._
       hosts: the swept grid is laptop data, the memory ceilings and large reorders are
       workstation. Cheap, and it also settles whether the ~45% swing was thermal or
       cross-machine. *(Author: earlier results were a faster machine — flagged, not a blocker.)*
-- [ ] ⬜ **B6 — Fix or remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
+- [x] ⬜ **B6 — Remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
       returns a wrong ordering (seed vertex, then ascending index order). Cause is a vectorized
       call to a scalar-typed `_get_dist`. Nothing calls it. See `REVIEW` ★2.
 
