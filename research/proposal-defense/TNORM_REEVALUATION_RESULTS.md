@@ -111,7 +111,7 @@ They also explain the runtime jumps that looked alarming mid-run
   wall-clock or a speed-up ratio derived from wall-clock, none beyond seed
   spread. `tribble-cluster` is at the identical SHA in both runs, so this is
   thermal/scheduling variance and nothing else. Worth noting the variance is not
-  small — the 256-point pVAT cell reads 1.271 ± 2.536 s vs 0.031 ± 0.058 s — which
+  small — the 256-point mergeVAT cell reads 1.271 ± 2.536 s vs 0.031 ± 0.058 s — which
   is exactly the instability the G4 protocol exists to fix.
 
 ## 4. What still cannot be answered

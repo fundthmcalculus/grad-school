@@ -146,6 +146,20 @@ def _try(build):
         return None
 
 
+def normalize(X):
+    """`concrete.py`'s feature treatment: auto log-transform, then standardize.
+
+    Shared rather than duplicated, because a second copy of this that drifted
+    would silently make two tables incomparable -- which is the exact failure
+    this harness exists to catch.
+
+    Returns (transformed_X, names_of_logged_columns).
+    """
+    from tribblefis.gauss_math import detect_and_apply_log_transform, standard_transform
+    Xt, logged = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
+    return standard_transform(Xt, column=Xt.columns), logged
+
+
 def mog_regressor(seed):
     from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
     return _try(lambda: MixtureOfGaussiansFuzzyRegressor(

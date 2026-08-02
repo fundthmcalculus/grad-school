@@ -53,6 +53,10 @@ sys.path.insert(0, os.path.dirname(_TABLES))
 sys.path.insert(0, _TABLES)
 import common as C            # noqa: E402
 import _fuzzy_models as F     # noqa: E402
+# One definition, shared with table_4_1: a second copy that drifted would make
+# the two tables quietly incomparable, which is the failure this harness exists
+# to catch.
+from _fuzzy_models import normalize  # noqa: E402
 
 ORDERS = [o.strip() for o in os.environ.get("REPRO_ORDERS", "1st,2nd,full-2nd").split(",")]
 N_BUCKETS = 3
@@ -61,13 +65,6 @@ L2 = 1e-2
 
 def _rmse(y, p):
     return float(np.sqrt(mean_squared_error(y, p)))
-
-
-def normalize(X):
-    """concrete.py's feature treatment: auto log-transform, then standardize."""
-    from tribblefis.gauss_math import detect_and_apply_log_transform, standard_transform
-    Xt, logged = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
-    return standard_transform(Xt, column=Xt.columns), logged
 
 
 # --------------------------------------------------------------------------- #
@@ -182,17 +179,20 @@ def main():
         nrm = store.get((model, setting, "log+standardized"))
         r_raw = C.cell(raw["r2"]) if raw else C.NA
         r_nrm = C.cell(nrm["r2"]) if nrm else C.NA
+        e_raw = C.cell(raw["rmse"]) if raw else C.NA
+        e_nrm = C.cell(nrm["rmse"]) if nrm else C.NA
         delta = C.NA
         if raw and nrm:
             a, _ = C.agg(raw["r2"])
             b, _ = C.agg(nrm["r2"])
             if a is not None and b is not None:
                 delta = f"{b - a:+.3f}"
-        rows.append([model, setting, r_raw, r_nrm, delta])
+        rows.append([model, setting, r_raw, r_nrm, delta, e_raw, e_nrm])
 
     C.emit("table_hyperparam_normalization",
-           "Concrete — hyperparameters × normalization (R², mean ± std over seeds)",
-           ["Model", "Hyperparameters", "raw features", "log + standardized", "Δ from normalizing"],
+           "Concrete — hyperparameters × normalization (R² and RMSE, mean ± std over seeds)",
+           ["Model", "Hyperparameters", "raw features", "log + standardized", "Δ from normalizing",
+            "RMSE raw (MPa)", "RMSE log+std (MPa)"],
            rows,
            note=("Normalization = auto log-transform of high-dynamic-range features (%s) "
                  "followed by feature standardization, exactly as `concrete.py` applies it. "
