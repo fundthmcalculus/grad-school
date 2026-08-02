@@ -45,20 +45,36 @@ import problem as P       # noqa: E402
 from budget import BudgetedObjective  # noqa: E402
 
 
+def checkpoints_for(budget):
+    """Budgets at which to snapshot, roughly a quarter-decade apart."""
+    grid = [125, 250, 500, 1000, 2000, 4000, 8000]
+    return [c for c in grid if c < budget] + [budget]
+
+
 def run_one(arm, dataset, seed, budget, radius, order, hp):
     """One (arm, seed) measurement. Returns a record dict, never raises."""
     prob = P.build(dataset=dataset, seed=seed, order=order, radius=radius)
-    obj = BudgetedObjective(prob.fitness, max_evals=budget, x0=prob.x0).start()
+    obj = BudgetedObjective(prob.fitness, max_evals=budget, x0=prob.x0,
+                            checkpoints=checkpoints_for(budget)).start()
 
     error = None
     try:
         A.run(arm, obj, prob, seed, **hp)
     except Exception as exc:  # noqa: BLE001 -- one bad arm must not kill the run
         error = f"{exc.__class__.__name__}: {exc}"
+    obj.finalize()
 
     r2, rmse = prob.score(obj.best_x)
     r2_0, rmse_0 = prob.score(prob.x0)
+    # The budget curve: what this arm would have delivered had it been stopped
+    # earlier. Scoring is cheap next to the search, so the whole curve comes out
+    # of the one run rather than out of one run per budget.
+    curve = []
+    for cp, (x_cp, f_cp, secs) in sorted(obj.snapshots.items()):
+        r2_cp, _ = prob.score(x_cp) if x_cp is not None else (float("nan"),) * 2
+        curve.append((cp, f_cp, r2_cp, secs))
     return {
+        "curve": curve,
         "arm": arm, "dataset": dataset, "seed": seed,
         "n_params": prob.n_params,
         "cv_mse_0": obj.f0, "cv_mse": obj.best_f,
@@ -166,7 +182,19 @@ def main():
 
     _write_traces(records)
     _write_seeds(records)
+    _write_curve(records)
     return 0
+
+
+def _write_curve(records):
+    """Held-out R² as a function of the evaluation budget, per arm and seed."""
+    path = os.path.join(C.OUTPUT_DIR, "table_opt_hotstart_budget.csv")
+    header = ["arm", "seed", "budget", "cv_mse", "r2", "r2_0", "seconds"]
+    rows = [[r["arm"], r["seed"], cp, f"{f:.6f}", f"{r2:.6f}",
+             f"{r['r2_0']:.6f}", f"{secs:.2f}"]
+            for r in records for (cp, f, r2, secs) in r["curve"]]
+    C.write_csv(path, header, rows)
+    print(f"  wrote {path}")
 
 
 def _write_seeds(records):
