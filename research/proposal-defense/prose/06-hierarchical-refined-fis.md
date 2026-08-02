@@ -49,7 +49,7 @@ I have designed it but not implemented it. The E-step assigns each point a respo
 
 I am careful about one thing here: the novelty of this work does **not** rest on the EM estimator, which is entirely standard since Jordan and Jacobs. It rests on the composition — that the M-step reduces to the same shared ridge primitive used everywhere else in the chapter. The EM is a proposed deliverable, and if it slips, the one-shot mixture and the trees stand on their own as completed contributions.
 
-**[FIGURE 6.2 — placeholder]** *The hierarchical mixture structure: fuzzy gates over named inputs routing to TSK sub-experts. Emphasize that gates split only on original variables (the Magdalena condition).*
+**Figure 6.2 — The hierarchical mixture of fuzzy experts.** A tree of fuzzy partition-of-unity gates over named inputs, routing to leaves that are themselves full ridge-TSK sub-models. Two things the figure is drawn to make unmissable. The routing is *soft*: a point does not land in one leaf, it reaches every leaf with a weight that is the product of the gate memberships along its path, and the output is the weighted average — which is what separates this from a decision tree with extra steps. And every gate names an *original* input. No synthetic intermediate can appear in one, because the declarative plan of §6.3.4 cannot express it, which is how the Magdalena condition of §6.2 is enforced rather than merely respected. The structure shown is schematic; the variable names are Concrete's, matching what the tree of §6.3.2 actually recovers.
 `![hme-structure](fig/06-hme-structure.png)`
 
 ### 6.3.4 Declarative structure and Ruspini export (built)

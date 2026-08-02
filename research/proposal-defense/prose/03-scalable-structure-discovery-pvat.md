@@ -53,7 +53,7 @@ That is the honest reading of the name: it points at the piece of the method wit
 
 > **Publication status.** Stage two is not yet published. What a write-up could and could not claim is set out in §9.3, after a prior-art search substantially narrowed it.
 
-**[FIGURE 3.1 — placeholder]** *Block diagram of the mergeVAT reorder: the priority-queue extraction of the minimum remaining dissimilarity, replacing the classical linear-scan argmin. (Adapt `vat_prim_mst_block_diagram_v2.svg`.)*
+**Figure 3.1 — The mergeVAT reorder, against the classical linear scan.** All three arms share one outer loop: seed at the farther endpoint of the most-dissimilar pair, append the nearest unplaced point, repeat $N-1$ times, and emit an ordering that is bit-identical across the three. What differs is the step inside it. The classical arm re-scans every (placed, unplaced) pair and recomputes from scratch a minimum it has just computed, at $O(N^3)$; stage one pushes each relaxation onto a priority queue and discards stale entries on the way out, at $O(N^2 \log N)$; stage two observes that the reorder only ever needs the *current* minimum, fuses the relaxation and the selection into one pass over a compact active set, and drops the heap and the log factor together, at $O(N^2)$. The figure is a schematic — what the difference is worth in wall-clock is Figure 3.2 and Table 3.1.
 `![pvat-reorder](fig/03-pvat-reorder.png)`
 
 ### 3.3.2 Holding it in one matrix
