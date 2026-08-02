@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/grad-school.iml" filepath="$PROJECT_DIR$/.idea/grad-school.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/optimizers.iml" filepath="$PROJECT_DIR$/.idea/optimizers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/tribble-clustering.iml" filepath="$PROJECT_DIR$/.idea/tribble-clustering.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/tribble-fis.iml" filepath="$PROJECT_DIR$/.idea/tribble-fis.iml" />
     </modules>
   </component>
 </project>
