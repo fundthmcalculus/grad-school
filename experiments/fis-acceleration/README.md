@@ -2,10 +2,20 @@
 
 **Status:** complete, all five PRs open · **Started:** 2026-08-01
 
-Findings are in [`RESULTS.md`](RESULTS.md). Short version: **3.7–5.5x on
-training, 3.3–8.7x on inference, bit-identical output**, plus a further 1.9–4.9x
-available on a GPU as an explicit opt-in. Two of the four hypotheses came back
-wrong in instructive ways — see the scoring section there.
+Findings are in [`RESULTS.md`](RESULTS.md). Short version:
+
+*Phase 1 (acceleration):* **3.7–5.5x on training, 3.3–8.7x on inference,
+bit-identical output**, plus a further 1.9–4.9x available on a GPU as an explicit
+opt-in.
+
+*Phase 2 (operators and search):* once the arithmetic was fast, the bottleneck
+moved out of it and the question became a modelling one. `min/max` turned out to
+be the **worst** of the four De Morgan families; switching the default to
+`probability` and pairing it with SLSQP plus an analytic gradient gives
+**+2.6 points of accuracy and another 1.96x** on top.
+
+Five of the seven hypotheses across both phases came back wrong, several in
+instructive ways — see the scoring sections there.
 
 ## Question
 

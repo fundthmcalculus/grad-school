@@ -114,7 +114,71 @@ an interactive matplotlib backend stalled on `plt.show()` inside
 fuzzy inference and was worth more per day than several of the optimizations
 above.
 
+## Phase 2: the bottleneck moved, and so did the question
+
+With the arithmetic ~5x faster, training stopped being dominated by it, and the
+next round turned into a *modelling* investigation rather than a performance one.
+Details in `tribble-fis/docs/analytic-gradient-evaluation.md` and
+`norm-family-evaluation.md`.
+
+**The default t-norm family was the wrong one.** Across 18 dataset × split
+combinations (iris, wine, breast_cancer, digits, two overlapping
+`make_classification` problems), `min/max` measured as the *worst* of the four
+De Morgan families:
+
+| family | refined accuracy | vs min/max |
+|---|---|---|
+| min/max | 0.7881 | — |
+| hamacher | 0.8029 | +0.0148 ± 0.0078 |
+| probability | 0.8135 | +0.0254 ± 0.0063 |
+| einstein | 0.8175 | +0.0294 ± 0.0061 |
+
+`luk` is unusable past a handful of features — its bounded sum saturates and
+leaves 99–100% of rows with no membership at all (mean accuracy 0.4458).
+
+**A bug made the earlier question unanswerable.** `refine_classifier_antecedents`
+hard-coded the default pair and the estimator never passed `norm_conorm` down, so
+`norm_conorm="probability", refine=True` tuned against min/max firing strengths
+and deployed under the probabilistic pair. The accept/reject guard scored under
+the wrong pair too. Fixed before any of the above was measured.
+
+**Old defaults vs new**, same protocol:
+
+| | accuracy | worst | time |
+|---|---|---|---|
+| min/max + L-BFGS-B + finite differences | 0.7881 | 0.3722 | 906.5 ms |
+| probability + SLSQP + analytic gradient | **0.8138** | **0.4028** | **463.2 ms** |
+
+**+0.0257 ± 0.0070 accuracy and 1.96x faster.** Accuracy from the family, speed
+from the solver and the gradient; they compose because they act on different
+parts of the problem.
+
+### Three more hypotheses that died on measurement
+
+- **"An analytic gradient will just be faster."** Under `min/max` it is a
+  *subgradient*, and it turned the search into an accuracy lottery — mean −0.9pp,
+  worst −9.7pp — for 1.43x. Under `probability` the objective is smooth, the
+  closed form is exact, and the same measurement gives +0.0012 ± 0.0026 at 1.74x.
+  The flag now keys on smoothness rather than being on or off.
+- **"SLSQP is 1.60x free."** It was, under min/max. Re-measured under the new
+  default family it is 1.14x — the smooth surface already suits L-BFGS-B, so
+  there is less to win. Worth taking, but the number does not transfer.
+- **"cProfile found two easy wins."** It had not. Both survived a first
+  measurement at 1.12x and evaporated under a paired isolated A/B (medians 648 ms
+  → 652 ms). cProfile's per-call overhead systematically overstates small
+  functions called thousands of times, which is every function in that loop.
+
+### The acceptance guard does not do what its name suggests
+
+Worth recording independently. It compares a refined model against the
+*heuristic*, which scored 0.005–0.51 on these problems — so it accepts
+essentially everything, including a run that lost 9.7 points against a sibling
+configuration. It protects against refining being worse than not refining, and
+says nothing about one refinement being worse than another.
+
 ## The PR stack
+
+Phase 1 — acceleration:
 
 | | PR | receipt |
 |---|---|---|
@@ -123,3 +187,14 @@ above.
 | 3 | [#55](https://github.com/fundthmcalculus/tribble-fis/pull/55) Cython kernel, threaded | forward 3.9–9.2x, training 2.13x |
 | 4 | [#56](https://github.com/fundthmcalculus/tribble-fis/pull/56) incremental fitness | training 5.52x on a realistic model |
 | 5 | [#57](https://github.com/fundthmcalculus/tribble-fis/pull/57) Torch/CUDA backend | 1.86–4.91x, opt-in only |
+
+Merged as the squashed [#58](https://github.com/fundthmcalculus/tribble-fis/pull/58).
+
+Phase 2 — operators and search:
+
+| PR | receipt |
+|---|---|
+| [#59](https://github.com/fundthmcalculus/tribble-fis/pull/59) analytic gradient | built, evaluated, shipped off — the min/max verdict |
+| [#60](https://github.com/fundthmcalculus/tribble-fis/pull/60) norm pass-through | the bug that made the rest measurable; `sub_method` |
+| [#61](https://github.com/fundthmcalculus/tribble-fis/pull/61) probability default | +2.5pp accuracy |
+| [#64](https://github.com/fundthmcalculus/tribble-fis/pull/64) SLSQP + auto gradient | 1.96x combined, accuracy-positive |
