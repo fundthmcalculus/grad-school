@@ -2,6 +2,8 @@
 
 Prioritized plan of record. `ACTION_ITEMS.md` is the full backlog with findings and history; this file is what to do next and in what order.
 
+**For the live burn-down list, see [`CHECKLIST.md`](CHECKLIST.md)** — tickable items with enough context to start cold, and the record of what the 2026-08-02 review pass closed. [`REVIEW_2026-08-02.md`](REVIEW_2026-08-02.md) is the findings report behind it.
+
 _Last updated: 2026-07-31. Proposal defense ~Dec 2026 · final defense March 2028._
 
 **Where things stand.** Chapters 1–8 and 10 are drafted and quality-passed (92 pages). The bibliography is consolidated and verified (70 entries, 0 unresolved). A reproduction harness runs 19 registered experiments, 6 of them verified end-to-end, and it has already produced four corrections to the text and one upstream bug fix. What is left divides cleanly into things only you can decide, cheap wins, and real research.
@@ -41,7 +43,7 @@ _Last updated: 2026-07-31. Proposal defense ~Dec 2026 · final defense March 202
 | **G6** | Interpretability measured, not asserted: rule counts, path lengths, and either an established metric or a small expert study. Fills Table 6.3's pending row. | 2028 Q1 |
 | **G7** | *(stretch, first to cut)* Adaptive band discovery for overlapping density scales. | 2028 Q1 |
 
-**G5 (output partitioning) is complete** — quantile by default; see Ch 4 Tables 4.2–4.3.
+**G5 (output partitioning) is reopened.** The three-seed recommendation ("quantile by default") did not survive ten seeds — the sign reverses in every row past symmetry, because quantile becomes *unstable* under skew rather than less accurate. See Ch 4 §4.3.2 and Ch 7 §7.2. What survives is the diagnosis; the remaining work is a decision, not corroboration: either characterize and guard quantile's instability, or accept that a heavily skewed target needs a transform rather than a better partition.
 
 ---
 

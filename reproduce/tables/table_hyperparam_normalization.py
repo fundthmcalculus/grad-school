@@ -182,17 +182,20 @@ def main():
         nrm = store.get((model, setting, "log+standardized"))
         r_raw = C.cell(raw["r2"]) if raw else C.NA
         r_nrm = C.cell(nrm["r2"]) if nrm else C.NA
+        e_raw = C.cell(raw["rmse"]) if raw else C.NA
+        e_nrm = C.cell(nrm["rmse"]) if nrm else C.NA
         delta = C.NA
         if raw and nrm:
             a, _ = C.agg(raw["r2"])
             b, _ = C.agg(nrm["r2"])
             if a is not None and b is not None:
                 delta = f"{b - a:+.3f}"
-        rows.append([model, setting, r_raw, r_nrm, delta])
+        rows.append([model, setting, r_raw, r_nrm, delta, e_raw, e_nrm])
 
     C.emit("table_hyperparam_normalization",
-           "Concrete — hyperparameters × normalization (R², mean ± std over seeds)",
-           ["Model", "Hyperparameters", "raw features", "log + standardized", "Δ from normalizing"],
+           "Concrete — hyperparameters × normalization (R² and RMSE, mean ± std over seeds)",
+           ["Model", "Hyperparameters", "raw features", "log + standardized", "Δ from normalizing",
+            "RMSE raw (MPa)", "RMSE log+std (MPa)"],
            rows,
            note=("Normalization = auto log-transform of high-dynamic-range features (%s) "
                  "followed by feature standardization, exactly as `concrete.py` applies it. "

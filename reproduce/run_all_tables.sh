@@ -192,6 +192,30 @@ PROV="$DEST/PROVENANCE.txt"
   echo "grad-school: $(git -C "$ROOT" rev-parse HEAD)"
   echo "seeds:       $FULL_SEEDS${REPRO_SEEDS:+ (REPRO_SEEDS override in effect)}"
   echo
+  # Machine identity. Recorded because timings are not portable between hosts OR
+  # between runs on one host: the same generator, same tribble-cluster commit and
+  # same ten seeds moved every wall-clock figure in Table 3.1 by ~45% across two
+  # runs hours apart, while the speedup RATIO moved under 3%. Without this block
+  # a future reader cannot tell a code change from a thermal one. The governor and
+  # boost fields are here for the same reason -- they are the usual culprits.
+  echo "machine:"
+  printf '  %-16s %s\n' "host"     "$(hostname 2>/dev/null || echo unknown)"
+  printf '  %-16s %s\n' "os"       "$( (. /etc/os-release 2>/dev/null && echo "$PRETTY_NAME") || uname -s )"
+  printf '  %-16s %s\n' "kernel"   "$(uname -srm 2>/dev/null)"
+  printf '  %-16s %s\n' "cpu"      "$(sed -n 's/^model name[[:space:]]*:[[:space:]]*//p' /proc/cpuinfo 2>/dev/null | head -1)"
+  printf '  %-16s %s\n' "cores"    "$(nproc 2>/dev/null) logical$(LC_ALL=C lscpu 2>/dev/null | sed -n 's/^Core(s) per socket:[[:space:]]*/, /p' | tr -d '\n' | sed 's/$/ physical per socket/')"
+  printf '  %-16s %s\n' "ram"      "$(awk '/MemTotal/ {printf "%.1f GiB (%.1f GB decimal)", $2/1048576, $2*1024/1e9}' /proc/meminfo 2>/dev/null)"
+  printf '  %-16s %s\n' "governor" "$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null || echo 'n/a')"
+  printf '  %-16s %s\n' "boost"    "$(cat /sys/devices/system/cpu/cpufreq/boost 2>/dev/null || echo 'n/a')"
+  if command -v nvidia-smi >/dev/null 2>&1; then
+    nvidia-smi --query-gpu=name,memory.total,driver_version \
+               --format=csv,noheader 2>/dev/null \
+      | while IFS= read -r g; do printf '  %-16s %s\n' "gpu" "$g"; done
+  else
+    printf '  %-16s %s\n' "gpu" "$(lspci 2>/dev/null | grep -iE 'vga|3d controller' | sed 's/^[^ ]* //' | head -1 || echo 'none detected')"
+  fi
+  printf '  %-16s %s\n' "python"   "$(python3 -V 2>&1)"
+  echo
   echo "status:"
   for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}"; do
     # Unset means the filter skipped it; say so rather than claiming a result.

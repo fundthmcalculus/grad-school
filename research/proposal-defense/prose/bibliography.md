@@ -9,16 +9,17 @@ A note on provenance and verification. The fuzzy-inference, fuzzy-tree, and mixt
 - **AuToMATo**'s title and authors were corrected (Huber, Kališnik, Schnider; *"An Out-Of-The-Box…"*, TMLR 2025).
 - **ConiVAT** remains an arXiv preprint only (arXiv:2008.09570) — no journal DOI exists, so none is asserted.
 
-Two items remain open, and one of them is not cosmetic:
+One item remains open, and it is cosmetic:
 
-- ⚠️ **One citation is still broken.** Chapters 2 and 3 refer to the kd-tree memory methods as "[*Information Sciences* 2024]" — a journal name and a year, with no author, title, or DOI. It sits in the `.bib` as `kdtreevat2024`, flagged `[!]`, and it will not survive review in that state. It also matters more than most: that line is the one achieving *sub-quadratic* memory for Euclidean data, so it is load-bearing for Chapter 3's argument about which regime is unoccupied. Resolving it is tracked in `ACTION_ITEMS.md`.
 - A proof-stage check: confirm the "Kališnik" accent survives the final BibTeX/LaTeX encoding.
+
+The formerly broken citation is resolved. Chapters 2 and 3 once referred to the kd-tree memory methods only as "[*Information Sciences* 2024]" — a journal name and a year, with no author, title, or DOI. That entry is now `deshpande2024scalable`, verified, and cited by name in §2.2 and §3.2. It matters more than most, because it is the line achieving *sub-quadratic* memory for Euclidean data and is therefore load-bearing for Chapter 3's argument about which regime is unoccupied.
 
 ## Reading guide by area
 
 - **Fuzzy inference systems, trees, and mixtures of experts** — the TSK form and ANFIS (`takagi1985fuzzy`, `jang1993anfis`, `wu2020optimize`); rule generation from data (`sugeno1993qualitative`, `wang1992generating`, `chiu1994fuzzy`, `abe1995method`, `jang1993functional`); genetic fuzzy systems (`cordon2001genetic`, `herrera2008genetic`, `alcala2007rule`); fuzzy and soft trees (`janikow1998fuzzy`, `yuan1995induction`, `suarez1999globally`, `olaru2003complete`, `medina2001backpropagation`, `fumanal2025fast`); hierarchical mixtures and TSK-fusion (`jordan1994hierarchical`, `wu2020functional`, `raju1991hierarchical`, `zhou2017deep`, `zhang2023tsk`); Ruspini partitions and interpretable design (`ruspini1969new`, `guillaume2004generating`, `deoliveira1999semantic`, `guillaume2006expert`, `guillaume2011learning`, `nanfack2022constraint`); cascades (`viola2001rapid`, `cavalin2019confusion`); universal approximation and the interpretability caveat (`wang1998universal`, `wang1999analysis`, `joo2002universal`, `magdalena2018do`, `higashi1983measures`).
-- **VAT / iVAT / cluster tendency** — `bezdek2002vat`, `wang2010ivat`, `havens2012efficient`, `kumar2016clusivat`, `kumar2020vatsurvey`, `rathore2020conivat`, and the fast-VAT competitors `meng2018evat`, `avinash2025fastvat`.
-- **MST, single-linkage, and Fuzzy C-Means** — `prim1957shortest`, `gower1969mst`, `zahn1971graph`, `dunn1973fuzzy`, `bezdek1981pattern`, `hathaway1994nerf`, `bien2011hierarchical`, `tibshirani2001gap`, `cate1977insitu`.
+- **VAT / iVAT / cluster tendency** — `bezdek2002vat`, `wang2010ivat`, `havens2012efficient`, `kumar2016clusivat`, `kumar2016incvat`, `kumar2020vatsurvey`, `rathore2020conivat`; the fast-VAT competitors `meng2018evat`, `avinash2025fastvat`, and `deshpande2024scalable` (the closest prior art, and the source of Chapter 3 §3.2's narrowed niche claim); and `parveen2013pvat`, the prior method of that name whose collision with mine is discussed in §3.3.1.
+- **MST, single-linkage, and Fuzzy C-Means** — `prim1957shortest`, `gower1969mst`, `zahn1971graph`, `havens2009disguise` and `mullner2011modern` (together the two papers from which §3.3.1's space-bound correction can be assembled, which is why §9.3 scopes that note as an audit rather than a result), `dunn1973fuzzy`, `bezdek1981pattern`, `hathaway1994nerf`, `bien2011hierarchical`, `tibshirani2001gap`, `cate1977insitu`.
 - **Persistence and topological data analysis** — `chazal2013persistence` (ToMATo), `bonis2018fuzzy` (the nearest precedent for Chapter 5), `automato2024`.
 - **Optimization, TSP, and quality-diversity** — `lin1973effective`, `helsgaun2000effective`, `croes1958method`, `dorigo1996ant`, `kennedy1995particle`, `deb2002nsga2`, `mouret2015illuminating`, `vassiliades2018cvt`.
 - **Interpretability / XAI** — `lundberg2017shap`.

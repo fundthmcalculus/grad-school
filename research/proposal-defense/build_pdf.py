@@ -76,8 +76,13 @@ def replace_mermaid(md):
     return re.sub(r"```mermaid.*?```", note, md, flags=re.DOTALL)
 
 
-def strip_editorial(md):
-    """Drop scaffolding that shouldn't appear in a reading copy."""
+def strip_editorial(md, src_dir=None):
+    """Drop scaffolding that shouldn't appear in a reading copy.
+
+    `src_dir` is the directory the Markdown came from, used to resolve image
+    references so a figure that actually exists can be told from one that is
+    still a placeholder.
+    """
     md = replace_mermaid(md)
     out = []
     for line in md.split("\n"):
@@ -87,7 +92,15 @@ def strip_editorial(md):
             continue
         if s.startswith("*Draft —") or s.startswith("*Source of truth:"):
             continue
-        if re.match(r"^`!\[.*\]\(.*\)`$", s):        # image placeholder lines
+        m = re.match(r"^`!\[.*\]\((.*)\)`$", s)      # image reference lines
+        if m:
+            # Strip the line only while the figure is still a PLACEHOLDER. Once
+            # the file exists, emit it as a real image so a generated figure
+            # actually reaches the built document -- previously every image line
+            # was dropped unconditionally, so producing a figure had no effect.
+            target = os.path.join(src_dir or HERE, m.group(1))
+            if os.path.exists(target):
+                out.append(s.strip("`"))
             continue
         out.append(line)
     return re.sub(r"\n{4,}", "\n\n\n", "\n".join(out))
@@ -100,7 +113,7 @@ def assemble():
         md = read(rel)
         if md is None:
             continue
-        parts.append(strip_editorial(md))
+        parts.append(strip_editorial(md, os.path.dirname(os.path.join(HERE, rel))))
         print(f"  + {rel}")
     combined = "\n\n\n".join(parts)
     md_path = os.path.join(BUILD, "proposal-combined.md")
