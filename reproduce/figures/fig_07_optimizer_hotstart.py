@@ -76,48 +76,58 @@ def build():
     ax.text(budget, start, "  heuristic start", va="center", ha="left",
             fontsize=F.FS_SMALL, color=F.MUTED)
 
-    finals = {}
+    finals, gains = {}, {}
     for i, arm in enumerate(present):
         curves = np.vstack([_step(tr, grid) for tr in by_arm[arm].values()])
+        starts = np.array([tr[0][2] for tr in by_arm[arm].values()])
         median = np.median(curves, axis=0)
         colour = F.SERIES[i % len(F.SERIES)]
-        ax.plot(grid, median, lw=1.7, color=colour, label=arm, zorder=4)
-        # Spread across seeds, drawn as a band rather than error bars: at 220
-        # grid points bars would be a solid block of ink.
-        ax.fill_between(grid, curves.min(axis=0), curves.max(axis=0),
-                        color=F.tint(colour, 0.88), lw=0, zorder=3 - i * 0.01)
+        ax.plot(grid, median, lw=1.7, color=colour, label=arm, zorder=5)
+        # Inter-quartile band, not min-max. One arm's worst seed here is four
+        # times its median improvement, and a min-max band for it covers the
+        # whole panel and hides every other arm's line. The spread that matters
+        # is reported per arm in the table's ± columns.
+        ax.fill_between(grid, np.percentile(curves, 25, axis=0),
+                        np.percentile(curves, 75, axis=0),
+                        color=F.tint(colour, 0.90), lw=0, zorder=2)
         finals[arm] = median[-1]
+        # Per-seed fractional improvement, then averaged -- the same statistic
+        # the table's "vs start" column reports. Aggregating the medians first
+        # gives a different number, and a figure that disagrees with its own
+        # table is the failure this harness exists to prevent.
+        gains[arm] = float(np.mean(100 * (starts - curves[:, -1]) / starts))
 
     ax.set_xscale("log")
     F.style_axes(ax, title="(a)  best objective so far, median over seeds",
                  xlabel="objective evaluations (log)",
                  ylabel="k-fold held-out MSE")
     ax.set_xlim(1, budget * 1.35)
-    F.legend(ax, loc="upper right", ncol=2)
+    F.legend(ax, loc="lower left", ncol=2)
 
     # -- right: how much of the start each arm removed -----------------------
-    order = sorted(present, key=lambda a: finals[a])
+    order = sorted(present, key=lambda a: -gains[a])
     y = np.arange(len(order))
-    gains = [100 * (start - finals[a]) / start for a in order]
+    values = [gains[a] for a in order]
     colours = [F.SERIES[ARM_ORDER.index(a) % len(F.SERIES)] for a in order]
-    bar.barh(y, gains, color=colours, height=0.62, zorder=3)
-    for yi, g in zip(y, gains):
-        bar.text(g + max(gains) * 0.02, yi, f"{g:.1f}%", va="center",
+    bar.barh(y, values, color=colours, height=0.62, zorder=3)
+    for yi, g in zip(y, values):
+        bar.text(g + max(values) * 0.02, yi, f"{g:.1f}%", va="center",
                  ha="left", fontsize=F.FS_SMALL, color=F.INK_2)
     bar.set_yticks(y)
     bar.set_yticklabels(order, fontsize=F.FS_SMALL)
     bar.invert_yaxis()
     F.style_axes(bar, title="(b)  objective removed, at the full budget",
                  xlabel="% below the heuristic start", grid_axis="x")
-    bar.set_xlim(0, max(gains) * 1.22)
+    bar.set_xlim(0, max(values) * 1.22)
 
     fig.text(0.5, -0.02,
              f"All arms optimize the same objective from the same hot start "
              f"inside the same box, cut off at exactly {budget} evaluations by a "
              f"wrapper that raises —\nno arm's own stopping rule is trusted to make "
              f"the budgets equal. Single-threaded throughout, so an optimizer that "
-             f"parallelises well gets no credit here.\nBands are min–max across "
-             f"seeds. {H.provenance_note(label)}",
+             f"parallelises well gets no credit here.\nBands are the inter-quartile "
+             f"range across seeds; panel (b) averages the per-seed improvement, the "
+             f"same statistic the table reports. {H.provenance_note(label)}",
              ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
              linespacing=1.6)
     fig.tight_layout()
