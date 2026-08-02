@@ -102,13 +102,26 @@ def load_concrete():
 def load_phiusiil(sample_size=20000):
     """PhiUSIIL phishing. Reuse the repo's own loader if importable; else fetch
     via ucimlrepo (id 967); else return None so the column shows N/A."""
+    # The repo loader reads a CSV that used to live in the tribble-fis submodule
+    # and was deleted with gaussian_mixture/ (8484fd6). Point it at data/ before
+    # importing, so it finds the file rather than silently failing through to the
+    # ucimlrepo fallback -- which returns a DIFFERENT feature set (numeric-only,
+    # dropna) and drops accuracy from ~0.997 to ~0.913. A fallback that quietly
+    # changes the experiment is worse than no fallback.
+    local = os.path.join(DATA_DIR, "PhiUSIIL_Phishing_URL_Dataset.csv")
     try:
         sys.path.insert(0, os.path.join(FIS, "tribble-tree"))
         import demo_phishing  # noqa: E402  -- repo loader, exact same features
+        if os.path.exists(local):
+            demo_phishing.DATA_PATH = local
         X, y = demo_phishing.load_data(sample_size=sample_size, random_state=42)
+        print(f"  [phiusiil] repo loader, data from {os.path.relpath(local, REPO_ROOT)}"
+              if os.path.exists(local) else "  [phiusiil] repo loader, bundled path")
         return X, np.asarray(y)
     except Exception as exc:  # noqa: BLE001
-        print(f"  [phiusiil] repo loader unavailable ({exc.__class__.__name__}); trying ucimlrepo")
+        print(f"  [phiusiil] repo loader unavailable ({exc.__class__.__name__}); "
+              f"FALLING BACK to ucimlrepo -- NOTE: different feature set, "
+              f"results are not comparable to a repo-loader run")
     try:
         from ucimlrepo import fetch_ucirepo
         ds = fetch_ucirepo(id=967)
