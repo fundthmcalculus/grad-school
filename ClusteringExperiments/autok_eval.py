@@ -13,7 +13,7 @@ adversarial datasets (where structure is clean for some, absent for others):
 
 For each we report the predicted k-hat and the ARI at that k-hat vs ground truth.
 
-Run:  python -m experiments.autok_eval
+Run:  python ClusteringExperiments/autok_eval.py
 """
 
 from __future__ import annotations
@@ -29,9 +29,9 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering.pcvat import compute_ivat_c  # noqa: E402
 from tribbleclustering.pvat import get_ivat_levels  # noqa: E402
-from experiments.blockwise_vat import adjusted_rand, labels_from_order  # noqa: E402
-from experiments.adversarial_eval import DATASETS  # noqa: E402
-from experiments.hardening_eval import d_euclidean  # noqa: E402
+from blockwise_vat import adjusted_rand, labels_from_order  # noqa: E402
+from adversarial_eval import DATASETS  # noqa: E402
+from hardening_eval import d_euclidean  # noqa: E402
 
 FIG_DIR = Path(__file__).parent / "figures"
 KMAX = 8

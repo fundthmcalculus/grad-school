@@ -1,19 +1,16 @@
-"""Run a tribble-cluster experiment with its output landing in grad-school.
+"""Run a Chapter 3 clustering experiment with its output landing in reproduce/.
 
-The Chapter 3 experiments live in the `tribble-cluster` submodule and write
-their figures next to their own source, into
-`tribble-cluster/experiments/figures/`. That means reproducing a proposal figure
-dirties a pinned submodule, and the evidence for a grad-school table ends up
-stored in a library that knows nothing about the proposal. This runner inverts
-that: the experiment code stays where it is, and only the *destination* moves
-up into this repository.
+These scripts write their figures next to their own source, into
+`ClusteringExperiments/figures/`. That is fine for ad-hoc runs but means a
+proposal figure and the table it supports live in different places with nothing
+tying them together. This runner redirects the destination into
+`reproduce/outputs/figures/cluster/`, alongside the rest of the evidence, so a
+regenerated Chapter 3 figure lands where the provenance map expects it.
 
-It also fixes the invocation. Every one of these scripts does
-`from experiments.blockwise_vat import ...`, which needs the submodule ROOT on
-`sys.path`. Running them by path (`python experiments/adversarial_eval.py`)
-puts `experiments/` there instead and they die with `ModuleNotFoundError: No
-module named 'experiments'` before doing any work -- so this runner puts the
-right directory on the path rather than leaving it to the caller.
+They used to live in the `tribble-cluster` submodule and import each other as
+`from experiments.foo import ...`; grad-school #26 moved them here and they are
+now plain sibling modules. This runner puts their directory on `sys.path` so the
+sibling imports resolve regardless of the caller's working directory.
 
 Usage, from the repo root:
 
@@ -24,8 +21,8 @@ Usage, from the repo root:
     uv run --project tribble-cluster --with scipy \\
         python reproduce/experiments/run_cluster_experiment.py --all
 
-Override the destination with `REPRO_FIG_DIR`. Nothing is written inside the
-submodule; check with `git -C tribble-cluster status` afterwards.
+Override the destination with `REPRO_FIG_DIR`. Nothing is written inside any
+submodule.
 """
 
 from __future__ import annotations
@@ -37,7 +34,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CLUSTER = ROOT / "tribble-cluster"
+# The experiments moved OUT of the tribble-cluster submodule and into this
+# repository (grad-school #26), leaving tribble-cluster a pure library. They now
+# live here as plain sibling modules.
+CLUSTER = ROOT / "ClusteringExperiments"
 DEFAULT_OUT = ROOT / "reproduce" / "outputs" / "figures" / "cluster"
 
 # module name -> the entry points to call, in order. These scripts do their work
@@ -57,17 +57,17 @@ def run_one(name: str, out_dir: Path) -> int:
               f"known: {', '.join(sorted(EXPERIMENTS))}")
         return 1
 
-    # The submodule root, not experiments/, is what the absolute imports need.
+    # Their own directory, so the sibling imports resolve from any cwd.
     if str(CLUSTER) not in sys.path:
         sys.path.insert(0, str(CLUSTER))
 
-    mod = importlib.import_module(f"experiments.{name}")
+    mod = importlib.import_module(name)   # sibling module, not a package
 
     # The scripts call FIG_DIR.mkdir(exist_ok=True), which is NOT recursive, so
     # the parents have to exist before the rebind or they raise FileNotFoundError.
     out_dir.mkdir(parents=True, exist_ok=True)
     if not hasattr(mod, "FIG_DIR"):
-        print(f"  [warn] {name} has no FIG_DIR; it may write inside the submodule")
+        print(f"  [warn] {name} has no FIG_DIR; it may write next to its source")
     mod.FIG_DIR = out_dir
 
     print(f"=== {name} -> {out_dir} ===")

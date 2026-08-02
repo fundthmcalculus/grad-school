@@ -13,7 +13,7 @@ Pipeline (all fp32 on the GB10, matrix resident):
 Reference = the published optimum from the TSPLIB `solutions` file (no LKH). We
 report % over optimum (raw and polished) and wall-clock (build / polish).
 
-Run:  python -m experiments.vat_tsp_perf_report
+Run:  python ClusteringExperiments/vat_tsp_perf_report.py
 """
 
 from __future__ import annotations
@@ -29,12 +29,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_coord_instance,
     optimal_length,
 )
-from experiments.vat_tsp_dualvat_lk import (  # noqa: E402
+from vat_tsp_dualvat_lk import (  # noqa: E402
     dual_vat_tour_device,
     lk_search,
     tour_len,

@@ -12,7 +12,7 @@ of features and constraints is held fixed so the plot isolates scaling in n.
 The dominant cost is the O(n^2) pairwise-distance + iVAT transform, so the
 curve should track n^2; metric learning is O(|constraints| * p^2) and n-independent.
 
-Run:  python -m experiments.conivat_scaling
+Run:  python ClusteringExperiments/conivat_scaling.py
 """
 
 from __future__ import annotations

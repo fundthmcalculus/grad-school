@@ -15,7 +15,7 @@ Operators:
                         evaluated by a recipe whose delta and application are the
                         same construction (self-tested vs brute force).
 
-Run:  python -m experiments.vat_tsp_kopt [target_n]   (default 1000)
+Run:  python ClusteringExperiments/vat_tsp_kopt.py [target_n]   (default 1000)
 """
 
 from __future__ import annotations
@@ -33,15 +33,15 @@ import matplotlib.pyplot as plt  # noqa: E402
 from numba import njit  # noqa: E402
 
 from tribbleclustering import gpu
-from experiments.vat_tsp_tsplib import (
+from vat_tsp_tsplib import (
     knn_device,
     nearest_euc_instance,
     optimal_length,
     _d,
 )
-from experiments.vat_tsp_dualvat_lk import tour_len
-from experiments.vat_tsp_2opt_bench import vat_order_nb
-from experiments.vat_tsp_reslice import gpu_two_opt
+from vat_tsp_dualvat_lk import tour_len
+from vat_tsp_2opt_bench import vat_order_nb
+from vat_tsp_reslice import gpu_two_opt
 
 if gpu.is_available():
     import cupy as cp

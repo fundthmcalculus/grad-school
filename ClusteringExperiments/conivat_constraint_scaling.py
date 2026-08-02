@@ -18,7 +18,7 @@ So the expectation is: total ConiVAT time is ~flat (the fixed core dominates),
 while the constraint-handling overhead rises with the constraint count. This
 script measures both and reports the expanded-pair counts that explain it.
 
-Run:  python -m experiments.conivat_constraint_scaling
+Run:  python ClusteringExperiments/conivat_constraint_scaling.py
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ from tribbleclustering import (  # noqa: E402
     generate_constraints_from_labels,
     learn_metric,
 )
-from experiments.conivat_scaling import make_blobs  # noqa: E402
+from conivat_scaling import make_blobs  # noqa: E402
 
 try:
     from tribbleclustering.pcvat import pairwise_distances_c  # noqa: F401,E402

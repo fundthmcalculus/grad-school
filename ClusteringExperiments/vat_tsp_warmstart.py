@@ -27,7 +27,7 @@ Four things it adds over the intro spike:
      double-tree bound (path <= 2*MST) is void there; we measure VAT/MST directly
      and whether VAT is still a strong empirical warm start.
 
-Run:  python -m experiments.vat_tsp_warmstart
+Run:  python ClusteringExperiments/vat_tsp_warmstart.py
 """
 
 from __future__ import annotations
@@ -44,14 +44,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering.pcvat import compute_ivat_c  # noqa: E402
-from experiments.vat_tsp import path_cost, mst_weight  # noqa: E402
-from experiments.stitched_vat import _prim_parent  # noqa: E402
-from experiments.adversarial_eval import (  # noqa: E402
+from vat_tsp import path_cost, mst_weight  # noqa: E402
+from stitched_vat import _prim_parent  # noqa: E402
+from adversarial_eval import (  # noqa: E402
     two_moons,
     circles,
     easy_blobs,
 )
-from experiments.hardening_eval import (  # noqa: E402
+from hardening_eval import (  # noqa: E402
     d_euclidean,
     d_fractional,
     d_cosine,
