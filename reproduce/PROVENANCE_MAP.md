@@ -197,7 +197,18 @@ renderer emits both so the choice is visible rather than implicit.
 | 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7 |
 | 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **reproduced** at 10 seeds — note 8 |
 | 6.3 Interpretability | *none* | — | **ungenerated** — structural by design |
-| 6.4 Memory augmentation | `tribble-fis/tests/test_double_pendulum.py` | none | **ungenerated** — entry point unconfirmed |
+| 6.4 Memory augmentation | `tribble-fis/tests/test_double_pendulum.py` | none | **ungenerated** — entry point unconfirmed, and the rollout it needs is broken (note 12) |
+| §6.3.5 refinement study | `reproduce/optimizers/run_study.py` | `outputs/table_opt_hotstart.{md,csv}`, `…_traces.csv` | **reproduced** — new; supersedes the two-optimizer evidence behind §6.3.5 |
+
+**Note 12 — Table 6.4 is blocked on a defect, not on effort.**
+`MimoGaussianPredictorMemory.predict_trajectory` returns its initial window
+unchanged for every `(window_size, memory_size)` pair: it slices exactly
+`window_size` rows of history, `prepare_sequences` then computes the last row's
+long-term average over an interval that is empty at exactly that row, and the
+method's own NaN guard breaks the loop at step zero. Verified at (3,1), (4,2),
+(10,4), (2,1). The one-step `predict` path is unaffected. Until the slice is
+widened to `window_size + memory_size` there is no iterated rollout to measure,
+which is also why Figure 6.3 is a placeholder.
 
 **Note 7 — one seed in ten destroys this cell, and that is the finding.** Table
 6.1 is re-quoted at 10 seeds: flat 2nd-refined 0.875 ± 0.019, fuzzy tree
