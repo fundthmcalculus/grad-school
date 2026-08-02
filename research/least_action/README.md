@@ -4,9 +4,10 @@ Working notes on Dr. Cohen's handwritten TSK/least-action derivation
 (`Handwritten_20250217`), extended to cover the classifier case and to answer
 the rule-orthogonality question.
 
-Code: `fis_action.py` (approximation), `fis_control.py` (control).
-Experiments: `demo_regression.py`, `demo_classifier.py`, `demo_control.py`.
-Recorded output: `results.txt`. Reproduction instructions: §11.
+Code: `fis_action.py` (approximation), `fis_control.py` (control),
+`fis_twocart.py` (the §8 benchmark plant), `fis_sos.py` (§12–14 certificates).
+Experiments: the `demo_*.py` scripts; machine verification: `verify_*.py`.
+Recorded output: `results.txt`. Reproduction instructions and an API map: §11.
 
 ### Notation
 
@@ -1436,6 +1437,15 @@ ball 0.274, Gram PSD to 1.9e−11, with the policy search restricted to the
 $u(0)=0$ subspace. Found a trade the objective never knew about: performance up
 (1.044 → 0.773), certified region down (0.568 → 0.274).
 
+**5b. Put the certified radius into the policy objective.** — **DONE, §14.**
+A sampled necessary condition for the SOS certificate is 2600× cheaper than the
+SDP, so it can sit inside the search; the real certificate then confirms each
+point of the front. Result: a weight $w$ that prices region against performance
+over a certified ball of [0.273, 0.358], and the finding that at $w=0.3$ the
+penalty is *free* — better score, better held-out score, and a larger certified
+ball than $w=0$. The proxy is 1.18–2.51× optimistic, so $w$ is a dial and not a
+specification; calibrating it is the natural follow-on.
+
 ### 10b. Resolves open questions, but buys no new guarantees
 
 **6. Direct policy optimization on the nonlinear plant.** Tests whether §8d's
@@ -1490,6 +1500,7 @@ cd research/least_action
 ../../.venv/bin/python demo_holdout.py       # ~12 min, generalization check
 ../../.venv/bin/python demo_sos.py           # ~1 min,  SOS stability certificate
 ../../.venv/bin/python demo_certified_policy.py   # ~8 min, certified policy opt
+../../.venv/bin/python demo_pareto.py        # ~35 min, certificate-aware Pareto front
 ../../.venv/bin/python verify_symbolic.py    # ~1 min,  21 symbolic identities
 ../../.venv/bin/python verify_sos_exact.py   # ~4 min,  exact rational SOS proof
 
@@ -1585,6 +1596,21 @@ reader changing one should know what it was protecting against.
 | `poly_basis` / `basis_size` | consequent monomials up to a given order (1, 5, 15, 35 for orders 0-3) |
 | `shaped_cost` | always-finite smooth surrogate of the three-objective score |
 | `policy_optimize` | derivative-free search on the FIS parameters against the closed loop |
+| `policy_optimize(penalty=…)` | same search with an extra term of the controller — how §14 makes it certificate-aware |
+| `TskController.evaluate_batch` | vectorized $u(z)$ over many states; the per-point path is too slow to sit inside a search |
+
+`fis_sos.py`:
+
+| function | does |
+|---|---|
+| `to_rational` | exact rational $(P,Q)$ form of a $\pi$-MF TSK controller (§12a) |
+| `certify_roa` | one S-procedure SOS solve: is $\dot V<0$ on $\{V\le\rho\}$? |
+| `max_certified_rho` | bisection on $\rho$ for the largest certified sublevel set |
+| `lyapunov_from_linearization` | $V$ from the controller's own closed-loop linearization |
+| `unsaturated_radius` | largest ball on which $\lvert u\rvert\le u_{\max}$ |
+| `certified_radius_proxy` | sampled *necessary* condition for `certify_roa`, ~2600× faster (§14a) |
+| `ball_samples` / `proxy_ball_radius` | metric-free sample cloud, and the proxy reported as an inscribed ball radius |
+| `capture` | side-channel exposing the Gram and monomials for exact re-verification (§13b) |
 
 ### Where each claim is checked
 
@@ -1619,6 +1645,12 @@ reader changing one should know what it was protecting against.
 | direct policy opt breaks plateau | 9h | policyopt AA, AD |
 | warm start is load-bearing | 9h | policyopt AB |
 | held-out generalization | 9i | holdout |
+| SOS certificate closes | 12d | sos |
+| performance/certificate trade exists | 12e | certified_policy B |
+| the $u(0)=0$ restriction | 12g | certified_policy C |
+| proxy is a valid necessary condition | 14a | pareto A |
+| $w$ prices region against performance | 14c, 14d | pareto B, C |
+| the penalty regularizes rather than costs | 14d | pareto C |
 
 ---
 
@@ -1784,6 +1816,11 @@ the certified region 0.568 → 0.274. It also shrinks the unsaturated radius
 aggression is exactly what a Lyapunov certificate charges for. Nothing in the
 objective knew that, because the certified radius was never in it.
 
+**§14 puts it in the objective, and the conclusion here turns out to be too
+pessimistic**: a small certificate penalty recovers part of the region *and*
+improves both the score and its held-out value. The two are opposed only past
+the point where the unpenalized search was overfitting.
+
 $N{=}3$ certifies under neither candidate. That is not proof that no certificate
 exists — only these two quadratic $V$ were tried, and the true statement is
 "no certificate with these candidates".
@@ -1923,3 +1960,154 @@ measurements, not theorems — there is nothing there to formalize.
 closed form (§4d′, a clean integral identity), then Proposition 1 (§4b, the
 greedy/joint equivalence, which is linear algebra Mathlib covers well). The SOS
 side should stay in exact integer arithmetic where it already is.
+
+---
+
+## 14. Balancing certified optimality against performance
+
+§12e ended on an uncontrolled trade: direct policy optimization improved the
+three-objective score 1.044 → 0.773 while the SOS-certified ball shrank
+0.568 → 0.274. Nothing in the objective knew the certificate existed, so the
+shrinkage was an accident rather than a decision. This section puts the
+certified radius *into* the objective. Code: `demo_pareto.py`; the machinery is
+`policy_optimize(penalty=…)` plus `certified_radius_proxy`.
+
+### 14a. The certificate is too slow to optimize against, so use a proxy
+
+One `certify_roa` solve is ~1.5 s and `max_certified_rho` bisects 14 of them
+against two Lyapunov candidates — 47 s per controller. The policy search takes
+601 evaluations. Certifying inside the loop is therefore a multi-day run.
+
+The proxy asks the same question of a fixed sample cloud: the smallest sublevel
+value $\rho$ at which any sampled point has $\dot V\ge0$,
+
+$$\hat\rho \;=\; \min\{\,z^\top Pz \;:\; z\in\mathcal{Z},\ \dot V(z)\ge0\,\},
+\qquad \hat r=\sqrt{\hat\rho/\lambda_{\min}(P)} .$$
+
+**Its logical status is what makes it usable.** A sampled point with
+$\dot V(z)\ge0$ *proves* the SOS program must fail at that $\rho$ — a
+certificate is a statement about every point of the sublevel set. So
+$\hat\rho$ is an **upper bound** on any achievable certified $\rho$: a
+necessary condition, never a sufficient one. That is the right direction for a
+search objective and the wrong one for a claim. It is optimized against and
+never reported; every controller on the front below is then put through the
+real SDP.
+
+| | proxy | real SOS | ratio |
+|---|---|---|---|
+| certified ball, imitation $N{=}2$ | 0.6718 | **0.5684** | 1.182 |
+| wall clock | 19 ms | 47 s | 2485× |
+
+Two details matter. The sample cloud is **metric-free** — a Euclidean ball, not
+a $P$-shaped ellipsoid — because the objective compares Lyapunov candidates
+against each other and a cloud shaped by one $P$ would bias that comparison. And
+it is **fixed across controllers** (seeded once, reused), so the proxy is a
+deterministic function of $\theta$ rather than a noisy one; a resampled estimate
+inside a derivative-free search is indistinguishable from a rough objective and
+stalls Powell immediately.
+
+The proxy is also reported as an inscribed *ball radius* rather than as $\rho$.
+Sublevel values of different $P$ are not comparable — $\rho$ carries the units
+of its own $P$ — and the certificates in §12 are all quoted as balls.
+
+### 14b. The penalty
+
+$$J_w(\theta)\;=\;\underbrace{\text{shaped\_cost}(\theta)}_{\S8h}
+\;+\;w\,\frac{\max\!\big(0,\;r_t-\hat r(\theta)\big)^2}{r_t^2},
+\qquad r_t=\hat r(\theta_{\text{imitation}})=0.6718 .$$
+
+A one-sided squared hinge, not a two-sided penalty: exceeding the target is
+never punished. Normalizing by $r_t^2$ makes $w$ dimensionless and directly
+comparable to the score, whose useful range here is about 0.2 — so $w\sim1$ is
+the scale at which the two terms genuinely compete, which is what the sweep
+confirms. The target is the *warm start's* proxy radius, i.e. "do not give up
+region relative to the controller you started from". Since no optimized point
+reaches it, the hinge is active at every row below.
+
+The search is still restricted to the $u(0)=0$ null space (§12e); without that
+the origin stops being an equilibrium and there is nothing to certify.
+
+### 14c. The front
+
+Six initial conditions for the objective, six *held-out* ones for
+generalization (the §8i split). Score is the reported three-objective
+scalarization against LQR; "SOS ball" is the real certificate, best of the
+Riccati and linearization candidates.
+
+| $w$ | score | held out | shaped | proxy $\hat r$ | **SOS ball** | $V$ from | $u(0)$ |
+|---|---|---|---|---|---|---|---|
+| — (imitation) | 1.0437 | 1.1395 | 1.4199 | 0.6718 | **0.5684** | Riccati | −2.1e−19 |
+| 0 (§12e) | 0.7725 | 0.8272 | 0.6626 | 0.3900 | 0.2729 | lin | +2.9e−18 |
+| 0.1 | 0.8155 | 0.7717 | 0.6775 | 0.8676 | 0.3452 | lin | +1.7e−18 |
+| **0.3** | **0.7713** | **0.7194** | 0.6548 | 0.6124 | **0.3354** | lin | −4.5e−22 |
+| 1 | 0.7906 | 0.7230 | 0.6638 | 0.7039 | 0.3498 | lin | +8.4e−20 |
+| 3 | 0.8265 | 0.8105 | 0.6882 | 0.8676 | **0.3579** | lin | +4.3e−18 |
+
+$w=0$ reproduces §12e exactly (0.7725, ball 0.273), which is the control this
+sweep needed.
+
+### 14d. What the front says
+
+**1. The first increment of certificate-awareness is free — better than free.**
+$w=0.3$ **dominates $w=0$ on all three axes**: score 0.7713 < 0.7725, held-out
+0.7194 < 0.8272, certified ball 0.3354 > 0.2729. This is not the trade the
+section was built to price. The explanation is visible in the held-out column:
+$w=0$ overfits its six training initial conditions (0.7725 → 0.8272 out of
+sample, a 7% degradation), and the certificate penalty suppresses exactly the
+aggressive behaviour responsible. **A Lyapunov certificate is a regularizer**
+— it charges for the same aggression that costs generalization. Every
+penalized row generalizes better than $w=0$.
+
+**2. Past that, the trade is real and $w$ prices it.** Over
+$w\in\{0.3,1,3\}$ the certified ball rises 0.3354 → 0.3498 → 0.3579 while the
+score degrades 0.7713 → 0.7906 → 0.8265. That is the dial the section set out
+to build.
+
+**3. The dial has limited range.** No optimized controller recovers the
+imitation controller's 0.5684 ball; even $w=3$ reaches only 0.3579. The
+certified region and the performance gain are not fully reconcilable within
+this rule count and this $V$ family — the front spans [0.273, 0.358] at scores
+0.77–0.83, and the 0.568 point costs a score of 1.044. The recommendation is
+therefore $w\approx0.3$: it takes the entire performance gain of §12e, improves
+on it out of sample, and recovers about a quarter of the lost certified region.
+
+### 14e. Honest limits
+
+- **The proxy's optimism is worst where it matters.** The ratio is 1.18 on the
+  imitation controller but ranges to **2.51** across the front. The optimizer
+  is steering on a loose upper bound, so $w$ is a dial, not a specification:
+  asking for $\hat r\ge0.67$ does not deliver a certified 0.67. It moved the
+  true ball in the right direction (0.273 → 0.358) but the mapping is not
+  calibrated. Tightening it means a denser cloud or a local refinement near the
+  binding point, not a different inequality.
+- **The front is not monotone in $w$.** The ball sequence
+  0.2729, 0.3452, 0.3354, 0.3498, 0.3579 dips once, at $w=0.3$ — because
+  $w=0.1$ sits above the trend through the other four, while its score (0.8155)
+  is worse than both its neighbours. $w=0.1$ also carries the largest proxy
+  radius of any row and delivers a middling true one, which is the optimism
+  above biting directly. Powell is a local search on a non-convex landscape:
+  each row is a local optimum at its own weight, not *the* Pareto-optimal point
+  for that trade-off. The table is a sampling of the achievable region, not its
+  boundary.
+- **Two Lyapunov candidates only.** Every "certified ball" is
+  $\max$ over $\{$Riccati, closed-loop linearization$\}$. A larger number would
+  presumably be certifiable with a $V$ searched jointly with $\theta$, which is
+  a bilinear problem (§10) and was not attempted.
+- **$N=2$ only.** §12f showed certification does not scale past three rules with
+  these solvers, so the whole section is confined to the rule count where the
+  method converges anyway.
+- **The sample cloud is discrete.** Two rows report the identical proxy 0.8676,
+  which happens when the innermost violating *sample* is the same point for both
+  controllers. With 20 000 points in a radius-2 ball the resolution near the
+  origin is coarse relative to the radii being measured.
+
+### 14f. Where this leaves the guarantee inventory
+
+No new theorem: §14 changes what is optimized, not what is proven. G12
+(SOS-certified ROA) now has a *knob* rather than a fixed value, and the
+certificate is obtained by the same exact-rational route as §13b, so the
+strength of the final statement is unchanged. What is new is empirical and
+worth stating plainly: **on this problem, requiring a certificate did not cost
+performance — it improved out-of-sample performance.** The framing of §12e,
+that certification and performance are opposed, was too pessimistic; they are
+opposed only past the point where the unpenalized search was overfitting.

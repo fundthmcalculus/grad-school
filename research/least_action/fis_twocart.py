@@ -325,6 +325,29 @@ class TskController:
     def __call__(self, z: af64) -> float:
         return float(self.regressors(np.asarray(z)) @ self.theta)
 
+    def evaluate_batch(self, zs: af64) -> af64:
+        """u(z) for every row of `zs`, vectorized.
+
+        The per-point path is far too slow to sit inside an optimization loop
+        that evaluates a certificate proxy on tens of thousands of states at
+        every step.
+        """
+        zs = np.atleast_2d(zs)
+        d = (zs[:, None, :] - self.centers[None, :, :]) / self.widths[None, :, :]
+        sq = np.sum(d**2, axis=2)
+        mu = 1.0 / (1.0 + sq) if self.mf == "pi" else np.exp(-sq)
+        phi = mu / np.maximum(mu.sum(axis=1, keepdims=True), 1e-300)
+        n_state = zs.shape[1]
+        cols = [np.ones((len(zs), 1))]
+        if self.order >= 1:
+            cols.append(zs)
+        for deg in range(2, self.order + 1):
+            for combo in combinations_with_replacement(range(n_state), deg):
+                cols.append(np.prod(zs[:, combo], axis=1, keepdims=True))
+        basis = np.hstack(cols)
+        return np.einsum("nr,nb,rb->n", phi, basis,
+                         self.theta.reshape(len(self.centers), basis.shape[1]))
+
 
 def place_rules(samples: af64, weights: af64, n_rules: int, seed: int = 0
                 ) -> tuple[af64, af64]:
@@ -504,6 +527,7 @@ def policy_optimize(
     maxfev: int = 1500,
     tune_antecedents: bool = False,
     preserve_origin: bool = True,
+    penalty: Callable[["TskController"], float] | None = None,
     seed: int = 0,
 ) -> tuple[TskController, float, int]:
     """Optimize the FIS parameters against the closed-loop objective directly.
@@ -517,6 +541,14 @@ def policy_optimize(
 
     Powell is used rather than a gradient method because the surrogate is still
     only piecewise smooth through the input saturation.
+
+    `penalty` adds an arbitrary extra term of the controller, evaluated at every
+    step.  It exists so the search can be made *certificate-aware*: §12e found
+    that optimizing performance alone shrinks the certified region, because
+    nothing in the objective knew the certificate existed.  Passing a penalty on
+    the certified radius turns that trade into a dial (README §14).  The returned
+    objective value is the penalized one; the caller recovers the unpenalized
+    cost by calling `shaped_cost` on the returned controller.
     """
     n_state = ctrl.centers.shape[1]
 
@@ -559,7 +591,10 @@ def policy_optimize(
 
     def obj(p: af64) -> float:
         evals["n"] += 1
-        return shaped_cost(plant, unpack(p), z0s, ref)
+        c = unpack(p)
+        return shaped_cost(plant, c, z0s, ref) + (
+            0.0 if penalty is None else float(penalty(c))
+        )
 
     base = obj(p0)
     res = minimize(obj, p0, method="Powell",
