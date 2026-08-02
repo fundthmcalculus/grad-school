@@ -36,6 +36,9 @@ Spine per author decision: primary framing = *scalable full-pipeline*, mechanism
 
 ## Document structure
 
+### Front matter
+- **Acknowledgements** (`prose/00-acknowledgements.md`): author-written, template in place. Not generated and carries no harness provenance; `build_pdf.py` places it ahead of Chapter 1 and strips the template's HTML-comment guidance from the build.
+
 ### Part I — Introduction & Preliminaries
 - **Ch 1 — Introduction** (`01-introduction.md`): Prelude/motivation, unique contributions, dissertation outline.
 - **Ch 2 — Background & Preliminaries** (`02-background.md`): Fuzzy logic & FIS; VAT/iVAT & single-linkage; persistence/TDA; the optimization/initialization bottleneck (brief — motivates "structure before search"; tribble-opt library details live in Appendix A.3); interpretability & the accuracy–interpretability trade.

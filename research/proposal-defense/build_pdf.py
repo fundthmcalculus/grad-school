@@ -31,6 +31,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BUILD = os.path.join(HERE, "build")
 
 SECTIONS = [
+    "prose/00-acknowledgements.md",   # front matter; author-written, not generated
     "prose/01-introduction.md",
     "prose/02-background.md",
     "prose/03-scalable-structure-discovery-pvat.md",
@@ -76,6 +77,16 @@ def replace_mermaid(md):
     return re.sub(r"```mermaid.*?```", note, md, flags=re.DOTALL)
 
 
+def strip_html_comments(md):
+    """Drop <!-- ... --> blocks.
+
+    The acknowledgements page ships as a template whose guidance lives in an HTML
+    comment. Markdown renderers hide it, but pandoc passes it through to LaTeX,
+    so it is removed here rather than relied on to stay invisible.
+    """
+    return re.sub(r"<!--.*?-->", "", md, flags=re.DOTALL)
+
+
 def strip_editorial(md, src_dir=None):
     """Drop scaffolding that shouldn't appear in a reading copy.
 
@@ -83,7 +94,7 @@ def strip_editorial(md, src_dir=None):
     references so a figure that actually exists can be told from one that is
     still a placeholder.
     """
-    md = replace_mermaid(md)
+    md = strip_html_comments(replace_mermaid(md))
     out = []
     for line in md.split("\n"):
         s = line.strip()
