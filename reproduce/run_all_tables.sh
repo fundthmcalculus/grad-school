@@ -66,6 +66,9 @@ PLAIN_TABLES=(
 declare -A STATUS
 declare -A SEEDS_USED
 
+# Check for submodule SHA divergence before running.
+check_submodule_shas
+
 # Resolved once, from common.py, so the provenance file reports the seed list the
 # generators will actually use rather than a default repeated here. This line
 # used to be hardcoded, and when the default moved from five seeds to ten it
@@ -97,6 +100,64 @@ wanted() {
   local t
   for t in "${ONLY[@]}"; do [ "$t" = "$1" ] && return 0; done
   return 1
+}
+
+check_submodule_shas() {
+  # Guard against silent submodule SHA divergence. This failure has happened twice
+  # (fix/pin-extreme-bucket-means, resolve-flm-pr), causing the harness to emit
+  # tables from a different commit than the last run without warning.
+  #
+  # If a previous archive exists, compare its recorded SHAs to the current ones.
+  # On mismatch, print a loud warning (failure mode: someone quotes old numbers).
+  # Don't refuse to emit (the user may have intentionally changed submodules), but
+  # make it impossible to miss.
+  local last_prov=""
+  local last_fis="" last_cluster="" last_grad=""
+  local curr_fis="" curr_cluster="" curr_grad=""
+
+  # Find the most recent archive (by modification time).
+  if [ -d "$OUT" ]; then
+    last_prov=$(find "$OUT" -maxdepth 2 -name "PROVENANCE.txt" -printf '%T@ %p\n' 2>/dev/null \
+      | sort -rn | head -1 | cut -d' ' -f2-)
+  fi
+
+  if [ -z "$last_prov" ] || [ ! -f "$last_prov" ]; then
+    return 0  # no previous archive; nothing to compare
+  fi
+
+  # Extract SHAs from the last archive.
+  last_fis=$(grep "^tribble-fis:" "$last_prov" | cut -d' ' -f2 | head -1)
+  last_cluster=$(grep "^tribble-cluster:" "$last_prov" | cut -d' ' -f2 | head -1)
+  last_grad=$(grep "^grad-school:" "$last_prov" | cut -d' ' -f2 | head -1)
+
+  # Get current SHAs.
+  curr_fis=$(git -C "$ROOT/tribble-fis" rev-parse HEAD 2>/dev/null || echo "")
+  curr_cluster=$(git -C "$ROOT/tribble-cluster" rev-parse HEAD 2>/dev/null || echo "")
+  curr_grad=$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo "")
+
+  # Compare. If any differ, print a loud warning.
+  if [ "$last_fis" != "$curr_fis" ] || [ "$last_cluster" != "$curr_cluster" ] || [ "$last_grad" != "$curr_grad" ]; then
+    echo "########################################################################"
+    echo "## WARNING: SUBMODULE SHA DIVERGENCE DETECTED                          ##"
+    echo "##                                                                    ##"
+    echo "## The current submodule SHAs differ from the last archive. This      ##"
+    echo "## means the generated tables are from different code than before.    ##"
+    echo "##                                                                    ##"
+    echo "## Last archive: $last_prov"
+    [ -n "$last_fis" ] && echo "##   tribble-fis:    $last_fis"
+    [ -n "$last_cluster" ] && echo "##   tribble-cluster: $last_cluster"
+    [ -n "$last_grad" ] && echo "##   grad-school:    $last_grad"
+    echo "##"
+    echo "## Current SHAs:"
+    echo "##   tribble-fis:    $curr_fis"
+    echo "##   tribble-cluster: $curr_cluster"
+    echo "##   grad-school:    $curr_grad"
+    echo "##                                                                    ##"
+    echo "## Continuing with this run, but VERIFY the code change is           ##"
+    echo "## intentional before quoting any numbers from it.                    ##"
+    echo "########################################################################"
+    echo
+  fi
 }
 
 run_one() {
