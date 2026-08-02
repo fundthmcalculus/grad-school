@@ -238,4 +238,4 @@ I want to be clear about what is and is not established. The construction is rea
 
 ---
 
-*Draft — Chapter 4 prose, in the author's voice, opening on the Hitchhiker's Guide / consequent-first motif to match the tribble motif of Ch 1. Citations in bracketed shorthand pending the consolidated `references.bib`. Seven tables (4.1–4.7) and three figure placeholders (4.1–4.3) inline. Source outline in `../chapters/04-fast-fis-synthesis-mog.md`; open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 4 prose, in the author's voice, opening on the Hitchhiker's Guide / consequent-first motif to match the tribble motif of Ch 1. Citations in bracketed shorthand pending the consolidated `references.bib`. Seven tables (4.1–4.7) and three figure placeholders (4.1–4.3) inline. Open items in `../ACTION_ITEMS.md`.*
