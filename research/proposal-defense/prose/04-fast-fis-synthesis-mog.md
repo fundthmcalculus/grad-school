@@ -157,7 +157,7 @@ I should be clear about the prior art, since novelty detection and open-set reco
 
 The datasets here are public, so unlike the psychiatric set of Chapter 3 I can name them freely.
 
-On the **PhiUSIIL phishing URL** dataset the model reaches 0.997 ± 0.001 accuracy in about half a second, with two rules and a handful of clauses. That is the headline: a readable, two-rule fuzzy classifier, competitive on accuracy, trained in the time it takes to describe it. I should temper the "competitive" immediately, though — CART and a random forest both score a perfect 1.000 on this dataset, so PhiUSIIL is saturated and cannot separate these methods on accuracy. What it demonstrates is the *rule count and the training time*, not superiority.
+On the **PhiUSIIL phishing URL** dataset the model reaches 0.996 ± 0.001 accuracy in about two-thirds of a second, with two rules and a handful of clauses. That is the headline: a readable, two-rule fuzzy classifier, competitive on accuracy, trained in the time it takes to describe it. I should temper the "competitive" immediately, though — CART and a random forest both score a perfect 1.000 on this dataset, so PhiUSIIL is saturated and cannot separate these methods on accuracy. What it demonstrates is the *rule count and the training time*, not superiority.
 
 On **RT-IOT2022** — 123,000 instances, 83 features, 12 output classes — the model trains in under a minute. This is the scale point: the answer-first construction does not fall over when the data gets large and multi-class, because the work is proportional to classes times features rather than to any product over inputs.
 
@@ -165,13 +165,13 @@ On the **BETH** host-telemetry set I test the anomaly rule of §4.3.5 in its har
 
 On the **UCI Concrete Compressive Strength** regression set, the flat model's test $R^2$ is −0.005, 0.783, and 0.829 at TSK orders zero, one, and two, rising to 0.869 with the full second-order basis. The zeroth-order figure deserves a word rather than a quiet omission: with constant consequents the model is no better than predicting the mean, so first-order consequents are not a refinement here but a requirement. From first order on the result is reasonable, and it is the launch point for the hierarchical models of Chapter 6.
 
-The reconciliation this section used to promise has now been done. Chapter 6 previously quoted a flat-model $R^2$ of 0.658 from the tree-and-mixture experiment, which read as a contradiction of the figures above; under one protocol — identical splits, seeds, and preprocessing — the flat model scores 0.875 with refinement and the discrepancy turns out to have been configuration rather than disagreement. Chapter 6 Table 6.1 and the table above are now the same measurement seen from two chapters. The one remaining trap for a reader comparing them is Chapter 6's Table 6.2, which deliberately runs everything untuned at raw features and reports the flat model at 0.651; that is a different question, not a different answer.
+The reconciliation this section used to promise has now been done. Chapter 6 previously quoted a flat-model $R^2$ of 0.658 from the tree-and-mixture experiment, which read as a contradiction of the figures above; under one protocol — identical splits, seeds, and preprocessing — the flat model scores 0.879 with refinement and the discrepancy turns out to have been configuration rather than disagreement. Chapter 6 Table 6.1 and the table above are now the same measurement seen from two chapters. The one remaining trap for a reader comparing them is Chapter 6's Table 6.2, which deliberately runs everything untuned at raw features and reports the flat model at 0.651; that is a different question, not a different answer.
 
 **Table 4.4 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation; the baseline comparison is Table 4.5.
 
 | Dataset (task) | Size (N × M) | Train time | Accuracy / R² | Rule base |
 |---|---|---:|---:|---|
-| PhiUSIIL (binary classification) | 235K × 54 | 0.54 ± 0.04 s | 0.997 ± 0.001 acc. | 2 rules (K = 2) |
+| PhiUSIIL (binary classification) | 235K × 54 | 0.67 ± 0.03 s | 0.996 ± 0.001 acc. | 2 rules (K = 2) |
 | RT-IOT2022 (12-class) | 123K × 83 | < 60 s | *pending* | ~12 rules (K = 12) |
 | Concrete (regression, TSK order 1) | 1,030 × 8 | seconds | R² = 0.783 ± 0.028 | 3 output buckets |
 | Concrete (regression, TSK order 2) | 1,030 × 8 | seconds | R² = 0.829 ± 0.023 | 3 output buckets |
@@ -183,11 +183,11 @@ The rule-base column is the point of the table as much as the accuracy is: for c
 
 | Method | Concrete R² | Concrete train time | PhiUSIIL accuracy | PhiUSIIL train time |
 |---|---:|---:|---:|---:|
-| **MoG FIS (this work)** | **0.869 ± 0.014** (full 2nd) | 0.37 ± 0.01 s | 0.997 ± 0.001 | 0.54 ± 0.04 s |
+| **MoG FIS (this work)** | **0.869 ± 0.014** (full 2nd) | 0.38 ± 0.01 s | 0.996 ± 0.001 | 0.67 ± 0.03 s |
 | ANFIS | *pending* | *pending* | *pending* | *pending* |
 | GA-tuned FIS | *pending* | *pending* | *pending* | *pending* |
-| CART (reference) | 0.825 ± 0.047 | seconds | 1.000 ± 0.000 | seconds |
-| Random Forest (reference) | 0.909 ± 0.018 | seconds | 1.000 ± 0.000 | seconds |
+| CART (reference) | 0.826 ± 0.047 | seconds | 1.000 ± 0.000 | seconds |
+| Random Forest (reference) | 0.909 ± 0.019 | seconds | 1.000 ± 0.000 | seconds |
 
 **The mechanism, measured.** The BETH files are not in the repository, so the harness runs the same protocol on public data: leave-one-class-out, where each class is withheld from training in turn and treated as unseen, averaged over held-out classes and seeds. Sweeping the boost gives the operating curve the section promised.
 

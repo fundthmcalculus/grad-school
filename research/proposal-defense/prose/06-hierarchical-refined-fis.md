@@ -28,7 +28,7 @@ Because the TSK output is linear in the consequent coefficients for fixed firing
 
 The fuzzy tree is a CART-style recursive partition, with two differences from an ordinary decision tree. The splits are soft, so a point flows down multiple paths with graded membership rather than being sent left or right, and each leaf holds a full ridge-TSK model rather than a constant. The split criterion is firing-weighted variance reduction for regression, and a fuzzy ambiguity or information-gain measure for classification. The payoff is readability: the tree renders as a short list of IF–THEN rules, one per root-to-leaf path, each mentioning only the variables on that path and ordered by importance. On the Concrete dataset the tree splits first on cement content and then on age, right at the standard 28-day curing mark — which is to say it recovers domain knowledge nobody told it, and a materials engineer can read that and nod.
 
-That readability is the reason the tree is fit on *raw*, untransformed features while the flat model of Chapter 4 is not. A threshold of "cement ≥ 350 kg/m³" is something an engineer can check; "cement ≥ 0.42" after standardization is not. The tree can afford the choice, because axis-aligned splits are rank-based and therefore invariant to monotone transforms — Chapter 4 §4.3 measures this directly and finds the transform worth exactly nothing to CART and Random Forest, against as much as +0.15 $R^2$ to the Gaussian models. The mixture is the interesting middle case: its gates are tree-like but its experts are Gaussian, and it gains +0.089 from the transform, which is roughly what one would predict from that split of machinery.
+That readability is the reason the tree is fit on *raw*, untransformed features while the flat model of Chapter 4 is not. A threshold of "cement ≥ 350 kg/m³" is something an engineer can check; "cement ≥ 0.42" after standardization is not. The tree can afford the choice, because axis-aligned splits are rank-based and therefore invariant to monotone transforms — Chapter 4 §4.3 measures this directly and finds the transform worth exactly nothing to CART and Random Forest, against as much as +0.13 $R^2$ to the Gaussian models. The mixture is the interesting middle case: its gates are tree-like but its experts are Gaussian, and it gains +0.091 from the transform, which is roughly what one would predict from that split of machinery.
 
 **[FIGURE 6.1 — placeholder]** *A trained fuzzy tree on Concrete, rendered as text rules, with the cement→age(28-day) split highlighted. Show the same for PhiUSIIL (HasSocialNet, HasCopyrightInfo, URLSimilarityIndex).*
 `![fuzzy-tree](fig/06-fuzzy-tree.png)`
@@ -79,45 +79,47 @@ The last piece extends the same machinery to time. I augment each feature with a
 
 | TSK order | closed-form only | refined | Δ |
 |---|---:|---:|---:|
-| 0th | −0.005 | **0.367** | **+0.372** |
-| 1st | 0.783 | **0.842** | +0.059 |
-| 2nd | 0.829 | **0.875** | +0.046 |
+| 0th | −0.005 | **0.404** | **+0.409** |
+| 1st | 0.783 | **0.844** | +0.061 |
+| 2nd | 0.829 | **0.879** | +0.050 |
 
-Refinement helps most where the consequent model has least capacity to begin with. At zeroth order the closed-form solve is worthless — an $R^2$ of essentially zero, no better than predicting the mean — and refinement lifts it to 0.367; at first and second order it buys a more modest five and a half and four and a half points. The trend is monotone in the wrong direction for the refinement stage: the more expressive the consequents, the less the extra search is worth. An earlier draft of this chapter reported refinement lifting Concrete from roughly 0.88 to 0.92; that figure is not reproduced, and 0.92 does not appear anywhere in a controlled run. I am striking it.
+Refinement helps most where the consequent model has least capacity to begin with. At zeroth order the closed-form solve is worthless — an $R^2$ of essentially zero, no better than predicting the mean — and refinement lifts it to 0.404; at first and second order it buys a more modest six and five points. The trend is monotone in the wrong direction for the refinement stage: the more expressive the consequents, the less the extra search is worth. An earlier draft of this chapter reported refinement lifting Concrete from roughly 0.88 to 0.92; that figure is not reproduced, and 0.92 does not appear anywhere in a controlled run. I am striking it.
 
-The shape of the correction is worth more than the number, and I should be careful about how far I push it. Refinement's value decays sharply with the capacity of the consequent model: worth 0.372 at zeroth order, 0.059 at first, 0.046 at second. That is the same direction §6.3.5 reported for the population methods, where differential evolution and a genetic algorithm overfit the cross-validation estimate and a plain local optimizer beat them. Both observations point the same way: once the structure has been recovered from the data, additional search buys progressively less. An earlier draft went further and claimed refinement actively *hurts* at high capacity, on the strength of a full-second-order row that lost 0.027. Under this protocol I cannot support that — refinement's contribution shrinks toward zero but stays positive at every order measured, and the negative row came from a configuration that is not in the uniform sweep. The honest version of the *structure before search* argument here is diminishing returns, not damage.
+The shape of the correction is worth more than the number, and I should be careful about how far I push it. Refinement's value decays sharply with the capacity of the consequent model: worth 0.409 at zeroth order, 0.061 at first, 0.050 at second. That is the same direction §6.3.5 reported for the population methods, where differential evolution and a genetic algorithm overfit the cross-validation estimate and a plain local optimizer beat them. Both observations point the same way: once the structure has been recovered from the data, additional search buys progressively less. An earlier draft went further and claimed refinement actively *hurts* at high capacity, on the strength of a full-second-order row that lost 0.027. Under this protocol I cannot support that — refinement's contribution shrinks toward zero but stays positive at every order measured, and the negative row came from a configuration that is not in the uniform sweep. The honest version of the *structure before search* argument here is diminishing returns, not damage.
 
 **Table 6.1 — The model family on Concrete, under one protocol.** Regenerated by the reproduction harness with the preprocessing of Chapter 4 §4.3 applied uniformly; 10 seeds, shared splits, mean ± standard deviation.
 
 | Model | R² | RMSE (MPa) |
 |---|---:|---:|
-| Flat MoG-TSK (2nd order, refined) | **0.875 ± 0.019** | **5.77** |
-| Mixture of experts (HME) | 0.805 ± 0.059 † | 7.15 † |
+| Flat MoG-TSK (2nd order, refined) | **0.879 ± 0.023** | **5.67** |
+| Mixture of experts (HME) | 0.810 ± 0.064 | 7.00 |
 | Fuzzy tree | 0.688 ± 0.056 | 9.09 |
 | CART (reference) | 0.826 ± 0.047 | 6.73 |
-| Random Forest (reference) | 0.909 ± 0.018 | 4.90 |
-
-† *Over the nine of ten seeds on which the mixture converges. On the tenth it diverges catastrophically — see below. Including it, the cell reads $R^2 = -220.9 \pm 665.0$, which is a statement about the failure rather than about the model.*
+| Random Forest (reference) | 0.909 ± 0.019 | 4.90 |
 
 These supersede the figures this chapter previously carried (flat 0.658, tree 0.746, mixture 0.791), which came from three different configurations and could not be read against one another. Three things change with the correction, and I would rather report all three than the flattering one.
 
 The mixture does *not* beat the flat model. At 0.805 against 0.875 the gap is now larger than an earlier five-seed run suggested and wider than either standard deviation, so the ordering in which the hierarchy improved on the flat baseline does not survive a common protocol. What survives is the weaker and more defensible claim: **the hierarchy reaches broadly comparable accuracy while producing a readable decision structure**, which is the trade this chapter has argued for throughout. The fuzzy tree remains clearly behind both, and a random forest still beats everything here.
 
-**The mixture has a rare catastrophic failure mode, and I only found it by widening the seed set.** At ten seeds one split — seed 9, under normalized features and library defaults — produces a model whose predictions run to 10,536 MPa on a target that never exceeds about 82. The other nine seeds land between 0.67 and 0.88 with nothing anomalous about them. A five-seed protocol did not contain the offending split and reported a clean $0.813 \pm 0.039$; the failure was always there and simply had not been sampled. I take two lessons from it. The narrow one is that the gating solve needs a guard before the hierarchy can be recommended for use, and that is now a goal for completion rather than a detail. The broader one is a caution about this entire results chapter: a five-seed mean is not enough to establish stability, and a method that is excellent nine times in ten and unusable the tenth is not adequately described by either number alone.
+**The mixture had a rare catastrophic failure mode, and finding it is the reason this table can be quoted at all.** At ten seeds one split — seed 9, under normalized features — produced a model whose predictions ran to 10,536 MPa on a target that never exceeds about 82. The other nine were unremarkable. A five-seed protocol did not contain the offending split and reported a clean $0.813 \pm 0.039$; the failure was always there and simply had not been sampled.
 
-The correction also cuts in the method's favor on one point, though less dramatically than I once claimed. Configuration matters: at library defaults the mixture reaches 0.729 on raw features, and at the settings `demo_concrete.py` specifies it reaches 0.834 on normalized ones. An earlier draft put that swing at "more than 0.22 in $R^2$"; measured under one protocol it is about 0.10, and most of it is the normalization rather than the hyperparameters — normalizing alone is worth +0.074 to the demo-tuned mixture. Any comparison that leaves a model at its defaults is still measuring the defaults, but the effect is smaller than asserted. The same caution applies to the baselines, reported here at *their* defaults.
+The cause was in the consequent solver, not the hierarchy: the closed-form ridge solve formed the normal equations, which squares the condition number, and applied no regularization to the rule intercepts — so two rules with nearly collinear firing strengths left a singular, unregularized block. `numpy.linalg.solve` does not raise on that; it returns finite coefficients of order $10^{24}$. Both halves are now fixed upstream, by solving least squares on the design rather than the normal equations and by giving the ridge term a non-zero default, and the row above is a clean ten-seed mean with no divergence.
+
+I keep the episode in the text because the lesson outlived the bug. A five-seed mean did not merely give a slightly wrong number here — it certified as stable a model that fails one time in ten, and no amount of care in the *reporting* would have caught it, because the failing configuration was never run. That is the argument for the seed floor in Goal G4, and it is worth more to this dissertation than the corrected cell.
+
+The correction also cuts in the method's favor on one point, though less dramatically than I once claimed. Configuration matters: at library defaults the mixture reaches 0.720 on raw features, and at the settings `demo_concrete.py` specifies it reaches 0.834 on normalized ones. An earlier draft put that swing at "more than 0.22 in $R^2$"; measured under one protocol it is about 0.11, and most of it is the normalization rather than the hyperparameters — normalizing alone is worth +0.091 to the library-default mixture and +0.056 to the demo-tuned one. Any comparison that leaves a model at its defaults is still measuring the defaults, but the effect is smaller than asserted. The same caution applies to the baselines, reported here at *their* defaults.
 
 **Table 6.2 — External baselines** *(structure fixed; cells to be filled by the reproduction harness — Goal G3).* Run on identical splits, multi-seed with error bars.
 
 | Method | Concrete R² | Concrete RMSE | PhiUSIIL accuracy |
 |---|---:|---:|---:|
 | **Fuzzy tree (this work)** | 0.580 ± 0.067 | 10.58 | 0.970 ± 0.003 |
-| **Mixture of experts (this work)** | 0.729 ± 0.065 | 8.43 | 0.997 ± 0.001 |
+| **Mixture of experts (this work)** | 0.720 ± 0.064 | 8.59 | 0.999 ± 0.002 |
 | CART | 0.825 ± 0.047 | 6.74 | 1.000 ± 0.000 |
 | Random Forest (reference) | 0.909 ± 0.018 | 4.90 | 1.000 ± 0.000 |
 | M5 model tree | *pending* | *pending* | — |
 | ANFIS | *pending* | *pending* | *pending* |
-| Flat TSK (= Ch 4 flat MoG) | 0.651 ± 0.052 | 9.62 | 0.997 ± 0.001 |
+| Flat TSK (= Ch 4 flat MoG) | 0.651 ± 0.052 | 9.62 | 0.996 ± 0.001 |
 
 This table runs every model at **raw features and library defaults**, which is why its numbers sit below Table 6.1's throughout — that is the comparison it is for, and the two must not be read as one series. The Concrete column here says what these models do untuned; Table 6.1 says what they do under the tuned, normalized protocol the chapter argues for. The PhiUSIIL column is the more interesting one now that it is filled: on that dataset every method saturates, the two tree baselines reach a perfect score, and the fuzzy models sit a fraction behind — so PhiUSIIL discriminates between these methods hardly at all and should not carry any weight in the comparison.
 
