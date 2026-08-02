@@ -58,8 +58,9 @@ CONORM = os.environ.get("REPRO_ANOM_CONORM", "hamacher")
 
 def load_openset_data():
     """(X, y) for the leave-one-class-out protocol. BETH if present, else Glass."""
-    beth = os.path.join(F.FIS, "gaussian_mixture", "beth_data",
-                        "labelled_training_data.csv")
+    # Under data/, not the submodule: tribble-fis dropped `gaussian_mixture/` in
+    # 8484fd6 and is now a pure library. See _fuzzy_models.DATA_DIR.
+    beth = os.path.join(F.DATA_DIR, "beth_data", "labelled_training_data.csv")
     if os.path.exists(beth):
         print("  [data] BETH found -- using it")
         df = pd.read_csv(beth)
