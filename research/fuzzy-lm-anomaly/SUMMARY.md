@@ -1,6 +1,6 @@
 # Fuzzy anomaly detection in small language models — what we learned
 
-Short version of `FINDINGS.md` (29 sections). ~69,000 generations across six
+Short version of `FINDINGS.md` (30 sections). ~69,000 generations across six
 frozen models on one 12 GB card. Nothing was fine-tuned; the models were only
 read.
 
@@ -8,13 +8,14 @@ read.
 
 ## The one-line result
 
-**Four apparent successes were each destroyed by a control, and the controls are
-the contribution.** What survived is narrower and more useful than what we set out
-to find: the fuzzy anomaly rule does not beat confidence-based detection in
-general, but *when* it helps is strongly and predictably governed by how badly
-confidence is doing.
+**Five apparent successes were each destroyed by a control, and the controls are
+the contribution.** Under an equal-budget comparison the fuzzy anomaly rule loses
+to every standard alternative on every model (§30); the durable output of the
+study is the five confounds, their remedies, and one strong practical finding —
+**max-token entropy is a far better hallucination-detection baseline than the
+mean-entropy / perplexity defaults** (+0.116 AUROC, better in 61 of 66 cells).
 
-## Four ways to manufacture a hallucination detector
+## Five ways to manufacture a hallucination detector
 
 Each of these, alone, produced a result that looked publishable.
 
@@ -24,16 +25,17 @@ Each of these, alone, produced a result that looked publishable.
 | **prompt family / style** | ~0.9 for a detector reading style, not fabrication | real-entity twins in identical surface forms |
 | **confidence** | mean entropy: **0.964** on a templated set | matching on entropy quartile |
 | **unequal search budget** | flips a comparison's sign (+0.014 → −0.019) | equal search for all arms, or fixed configs |
+| **baseline under-specification** | a weak default baseline invents a niche: `ent_max` beats `ent_mean` by **+0.116** (61/66 cells) | search the baseline family too |
 
-The fourth was found in our own protocol — after the first three had already
-taught us to look. A 120-candidate configuration search scored against labelled
-validation positives, with none for the baselines, produced a stable,
-seed-consistent, mechanistically plausible advantage that vanished at fixed
-configurations.
+The last two were found in our own protocol, after the first three had already
+taught us to look. The fourth: a 120-candidate configuration search scored against
+labelled validation positives, with none for the baselines. The fifth is sharper,
+because the baseline was never the object of suspicion — we picked mean entropy,
+held it fixed for twenty-odd sections, and it manufactured a "weak-entropy regime"
+that vanishes under a 38-candidate search over the statistic family.
 
-**Matching is a cheap, general remedy** for the first three and needs no change to
-the detector under test. The fourth needs only that search budget be stated and
-equalised.
+**Matching is a cheap, general remedy** for the first three. The last two need only
+that the search budget — *and the baseline family* — be stated and equalised.
 
 ## What was retracted
 
@@ -41,11 +43,19 @@ equalised.
   template control: at chance (0.529) against a different fabrication family.
 * §19 — the false-premise "niche". Killed by long-form real-subject twins.
 * §21/23/24 — the fuzzy rule beating full-covariance Mahalanobis. Killed by the
-  search-budget audit.
+  search-budget audit (§26).
+* §27/28/29 — the complementarity result and everything built on it. Killed by
+  re-baselining mean entropy to max entropy (§30).
 
 ## What survived
 
-**The complementarity result (§27, §29).** Across 44 cells (models × templates),
+**⚠ §27's complementarity result was itself retracted by §30** — it was measured
+against *mean* entropy; re-baselined on `ent_max` the weak-entropy regime shrinks
+from 12/66 cells to 1/66 and Gemma3-270m stops being a weak-entropy model. §28's
+switching and §29's scaling conclusions inherit that correction. Kept below for
+the record.
+
+**The complementarity result (§27, §29) — RETRACTED.** Across 44 cells (models × templates),
 fixed configurations for both detectors:
 
 * `corr(entropy AUROC, FIS − entropy)` = **−0.78**, p = 5e-10, verified against
@@ -55,16 +65,24 @@ fixed configurations for both detectors:
 * The fuzzy rule does *not* win overall — 0.628 vs entropy's 0.743, ahead in 10 of
   44 cells.
 
-**The regime is not set by model size (§29).** Entropy improves monotonically
-within the SmolLM2 family (0.713 → 0.838 → 0.909 for 135M/360M/1.7B), but
-Gemma3-270m sits at 0.546 while SmolLM2-135M — half its size — reaches 0.713. It
-is a **weak-entropy-model** technique, not a small-model one.
+(§29's scaling conclusion and §28's switching work inherit the §30 correction:
+they were measured against mean entropy. The observation that entropy improves
+monotonically within the SmolLM2 family — 0.713 → 0.838 → 0.909, and 0.866 →
+0.946 → 0.962 under `ent_max` — is unaffected and stands.)
 
-**Detector choice is decidable (§28, §29).** Twenty labelled examples buy +0.0104
-at 91% agreement with an oracle; 100 buy +0.0134 at 99.5%. Label-free, entropy's
-own reliability is predictable from the known-good split alone (held-out
-r = **+0.689** across six models) — but not sharply enough at the decision
-boundary to act on. Predictable, not yet actionable.
+**The equal-budget result (§30), which does stand.** Every family given a
+comparable search, same validation positives, same criterion:
+
+| family | budget | AUROC | FPR@95 |
+|---|---|---|---|
+| **single statistic** | 38 | **0.870** | **0.492** |
+| Mahalanobis | 120 | 0.776 | 0.714 |
+| IsolationForest | 96 | 0.768 | 0.694 |
+| OneClassSVM | 100 | 0.767 | 0.749 |
+| **FIS** | 120 | **0.750** | 0.785 |
+
+The fuzzy rule finishes last against every rival on every model (paired
+p ≤ 0.001), despite the largest budget in the comparison.
 
 **Negative results that are worth their cost:**
 
@@ -95,8 +113,8 @@ These had equal budgets across arms and are unaffected by the §26 audit:
 * **`papers/hallucination-detection-confounds.md`** — the viable write-up. Four
   confounds, each measured, each with a cheap remedy, one caught in the authors'
   own protocol. Blocking: measure length/style imbalance in a public benchmark.
-* **`papers/fuzzy-anomaly-rule-slm.md`** — ON HOLD pending an equal-budget
-  comparison.
+* **`papers/fuzzy-anomaly-rule-slm.md`** — **closed**. The equal-budget
+  comparison was run (§30) and the claim does not survive it.
 * **Ch 4 material regardless:** the θ result, the nilpotent-norm result, the
   membership-family dominance, and the library fixes.
 

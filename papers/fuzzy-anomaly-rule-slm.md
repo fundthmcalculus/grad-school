@@ -1,6 +1,15 @@
 # Write-up plan — A parsimonious fuzzy anomaly rule for ungrounded LM generation
 
-**Status:** ⚠️ **ON HOLD — the central claim was retracted in FINDINGS §26.**
+**Status:** ❌ **CLOSED — do not draft. FINDINGS §30 ran the equal-budget
+comparison that §26 asked for, and the fuzzy rule finishes LAST against every
+rival on every model (paired p ≤ 0.001), despite receiving the largest budget in
+the comparison. It also loses at zero budget. There is no fair comparison in which
+the claim survives. §22's within-FIS findings and the library fixes remain valid
+and belong in Ch 4; the detector claim does not.**
+
+<details><summary>previous status</summary>
+
+⚠️ ON HOLD — the central claim was retracted in FINDINGS §26.
 The comparison that produced it gave the fuzzy rule a 120-candidate supervised
 configuration search on labelled validation positives while its rivals received
 none; with a fixed configuration the sign flips (−0.019, 1/8 seeds) and the fuzzy
@@ -9,6 +18,8 @@ draft from §1 below until a like-for-like comparison exists — either an equal
 search budget for every detector, or fixed pre-declared configurations for all
 (`fuzzy_stats.py --no-select`). The §22 factorial findings (membership family
 ±0.262 etc.) are unaffected, since every arm there had the same budget.
+
+</details>
 **Source:** `research/fuzzy-lm-anomaly/` — see `FINDINGS.md` §§20–23.
 **Companion:** `papers/hallucination-detection-confounds.md` (the methodological
 negative result). **Keep these separate** — one is an evaluation-methods paper

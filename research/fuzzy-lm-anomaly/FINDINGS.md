@@ -1886,3 +1886,91 @@ The remaining gap is precision near the crossover, not the existence of the
 signal. A classifier trained directly on "is this cell below the crossover"
 — rather than regressing AUROC and thresholding the prediction — is the obvious
 next attempt, and would need more models still to validate.
+
+---
+
+## 30. The equal-budget comparison — and a fifth confound
+
+§26 showed the fuzzy rule's win came from a search its rivals never got. §27–§29
+then ran everything at *zero* budget. Neither is what a paper needs.
+`equal_budget.py` gives **every family a search of comparable size**, on the same
+validation positives, with the same criterion, reported on the same disjoint test
+half.
+
+| family | budget | searched | fixed | search gain | FPR@95 |
+|---|---|---|---|---|---|
+| **single statistic** | **38** | **0.8704 ± 0.062** | 0.7547 | **+0.116** | **0.492** |
+| Mahalanobis | 120 | 0.7755 ± 0.083 | 0.7281 | +0.047 | 0.714 |
+| IsolationForest | 96 | 0.7678 ± 0.097 | 0.7099 | +0.058 | 0.694 |
+| OneClassSVM | 100 | 0.7670 ± 0.091 | 0.6557 | +0.111 | 0.749 |
+| **FIS** | 120 | **0.7499 ± 0.092** | 0.6703 | +0.080 | 0.785 |
+
+Condition `length+template`, 6 models × 4 seeds. Paired against the FIS:
+
+    FIS - IsolationForest   -0.0179  wins  5/24  p = 0.0004
+    FIS - Mahalanobis       -0.0257  wins  1/24  p = 0.0000
+    FIS - OneClassSVM       -0.0172  wins  4/24  p = 0.0011
+    FIS - single statistic  -0.1205  wins  0/24  p = 0.0000
+
+**Under equal budgets the fuzzy rule is last, on every model, against every
+rival.** It is not close, and it is not a sample-size or configuration issue — the
+FIS received the largest budget in the comparison (120, tied with Mahalanobis) and
+still finished behind a family of 38 thresholds. The
+`papers/fuzzy-anomaly-rule-slm.md` claim is not recoverable.
+
+### The fifth confound: baseline under-specification
+
+The single-statistic family selected **`ent_max` in 46 of 48 runs** — the
+*maximum* per-token entropy over the generated answer, not the mean. Measured
+directly over 66 cells:
+
+| baseline | AUROC | |
+|---|---|---|
+| `ent_mean` (the field default, and what §§8–29 used) | 0.767 | |
+| **`ent_max`** | **0.883** | **+0.116, better in 61/66 cells** |
+
+Per model, `ent_mean → ent_max`: gemma **0.557 → 0.784**, sl135 0.713 → 0.866,
+qwen 0.775 → 0.849, lfm 0.809 → 0.893, smollm2 0.838 → 0.946, sl1700 0.911 → 0.962.
+
+**This retracts §27.** That result — the fuzzy rule beating entropy exactly where
+entropy is weak, r = −0.78, artefact-checked — was measured against *mean*
+entropy. Re-baselined on `ent_max`, the weak-entropy regime essentially
+disappears:
+
+    cells below the §27 crossover (0.608)
+      by mean entropy : 12 / 66
+      by MAX  entropy :  1 / 66
+
+Gemma3-270m, the entire basis of the "weak-entropy model" story, is not a
+weak-entropy model. Mean entropy was the wrong statistic for it. The
+complementarity result, the crossover, the scaling conclusion in §29 and the
+switching work in §28 were all built on that baseline and inherit the correction.
+
+So **choosing a weak default baseline is a confound in its own right**, with the
+same signature as the other four: it manufactures a stable, seed-consistent,
+mechanistically plausible niche for the method under test. It cost this study
+three sections.
+
+### What this leaves
+
+* **The fuzzy anomaly rule does not beat standard alternatives on this task under
+  any fair comparison.** Zero budget (§26), equal budget (here) — it loses either
+  way. That is the conclusion.
+* **`ent_max` is a much stronger and nearly free baseline than the field's usual
+  mean-entropy / perplexity defaults** (+0.116, 61/66 cells, 38-candidate search,
+  FPR@95 0.492 against the FIS's 0.785). This is the most directly useful result
+  in the study for anyone else working on hallucination detection.
+* Search budget must be stated and equalised, **and so must the baseline family**.
+  Comparing a searched method against an unsearched, arbitrarily chosen baseline
+  statistic is the same error twice over.
+
+### Consequence for the write-ups
+
+`papers/fuzzy-anomaly-rule-slm.md` is **closed**, not on hold — there is no
+equal-budget comparison in which the claim survives.
+
+`papers/hallucination-detection-confounds.md` gains a fifth confound and its
+sharpest example: *we* chose mean entropy as the baseline, held it fixed for
+twenty-odd sections, and it manufactured a regime that does not exist. That is a
+better illustration of the paper's thesis than any of the first four, because the
+baseline was never the object of suspicion.

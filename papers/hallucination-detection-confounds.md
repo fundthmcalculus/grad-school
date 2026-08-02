@@ -3,15 +3,15 @@
 **Status:** not started. This is a plan of record, not a draft.
 **Source of results:** `research/fuzzy-lm-anomaly/` (see `FINDINGS.md`; all numbers
 below are already produced and committed, with seeds and controls).
-**Provisional title:** *Length, Style, Confidence, and Search Budget: Four
-Confounds That Manufacture Hallucination Detectors*
+**Provisional title:** *Five Ways to Manufacture a Hallucination Detector — and
+the Controls That Remove Them*
 
 ---
 
 ## 1. Why this is a paper
 
 While testing whether a fuzzy inference system could flag hallucination from a
-frozen 360M language model, **four separate apparent successes were each
+frozen 360M language model, **five separate apparent successes were each
 destroyed by a control** — and each confound, on its own, produced a result that
 would have looked publishable.
 
@@ -21,8 +21,15 @@ would have looked publishable.
 | **prompt family / style** | ~0.9 for a detector reading style, not fabrication | real-entity twins in identical surface forms |
 | **confidence** | mean entropy: **0.964** on a templated set | matching on entropy quartile |
 | **unequal search budget** | flips a detector comparison's sign (+0.014 → −0.019) | equal search for all, or fixed configs |
+| **baseline under-specification** | `ent_max` beats the default `ent_mean` by **+0.116** (61/66 cells), erasing a "regime" we had reported | search the baseline family too |
 
-The fourth was found last, in our own protocol: giving one detector a
+The fifth is the sharpest example, because the baseline was never the object of
+suspicion: we picked mean entropy, held it fixed for twenty-odd sections, and it
+manufactured a "weak-entropy regime" that vanishes under a 38-candidate search
+over the statistic family (12/66 cells below the crossover → 1/66). It cost three
+sections of results.
+
+The fourth was found in our own protocol too: giving one detector a
 120-candidate supervised configuration search on labelled validation data while
 its rivals get none produces a stable, seed-consistent, mechanistically plausible
 advantage that vanishes at fixed configurations (§26). It has the same signature
