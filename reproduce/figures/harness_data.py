@@ -64,16 +64,32 @@ def archive(label=None):
 
 
 def table(basename, label=None):
-    """(rows, archive_label) for one table's CSV. Rows are dicts, values strings."""
+    """(rows, source_label) for one table's CSV. Rows are dicts, values strings.
+
+    Falls back to the loose files in `reproduce/outputs/` when the archive does
+    not carry this table -- which is the normal case for a study that is not part
+    of `run_all_tables.sh`, such as the optimizer sweep. The returned label says
+    which it was, and the figure prints it, so "drawn from an archived run" and
+    "drawn from whatever ran last" are never confused. Copying a loose file into
+    an archive directory to make this work would be falsifying provenance.
+    """
     name, path = archive(label)
     csv_path = os.path.join(path, f"{basename}.csv")
     if not os.path.exists(csv_path):
+        loose = os.path.join(OUTPUTS, f"{basename}.csv")
+        if os.path.exists(loose):
+            return _read(loose), "(unarchived — whatever ran last)"
         raise FileNotFoundError(
-            f"{basename}.csv is not in archive {name!r}. Run the generator that "
-            f"produces it (see reproduce/PROVENANCE_MAP.md) before drawing a "
-            f"figure from it.")
-    with open(csv_path, newline="") as f:
-        return list(csv.DictReader(f)), name
+            f"{basename}.csv is in neither archive {name!r} nor "
+            f"{os.path.relpath(OUTPUTS, ROOT)}. Run the generator that produces "
+            f"it (see reproduce/PROVENANCE_MAP.md) before drawing a figure "
+            f"from it.")
+    return _read(csv_path), name
+
+
+def _read(path):
+    with open(path, newline="") as f:
+        return list(csv.DictReader(f))
 
 
 def number(text):
@@ -92,4 +108,5 @@ def spread(text):
 
 def provenance_note(label):
     """The one-line source stamp a data figure carries in its corner."""
-    return f"source: reproduce/outputs/{label}"
+    sep = " " if label.startswith("(") else ""
+    return f"source: reproduce/outputs/{sep}{label}"
