@@ -1,30 +1,31 @@
 #!/usr/bin/env python3
-"""What each optimizer finds from the hot start, when it finds it, and whether
-the difference between them is real.
+"""What the Gaussian construction is worth as a starting point, in iterations.
 
-Three panels, in the order the questions should be asked.
+Three panels, answering the study's three questions in order.
 
-**(a) The objective, against evaluations.** What every convergence plot shows.
-Median across seeds with an inter-quartile band; the dashed line is the
-heuristic start. Read on its own it says the local methods win.
+**(a) Held-out R² against the evaluation budget, hot against cold.** Solid lines
+start from the Gaussian construction's antecedents; dashed from a uniform random
+point in the same box. If the construction were carrying the accuracy, the solid
+lines would start high and stay above. They do not.
 
-**(b) Held-out R², against the evaluation budget.** The same runs, scored on the
-test split at each budget checkpoint, which is the quantity the chapters
-actually quote. It does not agree with (a), and that disagreement is the
-study's main finding rather than an artifact: an arm can drive the
-cross-validated objective down and take nothing home.
+**(b) The price of not having the construction.** For each cold run, the number
+of evaluations before its objective matched what the construction supplies for
+free. This is the study's headline number and the reason the x axis everywhere
+is evaluations rather than seconds.
 
-**(c) The paired difference, with its spread.** Each arm's per-seed
-`R²(arm) − R²(start)`, mean and standard deviation. Pairing matters because all
-arms face the identical problem at a given seed, so the start's own seed-to-seed
-spread is common to them and swamps the between-arm gaps in an unpaired
-comparison. The bars overlap, and the panel is drawn to make that unmissable —
-the honest reading of this study is that *something* is reliably available and
-*which optimizer takes it* is not yet resolved.
+**(c) The paired gain over the heuristic, hot and cold side by side.** Mean ±1
+s.d. of `R²(run) − R²(heuristic)` per seed. Pairing matters because every run at
+a given seed faces the identical split and folds. The bars overlap each other
+almost completely, which is the honest headline: something is reliably available
+above the heuristic, and neither the optimizer nor the starting point determines
+how much.
 
-Panel (a) is drawn from the per-improvement trace, (b) and (c) from the budget
-and per-seed CSVs. All three come out of the one run, so they cannot disagree
-about what happened.
+One caveat the figure cannot draw, and the caption states: a "cold" draw is
+random only in *placement and width*. It inherits the structure the construction
+discovered — which features carry signal and how many mixture components sit on
+each — because those come from the fitted model that `build_param_bounds` is
+built from. This isolates the value of the placement, not of the construction as
+a whole.
 """
 
 from __future__ import annotations
@@ -41,122 +42,142 @@ import harness_data as H  # noqa: E402
 
 NAME = "07-optimizer-hotstart"
 
-# Fixed order, never cycled: SciPy incumbents first, then the package's arms.
 ARM_ORDER = ["scipy-lbfgsb", "scipy-powell", "scipy-de",
              "opt-ga", "opt-pso", "opt-aco", "opt-gd"]
 COLOUR = {a: F.SERIES[i % len(F.SERIES)] for i, a in enumerate(ARM_ORDER)}
-
-
-def _traces():
-    rows, label = H.table("table_opt_hotstart_traces")
-    by_arm = defaultdict(lambda: defaultdict(list))
-    for r in rows:
-        by_arm[r["arm"]][int(r["seed"])].append(
-            (int(r["eval"]), float(r["best_cv_mse"])))
-    for arm in by_arm:
-        for seed in by_arm[arm]:
-            by_arm[arm][seed].sort()
-    return by_arm, label
+STYLE = {"hot": "solid", "cold": (0, (4, 2))}
 
 
 def _budget_curve():
-    rows, _ = H.table("table_opt_hotstart_budget")
-    by_arm = defaultdict(lambda: defaultdict(dict))
-    starts = {}
+    """{(arm, init): {budget: {seed: r2}}}, plus the heuristic reference.
+
+    Keyed on (arm, init), not arm. The two inits share arm names, and collapsing
+    them would average a hot run together with a cold one and quietly destroy
+    the only comparison this figure exists to make.
+    """
+    rows, label = H.table("table_opt_hotstart_budget")
+    curve = defaultdict(lambda: defaultdict(dict))
+    heuristic = {}
     for r in rows:
-        by_arm[r["arm"]][int(r["budget"])][int(r["seed"])] = float(r["r2"])
-        starts[int(r["seed"])] = float(r["r2_0"])
-    return by_arm, starts
+        init = r.get("init", "hot")
+        curve[(r["arm"], init)][int(r["budget"])][int(r["seed"])] = float(r["r2"])
+        heuristic[int(r["seed"])] = float(r.get("heuristic_r2") or r["r2_0"])
+    return curve, heuristic, label
 
 
-def _step(trace, grid):
-    evals = np.array([e for e, _ in trace])
-    vals = np.array([v for _, v in trace])
-    idx = np.clip(np.searchsorted(evals, grid, side="right") - 1, 0, len(vals) - 1)
-    return vals[idx]
+def _seed_rows():
+    rows, _ = H.table("table_opt_hotstart_seeds")
+    out = defaultdict(list)
+    for r in rows:
+        out[(r["arm"], r.get("init", "hot"))].append(r)
+    return out
 
 
 def build():
-    by_arm, label = _traces()
-    present = [a for a in ARM_ORDER if a in by_arm]
+    curve, heuristic, label = _budget_curve()
+    seeds_by = _seed_rows()
+    present = [a for a in ARM_ORDER if (a, "hot") in curve]
+    inits = [i for i in ("hot", "cold") if any((a, i) in curve for a in present)]
     if not present:
-        raise RuntimeError("no traces found; run reproduce/optimizers/run_study.py")
-    budget_curve, starts = _budget_curve()
+        raise RuntimeError("no budget curve; run reproduce/optimizers/run_study.py")
 
-    budget = max(e for arm in by_arm.values() for tr in arm.values() for e, _ in tr)
-    grid = np.unique(np.round(np.geomspace(1, budget, 220)).astype(int))
-    start_obj = np.median([tr[0][1] for arm in by_arm.values()
-                           for tr in arm.values()])
+    fig, (rx, px, bx) = F.grid_figure(1, 3, width=F.W_WIDE + 1.6, height=3.8,
+                                      gridspec_kw={"width_ratios": [1.35, 1, 1.1]})
 
-    fig, (ax, rx, bx) = F.grid_figure(1, 3, width=F.W_WIDE + 1.4, height=3.7,
-                                      gridspec_kw={"width_ratios": [1.25, 1.25, 1]})
+    # -- (a) R^2 against budget, hot vs cold ---------------------------------
+    # Two colours, not seven. Fourteen coloured lines (seven arms x two inits)
+    # made this panel unreadable and buried its one message. Arm identity lives
+    # in (b) and (c); here the only question is whether the solid family sits
+    # above the dashed one, so the arms are drawn thin in the init's colour and
+    # the median across arms is drawn bold on top.
+    HOT_C, COLD_C = F.BLUE, F.ORANGE
+    ref = float(np.median(list(heuristic.values())))
+    rx.axhline(ref, lw=1.2, ls=(0, (2, 2)), color=F.FAINT, zorder=2)
 
-    # -- (a) objective against evaluations -----------------------------------
-    ax.axhline(start_obj, lw=1.2, ls=(0, (4, 2)), color=F.FAINT, zorder=2)
-    ax.text(1.15, start_obj, " heuristic start", va="bottom", ha="left",
-            fontsize=F.FS_SMALL, color=F.MUTED)
-    for arm in present:
-        curves = np.vstack([_step(tr, grid) for tr in by_arm[arm].values()])
-        ax.plot(grid, np.median(curves, axis=0), lw=1.6, color=COLOUR[arm],
-                label=arm, zorder=5)
-        ax.fill_between(grid, np.percentile(curves, 25, axis=0),
-                        np.percentile(curves, 75, axis=0),
-                        color=F.tint(COLOUR[arm], 0.90), lw=0, zorder=2)
-    ax.set_xscale("log")
-    F.style_axes(ax, title="(a)  the objective it was given",
-                 xlabel="objective evaluations (log)",
-                 ylabel="k-fold held-out MSE")
-    ax.set_xlim(1, budget * 1.1)
-    F.legend(ax, loc="lower left", ncol=2)
+    budgets = sorted(curve[(present[0], "hot")])
+    for init, colour in (("hot", HOT_C), ("cold", COLD_C)):
+        per_arm = []
+        for arm in present:
+            data = curve.get((arm, init))
+            if not data:
+                continue
+            med = [float(np.median(list(data[b].values()))) for b in budgets]
+            per_arm.append(med)
+            rx.plot(budgets, med, lw=0.9, color=F.tint(colour, 0.55), zorder=3)
+        if per_arm:
+            rx.plot(budgets, np.median(np.vstack(per_arm), axis=0), lw=2.4,
+                    color=colour, marker="o", ms=4.5, zorder=6,
+                    label=f"{init} start (median over arms)")
 
-    # -- (b) held-out R^2 against budget -------------------------------------
-    seeds = sorted(starts)
-    start_r2 = np.median([starts[s] for s in seeds])
-    rx.axhline(start_r2, lw=1.2, ls=(0, (4, 2)), color=F.FAINT, zorder=2)
-    for arm in present:
-        budgets = sorted(budget_curve[arm])
-        med = [np.median([budget_curve[arm][b][s] for s in budget_curve[arm][b]])
-               for b in budgets]
-        lo = [np.percentile(list(budget_curve[arm][b].values()), 25) for b in budgets]
-        hi = [np.percentile(list(budget_curve[arm][b].values()), 75) for b in budgets]
-        rx.plot(budgets, med, lw=1.6, marker="o", ms=3.5, color=COLOUR[arm], zorder=5)
-        rx.fill_between(budgets, lo, hi, color=F.tint(COLOUR[arm], 0.90), lw=0,
-                        zorder=2)
     rx.set_xscale("log")
-    F.style_axes(rx, title="(b)  the quantity the chapters quote",
-                 xlabel="evaluation budget (log)", ylabel="held-out $R^2$")
-    rx.text(min(sorted(budget_curve[present[0]])), start_r2, " heuristic start",
-            va="bottom", ha="left", fontsize=F.FS_SMALL, color=F.MUTED)
+    rx.set_xticks(budgets)
+    rx.set_xticklabels([str(b) for b in budgets], fontsize=F.FS_TICK)
+    rx.minorticks_off()
+    F.style_axes(rx, title="(a)  held-out $R^2$ against budget",
+                 xlabel="objective evaluations (log)", ylabel="held-out $R^2$")
+    rx.text(budgets[0], ref, " Gaussian construction", va="bottom", ha="left",
+            fontsize=F.FS_SMALL, color=F.MUTED)
+    F.legend(rx, loc="lower right")
 
-    # -- (c) paired delta, with spread ---------------------------------------
-    rows, _ = H.table("table_opt_hotstart_seeds")
-    per_arm = defaultdict(list)
-    for r in rows:
-        per_arm[r["arm"]].append(float(r["r2"]) - float(r["r2_0"]))
-    stats = {a: (float(np.mean(per_arm[a])), float(np.std(per_arm[a])))
-             for a in present if per_arm[a]}
-    order = sorted(stats, key=lambda a: -stats[a][0])
+    # -- (b) evaluations for a cold run to match the construction ------------
+    reach = {}
+    for arm in present:
+        vals = [int(r["evals_to_heuristic"]) for r in seeds_by.get((arm, "cold"), [])
+                if r.get("evals_to_heuristic") not in (None, "")]
+        if vals:
+            reach[arm] = (float(np.mean(vals)), float(np.std(vals)), len(vals))
+    order = sorted(reach, key=lambda a: reach[a][0])
     y = np.arange(len(order))
-    means = [stats[a][0] for a in order]
-    sds = [stats[a][1] for a in order]
-    bx.barh(y, means, color=[COLOUR[a] for a in order], height=0.6, zorder=3)
-    bx.errorbar(means, y, xerr=sds, fmt="none", ecolor=F.INK_2, elinewidth=1.0,
-                capsize=2.5, zorder=5)
+    px.barh(y, [max(reach[a][0], 1.0) for a in order],
+            color=[COLOUR[a] for a in order], height=0.6, zorder=3)
+    for yi, a in zip(y, order):
+        mean, _, n = reach[a]
+        note = f"{mean:.0f}" + ("" if n == 10 else f"  ({n}/10 seeds)")
+        px.text(mean * 1.35, yi, note, va="center", ha="left",
+                fontsize=F.FS_SMALL, color=F.INK_2)
+    px.set_yticks(y)
+    px.set_yticklabels(order, fontsize=F.FS_SMALL)
+    px.invert_yaxis()
+    # Log axis: the answers span 2 to 272, and on a linear scale the population
+    # methods' bars are invisible next to the local ones -- which is the
+    # comparison the panel exists to show.
+    px.set_xscale("log")
+    px.set_xlim(1, max(v[0] for v in reach.values()) * 4)
+    F.style_axes(px, title="(b)  cold start: evaluations to\nmatch the construction",
+                 xlabel="objective evaluations (log)", grid_axis="x")
+
+    # -- (c) paired gain over the heuristic, hot and cold --------------------
+    width = 0.38
+    for k, init in enumerate(inits):
+        means, sds = [], []
+        for arm in present:
+            d = [float(r["r2"]) - float(r["heuristic_r2"])
+                 for r in seeds_by.get((arm, init), []) if r.get("heuristic_r2")]
+            means.append(float(np.mean(d)) if d else np.nan)
+            sds.append(float(np.std(d)) if d else np.nan)
+        y = np.arange(len(present)) + (k - 0.5) * width
+        bx.barh(y, means, xerr=sds, height=width * 0.9,
+                color=[F.tint(COLOUR[a], 0.0 if init == "hot" else 0.55)
+                       for a in present],
+                zorder=3, error_kw=dict(ecolor=F.INK_2, elinewidth=0.9, capsize=2))
     bx.axvline(0, lw=0.9, color=F.AXIS, zorder=4)
-    bx.set_yticks(y)
-    bx.set_yticklabels(order, fontsize=F.FS_SMALL)
+    bx.set_yticks(np.arange(len(present)))
+    bx.set_yticklabels(present, fontsize=F.FS_SMALL)
     bx.invert_yaxis()
-    F.style_axes(bx, title="(c)  paired gain, ±1 s.d.",
-                 xlabel="$R^2$(arm) $-$ $R^2$(start), per seed", grid_axis="x")
+    F.style_axes(bx, title="(c)  paired gain over the\nconstruction, ±1 s.d.",
+                 xlabel="$R^2$(run) $-$ $R^2$(heuristic)", grid_axis="x")
+    bx.text(0.0, 1.005, "solid = hot start · pale = cold start",
+            transform=bx.transAxes, ha="left", va="bottom",
+            fontsize=F.FS_SMALL, color=F.MUTED)
 
     fig.text(0.5, -0.02,
-             "Every arm optimizes the same objective from the same hot start "
-             "inside the same box, cut off at the same evaluation count by a "
-             "wrapper that raises. Single-threaded,\nso an optimizer that "
-             "parallelises well gets no credit. Bands are inter-quartile across "
-             "seeds. **Panel (c) is the one to read for ordering, and its error "
-             "bars overlap:**\nthe gain over the heuristic start is real and "
-             "consistent, but no arm is separated from another by this evidence. "
+             "Same objective, same box, same folds, same test split; the budget is "
+             "evaluations, not time, and every arm is single-threaded. A \"cold\" "
+             "draw is random in the\nplacement and width of the membership "
+             "functions only — it inherits the structure the construction found "
+             "(which features, how many components), because that is what\n"
+             "`build_param_bounds` is built from. So this measures what the "
+             "construction's *placement* is worth, not the construction as a whole. "
              f"{H.provenance_note(label)}",
              ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
              linespacing=1.6)
