@@ -30,3 +30,9 @@ __pycache__/
 .idea/
 
 .twocart_train.npz
+
+# LaTeX build artifacts
+*.aux
+*.toc
+*.out
+*.synctex.gz
