@@ -10,7 +10,7 @@ Two specific gaps make this more than a packaging exercise, and both surfaced wh
 
 ## 7.2 Proposed studies
 
-I organize the remaining work as seven goals.
+I organize the remaining work as eight goals.
 
 **G1 — Direct one-pass membership generation.** Collapse Chapter 5's two-stage select-then-fit pipeline into a single pass, in which each block emits its native membership function, the disjunction recombines them, and the surviving envelope is the model. The research-interesting piece is a soft, kernel-weighted band membership, which I expect to fix the small-sample over-segmentation. This is the differentiator, and it feeds the capstone.
 
@@ -31,6 +31,8 @@ So the honest status is that neither scheme is safe on a heavily skewed target, 
 **G6 — Interpretability, measured.** The interpretability claim should be measured, not asserted: rule counts, path lengths, and either an established interpretability metric or a small expert-audience study, and an empirical demonstration of the Magdalena condition (hierarchies over named inputs).
 
 **G7 — Adaptive multi-scale (stretch).** Replace Chapter 5's gap heuristic for band discovery with a model-based criterion — a change-point or barcode-stability test — so that overlapping density scales, which the gap heuristic cannot handle, become tractable. I mark this explicitly as a stretch goal and the first thing I will cut if time runs short.
+
+**G8 — Joint memberships where the structure requires them (stretch).** Every membership function in this work is one-dimensional, which is what keeps the rule count linear and the clauses readable — and is a hard expressive limit, since a ring is not the intersection of per-axis intervals. I propose extending to joint two-feature memberships *only* for clusters that have no faithful axis-aligned description, using the topological disjunct count of Chapter 5 §5.3.5 as the detector so the decision is a measured property of the data rather than a preference. The reason this is a stretch goal and not a plank: it trades away interpretability, which is the property the dissertation is arguing for, so it is only worth having if such clusters turn out to be rare on real data. That is an empirical question I have not yet answered, and if the answer is "common" the honest conclusion is that this construction is the wrong tool for that data. **Estimated effort: one quarter.**
 
 ## 7.3 Application showcases
 
@@ -60,6 +62,7 @@ The floor under all of this is that Chapters 3 and 4 — the accelerated exact V
 | **capstone** integrated end-to-end pipeline | Ch 3→5→6 | not started | must | 2028 Q1 |
 | **G6** interpretability, measured | Ch 6 | not started | should | 2028 Q1 |
 | **G7** adaptive multi-scale (overlapping scales) | Ch 5 | not started | stretch (first cut) | 2028 Q1 |
+| **G8** joint memberships for non-axis-aligned clusters | Ch 5, 6 | not started | stretch | 2028 Q1 |
 
 ---
 
