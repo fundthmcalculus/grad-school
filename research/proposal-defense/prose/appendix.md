@@ -10,12 +10,12 @@ A distinction first, because it governs what belongs here. Sixteen figures are c
 
 ## A.2 Extended results tables
 
-The main text carries twenty-one summary tables (3.1–3.6, 4.1–4.7, 5.1–5.3, 6.1–6.4, 7.1); their full, multi-seed versions live here once the repeatability protocol (Goal G4) has been run. All of them regenerate from the harness in `reproduce/tables/`, which emits Markdown and CSV side by side, so the appendix version is the same data at full width rather than a re-transcription.
+The main text carries twenty-two summary tables (3.1–3.7, 4.1–4.7, 5.1–5.3, 6.1–6.4, 7.1); their full, multi-seed versions live here once the repeatability protocol (Goal G4) has been run. All of them regenerate from the harness in `reproduce/tables/`, which emits Markdown and CSV side by side, so the appendix version is the same data at full width rather than a re-transcription.
 
 - **A.2.1** Full adversarial-evaluation ARI grids and the complete stitch-ablation grid (all partitions × sizes).
 - **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results.
 - **A.2.3** The broadened fuzzy-model benchmark suite (Concrete, PhiUSIIL, turbine, wave-energy, wine, and the IoT sets) with the baseline methods.
-- **A.2.4** The three-arm reorder timing study behind Chapter 3 §3.3.1 — classical cubic, stage-one priority queue, stage-two compact active set — across the full grid of $N$ and both precisions. This is also the evidence base for the possible complexity note discussed in §9.3.
+- **A.2.4** The three-arm reorder study behind Chapter 3 §3.3.1 — classical cubic, stage-one priority queue, stage-two compact active set — across the full grid of $N$ and both precisions, in absolute seconds with per-seed spreads. The main text reports this normalized, because wall-clock is not portable between machines and ratios are; the appendix version is where the seconds live. It also carries the per-$N$ detail behind Table 3.2's exponent fit, including the stage-two plateau above $N \approx 750$ that the fitted exponent averages over. This is also the evidence base for the possible complexity note discussed in §9.3.
 - **A.2.5** The output-partitioning study of Goal G5 (uniform vs. quantile vs. pinned-extreme hybrid), including the per-decile and tail-error breakdowns and the bucket-starvation counts that aggregate error hides.
 
 ## A.3 The optimization engine (`tribble-opt`)

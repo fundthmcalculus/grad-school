@@ -22,6 +22,7 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
       Shuttle. Defines the Ch 7 capstone.
 - [ ] 🔒 **A4 — Confirm the EUSFLAT 2027 submission deadline.** Anchors the Ch 5 paper schedule
       and the Ch 10 timeline.
+- [ ] 🔒 **A6 — Write the acknowledgements.** Template is in place at `prose/00-acknowledgements.md` and already wired into the build ahead of Chapter 1; the guidance lives in an HTML comment that `build_pdf.py` strips, so it can stay in the file until you replace it. Prompts included for the committee, NAFIPS co-authors, funding, and the dataset providers — note the 135K psychiatric set is not redistributable, so check what may be named. Partly gated on A2 (co-author lists).
 - [ ] 🔒 **A5 — Confirm the proposal-defense month** (assumed ~Dec 2026) and teaching/RA load
       per semester (affects Ch 10 throughput).
 
@@ -114,7 +115,7 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
       "Status: Scaffold," describes pillar 1 without stage two or the name collision, and lists
       two already-completed fixes as pending. It is the document a committee member is most
       likely to open first.
-- [ ] ⬜ **D4 — Fill the remaining 22 `*pending*` table cells**, or mark them honestly.
+- [ ] ⬜ **D4 — Fill the remaining 23 `*pending*` table cells**, or mark them honestly.
 - [ ] ⬜ **D5 — Install a LaTeX engine** so display math typesets:
       `sudo zypper install texlive-xetex texlive-latex texlive-collection-fontsrecommended`.
       `build_pdf.py` auto-detects and switches.
@@ -131,7 +132,7 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
       the regression models** (−3.761 flat, −3.626 HME) while the other four families sit within
       0.03. Also: the whole norm/conorm study appears in *no chapter*, while Ch 2 §2.1 promises
       "Chapter 4 shows" something Chapter 4 does not show — harvest it or drop the reference.
-- [ ] ⬜ **E2 — Capture the Borůvka / GPU work.** Table 3.3 has no generator; fp16 was
+- [ ] ⬜ **E2 — Capture the Borůvka / GPU work.** Table 3.4 (GPU speedups) has no generator; fp16 was
       deliberately scoped out of the CPU memory table on the grounds it belongs here; the
       datacenter-FP64 prediction is untested; and the exact-GPU-engine standalone paper is
       flagged in §9.4. None of it is in the harness.
