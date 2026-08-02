@@ -26,6 +26,7 @@ _Last updated: 2026-07-31. Proposal defense ~Dec 2026 · final defense March 202
 3. **ANFIS and GA-tuned-FIS baselines** (Ch 4, Table 4.5). The speed claim is only as strong as what it is measured against, and these are the two methods the construction displaces. Needs adapters at `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py`; the table auto-detects them.
 4. **Install a LaTeX engine** so the PDF gets real typeset math: `sudo zypper install texlive-xetex texlive-latex texlive-collection-fontsrecommended`. `build_pdf.py` auto-detects and switches; display equations currently render as flattened glyphs.
 5. **Quantify the correction-rule pass** (Ch 4 §4.3.1) — claimed but never measured. Paired confusion matrices, before and after.
+6. **Migrate off `gauss_math.detect_and_apply_log_transform`/`standard_transform`** (`tribble-fis` [PR #67](https://github.com/fundthmcalculus/tribble-fis/pull/67) deletes both) and settle the normalization default with a real third arm: every existing "log+std" result actually measured log + `[0,1]` min-max (`standard_transform`'s real behavior despite the name — now `UnitScalar`), never log + z-score (`StandardScalar`). Seven files to update (see `ACTION_ITEMS.md` §A); re-run `table_hyperparam_normalization.py` with the `StandardScalar` arm added once migrated. Mechanical + one new experiment, not new research.
 
 ---
 
