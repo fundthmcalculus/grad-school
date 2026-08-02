@@ -113,8 +113,18 @@ FIGURES = [
            module="fig_06_hme_structure", extras=("matplotlib",)),
     Figure("06-mimo-rollout", "6.3",
            "Double-pendulum rollout: truth, memoryless FIS, memory-augmented FIS",
-           module="fig_06_mimo_rollout", project="tribble-fis",
-           extras=("matplotlib", "scipy", "pandas")),
+           skip="The memory-augmented rollout does not run. "
+                "`MimoGaussianPredictorMemory.predict_trajectory` slices exactly "
+                "`window_size` rows of history, and `MemoryWindowFeatureExtractor."
+                "prepare_sequences` then computes the last row's long-term average "
+                "over the half-open interval [i-window-memory+1, i-window+1), which "
+                "for i = window_size-1 is empty and yields NaN. The method's own NaN "
+                "guard therefore fires at step 0 for every (window_size, "
+                "memory_size) pair, and it returns the initial window unchanged. "
+                "Verified at (3,1), (4,2), (10,4) and (2,1). The one-step `predict` "
+                "path is unaffected; only the iterated rollout this figure needs is "
+                "dead. Table 6.4 also has no generator and no archived run, so there "
+                "is no measured horizon to plot even by hand."),
 ]
 
 BY_NAME = {f.name: f for f in FIGURES}
