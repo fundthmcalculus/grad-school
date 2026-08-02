@@ -29,9 +29,12 @@
 Sum-of-Squares Stability Certificates and a Calibrated\\
 Performance/Certificate Trade}
 
-\author{Scott Phillips\\
+\author{
+\begin{tabular}{c@{\hspace{1.2cm}}c}
+Scott Phillips & Kelly Cohen \\
+\end{tabular}\\[2mm]
 \small Department of Aerospace Engineering and Engineering Mechanics\\
-\small University of Cincinnati\\
+\small University of Cincinnati\\[1mm]
 \small \texttt{polygonguru@gmail.com}}
 
 \date{\today}
@@ -83,10 +86,11 @@ imitation fit on both axes.
 
 \section{Introduction}
 
-This paper develops an idea due to K.\ Cohen: that fitting a fuzzy inference
-system should be posed as a principle of least action rather than as least
-squares, and that the resulting stationarity conditions should be strong enough
-to certify optimality rather than merely to terminate an optimizer. The
+This paper develops an idea originating in a handwritten derivation by the
+second author: that fitting a fuzzy inference system should be posed as a
+principle of least action rather than as least squares, and that the resulting
+stationarity conditions should be strong enough to certify optimality rather
+than merely to terminate an optimizer. The
 motivation is that a TSK system is a smooth parametric model, and smooth
 parametric models admit variational treatment; what is unusual is insisting
 that every step of the treatment produce a \emph{statement that can be
@@ -1162,13 +1166,6 @@ was known in advance.
 Hessian is obtained by finite differences. The same envelope argument
 differentiated once more would upgrade it.
 \end{itemize}
-
-\section*{Acknowledgements}
-
-The least-action formulation of TSK inference is due to Dr.\ Kelly Cohen, whose
-handwritten derivation this work develops; the orthogonality question of
-\S\ref{sec:orthogonality} and the classifier framing of \S\ref{sec:classifier}
-arose in discussion with him.
 
 \section*{Reproducibility}
 
