@@ -5,7 +5,7 @@ the device/host distance matrix is kept in **float32** (only the NN construction
 reads it; 2-opt/3-opt use coords + kNN), so pla85900 fits in ~59 GB peak on the
 128 GB unified memory instead of 118 GB at f64. CEIL_2D rounding (pla instances).
 
-Run:  python -m experiments.vat_tsp_scale_xl 33810 85900
+Run:  python ClusteringExperiments/vat_tsp_scale_xl.py 33810 85900
 """
 
 from __future__ import annotations
@@ -22,14 +22,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_coord_instance,
     optimal_length,
 )
-from experiments.vat_tsp_dualvat_lk import tour_len  # noqa: E402
-from experiments.vat_tsp_kopt import two_opt_converge, three_opt_converge  # noqa: E402
-from experiments.vat_tsp_mprim import mprim_order  # noqa: E402
+from vat_tsp_dualvat_lk import tour_len  # noqa: E402
+from vat_tsp_kopt import two_opt_converge, three_opt_converge  # noqa: E402
+from vat_tsp_mprim import mprim_order  # noqa: E402
 
 if gpu.is_available():
     import cupy as cp

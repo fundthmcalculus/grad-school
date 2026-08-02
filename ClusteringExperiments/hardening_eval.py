@@ -14,7 +14,7 @@ PART B — partition-adversarial robustness.
   reconstruction? Sweep partition quality (k-means -> MaxiMin -> coordinate ->
   random -> worst-case-by-label) x N x #representatives r, measuring stitched ARI.
 
-Run:  python -m experiments.hardening_eval
+Run:  python ClusteringExperiments/hardening_eval.py
 """
 
 from __future__ import annotations
@@ -33,17 +33,17 @@ from scipy.spatial.distance import squareform, pdist  # noqa: E402
 from scipy.sparse.csgraph import shortest_path  # noqa: E402
 
 from tribbleclustering.pcvat import compute_ivat_c  # noqa: E402
-from experiments.blockwise_vat import (  # noqa: E402
+from blockwise_vat import (  # noqa: E402
     ivat_image_from_order,
     adjusted_rand,
     labels_from_order,
 )
-from experiments.stitched_vat import (  # noqa: E402
+from stitched_vat import (  # noqa: E402
     stitch_core,
     maximin_partition,
     kmeans_partition,
 )
-from experiments.adversarial_eval import two_moons, easy_blobs  # noqa: E402
+from adversarial_eval import two_moons, easy_blobs  # noqa: E402
 
 FIG_DIR = Path(__file__).parent / "figures"
 

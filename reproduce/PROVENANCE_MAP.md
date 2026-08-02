@@ -24,22 +24,24 @@ as having no generator yet.
 |---|---|---|---|
 | 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1 |
 | 3.2 Memory footprint | *none* | — | **ungenerated** |
-| 3.3 GPU speedups | `tribble-cluster/experiments/{boruvka_gpu,gpu_vat}.py` | findings only | **ungenerated** — needs a GPU host |
-| 3.4 Adversarial ARI | `tribble-cluster/experiments/adversarial_eval.py` | `experiments/findings/ADVERSARIAL_EVAL_FINDINGS.md` | **reproduced** — two cells corrected, note 10 |
-| 3.5 Stitch ablation | `tribble-cluster/experiments/principled_stitch.py` | `experiments/findings/GAPS_FINDINGS.md` | **reproduced** — re-quoted, note 10 |
-| 3.6 Non-metric agreement | `tribble-cluster/experiments/hardening_eval.py` | `experiments/findings/HARDENING_FINDINGS.md` | **reproduced** — cells match |
+| 3.3 GPU speedups | `ClusteringExperiments/{boruvka_gpu,gpu_vat}.py` | findings only | **ungenerated** — needs a GPU host |
+| 3.4 Adversarial ARI | `ClusteringExperiments/adversarial_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — two cells corrected, note 10 |
+| 3.5 Stitch ablation | `ClusteringExperiments/principled_stitch.py` | `ClusteringExperiments/findings/…` | **reproduced** — re-quoted, note 10 |
+| 3.6 Non-metric agreement | `ClusteringExperiments/hardening_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — cells match |
 
-**Note 10 — these three could not be run as the manifest invoked them.** All four
-registered tribble-cluster experiments do `from experiments.blockwise_vat import
-...`, which needs the submodule *root* on `sys.path`. Invoked by path — `python
-experiments/adversarial_eval.py`, the form the manifest used — Python puts
-`experiments/` on the path instead and every one of them dies with
-`ModuleNotFoundError: No module named 'experiments'` before doing any work. The
-manifest now runs them through `reproduce/experiments/run_cluster_experiment.py`,
-which puts the submodule root on `sys.path` *and* redirects their figures to
-`reproduce/outputs/figures/cluster/` so that reproducing a Chapter 3 figure no
-longer dirties a pinned submodule. (`_uvm` remains for experiments that write
-nothing, such as `autok_eval`.)
+**Note 10 — these three have moved, and were unrunnable before that.** They
+originally lived in the `tribble-cluster` submodule and imported each other as
+`from experiments.foo import ...`, which needed the submodule root on
+`sys.path`; invoked by path — the form the manifest used — every one died with
+`ModuleNotFoundError: No module named 'experiments'` before doing any work.
+
+grad-school #26 then moved them to `ClusteringExperiments/` **without updating
+those imports**, so all 37 affected files were still broken on arrival. The
+imports are now rewritten to plain sibling form and the run instructions in
+their docstrings updated to match. They are driven by
+`reproduce/experiments/run_cluster_experiment.py`, which puts their directory on
+`sys.path` and redirects `FIG_DIR` to `reproduce/outputs/figures/cluster/`, so a
+regenerated Chapter 3 figure lands with the rest of the evidence.
 
 With them actually running, Table 3.6 reproduces exactly and Table 3.4 needed two
 cells corrected (circles/naive-block 0.10 → 0.00, bridged/naive-block 0.07 →

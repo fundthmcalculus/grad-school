@@ -20,7 +20,7 @@ there is no LK implementation in this repo, so the real solver is the honest
 baseline. All costs use an integer distance matrix (what LKH consumes), so every
 method is compared on exactly the same objective.
 
-Run:  python -m experiments.vat_tsp_benchmark
+Run:  python ClusteringExperiments/vat_tsp_benchmark.py
 """
 
 from __future__ import annotations
@@ -37,16 +37,16 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering.pcvat import compute_ivat_c  # noqa: E402
-from experiments.vat_tsp import two_opt as two_opt_tour  # noqa: E402
-from experiments.vat_tsp_warmstart import (  # noqa: E402
+from vat_tsp import two_opt as two_opt_tour  # noqa: E402
+from vat_tsp_warmstart import (  # noqa: E402
     nn_order,
     greedy_edge_order,
     mst_dfs_order,
     _seed_of,
 )
-from experiments.adversarial_eval import two_moons, circles, easy_blobs  # noqa: E402
-from experiments.hardening_eval import d_geodesic  # noqa: E402
-from experiments.stitched_vat import maximin_partition  # noqa: E402
+from adversarial_eval import two_moons, circles, easy_blobs  # noqa: E402
+from hardening_eval import d_geodesic  # noqa: E402
+from stitched_vat import maximin_partition  # noqa: E402
 
 try:
     import elkai  # type: ignore

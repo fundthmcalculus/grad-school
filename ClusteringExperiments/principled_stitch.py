@@ -11,7 +11,7 @@ against the exact full-cross-edge oracle (== Boruvka merge, O(n^2)).
 Same partition-adversarial grid as the fragility test (two-moons, partition
 strategy x N). A robust stitch should flatten the checkerboard toward the oracle.
 
-Run:  python -m experiments.principled_stitch
+Run:  python ClusteringExperiments/principled_stitch.py
 """
 
 from __future__ import annotations
@@ -25,23 +25,23 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-from experiments.blockwise_vat import (  # noqa: E402
+from blockwise_vat import (  # noqa: E402
     ivat_image_from_order,
     adjusted_rand,
     labels_from_order,
 )
-from experiments.stitched_vat import (  # noqa: E402
+from stitched_vat import (  # noqa: E402
     stitch_core,
     maximin_partition,
     kmeans_partition,
 )
-from experiments.hardening_eval import (  # noqa: E402
+from hardening_eval import (  # noqa: E402
     d_euclidean,
     adversarial_partition,
     random_partition,
     coordinate_partition,
 )
-from experiments.adversarial_eval import two_moons, circles  # noqa: E402
+from adversarial_eval import two_moons, circles  # noqa: E402
 
 FIG_DIR = Path(__file__).parent / "figures"
 

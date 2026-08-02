@@ -31,29 +31,28 @@ def _uv(*args):
 
 
 def _cluster_exp(name):
-    """Run a tribble-cluster experiment with its figures redirected into this repo.
+    """Run a ClusteringExperiments script with figures redirected into reproduce/.
 
-    Runs from the repo ROOT, not the submodule, because the runner lives here.
-    Left to itself each experiment writes into
-    `tribble-cluster/experiments/figures/`, so reproducing a Chapter 3 figure
-    dirties a pinned submodule and files the evidence for a grad-school table
-    inside a library. The runner redirects to reproduce/outputs/figures/cluster/
-    and puts the submodule root on sys.path so the absolute `experiments.*`
-    imports resolve. scipy lives in tribble-cluster's `dev` extra, hence --with.
+    Runs from the repo ROOT. grad-school #26 moved these out of the
+    tribble-cluster submodule into ClusteringExperiments/, so they are now plain
+    sibling modules here; the runner puts that directory on sys.path and rebinds
+    FIG_DIR to reproduce/outputs/figures/cluster/ so a regenerated Chapter 3
+    figure lands with the rest of the evidence. tribble-cluster is still needed
+    for the `tribbleclustering` library itself, and scipy lives in its `dev`
+    extra, hence --with.
     """
     return ["uv", "run", "--project", "tribble-cluster", "--with", "scipy",
             "python", "reproduce/experiments/run_cluster_experiment.py", name]
 
 
 def _uvm(module, *args):
-    """Run a script as a module (`python -m pkg.mod`) from the submodule root.
+    """Run a script as a module (`python -m pkg.mod`) from a repo root.
 
-    Most of tribble-cluster's experiments do `from experiments.blockwise_vat
-    import ...`, which needs the submodule ROOT on sys.path. Invoking them by
-    path (`python experiments/foo.py`) puts `experiments/` there instead, and
-    every one of them dies with `ModuleNotFoundError: No module named
-    'experiments'` before doing any work. The module form is the only one that
-    runs, so entries here use it rather than the path.
+    Kept for entries that genuinely need package semantics. The Chapter 3
+    clustering experiments no longer do: grad-school #26 moved them out of the
+    tribble-cluster submodule into ClusteringExperiments/ as plain sibling
+    modules, and their `from experiments.foo import ...` imports were rewritten
+    to match, so they run by path.
     """
     return ["uv", "run", "python", "-m", module, *args]
 
@@ -217,17 +216,17 @@ EXPERIMENTS = [
     Experiment(
         id="ch4-mog-concrete", title="MoG-TSK on UCI Concrete (regression)",
         chapter="Ch4", produces="Fig 4.1 / Ch4 numbers", repo="tribble-fis",
-        command=_uv("gaussian_mixture/concrete.py"), datasets=["Concrete"],
+        command=_uv("../FuzzySystemsExperiments/concrete.py"), datasets=["Concrete"],
     ),
     Experiment(
         id="ch4-mog-phiusiil", title="MoG classifier on PhiUSIIL phishing",
         chapter="Ch4", produces="Ch4 numbers", repo="tribble-fis",
-        command=_uv("gaussian_mixture/phiusiil.py"), datasets=["PhiUSIIL"],
+        command=_uv("../FuzzySystemsExperiments/phiusiil.py"), datasets=["PhiUSIIL"],
     ),
     Experiment(
         id="ch4-mog-iot", title="MoG classifier on RT-IOT2022",
         chapter="Ch4", produces="Ch4 numbers", repo="tribble-fis",
-        command=_uv("gaussian_mixture/iot.py"), datasets=["RT-IOT2022"],
+        command=_uv("../FuzzySystemsExperiments/iot.py"), datasets=["RT-IOT2022"],
         hardware="big-mem", notes="123K x 83, 12 classes; large.",
     ),
     Experiment(
@@ -244,8 +243,8 @@ EXPERIMENTS = [
     Experiment(
         id="ch6-mimo-pendulum", title="MIMO memory FIS on double pendulum",
         chapter="Ch6", produces="Table 6.4 / Fig 6.3", repo="tribble-fis",
-        command=_uv("tests/test_double_pendulum.py"),
-        notes="Confirm exact MIMO-memory entry point; may live under tests/ or gaussian_mixture/.",
+        command=_uv("../AnalyticalDynamics/test_double_pendulum.py"),
+        notes="Moved to AnalyticalDynamics/ by grad-school #26. Entry point still unconfirmed.",
     ),
 
     # ---- Ch5 topological membership generation ----
@@ -279,7 +278,7 @@ EXPERIMENTS = [
         chapter="Ch3", produces="Table 3.4", repo=".",
         command=_cluster_exp("adversarial_eval"),
         outputs=["reproduce/outputs/figures/cluster/adversarial_eval.png",
-                 "tribble-cluster/experiments/findings/ADVERSARIAL_EVAL_FINDINGS.md"],
+                 "ClusteringExperiments/findings/ADVERSARIAL_EVAL_FINDINGS.md"],
     ),
     Experiment(
         id="ch3-principled-stitch",
@@ -288,7 +287,7 @@ EXPERIMENTS = [
         command=_cluster_exp("principled_stitch"),
         outputs=["reproduce/outputs/figures/cluster/principled_stitch_two_moons.png",
                  "reproduce/outputs/figures/cluster/principled_stitch_circles.png",
-                 "tribble-cluster/experiments/findings/GAPS_FINDINGS.md"],
+                 "ClusteringExperiments/findings/GAPS_FINDINGS.md"],
         notes="Table 3.5's four rows are the ablation grid. Numbers currently quoted in "
               "the prose match GAPS_FINDINGS.md; not yet re-run under this harness.",
     ),
@@ -298,19 +297,19 @@ EXPERIMENTS = [
         chapter="Ch3", produces="Table 3.6", repo=".",
         command=_cluster_exp("hardening_eval"),
         outputs=["reproduce/outputs/figures/cluster/hardening_partition_robustness.png",
-                 "tribble-cluster/experiments/findings/HARDENING_FINDINGS.md"],
+                 "ClusteringExperiments/findings/HARDENING_FINDINGS.md"],
         notes="Fractional Minkowski p=0.5 (14.1% triangle violations), cosine, and "
               "kNN-geodesic all reproduce the exact ordering (agreement 1.0).",
     ),
     Experiment(
         id="ch3-autok-eval", title="Auto-k selection eval", chapter="Ch3",
         produces="Ch3 numbers", repo="tribble-cluster",
-        command=_uvm("experiments.autok_eval"),
+        command=["python", "ClusteringExperiments/autok_eval.py"],
     ),
     Experiment(
         id="ch3-boruvka-gpu", title="GPU Boruvka MST vs serial Prim",
         chapter="Ch3", produces="Ch3 GPU numbers", repo="tribble-cluster",
-        command=_uv("experiments/boruvka_gpu.py"), hardware="gpu",
+        command=["python", "ClusteringExperiments/boruvka_gpu.py"], hardware="gpu",
         notes="Requires a CUDA GPU; skipped on CPU-only hosts.",
     ),
 

@@ -10,7 +10,7 @@ Run at n = 2000, 5000, ~18k (nearest-size EUC_2D TSPLIB), GPU-built distance
 matrix / kNN. Reports best / mean quality (% over published optimum) and wall
 time, and writes a raw-NN -> best-polished tour image per size.
 
-Run:  python -m experiments.vat_tsp_scale
+Run:  python ClusteringExperiments/vat_tsp_scale.py
 """
 
 from __future__ import annotations
@@ -26,14 +26,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_euc_instance,
     optimal_length,
 )
-from experiments.vat_tsp_dualvat_lk import tour_len  # noqa: E402
-from experiments.vat_tsp_kopt import two_opt_converge, three_opt_converge  # noqa: E402
-from experiments.vat_tsp_mprim import mprim_order  # noqa: E402
+from vat_tsp_dualvat_lk import tour_len  # noqa: E402
+from vat_tsp_kopt import two_opt_converge, three_opt_converge  # noqa: E402
+from vat_tsp_mprim import mprim_order  # noqa: E402
 
 if gpu.is_available():
     import cupy as cp

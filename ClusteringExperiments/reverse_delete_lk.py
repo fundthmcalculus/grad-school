@@ -23,7 +23,7 @@ candidate lists straight into `tribbleclustering.lin_kernighan`.
 
 This lets us ask the OPT-4 question properly: does a reverse-delete / Delaunay
 candidate set beat #45's plain kNN candidates for LK? Run:
-    python -m experiments.reverse_delete_lk
+    python ClusteringExperiments/reverse_delete_lk.py
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from typing import Optional, Sequence
 import numpy as np
 from numpy import ndarray
 
-from experiments.reverse_delete_tsp import (  # noqa: E402
+from reverse_delete_tsp import (  # noqa: E402
     Adj,
     distance_matrix,
     nearest_neighbour_tour,
@@ -42,7 +42,7 @@ from experiments.reverse_delete_tsp import (  # noqa: E402
     two_opt,
     uniform_cities,
 )
-from experiments.reverse_delete_opt import (  # noqa: E402
+from reverse_delete_opt import (  # noqa: E402
     delaunay_candidate_graph,
     knn_candidate_graph,
     reachable_bidirectional,

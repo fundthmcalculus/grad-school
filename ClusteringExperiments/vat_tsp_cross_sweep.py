@@ -11,7 +11,7 @@ uncrossing reversal, across a range of TSPLIB sizes. Reports, for the pipeline
 against the baseline `dual-VAT raw -> 2-opt+Or-opt` (no uncrossing). fp32,
 EUC_2D instances (geometry). Source figure: experiments/figures/vat_tsp_cross_sweep.png
 
-Run:  python -m experiments.vat_tsp_cross_sweep
+Run:  python ClusteringExperiments/vat_tsp_cross_sweep.py
 """
 
 from __future__ import annotations
@@ -27,17 +27,17 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_euc_instance,
     optimal_length,
 )
-from experiments.vat_tsp_dualvat_lk import (  # noqa: E402
+from vat_tsp_dualvat_lk import (  # noqa: E402
     dual_vat_tour_device,
     lk_search,
     tour_len,
 )
-from experiments.vat_tsp_cross import crossing_repair  # noqa: E402
+from vat_tsp_cross import crossing_repair  # noqa: E402
 
 if gpu.is_available():
     import cupy as cp

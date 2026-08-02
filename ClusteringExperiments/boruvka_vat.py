@@ -22,7 +22,7 @@ Outputs two figures under experiments/figures/:
   * boruvka_vat_quality.png  — serial vs Boruvka iVAT images + their difference
   * boruvka_vat_scaling.png  — MST build time vs n for the three backends
 
-Run:  python -m experiments.boruvka_vat
+Run:  python ClusteringExperiments/boruvka_vat.py
 """
 
 from __future__ import annotations
@@ -324,7 +324,7 @@ def _time_gpu(fn, arg):
 
 
 def scaling_figure():
-    from experiments.boruvka_gpu import boruvka_mst_gpu
+    from boruvka_gpu import boruvka_mst_gpu
 
     sizes = [1000, 2000, 4000, 8000]
     t_prim, t_bnumba, t_gpu_dev, t_gpu_xfer, order_match = [], [], [], [], []

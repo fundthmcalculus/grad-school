@@ -16,7 +16,7 @@ The headline number is the speedup of the compiled ConiVAT core over the pure
 one; it should land close to the compiled-vs-pure iVAT speedup, since ConiVAT
 adds only O(1)-per-constraint work on top of the shared core.
 
-Run:  python -m experiments.conivat_cython_bench
+Run:  python ClusteringExperiments/conivat_cython_bench.py
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ from tribbleclustering import (  # noqa: E402
     generate_constraints_from_labels,
     pairwise_distances,
 )
-from experiments.conivat_scaling import make_blobs  # noqa: E402
+from conivat_scaling import make_blobs  # noqa: E402
 
 try:
     from tribbleclustering.pcvat import (  # noqa: E402
