@@ -10,21 +10,34 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
 
 ## A. Blocked on the author
 
-- [ ] 🔒 **A1 — Rename the method.** `pVAT` is taken (Parveen & Sreevalsan-Nair, BDA 2013 — also
-      a GPU VAT that swaps the MST algorithm). Reading the *p* as parallel or performant
-      collides harder. Touches the dissertation's title-level nomenclature, Ch 3 throughout,
-      Ch 9, and two published NAFIPS papers. **Decide before the defense** — §3.3.1 currently
-      walks the committee through three names in sequence and will eat time.
+- [x] ✅ **A1 — Method renamed to `pqVAT`** (author decision, 2026-08-02).
+      *Decision: "make it `pqVAT` since it matches paper work as a priority queue. Acknowledge BDA 2013."*
+      `pVAT` was taken by Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013
+      (LNCS 8302:151–170) — also a GPU VAT that swaps the MST algorithm, so reading our *p* as
+      parallel/performant collided harder rather than less. Renamed across prose, chapters and
+      planning docs (60 occurrences); §3.3.1 now walks mergeVAT → pVAT → collision → pqVAT and
+      acknowledges the 2013 method by citation. **Recorded wrinkle:** stage two contains no
+      priority queue, so the name is exact for stage one and historical for stage two — §3.3.1
+      states this rather than letting a reader find it.
 - [ ] 🔒 **A2 — NAFIPS paper metadata** (Ch 9): exact titles, page numbers/DOIs, co-authors,
       which paper went to Banff 2025 vs. El Paso 2026, and whether they published separately
       or combined. Ch 9 cannot be finished without it.
 - [ ] 🔒 **A3 — Confirm the flagship end-to-end dataset**: RT-IOT2022 / IoT-botnet, or UCI-58
       Shuttle. Defines the Ch 7 capstone.
-- [ ] 🔒 **A4 — Confirm the EUSFLAT 2027 submission deadline.** Anchors the Ch 5 paper schedule
-      and the Ch 10 timeline.
+- [x] ✅ **A4 — EUSFLAT 2027 deadline confirmed: February 2027** (author, 2026-08-02);
+      conference September 2027. *Decision: "2027-02".*
+      ⚠️ **This broke the Ch 10 schedule and the fix is a decision, now taken and written into
+      §10.5.** The grid had the Ch 5 paper in 2027 Q2 and Goal **G1** — the differentiator §5.5
+      names — also in Q2. A February deadline is Q1, so the paper was scheduled a quarter late
+      *and* its headline contribution would not have existed when it was due. Resolution: submit
+      what §5.4 already supports (multi-scale recovery at ARI 1.00 vs 0.58–0.75 flat, the
+      selection bake-off, the falsification experiment) and make G1 the journal/next-year
+      extension. Cost, stated in §10.5: the EUSFLAT paper reports clustering scores rather than
+      end-to-end accuracy — the same proxy limitation §5.4 already concedes.
 - [x] ✅ **A6 — Acknowledgements written** (author, 2026-08-02). Template replaced with the real page; it renders correctly ahead of Chapter 1 in the build. One residual dependency: it thanks the committee and Jon Salisbury by name but not the NAFIPS co-authors, so give it a second pass once **A2** supplies those author lists.
-- [ ] 🔒 **A5 — Confirm the proposal-defense month** (assumed ~Dec 2026) and teaching/RA load
-      per semester (affects Ch 10 throughput).
+- [x] ✅ **A5 — Proposal defense confirmed: December 2026.** *Decision: "Dec 2026. Let's GO!"*
+      Hedged wording ("assumed ~Dec 2026") removed from Ch 7 Table 7.1, Ch 10, ACTION_ITEMS and
+      NEXT_STEPS. Final defense stays March 2028, so the runway is 15 months as planned.
 
 ## B. Reproducibility infrastructure
 

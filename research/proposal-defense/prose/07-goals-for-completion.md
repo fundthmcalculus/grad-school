@@ -24,7 +24,7 @@ I am widening this goal to cover *accuracy* claims and not only timing ones, bec
 
 That floor has one deliberate exception, and stating it is cleaner than letting the rule be quietly broken. The large-scale runs — the 58,000-point shuttle reorder, the 135,000-point psychiatric set — are **existence proofs, not estimates**. They answer "can this problem be reordered at all, in what memory, in roughly what time," and the answer to that question does not have a sampling distribution the way an $R^2$ does. Capability and accuracy are both established on the small and mid-size sets, where the seed floor applies in full and where the ground truth to score against actually exists; the large runs exist to show that the same code reaches that size. Re-running them ten times would consume hours of compute to put an error bar on a yes. So the standard is: every accuracy number and every comparative timing ratio gets ten seeds and a spread; a single-shot demonstration of reachable scale gets its hardware, its precision, and its memory footprint recorded instead, and is labeled a demonstration rather than a measurement.
 
-G4 also covers the head-to-head against eVAT and clusiVAT that Chapter 3 owes, and a push toward a distributed pVAT at half a million points. Two items moved into it while the chapters were being checked, and one of them has since been discharged.
+G4 also covers the head-to-head against eVAT and clusiVAT that Chapter 3 owes, and a push toward a distributed pqVAT at half a million points. Two items moved into it while the chapters were being checked, and one of them has since been discharged.
 
 The discharged one is the **complexity exponent**. Chapter 3 previously rested its claim on reachable problem size and treated the cubic-to-quadratic drop as asserted rather than shown, because the timing grid was too coarse to fit an exponent from. Table 3.2 now fits one: classical at 3.07 against a theoretical 3, stage two at 2.12 against 2, stage one at 1.81 where the log factor is not resolvable over the range swept — and all three stable to within 0.01 across independent runs. The exponent is measured, and the chapter says so.
 
@@ -60,7 +60,7 @@ The floor under all of this is that Chapters 3 and 4 — the accelerated exact V
 
 ## 7.5 Goals, mapped
 
-**Table 7.1 — Goals for completion, mapped.** Quarters are relative to the ~Dec 2026 proposal; final defense March 2028 (see Chapter 10). Status and items also tracked in `ACTION_ITEMS.md`.
+**Table 7.1 — Goals for completion, mapped.** Quarters are relative to the confirmed December 2026 proposal; final defense March 2028 (see Chapter 10). Status and items also tracked in `ACTION_ITEMS.md`.
 
 | Goal | Feeds | Current status | Priority | Target |
 |---|---|---|---|---|

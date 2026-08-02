@@ -4,7 +4,7 @@ Prioritized plan of record. `ACTION_ITEMS.md` is the full backlog with findings 
 
 **For the live burn-down list, see [`CHECKLIST.md`](CHECKLIST.md)** — tickable items with enough context to start cold, and the record of what the 2026-08-02 review pass closed. [`REVIEW_2026-08-02.md`](REVIEW_2026-08-02.md) is the findings report behind it.
 
-_Last updated: 2026-07-31. Proposal defense ~Dec 2026 · final defense March 2028._
+_Last updated: 2026-08-02. Proposal defense **December 2026** (confirmed) · final defense March 2028._
 
 **Where things stand.** Chapters 1–8 and 10 are drafted and quality-passed (92 pages). The bibliography is consolidated and verified (70 entries, 0 unresolved). A reproduction harness runs 19 registered experiments, 6 of them verified end-to-end, and it has already produced four corrections to the text and one upstream bug fix. What is left divides cleanly into things only you can decide, cheap wins, and real research.
 
@@ -15,7 +15,7 @@ _Last updated: 2026-07-31. Proposal defense ~Dec 2026 · final defense March 202
 | # | Item | Why it blocks | Effort |
 |---|---|---|---|
 | 0.1 | **Merge `fix/pin-extreme-bucket-means`** ([PR](https://github.com/fundthmcalculus/tribble-fis/pull/new/fix/pin-extreme-bucket-means)), then re-run `reproduce/run.py --chapter Ch4 --chapter Ch6` | Every Concrete number in the text was measured under the *old* solve. Small deltas (≤0.01), but the tables should describe shipped code. | 1 h |
-| 0.2 | **Rename the method — `pVAT` is taken.** Parveen & Sreevalsan-Nair (BDA 2013) published a *"pVAT: Parallel VAT on the GPU"* that also swaps the MST algorithm for the ordering. Reading the *p* as parallel/performant collides harder, not less. | Touches Ch 3 throughout, the method's identity, and how you introduce it to the committee. Independent of everything else, so do it early. | decision + 1 h |
+| ~~0.2~~ | ✅ **RESOLVED — the method is `pqVAT`** (priority-queue VAT). `pVAT` was taken by Parveen & Sreevalsan-Nair (BDA 2013), a *parallel* GPU VAT that also swaps the MST algorithm, so reading our *p* as parallel/performant collided harder. `pqVAT` is unambiguous and names the published contribution. Acknowledged in §3.3.1; renamed throughout. | — | done |
 | 0.3 | **NAFIPS paper metadata** (Ch 9): exact titles, page numbers/DOIs, co-authors, and which paper went to Banff 2025 vs. El Paso 2026 — and whether they published separately or combined. | Ch 9 cannot be finished without it. | your records |
 | 0.4 | **Confirm the flagship end-to-end dataset** — RT-IOT2022 / IoT-botnet, or UCI-58 Shuttle. | Defines the Ch 7 capstone. | decision |
 

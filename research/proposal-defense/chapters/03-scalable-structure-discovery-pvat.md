@@ -1,8 +1,8 @@
-# Chapter 3 — Scalable Structure Discovery: pVAT
+# Chapter 3 — Scalable Structure Discovery: pqVAT
 
 **Status:** Outline · Part II (COMPLETED work — NAFIPS papers 1 & 2)
 **Repo:** `tribble-cluster` (module `pvat`)
-**Name:** **pVAT (priority-queue VAT)** — naming centered on the priority-queue argmin (CPU) and Borůvka MST (parallel/GPU). Head-nod to Dr. V. Kreinovich, who observed the method is really a priority-queue/heap approach. Originally "mergeVAT" (see naming callout in §3.3.1); NAFIPS paper 2 published under the "mergeVAT" title — keep that title in Ch 9.
+**Name:** **pqVAT (priority-queue VAT)** — naming centered on the priority-queue argmin (CPU) and Borůvka MST (parallel/GPU). Head-nod to Dr. V. Kreinovich, who observed the method is really a priority-queue/heap approach. Originally "mergeVAT" (see naming callout in §3.3.1); NAFIPS paper 2 published under the "mergeVAT" title — keep that title in Ch 9.
 **Mirrors:** structural template of a completed methods paper (intro→prior-art→method→results→discussion).
 **One-line claim:** an exact, parallel, memory-lean VAT/iVAT engine that operates on arbitrary (incl. non-metric) dissimilarity matrices, lifting feasible problem size from ~5K to 130K+ and occupying regimes existing fast-VAT methods cannot.
 
@@ -25,10 +25,10 @@
 
 ## 3.3 Methodology
 
-### 3.3.1 The O(N²log N) reorder (pVAT) + naming callout
+### 3.3.1 The O(N²log N) reorder (pqVAT) + naming callout
 - Historical inner loop was BubbleSort-style argmin over the column remainder → O(N³).
 - Replace with a **priority queue / binary(Fibonacci) heap** extract-min → O(1) amortized; overall O(N²log N).
-- **NAMING CALLOUT (author-requested):** the method was first called *mergeVAT*, after a separate research direction — an attempt to implement what amounted to a 2D merge-sort — that did not pan out. Dr. Vladik Kreinovich observed that the working method is really a priority-queue/heap approach (closer to HeapSort than merge-sort), so the correct name is **pVAT (priority-queue VAT)**. The rename is a deliberate head-nod to his contribution. Frame the name around the priority-queue argmin and the Borůvka MST path.
+- **NAMING CALLOUT (author-requested):** the method was first called *mergeVAT*, after a separate research direction — an attempt to implement what amounted to a 2D merge-sort — that did not pan out. Dr. Vladik Kreinovich observed that the working method is really a priority-queue/heap approach (closer to HeapSort than merge-sort), so the correct name is **pqVAT (priority-queue VAT)**. The rename is a deliberate head-nod to his contribution. Frame the name around the priority-queue argmin and the Borůvka MST path.
 - **Fix to make (defensibility):** retire the "priority-queue MST speedup" framing for *dense* graphs — heap-Prim is O(N²log N) vs O(N²) dense-Prim; defend empirically or restate as the argmin/sort speedup it actually is.
 
 ### 3.3.2 In-place memory engine
@@ -53,7 +53,7 @@
 
 *Tables/figures to port from `SUMMARY_REPORT.md`, `white-paper.md`, `ADVERSARIAL_EVAL_FINDINGS.md`, quals paper1/paper2 slides.*
 
-- **Scaling (headline):** 4096-element dataset 124 s → 2.56 s; feasible size 5K → 130K+; "58K×58K in 60 s." Table: N vs time (BubbleSort-VAT vs pVAT), the ~8000× at 135K.
+- **Scaling (headline):** 4096-element dataset 124 s → 2.56 s; feasible size 5K → 130K+; "58K×58K in 60 s." Table: N vs time (BubbleSort-VAT vs pqVAT), the ~8000× at 135K.
 - **In-place memory:** max feasible N at 64 GB 52K → 89K; N=64000 float64 iVAT 98 GB (infeasible) → 32.85 GB / 25 s.
 - **GPU:** FCM 30–56× (n=50K–500K, >99% identical labels); Borůvka MST ~5× at n=32000 (order match 1.0); on-device VAT front-end 4.8–6.6×. **Honest negative:** GPU pairwise distances 1.3–2.5× only at high-d+float32, <1× at low-d/float64.
 - **Clustering quality (adversarial eval, ARI):** two_moons/circles VAT & stitched = 1.00 where k-means = 0.27/0.00; inherits single-linkage failures on bridged/aniso (0.00). Stitch ablation: principled (fps+top-m=8) mean ARI 1.00 across all partitions vs light 0.51.
@@ -64,7 +64,7 @@
 
 - What the composition buys: exact + parallel + non-metric + bounded-cost D&C in one engine; error confined to where single-linkage itself is unreliable.
 - Limits: inherits single-linkage bridge/aniso failures (→ ConiVAT / Ch 5 metric learning addresses this); consumer-GPU FP64 penalty; single-seed timings.
-- **Before-submission checklist:** thermally-stable re-timing + error bars; datacenter GPU full-rate FP64; head-to-head vs eVAT & clusiVAT on identical data; drop the ungrounded "pVAT six-orders-of-magnitude" web claim (self-citation at most); verify DOIs.
+- **Before-submission checklist:** thermally-stable re-timing + error bars; datacenter GPU full-rate FP64; head-to-head vs eVAT & clusiVAT on identical data; drop the ungrounded "pqVAT six-orders-of-magnitude" web claim (self-citation at most); verify DOIs.
 
 ---
 
