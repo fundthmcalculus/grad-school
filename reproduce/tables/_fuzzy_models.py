@@ -23,6 +23,15 @@ REPO_ROOT = os.path.dirname(os.path.dirname(_HERE))          # .../grad-school
 FIS = os.path.join(REPO_ROOT, "tribble-fis")
 sys.path.insert(0, os.path.join(FIS, "tribble-tree"))       # for `import fuzzytree`
 
+# Datasets live HERE, never in the submodule. tribble-fis used to carry
+# `gaussian_mixture/` with the benchmark data in it; upstream removed that
+# directory in 8484fd6 to make the library pure, and the experiments moved to
+# this repository. Caching a fetched dataset back into the submodule would
+# recreate a directory upstream deliberately deleted and leave a pinned
+# submodule permanently dirty -- the same failure this harness exists to prevent.
+# Override with GRAD_SCHOOL_DATA.
+DATA_DIR = os.environ.get("GRAD_SCHOOL_DATA", os.path.join(REPO_ROOT, "data"))
+
 
 def _first_attr(mod, *names):
     for n in names:
@@ -46,7 +55,7 @@ def load_concrete():
       3. the legacy ``.xls`` in AEEM6097 (needs ``xlrd``, often absent).
     Returns (X, y) or None, printing which route it took.
     """
-    csv_path = os.path.join(FIS, "gaussian_mixture", "Concrete_Data.csv")
+    csv_path = os.path.join(DATA_DIR, "Concrete_Data.csv")
 
     if not os.path.exists(csv_path):
         df = None
