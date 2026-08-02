@@ -67,14 +67,21 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
       small grid (100–1,000, sized so the cubic arm runs at every point) with both axes
       normalized, and fit a log-log exponent per arm. Classical **3.11** (theory 3) and stage
       one **1.87** (theory ≈2.1, the log factor invisible over one decade) both confirm.
-- [ ] ⬜ **C2b — Diagnose the stage-two cliff.** *(New, and the sharpest open item in Ch 3.)*
-      Stage two tracks $N^2$ almost exactly to N = 500 — 1.00 / 4.03 / 8.66 / 25.45 against a
-      theoretical 1.00 / 4.00 / 9.00 / 25.00 — then jumps more than an order of magnitude
-      between 500 and 750 and stays there. The **existence and location** reproduce across
-      runs and independently in the larger-grid study; the **magnitude** does not (563× then
-      789× at N = 1,000). Candidates, none tested: a cache boundary (the matrix is ~4.5 MB at
-      N = 750), a threading threshold, or an allocation path past a footprint. Until this is
-      understood, §3.3.1's quadratic claim is confirmed only to N = 500.
+- [ ] ⬜ **C2b — Find the ~10 ms fixed cost in the stage-two kernel.** *(Sharpest open item
+      in Ch 3, and now well characterized.)* With the grid extended to 3,000 the picture is
+      no longer "noise": stage two tracks $N^2$ cleanly to N = 500, **acquires a fixed cost of
+      roughly 10 ms at N ≈ 750**, and then runs flat — 8 to 15 ms everywhere from 750 to 3,000
+      — until the quadratic work catches up near 3,000. Exponents are stable across runs
+      (classical 3.07/3.07, stage 1 1.80/1.81, stage 2 2.13/2.12), so this is a real property
+      of the kernel, not the timer.
+      **Practical consequence:** below 750 stage two beats stage one by 5–8×; between ~750 and
+      ~1,250 the advantage **collapses to parity** and which arm wins varies between runs;
+      above 1,500 stage two recovers to 6.7× by N = 3,000. So the compiled kernel that
+      §3.3.1 says is "preferred at import time" buys nothing across a band of sizes.
+      **Leading candidate:** OpenMP parallel-region setup in the Cython `nogil` path — a
+      threading threshold above a size cutoff produces exactly this step-then-plateau
+      signature. A cache boundary or an allocation path would also fit. All testable; none
+      tested. If it is thread startup, a size-gated serial path below ~1,500 is the fix.
 - [ ] ⬜ **C3 — Ch 5 end-to-end FIS result.** Every Ch 5 number is a *clustering* score; the
       chapter exists to produce FIS antecedents. Until a model is built from them and measured,
       the central claim rests on a proxy. **Recommend pulling a minimal version into 2027 Q2**

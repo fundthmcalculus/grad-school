@@ -1,0 +1,10 @@
+Model,Hyperparameters,raw features,log + standardized,Δ from normalizing,RMSE raw (MPa),RMSE log+std (MPa)
+CART (reference),sklearn default,0.825 ± 0.047,0.826 ± 0.047,+0.001,6.744 ± 0.739,6.726 ± 0.740
+Random Forest (reference),sklearn default,0.909 ± 0.018,0.909 ± 0.019,+0.000,4.904 ± 0.307,4.899 ± 0.313
+flat MoG-TSK 1st,pipeline default,0.646 ± 0.039,0.772 ± 0.034,+0.126,9.721 ± 0.594,7.803 ± 0.734
+flat MoG-TSK 2nd,pipeline default,0.779 ± 0.036,0.824 ± 0.043,+0.044,7.678 ± 0.838,6.843 ± 0.944
+flat MoG-TSK full-2nd,pipeline default,0.790 ± 0.054,0.859 ± 0.039,+0.069,7.436 ± 0.971,6.102 ± 0.911
+fuzzy tree,demo-tuned,0.714 ± 0.029,0.741 ± 0.051,+0.027,8.749 ± 0.513,8.279 ± 0.632
+fuzzy tree,library default,0.580 ± 0.067,0.688 ± 0.056,+0.108,10.575 ± 0.863,9.085 ± 0.578
+mixture of experts,demo-tuned,0.768 ± 0.029,0.833 ± 0.024,+0.065,7.863 ± 0.459,6.669 ± 0.562
+mixture of experts,library default,0.682 ± 0.064,0.781 ± 0.068,+0.099,9.167 ± 0.792,7.542 ± 0.976

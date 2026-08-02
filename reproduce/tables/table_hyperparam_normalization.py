@@ -53,6 +53,10 @@ sys.path.insert(0, os.path.dirname(_TABLES))
 sys.path.insert(0, _TABLES)
 import common as C            # noqa: E402
 import _fuzzy_models as F     # noqa: E402
+# One definition, shared with table_4_1: a second copy that drifted would make
+# the two tables quietly incomparable, which is the failure this harness exists
+# to catch.
+from _fuzzy_models import normalize  # noqa: E402
 
 ORDERS = [o.strip() for o in os.environ.get("REPRO_ORDERS", "1st,2nd,full-2nd").split(",")]
 N_BUCKETS = 3
@@ -61,13 +65,6 @@ L2 = 1e-2
 
 def _rmse(y, p):
     return float(np.sqrt(mean_squared_error(y, p)))
-
-
-def normalize(X):
-    """concrete.py's feature treatment: auto log-transform, then standardize."""
-    from tribblefis.gauss_math import detect_and_apply_log_transform, standard_transform
-    Xt, logged = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
-    return standard_transform(Xt, column=Xt.columns), logged
 
 
 # --------------------------------------------------------------------------- #
