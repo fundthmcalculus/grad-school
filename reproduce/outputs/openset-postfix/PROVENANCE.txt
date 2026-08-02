@@ -1,0 +1,6 @@
+label:       openset-postfix
+tribble-fis: 23bfdbc54423bda22ff46a3a513194cad8adb6ce
+seeds:       0,1,2,3,4
+conorm:      hamacher (REPRO_ANOM_CONORM default)
+thetas:      0.5,0.6,0.7,0.8,0.9,0.99,1.1
+dataset:     glass.csv (214x10, 6 classes)

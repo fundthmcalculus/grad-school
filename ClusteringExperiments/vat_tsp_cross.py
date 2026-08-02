@@ -14,7 +14,7 @@ optimal euclidean tour has none). This strategy targets them directly:
 Compared, from the dual-VAT raw tour, against the neighbour-list 2-opt+Or-opt, on
 nearest-size TSPLIB instances (fp32, reference = published optimum).
 
-Run:  python -m experiments.vat_tsp_cross
+Run:  python ClusteringExperiments/vat_tsp_cross.py
 """
 
 from __future__ import annotations
@@ -30,12 +30,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_euc_instance,
     optimal_length,
 )
-from experiments.vat_tsp_dualvat_lk import (  # noqa: E402
+from vat_tsp_dualvat_lk import (  # noqa: E402
     dual_vat_tour_device,
     lk_search,
     tour_len,
@@ -72,7 +72,7 @@ def _crossers_device(coords_g, tour_g, i):
 
 
 def _two_opt_delta(tour, coords, i, j, ceil):
-    from experiments.vat_tsp_dualvat_lk import _d
+    from vat_tsp_dualvat_lk import _d
 
     n = len(tour)
     p, q = (i, j) if i < j else (j, i)
@@ -88,7 +88,7 @@ def _oropt1_best(tour, coords, i, js, ceil):
     """Best Or-opt(1) alternative for the long edge (tour[i]->tour[i+1]): relocate
     the city b=tour[i+1] into one of the crossing edges (between its endpoints).
     Removing b breaks the long edge too. Returns (delta, b_city, x_city)."""
-    from experiments.vat_tsp_dualvat_lk import _d
+    from vat_tsp_dualvat_lk import _d
 
     n = len(tour)
     a = tour[i]

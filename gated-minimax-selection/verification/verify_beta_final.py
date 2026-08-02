@@ -15,8 +15,39 @@ import pandas as pd
 import sys
 from pathlib import Path
 
-project_dir = Path(__file__).parent.parent
+# This file now lives at gated-minimax-selection/verification/, so the package
+# it imports (ivat_mf, nerfcm, battery...) is one level up and the repo root is
+# two. Resolved from __file__ rather than a developer's home directory.
+project_dir = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_dir))
+
+
+def _dataset(name, required=True):
+    """Locate a dataset CSV, or fail with a message that says what to do.
+
+    Checked in order: $GRAD_SCHOOL_DATA, the repo root, this script's directory.
+    These files are gitignored, so a fresh clone genuinely will not have them --
+    an explicit error naming the search path beats a stack trace from read_csv.
+    """
+    import os
+    here = Path(__file__).resolve().parent
+    roots = []
+    if os.environ.get("GRAD_SCHOOL_DATA"):
+        roots.append(Path(os.environ["GRAD_SCHOOL_DATA"]))
+    # Datasets moved to <repo>/data/ when the experiments came out of the
+    # submodules; the repo root and this directory are kept as fallbacks so an
+    # older working copy still resolves. Nothing reaches outside the repo.
+    repo_root = here.parent.parent
+    roots += [repo_root / "data", repo_root, here.parent, here]
+    for root in roots:
+        candidate = root / name
+        if candidate.exists():
+            return str(candidate)
+    raise FileNotFoundError(
+        f"{name} not found. Looked in: {', '.join(str(r) for r in roots)}. "
+        f"It is gitignored, so a fresh clone will not have it; place it at the "
+        f"repo data/ directory, or set GRAD_SCHOOL_DATA to hold it."
+    )
 
 from nerfcm import nerfcm
 import ivat_mf as im
@@ -131,7 +162,7 @@ def main():
     print("-" * 80)
 
     # Iris with Euclidean distance
-    df_iris = pd.read_csv("/home/scott/PycharmProjects/grad-school/IRIS.csv")
+    df_iris = pd.read_csv(_dataset("IRIS.csv"))
     X_iris = df_iris[["sepal_length", "sepal_width", "petal_length", "petal_width"]].values.astype(float)
     X_iris = (X_iris - X_iris.mean(axis=0)) / (X_iris.std(axis=0) + 1e-9)
     D_iris_euclidean = im.dissimilarity(X_iris)

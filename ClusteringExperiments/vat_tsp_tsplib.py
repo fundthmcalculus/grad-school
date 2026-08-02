@@ -1,6 +1,6 @@
 """VAT->TSP cluster-blocking on real TSPLIB instances (DGX Spark GB10).
 
-Complements experiments/vat_tsp_dgx_scale.py (synthetic blobs) with real
+Complements ClusteringExperiments/vat_tsp_dgx_scale.py (synthetic blobs) with real
 benchmark instances from the TSPLIB collection (git submodule
 experiments/tsplib, https://github.com/mastqe/tsplib; the number in each
 filename is the city count). Samples span ~50 to ~34000 cities.
@@ -14,7 +14,7 @@ official rounding (EUC_2D = nint, CEIL_2D = ceil) so the % gap over the
 published optimum is exactly comparable; flat LKH is run as a reference where it
 is still affordable (n <= 2000).
 
-Run:  python -m experiments.vat_tsp_tsplib
+Run:  python ClusteringExperiments/vat_tsp_tsplib.py
 """
 
 from __future__ import annotations
@@ -31,13 +31,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu, gpu_vat  # noqa: E402
-from experiments.vat_tsp import two_opt  # noqa: E402
-from experiments.vat_tsp_warmstart import nn_order  # noqa: E402
-from experiments.vat_tsp_dgx_scale import (  # noqa: E402
+from vat_tsp import two_opt  # noqa: E402
+from vat_tsp_warmstart import nn_order  # noqa: E402
+from vat_tsp_dgx_scale import (  # noqa: E402
     _vat_gap_blocks,
     _orient_cycle_dist,
 )
-from experiments.vat_tsp_benchmark import _open_from_subtour  # noqa: E402
+from vat_tsp_benchmark import _open_from_subtour  # noqa: E402
 
 try:
     import elkai  # type: ignore

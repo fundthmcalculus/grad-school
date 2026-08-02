@@ -14,7 +14,7 @@ We compare on a **balanced** partition (two-density-peak seed, so N ~ M and the
 N x M grid is meaningful), on nearest-size TSPLIB instances, reference = the
 published optimum. Report tour cost (raw + LK-polished) and the join wall-clock.
 
-Run:  python -m experiments.vat_tsp_join
+Run:  python ClusteringExperiments/vat_tsp_join.py
 """
 
 from __future__ import annotations
@@ -30,12 +30,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_coord_instance,
     optimal_length,
 )
-from experiments.vat_tsp_dualvat_lk import (  # noqa: E402
+from vat_tsp_dualvat_lk import (  # noqa: E402
     dual_vat_device,
     choose_seeds,
     join_endpoint,

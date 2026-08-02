@@ -1,0 +1,1947 @@
+Goal G5b -- does quantile's advantage grow with target skew?
+  synthetic: n=800 m=6 buckets=4 order=2nd seeds=[0, 1, 2, 3, 4]
+
+   lambda    skew  uniform R2  quantile R2      Q-U  unif min-n
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.6751
+ 3. x4                             - Score: 0.4353
+ 4. x0                             - Score: 0.2613
+ 5. x1                             - Score: 0.2176
+ 6. x2                             - Score: 0.2067
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.5119
+ 3. x4                             - Score: 0.3832
+ 4. x1                             - Score: 0.2381
+ 5. x0                             - Score: 0.2252
+ 6. x2                             - Score: 0.2064
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.7587
+ 3. x2                             - Score: 0.5797
+ 4. x1                             - Score: 0.3526
+ 5. x0                             - Score: 0.2531
+ 6. x3                             - Score: 0.2300
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.8215
+ 3. x2                             - Score: 0.7003
+ 4. x3                             - Score: 0.3638
+ 5. x1                             - Score: 0.3442
+ 6. x0                             - Score: 0.3031
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x3                             - Score: 0.8179
+ 3. x5                             - Score: 0.6993
+ 4. x2                             - Score: 0.6966
+ 5. x0                             - Score: 0.3271
+ 6. x4                             - Score: 0.3112
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 2 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 4 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 2 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 3 Gaussians for x4 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.8018
+ 3. x3                             - Score: 0.7337
+ 4. x2                             - Score: 0.6687
+ 5. x4                             - Score: 0.4051
+ 6. x0                             - Score: 0.2747
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x2                             - Score: 0.7035
+ 3. x0                             - Score: 0.4284
+ 4. x4                             - Score: 0.3715
+ 5. x1                             - Score: 0.3170
+ 6. x5                             - Score: 0.2470
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 2 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 4 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 2 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x2                             - Score: 0.5858
+ 3. x0                             - Score: 0.4811
+ 4. x1                             - Score: 0.3600
+ 5. x4                             - Score: 0.3365
+ 6. x5                             - Score: 0.2352
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 2 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.8766
+ 3. x4                             - Score: 0.8059
+ 4. x0                             - Score: 0.4943
+ 5. x3                             - Score: 0.3641
+ 6. x2                             - Score: 0.3397
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 4 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 4 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 4 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 2 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 3 Gaussians for x2 (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.7598
+ 3. x4                             - Score: 0.7208
+ 4. x3                             - Score: 0.3983
+ 5. x2                             - Score: 0.3795
+ 6. x0                             - Score: 0.3482
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+     0.01   +0.03       0.914        0.917   +0.003          15
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.9019
+ 3. x4                             - Score: 0.7197
+ 4. x0                             - Score: 0.7117
+ 5. x2                             - Score: 0.6822
+ 6. x1                             - Score: 0.6337
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 3 Gaussians for x3 (label 2)
+  Automatically selected 2 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 4 Gaussians for x5 (label 2)
+  Automatically selected 2 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 2 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 2 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 3 Gaussians for x2 (label 2)
+  Automatically selected 2 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 2 Gaussians for x1 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.5119
+ 3. x4                             - Score: 0.3832
+ 4. x1                             - Score: 0.2381
+ 5. x0                             - Score: 0.2252
+ 6. x2                             - Score: 0.2064
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x1                             - Score: 0.6766
+ 3. x5                             - Score: 0.5531
+ 4. x0                             - Score: 0.4708
+ 5. x3                             - Score: 0.4518
+ 6. x2                             - Score: 0.4097
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 2 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 2 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 2 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 2 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 2 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 2 Gaussians for x2 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.8215
+ 3. x2                             - Score: 0.7003
+ 4. x3                             - Score: 0.3638
+ 5. x1                             - Score: 0.3442
+ 6. x0                             - Score: 0.3031
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x3                             - Score: 0.9656
+ 3. x4                             - Score: 0.8289
+ 4. x5                             - Score: 0.7753
+ 5. x2                             - Score: 0.7745
+ 6. x0                             - Score: 0.7622
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 4 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 4 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 4 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 4 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 4 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 4 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.8018
+ 3. x3                             - Score: 0.7337
+ 4. x2                             - Score: 0.6687
+ 5. x4                             - Score: 0.4051
+ 6. x0                             - Score: 0.2747
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x2                             - Score: 0.4638
+ 3. x0                             - Score: 0.3636
+ 4. x1                             - Score: 0.3542
+ 5. x5                             - Score: 0.3457
+ 6. x4                             - Score: 0.3033
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 4 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 3 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 4 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 4 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 4 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 2 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 4 Gaussians for x4 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x2                             - Score: 0.5858
+ 3. x0                             - Score: 0.4811
+ 4. x1                             - Score: 0.3600
+ 5. x4                             - Score: 0.3365
+ 6. x5                             - Score: 0.2352
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 2 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.9699
+ 3. x4                             - Score: 0.9646
+ 4. x0                             - Score: 0.8776
+ 5. x3                             - Score: 0.8498
+ 6. x2                             - Score: 0.8113
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 2 Gaussians for x2 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.7598
+ 3. x4                             - Score: 0.7208
+ 4. x3                             - Score: 0.3983
+ 5. x2                             - Score: 0.3795
+ 6. x0                             - Score: 0.3482
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+     0.50   +1.74       0.882        0.881   -0.001           1
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.9634
+ 3. x1                             - Score: 0.8498
+ 4. x2                             - Score: 0.8489
+ 5. x4                             - Score: 0.8384
+ 6. x0                             - Score: 0.8299
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.5119
+ 3. x4                             - Score: 0.3832
+ 4. x1                             - Score: 0.2381
+ 5. x0                             - Score: 0.2252
+ 6. x2                             - Score: 0.2064
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.6755
+ 3. x1                             - Score: 0.6039
+ 4. x3                             - Score: 0.5190
+ 5. x2                             - Score: 0.4723
+ 6. x0                             - Score: 0.3835
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 4 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 4 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 4 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 3 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 4 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 4 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.8215
+ 3. x2                             - Score: 0.7003
+ 4. x3                             - Score: 0.3638
+ 5. x1                             - Score: 0.3442
+ 6. x0                             - Score: 0.3031
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x3                             - Score: 0.9715
+ 3. x4                             - Score: 0.8781
+ 4. x2                             - Score: 0.8487
+ 5. x5                             - Score: 0.8184
+ 6. x0                             - Score: 0.7994
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 4 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 4 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 4 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 4 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 4 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 4 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+    [uniform lam=1.0] seed 2: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.8018
+ 3. x3                             - Score: 0.7337
+ 4. x2                             - Score: 0.6687
+ 5. x4                             - Score: 0.4051
+ 6. x0                             - Score: 0.2747
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.6151
+ 3. x4                             - Score: 0.5566
+ 4. x2                             - Score: 0.4889
+ 5. x1                             - Score: 0.4258
+ 6. x0                             - Score: 0.4225
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 4 Gaussians for x3 (label 2)
+  Automatically selected 4 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 4 Gaussians for x5 (label 2)
+  Automatically selected 4 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 4 Gaussians for x4 (label 2)
+  Automatically selected 4 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 4 Gaussians for x2 (label 2)
+  Automatically selected 4 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 4 Gaussians for x1 (label 2)
+  Automatically selected 4 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 4 Gaussians for x0 (label 2)
+  Automatically selected 3 Gaussians for x0 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x2                             - Score: 0.5858
+ 3. x0                             - Score: 0.4811
+ 4. x1                             - Score: 0.3600
+ 5. x4                             - Score: 0.3365
+ 6. x5                             - Score: 0.2352
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 2 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x0                             - Score: 0.9995
+ 3. x3                             - Score: 0.9946
+ 4. x4                             - Score: 0.9802
+ 5. x5                             - Score: 0.9790
+ 6. x2                             - Score: 0.7825
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 2 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.7598
+ 3. x4                             - Score: 0.7208
+ 4. x3                             - Score: 0.3983
+ 5. x2                             - Score: 0.3795
+ 6. x0                             - Score: 0.3482
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+     1.00   +4.83       0.771        0.779   +0.008           1
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x3                             - Score: 0.9972
+ 3. x0                             - Score: 0.8907
+ 4. x1                             - Score: 0.8811
+ 5. x2                             - Score: 0.8551
+ 6. x4                             - Score: 0.8193
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 4 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 4 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 3 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 4 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 4 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 4 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.5119
+ 3. x4                             - Score: 0.3832
+ 4. x1                             - Score: 0.2381
+ 5. x0                             - Score: 0.2252
+ 6. x2                             - Score: 0.2064
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.8610
+ 3. x1                             - Score: 0.8040
+ 4. x2                             - Score: 0.7855
+ 5. x3                             - Score: 0.7505
+ 6. x0                             - Score: 0.7300
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 4 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 4 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.8215
+ 3. x2                             - Score: 0.7003
+ 4. x3                             - Score: 0.3638
+ 5. x1                             - Score: 0.3442
+ 6. x0                             - Score: 0.3031
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.9636
+ 3. x0                             - Score: 0.9471
+ 4. x3                             - Score: 0.9464
+ 5. x4                             - Score: 0.9447
+ 6. x2                             - Score: 0.9171
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+    [uniform lam=1.5] seed 2: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.8018
+ 3. x3                             - Score: 0.7337
+ 4. x2                             - Score: 0.6687
+ 5. x4                             - Score: 0.4051
+ 6. x0                             - Score: 0.2747
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x4                             - Score: 0.7041
+ 3. x5                             - Score: 0.5801
+ 4. x2                             - Score: 0.5176
+ 5. x0                             - Score: 0.4398
+ 6. x1                             - Score: 0.3258
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 4 Gaussians for x3 (label 1)
+  Automatically selected 2 Gaussians for x3 (label 2)
+  Automatically selected 3 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 4 Gaussians for x4 (label 1)
+  Automatically selected 2 Gaussians for x4 (label 2)
+  Automatically selected 3 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 4 Gaussians for x5 (label 1)
+  Automatically selected 2 Gaussians for x5 (label 2)
+  Automatically selected 3 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 4 Gaussians for x2 (label 1)
+  Automatically selected 2 Gaussians for x2 (label 2)
+  Automatically selected 3 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 4 Gaussians for x0 (label 1)
+  Automatically selected 2 Gaussians for x0 (label 2)
+  Automatically selected 3 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 4 Gaussians for x1 (label 1)
+  Automatically selected 2 Gaussians for x1 (label 2)
+  Automatically selected 3 Gaussians for x1 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x2                             - Score: 0.5858
+ 3. x0                             - Score: 0.4811
+ 4. x1                             - Score: 0.3600
+ 5. x4                             - Score: 0.3365
+ 6. x5                             - Score: 0.2352
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 2 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.9732
+ 3. x4                             - Score: 0.9393
+ 4. x3                             - Score: 0.9190
+ 5. x0                             - Score: 0.8214
+ 6. x2                             - Score: 0.6380
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 4 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 4 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 4 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 3 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 4 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 4 Gaussians for x2 (label 1)
+    [uniform lam=1.5] seed 4: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.7598
+ 3. x4                             - Score: 0.7208
+ 4. x3                             - Score: 0.3983
+ 5. x2                             - Score: 0.3795
+ 6. x0                             - Score: 0.3482
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+     1.50   +9.74       0.318        0.588   +0.270           1
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x3                             - Score: 0.9933
+ 3. x2                             - Score: 0.9085
+ 4. x1                             - Score: 0.8789
+ 5. x0                             - Score: 0.8600
+ 6. x4                             - Score: 0.8402
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+    [uniform lam=2.0] seed 0: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.5119
+ 3. x4                             - Score: 0.3832
+ 4. x1                             - Score: 0.2381
+ 5. x0                             - Score: 0.2252
+ 6. x2                             - Score: 0.2064
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x1                             - Score: 0.6080
+ 3. x5                             - Score: 0.6052
+ 4. x3                             - Score: 0.4747
+ 5. x2                             - Score: 0.3860
+ 6. x0                             - Score: 0.3049
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 4 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 4 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 4 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 3 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 4 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 4 Gaussians for x0 (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.8215
+ 3. x2                             - Score: 0.7003
+ 4. x3                             - Score: 0.3638
+ 5. x1                             - Score: 0.3442
+ 6. x0                             - Score: 0.3031
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.9636
+ 3. x0                             - Score: 0.9471
+ 4. x3                             - Score: 0.9464
+ 5. x4                             - Score: 0.9447
+ 6. x2                             - Score: 0.9171
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+    [uniform lam=2.0] seed 2: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.8018
+ 3. x3                             - Score: 0.7337
+ 4. x2                             - Score: 0.6687
+ 5. x4                             - Score: 0.4051
+ 6. x0                             - Score: 0.2747
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x4                             - Score: 0.7970
+ 3. x5                             - Score: 0.7684
+ 4. x1                             - Score: 0.6963
+ 5. x2                             - Score: 0.6729
+ 6. x0                             - Score: 0.6382
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 4 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 3 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 4 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 3 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 4 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 3 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 4 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 3 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 4 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 3 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 4 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 3 Gaussians for x0 (label 3)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x2                             - Score: 0.5858
+ 3. x0                             - Score: 0.4811
+ 4. x1                             - Score: 0.3600
+ 5. x4                             - Score: 0.3365
+ 6. x5                             - Score: 0.2352
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 2 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x4                             - Score: 0.9977
+ 3. x1                             - Score: 0.9900
+ 4. x0                             - Score: 0.9730
+ 5. x5                             - Score: 0.9483
+ 6. x2                             - Score: 0.6243
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+    [uniform lam=2.0] seed 4: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.7598
+ 3. x4                             - Score: 0.7208
+ 4. x3                             - Score: 0.3983
+ 5. x2                             - Score: 0.3795
+ 6. x0                             - Score: 0.3482
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+     2.00  +14.39       0.112        0.131   +0.019           0
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x3                             - Score: 0.9933
+ 3. x2                             - Score: 0.9085
+ 4. x1                             - Score: 0.8789
+ 5. x0                             - Score: 0.8600
+ 6. x4                             - Score: 0.8402
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+    [uniform lam=2.5] seed 0: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x5                             - Score: 0.5119
+ 3. x4                             - Score: 0.3832
+ 4. x1                             - Score: 0.2381
+ 5. x0                             - Score: 0.2252
+ 6. x2                             - Score: 0.2064
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x1                             - Score: 0.7862
+ 3. x0                             - Score: 0.5900
+ 4. x5                             - Score: 0.5038
+ 5. x3                             - Score: 0.4782
+ 6. x2                             - Score: 0.3583
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 2 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 2 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 2 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 2 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 2 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 2 Gaussians for x2 (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x5                             - Score: 0.8215
+ 3. x2                             - Score: 0.7003
+ 4. x3                             - Score: 0.3638
+ 5. x1                             - Score: 0.3442
+ 6. x0                             - Score: 0.3031
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.9636
+ 3. x0                             - Score: 0.9471
+ 4. x3                             - Score: 0.9464
+ 5. x4                             - Score: 0.9447
+ 6. x2                             - Score: 0.9171
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+    [uniform lam=2.5] seed 2: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x1                             - Score: 1.0000
+ 2. x5                             - Score: 0.8018
+ 3. x3                             - Score: 0.7337
+ 4. x2                             - Score: 0.6687
+ 5. x4                             - Score: 0.4051
+ 6. x0                             - Score: 0.2747
+================================================================================
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x4                             - Score: 0.8287
+ 3. x5                             - Score: 0.8270
+ 4. x2                             - Score: 0.7092
+ 5. x0                             - Score: 0.6691
+ 6. x1                             - Score: 0.6483
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 2 Gaussians for x3 (label 1)
+  Automatically selected 2 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 3 Gaussians for x4 (label 1)
+  Automatically selected 2 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 3 Gaussians for x5 (label 1)
+  Automatically selected 2 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 3 Gaussians for x2 (label 1)
+  Automatically selected 2 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 3 Gaussians for x0 (label 1)
+  Automatically selected 2 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 3 Gaussians for x1 (label 1)
+  Automatically selected 2 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x3                             - Score: 1.0000
+ 2. x2                             - Score: 0.5858
+ 3. x0                             - Score: 0.4811
+ 4. x1                             - Score: 0.3600
+ 5. x4                             - Score: 0.3365
+ 6. x5                             - Score: 0.2352
+================================================================================
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 2 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x5 (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x4                             - Score: 1.0000
+ 2. x0                             - Score: 0.9370
+ 3. x3                             - Score: 0.9182
+ 4. x5                             - Score: 0.9017
+ 5. x1                             - Score: 0.8712
+ 6. x2                             - Score: 0.8673
+================================================================================
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 3)
+    [uniform lam=2.5] seed 4: IndexError
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. x5                             - Score: 1.0000
+ 2. x1                             - Score: 0.7598
+ 3. x4                             - Score: 0.7208
+ 4. x3                             - Score: 0.3983
+ 5. x2                             - Score: 0.3795
+ 6. x0                             - Score: 0.3482
+================================================================================
+  Automatically selected 1 Gaussians for x5 (label 3)
+  Automatically selected 1 Gaussians for x5 (label 2)
+  Automatically selected 1 Gaussians for x5 (label 0)
+  Automatically selected 1 Gaussians for x5 (label 1)
+  Automatically selected 1 Gaussians for x1 (label 3)
+  Automatically selected 1 Gaussians for x1 (label 2)
+  Automatically selected 1 Gaussians for x1 (label 0)
+  Automatically selected 1 Gaussians for x1 (label 1)
+  Automatically selected 1 Gaussians for x4 (label 3)
+  Automatically selected 1 Gaussians for x4 (label 2)
+  Automatically selected 1 Gaussians for x4 (label 0)
+  Automatically selected 1 Gaussians for x4 (label 1)
+  Automatically selected 1 Gaussians for x3 (label 3)
+  Automatically selected 1 Gaussians for x3 (label 2)
+  Automatically selected 1 Gaussians for x3 (label 0)
+  Automatically selected 1 Gaussians for x3 (label 1)
+  Automatically selected 1 Gaussians for x2 (label 3)
+  Automatically selected 1 Gaussians for x2 (label 2)
+  Automatically selected 1 Gaussians for x2 (label 0)
+  Automatically selected 1 Gaussians for x2 (label 1)
+  Automatically selected 1 Gaussians for x0 (label 3)
+  Automatically selected 1 Gaussians for x0 (label 2)
+  Automatically selected 1 Gaussians for x0 (label 0)
+  Automatically selected 1 Gaussians for x0 (label 1)
+     2.50  +17.91       0.073       -1.441   -1.514           0
+  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_g5b_skew_sweep.md
+  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_g5b_skew_sweep.csv

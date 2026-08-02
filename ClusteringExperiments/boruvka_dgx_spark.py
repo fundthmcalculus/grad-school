@@ -1,6 +1,6 @@
 """DGX Spark (GB10, Grace-Blackwell unified memory) study of GPU Boruvka VAT.
 
-The device-side GPU Boruvka MST (``experiments/boruvka_gpu.py``) was first
+The device-side GPU Boruvka MST (``ClusteringExperiments/boruvka_gpu.py``) was first
 benchmarked on a discrete GPU, where a brutal host->device transfer tax
 (~10x the resident kernel time) made it impractical for host-resident data and a
 small device VRAM capped the reachable ``n``. The DGX Spark's GB10 changes both:
@@ -31,7 +31,7 @@ Outputs four figures under experiments/figures/:
   * boruvka_dgx_precision.png  — MST time + accuracy at f64/f32/f16
   * (capacity study prints a table; no figure)
 
-Run:  python -m experiments.boruvka_dgx_spark
+Run:  python ClusteringExperiments/boruvka_dgx_spark.py
 """
 
 from __future__ import annotations
@@ -51,12 +51,12 @@ from tribbleclustering.pcvat import (  # noqa: E402
     vat_prim_mst_c,
     compute_ivat_c,
 )
-from experiments.boruvka_vat import (  # noqa: E402
+from boruvka_vat import (  # noqa: E402
     make_blobs,
     boruvka_mst_numba,
     vat_order_from_mst,
 )
-from experiments.boruvka_gpu import (  # noqa: E402
+from boruvka_gpu import (  # noqa: E402
     boruvka_mst_gpu,
     pairwise_distances_gpu,
     as_unified,

@@ -1,0 +1,505 @@
+  [skip] _baseline_anfis unavailable (ModuleNotFoundError); columns ['fit_predict'] -> N/A
+  [skip] _baseline_gafis unavailable (ModuleNotFoundError); columns ['fit_predict'] -> N/A
+Table 4.1 -- MoG training time & accuracy vs. baselines
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9306
+ 3. Water                          - Score: 0.6608
+ 4. FineAgg                        - Score: 0.5154
+ 5. CoarseAgg                      - Score: 0.4978
+ 6. Superplasticizer               - Score: 0.4839
+ 7. Slag                           - Score: 0.1348
+ 8. FlyAsh                         - Score: 0.1057
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8865
+ 3. Water                          - Score: 0.6582
+ 4. CoarseAgg                      - Score: 0.5128
+ 5. FineAgg                        - Score: 0.4726
+ 6. Superplasticizer               - Score: 0.4546
+ 7. Slag                           - Score: 0.1093
+ 8. FlyAsh                         - Score: 0.0868
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9682
+ 3. Water                          - Score: 0.6490
+ 4. FineAgg                        - Score: 0.5475
+ 5. CoarseAgg                      - Score: 0.4744
+ 6. Superplasticizer               - Score: 0.4313
+ 7. FlyAsh                         - Score: 0.0989
+ 8. Slag                           - Score: 0.0816
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9641
+ 3. Water                          - Score: 0.6672
+ 4. FineAgg                        - Score: 0.5326
+ 5. CoarseAgg                      - Score: 0.5070
+ 6. Superplasticizer               - Score: 0.4563
+ 7. FlyAsh                         - Score: 0.1135
+ 8. Slag                           - Score: 0.0960
+================================================================================
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9291
+ 3. Water                          - Score: 0.6492
+ 4. FineAgg                        - Score: 0.5540
+ 5. CoarseAgg                      - Score: 0.5163
+ 6. Superplasticizer               - Score: 0.4924
+ 7. Slag                           - Score: 0.1341
+ 8. FlyAsh                         - Score: 0.1211
+================================================================================
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.7806
+ 3. NoOfCSS                        - Score: 0.6500
+ 4. HasCopyrightInfo               - Score: 0.5639
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.5318
+ 6. NoOfSelfRef                    - Score: 0.5302
+ 7. HasDescription                 - Score: 0.5225
+ 8. HasTitle                       - Score: 0.5014
+ 9. NoOfJS                         - Score: 0.4868
+10. NoOfImage                      - Score: 0.4548
+11. SpacialCharRatioInURL          - Score: 0.3713
+12. NoOfiFrame                     - Score: 0.3675
+13. HasSubmitButton                - Score: 0.3635
+14. DegitRatioInURL                - Score: 0.3402
+15. LineOfCode                     - Score: 0.3291
+16. NoOfEmptyRef                   - Score: 0.3136
+17. DomainTitleMatchScore          - Score: 0.3098
+18. IsHTTPS                        - Score: 0.3034
+19. HasHiddenFields                - Score: 0.3033
+20. URLCharProb                    - Score: 0.3021
+21. NoOfExternalRef                - Score: 0.2963
+22. HasFavicon                     - Score: 0.2937
+23. NoOfDegitsInURL                - Score: 0.2886
+24. LetterRatioInURL               - Score: 0.2838
+25. URLLength                      - Score: 0.2790
+26. IsResponsive                   - Score: 0.2781
+27. NoOfLettersInURL               - Score: 0.2775
+28. Robots                         - Score: 0.2631
+29. HasExternalFormSubmit          - Score: 0.2629
+30. URLTitleMatchScore             - Score: 0.2554
+31. LargestLineLength              - Score: 0.2540
+32. DomainLength                   - Score: 0.2416
+33. Pay                            - Score: 0.2369
+34. NoOfPopup                      - Score: 0.2001
+35. CharContinuationRate           - Score: 0.1999
+36. NoOfSubDomain                  - Score: 0.1371
+37. Bank                           - Score: 0.1324
+38. Crypto                         - Score: 0.1317
+39. HasPasswordField               - Score: 0.1010
+40. NoOfSelfRedirect               - Score: 0.0766
+41. TLDLength                      - Score: 0.0568
+42. TLDLegitimateProb              - Score: 0.0314
+43. NoOfURLRedirect                - Score: 0.0218
+44. NoOfQMarkInURL                 - Score: 0.0015
+45. NoOfEqualsInURL                - Score: 0.0005
+46. IsDomainIP                     - Score: 0.0000
+47. HasObfuscation                 - Score: 0.0000
+48. NoOfAmpersandInURL             - Score: 0.0000
+49. NoOfObfuscatedChar             - Score: 0.0000
+50. ObfuscationRatio               - Score: 0.0000
+================================================================================
+  Automatically selected 4 Gaussians for URLSimilarityIndex (label legit)
+  Automatically selected 1 Gaussians for URLSimilarityIndex (label phish)
+  Automatically selected 2 Gaussians for HasSocialNet (label legit)
+  Automatically selected 2 Gaussians for HasSocialNet (label phish)
+  Automatically selected 4 Gaussians for NoOfCSS (label legit)
+  Automatically selected 4 Gaussians for NoOfCSS (label phish)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label legit)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label phish)
+  Automatically selected 4 Gaussians for NoOfOtherSpecialCharsInURL (label legit)
+  Automatically selected 4 Gaussians for NoOfOtherSpecialCharsInURL (label phish)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.7935
+ 3. HasCopyrightInfo               - Score: 0.5801
+ 4. NoOfOtherSpecialCharsInURL     - Score: 0.5425
+ 5. NoOfSelfRef                    - Score: 0.5398
+ 6. HasDescription                 - Score: 0.5389
+ 7. NoOfCSS                        - Score: 0.5256
+ 8. HasTitle                       - Score: 0.4963
+ 9. NoOfJS                         - Score: 0.4954
+10. NoOfImage                      - Score: 0.4649
+11. SpacialCharRatioInURL          - Score: 0.3852
+12. HasSubmitButton                - Score: 0.3831
+13. NoOfiFrame                     - Score: 0.3705
+14. DegitRatioInURL                - Score: 0.3437
+15. NoOfEmptyRef                   - Score: 0.3142
+16. DomainTitleMatchScore          - Score: 0.3119
+17. HasHiddenFields                - Score: 0.3076
+18. URLCharProb                    - Score: 0.3032
+19. NoOfExternalRef                - Score: 0.3021
+20. IsHTTPS                        - Score: 0.2992
+21. HasFavicon                     - Score: 0.2933
+22. NoOfDegitsInURL                - Score: 0.2906
+23. URLLength                      - Score: 0.2817
+24. NoOfLettersInURL               - Score: 0.2812
+25. IsResponsive                   - Score: 0.2723
+26. LetterRatioInURL               - Score: 0.2703
+27. LineOfCode                     - Score: 0.2683
+28. Robots                         - Score: 0.2653
+29. HasExternalFormSubmit          - Score: 0.2641
+30. URLTitleMatchScore             - Score: 0.2586
+31. LargestLineLength              - Score: 0.2487
+32. DomainLength                   - Score: 0.2473
+33. Pay                            - Score: 0.2391
+34. NoOfPopup                      - Score: 0.2112
+35. CharContinuationRate           - Score: 0.2029
+36. NoOfSubDomain                  - Score: 0.1418
+37. Bank                           - Score: 0.1348
+38. Crypto                         - Score: 0.1332
+39. HasPasswordField               - Score: 0.1058
+40. NoOfSelfRedirect               - Score: 0.0756
+41. TLDLength                      - Score: 0.0558
+42. TLDLegitimateProb              - Score: 0.0348
+43. NoOfURLRedirect                - Score: 0.0250
+44. NoOfQMarkInURL                 - Score: 0.0014
+45. NoOfEqualsInURL                - Score: 0.0005
+46. IsDomainIP                     - Score: 0.0000
+47. HasObfuscation                 - Score: 0.0000
+48. NoOfAmpersandInURL             - Score: 0.0000
+49. NoOfObfuscatedChar             - Score: 0.0000
+50. ObfuscationRatio               - Score: 0.0000
+================================================================================
+  Automatically selected 1 Gaussians for URLSimilarityIndex (label phish)
+  Automatically selected 4 Gaussians for URLSimilarityIndex (label legit)
+  Automatically selected 2 Gaussians for HasSocialNet (label phish)
+  Automatically selected 2 Gaussians for HasSocialNet (label legit)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label phish)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label legit)
+  Automatically selected 4 Gaussians for NoOfOtherSpecialCharsInURL (label phish)
+  Automatically selected 4 Gaussians for NoOfOtherSpecialCharsInURL (label legit)
+  Automatically selected 4 Gaussians for NoOfSelfRef (label phish)
+  Automatically selected 4 Gaussians for NoOfSelfRef (label legit)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.7813
+ 3. HasCopyrightInfo               - Score: 0.5715
+ 4. HasDescription                 - Score: 0.5347
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.5336
+ 6. NoOfSelfRef                    - Score: 0.5317
+ 7. NoOfCSS                        - Score: 0.5210
+ 8. HasTitle                       - Score: 0.5096
+ 9. NoOfJS                         - Score: 0.4908
+10. NoOfImage                      - Score: 0.4607
+11. SpacialCharRatioInURL          - Score: 0.3778
+12. HasSubmitButton                - Score: 0.3638
+13. NoOfiFrame                     - Score: 0.3624
+14. DegitRatioInURL                - Score: 0.3377
+15. LineOfCode                     - Score: 0.3292
+16. DomainTitleMatchScore          - Score: 0.3144
+17. URLCharProb                    - Score: 0.3103
+18. HasHiddenFields                - Score: 0.3060
+19. NoOfEmptyRef                   - Score: 0.3039
+20. IsHTTPS                        - Score: 0.3032
+21. NoOfExternalRef                - Score: 0.2973
+22. HasFavicon                     - Score: 0.2867
+23. NoOfDegitsInURL                - Score: 0.2858
+24. URLLength                      - Score: 0.2792
+25. NoOfLettersInURL               - Score: 0.2788
+26. LargestLineLength              - Score: 0.2722
+27. IsResponsive                   - Score: 0.2720
+28. Robots                         - Score: 0.2672
+29. LetterRatioInURL               - Score: 0.2653
+30. URLTitleMatchScore             - Score: 0.2585
+31. HasExternalFormSubmit          - Score: 0.2496
+32. DomainLength                   - Score: 0.2425
+33. Pay                            - Score: 0.2378
+34. CharContinuationRate           - Score: 0.2022
+35. NoOfPopup                      - Score: 0.2014
+36. NoOfSubDomain                  - Score: 0.1421
+37. Bank                           - Score: 0.1334
+38. Crypto                         - Score: 0.1322
+39. HasPasswordField               - Score: 0.0977
+40. NoOfSelfRedirect               - Score: 0.0739
+41. TLDLength                      - Score: 0.0585
+42. TLDLegitimateProb              - Score: 0.0336
+43. NoOfURLRedirect                - Score: 0.0230
+44. NoOfQMarkInURL                 - Score: 0.0015
+45. NoOfEqualsInURL                - Score: 0.0005
+46. IsDomainIP                     - Score: 0.0000
+47. HasObfuscation                 - Score: 0.0000
+48. NoOfAmpersandInURL             - Score: 0.0000
+49. NoOfObfuscatedChar             - Score: 0.0000
+50. ObfuscationRatio               - Score: 0.0000
+================================================================================
+  Automatically selected 1 Gaussians for URLSimilarityIndex (label phish)
+  Automatically selected 4 Gaussians for URLSimilarityIndex (label legit)
+  Automatically selected 2 Gaussians for HasSocialNet (label phish)
+  Automatically selected 2 Gaussians for HasSocialNet (label legit)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label phish)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label legit)
+  Automatically selected 2 Gaussians for HasDescription (label phish)
+  Automatically selected 2 Gaussians for HasDescription (label legit)
+  Automatically selected 4 Gaussians for NoOfOtherSpecialCharsInURL (label phish)
+  Automatically selected 4 Gaussians for NoOfOtherSpecialCharsInURL (label legit)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.7989
+ 3. HasCopyrightInfo               - Score: 0.5793
+ 4. NoOfOtherSpecialCharsInURL     - Score: 0.5434
+ 5. NoOfSelfRef                    - Score: 0.5391
+ 6. HasDescription                 - Score: 0.5368
+ 7. NoOfCSS                        - Score: 0.5251
+ 8. HasTitle                       - Score: 0.5019
+ 9. NoOfJS                         - Score: 0.4991
+10. NoOfImage                      - Score: 0.4660
+11. NoOfExternalRef                - Score: 0.4479
+12. SpacialCharRatioInURL          - Score: 0.3901
+13. HasSubmitButton                - Score: 0.3732
+14. NoOfiFrame                     - Score: 0.3728
+15. DegitRatioInURL                - Score: 0.3464
+16. DomainTitleMatchScore          - Score: 0.3207
+17. URLCharProb                    - Score: 0.3139
+18. HasHiddenFields                - Score: 0.3038
+19. NoOfEmptyRef                   - Score: 0.3027
+20. IsHTTPS                        - Score: 0.2980
+21. HasFavicon                     - Score: 0.2952
+22. NoOfDegitsInURL                - Score: 0.2923
+23. LetterRatioInURL               - Score: 0.2833
+24. URLLength                      - Score: 0.2820
+25. NoOfLettersInURL               - Score: 0.2811
+26. IsResponsive                   - Score: 0.2804
+27. URLTitleMatchScore             - Score: 0.2678
+28. Robots                         - Score: 0.2678
+29. LineOfCode                     - Score: 0.2607
+30. LargestLineLength              - Score: 0.2605
+31. HasExternalFormSubmit          - Score: 0.2561
+32. DomainLength                   - Score: 0.2458
+33. Pay                            - Score: 0.2349
+34. NoOfPopup                      - Score: 0.2101
+35. CharContinuationRate           - Score: 0.2077
+36. NoOfSubDomain                  - Score: 0.1448
+37. Crypto                         - Score: 0.1412
+38. Bank                           - Score: 0.1292
+39. HasPasswordField               - Score: 0.1008
+40. NoOfSelfRedirect               - Score: 0.0782
+41. TLDLength                      - Score: 0.0566
+42. TLDLegitimateProb              - Score: 0.0332
+43. NoOfURLRedirect                - Score: 0.0217
+44. NoOfQMarkInURL                 - Score: 0.0017
+45. NoOfEqualsInURL                - Score: 0.0005
+46. IsDomainIP                     - Score: 0.0000
+47. HasObfuscation                 - Score: 0.0000
+48. NoOfAmpersandInURL             - Score: 0.0000
+49. NoOfObfuscatedChar             - Score: 0.0000
+50. ObfuscationRatio               - Score: 0.0000
+================================================================================
+  Automatically selected 4 Gaussians for URLSimilarityIndex (label legit)
+  Automatically selected 1 Gaussians for URLSimilarityIndex (label phish)
+  Automatically selected 2 Gaussians for HasSocialNet (label legit)
+  Automatically selected 2 Gaussians for HasSocialNet (label phish)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label legit)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label phish)
+  Automatically selected 4 Gaussians for NoOfOtherSpecialCharsInURL (label legit)
+  Automatically selected 4 Gaussians for NoOfOtherSpecialCharsInURL (label phish)
+  Automatically selected 4 Gaussians for NoOfSelfRef (label legit)
+  Automatically selected 4 Gaussians for NoOfSelfRef (label phish)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.8016
+ 3. NoOfCSS                        - Score: 0.6063
+ 4. HasCopyrightInfo               - Score: 0.5875
+ 5. NoOfSelfRef                    - Score: 0.5422
+ 6. NoOfOtherSpecialCharsInURL     - Score: 0.5417
+ 7. HasDescription                 - Score: 0.5415
+ 8. HasTitle                       - Score: 0.5080
+ 9. NoOfJS                         - Score: 0.4984
+10. NoOfImage                      - Score: 0.4647
+11. SpacialCharRatioInURL          - Score: 0.3833
+12. HasSubmitButton                - Score: 0.3784
+13. NoOfiFrame                     - Score: 0.3741
+14. DegitRatioInURL                - Score: 0.3443
+15. NoOfEmptyRef                   - Score: 0.3158
+16. DomainTitleMatchScore          - Score: 0.3143
+17. HasHiddenFields                - Score: 0.3108
+18. URLCharProb                    - Score: 0.3095
+19. NoOfPopup                      - Score: 0.3080
+20. NoOfExternalRef                - Score: 0.3080
+21. IsHTTPS                        - Score: 0.3042
+22. HasFavicon                     - Score: 0.2967
+23. NoOfDegitsInURL                - Score: 0.2902
+24. NoOfLettersInURL               - Score: 0.2831
+25. URLLength                      - Score: 0.2830
+26. IsResponsive                   - Score: 0.2803
+27. LetterRatioInURL               - Score: 0.2745
+28. HasExternalFormSubmit          - Score: 0.2641
+29. Robots                         - Score: 0.2632
+30. LineOfCode                     - Score: 0.2610
+31. URLTitleMatchScore             - Score: 0.2605
+32. LargestLineLength              - Score: 0.2563
+33. DomainLength                   - Score: 0.2497
+34. Pay                            - Score: 0.2421
+35. CharContinuationRate           - Score: 0.2042
+36. NoOfSubDomain                  - Score: 0.1440
+37. Bank                           - Score: 0.1348
+38. Crypto                         - Score: 0.1257
+39. HasPasswordField               - Score: 0.1000
+40. NoOfSelfRedirect               - Score: 0.0744
+41. TLDLength                      - Score: 0.0615
+42. TLDLegitimateProb              - Score: 0.0324
+43. NoOfURLRedirect                - Score: 0.0203
+44. NoOfQMarkInURL                 - Score: 0.0014
+45. NoOfEqualsInURL                - Score: 0.0005
+46. IsDomainIP                     - Score: 0.0000
+47. HasObfuscation                 - Score: 0.0000
+48. NoOfAmpersandInURL             - Score: 0.0000
+49. NoOfObfuscatedChar             - Score: 0.0000
+50. ObfuscationRatio               - Score: 0.0000
+================================================================================
+  Automatically selected 1 Gaussians for URLSimilarityIndex (label phish)
+  Automatically selected 4 Gaussians for URLSimilarityIndex (label legit)
+  Automatically selected 2 Gaussians for HasSocialNet (label phish)
+  Automatically selected 2 Gaussians for HasSocialNet (label legit)
+  Automatically selected 4 Gaussians for NoOfCSS (label phish)
+  Automatically selected 4 Gaussians for NoOfCSS (label legit)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label phish)
+  Automatically selected 2 Gaussians for HasCopyrightInfo (label legit)
+  Automatically selected 4 Gaussians for NoOfSelfRef (label phish)
+  Automatically selected 4 Gaussians for NoOfSelfRef (label legit)
+  wrote /home/user/grad-school/reproduce/outputs/table_4_1.md
+  wrote /home/user/grad-school/reproduce/outputs/table_4_1.csv

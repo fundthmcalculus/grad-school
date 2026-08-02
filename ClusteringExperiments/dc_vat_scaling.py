@@ -19,7 +19,7 @@ use the same C Prim kernel, so their speedups are apples-to-apples; naive's
 ideal-parallel time is the largest block (blocks are independent). Boruvka CPU is
 Numba, GPU is CuPy on a device-resident matrix.
 
-Run:  python -m experiments.dc_vat_scaling
+Run:  python ClusteringExperiments/dc_vat_scaling.py
 """
 
 from __future__ import annotations
@@ -40,19 +40,19 @@ from tribbleclustering.pcvat import (  # noqa: E402
     compute_ivat_c,
     pairwise_distances_c_64,
 )
-from experiments.blockwise_vat import (  # noqa: E402
+from blockwise_vat import (  # noqa: E402
     make_blobs,
     partition,
     ivat_image_from_order,
     adjusted_rand,
     labels_from_order,
 )
-from experiments.stitched_vat import stitched_vat  # noqa: E402
-from experiments.boruvka_vat import boruvka_mst_numba, vat_order_from_mst  # noqa: E402
+from stitched_vat import stitched_vat  # noqa: E402
+from boruvka_vat import boruvka_mst_numba, vat_order_from_mst  # noqa: E402
 
 try:
     import cupy as _cp
-    from experiments.boruvka_gpu import boruvka_mst_gpu
+    from boruvka_gpu import boruvka_mst_gpu
 
     _HAS_CUPY = _cp.cuda.runtime.getDeviceCount() > 0
 except Exception:

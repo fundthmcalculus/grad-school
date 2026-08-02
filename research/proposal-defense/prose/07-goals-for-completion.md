@@ -1,0 +1,69 @@
+# Chapter 7 — Goals for Completion
+
+This chapter states what remains to turn this proposal into a dissertation. I have a real head start — Chapters 3 and 4 are done and published or nearly so, and Chapters 5 and 6 have working code and preliminary results — so the goals here are about finishing, hardening, and, above all, connecting the pieces into one system. The plan is deliberately aggressive: the proposal defense is at the end of 2026 and the final defense is in March 2028, which is a little over a year of research runway, and I intend to use it to produce a substantial and convincing body of results rather than a minimal one.
+
+## 7.1 The capstone: the integrated pipeline
+
+The single most important deliverable is the end-to-end pipeline running as one system. Each chapter proves a stage in isolation — structure discovery in Chapter 3, membership generation in Chapter 5, model synthesis in Chapters 4 and 6, optional refinement in Appendix A — but the central claim of the dissertation, that a structure-first approach builds interpretable fuzzy models orders of magnitude faster and at far greater scale, is only fully demonstrated when the stages are chained: a bare dissimilarity matrix in, a readable fuzzy inference system out, with the speed and scale numbers measured across the whole path. The concrete deliverable is one reproducible driver and one flagship case study carried through every stage from start to finish.
+
+Two specific gaps make this more than a packaging exercise, and both surfaced while writing the chapters up. The first is that Chapter 5's membership functions have never actually been fed to Chapter 6's inference machinery: every result in Chapter 5 is a clustering score, which is a proxy for the fuzzy-model quality the chapter exists to produce. The second is smaller but cuts across everything — the Concrete benchmark is currently run three different ways in three places, so the numbers in Chapters 4 and 6 cannot be read against each other. Fixing that is cheap and removes a real vulnerability.
+
+## 7.2 Proposed studies
+
+I organize the remaining work as eight goals.
+
+**G1 — Direct one-pass membership generation.** Collapse Chapter 5's two-stage select-then-fit pipeline into a single pass, in which each block emits its native membership function, the disjunction recombines them, and the surviving envelope is the model. The research-interesting piece is a soft, kernel-weighted band membership, which I expect to fix the small-sample over-segmentation. This is the differentiator, and it feeds the capstone.
+
+**G2 — Real non-coordinate benchmarks.** Everything topological is so far demonstrated on synthetic data with known ground truth. The core niche — that this works where there are no coordinates — has to be shown on genuine non-metric domains: time series under dynamic time warping, sequences under edit distance, graphs under a kernel dissimilarity. This is the single most important credibility gap to close, and it serves both Chapter 3 and Chapter 5.
+
+**G3 — The hierarchical mixture, finished and compared.** Implement the EM refinement of the mixture of experts, and benchmark the whole model family against the baselines a reviewer will demand — ANFIS, CART/C4.5, M5 model trees, flat TSK, and the recent Fumanal-Idocin and D-TSK-FC methods — on identical splits.
+
+**G4 — Scale and hardware credibility.** This is the consolidation point for the board-wide repeatable-performance standard that recurs throughout the document. Every performance and scaling number, for both scalability and stability, is to be re-run under one fixed protocol: pinned clocks and thermals, multiple seeds, reported error bars, and a datacenter GPU with full double-precision throughput.
+
+I am widening this goal to cover *accuracy* claims and not only timing ones, because the seed count turned out to matter more than I assumed. Moving the harness from three seeds to ten retracted a crossover in §4.3.2, refuted the central hypothesis of §4.3.3 outright, and exposed a mixture-of-experts split that diverges to predictions of 10,536 MPa on a target bounded near 82 — a failure that three or five seeds never sampled and that no aggregate over them would have revealed. Ten seeds is now the floor for any number quoted in this document, tracked in `reproduce/common.py` and recorded in every run's provenance file. The general form of the lesson is that a mean without a spread, over a sample too small to contain the failure modes, is not evidence. It also includes the head-to-head against eVAT and clusiVAT that Chapter 3 owes, and a push toward a distributed pVAT at half a million points. It does *not* include a dense-Prim baseline: a code review established that the compiled kernel already is one, which is why Chapter 3 rests its claim on reachable problem size rather than on the exponent.
+
+**G5 — Output partitioning: reopened.** I previously recorded this goal as settled, with quantile boundaries the recommended default on the strength of a three-seed sweep showing quantile's advantage growing monotonically with target skew. Re-running the same experiment at ten seeds refutes that. The sign reverses in every row past symmetry, and the reason is visible in the spreads rather than the means: quantile does not become *less accurate* under skew, it becomes *unstable* — deviations of ±0.99, ±4.45, ±21.2 at the high-skew end, where a handful of catastrophic splits drag an otherwise reasonable distribution far negative. Uniform degrades smoothly and predictably to near-zero instead.
+
+What survives is the diagnosis, and it is worth more than the recommendation it replaces. Bucket starvation is real and measured — uniform's smallest bucket falls to one sample by skew 1.8 and to zero past skew 14 — and so is the correction to my own tail prediction: uniform does *not* hold the tails better, because an evenly spaced bucket in a sparse tail is useless if nothing lands in it. The study also surfaced a bug in the consequent solve, now fixed upstream. But the conclusion I drew from all that — that guaranteed occupancy therefore makes quantile the safe default — does not hold. Quantile removes one failure mode and introduces another.
+
+So the honest status is that neither scheme is safe on a heavily skewed target, and the remaining work is no longer corroboration but a decision: either characterize quantile's instability well enough to guard against it, or accept that a heavily skewed target needs a transform rather than a better partition. **Estimated effort: one quarter.** This is the clearest instance in the proposal of the seed-count lesson in G4 — a three-seed protocol produced a clean, publishable, wrong answer.
+
+**G6 — Interpretability, measured.** The interpretability claim should be measured, not asserted: rule counts, path lengths, and either an established interpretability metric or a small expert-audience study, and an empirical demonstration of the Magdalena condition (hierarchies over named inputs).
+
+**G7 — Adaptive multi-scale (stretch).** Replace Chapter 5's gap heuristic for band discovery with a model-based criterion — a change-point or barcode-stability test — so that overlapping density scales, which the gap heuristic cannot handle, become tractable. I mark this explicitly as a stretch goal and the first thing I will cut if time runs short.
+
+**G8 — Joint memberships where the structure requires them (stretch).** Every membership function in this work is one-dimensional, which is what keeps the rule count linear and the clauses readable — and is a hard expressive limit, since a ring is not the intersection of per-axis intervals. I propose extending to joint two-feature memberships *only* for clusters that have no faithful axis-aligned description, using the topological disjunct count of Chapter 5 §5.3.5 as the detector so the decision is a measured property of the data rather than a preference. The reason this is a stretch goal and not a plank: it trades away interpretability, which is the property the dissertation is arguing for, so it is only worth having if such clusters turn out to be rare on real data. That is an empirical question I have not yet answered, and if the answer is "common" the honest conclusion is that this construction is the wrong tool for that data. **Estimated effort: one quarter.**
+
+## 7.3 Application showcases
+
+The flagship case study is still flexible, and I will settle it with my committee, but the two strong candidates are a large cybersecurity/IoT dataset (RT-IOT2022 or an IoT-botnet set), where speed, scale, and readable rules all matter at once, and the UCI-58 shuttle set already used in Chapter 3, which gives a clean single thread from structure discovery through to the final model. Alongside the primary showcase I will carry the memory-augmented dynamical-systems result — the double pendulum and its relatives — as a deliberately aerospace-flavored demonstration for the committee.
+
+## 7.4 Risks and an honest de-scoping plan
+
+I would rather name the risks than have them named for me.
+
+The nearest one is the prior-art overlap in Chapter 5 with Bonis and Oudot; my mitigation is the three axes of daylight I already stated, and if a reviewer collapses them, the fallback is that the integration and the one-pass membership generation still stand as novel. The EM in Chapter 6 is designed but not built, and if the implementation slips, the one-shot mixture and the fuzzy trees are already complete contributions. The GPU story depends on getting time on a datacenter card; without it I will report the CPU-parallel and single-precision results clearly scoped, rather than overclaim. And the baseline tables in Chapters 4 and 6 are the first experiments I owe, because the speed and accuracy claims are only as strong as the methods they are measured against.
+
+Two further exposures are worth naming because a committee will find them. My selection gate in Chapter 5 loses outright to more aggressive selectors on the bridge case — that is a deliberate conservatism trade, but it is a loss, and I report it as one. And the non-metric claim that Chapter 3's niche rests on is so far demonstrated only on synthetic non-metric matrices built from coordinate data; until G2 runs on genuinely coordinate-free domains, that argument is structural rather than empirical.
+
+The floor under all of this is that Chapters 3 and 4 — the accelerated exact VAT engine and the fast Mixture-of-Gaussians synthesis — are done and defensible on their own. The proposed work extends and connects them; it is not load-bearing for the degree in the way a single make-or-break experiment would be. That is by design.
+
+## 7.5 Goals, mapped
+
+**Table 7.1 — Goals for completion, mapped.** Quarters are relative to the ~Dec 2026 proposal; final defense March 2028 (see Chapter 10). Status and items also tracked in `ACTION_ITEMS.md`.
+
+| Goal | Feeds | Current status | Priority | Target |
+|---|---|---|---|---|
+| **G4** repeatable perf + eVAT/clusiVAT head-to-head | Ch 3, 5, 6 | not started | must | 2027 Q1 |
+| **G1** one-pass membership generation | Ch 5, capstone | preliminary done | differentiator | 2027 Q2 |
+| **G5** output partitioning settled (quantile vs uniform) | Ch 4 | not started | should | 2027 Q2 |
+| **G2** real non-coordinate benchmarks (DTW/edit/graph) | Ch 3, 5 | not started | must | 2027 Q3 |
+| **G3** HME EM + full baseline suite | Ch 6 | one-shot done; EM design-only | must | 2027 Q3–Q4 |
+| **capstone** integrated end-to-end pipeline | Ch 3→5→6 | not started | must | 2028 Q1 |
+| **G6** interpretability, measured | Ch 6 | not started | should | 2028 Q1 |
+| **G7** adaptive multi-scale (overlapping scales) | Ch 5 | not started | stretch (first cut) | 2028 Q1 |
+| **G8** joint memberships for non-axis-aligned clusters | Ch 5, 6 | not started | stretch | 2028 Q1 |
+
+---
+
+*Draft — Chapter 7 prose, in the author's voice. One table placeholder. Source outline in `../chapters/07-goals-for-completion.md`; goals G1–G7 tracked in `../ACTION_ITEMS.md` and mapped to the Chapter 10 timeline.*

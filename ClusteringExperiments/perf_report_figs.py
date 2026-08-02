@@ -8,7 +8,7 @@ the result). They are constants here so the consolidated report stays consistent
 with the PRs and white-paper rather than re-measuring under end-of-session
 thermal throttling. Source is cited per figure.
 
-    python -m experiments.perf_report_figs
+    python ClusteringExperiments/perf_report_figs.py
 """
 
 from __future__ import annotations

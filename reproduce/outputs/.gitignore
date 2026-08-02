@@ -1,0 +1,21 @@
+# Loose files at the top level are scratch -- whatever the last ad-hoc run left.
+*
+!.gitkeep
+!.gitignore
+
+# ...except the cross-run comparison, which is a deliverable, not scratch.
+!FIX_IMPACT.md
+
+# Labelled run archives (reproduce/run_all_tables.sh <label>) ARE tracked: they
+# are the evidence behind the write-ups, and they have to survive the machine
+# that produced them for a diff between two runs to mean anything later.
+!*/
+!*/**
+
+# ...but regenerated figures are not. They used to be committed inside the
+# tribble-cluster submodule; reproduce/experiments/run_cluster_experiment.py now
+# redirects them here so reproducing a Chapter 3 figure no longer dirties a
+# pinned submodule. Ignored for now, matching the policy on
+# gated-minimax-selection/outputs/. This rule must stay AFTER the !*/ pair above
+# to win -- last match wins, and an excluded directory is never descended into.
+figures/

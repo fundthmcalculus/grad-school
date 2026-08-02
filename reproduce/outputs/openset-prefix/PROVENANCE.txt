@@ -1,0 +1,6 @@
+label:       openset-prefix
+tribble-fis: d0d67144f4d084a905f16031c13b6a0301ca85f8
+seeds:       0,1,2,3,4
+conorm:      hamacher (requested; bug #22 means the reduction ignores it)
+thetas:      0.5,0.6,0.7,0.8,0.9,0.99,1.1
+dataset:     glass.csv (214x10, 6 classes) -- identical to the postfix run

@@ -1,0 +1,139 @@
+# Proposal Defense — Action Items & Open TODOs
+
+Full backlog with findings and history. **For the prioritized plan of record, see [`NEXT_STEPS.md`](NEXT_STEPS.md)** — this file is the detail behind it. Legend: ⬜ open · 🟨 in progress · ✅ resolved.
+
+_Last updated: 2026-07-31 (post consistency pass across Ch 1–8)_
+
+---
+
+## A. Board-wide standards (apply to multiple chapters)
+
+- ⬜ **Repeatable performance results** (scalability AND stability). One fixed protocol for every performance/scaling number: pinned clocks/thermals, multiple seeds, reported error bars, datacenter GPU with full-rate FP64. Mirrored in Ch 3/5/6; consolidated as **Goal G4 (Ch 7)**. Current numbers are single-machine point estimates, some thermally throttled.
+- ✅ **Consolidate + verify the bibliography** — `references.bib` built and fully verified (Crossref/arXiv/DBLP pass 2026-07-31): 41 `[V]` + 23 `[S]`, zero unresolved. Placeholders resolved (eVAT = Meng & Yuan 2018 IJDSA; Fast-VAT = Avinash & Lachheb 2025 arXiv:2507.15904); Bonis–Oudot = PRL 102:37–43 (2018); AuToMATo title/authors corrected (TMLR 2025); ConiVAT confirmed arXiv-only. **Only proof-stage item:** confirm the "Kališnik" accent survives BibTeX/LaTeX encoding.
+- ✅ **Broken citation resolved.** "[*Information Sciences* 2024]" = **Deshpande & Kumar, "Time and Memory Scalable Algorithms for Clustering Tendency Assessment of Big Data", Information Sciences 664:120324 (2024), DOI 10.1016/j.ins.2024.120324.** Now cited properly in Ch2 §2.2 and Ch3 §3.2 as `deshpande2024scalable`. It is also the closest prior art to the planned Ch9 note — see the blocking reads below.
+- 🚫 **BLOCKING READS before writing the Ch9 complexity note** (and before approaching anyone about it). (1) **Deshpande & Kumar 2024** (Information Sciences 664:120324) — full text was unobtainable in the prior-art search; it already does MST-iVAT "without computing the full distance matrix" and attacks the ordering sub-quadratically with k-d trees. If it also states the O(N)-workspace result for VAT itself, the note has no contribution left. (2) **Wang et al. 2010** (PAKDD, iVAT) — no OA copy reachable; complexity content unknown. Institutional access needed for both.
+- ⚠️ **NAME COLLISION — "pVAT" is taken.** Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013 (LNCS 8302:151–170) is a published method of that name that also swaps the MST algorithm for the VAT ordering (Prim → Borůvka). Reading our *p* as parallel/performant collides harder, not less. **A new name is needed**; the draft still says pVAT only because renaming mid-proposal is more confusing than flagging it. Affects the dissertation title-level nomenclature, Ch 3 throughout, and Ch 9.
+- ⬜ **Regenerate all figures** at consistent publication style/size (see per-chapter figure placeholders).
+- ✅ **Reference PDFs are structural templates only** — never cite Pickering/Arnett as an intellectual source; author's work is independent.
+- 🟡 **Concrete reconciliation RAN with the real pipeline — Ch4 vindicated, Ch6's relative claim is not.** `reproduce/tables/table_concrete_reconciliation.py` now replicates `gaussian_mixture/concrete.py` (standardized target, quantile output partition, auto log-transform — it selects `Age` — feature standardization, closed-form ridge consequents). 3 seeds, identical splits, RMSE rescaled to MPa:
+
+  | Model | Preprocessing | R² | RMSE (MPa) | proposal says |
+  |---|---|---:|---:|---|
+  | flat MoG-TSK 0th | log+std | 0.262 | 13.74 | 0.44 ✗ |
+  | flat MoG-TSK 1st | log+std | **0.797** | 7.20 | 0.77 ✓ |
+  | flat MoG-TSK 2nd | log+std | **0.845** | 6.30 | 0.87 ✓ |
+  | flat MoG-TSK full-2nd | log+std | **0.881** | 5.54 | *not quoted* |
+  | fuzzy tree | raw / log+std | 0.562 / 0.687 | 10.52 / 8.92 | 0.746 |
+  | mixture of experts | raw / log+std | 0.690 / 0.638 | 8.91 / 9.54 | 0.791 |
+  | CART | raw | 0.797 | 7.19 | was *pending* |
+  | Random Forest | raw | 0.904 | 4.94 | was *pending* |
+
+  **Resolved:** preprocessing accounted for essentially the whole flat-model gap. Orders 1 and 2 now reproduce the proposal (0.797 vs 0.77; 0.845 vs 0.87). The earlier alarming 0.774 was an artifact of running the model outside its intended pipeline. **Order 0 is still off** (0.262 vs 0.44) — small, worth one look.
+
+  **Unadvertised win:** `full-2nd` reaches **0.881**, beating CART (0.797) and approaching Random Forest (0.904). The proposal stops at order 2 and never quotes this. Ch4 is underselling its own best configuration.
+
+  **Still unresolved — Ch6's relative claim.** Under a common protocol the flat model (0.845–0.881) decisively beats the fuzzy tree (0.562–0.687) and the mixture (0.638–0.690). Ch6 currently reads flat 0.658 → tree 0.746 → HME 0.791, i.e. hierarchy improving on flat; that ordering does not survive. Remaining confound: the tree/HME here use **default hyperparameters**, whereas `tribble-tree/demo_concrete.py` may configure them deliberately. **Next:** re-run the tree/HME with the demo's exact configuration before touching Ch6's text. If the inversion survives, Ch6's framing must become "the hierarchy costs accuracy and buys readability," which is a sharper version of what it already concedes.
+
+  Also measured: the transform helps the fuzzy tree (+0.125 R²) but *hurts* the mixture (−0.052) — worth understanding, since both consume the same features.
+
+  ✅ **CONFOUND RESOLVED — it was mostly hyperparameters.** `reproduce/tables/table_hyperparam_normalization.py` crosses model × hyperparameters × normalization (3 seeds, shared splits). R²:
+
+  | Model | Hyperparameters | raw | log+std | Δ |
+  |---|---|---:|---:|---:|
+  | flat MoG-TSK 1st | pipeline | 0.646 | 0.797 | **+0.151** |
+  | flat MoG-TSK 2nd | pipeline | 0.783 | 0.845 | +0.062 |
+  | flat MoG-TSK full-2nd | pipeline | 0.775 | **0.881** | +0.106 |
+  | fuzzy tree | library default | 0.562 | 0.687 | +0.125 |
+  | fuzzy tree | **demo-tuned** | 0.701 | 0.717 | +0.016 |
+  | mixture of experts | library default | 0.690 | 0.638 | −0.052 |
+  | mixture of experts | **demo-tuned** | 0.773 | **0.862** | +0.089 |
+  | CART | sklearn default | 0.797 | 0.797 | −0.000 |
+  | Random Forest | sklearn default | 0.904 | 0.905 | +0.000 |
+
+  **The earlier "Ch6 inversion" was largely an artifact of running the hierarchy at library defaults.** Tuning the mixture per `demo_concrete.py` moves it 0.638 → 0.862 under normalization (+0.224). The dramatic gap closes: flat full-2nd 0.881 vs mixture 0.862 — within roughly one standard deviation of each other, not the 0.881-vs-0.638 chasm the first run suggested.
+
+  **What still holds for Ch6, stated precisely:** the mixture does not *beat* the flat model here (0.862 vs 0.881), so "hierarchy improves accuracy" remains unsupported — but "comparable accuracy, better readability" is well supported, and that is close to what Ch6 already argues. The tree stays clearly behind both (0.717). Ch6's specific figures (flat 0.658 → tree 0.746 → HME 0.791) should be replaced with these; the tree-below-mixture ordering survives, the flat-lowest ordering does not.
+
+  **A clean incidental finding worth putting in the dissertation.** Normalization is worth +0.06 to +0.15 R² to every Gaussian/fuzzy model and *exactly zero* to CART and Random Forest (−0.000 / +0.000). That is textbook-consistent — axis-aligned tree splits are rank-based and therefore invariant to monotone feature transforms, while Gaussian membership functions are scale-dependent — and it is a tidy empirical illustration of why the fuzzy pipeline needs its preprocessing while the baselines do not. It also disposes of any suspicion that the transform is quietly doing the work: it cannot be, since the strongest baseline (RF, 0.905) is untouched by it.
+
+  ✅ **Refinement arms RAN — the 0.88→0.92 claim is not reproduced and has been struck.** Measured (log+std, 3 seeds): 1st 0.797→**0.830** (+0.033), 2nd 0.845→**0.872** (+0.027), full-2nd 0.881→**0.854** (**−0.027**). Refinement helps modestly at lower orders and *hurts* at the highest-capacity configuration; the best model overall is the **unrefined** closed-form full-2nd at 0.881, and 0.92 appears nowhere in a controlled run. Written into Ch6 §6.4, replacing the stale three-way-caution note (now obsolete since the reconciliation resolved it).
+  **Why this is good news:** the pattern matches §6.3.5's finding that population methods overfit the CV estimate — once structure is recovered, extra search finds noise, and at high capacity enough noise to do damage. That is *structure before search* evidenced against the author's own refinement stage, which is the strongest form of the argument.
+
+- ✅ **Concrete numbers reconciled and written into the text** (Ch4 §4.3 Table 4.1 = the transform study; Ch4 results now quote 0.797/0.845/0.881; Ch6 Table 6.1 replaced with one-protocol figures; Ch1 and Ch8 aligned). Original note follows for history.
+- ✅ ~~**Reconcile the Concrete numbers (original note, HIGH PRIORITY — three incomparable figures for "the flat model").** Ch 4: flat MoG-TSK 0.44/0.77/0.87 (orders 0/1/2). Ch 6 Table 6.1: flat baseline 0.658 (tree/HME experiment). Ch 6 §6.3.5: antecedent refinement 0.88→0.92. All real, all different configs (split/preprocessing/order/objective), none comparable. Worst symptom: refinement's 0.92 *appears* to beat the HME's 0.791, which would make Ch 6 pointless — it doesn't, they're different configurations. Both chapters now warn the reader explicitly, but the fix is ONE consistent Concrete benchmark so every model is measured identically.
+- 🟨 **Tables (21 total; 28 `*pending*` cells remain).** *Numbering below follows the current prose.* Fully measured: 3.2 (memory), 3.4 (adversarial ARI), 3.5 (stitch ablation), 3.6 (non-metric agreement), 4.4 (MoG results), 5.2 (multi-scale), 5.3 (selection bake-off), 6.1 (model family), 7.1 (goals map). Structure-fixed with pending cells: 3.1 (reorder time — intermediate N grid), 4.5 (ANFIS/GA-FIS/RF baselines), 6.2 (CART/M5/RF/ANFIS/flat-TSK baselines), 6.3 (interpretability counts at matched accuracy).
+- 🟨 **Reproduction harness** (`reproduce/`): `run.py` orchestrator + 23 registered experiments; `run_all_tables.sh` drives **10 table generators**, each of which has produced output at least once. Emits Markdown+CSV with mean ± std over fixed seeds; hardware-gated runs skipped explicitly. Per-table provenance — which script feeds which prose table, and which prose cells the harness does *not* currently reproduce — is tracked in `reproduce/PROVENANCE_MAP.md`. REMAINING: ANFIS/GA-FIS adapters; re-quote the drifted tables identified in the provenance map; fill the remaining `*pending*` cells.
+- ⬜ **Figure placeholders** still to produce (**15**, none yet drawn). Load-bearing: **Fig 1.2** (pipeline roadmap, orients the document) and **Fig 5.2** (band discovery, carries Ch 5's contribution).
+
+## B. Needed from author / advisor
+
+- ⬜ **NAFIPS paper details** (Ch 9): both published at **NAFIPS 2025 Banff (July 2025)** and **NAFIPS 2026 El Paso (March 2026)**. Need exact titles, page numbers/DOIs, co-author lists, which paper went to which meeting, and whether they're separate or combined.
+- ⬜ **Confirm EUSFLAT 2027 (Sept 2027) submission deadline** — anchors the Ch 5 (and possibly Ch 4) paper schedule and the Ch 10 timeline.
+- ⬜ **Confirm exact proposal-defense month** (assumed ~Dec 2026). Final defense = March 2028 (✅).
+- ⬜ **Teaching/RA load per semester** (affects timeline throughput, Ch 10).
+- ⬜ **Flagship end-to-end dataset** — author-preferred IoT (RT-IOT2022 / IoT-botnet) or UCI-58 Shuttle; left flexible, confirm later (Ch 7).
+- ✅ Title, committee, tribble-opt→appendix, final-defense date — all resolved.
+
+## C. Experiments / results owed (the "make it airtight" list)
+
+- ⬜ **Ch 4 — ANFIS + GA-tuned-FIS baseline table** (train time + accuracy on identical splits). First thing owed to Ch 4's speed claim.
+- ✅ **Ch 4 — OUTPUT PARTITIONING STUDY: COMPLETE (Goal G5).** Quantile by default; Ch4 Tables 4.2–4.3. `reproduce/tables/table_g5_output_partitioning.py`, 3 schemes × {3,4,6} buckets × {1st,2nd} order × 3 seeds.
+  ⚠️ **H4 RETRACTED at 10 seeds — there is no crossover.** The three-seed reading (uniform 0.811 vs 0.797 at 3 buckets, losing 0.842 vs 0.850 at 6) does not survive. At ten seeds the largest gap anywhere in the 18-config sweep is 0.012 in R² against σ ≈ 0.02–0.03, and 6/2nd agrees to three decimals. The starvation diagnostic is unaffected and still real: uniform's smallest bucket falls 132 → 75 → 39 while quantile's floor stays high by construction. Concrete's skew (+0.42) is simply too mild for that mechanism to reach the aggregate error.
+  **H3 weakly supported** — uniform holds the tail deciles slightly better, small and not consistent in every cell.
+  ✅ **H5 → a BUG, now FIXED upstream.** The "hybrid" is what `partition_output` already does, and it was bit-identical to pure quantile in all 18 configurations because `solve_tsk_consequents` re-derived the bucket means and `predict_tsk` used those. Worse than dead code: on a $[0,1]$ target the unconstrained solve chose extreme bucket means of **−0.81 and −0.31**, i.e. the lowest/highest rules' consequents pointed outside the data range — uninterpretable, and invisible to every accuracy metric.
+  **Fix:** `tribble-fis` branch `fix/pin-extreme-bucket-means` (commit `d0d6714`, pushed). Adds `pin_extremes=True` as an exact linear equality constraint — the pinned intercept columns move to the RHS and the rest is solved against the residual, so it is the exact constrained minimiser, not a penalty. Constraint verified to hold exactly (means return as 0.0/1.0); accuracy unchanged within noise (≤0.003 vs σ≈0.017). **Open:** merge the PR, then re-run every Concrete number, since the default behaviour has changed.
+  ✅ **H2 CONFIRMED — synthetic skew sweep run** (`reproduce/tables/table_g5b_skew_sweep.py`). Skew isolated via a strictly monotone map so the information in X is constant and only the target's shape varies. Q−U by skew: +0.003 (skew 0.07) → +0.009 (1.87) → +0.033 (5.44) → **+0.201 (11.18)**. Monotone growth, large effect. Mechanism confirmed directly: uniform's smallest bucket goes 21 → 1 → 1 → 1 → **0** as skew grows.
+  ⚠️ **H3 REVERSED.** I predicted uniform would hold the tails better; the opposite happens. Uniform tail RMSE degrades 0.055→0.178 while quantile stays flat 0.052→0.076. Even coverage of the *range* is worthless without coverage of the *samples*.
+  ⚠️ **H2 REFUTED at 10 seeds, and G5 is REOPENED.** The headline finding — quantile's advantage growing monotonically with skew to +0.201 — was a 3-seed artifact. At ten seeds Q−U is negative in every row past symmetry: +0.000, −0.016, −0.068, −0.291, −2.413, −11.811. Read the spreads, not the means: quantile's deviation explodes (±0.208, ±0.990, ±4.448, ±21.155) while uniform's stays bounded and decays smoothly. Quantile does not get less accurate under skew, it gets UNSTABLE — a few catastrophic splits drag the mean. The earlier caution ("past skew ~16 both fail") understated it; the instability starts around skew 5.
+  **Recommendation withdrawn.** "Quantile by default" is not supported. Neither scheme is safe on a heavily skewed target: uniform starves and decays predictably, quantile holds occupancy and goes unstable. Remaining work is a decision, not corroboration — characterize and guard quantile's instability, or accept that heavy skew needs a target transform rather than a better partition. Tracked as reopened G5 in Ch 7.
+  Written into Ch4 §4.3.2 as Table 4.2, replacing the open-question framing with a measured recommendation: quantile boundaries, bucket count low enough that nothing starves.
+- ⬜ **Ch 4 — quantify the correction-rule pass** (§4.3.1): accuracy before vs after the confusion-matrix-driven second pass, with the paired confusion matrices (Fig 4.3). Currently claimed but unmeasured.
+- ⬜ **Ch 4 — semi-supervised / incremental benchmark** (§4.3.3): the per-class-independence → incremental-update property is stated as a structural consequence, not a measured result. Needs a controlled streaming/partial-label experiment to promote it to a claim.
+- 🟨 **Ch 4 — anomaly/open-set head-to-head: RAN, mechanism validated, performance not.** `reproduce/tables/table_4_4_openset.py`, leave-one-class-out on Glass (BETH absent from the repo), 2 seeds.
+  **Validated:** the θ knob is monotone exactly as §4.3.5 predicts — raising θ shrinks the complement and cuts both detection and false alarms, saturating at θ ≥ 1.1 where the rule stops firing entirely. There is no sharp optimum: J sits in a flat band of +0.222…+0.239 across θ = 0.5…0.8, peaking at **θ = 0.60 (J = +0.239)**, against **θ = 0.99** (J = +0.169) inherited from `beth-anomaly.py`. Argues for reporting the curve, and says the knob is forgiving rather than delicate.
+  **Not validated:** absolute performance is a real but noisy signal rather than a deployable detector (best ≈ 71% detection at 47% false alarm), and at matched θ = 0.99 the complement rule (+0.169) and isolation forest (+0.171) are level to 0.002, with one-class SVM at +0.076 the only gap exceeding its own error bar. Glass (214 samples, 6 classes, several with <12 members) is a stress test, not a demonstration.
+  **The ordering has now flipped twice** — complement-leads (pre-fix), isolation-forest-by-0.038 (5 seeds), dead level (10 seeds) — which is the tell that all three readings were noise. Do not quote a winner from this table.
+  **Superseded:** figures are from `reproduce/outputs/seeds10-2026-08-01/` (tribble-fis `23bfdbc`, 10 seeds). The "best J = +0.155 at θ = 0.80" reading was 2-seed pre-`pin_extremes`; the "+0.261 at θ = 0.70" reading was 5-seed. Both retired.
+  **Next:** obtain BETH or an equivalent-scale set; then the claim can move from parity to a comparison.
+- ✅ ~~*(superseded by the entry above — the head-to-head ran)*~~ original note: complement rule vs **one-class SVM** and **isolation forest** on BETH (train on benign only, detect unseen `evil==1`). Report detection rate + false-alarm rate at a matched operating point, plus the θ sweep curve (Fig 4.2, from `plot_anomaly_threshold_sweep`). This is the experiment owed to the §4.3.5 claim.
+- ✅ **Ch 3 — dense-Prim question RESOLVED by code review (2026-07-31).** An earlier note claimed a tuned O(N²) dense Prim was a missing baseline. It is not missing: `_prim_mst_kernel_64/_32` in `tribble-cluster/src/tribbleclustering/pcvat.pyx` (lines 22–113 / 392+) IS a compact-active-set dense Prim — no heap, fused relax+next-min in one pass over the m active slots, O(N) workspace, O(N²) total — and it is the preferred import path. The O(N² log N) heap version (`pvat.py::vat_prim_mst`, lines 141–211) is the portable fallback. §3.3.1 rewritten to state all three regimes (cubic / heap / dense).
+- ✅ **Ch 3 — TWO-STAGE FRAMING (resolved with author, 2026-07-31).** The complexity story is a progression, not a caveat: **stage one** = priority queue, O(N³)→O(N² log N), the *published* NAFIPS result; **stage two** = compact active set with fused relax-and-select, O(N² log N)→O(N²), heap removed, O(N) workspace — the shipped Cython fast path, *not yet published*. §3.3.1 rewritten around this. Name: *p* now read as **performant** VAT (also covers Borůvka-on-GPU), with "priority-queue VAT" retained for stage one specifically.
+- ⬜ **POSSIBLE NOTE — VAT/iVAT sequencing complexity & memory** (Ch 9, tentatively 2027 Q1; authorship undecided). Implementation exists (`pcvat.pyx::_prim_mst_kernel_64/_32`); the work is the write-up plus a THREE-ARM timing study (classical cubic vs stage-one heap vs stage-two dense).
+  **Novelty scoped per the repo's own review** (`tribble-cluster/docs/performance-novelty.md` §4.1, §4.4): the techniques are classical, so the claim is (a) the *correction* — heap Prim is asymptotically worse than dense Prim on VAT's complete graph, apparently unremarked in this literature; (b) the measured heap-vs-dense crossover, which that doc calls "itself a publishable result"; (c) iVAT coverage, which Fast-VAT 2025 lacks; (d) the O(N)-workspace regime, stated as the ≈2× constant-factor memory win it is. NOT "a faster MST."
+  **Venue:** short-communication/NAFIPS style, not an algorithms conference.
+- ✅ **PRIOR-ART CHECK COMPLETE (2026-07-31).** Findings folded into Ch3/Ch9; scope cut, two blocking full-text reads remain (see NEXT_STEPS Tier 3). Original question: Does anyone already publish (i) an explicitly O(N²) VAT/iVAT *sequencing* bound, or (ii) the heap-vs-dense observation for VAT? The note's entire contribution hinges on both being unsaid. Also confirm what complexity Bezdek-Hathaway 2002 / Havens-Bezdek 2012 / Kumar-Bezdek 2020 actually claim, and whether Fast-VAT 2025 is constant-factor only.
+- ⬜ **Ch 3 — head-to-head vs eVAT (Meng & Yuan 2018) & clusiVAT** on identical datasets. First comparison a reviewer will demand.
+- ⬜ **Ch 3 — datacenter GPU re-run:** the pairwise-distance kernel currently LOSES (<1×) at low dimension/float64 on a consumer card. Prediction is that full-rate FP64 flips this; flagged in Table 3.3 as untested.
+- ⬜ **Ch 3 / Ch 5 — real non-metric domains** (DTW time-series, edit distance, graph/kernel dissimilarity). The core niche is so far only synthetic. (Goal G2.)
+- ⬜ **Ch 6 — HME EM refinement implemented** + full baseline suite (ANFIS, CART/C4.5, M5, flat TSK, Fumanal-Idocin 2025, D-TSK-FC). (Goal G3.)
+- ⬜ **Ch 5 — END-TO-END FIS RESULT (the chapter's missing evidence).** Every Ch5 number is a *clustering* score (ARI), but the chapter's purpose is generating FIS antecedents. Build a FIS from the generated membership functions, measure prediction accuracy end-to-end from a bare dissimilarity matrix, and compare against the Ch4 Gaussian construction on data where both run. Until this exists the central claim rests on a proxy. Feeds the Ch7 capstone.
+- ⬜ **Ch 5 — head-to-head vs Bonis–Oudot beta-plateau & AuToMATo** on identical data; formal prior-art search (IEEE Xplore/Scopus/ACM, cited-by on 1406.7130 / ToMATo).
+- ⬜ **Ch 6 — interpretability evaluation** (rule count, path length, expert/audience study or established metric); empirical Magdalena-2018 rebuttal. (Goal G6.) NOTE: this is what fills Table 6.3's pending row; until then Ch 6 must say the interpretability payoff is *described*, not quantified.
+- ⬜ **Ch 6 — Atwood machine memory result** (Table 6.4 pending row) + re-verify the double-pendulum numbers under the repeatability protocol.
+
+## D. Proposed builds (Part III deliverables)
+
+- ⬜ **Ch 5 / G1 — direct one-pass MF generation** (`MEMBERSHIP_ROADMAP.md` phases 1–6); phase 4 soft/kernel-weighted band membership is the research-interesting piece (fixes small-n over-segmentation).
+- ⬜ **Ch 5 / G7 (stretch) — adaptive/model-based band discovery** for overlapping scales (change-point / barcode stability), beyond the gap heuristic. Designated first cut if timeline slips.
+- ⬜ **Ch 5 — wire output MFs into the tribble-fis FIS** (integration that ties Ch 5 → Ch 6 → capstone).
+- ⬜ **Ch 7 — integrated end-to-end pipeline** capstone + flagship case study.
+
+## E. Defensibility fixes before submission
+
+- ✅ **Retired the "priority-queue MST speedup" framing.** Ch 3 §3.3.1 rewritten as the two-stage story (cubic → heap → compact dense), with the three-arm timing harness as evidence.
+- ✅ **"pVAT six-orders-of-magnitude" claim dropped** — and the prior-art search showed the repo's earlier conclusion was wrong in the other direction: a real prior **pVAT** exists (Parveen & Sreevalsan-Nair 2013). See the name-collision item.
+- ⬜ **Fix Zhang-2023 author attribution** in the HFIS references (README misattributes to "H. Wang et al.").
+- ⬜ Close open literature searches: knot/breakpoint optimization precedent (Ch 6); dedicated fuzzy-MoE/HHFNN search to narrow the HME nesting claim (Ch 6).
+
+## F. Structural / editorial decisions (lower stakes)
+
+- ⬜ Ch 1 — how heavily to invoke XAI/regulation framing (secondary per author).
+- ⬜ Ch 2 — whether to include a formal-methods/verification subsection (possible Kreinovich nod).
+- ⬜ Ch 5 — consolidate Options A–D presentation (recommend: lead with D + persistence-ramp; A/B/C supporting).
+- ⬜ Ch 6 — MIMO temporal-memory as its own short chapter vs a section (recommend section; nice aerospace hook).
+- ⬜ Engineering debt: de-duplicate the six caller scripts' predict loops (tribble-fis).
+
+---
+
+### How this doc is maintained
+Each chapter file carries inline TODO notes; this doc is the roll-up. When a chapter TODO is added or resolved, reflect it here. Goal labels (G1–G7) map to Chapter 7 §7.2.

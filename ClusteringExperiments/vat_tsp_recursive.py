@@ -18,7 +18,7 @@ s over [16, 256] (default 64) and report tour quality (% over LKH) and time,
 including an ablation that drops the cluster-to-cluster optimisation, and a GPU
 2-opt polish.
 
-Run:  python -m experiments.vat_tsp_recursive
+Run:  python ClusteringExperiments/vat_tsp_recursive.py
 """
 
 from __future__ import annotations
@@ -39,13 +39,13 @@ from tribbleclustering.pcvat import (
     compute_ivat_c,
 )  # noqa: E402
 from tribbleclustering.pvat import get_ivat_levels  # noqa: E402
-from experiments.vat_tsp_reslice import (  # noqa: E402
+from vat_tsp_reslice import (  # noqa: E402
     gpu_two_opt,
     _stitch_segments,
     uniform_instance,
     closed_len,
 )
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     neighbor_two_opt,
     _tour_len_coords,

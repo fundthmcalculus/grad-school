@@ -1,6 +1,6 @@
 """Real device-side GPU Boruvka MST (CuPy RawKernels), for the VAT spike.
 
-The naive GPU attempt (experiments/boruvka_vat.py::boruvka_mst_cupy) lost badly:
+The naive GPU attempt (ClusteringExperiments/boruvka_vat.py::boruvka_mst_cupy) lost badly:
 it materialised an n x n mask every round and ran union-find on the host in a
 Python loop, so it was allocation- and host-sync-bound. This version keeps the
 entire round on the device:

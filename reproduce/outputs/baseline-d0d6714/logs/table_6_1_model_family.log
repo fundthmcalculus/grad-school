@@ -1,0 +1,1728 @@
+  [skip] m5py unavailable (ModuleNotFoundError); columns ['M5Prime'] -> N/A
+Table 6.1 -- model family vs. baselines
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9306
+ 3. Water                          - Score: 0.6608
+ 4. FineAgg                        - Score: 0.5154
+ 5. CoarseAgg                      - Score: 0.4978
+ 6. Superplasticizer               - Score: 0.4839
+ 7. Slag                           - Score: 0.1348
+ 8. FlyAsh                         - Score: 0.1057
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9306
+ 3. Water                          - Score: 0.6608
+ 4. FineAgg                        - Score: 0.5154
+ 5. CoarseAgg                      - Score: 0.4978
+ 6. Superplasticizer               - Score: 0.4839
+ 7. Slag                           - Score: 0.1348
+ 8. FlyAsh                         - Score: 0.1057
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9306
+ 3. Water                          - Score: 0.6608
+ 4. FineAgg                        - Score: 0.5154
+ 5. CoarseAgg                      - Score: 0.4978
+ 6. Superplasticizer               - Score: 0.4839
+ 7. Slag                           - Score: 0.1348
+ 8. FlyAsh                         - Score: 0.1057
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.3659
+ 3. CoarseAgg                      - Score: 0.3077
+ 4. Slag                           - Score: 0.2954
+ 5. Cement                         - Score: 0.2514
+ 6. Superplasticizer               - Score: 0.1799
+ 7. Water                          - Score: 0.1763
+ 8. FlyAsh                         - Score: 0.1027
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9867
+ 3. Slag                           - Score: 0.9638
+ 4. FineAgg                        - Score: 0.7966
+ 5. FlyAsh                         - Score: 0.7617
+ 6. CoarseAgg                      - Score: 0.7322
+ 7. Water                          - Score: 0.7240
+ 8. Age                            - Score: 0.7213
+================================================================================
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Age (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Cement                         - Score: 0.5421
+ 3. CoarseAgg                      - Score: 0.5169
+ 4. FineAgg                        - Score: 0.5138
+ 5. Superplasticizer               - Score: 0.4063
+ 6. Water                          - Score: 0.3784
+ 7. FlyAsh                         - Score: 0.1226
+ 8. Age                            - Score: 0.0731
+================================================================================
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 1 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 1 Gaussians for Age (label 1)
+  Automatically selected 1 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Age (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. CoarseAgg                      - Score: 0.6795
+ 3. Age                            - Score: 0.5926
+ 4. Water                          - Score: 0.5755
+ 5. FineAgg                        - Score: 0.3711
+ 6. Superplasticizer               - Score: 0.1313
+ 7. Slag                           - Score: 0.1304
+ 8. FlyAsh                         - Score: 0.0657
+================================================================================
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Age (label 1)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 2 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.7421
+ 3. Water                          - Score: 0.6036
+ 4. CoarseAgg                      - Score: 0.5146
+ 5. Cement                         - Score: 0.4793
+ 6. Superplasticizer               - Score: 0.4327
+ 7. Slag                           - Score: 0.2375
+ 8. FlyAsh                         - Score: 0.1543
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.6314
+ 3. Cement                         - Score: 0.6205
+ 4. Water                          - Score: 0.5115
+ 5. CoarseAgg                      - Score: 0.3396
+ 6. FlyAsh                         - Score: 0.1476
+ 7. Superplasticizer               - Score: 0.0593
+ 8. Slag                           - Score: 0.0415
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.7383
+ 3. Cement                         - Score: 0.6637
+ 4. FineAgg                        - Score: 0.4603
+ 5. Superplasticizer               - Score: 0.4491
+ 6. CoarseAgg                      - Score: 0.4308
+ 7. Slag                           - Score: 0.3738
+ 8. FlyAsh                         - Score: 0.1263
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.5027
+ 3. Slag                           - Score: 0.4239
+ 4. Cement                         - Score: 0.3697
+ 5. FlyAsh                         - Score: 0.3534
+ 6. CoarseAgg                      - Score: 0.2443
+ 7. Superplasticizer               - Score: 0.2375
+ 8. FineAgg                        - Score: 0.2285
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 2 Gaussians for Water (label 0)
+  Automatically selected 2 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 1 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8865
+ 3. Water                          - Score: 0.6582
+ 4. CoarseAgg                      - Score: 0.5128
+ 5. FineAgg                        - Score: 0.4726
+ 6. Superplasticizer               - Score: 0.4546
+ 7. Slag                           - Score: 0.1093
+ 8. FlyAsh                         - Score: 0.0868
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8865
+ 3. Water                          - Score: 0.6582
+ 4. CoarseAgg                      - Score: 0.5128
+ 5. FineAgg                        - Score: 0.4726
+ 6. Superplasticizer               - Score: 0.4546
+ 7. Slag                           - Score: 0.1093
+ 8. FlyAsh                         - Score: 0.0868
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8865
+ 3. Water                          - Score: 0.6582
+ 4. CoarseAgg                      - Score: 0.5128
+ 5. FineAgg                        - Score: 0.4726
+ 6. Superplasticizer               - Score: 0.4546
+ 7. Slag                           - Score: 0.1093
+ 8. FlyAsh                         - Score: 0.0868
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.6904
+ 3. Cement                         - Score: 0.6825
+ 4. FineAgg                        - Score: 0.5997
+ 5. CoarseAgg                      - Score: 0.5908
+ 6. Superplasticizer               - Score: 0.4821
+ 7. Water                          - Score: 0.2821
+ 8. FlyAsh                         - Score: 0.1087
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for Age (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 1 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8640
+ 3. CoarseAgg                      - Score: 0.7405
+ 4. Water                          - Score: 0.6785
+ 5. Cement                         - Score: 0.4952
+ 6. FineAgg                        - Score: 0.3628
+ 7. Slag                           - Score: 0.3253
+ 8. FlyAsh                         - Score: 0.2494
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 1 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 3 Gaussians for Slag (label 1)
+  Automatically selected 3 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Cement                         - Score: 0.6247
+ 3. CoarseAgg                      - Score: 0.5435
+ 4. FineAgg                        - Score: 0.5210
+ 5. Age                            - Score: 0.4385
+ 6. Superplasticizer               - Score: 0.3872
+ 7. Water                          - Score: 0.3613
+ 8. FlyAsh                         - Score: 0.2284
+================================================================================
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 1)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for Age (label 1)
+  Automatically selected 1 Gaussians for Age (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. CoarseAgg                      - Score: 0.6476
+ 3. Age                            - Score: 0.6146
+ 4. Water                          - Score: 0.5695
+ 5. FineAgg                        - Score: 0.4677
+ 6. Superplasticizer               - Score: 0.1635
+ 7. Slag                           - Score: 0.1100
+ 8. FlyAsh                         - Score: 0.0765
+================================================================================
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4455
+ 3. Water                          - Score: 0.3759
+ 4. CoarseAgg                      - Score: 0.3245
+ 5. Cement                         - Score: 0.2514
+ 6. Slag                           - Score: 0.1856
+ 7. FlyAsh                         - Score: 0.0005
+ 8. Superplasticizer               - Score: 0.0005
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Slag (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7888
+ 3. Water                          - Score: 0.7125
+ 4. FineAgg                        - Score: 0.6887
+ 5. Superplasticizer               - Score: 0.5079
+ 6. CoarseAgg                      - Score: 0.4493
+ 7. FlyAsh                         - Score: 0.2620
+ 8. Slag                           - Score: 0.2053
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 2 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.9046
+ 3. Cement                         - Score: 0.8562
+ 4. Superplasticizer               - Score: 0.6582
+ 5. CoarseAgg                      - Score: 0.6578
+ 6. Slag                           - Score: 0.5791
+ 7. FineAgg                        - Score: 0.5782
+ 8. FlyAsh                         - Score: 0.1177
+================================================================================
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.4376
+ 3. Slag                           - Score: 0.3897
+ 4. Water                          - Score: 0.3715
+ 5. Superplasticizer               - Score: 0.3624
+ 6. FlyAsh                         - Score: 0.2970
+ 7. FineAgg                        - Score: 0.2817
+ 8. CoarseAgg                      - Score: 0.2626
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for Superplasticizer (label 0)
+  Automatically selected 1 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 1 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9682
+ 3. Water                          - Score: 0.6490
+ 4. FineAgg                        - Score: 0.5475
+ 5. CoarseAgg                      - Score: 0.4744
+ 6. Superplasticizer               - Score: 0.4313
+ 7. FlyAsh                         - Score: 0.0989
+ 8. Slag                           - Score: 0.0816
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9682
+ 3. Water                          - Score: 0.6490
+ 4. FineAgg                        - Score: 0.5475
+ 5. CoarseAgg                      - Score: 0.4744
+ 6. Superplasticizer               - Score: 0.4313
+ 7. FlyAsh                         - Score: 0.0989
+ 8. Slag                           - Score: 0.0816
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9682
+ 3. Water                          - Score: 0.6490
+ 4. FineAgg                        - Score: 0.5475
+ 5. CoarseAgg                      - Score: 0.4744
+ 6. Superplasticizer               - Score: 0.4313
+ 7. FlyAsh                         - Score: 0.0989
+ 8. Slag                           - Score: 0.0816
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.6677
+ 3. Slag                           - Score: 0.6225
+ 4. CoarseAgg                      - Score: 0.4632
+ 5. Cement                         - Score: 0.4354
+ 6. Superplasticizer               - Score: 0.3584
+ 7. Water                          - Score: 0.2744
+ 8. FlyAsh                         - Score: 0.0901
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 1 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. CoarseAgg                      - Score: 0.5400
+ 3. Superplasticizer               - Score: 0.5071
+ 4. Water                          - Score: 0.5040
+ 5. FineAgg                        - Score: 0.4550
+ 6. Cement                         - Score: 0.4032
+ 7. Slag                           - Score: 0.2290
+ 8. FlyAsh                         - Score: 0.1858
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 3 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.7722
+ 3. FineAgg                        - Score: 0.7522
+ 4. Cement                         - Score: 0.7207
+ 5. Superplasticizer               - Score: 0.5951
+ 6. CoarseAgg                      - Score: 0.5292
+ 7. Water                          - Score: 0.3729
+ 8. FlyAsh                         - Score: 0.1344
+================================================================================
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 1 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.6601
+ 3. Water                          - Score: 0.5153
+ 4. CoarseAgg                      - Score: 0.4813
+ 5. FineAgg                        - Score: 0.3122
+ 6. Slag                           - Score: 0.1121
+ 7. Superplasticizer               - Score: 0.1059
+ 8. FlyAsh                         - Score: 0.1006
+================================================================================
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 2 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.6814
+ 3. Cement                         - Score: 0.6554
+ 4. Water                          - Score: 0.5654
+ 5. CoarseAgg                      - Score: 0.3595
+ 6. Superplasticizer               - Score: 0.1914
+ 7. FlyAsh                         - Score: 0.0982
+ 8. Slag                           - Score: 0.0755
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 0)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 3 Gaussians for Slag (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7925
+ 3. FineAgg                        - Score: 0.7503
+ 4. Water                          - Score: 0.6568
+ 5. CoarseAgg                      - Score: 0.4217
+ 6. Superplasticizer               - Score: 0.0853
+ 7. Slag                           - Score: 0.0621
+ 8. FlyAsh                         - Score: 0.0156
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.7871
+ 3. Cement                         - Score: 0.7807
+ 4. FineAgg                        - Score: 0.5297
+ 5. Superplasticizer               - Score: 0.4741
+ 6. Slag                           - Score: 0.4298
+ 7. CoarseAgg                      - Score: 0.3919
+ 8. FlyAsh                         - Score: 0.1180
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 2 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 3 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.4587
+ 3. Water                          - Score: 0.4273
+ 4. CoarseAgg                      - Score: 0.3190
+ 5. Cement                         - Score: 0.3001
+ 6. FineAgg                        - Score: 0.2232
+ 7. FlyAsh                         - Score: 0.1829
+ 8. Superplasticizer               - Score: 0.1776
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 3 Gaussians for Slag (label 0)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 1 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9641
+ 3. Water                          - Score: 0.6672
+ 4. FineAgg                        - Score: 0.5326
+ 5. CoarseAgg                      - Score: 0.5070
+ 6. Superplasticizer               - Score: 0.4563
+ 7. FlyAsh                         - Score: 0.1135
+ 8. Slag                           - Score: 0.0960
+================================================================================
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9641
+ 3. Water                          - Score: 0.6672
+ 4. FineAgg                        - Score: 0.5326
+ 5. CoarseAgg                      - Score: 0.5070
+ 6. Superplasticizer               - Score: 0.4563
+ 7. FlyAsh                         - Score: 0.1135
+ 8. Slag                           - Score: 0.0960
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9641
+ 3. Water                          - Score: 0.6672
+ 4. FineAgg                        - Score: 0.5326
+ 5. CoarseAgg                      - Score: 0.5070
+ 6. Superplasticizer               - Score: 0.4563
+ 7. FlyAsh                         - Score: 0.1135
+ 8. Slag                           - Score: 0.0960
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7172
+ 3. FineAgg                        - Score: 0.7080
+ 4. Cement                         - Score: 0.6891
+ 5. CoarseAgg                      - Score: 0.6115
+ 6. Superplasticizer               - Score: 0.4558
+ 7. Water                          - Score: 0.3407
+ 8. FlyAsh                         - Score: 0.0947
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 2 Gaussians for Age (label 2)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 1 Gaussians for Superplasticizer (label 2)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.9227
+ 3. Superplasticizer               - Score: 0.9054
+ 4. CoarseAgg                      - Score: 0.8113
+ 5. Cement                         - Score: 0.6688
+ 6. FineAgg                        - Score: 0.5375
+ 7. Slag                           - Score: 0.3733
+ 8. FlyAsh                         - Score: 0.2690
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 1 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 3 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.8250
+ 3. FineAgg                        - Score: 0.8220
+ 4. CoarseAgg                      - Score: 0.7135
+ 5. Cement                         - Score: 0.6890
+ 6. Superplasticizer               - Score: 0.5438
+ 7. Water                          - Score: 0.4084
+ 8. FlyAsh                         - Score: 0.1663
+================================================================================
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 1 Gaussians for Slag (label 2)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 2 Gaussians for Age (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 1 Gaussians for Superplasticizer (label 2)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 1 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.6428
+ 3. CoarseAgg                      - Score: 0.5151
+ 4. Water                          - Score: 0.4400
+ 5. FineAgg                        - Score: 0.3345
+ 6. Superplasticizer               - Score: 0.1206
+ 7. FlyAsh                         - Score: 0.0894
+ 8. Slag                           - Score: 0.0855
+================================================================================
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Age (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 3 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.3825
+ 3. FineAgg                        - Score: 0.3213
+ 4. CoarseAgg                      - Score: 0.2490
+ 5. Cement                         - Score: 0.1520
+ 6. Slag                           - Score: 0.1440
+ 7. FlyAsh                         - Score: 0.0000
+ 8. Superplasticizer               - Score: 0.0000
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9685
+ 3. FineAgg                        - Score: 0.7389
+ 4. Water                          - Score: 0.6156
+ 5. CoarseAgg                      - Score: 0.3626
+ 6. Superplasticizer               - Score: 0.3336
+ 7. Slag                           - Score: 0.2459
+ 8. FlyAsh                         - Score: 0.2291
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.9660
+ 3. Cement                         - Score: 0.8893
+ 4. FineAgg                        - Score: 0.5579
+ 5. Superplasticizer               - Score: 0.5559
+ 6. Slag                           - Score: 0.4893
+ 7. CoarseAgg                      - Score: 0.4618
+ 8. FlyAsh                         - Score: 0.1493
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 2 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.4288
+ 3. Slag                           - Score: 0.3777
+ 4. Cement                         - Score: 0.3122
+ 5. CoarseAgg                      - Score: 0.2809
+ 6. FineAgg                        - Score: 0.2036
+ 7. FlyAsh                         - Score: 0.1820
+ 8. Superplasticizer               - Score: 0.1326
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 2 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9291
+ 3. Water                          - Score: 0.6492
+ 4. FineAgg                        - Score: 0.5540
+ 5. CoarseAgg                      - Score: 0.5163
+ 6. Superplasticizer               - Score: 0.4924
+ 7. Slag                           - Score: 0.1341
+ 8. FlyAsh                         - Score: 0.1211
+================================================================================
+  Automatically selected 3 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9291
+ 3. Water                          - Score: 0.6492
+ 4. FineAgg                        - Score: 0.5540
+ 5. CoarseAgg                      - Score: 0.5163
+ 6. Superplasticizer               - Score: 0.4924
+ 7. Slag                           - Score: 0.1341
+ 8. FlyAsh                         - Score: 0.1211
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9291
+ 3. Water                          - Score: 0.6492
+ 4. FineAgg                        - Score: 0.5540
+ 5. CoarseAgg                      - Score: 0.5163
+ 6. Superplasticizer               - Score: 0.4924
+ 7. Slag                           - Score: 0.1341
+ 8. FlyAsh                         - Score: 0.1211
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.3617
+ 3. FineAgg                        - Score: 0.3490
+ 4. CoarseAgg                      - Score: 0.3356
+ 5. Slag                           - Score: 0.3230
+ 6. Cement                         - Score: 0.3064
+ 7. Superplasticizer               - Score: 0.2638
+ 8. FlyAsh                         - Score: 0.1949
+================================================================================
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 2 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 2 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 1 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 1 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 2)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Cement                         - Score: 0.9389
+ 3. Superplasticizer               - Score: 0.9006
+ 4. FlyAsh                         - Score: 0.7700
+ 5. FineAgg                        - Score: 0.6884
+ 6. Water                          - Score: 0.6202
+ 7. CoarseAgg                      - Score: 0.6126
+ 8. Age                            - Score: 0.6025
+================================================================================
+  Automatically selected 3 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 3 Gaussians for Slag (label 2)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 1 Gaussians for Superplasticizer (label 1)
+  Automatically selected 1 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 3 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 2 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Age (label 1)
+  Automatically selected 2 Gaussians for Age (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Cement                         - Score: 0.5666
+ 3. FineAgg                        - Score: 0.5374
+ 4. CoarseAgg                      - Score: 0.4347
+ 5. Water                          - Score: 0.2957
+ 6. Superplasticizer               - Score: 0.2553
+ 7. FlyAsh                         - Score: 0.1418
+ 8. Age                            - Score: 0.1264
+================================================================================
+  Automatically selected 3 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 3 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 1 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 1 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 2 Gaussians for Water (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 3 Gaussians for Age (label 0)
+  Automatically selected 1 Gaussians for Age (label 2)
+  Automatically selected 1 Gaussians for Age (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. CoarseAgg                      - Score: 0.6669
+ 3. Age                            - Score: 0.6216
+ 4. Water                          - Score: 0.5663
+ 5. FineAgg                        - Score: 0.3842
+ 6. Superplasticizer               - Score: 0.2160
+ 7. Slag                           - Score: 0.1106
+ 8. FlyAsh                         - Score: 0.0788
+================================================================================
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 3 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 1 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 3 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 1)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 3 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4639
+ 3. Water                          - Score: 0.4189
+ 4. CoarseAgg                      - Score: 0.4081
+ 5. Cement                         - Score: 0.2197
+ 6. Slag                           - Score: 0.2150
+ 7. FlyAsh                         - Score: 0.1138
+ 8. Superplasticizer               - Score: 0.0847
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for FineAgg (label 2)
+  Automatically selected 1 Gaussians for FineAgg (label 1)
+  Automatically selected 1 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for Water (label 1)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 3 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 3 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for Superplasticizer (label 2)
+  Automatically selected 4 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for Superplasticizer (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9230
+ 3. FineAgg                        - Score: 0.8771
+ 4. Water                          - Score: 0.7689
+ 5. CoarseAgg                      - Score: 0.4845
+ 6. Superplasticizer               - Score: 0.4467
+ 7. Slag                           - Score: 0.2440
+ 8. FlyAsh                         - Score: 0.1338
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 3 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 3 Gaussians for Water (label 0)
+  Automatically selected 2 Gaussians for Water (label 1)
+  Automatically selected 2 Gaussians for Water (label 2)
+  Automatically selected 3 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 0)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 2 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 3 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7604
+ 3. Water                          - Score: 0.6944
+ 4. Superplasticizer               - Score: 0.5175
+ 5. CoarseAgg                      - Score: 0.4664
+ 6. FlyAsh                         - Score: 0.4009
+ 7. FineAgg                        - Score: 0.3774
+ 8. Slag                           - Score: 0.3432
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Cement (label 2)
+  Automatically selected 2 Gaussians for Cement (label 1)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Water (label 2)
+  Automatically selected 1 Gaussians for Water (label 1)
+  Automatically selected 1 Gaussians for Water (label 0)
+  Automatically selected 1 Gaussians for Superplasticizer (label 2)
+  Automatically selected 2 Gaussians for Superplasticizer (label 1)
+  Automatically selected 1 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for CoarseAgg (label 2)
+  Automatically selected 1 Gaussians for CoarseAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 2)
+  Automatically selected 4 Gaussians for FlyAsh (label 1)
+  Automatically selected 4 Gaussians for FlyAsh (label 0)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 4 Gaussians for FineAgg (label 1)
+  Automatically selected 3 Gaussians for FineAgg (label 0)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 1)
+  Automatically selected 2 Gaussians for Slag (label 0)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.9825
+ 3. Cement                         - Score: 0.6708
+ 4. Superplasticizer               - Score: 0.6005
+ 5. Slag                           - Score: 0.5451
+ 6. FineAgg                        - Score: 0.4750
+ 7. CoarseAgg                      - Score: 0.4415
+ 8. FlyAsh                         - Score: 0.1014
+================================================================================
+  Automatically selected 4 Gaussians for Age (label 2)
+  Automatically selected 4 Gaussians for Age (label 0)
+  Automatically selected 4 Gaussians for Age (label 1)
+  Automatically selected 1 Gaussians for Water (label 2)
+  Automatically selected 4 Gaussians for Water (label 0)
+  Automatically selected 2 Gaussians for Water (label 1)
+  Automatically selected 1 Gaussians for Cement (label 2)
+  Automatically selected 4 Gaussians for Cement (label 0)
+  Automatically selected 1 Gaussians for Cement (label 1)
+  Automatically selected 3 Gaussians for Superplasticizer (label 2)
+  Automatically selected 3 Gaussians for Superplasticizer (label 0)
+  Automatically selected 3 Gaussians for Superplasticizer (label 1)
+  Automatically selected 4 Gaussians for Slag (label 2)
+  Automatically selected 2 Gaussians for Slag (label 0)
+  Automatically selected 4 Gaussians for Slag (label 1)
+  Automatically selected 4 Gaussians for FineAgg (label 2)
+  Automatically selected 2 Gaussians for FineAgg (label 0)
+  Automatically selected 2 Gaussians for FineAgg (label 1)
+  Automatically selected 4 Gaussians for CoarseAgg (label 2)
+  Automatically selected 4 Gaussians for CoarseAgg (label 0)
+  Automatically selected 4 Gaussians for CoarseAgg (label 1)
+  Automatically selected 2 Gaussians for FlyAsh (label 2)
+  Automatically selected 2 Gaussians for FlyAsh (label 0)
+  Automatically selected 3 Gaussians for FlyAsh (label 1)
+  [phiusiil] repo loader unavailable (FileNotFoundError); trying ucimlrepo
+  [phiusiil] unavailable (ConnectionError); column -> N/A
+  wrote /home/user/grad-school/reproduce/outputs/table_6_1.md
+  wrote /home/user/grad-school/reproduce/outputs/table_6_1.csv

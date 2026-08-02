@@ -19,7 +19,7 @@ dissimilarity matrix resident in unified memory:
      optimally (endpoint TSP + per-arc orientation DP) — a targeted k-opt that
      spends its effort only on the worst edges.
 
-Run:  python -m experiments.vat_tsp_reslice
+Run:  python ClusteringExperiments/vat_tsp_reslice.py
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu, gpu_vat  # noqa: E402
-from experiments.vat_tsp_dgx_scale import _orient_cycle_dist  # noqa: E402
+from vat_tsp_dgx_scale import _orient_cycle_dist  # noqa: E402
 
 try:
     import elkai  # type: ignore

@@ -1,0 +1,4 @@
+# Recoverable from tribble-fis history:
+#   git -C tribble-fis show 8484fd6^:gaussian_mixture/phishing_data/PhiUSIIL_Phishing_URL_Dataset.csv > data/PhiUSIIL_Phishing_URL_Dataset.csv
+# 57 MB, too large to vendor here.
+PhiUSIIL_Phishing_URL_Dataset.csv

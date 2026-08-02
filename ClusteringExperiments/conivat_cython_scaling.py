@@ -15,7 +15,7 @@ For each n it measures (best-of-k, kernels pre-warmed):
 At n = 20000 a float64 distance matrix is ~3.2 GB (float32 ~1.6 GB), so this
 also exercises the memory behaviour the roadmap calls the scaling wall.
 
-Run:  python -m experiments.conivat_cython_scaling
+Run:  python ClusteringExperiments/conivat_cython_scaling.py
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import compute_conivat, expand_constraints  # noqa: E402
 from tribbleclustering import generate_constraints_from_labels  # noqa: E402
-from experiments.conivat_scaling import make_blobs  # noqa: E402
+from conivat_scaling import make_blobs  # noqa: E402
 
 try:
     from tribbleclustering.pcvat import (  # noqa: E402

@@ -12,38 +12,101 @@ import sys
 from pathlib import Path
 
 # Add parent directory to path to import project modules
-project_dir = Path(__file__).parent.parent
+# This file now lives at gated-minimax-selection/verification/, so the package
+# it imports (ivat_mf, nerfcm, battery...) is one level up and the repo root is
+# two. Resolved from __file__ rather than a developer's home directory.
+project_dir = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_dir))
+
+
+def _dataset(name, required=True):
+    """Locate a dataset CSV, or fail with a message that says what to do.
+
+    Checked in order: $GRAD_SCHOOL_DATA, the repo root, this script's directory.
+    These files are gitignored, so a fresh clone genuinely will not have them --
+    an explicit error naming the search path beats a stack trace from read_csv.
+    """
+    import os
+    here = Path(__file__).resolve().parent
+    roots = []
+    if os.environ.get("GRAD_SCHOOL_DATA"):
+        roots.append(Path(os.environ["GRAD_SCHOOL_DATA"]))
+    # Datasets moved to <repo>/data/ when the experiments came out of the
+    # submodules. Repo root and this directory stay as fallbacks so an older
+    # working copy still resolves; nothing reaches outside the repo.
+    repo_root = here.parent.parent
+    roots += [repo_root / "data", repo_root, here.parent, here]
+    for root in roots:
+        candidate = root / name
+        if candidate.exists():
+            return str(candidate)
+    if not required:
+        return None
+    raise FileNotFoundError(
+        f"{name} not found. Looked in: {', '.join(str(r) for r in roots)}. "
+        f"It is gitignored, so a fresh clone will not have it; place it at the "
+        f"repo data/ directory, or set GRAD_SCHOOL_DATA to hold it."
+    )
 
 import ivat_mf as im
 from nerfcm import nerfcm
 
 
 def load_iris():
-    """Load Iris dataset from UCI ML Repository, return (X, y, name)."""
-    from ucimlrepo import fetch_ucirepo
-    iris = fetch_ucirepo(id=53)
-    X = iris.data.features.values
-    y = iris.data.targets.values.ravel()
+    """Load Iris: the local CSV if present, else UCI id 53 (same data)."""
+    path = _dataset("IRIS.csv", required=False)
+    if path:
+        df = pd.read_csv(path)
+        X = df[["sepal_length", "sepal_width", "petal_length", "petal_width"]].values
+        species_map = {s: i for i, s in enumerate(df["species"].unique())}
+        y = np.array([species_map[s] for s in df["species"]])
+    else:
+        from ucimlrepo import fetch_ucirepo
+        iris = fetch_ucirepo(id=53)
+        X = iris.data.features.values
+        y = iris.data.targets.values.ravel()
     return X, y, "Iris"
 
 
 def load_glass():
-    """Load Glass dataset from UCI ML Repository, return (X, y, name)."""
-    from ucimlrepo import fetch_ucirepo
-    glass = fetch_ucirepo(id=42)
-    X = glass.data.features.values
-    y = glass.data.targets.values.ravel()
+    """Load Glass: the local CSV if present, else UCI id 42 (same data)."""
+    path = _dataset("glass.csv", required=False)
+    if path:
+        df = pd.read_csv(path)
+        X = df.iloc[:, :-1].values
+        y = df.iloc[:, -1].values
+    else:
+        from ucimlrepo import fetch_ucirepo
+        glass = fetch_ucirepo(id=42)
+        X = glass.data.features.values
+        y = glass.data.targets.values.ravel()
     return X, y, "Glass"
 
 
 def load_heart():
-    """Load Heart disease dataset from UCI ML Repository, return (X, y, name)."""
+    """Load a heart dataset, first 100 rows.
+
+    CAUTION: the two sources here are NOT the same dataset, so a run that falls
+    back is not comparable to one that does not -- the returned name says which
+    was used, and that name should be carried into any reported result.
+
+      local  heart_2020_cleaned.csv -- BRFSS 2020, ~320k rows, binary target
+      UCI 45 Cleveland heart disease -- 303 rows, multiclass `num` target
+
+    Local is preferred so existing numbers stay reproducible; the fetch is a
+    fallback for a machine that has no data directory.
+    """
+    path = _dataset("heart_2020_cleaned.csv", required=False)
+    if path:
+        df = pd.read_csv(path).iloc[:100]
+        X = pd.get_dummies(df.iloc[:, :-1], drop_first=True).values
+        y = df.iloc[:, -1].values
+        return X, y, "Heart BRFSS-2020 (n=100)"
     from ucimlrepo import fetch_ucirepo
     heart = fetch_ucirepo(id=45)
-    X = heart.data.features.values[:100]  # Take first 100 samples for speed
+    X = heart.data.features.values[:100]
     y = heart.data.targets.values.ravel()[:100]
-    return X, y, "Heart Disease (n=100)"
+    return X, y, "Heart Cleveland/UCI-45 (n=100)"
 
 
 def standardize(X):

@@ -36,7 +36,7 @@ This script verifies the equivalence (MST weight + clustering identical to the
 dense iVAT path) and measures the scaling: dense O(n^2) Prim vs the sparse
 O(n log n) EMST ordering, plus the memory wall the sparse route sidesteps.
 
-Run:  python -m experiments.ivat_minimax_complexity
+Run:  python ClusteringExperiments/ivat_minimax_complexity.py
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ from scipy.spatial import Delaunay  # noqa: E402
 from scipy.sparse import coo_matrix  # noqa: E402
 from scipy.sparse.csgraph import minimum_spanning_tree  # noqa: E402
 
-from experiments.conivat_scaling import make_blobs  # noqa: E402
+from conivat_scaling import make_blobs  # noqa: E402
 
 try:
     from tribbleclustering.pcvat import (  # noqa: E402

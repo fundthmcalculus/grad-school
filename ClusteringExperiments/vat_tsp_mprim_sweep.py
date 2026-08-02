@@ -5,7 +5,7 @@ Follows vat_tsp_mprim (single start, noisy). Here we average the FINAL quality
 starts per instance, across a range of sizes, to find a robust sweet-spot m and
 whether it scales with n. % over published optimum; nearest-size EUC_2D TSPLIB.
 
-Run:  python -m experiments.vat_tsp_mprim_sweep
+Run:  python ClusteringExperiments/vat_tsp_mprim_sweep.py
 """
 
 from __future__ import annotations
@@ -20,14 +20,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_euc_instance,
     optimal_length,
 )
-from experiments.vat_tsp_dualvat_lk import tour_len  # noqa: E402
-from experiments.vat_tsp_kopt import two_opt_converge, three_opt_converge  # noqa: E402
-from experiments.vat_tsp_mprim import mprim_order  # noqa: E402
+from vat_tsp_dualvat_lk import tour_len  # noqa: E402
+from vat_tsp_kopt import two_opt_converge, three_opt_converge  # noqa: E402
+from vat_tsp_mprim import mprim_order  # noqa: E402
 
 if gpu.is_available():
     import cupy as cp

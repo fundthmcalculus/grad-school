@@ -17,7 +17,7 @@ in the follow-up step. Saved to experiments/figures/vat_tsp_seqvar_coadj_<name>.
 
 Repeatable data only: nearest-size EUC_2D TSPLIB instance for each target n.
 
-Run:  python -m experiments.vat_tsp_seqvar
+Run:  python ClusteringExperiments/vat_tsp_seqvar.py
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-from experiments.vat_tsp_tsplib import nearest_euc_instance  # noqa: E402
+from vat_tsp_tsplib import nearest_euc_instance  # noqa: E402
 
 FIG_DIR = Path(__file__).parent / "figures"
 
