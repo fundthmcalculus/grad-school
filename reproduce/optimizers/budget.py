@@ -52,7 +52,7 @@ class BudgetedObjective:
         best_x, best_f = obj.best_x, obj.best_f
     """
 
-    def __init__(self, fn, max_evals, x0=None):
+    def __init__(self, fn, max_evals, x0=None, checkpoints=()):
         self._fn = fn
         self.max_evals = int(max_evals)
         self.n_evals = 0
@@ -60,6 +60,16 @@ class BudgetedObjective:
         self.best_f = np.inf
         self.trace = []            # (eval_index, seconds, best_so_far)
         self._t0 = None
+        # Checkpoints answer the question the study is actually asked: not "what
+        # does this optimizer find", but "how much does it find *in finite
+        # time*". The trace already gives the objective at any budget, but the
+        # objective is not the quantity that matters -- held-out R^2 is, and
+        # scoring that needs the parameter vector as it stood at each budget.
+        # Keeping a copy at each checkpoint turns one run into the whole
+        # budget curve, instead of one run per budget.
+        self.checkpoints = sorted(int(c) for c in checkpoints)
+        self.snapshots = {}        # eval budget -> best_x as of that budget
+        self._next_cp = 0
         # The hot start is scored outside the budget, deliberately. Every arm
         # begins from it, so charging one evaluation for it to some arms and not
         # others (SciPy's L-BFGS-B evaluates x0 itself; a population method may
@@ -96,7 +106,31 @@ class BudgetedObjective:
             self.best_f = value
             self.best_x = np.asarray(x, dtype=float).copy()
             self.trace.append((self.n_evals, self.seconds, value))
+        # Snapshot after the update, so a checkpoint reflects everything the
+        # budget bought including the evaluation that reached it.
+        while (self._next_cp < len(self.checkpoints)
+               and self.n_evals >= self.checkpoints[self._next_cp]):
+            cp = self.checkpoints[self._next_cp]
+            self.snapshots[cp] = (None if self.best_x is None
+                                  else self.best_x.copy(), self.best_f,
+                                  self.seconds)
+            self._next_cp += 1
         return value
+
+    def finalize(self):
+        """Fill any checkpoint the run never reached with the final state.
+
+        An arm that stops early -- SciPy's L-BFGS-B converges and returns long
+        before the cap on some seeds -- would otherwise have missing cells at the
+        larger budgets, which reads as "no data" when the truth is "it had
+        already finished and nothing changed after this point".
+        """
+        for cp in self.checkpoints:
+            if cp not in self.snapshots:
+                self.snapshots[cp] = (
+                    None if self.best_x is None else self.best_x.copy(),
+                    self.best_f, self.seconds)
+        return self
 
     def improvement(self):
         """Fractional drop in the objective from the hot start, or None."""
