@@ -11,15 +11,14 @@ import numpy as np
 import sys
 from pathlib import Path
 
-# Resolve paths relative to this file rather than to one developer's home
-# directory. `project_dir` is wherever this script lives; datasets sit at the
-# grad-school repo root, which is that directory or its parent depending on
-# whether this copy is the root one or the gated-minimax-selection one.
-project_dir = str(Path(__file__).resolve().parent)
-sys.path.insert(0, project_dir)
+# This file now lives at gated-minimax-selection/verification/, so the package
+# it imports (ivat_mf, nerfcm, battery...) is one level up and the repo root is
+# two. Resolved from __file__ rather than a developer's home directory.
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_dir))
 
 
-def _dataset(name):
+def _dataset(name, required=True):
     """Locate a dataset CSV, or fail with a message that says what to do.
 
     Checked in order: $GRAD_SCHOOL_DATA, the repo root, this script's directory.
@@ -31,10 +30,11 @@ def _dataset(name):
     roots = []
     if os.environ.get("GRAD_SCHOOL_DATA"):
         roots.append(Path(os.environ["GRAD_SCHOOL_DATA"]))
-    # This directory first, then its parent. The root copy of this script and
-    # the gated-minimax-selection copy both find the repo root that way, and
-    # neither reaches outside the repo before looking inside it.
-    roots += [here, here.parent]
+    # Datasets moved to <repo>/data/ when the experiments came out of the
+    # submodules; the repo root and this directory are kept as fallbacks so an
+    # older working copy still resolves. Nothing reaches outside the repo.
+    repo_root = here.parent.parent
+    roots += [repo_root / "data", repo_root, here.parent, here]
     for root in roots:
         candidate = root / name
         if candidate.exists():
@@ -42,7 +42,7 @@ def _dataset(name):
     raise FileNotFoundError(
         f"{name} not found. Looked in: {', '.join(str(r) for r in roots)}. "
         f"It is gitignored, so a fresh clone will not have it; place it at the "
-        f"repo root or set GRAD_SCHOOL_DATA to the directory holding it."
+        f"repo data/ directory, or set GRAD_SCHOOL_DATA to hold it."
     )
 
 from nerfcm import nerfcm

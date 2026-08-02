@@ -12,5 +12,6 @@ pyclustertend~=1.9.0
 fuzzy-c-means
 xlrd
 matplotlib~=3.10.1
+ucimlrepo
 # NOTE - Not always required
 numba-cuda[cu12]
