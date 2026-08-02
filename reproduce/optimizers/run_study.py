@@ -101,6 +101,10 @@ def main():
     ap.add_argument("--radius", type=float, default=1.0)
     ap.add_argument("--order", default="2nd")
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--archive", metavar="LABEL",
+                    help="copy the outputs into reproduce/outputs/<LABEL>/ with a "
+                         "PROVENANCE.txt — labelled archives are tracked, loose "
+                         "files in outputs/ are scratch")
     args = ap.parse_args()
 
     if args.smoke:
@@ -183,7 +187,71 @@ def main():
     _write_traces(records)
     _write_seeds(records)
     _write_curve(records)
+    if args.archive:
+        _archive(args.archive, args, seeds, arm_names)
     return 0
+
+
+ARTIFACTS = ["table_opt_hotstart.md", "table_opt_hotstart.csv",
+             "table_opt_hotstart_seeds.csv", "table_opt_hotstart_traces.csv",
+             "table_opt_hotstart_budget.csv"]
+
+
+def _archive(label, args, seeds, arm_names):
+    """Copy this run's artifacts under a label, with the provenance to read them.
+
+    Loose files in `reproduce/outputs/` are scratch by policy — whatever ran
+    last, untracked. A labelled directory is tracked, which is what makes a
+    result quotable: the evidence survives the machine that produced it, and a
+    later run can be diffed against it. Same convention as
+    `run_all_tables.sh <label>`, and this writes the same kind of
+    `PROVENANCE.txt` so `harness_data` can find it as an archive.
+    """
+    import shutil
+    import subprocess
+    import time
+
+    dest = os.path.join(C.OUTPUT_DIR, label)
+    os.makedirs(dest, exist_ok=True)
+
+    def sha(path):
+        try:
+            return subprocess.run(["git", "-C", path, "rev-parse", "HEAD"],
+                                  capture_output=True, text=True,
+                                  check=True).stdout.strip()
+        except Exception:  # noqa: BLE001
+            return "unknown"
+
+    stamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    lines = [
+        f"label:       {label}",
+        f"generated:   {stamp}",
+        f"tribble-fis: {sha(os.path.join(ROOT, 'tribble-fis'))}",
+        f"tribble-opt: {sha(os.path.join(ROOT, 'tribble-opt'))}",
+        f"grad-school: {sha(ROOT)}",
+        f"seeds:       {','.join(map(str, seeds))}",
+        "",
+        "study:       reproduce/optimizers/run_study.py",
+        f"dataset:     {args.dataset}",
+        f"order:       {args.order}",
+        f"radius:      {args.radius}",
+        f"budget:      {args.budget} objective evaluations per arm per seed",
+        f"arms:        {','.join(arm_names)}",
+        "",
+        C.machine_block().strip(),
+        "",
+    ]
+    with open(os.path.join(dest, "PROVENANCE.txt"), "w") as f:
+        f.write("\n".join(lines) + "\n")
+
+    copied = 0
+    for name in ARTIFACTS:
+        src = os.path.join(C.OUTPUT_DIR, name)
+        if os.path.exists(src):
+            shutil.copy2(src, os.path.join(dest, name))
+            copied += 1
+    print(f"  archived {copied} artifact(s) -> "
+          f"{os.path.relpath(dest, ROOT)}")
 
 
 def _write_curve(records):
