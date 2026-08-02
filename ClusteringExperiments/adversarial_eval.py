@@ -19,7 +19,7 @@ Decisive questions:
   1. Does exact-VAT beat k-means on non-convex data? (does VAT add anything?)
   2. Does stitched PRESERVE that, or collapse to its k-means partition?
 
-Run:  python -m experiments.adversarial_eval
+Run:  python ClusteringExperiments/adversarial_eval.py
 """
 
 from __future__ import annotations
@@ -41,14 +41,14 @@ from tribbleclustering.pcvat import (
     compute_ivat_c,
     pairwise_distances_c_64,
 )  # noqa: E402
-from experiments.blockwise_vat import (  # noqa: E402
+from blockwise_vat import (  # noqa: E402
     partition,
     blockwise_vat,
     ivat_image_from_order,
     adjusted_rand,
     labels_from_order,
 )
-from experiments.stitched_vat import stitched_vat  # noqa: E402
+from stitched_vat import stitched_vat  # noqa: E402
 
 FIG_DIR = Path(__file__).parent / "figures"
 

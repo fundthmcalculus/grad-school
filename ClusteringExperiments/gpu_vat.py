@@ -22,7 +22,7 @@ keeps the serial-in-r dependency (``ivat_row``, one launch per row). A final
 parallel ``symmetrize`` mirrors the lower triangle. Output is bit-identical to
 the numba ``ivat_image_from_order`` at f64.
 
-Run:  python -m experiments.gpu_vat
+Run:  python ClusteringExperiments/gpu_vat.py
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ import heapq
 
 import numpy as np
 
-from experiments.boruvka_gpu import (
+from boruvka_gpu import (
     _HAS_CUPY,
     _SUBST,
     boruvka_mst_gpu,
@@ -219,7 +219,7 @@ def vat_ivat_gpu(X, d_dtype=None, v_dtype="float64"):
 
 def _validate():
     from tribbleclustering.pcvat import pairwise_distances_c_64
-    from experiments.boruvka_vat import (
+    from boruvka_vat import (
         make_blobs,
         boruvka_mst_numba,
         vat_order_from_mst,
@@ -260,7 +260,7 @@ def pipeline_figure():
     import matplotlib.pyplot as plt
     from pathlib import Path
     from tribbleclustering.pcvat import pairwise_distances_c_64, compute_ivat_c
-    from experiments.boruvka_vat import make_blobs, ivat_image_from_order
+    from boruvka_vat import make_blobs, ivat_image_from_order
 
     def sync():
         cp.cuda.Stream.null.synchronize()

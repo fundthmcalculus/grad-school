@@ -2,7 +2,7 @@
 `reverse_delete_tsp.py`, prompted by the adversarial review of PR #46).
 
 Each section implements one proposed optimization and benchmarks it against the
-baseline. Run:  python -m experiments.reverse_delete_opt
+baseline. Run:  python ClusteringExperiments/reverse_delete_opt.py
 
   OPT 1  sparsify first (kNN / Delaunay candidate graph) before reverse-delete
   OPT 2  skip reverse-delete for m=1; use the package's Prim MST
@@ -22,7 +22,7 @@ from typing import Callable
 import numpy as np
 
 from tribbleclustering.pvat import vat_prim_mst  # noqa: E402
-from experiments.reverse_delete_tsp import (  # noqa: E402
+from reverse_delete_tsp import (  # noqa: E402
     Adj,
     complete_graph,
     distance_matrix,

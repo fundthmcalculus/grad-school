@@ -1,0 +1,282 @@
+#!/usr/bin/env python3
+"""Assemble the proposal chapters into one document and render it to PDF.
+
+LaTeX math is rendered by a real TeX pipeline, in this order of preference:
+
+  1. pandoc + a LaTeX engine (xelatex / lualatex / pdflatex / tectonic)
+     -- the correct, publication-grade path. Full LaTeX support.
+  2. pandoc --mathml + WeasyPrint -- works offline with no TeX install; math
+     quality depends on the renderer's MathML support.
+  3. pandoc --gladtex / plain fallback -- last resort so a PDF still builds.
+
+If no LaTeX engine is found, the script says exactly what to install.
+
+Usage (from repo root):
+    ./.venv/bin/python research/proposal-defense/build_pdf.py
+
+Outputs:
+    research/proposal-defense/build/proposal-combined.md
+    research/proposal-defense/build/proposal.pdf
+"""
+
+from __future__ import annotations
+
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+BUILD = os.path.join(HERE, "build")
+
+SECTIONS = [
+    "prose/01-introduction.md",
+    "prose/02-background.md",
+    "prose/03-scalable-structure-discovery-pvat.md",
+    "prose/04-fast-fis-synthesis-mog.md",
+    "prose/05-topological-membership-generation.md",
+    "prose/06-hierarchical-refined-fis.md",
+    "prose/07-goals-for-completion.md",
+    "prose/08-conclusion.md",
+    "chapters/09-publications.md",     # still outline-only (awaiting NAFIPS details)
+    "prose/10-timeline.md",
+    "prose/bibliography.md",
+    "prose/appendix.md",
+]
+
+TITLE = "Reproducing Like Tribbles"
+SUBTITLE = "Scaling Fuzzy Inference Systems from Hundreds to Hundreds of Thousands"
+AUTHOR = "Scott Phillips"
+COMMITTEE = ("Dr. Kelly Cohen (chair) · Dr. Vladik Kreinovich · Dr. Manish Kumar · "
+             "Dr. Ali Minai · Dr. Justin Zhan")
+DEPT = ("Department of Aerospace Engineering and Engineering Mechanics \\\\ "
+        "College of Engineering and Applied Sciences \\\\ University of Cincinnati")
+
+LATEX_ENGINES = ["xelatex", "lualatex", "pdflatex", "tectonic"]
+
+
+# --------------------------------------------------------------------------- #
+# source assembly
+# --------------------------------------------------------------------------- #
+def read(rel):
+    path = os.path.join(HERE, rel)
+    if not os.path.exists(path):
+        print(f"  [warn] missing {rel}")
+        return None
+    with open(path) as f:
+        return f.read()
+
+
+def replace_mermaid(md):
+    """Mermaid source is meaningless in print; the ASCII quarter grid that follows
+    it in Ch. 10 is the print rendering of the same schedule."""
+    note = ("*The Gantt chart is maintained as an interactive figure; the quarter "
+            "grid below is the print rendering of the same schedule.*")
+    return re.sub(r"```mermaid.*?```", note, md, flags=re.DOTALL)
+
+
+def strip_editorial(md):
+    """Drop scaffolding that shouldn't appear in a reading copy."""
+    md = replace_mermaid(md)
+    out = []
+    for line in md.split("\n"):
+        s = line.strip()
+        if re.match(r"^\*\*(Status|Repo|Mirrors|Length target|Name|Role note|"
+                    r"One-line claim):", s):
+            continue
+        if s.startswith("*Draft —") or s.startswith("*Source of truth:"):
+            continue
+        if re.match(r"^`!\[.*\]\(.*\)`$", s):        # image placeholder lines
+            continue
+        out.append(line)
+    return re.sub(r"\n{4,}", "\n\n\n", "\n".join(out))
+
+
+def assemble():
+    os.makedirs(BUILD, exist_ok=True)
+    parts = []
+    for rel in SECTIONS:
+        md = read(rel)
+        if md is None:
+            continue
+        parts.append(strip_editorial(md))
+        print(f"  + {rel}")
+    combined = "\n\n\n".join(parts)
+    md_path = os.path.join(BUILD, "proposal-combined.md")
+    with open(md_path, "w") as f:
+        f.write(combined)
+    print(f"  wrote {md_path}")
+    return md_path
+
+
+# --------------------------------------------------------------------------- #
+# rendering
+# --------------------------------------------------------------------------- #
+def pandoc_bin():
+    """System pandoc, else the pypandoc-bundled binary."""
+    if shutil.which("pandoc"):
+        return "pandoc"
+    try:
+        import pypandoc
+        return pypandoc.get_pandoc_path()
+    except Exception:
+        return None
+
+
+def find_latex_engine():
+    for eng in LATEX_ENGINES:
+        if shutil.which(eng):
+            return eng
+    return None
+
+
+TITLE_BLOCK = rf"""---
+title: "{TITLE}"
+subtitle: "{SUBTITLE}"
+author: "{AUTHOR}"
+date: "Dissertation Proposal · Draft"
+documentclass: article
+papersize: letter
+geometry: margin=1.05in
+fontsize: 11pt
+linestretch: 1.15
+numbersections: false
+colorlinks: true
+---
+
+"""
+
+
+def build_with_latex(md_path, pandoc, engine):
+    """The proper path: pandoc -> LaTeX -> PDF. Full math support."""
+    pdf = os.path.join(BUILD, "proposal.pdf")
+    src = os.path.join(BUILD, "proposal-titled.md")
+    with open(md_path) as f:
+        body = f.read()
+    with open(src, "w") as f:
+        f.write(TITLE_BLOCK + body)
+    cmd = [pandoc, src, "-o", pdf,
+           f"--pdf-engine={engine}",
+           "--from", "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks",
+           "-V", "linkcolor=blue",
+           "--wrap=preserve"]
+    print(f"  pandoc + {engine} ...")
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        print(res.stderr[-2500:])
+        return None
+    return pdf
+
+
+def build_with_weasyprint(md_path, pandoc):
+    """Offline fallback: pandoc -> HTML(MathML) -> WeasyPrint PDF."""
+    try:
+        from weasyprint import CSS, HTML
+    except ImportError:
+        print("  [fallback] weasyprint not installed")
+        return None
+
+    html_path = os.path.join(BUILD, "proposal.html")
+    cmd = [pandoc, md_path, "-o", html_path, "--standalone", "--mathml",
+           "--from", "markdown+tex_math_dollars+pipe_tables", "--wrap=preserve",
+           "--metadata", f"title={TITLE}"]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        print(res.stderr[-1500:])
+        return None
+
+    title_html = f"""<div class="titlepage">
+      <h1 class="doctitle">{TITLE}</h1>
+      <p class="sub">{SUBTITLE}</p><p class="author">{AUTHOR}</p>
+      <p class="meta">{DEPT.replace(chr(92) * 2, '<br>')}</p>
+      <p class="committee">{COMMITTEE}</p>
+      <p class="datestr">Dissertation Proposal · Draft</p></div>"""
+    with open(html_path) as f:
+        html = f.read()
+    html = html.replace("<body>", "<body>" + title_html, 1)
+
+    # WeasyPrint has no MathML support: it would print the glyph soup *and* the
+    # <annotation> TeX fallback, duplicating every formula. Drop the annotation so
+    # the interim PDF at least shows each formula once. (The real fix is a LaTeX
+    # engine -- see main().)
+    html = re.sub(r"<annotation\b[^>]*>.*?</annotation>", "", html, flags=re.DOTALL)
+    with open(html_path, "w") as f:      # keep the on-disk HTML in sync with the PDF
+        f.write(html)
+
+    css = CSS(string="""
+    @page { size: letter; margin: 1in 1.05in;
+            @bottom-center { content: counter(page);
+                             font-family: Georgia, serif; font-size: 9.5pt; color:#555; } }
+    @page :first { @bottom-center { content: ""; } }
+    body { font-family: Georgia, "Times New Roman", serif; font-size: 10.8pt;
+           line-height: 1.5; color:#14161a; text-align: justify; hyphens: auto; }
+    .titlepage { text-align:center; page-break-after:always; padding-top:2.2in; }
+    .titlepage .doctitle { font-size:26pt; margin:0 0 .35em; page-break-before:avoid; }
+    .titlepage .sub { font-size:14pt; color:#333; margin:0 0 2.4em; }
+    .titlepage .author { font-size:13.5pt; } .titlepage .meta,.titlepage .committee,
+    .titlepage .datestr { font-size:10.3pt; color:#444; }
+    h1 { font-size:18pt; page-break-before:always; page-break-after:avoid;
+         text-align:left; margin:0 0 .6em; }
+    h2 { font-size:13.5pt; margin:1.5em 0 .5em; page-break-after:avoid; text-align:left; }
+    h3 { font-size:11.6pt; font-style:italic; margin:1.2em 0 .4em;
+         page-break-after:avoid; text-align:left; }
+    p { margin:0 0 .62em; orphans:2; widows:2; }
+    table { border-collapse:collapse; width:100%; font-family:Arial,sans-serif;
+            font-size:8.6pt; margin:.8em 0 1em; page-break-inside:avoid; text-align:left; }
+    th,td { border-bottom:.6pt solid #ccc; padding:4pt 6pt; vertical-align:top; }
+    th { border-bottom:1pt solid #666; }
+    blockquote { margin:.8em 0; padding:6pt 10pt; border-left:2.5pt solid #a8501f;
+                 background:#faf7f4; font-family:Arial,sans-serif; font-size:8.8pt;
+                 text-align:left; page-break-inside:avoid; }
+    pre { background:#f7f7f4; border:.6pt solid #ddd; padding:7pt; font-size:8.2pt;
+          white-space:pre-wrap; page-break-inside:avoid; text-align:left; }
+    code { font-family:Menlo,Consolas,monospace; font-size:8.8pt; }
+    math { font-family:"Latin Modern Math","STIX Two Math","Cambria Math",serif; }
+    """)
+    pdf = os.path.join(BUILD, "proposal.pdf")
+    doc = HTML(string=html, base_url=HERE).render(stylesheets=[css])
+    doc.write_pdf(pdf)
+    return pdf, len(doc.pages)
+
+
+def page_count(pdf):
+    try:
+        with open(pdf, "rb") as f:
+            return len(re.findall(rb"/Type\s*/Page\b", f.read()))
+    except Exception:
+        return None
+
+
+def main():
+    print("Assembling proposal ...")
+    md_path = assemble()
+
+    pandoc = pandoc_bin()
+    if not pandoc:
+        sys.exit("pandoc not found. Install it, or: pip install pypandoc-binary")
+
+    engine = find_latex_engine()
+    if engine:
+        pdf = build_with_latex(md_path, pandoc, engine)
+        if pdf:
+            n = page_count(pdf)
+            print(f"  wrote {pdf}  ({n} pages)  [pandoc + {engine}: full LaTeX]")
+            return
+        print("  [warn] LaTeX build failed; falling back to WeasyPrint")
+    else:
+        print("  [note] No LaTeX engine found (xelatex/lualatex/pdflatex/tectonic).")
+        print("         For publication-grade math, install one, e.g.:")
+        print("           sudo zypper install texlive-xetex texlive-latex "
+              "texlive-collection-fontsrecommended")
+        print("         Falling back to pandoc --mathml + WeasyPrint for now.")
+
+    out = build_with_weasyprint(md_path, pandoc)
+    if not out:
+        sys.exit("PDF build failed.")
+    pdf, pages = out
+    print(f"  wrote {pdf}  ({pages} pages)  [pandoc --mathml + WeasyPrint]")
+
+
+if __name__ == "__main__":
+    main()

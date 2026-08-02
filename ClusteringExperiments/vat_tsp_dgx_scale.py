@@ -1,6 +1,6 @@
 """Scale study: the VAT->TSP cluster-blocking pipeline on the DGX Spark (GB10).
 
-The VAT-cluster-blocking TSP solver (experiments/vat_tsp_benchmark.py) is
+The VAT-cluster-blocking TSP solver (ClusteringExperiments/vat_tsp_benchmark.py) is
 "cluster-first, route-second": find blocks along the VAT ordering, solve each
 block's sub-TSP (LKH), then optimize the block-to-block stitch. Its per-block
 work is cheap and parallel; the wall it hits at scale is the **O(n^2) VAT
@@ -21,7 +21,7 @@ Two parts:
      O(n) + O(B^2) data on the host), tour cost vs the raw VAT tour, time
      breakdown, at n the host front-end cannot reach.
 
-Run:  python -m experiments.vat_tsp_dgx_scale
+Run:  python ClusteringExperiments/vat_tsp_dgx_scale.py
 """
 
 from __future__ import annotations
@@ -41,13 +41,13 @@ from tribbleclustering.pcvat import (  # noqa: E402
     pairwise_distances_c_64,
     compute_ivat_c,
 )
-from experiments.vat_tsp import two_opt  # noqa: E402  (njit closed-tour 2-opt)
-from experiments.vat_tsp_warmstart import nn_order  # noqa: E402
-from experiments.vat_tsp_benchmark import (
+from vat_tsp import two_opt  # noqa: E402  (njit closed-tour 2-opt)
+from vat_tsp_warmstart import nn_order  # noqa: E402
+from vat_tsp_benchmark import (
     _orient_cycle,
     _open_from_subtour,
 )  # noqa: E402
-from experiments.adversarial_eval import easy_blobs  # noqa: E402
+from adversarial_eval import easy_blobs  # noqa: E402
 
 try:
     import elkai  # type: ignore

@@ -1,0 +1,18 @@
+label:       audit-2026-08-01
+generated:   2026-08-01T21:09:58Z
+tribble-fis: 23bfdbc54423bda22ff46a3a513194cad8adb6ce
+tribble-cluster: c71171e76fade0bfc3ac9859478dbf45fa9a463e
+grad-school: 456247c8d5c8b1467c3f3e85c0657130b1d7c8fe
+seeds:       0,1,2,3,4 (default)
+
+status:
+  table_concrete_reconciliation          ok
+  table_hyperparam_normalization         ok
+  table_g5_output_partitioning           ok
+  table_g5b_skew_sweep                   ok
+  table_4_1_mog_baselines                ok
+  table_6_1_model_family                 ok
+  table_norm_conorm_matrix               ok
+  table_4_4_openset                      ok
+  table_3_1_pvat_scaling                 ok
+  table_3_1_reorder_three_arm            ok

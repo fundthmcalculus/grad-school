@@ -37,7 +37,7 @@ test, so ~O(n^4) on a dense graph — clean to reason about but quadratically
 slower to *build* than the package's Prim MST. The value here is the unifying
 m-knob framing, not the construction speed; Prim remains the production path.
 
-Run:  python -m experiments.reverse_delete_tsp
+Run:  python ClusteringExperiments/reverse_delete_tsp.py
 """
 
 from __future__ import annotations

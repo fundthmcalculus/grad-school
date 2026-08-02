@@ -24,7 +24,7 @@ Two experiments requested on top of the recursive-IVAT TSP thread:
 Data: repeatable TSPLIB reference instances (nearest-size EUC_2D via
 ``vat_tsp_tsplib.nearest_euc_instance``), not random points.
 
-Run:  python -m experiments.vat_tsp_dualvat_lk
+Run:  python ClusteringExperiments/vat_tsp_dualvat_lk.py
 """
 
 from __future__ import annotations
@@ -41,12 +41,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_euc_instance,
     optimal_length,
 )
-from experiments.vat_tsp_reslice import gpu_two_opt  # noqa: E402
+from vat_tsp_reslice import gpu_two_opt  # noqa: E402
 
 try:
     import elkai  # type: ignore

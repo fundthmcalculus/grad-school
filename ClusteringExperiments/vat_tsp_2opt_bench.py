@@ -16,7 +16,7 @@ often each reference-tour link recurs (a dict over consecutive pairs — no n x 
 matrix, so it scales to 20k). Time AND quality (% over published optimum) reported;
 nearest-size EUC_2D TSPLIB instances, official nint rounding.
 
-Run:  python -m experiments.vat_tsp_2opt_bench
+Run:  python ClusteringExperiments/vat_tsp_2opt_bench.py
 """
 
 from __future__ import annotations
@@ -34,13 +34,13 @@ import matplotlib.pyplot as plt  # noqa: E402
 from numba import njit  # noqa: E402
 
 from tribbleclustering import gpu  # noqa: E402
-from experiments.vat_tsp_tsplib import (  # noqa: E402
+from vat_tsp_tsplib import (  # noqa: E402
     knn_device,
     nearest_euc_instance,
     optimal_length,
     _d,
 )
-from experiments.vat_tsp_dualvat_lk import tour_len  # noqa: E402
+from vat_tsp_dualvat_lk import tour_len  # noqa: E402
 
 if gpu.is_available():
     import cupy as cp

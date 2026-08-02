@@ -16,12 +16,12 @@ and tuning the run-cap m (VAT_TSP_MPRIM_SWEEP: NN ~ best m, multi-start beats it
 Uses the GPU distance matrix / kNN when available, else a NumPy fallback.
 
 Library:
-    from experiments.vat_tsp_solve import solve_tsp
+    from vat_tsp_solve import solve_tsp
     tour, length, info = solve_tsp(coords, n_starts=8)
 
 CLI:
-    python -m experiments.vat_tsp_solve 1000            # nearest EUC_2D TSPLIB
-    python -m experiments.vat_tsp_solve 5000 --starts 16 --plot
+    python ClusteringExperiments/vat_tsp_solve.py 1000            # nearest EUC_2D TSPLIB
+    python ClusteringExperiments/vat_tsp_solve.py 5000 --starts 16 --plot
 """
 
 from __future__ import annotations
@@ -32,9 +32,9 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.vat_tsp_dualvat_lk import tour_len
-from experiments.vat_tsp_kopt import two_opt_converge, three_opt_converge
-from experiments.vat_tsp_mprim import mprim_order
+from vat_tsp_dualvat_lk import tour_len
+from vat_tsp_kopt import two_opt_converge, three_opt_converge
+from vat_tsp_mprim import mprim_order
 
 try:
     from tribbleclustering import gpu
@@ -54,7 +54,7 @@ def _distances_and_knn(coords, k, dtype):
     k = min(k, n - 1)
     if _HAS_GPU:
         import cupy as cp
-        from experiments.vat_tsp_tsplib import knn_device
+        from vat_tsp_tsplib import knn_device
 
         Dg = gpu.pairwise_distances_device(coords, dtype=dtype)
         D = cp.asnumpy(Dg).astype(np.float64)
@@ -176,7 +176,7 @@ def _main():
     ap.add_argument("--plot", action="store_true")
     args = ap.parse_args()
 
-    from experiments.vat_tsp_tsplib import nearest_euc_instance, optimal_length
+    from vat_tsp_tsplib import nearest_euc_instance, optimal_length
 
     name, coords, dim = nearest_euc_instance(args.target)
     opt = optimal_length(name)

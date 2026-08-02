@@ -22,7 +22,7 @@ Pipeline:
 This script compares exact / naive-blockwise / stitched on quality (ARI, runs)
 and renders the three iVAT images.
 
-Run:  python -m experiments.stitched_vat
+Run:  python ClusteringExperiments/stitched_vat.py
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ from tribbleclustering.pcvat import (
     compute_ivat_c,
     pairwise_distances_c_64,
 )  # noqa: E402
-from experiments.blockwise_vat import (  # noqa: E402
+from blockwise_vat import (  # noqa: E402
     make_blobs,
     partition,
     blockwise_vat,

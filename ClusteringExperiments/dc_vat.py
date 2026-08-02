@@ -24,7 +24,7 @@ iVAT:
     whether massive parallelism (e.g. GPU tiles) can beat the O(n^2) serial
     engine for useful n. Here we confirm exactness and characterize the cost.
 
-Run:  python -m experiments.dc_vat
+Run:  python ClusteringExperiments/dc_vat.py
 """
 from __future__ import annotations
 

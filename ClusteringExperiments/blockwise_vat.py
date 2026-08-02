@@ -15,7 +15,7 @@ a speed-for-accuracy trade whose error is concentrated at the seams.
 
 This script quantifies both sides and renders the artifact.
 
-Run:  python -m experiments.blockwise_vat
+Run:  python ClusteringExperiments/blockwise_vat.py
 """
 
 from __future__ import annotations
