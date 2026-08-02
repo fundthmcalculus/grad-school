@@ -119,6 +119,18 @@ are withdrawn. Unaffected by any of the library fixes — it is synthetic.
 configurations is 0.012 against σ ≈ 0.02–0.03. The starvation *mechanism*
 survives; the accuracy story built on it does not.
 
+**Chapter 5 gained the `IVATMeans` motivation.** `tribble-cluster` ships a
+wrapper that finds clusters with iVAT — minimax, ultrametric, good at non-convex
+structure — and then represents each one by a Euclidean mean and refines with
+Euclidean FCM. The two halves are in incompatible geometries: the mean of a ring
+is in the hole. On exactly the data where iVAT beats k-means, the back end throws
+the advantage away. The library documented this in `docs/novel-niche.md`; the
+proposal had never mentioned it, which was a real omission, because Ch5's method
+*is* the resolution — stay in minimax geometry and use a relational method that
+consumes a dissimilarity matrix. It also positions the work: the VAT lineage
+stayed crisp and visual, the fuzzy relational lineage never adopted the minimax
+ordering, and the gap between them is unoccupied rather than contested.
+
 **Appendix A.4 is new: feature scoring.** The Chapter 4 construction ranks
 features before building anything, so rule count and readability follow from that
 ranking. On PhiUSIIL the most informative feature is ranked 1st by wasserstein

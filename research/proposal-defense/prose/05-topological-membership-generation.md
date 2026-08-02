@@ -16,6 +16,44 @@ I have to be careful and honest here, because the nearest prior work is close. P
 
 The other prior art I lean on is relational: NERFCM [Hathaway and Bezdek 1994], which runs Fuzzy C-Means directly on a dissimilarity matrix, with a beta-spread safeguard for when the matrix is badly non-metric; and ConiVAT [Rathore et al. 2020], which repairs single-linkage's chaining failure with constraint-based metric learning.
 
+### The concrete version of this problem, in my own code
+
+Before the method, the failure it repairs — because it is not hypothetical, and
+it is sitting in my own library rather than in someone else's.
+
+`tribble-cluster` ships `IVATMeans`, a scikit-learn-style wrapper that uses iVAT
+to find clusters and then hands them to a Euclidean back end. Those two halves
+live in incompatible geometries, and the seam is exactly where the method fails.
+
+The iVAT recurrence $D'[r,c] = \max(D^*[r,j], D'[j,c])$ computes the minimax path
+distance — equivalently the single-linkage distance, the largest edge on the MST
+path between two points. Minimax distances form an **ultrametric**, and that is
+precisely why VAT and iVAT handle elongated, chained and non-convex structure
+well: they never assume a cluster is a blob.
+
+Having recovered such a cluster, `IVATMeans` then represents it by
+`np.mean(points, axis=0)` and refines with Euclidean fuzzy $c$-means. A mean is a
+Euclidean prototype, and $c$-means assigns by Euclidean distance, so both are
+constrained to convex regions. The mean of a ring is at its centre, where there
+are no points; the mean of a filament is off the filament. On the very data where
+iVAT beats $k$-means, the back end discards the advantage the front end just
+earned — it re-merges the two moons that iVAT had cut perfectly.
+
+I state it plainly because it sharpens what this chapter is for. The fix is not a
+better centroid heuristic; there is no good Euclidean prototype for a ring. The
+fix is to stay in the minimax geometry all the way through — transform the
+dissimilarities once, then use a method that consumes a dissimilarity matrix
+rather than coordinates, which is what relational FCM does and what §5.4 measures.
+Chapter 3's contribution is making that transform affordable at scale; this
+chapter's is showing what to do with it once you have it.
+
+It also locates the work relative to the literature more precisely than a claim of
+novelty usually can. The VAT lineage has stayed on the crisp, visual side —
+clusiVAT, aVAT, SpecVAT, ML-aVAT, kernel-iVAT — while the fuzzy relational lineage
+never adopted the VAT/minimax ordering. The gap between them is not a gap in
+anyone's argument; it is simply unoccupied, and `IVATMeans` is what falls into it
+when you build the obvious thing without noticing the geometries disagree.
+
 ## 5.3 Methodology
 
 ### 5.3.1 The minimax transform does the heavy lifting
