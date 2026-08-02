@@ -106,7 +106,12 @@ rule's advantage over mean entropy is governed by entropy's own performance
 (r ≈ −0.78, crossover at entropy AUROC ≈ 0.61). Two experiments follow directly.
 They are independent and can run in either order.
 
-## 5. Does model scale set the regime?
+## 5. Does model scale set the regime? — ✅ DONE (§29)
+
+**Answer: no.** Entropy improves monotonically within the SmolLM2 family (0.713 → 0.838 → 0.909 for 135M/360M/1.7B), but Gemma3-270m sits at 0.546 while SmolLM2-135M — half its size — reaches 0.713. Between-family variation swamps within-family scaling, so the fuzzy rule is a **weak-entropy-model** technique, not a small-model one, and you cannot predict the regime from parameter count.
+
+<details><summary>original plan</summary>
+
 
 **The hypothesis.** Gemma3-270m is the smallest model tested and the only one in
 the winning regime (entropy 0.546, barely above chance). If entropy calibration
@@ -139,7 +144,14 @@ for both detectors, template constant, length matched:
 **Cost:** ~35 min capture + ~10 min analysis. **Blocking risk:** none; the 1.7B
 model is 3.4 GB in bf16 and fits alongside activations in 12 GB.
 
-## 6. Can the detector be switched without labels?
+</details>
+
+## 6. Can the detector be switched without labels? — ✅ DONE (§28, §29)
+
+**With labels, yes and cheaply:** 20 labelled examples buy +0.0104 (91% oracle agreement), 100 buy +0.0134 (99.5%). **Label-free: predictable but not yet actionable.** At six models the known-good proxy predicts entropy's AUROC out-of-sample at r = +0.689 (it was −0.492 at four models — the n=4 'untestable' call was right), but converts to only +0.0025 of an available +0.0132, because it is not sharp enough near the 0.61 boundary where the decision is contested.
+
+<details><summary>original plan</summary>
+
 
 **Why switching and not blending.** §27 showed a zero-parameter rank-average of
 the two scores reaches 0.735 against entropy's 0.743 and beats both in only 9 of
@@ -174,3 +186,5 @@ none. The oracle arm must be labelled as an upper bound wherever it appears.
 bookkeeping; a label-free switch that recovers most of the oracle gain would be a
 genuinely useful and, as far as I know, unreported observation about when
 confidence-based hallucination detection can be trusted.
+
+</details>

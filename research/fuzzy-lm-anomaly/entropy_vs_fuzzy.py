@@ -83,10 +83,12 @@ def rank01(x):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, default=SEEDS)
+    ap.add_argument("--models", nargs="+", default=MODELS)
+    ap.add_argument("--out", default="entropy_vs_fuzzy.csv")
     args = ap.parse_args()
     rows = []
 
-    for m in MODELS:
+    for m in args.models:
         meta = pd.read_parquet(DATA / f"capture_v4_{m}_meta.parquet")
         F = meta[SCALAR_COLS].reset_index(drop=True).astype(float)
         good = np.flatnonzero((meta.family == "longform_real")
@@ -128,7 +130,7 @@ def main():
         print(f"  {m} done")
 
     df = pd.DataFrame(rows)
-    df.to_csv(DATA / "entropy_vs_fuzzy.csv", index=False)
+    df.to_csv(DATA / args.out, index=False)
     df["d_fis"] = df.fis - df.entropy
     df["d_fuse_best"] = df.fusion - df[["entropy", "fis"]].max(axis=1)
 

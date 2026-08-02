@@ -1792,3 +1792,97 @@ entropy is weakest. SmolLM2's +0.0362 is more interesting: its entropy is the
 *strongest* of the four, yet per-cell switching still finds a real gain, which
 means the regime is set at the level of individual templates and not only at the
 level of the model.
+
+---
+
+## 29. Scale does not set the regime — and the label-free proxy works after all
+
+Plan items 5 and 6's blocked rung, both resolved by the SmolLM2 family captures
+(135M / 360M / 1.7B on `prompts_v4.jsonl`, bfloat16, same protocol as §27).
+
+### Item 5 — entropy improves with scale, but family matters more
+
+SmolLM2 holds training data and recipe fixed and varies only size:
+
+| model | params | entropy | FIS | FIS − entropy |
+|---|---|---|---|---|
+| SmolLM2-135M | 135M | 0.713 | 0.627 | −0.086 |
+| SmolLM2-360M | 360M | 0.838 | 0.747 | −0.091 |
+| SmolLM2-1.7B | 1.7B | **0.909** | 0.841 | −0.068 |
+
+**Entropy improves monotonically with scale — 0.713 → 0.838 → 0.909.** The
+hypothesis that entropy calibration gets better with size is confirmed *within a
+family*. The fuzzy rule improves in step (0.627 → 0.747 → 0.841) and never closes
+the gap, which stays roughly flat.
+
+**But size is not what sets the regime.** Gemma3-270m has **entropy 0.546** — well
+below the crossover — while SmolLM2-**135M**, half its size, reaches **0.713**,
+comfortably above it. A model half the size is in the opposite regime.
+
+So the answer to item 5 is the third option in the plan's outcome table, not the
+first: within a family entropy scales with size, but **between-family variation is
+much larger than the within-family scaling effect**. Whatever puts Gemma in the
+winning regime — instruction tuning, calibration, tokenizer, its near-total
+absence of pushback (0.1% vs Qwen's 13%) — it is not parameter count. The
+practical consequence is that you cannot predict from a model's size whether the
+fuzzy rule will help; you have to measure it. Which is what item 6 is for.
+
+Across the SmolLM2 family alone the §27 relationship still holds but weaker
+(r = −0.502, p = 0.003, crossover 0.650, FIS ahead in 6/33 cells) — expected,
+since restricting to one family removes most of the range in entropy AUROC.
+
+### Item 6, rung 3 — the label-free proxy works with six models
+
+§28 reported the label-free predictor as *untestable* rather than refuted: with
+four models, leave-one-model-out has three to learn from, between-model offsets
+dominate eight features, and the held-out prediction inverted (r = −0.492). Six
+models was the stated minimum for the test to mean anything.
+
+| models | held-out r (predicted vs true entropy AUROC) | p |
+|---|---|---|
+| 4 | −0.492 | 0.001 |
+| **6** | **+0.689** | <0.001 |
+
+**The sign flips and the prediction becomes genuinely useful.** Entropy's
+discriminative power in a cell is predictable, out of sample and across model
+families, from statistics of the **known-good split alone** — no labels, no
+fabricated examples. That is a real and, as far as I know, unreported observation:
+*you can tell how much to trust a confidence-based hallucination detector by
+looking only at how its confidence behaves on output you already believe.*
+
+The n=4 diagnosis was therefore correct, which is worth recording because the
+tempting move at the time was to call the proxy dead.
+
+**But it does not convert into a switching gain.** Switching on the prediction
+nets **+0.0025** against the oracle threshold rule's **+0.0132** — about 19% of
+what is available. The prediction correlates well over the full range but is not
+accurate enough *near the 0.61 boundary*, which is the only place the switching
+decision is actually contested. Rung 2 remains the practical route: **20 labelled
+examples buy +0.0104 (91% agreement with the oracle), 100 buy +0.0134 (99.5%)**.
+
+### Six-model summary
+
+| model | entropy | FIS | oracle | oracle gain |
+|---|---|---|---|---|
+| gemma3-270m | 0.5719 | 0.5868 | 0.6376 | **+0.0657** |
+| SmolLM2-135M | 0.7245 | 0.6076 | 0.7480 | +0.0235 |
+| qwen2.5-0.5b | 0.7705 | 0.5743 | 0.7762 | +0.0057 |
+| lfm2.5-350m | 0.8262 | 0.6059 | 0.8347 | +0.0085 |
+| SmolLM2-360M | 0.8464 | 0.8064 | 0.8826 | +0.0362 |
+| SmolLM2-1.7B | 0.9103 | 0.8630 | 0.9238 | +0.0136 |
+
+### Where this leaves the two questions
+
+* **"Is the fuzzy rule a small-model technique?"** No — that framing is wrong.
+  It is a *weak-entropy-model* technique, and weak entropy is not a function of
+  size. Gemma3-270m and SmolLM2-135M are the same order of magnitude and sit on
+  opposite sides of the crossover.
+* **"Can you know in advance whether to use it?"** Partly. With ~20 labels, yes
+  and cheaply. Label-free, you can predict entropy's reliability well (r = +0.69
+  held-out) but not sharply enough at the decision boundary to act on — so the
+  honest statement is *predictable, not yet actionable*.
+
+The remaining gap is precision near the crossover, not the existence of the
+signal. A classifier trained directly on "is this cell below the crossover"
+— rather than regressing AUROC and thresholding the prediction — is the obvious
+next attempt, and would need more models still to validate.
