@@ -1,34 +1,14 @@
 # Acknowledgements
 
-<!--
-TEMPLATE — to be written by the author.
+Even though this degree will end up being "mine", it really belongs to all of you. I cannot put an order on this, so please don't read anything into it.
 
-Front matter. Sits between the title page and Chapter 1; `build_pdf.py` places it
-there via SECTIONS. Nothing below is generated, and nothing in it should be, so no
-reproduction note and no harness provenance belongs on this page.
 
-Conventions the rest of the document follows, in case they are useful here:
-  * First person, past tense, plain prose. No bullet lists.
-  * Names in full on first use, with the role that makes the thanks legible to a
-    reader who does not know the department.
-  * Committee members appear on the title page already, so this page is for what
-    they did rather than that they served.
+- Dr. Kelly Cohen: My advisor. You have put up with many questions, many more texts, results both good and bad. Even more, thank you for the motivation to do this. You sharing your story of getting your PhD made me that much more confident that I could, in fact, get mine.
+- Jon Salisbury: My boss. You hired me without an interview, and then pushed open the door to connect me with Dr Cohen. You've made space at work for me to work on school, as well as to support and encourage in so many ways. Thanks, boss!
+- Dr Vladik Kreinovich: Your specific interest in my work, as well as the willingness to teach when my "odd conventions and nomenclature" came in the way of showing the real results.
+- Dr Kumar, Dr Minai, Dr Zhan: Thank you for your ready willingness to be a part of my committee, and for your challenges and advice on where my research and ideas can go.
+- Hannah Phillips: My wife. You've let me work while snuggled on the couch, and supported so much more than your "share of the work" around the house. I love you so much more than you know.
+- Dr Phillips: While not a member of my committee, you've been more than willing to talk about ideas, provide advice, and search for details behind the scenes. I'm even more grateful to call you, "Dad".
 
-Prompts, not a required structure — cut freely:
-  - Advisor and committee: specific contributions rather than general gratitude.
-    (One example already in the text: Dr. Kreinovich's observation that the
-    reorder was a priority-queue algorithm, which renamed the method — §3.3.1.)
-  - Co-authors on the NAFIPS papers (Ch 9 — exact author lists still to confirm).
-  - Departmental and lab colleagues; anyone who supplied data or compute.
-  - Funding, fellowships, assistantships, or institutional support — usually
-    required to be named explicitly, and worth checking the college's wording.
-  - Providers of the non-public datasets, subject to whatever the agreements
-    permit. Note the 135,000-row psychiatric set is not redistributable and its
-    features were anonymized before receipt (Appendix A.5), so check what may be
-    acknowledged by name.
-  - Family, friends, and anyone who absorbed the cost of the last few years.
 
-Delete this comment block before building the final document.
--->
-
-*To be written.*
+Once again, thank you all for your support, advice, and so much more.
