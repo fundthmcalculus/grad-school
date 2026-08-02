@@ -76,6 +76,7 @@ def main():
     print("Table 3.1 -- pVAT vs. classical VAT reorder time")
     pvat = _resolve_pvat()
     rows = []
+    means = []   # (classical_mean, pvat_mean) per N, for the normalized view
     for n in N_GRID:
         classical_t, pvat_t = [], []
         for seed in C.SEEDS:
@@ -99,12 +100,36 @@ def main():
         pm, _ = C.agg(pvat_t)
         speed = f"{cm / pm:.0f}x" if (cm and pm) else C.NA
         rows.append([f"{n:,}", c_cell, p_cell, speed])
+        means.append((cm, pm))
+
+    # The CSV above keeps absolute seconds. The Markdown normalizes each row
+    # against its worst (slowest) arm, which is the machine-independent view:
+    # seconds move with thermals, governor and host, the ratio between two arms
+    # measured in the same pass does not.
+    md_rows = []
+    for r, (c_m, p_m) in zip(rows, means):
+        cn, pn = C.normalized_worst([c_m, p_m])
+        if c_m is None and p_m:
+            # No reference to normalize against, but the method DID run, and that
+            # is the whole point of these rows: say so rather than printing N/A,
+            # which reads as "did not run".
+            cn, pn = "infeasible (>cap)", "ran (no reference to normalize against)"
+        md_rows.append([r[0], cn, pn])
 
     C.emit("table_3_1", "Table 3.1 -- Reorder time: classical VAT vs. pVAT",
-           ["N (points)", "classical VAT", "pVAT", "speedup"], rows,
+           ["N (points)", "classical VAT (s)", "pVAT (s)", "speedup"], rows,
+           md_header=["N (points)", "classical VAT", "pVAT"],
+           md_rows=md_rows,
            note=f"Random 2-D point sets; classical reference capped at N<={NAIVE_CAP} "
-                "(it is genuinely cubic). Re-run under the G4 protocol on stable "
-                "hardware for the citable version.")
+                "(it is genuinely cubic). **The Markdown columns are normalized against "
+                "the worst arm in each row**: the slower arm is the 1.0x baseline and the "
+                "faster one reads as 'this many times faster'. Ratios survive a change of "
+                "machine and absolute seconds do not, so the chapters quote these and the "
+                "companion CSV keeps the seconds with their per-seed spreads. Rows where "
+                "the cubic reference exceeds its cap have nothing to normalize against, so "
+                "they say pVAT 'ran' rather than printing either a lone 1.0x (which would "
+                "read as a comparison) or N/A (which would read as 'did not run'). "
+                "Re-run under the G4 protocol on stable hardware for the citable version.")
 
 
 if __name__ == "__main__":

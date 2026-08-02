@@ -1,6 +1,6 @@
 # Chapter 10 — Timeline
 
-The plan runs from the proposal defense at the end of 2026 to the final defense in **March 2028** — a little over a year of research runway. It is deliberately aggressive, per my own intent to defend a substantial body of results rather than a minimal one, and the risk of that is managed in Chapter 7: the completed work (Chapters 3 and 4) is the floor, and the stretch goal (G7) is the designated first cut. The schedule below is organized around the seven goals of Chapter 7 and the papers they feed. Quarters are calendar quarters; the goal labels match Table 7.1 and `ACTION_ITEMS.md`.
+The plan runs from the proposal defense at the end of 2026 to the final defense in **March 2028** — a little over a year of research runway. It is deliberately aggressive, per my own intent to defend a substantial body of results rather than a minimal one, and the risk of that is managed in Chapter 7: the completed work (Chapters 3 and 4) is the floor, and the stretch goal (G7) is the designated first cut. The schedule below is organized around the eight goals of Chapter 7 and the papers they feed. Quarters are calendar quarters; the goal labels match Table 7.1 and `ACTION_ITEMS.md`.
 
 ## 10.1 Gantt
 
