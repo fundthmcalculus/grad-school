@@ -10,15 +10,17 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
 
 ## A. Blocked on the author
 
-- [x] ✅ **A1 — Method renamed to `pqVAT`** (author decision, 2026-08-02).
-      *Decision: "make it `pqVAT` since it matches paper work as a priority queue. Acknowledge BDA 2013."*
-      `pVAT` was taken by Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013
-      (LNCS 8302:151–170) — also a GPU VAT that swaps the MST algorithm, so reading our *p* as
-      parallel/performant collided harder rather than less. Renamed across prose, chapters and
-      planning docs (60 occurrences); §3.3.1 now walks mergeVAT → pVAT → collision → pqVAT and
-      acknowledges the 2013 method by citation. **Recorded wrinkle:** stage two contains no
-      priority queue, so the name is exact for stage one and historical for stage two — §3.3.1
-      states this rather than letting a reader find it.
+- [x] ✅ **A1 — Method name settled: `mergeVAT`** (author decision, 2026-08-02).
+      The name went round-trip: mergeVAT → `pVAT` (on Dr. Kreinovich's observation that stage one
+      is a priority-queue algorithm) → collision → back to **mergeVAT**. `pVAT` is taken by
+      Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013 (LNCS 8302:151–170),
+      a GPU VAT that also swaps the MST algorithm, so reading our *p* as parallel/performant
+      collided harder rather than less. Acknowledged by citation in §3.3.1.
+      **The name is imperfect and §3.3.1 says so**: it describes neither stage one (priority
+      queue) nor stage two (compact active set). What it does describe is §3.3.4's
+      divide-and-conquer stitch — which is a merge, is measured, and is the least finished part
+      of the method. Kept because a stable imperfect name beats a third rename while the work
+      underneath settles. See **C10** for the open merge questions.
 - [ ] 🔒 **A2 — NAFIPS paper metadata** (Ch 9): exact titles, page numbers/DOIs, co-authors,
       which paper went to Banff 2025 vs. El Paso 2026, and whether they published separately
       or combined. Ch 9 cannot be finished without it.
@@ -96,6 +98,18 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
       threading threshold above a size cutoff produces exactly this step-then-plateau
       signature. A cache boundary or an allocation path would also fit. All testable; none
       tested. If it is thread startup, a size-gated serial path below ~1,500 is the fix.
+- [ ] ⬜ **C10 — Generalize the merge operator** *(new; the method is named after this, and it is
+      the most open item in Ch 3).* §3.3.4's stitch works and is measured — Table 3.6 has the
+      principled version at ARI 1.00 across every partition tested against 0.47 for naive
+      concatenation — but it is a two-way stitch over farthest-point-sampled blocks, not a general
+      operator. Three unknowns, all of which a distributed implementation needs:
+      **(a) does it compose?** Merging four blocks pairwise should give the same ordering as
+      merging them at once; untested. **(b) How does the reconstruction-error bound grow** under
+      repeated or hierarchical application rather than a single pass? **(c) How are block
+      boundaries chosen** when the data does not partition cleanly — the ablation shows
+      farthest-point sampling is *necessary* but not that it is *sufficient*.
+      Until these are settled, G4's half-million-point target rests on a single-level result.
+      Noted briefly in Ch 7 G4.
 - [ ] ⬜ **C3 — Ch 5 end-to-end FIS result.** Every Ch 5 number is a *clustering* score; the
       chapter exists to produce FIS antecedents. Until a model is built from them and measured,
       the central claim rests on a proxy. **Recommend pulling a minimal version into 2027 Q2**

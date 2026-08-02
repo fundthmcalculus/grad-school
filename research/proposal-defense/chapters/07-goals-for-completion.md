@@ -8,7 +8,7 @@
 
 ## 7.1 The Integrated Pipeline (the capstone deliverable)
 
-- **Goal:** a single end-to-end system — Data → pqVAT structure (Ch 3) → persistence/multi-scale selection + MF generation (Ch 5) → FIS synthesis (Ch 4/Ch 6) → optional structure-driven refinement (Ch 2/Ch 6) → interpretable FIS — demonstrated on real, large, non-metric data.
+- **Goal:** a single end-to-end system — Data → mergeVAT structure (Ch 3) → persistence/multi-scale selection + MF generation (Ch 5) → FIS synthesis (Ch 4/Ch 6) → optional structure-driven refinement (Ch 2/Ch 6) → interpretable FIS — demonstrated on real, large, non-metric data.
 - **Why it's the capstone:** each chapter proves a stage; the dissertation's central claim (orders-of-magnitude faster & larger, interpretable) is only fully demonstrated end-to-end.
 - Deliverable: one reproducible driver + one flagship case study carried through every stage.
 
@@ -25,8 +25,8 @@
 
 ### G4 — Scale & hardware credibility (Ch 3, Ch 5, Ch 6) — the board-wide repeatable-performance goal
 - **This goal is the consolidation point for the board-wide "repeatable performance" TODO** mirrored in every chapter that reports numbers. One fixed protocol covering both **scalability** and **stability**: pinned clocks/thermals, multiple seeds, reported error bars, datacenter GPU with full-rate FP64.
-- Applies to: Ch 3 pqVAT scaling/memory/GPU numbers; Ch 5 selection-pipeline scaling; Ch 6 training-time/accuracy/speedup numbers.
-- Plus: head-to-head vs eVAT & clusiVAT on identical datasets; distributed pqVAT toward 500K elements.
+- Applies to: Ch 3 mergeVAT scaling/memory/GPU numbers; Ch 5 selection-pipeline scaling; Ch 6 training-time/accuracy/speedup numbers.
+- Plus: head-to-head vs eVAT & clusiVAT on identical datasets; distributed mergeVAT toward 500K elements.
 
 ### G5 — Interpretability evaluation (Ch 6 + Ch 2.6)
 - Quantify interpretability (rule count, path length, expert-audience study or established metric); Magdalena-2018 rebuttal demonstrated empirically; optional SHAP contrast (interpretable-by-construction vs post-hoc).

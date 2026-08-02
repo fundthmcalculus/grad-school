@@ -26,7 +26,7 @@ gantt
     G7 adaptive multi-scale (stretch)         :g7, 2028-01-15, 30d
 
     section Papers & conferences
-    Ch3 pqVAT journal                          :p3, 2027-01-01, 90d
+    Ch3 mergeVAT journal                          :p3, 2027-01-01, 90d
     VAT complexity correction note            :pk, 2027-02-01, 75d
     Ch5 membership paper (write/submit)       :crit, p5, 2027-01-02, 59d
     EUSFLAT 2027 (present)                    :milestone, e27, 2027-09-15, 0d
@@ -55,7 +55,7 @@ G3  HME EM + baseline suite            .       .       .     ####    ####      .
 G6  interpretability, measured         .       .       .       .       .     ###
 G7  adaptive multi-scale (stretch)     .       .       .       .       .     ~~~
 ------------------------------------------------------------------------------------
-    Ch3 pqVAT journal                   .     ####      .       .       .       .
+    Ch3 mergeVAT journal                   .     ####      .       .       .       .
     VAT complexity note (if pursued)   .     ####      .       .       .       .
     Ch5 paper -> EUSFLAT 2027          .     SUB#      .     PRES      .       .
     Ch6 hierarchy paper                .       .       .       .     ####      .
@@ -71,7 +71,7 @@ Legend: `####` scheduled work · `SUB#` write and submit (EUSFLAT deadline **Feb
 | Quarter | Focus | Goals | Deliverable |
 |---|---|---|---|
 | **2026 Q4** | Proposal defense (**Dec**) | — | Defended proposal; committee feedback folded in |
-| **2027 Q1** | Close credibility gaps | G4 | Fixed-protocol re-timing (error bars); eVAT/clusiVAT head-to-head; one consistent Concrete benchmark so Ch 4 and Ch 6 numbers are comparable; Ch 3 → pqVAT journal; VAT complexity correction note (if the blocking reads support it); **Ch 5 paper written and submitted to EUSFLAT (Feb deadline)** |
+| **2027 Q1** | Close credibility gaps | G4 | Fixed-protocol re-timing (error bars); eVAT/clusiVAT head-to-head; one consistent Concrete benchmark so Ch 4 and Ch 6 numbers are comparable; Ch 3 → mergeVAT journal; VAT complexity correction note (if the blocking reads support it); **Ch 5 paper written and submitted to EUSFLAT (Feb deadline)** |
 | **2027 Q2** | Membership generation | G1, G5 | One-pass MF (roadmap phases 1–4); output-partitioning study. *(The Ch 5 paper has already gone out in Q1 — see §10.5.)* |
 | **2027 Q3** | Real data + hierarchy | G2, G3 (start) | DTW/edit/graph benchmarks; begin HME EM; **present at EUSFLAT 2027 (Sept)** |
 | **2027 Q4** | Hierarchy + baselines | G3 | HME EM done; ANFIS/CART/M5/flat-TSK suite; Ch 6 paper; writing begins |
