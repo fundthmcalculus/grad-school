@@ -1,7 +1,7 @@
 # Bibliography (working — to be consolidated into BibTeX)
 
 **Status:** Outline · aggregated from repo docs. Existing partial `.bib`: `tribble-fis/tribble-tree/hfis_review.bib` (35 entries). Consolidate all into one `references.bib` for the final document.
-**Action:** verify every DOI / page number before submission (flagged repeatedly in repo self-reviews). Drop the ungrounded "pqVAT six-orders-of-magnitude" web claim. Fix Zhang-2023 author attribution.
+**Action:** verify every DOI / page number before submission (flagged repeatedly in repo self-reviews). Drop the ungrounded "mergeVAT six-orders-of-magnitude" web claim. Fix Zhang-2023 author attribution.
 
 ---
 

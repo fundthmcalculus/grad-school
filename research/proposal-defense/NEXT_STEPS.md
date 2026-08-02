@@ -15,7 +15,7 @@ _Last updated: 2026-08-02. Proposal defense **December 2026** (confirmed) · fin
 | # | Item | Why it blocks | Effort |
 |---|---|---|---|
 | 0.1 | **Merge `fix/pin-extreme-bucket-means`** ([PR](https://github.com/fundthmcalculus/tribble-fis/pull/new/fix/pin-extreme-bucket-means)), then re-run `reproduce/run.py --chapter Ch4 --chapter Ch6` | Every Concrete number in the text was measured under the *old* solve. Small deltas (≤0.01), but the tables should describe shipped code. | 1 h |
-| ~~0.2~~ | ✅ **RESOLVED — the method is `pqVAT`** (priority-queue VAT). `pVAT` was taken by Parveen & Sreevalsan-Nair (BDA 2013), a *parallel* GPU VAT that also swaps the MST algorithm, so reading our *p* as parallel/performant collided harder. `pqVAT` is unambiguous and names the published contribution. Acknowledged in §3.3.1; renamed throughout. | — | done |
+| ~~0.2~~ | ✅ **SETTLED — the method is `mergeVAT`.** Round-trip: mergeVAT → `pVAT` (Kreinovich's priority-queue observation) → collision with Parveen & Sreevalsan-Nair (BDA 2013) → back to mergeVAT. §3.3.1 acknowledges the 2013 method and concedes the name is imperfect; it names §3.3.4's stitch, which is the least finished part. Open merge questions tracked as CHECKLIST C10. | — | done |
 | 0.3 | **NAFIPS paper metadata** (Ch 9): exact titles, page numbers/DOIs, co-authors, and which paper went to Banff 2025 vs. El Paso 2026 — and whether they published separately or combined. | Ch 9 cannot be finished without it. | your records |
 | 0.4 | **Confirm the flagship end-to-end dataset** — RT-IOT2022 / IoT-botnet, or UCI-58 Shuttle. | Defines the Ch 7 capstone. | decision |
 
