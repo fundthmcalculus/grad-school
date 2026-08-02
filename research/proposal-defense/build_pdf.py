@@ -59,9 +59,24 @@ LATEX_ENGINES = ["xelatex", "lualatex", "pdflatex", "tectonic"]
 # Map from the harness output names to the prose figure names.
 # Key: basename as output by reproduce/tables via common.save_figure()
 # Value: filename expected in prose/fig/
-FIGURE_COPIES = {
-    "fig_03_complexity_fit": "03-complexity-fit",
-}
+#
+# The figure inventory lives in `reproduce/figures/registry.py` -- one row per
+# figure cited in the prose, naming its generator and the environment it needs.
+# Importing it here means adding a figure is a one-file edit; the fallback keeps
+# this script working if it is ever run somewhere `reproduce/` is not present.
+def _figure_copies():
+    figures_dir = os.path.join(HERE, "..", "..", "reproduce", "figures")
+    try:
+        sys.path.insert(0, os.path.abspath(figures_dir))
+        import registry
+        return registry.figure_copies()
+    except Exception as exc:  # noqa: BLE001 -- report and fall back, never abort a build
+        print(f"  [warn] figure registry unavailable ({exc.__class__.__name__}); "
+              f"copying only the Chapter 3 complexity fit")
+        return {"fig_03_complexity_fit": "03-complexity-fit"}
+
+
+FIGURE_COPIES = _figure_copies()
 
 
 # --------------------------------------------------------------------------- #
