@@ -50,4 +50,4 @@ The remainder of the document follows the pipeline in order, and separates work 
 
 ---
 
-*Draft — Chapter 1 prose, in the author's voice. Two figure placeholders (1.1–1.2) inline. Source outline in `../chapters/01-introduction.md`; open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 1 prose, in the author's voice. Two figure placeholders (1.1–1.2) inline. Open items in `../ACTION_ITEMS.md`.*

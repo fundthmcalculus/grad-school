@@ -232,4 +232,4 @@ There is work left before this is airtight as a journal result, and I would rath
 
 ---
 
-*Draft — Chapter 3 prose, in the author's voice. Citations in bracketed shorthand pending the consolidated `references.bib`. Six tables (3.1–3.6) and one figure placeholder inline. Source outline in `../chapters/03-scalable-structure-discovery-pvat.md`; open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 3 prose, in the author's voice. Citations in bracketed shorthand pending the consolidated `references.bib`. Seven tables (3.1–3.7) and one figure placeholder inline. Open items in `../ACTION_ITEMS.md`.*

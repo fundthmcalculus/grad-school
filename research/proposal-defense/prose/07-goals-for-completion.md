@@ -82,4 +82,4 @@ The floor under all of this is that Chapters 3 and 4 — the accelerated exact V
 
 ---
 
-*Draft — Chapter 7 prose, in the author's voice. One table placeholder. Source outline in `../chapters/07-goals-for-completion.md`; goals G1–G8 tracked in `../ACTION_ITEMS.md` and mapped to the Chapter 10 timeline.*
+*Draft — Chapter 7 prose, in the author's voice. One table placeholder. Goals G1–G8 tracked in `../ACTION_ITEMS.md` and mapped to the Chapter 10 timeline.*

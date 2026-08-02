@@ -85,4 +85,4 @@ I want to be honest about the cost. There is a real accuracy–interpretability 
 
 ---
 
-*Draft — Chapter 2 prose, in the author's voice. Citations shown in bracketed shorthand for now; to be reconciled against the consolidated `references.bib`. Three figure placeholders (2.1–2.3) inline. Source outline in `../chapters/02-background.md`.*
+*Draft — Chapter 2 prose, in the author's voice. Citations shown in bracketed shorthand for now; to be reconciled against the consolidated `references.bib`. Three figure placeholders (2.1–2.3) inline.*

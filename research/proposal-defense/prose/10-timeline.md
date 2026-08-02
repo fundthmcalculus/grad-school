@@ -106,4 +106,4 @@ The 15-month runway has little slack, which is intentional. **G7 (adaptive multi
 - ~~Confirm the EUSFLAT 2027 submission deadline~~ — **confirmed: February 2027** (conference September 2027). This is a quarter earlier than the schedule above assumed; see §10.5. NAFIPS 2025 Banff and NAFIPS 2026 El Paso are already published.
 - Confirm teaching/RA load per semester (affects realistic throughput).
 
-*Draft — Chapter 10 prose + Gantt, in the author's voice. Source outline in `../chapters/10-timeline.md`; goals map to Table 7.1 and `../ACTION_ITEMS.md`.*
+*Draft — Chapter 10 prose + Gantt, in the author's voice. Goals map to Table 7.1 and `../ACTION_ITEMS.md`.*

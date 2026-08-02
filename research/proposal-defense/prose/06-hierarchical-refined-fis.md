@@ -166,4 +166,4 @@ I should be equally clear about the interpretability claim, since I have used th
 
 ---
 
-*Draft — Chapter 6 prose, in the author's voice; built vs. proposed marked throughout. Citations in bracketed shorthand pending the consolidated `references.bib`. Four tables (6.1–6.4) and three figure placeholders (6.1–6.3) inline. Source outline in `../chapters/06-hierarchical-refined-fis.md`; open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 6 prose, in the author's voice; built vs. proposed marked throughout. Citations in bracketed shorthand pending the consolidated `references.bib`. Four tables (6.1–6.4) and three figure placeholders (6.1–6.3) inline. Open items in `../ACTION_ITEMS.md`.*

@@ -164,4 +164,4 @@ tribble-fis issues #49 (the regression) and #50 (`top_p` semantics).*
 
 ---
 
-*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring) and A.5 (reproducibility) are written out; A.1/A.2 are inventories to be filled as the figures and repeatability runs land. Source outline in `../chapters/appendix.md`; open items in `../ACTION_ITEMS.md`.*
+*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring) and A.5 (reproducibility) are written out; A.1/A.2 are inventories to be filled as the figures and repeatability runs land. Open items in `../ACTION_ITEMS.md`.*

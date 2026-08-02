@@ -12,4 +12,4 @@ The broader point I want to leave the committee with is methodological. The prev
 
 ---
 
-*Draft — Chapter 8 prose, in the author's voice; concise conclusion closing the tribble and structure-before-search motifs. Source outline in `../chapters/08-conclusion.md`.*
+*Draft — Chapter 8 prose, in the author's voice; concise conclusion closing the tribble and structure-before-search motifs.*
