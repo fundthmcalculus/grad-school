@@ -27,7 +27,7 @@ Spine per author decision: primary framing = *scalable full-pipeline*, mechanism
 
 | Pillar | Repo | Status | Home |
 |---|---|---|---|
-| 1. Scalable structure discovery (pVAT — priority-queue/Borůvka VAT, VAT/iVAT, VAT↔TSP) | `tribble-cluster` | **Done** (NAFIPS papers 1 & 2) | Part II, Ch 3 |
+| 1. Scalable structure discovery (pqVAT — priority-queue/Borůvka VAT, VAT/iVAT, VAT↔TSP) | `tribble-cluster` | **Done** (NAFIPS papers 1 & 2) | Part II, Ch 3 |
 | 2. Automatic selection + membership generation (persistence-gated set-cover, multi-scale, relational MF) | `gated-minimax-selection` | **Proposed / active** (strong preliminary results) | Part III, Ch 5 |
 | 3. Fast interpretable FIS synthesis (MoG antecedents, ridge-TSK, hierarchical trees/HME, Ruspini, MIMO) | `tribble-fis` | **Split:** MoG done; ridge-TSK/hFIS partial | Part II Ch 4 (MoG) + Part III Ch 6 (ridge-TSK/hFIS) |
 | 4. Optimization / refinement engine (metaheuristics, Lin-Kernighan, quality-diversity, perf kernels) | `tribble-opt` | **Done** (supporting infrastructure — NOT core dissertation) | **Appendix A.3**; brief motivating mention only in Ch 2; standalone-paper flags below |
@@ -44,7 +44,7 @@ Spine per author decision: primary framing = *scalable full-pipeline*, mechanism
 - **Ch 2 — Background & Preliminaries** (`02-background.md`): Fuzzy logic & FIS; VAT/iVAT & single-linkage; persistence/TDA; the optimization/initialization bottleneck (brief — motivates "structure before search"; tribble-opt library details live in Appendix A.3); interpretability & the accuracy–interpretability trade.
 
 ### Part II — Completed Work
-- **Ch 3 — Scalable Structure Discovery: pVAT** (`03-scalable-structure-discovery-pvat.md`): accelerated exact VAT/iVAT via priority-queue argmin (CPU) and Borůvka MST (parallel/GPU), in-place memory, divide-&-conquer with principled stitch, arbitrary/non-metric dissimilarity; VAT↔TSP hot-start. Name honors Dr. Kreinovich's priority-queue observation (was "mergeVAT").
+- **Ch 3 — Scalable Structure Discovery: pqVAT** (`03-scalable-structure-discovery-pvat.md`): accelerated exact VAT/iVAT via priority-queue argmin (CPU) and Borůvka MST (parallel/GPU), in-place memory, divide-&-conquer with principled stitch, arbitrary/non-metric dissimilarity; VAT↔TSP hot-start. Name honors Dr. Kreinovich's priority-queue observation (was "mergeVAT").
 - **Ch 4 — Fast Interpretable FIS Synthesis via Mixture-of-Gaussians** (`04-fast-fis-synthesis-mog.md`): MoG antecedent/rule generation with no GA/GD, closed-form ridge-TSK consequents (done portion), interpretability by construction.
 
 ### Part III — Proposed Work & Goals for Completion
@@ -72,8 +72,8 @@ The repo docs are candid adversarial self-reviews; preserve that rigor:
 - **Novelty = composition + regime, not primitives.** VAT, iVAT, FCM, MST-cut, minimax, Lin-Kernighan, persistence gating are all faithfully re-implemented prior art. State this plainly; claim the integrated architecture and the unoccupied regimes.
 - **Concede nearest precedents** explicitly (Bonis & Oudot 2014/2018 for persistence-based fuzzy membership; Medina-Chico 2001 for soft trees w/ linear leaves; Wu 2020 for TSK≡MoE; eVAT/Fast-VAT/clusiVAT for fast VAT; Magdalena 2018 for hierarchy≠interpretability).
 - **Report negatives** (VAT is a poor closed-tour TSP start; GPU FP64 pairwise loses at low-d; population methods overfit CV in antecedent refinement; tree/HME trades accuracy for interpretability).
-- **Fixes to make before submission:** retire the "priority-queue MST speedup" O-notation framing for dense graphs; drop the ungrounded "pVAT six-orders-of-magnitude" web claim; fix Zhang-2023 attribution; re-verify DOIs.
-- **BOARD-WIDE TODO — repeatable performance results (scalability AND stability):** every performance/scaling number in the dissertation (Ch 3 pVAT, Ch 5 selection scaling, Ch 6 benchmarks) must be reproduced under one fixed protocol before it is cited — pinned clocks/thermals, multiple seeds, reported error bars, and a datacenter GPU with full-rate FP64. Current numbers are single-machine point estimates, some thermally throttled. Consolidated as Goal G4 (Ch 7); a `TODO — repeatable performance` note is mirrored in each chapter that reports numbers.
+- **Fixes to make before submission:** retire the "priority-queue MST speedup" O-notation framing for dense graphs; drop the ungrounded "six-orders-of-magnitude" web claim; fix Zhang-2023 attribution; re-verify DOIs.
+- **BOARD-WIDE TODO — repeatable performance results (scalability AND stability):** every performance/scaling number in the dissertation (Ch 3 pqVAT, Ch 5 selection scaling, Ch 6 benchmarks) must be reproduced under one fixed protocol before it is cited — pinned clocks/thermals, multiple seeds, reported error bars, and a datacenter GPU with full-rate FP64. Current numbers are single-machine point estimates, some thermally throttled. Consolidated as Goal G4 (Ch 7); a `TODO — repeatable performance` note is mirrored in each chapter that reports numbers.
 
 ---
 
