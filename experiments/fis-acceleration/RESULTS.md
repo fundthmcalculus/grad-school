@@ -168,13 +168,49 @@ parts of the problem.
   → 652 ms). cProfile's per-call overhead systematically overstates small
   functions called thousands of times, which is every function in that loop.
 
-### The acceptance guard does not do what its name suggests
+## Phase 3: the guard, and a lesson about strengthening things
 
-Worth recording independently. It compares a refined model against the
-*heuristic*, which scored 0.005–0.51 on these problems — so it accepts
-essentially everything, including a run that lost 9.7 points against a sibling
-configuration. It protects against refining being worse than not refining, and
-says nothing about one refinement being worse than another.
+The acceptance guard looked underpowered — it compares a refined model against
+the *heuristic*, which scored 0.005–0.51 on these problems, so it accepts
+essentially everything. Filed as an issue with four routes to strengthen it
+(paired McNemar test, effect-size floor, scoring on cross-entropy, cross-
+validated refereeing) plus one to delete it.
+
+All four strengthening routes were implemented and measured against a ground
+truth — a test set neither the search nor the guard ever sees, 108 cases. **All
+four made things worse.**
+
+| guard | accept rate | false accepts | false rejects | mean kept accuracy |
+|---|---|---|---|---|
+| legacy | 0.676 | 6 / 12 | 24 / 85 | 0.8145 |
+| cross-entropy | 0.676 | 7 / 12 | 25 / 85 | 0.8139 |
+| effect-size | 0.426 | 2 / 12 | 44 / 85 | 0.8084 |
+| McNemar | 0.324 | 2 / 12 | 53 / 85 | 0.8044 |
+| **none** | 1.000 | 12 / 12 | 0 / 85 | **0.8296** |
+
+Each route does exactly what it was designed to do — McNemar really does cut
+false accepts from 6 to 2 — and each pays for it with far more false rejects.
+The base rate defeats all of them: refinement wins 85 times and loses 12,
+gaining ~4 points when it wins and shedding ~2 when it loses. Rejecting is
+usually the wrong call, and no threshold changes that.
+
+Two things in the issue's own diagnosis were wrong:
+
+- **The data mattered more than the decision.** Reclaiming the 25% validation
+  holdout, which only existed to referee a decision no longer being made, was
+  worth +0.0112 — nearly three times the +0.0039 from removing the rejection
+  rule itself.
+- **The "bounded worst case" defence fails.** No guard has the better worst
+  case; `none` does (0.4583 against 0.4028).
+
+The general lesson, which is the same one phases 1 and 2 kept teaching: a
+mechanism that is obviously too weak is not therefore worth strengthening.
+Measure what it costs before deciding which direction to move it.
+
+Also corrected: `MixtureOfGaussiansFuzzyClassifier.refine` was documented as
+"accepted only if it does not worsen a held-out validation split, so it can
+never hurt". The mechanism existed; the guarantee did not. Refinement is worse
+than not refining about one time in nine, typically by ~2 points.
 
 ## The PR stack
 
@@ -198,3 +234,9 @@ Phase 2 — operators and search:
 | [#60](https://github.com/fundthmcalculus/tribble-fis/pull/60) norm pass-through | the bug that made the rest measurable; `sub_method` |
 | [#61](https://github.com/fundthmcalculus/tribble-fis/pull/61) probability default | +2.5pp accuracy |
 | [#64](https://github.com/fundthmcalculus/tribble-fis/pull/64) SLSQP + auto gradient | 1.96x combined, accuracy-positive |
+
+Phase 3 — the guard ([#65](https://github.com/fundthmcalculus/tribble-fis/issues/65)):
+
+| PR | receipt |
+|---|---|
+| [#66](https://github.com/fundthmcalculus/tribble-fis/pull/66) drop the acceptance guard | +1.5pp; four strengthening routes measured and rejected |
