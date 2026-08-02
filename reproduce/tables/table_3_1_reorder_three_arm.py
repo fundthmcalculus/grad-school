@@ -42,12 +42,22 @@ _TABLES = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_TABLES))
 import common as C  # noqa: E402
 
-N_GRID = [int(x) for x in os.environ.get("REPRO_N_GRID", "500,1000,2000,4000").split(",")]
-CUBIC_CAP = int(os.environ.get("REPRO_CUBIC_CAP", "1500"))
-# Separate, deliberately small grid for the complexity fit: every point must be
-# cheap enough that the cubic arm runs there too.
-FIT_N_GRID = [int(x) for x in
-              os.environ.get("REPRO_FIT_N_GRID", "100,200,300,500,750,1000").split(",")]
+# One sweep feeds both tables. The grid is in two parts, for a reason.
+#
+#   BASE  every arm runs here. The ceiling is set by the CUBIC arm: it has to
+#         run at every base point so its exponent is fitted from the same
+#         samples as the others, rather than from the two that fit under a cap.
+#   EXT   the two quadratic arms only. They are milliseconds at the base grid,
+#         which is where timer resolution rather than the algorithm dominates,
+#         so they are carried out to a size where the runtime is large enough
+#         to measure. The cubic arm cannot follow them there -- N=3000 cubed is
+#         hours -- and that asymmetry is the point of splitting the grid.
+N_BASE = [int(x) for x in
+          os.environ.get("REPRO_N_BASE", "100,200,300,500,750,1000").split(",")]
+N_EXT = [int(x) for x in
+         os.environ.get("REPRO_N_EXT", "1250,1500,2000,2500,3000").split(",")]
+N_GRID = N_BASE + N_EXT
+CUBIC_CAP = int(os.environ.get("REPRO_CUBIC_CAP", str(max(N_BASE))))
 REPEATS = int(os.environ.get("REPRO_REPEATS", "3"))
 
 
@@ -210,7 +220,8 @@ def main():
                         cn if r[1] != "not run (> cap)" else "not run (> cap)",
                         hn, dn, r[6]])
 
-    emit_complexity_fit(classical, heap, dense)
+    emit_complexity_fit(N_GRID, [m[0] for m in means],
+                        [m[1] for m in means], [m[2] for m in means])
 
     C.emit("table_3_1_three_arm",
            "Table 3.1 — Reorder time across the three complexity regimes",
@@ -305,32 +316,13 @@ def _plot(ns, series, basename):
     plt.close(fig)
 
 
-def emit_complexity_fit(classical, heap, dense):
+def emit_complexity_fit(ns, tc, th, td):
     """Table 3.2 + its figure -- measured growth vs N^2, N^2 log N and N^3.
 
-    Deliberately swept on a SMALL grid, separate from the main three-arm table.
-    Keeping the largest N modest is what lets the cubic reference run at every
-    point, so all three arms are fitted from the same number of samples instead
-    of the cubic one being fitted from the two that fit under its cap. The
-    large-scale envelope is a different experiment (the OpenMP/GPU work), and
-    mixing the two would mean fitting an exponent across a change of machinery.
+    Consumes the shared sweep rather than re-timing: the same measurements that
+    produce Table 3.1 are what the exponents are fitted from, so the two tables
+    can never disagree about how long anything took.
     """
-    ns = FIT_N_GRID
-    print(f"\n  complexity-fit sweep on N={ns} (small by design: the cubic arm "
-          f"must run at every point)")
-    tc, th, td = [], [], []
-    for n in ns:
-        c_s, h_s, d_s = [], [], []
-        for seed in C.SEEDS:
-            D = distance_matrix(n, seed)
-            d_s.append(time_best_of(dense, D)[0])
-            if heap is not None:
-                h_s.append(time_best_of(heap, D)[0])
-            if classical is not None:
-                c_s.append(time_best_of(classical, D, repeats=1)[0])
-        tc.append(C.agg(c_s)[0]); th.append(C.agg(h_s)[0]); td.append(C.agg(d_s)[0])
-        print(f"    n={n:<6} done")
-
     arms = [("classical", tc, "N³", 3.0),
             ("stage 1", th, "N² log N", None),
             ("stage 2", td, "N²", 2.0)]
@@ -351,7 +343,8 @@ def emit_complexity_fit(classical, heap, dense):
     fit += ["2.00", "~2.1", "3.00"]
     rows.append(fit)
 
-    _plot(ns, [(a[0], a[1]) for a in arms if any(a[1])], "fig_03_complexity_fit")
+    _plot(ns, [(a[0], a[1]) for a in arms if any(v for v in a[1])],
+          "fig_03_complexity_fit")
 
     C.emit("table_3_1_complexity_fit",
            "Table 3.2 — Measured growth against the reference complexity curves",
@@ -363,13 +356,19 @@ def emit_complexity_fit(classical, heap, dense):
                  "straight line of slope k, independent of machine, language and constant "
                  "factor, which is what makes the comparison portable. The last row is the "
                  "least-squares slope of log(time) against log(N) -- the measured exponent "
-                 "-- beside the exponent each arm is supposed to have. The grid is "
-                 "deliberately SMALL: keeping the largest N modest is what lets the cubic "
-                 "reference run at every point, so all three arms are fitted from the same "
-                 "samples rather than the cubic one being fitted from the two that fit "
-                 "under its cap. The large-scale envelope is a separate experiment "
-                 "(OpenMP/GPU); fitting an exponent across a change of machinery would "
-                 "measure the machinery. Companion figure: "
+                 "-- beside the exponent each arm is supposed to have. The grid is in two "
+                 "parts. Every arm runs the BASE grid, whose ceiling is set by the cubic "
+                 "arm, so all three exponents are fitted from the same samples rather than "
+                 "the cubic one being fitted from whatever happens to fit under a cap. The "
+                 "two quadratic arms then continue onto an EXTENSION, because at the base "
+                 "grid they take milliseconds and the timer rather than the algorithm "
+                 "dominates; carrying them to a size with a measurable runtime is what "
+                 "makes their exponents mean anything. The cubic arm cannot follow -- N=3000 "
+                 "cubed is hours -- and that asymmetry is the reason for the split. NOTE the "
+                 "stage-two column: a fixed cost of roughly 10 ms engages at N>=750 and "
+                 "dominates until the quadratic work catches up with it, which is why that "
+                 "arm is flat across the middle of the grid and why it LOSES to stage one "
+                 "between 750 and 1000. Companion figure: "
                  "`outputs/figures/fig_03_complexity_fit.{png,eps}` -- PNG for the "
                  "Markdown, EPS for the LaTeX build."))
 

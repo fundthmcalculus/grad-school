@@ -155,7 +155,7 @@ I should be clear about the prior art, since novelty detection and open-set reco
 
 The datasets here are public, so unlike the psychiatric set of Chapter 3 I can name them freely.
 
-On the **PhiUSIIL phishing URL** dataset the model reaches 0.997 ± 0.001 accuracy in a little under a second, with two rules and a handful of clauses. That is the headline: a readable, two-rule fuzzy classifier, competitive on accuracy, trained in the time it takes to describe it. I should temper the "competitive" immediately, though — CART and a random forest both score a perfect 1.000 on this dataset, so PhiUSIIL is saturated and cannot separate these methods on accuracy. What it demonstrates is the *rule count and the training time*, not superiority.
+On the **PhiUSIIL phishing URL** dataset the model reaches 0.997 ± 0.001 accuracy in about seven-tenths of a second, with two rules and a handful of clauses. That is the headline: a readable, two-rule fuzzy classifier, competitive on accuracy, trained in the time it takes to describe it. I should temper the "competitive" immediately, though — CART and a random forest both score a perfect 1.000 on this dataset, so PhiUSIIL is saturated and cannot separate these methods on accuracy. What it demonstrates is the *rule count and the training time*, not superiority.
 
 On **RT-IOT2022** — 123,000 instances, 83 features, 12 output classes — the model trains in under a minute. This is the scale point: the answer-first construction does not fall over when the data gets large and multi-class, because the work is proportional to classes times features rather than to any product over inputs.
 
@@ -169,7 +169,7 @@ The reconciliation this section used to promise has now been done. Chapter 6 pre
 
 | Dataset (task) | Size (N × M) | Train time | Accuracy / R² | Rule base |
 |---|---|---:|---:|---|
-| PhiUSIIL (binary classification) | 235K × 54 | 0.92 ± 0.03 s | 0.997 ± 0.001 acc. | 2 rules (K = 2) |
+| PhiUSIIL (binary classification) | 235K × 54 | 0.72 ± 0.04 s | 0.997 ± 0.001 acc. | 2 rules (K = 2) |
 | RT-IOT2022 (12-class) | 123K × 83 | < 60 s | *pending* | ~12 rules (K = 12) |
 | Concrete (regression, TSK order 1) | 1,030 × 8 | seconds | R² = 0.772 ± 0.034 | 3 output buckets |
 | Concrete (regression, TSK order 2) | 1,030 × 8 | seconds | R² = 0.824 ± 0.043 | 3 output buckets |
@@ -177,12 +177,12 @@ The reconciliation this section used to promise has now been done. Chapter 6 pre
 
 The rule-base column is the point of the table as much as the accuracy is: for classification the count is simply the number of classes, and for regression the number of output buckets — never a product over inputs. RT-IOT2022 is the sharpest case, since a grid over 83 features would be beyond enumeration while this model carries twelve rules.
 
-**Table 4.5 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol. The MoG entry is deliberately split across two rows: an earlier version of this table paired the best accuracy with a training time measured on a *different* configuration, which is exactly the kind of quiet mismatch the reproduction harness exists to prevent. The harness times the as-shipped default; the full-second-order arm's training time is not separately instrumented yet and is marked pending rather than borrowed from the row above it.
+**Table 4.5 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol. Two notes on how to read it. The Concrete column runs **every** arm on the log-and-standardized features of §4.3, so nothing in it is comparing models fitted on different inputs — an earlier version of this table paired the MoG's best accuracy with a training time measured at raw features, which is exactly the quiet mismatch the harness exists to prevent. Applying the transform uniformly costs the baselines nothing: CART and Random Forest split on rank and are therefore invariant to any monotone transform, which Table 4.1 measures directly at +0.001 and +0.000, so their column reads the same either way and the uniformity is free. And the MoG appears on two rows because only the first is fully instrumented: the 1st-order row's accuracy and training time come from the same measured run, while the full-second-order arm's time is not separately timed yet and is marked pending rather than borrowed from the row above.
 
 | Method | Concrete R² | Concrete train time | PhiUSIIL accuracy | PhiUSIIL train time |
 |---|---:|---:|---:|---:|
-| **MoG FIS** — as-shipped default | 0.650 ± 0.056 | **0.61 ± 0.03 s** | **0.997 ± 0.001** | **0.92 ± 0.03 s** |
-| **MoG FIS** — full 2nd, log + standardized | **0.859 ± 0.039** | *pending* | — | — |
+| **MoG FIS (this work)**, 1st order | 0.780 ± 0.029 | **0.37 ± 0.01 s** | **0.997 ± 0.001** | **0.72 ± 0.04 s** |
+| **MoG FIS**, full 2nd order | **0.859 ± 0.039** | *pending* | — | — |
 | ANFIS | *pending* | *pending* | *pending* | *pending* |
 | GA-tuned FIS | *pending* | *pending* | *pending* | *pending* |
 | CART (reference) | 0.826 ± 0.047 | seconds | 1.000 ± 0.000 | seconds |

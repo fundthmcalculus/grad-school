@@ -75,7 +75,7 @@ The last piece extends the same machinery to time. I augment each feature with a
 
 ## 6.4 Results and Proposed Experiments
 
-> **Reproduction.** Table 6.1 regenerates from `reproduce/tables/table_concrete_reconciliation.py`, which is the script that runs every model on identical splits, seeds, and preprocessing — that uniformity is the whole point of the table, so it does *not* come from the similarly named `table_6_1_model_family.py`, which deliberately runs the fuzzy arms at raw preprocessing and library defaults. That script instead supplies Table 6.2's external baselines (CART, Random Forest, and an optional M5 adapter). Table 6.3 is structural and has no generator. Table 6.4 comes from the double-pendulum experiment in `tribble-fis`. Both harness scripts emit Markdown and CSV with mean ± standard deviation across a fixed seed set; cells marked *pending* are those whose adapter was not yet wired up, and the harness reports what it could not run rather than substituting a guess. Per-cell provenance is tracked in `reproduce/PROVENANCE_MAP.md`.
+> **Reproduction.** Table 6.1 is assembled from *two* generators, and it is worth saying which supplies what. `reproduce/tables/table_concrete_reconciliation.py` produces the flat-model rows, including the antecedent-refinement arm, which only it runs. `table_hyperparam_normalization.py` produces the demo-tuned column for the tree and the mixture, which only it runs. Combining them is safe rather than convenient: the two scripts share splits and seeds, and they agree to three decimals on every row they both compute — flat 2nd order, the fuzzy tree and mixture at library defaults, CART and Random Forest — so the join is cross-validated rather than assumed. Neither is the similarly named `table_6_1_model_family.py`, which deliberately runs the fuzzy arms at raw preprocessing and library defaults and instead supplies Table 6.2's external baselines (CART, Random Forest, and an optional M5 adapter). Table 6.3 is structural and has no generator. Table 6.4 comes from the double-pendulum experiment in `tribble-fis`. Both harness scripts emit Markdown and CSV with mean ± standard deviation across a fixed seed set; cells marked *pending* are those whose adapter was not yet wired up, and the harness reports what it could not run rather than substituting a guess. Per-cell provenance is tracked in `reproduce/PROVENANCE_MAP.md`.
 >
 > **TODO — repeatable performance (board-wide standard):** the training-time, accuracy, and speedup numbers here need the fixed reproducibility protocol and the full baseline suite before citation (see `ACTION_ITEMS.md` §A/§C and Ch 7 Goal G4/G3).
 
@@ -93,17 +93,17 @@ Refinement helps most where the consequent model has least capacity to begin wit
 
 The shape of the correction is worth more than the number, and I should be careful about how far I push it. Refinement's value decays sharply with the capacity of the consequent model: worth 0.914 at zeroth order, 0.072 at first, 0.037 at second — a factor of twenty-five across the range. That is the same direction §6.3.5 reported for the population methods, where differential evolution and a genetic algorithm overfit the cross-validation estimate and a plain local optimizer beat them. Both observations point the same way: once the structure has been recovered from the data, additional search buys progressively less. An earlier draft went further and claimed refinement actively *hurts* at high capacity, on the strength of a full-second-order row that lost 0.027. Under this protocol I cannot support that — refinement's contribution shrinks toward zero but stays positive at every order measured, and the negative row came from a configuration that is not in the uniform sweep. The honest version of the *structure before search* argument here is diminishing returns, not damage.
 
-**Table 6.1 — The model family on Concrete: architecture × configuration.** All arms at the log-and-standardize preprocessing of Chapter 4 §4.3; 10 seeds, shared splits, $R^2$ mean ± standard deviation with RMSE in MPa alongside. The columns are the hyperparameter setting; the flat model has a single pipeline configuration, so its rows vary the consequent basis instead.
+**Table 6.1 — The model family on Concrete: architecture × configuration.** All arms at the log-and-standardize preprocessing of Chapter 4 §4.3; 10 seeds, shared splits. Each cell is $R^2$ with RMSE in MPa beneath it, both as mean ± standard deviation. The columns are the hyperparameter setting; the flat model has one pipeline configuration, so its rows vary the consequent basis instead.
 
 | Model | default settings | demo-tuned |
 |---|---:|---:|
-| Flat MoG-TSK, 2nd order | 0.824 ± 0.043 (6.84) | — |
-| Flat MoG-TSK, full 2nd order | 0.859 ± 0.039 (6.10) | — |
-| Flat MoG-TSK, 2nd + antecedent refinement | **0.861 ± 0.044** (6.01) | — |
-| Mixture of experts (HME) | 0.781 ± 0.068 (7.54) | **0.833 ± 0.024** (6.67) |
-| Fuzzy tree | 0.688 ± 0.056 (9.09) | 0.741 ± 0.051 (8.28) |
-| CART (reference) | 0.826 ± 0.047 (6.73) | — |
-| Random Forest (reference) | **0.909 ± 0.019** (4.90) | — |
+| Flat MoG-TSK, 2nd order | 0.824 ± 0.043 <br> *6.84 ± 0.94 MPa* | — |
+| Flat MoG-TSK, full 2nd order | 0.859 ± 0.039 <br> *6.10 ± 0.91* | — |
+| Flat MoG-TSK, 2nd + antecedent refinement | **0.861 ± 0.044** <br> *6.01 ± 0.79* | — |
+| Mixture of experts (HME) | 0.781 ± 0.068 <br> *7.54 ± 0.98* | **0.833 ± 0.024** <br> *6.67 ± 0.56* |
+| Fuzzy tree | 0.688 ± 0.056 <br> *9.09 ± 0.58* | 0.741 ± 0.051 <br> *8.28 ± 0.63* |
+| CART (reference) | 0.826 ± 0.047 <br> *6.73 ± 0.74* | — |
+| Random Forest (reference) | **0.909 ± 0.019** <br> *4.90 ± 0.31* | — |
 
 These supersede the figures this chapter previously carried (flat 0.658, tree 0.746, mixture 0.791), which came from three different configurations and could not be read against one another. The table is deliberately a grid rather than a ranking, because the honest answer to "does the hierarchy beat the flat model?" turns entirely on what one holds fixed — and an earlier draft of this chapter picked a favourable answer without saying so, then a later one picked an unfavourable answer for the same bad reason.
 
