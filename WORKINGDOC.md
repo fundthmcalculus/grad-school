@@ -1,6 +1,8 @@
 # Working doc — making the proposal's tables and scripts reproducible
 
-_Session of 2026-08-01/02. Branch `feat/proposal-def-1`, pushed through `e9fce32`._
+_Session of 2026-08-01/02. Branch `feat/proposal-def-1`, pushed. Run of record and
+submodule pins are in the table below; those are the versions to check, not this
+doc's own commit._
 
 The task was "ensure all tables and scripts are reproducible." What that turned
 into: three scripts that did not run at all, a submodule on a commit that did not
@@ -20,7 +22,7 @@ Start with `reproduce/PROVENANCE_MAP.md` — the per-table index this work produ
 | Branch | `feat/proposal-def-1`, pushed, in sync |
 | Submodules | `tribble-fis` `4371a9d` · `tribble-cluster` `5d44dfa` · `tribble-opt` `94547ff` |
 | Seed standard | **10** (`common.SEEDS`) — protocol, not a knob |
-| Run of record | `reproduce/outputs/full-2026-08-02/` — 11 tables, all green, ~23 min |
+| Run of record | `reproduce/outputs/full-2026-08-02/` — 11 tables, all green, 24 min |
 | Concrete runtime | **369 s**, from 1301 s serial (analytic gradient + parallelism) |
 
 Two things need your judgement, in §5.
@@ -75,7 +77,7 @@ result.
 
 ## 2. Upstream: what this surfaced in `tribble-fis`
 
-Nine issues filed; six fixed and merged.
+Nine issues filed. **All nine are now closed**, across six upstream PRs.
 
 | | | |
 |---|---|---|
@@ -126,6 +128,13 @@ architecture**. A change to a step the pipeline treats as preprocessing damaged
 readability far more than accuracy, which an accuracy-only evaluation would never
 have surfaced.
 
+**What did *not* move, checked rather than assumed.** Tables 4.2, 4.3 and 4.6/4.7
+are byte-identical between the pre- and post-fix sweeps — the first two are
+synthetic and the third runs on Glass, so no Concrete or PhiUSIIL change can
+reach them. Table 4.1 is unchanged too: its rows are the library-default arms,
+and only the *demo-tuned* tree and mixture rows of the underlying table moved.
+Worth stating because "unchanged" is a claim like any other.
+
 **Tables 4.6/4.7 re-quoted twice, and the ordering flipped both times.**
 Complement-rule-leads → isolation-forest-by-0.038 → level to 0.002. Three
 orderings from one experiment is the tell that all three were noise; the table
@@ -136,7 +145,7 @@ now says so rather than naming a winner.
 ## 4. Running it
 
 ```bash
-reproduce/run_all_tables.sh my-label            # ~23 min, all 11 tables
+reproduce/run_all_tables.sh my-label            # 24 min, all 11 tables
 reproduce/run_all_tables.sh --fast smoke-check  # minutes, stamped NOT CITABLE
 uv run --project tribble-cluster --with scipy \
     python reproduce/experiments/run_cluster_experiment.py --all   # Ch3 figures
