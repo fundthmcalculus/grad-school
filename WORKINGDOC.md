@@ -1,15 +1,15 @@
 # Working doc — making the proposal's tables and scripts reproducible
 
-_Session of 2026-08-01. Branch `feat/proposal-def-1`, pushed through `7f399bc`._
+_Session of 2026-08-01/02. Branch `feat/proposal-def-1`, pushed through `e9fce32`._
 
-The task was "ensure all tables and scripts are reproducible." The short version
-is that three scripts did not run at all, one submodule was on the wrong commit,
-and most of the prose predated the pipeline meant to reproduce it. Fixing that
-changed numbers in every results chapter, retracted one published conclusion,
-refuted another, and surfaced a model that diverges on one split in ten.
+The task was "ensure all tables and scripts are reproducible." What that turned
+into: three scripts that did not run at all, a submodule on a commit that did not
+exist, two datasets silently substituted, a library regression that cost 7 points
+of accuracy, and one published conclusion retracted. Every table is now quoted
+from a single coherent run, and the failures are documented because most of them
+recur in the same shape.
 
-Everything below is committed. Start with `reproduce/PROVENANCE_MAP.md`, which is
-the per-table index this session produced.
+Start with `reproduce/PROVENANCE_MAP.md` — the per-table index this work produced.
 
 ---
 
@@ -17,213 +17,203 @@ the per-table index this session produced.
 
 | | |
 |---|---|
-| Branch | `feat/proposal-def-1`, pushed, in sync with `origin` |
-| Commits | `16f614d` audit + prose · `b008bb3` output redirect · `59f79ca` 10-seed re-quote · `7f399bc` jobs=4 |
-| `tribble-fis` pin | `23bfdbc` (restored — it was checked out at the wrong SHA) |
-| `tribble-cluster` pin | `c71171e` (only `uv.lock` dirty, and it was before this session) |
-| Seed standard | **10** (`common.SEEDS`), up from 5. This is now protocol, not a knob. |
-| Full sweep | 11 generators, all green, ~37 min → `reproduce/outputs/seeds10-2026-08-01/` |
+| Branch | `feat/proposal-def-1`, pushed, in sync |
+| Submodules | `tribble-fis` `4371a9d` · `tribble-cluster` `5d44dfa` · `tribble-opt` `94547ff` |
+| Seed standard | **10** (`common.SEEDS`) — protocol, not a knob |
+| Run of record | `reproduce/outputs/full-2026-08-02/` — 11 tables, all green, ~23 min |
+| Concrete runtime | **369 s**, from 1301 s serial (analytic gradient + parallelism) |
 
-Two decisions are waiting on you, in §4.
-
----
-
-## 1. Scripts that did not run
-
-These are the reproducibility defects proper. Each produced plausible-looking
-output or exited zero, which is why none had been noticed.
-
-**`tribble-fis` was checked out at `d0d6714`** — the *pre*-`pin_extremes`
-baseline — while the parent repo pins `23bfdbc`. Any run in that state silently
-reproduces the superseded numbers. `run_all_tables.sh` records the submodule SHA
-in `PROVENANCE.txt` for exactly this reason; check it before trusting a run.
-
-**`gated-minimax-selection/run_all.py` crashed and discarded its own results.**
-It died in `fig_membership` with `NameError: name 'row' is not defined`. A commit
-on 2026-07-20 changed that figure from `subplots(2, 2)` to `subplots(2, 1)` while
-the body still addressed `axes[row, 0]`, `axes[0, 1]`, and `axes[1, 1]`. Because
-`results.json` is written *after* every figure, each invocation threw away its
-entire numeric phase — the JSON on disk was last written 2026-07-20 and nothing
-since could regenerate it. Chapter 5's claim that the driver "writes the results
-and every figure referenced below" was not true when written.
-
-Fixed by restoring the 2×2 grid and the `enumerate` that supplies `row`, matching
-the pattern `fig_transform` already uses twenty lines earlier. The driver now
-completes, regenerates 16 of 17 figures (`fig11_scaling` is behind an opt-in
-`--scaling` flag), and rewrites `results.json` **byte-identical** to the
-2026-07-20 file. Chapter 5's numbers were never wrong — only unreproducible.
-
-**All four registered `tribble-cluster` experiments were unrunnable as invoked.**
-They do `from experiments.blockwise_vat import ...`, which needs the submodule
-*root* on `sys.path`. Run by path — `python experiments/adversarial_eval.py`, the
-form the manifest used — Python puts `experiments/` there instead and every one
-dies with `ModuleNotFoundError` before doing any work. Now run through
-`reproduce/experiments/run_cluster_experiment.py`.
-
-**`PROVENANCE.txt` was recording the wrong seed count.** It hardcoded
-`"0,1,2,3,4 (default)"` whenever `REPRO_SEEDS` was unset, so when the default
-moved to ten it kept reporting five — while every table footer in the same
-directory said ten. Now derived from `common.SEEDS`.
+Two things need your judgement, in §5.
 
 ---
 
-## 2. Where the output goes now
+## 1. What was broken
 
-Reproducing a Chapter 3 figure used to dirty a pinned submodule.
-`reproduce/experiments/run_cluster_experiment.py` inverts that: the experiment
-code stays in `tribble-cluster`, and only the destination moves up into this
-repo. It rebinds `FIG_DIR` to `reproduce/outputs/figures/cluster/` and puts the
-submodule root on `sys.path`, so it fixes the invocation and the output location
-together, with no edit to submodule source.
+Each of these produced plausible output or exited zero, which is why none had
+been noticed.
+
+**`tribble-fis` was on the wrong commit** — `d0d6714`, the pre-`pin_extremes`
+baseline, while the repo pinned `23bfdbc`. Anything run in that state silently
+reproduced superseded numbers.
+
+**Chapter 5's driver crashed and discarded its own results.**
+`gated-minimax-selection/run_all.py` died in `fig_membership`
+(`NameError: name 'row'`) because a commit changed `subplots(2,2)` to
+`subplots(2,1)` while the body still addressed `axes[row,0]`. `results.json` is
+written *after* every figure, so each run threw away its whole numeric phase.
+Fixed; it now completes and reproduces the JSON byte-identically — the numbers
+were never wrong, only unreproducible.
+
+**All four `tribble-cluster` experiments were unrunnable**, then unrunnable again
+for a different reason. Originally they imported `from experiments.foo import
+...` and died with `ModuleNotFoundError` when invoked by path. Then grad-school
+#26 moved them to `ClusteringExperiments/` **without updating those imports**, so
+all 37 files were broken on arrival. Rewritten to sibling imports; verified
+reproducing Tables 3.4/3.5/3.6.
+
+**Two datasets were silently substituted.** Caught by one tell: CART and Random
+Forest moved between runs, and no solver change can touch sklearn models.
+
+- *Concrete* fell back to `fetch_ucirepo(id=165)`, which is **rounded to two
+  decimals** (79.99 vs 79.98611076). Every row shifted slightly.
+- *PhiUSIIL* raised `FileNotFoundError` and fell back to ucimlrepo, which returns
+  a **different feature set**. That was the entire 0.997 → 0.913 "regression".
+
+Both restored to `data/`; the fallback now announces that its results are not
+comparable.
+
+**`PROVENANCE.txt` misstated its own seed count** — hardcoded `"0,1,2,3,4"`, so
+when the default moved to ten it kept reporting five while every table footer in
+the same directory said ten. Now derived from `common.SEEDS`.
+
+**`REPRO_THETA_SWEEP` is a θ *list*, not a boolean.** I ran two sweeps with `=1`,
+a valid list of one, which emits a single row at θ=1.0 where the boost saturates
+and every cell is legitimately zero — output indistinguishable from a null
+result.
+
+---
+
+## 2. Upstream: what this surfaced in `tribble-fis`
+
+Nine issues filed; six fixed and merged.
+
+| | | |
+|---|---|---|
+| #36 | `solve_tsk_consequents` returned 1e24 coefficients on a near-singular design | fixed (#37) |
+| #39 | `trapz_pdf` degenerate trapezoid | fixed (#45) |
+| #40 | pytest collection failed from either directory | fixed (#44) |
+| #41 | `l2_reg` defaulted to 0.0 with unpenalised intercepts | fixed (#47) |
+| #42 | pandas in the refinement hot path | fixed (#48) |
+| #43 | analytic gradients for antecedent refinement | fixed (#48) |
+| #49 | **PhiUSIIL accuracy 0.997 → 0.927, bisected to #34** | fixed (#52) |
+| #50 | `top_p` documented as cumulative, implemented as a threshold | fixed (#52) |
+| #51 | default scorer → `wasserstein` | fixed |
+| #38 | (PR) firing-strength column hoist, 9.8%, bit-identical | merged |
+
+The consequent-solver bug is the one worth remembering: `np.linalg.solve` only
+raises on an *exactly* singular matrix, which floating point almost never
+produces, so the `except LinAlgError` guard caught the case that never happens
+and missed the one that does — returning finite coefficients of order 10²⁴.
+
+---
+
+## 3. Findings that changed the proposal
+
+**The mixture of experts diverged on one split in ten.** Seed 9 predicted up to
+10,536 MPa on an ~82 MPa target. Nine seeds looked unremarkable, and a five-seed
+protocol reported a clean 0.813 ± 0.039. Now fixed upstream and reading
+**0.810 ± 0.064** across all ten. Chapter 6 keeps the episode as the concrete
+evidence behind G4's seed floor: a five-seed mean did not give a slightly wrong
+number, it *certified as stable a model that fails one time in ten*.
+
+**Goal G5 is refuted and reopened.** "Quantile's advantage grows monotonically
+with skew (+0.003 → +0.201)" was a three-seed artifact. At ten seeds Q−U is
+negative in every row past symmetry, to −11.8. The real finding is in the
+spreads: quantile *destabilises* (±0.99, ±4.45, ±21.2) rather than becoming
+inaccurate. Ch7 had this marked "settled (complete)" with a recommendation; both
+are withdrawn. Unaffected by any of the library fixes — it is synthetic.
+
+**Table 4.2's four-bucket crossover is retracted.** Largest gap across all 18
+configurations is 0.012 against σ ≈ 0.02–0.03. The starvation *mechanism*
+survives; the accuracy story built on it does not.
+
+**Appendix A.4 is new: feature scoring.** The Chapter 4 construction ranks
+features before building anything, so rule count and readability follow from that
+ranking. On PhiUSIIL the most informative feature is ranked 1st by wasserstein
+and outside the top 20 by bhattacharyya — 0.9967 versus 0.4267 at one feature.
+The argument: **interpretability is a property of the feature ranking, not the
+architecture**. A change to a step the pipeline treats as preprocessing damaged
+readability far more than accuracy, which an accuracy-only evaluation would never
+have surfaced.
+
+**Tables 4.6/4.7 re-quoted twice, and the ordering flipped both times.**
+Complement-rule-leads → isolation-forest-by-0.038 → level to 0.002. Three
+orderings from one experiment is the tell that all three were noise; the table
+now says so rather than naming a winner.
+
+---
+
+## 4. Running it
 
 ```bash
+reproduce/run_all_tables.sh my-label            # ~23 min, all 11 tables
+reproduce/run_all_tables.sh --fast smoke-check  # minutes, stamped NOT CITABLE
 uv run --project tribble-cluster --with scipy \
-    python reproduce/experiments/run_cluster_experiment.py --all
+    python reproduce/experiments/run_cluster_experiment.py --all   # Ch3 figures
 ```
 
-`git -C tribble-cluster status` stays clean afterwards. Generated figures are
-**gitignored for now** (`reproduce/outputs/.gitignore`); labelled run archives
-under `outputs/<label>/` stay tracked, because they are the evidence a later diff
-is taken against.
-
-Two notes for the experiments-and-notes migration:
-
-- The `findings/*.md` files are **not generated**. All three scripts write only
-  PNGs; the one `.md` mention is a docstring cross-reference. They are
-  hand-authored notes, nothing regenerates them, and the manifest still lists
-  them at their submodule paths — those strings need updating when they move.
-- `gated-minimax-selection/outputs/` is covered by a top-level `.gitignore` entry,
-  so none of Chapter 5's figures or `results.json` are tracked. A `git mv`-based
-  migration will silently leave all of them behind.
+`--fast` reduces seeds only on the four slow tables and records the seed set
+*per table*, so a thin cell can never be mistaken for a full one.
+`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1` for the operating curve.
+Datasets resolve under `data/` (`GRAD_SCHOOL_DATA` overrides); nothing is ever
+written inside a submodule.
 
 ---
 
-## 3. Running it
+## 5. Needs your judgement
 
-```bash
-reproduce/run_all_tables.sh my-label            # the real thing, ~37 min
-reproduce/run_all_tables.sh --fast smoke-check  # minutes, NOT citable
-```
+**Goal G5.** Not "corroborate on a real dataset" any more. Either characterise
+and guard quantile's instability, accept that heavy skew needs a target transform
+rather than a better partition, or default to uniform for predictability. The
+skew sweep is one of the cheapest tables in the harness (39 s), so this is
+minutes of compute, not hours. **If G5's "complete" status ever reached the
+committee, that needs correcting.**
 
-`--fast` cuts seeds (`REPRO_FAST_SEEDS`, default `0,1,2`) on the four tables that
-dominate runtime — `concrete_reconciliation`, `pvat_scaling`,
-`norm_conorm_matrix`, `hyperparam_normalization` — and leaves the other seven
-alone, since they total under two minutes and reducing them would only cost
-credibility. A fast archive is stamped **NOT CITABLE** in `PROVENANCE.txt` and
-records the seed set *per table*, so a thin cell cannot be mistaken for a full
-one later.
-
-**`REPRO_THETA_SWEEP` is a comma-separated θ list, not a boolean.** I ran two
-full sweeps with `REPRO_THETA_SWEEP=1`, which is a valid list of one and emits a
-single row at θ=1.0 where the boost saturates and every cell is legitimately
-zero — a mis-set knob that reads exactly like a null result. Use
-`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1`.
-
-The Concrete table went from **1301s to 652s** (measured at 8 workers,
-byte-identical output) by hoisting seed-independent preprocessing that was being
-recomputed 60 times and running the arms concurrently. Results are reassembled in
-job order, never completion order, so the table cannot depend on scheduling.
-`REPRO_JOBS` defaults to 4 to leave cores free; `REPRO_JOBS=1` restores the
-serial path. Worker stdout now interleaves and arrives late — cosmetic, and
-documented in the script, because this project has been bitten by misread logs.
-
----
-
-## 4. Two things that need your decision
-
-**The mixture of experts diverges on seed 9.** Under normalized features at
-library defaults it predicts up to **10,536 MPa** on a Concrete target that never
-exceeds ~82. The other nine seeds give 0.805 ± 0.059 with nothing anomalous about
-them; a five-seed run did not contain the split and reported a clean
-0.813 ± 0.039. Including it, the cell reads R² = −220.9 ± 665.0.
-
-Table 6.1 quotes the nine stable seeds with the failure disclosed in a footnote,
-on the grounds that a mean of −220.9 describes the failure rather than the model
-and suppressing it would be worse than either. **This is a real defect, not a
-reporting artifact** — the gating solve needs a numerical guard before the
-hierarchy can be recommended for use. Written into Ch6 and Goal G4.
-
-**Goal G5 has moved from "settled (complete)" to reopened.** The headline
-"quantile's advantage grows monotonically with skew (+0.003 → +0.201)" was a
-three-seed artifact. At ten seeds Q−U is negative in every row past symmetry,
-down to −11.8. The real finding is in the spreads: quantile *destabilises*
-(±0.99, ±4.45, ±21.2) rather than becoming inaccurate, while uniform decays
-smoothly. Neither scheme is safe on a heavily skewed target.
-
-The recommendation is withdrawn and the goal reopened; the starvation diagnosis
-and the tail correction both survive. **If G5's "complete" status was ever
-communicated to the committee, that needs correcting before the next
-conversation with them.**
-
----
-
-## 5. What changed in the prose
-
-Every numbered table is now quoted at ten seeds against
-`reproduce/outputs/seeds10-2026-08-01/`. Beyond the two items above:
-
-| Table | Change |
-|---|---|
-| 3.4 | Two cells corrected (circles naive-block 0.10 → 0.00, bridged 0.07 → 0.08) |
-| 3.5 | Re-quoted: light 0.51 → 0.47, top-m 0.74 → 0.61, fps 0.37. Conclusion *strengthened* — the gap to each single ingredient is wider |
-| 4.1 | Re-quoted, plus CART/RF control rows showing the transform is worth +0.001/+0.000 to rank-based models and +0.125 to the fuzzy one |
-| 4.2 | Four-bucket crossover **retracted** — largest gap in all 18 configs is 0.012 against σ ≈ 0.02–0.03. The starvation mechanism survives |
-| 4.6/4.7 | Re-quoted twice. Best point moved θ=0.80/J=+0.155 → θ=0.70/+0.261 → a flat band of +0.222…+0.239 peaking at θ=0.60. The complement-vs-isolation-forest ordering **flipped twice**, and at ten seeds they are level to 0.002 — every previous ordering was noise |
-| 5.1 | `0.00 (chaining)` was filed under *NERFCM on D\**; 0.00 is single-linkage. Three cells were dashed "not run" that the driver had run |
-| 6.1 | Re-quoted; caption said "3 seeds" |
-| 6.2 | Re-quoted; PhiUSIIL column filled and shows the dataset is saturated (CART and RF both 1.000), so it should carry no weight |
-| 6.4 §6.3.5 | "Refinement hurts at high capacity" softened to diminishing returns — it stays positive at every order in the uniform sweep |
-| Ch1, Ch7 | Intro figures updated; G4 widened to cover accuracy claims, with ten seeds as the floor |
-
-Chapter 6 also asserted flat 0.658 / tree 0.746 / mixture 0.791 as "what is
-measured today" fourteen lines above the table that explicitly retires them. And
-the `Reproduction` blockquotes in Ch3/Ch4/Ch6 all named the wrong scripts — Ch4
-claimed Tables 4.4–4.7 come from `table_4_1_mog_baselines.py` when 4.6 and 4.7
-come from `table_4_4_openset.py`.
+**`origin/main`'s submodule gitlinks are still broken.** PR #28 added
+`branch = main` to `.gitmodules`, but the recorded SHAs `56ac26e` and `de699c5`
+do not exist on their remotes. `branch = main` only affects
+`git submodule update --remote`; ordinary clone and CI checkout use the recorded
+SHA, so a fresh clone of main still fails. Fix is `git submodule update --remote
+&& git add tribble-fis tribble-cluster && commit`. This branch pins commits that
+resolve.
 
 ---
 
 ## 6. Still outstanding
 
-- **Table 3.1's headline 4,096-point pair** (124 s vs 2.56 s, ~48×) is reproduced
-  by neither generator and appears to be an external measurement from the NAFIPS
-  work. It needs a citation or a harness run. This is the one headline number in
-  Ch3 with no in-repo provenance.
+- **Table 3.1's 4,096-point pair** is cited to NAFIPS by decision, not
+  harness-reproduced. Raising `REPRO_NAIVE_CAP` would cost hours to re-derive a
+  constant factor the chapter does not rest on.
 - **Tables 3.2 and 3.3** have no generator; 3.3 needs a GPU host.
-- **Table 6.3** is structural by design; **6.4**'s entry point is unconfirmed.
+- **Table 6.3** is structural; **6.4**'s entry point is unconfirmed (moved to
+  `AnalyticalDynamics/`).
 - **ANFIS and GA-FIS adapters** absent, so those cells stay `N/A`.
 - **BETH** — unchanged from `research/proposal-defense/HANDOFF_LOCAL_SESSION.md`
-  §1, which is still the right brief. The LOCO harness needs ≥3 classes and BETH
-  is binary, so it needs its own one-class code path; that is a research decision
-  before it is a coding one.
-- **The HME numerical guard** and **the G5 decision**, from §4.
+  §1. LOCO needs ≥3 classes and BETH is binary, so it needs its own one-class
+  path; a research decision before a coding one.
+- **Appendix A.4's composite column** is measured against the *restored*
+  `composite`, which is not the pre-#34 blend — the blend ranked
+  `URLSimilarityIndex` first, the restored one ranks it second. The section says
+  which is which; worth a footnote at submission.
 
 ---
 
 ## 7. Traps worth not repeating
 
 **Silence is not success.** Every defect in §1 produced plausible output or
-exited zero. A submodule on the wrong commit, a driver crashing before it wrote
+exited zero. A submodule on the wrong commit, a driver crashing before writing
 its results, experiments dying on import, a provenance file misstating its own
-seed count — none of them announced themselves. Read the provenance, not the exit
-status.
+seeds, two datasets quietly swapped. Read the provenance, not the exit status.
 
 **A conclusion can be reproducible and still wrong.** The retracted crossover and
 the refuted skew hypothesis came from generators that ran correctly and
-deterministically every time. The harness was never broken; the sample was too
-small to support the story built on it. Determinism is not evidence.
+deterministically every time. Determinism is not evidence; the sample was too
+small to support the story built on it.
 
-**A five-seed mean does not establish stability.** The HME case is the clean
-example: a model that is excellent nine times in ten and catastrophic the tenth
-reads as a solid 0.813 ± 0.039 if the tenth split is not in the sample. Ten seeds
-is the floor now, and `PROVENANCE.txt` records the count per table.
+**Attribute changes to one variable at a time.** One sweep had three: a solver
+change, a rounded dataset, and a swapped feature set. I would have credited all
+of it to the solver. The tell was CART and Random Forest moving — sklearn models
+that the solver cannot touch. When a number moves, find something that *should
+not* have moved and check it.
 
-**My own errors this session, for calibration.** I ran both sweeps with
-`REPRO_THETA_SWEEP=1` and got a table of zeros that reads like a null result. My
-first Table 4.1 edit left orphaned rows behind that I caught only on a later
-sweep. And my background waiter shells used
-`until ! pgrep -f run_all_tables; do sleep 20; done`, where `pgrep -f` matched the
-waiter's *own* command line — three of them spun for up to 71 minutes and their
-completion notifications were never going to arrive. Nothing reported here
-depended on them, but the pattern is the same one that caused the drift in the
-first place: output that looks right is not the same as output that is right.
+**Do not size an optimisation from a profiler.** cProfile charges per-call
+overhead, so pandas `__getitem__` — deep internal call chain — showed as 57% of
+runtime and inflated a 130 s seed to 257 s. I published a 19% speedup that was
+really 9.8%. Profiles find hotspots; wall clocks size them.
+
+**My own errors this session, for calibration.** `REPRO_THETA_SWEEP=1` producing
+a table of zeros. An orphaned-row edit to Table 4.1 caught only on a later sweep.
+Background waiters using `pgrep -f run_all_tables` that matched their *own*
+command line and spun for over an hour. And a `git commit --amend` run in the
+wrong repository, which rewrote the message of an unrelated commit. Two of the
+four were directory or self-reference confusion; check which repo you are in.
