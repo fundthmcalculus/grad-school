@@ -1,0 +1,89 @@
+
+### iris, k=3, seed 0, convex antecedents — 1,296 subset combinations per class
+
+| class | selector | objective | gap to optimum | percentile | evals | % of space |
+|---|---|---|---|---|---|---|
+| setosa | mass | 0.7889 | 0.0576 | 98.611 | 9 | 0.6944% |
+| setosa | mst_mf | 0.8132 | 0.0333 | 99.074 | 11 | 0.8488% |
+| setosa | mst_core | 0.8179 | 0.0286 | 99.383 | 50 | 3.8580% |
+| setosa | greedy | 0.8344 | 0.0120 | 99.691 | 26 | 2.0062% |
+| setosa | anneal | 0.8464 | 0.0000 | 100.000 | 2763 | 213.1944% |
+| setosa | **optimum** | 0.8464 | 0 | 100 | 1296 | 100% |
+| versicolor | mass | 0.5944 | 0.0350 | 98.534 | 9 | 0.6944% |
+| versicolor | mst_mf | 0.6017 | 0.0277 | 98.920 | 13 | 1.0031% |
+| versicolor | mst_core | 0.6294 | 0.0000 | 100.000 | 50 | 3.8580% |
+| versicolor | greedy | 0.6294 | 0.0000 | 100.000 | 40 | 3.0864% |
+| versicolor | anneal | 0.6294 | 0.0000 | 100.000 | 3622 | 279.4753% |
+| versicolor | **optimum** | 0.6294 | 0 | 100 | 1296 | 100% |
+| virginica | mass | 0.4847 | 0.0962 | 98.225 | 9 | 0.6944% |
+| virginica | mst_mf | 0.5476 | 0.0333 | 99.074 | 12 | 0.9259% |
+| virginica | mst_core | 0.5476 | 0.0333 | 99.074 | 50 | 3.8580% |
+| virginica | greedy | 0.5810 | 0.0000 | 100.000 | 26 | 2.0062% |
+| virginica | anneal | 0.5810 | 0.0000 | 100.000 | 2711 | 209.1821% |
+| virginica | **optimum** | 0.5810 | 0 | 100 | 1296 | 100% |
+
+| class | mean objective | within 1% of optimum | within 5% | tied optima |
+|---|---|---|---|---|
+| setosa | -0.0530 | 0.3086% | 1.3889% | 4 |
+| versicolor | 0.0415 | 0.1543% | 1.3117% | 1 |
+| virginica | 0.0115 | 0.3086% | 0.9259% | 2 |
+
+### iris, k=5, seed 0, convex antecedents — 50,625 subset combinations per class
+
+| class | selector | objective | gap to optimum | percentile | evals | % of space |
+|---|---|---|---|---|---|---|
+| setosa | mass | 0.9715 | 0.0000 | 100.000 | 9 | 0.0178% |
+| setosa | mst_mf | 0.9715 | 0.0000 | 100.000 | 14 | 0.0277% |
+| setosa | mst_core | 0.9715 | 0.0000 | 100.000 | 50 | 0.0988% |
+| setosa | greedy | 0.9405 | 0.0310 | 99.953 | 37 | 0.0731% |
+| setosa | anneal | 0.9715 | 0.0000 | 100.000 | 2343 | 4.6281% |
+| setosa | **optimum** | 0.9715 | 0 | 100 | 50625 | 100% |
+| versicolor | mass | 0.6536 | 0.0881 | 99.482 | 9 | 0.0178% |
+| versicolor | mst_mf | 0.6476 | 0.0941 | 99.348 | 16 | 0.0316% |
+| versicolor | mst_core | 0.6668 | 0.0748 | 99.589 | 50 | 0.0988% |
+| versicolor | greedy | 0.7416 | 0.0000 | 100.000 | 61 | 0.1205% |
+| versicolor | anneal | 0.7416 | 0.0000 | 100.000 | 2673 | 5.2800% |
+| versicolor | **optimum** | 0.7416 | 0 | 100 | 50625 | 100% |
+| virginica | mass | 0.8048 | 0.0381 | 99.941 | 9 | 0.0178% |
+| virginica | mst_mf | 0.7681 | 0.0748 | 99.913 | 17 | 0.0336% |
+| virginica | mst_core | 0.8048 | 0.0381 | 99.941 | 50 | 0.0988% |
+| virginica | greedy | 0.8429 | 0.0000 | 100.000 | 37 | 0.0731% |
+| virginica | anneal | 0.8429 | 0.0000 | 100.000 | 2324 | 4.5906% |
+| virginica | **optimum** | 0.8429 | 0 | 100 | 50625 | 100% |
+
+| class | mean objective | within 1% of optimum | within 5% | tied optima |
+|---|---|---|---|---|
+| setosa | -0.0488 | 0.0237% | 0.0830% | 3 |
+| versicolor | 0.0500 | 0.1027% | 0.1422% | 48 |
+| virginica | -0.0012 | 0.0474% | 0.0711% | 12 |
+
+### iris, k=7, seed 0, convex antecedents — 614,656 subset combinations per class
+
+| class | selector | objective | gap to optimum | percentile | evals | % of space |
+|---|---|---|---|---|---|---|
+| setosa | mass | 1.0000 | 0.0000 | 100.000 | 9 | 0.0015% |
+| setosa | mst_mf | 1.0000 | 0.0000 | 100.000 | 18 | 0.0029% |
+| setosa | mst_core | 1.0000 | 0.0000 | 100.000 | 50 | 0.0081% |
+| setosa | greedy | 0.9929 | 0.0071 | 99.997 | 55 | 0.0089% |
+| setosa | anneal | 1.0000 | 0.0000 | 100.000 | 1704 | 0.2772% |
+| setosa | **optimum** | 1.0000 | 0 | 100 | 614656 | 100% |
+| versicolor | mass | 0.8578 | 0.0214 | 99.982 | 9 | 0.0015% |
+| versicolor | mst_mf | 0.8792 | 0.0000 | 100.000 | 20 | 0.0033% |
+| versicolor | mst_core | 0.8578 | 0.0214 | 99.982 | 50 | 0.0081% |
+| versicolor | greedy | 0.8440 | 0.0352 | 99.975 | 70 | 0.0114% |
+| versicolor | anneal | 0.8792 | 0.0000 | 100.000 | 2061 | 0.3353% |
+| versicolor | **optimum** | 0.8792 | 0 | 100 | 614656 | 100% |
+| virginica | mass | 0.8075 | 0.0604 | 99.982 | 9 | 0.0015% |
+| virginica | mst_mf | 0.8679 | 0.0000 | 100.000 | 22 | 0.0036% |
+| virginica | mst_core | 0.8075 | 0.0604 | 99.982 | 50 | 0.0081% |
+| virginica | greedy | 0.8679 | 0.0000 | 100.000 | 46 | 0.0075% |
+| virginica | anneal | 0.8679 | 0.0000 | 100.000 | 1766 | 0.2873% |
+| virginica | **optimum** | 0.8679 | 0 | 100 | 614656 | 100% |
+
+| class | mean objective | within 1% of optimum | within 5% | tied optima |
+|---|---|---|---|---|
+| setosa | -0.0444 | 0.0104% | 0.0329% | 20 |
+| versicolor | 0.0462 | 0.0117% | 0.0325% | 36 |
+| virginica | -0.0018 | 0.0052% | 0.0150% | 32 |
+
+Wrote /home/user/grad-school/experiments/fuzzy-combinatorial-rules/outputs/landscape-convex.[json|md]
