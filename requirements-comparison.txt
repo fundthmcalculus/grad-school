@@ -1,0 +1,13 @@
+# Reference implementations used only to check our own against, never imported
+# by library code. Kept out of requirements.txt because pyclustertend pins
+# numba<0.61, which conflicts with the numba>=0.66 that tribble-clustering and
+# `optimizers` resolve to -- installing it alongside them downgrades numba and
+# silently changes what the main stack runs on.
+#
+# Install only when running a comparison:
+#     pip install -r requirements-comparison.txt
+#
+# `AEEM6097/{ivat_tsp,final_project,test3}.py` compare our IVAT against
+# pyclustertend's and will skip, or fail to import, without it.
+
+pyclustertend~=1.9.0
