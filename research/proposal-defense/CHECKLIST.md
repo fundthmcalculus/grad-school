@@ -22,7 +22,7 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
       Shuttle. Defines the Ch 7 capstone.
 - [ ] 🔒 **A4 — Confirm the EUSFLAT 2027 submission deadline.** Anchors the Ch 5 paper schedule
       and the Ch 10 timeline.
-- [ ] 🔒 **A6 — Write the acknowledgements.** Template is in place at `prose/00-acknowledgements.md` and already wired into the build ahead of Chapter 1; the guidance lives in an HTML comment that `build_pdf.py` strips, so it can stay in the file until you replace it. Prompts included for the committee, NAFIPS co-authors, funding, and the dataset providers — note the 135K psychiatric set is not redistributable, so check what may be named. Partly gated on A2 (co-author lists).
+- [x] ✅ **A6 — Acknowledgements written** (author, 2026-08-02). Template replaced with the real page; it renders correctly ahead of Chapter 1 in the build. One residual dependency: it thanks the committee and Jon Salisbury by name but not the NAFIPS co-authors, so give it a second pass once **A2** supplies those author lists.
 - [ ] 🔒 **A5 — Confirm the proposal-defense month** (assumed ~Dec 2026) and teaching/RA load
       per semester (affects Ch 10 throughput).
 
