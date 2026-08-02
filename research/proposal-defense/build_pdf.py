@@ -127,14 +127,22 @@ def strip_html_comments(md):
     return re.sub(r"<!--.*?-->", "", md, flags=re.DOTALL)
 
 
-def strip_editorial(md, src_dir=None):
+def strip_editorial(md, src_dir=None, image_status=None):
     """Drop scaffolding that shouldn't appear in a reading copy.
 
     `src_dir` is the directory the Markdown came from, used to resolve image
     references so a figure that actually exists can be told from one that is
     still a placeholder.
+
+    `image_status` is an optional dict that will be populated with image
+    injection diagnostics: {'included': [...], 'missing': [...]}.
     """
     md = strip_html_comments(replace_mermaid(md))
+    if image_status is None:
+        image_status = {}
+    included = image_status.setdefault('included', [])
+    missing = image_status.setdefault('missing', [])
+
     out = []
     for line in md.split("\n"):
         s = line.strip()
@@ -150,8 +158,13 @@ def strip_editorial(md, src_dir=None):
             # actually reaches the built document -- previously every image line
             # was dropped unconditionally, so producing a figure had no effect.
             target = os.path.join(src_dir or HERE, m.group(1))
+            alt_text = re.match(r"^`!\[(.*?)\]", s)
+            label = alt_text.group(1) if alt_text else m.group(1)
             if os.path.exists(target):
                 out.append(s.strip("`"))
+                included.append(label)
+            else:
+                missing.append(label)
             continue
         out.append(line)
     return re.sub(r"\n{4,}", "\n\n\n", "\n".join(out))
@@ -160,17 +173,30 @@ def strip_editorial(md, src_dir=None):
 def assemble():
     os.makedirs(BUILD, exist_ok=True)
     parts = []
+    image_status = {'included': [], 'missing': []}
     for rel in SECTIONS:
         md = read(rel)
         if md is None:
             continue
-        parts.append(strip_editorial(md, os.path.dirname(os.path.join(HERE, rel))))
+        parts.append(strip_editorial(md, os.path.dirname(os.path.join(HERE, rel)),
+                                    image_status=image_status))
         print(f"  + {rel}")
     combined = "\n\n\n".join(parts)
     md_path = os.path.join(BUILD, "proposal-combined.md")
     with open(md_path, "w") as f:
         f.write(combined)
     print(f"  wrote {md_path}")
+
+    # Report image injection status
+    if image_status['included'] or image_status['missing']:
+        print(f"\n  image injection:")
+        if image_status['included']:
+            for img in image_status['included']:
+                print(f"    ✓ {img}")
+        if image_status['missing']:
+            for img in image_status['missing']:
+                print(f"    ✗ {img} (placeholder stripped)")
+
     return md_path
 
 
