@@ -1,0 +1,19 @@
+label:       main-d0efefc
+generated:   2026-08-02T13:16:08Z
+tribble-fis: d0efefc409009e772e1478f35430134051b0fa0b
+tribble-cluster: 5d44dfa4c9b501f264192e299a413155fbb3709f
+grad-school: e08382d9ddc7290302e5950768134c9ba42b9421
+seeds:       0,1,2,3,4,5,6,7,8,9
+
+status:
+  table_concrete_reconciliation          ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_hyperparam_normalization         ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_g5_output_partitioning           ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_g5b_skew_sweep                   ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_4_1_mog_baselines                ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_6_1_model_family                 ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_norm_conorm_matrix               ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_4_4_openset                      ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_3_1_pvat_scaling                 ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_3_1_reorder_three_arm            ok           seeds=0,1,2,3,4,5,6,7,8,9
+  table_5_x_ch5_selection                ok           seeds=0,1,2,3,4,5,6,7,8,9

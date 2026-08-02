@@ -13,7 +13,7 @@
 
 ## 8.2 What is already established (completed contributions)
 
-- pVAT: exact VAT/iVAT, 5K → 130K+, non-metric, GPU (Ch 3).
+- mergeVAT: exact VAT/iVAT, 5K → 130K+, non-metric, GPU (Ch 3).
 - MoG FIS synthesis: no rule explosion, no GA/GD, 97–99% in seconds (Ch 4).
 - Shared ridge-TSK solver + soft fuzzy trees + HME (one-shot) + Ruspini + MIMO memory (Ch 6, partial).
 - Optimization engine as enabling infrastructure (Ch 2).

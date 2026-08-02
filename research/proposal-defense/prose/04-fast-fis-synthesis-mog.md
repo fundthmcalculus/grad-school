@@ -18,7 +18,7 @@ I also owe the reader an honest caveat up front, because a sharp committee membe
 
 ### Preparing the inputs, and why the transform is not optional
 
-Before either construction, the inputs are transformed: features whose dynamic range spans more than a couple of orders of magnitude are log-scaled automatically, and every feature is then standardized. On Concrete the automatic detector selects exactly one feature, `Age`, which is unsurprising — curing time runs from one day to a year while the mixture components all live within a factor of a few.
+Before either construction, the inputs are transformed: features whose dynamic range spans more than a couple of orders of magnitude are log-scaled automatically, and every feature is then standardized. On Concrete the automatic detector selects two, `Slag` and `Age`. `Age` is the unsurprising one — curing time runs from one day to a year, while most features live within a factor of a few.
 
 I used to treat this as housekeeping and leave it out of the description. That was a mistake, because it is worth more than most of the modeling choices in this chapter. Measured across ten seeds on identical splits:
 
@@ -26,16 +26,16 @@ I used to treat this as housekeeping and leave it out of the description. That w
 
 | Model | raw features | log + standardized | Δ |
 |---|---:|---:|---:|
-| flat MoG-TSK, 1st order | 0.658 ± 0.046 | 0.783 ± 0.028 | **+0.125** |
-| flat MoG-TSK, 2nd order | 0.796 ± 0.018 | 0.829 ± 0.023 | +0.033 |
-| flat MoG-TSK, full 2nd | 0.812 ± 0.032 | 0.869 ± 0.014 | +0.057 |
-| fuzzy tree | 0.580 ± 0.067 | 0.688 ± 0.056 | +0.108 |
+| flat MoG-TSK, 1st order | 0.646 ± 0.039 | 0.772 ± 0.034 | **+0.126** |
+| flat MoG-TSK, 2nd order | 0.779 ± 0.036 | 0.824 ± 0.043 | +0.044 |
+| flat MoG-TSK, full 2nd | 0.790 ± 0.054 | 0.859 ± 0.039 | +0.069 |
+| fuzzy tree (library default) | 0.580 ± 0.067 | 0.688 ± 0.056 | +0.108 |
 | CART (reference) | 0.825 ± 0.047 | 0.826 ± 0.047 | +0.001 |
 | Random Forest (reference) | 0.909 ± 0.018 | 0.909 ± 0.019 | +0.000 |
 
 Two things fall out, and the second matters more than the first.
 
-The first is that the transform is worth up to twelve and a half points of $R^2$ to the Gaussian models. A first-order model goes from 0.658 to 0.783 on nothing but a log and a rescale. Any comparison that omits it is not measuring the method.
+The first is that the transform is worth nearly thirteen points of $R^2$ to the Gaussian models. A first-order model goes from 0.646 to 0.772 on nothing but a log and a rescale. Any comparison that omits it is not measuring the method.
 
 The second is that **the transform is worth essentially nothing to CART and Random Forest** — +0.001 and +0.000, which is not a rounding artifact but the expected result. An axis-aligned decision tree splits on rank: it asks whether a feature exceeds a threshold, and a monotone transform cannot change the answer, so the tree it induces is identical. A Gaussian membership function has no such immunity, because it is defined by a location and a width in the feature's own units; skew the feature and the membership function fits the skew rather than the structure.
 
@@ -62,20 +62,20 @@ So uniform optimizes for approximation geometry and quantile for statistical sta
 
 | buckets | order | scheme | R² | tail RMSE | min bucket |
 |---:|---|---|---:|---:|---:|
-| 3 | 1st | uniform | 0.787 ± 0.027 | **8.10** | 132 |
-| 3 | 1st | quantile | 0.784 ± 0.028 | 8.26 | 343 |
-| 4 | 1st | uniform | 0.790 ± 0.031 | **7.96** | 75 |
-| 4 | 1st | quantile | 0.798 ± 0.016 | 8.15 | 257 |
-| 6 | 2nd | uniform | 0.848 ± 0.024 | 6.47 | 39 |
-| 6 | 2nd | quantile | 0.848 ± 0.024 | **6.46** | 171 |
+| 3 | 1st | uniform | **0.795 ± 0.035** | **7.90** | 132 |
+| 3 | 1st | quantile | 0.773 ± 0.033 | 8.36 | 343 |
+| 4 | 1st | uniform | 0.785 ± 0.034 | 8.10 | 75 |
+| 4 | 1st | quantile | **0.790 ± 0.023** | 8.15 | 257 |
+| 6 | 2nd | uniform | 0.840 ± 0.029 | 6.49 | 39 |
+| 6 | 2nd | quantile | **0.849 ± 0.026** | **6.03** | 171 |
 
 Three things came out of this, and none of them is the one I expected.
 
-**On accuracy, the two schemes are indistinguishable.** An earlier three-seed run showed a clean crossover near four buckets — uniform ahead at three, quantile ahead at six — and I built an argument on it. At ten seeds that structure is gone. The largest gap anywhere in the full eighteen-configuration sweep is 0.012 in $R^2$, against seed-to-seed deviations of 0.02 to 0.03; at six buckets and second order the two agree to three decimals. The crossover was noise, and I am striking the claim rather than keeping it with a hedge. Choosing between these schemes on aggregate accuracy is choosing between two things that measure the same.
+**On accuracy, the two schemes are indistinguishable.** An earlier three-seed run showed a clean crossover near four buckets — uniform ahead at three, quantile ahead at six — and I built an argument on it. At ten seeds it does not hold up. The largest gap anywhere in the full eighteen-configuration sweep is 0.022 in $R^2$, against seed-to-seed deviations of 0.02 to 0.04 — so even the widest separation in the sweep sits inside one standard deviation of the arms producing it. The apparent sign pattern is if anything the *reverse* of the one I claimed (uniform ahead at three buckets, quantile ahead at four and six), which is the clearest possible sign that what I was reading was noise. I am striking the crossover claim rather than keeping it with a hedge, and I am not replacing it with the mirror-image claim either. Choosing between these schemes on aggregate accuracy is choosing between two things that measure the same.
 
 **The starvation mechanism is real even though the accuracy difference is not**, and this is the part worth keeping. Uniform's smallest bucket falls from 132 samples to 75 to 39 as the partition refines, while quantile's floor stays high by construction — 343, 257, 171. That is a genuine and predictable structural difference, and it is why uniform must eventually fail as buckets increase or skew grows: a bucket with almost no data cannot support a rule. Concrete's skew of +0.42 is simply too mild for it to bite within the range tested, which is exactly why the next experiment isolates skew directly.
 
-**Uniform holds the tails slightly better**, as predicted, in two of the three pairs above and by a margin of 0.15 to 0.19 MPa. The effect is directionally consistent with the geometric argument but small enough that I would not build on it either.
+**The tails do not settle it either.** Uniform holds them in two of the three pairs above, by 0.46 and 0.05 MPa, and loses the third by 0.46. The direction is consistent with the geometric argument in two cases out of three and inconsistent in the other, which is not a finding — it is the same noise the accuracy column shows, seen through a different metric.
 
 **The hybrid was not a third option — it was a bug, and the study found it.** `partition_output` takes equal-frequency boundaries and then pins the two extreme bucket centroids to the observed min and max, which is exactly the compromise I had hoped would dominate. It produced results *identical to pure quantile* in all eighteen configurations tested, to three decimal places on every metric, which is not how two different methods behave. The reason is that the closed-form consequent solve returned its own re-derived bucket means and the prediction path used those, so the pinned values were discarded before they could influence anything.
 
@@ -89,29 +89,27 @@ That still leaves the question the whole argument started from, because Concrete
 
 | target skew | uniform R² | quantile R² | Q − U | uniform tail RMSE | quantile tail RMSE | uniform min bucket |
 |---:|---:|---:|---:|---:|---:|---:|
-| +0.05 | 0.909 ± 0.011 | 0.909 ± 0.010 | +0.000 | 0.053 | 0.053 | 11 |
-| +1.84 | **0.875 ± 0.021** | 0.858 ± 0.042 | −0.016 | 0.068 | 0.069 | 1 |
-| +5.32 | **0.732 ± 0.079** | 0.664 ± 0.208 | −0.068 | 0.091 | **0.073** | 1 |
-| +10.44 | **0.335 ± 0.154** | 0.044 ± 0.990 | −0.291 | 0.110 | **0.070** | 1 |
-| +14.71 | **0.168 ± 0.073** | −2.246 ± 4.448 | −2.413 | 0.111 | **0.066** | 0 |
-| +17.71 | **0.084 ± 0.016** | −11.727 ± 21.155 | −11.811 | 0.132 | **0.063** | 0 |
-**The hypothesis I set out to confirm is refuted, and by my own experiment.** I predicted that quantile's advantage would grow with skew, and a three-seed run appeared to show exactly that — a clean monotone climb to +0.201 in $R^2$ by skew 11. At ten seeds the sign is the other way in every row past symmetry, and the gap widens *against* quantile as skew grows: −0.016, −0.068, −0.291, −2.413, −11.811. I want to be precise about what that does and does not establish, because the temptation is to over-correct into "uniform wins," and that is not what the table says either.
+| +0.05 | 0.912 ± 0.009 | 0.911 ± 0.010 | −0.001 | 0.052 | **0.051** | 11 |
+| +1.84 | **0.885 ± 0.018** | 0.876 ± 0.035 | −0.009 | 0.064 | **0.062** | 1 |
+| +5.32 | **0.761 ± 0.070** | 0.728 ± 0.169 | −0.033 | 0.085 | **0.066** | 1 |
+| +10.44 | **0.335 ± 0.124** | 0.183 ± 0.813 | −0.152 | 0.113 | **0.064** | 1 |
+| +14.71 | **0.168 ± 0.073** | −2.106 ± 4.274 | −2.274 | 0.111 | **0.062** | 0 |
+| +17.71 | **0.084 ± 0.016** | −12.562 ± 24.000 | −12.646 | 0.132 | **0.060** | 0 |
+**The hypothesis I set out to confirm is refuted, and by my own experiment.** I predicted that quantile's advantage would grow with skew, and a three-seed run appeared to show exactly that — a clean monotone climb to +0.201 in $R^2$ by skew 11. At ten seeds the sign is the other way in every row, and the gap widens *against* quantile as skew grows: −0.009, −0.033, −0.152, −2.274, −12.646. I want to be precise about what that does and does not establish, because the temptation is to over-correct into "uniform wins," and that is not what the table says either.
 
-**What it actually shows is that quantile becomes unstable, not that it becomes inaccurate.** Read the standard deviations rather than the means. Quantile's spread explodes — ±0.208 at skew 5, ±0.990 at skew 10, ±4.448 and ±21.155 beyond — while uniform's stays bounded and its mean degrades smoothly toward zero. A mean of −11.7 with a deviation of ±21.2 is not a measurement of typical behaviour; it is a small number of catastrophic splits dragging an otherwise reasonable distribution. Quantile on a heavily skewed target sometimes produces a usable model and sometimes produces a disaster, and the three-seed run happened to miss the disasters. Uniform fails, but it fails *predictably*, and for a component inside a larger pipeline that is often the more valuable property.
+**What it actually shows is that quantile becomes unstable, not that it becomes inaccurate.** Read the standard deviations rather than the means. Quantile's spread explodes — ±0.169 at skew 5, ±0.813 at skew 10, ±4.274 and ±24.000 beyond — while uniform's stays bounded and its mean degrades smoothly toward zero. A mean of −12.6 with a deviation of ±24.0 is not a measurement of typical behaviour; it is a small number of catastrophic splits dragging an otherwise reasonable distribution. Quantile on a heavily skewed target sometimes produces a usable model and sometimes produces a disaster, and the three-seed run happened to miss the disasters. Uniform fails, but it fails *predictably*, and for a component inside a larger pipeline that is often the more valuable property.
 
-**The starvation mechanism survives, and it is still the reason uniform degrades.** The last column collapses exactly as predicted: 11 samples at symmetry, *one* by skew 1.8, and *zero* past skew 14. Equal-width buckets on a skewed target put nearly every point in the first bucket and leave the rest to estimate rules from almost nothing, which is why uniform's $R^2$ falls from 0.909 to 0.084 across the sweep. That mechanism was never in doubt; what the ten-seed run overturns is the assumption that quantile's guaranteed occupancy therefore makes it the better choice. It removes one failure mode and introduces another.
+**The starvation mechanism survives, and it is still the reason uniform degrades.** The last column collapses exactly as predicted: 11 samples at symmetry, *one* by skew 1.8, and *zero* past skew 14. Equal-width buckets on a skewed target put nearly every point in the first bucket and leave the rest to estimate rules from almost nothing, which is why uniform's $R^2$ falls from 0.912 to 0.084 across the sweep. That mechanism was never in doubt; what the ten-seed run overturns is the assumption that quantile's guaranteed occupancy therefore makes it the better choice. It removes one failure mode and introduces another.
 
-**And my tail prediction was wrong, which is the one part of the original reading that holds up.** I expected uniform to hold the *tails* better because it covers the output range evenly. The opposite happens, consistently and with small spreads: uniform's tail error grows from 0.053 to 0.132 while quantile's actually *falls* slightly, 0.053 to 0.063. The reasoning was right about geometry and wrong about data — an evenly spaced bucket in the sparse tail is useless if nothing lands in it. Coverage of the range is worthless without coverage of the *samples*.
+**And my tail prediction was wrong, which is the one part of the original reading that holds up.** I expected uniform to hold the *tails* better because it covers the output range evenly. The opposite happens, consistently and with small spreads: uniform's tail error grows from 0.052 to 0.132 while quantile's actually *falls*, 0.051 to 0.060. The reasoning was right about geometry and wrong about data — an evenly spaced bucket in the sparse tail is useless if nothing lands in it. Coverage of the range is worthless without coverage of the *samples*.
+
+**A caution about the last two rows.** Past skew 14 both schemes fail — quantile's $R^2$ goes sharply negative with standard deviations of ±4.3 and ±24.0 — so the apparent uniform "win" there is noise between two broken models, not a result. At that point the target is so compressed that uniform's smallest bucket is empty outright and the problem needs a target transform, not a better partition.
 
 Taken together, this is now an open question rather than a settled recommendation, and Chapter 7 carries it as one. The defensible summary is that neither scheme is safe on a heavily skewed target: uniform starves and decays, quantile holds its buckets but goes unstable. What the experiment has actually earned is the negative result and the diagnosis — which is worth more to a reader than the tidy monotone story it replaces.
 
-**A caution about the last two rows.** Past skew 16 both schemes fail — quantile's $R^2$ goes negative with a standard deviation near unity — so the apparent uniform "win" there is noise between two broken models, not a result. At that point the target is so compressed that three buckets hold almost nothing and the problem needs a target transform, not a better partition.
+Having placed the output partition, I use the same per-feature Gaussian-mixture approach for the antecedents and apply linear regression to obtain first-order Takagi–Sugeno–Kang consequents. This is the Deep Thought move made concrete: the answers (the output buckets) are chosen before the questions (the antecedents) are known, and the questions are then fit to them.
 
-The recommendation, then, is unambiguous: **quantile boundaries by default.** On a near-symmetric target it costs nothing; on a skewed one it is worth up to 0.2 in $R^2$; and the failure it avoids — an empty bucket — is one that aggregate error reports only after the model is already broken. Uniform is defensible only at low bucket counts on a near-symmetric target, which is a narrow enough case that the default should not be built around it.
-
-Having fixed the output partition, I use the same per-feature Gaussian-mixture approach for the antecedents and apply linear regression to obtain first-order Takagi–Sugeno–Kang consequents. This is the Deep Thought move made concrete: the answers (the output buckets) are chosen before the questions (the antecedents) are known, and the questions are then fit to them.
-
-Two empirical observations shape this. First, first-order TSK consequents are enough — going to second order or higher barely moves the accuracy on the problems I have tried. Second, a round of local optimization on top of the fitted model also barely helps, which is a small but direct piece of evidence for the *structure before search* thesis: once the model is built from the data's structure, there is very little left for a search to find. The closed-form solve I use for these consequents is a single shared primitive across several model types, and I defer its full treatment to Chapter 6.
+Two empirical observations shape this, and the first corrects something I believed for longer than I should have. Consequent order matters more than I once credited: an earlier draft of this chapter asserted that first-order consequents were enough and that higher orders barely moved the accuracy, and Table 4.4 does not support that — moving from first to second order and then to the full second-order basis is worth several points of $R^2$ apiece on Concrete. First order is a floor here, not a sufficient choice. Second, the *antecedent* refinement that Chapter 6 §6.4 measures buys progressively less as that consequent capacity grows, and almost nothing at the top of the range. That decay is the *structure before search* thesis in miniature, and it is the more interesting of the two observations: the better the structure-derived model already is, the less a subsequent search finds. The closed-form solve I use for these consequents is a single shared primitive across several model types, and I defer its full treatment to Chapter 6.
 
 ### 4.3.3 Inference
 
@@ -157,33 +155,34 @@ I should be clear about the prior art, since novelty detection and open-set reco
 
 The datasets here are public, so unlike the psychiatric set of Chapter 3 I can name them freely.
 
-On the **PhiUSIIL phishing URL** dataset the model reaches 0.996 ± 0.001 accuracy in about two-thirds of a second, with two rules and a handful of clauses. That is the headline: a readable, two-rule fuzzy classifier, competitive on accuracy, trained in the time it takes to describe it. I should temper the "competitive" immediately, though — CART and a random forest both score a perfect 1.000 on this dataset, so PhiUSIIL is saturated and cannot separate these methods on accuracy. What it demonstrates is the *rule count and the training time*, not superiority.
+On the **PhiUSIIL phishing URL** dataset the model reaches 0.997 ± 0.001 accuracy in about seven-tenths of a second, with two rules and a handful of clauses. That is the headline: a readable, two-rule fuzzy classifier, competitive on accuracy, trained in the time it takes to describe it. I should temper the "competitive" immediately, though — CART and a random forest both score a perfect 1.000 on this dataset, so PhiUSIIL is saturated and cannot separate these methods on accuracy. What it demonstrates is the *rule count and the training time*, not superiority.
 
 On **RT-IOT2022** — 123,000 instances, 83 features, 12 output classes — the model trains in under a minute. This is the scale point: the answer-first construction does not fall over when the data gets large and multi-class, because the work is proportional to classes times features rather than to any product over inputs.
 
 On the **BETH** host-telemetry set I test the anomaly rule of §4.3.5 in its hardest honest configuration: the model is trained on *benign traffic only* and then shown a test set containing malicious activity it has never seen. Nothing about the malicious class is available at training time — there is no "attack" rule to fire — so detection has to come from the complement rule alone. This is open-set recognition rather than classification, and it is the setting where the construction earns its keep. Because the boost $\theta$ is a single scalar, the operating point is a one-dimensional sweep rather than a retraining problem, and the sensitivity/precision trade-off can be read straight off that curve.
 
-On the **UCI Concrete Compressive Strength** regression set, the flat model's test $R^2$ is −0.005, 0.783, and 0.829 at TSK orders zero, one, and two, rising to 0.869 with the full second-order basis. The zeroth-order figure deserves a word rather than a quiet omission: with constant consequents the model is no better than predicting the mean, so first-order consequents are not a refinement here but a requirement. From first order on the result is reasonable, and it is the launch point for the hierarchical models of Chapter 6.
+On the **UCI Concrete Compressive Strength** regression set, the flat model's test $R^2$ is −0.334, 0.772, and 0.824 at TSK orders zero, one, and two, rising to 0.859 with the full second-order basis. The zeroth-order figure deserves a word rather than a quiet omission: with constant consequents the model is not merely no better than predicting the mean, it is measurably *worse* than predicting the mean — a negative $R^2$ — so first-order consequents are not a refinement here but a requirement. From first order on the result is reasonable, and it is the launch point for the hierarchical models of Chapter 6.
 
-The reconciliation this section used to promise has now been done. Chapter 6 previously quoted a flat-model $R^2$ of 0.658 from the tree-and-mixture experiment, which read as a contradiction of the figures above; under one protocol — identical splits, seeds, and preprocessing — the flat model scores 0.879 with refinement and the discrepancy turns out to have been configuration rather than disagreement. Chapter 6 Table 6.1 and the table above are now the same measurement seen from two chapters. The one remaining trap for a reader comparing them is Chapter 6's Table 6.2, which deliberately runs everything untuned at raw features and reports the flat model at 0.651; that is a different question, not a different answer.
+The reconciliation this section used to promise has now been done. Chapter 6 previously quoted a flat-model $R^2$ of 0.658 from the tree-and-mixture experiment, which read as a contradiction of the figures above; under one protocol — identical splits, seeds, and preprocessing — the flat model scores 0.861 with refinement and the discrepancy turns out to have been configuration rather than disagreement. Chapter 6 Table 6.1 and the table above are now the same measurement seen from two chapters. The one remaining trap for a reader comparing them is Chapter 6's Table 6.2, which deliberately runs everything untuned at raw features and reports the flat model at 0.650; that is a different question, not a different answer.
 
 **Table 4.4 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation; the baseline comparison is Table 4.5.
 
 | Dataset (task) | Size (N × M) | Train time | Accuracy / R² | Rule base |
 |---|---|---:|---:|---|
-| PhiUSIIL (binary classification) | 235K × 54 | 0.67 ± 0.03 s | 0.996 ± 0.001 acc. | 2 rules (K = 2) |
+| PhiUSIIL (binary classification) | 235K × 54 | 0.72 ± 0.04 s | 0.997 ± 0.001 acc. | 2 rules (K = 2) |
 | RT-IOT2022 (12-class) | 123K × 83 | < 60 s | *pending* | ~12 rules (K = 12) |
-| Concrete (regression, TSK order 1) | 1,030 × 8 | seconds | R² = 0.783 ± 0.028 | 3 output buckets |
-| Concrete (regression, TSK order 2) | 1,030 × 8 | seconds | R² = 0.829 ± 0.023 | 3 output buckets |
-| Concrete (regression, full 2nd) | 1,030 × 8 | seconds | **R² = 0.869 ± 0.014** | 3 output buckets |
+| Concrete (regression, TSK order 1) | 1,030 × 8 | seconds | R² = 0.772 ± 0.034 | 3 output buckets |
+| Concrete (regression, TSK order 2) | 1,030 × 8 | seconds | R² = 0.824 ± 0.043 | 3 output buckets |
+| Concrete (regression, full 2nd) | 1,030 × 8 | seconds | **R² = 0.859 ± 0.039** | 3 output buckets |
 
 The rule-base column is the point of the table as much as the accuracy is: for classification the count is simply the number of classes, and for regression the number of output buckets — never a product over inputs. RT-IOT2022 is the sharpest case, since a grid over 83 features would be beyond enumeration while this model carries twelve rules.
 
-**Table 4.5 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol.
+**Table 4.5 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol. Two notes on how to read it. The Concrete column runs **every** arm on the log-and-standardized features of §4.3, so nothing in it is comparing models fitted on different inputs — an earlier version of this table paired the MoG's best accuracy with a training time measured at raw features, which is exactly the quiet mismatch the harness exists to prevent. Applying the transform uniformly costs the baselines nothing: CART and Random Forest split on rank and are therefore invariant to any monotone transform, which Table 4.1 measures directly at +0.001 and +0.000, so their column reads the same either way and the uniformity is free. And the MoG appears on two rows because only the first is fully instrumented: the 1st-order row's accuracy and training time come from the same measured run, while the full-second-order arm's time is not separately timed yet and is marked pending rather than borrowed from the row above.
 
 | Method | Concrete R² | Concrete train time | PhiUSIIL accuracy | PhiUSIIL train time |
 |---|---:|---:|---:|---:|
-| **MoG FIS (this work)** | **0.869 ± 0.014** (full 2nd) | 0.38 ± 0.01 s | 0.996 ± 0.001 | 0.67 ± 0.03 s |
+| **MoG FIS (this work)**, 1st order | 0.780 ± 0.029 | **0.37 ± 0.01 s** | **0.997 ± 0.001** | **0.72 ± 0.04 s** |
+| **MoG FIS**, full 2nd order | **0.859 ± 0.039** | *pending* | — | — |
 | ANFIS | *pending* | *pending* | *pending* | *pending* |
 | GA-tuned FIS | *pending* | *pending* | *pending* | *pending* |
 | CART (reference) | 0.826 ± 0.047 | seconds | 1.000 ± 0.000 | seconds |
@@ -239,4 +238,4 @@ I want to be clear about what is and is not established. The construction is rea
 
 ---
 
-*Draft — Chapter 4 prose, in the author's voice, opening on the Hitchhiker's Guide / consequent-first motif to match the tribble motif of Ch 1. Citations in bracketed shorthand pending the consolidated `references.bib`. Three tables (4.1–4.3) and three figure placeholders (4.1–4.3) inline. Source outline in `../chapters/04-fast-fis-synthesis-mog.md`; open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 4 prose, in the author's voice, opening on the Hitchhiker's Guide / consequent-first motif to match the tribble motif of Ch 1. Citations in bracketed shorthand pending the consolidated `references.bib`. Seven tables (4.1–4.7) and three figure placeholders (4.1–4.3) inline. Source outline in `../chapters/04-fast-fis-synthesis-mog.md`; open items in `../ACTION_ITEMS.md`.*

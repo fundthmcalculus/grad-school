@@ -30,8 +30,21 @@ import _fuzzy_models as _fm   # noqa: E402
 (gafis_fit_predict,) = C.optional_import("_baseline_gafis", ["fit_predict"])
 
 
-def _bench(kind, X, y, mog_factory, score):
-    """Return dict col -> list-of-per-seed (train_seconds, score)."""
+def _bench(kind, X, y, mog_factory, score, norm=False):
+    """Return dict col -> list-of-per-seed (train_seconds, score).
+
+    `norm` applies the pipeline's log-and-standardize treatment to X before any
+    split, for EVERY arm in the table rather than only the MoG one. That
+    uniformity is the point: an earlier version of this table timed the MoG at
+    its raw-feature default while quoting tree baselines that had been measured
+    under normalization, so the headline row was competing against arms fitted
+    on different inputs. Applying it to all arms costs the baselines nothing --
+    CART and Random Forest split on rank and are provably invariant to a
+    monotone transform, which `table_hyperparam_normalization` measures at
+    +0.001 and +0.000 -- and it removes the mismatch.
+    """
+    if norm:
+        X = _fm.normalize(X)[0]
     cols = {c: {"t": [], "s": []} for c in ["mog", "rf", "anfis", "gafis"]}
     for seed in C.SEEDS:
         Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
@@ -81,7 +94,9 @@ def main():
     concrete = _fm.load_concrete()
     if concrete is not None:
         X, y = concrete
-        cols = _bench("reg", X, y, _fm.mog_regressor, r2_score)
+        # Concrete: normalized, because that is the configuration Ch 4 argues for
+        # and the one its accuracy figures are quoted at.
+        cols = _bench("reg", X, y, _fm.mog_regressor, r2_score, norm=True)
         rows.append(_row("Concrete (regression)", "R2", cols))
     else:
         rows.append(["Concrete (regression)", C.NA, C.NA, C.NA, C.NA, C.NA])
@@ -89,7 +104,9 @@ def main():
     phi = _fm.load_phiusiil()
     if phi is not None:
         X, y = phi
-        cols = _bench("clf", X, y, _fm.mog_classifier, accuracy_score)
+        # PhiUSIIL: left at the shipped default. Every method saturates on this
+        # set, so the transform has nothing to buy, and Ch 4 quotes it as shipped.
+        cols = _bench("clf", X, y, _fm.mog_classifier, accuracy_score, norm=False)
         rows.append(_row("PhiUSIIL (classification)", "acc", cols))
     else:
         rows.append(["PhiUSIIL (classification)", C.NA, C.NA, C.NA, C.NA, C.NA])

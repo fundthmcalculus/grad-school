@@ -227,7 +227,7 @@ Each is a separate commit on `claude/tribble-fis-evaluation-s97850`.
 | **6** | **Build `table_norm_conorm_matrix.py`** and generate it across every runnable dataset. | 4, 5 | 3 h |
 | **7** | **Register** the new table in `manifest.py`, document it in `reproduce/tables/README.md`. | 6 | 30 m |
 | **8** | **Write the findings into the text** — Ch 4 §4.3.5 (the complement rule, corrected), Ch 6 if anything moved, and a note in `ACTION_ITEMS.md` retiring the stale line 93–94 numbers. | 3, 6 | 2 h |
-| **9** | **Re-run the non-`tribble-fis` scripts** (Table 3.1 pVAT under `tribble-cluster`, the gated-minimax pipeline, the `tribble-opt` TSP sample) to confirm they are untouched, and record that they are. | — | 1 h |
+| **9** | **Re-run the non-`tribble-fis` scripts** (Table 3.1 mergeVAT under `tribble-cluster`, the gated-minimax pipeline, the `tribble-opt` TSP sample) to confirm they are untouched, and record that they are. | — | 1 h |
 
 Items 1, 2, 3 and 9 are the "full evaluation" you asked for. Items 4–7 are the
 comparison table. Item 8 is what makes it count.

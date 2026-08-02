@@ -2,7 +2,7 @@
 
 **Status:** Outline · Part III (placeholder milestones — refine with author/advisor)
 **Mirrors:** Pickering Ch 11; Arnett Ch 7.
-**Anchors:** proposal defense ~Dec 2026; **final (terminal) defense March 2028** (~15 months of research runway). Aggressive scope.
+**Anchors:** proposal defense **December 2026** (confirmed 2026-08-02); **final (terminal) defense March 2028** (~15 months of research runway). Aggressive scope.
 **Deliverable:** a Gantt-style chart (create as figure) + the milestone table below.
 
 ---
@@ -11,7 +11,7 @@
 
 | Quarter | Focus | Goal (Ch 7) | Deliverable |
 |---|---|---|---|
-| **Q0 — 2026 Q4** | Proposal defense (~Dec 2026) | — | Defended proposal; committee feedback incorporated |
+| **Q0 — 2026 Q4** | Proposal defense (**Dec 2026**) | — | Defended proposal; committee feedback incorporated |
 | **Q1 — 2027 Q1** | Close credibility gaps | G4 (part) | Thermally-stable re-timing + error bars; eVAT/clusiVAT head-to-head (Ch 3 → journal) |
 | **Q2 — 2027 Q2** | Membership generation | G1 | One-pass MF (MEMBERSHIP_ROADMAP phases 1–4); Ch 5 paper → EUSFLAT 2027 |
 | **Q3 — 2027 Q3** | Real non-metric data + hierarchy | G2 + G3 (start) | DTW / edit-distance / graph benchmarks; begin HME EM implementation |
@@ -25,7 +25,7 @@
 - G2 (real non-metric) depends on nothing — start early (Q3); it's the top credibility item.
 - G1 (one-pass MF) feeds the integrated pipeline (Q5) — must precede capstone; do it Q2.
 - G3 EM is the largest single build — spans Q3–Q4; de-scope path = keep HME one-shot if it slips.
-- Papers pipeline: Ch 3 journal (Q1) → Ch 5 → EUSFLAT 2027 (submit ~spring 2027, present Sept 2027) → Ch 6 (Q4) → capstone/journal (Q5).
+- Papers pipeline: Ch 3 journal (Q1) → Ch 5 → EUSFLAT 2027 (submit **Feb 2027**, present Sept 2027 — see prose §10.5 for the conflict this creates with G1) → Ch 6 (Q4) → capstone/journal (Q5).
 
 ## 10.3 Buffer / risk
 
@@ -34,6 +34,6 @@
 ---
 
 ### Open items — NEED FROM AUTHOR/ADVISOR
-- ~~Hard graduation deadline~~ → **RESOLVED: final defense March 2028** (2028 Q1). Still confirm the exact proposal-defense month (assumed ~Dec 2026).
+- ~~Hard graduation deadline~~ · ~~exact proposal-defense month~~ → **RESOLVED: proposal defense December 2026, final defense March 2028** (2028 Q1).
 - Confirm teaching/RA load per semester (affects realistic throughput).
-- Confirm which conferences drive the paper schedule. **Known anchor: EUSFLAT 2027 (September 2027)** — the target venue for the Ch 5 (topological membership) and Ch 4 (MoG) submissions; back-plan the Q1–Q2 2027 writing against its submission deadline once announced. (NAFIPS 2025 Banff / NAFIPS 2026 El Paso are already published.)
+- Confirm which conferences drive the paper schedule. **Known anchor: EUSFLAT 2027 — submission February 2027, conference September 2027** — the target venue for the Ch 5 (topological membership) and Ch 4 (MoG) submissions; back-plan the Q1–Q2 2027 writing against its submission deadline once announced. (NAFIPS 2025 Banff / NAFIPS 2026 El Paso are already published.)

@@ -116,7 +116,7 @@ The results here are on synthetic data with known ground truth, which is both th
 | Dataset | single-linkage on $D$ | NERFCM on raw $D$ | NERFCM on $D^*$ (given $k$) | ConiVAT (constrained) | Gated set-cover (**$k$ discovered**) |
 |---|---:|---:|---:|---:|---:|
 | concentric_rings | 1.00 | 0.02 | **1.00** | 1.00 | **1.00** |
-| bridged_gaussians | 0.00 (chaining) | 1.00 | 1.00 | **1.00** | 0.00 |
+| bridged_gaussians | 0.00 (chaining) | 1.00 | 1.00 | **1.00** | 0.001 |
 | well_separated | 1.00 | 1.00 | 1.00 | 1.00 | **1.00** |
 | varying_density | 0.98 | 0.98 | 0.98 | 0.98 | **0.98** |
 | uniform_noise | — | — | — | — | **abstains: 12.5% coverage** |
@@ -131,23 +131,25 @@ One column deserves a word on how it is scored, because the bridged row looks co
 
 | Dataset | flat cover | multi-scale | granularities recovered |
 |---|---:|---:|:--:|
-| nested_gaussians | 0.66 | **1.00** | *not recorded* |
+| nested_gaussians | 0.66 | **1.00** | [6, 2] |
 | three_level_hierarchy | 0.58 | **1.00** | [8, 4, 2] |
-| density_hierarchy | 0.75 | **1.00** | *not recorded* |
+| density_hierarchy | 0.75 | **1.00** | [4, 2] |
 
 **The falsification experiment.** To keep myself honest, a flat cover holds ARI ≈ 0.983 across a thirty-fold spread in cluster width. This is the result that says the multi-scale method is not solving a single-level varying-density problem, because there is no such problem to solve; it is solving nesting.
 
 **Scaling.** With the exact $O(N^2)$ minimax transform, the full pipeline runs to 5,000 points in about five seconds, and the multi-scale recovery of [8, 4, 2] is unchanged from 100 points up to 5,000.
 
-**The selection bake-off.** Comparing my persistence-gap gate against beta-plateau and bottleneck-bootstrap, there is no universal winner, and I report that as a finding rather than hide it. My gate fails a deliberately adversarial "bridge" case (ARI 0.001) but is conservative on noise; beta-plateau and bottleneck-bootstrap fix the bridge (0.927 and 0.891) but over-fire on noise, reporting seven clusters where there are none. Bridge-robustness and noise-conservatism turn out to be incompatible for any single fixed threshold, which is itself worth stating.
+**The selection bake-off.** Comparing my persistence-gap gate against beta-plateau and bottleneck-bootstrap, there is no universal winner, and I report that as a finding rather than hide it. My gate fails a deliberately adversarial "bridge" case (ARI 0.001) but abstains on noise; beta-plateau and bottleneck-bootstrap fix the bridge (0.927 and 0.891) but are less conservative there, both reporting seven clusters where there are none.
 
-**Table 5.3 — Selection-method comparison.** No universal winner; the two objectives (bridge-robust vs. noise-conservative) are incompatible for a single fixed threshold.
+That last comparison needs the coverage column to be read honestly, and adding it costs me part of my own claim. Abstention here is not a matter of reporting no clusters — my gate *does* report four on uniform noise — it is a matter of how much of the data a method is willing to commit to. Mine claims 12.5% of the noise points. Beta-plateau claims 95.8%, which is genuine over-firing. But bottleneck-bootstrap claims only 25%, far closer to my gate than to beta-plateau, while also repairing the bridge. So the trade-off between bridge-robustness and noise-conservatism is real but it is a *gradient*, not the dichotomy I first described, and bottleneck-bootstrap is the serious competitor: it does both things at once, less cleanly than I do one and than beta-plateau does the other. I would rather state that than let the coarser reading stand.
 
-| Selection method | bridge case (ARI) | noise behavior |
-|---|---:|---|
-| persistence-gap gate (ours) | 0.001 | conservative — reports no clusters (correct) |
-| beta-plateau [Bonis–Oudot] | 0.927 | over-fires — k = 7 where there are none |
-| bottleneck-bootstrap [AuToMATo] | 0.891 | over-fires |
+**Table 5.3 — Selection-method comparison.** Noise has no ground-truth partition, so ARI is undefined there for every method and the behavior has to be read off $k$ and coverage instead.
+
+| Selection method | bridge case (ARI) | noise: $k$ | noise: coverage | noise behavior |
+|---|---:|---:|---:|---|
+| persistence-gap gate (ours) | 0.001 | 4 | **0.125** | abstains by coverage — claims an eighth of the points |
+| beta-plateau [Bonis–Oudot] | 0.927 | 7 | **0.958** | over-fires — seven clusters spanning 96% of the data |
+| bottleneck-bootstrap [AuToMATo] | 0.891 | 7 | **0.250** | intermediate — seven clusters, but only a quarter of the data |
 
 **Relational-only data.** On dissimilarity-matrix-only datasets built from trees, the simple cases are already solved by NERFCM, but a genuinely multi-scale relational case leaves both the raw and transformed matrices stuck at ARI ≈ 0.29 — confirming that multi-scale relational structure is the honestly hard, still-open problem.
 
@@ -179,7 +181,7 @@ Sixth, **band discovery for overlapping scales (G7, stretch).** The current gap 
 
 The position I am staking out is narrow and, I think, defensible: a density-free, connectivity-based generator of fuzzy membership functions for problems that arrive as a dissimilarity matrix — the missing bridge from the VAT/iVAT structure I can already compute at scale to the fuzzy antecedents I need. Everything the method needs is a merge height the hierarchy already computed, which is what lets it work with no coordinates and no assumed shape.
 
-I have tried to be equally clear about the boundaries. The result is carried by the transform, not by the selection machinery. The method does not apply to single-level varying density, which flat methods already handle, and I ran the falsification experiment rather than let that go untested. My selection gate is deliberately conservative and loses outright on the bridge case to a more aggressive competitor. The band discovery assumes separated scales and is ill-posed when they overlap. The coverage floor can drop a small real cluster. Every result so far is on synthetic data, and every metric so far is a clustering proxy for the fuzzy-model quality I actually care about. And the overlap with Bonis and Oudot is close enough that it has to be actively managed rather than waved away — which is why the distinction rests on three separate axes, the third of which is the one I would defend if pressed.
+I have tried to be equally clear about the boundaries. The result is carried by the transform, not by the selection machinery. The method does not apply to single-level varying density, which flat methods already handle, and I ran the falsification experiment rather than let that go untested. My selection gate is deliberately conservative and loses outright on the bridge case. That was easy to frame as a clean trade until the coverage column went into Table 5.3: bottleneck-bootstrap repairs the bridge *and* declines three-quarters of the noise, which is closer to my gate's behaviour than to beta-plateau's. So the trade-off is a gradient rather than a dichotomy, and there is one competitor that is currently better on both axes at once. The band discovery assumes separated scales and is ill-posed when they overlap. The coverage floor can drop a small real cluster. Every result so far is on synthetic data, and every metric so far is a clustering proxy for the fuzzy-model quality I actually care about. And the overlap with Bonis and Oudot is close enough that it has to be actively managed rather than waved away — which is why the distinction rests on three separate axes, the third of which is the one I would defend if pressed.
 
 None of those limitations is fatal, and stating them is not hedging. This is proposed work; the honest measure of it is whether the open problems are the interesting ones, and I think nested structure in relational data and one-pass membership generation are exactly that.
 
