@@ -67,6 +67,12 @@ class HotStartProblem:
     n_params: int
     order: str
     radius: float
+    init: str = "hot"
+    # The Gaussian construction's own result, carried on every problem so a cold
+    # run can be measured against the thing it is being compared to.
+    heuristic_x: object = None
+    heuristic_r2: float = float("nan")
+    heuristic_cv: float = float("nan")
     meta: dict = field(default_factory=dict)
 
     @property
@@ -98,17 +104,29 @@ _CACHE = {}
 
 
 def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
-          l2_reg=1e-2, test_size=0.2):
+          l2_reg=1e-2, test_size=0.2, init="hot"):
     """Fit the heuristic model and return everything the arms need.
 
     Cached on the full key. Every arm at a given seed must face the *identical*
     problem, and while the construction is deterministic anyway, refitting it
     once per arm costs a few seconds x arms x seeds for no benefit and leaves
     open the question of whether two arms really did get the same start.
+
+    `init` chooses where the search begins, and it is the study's central
+    contrast:
+
+      "hot"   the antecedent parameters the Gaussian construction produced --
+              the tribble-fis result, structure recovered from the data;
+      "cold"  a uniform random draw inside the same box.
+
+    Everything else is held identical between the two, including the box, the
+    objective, the folds and the test split, so the only difference is where the
+    search starts. What separates the two curves is what the structure-first
+    construction is worth, denominated in objective evaluations.
     """
     if dataset not in DATASETS:
         raise KeyError(f"unknown dataset {dataset!r}; have {sorted(DATASETS)}")
-    key = (dataset, seed, order, radius, n_folds, l2_reg, test_size)
+    key = (dataset, seed, order, radius, n_folds, l2_reg, test_size, init)
     if key in _CACHE:
         return _CACHE[key]
 
@@ -153,8 +171,25 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
                                   order, l2_reg, "raw", None)
 
     full_bounds = build_param_bounds(model, Xtr)
-    x0 = np.clip(extract_gaussian_params(model),
-                 [b[0] for b in full_bounds], [b[1] for b in full_bounds])
+    heuristic = np.clip(extract_gaussian_params(model),
+                        [b[0] for b in full_bounds], [b[1] for b in full_bounds])
+
+    if init == "hot":
+        x0 = heuristic
+    elif init == "cold":
+        # A uniform draw in the same box. Its own generator, so that switching
+        # init does not shift the data split or the folds -- those stay keyed to
+        # `seed`, and only the starting point moves.
+        rng = np.random.default_rng([seed, 0xC01D])
+        lo = np.array([b[0] for b in full_bounds])
+        hi = np.array([b[1] for b in full_bounds])
+        x0 = lo + rng.random(len(lo)) * (hi - lo)
+    else:
+        raise ValueError(f"init must be 'hot' or 'cold', not {init!r}")
+
+    # The trust region is always centred on the point the search starts from.
+    # Centring a cold start's box on the heuristic instead would hand it the
+    # answer through the bounds, which is the comparison this is meant to make.
     bounds = _trust_region(full_bounds, x0, radius)
 
     def score(vec):
@@ -180,11 +215,19 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
         rmse = float(np.sqrt(np.mean((truth[keep] - pred[keep]) ** 2))) * span
         return float(r2_score(truth[keep], pred[keep])), rmse
 
+    # The heuristic's own scores travel with every problem, hot or cold: a cold
+    # run's headline number is "how many evaluations to reach what the Gaussian
+    # construction starts at", and that reference has to be the same object.
+    heuristic_r2, heuristic_rmse = score(heuristic)
+
     problem = HotStartProblem(
         dataset=dataset, seed=seed, x0=x0, bounds=bounds, fitness=fitness,
-        score=score, n_params=len(x0), order=order, radius=radius,
+        score=score, n_params=len(x0), order=order, radius=radius, init=init,
+        heuristic_x=heuristic, heuristic_r2=heuristic_r2,
+        heuristic_cv=fitness(heuristic),
         meta={"n_train": len(Xtr), "n_test": len(Xte), "n_folds": n_folds,
               "n_buckets": n_buckets, "l2_reg": l2_reg,
+              "heuristic_rmse": heuristic_rmse,
               "logged": list(prep.get("logged") or [])},
     )
     _CACHE[key] = problem
