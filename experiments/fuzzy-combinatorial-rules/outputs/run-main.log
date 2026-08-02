@@ -1,0 +1,77 @@
+Ruspini partition-of-unity check passed for k in [3, 5, 7]
+
+iris k=3: search space 7^(4*3) = 1.384e+10, exhaustive per class feasible
+  mass        acc 0.933 ± 0.024  obj 1.883 ± 0.042  mfs 7.1 ± 0.2  [0.1s]
+  mst_mf      acc 0.949 ± 0.026  obj 1.940 ± 0.050  mfs 8.2 ± 0.2  [0.2s]
+  mst_core    acc 0.929 ± 0.045  obj 1.964 ± 0.042  mfs 8.0 ± 0.5  [0.3s]
+  greedy      acc 0.956 ± 0.028  obj 2.057 ± 0.030  mfs 9.6 ± 0.2  [0.1s]
+  anneal      acc 0.956 ± 0.028  obj 2.059 ± 0.032  mfs 9.6 ± 0.2  [5.6s]
+  exhaustive  acc 0.953 ± 0.027  obj 2.059 ± 0.032  mfs 8.5 ± 0.2  [0.2s]
+
+iris k=5: search space 31^(4*3) = 7.877e+17, exhaustive per class feasible
+  mass        acc 0.884 ± 0.050  obj 2.378 ± 0.087  mfs 11.0 ± 0.3  [0.1s]
+  mst_mf      acc 0.916 ± 0.036  obj 2.408 ± 0.058  mfs 11.6 ± 0.5  [0.2s]
+  mst_core    acc 0.929 ± 0.036  obj 2.432 ± 0.094  mfs 10.6 ± 0.5  [0.3s]
+  greedy      acc 0.953 ± 0.025  obj 2.548 ± 0.071  mfs 15.4 ± 0.4  [0.2s]
+  anneal      acc 0.958 ± 0.029  obj 2.577 ± 0.055  mfs 13.9 ± 0.3  [6.0s]
+  exhaustive  acc 0.958 ± 0.029  obj 2.577 ± 0.055  mfs 12.1 ± 0.4  [37.6s]
+
+iris k=7: search space 127^(4*3) = 1.761e+25, exhaustive per class out of budget
+  mass        acc 0.933 ± 0.030  obj 2.669 ± 0.050  mfs 15.0 ± 0.3  [0.1s]
+  mst_mf      acc 0.944 ± 0.033  obj 2.692 ± 0.064  mfs 16.0 ± 0.6  [0.2s]
+  mst_core    acc 0.936 ± 0.025  obj 2.675 ± 0.058  mfs 15.1 ± 0.3  [0.3s]
+  greedy      acc 0.951 ± 0.033  obj 2.740 ± 0.031  mfs 22.4 ± 0.6  [0.3s]
+  anneal      acc 0.949 ± 0.034  obj 2.743 ± 0.032  mfs 18.3 ± 1.6  [5.9s]
+  exhaustive  N/A (out of budget)
+
+wine k=3: search space 7^(13*3) = 9.095e+32, exhaustive per class out of budget
+  mass        acc 0.885 ± 0.030  obj 1.518 ± 0.057  mfs 28.6 ± 1.2  [0.1s]
+  mst_mf      acc 0.906 ± 0.021  obj 1.795 ± 0.063  mfs 34.1 ± 1.0  [0.4s]
+  mst_core    acc 0.861 ± 0.043  obj 1.564 ± 0.040  mfs 28.9 ± 2.0  [0.5s]
+  greedy      acc 0.911 ± 0.027  obj 1.906 ± 0.045  mfs 34.0 ± 0.4  [0.4s]
+  anneal      acc 0.902 ± 0.025  obj 1.928 ± 0.042  mfs 34.0 ± 0.5  [6.6s]
+  exhaustive  N/A (out of budget)
+
+wine k=5: search space 31^(13*3) = 1.456e+58, exhaustive per class out of budget
+  mass        acc 0.904 ± 0.020  obj 2.203 ± 0.059  mfs 44.4 ± 2.2  [0.2s]
+  mst_mf      acc 0.902 ± 0.045  obj 2.389 ± 0.053  mfs 48.7 ± 2.2  [0.5s]
+  mst_core    acc 0.889 ± 0.038  obj 2.254 ± 0.064  mfs 44.3 ± 2.6  [0.4s]
+  greedy      acc 0.931 ± 0.026  obj 2.565 ± 0.046  mfs 56.4 ± 0.9  [0.8s]
+  anneal      acc 0.941 ± 0.020  obj 2.607 ± 0.026  mfs 53.9 ± 1.4  [7.6s]
+  exhaustive  N/A (out of budget)
+
+wine k=7: search space 127^(13*3) = 1.118e+82, exhaustive per class out of budget
+  mass        acc 0.913 ± 0.023  obj 2.471 ± 0.046  mfs 64.4 ± 0.8  [0.1s]
+  mst_mf      acc 0.922 ± 0.036  obj 2.549 ± 0.070  mfs 66.8 ± 1.6  [0.7s]
+  mst_core    acc 0.907 ± 0.025  obj 2.523 ± 0.060  mfs 64.6 ± 1.9  [0.4s]
+  greedy      acc 0.954 ± 0.028  obj 2.687 ± 0.023  mfs 80.0 ± 0.7  [1.4s]
+  anneal      acc 0.944 ± 0.012  obj 2.748 ± 0.019  mfs 74.6 ± 2.0  [8.2s]
+  exhaustive  N/A (out of budget)
+
+glass k=3: search space 7^(9*6) = 4.318e+45, exhaustive per class out of budget
+  mass        acc 0.400 ± 0.071  obj 2.594 ± 0.119  mfs 17.9 ± 0.6  [0.1s]
+  mst_mf      acc 0.375 ± 0.072  obj 2.592 ± 0.182  mfs 18.2 ± 0.6  [0.5s]
+  mst_core    acc 0.369 ± 0.075  obj 2.808 ± 0.113  mfs 18.3 ± 0.5  [0.7s]
+  greedy      acc 0.398 ± 0.055  obj 2.810 ± 0.111  mfs 21.1 ± 0.4  [0.5s]
+  anneal      acc 0.414 ± 0.077  obj 2.958 ± 0.071  mfs 20.0 ± 0.3  [12.2s]
+  exhaustive  N/A (out of budget)
+
+glass k=5: search space 31^(9*6) = 3.416e+80, exhaustive per class out of budget
+  mass        acc 0.380 ± 0.052  obj 3.266 ± 0.162  mfs 23.2 ± 1.7  [0.2s]
+  mst_mf      acc 0.366 ± 0.085  obj 3.327 ± 0.195  mfs 28.5 ± 0.9  [0.6s]
+  mst_core    acc 0.398 ± 0.087  obj 3.478 ± 0.110  mfs 23.8 ± 1.0  [0.7s]
+  greedy      acc 0.538 ± 0.088  obj 3.765 ± 0.062  mfs 34.8 ± 0.7  [1.2s]
+  anneal      acc 0.549 ± 0.062  obj 3.786 ± 0.073  mfs 33.1 ± 1.0  [13.8s]
+  exhaustive  N/A (out of budget)
+
+glass k=7: search space 127^(9*6) = 4.031e+113, exhaustive per class out of budget
+  mass        acc 0.400 ± 0.072  obj 3.571 ± 0.121  mfs 31.0 ± 1.8  [0.2s]
+  mst_mf      acc 0.354 ± 0.068  obj 3.640 ± 0.160  mfs 35.9 ± 3.2  [0.8s]
+  mst_core    acc 0.438 ± 0.074  obj 3.753 ± 0.100  mfs 29.9 ± 1.5  [0.7s]
+  greedy      acc 0.528 ± 0.063  obj 4.133 ± 0.070  mfs 50.0 ± 0.6  [2.1s]
+  anneal      acc 0.555 ± 0.062  obj 4.155 ± 0.060  mfs 44.3 ± 2.4  [14.9s]
+  exhaustive  N/A (out of budget)
+
+Total 135.5s
+Wrote /home/user/grad-school/experiments/fuzzy-combinatorial-rules/outputs/results-main.json
+      /home/user/grad-school/experiments/fuzzy-combinatorial-rules/outputs/tables-main.md

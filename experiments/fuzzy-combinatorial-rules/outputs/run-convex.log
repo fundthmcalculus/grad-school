@@ -1,0 +1,77 @@
+Ruspini partition-of-unity check passed for k in [3, 5, 7]
+
+iris k=3: search space 6^(4*3) = 2.177e+09 [convex antecedents only], exhaustive per class feasible
+  mass        acc 0.933 ± 0.024  obj 1.883 ± 0.042  mfs 7.1 ± 0.2  [0.1s]
+  mst_mf      acc 0.949 ± 0.026  obj 1.940 ± 0.050  mfs 8.2 ± 0.2  [0.2s]
+  mst_core    acc 0.929 ± 0.045  obj 1.964 ± 0.042  mfs 8.0 ± 0.5  [0.3s]
+  greedy      acc 0.956 ± 0.028  obj 2.046 ± 0.035  mfs 9.6 ± 0.2  [0.1s]
+  anneal      acc 0.956 ± 0.028  obj 2.059 ± 0.032  mfs 9.2 ± 0.2  [5.1s]
+  exhaustive  acc 0.953 ± 0.027  obj 2.059 ± 0.032  mfs 8.5 ± 0.2  [0.1s]
+
+iris k=5: search space 15^(4*3) = 1.297e+14 [convex antecedents only], exhaustive per class feasible
+  mass        acc 0.884 ± 0.050  obj 2.378 ± 0.087  mfs 11.0 ± 0.3  [0.1s]
+  mst_mf      acc 0.916 ± 0.036  obj 2.408 ± 0.058  mfs 11.6 ± 0.5  [0.2s]
+  mst_core    acc 0.929 ± 0.036  obj 2.432 ± 0.094  mfs 10.6 ± 0.5  [0.3s]
+  greedy      acc 0.958 ± 0.029  obj 2.525 ± 0.055  mfs 16.3 ± 0.3  [0.1s]
+  anneal      acc 0.958 ± 0.029  obj 2.577 ± 0.055  mfs 14.3 ± 0.4  [4.5s]
+  exhaustive  acc 0.958 ± 0.029  obj 2.577 ± 0.055  mfs 12.1 ± 0.4  [3.0s]
+
+iris k=7: search space 28^(4*3) = 2.322e+17 [convex antecedents only], exhaustive per class feasible
+  mass        acc 0.933 ± 0.030  obj 2.669 ± 0.050  mfs 15.0 ± 0.3  [0.1s]
+  mst_mf      acc 0.944 ± 0.033  obj 2.692 ± 0.064  mfs 16.0 ± 0.6  [0.2s]
+  mst_core    acc 0.936 ± 0.025  obj 2.675 ± 0.058  mfs 15.1 ± 0.3  [0.3s]
+  greedy      acc 0.964 ± 0.030  obj 2.703 ± 0.043  mfs 23.0 ± 0.1  [0.2s]
+  anneal      acc 0.949 ± 0.034  obj 2.743 ± 0.032  mfs 17.5 ± 1.4  [3.8s]
+  exhaustive  acc 0.949 ± 0.034  obj 2.743 ± 0.032  mfs 16.1 ± 0.5  [25.9s]
+
+wine k=3: search space 6^(13*3) = 2.228e+30 [convex antecedents only], exhaustive per class out of budget
+  mass        acc 0.885 ± 0.030  obj 1.518 ± 0.057  mfs 28.6 ± 1.2  [0.1s]
+  mst_mf      acc 0.906 ± 0.021  obj 1.795 ± 0.063  mfs 34.1 ± 1.0  [0.5s]
+  mst_core    acc 0.861 ± 0.043  obj 1.564 ± 0.040  mfs 28.9 ± 2.0  [0.5s]
+  greedy      acc 0.902 ± 0.030  obj 1.901 ± 0.052  mfs 34.7 ± 0.4  [0.3s]
+  anneal      acc 0.906 ± 0.031  obj 1.925 ± 0.042  mfs 34.3 ± 0.7  [6.4s]
+  exhaustive  N/A (out of budget)
+
+wine k=5: search space 15^(13*3) = 7.372e+45 [convex antecedents only], exhaustive per class out of budget
+  mass        acc 0.913 ± 0.028  obj 2.210 ± 0.055  mfs 44.1 ± 2.0  [0.1s]
+  mst_mf      acc 0.906 ± 0.046  obj 2.391 ± 0.053  mfs 48.8 ± 2.2  [0.7s]
+  mst_core    acc 0.896 ± 0.039  obj 2.261 ± 0.057  mfs 44.4 ± 2.7  [0.5s]
+  greedy      acc 0.920 ± 0.039  obj 2.396 ± 0.107  mfs 58.0 ± 0.7  [0.5s]
+  anneal      acc 0.937 ± 0.024  obj 2.608 ± 0.027  mfs 52.9 ± 0.9  [5.5s]
+  exhaustive  N/A (out of budget)
+
+wine k=7: search space 28^(13*3) = 2.749e+56 [convex antecedents only], exhaustive per class out of budget
+  mass        acc 0.913 ± 0.020  obj 2.475 ± 0.050  mfs 64.7 ± 0.7  [0.1s]
+  mst_mf      acc 0.926 ± 0.035  obj 2.557 ± 0.069  mfs 67.2 ± 1.6  [0.9s]
+  mst_core    acc 0.913 ± 0.017  obj 2.523 ± 0.062  mfs 65.1 ± 1.6  [0.5s]
+  greedy      acc 0.939 ± 0.020  obj 2.517 ± 0.088  mfs 82.1 ± 1.5  [0.6s]
+  anneal      acc 0.946 ± 0.024  obj 2.740 ± 0.020  mfs 72.3 ± 1.8  [5.0s]
+  exhaustive  N/A (out of budget)
+
+glass k=3: search space 6^(9*6) = 1.048e+42 [convex antecedents only], exhaustive per class out of budget
+  mass        acc 0.395 ± 0.064  obj 2.577 ± 0.115  mfs 18.0 ± 0.6  [0.2s]
+  mst_mf      acc 0.374 ± 0.075  obj 2.587 ± 0.176  mfs 18.0 ± 0.4  [0.5s]
+  mst_core    acc 0.362 ± 0.085  obj 2.802 ± 0.111  mfs 18.3 ± 0.6  [0.8s]
+  greedy      acc 0.411 ± 0.051  obj 2.757 ± 0.107  mfs 21.9 ± 0.4  [0.4s]
+  anneal      acc 0.425 ± 0.087  obj 2.944 ± 0.064  mfs 19.6 ± 0.4  [11.6s]
+  exhaustive  N/A (out of budget)
+
+glass k=5: search space 15^(9*6) = 3.228e+63 [convex antecedents only], exhaustive per class out of budget
+  mass        acc 0.375 ± 0.061  obj 3.238 ± 0.156  mfs 24.2 ± 1.5  [0.2s]
+  mst_mf      acc 0.422 ± 0.078  obj 3.232 ± 0.214  mfs 27.8 ± 2.0  [0.7s]
+  mst_core    acc 0.415 ± 0.101  obj 3.454 ± 0.089  mfs 24.5 ± 0.9  [0.8s]
+  greedy      acc 0.463 ± 0.072  obj 3.454 ± 0.186  mfs 38.1 ± 0.5  [0.6s]
+  anneal      acc 0.538 ± 0.067  obj 3.713 ± 0.065  mfs 29.4 ± 0.7  [9.8s]
+  exhaustive  N/A (out of budget)
+
+glass k=7: search space 28^(9*6) = 1.401e+78 [convex antecedents only], exhaustive per class out of budget
+  mass        acc 0.414 ± 0.079  obj 3.520 ± 0.139  mfs 33.1 ± 1.7  [0.2s]
+  mst_mf      acc 0.425 ± 0.076  obj 3.566 ± 0.169  mfs 36.3 ± 3.3  [0.8s]
+  mst_core    acc 0.471 ± 0.077  obj 3.716 ± 0.111  mfs 31.1 ± 1.1  [0.8s]
+  greedy      acc 0.437 ± 0.092  obj 3.612 ± 0.265  mfs 54.6 ± 1.0  [0.7s]
+  anneal      acc 0.534 ± 0.085  obj 4.050 ± 0.062  mfs 39.1 ± 1.5  [8.7s]
+  exhaustive  N/A (out of budget)
+
+Total 104.0s
+Wrote /home/user/grad-school/experiments/fuzzy-combinatorial-rules/outputs/results-convex.json
+      /home/user/grad-school/experiments/fuzzy-combinatorial-rules/outputs/tables-convex.md
