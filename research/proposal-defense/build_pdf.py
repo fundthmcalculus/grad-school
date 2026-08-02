@@ -56,6 +56,46 @@ DEPT = ("Department of Aerospace Engineering and Engineering Mechanics \\\\ "
 
 LATEX_ENGINES = ["xelatex", "lualatex", "pdflatex", "tectonic"]
 
+# Map from the harness output names to the prose figure names.
+# Key: basename as output by reproduce/tables via common.save_figure()
+# Value: filename expected in prose/fig/
+FIGURE_COPIES = {
+    "fig_03_complexity_fit": "03-complexity-fit",
+}
+
+
+# --------------------------------------------------------------------------- #
+# figure copying
+# --------------------------------------------------------------------------- #
+def copy_figures():
+    """Copy figures from the harness outputs to the prose directory.
+
+    The harness generates figures like 'fig_03_complexity_fit.{png,eps}' in
+    reproduce/outputs/figures/; the prose expects them at prose/fig/03-complexity-fit.{png,eps}.
+    This copies them once at build time, so a newly-generated figure automatically
+    reaches the document without manual intervention.
+
+    Returns the number of figures copied (for reporting).
+    """
+    source_dir = os.path.join(HERE, "..", "..", "reproduce", "outputs", "figures")
+    dest_dir = os.path.join(HERE, "prose", "fig")
+
+    if not os.path.exists(source_dir):
+        return 0  # no figures generated yet; not an error
+
+    os.makedirs(dest_dir, exist_ok=True)
+    copied = 0
+
+    for harness_name, prose_name in FIGURE_COPIES.items():
+        for ext in ("png", "eps"):
+            source = os.path.join(source_dir, f"{harness_name}.{ext}")
+            dest = os.path.join(dest_dir, f"{prose_name}.{ext}")
+            if os.path.exists(source):
+                shutil.copy2(source, dest)
+                copied += 1
+
+    return copied
+
 
 # --------------------------------------------------------------------------- #
 # source assembly
@@ -273,6 +313,11 @@ def page_count(pdf):
 
 
 def main():
+    print("Copying figures from harness outputs ...")
+    n = copy_figures()
+    if n > 0:
+        print(f"  copied {n} figure(s)")
+
     print("Assembling proposal ...")
     md_path = assemble()
 
