@@ -648,6 +648,96 @@ C. Reading the front
    also regularizes a search that was overfitting six initial
    conditions.  Past that point the trade is real and w prices it.
 
+===== demo_calibrate.py =====
+A. Why the cloud proxy was loose -- it is a minimum-order statistic
+   Violations are not rare: 37% of cloud points have Vdot >= 0.  The
+   estimate is the smallest one SAMPLED, so it turns on luck:
+     seed  cloud (Riccati)  ray (Riccati)
+        0           0.6718         0.5937
+        1           0.6744         0.5934
+        2           0.7484         0.5849
+   Fixing the seed made the cloud deterministic, not accurate.
+   Local descent does not rescue it either, and the reason is
+   structural: min{z'Pz : Vdot(z) >= 0} has the trivial solution
+   z = 0, because Vdot(0) = 0.  A descent method walks to the origin.
+   Rays exclude it by construction -- the scan starts at r > 0.
+
+   imitation N=2: ray 0.5937 (110 ms), SOS 0.5684 (Riccati, 43 s), ratio 1.044
+   (the §14 cloud proxy reported 0.6718 here, ratio 1.182)
+
+B. Calibration set -- is the residual gap a constant?
+   Controllers spanning a range of aggressiveness, made by perturbing
+   the imitation fit along the u(0)=0 null space (so every one of
+   them still has an equilibrium at the origin to certify).
+       controller    score      ray      SOS   V from  SOS/ray
+        imitation   1.0437   0.5937   0.5684  Riccati   0.9574
+        perturb 1   1.0279   0.5612   0.5399  Riccati   0.9620
+        perturb 2   1.1456   0.6084   0.5641  Riccati   0.9271
+        perturb 3   0.9215   0.3313   0.3226      lin   0.9735
+        perturb 4   1.1343   0.2599   0.2525      lin   0.9716
+        perturb 5      inf   0.0154     none       --       --
+   kappa = median(SOS/ray) = 0.9620  over [0.9271, 0.9735], 5 controllers
+   Of the 3.8% shortfall, 2.5% is the deliberate 0.95
+   shrink applied to rho before re-certifying; the rest is the
+   S-procedure's own conservatism at multiplier degree 4.
+
+C. Does a SPECIFIED certified radius come out the other end?
+   Penalty hinges on the CALIBRATED estimate kappa*ray, at w=10, so the
+   target is stated directly in certified-ball units.
+   A pass that misses raises the target by exactly the shortfall.  A
+   pass that misses AND does not improve on the one before it is not
+   short of target, it is stuck in a basin, so the target is pushed
+   50% further to leave it -- the per-candidate columns show that
+   happening as the certificate jumps from one Lyapunov function to
+   the other.
+     spec  pass    score  holdout  kappa*ray  SOS Ric  SOS lin     best  met?     s
+     0.35     1   0.7956   0.7546     0.3478   0.0000   0.3415   0.3415    no   259
+     0.35     2   0.7962   0.7227     0.3577   0.0000   0.3549   0.3549   yes   268
+     0.45     1   0.7690   0.7296     0.5277   0.0000   0.3452   0.3452    no   279
+     0.45     2   0.7857   0.7536     0.5865   0.0000   0.3430   0.3430    no   278
+     0.45     3   0.8487   0.8667     0.7269   0.6782   0.3654   0.6782   yes   289
+     0.55     1   0.7717   0.7466     0.5503   0.1038   0.3368   0.3368    no   272
+     0.55     2   0.8469   0.8560     0.7278   0.6791   0.0000   0.6791   yes   284
+
+D. Reading it
+   The proxy is now an estimator with a known bias rather than an
+   uncontrolled upper bound, so the penalty target is stated in the
+   units the certificate is reported in.  What it does NOT buy is
+   monotonicity: the certified radius is a max over two Lyapunov
+   candidates, and the search sits in a basin where one of them
+   dominates until the target is pushed hard enough to leave it.
+   A spec can therefore fail while a LARGER one succeeds, which is a
+   property of the landscape and not of the calibration.  Every row
+   is confirmed by the real SDP, so a 'yes' is a certificate and not
+   an estimate.
+
+===== verify_proxy.py =====
+1. The descent formulation is degenerate, not badly tuned
+   Vdot(0) = +0.000e+00  ->  z = 0 SATISFIES the constraint Vdot >= 0,
+   so min{z'Pz : Vdot(z) >= 0} has global optimum 0 at the origin.
+   violations are not rare: 7468/20000 (37%) of cloud points have Vdot >= 0,
+   so the cloud estimate is a minimum-order statistic (see 3).
+   of 6 local solves from the best sampled starts: 2 collapsed to ||z|| = 0,
+   and 6 ended infeasible (on the Vdot = 0 boundary from below), so a
+   strict feasibility recheck discards every one and the bound never moves.
+
+2. The ray proxy's witnesses are real (necessary condition holds)
+   every returned endpoint satisfies Vdot >= 0: 973/973, min Vdot = +2.393e-12
+   the binding witness is a REAL state, not an extrapolation:
+     z*   = [+0.0237, +0.0778, +0.0628, -0.2563]
+     Vdot = +2.861e-09 >= 0,  ball radius 0.5937
+   so no certificate can reach past it -- necessary, never sufficient.
+
+3. Seed stability of the two estimators
+     seed      cloud        ray
+        0     0.6718     0.5937
+        1     0.6744     0.5934
+        2     0.7484     0.5849
+        3     0.6608     0.5937
+        4     0.7369     0.5915
+   spread: cloud 12.5%, ray 1.5%
+   Same necessary condition, same controller -- only the estimator differs.
+
 ===== verify_symbolic.py =====
 SYMBOLIC VERIFICATION (sympy; identities, not sampled points)
 ==============================================================================

@@ -37,6 +37,7 @@ import cvxpy as cp
 import numpy as np
 import sympy as sp
 from numpy.typing import NDArray
+from scipy.optimize import minimize
 
 af64 = NDArray[np.float64]
 
@@ -562,6 +563,94 @@ def ball_samples(n: int = 20000, radius: float = 2.0, dim: int = 4,
     d = rng.normal(size=(n, dim))
     d /= np.linalg.norm(d, axis=1, keepdims=True)
     return d * (radius * rng.uniform(0.01, 1.0, size=n) ** 0.5)[:, None]
+
+
+def _vdot_at(z: af64, ctrl, plant, p_lyap: af64) -> float:
+    """Vdot at a single state, through the plant's own saturating RHS."""
+    return float(2.0 * z @ p_lyap @ plant.rhs(z, ctrl(z)))
+
+
+def _vdot_batch(zs: af64, ctrl, plant, p_lyap: af64) -> af64:
+    """Vdot at many states at once, matching the plant's saturating RHS."""
+    u = ctrl.evaluate_batch(zs)
+    x1, x2, v1, v2 = zs.T
+    d = np.clip(x2 - x1, -1e3, 1e3)
+    spring = plant.k_lin * d + plant.k_nl * d**3
+    zdot = np.column_stack([
+        v1, v2,
+        (spring - plant.damping * v1 + np.clip(u, -plant.u_max, plant.u_max))
+        / plant.m1,
+        (-spring - plant.damping * v2) / plant.m2,
+    ])
+    return 2.0 * np.einsum("ni,ij,nj->n", zs, p_lyap, zdot)
+
+
+def sphere_directions(n: int = 2000, dim: int = 4, seed: int = 0) -> af64:
+    """Fixed unit directions, shared by every controller and every candidate P."""
+    rng = np.random.default_rng(seed)
+    d = rng.normal(size=(n, dim))
+    return d / np.linalg.norm(d, axis=1, keepdims=True)
+
+
+def ray_radius_proxy(
+    ctrl, plant, p_lyap: af64, dirs: af64, radius_cap: float = 2.0,
+    n_grid: int = 64, n_bisect: int = 22,
+) -> float:
+    """Sharp necessary condition: search along rays, not over a point cloud.
+
+    `certified_radius_proxy` estimates min{z'Pz : Vdot(z) >= 0} by taking the
+    minimum over a random cloud.  That is a minimum-order statistic, and it
+    behaves like one: on this problem 37% of cloud points violate, yet the
+    reported minimum swings 0.672 / 0.674 / 0.748 across three seeds, because
+    everything depends on whether some point happened to land near the inner
+    boundary.  Fixing the seed makes it deterministic, not accurate.
+
+    Local descent from the cloud does not fix it either, and the reason is
+    structural rather than numerical: **z = 0 satisfies Vdot(0) = 0 >= 0**, so
+    the program has the trivial global solution 0 and a descent method walks
+    straight to it.
+
+    Rays remove both defects.  Along a fixed direction d the violation radius
+
+        r(d) = min { r > 0 : Vdot(r d) >= 0 }
+
+    is found by scan-and-bisect -- no optimizer, no degenerate solution, and the
+    origin is excluded by construction since the scan starts at r > 0.  The
+    estimate is then min_d r(d)^2 d'Pd over the direction set, and the only
+    remaining error is angular resolution, which is uniform rather than luck.
+
+    **Still a rigorous upper bound.** Bisection returns the OUTER bracket
+    endpoint, which is a state that genuinely satisfies Vdot >= 0, so it
+    witnesses that no certificate can reach beyond it.  Never sufficient,
+    always necessary -- the property that makes it safe to optimize against.
+    """
+    lo = float(np.linalg.eigvalsh(p_lyap).min())
+    m = len(dirs)
+    grid = np.linspace(radius_cap / n_grid, radius_cap, n_grid)
+    pts = (dirs[:, None, :] * grid[None, :, None]).reshape(-1, dirs.shape[1])
+    vd = _vdot_batch(pts, ctrl, plant, p_lyap).reshape(m, n_grid)
+
+    hit = vd >= 0.0
+    any_hit = hit.any(axis=1)
+    if not any_hit.any():
+        return float(radius_cap)
+    first = np.argmax(hit, axis=1)                      # first crossing index
+    idx = np.flatnonzero(any_hit)
+    first = first[idx]
+    dirs_h = dirs[idx]
+    # Bracket: lo_r has Vdot < 0 (or is the floor), hi_r has Vdot >= 0.
+    hi_r = grid[first]
+    lo_r = np.where(first > 0, grid[np.maximum(first - 1, 0)], 0.0)
+    for _ in range(n_bisect):
+        mid = 0.5 * (lo_r + hi_r)
+        v = _vdot_batch(dirs_h * mid[:, None], ctrl, plant, p_lyap)
+        good = v >= 0.0
+        hi_r = np.where(good, mid, hi_r)
+        lo_r = np.where(good, lo_r, mid)
+    # hi_r is feasible by construction; rho from the outer endpoint.
+    z = dirs_h * hi_r[:, None]
+    rho = np.einsum("ni,ij,nj->n", z, p_lyap, z)
+    return float(np.sqrt(min(float(rho.min()), lo * radius_cap**2) / lo))
 
 
 def proxy_ball_radius(ctrl, plant, p_lyap: af64, samples: af64,
