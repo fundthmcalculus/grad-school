@@ -1,0 +1,25 @@
+init,arm,started from,objective,test accuracy,test errors,Δ accuracy vs construction (paired),acc wins,seconds to match the construction,seconds spent
+hot,none,Gaussian construction,0.01116 ± 0.00251,0.9995 ± 0.0004,25 ± 19,+0.0000,0/5,0.0,0.3 ± 0.0
+hot,scipy-lbfgsb,Gaussian construction,0.00086 ± 0.00033,0.9998 ± 0.0000,8 ± 1,+0.0003 ± +0.0004,4/5,0.0,62.7 ± 1.6
+hot,scipy-powell,Gaussian construction,0.00076 ± 0.00021,0.9999 ± 0.0000,7 ± 1,+0.0004 ± +0.0004,5/5,0.0,62.6 ± 1.4
+hot,scipy-de,Gaussian construction,0.01116 ± 0.00251,0.9995 ± 0.0004,25 ± 19,+0.0000,0/5,0.0,22.1 ± 17.8
+hot,opt-ga,Gaussian construction,0.00319 ± 0.00477,0.9998 ± 0.0000,9 ± 1,+0.0003 ± +0.0004,4/5,0.0,53.1 ± 6.5
+hot,opt-pso,Gaussian construction,0.01116 ± 0.00251,0.9995 ± 0.0004,25 ± 19,+0.0000,0/5,0.0,38.3 ± 1.1
+hot,opt-aco,Gaussian construction,0.00804 ± 0.00426,0.9992 ± 0.0003,39 ± 15,-0.0003 ± +0.0002,0/5,0.0,37.9 ± 0.7
+hot,opt-gd,Gaussian construction,0.00103 ± 0.00065,0.9998 ± 0.0000,9 ± 1,+0.0003 ± +0.0004,4/5,0.0,63.3 ± 2.1
+cold,none,random point in the box,7.04249 ± 6.26944,0.3806 ± 0.0773,29730 ± 3709,-0.6189 ± +0.0774,0/5,never,0.2 ± 0.0
+cold,scipy-lbfgsb,random point in the box,3.37301 ± 6.22786,0.8280 ± 0.2049,8257 ± 9834,-0.1715 ± +0.2051,0/5,never,36.4 ± 6.1
+cold,scipy-powell,random point in the box,3.16883 ± 6.32957,0.8852 ± 0.2290,5508 ± 10993,-0.1142 ± +0.2292,3/5,12.8 ± 9.7 (4/5),37.0 ± 1.7
+cold,scipy-de,random point in the box,0.05157 ± 0.03451,0.9887 ± 0.0119,541 ± 572,-0.0108 ± +0.0121,1/5,25.4 (1/5),37.3 ± 0.8
+cold,opt-ga,random point in the box,0.00689 ± 0.00193,0.9997 ± 0.0002,15 ± 10,+0.0002 ± +0.0004,4/5,20.7 ± 6.6,37.7 ± 1.6
+cold,opt-pso,random point in the box,0.12337 ± 0.04719,0.9820 ± 0.0151,865 ± 724,-0.0175 ± +0.0148,0/5,never,37.1 ± 1.2
+cold,opt-aco,random point in the box,0.00938 ± 0.00215,0.9993 ± 0.0007,36 ± 33,-0.0002 ± +0.0009,2/5,23.6 ± 2.0 (3/5),36.8 ± 1.9
+cold,opt-gd,random point in the box,5.54726 ± 6.70887,0.7698 ± 0.2253,11048 ± 10817,-0.2297 ± +0.2256,0/5,never,36.0 ± 5.8
+classical-kmeans,none,k-means within each class,0.02804 ± 0.01348,0.9933 ± 0.0005,322 ± 23,-0.0062 ± +0.0006,0/5,never,0.2 ± 0.0
+classical-kmeans,scipy-lbfgsb,k-means within each class,0.00669 ± 0.00576,0.9995 ± 0.0004,26 ± 17,-0.0000 ± +0.0006,2/5,11.1 ± 13.5 (4/5),34.7 ± 1.6
+classical-kmeans,scipy-powell,k-means within each class,0.00156 ± 0.00066,0.9998 ± 0.0001,11 ± 2,+0.0003 ± +0.0004,3/5,12.5 ± 10.1,33.6 ± 0.6
+classical-kmeans,scipy-de,k-means within each class,0.02804 ± 0.01348,0.9933 ± 0.0005,322 ± 23,-0.0062 ± +0.0006,0/5,never,16.8 ± 13.5
+classical-kmeans,opt-ga,k-means within each class,0.01467 ± 0.00975,0.9985 ± 0.0014,72 ± 69,-0.0010 ± +0.0016,1/5,2.7 (1/5),29.8 ± 1.7
+classical-kmeans,opt-pso,k-means within each class,0.02804 ± 0.01348,0.9933 ± 0.0005,322 ± 23,-0.0062 ± +0.0006,0/5,never,28.6 ± 0.6
+classical-kmeans,opt-aco,k-means within each class,0.00636 ± 0.00312,0.9986 ± 0.0014,65 ± 65,-0.0008 ± +0.0016,2/5,16.8 ± 2.6 (4/5),28.2 ± 0.4
+classical-kmeans,opt-gd,k-means within each class,0.00717 ± 0.00639,0.9995 ± 0.0003,24 ± 14,+0.0000 ± +0.0006,2/5,3.4 ± 2.0 (3/5),34.3 ± 1.4
