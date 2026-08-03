@@ -235,8 +235,13 @@ def run_one(setting, out_dir: Path, skip_existing: bool, axis: str = "threads") 
     return csv_path
 
 
-def compare(results: dict, axis: str = "threads") -> int:
-    """Diff the accuracy cells across settings of one axis. 0 if all tied."""
+def compare(results: dict, axis: str = "threads") -> tuple[int, bool]:
+    """Diff the accuracy cells across settings of one axis.
+
+    Returns (moved, manipulated): moved is 0 if all tied, 1 if at least one
+    column moved, or the sentinel 2 if fewer than two runs were usable to
+    compare at all. manipulated is False in the sentinel case.
+    """
     parsed: dict = {}
     for setting, path in results.items():
         if path.is_file():
@@ -245,7 +250,7 @@ def compare(results: dict, axis: str = "threads") -> int:
             print(f"  [missing] {axis}={setting}: {path}")
     if len(parsed) < 2:
         print("  fewer than two usable runs; nothing to compare")
-        return 2
+        return 2, False
 
     counts = list(parsed)
     reference = counts[0]
