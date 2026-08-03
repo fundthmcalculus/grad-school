@@ -156,6 +156,39 @@ empirical follow-up it spun off is **E9**, deliberately low priority._
 - [x] ⬜ **B6 — Remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
       returns a wrong ordering (seed vertex, then ascending index order). Cause is a vectorized
       call to a scalar-typed `_get_dist`. Nothing calls it. See `REVIEW` ★2.
+- [ ] 🔒 **B9 — Backfill `log_features` into the sample scripts. BLOCKED on `tribble-fis` #73.**
+      The samples were converted onto `UnitFuzzyScalar` (PR #55 here), which auto-detects log
+      columns by dynamic range, whereas each sample previously named its own columns. Upstream
+      #73 adds `log_features=[...]`, and once it merges and the gitlink is bumped past it, the
+      lists below restore each sample's original logged set — turning behaviour-*changing*
+      conversions into behaviour-*preserving* ones.
+      **This is not a mechanical sweep. Two files are deliberate exceptions.**
+      **`concrete_trapz.py` — do NOT backfill.** *(Author decision, 2026-08-03: "I like the
+      improvement.")* Under auto-detection it **improved in 9 of 10 rows**, +0.023 to +0.123 R²
+      (Gaussian 2-full 0.854 → 0.915; Trapz 1st 0.692 → 0.815; only 0th order regresses, −0.099,
+      and that row has no consequent to fit). Its original list was `['Slag','FlyAsh','Age']`,
+      which is exactly the set `concrete.py` logs and exactly the set no dynamic-range threshold
+      can select — so `log_features` is what would make it expressible, and expressing it here
+      means choosing the worse configuration. It keeps auto-detection. Single split, so re-measure
+      at ten seeds before quoting the gain anywhere.
+      **`nasa.py` — cannot be fully restored.** Its column set is recoverable (`Rad Flow`,
+      `Fpv Close`, `Fpv Open`, `High`, `Bypass`, `Bpv Close`, `Bpv Open`) but its *order* was
+      normalize→log, which the scaler cannot express. `log_features` restores the set, not the
+      order, so this stays a deliberate behaviour change either way. Do not let the list imply
+      otherwise. Unverifiable in principle — `load_data()` fetches Statlog Shuttle over the wire.
+      **Lists for the rest** (recovered from `feat/normalization-migration:FuzzySystemsExperiments/`):
+      `beth.py` → `["timestamp","processId","mountNamespace","eventId","userId"]`;
+      `beth-anomaly.py` → `["processId","mountNamespace","eventId","userId"]`;
+      `iot.py` → the 12 rate/inter-arrival columns (`fwd_pkts_per_sec` … `flow_duration`);
+      `wine_red.py` → `["total sulfur dioxide","free sulfur dioxide","chlorides"]`;
+      `phiusiil.py` → two calls, 17 count/length columns then 4 ratio columns.
+      `iot-botnet.py` has no recoverable explicit list — re-read its pre-conversion source rather
+      than assuming one.
+      **Only `phiusiil.py` is verifiable here** (its dataset is in `data/`), and it came out
+      result-neutral under auto-detection — accuracy identical to four decimals despite a
+      completely different logged set. Check rather than assume that restoring its list is also
+      neutral. The remaining four have no local data and cannot be verified either way, which is
+      the honest reason to prefer behaviour-preserving lists for them.
 
 ## C. Experiments owed
 
