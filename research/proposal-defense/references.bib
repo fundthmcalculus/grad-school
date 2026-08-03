@@ -11,11 +11,37 @@
 %   [V] adversarially verified / confirmed from publisher-index this session
 %   [S] standard well-known DOI for a seminal work; spot-check at proof stage
 %   [?] added from working knowledge, pending verification.
-%       NOTE: all [?] entries were resolved in the 2026-07-31 verification
-%       pass (Crossref / arXiv / DBLP) and promoted to [V]; the marker is
-%       kept in the legend for any future additions. One proof-stage check
-%       remains: confirm the "Kali{\v{s}}nik" accent survives BibTeX encoding
-%       (automato2024).
+%
+% Counted 2026-08-03: 70 entries = 45 [V] + 23 [S] + 2 [?].
+%
+% This block previously said "all [?] entries were resolved in the 2026-07-31
+% verification pass and promoted to [V]". That is not true, and neither is the
+% claim it supported in prose/bibliography.md that there are no unresolved
+% entries. Two [?] markers remain, and one entry marked [V] carries a literal
+% placeholder in a field. Corrected rather than re-ticked, because a legend that
+% asserts a state the file does not have is worse than no legend:
+%
+%   [?] arnett2018proposal  -- title is the placeholder "Dissertation Proposal";
+%                              type/date unconfirmed. Cited in section 2.1.
+%   [?] mullner2011modern   -- journal is "arXiv preprint", no volume or pages.
+%                              One of the two papers section 3.3.1's space-bound
+%                              correction is assembled from, and chapter 9 says to
+%                              cite it prominently, so this one is load-bearing.
+%   [V] parveen2013pvat     -- author field contains the literal string
+%                              "[given name]". It is marked [V] because the
+%                              venue, volume and pages ARE confirmed; the name
+%                              is not, and BibTeX will typeset the placeholder
+%                              verbatim. This is the name-collision citation
+%                              section 3.3.1 turns on, so it cannot ship as is.
+%   [V] deshpande2024scalable -- metadata confirmed; FULL TEXT NOT READ. [V]
+%                              means the reference is correct, NOT that its
+%                              content claims have been checked against the
+%                              paper. Sections 2.2 and 3.2 characterise it from
+%                              the abstract and the citing literature.
+%
+% Also outstanding, and not cosmetic: the Zhang-2023 attribution error tracked
+% as checklist E7. The one genuinely cosmetic item is confirming the
+% "Kali{\v{s}}nik" accent survives BibTeX encoding (automato2024).
 % ===========================================================================
 
 
@@ -505,7 +531,12 @@
              geometry) and MST-iVAT, which computes the iVAT RDI "without having to
              compute the full distance matrix". BLOCKING: obtain full text.}}
 
-@inproceedings{parveen2013pvat,                 % [V] -- NAME COLLISION with this work's "pVAT"
+@inproceedings{parveen2013pvat,                 % [V] venue/volume/pages -- but see BLOCKING below
+  % BLOCKING: the author field below contains a literal placeholder and BibTeX will
+  % typeset it verbatim. This is the NAME COLLISION citation section 3.3.1 turns on
+  % -- the reason the method is called mergeVAT rather than pVAT -- so it appears in
+  % the one paragraph a reviewer is most likely to check. Resolve the given name from
+  % LNCS 8302 before any build that leaves this machine.
   author    = {Parveen, [given name] and Sreevalsan-Nair, Jaya},
   title     = {{pVAT}: Parallel {VAT} on the {GPU}},
   booktitle = {Big Data Analytics (BDA 2013)},
