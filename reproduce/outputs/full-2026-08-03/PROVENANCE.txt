@@ -12,6 +12,11 @@ generated:   2026-08-03T20:34:58Z
 ## Use this only to recover a run whose numeric phase completed and    ##
 ## whose archive step failed. Confirm the SHAs and the logs/ contents  ##
 ## match the run you think this is before quoting any number from it.  ##
+##                                                                    ##
+## THIS BANNER IS NOT A VERDICT. The addendum at the end of this file  ##
+## establishes what produced these tables, and this archive IS         ##
+## citable -- see PROVENANCE_MAP.md note 18. Two independent readers   ##
+## stopped at this banner and concluded the opposite.                  ##
 ########################################################################
 
 tribble-fis: 4b33a0deadbe0254ed42b7f6841e3e9c4bbfdde2
