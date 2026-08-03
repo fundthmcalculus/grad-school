@@ -13,8 +13,14 @@ from tribblefis.gauss_math import (
 # tribble-fis PR #67 deleted gauss_math.detect_and_apply_log_transform and
 # .standard_transform. UnitScalar is standard_transform's behaviour-preserving
 # successor -- despite the name, standard_transform min-max scaled to [0,1], it
-# never z-scored. StandardScalar is the genuine z-score; swapping it in here
-# would change every number this script prints.
+# never z-scored.
+#
+# Do NOT swap in StandardScalar (the genuine z-score). That is now measured, not
+# assumed: ten seeds on this dataset take the 1st-order flat MoG from R2 0.772 to
+# 0.087 -- below raw features (0.646) -- and RMSE 7.8 -> 15.6 MPa, while the
+# demo-tuned mixture of experts drops 0.834 -> 0.706. Min-max is best-or-tied in
+# 8 of 9 rows. See reproduce/outputs/NORMALIZATION_THREE_ARM.md and
+# PROVENANCE_MAP.md note 16. FIS membership functions want *bounded* inputs.
 from tribblefis.scaling import UnitScalar
 from tribblefis.regression import (
     report_regression_performance,
@@ -27,16 +33,6 @@ from tribblefis.regression import (
 )
 from tribblefis.refine import refine_antecedents_coordinate
 from tribblefis.report import print_membership_details
-
-
-def _standardize(X):
-    """Standardize features in the dataset."""
-    return (X - X.mean()) / X.std()
-
-
-def _normalize(X):
-    """Normalize features in the dataset."""
-    return (X - X.min()) / (X.max() - X.min())
 
 
 def load_data():
