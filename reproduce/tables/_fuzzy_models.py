@@ -198,6 +198,44 @@ def unit_scale(X, column=None):
     return out
 
 
+def fit_scaler(X, scaler="unit", log_dynamic_range=2):
+    """Fit a feature scaler and return it, for callers that must not leak the test fold.
+
+    `normalize()` below calls `fit_transform` on whatever frame it is handed, and every
+    generator hands it the full dataset before splitting. That is deliberate and
+    documented above -- reproducing the archive means reproducing it -- but it means
+    there is no way to fit on a training fold with these helpers, so measuring what the
+    transduction is worth was not possible without a second copy of the treatment.
+    Handing back the fitted scaler makes the leak-free variant a two-line change at the
+    call site instead of a duplicate implementation that can drift.
+
+    Returns (fitted_scaler, names_of_logged_columns).
+    """
+    sc = _scaler(scaler, log_dynamic_range)
+    sc.fit(X.copy())
+    return sc, list(sc.log_features_)
+
+
+def apply_scaler(sc, X):
+    """Transform with an already-fitted scaler, preserving index and column names."""
+    return pd.DataFrame(sc.transform(X.copy()), index=X.index, columns=X.columns)
+
+
+def unit_scale_with(lo, hi, y):
+    """Min-max a target using bounds supplied from elsewhere -- normally a train fold.
+
+    `unit_scale()` derives its bounds from its argument, so scaling a target before
+    splitting puts the test fold's min and max into the transform. R^2 is invariant
+    under an affine map of the target, so on its own that biases nothing; it matters
+    because the *bucket* boundaries and bucket means computed downstream from the scaled
+    target are not affine, and those do reach the prediction path.
+    """
+    span = float(hi) - float(lo)
+    if span == 0:
+        return pd.Series(np.zeros(len(y)), index=y.index, name=y.name)
+    return (y - float(lo)) / span
+
+
 def normalize(X, scaler="unit"):
     """`concrete.py`'s feature treatment: auto log-transform, then scale.
 
