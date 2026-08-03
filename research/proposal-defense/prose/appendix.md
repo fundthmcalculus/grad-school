@@ -18,6 +18,8 @@ The main text carries twenty-two summary tables (3.1–3.7, 4.1–4.7, 5.1–5.3
 - **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results.
 - **A.2.3** The broadened fuzzy-model benchmark suite (Concrete, PhiUSIIL, turbine, wave-energy, wine, and the IoT sets) with the baseline methods.
 - **A.2.4** The three-arm reorder study behind Chapter 3 §3.3.1 (classical cubic, stage-one priority queue, stage-two compact active set) over the full grid of $N$ and both precisions, in absolute seconds with per-seed spreads. The main text normalizes, wall-clock being unportable between machines and ratios far more so; the seconds live here, with the per-$N$ detail behind Table 3.2's exponent fit. An earlier version of this line promised the **stage-two plateau above $N \approx 750$** as detail the fitted exponent averages over. That plateau is **withdrawn**: measured repeatably on the four-core development laptop, it does not reproduce on the host of record. Across five independent runs here stage two is monotone in $N$ and beats stage one at every size in the grid, including inside the band said to collapse to parity, and the exponent fit is *cleaner* without it, not distorted by its absence (Chapter 3 §3.4, Chapter 7 §7.2, `PROVENANCE_MAP.md` note 11). So it appears as a separately labelled laptop-only artifact and nothing else, kept visible as the document's cleanest case of a repeatable, seeded, error-barred measurement that was still a property of the machine and not the code (the argument for G4's hardware half). This subsection is also the evidence base for the possible complexity note of §9.3.
+
+  *The fitted exponents, per arm.* Classical fits 3.20 against a theoretical 3 and stage two 1.97 against 2, both stable across five independent runs (3.14–3.21 and 1.93–1.97), and both confirmed. Stage one fits 1.86, stable across 1.84–1.87, short of the $\approx 2.1$ that $O(N^2 \log N)$ predicts and below the pure quadratic reference of 2.00. The shortfall is attributed to an unresolvable log factor, asserted rather than shown: Table 3.2 cannot separate a log factor invisible over a decade and a half from an arm doing less work than the bound allows (Goal G4a: bounded, not confirmed). The prescription is one line in the generator, a constrained fit beside the free one: fix $t = c \cdot N^2 \log N$ with $c$ the only free parameter and report its residual against the free fit's. Within noise the log factor is present; worse than a free exponent of 1.86, and the story changes.
 - **A.2.5** The output-partitioning study of Goal G5 (uniform vs. quantile vs. pinned-extreme hybrid), including the per-decile and tail-error breakdowns and the bucket-starvation counts that aggregate error hides.
 
 ## A.3 The optimization engine (`tribble-opt`)
@@ -139,10 +141,64 @@ Deliberately different standards, by the rule Chapter 7's Goal G4 states. Every 
 
 The datasets are not uniformly available, and "public" and "reproducible from this repository" are two claims an earlier version of this section ran together. **Concrete, PhiUSIIL and the shuttle set are public and present**; a reader can reproduce those results directly. **RT-IOT2022 and BETH are public but are not in this repository**, so their rows cannot be reproduced directly by anyone, myself included: hence Table 4.4's RT-IOT2022 accuracy cell being empty and labelled instead of estimated, and hence §4.3.5's open-set study running leave-one-class-out on Glass (214 samples, a stress test and not a demonstration) instead of on BETH as designed. Obtaining BETH or a set of comparable scale would move the complement-rule result from parity to a comparison, a research decision before a coding one: leave-one-class-out needs at least three classes and BETH is binary. The 135,000-row psychiatric-evaluation set behind Chapter 3's memory results is **not** public and cannot be redistributed; its feature names were anonymized before I ever saw them, so Chapter 3 treats it purely as a scaling exercise and draws no conclusion from any individual feature. That measurement is therefore not independently reproducible, and the fix is to re-take it on a public dataset of comparable size, not to ask anyone to take it on trust.
 
+**What Goal G2 adds, and why it arrives without baselines.** G2's non-coordinate data is identified and verified here: UCR/UEA sets under dynamic time warping through `aeon` (Crop, at 24,000 series and 24 classes, ElectricDevices, StarLightCurves, ECG5000, FordA); TUDataset graphs under a graph kernel; and the Duin–Pękalska collection, distributed *as* distance matrices and so matching Chapter 3's claim most literally. No natural competitor can run on them: Deshpande and Kumar's kd-tree and bounding-box methods need Euclidean coordinates by construction, clusiVAT samples a coordinate space, eVAT's GPU front end computes distances from points, and warped series have no fixed vector embedding, the premise of DTW. That is the seam §3.2 claims, and why "beat the baselines" is unavailable to G2: in the regime the experiment exists to demonstrate, there are no baselines to beat. Chapter 7 gives the four criteria that replace it.
+
 #### Two implementations, cross-validating
 
 The reorder exists in two forms, the stage-one priority-queue path (`pvat.py`) and the stage-two compact-active-set Cython kernel (`pcvat.pyx`), required to produce bit-identical orderings. That equality is itself a test: each path validates the other, asserted against the serial reference, never against permutation-invariant summaries. Chapter 3 §3.3.2 records why that matters: an earlier bug survived because the tests only checked invariant quantities.
 
 ---
 
-*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring) and A.5 (reproducibility) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../ACTION_ITEMS.md`.*
+## A.6 Retractions, and what re-taking the measurements cost
+
+Four claims in this document were withdrawn on evidence the project itself generated: a stage-two timing plateau in Chapter 3, a crossover in Chapter 4 §4.3.2, quantile boundaries as Goal G5's recommended default, and the expectation that soft kernel-weighted bands would fix Chapter 5's small-sample over-segmentation. Chapter 7 carries the resulting statuses; the evidence behind them, and what the corrections cost, are here, so that a reader asking what this project got wrong and what fixing it took has one place to look rather than five chapters. That record is worth more than a document that never appears to have been wrong. Four further entries follow the four retractions: the measurements that still break the seed floor; two predicted failures with the evidence that makes each likely, on record before the experiments run; and three narrowings of scope, each with its reason.
+
+#### The stage-two plateau and the parity band (Chapter 3, Goal G4a)
+
+A.2.4 carries the withdrawal; these are the figures behind it. Chapter 3 had stage two acquiring a fixed cost of roughly ten milliseconds at $N \approx 750$, flat to 3,000, level with the portable fallback between roughly 750 and 1,250, with OpenMP parallel-region setup as the candidate cause. On the host of record it runs 0.4 ms at 750 rising to 9.6 ms at 3,000, ahead of stage one by 7.4× to 17.5× across the grid and by 17.3× inside the band. The quadratic exponent is better established for the plateau's absence: 1.97 where the laptop gave 2.12, which Chapter 3 had conceded was right for the wrong reason.
+
+A smaller item survives on the laptop, where something cost ten milliseconds above a size threshold. OpenMP is the weaker candidate for it now, because thread-startup overhead should be at least as visible on thirty-two cores as on four; a four-core `powersave` governor ramping clocks on thread spawn fits better and is testable by pinning that machine's governor. Nothing in the method depends on the answer.
+
+#### The §4.3.2 crossover, and why the floor is ten seeds (Chapter 4, Goal G4a)
+
+The floor came from an accuracy failure and not a timing one. Three seeds to ten retracted a crossover in Chapter 4 §4.3.2, refuted that section's central hypothesis, and exposed a mixture-of-experts split diverging to predictions of 10,536 MPa on a target bounded near 82. One seed in ten carried that divergence: the case A.2's per-seed detail exists to make findable.
+
+#### Quantile output boundaries, recommended and withdrawn (Chapter 4, Goal G5)
+
+At ten seeds the sign reverses in every row past symmetry, and the reason is in the spreads rather than the means: quantile does not become *less accurate* under skew, it becomes *unstable*, with deviations of ±0.99, ±4.45 and ±21.2 at the high-skew end, where uniform degrades smoothly to near-zero.
+
+Three findings survive the recommendation they replace. Bucket starvation is real and measured: uniform's smallest bucket falls to one sample by skew 1.8 and to zero past skew 14. My tail prediction was wrong too, since uniform does not hold the tails better, an evenly spaced bucket in a sparse tail being useless if nothing lands in it. And the sweep surfaced a bug in the consequent solve, since fixed upstream. Guaranteed occupancy does not make quantile safe by default either; it removes one failure mode and introduces another. A three-seed protocol produced a clean, publishable, wrong answer.
+
+#### Phase four's soft bands (Chapter 5, Goal G1)
+
+Phase four of `MEMBERSHIP_ROADMAP.md` proposed soft kernel-weighted band memberships as the fix for small-sample over-segmentation, and the one attempt on `feat/mf-phase4-bands` added a single-block-band drop and a containment-aware merge: `single_scale` cleaned up, genuine hierarchies were unregressed, and the case it was built for still failed (Goal G1 has the adjusted Rand indices). The cause is not sampling density. Single-linkage chains through the diffuse cluster, so one cluster produces about eighteen nested significant blocks spanning birth heights 25 to 180, and birth-height banding shreds that and is then fooled by its own containment test. Birth height is a clean band coordinate only where each cluster occupies a narrow birth range, the consequence Goals G1 and G7 both carry.
+
+#### The three measurements that break the seed floor (Goal G4a)
+
+Goal G4a's ten-seed floor has three known violations. None is a retraction and none is yet repaired.
+
+- **Table 6.4**, the memory-augmented result: the double-pendulum row runs at one fixed `random_state=42`, outside `reproduce/`, emitting no CSV. A one-seed point estimate, neither ten seeds nor a scale demonstration, quoted in §6.3.6, §6.4 and §7.3, and blocked on a defect too, the iterated rollout returning its initial window unchanged. Checklist **C7**.
+- **The §6.3.5 optimizer study**: ten seeds, so the seed half is met, but the archive `reproduce/outputs/opt-hotcold-2026-08-02/` carries a machine block reading a four-logical-core Xeon virtual machine under Linux, not the run of record's thirty-two-core i9. A host in the archive and undeclared in the prose is what produced the plateau above. The identification sweep beside it runs at three seeds. Name the host.
+- **Appendix A.3**, the `tribble-opt` section: every speedup with no seeds, no spreads, no host and no generator, taken from an engineering profiling log and labelled as such there. A.3's opening carries the `WORKINGDOC.md` §7 precedent, where a 19% speedup sized off a cProfile pass measured 9.8% on a wall clock.
+
+#### The capstone's likelier failure, already on record (§7.1)
+
+A mechanism for the failure §7.1 treats as the likelier of its two is on record: phase-6 validation in `gated-minimax-selection/notes/MF_PROGRESS_LOG.md` scores the ultrametric step memberships worse than crisp zero-one labels against true Gaussian posteriors.
+
+#### The mixture's EM, and the answers the document had pre-absorbed (Chapter 6, Goal G3)
+
+G3's prediction is registered in advance because the document had already absorbed every outcome. §6.2 concedes that a single-layer TSK system is functionally equivalent to a mixture of experts; §6.3.5 and §6.4 both measure additional search buying less as consequent capacity grows, refinement worth 0.914 at zeroth order, 0.072 at first and 0.037 at second, a factor of twenty-five; and §6.3.3 says that if the EM slips, the one-shot mixture stands as a completed contribution. Left alone, EM ≈ one-shot reads as confirmation, EM > one-shot as the deliverable, EM-never-runs as a de-scope: three doors and no experiment.
+
+The asymmetry runs the uncomfortable way too, and the outcome that would embarrass the thesis is the positive one: if joint EM re-estimation beats the greedy one-shot fit by more than G3's band, a global search over the gates found what the structure-first construction left on the table, and §6.3.5's "once structure is recovered, search has little left to find" needs weakening in print.
+
+#### Three narrowings, and what each one costs (Goals G3, G6, G8)
+
+Three goals are narrowed rather than dropped. Each narrowing's reason is here; Chapter 7 states its price.
+
+- **G3's baselines.** Fumanal-Idocin et al. (2025) and the deep TSK fuzzy classifier are complete published architectures with no implementation the harness can reach, and neither is load-bearing: ANFIS and GA-FIS answer "faster than conventional fuzzy training", CART, Random Forest, M5 and flat TSK answer "competitive with standard regressors". Both stay cited in §6.2.
+- **G6's expert-audience study.** No protocol, no computed sample size, no institutional-review timeline, and "six domain experts preferred the hierarchy" would not be defensible in a dissertation whose interpretability bibliography is one XAI entry deep.
+- **G8's construction.** It had held one quarter, 2028 Q1, which Chapter 10's Gantt omitted and which already carries the capstone, G6, G7, the write-up and the defense. It spends interpretability, the dissertation's own thesis, making it the one goal whose success would weaken the argument around it, a tension §6.2 flags. And the §5.3.5 disjunct counter that decides whether it is worth having has never returned a value other than one, in either mode on any recorded run.
+
+---
+
+*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility) and A.6 (retractions) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../ACTION_ITEMS.md`.*
