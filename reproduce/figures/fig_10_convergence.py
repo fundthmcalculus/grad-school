@@ -81,7 +81,8 @@ def _n_params(label):
     for name, path, _ in H.archives():
         if name != label:
             continue
-        with open(os.path.join(path, "PROVENANCE.txt")) as f:
+        with open(os.path.join(path, "PROVENANCE.txt"),
+                  encoding="utf-8", errors="replace") as f:
             m = re.search(r"^params:\s*(\d+)", f.read(), re.M)
         if m:
             return int(m.group(1))
