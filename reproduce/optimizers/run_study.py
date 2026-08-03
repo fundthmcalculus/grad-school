@@ -243,7 +243,7 @@ def main():
     _write_seeds(records)
     _write_curve(records)
     if args.archive:
-        _archive(args.archive, args, seeds, arm_names)
+        _archive(args.archive, args, seeds, arm_names, n_params)
     return 0
 
 
@@ -252,7 +252,7 @@ ARTIFACTS = ["table_opt_hotstart.md", "table_opt_hotstart.csv",
              "table_opt_hotstart_budget.csv"]
 
 
-def _archive(label, args, seeds, arm_names):
+def _archive(label, args, seeds, arm_names, n_params=0):
     """Copy this run's artifacts under a label, with the provenance to read them.
 
     Loose files in `reproduce/outputs/` are scratch by policy — whatever ran
@@ -291,6 +291,13 @@ def _archive(label, args, seeds, arm_names):
         f"order:       {args.order}",
         f"radius:      {args.radius}",
         f"budget:      {args.budget} objective evaluations per arm per seed",
+        # Recorded because it is not a constant: the parameter count follows the
+        # model the construction produces, so a library change moves it (144
+        # before the identification fix, 136 after). Anything that converts
+        # evaluations into generations needs it -- scipy's differential evolution
+        # takes `popsize` as a MULTIPLIER of the dimension, so its population is
+        # popsize x this number.
+        f"params:      {n_params} antecedent parameters",
         f"arms:        {','.join(arm_names)}",
         f"init:        {args.init}",
         "",
