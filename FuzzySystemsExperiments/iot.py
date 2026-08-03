@@ -47,10 +47,11 @@ def main(augment_data=False):
     # Not a pipeline: report_figures_of_merit / simple_gaussian_predict /
     # generate_synthetic_data below all take X frames directly and must see the
     # same scaled space as the memberships. Fitted on train only.
-    _scaler = UnitScalar().fit(X_train)
-    _rescale = lambda F: pd.DataFrame(_scaler.transform(F), index=F.index, columns=F.columns)
+    # set_output("pandas") keeps the column names and index the tribblefis helpers
+    # below rely on, so no manual DataFrame re-wrapping is needed.
+    _scaler = UnitScalar().set_output(transform="pandas").fit(X_train)
     print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
-    X_train, X_test = _rescale(X_train), _rescale(X_test)
+    X_train, X_test = _scaler.transform(X_train), _scaler.transform(X_test)
 
     # Initialize and fit the Gaussian Mixture Classifier
     # TODO - top-n=3!

@@ -99,10 +99,11 @@ def main():
     #
     # Not a pipeline: create_gaussian_membership_dict / simple_gaussian_predict /
     # the threshold sweep below take X frames directly.
-    _scaler = UnitScalar().fit(X_train)
-    _rescale = lambda F: pd.DataFrame(_scaler.transform(F), index=F.index, columns=F.columns)
+    # set_output("pandas") keeps the column names and index the tribblefis helpers
+    # below rely on, so no manual DataFrame re-wrapping is needed.
+    _scaler = UnitScalar().set_output(transform="pandas").fit(X_train)
     print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
-    X_train, X_test = _rescale(X_train), _rescale(X_test)
+    X_train, X_test = _scaler.transform(X_train), _scaler.transform(X_test)
 
     # Calculate correlation coefficient between Gaussian distributions using training data
     feature_differentiators = calculate_gaussian_correlation(X_train, y_train)

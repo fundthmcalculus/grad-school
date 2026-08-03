@@ -79,8 +79,8 @@ def main():
     # log(dynamic range >= 2 decades) then min-max to [0,1], in one transformer.
     # `log_dynamic_range=2` is explicit: UnitScalar's default is 3.0, which on
     # Concrete drops `Slag` from the logged set and moves every result.
-    _scaler = UnitScalar(log_dynamic_range=2)
-    X = pd.DataFrame(_scaler.fit_transform(X), index=X.index, columns=X.columns)
+    _scaler = UnitScalar(log_dynamic_range=2).set_output(transform="pandas")
+    X = _scaler.fit_transform(X)
     log_transformed_features = list(_scaler.log_features_)
     if log_transformed_features:
         print(f"Auto-detected log transform for: {log_transformed_features}")
