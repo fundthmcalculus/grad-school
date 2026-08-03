@@ -156,11 +156,14 @@ This note validates that the $n$-link derivation is *correct* and
 - A chaos/Lyapunov characterization of the triple or quintuple pendulum
   (§4-5 style, from the double-pendulum report) — worth doing once these are
   wanted as standalone results sections.
-- Re-running the fuzzy TSK surrogate-modeling study (§5 of the double-pendulum
-  report) against $n=3$/$n=5$ trajectory data.
 - Performance work if $n>5$ is ever wanted — the symbolic build time trend
   above suggests $n=6$–$7$ would still be minutes, not hours, but a fully
   numeric (Newton–Euler recursive) formulation would be the next step past
   that if needed.
 
-Both are natural follow-ons once the $n=3$/$n=5$ results phase is wanted.
+The fuzzy TSK surrogate-modeling study (§5 of the double-pendulum report)
+**has** now been re-run against $n=3$/$n=5$ trajectory data — see
+[`N3_N5_FUZZY_REGRESSION_REPORT.md`](N3_N5_FUZZY_REGRESSION_REPORT.md). That
+pass also found and fixed a rollout-evaluation bug that had made the
+original n=2 result meaningless; the double-pendulum report has been amended
+accordingly.
