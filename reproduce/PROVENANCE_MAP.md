@@ -22,12 +22,23 @@ as having no generator yet.
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1 |
-| 3.2 Memory footprint | *none* | — | **ungenerated** |
-| 3.3 GPU speedups | `ClusteringExperiments/{boruvka_gpu,gpu_vat}.py` | findings only | **ungenerated** — needs a GPU host |
-| 3.4 Adversarial ARI | `ClusteringExperiments/adversarial_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — two cells corrected, note 10 |
-| 3.5 Stitch ablation | `ClusteringExperiments/principled_stitch.py` | `ClusteringExperiments/findings/…` | **reproduced** — re-quoted, note 10 |
-| 3.6 Non-metric agreement | `ClusteringExperiments/hardening_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — cells match |
+| 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1; re-taken on one host — note 11 |
+| 3.2 Complexity fit | `reproduce/tables/table_3_1_reorder_three_arm.py` | `outputs/table_3_1_complexity_fit.{md,csv}` | **reproduced** — exponents confirm; stage-two plateau does **not** reproduce, note 11 |
+| 3.3 Memory footprint | `reproduce/tables/table_3_2_memory_precision.py` | `outputs/table_3_2_memory_precision.{md,csv}` | **reproduced** — all 32 cells identical to `main-d0efefc` |
+| 3.4 GPU speedups | `ClusteringExperiments/{boruvka_gpu,gpu_vat}.py` | findings only | **ungenerated** — needs a GPU host |
+| 3.5 Adversarial ARI | `ClusteringExperiments/adversarial_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — two cells corrected, note 10 |
+| 3.6 Stitch ablation | `ClusteringExperiments/principled_stitch.py` | `ClusteringExperiments/findings/…` | **reproduced** — re-quoted, note 10 |
+| 3.7 Non-metric agreement | `ClusteringExperiments/hardening_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — cells match |
+
+**These row numbers were one behind the prose.** Table 3.2 (the complexity fit)
+was inserted into the chapter and this map never renumbered, so every row from
+the second down named the table above it. The visible cost: Table 3.3's memory
+ceilings were listed as having *no generator* while
+`table_3_2_memory_precision.py` produced them and reproduced all 32 cells
+exactly — the file whose one job is to make numbers traceable was pointing a
+reader at nothing. The generator's own docstring says "Table 3.3"; the filename
+still says 3.2, and is left alone because renaming it would break the archives
+that carry `table_3_2_memory_precision.csv`.
 
 **Note 10 — these three have moved, and were unrunnable before that.** They
 originally lived in the `tribble-cluster` submodule and imported each other as
@@ -65,6 +76,35 @@ cubic-to-quadratic exponent drop and a feasible problem size moving from ~5,000
 to >130,000 points -- and the exponent is established by the swept grid and the
 three-arm decomposition, both of which run in minutes. Cite the row; do not
 re-run it.
+
+**Note 11 — the grid was re-taken on one host, and two claims did not survive.**
+§3.4 spanned two machines: the swept grid came from the development laptop
+(4-core i7-1185G7, 16 GB, `powersave`) while the memory ceilings came from the
+workstation (i9-14900HX, 32 logical cores, 96 GB, RTX 4080 Laptop). Checklist B5
+asked for one host; `outputs/full-14900hx-*` is the workstation run.
+
+*What the re-take settles.* The ~45–50% wall-clock swing is **thermal and
+laptop-specific**. Three runs here put the 1,024-point classical arm at 13.7,
+14.2 and 14.5 s — a 6% spread against the laptop's 22.2/31.7/21.3 s.
+
+*What it costs.* The ratio is **not** machine-invariant, which §3.4 asserts it is.
+The 1,024-point speedup reads 1,129x on the laptop and 660–700x here, a 40% move,
+because the classical arm is interpreted Python and mergeVAT is compiled, so the
+two arms do not respond to a change of host by the same factor. Ratios still
+travel far better than seconds, and the reporting standard stands; the
+justification for it needs weakening from "survive a change of machine" to
+"stable within a host, and far more portable than seconds".
+
+*What is retired.* The stage-two **10 ms fixed cost, the flat plateau above
+N ≈ 750, and the parity band where stage two loses to stage one** are properties
+of the laptop, not the kernel. Across four independent runs here stage two is
+monotone in N (0.5 ms at N=750, 8.4 ms at N=3,000) and beats stage one by
+8.1–17.7x at every size, including 17.3x in the band said to collapse. The fitted
+exponents are 3.14–3.19 (classical), 1.84–1.87 (stage one) and **1.93–1.95**
+(stage two) — the last a *cleaner* confirmation of the quadratic claim than the
+laptop's 2.12, which the chapter itself calls "right for the wrong reason"
+because the plateau contaminated the fit. **CHECKLIST C2b, which asks what the
+10 ms is, should be rescoped: the thing to explain is why the laptop had it.**
 
 ---
 
@@ -230,13 +270,61 @@ Table 7.1 is a goals-and-status matrix, not a measurement. No generator applies.
 
 ---
 
+## Appendix A.4 — feature scoring
+
+| Table | Generator | Output | Status |
+|---|---|---|---|
+| A.1 Feature ranking by scorer | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a1_feature_ranking.{md,csv}` | **reproduced** — all 20 cells identical to `main-d0efefc` |
+| A.2 Accuracy and fit time vs features kept | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a2_feature_count.{md,csv}` | **reproduced within a host**; the bhattacharyya accuracies are **not host-portable** — note 12 |
+
+**Note 12 — one arm of A.2 moves between environments, and it is the arm the
+appendix is least resting on.** Against `main-d0efefc`, at the same `tribble-fis`
+commit, the same ten seeds and an *identical* A.1 ranking, every bhattacharyya
+accuracy in A.2 sits higher: +0.017 at 4 features, +0.033 at 5, +0.043 at 7,
++0.040 at 10, +0.029 at 15, +0.030 at 20. Wasserstein and composite agree to
+within 0.0002 everywhere.
+
+This is not nondeterminism. Two complete sweeps on this host
+(`full-14900hx-2026-08-02` and `full-14900hx-r2`) reproduce **every one of those
+accuracies exactly**; only fit times move. It is an environment difference, and
+it could not be narrowed further because no archive before this one recorded the
+numeric stack — `PROVENANCE.txt` now carries numpy/scipy/sklearn and the BLAS
+build for that reason.
+
+The arm that moved is the ill-conditioned one, which is what a BLAS or threading
+difference would look like: bhattacharyya's own ranking scores 0.4267 at one
+feature, so its models are fitted on poor features and sit where small numerical
+differences change the outcome. **Do not quote A.2's bhattacharyya cells to four
+decimals across machines.** A.4's actual argument is untouched — it rests on
+wasserstein 0.9967 against bhattacharyya 0.4267 at a single feature, a gap of
+0.57 against a host effect of 0.04.
+
+---
+
 ## Verification runs behind this map
 
 | Run | Label | What it establishes |
 |---|---|---|
-| Ten-table sweep, 5 seeds | `outputs/audit-2026-08-01/` | All ten generators green. Five tables came back **byte-identical** to `postfix-pr29`; `table_4_1` differed only in wall-clock timing. The harness is deterministic, so every mismatch in this map is prose-vs-harness, not run-to-run noise. |
+| Ten-table sweep, 5 seeds | `outputs/audit-2026-08-01/` | All ten generators green. Five tables came back **byte-identical** to `postfix-pr29`; `table_4_1` differed only in wall-clock timing. The harness is deterministic *on a fixed host and numeric stack* (measured below), so a mismatch in this map is prose-vs-harness rather than run-to-run noise — but see note 12 before reading one across machines. |
 | Ten-table sweep, 10 seeds | `outputs/seeds10-2026-08-01/` | The run the chapters are now quoted at. |
 | Ch5 driver | `gated-minimax-selection/outputs/` | Runs to completion after the `fig_membership` fix; `results.json` reproduces the 2026-07-20 file exactly. |
+| Workstation sweep, 10 seeds | `outputs/full-14900hx-2026-08-02/` | First pass on the i9-14900HX. 13 generators green. Superseded by r2 for citation: its tables carry a degraded machine block (`ram: unknown`), and it lacks Table 4.4b. |
+| **Workstation sweep, 10 seeds (run of record)** | `outputs/full-14900hx-r2/` | **The citable run.** All 13 generators green in one pass, 14 tables including the θ curve, correct machine block on every table, and the numeric stack recorded. This is the single-host re-take checklist B5 asked for — note 11. |
+
+**The two workstation sweeps are also the determinism test, and they pass.**
+Comparing them cell by cell: `table_concrete_reconciliation` (34),
+`table_hyperparam_normalization` (48), `table_norm_conorm_matrix` (57),
+`table_g5_output_partitioning` (126), `table_g5b_skew_sweep` (48),
+`table_3_2_memory_precision` (32), `table_4_4_openset` (9), `table_6_1` (16),
+`table_a1_feature_ranking` (20) and all three Chapter 5 tables (64) are
+**byte-identical across two independent full runs**. Every cell that moved is a
+wall clock — `table_3_1`, `table_3_1_three_arm`, and A.2's fit-time halves — and
+all of those are within noise.
+
+So "the harness is deterministic" is now a measured claim rather than an
+assumption, with one boundary worth stating precisely: it is deterministic **on
+one host with one numeric stack**. Note 12 is the counterexample across hosts,
+and note 11 is why wall-clock cells must never be diffed as if they were results.
 
 Before this pass, `tribble-fis` was checked out at `d0d6714` — the *pre-fix*
 baseline — while the parent repo pins `23bfdbc`. Anything run in that state

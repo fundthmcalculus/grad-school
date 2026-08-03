@@ -10206,7 +10206,7 @@ Features Ranked by Differentiation Strength:
   Automatically selected 4 Gaussians for FlyAsh (label 0)
   Automatically selected 2 Gaussians for FlyAsh (label 1)
   Concrete: einstein done
-  [phiusiil] repo loader, data from data/PhiUSIIL_Phishing_URL_Dataset.csv
+  [phiusiil] repo loader, data from data\PhiUSIIL_Phishing_URL_Dataset.csv
 
 Features Ranked by Differentiation Strength:
 ================================================================================
@@ -28412,5 +28412,5 @@ Features Ranked by Differentiation Strength:
   Automatically selected 2 Gaussians for HasHiddenFields (label phish)
   Automatically selected 2 Gaussians for HasHiddenFields (label legit)
   PhiUSIIL: einstein done
-  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_norm_conorm_matrix.md
-  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_norm_conorm_matrix.csv
+  wrote C:\personal\grad-school\reproduce\outputs\table_norm_conorm_matrix.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_norm_conorm_matrix.csv

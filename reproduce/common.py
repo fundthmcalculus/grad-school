@@ -12,6 +12,7 @@ import os
 import platform
 import statistics
 import subprocess
+import sys
 import time
 from contextlib import contextmanager
 
@@ -67,7 +68,7 @@ def cell(values, fmt="{:.3f}", na=NA):
 
 def _read(path, default=""):
     try:
-        with open(path) as f:
+        with open(path, encoding="utf-8", errors="replace") as f:
             return f.read().strip()
     except OSError:
         return default
@@ -93,6 +94,45 @@ def machine():
         if line.startswith("MemTotal"):
             mem_kb = int(line.split()[1])
             break
+
+    # /proc exists under Git Bash but NOT for a native Windows interpreter, which
+    # is what `uv run` launches -- so on the very host the proposal calls "the
+    # workstation" every table recorded `ram: unknown` and a registry-style CPU
+    # string instead of "i9-14900HX". The machine block is the whole point of
+    # checklist B1/B2; degrading silently on one platform defeats it. The shell
+    # harness already reports these correctly, which is why the gap was invisible
+    # in PROVENANCE.txt while being present in all thirteen emitted tables.
+    if not mem_kb and sys.platform == "win32":
+        try:
+            import ctypes
+
+            class _MemStatus(ctypes.Structure):
+                _fields_ = [("dwLength", ctypes.c_ulong),
+                            ("dwMemoryLoad", ctypes.c_ulong),
+                            ("ullTotalPhys", ctypes.c_ulonglong),
+                            ("ullAvailPhys", ctypes.c_ulonglong),
+                            ("ullTotalPageFile", ctypes.c_ulonglong),
+                            ("ullAvailPageFile", ctypes.c_ulonglong),
+                            ("ullTotalVirtual", ctypes.c_ulonglong),
+                            ("ullAvailVirtual", ctypes.c_ulonglong),
+                            ("ullAvailExtendedVirtual", ctypes.c_ulonglong)]
+
+            st = _MemStatus()
+            st.dwLength = ctypes.sizeof(_MemStatus)
+            if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(st)):
+                mem_kb = st.ullTotalPhys // 1024
+        except Exception:  # noqa: BLE001 -- identity is best-effort, never fatal
+            pass
+    if not cpu and sys.platform == "win32":
+        try:
+            import winreg
+
+            with winreg.OpenKey(
+                    winreg.HKEY_LOCAL_MACHINE,
+                    r"HARDWARE\DESCRIPTION\System\CentralProcessor\0") as k:
+                cpu = winreg.QueryValueEx(k, "ProcessorNameString")[0].strip()
+        except Exception:  # noqa: BLE001
+            pass
     gpu = ""
     try:
         gpu = subprocess.run(
@@ -133,9 +173,16 @@ def machine_block():
 
 
 def write_markdown(path, title, header, rows, note=""):
-    """Write a GitHub-flavored Markdown table."""
+    """Write a GitHub-flavored Markdown table.
+
+    Encoding is pinned to UTF-8 rather than left to the platform default. Tables
+    carry `±` in every cell and `λ`, `Δ`, `σ` in several headers; on Windows the
+    default is cp1252, which encodes `±` but not `λ`, so two of eleven tables
+    crashed in `f.write` *after* completing their entire numeric phase -- the
+    same shape as the Chapter 5 driver that discarded its own results.
+    """
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(f"**{title}**\n\n")
         f.write("| " + " | ".join(header) + " |\n")
         f.write("|" + "|".join(["---"] * len(header)) + "|\n")
@@ -232,7 +279,7 @@ def save_figure(fig, basename, formats=("png", "eps")):
 
 def write_csv(path, header, rows):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:  # see write_markdown
         w = csv.writer(f)
         w.writerow(header)
         w.writerows(rows)

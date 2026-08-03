@@ -9306,5 +9306,5 @@ Features Ranked by Differentiation Strength:
 Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
   Training MSE: 0.0048
   done: n=6 2nd
-  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_g5_output_partitioning.md
-  wrote /home/scott/PycharmProjects/grad-school/reproduce/outputs/table_g5_output_partitioning.csv
+  wrote C:\personal\grad-school\reproduce\outputs\table_g5_output_partitioning.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_g5_output_partitioning.csv
