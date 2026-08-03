@@ -235,10 +235,46 @@ it needs your records rather than a decision._
       the regression models** (−3.761 flat, −3.626 HME) while the other four families sit within
       0.03. Also: the whole norm/conorm study appears in *no chapter*, while Ch 2 §2.1 promises
       "Chapter 4 shows" something Chapter 4 does not show — harvest it or drop the reference.
-- [ ] ⬜ **E2 — Capture the Borůvka / GPU work.** Table 3.4 (GPU speedups) has no generator; fp16 was
-      deliberately scoped out of the CPU memory table on the grounds it belongs here; the
-      datacenter-FP64 prediction is untested; and the exact-GPU-engine standalone paper is
-      flagged in §9.4. None of it is in the harness.
+- [x] ✅ **E2 — Table 3.4 now has a generator, and it runs on this host.**
+      `reproduce/tables/table_3_4_gpu_speedups.py`, 31 rows, ten seeds, each row one CPU arm
+      against one GPU arm timed in the same pass, device timings stream-synchronised and all
+      JIT warmed first (the first `boruvka_mst_device` call spends ~0.4 s compiling — 13× the
+      N=16,000 kernel time, so cold timings would have been fiction). In the sweep with its
+      CuPy dep isolated and a no-device fallback. Run of record
+      `reproduce/outputs/gpu-table34-2026-08-02/`. Environment: CuPy 14.1.1, CUDA 12.9,
+      RTX 4080 Laptop 12 GB, driver 610.74, compute 8.9.
+      **The exactness claim holds where it matters**: the device ordering is elementwise
+      identical to serial at float64 for every N and seed, and at float32 to N = 32,000. The
+      48,000-point float32 *demonstration* reads 0.99992 — about 4 positions in 48,000 — which
+      is a benign tie-break, not an error: the Prim totals agree to every digit printed, so the
+      device found a different member of an equal-weight MST set. Worth one sentence in §3.3.3
+      rather than the unqualified "bit-identical".
+      **The negative result reproduced**: pairwise distances lose at float64, 0.30× at d=10.
+      The datacenter-FP64 prediction remains untested and untestable here; no cell estimates it.
+      fp16 and the §9.4 standalone-paper item are still open and unaffected.
+- [ ] ⬜ **E2b — Re-quote Table 3.4 and §3.3.3 from the generator; one row overstates the GPU
+      by roughly an order of magnitude.** `PROVENANCE_MAP` now marks Table 3.4 **drifted**.
+      **The FCM row is the problem.** The chapter's "thirty to fifty times over the 32-core CPU"
+      compares `fcm.fuzzy_c_means` — NumPy broadcasting with (n,k,d) and (n,k,k) temporaries —
+      against a GPU path using the gram identity and two GEMMs. Those are different
+      *algorithms*, not the same algorithm on different hardware. Measured against the GPU's own
+      formulation written in NumPy/BLAS, the same three sizes give **1.3× / 2.1× / 3.7×**, and
+      the library CPU arm is ~11× slower than a matched CPU arm at every size. The generator now
+      emits both, and the chapter must quote the matched one or say plainly which comparison it
+      is making. **This is note 11's hazard in a second place** — a ratio between arms that
+      differ in implementation is not a property of the hardware.
+      Three smaller mismatches: the MST is *faster* than quoted (5.4–7.7×) but does **not** grow
+      with N — it peaks mid-grid and falls to 6.3× at 32,000, as expected from an O(n²) dense
+      Prim CPU arm against O(n² log n) Borůvka rounds; the front end's quoted 4.8–6.6× matches
+      matched-work only at the top of the grid (4.9×) and is reproducible as a band only if the
+      CPU arm also materialises the reordered n×n matrix the GPU never builds (5.6–11.8×); and
+      "exact" is wrong for the two fastest pairwise cells (2.06×, 4.18×), which run
+      `high_precision=False` and deviate ~1e-4.
+      **Do not quote a single FCM cell without the CSV**: with identical initial centres and
+      convergence test, iterations to the fixed point range 11→100 across seeds, so the spread
+      rivals the mean (29.16 ± 26.21 s). And the N=48,000 demonstration moved 3.3× between runs
+      at the VRAM edge (9.2 of 11.6 GB), cause unknown — likely WDDM memory management; it is
+      labelled volatile.
 - [ ] ⬜ **E3 — Schedule or explicitly defer G8.** Ch 7 assigns it 2028 Q1 and one quarter of
       effort; Ch 10's Gantt and quarter grid omit it entirely. 2028 Q1 already carries the
       capstone, G6, G7, writing and the defense.
