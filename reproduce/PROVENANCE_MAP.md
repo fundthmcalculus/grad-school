@@ -196,7 +196,7 @@ estimates or extrapolates it, and the generator does not model it.
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| 4.1 Value of the transform | `table_hyperparam_normalization.py` | `outputs/table_hyperparam_normalization.{md,csv}` | **reproduced** at 10 seeds |
+| 4.1 Value of the transform | `table_hyperparam_normalization.py` | `outputs/table_hyperparam_normalization.{md,csv}` | **reproduced** at 10 seeds; **now three arms, and the prose's column label is wrong — note 16** |
 | 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** — claim retracted, note 3 |
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
 | 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
@@ -209,7 +209,63 @@ estimates or extrapolates it, and the generator does not model it.
 0.796 → 0.829 (Δ +0.033). The table now also carries the CART and Random Forest
 rows, which are the control that gives it force — both are rank-based, so a
 monotone feature transform is worth exactly +0.001 and +0.000 to them, against
-+0.125 for the fuzzy model.
++0.125 for the fuzzy model. **Superseded on the normalization axis by note 16:
+the column this note calls "normalized" is min-max, not z-score, and the table
+now has three arms.**
+
+**Note 16 — Table 4.1's "log+std" column never measured standardization, and the
+third arm now shows the mislabel was lucky.** `gauss_math.standard_transform`,
+behind every "log+std" / "standardized" / "normalized" figure in this document,
+computed `(X − min)/(max − min)` — **min-max to [0,1]**, never z-score, despite
+the name. `tribble-fis` PR #67 (`a385a1a`) split it into honestly-named
+`UnitScalar` (min-max) and `StandardScalar` (z-score) and deleted the original,
+which forced the migration and made the missing arm cheap to measure.
+
+*The migration moved no number.* `UnitScalar(log_dynamic_range=2)` is bit-for-bit
+identical to the deleted pair (`max|diff| = 0.0` exactly, same detected log
+features `['Slag','Age']`), and re-running all five affected generators at ten
+seeds against the run of record left `table_concrete_reconciliation` (34 cells),
+`table_hyperparam_normalization` (48), `table_g5_output_partitioning` (126) and
+`table_g5b_skew_sweep` (48) **byte-identical** — 256 cells, zero movement.
+`table_4_1` matches `outputs/warmup-discarded/` on every accuracy cell, with only
+its three wall-clocks moving ≤0.01 s inside their own bars.
+
+*The measured facts* (`outputs/norm-three-arm-a385a1a/`, ten seeds):
+
+| row | raw | log+min-max | log+z-score | Δ z−mm |
+|---|---|---|---|---|
+| CART (control) | 0.825 ± 0.047 | 0.826 ± 0.047 | 0.826 ± 0.046 | -0.000 |
+| Random Forest (control) | 0.909 ± 0.018 | 0.909 ± 0.019 | 0.909 ± 0.018 | -0.000 |
+| flat MoG-TSK 1st | 0.646 ± 0.039 | 0.772 ± 0.034 | 0.087 ± 0.089 | **-0.685** |
+| flat MoG-TSK 2nd | 0.779 ± 0.036 | 0.824 ± 0.043 | 0.781 ± 0.045 | -0.043 |
+| flat MoG-TSK full-2nd | 0.790 ± 0.054 | 0.859 ± 0.039 | 0.819 ± 0.058 | -0.040 |
+| mixture of experts (demo-tuned) | 0.768 ± 0.029 | 0.834 ± 0.025 | 0.706 ± 0.024 | **-0.128** |
+
+**The rank-based control extends cleanly to three levels**, which is what licenses
+reading the rest: CART, Random Forest and both fuzzy-tree rows move by at most
+**0.002** between the two normalized arms (against ±0.018–0.056 seed spreads), and
+the two scalers' outputs are monotone-equivalent at Spearman 1.000000000000 per
+feature.
+
+**Min-max is therefore the correct default, not just the one that happened to
+run.** It is best-or-tied in 8 of 9 rows (uniquely best in 5; the sole row where
+z-score leads is `fuzzy tree / library default` by +0.002, i.e. noise, and it is
+itself an invariance control). Under z-score the 1st-order flat MoG (0.087) is
+*worse than raw features* (0.646) — the transform the prose claims would have
+destroyed Chapter 4's headline model. Not a ridge artifact (sweeping `l2_reg`
+1e-2 → 0 moves the gap by 0.001) and not the scale-dependent BIC membership-count
+choice (pinning `n_gaussians` to give both arms an identical rule base still
+leaves −0.407/−0.524/−0.634 at n=2/3/4). It underfits on *train* too (MSE 0.030
+vs 0.009), consistent with Gaussian memberships and the `[0,1]`-pinned extreme
+bucket means assuming a bounded, non-negative domain.
+
+**The prose is mislabelled, not false**, and the relabel is an author decision
+that is still open — see `outputs/NORMALIZATION_THREE_ARM.md` §4 for the three
+directions and what each costs, and CHECKLIST **A9**. No prose label has been
+changed. Nothing in the prose asserts the arithmetic (a sweep for `z-score`,
+`zero mean`, `unit variance`, `μ=0`, `σ=1`, "divide by the standard deviation" and
+related phrasings returns nothing); §4.3's "target standardized to $[0,1]$" and
+the bucket means pinned at 0.0/1.0 are already correct and already say min-max.
 
 **Note 3 — the claim was retracted, not just re-quoted.** The prose read a
 crossover near four buckets off this table ("at three buckets uniform wins

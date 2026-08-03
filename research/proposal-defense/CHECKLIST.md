@@ -8,12 +8,54 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
 
 ---
 
-## A. Author decisions — **all settled 2026-08-02**
+## A. Author decisions — settled 2026-08-02, **one reopened 2026-08-03 (A9)**
 
-_Nothing here is blocking any more. Kept as the record of what was decided and why, since
-several of these changed the document materially and a committee may ask. The one item that
-used to live here and is still outstanding — NAFIPS paper metadata — moved to **D2**, because
-it needs your records rather than a decision._
+_Kept as the record of what was decided and why, since several of these changed the document
+materially and a committee may ask. The one item that used to live here and is still
+outstanding — NAFIPS paper metadata — moved to **D2**, because it needs your records rather
+than a decision. **A9 is new and open**: measuring the normalization axis properly turned up a
+naming decision the measurement cannot make for you. It is not blocking, and it costs no
+numbers in the recommended direction._
+
+- [ ] ⬜ **A9 — Decide what the document calls its normalization, now that all three arms are
+      measured.** *(Opened 2026-08-03. Measurement done; only the naming/reporting choice is
+      left. Full write-up with costs: `reproduce/outputs/NORMALIZATION_THREE_ARM.md`; measured
+      facts: `PROVENANCE_MAP.md` note 16; data: `reproduce/outputs/norm-three-arm-a385a1a/`.)*
+      **The concession.** `gauss_math.standard_transform` — behind every "log+std",
+      "standardized" and "normalized" number in Chapters 4 and 6 — computed
+      `(X − min)/(max − min)`, i.e. **min-max to [0,1]**, never z-score, despite the name. So
+      **log + z-score had never been measured.** It has now been, at ten seeds, as Table 4.1's
+      third arm.
+      **The result is favourable, which is what makes this cheap.** Min-max is best-or-tied in
+      8 of 9 rows. Under genuine z-score the 1st-order flat MoG drops to **0.087 ± 0.089**,
+      *below raw features* (0.646 ± 0.039); the demo-tuned mixture of experts falls 0.834 →
+      0.706. So the mislabel was lucky: the code did the right thing under the wrong name, and
+      relabelling costs **no numbers at all**. Ruled out as explanations: ridge scale (sweeping
+      `l2_reg` 1e-2 → 0 moves the gap 0.001) and the scale-dependent BIC membership-count choice
+      (identical pinned rule bases still give −0.407/−0.524/−0.634).
+      **The control that licenses believing it:** CART, Random Forest and both fuzzy-tree rows
+      move ≤ **0.002** between the two normalized arms, against ±0.018–0.056 seed spreads —
+      exactly as required, since both transforms are monotone and those models split on rank.
+      **What you are choosing between** (full costs in §4 of the findings file):
+      **(A)** relabel to "log + min-max to [0,1]" and keep it the default — no numbers change,
+      and it *fixes* two sentences, since §6.3.2's and §4.3's `"cement ≥ 0.42 after
+      standardization"` is a valid min-max value and an impossible z-score one;
+      **(B)** switch the default to z-score — re-quotes most of Ch 4 and Ch 6, inverts §4.3's
+      headline, and breaks the `[0,1]`-target assumption behind the extreme-bucket-mean pin
+      (**not recommended; no measurement supports it**);
+      **(C)** report both arms side by side in §4.3 / Table 4.1 — costs one wider table and a
+      paragraph, and upgrades the finding from "normalization helps" to the sharper *"bounded
+      normalization helps, centred normalization does not, and the bounded-input assumption is
+      load-bearing"*.
+      A reasonable default if you don't want to think about it: **C for §4.3 and Table 4.1, A
+      everywhere else.** One terminology trap either way: Ch 5 uses "the minimax transform" in
+      the unrelated iVAT bottleneck-ultrametric sense, so write "min-max scaling to [0,1]" or
+      "unit scaling", never bare "minmax", in Ch 4/6.
+      **Nothing in the prose is false**, only mislabelled — a sweep for `z-score`, `zero mean`,
+      `unit variance`, `μ=0`, `σ=1`, "divide by the standard deviation" and related phrasings
+      across `prose/*.md` returns nothing; the text never states the arithmetic. **No prose
+      label has been changed**, deliberately. When you pick, `build/proposal-combined.md` needs
+      a rebuild rather than a hand-edit.
 
 - [x] ✅ **A1 — Method name settled: `mergeVAT`** (author decision, 2026-08-02).
       The name went round-trip: mergeVAT → `pVAT` (on Dr. Kreinovich's observation that stage one
