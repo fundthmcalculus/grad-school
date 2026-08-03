@@ -257,10 +257,13 @@ swinging double pendulum, alongside its two nearest training neighbors.
   non-monotonic window-size effect and an autocorrelation confound in the
   single-step baseline that a first read of the numbers would miss.
 
-## 7. Roadmap (next phase, not yet started)
+## 7. Roadmap
 
-This report covers the double pendulum's *numerical* side. The planned next
-phase is a from-scratch **symbolic** Lagrangian derivation (SymPy) of the
-same equations of motion, cross-checked against §2 and the fixed code, then
-generalized to an $n$-link planar pendulum chain, with worked $n=3$ and $n=5$
-cases for later results sections. See chat for the phased plan.
+This report covers the double pendulum's *numerical* side. The symbolic
+(SymPy) Lagrangian re-derivation, its cross-check against §2/§3 above, and
+its generalization to an $n$-link planar pendulum chain (validated through
+$n=5$) are now done — see
+[`N_PENDULUM_SYMBOLIC_DERIVATION.md`](N_PENDULUM_SYMBOLIC_DERIVATION.md).
+Still queued: full chaos/results sections for the triple ($n=3$) and
+quintuple ($n=5$) pendulum, and (optionally) extending the fuzzy TSK
+surrogate study of §5 to those cases.
