@@ -94,3 +94,64 @@ deliberately: ~144 free antecedent parameters, ten seeds × seven arms in well
 under an hour, and it is the dataset §6.3.5's existing claim is measured on, so
 the new numbers are directly comparable to the old ones. Add a rung by adding an
 entry and a branch in `build()`; nothing else in the harness is dataset-specific.
+
+## The identification studies — before any optimizer runs
+
+Two more studies live here and neither runs an optimizer. They ask the prior
+question: *where does a rule base come from, and what does that cost?* One
+answer is the Gaussian construction, the other is the way it was usually done —
+cluster, then read one rule off each cluster.
+
+```bash
+# Concrete: matched rule count, construction against joint-space clustering
+uv run --project tribble-fis --with-editable tribble-cluster --with scikit-learn \
+    python reproduce/optimizers/run_identification_study.py \
+        --rules 2,3,4,6,8,12 --seeds 0,1,2 --pin-components 1
+
+# PhiUSIIL: the same contest against sample size
+uv run --project tribble-fis --with-editable tribble-cluster --with scikit-learn \
+    python reproduce/optimizers/run_phishing_study.py \
+        --sizes 5000,20000,50000,120000,235795 --seeds 0,1,2 \
+        --pin-components --cap-classical 20000
+```
+
+`classical.py` does the regression case (cluster the joint input-output space,
+project onto the input axes), `phishing.py` the classification case (cluster
+within each class). Both hand their model to the same predictor the construction
+uses, so what is compared is placement and nothing else.
+
+### Three flags that decide what the comparison means
+
+Getting these wrong produces a number that looks like a result and is not. All
+three exist because the first pass got them wrong; see Addendum 3 of
+`RESULTS_2026-08-02.md`.
+
+**`--pin-components`.** Left off, the construction chooses its component count
+per (feature, bucket) by BIC — `find_optimal_gaussians` fits four EM mixtures,
+keeps the winning *count*, throws the mixtures away, and runs k-means. That
+search is **82–91% of the construction's identification time** on both datasets,
+and it leaves the construction with ~3× the classical parameter count. A
+classical route is never asked to do model selection, so leaving it in compares
+two different jobs. Pinned, the parameter counts match exactly.
+
+**`--cap-classical`.** `fit_gaussians` truncates every (feature, class) column
+to its first `max_samples=20_000` rows before fitting. Above that the
+construction's fitting cost stops growing — which is most of what a flat cost
+curve on a large dataset is showing. A clustering that reads every row is not
+its control; one given the same cap is, and it flattens the same way.
+
+**`--kmeans-n-init`.** Restarts are a quality-versus-time dial, not a property
+of the algorithm. The default of 10 makes k-means look slow; quoting the timing
+without saying so would rig the comparison, so the table's note states it.
+
+### Two things about the library worth knowing at the call site
+
+Neither is a bug, both are load-bearing, and neither is visible from the
+signature:
+
+1. **`fit_gaussians` silently caps at 20,000 samples.** Any scaling claim made
+   without knowing this is measuring the cap.
+2. **`find_optimal_gaussians` discards the mixtures it fits.** The BIC winner's
+   own component means are already computed and would make the following k-means
+   redundant — the cheapest available speedup in the identification path, by a
+   wide margin.
