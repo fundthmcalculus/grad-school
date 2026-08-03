@@ -223,20 +223,29 @@ points). Only $(\theta_1,\theta_2)$ are used as model inputs — velocities are
    fragmenting the training data. This is the kind of bias–variance tradeoff
    worth a follow-up sweep with velocity terms included explicitly.
 
-3. **The near-perfect iterative rollout (window=1, R²=1.0000 over the full 30 s)
-   looks like it contradicts finding #2 — it doesn't, once you notice what's
-   being measured.** The "divergence" check only flags numerical blow-up
-   ($>10^4$ rad), not accuracy, and none of the runs ever hit that; the
-   stability table in the test output is measuring something closer to
-   "did it stay finite" than "was it correct." Separately, the rollout tracks
-   so closely because the 16 training initial conditions are packed into a
-   $1.5°$ window and the test case sits inside it — the regressor is
-   effectively interpolating between near-identical neighboring trajectories
-   of the *same* underlying vector field, not extrapolating to a genuinely
-   novel chaotic orbit. The right-hand panel above makes this visible: the two
-   nearest training trajectories (dashed green) separate visibly from the test
-   trajectory (cyan) after about 8 s, exactly as chaos predicts — the surrogate
-   is not "beating chaos," it just isn't being asked to on this test case.
+3. **CORRECTION (superseding what this section originally said).** The
+   "near-perfect iterative rollout" (window=1, R²=1.0000 over the full 30 s)
+   reported here was **not real** — it was a bug in
+   `test_double_pendulum.py`'s `run_iterative_prediction`. That function was
+   called with the *entire actual test trajectory* as its seed, not just the
+   initial condition, and its accuracy check downstream (`n = min(len(actual),
+   len(predicted))`) only ever compared the copied portion against itself.
+   Worse, once real predictions did start, adding the model's predicted-delta
+   `DataFrame` (columns `[theta_1, theta_2]`) to a state row that still carried
+   the unpredicted `omega_1, omega_2` columns produced `NaN` in those columns
+   via pandas' column-alignment rules — which the divergence check reads as
+   "diverged," at exactly the boundary between copied data and real
+   prediction. Net effect: not one genuinely-predicted step was ever actually
+   scored. Full write-up of the bug, the fix, and the honest re-measurement
+   (across n=2, 3, and 5) is in
+   [`N3_N5_FUZZY_REGRESSION_REPORT.md`](N3_N5_FUZZY_REGRESSION_REPORT.md).
+   **The real result:** seeded correctly with only $\theta(0)$ and rolled
+   forward on its own predictions, this window=1 surrogate's error crosses
+   0.5 rad in about **0.3 s** — chaos wins almost immediately, as it should
+   for a model with no velocity inputs and no physics constraints. The
+   original explanation in this section (interpolation between nearby
+   training trajectories) was a plausible-sounding story for a number that
+   turned out to be measuring nothing.
 
 Two GIF animations (`double_pendulum_comparison.gif`,
 `double_pendulum_with_training.gif`) render the same rollout as the actual
@@ -256,6 +265,10 @@ swinging double pendulum, alongside its two nearest training neighbors.
   window=3 MIMO prediction went from R²<0 to R²≈0.75–0.86 — and identified a
   non-monotonic window-size effect and an autocorrelation confound in the
   single-step baseline that a first read of the numbers would miss.
+- **Amendment:** the "near-perfect rollout" originally reported in §5 was
+  itself a bug (data leakage + a silent `NaN`-producing column mismatch), not
+  a real result — see the correction in §5 point 3 and the full re-measurement
+  in `N3_N5_FUZZY_REGRESSION_REPORT.md`.
 
 ## 7. Roadmap
 

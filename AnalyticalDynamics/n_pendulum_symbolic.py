@@ -25,6 +25,8 @@ import sympy as sp
 from sympy import symbols, sin, cos, Rational, lambdify
 from sympy.physics.mechanics import dynamicsymbols, LagrangesMethod
 
+from odemodel import OdeSystem
+
 
 @dataclass
 class NPendulumModel:
@@ -116,6 +118,40 @@ def state_labels(n: int) -> list[str]:
     for i in range(1, n + 1):
         labels += [f'theta_{i}', f'omega_{i}']
     return labels
+
+
+def derivative_labels(n: int) -> list[str]:
+    labels = []
+    for i in range(1, n + 1):
+        labels += [f'omega_{i}', f'alpha_{i}']
+    return labels
+
+
+class NPendulum(OdeSystem):
+    """OdeSystem-compatible wrapper around the symbolic n-link pendulum.
+
+    Drop-in generalization of DoublePendulum (test_fuzzy_ode.py) for
+    arbitrary chain length n, so OdeSystem.simulate() and the rest of the
+    trajectory-generation pipeline work unchanged.
+    """
+
+    def __init__(self, n: int, m_vals=None, l_vals=None, g: float = 9.81):
+        self.n = n
+        self.m_vals = tuple(m_vals) if m_vals is not None else tuple([1.0] * n)
+        self.l_vals = tuple(l_vals) if l_vals is not None else tuple([1.0] * n)
+        self.g = g
+        self._rhs, self.model = make_state_space(n, self.m_vals, self.l_vals, self.g)
+
+    @property
+    def state_labels(self) -> list[str]:
+        return state_labels(self.n)
+
+    @property
+    def derivative_labels(self) -> list[str]:
+        return derivative_labels(self.n)
+
+    def equations_of_motion(self, state, t):
+        return list(self._rhs(np.asarray(state, dtype=float), t))
 
 
 if __name__ == '__main__':
