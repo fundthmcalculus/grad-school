@@ -115,7 +115,7 @@ def build():
     rx.minorticks_off()
     F.style_axes(rx, title="(a)  held-out $R^2$ against budget",
                  xlabel="objective evaluations (log)", ylabel="held-out $R^2$")
-    rx.text(budgets[0], ref, " Gaussian construction", va="bottom", ha="left",
+    rx.text(budgets[-1], ref, "Gaussian construction ", va="bottom", ha="right",
             fontsize=F.FS_SMALL, color=F.MUTED)
     F.legend(rx, loc="lower right")
 
