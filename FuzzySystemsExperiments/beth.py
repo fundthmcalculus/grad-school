@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
-from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
+from tribblefis.scaling import UnitScalar
 from tribblefis.gauss_plot import report_figures_of_merit
 
 
@@ -35,11 +35,28 @@ def main():
     n_unique = y.nunique()
     print(f"Number of unique values in y: {n_unique}")
 
-    X = log_transform(X, ["timestamp", "processId", "mountNamespace", "eventId", "userId"], 1)
-
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
+
+    # BEHAVIOUR CHANGE. This used to be
+    #   log_transform(X, ["timestamp","processId","mountNamespace","eventId","userId"], 1)
+    # -- an explicit column list, pre-split, and no normalization whatsoever.
+    # UnitScalar auto-detects the logged set by dynamic range and min-max bounds
+    # to [0,1] afterwards. Adding the normalization is deliberate: FIS membership
+    # functions want bounded inputs. No `log_dynamic_range` is claimed to
+    # reproduce the old list, so the library default (3.0) is used.
+    #
+    # Not a pipeline: `report_figures_of_merit` and `clf.augment` below are handed
+    # X frames directly and must see the same scaled space the memberships were
+    # built in, so the transform has to be materialized rather than hidden inside
+    # an estimator. Fitted on train only.
+    # set_output("pandas") keeps the column names and index the tribblefis helpers
+    # below rely on, so no manual DataFrame re-wrapping is needed.
+    _scaler = UnitScalar().set_output(transform="pandas").fit(X_train)
+    if _scaler.log_features_:
+        print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
+    X_train, X_test = _scaler.transform(X_train), _scaler.transform(X_test)
 
     # Initialize and fit the Gaussian Mixture Classifier
     clf = MixtureOfGaussiansFuzzyClassifier(top_n=3)

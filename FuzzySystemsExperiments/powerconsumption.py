@@ -54,7 +54,12 @@ def main():
 
     y, y_bucket_mean = partition_output(n_output_buckets, y_raw)
 
-    # X = log_transform(X, ["Slag", "FlyAsh", "Age"], 1)
+    # No feature scaling here. The line that used to sit commented out on this spot
+    # was a copy-paste of concrete.py's log_transform and named Concrete's columns
+    # ("Slag", "FlyAsh", "Age"), none of which exist in this dataset, so it could
+    # never have run. If scaling is wanted, it is now one transformer:
+    #     from tribblefis.scaling import UnitScalar
+    #     X = pd.DataFrame(UnitScalar().fit_transform(X), index=X.index, columns=X.columns)
 
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y["y_bucket"])
