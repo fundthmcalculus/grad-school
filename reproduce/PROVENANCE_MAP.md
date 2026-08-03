@@ -301,27 +301,68 @@ Table 7.1 is a goals-and-status matrix, not a measurement. No generator applies.
 | A.1 Feature ranking by scorer | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a1_feature_ranking.{md,csv}` | **reproduced** — all 20 cells identical to `main-d0efefc` |
 | A.2 Accuracy and fit time vs features kept | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a2_feature_count.{md,csv}` | **reproduced within a host**; the bhattacharyya accuracies are **not host-portable** — note 12 |
 
-**Note 12 — one arm of A.2 moves between environments, and it is the arm the
-appendix is least resting on.** Against `main-d0efefc`, at the same `tribble-fis`
-commit, the same ten seeds and an *identical* A.1 ranking, every bhattacharyya
-accuracy in A.2 sits higher: +0.017 at 4 features, +0.033 at 5, +0.043 at 7,
-+0.040 at 10, +0.029 at 15, +0.030 at 20. Wasserstein and composite agree to
-within 0.0002 everywhere.
+**Note 12 — one arm of A.2 moves between environments, it is the arm the appendix
+is least resting on, and the cause is now measured rather than guessed.** Against
+`main-d0efefc`, at the same `tribble-fis` commit, the same ten seeds and a
+*byte-identical* A.1 ranking, A.2's bhattacharyya accuracies sit higher on this
+host from four features on: +0.0174 at 4, +0.0325 at 5, +0.0427 at 7, +0.0402 at
+10, +0.0288 at 15, +0.0300 at 20. At one and two features the two runs agree
+exactly and at three this host is 0.0002 *lower* — the divergence appears only
+once the model has enough features to fit something, so whatever causes it acts on
+the fit and not on the ranking or the data. (An earlier version of this note said
+"every" accuracy sits higher, and put the control columns' agreement at 0.0002
+everywhere. Composite's largest deviation is indeed 0.0001, but **wasserstein's is
+0.0017**, at 15 features — eight times the figure quoted. Two orders below
+bhattacharyya's 0.0427, so the argument holds and the number did not.)
 
 This is not nondeterminism. Two complete sweeps on this host
 (`full-14900hx-2026-08-02` and `full-14900hx-r2`) reproduce **every one of those
-accuracies exactly**; only fit times move. It is an environment difference, and
-it could not be narrowed further because no archive before this one recorded the
-numeric stack — `PROVENANCE.txt` now carries numpy/scipy/sklearn and the BLAS
-build for that reason.
+accuracies exactly**; only fit times move.
 
-The arm that moved is the ill-conditioned one, which is what a BLAS or threading
-difference would look like: bhattacharyya's own ranking scores 0.4267 at one
-feature, so its models are fitted on poor features and sit where small numerical
-differences change the outcome. **Do not quote A.2's bhattacharyya cells to four
-decimals across machines.** A.4's actual argument is untouched — it rests on
-wasserstein 0.9967 against bhattacharyya 0.4267 at a single feature, a gap of
-0.57 against a host effect of 0.04.
+**The standing hypothesis — a BLAS/threading difference — was tested and it does
+not hold.** `reproduce/experiments/run_note12_threading.py`, ten seeds, full grid,
+all three scorers, one variable at a time; write-up in
+`outputs/NOTE12_THREADING.md`, per-setting tables in `outputs/note12-threading/`.
+
+| Variable | Range | Did the knob bite? | Accuracy effect | Verdict |
+|---|---|---|---|---|
+| Thread count (`OMP`/`OPENBLAS`/`MKL`…) | 1 → 32 | yes — 140% runtime spread | **0.000000** in all 27 cells | **refuted** |
+| BLAS kernel family (`OPENBLAS_CORETYPE`) | Haswell → Katmai (SSE-only) | **no** — 1.6% runtime spread | **0.000000** in all 27 cells | **inconclusive** |
+
+Thread count is excluded outright: it moves this generator's wall clock by 2.4×
+and moves the reported accuracy by nothing. The kernel-family sweep is reported as
+inconclusive rather than as a second refutation because its manipulation check
+failed — dropping OpenBLAS from AVX2 to SSE-only changed runtime by 1.6%, so the
+variable loaded and then did nothing this workload can feel, and an unchanged
+accuracy says nothing either way.
+
+That failed check is the more useful finding, because it undercuts the *framing*
+rather than one branch of it: a computation this insensitive to which vector
+instruction path executes it is not spending its time in the BLAS, so "a BLAS
+difference" is an unlikely explanation for a 0.043 swing in it. What is left is
+the part of the stack this workload does use and that does differ — numpy 2.4.6 /
+scipy 1.17.1 / scikit-learn 1.9.0 here against an **unrecorded** stack there.
+`main-d0efefc/PROVENANCE.txt` has no machine block at all, and `logs/` has no
+`table_a1_feature_scoring.log`: those A.2 numbers came from a hand run outside the
+orchestrator. The generator itself is byte-identical between that archive's
+`grad-school` commit and now, so code, commit, seeds and data are all ruled out.
+
+The next experiment is cheap and no longer needs a second machine: re-run the
+generator on this host against pinned older library versions (`uv run --with
+'numpy==2.1.*' --with 'scikit-learn==1.5.*'`). If a downgrade reproduces the
+archive column, note 12 is solved. One direction stays closed —
+`OPENBLAS_CORETYPE=SkylakeX` faults on Raptor Lake rather than falling back, so
+the AVX-512 kernels the suspected archive host (i7-1185G7, Tiger Lake) would have
+used cannot be tested from here.
+
+**Do not quote A.2's bhattacharyya cells to four decimals across machines** — the
+guidance is unchanged. Its positive half is now stronger than before: within one
+environment that column survives four thread counts, four BLAS kernel families and
+two independent full sweeps, all bit-identical. It is reproducible on a fixed
+environment and not portable off it. A.4's actual argument is untouched either way
+— it rests on wasserstein 0.9967 against bhattacharyya 0.4267 at a single feature,
+a gap of 0.57 against an environment effect of 0.043 and a thread-count effect of
+exactly zero.
 
 ---
 
@@ -347,7 +388,11 @@ all of those are within noise.
 
 So "the harness is deterministic" is now a measured claim rather than an
 assumption, with one boundary worth stating precisely: it is deterministic **on
-one host with one numeric stack**. Note 12 is the counterexample across hosts,
+one host with one numeric stack**, and note 12 now sharpens both halves of that:
+A.2's sensitive column is invariant to thread count (1 → 32) and to BLAS kernel
+family (AVX2 → SSE-only) on this host, so "one host" is a stronger guarantee than
+it was, while the across-host difference survives every in-environment knob
+measured. Note 12 is the counterexample across hosts,
 and note 11 is why wall-clock cells must never be diffed as if they were results.
 
 Before this pass, `tribble-fis` was checked out at `d0d6714` — the *pre-fix*
