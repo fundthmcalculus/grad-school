@@ -6,12 +6,17 @@
     python reproduce/check_prose.py full-2026-08-03 --chapter 06 --show-ok
     python reproduce/check_prose.py --since HEAD~1        # did an edit lose a fact?
 
-There are two checks here, against two different failures. The archive modes below ask
-whether the document quotes the run it claims to. `--since <git-ref>` asks whether an
-editing pass changed the writing and nothing else, by diffing every numeric literal in
-the prose against that ref. A voice or compression pass should come back identical; when
-one does not, the tokens it dropped are the worklist. See `since()` for why that check
-exists and what it cannot tell you.
+There are two checks here, against two different failures, and using the wrong one reads
+as a disaster.
+
+The archive modes ask whether the document quotes the run it claims to. Use them after a
+re-quote, where digits are *supposed* to move: the number to watch is drifted plus
+untraceable falling toward a residue you can give a reason for.
+
+`--since <git-ref>` asks whether an editing pass changed the writing and nothing else. Use
+it after a voice or compression pass, which should come back identical. Do NOT use it
+across a re-quote -- every superseded value will report GONE, correctly and uselessly,
+because replacing them was the point. See `since()` for what it cannot tell you.
 
 `compare_runs.py` answers "did the harness move between two runs". This answers the
 other half, which the project has so far done by hand: **does the document quote what
@@ -83,7 +88,11 @@ ROOT = os.path.dirname(HERE)
 OUTPUTS = os.path.join(HERE, "outputs")
 PROSE = os.path.join(ROOT, "research", "proposal-defense", "prose")
 
-_NUM = r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
+# `−` (MINUS SIGN) is what the prose uses; the generators emit ASCII `-`. Without it
+# here, a negative prose cell is compared as if unsigned and reports untraceable against
+# the very CSV that holds it -- `-2.106 ± 4.274` and `-12.562 ± 24.000` in Table 4.3
+# both did. `norm()` folds it to ASCII so the two forms compare equal.
+_NUM = r"[-+−]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
 # `±`, `+/-`, and LaTeX `\pm` all appear in the prose; the generators emit `±`.
 _SEP = r"(?:±|\+/-|\\pm)"
 _PAIR = re.compile(rf"({_NUM})\s*{_SEP}\s*({_NUM})")
@@ -106,7 +115,7 @@ def norm(text):
     float equality would hide it. The float value is carried alongside for the
     near-miss check.
     """
-    return text.strip().lstrip("+")
+    return text.strip().lstrip("+").replace("−", "-")
 
 
 def read_archive(label):
@@ -217,7 +226,7 @@ def near_miss(mean, std, pairs):
 # leading guard still excludes identifiers, since `_` is a word character, so `fig_07`
 # and `table_5_x` do not match at all.
 _TOKEN = re.compile(
-    r"(?<![\w.])[-+]?\d+(?:,\d{3})*(?:\.\d+)?(?:[eE][-+]?\d+)?(?!\d)(?!\.\d)")
+    r"(?<![\w.])[-+−]?\d+(?:,\d{3})*(?:\.\d+)?(?:[eE][-+]?\d+)?(?!\d)(?!\.\d)")
 
 
 def numeric_tokens(text):
@@ -231,7 +240,8 @@ def numeric_tokens(text):
     one and this document has cells of both signs.
     """
     from collections import Counter
-    return Counter(t.lstrip("+") for t in _TOKEN.findall(text))
+    return Counter(t.lstrip("+").replace("−", "-")
+                   for t in _TOKEN.findall(text))
 
 
 def since(ref, chapter=None):
