@@ -23,3 +23,12 @@ threads:     1 (OMP/BLAS pinned before numpy import)
 >
 > Wall-clock times are machine-dependent; ratios are not. Markdown tables report normalized ratios where a timing is involved, and the companion CSV carries the absolute seconds.
 
+
+NOTE, appended after the run
+---------------------------
+table_opt_phishing_timing.{md,csv} were re-emitted from this
+archive's own table_opt_phishing_seeds.csv via --reemit-timing.
+No measurement changed. Two rendering faults were fixed: the
+ratio column used medians while the column beside it used
+mean +/- s.d., and the hot rows read '0'/'0x' where the truth is
+that a hot arm starts at the construction.
