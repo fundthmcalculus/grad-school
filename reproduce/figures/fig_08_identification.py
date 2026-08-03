@@ -5,26 +5,33 @@ Both routes are asked for the same number of rules at every point, because the
 rule count is an input to one and normally an output of the other, and comparing
 across different counts would be comparing capacity rather than identification.
 
-The first version of this figure compared the construction *with its own model
-selection left in* against a classical route that is simply told how many
-clusters to make. That is two questions at once, and it flattered the classical
-route by an order of magnitude. Both runs are drawn here:
+Two things had to be fixed before this comparison meant anything, and both were
+in the library rather than in the method.
 
-* **auto** — the construction chooses its component count per (feature, bucket)
-  by BIC, which costs four EM fits per pair on top of the k-means it keeps, and
-  leaves it with roughly three times the classical parameter count;
-* **pinned** — one Gaussian per (feature, bucket), which is *exactly* the
-  classical shape, so panel (c)'s lines coincide and panels (a) and (b) are
-  like-for-like.
+The first was a matched-capacity problem: the construction was choosing its own
+component count while the classical route was told how many clusters to make, so
+it carried three times the parameters. **pinned** fixes that — one Gaussian per
+(feature, bucket) is exactly the classical shape, so panel (c)'s lines coincide
+and panels (a) and (b) are like-for-like. **auto** is the construction still
+choosing for itself.
+
+The second was that choosing cost far more than it should. `find_optimal_gaussians`
+fitted a full EM mixture at every candidate count, kept the winning *number*, threw
+the mixtures away, and refitted by k-means. Scoring the k-means partition directly
+made identification 4.1-4.7x cheaper here with equal or better held-out R². The
+faint line in panel (b) is the same automatic construction before that fix, and
+the distance to the line above it is the whole of what was being wasted.
 
 **(a) Accuracy against rule count.** Held-out R², mean and ±1 s.d. over seeds.
 Read the *overlap*, not the ordering — three seeds is not enough to separate
 these curves, and the panel is drawn so that is obvious.
 
-**(b) Identification cost against rule count**, log scale. The classical route
-is still cheaper at matched parameters, by about 2-5x. It was 12-63x before
-pinning, and the difference between those two numbers is model selection, not
-rule placement. Cost is wall-clock here rather than iterations, unlike the
+**(b) Identification cost against rule count**, log scale. With both fixes in,
+the pinned construction and the classical routes are **at parity** — the ordering
+changes with the rule count and the margins are tens of percent, not orders of
+magnitude. The 23-84x classical advantage this study first reported was two
+artifacts stacked: an unmatched parameter count and a model-selection search
+nobody asked for. Cost is wall-clock here rather than iterations, unlike the
 optimizer study — "the construction is cheaper" is a claim about time, so time
 is what is measured, and measured single-threaded.
 
@@ -51,8 +58,9 @@ NAME = "08-identification"
 # Both archives are named rather than inferred. The panels are a comparison
 # *between* two runs, so "whatever is newest" would silently plot one run
 # against itself the moment either is re-archived.
-AUTO = "opt-identification-2026-08-02"
-PINNED = "opt-identification-pinned-2026-08-03"
+AUTO = "opt-identification-kmbic-2026-08-03"
+PINNED = "opt-identification-kmbic-pinned-2026-08-03"
+PREFIX = "opt-identification-2026-08-02"     # same sweep, before the library fix
 
 CLASSICAL = ["classical-kmeans", "classical-fcm"]
 COLOUR = {"construction": F.BLUE, "classical-kmeans": F.ORANGE,
@@ -80,6 +88,10 @@ def _stats(by, route, index):
 def build():
     auto, auto_src = _load(AUTO)
     pinned, pinned_src = _load(PINNED)
+    try:
+        before, before_src = _load(PREFIX)
+    except FileNotFoundError:
+        before, before_src = None, "(missing)"
     if "construction" not in auto or "construction" not in pinned:
         raise RuntimeError("no sweep data; run run_identification_study.py")
     rules = sorted(auto["construction"])
@@ -119,12 +131,30 @@ def build():
         cs, _, _, med = _stats(src, "construction", 1)
         tx.plot(cs, 1000 * med, lw=1.8, ls=ls, marker=mk, ms=4.5,
                 color=F.BLUE, label=name, zorder=4)
+    # The same automatic construction before the selector was fixed. Drawn faint
+    # because it is not a competitor -- it is the same code path paying for four
+    # EM fits it discarded.
+    if before is not None:
+        cs, _, _, med = _stats(before, "construction", 1)
+        tx.plot(cs, 1000 * med, lw=1.4, ls=(0, (1, 2)), marker="v", ms=4.0,
+                color=F.FAINT, label="auto, before the\nlibrary fix", zorder=3)
     tx.set_yscale("log")
     lo, hi = tx.get_ylim()
-    tx.set_ylim(lo * 0.55, hi)
+    tx.set_ylim(lo * 0.55, hi * 3.0)
+    # No legend here: five series in a narrow log panel puts the key on top of
+    # the curves whichever corner it goes in, and (a) and (c) already name the
+    # same four. Only the fifth needs saying, so it is said on the line itself.
+    if before is not None:
+        cs, _, _, med = _stats(before, "construction", 1)
+        _cs, _, _, med_auto = _stats(auto, "construction", 1)
+        tx.annotate(f"auto, before the library fix\n"
+                    f"({med[-1] / med_auto[-1]:.1f}× dearer at 12 rules)",
+                    xy=(cs[-2], 1000 * med[-2] * 1.06),
+                    xytext=(cs[0] + 0.05, 1000 * med[-1] * 2.4),
+                    fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.5,
+                    arrowprops=dict(arrowstyle="->", lw=0.8, color=F.AXIS))
     F.style_axes(tx, title="(b)  identification cost",
                  xlabel="rules", ylabel="milliseconds, single-threaded (log)")
-    F.legend(tx, loc="lower right", handlelength=2.8)
     tx.set_xticks(rules)
 
     # -- (c) parameters ----------------------------------------------------- #
@@ -153,13 +183,16 @@ def build():
              "every row — what differs is only how the rules are identified. Bands in "
              "(a) are ±1 s.d. over seeds and they\noverlap everywhere: three seeds "
              "cannot separate these curves, and the accuracy ordering is not a result. "
-             "The gap between the two blue lines in (b) is BIC component\nselection, "
-             "which the classical route is never asked to do; on the pinned run the "
-             "three routes carry identical parameter counts, which is the (c) lines "
-             "coinciding.\nTiming is wall-clock, single-threaded, median of repeats — "
-             "the one place in this study where time rather than iteration count is the "
-             f"quantity of interest.\nauto: {H.provenance_note(auto_src)} · "
-             f"pinned: {pinned_src}",
+             "The gap between the two solid blue\nlines and the classical ones in (b) "
+             "is now tens of percent rather than the orders of magnitude this study "
+             "first reported: that gap was an unmatched\nparameter count plus a "
+             "model-selection search the classical route is never asked to do, and (c) "
+             "shows the first of those — on the pinned run all\nthree routes carry "
+             "identical parameter counts, which is why those lines coincide. Timing is "
+             "wall-clock, single-threaded, median of repeats — the one\nplace in this "
+             "study where time rather than iteration count is the quantity of interest. "
+             f"auto: {H.provenance_note(auto_src)} · pinned: {pinned_src}"
+             + (f" · before: {before_src}" if before is not None else ""),
              ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
              linespacing=1.6)
     fig.tight_layout()

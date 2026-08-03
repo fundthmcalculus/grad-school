@@ -76,6 +76,11 @@ def main():
                          "advantage is just that it does not.")
     ap.add_argument("--seeds", default="0")
     ap.add_argument("--repeats", type=int, default=3)
+    ap.add_argument("--max-samples", type=int, default=0, metavar="N",
+                    help="cap the rows each (feature, class) fit sees; 0 (the "
+                         "default) uses every row. The library used to apply "
+                         "N=20000 unconditionally, as a prefix rather than a "
+                         "sample, with no way for a caller to see it.")
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--archive", metavar="LABEL")
     args = ap.parse_args()
@@ -106,7 +111,8 @@ def main():
             routes = [
                 ("construction", lambda: P.construction(
                     Xtr, ytr, features,
-                    n_gaussians=args.components if args.pin_components else -1)),
+                    n_gaussians=args.components if args.pin_components else -1,
+                    max_samples=args.max_samples or None)),
                 ("classical-kmeans", lambda: P.classical(
                     Xtr, ytr, features, args.components, "kmeans", seed)),
                 ("classical-fcm", lambda: P.classical(
@@ -232,12 +238,27 @@ def _archive(label, args, sizes, seeds):
     os.makedirs(dest, exist_ok=True)
 
     def sha(path):
+        """HEAD, plus `-dirty` when the tree has uncommitted changes.
+
+        Without the suffix a stamp reads as "this commit produced these numbers"
+        when the numbers may have come from an edited working tree -- which is
+        exactly what happens while a library fix is being measured before it is
+        committed.
+        """
         try:
-            return subprocess.run(["git", "-C", path, "rev-parse", "HEAD"],
-                                  capture_output=True, text=True,
-                                  check=True).stdout.strip()
+            rev = subprocess.run(["git", "-C", path, "rev-parse", "HEAD"],
+                                 capture_output=True, text=True,
+                                 check=True).stdout.strip()
         except Exception:  # noqa: BLE001
             return "unknown"
+        try:
+            dirty = subprocess.run(["git", "-C", path, "status", "--porcelain",
+                                    "--untracked-files=no"],
+                                   capture_output=True, text=True,
+                                   check=True).stdout.strip()
+        except Exception:  # noqa: BLE001
+            return rev
+        return f"{rev}-dirty" if dirty else rev
 
     lines = [f"label:       {label}",
              f"generated:   {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}",
@@ -251,6 +272,7 @@ def _archive(label, args, sizes, seeds):
              f"components:  {args.components}"
              + (" (construction pinned to match)" if args.pin_components else ""),
              f"top_n:       {args.top_n}",
+             f"max samples: {args.max_samples or 'all rows'}",
              f"repeats:     {args.repeats} (median reported)",
              "threads:     1 (OMP/BLAS pinned before numpy import)", "",
              C.machine_block().strip(), ""]
