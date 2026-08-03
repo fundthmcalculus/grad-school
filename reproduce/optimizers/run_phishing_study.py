@@ -108,10 +108,13 @@ def main():
                     model, _inner = build()
                     times.append(time.perf_counter() - t0)
                 acc = P.accuracy(model, Xte, yte, features)
-                # Screening is charged to the construction only: choosing
-                # features is not part of what clustering does, and the table
-                # says so. The classical route is handed the same feature set.
-                charged = float(np.median(times)) + (screen_s if name == "construction" else 0.0)
+                # Model training only. Feature engineering is reported as its
+                # own line and charged to nobody: selecting features is a
+                # preprocessing decision that any route needs made for it, and
+                # folding it into one route's training time compares a pipeline
+                # against a training step. Both routes here consume the SAME
+                # selected feature set.
+                charged = float(np.median(times))
                 rec = {"route": name, "seed": seed, "n_rows": len(Xtr),
                        "components": args.components,
                        "n_features": len(features),
@@ -120,8 +123,29 @@ def main():
                 records.append(rec)
                 _write(records)
                 print(f"  n={len(Xtr):<7} {name:<18} acc={acc:.4f}  "
-                      f"mfs={rec['n_mfs']:<4} {1000 * charged:9.1f} ms"
-                      f"{'  (incl. ' + format(1000 * screen_s, '.0f') + ' ms screening)' if name == 'construction' else ''}")
+                      f"mfs={rec['n_mfs']:<4} train {1000 * charged:8.1f} ms")
+
+    # Feature engineering, reported once per size: it is shared, it is not
+    # training, and it belongs to neither route.
+    fe_rows = []
+    for n in sizes:
+        sel = [r for r in records if r["n_rows"] == int(n * 0.8)]
+        if sel:
+            fe_rows.append([f"{sel[0]['n_rows']:,}", f"{sel[0]['n_features']}",
+                            C.cell([1000 * r["screen_s"] for r in sel],
+                                   fmt="{:.0f}")])
+    C.emit("table_phishing_feature_engineering",
+           "PhiUSIIL — feature engineering, shared by every route",
+           ["train rows", "features kept", "screening (ms)"], fe_rows,
+           note=("`calculate_gaussian_correlation` + `take_top_features`, the "
+                 "O(M^2) screen that ranks 50 features and keeps the top "
+                 f"{args.top_n}. **This is preprocessing, not model training**, "
+                 "and it is deliberately kept out of the training comparison: "
+                 "every route in that table consumes the same selected feature "
+                 "set, so charging the screen to whichever route happens to "
+                 "implement it would compare a pipeline against a training step. "
+                 "It is reported here because it is a real cost that someone "
+                 "pays, and because on this dataset it is not small."))
 
     rows = []
     for name in ("construction", "classical-kmeans", "classical-fcm"):
@@ -141,7 +165,7 @@ def main():
         "table_phishing_identification",
         "PhiUSIIL — identification cost and accuracy against sample size",
         ["route", "train rows", "membership fns", "test accuracy",
-         "identify (ms)"],
+         "train (ms)"],
         rows,
         note=(f"Binary classification, so the rule count is fixed at K = 2 for "
               f"every route and there is no rule count to sweep — what is swept "
@@ -159,11 +183,10 @@ def main():
                  f"membership-function count differs and the comparison is "
                  f"shape-matched only when `--pin-components` is passed") +
               f". Top {args.top_n} features by the construction's own screening, "
-              f"used by all three routes; **the screening time is charged to the "
-              f"construction alone**, since choosing features is not part of what "
-              f"clustering does — an asymmetry that favours the classical route "
-              f"and is stated rather than hidden. Timing single-threaded, median "
-              f"of {args.repeats}."))
+              f"used by all three routes. **Timing is model training only** — the shared "
+              f"feature-engineering cost is in its own table and is charged to "
+              f"neither route, because it is preprocessing that both consume the "
+              f"output of. Single-threaded, median of {args.repeats}."))
 
     print(f"  wrote {_write(records)}")
     if args.archive:
