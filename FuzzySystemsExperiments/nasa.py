@@ -3,8 +3,15 @@ import time
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from tribblefis.gauss_math import log_transform, standard_transform
 from tribblefis.gauss_plot import report_figures_of_merit
+# tribble-fis PR #67 deleted gauss_math.{standard_transform,log_transform,
+# detect_and_apply_log_transform}. UnitScalar replaces standard_transform's
+# min-max-to-[0,1] behaviour (the name was always a misnomer -- it never
+# z-scored); the bare `log_transform` has no successor, but it was only ever
+# np.log1p, applied HERE *after* the scaling rather than before it. UnitScalar's
+# own log step runs before its min-max, so it cannot express this order and
+# `log_dynamic_range=None` disables it; the log1p stays explicit below.
+from tribblefis.scaling import UnitScalar
 from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
 
 
@@ -34,8 +41,12 @@ def main():
     n_unique = y.nunique()
     print(f"Number of unique values in y: {n_unique}")
 
-    X = standard_transform(X, ["Rad Flow", "Fpv Close", "Fpv Open", "High", "Bypass","Bpv Close", "Bpv Open"])
-    X = log_transform(X, ["Rad Flow", "Fpv Close", "Fpv Open", "High", "Bypass","Bpv Close", "Bpv Open"], 1)
+    scaled_cols = ["Rad Flow", "Fpv Close", "Fpv Open", "High", "Bypass",
+                   "Bpv Close", "Bpv Open"]
+    # min-max to [0,1] on this subset only, then log1p -- the original order.
+    X[scaled_cols] = UnitScalar(log_dynamic_range=None).fit_transform(
+        X[scaled_cols]).astype(X[scaled_cols].dtypes.iloc[0])
+    X[scaled_cols] = np.log1p(X[scaled_cols])
 
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)

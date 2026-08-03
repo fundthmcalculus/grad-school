@@ -6,12 +6,16 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gauss_math import (
-    detect_and_apply_log_transform,
     calculate_gaussian_correlation,
     create_gaussian_membership_dict,
     take_top_features,
-    standard_transform,
 )
+# tribble-fis PR #67 deleted gauss_math.detect_and_apply_log_transform and
+# .standard_transform. UnitScalar is standard_transform's behaviour-preserving
+# successor -- despite the name, standard_transform min-max scaled to [0,1], it
+# never z-scored. StandardScalar is the genuine z-score; swapping it in here
+# would change every number this script prints.
+from tribblefis.scaling import UnitScalar
 from tribblefis.regression import (
     report_regression_performance,
     plot_tsk_order_comparison,
@@ -55,7 +59,9 @@ def main():
     start_time = time.time()
     X, y_raw = load_data()
 
-    y_raw = standard_transform(y_raw)
+    y_raw = pd.Series(
+        UnitScalar(log_dynamic_range=None).fit_transform(y_raw.to_frame()).ravel(),
+        index=y_raw.index, name=y_raw.name)
 
     n_output_buckets: int = 3
     n_top_vars: int = -1
@@ -74,8 +80,12 @@ def main():
 
     y, y_bucket_mean = partition_output(n_output_buckets, y_raw)
 
-    X, log_transformed_features = detect_and_apply_log_transform(X, min_dynamic_range=2)
-    X = standard_transform(X, column=X.columns)
+    # log(dynamic range >= 2 decades) then min-max to [0,1], in one transformer.
+    # `log_dynamic_range=2` is explicit: UnitScalar's default is 3.0, which on
+    # Concrete drops `Slag` from the logged set and moves every result.
+    _scaler = UnitScalar(log_dynamic_range=2)
+    X = pd.DataFrame(_scaler.fit_transform(X), index=X.index, columns=X.columns)
+    log_transformed_features = list(_scaler.log_features_)
     if log_transformed_features:
         print(f"Auto-detected log transform for: {log_transformed_features}")
 

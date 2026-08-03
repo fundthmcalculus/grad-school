@@ -97,15 +97,14 @@ def partition(y_raw, n, scheme):
 def run_one(X, y_raw, seed, n, order, scheme):
     from tribblefis.gauss_math import (calculate_gaussian_correlation,
                                        create_gaussian_membership_dict,
-                                       detect_and_apply_log_transform,
-                                       standard_transform, take_top_features)
+                                       take_top_features)
     from tribblefis.regression import predict_tsk, solve_tsk_consequents
 
-    yt = standard_transform(pd.Series(np.asarray(y_raw, float), name="y_value"))
+    yt = F.unit_scale(pd.Series(np.asarray(y_raw, float), name="y_value"))
     y, cent, occ = partition(yt, n, scheme)
 
-    Xt, _ = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
-    Xt = standard_transform(Xt, column=Xt.columns)
+    # log + min-max, i.e. what this table has always measured (see F.normalize).
+    Xt, _ = F.normalize(X, scaler="unit")
 
     Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
     diffs = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])

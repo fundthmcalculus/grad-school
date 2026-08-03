@@ -113,14 +113,13 @@ def prepare(X, y_raw):
     run inside `mog_arm`, so a 3-order x 2-refinement x 10-seed table recomputed
     the identical result sixty times. Hoisting changes no number.
     """
-    from tribblefis.gauss_math import detect_and_apply_log_transform, standard_transform
     from tribblefis.regression import partition_output
 
-    yt = standard_transform(y_raw)                      # affine: R^2-invariant
+    yt = F.unit_scale(y_raw)                            # affine: R^2-invariant
     y, y_bucket_mean = partition_output(N_BUCKETS, yt)
 
-    Xt, logged = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
-    Xt = standard_transform(Xt, column=Xt.columns)
+    # log + min-max, i.e. what this table has always measured (see F.normalize).
+    Xt, logged = F.normalize(X, scaler="unit")
 
     # The MoG pipeline scores on the TRANSFORMED target. R^2 is invariant under
     # that affine map, but RMSE is not -- reporting it as-is would put this arm on
@@ -189,9 +188,7 @@ def preprocess_for_others(X, y, seed, style):
     """Split for the tree/mixture/sklearn arms under a chosen preprocessing style."""
     if style == "raw":
         return train_test_split(X, y, test_size=0.2, random_state=seed)
-    from tribblefis.gauss_math import detect_and_apply_log_transform, standard_transform
-    Xt, _ = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
-    Xt = standard_transform(Xt, column=Xt.columns)
+    Xt, _ = F.normalize(X, scaler="unit")
     return train_test_split(Xt, y, test_size=0.2, random_state=seed)
 
 
