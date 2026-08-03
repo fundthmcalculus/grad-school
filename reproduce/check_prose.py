@@ -221,8 +221,17 @@ _TOKEN = re.compile(
 
 
 def numeric_tokens(text):
+    """Multiset of numeric literals, with the sign normalised away.
+
+    A leading `+` is dropped so `+0.914` in a table cell and `0.914` in the sentence
+    describing it are the same fact. Without that, moving a number between a table and
+    its prose reads as one deletion and one addition -- which is exactly what Chapter 6
+    produced when a compression pass cut a restatement whose table row was still there.
+    A leading `-` is kept, because a negative R2 is a different claim from a positive
+    one and this document has cells of both signs.
+    """
     from collections import Counter
-    return Counter(_TOKEN.findall(text))
+    return Counter(t.lstrip("+") for t in _TOKEN.findall(text))
 
 
 def since(ref, chapter=None):
@@ -259,7 +268,7 @@ def since(ref, chapter=None):
         with open(os.path.join(PROSE, name), encoding="utf-8") as f:
             now = numeric_tokens(f.read())
         was = numeric_tokens(proc.stdout)
-        out.append((name, was - now, now - was))
+        out.append((name, was - now, now - was, was, now))
     return out
 
 
@@ -290,7 +299,7 @@ def main():
         rc = 0
         print(f"prose numeric literals: {args.since} -> working tree")
         print(f"{'':-<78}")
-        for name, lost, gained in since(args.since, args.chapter):
+        for name, lost, gained, was, now in since(args.since, args.chapter):
             if lost is None:
                 print(f"  {name:46s} not present at {args.since}")
                 continue
@@ -299,13 +308,20 @@ def main():
                 continue
             rc = 1
             print(f"  {name:46s} DIFFERS")
+            # before -> after, not just the deficit. Without it every legitimate
+            # de-duplication reads as a deletion: collapsing a fact stated three
+            # times into two shows as "lost 0.62 x1" and looks identical to losing
+            # the only mention. GONE is the line to read.
             for tok, n in sorted(lost.items()):
-                print(f"      lost   {tok:>14s}  x{n}")
+                after = now.get(tok, 0)
+                tag = "GONE  " if after == 0 else "de-dup"
+                print(f"      {tag} {tok:>14s}   {was[tok]} -> {after}")
             for tok, n in sorted(gained.items()):
-                print(f"      new    {tok:>14s}  x{n}")
-        print("\nA lost token is a worklist entry, not a verdict: collapsing a "
-              "cross-reference\nmentioned twice legitimately drops one. A 1 -> 0 "
-              "deletion is the one to read.")
+                print(f"      new    {tok:>14s}   {was.get(tok, 0)} -> {now[tok]}")
+        print("")
+        print("Read the GONE lines. `de-dup` is a repeated fact stated fewer times,")
+        print("which is what a compression pass is for; `GONE` is a number's only")
+        print("mention disappearing, which is what it must never do.")
         return rc
 
     if not args.archive:
