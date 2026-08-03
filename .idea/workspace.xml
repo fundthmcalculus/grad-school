@@ -16,7 +16,7 @@
     </option>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="124" />
+    <option name="cachedIndexableFilesCount" value="127" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -45,7 +45,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/fundthmcalculus/grad-school.git&quot;,
-    &quot;accountId&quot;: &quot;40e4aa2a-9b99-4612-b3f4-3918eb37235f&quot;
+    &quot;accountId&quot;: &quot;c31be3c0-7daf-44bb-b614-489fbede21b8&quot;
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
@@ -164,21 +164,14 @@
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}</component>
+}]]></component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySaveCallSignatures" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\personal\grad-school\presentations\quals\slides" />
-      <recent name="C:\personal\grad-school\presentations\quals\slides\img" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\personal\grad-school\presentations\quals\slides\img\paper3" />
-      <recent name="C:\personal\grad-school\presentations\quals\site\img\paper3" />
-      <recent name="C:\personal\grad-school\presentations\quals\slides" />
-      <recent name="C:\personal\grad-school\presentations\quals\img" />
-      <recent name="C:\personal\grad-school\presentations\quals\img\paper2" />
+      <recent name="C:\personal\grad-school\research\quals" />
+      <recent name="$PROJECT_DIR$/AEEM6097/project-data" />
     </key>
     <key name="ImportExportFile.TargetDir.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/AEEM6022" />
@@ -328,8 +321,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-PY-261.23567.35" />
-        <option value="bundled-python-sdk-4e9d64b24869-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.23567.35" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PY-262.8665.186" />
+        <option value="bundled-python-sdk-17dd2e523595-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.8665.186" />
       </set>
     </attachedChunks>
   </component>
@@ -388,18 +381,14 @@
       <workItem from="1765152697164" duration="14011000" />
       <workItem from="1765244450851" duration="1254000" />
       <workItem from="1765291091396" duration="148000" />
-      <workItem from="1775073536131" duration="3257000" />
-      <workItem from="1775129837254" duration="15769000" />
-      <workItem from="1775478915300" duration="3104000" />
-      <workItem from="1775489252891" duration="4485000" />
-      <workItem from="1775576233371" duration="771000" />
-      <workItem from="1775584943030" duration="2989000" />
-      <workItem from="1775659888818" duration="2730000" />
-      <workItem from="1775753270495" duration="1358000" />
-      <workItem from="1775829937369" duration="5538000" />
-      <workItem from="1776083671088" duration="260000" />
-      <workItem from="1776086490407" duration="2134000" />
-      <workItem from="1777555380566" duration="3392000" />
+      <workItem from="1775073536131" duration="2591000" />
+      <workItem from="1783029652143" duration="604000" />
+      <workItem from="1783353165886" duration="1213000" />
+      <workItem from="1783638029650" duration="78000" />
+      <workItem from="1783638271510" duration="2827000" />
+      <workItem from="1783732637674" duration="11000" />
+      <workItem from="1783732755529" duration="61000" />
+      <workItem from="1784400828630" duration="2828000" />
     </task>
     <task id="LOCAL-00001" summary="spike:various changes">
       <option name="closed" value="true" />
@@ -641,117 +630,37 @@
       <option name="project" value="LOCAL" />
       <updated>1775076090638</updated>
     </task>
-    <task id="LOCAL-00031" summary="Fix formatting issues and adjust text wrapping in `quals.md` for improved readability">
+    <task id="LOCAL-00031" summary="Assignment 7">
       <option name="closed" value="true" />
-      <created>1775076175878</created>
+      <created>1782606704019</created>
       <option name="number" value="00031" />
       <option name="presentableId" value="LOCAL-00031" />
       <option name="project" value="LOCAL" />
-      <updated>1775076175878</updated>
+      <updated>1782606704019</updated>
     </task>
-    <task id="LOCAL-00032" summary="chore: update project configuration files and `.gitignore` for improved tooling setup and file management">
+    <task id="LOCAL-00032" summary="Assignment 7 - Refactor and expand notebook to include additional tasks and detailed step-by-step workflow descriptions.">
       <option name="closed" value="true" />
-      <created>1775130038824</created>
+      <created>1782609360495</created>
       <option name="number" value="00032" />
       <option name="presentableId" value="LOCAL-00032" />
       <option name="project" value="LOCAL" />
-      <updated>1775130038824</updated>
+      <updated>1782609360495</updated>
     </task>
-    <task id="LOCAL-00033" summary="build: Paper 1 presentation">
+    <task id="LOCAL-00033" summary="feat: Add Assignment 8 notebook with enhanced workflow, classifier models, and visualizations">
       <option name="closed" value="true" />
-      <created>1775135522606</created>
+      <created>1782611334830</created>
       <option name="number" value="00033" />
       <option name="presentableId" value="LOCAL-00033" />
       <option name="project" value="LOCAL" />
-      <updated>1775135522606</updated>
+      <updated>1782611334830</updated>
     </task>
-    <task id="LOCAL-00034" summary="build: Paper 2 Presentation">
+    <task id="LOCAL-00034" summary="feat: Assignment 9 + project proposal">
       <option name="closed" value="true" />
-      <created>1775136384020</created>
+      <created>1784403161057</created>
       <option name="number" value="00034" />
       <option name="presentableId" value="LOCAL-00034" />
       <option name="project" value="LOCAL" />
-      <updated>1775136384020</updated>
-    </task>
-    <task id="LOCAL-00035" summary="build: Draft Paper 3">
-      <option name="closed" value="true" />
-      <created>1775158495985</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1775158495985</updated>
-    </task>
-    <task id="LOCAL-00036" summary="build: Add updated block diagram for `vat_prim_mst` in Paper 3 presentation">
-      <option name="closed" value="true" />
-      <created>1775478987070</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1775478987070</updated>
-    </task>
-    <task id="LOCAL-00037" summary="build: Remove outdated block diagram for `vat_prim_mst` in Paper 3 presentation">
-      <option name="closed" value="true" />
-      <created>1775480661617</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1775480661617</updated>
-    </task>
-    <task id="LOCAL-00038" summary="build: Move all images to the appropriate locations!">
-      <option name="closed" value="true" />
-      <created>1775480703904</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1775480703904</updated>
-    </task>
-    <task id="LOCAL-00039" summary="build: Update Paper 3 slides with refined research details and add new model training visuals">
-      <option name="closed" value="true" />
-      <created>1775481644891</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1775481644891</updated>
-    </task>
-    <task id="LOCAL-00040" summary="build: Refine slide content and update research goals in `index.md`">
-      <option name="closed" value="true" />
-      <created>1775482006620</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1775482006620</updated>
-    </task>
-    <task id="LOCAL-00041" summary="build: Add combined slides for Papers 1/2, remove redundant `about.md`, and refine presentation details">
-      <option name="closed" value="true" />
-      <created>1775503017618</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1775503017618</updated>
-    </task>
-    <task id="LOCAL-00042" summary="build: Consolidate slides further">
-      <option name="closed" value="true" />
-      <created>1775585411646</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1775585411646</updated>
-    </task>
-    <task id="LOCAL-00043" summary="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements">
-      <option name="closed" value="true" />
-      <created>1775588665728</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1775588665728</updated>
-    </task>
-    <task id="LOCAL-00044" summary="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`">
-      <option name="closed" value="true" />
-      <created>1776087218628</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1776087218628</updated>
+      <updated>1784403161057</updated>
     </task>
     <task id="LOCAL-00045" summary="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation">
       <option name="closed" value="true" />
@@ -861,12 +770,12 @@
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/presentations/node_modules/yaml/dist/nodes/Alias.js</url>
+          <url>file://$PROJECT_DIR$/research/node_modules/yaml/dist/nodes/Alias.js</url>
           <line>54</line>
           <option name="timeStamp" value="84" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/presentations/node_modules/.pnpm/yaml@2.8.3/node_modules/yaml/dist/nodes/Alias.js</url>
+          <url>file://$PROJECT_DIR$/research/node_modules/.pnpm/yaml@2.8.3/node_modules/yaml/dist/nodes/Alias.js</url>
           <line>54</line>
           <option name="timeStamp" value="85" />
         </line-breakpoint>
