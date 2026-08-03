@@ -7,9 +7,11 @@ question was never "which is faster" but "does that gap survive size". Here it
 does not — it closes steadily — and the accuracy ordering is the reverse of
 Concrete's.
 
-**(a) Identification cost against training rows**, log-log. Different slopes are
-the whole point: the construction's own placement step grows sublinearly in n
-while a clustering grows about linearly, so the curves converge.
+**(a) Training cost against training rows**, log-log. Model training only —
+feature engineering is drawn separately and belongs to neither route. Different
+slopes are the whole point: the construction's training grows sublinearly in n
+while a clustering grows about linearly, so the curves converge and, against
+FCM, cross.
 
 **(b) Error rate, log scale.** Accuracy is the wrong axis on a saturated
 dataset — 0.9998 against 0.9960 reads as a rounding difference and is a
@@ -87,17 +89,18 @@ def build():
                         fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.5,
                         arrowprops=dict(arrowstyle="->", lw=0.8, color=F.AXIS))
 
-    # The construction's screening, drawn inside its own bar of time: at the
-    # largest size it is more than half the total, which is why the slope in (a)
-    # is what it is.
+    # Feature engineering, drawn alongside rather than inside any route's line.
+    # It is shared preprocessing, it is charged to nobody, and it is here for
+    # completeness: at the largest size it costs more than either clustering,
+    # and it grows about linearly while the construction's training does not.
     xs = sorted(by["construction"])
-    tx.plot(xs, [1000 * by["construction"][n][3] for n in xs], lw=1.2,
-            ls=(0, (3, 2)), color=F.tint(F.BLUE, 0.45), zorder=3,
-            label="…of which feature screening")
+    tx.plot(xs, [1000 * by["construction"][n][3] for n in xs], lw=1.4,
+            ls=(0, (3, 2)), color=F.FAINT, zorder=3,
+            label="feature engineering (shared,\nnot training — see caption)")
 
     tx.set_xscale("log")
     tx.set_yscale("log")
-    F.style_axes(tx, title="(a)  identification cost",
+    F.style_axes(tx, title="(a)  model training cost",
                  xlabel="training rows (log)",
                  ylabel="milliseconds, single-threaded (log)")
     F.legend(tx, loc="upper left")
@@ -118,16 +121,16 @@ def build():
             color=F.MUTED)
     rx.set_xscale("log")
     rx.set_yscale("log")
-    F.style_axes(rx, title="(c)  how much dearer the\nconstruction is",
+    F.style_axes(rx, title="(c)  how much dearer the\nconstruction is to train",
                  xlabel="training rows (log)", ylabel="cost ratio (log)")
     F.legend(rx, loc="upper right")
 
     fig.text(0.5, -0.02,
-             "Same model shape, same prediction path, same retained features — only "
-             "the placement method differs. The construction is additionally charged "
-             "for its own feature\nscreening, which the classical routes are handed "
-             "free; at the largest size that screening is more than half its total, "
-             "and the comparison is a handicap in the classical\nroute's favour. One "
+             "Same model shape, same prediction path, same features — only the "
+             "placement method differs, and the timing is model training ONLY. "
+             "Feature engineering is the\ndashed grey line: shared preprocessing "
+             "whose output every route consumes, charged to none of them, shown "
+             "because it is a real cost and on this dataset not a small one.\nOne "
              "seed, so read the trends and not the individual points. Timing "
              f"single-threaded, median of repeats. {H.provenance_note(label)}",
              ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
