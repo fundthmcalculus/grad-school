@@ -92,8 +92,20 @@ it needs your records rather than a decision._
       "Why this table reports ratios and not seconds" needs that edit.**
       **(c) Table 3.1's swept ratios must be re-quoted**: 28.8× → 28.6×, 398× → 304×,
       1,129× → 660× at 10 seeds on one host.
-- [ ] ⬜ **B5b — Re-quote §3.4's swept rows and Table 3.2 from the workstation run.** Follows
-      directly from B5; the harness numbers exist, the prose still carries the laptop's.
+- [x] ✅ **B5b — §3.4's swept rows and Table 3.2 re-quoted from the workstation run.** Table 3.1
+      reads 25× / 311× / 673× (was 28.8× / 398× / 1,129×); the 4,096-point stage-two figure is
+      0.229 ± 0.006 s, so the comparison against the published stage-one measurement reads ~11×.
+      Table 3.2's grid and exponents are re-quoted at classical **3.20**, stage one **1.86**,
+      stage two **1.97**. Every cell was checked programmatically against the archive CSVs. The
+      plateau and parity-band paragraphs are rewritten as an explicit retraction rather than
+      replaced silently, and Ch 7's G4 is rebuilt around the lesson — repeatability cannot
+      distinguish a property of the code from a property of the host. The appendix's hardware
+      bullet and §3.4's two-hosts note are updated to match.
+- [ ] ⬜ **B5c — Install a PDF renderer on this host.** `build_pdf.py` now assembles all
+      thirteen sections and injects all sixteen figures on Windows (it previously died reading
+      `chapters/09-publications.md` under cp1252), but rendering needs pandoc plus either a
+      LaTeX engine or WeasyPrint's GTK runtime, none of which are present. The combined
+      Markdown builds; the PDF does not. Not a code defect — a machine setup item.
 - [x] ⬜ **B6 — Remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
       returns a wrong ordering (seed vertex, then ascending index order). Cause is a vectorized
       call to a scalar-typed `_get_dist`. Nothing calls it. See `REVIEW` ★2.
