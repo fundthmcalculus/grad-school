@@ -6,12 +6,18 @@
     uv run --project tribble-fis --with-editable tribble-cluster --with scikit-learn \
         python reproduce/optimizers/run_phishing_study.py --archive <label>
 
-On Concrete (824 x 8) the classical route identified a rule base 25-84x faster
-than the Gaussian construction. That cannot be extrapolated: the construction's
-cost there was dominated by fitting candidate mixtures, k-means on 824 rows is
-free, and the two scale in different variables. So the question here is not
-"which is faster" but **"where do the two curves cross, if they cross"** — which
-is why the sweep is over sample size, not just over component count.
+This sweep exists because a Concrete-sized result cannot be extrapolated: the
+construction and a clustering scale in different variables, so the question is
+not "which is faster" but **"where do the two curves cross, if they cross"** —
+hence a sweep over sample size rather than only over component count.
+
+It also caught two library defects that were doing most of the talking, both now
+fixed (tribble-fis `claude/identification-cost-fix`): `fit_gaussians` truncated
+each (feature, class) column to its first 20,000 rows before fitting anything,
+which read as sublinear scaling, and its component selection fitted four EM
+mixtures per pair only to discard them. `--max-samples` and `--cap-classical`
+reproduce the old behaviour for comparison; see Addendum 4 of
+`RESULTS_2026-08-02.md`.
 
 Both routes produce the same model shape (K class rules, c components per
 feature per class) and are read by the same `simple_gaussian_predict`, so what
@@ -196,8 +202,8 @@ def main():
         rows,
         note=(f"Binary classification, so the rule count is fixed at K = 2 for "
               f"every route and there is no rule count to sweep — what is swept "
-              f"is the **sample size**, because the Concrete result (classical "
-              f"25-84x cheaper on 824 rows) cannot be extrapolated: the two "
+              f"is the **sample size**, because a Concrete-sized result cannot "
+              f"be extrapolated: the two "
               f"routes scale in different variables. Both produce the same model "
               f"shape and are read by the same `simple_gaussian_predict`, so what "
               f"differs is only how the Gaussians are placed: a per-feature 1-D "
@@ -214,14 +220,15 @@ def main():
               f"feature-engineering cost is in its own table and is charged to "
               f"neither route, because it is preprocessing that both consume the "
               f"output of. "
-              + (f"The `-{args.cap_classical // 1000}k` rows are the honest "
-                 f"control on scaling: the construction truncates every "
-                 f"(feature, class) column to its first "
-                 f"{args.cap_classical:,} rows inside `fit_gaussians`, so its "
-                 f"fitting cost stops growing above that and only the row "
-                 f"filtering still scales. Those rows give the classical route "
-                 f"the same cap, which is what separates *the construction "
-                 f"scales better* from *the construction reads less data*. "
+              + (f"The `-{args.cap_classical // 1000}k` rows cap the classical "
+                 f"routes at {args.cap_classical:,} rows per class. That cap "
+                 f"used to be forced on the construction by `fit_gaussians`, "
+                 f"invisibly, which read as sublinear scaling; giving the "
+                 f"classical routes the same cap is what separated *the "
+                 f"construction scales better* from *the construction reads "
+                 f"less data*. The cap is now off by default on both sides, so "
+                 f"these rows are a comparison against the old behaviour rather "
+                 f"than a control on the current one. "
                  if args.cap_classical else "")
               + f"Single-threaded, median of {args.repeats}."))
 
