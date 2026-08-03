@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/grad-school.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/grad-school.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fuzzy_torch/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gated-minimax-selection/run_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/gated-minimax-selection/run_all.py" afterDir="false" />
-    </list>
+    <list default="true" id="98c7e274-2ba7-4623-bcbb-a53a72f8724e" name="Changes" comment="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,6 +28,7 @@
   </component>
   <component name="Git.Settings">
     <option name="PREVIEW_PUSH_PROTECTED_ONLY" value="true" />
+    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="feat/fuzzy-symphony" />
@@ -65,61 +60,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.9481758143038161" />
-      <entry key="MS500" value="6.000174011481214" />
-      <entry key="S2" value="15.726522144216572" />
-      <entry key="S5" value="23.22509796760516" />
-      <entry key="S10" value="27.12384918890646" />
-      <entry key="S30" value="32.32696000020712" />
-      <entry key="S60" value="37.07714040112914" />
-      <entry key="M2" value="42.20153996177895" />
-      <entry key="M5" value="48.23797197686045" />
-      <entry key="M10" value="51.51230070488776" />
-      <entry key="M15" value="52.846034155203434" />
-      <entry key="M30" value="54.33361916116931" />
-      <entry key="H1" value="55.14273545996474" />
-      <entry key="H2" value="55.56511774150367" />
-      <entry key="H4" value="55.78096638495843" />
-      <entry key="D1" value="55.96327062283292" />
-      <entry key="W1" value="55.994747431723475" />
+      <entry key="MS100" value="1.9815528259498087" />
+      <entry key="MS500" value="6.444205112870621" />
+      <entry key="S2" value="17.585180805333103" />
+      <entry key="S5" value="33.00334486010013" />
+      <entry key="S10" value="49.94017659976174" />
+      <entry key="S30" value="75.04742516762416" />
+      <entry key="S60" value="87.41072051632355" />
+      <entry key="M2" value="97.19575228876921" />
+      <entry key="M5" value="106.55423316463954" />
+      <entry key="M10" value="111.0983957000076" />
+      <entry key="M15" value="112.88421634081486" />
+      <entry key="M30" value="114.84208476391734" />
+      <entry key="H1" value="115.89409563320855" />
+      <entry key="H2" value="116.44005015636031" />
+      <entry key="H4" value="116.71824181743122" />
+      <entry key="D1" value="116.9527896962355" />
+      <entry key="W1" value="116.99324949495447" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="2.4243092750316812E-145" />
-      <entry key="S2" value="7.016927765056946E-37" />
-      <entry key="S5" value="3.4550855266646826E-15" />
-      <entry key="S10" value="5.877997555855802E-8" />
-      <entry key="S30" value="0.0038881510975934614" />
-      <entry key="S60" value="0.0623550406751007" />
-      <entry key="M2" value="0.24970991304932327" />
-      <entry key="M5" value="0.5740825067216766" />
-      <entry key="M10" value="0.7576823257287166" />
-      <entry key="M15" value="0.8311092280898904" />
-      <entry key="M30" value="0.9116519226601189" />
-      <entry key="H1" value="0.9548046515702138" />
-      <entry key="H2" value="0.9771410602212014" />
-      <entry key="H4" value="0.9885044563486806" />
-      <entry key="D1" value="0.9980748341488194" />
-      <entry key="W1" value="0.999724749122078" />
+      <entry key="MS500" value="3.866035023907673E-155" />
+      <entry key="S2" value="2.49354061270837E-39" />
+      <entry key="S5" value="3.6201501052564077E-16" />
+      <entry key="S10" value="1.9026692054207405E-8" />
+      <entry key="S30" value="0.0026696506275648256" />
+      <entry key="S60" value="0.05166866194865916" />
+      <entry key="M2" value="0.22730741727594148" />
+      <entry key="M5" value="0.5528985398014032" />
+      <entry key="M10" value="0.7435714759197006" />
+      <entry key="M15" value="0.8207580437117525" />
+      <entry key="M30" value="0.9059569767443446" />
+      <entry key="H1" value="0.9518177224365718" />
+      <entry key="H2" value="0.9756114607960346" />
+      <entry key="H4" value="0.9877304595870448" />
+      <entry key="D1" value="0.9979445432440798" />
+      <entry key="W1" value="0.9997061043234666" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.8445468447557145" />
-      <entry key="MS500" value="5.936431421710881" />
-      <entry key="S2" value="15.684826105175878" />
-      <entry key="S5" value="23.19983996867097" />
-      <entry key="S10" value="27.108833496230712" />
-      <entry key="S30" value="32.323029153763734" />
-      <entry key="S60" value="37.13267276887087" />
-      <entry key="M2" value="42.44535038773136" />
-      <entry key="M5" value="48.80831007349955" />
-      <entry key="M10" value="52.26774588997304" />
-      <entry key="M15" value="53.67555649050702" />
-      <entry key="M30" value="55.24442572442568" />
-      <entry key="H1" value="56.09710360672709" />
-      <entry key="H2" value="56.542036981275956" />
-      <entry key="H4" value="56.76935902471306" />
-      <entry key="D1" value="56.96132669376092" />
-      <entry key="W1" value="56.99446949725599" />
+      <entry key="MS100" value="1.9520219367081224" />
+      <entry key="MS500" value="6.423116595539498" />
+      <entry key="S2" value="17.56807256523301" />
+      <entry key="S5" value="32.98634357453006" />
+      <entry key="S10" value="49.9247265079251" />
+      <entry key="S30" value="75.03990471562301" />
+      <entry key="S60" value="87.45411138744696" />
+      <entry key="M2" value="97.41631893914456" />
+      <entry key="M5" value="107.10296255588956" />
+      <entry key="M10" value="111.8394877365841" />
+      <entry key="M15" value="113.70321738579362" />
+      <entry key="M30" value="115.74710644497404" />
+      <entry key="H1" value="116.84543053708543" />
+      <entry key="H2" value="117.41541628659638" />
+      <entry key="H4" value="117.70584861487384" />
+      <entry key="D1" value="117.95071348924215" />
+      <entry key="W1" value="117.99295263151382" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -133,43 +128,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor": "Run",
-    "Python.final_project.executor": "Debug",
-    "Python.fuzzy-and-or.executor": "Run",
-    "Python.fuzzy-symphony.executor": "Run",
-    "Python.ga.executor": "Run",
-    "Python.hw3.executor": "Run",
-    "Python.hw4.executor": "Run",
-    "Python.ivat_tsp.executor": "Run",
-    "Python.midterm_project.executor": "Run",
-    "Python.project1.executor": "Run",
-    "Python.run_all.executor": "Run",
-    "Python.test1.executor": "Run",
-    "Python.tire_selector.executor": "Run",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/personal/grad-school/presentations/quals/slides",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "Runtime.Targets.Configurable",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python tests.pytest for AEEM6097.ivat_tsp.test_vat_scaling.executor&quot;: &quot;Run&quot;,
+    &quot;Python.final_project.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.fuzzy-and-or.executor&quot;: &quot;Run&quot;,
+    &quot;Python.fuzzy-symphony.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ga.executor&quot;: &quot;Run&quot;,
+    &quot;Python.hw3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.hw4.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ivat_tsp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.midterm_project.executor&quot;: &quot;Run&quot;,
+    &quot;Python.project1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run_all.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tire_selector.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;fix/assignments&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/personal/grad-school/presentations/quals/slides&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Runtime.Targets.Configurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySaveCallSignatures" value="true" />
   </component>
@@ -203,7 +198,9 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AEEM6022/hw3.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -764,7 +761,23 @@
       <option name="project" value="LOCAL" />
       <updated>1784587833720</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="feat(data-pandas): add notebook for Pandas basics with data cleaning steps and resampling">
+      <option name="closed" value="true" />
+      <created>1785633483570</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1785633483570</updated>
+    </task>
+    <task id="LOCAL-00047" summary="feat(data-pandas): add notebook for Pandas basics with data cleaning steps and resampling">
+      <option name="closed" value="true" />
+      <created>1785633490254</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1785633490254</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -782,7 +795,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chore: add `.gitignore` entry for large-scale wave energy farm file" />
     <MESSAGE value="output figures" />
     <MESSAGE value="fix: P2 notes" />
     <MESSAGE value="fix: Added UAV notes" />
@@ -804,10 +816,11 @@
     <MESSAGE value="build: Add combined slides for Papers 1/2, remove redundant `about.md`, and refine presentation details" />
     <MESSAGE value="build: Consolidate slides further" />
     <MESSAGE value="build: Refactor combined presentation slides for improved clarity and update Paper 3 content with GMM refinements" />
-    <MESSAGE value="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`" />
     <MESSAGE value="fix: Correct variable usage, execution count, and typo in Assignment 9 notebook" />
     <MESSAGE value="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Add reproducible analysis and results pipeline for iVAT membership function investigation" />
+    <MESSAGE value="build: Remove outdated `quals.md` presentation and apply minor refinements to `index.md`" />
+    <MESSAGE value="feat(data-pandas): add notebook for Pandas basics with data cleaning steps and resampling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(data-pandas): add notebook for Pandas basics with data cleaning steps and resampling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
