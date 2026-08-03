@@ -25,7 +25,7 @@ as having no generator yet.
 | 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1; re-taken on one host — note 11 |
 | 3.2 Complexity fit | `reproduce/tables/table_3_1_reorder_three_arm.py` | `outputs/table_3_1_complexity_fit.{md,csv}` | **reproduced** — exponents confirm; stage-two plateau does **not** reproduce, note 11 |
 | 3.3 Memory footprint | `reproduce/tables/table_3_2_memory_precision.py` | `outputs/table_3_2_memory_precision.{md,csv}` | **reproduced** — all 32 cells identical to `main-d0efefc` |
-| 3.4 GPU speedups | `ClusteringExperiments/{boruvka_gpu,gpu_vat}.py` | findings only | **ungenerated** — needs a GPU host |
+| 3.4 GPU speedups | `reproduce/tables/table_3_4_gpu_speedups.py` | `outputs/table_3_4_gpu_speedups.{md,csv}` | **drifted** — measured on the card the chapter names; the exactness claim holds, three of the four speedup rows do not read as quoted — note 15 |
 | 3.5 Adversarial ARI | `ClusteringExperiments/adversarial_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — two cells corrected, note 10 |
 | 3.6 Stitch ablation | `ClusteringExperiments/principled_stitch.py` | `ClusteringExperiments/findings/…` | **reproduced** — re-quoted, note 10 |
 | 3.7 Non-metric agreement | `ClusteringExperiments/hardening_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — cells match |
@@ -105,6 +105,90 @@ exponents are 3.14–3.19 (classical), 1.84–1.87 (stage one) and **1.93–1.95
 laptop's 2.12, which the chapter itself calls "right for the wrong reason"
 because the plateau contaminated the fit. **CHECKLIST C2b, which asks what the
 10 ms is, should be rescoped: the thing to explain is why the laptop had it.**
+
+**Note 15 — Table 3.4 is measured now, and the exactness claim survives while
+three of the four speedup rows do not.** `table_3_4_gpu_speedups.py` runs on the
+card §3.4 names (RTX 4080 Laptop, 12 GB, driver 610.74, CuPy 14.1.1 on CUDA
+runtime 12.9, compute capability 8.9) against the same host's CPU — the "32-core
+CPU" of that table is this machine's 32 logical cores, not a separate box. Ten
+seeds, every device timing synchronised, all kernels warmed before measurement
+(the first `boruvka_mst_device` call spends ~0.4 s compiling its RawModule, 13x
+the N=16,000 kernel time, which would have made the small-N cells fiction). The
+run of record is `outputs/gpu-table34-2026-08-02/`, 1332 s through
+`run_all_tables.sh`; every figure below is from its CSV, checked against it
+programmatically rather than read off. Two full runs hours apart agree within 2%
+on most swept rows and under 1% at N = 32,000, but not everywhere: at N = 8,000 —
+the smallest, noisiest point on the grid — the MST ratio moved 11% (8.5× → 7.6×)
+and the matched front end 18% (3.4× → 2.8×). Quote the large-N cells.
+
+*What holds, and holds more strongly than quoted.* The exactness column is the
+chapter's central GPU claim and it reproduces everywhere it is claimed. The VAT
+ordering derived from the device Borůvka MST is elementwise identical to the
+compiled Cython serial Prim reference at float64 at **every** N and **every** one
+of the ten seeds; FCM agrees on 100.0% of hard labels (the chapter claims
+">99%") with centres within 5e-5 of the CPU fixed point, and within 6e-13 of the
+matched-formulation arm.
+
+*Row 1 — the MST.* Quoted "≈5× at N = 32,000, growing with N". Measured
+**6.3×** at N = 32,000 — the chapter *understates* it — but it does **not** grow
+with N: 5.4× (4,000), 7.6× (8,000), 7.7× (16,000), 6.3× (32,000). It peaks in the
+middle of the grid and falls off at the top. The CPU arm is O(n²) dense Prim and
+the device arm is O(n² log n) Borůvka rounds, so a non-increasing ratio is what
+the algorithms predict; "growing with N" belongs to the front-end row, not this
+one.
+
+*Row 2 — the front end.* Quoted "≈4.8–6.6× end to end". With **matched work** —
+both arms producing an ordering and nothing else — it reads 2.3×, 2.8×, 3.9×,
+**4.9×** across the same grid. It does grow with N, and only the largest cell
+reaches the bottom of the quoted band. The band is reproducible only by letting
+the CPU arm additionally materialise the reordered n × n matrix
+(`compute_vat_c`) that the GPU arm never builds; that unmatched pair reads
+5.6–11.8×, i.e. *above* the quoted band. The chapter's cell therefore matches
+neither arm: it sits between a comparison that is fair and one that is not.
+
+*Row 3 — Fuzzy C-Means, the row to fix.* Quoted **30–56×**. Measured 14.4×,
+24.1×, 41.0× at N = 50,000 / 200,000 / 500,000 against `fcm.fuzzy_c_means` —
+below the quoted range at the two smaller sizes. More importantly, that ratio is
+**not a device speedup**: `fcm.fuzzy_c_means` is a NumPy broadcasting
+implementation materialising (n, k, d) and (n, k, k) temporaries, while
+`gpu.fuzzy_c_means_gpu` uses the gram identity and two GEMMs. Run the GPU's own
+formulation in NumPy/BLAS on the CPU and the same three sizes read **1.3×, 2.1×,
+3.7×**. About an order of magnitude of the quoted figure is the rewrite, not the
+card. This is note 11's hazard again — a ratio between arms that differ *in kind*
+rather than in device — and it is why the generator carries both CPU arms.
+Caveat on all six FCM cells: with identical initial centres and convergence test
+the iteration count to the fixed point ranges from 11 to the 100-iteration cap
+across the ten seeds, so the seconds carry a spread as large as their mean. Read
+the CSV before quoting one.
+
+*Row 4 — pairwise distances, and the loss is real.* The negative result
+reproduces cleanly and is the best-behaved row in the table: float64 at d = 10
+runs at **0.30×** of the CPU (i.e. 3.3x slower), d = 50 at 0.38×, and even
+d = 784 at 0.64×; float32 at d = 10 is 0.35×. The GPU wins at d = 200 (1.08×
+f64, 1.07× f32) and at d = 784 f32 (1.54×), rising to 2.06× and **4.18×** with
+`high_precision=False`. Two departures from the quoted "1.3–2.5×, exact": the
+upper end is higher than quoted, and **the fastest cells are not exact** —
+`high_precision=False` accumulates in the input dtype and deviates from the CPU
+kernel by ~1e-4. Exactness in this row holds for the high-precision mode only
+(max |Δ| = 0 at float32, ≤4.3e-14 at float64).
+
+*The one row that is a demonstration, not an estimate.* The largest float32
+device-resident front end that fits the card, N = 48,000 (9.22 GB resident), is
+recorded once with its hardware, precision and footprint per §7.2 rather than as
+a ten-seed mean — and it should be read that way, because runs of identical code
+on the same seed put it at **1.06×, 3.50× and 3.49×**, a 3.3x move at the VRAM
+edge between the first and the rest. Its ordering agreement is **0.99992**, not
+1.0: about four of 48,000
+positions differ from the serial reference. That is a benign tie-break, not an
+error — the Prim total of the two orderings is identical to every digit printed
+(relative difference 0.0e+00), so the device found a different member of a set of
+equally valid minimum spanning trees. The "bit-identical" claim is exact at
+float64 at every size tested and at float32 up to 32,000; it is not universal.
+
+*What could not be measured.* §3.4 predicts a datacenter card with full-rate FP64
+would flip the pairwise-distance loss. There is no such card on this host, so
+that prediction stays exactly what the chapter calls it — untested. No cell
+estimates or extrapolates it, and the generator does not model it.
 
 ---
 
@@ -461,7 +545,10 @@ resolved:
 Neither was a defect in the harness. What remains outstanding is narrow:
 
 - **Table 3.1's headline 4,096-point pair** has no in-repo provenance (note 1).
-- **Tables 3.2 and 3.3** have no generator; 3.3 needs a GPU host.
+- **Table 3.4** now has a generator and is **drifted**, not ungenerated (note 15).
+  This line previously read "Tables 3.2 and 3.3 have no generator; 3.3 needs a
+  GPU host" — the same off-by-one numbering documented above, naming two tables
+  that both have generators and reproduce.
 - **Table 6.3** is structural by design and 6.4's entry point is unconfirmed.
 - **ANFIS and GA-FIS adapters** are still absent, so those cells stay `N/A`.
 
