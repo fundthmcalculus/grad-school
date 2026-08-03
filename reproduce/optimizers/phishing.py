@@ -26,6 +26,24 @@ same component count, same prediction path — and leaves exactly one thing
 different: whether the Gaussians are placed by a per-feature 1-D mixture fit or
 by a multivariate clustering of the class.
 
+## Two things that look like scaling but are not
+
+Both surfaced only once the timings were read against the library source, and
+both change what the cost curves mean:
+
+1. **The construction subsamples.** `fit_gaussians(..., max_samples=20_000)`
+   truncates each (feature, class) column to its first 20,000 rows before
+   fitting anything. Above that, the fitting cost stops growing and only the
+   row filtering still scales — which is most of why the construction's curve
+   flattens. It is a real design choice, not an accident, but a route that
+   reads every row is not its fair control. Hence `classical(..., max_samples=)`
+   and the `--cap-classical` arms.
+2. **Unpinned construction pays for model selection.** With `n_gaussians=-1`,
+   `find_optimal_gaussians` fits four EM mixtures per (feature, class) to pick a
+   component count by BIC, then throws them away and runs k-means at the winning
+   count. That search, not the fit, is the bulk of the unpinned cost.
+   `--pin-components` removes it and matches the classical parameter count.
+
 ## What is charged to whom
 
 The construction pays for its own feature screening (`calculate_gaussian_correlation`
@@ -81,13 +99,23 @@ def construction(X, y, features, n_gaussians=-1):
     return model, time.perf_counter() - start
 
 
-def classical(X, y, features, c, method="kmeans", seed=0):
+def classical(X, y, features, c, method="kmeans", seed=0, max_samples=None):
     """Identify by clustering within each class. (model, seconds).
 
     One clustering per class over the retained features; each cluster
     contributes one Gaussian per feature, so a class ends up with c components
     on every feature — the same shape the construction produces with c mixture
     components, and read by the same predictor.
+
+    `max_samples` caps the rows each class is clustered on, mirroring
+    `fit_gaussians(..., max_samples=20_000)` in the construction: that function
+    truncates to the first 20,000 rows of the class *before* fitting anything,
+    so above 20,000 rows per class the construction's fitting cost stops
+    growing and only the row filtering still scales. That is a real design
+    choice and it is most of why the construction's curve flattens — so the
+    honest control is a classical route capped the same way. Rows are taken in
+    order, as the construction takes them; the split is shuffled and stratified
+    upstream, so a prefix is an unbiased sample.
     """
     from tribblefis.gauss_data import (FeatureModel, GaussianMembership,
                                        GaussianMixtureModel, LabelModel)
@@ -101,6 +129,8 @@ def classical(X, y, features, c, method="kmeans", seed=0):
     assign = {}
     for cls in classes:
         rows = Xf.to_numpy(dtype=float)[y_arr == cls]
+        if max_samples:
+            rows = rows[:max_samples]
         k = min(c, len(rows)) or 1
         if k == 1 or len(np.unique(rows, axis=0)) < k:
             assign[cls] = (rows, np.zeros(len(rows), dtype=int), 1)

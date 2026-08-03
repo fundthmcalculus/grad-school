@@ -83,6 +83,9 @@ def _data(dataset, seed, test_size=0.2):
     return Xtr, Xte, ytr, yte, prep["span"]
 
 
+PIN_COMPONENTS = [-1]    # set from --pin-components; -1 means "choose by BIC"
+
+
 def _construction(Xtr, ytr, c, seed):
     """Identify by the Gaussian construction at c output buckets.
 
@@ -93,6 +96,13 @@ def _construction(Xtr, ytr, c, seed):
     identification route consumes. Training is the output partition and the
     mixture fit. Folding the screen into the training number would compare a
     pipeline against a training step, which is not the comparison being made.
+
+    With `PIN_COMPONENTS` left at -1 the construction chooses its own component
+    count per (feature, bucket) by BIC, which costs four EM fits per pair on top
+    of the k-means it actually keeps. Pinning it to 1 produces exactly the
+    classical route's shape -- one Gaussian per (feature, bucket) -- so the two
+    can be compared at equal parameter counts, and separates "the construction
+    is dearer" from "model selection is dearer".
     """
     from tribblefis.gauss_math import (calculate_gaussian_correlation,
                                        create_gaussian_membership_dict,
@@ -111,7 +121,7 @@ def _construction(Xtr, ytr, c, seed):
     t0 = time.perf_counter()
     model = create_gaussian_membership_dict(Xtr, y_all["y_bucket"],
                                             top_n_var_names=features,
-                                            n_gaussians=-1)
+                                            n_gaussians=PIN_COMPONENTS[0])
     train_seconds = t_part + (time.perf_counter() - t0)
     return model, y_all, bucket_mean, list(features), train_seconds, screen_seconds
 
@@ -203,12 +213,22 @@ def main():
     ap.add_argument("--l2", type=float, default=1e-2)
     ap.add_argument("--repeats", type=int, default=5)
     ap.add_argument("--kmeans-n-init", type=int, default=10)
+    ap.add_argument("--pin-components", type=int, default=-1, metavar="N",
+                    help="force N Gaussians per (feature, bucket) instead of "
+                         "choosing by BIC. N=1 gives exactly the classical "
+                         "route's parameter count, which is the matched "
+                         "comparison; the default -1 leaves model selection in.")
     ap.add_argument("--archive", metavar="LABEL")
     args = ap.parse_args()
 
+    PIN_COMPONENTS[0] = args.pin_components
     _install_n_init_hook()
     grid = [int(x) for x in args.rules.split(",")]
     seeds = [int(s) for s in args.seeds.split(",")]
+    # The Markdown footer prints `common.SEEDS` -- the ten-seed protocol the
+    # table harness runs. This study takes `--seeds`, so leaving it alone makes
+    # a three-seed run claim ten.
+    C.SEEDS = seeds
     routes = [("construction", _construction),
               ("classical-kmeans",
                lambda X, y, c, s: _classical(X, y, c, s, "kmeans", args.kmeans_n_init)),
@@ -271,7 +291,7 @@ def main():
         f"Identification at matched rule count — construction against the "
         f"classical route ({args.dataset}, order {args.order})",
         ["route", "rules", "membership fns", "free params", "test R²",
-         "CV MSE", "identify (ms)"],
+         "CV MSE", "train (ms)", "feat. eng. (ms)"],
         rows,
         note=(f"**Identification only — no optimizer runs in this table.** Each "
               f"route is asked for the same number of rules and reports what it "
@@ -295,8 +315,18 @@ def main():
               f"dial, not a property of the algorithm, and quoting k-means as slow "
               f"without saying so would rig the comparison. Consequents come from "
               f"the same closed-form ridge-TSK solve in every row, so what is "
-              f"compared is rule identification alone. Seeds: "
-              f"{','.join(map(str, seeds))}."))
+              f"compared is rule identification alone. "
+              + (f"The construction is **pinned to {args.pin_components} "
+                 f"Gaussian(s) per (feature, bucket)**, so its parameter count "
+                 f"matches the classical route's and its BIC model selection — "
+                 f"four EM fits per pair, kept out of what the classical route "
+                 f"is asked to do — is excluded. "
+                 if args.pin_components > 0 else
+                 f"The construction **chooses its own component count by BIC**, "
+                 f"which costs four EM fits per (feature, bucket) beyond the "
+                 f"k-means it keeps, and gives it more parameters than the "
+                 f"classical route; `--pin-components 1` is the matched run. ")
+              + f"Seeds: {','.join(map(str, seeds))}."))
 
     print(f"  wrote {_write_seed_csv(records)}")
 
@@ -333,6 +363,9 @@ def _archive_here(label, args, seeds, grid):
         f"order:       {args.order}",
         f"repeats:     {args.repeats} (median reported)",
         f"kmeans n_init: {args.kmeans_n_init}",
+        f"pin components: {args.pin_components}"
+        + (" (BIC model selection)" if args.pin_components < 0 else
+           " (fixed; BIC selection excluded)"),
         "threads:     1 (OMP/BLAS pinned before numpy import)",
         "",
         C.machine_block().strip(),

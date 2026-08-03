@@ -67,6 +67,13 @@ def main():
                     help="force the construction to the same component count, "
                          "so the two have identical parameter counts")
     ap.add_argument("--top-n", type=int, default=10)
+    ap.add_argument("--cap-classical", type=int, default=0, metavar="N",
+                    help="also run classical routes clustering on at most N "
+                         "rows per class, the same cap the construction "
+                         "applies internally (fit_gaussians max_samples=20000). "
+                         "Without this the construction is compared against "
+                         "routes that read every row, and part of its scaling "
+                         "advantage is just that it does not.")
     ap.add_argument("--seeds", default="0")
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--smoke", action="store_true")
@@ -77,6 +84,10 @@ def main():
         args.sizes, args.repeats, args.seeds = "5000,20000", 1, "0"
     sizes = [int(s) for s in args.sizes.split(",")]
     seeds = [int(s) for s in args.seeds.split(",")]
+    # The Markdown footer prints `common.SEEDS`, which is the ten-seed protocol
+    # the table harness runs. This study takes `--seeds`, so the footer would
+    # otherwise claim ten seeds for a three-seed run.
+    C.SEEDS = seeds
 
     print(f"phishing identification sweep: sizes={sizes}, components="
           f"{args.components}, top_n={args.top_n}, seeds={seeds}, "
@@ -101,6 +112,16 @@ def main():
                 ("classical-fcm", lambda: P.classical(
                     Xtr, ytr, features, args.components, "fcm", seed)),
             ]
+            if args.cap_classical:
+                cap = args.cap_classical
+                routes += [
+                    (f"classical-kmeans-{cap // 1000}k", lambda: P.classical(
+                        Xtr, ytr, features, args.components, "kmeans", seed,
+                        max_samples=cap)),
+                    (f"classical-fcm-{cap // 1000}k", lambda: P.classical(
+                        Xtr, ytr, features, args.components, "fcm", seed,
+                        max_samples=cap)),
+                ]
             for name, build in routes:
                 times, model = [], None
                 for _ in range(args.repeats):
@@ -148,7 +169,7 @@ def main():
                  "pays, and because on this dataset it is not small."))
 
     rows = []
-    for name in ("construction", "classical-kmeans", "classical-fcm"):
+    for name in dict.fromkeys(r["route"] for r in records):
         for n in sizes:
             sel = [r for r in records if r["route"] == name
                    and r["n_rows"] == int(n * 0.8)]
@@ -186,7 +207,17 @@ def main():
               f"used by all three routes. **Timing is model training only** — the shared "
               f"feature-engineering cost is in its own table and is charged to "
               f"neither route, because it is preprocessing that both consume the "
-              f"output of. Single-threaded, median of {args.repeats}."))
+              f"output of. "
+              + (f"The `-{args.cap_classical // 1000}k` rows are the honest "
+                 f"control on scaling: the construction truncates every "
+                 f"(feature, class) column to its first "
+                 f"{args.cap_classical:,} rows inside `fit_gaussians`, so its "
+                 f"fitting cost stops growing above that and only the row "
+                 f"filtering still scales. Those rows give the classical route "
+                 f"the same cap, which is what separates *the construction "
+                 f"scales better* from *the construction reads less data*. "
+                 if args.cap_classical else "")
+              + f"Single-threaded, median of {args.repeats}."))
 
     print(f"  wrote {_write(records)}")
     if args.archive:
