@@ -144,14 +144,26 @@ its control; one given the same cap is, and it flattens the same way.
 of the algorithm. The default of 10 makes k-means look slow; quoting the timing
 without saying so would rig the comparison, so the table's note states it.
 
-### Two things about the library worth knowing at the call site
+### Both library defects are now fixed
 
-Neither is a bug, both are load-bearing, and neither is visible from the
-signature:
+They were real, they were load-bearing, and they were invisible from the
+signature. `tribble-fis` branch `claude/identification-cost-fix` (commit
+`10205df`) fixes both; the rationale and measurements are in that repo's
+`docs/identification-cost-evaluation.md`.
 
-1. **`fit_gaussians` silently caps at 20,000 samples.** Any scaling claim made
-   without knowing this is measuring the cap.
-2. **`find_optimal_gaussians` discards the mixtures it fits.** The BIC winner's
-   own component means are already computed and would make the following k-means
-   redundant — the cheapest available speedup in the identification path, by a
-   wide margin.
+1. **`fit_gaussians` silently capped at 20,000 samples**, as a prefix rather
+   than a sample. `max_samples` now defaults to `None`, is exposed on
+   `create_gaussian_membership_dict`, and draws at random when set.
+2. **`find_optimal_gaussians` discarded the mixtures it fitted.**
+   `fit_gaussian_mixture_1d` scores each candidate off the k-means partition it
+   implies and returns the winner's components, so nothing is refitted.
+
+Identification is 4.1-4.7x cheaper on Concrete and 5.5-9.1x on PhiUSIIL, with
+held-out accuracy equal or better. `--max-samples` and `--pin-components` remain
+on both sweeps so the old behaviour can still be reproduced for comparison, and
+`check_fit_gaussians_fix.py` runs the two selectors side by side over every
+(feature, label) group.
+
+**The reversal this caused is in Addendum 4 of `RESULTS_2026-08-02.md`.** At
+matched parameter counts the construction is now at parity with classical
+clustering rather than 23-84x dearer, which was the study's original headline.

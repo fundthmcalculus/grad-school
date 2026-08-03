@@ -84,6 +84,7 @@ def _data(dataset, seed, test_size=0.2):
 
 
 PIN_COMPONENTS = [-1]    # set from --pin-components; -1 means "choose by BIC"
+MAX_SAMPLES = [None]     # set from --max-samples; None means "use every row"
 
 
 def _construction(Xtr, ytr, c, seed):
@@ -121,7 +122,8 @@ def _construction(Xtr, ytr, c, seed):
     t0 = time.perf_counter()
     model = create_gaussian_membership_dict(Xtr, y_all["y_bucket"],
                                             top_n_var_names=features,
-                                            n_gaussians=PIN_COMPONENTS[0])
+                                            n_gaussians=PIN_COMPONENTS[0],
+                                            max_samples=MAX_SAMPLES[0])
     train_seconds = t_part + (time.perf_counter() - t0)
     return model, y_all, bucket_mean, list(features), train_seconds, screen_seconds
 
@@ -218,10 +220,16 @@ def main():
                          "choosing by BIC. N=1 gives exactly the classical "
                          "route's parameter count, which is the matched "
                          "comparison; the default -1 leaves model selection in.")
+    ap.add_argument("--max-samples", type=int, default=0, metavar="N",
+                    help="cap the rows each (feature, bucket) fit sees; 0 (the "
+                         "default) uses every row. The library used to apply "
+                         "N=20000 unconditionally, as a prefix rather than a "
+                         "sample, with no way for a caller to see it.")
     ap.add_argument("--archive", metavar="LABEL")
     args = ap.parse_args()
 
     PIN_COMPONENTS[0] = args.pin_components
+    MAX_SAMPLES[0] = args.max_samples or None
     _install_n_init_hook()
     grid = [int(x) for x in args.rules.split(",")]
     seeds = [int(s) for s in args.seeds.split(",")]
@@ -342,12 +350,27 @@ def _archive_here(label, args, seeds, grid):
     os.makedirs(dest, exist_ok=True)
 
     def sha(path):
+        """HEAD, plus `-dirty` when the tree has uncommitted changes.
+
+        Without the suffix a stamp reads as "this commit produced these numbers"
+        when the numbers may have come from an edited working tree -- which is
+        exactly what happens while a library fix is being measured before it is
+        committed.
+        """
         try:
-            return subprocess.run(["git", "-C", path, "rev-parse", "HEAD"],
-                                  capture_output=True, text=True,
-                                  check=True).stdout.strip()
+            rev = subprocess.run(["git", "-C", path, "rev-parse", "HEAD"],
+                                 capture_output=True, text=True,
+                                 check=True).stdout.strip()
         except Exception:  # noqa: BLE001
             return "unknown"
+        try:
+            dirty = subprocess.run(["git", "-C", path, "status", "--porcelain",
+                                    "--untracked-files=no"],
+                                   capture_output=True, text=True,
+                                   check=True).stdout.strip()
+        except Exception:  # noqa: BLE001
+            return rev
+        return f"{rev}-dirty" if dirty else rev
 
     lines = [
         f"label:       {label}",
@@ -363,6 +386,7 @@ def _archive_here(label, args, seeds, grid):
         f"order:       {args.order}",
         f"repeats:     {args.repeats} (median reported)",
         f"kmeans n_init: {args.kmeans_n_init}",
+        f"max samples: {args.max_samples or 'all rows'}",
         f"pin components: {args.pin_components}"
         + (" (BIC model selection)" if args.pin_components < 0 else
            " (fixed; BIC selection excluded)"),
