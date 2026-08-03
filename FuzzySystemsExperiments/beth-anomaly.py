@@ -8,10 +8,11 @@ from tribblefis.gauss_math import (
     calculate_gaussian_correlation,
     create_gaussian_membership_dict,
     take_top_features,
-    log_transform, simple_gaussian_predict,
+    simple_gaussian_predict,
 )
 from tribblefis.gauss_plot import report_figures_of_merit, plot_anomaly_threshold_sweep, plot_membership_functions, \
     plot_confusion_matrix, plot_classification_report
+from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
 
 
 def load_data(test: bool = False):

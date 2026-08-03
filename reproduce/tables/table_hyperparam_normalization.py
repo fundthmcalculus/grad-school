@@ -73,10 +73,10 @@ def _rmse(y, p):
 def mog(X, y_raw, seed, order, norm):
     from tribblefis.gauss_math import (
         calculate_gaussian_correlation, create_gaussian_membership_dict,
-        standard_transform, take_top_features)
+        take_top_features)
     from tribblefis.regression import partition_output, predict_tsk, solve_tsk_consequents
 
-    yt = standard_transform(y_raw)
+    yt = F.unit_scale(y_raw)
     y, ybm = partition_output(N_BUCKETS, yt)
     Xt = normalize(X)[0] if norm else X.copy()
 
