@@ -236,8 +236,8 @@ renderer emits both so the choice is visible rather than implicit.
 |---|---|---|---|
 | 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7 |
 | 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **reproduced** at 10 seeds — note 8 |
-| 6.3 Interpretability | *none* | — | **ungenerated** — structural by design |
-| 6.4 Memory augmentation | `tribble-fis/tests/test_double_pendulum.py` | none | **ungenerated** — entry point unconfirmed |
+| 6.3 Interpretability | *none* | — | **ungenerated** — structural by design; the counts row is checklist C9 / Goal G6 |
+| 6.4 Memory augmentation | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **ungenerated** — entry point now located, but single-seed and outside the harness — note 13 |
 
 **Note 7 — one seed in ten destroys this cell, and that is the finding.** Table
 6.1 is re-quoted at 10 seeds: flat 2nd-refined 0.875 ± 0.019, fuzzy tree
@@ -260,7 +260,31 @@ and library defaults**, which is why every cell sits below Table 6.1's; the two
 must not be read as one series. Its PhiUSIIL column is now filled and shows the
 dataset is saturated — CART and RF both reach 1.000, the fuzzy models 0.970–0.997
 — so PhiUSIIL discriminates between these methods hardly at all and should carry
-no weight in the comparison.
+no weight in the comparison. Its **M5 row is blocked on a dependency, not on an
+experiment**: the generator already imports `m5py` optionally and would fill the
+row unattended, but `m5py` does not load against scikit-learn 1.9.0 —
+`ImportError: cannot import name 'DTYPE' from 'sklearn.tree._classes'` — and
+pinning an older scikit-learn to rescue two cells would move every other number
+in the chapter. Measured on this host 2026-08-02.
+
+**Note 13 — Table 6.4's entry point is located, and it is still not quotable.**
+This row said `tribble-fis/tests/test_double_pendulum.py`, and Chapter 6's
+reproduction paragraph said the experiment lived in `tribble-fis`. **Neither is
+true** — no such file exists in that submodule. The scripts are in *this*
+repository, at `AnalyticalDynamics/test_double_pendulum.py` and
+`AnalyticalDynamics/test_atwood_machine.py`; the Atwood one simulates its own
+trajectories and reports R² and RMSE for a single-step and a window-of-3
+(memory-augmented) model, which is exactly the comparison the table wants.
+
+Finding them does not fill the table. Both run at one fixed `random_state=42`,
+neither goes through `reproduce/common.py`, and neither emits a CSV — so what
+they print is a one-seed point estimate, the thing the ten-seed floor exists to
+keep out of the document. Wiring them into the harness is checklist **C7**, which
+also owes a reconciliation the located code makes more urgent: Table 6.4's two
+double-pendulum pairs disagree about the target's scale (0.92/0.045 implies
+σ ≈ 0.159, 0.96/0.028 implies σ ≈ 0.140), so the headline "38% error reduction"
+should be read as an order of magnitude and not as two significant figures until
+both rows are re-measured under one protocol.
 
 ---
 

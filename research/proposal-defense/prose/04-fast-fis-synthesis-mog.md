@@ -170,7 +170,7 @@ The reconciliation this section used to promise has now been done. Chapter 6 pre
 | Dataset (task) | Size (N × M) | Train time | Accuracy / R² | Rule base |
 |---|---|---:|---:|---|
 | PhiUSIIL (binary classification) | 235K × 54 | 0.72 ± 0.04 s | 0.997 ± 0.001 acc. | 2 rules (K = 2) |
-| RT-IOT2022 (12-class) | 123K × 83 | < 60 s | *pending* | ~12 rules (K = 12) |
+| RT-IOT2022 (12-class) | 123K × 83 | < 60 s | *not run — RT-IOT2022 is not in the repository* | ~12 rules (K = 12) |
 | Concrete (regression, TSK order 1) | 1,030 × 8 | seconds | R² = 0.772 ± 0.034 | 3 output buckets |
 | Concrete (regression, TSK order 2) | 1,030 × 8 | seconds | R² = 0.824 ± 0.043 | 3 output buckets |
 | Concrete (regression, full 2nd) | 1,030 × 8 | seconds | **R² = 0.859 ± 0.039** | 3 output buckets |
@@ -183,10 +183,12 @@ The rule-base column is the point of the table as much as the accuracy is: for c
 |---|---:|---:|---:|---:|
 | **MoG FIS (this work)**, 1st order | 0.780 ± 0.029 | **0.37 ± 0.01 s** | **0.997 ± 0.001** | **0.72 ± 0.04 s** |
 | **MoG FIS**, full 2nd order | **0.859 ± 0.039** | *pending* | — | — |
-| ANFIS | *pending* | *pending* | *pending* | *pending* |
-| GA-tuned FIS | *pending* | *pending* | *pending* | *pending* |
+| ANFIS | N/A (C1) | N/A (C1) | N/A (C1) | N/A (C1) |
+| GA-tuned FIS | N/A (C1) | N/A (C1) | N/A (C1) | N/A (C1) |
 | CART (reference) | 0.826 ± 0.047 | seconds | 1.000 ± 0.000 | seconds |
 | Random Forest (reference) | 0.909 ± 0.019 | seconds | 1.000 ± 0.000 | seconds |
+
+*Reading the empty cells.* `N/A (C1)` is not a number withheld; it is a measurement that cannot be taken with what is in the repository. `table_4_1_mog_baselines.py` looks for `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py` and emits `N/A` when they are absent, which they are — writing those two adapters is checklist item **C1**, and it is the single most important experiment still owed, because the *orders of magnitude faster* claim in the title and in Chapters 1, 7 and 8 has no fuzzy baseline to be faster **than** until they exist. The eight cells are the shape of that hole, marked rather than filled with a plausible figure.
 
 **The mechanism, measured.** The BETH files are not in the repository, so the harness runs the same protocol on public data: leave-one-class-out, where each class is withheld from training in turn and treated as unseen, averaged over held-out classes and seeds. Sweeping the boost gives the operating curve the section promised.
 

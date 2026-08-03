@@ -75,7 +75,7 @@ The last piece extends the same machinery to time. I augment each feature with a
 
 ## 6.4 Results and Proposed Experiments
 
-> **Reproduction.** Table 6.1 is assembled from *two* generators, and it is worth saying which supplies what. `reproduce/tables/table_concrete_reconciliation.py` produces the flat-model rows, including the antecedent-refinement arm, which only it runs. `table_hyperparam_normalization.py` produces the demo-tuned column for the tree and the mixture, which only it runs. Combining them is safe rather than convenient: the two scripts share splits and seeds, and they agree to three decimals on every row they both compute — flat 2nd order, the fuzzy tree and mixture at library defaults, CART and Random Forest — so the join is cross-validated rather than assumed. Neither is the similarly named `table_6_1_model_family.py`, which deliberately runs the fuzzy arms at raw preprocessing and library defaults and instead supplies Table 6.2's external baselines (CART, Random Forest, and an optional M5 adapter). Table 6.3 is structural and has no generator. Table 6.4 comes from the double-pendulum experiment in `tribble-fis`. Both harness scripts emit Markdown and CSV with mean ± standard deviation across a fixed seed set; cells marked *pending* are those whose adapter was not yet wired up, and the harness reports what it could not run rather than substituting a guess. Per-cell provenance is tracked in `reproduce/PROVENANCE_MAP.md`.
+> **Reproduction.** Table 6.1 is assembled from *two* generators, and it is worth saying which supplies what. `reproduce/tables/table_concrete_reconciliation.py` produces the flat-model rows, including the antecedent-refinement arm, which only it runs. `table_hyperparam_normalization.py` produces the demo-tuned column for the tree and the mixture, which only it runs. Combining them is safe rather than convenient: the two scripts share splits and seeds, and they agree to three decimals on every row they both compute — flat 2nd order, the fuzzy tree and mixture at library defaults, CART and Random Forest — so the join is cross-validated rather than assumed. Neither is the similarly named `table_6_1_model_family.py`, which deliberately runs the fuzzy arms at raw preprocessing and library defaults and instead supplies Table 6.2's external baselines (CART, Random Forest, and an optional M5 adapter). Table 6.3 is structural and has no generator. Table 6.4 comes from the double-pendulum experiment, which lives at `AnalyticalDynamics/test_double_pendulum.py` in *this* repository and not, as this paragraph and `PROVENANCE_MAP.md` both used to say, in the `tribble-fis` submodule — there is no `tribble-fis/tests/test_double_pendulum.py`. It is not part of the table harness and runs at a single fixed seed. Both harness scripts emit Markdown and CSV with mean ± standard deviation across a fixed seed set; no cell in this chapter is left as a bare *pending* — every unfilled cell carries the reason it is unfilled and the checklist item that tracks it, and the harness reports what it could not run rather than substituting a guess. Per-cell provenance is tracked in `reproduce/PROVENANCE_MAP.md`.
 >
 > **TODO — repeatable performance (board-wide standard):** the training-time, accuracy, and speedup numbers here need the fixed reproducibility protocol and the full baseline suite before citation (see `ACTION_ITEMS.md` §A/§C and Ch 7 Goal G4/G3).
 
@@ -127,20 +127,22 @@ The configuration effect the grid makes visible is worth one more paragraph, bec
 | **Mixture of experts (this work)** | 0.682 ± 0.064 | 9.17 | 0.999 ± 0.001 |
 | CART | 0.825 ± 0.047 | 6.74 | 1.000 ± 0.000 |
 | Random Forest (reference) | 0.909 ± 0.018 | 4.90 | 1.000 ± 0.000 |
-| M5 model tree | *pending* | *pending* | — |
-| ANFIS | *pending* | *pending* | *pending* |
+| M5 model tree | N/A (no working M5) | N/A (no working M5) | — |
+| ANFIS | N/A (C1) | N/A (C1) | N/A (C1) |
 | Flat TSK (= Ch 4 flat MoG) | 0.650 ± 0.056 | 9.63 | 0.997 ± 0.001 |
+
+*Reading the empty cells.* Both are blocked for stated reasons rather than unfinished. ANFIS is checklist item **C1**: `table_6_1_model_family.py` emits `N/A` unless an adapter is present, and none is. M5 is a different and more annoying problem — the generator already imports `m5py` optionally and would fill the row automatically, but `m5py` does not load against the scikit-learn in this environment (`ImportError: cannot import name 'DTYPE' from 'sklearn.tree._classes'`, sklearn 1.9.0), and pinning an older scikit-learn to rescue one row would move every other number in the chapter. So the row stays `N/A` until either `m5py` is updated or an M5' implementation is written against a current scikit-learn; it is a dependency fault, not an experiment not yet run.
 
 This table exists for two things Table 6.1 does not cover: the external baselines a reviewer will demand (M5 and ANFIS, both still owed), and the PhiUSIIL column. It runs every model at **raw features and library defaults**, which is why its Concrete numbers sit below Table 6.1's throughout — that is the third axis, and the two tables must not be read as one series. The Concrete column here says what these models do untuned; Table 6.1 says what they do under the tuned, normalized protocol the chapter argues for. The PhiUSIIL column is the more interesting one now that it is filled: on that dataset every method saturates, the two tree baselines reach a perfect score, and the fuzzy models sit a fraction behind — so PhiUSIIL discriminates between these methods hardly at all and should not carry any weight in the comparison.
 
-**Table 6.3 — The interpretability side of the trade** *(structural today; the counts are pending).* The intent of this table is to make the trade-off legible rather than asserted — the hierarchy's value is the readable decision path, not a smaller rule base. I should be straight that in its current form it describes the *shape* of each model rather than measuring it; the numbers that would make it an argument are the pending row, and until they exist this table sets up the claim rather than settling it.
+**Table 6.3 — The interpretability side of the trade** *(structural today; the counts are not yet measured — checklist C9, Goal G6).* The intent of this table is to make the trade-off legible rather than asserted — the hierarchy's value is the readable decision path, not a smaller rule base. I should be straight that in its current form it describes the *shape* of each model rather than measuring it; the numbers that would make it an argument are the pending row, and until they exist this table sets up the claim rather than settling it.
 
 | Model | Rules / leaves | Variables per rule | Reads as |
 |---|---|---|---|
 | Flat FIS (Concrete) | 3 output buckets | all 8 | one weighted rule set |
 | Fuzzy tree (Concrete) | shallow, depth-capped | only the path variables | root→leaf IF–THEN path |
 | Mixture of experts | one sub-FIS per gate leaf | path gates + expert inputs | gated hierarchy |
-| **Exact counts at matched accuracy** | *pending* | *pending* | — |
+| **Exact counts at matched accuracy** | *not measured (C9 / Goal G6)* | *not measured (C9 / Goal G6)* | — |
 
 **Table 6.4 — Memory augmentation on dynamical systems.** The clearest single result in the chapter, and the one least entangled with the Concrete configuration problem above.
 
@@ -148,9 +150,11 @@ This table exists for two things Table 6.1 does not cover: the external baseline
 |---|---|---:|---:|
 | Double pendulum | standard FIS | 0.92 | 0.045 |
 | Double pendulum | **memory-augmented** | **0.96** | **0.028** |
-| Atwood machine | standard / memory-augmented | *pending* | *pending* |
+| Atwood machine | standard / memory-augmented | *not run (C7)* | *not run (C7)* |
 
 The error reduction is roughly 38%, achieved by adding short- and long-term feature averages rather than any recurrent machinery.
+
+*Reading the empty cells, and a caution about the filled ones.* The Atwood row is checklist item **C7**. An entry point does exist — `AnalyticalDynamics/test_atwood_machine.py`, which simulates its own trajectories and reports R² and RMSE for a single-step and a window-of-3 (memory-augmented) model — but it runs at one fixed `random_state=42` and is not wired into `reproduce/`, so anything it prints today would be a one-seed point estimate, which is exactly what the ten-seed floor in Goal G4 exists to stop this document quoting. C7 is that integration. The double-pendulum row above is under the same cloud for a different reason: its R²/RMSE pairs are mutually inconsistent about the target's scale (0.92/0.045 implies σ ≈ 0.159, 0.96/0.028 implies σ ≈ 0.140), so the 38% figure is a reduction of the right order rather than a number to quote to two digits until C7 re-measures both rows under the protocol.
 
 **The honest scope.** I want to be plain about what the hierarchy buys and what it does not. On raw accuracy the tree and mixture do not *reliably* beat the flat model — on Concrete the tuned mixture and the flat model are level within their spreads, and on PhiUSIIL the mixture's nominal lead sits on a dataset where every method saturates and nothing is separable — and they do not shrink the rule count below the already-compact flat model. What they buy is an explicit decision hierarchy over named variables and a readable path structure, and that payoff is real only at shallow depth and few terms, which is why I cap depth and leaf count. This is an interpretability-for-accuracy trade, made deliberately, and I would rather state it than let a reviewer discover it.
 
