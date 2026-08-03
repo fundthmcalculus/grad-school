@@ -22,9 +22,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-from tests.ode_helpers import (load_and_prepare_data, train_and_evaluate_single_step, set_axes_style,
+from ode_helpers import (load_and_prepare_data, train_and_evaluate_single_step, set_axes_style,
                               angles_to_xy, plot_test_vs_nearest_training)
-from tests.test_fuzzy_ode import initialize_model
+from test_fuzzy_ode import initialize_model
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
@@ -324,7 +324,7 @@ def create_pendulum_animation_with_training(actual_df, predicted_df, train_traje
         max_frames: cap on frames to keep the GIF manageable
         fps: frames per second in the output GIF
     """
-    from tests.ode_helpers import find_nearest_trajectories
+    from ode_helpers import find_nearest_trajectories
 
     # Find nearest training trajectories
     nearest_list = find_nearest_trajectories(actual_df, train_trajectories, k=2, features=OUTPUT_FEATURES)

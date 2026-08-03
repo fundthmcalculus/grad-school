@@ -18,7 +18,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
-from tests.ode_helpers import plot_second_pendulum_position, plot_prediction_comparison, load_and_prepare_data, \
+from ode_helpers import plot_second_pendulum_position, plot_prediction_comparison, load_and_prepare_data, \
     train_and_evaluate_window, train_and_evaluate_single_step
 
 # Comparison set: https://arxiv.org/pdf/2504.13453
