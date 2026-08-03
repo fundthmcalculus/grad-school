@@ -248,8 +248,20 @@ map quoting numbers a reader cannot find in the prose or in the run of record
 inverts its own purpose — it becomes a fourth version of the table. Cross-check
 this file's inline figures against the run of record when the run of record moves.
 
-**Note 14 — Table 4.5's two MoG rows are not the same measurement.** The
-1st-order row (R² 0.780 ± 0.029, 1.04 ± 0.62 s) comes from
+**Note 14 — Table 4.5's two MoG rows are not the same measurement.**
+
+*(Timing note, since this row's clock changed.* The 1st-order cell read
+1.04 ± 0.62 s until the generator gained a discarded warm-up fit. That ±60% was
+never seed spread: Concrete is the first arm the process fits, so seed 0 carried
+import, JIT, BLAS thread-pool spin-up and first-touch allocation at **3.68x** the
+mean of the other nine, and dropping it alone moved the spread from ±0.641 s to
+±0.021 s. The PhiUSIIL row in the same table was never affected, because it is
+fitted second — that asymmetry is what identified it. Post-fix the cell reads
+0.84 ± 0.01 s (`outputs/warmup-discarded/`), and **every accuracy in the table is
+byte-identical across the change**, which is the check that the warm-up consumes no
+shared randomness. A ±60% error bar on the headline cell of a speed claim is worth
+one discarded fit.)* The
+1st-order row (R² 0.780 ± 0.029, 0.84 ± 0.01 s) comes from
 `table_4_1_mog_baselines.py`, which drives the
 `MixtureOfGaussiansFuzzyRegressor` estimator. The full-second-order row's
 R² 0.859 ± 0.039 comes from **`table_hyperparam_normalization.py`** (Table 4.1's

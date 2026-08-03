@@ -46,6 +46,39 @@ def _bench(kind, X, y, mog_factory, score, norm=False):
     if norm:
         X = _fm.normalize(X)[0]
     cols = {c: {"t": [], "s": []} for c in ["mog", "rf", "anfis", "gafis"]}
+
+    # One DISCARDED warm-up fit, so the first seed does not pay for the process.
+    #
+    # Without it seed 0 absorbs import, JIT, BLAS thread-pool spin-up and
+    # first-touch allocation, and that lands on the headline cell of a *speed*
+    # claim: Concrete measured 1.04 +/- 0.62 s, a +/-60% deviation presented as
+    # seed spread. Per-seed times say otherwise -- seed 0 is 3.68x the mean of
+    # the other nine, and dropping it moves the spread from +/-0.641 s to
+    # +/-0.021 s (2.6%), which matches the PhiUSIIL row's +/-0.02 s. PhiUSIIL was
+    # never affected because it is fitted second, and that asymmetry between two
+    # rows of one table is what gives the diagnosis away.
+    #
+    # The warm-up runs on the SAME first split rather than on synthetic data: a
+    # differently-shaped input may not touch the same code paths, which would
+    # leave part of the cost still charged to seed 0.
+    #
+    # The global numpy RNG state is snapshotted and restored around it. The models
+    # take an explicit random_state, but a discarded fit is only free if it
+    # consumes no shared randomness, and that is cheap to guarantee rather than
+    # assume. Verified by the accuracy columns coming back byte-identical to
+    # outputs/full-14900hx-r2/table_4_1.csv -- only the time cells moved.
+    _warm = mog_factory(C.SEEDS[0])
+    if _warm is not None:
+        Xw, Xwte, yw, _ = train_test_split(X, y, test_size=0.2,
+                                           random_state=C.SEEDS[0])
+        _rng_state = np.random.get_state()
+        try:
+            _warm.fit(Xw, yw).predict(Xwte)
+        except Exception:  # noqa: BLE001 -- a failed warm-up must not fail the table
+            pass
+        finally:
+            np.random.set_state(_rng_state)
+
     for seed in C.SEEDS:
         Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
 
