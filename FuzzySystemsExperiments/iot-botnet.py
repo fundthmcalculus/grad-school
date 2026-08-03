@@ -14,7 +14,7 @@ from tribblefis.gauss_math import (
 )
 from tribblefis.gauss_plot import report_figures_of_merit, plot_anomaly_threshold_sweep, plot_confusion_matrix, \
     plot_classification_report
-from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
+from tribblefis.scaling import UnitScalar
 
 gauss_math.NORM_CONORM = "min/max"
 gauss_math.MEMBER_FCN = "triangular"
@@ -69,11 +69,10 @@ def main():
     X, y = load_data()
     start_time = time.time()
 
-    # Apply log transformation to all *_variance columns
+    # These three groups drive the per-feature membership counts further down.
     weight_cols = [col for col in X.columns if col.endswith("_weight")]
     mean_cols = [col for col in X.columns if col.endswith("_mean")]
     variance_cols = [col for col in X.columns if col.endswith("_variance")]
-    log_transform(X, variance_cols, 1)
 
     # Get the number of unique values in y
     n_unique = y.nunique()
@@ -82,6 +81,28 @@ def main():
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = _train_test_split(X, y)
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
+
+    # BEHAVIOUR CHANGE. This used to be `log_transform(X, variance_cols, 1)` --
+    # the *_variance columns only, pre-split, in place, with no normalization.
+    # UnitScalar auto-detects the logged set by dynamic range (library default
+    # 3.0), so the *_weight and *_mean columns are now eligible too, and min-max
+    # bounds everything to [0,1] afterwards. The normalization is deliberate:
+    # FIS membership functions want bounded inputs.
+    #
+    # Worth noting for this script specifically: the split is one-class (train is
+    # benign traffic only), so the scaler's min/max come from benign data and
+    # attack rows will land outside [0,1]. UnitScalar(clip=True) by default pins
+    # them at the bounds, which is defensible for anomaly detection -- "beyond
+    # anything seen in training" saturates rather than extrapolating -- but it is
+    # a real modelling choice, not a neutral rescale. Unverified: iot-botnet/ is
+    # not in this repo.
+    #
+    # Not a pipeline: create_gaussian_membership_dict / simple_gaussian_predict /
+    # the threshold sweep below take X frames directly.
+    _scaler = UnitScalar().fit(X_train)
+    _rescale = lambda F: pd.DataFrame(_scaler.transform(F), index=F.index, columns=F.columns)
+    print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
+    X_train, X_test = _rescale(X_train), _rescale(X_test)
 
     # Calculate correlation coefficient between Gaussian distributions using training data
     feature_differentiators = calculate_gaussian_correlation(X_train, y_train)

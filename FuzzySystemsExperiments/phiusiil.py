@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
 from tribblefis.gauss_math import simple_gaussian_predict
-from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
+from tribblefis.scaling import UnitScalar
 from tribblefis.gauss_plot import report_figures_of_merit, plot_confusion_matrix, plot_classification_report, \
     plot_membership_functions
 
@@ -38,36 +38,38 @@ def main():
     n_unique = y.nunique()
     print(f"Number of unique values in y: {n_unique}")
 
-    X = log_transform(
-        X,
-        [
-            "URLLength",
-            "DomainLength",
-            "NoOfAmpersandInURL",
-            "NoOfObfuscatedChar",
-            "LineOfCode",
-            "LargestLineLength",
-            "NoOfPopup",
-            "NoOfiFrame",
-            "NoOfLettersInURL",
-            "NoOfDegitsInURL",
-            "NoOfImage",
-            "NoOfCSS",
-            "NoOfJS",
-            "NoOfSelfRef",
-            "NoOfEmptyRef",
-            "NoOfExternalRef",
-            "TLDLength",
-        ],
-        1,
-    )
-    X = log_transform(
-        X, ["SpacialCharRatioInURL", "DegitRatioInURL", "ObfuscationRatio", "CharContinuationRate"], 0.0001
-    )
-
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
+
+    # BEHAVIOUR CHANGE. This used to be two explicit, pre-split `log_transform`
+    # calls with no normalization at all: 17 count/length columns at offset 1,
+    # then 4 ratio columns at offset 1e-4. Both are now one UnitScalar.
+    #
+    # What happened to `offset=1e-4`: nothing, and nothing is needed. All four
+    # ratio columns (SpacialCharRatioInURL, DegitRatioInURL, ObfuscationRatio,
+    # CharContinuationRate) have min == 0 -- measured on the real dataset, with
+    # 184334 and 235310 exact zeros in two of them -- so the offset's only job was
+    # keeping `np.log(0)` from returning -inf. UnitScalar applies
+    # `log1p(x - col_min)`, which is 0 at x == col_min by construction, so there is
+    # no -inf to dodge and no offset parameter to carry over. Note the consequence:
+    # `log(x + 1e-4)` spread [0, 0.397] over [-9.21, -0.92], nine decades of
+    # near-zero detail; `log1p` on the same range is [0, 0.334] and very nearly
+    # linear. The old code magnified the near-zero ratio mass; this does not.
+    #
+    # The logged *set* also differs, measured on the real dataset: at the library
+    # default 3.0 UnitScalar logs 13 columns, of which 2 (TLDLegitimateProb,
+    # URLTitleMatchScore) were never in the explicit lists and 10 explicit ones --
+    # including all four ratio columns -- fall below threshold. No
+    # `log_dynamic_range` reproduces the old lists, so none is faked.
+    #
+    # Not a pipeline: `report_figures_of_merit` / `simple_gaussian_predict` below
+    # take X frames directly and must see the same scaled space as the
+    # memberships. Fitted on train only.
+    _scaler = UnitScalar().fit(X_train)
+    _rescale = lambda F: pd.DataFrame(_scaler.transform(F), index=F.index, columns=F.columns)
+    print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
+    X_train, X_test = _rescale(X_train), _rescale(X_test)
 
     # Initialize and fit the Gaussian Mixture Classifier
     clf = MixtureOfGaussiansFuzzyClassifier(

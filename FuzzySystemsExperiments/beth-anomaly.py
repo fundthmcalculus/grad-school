@@ -12,7 +12,7 @@ from tribblefis.gauss_math import (
 )
 from tribblefis.gauss_plot import report_figures_of_merit, plot_anomaly_threshold_sweep, plot_membership_functions, \
     plot_confusion_matrix, plot_classification_report
-from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
+from tribblefis.scaling import UnitScalar
 
 
 def load_data(test: bool = False):
@@ -31,7 +31,7 @@ def load_data(test: bool = False):
     X = X.drop(columns=["sus", "evil", "Traffic_type", "args", "timestamp"])
     # data (as pandas dataframes)
     X = X.select_dtypes(include=[np.number])
-    X = log_transform(X, ["processId", "mountNamespace", "eventId", "userId"], 1)
+    # The log used to happen here. It has moved to main() -- see the note there.
     return X, y
 
 
@@ -52,6 +52,27 @@ def main():
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = _train_test_split(X, y)
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
+
+    # BEHAVIOUR CHANGE. This used to be
+    #   log_transform(X, ["processId","mountNamespace","eventId","userId"], 1)
+    # inside load_data(), with no normalization. UnitScalar auto-detects the logged
+    # set by dynamic range (library default 3.0) and min-max bounds to [0,1]; the
+    # normalization is deliberate, since FIS membership functions want bounded
+    # inputs.
+    #
+    # It also had to MOVE. Train and test here come from two different CSVs via two
+    # separate load_data() calls, so a stateful scaler fitted inside load_data would
+    # be fitted twice and scale the test file by its own min/max -- silently wrong.
+    # It is fitted on train and applied to both. The old log was stateless, so this
+    # distinction did not exist before; it does now.
+    #
+    # Not a pipeline: create_gaussian_membership_dict, simple_gaussian_predict and
+    # the plotting helpers below take X frames directly and must see the same
+    # scaled space as the memberships.
+    _scaler = UnitScalar().fit(X_train)
+    _rescale = lambda F: pd.DataFrame(_scaler.transform(F), index=F.index, columns=F.columns)
+    print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
+    X_train, X_test = _rescale(X_train), _rescale(X_test)
 
     # Calculate correlation coefficient between Gaussian distributions using training data
     feature_differentiators = calculate_gaussian_correlation(X_train, y_train)
