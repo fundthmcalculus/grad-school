@@ -84,27 +84,46 @@ def _data(dataset, seed, test_size=0.2):
 
 
 def _construction(Xtr, ytr, c, seed):
-    """Identify by the Gaussian construction at c output buckets. (model, y, ...)"""
+    """Identify by the Gaussian construction at c output buckets.
+
+    Returns (model, y, bucket_mean, features, train_seconds, screen_seconds).
+
+    The two timers are separate on purpose. Ranking the features is *feature
+    engineering* -- a preprocessing decision, made once, whose output any
+    identification route consumes. Training is the output partition and the
+    mixture fit. Folding the screen into the training number would compare a
+    pipeline against a training step, which is not the comparison being made.
+    """
     from tribblefis.gauss_math import (calculate_gaussian_correlation,
                                        create_gaussian_membership_dict,
                                        take_top_features)
     from tribblefis.regression import partition_output
 
-    start = time.perf_counter()
+    t0 = time.perf_counter()
     y_all, bucket_mean = partition_output(c, ytr["y_value"])
+    t_part = time.perf_counter() - t0
+
+    t0 = time.perf_counter()
     diffs = calculate_gaussian_correlation(Xtr, y_all["y_bucket"])
     _, features = take_top_features(diffs, top_n=len(Xtr.columns))
+    screen_seconds = time.perf_counter() - t0
+
+    t0 = time.perf_counter()
     model = create_gaussian_membership_dict(Xtr, y_all["y_bucket"],
                                             top_n_var_names=features,
                                             n_gaussians=-1)
-    seconds = time.perf_counter() - start
-    return model, y_all, bucket_mean, list(features), seconds
+    train_seconds = t_part + (time.perf_counter() - t0)
+    return model, y_all, bucket_mean, list(features), train_seconds, screen_seconds
 
 
 def _classical(Xtr, ytr, c, seed, method, n_init=10):
+    """Same signature as `_construction`; the classical route does no screening,
+    so its feature-engineering time is zero and it uses every column."""
     import classical as CL
     CL_KM_N_INIT[0] = n_init
-    return CL.identify(Xtr, ytr["y_value"], c, method, seed=seed)
+    model, y_df, bm, feats, secs = CL.identify(Xtr, ytr["y_value"], c, method,
+                                               seed=seed)
+    return model, y_df, bm, feats, secs, 0.0
 
 
 CL_KM_N_INIT = [10]      # patched into classical._cluster_joint below
@@ -166,9 +185,10 @@ def _evaluate(model, Xtr, Xte, ytr_df, yte, features, bucket_mean, c, order,
 def _write_seed_csv(records):
     path = os.path.join(C.OUTPUT_DIR, "table_identification_sweep_seeds.csv")
     C.write_csv(path, ["route", "seed", "rules", "n_mfs", "n_params", "r2",
-                       "cv_mse", "seconds"],
+                       "cv_mse", "seconds", "screen_seconds"],
                 [[r["route"], r["seed"], r["rules"], r["n_mfs"], r["n_params"],
-                  f"{r['r2']:.6f}", f"{r['cv_mse']:.6f}", f"{r['seconds']:.6f}"]
+                  f"{r['r2']:.6f}", f"{r['cv_mse']:.6f}", f"{r['seconds']:.6f}",
+                  f"{r.get('screen_seconds', 0.0):.6f}"]
                  for r in records])
     return path
 
@@ -204,23 +224,26 @@ def main():
         Xtr, Xte, ytr, yte, span = _data(args.dataset, seed)
         for name, build in routes:
             for c in grid:
-                times = []
+                times, screens = [], []
                 out = None
                 for _ in range(args.repeats):
-                    t0 = time.perf_counter()
                     out = build(Xtr, ytr, c, seed)
-                    times.append(time.perf_counter() - t0)
-                model, y_df, bucket_mean, features, _inner = out
+                    times.append(out[4])
+                    screens.append(out[5])
+                model, y_df, bucket_mean, features = out[0], out[1], out[2], out[3]
                 cv, r2, n_mfs, n_params = _evaluate(
                     model, Xtr, Xte, y_df, yte, features, bucket_mean, c,
                     args.order, args.l2, span, seed=seed)
                 rec = {"route": name, "seed": seed, "rules": c,
-                       "seconds": float(np.median(times)), "cv_mse": cv,
-                       "r2": r2, "n_mfs": n_mfs, "n_params": n_params}
+                       "seconds": float(np.median(times)),
+                       "screen_seconds": float(np.median(screens)),
+                       "cv_mse": cv, "r2": r2, "n_mfs": n_mfs,
+                       "n_params": n_params}
                 records.append(rec)
                 print(f"  {name:<18} c={c:<3} R2={r2:6.3f}  cv={cv:.5f}  "
                       f"mfs={n_mfs:<4} params={n_params:<4} "
-                      f"{1000 * rec['seconds']:8.1f} ms")
+                      f"train {1000 * rec['seconds']:8.1f} ms"
+                      f"  (+{1000 * rec['screen_seconds']:.0f} ms feat.eng.)")
                 # Flush after every measurement. The first attempt at this sweep
                 # was killed by a timeout after ~40 minutes and left nothing at
                 # all, because the emit happened only at the end. A partial run
@@ -240,6 +263,7 @@ def main():
                 C.cell([r["r2"] for r in sel]),
                 C.cell([r["cv_mse"] for r in sel], fmt="{:.5f}"),
                 C.cell([1000 * r["seconds"] for r in sel], fmt="{:.1f}"),
+                C.cell([1000 * r["screen_seconds"] for r in sel], fmt="{:.1f}"),
             ])
 
     C.emit(
@@ -255,7 +279,14 @@ def main():
               f"swept alongside the classical cluster count, because the rule "
               f"count is an input to one and normally an output of the other, and "
               f"comparing across different rule counts would be comparing capacity "
-              f"rather than identification. Timing is the **median of "
+              f"rather than identification. **The timing column is model "
+              f"training only.** Feature engineering — the construction's O(M^2) "
+              f"screen — is its own column and is charged to neither route: it is "
+              f"a preprocessing decision whose output an identification route "
+              f"consumes, and folding it in would compare a pipeline against a "
+              f"training step. On Concrete it also selects nothing, since "
+              f"`top_n` is the full feature count; it only ranks. Timing is the "
+              f"**median of "
               f"{args.repeats}** repeats, forced **single-threaded** through the "
               f"OpenMP/BLAS environment before numpy is imported — scikit-learn's "
               f"k-means is threaded and would otherwise be timed on more cores "
