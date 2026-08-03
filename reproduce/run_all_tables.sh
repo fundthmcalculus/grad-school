@@ -70,6 +70,10 @@ declare -A SLOW_TABLES=(
   [table_3_1_pvat_scaling]=1
   [table_norm_conorm_matrix]=1
   [table_hyperparam_normalization]=1
+  # The GPU table sweeps four N for the MST/front end, three for FCM and eight
+  # (dimension x precision) for distances, with a CPU arm beside every one, so ten
+  # seeds is ~25 min on its own -- the slowest single table in the suite.
+  [table_3_4_gpu_speedups]=1
 )
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/reproduce/outputs"
@@ -116,6 +120,25 @@ CLUSTER_TABLES=(
   table_3_1_pvat_scaling
   table_3_1_reorder_three_arm
   table_3_2_memory_precision
+  table_3_4_gpu_speedups
+)
+
+# Per-table dependency overrides, for a table needing something the group's
+# EXTRA_DEPS does not carry. table_3_4_gpu_speedups needs CuPy, which is an
+# OPTIONAL extra of tribble-cluster (`[gpu]`) and must not be forced on the other
+# cluster tables -- they run fine without a device, and on a host with no CUDA
+# wheel available the resolution failure would take them down with it.
+#
+# The GPU table is written to survive the absence of a device: it emits N/A cells
+# naming the blocker. That graceful path is only reachable if the interpreter
+# starts at all, so if the CuPy-bearing invocation fails to resolve, run_one
+# retries WITHOUT the GPU dep -- a table that says "no CUDA runtime, here is why"
+# is a real deliverable, and a resolution error that emits nothing is not.
+declare -A TABLE_DEPS=(
+  [table_3_4_gpu_speedups]="--with scipy --with cupy-cuda12x"
+)
+declare -A TABLE_DEPS_FALLBACK=(
+  [table_3_4_gpu_speedups]="--with scipy"
 )
 # Stdlib-only renderers -- no submodule environment, so they run on the host python.
 PLAIN_TABLES=(
@@ -247,13 +270,26 @@ run_one() {
   local -a env_prefix=()
   [ -n "$seed_env" ] && env_prefix=(env "REPRO_SEEDS=$seed_env")
 
+  # A table listed in TABLE_DEPS overrides its group's EXTRA_DEPS.
+  local deps="${TABLE_DEPS[$name]:-${EXTRA_DEPS:-}}"
   if [ "$project" = "-" ]; then
     "${env_prefix[@]}" $PY "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
   else
-    "${env_prefix[@]}" uv run --project "$ROOT/$project" ${EXTRA_DEPS:-} python \
+    "${env_prefix[@]}" uv run --project "$ROOT/$project" $deps python \
         "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
   fi
   rc=$?
+  # An optional dependency that cannot be resolved (no CUDA wheel for this
+  # platform, no network) must not cost the table entirely: the GPU generator
+  # reports its own blocker as N/A cells when the import is missing, so retry
+  # once on the reduced dependency set. Both attempts stay in the one log.
+  if [ $rc -ne 0 ] && [ -n "${TABLE_DEPS_FALLBACK[$name]:-}" ]; then
+    echo "--- retrying without the optional GPU dependency ---" >>"$log"
+    "${env_prefix[@]}" uv run --project "$ROOT/$project" \
+        ${TABLE_DEPS_FALLBACK[$name]} python \
+        "$ROOT/reproduce/tables/$name.py" >>"$log" 2>&1
+    rc=$?
+  fi
   t1=$(date +%s)
   after=$(snapshot_tables)
   if [ $rc -ne 0 ]; then
