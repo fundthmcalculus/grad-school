@@ -10,7 +10,7 @@ from tribblefis.gauss_math import (
 )
 from tribblefis.gauss_plot import report_figures_of_merit, plot_membership_functions, plot_confusion_matrix, \
     plot_classification_report
-from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
+from tribblefis.scaling import UnitScalar
 
 
 def load_data():
@@ -32,28 +32,25 @@ def main(augment_data=False):
     n_unique = y.nunique()
     print(f"Number of unique values in y: {n_unique}")
 
-    X = log_transform(
-        X,
-        [
-            "fwd_pkts_per_sec",
-            "flow_pkts_per_sec",
-            "bwd_pkts_per_sec",
-            "flow_iat.max",
-            "flow_iat.avg",
-            "flow_iat.min",
-            "active.min",
-            "active.max",
-            "active.avg",
-            "active.tot",
-            "flow_iat.tot",
-            "flow_duration",
-        ],
-        1,
-    )
-
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
+
+    # BEHAVIOUR CHANGE. This used to log an explicit 12-column list (the
+    # *_pkts_per_sec / flow_iat.* / active.* / flow_duration rate and duration
+    # features) at offset 1, pre-split, and normalize nothing. UnitScalar
+    # auto-detects the logged set by dynamic range and min-max bounds to [0,1].
+    # The normalization is deliberate -- FIS membership functions want bounded
+    # inputs. Library default `log_dynamic_range=3.0`; nothing is claimed to
+    # reproduce the old list. Unverified: rt-iot2022/ is not in this repo.
+    #
+    # Not a pipeline: report_figures_of_merit / simple_gaussian_predict /
+    # generate_synthetic_data below all take X frames directly and must see the
+    # same scaled space as the memberships. Fitted on train only.
+    _scaler = UnitScalar().fit(X_train)
+    _rescale = lambda F: pd.DataFrame(_scaler.transform(F), index=F.index, columns=F.columns)
+    print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
+    X_train, X_test = _rescale(X_train), _rescale(X_test)
 
     # Initialize and fit the Gaussian Mixture Classifier
     # TODO - top-n=3!

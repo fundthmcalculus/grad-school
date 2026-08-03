@@ -6,8 +6,10 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
+from sklearn.pipeline import make_pipeline
+
 from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
-from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
+from tribblefis.scaling import UnitScalar
 from tribblefis.regression import (
     report_regression_performance,
     plot_tsk_order_comparison,
@@ -39,8 +41,16 @@ def main():
     print(f"Target 'quality' range: [{y.min():.2f}, {y.max():.2f}], "
           f"mean={y.mean():.3f}, std={y.std():.3f}")
 
-    X = log_transform(X, ["total sulfur dioxide", "free sulfur dioxide", "chlorides"], 1)
-
+    # Feature scaling now lives in a pipeline in front of each estimator (see
+    # below) rather than a bare pre-split log. BEHAVIOUR CHANGE, twice over:
+    # this script used to log exactly ["total sulfur dioxide",
+    # "free sulfur dioxide", "chlorides"] and normalize nothing. UnitScalar
+    # auto-detects the logged set by dynamic range (>= 3 decades, the library
+    # default) and always min-max bounds to [0,1] afterwards. The normalization
+    # is the point -- FIS membership functions want bounded inputs, and on
+    # Concrete it is worth +0.06 to +0.15 R2 to Gaussian/fuzzy models. No
+    # `log_dynamic_range` reproduces the old explicit column list, so no attempt
+    # is made to fake one. Unverified: winequality-white.csv is not in this repo.
     # Split dataset into train/test. Stratify on coarse quality buckets so both
     # splits span the full continuous range.
     strata = pd.cut(y, bins=5, labels=False, include_lowest=True)
@@ -61,11 +71,16 @@ def main():
     r2_list, rmse_list, pred_list = [], [], []
     for order, label in zip(orders, order_labels):
         print(f"\nFitting {order}-order TSK regressor...")
-        reg = MixtureOfGaussiansFuzzyRegressor(
-            n_output_buckets=5,
-            tsk_order=order,
-            optimize_coefficients=True,
-            random_state=42,
+        # Scaler inside the pipeline: it is fitted on the training fold only, so
+        # the test split's min/max never leak into the transform.
+        reg = make_pipeline(
+            UnitScalar(),
+            MixtureOfGaussiansFuzzyRegressor(
+                n_output_buckets=5,
+                tsk_order=order,
+                optimize_coefficients=True,
+                random_state=42,
+            ),
         )
         reg.fit(X_train, y_train)
 
@@ -81,7 +96,13 @@ def main():
 
     # Comparison baseline: a Random Forest regressor on the same split.
     print("\nFitting RandomForest regressor (comparison baseline)...")
-    rf = RandomForestRegressor(n_estimators=300, random_state=42, n_jobs=-1)
+    # Same scaling for the baseline, so the comparison stays apples-to-apples.
+    # A forest splits on rank, so a monotone per-feature transform is worth
+    # ~0.000 to it either way; this is for symmetry, not for its score.
+    rf = make_pipeline(
+        UnitScalar(),
+        RandomForestRegressor(n_estimators=300, random_state=42, n_jobs=-1),
+    )
     rf.fit(X_train, y_train)
     # Round to match the TSK predictions for an apples-to-apples comparison.
     y_pred_rf = np.round(rf.predict(X_test))
