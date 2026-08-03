@@ -158,7 +158,7 @@ def main():
         print(f"  [skip] {RESULTS} not found -- run "
               f"`python run_all.py` in gated-minimax-selection/ first.")
         return 1
-    with open(RESULTS) as fh:
+    with open(RESULTS, encoding="utf-8") as fh:
         results = json.load(fh)
     print("Chapter 5 tables from the gated-minimax results of record")
     print(f"  source: {RESULTS}")
