@@ -158,6 +158,13 @@ TIED = 0.00005
 # The smallest move that would be interesting -- an order below the 0.043 the note
 # reports, so a real-but-smaller thread effect still counts as confirmation.
 MATERIAL = 0.001
+# How much the manipulation check must move before an invariance result counts as
+# a refutation. Below this the variable was loaded but did nothing this workload
+# can feel, and "no effect on accuracy" is then uninformative rather than
+# negative. 5% is comfortably outside the run-to-run timing noise measured here
+# (the two full workstation sweeps agreed on accuracy exactly while their fit
+# times moved a few percent) and far below the 140% the thread axis produces.
+MANIPULATION_FLOOR = 0.05
 
 
 def parse_a2(path: Path) -> dict[str, dict[int, tuple[float, float]]]:
@@ -275,14 +282,24 @@ def compare(results: dict, axis: str = "threads") -> int:
     # the accuracy invariance says nothing.
     print("\n  Manipulation check -- total A.2 fit seconds per run "
           "(sum over scorers and k, mean per seed):")
+    totals = {}
     for t in counts:
-        total = sum(secs for sc in parsed[t].values() for _, secs in sc.values())
-        print(f"    {str(t):<14} {total:8.2f} s")
-    print(f"    {label} must visibly move this, in either direction. If it "
-          "does not,\n    the variable was never actually varied and the "
-          "invariance above is vacuous.")
+        totals[t] = sum(secs for sc in parsed[t].values()
+                        for _, secs in sc.values())
+        print(f"    {str(t):<14} {totals[t]:8.2f} s")
+    lo, hi = min(totals.values()), max(totals.values())
+    spread = (hi - lo) / lo if lo else 0.0
+    print(f"    spread {spread * 100:.1f}%  "
+          f"({'PASS' if spread >= MANIPULATION_FLOOR else 'FAIL'}: needs "
+          f">= {MANIPULATION_FLOOR * 100:.0f}% for the invariance to mean "
+          f"anything)")
+    if spread < MANIPULATION_FLOOR:
+        print(f"    {label} loaded but did not measurably change execution, so"
+              "\n    an unchanged accuracy is WEAK evidence rather than a"
+              "\n    refutation -- the workload may simply not exercise what this"
+              "\n    variable controls.")
 
-    return 1 if moved_any else 0
+    return (1 if moved_any else 0), spread >= MANIPULATION_FLOOR
 
 
 def compare_to_archive(results: dict, axis: str = "threads") -> None:
@@ -384,7 +401,7 @@ def main() -> int:
             s, out_dir, args.skip_existing, axis=axis)
 
     print(f"\n--- A.2 accuracy across {args.vary} settings ---")
-    moved = compare(results, axis=axis)
+    moved, manipulated = compare(results, axis=axis)
 
     # The ranking is the input control: it must not move.
     ranks = {}
@@ -408,11 +425,18 @@ def main() -> int:
               f"{args.vary}.\n  Consistent with the note-12 numerical-environment"
               "\n  hypothesis -- check WHICH column moved before concluding it"
               "\n  (see the registered outcomes in this file's docstring).")
+    elif not manipulated:
+        print(f"  INCONCLUSIVE. Every accuracy column is invariant to {args.vary},"
+              "\n  but the manipulation check failed: the variable loaded and"
+              "\n  changed no measurable amount of work, so this workload does not"
+              "\n  exercise what it controls and the invariance is not evidence"
+              "\n  either way. Do not record this as a refutation.")
     else:
         print(f"  every A.2 accuracy column is invariant to {args.vary} on this"
-              "\n  host, to the fourth decimal the table prints. That branch of"
-              "\n  note 12's hypothesis is REFUTED; it does not become more likely"
-              "\n  by elimination, it is removed.")
+              "\n  host, to the fourth decimal the table prints, while the"
+              "\n  manipulation check confirms the variable really changed the"
+              "\n  work done. That branch of note 12's hypothesis is REFUTED; it"
+              "\n  does not become more likely by elimination, it is removed.")
     if reduced:
         print("  *** reduced run; do not quote these as the ten-seed result ***")
     return 0

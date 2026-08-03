@@ -1,0 +1,71 @@
+Note 12 -- threads vs Table A.2 accuracy
+  generator : C:\personal\grad-school\reproduce\tables\table_a1_feature_scoring.py
+  varying   : threads over [1, 2, 8, 32]
+  seeds     : 0,1,2,3,4,5,6,7,8,9
+  out       : C:\personal\grad-school\reproduce\outputs\note12-threading
+  [blas] openblas 0.3.31.188.0 arch=Haswell threads=24 prefix=libscipy_openblas
+  [blas] openblas 0.3.30 arch=Haswell threads=24 prefix=libscipy_openblas
+
+--- A.2 accuracy across threads settings ---
+
+  wasserstein: accuracy vs thread count (reference = 1)
+    k                 1             2             8            32     max |Δ|
+    1            0.9967        0.9967        0.9967        0.9967      0.0000
+    2            0.9967        0.9967        0.9967        0.9967      0.0000
+    3            0.9967        0.9967        0.9967        0.9967      0.0000
+    4            0.9967        0.9967        0.9967        0.9967      0.0000
+    5            0.9966        0.9966        0.9966        0.9966      0.0000
+    7            0.9998        0.9998        0.9998        0.9998      0.0000
+    10           0.9995        0.9995        0.9995        0.9995      0.0000
+    15           0.9974        0.9974        0.9974        0.9974      0.0000
+    20           0.9990        0.9990        0.9990        0.9990      0.0000
+    max |Δ| over the whole column: 0.000000  -> identical
+
+  bhattacharyya: accuracy vs thread count (reference = 1)
+    k                 1             2             8            32     max |Δ|
+    1            0.4267        0.4267        0.4267        0.4267      0.0000
+    2            0.4527        0.4527        0.4527        0.4527      0.0000
+    3            0.8455        0.8455        0.8455        0.8455      0.0000
+    4            0.9160        0.9160        0.9160        0.9160      0.0000
+    5            0.9456        0.9456        0.9456        0.9456      0.0000
+    7            0.9610        0.9610        0.9610        0.9610      0.0000
+    10           0.9676        0.9676        0.9676        0.9676      0.0000
+    15           0.9765        0.9765        0.9765        0.9765      0.0000
+    20           0.9777        0.9777        0.9777        0.9777      0.0000
+    max |Δ| over the whole column: 0.000000  -> identical
+
+  composite: accuracy vs thread count (reference = 1)
+    k                 1             2             8            32     max |Δ|
+    1            0.4267        0.4267        0.4267        0.4267      0.0000
+    2            0.9967        0.9967        0.9967        0.9967      0.0000
+    3            0.9967        0.9967        0.9967        0.9967      0.0000
+    4            0.9966        0.9966        0.9966        0.9966      0.0000
+    5            0.9966        0.9966        0.9966        0.9966      0.0000
+    7            0.9967        0.9967        0.9967        0.9967      0.0000
+    10           0.9980        0.9980        0.9980        0.9980      0.0000
+    15           0.9999        0.9999        0.9999        0.9999      0.0000
+    20           0.9995        0.9995        0.9995        0.9995      0.0000
+    max |Δ| over the whole column: 0.000000  -> identical
+
+  Manipulation check -- total A.2 fit seconds per run (sum over scorers and k, mean per seed):
+    1                 17.49 s
+    2                 17.88 s
+    8                 19.22 s
+    32                42.02 s
+    spread 140.3%  (PASS: needs >= 5% for the invariance to mean anything)
+
+  A.1 ranking (input control): identical at every setting
+
+  Against the archive (main-d0efefc): max |Δ accuracy| per column
+    threads              wasserstein     bhattacharyya         composite
+    1                         0.0017            0.0427            0.0001
+    2                         0.0017            0.0427            0.0001
+    8                         0.0017            0.0427            0.0001
+    32                        0.0017            0.0427            0.0001
+
+--- verdict ---
+  every A.2 accuracy column is invariant to threads on this
+  host, to the fourth decimal the table prints, while the
+  manipulation check confirms the variable really changed the
+  work done. That branch of note 12's hypothesis is REFUTED; it
+  does not become more likely by elimination, it is removed.
