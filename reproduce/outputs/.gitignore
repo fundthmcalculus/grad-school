@@ -3,8 +3,12 @@
 !.gitkeep
 !.gitignore
 
-# ...except the cross-run comparison, which is a deliverable, not scratch.
+# ...except the write-ups, which are deliverables, not scratch. A findings file
+# left ignored here is worse than no findings file: the experiment reads as done,
+# the conclusion is in nobody's working tree, and the next person re-runs an hour
+# of compute to learn what was already known.
 !FIX_IMPACT.md
+!NOTE12_THREADING.md
 
 # Labelled run archives (reproduce/run_all_tables.sh <label>) ARE tracked: they
 # are the evidence behind the write-ups, and they have to survive the machine
