@@ -163,6 +163,16 @@ def _evaluate(model, Xtr, Xte, ytr_df, yte, features, bucket_mean, c, order,
     return cv, r2, n_mfs, len(params)
 
 
+def _write_seed_csv(records):
+    path = os.path.join(C.OUTPUT_DIR, "table_identification_sweep_seeds.csv")
+    C.write_csv(path, ["route", "seed", "rules", "n_mfs", "n_params", "r2",
+                       "cv_mse", "seconds"],
+                [[r["route"], r["seed"], r["rules"], r["n_mfs"], r["n_params"],
+                  f"{r['r2']:.6f}", f"{r['cv_mse']:.6f}", f"{r['seconds']:.6f}"]
+                 for r in records])
+    return path
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -211,6 +221,11 @@ def main():
                 print(f"  {name:<18} c={c:<3} R2={r2:6.3f}  cv={cv:.5f}  "
                       f"mfs={n_mfs:<4} params={n_params:<4} "
                       f"{1000 * rec['seconds']:8.1f} ms")
+                # Flush after every measurement. The first attempt at this sweep
+                # was killed by a timeout after ~40 minutes and left nothing at
+                # all, because the emit happened only at the end. A partial run
+                # should cost the rows it did not reach, not the ones it did.
+                _write_seed_csv(records)
 
     rows = []
     for name, _ in routes:
@@ -252,13 +267,7 @@ def main():
               f"compared is rule identification alone. Seeds: "
               f"{','.join(map(str, seeds))}."))
 
-    path = os.path.join(C.OUTPUT_DIR, "table_identification_sweep_seeds.csv")
-    C.write_csv(path, ["route", "seed", "rules", "n_mfs", "n_params", "r2",
-                       "cv_mse", "seconds"],
-                [[r["route"], r["seed"], r["rules"], r["n_mfs"], r["n_params"],
-                  f"{r['r2']:.6f}", f"{r['cv_mse']:.6f}", f"{r['seconds']:.6f}"]
-                 for r in records])
-    print(f"  wrote {path}")
+    print(f"  wrote {_write_seed_csv(records)}")
 
     if args.archive:
         _archive_here(args.archive, args, seeds, grid)
