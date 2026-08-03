@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -73,8 +75,10 @@ def integrate_fcn(a, b, dt, l, n_stages):
     # Plot the results as a function of x and u
     return admit_pts
 
+fig_count = 1
 
 def plot_J_grid(admit_pts, details_str):
+    global fig_count
     # Extract data points
     x_vals = [pt[0] for pt in admit_pts]
     u_vals = [pt[1] for pt in admit_pts]
@@ -98,9 +102,16 @@ def plot_J_grid(admit_pts, details_str):
     ax2.grid(True)
 
     plt.tight_layout()
+
+    # Create output directory if it doesn't exist
+    os.makedirs('hw4_output', exist_ok=True)
+    # Save figure with sequential naming
+    plt.savefig(f'hw4_output/fig{fig_count:02d}.png')
+    fig_count += 1
     plt.show()
 
 
 if __name__ == "__main__":
     p314()
     p316()
+    
