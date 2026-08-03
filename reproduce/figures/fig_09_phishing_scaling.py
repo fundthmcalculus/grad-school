@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """PhiUSIIL: how the identification routes scale, and where the cost actually is.
 
-Concrete said the classical route identifies a rule base 25-84x cheaper. That
-was 824 rows. The two routes scale in different variables, so the interesting
-question was never "which is faster" but "does that gap survive size". It does
-not — and reading the timings against the library source says why, which is not
-what the first version of this figure implied.
+Concrete first said the classical route identifies a rule base 25-84x cheaper.
+That was 824 rows, and it was wrong twice over: the two routes scale in
+different variables, so it could not be extrapolated, and most of the gap turned
+out to be library defects rather than method. Reading the timings against the
+library source is what said so, which is not what the first version of this
+figure implied.
 
 Two library defects were doing most of the talking, and both have since been
 fixed in `fit_gaussians`:
