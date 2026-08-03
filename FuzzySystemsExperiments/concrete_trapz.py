@@ -33,17 +33,7 @@ from tribblefis.regression import (
 from tribblefis.report import print_membership_details
 from tribblefis.trapz_math import create_trapz_membership_dict
 from tribblefis.trapz_math_fast import create_trapz_membership_dict_fast
-from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
-
-
-def _standardize(X):
-    """Standardize features in the dataset."""
-    return (X - X.mean()) / X.std()
-
-
-def _normalize(X):
-    """Normalize features in the dataset."""
-    return (X - X.min()) / (X.max() - X.min())
+from tribblefis.scaling import UnitScalar
 
 
 def load_data():
@@ -58,9 +48,9 @@ def load_data():
     y = X["Strength"]
     y.name = "y_value"
     X.drop("Strength", axis=1, inplace=True)
-    X = X.select_dtypes(include=[np.number])
-    X = _standardize(X)
-    X = _normalize(X)
+    X = X.select_dtypes(include=[np.number]).astype(np.float64)
+    # Scaling used to happen here (_standardize then _normalize); it has moved to
+    # main() so that the log runs first. See the note there.
     return X, y
 
 
@@ -237,7 +227,27 @@ def main():
 
     y, y_bucket_mean = partition_output(n_output_buckets, y_raw)
 
-    X = log_transform(X, ["Slag", "FlyAsh", "Age"], 1)
+    # BEHAVIOUR CHANGE, and a structural one -- this script normalized BEFORE
+    # logging, which is the reverse of the scaler's fixed log -> normalize order,
+    # so UnitScalar cannot reproduce it. Previously: load_data() applied
+    # _standardize (z-score) then _normalize (min-max) -- which compose to plain
+    # min-max, both being monotone affine -- and main() then applied
+    # log_transform(X, ["Slag","FlyAsh","Age"], 1) on top of the [0,1] values.
+    # Now: log first, then min-max, in one transformer.
+    #
+    # The logged set changes too, and this is measured on the real data rather than
+    # assumed: no `log_dynamic_range` yields the old ["Slag","FlyAsh","Age"]
+    # (dynamic ranges 4.255 / 0.913 / 2.562 decades -- FlyAsh sits below Cement's
+    # 0.724 and Superplasticizer's 1.272, so any threshold low enough to catch it
+    # catches those too). `log_dynamic_range=2` gives ["Slag","Age"] and is chosen
+    # to match the sibling concrete.py, which is pinned there for exactly this
+    # dataset; UnitScalar's own default of 3.0 would drop Age as well.
+    #
+    # Kept pre-split, where the old transform was, so this file's before/after
+    # delta is attributable to the transform alone and nothing else.
+    _scaler = UnitScalar(log_dynamic_range=2)
+    X = pd.DataFrame(_scaler.fit_transform(X), index=X.index, columns=X.columns)
+    print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
 
     # Split dataset once for fair comparison
     X_train, X_test, y_train, y_test = train_test_split(
