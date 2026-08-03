@@ -13,13 +13,18 @@ _Opened 2026-08-02. Legend: ⬜ open · 🟨 in progress · ✅ done · 🔒 blo
 _Kept as the record of what was decided and why, since several of these changed the document
 materially and a committee may ask. The one item that used to live here and is still
 outstanding — NAFIPS paper metadata — moved to **D2**, because it needs your records rather
-than a decision. **A9 is new and open**: measuring the normalization axis properly turned up a
-naming decision the measurement cannot make for you. It is not blocking, and it costs no
-numbers in the recommended direction._
+than a decision. **A9 is new and narrowed**: measuring the normalization axis properly turned up
+a naming decision the measurement cannot make for you, and the author has since ruled out its one
+costly branch. It is not blocking, and it costs no numbers in either remaining direction. The
+empirical follow-up it spun off is **E9**, deliberately low priority._
 
-- [ ] ⬜ **A9 — Decide what the document calls its normalization, now that all three arms are
-      measured.** *(Opened 2026-08-03. Measurement done; only the naming/reporting choice is
-      left. Full write-up with costs: `reproduce/outputs/NORMALIZATION_THREE_ARM.md`; measured
+- [ ] ⬜ **A9 — Decide what the document *calls* its normalization. Narrowed to A or C.**
+      *(Opened 2026-08-03; narrowed the same day. **Author confirmed min-max/`UnitScalar` is
+      correct**, which rules out option B below — the transform the samples now use is the one
+      Ch 4 and Ch 6 have measured all along, so no number in the document is in question and
+      nothing here is blocking. What remains is purely how the prose labels it. The empirical
+      follow-up on *why* bounded beats centred is tracked separately and at low priority as
+      **E9**. Full write-up with costs: `reproduce/outputs/NORMALIZATION_THREE_ARM.md`; measured
       facts: `PROVENANCE_MAP.md` note 16; data: `reproduce/outputs/norm-three-arm-a385a1a/`.)*
       **The concession.** `gauss_math.standard_transform` — behind every "log+std",
       "standardized" and "normalized" number in Chapters 4 and 6 — computed
@@ -338,6 +343,36 @@ numbers in the recommended direction._
 - [ ] ⬜ **E8 — Two blocking reads** before writing the Ch 9 complexity note: **Deshpande & Kumar
       2024** full text and **Wang et al. 2010** (PAKDD). If the former already states the
       O(N)-workspace result for VAT itself, drop the note.
+- [ ] ⬜ **E9 — `UnitScalar` vs `StandardScalar`: characterize *why* bounded normalization wins.**
+      *(Low priority — author 2026-08-03: "I don't need it but it's worth addressing." Nothing in
+      the document depends on it; the choice itself is already settled. Data in hand:
+      `reproduce/outputs/norm-three-arm-a385a1a/`, write-up in
+      `reproduce/outputs/NORMALIZATION_THREE_ARM.md`, measured facts in `PROVENANCE_MAP.md`
+      note 16.)*
+      **Settled, so this is not a decision:** min-max (`UnitScalar`) is correct and is what the
+      samples and the harness use. Confirmed by measurement — best-or-tied in 8 of 9 rows — and by
+      author decision. z-score is *not* a candidate: it takes the 1st-order flat MoG to
+      R² 0.087 ± 0.089, below raw features at 0.646 (RMSE 7.8 → 15.6 MPa), and drops the
+      demo-tuned mixture 0.834 → 0.706.
+      **What is left is the explanation**, which the chapter currently asserts rather than shows.
+      The working account is that Gaussian membership functions and the `[0,1]`-pinned extreme
+      bucket means assume a **bounded, non-negative** domain, so an unbounded centred transform
+      breaks an assumption the construction relies on — supported by the model underfitting on
+      *train* as well as test (MSE 0.030 vs 0.009), and by two innocent explanations already ruled
+      out: ridge scale (sweeping `l2_reg` 1e-2 → 0 moves the gap 0.001) and the scale-dependent
+      BIC membership count (pinning `n_gaussians` for an identical rule base still gives
+      −0.407/−0.524/−0.634).
+      **Cheap experiments that would settle it**, none needing new data: (a) `UnitScalar` with
+      `feature_range=(-1, 1)` — if centring alone is harmless but unboundedness is not, this
+      should behave like `[0,1]`, and if it degrades, the pin on 0.0/1.0 bucket means is the real
+      culprit; (b) clip a z-score arm to a fixed range and see how much of the loss comes back;
+      (c) check whether the damage concentrates on the log-detected features (`Slag`, `Age`),
+      which are the ones whose post-transform distribution changes most.
+      **Why it is worth the hour eventually:** §4.3's finding is currently "normalization helps",
+      which is weak and slightly lucky — the code did the right thing under the wrong name. The
+      sharper claim, *"bounded normalization helps, centred normalization actively hurts, and the
+      bounded-input assumption is load-bearing"*, is a better answer to the obvious committee
+      question and is already 90% measured. Pairs naturally with **A9** option C.
 
 ---
 
