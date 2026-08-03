@@ -10,6 +10,8 @@ dataset:     concrete
 order:       2nd
 radius:      1.0
 budget:      2000 objective evaluations per arm per seed
+params:      136 antecedent parameters (backfilled; the
+             harness records this from the run itself as of this commit)
 arms:        none,scipy-lbfgsb,scipy-powell,scipy-de,opt-ga,opt-pso,opt-aco,opt-gd
 init:        hot,cold
 
