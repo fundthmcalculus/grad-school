@@ -90,12 +90,18 @@ def screen(X, y, top_n):
     return list(features), time.perf_counter() - start
 
 
-def construction(X, y, features, n_gaussians=-1):
-    """Identify by the Gaussian construction. (model, seconds)."""
+def construction(X, y, features, n_gaussians=-1, max_samples=None):
+    """Identify by the Gaussian construction. (model, seconds).
+
+    `max_samples=None` means every row. The library used to apply an invisible
+    20,000-row prefix here; it is now the caller's decision and the caller's to
+    report, which is what `--max-samples` in the sweep is for.
+    """
     from tribblefis.gauss_math import create_gaussian_membership_dict
     start = time.perf_counter()
     model = create_gaussian_membership_dict(X, y, top_n_var_names=features,
-                                            n_gaussians=n_gaussians)
+                                            n_gaussians=n_gaussians,
+                                            max_samples=max_samples)
     return model, time.perf_counter() - start
 
 

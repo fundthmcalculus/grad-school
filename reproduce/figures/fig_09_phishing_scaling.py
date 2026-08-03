@@ -7,21 +7,23 @@ question was never "which is faster" but "does that gap survive size". It does
 not — and reading the timings against the library source says why, which is not
 what the first version of this figure implied.
 
-Two facts drive every panel, and both come from `fit_gaussians`:
+Two library defects were doing most of the talking, and both have since been
+fixed in `fit_gaussians`:
 
-* the construction **truncates each (feature, class) column to its first 20,000
-  rows** before fitting anything, so above that its fitting cost stops growing;
-* with an automatic component count it fits **four EM mixtures per (feature,
-  class)** to choose one by BIC, then throws them away and runs k-means at the
-  winning count.
+* it **truncated each (feature, class) column to its first 20,000 rows** before
+  fitting anything, so above that the cost stopped growing — a subsampling cap
+  read as sublinear scaling;
+* with an automatic component count it fitted **four EM mixtures per (feature,
+  class)** to choose one by BIC, discarded them, and ran k-means at the winning
+  count — 82% of training time spent choosing rather than placing.
 
-So the flat curve is a subsampling cap, not an algorithmic property, and the
-bulk of the cost is model selection rather than the fit. **(c)** is the control
-that establishes the first — classical routes given the same cap flatten the
-same way. **(d)** is the decomposition that establishes the second.
+Every route in **(a)** now reads every row. **(c)** is the before-and-after on
+those two defects, and **(d)** is what is left of the selection cost.
 
 **(a) Training cost against training rows**, log-log. Model training only;
-feature engineering is drawn separately and belongs to neither route.
+feature engineering is drawn separately and belongs to neither route. This is
+now a matched comparison in both directions — same parameter budget is (d)'s
+business, but every route here sees the whole training set.
 
 **(b) Error rate, log scale.** Accuracy is the wrong axis on a saturated
 dataset — 0.9997 against 0.9951 reads as a rounding difference and is a
@@ -50,7 +52,9 @@ FLOOR = 1e-5      # log-axis floor for a zero error rate; drawn hollow
 # The component-pinned companion run. Panel (d) is a difference between two
 # archives, so the label is named rather than inferred: "whatever ran last"
 # would silently subtract two unrelated runs.
-PINNED = "opt-phishing-pinned-2026-08-03"
+PINNED = "opt-phishing-kmbic-pinned-2026-08-03"
+CAPPED = "opt-phishing-kmbic-capped-2026-08-03"    # after the fix, old 20k cap
+BEFORE = "opt-phishing-2026-08-03"                 # before the fix, 20k cap
 
 CAP = "20k"
 KM, FCM = "classical-kmeans", "classical-fcm"
@@ -134,46 +138,40 @@ def _error(ax, by):
     F.legend(ax, loc="lower right")
 
 
-def _cap_control(ax, by):
-    """(c) — is the flat curve an algorithm, or is it the 20,000-row cap?"""
-    pairs = [(KM, KM_CAP, F.ORANGE, "k-means"),
-             (FCM, FCM_CAP, F.AQUA, "fuzzy c-means")]
+def _before_after(ax, by, capped, before):
+    """(c) — what the two library fixes were worth, at every size."""
     drawn = False
-    for full, capped, colour, label in pairs:
-        if capped not in by:
-            continue
+    if before is not None:
+        xs = sorted(before["construction"])
+        ax.plot(xs, [1000 * before["construction"][n][0] for n in xs], lw=1.5,
+                ls=(0, (1, 2)), marker="v", ms=4.0, color=F.FAINT, zorder=3,
+                label="before the fix\n(EM select, 20k cap)")
         drawn = True
-        xs = sorted(by[full])
-        ax.plot(xs, [1000 * by[full][n][0] for n in xs], lw=1.8, marker="o",
-                ms=4.0, color=colour, label=f"{label}, all rows", zorder=4)
-        xs = sorted(by[capped])
-        ax.plot(xs, [1000 * by[capped][n][0] for n in xs], lw=1.5,
+    if capped is not None:
+        xs = sorted(capped["construction"])
+        ax.plot(xs, [1000 * capped["construction"][n][0] for n in xs], lw=1.5,
                 ls=(0, (4, 2)), marker="s", ms=3.6, mfc=F.SURFACE,
-                color=colour, label=f"{label}, capped at 20k", zorder=4)
-    if not drawn:
-        ax.text(0.5, 0.5, f"no capped arms in this run\n"
-                          f"(re-run with --cap-classical 20000)",
-                transform=ax.transAxes, ha="center", va="center",
-                fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.6)
-        F.style_axes(ax, title="(c)  the subsampling control")
-        return
-
+                color=F.VIOLET, zorder=4,
+                label="k-means select,\nsame 20k cap")
+        drawn = True
     xs = sorted(by["construction"])
     ax.plot(xs, [1000 * by["construction"][n][0] for n in xs], lw=1.8,
-            marker="o", ms=4.0, color=F.BLUE, label="construction", zorder=4)
-    ax.axvline(20_000, lw=1.0, ls=(0, (2, 2)), color=F.FAINT, zorder=2)
+            marker="o", ms=4.0, color=F.BLUE, zorder=5,
+            label="shipped: k-means select,\nno cap, every row")
+    # The reference the construction is trying to reach. Without it the panel
+    # reads as "smaller is better" with no scale for how much smaller matters.
+    if KM in by:
+        xs = sorted(by[KM])
+        ax.plot(xs, [1000 * by[KM][n][0] for n in xs], lw=1.4, ls="-",
+                marker="o", ms=3.4, color=F.ORANGE, zorder=3,
+                label="k-means clustering,\nfor scale")
+
     ax.set_xscale("log")
     ax.set_yscale("log")
-    # Five series need a five-row legend; headroom above the curves is cheaper
-    # than a legend sitting on top of them.
-    lo, hi = ax.get_ylim()
-    ax.set_ylim(lo, hi * 6.0)
-    # After the scale is set: an axes-fraction y keeps the note off the floor
-    # whatever the data does.
-    ax.text(22_000, 0.04, "cap bites\nabove here",
-            transform=ax.get_xaxis_transform(), va="bottom", ha="left",
-            fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.4)
-    F.style_axes(ax, title="(c)  the same cap, given to the classical routes",
+    if drawn:
+        lo, hi = ax.get_ylim()
+        ax.set_ylim(lo, hi * 5.0)
+    F.style_axes(ax, title="(c)  the two library fixes, priced",
                  xlabel="training rows (log)",
                  ylabel="milliseconds, single-threaded (log)")
     F.legend(ax, loc="upper left", ncol=1)
@@ -214,7 +212,7 @@ def _anatomy(ax, by, pinned):
     F.legend(ax, loc="upper left")
 
     share = 100.0 * select[-1] / (fit[-1] + select[-1])
-    ax.annotate(f"{share:.0f}% of full-size training\nis component selection",
+    ax.annotate(f"{share:.0f}% of full-size training\nis component selection\n(was 82% before the fix)",
                 xy=(x[-1] - 0.30, fit[-1] + select[-1] * 0.5),
                 xytext=(0.04, 0.56), textcoords="axes fraction",
                 fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.5,
@@ -226,6 +224,18 @@ def build():
     by, label = _load()
     if "construction" not in by:
         raise RuntimeError("no data; run run_phishing_study.py")
+    capped = before = None
+    for companion, target in ((CAPPED, "capped"), (BEFORE, "before")):
+        try:
+            data, src = _load(companion)
+            if "unarchived" not in src:
+                if target == "capped":
+                    capped = data
+                else:
+                    before = data
+        except FileNotFoundError:
+            pass
+
     try:
         pinned, pinned_label = _load(PINNED)
         # `H.table` falls back to the loose outputs when an archive lacks a
@@ -243,18 +253,20 @@ def build():
 
     _cost(ax_a, by)
     _error(ax_b, by)
-    _cap_control(ax_c, by)
+    _before_after(ax_c, by, capped, before)
     _anatomy(ax_d, by, pinned)
 
     fig.text(0.5, -0.015,
-             "Same model shape, same prediction path, same features — only the "
-             "placement method differs, and the timing is model training ONLY. "
-             "Three seeds, median across seeds of a\nper-seed median of three "
-             "repeats, single-threaded. The 20,000-row cap in (c) is the "
-             "construction's own: `fit_gaussians` truncates each (feature, "
-             "class) column before fitting, so a\nclassical route that reads "
-             "every row is not its control. (d) subtracts the component-pinned "
-             f"run from the automatic one. {H.provenance_note(label)}"
+             "Same model shape, same prediction path, same features, and every "
+             "route reads every row — what differs is the placement method, and "
+             "the timing is model training ONLY.\nThree seeds, median across "
+             "seeds of a per-seed median of three repeats, single-threaded. The "
+             "20,000-row cap in (c) was the construction's own: `fit_gaussians` "
+             "truncated each\n(feature, class) column before fitting anything, "
+             "which is why its curve used to go flat. Both that and the "
+             "discarded EM model selection are fixed; (c) prices them and (d) "
+             f"shows\nwhat is left. (d) subtracts the component-pinned run from "
+             f"the automatic one. {H.provenance_note(label)}"
              + (f" · pinned: {pinned_label}" if pinned is not None else ""),
              ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
              linespacing=1.6)
