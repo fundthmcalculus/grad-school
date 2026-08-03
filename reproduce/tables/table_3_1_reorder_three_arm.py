@@ -316,6 +316,60 @@ def _plot(ns, series, basename):
     plt.close(fig)
 
 
+def _stage_two_shape(ns, th, td):
+    """Describe stage two's measured shape, from the measurements themselves.
+
+    This sentence used to be hardcoded: it asserted a fixed cost of roughly 10 ms
+    engaging at N >= 750, a flat plateau above it, and stage two LOSING to stage
+    one between 750 and 1,000. All three were true of the development laptop and
+    none of them is true of the workstation, where stage two is monotone and wins
+    by 8-17x at every size. A generator that states a conclusion its own table
+    contradicts is worse than one that states nothing, so the shape is derived
+    here and the host-specific reading is left to whoever reads the table.
+    """
+    pairs = [(n, s1 / s2) for n, s1, s2 in zip(ns, th, td) if s1 and s2]
+    if not pairs:
+        return "Stage one/stage two comparison unavailable: one arm did not run."
+    lo_n, lo_r = min(pairs, key=lambda p: p[1])
+    hi_n, hi_r = max(pairs, key=lambda p: p[1])
+
+    # A plateau is a stretch where N at least doubles while the time does not
+    # move more than 25% -- a cost that is constant in N is an overhead, not the
+    # algorithm. Reported with its level so it can be compared against a host
+    # that does not show one.
+    plateau = ""
+    for i in range(len(ns)):
+        for j in range(len(ns) - 1, i + 1, -1):
+            seg = [t for t in td[i:j + 1] if t]
+            if len(seg) < 3 or ns[j] < 2 * ns[i]:
+                continue
+            if max(seg) <= 1.25 * min(seg):
+                plateau = (f" A PLATEAU is present: stage two holds "
+                           f"{1e3 * min(seg):.1f}-{1e3 * max(seg):.1f} ms across "
+                           f"N={ns[i]:,}-{ns[j]:,}, i.e. a cost constant in N, "
+                           f"which is an overhead rather than the algorithm.")
+                break
+        if plateau:
+            break
+    if not plateau:
+        monotone = all(a <= b for a, b in zip([t for t in td if t],
+                                             [t for t in td if t][1:]))
+        plateau = (" NO plateau on this host: stage two's time is "
+                   f"{'monotone' if monotone else 'non-monotone but trending'} "
+                   f"in N across the whole grid "
+                   f"({1e3 * min(t for t in td if t):.2f}-"
+                   f"{1e3 * max(t for t in td if t):.1f} ms).")
+
+    parity = (f" Stage two never reaches parity with stage one here: the "
+              f"stage1/stage2 ratio stays between {lo_r:.1f}x (N={lo_n:,}) and "
+              f"{hi_r:.1f}x (N={hi_n:,})."
+              if lo_r > 1.5 else
+              f" Stage two's advantage COLLAPSES to {lo_r:.1f}x at N={lo_n:,} "
+              f"(best {hi_r:.1f}x at N={hi_n:,}), so the compiled kernel buys "
+              f"little across a band of sizes.")
+    return plateau + parity
+
+
 def emit_complexity_fit(ns, tc, th, td):
     """Table 3.2 + its figure -- measured growth vs N^2, N^2 log N and N^3.
 
@@ -365,10 +419,7 @@ def emit_complexity_fit(ns, tc, th, td):
                  "dominates; carrying them to a size with a measurable runtime is what "
                  "makes their exponents mean anything. The cubic arm cannot follow -- N=3000 "
                  "cubed is hours -- and that asymmetry is the reason for the split. NOTE the "
-                 "stage-two column: a fixed cost of roughly 10 ms engages at N>=750 and "
-                 "dominates until the quadratic work catches up with it, which is why that "
-                 "arm is flat across the middle of the grid and why it LOSES to stage one "
-                 "between 750 and 1000. Companion figure: "
+                 "stage-two column:" + _stage_two_shape(ns, th, td) + " Companion figure: "
                  "`outputs/figures/fig_03_complexity_fit.{png,eps}` -- PNG for the "
                  "Markdown, EPS for the LaTeX build."))
 

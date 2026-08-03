@@ -17,8 +17,24 @@
 # mode being guarded against is someone quoting one a month from now.
 set -uo pipefail
 
+usage() {
+  sed -n '2,17p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  exit "${1:-0}"
+}
+
+# Any unrecognised leading flag is a usage error, not a label. `--help` used to be
+# taken as one, which archived a full run under reproduce/outputs/--help/ -- seven
+# log files that were then committed.
+case "${1:-}" in
+  -h|--help) usage 0 ;;
+esac
+
 FAST=0
 if [ "${1:-}" = "--fast" ]; then FAST=1; shift; fi
+
+case "${1:-}" in
+  -*) echo "error: unknown option '$1'" >&2; usage 2 ;;
+esac
 
 LABEL="${1:?usage: run_all_tables.sh [--fast] <label> [table_name ...]}"
 shift
@@ -28,6 +44,24 @@ ONLY=("$@")          # optional: run just these tables, e.g. to backfill one
 # the cheap tables gain nothing from a reduction, so they should not pay the
 # credibility cost of one.
 FAST_SEEDS="${REPRO_FAST_SEEDS:-0,1,2}"
+
+# Every generator writes ± into its cells and several write λ / Δ / σ into their
+# headers. Python picks its stdout AND default file encoding from the platform,
+# which on Windows is cp1252 -- so a table would finish its whole numeric phase
+# and then die in the f.write that emits it. The emitters now pin UTF-8
+# explicitly; this covers the generators' own stdout for the same reason.
+export PYTHONIOENCODING=utf-8
+
+# Table 4.4b, the theta operating curve, is emitted by table_4_4_openset ONLY when
+# this is set -- so every sweep so far produced 4.4 and silently omitted 4.4b,
+# while 4.4b sat in the archives from a hand-run. Defaulted here so the curve is
+# part of the sweep rather than a thing someone remembers to do.
+#
+# It is a LIST of thetas, not a flag. `REPRO_THETA_SWEEP=1` is a valid list of one
+# that emits a single row at theta=1.0, where the boost saturates and every cell is
+# legitimately zero -- output indistinguishable from a null result. Two sweeps were
+# lost to that reading.
+export REPRO_THETA_SWEEP="${REPRO_THETA_SWEEP:-0.5,0.6,0.7,0.8,0.9,0.99,1.1}"
 
 # Runtimes at 10 seeds from outputs/seeds10-2026-08-01/: these four are 1301s,
 # 302s, 187s and 112s; the remaining seven total under two minutes combined.
@@ -41,9 +75,32 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/reproduce/outputs"
 DEST="$OUT/$LABEL"
 
+# Interpreter for the stdlib-only renderers, the seed-list query and the version
+# line in PROVENANCE.txt. `python3` is not universally on PATH -- Windows/Git Bash
+# ships the `py` launcher instead, and Windows also plants a `python` stub that
+# prints a Store advert and exits nonzero. Probing with `-c ''` picks the first
+# one that actually runs, so a host without `python3` no longer records its seed
+# list as the literal string "unknown" (the same class of silent-provenance bug
+# the hardcoded seed list was).
+PY=""
+for _cand in python3 python "py -3"; do
+  if $_cand -c '' >/dev/null 2>&1; then PY="$_cand"; break; fi
+done
+if [ -z "$PY" ]; then
+  echo "error: no working python interpreter (tried python3, python, py -3)" >&2
+  exit 1
+fi
+
 mkdir -p "$DEST/logs"
 
 # (project, script) pairs -- the project is the uv environment the script needs.
+#
+# table_a1_feature_scoring and table_3_2_memory_precision were absent from these
+# lists while their outputs (table_a1_feature_ranking, table_a2_feature_count,
+# table_3_2_memory_precision) sat in the run-of-record archive -- they had been
+# run by hand. An archive containing a table the orchestrator does not produce is
+# the same trap as a hardcoded seed list: the next full sweep silently carries the
+# older table forward and reports eleven-of-eleven green.
 FIS_TABLES=(
   table_concrete_reconciliation
   table_hyperparam_normalization
@@ -53,10 +110,12 @@ FIS_TABLES=(
   table_6_1_model_family
   table_norm_conorm_matrix
   table_4_4_openset
+  table_a1_feature_scoring
 )
 CLUSTER_TABLES=(
   table_3_1_pvat_scaling
   table_3_1_reorder_three_arm
+  table_3_2_memory_precision
 )
 # Stdlib-only renderers -- no submodule environment, so they run on the host python.
 PLAIN_TABLES=(
@@ -66,14 +125,11 @@ PLAIN_TABLES=(
 declare -A STATUS
 declare -A SEEDS_USED
 
-# Check for submodule SHA divergence before running.
-check_submodule_shas
-
 # Resolved once, from common.py, so the provenance file reports the seed list the
 # generators will actually use rather than a default repeated here. This line
 # used to be hardcoded, and when the default moved from five seeds to ten it
 # silently kept recording five.
-FULL_SEEDS="$(SEEDLIST_ROOT="$ROOT" python3 -c 'import os,sys;
+FULL_SEEDS="$(SEEDLIST_ROOT="$ROOT" $PY -c 'import os,sys;
 sys.path.insert(0, os.path.join(os.environ["SEEDLIST_ROOT"], "reproduce"));
 import common; print(",".join(map(str, common.SEEDS)))' 2>/dev/null \
     || echo "${REPRO_SEEDS:-unknown}")"
@@ -192,7 +248,7 @@ run_one() {
   [ -n "$seed_env" ] && env_prefix=(env "REPRO_SEEDS=$seed_env")
 
   if [ "$project" = "-" ]; then
-    "${env_prefix[@]}" python3 "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
+    "${env_prefix[@]}" $PY "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
   else
     "${env_prefix[@]}" uv run --project "$ROOT/$project" ${EXTRA_DEPS:-} python \
         "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
@@ -209,6 +265,11 @@ run_one() {
   fi
   printf '%-10s %4ss\n' "${STATUS[$name]}" "$((t1 - t0))"
 }
+
+# Check for submodule SHA divergence before running. This call used to sit above
+# the function's own definition, where bash resolves it as an unknown command --
+# `set -e` is off, so the run continued and the guard never once fired.
+check_submodule_shas
 
 echo "=== $LABEL ==="
 echo "tribble-fis:"
@@ -252,6 +313,7 @@ PROV="$DEST/PROVENANCE.txt"
   echo "tribble-cluster: $(git -C "$ROOT/tribble-cluster" rev-parse HEAD)"
   echo "grad-school: $(git -C "$ROOT" rev-parse HEAD)"
   echo "seeds:       $FULL_SEEDS${REPRO_SEEDS:+ (REPRO_SEEDS override in effect)}"
+  echo "thetas:      $REPRO_THETA_SWEEP (table_4_4b operating curve)"
   echo
   # Machine identity. Recorded because timings are not portable between hosts OR
   # between runs on one host: the same generator, same tribble-cluster commit and
@@ -275,7 +337,36 @@ PROV="$DEST/PROVENANCE.txt"
   else
     printf '  %-16s %s\n' "gpu" "$(lspci 2>/dev/null | grep -iE 'vga|3d controller' | sed 's/^[^ ]* //' | head -1 || echo 'none detected')"
   fi
-  printf '  %-16s %s\n' "python"   "$(python3 -V 2>&1)"
+  printf '  %-16s %s\n' "python"   "$($PY -V 2>&1)"
+  # Numeric library versions, from the environment the tables actually ran in --
+  # not the host python, which is a different interpreter with different wheels.
+  #
+  # Added because a difference turned out to be unattributable without them:
+  # Table A.2's bhattacharyya accuracies sit up to +0.043 above the main-d0efefc
+  # archive at identical code, seeds and feature rankings, while wasserstein and
+  # composite agree to four decimals. Two full sweeps on this host reproduce every
+  # one of those accuracies exactly, so it is not run-to-run noise -- it is the
+  # environment, and no archive recorded enough to say which part of it. The
+  # ill-conditioned arm is the one that moved, which is what a BLAS or threading
+  # difference would look like.
+  _env_probe='
+import numpy, scipy, sklearn, sys
+print("numpy", numpy.__version__, " scipy", scipy.__version__,
+      " sklearn", sklearn.__version__, " python", sys.version.split()[0])
+blas = "unknown"
+try:
+    d = numpy.show_config("dicts")
+    b = d["Build Dependencies"]["blas"]
+    blas = b.get("name", "?") + " " + b.get("version", "?")
+except Exception:
+    pass
+print("blas", blas)
+'
+  uv run --project "$ROOT/tribble-fis" python -c "$_env_probe" 2>/dev/null \
+    | while IFS= read -r _line; do
+        printf '  %-16s %s\n' "${_line%% *}" "${_line#* }"
+      done \
+    || printf '  %-16s %s\n' "libs" "unavailable"
   echo
   echo "status:"
   for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}"; do

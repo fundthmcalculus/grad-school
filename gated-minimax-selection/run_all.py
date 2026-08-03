@@ -31,6 +31,15 @@ All randomness is seeded. Re-running reproduces identical numbers and figures.
 """
 
 import json
+import sys
+
+# The summary block at the end prints Δ and ±. Windows stdout defaults to cp1252,
+# which encodes neither, so this driver died in its final print *after* writing
+# results.json and every figure -- exiting 1 on a run that had actually succeeded.
+# A harness reads the exit code, so that reads as a failed reproduction.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")

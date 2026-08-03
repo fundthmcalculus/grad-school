@@ -1,0 +1,15 @@
+Model,Preprocessing,Refinement,R²,RMSE
+flat MoG-TSK 0th,log+standardized,closed-form only,-0.334 ± 0.201,18.83 ± 1.21
+flat MoG-TSK 1st,log+standardized,closed-form only,0.772 ± 0.034,7.80 ± 0.73
+flat MoG-TSK 2nd,log+standardized,closed-form only,0.824 ± 0.043,6.84 ± 0.94
+flat MoG-TSK 0th,log+standardized,refined,0.582 ± 0.072,10.54 ± 0.95
+flat MoG-TSK 1st,log+standardized,refined,0.836 ± 0.054,6.52 ± 0.93
+flat MoG-TSK 2nd,log+standardized,refined,0.864 ± 0.046,5.94 ± 0.82
+fuzzy tree,raw,n/a,0.583 ± 0.067,10.53 ± 0.89
+mixture of experts (HME),raw,n/a,0.686 ± 0.060,9.11 ± 0.74
+CART (reference),raw,n/a,0.825 ± 0.047,6.74 ± 0.74
+Random Forest (reference),raw,n/a,0.909 ± 0.018,4.90 ± 0.31
+fuzzy tree,log+standardized,n/a,0.689 ± 0.056,9.07 ± 0.57
+mixture of experts (HME),log+standardized,n/a,0.763 ± 0.057,7.90 ± 0.93
+CART (reference),log+standardized,n/a,0.826 ± 0.047,6.73 ± 0.74
+Random Forest (reference),log+standardized,n/a,0.909 ± 0.019,4.90 ± 0.31
