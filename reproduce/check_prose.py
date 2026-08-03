@@ -4,6 +4,14 @@
     python reproduce/check_prose.py full-2026-08-03
     python reproduce/check_prose.py full-2026-08-03 --against full-14900hx-r2
     python reproduce/check_prose.py full-2026-08-03 --chapter 06 --show-ok
+    python reproduce/check_prose.py --since HEAD~1        # did an edit lose a fact?
+
+There are two checks here, against two different failures. The archive modes below ask
+whether the document quotes the run it claims to. `--since <git-ref>` asks whether an
+editing pass changed the writing and nothing else, by diffing every numeric literal in
+the prose against that ref. A voice or compression pass should come back identical; when
+one does not, the tokens it dropped are the worklist. See `since()` for why that check
+exists and what it cannot tell you.
 
 `compare_runs.py` answers "did the harness move between two runs". This answers the
 other half, which the project has so far done by hand: **does the document quote what
@@ -189,10 +197,77 @@ def near_miss(mean, std, pairs):
     return hits[:_MAX_SUGGESTIONS]
 
 
+# Numeric literals, tracking the VALUE and ignoring whatever unit follows it. Two
+# versions of this were wrong in opposite directions, and both failed the same way -- by
+# reporting a formatting change as a lost fact, which is worse than reporting nothing.
+#
+#   `(?<![\w.])\d+...` with a trailing `(?![\w])`: rejected any number followed by a
+#   letter, and `\w` is Unicode-aware, so `571σ` did not tokenise at all. Chapter 5's
+#   sigma-multiples then read as deleted when they had only gained their unit.
+#
+#   Before that, no trailing guard at all: `1,` and `7.` became tokens, so a sentence
+#   split or a serial comma read as a lost number in three files.
+#
+# The trailing guard is therefore `(?!\d)(?!\.\d)`: the token must not run into another
+# digit, nor into a decimal point that is followed by one. Anything else may follow it.
+# Both halves are needed. `(?![\d.])` alone -- the obvious form -- rejects a number at
+# the end of a sentence, so `... rising to 7.` silently contributes nothing and a
+# reflowed paragraph reads as a deletion. `0.62 s`, `571σ`, `48×`, `12-class` and a
+# sentence-final `7.` all yield the number; `4.3e-14` and `1,024` stay whole. The
+# leading guard still excludes identifiers, since `_` is a word character, so `fig_07`
+# and `table_5_x` do not match at all.
+_TOKEN = re.compile(
+    r"(?<![\w.])[-+]?\d+(?:,\d{3})*(?:\.\d+)?(?:[eE][-+]?\d+)?(?!\d)(?!\.\d)")
+
+
+def numeric_tokens(text):
+    from collections import Counter
+    return Counter(_TOKEN.findall(text))
+
+
+def since(ref, chapter=None):
+    """Numbers present in the prose at `ref` and missing now, per file.
+
+    The companion check to the archive comparison above, and the one that catches a
+    different failure: an editing pass that drops a fact while reporting that it did
+    not. A voice or compression pass is supposed to change how the document reads and
+    nothing about what it claims, so every numeric literal in it should survive.
+
+    That is a real thing that happened. A compression pass reported per file that every
+    correction had survived; this check, run against the pre-compression commit, found
+    Chapter 5 missing the sigma-multiples and inter-level ratios its own table caption
+    depended on. (They came back -- the file was mid-edit -- but the self-report could
+    not have told the difference, and neither could a reader.)
+
+    Two things it is NOT. It is not a fact checker: a number can survive while the
+    sentence around it turns false. And a missing token is not automatically a defect --
+    collapsing a cross-reference mentioned twice into one mention legitimately drops a
+    `6.1`. So the output is a worklist to read, not a verdict, and it prints the counts
+    so a 2 -> 1 duplicate reads differently from a 1 -> 0 deletion.
+    """
+    import subprocess
+    out = []
+    for name in sorted(os.listdir(PROSE)):
+        if not name.endswith(".md") or (chapter and not name.startswith(chapter)):
+            continue
+        rel = os.path.relpath(os.path.join(PROSE, name), ROOT).replace(os.sep, "/")
+        proc = subprocess.run(["git", "show", f"{ref}:{rel}"], cwd=ROOT,
+                              capture_output=True, text=True, encoding="utf-8")
+        if proc.returncode != 0:
+            out.append((name, None, None))          # not present at that ref
+            continue
+        with open(os.path.join(PROSE, name), encoding="utf-8") as f:
+            now = numeric_tokens(f.read())
+        was = numeric_tokens(proc.stdout)
+        out.append((name, was - now, now - was))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("archive", help="archive label the prose claims to quote")
+    ap.add_argument("archive", nargs="?",
+                    help="archive label the prose claims to quote; omit with --since")
     ap.add_argument("--against", metavar="LABEL",
                     help="second archive; untraceable pairs found here are named as "
                          "coming from a superseded run")
@@ -205,7 +280,36 @@ def main():
     ap.add_argument("--ignore-file", metavar="PATH",
                     help="file of 'mean ± std' pairs that are cited rather than "
                          "harness-produced; one per line, # comments allowed")
+    ap.add_argument("--since", metavar="GIT_REF",
+                    help="instead of checking against an archive, report numeric "
+                         "literals present in the prose at GIT_REF and missing now -- "
+                         "the check that an editing pass changed voice and not facts")
     args = ap.parse_args()
+
+    if args.since:
+        rc = 0
+        print(f"prose numeric literals: {args.since} -> working tree")
+        print(f"{'':-<78}")
+        for name, lost, gained in since(args.since, args.chapter):
+            if lost is None:
+                print(f"  {name:46s} not present at {args.since}")
+                continue
+            if not lost and not gained:
+                print(f"  {name:46s} identical")
+                continue
+            rc = 1
+            print(f"  {name:46s} DIFFERS")
+            for tok, n in sorted(lost.items()):
+                print(f"      lost   {tok:>14s}  x{n}")
+            for tok, n in sorted(gained.items()):
+                print(f"      new    {tok:>14s}  x{n}")
+        print("\nA lost token is a worklist entry, not a verdict: collapsing a "
+              "cross-reference\nmentioned twice legitimately drops one. A 1 -> 0 "
+              "deletion is the one to read.")
+        return rc
+
+    if not args.archive:
+        ap.error("an archive label is required unless --since is given")
 
     pairs, singles = read_archive(args.archive)
     other_pairs, other_singles = ({}, {})
