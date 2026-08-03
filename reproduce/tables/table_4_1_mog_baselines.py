@@ -98,6 +98,16 @@ def main():
         # and the one its accuracy figures are quoted at.
         cols = _bench("reg", X, y, _fm.mog_regressor, r2_score, norm=True)
         rows.append(_row("Concrete (regression)", "R2", cols))
+        # Second consequent order, timed. Table 4.5 quotes a full-2nd-order R2
+        # from `table_concrete_reconciliation.py`, which sweeps orders but never
+        # times them, so that row's training-time cell had nothing behind it and
+        # read `*pending*`. Measuring it here -- same split, same seeds, same
+        # normalization, same timer as the 1st-order row -- makes the two rows
+        # comparable, which borrowing the 1st-order seconds would not have.
+        cols2 = _bench("reg", X, y,
+                       lambda s: _fm.mog_regressor(s, tsk_order="full-2nd"),
+                       r2_score, norm=True)
+        rows.append(_row("Concrete (regression, full 2nd order)", "R2", cols2))
     else:
         rows.append(["Concrete (regression)", C.NA, C.NA, C.NA, C.NA, C.NA])
 

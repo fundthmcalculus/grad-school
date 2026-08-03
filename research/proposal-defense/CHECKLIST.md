@@ -203,7 +203,22 @@ it needs your records rather than a decision._
       "Status: Scaffold," describes pillar 1 without stage two or the name collision, and lists
       two already-completed fixes as pending. It is the document a committee member is most
       likely to open first.
-- [ ] ⬜ **D4 — Fill the remaining 23 `*pending*` table cells**, or mark them honestly.
+- [x] ✅ **D4 — The `*pending*` table cells are all marked or resolved** (2026-08-02).
+      **The count was wrong: 20, not 23.** This item, `NEXT_STEPS` and `ACTION_ITEMS` all
+      said 23 and `REVIEW_2026-08-02` said 22; the actual inventory across the chapter tables
+      was 20 — Ch 3: 1, Ch 4: 10, Ch 6: 9. (The three stray counts came from counting rows and
+      prose mentions along with cells.) None is now a bare `*pending*`: each names what blocks
+      it and the item that tracks it, so the gaps can be triaged rather than re-derived.
+      ANFIS / GA-FIS, 11 cells across Tables 4.5 and 6.2 → `N/A (C1)`. Table 3.7's
+      non-coordinate row → Goal G2. Table 6.3's counts → C9 / G6. Table 6.4's Atwood row → C7.
+      Table 4.4's RT-IOT2022 accuracy → dataset absent from the repository. Table 6.2's M5 row
+      → **a dependency fault, not an unrun experiment**: the generator already imports `m5py`
+      optionally and would fill it unattended, but `m5py` does not load against scikit-learn
+      1.9.0. Table 4.5's full-2nd training time → deliberately left empty; see note 14 in
+      `PROVENANCE_MAP.md`, because that row's R² and its available timing come from two
+      different code paths and pairing them would repeat the mismatch the table's caption
+      exists to prevent. **What this item did not do is fill any cell with a number**, and the
+      three follow-ups it exposed — C1, C7 and the Table 4.5 timing split — are the real work.
 - [ ] ⬜ **D5 — Install a LaTeX engine** so display math typesets:
       `sudo zypper install texlive-xetex texlive-latex texlive-collection-fontsrecommended`.
       `build_pdf.py` auto-detects and switches.
