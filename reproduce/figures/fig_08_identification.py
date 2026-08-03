@@ -1,27 +1,37 @@
 #!/usr/bin/env python3
-"""Rule identification: the classical route against the Gaussian construction.
+"""Rule identification on Concrete: the classical route against the construction.
 
 Both routes are asked for the same number of rules at every point, because the
 rule count is an input to one and normally an output of the other, and comparing
 across different counts would be comparing capacity rather than identification.
 
-**(a) Accuracy against rule count.** Held-out R², mean and spread over seeds.
+The first version of this figure compared the construction *with its own model
+selection left in* against a classical route that is simply told how many
+clusters to make. That is two questions at once, and it flattered the classical
+route by an order of magnitude. Both runs are drawn here:
+
+* **auto** — the construction chooses its component count per (feature, bucket)
+  by BIC, which costs four EM fits per pair on top of the k-means it keeps, and
+  leaves it with roughly three times the classical parameter count;
+* **pinned** — one Gaussian per (feature, bucket), which is *exactly* the
+  classical shape, so panel (c)'s lines coincide and panels (a) and (b) are
+  like-for-like.
+
+**(a) Accuracy against rule count.** Held-out R², mean and ±1 s.d. over seeds.
 Read the *overlap*, not the ordering — three seeds is not enough to separate
 these curves, and the panel is drawn so that is obvious.
 
-**(b) Identification cost against rule count**, log scale. This is the result
-that is not close: the classical route is one to two orders of magnitude
-cheaper at every rule count, with spreads too small to see. Note that cost is
-wall-clock here rather than iterations, unlike the optimizer study — "the
-construction is cheaper" is a claim about time, so time is what is measured, and
-measured single-threaded.
+**(b) Identification cost against rule count**, log scale. The classical route
+is still cheaper at matched parameters, by about 2-5x. It was 12-63x before
+pinning, and the difference between those two numbers is model selection, not
+rule placement. Cost is wall-clock here rather than iterations, unlike the
+optimizer study — "the construction is cheaper" is a claim about time, so time
+is what is measured, and measured single-threaded.
 
-**(c) What each route spends its parameters on.** At a matched rule count the
-construction carries roughly three times the free parameters, because it fits an
-automatically-chosen number of mixture components per (feature, bucket) while
-the classical route places exactly one Gaussian per (feature, rule). This is
-arithmetic, not measurement, and it is why panel (a) is not a like-for-like
-capacity comparison in the construction's favour.
+**(c) What each route spends its parameters on.** Why (a) is only a fair
+comparison for the pinned run: at a matched rule count the automatic
+construction carries about three times the free parameters, while the pinned one
+lands exactly on the classical line. Arithmetic, not measurement.
 """
 
 from __future__ import annotations
@@ -38,72 +48,118 @@ import harness_data as H  # noqa: E402
 
 NAME = "08-identification"
 
-ROUTES = ["construction", "classical-kmeans", "classical-fcm"]
+# Both archives are named rather than inferred. The panels are a comparison
+# *between* two runs, so "whatever is newest" would silently plot one run
+# against itself the moment either is re-archived.
+AUTO = "opt-identification-2026-08-02"
+PINNED = "opt-identification-pinned-2026-08-03"
+
+CLASSICAL = ["classical-kmeans", "classical-fcm"]
 COLOUR = {"construction": F.BLUE, "classical-kmeans": F.ORANGE,
           "classical-fcm": F.AQUA}
+LABEL = {"classical-kmeans": "k-means", "classical-fcm": "fuzzy c-means"}
 
 
-def _load():
-    rows, label = H.table("table_identification_sweep_seeds")
+def _load(label):
+    rows, src = H.table("table_identification_sweep_seeds", label)
     by = defaultdict(lambda: defaultdict(list))
     for r in rows:
         by[r["route"]][int(r["rules"])].append(
             (float(r["r2"]), float(r["seconds"]), int(r["n_params"])))
-    return by, label
+    return by, src
+
+
+def _stats(by, route, index):
+    cs = sorted(by[route])
+    vals = [[v[index] for v in by[route][c]] for c in cs]
+    return (cs, np.array([np.mean(v) for v in vals]),
+            np.array([np.std(v) for v in vals]),
+            np.array([np.median(v) for v in vals]))
 
 
 def build():
-    by, label = _load()
-    present = [r for r in ROUTES if r in by]
-    if not present:
+    auto, auto_src = _load(AUTO)
+    pinned, pinned_src = _load(PINNED)
+    if "construction" not in auto or "construction" not in pinned:
         raise RuntimeError("no sweep data; run run_identification_study.py")
-    rules = sorted(by[present[0]])
+    rules = sorted(auto["construction"])
 
-    fig, (ax, tx, px) = F.grid_figure(1, 3, width=F.W_WIDE + 1.4, height=3.6)
+    fig, (ax, tx, px) = F.grid_figure(1, 3, width=F.W_WIDE + 1.4, height=3.9)
 
-    for route in present:
-        cs = sorted(by[route])
-        r2 = np.array([[v[0] for v in by[route][c]] for c in cs], dtype=object)
-        mean = np.array([np.mean([v[0] for v in by[route][c]]) for c in cs])
-        sd = np.array([np.std([v[0] for v in by[route][c]]) for c in cs])
+    # -- (a) accuracy ------------------------------------------------------- #
+    for route in CLASSICAL:
+        cs, mean, sd, _ = _stats(pinned, route, 0)
         ax.plot(cs, mean, lw=1.8, marker="o", ms=4.5, color=COLOUR[route],
-                label=route, zorder=4)
-        ax.fill_between(cs, mean - sd, mean + sd, color=F.tint(COLOUR[route], 0.88),
-                        lw=0, zorder=2)
-
-        ms = [1000 * np.median([v[1] for v in by[route][c]]) for c in cs]
-        tx.plot(cs, ms, lw=1.8, marker="o", ms=4.5, color=COLOUR[route], zorder=4)
-
-        pars = [np.mean([v[2] for v in by[route][c]]) for c in cs]
-        # The two classical routes have identical parameter counts by
-        # construction (one Gaussian per feature per rule), so one is dashed --
-        # otherwise the second is drawn exactly under the first and looks absent.
-        px.plot(cs, pars, lw=1.8, marker="o", ms=4.5, color=COLOUR[route],
-                ls=(0, (4, 2)) if route == "classical-kmeans" else "solid",
-                zorder=4)
-
+                label=LABEL[route], zorder=4)
+        ax.fill_between(cs, mean - sd, mean + sd,
+                        color=F.tint(COLOUR[route], 0.88), lw=0, zorder=2)
+    # Distinct markers, not just distinct dashes: a legend swatch is short
+    # enough that a marker sits on top of the dash pattern and the two blue
+    # entries become indistinguishable.
+    for src, ls, mk, name in ((pinned, "solid", "o", "construction (pinned)"),
+                              (auto, (0, (4, 2)), "^", "construction (auto)")):
+        cs, mean, sd, _ = _stats(src, "construction", 0)
+        ax.plot(cs, mean, lw=1.8, ls=ls, marker=mk, ms=4.5, color=F.BLUE,
+                label=name, zorder=4)
+        if ls == "solid":
+            ax.fill_between(cs, mean - sd, mean + sd,
+                            color=F.tint(F.BLUE, 0.88), lw=0, zorder=2)
     F.style_axes(ax, title="(a)  accuracy at matched rule count",
                  xlabel="rules", ylabel="held-out $R^2$")
-    F.legend(ax, loc="lower right")
+    F.legend(ax, loc="lower right", handlelength=2.8)
     ax.set_xticks(rules)
 
+    # -- (b) cost ----------------------------------------------------------- #
+    for route in CLASSICAL:
+        cs, _, _, med = _stats(pinned, route, 1)
+        tx.plot(cs, 1000 * med, lw=1.8, marker="o", ms=4.5,
+                color=COLOUR[route], label=LABEL[route], zorder=4)
+    for src, ls, mk, name in ((pinned, "solid", "o", "construction (pinned)"),
+                              (auto, (0, (4, 2)), "^", "construction (auto)")):
+        cs, _, _, med = _stats(src, "construction", 1)
+        tx.plot(cs, 1000 * med, lw=1.8, ls=ls, marker=mk, ms=4.5,
+                color=F.BLUE, label=name, zorder=4)
     tx.set_yscale("log")
+    lo, hi = tx.get_ylim()
+    tx.set_ylim(lo * 0.55, hi)
     F.style_axes(tx, title="(b)  identification cost",
                  xlabel="rules", ylabel="milliseconds, single-threaded (log)")
+    F.legend(tx, loc="lower right", handlelength=2.8)
     tx.set_xticks(rules)
 
+    # -- (c) parameters ----------------------------------------------------- #
+    # The two classical routes and the pinned construction have identical
+    # parameter counts by construction (one Gaussian per feature per rule), so
+    # they are drawn with different dashes -- otherwise three lines sit exactly
+    # on top of each other and two of them look absent.
+    for route, ls in (("classical-kmeans", (0, (4, 2))),
+                      ("classical-fcm", "solid")):
+        cs, mean, _, _ = _stats(pinned, route, 2)
+        px.plot(cs, mean, lw=1.8, ls=ls, marker="o", ms=4.5,
+                color=COLOUR[route], label=LABEL[route], zorder=4)
+    cs, mean, _, _ = _stats(pinned, "construction", 2)
+    px.plot(cs, mean, lw=1.4, ls=(0, (1, 2)), marker="s", ms=3.6,
+            color=F.BLUE, label="construction (pinned)", zorder=5)
+    cs, mean, _, _ = _stats(auto, "construction", 2)
+    px.plot(cs, mean, lw=1.8, marker="^", ms=4.5, color=F.BLUE,
+            label="construction (auto)", zorder=4)
     F.style_axes(px, title="(c)  free antecedent parameters",
                  xlabel="rules", ylabel="parameters")
+    F.legend(px, loc="upper left", handlelength=2.8)
     px.set_xticks(rules)
 
     fig.text(0.5, -0.02,
              "Same data, same split, same closed-form ridge-TSK consequent solve in "
              "every row — what differs is only how the rules are identified. Bands in "
-             "(a) are ±1 s.d. over\nseeds and they overlap everywhere: three seeds "
+             "(a) are ±1 s.d. over seeds and they\noverlap everywhere: three seeds "
              "cannot separate these curves, and the accuracy ordering is not a result. "
-             "Panel (b) is not close. Timing is wall-clock,\nsingle-threaded, median of "
-             "repeats — the one place in this study where time rather than iteration "
-             f"count is the quantity of interest. {H.provenance_note(label)}",
+             "The gap between the two blue lines in (b) is BIC component\nselection, "
+             "which the classical route is never asked to do; on the pinned run the "
+             "three routes carry identical parameter counts, which is the (c) lines "
+             "coinciding.\nTiming is wall-clock, single-threaded, median of repeats — "
+             "the one place in this study where time rather than iteration count is the "
+             f"quantity of interest.\nauto: {H.provenance_note(auto_src)} · "
+             f"pinned: {pinned_src}",
              ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
              linespacing=1.6)
     fig.tight_layout()
