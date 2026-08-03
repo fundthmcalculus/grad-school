@@ -7,10 +7,7 @@ from tribblefis.gauss_plot import report_figures_of_merit
 # tribble-fis PR #67 deleted gauss_math.{standard_transform,log_transform,
 # detect_and_apply_log_transform}. UnitScalar replaces standard_transform's
 # min-max-to-[0,1] behaviour (the name was always a misnomer -- it never
-# z-scored); the bare `log_transform` has no successor, but it was only ever
-# np.log1p, applied HERE *after* the scaling rather than before it. UnitScalar's
-# own log step runs before its min-max, so it cannot express this order and
-# `log_dynamic_range=None` disables it; the log1p stays explicit below.
+# z-scored).
 from tribblefis.scaling import UnitScalar
 from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
 
@@ -43,10 +40,30 @@ def main():
 
     scaled_cols = ["Rad Flow", "Fpv Close", "Fpv Open", "High", "Bypass",
                    "Bpv Close", "Bpv Open"]
-    # min-max to [0,1] on this subset only, then log1p -- the original order.
-    X[scaled_cols] = UnitScalar(log_dynamic_range=None).fit_transform(
+    # BEHAVIOUR CHANGE, and the reason is structural rather than cosmetic.
+    #
+    # This script was the one sample that normalized BEFORE logging: it min-max
+    # scaled this column subset to [0,1] and then applied np.log1p on top of the
+    # scaled values. UnitScalar's order is fixed at log -> normalize, so it simply
+    # cannot express the old order; the previous code kept it only by disabling the
+    # scaler's log step (`log_dynamic_range=None`) and doing the log1p by hand
+    # afterwards. That is exactly the custom transformation code this migration is
+    # meant to remove, so it is converted to the canonical order instead.
+    #
+    # ==> THIS SAMPLE'S NUMBERS WILL MOVE, and not by rounding. Both orders are
+    # monotone per feature, so anything rank-based would be unaffected, but
+    # MixtureOfGaussiansFuzzyClassifier fits Gaussian membership functions to
+    # actual values and will see a different distribution. Nothing here reproduces
+    # the old output, and nothing pretends to. Unverified: load_data() fetches
+    # Statlog Shuttle over the network via ucimlrepo, so this cannot be run here.
+    #
+    # `log_dynamic_range=0` forces the log1p onto every column it is handed, which
+    # is how the old code behaved (it logged all seven unconditionally). It is the
+    # only way to say "log exactly these columns" through this API -- there is no
+    # explicit log-column list -- and it is applied to the subset precisely so the
+    # logged set stays the seven columns named above.
+    X[scaled_cols] = UnitScalar(log_dynamic_range=0).fit_transform(
         X[scaled_cols]).astype(X[scaled_cols].dtypes.iloc[0])
-    X[scaled_cols] = np.log1p(X[scaled_cols])
 
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
