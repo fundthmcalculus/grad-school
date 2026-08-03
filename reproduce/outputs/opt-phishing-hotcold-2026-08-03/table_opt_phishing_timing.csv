@@ -1,24 +1,24 @@
 what,to match the construction (ms),full budget (ms),"cost of matching, ÷ the construction"
 the construction itself,—,138 ± 22,—
 "feature engineering (shared, not training)",—,209 ± 22,—
-hot · scipy-lbfgsb,0,62669 ± 1551,0×
-hot · scipy-powell,0,62638 ± 1393,0×
-hot · scipy-de,0,22071 ± 17755,0×
-hot · opt-ga,0,53060 ± 6483,0×
-hot · opt-pso,0,38324 ± 1137,0×
-hot · opt-aco,0,37858 ± 699,0×
-hot · opt-gd,0,63310 ± 2051,0×
-cold · scipy-lbfgsb,never,36364 ± 6127,—
-cold · scipy-powell,12807 ± 9670,37041 ± 1663,104×
-cold · scipy-de,25389,37319 ± 799,205×
-cold · opt-ga,20692 ± 6560,37692 ± 1593,155×
+hot · scipy-lbfgsb,starts there,62669 ± 1550,—
+hot · scipy-powell,starts there,62638 ± 1393,—
+hot · scipy-de,starts there,22071 ± 17755,—
+hot · opt-ga,starts there,53060 ± 6483,—
+hot · opt-pso,starts there,38324 ± 1136,—
+hot · opt-aco,starts there,37858 ± 699,—
+hot · opt-gd,starts there,63310 ± 2051,—
+cold · scipy-lbfgsb,never,36365 ± 6127,—
+cold · scipy-powell,12807 ± 9670,37041 ± 1663,93×
+cold · scipy-de,25389,37319 ± 799,184×
+cold · opt-ga,20692 ± 6560,37692 ± 1593,150×
 cold · opt-pso,never,37132 ± 1197,—
-cold · opt-aco,23611 ± 2002,36825 ± 1856,192×
+cold · opt-aco,23612 ± 2002,36825 ± 1856,171×
 cold · opt-gd,never,36019 ± 5824,—
-classical-kmeans · scipy-lbfgsb,11086 ± 13455,34735 ± 1552,33×
-classical-kmeans · scipy-powell,12502 ± 10149,33578 ± 565,47×
+classical-kmeans · scipy-lbfgsb,11086 ± 13455,34734 ± 1552,80×
+classical-kmeans · scipy-powell,12502 ± 10149,33578 ± 565,91×
 classical-kmeans · scipy-de,never,16768 ± 13505,—
-classical-kmeans · opt-ga,2665,29830 ± 1707,22×
+classical-kmeans · opt-ga,2665,29830 ± 1707,19×
 classical-kmeans · opt-pso,never,28591 ± 590,—
-classical-kmeans · opt-aco,16819 ± 2588,28168 ± 433,140×
-classical-kmeans · opt-gd,3407 ± 1972,34337 ± 1431,17×
+classical-kmeans · opt-aco,16819 ± 2588,28168 ± 433,122×
+classical-kmeans · opt-gd,3407 ± 1972,34337 ± 1431,25×

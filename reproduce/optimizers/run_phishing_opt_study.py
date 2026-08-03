@@ -224,7 +224,14 @@ def main():
                          "construction choose by BIC")
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--archive", metavar="LABEL")
+    ap.add_argument("--reemit-timing", metavar="LABEL",
+                    help="rebuild the timing table from an existing archive's "
+                         "seeds CSV and write it back, without re-running "
+                         "anything. Every column it needs is in that CSV.")
     args = ap.parse_args()
+
+    if args.reemit_timing:
+        return _reemit_timing(args.reemit_timing, args)
 
     if args.smoke:
         args.seeds, args.budget = "0", min(args.budget, 200)
@@ -336,6 +343,17 @@ def _emit(records, args, seeds, inits, arm_names):
               f"invisible cap `fit_gaussians` used to apply. Single-threaded. "
               f"Seeds: {','.join(map(str, seeds))}."))
 
+    _emit_timing(records, inits, arm_names)
+
+
+def _emit_timing(records, inits, arm_names):
+    """The timing table, on its own.
+
+    Factored out of `_emit` so it can be rebuilt from an archive's per-seed
+    CSV without re-running the study -- every column it reads is in there.
+    See `_reemit_timing`.
+    """
+    ref = [r for r in records if r["arm"] == "none" and r["init"] == "hot"]
     # Timing, on its own, because it answers a different question from accuracy
     # and because mixing the two invites reading a machine-dependent number as a
     # property of the method.
@@ -364,10 +382,10 @@ def _emit(records, args, seeds, inits, arm_names):
                                      fmt="{:.0f}"), "—"])
                 continue
             if reached and ref:
-                base = float(np.median([r["construction_seconds"] for r in ref]))
-                med = float(np.median([r["seconds_to_heuristic"] for r in reached]))
+                base = float(np.mean([r["construction_seconds"] for r in ref]))
+                mean = float(np.mean([r["seconds_to_heuristic"] for r in reached]))
                 if base > 0:
-                    ratio = f"{med / base:,.0f}×"
+                    ratio = f"{mean / base:,.0f}×"
             trows.append([
                 f"{init} · {arm}",
                 C.cell([1000 * r["seconds_to_heuristic"] for r in reached],
@@ -394,6 +412,62 @@ def _emit(records, args, seeds, inits, arm_names):
               "Single-threaded throughout, so no arm can buy time with cores — "
               "which also means an optimizer that parallelises well gets no "
               "credit here."))
+
+def _reemit_timing(label, args):
+    """Rebuild one archive's timing table from its own seeds CSV.
+
+    The timing table is a pure function of columns the per-seed CSV already
+    holds, so a change to how it is *rendered* — a statistic made consistent, a
+    misleading label fixed — should not cost a re-run. The measurements are
+    untouched; only the presentation is recomputed, and the archive's
+    PROVENANCE.txt records that it happened.
+    """
+    import csv
+    import shutil
+
+    dest = os.path.join(C.OUTPUT_DIR, label)
+    src = os.path.join(dest, "table_opt_phishing_seeds.csv")
+    if not os.path.exists(src):
+        raise SystemExit(f"no seeds CSV in {label}")
+    with open(src) as f:
+        rows = list(csv.DictReader(f))
+
+    def num(r, k):
+        try:
+            return float(r[k])
+        except (KeyError, TypeError, ValueError):
+            return None
+
+    records = []
+    for r in rows:
+        stoh = num(r, "seconds_to_heuristic")
+        records.append({
+            "arm": r["arm"], "init": r["init"], "seed": r["seed"],
+            "seconds": num(r, "seconds") or 0.0,
+            "seconds_to_heuristic": stoh,
+            "construction_seconds": num(r, "construction_seconds") or 0.0,
+            "screen_seconds": num(r, "screen_seconds") or 0.0,
+            "n_params": 0, "n_mfs": 0, "n_train": 0,
+        })
+    inits = list(dict.fromkeys(r["init"] for r in records))
+    arm_names = list(dict.fromkeys(r["arm"] for r in records))
+    _emit_timing(records, inits, arm_names)
+    for name in ("table_opt_phishing_timing.md", "table_opt_phishing_timing.csv"):
+        out = os.path.join(C.OUTPUT_DIR, name)
+        if os.path.exists(out):
+            shutil.copy2(out, os.path.join(dest, name))
+    with open(os.path.join(dest, "PROVENANCE.txt"), "a") as f:
+        f.write("\n"
+                "NOTE, appended after the run\n"
+                "---------------------------\n"
+                "table_opt_phishing_timing.{md,csv} were re-emitted from this\n"
+                "archive's own table_opt_phishing_seeds.csv via --reemit-timing.\n"
+                "No measurement changed. Two rendering faults were fixed: the\n"
+                "ratio column used medians while the column beside it used\n"
+                "mean +/- s.d., and the hot rows read '0'/'0x' where the truth is\n"
+                "that a hot arm starts at the construction.\n")
+    print(f"  re-emitted timing table -> {os.path.relpath(dest, ROOT)}")
+    return 0
 
 
 def _archive(label, args, seeds, inits, arm_names):
