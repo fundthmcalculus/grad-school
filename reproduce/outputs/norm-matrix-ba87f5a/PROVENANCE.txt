@@ -1,0 +1,10 @@
+label:       norm-matrix-ba87f5a
+generated:   2026-08-01T18:57:21Z
+tribble-fis: ba87f5a33409ef3640c1b75418ef2661154431db
+grad-school: c76939d1b8121701025fa8f4b1ef2bb16edb6c09
+seeds:       0,1,2,3,4 (default)
+families:    min/max,probability,luk,hamacher,einstein
+phiusiil_n:  20000
+
+status:
+  table_norm_conorm_matrix               ok (no skipped cells)

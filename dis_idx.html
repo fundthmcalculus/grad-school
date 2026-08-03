@@ -1,0 +1,552 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><script type="text/javascript" src="https://web-static.archive.org/_static/js/bundle-playback.js?v=2N_sDSC0" charset="utf-8"></script>
+<script type="text/javascript" src="https://web-static.archive.org/_static/js/wombat.js?v=o9P2E1FK" charset="utf-8"></script>
+<script>window.RufflePlayer=window.RufflePlayer||{};window.RufflePlayer.config={"autoplay":"on","unmuteOverlay":"hidden","showSwfDownload":true};</script>
+<script type="text/javascript" src="https://web-static.archive.org/_static/js/ruffle/ruffle.js"></script>
+<script type="text/javascript">
+    __wm.init("http://web.archive.org/web");
+  __wm.wombat("http://prtools.tudelft.nl/disdatasets/index.html","20220119051542","http://web.archive.org/","web","https://web-static.archive.org/_static/",
+	      "1642569342");
+</script>
+<link rel="stylesheet" type="text/css" href="https://web-static.archive.org/_static/css/banner-styles.css?v=1utQkbB3" />
+<link rel="stylesheet" type="text/css" href="https://web-static.archive.org/_static/css/iconochive.css?v=3PDvdIFv" />
+<!-- End Wayback Rewrite JS Include -->
+<title>Dissimilarity Datasets</title>
+<meta content="MSHTML 6.00.6000.17080" name="GENERATOR">
+<meta http-equiv="Content-Type" content="text/html; charset=unicode"></head>
+<body bgcolor="#ffffff">
+<h3 align="center">
+<table cellspacing="0" cellpadding="3" width="100%" align="center" border="0">
+  <tbody>
+  <tr>
+    <td valign="baseline">
+      <p align="left"><img hspace="0" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/prlogo_text.png" width="130" border="0"></p></td>
+    <td>
+      <h3 align="center">Dissimilarity Datasets for Pattern Recognition</h3></td>
+    <td>
+      <p align="right"><img hspace="0" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/simbad.png" width="100" border="0"></p></td></tr></tbody></table></h3>
+<p align="left">On this page information and links are given for a number of&nbsp; 
+dissimilarity datasets collected by the <a href="http://web.archive.org/web/20220119051542/http://prlab.tudelft.nl/">Pattern Recognition Lab</a> of <a href="http://web.archive.org/web/20220119051542/http://www.tudelft.nl/">Delft University of Technology</a>. They are 
+stored as Matlab's&nbsp; mat-files and are in the dataset format of <a href="http://web.archive.org/web/20220119051542/http://prtools.org/">PRTools</a>. Without PRTools it is a Matlab structure 
+<font face="Courier">d</font> with the data in <font face="Courier">d.data</font>, a 
+label index in <font face="Courier">d.nlab</font> pointing to class names in <font face="Courier">d.lablist</font>. A number of these datasets are collected with 
+support of the&nbsp; FET programme within the EU FP7, under the <a href="http://web.archive.org/web/20220119051542/http://simbad-fp7.eu/">SIMBAD</a> project (contract 213250).</p>
+<p align="left">
+<table cellspacing="0" cellpadding="3" width="400" align="left" border="1">
+  <tbody>
+  <tr>
+    <td>Name</td>
+    <td align="middle"># matrices</td>
+    <td align="middle">#&nbsp;classes</td>
+    <td align="right"># objects</td></tr>
+  <tr>
+    <td><a href="#Balss3D">Balls3D</a></td>
+    <td align="middle">1</td>
+    <td align="middle">2</td>
+    <td align="right">200</td></tr>
+  <tr>
+    <td><a href="#Balls50D">Balls50D</a></td>
+    <td align="middle">1</td>
+    <td align="middle">4</td>
+    <td align="right">2000</td></tr>
+  <tr>
+    <td><a href="#CatCortex">CatCortex</a></td>
+    <td align="middle">1</td>
+    <td align="middle">4</td>
+    <td align="right">65</td></tr>
+  <tr>
+    <td><a href="#Chickenpieces">Chickenpieces</a></td>
+    <td align="middle">44</td>
+    <td align="middle">5</td>
+    <td align="right">446</td></tr>
+  <tr>
+    <td><a href="#CoilDelftDiff">CoilDelftDiff</a>,</td>
+    <td align="middle">1</td>
+    <td align="middle">4</td>
+    <td align="right">288</td></tr>
+  <tr>
+    <td><a href="#CoilDelftSame">CoilDelftSame</a></td>
+    <td align="middle">1</td>
+    <td align="middle">4</td>
+    <td align="right">288</td></tr>
+  <tr>
+    <td><a href="#CoilYork">CoilYork</a></td>
+    <td align="middle">1</td>
+    <td align="middle">4</td>
+    <td align="right">288</td></tr>
+  <tr>
+    <td><a href="#DelftGestures">DelftGestures</a></td>
+    <td align="middle">1</td>
+    <td align="middle">20</td>
+    <td align="right">1500</td></tr>
+  <tr>
+    <td><a href="#FlowCyto">FlowCyto</a></td>
+    <td align="middle">4</td>
+    <td align="middle">3</td>
+    <td align="right">612</td></tr>
+  <tr>
+    <td><a href="#GaussM1">GaussM1</a></td>
+    <td align="middle">1</td>
+    <td align="middle">2</td>
+    <td align="right">2000</td></tr>
+  <tr>
+    <td><a href="#GaussM02">GaussM02</a></td>
+    <td align="middle">1</td>
+    <td align="middle">2</td>
+    <td align="right">2000</td></tr>
+  <tr>
+    <td><a href="#NewsGroups">NewsGroups</a></td>
+    <td align="middle">1</td>
+    <td align="middle">4</td>
+    <td align="right">600</td></tr>
+  <tr>
+    <td><a href="#PolyDisH57">PolyDisH57</a></td>
+    <td align="middle">1</td>
+    <td align="middle">2</td>
+    <td align="right">3000</td></tr>
+  <tr>
+    <td><a href="#PolyDisM57">PolyDisM57</a></td>
+    <td align="middle">1</td>
+    <td align="middle">2</td>
+    <td align="right">3000</td></tr>
+  <tr>
+    <td><a href="#ProDom">ProDom</a></td>
+    <td align="middle">1</td>
+    <td align="middle">4</td>
+    <td align="right">2604</td></tr>
+  <tr>
+    <td><a href="#Protein">Protein</a></td>
+    <td align="middle">1</td>
+    <td align="middle">4</td>
+    <td align="right">213</td></tr>
+  <tr>
+    <td><a href="#WoodyPlants50">WoodyPlants50</a></td>
+    <td align="middle">1</td>
+    <td align="middle">14</td>
+    <td align="right">791</td></tr>
+  <tr>
+    <td><a href="#Zongker">Zongker</a></td>
+    <td align="middle">1</td>
+    <td align="middle">10</td>
+    <td align="right">2000</td></tr></tbody></table></p>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p><br>&nbsp;</p></blockquote>
+<p dir="ltr">&nbsp;</p>
+<p dir="ltr" align="left">&nbsp;</p>
+<p dir="ltr" align="left"><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="Balss3D"></a>Balls3D</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This dataset has been generated by the DisTools command genballd([100 100], 
+  3, [0.02 0.04]) which generates the given numbers of 3-D balls with sizes 
+  [0.02 0.04] in a 3-D hypercube. Balls do not overlap. Dissimilarities are 
+  computed as the shortest distance between two points on the surface of two 
+  balls. The intention is to study strong examples in which non-Euclidean 
+  dissimilarities are informative.</p></blockquote>
+<h4>References</h4>
+<ul>
+  <li>E. Pekalska, A. Harol, R.P.W. Duin, D. Spillman, and H. Bunke, 
+  Non-Euclidean or nonmetric measures can be informative, in: D.-Y. Yeung et 
+  al., Proc. SSSPR2006 Lecture Notes in Comp. Sc., vol. 4109, Springer, Berlin, 
+  2006, 871-880. 
+  <li>R.P.W. Duin, E. Pekalska, A. Harol, W.J. Lee, and H. Bunke, On Euclidean 
+  corrections for non-Euclidean dissimilarities, in: N. da Vitoria Lobo et al., 
+  Proc. SSSPR2008, Lecture Notes in Comp.Sc., vol. 5342, Springer, Berlin, 2008, 
+  551-561. 
+  <li>J. Laub, V. Roth, J.M. Buhmann, K.R. Mueller, On the information and 
+  representation of non-euclidean pairwise data, Pattern Recognition, vol. 39, 
+  2006, 1815-1826.</li></ul>
+<p><strong>Links</strong>: &nbsp;<a href="http://web.archive.org/web/20220119051542/http://prtools.org/">PRTools</a>, <a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/DisTools.zip">DisTools toolbox</a>, <a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/balls3d.zip">Balls3D dataset</a><br><br></p>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"><o:p></o:p></p>
+<h3><a name="Balls50D"></a>Balls50D</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This dataset has been generated by the DisTools command GENBALLD([500 500 
+  500 500], 50, [0.01 0.02 0.04 0.08]) which generates the given numbers of 50-D 
+  balls with sizes [0.01 0.02 0.04 0.08] in a50-D hypercube. Balls do not 
+  overlap. Dissimilarities are computed as the shortest distance between two 
+  points on the surface of two balls. The intention is to study strong examples 
+  in which non-Euclidean dissimilarities are informative.</p></blockquote>
+<h4>References</h4>
+<ul>
+  <li>E. Pekalska, A. Harol, R.P.W. Duin, D. Spillman, and H. Bunke, 
+  Non-Euclidean or nonmetric measures can be informative, in: D.-Y. Yeung et 
+  al., Proc. SSSPR2006 Lecture Notes in Comp. Sc., vol. 4109, Springer, Berlin, 
+  2006, 871-880. 
+  <li>R.P.W. Duin, E. Pekalska, A. Harol, W.J. Lee, and H. Bunke, On Euclidean 
+  corrections for non-Euclidean dissimilarities, in: N. da Vitoria Lobo et al., 
+  Proc. SSSPR2008, Lecture Notes in Comp.Sc., vol. 5342, Springer, Berlin, 2008, 
+  551-561. 
+  <li>J. Laub, V. Roth, J.M. Buhmann, K.R. Mueller, On the information and 
+  representation of&nbsp; non-euclidean pairwise data, Pattern Recognition, vol. 
+  39, 2006, 1815-1826.</li></ul>
+<p><strong>Links</strong>: &nbsp;<a href="http://web.archive.org/web/20220119051542/http://prtools.org/">PRTools</a>, <a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/DisTools.zip">DisTools toolbox</a>, <a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/balls50d.zip">Balls50D dataset</a><br><br><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="CatCortex"></a>CatCortex</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>The cat-cortex data set is provided as a 65x65 dissimilarity matrix 
+  describing the connection strengths between 65 cortical areas of a cat from 
+  four regions (classes): auditory (A), frontolimbic (F), somatosensory (S) and 
+  visual (V). The data was collected by [Scannell] and used for classication 
+  [Graepel] and clustering [Denoeux and Masson]. The dissimilarity values are 
+  measured on an ordinal scale.</p></blockquote>
+<h4>References</h4>
+<ul>
+  <li>J. Scannell, C. Blakemore, M. Young, Analysis of connectivity in the cat 
+  cerebral cortex.&nbsp; Journal of Neuroscience, vol. 15, 1463-1483, 1995. 
+  <li>T. Graepel, R. Herbrich, P. Bollmann-Sdorra, K. Obermayer, Classification 
+  on pairwise proximity data. In Advances in Neural Information System 
+  Processing vol. 11, 438-444, 1999. 
+  <li>T. Denoeux, T. and M.-H. Masson, EVCLUS: Evidential clustering of 
+  proximity data. IEEE Transations on Systems, Man and Cybernetics, vol. 34, 
+  95-109, 2004.</li></ul>
+<h4>Links</h4>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://www.hds.utc.fr/? tdenoeux/software.htm">The original 
+  data</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/catcortex.zip">The PRTools version of 
+  the data</a>&nbsp;</li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="CoilDelftDiff"></a>CoilDelftDiff</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This is a dissimilarity matrix between set of graphs derived from four 
+  objects of the COIL database computed by Richard Wilson. The graphs are the 
+  Delaunay triangulations derived from corner points found in these images, see 
+  [Xia and Hancock]. Graphs are compared in the eigenspace with a dimensionality 
+  determined by the smallest graph in every pairwise comparison by the JoEig 
+  approach. see [Lee and Duin].</p></blockquote>
+<h4>References</h4>
+<ul>
+  <li>B. Xiao and E. R. Hancock. Geometric characterisation of graphs. ICIAP 
+  2005, LNCS 3617:471-478, 2005 
+  <li>W.J. Lee and R.P.W. Duin, An Inexact Graph Comparison Approach in Joint 
+  Eigenspace, in: N. da Vitoria Lobo et al. (eds.), Proc. SSSPR2008, Lecture 
+  Notes in Computer Science, vol. 5342, Springer, Berlin, 2008, 35-44.</li></ul>
+<p><strong>Links</strong>: <a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/CoilDelftDiff.zip">The PRTools version of the 
+data</a></p>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="CoilDelftSame"></a>CoilDelftSame</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This is a dissimilarity matrix between set of graphs derived from four 
+  objects of the COIL database computed by Richard Wilson. The graphs are the 
+  Delaunay triangulations derived from corner points found in these images, see 
+  [Xia and Hancock]. Distances are obtained in a pairwise fashion in a 5D space 
+  of eigenvectors derived from the two graphs by the JoEig approach, see [Lee 
+  and Duin].</p></blockquote>
+<h4>References</h4>
+<ul>
+  <li>B. Xiao and E. R. Hancock. Geometric characterisation of graphs. ICIAP 
+  2005, LNCS 3617:471-478, 2005 
+  <li>W.J. Lee and R.P.W. Duin, An Inexact Graph Comparison Approach in Joint 
+  Eigenspace, in: N. da Vitoria Lobo et al. (eds.), Proc. SSSPR2008, Lecture 
+  Notes in Computer Science, vol. 5342, Springer, Berlin, 2008, 35-44.</li></ul>
+<p><strong>Link</strong>: <a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/CoilDelftSame.zip">The PRTools version of the 
+data</a></p>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"><o:p></o:p></p>
+<h3><a name="CoilYork"></a>CoilYork</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This is a dissimilarity matrix between set of graphs derived from four 
+  objects of the COIL database computed by Richard Wilson. The graphs are the 
+  Delaunay triangulations derived from corner points found in these images, see 
+  [Xia and Hancock]. The distance matrix is constructed by graph matching, using 
+  the algorithm of [Gold and Ranguranjan]</p></blockquote>
+<p><strong>References</strong></p>
+<ul>
+  <li>B. Xiao and E. R. Hancock. Geometric characterisation of graphs. ICIAP 
+  2005, LNCS 3617:471-478, 2005 
+  <li>S. Gold and A. Rangarajan. A graduated assignment algorithm for graph 
+  matching. IEEE Transactions on Pattern Analysis and Machine Intelligence, 
+  18:377-388, 1996.</li></ul>
+<p><strong>Link</strong>: <a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/CoilYork.zip">The 
+PRTools version of the data</a></p>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"><o:p></o:p></p>
+<h3><a name="DelftGestures"></a>DelftGestures</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This dataset consists of the dissimilarities computed from a set of 
+  gestures in a sign-language study. They are measured by two video cameras 
+  observing the positions the two hands in 75 repititions of creating 20 
+  different signs. The dissimilarities result from a dynamic time warping 
+  procedure. The experiments are performed by Gineke ten Holt, Jeroen Arendsen 
+  Robbert Eggermont and Jeroen Lichtenauer who also prepared the 
+dataset.</p></blockquote>
+<p><strong>Reference</strong></p>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>Jeroen Lichtenauer, Emile A. Hendriks, Marcel J. T. Reinders: Sign Language 
+  Recognition by Combining Statistical DTW and Independent Classification. IEEE 
+  Trans. Pattern Anal.&nbsp; Mach. Intell. vol. 30, 2040-2046, 
+2008.</p></blockquote>
+<p><strong>Link</strong>: <a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/delftgestures.zip">The PRTools version of the 
+data</a></p>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"><o:p></o:p></p>
+<h3><a name="FlowCyto"></a>FlowCyto</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This dissimilarity dataset is based on 612 FL3-A DNA flowcytometer 
+  histograms from breast cancer tissues in 256 resolution. The initial data were 
+  acquired by M. Nap and N.&nbsp; van Rodijnen of the Atrium Medical Center in 
+  Heerlen, The Netherlands, during 2000-2004, using tubes 3, 4,5 and 6 of a DACO 
+  Galaxy flowcytometer. There are thereby 4 datasets. Histograms are labeled in 
+  3 classes: aneuploid (335 patients), diploid (131) and tetraploid (146). 
+  Dissimilarities between normalized histograms are computed using the L1 norm, 
+  correcting for possible different calibration factors.</p></blockquote>
+<p><strong>Links</strong></p>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/flowcytohist.zip">The original 4 sets of 
+  histograms</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/flowcytodis.zip">The PRTools version of 
+  the 4 dissimilarity matrices</a><br></li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="GaussM1"></a>GaussM1</h3>
+<p>The dissimilarity dataset consists of the L1 distances between all points 
+of&nbsp;&nbsp;&nbsp;two 20-dimensional Gaussian distributed sets of 1000 points 
+each. Variances in&nbsp; all directions for both sets are 1. The means of the 
+two sets are equal, except for the first dimension, where they have a distance 
+1.&nbsp;&nbsp;&nbsp;The&nbsp;&nbsp;20-dimensional set of points is generated by 
+the PRTools command <font face="Courier">gendats([1000 1000],20)</font>.</p>
+<p><strong>Links</strong></p>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/">PRTools</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/gaussm1.zip">The dissimilarity dataset 
+  GaussM1</a></li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="GaussM1"></a><a name="GaussM02"><a name="GaussM02"></a>GaussM02</h3>
+<p>The dissimilarity dataset consists of the Minkowsky 0.2 distances between 
+all&nbsp; points of two 20-dimensional Gaussian distributed sets of 1000 points 
+each.&nbsp;&nbsp;Variances in all directions for both sets are 1. The means of 
+the two sets are equal, except for the first dimension, where they have a 
+distance 1.&nbsp;&nbsp;The&nbsp;&nbsp;20-dimensional set of points is generated 
+by the PRTools command <font face="Courier">gendats([1000,1000],20)</font>.</p>
+<p><strong>Links</strong></p>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/">PRTools</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/gaussm02.zip">The dissimilarity dataset 
+  GaussM02</a></li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"><o:p></o:p></p>
+<h3><a name="NewsGroups"></a>NewsGroups</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This is a small part of the so-called 20Newsgroups data, as considered by 
+  Roweis. A nonmetric correlation measure for messages from four classes of 
+  newsgroups, .comp.*., .rec.*., .sci.*. and .talk.*. are computed on the 
+  occurrence for 100 words across 16242 postings.</p></blockquote>
+<p><strong>Reference</strong></p>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>E. Pekalska and R.P.W. Duin, The Dissimilarity Representation for Pattern 
+  Recognition, Foundations and Applications, World Scientific, Singapore, 
+  2005.</p></blockquote>
+<p><strong>Links</strong></p>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://people.csail.mit.edu/jrennie/20Newsgroups/">The original 
+  data</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/newsgroups.zip">The PRTools version of 
+  the dissimilarity matrix</a></li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="PolyDisH57"></a>PolyDisH57</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>These are the Hausdorff distances between two randomly generated sets of 
+  polygons, pentagons and heptagons, both possibly non-convex. Means are made 
+  equal and scales are normalized before the distances are computed, but the 
+  polygons are not rotated.</p></blockquote>
+<p><strong>References</strong></p>
+<ul>
+  <li>A.K. Jain and D. Zongker, Representation and recognition of handwritten 
+  digits using deformable templates, PAMI, vol. 19, no. 12, 1997, 1386-1391. 
+  <li>E. Pekalska and R.P.W. Duin, The Dissimilarity Representation for Pattern 
+  Recognition, Foundations and Applications, World Scientific, Singapore, 
+  2005.</li></ul>
+<p><strong>Links</strong></p>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/polydish57.zip">The PRTools version of 
+  PolyDisH57</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/polygons57.zip">Matlab files&nbsp;with 
+  the polygons</a></li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="PolyDisM57"></a>PolyDisM57</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>These are the modified Hausdorff distances between two randomly generated 
+  sets of polygons, pentagons and heptagons, both possibly non-convex. Means are 
+  made equal and scales are normalized before the distances are computed, but 
+  the polygons are not rotated.</p></blockquote>
+<p><strong>References</strong></p>
+<ul>
+  <li>M.-P. Dubuisson and A.K. Jain, Modified Hausdorff distance for object 
+  matching, Proceedings 12th IAPR International Conference on Pattern 
+  Recognition (Jerusalem, October 9-13, 1994), vol. 1, IEEE, Piscataway, NJ, 
+  USA,94CH3440-5, 1994, 566-568. 
+  <li>E. Pekalska and R.P.W. Duin, The Dissimilarity Representation for Pattern 
+  Recognition, Foundations and Applications, World Scientific, Singapore, 
+  2005.</li></ul>
+<p><strong>Links</strong></p>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/polydism57.zip">The PRTools version of 
+  PolyDisM57</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/polygons57.zip">Matlab files&nbsp;with 
+  the polygons</a><br></li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="ProDom"></a>ProDom</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>ProDom is a comprehensive set of protein domain families [Corpet]. A ProDom 
+  subset of 2604 protein domain sequences from the ProDom set was selected by 
+  [Roth]. These are chosen based on a high similarity to at least one sequence 
+  contained in the first four folds of the SCOP database. The pairwise 
+  structural alignments are computed [Roth]. Each SCOP sequence belongs to a 
+  group, as labeled by the experts [Murzin]. The same four classes are assigned 
+  here.</p></blockquote>
+<p><strong>References</strong></p>
+<ul>
+  <li>V. Roth, J. Laub, J.M. Buhmann, and K.-R. Mueller, Going metric: Denoising 
+  pairwise data, Advances in Neural Information Processing Systems, 841-856, MIT 
+  Press, 2003. 
+  <li>F. Corpet, F. Servant, J. Gouzy and D. Kahn, ProDom and ProDom-CG: tools 
+  for protein domain analysis and whole genome comparisons, Nucleid Acids Res., 
+  vol. 28, 267-269, 2000. 
+  <li>A.G. Murzin, S.E. Brenner, T. Hubbard and C. Chothia, SCOP: a structural 
+  classification of proteins database for the investigation of sequences and 
+  structures, Journal of Molecular Biology, vol. 247, 536-540, 1995.</li></ul>
+<p><strong>Links</strong></p>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/prodom.zip">The PRTools version of 
+  ProDom</a><br></p></blockquote>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="Protein"></a>Protein</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>The protein data are provided as a 213x213 dissimilarity matrix comparing 
+  the protein sequences based on the concept of an evolutionary distance. It was 
+  used for classification in [Graepel] and for clustering in [Denoeux and 
+  Masson]. There are four classes of globins: heterogeneous globin (G), 
+  hemoglobin-A (HA), hemoglobin-B (HB) and myoglobin (M).</p></blockquote>
+<p><strong>References</strong></p>
+<ul dir="ltr">
+  <li>
+  <div style="MARGIN-RIGHT: 0px">T. Graepel, R. Herbrich, P. Bollmann-Sdorra, K. 
+  Obermayer, Classification on pairwise proximity data. In Advances in Neural 
+  Information System Processing vol. 11, 438-444, 1999.</div>
+  <li>
+  <div style="MARGIN-RIGHT: 0px">T. Denoeux, T. and M.-H. Masson, EVCLUS: 
+  Evidential clustering of proximity data. IEEE Transations on Systems, Man and 
+  Cybernetics, vol. 34, 95-109, 2004.</div></li></ul>
+<p><strong>Links</strong></p>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://www.hds.utc.fr/tdenoeux/software.htm">The original 
+  data</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/protein.zip">The PRTools version of 
+  Protein</a> </li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="WoodyPlants50"></a>WoodyPlants50</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>This dataset of shape dissimilarities between leaves is a small part of the 
+  data that is collected in a study on woody plants. This particular subset has 
+  been donated by David Jacobs of University College Maryland and consists out 
+  of examples of 14 species for which more than 50 leaves per class are 
+  avialable.</p></blockquote>
+<p><strong>References</strong></p>
+<ul>
+  <li>Agarwal, G., Belhumeur, P., Feiner, S., Jacobs, D., Kress, W.J., 
+  Ramamoorthi, R., Bourg, N., Dixit, N., Ling, H., Mahajan, D.,Russell, R., 
+  Shirdhonkar, S., Sunkavalli, K., and 
+  <li>White, S., First Steps Toward an Electronic Field Guide for Plants, Taxon, 
+  Journal of the International Association for Plant Taxonomy, vol. 55, August 
+  2006, 597610. 
+  <li>Ling, H., and Jacobs, D.W., Shape Classification Using the Inner-Distance, 
+  IEEE Trans on Pattern Anal. and Mach. Intell. (PAMI), vol. 29, no. 2, 286-299, 
+  2007.</li></ul>
+<p><strong>Links</strong></p>
+<ul>
+  <li><a href="http://web.archive.org/web/20220119051542/http://herbarium.cs.columbia.edu/About.html">The Woody Plant 
+  project website</a> 
+  <li><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/woodyplants50.zip">The PRTools version 
+  of WoodyPlants50</a><br></li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="Zongker"></a>Zongker</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>These similarities between 2000 handwritten digits in 10 classes are based 
+  on deformable template matching. The dissimilarity measure is the result of an 
+  iterative optimization of the non-linear deformation of the grid, see the 
+  study by Jain and Zongker. The data has been made available by them to 
+  Pekalska who used it in slightly modified version (symmetrized 
+  dissimilarities) in several studies.</p></blockquote>
+<p><strong>References</strong></p>
+<ul>
+  <li>A.K. Jain and D. Zongker, Representation and recognition of handwritten 
+  digits using deformable templates, PAMI, vol. 19, no. 12, 1997, 1386-1391. 
+  <li>E. Pekalska and R.P.W. Duin, The Dissimilarity Representation for Pattern 
+  Recognition, Foundations and Applications, World Scientific, Singapore, 
+  2005.</li></ul>
+<p><strong>Link</strong></p>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/zongker.zip">The PRTools version of the 
+  dataset</a></p></blockquote>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<h3><a name="Chickenpieces"></a>Chickenpieces</h3>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>There are 44 dissimilarity matrices made available by Bunke et.al. for the 
+  Chickenpieces&nbsp;binary images based&nbsp;on shape&nbsp;distances between 
+  the contours.&nbsp; Every entry in a dissimilarity matrix is a weighted edit 
+  distance between two strings representing the contours of 2D blobs. Contours 
+  are approximated by vectors of lengths 5, 7, 10, 15, 20, 25, 29, 30, 31, 35 
+  and 40. Angles between vectors are used as replacement costs. The costs for 
+  insertion and deletion are for every of these 11 lengths taken as 45, 60, 90 
+  and 120.</p></blockquote>
+<p><strong>Reference</strong></p>
+<blockquote dir="ltr" style="MARGIN-RIGHT: 0px">
+  <p>H. Bunke, H., U. Buhler, Applications of approximate string matching to 2D 
+  shape recognition, Pattern recognition 26 (1993) 1797-1812</p></blockquote>
+<p><strong>Links</strong></p>
+<ul dir="ltr">
+  <li>
+  <div style="MARGIN-RIGHT: 0px"><a href="http://web.archive.org/web/20220119051542/http://www.iam.unibe.ch/fki/databases/string-edit-distance-matrices">The 
+  original dissimilarity datasets</a> </div>
+  <li>
+  <div style="MARGIN-RIGHT: 0px"><a href="http://web.archive.org/web/20220119051542/http://algoval.essex.ac.uk/data/sequence/chicken/">The original 
+  images</a> </div>
+  <li>
+  <div style="MARGIN-RIGHT: 0px"><a href="http://web.archive.org/web/20220119051542/http://prtools.org/disdatasets/chickenpieces.zip">The PRTools versions of the 
+  datasets</a></div></li></ul>
+<p><img id="_x0000_i1025" height="18" src="/web/20220119051542im_/http://prtools.tudelft.nl/disdatasets/colorbar.gif" width="300" border="0"></p><o:p></o:p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p align="center"><font size="1">This Web Page Created with PageBreeze </font><a href="http://web.archive.org/web/20220119051542/http://www.pagebreeze.com/" target="_blank"><font size="1">Free HTML 
+Editor</font></a></p></body></html>
+<!--
+     FILE ARCHIVED ON 05:15:42 Jan 19, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 00:11:04 Aug 01, 2026.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->
+<!--
+playback timings (ms):
+  captures_list: 0.324
+  exclusion.robots: 0.031
+  exclusion.robots.policy: 0.025
+  esindex: 0.005
+  cdx.remote: 8.712
+  LoadShardBlock: 62.214 (3)
+  PetaboxLoader3.datanode: 130.666 (5)
+  PetaboxLoader3.resolve: 3284.318 (2)
+  load_resource: 3363.201
+  loaddict: 77.802
+-->

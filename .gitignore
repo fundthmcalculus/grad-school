@@ -8,3 +8,20 @@ presentations/node_modules/
 /ivat-C256-48G.png
 /ivat-paths-256.png
 /N256-10000P.png
+/IRIS.csv
+/heart_2020_cleaned.csv
+/turbine-data.csv
+/gated-minimax-selection/outputs/
+/dominant-colors.jpg
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Editor swap / backup files. A Vim swapfile was committed once (57dc1a4) by an
+# auto-staging hook while a doc was open; these keep that from recurring.
+*.swp
+*.swo
+*~
+*.orig
+*.rej

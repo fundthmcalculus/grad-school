@@ -1,0 +1,12 @@
+[submodule "tribble-fis"]
+	path = tribble-fis
+	url = https://github.com/fundthmcalculus/tribble-fis
+	branch = main
+[submodule "tribble-opt"]
+	path = tribble-opt
+	url = https://github.com/fundthmcalculus/optimizers
+	branch = main
+[submodule "tribble-cluster"]
+	path = tribble-cluster
+	url = https://github.com/fundthmcalculus/clustering
+	branch = main
