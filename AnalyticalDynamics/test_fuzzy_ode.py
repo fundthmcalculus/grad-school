@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from pandas import DataFrame
 
-from tests.ode_helpers import angles_to_xy, set_axes_style
-from tests.odemodel import OdeSystem
+from ode_helpers import angles_to_xy, set_axes_style
+from odemodel import OdeSystem
 from tribblefis.gaussian_regressor import MimoGaussianPredictor
 
 
