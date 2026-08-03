@@ -71,6 +71,35 @@ Generated figures are **gitignored for now** — regenerate rather than commit
 them. The labelled run archives under `outputs/<label>/` are tracked, because
 they are the evidence a later diff is taken against.
 
+## Controlled experiments on the harness itself
+
+`experiments/run_note12_threading.py` is a different kind of runner: instead of
+producing a proposal table it runs one *stock* generator many times over with a
+single environment variable changed, to test a claim about the harness rather than
+about the research. It exists because note 12 in `PROVENANCE_MAP.md` asserted a
+cause — a BLAS/threading difference behind Table A.2's non-portable bhattacharyya
+column — that had never been measured.
+
+```bash
+export PYTHONIOENCODING=utf-8
+uv run --project tribble-fis python reproduce/experiments/run_note12_threading.py
+uv run --project tribble-fis python reproduce/experiments/run_note12_threading.py \
+    --vary coretype
+```
+
+Findings are written up in `outputs/NOTE12_THREADING.md` and the per-setting
+tables are kept under `outputs/note12-threading/`. Two conventions from it are
+worth reusing for anything of this shape: the pass/fail outcomes are **registered
+in the script's docstring before it is run**, and it prints a **manipulation
+check** — evidence that the variable it claims to have varied actually changed
+something — because an invariance result is worthless if the knob never bit, and
+"the environment variable was ignored" is indistinguishable from "this variable
+does not matter".
+
+Redirect the destination of any generator with `REPRO_OUTPUT_DIR`; that override
+exists so repeated runs of one generator do not overwrite each other at the
+canonical path.
+
 ## Layout
 
 ```
