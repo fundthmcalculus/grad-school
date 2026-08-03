@@ -435,10 +435,27 @@ def main():
             return
         print("  [warn] LaTeX build failed; falling back to WeasyPrint")
     else:
+        # The hint has to match the host it is printed on. This used to offer a
+        # `sudo zypper` line unconditionally, which is wrong advice on the machine the
+        # proposal is actually built on: a Windows workstation, where it sends the
+        # reader looking for a package manager that is not there. The document assembles
+        # and every image resolves on this host; only the PDF stage is blocked, so the
+        # instruction is the whole value of this branch.
         print("  [note] No LaTeX engine found (xelatex/lualatex/pdflatex/tectonic).")
-        print("         For publication-grade math, install one, e.g.:")
-        print("           sudo zypper install texlive-xetex texlive-latex "
-              "texlive-collection-fontsrecommended")
+        print("         The combined Markdown above is complete; only the PDF needs one.")
+        print("         For publication-grade math, install one:")
+        if sys.platform == "win32":
+            print("           winget install MiKTeX.MiKTeX      (or TeX Live, or")
+            print("           tectonic -- a single self-contained binary, smallest option)")
+            print("         WeasyPrint is NOT a usable fallback here: it needs the GTK")
+            print("         libraries (libgobject-2.0-0), which Windows does not ship.")
+        elif sys.platform == "darwin":
+            print("           brew install --cask mactex-no-gui   (or `brew install tectonic`)")
+        else:
+            print("           apt:    sudo apt install texlive-xetex texlive-latex-recommended")
+            print("           zypper: sudo zypper install texlive-xetex texlive-latex "
+                  "texlive-collection-fontsrecommended")
+            print("           or:     cargo install tectonic")
         print("         Falling back to pandoc --mathml + WeasyPrint for now.")
 
     out = build_with_weasyprint(md_path, pandoc)
