@@ -27,6 +27,14 @@ import shutil
 import subprocess
 import sys
 
+# This script both reads UTF-8 prose and prints ✓/✗ progress marks. Windows
+# defaults stdout to cp1252, which encodes neither, so the build died in its own
+# progress print *after* assembling the document -- the same failure shape as the
+# harness emitters and the Chapter 5 driver. Every file open here pins UTF-8 for
+# the reading half; this covers the printing half.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 BUILD = os.path.join(HERE, "build")
 
@@ -120,7 +128,10 @@ def read(rel):
     if not os.path.exists(path):
         print(f"  [warn] missing {rel}")
         return None
-    with open(path) as f:
+    # UTF-8 explicitly: the prose carries em dashes, times signs and Greek, and the
+    # platform default is cp1252 on Windows, which cannot decode them. This build died
+    # on chapters/09-publications.md byte 0x8f before the fix.
+    with open(path, encoding="utf-8") as f:
         return f.read()
 
 
@@ -198,7 +209,7 @@ def assemble():
         print(f"  + {rel}")
     combined = "\n\n\n".join(parts)
     md_path = os.path.join(BUILD, "proposal-combined.md")
-    with open(md_path, "w") as f:
+    with open(md_path, "w", encoding="utf-8") as f:
         f.write(combined)
     print(f"  wrote {md_path}")
 
@@ -259,7 +270,7 @@ def build_with_latex(md_path, pandoc, engine):
     """The proper path: pandoc -> LaTeX -> PDF. Full math support."""
     pdf = os.path.join(BUILD, "proposal.pdf")
     src = os.path.join(BUILD, "proposal-titled.md")
-    with open(md_path) as f:
+    with open(md_path, encoding="utf-8") as f:
         body = f.read()
 
     # Construct title page with department and committee info
@@ -287,7 +298,7 @@ def build_with_latex(md_path, pandoc, engine):
 ```
 """
 
-    with open(src, "w") as f:
+    with open(src, "w", encoding="utf-8") as f:
         f.write(title_page + body)
     prose_dir = os.path.join(HERE, "prose")
     cmd = [pandoc, src, "-o", pdf,
@@ -330,7 +341,7 @@ def build_with_weasyprint(md_path, pandoc):
       <p class="meta">{DEPT.replace(chr(92) * 2, '<br>')}</p>
       <p class="committee">{COMMITTEE}</p>
       <p class="datestr">Dissertation Proposal · Draft</p></div>"""
-    with open(html_path) as f:
+    with open(html_path, encoding="utf-8") as f:
         html = f.read()
     html = html.replace("<body>", "<body>" + title_html, 1)
 
@@ -339,7 +350,7 @@ def build_with_weasyprint(md_path, pandoc):
     # the interim PDF at least shows each formula once. (The real fix is a LaTeX
     # engine -- see main().)
     html = re.sub(r"<annotation\b[^>]*>.*?</annotation>", "", html, flags=re.DOTALL)
-    with open(html_path, "w") as f:      # keep the on-disk HTML in sync with the PDF
+    with open(html_path, "w", encoding="utf-8") as f:      # keep the on-disk HTML in sync with the PDF
         f.write(html)
 
     css = CSS(string="""
