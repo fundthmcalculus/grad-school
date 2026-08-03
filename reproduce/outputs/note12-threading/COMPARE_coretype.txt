@@ -1,0 +1,75 @@
+Note 12 -- coretype vs Table A.2 accuracy
+  generator : C:\personal\grad-school\reproduce\tables\table_a1_feature_scoring.py
+  varying   : coretype over ['Haswell', 'Sandybridge', 'Nehalem', 'Prescott']
+  seeds     : 0,1,2,3,4,5,6,7,8,9
+  out       : C:\personal\grad-school\reproduce\outputs\note12-threading
+  [blas] openblas 0.3.31.188.0 arch=Haswell threads=24 prefix=libscipy_openblas
+  [blas] openblas 0.3.30 arch=Haswell threads=24 prefix=libscipy_openblas
+
+--- A.2 accuracy across coretype settings ---
+
+  wasserstein: accuracy vs OPENBLAS_CORETYPE (reference = Haswell)
+    k           Haswell   Sandybridge       Nehalem      Prescott     max |Δ|
+    1            0.9967        0.9967        0.9967        0.9967      0.0000
+    2            0.9967        0.9967        0.9967        0.9967      0.0000
+    3            0.9967        0.9967        0.9967        0.9967      0.0000
+    4            0.9967        0.9967        0.9967        0.9967      0.0000
+    5            0.9966        0.9966        0.9966        0.9966      0.0000
+    7            0.9998        0.9998        0.9998        0.9998      0.0000
+    10           0.9995        0.9995        0.9995        0.9995      0.0000
+    15           0.9974        0.9974        0.9974        0.9974      0.0000
+    20           0.9990        0.9990        0.9990        0.9990      0.0000
+    max |Δ| over the whole column: 0.000000  -> identical
+
+  bhattacharyya: accuracy vs OPENBLAS_CORETYPE (reference = Haswell)
+    k           Haswell   Sandybridge       Nehalem      Prescott     max |Δ|
+    1            0.4267        0.4267        0.4267        0.4267      0.0000
+    2            0.4527        0.4527        0.4527        0.4527      0.0000
+    3            0.8455        0.8455        0.8455        0.8455      0.0000
+    4            0.9160        0.9160        0.9160        0.9160      0.0000
+    5            0.9456        0.9456        0.9456        0.9456      0.0000
+    7            0.9610        0.9610        0.9610        0.9610      0.0000
+    10           0.9676        0.9676        0.9676        0.9676      0.0000
+    15           0.9765        0.9765        0.9765        0.9765      0.0000
+    20           0.9777        0.9777        0.9777        0.9777      0.0000
+    max |Δ| over the whole column: 0.000000  -> identical
+
+  composite: accuracy vs OPENBLAS_CORETYPE (reference = Haswell)
+    k           Haswell   Sandybridge       Nehalem      Prescott     max |Δ|
+    1            0.4267        0.4267        0.4267        0.4267      0.0000
+    2            0.9967        0.9967        0.9967        0.9967      0.0000
+    3            0.9967        0.9967        0.9967        0.9967      0.0000
+    4            0.9966        0.9966        0.9966        0.9966      0.0000
+    5            0.9966        0.9966        0.9966        0.9966      0.0000
+    7            0.9967        0.9967        0.9967        0.9967      0.0000
+    10           0.9980        0.9980        0.9980        0.9980      0.0000
+    15           0.9999        0.9999        0.9999        0.9999      0.0000
+    20           0.9995        0.9995        0.9995        0.9995      0.0000
+    max |Δ| over the whole column: 0.000000  -> identical
+
+  Manipulation check -- total A.2 fit seconds per run (sum over scorers and k, mean per seed):
+    Haswell           31.93 s
+    Sandybridge       32.18 s
+    Nehalem           31.86 s
+    Prescott          31.68 s
+    spread 1.6%  (FAIL: needs >= 5% for the invariance to mean anything)
+    OPENBLAS_CORETYPE loaded but did not measurably change execution, so
+    an unchanged accuracy is WEAK evidence rather than a
+    refutation -- the workload may simply not exercise what this
+    variable controls.
+
+  A.1 ranking (input control): identical at every setting
+
+  Against the archive (main-d0efefc): max |Δ accuracy| per column
+    core                 wasserstein     bhattacharyya         composite
+    Haswell                   0.0017            0.0427            0.0001
+    Sandybridge               0.0017            0.0427            0.0001
+    Nehalem                   0.0017            0.0427            0.0001
+    Prescott                  0.0017            0.0427            0.0001
+
+--- verdict ---
+  INCONCLUSIVE. Every accuracy column is invariant to coretype,
+  but the manipulation check failed: the variable loaded and
+  changed no measurable amount of work, so this workload does not
+  exercise what it controls and the invariance is not evidence
+  either way. Do not record this as a refutation.

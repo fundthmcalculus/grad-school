@@ -116,7 +116,7 @@ because the plateau contaminated the fit. **CHECKLIST C2b, which asks what the
 | 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** — claim retracted, note 3 |
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
 | 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
-| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent |
+| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **reproduced** — note 6 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **reproduced** — note 6 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
@@ -147,13 +147,56 @@ drag the mean — and a 3-seed run simply missed them. Ch 7's G5, previously mar
 "settled (complete)" with "quantile by default", is reopened; the recommendation
 is withdrawn and the diagnosis kept.
 
-**Note 5.** Re-quoted at 10 seeds. Tables 4.4/4.5 now read flat R² −0.005 / 0.783
-/ 0.829, rising to 0.869 at full second order, with CART 0.825 ± 0.047 and RF
-0.909 ± 0.018. The old 0.797/0.904 pair appears in no archive and came from a
-3-seed run predating every run under `outputs/`. The zeroth-order figure is worth
-keeping visible rather than dropping: with constant consequents the model is no
-better than predicting the mean, which makes first-order consequents a
-requirement here rather than a refinement.
+**Note 5.** Re-quoted at 10 seeds. Tables 4.4/4.5 read flat R² **−0.334 / 0.772 /
+0.824** at TSK orders 0 / 1 / 2, with CART 0.825 ± 0.047 and RF 0.909 ± 0.018 —
+all four from the run of record `full-14900hx-r2`, and matching the prose. The old
+0.797/0.904 pair appears in no archive and came from a 3-seed run predating every
+run under `outputs/`. The zeroth-order figure is worth keeping visible rather than
+dropping: with constant consequents the model is no better than predicting the
+mean, which makes first-order consequents a requirement here rather than a
+refinement.
+
+*This note itself was stale and is corrected above.* It previously read
+"−0.005 / 0.783 / 0.829, rising to 0.869 at full second order." Those are
+`seeds10-2026-08-01` / `full-2026-08-02` values, superseded by `main-d0efefc` and
+then by `full-14900hx-r2`, and none of them is what the prose says. A provenance
+map quoting numbers a reader cannot find in the prose or in the run of record
+inverts its own purpose — it becomes a fourth version of the table. Cross-check
+this file's inline figures against the run of record when the run of record moves.
+
+**Note 14 — Table 4.5's two MoG rows are not the same measurement.** The
+1st-order row (R² 0.780 ± 0.029, 1.04 ± 0.62 s) comes from
+`table_4_1_mog_baselines.py`, which drives the
+`MixtureOfGaussiansFuzzyRegressor` estimator. The full-second-order row's
+R² 0.859 ± 0.039 comes from **`table_hyperparam_normalization.py`** (Table 4.1's
+study), which drives `solve_tsk_consequents` / `predict_tsk` directly and
+standardizes the target. Two implementations of the same idea, in adjacent rows of
+a table whose caption promises "identical splits."
+
+The gap is measurable, not theoretical. `table_4_1_mog_baselines.py` now carries a
+timed full-2nd arm on the estimator path; at ten seeds it scores
+**R² 0.840 ± 0.049 in 0.83 ± 0.01 s** (`outputs/table45-full2nd/`) against the
+functional path's 0.859 ± 0.039 — a 0.019 difference between two things the
+document treats as one number. So the row's `*pending*` training-time cell was
+**not** filled with the 0.83 s: pairing that time with the 0.859 above it would be
+the same quiet mismatch, one generator over, as the earlier version of this table
+that paired a normalized accuracy with a raw-feature time. The cell is marked and
+the reason stated; filling it properly means timing the functional pipeline, which
+no generator does.
+
+Two related timing observations from the same run, both wall-clock rather than
+result, and neither yet acted on:
+
+- **Full second order is not slower than first order** here — 0.83 s against
+  1.04 s — and it is far steadier (±0.01 against ±0.62).
+- **That ±0.62 is a warm-up artifact, not variance.** The Concrete arm runs first
+  in the process and absorbs first-fit costs; the arms that run after it come back
+  at ±0.01 to ±0.03 in the same run, and the same pattern holds in every archive
+  (Concrete first at ±0.62, PhiUSIIL second at ±0.02). A ±60% deviation on the
+  headline cell of a table whose whole point is a speed claim should not be read
+  as seed-to-seed spread. The fix is a discarded warm-up fit before timing begins;
+  it would change Table 4.5's quoted time, so it is flagged here rather than done
+  in passing.
 
 **Note 6 — re-quoted twice, and the ordering flipped both times.** Tables 4.6/4.7
 originally quoted the pre-`pin_extremes` path. Current values are 10-seed, from
@@ -236,8 +279,8 @@ renderer emits both so the choice is visible rather than implicit.
 |---|---|---|---|
 | 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7 |
 | 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **reproduced** at 10 seeds — note 8 |
-| 6.3 Interpretability | *none* | — | **ungenerated** — structural by design |
-| 6.4 Memory augmentation | `tribble-fis/tests/test_double_pendulum.py` | none | **ungenerated** — entry point unconfirmed |
+| 6.3 Interpretability | *none* | — | **ungenerated** — structural by design; the counts row is checklist C9 / Goal G6 |
+| 6.4 Memory augmentation | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **ungenerated** — entry point now located, but single-seed and outside the harness — note 13 |
 
 **Note 7 — one seed in ten destroys this cell, and that is the finding.** Table
 6.1 is re-quoted at 10 seeds: flat 2nd-refined 0.875 ± 0.019, fuzzy tree
@@ -260,7 +303,31 @@ and library defaults**, which is why every cell sits below Table 6.1's; the two
 must not be read as one series. Its PhiUSIIL column is now filled and shows the
 dataset is saturated — CART and RF both reach 1.000, the fuzzy models 0.970–0.997
 — so PhiUSIIL discriminates between these methods hardly at all and should carry
-no weight in the comparison.
+no weight in the comparison. Its **M5 row is blocked on a dependency, not on an
+experiment**: the generator already imports `m5py` optionally and would fill the
+row unattended, but `m5py` does not load against scikit-learn 1.9.0 —
+`ImportError: cannot import name 'DTYPE' from 'sklearn.tree._classes'` — and
+pinning an older scikit-learn to rescue two cells would move every other number
+in the chapter. Measured on this host 2026-08-02.
+
+**Note 13 — Table 6.4's entry point is located, and it is still not quotable.**
+This row said `tribble-fis/tests/test_double_pendulum.py`, and Chapter 6's
+reproduction paragraph said the experiment lived in `tribble-fis`. **Neither is
+true** — no such file exists in that submodule. The scripts are in *this*
+repository, at `AnalyticalDynamics/test_double_pendulum.py` and
+`AnalyticalDynamics/test_atwood_machine.py`; the Atwood one simulates its own
+trajectories and reports R² and RMSE for a single-step and a window-of-3
+(memory-augmented) model, which is exactly the comparison the table wants.
+
+Finding them does not fill the table. Both run at one fixed `random_state=42`,
+neither goes through `reproduce/common.py`, and neither emits a CSV — so what
+they print is a one-seed point estimate, the thing the ten-seed floor exists to
+keep out of the document. Wiring them into the harness is checklist **C7**, which
+also owes a reconciliation the located code makes more urgent: Table 6.4's two
+double-pendulum pairs disagree about the target's scale (0.92/0.045 implies
+σ ≈ 0.159, 0.96/0.028 implies σ ≈ 0.140), so the headline "38% error reduction"
+should be read as an order of magnitude and not as two significant figures until
+both rows are re-measured under one protocol.
 
 ---
 
@@ -277,27 +344,68 @@ Table 7.1 is a goals-and-status matrix, not a measurement. No generator applies.
 | A.1 Feature ranking by scorer | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a1_feature_ranking.{md,csv}` | **reproduced** — all 20 cells identical to `main-d0efefc` |
 | A.2 Accuracy and fit time vs features kept | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a2_feature_count.{md,csv}` | **reproduced within a host**; the bhattacharyya accuracies are **not host-portable** — note 12 |
 
-**Note 12 — one arm of A.2 moves between environments, and it is the arm the
-appendix is least resting on.** Against `main-d0efefc`, at the same `tribble-fis`
-commit, the same ten seeds and an *identical* A.1 ranking, every bhattacharyya
-accuracy in A.2 sits higher: +0.017 at 4 features, +0.033 at 5, +0.043 at 7,
-+0.040 at 10, +0.029 at 15, +0.030 at 20. Wasserstein and composite agree to
-within 0.0002 everywhere.
+**Note 12 — one arm of A.2 moves between environments, it is the arm the appendix
+is least resting on, and the cause is now measured rather than guessed.** Against
+`main-d0efefc`, at the same `tribble-fis` commit, the same ten seeds and a
+*byte-identical* A.1 ranking, A.2's bhattacharyya accuracies sit higher on this
+host from four features on: +0.0174 at 4, +0.0325 at 5, +0.0427 at 7, +0.0402 at
+10, +0.0288 at 15, +0.0300 at 20. At one and two features the two runs agree
+exactly and at three this host is 0.0002 *lower* — the divergence appears only
+once the model has enough features to fit something, so whatever causes it acts on
+the fit and not on the ranking or the data. (An earlier version of this note said
+"every" accuracy sits higher, and put the control columns' agreement at 0.0002
+everywhere. Composite's largest deviation is indeed 0.0001, but **wasserstein's is
+0.0017**, at 15 features — eight times the figure quoted. Two orders below
+bhattacharyya's 0.0427, so the argument holds and the number did not.)
 
 This is not nondeterminism. Two complete sweeps on this host
 (`full-14900hx-2026-08-02` and `full-14900hx-r2`) reproduce **every one of those
-accuracies exactly**; only fit times move. It is an environment difference, and
-it could not be narrowed further because no archive before this one recorded the
-numeric stack — `PROVENANCE.txt` now carries numpy/scipy/sklearn and the BLAS
-build for that reason.
+accuracies exactly**; only fit times move.
 
-The arm that moved is the ill-conditioned one, which is what a BLAS or threading
-difference would look like: bhattacharyya's own ranking scores 0.4267 at one
-feature, so its models are fitted on poor features and sit where small numerical
-differences change the outcome. **Do not quote A.2's bhattacharyya cells to four
-decimals across machines.** A.4's actual argument is untouched — it rests on
-wasserstein 0.9967 against bhattacharyya 0.4267 at a single feature, a gap of
-0.57 against a host effect of 0.04.
+**The standing hypothesis — a BLAS/threading difference — was tested and it does
+not hold.** `reproduce/experiments/run_note12_threading.py`, ten seeds, full grid,
+all three scorers, one variable at a time; write-up in
+`outputs/NOTE12_THREADING.md`, per-setting tables in `outputs/note12-threading/`.
+
+| Variable | Range | Did the knob bite? | Accuracy effect | Verdict |
+|---|---|---|---|---|
+| Thread count (`OMP`/`OPENBLAS`/`MKL`…) | 1 → 32 | yes — 140% runtime spread | **0.000000** in all 27 cells | **refuted** |
+| BLAS kernel family (`OPENBLAS_CORETYPE`) | Haswell → Katmai (SSE-only) | **no** — 1.6% runtime spread | **0.000000** in all 27 cells | **inconclusive** |
+
+Thread count is excluded outright: it moves this generator's wall clock by 2.4×
+and moves the reported accuracy by nothing. The kernel-family sweep is reported as
+inconclusive rather than as a second refutation because its manipulation check
+failed — dropping OpenBLAS from AVX2 to SSE-only changed runtime by 1.6%, so the
+variable loaded and then did nothing this workload can feel, and an unchanged
+accuracy says nothing either way.
+
+That failed check is the more useful finding, because it undercuts the *framing*
+rather than one branch of it: a computation this insensitive to which vector
+instruction path executes it is not spending its time in the BLAS, so "a BLAS
+difference" is an unlikely explanation for a 0.043 swing in it. What is left is
+the part of the stack this workload does use and that does differ — numpy 2.4.6 /
+scipy 1.17.1 / scikit-learn 1.9.0 here against an **unrecorded** stack there.
+`main-d0efefc/PROVENANCE.txt` has no machine block at all, and `logs/` has no
+`table_a1_feature_scoring.log`: those A.2 numbers came from a hand run outside the
+orchestrator. The generator itself is byte-identical between that archive's
+`grad-school` commit and now, so code, commit, seeds and data are all ruled out.
+
+The next experiment is cheap and no longer needs a second machine: re-run the
+generator on this host against pinned older library versions (`uv run --with
+'numpy==2.1.*' --with 'scikit-learn==1.5.*'`). If a downgrade reproduces the
+archive column, note 12 is solved. One direction stays closed —
+`OPENBLAS_CORETYPE=SkylakeX` faults on Raptor Lake rather than falling back, so
+the AVX-512 kernels the suspected archive host (i7-1185G7, Tiger Lake) would have
+used cannot be tested from here.
+
+**Do not quote A.2's bhattacharyya cells to four decimals across machines** — the
+guidance is unchanged. Its positive half is now stronger than before: within one
+environment that column survives four thread counts, four BLAS kernel families and
+two independent full sweeps, all bit-identical. It is reproducible on a fixed
+environment and not portable off it. A.4's actual argument is untouched either way
+— it rests on wasserstein 0.9967 against bhattacharyya 0.4267 at a single feature,
+a gap of 0.57 against an environment effect of 0.043 and a thread-count effect of
+exactly zero.
 
 ---
 
@@ -323,7 +431,11 @@ all of those are within noise.
 
 So "the harness is deterministic" is now a measured claim rather than an
 assumption, with one boundary worth stating precisely: it is deterministic **on
-one host with one numeric stack**. Note 12 is the counterexample across hosts,
+one host with one numeric stack**, and note 12 now sharpens both halves of that:
+A.2's sensitive column is invariant to thread count (1 → 32) and to BLAS kernel
+family (AVX2 → SSE-only) on this host, so "one host" is a stronger guarantee than
+it was, while the across-host difference survives every in-environment knob
+measured. Note 12 is the counterexample across hosts,
 and note 11 is why wall-clock cells must never be diffed as if they were results.
 
 Before this pass, `tribble-fis` was checked out at `d0d6714` — the *pre-fix*

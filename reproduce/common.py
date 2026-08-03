@@ -27,8 +27,16 @@ from contextlib import contextmanager
 SEEDS = [int(s) for s in
          os.environ.get("REPRO_SEEDS", "0,1,2,3,4,5,6,7,8,9").split(",")]
 
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                          "reproduce", "outputs")
+# Where emit() writes. `REPRO_OUTPUT_DIR` redirects it, which is what the
+# controlled experiments under reproduce/experiments/ use: they run a *stock*
+# generator many times over with one variable changed, and each repetition has to
+# land somewhere of its own. Without the override every repetition overwrites the
+# previous one at the canonical path, so the comparison the experiment exists to
+# make is destroyed by the act of making it -- and the loose top-level files are
+# gitignored scratch, so nothing would survive to diff afterwards either.
+OUTPUT_DIR = os.environ.get("REPRO_OUTPUT_DIR") or os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "reproduce", "outputs")
 
 NA = "N/A"          # column that genuinely could not be produced (missing dep/data)
 
