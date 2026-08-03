@@ -307,9 +307,20 @@ def main():
 
     if args.since:
         rc = 0
+        # Document-wide totals as well as per file, because a token MOVED between two
+        # files is lost from one and gained by the other. Per file that reads as a
+        # deletion plus an unexplained addition; across the document it is neither. A
+        # relocation pass -- pulling retraction history out of Chapter 7 into a new
+        # appendix section -- is exactly the case the per-file view cannot judge, so it
+        # is the aggregate that decides whether anything actually went missing.
+        from collections import Counter
+        doc_was, doc_now = Counter(), Counter()
         print(f"prose numeric literals: {args.since} -> working tree")
         print(f"{'':-<78}")
         for name, lost, gained, was, now in since(args.since, args.chapter):
+            if was is not None:
+                doc_was += was
+                doc_now += now
             if lost is None:
                 print(f"  {name:46s} not present at {args.since}")
                 continue
@@ -328,11 +339,23 @@ def main():
                 print(f"      {tag} {tok:>14s}   {was[tok]} -> {after}")
             for tok, n in sorted(gained.items()):
                 print(f"      new    {tok:>14s}   {was.get(tok, 0)} -> {now[tok]}")
+        doc_lost, doc_gained = doc_was - doc_now, doc_now - doc_was
+        gone = {t: n for t, n in doc_lost.items() if doc_now.get(t, 0) == 0}
+        print(f"{'':-<78}")
+        if not doc_lost and not doc_gained:
+            print("  WHOLE DOCUMENT: identical")
+        else:
+            print(f"  WHOLE DOCUMENT: {len(gone)} token(s) gone, "
+                  f"{len(doc_lost) - len(gone)} de-duplicated, "
+                  f"{len(doc_gained)} new")
+            for tok in sorted(gone):
+                print(f"      GONE   {tok:>14s}   {doc_was[tok]} -> 0")
         print("")
-        print("Read the GONE lines. `de-dup` is a repeated fact stated fewer times,")
-        print("which is what a compression pass is for; `GONE` is a number's only")
-        print("mention disappearing, which is what it must never do.")
-        return rc
+        print("Read the WHOLE DOCUMENT line first. A token moved between two files is")
+        print("lost from one and gained by the other, so only the aggregate can say")
+        print("whether a fact left the document. Per file, `de-dup` is a repeated fact")
+        print("stated fewer times, which is what a compression pass is for.")
+        return 1 if gone else 0
 
     if not args.archive:
         ap.error("an archive label is required unless --since is given")
