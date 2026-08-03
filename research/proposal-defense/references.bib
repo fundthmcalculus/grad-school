@@ -1,0 +1,555 @@
+% ===========================================================================
+% references.bib  --  consolidated bibliography for the dissertation proposal
+%   "Reproducing Like Tribbles: Scaling Fuzzy Inference Systems from Hundreds
+%    to Hundreds of Thousands"  --  Scott Phillips
+%
+% Assembled from tribble-fis/tribble-tree/hfis_review.bib (Mechanisms 1-9,
+% verified) plus the VAT/clustering, persistence, optimization, and
+% interpretability entries the proposal cites.
+%
+% Verification legend:
+%   [V] adversarially verified / confirmed from publisher-index this session
+%   [S] standard well-known DOI for a seminal work; spot-check at proof stage
+%   [?] added from working knowledge, pending verification.
+%       NOTE: all [?] entries were resolved in the 2026-07-31 verification
+%       pass (Crossref / arXiv / DBLP) and promoted to [V]; the marker is
+%       kept in the legend for any future additions. One proof-stage check
+%       remains: confirm the "Kali{\v{s}}nik" accent survives BibTeX encoding
+%       (automato2024).
+% ===========================================================================
+
+
+% ####################  FUZZY INFERENCE SYSTEMS / TREES / HME  ###############
+% (imported verbatim from hfis_review.bib -- already verified there)
+
+@article{takagi1985fuzzy,                       % [V]
+  author  = {Takagi, Tomohiro and Sugeno, Michio},
+  title   = {Fuzzy Identification of Systems and Its Applications to Modeling and Control},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics},
+  volume  = {SMC-15}, number = {1}, pages = {116--132}, year = {1985},
+  doi     = {10.1109/TSMC.1985.6313399}}
+
+@article{jang1993anfis,                         % [V]
+  author  = {Jang, Jyh-Shing Roger},
+  title   = {{ANFIS}: Adaptive-Network-Based Fuzzy Inference System},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics},
+  volume  = {23}, number = {3}, pages = {665--685}, year = {1993},
+  doi     = {10.1109/21.256541}}
+
+@article{wu2020optimize,                        % [V]
+  author  = {Wu, Dongrui and Yuan, Ye and Huang, Jian and Tan, Yihua},
+  title   = {Optimize {Takagi--Sugeno--Kang} Fuzzy Systems for Regression Problems:
+             Minibatch Gradient Descent with Regularization, {DropRule}, and {AdaBound} ({MBGD-RDA})},
+  journal = {IEEE Transactions on Fuzzy Systems},
+  volume  = {28}, number = {5}, pages = {1003--1015}, year = {2020},
+  doi     = {10.1109/TFUZZ.2019.2958559}, note = {arXiv:1903.10951}}
+
+@article{sugeno1993qualitative,                 % [V]
+  author  = {Sugeno, Michio and Yasukawa, Takahiro},
+  title   = {A Fuzzy-Logic-Based Approach to Qualitative Modeling},
+  journal = {IEEE Transactions on Fuzzy Systems},
+  volume  = {1}, number = {1}, pages = {7--31}, year = {1993},
+  doi     = {10.1109/TFUZZ.1993.390281}}
+
+@article{wang1992generating,                    % [V]
+  author  = {Wang, Li-Xin and Mendel, Jerry M.},
+  title   = {Generating Fuzzy Rules by Learning from Examples},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics},
+  volume  = {22}, number = {6}, pages = {1414--1427}, year = {1992},
+  doi     = {10.1109/21.199466}}
+
+@article{chiu1994fuzzy,                          % [V]
+  author  = {Chiu, Stephen L.},
+  title   = {Fuzzy Model Identification Based on Cluster Estimation},
+  journal = {Journal of Intelligent and Fuzzy Systems},
+  volume  = {2}, number = {3}, pages = {267--278}, year = {1994},
+  doi     = {10.3233/IFS-1994-2306}}
+
+@article{jang1993functional,                    % [V]
+  author  = {Jang, Jyh-Shing Roger and Sun, Chuen-Tsai},
+  title   = {Functional Equivalence Between Radial Basis Function Networks and Fuzzy Inference Systems},
+  journal = {IEEE Transactions on Neural Networks},
+  volume  = {4}, number = {1}, pages = {156--159}, year = {1993},
+  doi     = {10.1109/72.182710}}
+
+@article{abe1995method,                          % [V]
+  author  = {Abe, Shigeo and Lan, Ming-Shong},
+  title   = {A Method for Fuzzy Rules Extraction Directly from Numerical Data and
+             Its Application to Pattern Classification},
+  journal = {IEEE Transactions on Fuzzy Systems},
+  volume  = {3}, number = {1}, pages = {18--28}, year = {1995},
+  doi     = {10.1109/91.366565}}
+
+@book{cordon2001genetic,                        % [V]
+  author    = {Cord{\'o}n, Oscar and Herrera, Francisco and Hoffmann, Frank and Magdalena, Luis},
+  title     = {Genetic Fuzzy Systems: Evolutionary Tuning and Learning of Fuzzy Knowledge Bases},
+  publisher = {World Scientific}, year = {2001}, doi = {10.1142/4177}}
+
+@article{herrera2008genetic,                    % [V]
+  author  = {Herrera, Francisco},
+  title   = {Genetic Fuzzy Systems: Taxonomy, Current Research Trends and Prospects},
+  journal = {Evolutionary Intelligence},
+  volume  = {1}, number = {1}, pages = {27--46}, year = {2008},
+  doi     = {10.1007/s12065-007-0001-5}}
+
+@article{alcala2007rule,                        % [V]
+  author  = {Alcal{\'a}, Rafael and Alcal{\'a}-Fdez, Jes{\'u}s and Gacto, Mar{\'i}a Jos{\'e} and Herrera, Francisco},
+  title   = {Rule Base Reduction and Genetic Tuning of Fuzzy Systems Based on the Linguistic 3-Tuples Representation},
+  journal = {Soft Computing},
+  volume  = {11}, number = {5}, pages = {401--419}, year = {2007},
+  doi     = {10.1007/s00500-006-0106-2}}
+
+@article{janikow1998fuzzy,                      % [V]
+  author  = {Janikow, Cezary Z.},
+  title   = {Fuzzy Decision Trees: Issues and Methods},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics)},
+  volume  = {28}, number = {1}, pages = {1--14}, year = {1998},
+  doi     = {10.1109/3477.658573}}
+
+@article{yuan1995induction,                     % [V]
+  author  = {Yuan, Yufei and Shaw, Michael J.},
+  title   = {Induction of Fuzzy Decision Trees},
+  journal = {Fuzzy Sets and Systems},
+  volume  = {69}, number = {2}, pages = {125--139}, year = {1995},
+  doi     = {10.1016/0165-0114(94)00229-Z}}
+
+@article{suarez1999globally,                    % [V]
+  author  = {Su{\'a}rez, Alberto and Lutsko, James F.},
+  title   = {Globally Optimal Fuzzy Decision Trees for Classification and Regression},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {21}, number = {12}, pages = {1297--1311}, year = {1999},
+  doi     = {10.1109/34.817409}}
+
+@article{olaru2003complete,                     % [V]
+  author  = {Olaru, Cristina and Wehenkel, Louis},
+  title   = {A Complete Fuzzy Decision Tree Technique},
+  journal = {Fuzzy Sets and Systems},
+  volume  = {138}, number = {2}, pages = {221--254}, year = {2003},
+  doi     = {10.1016/S0165-0114(03)00089-7}}
+
+@inproceedings{medina2001backpropagation,       % [V]
+  author    = {Medina-Chico, V{\'i}ctor and Su{\'a}rez, Alberto and Lutsko, James F.},
+  title     = {Backpropagation in Decision Trees for Regression},
+  booktitle = {Machine Learning: ECML 2001},
+  series    = {Lecture Notes in Computer Science}, volume = {2167},
+  pages     = {348--359}, publisher = {Springer}, year = {2001},
+  doi       = {10.1007/3-540-44795-4_30}}
+
+@misc{fumanal2025fast,                          % [V]
+  author = {Fumanal-Idocin, Javier and Fernandez-Peralta, Raquel and Andreu-Perez, Javier},
+  title  = {A Fast Interpretable Fuzzy Tree Learner},
+  year   = {2025}, eprint = {2512.11616}, archivePrefix = {arXiv},
+  url    = {https://arxiv.org/abs/2512.11616}}
+
+@article{jordan1994hierarchical,                % [V]
+  author  = {Jordan, Michael I. and Jacobs, Robert A.},
+  title   = {Hierarchical Mixtures of Experts and the {EM} Algorithm},
+  journal = {Neural Computation},
+  volume  = {6}, number = {2}, pages = {181--214}, year = {1994},
+  doi     = {10.1162/neco.1994.6.2.181}}
+
+@article{wu2020functional,                      % [V]
+  author  = {Wu, Dongrui and Lin, Chin-Teng and Huang, Jian and Zeng, Zhigang},
+  title   = {On the Functional Equivalence of {TSK} Fuzzy Systems to Neural Networks,
+             Mixture of Experts, {CART}, and Stacking Ensemble Regression},
+  journal = {IEEE Transactions on Fuzzy Systems},
+  volume  = {28}, number = {10}, pages = {2570--2580}, year = {2020},
+  doi     = {10.1109/TFUZZ.2019.2940153}, note = {arXiv:1903.10572}}
+
+@article{raju1991hierarchical,                  % [V]
+  author  = {Raju, G. V. S. and Zhou, Jun and Kisner, Roger A.},
+  title   = {Hierarchical Fuzzy Control},
+  journal = {International Journal of Control},
+  volume  = {54}, number = {5}, pages = {1201--1216}, year = {1991},
+  doi     = {10.1080/00207179108934205}}
+
+@article{zhou2017deep,                          % [V]
+  author  = {Zhou, Ta and Chung, Fu-Lai and Wang, Shitong},
+  title   = {Deep {TSK} Fuzzy Classifier With Stacked Generalization and Triplely Concise
+             Interpretability Guarantee for Large Data},
+  journal = {IEEE Transactions on Fuzzy Systems},
+  volume  = {25}, number = {5}, pages = {1207--1221}, year = {2017},
+  doi     = {10.1109/TFUZZ.2016.2604003}}
+
+@article{zhang2023tsk,                          % [V] (first author is Zhang, not "H. Wang")
+  author  = {Zhang, Yuanpeng and Wang, Guanjin and Zhou, Ta and Huang, Xiuyu and Lam, Saikit
+             and Sheng, Jie and Choi, Kup-Sze and Cai, Jing and Ding, Weiping},
+  title   = {{Takagi--Sugeno--Kang} Fuzzy System Fusion: A Survey at Hierarchical, Wide and Stacked Levels},
+  journal = {Information Fusion},
+  volume  = {101}, pages = {101977}, year = {2023},
+  doi     = {10.1016/j.inffus.2023.101977}}
+
+@article{ruspini1969new,                        % [S]
+  author  = {Ruspini, Enrique H.},
+  title   = {A New Approach to Clustering},
+  journal = {Information and Control},
+  volume  = {15}, number = {1}, pages = {22--32}, year = {1969},
+  doi     = {10.1016/S0019-9958(69)90591-9}}
+
+@article{guillaume2004generating,               % [S]
+  author  = {Guillaume, Serge and Charnomordic, Brigitte},
+  title   = {Generating an Interpretable Family of Fuzzy Partitions From Data},
+  journal = {IEEE Transactions on Fuzzy Systems},
+  volume  = {12}, number = {3}, pages = {324--335}, year = {2004},
+  doi     = {10.1109/TFUZZ.2004.825979}}
+
+@article{deoliveira1999semantic,                % [S]
+  author  = {{Valente de Oliveira}, Jos{\'e}},
+  title   = {Semantic Constraints for Membership Function Optimization},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics, Part A: Systems and Humans},
+  volume  = {29}, number = {1}, pages = {128--138}, year = {1999},
+  doi     = {10.1109/3468.736369}}
+
+@article{guillaume2006expert,                   % [S]
+  author  = {Guillaume, Serge and Charnomordic, Brigitte},
+  title   = {Expert Guided Integration of Induced Knowledge into a Fuzzy Knowledge Base},
+  journal = {Soft Computing},
+  volume  = {10}, number = {9}, pages = {814--820}, year = {2006},
+  doi     = {10.1007/s00500-005-0007-9}}
+
+@article{guillaume2011learning,                 % [S]
+  author  = {Guillaume, Serge and Charnomordic, Brigitte},
+  title   = {Learning Interpretable Fuzzy Inference Systems with {FisPro}},
+  journal = {Information Sciences},
+  volume  = {181}, number = {20}, pages = {4409--4427}, year = {2011},
+  doi     = {10.1016/j.ins.2011.03.025}}
+
+@article{nanfack2022constraint,                 % [V]
+  author  = {Nanfack, G{\'e}anderson and Temple, Paul and Fr{\'e}nay, Beno{\^i}t},
+  title   = {Constraint Enforcement on Decision Trees: A Survey},
+  journal = {ACM Computing Surveys},
+  volume  = {54}, number = {10s}, pages = {1--36}, year = {2022},
+  doi     = {10.1145/3506734}}
+
+@inproceedings{viola2001rapid,                  % [S]
+  author    = {Viola, Paul and Jones, Michael},
+  title     = {Rapid Object Detection Using a Boosted Cascade of Simple Features},
+  booktitle = {Proceedings of the 2001 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  volume    = {1}, pages = {I-511--I-518}, year = {2001},
+  doi       = {10.1109/CVPR.2001.990517}}
+
+@inproceedings{cavalin2019confusion,            % [V]
+  author    = {Cavalin, Paulo and Oliveira, Luiz},
+  title     = {Confusion Matrix-Based Building of Hierarchical Classification},
+  booktitle = {Progress in Pattern Recognition, Image Analysis, Computer Vision, and Applications (CIARP 2018)},
+  series    = {Lecture Notes in Computer Science}, volume = {11401},
+  pages     = {271--278}, publisher = {Springer}, year = {2019},
+  doi       = {10.1007/978-3-030-13469-3_32}}
+
+@article{wang1998universal,                     % [S]
+  author  = {Wang, Li-Xin},
+  title   = {Universal Approximation by Hierarchical Fuzzy Systems},
+  journal = {Fuzzy Sets and Systems},
+  volume  = {93}, number = {2}, pages = {223--230}, year = {1998},
+  doi     = {10.1016/S0165-0114(96)00197-2}}
+
+@article{wang1999analysis,                      % [S]
+  author  = {Wang, Li-Xin},
+  title   = {Analysis and Design of Hierarchical Fuzzy Systems},
+  journal = {IEEE Transactions on Fuzzy Systems},
+  volume  = {7}, number = {5}, pages = {617--624}, year = {1999},
+  doi     = {10.1109/91.797984}}
+
+@article{joo2002universal,                      % [S]
+  author  = {Joo, Moon G. and Lee, Ju-Jang},
+  title   = {Universal Approximation by Hierarchical Fuzzy System with Constraints on the Fuzzy Rule},
+  journal = {Fuzzy Sets and Systems},
+  volume  = {130}, number = {2}, pages = {175--188}, year = {2002},
+  doi     = {10.1016/S0165-0114(01)00176-2}}
+
+@incollection{magdalena2018do,                  % [S]
+  author    = {Magdalena, Luis},
+  title     = {Do Hierarchical Fuzzy Systems Really Improve Interpretability?},
+  booktitle = {Information Processing and Management of Uncertainty in Knowledge-Based Systems (IPMU 2018)},
+  series    = {Communications in Computer and Information Science}, volume = {853},
+  pages     = {16--26}, publisher = {Springer}, year = {2018},
+  doi       = {10.1007/978-3-319-91473-2_2}}
+
+@article{higashi1983measures,                   % [V]
+  author  = {Higashi, Masahiko and Klir, George J.},
+  title   = {Measures of Uncertainty and Information Based on Possibility Distributions},
+  journal = {International Journal of General Systems},
+  volume  = {9}, number = {1}, pages = {43--58}, year = {1983},
+  doi     = {10.1080/03081078208960799}}
+
+
+% ####################  VAT / iVAT / CLUSTER TENDENCY  ######################
+
+@inproceedings{bezdek2002vat,                   % [V] verified
+  author    = {Bezdek, James C. and Hathaway, Richard J.},
+  title     = {{VAT}: A Tool for Visual Assessment of (Cluster) Tendency},
+  booktitle = {Proceedings of the 2002 International Joint Conference on Neural Networks (IJCNN)},
+  volume    = {3}, pages = {2225--2230}, year = {2002},
+  doi       = {10.1109/IJCNN.2002.1007487}}
+
+@inproceedings{wang2010ivat,                    % [V] verified (LNAI 6118)
+  author    = {Wang, Liang and Nguyen, Uyen T. V. and Bezdek, James C. and Leckie, Christopher A. and Ramamohanarao, Kotagiri},
+  title     = {{iVAT} and {aVAT}: Enhanced Visual Analysis for Cluster Tendency Assessment},
+  booktitle = {Advances in Knowledge Discovery and Data Mining (PAKDD 2010)},
+  series    = {Lecture Notes in Computer Science}, volume = {6118}, pages = {16--27},
+  publisher = {Springer}, year = {2010}, doi = {10.1007/978-3-642-13657-3_5}}
+
+@article{havens2012efficient,                   % [V] verified
+  author  = {Havens, Timothy C. and Bezdek, James C.},
+  title   = {An Efficient Formulation of the Improved Visual Assessment of Cluster Tendency ({iVAT}) Algorithm},
+  journal = {IEEE Transactions on Knowledge and Data Engineering},
+  volume  = {24}, number = {5}, pages = {813--822}, year = {2012},
+  doi     = {10.1109/TKDE.2011.33}}
+
+@article{kumar2016clusivat,                     % [V] verified (clusiVAT journal version)
+  author  = {Kumar, Dheeraj and Bezdek, James C. and Palaniswami, Marimuthu and Rajasegarar, Sutharshan
+             and Leckie, Christopher and Havens, Timothy C.},
+  title   = {A Hybrid Approach to Clustering in Big Data},
+  journal = {IEEE Transactions on Cybernetics},
+  volume  = {46}, number = {10}, pages = {2372--2385}, year = {2016},
+  doi     = {10.1109/TCYB.2015.2477416}}
+
+@article{kumar2020vatsurvey,                    % [V] verified
+  author  = {Kumar, Dheeraj and Bezdek, James C.},
+  title   = {Visual Approaches for Exploratory Data Analysis: A Survey of the Visual
+             Assessment of Clustering Tendency ({VAT}) Family of Algorithms},
+  journal = {IEEE Systems, Man, and Cybernetics Magazine},
+  volume  = {6}, number = {2}, pages = {10--48}, year = {2020},
+  doi     = {10.1109/MSMC.2019.2961163}}
+
+@misc{rathore2020conivat,                       % [V] verified -- arXiv only, no journal DOI found
+  author        = {Rathore, Punit and Bezdek, James C. and Santi, Paolo and Ratti, Carlo},
+  title         = {{ConiVAT}: Cluster Tendency Assessment and Clustering with Partial Background Knowledge},
+  year          = {2020}, eprint = {2008.09570}, archivePrefix = {arXiv}, primaryClass = {cs.LG},
+  note          = {arXiv preprint; not formally published as of verification}}
+
+@article{meng2018evat,                          % [V] verified (this is the "eVAT" GPU paper)
+  author  = {Meng, Tao and Yuan, Bo},
+  title   = {Parallel Edge-Based Visual Assessment of Cluster Tendency on {GPU}},
+  journal = {International Journal of Data Science and Analytics},
+  volume  = {6}, number = {4}, pages = {287--295}, year = {2018},
+  doi     = {10.1007/s41060-018-0100-7}}
+
+@misc{avinash2025fastvat,                       % [V] verified
+  author        = {Avinash, M. S. R. and Lachheb, Ismael},
+  title         = {Fast-{VAT}: Accelerating Cluster Tendency Visualization using {Cython} and {Numba}},
+  year          = {2025}, eprint = {2507.15904}, archivePrefix = {arXiv}, primaryClass = {cs.LG}}
+
+
+% ####################  MST / SINGLE-LINKAGE / FCM  #########################
+
+@article{prim1957shortest,                      % [S]
+  author  = {Prim, Robert C.},
+  title   = {Shortest Connection Networks and Some Generalizations},
+  journal = {The Bell System Technical Journal},
+  volume  = {36}, number = {6}, pages = {1389--1401}, year = {1957},
+  doi     = {10.1002/j.1538-7305.1957.tb01515.x}}
+
+@article{gower1969mst,                          % [S]
+  author  = {Gower, John C. and Ross, G. J. S.},
+  title   = {Minimum Spanning Trees and Single Linkage Cluster Analysis},
+  journal = {Journal of the Royal Statistical Society: Series C (Applied Statistics)},
+  volume  = {18}, number = {1}, pages = {54--64}, year = {1969},
+  doi     = {10.2307/2346439}}
+
+@article{zahn1971graph,                         % [S]
+  author  = {Zahn, Charles T.},
+  title   = {Graph-Theoretical Methods for Detecting and Describing Gestalt Clusters},
+  journal = {IEEE Transactions on Computers},
+  volume  = {C-20}, number = {1}, pages = {68--86}, year = {1971},
+  doi     = {10.1109/T-C.1971.223083}}
+
+@article{dunn1973fuzzy,                          % [S]
+  author  = {Dunn, Joseph C.},
+  title   = {A Fuzzy Relative of the {ISODATA} Process and Its Use in Detecting Compact Well-Separated Clusters},
+  journal = {Journal of Cybernetics},
+  volume  = {3}, number = {3}, pages = {32--57}, year = {1973},
+  doi     = {10.1080/01969727308546046}}
+
+@book{bezdek1981pattern,                        % [S]
+  author    = {Bezdek, James C.},
+  title     = {Pattern Recognition with Fuzzy Objective Function Algorithms},
+  publisher = {Springer (Plenum Press)}, year = {1981},
+  doi       = {10.1007/978-1-4757-0450-1}}
+
+@article{hathaway1994nerf,                       % [V] verified (Crossref)
+  author  = {Hathaway, Richard J. and Bezdek, James C.},
+  title   = {{NERF} c-Means: Non-{E}uclidean Relational Fuzzy Clustering},
+  journal = {Pattern Recognition},
+  volume  = {27}, number = {3}, pages = {429--437}, year = {1994},
+  doi     = {10.1016/0031-3203(94)90119-8}}
+
+@article{bien2011hierarchical,                   % [V] verified (Crossref)
+  author  = {Bien, Jacob and Tibshirani, Robert},
+  title   = {Hierarchical Clustering with Prototypes via Minimax Linkage},
+  journal = {Journal of the American Statistical Association},
+  volume  = {106}, number = {495}, pages = {1075--1084}, year = {2011},
+  doi     = {10.1198/jasa.2011.tm10183}}
+
+@article{tibshirani2001gap,                      % [S]
+  author  = {Tibshirani, Robert and Walther, Guenther and Hastie, Trevor},
+  title   = {Estimating the Number of Clusters in a Data Set via the Gap Statistic},
+  journal = {Journal of the Royal Statistical Society: Series B},
+  volume  = {63}, number = {2}, pages = {411--423}, year = {2001},
+  doi     = {10.1111/1467-9868.00293}}
+
+@article{cate1977insitu,                         % [V] verified (Crossref); Esko G. Cate, David W. Twigg
+  author  = {Cate, Esko G. and Twigg, David W.},
+  title   = {Algorithm 513: Analysis of In-Situ Transposition},
+  journal = {ACM Transactions on Mathematical Software},
+  volume  = {3}, number = {1}, pages = {104--110}, year = {1977},
+  doi     = {10.1145/355719.355729}}
+
+
+% ####################  PERSISTENCE / TDA  ##################################
+
+@article{chazal2013persistence,                 % [V] verified (ToMATo)
+  author    = {Chazal, Fr{\'e}d{\'e}ric and Guibas, Leonidas J. and Oudot, Steve Y. and Skraba, Primoz},
+  title     = {Persistence-Based Clustering in {R}iemannian Manifolds},
+  journal   = {Journal of the ACM},
+  volume    = {60}, number = {6}, articleno = {41}, pages = {41:1--41:38}, year = {2013},
+  doi       = {10.1145/2535927}}
+
+@article{bonis2018fuzzy,                         % [V] verified; the nearest precedent for Ch5
+  author  = {Bonis, Thomas and Oudot, Steve},
+  title   = {A Fuzzy Clustering Algorithm for the Mode-Seeking Framework},
+  journal = {Pattern Recognition Letters},
+  volume  = {102}, pages = {37--43}, year = {2018},
+  doi     = {10.1016/j.patrec.2017.11.019}, note = {arXiv:1406.7130}}
+
+@article{automato2024,                           % [V] verified (title + authors corrected; TMLR 2025)
+  author  = {Huber, Marius and Kali{\v{s}}nik, Sara and Schnider, Patrick},
+  title   = {{AuToMATo}: An Out-Of-The-Box Persistence-Based Clustering Algorithm},
+  journal = {Transactions on Machine Learning Research (TMLR)},
+  year    = {2025}, note = {arXiv:2408.06958 (2024)}}
+
+
+% ####################  OPTIMIZATION / TSP / QUALITY-DIVERSITY  ##############
+
+@article{lin1973effective,                       % [S]
+  author  = {Lin, Shen and Kernighan, Brian W.},
+  title   = {An Effective Heuristic Algorithm for the Traveling-Salesman Problem},
+  journal = {Operations Research},
+  volume  = {21}, number = {2}, pages = {498--516}, year = {1973},
+  doi     = {10.1287/opre.21.2.498}}
+
+@article{helsgaun2000effective,                  % [V] verified (Crossref)
+  author  = {Helsgaun, Keld},
+  title   = {An Effective Implementation of the {Lin--Kernighan} Traveling Salesman Heuristic},
+  journal = {European Journal of Operational Research},
+  volume  = {126}, number = {1}, pages = {106--130}, year = {2000},
+  doi     = {10.1016/S0377-2217(99)00284-2}}
+
+@article{croes1958method,                        % [S]
+  author  = {Croes, G. A.},
+  title   = {A Method for Solving Traveling-Salesman Problems},
+  journal = {Operations Research},
+  volume  = {6}, number = {6}, pages = {791--812}, year = {1958},
+  doi     = {10.1287/opre.6.6.791}}
+
+@article{dorigo1996ant,                          % [S]
+  author  = {Dorigo, Marco and Maniezzo, Vittorio and Colorni, Alberto},
+  title   = {Ant System: Optimization by a Colony of Cooperating Agents},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics, Part B},
+  volume  = {26}, number = {1}, pages = {29--41}, year = {1996},
+  doi     = {10.1109/3477.484436}}
+
+@inproceedings{kennedy1995particle,              % [S]
+  author    = {Kennedy, James and Eberhart, Russell},
+  title     = {Particle Swarm Optimization},
+  booktitle = {Proceedings of the IEEE International Conference on Neural Networks (ICNN)},
+  volume    = {4}, pages = {1942--1948}, year = {1995},
+  doi       = {10.1109/ICNN.1995.488968}}
+
+@article{deb2002nsga2,                           % [S]
+  author  = {Deb, Kalyanmoy and Pratap, Amrit and Agarwal, Sameer and Meyarivan, T.},
+  title   = {A Fast and Elitist Multiobjective Genetic Algorithm: {NSGA-II}},
+  journal = {IEEE Transactions on Evolutionary Computation},
+  volume  = {6}, number = {2}, pages = {182--197}, year = {2002},
+  doi     = {10.1109/4235.996017}}
+
+@misc{mouret2015illuminating,                    % [S]
+  author = {Mouret, Jean-Baptiste and Clune, Jeff},
+  title  = {Illuminating Search Spaces by Mapping Elites},
+  year   = {2015}, eprint = {1504.04909}, archivePrefix = {arXiv}}
+
+@article{vassiliades2018cvt,                      % [V] verified (Crossref)
+  author  = {Vassiliades, Vassilis and Chatzilygeroudis, Konstantinos and Mouret, Jean-Baptiste},
+  title   = {Using Centroidal {V}oronoi Tessellations to Scale Up the Multidimensional
+             Archive of Phenotypic Elites Algorithm},
+  journal = {IEEE Transactions on Evolutionary Computation},
+  volume  = {22}, number = {4}, pages = {623--630}, year = {2018},
+  doi     = {10.1109/TEVC.2017.2735550}}
+
+
+% ####################  SAME-DEPARTMENT PARALLEL WORK  ######################
+% Cited in Ch2 s2.1 as a PARALLEL instance of the same constraint set, explicitly
+% not as a source. See prose/bibliography.md "On the reference proposals".
+
+@phdthesis{arnett2018proposal,                   % [?] confirm exact title/date/type
+  author      = {Arnett, Timothy},
+  title       = {Dissertation Proposal},
+  school      = {University of Cincinnati, Department of Aerospace Engineering and Engineering Mechanics},
+  type        = {Dissertation proposal},
+  year        = {2018}, month = {4},
+  note        = {Unpublished proposal; cited as parallel use of the same FIS constraint set}}
+
+
+% ####################  VAT ORDERING COMPLEXITY / NEAREST PRIOR ART  #########
+% Surfaced by the 2026-07-31 prior-art search. These are load-bearing for Ch3 and
+% for the planned complexity note (Ch9) -- read before writing either.
+
+@article{deshpande2024scalable,                 % [V] title/venue/DOI confirmed; FULL TEXT NOT YET READ
+  author  = {Deshpande, Ojas and Kumar, Dheeraj},
+  title   = {Time and Memory Scalable Algorithms for Clustering Tendency Assessment of Big Data},
+  journal = {Information Sciences},
+  volume  = {664}, pages = {120324}, year = {2024},
+  doi     = {10.1016/j.ins.2024.120324},
+  note    = {Closest prior art to the planned Ch9 note. Proposes BB-VAT, kdT-VAT,
+             TkdT-VAT (attacking the VAT EMST/ordering step itself, sub-quadratic via
+             geometry) and MST-iVAT, which computes the iVAT RDI "without having to
+             compute the full distance matrix". BLOCKING: obtain full text.}}
+
+@inproceedings{parveen2013pvat,                 % [V] -- NAME COLLISION with this work's "pVAT"
+  author    = {Parveen, [given name] and Sreevalsan-Nair, Jaya},
+  title     = {{pVAT}: Parallel {VAT} on the {GPU}},
+  booktitle = {Big Data Analytics (BDA 2013)},
+  series    = {Lecture Notes in Computer Science}, volume = {8302},
+  pages     = {151--170}, publisher = {Springer}, year = {2013},
+  note      = {A published method already named pVAT, which likewise changes the MST
+               algorithm used for the VAT ordering (Prim to Boruvka, on GPU). Verify
+               first author's given name and exact title.}}
+
+@article{havens2009disguise,                    % [V] -- hands a reviewer the Prim/VAT equivalence
+  author  = {Havens, Timothy C. and Bezdek, James C. and Keller, James M. and Popescu, Mihail and Huband, Jacalyn M.},
+  title   = {Is {VAT} Really Single Linkage in Disguise?},
+  journal = {Annals of Mathematics and Artificial Intelligence},
+  volume  = {55}, pages = {237--251}, year = {2009},
+  url     = {https://pages.mtu.edu/~thavens/papers/AMAI_2009_55_Havens.pdf},
+  note    = {Prints Prim's algorithm and the VAT ordering side by side and notes their
+             "almost line-for-line similarity". Bezdek's own group established the
+             equivalence, so a reviewer need not construct it.}}
+
+@article{kumar2016incvat,                       % [V]
+  author  = {Kumar, Dheeraj and Bezdek, James C. and Palaniswami, Marimuthu and Rajasegarar, Sutharshan and Leckie, Christopher},
+  title   = {A Scalable Framework for Clustering Tendency Assessment of Big Data:
+             {inc-VAT}, {dec-VAT}, {inc-iVAT}, {dec-iVAT}},
+  journal = {ACM Transactions on Knowledge Discovery from Data},
+  volume  = {11}, number = {2}, year = {2016},
+  doi     = {10.1145/2997656},
+  note    = {Incremental/decremental update of an existing VAT ordering; the prior work
+             that most directly restructures the sequencing for efficiency. Verify title.}}
+
+@article{mullner2011modern,                     % [?] verify volume/pages
+  author  = {M{\"u}llner, Daniel},
+  title   = {Modern Hierarchical, Agglomerative Clustering Algorithms},
+  journal = {arXiv preprint}, year = {2011},
+  eprint  = {1109.2378}, archivePrefix = {arXiv},
+  note    = {Supplies the O(N) working-memory nearest-neighbour-chain / array-based
+             argument for single-linkage. Via havens2009disguise this transfers directly
+             to VAT, which is the reviewer objection the Ch9 note must answer up front.}}
+
+
+% ####################  INTERPRETABILITY / XAI  #############################
+
+@inproceedings{lundberg2017shap,                 % [S]
+  author    = {Lundberg, Scott M. and Lee, Su-In},
+  title     = {A Unified Approach to Interpreting Model Predictions},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {30}, pages = {4765--4774}, year = {2017},
+  note      = {arXiv:1705.07874}}

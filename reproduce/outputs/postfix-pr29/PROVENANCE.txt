@@ -1,0 +1,36 @@
+label:       postfix-pr29
+generated:   2026-08-01T17:35:58Z
+tribble-fis: d4dd392a278c4a89d865a6c30a82270cfc2581a9
+tribble-cluster: c71171e76fade0bfc3ac9859478dbf45fa9a463e
+grad-school: e8a00b776ae95cb93f8338dc685068c125fc2c32
+seeds:       0,1,2,3,4 (default)
+
+status:
+  table_concrete_reconciliation          ok
+  table_hyperparam_normalization         ok
+  table_g5_output_partitioning           ok
+  table_g5b_skew_sweep                   ok
+  table_4_1_mog_baselines                ok
+  table_6_1_model_family                 ok
+  table_4_4_openset                      no-output (corrected: reported ok by a
+                                         faulty mtime-window check; the script
+                                         wrote nothing -- no glass.csv)
+  table_3_1_pvat_scaling                 ok
+  table_3_1_reorder_three_arm            ok
+
+--- backfill 2026-08-01T17:36:30Z: table_4_4_openset ---
+tribble-fis: d4dd392a278c4a89d865a6c30a82270cfc2581a9
+tribble-cluster: c71171e76fade0bfc3ac9859478dbf45fa9a463e
+grad-school: e8a00b776ae95cb93f8338dc685068c125fc2c32
+seeds:       0,1,2,3,4 (default)
+
+status:
+  table_concrete_reconciliation          not-run-this-pass
+  table_hyperparam_normalization         not-run-this-pass
+  table_g5_output_partitioning           not-run-this-pass
+  table_g5b_skew_sweep                   not-run-this-pass
+  table_4_1_mog_baselines                not-run-this-pass
+  table_6_1_model_family                 not-run-this-pass
+  table_4_4_openset                      no-output
+  table_3_1_pvat_scaling                 not-run-this-pass
+  table_3_1_reorder_three_arm            not-run-this-pass

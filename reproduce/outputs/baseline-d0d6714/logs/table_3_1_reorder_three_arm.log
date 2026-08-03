@@ -1,0 +1,9 @@
+Table 3.1 -- three-arm reorder timing (classical / stage one / stage two)
+  JIT warm-up complete
+
+  n=500    done
+  n=1000   done
+  n=2000   done
+  n=4000   done
+  wrote /home/user/grad-school/reproduce/outputs/table_3_1_three_arm.md
+  wrote /home/user/grad-school/reproduce/outputs/table_3_1_three_arm.csv
