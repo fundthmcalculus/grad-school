@@ -432,7 +432,8 @@ renderer emits both so the choice is visible rather than implicit.
 | 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7 |
 | 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **reproduced** at 10 seeds — note 8 |
 | 6.3 Interpretability | *none* | — | **ungenerated** — structural by design; the counts row is checklist C9 / Goal G6 |
-| 6.4 Memory augmentation | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **ungenerated** — entry point now located, but single-seed and outside the harness — note 13 |
+| 6.4 Memory augmentation | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **ungenerated** — entry point now located, but single-seed and outside the harness, and blocked on a real defect — notes 13, 17 |
+| §6.3.5 refinement study | `reproduce/optimizers/run_study.py` | `outputs/table_opt_hotstart.{md,csv}`, `…_traces.csv` | **reproduced** — new; supersedes the two-optimizer evidence behind §6.3.5 |
 
 **Note 7 — one seed in ten destroys this cell, and that is the finding.** Table
 6.1 is re-quoted at 10 seeds: flat 2nd-refined 0.875 ± 0.019, fuzzy tree
@@ -480,6 +481,16 @@ double-pendulum pairs disagree about the target's scale (0.92/0.045 implies
 σ ≈ 0.159, 0.96/0.028 implies σ ≈ 0.140), so the headline "38% error reduction"
 should be read as an order of magnitude and not as two significant figures until
 both rows are re-measured under one protocol.
+
+**Note 17 — Table 6.4 is also blocked on a defect, not just on effort.**
+`MimoGaussianPredictorMemory.predict_trajectory` returns its initial window
+unchanged for every `(window_size, memory_size)` pair: it slices exactly
+`window_size` rows of history, `prepare_sequences` then computes the last row's
+long-term average over an interval that is empty at exactly that row, and the
+method's own NaN guard breaks the loop at step zero. Verified at (3,1), (4,2),
+(10,4), (2,1). The one-step `predict` path is unaffected. Until the slice is
+widened to `window_size + memory_size` there is no iterated rollout to measure,
+which is also why Figure 6.3 is a placeholder.
 
 ---
 
