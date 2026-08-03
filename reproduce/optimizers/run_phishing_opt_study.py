@@ -148,16 +148,19 @@ def _one(arm, init, seed, args):
 def _write_seeds(records):
     path = os.path.join(C.OUTPUT_DIR, "table_opt_phishing_seeds.csv")
     C.write_csv(path,
-                ["arm", "init", "seed", "n_train", "n_params", "n_mfs",
+                ["arm", "init", "seed", "n_train", "n_test", "n_params", "n_mfs",
                  "obj_0", "obj", "improvement", "beat_start",
-                 "acc_0", "acc", "heuristic_acc", "heuristic_obj",
+                 "acc_0", "acc", "errors_0", "errors",
+                 "heuristic_acc", "heuristic_obj",
                  "evals_to_heuristic", "seconds_to_heuristic",
                  "evals", "seconds", "construction_seconds", "screen_seconds",
                  "init_seconds", "error"],
-                [[r["arm"], r["init"], r["seed"], r["n_train"], r["n_params"],
+                [[r["arm"], r["init"], r["seed"], r["n_train"], r["n_test"],
+                  r["n_params"],
                   r["n_mfs"], f"{r['obj_0']:.6f}", f"{r['obj']:.6f}",
                   f"{r['improvement']:.6f}", int(r["beat_start"]),
                   f"{r['acc_0']:.6f}", f"{r['acc']:.6f}",
+                  f"{r['errors_0']:.0f}", f"{r['errors']:.0f}",
                   f"{r['heuristic_acc']:.6f}", f"{r['heuristic_obj']:.6f}",
                   "" if r["evals_to_heuristic"] is None else r["evals_to_heuristic"],
                   "" if r["seconds_to_heuristic"] is None
@@ -353,6 +356,13 @@ def _emit(records, args, seeds, inits, arm_names):
             if not sel:
                 continue
             ratio = "—"
+            if init == "hot":
+                # A hot arm begins at the construction. "0x" is arithmetically
+                # true and reads as a measured speedup, which it is not.
+                trows.append([f"{init} · {arm}", "starts there",
+                              C.cell([1000 * r["seconds"] for r in sel],
+                                     fmt="{:.0f}"), "—"])
+                continue
             if reached and ref:
                 base = float(np.median([r["construction_seconds"] for r in ref]))
                 med = float(np.median([r["seconds_to_heuristic"] for r in reached]))
