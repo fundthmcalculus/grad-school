@@ -92,7 +92,7 @@ def load_concrete():
     df.columns = [c.strip() for c in df.columns]
     # y is returned as a *named Series*, matching gaussian_mixture/concrete.py's
     # loader: the tribblefis transforms index it by column name, so a bare ndarray
-    # raises deep inside standard_transform.
+    # raises deep inside the scaling/partition path.
     y = df["Strength"].astype(float)
     y.name = "y_value"
     X = df.drop(columns=["Strength"]).select_dtypes(include=[np.number]).astype(float)
@@ -146,18 +146,74 @@ def _try(build):
         return None
 
 
-def normalize(X):
-    """`concrete.py`'s feature treatment: auto log-transform, then standardize.
+# --- normalization ------------------------------------------------------------
+# `tribble-fis` PR #67 (a385a1a) DELETED `gauss_math.standard_transform` and
+# `gauss_math.detect_and_apply_log_transform` and replaced them with two sklearn
+# transformers in `tribblefis.scaling`:
+#
+#   UnitScalar     min-max to [0, 1], log1p-ing wide-dynamic-range features first
+#   StandardScalar z-score (mu=0, sigma=1), same log-transform step
+#
+# `standard_transform` applied MIN-MAX despite its name, so `UnitScalar` -- not
+# `StandardScalar` -- is its behaviour-preserving successor. The two wrappers
+# below exist because the deleted helpers had three call shapes the sklearn
+# surface does not: Series-in/Series-out, a column *subset*, and a DataFrame out
+# (the tribblefis transforms index features by name, so a bare ndarray raises).
+# They are wrappers, not reimplementations: the arithmetic is `tribblefis.scaling`'s.
+#
+# Two details are load-bearing for reproducing the archived numbers:
+#   * `log_dynamic_range=2` is passed explicitly. The old calls passed
+#     `min_dynamic_range=2`; `UnitScalar`'s default is 3.0, which on Concrete
+#     would drop `Slag` from the logged set and change every cell.
+#   * the scaler is FIT ON THE FULL FRAME, before the train/test split, exactly
+#     as the deleted helpers were called. This is transductive and would be wrong
+#     in a deployment pipeline, but reproducing the archive means reproducing it.
+SCALERS = ("unit", "standard")
+
+
+def _scaler(kind, log_dynamic_range):
+    from tribblefis.scaling import StandardScalar, UnitScalar
+    if kind == "unit":
+        return UnitScalar(log_dynamic_range=log_dynamic_range)
+    if kind == "standard":
+        return StandardScalar(log_dynamic_range=log_dynamic_range)
+    raise ValueError(f"scaler must be one of {SCALERS}, got {kind!r}")
+
+
+def unit_scale(X, column=None):
+    """Min-max to [0, 1] with no log step: the exact behaviour of the deleted
+    `gauss_math.standard_transform`, verified bit-for-bit against it.
+
+    Accepts a Series (returns a Series), or a DataFrame with an optional
+    `column` subset (returns a DataFrame, untouched columns passed through).
+    """
+    if isinstance(X, pd.Series):
+        scaled = _scaler("unit", None).fit_transform(X.to_frame()).ravel()
+        return pd.Series(scaled, index=X.index, name=X.name)
+
+    cols = list(X.columns) if column is None else (
+        [column] if isinstance(column, str) else list(column))
+    out = X.copy()
+    out[cols] = _scaler("unit", None).fit_transform(X[cols].copy())
+    return out
+
+
+def normalize(X, scaler="unit"):
+    """`concrete.py`'s feature treatment: auto log-transform, then scale.
 
     Shared rather than duplicated, because a second copy of this that drifted
     would silently make two tables incomparable -- which is the exact failure
     this harness exists to catch.
 
+    `scaler="unit"` (the default) is what every archived "log+std" number in
+    this repository actually measured: log + min-max to [0, 1]. `"standard"` is
+    genuine z-score, which had never been measured before Table 4.1's third arm.
+
     Returns (transformed_X, names_of_logged_columns).
     """
-    from tribblefis.gauss_math import detect_and_apply_log_transform, standard_transform
-    Xt, logged = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
-    return standard_transform(Xt, column=Xt.columns), logged
+    sc = _scaler(scaler, 2)
+    Xt = pd.DataFrame(sc.fit_transform(X.copy()), index=X.index, columns=X.columns)
+    return Xt, list(sc.log_features_)
 
 
 def mog_regressor(seed, tsk_order="1st"):

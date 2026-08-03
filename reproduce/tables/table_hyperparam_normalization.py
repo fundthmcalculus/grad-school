@@ -3,10 +3,13 @@
 Two confounds were left open by the reconciliation, and they are entangled:
 
   NORMALIZATION   Does the auto log-transform (of high-dynamic-range features --
-                  it selects Age) plus feature standardization help, and does it
+                  it selects Slag and Age) plus feature scaling help, and does it
                   help every model equally? The flat MoG pipeline uses it; the
                   tree/HME demo deliberately does NOT, to keep split thresholds
-                  physically meaningful.
+                  physically meaningful. Three levels: raw, log + min-max to
+                  [0,1] (`UnitScalar`), and log + z-score (`StandardScalar`).
+                  The middle one is what every run before `tribble-fis` a385a1a
+                  reported as "log+std" -- see the ARMS comment below.
 
   HYPERPARAMETERS Do the tree and mixture underperform because the hierarchy is
                   genuinely weaker, or because the reconciliation ran them at
@@ -62,6 +65,26 @@ ORDERS = [o.strip() for o in os.environ.get("REPRO_ORDERS", "1st,2nd,full-2nd").
 N_BUCKETS = 3
 L2 = 1e-2
 
+# The normalization axis, now with all three levels.
+#
+# Until `tribble-fis` a385a1a there were only two, and the second was mislabelled:
+# the transform behind every "log+std" number this repository has ever emitted was
+# `gauss_math.standard_transform`, which min-max scaled to [0,1] despite its name.
+# It never z-scored, so **log + z-score had never been measured at all**. Upstream
+# renamed the two honestly (`UnitScalar` / `StandardScalar`), which makes the third
+# level cheap to add and impossible to keep conflating.
+#
+# `"log + min-max"` is therefore not a new arm -- it is the old "log + standardized"
+# column under its true name, and its numbers are unchanged (verified byte-identical
+# against `outputs/full-14900hx-r2/`). `"log + z-score"` is the new measurement.
+#
+# Both transforms are strictly monotone per feature, so CART and Random Forest --
+# which split on rank -- must be invariant across all three arms. That is this
+# table's CONTROL, not a side observation: if a reference row moves under the
+# z-score arm, the plumbing is wrong, because the world cannot have changed.
+ARMS = (("raw", None), ("log + min-max", "unit"), ("log + z-score", "standard"))
+RAW, MINMAX, ZSCORE = (a[0] for a in ARMS)
+
 
 def _rmse(y, p):
     return float(np.sqrt(mean_squared_error(y, p)))
@@ -70,15 +93,23 @@ def _rmse(y, p):
 # --------------------------------------------------------------------------- #
 # flat MoG, with normalization as a switch
 # --------------------------------------------------------------------------- #
-def mog(X, y_raw, seed, order, norm):
+def mog(X, y_raw, seed, order, scaler):
+    """One flat MoG-TSK measurement. `scaler` is None (raw), "unit", or "standard".
+
+    The TARGET transform is min-max in every arm and deliberately does not vary:
+    the axis under study is the feature transform, and `partition_output` plus the
+    pinned extreme bucket means both assume a target on [0,1] (see Ch 4 §4.3's
+    pin_extremes discussion). Moving the target scaling too would confound the
+    one variable this table exists to isolate.
+    """
     from tribblefis.gauss_math import (
         calculate_gaussian_correlation, create_gaussian_membership_dict,
-        standard_transform, take_top_features)
+        take_top_features)
     from tribblefis.regression import partition_output, predict_tsk, solve_tsk_consequents
 
-    yt = standard_transform(y_raw)
+    yt = F.unit_scale(y_raw)
     y, ybm = partition_output(N_BUCKETS, yt)
-    Xt = normalize(X)[0] if norm else X.copy()
+    Xt = normalize(X, scaler=scaler)[0] if scaler else X.copy()
 
     Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
     diffs = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
@@ -139,23 +170,21 @@ def main():
         store[key]["r2"].append(r2)
         store[key]["rmse"].append(rmse)
 
-    # flat MoG: both normalization settings
-    for norm in (False, True):
-        tag = "log+standardized" if norm else "raw"
+    # flat MoG: all three normalization settings
+    for tag, scaler in ARMS:
         for order in ORDERS:
             for seed in C.SEEDS:
                 try:
-                    r2, rmse = mog(X, y, seed, order, norm)
+                    r2, rmse = mog(X, y, seed, order, scaler)
                     add((f"flat MoG-TSK {order}", "pipeline default", tag), r2, rmse)
                 except Exception as exc:  # noqa: BLE001
                     print(f"    [MoG {order}/{tag}] seed {seed}: {exc.__class__.__name__}")
             print(f"  done: MoG {order:<9} {tag}")
 
-    # tree / HME / references: both normalization settings, both hyperparameter settings
+    # tree / HME / references: all three normalizations, both hyperparameter settings
     builders = tree_hme_builders()
-    for norm in (False, True):
-        tag = "log+standardized" if norm else "raw"
-        Xu = normalize(X)[0] if norm else X
+    for tag, scaler in ARMS:
+        Xu = normalize(X, scaler=scaler)[0] if scaler else X
         for seed in C.SEEDS:
             Xtr, Xte, ytr, yte = train_test_split(Xu, y, test_size=0.2, random_state=seed)
             for (label, setting), make in builders.items():
@@ -172,35 +201,62 @@ def main():
         print(f"  done: tree/HME/references {tag}")
 
     # ---- emit: one row per (model, setting), columns for each normalization ----
+    def _mean(bucket):
+        if not bucket:
+            return None
+        m, _ = C.agg(bucket["r2"])
+        return m
+
+    def _delta(a, b):
+        """b - a, or N/A if either side is missing."""
+        return f"{b - a:+.3f}" if (a is not None and b is not None) else C.NA
+
     combos = sorted({(k[0], k[1]) for k in store})
     rows = []
     for model, setting in combos:
-        raw = store.get((model, setting, "raw"))
-        nrm = store.get((model, setting, "log+standardized"))
-        r_raw = C.cell(raw["r2"]) if raw else C.NA
-        r_nrm = C.cell(nrm["r2"]) if nrm else C.NA
-        e_raw = C.cell(raw["rmse"]) if raw else C.NA
-        e_nrm = C.cell(nrm["rmse"]) if nrm else C.NA
-        delta = C.NA
-        if raw and nrm:
-            a, _ = C.agg(raw["r2"])
-            b, _ = C.agg(nrm["r2"])
-            if a is not None and b is not None:
-                delta = f"{b - a:+.3f}"
-        rows.append([model, setting, r_raw, r_nrm, delta, e_raw, e_nrm])
+        got = {tag: store.get((model, setting, tag)) for tag, _ in ARMS}
+        r2c = {tag: (C.cell(got[tag]["r2"]) if got[tag] else C.NA) for tag, _ in ARMS}
+        rmc = {tag: (C.cell(got[tag]["rmse"]) if got[tag] else C.NA) for tag, _ in ARMS}
+        m = {tag: _mean(got[tag]) for tag, _ in ARMS}
+        rows.append([model, setting,
+                     r2c[RAW], r2c[MINMAX], r2c[ZSCORE],
+                     _delta(m[RAW], m[MINMAX]),      # Δ from log+min-max
+                     _delta(m[RAW], m[ZSCORE]),      # Δ from log+z-score
+                     _delta(m[MINMAX], m[ZSCORE]),   # z-score vs min-max: which normalization
+                     rmc[RAW], rmc[MINMAX], rmc[ZSCORE]])
 
     C.emit("table_hyperparam_normalization",
-           "Concrete — hyperparameters × normalization (R² and RMSE, mean ± std over seeds)",
-           ["Model", "Hyperparameters", "raw features", "log + standardized", "Δ from normalizing",
-            "RMSE raw (MPa)", "RMSE log+std (MPa)"],
+           "Concrete — hyperparameters × normalization, three arms "
+           "(R² and RMSE, mean ± std over seeds)",
+           ["Model", "Hyperparameters",
+            "raw features", "log + min-max", "log + z-score",
+            "Δ min-max − raw", "Δ z-score − raw", "Δ z-score − min-max",
+            "RMSE raw (MPa)", "RMSE log+min-max (MPa)", "RMSE log+z-score (MPa)"],
            rows,
-           note=("Normalization = auto log-transform of high-dynamic-range features (%s) "
-                 "followed by feature standardization, exactly as `concrete.py` applies it. "
-                 "Demo-tuned settings are taken verbatim from `tribble-tree/demo_concrete.py` "
-                 "(tree: max_depth=3, n_terms=2, top_n=4, min_soft_count=20; HME: max_depth=2, "
-                 "n_gate_terms=2, top_n=4, min_soft_count=40, min_expert_samples=60, 1st-order "
-                 "experts) — that script passes no random_state, so those arms are built as "
-                 "written and vary only with the split. Identical splits and seeds throughout."
+           note=("**The normalization axis now has three levels, and the middle one has been "
+                 "renamed rather than changed.** Every prior run of this table labelled its "
+                 "second column *log + standardized*; the transform behind it was "
+                 "`gauss_math.standard_transform`, which min-max scaled to [0,1] **despite its "
+                 "name** — it never z-scored. That column is now labelled **log + min-max** and "
+                 "its numbers are unchanged (verified byte-identical against "
+                 "`outputs/full-14900hx-r2/`). **log + z-score** is a genuinely new "
+                 "measurement: `tribblefis.scaling.StandardScalar` (μ=0, σ=1), which had never "
+                 "been run against this pipeline. Both arms log-transform the same "
+                 "high-dynamic-range features first (%s), detected at "
+                 "`log_dynamic_range=2`.\n\n"
+                 "**CART and Random Forest are the control.** Both split on rank, and both "
+                 "transforms are strictly monotone per feature, so both reference rows must "
+                 "read ≈0.000 in the *Δ z-score − min-max* column. A reference row that moves "
+                 "there indicts the plumbing, not the transform.\n\n"
+                 "The **target** is min-max scaled in all three arms and deliberately does not "
+                 "vary — `partition_output` and the pinned extreme bucket means both assume a "
+                 "target on [0,1], so varying it too would confound the feature transform this "
+                 "table isolates. Demo-tuned settings are taken verbatim from "
+                 "`tribble-tree/demo_concrete.py` (tree: max_depth=3, n_terms=2, top_n=4, "
+                 "min_soft_count=20; HME: max_depth=2, n_gate_terms=2, top_n=4, "
+                 "min_soft_count=40, min_expert_samples=60, 1st-order experts) — that script "
+                 "passes no random_state, so those arms are built as written and vary only with "
+                 "the split. Identical splits and seeds throughout."
                  % (", ".join(map(str, logged)) or "none")))
 
 

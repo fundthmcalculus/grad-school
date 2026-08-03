@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
-from tribblefis.gauss_math import log_transform
+from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
 from tribblefis.regression import (
     report_regression_performance,
     plot_tsk_order_comparison,

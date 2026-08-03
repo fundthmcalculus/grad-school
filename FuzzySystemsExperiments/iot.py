@@ -6,11 +6,11 @@ from sklearn.model_selection import train_test_split
 
 from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
 from tribblefis.gauss_math import (
-    log_transform,
     generate_synthetic_data, simple_gaussian_predict,
 )
 from tribblefis.gauss_plot import report_figures_of_merit, plot_membership_functions, plot_confusion_matrix, \
     plot_classification_report
+from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
 
 
 def load_data():

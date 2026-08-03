@@ -15,7 +15,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gauss_math import (
-    log_transform,
     calculate_gaussian_correlation,
     create_gaussian_membership_dict,
     take_top_features,
@@ -34,6 +33,7 @@ from tribblefis.regression import (
 from tribblefis.report import print_membership_details
 from tribblefis.trapz_math import create_trapz_membership_dict
 from tribblefis.trapz_math_fast import create_trapz_membership_dict_fast
+from _transforms import log_transform  # tribble-fis PR #67 deleted gauss_math.log_transform
 
 
 def _standardize(X):

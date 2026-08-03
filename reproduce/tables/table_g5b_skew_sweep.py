@@ -103,12 +103,13 @@ def partition(y_raw, n, scheme):
 def evaluate(X, y_raw, seed, scheme, n=BUCKETS, order=ORDER):
     from tribblefis.gauss_math import (calculate_gaussian_correlation,
                                        create_gaussian_membership_dict,
-                                       standard_transform, take_top_features)
+                                       take_top_features)
     from tribblefis.regression import predict_tsk, solve_tsk_consequents
 
-    yt = standard_transform(pd.Series(np.asarray(y_raw, float), name="y_value"))
+    yt = F.unit_scale(pd.Series(np.asarray(y_raw, float), name="y_value"))
     y, cent, occ = partition(yt, n, scheme)
-    Xt = standard_transform(X.copy(), column=X.columns)
+    # min-max only -- this sweep deliberately applies NO log step.
+    Xt = F.unit_scale(X)
 
     Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
     d = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
