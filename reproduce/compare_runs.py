@@ -61,7 +61,9 @@ def read_table(path):
     """-> (header, rows) or None if the file is absent."""
     if not os.path.exists(path):
         return None
-    with open(path, newline="") as f:
+    # UTF-8 explicitly: the tables carry ± / λ / Δ and the platform default is
+    # cp1252 on Windows, which cannot read what the emitters write.
+    with open(path, newline="", encoding="utf-8") as f:
         rows = list(csv.reader(f))
     if not rows:
         return None
@@ -306,11 +308,11 @@ def main():
     for label, d in ((base_label, base_dir), (new_label, new_dir)):
         p = os.path.join(d, "PROVENANCE.txt")
         if os.path.exists(p):
-            with open(p) as f:
+            with open(p, encoding="utf-8") as f:
                 provenance[label] = f.read()
 
     out = os.path.join(OUTPUTS, "FIX_IMPACT.md")
-    with open(out, "w") as f:
+    with open(out, "w", encoding="utf-8") as f:
         f.write(render(base_label, new_label, results, provenance))
     print(f"wrote {out}")
 

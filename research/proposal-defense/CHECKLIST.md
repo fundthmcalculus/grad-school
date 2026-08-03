@@ -75,10 +75,37 @@ it needs your records rather than a decision._
       a submodule SHA differs from the last archive's. **This failure has happened twice** —
       once with `fix/pin-extreme-bucket-means`, once with `resolve-flm-pr`. Highest-value
       remaining infra item.
-- [ ] ⬜ **B5 — Re-take Chapter 3's timing grid on the workstation.** §3.4 currently spans two
-      hosts: the swept grid is laptop data, the memory ceilings and large reorders are
-      workstation. Cheap, and it also settles whether the ~45% swing was thermal or
-      cross-machine. *(Author: earlier results were a faster machine — flagged, not a blocker.)*
+- [x] ✅ **B5 — Chapter 3's timing grid re-taken on the workstation.** Run of record
+      `reproduce/outputs/full-14900hx-r2/` (i9-14900HX, 32 logical cores, 96 GB, RTX 4080
+      Laptop), 10 seeds, all 13 generators green in one pass; §3.4 no longer spans two hosts.
+      See `reproduce/PROVENANCE_MAP.md` note 11. Three outcomes, two of which cost the chapter
+      something:
+      **(a) The ~45–50% swing was thermal and laptop-specific.** Three runs here put the
+      1,024-point classical arm at 13.7 / 14.2 / 14.5 s — a 6% spread against the laptop's
+      22.2 / 31.7 / 21.3 s.
+      **(b) The ratio is NOT machine-invariant, which §3.4 asserts it is.** The 1,024-point
+      speedup reads 1,129× on the laptop and 660–700× here — a 40% move — because the
+      classical arm is interpreted Python and mergeVAT is compiled, so a change of host does
+      not scale the two arms by the same factor. The report-ratios-not-seconds standard
+      stands; its justification needs weakening from "ratios survive a change of machine" to
+      "stable within a host, and far more portable than seconds". **§3.4's paragraph beginning
+      "Why this table reports ratios and not seconds" needs that edit.**
+      **(c) Table 3.1's swept ratios must be re-quoted**: 28.8× → 28.6×, 398× → 304×,
+      1,129× → 660× at 10 seeds on one host.
+- [x] ✅ **B5b — §3.4's swept rows and Table 3.2 re-quoted from the workstation run.** Table 3.1
+      reads 25× / 311× / 673× (was 28.8× / 398× / 1,129×); the 4,096-point stage-two figure is
+      0.229 ± 0.006 s, so the comparison against the published stage-one measurement reads ~11×.
+      Table 3.2's grid and exponents are re-quoted at classical **3.20**, stage one **1.86**,
+      stage two **1.97**. Every cell was checked programmatically against the archive CSVs. The
+      plateau and parity-band paragraphs are rewritten as an explicit retraction rather than
+      replaced silently, and Ch 7's G4 is rebuilt around the lesson — repeatability cannot
+      distinguish a property of the code from a property of the host. The appendix's hardware
+      bullet and §3.4's two-hosts note are updated to match.
+- [ ] ⬜ **B5c — Install a PDF renderer on this host.** `build_pdf.py` now assembles all
+      thirteen sections and injects all sixteen figures on Windows (it previously died reading
+      `chapters/09-publications.md` under cp1252), but rendering needs pandoc plus either a
+      LaTeX engine or WeasyPrint's GTK runtime, none of which are present. The combined
+      Markdown builds; the PDF does not. Not a code defect — a machine setup item.
 - [x] ⬜ **B6 — Remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
       returns a wrong ordering (seed vertex, then ascending index order). Cause is a vectorized
       call to a scalar-typed `_get_dist`. Nothing calls it. See `REVIEW` ★2.
@@ -94,13 +121,29 @@ it needs your records rather than a decision._
       small grid (100–1,000, sized so the cubic arm runs at every point) with both axes
       normalized, and fit a log-log exponent per arm. Classical **3.11** (theory 3) and stage
       one **1.87** (theory ≈2.1, the log factor invisible over one decade) both confirm.
-- [ ] ⬜ **C2b — Find the ~10 ms fixed cost in the stage-two kernel.** *(Sharpest open item
-      in Ch 3, and now well characterized.)* With the grid extended to 3,000 the picture is
+- [ ] ⬜ **C2b — RESCOPED: the ~10 ms fixed cost is a property of the laptop, not the kernel.**
+      It does not reproduce on the workstation. Across **five** independent measurements there
+      (`full-14900hx-2026-08-02`, its backfill, three manual repeats, `full-14900hx-r2`) stage
+      two is monotone in N — 0.5 ms at N=750 rising smoothly to 8.4 ms at N=3,000, against the
+      8–15 ms *flat* band described below — and it beats stage one by **8.1–17.7× at every
+      size**, including 17.3× in the 750–1,250 band said to collapse to parity. The fitted
+      exponent is **1.93–1.97** here against the laptop's 2.12/2.13, i.e. a cleaner
+      confirmation of the quadratic claim, since the plateau was contaminating that fit — the
+      chapter already calls 2.12 "right for the wrong reason".
+      **The question to answer is now "why did the laptop have it", not "what is it".** The
+      OpenMP-parallel-region hypothesis is *weakened*: thread-startup cost should be at least
+      as visible on 32 cores as on 4. A 4-core `powersave` governor ramping clocks on thread
+      spawn fits the evidence better, and is testable by pinning the laptop's governor.
+      **The chapter's claim that the compiled kernel "buys nothing across a band of problem
+      sizes" is not supported on the workstation and must be qualified by host.**
+      *(Original characterization, which remains accurate for the development laptop:)* With the grid extended to 3,000 the picture is
       no longer "noise": stage two tracks $N^2$ cleanly to N = 500, **acquires a fixed cost of
       roughly 10 ms at N ≈ 750**, and then runs flat — 8 to 15 ms everywhere from 750 to 3,000
       — until the quadratic work catches up near 3,000. Exponents are stable across runs
-      (classical 3.07/3.07, stage 1 1.80/1.81, stage 2 2.13/2.12), so this is a real property
-      of the kernel, not the timer.
+      (classical 3.07/3.07, stage 1 1.80/1.81, stage 2 2.13/2.12), so this is a real effect and
+      not the timer. *(It is real and repeatable — on that host. Reading repeatability as
+      "a property of the kernel" is the step the workstation run invalidates: stable across
+      runs is not the same as stable across machines, and only one machine had been tried.)*
       **Practical consequence:** below 750 stage two beats stage one by 5–8×; between ~750 and
       ~1,250 the advantage **collapses to parity** and which arm wins varies between runs;
       above 1,500 stage two recovers to 6.7× by N = 3,000. So the compiled kernel that
