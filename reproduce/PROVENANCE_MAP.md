@@ -116,7 +116,7 @@ because the plateau contaminated the fit. **CHECKLIST C2b, which asks what the
 | 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** — claim retracted, note 3 |
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
 | 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
-| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent |
+| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **reproduced** — note 6 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **reproduced** — note 6 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
@@ -147,13 +147,56 @@ drag the mean — and a 3-seed run simply missed them. Ch 7's G5, previously mar
 "settled (complete)" with "quantile by default", is reopened; the recommendation
 is withdrawn and the diagnosis kept.
 
-**Note 5.** Re-quoted at 10 seeds. Tables 4.4/4.5 now read flat R² −0.005 / 0.783
-/ 0.829, rising to 0.869 at full second order, with CART 0.825 ± 0.047 and RF
-0.909 ± 0.018. The old 0.797/0.904 pair appears in no archive and came from a
-3-seed run predating every run under `outputs/`. The zeroth-order figure is worth
-keeping visible rather than dropping: with constant consequents the model is no
-better than predicting the mean, which makes first-order consequents a
-requirement here rather than a refinement.
+**Note 5.** Re-quoted at 10 seeds. Tables 4.4/4.5 read flat R² **−0.334 / 0.772 /
+0.824** at TSK orders 0 / 1 / 2, with CART 0.825 ± 0.047 and RF 0.909 ± 0.018 —
+all four from the run of record `full-14900hx-r2`, and matching the prose. The old
+0.797/0.904 pair appears in no archive and came from a 3-seed run predating every
+run under `outputs/`. The zeroth-order figure is worth keeping visible rather than
+dropping: with constant consequents the model is no better than predicting the
+mean, which makes first-order consequents a requirement here rather than a
+refinement.
+
+*This note itself was stale and is corrected above.* It previously read
+"−0.005 / 0.783 / 0.829, rising to 0.869 at full second order." Those are
+`seeds10-2026-08-01` / `full-2026-08-02` values, superseded by `main-d0efefc` and
+then by `full-14900hx-r2`, and none of them is what the prose says. A provenance
+map quoting numbers a reader cannot find in the prose or in the run of record
+inverts its own purpose — it becomes a fourth version of the table. Cross-check
+this file's inline figures against the run of record when the run of record moves.
+
+**Note 14 — Table 4.5's two MoG rows are not the same measurement.** The
+1st-order row (R² 0.780 ± 0.029, 1.04 ± 0.62 s) comes from
+`table_4_1_mog_baselines.py`, which drives the
+`MixtureOfGaussiansFuzzyRegressor` estimator. The full-second-order row's
+R² 0.859 ± 0.039 comes from **`table_hyperparam_normalization.py`** (Table 4.1's
+study), which drives `solve_tsk_consequents` / `predict_tsk` directly and
+standardizes the target. Two implementations of the same idea, in adjacent rows of
+a table whose caption promises "identical splits."
+
+The gap is measurable, not theoretical. `table_4_1_mog_baselines.py` now carries a
+timed full-2nd arm on the estimator path; at ten seeds it scores
+**R² 0.840 ± 0.049 in 0.83 ± 0.01 s** (`outputs/table45-full2nd/`) against the
+functional path's 0.859 ± 0.039 — a 0.019 difference between two things the
+document treats as one number. So the row's `*pending*` training-time cell was
+**not** filled with the 0.83 s: pairing that time with the 0.859 above it would be
+the same quiet mismatch, one generator over, as the earlier version of this table
+that paired a normalized accuracy with a raw-feature time. The cell is marked and
+the reason stated; filling it properly means timing the functional pipeline, which
+no generator does.
+
+Two related timing observations from the same run, both wall-clock rather than
+result, and neither yet acted on:
+
+- **Full second order is not slower than first order** here — 0.83 s against
+  1.04 s — and it is far steadier (±0.01 against ±0.62).
+- **That ±0.62 is a warm-up artifact, not variance.** The Concrete arm runs first
+  in the process and absorbs first-fit costs; the arms that run after it come back
+  at ±0.01 to ±0.03 in the same run, and the same pattern holds in every archive
+  (Concrete first at ±0.62, PhiUSIIL second at ±0.02). A ±60% deviation on the
+  headline cell of a table whose whole point is a speed claim should not be read
+  as seed-to-seed spread. The fix is a discarded warm-up fit before timing begins;
+  it would change Table 4.5's quoted time, so it is flagged here rather than done
+  in passing.
 
 **Note 6 — re-quoted twice, and the ordering flipped both times.** Tables 4.6/4.7
 originally quoted the pre-`pin_extremes` path. Current values are 10-seed, from

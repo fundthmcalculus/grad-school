@@ -160,10 +160,19 @@ def normalize(X):
     return standard_transform(Xt, column=Xt.columns), logged
 
 
-def mog_regressor(seed):
+def mog_regressor(seed, tsk_order="1st"):
+    """The flat MoG-TSK regressor at one consequent order.
+
+    `tsk_order` is exposed because Table 4.5 quotes a full-second-order R² whose
+    training time was never measured -- the accuracy came from
+    `table_concrete_reconciliation.py`, which sweeps orders but does not time
+    them, so the cell sat as `*pending*` rather than borrow the 1st-order row's
+    seconds. Same object, same preprocessing, one keyword: the alternative was a
+    second copy of this constructor, which is how two tables drift apart.
+    """
     from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
     return _try(lambda: MixtureOfGaussiansFuzzyRegressor(
-        n_output_buckets=3, tsk_order="1st", top_n=-1, random_state=seed))
+        n_output_buckets=3, tsk_order=tsk_order, top_n=-1, random_state=seed))
 
 
 def mog_classifier(seed):
