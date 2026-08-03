@@ -245,8 +245,8 @@ def main():
     #
     # Kept pre-split, where the old transform was, so this file's before/after
     # delta is attributable to the transform alone and nothing else.
-    _scaler = UnitScalar(log_dynamic_range=2)
-    X = pd.DataFrame(_scaler.fit_transform(X), index=X.index, columns=X.columns)
+    _scaler = UnitScalar(log_dynamic_range=2).set_output(transform="pandas")
+    X = _scaler.fit_transform(X)
     print(f"Auto-detected log transform for: {list(_scaler.log_features_)}")
 
     # Split dataset once for fair comparison
