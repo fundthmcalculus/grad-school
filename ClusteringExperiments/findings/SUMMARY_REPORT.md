@@ -58,9 +58,9 @@ All results in this section are **exact** unless noted.
 | Contribution | Result | Exact? | Source |
 |---|---|---|---|
 | In-place iVAT construction + permutation (3 matrices → 1) | max feasible `n` at 64 GB: **52k → 89k**; `n=64k` float64 iVAT now runs (98 GB infeasible → **32.85 GB / 25 s**) | ✅ | PR #17 / #18 |
-| GPU Fuzzy-C-Means (data-resident) | **30–56×** vs 32-core CPU at n = 50k–500k | same fixed point (~1e-5, labels >99% identical) | PR #20 |
+| GPU Fuzzy-C-Means (data-resident) | **1.24–3.71×** vs 32-core CPU at n = 50k–500k, matched formulation (13–39× against a NumPy-broadcasting CPU arm) | same fixed point (~1e-5, labels >99% identical) | PR #20 |
 | GPU pairwise distances | **1.3–2.5×** only at high dimension + float32; **<1×** low-d / float64 (honest negative) | ✅ | PR #19 |
-| GPU Borůvka MST (device-resident) | **~5×** vs serial Prim at n = 32000, growing with n | ✅ (VAT-order match 1.0) | PR #22 |
+| GPU Borůvka MST (device-resident) | **5.4–8.2×** vs serial Prim, peaking mid-grid rather than growing with n | ✅ (VAT-order match 1.0) | PR #22 |
 | On-device VAT front-end (distances → MST → order) | **4.8–6.6×** end-to-end, growing with n | ✅ | PR #23 |
 
 ### 2.1 Memory is the scaling wall, not compute
@@ -85,8 +85,10 @@ reference (PR #18).
 
 Not every stage benefits from the GPU on consumer hardware:
 
-- **FCM (clean win, 30–56×):** iterative and data-resident, so it amortizes the
-  PCIe transfer; converges to the same fixed point as the CPU (PR #20).
+- **FCM (1.2–3.7× at matched work):** iterative and data-resident, so it amortizes
+  the PCIe transfer; converges to the same fixed point as the CPU (PR #20). Quoted at
+  30–56× until 2026-08-04, which compared two *formulations* rather than two devices
+  and came from a single run; see `performance-report.md` §3.
 - **On-device MST/ordering (4.8–6.6×):** exact, and the lead *grows* with n
   because GPU bandwidth absorbs the O(n² log n) work — but only when the matrix
   is already device-resident (PR #22 / #23).

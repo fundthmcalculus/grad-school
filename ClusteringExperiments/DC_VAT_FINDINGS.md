@@ -117,7 +117,8 @@ already-optimized O(n²) parallel engine.
   very small constant, so this is speculative future work, not a quick win.
 - **Net:** the serial O(n²) engine (now made memory-frugal by the in-place PRs)
   is the right VAT/iVAT path at scale; the GPU's payoff is elsewhere — FCM
-  (30–56×, data-resident iteration) and high-dimensional float32 distances.
+  (1.2–3.7× at matched work, data-resident iteration) and high-dimensional float32
+  distances.
 
 ---
 

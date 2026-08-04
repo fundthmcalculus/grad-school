@@ -15,9 +15,9 @@ VAT/iVAT (Visual Assessment of cluster Tendency) reorders a pairwise
 dissimilarity matrix via an MST traversal so that clusters appear as dark
 diagonal blocks. This note reports two threads of work. **(1) A systems thread**
 that makes *exact* iVAT dramatically more memory- and compute-efficient at scale
-(a 3× peak-memory reduction that lifts the feasible problem size, a 30–56×
-GPU Fuzzy-C-Means front-end, and an exact GPU-Borůvka VAT ordering that is ~5×
-faster than serial Prim). **(2) A methods thread** that investigates
+(a 3× peak-memory reduction that lifts the feasible problem size, a 1.2–3.7×
+GPU Fuzzy-C-Means front-end, and an exact GPU-Borůvka VAT ordering that is
+5.4–8.2× faster than serial Prim). **(2) A methods thread** that investigates
 divide-and-conquer VAT — partitioning the dissimilarity matrix, solving
 sub-blocks in parallel, and merging. We show, on adversarial (non-convex,
 non-metric) data and against the appropriate controls, that the machinery is
@@ -50,7 +50,7 @@ engine) unless noted.
 | Contribution | Result | Note |
 |---|---|---|
 | In-place iVAT construction + permutation | IVAT peak memory **3 matrices → 1** | `n=64000` float64 iVAT: from *infeasible in 64 GB* (needed 98 GB) to **32.85 GB** |
-| GPU Fuzzy-C-Means (data-resident) | **30–56×** vs 32-core CPU at n = 50k–500k | bit-comparable fixed point; a deterministic seed for FCM |
+| GPU Fuzzy-C-Means (data-resident) | **1.24–3.71×** vs 32-core CPU at n = 50k–500k, matched formulation | bit-comparable fixed point; a deterministic seed for FCM |
 | GPU Borůvka MST (device-resident matrix) | **~5×** vs serial Prim at n = 32000, and the lead *grows* with n | exact; the O(n² log n) work is absorbed by GPU bandwidth |
 | On-device VAT front-end (distances→MST→order) | **4.8–6.6×** end-to-end, growing with n | matrix never leaves the GPU |
 
