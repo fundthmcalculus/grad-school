@@ -197,7 +197,7 @@ estimates or extrapolates it, and the generator does not model it.
 | Table | Generator | Output | Status |
 |---|---|---|---|
 | 4.1 Value of the transform | `table_hyperparam_normalization.py` | `outputs/table_hyperparam_normalization.{md,csv}` | **reproduced** at 10 seeds; **now three arms, and the prose's column label is wrong — note 16** |
-| 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** — claim retracted, note 3 |
+| 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** at three consequent orders; **G5 settled on the 0th-order rows — note 19** |
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
 | 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
@@ -591,7 +591,9 @@ exactly zero.
 | Ch5 driver | `gated-minimax-selection/outputs/` | Runs to completion after the `fig_membership` fix; `results.json` reproduces the 2026-07-20 file exactly. |
 | Workstation sweep, 10 seeds | `outputs/full-14900hx-2026-08-02/` | First pass on the i9-14900HX. 13 generators green. Superseded by r2 for citation: its tables carry a degraded machine block (`ram: unknown`), and it lacks Table 4.4b. |
 | Workstation sweep, 10 seeds | `outputs/full-14900hx-r2/` | The previous run of record, at `tribble-fis d0efefc`. Superseded by `full-2026-08-03` — note 18. |
-| **Full trace, 10 seeds (run of record)** | `outputs/full-2026-08-03/` | **The citable run.** All 13 table generators green, the GPU table included in the same pass for the first time (1380 s of the 48 min), 19 of 19 drawable figures, the Chapter 5 driver and its opt-in scaling benchmark, and the Chapter 3 cluster experiments. At `tribble-fis 4b33a0d`, which is three functional PRs past the previous run of record — note 18. Read its `PROVENANCE.txt` in full: the archive step was recovered with `--archive-only` and says so. |
+| Full trace, 10 seeds | `outputs/full-2026-08-03/` | The previous run of record, at `tribble-fis 4b33a0d`. Superseded by `uniform-2026-08-03` — note 19.  <!-- superseded; the original entry follows -->
+| &nbsp; | &nbsp; | **Was the citable run.** All 13 table generators green, the GPU table included in the same pass for the first time (1380 s of the 48 min), 19 of 19 drawable figures, the Chapter 5 driver and its opt-in scaling benchmark, and the Chapter 3 cluster experiments. At `tribble-fis 4b33a0d`, which is three functional PRs past the previous run of record — note 18. Read its `PROVENANCE.txt` in full: the archive step was recovered with `--archive-only` and says so. |
+| **Full trace, 10 seeds (run of record)** | `outputs/uniform-2026-08-03/` | **The citable run.** All 14 table generators green at ten seeds, at `tribble-fis 6ddb802`. Differs from `full-2026-08-03` by one library default: `partition_output` cuts the target at equal width rather than equal frequency with pinned extremes — note 19. Its `table_g5_output_partitioning` was backfilled to add 0th order, the axis that settled G5. Read its `PROVENANCE.txt` addendum: the header records `tribble-fis 1a83df8`, a squash-merged branch commit, and the run spans two SHAs whose `src/` trees are identical. |
 | Preprocessing control | `outputs/splitfirst-2026-08-03/` | Table 6.1's flat arms with the target scale, output partition and feature scaler fit on the training fold only. Bounds the transductive-preprocessing defect at inside-the-seed-spread on every exposed row — `outputs/SPLIT_FIRST_LEAK.md`. |
 
 **Note 18 — the 2026-08-03 full trace, and the one result in it that changes a
@@ -703,3 +705,50 @@ dying on import — all produced output that looked plausible or exited zero. So
 did `REPRO_THETA_SWEEP=1`, which is a valid θ list of one and emits a table of
 zeros that reads exactly like a null result. Check the provenance, not the exit
 status.
+
+**Note 19 — the output partition, and the two chapter claims that were artifacts
+of it.** `partition_output` cut the target with `pd.qcut` and then overwrote the two
+extreme bucket centroids with the observed min and max. `uniform-2026-08-03` is the
+same sweep with equal-width cuts and per-bucket centroids, one library default
+different (`tribble-fis` #81), and it moves two claims that three prior studies had
+looked straight at.
+
+**Why three studies missed it.** `table_g5_output_partitioning` ran 126 cells over
+three schemes and six configurations — at 1st and 2nd consequent order only. There
+the three arms span 0.009 in R² against seed spreads of ±0.018 to ±0.027, so G5 was
+left open with no scheme recommended, correctly given what was measured.
+`solve_tsk_consequents` holds the first and last rules' *constant* terms at the
+centroids it is handed, as an exact equality constraint. At 0th order that constant
+is a rule's entire output, so the same three arms span **0.828**: uniform
+0.394 ± 0.065, pure quantile 0.242 ± 0.070, pinned quantile −0.434 ± 0.241, ordering
+preserved at three, four and six buckets. Decomposed, the boundary scheme is worth
+0.152 and the pinning 0.676. The generator now runs 0th order by default.
+
+**Claim 1, Chapter 4's consequent-order ladder.** §4.3 read −0.434 at 0th order as
+evidence that first-order consequents were a requirement rather than a refinement.
+They are not: the flat arm is 0.394 ± 0.065 under equal-width cuts, and the ladder
+0.394 / 0.796 / 0.841 / 0.861 has its knee between first and second order. Chapter 1
+and Chapter 2 both carried the negative figure in their opening arguments and are
+re-quoted.
+
+**Claim 2, Chapter 4's boundedness argument.** §4.1 reported that real z-scoring
+collapsed the first-order model to 0.014 ± 0.195, below its raw-feature score, and
+built the case that a bounded input domain was load-bearing. Under equal-width cuts
+that cell is 0.713 ± 0.035 and Δ z-score − raw flips from −0.651 to +0.018. The
+interaction was the two pinned extreme rules against features z-scoring leaves
+unbounded. What survives is a preference worth 0.083 at first order, plus a real
+variance cost at full second order (±0.115 against ±0.026). The `n_gaussians`-pinned
+figures −0.407/−0.524/−0.634 quoted from the old arm are withdrawn.
+
+**What did not move.** `table_g5_output_partitioning` and `table_g5b_skew_sweep` are
+identical across all 174 cells, since both implement their own arms and are the
+evidence for the change rather than consumers of the default. The four rank-based
+control rows of `table_concrete_reconciliation` move by exactly 0.000, which is the
+check that the switch touched only what it claimed to. Chapter 3's movement is
+timing variance plus two fitted exponents (classical 3.20 → 3.15, stage one
+1.88 → 1.86). Chapter 5 is untouched.
+
+**The lesson is not "more seeds".** This survived ten seeds, three schemes, six
+configurations and four archives. It was a regime never entered, and no amount of
+repetition inside the wrong regime finds that. What found it was reading the solved
+coefficients instead of the scores.
