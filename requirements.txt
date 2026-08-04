@@ -15,3 +15,5 @@ matplotlib~=3.10.1
 ucimlrepo
 # NOTE - Not always required
 numba-cuda[cu12]
+cvxpy
+sympy
