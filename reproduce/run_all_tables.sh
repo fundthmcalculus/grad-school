@@ -389,6 +389,10 @@ PROV="$DEST/PROVENANCE.txt"
     echo "## Use this only to recover a run whose numeric phase completed and    ##"
     echo "## whose archive step failed. Confirm the SHAs and the logs/ contents  ##"
     echo "## match the run you think this is before quoting any number from it.  ##"
+    echo "##                                                                    ##"
+    echo "## THIS BANNER IS NOT A VERDICT. If an addendum below establishes what ##"
+    echo "## produced these tables, read it: the archive may well be citable.    ##"
+    echo "## Two independent readers stopped here and concluded it was not.      ##"
     echo "########################################################################"
     echo
   fi
