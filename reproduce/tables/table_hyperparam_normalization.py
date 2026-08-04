@@ -44,6 +44,7 @@ import sys
 import warnings
 
 import numpy as np
+import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -93,6 +94,56 @@ def _rmse(y, p):
 # --------------------------------------------------------------------------- #
 # flat MoG, with normalization as a switch
 # --------------------------------------------------------------------------- #
+# `REPRO_LEAKY=1` restores the pre-2026-08-04 behaviour, where the target scale, the
+# output partition and the feature scaler were all fit on all 1,030 rows before the
+# split. Kept so an archive taken before that date can be reproduced, and it announces
+# itself in the log because a run that quietly used it would look identical in the table.
+LEAKY = os.environ.get("REPRO_LEAKY", "").strip() not in ("", "0", "false")
+
+
+def _split_first(X, y_raw, seed, scaler):
+    """Split first, then fit every data-dependent transform on the training fold.
+
+    Returns `(Xtr, Xte, ytr, yte, y_bucket_mean)` in the shape `mog` consumes.
+
+    The test rows keep their scaled target value and are given bucket labels derived from
+    the training fold's edges. Those labels are cosmetic here -- `mog` reads only
+    `yte["y_value"]`, for scoring -- but deriving them from the train edges is the honest
+    way to fill the column, and it keeps the frame shape identical to the leaky path.
+
+    `span`, used to put RMSE back on the MPa scale, still comes from the full raw target.
+    It is a unit conversion applied after scoring, not a model input, and holding it fixed
+    keeps the RMSE columns comparable across arms and across both code paths.
+    """
+    from tribblefis.regression import partition_output
+
+    idx = np.arange(len(X))
+    itr, _ite = train_test_split(idx, test_size=0.2, random_state=seed)
+    train = np.zeros(len(X), dtype=bool)
+    train[itr] = True
+
+    yr = pd.Series(np.asarray(y_raw, dtype=float).ravel(), index=X.index,
+                   name=getattr(y_raw, "name", "y_value"))
+    lo, hi = float(yr[train].min()), float(yr[train].max())
+    yt = F.unit_scale_with(lo, hi, yr)
+
+    y_train_part, ybm = partition_output(N_BUCKETS, yt[train])
+    buckets = pd.Series(np.nan, index=yt.index, name="y_bucket")
+    buckets[train] = y_train_part["y_bucket"].values
+    # Uniform cuts: equal-width edges over the TRAINING fold's observed range.
+    edges = np.linspace(float(yt[train].min()), float(yt[train].max()), N_BUCKETS + 1)[1:-1]
+    buckets[~train] = np.digitize(yt[~train].values, edges)
+    y = pd.concat([buckets.astype(int), yt.rename("y_value")], axis=1)
+
+    if scaler:
+        sc, _logged = F.fit_scaler(X[train], scaler=scaler, log_dynamic_range=2)
+        Xt = F.apply_scaler(sc, X)
+    else:
+        Xt = X.copy()
+
+    return Xt[train], Xt[~train], y[train], y[~train], ybm
+
+
 def mog(X, y_raw, seed, order, scaler):
     """One flat MoG-TSK measurement. `scaler` is None (raw), "unit", or "standard".
 
@@ -101,19 +152,29 @@ def mog(X, y_raw, seed, order, scaler):
     pinned extreme bucket means both assume a target on [0,1] (see Ch 4 §4.3's
     pin_extremes discussion). Moving the target scaling too would confound the
     one variable this table exists to isolate.
+
+    Leak-free since 2026-08-04: the target scale, the output partition and the feature
+    scaler are all fit on the training fold. Every one of them used to be fit on all
+    1,030 rows before the split, so each arm saw a transform derived partly from the rows
+    it was then scored on -- and the output partition's per-bucket means reach the
+    prediction path through `solve_tsk_consequents`, which makes that half a real leak
+    rather than merely transductive. `REPRO_LEAKY=1` restores the old path.
     """
     from tribblefis.gauss_math import (
         calculate_gaussian_correlation, create_gaussian_membership_dict,
         take_top_features)
     from tribblefis.regression import partition_output, predict_tsk, solve_tsk_consequents
 
-    yt = F.unit_scale(y_raw)
-    y, ybm = partition_output(N_BUCKETS, yt)
-    Xt = normalize(X, scaler=scaler)[0] if scaler else X.copy()
+    if LEAKY:
+        yt = F.unit_scale(y_raw)
+        y, ybm = partition_output(N_BUCKETS, yt)
+        Xt = normalize(X, scaler=scaler)[0] if scaler else X.copy()
+        Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
+    else:
+        Xtr, Xte, ytr, yte, ybm = _split_first(X, y_raw, seed, scaler)
 
-    Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
     diffs = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
-    _, top_vars = take_top_features(diffs, top_n=len(Xt.columns))
+    _, top_vars = take_top_features(diffs, top_n=len(Xtr.columns))
     memb = create_gaussian_membership_dict(Xtr, ytr["y_bucket"],
                                            top_n_var_names=top_vars, n_gaussians=-1)
     corr, ybm2 = solve_tsk_consequents(Xtr, memb, top_vars, ybm, ytr,
@@ -182,11 +243,27 @@ def main():
             print(f"  done: MoG {order:<9} {tag}")
 
     # tree / HME / references: all three normalizations, both hyperparameter settings
+    # Leak-free since 2026-08-04 here too: the feature scaler is fit per training fold.
+    # It used to be fit once on the full frame outside the seed loop. That half is milder
+    # than the MoG path's -- no target information is involved, and for CART, Random Forest
+    # and the fuzzy trees a monotone per-feature map is rank-invariant, which is the control
+    # this table's own argument rests on -- but "milder" is not "absent", and leaving one
+    # arm transductive while fixing another is how a table stops being internally
+    # comparable. The hoist out of the seed loop goes with it; that costs one scaler fit
+    # per seed on 1,030 rows.
     builders = tree_hme_builders()
     for tag, scaler in ARMS:
-        Xu = normalize(X, scaler=scaler)[0] if scaler else X
+        Xu = normalize(X, scaler=scaler)[0] if (scaler and LEAKY) else X
         for seed in C.SEEDS:
-            Xtr, Xte, ytr, yte = train_test_split(Xu, y, test_size=0.2, random_state=seed)
+            if LEAKY or not scaler:
+                Xtr, Xte, ytr, yte = train_test_split(Xu, y, test_size=0.2, random_state=seed)
+            else:
+                idx = np.arange(len(X))
+                itr, _ite = train_test_split(idx, test_size=0.2, random_state=seed)
+                tr = np.zeros(len(X), dtype=bool); tr[itr] = True
+                sc, _lg = F.fit_scaler(X[tr], scaler=scaler, log_dynamic_range=2)
+                Xs = F.apply_scaler(sc, X)
+                Xtr, Xte, ytr, yte = Xs[tr], Xs[~tr], y[tr], y[~tr]
             for (label, setting), make in builders.items():
                 try:
                     p = np.asarray(make().fit(Xtr, ytr).predict(Xte), dtype=float).ravel()

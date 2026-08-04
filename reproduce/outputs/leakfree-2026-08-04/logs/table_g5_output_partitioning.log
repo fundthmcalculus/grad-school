@@ -1,0 +1,4063 @@
+Goal G5 -- output partitioning: uniform vs quantile vs hybrid
+  Concrete N=1030 target skew=+0.417 buckets=[3, 4, 6] orders=['0th', '1st', '2nd'] seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0256
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9399
+ 3. Water                          - Score: 0.7560
+ 4. Superplasticizer               - Score: 0.7115
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.3678
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0210
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0236
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0196
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0234
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0205
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9505
+ 3. Water                          - Score: 0.7745
+ 4. Superplasticizer               - Score: 0.7169
+ 5. Slag                           - Score: 0.3692
+ 6. CoarseAgg                      - Score: 0.3635
+ 7. FineAgg                        - Score: 0.2567
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0212
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0214
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9198
+ 3. Water                          - Score: 0.6974
+ 4. Superplasticizer               - Score: 0.6340
+ 5. Slag                           - Score: 0.3815
+ 6. CoarseAgg                      - Score: 0.3367
+ 7. FineAgg                        - Score: 0.2695
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0296
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0240
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6772
+ 3. Superplasticizer               - Score: 0.5204
+ 4. Water                          - Score: 0.4854
+ 5. FineAgg                        - Score: 0.3168
+ 6. Slag                           - Score: 0.3120
+ 7. CoarseAgg                      - Score: 0.3026
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0325
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6811
+ 3. Superplasticizer               - Score: 0.4945
+ 4. Water                          - Score: 0.4754
+ 5. CoarseAgg                      - Score: 0.3336
+ 6. Slag                           - Score: 0.2802
+ 7. FineAgg                        - Score: 0.2704
+ 8. FlyAsh                         - Score: 0.1539
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0328
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7532
+ 3. Superplasticizer               - Score: 0.4709
+ 4. Water                          - Score: 0.4504
+ 5. FineAgg                        - Score: 0.3400
+ 6. CoarseAgg                      - Score: 0.3251
+ 7. Slag                           - Score: 0.2966
+ 8. FlyAsh                         - Score: 0.1671
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0291
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Superplasticizer               - Score: 0.4997
+ 4. Water                          - Score: 0.4930
+ 5. FineAgg                        - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3281
+ 7. Slag                           - Score: 0.3105
+ 8. FlyAsh                         - Score: 0.1934
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0285
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5561
+ 4. Water                          - Score: 0.4943
+ 5. CoarseAgg                      - Score: 0.3707
+ 6. FineAgg                        - Score: 0.3577
+ 7. Slag                           - Score: 0.3559
+ 8. FlyAsh                         - Score: 0.2355
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0315
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7117
+ 3. Superplasticizer               - Score: 0.4907
+ 4. Water                          - Score: 0.4465
+ 5. CoarseAgg                      - Score: 0.3112
+ 6. FineAgg                        - Score: 0.2975
+ 7. Slag                           - Score: 0.2795
+ 8. FlyAsh                         - Score: 0.1852
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0285
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7015
+ 3. Superplasticizer               - Score: 0.5014
+ 4. Water                          - Score: 0.4602
+ 5. Slag                           - Score: 0.3060
+ 6. FineAgg                        - Score: 0.3028
+ 7. CoarseAgg                      - Score: 0.2983
+ 8. FlyAsh                         - Score: 0.1466
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0282
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7435
+ 3. Superplasticizer               - Score: 0.4960
+ 4. Water                          - Score: 0.4798
+ 5. Slag                           - Score: 0.3364
+ 6. FineAgg                        - Score: 0.3333
+ 7. CoarseAgg                      - Score: 0.3098
+ 8. FlyAsh                         - Score: 0.1330
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0310
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7674
+ 3. Superplasticizer               - Score: 0.4636
+ 4. Water                          - Score: 0.4576
+ 5. FineAgg                        - Score: 0.3431
+ 6. Slag                           - Score: 0.3354
+ 7. CoarseAgg                      - Score: 0.2930
+ 8. FlyAsh                         - Score: 0.1687
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0327
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7275
+ 3. Superplasticizer               - Score: 0.5009
+ 4. Water                          - Score: 0.4495
+ 5. CoarseAgg                      - Score: 0.2933
+ 6. FineAgg                        - Score: 0.2852
+ 7. Slag                           - Score: 0.2711
+ 8. FlyAsh                         - Score: 0.1628
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0290
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6772
+ 3. Superplasticizer               - Score: 0.5204
+ 4. Water                          - Score: 0.4854
+ 5. FineAgg                        - Score: 0.3168
+ 6. Slag                           - Score: 0.3120
+ 7. CoarseAgg                      - Score: 0.3026
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0579
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6811
+ 3. Superplasticizer               - Score: 0.4945
+ 4. Water                          - Score: 0.4754
+ 5. CoarseAgg                      - Score: 0.3336
+ 6. Slag                           - Score: 0.2802
+ 7. FineAgg                        - Score: 0.2704
+ 8. FlyAsh                         - Score: 0.1539
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0606
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7532
+ 3. Superplasticizer               - Score: 0.4709
+ 4. Water                          - Score: 0.4504
+ 5. FineAgg                        - Score: 0.3400
+ 6. CoarseAgg                      - Score: 0.3251
+ 7. Slag                           - Score: 0.2966
+ 8. FlyAsh                         - Score: 0.1671
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0527
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Superplasticizer               - Score: 0.4997
+ 4. Water                          - Score: 0.4930
+ 5. FineAgg                        - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3281
+ 7. Slag                           - Score: 0.3105
+ 8. FlyAsh                         - Score: 0.1934
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0597
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5561
+ 4. Water                          - Score: 0.4943
+ 5. CoarseAgg                      - Score: 0.3707
+ 6. FineAgg                        - Score: 0.3577
+ 7. Slag                           - Score: 0.3559
+ 8. FlyAsh                         - Score: 0.2355
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0579
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7117
+ 3. Superplasticizer               - Score: 0.4907
+ 4. Water                          - Score: 0.4465
+ 5. CoarseAgg                      - Score: 0.3112
+ 6. FineAgg                        - Score: 0.2975
+ 7. Slag                           - Score: 0.2795
+ 8. FlyAsh                         - Score: 0.1852
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0530
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7015
+ 3. Superplasticizer               - Score: 0.5014
+ 4. Water                          - Score: 0.4602
+ 5. Slag                           - Score: 0.3060
+ 6. FineAgg                        - Score: 0.3028
+ 7. CoarseAgg                      - Score: 0.2983
+ 8. FlyAsh                         - Score: 0.1466
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0529
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7435
+ 3. Superplasticizer               - Score: 0.4960
+ 4. Water                          - Score: 0.4798
+ 5. Slag                           - Score: 0.3364
+ 6. FineAgg                        - Score: 0.3333
+ 7. CoarseAgg                      - Score: 0.3098
+ 8. FlyAsh                         - Score: 0.1330
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0551
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7674
+ 3. Superplasticizer               - Score: 0.4636
+ 4. Water                          - Score: 0.4576
+ 5. FineAgg                        - Score: 0.3431
+ 6. Slag                           - Score: 0.3354
+ 7. CoarseAgg                      - Score: 0.2930
+ 8. FlyAsh                         - Score: 0.1687
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0546
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7275
+ 3. Superplasticizer               - Score: 0.5009
+ 4. Water                          - Score: 0.4495
+ 5. CoarseAgg                      - Score: 0.2933
+ 6. FineAgg                        - Score: 0.2852
+ 7. Slag                           - Score: 0.2711
+ 8. FlyAsh                         - Score: 0.1628
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0562
+  done: n=3 0th
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0082
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9399
+ 3. Water                          - Score: 0.7560
+ 4. Superplasticizer               - Score: 0.7115
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.3678
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0078
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0072
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0079
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0080
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0081
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9505
+ 3. Water                          - Score: 0.7745
+ 4. Superplasticizer               - Score: 0.7169
+ 5. Slag                           - Score: 0.3692
+ 6. CoarseAgg                      - Score: 0.3635
+ 7. FineAgg                        - Score: 0.2567
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0079
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0077
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9198
+ 3. Water                          - Score: 0.6974
+ 4. Superplasticizer               - Score: 0.6340
+ 5. Slag                           - Score: 0.3815
+ 6. CoarseAgg                      - Score: 0.3367
+ 7. FineAgg                        - Score: 0.2695
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0088
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0080
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6772
+ 3. Superplasticizer               - Score: 0.5204
+ 4. Water                          - Score: 0.4854
+ 5. FineAgg                        - Score: 0.3168
+ 6. Slag                           - Score: 0.3120
+ 7. CoarseAgg                      - Score: 0.3026
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0082
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6811
+ 3. Superplasticizer               - Score: 0.4945
+ 4. Water                          - Score: 0.4754
+ 5. CoarseAgg                      - Score: 0.3336
+ 6. Slag                           - Score: 0.2802
+ 7. FineAgg                        - Score: 0.2704
+ 8. FlyAsh                         - Score: 0.1539
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0082
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7532
+ 3. Superplasticizer               - Score: 0.4709
+ 4. Water                          - Score: 0.4504
+ 5. FineAgg                        - Score: 0.3400
+ 6. CoarseAgg                      - Score: 0.3251
+ 7. Slag                           - Score: 0.2966
+ 8. FlyAsh                         - Score: 0.1671
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0074
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Superplasticizer               - Score: 0.4997
+ 4. Water                          - Score: 0.4930
+ 5. FineAgg                        - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3281
+ 7. Slag                           - Score: 0.3105
+ 8. FlyAsh                         - Score: 0.1934
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0079
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5561
+ 4. Water                          - Score: 0.4943
+ 5. CoarseAgg                      - Score: 0.3707
+ 6. FineAgg                        - Score: 0.3577
+ 7. Slag                           - Score: 0.3559
+ 8. FlyAsh                         - Score: 0.2355
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0081
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7117
+ 3. Superplasticizer               - Score: 0.4907
+ 4. Water                          - Score: 0.4465
+ 5. CoarseAgg                      - Score: 0.3112
+ 6. FineAgg                        - Score: 0.2975
+ 7. Slag                           - Score: 0.2795
+ 8. FlyAsh                         - Score: 0.1852
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0081
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7015
+ 3. Superplasticizer               - Score: 0.5014
+ 4. Water                          - Score: 0.4602
+ 5. Slag                           - Score: 0.3060
+ 6. FineAgg                        - Score: 0.3028
+ 7. CoarseAgg                      - Score: 0.2983
+ 8. FlyAsh                         - Score: 0.1466
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0078
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7435
+ 3. Superplasticizer               - Score: 0.4960
+ 4. Water                          - Score: 0.4798
+ 5. Slag                           - Score: 0.3364
+ 6. FineAgg                        - Score: 0.3333
+ 7. CoarseAgg                      - Score: 0.3098
+ 8. FlyAsh                         - Score: 0.1330
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0083
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7674
+ 3. Superplasticizer               - Score: 0.4636
+ 4. Water                          - Score: 0.4576
+ 5. FineAgg                        - Score: 0.3431
+ 6. Slag                           - Score: 0.3354
+ 7. CoarseAgg                      - Score: 0.2930
+ 8. FlyAsh                         - Score: 0.1687
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0085
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7275
+ 3. Superplasticizer               - Score: 0.5009
+ 4. Water                          - Score: 0.4495
+ 5. CoarseAgg                      - Score: 0.2933
+ 6. FineAgg                        - Score: 0.2852
+ 7. Slag                           - Score: 0.2711
+ 8. FlyAsh                         - Score: 0.1628
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0086
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6772
+ 3. Superplasticizer               - Score: 0.5204
+ 4. Water                          - Score: 0.4854
+ 5. FineAgg                        - Score: 0.3168
+ 6. Slag                           - Score: 0.3120
+ 7. CoarseAgg                      - Score: 0.3026
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0081
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6811
+ 3. Superplasticizer               - Score: 0.4945
+ 4. Water                          - Score: 0.4754
+ 5. CoarseAgg                      - Score: 0.3336
+ 6. Slag                           - Score: 0.2802
+ 7. FineAgg                        - Score: 0.2704
+ 8. FlyAsh                         - Score: 0.1539
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0081
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7532
+ 3. Superplasticizer               - Score: 0.4709
+ 4. Water                          - Score: 0.4504
+ 5. FineAgg                        - Score: 0.3400
+ 6. CoarseAgg                      - Score: 0.3251
+ 7. Slag                           - Score: 0.2966
+ 8. FlyAsh                         - Score: 0.1671
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0074
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Superplasticizer               - Score: 0.4997
+ 4. Water                          - Score: 0.4930
+ 5. FineAgg                        - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3281
+ 7. Slag                           - Score: 0.3105
+ 8. FlyAsh                         - Score: 0.1934
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0078
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5561
+ 4. Water                          - Score: 0.4943
+ 5. CoarseAgg                      - Score: 0.3707
+ 6. FineAgg                        - Score: 0.3577
+ 7. Slag                           - Score: 0.3559
+ 8. FlyAsh                         - Score: 0.2355
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0082
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7117
+ 3. Superplasticizer               - Score: 0.4907
+ 4. Water                          - Score: 0.4465
+ 5. CoarseAgg                      - Score: 0.3112
+ 6. FineAgg                        - Score: 0.2975
+ 7. Slag                           - Score: 0.2795
+ 8. FlyAsh                         - Score: 0.1852
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0081
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7015
+ 3. Superplasticizer               - Score: 0.5014
+ 4. Water                          - Score: 0.4602
+ 5. Slag                           - Score: 0.3060
+ 6. FineAgg                        - Score: 0.3028
+ 7. CoarseAgg                      - Score: 0.2983
+ 8. FlyAsh                         - Score: 0.1466
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0079
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7435
+ 3. Superplasticizer               - Score: 0.4960
+ 4. Water                          - Score: 0.4798
+ 5. Slag                           - Score: 0.3364
+ 6. FineAgg                        - Score: 0.3333
+ 7. CoarseAgg                      - Score: 0.3098
+ 8. FlyAsh                         - Score: 0.1330
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0082
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7674
+ 3. Superplasticizer               - Score: 0.4636
+ 4. Water                          - Score: 0.4576
+ 5. FineAgg                        - Score: 0.3431
+ 6. Slag                           - Score: 0.3354
+ 7. CoarseAgg                      - Score: 0.2930
+ 8. FlyAsh                         - Score: 0.1687
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0085
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7275
+ 3. Superplasticizer               - Score: 0.5009
+ 4. Water                          - Score: 0.4495
+ 5. CoarseAgg                      - Score: 0.2933
+ 6. FineAgg                        - Score: 0.2852
+ 7. Slag                           - Score: 0.2711
+ 8. FlyAsh                         - Score: 0.1628
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0086
+  done: n=3 1st
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0059
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9399
+ 3. Water                          - Score: 0.7560
+ 4. Superplasticizer               - Score: 0.7115
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.3678
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0058
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0052
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0057
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0056
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0057
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9505
+ 3. Water                          - Score: 0.7745
+ 4. Superplasticizer               - Score: 0.7169
+ 5. Slag                           - Score: 0.3692
+ 6. CoarseAgg                      - Score: 0.3635
+ 7. FineAgg                        - Score: 0.2567
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0059
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0055
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9198
+ 3. Water                          - Score: 0.6974
+ 4. Superplasticizer               - Score: 0.6340
+ 5. Slag                           - Score: 0.3815
+ 6. CoarseAgg                      - Score: 0.3367
+ 7. FineAgg                        - Score: 0.2695
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0065
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0056
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6772
+ 3. Superplasticizer               - Score: 0.5204
+ 4. Water                          - Score: 0.4854
+ 5. FineAgg                        - Score: 0.3168
+ 6. Slag                           - Score: 0.3120
+ 7. CoarseAgg                      - Score: 0.3026
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0056
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6811
+ 3. Superplasticizer               - Score: 0.4945
+ 4. Water                          - Score: 0.4754
+ 5. CoarseAgg                      - Score: 0.3336
+ 6. Slag                           - Score: 0.2802
+ 7. FineAgg                        - Score: 0.2704
+ 8. FlyAsh                         - Score: 0.1539
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0061
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7532
+ 3. Superplasticizer               - Score: 0.4709
+ 4. Water                          - Score: 0.4504
+ 5. FineAgg                        - Score: 0.3400
+ 6. CoarseAgg                      - Score: 0.3251
+ 7. Slag                           - Score: 0.2966
+ 8. FlyAsh                         - Score: 0.1671
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0053
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Superplasticizer               - Score: 0.4997
+ 4. Water                          - Score: 0.4930
+ 5. FineAgg                        - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3281
+ 7. Slag                           - Score: 0.3105
+ 8. FlyAsh                         - Score: 0.1934
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0052
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5561
+ 4. Water                          - Score: 0.4943
+ 5. CoarseAgg                      - Score: 0.3707
+ 6. FineAgg                        - Score: 0.3577
+ 7. Slag                           - Score: 0.3559
+ 8. FlyAsh                         - Score: 0.2355
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0059
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7117
+ 3. Superplasticizer               - Score: 0.4907
+ 4. Water                          - Score: 0.4465
+ 5. CoarseAgg                      - Score: 0.3112
+ 6. FineAgg                        - Score: 0.2975
+ 7. Slag                           - Score: 0.2795
+ 8. FlyAsh                         - Score: 0.1852
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0058
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7015
+ 3. Superplasticizer               - Score: 0.5014
+ 4. Water                          - Score: 0.4602
+ 5. Slag                           - Score: 0.3060
+ 6. FineAgg                        - Score: 0.3028
+ 7. CoarseAgg                      - Score: 0.2983
+ 8. FlyAsh                         - Score: 0.1466
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0060
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7435
+ 3. Superplasticizer               - Score: 0.4960
+ 4. Water                          - Score: 0.4798
+ 5. Slag                           - Score: 0.3364
+ 6. FineAgg                        - Score: 0.3333
+ 7. CoarseAgg                      - Score: 0.3098
+ 8. FlyAsh                         - Score: 0.1330
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0059
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7674
+ 3. Superplasticizer               - Score: 0.4636
+ 4. Water                          - Score: 0.4576
+ 5. FineAgg                        - Score: 0.3431
+ 6. Slag                           - Score: 0.3354
+ 7. CoarseAgg                      - Score: 0.2930
+ 8. FlyAsh                         - Score: 0.1687
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0062
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7275
+ 3. Superplasticizer               - Score: 0.5009
+ 4. Water                          - Score: 0.4495
+ 5. CoarseAgg                      - Score: 0.2933
+ 6. FineAgg                        - Score: 0.2852
+ 7. Slag                           - Score: 0.2711
+ 8. FlyAsh                         - Score: 0.1628
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6772
+ 3. Superplasticizer               - Score: 0.5204
+ 4. Water                          - Score: 0.4854
+ 5. FineAgg                        - Score: 0.3168
+ 6. Slag                           - Score: 0.3120
+ 7. CoarseAgg                      - Score: 0.3026
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0056
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6811
+ 3. Superplasticizer               - Score: 0.4945
+ 4. Water                          - Score: 0.4754
+ 5. CoarseAgg                      - Score: 0.3336
+ 6. Slag                           - Score: 0.2802
+ 7. FineAgg                        - Score: 0.2704
+ 8. FlyAsh                         - Score: 0.1539
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0062
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7532
+ 3. Superplasticizer               - Score: 0.4709
+ 4. Water                          - Score: 0.4504
+ 5. FineAgg                        - Score: 0.3400
+ 6. CoarseAgg                      - Score: 0.3251
+ 7. Slag                           - Score: 0.2966
+ 8. FlyAsh                         - Score: 0.1671
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0054
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Superplasticizer               - Score: 0.4997
+ 4. Water                          - Score: 0.4930
+ 5. FineAgg                        - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3281
+ 7. Slag                           - Score: 0.3105
+ 8. FlyAsh                         - Score: 0.1934
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0053
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5561
+ 4. Water                          - Score: 0.4943
+ 5. CoarseAgg                      - Score: 0.3707
+ 6. FineAgg                        - Score: 0.3577
+ 7. Slag                           - Score: 0.3559
+ 8. FlyAsh                         - Score: 0.2355
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0059
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7117
+ 3. Superplasticizer               - Score: 0.4907
+ 4. Water                          - Score: 0.4465
+ 5. CoarseAgg                      - Score: 0.3112
+ 6. FineAgg                        - Score: 0.2975
+ 7. Slag                           - Score: 0.2795
+ 8. FlyAsh                         - Score: 0.1852
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0059
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7015
+ 3. Superplasticizer               - Score: 0.5014
+ 4. Water                          - Score: 0.4602
+ 5. Slag                           - Score: 0.3060
+ 6. FineAgg                        - Score: 0.3028
+ 7. CoarseAgg                      - Score: 0.2983
+ 8. FlyAsh                         - Score: 0.1466
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0061
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7435
+ 3. Superplasticizer               - Score: 0.4960
+ 4. Water                          - Score: 0.4798
+ 5. Slag                           - Score: 0.3364
+ 6. FineAgg                        - Score: 0.3333
+ 7. CoarseAgg                      - Score: 0.3098
+ 8. FlyAsh                         - Score: 0.1330
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0060
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7674
+ 3. Superplasticizer               - Score: 0.4636
+ 4. Water                          - Score: 0.4576
+ 5. FineAgg                        - Score: 0.3431
+ 6. Slag                           - Score: 0.3354
+ 7. CoarseAgg                      - Score: 0.2930
+ 8. FlyAsh                         - Score: 0.1687
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7275
+ 3. Superplasticizer               - Score: 0.5009
+ 4. Water                          - Score: 0.4495
+ 5. CoarseAgg                      - Score: 0.2933
+ 6. FineAgg                        - Score: 0.2852
+ 7. Slag                           - Score: 0.2711
+ 8. FlyAsh                         - Score: 0.1628
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0065
+  done: n=3 2nd
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8625
+ 3. Water                          - Score: 0.6909
+ 4. Superplasticizer               - Score: 0.5937
+ 5. Slag                           - Score: 0.4414
+ 6. FlyAsh                         - Score: 0.3628
+ 7. CoarseAgg                      - Score: 0.2885
+ 8. FineAgg                        - Score: 0.2661
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0216
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8980
+ 3. Water                          - Score: 0.6783
+ 4. Superplasticizer               - Score: 0.5800
+ 5. Slag                           - Score: 0.3989
+ 6. CoarseAgg                      - Score: 0.3383
+ 7. FlyAsh                         - Score: 0.3171
+ 8. FineAgg                        - Score: 0.2285
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0208
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8903
+ 3. Water                          - Score: 0.6734
+ 4. Superplasticizer               - Score: 0.5302
+ 5. Slag                           - Score: 0.3649
+ 6. FlyAsh                         - Score: 0.2957
+ 7. CoarseAgg                      - Score: 0.2733
+ 8. FineAgg                        - Score: 0.2720
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0217
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9109
+ 3. Water                          - Score: 0.7114
+ 4. Superplasticizer               - Score: 0.5695
+ 5. Slag                           - Score: 0.3957
+ 6. FlyAsh                         - Score: 0.3409
+ 7. CoarseAgg                      - Score: 0.3143
+ 8. FineAgg                        - Score: 0.2547
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0200
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9899
+ 3. Water                          - Score: 0.7042
+ 4. Superplasticizer               - Score: 0.6145
+ 5. Slag                           - Score: 0.4902
+ 6. FlyAsh                         - Score: 0.3785
+ 7. CoarseAgg                      - Score: 0.3726
+ 8. FineAgg                        - Score: 0.2924
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0207
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9091
+ 3. Water                          - Score: 0.6323
+ 4. Superplasticizer               - Score: 0.5494
+ 5. Slag                           - Score: 0.3802
+ 6. FlyAsh                         - Score: 0.3314
+ 7. CoarseAgg                      - Score: 0.3027
+ 8. FineAgg                        - Score: 0.2417
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0222
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8560
+ 3. Water                          - Score: 0.6437
+ 4. Superplasticizer               - Score: 0.5658
+ 5. Slag                           - Score: 0.3937
+ 6. CoarseAgg                      - Score: 0.3009
+ 7. FlyAsh                         - Score: 0.2815
+ 8. FineAgg                        - Score: 0.2543
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0204
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8665
+ 3. Water                          - Score: 0.6577
+ 4. Superplasticizer               - Score: 0.5795
+ 5. Slag                           - Score: 0.4665
+ 6. FlyAsh                         - Score: 0.3275
+ 7. CoarseAgg                      - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2863
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0192
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9063
+ 3. Water                          - Score: 0.6506
+ 4. Superplasticizer               - Score: 0.5520
+ 5. Slag                           - Score: 0.4257
+ 6. CoarseAgg                      - Score: 0.2979
+ 7. FineAgg                        - Score: 0.2878
+ 8. FlyAsh                         - Score: 0.2809
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0207
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9249
+ 3. Water                          - Score: 0.6587
+ 4. Superplasticizer               - Score: 0.5766
+ 5. Slag                           - Score: 0.4221
+ 6. FlyAsh                         - Score: 0.3682
+ 7. CoarseAgg                      - Score: 0.3076
+ 8. FineAgg                        - Score: 0.2565
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0208
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7289
+ 3. Superplasticizer               - Score: 0.5282
+ 4. Water                          - Score: 0.5164
+ 5. FineAgg                        - Score: 0.3496
+ 6. Slag                           - Score: 0.3337
+ 7. CoarseAgg                      - Score: 0.3127
+ 8. FlyAsh                         - Score: 0.2297
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0260
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7740
+ 3. Superplasticizer               - Score: 0.5387
+ 4. Water                          - Score: 0.5100
+ 5. CoarseAgg                      - Score: 0.3521
+ 6. FineAgg                        - Score: 0.3053
+ 7. Slag                           - Score: 0.3038
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0257
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7571
+ 3. Superplasticizer               - Score: 0.4738
+ 4. Water                          - Score: 0.4723
+ 5. FineAgg                        - Score: 0.3330
+ 6. CoarseAgg                      - Score: 0.3042
+ 7. Slag                           - Score: 0.2869
+ 8. FlyAsh                         - Score: 0.1859
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0268
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8342
+ 3. Water                          - Score: 0.5018
+ 4. Superplasticizer               - Score: 0.4692
+ 5. FineAgg                        - Score: 0.3377
+ 6. CoarseAgg                      - Score: 0.3111
+ 7. Slag                           - Score: 0.2844
+ 8. FlyAsh                         - Score: 0.2328
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0291
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8188
+ 3. Superplasticizer               - Score: 0.5449
+ 4. Water                          - Score: 0.5396
+ 5. Slag                           - Score: 0.3616
+ 6. CoarseAgg                      - Score: 0.3574
+ 7. FineAgg                        - Score: 0.3395
+ 8. FlyAsh                         - Score: 0.2381
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0260
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7895
+ 3. Superplasticizer               - Score: 0.5057
+ 4. Water                          - Score: 0.4890
+ 5. CoarseAgg                      - Score: 0.3294
+ 6. Slag                           - Score: 0.3136
+ 7. FineAgg                        - Score: 0.3014
+ 8. FlyAsh                         - Score: 0.2225
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0275
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7232
+ 3. Superplasticizer               - Score: 0.5090
+ 4. Water                          - Score: 0.4840
+ 5. Slag                           - Score: 0.3268
+ 6. FineAgg                        - Score: 0.3203
+ 7. CoarseAgg                      - Score: 0.3171
+ 8. FlyAsh                         - Score: 0.1549
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0267
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7492
+ 3. Water                          - Score: 0.4981
+ 4. Superplasticizer               - Score: 0.4922
+ 5. Slag                           - Score: 0.3399
+ 6. FineAgg                        - Score: 0.3206
+ 7. CoarseAgg                      - Score: 0.3095
+ 8. FlyAsh                         - Score: 0.1588
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0228
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7849
+ 3. Water                          - Score: 0.4871
+ 4. Superplasticizer               - Score: 0.4738
+ 5. Slag                           - Score: 0.3572
+ 6. FineAgg                        - Score: 0.3487
+ 7. CoarseAgg                      - Score: 0.3062
+ 8. FlyAsh                         - Score: 0.2062
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0248
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7987
+ 3. Superplasticizer               - Score: 0.5443
+ 4. Water                          - Score: 0.5130
+ 5. CoarseAgg                      - Score: 0.3183
+ 6. Slag                           - Score: 0.3142
+ 7. FineAgg                        - Score: 0.2950
+ 8. FlyAsh                         - Score: 0.2068
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0286
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7289
+ 3. Superplasticizer               - Score: 0.5282
+ 4. Water                          - Score: 0.5164
+ 5. FineAgg                        - Score: 0.3496
+ 6. Slag                           - Score: 0.3337
+ 7. CoarseAgg                      - Score: 0.3127
+ 8. FlyAsh                         - Score: 0.2297
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0306
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7740
+ 3. Superplasticizer               - Score: 0.5387
+ 4. Water                          - Score: 0.5100
+ 5. CoarseAgg                      - Score: 0.3521
+ 6. FineAgg                        - Score: 0.3053
+ 7. Slag                           - Score: 0.3038
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0327
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7571
+ 3. Superplasticizer               - Score: 0.4738
+ 4. Water                          - Score: 0.4723
+ 5. FineAgg                        - Score: 0.3330
+ 6. CoarseAgg                      - Score: 0.3042
+ 7. Slag                           - Score: 0.2869
+ 8. FlyAsh                         - Score: 0.1859
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0370
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8342
+ 3. Water                          - Score: 0.5018
+ 4. Superplasticizer               - Score: 0.4692
+ 5. FineAgg                        - Score: 0.3377
+ 6. CoarseAgg                      - Score: 0.3111
+ 7. Slag                           - Score: 0.2844
+ 8. FlyAsh                         - Score: 0.2328
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0375
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8188
+ 3. Superplasticizer               - Score: 0.5449
+ 4. Water                          - Score: 0.5396
+ 5. Slag                           - Score: 0.3616
+ 6. CoarseAgg                      - Score: 0.3574
+ 7. FineAgg                        - Score: 0.3395
+ 8. FlyAsh                         - Score: 0.2381
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0350
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7895
+ 3. Superplasticizer               - Score: 0.5057
+ 4. Water                          - Score: 0.4890
+ 5. CoarseAgg                      - Score: 0.3294
+ 6. Slag                           - Score: 0.3136
+ 7. FineAgg                        - Score: 0.3014
+ 8. FlyAsh                         - Score: 0.2225
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0380
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7232
+ 3. Superplasticizer               - Score: 0.5090
+ 4. Water                          - Score: 0.4840
+ 5. Slag                           - Score: 0.3268
+ 6. FineAgg                        - Score: 0.3203
+ 7. CoarseAgg                      - Score: 0.3171
+ 8. FlyAsh                         - Score: 0.1549
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0366
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7492
+ 3. Water                          - Score: 0.4981
+ 4. Superplasticizer               - Score: 0.4922
+ 5. Slag                           - Score: 0.3399
+ 6. FineAgg                        - Score: 0.3206
+ 7. CoarseAgg                      - Score: 0.3095
+ 8. FlyAsh                         - Score: 0.1588
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0289
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7849
+ 3. Water                          - Score: 0.4871
+ 4. Superplasticizer               - Score: 0.4738
+ 5. Slag                           - Score: 0.3572
+ 6. FineAgg                        - Score: 0.3487
+ 7. CoarseAgg                      - Score: 0.3062
+ 8. FlyAsh                         - Score: 0.2062
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0318
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7987
+ 3. Superplasticizer               - Score: 0.5443
+ 4. Water                          - Score: 0.5130
+ 5. CoarseAgg                      - Score: 0.3183
+ 6. Slag                           - Score: 0.3142
+ 7. FineAgg                        - Score: 0.2950
+ 8. FlyAsh                         - Score: 0.2068
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0409
+  done: n=4 0th
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8625
+ 3. Water                          - Score: 0.6909
+ 4. Superplasticizer               - Score: 0.5937
+ 5. Slag                           - Score: 0.4414
+ 6. FlyAsh                         - Score: 0.3628
+ 7. CoarseAgg                      - Score: 0.2885
+ 8. FineAgg                        - Score: 0.2661
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0078
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8980
+ 3. Water                          - Score: 0.6783
+ 4. Superplasticizer               - Score: 0.5800
+ 5. Slag                           - Score: 0.3989
+ 6. CoarseAgg                      - Score: 0.3383
+ 7. FlyAsh                         - Score: 0.3171
+ 8. FineAgg                        - Score: 0.2285
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0077
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8903
+ 3. Water                          - Score: 0.6734
+ 4. Superplasticizer               - Score: 0.5302
+ 5. Slag                           - Score: 0.3649
+ 6. FlyAsh                         - Score: 0.2957
+ 7. CoarseAgg                      - Score: 0.2733
+ 8. FineAgg                        - Score: 0.2720
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0072
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9109
+ 3. Water                          - Score: 0.7114
+ 4. Superplasticizer               - Score: 0.5695
+ 5. Slag                           - Score: 0.3957
+ 6. FlyAsh                         - Score: 0.3409
+ 7. CoarseAgg                      - Score: 0.3143
+ 8. FineAgg                        - Score: 0.2547
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0070
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9899
+ 3. Water                          - Score: 0.7042
+ 4. Superplasticizer               - Score: 0.6145
+ 5. Slag                           - Score: 0.4902
+ 6. FlyAsh                         - Score: 0.3785
+ 7. CoarseAgg                      - Score: 0.3726
+ 8. FineAgg                        - Score: 0.2924
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0073
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9091
+ 3. Water                          - Score: 0.6323
+ 4. Superplasticizer               - Score: 0.5494
+ 5. Slag                           - Score: 0.3802
+ 6. FlyAsh                         - Score: 0.3314
+ 7. CoarseAgg                      - Score: 0.3027
+ 8. FineAgg                        - Score: 0.2417
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0073
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8560
+ 3. Water                          - Score: 0.6437
+ 4. Superplasticizer               - Score: 0.5658
+ 5. Slag                           - Score: 0.3937
+ 6. CoarseAgg                      - Score: 0.3009
+ 7. FlyAsh                         - Score: 0.2815
+ 8. FineAgg                        - Score: 0.2543
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0074
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8665
+ 3. Water                          - Score: 0.6577
+ 4. Superplasticizer               - Score: 0.5795
+ 5. Slag                           - Score: 0.4665
+ 6. FlyAsh                         - Score: 0.3275
+ 7. CoarseAgg                      - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2863
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0069
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9063
+ 3. Water                          - Score: 0.6506
+ 4. Superplasticizer               - Score: 0.5520
+ 5. Slag                           - Score: 0.4257
+ 6. CoarseAgg                      - Score: 0.2979
+ 7. FineAgg                        - Score: 0.2878
+ 8. FlyAsh                         - Score: 0.2809
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0078
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9249
+ 3. Water                          - Score: 0.6587
+ 4. Superplasticizer               - Score: 0.5766
+ 5. Slag                           - Score: 0.4221
+ 6. FlyAsh                         - Score: 0.3682
+ 7. CoarseAgg                      - Score: 0.3076
+ 8. FineAgg                        - Score: 0.2565
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0074
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7289
+ 3. Superplasticizer               - Score: 0.5282
+ 4. Water                          - Score: 0.5164
+ 5. FineAgg                        - Score: 0.3496
+ 6. Slag                           - Score: 0.3337
+ 7. CoarseAgg                      - Score: 0.3127
+ 8. FlyAsh                         - Score: 0.2297
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0076
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7740
+ 3. Superplasticizer               - Score: 0.5387
+ 4. Water                          - Score: 0.5100
+ 5. CoarseAgg                      - Score: 0.3521
+ 6. FineAgg                        - Score: 0.3053
+ 7. Slag                           - Score: 0.3038
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0076
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7571
+ 3. Superplasticizer               - Score: 0.4738
+ 4. Water                          - Score: 0.4723
+ 5. FineAgg                        - Score: 0.3330
+ 6. CoarseAgg                      - Score: 0.3042
+ 7. Slag                           - Score: 0.2869
+ 8. FlyAsh                         - Score: 0.1859
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0073
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8342
+ 3. Water                          - Score: 0.5018
+ 4. Superplasticizer               - Score: 0.4692
+ 5. FineAgg                        - Score: 0.3377
+ 6. CoarseAgg                      - Score: 0.3111
+ 7. Slag                           - Score: 0.2844
+ 8. FlyAsh                         - Score: 0.2328
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0074
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8188
+ 3. Superplasticizer               - Score: 0.5449
+ 4. Water                          - Score: 0.5396
+ 5. Slag                           - Score: 0.3616
+ 6. CoarseAgg                      - Score: 0.3574
+ 7. FineAgg                        - Score: 0.3395
+ 8. FlyAsh                         - Score: 0.2381
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0076
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7895
+ 3. Superplasticizer               - Score: 0.5057
+ 4. Water                          - Score: 0.4890
+ 5. CoarseAgg                      - Score: 0.3294
+ 6. Slag                           - Score: 0.3136
+ 7. FineAgg                        - Score: 0.3014
+ 8. FlyAsh                         - Score: 0.2225
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0078
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7232
+ 3. Superplasticizer               - Score: 0.5090
+ 4. Water                          - Score: 0.4840
+ 5. Slag                           - Score: 0.3268
+ 6. FineAgg                        - Score: 0.3203
+ 7. CoarseAgg                      - Score: 0.3171
+ 8. FlyAsh                         - Score: 0.1549
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0072
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7492
+ 3. Water                          - Score: 0.4981
+ 4. Superplasticizer               - Score: 0.4922
+ 5. Slag                           - Score: 0.3399
+ 6. FineAgg                        - Score: 0.3206
+ 7. CoarseAgg                      - Score: 0.3095
+ 8. FlyAsh                         - Score: 0.1588
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0076
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7849
+ 3. Water                          - Score: 0.4871
+ 4. Superplasticizer               - Score: 0.4738
+ 5. Slag                           - Score: 0.3572
+ 6. FineAgg                        - Score: 0.3487
+ 7. CoarseAgg                      - Score: 0.3062
+ 8. FlyAsh                         - Score: 0.2062
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0076
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7987
+ 3. Superplasticizer               - Score: 0.5443
+ 4. Water                          - Score: 0.5130
+ 5. CoarseAgg                      - Score: 0.3183
+ 6. Slag                           - Score: 0.3142
+ 7. FineAgg                        - Score: 0.2950
+ 8. FlyAsh                         - Score: 0.2068
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0080
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7289
+ 3. Superplasticizer               - Score: 0.5282
+ 4. Water                          - Score: 0.5164
+ 5. FineAgg                        - Score: 0.3496
+ 6. Slag                           - Score: 0.3337
+ 7. CoarseAgg                      - Score: 0.3127
+ 8. FlyAsh                         - Score: 0.2297
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0074
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7740
+ 3. Superplasticizer               - Score: 0.5387
+ 4. Water                          - Score: 0.5100
+ 5. CoarseAgg                      - Score: 0.3521
+ 6. FineAgg                        - Score: 0.3053
+ 7. Slag                           - Score: 0.3038
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0075
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7571
+ 3. Superplasticizer               - Score: 0.4738
+ 4. Water                          - Score: 0.4723
+ 5. FineAgg                        - Score: 0.3330
+ 6. CoarseAgg                      - Score: 0.3042
+ 7. Slag                           - Score: 0.2869
+ 8. FlyAsh                         - Score: 0.1859
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0072
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8342
+ 3. Water                          - Score: 0.5018
+ 4. Superplasticizer               - Score: 0.4692
+ 5. FineAgg                        - Score: 0.3377
+ 6. CoarseAgg                      - Score: 0.3111
+ 7. Slag                           - Score: 0.2844
+ 8. FlyAsh                         - Score: 0.2328
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0073
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8188
+ 3. Superplasticizer               - Score: 0.5449
+ 4. Water                          - Score: 0.5396
+ 5. Slag                           - Score: 0.3616
+ 6. CoarseAgg                      - Score: 0.3574
+ 7. FineAgg                        - Score: 0.3395
+ 8. FlyAsh                         - Score: 0.2381
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0075
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7895
+ 3. Superplasticizer               - Score: 0.5057
+ 4. Water                          - Score: 0.4890
+ 5. CoarseAgg                      - Score: 0.3294
+ 6. Slag                           - Score: 0.3136
+ 7. FineAgg                        - Score: 0.3014
+ 8. FlyAsh                         - Score: 0.2225
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0077
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7232
+ 3. Superplasticizer               - Score: 0.5090
+ 4. Water                          - Score: 0.4840
+ 5. Slag                           - Score: 0.3268
+ 6. FineAgg                        - Score: 0.3203
+ 7. CoarseAgg                      - Score: 0.3171
+ 8. FlyAsh                         - Score: 0.1549
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0071
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7492
+ 3. Water                          - Score: 0.4981
+ 4. Superplasticizer               - Score: 0.4922
+ 5. Slag                           - Score: 0.3399
+ 6. FineAgg                        - Score: 0.3206
+ 7. CoarseAgg                      - Score: 0.3095
+ 8. FlyAsh                         - Score: 0.1588
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0075
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7849
+ 3. Water                          - Score: 0.4871
+ 4. Superplasticizer               - Score: 0.4738
+ 5. Slag                           - Score: 0.3572
+ 6. FineAgg                        - Score: 0.3487
+ 7. CoarseAgg                      - Score: 0.3062
+ 8. FlyAsh                         - Score: 0.2062
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0076
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7987
+ 3. Superplasticizer               - Score: 0.5443
+ 4. Water                          - Score: 0.5130
+ 5. CoarseAgg                      - Score: 0.3183
+ 6. Slag                           - Score: 0.3142
+ 7. FineAgg                        - Score: 0.2950
+ 8. FlyAsh                         - Score: 0.2068
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0080
+  done: n=4 1st
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8625
+ 3. Water                          - Score: 0.6909
+ 4. Superplasticizer               - Score: 0.5937
+ 5. Slag                           - Score: 0.4414
+ 6. FlyAsh                         - Score: 0.3628
+ 7. CoarseAgg                      - Score: 0.2885
+ 8. FineAgg                        - Score: 0.2661
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0054
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8980
+ 3. Water                          - Score: 0.6783
+ 4. Superplasticizer               - Score: 0.5800
+ 5. Slag                           - Score: 0.3989
+ 6. CoarseAgg                      - Score: 0.3383
+ 7. FlyAsh                         - Score: 0.3171
+ 8. FineAgg                        - Score: 0.2285
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0052
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8903
+ 3. Water                          - Score: 0.6734
+ 4. Superplasticizer               - Score: 0.5302
+ 5. Slag                           - Score: 0.3649
+ 6. FlyAsh                         - Score: 0.2957
+ 7. CoarseAgg                      - Score: 0.2733
+ 8. FineAgg                        - Score: 0.2720
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0051
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9109
+ 3. Water                          - Score: 0.7114
+ 4. Superplasticizer               - Score: 0.5695
+ 5. Slag                           - Score: 0.3957
+ 6. FlyAsh                         - Score: 0.3409
+ 7. CoarseAgg                      - Score: 0.3143
+ 8. FineAgg                        - Score: 0.2547
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9899
+ 3. Water                          - Score: 0.7042
+ 4. Superplasticizer               - Score: 0.6145
+ 5. Slag                           - Score: 0.4902
+ 6. FlyAsh                         - Score: 0.3785
+ 7. CoarseAgg                      - Score: 0.3726
+ 8. FineAgg                        - Score: 0.2924
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0047
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9091
+ 3. Water                          - Score: 0.6323
+ 4. Superplasticizer               - Score: 0.5494
+ 5. Slag                           - Score: 0.3802
+ 6. FlyAsh                         - Score: 0.3314
+ 7. CoarseAgg                      - Score: 0.3027
+ 8. FineAgg                        - Score: 0.2417
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0051
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8560
+ 3. Water                          - Score: 0.6437
+ 4. Superplasticizer               - Score: 0.5658
+ 5. Slag                           - Score: 0.3937
+ 6. CoarseAgg                      - Score: 0.3009
+ 7. FlyAsh                         - Score: 0.2815
+ 8. FineAgg                        - Score: 0.2543
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0054
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8665
+ 3. Water                          - Score: 0.6577
+ 4. Superplasticizer               - Score: 0.5795
+ 5. Slag                           - Score: 0.4665
+ 6. FlyAsh                         - Score: 0.3275
+ 7. CoarseAgg                      - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2863
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9063
+ 3. Water                          - Score: 0.6506
+ 4. Superplasticizer               - Score: 0.5520
+ 5. Slag                           - Score: 0.4257
+ 6. CoarseAgg                      - Score: 0.2979
+ 7. FineAgg                        - Score: 0.2878
+ 8. FlyAsh                         - Score: 0.2809
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0056
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9249
+ 3. Water                          - Score: 0.6587
+ 4. Superplasticizer               - Score: 0.5766
+ 5. Slag                           - Score: 0.4221
+ 6. FlyAsh                         - Score: 0.3682
+ 7. CoarseAgg                      - Score: 0.3076
+ 8. FineAgg                        - Score: 0.2565
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7289
+ 3. Superplasticizer               - Score: 0.5282
+ 4. Water                          - Score: 0.5164
+ 5. FineAgg                        - Score: 0.3496
+ 6. Slag                           - Score: 0.3337
+ 7. CoarseAgg                      - Score: 0.3127
+ 8. FlyAsh                         - Score: 0.2297
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7740
+ 3. Superplasticizer               - Score: 0.5387
+ 4. Water                          - Score: 0.5100
+ 5. CoarseAgg                      - Score: 0.3521
+ 6. FineAgg                        - Score: 0.3053
+ 7. Slag                           - Score: 0.3038
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0052
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7571
+ 3. Superplasticizer               - Score: 0.4738
+ 4. Water                          - Score: 0.4723
+ 5. FineAgg                        - Score: 0.3330
+ 6. CoarseAgg                      - Score: 0.3042
+ 7. Slag                           - Score: 0.2869
+ 8. FlyAsh                         - Score: 0.1859
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8342
+ 3. Water                          - Score: 0.5018
+ 4. Superplasticizer               - Score: 0.4692
+ 5. FineAgg                        - Score: 0.3377
+ 6. CoarseAgg                      - Score: 0.3111
+ 7. Slag                           - Score: 0.2844
+ 8. FlyAsh                         - Score: 0.2328
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0048
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8188
+ 3. Superplasticizer               - Score: 0.5449
+ 4. Water                          - Score: 0.5396
+ 5. Slag                           - Score: 0.3616
+ 6. CoarseAgg                      - Score: 0.3574
+ 7. FineAgg                        - Score: 0.3395
+ 8. FlyAsh                         - Score: 0.2381
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7895
+ 3. Superplasticizer               - Score: 0.5057
+ 4. Water                          - Score: 0.4890
+ 5. CoarseAgg                      - Score: 0.3294
+ 6. Slag                           - Score: 0.3136
+ 7. FineAgg                        - Score: 0.3014
+ 8. FlyAsh                         - Score: 0.2225
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0054
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7232
+ 3. Superplasticizer               - Score: 0.5090
+ 4. Water                          - Score: 0.4840
+ 5. Slag                           - Score: 0.3268
+ 6. FineAgg                        - Score: 0.3203
+ 7. CoarseAgg                      - Score: 0.3171
+ 8. FlyAsh                         - Score: 0.1549
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0054
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7492
+ 3. Water                          - Score: 0.4981
+ 4. Superplasticizer               - Score: 0.4922
+ 5. Slag                           - Score: 0.3399
+ 6. FineAgg                        - Score: 0.3206
+ 7. CoarseAgg                      - Score: 0.3095
+ 8. FlyAsh                         - Score: 0.1588
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7849
+ 3. Water                          - Score: 0.4871
+ 4. Superplasticizer               - Score: 0.4738
+ 5. Slag                           - Score: 0.3572
+ 6. FineAgg                        - Score: 0.3487
+ 7. CoarseAgg                      - Score: 0.3062
+ 8. FlyAsh                         - Score: 0.2062
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0058
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7987
+ 3. Superplasticizer               - Score: 0.5443
+ 4. Water                          - Score: 0.5130
+ 5. CoarseAgg                      - Score: 0.3183
+ 6. Slag                           - Score: 0.3142
+ 7. FineAgg                        - Score: 0.2950
+ 8. FlyAsh                         - Score: 0.2068
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0052
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7289
+ 3. Superplasticizer               - Score: 0.5282
+ 4. Water                          - Score: 0.5164
+ 5. FineAgg                        - Score: 0.3496
+ 6. Slag                           - Score: 0.3337
+ 7. CoarseAgg                      - Score: 0.3127
+ 8. FlyAsh                         - Score: 0.2297
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7740
+ 3. Superplasticizer               - Score: 0.5387
+ 4. Water                          - Score: 0.5100
+ 5. CoarseAgg                      - Score: 0.3521
+ 6. FineAgg                        - Score: 0.3053
+ 7. Slag                           - Score: 0.3038
+ 8. FlyAsh                         - Score: 0.1992
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0052
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7571
+ 3. Superplasticizer               - Score: 0.4738
+ 4. Water                          - Score: 0.4723
+ 5. FineAgg                        - Score: 0.3330
+ 6. CoarseAgg                      - Score: 0.3042
+ 7. Slag                           - Score: 0.2869
+ 8. FlyAsh                         - Score: 0.1859
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8342
+ 3. Water                          - Score: 0.5018
+ 4. Superplasticizer               - Score: 0.4692
+ 5. FineAgg                        - Score: 0.3377
+ 6. CoarseAgg                      - Score: 0.3111
+ 7. Slag                           - Score: 0.2844
+ 8. FlyAsh                         - Score: 0.2328
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0048
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8188
+ 3. Superplasticizer               - Score: 0.5449
+ 4. Water                          - Score: 0.5396
+ 5. Slag                           - Score: 0.3616
+ 6. CoarseAgg                      - Score: 0.3574
+ 7. FineAgg                        - Score: 0.3395
+ 8. FlyAsh                         - Score: 0.2381
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7895
+ 3. Superplasticizer               - Score: 0.5057
+ 4. Water                          - Score: 0.4890
+ 5. CoarseAgg                      - Score: 0.3294
+ 6. Slag                           - Score: 0.3136
+ 7. FineAgg                        - Score: 0.3014
+ 8. FlyAsh                         - Score: 0.2225
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0055
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7232
+ 3. Superplasticizer               - Score: 0.5090
+ 4. Water                          - Score: 0.4840
+ 5. Slag                           - Score: 0.3268
+ 6. FineAgg                        - Score: 0.3203
+ 7. CoarseAgg                      - Score: 0.3171
+ 8. FlyAsh                         - Score: 0.1549
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0054
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7492
+ 3. Water                          - Score: 0.4981
+ 4. Superplasticizer               - Score: 0.4922
+ 5. Slag                           - Score: 0.3399
+ 6. FineAgg                        - Score: 0.3206
+ 7. CoarseAgg                      - Score: 0.3095
+ 8. FlyAsh                         - Score: 0.1588
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7849
+ 3. Water                          - Score: 0.4871
+ 4. Superplasticizer               - Score: 0.4738
+ 5. Slag                           - Score: 0.3572
+ 6. FineAgg                        - Score: 0.3487
+ 7. CoarseAgg                      - Score: 0.3062
+ 8. FlyAsh                         - Score: 0.2062
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0058
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7987
+ 3. Superplasticizer               - Score: 0.5443
+ 4. Water                          - Score: 0.5130
+ 5. CoarseAgg                      - Score: 0.3183
+ 6. Slag                           - Score: 0.3142
+ 7. FineAgg                        - Score: 0.2950
+ 8. FlyAsh                         - Score: 0.2068
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0052
+  done: n=4 2nd
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8676
+ 3. Water                          - Score: 0.6860
+ 4. Superplasticizer               - Score: 0.5891
+ 5. Slag                           - Score: 0.4092
+ 6. FineAgg                        - Score: 0.3771
+ 7. FlyAsh                         - Score: 0.3578
+ 8. CoarseAgg                      - Score: 0.3123
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0175
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9000
+ 3. Water                          - Score: 0.6781
+ 4. Superplasticizer               - Score: 0.5713
+ 5. Slag                           - Score: 0.3585
+ 6. CoarseAgg                      - Score: 0.3354
+ 7. FlyAsh                         - Score: 0.3319
+ 8. FineAgg                        - Score: 0.3045
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0172
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9523
+ 3. Water                          - Score: 0.6966
+ 4. Superplasticizer               - Score: 0.5468
+ 5. Slag                           - Score: 0.3606
+ 6. FineAgg                        - Score: 0.3401
+ 7. FlyAsh                         - Score: 0.3372
+ 8. CoarseAgg                      - Score: 0.3062
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0148
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9607
+ 3. Water                          - Score: 0.7011
+ 4. Superplasticizer               - Score: 0.5353
+ 5. FlyAsh                         - Score: 0.3892
+ 6. Slag                           - Score: 0.3416
+ 7. FineAgg                        - Score: 0.3329
+ 8. CoarseAgg                      - Score: 0.2898
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0155
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9728
+ 3. Water                          - Score: 0.7067
+ 4. Superplasticizer               - Score: 0.5812
+ 5. Slag                           - Score: 0.3938
+ 6. FlyAsh                         - Score: 0.3707
+ 7. CoarseAgg                      - Score: 0.3540
+ 8. FineAgg                        - Score: 0.3287
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0171
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9271
+ 3. Water                          - Score: 0.6476
+ 4. Superplasticizer               - Score: 0.5390
+ 5. FlyAsh                         - Score: 0.3630
+ 6. Slag                           - Score: 0.3443
+ 7. FineAgg                        - Score: 0.3197
+ 8. CoarseAgg                      - Score: 0.2876
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0174
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9392
+ 3. Water                          - Score: 0.6557
+ 4. Superplasticizer               - Score: 0.5557
+ 5. Slag                           - Score: 0.3349
+ 6. FineAgg                        - Score: 0.3343
+ 7. CoarseAgg                      - Score: 0.3112
+ 8. FlyAsh                         - Score: 0.2854
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0169
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9083
+ 3. Water                          - Score: 0.6684
+ 4. Superplasticizer               - Score: 0.5515
+ 5. Slag                           - Score: 0.4272
+ 6. FlyAsh                         - Score: 0.3588
+ 7. FineAgg                        - Score: 0.3561
+ 8. CoarseAgg                      - Score: 0.3008
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0176
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9195
+ 3. Water                          - Score: 0.6585
+ 4. Superplasticizer               - Score: 0.5420
+ 5. Slag                           - Score: 0.3853
+ 6. FineAgg                        - Score: 0.3779
+ 7. CoarseAgg                      - Score: 0.3079
+ 8. FlyAsh                         - Score: 0.2794
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0163
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9380
+ 3. Water                          - Score: 0.6635
+ 4. Superplasticizer               - Score: 0.5548
+ 5. FlyAsh                         - Score: 0.3920
+ 6. Slag                           - Score: 0.3698
+ 7. FineAgg                        - Score: 0.3142
+ 8. CoarseAgg                      - Score: 0.3135
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0162
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7260
+ 3. Water                          - Score: 0.5469
+ 4. Superplasticizer               - Score: 0.5306
+ 5. FineAgg                        - Score: 0.3500
+ 6. CoarseAgg                      - Score: 0.3408
+ 7. Slag                           - Score: 0.3261
+ 8. FlyAsh                         - Score: 0.2368
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0218
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7201
+ 3. Water                          - Score: 0.4956
+ 4. Superplasticizer               - Score: 0.4808
+ 5. CoarseAgg                      - Score: 0.3279
+ 6. Slag                           - Score: 0.2749
+ 7. FineAgg                        - Score: 0.2721
+ 8. FlyAsh                         - Score: 0.1893
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0203
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7668
+ 3. Water                          - Score: 0.5200
+ 4. Superplasticizer               - Score: 0.4735
+ 5. FineAgg                        - Score: 0.3432
+ 6. CoarseAgg                      - Score: 0.3295
+ 7. Slag                           - Score: 0.3021
+ 8. FlyAsh                         - Score: 0.2002
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0200
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8266
+ 3. Water                          - Score: 0.5476
+ 4. Superplasticizer               - Score: 0.5052
+ 5. FineAgg                        - Score: 0.3505
+ 6. CoarseAgg                      - Score: 0.3424
+ 7. Slag                           - Score: 0.3198
+ 8. FlyAsh                         - Score: 0.2242
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0171
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8207
+ 3. Water                          - Score: 0.5490
+ 4. Superplasticizer               - Score: 0.5396
+ 5. CoarseAgg                      - Score: 0.3723
+ 6. Slag                           - Score: 0.3558
+ 7. FineAgg                        - Score: 0.3434
+ 8. FlyAsh                         - Score: 0.2630
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0233
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Water                          - Score: 0.4983
+ 4. Superplasticizer               - Score: 0.4823
+ 5. CoarseAgg                      - Score: 0.3091
+ 6. FineAgg                        - Score: 0.2999
+ 7. Slag                           - Score: 0.2944
+ 8. FlyAsh                         - Score: 0.2261
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0199
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7412
+ 3. Superplasticizer               - Score: 0.4947
+ 4. Water                          - Score: 0.4796
+ 5. CoarseAgg                      - Score: 0.3228
+ 6. FineAgg                        - Score: 0.3207
+ 7. Slag                           - Score: 0.3183
+ 8. FlyAsh                         - Score: 0.1925
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0231
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7574
+ 3. Water                          - Score: 0.5155
+ 4. Superplasticizer               - Score: 0.4879
+ 5. Slag                           - Score: 0.3480
+ 6. FineAgg                        - Score: 0.3331
+ 7. CoarseAgg                      - Score: 0.3207
+ 8. FlyAsh                         - Score: 0.1937
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0188
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7947
+ 3. Water                          - Score: 0.4987
+ 4. Superplasticizer               - Score: 0.4577
+ 5. FineAgg                        - Score: 0.3468
+ 6. Slag                           - Score: 0.3414
+ 7. CoarseAgg                      - Score: 0.2996
+ 8. FlyAsh                         - Score: 0.1948
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0210
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5195
+ 4. Water                          - Score: 0.5153
+ 5. CoarseAgg                      - Score: 0.3289
+ 6. FineAgg                        - Score: 0.2967
+ 7. Slag                           - Score: 0.2902
+ 8. FlyAsh                         - Score: 0.2281
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0196
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7260
+ 3. Water                          - Score: 0.5469
+ 4. Superplasticizer               - Score: 0.5306
+ 5. FineAgg                        - Score: 0.3500
+ 6. CoarseAgg                      - Score: 0.3408
+ 7. Slag                           - Score: 0.3261
+ 8. FlyAsh                         - Score: 0.2368
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0230
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7201
+ 3. Water                          - Score: 0.4956
+ 4. Superplasticizer               - Score: 0.4808
+ 5. CoarseAgg                      - Score: 0.3279
+ 6. Slag                           - Score: 0.2749
+ 7. FineAgg                        - Score: 0.2721
+ 8. FlyAsh                         - Score: 0.1893
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0211
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7668
+ 3. Water                          - Score: 0.5200
+ 4. Superplasticizer               - Score: 0.4735
+ 5. FineAgg                        - Score: 0.3432
+ 6. CoarseAgg                      - Score: 0.3295
+ 7. Slag                           - Score: 0.3021
+ 8. FlyAsh                         - Score: 0.2002
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0187
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8266
+ 3. Water                          - Score: 0.5476
+ 4. Superplasticizer               - Score: 0.5052
+ 5. FineAgg                        - Score: 0.3505
+ 6. CoarseAgg                      - Score: 0.3424
+ 7. Slag                           - Score: 0.3198
+ 8. FlyAsh                         - Score: 0.2242
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0189
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8207
+ 3. Water                          - Score: 0.5490
+ 4. Superplasticizer               - Score: 0.5396
+ 5. CoarseAgg                      - Score: 0.3723
+ 6. Slag                           - Score: 0.3558
+ 7. FineAgg                        - Score: 0.3434
+ 8. FlyAsh                         - Score: 0.2630
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0272
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Water                          - Score: 0.4983
+ 4. Superplasticizer               - Score: 0.4823
+ 5. CoarseAgg                      - Score: 0.3091
+ 6. FineAgg                        - Score: 0.2999
+ 7. Slag                           - Score: 0.2944
+ 8. FlyAsh                         - Score: 0.2261
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0197
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7412
+ 3. Superplasticizer               - Score: 0.4947
+ 4. Water                          - Score: 0.4796
+ 5. CoarseAgg                      - Score: 0.3228
+ 6. FineAgg                        - Score: 0.3207
+ 7. Slag                           - Score: 0.3183
+ 8. FlyAsh                         - Score: 0.1925
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0269
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7574
+ 3. Water                          - Score: 0.5155
+ 4. Superplasticizer               - Score: 0.4879
+ 5. Slag                           - Score: 0.3480
+ 6. FineAgg                        - Score: 0.3331
+ 7. CoarseAgg                      - Score: 0.3207
+ 8. FlyAsh                         - Score: 0.1937
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0183
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7947
+ 3. Water                          - Score: 0.4987
+ 4. Superplasticizer               - Score: 0.4577
+ 5. FineAgg                        - Score: 0.3468
+ 6. Slag                           - Score: 0.3414
+ 7. CoarseAgg                      - Score: 0.2996
+ 8. FlyAsh                         - Score: 0.1948
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0221
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5195
+ 4. Water                          - Score: 0.5153
+ 5. CoarseAgg                      - Score: 0.3289
+ 6. FineAgg                        - Score: 0.2967
+ 7. Slag                           - Score: 0.2902
+ 8. FlyAsh                         - Score: 0.2281
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0223
+  done: n=6 0th
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8676
+ 3. Water                          - Score: 0.6860
+ 4. Superplasticizer               - Score: 0.5891
+ 5. Slag                           - Score: 0.4092
+ 6. FineAgg                        - Score: 0.3771
+ 7. FlyAsh                         - Score: 0.3578
+ 8. CoarseAgg                      - Score: 0.3123
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0068
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9000
+ 3. Water                          - Score: 0.6781
+ 4. Superplasticizer               - Score: 0.5713
+ 5. Slag                           - Score: 0.3585
+ 6. CoarseAgg                      - Score: 0.3354
+ 7. FlyAsh                         - Score: 0.3319
+ 8. FineAgg                        - Score: 0.3045
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9523
+ 3. Water                          - Score: 0.6966
+ 4. Superplasticizer               - Score: 0.5468
+ 5. Slag                           - Score: 0.3606
+ 6. FineAgg                        - Score: 0.3401
+ 7. FlyAsh                         - Score: 0.3372
+ 8. CoarseAgg                      - Score: 0.3062
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0062
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9607
+ 3. Water                          - Score: 0.7011
+ 4. Superplasticizer               - Score: 0.5353
+ 5. FlyAsh                         - Score: 0.3892
+ 6. Slag                           - Score: 0.3416
+ 7. FineAgg                        - Score: 0.3329
+ 8. CoarseAgg                      - Score: 0.2898
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0061
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9728
+ 3. Water                          - Score: 0.7067
+ 4. Superplasticizer               - Score: 0.5812
+ 5. Slag                           - Score: 0.3938
+ 6. FlyAsh                         - Score: 0.3707
+ 7. CoarseAgg                      - Score: 0.3540
+ 8. FineAgg                        - Score: 0.3287
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0066
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9271
+ 3. Water                          - Score: 0.6476
+ 4. Superplasticizer               - Score: 0.5390
+ 5. FlyAsh                         - Score: 0.3630
+ 6. Slag                           - Score: 0.3443
+ 7. FineAgg                        - Score: 0.3197
+ 8. CoarseAgg                      - Score: 0.2876
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9392
+ 3. Water                          - Score: 0.6557
+ 4. Superplasticizer               - Score: 0.5557
+ 5. Slag                           - Score: 0.3349
+ 6. FineAgg                        - Score: 0.3343
+ 7. CoarseAgg                      - Score: 0.3112
+ 8. FlyAsh                         - Score: 0.2854
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0067
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9083
+ 3. Water                          - Score: 0.6684
+ 4. Superplasticizer               - Score: 0.5515
+ 5. Slag                           - Score: 0.4272
+ 6. FlyAsh                         - Score: 0.3588
+ 7. FineAgg                        - Score: 0.3561
+ 8. CoarseAgg                      - Score: 0.3008
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0064
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9195
+ 3. Water                          - Score: 0.6585
+ 4. Superplasticizer               - Score: 0.5420
+ 5. Slag                           - Score: 0.3853
+ 6. FineAgg                        - Score: 0.3779
+ 7. CoarseAgg                      - Score: 0.3079
+ 8. FlyAsh                         - Score: 0.2794
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0066
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9380
+ 3. Water                          - Score: 0.6635
+ 4. Superplasticizer               - Score: 0.5548
+ 5. FlyAsh                         - Score: 0.3920
+ 6. Slag                           - Score: 0.3698
+ 7. FineAgg                        - Score: 0.3142
+ 8. CoarseAgg                      - Score: 0.3135
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0060
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7260
+ 3. Water                          - Score: 0.5469
+ 4. Superplasticizer               - Score: 0.5306
+ 5. FineAgg                        - Score: 0.3500
+ 6. CoarseAgg                      - Score: 0.3408
+ 7. Slag                           - Score: 0.3261
+ 8. FlyAsh                         - Score: 0.2368
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0064
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7201
+ 3. Water                          - Score: 0.4956
+ 4. Superplasticizer               - Score: 0.4808
+ 5. CoarseAgg                      - Score: 0.3279
+ 6. Slag                           - Score: 0.2749
+ 7. FineAgg                        - Score: 0.2721
+ 8. FlyAsh                         - Score: 0.1893
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0065
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7668
+ 3. Water                          - Score: 0.5200
+ 4. Superplasticizer               - Score: 0.4735
+ 5. FineAgg                        - Score: 0.3432
+ 6. CoarseAgg                      - Score: 0.3295
+ 7. Slag                           - Score: 0.3021
+ 8. FlyAsh                         - Score: 0.2002
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0062
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8266
+ 3. Water                          - Score: 0.5476
+ 4. Superplasticizer               - Score: 0.5052
+ 5. FineAgg                        - Score: 0.3505
+ 6. CoarseAgg                      - Score: 0.3424
+ 7. Slag                           - Score: 0.3198
+ 8. FlyAsh                         - Score: 0.2242
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0065
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8207
+ 3. Water                          - Score: 0.5490
+ 4. Superplasticizer               - Score: 0.5396
+ 5. CoarseAgg                      - Score: 0.3723
+ 6. Slag                           - Score: 0.3558
+ 7. FineAgg                        - Score: 0.3434
+ 8. FlyAsh                         - Score: 0.2630
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Water                          - Score: 0.4983
+ 4. Superplasticizer               - Score: 0.4823
+ 5. CoarseAgg                      - Score: 0.3091
+ 6. FineAgg                        - Score: 0.2999
+ 7. Slag                           - Score: 0.2944
+ 8. FlyAsh                         - Score: 0.2261
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0064
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7412
+ 3. Superplasticizer               - Score: 0.4947
+ 4. Water                          - Score: 0.4796
+ 5. CoarseAgg                      - Score: 0.3228
+ 6. FineAgg                        - Score: 0.3207
+ 7. Slag                           - Score: 0.3183
+ 8. FlyAsh                         - Score: 0.1925
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0065
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7574
+ 3. Water                          - Score: 0.5155
+ 4. Superplasticizer               - Score: 0.4879
+ 5. Slag                           - Score: 0.3480
+ 6. FineAgg                        - Score: 0.3331
+ 7. CoarseAgg                      - Score: 0.3207
+ 8. FlyAsh                         - Score: 0.1937
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0064
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7947
+ 3. Water                          - Score: 0.4987
+ 4. Superplasticizer               - Score: 0.4577
+ 5. FineAgg                        - Score: 0.3468
+ 6. Slag                           - Score: 0.3414
+ 7. CoarseAgg                      - Score: 0.2996
+ 8. FlyAsh                         - Score: 0.1948
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0070
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5195
+ 4. Water                          - Score: 0.5153
+ 5. CoarseAgg                      - Score: 0.3289
+ 6. FineAgg                        - Score: 0.2967
+ 7. Slag                           - Score: 0.2902
+ 8. FlyAsh                         - Score: 0.2281
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0068
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7260
+ 3. Water                          - Score: 0.5469
+ 4. Superplasticizer               - Score: 0.5306
+ 5. FineAgg                        - Score: 0.3500
+ 6. CoarseAgg                      - Score: 0.3408
+ 7. Slag                           - Score: 0.3261
+ 8. FlyAsh                         - Score: 0.2368
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7201
+ 3. Water                          - Score: 0.4956
+ 4. Superplasticizer               - Score: 0.4808
+ 5. CoarseAgg                      - Score: 0.3279
+ 6. Slag                           - Score: 0.2749
+ 7. FineAgg                        - Score: 0.2721
+ 8. FlyAsh                         - Score: 0.1893
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0064
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7668
+ 3. Water                          - Score: 0.5200
+ 4. Superplasticizer               - Score: 0.4735
+ 5. FineAgg                        - Score: 0.3432
+ 6. CoarseAgg                      - Score: 0.3295
+ 7. Slag                           - Score: 0.3021
+ 8. FlyAsh                         - Score: 0.2002
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0061
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8266
+ 3. Water                          - Score: 0.5476
+ 4. Superplasticizer               - Score: 0.5052
+ 5. FineAgg                        - Score: 0.3505
+ 6. CoarseAgg                      - Score: 0.3424
+ 7. Slag                           - Score: 0.3198
+ 8. FlyAsh                         - Score: 0.2242
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0065
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8207
+ 3. Water                          - Score: 0.5490
+ 4. Superplasticizer               - Score: 0.5396
+ 5. CoarseAgg                      - Score: 0.3723
+ 6. Slag                           - Score: 0.3558
+ 7. FineAgg                        - Score: 0.3434
+ 8. FlyAsh                         - Score: 0.2630
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Water                          - Score: 0.4983
+ 4. Superplasticizer               - Score: 0.4823
+ 5. CoarseAgg                      - Score: 0.3091
+ 6. FineAgg                        - Score: 0.2999
+ 7. Slag                           - Score: 0.2944
+ 8. FlyAsh                         - Score: 0.2261
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0064
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7412
+ 3. Superplasticizer               - Score: 0.4947
+ 4. Water                          - Score: 0.4796
+ 5. CoarseAgg                      - Score: 0.3228
+ 6. FineAgg                        - Score: 0.3207
+ 7. Slag                           - Score: 0.3183
+ 8. FlyAsh                         - Score: 0.1925
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0065
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7574
+ 3. Water                          - Score: 0.5155
+ 4. Superplasticizer               - Score: 0.4879
+ 5. Slag                           - Score: 0.3480
+ 6. FineAgg                        - Score: 0.3331
+ 7. CoarseAgg                      - Score: 0.3207
+ 8. FlyAsh                         - Score: 0.1937
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7947
+ 3. Water                          - Score: 0.4987
+ 4. Superplasticizer               - Score: 0.4577
+ 5. FineAgg                        - Score: 0.3468
+ 6. Slag                           - Score: 0.3414
+ 7. CoarseAgg                      - Score: 0.2996
+ 8. FlyAsh                         - Score: 0.1948
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0070
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5195
+ 4. Water                          - Score: 0.5153
+ 5. CoarseAgg                      - Score: 0.3289
+ 6. FineAgg                        - Score: 0.2967
+ 7. Slag                           - Score: 0.2902
+ 8. FlyAsh                         - Score: 0.2281
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0068
+  done: n=6 1st
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8676
+ 3. Water                          - Score: 0.6860
+ 4. Superplasticizer               - Score: 0.5891
+ 5. Slag                           - Score: 0.4092
+ 6. FineAgg                        - Score: 0.3771
+ 7. FlyAsh                         - Score: 0.3578
+ 8. CoarseAgg                      - Score: 0.3123
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0049
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9000
+ 3. Water                          - Score: 0.6781
+ 4. Superplasticizer               - Score: 0.5713
+ 5. Slag                           - Score: 0.3585
+ 6. CoarseAgg                      - Score: 0.3354
+ 7. FlyAsh                         - Score: 0.3319
+ 8. FineAgg                        - Score: 0.3045
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0044
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9523
+ 3. Water                          - Score: 0.6966
+ 4. Superplasticizer               - Score: 0.5468
+ 5. Slag                           - Score: 0.3606
+ 6. FineAgg                        - Score: 0.3401
+ 7. FlyAsh                         - Score: 0.3372
+ 8. CoarseAgg                      - Score: 0.3062
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0043
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9607
+ 3. Water                          - Score: 0.7011
+ 4. Superplasticizer               - Score: 0.5353
+ 5. FlyAsh                         - Score: 0.3892
+ 6. Slag                           - Score: 0.3416
+ 7. FineAgg                        - Score: 0.3329
+ 8. CoarseAgg                      - Score: 0.2898
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0043
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9728
+ 3. Water                          - Score: 0.7067
+ 4. Superplasticizer               - Score: 0.5812
+ 5. Slag                           - Score: 0.3938
+ 6. FlyAsh                         - Score: 0.3707
+ 7. CoarseAgg                      - Score: 0.3540
+ 8. FineAgg                        - Score: 0.3287
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0046
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9271
+ 3. Water                          - Score: 0.6476
+ 4. Superplasticizer               - Score: 0.5390
+ 5. FlyAsh                         - Score: 0.3630
+ 6. Slag                           - Score: 0.3443
+ 7. FineAgg                        - Score: 0.3197
+ 8. CoarseAgg                      - Score: 0.2876
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0047
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9392
+ 3. Water                          - Score: 0.6557
+ 4. Superplasticizer               - Score: 0.5557
+ 5. Slag                           - Score: 0.3349
+ 6. FineAgg                        - Score: 0.3343
+ 7. CoarseAgg                      - Score: 0.3112
+ 8. FlyAsh                         - Score: 0.2854
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0051
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9083
+ 3. Water                          - Score: 0.6684
+ 4. Superplasticizer               - Score: 0.5515
+ 5. Slag                           - Score: 0.4272
+ 6. FlyAsh                         - Score: 0.3588
+ 7. FineAgg                        - Score: 0.3561
+ 8. CoarseAgg                      - Score: 0.3008
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9195
+ 3. Water                          - Score: 0.6585
+ 4. Superplasticizer               - Score: 0.5420
+ 5. Slag                           - Score: 0.3853
+ 6. FineAgg                        - Score: 0.3779
+ 7. CoarseAgg                      - Score: 0.3079
+ 8. FlyAsh                         - Score: 0.2794
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0049
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9380
+ 3. Water                          - Score: 0.6635
+ 4. Superplasticizer               - Score: 0.5548
+ 5. FlyAsh                         - Score: 0.3920
+ 6. Slag                           - Score: 0.3698
+ 7. FineAgg                        - Score: 0.3142
+ 8. CoarseAgg                      - Score: 0.3135
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0045
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7260
+ 3. Water                          - Score: 0.5469
+ 4. Superplasticizer               - Score: 0.5306
+ 5. FineAgg                        - Score: 0.3500
+ 6. CoarseAgg                      - Score: 0.3408
+ 7. Slag                           - Score: 0.3261
+ 8. FlyAsh                         - Score: 0.2368
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0045
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7201
+ 3. Water                          - Score: 0.4956
+ 4. Superplasticizer               - Score: 0.4808
+ 5. CoarseAgg                      - Score: 0.3279
+ 6. Slag                           - Score: 0.2749
+ 7. FineAgg                        - Score: 0.2721
+ 8. FlyAsh                         - Score: 0.1893
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0044
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7668
+ 3. Water                          - Score: 0.5200
+ 4. Superplasticizer               - Score: 0.4735
+ 5. FineAgg                        - Score: 0.3432
+ 6. CoarseAgg                      - Score: 0.3295
+ 7. Slag                           - Score: 0.3021
+ 8. FlyAsh                         - Score: 0.2002
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0042
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8266
+ 3. Water                          - Score: 0.5476
+ 4. Superplasticizer               - Score: 0.5052
+ 5. FineAgg                        - Score: 0.3505
+ 6. CoarseAgg                      - Score: 0.3424
+ 7. Slag                           - Score: 0.3198
+ 8. FlyAsh                         - Score: 0.2242
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0040
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8207
+ 3. Water                          - Score: 0.5490
+ 4. Superplasticizer               - Score: 0.5396
+ 5. CoarseAgg                      - Score: 0.3723
+ 6. Slag                           - Score: 0.3558
+ 7. FineAgg                        - Score: 0.3434
+ 8. FlyAsh                         - Score: 0.2630
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0044
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Water                          - Score: 0.4983
+ 4. Superplasticizer               - Score: 0.4823
+ 5. CoarseAgg                      - Score: 0.3091
+ 6. FineAgg                        - Score: 0.2999
+ 7. Slag                           - Score: 0.2944
+ 8. FlyAsh                         - Score: 0.2261
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0045
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7412
+ 3. Superplasticizer               - Score: 0.4947
+ 4. Water                          - Score: 0.4796
+ 5. CoarseAgg                      - Score: 0.3228
+ 6. FineAgg                        - Score: 0.3207
+ 7. Slag                           - Score: 0.3183
+ 8. FlyAsh                         - Score: 0.1925
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0046
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7574
+ 3. Water                          - Score: 0.5155
+ 4. Superplasticizer               - Score: 0.4879
+ 5. Slag                           - Score: 0.3480
+ 6. FineAgg                        - Score: 0.3331
+ 7. CoarseAgg                      - Score: 0.3207
+ 8. FlyAsh                         - Score: 0.1937
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0044
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7947
+ 3. Water                          - Score: 0.4987
+ 4. Superplasticizer               - Score: 0.4577
+ 5. FineAgg                        - Score: 0.3468
+ 6. Slag                           - Score: 0.3414
+ 7. CoarseAgg                      - Score: 0.2996
+ 8. FlyAsh                         - Score: 0.1948
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0047
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5195
+ 4. Water                          - Score: 0.5153
+ 5. CoarseAgg                      - Score: 0.3289
+ 6. FineAgg                        - Score: 0.2967
+ 7. Slag                           - Score: 0.2902
+ 8. FlyAsh                         - Score: 0.2281
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0046
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7260
+ 3. Water                          - Score: 0.5469
+ 4. Superplasticizer               - Score: 0.5306
+ 5. FineAgg                        - Score: 0.3500
+ 6. CoarseAgg                      - Score: 0.3408
+ 7. Slag                           - Score: 0.3261
+ 8. FlyAsh                         - Score: 0.2368
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0045
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7201
+ 3. Water                          - Score: 0.4956
+ 4. Superplasticizer               - Score: 0.4808
+ 5. CoarseAgg                      - Score: 0.3279
+ 6. Slag                           - Score: 0.2749
+ 7. FineAgg                        - Score: 0.2721
+ 8. FlyAsh                         - Score: 0.1893
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0044
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7668
+ 3. Water                          - Score: 0.5200
+ 4. Superplasticizer               - Score: 0.4735
+ 5. FineAgg                        - Score: 0.3432
+ 6. CoarseAgg                      - Score: 0.3295
+ 7. Slag                           - Score: 0.3021
+ 8. FlyAsh                         - Score: 0.2002
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0042
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8266
+ 3. Water                          - Score: 0.5476
+ 4. Superplasticizer               - Score: 0.5052
+ 5. FineAgg                        - Score: 0.3505
+ 6. CoarseAgg                      - Score: 0.3424
+ 7. Slag                           - Score: 0.3198
+ 8. FlyAsh                         - Score: 0.2242
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0040
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8207
+ 3. Water                          - Score: 0.5490
+ 4. Superplasticizer               - Score: 0.5396
+ 5. CoarseAgg                      - Score: 0.3723
+ 6. Slag                           - Score: 0.3558
+ 7. FineAgg                        - Score: 0.3434
+ 8. FlyAsh                         - Score: 0.2630
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0044
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7766
+ 3. Water                          - Score: 0.4983
+ 4. Superplasticizer               - Score: 0.4823
+ 5. CoarseAgg                      - Score: 0.3091
+ 6. FineAgg                        - Score: 0.2999
+ 7. Slag                           - Score: 0.2944
+ 8. FlyAsh                         - Score: 0.2261
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0045
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7412
+ 3. Superplasticizer               - Score: 0.4947
+ 4. Water                          - Score: 0.4796
+ 5. CoarseAgg                      - Score: 0.3228
+ 6. FineAgg                        - Score: 0.3207
+ 7. Slag                           - Score: 0.3183
+ 8. FlyAsh                         - Score: 0.1925
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0046
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7574
+ 3. Water                          - Score: 0.5155
+ 4. Superplasticizer               - Score: 0.4879
+ 5. Slag                           - Score: 0.3480
+ 6. FineAgg                        - Score: 0.3331
+ 7. CoarseAgg                      - Score: 0.3207
+ 8. FlyAsh                         - Score: 0.1937
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0045
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7947
+ 3. Water                          - Score: 0.4987
+ 4. Superplasticizer               - Score: 0.4577
+ 5. FineAgg                        - Score: 0.3468
+ 6. Slag                           - Score: 0.3414
+ 7. CoarseAgg                      - Score: 0.2996
+ 8. FlyAsh                         - Score: 0.1948
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0047
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8014
+ 3. Superplasticizer               - Score: 0.5195
+ 4. Water                          - Score: 0.5153
+ 5. CoarseAgg                      - Score: 0.3289
+ 6. FineAgg                        - Score: 0.2967
+ 7. Slag                           - Score: 0.2902
+ 8. FlyAsh                         - Score: 0.2281
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0046
+  done: n=6 2nd
+  wrote C:\personal\grad-school\reproduce\outputs\table_g5_output_partitioning.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_g5_output_partitioning.csv

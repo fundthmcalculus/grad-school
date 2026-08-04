@@ -181,6 +181,10 @@ PLAIN_TABLES=(
 )
 
 declare -A STATUS
+# Set when a dependency-fallback retry produced less output than the primary attempt,
+# so the primary's tables were restored. `ok` would be a lie for such a cell and
+# `FAILED` would be too, since usable tables are present -- hence a third state.
+declare -A DEGRADED
 declare -A SEEDS_USED
 
 # Resolved once, from common.py, so the provenance file reports the seed list the
@@ -318,17 +322,42 @@ run_one() {
   # platform, no network) must not cost the table entirely: the GPU generator
   # reports its own blocker as N/A cells when the import is missing, so retry
   # once on the reduced dependency set. Both attempts stay in the one log.
+  #
+  # The retry runs in a DEGRADED environment, so it must never overwrite a
+  # successful primary attempt. It did once: on 2026-08-04 the GPU generator
+  # measured all thirty-two rows, its workers were then killed, the non-zero exit
+  # took this branch, the retry found no CuPy, wrote four N/A rows over the good
+  # CSV and exited 0 -- so the run reported `ok` for a stubbed table. Exit status
+  # alone cannot tell those apart, which is this harness's founding complaint about
+  # itself. So: snapshot the outputs the primary attempt produced, and if the retry
+  # leaves fewer bytes than the primary did, put the primary's files back and label
+  # the cell DEGRADED rather than ok.
   if [ $rc -ne 0 ] && [ -n "${TABLE_DEPS_FALLBACK[$name]:-}" ]; then
+    _keep=$(mktemp -d)
+    for _f in "$OUT"/"$name".*; do [ -e "$_f" ] && cp -p "$_f" "$_keep/"; done
+    _kept_bytes=$(cat "$_keep"/* 2>/dev/null | wc -c)
     echo "--- retrying without the optional GPU dependency ---" >>"$log"
     "${env_prefix[@]}" uv run --project "$ROOT/$project" \
         ${TABLE_DEPS_FALLBACK[$name]} python \
         "$ROOT/reproduce/tables/$name.py" >>"$log" 2>&1
     rc=$?
+    _now_bytes=$(cat "$OUT"/"$name".* 2>/dev/null | wc -c)
+    if [ "$_kept_bytes" -gt "$_now_bytes" ] 2>/dev/null; then
+      echo "--- retry produced LESS output ($_now_bytes B) than the first attempt" \
+           "($_kept_bytes B); restoring the first attempt's tables ---" >>"$log"
+      cp -p "$_keep"/* "$OUT"/ 2>/dev/null
+      DEGRADED[$name]=1
+    fi
+    rm -rf "$_keep"
   fi
   t1=$(date +%s)
   after=$(snapshot_tables)
   if [ $rc -ne 0 ]; then
     STATUS[$name]="FAILED"
+  elif [ -n "${DEGRADED[$name]:-}" ]; then
+    # The retry clobbered a good primary result and its output was put back. Never `ok`:
+    # the tables present are the primary attempt's, but this pass did not verify them.
+    STATUS[$name]="DEGRADED-see-log"
   elif [ "$before" = "$after" ]; then
     STATUS[$name]="no-output"
   else

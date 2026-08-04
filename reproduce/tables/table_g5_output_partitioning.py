@@ -114,24 +114,66 @@ def partition(y_raw, n, scheme):
     return pd.concat([lab, y_raw], axis=1), cent, int(occ)
 
 
+def _drop_empty_buckets(lab, cent, n):
+    """Renumber the occupied buckets to 0..k-1 and keep only their centroids.
+
+    Needed because the partition is now fit on the training fold. At high skew an
+    equal-width bucket can be empty in the train fold, and then the rule base built from
+    the labels has fewer rules than `cent` has entries: `solve_tsk_consequents` returns
+    one mean per rule while `predict_tsk` indexes by rule id, which raised IndexError.
+    Starvation to the point of an empty bucket is the phenomenon this sweep exists to
+    measure, so it has to degrade to a smaller rule base rather than crash.
+
+    The caller keeps the occupancy reported by `partition` for the REQUESTED n, which is
+    the starvation diagnostic and is allowed to be zero. This only changes what the model
+    is fit on.
+    """
+    present = np.unique(np.asarray(lab))
+    if len(present) == n:
+        return np.asarray(lab), cent, n
+    remap = {int(o): i for i, o in enumerate(present)}
+    return (np.array([remap[int(v)] for v in np.asarray(lab)]),
+            np.asarray(cent)[present.astype(int)], int(len(present)))
+
+
 def run_one(X, y_raw, seed, n, order, scheme):
     from tribblefis.gauss_math import (calculate_gaussian_correlation,
                                        create_gaussian_membership_dict,
                                        take_top_features)
     from tribblefis.regression import predict_tsk, solve_tsk_consequents
 
-    yt = F.unit_scale(pd.Series(np.asarray(y_raw, float), name="y_value"))
-    y, cent, occ = partition(yt, n, scheme)
+    # Leak-free since 2026-08-04: split first, then derive the target scale, the partition
+    # and the feature scaler from the training fold alone. The partition is the variable
+    # under study here, so fitting it on all 1,030 rows would have let every arm see the
+    # test fold's target distribution through its own bin edges and centroids -- and the
+    # centroids reach inference through `solve_tsk_consequents`. The leak was symmetric
+    # across the three arms, so it did not bias the comparison, which is why this table's
+    # conclusion is unchanged; it did make the absolute R2 values non-comparable with any
+    # honest out-of-sample number. `occ` is the TRAIN-fold occupancy, which is the quantity
+    # the starvation argument is about.
+    idx = np.arange(len(X))
+    itr, _ite = train_test_split(idx, test_size=0.2, random_state=seed)
+    tr = np.zeros(len(X), dtype=bool); tr[itr] = True
+
+    yr = pd.Series(np.asarray(y_raw, float), index=X.index, name="y_value")
+    yt = F.unit_scale_with(float(yr[tr].min()), float(yr[tr].max()), yr)
+    y_tr_part, cent, occ = partition(yt[tr], n, scheme)
+    lab_tr, cent, n_eff = _drop_empty_buckets(y_tr_part["y_bucket"].values, cent, n)
+    buckets = pd.Series(np.nan, index=yt.index, name="y_bucket")
+    buckets[tr] = lab_tr
+    buckets[~tr] = 0          # cosmetic: only ytr["y_bucket"] is ever read
+    y = pd.concat([buckets.astype(int), yt.rename("y_value")], axis=1)
 
     # log + min-max, i.e. what this table has always measured (see F.normalize).
-    Xt, _ = F.normalize(X, scaler="unit")
+    sc, _lg = F.fit_scaler(X[tr], scaler="unit", log_dynamic_range=2)
+    Xt = F.apply_scaler(sc, X)
 
-    Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
+    Xtr, Xte, ytr, yte = Xt[tr], Xt[~tr], y[tr], y[~tr]
     diffs = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
     _, top = take_top_features(diffs, top_n=len(Xt.columns))
     memb = create_gaussian_membership_dict(Xtr, ytr["y_bucket"], top_n_var_names=top)
     corr, cent2 = solve_tsk_consequents(Xtr, memb, top, cent, ytr,
-                                        n_output_buckets=n, order=order,
+                                        n_output_buckets=n_eff, order=order,
                                         l2_reg=L2, basis="raw", cross_pairs=None)
     pred = np.asarray(predict_tsk(Xte, memb, top, cent2, corr, order=order,
                                   basis="raw", cross_pairs=None), float).ravel()

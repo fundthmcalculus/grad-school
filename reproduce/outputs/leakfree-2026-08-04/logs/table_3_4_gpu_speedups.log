@@ -1,0 +1,36 @@
+Table 3.4 -- GPU speedups over the CPU  (seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  device: NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 610.74; compute capability 89; VRAM free 11.6/12.9 GB at start; CuPy 14.1.1; CUDA runtime 12.9
+  warming device kernels (RawModule JIT, cuBLAS handles)...
+  MST + VAT front end (float64, d=10)
+    Boruvka MST (device)   N=4,000, float64, matrix resident  CPU    0.020s GPU    0.003s  ->     6.00x   order 1.000 (bit-identical)
+    VAT front end          N=4,000, float64, order only       CPU    0.041s GPU    0.017s  ->     2.39x   order 1.000 (bit-identical)
+    VAT front end          N=4,000, float64, UNMATCHED work   CPU    0.099s GPU    0.017s  ->     5.77x   order 1.000 (bit-identical)
+    Boruvka MST (device)   N=8,000, float64, matrix resident  CPU    0.070s GPU    0.009s  ->     7.77x   order 1.000 (bit-identical)
+    VAT front end          N=8,000, float64, order only       CPU    0.136s GPU    0.040s  ->     3.43x   order 1.000 (bit-identical)
+    VAT front end          N=8,000, float64, UNMATCHED work   CPU    0.358s GPU    0.040s  ->     9.05x   order 1.000 (bit-identical)
+    Boruvka MST (device)   N=16,000, float64, matrix resident CPU    0.282s GPU    0.036s  ->     7.88x   order 1.000 (bit-identical)
+    VAT front end          N=16,000, float64, order only      CPU    0.592s GPU    0.160s  ->     3.71x   order 1.000 (bit-identical)
+    VAT front end          N=16,000, float64, UNMATCHED work  CPU    1.553s GPU    0.160s  ->     9.73x   order 1.000 (bit-identical)
+    Boruvka MST (device)   N=32,000, float64, matrix resident CPU    0.923s GPU    0.140s  ->     6.60x   order 1.000 (bit-identical)
+    VAT front end          N=32,000, float64, order only      CPU    2.652s GPU    0.511s  ->     5.19x   order 1.000 (bit-identical)
+    VAT front end          N=32,000, float64, UNMATCHED work  CPU    6.875s GPU    0.511s  ->    13.45x   order 1.000 (bit-identical)
+  Fuzzy C-Means (k=10, d=20, m=2, <=100 iters)
+    Fuzzy C-Means          N=50,000, k=10, d=20               CPU    2.339s GPU    0.136s  ->    17.26x   labels 1.000 ± 0.001; max abs Δcentre 4.9e-05
+    Fuzzy C-Means          N=50,000, k=10, d=20, MATCHED formulation CPU    0.224s GPU    0.136s  ->     1.66x   labels 1.000; max abs Δcentre 1.6e-13
+      (matched-formulation CPU arm converged in 11-78 iterations)
+    Fuzzy C-Means          N=200,000, k=10, d=20              CPU   10.683s GPU    0.415s  ->    25.73x   labels 1.000; max abs Δcentre 4.8e-06
+    Fuzzy C-Means          N=200,000, k=10, d=20, MATCHED formulation CPU    1.036s GPU    0.415s  ->     2.49x   labels 1.000; max abs Δcentre 3.2e-13
+      (matched-formulation CPU arm converged in 13-100 iterations)
+    Fuzzy C-Means          N=500,000, k=10, d=20              CPU   30.217s GPU    0.761s  ->    39.71x   labels 1.000; max abs Δcentre 9.8e-06
+    Fuzzy C-Means          N=500,000, k=10, d=20, MATCHED formulation CPU    2.975s GPU    0.761s  ->     3.91x   labels 1.000; max abs Δcentre 6.0e-13
+      (matched-formulation CPU arm converged in 12-100 iterations)
+  Pairwise distances (N=16000)
+    Pairwise distances     N=16,000, d=10, float64, high_precision CPU    0.294s GPU    1.058s  ->     0.28x   max abs Δ = 7.1e-15
+    Pairwise distances     N=16,000, d=50, float64, high_precision CPU    0.470s GPU    1.044s  ->     0.45x   max abs Δ = 1.4e-14
+    Pairwise distances     N=16,000, d=200, float64, high_precision CPU    1.696s GPU    1.418s  ->     1.20x   max abs Δ = 2.8e-14
+--- retrying without the optional GPU dependency ---
+Table 3.4 -- GPU speedups over the CPU  (seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  device: CuPy not importable (ModuleNotFoundError: No module named 'cupy')
+  [BLOCKED] the GPU arm cannot run; emitting N/A rows with the reason
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_4_gpu_speedups.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_4_gpu_speedups.csv

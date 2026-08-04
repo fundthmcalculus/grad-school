@@ -27,12 +27,15 @@
 %                              One of the two papers section 3.3.1's space-bound
 %                              correction is assembled from, and chapter 9 says to
 %                              cite it prominently, so this one is load-bearing.
-%   [V] parveen2013pvat     -- author field contains the literal string
-%                              "[given name]". It is marked [V] because the
-%                              venue, volume and pages ARE confirmed; the name
-%                              is not, and BibTeX will typeset the placeholder
-%                              verbatim. This is the name-collision citation
-%                              section 3.3.1 turns on, so it cannot ship as is.
+%   [V] parveen2013pvat     -- RESOLVED 2026-08-04, and it was two errors rather
+%                              than the one recorded here. The author placeholder
+%                              is Saima Parveen, and the TITLE was also wrong: the
+%                              entry carried the method's name, "pVAT: Parallel VAT
+%                              on the GPU", not the paper's. Both confirmed against
+%                              Crossref and the full text, now in refs/. Worth a
+%                              line because the wrong field was the one this legend
+%                              said was confirmed -- venue, volume and pages were
+%                              right, and "verified" for those did not cover title.
 %   [V] deshpande2024scalable -- metadata confirmed; FULL TEXT NOT READ. [V]
 %                              means the reference is correct, NOT that its
 %                              content claims have been checked against the
@@ -531,20 +534,31 @@
              geometry) and MST-iVAT, which computes the iVAT RDI "without having to
              compute the full distance matrix". BLOCKING: obtain full text.}}
 
-@inproceedings{parveen2013pvat,                 % [V] venue/volume/pages -- but see BLOCKING below
-  % BLOCKING: the author field below contains a literal placeholder and BibTeX will
-  % typeset it verbatim. This is the NAME COLLISION citation section 3.3.1 turns on
-  % -- the reason the method is called mergeVAT rather than pVAT -- so it appears in
-  % the one paragraph a reviewer is most likely to check. Resolve the given name from
-  % LNCS 8302 before any build that leaves this machine.
-  author    = {Parveen, [given name] and Sreevalsan-Nair, Jaya},
-  title     = {{pVAT}: Parallel {VAT} on the {GPU}},
+@inproceedings{parveen2013pvat,                 % [V] fully verified 2026-08-04: Crossref + full text
+  % Two errors were fixed here on 2026-08-04, both in one entry.
+  %   1. The author field held a literal "[given name]" placeholder. It is Saima.
+  %   2. The TITLE was wrong. This entry carried "pVAT: Parallel VAT on the GPU",
+  %      which is the METHOD's name, not the paper's. The paper is titled
+  %      "Visualization of Small World Networks Using Similarity Matrices"; pVAT is
+  %      contribution 1 of 3 inside it. Venue, volume and pages were right all along.
+  % Verified against Crossref (doi below) and against the full text, a copy of which
+  % is in the repository at research/proposal-defense/refs/.
+  author    = {Parveen, Saima and Sreevalsan-Nair, Jaya},
+  title     = {Visualization of Small World Networks Using Similarity Matrices},
   booktitle = {Big Data Analytics (BDA 2013)},
   series    = {Lecture Notes in Computer Science}, volume = {8302},
-  pages     = {151--170}, publisher = {Springer}, year = {2013},
-  note      = {A published method already named pVAT, which likewise changes the MST
-               algorithm used for the VAT ordering (Prim to Boruvka, on GPU). Verify
-               first author's given name and exact title.}}
+  pages     = {151--170}, publisher = {Springer International Publishing}, year = {2013},
+  doi       = {10.1007/978-3-319-03689-2_10},
+  isbn      = {978-3-319-03689-2},
+  note      = {The name-collision citation for section 3.3.1, and the reason this work's
+               method is called mergeVAT. The paper names its own method pVAT, sixteen
+               times, and defines it in the contributions list: "We propose a GPU-based
+               parallel implementation of VAT (pVAT), which is an optimal parallel
+               implementation of VAT using CUDA based on Boruvka's algorithm." So the
+               collision is with the method name rather than the title, and it is the
+               same substitution this work makes, Prim to Boruvka on the GPU. Quoting the
+               sentence rather than the title is deliberate: a reader checking the title
+               alone would not find the word pVAT in it.}}
 
 @article{havens2009disguise,                    % [V] -- hands a reviewer the Prim/VAT equivalence
   author  = {Havens, Timothy C. and Bezdek, James C. and Keller, James M. and Popescu, Mihail and Huband, Jacalyn M.},

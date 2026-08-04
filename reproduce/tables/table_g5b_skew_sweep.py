@@ -100,22 +100,63 @@ def partition(y_raw, n, scheme):
     return pd.concat([lab, y_raw], axis=1), cent, occ
 
 
+def _drop_empty_buckets(lab, cent, n):
+    """Renumber the occupied buckets to 0..k-1 and keep only their centroids.
+
+    Needed because the partition is now fit on the training fold. At high skew an
+    equal-width bucket can be empty in the train fold, and then the rule base built from
+    the labels has fewer rules than `cent` has entries: `solve_tsk_consequents` returns
+    one mean per rule while `predict_tsk` indexes by rule id, which raised IndexError.
+    Starvation to the point of an empty bucket is the phenomenon this sweep exists to
+    measure, so it has to degrade to a smaller rule base rather than crash.
+
+    The caller keeps the occupancy reported by `partition` for the REQUESTED n, which is
+    the starvation diagnostic and is allowed to be zero. This only changes what the model
+    is fit on.
+    """
+    present = np.unique(np.asarray(lab))
+    if len(present) == n:
+        return np.asarray(lab), cent, n
+    remap = {int(o): i for i, o in enumerate(present)}
+    return (np.array([remap[int(v)] for v in np.asarray(lab)]),
+            np.asarray(cent)[present.astype(int)], int(len(present)))
+
+
 def evaluate(X, y_raw, seed, scheme, n=BUCKETS, order=ORDER):
     from tribblefis.gauss_math import (calculate_gaussian_correlation,
                                        create_gaussian_membership_dict,
                                        take_top_features)
     from tribblefis.regression import predict_tsk, solve_tsk_consequents
 
-    yt = F.unit_scale(pd.Series(np.asarray(y_raw, float), name="y_value"))
-    y, cent, occ = partition(yt, n, scheme)
-    # min-max only -- this sweep deliberately applies NO log step.
-    Xt = F.unit_scale(X)
+    # Leak-free since 2026-08-04, matching table_g5_output_partitioning: split first, then
+    # derive the target scale, the partition and the feature scaler from the training fold.
+    # It matters more here than anywhere else in the harness. This sweep pushes the target
+    # to skew 17, where the extreme bins hold one sample or none, so a partition fit on all
+    # the data was getting its edges from test-fold points that the train fold does not
+    # contain at all. `occ`, the starvation diagnostic the whole argument turns on, is now
+    # the train-fold occupancy, which is the quantity that was always meant.
+    idx = np.arange(len(X))
+    itr, _ite = train_test_split(idx, test_size=0.2, random_state=seed)
+    tr = np.zeros(len(X), dtype=bool); tr[itr] = True
 
-    Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
+    yr = pd.Series(np.asarray(y_raw, float), name="y_value")
+    yt = F.unit_scale_with(float(yr[tr].min()), float(yr[tr].max()), yr)
+    y_tr_part, cent, occ = partition(yt[tr], n, scheme)
+    lab_tr, cent, n_eff = _drop_empty_buckets(y_tr_part["y_bucket"].values, cent, n)
+    buckets = pd.Series(0, index=yt.index, name="y_bucket")
+    buckets[tr] = lab_tr
+    y = pd.concat([buckets.astype(int), yt.rename("y_value")], axis=1)
+
+    # min-max only -- this sweep deliberately applies NO log step.
+    Xdf = X if hasattr(X, "columns") else pd.DataFrame(np.asarray(X))
+    sc, _lg = F.fit_scaler(Xdf.iloc[itr], scaler="unit", log_dynamic_range=None)
+    Xt = F.apply_scaler(sc, Xdf)
+
+    Xtr, Xte, ytr, yte = Xt[tr], Xt[~tr], y[tr], y[~tr]
     d = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
     _, top = take_top_features(d, top_n=len(Xt.columns))
     memb = create_gaussian_membership_dict(Xtr, ytr["y_bucket"], top_n_var_names=top)
-    corr, cent2 = solve_tsk_consequents(Xtr, memb, top, cent, ytr, n_output_buckets=n,
+    corr, cent2 = solve_tsk_consequents(Xtr, memb, top, cent, ytr, n_output_buckets=n_eff,
                                         order=order, l2_reg=L2, basis="raw",
                                         cross_pairs=None, verbose=False)
     pred = np.asarray(predict_tsk(Xte, memb, top, cent2, corr, order=order,
