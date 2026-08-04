@@ -32,7 +32,7 @@ behind the reordered image suggest a hierarchy rather than only a flat partition
 the same call begins to advise on tree structure.
 
 The back half is where the applicability ends. `IVATMeans` represents each recovered
-cluster by `np.mean(points, axis=0)` and refines with Euclidean fuzzy $c$-means. A
+cluster by `np.mean(points, axis=0)` and labels every point by nearest Euclidean centre. A
 mean is a Euclidean prototype and $c$-means assigns by Euclidean distance, so both are
 confined to convex regions. The mean of a ring is at its centre, where there are no
 points; the mean of a filament is off the filament. That bounds the mean-based back end
