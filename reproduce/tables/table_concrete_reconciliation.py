@@ -132,31 +132,33 @@ def prepare(X, y_raw):
             "logged": logged}
 
 
-# Opt-in: fit every data-dependent preprocessing step on the training fold only.
+# DEFAULT since 2026-08-04: every data-dependent preprocessing step is fit on the
+# training fold only.
 #
 # `prepare()` above runs the target scaling, the output partition, the log detection and
-# the feature scaling on the FULL dataset, then `mog_arm` splits. So the flat MoG arms
-# see a transform derived in part from the rows they are then scored on. Two halves,
-# with different severities, and the distinction is the whole reason this is measured
-# rather than asserted:
+# the feature scaling on the FULL dataset and then splits, so the flat MoG arms would see
+# a transform derived in part from the rows they are scored on. Two halves, with
+# different severities, and the distinction is why this was measured rather than
+# asserted before the default moved:
 #
 #   * `F.unit_scale` on the target is AFFINE. R^2 is invariant under an affine map of
 #     the target, so this half moves no R^2 cell. It is still transductive.
-#   * `partition_output` is a data-dependent NONLINEAR discretization: `pd.qcut` takes
-#     its quantile edges from the values handed to it, and the per-bucket means it
-#     returns are passed to `solve_tsk_consequents` and on into `predict_tsk`. Test-fold
-#     targets therefore reach the prediction path. This half is a genuine leak.
+#   * `partition_output` is a data-dependent NONLINEAR discretization: it takes its bin
+#     edges from the values handed to it, and the per-bucket means it returns are passed
+#     to `solve_tsk_consequents` and on into `predict_tsk`. Test-fold targets therefore
+#     reach the prediction path. This half is a genuine leak.
 #
-# The feature scaler is fit on the full frame in BOTH code paths -- `prepare()` and
-# `preprocess_for_others()` -- so it is at least symmetric across arms. The target
-# partition is not: the tree, mixture, CART and Random Forest arms never touch it. That
-# asymmetry is what makes Table 6.1's "shared splits" caption misleading, because the
-# gaps in that table are the same order as the effect being measured here.
+# What the measurement found, before the switch (`outputs/SPLIT_FIRST_LEAK.md`): all
+# eight rank-based control rows move by exactly 0.000, the three closed-form arms move
+# UPWARD when the leak is removed (+0.005, +0.005, +0.018), and the largest single move
+# is -0.032, inside one seed spread. So the leak was not inflating the results, which is
+# why removing it is a correctness change rather than a correction.
 #
-# Set `REPRO_SPLIT_FIRST=1` to run the leak-free variant. It is opt-in rather than the
-# default deliberately: switching the default would re-quote most of Chapters 4 and 6,
-# and that is an author's decision, not a side effect of a bug fix. Run both and diff.
-SPLIT_FIRST = os.environ.get("REPRO_SPLIT_FIRST", "").strip() not in ("", "0", "false")
+# `REPRO_LEAKY=1` restores the old whole-frame path, for reproducing an archive taken
+# before this date. It prints a warning, because a run that quietly used it would be
+# indistinguishable in the table from one that did not.
+LEAKY = os.environ.get("REPRO_LEAKY", "").strip() not in ("", "0", "false")
+SPLIT_FIRST = not LEAKY
 
 
 def prepare_split_first(X, y_raw, seed):
@@ -315,15 +317,19 @@ def main():
     refine_flags = {"off": [False], "on": [True], "both": [False, True]}[REFINE_MODE]
     store: dict = {}
 
-    # Under REPRO_SPLIT_FIRST every data-dependent step is fit per fold, so the
-    # preprocessing cannot be hoisted and each job carries its own. The hoist above is
-    # valid only because the default preprocessing ignores the split -- which is exactly
-    # the property this variant removes.
+    # By default every data-dependent step is fit per fold, so the preprocessing cannot be
+    # hoisted and each job carries its own. `prepare()` is still called once, for its
+    # `logged` list -- which features the log detector selects, reported in the table note.
+    # That list is a property of the dataset and is not a model input.
     prep = prepare(X, y)
     logged_note = ", ".join(map(str, prep["logged"])) if prep["logged"] else ""
     if SPLIT_FIRST:
-        print("  REPRO_SPLIT_FIRST: fitting the target scale, the output partition and "
-              "the feature scaler on each training fold only")
+        print("  leak-free preprocessing: fitting the target scale, the output partition "
+              "and the feature scaler on each training fold only")
+    else:
+        print("  *** REPRO_LEAKY=1: the target scale, output partition and feature scaler "
+              "are fit on ALL 1,030 rows before the split. Numbers from this run are NOT "
+              "the shipped configuration -- see outputs/SPLIT_FIRST_LEAK.md ***")
 
     def prep_for(seed):
         return prepare_split_first(X, y, seed) if SPLIT_FIRST else prep

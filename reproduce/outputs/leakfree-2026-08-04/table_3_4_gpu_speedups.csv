@@ -1,0 +1,5 @@
+kernel,conditions,CPU arm,GPU arm,CPU (s),GPU (s),GPU speedup (CPU/GPU),exactness vs CPU,kind
+Boruvka MST (device),"float64, matrix resident",(not run: GPU arm unavailable),gpu_vat.boruvka_mst_device,N/A,N/A,N/A,N/A,not measured (no device)
+VAT front end,"float64, order only",(not run: GPU arm unavailable),gpu_vat.vat_gpu,N/A,N/A,N/A,N/A,not measured (no device)
+Fuzzy C-Means,"k=10, d=20",(not run: GPU arm unavailable),gpu.fuzzy_c_means_gpu,N/A,N/A,N/A,N/A,not measured (no device)
+Pairwise distances,float64/float32 x dimension,(not run: GPU arm unavailable),gpu.pairwise_distances_gpu,N/A,N/A,N/A,N/A,not measured (no device)

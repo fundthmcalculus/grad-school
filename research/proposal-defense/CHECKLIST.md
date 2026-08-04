@@ -65,9 +65,13 @@ empirical follow-up it spun off is **E9**, deliberately low priority._
 - [x] ✅ **A1 — Method name settled: `mergeVAT`** (author decision, 2026-08-02).
       The name went round-trip: mergeVAT → `pVAT` (on Dr. Kreinovich's observation that stage one
       is a priority-queue algorithm) → collision → back to **mergeVAT**. `pVAT` is taken by
-      Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013 (LNCS 8302:151–170),
-      a GPU VAT that also swaps the MST algorithm, so reading our *p* as parallel/performant
-      collided harder rather than less. Acknowledged by citation in §3.3.1.
+      Saima Parveen & Jaya Sreevalsan-Nair, BDA 2013 (LNCS 8302:151–170), whose *method* is named
+      pVAT — the paper itself is titled *"Visualization of Small World Networks Using Similarity
+      Matrices"* and pVAT is contribution 1 of 3 inside it. It is a GPU VAT that also swaps the MST
+      algorithm, so reading our *p* as parallel/performant collided harder rather than less.
+      Acknowledged by citation in §3.3.1. Citation fully verified 2026-08-04 against Crossref and
+      the full text (`refs/2013_ParveenSreevalsanNair_pvat_preprint.pdf`); the bib entry had been
+      carrying the method name as the title, which is why a title search never surfaced the clash.
       **The name is imperfect and §3.3.1 says so**: it describes neither stage one (priority
       queue) nor stage two (compact active set). What it does describe is §3.3.4's
       divide-and-conquer stitch — which is a merge, is measured, and is the least finished part

@@ -21,7 +21,7 @@ Two distinctions matter more than the arithmetic. **`[V]` is metadata-verified, 
 |---|---|---|---|
 | `arnett2018proposal` | `[?]` | `title` is literally `Dissertation Proposal`; note asks to confirm title, date, type | the same-department parallel-work citation below, cited once in §2.1; needs a real title to submit |
 | `mullner2011modern` | `[?]` | arXiv record (`arXiv:1109.2378`), `journal = {arXiv preprint}`, no volume or pages | the more serious `[?]`: load-bearing for §3.3.1's space-bound correction, cited prominently and early per Chapter 9 §9.3, so an unresolved venue is not cosmetic |
-| `parveen2013pvat` | `[V]` | author placeholder `{Parveen, [given name] and Sreevalsan-Nair, Jaya}`; note asks to verify that given name and the exact title | the `pVAT` name collision §3.3.1 turns on, which forced this work's rename to mergeVAT; it will be read closely, and it cannot yet be typeset |
+| ~~`parveen2013pvat`~~ | **resolved** | was: author placeholder `{Parveen, [given name] ...}`, note asking to verify the given name and the exact title. Both were wrong, and the title was the one this table did not flag as a risk — the entry carried the *method* name, `pVAT: Parallel VAT on the GPU`, rather than the paper's actual title. Fixed 2026-08-04 to **Saima Parveen** and *Visualization of Small World Networks Using Similarity Matrices*, against Crossref and the full text (now in `refs/`) | closed. The lesson kept: venue, volume and pages were verified and the marker said `[V]`, which did not cover the title |
 | `deshpande2024scalable` | `[V]` | note reads `FULL TEXT NOT YET READ` / `BLOCKING: obtain full text` | see below |
 | `kumar2016incvat` | `[V]` | note asks to verify the title | smallest of the five, the only genuine proof-stage item |
 

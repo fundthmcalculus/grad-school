@@ -1,0 +1,4 @@
+Selection method,bridge case (ARI),bridge k,bridge coverage,noise k (true: none),noise coverage
+persistence-gap gate (ours),0.001,3,0.533,4,0.125
+beta-plateau [Bonis-Oudot],0.927,2,0.983,7,0.958
+bottleneck-bootstrap [AuToMATo],0.891,2,0.975,7,0.250
