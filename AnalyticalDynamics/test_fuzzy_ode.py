@@ -108,6 +108,22 @@ class DoublePendulum(OdeSystem):
     def derivative_labels(self) -> list[str]:
         return ["omega_1", "alpha_1", "omega_2", "alpha_2"]
 
+    def potential_energy(self, theta1, theta2):
+        """Gravitational potential, measured from the pivot: zero with both arms horizontal."""
+        return -self.m1 * self.g * self.l1 * np.cos(theta1) \
+            - self.m2 * self.g * (self.l1 * np.cos(theta1) + self.l2 * np.cos(theta2))
+
+    def kinetic_energy(self, theta1, omega1, theta2, omega2):
+        """Kinetic energy, including the l1*l2 cross term between the two arms."""
+        return 0.5 * self.m1 * self.l1**2 * omega1**2 \
+            + 0.5 * self.m2 * (self.l1**2 * omega1**2 + self.l2**2 * omega2**2
+                               + 2 * self.l1 * self.l2 * omega1 * omega2 * np.cos(theta1 - theta2))
+
+    def energy(self, theta1, omega1, theta2, omega2):
+        """Total energy. Conserved exactly by this system, so it scores a rollout."""
+        return self.kinetic_energy(theta1, omega1, theta2, omega2) \
+            + self.potential_energy(theta1, theta2)
+
     def equations_of_motion(self, state, t):
         """
         Compute double pendulum equations of motion using Lagrangian approach.
