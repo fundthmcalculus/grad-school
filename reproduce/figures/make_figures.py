@@ -70,12 +70,22 @@ def environment(fig):
     gitignored. That combination is why the six study generators raised
     FileNotFoundError from a clean checkout.
 
-    An archive already set in the caller's environment wins, so
-    `REPRO_ARCHIVE=<label> make_figures.py` still works for redrawing a whole
-    document against one run.
+    A registry pin BEATS an ambient `REPRO_ARCHIVE`, and that ordering is
+    deliberate. It used to be the other way round, so
+    `REPRO_ARCHIVE=<sweep-label> make_figures.py` -- the obvious way to redraw a
+    document against one run -- silently repointed all six pinned study figures at
+    a sweep archive that does not contain their tables. Here that failed loudly,
+    five FileNotFoundErrors in a row. It would not have: a study CSV whose name
+    collides with a sweep table would have been read instead, and the figure would
+    have been drawn from the wrong experiment without a word.
+
+    A pin means the figure comes from a study the sweep does not run, so no sweep
+    label can be the right answer for it. Unpinned figures still follow the
+    caller's `REPRO_ARCHIVE`, which is the case that override exists for. Use
+    `--only <name>` to redraw a pinned figure against something else.
     """
     env = dict(os.environ)
-    if fig.archive and "REPRO_ARCHIVE" not in env:
+    if fig.archive:
         env["REPRO_ARCHIVE"] = fig.archive
     return env
 

@@ -1,0 +1,13 @@
+Table 3.2 -- memory x precision  (budgets 64 GB, 96 GB, footprint at N=64,000, ordering at N=2,000, seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  done: seed 0
+  done: seed 1
+  done: seed 2
+  done: seed 3
+  done: seed 4
+  done: seed 5
+  done: seed 6
+  done: seed 7
+  done: seed 8
+  done: seed 9
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_2_memory_precision.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_2_memory_precision.csv

@@ -1,0 +1,43 @@
+Table 3.4 -- GPU speedups over the CPU  (seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  device: NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 610.74; compute capability 89; VRAM free 11.6/12.9 GB at start; CuPy 14.1.1; CUDA runtime 12.9
+  warming device kernels (RawModule JIT, cuBLAS handles)...
+  MST + VAT front end (float64, d=10)
+    Boruvka MST (device)   N=4,000, float64, matrix resident  CPU    0.017s GPU    0.003s  ->     5.42x   order 1.000 (bit-identical)
+    VAT front end          N=4,000, float64, order only       CPU    0.037s GPU    0.016s  ->     2.28x   order 1.000 (bit-identical)
+    VAT front end          N=4,000, float64, UNMATCHED work   CPU    0.091s GPU    0.016s  ->     5.52x   order 1.000 (bit-identical)
+    Boruvka MST (device)   N=8,000, float64, matrix resident  CPU    0.072s GPU    0.009s  ->     8.16x   order 1.000 (bit-identical)
+    VAT front end          N=8,000, float64, order only       CPU    0.139s GPU    0.040s  ->     3.47x   order 1.000 (bit-identical)
+    VAT front end          N=8,000, float64, UNMATCHED work   CPU    0.345s GPU    0.040s  ->     8.62x   order 1.000 (bit-identical)
+    Boruvka MST (device)   N=16,000, float64, matrix resident CPU    0.237s GPU    0.033s  ->     7.11x   order 1.000 (bit-identical)
+    VAT front end          N=16,000, float64, order only      CPU    0.522s GPU    0.139s  ->     3.75x   order 1.000 (bit-identical)
+    VAT front end          N=16,000, float64, UNMATCHED work  CPU    1.334s GPU    0.139s  ->     9.57x   order 1.000 (bit-identical)
+    Boruvka MST (device)   N=32,000, float64, matrix resident CPU    0.882s GPU    0.136s  ->     6.50x   order 1.000 (bit-identical)
+    VAT front end          N=32,000, float64, order only      CPU    2.540s GPU    0.506s  ->     5.02x   order 1.000 (bit-identical)
+    VAT front end          N=32,000, float64, UNMATCHED work  CPU    6.138s GPU    0.506s  ->    12.13x   order 1.000 (bit-identical)
+  Fuzzy C-Means (k=10, d=20, m=2, <=100 iters)
+    Fuzzy C-Means          N=50,000, k=10, d=20               CPU    2.315s GPU    0.176s  ->    13.17x   labels 1.000 ± 0.001; max abs Δcentre 4.9e-05
+    Fuzzy C-Means          N=50,000, k=10, d=20, MATCHED formulation CPU    0.217s GPU    0.176s  ->     1.24x   labels 1.000; max abs Δcentre 1.6e-13
+      (matched-formulation CPU arm converged in 11-78 iterations)
+    Fuzzy C-Means          N=200,000, k=10, d=20              CPU   10.564s GPU    0.417s  ->    25.32x   labels 1.000; max abs Δcentre 4.8e-06
+    Fuzzy C-Means          N=200,000, k=10, d=20, MATCHED formulation CPU    0.982s GPU    0.417s  ->     2.35x   labels 1.000; max abs Δcentre 3.2e-13
+      (matched-formulation CPU arm converged in 13-100 iterations)
+    Fuzzy C-Means          N=500,000, k=10, d=20              CPU   29.187s GPU    0.745s  ->    39.15x   labels 1.000; max abs Δcentre 9.8e-06
+    Fuzzy C-Means          N=500,000, k=10, d=20, MATCHED formulation CPU    2.763s GPU    0.745s  ->     3.71x   labels 1.000; max abs Δcentre 6.0e-13
+      (matched-formulation CPU arm converged in 12-100 iterations)
+  Pairwise distances (N=16000)
+    Pairwise distances     N=16,000, d=10, float64, high_precision CPU    0.282s GPU    0.960s  ->     0.29x   max abs Δ = 7.1e-15
+    Pairwise distances     N=16,000, d=50, float64, high_precision CPU    0.430s GPU    1.135s  ->     0.38x   max abs Δ = 1.4e-14
+    Pairwise distances     N=16,000, d=200, float64, high_precision CPU    1.590s GPU    1.463s  ->     1.09x   max abs Δ = 2.8e-14
+    Pairwise distances     N=16,000, d=784, float64, high_precision CPU    7.134s GPU   11.194s  ->     0.64x   max abs Δ = 4.3e-14
+    Pairwise distances     N=16,000, d=10, float32, high_precision CPU    0.194s GPU    0.614s  ->     0.32x   max abs Δ = 0.0e+00
+    Pairwise distances     N=16,000, d=10, float32, fast (native acc) CPU    0.192s GPU    0.489s  ->     0.39x   max abs Δ = 3.8e-06
+    Pairwise distances     N=16,000, d=50, float32, high_precision CPU    0.480s GPU    0.877s  ->     0.55x   max abs Δ = 0.0e+00
+    Pairwise distances     N=16,000, d=50, float32, fast (native acc) CPU    0.474s GPU    0.642s  ->     0.74x   max abs Δ = 1.1e-05
+    Pairwise distances     N=16,000, d=200, float32, high_precision CPU    1.685s GPU    1.538s  ->     1.10x   max abs Δ = 0.0e+00
+    Pairwise distances     N=16,000, d=200, float32, fast (native acc) CPU    1.838s GPU    0.913s  ->     2.01x   max abs Δ = 3.8e-05
+    Pairwise distances     N=16,000, d=784, float32, high_precision CPU    6.682s GPU    4.022s  ->     1.66x   max abs Δ = 0.0e+00
+    Pairwise distances     N=16,000, d=784, float32, fast (native acc) CPU    7.247s GPU    1.697s  ->     4.27x   max abs Δ = 1.4e-04
+  reachable-scale demonstration: N=48,000 float32 (9.22 GB resident)
+    VAT front end          N=48,000, float32, 9.22 GB resident CPU    4.533s GPU    1.194s  ->     3.80x   order 0.99992; Prim total CPU 42023.180315 vs GPU 42023.180315 (rel 0.00e+00)
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_4_gpu_speedups.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_4_gpu_speedups.csv
