@@ -1149,6 +1149,25 @@ def main(high_res=False, svg=False, scaling=False):
     print("Generating selection-method comparison figures...")
     fig_selection_comparison(persistence_methods)
     fig_persistence_thresholds(persistence_methods)
+    # Record the seed sets this run actually used, so a downstream renderer can state
+    # them instead of assuming. `reproduce/tables/table_5_x_ch5_selection.py` does no
+    # computation -- it renders this JSON -- and `reproduce/common.py` was stamping its
+    # own ten-seed default into the footer of all three Chapter 5 tables, over a run
+    # made at five. That is the same defect as a PROVENANCE.txt reporting a seed list
+    # it did not use, and it is worse in a table footer, because the footer is what
+    # gets quoted into a chapter.
+    #
+    # It is a dict rather than a single list because the seeding here is genuinely
+    # heterogeneous, and flattening it to one number would be the same lie in a
+    # different shape: the battery repeats over SEEDS, NERFCM restarts over
+    # NERFCM_SEEDS, and the multi-scale and selection generators use fixed per-dataset
+    # seeds so their cells are single deterministic runs with no spread to report.
+    results["seeds"] = {
+        "battery_repeats": list(SEEDS),
+        "nerfcm_restarts": list(NERFCM_SEEDS),
+        "multiscale_and_selection": "fixed per-generator seeds; single deterministic "
+                                    "run per cell, no spread",
+    }
     with open(f"{OUT}/results.json", "w") as f:
         json.dump(results, f, indent=2)
     print("Done. Results and figures written to", OUT)
