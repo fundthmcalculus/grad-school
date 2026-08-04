@@ -192,7 +192,14 @@ def run_iterative_prediction(
                                       ignore_index=True)
         else:
             # Predict DELTAS so we can scale to preserve energy!
-            next_state_delta_df = regressor.predict(running_state[-window_size:])
+            # Exactly one row: for window_size>1, running_state's rows are
+            # already fully-windowed feature vectors (each row already
+            # encodes all window_size historical steps as columns), so only
+            # the single most recent row is a valid input -- slicing multiple
+            # rows here and then taking .iloc[0] of the output would use the
+            # *stalest* row's prediction while attaching it to the current
+            # state below, silently mixing two different points in time.
+            next_state_delta_df = regressor.predict(running_state.iloc[[-1]])
             if window_size == 1:
                 new_state = running_state.iloc[-1,:] + next_state_delta_df
             else:
@@ -632,9 +639,25 @@ class TestDoublePendulumFuzzyPrediction(unittest.TestCase):
             n_steps = len(tst_df) - ws
             print(f"\nWindow size {ws}: running {n_steps} iterative prediction steps...")
 
+            # Seed with ONLY the initial condition, restricted to OUTPUT_FEATURES --
+            # not the whole actual trajectory. Seeding with tst_df (as this used to
+            # do) meant the "prediction" for the first len(tst_df) rows was a
+            # verbatim copy of the ground truth (the accuracy check below only ever
+            # compares up to len(actual_trajectory) rows, all of them copied), and
+            # the omega_1/omega_2 columns tst_df carries but the regressor never
+            # predicts turned every genuinely-new row to NaN via pandas' Series+
+            # DataFrame column-alignment -- which the divergence check then read as
+            # "diverged" at exactly that boundary, not a real numerical blow-up.
+            # window_size=1 needs exactly 1 raw seed row; window_size>1 needs
+            # window_size+1 (get_mimo_df drops the newest possible window since it's
+            # designed for X/y training pairs, so the seed needs one extra row to
+            # yield the single window [0, ws-1] before rollout continues from there).
+            seed_rows = 1 if ws == 1 else ws + 1
+            seed_df = tst_df[OUTPUT_FEATURES].iloc[:seed_rows].reset_index(drop=True)
+
             with time_this(f'iterative-rollout-window{ws}'):
                 predicted_traj = run_iterative_prediction(
-                    mimo_results_by_window[ws]['regressor'], tst_df, n_steps, window_size=ws, verbose=False
+                    mimo_results_by_window[ws]['regressor'], seed_df, n_steps, window_size=ws, verbose=False
                 )
                 predicted_trajectories_by_window[ws] = predicted_traj
 
