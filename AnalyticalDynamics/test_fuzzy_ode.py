@@ -1,15 +1,41 @@
 from dataclasses import dataclass
-from typing import Any
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 from pandas import DataFrame
 
-from ode_helpers import angles_to_xy, set_axes_style
 from odemodel import OdeSystem
 from tribblefis.gaussian_regressor import MimoGaussianPredictor
+from tribblefis.gaussian_regressor_memory import MemoryWindowFeatureExtractor
+
+# The FIS sees the two angles and their history -- current value, short-term
+# moving average, and the average over the steps preceding that window -- and
+# predicts the angular velocities. Accelerations are never modelled: the Euler
+# step integrates theta directly from the predicted omega.
+THETA_FEATURES = ['theta_1', 'theta_2']
+OMEGA_TARGETS = ['omega_1', 'omega_2']
+WINDOW_SIZE = 50  # short-term moving average spans this many steps
+MEMORY_SIZE = 25  # long-term average spans the MEMORY_SIZE steps before that window
+# Rows of history needed before a feature row has a fully populated long-term average.
+HISTORY_LEN = WINDOW_SIZE + MEMORY_SIZE
+
+# A 0th-order consequent, against the library default of '1st'. The three features
+# per angle are near-collinear -- at dt=0.01 a 50-step average trails the current
+# value by ~0.2 rad against a ~4.5 rad range, correlation 0.98 -- so a consequent
+# that is linear in them is ill-conditioned and extrapolates without bound: it
+# spikes to |omega| in the hundreds a few steps into a rollout and then locks the
+# angles at a fixed point. The piecewise-constant consequent cannot extrapolate,
+# and tracks ~3x closer over the full run. Widening the window is what supplies the
+# velocity information; 50/25 tracks theta_1 to 0.1 rad for ~0.8 s, against ~0.2 s
+# at the 5/3 window.
+TSK_ORDER = '0th'
+
+# Categorical slots 1 and 2 of the validated light-mode palette.
+COLOR_ACTUAL = '#2a78d6'
+COLOR_PREDICTED = '#eb6834'
+COLOR_MUTED = '#52514e'
 
 
 @dataclass
@@ -34,11 +60,25 @@ class DataSimulation:
     trajectories: list[pd.DataFrame]
 
     def get_combined_data(self: 'DataSimulation') -> tuple[DataFrame, DataFrame]:
-        # This would use MimoGaussianPredictor after combining trajectory data
-        X_combined = pd.concat([t.iloc[:-1] for t in self.trajectories], ignore_index=True)
-        # 1st order differentiation
-        y_combined = pd.concat([t.diff().iloc[1:] / self.params.dt for t in self.trajectories], ignore_index=True)
-        return X_combined, y_combined
+        """Angles and their moving averages as inputs, angular velocities as targets.
+
+        Both sides are taken at the same time step, so the fitted model is a
+        state-to-velocity map that an Euler step can integrate directly. Rows
+        whose long-term average has too little history behind it are dropped, so
+        every training row carries a fully defined feature vector.
+
+        `include_time` is deliberately off: `time_step` is an absolute row index,
+        which would sit far outside its training range during a rollout.
+        """
+        extractor = MemoryWindowFeatureExtractor(window_size=WINDOW_SIZE, memory_size=MEMORY_SIZE)
+        all_x = []
+        all_y = []
+        for trajectory in self.trajectories:
+            features = extractor.prepare_sequences(trajectory, THETA_FEATURES, include_time=False)
+            valid = ~features.isna().any(axis=1).values
+            all_x.append(features[valid])
+            all_y.append(trajectory[OMEGA_TARGETS][valid])
+        return pd.concat(all_x, ignore_index=True), pd.concat(all_y, ignore_index=True)
 
 
 
@@ -145,160 +185,85 @@ class DoublePendulumDamped(OdeSystem):
 
 
 def test_tribble_ode():
-    """Test ODE system with fuzzy regression model."""
+    """Fit a memory-augmented FIS on the angles alone and roll it out with Euler."""
     # 1) Create the simulation data for various initial conditions.
     train_results, test_results = initialize_model()
     X_combined, y_combined = train_results.get_combined_data()
-    ode_m = MimoGaussianPredictor()
+    print(f"Training rows: {len(X_combined)}")
+    print(f"Inputs:  {list(X_combined.columns)}")
+    print(f"Outputs: {list(y_combined.columns)}")
+    ode_m = MimoGaussianPredictor(tsk_order=TSK_ORDER)
     ode_m.fit(X_combined, y_combined)
 
-    def gauss_fcn(s, t):
-        s_df = pd.DataFrame([s], columns=train_results.model.state_labels)
-        return ode_m.predict(s_df).values.flatten()
-
-    # 3) Roll out using odeint; fall back to Euler if odeint diverges.
-    t_span = np.arange(0, train_results.params.duration, train_results.params.dt)
-
-    # Euler integration is more stable than odeint for learned models
+    # 2) Euler rollout: theta_{n+1} = theta_n + omega_hat_n * dt. Only theta is
+    # integrated, and only theta feeds back in, so the accelerations never enter.
+    extractor = MemoryWindowFeatureExtractor(window_size=WINDOW_SIZE, memory_size=MEMORY_SIZE)
     actual_trajectory = test_results.trajectories[0]
-    state = test_results.params.np
-    states = [state.copy()]
-    for ij in range(len(t_span) - 1):
-        ds = gauss_fcn(state, t_span[ij])
-        state += ds * test_results.params.dt
-        if not np.isfinite(state).all():
-            print(f"Warning: Euler diverged at step {len(states)}, stopping early.")
+    dt = test_results.params.dt
+
+    # The moving averages need HISTORY_LEN samples behind them, so the rollout is
+    # seeded with that many rows of the true trajectory. Error is zero by
+    # construction over the seed, which is why the metrics below skip it.
+    theta_rows = list(actual_trajectory[THETA_FEATURES].iloc[:HISTORY_LEN].values)
+    omega_rows = [np.full(len(OMEGA_TARGETS), np.nan) for _ in range(HISTORY_LEN)]
+
+    for _ in range(len(actual_trajectory) - HISTORY_LEN):
+        history = pd.DataFrame(theta_rows[-HISTORY_LEN:], columns=THETA_FEATURES)
+        features = extractor.prepare_sequences(history, THETA_FEATURES, include_time=False)
+        omega = ode_m.predict(features.iloc[-1:]).values.flatten()
+        theta = theta_rows[-1] + omega * dt
+        if not np.isfinite(theta).all():
+            print(f"Warning: Euler diverged at step {len(theta_rows)}, stopping early.")
             break
-        states.append(state.copy())
-    predicted = pd.DataFrame(states, columns=test_results.model.state_labels)
-    print(f"Euler rollout completed ({len(states)} steps vs {len(predicted)} steps).")
+        theta_rows.append(theta)
+        omega_rows.append(omega)
 
-    # 4) Animate the trajectories with dark theme and error/phase plots
-    fig = plt.figure(figsize=(14, 10))
-    fig.patch.set_facecolor('#1a1a2e')
+    predicted = pd.DataFrame(theta_rows, columns=THETA_FEATURES)
+    predicted[OMEGA_TARGETS] = np.array(omega_rows)
+    print(f"Euler rollout produced {len(predicted)} of {len(actual_trajectory)} steps "
+          f"({HISTORY_LEN} seeded from truth).")
 
-    ax_actual = plt.subplot(2, 2, 1)
-    ax_pred = plt.subplot(2, 2, 2)
-    ax_error = plt.subplot(2, 2, 3)
-    ax_phase = plt.subplot(2, 2, 4)
+    # 3) Report how long the rollout tracks, rather than only whether it stayed finite.
+    n = min(len(predicted), len(actual_trajectory))
+    print("\nRollout accuracy past the seed window:")
+    for col in THETA_FEATURES + OMEGA_TARGETS:
+        error = np.abs(actual_trajectory[col].values[HISTORY_LEN:n] - predicted[col].values[HISTORY_LEN:n])
+        print(f"  {col:8s} MAE={np.nanmean(error):8.4f}")
+    theta1_error = np.abs(actual_trajectory['theta_1'].values[:n] - predicted['theta_1'].values[:n])
+    for tol in (0.01, 0.1, 0.5, 1.0):
+        exceeded = np.flatnonzero(theta1_error > tol)
+        when = f"{exceeded[0] * dt:.2f} s" if exceeded.size else "never"
+        print(f"  |theta_1 error| first exceeds {tol:>4}: {when}")
 
-    # Style animation axes
-    for ax in [ax_actual, ax_pred]:
-        set_axes_style(ax)
+    # 4) Plot the traces: one panel per state, actual against the FIS rollout.
+    fig, axes = plt.subplots(2, 2, figsize=(14, 8))
+    fig.suptitle('Memory-augmented FIS rollout: angles and angular velocities',
+                 fontsize=14, fontweight='bold')
 
-    # Style error and phase axes
-    for ax in [ax_error, ax_phase]:
-        ax.set_facecolor('#16213e')
-        ax.grid(True, alpha=0.2, color='#444')
-        ax.tick_params(colors='white')
-        for spine in ax.spines.values():
-            spine.set_edgecolor('#444')
+    t_actual = np.arange(len(actual_trajectory)) * dt
+    t_predicted = np.arange(len(predicted)) * dt
+    for ax, col in zip(axes.flat, THETA_FEATURES + OMEGA_TARGETS):
+        ax.plot(t_actual, actual_trajectory[col].values, '-',
+                color=COLOR_ACTUAL, linewidth=2, label='Actual')
+        ax.plot(t_predicted, predicted[col].values, '-',
+                color=COLOR_PREDICTED, linewidth=2, label='FIS rollout')
+        ax.axvline(HISTORY_LEN * dt, color=COLOR_MUTED, linestyle=':', linewidth=1,
+                   label='end of seed window')
+        units = 'rad' if col.startswith('theta') else 'rad/s'
+        ax.set_title(col, fontsize=11)
+        ax.set_xlabel('Time (s)', fontsize=10)
+        ax.set_ylabel(f'{col} ({units})', fontsize=10)
+        ax.grid(True, alpha=0.25)
+        for spine in ('top', 'right'):
+            ax.spines[spine].set_visible(False)
+        ax.legend(loc='best', fontsize=9, framealpha=0.9)
 
-    ax_actual.set_title('Actual', color='white', fontsize=13, fontweight='bold')
-    ax_pred.set_title('Predicted', color='white', fontsize=13, fontweight='bold')
-    ax_error.set_title('Running Error', color='white', fontsize=11, fontweight='bold')
-    ax_phase.set_title('Phase Space (θ₂ vs ω₂)', color='white', fontsize=11, fontweight='bold')
-
-    ax_error.set_xlabel('Time (s)', color='white', fontsize=10)
-    ax_error.set_ylabel('Position Error', color='white', fontsize=10)
-    ax_phase.set_xlabel('θ₂ (rad)', color='white', fontsize=10)
-    ax_phase.set_ylabel('ω₂ (rad/s)', color='white', fontsize=10)
-
-    fig.suptitle('Double Pendulum: Actual vs Predicted', color='white', fontsize=14, fontweight='bold')
-
-    n_frames = min(len(actual_trajectory), len(predicted))
-    step = 1
-    trail_len = 40
-
-    # Pre-create line objects for actual trajectory
-    act_trail2, = ax_actual.plot([], [], '-', color='#00d4ff', linewidth=1.2, alpha=0.5)
-    act_rod1, = ax_actual.plot([], [], 'o-', color='#e0e0e0', lw=2.5, ms=6, markerfacecolor='white')
-    act_rod2, = ax_actual.plot([], [], 'o-', color='#e0e0e0', lw=2.5, ms=6, markerfacecolor='#00d4ff')
-
-    # Pre-create line objects for predicted trajectory
-    pred_trail2, = ax_pred.plot([], [], '-', color='#ff6b6b', linewidth=1.2, alpha=0.5)
-    pred_rod1, = ax_pred.plot([], [], 'o-', color='#e0e0e0', lw=2.5, ms=6, markerfacecolor='white')
-    pred_rod2, = ax_pred.plot([], [], 'o-', color='#e0e0e0', lw=2.5, ms=6, markerfacecolor='#ff6b6b')
-
-    # Pre-create line objects for error and phase plots
-    err_line, = ax_error.plot([], [], color='#ff6b6b', linewidth=2)
-    phase_act, = ax_phase.plot([], [], color='#00d4ff', linewidth=1.5, label='Actual', marker='o', markersize=3)
-    phase_pred, = ax_phase.plot([], [], color='#ff6b6b', linewidth=1.5, label='Predicted', marker='s', markersize=3)
-    ax_phase.legend(loc='upper right', fontsize=9, framealpha=0.9)
-
-    def update(frame):
-        idx = frame * step
-        t_start = max(0, idx - trail_len)
-        idx_pred = idx
-        t_start_pred = t_start
-
-        # Actual trajectory
-        theta1_act = actual_trajectory.iloc[t_start:idx+1, 0].values
-        theta2_act = actual_trajectory.iloc[t_start:idx+1, 2].values
-        x1_act, y1_act, x2_act, y2_act = angles_to_xy(theta1_act, theta2_act, test_results.model.l1, test_results.model.l2)
-
-        act_trail2.set_data(x2_act, y2_act)
-        act_rod1.set_data([0, x1_act[-1]], [0, y1_act[-1]])
-        act_rod2.set_data([x1_act[-1], x2_act[-1]], [y1_act[-1], y2_act[-1]])
-
-        # Predicted trajectory
-        theta1_pred = predicted.iloc[t_start_pred:idx_pred+1, 0].values
-        theta2_pred = predicted.iloc[t_start_pred:idx_pred+1, 2].values
-        x1_pred, y1_pred, x2_pred, y2_pred = angles_to_xy(theta1_pred, theta2_pred, test_results.model.l1, test_results.model.l2)
-
-        pred_trail2.set_data(x2_pred, y2_pred)
-        pred_rod1.set_data([0, x1_pred[-1]], [0, y1_pred[-1]])
-        pred_rod2.set_data([x1_pred[-1], x2_pred[-1]], [y1_pred[-1], y2_pred[-1]])
-
-        # Running error: position error between actual and predicted
-        time_vec = np.arange(idx + 1) * test_results.params.dt
-        act_pos = np.sqrt(
-            actual_trajectory.iloc[:idx+1, 0].values**2 +
-            actual_trajectory.iloc[:idx+1, 2].values**2
-        )
-        pred_pos = np.sqrt(
-            predicted.iloc[:idx+1, 0].values**2 +
-            predicted.iloc[:idx+1, 2].values**2
-        )
-        error = np.abs(act_pos - pred_pos)
-        err_line.set_data(time_vec, error)
-        ax_error.set_xlim(0, max(test_results.params.duration, max(time_vec) * 1.05))
-        err_max = max(error) if np.any(error) else 1
-        ax_error.set_ylim(0, max(err_max * 1.1, 0.1))
-
-        # Phase space: theta2 vs omega2
-        phase_act.set_data(
-            actual_trajectory.iloc[:idx+1, 2].values,
-            actual_trajectory.iloc[:idx+1, 3].values
-        )
-        phase_pred.set_data(
-            predicted.iloc[:idx+1, 2].values,
-            predicted.iloc[:idx+1, 3].values
-        )
-        ax_phase.set_xlim(-10, 10)
-        ax_phase.set_ylim(-10, 10)
-
-        return act_trail2, act_rod1, act_rod2, pred_trail2, pred_rod1, pred_rod2, err_line, phase_act, phase_pred
-
-    n_display_frames = n_frames // step
-    ani = animation.FuncAnimation(
-        fig, update, frames=n_display_frames, blit=True, repeat=True
-    )
-
-    plt.tight_layout()
-
-    # Save animation to file
-    try:
-        from pathlib import Path
-        output_dir = Path(__file__).parent
-        output_file = output_dir / "tribble_ode_animation.gif"
-        writer = animation.PillowWriter(fps=20)
-        ani.save(str(output_file), writer=writer)
-        print(f"Animation saved to: {output_file}")
-    except Exception as e:
-        print(f"Warning: Could not save animation: {e}")
-
+    fig.tight_layout()
+    output_file = Path(__file__).parent / "tribble_ode_traces.png"
+    fig.savefig(output_file, dpi=150, bbox_inches='tight')
     plt.close(fig)
+    print(f"\nTraces saved to: {output_file}")
+
     print("Test completed successfully!")
 
 
