@@ -442,7 +442,7 @@ renderer emits both so the choice is visible rather than implicit.
 | 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7 |
 | 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **reproduced** at 10 seeds — note 8 |
 | 6.3 Interpretability | *none* | — | **ungenerated** — structural by design; the counts row is checklist C9 / Goal G6 |
-| 6.4 Memory augmentation | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **ungenerated** — entry point now located, but single-seed and outside the harness, and blocked on a real defect — notes 13, 17 |
+| ~~6.4 Memory augmentation~~ | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **DESCOPED 2026-08-04 — no longer a table in the document.** §6.3.6, Table 6.4, Figure 6.3 and Goal C7 are removed; that work continues outside the proposal. Notes 13 and 17 stay as the record of why it was never quotable |
 | §6.3.5 refinement study | `reproduce/optimizers/run_study.py` | `outputs/table_opt_hotstart.{md,csv}`, `…_traces.csv` | **reproduced** — new; supersedes the two-optimizer evidence behind §6.3.5 |
 
 **Note 7 — one seed in ten destroys this cell, and that is the finding.** Table
@@ -473,7 +473,9 @@ row unattended, but `m5py` does not load against scikit-learn 1.9.0 —
 pinning an older scikit-learn to rescue two cells would move every other number
 in the chapter. Measured on this host 2026-08-02.
 
-**Note 13 — Table 6.4's entry point is located, and it is still not quotable.**
+**Note 13 — Table 6.4's entry point is located, and it is still not quotable.** *(Retained
+as a record; Table 6.4 was descoped from the document on 2026-08-04, so nothing below is
+owed to the proposal.)*
 This row said `tribble-fis/tests/test_double_pendulum.py`, and Chapter 6's
 reproduction paragraph said the experiment lived in `tribble-fis`. **Neither is
 true** — no such file exists in that submodule. The scripts are in *this*
@@ -492,7 +494,8 @@ double-pendulum pairs disagree about the target's scale (0.92/0.045 implies
 should be read as an order of magnitude and not as two significant figures until
 both rows are re-measured under one protocol.
 
-**Note 17 — Table 6.4 is also blocked on a defect, not just on effort.**
+**Note 17 — Table 6.4 is also blocked on a defect, not just on effort.** *(Retained as a
+record of a live upstream bug; the table itself was descoped on 2026-08-04.)*
 `MimoGaussianPredictorMemory.predict_trajectory` returns its initial window
 unchanged for every `(window_size, memory_size)` pair: it slices exactly
 `window_size` rows of history, `prepare_sequences` then computes the last row's
