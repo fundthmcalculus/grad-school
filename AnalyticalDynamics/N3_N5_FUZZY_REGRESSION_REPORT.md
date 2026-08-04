@@ -304,6 +304,107 @@ correction that could plausibly do better would need to constrain
 structure, not just its energy level) — a meaningfully harder problem than
 this one closed-form fix could reach.
 
+### 4.4 Physics-inspired consequent equations, attempt 1: naive basis features (n=2, `n2_physics_informed_fuzzy.py`)
+
+§4.3 ended by naming the harder problem directly: constrain the predicted
+*direction* on the energy shell, not just its magnitude — i.e., structure
+the consequent around the true vector field, not just correct after the
+fact. The true equations of motion (§2-3 of `DOUBLE_PENDULUM_REPORT.md`)
+are built from a small set of nonlinear terms:
+
+$$
+\ddot\theta_1=\frac{-g(2m_1+m_2)\sin\theta_1 - m_2 g\sin(\theta_1-2\theta_2)
+-2\sin\Delta\, m_2\left(\dot\theta_2^2 l_2+\dot\theta_1^2 l_1\cos\Delta\right)}
+{l_1(2m_1+m_2-m_2\cos2\Delta)}, \qquad \Delta=\theta_1-\theta_2
+$$
+
+(and the analogous $\ddot\theta_2$). The first attempt fed the nine
+numerator-side basis terms — $\sin\theta_1$, $\sin(\theta_1-2\theta_2)$,
+$\sin\Delta\,\dot\theta_1^2$, $\cos\Delta$, etc., each computable exactly
+from the current state — as inputs to the standard multi-rule fuzzy TSK
+regressor (same machinery as every prior ablation), predicting Δstate as
+before.
+
+**Result: worse than the plain angle+velocity baseline** — time to 0.5 rad
+error dropped to **0.21s** (vs. 0.60s for raw angle+velocity inputs). Two
+compounding reasons, both diagnosable from the architecture rather than
+guesswork: (1) a locally-*linear* TSK consequent cannot represent a
+division by a state-dependent denominator — the true relationship isn't
+affine in these basis terms, it's affine in these terms *divided by*
+$2m_1+m_2-m_2\cos2\Delta$, and no per-rule linear combination can produce
+that; (2) the fuzzy antecedent clustering itself operates on whatever
+feature space it's given, and clustering on 9 transformed nonlinear basis
+terms produced a materially different (and here, worse) partition of the
+state space than clustering on raw $(\theta,\omega)$. Structure alone,
+applied naively, is not sufficient — the consequent's *functional form*
+has to actually be able to express the target relationship.
+
+### 4.5 Physics-inspired consequent equations, attempt 2: the known rational structure (n=2, `n2_physics_informed_v2_rational.py`)
+
+The fix follows directly from the diagnosis: $l_1,l_2,m_1,m_2$ are known
+system constants (the same assumption already used in §4.3's energy
+correction), so the denominator $2m_1+m_2-m_2\cos2\Delta$ can be computed
+**exactly**, not learned. Dividing each numerator basis term by the exact,
+known denominator turns the target into something that genuinely *is*
+linear in the resulting features, with fixed coefficients
+($-(2m_1+m_2)g$, $-m_2 g$, $-2m_2 l_2$, $-2m_2 l_1$, ...) that a plain
+linear regression can recover. Structured this way as **two physics-shaped
+consequent equations, one per angular acceleration** — each seeing only the
+basis terms that physically belong to it, and each fit with plain
+(no-intercept) linear regression rather than the fuzzy-clustering machinery
+(a degenerate single-rule TSK consequent *is* linear regression; the
+library's own clustering step turned out to be numerically unstable on
+this feature parameterization at its minimum rule count, R²<0, while a
+plain fit on the same features gets R²≈0.99 — worth filing upstream, out of
+scope here) — and rolling $\theta$ forward using the *updated* $\omega$
+each step (semi-implicit/Euler–Cromer integration, not a fitted Δθ):
+
+| | Time to 0.5 rad error |
+|---|---|
+| Angle-only | 0.32 s |
+| Angle + velocity | 0.60 s |
+| Physics-basis features (naive, §4.4) | 0.21 s |
+| **Physics-inspired rational consequent (this)** | **3.31 s** |
+
+![n=2 rollout error: black-box vs. physics-informed consequents](figures/n2_rollout_comparison_with_physics.png)
+
+More than **5× the best black-box result, and >10× the naive baseline** —
+the single largest improvement in this entire investigation, from a change
+that added no new training data at all (same 16 trajectories throughout).
+Single-step cross-sectional fit is excellent too (R²=0.992, 0.991 for
+$\dot\theta_1,\dot\theta_2$), and the fitted coefficients land within a few
+percent of the true physical constants scaled by $dt$ (e.g.
+$-g(2m_1+m_2)\cdot dt=-0.2943$ fitted vs. $-0.2946$ true).
+
+![n=2 rollout: actual vs. physics-informed-rational prediction](figures/n2_physics_informed_v2_rollout.png)
+
+**The failure mode itself changed character, not just its timing.** Every
+other approach in this report flatlines or saturates once it leaves the
+training manifold — a black-box consequent has no reason to extrapolate
+toward anything physically sane. This model's predicted trajectory keeps
+*looking like a double pendulum* — bounded oscillation at roughly the right
+frequency and amplitude — for the full 30 seconds, gradually drifting out
+of phase with the true trajectory rather than collapsing. That is exactly
+what "the vector field structure is right, chaos still amplifies small
+errors" should look like, and it is a qualitatively different, more
+physically honest failure than anything upstream of it in this report.
+
+**What this does and doesn't demonstrate.** This is not "solving chaos" —
+3.3s is still a small fraction of the 30s horizon, and the same Lyapunov
+argument from `DOUBLE_PENDULUM_REPORT.md` §4 still applies eventually. What
+it demonstrates is that the *ceiling* identified in §4.1–4.3 (a free-form
+consequent cannot locate the correct point in phase space once chaos
+amplifies error past the training manifold) was a property of the
+black-box function class, not of the 16-trajectory training budget or of
+chaos itself — constraining the consequent to the true functional form
+bought an order of magnitude before chaos took back over, using the exact
+same data. It also is not free of domain knowledge: it required knowing
+$m_1,m_2,l_1,l_2$ exactly (fair, per §4.3) *and* the specific trigonometric
+structure of the manipulator equation (a much stronger assumption — this
+would not transfer to a system whose equations of motion were unknown, a
+genuine limitation of "physics-informed" methods generally, not specific to
+this experiment).
+
 ## 5. Caveats and Honest Limits of This Pass
 
 - **The n=5 single-step model was not re-run** for this report (only MIMO
@@ -359,3 +460,14 @@ this one closed-form fix could reach.
   cleanest evidence yet that the failure mode is chaotic phase-space
   sensitivity, not energy non-conservation. Energy drift was a real defect,
   just not the one determining how long the rollout stays useful.
+- Tried physics-inspired consequent equations, twice. Naive nonlinear basis
+  features fed through the standard fuzzy-clustering machinery did worse
+  than the black-box baseline (0.21s) — a locally-linear consequent can't
+  represent the true rational (division) structure, and clustering on
+  transformed features scrambled the partitioning. Restructuring as two
+  physics-shaped equations (numerator basis divided by the exact, known
+  denominator, fit as plain linear regression, θ integrated forward from
+  the updated ω) reached **3.31s** — more than 5× the best black-box result,
+  from the same 16 trajectories — and changed the failure mode itself: the
+  rollout stays a plausible bounded oscillation for the full 30s rather
+  than flatlining, drifting out of phase rather than collapsing.
