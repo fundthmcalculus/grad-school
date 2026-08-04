@@ -1,6 +1,8 @@
 # Fuzzy TSK Surrogate Modeling: n=3 and n=5, and a Rollout-Evaluation Bug Fix
 
-**Code:** `n_pendulum_fuzzy_regression.py`, `n_pendulum_regression_comparison.py`
+**Code:** `n_pendulum_fuzzy_regression.py`, `n_pendulum_regression_comparison.py`,
+`n2_physics_informed_v2_rational.py`, `n_pendulum_physics_basis.py`,
+`n3_physics_informed_rational.py`, `n_output_bucket_sensitivity.py`
 **Builds on:** `DOUBLE_PENDULUM_REPORT.md` §5 (the original n=2 fuzzy TSK study),
 `N_PENDULUM_SYMBOLIC_DERIVATION.md` (the validated symbolic n-link model)
 
@@ -350,14 +352,16 @@ linear in the resulting features, with fixed coefficients
 ($-(2m_1+m_2)g$, $-m_2 g$, $-2m_2 l_2$, $-2m_2 l_1$, ...) that a plain
 linear regression can recover. Structured this way as **two physics-shaped
 consequent equations, one per angular acceleration** — each seeing only the
-basis terms that physically belong to it, and each fit with plain
-(no-intercept) linear regression rather than the fuzzy-clustering machinery
-(a degenerate single-rule TSK consequent *is* linear regression; the
-library's own clustering step turned out to be numerically unstable on
-this feature parameterization at its minimum rule count, R²<0, while a
-plain fit on the same features gets R²≈0.99 — worth filing upstream, out of
-scope here) — and rolling $\theta$ forward using the *updated* $\omega$
-each step (semi-implicit/Euler–Cromer integration, not a fitted Δθ):
+basis terms that physically belong to it — and rolling $\theta$ forward
+using the *updated* $\omega$ each step (semi-implicit/Euler–Cromer
+integration, not a fitted Δθ). First fit with plain (no-intercept) linear
+regression rather than the fuzzy-clustering machinery — a degenerate
+single-rule TSK consequent *is* linear regression, and at the time this was
+written the library's own fit at its minimum rule count (`n_output_buckets=2`)
+looked unstable (R²<0) next to a plain fit's R²≈0.99. **§4.7 below finds the
+actual mechanism** (it's not instability) **and revisits this comparison
+with the library tuned properly** — the headline numbers here are worth
+reading provisionally until then:
 
 | | Time to 0.5 rad error |
 |---|---|
@@ -368,13 +372,17 @@ each step (semi-implicit/Euler–Cromer integration, not a fitted Δθ):
 
 ![n=2 rollout error: black-box vs. physics-informed consequents](figures/n2_rollout_comparison_with_physics.png)
 
-More than **5× the best black-box result, and >10× the naive baseline** —
-the single largest improvement in this entire investigation, from a change
-that added no new training data at all (same 16 trajectories throughout).
-Single-step cross-sectional fit is excellent too (R²=0.992, 0.991 for
-$\dot\theta_1,\dot\theta_2$), and the fitted coefficients land within a few
-percent of the true physical constants scaled by $dt$ (e.g.
-$-g(2m_1+m_2)\cdot dt=-0.2943$ fitted vs. $-0.2946$ true).
+More than **5× the best black-box result shown here, and >10× the naive
+baseline** — from a change that added no new training data at all (same 16
+trajectories throughout). Single-step cross-sectional fit is excellent too
+(R²=0.992, 0.991 for $\dot\theta_1,\dot\theta_2$), and the fitted
+coefficients land within a few percent of the true physical constants
+scaled by $dt$ (e.g. $-g(2m_1+m_2)\cdot dt=-0.2943$ fitted vs. $-0.2946$
+true). **Update (§4.7): the "best black-box result" above used the same
+`n_output_buckets=3` as every earlier ablation. Tuned properly, the
+angle+velocity baseline nearly doubles to ~1.15s, shrinking this multiplier
+to roughly 2–3× rather than 5×** — still a real, substantial win, just a
+smaller one than first reported.
 
 ![n=2 rollout: actual vs. physics-informed-rational prediction](figures/n2_physics_informed_v2_rollout.png)
 
@@ -439,17 +447,124 @@ trajectories):
 
 ![n=3 rollout: actual vs. physics-informed prediction](figures/n3_physics_informed_rollout.png)
 
-**>8× the black-box result** — a larger multiplier than n=2's 5×, from the
-same 16-trajectory budget and the identical automated pipeline (only $n$
-changed). Single-step cross-sectional fit is excellent across all three
-outputs (R²=0.980, 0.978, 0.985), and the qualitative failure mode matches
-§4.5 exactly: the rollout tracks the true oscillation's shape and phase
-closely for the first ~4 seconds, then drifts out of phase while remaining
-a plausible bounded double-and-triple-pendulum-like motion — never
-flatlining, unlike every black-box approach in this report. The consistency
-between n=2 and n=3 here (same mechanism, same qualitative payoff, larger
-gain at higher $n$) is reasonably strong evidence this is a real effect of
-the method, not a coincidence of the double-pendulum's specific algebra.
+**>8× the black-box result** — a larger multiplier than n=2's headline 5×,
+from the same 16-trajectory budget and the identical automated pipeline
+(only $n$ changed). Single-step cross-sectional fit is excellent across all
+three outputs (R²=0.980, 0.978, 0.985), and the qualitative failure mode
+matches §4.5 exactly: the rollout tracks the true oscillation's shape and
+phase closely for the first ~4 seconds, then drifts out of phase while
+remaining a plausible bounded double-and-triple-pendulum-like motion —
+never flatlining, unlike every black-box approach in this report.
+
+**Unlike n=2's comparison, this one holds up under the §4.7 tuning check.**
+The n=3 baseline here is angle-only (no $\omega$ inputs, same as this
+report's original n=3 study) — and §4.7 finds that angle-only baselines
+don't benefit meaningfully from more fuzzy rules regardless of chain length
+(they're missing information no amount of local-fit resolution can supply),
+so 0.48s is a fair number to compare against, not an artifact of under-tuning.
+The >8× multiplier is real, not an apples-to-oranges bucket-count effect.
+
+### 4.7 Was `n_output_buckets=3` quietly handicapping every black-box baseline? A tuning check
+
+§4.5 flagged, but didn't explain, that `MimoGaussianPredictor` did badly on
+the physics-basis features at low rule counts. Every black-box ablation in
+this report (§4.1–4.2, and the n=3/n=5 study) used `n_output_buckets=3` (or
+`n_bins=3`), matching the original n=2 study's default. If bucket count
+matters this much for one feature set, it's a fair question whether it was
+quietly under-serving *every* comparison in this report, not just the
+physics-informed ones.
+
+**What `n_output_buckets` actually controls.** Reading `gaussian_regressor.py`:
+it is not the number of *input*-space fuzzy regions — it partitions the
+*target* $y$ into that many value ranges first
+(`partition_output(n_output_buckets, y)`), then fits antecedent memberships
+and a local TSK consequent per bucket from whatever training rows land in
+that $y$-range. For a relationship that is genuinely linear across the
+whole domain (exactly the case §4.5 engineered by dividing out the known
+denominator), this is the wrong inductive bias at low bucket counts: each
+bucket sees a restricted, non-representative slice of $x$-space, so its
+locally-fit slope is biased, and blending a handful of biased local lines
+does not reconstruct the one correct global line. It converges to the
+correct line as bucket count rises and each slice narrows — confirmed
+directly on the n=2 $\ddot\theta_1$ features:
+
+| `n_output_buckets` | 2 | 3 | 5 | 10 | 20 | 40 |
+|---|---|---|---|---|---|---|
+| Single-step R² | −0.85 | 0.13 | 0.64 | 0.95 | 0.98 | 0.99 |
+
+...climbing to the plain-OLS R²≈0.99 as the partition gets fine enough.
+Not a library bug — the earlier "the clustering step is numerically
+unstable" language in §4.5 was an incorrect guess, corrected here. (Worth
+noting for whoever touches this library next: a low default rule count is a
+reasonable choice for genuinely piecewise/nonlinear targets, which is most
+of what a fuzzy system is *for* — it's specifically the wrong default for a
+target that's exactly globally linear, which physics-derived
+rational-structure features can produce.)
+
+**Does the same sensitivity apply to the black-box baselines?** Swept
+`n_output_buckets` from 3 to 40 for every n=2 black-box ablation and the
+n=3 baseline, measuring both single-step R² and the actual rollout metric
+this report cares about (time to 0.5 rad error):
+
+| Approach | nb=3 | nb=10 | nb=20 | nb=40 |
+|---|---|---|---|---|
+| n=2 angle-only | 0.32s | 0.40s | 0.43s | 0.45s |
+| n=2 angle+velocity | 0.60s | 1.15s | 1.11s | 0.94s |
+| n=2 moving-average (§4.2, 101 traj) | 0.44s | 0.76s | 0.49s | 0.82s |
+| n=3 angle-only (fan) | 0.48s | 0.39s | 0.38s | 0.44s |
+
+Split result: **angle+velocity nearly doubles** (0.60s→~1.1s) — it has the
+information a finer partition can exploit, and low bucket count was
+genuinely leaving performance on the table. **Angle-only (both n=2 and n=3)
+barely moves, and non-monotonically** — no bucket count can supply
+velocity information that was never in the input, so §4.1's core point
+(angle-only is missing information, not under-fit) stands unchanged. The
+moving-average result is noisy and mildly improves overall, consistent with
+its features carrying partial, imperfect velocity information. Rollout time
+is visibly non-monotonic in bucket count in every row (small sample of one
+test trajectory, plus fuzzy-partition granularity interacting with a
+chaotic rollout in ways that don't have to be smooth) — treat single data
+points at high bucket counts as indicative, not exact.
+
+**Refitting the physics-informed consequent through the actual fuzzy
+machinery** (not plain linear regression this time), sweeping bucket count
+the same way:
+
+| | nb=10 | nb=20 | nb=40 | Plain linear regression (§4.5/§4.6) |
+|---|---|---|---|---|
+| n=2 physics-informed | — | 2.20s | 2.47s | 3.31s |
+| n=3 physics-informed | 0.91s | 1.39s | 2.26s | 3.98s |
+
+Genuine multi-rule TSK on the physics-basis features climbs steadily with
+bucket count in both cases but doesn't reach the plain-regression ceiling
+by nb=40 — consistent with the R² table above: recovering an exactly-linear
+target through a partition-then-blend architecture takes a lot of rules,
+and 40 isn't quite enough at this training-set size. It didn't need to be
+run higher to answer the question this section asks, but it would likely
+keep climbing.
+
+**The corrected, tuned comparison:**
+
+| | n=2 | n=3 |
+|---|---|---|
+| Best black-box, nb=3 (as first reported) | 0.60s | 0.48s |
+| Best black-box, tuned | ~1.15s (nb=10) | ~0.48s (untunable) |
+| Physics-informed, fuzzy TSK, nb=40 | 2.47s | 2.26s |
+| Physics-informed, plain linear regression | 3.31s | 3.98s |
+| **Multiplier, tuned black-box vs. physics-informed (fuzzy)** | **~2.1×** | **~4.7×** |
+| **Multiplier, tuned black-box vs. physics-informed (plain OLS)** | **~2.9×** | **~8.3×** |
+
+**Bottom line.** The core finding survives revision: physics-structured
+consequents beat black-box ones by a real, substantial margin at both chain
+lengths, under any regression backend. What changes is the *size* of the
+claim for n=2 — 5× shrinks to roughly 2–3× once the fairest black-box
+competitor is properly tuned, because that specific baseline
+(angle+velocity) turned out to have real headroom a finer partition could
+reach. n=3's multiplier holds close to its original size, because its
+baseline's ceiling was never about rule count. This is exactly the kind of
+correction this report has made a habit of making in place rather than
+letting stand (§2's bug fix, §4's rollout-evaluation bugs) — a smaller,
+correctly-measured effect is worth more than a larger, unexamined one.
 
 ## 5. Caveats and Honest Limits of This Pass
 
@@ -509,19 +624,26 @@ the method, not a coincidence of the double-pendulum's specific algebra.
 - Tried physics-inspired consequent equations, twice. Naive nonlinear basis
   features fed through the standard fuzzy-clustering machinery did worse
   than the black-box baseline (0.21s) — a locally-linear consequent can't
-  represent the true rational (division) structure, and clustering on
-  transformed features scrambled the partitioning. Restructuring as two
+  represent the true rational (division) structure. Restructuring as two
   physics-shaped equations (numerator basis divided by the exact, known
-  denominator, fit as plain linear regression, θ integrated forward from
-  the updated ω) reached **3.31s** — more than 5× the best black-box result,
-  from the same 16 trajectories — and changed the failure mode itself: the
-  rollout stays a plausible bounded oscillation for the full 30s rather
-  than flatlining, drifting out of phase rather than collapsing.
-- Generalized the physics-informed consequent to n=3 via automated symbolic
-  extraction (Cramer's rule on the symbolic manipulator equation, no
-  by-hand algebra) — no new derivation work, just calling the same pipeline
-  with n=3. Result: **3.98s** to 0.5 rad error vs. the original n=3
-  black-box study's 0.48s, **>8×**, an even larger multiplier than n=2's 5×.
-  Same qualitative payoff at a second, independent chain length is decent
-  evidence this is a real effect of the method, not an artifact of the
-  double pendulum's specific algebra.
+  denominator, θ integrated forward from the updated ω) reached **3.31s**
+  (n=2, plain linear regression) and **3.98s** (n=3, via automated symbolic
+  extraction — Cramer's rule on the manipulator equation, no by-hand
+  algebra needed to move from n=2 to n=3). Both changed the failure mode
+  itself: the rollout stays a plausible bounded oscillation for the full
+  30s rather than flatlining, drifting out of phase rather than collapsing.
+- **Went back and checked whether `n_output_buckets=3` (used everywhere in
+  this report) was itself under-tuned** — it was, for some baselines but
+  not others. The library partitions by *output value*, not input region, so
+  low bucket counts bias each local fit; raising it to 10-40 nearly doubles
+  the angle+velocity baseline (0.60s→~1.15s) but barely moves angle-only at
+  either chain length (missing information, not under-fitting). Refitting
+  the physics-informed consequent through genuine multi-rule
+  `MimoGaussianPredictor` (not plain regression) climbs steadily with bucket
+  count (n=2: 2.47s at nb=40; n=3: 2.26s at nb=40) without quite reaching the
+  plain-regression ceiling. Net effect: n=2's multiplier over a *properly
+  tuned* black-box baseline shrinks from 5× to **~2-3×**; n=3's holds at
+  **~5-8×**, because its baseline was never bucket-limited to begin with.
+  The earlier "clustering instability" explanation for the fuzzy library's
+  poor showing was wrong and is corrected in §4.7 — the real mechanism is
+  output-bucket resolution, not instability.
