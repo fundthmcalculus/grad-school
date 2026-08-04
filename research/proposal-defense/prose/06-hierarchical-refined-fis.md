@@ -175,4 +175,4 @@ That warning has to be honoured elsewhere, and is not. Chapter 8 describes the a
 
 ---
 
-*Draft — Chapter 6 prose, in the author's voice; built vs. proposed marked throughout. Citations in bracketed shorthand pending the consolidated `references.bib`. Four tables (6.1–6.4) and three figure placeholders (6.1–6.3) inline. Open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 6 prose; built vs. proposed marked throughout. Citations in bracketed shorthand pending the consolidated `references.bib`. Three tables (6.1–6.3) and two figure placeholders (6.1–6.2) inline. Open items in `../ACTION_ITEMS.md`.*
