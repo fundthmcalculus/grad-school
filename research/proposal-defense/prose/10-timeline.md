@@ -4,9 +4,9 @@ The plan runs from the proposal defense at the end of 2026 to the final defense 
 
 Three things changed here, all of them cases of the schedule having assumed the hard parts were done.
 
-- **The baseline adapters are now first.** §7.4 calls the ANFIS and GA-tuned-FIS tables the first experiments owed, and an earlier version scheduled them last, inside Goal G3, with no bar of their own. Eleven cells across Tables 4.5 and 6.2 read `N/A` until they exist, and the speed argument in the title and in Chapters 1, 4 and 8 has no conventional fuzzy method measured beside it. That is the reason they open the schedule (checklist **C1**).
+- **The baseline adapters come first.** §7.4 calls the ANFIS and GA-tuned-FIS tables the first experiments owed. Eleven cells across Tables 4.5 and 6.2 read `N/A` until they exist, and the speed argument in the title and in Chapters 1, 4 and 8 has no conventional fuzzy method measured beside it. That is the reason they open the schedule (checklist **C1**).
 - **Every blocker the evidence names now has a bar or an explicit de-scope.** The M5 dependency fault gets a decision date; the defective rollout behind Table 6.4 gets a bar, because §7.3 promises that result to the committee; BETH's one-class path gets a slot and a stated fallback; eVAT and clusiVAT get their own bar. Fumanal-Idocin et al. (2025) and the deep TSK fuzzy classifier, itemized in Chapter 6's baseline list and nowhere here, are de-scoped in §7.2 instead of silently carried.
-- **Goal G8 is absent deliberately.** An earlier Table 7.1 gave it one quarter and 2028 Q1 while this chapter's Gantt and grid left it out. §7.2 retargets the construction post-defense and keeps only the disjunct count over G2's datasets, which rides inside G2.
+- **Goal G8 is absent deliberately.** §7.2 retargets the construction post-defense, since the 2028 Q1 quarter it would need already carries the capstone, G6, G7, the write-up and the defense, and keeps only the disjunct count over G2's datasets, which rides inside G2.
 
 ## 10.1 Gantt
 
@@ -33,6 +33,7 @@ gantt
     G1 one-pass membership generation         :g1, 2027-04-01, 91d
     G5 output partitioning decision           :g5a, 2027-04-01, 21d
     G2 real non-coordinate benchmarks         :crit, g2, 2027-04-15, 168d
+    G9 IVATMeans vs FCM and k-means           :g9, 2027-05-04, 21d
     BETH one-class path (or keep Glass)       :beth, 2027-05-17, 21d
     C3 Ch5 to Ch6 minimal end-to-end          :crit, c3, 2027-07-01, 45d
     G3 HME EM + narrowed baseline suite       :crit, g3, 2027-08-16, 137d
@@ -58,7 +59,7 @@ The Chapter 5 membership paper targets **EUSFLAT 2027**: written in January and 
 
 Two bars deliberately have no dates. **G4c**, the datacenter-GPU re-run, is gated on access to a card with full-rate double precision, not on effort, and §7.4's fallback applies if it never opens. **G4d**, the matrix-free reorder, is a cut candidate nothing in Chapter 3 depends on, listed unscheduled in Table 7.1.
 
-\* *Bar arithmetic, in one place.* The Chapter 5 paper ran 59 days from 2027-01-02, ending 2027-03-02, after the deadline it was rewritten for; it now runs 57 days and ends 28 February, the last day the deadline can fall on. An earlier day shortens it (open item below).
+\* *Bar arithmetic, in one place.* A 59-day bar from 2027-01-02 ends 2027-03-02, past the confirmed deadline, so the Chapter 5 paper's bar runs 57 days and ends 28 February, the last day the deadline can fall on. An earlier day shortens it (open item below).
 
 ## 10.2 Quarter grid (renderer-independent fallback)
 
@@ -75,6 +76,7 @@ G4b eVAT + clusiVAT head-to-head       .     ###     ###       .       .       .
 G1  one-pass membership generation     .       .    ####       .       .       .
 G5  output partitioning decision       .       .     ###       .       .       .
 G2  real non-coordinate benchmarks     .       .    ####    ####       .       .
+G9  IVATMeans vs FCM and k-means       .       .     ###       .       .       .
 BETH one-class path (or keep Glass)    .       .     ###       .       .       .
 C3  Ch5 -> Ch6 minimal end-to-end      .       .       .     ###       .       .
 G3  HME EM + narrowed baselines        .       .       .     ###    ####       .
@@ -101,7 +103,7 @@ Legend: `####` a full quarter of scheduled work · `###` a partial quarter, star
 |---|---|---|---|
 | **2026 Q4** | Proposal defense (**Dec**) | — | Defended proposal; committee feedback folded in |
 | **2027 Q1** | Baselines and fixes owed first | C1, G4a, C7, M5, G4b (start) | **Adapters filling the eleven `N/A` cells** in Tables 4.5 and 6.2; G4a finished (clocks/thermals, SHA guard, §7.2's three exceptions named); `predict_trajectory` fixed, Table 6.4 at ten seeds in the harness; **M5 go/no-go by 31 March**; eVAT and clusiVAT obtained or written; one consistent Concrete benchmark; **Ch 5 paper submitted (Feb deadline)**; Ch 3 journal begun |
-| **2027 Q2** | Memberships and the credibility gap | G1, G5, G2 (start), G4b (finish), BETH | One-pass MF (phase 4 re-attempted against §7.2's threshold, 5 the refactor); output-partitioning **decision** in about three weeks; **G2 starts here, not Q3**; eVAT/clusiVAT reported; BETH one-class path settled or the claim explicitly on Glass |
+| **2027 Q2** | Memberships and the credibility gap | G1, G5, G2 (start), G4b (finish), G9, BETH | One-pass MF (phase 4 re-attempted against §7.2's threshold, 5 the refactor); output-partitioning **decision** in about three weeks; **G2 starts here, not Q3**; eVAT/clusiVAT reported; `IVATMeans` timed and scored against FCM and k-means, including the non-convex sets where §3.3.5 predicts it loses; BETH one-class path settled or the claim explicitly on Glass |
 | **2027 Q3** | Real non-coordinate data | G2, C3, G3 (start) | DTW and graph-kernel benchmarks against §7.2's four criteria; **the minimal Ch 5 → Ch 6 result, pulled forward out of 2028 Q1** (C3); HME EM begun; **EUSFLAT presented (Sept)** |
 | **2027 Q4** | Hierarchy, baselines, merge question | G3, G4e, G3b | HME EM judged against the rule §7.2 states *before* it runs; narrowed baseline suite; merge composition test; broadened suite (cut 2); Ch 6 paper; writing begins |
 | **2028 Q1** | Capstone, write-up, **defense (Mar)** | capstone, G6\*, G7\* | Shuttle case study end to end **plus the same driver on one DTW matrix**, against §7.1's threshold; interpretability counts and named semantic criteria; **final defense March 2028** |
@@ -110,7 +112,8 @@ Legend: `####` a full quarter of scheduled work · `###` a partial quarter, star
 
 - **C1 has no upstream dependency**, which is why Q1 looks crowded: two adapter files, auto-detected by the tables. First, because everything downstream is measured against them.
 - **G4a stays front-loaded** (Q1); every later number is reported under its protocol. Its bar lands mid-February.
-- **G2 therefore starts 15 April and runs two quarters**, Q2 into Q3, which is what this list always said it should: an earlier version called it the top credibility item and the riskiest to leave late, then left it third and late in Q3.
+- **G2 therefore starts 15 April and runs two quarters**, Q2 into Q3, matching its billing as the top credibility item and the riskiest thing to leave late.
+- **G9 follows G4b**, starting the week that bar ends, because it is the same shape of work: a competitor comparison on the run-of-record host, reusing G4b's driver and its timing harness. Three weeks, not a quarter, since the estimator and both baselines already exist.
 - **G1 precedes C3 and the capstone.** C3 is the new intermediate, the first time Chapter 5's memberships reach Chapter 6's models at all, and putting a small version in Q3 is checklist **C3**'s own recommendation. It leaves the capstone an integration rather than a first attempt.
 - **C7 gates §7.3's second showcase**, so it sits in Q1. **The M5 decision gates G3's suite**, hence the dated milestone: one of four baselines may be a *build*, and finding that out in Q4 with the suite half-run is what the date prevents. **G3's EM is the largest single build**, spanning Q3–Q4, with the one-shot mixture as its de-scope path.
 - **Papers track the work**: Ch 5 → EUSFLAT (written Q1, presented Q3) → Ch 3 journal (Q1–Q2, a write-up, so it absorbs slip) → the VAT complexity note if the two blocking full-text reads clear (Q2, the fourth cut) → Ch 6 (Q4) → the capstone journal version alongside the write-up (2028 Q1).
@@ -127,7 +130,7 @@ The cost of that choice should be named too: the EUSFLAT paper would report clus
 
 ## 10.6 The runway is oversubscribed, and here is what I would cut
 
-An earlier version of this section called the fifteen-month runway "little slack, which is intentional," and named G7 as the designated first cut. With everything the evidence requires now scheduled — the baseline adapters, the eVAT and clusiVAT implementations, the M5 branch, the trajectory fix, the BETH decision, the broadened suite, the merge composition test, G2 at its real two-quarter size — that no longer holds. **The runway is oversubscribed, not merely tight, and cutting G7 alone does not fix it.** G7 is roughly thirty days of a stretch goal; the additions are considerably more. So the plan is an ordered list, the same one as §7.4's.
+With everything the evidence requires now scheduled — the baseline adapters, the eVAT and clusiVAT implementations, the M5 branch, the trajectory fix, the BETH decision, the broadened suite, the merge composition test, G2 at its real two-quarter size — the fifteen-month runway has no slack left. **It is oversubscribed, not merely tight, and cutting G7 alone does not fix it.** G7 is roughly thirty days of a stretch goal; the items above are considerably more. So the plan is an ordered list, the same one as §7.4's.
 
 1. **G7, adaptive multi-scale.** Already the designated first cut. Its likeliest outcome, on the phase-four evidence, is a negative result G1 would reach anyway.
 2. **G3b, the broadened dataset suite**, narrowed from six datasets (turbine, wave-energy, wine and the IoT sets) to Concrete, PhiUSIIL and one added regression set. Chapter 6 §6.4 promises "characterized across more than two problems," which three satisfy; six against six baselines at ten seeds is a quarter of engineering.
@@ -135,6 +138,8 @@ An earlier version of this section called the fifteen-month runway "little slack
 4. **The VAT complexity note (§9.3).** Conditional on two blocking full-text reads, and §3.3.1 concedes it is a modest correction to a problem someone else solved better. The cheapest paper to drop.
 5. **G4d, the matrix-free reorder.** Nothing in Chapter 3 depends on it, and it buys the regime past about 155,000 points, which no result here occupies. Listed unscheduled in Table 7.1, so cutting it means not adding it back.
 6. **G4e narrows to the composition test alone**, error-growth bound and block-boundary question named as future work. If even that goes, Chapter 3 withdraws the half-million-point distributed target.
+
+**G9 is on neither list, and that is a choice.** It is three weeks on machinery that already exists, and it is the only measurement behind a contribution Chapter 3 §3.3.5 now claims, so putting it on the cut list would mean planning to claim the estimator and never test it. If the quarter overruns anyway, the fallback is stated in §7.4: the claim narrows to what the code proves, and Chapter 3 says so.
 
 What I will not cut, and would rather move the final defense than lose: **C1**, **G2**, **G4a**, **C7**, and the capstone. If G3's EM or G2 overruns, Chapter 7's fallbacks apply (the one-shot mixture, and a synthetic-plus-one-real-domain result), and Chapters 3 and 4 remain a defensible floor. Defense preparation is carved out in Feb 2028 so the final month is not a scramble.
 
