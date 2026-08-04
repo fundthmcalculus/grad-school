@@ -21,21 +21,75 @@ MEMORY_SIZE = 25  # long-term average spans the MEMORY_SIZE steps before that wi
 # Rows of history needed before a feature row has a fully populated long-term average.
 HISTORY_LEN = WINDOW_SIZE + MEMORY_SIZE
 
-# A 0th-order consequent, against the library default of '1st'. The three features
-# per angle are near-collinear -- at dt=0.01 a 50-step average trails the current
-# value by ~0.2 rad against a ~4.5 rad range, correlation 0.98 -- so a consequent
-# that is linear in them is ill-conditioned and extrapolates without bound: it
-# spikes to |omega| in the hundreds a few steps into a rollout and then locks the
-# angles at a fixed point. The piecewise-constant consequent cannot extrapolate,
-# and tracks ~3x closer over the full run. Widening the window is what supplies the
-# velocity information; 50/25 tracks theta_1 to 0.1 rad for ~0.8 s, against ~0.2 s
-# at the 5/3 window.
+# A 0th-order consequent, against the library default of '1st'. At the 5/3 window
+# this was forced: there the three features per angle correlate at 0.98, a linear
+# consequent over them is ill-conditioned, and the rollout spiked to |omega| in the
+# hundreds within a few steps before locking the angles at a fixed point. At 50/25
+# the collinearity is milder (worst pairwise 0.78 within an angle's block) and
+# energy projection bounds omega anyway, so 1st order is no longer unstable -- but
+# 0th still leads on the horizon over seven held-out initial conditions: theta_1
+# holds 1 rad for 3.67 s past the seed against 2.99 s, with theta_2 MAE 10.2
+# against 21.7. Widening the window is what supplies the velocity information.
 TSK_ORDER = '0th'
+
+# Rejected: feeding differences instead of raw averages, i.e. replacing
+# (theta, MA_short, MA_long) with (theta, theta - MA_short, MA_short - MA_long) to
+# make velocity explicit rather than implicit in near-cancelling terms. The premise
+# does not survive measurement. The 0.98 collinearity that motivated it belongs to
+# the 5/3 window; at 50/25 the raw block is already at 0.78, and the difference
+# transform *raises* the worst pair to 0.84 -- the two lagged velocity proxies
+# correlate with each other about as badly as the averages did. Over the same seven
+# ICs it does not pay: with a 0th-order consequent the 1 rad horizon collapses to
+# 0.47 s and theta_1 MAE nearly doubles to 2.06; with 1st order it takes theta_1
+# MAE to 0.924, the best of any arm, but gives back the horizon (3.52 s) and 65% of
+# theta_2 MAE (16.8). No arm dominates the raw/0th pairing, so it stands.
+
+# Rescale each predicted omega so the rollout stays on the true energy shell. The
+# unprojected rollout drifts by ~19 against an E0 of ~0.006 -- it silently becomes a
+# different physical system, and draining the budget is what parks it at a fixed
+# point, which projection removes: the rollout then sustains oscillation for the full
+# 30 s instead of freezing around 5 s.
+#
+# Note what the energy readout means in each mode. With projection ON it is ~0 by
+# construction, since that is precisely what the projection imposes -- it verifies
+# the implementation and counts unreachable-angle steps, and says nothing about model
+# quality. The diagnostic is only informative with projection OFF. Do not read the
+# projected figure as an achievement.
+#
+# Projection does NOT improve tracking: the theta_1 horizon is unchanged and theta_1
+# MAE is slightly worse (0.84 -> 0.96 over seven held-out initial conditions). It
+# buys physical admissibility, not accuracy.
+PROJECT_ENERGY = True
 
 # Categorical slots 1 and 2 of the validated light-mode palette.
 COLOR_ACTUAL = '#2a78d6'
 COLOR_PREDICTED = '#eb6834'
 COLOR_MUTED = '#52514e'
+
+
+def project_onto_energy_shell(model, theta, omega, e0):
+    """Scale omega so that E(theta, omega) == e0, leaving its direction alone.
+
+    Kinetic energy is quadratic in omega, so T(lambda*omega) = lambda^2 * T(omega),
+    and the lambda that spends exactly the available budget is closed-form. e0 comes
+    from the seed state the rollout already has, so this uses no information the
+    rollout was not given.
+
+    Where theta is outside the region E0 can reach, the budget is negative and no
+    omega satisfies the constraint, so omega is zeroed. That branch does not fire in
+    this rollout (0 of 2925 steps), but it is absorbing for any model whose features
+    are the instantaneous state: omega=0 freezes theta, which leaves the state and
+    hence the next prediction unchanged. The moving-average features here keep
+    evolving while theta is held still, so this variant would escape.
+    """
+    theta1, theta2 = theta
+    budget = e0 - model.potential_energy(theta1, theta2)
+    if budget <= 0.0:
+        return np.zeros_like(omega)
+    available = model.kinetic_energy(theta1, omega[0], theta2, omega[1])
+    if available <= 1e-12:
+        return omega
+    return omega * np.sqrt(budget / available)
 
 
 @dataclass
@@ -107,6 +161,22 @@ class DoublePendulum(OdeSystem):
     @property
     def derivative_labels(self) -> list[str]:
         return ["omega_1", "alpha_1", "omega_2", "alpha_2"]
+
+    def potential_energy(self, theta1, theta2):
+        """Gravitational potential, measured from the pivot: zero with both arms horizontal."""
+        return -self.m1 * self.g * self.l1 * np.cos(theta1) \
+            - self.m2 * self.g * (self.l1 * np.cos(theta1) + self.l2 * np.cos(theta2))
+
+    def kinetic_energy(self, theta1, omega1, theta2, omega2):
+        """Kinetic energy, including the l1*l2 cross term between the two arms."""
+        return 0.5 * self.m1 * self.l1**2 * omega1**2 \
+            + 0.5 * self.m2 * (self.l1**2 * omega1**2 + self.l2**2 * omega2**2
+                               + 2 * self.l1 * self.l2 * omega1 * omega2 * np.cos(theta1 - theta2))
+
+    def energy(self, theta1, omega1, theta2, omega2):
+        """Total energy. Conserved exactly by this system, so it scores a rollout."""
+        return self.kinetic_energy(theta1, omega1, theta2, omega2) \
+            + self.potential_energy(theta1, theta2)
 
     def equations_of_motion(self, state, t):
         """
@@ -212,44 +282,74 @@ def test_tribble_ode():
     # seeded with that many rows of the true trajectory. Error is zero by
     # construction over the seed, which is why the metrics below skip it.
     theta_rows = list(actual_trajectory[THETA_FEATURES].iloc[:HISTORY_LEN].values)
-    omega_rows = [np.full(len(OMEGA_TARGETS), np.nan) for _ in range(HISTORY_LEN)]
+    # One fewer than theta_rows: omega_rows[k] is the velocity predicted AT theta[k]
+    # and used to reach theta[k+1], so the two line up index for index. Recording it
+    # against theta[k+1] instead would pair each omega with an angle it was not
+    # computed from, and the energy check below would read that offset as drift.
+    omega_rows = [np.full(len(OMEGA_TARGETS), np.nan) for _ in range(HISTORY_LEN - 1)]
+
+    model = test_results.model
+    e0 = model.energy(*test_results.params.np)
 
     for _ in range(len(actual_trajectory) - HISTORY_LEN):
         history = pd.DataFrame(theta_rows[-HISTORY_LEN:], columns=THETA_FEATURES)
         features = extractor.prepare_sequences(history, THETA_FEATURES, include_time=False)
         omega = ode_m.predict(features.iloc[-1:]).values.flatten()
+        if PROJECT_ENERGY:
+            omega = project_onto_energy_shell(model, theta_rows[-1], omega, e0)
         theta = theta_rows[-1] + omega * dt
         if not np.isfinite(theta).all():
             print(f"Warning: Euler diverged at step {len(theta_rows)}, stopping early.")
             break
-        theta_rows.append(theta)
         omega_rows.append(omega)
+        theta_rows.append(theta)
+    # No velocity is predicted at the final angle, so pad to keep the columns aligned.
+    omega_rows.append(np.full(len(OMEGA_TARGETS), np.nan))
 
     predicted = pd.DataFrame(theta_rows, columns=THETA_FEATURES)
     predicted[OMEGA_TARGETS] = np.array(omega_rows)
     print(f"Euler rollout produced {len(predicted)} of {len(actual_trajectory)} steps "
-          f"({HISTORY_LEN} seeded from truth).")
+          f"({HISTORY_LEN} seeded from truth, energy projection "
+          f"{'on' if PROJECT_ENERGY else 'off'}).")
 
-    # 3) Report how long the rollout tracks, rather than only whether it stayed finite.
+    # 3) Score the rollout on tracking and on energy. Horizons are measured from the
+    # end of the seed window, not from t=0: HISTORY_LEN rows are copied from the true
+    # trajectory, so timing from t=0 credits the model for a head start it was given
+    # and makes a longer window look better than a shorter one for no reason.
     n = min(len(predicted), len(actual_trajectory))
+    seed_end = HISTORY_LEN * dt
     print("\nRollout accuracy past the seed window:")
     for col in THETA_FEATURES + OMEGA_TARGETS:
         error = np.abs(actual_trajectory[col].values[HISTORY_LEN:n] - predicted[col].values[HISTORY_LEN:n])
         print(f"  {col:8s} MAE={np.nanmean(error):8.4f}")
-    theta1_error = np.abs(actual_trajectory['theta_1'].values[:n] - predicted['theta_1'].values[:n])
+    theta1_error = np.abs(actual_trajectory['theta_1'].values[HISTORY_LEN:n]
+                          - predicted['theta_1'].values[HISTORY_LEN:n])
     for tol in (0.01, 0.1, 0.5, 1.0):
         exceeded = np.flatnonzero(theta1_error > tol)
-        when = f"{exceeded[0] * dt:.2f} s" if exceeded.size else "never"
+        when = f"{exceeded[0] * dt:6.2f} s past seed" if exceeded.size else "        never"
         print(f"  |theta_1 error| first exceeds {tol:>4}: {when}")
 
-    # 4) Plot the traces: one panel per state, actual against the FIS rollout.
-    fig, axes = plt.subplots(2, 2, figsize=(14, 8))
-    fig.suptitle('Memory-augmented FIS rollout: angles and angular velocities',
+    # Total energy is a constant of motion, so its drift measures whether the rollout
+    # is a trajectory this system could have taken at all -- independently of whether
+    # it is the right one. A rollout that sheds all of it parks the pendulum at rest.
+    rollout_energy = model.energy(predicted['theta_1'].values, predicted['omega_1'].values,
+                                 predicted['theta_2'].values, predicted['omega_2'].values)
+    drift = np.abs(rollout_energy[HISTORY_LEN:n] - e0)
+    print(f"\nEnergy (E0 = {e0:.6f}, conserved exactly by the true system):")
+    print(f"  |E - E0|  mean={np.nanmean(drift):.4f}  max={np.nanmax(drift):.4f}")
+
+    # 4) Plot the traces: one panel per state, plus energy across the bottom.
+    fig = plt.figure(figsize=(14, 11))
+    grid = fig.add_gridspec(3, 2)
+    axes = [fig.add_subplot(grid[0, 0]), fig.add_subplot(grid[0, 1]),
+            fig.add_subplot(grid[1, 0]), fig.add_subplot(grid[1, 1])]
+    ax_energy = fig.add_subplot(grid[2, :])
+    fig.suptitle('Memory-augmented FIS rollout: angles, angular velocities, energy',
                  fontsize=14, fontweight='bold')
 
     t_actual = np.arange(len(actual_trajectory)) * dt
     t_predicted = np.arange(len(predicted)) * dt
-    for ax, col in zip(axes.flat, THETA_FEATURES + OMEGA_TARGETS):
+    for ax, col in zip(axes, THETA_FEATURES + OMEGA_TARGETS):
         ax.plot(t_actual, actual_trajectory[col].values, '-',
                 color=COLOR_ACTUAL, linewidth=2, label='Actual')
         ax.plot(t_predicted, predicted[col].values, '-',
@@ -264,6 +364,24 @@ def test_tribble_ode():
         for spine in ('top', 'right'):
             ax.spines[spine].set_visible(False)
         ax.legend(loc='best', fontsize=9, framealpha=0.9)
+
+    # Energy: the true value is a flat line, so any departure is model error rather
+    # than dynamics. Signed, so shedding energy reads differently from gaining it --
+    # the collapse to a fixed point shows up as a one-way slide toward -E0.
+    ax_energy.axhline(0.0, color=COLOR_ACTUAL, linewidth=2,
+                      label=f'Actual (E0 = {e0:.4f}, constant)')
+    ax_energy.plot(t_predicted, rollout_energy - e0, '-',
+                   color=COLOR_PREDICTED, linewidth=2, label='FIS rollout')
+    ax_energy.axvline(HISTORY_LEN * dt, color=COLOR_MUTED, linestyle=':', linewidth=1,
+                      label='end of seed window')
+    ax_energy.set_title(f'Energy drift from E0  (mean |E-E0| past seed = {np.nanmean(drift):.4f}, '
+                        f"projection {'on' if PROJECT_ENERGY else 'off'})", fontsize=11)
+    ax_energy.set_xlabel('Time (s)', fontsize=10)
+    ax_energy.set_ylabel('E - E0', fontsize=10)
+    ax_energy.grid(True, alpha=0.25)
+    for spine in ('top', 'right'):
+        ax_energy.spines[spine].set_visible(False)
+    ax_energy.legend(loc='best', fontsize=9, framealpha=0.9)
 
     fig.tight_layout()
     output_file = Path(__file__).parent / "tribble_ode_traces.png"
