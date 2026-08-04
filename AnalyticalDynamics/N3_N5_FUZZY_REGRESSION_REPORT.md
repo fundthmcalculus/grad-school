@@ -203,6 +203,46 @@ not fix the underlying problem** — 16 trajectories packed into a 1.5° band
 is not enough training data, in any feature space, for a rule-based fuzzy
 regressor to track a chaotic system's own Lyapunov-driven divergence.
 
+### 4.2 Moving-average position features + a much wider training set (n=2, `n2_moving_average_fuzzy.py`)
+
+A second attempt at rollout stability, per a follow-up ask: keep the fuzzy
+TSK regressor and delta-state prediction (no separate velocity-prediction/
+integration step), but engineer richer inputs — for each angle, the current
+value plus a 3-sample and a 9-sample trailing moving average (6 input
+columns total) — and train on a training set widened by more than 10×: the
+original study fixed $\theta_1(0)=120°$ and swept $\theta_2(0)$ over a
+$1.5°$ band (16 trajectories); this pass sweeps the same parameter over a
+full $30°$ band at finer resolution (101 trajectories, $\theta_2(0)\in
+[-15°,15°]$, step $0.3°$), holding out a test case at $\theta_2(0)=7.35°$.
+
+The moving-average features are a compact alternative to the raw-lagged MIMO
+windowing tried earlier (window={1,3,5,7,10}, which degraded past window=3):
+current + MA3 + MA9 compresses a longer history into a fixed 6 columns
+regardless of how far back the long average looks, instead of adding one
+column per lagged step.
+
+| Approach | Training trajectories | Time to 0.5 rad rollout error |
+|---|---|---|
+| Angle-only ($\theta_1,\theta_2$) | 16 | 0.32 s |
+| Angle + velocity ($\theta,\omega$) | 16 | 0.60 s |
+| Current + MA3 + MA9 | 101 | 0.44 s |
+
+![n=2 rollout error: three feature-engineering approaches](figures/n2_rollout_comparison_all.png)
+
+The moving-average approach lands **between** the other two — a real
+improvement over angle-only (0.32s → 0.44s, +38%) despite using no velocity
+information at all, consistent with moving averages implicitly encoding a
+finite-difference-like rate-of-change signal. But it does not beat the
+explicit-velocity result, and more importantly it does not change the
+fundamental picture: even with **more than six times the training data**
+covering a **twenty-fold wider** range of initial conditions, the rollout
+still crosses half a radian of error in under half a second and then
+flatlines outside the training manifold, the same extrapolation-collapse
+failure mode described in §4. **A larger, wider training set measurably
+helps the margin, not the order of magnitude** — this is consistent with
+the diagnosis in §4.1: the ceiling here is Lyapunov-driven chaotic
+divergence itself, not a fixable feature-engineering or data-volume gap.
+
 ## 5. Caveats and Honest Limits of This Pass
 
 - **The n=5 single-step model was not re-run** for this report (only MIMO
@@ -245,3 +285,8 @@ regressor to track a chaotic system's own Lyapunov-driven divergence.
   from monotonic saturation to oscillating near/above threshold, but don't
   fix the underlying cause — 16 trajectories in a 1.5° band is too little
   data for a fuzzy regressor to track chaotic divergence, in any feature space.
+- Tried moving-average position features (current + MA3 + MA9 per angle)
+  with an 11x larger, 20x wider training set: survival time improves to
+  0.44s (between the angle-only and velocity results) but the same
+  order-of-magnitude collapse persists — more/wider training data narrows
+  the gap, it doesn't close it.
