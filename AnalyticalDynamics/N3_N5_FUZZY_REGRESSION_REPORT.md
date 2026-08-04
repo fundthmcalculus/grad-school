@@ -243,6 +243,67 @@ helps the margin, not the order of magnitude** — this is consistent with
 the diagnosis in §4.1: the ceiling here is Lyapunov-driven chaotic
 divergence itself, not a fixable feature-engineering or data-volume gap.
 
+### 4.3 Physics-informed energy correction (n=2, `n2_energy_conserving_fuzzy.py`)
+
+§4.1/4.2 diagnosed the ceiling as chaos, but hadn't ruled out a compounding
+factor: does the free-form delta regressor also inject or dissipate energy
+every step, on top of being chaotically sensitive, and would removing that
+alone buy meaningful stability? This is testable exactly, not just
+approximately. Kinetic energy
+
+$$
+T(\omega_1,\omega_2;\theta_1,\theta_2) = \tfrac12 m_1 l_1^2\omega_1^2
++ \tfrac12 m_2\left(l_1^2\omega_1^2 + l_2^2\omega_2^2 + 2l_1l_2\omega_1\omega_2\cos(\theta_1-\theta_2)\right)
+$$
+
+is exactly homogeneous of degree 2 in $(\omega_1,\omega_2)$ jointly (every
+term is $\omega_i^2$ or the $\omega_1\omega_2$ cross term) — so
+$T(\lambda\omega_1,\lambda\omega_2)=\lambda^2 T(\omega_1,\omega_2)$ for any
+$\lambda$, exactly, no approximation. That means after every predicted step
+$(\theta_{new},\omega_{raw})$, solving
+
+$$
+T(\lambda\,\omega_{raw}) + V(\theta_{new}) = E_0 \implies
+\lambda = \sqrt{\max\left(0, \frac{E_0 - V(\theta_{new})}{T(\omega_{raw})}\right)}
+$$
+
+and rescaling $\omega_{raw}\to\lambda\,\omega_{raw}$ projects the predicted
+state back onto the true initial energy shell **exactly**, every step —
+using only the known physical constants ($m,l,g$), not the dynamics being
+predicted. Applied to the angle+velocity model from §4.1 (same regressor,
+same seed, same 16-trajectory training set — only the rollout loop differs):
+
+| | Energy drift (max, 30s) | Time to 0.5 rad error |
+|---|---|---|
+| Actual (integrator truth) | $2.4\times10^{-5}$ | — |
+| Uncorrected rollout | **352 J** (E₀=0.0063 J) | 0.60 s |
+| Energy-corrected rollout | $1.4\times10^{-14}$ | 0.57 s |
+
+![n=2 rollout: with vs. without energy correction](figures/n2_energy_conservation_rollout.png)
+
+The correction works exactly as derived — energy drift drops from 352 J to
+machine precision, a full 16 orders of magnitude — and the two error curves
+in the left panel are, past the first second, **visually indistinguishable**.
+Correcting energy exactly does not measurably change the tracking accuracy.
+
+**This is the clearest evidence in this report for what the actual failure
+mode is.** Left uncorrected, the model's errors happen to also violate
+energy conservation (bounded oscillation up to +352 J here, not runaway —
+the specific way it fails depends on the trained model, but it is always
+unphysical). Correcting that exactly still leaves the rollout on the
+*wrong point of the right energy shell*: the double pendulum's chaotic
+sensitivity means nearby points on the same energy surface diverge from
+each other exponentially regardless of whether either point violates
+conservation. Energy drift was a real, fixable defect and a symptom, not
+the disease — the disease is that a free-form regressor with 16 training
+trajectories has no way to locate the correct point in an 8-dimensional-ish
+effective phase neighborhood once chaos has amplified a small initial
+error past the training manifold's resolution. A physics-informed
+correction that could plausibly do better would need to constrain
+*direction* on the energy shell (e.g. respecting the actual vector field's
+structure, not just its energy level) — a meaningfully harder problem than
+this one closed-form fix could reach.
+
 ## 5. Caveats and Honest Limits of This Pass
 
 - **The n=5 single-step model was not re-run** for this report (only MIMO
@@ -290,3 +351,11 @@ divergence itself, not a fixable feature-engineering or data-volume gap.
   0.44s (between the angle-only and velocity results) but the same
   order-of-magnitude collapse persists — more/wider training data narrows
   the gap, it doesn't close it.
+- Tried an exact physics-informed fix: rescaling predicted angular
+  velocities every step so the rolled-out state lands exactly on the true
+  energy shell (closed-form, since kinetic energy is exactly quadratic in
+  omega). Eliminated a 352 J energy drift down to machine precision, and
+  changed tracking accuracy by essentially nothing (0.60s → 0.57s) — the
+  cleanest evidence yet that the failure mode is chaotic phase-space
+  sensitivity, not energy non-conservation. Energy drift was a real defect,
+  just not the one determining how long the rollout stays useful.
