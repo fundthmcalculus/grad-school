@@ -615,7 +615,7 @@ range needs widening to 1.84–1.88 across five runs.
 
 *The exception is Table 4.6, and it is not cosmetic.* The θ operating curve moved at
 every θ: detection rate up 0.084–0.152, false-alarm rate up **0.151–0.221**, and the
-net J therefore *down* 0.040–0.103. The band §4.3.5 quotes as **+0.222…+0.239 peaking
+net J therefore *down* 0.040–0.103. The band §4.4 quotes as **+0.222…+0.239 peaking
 at θ = 0.60** now reads **+0.119…+0.154 peaking at θ = 0.80**. About 35% of the
 achievable separation is gone and the operating point has moved two steps along the
 sweep. The chapter's qualitative reading survives — there is still no sharp optimum, so
