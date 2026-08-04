@@ -376,7 +376,7 @@ empirical follow-up it spun off is **E9**, deliberately low priority._
       differ in implementation is not a property of the hardware.
       Three smaller mismatches: the MST is *faster* than quoted (5.4–7.7×) but does **not** grow
       with N — it peaks mid-grid and falls to 6.3× at 32,000, as expected from an O(n²) dense
-      Prim CPU arm against O(n² log n) Borůvka rounds; the front end's quoted 4.8–6.6× matches
+      Prim CPU arm against O(n² log n) Borůvka rounds; the front end's since-corrected 4.8–6.6× matched
       matched-work only at the top of the grid (4.9×) and is reproducible as a band only if the
       CPU arm also materialises the reordered n×n matrix the GPU never builds (5.6–11.8×); and
       "exact" is wrong for the two fastest pairwise cells (2.06×, 4.18×), which run

@@ -146,7 +146,7 @@ the CPU arm additionally materialise the reordered n × n matrix
 5.6–11.8×, i.e. *above* the quoted band. The chapter's cell therefore matches
 neither arm: it sits between a comparison that is fair and one that is not.
 
-*Row 3 — Fuzzy C-Means, the row to fix.* Quoted **30–56×**. Measured 14.4×,
+*Row 3 — Fuzzy C-Means, now fixed in the chapter.* Quoted **30–56×** until 2026-08-04; §3.4 now prints the matched arm, 1.24× / 2.35× / 3.71× at `uniform-2026-08-03`, and reports the unmatched pair separately as the reformulation result it is. Measured 14.4×,
 24.1×, 41.0× at N = 50,000 / 200,000 / 500,000 against `fcm.fuzzy_c_means` —
 below the quoted range at the two smaller sizes. More importantly, that ratio is
 **not a device speedup**: `fcm.fuzzy_c_means` is a NumPy broadcasting
@@ -752,3 +752,20 @@ timing variance plus two fitted exponents (classical 3.20 → 3.15, stage one
 configurations and four archives. It was a regime never entered, and no amount of
 repetition inside the wrong regime finds that. What found it was reading the solved
 coefficients instead of the scores.
+
+**Note 20 — why the Table 3.4 diagnosis sat here for four archives without
+reaching the chapter.** Note 11 above identified all three defective rows,
+including the FCM row's order-of-magnitude formulation confound, and the chapter
+went on printing **30–56×** anyway. The gap is mechanical, not editorial:
+`check_prose` compares `mean ± std` pairs against archive CSVs, and every
+defective cell in Table 3.4 was written as a *range* — "30–56×",
+"≈4.8–6.6×", "1.3–2.5×", "≈5× ... growing with N". None of them is a
+mean-and-spread pair, so the archive checker never looked at any of them, and the
+one check that would have caught a four-archive-stale headline number ran clean the
+whole time.
+
+Two consequences worth acting on. Ranges are now avoided in that table in favour of
+per-condition values, which the checker can see. And a note in `PROVENANCE_MAP.md`
+is not a correction: it records that someone knew, which is worse than not knowing
+if the chapter is what gets read. Findings belong in the prose or in a tracked
+checklist item, not only here.
