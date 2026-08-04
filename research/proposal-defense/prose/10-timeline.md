@@ -31,7 +31,7 @@ gantt
     G4a measurement protocol (finish)         :crit, g4a, 2027-01-04, 45d
     G4b eVAT + clusiVAT (obtain or write)     :crit, g4b, 2027-02-18, 75d
     G1 one-pass membership generation         :g1, 2027-04-01, 91d
-    G5 output partitioning decision           :g5a, 2027-04-01, 21d
+    G5 output partitioning decision (done)    :done, g5a, 2026-08-03, 1d
     G2 real non-coordinate benchmarks         :crit, g2, 2027-04-15, 168d
     G9 IVATMeans vs FCM and k-means           :g9, 2027-05-04, 21d
     BETH one-class path (or keep Glass)       :beth, 2027-05-17, 21d
@@ -74,7 +74,7 @@ M5  decide: patch, build, or drop      .     ###       .       .       .       .
 G4a measurement protocol (finish)      .    ####       .       .       .       .
 G4b eVAT + clusiVAT head-to-head       .     ###     ###       .       .       .
 G1  one-pass membership generation     .       .    ####       .       .       .
-G5  output partitioning decision       .       .     ###       .       .       .
+G5  output partitioning decision       DONE    .       .       .       .       .
 G2  real non-coordinate benchmarks     .       .    ####    ####       .       .
 G9  IVATMeans vs FCM and k-means       .       .     ###       .       .       .
 BETH one-class path (or keep Glass)    .       .     ###       .       .       .
@@ -103,7 +103,7 @@ Legend: `####` a full quarter of scheduled work · `###` a partial quarter, star
 |---|---|---|---|
 | **2026 Q4** | Proposal defense (**Dec**) | — | Defended proposal; committee feedback folded in |
 | **2027 Q1** | Baselines and fixes owed first | C1, G4a, C7, M5, G4b (start) | **Adapters filling the eleven `N/A` cells** in Tables 4.5 and 6.2; G4a finished (clocks/thermals, SHA guard, §7.2's three exceptions named); `predict_trajectory` fixed, Table 6.4 at ten seeds in the harness; **M5 go/no-go by 31 March**; eVAT and clusiVAT obtained or written; one consistent Concrete benchmark; **Ch 5 paper submitted (Feb deadline)**; Ch 3 journal begun |
-| **2027 Q2** | Memberships and the credibility gap | G1, G5, G2 (start), G4b (finish), G9, BETH | One-pass MF (phase 4 re-attempted against §7.2's threshold, 5 the refactor); output-partitioning **decision** in about three weeks; **G2 starts here, not Q3**; eVAT/clusiVAT reported; `IVATMeans` timed and scored against FCM and k-means, including the non-convex sets where §3.3.5 predicts it loses; BETH one-class path settled or the claim explicitly on Glass |
+| **2027 Q2** | Memberships and the credibility gap | G1, G5, G2 (start), G4b (finish), G9, BETH | One-pass MF (phase 4 re-attempted against §7.2's threshold, 5 the refactor); **G2 starts here, not Q3**; eVAT/clusiVAT reported; `IVATMeans` timed and scored against FCM and k-means, including the non-convex sets where §3.3.5 predicts it loses; BETH one-class path settled or the claim explicitly on Glass |
 | **2027 Q3** | Real non-coordinate data | G2, C3, G3 (start) | DTW and graph-kernel benchmarks against §7.2's four criteria; **the minimal Ch 5 → Ch 6 result, pulled forward out of 2028 Q1** (C3); HME EM begun; **EUSFLAT presented (Sept)** |
 | **2027 Q4** | Hierarchy, baselines, merge question | G3, G4e, G3b | HME EM judged against the rule §7.2 states *before* it runs; narrowed baseline suite; merge composition test; broadened suite (cut 2); Ch 6 paper; writing begins |
 | **2028 Q1** | Capstone, write-up, **defense (Mar)** | capstone, G6\*, G7\* | Shuttle case study end to end **plus the same driver on one DTW matrix**, against §7.1's threshold; interpretability counts and named semantic criteria; **final defense March 2028** |

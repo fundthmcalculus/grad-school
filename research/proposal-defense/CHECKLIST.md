@@ -142,7 +142,7 @@ empirical follow-up it spun off is **E9**, deliberately low priority._
 - [x] ✅ **B5b — §3.4's swept rows and Table 3.2 re-quoted from the workstation run.** Table 3.1
       reads 25× / 311× / 673× (was 28.8× / 398× / 1,129×); the 4,096-point stage-two figure is
       0.229 ± 0.006 s, so the comparison against the published stage-one measurement reads ~11×.
-      Table 3.2's grid and exponents are re-quoted at classical **3.20**, stage one **1.86**,
+      Table 3.2's grid and exponents are re-quoted at classical **3.15**, stage one **1.86**,
       stage two **1.97**. Every cell was checked programmatically against the archive CSVs. The
       plateau and parity-band paragraphs are rewritten as an explicit retraction rather than
       replaced silently, and Ch 7's G4 is rebuilt around the lesson — repeatability cannot
@@ -199,7 +199,7 @@ empirical follow-up it spun off is **E9**, deliberately low priority._
       auto-detects them.
 - [x] ✅ **C2 — Complexity fit against reference curves.** Table 3.2 + Figure 3.2 now sweep a
       small grid (100–1,000, sized so the cubic arm runs at every point) with both axes
-      normalized, and fit a log-log exponent per arm. Classical **3.20** (theory 3) confirms.
+      normalized, and fit a log-log exponent per arm. Classical **3.15** (theory 3) confirms.
       **Stage one does not, and this item was ticked claiming it did.** Five runs on the
       workstation fit stage one at **1.86–1.88** against a theoretical ≈2.1 for
       $O(N^2 \log N)$ — but the number to notice is that it sits *below* the pure quadratic
@@ -465,7 +465,7 @@ removed; PhiUSIIL reversal fixed in two places; refinement table re-quoted; conf
 paragraph re-quoted and re-attributed; Table 6.2 re-quoted and its purpose narrowed.
 
 **Cross-cutting.** Bibliography false alarm removed and six missing keys added; six count fixes;
-G5 marked reopened in two documents; estimates-vs-demonstrations standard written into G4 and
+G5 marked settled in two documents; estimates-vs-demonstrations standard written into G4 and
 Appendix A.5; four notes logged in `ACTION_ITEMS.md`.
 
 **New results.** float32 in-place reaches 126,491 points under the cap and 154,919 on the full
