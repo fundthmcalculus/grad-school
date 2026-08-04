@@ -17,7 +17,27 @@ the open question hypothesised might dominate. So the three arms are:
   quantile        equal-FREQUENCY boundaries; centroids are bucket means.
                   Every bucket well-supported; under-resolves the extremes.
   hybrid          equal-frequency boundaries, extreme centroids pinned to
-                  min/max. THE SHIPPED DEFAULT.
+                  min/max. The default UP TO 2026-08-03; uniform is now shipped,
+                  and `partition_output(..., method="quantile")` reproduces this.
+
+CONSEQUENT ORDER IS THE AXIS THIS STUDY ORIGINALLY MISSED. It ran 1st and 2nd
+order only, found every separation smaller than the seed spread producing it, and
+left G5 open with no scheme recommended. That was a correct reading of the wrong
+regime. `solve_tsk_consequents` pins the first and last rules' CONSTANT terms to
+whatever centroids it is handed, so at 0th order -- where the constant is a rule's
+entire output -- a pinned centroid becomes prediction error with nothing to absorb
+it, while 1st and 2nd order pay for it through their linear terms and hide it
+inside the seed spread. Concrete, three buckets:
+
+  0th   uniform +0.394 +/- 0.065   quantile +0.242   hybrid -0.434 +/- 0.241
+  1st   uniform  0.796 +/- 0.018   quantile  0.789   hybrid  0.787 +/- 0.026
+  2nd   uniform  0.841 +/- 0.021   quantile  0.836   hybrid  0.832 +/- 0.027
+
+0.828 across the arms at 0th order, 0.009 at 1st. The partition binds hardest
+exactly where the study was not looking, so 0th order is now in ORDERS by default.
+The decomposition matters too: of that 0.828, the boundary scheme is worth 0.152
+and the PINNING is worth 0.676 -- the hybrid was a real third scheme all along,
+and the worst of the three, not the inert no-op §4.3.2 once called it.
 
 METRICS -- aggregate error alone cannot answer this, because the failure mode is
 localised. A starved bucket or a mangled tail barely moves a global average. So
@@ -55,7 +75,7 @@ import common as C            # noqa: E402
 import _fuzzy_models as F     # noqa: E402
 
 BUCKETS = [int(b) for b in os.environ.get("REPRO_BUCKETS", "3,4,6").split(",")]
-ORDERS = [o.strip() for o in os.environ.get("REPRO_ORDERS", "1st,2nd").split(",")]
+ORDERS = [o.strip() for o in os.environ.get("REPRO_ORDERS", "0th,1st,2nd").split(",")]
 L2 = 1e-2
 
 
@@ -184,9 +204,15 @@ def main():
                  "and should hold the extremes, quantile crowds its boundaries where the data "
                  "is dense and should lose them. 'min bucket n' is the smallest training-bucket "
                  "occupancy and is the diagnostic that explains *why* a scheme fails when it "
-                 "does. NOTE: `partition_output` as shipped is the hybrid — equal-frequency "
-                 "boundaries with the two extreme centroids pinned to the observed min and max "
-                 f"— so that row is the current default, not a proposal. Concrete target skew "
+                 "does. The 0th-order rows are the ones that separate the arms: "
+                 "`solve_tsk_consequents` holds the first and last rules' constant terms at the "
+                 "centroids it is handed, and at 0th order that constant is a rule's entire "
+                 "output, so the hybrid's pinned extremes become prediction error directly. At "
+                 "1st and 2nd order the linear terms absorb them and every separation falls "
+                 "inside the seed spread — which is why running those two orders alone left G5 "
+                 "looking undecidable. `hybrid` was the shipped default up to 2026-08-03; "
+                 "`uniform` is now the default and `partition_output(..., method=\"quantile\") "
+                 "reproduces the hybrid. Concrete target skew "
                  f"= {skew:+.3f}."))
 
 
