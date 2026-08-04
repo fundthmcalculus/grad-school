@@ -121,7 +121,7 @@ class DoublePendulum(OdeSystem):
 
         num21 = omega1**2 *self.l1 *(self.m1+self.m2)
         num22 = self.g*(self.m1+self.m2)*np.cos(theta1)
-        num23 = omega2**2 + self.l2*self.m2 * np.cos(delta_theta)
+        num23 = omega2**2 * self.l2*self.m2 * np.cos(delta_theta)
         denom2 = self.l2 *(2*self.m1 + self.m2 - self.m2 * np.cos(2*delta_theta))
         alpha2 = 2*np.sin(delta_theta)*(num21 + num22 + num23) / denom2
 
@@ -165,7 +165,7 @@ class DoublePendulumDamped(OdeSystem):
 
         # Isolated equation for α₁ (upper pendulum angular acceleration)
         num1_1 = -self.g * (self.m1 + self.m2) * np.sin(theta1)
-        num1_2 = -self.m2 * self.g * np.sin(theta2) * np.cos(delta_theta)
+        num1_2 = self.m2 * self.g * np.sin(theta2) * np.cos(delta_theta)
         num1_3 = -self.m2 * self.l2 * omega2**2 * np.sin(delta_theta)
         num1_4 = -self.m2 * self.l1 * omega1**2 * np.sin(delta_theta) * np.cos(delta_theta)
         num1_5 = -(self.c1 * omega1) / self.l1
