@@ -169,6 +169,40 @@ Two GIF animations render the same rollouts as the actual swinging chains,
 actual (left) next to predicted (right): `n3_fuzzy_comparison.gif` and
 `n5_fuzzy_comparison.gif`.
 
+### 4.1 Does adding velocity inputs fix the collapse? (n=2, `n_pendulum_velocity_ablation.py`)
+
+Every rollout above — the n=2 baseline included — uses angle-only inputs.
+Repeating the n=2 single-step and window=1 rollout with
+$(\theta_1,\omega_1,\theta_2,\omega_2)$ as inputs instead of just
+$(\theta_1,\theta_2)$:
+
+| | Single-step R² (θ₁, ω₁, θ₂, ω₂) | Time to 0.5 rad rollout error |
+|---|---|---|
+| Angles only | 0.965* | 0.32 s |
+| Angles + velocities | 0.602, 0.331, 0.491, −0.462 | 0.60 s |
+
+*(*the angles-only single-step number predicts absolute θ₁, not comparable
+row-for-row to the four velocity-augmented outputs — see the autocorrelation
+caveat in `DOUBLE_PENDULUM_REPORT.md` §5 point 1. The velocity-augmented
+single-step fit is on Δstate, like the MIMO models, and is directly what a
+fairer comparison should use.)*
+
+![n=2 rollout error: angles only vs. angles+velocities](figures/rollout_error_velocity_ablation.png)
+
+Velocity inputs roughly **double** the survival time (0.32s → 0.60s) and
+visibly change the *shape* of the failure: the angle-only rollout error
+saturates monotonically once it leaves the training manifold, while the
+velocity-augmented rollout error bounces — dropping back down near zero
+multiple times before climbing again — meaning the model gets the
+oscillation *frequency* roughly right but the *phase and amplitude* wrong,
+so it happens to re-align with the true trajectory periodically by
+coincidence rather than by tracking it. Either way, the error is back above
+threshold within a second and stays mostly above it for the rest of the 30s
+horizon. **Conclusion: velocity inputs measurably help the local fit but do
+not fix the underlying problem** — 16 trajectories packed into a 1.5° band
+is not enough training data, in any feature space, for a rule-based fuzzy
+regressor to track a chaotic system's own Lyapunov-driven divergence.
+
 ## 5. Caveats and Honest Limits of This Pass
 
 - **The n=5 single-step model was not re-run** for this report (only MIMO
@@ -180,13 +214,7 @@ actual (left) next to predicted (right): `n3_fuzzy_comparison.gif` and
   Higher window sizes are more expensive per chain (more columns, same 16
   trajectories) and, given window=3 already regressed relative to n=2, are
   unlikely to change the qualitative conclusion.
-- **This is still an angles-only feature set.** Every result here — the
-  original n=2 numbers included — omits $\omega_i$ from the regressor's
-  inputs. A natural next step, now that the evaluation methodology is
-  trustworthy, is repeating this with $(\theta,\omega)$ inputs to see
-  whether that alone fixes the sub-second collapse, or whether the training
-  manifold (16 trajectories in a $1.5°$ band) is simply too narrow regardless
-  of feature set.
+- ~~This is still an angles-only feature set...~~ **Resolved:** see §4.1.
 - **No chaos/Lyapunov characterization of n=3 or n=5** yet (that's still the
   deferred item from `N_PENDULUM_SYMBOLIC_DERIVATION.md` §5) — this report
   only establishes that the surrogate-modeling evaluation is now trustworthy,
@@ -208,3 +236,12 @@ actual (left) next to predicted (right): `n3_fuzzy_comparison.gif` and
   of open-loop rollout once evaluated honestly.
 - Two comparison GIFs (actual vs. predicted, full chain) and one
   cross-n error-growth figure delivered as the visual record of this pass.
+- The rollout-evaluation bugs (including a second, independent one affecting
+  `window_size>1`) are now fixed directly in `test_double_pendulum.py`, not
+  just documented — re-running that suite reproduces this report's n=2
+  numbers exactly.
+- Closed the "would velocity inputs fix this" question raised above: they
+  roughly double survival time (0.32s → 0.60s) and change the failure mode
+  from monotonic saturation to oscillating near/above threshold, but don't
+  fix the underlying cause — 16 trajectories in a 1.5° band is too little
+  data for a fuzzy regressor to track chaotic divergence, in any feature space.
