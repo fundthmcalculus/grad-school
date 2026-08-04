@@ -405,6 +405,52 @@ would not transfer to a system whose equations of motion were unknown, a
 genuine limitation of "physics-informed" methods generally, not specific to
 this experiment).
 
+### 4.6 Generalizing to n=3 (`n_pendulum_physics_basis.py`, `n3_physics_informed_rational.py`)
+
+§4.5's decomposition was derived by hand from the double pendulum's
+published closed-form $\ddot\theta_1,\ddot\theta_2$. That doesn't scale —
+by hand, n=3 already means differentiating a 3×3 linear solve. It
+generalizes cleanly through the symbolic $n$-link model instead
+(`n_pendulum_symbolic.py`, §2 of `N_PENDULUM_SYMBOLIC_DERIVATION.md`):
+Cramer's rule gives $\ddot q_i=\det(M_i)/\det(M)$, where $M_i$ is $M$ with
+column $i$ replaced by $f$. $\det(M)$ depends only on $\theta$ (given known
+$m,l$) — the exact same *shared* denominator for every output, generalizing
+the double pendulum's $2m_1+m_2-m_2\cos2\Delta$ bracket. Expanding
+$\det(M_i)$ algebraically (leaving compound arguments like
+$\sin(\theta_1-\theta_2)$ atomic — expanding those into
+$\sin\theta_1\cos\theta_2-\cos\theta_1\sin\theta_2$ produces a much larger,
+uglier, but mathematically equivalent set) turns it into a finite sum of
+additive terms automatically, with no hand algebra: 4 and 3 terms for the
+double pendulum's two outputs (exactly reproducing §4.5's by-hand basis),
+18 terms per output for the triple pendulum's three. Each term divided by
+$\det(M)$ becomes one physics-basis feature, fit exactly as in §4.5: one
+sparse linear consequent per output, $\theta$ integrated from the updated
+$\omega$.
+
+Applied to the same fan-configuration train/test scenario as the original
+n=3 study (§3, `n_pendulum_fuzzy_regression.py`: base
+$\theta=[120°,60°,0°]$, $\theta_3$ swept over $[1.5°,3.0°]$, 16 training
+trajectories):
+
+| | Time to 0.5 rad error |
+|---|---|
+| n=3 black-box MIMO baseline (§3) | 0.48 s |
+| **n=3 physics-informed rational consequent** | **3.98 s** |
+
+![n=3 rollout: actual vs. physics-informed prediction](figures/n3_physics_informed_rollout.png)
+
+**>8× the black-box result** — a larger multiplier than n=2's 5×, from the
+same 16-trajectory budget and the identical automated pipeline (only $n$
+changed). Single-step cross-sectional fit is excellent across all three
+outputs (R²=0.980, 0.978, 0.985), and the qualitative failure mode matches
+§4.5 exactly: the rollout tracks the true oscillation's shape and phase
+closely for the first ~4 seconds, then drifts out of phase while remaining
+a plausible bounded double-and-triple-pendulum-like motion — never
+flatlining, unlike every black-box approach in this report. The consistency
+between n=2 and n=3 here (same mechanism, same qualitative payoff, larger
+gain at higher $n$) is reasonably strong evidence this is a real effect of
+the method, not a coincidence of the double-pendulum's specific algebra.
+
 ## 5. Caveats and Honest Limits of This Pass
 
 - **The n=5 single-step model was not re-run** for this report (only MIMO
@@ -471,3 +517,11 @@ this experiment).
   from the same 16 trajectories — and changed the failure mode itself: the
   rollout stays a plausible bounded oscillation for the full 30s rather
   than flatlining, drifting out of phase rather than collapsing.
+- Generalized the physics-informed consequent to n=3 via automated symbolic
+  extraction (Cramer's rule on the symbolic manipulator equation, no
+  by-hand algebra) — no new derivation work, just calling the same pipeline
+  with n=3. Result: **3.98s** to 0.5 rad error vs. the original n=3
+  black-box study's 0.48s, **>8×**, an even larger multiplier than n=2's 5×.
+  Same qualitative payoff at a second, independent chain length is decent
+  evidence this is a real effect of the method, not an artifact of the
+  double pendulum's specific algebra.
