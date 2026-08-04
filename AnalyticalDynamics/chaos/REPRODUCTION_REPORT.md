@@ -131,6 +131,14 @@ Our FIS is in the same position: it beats every learned model and still loses to
 the baseline. We report that rather than quoting only the rank among learned
 models.
 
+**This is chain-length-dependent, and the paper's two chain lengths are the two
+where it is most extreme.** At n = 5 the same baseline is 20× worse (0.05150),
+because the bracketing trajectories no longer stay close. It is still ahead of the
+FIS there, but by 1.3× rather than 4.8×. §8 has the numbers. So the correct claim
+is not "interpolation always wins" — it is that the friction variant at n = 2 and
+n = 3, which is where the paper's headline results live, is nearly solved by
+interpolation.
+
 ### 3.2 Why: measured, not asserted
 
 `bracket_diagnostic.py` measures how long the bracketing pair stays coherent, and
@@ -309,31 +317,138 @@ work:
   (`../n_pendulum_symbolic.py`, itself validated in `../n_pendulum_validation.py`).
   Maximum disagreement over 200 random states: **1.07e-14**. This check runs on
   every invocation of `pendulum_data.py` and raises if it fails.
-- Triple-pendulum dynamics come from that symbolic model rather than from the
-  paper's cited Yesilyurt formulation, since it is the derivation this repository
-  can verify.
-- RK4 at h = 0.005 s over 10 s: maximum relative energy drift **6.6e-7** on the
-  undamped `[120°, 0°]` run.
+- Triple- and quintuple-pendulum dynamics come from that symbolic model rather
+  than from the paper's cited Yesilyurt formulation, since it is the derivation
+  this repository can verify.
+- RK4 at h = 0.005 s over 10 s, undamped `[120°, 0, …]`, drift relative to the
+  potential swing: **6.6e-7** at n = 2, **1.8e-6** at n = 3, **5.2e-5** at n = 5.
+  The n = 5 figure is step size rather than derivation error — halving h cuts it
+  ~16×, RK4's order — and `pendulum_data.rk4_order_check()` asserts that ratio
+  stays above 8× on every run. See `METHOD_AND_PARAMETERS.md` §7.
+- The symbolic n = 2 model and the paper's closed form produce identical drift to
+  every printed digit, a second check that they are the same model.
 - Every reported FIS number is produced by refitting the selected configuration
   and asserting the refit reproduces the swept score to 1e-9 (`run_all.py`).
-- 167 scored configurations across the two sweeps: `results/sweep.csv` — 76 rows,
-  71 scored, 5 failed per §4.3 — plus `results/sweep_lowcap.csv`, 96 rows all
-  scored. Failures are written to the CSV as error rows, not dropped.
+- **253 scored configurations across four sweeps**, all tracked in `results/`:
+
+  | file | rows | scored | note |
+  |---|---|---|---|
+  | `sweep.csv` | 76 | 71 | 5 failed, per §4.3 |
+  | `sweep_lowcap.csv` | 96 | 96 | n = 2, 3 |
+  | `sweep_n5.csv` | 38 | 38 | n = 5 main grid |
+  | `sweep_lowcap_n5.csv` | 48 | 48 | n = 5, 2–20 rules |
+
+  Failures are written to the CSV as error rows, not dropped. `run_all.py` merges
+  every file it finds, so a new chain length is swept into its own file rather than
+  by re-running the ~2 h already scored.
 
 ## 7. Figures
 
 Paper-format comparison plots, in `figures/`. No animations, by request.
 
+`{system}` is `double`, `triple` or `quintuple`; `{setting}` is `trained` or
+`holdout`. Twelve of each per-cell figure, four chain-length-spanning ones.
+
 | Figure | Paper analogue |
 |---|---|
-| `fig_compare_{system}_{friction}_{setting}.png` (8) | Figs. 11, 12, 13, 18B–D — dual-axis RMSE/R² grouped bars, with the FIS and the no-learning baselines appended |
-| `fig_angles_{system}_{friction}_{setting}.png` (8) | the θ(t) truth-vs-prediction plot every reference notebook ends with |
-| `fig_trajectory_{system}_{friction}_{setting}.png` (8) | Figs. 14, 15, 16, 19 — bob paths in the plane over 10 s |
-| `fig_rmse_heatmap_friction_holdout.png` | Fig. 22 |
-| `fig_capacity_vs_holdout.png` | not in the paper — held-out R² against rule count, showing the two regimes |
-| `fig_bracket.png` | not in the paper — the §3.2 measurement |
+| `fig_compare_{system}_{friction}_{setting}.png` (12) | Figs. 11, 12, 13, 18B–D — dual-axis RMSE/R² grouped bars, with the FIS and the no-learning baselines appended. The four n = 5 panels show every paper model hatched "not run in paper". |
+| `fig_angles_{system}_{friction}_{setting}.png` (12) | the θ(t) truth-vs-prediction plot every reference notebook ends with |
+| `fig_trajectory_{system}_{friction}_{setting}.png` (12) | Figs. 14, 15, 16, 19 — bob paths in the plane over 10 s |
+| `fig_rmse_heatmap_friction_holdout.png` | Fig. 22, with a `quintuple` column and a FIS row |
+| `fig_capacity_vs_holdout.png` | not in the paper — held-out R² against rule count for all six datasets, showing that capacity buys everything on friction and nothing on frictionless |
+| `fig_bracket.png` | not in the paper — the §3.2 measurement, now across all three chain lengths |
 
-## 8. If this were taken further
+## 8. Extension to n = 5
+
+The paper stops at the triple pendulum. Its time-step protocol has nothing
+chain-length-specific in it, so the whole thing is run again at n = 5 here. **No
+published number exists in any n = 5 cell**, so the figures and tables say "not run
+in paper" rather than dropping the column; all four `quintuple_*` entries in
+`paper_results.py` are `None` by construction.
+
+### Nothing new was derived
+
+`../n_pendulum_symbolic.py` already forms the Euler–Lagrange equations with SymPy
+for arbitrary n and was already validated at n = 5 by
+`../n_pendulum_validation.py`. Extending the reproduction meant deleting
+`{2: "double", 3: "triple"}` dispatch tables, not deriving equations: chain length
+now flows from `pendulum_data.N_LINKS` through a single
+`system_name()` / `dataset_label()` pair, and adding n = 4 would be a one-tuple
+edit. Symbolic derivation costs 8.9 s once (`lru_cache`d); all six datasets
+generate in 33 s. Integrator accuracy and the h-refinement check are in
+`METHOD_AND_PARAMETERS.md` §7.
+
+The initial-condition grid `[120, 0, 0, 0, x]` continues the paper's own pattern
+(θ₁ pinned, last link swept, middles hanging down). That is a reading of their
+convention rather than a published choice, and it is the one assumption in the
+n = 5 work another reader might make differently.
+
+### Results
+
+| n = 5 cell | FIS | bracket midpoint | nearest trained IC |
+|---|---|---|---|
+| friction, trained IC | **0.02458** / R² 0.9874 (3.3°) | — | — |
+| friction, holdout IC | 0.06720 / R² 0.9016 (11.3°) | **0.05150** / R² 0.9433 | 0.05199 / R² 0.9455 |
+| frictionless, trained IC | **0.02666** / R² 0.9866 (7.2°) | — | — |
+| frictionless, holdout IC | **0.21130** / R² 0.2014 (171.2°) | 0.22749 / R² 0.1101 | 0.27780 / R² −0.3330 |
+
+Winning configurations follow the same split as n = 2 and n = 3: `nb300` with
+`full-2nd` consequents and `l2_reg=1e-9` for both trained-IC cells, and low
+capacity with coarse memberships (`nb40`, 8 fixed Gaussians) for the frictionless
+holdout — the identical configuration that won that cell at n = 2.
+
+### What n = 5 shows: the trivial baseline's dominance is chain-length-dependent
+
+The no-learning baseline degrades sharply with n on the friction problems, because
+the bracketing pair stops staying close:
+
+| friction dataset | bracket separation at t = 10 s | as % of holdout range | λ | midpoint RMSE |
+|---|---|---|---|---|
+| double | 8.8° | 3.3% | 0.56 /s | 0.00250 |
+| triple | 8.2° | 4.0% | 0.23 /s | 0.00036 |
+| quintuple | 105.3° | 23.7% | 1.25 /s | 0.05150 |
+
+So the finding in §3.1 — that averaging two training rows beats every model in the
+paper by 6–18× — is specific to short chains. At n = 5 the baseline is 20× worse
+than at n = 2 and no longer unbeatable in principle.
+
+**I expected the FIS to take that opening. It did not.** At n = 5 with friction the
+FIS reaches 0.06720 against the baseline's 0.05150 — still behind, by 1.3×. The
+honest summary across all three chain lengths is therefore:
+
+- **Friction holdout: the FIS loses to the no-learning baseline at every n**
+  (0.01201 vs 0.00250; 0.00477 vs 0.00036; 0.06720 vs 0.05150). More links narrows
+  the gap from 4.8× to 1.3× but does not close it.
+- **Frictionless holdout: the FIS beats both baselines at every n**
+  (0.1839 vs 0.2256; 0.1620 vs 0.1657; 0.2113 vs 0.2275). It is the only entrant
+  that does, at any chain length.
+
+That is a consistent story rather than a lucky cell, and it says something specific
+about what the FIS is good for here: it wins exactly where the answer is a blend
+over many training initial conditions, and loses exactly where the answer is a
+single nearby trajectory copied accurately.
+
+### Frictionless n = 5 is past the information limit
+
+R² 0.2014 on the frictionless holdout, against 0.1101 for the midpoint and
+−0.3330 for the nearest neighbour, with an RMSE of 171° on a trajectory spanning
+1148°. Every method has collapsed to roughly the conditional mean. The bracketing
+pair separates from 0.1° to 709° (λ = 1.40 /s), which is more than half the
+holdout's own range, so there is very little left to recover. Five links over 10 s
+is past the point where this protocol carries usable information about an unseen
+initial condition, and capacity does not change that. Across all 43 configurations
+swept for this dataset, spanning 2 to 300 rules per output, held-out R² ranges from
+−0.0772 to +0.2014 with no monotone trend. The best of them is `nb40` with 8 fixed
+Gaussians — the same coarse, low-capacity setting that wins the frictionless
+holdout at n = 2, and verified against the low-capacity sweep so it is not a
+boundary artefact of the main grid's floor.
+
+For contrast, the friction dataset over the same 43 configurations ranges from
+R² 0.4288 to 0.9016 and does rise monotonically with rule count. Capacity buys
+something there and nothing at all in the frictionless case, which is the
+information limit showing up as a hyperparameter that has stopped mattering.
+
+## 9. If this were taken further
 
 The interesting question this reproduction surfaces is not which regressor wins.
 It is that **the benchmark as constructed cannot distinguish models**, because the

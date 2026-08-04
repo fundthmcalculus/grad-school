@@ -20,18 +20,27 @@ negative results.
     only knob that improved held-out-initial-condition score on the
     *frictionless* problems while making every other number worse.
 
-Run: python sweep.py [--quick]
+Run:
+    python sweep.py                             # every chain length -> sweep.csv
+    python sweep.py --quick                     # 4-config smoke subset
+    python sweep.py --n 5 --out sweep_n5.csv    # just n=5, into its own file
+
+`--n` and `--out` exist so a new chain length can be added without re-running the
+~67 minutes of n=2 and n=3 that are already scored. run_all.py merges every
+sweep CSV it finds, so a separate file is equivalent to appending to sweep.csv.
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
-import sys
 import time
 
+import pendulum_data as pdata
 from fis_timestep import FisConfig, RESULT_DIR, load, run
 
-DATASETS = [(2, False), (2, True), (3, False), (3, True)]
+#: Chain lengths swept by default; n=2 and n=3 are the paper's, n=5 extends it.
+N_LINKS = (2, 3, 5)
 
 
 def configs(quick=False):
@@ -59,17 +68,29 @@ def configs(quick=False):
 
 
 def main():
-    quick = "--quick" in sys.argv
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--quick", action="store_true", help="4-config smoke subset")
+    ap.add_argument("--n", type=int, nargs="+", default=list(N_LINKS),
+                    metavar="N", help=f"chain lengths to sweep (default {list(N_LINKS)})")
+    ap.add_argument("--out", metavar="NAME",
+                    help="output CSV name under results/ (default sweep.csv)")
+    args = ap.parse_args()
+
+    quick = args.quick
+    datasets = [(n, f) for n in args.n for f in (False, True)]
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
-    path = RESULT_DIR / ("sweep_quick.csv" if quick else "sweep.csv")
+    default = "sweep_quick.csv" if quick else "sweep.csv"
+    path = RESULT_DIR / (args.out or default)
 
     rows = []
     cfgs = configs(quick)
-    total = len(DATASETS) * len(cfgs)
+    total = len(datasets) * len(cfgs)
     done = 0
     t_start = time.perf_counter()
+    print(f"sweeping {[pdata.system_name(n) for n in args.n]} x "
+          f"{{frictionless, friction}} x {len(cfgs)} configs -> {path.name}", flush=True)
 
-    for n_links, friction in DATASETS:
+    for n_links, friction in datasets:
         split = load(n_links, friction)
         for cfg in cfgs:
             done += 1

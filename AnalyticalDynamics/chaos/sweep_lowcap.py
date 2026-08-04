@@ -20,17 +20,21 @@ frictionless optimum, and the best held-out configuration overall remains
 `nb40` with 8 fixed Gaussians per feature. Recorded here so the bound is
 documented rather than assumed.
 
-Run: python sweep_lowcap.py
+Run:
+    python sweep_lowcap.py                                # every chain length
+    python sweep_lowcap.py --n 5 --out sweep_lowcap_n5.csv
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 import time
 
+import pendulum_data as pdata
 from fis_timestep import FisConfig, RESULT_DIR, load, run
 
-DATASETS = [(2, False), (3, False), (2, True), (3, True)]
+N_LINKS = (2, 3, 5)
 
 
 def configs():
@@ -45,13 +49,21 @@ def configs():
 
 
 def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--n", type=int, nargs="+", default=list(N_LINKS), metavar="N")
+    ap.add_argument("--out", metavar="NAME", help="output CSV name under results/")
+    args = ap.parse_args()
+
+    datasets = [(n, f) for n in args.n for f in (False, True)]
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
     rows = []
     cfgs = configs()
-    total = len(DATASETS) * len(cfgs)
+    total = len(datasets) * len(cfgs)
     done = 0
     t0 = time.perf_counter()
-    for n_links, friction in DATASETS:
+    print(f"low-capacity sweep: {[pdata.system_name(n) for n in args.n]} x "
+          f"{{frictionless, friction}} x {len(cfgs)} configs", flush=True)
+    for n_links, friction in datasets:
         split = load(n_links, friction)
         for cfg in cfgs:
             done += 1
@@ -75,7 +87,7 @@ def main():
         for k in r:
             if k not in fields:
                 fields.append(k)
-    path = RESULT_DIR / "sweep_lowcap.csv"
+    path = RESULT_DIR / (args.out or "sweep_lowcap.csv")
     with open(path, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=fields)
         w.writeheader()

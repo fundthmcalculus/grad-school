@@ -46,6 +46,7 @@ ORANGE = "#eb6834"
 AQUA = "#1baf7a"
 YELLOW = "#eda100"
 VIOLET = "#4a3aa7"
+RED = "#e34948"
 SURFACE = "#fcfcfb"
 INK = "#0b0b0b"
 INK_2 = "#3d3d39"
@@ -79,6 +80,27 @@ def _style(ax, title=None, xlabel=None, ylabel=None, grid=True):
     if ylabel:
         ax.set_ylabel(ylabel, fontsize=FS_LABEL, color=INK)
     return ax
+
+
+def regime_colors(labels):
+    """Map dataset labels to palette slots, friction cool and frictionless warm.
+
+    Keeps the two regimes visually separated however many chain lengths are
+    present, and keeps a given dataset the same colour across every figure.
+
+    The suffix test is on ``_frictionless``, not ``_friction``: every frictionless
+    label also ends with the substring "friction"'s prefix, so testing the shorter
+    suffix first would put both regimes in the same pool.
+    """
+    pools = {True: [BLUE, AQUA, VIOLET], False: [ORANGE, YELLOW, RED]}
+    used = {True: 0, False: 0}
+    out = {}
+    for label in sorted(labels):
+        has_friction = not label.endswith("_frictionless")
+        pool = pools[has_friction]
+        out[label] = pool[used[has_friction] % len(pool)]
+        used[has_friction] += 1
+    return out
 
 
 def _save(fig, name):
@@ -144,7 +166,7 @@ def compare_bars(system, friction, setting, fis_rmse, fis_r2, name=None, baselin
         ax2.text(x[i] + w / 2, qv, f" {qv:.4f}", ha="center", va="top",
                  fontsize=FS_SMALL, color="white", rotation=90)
 
-    sysname = {"double": "Double", "triple": "Triple"}[system]
+    sysname = system.capitalize()
     fric = "With Friction" if friction else "Frictionless"
     which = ("Trained Initial Condition" if setting == "trained"
              else 'Unknown "In-Between" Initial Condition')
@@ -252,12 +274,14 @@ def trajectory_overlay(pred, system, friction, setting):
 
 
 # ---------------------------------------------------------------------------
-def rmse_heatmap(fis_rmse, setting="holdout", friction=True):
+def rmse_heatmap(fis_rmse, setting="holdout", friction=True, systems=None):
     """Fig. 22-style model x system RMSE heatmap, with the FIS row appended.
 
-    fis_rmse : {"double": value, "triple": value}
+    fis_rmse : {system name: value}. Columns follow `systems`, defaulting to the
+    keys of fis_rmse, so adding a chain length adds a column without a code change.
+    Cells the paper never ran are drawn "n/a" rather than left blank.
     """
-    systems = ["double", "triple"]
+    systems = list(systems if systems is not None else fis_rmse)
     labels = pr.MODEL_ORDER + ["FIS (ours)"]
     M = np.full((len(labels), len(systems)), np.nan)
     for cj, sysname in enumerate(systems):
@@ -301,23 +325,30 @@ def capacity_curve(curves, best_paper=None):
     """Held-out-IC R^2 against rule count, per dataset.
 
     Not a figure in the paper. It is here because it carries the reproduction's
-    central result: on the friction problems more rules monotonically help,
-    while on the frictionless problems held-out score falls as the fit to the
-    training initial conditions improves. curves maps label -> (rules, r2).
+    central result: on the friction problems more rules keep helping all the way
+    to the grid ceiling, while on the frictionless problems held-out score
+    saturates within a handful of rules and then drifts down as the fit to the
+    training initial conditions tightens. curves maps label -> (rules, r2).
     """
-    fig, ax = plt.subplots(figsize=(6.2, 4.0))
+    fig, ax = plt.subplots(figsize=(6.6, 4.2))
     fig.patch.set_facecolor(SURFACE)
-    colors = {"double_friction": BLUE, "triple_friction": AQUA,
-              "double_frictionless": ORANGE, "triple_frictionless": YELLOW}
-    for label, (rules, r2) in curves.items():
+    colors = regime_colors(curves)
+    for label, (rules, r2) in sorted(curves.items()):
         order = np.argsort(rules)
         ax.plot(np.asarray(rules)[order], np.asarray(r2)[order], "-o",
-                color=colors.get(label, FAINT), markersize=4, linewidth=1.4, label=label)
+                color=colors.get(label, FAINT), markersize=4, linewidth=1.4,
+                label=label.replace("_", " "))
     if best_paper is not None:
         ax.axhline(best_paper, color=FAINT, linestyle=":", linewidth=1.2)
-        ax.text(ax.get_xlim()[1], best_paper, " paper best (friction)", va="center",
+        # Name the cell: with three chain lengths on the axes, an unqualified
+        # "paper best" reads as if it applied to all of them, and the paper has no
+        # n=5 result at all.
+        ax.text(ax.get_xlim()[1], best_paper, " paper best (n=2, friction)", va="center",
                 fontsize=FS_SMALL, color=FAINT)
     _style(ax, title="Held-out initial condition: score against FIS capacity",
            xlabel="rules per output (n_output_buckets)", ylabel="$R^2$ on unknown IC")
-    ax.legend(fontsize=FS_SMALL, frameon=False, loc="lower left")
+    # Legend below the axes: with six curves the low-left and low-right corners are
+    # both occupied, and an inset legend covered the n=5 frictionless trace.
+    ax.legend(fontsize=FS_SMALL, frameon=False, loc="upper center",
+              bbox_to_anchor=(0.5, -0.14), ncol=3)
     return _save(fig, "fig_capacity_vs_holdout")

@@ -91,8 +91,7 @@ class Split:
 
     @property
     def label(self):
-        name = {2: "double", 3: "triple"}[self.n_links]
-        return f"{name}_{'friction' if self.friction else 'frictionless'}"
+        return pdata.dataset_label(self.n_links, self.friction)
 
     @property
     def swept_index(self):
@@ -111,8 +110,7 @@ def _scale_per_trajectory(theta_deg):
 
 
 def load(n_links, friction):
-    system = {2: "double", 3: "triple"}[n_links]
-    label = f"{system}_{'friction' if friction else 'frictionless'}"
+    label = pdata.dataset_label(n_links, friction)
     train = np.load(DATA_DIR / f"{label}.npz")
     hold = np.load(DATA_DIR / f"{label}_holdout.npz")
 

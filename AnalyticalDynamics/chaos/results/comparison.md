@@ -135,3 +135,39 @@ FIS configuration: `nb300_full-2nd_g0_quantile_raw_probability`. Rank by RMSE: *
 | 11 | AR (paper) | 0.09074 | 0.812740 |
 
 FIS configuration: `nb300_full-2nd_g0_quantile_raw_probability`. Rank by RMSE: **3 of 11**. RMSE in degrees: 0.95.
+
+## quintuple pendulum, frictionless, trained IC
+
+| Rank | Model | RMSE | R^2 |
+|---|---|---|---|
+| 1 | **FIS (ours)** | 0.02666 | 0.986572 |
+
+The paper ran no model in this cell. FIS configuration: `nb300_full-2nd_g0_uniform_raw_probability_l21e-09`. RMSE in degrees: 7.18.
+
+## quintuple pendulum, frictionless, holdout IC
+
+| Rank | Model | RMSE | R^2 |
+|---|---|---|---|
+| 1 | **FIS (ours)** | 0.2113 | 0.201385 |
+| 2 | _bracket midpoint (no learning)_ | 0.2275 | 0.110068 |
+| 3 | _nearest trained IC (no learning)_ | 0.2778 | -0.333036 |
+
+The paper ran no model in this cell. FIS configuration: `nb40_1st_g8_uniform_raw_probability`. Rank by RMSE: **1 of 3**. RMSE in degrees: 171.19.
+
+## quintuple pendulum, friction, trained IC
+
+| Rank | Model | RMSE | R^2 |
+|---|---|---|---|
+| 1 | **FIS (ours)** | 0.02458 | 0.987446 |
+
+The paper ran no model in this cell. FIS configuration: `nb300_full-2nd_g0_uniform_raw_probability_l21e-09`. RMSE in degrees: 3.32.
+
+## quintuple pendulum, friction, holdout IC
+
+| Rank | Model | RMSE | R^2 |
+|---|---|---|---|
+| 1 | _bracket midpoint (no learning)_ | 0.0515 | 0.943335 |
+| 2 | _nearest trained IC (no learning)_ | 0.05199 | 0.945460 |
+| 3 | **FIS (ours)** | 0.0672 | 0.901591 |
+
+The paper ran no model in this cell. FIS configuration: `nb300_full-2nd_g0_quantile_raw_probability`. Rank by RMSE: **3 of 3**. RMSE in degrees: 11.35.

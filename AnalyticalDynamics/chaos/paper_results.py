@@ -103,6 +103,14 @@ RESULTS = {
     # The paper never ran a frictionless triple-pendulum holdout: it abandoned
     # frictionless holdout testing after the double-pendulum LSTM result.
     ("triple", False, "holdout"): {m: None for m in MODEL_ORDER},
+    # n=5 is this repository's extension. The paper stops at the triple pendulum,
+    # so there is no published number to compare against in any of these four
+    # cells -- they exist so the reporting code can say "not run" rather than
+    # raise, and so the gap is visible in the figures instead of being omitted.
+    ("quintuple", False, "trained"): {m: None for m in MODEL_ORDER},
+    ("quintuple", False, "holdout"): {m: None for m in MODEL_ORDER},
+    ("quintuple", True, "trained"): {m: None for m in MODEL_ORDER},
+    ("quintuple", True, "holdout"): {m: None for m in MODEL_ORDER},
 }
 
 

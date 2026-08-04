@@ -88,6 +88,7 @@ the paper's own conclusions, so it is not reproduced.
 | Step size h | 0.005 s | **[code]** `h=(b-a)/N` |
 | Double pendulum ICs | θ₁(0) = 120° fixed; θ₂(0) = 0.0° … 3.0° step 0.1° | paper §2.2 + **[code]** |
 | Triple pendulum ICs | θ₁(0) = 120°, θ₂(0) = 0° fixed; θ₃(0) = 0.1° … 3.0° step 0.1° | paper Fig. 18B caption + §3.3 |
+| **Quintuple pendulum ICs** | θ₁(0) = 120°, θ₂..₄(0) = 0° fixed; θ₅(0) = 0.0° … 3.0° step 0.1° | **extension — see §7** |
 | Number of training ICs | paper says 30; **[code]** `angles` list has 31 entries | — |
 | Held-out "in-between" IC | [120°, 2.05°] / [120°, 0°, 2.05°] | paper §2.2 |
 | Total training rows | 60,000 (paper) / 62,000 (**[code]**, 31 × 2000) | — |
@@ -246,7 +247,63 @@ and [180°,180°] an unstable saddle (real ±5.7874, ±2.3972).
 | θ₁(0) fed in as a constant input | Zero-variance inputs dropped | A Gaussian membership on a constant feature has σ = 0 and a degenerate firing strength. A net can absorb a dead input; a fuzzy partition cannot. |
 | RMSE reported only in scaled units | Scaled **and** degrees | Scaled RMSE is per-trajectory-relative and not physically interpretable |
 | Two metric settings | Three: `pooled`, `trained_ic`, `holdout_ic` | Separates within-trajectory interpolation from generalisation to a new IC |
+| n = 2 and n = 3 | n = 2, 3 **and 5** | §7 |
 | Animations | None | Explicitly out of scope |
 
 Integrator provenance for this reproduction: RK4 at h = 0.005 s over 10 s gives
-max relative energy drift 6.6e-7 on the undamped [120°, 0°] run.
+max relative energy drift 6.6e-7 on the undamped [120°, 0°] run. Per-n figures in
+§7.
+
+---
+
+## 7. The n = 5 extension
+
+The paper stops at the triple pendulum. Nothing in its time-step protocol is
+specific to a chain length, so the same protocol is run at n = 5 here. **There is
+no published number to compare against in any n = 5 cell** — the four
+`quintuple_*` entries in `paper_results.py` are deliberately all `None` so the
+tables and figures say "not run in paper" rather than omitting the gap.
+
+### What was reused, not rewritten
+
+The equations of motion come from `../n_pendulum_symbolic.py`, which forms the
+Euler–Lagrange equations with SymPy for arbitrary n and solves
+`M(q) q̈ = f(q, q̇)` numerically per evaluation. It already supported n = 5 —
+`../n_pendulum_validation.py` validates n = 3 and n = 5, and
+`../quintuple_pendulum.gif` predates this work. Extending the reproduction was
+therefore a matter of removing `{2: "double", 3: "triple"}` dispatch tables, not
+of deriving anything: chain length now flows from `pendulum_data.N_LINKS` through
+a single `system_name()` / `dataset_label()` pair.
+
+Deriving n = 5 symbolically costs 8.9 s once (it is `lru_cache`d); evaluating the
+right-hand side is ~20 µs, so all six datasets generate in 33 s.
+
+### The initial-condition pattern is an extrapolation
+
+The paper's two cases are `[120, x]` and `[120, 0, x]`: θ₁(0) is pinned at 120°,
+the *last* link's angle is swept over 0–3°, and every link in between starts
+hanging straight down. Continuing that gives `[120, 0, 0, 0, x]` for n = 5. That
+is a reading of the paper's convention, not a published choice, and it is the one
+assumption in the n = 5 work that a different reader might make differently.
+
+### Integrator accuracy degrades with n, as it should
+
+Undamped [120°, 0, …, 0] over 10 s at the paper's h = 0.005 s, drift measured
+against the potential swing using `../n_pendulum_animation.chain_energy`:
+
+| n | E₀ (J) | max drift / PE swing |
+|---|---|---|
+| 2 (paper's closed form) | −0.000000 | 6.58e-07 |
+| 2 (symbolic) | −0.000000 | 6.58e-07 |
+| 3 (symbolic) | −14.715 | 1.83e-06 |
+| 5 (symbolic) | −73.575 | 5.21e-05 |
+
+n = 5 drifts about eighty times more than n = 2. That is the step size, not the
+derivation: halving h cuts the drift by ~16×, which is RK4's fourth-order rate,
+and a wrong derivation would not obey the integrator's convergence rate.
+`pendulum_data.rk4_order_check()` measures this on every run and asserts the ratio
+stays above 8×. The n = 2 symbolic and closed-form drifts agreeing to all printed
+digits is a second, independent check that the two derivations are the same model.
+
+If a future experiment needs tighter conservation at n = 5, `h` is the knob — but
+h = 0.005 is what the paper specifies, so it is what the reproduction uses.

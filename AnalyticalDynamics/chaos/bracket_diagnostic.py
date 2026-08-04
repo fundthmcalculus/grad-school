@@ -13,6 +13,13 @@ which caps achievable R^2 well below 1 regardless of architecture. That is a
 property of the dataset, not of the model, and it is why every model in the paper
 scores ~0.2 on the frictionless holdout and ~0.99 with friction.
 
+The separation is also what makes the friction problems easy, and how easy depends
+on chain length. At n=2 and n=3 the bracketing pair stays inside 4% of the target's
+range for the whole 10 s window, so the midpoint baseline reaches R^2 0.9999 and
+beats every model in the paper. At n=5 it separates to 24%, the baseline degrades
+twentyfold, and interpolating the grid stops being close to sufficient. Run this
+before concluding anything from a friction-variant score.
+
 Two reference errors are reported for scale, neither of which is a lower bound:
 `midpoint_rmse_scaled` (average the two bracketing trained trajectories) and
 `constant_mean_rmse_scaled` (predict the trajectory's own mean, i.e. R^2 = 0).
@@ -26,6 +33,7 @@ import csv
 
 import numpy as np
 
+import pendulum_data as pdata
 import plots
 from fis_timestep import RESULT_DIR, load
 
@@ -99,7 +107,7 @@ def measure(split):
 def main():
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
     rows, curves = [], {}
-    for n_links in (2, 3):
+    for n_links in pdata.N_LINKS:
         for friction in (True, False):
             split = load(n_links, friction)
             m = measure(split)
@@ -119,11 +127,10 @@ def main():
         w.writeheader()
         w.writerows(rows)
 
-    fig, ax = plots.plt.subplots(figsize=(6.4, 4.0))
+    fig, ax = plots.plt.subplots(figsize=(6.6, 4.2))
     fig.patch.set_facecolor(plots.SURFACE)
-    colors = {"double_friction": plots.BLUE, "triple_friction": plots.AQUA,
-              "double_frictionless": plots.ORANGE, "triple_frictionless": plots.YELLOW}
-    for label, (t, sep) in curves.items():
+    colors = plots.regime_colors(curves)
+    for label, (t, sep) in sorted(curves.items()):
         ax.semilogy(t, np.maximum(sep, 1e-6), color=colors[label], linewidth=1.3,
                     label=label.replace("_", " "))
     plots._style(

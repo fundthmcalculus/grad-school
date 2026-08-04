@@ -27,6 +27,7 @@ import csv
 import sys
 
 import paper_results as pr
+import pendulum_data as pdata
 import plots
 from fis_timestep import (
     FisConfig,
@@ -38,13 +39,15 @@ from fis_timestep import (
     run,
 )
 
-SYSTEM_OF = {2: "double", 3: "triple"}
+#: Chain lengths reported, and the (n_links, friction) datasets they expand to.
+N_LINKS = (2, 3, 5)
+DATASETS = [(n, f) for n in N_LINKS for f in (False, True)]
 
 
 #: Every sweep whose rows are candidates for selection. sweep.csv is required;
 #: sweep_lowcap.csv extends the grid downward for the frictionless problems,
 #: whose held-out optimum sits below the main grid's floor.
-SWEEP_FILES = ("sweep.csv", "sweep_lowcap.csv")
+SWEEP_FILES = ("sweep.csv", "sweep_lowcap.csv", "sweep_n5.csv", "sweep_lowcap_n5.csv")
 
 
 def read_sweep(names=SWEEP_FILES):
@@ -129,7 +132,6 @@ def draw_dataset(split, system, friction, base, trained, holdout):
 
 def main():
     rows = read_sweep()
-    datasets = [(2, False), (2, True), (3, False), (3, True)]
 
     best_rows = []
     fis_holdout_rmse = {}
@@ -137,10 +139,10 @@ def main():
     baselines = {}
     capacity = {}
 
-    for n_links, friction in datasets:
+    for n_links, friction in DATASETS:
         split = load(n_links, friction)
         label = split.label
-        system = SYSTEM_OF[n_links]
+        system = pdata.system_name(n_links)
 
         by_hold = pick(rows, label, "holdout_rmse", True)
         by_train = pick(rows, label, "trained_rmse", True)
@@ -203,7 +205,8 @@ def main():
             f"({res_t.trained_ic['rmse_deg']:.2f} deg)"
         )
 
-    plots.rmse_heatmap(fis_holdout_rmse, setting="holdout", friction=True)
+    plots.rmse_heatmap(fis_holdout_rmse, setting="holdout", friction=True,
+                       systems=[pdata.system_name(n) for n in N_LINKS])
     plots.capacity_curve(capacity, best_paper=pr.best("double", True, "holdout")[2])
 
     fields = []
@@ -261,11 +264,14 @@ def write_comparison(fis, baselines):
             for i, (name, (rm, r2)) in enumerate(merged, 1):
                 lines.append(f"| {i} | {name} | {rm:.4g} | {r2:.6f} |")
             rank = [n for n, _ in merged].index("**FIS (ours)**") + 1
-            note = (f"FIS configuration: `{cfg_key}`. "
-                    f"Rank by RMSE: **{rank} of {len(merged)}**. "
-                    f"RMSE in degrees: {metrics['rmse_deg']:.2f}.")
+            note = f"FIS configuration: `{cfg_key}`. "
             if not cell:
                 note = "The paper ran no model in this cell. " + note
+            # "Rank 1 of 1" is noise: with no paper models and no baselines there
+            # is nothing to rank against, and printing a rank implies there was.
+            if len(merged) > 1:
+                note += f"Rank by RMSE: **{rank} of {len(merged)}**. "
+            note += f"RMSE in degrees: {metrics['rmse_deg']:.2f}."
             lines += ["", note, ""]
     (RESULT_DIR / "comparison.md").write_text("\n".join(lines), encoding="utf-8")
 

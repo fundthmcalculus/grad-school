@@ -45,6 +45,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from n_pendulum_animation import chain_energy  # noqa: E402
 from n_pendulum_symbolic import make_state_space  # noqa: E402
 
 # ---------------------------------------------------------------------------
@@ -60,7 +61,27 @@ T_END = 10.0
 N_STEPS = 2000
 H = (T_END - T_START) / N_STEPS  # 0.005 s
 
-#: theta_1(0) = 120 deg, theta_2(0) swept over this grid (degrees).
+#: Single source of truth for dataset naming, imported by every other module here.
+#: The paper covers n=2 and n=3 only; n=5 is this repository's extension, which the
+#: symbolic Lagrangian model in n_pendulum_symbolic.py supports without changes.
+SYSTEM_NAMES = {1: "single", 2: "double", 3: "triple", 4: "quadruple", 5: "quintuple"}
+
+
+def system_name(n_links):
+    """'double', 'triple', 'quintuple', ... for use in labels and filenames."""
+    try:
+        return SYSTEM_NAMES[n_links]
+    except KeyError:
+        raise ValueError(
+            f"no name for n_links={n_links}; add it to SYSTEM_NAMES"
+        ) from None
+
+
+def dataset_label(n_links, friction):
+    return f"{system_name(n_links)}_{'friction' if friction else 'frictionless'}"
+
+
+#: theta_1(0) = 120 deg; the last link's angle is swept over this grid (degrees).
 TRAIN_THETA2_DEG = np.round(np.arange(0.0, 3.0 + 1e-9, 0.1), 2)
 #: The paper's held-out "in-between" initial condition.
 TEST_THETA2_DEG = 2.05
@@ -185,24 +206,40 @@ def validate_against_reference(n_trials=200, seed=42, tol=1e-9):
     return worst
 
 
-def energy_drift_double(damping=0.0):
-    """Relative energy drift of an undamped 120 deg / 0 deg run over 10 s.
+def energy_drift(n_links, use_reference_rhs=None):
+    """Relative energy drift of the undamped [120, 0, ..., 0] run over 10 s.
 
-    A sanity gate on the integrator: for damping=0 this must be tiny. Returns
-    (E0, max relative |dE/E_scale|). Energy uses the pivot as the potential
-    zero, so E can pass through 0; we normalise by the total kinetic+potential
-    swing instead of by E0.
+    A sanity gate on the integrator, run for every n. Returns
+    (E0, max |dE| / potential swing). Energy uses the pivot as the potential zero,
+    so E passes through zero for some initial conditions; normalising by the
+    potential swing rather than by E0 keeps the ratio meaningful when it does.
+
+    Energy comes from `n_pendulum_animation.chain_energy`, the same function the
+    existing n=3 and n=5 validation in n_pendulum_validation.py uses -- so a drift
+    figure here is comparable to the ones already recorded for this repository.
+
+    use_reference_rhs selects which derivation to integrate; it defaults to the
+    paper's own closed form at n=2 and the symbolic model elsewhere. Passing it
+    explicitly lets the two be compared at n=2, where both exist.
     """
-    traj = rk4_integrate(
-        lambda r, t: rhs_double_reference(r, t, damping, damping),
-        [np.deg2rad(THETA1_DEG), 0.0, 0.0, 0.0],
-    )
-    th1, om1, th2, om2 = traj[:, 0], traj[:, 1], traj[:, 2], traj[:, 3]
-    ke = 0.5 * M1 * (L1 * om1) ** 2 + 0.5 * M2 * (
-        (L1 * om1) ** 2 + (L2 * om2) ** 2 + 2 * L1 * L2 * om1 * om2 * np.cos(th1 - th2)
-    )
-    pe = -(M1 + M2) * G * L1 * np.cos(th1) - M2 * G * L2 * np.cos(th2)
-    e = ke + pe
+    if use_reference_rhs is None:
+        use_reference_rhs = n_links == 2
+    if use_reference_rhs:
+        if n_links != 2:
+            raise ValueError("the paper's closed-form RHS exists only for n=2")
+        rhs = lambda r, t: rhs_double_reference(r, t, 0.0, 0.0)  # noqa: E731
+    else:
+        rhs = make_rhs_n(n_links, damping=0.0)
+
+    state0 = np.zeros(2 * n_links)
+    state0[0] = np.deg2rad(THETA1_DEG)
+    traj = rk4_integrate(rhs, state0)
+
+    theta, omega = traj[:, 0::2], traj[:, 1::2]
+    ones = tuple([1.0] * n_links)
+    e = chain_energy(theta, omega, ones, ones, G)
+    # Potential-only swing, as the normaliser: recompute with omega zeroed.
+    pe = chain_energy(theta, np.zeros_like(omega), ones, ones, G)
     scale = float(np.ptp(pe))
     return float(e[0]), float(np.max(np.abs(e - e[0])) / scale)
 
@@ -226,26 +263,30 @@ class Dataset:
 
     @property
     def label(self):
-        name = {2: "double", 3: "triple"}[self.n_links]
-        return f"{name}_{'friction' if self.friction else 'frictionless'}"
+        return dataset_label(self.n_links, self.friction)
 
 
-def _initial_conditions(n_links, theta2_grid_deg):
-    """Initial-angle rows for the sweep.
+def _initial_conditions(n_links, theta_grid_deg):
+    """Initial-angle rows for the sweep: [120, 0, ..., 0, x] for x in the grid.
 
-    Double:  [120, x] for x in the grid.
-    Triple:  [120, 0, x] -- the paper varies the *third* angle
-             ("the initial angles for the new approach started at
-             [120, 0, 0.1] and we incremented the third angle by 0.1
-             until we reached 3.0", Fig. 18B caption).
+    This is the paper's own pattern, read off its two cases and continued:
+
+      Double: [120, x]        -- theta_1 fixed at 120, sweep theta_2.
+      Triple: [120, 0, x]     -- "the initial angles for the new approach started
+                                 at [120, 0, 0.1], and we incremented the third
+                                 angle by 0.1 until we reached 3.0" (Fig. 18B
+                                 caption).
+
+    So the swept angle is always the *last* link and every intermediate link starts
+    at rest hanging straight down. For n=5 that gives [120, 0, 0, 0, x], which is
+    an extrapolation of the paper's convention -- the paper has no n=5 experiment.
     """
-    grid = np.asarray(theta2_grid_deg, dtype=float).reshape(-1, 1)
+    grid = np.asarray(theta_grid_deg, dtype=float).reshape(-1, 1)
+    if n_links < 2:
+        raise ValueError(f"n_links must be >= 2, got {n_links}")
     lead = np.full((grid.size, 1), THETA1_DEG)
-    if n_links == 2:
-        return np.hstack([lead, grid])
-    if n_links == 3:
-        return np.hstack([lead, np.zeros_like(grid), grid])
-    raise ValueError(f"unsupported n_links={n_links}")
+    middle = np.zeros((grid.size, n_links - 2))
+    return np.hstack([lead, middle, grid])
 
 
 def generate(n_links, friction, theta_grid_deg=None):
@@ -293,16 +334,60 @@ def save(ds, out_dir=DATA_DIR):
     return npz, csv
 
 
+def rk4_order_check(n_links, refinements=2):
+    """Confirm energy drift falls as h^4, so drift is discretization not derivation.
+
+    At the paper's h = 0.005 the n=5 chain drifts ~5e-5 of its potential swing --
+    two orders worse than n=2, which invites the question of whether the symbolic
+    n=5 equations are wrong. They are not: halving h cuts the drift by ~16x, which
+    is RK4's order. A derivation error would not obey the integrator's convergence
+    rate. Returns [(h, drift), ...] finest-last.
+    """
+    out = []
+    for k in range(refinements + 1):
+        div = 2**k
+        rhs = make_rhs_n(n_links, damping=0.0)
+        state0 = np.zeros(2 * n_links)
+        state0[0] = np.deg2rad(THETA1_DEG)
+        traj = rk4_integrate(rhs, state0, n_steps=N_STEPS * div, h=H / div)
+        theta, omega = traj[:, 0::2], traj[:, 1::2]
+        ones = tuple([1.0] * n_links)
+        e = chain_energy(theta, omega, ones, ones, G)
+        pe = chain_energy(theta, np.zeros_like(omega), ones, ones, G)
+        out.append((H / div, float(np.max(np.abs(e - e[0])) / np.ptp(pe))))
+    return out
+
+
+#: Which chains to build. n=2 and n=3 are the paper's; n=5 extends it.
+N_LINKS = (2, 3, 5)
+
+
 def main():
     print("Validating the symbolic n=2 model against the paper's closed form ...")
     worst = validate_against_reference()
     print(f"  max |d(state)/dt| disagreement over 200 random states: {worst:.3e}")
 
-    e0, drift = energy_drift_double(damping=0.0)
-    print(f"  undamped 10 s run: E0 = {e0:.6f} J, max relative energy drift = {drift:.3e}")
+    print("Energy conservation of the undamped [120, 0, ...] run over 10 s:")
+    e0, drift = energy_drift(2, use_reference_rhs=True)
+    print(f"  n=2 (paper's closed form): E0 = {e0:+.6f} J, max drift / PE swing = {drift:.3e}")
+    for n_links in N_LINKS:
+        e0, drift = energy_drift(n_links, use_reference_rhs=False)
+        print(f"  n={n_links} (symbolic)          : E0 = {e0:+.6f} J, "
+              f"max drift / PE swing = {drift:.3e}")
+
+    worst_n = max(N_LINKS)
+    steps = rk4_order_check(worst_n)
+    ratios = [a[1] / b[1] for a, b in zip(steps, steps[1:])]
+    print(f"  n={worst_n} h-refinement drift: "
+          + " -> ".join(f"{d:.2e}" for _, d in steps)
+          + "  (ratios " + ", ".join(f"{r:.1f}x" for r in ratios) + ", RK4 expects ~16x)")
+    assert min(ratios) > 8.0, (
+        f"n={worst_n} energy drift is not converging at RK4's order "
+        f"(ratios {ratios}); suspect the derivation, not the step size"
+    )
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    for n_links in (2, 3):
+    for n_links in N_LINKS:
         for friction in (False, True):
             train = generate(n_links, friction)
             npz, csv = save(train)
