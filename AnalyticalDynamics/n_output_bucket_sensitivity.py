@@ -25,6 +25,12 @@ Three things this script checks, printed as it goes:
   3. Rollout time-to-0.5rad-error vs. bucket count for the physics-informed
      consequent refit through genuine multi-rule MimoGaussianPredictor
      (does it approach the plain-regression ceiling?).
+
+Runtime: parts 1-2 finish in a couple minutes; part 3's n=3 sweep alone
+(3 bucket counts x 3 outputs x ~25-30s per fit at n_output_buckets=40) adds
+roughly 10-15 more -- expect ~15-20 minutes end to end. A `timeout 590`
+wrapper will kill this mid-part-3; run detached/backgrounded or with a
+longer or no wrapper timeout if reproducing the full output.
 """
 import time
 from pathlib import Path
