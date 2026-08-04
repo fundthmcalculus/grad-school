@@ -223,29 +223,37 @@ points). Only $(\theta_1,\theta_2)$ are used as model inputs — velocities are
    fragmenting the training data. This is the kind of bias–variance tradeoff
    worth a follow-up sweep with velocity terms included explicitly.
 
-3. **CORRECTION (superseding what this section originally said).** The
-   "near-perfect iterative rollout" (window=1, R²=1.0000 over the full 30 s)
-   reported here was **not real** — it was a bug in
-   `test_double_pendulum.py`'s `run_iterative_prediction`. That function was
-   called with the *entire actual test trajectory* as its seed, not just the
-   initial condition, and its accuracy check downstream (`n = min(len(actual),
-   len(predicted))`) only ever compared the copied portion against itself.
-   Worse, once real predictions did start, adding the model's predicted-delta
-   `DataFrame` (columns `[theta_1, theta_2]`) to a state row that still carried
-   the unpredicted `omega_1, omega_2` columns produced `NaN` in those columns
-   via pandas' column-alignment rules — which the divergence check reads as
-   "diverged," at exactly the boundary between copied data and real
-   prediction. Net effect: not one genuinely-predicted step was ever actually
-   scored. Full write-up of the bug, the fix, and the honest re-measurement
-   (across n=2, 3, and 5) is in
-   [`N3_N5_FUZZY_REGRESSION_REPORT.md`](N3_N5_FUZZY_REGRESSION_REPORT.md).
+3. **CORRECTION (superseding what this section originally said, and now
+   fixed at the source).** The "near-perfect iterative rollout" (window=1,
+   R²=1.0000 over the full 30 s) originally reported here was **not real** —
+   it was a bug in `test_double_pendulum.py`'s `run_iterative_prediction`
+   call. That function was called with the *entire actual test trajectory*
+   as its seed, not just the initial condition, and its accuracy check
+   downstream (`n = min(len(actual), len(predicted))`) only ever compared
+   the copied portion against itself. Worse, once real predictions did
+   start, adding the model's predicted-delta `DataFrame` (columns
+   `[theta_1, theta_2]`) to a state row that still carried the unpredicted
+   `omega_1, omega_2` columns produced `NaN` in those columns via pandas'
+   column-alignment rules — which the divergence check reads as "diverged,"
+   at exactly the boundary between copied data and real prediction. Net
+   effect: not one genuinely-predicted step was ever actually scored. A
+   second, independent bug in the same function affected every
+   `window_size>1` rollout too: it sliced the last `window_size` *rows* of
+   an already-windowed feature frame and predicted from all of them, then
+   kept only the prediction from the *stalest* row while attaching it to
+   the *current* state — mixing two different points in time. Both are now
+   fixed directly in `test_double_pendulum.py` (not just documented), and
+   the figures above are the regenerated, honest output of that fix. Full
+   write-up of the bug, the fix, and the cross-n comparison (n=2, 3, 5) is
+   in [`N3_N5_FUZZY_REGRESSION_REPORT.md`](N3_N5_FUZZY_REGRESSION_REPORT.md).
    **The real result:** seeded correctly with only $\theta(0)$ and rolled
    forward on its own predictions, this window=1 surrogate's error crosses
-   0.5 rad in about **0.3 s** — chaos wins almost immediately, as it should
-   for a model with no velocity inputs and no physics constraints. The
-   original explanation in this section (interpolation between nearby
-   training trajectories) was a plausible-sounding story for a number that
-   turned out to be measuring nothing.
+   0.5 rad in about **0.3 s** ($\theta_1$ MAE=3.87 rad, R²=−13.8 over the
+   full 30 s) — chaos wins almost immediately, as it should for a model with
+   no velocity inputs and no physics constraints. The original explanation
+   in this section (interpolation between nearby training trajectories) was
+   a plausible-sounding story for a number that turned out to be measuring
+   nothing.
 
 Two GIF animations (`double_pendulum_comparison.gif`,
 `double_pendulum_with_training.gif`) render the same rollout as the actual

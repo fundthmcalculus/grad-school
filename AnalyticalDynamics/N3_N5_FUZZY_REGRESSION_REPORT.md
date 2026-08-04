@@ -90,6 +90,26 @@ n_steps = len(test_trajectory) - window_size
 predicted = run_iterative_prediction(regressor, seed, feature_names, n_steps, window_size)
 ```
 
+**Update: patched at the source, not just documented.** `test_double_pendulum.py`
+now seeds `run_iterative_prediction` with only the initial condition
+(`tst_df[OUTPUT_FEATURES].iloc[:seed_rows]`, restricted to the regressor's
+own feature columns), fixing Problems 1 and 2 directly. Re-running the full
+n=2 test suite after the patch reproduces this report's numbers exactly
+(θ₁ MAE=3.8695, R²=−13.8361 over the full 30 s — identical to the
+independent measurement in §4 below to 4 decimal places), which is itself a
+useful cross-check that both fixes are equivalent.
+
+While patching the source, a **third problem** turned up in the same
+function, specific to `window_size>1`: the prediction call sliced the last
+`window_size` *rows* of an already-windowed feature frame
+(`running_state[-window_size:]`) and predicted from all of them, then kept
+only `.iloc[0]` — the prediction belonging to the *stalest* of those rows —
+while adding it to `running_state.iloc[-1]`, the *current* state. That mixes
+two different points in time on every step. Fixed by predicting from exactly
+the single most recent row (`running_state.iloc[[-1]]`). This report's own
+`n_pendulum_fuzzy_regression.py` never exercised this path (it only ever
+rolls out at window=1), so n=3/n=5 results below are unaffected by Problem 3.
+
 ## 3. Results: Single-Step and MIMO Cross-Sectional Fit
 
 | Model | n=2 (θ₁, θ₂) | n=3 (θ₁, θ₂, θ₃) | n=5 (θ₁…θ₅) |
