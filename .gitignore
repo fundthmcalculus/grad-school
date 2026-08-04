@@ -14,6 +14,11 @@ presentations/node_modules/
 /gated-minimax-selection/outputs/
 /dominant-colors.jpg
 
+# Figures the AnalyticalDynamics simulations regenerate on every run. None has
+# ever been tracked; the chapter figures live under research/ instead.
+/AnalyticalDynamics/*.png
+/AnalyticalDynamics/*.gif
+
 # Python bytecode
 __pycache__/
 *.py[cod]
