@@ -1,0 +1,3492 @@
+Concrete reconciliation -- replicating gaussian_mixture/concrete.py
+  N=1030  M=8  seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  orders=['0th', '1st', '2nd']  jobs=4
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9401
+ 3. Water                          - Score: 0.7291
+ 4. Superplasticizer               - Score: 0.6564
+ 5. CoarseAgg                      - Score: 0.3785
+ 6. Slag                           - Score: 0.3733
+ 7. FlyAsh                         - Score: 0.2997
+ 8. FineAgg                        - Score: 0.2381
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0288
+  Training MSE: 0.0241
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0222
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0218
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9185
+ 3. Water                          - Score: 0.7050
+ 4. Superplasticizer               - Score: 0.6442
+ 5. Slag                           - Score: 0.3723
+ 6. CoarseAgg                      - Score: 0.3528
+ 7. FlyAsh                         - Score: 0.2860
+ 8. FineAgg                        - Score: 0.2503
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0200
+  Training MSE: 0.0247
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9272
+ 3. Water                          - Score: 0.6833
+ 4. Superplasticizer               - Score: 0.5923
+ 5. Slag                           - Score: 0.3746
+ 6. CoarseAgg                      - Score: 0.3176
+ 7. FlyAsh                         - Score: 0.2803
+ 8. FineAgg                        - Score: 0.2673
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0264
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0199
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9401
+ 3. Water                          - Score: 0.7291
+ 4. Superplasticizer               - Score: 0.6564
+ 5. CoarseAgg                      - Score: 0.3785
+ 6. Slag                           - Score: 0.3733
+ 7. FlyAsh                         - Score: 0.2997
+ 8. FineAgg                        - Score: 0.2381
+================================================================================
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0212
+  Training MSE: 0.0193
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+  Training MSE: 0.0086
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0077
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0077
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0077
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9185
+ 3. Water                          - Score: 0.7050
+ 4. Superplasticizer               - Score: 0.6442
+ 5. Slag                           - Score: 0.3723
+ 6. CoarseAgg                      - Score: 0.3528
+ 7. FlyAsh                         - Score: 0.2860
+ 8. FineAgg                        - Score: 0.2503
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================  Training MSE: 0.0078
+
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0080
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9272
+ 3. Water                          - Score: 0.6833
+ 4. Superplasticizer               - Score: 0.5923
+ 5. Slag                           - Score: 0.3746
+ 6. CoarseAgg                      - Score: 0.3176
+ 7. FlyAsh                         - Score: 0.2803
+ 8. FineAgg                        - Score: 0.2673
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0080
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0074
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+  Training MSE: 0.0081
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)... 2. Age                            - Score: 0.9401
+ 3. Water                          - Score: 0.7291
+ 4. Superplasticizer               - Score: 0.6564
+ 5. CoarseAgg                      - Score: 0.3785
+ 6. Slag                           - Score: 0.3733
+ 7. FlyAsh                         - Score: 0.2997
+ 8. FineAgg                        - Score: 0.2381
+================================================================================
+
+  Training MSE: 0.0076
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0061
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0058
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0056
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0057
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9185
+ 3. Water                          - Score: 0.7050
+ 4. Superplasticizer               - Score: 0.6442
+ 5. Slag                           - Score: 0.3723
+ 6. CoarseAgg                      - Score: 0.3528
+ 7. FlyAsh                         - Score: 0.2860
+ 8. FineAgg                        - Score: 0.2503
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0054
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0060
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9272
+ 3. Water                          - Score: 0.6833
+ 4. Superplasticizer               - Score: 0.5923
+ 5. Slag                           - Score: 0.3746
+ 6. CoarseAgg                      - Score: 0.3176
+ 7. FlyAsh                         - Score: 0.2803
+ 8. FineAgg                        - Score: 0.2673
+================================================================================
+  Training MSE: 0.0063
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0053
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9401
+ 3. Water                          - Score: 0.7291
+ 4. Superplasticizer               - Score: 0.6564
+ 5. CoarseAgg                      - Score: 0.3785
+ 6. Slag                           - Score: 0.3733
+ 7. FlyAsh                         - Score: 0.2997
+ 8. FineAgg                        - Score: 0.2381
+================================================================================
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0057
+  Training MSE: 0.0058
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Coordinate-descent antecedent refinement: 142 params (71 blocks of 2), order=0th, 3-fold init val MSE=0.02720 (analytic gradient)
+
+Coordinate-descent antecedent refinement: 138 params (69 blocks of 2), order=0th, 3-fold init val MSE=0.02322 (analytic gradient)
+
+Coordinate-descent antecedent refinement: 132 params (66 blocks of 2), order=0th, 3-fold init val MSE=0.02205 (analytic gradient)
+
+Coordinate-descent antecedent refinement: 128 params (64 blocks of 2), order=0th, 3-fold init val MSE=0.02135 (analytic gradient)
+  sweep 1/3: val MSE=0.01104 (evals=577)
+  sweep 1/3: val MSE=0.00973 (evals=635)
+  sweep 1/3: val MSE=0.01296 (evals=766)
+  sweep 1/3: val MSE=0.01060 (evals=742)
+  sweep 2/3: val MSE=0.00865 (evals=1115)
+  sweep 2/3: val MSE=0.00708 (evals=1116)
+  sweep 2/3: val MSE=0.00766 (evals=1225)
+  sweep 3/3: val MSE=0.00612 (evals=1529)
+  Coordinate descent done: val MSE 0.02322 -> 0.00612 (73.6% lower, 1529 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0092
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+  sweep 2/3: val MSE=0.01071 (evals=1664)
+  sweep 3/3: val MSE=0.00613 (evals=1614)
+  Coordinate descent done: val MSE 0.02205 -> 0.00613 (72.2% lower, 1614 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0085
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Coordinate-descent antecedent refinement: 132 params (66 blocks of 2), order=0th, 3-fold init val MSE=0.01937 (analytic gradient)
+
+Coordinate-descent antecedent refinement: 130 params (65 blocks of 2), order=0th, 3-fold init val MSE=0.02410 (analytic gradient)
+  sweep 3/3: val MSE=0.00751 (evals=1703)
+  Coordinate descent done: val MSE 0.02135 -> 0.00751 (64.8% lower, 1703 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0091
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9185
+ 3. Water                          - Score: 0.7050
+ 4. Superplasticizer               - Score: 0.6442
+ 5. Slag                           - Score: 0.3723
+ 6. CoarseAgg                      - Score: 0.3528
+ 7. FlyAsh                         - Score: 0.2860
+ 8. FineAgg                        - Score: 0.2503
+================================================================================
+
+Coordinate-descent antecedent refinement: 126 params (63 blocks of 2), order=0th, 3-fold init val MSE=0.02571 (analytic gradient)
+  sweep 3/3: val MSE=0.00909 (evals=2149)
+  Coordinate descent done: val MSE 0.02720 -> 0.00909 (66.6% lower, 2149 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0095
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Coordinate-descent antecedent refinement: 134 params (67 blocks of 2), order=0th, 3-fold init val MSE=0.01913 (analytic gradient)
+  sweep 1/3: val MSE=0.00875 (evals=620)
+  sweep 1/3: val MSE=0.01102 (evals=663)
+  sweep 1/3: val MSE=0.00880 (evals=803)
+  sweep 2/3: val MSE=0.00708 (evals=1067)
+  sweep 1/3: val MSE=0.00859 (evals=634)
+  sweep 2/3: val MSE=0.00899 (evals=1132)
+  sweep 3/3: val MSE=0.00667 (evals=1520)
+  Coordinate descent done: val MSE 0.02410 -> 0.00667 (72.3% lower, 1520 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0112
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9272
+ 3. Water                          - Score: 0.6833
+ 4. Superplasticizer               - Score: 0.5923
+ 5. Slag                           - Score: 0.3746
+ 6. CoarseAgg                      - Score: 0.3176
+ 7. FlyAsh                         - Score: 0.2803
+ 8. FineAgg                        - Score: 0.2673
+================================================================================
+  sweep 3/3: val MSE=0.00818 (evals=1527)
+  Coordinate descent done: val MSE 0.02571 -> 0.00818 (68.2% lower, 1527 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0094
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Coordinate-descent antecedent refinement: 134 params (67 blocks of 2), order=0th, 3-fold init val MSE=0.02022 (analytic gradient)
+
+Coordinate-descent antecedent refinement: 128 params (64 blocks of 2), order=0th, 3-fold init val MSE=0.01866 (analytic gradient)
+  sweep 2/3: val MSE=0.00709 (evals=1551)
+  sweep 2/3: val MSE=0.00683 (evals=1204)
+  sweep 1/3: val MSE=0.00859 (evals=566)
+  sweep 3/3: val MSE=0.00618 (evals=1704)
+  Coordinate descent done: val MSE 0.01913 -> 0.00618 (67.7% lower, 1704 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0087
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Coordinate-descent antecedent refinement: 142 params (71 blocks of 2), order=1st, 3-fold init val MSE=0.00948 (analytic gradient)
+  sweep 1/3: val MSE=0.00994 (evals=631)
+  sweep 3/3: val MSE=0.00639 (evals=2412)
+  Coordinate descent done: val MSE 0.01937 -> 0.00639 (67.0% lower, 2412 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0099
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9401
+ 3. Water                          - Score: 0.7291
+ 4. Superplasticizer               - Score: 0.6564
+ 5. CoarseAgg                      - Score: 0.3785
+ 6. Slag                           - Score: 0.3733
+ 7. FlyAsh                         - Score: 0.2997
+ 8. FineAgg                        - Score: 0.2381
+================================================================================
+  sweep 2/3: val MSE=0.00678 (evals=967)
+
+Coordinate-descent antecedent refinement: 138 params (69 blocks of 2), order=1st, 3-fold init val MSE=0.00738 (analytic gradient)
+  sweep 2/3: val MSE=0.00720 (evals=1090)
+  sweep 3/3: val MSE=0.00624 (evals=1387)
+  Coordinate descent done: val MSE 0.01866 -> 0.00624 (66.5% lower, 1387 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0096
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Coordinate-descent antecedent refinement: 128 params (64 blocks of 2), order=1st, 3-fold init val MSE=0.00791 (analytic gradient)
+  sweep 3/3: val MSE=0.00653 (evals=1509)
+  Coordinate descent done: val MSE 0.02022 -> 0.00653 (67.7% lower, 1509 evals)
+
+Solving 0th consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0086
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Coordinate-descent antecedent refinement: 132 params (66 blocks of 2), order=1st, 3-fold init val MSE=0.00764 (analytic gradient)
+  sweep 1/3: val MSE=0.00467 (evals=652)
+  sweep 1/3: val MSE=0.00547 (evals=1136)
+  sweep 1/3: val MSE=0.00499 (evals=616)
+  sweep 1/3: val MSE=0.00526 (evals=814)
+  sweep 2/3: val MSE=0.00428 (evals=1205)
+  sweep 2/3: val MSE=0.00462 (evals=1003)
+  sweep 3/3: val MSE=0.00420 (evals=1706)
+  Coordinate descent done: val MSE 0.00738 -> 0.00420 (43.1% lower, 1706 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0041
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Coordinate-descent antecedent refinement: 132 params (66 blocks of 2), order=1st, 3-fold init val MSE=0.00753 (analytic gradient)
+  sweep 3/3: val MSE=0.00444 (evals=1359)
+  Coordinate descent done: val MSE 0.00764 -> 0.00444 (41.9% lower, 1359 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0044
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Coordinate-descent antecedent refinement: 130 params (65 blocks of 2), order=1st, 3-fold init val MSE=0.00786 (analytic gradient)
+  sweep 2/3: val MSE=0.00467 (evals=2188)
+  sweep 2/3: val MSE=0.00501 (evals=1758)
+  sweep 1/3: val MSE=0.00524 (evals=995)
+  sweep 1/3: val MSE=0.00537 (evals=954)
+  sweep 3/3: val MSE=0.00483 (evals=2593)
+  Coordinate descent done: val MSE 0.00791 -> 0.00483 (38.9% lower, 2593 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0047
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9185
+ 3. Water                          - Score: 0.7050
+ 4. Superplasticizer               - Score: 0.6442
+ 5. Slag                           - Score: 0.3723
+ 6. CoarseAgg                      - Score: 0.3528
+ 7. FlyAsh                         - Score: 0.2860
+ 8. FineAgg                        - Score: 0.2503
+================================================================================
+
+Coordinate-descent antecedent refinement: 126 params (63 blocks of 2), order=1st, 3-fold init val MSE=0.00817 (analytic gradient)
+  sweep 3/3: val MSE=0.00418 (evals=3155)
+  Coordinate descent done: val MSE 0.00948 -> 0.00418 (55.9% lower, 3155 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0039
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Coordinate-descent antecedent refinement: 134 params (67 blocks of 2), order=1st, 3-fold init val MSE=0.00729 (analytic gradient)
+  sweep 2/3: val MSE=0.00479 (evals=1523)
+  sweep 2/3: val MSE=0.00448 (evals=1837)
+  sweep 1/3: val MSE=0.00504 (evals=822)
+  sweep 3/3: val MSE=0.00448 (evals=1935)
+  Coordinate descent done: val MSE 0.00786 -> 0.00448 (43.0% lower, 1935 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0050
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9272
+ 3. Water                          - Score: 0.6833
+ 4. Superplasticizer               - Score: 0.5923
+ 5. Slag                           - Score: 0.3746
+ 6. CoarseAgg                      - Score: 0.3176
+ 7. FlyAsh                         - Score: 0.2803
+ 8. FineAgg                        - Score: 0.2673
+================================================================================
+
+Coordinate-descent antecedent refinement: 134 params (67 blocks of 2), order=1st, 3-fold init val MSE=0.00781 (analytic gradient)
+  sweep 1/3: val MSE=0.00542 (evals=1010)
+  sweep 3/3: val MSE=0.00415 (evals=2494)
+  Coordinate descent done: val MSE 0.00753 -> 0.00415 (44.9% lower, 2494 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0041
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Coordinate-descent antecedent refinement: 128 params (64 blocks of 2), order=1st, 3-fold init val MSE=0.00752 (analytic gradient)
+  sweep 2/3: val MSE=0.00460 (evals=1532)
+  sweep 2/3: val MSE=0.00454 (evals=1751)
+  sweep 1/3: val MSE=0.00577 (evals=954)
+  sweep 1/3: val MSE=0.00495 (evals=619)
+  sweep 3/3: val MSE=0.00442 (evals=2126)
+  Coordinate descent done: val MSE 0.00817 -> 0.00442 (45.9% lower, 2126 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0044
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Coordinate-descent antecedent refinement: 142 params (71 blocks of 2), order=2nd, 3-fold init val MSE=0.00714 (analytic gradient)
+  sweep 2/3: val MSE=0.00444 (evals=983)
+  sweep 3/3: val MSE=0.00438 (evals=2451)
+  Coordinate descent done: val MSE 0.00729 -> 0.00438 (39.9% lower, 2451 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0046
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9401
+ 3. Water                          - Score: 0.7291
+ 4. Superplasticizer               - Score: 0.6564
+ 5. CoarseAgg                      - Score: 0.3785
+ 6. Slag                           - Score: 0.3733
+ 7. FlyAsh                         - Score: 0.2997
+ 8. FineAgg                        - Score: 0.2381
+================================================================================
+
+Coordinate-descent antecedent refinement: 138 params (69 blocks of 2), order=2nd, 3-fold init val MSE=0.00589 (analytic gradient)
+  sweep 3/3: val MSE=0.00424 (evals=1328)
+  Coordinate descent done: val MSE 0.00752 -> 0.00424 (43.6% lower, 1328 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0043
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+  sweep 2/3: val MSE=0.00537 (evals=1778)
+
+Coordinate-descent antecedent refinement: 128 params (64 blocks of 2), order=2nd, 3-fold init val MSE=0.00641 (analytic gradient)
+  sweep 1/3: val MSE=0.00408 (evals=662)
+  sweep 3/3: val MSE=0.00499 (evals=2464)
+  Coordinate descent done: val MSE 0.00781 -> 0.00499 (36.2% lower, 2464 evals)
+
+Solving 1st consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0048
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Coordinate-descent antecedent refinement: 132 params (66 blocks of 2), order=2nd, 3-fold init val MSE=0.00621 (analytic gradient)
+  sweep 1/3: val MSE=0.00410 (evals=713)
+  sweep 1/3: val MSE=0.00382 (evals=848)
+  sweep 2/3: val MSE=0.00357 (evals=1269)
+  sweep 1/3: val MSE=0.00392 (evals=636)
+  sweep 2/3: val MSE=0.00369 (evals=1193)
+  sweep 2/3: val MSE=0.00342 (evals=1375)
+  sweep 3/3: val MSE=0.00343 (evals=1788)
+  Coordinate descent done: val MSE 0.00714 -> 0.00343 (52.0% lower, 1788 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0035
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Coordinate-descent antecedent refinement: 132 params (66 blocks of 2), order=2nd, 3-fold init val MSE=0.00559 (analytic gradient)
+  sweep 3/3: val MSE=0.00337 (evals=1575)
+  Coordinate descent done: val MSE 0.00641 -> 0.00337 (47.5% lower, 1575 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0034
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Coordinate-descent antecedent refinement: 130 params (65 blocks of 2), order=2nd, 3-fold init val MSE=0.00632 (analytic gradient)
+  sweep 3/3: val MSE=0.00323 (evals=1814)
+  Coordinate descent done: val MSE 0.00589 -> 0.00323 (45.2% lower, 1814 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0030
+  sweep 2/3: val MSE=0.00354 (evals=1290)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9185
+ 3. Water                          - Score: 0.7050
+ 4. Superplasticizer               - Score: 0.6442
+ 5. Slag                           - Score: 0.3723
+ 6. CoarseAgg                      - Score: 0.3528
+ 7. FlyAsh                         - Score: 0.2860
+ 8. FineAgg                        - Score: 0.2503
+================================================================================
+
+Coordinate-descent antecedent refinement: 126 params (63 blocks of 2), order=2nd, 3-fold init val MSE=0.00653 (analytic gradient)
+  sweep 1/3: val MSE=0.00361 (evals=528)
+  sweep 2/3: val MSE=0.00320 (evals=921)
+  sweep 3/3: val MSE=0.00344 (evals=1881)
+  Coordinate descent done: val MSE 0.00621 -> 0.00344 (44.5% lower, 1881 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0036
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Coordinate-descent antecedent refinement: 134 params (67 blocks of 2), order=2nd, 3-fold init val MSE=0.00561 (analytic gradient)
+  sweep 1/3: val MSE=0.00422 (evals=807)
+  sweep 1/3: val MSE=0.00418 (evals=688)
+  sweep 3/3: val MSE=0.00302 (evals=1245)
+  Coordinate descent done: val MSE 0.00559 -> 0.00302 (45.9% lower, 1245 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0028
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9272
+ 3. Water                          - Score: 0.6833
+ 4. Superplasticizer               - Score: 0.5923
+ 5. Slag                           - Score: 0.3746
+ 6. CoarseAgg                      - Score: 0.3176
+ 7. FlyAsh                         - Score: 0.2803
+ 8. FineAgg                        - Score: 0.2673
+================================================================================
+
+Coordinate-descent antecedent refinement: 134 params (67 blocks of 2), order=2nd, 3-fold init val MSE=0.00588 (analytic gradient)
+  sweep 2/3: val MSE=0.00367 (evals=1045)
+  sweep 1/3: val MSE=0.00386 (evals=632)
+  sweep 3/3: val MSE=0.00354 (evals=1336)
+  Coordinate descent done: val MSE 0.00653 -> 0.00354 (45.8% lower, 1336 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0036
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Coordinate-descent antecedent refinement: 128 params (64 blocks of 2), order=2nd, 3-fold init val MSE=0.00609 (analytic gradient)
+  sweep 1/3: val MSE=0.00369 (evals=559)
+  sweep 2/3: val MSE=0.00392 (evals=1690)
+  sweep 2/3: val MSE=0.00334 (evals=953)
+  sweep 2/3: val MSE=0.00331 (evals=1329)
+  sweep 3/3: val MSE=0.00318 (evals=1309)
+  Coordinate descent done: val MSE 0.00588 -> 0.00318 (45.9% lower, 1309 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0035
+  sweep 1/3: val MSE=0.00415 (evals=930)
+  sweep 3/3: val MSE=0.00381 (evals=2591)
+  Coordinate descent done: val MSE 0.00632 -> 0.00381 (39.8% lower, 2591 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0038
+  sweep 2/3: val MSE=0.00371 (evals=1342)
+  sweep 3/3: val MSE=0.00306 (evals=2146)
+  Coordinate descent done: val MSE 0.00561 -> 0.00306 (45.5% lower, 2146 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0035
+  sweep 3/3: val MSE=0.00353 (evals=1658)
+  Coordinate descent done: val MSE 0.00609 -> 0.00353 (42.1% lower, 1658 evals)
+
+Solving 2nd consequents in closed form (basis=raw, l2=0.01)...
+  Training MSE: 0.0035
+  done: flat MoG-TSK 0th        closed-form only
+  done: flat MoG-TSK 1st        closed-form only
+  done: flat MoG-TSK 2nd        closed-form only
+  done: flat MoG-TSK 0th        refined
+  done: flat MoG-TSK 1st        refined
+  done: flat MoG-TSK 2nd        refined
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7472
+ 3. Superplasticizer               - Score: 0.7047
+ 4. Age                            - Score: 0.6224
+ 5. CoarseAgg                      - Score: 0.3548
+ 6. FlyAsh                         - Score: 0.3396
+ 7. Slag                           - Score: 0.3186
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7472
+ 3. Superplasticizer               - Score: 0.7047
+ 4. Age                            - Score: 0.6224
+ 5. CoarseAgg                      - Score: 0.3548
+ 6. FlyAsh                         - Score: 0.3396
+ 7. Slag                           - Score: 0.3186
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4070
+ 3. Slag                           - Score: 0.3096
+ 4. Superplasticizer               - Score: 0.3054
+ 5. FlyAsh                         - Score: 0.2385
+ 6. CoarseAgg                      - Score: 0.2299
+ 7. Water                          - Score: 0.1994
+ 8. Cement                         - Score: 0.1766
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7660
+ 3. Slag                           - Score: 0.5558
+ 4. FineAgg                        - Score: 0.4748
+ 5. Age                            - Score: 0.4616
+ 6. Superplasticizer               - Score: 0.4326
+ 7. FlyAsh                         - Score: 0.3141
+ 8. CoarseAgg                      - Score: 0.1968
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.5551
+ 3. FineAgg                        - Score: 0.4663
+ 4. Superplasticizer               - Score: 0.3920
+ 5. Cement                         - Score: 0.3554
+ 6. CoarseAgg                      - Score: 0.3246
+ 7. Water                          - Score: 0.2370
+ 8. FlyAsh                         - Score: 0.2097
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7999
+ 3. Age                            - Score: 0.5768
+ 4. Superplasticizer               - Score: 0.5118
+ 5. CoarseAgg                      - Score: 0.4144
+ 6. FineAgg                        - Score: 0.2068
+ 7. Slag                           - Score: 0.1635
+ 8. FlyAsh                         - Score: 0.1174
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. CoarseAgg                      - Score: 0.9725
+ 3. FineAgg                        - Score: 0.7657
+ 4. Age                            - Score: 0.7328
+ 5. Cement                         - Score: 0.6989
+ 6. Water                          - Score: 0.6407
+ 7. Slag                           - Score: 0.5214
+ 8. FlyAsh                         - Score: 0.4195
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7941
+ 3. CoarseAgg                      - Score: 0.5801
+ 4. FineAgg                        - Score: 0.5209
+ 5. Age                            - Score: 0.4123
+ 6. FlyAsh                         - Score: 0.2053
+ 7. Slag                           - Score: 0.1063
+ 8. Superplasticizer               - Score: 0.1030
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Slag                           - Score: 0.9172
+ 3. Age                            - Score: 0.9063
+ 4. Superplasticizer               - Score: 0.8603
+ 5. Cement                         - Score: 0.7141
+ 6. CoarseAgg                      - Score: 0.5400
+ 7. FlyAsh                         - Score: 0.4562
+ 8. FineAgg                        - Score: 0.3645
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.3935
+ 3. Slag                           - Score: 0.3917
+ 4. Water                          - Score: 0.3747
+ 5. FlyAsh                         - Score: 0.3394
+ 6. Superplasticizer               - Score: 0.2259
+ 7. CoarseAgg                      - Score: 0.1877
+ 8. FineAgg                        - Score: 0.1634
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7560
+ 3. Superplasticizer               - Score: 0.7115
+ 4. Age                            - Score: 0.6340
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.2740
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7560
+ 3. Superplasticizer               - Score: 0.7115
+ 4. Age                            - Score: 0.6340
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.2740
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.5853
+ 3. FlyAsh                         - Score: 0.5656
+ 4. Water                          - Score: 0.5500
+ 5. FineAgg                        - Score: 0.4098
+ 6. CoarseAgg                      - Score: 0.3238
+ 7. Cement                         - Score: 0.2965
+ 8. Slag                           - Score: 0.1879
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5873
+ 3. Superplasticizer               - Score: 0.4844
+ 4. FlyAsh                         - Score: 0.3281
+ 5. Slag                           - Score: 0.3178
+ 6. FineAgg                        - Score: 0.2207
+ 7. CoarseAgg                      - Score: 0.2172
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.8048
+ 3. Superplasticizer               - Score: 0.5184
+ 4. FineAgg                        - Score: 0.4723
+ 5. Cement                         - Score: 0.4210
+ 6. CoarseAgg                      - Score: 0.4177
+ 7. Water                          - Score: 0.3004
+ 8. FlyAsh                         - Score: 0.2290
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5661
+ 3. Superplasticizer               - Score: 0.4747
+ 4. Age                            - Score: 0.4029
+ 5. CoarseAgg                      - Score: 0.3587
+ 6. FineAgg                        - Score: 0.2175
+ 7. Slag                           - Score: 0.1774
+ 8. FlyAsh                         - Score: 0.1480
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.7369
+ 3. FineAgg                        - Score: 0.5541
+ 4. CoarseAgg                      - Score: 0.4765
+ 5. Slag                           - Score: 0.3835
+ 6. Cement                         - Score: 0.2161
+ 7. FlyAsh                         - Score: 0.0000
+ 8. Superplasticizer               - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6774
+ 3. Superplasticizer               - Score: 0.6082
+ 4. Age                            - Score: 0.5514
+ 5. FineAgg                        - Score: 0.4855
+ 6. CoarseAgg                      - Score: 0.3874
+ 7. FlyAsh                         - Score: 0.3425
+ 8. Slag                           - Score: 0.2394
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8860
+ 3. Slag                           - Score: 0.8561
+ 4. Age                            - Score: 0.8144
+ 5. Cement                         - Score: 0.7381
+ 6. CoarseAgg                      - Score: 0.5763
+ 7. FlyAsh                         - Score: 0.3365
+ 8. FineAgg                        - Score: 0.2981
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.4860
+ 3. Slag                           - Score: 0.3048
+ 4. CoarseAgg                      - Score: 0.2583
+ 5. Water                          - Score: 0.2541
+ 6. FlyAsh                         - Score: 0.2499
+ 7. FineAgg                        - Score: 0.2420
+ 8. Superplasticizer               - Score: 0.1911
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7033
+ 3. Superplasticizer               - Score: 0.6242
+ 4. Age                            - Score: 0.5808
+ 5. CoarseAgg                      - Score: 0.3285
+ 6. FlyAsh                         - Score: 0.2729
+ 7. FineAgg                        - Score: 0.2608
+ 8. Slag                           - Score: 0.2473
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7033
+ 3. Superplasticizer               - Score: 0.6242
+ 4. Age                            - Score: 0.5808
+ 5. CoarseAgg                      - Score: 0.3285
+ 6. FlyAsh                         - Score: 0.2729
+ 7. FineAgg                        - Score: 0.2608
+ 8. Slag                           - Score: 0.2473
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7447
+ 3. Superplasticizer               - Score: 0.4949
+ 4. FineAgg                        - Score: 0.4947
+ 5. Water                          - Score: 0.3522
+ 6. Cement                         - Score: 0.2350
+ 7. CoarseAgg                      - Score: 0.2152
+ 8. FlyAsh                         - Score: 0.1784
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.8090
+ 3. Superplasticizer               - Score: 0.7180
+ 4. Cement                         - Score: 0.5189
+ 5. FineAgg                        - Score: 0.4792
+ 6. CoarseAgg                      - Score: 0.4567
+ 7. Water                          - Score: 0.4128
+ 8. FlyAsh                         - Score: 0.2918
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.8667
+ 3. Superplasticizer               - Score: 0.7448
+ 4. FineAgg                        - Score: 0.5575
+ 5. Water                          - Score: 0.4537
+ 6. Cement                         - Score: 0.4471
+ 7. CoarseAgg                      - Score: 0.2317
+ 8. FlyAsh                         - Score: 0.2149
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.4793
+ 3. Age                            - Score: 0.3990
+ 4. Superplasticizer               - Score: 0.3473
+ 5. CoarseAgg                      - Score: 0.2732
+ 6. FineAgg                        - Score: 0.1583
+ 7. Slag                           - Score: 0.1468
+ 8. FlyAsh                         - Score: 0.0924
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.9341
+ 3. Superplasticizer               - Score: 0.8589
+ 4. Cement                         - Score: 0.8479
+ 5. CoarseAgg                      - Score: 0.8405
+ 6. Water                          - Score: 0.8308
+ 7. Slag                           - Score: 0.5483
+ 8. FlyAsh                         - Score: 0.3881
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6807
+ 3. FineAgg                        - Score: 0.5498
+ 4. CoarseAgg                      - Score: 0.5348
+ 5. Age                            - Score: 0.4378
+ 6. Superplasticizer               - Score: 0.2201
+ 7. Slag                           - Score: 0.1101
+ 8. FlyAsh                         - Score: 0.1050
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Slag                           - Score: 0.7713
+ 3. Age                            - Score: 0.7372
+ 4. Superplasticizer               - Score: 0.7309
+ 5. Cement                         - Score: 0.7037
+ 6. FineAgg                        - Score: 0.3547
+ 7. CoarseAgg                      - Score: 0.3306
+ 8. FlyAsh                         - Score: 0.3230
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.3787
+ 3. Cement                         - Score: 0.3512
+ 4. Water                          - Score: 0.3050
+ 5. FlyAsh                         - Score: 0.2863
+ 6. FineAgg                        - Score: 0.1941
+ 7. Superplasticizer               - Score: 0.1693
+ 8. CoarseAgg                      - Score: 0.1493
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7100
+ 3. Superplasticizer               - Score: 0.6209
+ 4. Age                            - Score: 0.5824
+ 5. CoarseAgg                      - Score: 0.3118
+ 6. FlyAsh                         - Score: 0.2938
+ 7. FineAgg                        - Score: 0.2617
+ 8. Slag                           - Score: 0.2457
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7100
+ 3. Superplasticizer               - Score: 0.6209
+ 4. Age                            - Score: 0.5824
+ 5. CoarseAgg                      - Score: 0.3118
+ 6. FlyAsh                         - Score: 0.2938
+ 7. FineAgg                        - Score: 0.2617
+ 8. Slag                           - Score: 0.2457
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.8147
+ 3. Superplasticizer               - Score: 0.5811
+ 4. FineAgg                        - Score: 0.5128
+ 5. CoarseAgg                      - Score: 0.4035
+ 6. Cement                         - Score: 0.3813
+ 7. Water                          - Score: 0.3752
+ 8. FlyAsh                         - Score: 0.1902
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.8459
+ 3. Superplasticizer               - Score: 0.7130
+ 4. Water                          - Score: 0.4726
+ 5. FineAgg                        - Score: 0.4408
+ 6. Cement                         - Score: 0.4315
+ 7. CoarseAgg                      - Score: 0.3748
+ 8. FlyAsh                         - Score: 0.2467
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.9368
+ 3. Superplasticizer               - Score: 0.7388
+ 4. FineAgg                        - Score: 0.6050
+ 5. Cement                         - Score: 0.5143
+ 6. Water                          - Score: 0.4680
+ 7. CoarseAgg                      - Score: 0.3761
+ 8. FlyAsh                         - Score: 0.2139
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5730
+ 3. Age                            - Score: 0.5615
+ 4. Superplasticizer               - Score: 0.4351
+ 5. CoarseAgg                      - Score: 0.2823
+ 6. FineAgg                        - Score: 0.1718
+ 7. Slag                           - Score: 0.1546
+ 8. FlyAsh                         - Score: 0.0838
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. FineAgg                        - Score: 1.0000
+ 2. Age                            - Score: 0.9304
+ 3. Water                          - Score: 0.8902
+ 4. Slag                           - Score: 0.5017
+ 5. CoarseAgg                      - Score: 0.4621
+ 6. Cement                         - Score: 0.2616
+ 7. FlyAsh                         - Score: 0.0000
+ 8. Superplasticizer               - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5570
+ 3. Age                            - Score: 0.4353
+ 4. FineAgg                        - Score: 0.4200
+ 5. Superplasticizer               - Score: 0.3729
+ 6. CoarseAgg                      - Score: 0.2907
+ 7. FlyAsh                         - Score: 0.2102
+ 8. Slag                           - Score: 0.1554
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7199
+ 3. Slag                           - Score: 0.7123
+ 4. Age                            - Score: 0.6986
+ 5. Cement                         - Score: 0.6877
+ 6. FlyAsh                         - Score: 0.3984
+ 7. CoarseAgg                      - Score: 0.3124
+ 8. FineAgg                        - Score: 0.3054
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.3337
+ 3. Water                          - Score: 0.3243
+ 4. Cement                         - Score: 0.3228
+ 5. FlyAsh                         - Score: 0.2481
+ 6. Superplasticizer               - Score: 0.1718
+ 7. FineAgg                        - Score: 0.1559
+ 8. CoarseAgg                      - Score: 0.1462
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6980
+ 3. Superplasticizer               - Score: 0.6469
+ 4. Age                            - Score: 0.5547
+ 5. CoarseAgg                      - Score: 0.3693
+ 6. FlyAsh                         - Score: 0.3215
+ 7. Slag                           - Score: 0.2862
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6980
+ 3. Superplasticizer               - Score: 0.6469
+ 4. Age                            - Score: 0.5547
+ 5. CoarseAgg                      - Score: 0.3693
+ 6. FlyAsh                         - Score: 0.3215
+ 7. Slag                           - Score: 0.2862
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.3164
+ 3. CoarseAgg                      - Score: 0.2683
+ 4. FlyAsh                         - Score: 0.2195
+ 5. Water                          - Score: 0.2128
+ 6. FineAgg                        - Score: 0.2109
+ 7. Slag                           - Score: 0.1731
+ 8. Cement                         - Score: 0.1648
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5457
+ 3. Slag                           - Score: 0.4174
+ 4. Age                            - Score: 0.4086
+ 5. FineAgg                        - Score: 0.4037
+ 6. Superplasticizer               - Score: 0.3633
+ 7. FlyAsh                         - Score: 0.3576
+ 8. CoarseAgg                      - Score: 0.2120
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.5362
+ 3. FineAgg                        - Score: 0.4967
+ 4. Superplasticizer               - Score: 0.3391
+ 5. Cement                         - Score: 0.3198
+ 6. CoarseAgg                      - Score: 0.2837
+ 7. Water                          - Score: 0.2747
+ 8. FlyAsh                         - Score: 0.2041
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.5163
+ 3. Water                          - Score: 0.4536
+ 4. CoarseAgg                      - Score: 0.3979
+ 5. Superplasticizer               - Score: 0.3055
+ 6. FineAgg                        - Score: 0.2810
+ 7. Slag                           - Score: 0.2003
+ 8. FlyAsh                         - Score: 0.1311
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. CoarseAgg                      - Score: 0.8320
+ 3. FineAgg                        - Score: 0.7884
+ 4. Water                          - Score: 0.7381
+ 5. Slag                           - Score: 0.6787
+ 6. Cement                         - Score: 0.3160
+ 7. FlyAsh                         - Score: 0.2600
+ 8. Superplasticizer               - Score: 0.1483
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6442
+ 3. FineAgg                        - Score: 0.5353
+ 4. Superplasticizer               - Score: 0.4952
+ 5. Age                            - Score: 0.4834
+ 6. CoarseAgg                      - Score: 0.3828
+ 7. Slag                           - Score: 0.2533
+ 8. FlyAsh                         - Score: 0.2185
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9995
+ 3. Slag                           - Score: 0.6983
+ 4. FlyAsh                         - Score: 0.6729
+ 5. Superplasticizer               - Score: 0.5186
+ 6. Water                          - Score: 0.4393
+ 7. CoarseAgg                      - Score: 0.4193
+ 8. FineAgg                        - Score: 0.2075
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Slag                           - Score: 0.8561
+ 3. Age                            - Score: 0.8372
+ 4. Superplasticizer               - Score: 0.7921
+ 5. Cement                         - Score: 0.5062
+ 6. CoarseAgg                      - Score: 0.3835
+ 7. FlyAsh                         - Score: 0.3608
+ 8. FineAgg                        - Score: 0.3538
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6995
+ 3. Superplasticizer               - Score: 0.6378
+ 4. Age                            - Score: 0.5758
+ 5. CoarseAgg                      - Score: 0.3260
+ 6. FlyAsh                         - Score: 0.3014
+ 7. Slag                           - Score: 0.2634
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6995
+ 3. Superplasticizer               - Score: 0.6378
+ 4. Age                            - Score: 0.5758
+ 5. CoarseAgg                      - Score: 0.3260
+ 6. FlyAsh                         - Score: 0.3014
+ 7. Slag                           - Score: 0.2634
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.5459
+ 3. FineAgg                        - Score: 0.4652
+ 4. Superplasticizer               - Score: 0.4209
+ 5. CoarseAgg                      - Score: 0.3384
+ 6. Water                          - Score: 0.2724
+ 7. Cement                         - Score: 0.2132
+ 8. FlyAsh                         - Score: 0.1530
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7652
+ 3. Water                          - Score: 0.5131
+ 4. CoarseAgg                      - Score: 0.4410
+ 5. Slag                           - Score: 0.4147
+ 6. Cement                         - Score: 0.4109
+ 7. FlyAsh                         - Score: 0.3341
+ 8. FineAgg                        - Score: 0.2052
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7445
+ 3. Superplasticizer               - Score: 0.6147
+ 4. FineAgg                        - Score: 0.5825
+ 5. CoarseAgg                      - Score: 0.3730
+ 6. Cement                         - Score: 0.3701
+ 7. Water                          - Score: 0.3552
+ 8. FlyAsh                         - Score: 0.2306
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5736
+ 3. Superplasticizer               - Score: 0.4654
+ 4. Age                            - Score: 0.4498
+ 5. CoarseAgg                      - Score: 0.2924
+ 6. FineAgg                        - Score: 0.2209
+ 7. Slag                           - Score: 0.1594
+ 8. FlyAsh                         - Score: 0.1277
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.9263
+ 3. CoarseAgg                      - Score: 0.8947
+ 4. FineAgg                        - Score: 0.8058
+ 5. Cement                         - Score: 0.4197
+ 6. Slag                           - Score: 0.2460
+ 7. FlyAsh                         - Score: 0.0000
+ 8. Superplasticizer               - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. FineAgg                        - Score: 0.5837
+ 3. Water                          - Score: 0.5736
+ 4. Age                            - Score: 0.5462
+ 5. Superplasticizer               - Score: 0.5335
+ 6. CoarseAgg                      - Score: 0.3644
+ 7. FlyAsh                         - Score: 0.3423
+ 8. Slag                           - Score: 0.2747
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Slag                           - Score: 0.8925
+ 3. Age                            - Score: 0.8263
+ 4. Superplasticizer               - Score: 0.8035
+ 5. Cement                         - Score: 0.6863
+ 6. CoarseAgg                      - Score: 0.4369
+ 7. FlyAsh                         - Score: 0.3635
+ 8. FineAgg                        - Score: 0.3110
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.3441
+ 3. Slag                           - Score: 0.3180
+ 4. FineAgg                        - Score: 0.2297
+ 5. Water                          - Score: 0.2246
+ 6. FlyAsh                         - Score: 0.1940
+ 7. Superplasticizer               - Score: 0.1526
+ 8. CoarseAgg                      - Score: 0.1040
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7745
+ 3. Superplasticizer               - Score: 0.7169
+ 4. Age                            - Score: 0.6343
+ 5. CoarseAgg                      - Score: 0.3635
+ 6. FineAgg                        - Score: 0.2567
+ 7. Slag                           - Score: 0.2540
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7745
+ 3. Superplasticizer               - Score: 0.7169
+ 4. Age                            - Score: 0.6343
+ 5. CoarseAgg                      - Score: 0.3635
+ 6. FineAgg                        - Score: 0.2567
+ 7. Slag                           - Score: 0.2540
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4174
+ 3. Slag                           - Score: 0.3002
+ 4. Water                          - Score: 0.2619
+ 5. CoarseAgg                      - Score: 0.2521
+ 6. Superplasticizer               - Score: 0.2484
+ 7. FlyAsh                         - Score: 0.1491
+ 8. Cement                         - Score: 0.1052
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7807
+ 3. Age                            - Score: 0.6009
+ 4. Slag                           - Score: 0.5923
+ 5. Superplasticizer               - Score: 0.5154
+ 6. FineAgg                        - Score: 0.5059
+ 7. FlyAsh                         - Score: 0.4820
+ 8. CoarseAgg                      - Score: 0.2430
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.9663
+ 3. Superplasticizer               - Score: 0.7274
+ 4. FineAgg                        - Score: 0.6741
+ 5. Cement                         - Score: 0.5729
+ 6. Water                          - Score: 0.3807
+ 7. CoarseAgg                      - Score: 0.3708
+ 8. FlyAsh                         - Score: 0.1877
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.4630
+ 3. Age                            - Score: 0.4626
+ 4. CoarseAgg                      - Score: 0.3607
+ 5. Superplasticizer               - Score: 0.3435
+ 6. Slag                           - Score: 0.2173
+ 7. FineAgg                        - Score: 0.1857
+ 8. FlyAsh                         - Score: 0.1281
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.7717
+ 3. FineAgg                        - Score: 0.7591
+ 4. CoarseAgg                      - Score: 0.7193
+ 5. Slag                           - Score: 0.5512
+ 6. Cement                         - Score: 0.2685
+ 7. Superplasticizer               - Score: 0.2343
+ 8. FlyAsh                         - Score: 0.1507
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7248
+ 3. FlyAsh                         - Score: 0.5440
+ 4. Cement                         - Score: 0.5129
+ 5. Water                          - Score: 0.3428
+ 6. FineAgg                        - Score: 0.2891
+ 7. Superplasticizer               - Score: 0.2465
+ 8. CoarseAgg                      - Score: 0.1942
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6771
+ 3. Age                            - Score: 0.6387
+ 4. Superplasticizer               - Score: 0.5925
+ 5. FineAgg                        - Score: 0.5403
+ 6. CoarseAgg                      - Score: 0.4537
+ 7. FlyAsh                         - Score: 0.3433
+ 8. Slag                           - Score: 0.2905
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.9586
+ 3. Slag                           - Score: 0.9572
+ 4. Superplasticizer               - Score: 0.7363
+ 5. Cement                         - Score: 0.7099
+ 6. FineAgg                        - Score: 0.4315
+ 7. CoarseAgg                      - Score: 0.4054
+ 8. FlyAsh                         - Score: 0.3715
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6937
+ 3. Age                            - Score: 0.6465
+ 4. Superplasticizer               - Score: 0.6288
+ 5. CoarseAgg                      - Score: 0.3302
+ 6. Slag                           - Score: 0.3214
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6937
+ 3. Age                            - Score: 0.6465
+ 4. Superplasticizer               - Score: 0.6288
+ 5. CoarseAgg                      - Score: 0.3302
+ 6. Slag                           - Score: 0.3214
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7819
+ 3. FineAgg                        - Score: 0.5635
+ 4. Superplasticizer               - Score: 0.3484
+ 5. CoarseAgg                      - Score: 0.3197
+ 6. Water                          - Score: 0.3064
+ 7. Cement                         - Score: 0.2313
+ 8. FlyAsh                         - Score: 0.1729
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.9722
+ 3. Superplasticizer               - Score: 0.7962
+ 4. Water                          - Score: 0.5226
+ 5. FineAgg                        - Score: 0.4660
+ 6. CoarseAgg                      - Score: 0.4481
+ 7. Cement                         - Score: 0.3908
+ 8. FlyAsh                         - Score: 0.2724
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.9813
+ 3. Superplasticizer               - Score: 0.6231
+ 4. FineAgg                        - Score: 0.6196
+ 5. Cement                         - Score: 0.5161
+ 6. Water                          - Score: 0.4061
+ 7. CoarseAgg                      - Score: 0.3716
+ 8. FlyAsh                         - Score: 0.3467
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.6023
+ 3. Water                          - Score: 0.4889
+ 4. CoarseAgg                      - Score: 0.3441
+ 5. Superplasticizer               - Score: 0.3432
+ 6. FineAgg                        - Score: 0.2807
+ 7. Slag                           - Score: 0.1907
+ 8. FlyAsh                         - Score: 0.1194
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. FineAgg                        - Score: 1.0000
+ 2. Age                            - Score: 0.9356
+ 3. Superplasticizer               - Score: 0.8049
+ 4. CoarseAgg                      - Score: 0.7689
+ 5. Water                          - Score: 0.6548
+ 6. Slag                           - Score: 0.6291
+ 7. Cement                         - Score: 0.5277
+ 8. FlyAsh                         - Score: 0.3455
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. FineAgg                        - Score: 0.7336
+ 3. Water                          - Score: 0.6359
+ 4. CoarseAgg                      - Score: 0.6083
+ 5. Age                            - Score: 0.3662
+ 6. Superplasticizer               - Score: 0.2260
+ 7. FlyAsh                         - Score: 0.2040
+ 8. Slag                           - Score: 0.1006
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.9558
+ 3. Slag                           - Score: 0.8841
+ 4. Superplasticizer               - Score: 0.8346
+ 5. Cement                         - Score: 0.7900
+ 6. CoarseAgg                      - Score: 0.5354
+ 7. FlyAsh                         - Score: 0.4486
+ 8. FineAgg                        - Score: 0.3102
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.3113
+ 3. Water                          - Score: 0.2842
+ 4. Cement                         - Score: 0.2738
+ 5. FlyAsh                         - Score: 0.2407
+ 6. Superplasticizer               - Score: 0.1703
+ 7. FineAgg                        - Score: 0.1575
+ 8. CoarseAgg                      - Score: 0.1420
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6974
+ 3. Superplasticizer               - Score: 0.6340
+ 4. Age                            - Score: 0.5875
+ 5. CoarseAgg                      - Score: 0.3367
+ 6. FineAgg                        - Score: 0.2695
+ 7. Slag                           - Score: 0.2569
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6974
+ 3. Superplasticizer               - Score: 0.6340
+ 4. Age                            - Score: 0.5875
+ 5. CoarseAgg                      - Score: 0.3367
+ 6. FineAgg                        - Score: 0.2695
+ 7. Slag                           - Score: 0.2569
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.7414
+ 3. Slag                           - Score: 0.7328
+ 4. Superplasticizer               - Score: 0.4449
+ 5. Water                          - Score: 0.3004
+ 6. Cement                         - Score: 0.2873
+ 7. CoarseAgg                      - Score: 0.1937
+ 8. FlyAsh                         - Score: 0.1368
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Water                          - Score: 0.7809
+ 3. Superplasticizer               - Score: 0.7275
+ 4. Age                            - Score: 0.6629
+ 5. CoarseAgg                      - Score: 0.3761
+ 6. Cement                         - Score: 0.3068
+ 7. FineAgg                        - Score: 0.2751
+ 8. FlyAsh                         - Score: 0.2706
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.9137
+ 3. FineAgg                        - Score: 0.6846
+ 4. Superplasticizer               - Score: 0.6214
+ 5. Cement                         - Score: 0.4716
+ 6. CoarseAgg                      - Score: 0.3669
+ 7. Water                          - Score: 0.3441
+ 8. FlyAsh                         - Score: 0.1693
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.5721
+ 3. Water                          - Score: 0.5206
+ 4. CoarseAgg                      - Score: 0.3983
+ 5. Superplasticizer               - Score: 0.3847
+ 6. FineAgg                        - Score: 0.2186
+ 7. Slag                           - Score: 0.1735
+ 8. FlyAsh                         - Score: 0.0926
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.8428
+ 3. Cement                         - Score: 0.8366
+ 4. Superplasticizer               - Score: 0.6756
+ 5. Water                          - Score: 0.6188
+ 6. FlyAsh                         - Score: 0.5179
+ 7. CoarseAgg                      - Score: 0.4887
+ 8. Slag                           - Score: 0.3059
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5993
+ 3. Age                            - Score: 0.4274
+ 4. CoarseAgg                      - Score: 0.3339
+ 5. Superplasticizer               - Score: 0.2909
+ 6. Slag                           - Score: 0.2116
+ 7. FineAgg                        - Score: 0.2012
+ 8. FlyAsh                         - Score: 0.1911
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.8770
+ 3. Slag                           - Score: 0.8698
+ 4. Cement                         - Score: 0.8057
+ 5. Superplasticizer               - Score: 0.7938
+ 6. CoarseAgg                      - Score: 0.4827
+ 7. FlyAsh                         - Score: 0.3312
+ 8. FineAgg                        - Score: 0.3269
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.4540
+ 3. FlyAsh                         - Score: 0.3166
+ 4. Slag                           - Score: 0.2925
+ 5. Water                          - Score: 0.2814
+ 6. FineAgg                        - Score: 0.2451
+ 7. CoarseAgg                      - Score: 0.1880
+ 8. Superplasticizer               - Score: 0.1751
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7026
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. FlyAsh                         - Score: 0.3322
+ 6. CoarseAgg                      - Score: 0.3198
+ 7. Slag                           - Score: 0.2684
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7026
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. FlyAsh                         - Score: 0.3322
+ 6. CoarseAgg                      - Score: 0.3198
+ 7. Slag                           - Score: 0.2684
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7621
+ 3. Superplasticizer               - Score: 0.5328
+ 4. FineAgg                        - Score: 0.4546
+ 5. Cement                         - Score: 0.3357
+ 6. CoarseAgg                      - Score: 0.3232
+ 7. Water                          - Score: 0.2796
+ 8. FlyAsh                         - Score: 0.1608
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.9957
+ 3. Superplasticizer               - Score: 0.6715
+ 4. Cement                         - Score: 0.6002
+ 5. CoarseAgg                      - Score: 0.4581
+ 6. FineAgg                        - Score: 0.4296
+ 7. Water                          - Score: 0.4152
+ 8. FlyAsh                         - Score: 0.1922
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.6075
+ 3. FineAgg                        - Score: 0.4803
+ 4. Cement                         - Score: 0.4563
+ 5. Superplasticizer               - Score: 0.4094
+ 6. CoarseAgg                      - Score: 0.3276
+ 7. Water                          - Score: 0.2352
+ 8. FlyAsh                         - Score: 0.1572
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.6052
+ 3. Water                          - Score: 0.6051
+ 4. Superplasticizer               - Score: 0.3875
+ 5. CoarseAgg                      - Score: 0.3615
+ 6. Slag                           - Score: 0.1603
+ 7. FineAgg                        - Score: 0.1464
+ 8. FlyAsh                         - Score: 0.1043
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. FineAgg                        - Score: 1.0000
+ 2. Age                            - Score: 0.7976
+ 3. CoarseAgg                      - Score: 0.6606
+ 4. Slag                           - Score: 0.6605
+ 5. Water                          - Score: 0.6144
+ 6. Cement                         - Score: 0.3288
+ 7. FlyAsh                         - Score: 0.1270
+ 8. Superplasticizer               - Score: 0.1270
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.9361
+ 3. Superplasticizer               - Score: 0.8470
+ 4. Age                            - Score: 0.6768
+ 5. FineAgg                        - Score: 0.5048
+ 6. CoarseAgg                      - Score: 0.4420
+ 7. Slag                           - Score: 0.3655
+ 8. FlyAsh                         - Score: 0.3148
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.9933
+ 3. Slag                           - Score: 0.8489
+ 4. Superplasticizer               - Score: 0.8121
+ 5. Cement                         - Score: 0.7082
+ 6. CoarseAgg                      - Score: 0.4493
+ 7. FlyAsh                         - Score: 0.4336
+ 8. FineAgg                        - Score: 0.3252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.5392
+ 3. FlyAsh                         - Score: 0.2993
+ 4. Slag                           - Score: 0.2917
+ 5. FineAgg                        - Score: 0.2573
+ 6. Water                          - Score: 0.2397
+ 7. Superplasticizer               - Score: 0.2284
+ 8. CoarseAgg                      - Score: 0.2030
+================================================================================
+  done: other arms under raw
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7637
+ 3. Slag                           - Score: 0.7229
+ 4. FineAgg                        - Score: 0.5538
+ 5. Water                          - Score: 0.4334
+ 6. FlyAsh                         - Score: 0.2860
+ 7. CoarseAgg                      - Score: 0.2486
+ 8. Cement                         - Score: 0.2126
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.4357
+ 3. FineAgg                        - Score: 0.3165
+ 4. CoarseAgg                      - Score: 0.3159
+ 5. Cement                         - Score: 0.2599
+ 6. Water                          - Score: 0.2578
+ 7. FlyAsh                         - Score: 0.2544
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.4357
+ 3. FineAgg                        - Score: 0.3165
+ 4. CoarseAgg                      - Score: 0.3159
+ 5. Cement                         - Score: 0.2599
+ 6. Water                          - Score: 0.2578
+ 7. FlyAsh                         - Score: 0.2544
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Cement                         - Score: 0.9917
+ 3. Age                            - Score: 0.9506
+ 4. CoarseAgg                      - Score: 0.7659
+ 5. Superplasticizer               - Score: 0.5491
+ 6. FineAgg                        - Score: 0.2693
+ 7. FlyAsh                         - Score: 0.2144
+ 8. Slag                           - Score: 0.1403
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7159
+ 3. Water                          - Score: 0.5271
+ 4. FineAgg                        - Score: 0.3581
+ 5. Superplasticizer               - Score: 0.3108
+ 6. CoarseAgg                      - Score: 0.2516
+ 7. FlyAsh                         - Score: 0.2122
+ 8. Slag                           - Score: 0.1609
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.5670
+ 3. Superplasticizer               - Score: 0.5010
+ 4. Water                          - Score: 0.3500
+ 5. CoarseAgg                      - Score: 0.3473
+ 6. FineAgg                        - Score: 0.1781
+ 7. FlyAsh                         - Score: 0.1630
+ 8. Slag                           - Score: 0.1548
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.9215
+ 3. Slag                           - Score: 0.5299
+ 4. FineAgg                        - Score: 0.4737
+ 5. Superplasticizer               - Score: 0.3795
+ 6. CoarseAgg                      - Score: 0.3557
+ 7. Age                            - Score: 0.3502
+ 8. FlyAsh                         - Score: 0.2429
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9067
+ 3. Cement                         - Score: 0.6893
+ 4. FineAgg                        - Score: 0.6336
+ 5. Slag                           - Score: 0.3975
+ 6. Age                            - Score: 0.3944
+ 7. FlyAsh                         - Score: 0.3208
+ 8. CoarseAgg                      - Score: 0.3145
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9399
+ 3. Water                          - Score: 0.7560
+ 4. Superplasticizer               - Score: 0.7115
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.3678
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9399
+ 3. Water                          - Score: 0.7560
+ 4. Superplasticizer               - Score: 0.7115
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.3678
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9436
+ 3. Slag                           - Score: 0.4777
+ 4. Water                          - Score: 0.4601
+ 5. FineAgg                        - Score: 0.4427
+ 6. FlyAsh                         - Score: 0.3782
+ 7. CoarseAgg                      - Score: 0.2568
+ 8. Cement                         - Score: 0.1844
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.4265
+ 3. CoarseAgg                      - Score: 0.3259
+ 4. FlyAsh                         - Score: 0.2908
+ 5. Water                          - Score: 0.2564
+ 6. Cement                         - Score: 0.2500
+ 7. FineAgg                        - Score: 0.2346
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6220
+ 3. CoarseAgg                      - Score: 0.4161
+ 4. Water                          - Score: 0.3298
+ 5. FineAgg                        - Score: 0.3170
+ 6. FlyAsh                         - Score: 0.2547
+ 7. Slag                           - Score: 0.2348
+ 8. Superplasticizer               - Score: 0.1795
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9036
+ 3. CoarseAgg                      - Score: 0.3852
+ 4. FlyAsh                         - Score: 0.2850
+ 5. Slag                           - Score: 0.2628
+ 6. Age                            - Score: 0.2571
+ 7. FineAgg                        - Score: 0.2256
+ 8. Cement                         - Score: 0.1395
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7340
+ 3. Water                          - Score: 0.4673
+ 4. FineAgg                        - Score: 0.3940
+ 5. Superplasticizer               - Score: 0.2789
+ 6. Slag                           - Score: 0.2779
+ 7. CoarseAgg                      - Score: 0.2360
+ 8. FlyAsh                         - Score: 0.1175
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6077
+ 3. Superplasticizer               - Score: 0.4891
+ 4. CoarseAgg                      - Score: 0.3597
+ 5. Water                          - Score: 0.3224
+ 6. FineAgg                        - Score: 0.1909
+ 7. FlyAsh                         - Score: 0.1802
+ 8. Slag                           - Score: 0.1358
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.9484
+ 3. Slag                           - Score: 0.6070
+ 4. Superplasticizer               - Score: 0.4443
+ 5. FineAgg                        - Score: 0.4264
+ 6. FlyAsh                         - Score: 0.3631
+ 7. Age                            - Score: 0.3176
+ 8. CoarseAgg                      - Score: 0.3120
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8994
+ 3. Cement                         - Score: 0.7380
+ 4. FineAgg                        - Score: 0.5426
+ 5. Age                            - Score: 0.4034
+ 6. Slag                           - Score: 0.3685
+ 7. FlyAsh                         - Score: 0.3006
+ 8. CoarseAgg                      - Score: 0.2269
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Age                            - Score: 0.9674
+ 3. Slag                           - Score: 0.6750
+ 4. FineAgg                        - Score: 0.5319
+ 5. Water                          - Score: 0.4888
+ 6. FlyAsh                         - Score: 0.2667
+ 7. CoarseAgg                      - Score: 0.2322
+ 8. Cement                         - Score: 0.2001
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4582
+ 3. Superplasticizer               - Score: 0.3400
+ 4. Cement                         - Score: 0.3258
+ 5. FlyAsh                         - Score: 0.3043
+ 6. Water                          - Score: 0.2884
+ 7. CoarseAgg                      - Score: 0.2114
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9796
+ 3. CoarseAgg                      - Score: 0.5899
+ 4. Water                          - Score: 0.4597
+ 5. FineAgg                        - Score: 0.3158
+ 6. Slag                           - Score: 0.2928
+ 7. FlyAsh                         - Score: 0.2523
+ 8. Superplasticizer               - Score: 0.1865
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9818
+ 3. Slag                           - Score: 0.4418
+ 4. Age                            - Score: 0.3281
+ 5. CoarseAgg                      - Score: 0.3278
+ 6. Cement                         - Score: 0.3163
+ 7. FineAgg                        - Score: 0.2688
+ 8. FlyAsh                         - Score: 0.1634
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.5494
+ 3. Water                          - Score: 0.4451
+ 4. FlyAsh                         - Score: 0.4119
+ 5. CoarseAgg                      - Score: 0.2283
+ 6. FineAgg                        - Score: 0.1727
+ 7. Cement                         - Score: 0.1543
+ 8. Slag                           - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7689
+ 3. Water                          - Score: 0.7312
+ 4. Superplasticizer               - Score: 0.4353
+ 5. Slag                           - Score: 0.3988
+ 6. FineAgg                        - Score: 0.3957
+ 7. FlyAsh                         - Score: 0.3267
+ 8. CoarseAgg                      - Score: 0.2822
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.5679
+ 3. Superplasticizer               - Score: 0.5393
+ 4. Water                          - Score: 0.3756
+ 5. CoarseAgg                      - Score: 0.3159
+ 6. FineAgg                        - Score: 0.2185
+ 7. FlyAsh                         - Score: 0.1707
+ 8. Slag                           - Score: 0.1548
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9615
+ 3. Cement                         - Score: 0.7521
+ 4. FineAgg                        - Score: 0.5082
+ 5. Slag                           - Score: 0.4175
+ 6. Age                            - Score: 0.3650
+ 7. FlyAsh                         - Score: 0.3024
+ 8. CoarseAgg                      - Score: 0.2545
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9315
+ 3. Slag                           - Score: 0.6807
+ 4. FineAgg                        - Score: 0.5195
+ 5. Water                          - Score: 0.4689
+ 6. FlyAsh                         - Score: 0.2782
+ 7. CoarseAgg                      - Score: 0.2514
+ 8. Cement                         - Score: 0.2054
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. FineAgg                        - Score: 0.3793
+ 3. Cement                         - Score: 0.3642
+ 4. Superplasticizer               - Score: 0.3630
+ 5. FlyAsh                         - Score: 0.2667
+ 6. Water                          - Score: 0.2623
+ 7. CoarseAgg                      - Score: 0.2108
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4754
+ 3. Cement                         - Score: 0.3716
+ 4. CoarseAgg                      - Score: 0.3597
+ 5. Slag                           - Score: 0.3479
+ 6. Water                          - Score: 0.3460
+ 7. Superplasticizer               - Score: 0.1594
+ 8. FlyAsh                         - Score: 0.1041
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7802
+ 3. Water                          - Score: 0.7652
+ 4. Superplasticizer               - Score: 0.3166
+ 5. FineAgg                        - Score: 0.3070
+ 6. FlyAsh                         - Score: 0.2835
+ 7. CoarseAgg                      - Score: 0.2320
+ 8. Slag                           - Score: 0.1666
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.6707
+ 3. Water                          - Score: 0.4385
+ 4. FineAgg                        - Score: 0.3194
+ 5. Superplasticizer               - Score: 0.3015
+ 6. CoarseAgg                      - Score: 0.2302
+ 7. Slag                           - Score: 0.1927
+ 8. FlyAsh                         - Score: 0.1758
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.5003
+ 3. Superplasticizer               - Score: 0.4935
+ 4. Water                          - Score: 0.3610
+ 5. CoarseAgg                      - Score: 0.2476
+ 6. FineAgg                        - Score: 0.1928
+ 7. FlyAsh                         - Score: 0.1524
+ 8. Slag                           - Score: 0.1342
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.8695
+ 3. Slag                           - Score: 0.5865
+ 4. FineAgg                        - Score: 0.4309
+ 5. Superplasticizer               - Score: 0.4235
+ 6. FlyAsh                         - Score: 0.3285
+ 7. CoarseAgg                      - Score: 0.2992
+ 8. Age                            - Score: 0.2592
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9102
+ 3. Cement                         - Score: 0.7495
+ 4. FineAgg                        - Score: 0.6286
+ 5. Slag                           - Score: 0.5541
+ 6. Age                            - Score: 0.4851
+ 7. FlyAsh                         - Score: 0.3143
+ 8. CoarseAgg                      - Score: 0.2995
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7933
+ 3. Slag                           - Score: 0.5440
+ 4. Water                          - Score: 0.4906
+ 5. FineAgg                        - Score: 0.3758
+ 6. FlyAsh                         - Score: 0.2929
+ 7. CoarseAgg                      - Score: 0.2774
+ 8. Cement                         - Score: 0.2156
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4716
+ 3. Superplasticizer               - Score: 0.3250
+ 4. FlyAsh                         - Score: 0.2698
+ 5. Water                          - Score: 0.2613
+ 6. CoarseAgg                      - Score: 0.2480
+ 7. Cement                         - Score: 0.1890
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6316
+ 3. CoarseAgg                      - Score: 0.3375
+ 4. Slag                           - Score: 0.2676
+ 5. Water                          - Score: 0.2511
+ 6. FineAgg                        - Score: 0.1764
+ 7. Superplasticizer               - Score: 0.1741
+ 8. FlyAsh                         - Score: 0.1325
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9881
+ 3. Cement                         - Score: 0.3286
+ 4. FineAgg                        - Score: 0.3074
+ 5. FlyAsh                         - Score: 0.2991
+ 6. CoarseAgg                      - Score: 0.2763
+ 7. Age                            - Score: 0.2503
+ 8. Slag                           - Score: 0.1961
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8399
+ 3. Water                          - Score: 0.7543
+ 4. FlyAsh                         - Score: 0.4747
+ 5. Cement                         - Score: 0.2547
+ 6. CoarseAgg                      - Score: 0.2246
+ 7. FineAgg                        - Score: 0.1333
+ 8. Slag                           - Score: 0.1155
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7858
+ 3. Water                          - Score: 0.7094
+ 4. Superplasticizer               - Score: 0.4423
+ 5. FineAgg                        - Score: 0.4256
+ 6. Slag                           - Score: 0.3332
+ 7. CoarseAgg                      - Score: 0.3186
+ 8. FlyAsh                         - Score: 0.2855
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9435
+ 3. Superplasticizer               - Score: 0.7595
+ 4. Water                          - Score: 0.6696
+ 5. Slag                           - Score: 0.3679
+ 6. CoarseAgg                      - Score: 0.3585
+ 7. FlyAsh                         - Score: 0.3120
+ 8. FineAgg                        - Score: 0.2674
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.2838
+ 3. Water                          - Score: 0.2807
+ 4. FineAgg                        - Score: 0.2346
+ 5. Slag                           - Score: 0.2126
+ 6. FlyAsh                         - Score: 0.1660
+ 7. CoarseAgg                      - Score: 0.1526
+ 8. Cement                         - Score: 0.1472
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7725
+ 3. Slag                           - Score: 0.5640
+ 4. FineAgg                        - Score: 0.5341
+ 5. Water                          - Score: 0.4584
+ 6. FlyAsh                         - Score: 0.2947
+ 7. CoarseAgg                      - Score: 0.1865
+ 8. Cement                         - Score: 0.1694
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.4193
+ 3. FineAgg                        - Score: 0.4022
+ 4. Water                          - Score: 0.3125
+ 5. FlyAsh                         - Score: 0.2668
+ 6. CoarseAgg                      - Score: 0.2649
+ 7. Cement                         - Score: 0.2363
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.4193
+ 3. FineAgg                        - Score: 0.4022
+ 4. Water                          - Score: 0.3125
+ 5. FlyAsh                         - Score: 0.2668
+ 6. CoarseAgg                      - Score: 0.2649
+ 7. Cement                         - Score: 0.2363
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7878
+ 3. Water                          - Score: 0.6816
+ 4. Superplasticizer               - Score: 0.4874
+ 5. CoarseAgg                      - Score: 0.3919
+ 6. FineAgg                        - Score: 0.1725
+ 7. Slag                           - Score: 0.1099
+ 8. FlyAsh                         - Score: 0.1003
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8239
+ 3. Water                          - Score: 0.7871
+ 4. FlyAsh                         - Score: 0.5776
+ 5. CoarseAgg                      - Score: 0.2626
+ 6. Cement                         - Score: 0.2580
+ 7. FineAgg                        - Score: 0.1411
+ 8. Slag                           - Score: 0.0501
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9489
+ 3. Water                          - Score: 0.7429
+ 4. Superplasticizer               - Score: 0.5340
+ 5. Slag                           - Score: 0.4831
+ 6. FlyAsh                         - Score: 0.4600
+ 7. FineAgg                        - Score: 0.4584
+ 8. CoarseAgg                      - Score: 0.3641
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.5815
+ 3. Superplasticizer               - Score: 0.4724
+ 4. Water                          - Score: 0.3355
+ 5. CoarseAgg                      - Score: 0.2979
+ 6. FineAgg                        - Score: 0.1773
+ 7. FlyAsh                         - Score: 0.1755
+ 8. Slag                           - Score: 0.1443
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9625
+ 3. Cement                         - Score: 0.9199
+ 4. FineAgg                        - Score: 0.6217
+ 5. Slag                           - Score: 0.5991
+ 6. Age                            - Score: 0.4783
+ 7. FlyAsh                         - Score: 0.4469
+ 8. CoarseAgg                      - Score: 0.3732
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9505
+ 3. Water                          - Score: 0.7745
+ 4. Superplasticizer               - Score: 0.7169
+ 5. Slag                           - Score: 0.3692
+ 6. CoarseAgg                      - Score: 0.3635
+ 7. FineAgg                        - Score: 0.2567
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9505
+ 3. Water                          - Score: 0.7745
+ 4. Superplasticizer               - Score: 0.7169
+ 5. Slag                           - Score: 0.3692
+ 6. CoarseAgg                      - Score: 0.3635
+ 7. FineAgg                        - Score: 0.2567
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7813
+ 3. Slag                           - Score: 0.6014
+ 4. Water                          - Score: 0.3895
+ 5. FineAgg                        - Score: 0.3557
+ 6. CoarseAgg                      - Score: 0.3235
+ 7. Cement                         - Score: 0.2554
+ 8. FlyAsh                         - Score: 0.2285
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4867
+ 3. Superplasticizer               - Score: 0.4598
+ 4. Cement                         - Score: 0.3931
+ 5. Water                          - Score: 0.2829
+ 6. FlyAsh                         - Score: 0.2636
+ 7. CoarseAgg                      - Score: 0.1844
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9696
+ 3. CoarseAgg                      - Score: 0.6515
+ 4. Water                          - Score: 0.4375
+ 5. FineAgg                        - Score: 0.3968
+ 6. Slag                           - Score: 0.2586
+ 7. FlyAsh                         - Score: 0.2381
+ 8. Superplasticizer               - Score: 0.1772
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8242
+ 3. Slag                           - Score: 0.4987
+ 4. CoarseAgg                      - Score: 0.3150
+ 5. Age                            - Score: 0.2765
+ 6. FineAgg                        - Score: 0.2709
+ 7. Cement                         - Score: 0.2292
+ 8. FlyAsh                         - Score: 0.1957
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8380
+ 3. Water                          - Score: 0.7883
+ 4. FlyAsh                         - Score: 0.6188
+ 5. CoarseAgg                      - Score: 0.2646
+ 6. Cement                         - Score: 0.2260
+ 7. FineAgg                        - Score: 0.1194
+ 8. Slag                           - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8998
+ 3. Water                          - Score: 0.7764
+ 4. FineAgg                        - Score: 0.5258
+ 5. Superplasticizer               - Score: 0.5167
+ 6. Slag                           - Score: 0.3867
+ 7. FlyAsh                         - Score: 0.3739
+ 8. CoarseAgg                      - Score: 0.3400
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7147
+ 3. Superplasticizer               - Score: 0.5068
+ 4. CoarseAgg                      - Score: 0.3838
+ 5. Water                          - Score: 0.3494
+ 6. FineAgg                        - Score: 0.1914
+ 7. Slag                           - Score: 0.1562
+ 8. FlyAsh                         - Score: 0.1499
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9723
+ 3. Cement                         - Score: 0.8845
+ 4. FineAgg                        - Score: 0.6731
+ 5. Slag                           - Score: 0.4663
+ 6. Age                            - Score: 0.4141
+ 7. CoarseAgg                      - Score: 0.3946
+ 8. FlyAsh                         - Score: 0.3212
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8639
+ 3. Slag                           - Score: 0.6023
+ 4. FineAgg                        - Score: 0.4900
+ 5. Water                          - Score: 0.4027
+ 6. FlyAsh                         - Score: 0.3233
+ 7. CoarseAgg                      - Score: 0.2684
+ 8. Cement                         - Score: 0.1737
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Cement                         - Score: 0.6372
+ 3. Superplasticizer               - Score: 0.5012
+ 4. Water                          - Score: 0.4365
+ 5. FlyAsh                         - Score: 0.3486
+ 6. FineAgg                        - Score: 0.3423
+ 7. CoarseAgg                      - Score: 0.2712
+ 8. Age                            - Score: 0.2395
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7437
+ 3. CoarseAgg                      - Score: 0.5692
+ 4. Water                          - Score: 0.4864
+ 5. FineAgg                        - Score: 0.3595
+ 6. Superplasticizer               - Score: 0.3418
+ 7. FlyAsh                         - Score: 0.3120
+ 8. Slag                           - Score: 0.2571
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7808
+ 3. Slag                           - Score: 0.3945
+ 4. FineAgg                        - Score: 0.2897
+ 5. CoarseAgg                      - Score: 0.2492
+ 6. Age                            - Score: 0.2484
+ 7. Cement                         - Score: 0.1657
+ 8. FlyAsh                         - Score: 0.1457
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8096
+ 3. Water                          - Score: 0.7135
+ 4. FlyAsh                         - Score: 0.5666
+ 5. Cement                         - Score: 0.2274
+ 6. CoarseAgg                      - Score: 0.2200
+ 7. FineAgg                        - Score: 0.1317
+ 8. Slag                           - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9998
+ 3. Water                          - Score: 0.7165
+ 4. FineAgg                        - Score: 0.5889
+ 5. Superplasticizer               - Score: 0.5515
+ 6. FlyAsh                         - Score: 0.5211
+ 7. Slag                           - Score: 0.4938
+ 8. CoarseAgg                      - Score: 0.3712
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.4425
+ 3. Superplasticizer               - Score: 0.4017
+ 4. CoarseAgg                      - Score: 0.3038
+ 5. Water                          - Score: 0.2864
+ 6. FineAgg                        - Score: 0.1921
+ 7. FlyAsh                         - Score: 0.1894
+ 8. Slag                           - Score: 0.1882
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9327
+ 3. Cement                         - Score: 0.7185
+ 4. FineAgg                        - Score: 0.6628
+ 5. Slag                           - Score: 0.5036
+ 6. Age                            - Score: 0.3922
+ 7. CoarseAgg                      - Score: 0.3440
+ 8. FlyAsh                         - Score: 0.3011
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9198
+ 3. Water                          - Score: 0.6974
+ 4. Superplasticizer               - Score: 0.6340
+ 5. Slag                           - Score: 0.3815
+ 6. CoarseAgg                      - Score: 0.3367
+ 7. FineAgg                        - Score: 0.2695
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9198
+ 3. Water                          - Score: 0.6974
+ 4. Superplasticizer               - Score: 0.6340
+ 5. Slag                           - Score: 0.3815
+ 6. CoarseAgg                      - Score: 0.3367
+ 7. FineAgg                        - Score: 0.2695
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9502
+ 3. Slag                           - Score: 0.6961
+ 4. FineAgg                        - Score: 0.5965
+ 5. Water                          - Score: 0.4357
+ 6. CoarseAgg                      - Score: 0.2081
+ 7. FlyAsh                         - Score: 0.1924
+ 8. Cement                         - Score: 0.1855
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.5112
+ 3. FlyAsh                         - Score: 0.3434
+ 4. Cement                         - Score: 0.3017
+ 5. FineAgg                        - Score: 0.2966
+ 6. Water                          - Score: 0.2276
+ 7. CoarseAgg                      - Score: 0.2060
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.8309
+ 3. CoarseAgg                      - Score: 0.5298
+ 4. Water                          - Score: 0.3510
+ 5. Slag                           - Score: 0.3033
+ 6. FineAgg                        - Score: 0.2765
+ 7. FlyAsh                         - Score: 0.2633
+ 8. Superplasticizer               - Score: 0.2091
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8440
+ 3. Slag                           - Score: 0.6253
+ 4. CoarseAgg                      - Score: 0.3378
+ 5. Age                            - Score: 0.3337
+ 6. FineAgg                        - Score: 0.2946
+ 7. Cement                         - Score: 0.2738
+ 8. FlyAsh                         - Score: 0.1965
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7680
+ 3. Water                          - Score: 0.6831
+ 4. FlyAsh                         - Score: 0.5916
+ 5. CoarseAgg                      - Score: 0.2520
+ 6. Cement                         - Score: 0.2150
+ 7. FineAgg                        - Score: 0.1216
+ 8. Slag                           - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8505
+ 3. Water                          - Score: 0.8328
+ 4. Superplasticizer               - Score: 0.5009
+ 5. FineAgg                        - Score: 0.4253
+ 6. Slag                           - Score: 0.4136
+ 7. FlyAsh                         - Score: 0.3801
+ 8. CoarseAgg                      - Score: 0.3233
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.6140
+ 3. Superplasticizer               - Score: 0.4594
+ 4. CoarseAgg                      - Score: 0.3411
+ 5. Water                          - Score: 0.3289
+ 6. FineAgg                        - Score: 0.1866
+ 7. Slag                           - Score: 0.1854
+ 8. FlyAsh                         - Score: 0.1758
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9972
+ 3. Cement                         - Score: 0.7553
+ 4. FineAgg                        - Score: 0.6021
+ 5. Slag                           - Score: 0.4226
+ 6. Age                            - Score: 0.4175
+ 7. CoarseAgg                      - Score: 0.3201
+ 8. FlyAsh                         - Score: 0.3063
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.4967
+ 3. FineAgg                        - Score: 0.4733
+ 4. CoarseAgg                      - Score: 0.2770
+ 5. Water                          - Score: 0.1843
+ 6. Superplasticizer               - Score: 0.1787
+ 7. Cement                         - Score: 0.1755
+ 8. FlyAsh                         - Score: 0.1105
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7902
+ 3. Slag                           - Score: 0.7466
+ 4. Age                            - Score: 0.6946
+ 5. Superplasticizer               - Score: 0.5729
+ 6. FineAgg                        - Score: 0.4866
+ 7. FlyAsh                         - Score: 0.4583
+ 8. CoarseAgg                      - Score: 0.1983
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.7457
+ 3. CoarseAgg                      - Score: 0.4737
+ 4. Water                          - Score: 0.3347
+ 5. FineAgg                        - Score: 0.2450
+ 6. Slag                           - Score: 0.1995
+ 7. FlyAsh                         - Score: 0.1512
+ 8. Superplasticizer               - Score: 0.1355
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.9804
+ 3. Slag                           - Score: 0.3742
+ 4. Cement                         - Score: 0.3055
+ 5. CoarseAgg                      - Score: 0.2620
+ 6. FineAgg                        - Score: 0.2339
+ 7. Age                            - Score: 0.2136
+ 8. FlyAsh                         - Score: 0.2127
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8374
+ 3. Water                          - Score: 0.7792
+ 4. FlyAsh                         - Score: 0.5110
+ 5. Cement                         - Score: 0.2501
+ 6. CoarseAgg                      - Score: 0.2443
+ 7. FineAgg                        - Score: 0.1312
+ 8. Slag                           - Score: 0.0950
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9771
+ 3. Water                          - Score: 0.8550
+ 4. Superplasticizer               - Score: 0.6051
+ 5. FineAgg                        - Score: 0.4908
+ 6. FlyAsh                         - Score: 0.4653
+ 7. Slag                           - Score: 0.3781
+ 8. CoarseAgg                      - Score: 0.3681
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.5562
+ 3. Superplasticizer               - Score: 0.4494
+ 4. Water                          - Score: 0.3313
+ 5. CoarseAgg                      - Score: 0.2902
+ 6. FineAgg                        - Score: 0.1727
+ 7. FlyAsh                         - Score: 0.1614
+ 8. Slag                           - Score: 0.1542
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.9919
+ 3. Cement                         - Score: 0.8399
+ 4. FineAgg                        - Score: 0.6097
+ 5. Age                            - Score: 0.5324
+ 6. Slag                           - Score: 0.4891
+ 7. FlyAsh                         - Score: 0.3948
+ 8. CoarseAgg                      - Score: 0.3225
+================================================================================
+  done: other arms under log+standardized
+  wrote C:\personal\grad-school\reproduce\outputs\table_concrete_reconciliation.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_concrete_reconciliation.csv
