@@ -259,6 +259,28 @@ empirical follow-up it spun off is **E9**, deliberately low priority._
       rather than leaving it all in the 2028 Q1 capstone alongside G6/G7/G8/write-up/defense.
 - [ ] ⬜ **C4 — Quantify the correction-rule pass** (Ch 4 §4.3.1). Claimed, never measured.
       Paired confusion matrices, before and after. Fills Fig 4.3.
+- [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(new 2026-08-03; Ch 7 **G9**,
+      Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
+      claims is provable from `ivatmeans.py` rather than measured: initialization-free because
+      the iVAT ordering is deterministic, verifiable against the reordered image, assignment
+      and membership from one fit. Chapter 3 measures the **engine** — the reorder, the
+      footprint, the device MST — and never the estimator. **Nothing in this repository times
+      `IVATMeans` against either baseline or scores its partitions against theirs.** Both
+      halves owed: wall clock across §3.4's existing size ladder with the CPU and
+      whole-pipeline-on-device paths reported separately, and ARI on Table 3.5's four
+      constructions plus one blob set where a prototype is the right model.
+      Two protocol points that are the reason this is a real experiment rather than a
+      formality. **The suite must include the sets where §3.3.5's envelope predicts a loss** —
+      two moons and circles — because a benchmark run only where the method wins is not one,
+      and that predicted loss is the refutation condition: if `IVATMeans` reaches ARI 1.00
+      there, the Euclidean-prototype bound is not a bound and §5.2's argument for the
+      relational method loses its motivating case. And the **determinism asymmetry belongs in
+      the protocol**: FCM and k-means are reported as a spread over restarts, `IVATMeans` has
+      none over seeds, so the protocol verifies the labelling elementwise identical across ten
+      seeds and prints the zero rather than leaving a blank column.
+      Three weeks on existing machinery; estimator, both baselines and the timing harness all
+      exist. Related: clustering#61, which notes the estimator could also surface the
+      hierarchy it already computes.
 - [ ] ⬜ **C5 — Ch 3 head-to-head vs. eVAT (Meng & Yuan 2018) and clusiVAT** on identical
       datasets. First comparison a reviewer will demand.
 - [ ] ⬜ **C6 — Ch 5 head-to-head vs. Bonis–Oudot beta-plateau and AuToMATo** on identical data.
