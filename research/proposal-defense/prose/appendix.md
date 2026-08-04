@@ -119,7 +119,7 @@ tribble-fis issues #49 (the regression) and #50 (`top_p` semantics).*
 
 #### Where the "most" bites
 
-Two tables have no generator at all. **7.1** is a goals-and-status matrix, structural by design. **6.3** is structural until Goal G6 measures the interpretability counts its pending row wants. Three more have generators outside `reproduce/tables/`: **3.5, 3.6 and 3.7** come from the `ClusteringExperiments/` scripts through `reproduce/experiments/run_cluster_experiment.py`, which puts their directory on `sys.path` and redirects figure output into `reproduce/outputs/`. Per-table provenance for all twenty-two is in `reproduce/PROVENANCE_MAP.md`, the file to check.
+Two tables have no generator at all. **7.1** is a goals-and-status matrix, structural by design. **6.3** is structural until Goal G6 measures the interpretability counts its pending row wants. Three more have generators outside `reproduce/tables/`: **3.5, 3.6 and 3.7** come from the `ClusteringExperiments/` scripts through `reproduce/experiments/run_cluster_experiment.py`, which puts their directory on `sys.path` and redirects figure output into `reproduce/outputs/`. Per-table provenance for all twenty-one is in `reproduce/PROVENANCE_MAP.md`, the file to check.
 
 #### "One command" is not yet true from a clean start
 

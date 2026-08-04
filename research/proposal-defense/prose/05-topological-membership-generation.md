@@ -226,4 +226,4 @@ None of those limitations is fatal, and stating them is not hedging. This is pro
 
 ---
 
-*Draft — Chapter 5 prose, in the author's voice; proposed work with preliminary results front-loaded. Citations in bracketed shorthand pending the consolidated `references.bib`. Three tables (5.1–5.3) and three figure placeholders (5.1–5.3) inline. Open items tracked in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 5 prose; proposed work with preliminary results front-loaded. Citations in bracketed shorthand pending the consolidated `references.bib`. Three tables (5.1–5.3) and three figure placeholders (5.1–5.3) inline. Open items tracked in `../ACTION_ITEMS.md`.*

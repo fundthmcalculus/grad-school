@@ -155,4 +155,4 @@ Two caveats. Q1 2027 is the densest quarter, carrying five research items and a 
   - Whether the M5 branch may be a *build*, writing an M5′ implementation against a current scikit-learn. Dated 31 March 2027, not decided.
   - Whether either Fumanal-Idocin et al. (2025) or the deep TSK fuzzy classifier must be reimplemented: §7.2 de-scopes both, and taking one on displaces G3b.
 
-*Draft — Chapter 10 prose + Gantt, in the author's voice. Goals map to Table 7.1, `../CHECKLIST.md` and `../ACTION_ITEMS.md`.*
+*Draft — Chapter 10 prose + Gantt. Goals map to Table 7.1, `../CHECKLIST.md` and `../ACTION_ITEMS.md`.*

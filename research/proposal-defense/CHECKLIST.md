@@ -309,10 +309,11 @@ empirical follow-up it spun off is **E9**, deliberately low priority._
       combined. *(Was tracked as A2; it is a writing task, not a decision, so it belongs here.)*
       Also gates the second pass on the acknowledgements (**A6**), which currently names the
       committee and Jon Salisbury but no co-authors.
-- [ ] ⬜ **D3 — Regenerate `chapters/00-README-master-outline.md` from the prose.** It still reads
-      "Status: Scaffold," describes pillar 1 without stage two or the name collision, and lists
-      two already-completed fixes as pending. It is the document a committee member is most
-      likely to open first.
+- [x] ✅ **D3 — `chapters/00-README-master-outline.md` removed (2026-08-04)**, rather than
+      regenerated. It had fallen a generation behind the prose ("Status: Scaffold," pillar 1
+      missing stage two and the name collision, MIMO still listed after that work was
+      descoped). A committee member skimming first now gets that orientation from Chapter 1's
+      outline and Chapter 7's goal table, which stay in sync with the rest of the prose.
 - [x] ✅ **D4 — The `*pending*` table cells are all marked or resolved** (2026-08-02).
       **The count was wrong: 20, not 23.** This item, `NEXT_STEPS` and `ACTION_ITEMS` all
       said 23 and `REVIEW_2026-08-02` said 22; the actual inventory across the chapter tables
