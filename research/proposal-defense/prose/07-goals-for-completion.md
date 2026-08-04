@@ -1,6 +1,6 @@
 # Chapter 7 — Goals for Completion
 
-This chapter states what remains to turn this proposal into a dissertation. Chapters 3 and 4 are done and published or nearly so; Chapters 5 and 6 have working code and preliminary results. What is left is finishing, hardening, and connecting the pieces into one system, and the plan uses all fifteen months of runway from the proposal defense at the end of 2026 to the final defense in March 2028.
+This chapter states what remains to turn this proposal into a dissertation. Chapter 3 is done and published; Chapter 4 is done, with its paper in preparation; Chapters 5 and 6 have working code and preliminary results. What is left is finishing, hardening, and connecting the pieces into one system, and the plan uses all fifteen months of runway from the proposal defense at the end of 2026 to the final defense in March 2028.
 
 Every goal below carries a named experiment, a metric, a threshold, and the outcome that counts as refutation, because a committee cannot approve what it cannot check. Where the likely outcome is a null result, it is predicted in advance. The statuses here are decisions; Appendix A.6 collects the evidence behind them, including the investigations that did not work.
 
@@ -187,4 +187,4 @@ The runway is oversubscribed, not merely tight, so the de-scoping plan is an ord
 
 ---
 
-*Draft — Chapter 7 prose, in the author's voice. One table. Goals tracked in `../ACTION_ITEMS.md` and `../CHECKLIST.md`, and mapped to the Chapter 10 timeline.*
+*Draft — Chapter 7 prose. One table. Goals tracked in `../ACTION_ITEMS.md` and `../CHECKLIST.md`, and mapped to the Chapter 10 timeline.*

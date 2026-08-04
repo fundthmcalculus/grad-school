@@ -41,7 +41,7 @@ The remainder follows the pipeline in order, separating work already done from w
 
 **Part I — Introduction and Preliminaries.** Chapter 2 collects the shared background: fuzzy inference systems and the Takagi–Sugeno–Kang rule form; VAT, iVAT, and their equivalence to single-linkage clustering; persistence and a little topological data analysis; Fuzzy C-Means and relational fuzzy clustering; why the literature treats stochastic optimization as the bottleneck (the foil for *structure before search*); and the accuracy–interpretability trade-off.
 
-**Part II — Completed Work.** Chapter 3 presents mergeVAT: the acceleration, the in-place memory scheme, the GPU implementation, the divide-and-conquer stitch, and the extension to non-metric data, along with the VAT-to-TSP hot-start from the same machinery. This work was published across NAFIPS 2025 (Banff) and NAFIPS 2026 (El Paso). Chapter 4 presents the Mixture-of-Gaussians approach to synthesizing a fuzzy model directly from data: the fast, no-search core of the pipeline.
+**Part II — Completed Work.** Chapter 3 presents mergeVAT: the acceleration, the in-place memory scheme, the GPU implementation, the divide-and-conquer stitch, and the extension to non-metric data, along with the VAT-to-TSP hot-start from the same machinery. This work was presented at NAFIPS 2025 (Banff) and NAFIPS 2026 (El Paso); Chapter 9 has the paper-level detail, which is not yet settled. Chapter 4 presents the Mixture-of-Gaussians approach to synthesizing a fuzzy model directly from data: the fast, no-search core of the pipeline.
 
 **Part III — Proposed Work and Goals for Completion.** Chapter 5 is the proposed contribution I am most excited about: generating fuzzy membership functions from the topological structure of a dissimilarity matrix, including the multi-scale case. It has strong preliminary results already, and it is the conceptual bridge from clustering to fuzzy modeling. Chapter 6 covers the hierarchical and refined models: the shared ridge-TSK solver, the fuzzy trees and the mixture of experts, some built and some proposed. Chapter 7 lays out the goals for completion: the integrated end-to-end pipeline, the experiments that would make the scale and accuracy claims airtight, and a risk register with a de-scoping plan. Chapter 8 concludes, Chapter 9 lists publications, Chapter 10 gives the timeline through the final defense.
 
@@ -50,4 +50,4 @@ The remainder follows the pipeline in order, separating work already done from w
 
 ---
 
-*Draft — Chapter 1 prose, in the author's voice. Two figure placeholders (1.1–1.2) inline. Open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 1 prose. Two figure placeholders (1.1–1.2) inline. Open items in `../ACTION_ITEMS.md`.*

@@ -272,4 +272,4 @@ There is work left before this is airtight as a journal result, and I name it ra
 
 ---
 
-*Draft — Chapter 3 prose, in the author's voice. Citations in bracketed shorthand pending the consolidated `references.bib`. Seven tables (3.1–3.7) and one figure placeholder inline. Open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 3 prose. Citations in bracketed shorthand pending the consolidated `references.bib`. Seven tables (3.1–3.7) and one figure placeholder inline. Open items in `../ACTION_ITEMS.md`.*

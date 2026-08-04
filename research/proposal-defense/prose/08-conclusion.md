@@ -16,4 +16,4 @@ The broader point is methodological. The prevailing instinct in machine learning
 
 ---
 
-*Draft — Chapter 8 prose, in the author's voice; closes the tribble and structure-before-search motifs.*
+*Draft — Chapter 8 prose; closes the tribble and structure-before-search motifs.*
