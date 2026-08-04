@@ -199,8 +199,17 @@ empirical follow-up it spun off is **E9**, deliberately low priority._
       auto-detects them.
 - [x] ✅ **C2 — Complexity fit against reference curves.** Table 3.2 + Figure 3.2 now sweep a
       small grid (100–1,000, sized so the cubic arm runs at every point) with both axes
-      normalized, and fit a log-log exponent per arm. Classical **3.11** (theory 3) and stage
-      one **1.87** (theory ≈2.1, the log factor invisible over one decade) both confirm.
+      normalized, and fit a log-log exponent per arm. Classical **3.20** (theory 3) confirms.
+      **Stage one does not, and this item was ticked claiming it did.** Five runs on the
+      workstation fit stage one at **1.86–1.88** against a theoretical ≈2.1 for
+      $O(N^2 \log N)$ — but the number to notice is that it sits *below* the pure quadratic
+      reference of **2.00**, so "the log factor is invisible over one decade" is asserted
+      rather than shown, and an exponent under 2 is not evidence for a bound above it. What
+      the sweep establishes is the cubic-to-quadratic *separation*, which both arms agree on;
+      stage one's own exponent is **bounded, not confirmed**. Reporting a constrained fit at
+      $t = c \cdot N^2 \log N$ beside the free exponent would settle it, and is the remaining
+      work — tracked in Chapter 7 under G4a. Stage two fits **1.93–1.97**, which does confirm
+      the quadratic claim it is making.
 - [ ] ⬜ **C2b — RESCOPED: the ~10 ms fixed cost is a property of the laptop, not the kernel.**
       It does not reproduce on the workstation. Across **five** independent measurements there
       (`full-14900hx-2026-08-02`, its backfill, three manual repeats, `full-14900hx-r2`) stage
