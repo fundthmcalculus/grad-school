@@ -84,7 +84,14 @@ class DataSimulation:
 
 
 class DoublePendulum(OdeSystem):
-    """Double pendulum simulator using Lagrangian mechanics."""
+    """Double pendulum simulator using Lagrangian mechanics.
+
+    TODO - alpha_2 was wrong until 797b69a: a sum where the cited reference has a
+    product, so the system gained energy instead of conserving it. Figure 6.3 and
+    anything else measured through this generator -- test_double_pendulum.py
+    imports initialize_model from here -- was fit against the uncorrected
+    equations and has to be re-run before it is quoted.
+    """
 
     def __init__(self, m1=1.0, m2=1.0, l1=1.0, l2=1.0, g=9.81):
         self.m1 = m1
