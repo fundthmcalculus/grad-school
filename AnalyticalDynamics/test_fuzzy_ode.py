@@ -47,10 +47,18 @@ TSK_ORDER = '0th'
 # Rescale each predicted omega so the rollout stays on the true energy shell. The
 # unprojected rollout drifts by ~19 against an E0 of ~0.006 -- it silently becomes a
 # different physical system, and draining the budget is what parks it at a fixed
-# point. Projection cuts drift ~57x (19.05 -> 0.33), measured over seven held-out
-# initial conditions including two outside the training fan. It does NOT improve
-# tracking: the theta_1 horizon is unchanged and theta_1 MAE is slightly worse
-# (0.84 -> 0.96). It buys physical admissibility, not accuracy.
+# point, which projection removes: the rollout then sustains oscillation for the full
+# 30 s instead of freezing around 5 s.
+#
+# Note what the energy readout means in each mode. With projection ON it is ~0 by
+# construction, since that is precisely what the projection imposes -- it verifies
+# the implementation and counts unreachable-angle steps, and says nothing about model
+# quality. The diagnostic is only informative with projection OFF. Do not read the
+# projected figure as an achievement.
+#
+# Projection does NOT improve tracking: the theta_1 horizon is unchanged and theta_1
+# MAE is slightly worse (0.84 -> 0.96 over seven held-out initial conditions). It
+# buys physical admissibility, not accuracy.
 PROJECT_ENERGY = True
 
 # Categorical slots 1 and 2 of the validated light-mode palette.
@@ -68,9 +76,11 @@ def project_onto_energy_shell(model, theta, omega, e0):
     rollout was not given.
 
     Where theta is outside the region E0 can reach, the budget is negative and no
-    omega satisfies the constraint; omega is zeroed there, which is why projected
-    drift is small but not zero. That residual counts steps whose angles are
-    themselves unreachable.
+    omega satisfies the constraint, so omega is zeroed. That branch does not fire in
+    this rollout (0 of 2925 steps), but it is absorbing for any model whose features
+    are the instantaneous state: omega=0 freezes theta, which leaves the state and
+    hence the next prediction unchanged. The moving-average features here keep
+    evolving while theta is held still, so this variant would escape.
     """
     theta1, theta2 = theta
     budget = e0 - model.potential_energy(theta1, theta2)
@@ -272,7 +282,11 @@ def test_tribble_ode():
     # seeded with that many rows of the true trajectory. Error is zero by
     # construction over the seed, which is why the metrics below skip it.
     theta_rows = list(actual_trajectory[THETA_FEATURES].iloc[:HISTORY_LEN].values)
-    omega_rows = [np.full(len(OMEGA_TARGETS), np.nan) for _ in range(HISTORY_LEN)]
+    # One fewer than theta_rows: omega_rows[k] is the velocity predicted AT theta[k]
+    # and used to reach theta[k+1], so the two line up index for index. Recording it
+    # against theta[k+1] instead would pair each omega with an angle it was not
+    # computed from, and the energy check below would read that offset as drift.
+    omega_rows = [np.full(len(OMEGA_TARGETS), np.nan) for _ in range(HISTORY_LEN - 1)]
 
     model = test_results.model
     e0 = model.energy(*test_results.params.np)
@@ -287,8 +301,10 @@ def test_tribble_ode():
         if not np.isfinite(theta).all():
             print(f"Warning: Euler diverged at step {len(theta_rows)}, stopping early.")
             break
-        theta_rows.append(theta)
         omega_rows.append(omega)
+        theta_rows.append(theta)
+    # No velocity is predicted at the final angle, so pad to keep the columns aligned.
+    omega_rows.append(np.full(len(OMEGA_TARGETS), np.nan))
 
     predicted = pd.DataFrame(theta_rows, columns=THETA_FEATURES)
     predicted[OMEGA_TARGETS] = np.array(omega_rows)
