@@ -1,41 +1,40 @@
 # Chapter 9 — Publications
 
-**Status:** Outline · Part III (needs author input — publication metadata)
+**Status:** Outline · Part III — **blocked on author records** (paper metadata; checklist **D2**). The venues are confirmed; nothing about the papers themselves is.
 **Mirrors:** Pickering Ch 10 "My Publications".
 **Purpose:** list published / submitted / in-preparation work mapped to chapters, so the committee sees the completed record and the plan.
 
 ---
 
-## 9.1 Published / Presented
+## 9.1 Published — venues confirmed, paper metadata not yet supplied
 
-Two published conference venues, both feeding Chapter 3:
+Two NAFIPS meetings, both feeding Chapter 3, both confirmed by the author:
 - **NAFIPS 2025 — Banff, Alberta (July 2025)**
 - **NAFIPS 2026 — El Paso, TX (March 2026)**
 
-Papers:
-- **"Utilization of VAT for Hot-start of TSP"** → Ch 3. *(confirm venue: Banff 2025 or El Paso 2026; exact title, co-authors, page/DOI)*
-- **"mergeVAT: 58K×58K in 60 seconds"** → Ch 3. *(confirm venue; exact title, co-authors, page/DOI)*
-- *(Note: quals slides also present a "paper_combined" — confirm whether the two papers published separately or as one combined paper, and which paper went to which of the two NAFIPS meetings.)*
+Everything about the *papers* is unresolved, and this section cannot be written until it is supplied from the author's own records. Nothing below is a citation; each line is a placeholder that names what is missing, and none of it should be typeset as a reference in this state.
 
-## 9.2 Submitted / Under Review
+- 🔒 **Paper A** *(working title "Utilization of VAT for Hot-start of TSP")* → Ch 3. **Blocking:** exact title; which of the two meetings; co-author list; pages; DOI.
+- 🔒 **Paper B** *(working title "mergeVAT: 58K×58K in 60 seconds")* → Ch 3. **Blocking:** exact title; which of the two meetings; co-author list; pages; DOI.
+- 🔒 **The cardinality is itself unresolved.** The quals slides present a "paper_combined", so it is not currently known whether these went to the two meetings as two separate papers or as one combined paper. Until that is settled, "two published papers" is an assumption rather than a record, and this chapter does not assert it.
 
-- *(fill as applicable)*
+All three are checklist **D2** — author records, not research. They also gate the second pass on the acknowledgements (**A6**), which currently thanks the committee and Jon Salisbury but no co-authors, precisely because the co-author lists are what is missing here.
+
+> ⚠️ **Other chapters currently overstate this, and the sentences should be reconciled against this section rather than the other way round.** Two in particular:
+> - `prose/07-goals-for-completion.md` §7 opening — *"Chapters 3 and 4 are done and published or nearly so"*. Chapter 4's paper appears only under **In Preparation** in §9.3; only Chapter 3's work is published.
+> - `prose/01-introduction.md` §1.3 (Dissertation Outline) — *"This work was published across NAFIPS 2025 (Banff) and NAFIPS 2026 (El Paso)."* The word "across" presumes exactly the split this section records as unknown; it should be softened until the cardinality question above is answered.
+>
+> Chapter 8's version of the same claim has been narrowed to "Chapter 3's work is published, Chapter 4's paper is in preparation". Chapter 10 §10.1 refers to the two meetings at venue level only and asserts nothing about papers, so it needs no change.
+
+## 9.2 Submitted / Under Review — nothing currently under review
+
+There is no work under review as of this draft. The next submission is the Chapter 5 membership paper to **EUSFLAT 2027** (February 2027 deadline), listed under §9.3 as in preparation. This heading is kept rather than deleted so that its emptiness is a statement about the current state rather than an omission a reader has to infer.
 
 ## 9.3 In Preparation (mapped to chapters)
 
 Primary target venue: **EUSFLAT 2027 (September 2027)** (also consider FUZZ-IEEE / Fuzzy Sets & Systems / Information Sciences for journal versions).
 
-- **A correction note on VAT ordering complexity and memory** → Ch 3 §3.3.1. **⚠️ SCOPE CUT after the 2026-07-31 prior-art search; do not write this until the two blocking reads below are done.**
-
-  **What the search killed.** (a) The claim that the literature is confused about *time* — the Kumar–Bezdek 2020 survey states O(N²) for VAT in four places and correctly credits Havens–Bezdek for iVAT O(N³)→O(N²). (b) The claim that "which MST algorithm should VAT use" is untouched — **Parveen & Sreevalsan-Nair 2013 already published a method called mergeVAT** that swaps Prim for Borůvka on GPU. (c) The O(N)-workspace/no-full-matrix angle for iVAT — **Deshpande & Kumar 2024** (*Information Sciences* 664:120324) already do this via MST-iVAT, and attack the ordering *sub-quadratically* with k-d trees. (d) Any pretence of distance from the single-linkage literature — Bezdek's own group published *"Is VAT really single linkage in disguise?"* (Havens et al. 2009) printing Prim and the VAT ordering side by side, after which Müllner (2011) supplies the O(N)-memory argument directly.
-
-  **What survives.** One genuine, cited error: the VAT literature repeatedly asserts that O(N²) *space* is inherent to using Prim — Fast-VAT ("O(n²) space complexity for storing R"), Kumar's thesis ("O(n²) time and space to store all the edges"), and Deshpande & Kumar's own motivation ("O(N²) time and space complexity as they use Prim's algorithm"). That is false; array-based dense Prim needs O(N) working memory. The misconception is load-bearing enough to have motivated a 2024 *Information Sciences* paper. Alongside it: the widely used implementations (R **seriation**, Python **pyclustertend**, Fast-VAT's own code) are cubic in the ordering while citing O(N²).
-
-  **Therefore: an audit/correspondence piece, not a methods paper.** Structure: the stated-vs-actual space bound; the O(N)-workspace result following from Rohlf (1973)/Müllner (2011) via the equivalence Havens et al. (2009) already established; the survey of shipped implementations that are cubic in practice; the measured three-arm envelope (cubic / heap / dense). Claim **no** algorithmic novelty. Cite Müllner and Deshpande & Kumar prominently and early. Venue: short correspondence or software note. Framed as a new algorithm it will be rejected, and correctly.
-
-  **Honest assessment of worth:** a simpler fix to a problem Deshpande & Kumar already solved by a better route, plus a real correction to a real error. Modest. Worth writing only if the audit of shipped implementations is done properly, since that is the part with no precedent.
-
-  🚫 **BLOCKING READS.** (1) **Deshpande & Kumar 2024** — full text unobtainable in the search; if it already states the O(N)-workspace result for VAT itself rather than only for MST-iVAT, even this narrow framing collapses. (2) **Wang et al. 2010 (PAKDD)** — genuinely unverifiable, no OA copy; its complexity content is unknown.
+- **A correction note on VAT ordering complexity and memory** → Ch 3 §3.3.1. An audit and correspondence piece rather than a methods paper, scoped down after the 2026-07-31 prior-art search (Ch 3 §3.3.1 gives the reasoning and the honest assessment of what it is worth). Its claim is that the VAT literature repeatedly states an O(N²) *space* bound as inherent to using Prim for the ordering — Fast-VAT, Kumar's thesis, and Deshpande & Kumar's own motivation all say so — when array-based dense Prim needs only O(N) working memory, and that the widely used implementations (R **seriation**, Python **pyclustertend**, Fast-VAT's own code) are cubic in the ordering while citing O(N²); the supporting evidence is the measured three-arm envelope of cubic, heap and dense. It claims **no algorithmic novelty**, cites Müllner (2011) and Deshpande & Kumar (2024) prominently and early, and targets a short correspondence or software-note venue. It is contingent on two full-text reads that are still outstanding — checklist **E8**: **Deshpande & Kumar 2024** and **Wang et al. 2010 (PAKDD)** — and if the former already states the O(N)-workspace result for VAT itself rather than only for MST-iVAT, the note should be dropped rather than narrowed further.
 
 - **Fast interpretable FIS via Mixture-of-Gaussians** ("draft paper 3") → Ch 4.
 - **Topological membership generation for fuzzy inference systems** → Ch 5 (lead differentiator; EUSFLAT 2027 target).
@@ -45,7 +44,7 @@ Primary target venue: **EUSFLAT 2027 (September 2027)** (also consider FUZZ-IEEE
 
 - Performance-engineering study (tribble-opt) — systems/methods venue.
 - Quality-Diversity over legacy solvers (CVT-MAP-Elites + Iso+LineDD) — optimization venue.
-- Exact GPU/parallel VAT engine as a systems paper (vs eVAT / Fast-VAT / clusiVAT).
+- Exact GPU/parallel VAT engine as a systems paper (vs eVAT / Fast-VAT / clusiVAT). **On hold until Table 3.4 is re-quoted:** `reproduce/PROVENANCE_MAP.md` note 15 marks that table **drifted**, and its Fuzzy C-Means row overstates the GPU by roughly an order of magnitude because the quoted ratio compares a NumPy broadcasting implementation against a GEMM-based one — a difference of formulation, not of device. The exactness result the paper would rest on does reproduce; the speed envelope is being re-measured (checklist **E2b**).
 - Lin-Kernighan dual-backend + VAT-blocked TSP.
 
 ---

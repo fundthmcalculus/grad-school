@@ -67,6 +67,7 @@ import sys
 import warnings
 
 import numpy as np
+import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -127,6 +128,83 @@ def prepare(X, y_raw):
     # the RMSE column means one thing throughout.
     yr = np.asarray(y_raw, dtype=float)
     span = float(yr.max() - yr.min())
+    return {"Xt": Xt, "y": y, "y_bucket_mean": y_bucket_mean, "span": span,
+            "logged": logged}
+
+
+# Opt-in: fit every data-dependent preprocessing step on the training fold only.
+#
+# `prepare()` above runs the target scaling, the output partition, the log detection and
+# the feature scaling on the FULL dataset, then `mog_arm` splits. So the flat MoG arms
+# see a transform derived in part from the rows they are then scored on. Two halves,
+# with different severities, and the distinction is the whole reason this is measured
+# rather than asserted:
+#
+#   * `F.unit_scale` on the target is AFFINE. R^2 is invariant under an affine map of
+#     the target, so this half moves no R^2 cell. It is still transductive.
+#   * `partition_output` is a data-dependent NONLINEAR discretization: `pd.qcut` takes
+#     its quantile edges from the values handed to it, and the per-bucket means it
+#     returns are passed to `solve_tsk_consequents` and on into `predict_tsk`. Test-fold
+#     targets therefore reach the prediction path. This half is a genuine leak.
+#
+# The feature scaler is fit on the full frame in BOTH code paths -- `prepare()` and
+# `preprocess_for_others()` -- so it is at least symmetric across arms. The target
+# partition is not: the tree, mixture, CART and Random Forest arms never touch it. That
+# asymmetry is what makes Table 6.1's "shared splits" caption misleading, because the
+# gaps in that table are the same order as the effect being measured here.
+#
+# Set `REPRO_SPLIT_FIRST=1` to run the leak-free variant. It is opt-in rather than the
+# default deliberately: switching the default would re-quote most of Chapters 4 and 6,
+# and that is an author's decision, not a side effect of a bug fix. Run both and diff.
+SPLIT_FIRST = os.environ.get("REPRO_SPLIT_FIRST", "").strip() not in ("", "0", "false")
+
+
+def prepare_split_first(X, y_raw, seed):
+    """`prepare()` with every data-dependent step fit on the training fold only.
+
+    Returns the same dict shape `mog_arm` consumes, plus the pre-split indices, so the
+    arm reuses the identical fold rather than re-deriving one that might differ.
+
+    Cannot be hoisted out of the seed loop the way `prepare()` is, because that hoist is
+    only valid *because* the preprocessing ignores the split -- which is the property
+    being removed. So this pays one preprocessing per seed, which is the honest cost of
+    not leaking and is a few milliseconds on 1,030 rows.
+
+    `span` still comes from the full raw target. It is a unit conversion applied to RMSE
+    for reporting, not an input to any model, and holding it fixed keeps the RMSE column
+    on one scale across every arm in the table. Using a per-fold span would make the two
+    variants' RMSE columns incomparable while changing no R^2.
+    """
+    from tribblefis.regression import partition_output
+
+    idx = np.arange(len(X))
+    itr, _ite = train_test_split(idx, test_size=0.2, random_state=seed)
+    train = np.zeros(len(X), dtype=bool)
+    train[itr] = True
+
+    yr = pd.Series(np.asarray(y_raw, dtype=float).ravel(),
+                   index=X.index, name=getattr(y_raw, "name", "y_value"))
+    lo, hi = float(yr[train].min()), float(yr[train].max())
+    yt = F.unit_scale_with(lo, hi, yr)
+
+    # Quantile edges and bucket means from the training fold alone. The test rows keep
+    # their scaled value and are given the train buckets' labels; `mog_arm` never reads a
+    # test bucket -- only `yte["y_value"]`, for scoring -- so the labels are cosmetic
+    # here, and deriving them from the train edges is simply the honest way to fill them.
+    y_train_part, y_bucket_mean = partition_output(N_BUCKETS, yt[train])
+    buckets = pd.Series(np.nan, index=yt.index, name="y_bucket")
+    buckets[train] = y_train_part["y_bucket"].values
+    edges = np.quantile(yt[train], np.linspace(0, 1, N_BUCKETS + 1)[1:-1])
+    buckets[~train] = np.digitize(yt[~train].values, edges)
+    y = pd.concat([buckets.astype(int), yt.rename("y_value")], axis=1)
+
+    sc, logged = F.fit_scaler(X[train], scaler="unit", log_dynamic_range=2)
+    Xt = F.apply_scaler(sc, X)
+
+    # Written as max - min rather than `.ptp()`: the ndarray method was removed in
+    # NumPy 2.0, and this matches `prepare()` above exactly, which is the point.
+    _yr = np.asarray(y_raw, dtype=float).ravel()
+    span = float(_yr.max() - _yr.min())
     return {"Xt": Xt, "y": y, "y_bucket_mean": y_bucket_mean, "span": span,
             "logged": logged}
 
@@ -237,8 +315,18 @@ def main():
     refine_flags = {"off": [False], "on": [True], "both": [False, True]}[REFINE_MODE]
     store: dict = {}
 
+    # Under REPRO_SPLIT_FIRST every data-dependent step is fit per fold, so the
+    # preprocessing cannot be hoisted and each job carries its own. The hoist above is
+    # valid only because the default preprocessing ignores the split -- which is exactly
+    # the property this variant removes.
     prep = prepare(X, y)
     logged_note = ", ".join(map(str, prep["logged"])) if prep["logged"] else ""
+    if SPLIT_FIRST:
+        print("  REPRO_SPLIT_FIRST: fitting the target scale, the output partition and "
+              "the feature scaler on each training fold only")
+
+    def prep_for(seed):
+        return prepare_split_first(X, y, seed) if SPLIT_FIRST else prep
 
     # --- flat MoG arms, concrete.py pipeline ---
     # Build the full job list first so results can be zipped back in job order.
@@ -250,10 +338,10 @@ def main():
     if N_JOBS > 1 and len(jobs) > 1:
         from joblib import Parallel, delayed
         results = Parallel(n_jobs=N_JOBS, backend="loky")(
-            delayed(_mog_task)(prep, seed, order, refine)
+            delayed(_mog_task)(prep_for(seed), seed, order, refine)
             for refine, order, seed in jobs)
     else:
-        results = [_mog_task(prep, seed, order, refine)
+        results = [_mog_task(prep_for(seed), seed, order, refine)
                    for refine, order, seed in jobs]
 
     for (refine, order, seed), (res, err) in zip(jobs, results):

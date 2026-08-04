@@ -1159,14 +1159,22 @@ def main(high_res=False, svg=False, scaling=False):
     #
     # It is a dict rather than a single list because the seeding here is genuinely
     # heterogeneous, and flattening it to one number would be the same lie in a
-    # different shape: the battery repeats over SEEDS, NERFCM restarts over
-    # NERFCM_SEEDS, and the multi-scale and selection generators use fixed per-dataset
-    # seeds so their cells are single deterministic runs with no spread to report.
+    # different shape.
+    #
+    # The first version of this block asserted a structure instead of reading the code,
+    # and got it wrong twice: it claimed a separate `NERFCM_SEEDS` drove the NERFCM
+    # restarts (that name is local to `fig_relational_memberships`, a *figure*
+    # function, and reaching for it here raised NameError), and it described the
+    # multi-scale generators as merely "fixed per-generator". What the code actually
+    # does: module-scope SEEDS drives `nerfcm_ari` AND `conivat_ari`, which are the only
+    # columns in the battery carrying a spread; everything else is one deterministic
+    # pass. Worth stating, because asserting a seed list rather than deriving it is the
+    # exact bug this block exists to fix.
     results["seeds"] = {
-        "battery_repeats": list(SEEDS),
-        "nerfcm_restarts": list(NERFCM_SEEDS),
-        "multiscale_and_selection": "fixed per-generator seeds; single deterministic "
-                                    "run per cell, no spread",
+        "nerfcm_and_conivat_restarts": list(SEEDS),
+        "set_cover_multiscale_and_selection":
+            "single deterministic run per cell; the generators are seeded per dataset "
+            "and no spread is computed, so these cells have no error bar",
     }
     with open(f"{OUT}/results.json", "w") as f:
         json.dump(results, f, indent=2)

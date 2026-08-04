@@ -37,7 +37,9 @@ def archives():
         prov = os.path.join(OUTPUTS, entry, "PROVENANCE.txt")
         if not os.path.isfile(prov):
             continue
-        with open(prov) as f:
+        # UTF-8 pinned for the same reason as `_read` below: this file is
+        # produced by run_all_tables.sh and read back on a cp1252 host.
+        with open(prov, encoding="utf-8", errors="replace") as f:
             text = f.read()
         stamp = _STAMP.search(text)
         label = _LABEL.search(text)
@@ -88,7 +90,15 @@ def table(basename, label=None):
 
 
 def _read(path):
-    with open(path, newline="") as f:
+    # UTF-8 pinned, matching `common.write_csv`, which writes these files with
+    # `encoding="utf-8"` explicitly. Left to the platform this reads cp1252 on Windows,
+    # and every header carrying a non-ASCII character comes back mojibake: `R²` decodes
+    # as `RÂ²`, so `row["R²"]` raises KeyError and the figure dies. That is exactly how
+    # `fig_01_pipeline_roadmap` and `fig_04_anomaly_sweep` failed -- the two figures that
+    # read a table with `R²` or `Δ` in a column name. The writer half of this pair was
+    # already pinned for the same reason; the reader half was not, so the harness could
+    # only round-trip its own output on a UTF-8 locale.
+    with open(path, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
