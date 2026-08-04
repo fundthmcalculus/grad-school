@@ -21,16 +21,28 @@ MEMORY_SIZE = 25  # long-term average spans the MEMORY_SIZE steps before that wi
 # Rows of history needed before a feature row has a fully populated long-term average.
 HISTORY_LEN = WINDOW_SIZE + MEMORY_SIZE
 
-# A 0th-order consequent, against the library default of '1st'. The three features
-# per angle are near-collinear -- at dt=0.01 a 50-step average trails the current
-# value by ~0.2 rad against a ~4.5 rad range, correlation 0.98 -- so a consequent
-# that is linear in them is ill-conditioned and extrapolates without bound: it
-# spikes to |omega| in the hundreds a few steps into a rollout and then locks the
-# angles at a fixed point. The piecewise-constant consequent cannot extrapolate,
-# and tracks ~3x closer over the full run. Widening the window is what supplies the
-# velocity information; 50/25 tracks theta_1 to 0.1 rad for ~0.8 s, against ~0.2 s
-# at the 5/3 window.
+# A 0th-order consequent, against the library default of '1st'. At the 5/3 window
+# this was forced: there the three features per angle correlate at 0.98, a linear
+# consequent over them is ill-conditioned, and the rollout spiked to |omega| in the
+# hundreds within a few steps before locking the angles at a fixed point. At 50/25
+# the collinearity is milder (worst pairwise 0.78 within an angle's block) and
+# energy projection bounds omega anyway, so 1st order is no longer unstable -- but
+# 0th still leads on the horizon over seven held-out initial conditions: theta_1
+# holds 1 rad for 3.67 s past the seed against 2.99 s, with theta_2 MAE 10.2
+# against 21.7. Widening the window is what supplies the velocity information.
 TSK_ORDER = '0th'
+
+# Rejected: feeding differences instead of raw averages, i.e. replacing
+# (theta, MA_short, MA_long) with (theta, theta - MA_short, MA_short - MA_long) to
+# make velocity explicit rather than implicit in near-cancelling terms. The premise
+# does not survive measurement. The 0.98 collinearity that motivated it belongs to
+# the 5/3 window; at 50/25 the raw block is already at 0.78, and the difference
+# transform *raises* the worst pair to 0.84 -- the two lagged velocity proxies
+# correlate with each other about as badly as the averages did. Over the same seven
+# ICs it does not pay: with a 0th-order consequent the 1 rad horizon collapses to
+# 0.47 s and theta_1 MAE nearly doubles to 2.06; with 1st order it takes theta_1
+# MAE to 0.924, the best of any arm, but gives back the horizon (3.52 s) and 65% of
+# theta_2 MAE (16.8). No arm dominates the raw/0th pairing, so it stands.
 
 # Rescale each predicted omega so the rollout stays on the true energy shell. The
 # unprojected rollout drifts by ~19 against an E0 of ~0.006 -- it silently becomes a
