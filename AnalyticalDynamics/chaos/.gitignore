@@ -1,0 +1,13 @@
+# Regenerated artifacts, following the convention of the root .gitignore for
+# /AnalyticalDynamics/*.png: anything a script rebuilds on every run is not
+# tracked.
+#
+# data/    16 MB, rebuilt by pendulum_data.py in ~13 s
+# figures/ 3.8 MB, rebuilt by run_all.py + bracket_diagnostic.py
+#
+# results/ IS tracked. The sweep CSVs are the evidence behind every number in
+# REPRODUCTION_REPORT.md -- 167 scored configurations that take ~2 hours to
+# reproduce -- and they are small. Same reasoning as reproduce/outputs/.
+data/
+figures/
+results/*.log
