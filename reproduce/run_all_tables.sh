@@ -52,6 +52,16 @@ FAST_SEEDS="${REPRO_FAST_SEEDS:-0,1,2}"
 # explicitly; this covers the generators' own stdout for the same reason.
 export PYTHONIOENCODING=utf-8
 
+# Unbuffer the generators' stdout. Python buffers when stdout is a file rather than a
+# terminal, and every generator here is run with `>"$log"` -- so a long one shows an
+# EMPTY log for its whole duration and then dumps everything at exit. That is bad in
+# two ways this project already has scars from. Watching a 25-minute GPU sweep, an
+# empty log is indistinguishable from a hung process: on the run that prompted this
+# line the only way to tell it was alive was to notice a python.exe holding 12.9 GB.
+# And if a generator is killed or dies hard, the buffer goes with it -- so the log of
+# the run that failed is blank, which is the exact opposite of what a log is for.
+export PYTHONUNBUFFERED=1
+
 # Table 4.4b, the theta operating curve, is emitted by table_4_4_openset ONLY when
 # this is set -- so every sweep so far produced 4.4 and silently omitted 4.4b,
 # while 4.4b sat in the archives from a hand-run. Defaulted here so the curve is
