@@ -1,0 +1,38 @@
+--- table_4_8_mf_dedup + table_4_9_correction_pass: 2026-08-05 ---
+tribble-fis (pinned, grad-school `git ls-tree HEAD tribble-fis`): 6ddb80281af49688bce21fe218eeab47469976dd
+tribble-fis (commit actually run against): c4e690fe6d14ec2f8f293044ff52ca560472fc85
+seeds:       0,1,2,3,4,5,6,7,8,9
+
+SHA MISMATCH, RESOLVED. This session's `grad-school/tribble-fis` submodule directory
+was not checked out (empty; `uv run --project tribble-fis` there has no environment),
+so this table was run from a separate `tribble-fis` clone at its main-branch tip
+(c4e690f) instead of the repo's pinned commit (6ddb8028) -- exactly the failure mode
+CHECKLIST.md B4 ("submodule SHA guard") already flags as unresolved, caught here by
+hand rather than by tooling.
+
+Diffed the two commits (`git diff 6ddb8028..c4e690f -- src/tribblefis/`): two files
+differ, `scaling.py` (unrelated to this table) and `regression.py` (a `predict_tsk`
+indexing fix, `y_bucket_mean[rule_id]` -> `y_bucket_mean[ij]`, relevant to the
+regression arms). Re-ran the full 10-seed sweep against the pinned commit (6ddb8028)
+and diffed all three output files against the c4e690f run: byte-identical. The fix is
+a no-op for this table's regression setup (3 contiguous 0-indexed output buckets,
+where rule_id == ij always), so the committed numbers are correct for the pinned
+commit even though they were first produced against a later one. Re-verify if this
+table is ever re-run with a non-default `n_output_buckets` or a non-contiguous label
+set, where the two commits would not agree.
+
+machine:
+  host             vm (separate tribble-fis clone; NOT the grad-school checkout)
+  os               Linux-6.18.5-fc-v18-x86_64-with-glibc2.39
+  kernel           Linux 6.18.5-fc-v18 x86_64
+  cpu              Intel(R) Xeon(R) Processor @ 2.80GHz
+  cores            4 logical, 4 physical per socket
+  ram              15.7 GiB (16.9 GB decimal)
+  gpu              none detected
+  python           3.11.15
+  numpy            2.4.6  scipy 1.17.1  scikit-learn 1.9.0
+
+status:
+  table_4_8_mf_dedup           ok  seeds=0,1,2,3,4,5,6,7,8,9
+  table_4_8_mf_dedup_sweep     ok  seeds=0,1,2,3,4,5,6,7,8,9
+  table_4_9_correction_pass    ok  seeds=0,1,2,3,4,5,6,7,8,9
