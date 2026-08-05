@@ -226,4 +226,103 @@ Three goals are narrowed rather than dropped. Each narrowing's reason is here; C
 
 ---
 
-*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility) and A.6 (side quests) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../CHECKLIST.md`.*
+## A.7 Benchmark dataset inventory, by category
+
+A.5 above answers *is this dataset public, and is it present in this repository.* This section answers a different question: for each task category the document measures something on, does a **small, fast** dataset and a **large, at-scale** dataset both exist — the pairing that lets a method be iterated on cheaply and then shown not to fall over at size. Availability and role-completeness are not the same claim, and keeping them separate matters here: a dataset can be public and present and still leave a category with no large partner, and a category can name a large dataset that has never once been measured. Compiled by reading every prose chapter, `CHECKLIST.md`, `NEXT_STEPS.md`, and the loader code under `reproduce/tables/`, `reproduce/optimizers/`, and `FuzzySystemsExperiments/`.
+
+**Status vocabulary**, reusing A.5's own distinction rather than inventing a second one: *measured* (a seeded, repeatable generator produced the number cited), *demonstrated* (a single-shot run at scale, recorded with hardware and footprint instead of a spread, per §7.2's rule), *named* (appears in the prose or in a loader script, but no run of any kind exists), and one state A.5 does not need but this table does — *unwired* (a real dataset, verified loadable, that no generator or manifest entry uses yet).
+
+### A.7.1 Regression
+
+| Dataset | Size | Status | Role |
+|---|---|---|---|
+| UCI Concrete Compressive Strength | 1,030 × 8 | measured (Ch1, Ch2, Ch4 §4.3.2–4.4, Ch6, every table generator that touches regression) | small / fast — the *only* regression benchmark in the document, at every consequent order |
+| Diabetes (sklearn) | 442 × 10 | measured (Table 4.8, dedup sweep only) | small / fast — chosen for the tolerance sweep, not a modeling flagship |
+
+**Gap.** No large regression dataset appears anywhere. Concrete carries the entire regression story, including Chapter 6's model-family comparison and the optimizer study's hot-start problem (A.7.6). There is no regression counterpart to classification's PhiUSIIL/RT-IOT2022 pairing below.
+
+### A.7.2 Classification
+
+| Dataset | Size | Status | Role |
+|---|---|---|---|
+| Glass (UCI) | 214 × 9, 6 classes | measured — also the anomaly substitute (A.7.3) and the Table 4.8/4.9 dedup and correction-pass testbed | small / fast |
+| Wine, Breast Cancer, Digits (sklearn) | 178×13 / 569×30 / 1,797×64 | measured (Table 4.8, dedup sweep only) | small / fast |
+| PhiUSIIL phishing URL | 235,000 × 54, binary | measured historically (Table 4.1: 0.997 ± 0.001 acc, 0.28–0.64 s) — **but no longer reproducible from a clean checkout.** The repo loader's bundled copy lived at `tribble-fis/gaussian_mixture/phishing_data/`, and `gaussian_mixture/` was deleted upstream (commit `8484fd6`, per `_fuzzy_models.py`'s own comment); `data/` in this repository holds only `Concrete_Data.csv`. A fresh run falls through to a `ucimlrepo` fetch that returns a *different* feature set, which the loader's own comment flags as producing results "not comparable" to every number quoted from it | large / scale — the one role currently filled, on a fragile path |
+| RT-IOT2022 | 123,000 × 83, 12 classes | named — `FuzzySystemsExperiments/iot.py` exists but its own comment states the `rt-iot2022/` data directory "is not in this repo"; Table 4.4 marks the row unrun | large / scale — the *intended* flagship, never measured |
+
+**Gap, of a different shape than A.7.1's.** Both roles are nominally filled, but the large role has no solid representative today: PhiUSIIL's measured numbers are real but sit on a reproduction path this pass found to be broken, and RT-IOT2022, the dataset actually named as the chapter's scale target, has never been run at all. A.5 states "Concrete, PhiUSIIL and the shuttle set are public and present, a reader can reproduce those results directly" — that sentence is no longer accurate for PhiUSIIL and is worth revisiting there.
+
+### A.7.3 Anomaly / open-set detection
+
+| Dataset | Size | Status | Role |
+|---|---|---|---|
+| Glass, leave-one-class-out | 214 × 9, 6 classes | measured (Tables 4.6–4.7, Fig 4.2) — explicitly called "a stress test, not a demonstration," i.e. a substitute standing in for the missing large set | small / fast |
+| BETH (host telemetry) | not stated in the document | named — `FuzzySystemsExperiments/beth.py` and `beth-anomaly.py` both exist (one is the source of the inherited θ = 0.99 default) but both need a local `beth_data/` file that is absent; also structurally blocked, since leave-one-class-out needs at least three classes and BETH is binary | large — never measured, and not just a data-availability gap: the experiment protocol itself needs a one-class path that does not exist yet (Ch10, 2027 Q2) |
+
+**Gap.** No large anomaly dataset exists in any form; A.5 already says this plainly. Worth restating here because it is the cleanest single-category case of a missing large partner: the small side is not a stopgap awaiting data, it is standing in for an experiment design that has not been decided yet.
+
+### A.7.4 Clustering / structure discovery (Ch3)
+
+| Dataset | Size | Status | Role |
+|---|---|---|---|
+| Synthetic batteries (circular-cities, two_moons, circles, aniso, bridged) | 120–1,500 pts | measured (Fig 2.2; Tables 3.5–3.7) | small / fast |
+| NASA/UCI Statlog Shuttle | ~58,000 × 7, 7 classes | demonstrated — an exact reorder, "in about a minute," recorded with hardware and precision per §7.2's rule; fetched over the network via `ucimlrepo` (`FuzzySystemsExperiments/nasa.py`), not wired into `reproduce/manifest.py` as a repeatable table cell | large / scale — also the flagship for the Chapter 7 capstone, which notes it *has coordinates* and so does not by itself close Goal G2 |
+| Psychiatric-evaluation set (private) | 135,000 × 165 | demonstrated — same single-shot standard, but **not public and not redistributable**: feature names were anonymized before the author saw them, so no conclusion is drawn from any individual feature, and the measurement is not independently reproducible by anyone else | large / scale |
+
+**Gap, again a different shape.** Two large representatives exist, but both are demonstrations rather than measurements — single-shot, no seed spread, by design (§7.2) — and one of the two cannot be handed to anyone else at all. This category has a large *role* filled twice over and a large *measurement* filled zero times; the small/fast side is the only one with the seeded, repeatable evidence the document's own G4a standard asks for.
+
+### A.7.5 Topological membership generation (Ch5, all synthetic)
+
+| Dataset family | Size | Status | Role |
+|---|---|---|---|
+| two_gaussians, bridged_gaussians, concentric_rings, varying_density, uniform_noise | 120–160 pts | measured (Table 5.1) | small / fast |
+| nested_gaussians, three_level_hierarchy, density_hierarchy | n = 96–120, single fixed realization | measured, but with no seed spread — "singly-realized" (Table 5.2, Fig 5.2) | small |
+| three_clusters_tree, chain_then_ring, multi_scale_hierarchy | n = 30, 40, 39 | measured — the chapter's only coordinate-free experiment, and it scores NERFCM rather than the chapter's own selector | small |
+| scalable_single_scale, scalable_many_scale, scalable_log_separated | n = 100…5,000, generator-swept | named only. §5.4's own text is explicit: "no recorded run of the [8, 4, 2] recovery exists at any size other than 96... the 'unchanged from 100 up to 5,000' sentence describes a table never written" | large / scale — the generators exist and run (`battery_hierarchical.SCALABLE`), but no output has ever been produced or registered in `reproduce/manifest.py` |
+
+**Gap.** This is the one category where the chapter has already caught and stated its own gap in the prose: every dataset actually scored is small (≤160 points, several at a single fixed size with no seed spread), and the large/scaling regime this chapter needs to support its own invariance claim exists only as an unrun generator.
+
+### A.7.6 Optimizer / identification benchmarks — a role reuse, not a separate pool
+
+`reproduce/optimizers/` and Chapter 6 §6.3.5 do not introduce new datasets; they put Concrete and PhiUSIIL through a different task (antecedent-refinement search, classical-vs-construction identification at scale) and inherit both datasets' status from A.7.1 and A.7.2 above — Concrete filling the small/fast rung, PhiUSIIL the large/scale one, on the same fragile reproduction path noted there. Appendix A.3's TSP timings reuse the two_moons/circles synthetics from A.7.4 for the same reason.
+
+### A.7.7 Non-coordinate / relational family for Goal G2 — verified loadable, not yet wired in
+
+| Dataset | Size | Status |
+|---|---|---|
+| ECG5000 | 5,000 series × 140 | unwired — verified loadable via `aeon.datasets.load_classification` (network fetch), no `reproduce/` generator uses it |
+| FordA | 4,921 × 500 | unwired, same verification path |
+| ElectricDevices | 16,637 × 96 | unwired, same verification path |
+| StarLightCurves | 9,236 × 1,024 | unwired, same verification path |
+| Crop | 24,000 × 46, 24 classes | unwired — named in `NEXT_STEPS.md` as "the scale target," ≈4.6 GB as a float64 dissimilarity matrix |
+| TUDataset graphs (MUTAG, PROTEINS, ENZYMES, NCI1); Duin–Pękalska dissimilarity collection | not stated | unwired, and one step earlier than the row above: `NEXT_STEPS.md` calls this family "to confirm," with verification still in progress |
+
+**Not a gap in the same sense as the others — a different state entirely, worth distinguishing.** Both a small/mid representative (ECG5000, FordA) and a large one (Crop) have already been identified and confirmed loadable; what has not happened is a single generator or manifest entry that uses either. This is a category where the small/large pairing is *planned*, not missing — closer to A.7.5's gap than to A.7.1's or A.7.3's, but one step earlier: nothing has been run yet, including the small side.
+
+### A.7.8 Named in the prose or in a script, with no working path today
+
+| Dataset | Where named | What exists |
+|---|---|---|
+| Gas turbine set | Ch6 §6.4 | loader `FuzzySystemsExperiments/turbine.py` exists; its data directory does not |
+| Wine quality (UCI) | Ch6 §6.4 | loader `FuzzySystemsExperiments/wine_red.py` exists — despite the filename, it reads `winequality-white.csv`, per its own in-code comment; that file is not in this repository |
+| IoT-botnet set | Ch6 §6.4 | loader `FuzzySystemsExperiments/iot-botnet.py` exists; per CHECKLIST **B9** it "has no recoverable explicit list" for which columns need log-scaling, and no local data either |
+| Wave-energy set | Ch6 §6.4 | no loader, no data, no other mention anywhere in the repository |
+
+These four are not placed into A.7.1–A.7.5's categories because none has ever been assigned a small-or-large role in the first place; they are named as a "broadened suite" and left there. Table 7.1 already marks this tier "not started; no loaders wired," which this row-by-row pass confirms rather than contradicts.
+
+### Summary — where the small/large pairing is actually missing
+
+Sorted by how complete the gap is, not by chapter:
+
+1. **Regression (A.7.1) has no large dataset in any form.** Not named, not attempted, not demonstrated.
+2. **Anomaly detection (A.7.3) has no large dataset in any form**, and the reason is partly a research decision (a one-class protocol) rather than only a missing file.
+3. **Topological membership generation (A.7.5) has no large *measurement*.** The generators exist; the run does not, by the chapter's own admission.
+4. **Classification (A.7.2) has a named large dataset that was never measured** (RT-IOT2022) **and a measured large dataset whose reproduction path is now broken** (PhiUSIIL) — a category that looks complete until either row is checked.
+5. **Clustering (A.7.4) has two large representatives, and zero large *measurements*** — both are single-shot demonstrations by design, one of them permanently non-reproducible by a third party.
+6. **The non-coordinate/relational family (A.7.7) has a full small-and-large pairing already identified and confirmed loadable, run zero times.** This is the one row where "wire it in" is closer to true than "find a dataset."
+
+None of the above is filled in here. That is the point of the exercise: A.5 already says which datasets are public and present; this section says, by category, which small/large pairing is real and which is a name.
+
+---
+
+*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility), A.6 (side quests) and A.7 (dataset inventory) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../CHECKLIST.md`.*
