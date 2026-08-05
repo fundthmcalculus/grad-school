@@ -246,5 +246,5 @@ would have been.
 
 ---
 
-*Review by Claude, 2026-08-02. Figures drawn against `reproduce/outputs/main-d0efefc/`,
+*Review dated 2026-08-02. Figures drawn against `reproduce/outputs/main-d0efefc/`,
 `tribble-fis` `d0efefc`, `tribble-cluster` `e3c27e6`.*
