@@ -12,11 +12,10 @@ rather than a winner, and the crossover is the honest answer to "can we beat it"
 
 Two caveats bound what this can show, and both are properties of `elkai` rather than of LKH:
 
-* it needs a full integer distance matrix, so memory is O(n^2) and instances above a few
-  thousand cities are out of reach here;
-* it takes no time limit, only a run count, so its cheapest available point is one full run —
-  and on these instances that is already seconds to a minute. LKH *has* no fast regime through
-  this interface, which is exactly why the crossover sits where it does.
+* it takes no time limit, only a run count, so its cheapest available point is one full run.
+  LKH has no arbitrarily-fast regime through this interface, and where that floor sits relative
+  to our curve is most of the answer;
+* it builds the problem as EUC_2D, so CEIL_2D instances would be mis-scored and are skipped.
 
 Run:  python frontier_vs_lkh.py [--instances pr1002 d1291 pr2392] [--out lkh_frontier.json]
 """
@@ -43,7 +42,7 @@ LK_GRID = [(32, 2, 4), (32, 3, 8), (32, 6, 8), (32, 6, 32), (32, 10, 32), (48, 1
 
 # Kick budgets for the iterated arm. Spread over two orders of magnitude, because the whole
 # question is what the curve does as effort grows rather than where one point lands.
-KICKS = [0, 100, 400, 1600, 6400, 25600]
+KICKS = [0, 100, 400, 1600, 6400, 25600, 102400]
 
 # LKH's own effort dial.
 LKH_RUNS = [1, 2, 5]
@@ -74,19 +73,25 @@ def lkh_curve(inst, runs_list, timeout=600):
 
     out = []
     for runs in runs_list:
+        # The *coordinates* API, not solve_int_matrix. Handing LKH a dense matrix disables
+        # its own geometric preprocessing — alpha-nearness candidate sets built from a
+        # minimum spanning tree — and it becomes drastically slower: one run on pr1002 does
+        # not finish in 420s through the matrix interface and takes about a second through
+        # this one. Measuring the matrix path would have understated LKH by orders of
+        # magnitude, which is the opposite of the error worth making here.
         code = (
             "import time, numpy as np, elkai, sys;"
             "sys.path.insert(0, %r);" % str(HERE)
-            + "from tsplib import load, reference_length;"
+            + "from tsplib import load, reference_length, validate_tour;"
             f"inst = load({inst.name!r});"
-            "c = inst.coords;"
-            "d = np.rint(np.hypot(c[:,0][:,None]-c[:,0][None,:], "
-            "c[:,1][:,None]-c[:,1][None,:])).astype(np.int64);"
+            "coords = {str(i): (float(x), float(y)) for i, (x, y) in enumerate(inst.coords)};"
             "t0 = time.perf_counter();"
-            f"tour = elkai.solve_int_matrix(d, runs={runs});"
+            f"order = elkai.Coordinates2D(coords).solve_tsp(runs={runs});"
             "dt = time.perf_counter() - t0;"
-            "import numpy as np2;"
-            "L = reference_length(np.asarray(tour, dtype=np.int32), inst);"
+            "tour = np.array([int(v) for v in order], dtype=np.int32);"
+            "tour = tour[:-1] if tour.shape[0] == inst.n + 1 else tour;"
+            "validate_tour(tour, inst.n);"
+            "L = reference_length(tour, inst);"
             "print(L, dt)"
         )
         try:
