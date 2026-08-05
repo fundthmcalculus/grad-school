@@ -26,7 +26,7 @@ from core import (
 )
 from fis_lk import construct as fis_build
 from fis_lk import local_search as fis_ls
-from lk import improve_city, lk_solve
+from lk import N_STATS, improve_city, lk_solve
 from tsplib import load, reference_length, validate_tour
 
 SMALL = ["berlin52", "a280", "pr1002"]
@@ -95,9 +95,12 @@ def test_every_move_gain_matches_the_tour():
         rev_i = np.empty(12, np.int64)
         rev_j = np.empty(12, np.int64)
         touched = np.empty(48, np.int32)
-        stats = np.zeros(fis.N_TERMS * 0 + 6, np.int64)
-        xc = np.empty(4, np.float64)
-        mu = np.empty((4, 3), np.float64)
+        stats = np.zeros(N_STATS, np.int64)
+        # sized from the rule base, never hard-coded: numba does not bounds-check, so a
+        # buffer one element short of the chain rule base's input count would be a silent
+        # out-of-bounds write rather than an error
+        xc = np.empty(fis.CH_N_IN, np.float64)
+        mu = np.empty((fis.CH_N_IN, fis.N_TERMS), np.float64)
         length = tour_length(tour, inst.coords, inst.ceil)
         moves = 0
         for _ in range(3):
@@ -162,6 +165,33 @@ def test_deferred_verification_never_returns_a_worse_tour():
     print("  deferred verification never worsens the tour               ok")
 
 
+def test_scratch_buffers_are_wide_enough_for_every_rule_base():
+    """Every hot-path scratch buffer must be at least as wide as its rule base's input
+    count.
+
+    numba does not bounds-check, so a buffer sized for a four-input rule base and handed
+    to a five-input one is a silent out-of-bounds write, not an exception — it corrupts
+    whatever follows it in memory and the solver carries on producing plausible tours.
+    Adding an antecedent is exactly the change that triggers it, so this asserts the
+    relationship rather than trusting every allocation site to have been updated.
+    """
+    for name, tab, ant in (
+        ("CONSTRUCT", fis.CONSTRUCT_TAB, fis.CONSTRUCT_ANT),
+        ("EFFORT", fis.EFFORT_TAB, fis.EFFORT_ANT),
+        ("CHAIN", fis.CHAIN_TAB, fis.CHAIN_ANT),
+        ("NO_CHAIN", fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT),
+    ):
+        assert tab.shape[0] == ant.shape[1], (
+            f"{name}: membership bank has {tab.shape[0]} inputs, rules have {ant.shape[1]}"
+        )
+        assert tab.shape[1] == fis.N_TERMS, f"{name}: wrong term count"
+        assert int(ant.max()) < fis.N_TERMS, f"{name}: a rule names a nonexistent term"
+    # the baseline arm passes the chain rule base through even with use_chain off, so its
+    # buffers must fit the real chain base, not the stub
+    assert fis.NO_CHAIN_ANT.shape[1] == fis.CH_N_IN, "NO_CHAIN stub width drifted"
+    print("  scratch buffers wide enough for every rule base            ok")
+
+
 def test_membership_table_matches_the_functions_it_compiled():
     """The lookup table is an optimisation, so it has to agree with the closed form it
     replaced — otherwise the fitted rule bases mean something different at run time than
@@ -219,6 +249,7 @@ def main():
     test_every_move_gain_matches_the_tour()
     test_solvers_return_valid_tours_and_honest_lengths()
     test_deferred_verification_never_returns_a_worse_tour()
+    test_scratch_buffers_are_wide_enough_for_every_rule_base()
     test_membership_table_matches_the_functions_it_compiled()
     test_fuzzy_construction_is_a_tour_and_beats_nothing_silently()
     test_scale_statistics_stay_finite_on_coincident_points()

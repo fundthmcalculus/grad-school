@@ -267,7 +267,17 @@ E_EXCESS = 0  # mean incident edge / nearest-neighbour distance  (HIGH = bad edg
 E_FAIL = 1  # how often this city has already come up empty     (HIGH = give up)
 E_TURN = 2  # local turn sharpness at the city                  (HIGH = kinked)
 E_PROGRESS = 3  # fraction of the search's work already spent    (HIGH = late)
-E_N_IN = 4
+# Rank of this city's worse tour edge within its own candidate list: 0 if that edge
+# already goes to its nearest neighbour, 1 if every candidate is closer than it. This is
+# the most direct statement of "is there anything here to find" the solver can make
+# cheaply, and unlike E_EXCESS it is scale-free without dividing by anything — it asks how
+# many strictly better neighbours exist rather than how much longer the edge is.
+E_RANK = 4  # (HIGH = many nearer neighbours going unused)
+# Peakedness of the neighbourhood: nearest-neighbour distance over the mean candidate
+# distance. LOW means one dominant close neighbour with the rest far away (a clustered or
+# isolated city, where the candidate list is mostly useless); HIGH means a uniform field.
+E_PEAK = 5  # (LOW = one close neighbour and a lot of nothing)
+E_N_IN = 6
 
 # outputs, each in [0, 1] and rescaled to a real LK parameter by the caller
 E_BREADTH = 0  # how far into the candidate list to back-track at the first level
@@ -312,6 +322,20 @@ EFFORT_RULES = [
     ({E_EXCESS: HIGH, E_PROGRESS: HIGH}, [0.90, 0.75, 0.85, 0.90]),
     ({E_TURN: LOW, E_FAIL: HIGH}, [0.25, 0.10, 0.02, 0.10]),
     ({E_TURN: LOW, E_PROGRESS: HIGH}, [0.35, 0.20, 0.08, 0.30]),
+    # edge rank: if the worse tour edge already runs to the nearest neighbour there is
+    # nothing a wider or deeper search can find here, whatever the other cues say
+    ({E_RANK: LOW}, [0.25, 0.15, 0.05, 0.25]),
+    ({E_RANK: MED}, [0.65, 0.50, 0.45, 0.65]),
+    ({E_RANK: HIGH}, [0.95, 0.85, 0.90, 0.95]),
+    # rank is evidence about *where* the move is, so it earns breadth more than depth
+    ({E_RANK: HIGH, E_EXCESS: LOW}, [0.90, 0.70, 0.45, 0.75]),
+    ({E_RANK: LOW, E_EXCESS: HIGH}, [0.45, 0.35, 0.60, 0.60]),
+    ({E_RANK: LOW, E_FAIL: HIGH}, [0.15, 0.05, 0.02, 0.08]),
+    # a peaked neighbourhood means the candidate list runs out of useful entries early,
+    # so breadth is wasted there while depth may still pay
+    ({E_PEAK: LOW}, [0.35, 0.30, 0.50, 0.55]),
+    ({E_PEAK: HIGH}, [0.70, 0.60, 0.50, 0.65]),
+    ({E_PEAK: LOW, E_RANK: HIGH}, [0.55, 0.45, 0.85, 0.80]),
 ]
 
 EFFORT_ANT, EFFORT_CONS = _pack(EFFORT_RULES, E_N_IN, E_N_OUT)
@@ -337,7 +361,14 @@ CH_CREDIT = 0  # gain credit carried into the next level, over the first broken 
 CH_DEPTH = 1  # how deep the chain already is, as a fraction of the cap
 CH_BANKED = 2  # best closing gain found so far, over the first broken edge
 CH_TRADE = 3  # next step's "break long, add short" margin, same scale
-CH_N_IN = 4
+# How much array the reversal at this level actually moved, as a fraction of the most it
+# could (n/2). This is the one input taken directly from the cost model rather than from
+# the search's own logic: reversal element traffic is a real and separately-priced part of
+# runtime (~5ns per element against ~120ns per chain level), and a chain working in a
+# region where every level shuffles half the tour is expensive in a way that no gain
+# number reveals. It costs nothing to read, because `reverse` already returns the count.
+CH_REVCOST = 4  # (HIGH = each level here is shifting a lot of array)
+CH_N_IN = 5
 
 # One output: a continuation score. The chain deepens while it is above 0.5.
 CHAIN_RULES = [
@@ -364,6 +395,14 @@ CHAIN_RULES = [
     ({CH_BANKED: HIGH, CH_DEPTH: HIGH}, [0.10]),
     ({CH_BANKED: LOW, CH_TRADE: HIGH}, [0.90]),
     ({CH_BANKED: HIGH, CH_CREDIT: LOW}, [0.08]),
+    # reversal traffic is real time that the gain trajectory says nothing about
+    ({CH_REVCOST: LOW}, [0.70]),
+    ({CH_REVCOST: HIGH}, [0.35]),
+    # expensive surgery needs better news to justify continuing
+    ({CH_REVCOST: HIGH, CH_CREDIT: LOW}, [0.05]),
+    ({CH_REVCOST: HIGH, CH_CREDIT: HIGH}, [0.70]),
+    ({CH_REVCOST: LOW, CH_CREDIT: MED}, [0.65]),
+    ({CH_REVCOST: HIGH, CH_DEPTH: HIGH}, [0.08]),
 ]
 
 CHAIN_ANT, CHAIN_CONS = _pack(CHAIN_RULES, CH_N_IN, 1)

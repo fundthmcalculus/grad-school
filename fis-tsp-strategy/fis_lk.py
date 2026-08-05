@@ -82,8 +82,9 @@ def fis_construct(
         unvisited[i] = i
         where[i] = i
     m = n
-    x = np.empty(4, np.float64)
-    mu = np.empty((4, 3), np.float64)
+    n_in = ant.shape[1]
+    x = np.empty(n_in, np.float64)
+    mu = np.empty((n_in, 3), np.float64)
 
     cur = start
     tour[0] = cur
@@ -245,11 +246,13 @@ def fis_lk_solve(
     # a city is settled once a full-effort attempt has failed on it and nothing has
     # touched its neighbourhood since
     settled = np.zeros(n, np.uint8)
-    x = np.empty(4, np.float64)
-    mu = np.empty((4, 3), np.float64)
-    xc = np.empty(4, np.float64)
-    mu_c = np.empty((4, 3), np.float64)
-    out = np.empty(4, np.float64)
+    n_e = ant.shape[1]
+    n_c = ch_ant.shape[1]
+    x = np.empty(n_e, np.float64)
+    mu = np.empty((n_e, 3), np.float64)
+    xc = np.empty(n_c, np.float64)
+    mu_c = np.empty((n_c, 3), np.float64)
+    out = np.empty(cons.shape[1], np.float64)
 
     cap = n + 1
     qa = np.empty(cap, np.int32)  # cheap pass, at the fuzzy-chosen effort
@@ -334,6 +337,22 @@ def fis_lk_solve(
             if v > 1.0:
                 v = 1.0
             x[3] = v
+
+            # rank of the worse incident tour edge within this city's candidate list:
+            # how many strictly nearer neighbours it is currently ignoring. The list is
+            # ascending, so this is a short scan that stops at the first candidate no
+            # nearer than the edge.
+            d_long = d_s if d_s > d_p else d_p
+            r = 0
+            for t in range(k):
+                if cand_d[t1, t] >= d_long:
+                    break
+                r += 1
+            x[4] = r / k
+
+            # peakedness of the neighbourhood: nearest-neighbour distance over the mean
+            # candidate distance. Both are precomputed, so this is two loads and a divide.
+            x[5] = nn1[t1] / mean_c[t1]
 
             fis_eval(x, mu, tab, ant, cons, out)
             stats[STAT_FIS_CALLS] += 1

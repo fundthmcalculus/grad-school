@@ -63,6 +63,13 @@ TEST = [
 # The baseline frontier: (candidate list, chain depth, deep breadth). Swept because
 # these are the three parameters that move its time/quality trade-off.
 BASE_GRID = [
+    # The cheap end matters more than it looks. An earlier sweep started at depth 4 and
+    # so had no cheap operating point at all, which flattered the fuzzy arm: it appeared
+    # to dominate six of nine configurations, when what it had actually done was land in
+    # a gap in the sweep. LK at depth 2-3 is both fast and respectable, and it is the
+    # configuration the adaptive arm has to beat.
+    (32, 2, 4),
+    (32, 3, 8),
     (16, 4, 8),
     (24, 4, 8),
     (32, 4, 8),
@@ -277,18 +284,58 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
     return rows
 
 
-def summarise(rows):
-    """Mean gap and total seconds per arm, plus which arms are on the frontier."""
+def _instance_frontier(row):
+    """The baseline sweep's own frontier on one instance, as ascending-time arrays."""
+    pts = []
+    for k, depth, deep in BASE_GRID:
+        key = f"lk_{k}_{depth}_{deep}"
+        if f"{key}_gap" in row:
+            pts.append((row[f"{key}_s"], row[f"{key}_gap"]))
+    keep = [p for p in pts if not any(q[0] <= p[0] and q[1] <= p[1] and q != p for q in pts)]
+    keep.sort()
+    t = np.array([p[0] for p in keep])
+    g = np.array([p[1] for p in keep])
+    for i in range(1, len(t)):
+        if t[i] <= t[i - 1]:
+            t[i] = t[i - 1] * (1 + 1e-9)
+    return t, g
+
+
+def summarise(rows, min_n=0):
+    """Per-arm aggregates, including the frontier-relative ratio that is the honest one.
+
+    Two numbers are reported and they answer different questions.
+
+    ``mean_gap`` / ``total_s`` is the conventional pair, and it is the one that misleads:
+    it puts an unweighted mean against a sum, so a handful of high-gap instances decide the
+    quality axis while the largest instance decides the time axis. Under that pair the
+    hand-written rule base appeared to dominate six of nine sweep configurations.
+
+    ``mean_q`` is per-instance: the arm's gap divided by the gap the baseline sweep's own
+    frontier reaches *at the same wall clock on that instance*, averaged over instances.
+    Below 1.0 means the arm is outside LK's frontier — beating every LK configuration that
+    spends what it spent — which is the actual claim. It needs no weighting choice, and it
+    cannot be carried by one instance.
+    """
     keys = [k[:-4] for k in rows[0] if k.endswith("_gap")]
+    use = [r for r in rows if r["n"] >= min_n]
     out = {}
     for key in keys:
-        gaps = [r[f"{key}_gap"] for r in rows if f"{key}_gap" in r]
-        secs = [r[f"{key}_s"] for r in rows if f"{key}_s" in r]
+        gaps, secs, qs = [], [], []
+        for r in use:
+            if f"{key}_gap" not in r:
+                continue
+            gaps.append(r[f"{key}_gap"])
+            secs.append(r[f"{key}_s"])
+            t, g = _instance_frontier(r)
+            if len(t):
+                qs.append(r[f"{key}_gap"] / max(float(np.interp(r[f"{key}_s"], t, g)), 1e-9))
         if not gaps:
             continue
         out[key] = {
             "mean_gap": float(np.mean(gaps)),
             "total_s": float(np.sum(secs)),
+            "mean_q": float(np.mean(qs)) if qs else None,
             "n_inst": len(gaps),
         }
     return out
@@ -311,11 +358,25 @@ def main():
     rows = run(names, args.reps, args.max_n, tuned, args.lkh)
 
     summary = summarise(rows)
+    summary_big = summarise(rows, min_n=1000)
     print(f"\n{'arm':>22s} {'mean gap':>9s} {'total s':>9s} {'n':>4s}")
-    for key, v in sorted(summary.items(), key=lambda kv: kv[1]["mean_gap"]):
-        print(f"{key:>22s} {v['mean_gap']:8.3f}% {v['total_s']:8.4f}s {v['n_inst']:4d}")
+    print(f"\n{'arm':>32s} {'mean gap':>9s} {'total s':>9s} {'mean q':>7s} {'q n>=1k':>8s}")
+    for key, v in sorted(
+        summary.items(), key=lambda kv: kv[1]["mean_q"] if kv[1]["mean_q"] else 9e9
+    ):
+        qb = summary_big.get(key, {}).get("mean_q")
+        q = v["mean_q"] if v["mean_q"] is not None else float("nan")
+        qbv = qb if qb is not None else float("nan")
+        secs = v["total_s"]
+        gap = v["mean_gap"]
+        print(f"{key:>32s} {gap:8.3f}% {secs:8.3f}s {q:7.4f} {qbv:8.4f}")
+    print("\n(mean q < 1 means outside the baseline frontier at the same wall clock)")
 
-    Path(args.out).write_text(json.dumps({"rows": rows, "summary": summary}, indent=1))
+    Path(args.out).write_text(
+        json.dumps(
+            {"rows": rows, "summary": summary, "summary_n_ge_1000": summary_big}, indent=1
+        )
+    )
     print(f"\nwrote {args.out}")
 
 

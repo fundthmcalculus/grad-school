@@ -30,7 +30,7 @@ from __future__ import annotations
 import numpy as np
 from numba import njit
 
-from fis import NO_CHAIN_ANT, NO_CHAIN_CONS, NO_CHAIN_TAB, fis_eval1
+from fis import CH_N_IN, NO_CHAIN_ANT, NO_CHAIN_CONS, NO_CHAIN_TAB, fis_eval1
 from core import (
     block_swap,
     dist,
@@ -139,7 +139,8 @@ def _lk_chain(
         else:
             ri = pos[t4]
             rj = pos[cur_t2]
-        stats[STAT_REV_WORK] += reverse(tour, pos, n, ri, rj)
+        rev_swaps = reverse(tour, pos, n, ri, rj)
+        stats[STAT_REV_WORK] += rev_swaps
         rev_i[level] = ri
         rev_j[level] = rj
 
@@ -212,6 +213,11 @@ def _lk_chain(
                 xc[3] = 1.0
             elif xc[3] < 0.0:
                 xc[3] = 0.0
+            # how much array this level's reversal actually moved, over the most it
+            # could. `reverse` returns its swap count, so this costs nothing to read.
+            xc[4] = 4.0 * rev_swaps / n
+            if xc[4] > 1.0:
+                xc[4] = 1.0
             stats[STAT_CHAIN_CALLS] += 1
             if fis_eval1(xc, mu, ch_tab, ch_ant, ch_cons) < 0.5:
                 break  # cut it here
@@ -459,8 +465,8 @@ def lk_solve(
     if tsize < 8:
         tsize = 8
     touched = np.empty(tsize, np.int32)
-    xc = np.empty(4, np.float64)
-    mu = np.empty((4, 3), np.float64)
+    xc = np.empty(CH_N_IN, np.float64)
+    mu = np.empty((CH_N_IN, 3), np.float64)
 
     cap = n + 1
     queue = np.empty(cap, np.int32)
