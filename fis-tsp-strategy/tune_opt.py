@@ -20,7 +20,8 @@ membership functions move too â€” every term's centre and width on every input â
 is what decides where one linguistic term stops and the next begins. That is 72 extra
 parameters on top of the 110 consequents. Because the membership bank is
 compiled to a lookup table (``fis.mf_table``), the functional form is a free choice as
-well, so gaussian and triangular terms are both fitted and compared.
+well; triangular terms beat gaussian ones on every run that compared them, so they are
+the default and gaussian is left selectable rather than swept.
 
 **3. The instance pool is larger and size-weighted.** 18 training and 13 validation
 instances reaching n = 5934, against the previous 12 and 6, and deliberately weighted
@@ -33,7 +34,7 @@ optimises against and that all selection goes through.
 Every training instance is disjoint from ``benchmark.TEST``; the assertion at import
 time enforces it rather than trusting the lists to stay right.
 
-Run:  python tune_opt.py [--mf-kinds gaussian triangular] [--mf-scopes base input]
+Run:  python tune_opt.py [--mf-kinds triangular] [--mf-scopes base input]
                         [--optimizers ga|pso|aco] [--generations 40] [--out tuned_opt.npz]
 """
 
@@ -213,7 +214,8 @@ class ParamSpace:
 #
 # What replaces it asks the frontier question directly, per instance:
 #
-#     q_i = gap_i / (the gap the swept baseline achieves at cost_i)
+#     q_i = (this candidate's tour length on instance i)
+#           / (the tour length the swept baseline frontier reaches at the same cost)
 #     J   = mean_i q_i
 #
 # q_i < 1 means "at the budget this candidate chose to spend, it beat every LK
@@ -338,7 +340,10 @@ class Objective:
             total += cost
             if abort and cost > self.abort_cost[i]:
                 return float("nan"), None, cost / self.abort_cost[i]
-            ratios.append(inst.gap(reference_length(tour, inst)) / max(self.bar(i, cost), 1e-9))
+            # a length ratio, not a gap ratio: gaps are 0 on instances the baseline
+            # solves exactly, and gap = 100 (L/L* - 1) makes the conversion trivial
+            gap = inst.gap(reference_length(tour, inst))
+            ratios.append((1.0 + gap / 100.0) / (1.0 + self.bar(i, cost) / 100.0))
         return float(np.mean(ratios)), np.array(ratios), total
 
     def report(self, theta, **kw):
@@ -517,7 +522,7 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--optimizers", nargs="*", default=["ga"])
-    ap.add_argument("--mf-kinds", nargs="*", default=["gaussian", "triangular"])
+    ap.add_argument("--mf-kinds", nargs="*", default=["triangular"])
     ap.add_argument("--mf-scopes", nargs="*", default=["base"])
     ap.add_argument("--shrink", type=float, default=0.3)
     ap.add_argument("--generations", type=int, default=30)

@@ -102,8 +102,14 @@ def figure(results, out):
         if key not in summary:
             continue
         v = summary[key]
+        # The q value goes in the label because this plane is the *aggregate* view — mean
+        # gap against total seconds — and that view flatters the fuzzy arms. q is the
+        # per-instance frontier ratio from FINDINGS.md §1 and is the honest number; a
+        # marker can sit below-left of this aggregate frontier while still having q > 1.
+        q = v.get("mean_q")
+        tag = f"{label}  (q={q:.4f})" if q else label
         ax.scatter(
-            v["total_s"], v["mean_gap"], marker=mk, s=size, color=col, zorder=5, label=label
+            v["total_s"], v["mean_gap"], marker=mk, s=size, color=col, zorder=5, label=tag
         )
 
     # The movement fitting produced. Drawn as arrows from the hand-written rule base to
@@ -136,7 +142,7 @@ def figure(results, out):
     ax.set_ylabel("mean % over published optimum")
     ax.set_title(
         "Swept LK effort baseline, and where adaptive effort lands\n"
-        "(down and left is better)",
+        "aggregate view — q in the legend is the per-instance frontier ratio",
         fontsize=10,
     )
     ax.grid(alpha=0.3, which="both")

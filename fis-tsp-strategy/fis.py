@@ -43,12 +43,11 @@ N_TERMS = 3
 
 
 def default_mf(n_in, sigma=0.30):
-    """Gaussian terms centred at 0.0 / 0.5 / 1.0 on every input.
+    """Membership terms centred at 0.0 / 0.5 / 1.0 on every input, with width ``sigma``.
 
-    ``sigma`` 0.30 makes adjacent terms cross at roughly half membership, so the
-    rule base interpolates smoothly instead of switching. Inputs are all mapped to
-    [0, 1] by their feature extractors, which is what lets one MF bank serve every
-    input.
+    0.30 makes adjacent terms overlap enough that the rule base interpolates smoothly
+    instead of switching. Inputs are all mapped to [0, 1] by their feature extractors,
+    which is what lets one bank serve every input.
     """
     c = np.tile(np.array([0.0, 0.5, 1.0]), (n_in, 1))
     s = np.full((n_in, N_TERMS), sigma, dtype=np.float64)
@@ -67,10 +66,17 @@ def _mf_triangular(xs, c, w):
     return np.maximum(0.0, 1.0 - np.abs(xs - c) / max(w, 1e-6))
 
 
-MF_KINDS = {"gaussian": _mf_gaussian, "triangular": _mf_triangular}
+MF_KINDS = {"triangular": _mf_triangular, "gaussian": _mf_gaussian}
+
+# Triangular is the default. Fitted against gaussian terms on the same instances, the
+# same optimiser and the same budget, triangular came out ahead every time it was tried
+# (validation frontier ratio 1.017 against 1.069 on the last full run), and it is cheaper
+# to tabulate besides. Gaussian is kept selectable because the invariant tests check the
+# lookup table against both closed forms.
+DEFAULT_MF_KIND = "triangular"
 
 
-def mf_table(mf_c, mf_w, kind="gaussian"):
+def mf_table(mf_c, mf_w, kind=DEFAULT_MF_KIND):
     """Compile a membership-function bank into a lookup table over [0, 1].
 
     Every fuzzy input here is already normalised to [0, 1] by its feature extractor,
@@ -79,8 +85,8 @@ def mf_table(mf_c, mf_w, kind="gaussian"):
     functional form. Two things fall out of that:
 
     * it is much cheaper. The cost model measured a rule-base evaluation at ~580ns
-      against ~870ns for the whole city scan it was deciding about, and the twelve
-      exponentials were most of it;
+      against ~870ns for the whole city scan it was deciding about, and the membership
+      functions were most of it;
     * the *shape* of the membership functions stops being hard-coded. Centres, widths
       and the functional form all become parameters the optimiser can move, because
       the hot path never knows which it got.

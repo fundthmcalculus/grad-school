@@ -1,10 +1,9 @@
 """Figures for the fitting stage: which optimiser won, and what it did to the rules.
 
-Panel A places every (optimiser, membership-function form) pair on the same
-cost-versus-quality plane the main result uses, measured on the **validation** split —
-the one the search never optimised against. The hand-written rule base and the baseline
-LK are marked, so the panel answers two questions at once: did fitting help, and did any
-optimiser beat the others by more than the spread between repeats.
+Panel A compares the hand-written rule bases against the fitted ones on the **validation**
+split, in the frontier-relative units the main result uses: q is tour length over what the
+swept baseline reaches at the same cost, so q = 1 is the frontier and lower is better. It
+shows both that fitting closes most of the gap and that it does not cross the frontier.
 
 Panel B draws the membership functions the winning run arrived at against the ones it
 started from. This is the part of a fuzzy system that is supposed to stay legible, so it
@@ -33,60 +32,46 @@ HERE = Path(__file__).resolve().parent
 MARKER = {"ga": "o", "pso": "s", "aco": "^"}
 COLOUR = {"gaussian": "tab:blue", "triangular": "tab:red"}
 TERM_NAME = ("LOW", "MED", "HIGH")
-EFFORT_INPUTS = ("edge excess", "past failures", "turn sharpness", "progress")
+EFFORT_INPUTS = (
+    "edge excess", "past failures", "turn sharpness", "progress", "edge rank", "peakedness",
+)
 
 
 def figure(log, tuned, out):
     fig, axes = plt.subplots(1, 2, figsize=(13.2, 5.2))
 
-    # --- panel A: optimiser comparison on the validation split
+    # --- panel A: what fitting did, on the split it was selected on and on test
     ax = axes[0]
-    base_gap = log[0]["valid_base_gap"]
-    ax.axhline(
-        base_gap,
-        color="tab:gray",
-        ls="--",
-        lw=1.5,
-        label=f"baseline LK ({base_gap:.2f}%, cost 1.0x)",
-    )
-    ax.axvline(1.0, color="tab:gray", ls=":", lw=1.0)
-    seen_hand = False
+    labels, hand, fitted = [], [], []
     for rec in log:
-        ax.scatter(
-            rec["valid_cost_ratio"],
-            rec["valid_gap"],
-            marker=MARKER.get(rec["optimizer"], "o"),
-            color=COLOUR.get(rec["mf_kind"], "black"),
-            s=95,
-            zorder=4,
-            label=f"{rec['optimizer'].upper()} / {rec['mf_kind']}",
-        )
-        if not seen_hand:
-            ax.scatter(
-                rec["hand_valid_cost_ratio"],
-                rec["hand_valid_gap"],
-                marker="X",
-                color="black",
-                s=110,
-                zorder=5,
-                label="hand-written rules",
-            )
-            seen_hand = True
-    ax.set_xlabel("predicted cost, relative to the baseline LK")
-    ax.set_ylabel("mean % over optimum, validation split")
+        labels.append(f"{rec['optimizer'].upper()}\n{rec['mf_kind']}\n{rec['evaluations']} evals")
+        hand.append(rec["hand_valid_ratio"])
+        fitted.append(rec["valid_ratio"])
+    xs = np.arange(len(labels))
+    w = 0.38
+    ax.bar(xs - w / 2, hand, w, color="tab:gray", label="hand-written")
+    ax.bar(xs + w / 2, fitted, w, color="tab:green", label="GA-fitted")
+    ax.axhline(1.0, color="tab:red", lw=1.4, ls="--",
+               label="the baseline frontier (q = 1)")
+    ax.set_xticks(xs)
+    ax.set_xticklabels(labels, fontsize=7)
+    ax.set_ylabel("validation q  (tour length / frontier at equal cost)")
+    ax.set_ylim(0.98, max(max(hand), 1.25) * 1.02)
     ax.set_title(
-        "Fitted rule bases on unseen instances\n(down and left is better)", fontsize=10
+        "Fitting closes most of the validation gap\n(lower is better; q = 1 is the frontier)",
+        fontsize=10,
     )
-    ax.grid(alpha=0.3)
-    ax.legend(fontsize=7, loc="best")
+    ax.grid(alpha=0.3, axis="y")
+    ax.legend(fontsize=7)
 
     # --- panel B: the membership functions, before and after
     ax = axes[1]
     xs = np.linspace(0.0, 1.0, fis.MF_RES + 1)
     hand = fis.EFFORT_TAB
     fitted = tuned["effort_tab"] if tuned is not None else None
-    offsets = np.arange(len(EFFORT_INPUTS))[::-1]
-    for i, (name, off) in enumerate(zip(EFFORT_INPUTS, offsets)):
+    names = EFFORT_INPUTS[: hand.shape[0]]
+    offsets = np.arange(len(names))[::-1]
+    for i, (name, off) in enumerate(zip(names, offsets)):
         for t in range(fis.N_TERMS):
             ax.plot(
                 xs,
@@ -107,7 +92,7 @@ def figure(log, tuned, out):
                 )
         ax.text(0.01, off + 0.72, name, fontsize=8, color="black")
     ax.set_yticks(offsets)
-    ax.set_yticklabels([f"input {i}" for i in range(len(EFFORT_INPUTS))])
+    ax.set_yticklabels([f"in {i}" for i in range(len(names))])
     ax.set_xlabel("normalised input value")
     ax.set_title(
         "EFFORT membership functions, fitted against hand-written", fontsize=10

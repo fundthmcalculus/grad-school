@@ -311,11 +311,16 @@ def summarise(rows, min_n=0):
     quality axis while the largest instance decides the time axis. Under that pair the
     hand-written rule base appeared to dominate six of nine sweep configurations.
 
-    ``mean_q`` is per-instance: the arm's gap divided by the gap the baseline sweep's own
-    frontier reaches *at the same wall clock on that instance*, averaged over instances.
-    Below 1.0 means the arm is outside LK's frontier — beating every LK configuration that
-    spends what it spent — which is the actual claim. It needs no weighting choice, and it
-    cannot be carried by one instance.
+    ``mean_q`` is per-instance: the arm's tour length divided by the tour length the
+    baseline sweep's own frontier reaches *at the same wall clock on that instance*,
+    averaged over instances. Below 1.0 means the arm is outside LK's frontier — a shorter
+    tour than every LK configuration that spends what it spent — which is the actual claim.
+    It needs no weighting choice and cannot be carried by one instance.
+
+    Lengths, not gaps. A ratio of gaps is undefined on the instances the baseline solves to
+    optimality, where the gap is exactly 0 — and since ``gap = 100 (L/L* - 1)``, the length
+    ratio is just ``(1 + gap/100) / (1 + bar/100)``, which is finite everywhere and reads
+    directly as "how much longer is this tour than LK's at the same budget".
     """
     keys = [k[:-4] for k in rows[0] if k.endswith("_gap")]
     use = [r for r in rows if r["n"] >= min_n]
@@ -329,7 +334,8 @@ def summarise(rows, min_n=0):
             secs.append(r[f"{key}_s"])
             t, g = _instance_frontier(r)
             if len(t):
-                qs.append(r[f"{key}_gap"] / max(float(np.interp(r[f"{key}_s"], t, g)), 1e-9))
+                bar = float(np.interp(r[f"{key}_s"], t, g))
+                qs.append((1.0 + r[f"{key}_gap"] / 100.0) / (1.0 + bar / 100.0))
         if not gaps:
             continue
         out[key] = {

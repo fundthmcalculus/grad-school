@@ -1,294 +1,390 @@
 # A fuzzy inference system as a TSP strategy engine — findings
 
-**Question.** Can a fuzzy inference system, reading the same cheap features a
-Lin-Kernighan solver already has to hand, beat that solver on both wall clock and
-tour quality by spending its search effort unevenly?
+A Lin-Kernighan solver spends its time unevenly and its parameters uniformly. This work
+replaces three of LK's fixed rules with fuzzy inference systems and measures what that
+buys:
 
-**Answer, in one line.** Partly. Fuzzy effort control produces a point that no
-configuration of the baseline dominates, and that strictly dominates three of the
-nine baseline configurations swept — cleanly and consistently for n ≥ 4000. It does
-not beat the baseline's *best-quality* configuration, which still reaches a shorter
-tour (2.95% vs 3.12% over optimum) for about twice the time. Below n ≈ 4000 the
-fuzzy arm is dominated outright: the per-city inference does not pay for itself when
-there is little search to allocate.
+* **`CONSTRUCT`** — which city to visit next, instead of "the nearest unvisited".
+* **`EFFORT`** — how hard to search each city, instead of one setting everywhere.
+* **`CHAIN`** — whether to deepen or cut each gain chain, instead of stopping at a fixed depth.
 
-Two of the three rule bases earned their place. The third — the fuzzy next-city
-ranker for construction — did not, and §5 says so with numbers.
+Both arms call the same `lk.py`. The baseline *is* that module with `use_chain` off and
+constant parameters, so the two cannot differ in move repertoire or in the speed of their
+arithmetic — only in strategy. Every reported tour is checked to be a permutation and
+re-scored from the coordinates under TSPLIB rounding, independently of the solver's own
+bookkeeping.
+
+**Where this stands.** Adaptive effort is competitive with a swept LK, and its standing
+improves monotonically with instance size: over the whole test set no fuzzy arm beats the
+best fixed LK configuration, but at n ≥ 2000 the best fuzzy arm is the best arm measured,
+and below n ≈ 1000 it is plainly worse. The margins at large n are smaller than this
+measurement can resolve; the size trend is much larger and is the real result. Fitting the
+rule bases with a genetic algorithm improves them on validation and makes them worse on
+test. Fuzzy construction fails.
 
 ---
 
-## 1. What is being compared, and why it is a frontier
+## 1. How this is measured
 
-The baseline is a real LK: variable-depth sequential gain chains implemented as
-chained 2-opt moves on an array tour, first-level backtracking over the candidate
-list, LKH's "break long, add short" ordering rule at depth, Or-opt(1..3) as a
-companion move, don't-look bits over a work queue, and shorter-side segment
-reversal. From a greedy-edge start it reaches ~2.8–3.1% over the published optima.
+Beating one configuration of a tunable solver proves nothing — there is always a slow one
+and always a weak one. So the baseline is LK swept into a time-versus-quality **frontier**
+over the parameters that trade one for the other: 11 configurations, k ∈ {16, 24, 32, 48,
+64}, chain depth 2…10, deep breadth 4…32.
 
-Beating one configuration of a tunable solver proves nothing, so the baseline is
-swept over the three parameters that trade its time against its quality
-(candidate-list size *k*, chain depth *d*, deep breadth *b*) and reported as a
-frontier. The claim under test is whether the fuzzy arm lands **outside** it.
+The reported number is **q**, computed per instance:
 
-Both arms run the same `lk.py`. The baseline *is* that module with `use_chain` off
-and constant parameters, so the two cannot differ in move repertoire or in the speed
-of their arithmetic — only in strategy. Every reported tour is checked to be a
-permutation of the cities and re-scored from coordinates under TSPLIB rounding,
-independently of the solver's bookkeeping. Times are the minimum of 3 runs after a
-warm-up that pays all JIT compilation. Test instances (20 TSPLIB instances,
-n = 52…18 512) are disjoint from the sets the rule bases were fitted and selected on.
+> **q** = (this arm's tour length) ÷ (the tour length the baseline sweep's own frontier
+> reaches **at the same wall clock on that instance**), averaged over instances.
 
-![time against quality](figures/fis_tsp_pareto.png)
+**q < 1 means the arm is outside LK's frontier** — a shorter tour than every LK
+configuration that spends what it spent. Three properties make this the right measure, and
+each was arrived at by getting it wrong first:
+
+* **Per instance, not aggregated.** The conventional pair — mean gap against total seconds —
+  puts an unweighted mean against a sum, so a few high-gap instances decide the quality axis
+  while the largest instance decides the time axis. Under that pair the hand-written rule
+  base appears to dominate most of the sweep; under q it does not. The aggregate was largely
+  measuring instance mix.
+* **Against the frontier, not one reference configuration.** A solver whose entire premise
+  is choosing its own operating point cannot be judged at someone else's. A sweep also has
+  to include a *cheap* point: an earlier sweep started at depth 4 and so had none, and the
+  fuzzy arm scored well by landing in the gap. LK at depth 2 reaches 4.05% in 1.86 s.
+* **Lengths, not gaps.** A ratio of gaps is undefined on instances the baseline solves
+  exactly, where the gap is 0. Since `gap = 100(L/L* − 1)`, the length ratio is just
+  `(1 + gap/100) / (1 + bar/100)` — finite everywhere, and it reads directly as "how much
+  longer is this tour".
+
+**q = 1 is a demanding bar.** The frontier is the envelope over all 11 configurations *per
+instance*, so no single fixed configuration reaches it either — the best fixed LK sits at
+q = 1.0035 over the test set. Only an oracle picking the best configuration per instance and
+per budget would sit at 1. Comparisons below are therefore between arms, not against 1.
+
+Reference values are the published TSPLIB optima. The 20 test instances (n = 52…18512) are
+disjoint from everything used for fitting; `tune_opt.py` asserts that at import rather than
+trusting the lists to stay right.
 
 ---
 
 ## 2. The result
 
-Every arm measured, over all 20 test instances, sorted by quality. Baseline
-configurations are labelled `k / depth / deep-breadth`.
+Test set, 20 instances, n = 52…18512, wall clock, best of 3 repetitions.
 
-| arm | mean % over optimum | total s |
-|---|---|---|
-| LK `k48/d10/b32` | **3.070** | 4.729 |
-| FIS effort + verification pass (§4) | 3.135 | 4.942 |
-| LK `k32/d10/b32` | 3.284 | 4.779 |
-| LK `k64/d10/b32` | 3.357 | 5.393 |
-| LK `k32/d6/b32` | 3.357 | 3.035 |
-| FIS effort, hand-written rules | 3.455 | 3.035 |
-| LK `k32/d10/b12` | 3.502 | 4.472 |
-| FIS effort, fitted rules | 3.512 | 3.142 |
-| LK `k32/d6/b8` | 3.571 | 3.057 |
-| **FIS effort + fuzzy chain cut-off** | **3.606** | **2.188** |
-| fuzzy construction + unmodified LK (§5) | 3.695 | 5.131 |
-| FIS effort + fuzzy construction (§5) | 3.847 | 3.269 |
-| LK `k32/d4/b8` | 3.881 | 2.400 |
-| FIS effort, NN start | 4.120 | 3.250 |
-| LK `k24/d4/b8` | 4.168 | 2.515 |
-| LK `k16/d4/b8` | 4.743 | 3.799 |
-
-The baseline's own Pareto frontier is `k32/d4/b8` (2.400 s, 3.881%) →
-`k32/d6/b32` (3.035 s, 3.357%) → `k48/d10/b32` (4.729 s, 3.070%).
-
-The fuzzy arm at **2.188 s / 3.606%** is dominated by nothing in the sweep, and
-strictly dominates `k32/d4/b8`, `k24/d4/b8` and `k16/d4/b8` — faster *and* shorter
-tours than all three. It is a genuine new point at the fast end of the frontier, not
-a re-parameterisation.
-
-It is not a clean win overall: `k48/d10/b32` still buys 0.54 points of quality for
-2.2x the time, and the fuzzy arm cannot reach it at any setting tested.
-
-### The result is strongly size-dependent
-
-This is the most informative cut in the study, and it is not visible in the totals.
-
-| | n < 4000 (12 inst.) | | n ≥ 4000 (8 inst.) | |
-|---|---|---|---|---|
-| arm | mean gap | total s | mean gap | total s |
-| LK `k32/d4/b8` | 4.420% | 0.187 | 3.073% | 2.213 |
-| LK `k32/d6/b32` | 3.505% | 0.231 | 3.136% | 2.804 |
-| LK `k48/d10/b32` | **3.148%** | 0.357 | **2.954%** | 4.372 |
-| FIS effort + chain | 3.928% | 0.235 | 3.124% | **1.953** |
-| FIS effort (hand-written rules) | 3.741% | 0.232 | 3.024% | 2.803 |
-
-- **n < 4000: every fuzzy arm is dominated** by `k32/d6/b32`. Consulting a rule base
-  per city — and per chain level — costs a fixed amount per decision, and on a small
-  instance there is not enough search for better allocation to repay it.
-- **n ≥ 4000: the fuzzy arms are not dominated by anything, and dominate
-  `k32/d6/b32`.** With the chain rules, 3.124% in 1.953 s against 3.136% in 2.804 s:
-  a shorter tour, 1.44x faster. With the hand-written effort rules at matched time
-  (2.803 s vs 2.804 s), 3.024% against 3.136% — 0.11 points of quality for free.
-
-So the honest scope of the claim is: **the strategy engine beats LK on both axes at
-scale, against LK at matched or lighter settings, and loses to LK's most expensive
-setting on quality.**
-
----
-
-## 3. The mechanism: depth is the budget, and it was not the obvious one
-
-The first design assumed candidate *breadth* was the thing to allocate. Measured, it
-is nearly free. Sweeping the first-level breadth from 2 to 32 with everything else
-fixed moves the clock by under 10%, because the sequential positive-gain criterion
-(`G_{i-1} - |y_i| > 0`) truncates most candidate scans long before the cap applies.
-
-Chain **depth** is where the time is. On 8 instances, `k=32`, deep breadth 32:
-
-| chain depth | mean gap | total s | chain levels entered |
+| arm | mean gap | total s | **q** |
 |---|---|---|---|
-| 4 | 3.121% | 0.0955 | 117 180 |
-| 6 | 2.929% | 0.1290 | 177 684 |
-| 10 | 2.833% | 0.2398 | 296 750 |
+| `lk_32_6_32` — best fixed LK | 3.485% | 2.99 | **1.0035** |
+| `lk_16_4_8` | 4.598% | 3.54 | 1.0040 |
+| `lk_32_2_4` | 4.048% | 1.86 | 1.0045 |
+| **FIS effort, hand-written** | 3.649% | 2.82 | **1.0049** |
+| **FIS effort + chain, hand-written** | 3.711% | 2.33 | **1.0050** |
+| `lk_32_3_8` | 3.876% | 2.16 | 1.0051 |
+| `lk_48_10_32` | 3.305% | 4.59 | 1.0055 |
+| FIS effort, GA-fitted | 3.791% | 3.27 | 1.0067 |
+| FIS + deferred verification | 3.925% | 2.41 | 1.0075 |
+| FIS effort + chain, GA-fitted | 4.415% | 1.92 | 1.0096 |
+| FIS + fuzzy construction | 6.346% | 2.47 | 1.0299 |
 
-2.6x the time for 0.29 points. That is the inefficiency the rule base exploits: most
-cities do not need a deep chain, a few need a very deep one, and a fixed cut-off
-cannot tell them apart. On the test set the fuzzy arm runs a **mean chain depth of
-4.88 against the baseline's fixed 10**, and a mean first-level breadth of 18.4
-against 32 — and lands nearer the depth-10 tour than the depth-4 one.
+Over the whole test set **no fuzzy arm beats the best fixed LK configuration.** The
+hand-written effort arm is better than 8 of the 11 fixed configurations and worse than 3 —
+a good operating point chosen without being told which one to pick, but not a new frontier.
 
-The clearest single win is the CHAIN rule base, which takes the deepen-or-cut
-decision from the chain's own gain trajectory (gain credit carried forward, depth so
-far, gain already banked, and whether the next step still trades a long edge for a
-short one) instead of at a fixed depth. Adding it moved the arm from 3.512% / 3.142 s
-to 3.606% / 2.188 s — **30% of the runtime for 0.09 points of quality**, the best
-exchange rate anywhere in the study.
+### The size dependence is the finding
+
+| arm | n < 1000 (5) | 1000–5000 (8) | n ≥ 5000 (7) |
+|---|---|---|---|
+| FIS + deferred verification | 1.0191 | 1.0065 | **1.0002** |
+| FIS effort + chain, hand-written | 1.0090 | 1.0058 | **1.0013** |
+| FIS effort, hand-written | 1.0098 | 1.0035 | 1.0029 |
+| `lk_32_2_4` | 1.0084 | 1.0058 | 1.0002 |
+| `lk_48_10_32` | 1.0169 | 1.0028 | 1.0005 |
+| `lk_32_6_32` | **1.0042** | 1.0026 | 1.0040 |
+| `lk_32_3_8` | 1.0143 | 1.0021 | 1.0019 |
+
+Ranked over the 10 instances with n ≥ 2000, the fuzzy arm with a deferred verification pass
+is the best arm measured:
+
+| arm (n ≥ 2000) | mean gap | total s | q |
+|---|---|---|---|
+| **FIS + deferred verification** | 3.440% | 2.32 | **1.0009** |
+| `lk_32_2_4` | 3.864% | 1.79 | 1.0011 |
+| `lk_32_3_8` | 3.600% | 2.09 | 1.0014 |
+| `lk_32_6_8` | 3.433% | 2.83 | 1.0015 |
+| `lk_32_4_8` | 3.598% | 2.32 | 1.0018 |
+| `lk_48_10_32` | 3.190% | 4.46 | 1.0022 |
+| FIS effort + chain, hand-written | 3.645% | 2.25 | 1.0027 |
+
+**These margins are not resolvable.** 1.0009 against 1.0011 is two parts in ten thousand of
+tour length over ten instances, with timing taken as the best of three runs. The defensible
+statement is that at n ≥ 2000 the fuzzy arm is *among the best*, and that this is a reversal
+of its standing below n = 1000, where it is clearly worse. The size trend is an order of
+magnitude larger than the between-arm differences, and §4 gives its mechanism.
 
 ---
 
-## 4. Where the fuzzy allocation does lose moves
+## 3. What the rule bases do
 
-Cutting effort at a city is not free even when it looks it. A city searched at
-reduced depth that finds nothing has its don't-look bit set, and a move a deeper
-chain would have found there is lost for good.
+Averaged over city searches on the test instances, `EFFORT` and `CHAIN` run the solver at
+**mean chain depth 4.41** where the baseline is pinned at 10, and **mean first-level breadth
+16.5** where the baseline is 32 — reaching a tour within ~0.2 points of a fixed LK that
+spends twice as long.
 
-`defer=True` measures exactly this: a city that fails cheaply is re-queued and
-re-searched at full breadth and full depth, so the run cannot stop until every city
-has failed at full effort — the baseline's own stopping condition.
+That *depth* is the parameter worth being clever about was not the obvious guess. Sweeping
+first-level breadth from 2 to 32 barely moves the clock: the sequential positive-gain
+criterion truncates most candidate scans long before the breadth cap bites. Sweeping chain
+depth from 4 to 10 costs 2.6×. So the rule bases earn their keep by deciding *which cities
+deserve a deep chain*, and `CHAIN` — which cuts a chain mid-flight from its own gain
+trajectory rather than at a fixed depth — is the most valuable of the three.
 
-| arm | mean gap | total s |
+---
+
+## 4. Making inference cheap enough to be worth consulting
+
+A rule base consulted once per city scan must cost far less than the scan. It did not.
+`costmodel.py` (§5) priced the pieces: a chain-continuation decision cost **494 ns** against
+the **~120 ns** chain level it was deciding about.
+
+Two fixes, in the order they were found:
+
+1. **Memberships were recomputed inside the rule loop** — 19 rules over 4 inputs evaluating
+   up to 76 membership functions when only 12 distinct values exist. Hoisting them into a
+   per-evaluation table should have been a clear win.
+2. **It wasn't, because that table was a heap allocation.** numba allocates a small array per
+   call, and the allocation cost about what the saved exponentials did: measured improvement
+   494 → 494 ns. Every scratch buffer is now owned by the caller and threaded down.
+
+Then the membership bank was compiled to a **lookup table over [0,1]**, which every fuzzy
+input already maps into. That removed the exponentials and had a larger second consequence:
+*membership shape became data.* Centres, widths and functional form are now all things an
+optimiser can move at no hot-path cost, because the hot path never learns which it got.
+
+| | chain decision | effort decision | city scan |
+|---|---|---|---|
+| original | 494 ns | 578 ns | 866 ns |
+| caller-owned buffers | 210 ns | 578 ns | 866 ns |
+| + lookup-table bank | **161 ns** | **344 ns** | 760 ns |
+
+The residual **349 ns effort decision against a ~493 ns city scan** is the mechanism behind
+§2's size dependence. It is a fixed cost per city, so it is amortised only once each city's
+search does enough work to hide it — which is why the fuzzy arm loses below n ≈ 1000 and
+leads above n ≈ 2000, and it says where the crossover has to be rather than leaving it as an
+empirical curiosity.
+
+---
+
+## 5. A deterministic cost proxy, so the search can be reproducible
+
+The objective must include runtime, but wall clock is a bad thing to optimise against: it is
+noisy, irreproducible, and — decisively — unmeasurable under parallel evaluation, because
+concurrent workers contend for cores.
+
+`costmodel.py` fits the solver's own work counters to measured time by **non-negative least
+squares** (a counter cannot make the solver faster; a model that says it does is fitting
+noise) in **relative** space (times span four orders of magnitude, so a plain fit is
+dominated by the largest instance and over-predicts every small one by more than 100%).
+
+Current fit, 224 (instance, configuration) samples: **R² 0.9990, rank correlation 0.9995,
+mean relative error 3.0%, p90 6.3%.** Per-unit costs: city scan 493 ns, accepted move
+1151 ns, effort decision 349 ns, chain decision 135 ns, chain level 91 ns, candidate
+evaluation 7.5 ns, reversal element 4.4 ns.
+
+Two things came out of building it, beyond serving the tuner:
+
+* **A reversal-element counter had to be added** before the fit was usable. Without it, `n`
+  absorbed the missing cost at 6684 ns/city and mean relative error was 146%. Segment
+  reversal is real memory traffic that no move count sees.
+* **It found the inference overhead in §4.** The model was built for the objective; its
+  largest payoff was diagnostic.
+
+`benchmark.py` still reports real wall clock. The proxy is what the *search* spends; it is
+not what any result is measured with.
+
+---
+
+## 6. Fitting the rules: what the GA bought, and what it cost
+
+`tune_opt.py` fits 170 parameters — 152 rule consequents plus membership centres and widths —
+with the `optimizers` library's genetic algorithm, over 9 training and 7 validation
+instances, all n ≥ 1000.
+
+**Triangular membership functions beat gaussian on every run that compared them** (validation
+q 1.017 against 1.069 at matched budget) and are cheaper to tabulate. They are the default.
+
+**The GA improves the rules where it can see them, and not where it cannot:**
+
+| | validation q | test q |
 |---|---|---|
-| FIS effort, tuned | 3.512% | 3.142 |
-| FIS effort + full-effort verification | 3.135% | 4.942 |
+| hand-written | 1.2026 | **1.0049** |
+| GA-fitted | **1.0571** | 1.0067 |
 
-The verification pass recovers **0.38 points**, so the cheap schedule *is* discarding
-real improvements. It costs 57% more time to recover them, which leaves the deferred
-arm dominated by `k48/d10/b32` (3.070% / 4.729 s) — the pass is a good instrument and
-a bad algorithm.
+It closes most of the validation gap and then loses on test. The reason is not mysterious:
+selecting the best of 24 pooled candidates *on* validation makes validation part of the
+fitting procedure, so its score stops being unbiased. Only the test set is untouched, and it
+says the fit did not transfer.
 
-One caution about how this was nearly mis-read: on `d493` alone the verification pass
-makes 493 full-effort attempts and finds *zero* additional moves, which looks like
-proof that the reduced effort lost nothing. It does not generalise, and a
-single-instance check would have shipped the wrong claim.
+### More search makes generalisation worse
 
----
-
-## 5. The fuzzy next-city ranker: a negative result
-
-The construction ranker asks the question in its most direct form — score each
-candidate next city with a rule base over four cues (how much worse than the nearest
-available option, whether the candidate is about to be stranded, what coming back for
-it later would cost, and whether it continues the heading) and take the best.
-
-It works, in the sense that it beats the heuristic it generalises:
-
-| construction | mean % over optimum | total s |
+| GA evaluations | training q | validation q |
 |---|---|---|
-| greedy edge | **17.043** | 0.537 |
-| fuzzy ranker | 21.851 | 0.269 |
-| nearest neighbour | 22.299 | 0.027 |
+| 140 | — | **0.990** |
+| 1440 | 0.9938 | 1.057 |
+| 2720 | 0.9188 | 1.017 |
+| 4000 | 0.9520 | 1.069 |
 
-It beats nearest-neighbour (21.85% vs 22.30%) at 10x the cost, and loses to
-greedy-edge by 4.8 points. Because a start tour is only worth what the local search
-makes of it, that gap carries through: **fuzzy construction + fuzzy effort reaches
-3.847% / 3.269 s and is dominated** by two baseline configurations, while the same
-effort controller from a greedy-edge start reaches 3.512% / 3.142 s. Feeding the
-fuzzy start to an unmodified LK is worse still (3.695% / 5.131 s, dominated by five).
+Training score improves throughout while the answer degrades. With 170 parameters and 9
+training instances that is the expected outcome, and the default budget is deliberately
+modest because of it. (The 140-evaluation run's 0.990 is the only sub-1.0 validation figure
+seen and it is a single short run, not a reproducible setting.)
 
-The reason is structural, not a tuning failure. A sequential ranker commits to a city
-knowing only the local neighbourhood; greedy-edge sorts all candidate edges globally
-before committing to any. No amount of fuzzy reasoning over local cues recovers
-global edge information the ranker never sees. **The shipped configuration therefore
-starts from greedy-edge**, and the ranker is reported rather than used.
+Four defences were added, each becoming visible only after the previous was fixed:
 
-Two things did improve it substantially and are worth recording:
+1. **More and larger instances.** An early split with 8 of 20 instances under n = 200 made
+   the optimiser chase per-city overhead — the one cost that only matters where this engine
+   is the wrong tool. It produced better tours at 1.26× the cost. Fitting is now n ≥ 1000.
+2. **A shrinkage prior toward the hand-written rules**, which encode what §3 measured. Better
+   motivated than a plain norm penalty, and the reason the fitted vectors stay interpretable.
+3. **Selection from a pool, on validation.** Scoring validation only at successive
+   training-bests fails: once the two decouple, every training improvement lies further along
+   the overfitting path, so that is the only region validation judges. A 684-evaluation run
+   selected that way returned 4.21% where a 252-evaluation run of the same optimiser found
+   3.75%.
+4. **A smaller parameter space.** One shared set of three terms per rule base (18 membership
+   parameters) rather than per-input terms (72); the expressive version overfits harder.
 
-- **Feature scaling mattered more than the rules.** Normalising nearness by the
-  city's neighbourhood scale made the nearest and second-nearest candidate both score
-  "very near", firing identical rules, so the other three cues decided every step and
-  the construction wandered — 30.7% over optimum, far *worse* than nearest-neighbour.
-  Re-expressing it as excess over the best option currently available (the greedy
-  choice sits at exactly 0.0, a candidate 30% further at 0.3) fixed it with no change
-  to the rule base: on a 10-instance probe it went from 30.7% to 21.2%, against 21.9%
-  for nearest-neighbour on the same ten.
-- **It has to be fitted against its own tour length.** Fitted end-to-end, on quality
-  after the local search, construction quality rotted to 24.0% — worse than
-  nearest-neighbour — while the effort consequents silently absorbed the loss. The
-  local search washes out most of what the construction does, so the end-to-end
-  gradient is mostly noise. Fitting it on the tour it builds is both the honest
-  objective and thousands of times cheaper, since no local search has to run.
+All four help. None is sufficient.
+
+### Practical notes on the optimiser
+
+* **Thread parallelism buys nothing.** numba holds the GIL: `n_jobs=4` measured 18.0 s
+  against 17.2 s for `n_jobs=1`. The deterministic proxy of §5 was built partly to enable
+  parallel evaluation, which turned out to be unavailable for an unrelated reason.
+* **Evaluation cost depends on the candidate.** A vector telling the rule bases to use full
+  depth and breadth everywhere makes the solver several times slower than the baseline, and
+  bound-seeking optimisers walk into that region: one PSO generation cost 99 s against the
+  GA's 12.5 s. Evaluation now walks instances in increasing size and abandons a candidate
+  once it exceeds twice the dearest baseline configuration's cost, ranked by how far over it
+  ran so the search retains a gradient. PSO then completed 720 evaluations in 73 s.
+* GA is the reported optimiser; PSO and ACO drivers remain selectable but are not part of the
+  comparison.
 
 ---
 
-## 6. Fitting the rules, and how it overfits
+## 7. Three antecedents added
 
-The antecedents, membership functions and rule structure are fixed by hand and stay
-readable. Only the consequent singletons are fitted: 20 desirabilities for the
-ranker, 19x4 parameter settings for the effort controller, 18 continuation scores for
-the chain rules. A (1+1) evolution strategy with the 1/5th success rule searches them.
-
-**Fitting is the least trustworthy part of this study.** The first attempt fitted 8
-small instances and reached 2.44% on them and **4.67% on unseen instances** — worse
-than the baseline it was supposed to beat. Widening the training set and adding a
-validation split that the search cannot see, and keeping the vector that transfers
-rather than the vector that fits, took validation to 3.742% against a 4.704% baseline
-at 0.90x its time.
-
-Even so, on the test set the **hand-written effort rules beat the fitted ones**:
-
-| effort rules | mean gap | total s |
+| input | what it reads | cost |
 |---|---|---|
-| hand-written | **3.455%** | 3.035 |
-| fitted | 3.512% | 3.142 |
+| `E_RANK` | how many strictly nearer neighbours the city's worse tour edge is ignoring | short scan of an ascending list |
+| `E_PEAK` | nearest-neighbour distance ÷ mean candidate distance | two loads and a divide, both precomputed |
+| `CH_REVCOST` | how much array this chain level's reversal moved | free — `reverse` already returns its swap count |
 
-The residual overfitting is real, and the hand-written rules are the more honest
-artefact — they encode the mechanism §3 identifies and were never shown the test set
-at all. The fitted vector is kept because it is what makes the chain rules usable
-(untuned, the chain rules cut too aggressively: 3.013% / 0.106 s against 2.847% /
-0.121 s for no chain rules on the 8-instance probe — worse quality for the time
-saved).
+`E_RANK` is the most direct cheap statement of "is there anything here to find", and unlike
+the existing excess feature it is scale-free without dividing by anything: it counts how many
+strictly better neighbours exist rather than measuring how much longer the edge is.
+`CH_REVCOST` is the only input taken from the cost model rather than from the search's own
+logic — reversal traffic is separately priced at 4.4 ns/element, and a chain working where
+every level shuffles half the tour is expensive in a way no gain number reveals.
 
----
-
-## 7. Absolute standing: LKH
-
-On the 9 test instances where LKH (via `elkai`, one run) finishes inside 90 s:
-
-| | mean % over optimum | total s |
-|---|---|---|
-| LKH | **0.003** | 153.9 |
-| FIS effort + chain | 3.220 | 0.130 |
-| LK `k48/d10/b32` | 2.353 | 0.185 |
-
-LKH is essentially exact and about **1180x slower**. Nothing here competes with it,
-and nothing here claims to: it uses alpha-nearness candidates from a held 1-tree
-rather than plain k-nearest neighbours, and 5-opt basic moves. Both arms of this study
-live in a different time regime — tens of milliseconds against tens of seconds. On
-`fl1577` LKH returned no tour within 90 s at all.
+`EFFORT` is now 6 inputs over 27 rules, `CHAIN` 5 over 24. **These have not been ablated
+individually.** They are present in every arm in §2, but which of the three earns its keep is
+unmeasured.
 
 ---
 
-## 8. Two bugs worth recording
+## 8. Two components that do not work
 
-**Tied neighbours made every measurement noisy.** TSPLIB instances are full of exact
-distance ties — in `pr1002`, cities 326 and 328 are both at distance 150 from 327 —
-and `cKDTree` returns tied neighbours in an order that shifts with *k*. The k=8
-candidate list therefore stopped being a prefix of the k=20 one, and nearest-neighbour
-tour length changed with k (21.8% to 29.5% across k = 6…20) for a construction that
-cannot depend on k at all. Breaking ties by city index, and breaking the
-exact-scan fallback's ties the same way, made it invariant. Any parameter sweep run
-before that fix was measuring tie-break luck as much as parameters.
+**Fuzzy construction fails.** The `CONSTRUCT` ranker reaches 48.2% over optimum against
+nearest-neighbour's 22.7% and greedy-edge's 17.0%, and feeding it to an unmodified LK is
+worse than feeding greedy-edge (q 1.0125 against 1.0035). Local search erases most
+construction differences, so a better construction has little to win while a worse one still
+costs its own runtime.
 
-**Or-opt surgery needed an exact reversal.** Relocating a segment is a swap of two
-adjacent blocks, done as three reversals via `(A B)^R = B^R A^R`. The 2-opt reversal
-used elsewhere is free to reverse a segment's *complement* instead — same tour edges,
-different array layout — which silently breaks that algebra. Block swaps use a
-reversal that is never allowed to substitute the complement, and choose the shorter of
-the forward and backward spans so a move stays sub-linear. Verified by checking every
-move's predicted gain against the recomputed tour length: zero mismatches over
-several hundred moves across three instances, with `pos` and permutation validity
-re-checked after each.
+One caveat on that figure: those consequents were hand-written against gaussian terms, and
+switching the default to triangular roughly doubled the construction gap (25% → 48%) while
+barely moving `EFFORT` and `CHAIN`. That is itself evidence the construction consequents were
+fitted to the old term shapes, so 48.2% overstates how bad the design is. The conclusion is
+unchanged: it was already losing to greedy-edge under gaussian terms.
+
+**Deferred verification is an interesting half-success.** Running the cheap fuzzy schedule
+first and then a full-effort pass over the cities it touched is the arm that leads at n ≥ 2000
+(§2) — but it leads by *spending more*, and it costs quality against the plain fuzzy arm on
+small instances (q 1.0191 below n = 1000). Its guarantee is real and worth keeping: the
+verification pass can only find additional improvements, so its tour is never longer, which
+`test_invariants.py` asserts.
 
 ---
 
-## 9. Reproducing
+## 9. Absolute standing: LKH
+
+LKH (via `elkai`) completed 9 of the 10 test instances it was given (it timed out on
+fl1577): **exactly optimal on 7, and within 0.03% on the other two** — but taking up to 80 s
+on d2103, where every arm here finishes that instance in under 0.03 s. LKH is a yardstick, not a competitor this work
+claims to beat — it implements a genuine 5-opt sequential search with alpha-nearness
+candidate sets and backbone-guided restarts. The relevant comparison here is against the
+*same* LK step under fixed parameters, which is what §2 reports.
+
+---
+
+## 10. Four bugs worth recording
+
+Each produced plausible results rather than a crash, which is why `test_invariants.py` now
+holds them.
+
+1. **Or-opt gain accounting.** Relocating a segment is three reversals composed via
+   `(AB)^R = B^R A^R`; getting one wrong yields a valid tour of the wrong length. Every
+   accepted move's claimed gain is now checked against the real change in tour length, and
+   `pos` is re-derived and compared — a stale position index corrupts every *later* move
+   rather than this one.
+
+2. **Candidate-list tie order depended on k.** TSPLIB instances are full of exact ties, and
+   integer rounding creates many more. Three things were needed, each found by the previous
+   fix failing: a deterministic key (the k-d tree's own order is arbitrary); enough queried
+   neighbours that a tie group straddling the k-th place is fully seen, since otherwise the
+   returned *set* is k-dependent even when the key is not; and *the same key the exact-scan
+   fallback uses*, or the two paths disagree whenever the fallback fires. Nearest-neighbour
+   tour length is now exactly k-invariant, and the lists are verified against brute force.
+
+3. **The fix for (2) cost a factor of 90, and no correctness check could see it.** Widening
+   the query until no row had a straddling tie is almost never satisfiable — 933 of rl5915's
+   5915 rows have one, the coordinates being grid-like — so it widened until it was fetching
+   every city. Candidate building went from 60 ms to seconds and, since both arms are charged
+   for it, rl5915's LK arm read 17.4 s against its true 0.20 s. The lists it produced were
+   *correct*, merely ruinous to produce. Contested rows are now settled individually with one
+   ball query each, and the tests carry a loose wall-clock ceiling, because that is the shape
+   of regression correctness checks are blind to.
+
+4. **numba does not bounds-check.** Adding a fifth input to `CHAIN` left the 4-wide scratch
+   buffers in place, so `xc[4]` was a silent out-of-bounds write rather than an exception.
+   Buffers are now sized from each rule base's own antecedent array, with an invariant
+   asserting the relationship — adding an antecedent is exactly the change that triggers it.
+
+---
+
+## 11. Worth doing next
+
+* **Ablate the three antecedents in §7.** They are in every measured arm; their individual
+  contributions are unknown.
+* **Settle whether the n ≥ 2000 lead is real.** Two parts in ten thousand over ten instances
+  does not support a stronger claim than "among the best". More instances in that band and
+  more timing repetitions would decide it.
+* **Cut the 349 ns effort decision further.** It is the entire mechanism of the size
+  dependence and still ~70% of a city scan. Evaluating `EFFORT` once per region rather than
+  per city, or caching it while a city's features have not moved, would lower the crossover.
+* **Stop selecting on validation** (§6). A nested split, or fitting on all 16 instances with
+  the budget fixed a priori, would give an unbiased estimate rather than an optimistic one.
+
+---
+
+## 12. Reproducing
 
 ```bash
-python tune.py --construct-seconds 150 --seconds 900   # -> tuned.npz
-python benchmark.py --reps 3                           # -> results.json
-python lkh_reference.py --max-n 2500 --timeout 90      # -> lkh.json
-python figures.py                                      # -> figures/
+pip install numpy scipy matplotlib numba elkai
+pip install -e ../tribble-opt
+
+python test_invariants.py                              # correctness first
+python costmodel.py                                    # writes costmodel.npz
+python tune_opt.py                                     # writes tuned_opt.npz
+python benchmark.py --reps 3 --tuned tuned_opt.npz     # writes results.json
+python lkh_reference.py --max-n 2500 --timeout 90
+python figures.py && python figures_tuning.py
 ```
 
-Numbers above are from a single machine, 3 timed repetitions per measurement, minimum
-taken. Absolute times will move between machines; the domination relations are what
-should be reproducible, and the size split in §2 is the claim most worth re-checking
-on different hardware, since it turns on a fixed per-decision overhead.
+`costmodel.py` must run before `tune_opt.py`, and again after any change to the solver's hot
+path — its fitted coefficients are what the objective spends.
