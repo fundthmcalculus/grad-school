@@ -599,7 +599,121 @@ the frame and its peak magnitude is annotated instead of being drawn to scale. I
 angles are periodic: a prediction that has diverged to 1e5° still lands somewhere on
 the unit circle and would otherwise look perfectly plausible.
 
-## 10. If this were taken further
+## 10. Angle representation: wrapping, hysteresis, and sin/cos
+
+The frictionless chains spin — θ reaches 1501° on the double pendulum and 1589° on
+the quintuple — so the per-trajectory min-max scaling normalises against a range
+dominated by monotone accumulation rather than by oscillation. Bounding the angle
+representation is therefore worth trying. `wrap_sweep.py` tests three ways of
+doing it; `results/wrap_sweep.csv` and `results/representation_sweep.csv` hold the
+numbers.
+
+### `np.unwrap` cannot help, and the reason is topological
+
+Measured, not assumed: `np.unwrap` changes the raw angles by **1e-13°**, i.e. it
+is a no-op. RK4 at h = 0.005 s never moves an angle more than 4.6° per step, far
+below the 180° discontinuity threshold, so there is no wrapping to undo. And
+wrap-then-unwrap round-trips to the original to 2e-13°.
+
+`np.unwrap` *recovers* continuity after wrapping; it cannot impose a bound. Nor
+can anything else of its type: **a bounded, continuous, single-scalar
+representation of a monotonically drifting angle does not exist.** A circle does
+not embed in an interval without a cut. Every option below gives up one of the
+three properties.
+
+### Pointwise wrapping raises the discontinuity count; hysteresis lowers it
+
+Wrapping when |θ| exceeds a limit L, choosing the branch independently per sample,
+makes things *worse* as the overlap band widens — an oscillation crossing ±L flips
+branch every time, and a wider band is a wider flip zone. Making the branch
+*stateful*, so it is kept until the value leaves [−L, L], reverses the trend
+(double pendulum, frictionless, training set):
+
+| L | pointwise jumps | hysteresis jumps |
+|---|---|---|
+| 180° | 66 | 66 |
+| 240° | 76 | **53** |
+| 300° | 94 | **51** |
+| 360° | 111 | **48** |
+| 420° | 93 | **47** |
+
+The two agree at L = 180° because there is no overlap band to exploit. This
+confirms the mechanism: the overlap band does suppress jitter, but only with
+branch memory.
+
+### Fewer discontinuities does not reliably mean better accuracy
+
+That is the finding worth keeping, because it breaks the causal chain the exercise
+assumed. Circular angular error, in degrees, at 120 rules with quantile
+partitioning throughout:
+
+| dataset | no wrap | ±180 | pointwise ±360 | hysteresis ±360 | sin/cos |
+|---|---|---|---|---|---|
+| double, no fric. | 81.9 / 107.4 | 73.7 / 106.9 | 68.5 / 108.0 | **62.5** / 108.9 | 74.1 / **92.1** |
+| triple, no fric. | 59.0 / 108.7 | **49.8** / 106.9 | 54.9 / 108.3 | 59.5 / 109.1 | 48.0 / **80.1** |
+| quintuple, no fric. | 51.9 / 107.7 | 50.5 / 111.4 | 59.0 / 103.7 | 51.2 / 104.2 | **43.6** / **71.9** |
+| quintuple, friction | **12.3** / 92.2 | 13.7 / 107.2 | 38.3 / 92.8 | 15.8 / 95.8 | 12.1 / 109.1 |
+
+(in-window / past-window.) Hysteresis at ±360° cuts the double pendulum's
+in-window error from 68.5° to 62.5°, but *raises* the triple pendulum's from 54.9°
+to 59.5° while cutting its jumps from 93 to 56. Jitter is not the binding
+constraint on accuracy here.
+
+### sin/cos is the representation to use
+
+Predicting (sin θ, cos θ) per angle and recovering θ by `atan2` is bounded in
+[−1, 1] **and** continuous everywhere, at the cost of a second output per angle
+and of discarding the winding number — which costs nothing, since the dynamics see
+the angles only through sin and cos. It is best in-window on three of four
+datasets and best past the window on three of four, and **it is the only
+representation that improves the extrapolated error at all**: 92.1°, 80.1° and
+71.9° on the three frictionless sets against 104–111° for every wrap variant.
+
+One caveat: on `quintuple_friction` — the one dataset where the angle spins but the
+dynamics are damped — sin/cos has the best in-window error (12.1°) and the worst
+extrapolation (109.1°), so it is not uniformly better.
+
+### The unit-circle "lever" is a no-op, and the radius means something else
+
+The predicted (sin, cos) pair is not constrained to the unit circle: its mean
+radius is 0.843, 0.865, 0.900 and 0.979 across the four datasets. An earlier draft
+of this section proposed renormalising the pair before `atan2` as the obvious fix.
+**That cannot work.** `atan2` is invariant to positive scaling of both arguments,
+`atan2(ks, kc) = atan2(s, c)`, so renormalisation leaves the recovered angle
+unchanged — verified to 4e-16 rad. The angular error comes from the *ratio*
+s/c being wrong, which no rescaling of the magnitude touches.
+
+What the radius does carry is shrinkage. Sweeping capacity on the frictionless
+double pendulum with sin/cos targets:
+
+| rules | circ. err. in-window | past-window | mean radius | corr(1−r, \|err\|) |
+|---|---|---|---|---|
+| 40 | **67.8°** | 102.4° | 0.723 | **0.365** |
+| 120 | 74.1° | **92.1°** | 0.843 | 0.252 |
+| 300 | 74.0° | 110.1° | 0.835 | 0.218 |
+
+Two readings, neither of them a lever:
+
+- **Radius is only partly a fit-quality proxy.** It rises from 0.72 to 0.84 between
+  40 and 120 rules and then *saturates* — 300 rules gives 0.835, not something
+  approaching 1.0. The residual 16% shortfall is not underfitting that more
+  capacity would remove; it is the model hedging toward the conditional mean,
+  which is the same behaviour §5.2 and §8 document by other means. A shrunken
+  radius is the sin/cos representation's way of showing it.
+- **Radius is a weak per-sample confidence signal.** The correlation between radius
+  shortfall and angular error is positive at every capacity (+0.22 to +0.37), so
+  low-radius samples really are the wrong ones — but it explains only 5–13% of
+  error variance. Usable as a soft flag, not as calibrated uncertainty.
+
+Note also that sin/cos is *capacity-saturated* on this dataset: in-window error is
+best at 40 rules (67.8°) and does not improve at 300 (74.0°). That matches the
+frictionless capacity behaviour in §8 and means the sin/cos numbers in the table
+above, taken at 120 rules for comparability, are not this representation's best.
+
+Wrapping never improved extrapolation, which is consistent with §9: the horizon
+problem is the time input, not the angle representation.
+
+## 11. If this were taken further
 
 The interesting question this reproduction surfaces is not which regressor wins.
 It is that **the benchmark as constructed cannot distinguish models**, because the
