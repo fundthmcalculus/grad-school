@@ -15,17 +15,21 @@ re-scored from the coordinates under TSPLIB rounding, independently of the solve
 bookkeeping.
 
 **Where this stands.** Adaptive effort's standing improves monotonically with instance size,
-and at the top of the range it crosses the frontier: at n ≥ 5000 the best fuzzy arm reaches
-**q = 0.9994**, a shorter tour than every LK configuration spending the same wall clock,
-averaged over seven instances. Over the whole test set, which is half small instances, no
-fuzzy arm beats the best fixed LK. The size trend is the reportable result — the margin at
-the top is six parts in ten thousand and the arm is only ahead on four of seven instances
-there, which is not a claim.
+and at the top of the range it crosses the frontier: at n ≥ 5000 the best arm reaches
+**q = 0.9991** — a shorter tour than every LK configuration spending the same wall clock —
+below 1.0 on five of seven instances. Over the whole test set, half of which is small
+instances, no fuzzy arm beats the best fixed LK. The size trend is the reportable result; the
+margin at the top is nine parts in ten thousand, which this measurement cannot establish as
+real.
 
-Fitting now transfers to unseen instances, which it previously did not, and the changes that
-did it were selecting antecedents by measured predictive power, halving the rule count, and
-generating synthetic instances to quadruple the training pool. Fuzzy construction still
-fails.
+Fitting now transfers to unseen instances, which it previously did not. What did it: selecting
+antecedents by measured predictive power rather than by argument, halving the rule count, and
+generating synthetic instances to quadruple the training pool.
+
+**Rule-base size trades against instance size.** The larger rule base (8 inputs, 55 rules, 157
+parameters) is *worse overall* than the small one (5 inputs, 30 rules, 87) and *better above
+n = 5000*. Both halves of that follow from the same mechanism, and neither is a tuning
+accident. Fuzzy construction still fails.
 
 ---
 
@@ -107,24 +111,26 @@ equally fixed at every scale.
 | `lk_48_10_32` | 1.0169 | 1.0000 | 1.0045 | 1.0008 |
 | `lk_32_6_32` | 1.0042 | 1.0047 | 1.0013 | 1.0040 |
 
-At n ≥ 5000 the deferred-verification arm is at **q = 0.9994**, outside the frontier, and it
-is the only arm there that is. Ranked over those seven instances:
+At n ≥ 5000 the fuzzy arms are the only ones outside the frontier. Ranked over those seven
+instances, at the **`large`** scale (§3b — the better choice in this band):
 
 | arm (n ≥ 5000) | mean gap | total s | q |
 |---|---|---|---|
-| **FIS + deferred verification** | 3.400% | 2.08 | **0.9994** |
-| `lk_32_2_4` | 3.782% | 1.91 | 1.0000 |
-| `lk_48_10_32` | 2.824% | 4.79 | 1.0008 |
+| **FIS + deferred verification** | 3.196% | 2.40 | **0.9991** |
+| **FIS effort + chain, GA-fitted** | 3.533% | 1.92 | **0.9994** |
+| `lk_32_2_4` | 3.782% | 1.87 | 1.0000 |
+| `lk_48_10_32` | 2.824% | 4.75 | 1.0008 |
 | `lk_32_6_8` | 3.297% | 2.99 | 1.0012 |
-| FIS effort + chain, GA-fitted | 3.848% | 1.75 | 1.0014 |
 
-**What that is and is not.** Per instance the deferred arm is below 1.0 on **four of seven**
-(rl5915 0.9984, usa13509 0.9943, d15112 0.9980, d18512 0.9998) and above on three (rl11849
-1.0046 is the worst). A sign test on four of seven is worth nothing, the mean margin is six
-parts in ten thousand of tour length, and the standard errors in every band overlap between
-arms. So: adaptive effort is *at* LK's frontier at the top of this size range and inside it
-below, with a suggestion of crossing that this measurement cannot establish. The size trend
-itself is much larger than the between-arm differences and is solid.
+**What that is and is not.** Per instance the deferred arm is below 1.0 on **five of seven**
+(0.9943, 0.9965, 0.9979, 0.9986, 0.9993) and above on two, the worst being pla7397 at 1.0063.
+A sign test on five of seven gives p ≈ 0.23; the mean margin is nine parts in ten thousand of
+tour length; and re-running the benchmark moves the same figure by ±0.0006, which is most of
+the margin. The standard errors in every band overlap between arms.
+
+So: adaptive effort is **at** LK's frontier at the top of this size range, with a consistent
+but unestablished suggestion of crossing it, and inside the frontier below. The size trend is
+an order of magnitude larger than the between-arm differences and is the solid part.
 
 ## 3. What the rule bases do
 
@@ -143,6 +149,54 @@ criterion truncates most candidate scans long before the breadth cap bites. Swee
 depth from 4 to 10 costs 2.6×. So the rule bases earn their keep by deciding *which cities
 deserve a deep chain*, and `CHAIN` — which cuts a chain mid-flight from its own gain
 trajectory rather than at a fixed depth — is the most valuable of the three.
+
+## 3b. Does a bigger rule base help? Only at the top of the size range
+
+Two scales were fitted with an identical pipeline — same GA budget, same compass polish, same
+20/14 instance pools, same seed — and differ only in the rule base:
+
+| | inputs | rules (EFFORT + CHAIN) | fitted parameters |
+|---|---|---|---|
+| `small` | 5 (AUC ≥ 0.74) | 15 + 15 | 87 |
+| `large` | 8 (adds AUC 0.55–0.70) | 30 + 25 | 157 |
+
+Test-set q for the two best arms, by size band:
+
+| arm | scale | q, all 20 | n<1000 | 1000–2000 | 2000–5000 | **n ≥ 5000** |
+|---|---|---|---|---|---|---|
+| FIS + deferred verification | small | **1.0059** | 1.0164 | 1.0075 | 1.0033 | 0.9997 |
+| FIS + deferred verification | large | 1.0077 | 1.0189 | 1.0124 | 1.0056 | **0.9991** |
+| FIS effort + chain | small | **1.0070** | 1.0192 | 1.0063 | 1.0033 | 1.0013 |
+| FIS effort + chain | large | 1.0081 | 1.0186 | 1.0112 | 1.0077 | **0.9994** |
+
+The pattern is consistent across both arms and it inverts at around n = 5000. Below that the
+large base is clearly worse — at 1000–2000 it loses by 0.005, which is large by the standards
+of everything else here. Above it, the large base produces the two best figures in the study
+and is below 1.0 on **five of seven** instances against the small base's four.
+
+**Why, mechanically.** The three extra inputs are not free: `turn` needs two square roots and
+is the most expensive feature in the system. That is a fixed cost per city scan, so it lands on
+exactly the same amortisation curve as §4's inference overhead — it hurts wherever the work per
+city is small and disappears wherever it is large. The extra discrimination has to beat that
+cost, and it only does so at the top of the range. Mean chain depth confirms the base is
+behaving differently rather than just costing more: 7.5 for `large` against 6.4 for `small`,
+so the wider base is finding more places it judges worth a deep chain.
+
+**The other half of the answer is about the search, not the rule base.** At a matched
+380-evaluation GA budget, `large` fits its *training* set **worse** than `small` — q 1.0046
+against 1.0033 — despite having 70 more parameters to do it with. More capacity did not
+produce a better fit because the same budget spread over nearly twice the dimensions explores
+each of them less. So the large base is not being shown at its best here, and the honest
+reading of its n ≥ 5000 advantage is that it is achieved *despite* being under-fitted. A budget
+scaled to the dimension count is the obvious next experiment, and it is the one that would
+decide whether the middling-AUC features are worth their runtime or merely tolerable.
+
+**What is kept.** `small` remains the default: better over the whole test set, cheaper, and
+half the parameters. `large` is the better choice above n ≈ 5000 and is selectable with
+`--scale large`. That both are worth keeping — rather than one being simply right — is itself
+the result.
+
+---
 
 ## 4. Making inference cheap enough to be worth consulting
 
@@ -461,6 +515,10 @@ holds them.
   the frontier-relative metric needs no optimum — so a held-out synthetic test set at
   n = 5000…50000, sized for the margin being measured, would settle it. This is the single
   highest-value next step and it is now cheap.
+* **Give `large` a budget scaled to its dimension count** (§3b). At a matched 380 evaluations
+  it fits its own training set worse than `small` does, so its n ≥ 5000 advantage is achieved
+  while under-fitted. This is the experiment that would decide whether the middling-AUC
+  features are worth their runtime, and it is cheap.
 * **Ablate the five kept antecedents individually.** §7 measured their predictive power in
   isolation but not their marginal contribution to the fitted system; `probe_frac` and `probe`
   are likely to be partly redundant with each other.

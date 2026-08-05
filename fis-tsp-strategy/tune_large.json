@@ -1,0 +1,29 @@
+[
+ {
+  "optimizer": "ga",
+  "mf_kind": "triangular",
+  "mf_scope": "base",
+  "scale": "large",
+  "n_params": 157,
+  "seconds": 129.3766484050002,
+  "generations": 9,
+  "stop_reason": "no_improvement",
+  "evaluations": 380,
+  "polish_evals": 800,
+  "polish_sweeps": 3,
+  "polish_seconds": 287.12473387299997,
+  "polish_train": 0.9968810598176059,
+  "valid_before_polish": 0.999864136596379,
+  "valid_after_polish": 1.0003910105070042,
+  "polish_kept": false,
+  "train_ratio": 1.0046238010548254,
+  "train_gap": 4.939885370144973,
+  "valid_ratio": 0.999864136596379,
+  "valid_gap": 4.613659346325282,
+  "untracked_valid_ratio": 1.0018716604190847,
+  "hand_train_ratio": 1.0035562540314256,
+  "hand_train_gap": 4.562994824547922,
+  "hand_valid_ratio": 1.0037934758752283,
+  "hand_valid_gap": 4.780918016515315
+ }
+]
