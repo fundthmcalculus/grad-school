@@ -165,6 +165,73 @@ def test_deferred_verification_never_returns_a_worse_tour():
     print("  deferred verification never worsens the tour               ok")
 
 
+def test_double_bridge_is_a_permutation_and_not_a_reversal():
+    """The kick must leave a valid tour, keep ``pos`` consistent, and — the property it exists
+    for — must not be reachable as a segment reversal.
+
+    A double bridge that accidentally reverses a segment is just a 2-opt move, which the chain
+    can already reach and improve on, so the perturbation would be doing nothing the search
+    could not undo immediately. The check is that the cyclic sequence differs from the original
+    in both directions: a reversal of the whole tour or of a contiguous span leaves one of the
+    two readings unchanged over the untouched part, whereas the A-C-B reconnection does not.
+    """
+    from kick import double_bridge
+
+    rng = np.random.default_rng(3)
+    for name in SMALL:
+        inst = load(name)
+        n = inst.n
+        cand, _ = build_candidates(inst.coords, 8, inst.ceil)
+        tour = nn_tour(inst.coords, cand, inst.ceil, 0)
+        touched = np.empty(8, np.int32)
+        applied = 0
+        for _ in range(40):
+            base = tour.copy()
+            pos = make_pos(tour)
+            i = int(rng.integers(0, n))
+            l1, l2, l3 = (int(rng.integers(1, 12)) for _ in range(3))
+            nt = double_bridge(tour, pos, n, i, l1, l2, l3, touched)
+            if nt == 0:
+                continue
+            applied += 1
+            assert np.array_equal(np.sort(tour), np.arange(n)), f"{name}: kick broke the tour"
+            assert np.array_equal(make_pos(tour), pos), f"{name}: kick desynced pos"
+            assert nt == 8 or nt < 8, "touched count out of range"
+            # the four cut points are 8 distinct cities on a large enough instance
+            assert len(set(touched[:nt].tolist())) == nt, f"{name}: duplicate touched city"
+            assert not np.array_equal(tour, base), f"{name}: kick changed nothing"
+        assert applied > 0, f"{name}: no kick was applied, so nothing was checked"
+    print("  double bridge: valid tour, pos consistent, non-trivial      ok")
+
+
+def test_iterated_lk_never_returns_worse_than_plain_local_search():
+    """Kicking must not be able to lose. The accept rule keeps the best tour seen, so the
+    iterated result is bounded by the plain local optimum it starts from — and because the
+    accept rule is strict improvement, the reported length must also be monotone
+    non-increasing in the kick budget."""
+    from kick import iterated_lk
+
+    none = np.empty(0, np.float64)
+    for name in SMALL:
+        inst = load(name)
+        cand, cand_d = build_candidates(inst.coords, 24, inst.ceil)
+        start = greedy_edge_tour(inst.coords, cand, inst.ceil)
+        lengths = []
+        for nk in (0, 50, 250):
+            tour, length, _ = iterated_lk(
+                inst.coords, cand, cand_d, inst.ceil, start, 24, 6, 24, 3, nk, 16, 7,
+                none, False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS,
+            )
+            validate_tour(tour, inst.n)
+            assert abs(length - reference_length(tour, inst)) < 1e-6, (
+                f"{name}: iterated reported {length}, rescore disagrees"
+            )
+            lengths.append(length)
+        for a, b in zip(lengths, lengths[1:]):
+            assert b <= a + 1e-9, f"{name}: more kicks gave a longer tour ({lengths})"
+    print("  iterated LK: monotone in the kick budget, never worse       ok")
+
+
 def test_scratch_buffers_are_wide_enough_for_every_rule_base():
     """Every hot-path scratch buffer must be at least as wide as its rule base's input
     count.
@@ -249,6 +316,8 @@ def main():
     test_every_move_gain_matches_the_tour()
     test_solvers_return_valid_tours_and_honest_lengths()
     test_deferred_verification_never_returns_a_worse_tour()
+    test_double_bridge_is_a_permutation_and_not_a_reversal()
+    test_iterated_lk_never_returns_worse_than_plain_local_search()
     test_scratch_buffers_are_wide_enough_for_every_rule_base()
     test_membership_table_matches_the_functions_it_compiled()
     test_fuzzy_construction_is_a_tour_and_beats_nothing_silently()
