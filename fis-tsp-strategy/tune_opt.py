@@ -119,6 +119,21 @@ BASE_DEEP = 32
 # other is preferred.
 TIE_WEIGHT = 0.15
 
+# Early abandoning. The cost of *evaluating* a candidate depends on the candidate: a
+# vector that tells the rule bases to use full breadth and full depth at every city
+# makes the local search several times slower than the baseline, and the bound-seeking
+# optimisers walk straight into that region — PSO drives particles onto the bounds, and
+# clipping them to 1.0 is exactly "maximum effort everywhere". Measured, one PSO
+# generation cost 99s against the GA's 12.5s, which would have made the full comparison
+# a seven-hour run.
+#
+# Such a candidate is hopeless anyway: it cannot win on cost, so its tour quality does
+# not matter. So the evaluation walks the instances in increasing size and gives up as
+# soon as accumulated cost passes ABORT_FACTOR x the baseline's over the same prefix,
+# returning a score that still ranks abandoned candidates by how far over they went, so
+# the search keeps a gradient to descend rather than a flat penalty plateau.
+ABORT_FACTOR = 2.0
+
 N_IN = 4
 N_TERMS = fis.N_TERMS
 W_LO, W_HI = 0.06, 0.60  # membership-function width range
@@ -208,18 +223,30 @@ class Objective:
         self.space = space
         self.coef = coef
         self.items = []
-        for name in names:
+        for name in sorted(names, key=lambda nm: load(nm).n):
             inst = load(name)
             cand, cand_d = build_candidates(inst.coords, K, inst.ceil)
             nn1, mean_c = nn_stats(cand_d)
             start = greedy_edge_tour(inst.coords, cand, inst.ceil)
             self.items.append((inst, cand, cand_d, nn1, mean_c, start))
+        base_costs = self._baseline_costs()
+        self.base_cost_prefix = np.cumsum(base_costs)
         self.base_gap, self.base_cost = self._baseline()
         if verbose:
             print(
                 f"  baseline LK k{K}/d{BASE_DEPTH}/b{BASE_DEEP}: "
                 f"{self.base_gap:.3f}% gap, {1e3 * self.base_cost:.1f}ms predicted"
             )
+
+    def _baseline_costs(self):
+        """Predicted baseline cost per instance, in the same order as ``items``."""
+        out = []
+        for inst, cand, cand_d, _, _, start in self.items:
+            _, _, st = lk_solve(
+                inst.coords, cand, cand_d, inst.ceil, start, K, BASE_DEPTH, BASE_DEEP, OR_SEG
+            )
+            out.append(float(features_from_stats(st, inst.n) @ self.coef))
+        return out
 
     def _baseline(self):
         gaps = []
@@ -233,15 +260,21 @@ class Objective:
             cost += float(features_from_stats(st, inst.n) @ self.coef)
         return float(np.mean(gaps)), cost
 
-    def measure(self, theta, use_chain=True, construct=True):
-        """(mean gap, predicted cost) for one rule-base vector."""
+    def measure(self, theta, use_chain=True, construct=True, abort_factor=None):
+        """(mean gap, predicted cost) for one rule-base vector.
+
+        With ``abort_factor`` the walk stops early once accumulated cost exceeds that
+        multiple of the baseline's cost over the same instances, returning
+        ``(nan, cost ratio so far)``; the caller turns that into a ranked penalty.
+        Without it every instance is evaluated, which is what reporting uses.
+        """
         d = self.space.decode(theta)
         c_cons, c_tab = d["construct"]
         e_cons, e_tab = d["effort"]
         h_cons, h_tab = d["chain"]
         gaps = []
         cost = 0.0
-        for inst, cand, cand_d, nn1, mean_c, start in self.items:
+        for i, (inst, cand, cand_d, nn1, mean_c, start) in enumerate(self.items):
             if construct:
                 tour = fis_construct(
                     inst.coords, cand, cand_d, inst.ceil, mean_c,
@@ -258,6 +291,8 @@ class Objective:
             validate_tour(tour, inst.n)
             gaps.append(inst.gap(reference_length(tour, inst)))
             cost += float(features_from_stats(st, inst.n) @ self.coef)
+            if abort_factor is not None and cost > abort_factor * self.base_cost_prefix[i]:
+                return float("nan"), cost / self.base_cost_prefix[i]
         return float(np.mean(gaps)), cost
 
     def ratios(self, theta, **kw):
@@ -266,7 +301,10 @@ class Objective:
         return gap / self.base_gap, cost / self.base_cost
 
     def scalar(self, theta):
-        gr, cr = self.ratios(theta)
+        gap, cost = self.measure(theta, abort_factor=ABORT_FACTOR)
+        if np.isnan(gap):  # abandoned: rank by how far over budget it ran
+            return ABORT_FACTOR + cost
+        gr, cr = gap / self.base_gap, cost / self.base_cost
         return max(gr, cr) + TIE_WEIGHT * 0.5 * (gr + cr)
 
 
@@ -313,7 +351,10 @@ class TrackedObjective:
     def __call__(self, theta):
         theta = np.clip(np.asarray(theta, dtype=np.float64), 0.0, 1.0)
         self.n_calls += 1
-        gap, cost = self.train.measure(theta)
+        gap, cost = self.train.measure(theta, abort_factor=ABORT_FACTOR)
+        if np.isnan(gap):
+            # hopeless on cost, and cheap to have found out; never worth pooling
+            return ABORT_FACTOR + cost
         gr = gap / self.train.base_gap
         cr = cost / self.train.base_cost
         j = max(gr, cr) + TIE_WEIGHT * 0.5 * (gr + cr)
