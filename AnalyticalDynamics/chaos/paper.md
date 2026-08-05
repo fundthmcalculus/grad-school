@@ -209,13 +209,30 @@ weighted MSE — no iterative optimiser, unlike gradient-trained TSK variants [1
 or ANFIS [8]. Antecedent placement from data rather than a grid follows the
 cluster-estimation tradition [3, 18].
 
-Two implementation details matter. First, $\theta_1(0)$ is constant across the
-sweep, so a Gaussian membership on it has $\sigma = 0$ and a degenerate firing
-strength; **zero-variance inputs must be dropped**. A network absorbs a dead
-input, a fuzzy partition cannot. Second, all scalers are **unclipped**: at
-$t = 20$ s the input scaler returns $2.0$ rather than saturating at $1.0$. This is
-deliberate and load-bearing — §6 depends on the failure being visible rather than
-disguised as a plateau.
+Three implementation details matter.
+
+First, $\theta_1(0)$ is constant across the sweep, so a Gaussian membership on it
+has $\sigma = 0$ and a degenerate firing strength; **zero-variance inputs must be
+dropped**. A network absorbs a dead input, a fuzzy partition cannot.
+
+Second, the **input** scaler is unclipped: at $t = 20$ s it returns $2.0$ rather
+than saturating at $1.0$. This is deliberate and load-bearing — §6 depends on the
+failure past the window being visible rather than disguised as a plateau.
+
+Third, the **target** scaler is fitted on the training window and then applied to
+the whole test span. Per-trajectory min–max only makes training and test
+commensurable when both are normalised over the same duration: training targets
+span exactly $[0,1]$ by construction, so fitting a 20 s holdout's scaler over its
+full length would leave its first 10 s spanning only $[0, 0.678]$ on the
+frictionless double pendulum, and a model trained to emit over $[0,1]$ would
+overshoot by ${\sim}1.5\times$ for reasons unrelated to its dynamics. Fitting on
+the window keeps every in-window number comparable to the 10 s protocol, and leaks
+nothing the protocol does not already leak — whereas fitting over 20 s would
+additionally leak the range of the region being extrapolated into. Scaled truth
+beyond 10 s may consequently exceed $[0,1]$, which is correct: the chain does leave
+the window it was normalised against. Friction datasets are indifferent to the
+choice, their 20 s and 10 s ranges being bitwise equal; only the frictionless ones
+move.
 
 We report three metric families: **pooled** (the original protocol's random 80/20
 split over pooled rows), **trained-IC** (all samples of a trajectory that was in
@@ -771,15 +788,12 @@ holdout spans $225^{\circ}$ and $937^{\circ}$ in its two angles, so the original
 0.26 corresponds to roughly $177^{\circ}$. We report degrees throughout alongside scaled
 values.
 
-**The normalisation assumes fixed-length trajectories.** Per-trajectory scaling
-only makes training and test commensurable when both are normalised over the same
-duration. Training targets span exactly $[0, 1]$ by construction; normalising a
-20 s holdout over its full length leaves its first 10 s spanning only
-$[0, 0.678]$, so a model trained to emit over $[0, 1]$ overshoots by ~1.5× for
-reasons unrelated to its dynamics. This is a latent flaw in the protocol that a
-10 s test cannot expose. Friction datasets are unaffected (their 20 s range equals
-their 10 s range bitwise); frictionless in-window numbers are not comparable
-across the choice.
+**The normalisation assumes fixed-length trajectories.** Per-trajectory min–max
+scaling is only well-posed when every trajectory is normalised over the same
+duration, and the benchmark never has to confront this because all its trajectories
+are 10 s. Testing on a longer horizon does, and §3 explains how we resolve it —
+fit the target scaler on the training window. We flag the assumption because it is
+latent in the published protocol, not because it affects any number here.
 
 **The frictionless reference is not converged.** Energy drift attests that an
 integrator is self-consistent, not that a trajectory is converged — on a chaotic

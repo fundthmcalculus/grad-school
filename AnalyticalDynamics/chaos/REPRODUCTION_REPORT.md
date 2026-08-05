@@ -528,34 +528,39 @@ Both baselines are therefore scored over 0–10 s only, and that is stated in
 
 ### The 20 s window exposes a latent flaw in the paper's normalisation
 
-Both min-max scalers are unclipped, so the held-out target is normalised over its
-full 20 s rather than over the training window. That is the literal protocol —
-each trajectory scaled by its own range — and applying it to a longer test
-trajectory reveals something a 10 s test cannot.
+Per-trajectory min-max scaling only makes training and test commensurable when
+every trajectory is normalised over the *same duration*. The benchmark never has
+to confront this, because all of its trajectories are 10 s. Testing on 20 s does.
 
-Per-trajectory scaling only makes training and test commensurable when every
-trajectory is normalised over the *same duration*. Training targets span exactly
-[0, 1] in every column by construction. Normalise the holdout over 20 s and its
-first 10 s no longer fills that range:
+Training targets span exactly [0, 1] in every column by construction. Fitting the
+holdout's scaler over its full 20 s instead leaves its first 10 s short of that:
 
-| dataset | holdout θ range over 0–10 s |
+| dataset | holdout θ range over 0–10 s, if scaled over 20 s |
 |---|---|
 | double, friction | [0, 1.000], [0, 1.000] |
 | double, frictionless | [0, 1.000], **[0, 0.678]** |
 
-A model trained to emit values across [0, 1] is then scored against an in-window
-truth reaching only 0.678, so it overshoots that column by ~1.5× for reasons
-unrelated to its dynamics. Frictionless in-window scores fall accordingly — nb80
-held-out R² moves 0.439 → 0.032 — and **that fall is a scaling artefact, not a
-modelling result**. The friction datasets are bitwise unaffected: damping keeps
-their 20 s range identical to their 10 s range, so every friction number in this
-report is unchanged.
+A model trained to emit across [0, 1] scored against an in-window truth reaching
+only 0.678 overshoots that column by ~1.5× for reasons unrelated to its dynamics.
+Frictionless in-window scores fall accordingly — nb80 held-out R² moves
+0.439 → 0.032 — and **that fall is a scaling artefact, not a modelling result**.
 
-The general point is about the benchmark, not about us. The paper's normalisation
-silently assumes fixed-length trajectories, and any attempt to test its models on a
-longer horizon than they were trained on inherits this offset before a single
-prediction is made. Frictionless in-window numbers are therefore not comparable
-across the clipped/unclipped choice; friction ones are.
+**We therefore fit the target scaler on the training window** and apply it across
+the whole test span, which keeps every in-window number comparable to the 10 s
+protocol. Scaled truth beyond 10 s may then exceed [0, 1], which is correct: the
+chain does leave the window it was normalised against. It also leaks less than the
+alternative — the protocol already hands the model the test trajectory's own min
+and max, whereas fitting over 20 s would additionally leak the range of the region
+being extrapolated into. The *input* scaler stays unclipped, which is a separate
+and opposite choice: it is what makes the failure past the window visible rather
+than a plateau.
+
+Friction datasets are indifferent either way, damping making their 20 s and 10 s
+ranges bitwise equal, so every friction number in this report is unchanged. The
+general point is about the benchmark rather than about us: its normalisation
+silently assumes fixed-length trajectories, and any attempt to test its models on
+a longer horizon than they were trained on has to resolve that before a single
+prediction is made.
 
 ### Caveat: the frictionless reference is not converged over this window
 

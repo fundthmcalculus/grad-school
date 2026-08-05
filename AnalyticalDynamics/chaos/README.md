@@ -121,9 +121,11 @@ extension.
    independently before pooling, so RMSE is a fraction of that trajectory's own
    angular range. 0.017 on the frictionless double-pendulum holdout is ≈ 16°, not
    0.017°. Every FIS metric here is reported in degrees as well. Both scalers are
-   **unclipped**: the target scaler is fitted over each trajectory's full 20 s, and
-   the input scaler returns 2.0 for t = 20 s rather than saturating at 1.0 — which
-   is why extrapolation diverges instead of plateauing.
+   clipped differently on purpose: the **target** scaler is fitted on the 10 s
+   training window, so in-window numbers stay comparable to the 10 s protocol,
+   while the **input** scaler is unclipped and returns 2.0 for t = 20 s rather
+   than saturating at 1.0 — which is why extrapolation diverges instead of
+   plateauing.
 2. **Four metric families, not one.** `pooled` is the paper's own random 80/20
    split over pooled rows — it interleaves samples 5 ms apart between train and
    test and measures interpolation, not generalisation. `trained_ic` scores a

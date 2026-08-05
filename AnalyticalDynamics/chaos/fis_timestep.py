@@ -135,20 +135,29 @@ def load(n_links, friction):
     h_t = hold["t"]
     train_t_end = float(hold["train_t_end"]) if "train_t_end" in hold else pdata.T_END
 
-    # Unclipped min-max: the holdout target scaler is fitted over the *whole* test
-    # trajectory, all 20 s of it, not clipped to the 10 s training window. This is
-    # the literal reading of the paper's protocol -- each trajectory min-max scaled
-    # by its own range -- applied to the trajectory as it actually is.
+    # The holdout target scaler is fitted on the *training window* only -- the
+    # holdout's first 10 s -- and then applied to all 20 s.
     #
-    # It costs something and the cost is worth naming. The scaler now depends on
-    # how far the chain travels in the extrapolation region, which is information
-    # about the answer beyond t = 10 s. On the three friction datasets that is
-    # free: damping means the 20 s range equals the 10 s range to the digit, so
-    # nothing changes. On the frictionless ones the range grows by up to 1.6x, so
-    # their scaled RMSE shrinks by that factor for a reason that has nothing to do
-    # with the model. Frictionless in-window numbers are therefore NOT comparable
-    # to the clipped-scaler results in earlier commits; friction ones are identical.
-    _, h_range = _scale_per_trajectory(h_deg)
+    # Per-trajectory min-max only makes training and test commensurable when both
+    # are normalised over the same duration. Training targets span exactly [0, 1]
+    # by construction, so fitting the holdout's scaler over its full 20 s would
+    # leave its first 10 s spanning only [0, 0.678] on the frictionless double
+    # pendulum, and a model trained to emit over [0, 1] would overshoot by ~1.5x
+    # for reasons having nothing to do with its dynamics. Fitting on the window
+    # keeps the two commensurable and keeps every in-window number comparable to
+    # the 10 s protocol.
+    #
+    # It also leaks nothing new: the protocol already hands the model the test
+    # trajectory's own min and max (METHOD_AND_PARAMETERS.md section 3), whereas
+    # fitting over 20 s would additionally leak the range of the region being
+    # extrapolated into. Scaled truth beyond 10 s may therefore fall outside
+    # [0, 1], which is correct -- the chain genuinely leaves the window it was
+    # normalised against.
+    #
+    # Friction datasets are indifferent to the choice (their 20 s range equals
+    # their 10 s range bitwise); only the frictionless ones move.
+    window = h_t < train_t_end
+    _, h_range = _scale_per_trajectory(h_deg[window])
     lo, hi = h_range[:, 0][None, :], h_range[:, 1][None, :]
     span = np.where(hi - lo == 0.0, 1.0, hi - lo)
     h_scaled = (h_deg - lo) / span
