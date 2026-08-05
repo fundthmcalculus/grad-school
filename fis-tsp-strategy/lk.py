@@ -50,7 +50,8 @@ STAT_SCANS = 2
 STAT_DEPTH = 3
 STAT_CHAIN_CALLS = 4  # continuation decisions taken by the CHAIN rule base
 STAT_REV_WORK = 5  # element swaps performed by segment reversal — the real memory cost
-N_STATS = 6
+STAT_KICKS = 6  # double-bridge perturbations applied (kick.py)
+N_STATS = 7
 
 
 @njit(cache=True, inline="always")
@@ -459,6 +460,34 @@ def lk_solve(
     pos = make_pos(tour)
     stats = np.zeros(N_STATS, np.int64)
 
+    seeds = np.empty(n, np.int32)
+    for i in range(n):
+        seeds[i] = tour[i]
+    lk_reopt(
+        tour, pos, n, coords, cand, cand_d, ceil, seeds, n,
+        breadth, max_depth, deep_breadth, or_seg, stats,
+        False, NO_CHAIN_TAB, NO_CHAIN_ANT, NO_CHAIN_CONS, max_moves,
+    )
+    return tour, tour_length(tour, coords, ceil), stats
+
+
+@njit(cache=True)
+def lk_reopt(
+    tour, pos, n, coords, cand, cand_d, ceil, seeds, n_seeds,
+    breadth, max_depth, deep_breadth, or_seg, stats,
+    use_chain, ch_tab, ch_ant, ch_cons, max_moves=-1,
+):
+    """Run the work queue to convergence, seeded from ``seeds[:n_seeds]``.
+
+    This is the queue discipline that used to live inside :func:`lk_solve`: FIFO, don't-look
+    bits, and re-activation of the cities whose edges changed by an accepted move. It is
+    factored out because the iterated-kick loop in ``kick.py`` needs to re-converge from the
+    eight cities a double bridge disturbed rather than from every city, and a second copy of
+    this loop would be a second place for the discipline to drift. ``lk_solve`` is now this
+    function seeded with every city.
+
+    Mutates ``tour`` and ``pos`` in place; returns the number of accepted moves.
+    """
     rev_i = np.empty(max_depth + 1, np.int64)
     rev_j = np.empty(max_depth + 1, np.int64)
     tsize = 4 * (max_depth + 1)
@@ -471,13 +500,18 @@ def lk_solve(
     cap = n + 1
     queue = np.empty(cap, np.int32)
     in_queue = np.zeros(n, np.uint8)
-    for i in range(n):
-        queue[i] = tour[i]
-        in_queue[tour[i]] = 1
     qh = 0
-    qt = n
-    qn = n
+    qt = 0
+    qn = 0
+    for i in range(n_seeds):
+        c = seeds[i]
+        if in_queue[c] == 0:
+            in_queue[c] = 1
+            queue[qt] = c
+            qt = (qt + 1) % cap
+            qn += 1
 
+    moves = 0
     while qn > 0:
         t1 = queue[qh]
         qh = (qh + 1) % cap
@@ -501,14 +535,15 @@ def lk_solve(
             rev_j,
             touched,
             stats,
-            False,
-            NO_CHAIN_TAB,
-            NO_CHAIN_ANT,
-            NO_CHAIN_CONS,
+            use_chain,
+            ch_tab,
+            ch_ant,
+            ch_cons,
             xc,
             mu,
         )
         if gain > 1e-9:
+            moves += 1
             for s in range(nt):
                 c = touched[s]
                 if in_queue[c] == 0 and qn < cap - 1:
@@ -518,5 +553,4 @@ def lk_solve(
                     qn += 1
             if max_moves > 0 and stats[STAT_MOVES] >= max_moves:
                 break
-
-    return tour, tour_length(tour, coords, ceil), stats
+    return moves
