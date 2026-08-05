@@ -154,12 +154,16 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
     c_tab = e_tab = h_tab = None  # None keeps the hand-written membership functions
     if tuned is not None:
         z = np.load(tuned)
-        c_cons = np.ascontiguousarray(z["construct_cons"])
+        # CONSTRUCT is no longer fitted — fuzzy construction is a measured failure and is in
+        # none of the reported arms — so a tuned file carries EFFORT and CHAIN only, and the
+        # construction ranker keeps its hand-written rules.
         e_cons = np.ascontiguousarray(z["effort_cons"])
         h_cons = np.ascontiguousarray(z["chain_cons"])
-        # tune_opt.py fits the membership functions too and stores them compiled
-        if "construct_tab" in z:
+        if "construct_cons" in z:
+            c_cons = np.ascontiguousarray(z["construct_cons"])
             c_tab = np.ascontiguousarray(z["construct_tab"])
+        # tune_opt.py fits the membership functions too and stores them compiled
+        if "effort_tab" in z:
             e_tab = np.ascontiguousarray(z["effort_tab"])
             h_tab = np.ascontiguousarray(z["chain_tab"])
     rows = []

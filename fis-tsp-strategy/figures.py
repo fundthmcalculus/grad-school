@@ -26,6 +26,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
+from benchmark import _instance_frontier as instance_frontier  # noqa: E402
+
 HERE = Path(__file__).resolve().parent
 
 
@@ -52,7 +54,7 @@ def figure(results, out):
         if key.startswith("lk_"):
             base[key] = (v["total_s"], v["mean_gap"])
 
-    fig, axes = plt.subplots(1, 2, figsize=(13.0, 5.4))
+    fig, axes = plt.subplots(1, 3, figsize=(19.0, 5.4))
 
     # --- panel A: the time/quality plane
     ax = axes[0]
@@ -90,11 +92,11 @@ def figure(results, out):
         )
 
     markers = {
-        "fis_chain_greedy_handwritten": ("*", "tab:red", 320, "FIS effort+chain, hand-written"),
-        "fis_effort_greedy_handwritten": ("D", "tab:orange", 75, "FIS effort, hand-written"),
-        "fis_effort_chain_greedy": ("v", "tab:green", 70, "FIS effort+chain, GA-fitted"),
+        "fis_defer": ("*", "tab:red", 320, "FIS + deferred verification"),
+        "fis_effort_chain_greedy": ("v", "tab:green", 85, "FIS effort+chain, GA-fitted"),
+        "fis_chain_greedy_handwritten": ("D", "tab:orange", 70, "FIS effort+chain, hand-written"),
         "fis_effort_greedy": ("s", "tab:olive", 60, "FIS effort, GA-fitted"),
-        "fis_defer": ("P", "tab:gray", 55, "FIS + full-effort verification"),
+        "fis_effort_greedy_handwritten": ("P", "tab:gray", 55, "FIS effort, hand-written"),
         "fis_full": ("^", "tab:purple", 55, "FIS + fuzzy construction"),
         "fis_effort_nn": ("X", "tab:brown", 50, "FIS effort, NN start"),
     }
@@ -116,7 +118,6 @@ def figure(results, out):
     # the GA-fitted one, for each of the two configurations, because the direction is the
     # result: on these held-out instances fitting moved both arms up and to the right.
     for hand, fitted, col in (
-        ("fis_effort_greedy_handwritten", "fis_effort_greedy", "tab:olive"),
         ("fis_chain_greedy_handwritten", "fis_effort_chain_greedy", "tab:green"),
     ):
         if hand not in summary or fitted not in summary:
@@ -153,7 +154,7 @@ def figure(results, out):
     ns = [r["n"] for r in rows]
     order = np.argsort(ns)
     ns = np.array(ns)[order]
-    key = "fis_chain_greedy_handwritten"
+    key = "fis_defer"
     md = np.array([r.get(f"{key}_mean_depth", np.nan) for r in rows])[order]
     mb = np.array([r.get(f"{key}_mean_breadth", np.nan) for r in rows])[order]
     ax.plot(ns, md, "o-", color="tab:red", label="FIS mean chain depth (adaptive)")
@@ -170,6 +171,56 @@ def figure(results, out):
     )
     ax.grid(alpha=0.3, which="both")
     ax.legend(fontsize=7)
+
+    # --- panel C: the size dependence, which is the actual finding.
+    # Band means rather than per-instance points: per instance the ratio swings by a few
+    # percent on the small instances, which compresses the region where every arm sits
+    # within a fraction of a percent of the frontier and where the result actually is. The
+    # error bars are the standard error within each band, and they are the reason the
+    # write-up does not claim more than "among the best" at large n.
+    ax = axes[2]
+    bands = [(0, 1000), (1000, 2000), (2000, 5000), (5000, 30000)]
+    centres = [np.sqrt(max(a, 60) * b) for a, b in bands]
+    series = [
+        ("fis_defer", "tab:red", "o", "FIS + deferred verification"),
+        ("fis_effort_chain_greedy", "tab:green", "v", "FIS effort+chain, GA-fitted"),
+        ("fis_chain_greedy_handwritten", "tab:orange", "D", "FIS effort+chain, hand-written"),
+        ("lk_32_2_4", "tab:blue", "s", "LK k32/d2/b4 (best fixed overall)"),
+        ("lk_48_10_32", "tab:cyan", "^", "LK k48/d10/b32 (best quality)"),
+    ]
+    for key, col, mk, label in series:
+        mus, ses = [], []
+        for a, b in bands:
+            qs = []
+            for r in rows:
+                if not (a <= r["n"] < b):
+                    continue
+                t, g = instance_frontier(r)
+                bar = float(np.interp(r[f"{key}_s"], t, g))
+                qs.append((1.0 + r[f"{key}_gap"] / 100.0) / (1.0 + bar / 100.0))
+            qs = np.array(qs)
+            mus.append(qs.mean())
+            ses.append(qs.std(ddof=1) / np.sqrt(len(qs)) if len(qs) > 1 else 0.0)
+        ax.errorbar(
+            centres, mus, yerr=ses, fmt=mk + "-", color=col, ms=6, lw=1.5,
+            capsize=3, alpha=0.9, label=label,
+        )
+    ax.axhline(1.0, color="black", lw=1.6, ls="--", label="the baseline frontier")
+    ax.set_xscale("log")
+    ax.set_xticks(centres)
+    ax.set_xticklabels([f"<1k\n({sum(1 for r in rows if r['n'] < 1000)})"]
+                       + [f"{a // 1000}k-{b // 1000}k\n"
+                          f"({sum(1 for r in rows if a <= r['n'] < b)})"
+                          for a, b in bands[1:]], fontsize=8)
+    ax.set_xlabel("instance size band (instances)")
+    ax.set_ylabel("mean q  (tour length / frontier at equal wall clock)")
+    ax.set_title(
+        "Frontier ratio against size, with standard error\n"
+        "(below the dashed line is outside LK's frontier)",
+        fontsize=10,
+    )
+    ax.grid(alpha=0.3)
+    ax.legend(fontsize=7, loc="upper right")
 
     fig.tight_layout()
     fig.savefig(out, dpi=130)
