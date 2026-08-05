@@ -1,0 +1,7 @@
+# Cython build products from profile_kernels.py --cython. Regenerated on demand by
+# build_cython(); a compiled extension is machine-specific and does not belong in git.
+_cython_setup.py
+cython_fis_eval.c
+*.pyd
+*.so
+build/

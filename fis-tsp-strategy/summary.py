@@ -133,6 +133,7 @@ def markdown(rows, limit=None):
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--sort", default="n", choices=("n", "arm", "gap", "s", "instance"))
     ap.add_argument("--arms", nargs="*", default=None, help="substring filter on the arm name")

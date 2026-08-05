@@ -21,10 +21,12 @@ The bottom row is the scaling question, which one panel per instance cannot answ
 * **left** — LKH's floor and our time-to-best against n, on log-log axes. Whether the window
   below LKH's floor is a footnote or the result depends entirely on whether it widens with n,
   and two lines diverging on a log-log plot is what that looks like.
-* **right** — the two iterated arms' best gap against n, which isolates what the fuzzy
-  engine contributes once perturbation is in play: identical loop, identical budgets, and the
-  only differences are that ``EFFORT`` aims the kicks and ``CHAIN`` runs inside each
-  re-optimisation.
+* **right** — the iterated 2x2 read at one common budget per instance, which isolates what the
+  fuzzy engine contributes once perturbation is in play: identical loop, identical seed and
+  budgets, and the only two things that vary are whether ``EFFORT`` aims the kicks and whether
+  ``CHAIN`` sets each re-optimisation's depth. The common budget is the control's dearest
+  point, because comparing each arm at its *own* best budget compares different amounts of
+  spending — which is the confound the factorial exists to remove.
 
 Run:  python figures_lkh.py
 """
@@ -105,14 +107,22 @@ def _panel(ax, name, d):
                 label=label, zorder=5)
         floor = min(t for t, _ in lkh)
         left = ax.get_xlim()[0]
-        ax.axvspan(left if left > 0 else 1e-3, floor, color=colour, alpha=0.07, zorder=0)
+        # Deliberately faint. This region is most of the panel — every point of ours is inside
+        # it — so shading it at any weight that reads as "highlighted" would say the opposite of
+        # what it means. It marks where there is no opponent, not where we are winning. The
+        # label sits at the bottom, away from the legend and away from the curves.
+        ax.axvspan(left if left > 0 else 1e-3, floor, color=colour, alpha=0.045, zorder=0)
         ax.axvline(floor, color=colour, ls="--", lw=1.2, alpha=0.7)
-        ax.annotate(f"LKH returns nothing\nbelow {floor:.1f}s", xy=(floor, ax.get_ylim()[1]),
-                    xytext=(-6, -6), textcoords="offset points", ha="right", va="top",
+        # Anchored in axes fraction on y, because ``set_ylim`` below moves the data limits and
+        # a data-coordinate annotation placed here would silently fall off the panel.
+        ax.annotate(f"← LKH returns nothing below {floor:.1f}s", xy=(floor, 0.02),
+                    xycoords=("data", "axes fraction"), xytext=(-6, 0),
+                    textcoords="offset points", ha="right", va="bottom",
                     fontsize=8, color=colour)
         if min(g for _, g in lkh) <= 1e-9:
-            ax.annotate("LKH: exactly optimal", xy=(max(t for t, _ in lkh), 0.0),
-                        xytext=(-4, 8), textcoords="offset points", ha="right",
+            ax.annotate("LKH: exactly optimal", xy=(max(t for t, _ in lkh), 0.10),
+                        xycoords=("data", "axes fraction"), xytext=(-4, 0),
+                        textcoords="offset points", ha="right",
                         fontsize=8, color=colour)
     else:
         ax.text(0.5, 0.5, "LKH did not finish", transform=ax.transAxes,
@@ -192,6 +202,7 @@ def figure(data, out):
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default=str(paths.LKH_COMPARE))
     ap.add_argument("--out", default=str(paths.FIGURES / "fis_tsp_vs_lkh.png"))

@@ -219,6 +219,7 @@ def predict(coef, stats, n):
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--out", default=str(paths.COSTMODEL))

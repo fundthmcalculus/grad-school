@@ -317,6 +317,7 @@ def build_cython():
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--instance", default=PROFILE_INSTANCE)
     ap.add_argument("--reps", type=int, default=2_000_000)

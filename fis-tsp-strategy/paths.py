@@ -65,6 +65,25 @@ def ensure() -> None:
         d.mkdir(parents=True, exist_ok=True)
 
 
+def utf8_stdout() -> None:
+    """Make stdout able to carry the characters this project's tables are written with.
+
+    On Windows, redirecting a script's output to a file or a pipe gives it a ``cp1252`` stream,
+    and ``cp1252`` cannot encode ``ρ``, ``≥``, ``●`` or an em dash. The failure mode is a
+    ``UnicodeEncodeError`` *only when redirected* — the console itself replaces unknown
+    characters instead of raising — so it hides from interactive use and surfaces the first
+    time someone pipes the output into a file or into ``run_all.py``. That is exactly how
+    ``feature_registry.py`` came to crash printing its own table.
+
+    Called from ``main()`` rather than at import, so that importing a module for its functions
+    never reconfigures the caller's streams.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8", errors="replace")
+
+
 def on_path() -> str:
     """Put the project root on ``sys.path`` and return it.
 

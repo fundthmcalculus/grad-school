@@ -12,7 +12,7 @@ measures what that buys.
 | | fixed rule | rule base |
 |---|---|---|
 | **which city next**, during construction | take the nearest unvisited | `CONSTRUCT`: nearness, stranding risk, cost of coming back, heading continuity |
-| **how hard to search a city** | one (breadth, deep breadth, depth, Or-opt) everywhere | `EFFORT`: edge excess, past failures, turn sharpness, progress |
+| **how hard to search a city** | one (breadth, deep breadth, depth, Or-opt) everywhere | `EFFORT`: a depth-1 look-ahead probe, candidate rank, edge excess, edge asymmetry |
 | **deepen this chain or cut it** | run to a fixed depth | `CHAIN`: gain credit carried, depth so far, gain already banked, next step's trade |
 
 The engine is small and plain on purpose: three linguistic terms per input, product
@@ -38,8 +38,10 @@ speed of their arithmetic — only in strategy. Every reported tour is checked t
 permutation of the cities and re-scored from the coordinates under TSPLIB rounding,
 independently of the solver's own bookkeeping.
 
-Reference values are the published TSPLIB optima. LKH (via `elkai`) is reported as an
-external yardstick, not a competitor this work claims to beat.
+Reference values are the published TSPLIB optima. **LKH** (via `elkai`) is measured as a
+separate question by `lkh_compare.py`, curve against curve rather than point against point,
+because a solver whose premise is choosing its own operating point cannot be judged at
+somebody else's. The answer there is unambiguous and negative — see below and FINDINGS §9b.
 
 See **[FINDINGS.md](FINDINGS.md)** for the results, including the components that did not work.
 
@@ -96,7 +98,7 @@ able to tell a reported result from an exploration without reading the code.
 | `benchmark.py --scale small\|large` | `results/results_<scale>.json` — the frontier-relative test-set comparison |
 | `lkh_reference.py` | `results/lkh.json` — LKH once per test instance, as a yardstick |
 | `lkh_compare.py` | `results/lkh_compare.json` — every arm and LKH, curve against curve, across a size ladder |
-| `figures.py`, `figures_tuning.py`, `figures_lkh.py` | `results/figures/*.png` |
+| `figures.py`, `figures_tuning.py`, `figures_fis.py`, `figures_lkh.py` | `results/figures/*.png` |
 | `summary.py` | `results/summary.csv` — one flat size / quality / time row per (instance, arm) |
 
 **`experiments/`** — superseded, one-off, or illustrative. Nothing reported depends on it; see
@@ -134,7 +136,7 @@ search spends.
 ### The expensive stage
 
 `lkh_compare.py` dominates everything else, and not because of our solver: LKH's cost grows as
-roughly n^3.5, so one run on the largest instance of the ladder costs more than every other
+steeply in n, so one run on the largest instance of the ladder costs more than every other
 stage combined. `--dry-run` prices it per instance before it starts, `--ladder` opts into the
 full size range, and results are written after each instance so an interrupted run keeps
 everything it measured. `--skip-lkh` re-measures our arms against an LKH curve already on disk.

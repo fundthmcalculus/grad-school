@@ -69,6 +69,7 @@ def lkh_one(name, timeout):
 
 
 def main():
+    paths.utf8_stdout()
     import benchmark
     from tsplib import load
 

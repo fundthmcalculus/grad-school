@@ -33,8 +33,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
 import fis  # noqa: E402
-
-HERE = Path(__file__).resolve().parent
+import paths  # noqa: E402
 
 TERM = ("LOW", "MED", "HIGH")
 TERM_COLOUR = ("tab:blue", "tab:orange", "tab:green")
@@ -172,14 +171,20 @@ def describe(tuned, scale):
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tuned", default=str(HERE / "tuned_small.npz"))
-    ap.add_argument("--scale", default=None)
-    ap.add_argument("--out", default=str(HERE / "figures" / "fis_tsp_rulebase.png"))
+    ap.add_argument("--scale", default="small", choices=("small", "large"))
+    ap.add_argument("--tuned", default=None, help="default: results/tuned_<scale>.npz")
+    ap.add_argument("--out", default=str(paths.FIGURES / "fis_tsp_rulebase.png"))
     args = ap.parse_args()
+    paths.ensure()
+    if args.tuned is None:
+        args.tuned = str(paths.tuned(args.scale))
     tuned = np.load(args.tuned)
-    scale = args.scale or (str(tuned["scale"]) if "scale" in tuned else fis.DEFAULT_SCALE)
-    Path(args.out).parent.mkdir(exist_ok=True)
+    # The file's own record of the scale it was fitted at wins over the flag: its consequents
+    # are only meaningful against that scale's antecedents, so drawing them under the other
+    # scale's input names would label every axis wrongly and still render.
+    scale = str(tuned["scale"]) if "scale" in tuned else args.scale
     print(f"wrote {figure(tuned, scale, args.out)}")
     describe(tuned, scale)
 

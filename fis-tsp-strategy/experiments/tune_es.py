@@ -292,6 +292,7 @@ def tune(seconds=600.0, seed=0, verbose=True, construct_seconds=120.0):
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--seconds", type=float, default=600.0)
     ap.add_argument("--construct-seconds", type=float, default=120.0)

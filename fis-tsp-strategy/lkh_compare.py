@@ -396,7 +396,42 @@ def report(data):
     return rows
 
 
+#: Fallback cost law, from the superseded run in ``results/legacy/``: floors of 3.8s at
+#: n=1002, 54.6s at n=2392 and 165.5s at n=3038. Used only when nothing has been measured on
+#: this machine yet, since LKH's absolute speed is hardware-dependent and these were not
+#: measured here.
+_FALLBACK_LAW = (3.5, 3038, 165.5, "the superseded run in results/legacy/")
+
+
+def _lkh_cost_law(measured_path):
+    """(exponent, reference n, reference seconds, provenance) for pricing an LKH run.
+
+    Fitted to whatever floors have actually been measured on *this* machine, because LKH's
+    absolute speed is hardware-dependent and an estimate carried over from other hardware is
+    the kind of number that gets quoted long after it stopped being true. Two measured floors
+    are enough for a log-log slope; below that it falls back to the recorded law and says so.
+    """
+    p = Path(measured_path)
+    if not p.exists():
+        return _FALLBACK_LAW
+    data = json.loads(p.read_text())
+    pts = []
+    for d in data.values():
+        lkh = [r["s"] for r in d.get("lkh", []) if r.get("s") is not None]
+        if lkh and d.get("n"):
+            pts.append((d["n"], min(lkh)))
+    if len(pts) < 2:
+        return _FALLBACK_LAW
+    pts.sort()
+    ns = np.log(np.array([p[0] for p in pts], float))
+    ss = np.log(np.array([p[1] for p in pts], float))
+    slope = float(np.polyfit(ns, ss, 1)[0])
+    n_ref, s_ref = pts[-1]  # anchor at the largest measured point, not an extrapolated one
+    return slope, n_ref, s_ref, f"{len(pts)} floors measured on this machine"
+
+
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--instances", nargs="*", default=None)
     ap.add_argument("--ladder", action="store_true", help=f"the full ladder: {' '.join(LADDER)}")
@@ -424,13 +459,14 @@ def main():
         print(f"our arms: {len(LK_GRID)} sweep configs, 1 FIS local search, "
               f"{len(IT_ARMS)} x {len(args.kicks)} kick budgets, x{args.reps} reps")
         print(f"LKH: run counts {args.lkh_runs}, timeout {args.lkh_timeout}s each\n")
-        print("LKH's cost grows steeply. Measured floors here are 3.8s at n=1002, 54.6s at")
-        print("n=2392 and 165.5s at n=3038, which is about n^3.5 — so the extrapolation below")
-        print("is a rough guide and the tail of the ladder is where the budget goes:")
+        exponent, ref_n, ref_s, source = _lkh_cost_law(args.out)
+        print(f"LKH's cost grows steeply — about n^{exponent:.1f}, from {source}. Extrapolating")
+        print(f"from {ref_s:.1f}s at n={ref_n} (a rough guide; the tail of the ladder is where")
+        print("the budget goes, and LKH's cost varies a lot with instance structure):")
         total = 0.0
         for name in names:
             n = load(name).n
-            est = 165.5 * (n / 3038.0) ** 3.5
+            est = ref_s * (n / ref_n) ** exponent
             capped = sum(min(est * r, args.lkh_timeout) for r in args.lkh_runs)
             total += capped
             print(f"  {name:>10s} n={n:6d}  ~{est:8.0f}s per run, ~{capped / 60:7.1f} min "

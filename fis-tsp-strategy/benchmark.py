@@ -364,6 +364,7 @@ def summarise(rows, min_n=0):
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--max-n", type=int, default=20000)

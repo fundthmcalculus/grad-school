@@ -266,6 +266,7 @@ def spearman(a, b):
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(paths.FEATURE_SCREEN))
     args = ap.parse_args()

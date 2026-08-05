@@ -567,6 +567,7 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--optimizers", nargs="*", default=["ga"])
     ap.add_argument("--mf-kinds", nargs="*", default=["triangular"])

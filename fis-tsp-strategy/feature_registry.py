@@ -34,6 +34,8 @@ Run:  python feature_registry.py            # the table as markdown
 from __future__ import annotations
 
 import argparse
+
+import paths
 from dataclasses import dataclass, field
 
 
@@ -276,6 +278,7 @@ def check():
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     args = ap.parse_args()

@@ -20,9 +20,10 @@ Both rule-base scales are built. They are a reported comparison, not a default a
 §3b), so a run that produced only one of them could not state the result.
 
 The stages differ in cost by three orders of magnitude, and the expensive one is not ours —
-LKH's cost grows as roughly n^3.5, so ``lkh-compare`` over the full size ladder dominates
-everything else combined. It is therefore its own stage, off by default at full ladder, and
-``--dry-run`` prices it before it is started.
+LKH's cost grows steeply in n, so ``lkh-compare`` over the full size ladder dominates everything
+else combined. It is therefore its own stage, with the full ladder off by default, and
+``--dry-run`` prices it first from floors measured *on this machine* rather than from a constant
+carried over from other hardware.
 
 Run:  python run_all.py                       # everything except the full LKH ladder
       python run_all.py --stages bench figs    # just these
@@ -60,11 +61,14 @@ def _stages(args):
         ("lkh-compare", [PY, "lkh_compare.py", *ladder, *reps], paths.LKH_COMPARE),
         ("figs", [PY, "figures.py"], paths.FIGURES / "fis_tsp_pareto.png"),
         ("figs-tuning", [PY, "figures_tuning.py"], paths.FIGURES / "fis_tsp_tuning.png"),
+        ("figs-rules", [PY, "figures_fis.py"], paths.FIGURES / "fis_tsp_rulebase.png"),
         ("figs-lkh", [PY, "figures_lkh.py"], paths.FIGURES / "fis_tsp_vs_lkh.png"),
+        ("summary", [PY, "summary.py", "--limit", "0"], paths.RESULTS / "summary.csv"),
     ]
 
 
 def main():
+    paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--stages", nargs="*", default=None, help="default: all of them")
     ap.add_argument("--skip", nargs="*", default=[], help="stage names to leave out")
@@ -83,9 +87,13 @@ def main():
         for name, argv, writes in stages:
             print(f"  {name:<12s} {' '.join(argv[1:]):<46s} -> {writes}")
         if args.dry_run:
-            print("\npricing the LKH stage:")
-            subprocess.run([PY, "lkh_compare.py", "--dry-run", *(["--ladder"] if args.ladder else [])],
-                           cwd=str(paths.ROOT))
+            # Flushed first: the child inherits this stdout, and a buffered parent would have
+            # its own lines land *after* the child's whenever the stream is redirected.
+            print("\npricing the LKH stage:", flush=True)
+            subprocess.run(
+                [PY, "lkh_compare.py", "--dry-run", *(["--ladder"] if args.ladder else [])],
+                cwd=str(paths.ROOT),
+            )
         return
 
     chosen = [s for s in stages if (args.stages is None or s[0] in args.stages)

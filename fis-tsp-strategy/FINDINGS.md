@@ -619,8 +619,10 @@ of our own arms, which is a rounding error next to LKH's, and it is the differen
 result and an anecdote.
 
 **Scale.** Four instances spanning n = 783…2392, one machine. `lkh_compare.py --ladder` extends
-to n = 5915; `--dry-run` prices it first, because LKH's cost grows as roughly n^3.5 and the
-tail of that ladder is hours.
+to n = 5915; `--dry-run` prices it first, fitting LKH's cost law to the floors measured on the
+machine it is about to run on. On these four that fit is n^2.3 and the full ladder costs about
+50 minutes — the n^3.5 recorded in `results/legacy/` was measured on other hardware, which is
+why the estimate is derived rather than stored.
 
 ---
 
