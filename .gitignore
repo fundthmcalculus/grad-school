@@ -33,3 +33,15 @@ __pycache__/
 
 # IDE
 .idea/
+
+# Local venvs
+.venv*/
+
+# Cython build artifacts (ode_kernels): generated C, compiled extensions,
+# annotation HTML, and the build/ scratch tree are all reproducible via
+# `python ode_kernels/setup.py build_ext --inplace`.
+ode_kernels/build/
+ode_kernels/*.c
+ode_kernels/*.so
+ode_kernels/*.html
+.pytest_cache/
