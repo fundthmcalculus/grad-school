@@ -41,8 +41,30 @@ independently of the solver's own bookkeeping.
 Reference values are the published TSPLIB optima. LKH (via `elkai`) is reported as an
 external yardstick, not a competitor this work claims to beat.
 
-See **[FINDINGS.md](FINDINGS.md)** for the results, including the two components that
-did not work.
+See **[FINDINGS.md](FINDINGS.md)** for the results, including the components that did not work.
+
+## Where this stands, in three sentences
+
+Against the *same* LK under fixed parameters, adaptive effort improves monotonically with
+instance size and reaches the frontier at the top of the range — the size trend is solid, the
+margin at the top is nine parts in ten thousand and is not (FINDINGS §2). Against **LKH** it
+loses outright: on four held-out instances LKH reaches the published optimum exactly at its
+cheapest available setting, and no arm here beats it at any budget — what exists is a speed
+window below LKH's floor, partly an artefact of `elkai` taking a run count rather than a time
+limit (§9b). The rule bases' real contribution is *cheapness*: they run the solver in 0.43x the
+baseline's wall clock, which is where the frontier result comes from and why the picture
+improves with n.
+
+### Size, quality and time at a glance
+
+```bash
+python summary.py --sort n            # every measured (instance, arm), long form
+python summary.py --arms iterated lkh --instances pr2392
+```
+
+`results/summary.csv` carries all of it. The three source files answer different questions and
+print different shapes; this joins them into one table of *n*, gap over the published optimum,
+and wall clock.
 
 ## Layout
 
@@ -75,6 +97,7 @@ able to tell a reported result from an exploration without reading the code.
 | `lkh_reference.py` | `results/lkh.json` — LKH once per test instance, as a yardstick |
 | `lkh_compare.py` | `results/lkh_compare.json` — every arm and LKH, curve against curve, across a size ladder |
 | `figures.py`, `figures_tuning.py`, `figures_lkh.py` | `results/figures/*.png` |
+| `summary.py` | `results/summary.csv` — one flat size / quality / time row per (instance, arm) |
 
 **`experiments/`** — superseded, one-off, or illustrative. Nothing reported depends on it; see
 [experiments/README.md](experiments/README.md).

@@ -760,10 +760,20 @@ any kernel's code generation.
 * **Ablate the five kept antecedents individually.** §7 measured their predictive power in
   isolation but not their marginal contribution to the fitted system; `probe_frac` and `probe`
   are likely to be partly redundant with each other.
+* **Replace the tour representation.** §11 makes this the highest-value performance work by a
+  wide margin: segment reversal is 45% of the baseline solve and 30% of the fuzzy one, and a
+  two-level list removes essentially all of it. Every other speed item on this list is a few
+  percent of a cost that reversal dominates.
 * **Cut the effort decision below 349 ns.** It is the entire mechanism of the size dependence
   and still ~70% of a city scan. Evaluating `EFFORT` once per region rather than per city, or
   caching it while a city's features have not moved, would lower the crossover — which is worth
   more than any further tuning, because it moves where the engine works rather than how well.
+  Not by changing compilers, though: §11 measured Cython at 0.87x numba on the hottest kernel.
+* **Aim perturbations by something other than `EFFORT`.** §9b's 2x2 says the per-city payoff
+  prediction is the wrong signal for where to *kick* — plausibly because a city with improving
+  moves still available is one the local search has not finished with, whereas a kick is worth
+  spending where it has converged. A "how stuck is this region" signal is a different feature
+  screen, and §7's methodology applies to it directly.
 * **Stop selecting on validation** (§6). A nested split, or a budget fixed a priori with no
   accept/reject gate, would make the reported validation numbers unbiased instead of
   optimistic.
