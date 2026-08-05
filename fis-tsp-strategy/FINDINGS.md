@@ -31,6 +31,19 @@ parameters) is *worse overall* than the small one (5 inputs, 30 rules, 87) and *
 n = 5000*. Both halves of that follow from the same mechanism, and neither is a tuning
 accident. Fuzzy construction still fails.
 
+**Against LKH the answer is no, and it is not close.** §9b puts the FIS itself on LKH's axes
+for the first time — the earlier comparison ran with the fuzzy engine switched off, on two
+instances the rule base is fitted on. On four held-out instances LKH reaches the published
+optimum *exactly* at its cheapest available setting, and no arm here beats it at any budget.
+What we have is a speed window below LKH's floor, which is partly an artefact of `elkai`'s
+interface. Aiming perturbations with `EFFORT` — the obvious next use of the rule base — is
+measured as a 2x2 factorial and **does not work**.
+
+**Where the time actually goes is not where this work spent its attention.** Segment reversal
+is 45% of the baseline solve and 30% of the fuzzy one (§11), larger than the inference §4 was
+written to make cheap. Cython was measured against numba on the hottest kernel and is 13%
+*slower*.
+
 ---
 
 ## 1. How this is measured
@@ -545,9 +558,73 @@ next step is not perturbation scheduling but **alpha-nearness candidate sets** �
 candidates from a minimum spanning tree rather than by plain k-nearest, which improves every move
 rather than adding one. That measurement is the sharpest open question in this document.
 
+### 9b. Putting the FIS itself against LKH — and the answer is no
+
+Everything above compares the FIS against a swept LK. The comparison against LKH was, until
+now, run with the fuzzy engine switched off: `frontier_vs_lkh.py` measured the plain iterated
+solver with `use_chain=False` and uniform kicks, and its `targeted` parameter was accepted and
+never used. Two of its three default instances — `pr1002` and `d1291` — are instances
+`tune_opt.py` **fits on**. So the headline question had no measurement behind it, and the
+measurement it did have was partly on training data.
+
+`lkh_compare.py` now runs the FIS against LKH on held-out instances only, and refuses at
+import to measure on anything from the fitting pools. The FIS enters twice: as the fitted
+`EFFORT`+`CHAIN` local search, and — since a perturbation has to be aimed somewhere — as a
+**2x2 factorial** over the two places inference can act once kicking is in play. `EFFORT` can
+choose where kicks land; `CHAIN` can set how deep each seeded re-optimisation goes.
+
+Test instances, `small` scale, wall clock, best of 3:
+
+| instance | n | LKH's floor | LKH's best | our best | at | beats LKH? |
+|---|---|---|---|---|---|---|
+| rat783 | 783 | 1.9 s | **0.000%** | 0.477% | 3.9 s | no arm |
+| pcb1173 | 1173 | 3.1 s | **0.000%** | 0.336% | 4.7 s | no arm |
+| rl1323 | 1323 | 4.8 s | **0.000%** | 0.526% | 4.0 s | no arm |
+| pr2392 | 2392 | 23.5 s | **0.000%** | 0.988% | 6.3 s | no arm |
+
+**No arm beats LKH anywhere, on any instance, at any budget.** LKH reaches the published
+optimum exactly at its cheapest available setting on all four. There is no quality at which
+we are competitive and no budget above its floor at which we are preferable. The only thing
+we have is a *speed* window below that floor — 1.9 s to 23.5 s here — and that window is
+partly an artefact of `elkai` taking a run count rather than a time limit. Being the only
+solver present is not the same as being better, and §9's table should be read that way too.
+
+### The 2x2: aiming the kicks with `EFFORT` does not work
+
+Each arm read at one common budget per instance — the control's dearest point — because
+comparing each at its own best budget compares different amounts of spending.
+
+| instance | n | budget | control | + aimed kicks | + `CHAIN` depth | + both |
+|---|---|---|---|---|---|---|
+| rat783 | 783 | 3.86 s | **0.477%** | 0.488% | 0.693% | 0.500% |
+| pcb1173 | 1173 | 4.66 s | **0.336%** | 0.809% | 0.603% | 0.810% |
+| rl1323 | 1323 | 7.43 s | 0.573% | 0.811% | **0.526%** | 0.618% |
+| pr2392 | 2392 | 6.15 s | 1.161% | 1.180% | 1.118% | **1.104%** |
+
+**Aiming is never best and is worst or near-worst on three of four.** That is the clearest
+negative result in this document, and it is a specific one: the `EFFORT` base predicts where a
+*local search* will find an improving move, and §7 says it does that well (AUC 0.858 for the
+best antecedent). It does not follow that those are the cities worth *perturbing*, and this
+says they are not. The two questions differ in a way that now looks obvious — a city where
+improving moves are still available is one the local search has not finished with, whereas a
+kick is worth spending where the search has converged to something that needs breaking.
+
+`CHAIN` is roughly neutral and its two wins are both at the larger end, which is consistent
+with the amortisation argument of §4 and is not established by four instances.
+
+**What this cost to learn.** The first version of this measurement bundled aiming and chain
+control into one arm. It was faster and worse than the control, and there was no way to say
+which half did which — on rat783 alone it looked like a win. The factorial doubles the runtime
+of our own arms, which is a rounding error next to LKH's, and it is the difference between a
+result and an anecdote.
+
+**Scale.** Four instances spanning n = 783…2392, one machine. `lkh_compare.py --ladder` extends
+to n = 5915; `--dry-run` prices it first, because LKH's cost grows as roughly n^3.5 and the
+tail of that ladder is hours.
+
 ---
 
-## 9b. Absolute standing: LKH
+## 9c. Absolute standing: LKH
 
 LKH (via `elkai`) completed 9 of the 10 test instances it was given (it timed out on
 fl1577): **exactly optimal on 7, and within 0.03% on the other two** — but taking up to 80 s
@@ -593,7 +670,83 @@ holds them.
 
 ---
 
-## 11. Worth doing next
+## 11. Where the time goes, and why Cython would not take any of it back
+
+An ordinary profiler is useless on this solver, and the reason is worth stating before any
+number below is trusted. A whole solve is **one** `@njit` call: `lk_solve` and `iterated_lk`
+enter nopython mode once and do not return to the interpreter until the tour is finished.
+`cProfile` therefore reports a single entry taking 100% of the time and `line_profiler` sees
+nothing at all. `experiments/profile_kernels.py` attributes the time three ways instead, each
+checking the others.
+
+### The profile
+
+The fitted cost model (§5) applied to a real solve of pr2392 — the only method here that
+measures the kernels *in situ*, contending for the same caches as everything else:
+
+| | baseline LK | FIS `EFFORT`+`CHAIN` |
+|---|---|---|
+| reversal element swaps | **44.8%** | **29.7%** |
+| candidate evaluations | 26.7% | 12.6% |
+| chain levels entered | 20.5% | 9.9% |
+| city scans | 6.1% | 16.2% |
+| `CHAIN` decisions | — | 14.7% |
+| `EFFORT` decisions | — | 11.4% |
+| accepted moves | 1.9% | 5.4% |
+| measured wall clock | 17.6 ms | **7.4 ms** |
+
+Two things fall out of it.
+
+**Segment reversal is the largest single cost in both arms**, at 45% and 30% — larger than the
+inference the rule bases were built to make cheap, and larger than the candidate evaluation
+that the search's whole structure is organised around. It is also the cost §10's third bug
+already flagged as invisible to move counts. Any further work on speed belongs here, not in
+the rule bases: a doubly-linked-list or two-level-list tour representation removes it more or
+less entirely, and that is a bigger lever than anything in §4.
+
+**The rule bases together account for 26% of the fuzzy arm's time and buy a 2.4x speedup.**
+That is the honest framing of §4's overhead: it is real, it is the mechanism behind the size
+dependence, and it is paid for several times over by the work it avoids. The ablation agrees
+independently — `EFFORT` alone runs at 0.76x the baseline's time and `EFFORT`+`CHAIN` at
+0.43x.
+
+**A calibration note.** The shipped coefficients over-predict this machine by 1.58–1.69x, and
+by close to the *same* factor on both arms. A near-uniform scale error is what a cost model
+fitted on other hardware looks like, and it is harmless for the job it has: the tuner ranks
+candidates rather than reading absolute times off it, which is what the fit's 0.9995 rank
+correlation measures. The shares above are unaffected; the totals should be recalibrated by
+re-running `costmodel.py` before anyone quotes them as absolute.
+
+### Cython: measured, and it loses
+
+The question is not whether Cython beats Python — nothing in the hot path is Python. It is
+whether Cython beats **numba**, which already emits LLVM-optimised machine code with bounds
+checking off. So `experiments/cython_fis_eval.pyx` is a faithful C transcription of
+`fis_eval1` — the smallest and hottest kernel in the system, the chain cut-off — with typed
+memoryviews, `boundscheck=False`, `wraparound=False`, `cdivision=True`, `-O3 -ffast-math
+-march=native`, and the benchmark loop *inside* the C function so neither side pays a
+per-call boundary cost.
+
+| | ns per call |
+|---|---|
+| numba `@njit` | **54.0** |
+| Cython + gcc `-O3 -march=native` | 61.9 (0.87x) |
+
+Outputs agree exactly. **Cython is 13% slower**, on the kernel most favourable to it, with the
+algorithm held fixed so the only variable is code generation. Porting the solver would cost a
+build toolchain, a compilation step, and platform-specific artifacts, in exchange for a loss.
+
+Two measurements make it clear why there was never much room. Membership evaluation — the part
+that was an exponential before §4 tabulated it — is now **17.6 ns of the 54**, so a third of
+the kernel is a table lerp that neither compiler can improve on. And one Python-level call into
+nopython mode costs **381 ns**, seven times the kernel itself; the only way Cython could have
+won was on boundary crossings, and there is one per *solve*, not one per call.
+
+The measurement that would change this answer is not a different compiler. It is removing the
+reversal cost, which is 45% of the baseline and belongs to the data structure rather than to
+any kernel's code generation.
+
+## 12. Worth doing next
 
 * **Settle the n ≥ 5000 crossing.** q = 0.9994 on four of seven instances is a suggestion, not
   a result. TSPLIB has few instances that large, but `synth.py` can generate them freely and
@@ -619,7 +772,7 @@ holds them.
   payoff to effort with a single monotone curve. That is far fewer parameters than a rule base
   per LK parameter, and the screening data is already the training set for it.
 
-## 12. Reproducing
+## 13. Reproducing
 
 ```bash
 pip install numpy scipy matplotlib numba elkai
