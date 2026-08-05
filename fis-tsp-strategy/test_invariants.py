@@ -11,6 +11,8 @@ Run:  python test_invariants.py      (or: pytest -q test_invariants.py)
 
 from __future__ import annotations
 
+import time
+
 import numpy as np
 
 import fis
@@ -29,6 +31,13 @@ from tsplib import load, reference_length, validate_tour
 
 SMALL = ["berlin52", "a280", "pr1002"]
 
+# Instances whose coordinates are grid-like or clustered, so exactly-equidistant
+# neighbours are common: 933 of rl5915's 5915 cities have a distance tie straddling the
+# 32nd-nearest place. These are what break tie handling, and what made an earlier
+# "widen the query until no row is contested" approach degenerate into querying every
+# city — a 90x slowdown in candidate building that the quality checks could not see.
+TIE_HEAVY = ["fl1577", "pcb3038", "rl5915", "d18512"]
+
 
 def test_candidate_lists_are_prefix_stable_in_k():
     """The k=8 list must be the first 8 of the k=24 list.
@@ -37,7 +46,7 @@ def test_candidate_lists_are_prefix_stable_in_k():
     makes nearest-neighbour tour length depend on k — for a construction that provably
     cannot. That bug made every early parameter sweep partly a measurement of luck.
     """
-    for name in SMALL:
+    for name in SMALL + TIE_HEAVY:
         inst = load(name)
         small, _ = build_candidates(inst.coords, 8, inst.ceil)
         large, _ = build_candidates(inst.coords, 24, inst.ceil)
@@ -46,7 +55,26 @@ def test_candidate_lists_are_prefix_stable_in_k():
         a = nn_tour(inst.coords, small, inst.ceil, 0)
         b = nn_tour(inst.coords, large, inst.ceil, 0)
         assert reference_length(a, inst) == reference_length(b, inst), f"{name}: NN moved"
-    print("  candidate lists prefix-stable in k, NN invariant           ok")
+    print(f"  prefix-stable in k, NN invariant ({len(SMALL) + len(TIE_HEAVY)} instances)     ok")
+
+
+def test_candidate_building_stays_cheap():
+    """Candidate building must not degenerate on tie-heavy instances.
+
+    The bound is deliberately loose — this is not a benchmark, it is a guard against the
+    failure mode where settling contested rows turns into querying every city. That
+    regression cost a factor of ~90 and was invisible to every correctness check, because
+    the lists it produced were right; they were just ruinously slow to produce.
+    """
+    build_candidates(load("berlin52").coords, 32, False)  # pay the JIT first
+    for name in TIE_HEAVY:
+        inst = load(name)
+        t0 = time.perf_counter()
+        build_candidates(inst.coords, 32, inst.ceil)
+        dt = time.perf_counter() - t0
+        budget = 0.5 + inst.n * 2e-4  # generous: ~4x the observed cost at n=18512
+        assert dt < budget, f"{name}: candidate build took {dt:.2f}s, budget {budget:.2f}s"
+    print("  candidate building stays cheap on tie-heavy instances      ok")
 
 
 def test_every_move_gain_matches_the_tour():
@@ -187,6 +215,7 @@ def test_scale_statistics_stay_finite_on_coincident_points():
 def main():
     print("invariant checks")
     test_candidate_lists_are_prefix_stable_in_k()
+    test_candidate_building_stays_cheap()
     test_every_move_gain_matches_the_tour()
     test_solvers_return_valid_tours_and_honest_lengths()
     test_deferred_verification_never_returns_a_worse_tour()

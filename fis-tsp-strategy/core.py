@@ -91,43 +91,43 @@ def build_candidates(coords, k, ceil):
     k = min(k, n - 1)
     tree = cKDTree(coords)
 
-    # Query a margin beyond k and resolve ties inside the larger set. Ordering by
-    # (distance, index) is not on its own enough to make the k=8 list a prefix of the
-    # k=24 list: when a tie group straddles the cut, the *set* the tree returns is
-    # itself k-dependent, so the tree may hand back one member of the tie at k=8 and a
-    # different one at k=24. Widening the query until no tie spans the boundary removes
-    # the last of that k-dependence, which is what lets a sweep over k measure k rather
-    # than tie-break luck.
-    margin = 8
-    while True:
-        kq = min(n - 1, k + margin)
-        dd, idx = tree.query(coords, k=kq + 1, workers=-1)
-        # drop the point itself; for coincident points its index can land anywhere in
-        # the tied block, so mask by index rather than assuming column 0
-        dd = np.where(idx == np.arange(n)[:, None], np.inf, dd)
-        # Order by (rounded distance, euclidean distance, index), in that order.
-        #
-        # The rounded distance has to come first because that is the metric the solver
-        # optimises, and it is what the exact-scan fallback in `nn_tour` compares. But
-        # rounding creates ties the euclidean order does not have — 10.4 and 10.6 both
-        # round to 10 — and breaking those by index alone would order the candidate list
-        # by city number rather than by proximity, which is geometrically worse for every
-        # move that walks the list. So euclidean distance breaks the rounded ties, and the
-        # index breaks the remaining exact ones. `nn_tour`'s fallback compares the same
-        # three keys, so the candidate path and the scan path can never disagree.
-        dd_round = np.where(
-            np.isinf(dd), np.inf, np.ceil(dd) if ceil else np.floor(dd + 0.5)
-        )
-        order = np.lexsort((idx, dd, dd_round), axis=1)
-        dd_s = np.take_along_axis(dd_round, order, axis=1)
-        idx_s = np.take_along_axis(idx, order, axis=1)
-        if kq >= n - 1 or dd_s.shape[1] <= k:
-            break
-        # a tie spanning the cut means the k-th neighbour is not yet determined
-        if not np.any(dd_s[:, k - 1] == dd_s[:, k]):
-            break
-        margin *= 2
-    cand = np.ascontiguousarray(idx_s[:, :k].astype(np.int32))
+    # Order by (euclidean distance, city index). Both are intrinsic to the pair, so the
+    # k nearest under this key is well defined independently of how many neighbours were
+    # queried — which is what makes the k=8 list a prefix of the k=24 list. Note this is
+    # also consistent with the *rounded* metric the solver optimises and that
+    # `nn_tour`'s exact-scan fallback compares, because rounding is monotone: a smaller
+    # euclidean distance can never round to a larger integer. So the two paths agree.
+    kq = min(n - 1, k + 16)
+    dd, idx = tree.query(coords, k=kq + 1, workers=-1)
+    # drop the point itself; for coincident points its index can land anywhere in the
+    # tied block, so mask by index rather than assuming column 0
+    dd = np.where(idx == np.arange(n)[:, None], np.inf, dd)
+    order = np.lexsort((idx, dd), axis=1)
+    dd_s = np.take_along_axis(dd, order, axis=1)
+    cand = np.take_along_axis(idx, order, axis=1)[:, :k].astype(np.int32)
+
+    # A tie group straddling the k-th place is the one case the window above cannot
+    # settle: the tree returns *some* members of the group, not necessarily the
+    # lowest-indexed ones, so which of them lands in the list would depend on kq.
+    #
+    # Widening the window until no row straddles is not a workable fix — these ties are
+    # far more common than they sound (933 of 5915 rows in rl5915, whose coordinates are
+    # grid-like), so the loop keeps doubling until it is querying every city, which cost
+    # a factor of ~90 in wall clock when it was tried. Instead the contested rows are
+    # settled individually and exactly: a ball of the k-th distance contains the whole
+    # tie group by construction, so sorting that ball by the same key gives the right
+    # answer in one query per row.
+    if kq < n - 1:
+        contested = np.flatnonzero(dd_s[:, k - 1] == dd_s[:, k])
+        for i in contested:
+            radius = float(dd_s[i, k - 1])
+            ball = [j for j in tree.query_ball_point(coords[i], radius * (1 + 1e-9)) if j != i]
+            if len(ball) < k:
+                continue  # window already held everything within the radius
+            ball = np.array(ball)
+            d = np.hypot(coords[ball, 0] - coords[i, 0], coords[ball, 1] - coords[i, 1])
+            cand[i] = ball[np.lexsort((ball, d))][:k]
+    cand = np.ascontiguousarray(cand)
     cand_d = np.zeros(cand.shape, dtype=np.float64)
     _cand_dist_kernel(coords, cand, ceil, cand_d)
     return cand, cand_d

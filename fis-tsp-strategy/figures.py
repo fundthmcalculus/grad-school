@@ -28,16 +28,6 @@ import numpy as np  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 
-ARM_LABEL = {
-    "fis_effort_chain_greedy": "FIS effort + fuzzy chain cut-off",
-    "fis_effort_greedy_handwritten": "FIS effort, hand-written rules",
-    "fis_effort_greedy": "FIS effort, tuned rules",
-    "fis_full": "FIS effort + fuzzy construction",
-    "fis_effort_nn": "FIS effort, NN start",
-    "fis_construct_lk": "fuzzy construction only (+ fixed LK)",
-    "fis_defer": "FIS effort + full-effort verification pass",
-}
-
 
 def pareto_front(points):
     """Indices of the points not dominated on (time, gap), both minimised."""
@@ -100,27 +90,43 @@ def figure(results, out):
         )
 
     markers = {
-        "fis_effort_chain_greedy": ("*", "tab:red", 300),
-        "fis_effort_greedy_handwritten": ("D", "tab:green", 65),
-        "fis_effort_greedy": ("o", "tab:cyan", 55),
-        "fis_full": ("^", "tab:purple", 55),
-        "fis_effort_nn": ("s", "tab:olive", 45),
-        "fis_construct_lk": ("P", "tab:brown", 45),
-        "fis_defer": ("v", "tab:gray", 45),
+        "fis_chain_greedy_handwritten": ("*", "tab:red", 320, "FIS effort+chain, hand-written"),
+        "fis_effort_greedy_handwritten": ("D", "tab:orange", 75, "FIS effort, hand-written"),
+        "fis_effort_chain_greedy": ("v", "tab:green", 70, "FIS effort+chain, GA-fitted"),
+        "fis_effort_greedy": ("s", "tab:olive", 60, "FIS effort, GA-fitted"),
+        "fis_defer": ("P", "tab:gray", 55, "FIS + full-effort verification"),
+        "fis_full": ("^", "tab:purple", 55, "FIS + fuzzy construction"),
+        "fis_effort_nn": ("X", "tab:brown", 50, "FIS effort, NN start"),
     }
-    for key, (mk, col, size) in markers.items():
+    for key, (mk, col, size, label) in markers.items():
         if key not in summary:
             continue
         v = summary[key]
         ax.scatter(
-            v["total_s"],
-            v["mean_gap"],
-            marker=mk,
-            s=size,
-            color=col,
-            zorder=5,
-            label=ARM_LABEL.get(key, key),
+            v["total_s"], v["mean_gap"], marker=mk, s=size, color=col, zorder=5, label=label
         )
+
+    # The movement fitting produced. Drawn as arrows from the hand-written rule base to
+    # the GA-fitted one, for each of the two configurations, because the direction is the
+    # result: on these held-out instances fitting moved both arms up and to the right.
+    for hand, fitted, col in (
+        ("fis_effort_greedy_handwritten", "fis_effort_greedy", "tab:olive"),
+        ("fis_chain_greedy_handwritten", "fis_effort_chain_greedy", "tab:green"),
+    ):
+        if hand not in summary or fitted not in summary:
+            continue
+        a, b = summary[hand], summary[fitted]
+        ax.annotate(
+            "",
+            xy=(b["total_s"], b["mean_gap"]),
+            xytext=(a["total_s"], a["mean_gap"]),
+            arrowprops=dict(arrowstyle="-|>", color=col, lw=1.6, alpha=0.85,
+                            shrinkA=7, shrinkB=7, linestyle=(0, (4, 2))),
+            zorder=4,
+        )
+    ax.plot([], [], color="black", ls=(0, (4, 2)), lw=1.6,
+            label="hand-written $\\rightarrow$ GA-fitted")
+
     # LKH is deliberately absent from this panel. It only finishes on a subset of the
     # test instances, and putting a point measured over a different subset on a shared
     # total-time axis would be a misleading comparison. It is reported in FINDINGS.md
@@ -128,7 +134,11 @@ def figure(results, out):
     ax.set_xscale("log")
     ax.set_xlabel("total wall clock over the test instances (s, log scale)")
     ax.set_ylabel("mean % over published optimum")
-    ax.set_title("Time against tour quality\n(down and left is better)", fontsize=10)
+    ax.set_title(
+        "Swept LK effort baseline, and where adaptive effort lands\n"
+        "(down and left is better)",
+        fontsize=10,
+    )
     ax.grid(alpha=0.3, which="both")
     ax.legend(fontsize=7, loc="upper right")
 
@@ -137,10 +147,10 @@ def figure(results, out):
     ns = [r["n"] for r in rows]
     order = np.argsort(ns)
     ns = np.array(ns)[order]
-    key = "fis_effort_chain_greedy"
+    key = "fis_chain_greedy_handwritten"
     md = np.array([r.get(f"{key}_mean_depth", np.nan) for r in rows])[order]
     mb = np.array([r.get(f"{key}_mean_breadth", np.nan) for r in rows])[order]
-    ax.plot(ns, md, "o-", color="tab:red", label="FIS mean chain depth")
+    ax.plot(ns, md, "o-", color="tab:red", label="FIS mean chain depth (adaptive)")
     ax.axhline(
         10.0, color="tab:blue", ls="--", lw=1.5, label="baseline chain depth (fixed, 10)"
     )
