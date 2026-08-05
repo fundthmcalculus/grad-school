@@ -323,23 +323,47 @@ three synthetic, of which 10.9% yielded an improving move. AUC is for predicting
 ρ is the rank correlation with realised gain over the paying cities only, which is a different
 question and worth separating.
 
-| feature | AUC | ρ (paying) | |
-|---|---|---|---|
-| `probe_frac` — candidates passing the depth-1 gain test | **0.858** | **0.327** | new, kept |
-| `rank` — nearer neighbours the worse edge ignores | 0.833 | 0.301 | kept |
-| `probe` — size of the best depth-1 gain | 0.795 | 0.197 | new, kept |
-| `excess` — mean incident edge / nearest-neighbour | 0.759 | 0.153 | kept |
-| `edge_asym` — \|d_succ − d_pred\| / (d_succ + d_pred) | 0.741 | 0.157 | new, kept |
-| `turn` — local turn sharpness | 0.691 | −0.116 | dropped |
-| `peak` — nearest-neighbour / mean candidate distance | 0.589 | 0.231 | dropped |
-| `progress` — fraction of the run's work spent | 0.579 | 0.018 | dropped |
-| `pos_spread` — tour-position spread of the neighbours | 0.547 | 0.174 | new, rejected |
-| `cand_step` — (2nd nearest − nearest) / nearest | 0.520 | −0.106 | new, rejected |
-| `fails` — prior failure count at this city | **0.488** | −0.123 | dropped |
-| `in_degree` — cities holding this one as a candidate | 0.449 | −0.031 | new, rejected |
-| `nbr_active` — candidate neighbours still queued | 0.426 | −0.100 | new, rejected |
+### The master table
 
-Four of seven proposals were rejected, which is the point: without this they would have been
+Every antecedent tried, its measured score, what computing it costs, the verdict, and which
+rule-base scale includes it. `feature_registry.py` holds this as data and `FINDINGS.md` renders
+it, so the two cannot drift apart; `python feature_registry.py --check` verifies the scale
+columns against what `fis.py` actually builds.
+
+| feature | AUC | ρ (paying) | cost | verdict | legacy | small | large |
+|---|---|---|---|---|---|---|---|
+| `probe_frac` (EFFORT) | 0.858 | +0.327 | a scan that breaks at the first failing candidate; usually 1-3 iterations | kept |  | ● | ● |
+| `rank` (EFFORT) | 0.833 | +0.301 | a scan of an ascending list, breaks at the edge length | kept |  | ● | ● |
+| `probe` (EFFORT) | 0.795 | +0.197 | free alongside probe_frac — same loop | kept |  | ● | ● |
+| `excess` (EFFORT) | 0.759 | +0.153 | two distance evaluations and a divide | kept | ● | ● | ● |
+| `edge_asym` (EFFORT) | 0.741 | +0.157 | free — both distances are already computed | kept |  | ● | ● |
+| `turn` (EFFORT) | 0.691 | -0.116 | two hypots — the most expensive feature here | dropped | ● |  | ● |
+| `peak` (EFFORT) | 0.589 | +0.231 | two loads and a divide, both precomputed per instance | dropped | ● |  | ● |
+| `progress` (EFFORT) | 0.579 | +0.018 | a divide | dropped | ● |  | ● |
+| `pos_spread` (EFFORT) | 0.547 | +0.174 | a full k-iteration scan, no early break | rejected |  |  |  |
+| `cand_step` (EFFORT) | 0.520 | -0.106 | two loads and a divide | rejected |  |  |  |
+| `fails` (EFFORT) | 0.488 | -0.123 | one load | dropped | ● |  |  |
+| `in_degree` (EFFORT) | 0.449 | -0.031 | one load, precomputed per instance | rejected |  |  |  |
+| `nbr_active` (EFFORT) | 0.426 | -0.100 | a full k-iteration scan, no early break | rejected |  |  |  |
+| `credit` (CHAIN) | — | — | free — the chain already has it | kept | ● | ● | ● |
+| `depth` (CHAIN) | — | — | free | kept | ● | ● | ● |
+| `banked` (CHAIN) | — | — | free | kept | ● | ● | ● |
+| `trade` (CHAIN) | — | — | free — computed while choosing the next candidate | kept | ● | ● | ● |
+| `revcost` (CHAIN) | — | — | free — `reverse` already returns its swap count | kept |  | ● | ● |
+
+The scales:
+
+* **`legacy`** — features by argument; 6 inputs, 27 rules, 9 interactions. EFFORT reads `excess`, `turn`, `peak`, `progress`, `fails`.
+* **`small`** — AUC >= 0.74 only; 5 inputs, 15 rules, no interactions. EFFORT reads `probe_frac`, `rank`, `probe`, `excess`, `edge_asym`.
+* **`large`** — small + the AUC 0.55-0.70 band + interactions; 8 inputs, 36 rules. EFFORT reads `probe_frac`, `rank`, `probe`, `excess`, `edge_asym`, `turn`, `peak`, `progress`.
+
+`CHAIN`'s inputs are deliberately unscored. The screen answers a *per-city* question — "will
+searching this city pay off" — and the chain cut-off is a decision taken many times within one
+city, whose outcome is "would one more level have improved the best closing gain". That is a
+different label, and the per-city one does not answer it. Those five are justified by the
+chain's own arithmetic and by ablation instead, which is a weaker footing and worth saying.
+
+Four of seven new proposals were rejected, which is the point: without this they would have been
 argued into the rule base and judged only by whether the system got better.
 
 **The winners are a look-ahead probe.** Run one level of search *before* committing to any, and

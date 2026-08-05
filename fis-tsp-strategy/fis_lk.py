@@ -353,6 +353,32 @@ def fis_lk_solve(
             tot = d_s + d_p
             x[4] = (d_s - d_p if d_s > d_p else d_p - d_s) / tot if tot > 0.0 else 0.0
 
+            # The middling-AUC inputs, computed only when the rule base is wide enough to
+            # reference them, so the small scale does not pay for what it never reads. The
+            # turn calculation is the most expensive feature in the system (two square roots),
+            # which is most of the reason this branch exists.
+            if n_e > 5:
+                ax = coords[t1, 0] - coords[p1, 0]
+                ay = coords[t1, 1] - coords[p1, 1]
+                bx = coords[s1, 0] - coords[t1, 0]
+                by = coords[s1, 1] - coords[t1, 1]
+                na = np.sqrt(ax * ax + ay * ay)
+                nb = np.sqrt(bx * bx + by * by)
+                if na <= 0.0 or nb <= 0.0:
+                    x[5] = 0.5
+                else:
+                    cosang = (ax * bx + ay * by) / (na * nb)
+                    if cosang > 1.0:
+                        cosang = 1.0
+                    elif cosang < -1.0:
+                        cosang = -1.0
+                    x[5] = 0.5 * (1.0 - cosang)
+                x[6] = nn1[t1] / mean_c[t1]
+                v = pops / (3.0 * n)
+                if v > 1.0:
+                    v = 1.0
+                x[7] = v
+
             fis_eval(x, mu, tab, ant, cons, out)
             stats[STAT_FIS_CALLS] += 1
 
@@ -478,6 +504,8 @@ def local_search(
     use_chain=True,
     effort_tab=None,
     chain_tab=None,
+    effort_ant=None,
+    chain_ant=None,
 ):
     """Fuzzy-controlled LK from a given start tour, as a one-call helper.
 
@@ -494,10 +522,10 @@ def local_search(
         nn1,
         mean_c,
         fis_mod.EFFORT_TAB if effort_tab is None else effort_tab,
-        fis_mod.EFFORT_ANT,
+        fis_mod.EFFORT_ANT if effort_ant is None else effort_ant,
         effort_cons,
         fis_mod.CHAIN_TAB if chain_tab is None else chain_tab,
-        fis_mod.CHAIN_ANT,
+        fis_mod.CHAIN_ANT if chain_ant is None else chain_ant,
         chain_cons,
         max_depth,
         or_max,

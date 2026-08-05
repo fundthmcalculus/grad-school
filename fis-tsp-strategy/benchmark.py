@@ -151,6 +151,7 @@ def lkh_reference(inst, runs=1):
 
 def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
     c_cons, e_cons, h_cons = fis.CONSTRUCT_CONS, fis.EFFORT_CONS, fis.CHAIN_CONS
+    e_ant, h_ant = fis.EFFORT_ANT, fis.CHAIN_ANT
     c_tab = e_tab = h_tab = None  # None keeps the hand-written membership functions
     if tuned is not None:
         z = np.load(tuned)
@@ -166,6 +167,11 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
         if "effort_tab" in z:
             e_tab = np.ascontiguousarray(z["effort_tab"])
             h_tab = np.ascontiguousarray(z["chain_tab"])
+        # A tuned file records which rule-base scale it was fitted at; the antecedent arrays
+        # have to match it or the consequents mean something else entirely.
+        scale = str(z["scale"]) if "scale" in z else fis.DEFAULT_SCALE
+        e_ant = fis.effort_base(scale)[0]
+        h_ant = fis.chain_base(scale)[0]
     rows = []
 
     for name in names:
@@ -219,17 +225,21 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
         # so the table separates the ranker from the effort controller from the
         # chain-continuation rules, and the tuned rule base from the hand-written one.
         arms = [
-            ("fis_effort_greedy", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, False, False),
-            ("fis_effort_chain_greedy", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, True, False),
-            ("fis_full", fc_t, t_fc, e_cons, h_cons, e_tab, h_tab, True, False),
-            ("fis_effort_nn", nn_t, t_nn, e_cons, h_cons, e_tab, h_tab, True, False),
-            ("fis_defer", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, True, True),
+            ("fis_effort_greedy", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant,
+             False, False),
+            ("fis_effort_chain_greedy", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant,
+             True, False),
+            ("fis_full", fc_t, t_fc, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant, True, False),
+            ("fis_effort_nn", nn_t, t_nn, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant, True, False),
+            ("fis_defer", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant, True, True),
             (
                 "fis_effort_greedy_handwritten",
                 gr_t,
                 t_gr,
                 fis.EFFORT_CONS,
                 fis.CHAIN_CONS,
+                None,
+                None,
                 None,
                 None,
                 False,
@@ -243,14 +253,17 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
                 fis.CHAIN_CONS,
                 None,
                 None,
+                None,
+                None,
                 True,
                 False,
             ),
         ]
-        for tag, start, t_start, ec, hc, et, ht, use_chain, defer in arms:
+        for tag, start, t_start, ec, hc, et, ht, ea, ha, use_chain, defer in arms:
             (res, t_run) = _tmin(
-                lambda s=start, ec=ec, hc=hc, et=et, ht=ht, u=use_chain, d=defer: fis_ls(
-                    inst, cand, cand_d, s, ec, hc, FIS_DEPTH, FIS_OR, d, u, et, ht
+                lambda s=start, ec=ec, hc=hc, et=et, ht=ht, ea=ea, ha=ha,
+                u=use_chain, d=defer: fis_ls(
+                    inst, cand, cand_d, s, ec, hc, FIS_DEPTH, FIS_OR, d, u, et, ht, ea, ha
                 ),
                 reps,
             )

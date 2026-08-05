@@ -137,19 +137,24 @@ class ParamSpace:
     so adding an antecedent to ``fis.py`` needs no change here.
     """
 
-    def __init__(self, kind="gaussian", mf_scope="base"):
+    def __init__(self, kind="gaussian", mf_scope="base", scale=fis.DEFAULT_SCALE):
         self.kind = kind
         self.mf_scope = mf_scope
+        self.scale = scale
+        e_ant, e_cons, e_c, e_w, _ = fis.effort_base(scale)
+        h_ant, h_cons, h_c, h_w, _ = fis.chain_base(scale)
+        self.bases = {
+            "effort": (e_ant, e_cons, e_c, e_w),
+            "chain": (h_ant, h_cons, h_c, h_w),
+        }
         self.blocks = []
         off = 0
         # CONSTRUCT is deliberately absent. Fuzzy construction is a measured failure (it
         # reaches 48% over optimum against greedy-edge's 17%), it appears in none of the
         # reported arms, and every parameter spent on it is a parameter the GA can overfit
         # with. Fitting only what is used takes the vector from 170 to 87.
-        for name, cons, ant in (
-            ("effort", fis.EFFORT_CONS, fis.EFFORT_ANT),
-            ("chain", fis.CHAIN_CONS, fis.CHAIN_ANT),
-        ):
+        for name in ("effort", "chain"):
+            ant, cons, _, _ = self.bases[name]
             n_cons = int(cons.size)
             n_in = int(ant.shape[1])
             # "base": one set of three terms shared by the rule base's inputs (3 centres
@@ -172,12 +177,8 @@ class ParamSpace:
     def default(self):
         """The hand-written rule bases, as a vector — the point to beat."""
         theta = np.empty(self.size)
-        defaults = {
-            "effort": (fis.EFFORT_CONS, fis.EFFORT_MF_C, fis.EFFORT_MF_S),
-            "chain": (fis.CHAIN_CONS, fis.CHAIN_MF_C, fis.CHAIN_MF_S),
-        }
         for b in self.blocks:
-            cons, mfc, mfw = defaults[b["name"]]
+            _, cons, mfc, mfw = self.bases[b["name"]]
             theta[b["cons"]] = cons.ravel()
             if self.mf_scope == "input":
                 theta[b["mfc"]] = mfc.ravel()
@@ -343,8 +344,8 @@ class Objective:
             tour = start
             tour, _, st = fis_lk_solve(
                 inst.coords, cand, cand_d, inst.ceil, tour, nn1, mean_c,
-                e_tab, fis.EFFORT_ANT, e_cons,
-                h_tab, fis.CHAIN_ANT, h_cons,
+                e_tab, self.space.bases['effort'][0], e_cons,
+                h_tab, self.space.bases['chain'][0], h_cons,
                 FIS_DEPTH, OR_SEG, 1, False, use_chain,
             )
             validate_tour(tour, inst.n)
@@ -370,8 +371,8 @@ class Objective:
                 continue
             tour, _, _ = fis_lk_solve(
                 inst.coords, cand, cand_d, inst.ceil, start, nn1, mean_c,
-                d["effort"][1], fis.EFFORT_ANT, d["effort"][0],
-                d["chain"][1], fis.CHAIN_ANT, d["chain"][0],
+                d["effort"][1], self.space.bases['effort'][0], d["effort"][0],
+                d["chain"][1], self.space.bases['chain'][0], d["chain"][0],
                 FIS_DEPTH, OR_SEG, 1, False, kw.get("use_chain", True),
             )
             gaps.append(inst.gap(reference_length(tour, inst)))
@@ -480,10 +481,10 @@ def build_optimizer(kind, space, fcn, seed_theta, generations, population, jobs)
 
 
 def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink, log,
-            polish_evals=2500):
+            polish_evals=2500, scale=fis.DEFAULT_SCALE):
     """Fit with one optimiser / MF form / MF scope, selecting on the validation split."""
     set_seed(seed)
-    space = ParamSpace(mf_kind, mf_scope)
+    space = ParamSpace(mf_kind, mf_scope, scale)
     coef = np.load(HERE / "costmodel.npz")["coef"]
     train = Objective(train_instances(), space, coef)
     valid = Objective(valid_instances(), space, coef)
@@ -525,6 +526,7 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
         "optimizer": kind,
         "mf_kind": mf_kind,
         "mf_scope": mf_scope,
+        "scale": scale,
         "n_params": space.size,
         "seconds": dt,
         "generations": int(result.generations_completed),
@@ -571,6 +573,8 @@ def main():
     ap.add_argument("--mf-scopes", nargs="*", default=["base"])
     ap.add_argument("--shrink", type=float, default=0.3)
     ap.add_argument("--polish-evals", type=int, default=2500)
+    ap.add_argument("--scale", default=fis.DEFAULT_SCALE,
+                    choices=sorted(fis.EFFORT_RULES_BY_SCALE))
     ap.add_argument("--generations", type=int, default=30)
     ap.add_argument("--population", type=int, default=30)
     ap.add_argument("--jobs", type=int, default=1)
@@ -584,7 +588,7 @@ def main():
     print(f"{n_tr} training ({len(TRAIN_REAL)} TSPLIB + {len(synth.TRAIN_SPEC)} synthetic) "
           f"and {n_va} validation instances, disjoint from the "
           f"{len(bench_mod.TEST)} test instances")
-    space0 = ParamSpace(mf_scope=args.mf_scopes[0])
+    space0 = ParamSpace(mf_scope=args.mf_scopes[0], scale=args.scale)
     n_cons = sum(int(np.prod(b["cons_shape"])) for b in space0.blocks)
     print(f"fitting {space0.size} parameters ({n_cons} rule consequents + "
           f"{space0.size - n_cons} membership-function centres/widths)")
@@ -600,7 +604,7 @@ def main():
             for kind in args.optimizers:
                 theta, rec, valid = run_one(
                     kind, mf_kind, mf_scope, args.generations, args.population,
-                    args.jobs, args.seed, args.shrink, log, args.polish_evals,
+                    args.jobs, args.seed, args.shrink, log, args.polish_evals, args.scale,
                 )
                 # selection across runs, on the validation split
                 score = rec["valid_ratio"]
@@ -608,9 +612,9 @@ def main():
                     best = (score, theta, rec, mf_kind, mf_scope)
 
     score, theta, rec, mf_kind, mf_scope = best
-    space = ParamSpace(mf_kind, mf_scope)
+    space = ParamSpace(mf_kind, mf_scope, rec["scale"])
     d = space.decode(theta)
-    print(f"\nkept: {rec['optimizer']}/{mf_kind}/{mf_scope}  "
+    print(f"\nkept: {rec['optimizer']}/{mf_kind}/{mf_scope}/{rec['scale']}  "
           f"validation q={rec['valid_ratio']:.4f} ({rec['valid_gap']:.3f}%), "
           f"hand-written q={rec['hand_valid_ratio']:.4f} ({rec['hand_valid_gap']:.3f}%)")
     np.savez(
@@ -618,6 +622,7 @@ def main():
         theta=theta,
         mf_kind=mf_kind,
         mf_scope=mf_scope,
+        scale=rec["scale"],
         optimizer=rec["optimizer"],
         effort_cons=d["effort"][0],
         effort_tab=d["effort"][1],

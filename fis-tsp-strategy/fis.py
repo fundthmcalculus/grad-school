@@ -75,6 +75,10 @@ MF_KINDS = {"triangular": _mf_triangular, "gaussian": _mf_gaussian}
 # lookup table against both closed forms.
 DEFAULT_MF_KIND = "triangular"
 
+# Which rule-base size the module-level defaults use. `small` is the reported default;
+# `large` is selectable and compared in the findings.
+DEFAULT_SCALE = "small"
+
 
 def mf_table(mf_c, mf_w, kind=DEFAULT_MF_KIND):
     """Compile a membership-function bank into a lookup table over [0, 1].
@@ -271,20 +275,26 @@ CONSTRUCT_TAB = mf_table(CONSTRUCT_MF_C, CONSTRUCT_MF_S)
 # inputs
 # Inputs, chosen by measured predictive power rather than by argument. `features_probe.py`
 # scores each candidate on how well it predicts whether a city search will yield an improving
-# move (AUC) and, among those that do, how large the gain is (rank correlation). The five
-# kept here all clear AUC 0.74; the ones dropped — turn sharpness 0.69, neighbourhood
-# peakedness 0.59, run progress 0.58, and prior failure count 0.49 — did not earn their
-# runtime or their parameters. Prior failure count is the striking one: at AUC 0.488 it is
-# indistinguishable from noise for this purpose, because the don't-look-bit queue already
-# removes settled cities structurally and the count adds nothing on top.
+# move (AUC) and, among those that do, how large the gain is. `feature_registry.py` is the
+# master record of what was tried, what was rejected, and which scale each survivor is in.
 #
-# All five read in the same direction: higher means there is more here to find.
-E_PROBEF = 0  # fraction of candidates passing the depth-1 gain test   (AUC 0.858)
-E_RANK = 1  # nearer neighbours the worse tour edge ignores, / k       (AUC 0.833)
-E_PROBE = 2  # best depth-1 gain available, over the broken edge       (AUC 0.795)
-E_EXCESS = 3  # mean incident edge / nearest-neighbour distance        (AUC 0.759)
-E_ASYM = 4  # |d_succ - d_pred| / (d_succ + d_pred)                    (AUC 0.741)
-E_N_IN = 5
+# The first five clear AUC 0.74 and are in every scale. The last three sit in the 0.55-0.70
+# band: dropped from `small`, kept in `large` to test whether interaction rules and a four
+# times larger training pool can extract something the single-antecedent base could not.
+#
+# Index order is load-bearing: the feature extractor in `fis_lk.py` fills x[0:5]
+# unconditionally and x[5:8] only when the rule base is wide enough to reference them, so the
+# small scale does not pay for what it does not read.
+E_PROBEF = 0  # candidates passing the depth-1 gain test, / 2k        (AUC 0.858)
+E_RANK = 1  # nearer neighbours the worse tour edge ignores, / k      (AUC 0.833)
+E_PROBE = 2  # best depth-1 gain available, over the broken edge      (AUC 0.795)
+E_EXCESS = 3  # mean incident edge / nearest-neighbour distance       (AUC 0.759)
+E_ASYM = 4  # |d_succ - d_pred| / (d_succ + d_pred)                   (AUC 0.741)
+E_TURN = 5  # local turn sharpness                                   (AUC 0.691, large only)
+E_PEAK = 6  # nearest-neighbour / mean candidate distance            (AUC 0.589, large only)
+E_PROGRESS = 7  # fraction of the run's work already spent           (AUC 0.579, large only)
+E_N_IN_SMALL = 5
+E_N_IN_LARGE = 8
 
 # outputs, each in [0, 1] and rescaled to a real LK parameter by the caller
 E_BREADTH = 0  # how far into the candidate list to back-track at the first level
@@ -293,19 +303,16 @@ E_DEPTH = 2  # how deep to push the gain chain — the parameter that costs real
 E_ORSEG = 3  # longest Or-opt segment to try
 E_N_OUT = 4
 
-# Three rules per input, no interactions. That is a deliberate simplification: the previous
-# base carried 27 rules with nine two-input interactions, and the interactions were where
-# most of the 108 fitted consequents lived and therefore where most of the overfitting did.
-# A purely additive base cannot express "long edge but already failed twice", but it has 60
-# consequents instead of 108, every one of them reads as a sentence, and the GA has a
-# correspondingly easier target.
-#
 # Consequents are [breadth, deep_breadth, depth, or_seg]. Depth carries the widest spread
-# because depth is the parameter that costs time (§3 of the findings); breadth barely moves
-# the clock, so it is kept generous throughout.
-EFFORT_RULES = [
-    # the probe is the strongest signal there is: if a single level of search can already
-    # see gain here, commit; if it can see none, there is very little point going deeper
+# because depth is the parameter that costs time; breadth barely moves the clock, so it stays
+# generous throughout.
+#
+# `small`: three rules per input, no interactions. A purely additive base cannot express "long
+# edge but the probe sees nothing", but it has 60 consequents and every rule reads as a
+# sentence.
+_EFFORT_CORE = [
+    # the probe is the strongest signal there is: if one level of search can already see gain
+    # here, commit; if it can see none, there is little point going deeper
     ({E_PROBEF: LOW}, [0.30, 0.20, 0.05, 0.25]),
     ({E_PROBEF: MED}, [0.65, 0.50, 0.45, 0.65]),
     ({E_PROBEF: HIGH}, [1.00, 0.90, 0.95, 1.00]),
@@ -321,16 +328,62 @@ EFFORT_RULES = [
     ({E_EXCESS: LOW}, [0.30, 0.20, 0.05, 0.30]),
     ({E_EXCESS: MED}, [0.60, 0.45, 0.35, 0.65]),
     ({E_EXCESS: HIGH}, [1.00, 0.90, 0.90, 1.00]),
-    # one long edge and one short one is a stronger signal than two medium ones, because the
-    # long one is what a 2-opt move can actually remove
+    # one long edge and one short is a stronger signal than two medium ones
     ({E_ASYM: LOW}, [0.45, 0.30, 0.20, 0.45]),
     ({E_ASYM: MED}, [0.65, 0.50, 0.50, 0.65]),
     ({E_ASYM: HIGH}, [0.90, 0.80, 0.85, 0.90]),
 ]
 
-EFFORT_ANT, EFFORT_CONS = _pack(EFFORT_RULES, E_N_IN, E_N_OUT)
-EFFORT_MF_C, EFFORT_MF_S = default_mf(E_N_IN)
-EFFORT_TAB = mf_table(EFFORT_MF_C, EFFORT_MF_S)
+# `large`: the middling-AUC inputs, plus interactions. The interactions are chosen where the
+# screening gives a reason to expect one, not exhaustively — an exhaustive set would be 3^2
+# rules per pair and put the parameter count back where the overfitting was.
+_EFFORT_EXTRA = [
+    # turn sharpness predicts *whether* a city pays (AUC 0.691) but among paying cities
+    # sharper turns pay *less* (rho -0.116). A single monotone rule cannot serve both; these
+    # two say "a kink is worth looking at, but not worth a deep chain on its own"
+    ({E_TURN: HIGH}, [0.85, 0.65, 0.45, 0.80]),
+    ({E_TURN: LOW}, [0.45, 0.35, 0.30, 0.45]),
+    # peakedness is weak on whether (0.589) and second-best on how much (rho 0.231), so it is
+    # given influence over depth, which is what pays off on the large gains
+    ({E_PEAK: LOW}, [0.40, 0.35, 0.55, 0.55]),
+    ({E_PEAK: HIGH}, [0.70, 0.55, 0.45, 0.65]),
+    # late in the run the queue holds mostly stragglers
+    ({E_PROGRESS: HIGH}, [0.50, 0.40, 0.30, 0.50]),
+    ({E_PROGRESS: LOW}, [0.65, 0.50, 0.50, 0.65]),
+    # interactions: the probe agreeing or disagreeing with the static geometry is the case a
+    # purely additive base cannot express, and it is the reason to try `large` at all
+    ({E_PROBEF: HIGH, E_EXCESS: HIGH}, [1.00, 0.95, 1.00, 1.00]),
+    ({E_PROBEF: LOW, E_EXCESS: HIGH}, [0.40, 0.30, 0.15, 0.40]),
+    ({E_PROBEF: HIGH, E_EXCESS: LOW}, [0.85, 0.70, 0.70, 0.85]),
+    ({E_PROBEF: LOW, E_RANK: LOW}, [0.15, 0.10, 0.02, 0.12]),
+    ({E_PROBE: HIGH, E_PEAK: LOW}, [0.90, 0.80, 1.00, 0.95]),
+    ({E_TURN: HIGH, E_PROBEF: LOW}, [0.55, 0.40, 0.15, 0.50]),
+    ({E_RANK: HIGH, E_PROGRESS: HIGH}, [0.85, 0.70, 0.75, 0.85]),
+    ({E_ASYM: HIGH, E_PROBEF: HIGH}, [1.00, 0.90, 0.95, 1.00]),
+    ({E_EXCESS: LOW, E_PROBE: LOW}, [0.20, 0.12, 0.02, 0.18]),
+]
+
+EFFORT_RULES_BY_SCALE = {
+    "small": (_EFFORT_CORE, E_N_IN_SMALL),
+    "large": (_EFFORT_CORE + _EFFORT_EXTRA, E_N_IN_LARGE),
+}
+
+_E_NAMES = (
+    "probe_frac", "rank", "probe", "excess", "edge_asym", "turn", "peak", "progress",
+)
+
+
+def effort_inputs(scale):
+    """The antecedent names this scale's EFFORT base reads, in index order."""
+    return list(_E_NAMES[: EFFORT_RULES_BY_SCALE[scale][1]])
+
+
+def effort_base(scale=DEFAULT_SCALE):
+    """(ant, cons, mf_c, mf_w, tab) for one EFFORT scale."""
+    rules, n_in = EFFORT_RULES_BY_SCALE[scale]
+    ant, cons = _pack(rules, n_in, E_N_OUT)
+    c, w = default_mf(n_in)
+    return ant, cons, c, w, mf_table(c, w)
 
 
 # ---------------------------------------------------------------------------
@@ -386,9 +439,47 @@ CHAIN_RULES = [
     ({CH_REVCOST: HIGH}, [0.30]),
 ]
 
-CHAIN_ANT, CHAIN_CONS = _pack(CHAIN_RULES, CH_N_IN, 1)
-CHAIN_MF_C, CHAIN_MF_S = default_mf(CH_N_IN)
-CHAIN_TAB = mf_table(CHAIN_MF_C, CHAIN_MF_S)
+_CHAIN_EXTRA = [
+    # `large` adds interactions only; the chain's five inputs are all free to compute, so
+    # there is nothing to add on that side. These say what the additive base cannot: that the
+    # same gain credit means different things at different depths and reversal costs.
+    ({CH_CREDIT: HIGH, CH_DEPTH: HIGH}, [0.55]),
+    ({CH_CREDIT: LOW, CH_DEPTH: HIGH}, [0.02]),
+    ({CH_CREDIT: LOW, CH_DEPTH: LOW}, [0.38]),
+    ({CH_CREDIT: HIGH, CH_TRADE: HIGH}, [0.95]),
+    ({CH_CREDIT: LOW, CH_TRADE: LOW}, [0.04]),
+    ({CH_BANKED: HIGH, CH_DEPTH: HIGH}, [0.08]),
+    ({CH_BANKED: LOW, CH_TRADE: HIGH}, [0.90]),
+    ({CH_REVCOST: HIGH, CH_CREDIT: LOW}, [0.04]),
+    ({CH_REVCOST: HIGH, CH_CREDIT: HIGH}, [0.68]),
+    ({CH_REVCOST: LOW, CH_CREDIT: MED}, [0.66]),
+]
+
+CHAIN_RULES_BY_SCALE = {
+    "small": CHAIN_RULES,
+    "large": CHAIN_RULES + _CHAIN_EXTRA,
+}
+
+_CH_NAMES = ("credit", "depth", "banked", "trade", "revcost")
+
+
+def chain_inputs(scale):
+    """The antecedent names this scale's CHAIN base reads, in index order."""
+    return list(_CH_NAMES[:CH_N_IN])
+
+
+def chain_base(scale=DEFAULT_SCALE):
+    """(ant, cons, mf_c, mf_w, tab) for one CHAIN scale."""
+    ant, cons = _pack(CHAIN_RULES_BY_SCALE[scale], CH_N_IN, 1)
+    c, w = default_mf(CH_N_IN)
+    return ant, cons, c, w, mf_table(c, w)
+
+
+# Module-level defaults, built at the default scale. Everything that does not care about
+# scale — the benchmark's hand-written arms, the invariant tests — reads these; anything that
+# does calls effort_base()/chain_base() with the scale it wants.
+EFFORT_ANT, EFFORT_CONS, EFFORT_MF_C, EFFORT_MF_S, EFFORT_TAB = effort_base(DEFAULT_SCALE)
+CHAIN_ANT, CHAIN_CONS, CHAIN_MF_C, CHAIN_MF_S, CHAIN_TAB = chain_base(DEFAULT_SCALE)
 
 # Passed to the shared LK chain by the baseline arm, which does not consult a rule
 # base at all; never read, because the ``use_chain`` flag is false there.
