@@ -241,6 +241,8 @@ A.5 above answers *is this dataset public, and is it present in this repository.
 
 **Gap.** No large regression dataset appears anywhere. Concrete carries the entire regression story, including Chapter 6's model-family comparison and the optimizer study's hot-start problem (A.7.6). There is no regression counterpart to classification's PhiUSIIL/RT-IOT2022 pairing below.
 
+*A pilot investigation of this gap exists*, `reproduce/regression_scale/RESULTS_2026-08-05.md`: single-seed, not canonically sourced, and not yet a decision about which dataset or model family to carry forward — see CHECKLIST **C13**. Filed as a start, not a close.
+
 ### A.7.2 Classification
 
 | Dataset | Size | Status | Role |
