@@ -44,7 +44,7 @@ import numpy as np
 from numba import njit
 
 import fis
-from core import build_candidates, greedy_edge_tour, make_pos, nn_stats, tour_length
+from core import build_candidates, greedy_edge_tour, make_pos, tour_length
 from lk import N_STATS, lk_reopt
 from tsplib import load, reference_length, validate_tour
 
@@ -64,10 +64,11 @@ def double_bridge(tour, pos, n, i, l1, l2, l3, touched):
     if total + 2 > n:
         return 0
     buf = np.empty(total, tour.dtype)
-    # B = window[0:l1], C = window[l1:l1+l2], D = window[l1+l2:total]; write C D B... no:
-    # the double bridge exchanges the first and last runs, giving D C B order on the window's
-    # three parts -> here: third run, middle run, first run is a 3-cycle; the exchange that
-    # is a true double bridge is (first, third) swapped with the middle held in place.
+    # The window holds three consecutive runs X Y Z. Writing them back as Z Y X exchanges the
+    # outer two and leaves the middle in place, with every run's internal order preserved —
+    # that is the double bridge. Preserving internal order is the whole point: a version that
+    # wrote any run backwards would be a segment reversal, which the 2-opt chain can already
+    # reach and would immediately undo, so the perturbation would accomplish nothing.
     w = 0
     for t in range(l3):  # third run first
         buf[w] = tour[(i + l1 + l2 + t) % n]
@@ -108,17 +109,32 @@ def iterated_lk(
     n_kicks, window, seed,
     weights,
     use_chain, ch_tab, ch_ant, ch_cons,
+    accept_equal=False,
+    patience=0,
 ):
     """Local search, then ``n_kicks`` double-bridge kicks each followed by seeded re-optimisation.
 
     ``weights`` biases where kicks land: a cumulative distribution over cities, or an empty
     array for uniform. Returns (best tour, best length, stats).
 
-    The accept rule is strict improvement against the best tour seen, with rejection restoring
-    that best. Accepting equal-length tours would let the search drift across a plateau, which
-    is sometimes better and is not what is measured here; strict improvement keeps the reported
-    length monotone in the kick budget, so a frontier built by varying ``n_kicks`` is a genuine
-    frontier and not a sampling artefact.
+    The default accept rule is strict improvement against the best tour seen, with rejection
+    restoring that best. That keeps reported length monotone in the kick budget, so a frontier
+    built by varying ``n_kicks`` is a genuine frontier rather than a sampling artefact.
+
+    Two options exist because the curve *plateaus*, and the plateau has more than one possible
+    cause. On pr2392 quadrupling the budget past 25 600 kicks buys 0.04 points, which is either
+    the move repertoire running out of reachable improvements or the accept rule refusing to
+    cross the plateau it is sitting on:
+
+    * ``accept_equal`` keeps equal-length tours, letting the search drift sideways across a
+      plateau to a different basin. This is the standard remedy and it costs the monotonicity
+      guarantee above, so the two cannot be had together.
+    * ``patience`` allows a *worsening* tour to be kept after that many consecutive rejections,
+      a minimal record-to-record travel. Restores from best when it does improve, so it cannot
+      lose the best tour found.
+
+    If neither moves the plateau, the plateau is the repertoire, and no amount of perturbation
+    scheduling will fix it — that is the diagnostic these exist to run.
     """
     n = tour_in.shape[0]
     tour = tour_in.copy()
@@ -140,6 +156,7 @@ def iterated_lk(
         return best, best_len, stats
 
     np.random.seed(seed)
+    since = 0
     kick_touched = np.empty(8, np.int32)
     lo = 1
     hi = window
@@ -178,9 +195,15 @@ def iterated_lk(
         length = tour_length(tour, coords, ceil)
         if length < best_len - 1e-9:
             best_len = length
+            since = 0
             for t in range(n):
                 best[t] = tour[t]
+        elif accept_equal and length <= best_len + 1e-9:
+            since = 0  # sideways move: keep the current tour, best is unchanged
+        elif patience > 0 and since >= patience:
+            since = 0  # keep a worse tour to escape; best is still recorded
         else:
+            since += 1
             for t in range(n):
                 tour[t] = best[t]
                 pos[best[t]] = t
