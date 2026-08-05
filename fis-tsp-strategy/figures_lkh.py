@@ -4,6 +4,10 @@ The point this figure has to make is not "who is better" — at matched time abo
 wins outright and reaches the published optimum — but that the two solvers occupy *different
 parts of the time axis*, and that the split moves with instance size.
 
+The gap axis is linear, not log, and that is not a stylistic choice: LKH's gap is exactly 0 on
+these instances, log(0) is -inf, and matplotlib drops such points *silently* — producing a clean
+figure with the competitor absent from it.
+
 LKH through `elkai` takes a run count rather than a time limit, so it has a hard floor: the cost
 of one full run, below which it produces nothing at all. That floor is drawn as a shaded region.
 Every point of ours inside it is non-dominated by construction, because there is no LKH tour to
@@ -70,15 +74,26 @@ def figure(data, out):
                 textcoords="offset points", ha="right", va="top",
                 fontsize=8, color="tab:green",
             )
+            if min(g for _, g in lkh) <= 1e-9:
+                ax.annotate(
+                    "LKH: exactly optimal",
+                    xy=(max(t for t, _ in lkh), 0.0), xytext=(-4, 8),
+                    textcoords="offset points", ha="right", fontsize=8, color="tab:green",
+                )
         else:
             ax.text(0.5, 0.5, "LKH did not finish", transform=ax.transAxes,
                     ha="center", color="tab:green", fontsize=9)
 
         n = int(name[-4:]) if name[-4:].isdigit() else None
         ax.set_xscale("log")
-        ax.set_yscale("log")
+        # Linear in gap, deliberately. A log gap axis drops LKH entirely, because its gap is
+        # exactly 0 on these instances and log(0) is -inf — matplotlib discards the points
+        # silently, so the figure renders cleanly with the competitor missing. That is the worst
+        # available failure mode for a comparison plot, and worth a comment so it is not
+        # reintroduced by someone reaching for a log axis to spread out our own curve.
+        ax.set_ylim(bottom=-0.15)
         ax.set_xlabel("wall clock (s, log)")
-        ax.set_ylabel("% over published optimum (log)")
+        ax.set_ylabel("% over published optimum")
         ax.set_title(f"{name}" + (f"  (n={n})" if n else ""), fontsize=11)
         ax.grid(alpha=0.3, which="both")
         ax.legend(fontsize=7, loc="lower left")

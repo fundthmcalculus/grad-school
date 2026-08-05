@@ -462,7 +462,92 @@ the full test set (1.0057), because below n = 1000 it pays for a second pass it 
 Its guarantee is real and worth keeping: the verification pass can only find additional
 improvements, so its tour is never longer, which `test_invariants.py` asserts.
 
-## 9. Absolute standing: LKH
+## 9. The move repertoire was the binding constraint all along
+
+Every section above tunes *how much* search to spend and *where*. None of it changes **what
+moves exist**, and that turns out to have been the ceiling the whole time.
+
+The repertoire was sequential 2-opt chains plus Or-opt relocation. Both are improving moves, so
+the search converges to a local optimum of that neighbourhood and stops. The rule bases can
+decide how fast to get there and how cheaply; they cannot decide to leave. The evidence that
+this bound everything is in the sweep itself: on pr1002 **every** fixed configuration tops out
+at 2.473%, and spending more time — `k32/d10/b32`, `k48/d10/b32` — buys nothing or loses. That
+is not a tuning plateau, it is the neighbourhood being exhausted.
+
+### The double bridge
+
+A non-sequential 4-opt move reconnecting A-B-C-D as A-C-B-D. What makes it the right addition is
+precisely that **it reverses no segment**, so no sequence of improving 2-opt steps can reach it —
+which is why it escapes the optimum they converge to. It is applied as a perturbation: on its own
+it lengthens the tour, and the bet is that re-optimising recovers more than it lost often enough
+to pay.
+
+Three implementation choices make it affordable at these sizes:
+
+* the kick is drawn inside a **bounded window**, so it costs O(window) and damages a region
+  rather than the tour — the textbook uniform-cut-point version is O(n) per kick;
+* re-optimisation is **seeded from the eight cities whose edges changed**, not restarted, which
+  is why `lk_solve`'s queue loop was factored out as `lk_reopt` rather than copied;
+* rejection **restores by copying the best tour**. An undo log through an arbitrary
+  re-optimisation is complicated and easy to get subtly wrong; the copy is O(n) of memcpy
+  against a much larger re-optimisation cost.
+
+### What it bought
+
+| kicks | pr1002 | pr2392 | pcb3038 |
+|---|---|---|---|
+| 0 (plain local search) | 2.473% / 0.013s | 4.705% / 0.037s | 3.836% / 0.048s |
+| 1 600 | 1.387% / 0.28s | 1.612% / 0.36s | 1.802% / 0.38s |
+| 25 600 | 0.665% / 3.87s | 1.203% / 4.06s | 0.967% / 4.68s |
+| 102 400 | 0.580% / 14.3s | 1.161% / 16.0s | **0.726% / 17.2s** |
+
+A factor of three to four in quality. Every other section of this document moves the number by
+hundredths of a percent; this moves it by whole points, and it is the only change that extends
+the frontier *rightwards* into the region where a serious solver operates rather than shuffling
+position along the existing one.
+
+### Against LKH: a crossover, not a win
+
+| instance | LKH's cheapest possible point | our best strictly below that budget |
+|---|---|---|
+| pr1002 (n=1002) | 0.000% at **3.81s** | 1.387% at 0.28s |
+| pr2392 (n=2392) | 0.000% at **54.57s** | 1.161% at 16.0s |
+
+Three separate things are true and they should not be blurred together.
+
+**Above LKH's floor, LKH wins outright and not narrowly.** It reaches the published optimum
+exactly, at every run count tried, on both instances. Our curve asymptotes around 0.58% on
+pr1002 and 1.16% on pr2392 and does not get closer with more kicks. There is no budget above
+3.81s on pr1002 at which we are competitive.
+
+**Below LKH's floor we are the only solver present, and that window widens steeply with n** —
+3.81s at n=1002 against 54.57s at n=2392, so n grew 2.4x while the floor grew 14x. Because
+`elkai` accepts a run count rather than a time limit, LKH returns nothing at all until its first
+run completes. Every point of ours inside that window is non-dominated by construction.
+
+**How much credit that deserves is limited, and the limit is worth stating.** It is partly a
+property of `elkai`'s interface rather than of LKH: the real LKH accepts a time limit, and a
+properly configured LKH would return *something* in a second. What survives that objection is
+narrower but still real — our solver is genuinely anytime, and its quality in the 0.3–17s band
+is respectable in absolute terms (0.7–1.6% over optimum) rather than merely unopposed.
+
+### The asymptote is the next binding constraint, and it is not the scheduling
+
+More kicking stops helping. On pr2392 quadrupling the budget past 25 600 kicks buys 0.04 points.
+But this is **not uniform across instances** — pcb3038 was still descending over the same step,
+0.967% to 0.726% — so it is not a fixed property of the repertoire either. Something binds on the
+structured `pr` instance that does not bind on `pcb` at the same budget.
+
+Two candidate causes call for opposite investments, so `kick.py` carries a switch for each rather
+than a guess: `accept_equal` (drift sideways across a plateau) and `patience` (accept a worsening
+tour after N rejections). If neither moves the asymptote, the cause is the repertoire, and the
+next step is not perturbation scheduling but **alpha-nearness candidate sets** — LKH builds its
+candidates from a minimum spanning tree rather than by plain k-nearest, which improves every move
+rather than adding one. That measurement is the sharpest open question in this document.
+
+---
+
+## 9b. Absolute standing: LKH
 
 LKH (via `elkai`) completed 9 of the 10 test instances it was given (it timed out on
 fl1577): **exactly optimal on 7, and within 0.03% on the other two** — but taking up to 80 s
