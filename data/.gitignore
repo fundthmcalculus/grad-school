@@ -2,3 +2,10 @@
 #   git -C tribble-fis show 8484fd6^:gaussian_mixture/phishing_data/PhiUSIIL_Phishing_URL_Dataset.csv > data/PhiUSIIL_Phishing_URL_Dataset.csv
 # 57 MB, too large to vendor here.
 PhiUSIIL_Phishing_URL_Dataset.csv
+
+# reproduce/regression_scale/'s pilot data: fetched and cached by _datasets.py
+# on first run, from a GitHub mirror rather than the canonical UCI/figshare
+# source (see reproduce/regression_scale/README.md's provenance section).
+# housing.csv is ~1.4 MB; superconduct_train.csv is ~24 MB, too large to
+# vendor for a pilot that isn't a committed measurement yet.
+regression_scale/

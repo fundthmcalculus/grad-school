@@ -327,6 +327,19 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       independence → incremental-update property (new labeled data for one class updates only
       that class's rules) is stated as a structural consequence, not a measured result. Needs a
       controlled streaming or partial-label experiment before it can be promoted to a claim.
+- [ ] ⬜ **C13 — Large-scale regression benchmark, pilot started** (Appendix A.7's regression
+      gap: no large dataset exists in any form). `reproduce/regression_scale/RESULTS_2026-08-05.md`
+      piloted California Housing (20,433 × 8) and Superconductivity (21,263 × 81), single seed,
+      not yet canonically sourced (both come from a GitHub mirror; UCI/figshare are unreachable
+      from the session that ran this). Findings so far: California Housing works out of the box
+      (R² = 0.660); Superconductivity's raw fit is badly broken (R² = −0.644) from feature
+      collinearity that the library's own `top_p` selector cannot see, fixed by
+      `sklearn.cluster.FeatureAgglomeration` decorrelation first (R² = 0.685 at the tuned peak).
+      Table 6.1's model family run on both shows Random Forest beating every FIS-family arm by a
+      wide margin on both datasets, and fuzzy tree beating tuned MoG on Superconductivity with no
+      tuning at all. No decision yet on which dataset or model family, if any, is worth promoting
+      to a `reproduce/tables/` generator — this item stays open until one is made and the chosen
+      dataset is re-sourced from its canonical location.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because
