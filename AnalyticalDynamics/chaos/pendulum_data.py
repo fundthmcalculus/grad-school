@@ -90,9 +90,16 @@ THETA1_DEG = 120.0
 DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
-def time_points() -> np.ndarray:
-    """The 2000 sample times, matching ``np.arange(0, 10, 0.005)``."""
-    return np.arange(T_START, T_END, H)
+#: The held-out trajectory is integrated twice as far as the training window so the
+#: second half tests extrapolation in *time*, not just to an unseen initial angle.
+#: Training is unchanged at 10 s; only the holdout is longer.
+TEST_T_END = 20.0
+TEST_N_STEPS = int(round((TEST_T_END - T_START) / H))  # 4000
+
+
+def time_points(t_end=T_END) -> np.ndarray:
+    """Sample times on the paper's grid: ``np.arange(0, t_end, 0.005)``."""
+    return np.arange(T_START, t_end, H)
 
 
 # ---------------------------------------------------------------------------
@@ -289,8 +296,13 @@ def _initial_conditions(n_links, theta_grid_deg):
     return np.hstack([lead, middle, grid])
 
 
-def generate(n_links, friction, theta_grid_deg=None):
-    """Integrate every initial condition in the sweep."""
+def generate(n_links, friction, theta_grid_deg=None, n_steps=N_STEPS):
+    """Integrate every initial condition in the sweep.
+
+    n_steps defaults to the paper's 2000 (10 s). The held-out trajectory is
+    generated with TEST_N_STEPS (20 s) so its second half lies beyond anything the
+    model was trained on.
+    """
     if theta_grid_deg is None:
         theta_grid_deg = TRAIN_THETA2_DEG
     ic_deg = _initial_conditions(n_links, theta_grid_deg)
@@ -301,14 +313,14 @@ def generate(n_links, friction, theta_grid_deg=None):
     else:
         rhs = make_rhs_n(n_links, damping)
 
-    theta = np.empty((ic_deg.shape[0], N_STEPS, n_links), dtype=float)
+    theta = np.empty((ic_deg.shape[0], n_steps, n_links), dtype=float)
     for k, row in enumerate(ic_deg):
         state0 = np.zeros(2 * n_links)
         state0[0::2] = np.deg2rad(row)
-        traj = rk4_integrate(rhs, state0)
+        traj = rk4_integrate(rhs, state0, n_steps=n_steps)
         theta[k] = np.rad2deg(traj[:, 0::2])
 
-    return Dataset(n_links, friction, ic_deg, theta, time_points())
+    return Dataset(n_links, friction, ic_deg, theta, time_points(T_START + n_steps * H))
 
 
 def save(ds, out_dir=DATA_DIR):
@@ -358,6 +370,115 @@ def rk4_order_check(n_links, refinements=2):
     return out
 
 
+def integrate_dop853(rhs, state0, t_eval, rtol=1e-12, atol=1e-14):
+    """High-accuracy reference integration with scipy's 8th-order Dormand-Prince.
+
+    The paper specifies fixed-step RK4 at h = 0.005 and the reproduction datasets
+    keep it -- changing the training integrator would be changing the experiment.
+    This exists for the other job: an *independent* check on whether that choice is
+    accurate enough, and a reference to score long rollouts against.
+
+    Independence is the point. `reference_convergence` refines the RK4 step and
+    checks self-agreement, which catches step-size error but shares any structural
+    bias with itself. DOP853 is a different order, different coefficients, and
+    adaptive, so agreement between the two is evidence rather than consistency.
+
+    `rhs` takes (state, t) in this module's odeint-style convention; solve_ivp wants
+    (t, state), so it is flipped here rather than at every call site.
+    """
+    from scipy.integrate import solve_ivp
+
+    sol = solve_ivp(
+        lambda t, y: rhs(y, t),
+        (float(t_eval[0]), float(t_eval[-1])),
+        np.asarray(state0, dtype=float),
+        method="DOP853",
+        t_eval=np.asarray(t_eval, dtype=float),
+        rtol=rtol,
+        atol=atol,
+        dense_output=False,
+    )
+    if not sol.success:
+        raise RuntimeError(f"DOP853 failed: {sol.message}")
+    return sol.y.T
+
+
+def rhs_for(n_links, friction):
+    """The right-hand side used for a given dataset, paper's form at n=2."""
+    damping = DAMPING if friction else 0.0
+    if n_links == 2:
+        return lambda r, t: rhs_double_reference(r, t, damping, damping)
+    return make_rhs_n(n_links, damping)
+
+
+def cross_check_integrators(n_links, friction, duration=TEST_T_END,
+                            rtol=1e-12, atol=1e-14):
+    """Max angular disagreement (deg) between RK4 at h=0.005 and DOP853.
+
+    Returns (max_delta_deg, t_first_exceeds_10deg). For a converged reference this
+    is small and the threshold is never crossed; for a chaotic one it is large and
+    tells you where the paper's step size stops resolving the trajectory.
+    """
+    rhs = rhs_for(n_links, friction)
+    state0 = np.zeros(2 * n_links)
+    state0[0] = np.deg2rad(THETA1_DEG)
+    state0[-2] = np.deg2rad(TEST_THETA2_DEG)
+
+    n_steps = int(round(duration / H))
+    t = time_points(duration)
+    a = np.rad2deg(rk4_integrate(rhs, state0, n_steps=n_steps)[:, 0::2])
+    b = np.rad2deg(integrate_dop853(rhs, state0, t, rtol=rtol, atol=atol)[:, 0::2])
+    delta = np.abs(a - b)
+    over = np.flatnonzero(np.max(delta, axis=1) > 10.0)
+    return float(np.max(delta)), (float(t[over[0]]) if over.size else float("inf"))
+
+
+def reference_convergence(n_links, friction, duration=TEST_T_END, refinements=3,
+                          threshold_deg=10.0):
+    """How long the reference trajectory itself is trustworthy.
+
+    Energy drift says the integrator is self-consistent; it says nothing about
+    whether the *trajectory* is converged. On a chaotic system those differ
+    enormously, because any step-size error is amplified at the Lyapunov rate. So
+    integrate the held-out initial condition at h, h/2, h/4, ... and report where
+    successive refinements stop agreeing. Beyond that time the "ground truth" is a
+    property of the step size, not of the pendulum, and no surrogate should be
+    scored against it.
+
+    Measured on the paper's h = 0.005 over 20 s: the friction chains agree to 0.00
+    degrees under 8x refinement -- fully converged, nothing to fix. The frictionless
+    ones disagree by hundreds of degrees and part company from about t = 11.5 s,
+    which is well inside the 10-20 s extrapolation window. Returns
+    [(h, max_abs_delta_deg, t_exceeds_threshold), ...]; the first row is the
+    coarsest and has no predecessor to compare against.
+    """
+    damping = DAMPING if friction else 0.0
+    if n_links == 2:
+        rhs = lambda r, t: rhs_double_reference(r, t, damping, damping)  # noqa: E731
+    else:
+        rhs = make_rhs_n(n_links, damping)
+
+    state0 = np.zeros(2 * n_links)
+    state0[0] = np.deg2rad(THETA1_DEG)
+    state0[-2] = np.deg2rad(TEST_THETA2_DEG)
+
+    base_steps = int(round(duration / H))
+    out, prev = [], None
+    for k in range(refinements + 1):
+        div = 2**k
+        traj = rk4_integrate(rhs, state0, n_steps=base_steps * div, h=H / div)
+        theta = np.rad2deg(traj[::div, 0::2])
+        if prev is None:
+            out.append((H, None, None))
+        else:
+            delta = np.abs(theta - prev)
+            over = np.flatnonzero(np.max(delta, axis=1) > threshold_deg)
+            out.append((H / div, float(np.max(delta)),
+                        float(over[0] * H) if over.size else float("inf")))
+        prev = theta
+    return out
+
+
 #: Which chains to build. n=2 and n=3 are the paper's; n=5 extends it.
 N_LINKS = (2, 3, 5)
 
@@ -391,16 +512,18 @@ def main():
         for friction in (False, True):
             train = generate(n_links, friction)
             npz, csv = save(train)
-            test = generate(n_links, friction, [TEST_THETA2_DEG])
-            test_ds = Dataset(n_links, friction, test.ic_deg, test.theta_deg, test.t)
-            tnpz = DATA_DIR / f"{test_ds.label}_holdout.npz"
+            # The holdout runs to TEST_T_END, double the training window, so the
+            # second half is extrapolation in time as well as to an unseen angle.
+            test = generate(n_links, friction, [TEST_THETA2_DEG], n_steps=TEST_N_STEPS)
+            tnpz = DATA_DIR / f"{test.label}_holdout.npz"
             np.savez_compressed(
-                tnpz, ic_deg=test_ds.ic_deg, theta_deg=test_ds.theta_deg, t=test_ds.t,
-                n_links=n_links, friction=friction,
+                tnpz, ic_deg=test.ic_deg, theta_deg=test.theta_deg, t=test.t,
+                n_links=n_links, friction=friction, train_t_end=T_END,
             )
             print(
-                f"  {train.label}: train {train.theta_deg.shape} -> {npz.name}, {csv.name}; "
-                f"holdout {test_ds.theta_deg.shape} -> {tnpz.name}"
+                f"  {train.label}: train {train.theta_deg.shape} over "
+                f"{train.t[-1] + H:.0f}s -> {npz.name}, {csv.name}; "
+                f"holdout {test.theta_deg.shape} over {test.t[-1] + H:.0f}s -> {tnpz.name}"
             )
 
 

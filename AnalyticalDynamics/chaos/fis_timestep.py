@@ -19,6 +19,13 @@ reproduced here rather than silently improved on:
     angular range, not 0.027 degrees.
   * Inputs are min-max scaled globally over the pooled training rows.
 
+Both scalers are **unclipped**. The input scaler maps the training window's t to
+[0, 1] and is then asked for t up to 20 s, which it maps to 2.0 rather than
+saturating at 1.0 -- so a prediction past the training window diverges instead of
+freezing at its t = 10 s value, and the failure is visible rather than disguised as
+a plateau. The target scaler is fitted over each trajectory's full extent, the
+holdout's included, so scaled truth stays in [0, 1] across all 20 s.
+
 Because scaled RMSE is only interpretable relative to a trajectory's range, every
 metric below is also reported in degrees.
 
@@ -85,13 +92,20 @@ class Split:
     theta_scaled: np.ndarray  # (n_ics, n_steps, n_links)   per-trajectory [0, 1]
     ranges: np.ndarray  # (n_ics, n_links, 2)  the (min, max) used per trajectory
     holdout_ic_deg: np.ndarray  # (n_links,)
-    holdout_theta_deg: np.ndarray  # (n_steps, n_links)
+    holdout_theta_deg: np.ndarray  # (n_test_steps, n_links)
     holdout_theta_scaled: np.ndarray
     holdout_range: np.ndarray  # (n_links, 2)
+    holdout_t: np.ndarray  # (n_test_steps,)  runs to 20 s, twice the training window
+    train_t_end: float = pdata.T_END  # where the training window stops
 
     @property
     def label(self):
         return pdata.dataset_label(self.n_links, self.friction)
+
+    @property
+    def in_window(self):
+        """Boolean mask over holdout_t: samples inside the training time window."""
+        return self.holdout_t < self.train_t_end
 
     @property
     def swept_index(self):
@@ -116,8 +130,28 @@ def load(n_links, friction):
 
     theta_deg = train["theta_deg"]
     scaled, ranges = _scale_per_trajectory(theta_deg)
+
     h_deg = hold["theta_deg"][0]
-    h_scaled, h_range = _scale_per_trajectory(h_deg)
+    h_t = hold["t"]
+    train_t_end = float(hold["train_t_end"]) if "train_t_end" in hold else pdata.T_END
+
+    # Unclipped min-max: the holdout target scaler is fitted over the *whole* test
+    # trajectory, all 20 s of it, not clipped to the 10 s training window. This is
+    # the literal reading of the paper's protocol -- each trajectory min-max scaled
+    # by its own range -- applied to the trajectory as it actually is.
+    #
+    # It costs something and the cost is worth naming. The scaler now depends on
+    # how far the chain travels in the extrapolation region, which is information
+    # about the answer beyond t = 10 s. On the three friction datasets that is
+    # free: damping means the 20 s range equals the 10 s range to the digit, so
+    # nothing changes. On the frictionless ones the range grows by up to 1.6x, so
+    # their scaled RMSE shrinks by that factor for a reason that has nothing to do
+    # with the model. Frictionless in-window numbers are therefore NOT comparable
+    # to the clipped-scaler results in earlier commits; friction ones are identical.
+    _, h_range = _scale_per_trajectory(h_deg)
+    lo, hi = h_range[:, 0][None, :], h_range[:, 1][None, :]
+    span = np.where(hi - lo == 0.0, 1.0, hi - lo)
+    h_scaled = (h_deg - lo) / span
 
     return Split(
         n_links=n_links,
@@ -131,6 +165,8 @@ def load(n_links, friction):
         holdout_theta_deg=h_deg,
         holdout_theta_scaled=h_scaled,
         holdout_range=h_range,
+        holdout_t=h_t,
+        train_t_end=train_t_end,
     )
 
 
@@ -269,7 +305,12 @@ class FisOperator:
 
     def fit(self, X_raw, names, Y):
         X, self.names_, self.keep_ = _drop_constant(X_raw, names)
-        self.x_scaler_ = MinMaxScaler().fit(X)
+        # clip=False is sklearn's default and is stated here because it is a load-
+        # bearing choice, not an oversight: at t = 20 s this returns 2.0, putting
+        # the query outside every Gaussian membership's support. With clip=True the
+        # model would silently return its t = 10 s answer forever and the
+        # extrapolation failure would look like a stable plateau.
+        self.x_scaler_ = MinMaxScaler(clip=False).fit(X)
         Xs = self.x_scaler_.transform(X)
         self.models_ = []
         # gauss_math.rank_feature_differentiators prints its ranking table
@@ -316,6 +357,38 @@ def _metrics(y_true_scaled, y_pred_scaled, rng):
     return out
 
 
+def horizon_metrics(split, y_true_scaled, y_pred_scaled):
+    """Split a 20 s holdout score into the in-window and extrapolated halves.
+
+    Returns {"holdout": ..., "in_window": ..., "extrap": ..., "t_break": ...}.
+
+    `holdout` covers 0-10 s and is the number every earlier table reports, so it
+    stays directly comparable. `extrap` covers 10-20 s, where both the target time
+    and the target range lie outside anything the model saw. `t_break` is the first
+    time the absolute error exceeds 10% of the training-window range and stays
+    above it, i.e. how far the model actually generalises, in seconds -- inf if it
+    never does.
+    """
+    mask = split.in_window
+    rng = split.holdout_range
+    out = {
+        "holdout": _metrics(y_true_scaled[mask], y_pred_scaled[mask], rng),
+        "in_window": _metrics(y_true_scaled[mask], y_pred_scaled[mask], rng),
+        "extrap": _metrics(y_true_scaled[~mask], y_pred_scaled[~mask], rng),
+        "full": _metrics(y_true_scaled, y_pred_scaled, rng),
+    }
+    err = np.max(np.abs(y_pred_scaled - y_true_scaled), axis=1)
+    over = err > 0.10
+    # First index from which it never recovers below the threshold.
+    never_back = np.flatnonzero(over & (np.cumsum(~over[::-1])[::-1] == 0))
+    if never_back.size:
+        out["t_break"] = float(split.holdout_t[never_back[0]])
+    else:
+        first = np.flatnonzero(over)
+        out["t_break"] = float(split.holdout_t[first[0]]) if first.size else float("inf")
+    return out
+
+
 @dataclass
 class Result:
     label: str
@@ -323,14 +396,16 @@ class Result:
     pooled: dict = field(default_factory=dict)
     trained_ic: dict = field(default_factory=dict)
     holdout_ic: dict = field(default_factory=dict)
+    extrap_ic: dict = field(default_factory=dict)
+    t_break: float = float("nan")
     n_rules: int = 0
     fit_seconds: float = 0.0
 
     def flat(self):
         row = {"dataset": self.label, "config": self.config, "n_rules": self.n_rules,
-               "fit_seconds": round(self.fit_seconds, 2)}
+               "fit_seconds": round(self.fit_seconds, 2), "t_break": self.t_break}
         for fam, d in (("pooled", self.pooled), ("trained", self.trained_ic),
-                       ("holdout", self.holdout_ic)):
+                       ("holdout", self.holdout_ic), ("extrap", self.extrap_ic)):
             for k, v in d.items():
                 row[f"{fam}_{k}"] = v
         return row
@@ -373,8 +448,15 @@ def run(split, cfg, test_fraction=0.2, seed=42, verbose=False):
     Xk, _ = encode(split.ic_deg[k: k + 1], split.t, cfg.encoding, cfg.n_harmonics)
     res.trained_ic = _metrics(split.theta_scaled[k], model.predict(Xk), split.ranges[k])
 
-    Xh, _ = encode(split.holdout_ic_deg[None, :], split.t, cfg.encoding, cfg.n_harmonics)
-    res.holdout_ic = _metrics(split.holdout_theta_scaled, model.predict(Xh), split.holdout_range)
+    # The holdout is evaluated over the full 20 s, then split at the training
+    # window edge: `holdout_ic` stays the 0-10 s number every earlier table quotes,
+    # `extrap_ic` is the 10-20 s continuation.
+    Xh, _ = encode(split.holdout_ic_deg[None, :], split.holdout_t,
+                   cfg.encoding, cfg.n_harmonics)
+    seg = horizon_metrics(split, split.holdout_theta_scaled, model.predict(Xh))
+    res.holdout_ic = seg["holdout"]
+    res.extrap_ic = seg["extrap"]
+    res.t_break = seg["t_break"]
 
     if verbose:
         print(
@@ -382,6 +464,7 @@ def run(split, cfg, test_fraction=0.2, seed=42, verbose=False):
             f"pooled R2={res.pooled['r2']:.4f} "
             f"trained R2={res.trained_ic['r2']:.4f} RMSE={res.trained_ic['rmse']:.4e} "
             f"holdout R2={res.holdout_ic['r2']:.4f} RMSE={res.holdout_ic['rmse']:.4e} "
+            f"extrap R2={res.extrap_ic['r2']:.4f} t_break={res.t_break:.2f}s "
             f"({fit_s:.1f}s)"
         )
     return res, model
@@ -398,6 +481,11 @@ def baseline_bracket_midpoint(split, lower_deg=2.0, upper_deg=2.1):
 
     Reported because a learned model that cannot beat this baseline has not been
     shown to have learned the dynamics, only to have interpolated the grid.
+
+    Scored over the training window only. Both baselines are built out of training
+    trajectories, which stop at 10 s, so neither has any value to offer beyond it --
+    a fact worth stating rather than papering over: on the 10-20 s extrapolation
+    the no-learning baselines do not merely score badly, they do not exist.
     """
     swept = split.ic_deg[:, split.swept_index]
     i_lo = int(np.argmin(np.abs(swept - lower_deg)))
@@ -406,37 +494,49 @@ def baseline_bracket_midpoint(split, lower_deg=2.0, upper_deg=2.1):
         f"{split.label}: bracketing ICs {lower_deg}/{upper_deg} are not in the training grid"
     )
     pred = 0.5 * (split.theta_scaled[i_lo] + split.theta_scaled[i_hi])
-    return _metrics(split.holdout_theta_scaled, pred, split.holdout_range)
+    return _metrics(split.holdout_theta_scaled[split.in_window], pred, split.holdout_range)
 
 
 def baseline_nearest(split):
-    """No-learning reference: copy the single nearest trained trajectory."""
+    """No-learning reference: copy the single nearest trained trajectory.
+
+    Training-window only, for the reason in `baseline_bracket_midpoint`.
+    """
     swept = split.ic_deg[:, split.swept_index]
     target = split.holdout_ic_deg[split.swept_index]
     k = int(np.argmin(np.abs(swept - target)))
-    return _metrics(split.holdout_theta_scaled, split.theta_scaled[k], split.holdout_range)
+    return _metrics(split.holdout_theta_scaled[split.in_window],
+                    split.theta_scaled[k], split.holdout_range)
 
 
 def predictions_for(split, model, cfg, which="holdout"):
-    """Scaled predictions plus ground truth for plotting."""
+    """Scaled predictions plus ground truth for plotting.
+
+    The holdout runs the full 20 s; the trained IC stays at the 10 s it was fitted
+    on. `train_t_end` tells the plotting code where to draw the window edge, and is
+    None when the whole series is inside the training window.
+    """
     if which == "holdout":
         ic = split.holdout_ic_deg[None, :]
-        truth, rng = split.holdout_theta_scaled, split.holdout_range
+        truth, rng, t = split.holdout_theta_scaled, split.holdout_range, split.holdout_t
+        t_end = split.train_t_end
     else:
         k = int(np.argmin(np.abs(split.ic_deg[:, split.swept_index] - TRAINED_IC_THETA_DEG)))
         ic = split.ic_deg[k: k + 1]
-        truth, rng = split.theta_scaled[k], split.ranges[k]
-    X, _ = encode(ic, split.t, cfg.encoding, cfg.n_harmonics)
+        truth, rng, t = split.theta_scaled[k], split.ranges[k], split.t
+        t_end = None
+    X, _ = encode(ic, t, cfg.encoding, cfg.n_harmonics)
     pred = model.predict(X)
     span = (rng[:, 1] - rng[:, 0])[None, :]
     lo = rng[:, 0][None, :]
     return {
-        "t": split.t,
+        "t": t,
         "truth_scaled": truth,
         "pred_scaled": pred,
         "truth_deg": truth * span + lo,
         "pred_deg": pred * span + lo,
         "ic_deg": ic[0],
+        "train_t_end": t_end,
     }
 
 

@@ -14,6 +14,7 @@ Read in this order:
 | `METHOD_AND_PARAMETERS.md` | The paper's method, step by step, and every training parameter — separating what the PDF says from what the authors' code does. §7 covers the n=5 extension. Read first. |
 | `REPRODUCTION_REPORT.md` | What worked, what didn't, and how the FIS compares to the paper's reported numbers. §8 is the n=5 extension. |
 | `results/comparison.md` | Generated cell-by-cell ranking tables: FIS vs the paper's models vs two no-learning baselines. |
+| `paper.md` | Write-up as a NAFIPS-length paper (~5,400 words, 9 sections, 12 equations), with `references.bib` alongside. Lives here rather than under `papers/` on purpose: it is a draft against live code, and its figure links point at `figures/` in this directory. Move both to `papers/` when drafting for submission. |
 
 **Short version:** the FIS beats all eight of the paper's time-step models in six of
 the seven cells the paper reports and places second in the seventh. But on the
@@ -47,8 +48,8 @@ plots.py               figure generators (paper figure formats)
 paper_results.py       the paper's reported numbers, transcribed
 run_all.py             picks the winner per dataset, refits, emits all outputs
 data/                  generated datasets (.npz + tidy .csv)
-results/               sweep{,_lowcap,_n5,_lowcap_n5}.csv, best.csv,
-                       comparison.md, bracket.csv  (tracked -- this is the evidence)
+results/               sweep{,_lowcap,_n5,_lowcap_n5}.csv, best.csv, comparison.md,
+                       bracket.csv, extrapolation.csv  (tracked -- the evidence)
 figures/               PNGs
 ```
 
@@ -93,7 +94,9 @@ there — see `REPRODUCTION_REPORT.md` §4.3.
 ## Datasets
 
 Six, each 31 initial conditions × 2000 samples over 10 s at h = 0.005 s, plus a
-held-out `[120°, …, 2.05°]` trajectory that is never trained on:
+held-out `[120°, …, 2.05°]` trajectory that is never trained on and runs to
+**20 s** — twice the training window, so its second half tests extrapolation in
+time as well as to an unseen angle:
 
 | | frictionless | friction (damping 0.15) |
 |---|---|---|
@@ -117,11 +120,25 @@ extension.
 1. **RMSE is dimensionless.** The paper min-max scales each trajectory to [0, 1]
    independently before pooling, so RMSE is a fraction of that trajectory's own
    angular range. 0.017 on the frictionless double-pendulum holdout is ≈ 16°, not
-   0.017°. Every FIS metric here is reported in degrees as well.
-2. **Three metric families, not one.** `pooled` is the paper's own random 80/20
+   0.017°. Every FIS metric here is reported in degrees as well. Both scalers are
+   **unclipped**: the target scaler is fitted over each trajectory's full 20 s, and
+   the input scaler returns 2.0 for t = 20 s rather than saturating at 1.0 — which
+   is why extrapolation diverges instead of plateauing.
+2. **Four metric families, not one.** `pooled` is the paper's own random 80/20
    split over pooled rows — it interleaves samples 5 ms apart between train and
    test and measures interpolation, not generalisation. `trained_ic` scores a
    trajectory that was in training. `holdout_ic` scores the never-trained
-   `2.05°` IC and is the only number that tests the paper's actual claim.
+   `2.05°` IC over 0–10 s and is the number that tests the paper's actual claim.
+   `extrap_ic` scores the same trajectory over 10–20 s, beyond the training
+   window entirely.
+3. **Nothing survives the window edge.** On all three friction datasets the FIS is
+   accurate right up to t = 10 s and then fails within one or two timesteps
+   (R² +0.998 → −6.3e7 on the double pendulum). The time-step formulation makes
+   `t` an input feature rather than integrating a state, which is why it is
+   accurate inside the window and has no horizon at all outside it.
+   `REPRODUCTION_REPORT.md` §9, `results/extrapolation.csv`.
+
+Figures are per-metric: `fig_rmse_*` and `fig_r2_*`, each a bar chart sorted
+best-first, rather than the paper's dual-axis combined chart.
 
 No animations are produced, by request.

@@ -138,7 +138,56 @@ standard point-mass double-pendulum form, which is what we transcribed.
    exactly 0 and max exactly 1 — the target scaler is the identity map.
 5. `torch.utils.data.random_split` 80/20 on the **pooled rows**.
 
-Three consequences worth stating plainly:
+**Both scalers here are unclipped**, which is sklearn's default (`clip=False`) and
+is load-bearing in two places:
+
+- *Inputs.* The scaler maps the training window's `t` onto [0, 1]. Asked for
+  t = 20 s it returns 2.0 rather than saturating at 1.0, so a query past the
+  training window lands outside every Gaussian membership's support and the
+  prediction diverges. With `clip=True` the model would return its t = 10 s answer
+  forever and the extrapolation failure would be disguised as a stable plateau.
+- *Targets.* Each trajectory's scaler is fitted over its full extent — for the
+  held-out trajectory, all 20 s, not clipped to the 10 s training window. Scaled
+  truth therefore stays inside [0, 1] across the whole test span.
+
+  This exposes a latent inconsistency in the paper's protocol that a 10 s test
+  cannot show. Per-trajectory scaling only makes train and test commensurable if
+  every trajectory is normalised over the same duration. Training targets span
+  exactly [0, 1] in every column by construction, and so did the old 10 s holdout.
+  Normalise the holdout over 20 s instead and its *first 10 s* no longer fills
+  [0, 1]:
+
+  | dataset | holdout θ range over 0–10 s, unclipped scaling |
+  |---|---|
+  | double, friction | [0, 1.000] and [0, 1.000] |
+  | double, frictionless | [0, 1.000] and **[0, 0.678]** |
+
+  A model trained to emit values across [0, 1] is now scored against an in-window
+  truth that only reaches 0.678, so it overshoots by ~1.5x on that column for
+  reasons that have nothing to do with its dynamics. Frictionless in-window scores
+  drop sharply as a result — nb80 held-out R² moves 0.439 → 0.032 — and that drop
+  is a scaling artefact, not a modelling result. Friction datasets are bitwise
+  unaffected, because damping keeps the 20 s range identical to the 10 s range.
+
+  The consequence for reading this repository: **frictionless in-window numbers are
+  not comparable across the clipped/unclipped choice**, friction ones are. Where
+  earlier commits are quoted, the friction figures carry over and the frictionless
+  ones do not.
+
+  The blast radius was measured rather than assumed, by re-scoring every swept
+  configuration and diffing against the committed values:
+
+  | metric | friction | frictionless |
+  |---|---|---|
+  | `trained_rmse` | 48/48 bitwise identical | 48/48 bitwise identical |
+  | `pooled_rmse` | 48/48 bitwise identical | 48/48 bitwise identical |
+  | `holdout_rmse` | 48/48 bitwise identical | 0/48 identical, max Δ 0.047 |
+
+  Only the held-out metric on frictionless datasets moves, which is exactly the
+  set of numbers the scaler touches: training and pooled scores are computed from
+  training trajectories, whose scaling never changed.
+
+Three further consequences worth stating plainly:
 
 - **RMSE is dimensionless and per-trajectory-relative.** A reported RMSE of
   0.027 means 2.7% of *that trajectory's own* angular range. For the frictionless

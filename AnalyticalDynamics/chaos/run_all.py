@@ -111,23 +111,31 @@ def pick(rows, label, metric, lower_is_better=True):
 
 
 def draw_dataset(split, system, friction, base, trained, holdout):
-    """All six figures for one dataset, each drawn with that cell's winner."""
+    """Every figure for one dataset, each drawn with that cell's winner.
+
+    Returns the held-out prediction dict so the caller can build the
+    error-against-time figure across all datasets.
+    """
     bars = {
-        "bracket\nmid.": (base["bracket midpoint (no learning)"]["rmse"],
-                          base["bracket midpoint (no learning)"]["r2"]),
-        "nearest\nIC": (base["nearest trained IC (no learning)"]["rmse"],
-                        base["nearest trained IC (no learning)"]["r2"]),
+        "bracket midpoint": (base["bracket midpoint (no learning)"]["rmse"],
+                             base["bracket midpoint (no learning)"]["r2"]),
+        "nearest trained IC": (base["nearest trained IC (no learning)"]["rmse"],
+                               base["nearest trained IC (no learning)"]["r2"]),
     }
+    holdout_pred = None
     for setting, (model, cfg, res) in (("trained", trained), ("holdout", holdout)):
         pred = predictions_for(split, model, cfg, which=setting)
+        if setting == "holdout":
+            holdout_pred = pred
         plots.angles_overlay(pred, system, friction, setting)
         plots.trajectory_overlay(pred, system, friction, setting)
         metrics = res.trained_ic if setting == "trained" else res.holdout_ic
         # The no-learning baselines only exist for the held-out IC: they are
         # defined by interpolating *between* trained ICs, so on a trained IC they
         # would just be that trajectory itself.
-        plots.compare_bars(system, friction, setting, metrics["rmse"], metrics["r2"],
+        plots.compare_cell(system, friction, setting, metrics["rmse"], metrics["r2"],
                            baselines=bars if setting == "holdout" else None)
+    return holdout_pred
 
 
 def main():
@@ -138,6 +146,8 @@ def main():
     fis_trained = {}
     baselines = {}
     capacity = {}
+    holdout_preds = {}
+    extrap_rows = []
 
     for n_links, friction in DATASETS:
         split = load(n_links, friction)
@@ -182,6 +192,24 @@ def main():
                 "refit did not reproduce the swept trained-IC score"
             )
 
+        # Extrapolation is a property of the reported model, not of every swept
+        # configuration -- the sweeps score 0-10 s only, and selection never sees
+        # the 10-20 s segment. So it is recorded here, from the refit, rather than
+        # being back-filled into best.csv from rows that never measured it.
+        extrap_rows.append({
+            "dataset": label,
+            "config": cfg_h.key(),
+            "train_t_end_s": split.train_t_end,
+            "test_t_end_s": round(float(split.holdout_t[-1] + (split.t[1] - split.t[0])), 3),
+            "in_window_rmse": res_h.holdout_ic["rmse"],
+            "in_window_r2": res_h.holdout_ic["r2"],
+            "in_window_rmse_deg": res_h.holdout_ic["rmse_deg"],
+            "extrap_rmse": res_h.extrap_ic["rmse"],
+            "extrap_r2": res_h.extrap_ic["r2"],
+            "extrap_rmse_deg": res_h.extrap_ic["rmse_deg"],
+            "t_break_s": res_h.t_break,
+        })
+
         fis_holdout_rmse[system] = res_h.holdout_ic["rmse"]
         fis_trained[(system, friction)] = {
             "trained": (res_t.trained_ic, cfg_t.key()),
@@ -192,8 +220,9 @@ def main():
             "nearest trained IC (no learning)": baseline_nearest(split),
         }
 
-        draw_dataset(split, system, friction, baselines[(system, friction)],
-                     trained=(model_t, cfg_t, res_t), holdout=(model_h, cfg_h, res_h))
+        holdout_preds[label] = draw_dataset(
+            split, system, friction, baselines[(system, friction)],
+            trained=(model_t, cfg_t, res_t), holdout=(model_h, cfg_h, res_h))
 
         print(
             f"{label}:\n"
@@ -205,6 +234,7 @@ def main():
             f"({res_t.trained_ic['rmse_deg']:.2f} deg)"
         )
 
+    plots.error_vs_time(holdout_preds, t_end=pdata.T_END)
     plots.rmse_heatmap(fis_holdout_rmse, setting="holdout", friction=True,
                        systems=[pdata.system_name(n) for n in N_LINKS])
     plots.capacity_curve(capacity, best_paper=pr.best("double", True, "holdout")[2])
@@ -218,6 +248,16 @@ def main():
         w = csv.DictWriter(fh, fieldnames=fields)
         w.writeheader()
         w.writerows(best_rows)
+
+    with open(RESULT_DIR / "extrapolation.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(extrap_rows[0]))
+        w.writeheader()
+        w.writerows(extrap_rows)
+    print("\nPast the training window (held-out IC, holdout-winning config):")
+    for r in extrap_rows:
+        print(f"  {r['dataset']:24s} 0-{r['train_t_end_s']:.0f}s R2={r['in_window_r2']:+.4f}"
+              f"  {r['train_t_end_s']:.0f}-{r['test_t_end_s']:.0f}s R2={r['extrap_r2']:+.3e}"
+              f"  RMSE={r['extrap_rmse']:.4g}  breaks at {r['t_break_s']:.2f}s")
 
     write_comparison(fis_trained, baselines)
     print(f"\nwrote {RESULT_DIR / 'best.csv'} and {RESULT_DIR / 'comparison.md'}")

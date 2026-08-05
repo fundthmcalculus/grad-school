@@ -351,11 +351,13 @@ Paper-format comparison plots, in `figures/`. No animations, by request.
 
 | Figure | Paper analogue |
 |---|---|
-| `fig_compare_{system}_{friction}_{setting}.png` (12) | Figs. 11, 12, 13, 18B–D — dual-axis RMSE/R² grouped bars, with the FIS and the no-learning baselines appended. The four n = 5 panels show every paper model hatched "not run in paper". |
-| `fig_angles_{system}_{friction}_{setting}.png` (12) | the θ(t) truth-vs-prediction plot every reference notebook ends with |
-| `fig_trajectory_{system}_{friction}_{setting}.png` (12) | Figs. 14, 15, 16, 19 — bob paths in the plane over 10 s |
+| `fig_rmse_{system}_{friction}_{setting}.png` (12) | Figs. 11, 12, 13, 18B–D, split — RMSE only, sorted best-first, with the FIS and the no-learning baselines included. The four n = 5 panels show every paper model hatched "not run in paper". |
+| `fig_r2_{system}_{friction}_{setting}.png` (12) | the same cells, R² only, sorted best-first on an axis zoomed to the data so near-1 values stay distinguishable |
+| `fig_angles_{system}_{friction}_{setting}.png` (12) | the θ(t) truth-vs-prediction plot every reference notebook ends with. The holdout panels run to 20 s with a dotted rule at t = 10 s where the training data ends; y-axes are scaled to the truth, so the diverging prediction leaves the frame and its peak is annotated. |
+| `fig_trajectory_{system}_{friction}_{setting}.png` (12) | Figs. 14, 15, 16, 19 — bob paths in the plane, with the past-the-window portion drawn faint |
 | `fig_rmse_heatmap_friction_holdout.png` | Fig. 22, with a `quintuple` column and a FIS row |
 | `fig_capacity_vs_holdout.png` | not in the paper — held-out R² against rule count for all six datasets, showing that capacity buys everything on friction and nothing on frictionless |
+| `fig_error_vs_time.png` | not in the paper — the §9 measurement: absolute error against time, log axis, window edge marked |
 | `fig_bracket.png` | not in the paper — the §3.2 measurement, now across all three chain lengths |
 
 ## 8. Extension to n = 5
@@ -448,7 +450,156 @@ R² 0.4288 to 0.9016 and does rise monotonically with rule count. Capacity buys
 something there and nothing at all in the frictionless case, which is the
 information limit showing up as a hyperparameter that has stopped mattering.
 
-## 9. If this were taken further
+## 9. Extrapolating past the training window: 20 s tests
+
+Training is unchanged at 10 s. The held-out trajectory is now integrated to **20 s**
+and scored over the whole span, so the second half asks a question the first half
+cannot: not "can you predict an unseen initial angle", but "can you predict a time
+you were never trained on". Every θ(t) figure carries a dotted rule at t = 10 s
+marking where the training data ends.
+
+### The answer is no, immediately and by orders of magnitude
+
+Each row uses that dataset's reported held-out winner, the same model quoted
+everywhere else. Generated into `results/extrapolation.csv`.
+
+| dataset | 0–10 s R² | 10–20 s R² | error exceeds 10% at |
+|---|---|---|---|
+| double, friction | +0.9979 | −6.31e7 | 10.05 s |
+| triple, friction | +0.9995 | −1.35e4 | 10.10 s |
+| quintuple, friction | +0.9016 | −6.69e7 | 9.04 s |
+| double, frictionless | +0.6199 | −2.94e1 | 7.75 s |
+| triple, frictionless | +0.6091 | −3.37e3 | 9.14 s |
+| quintuple, frictionless | +0.2014 | −6.02e0 | 2.37 s |
+
+RMSE is in scaled units where 1.0 is the trajectory's entire training-window
+angular range, and past the window it reaches order 1e3 — a prediction wrong by a
+thousand times the full swing of the pendulum. In degrees the double-friction
+prediction peaks around 5.4e5°, roughly 1500 revolutions.
+
+Two details worth reading off that table. **The three friction datasets stay
+accurate right up to the edge and then fail within one or two timesteps** (10.05,
+10.10, 9.04 s) — the collapse is the window boundary, not a gradual decay. The
+frictionless ones break *earlier* than t = 10 s because they were already
+inaccurate inside it, so their `t_break` measures the in-window failure documented
+in §3.3, not the boundary. And the *least* negative extrapolation R² belongs to the
+worst in-window model (quintuple frictionless, −6.0): a model that has already
+regressed to the conditional mean has less far to fall.
+
+### Why, and why it was predictable
+
+The failure is structural, not a tuning problem. Inputs are min-max scaled on the
+training range, so `t` maps [0, 10) → [0, 1]; at t = 20 the model is asked to
+evaluate at scaled `t = 2.0`. Two things break at once:
+
+1. **The antecedents have no support there.** Firing strength is a product of
+   Gaussian memberships fitted over [0, 1]. At 2.0 every membership is far into its
+   tail, so all firing strengths underflow toward zero and the normalisation that
+   turns them into weights amplifies numerical noise into arbitrary rule selection.
+2. **The consequents are affine and unbounded.** Each rule contributes
+   `mean_r + basis(x) · coef_r`, linear in `t`. Evaluated at double the fitted
+   range with essentially random weights, the blend diverges rather than saturating.
+
+This is the same mechanism as the flat-lining documented in
+`../N3_N5_FUZZY_REGRESSION_REPORT.md` §4 — a rolled-out state leaving the
+antecedents' support — with the sign reversed. There the prediction collapsed
+toward zero because the surviving rule contributed ≈ 0; here it explodes because
+the surviving consequent is a line with a large slope. Both are the same fact:
+**outside the antecedents' support a TSK model has no defined behaviour, and which
+way it fails is an accident of the consequent.**
+
+### What this says about the paper's approach
+
+The time-step formulation buys its accuracy by making `t` an input feature rather
+than integrating a state forward. That is exactly why it works so well inside the
+window — and exactly why it has no horizon at all outside it. An integrator, or an
+autoregressive rollout, degrades gradually as error accumulates; this degrades
+discontinuously at the window edge because there is no dynamical structure carrying
+information across it. The paper's Limitation 2 ("we narrowed the time-step approach
+down to a 10-second prediction interval… longer intervals may have been useful")
+frames the window as a compute budget. It is not: **the window is the model's entire
+domain of validity, and nothing in the formulation extends past it.**
+
+The no-learning baselines are not merely worse here — they are undefined. Both are
+built from training trajectories, which stop at 10 s. Beyond the window there is
+nothing to average and nothing to copy, so §3's comparison simply has no entries.
+Both baselines are therefore scored over 0–10 s only, and that is stated in
+`results/comparison.md` rather than left for a reader to infer.
+
+### The 20 s window exposes a latent flaw in the paper's normalisation
+
+Both min-max scalers are unclipped, so the held-out target is normalised over its
+full 20 s rather than over the training window. That is the literal protocol —
+each trajectory scaled by its own range — and applying it to a longer test
+trajectory reveals something a 10 s test cannot.
+
+Per-trajectory scaling only makes training and test commensurable when every
+trajectory is normalised over the *same duration*. Training targets span exactly
+[0, 1] in every column by construction. Normalise the holdout over 20 s and its
+first 10 s no longer fills that range:
+
+| dataset | holdout θ range over 0–10 s |
+|---|---|
+| double, friction | [0, 1.000], [0, 1.000] |
+| double, frictionless | [0, 1.000], **[0, 0.678]** |
+
+A model trained to emit values across [0, 1] is then scored against an in-window
+truth reaching only 0.678, so it overshoots that column by ~1.5× for reasons
+unrelated to its dynamics. Frictionless in-window scores fall accordingly — nb80
+held-out R² moves 0.439 → 0.032 — and **that fall is a scaling artefact, not a
+modelling result**. The friction datasets are bitwise unaffected: damping keeps
+their 20 s range identical to their 10 s range, so every friction number in this
+report is unchanged.
+
+The general point is about the benchmark, not about us. The paper's normalisation
+silently assumes fixed-length trajectories, and any attempt to test its models on a
+longer horizon than they were trained on inherits this offset before a single
+prediction is made. Frictionless in-window numbers are therefore not comparable
+across the clipped/unclipped choice; friction ones are.
+
+### Caveat: the frictionless reference is not converged over this window
+
+Energy drift (§6) says the integrator is self-consistent. It does not say the
+*trajectory* is converged, and on a chaotic system those are very different
+claims: any step-size error is amplified at the Lyapunov rate. Integrating the
+held-out initial condition at h, h/2, h/4 and h/8 and asking where successive
+refinements stop agreeing (`pendulum_data.reference_convergence`):
+
+| dataset | max Δ at h/2 | refinements disagree from |
+|---|---|---|
+| double, friction | **0.00°** | never |
+| triple, friction | 0.15° | never |
+| quintuple, friction | 7.07° | never |
+| double, frictionless | 546° | 11.50 s |
+| triple, frictionless | 892° | 10.93 s |
+| quintuple, frictionless | 1533° | 8.90 s |
+
+**The three friction references are converged** — the double pendulum's is
+identical to the digit under 8× refinement — so every friction number in this
+report stands. The three frictionless references are not: past roughly 9–11.5 s
+the "ground truth" is a property of the step size rather than of the pendulum.
+
+That window overlaps the 10–20 s extrapolation segment, so the frictionless
+`extrap` figures in the table above should be read as *"the surrogate does not
+track a reference that is itself not reproducible there"* — which is a weaker
+statement than the friction rows support, and a fair one, since both the surrogate
+and the reference have lost the trajectory. Refining h pushes the horizon out only
+logarithmically (11.50 → 15.17 → 16.84 s for four-fold refinement), which is what
+exponential error growth implies: no integrator makes a chaotic 20 s reference
+trustworthy, it only buys a few more seconds per order of magnitude.
+
+### Where to look
+
+`figures/fig_error_vs_time.png` plots absolute error against time on a log axis for
+all six datasets with the window edge marked — the clearest single view of how far
+each survives. The per-dataset `fig_angles_*_holdout.png` show the same thing in
+degrees; their y-axes are scaled to the *truth*, so the diverging prediction leaves
+the frame and its peak magnitude is annotated instead of being drawn to scale. In
+`fig_trajectory_*_holdout.png` the past-the-window portion is drawn faint, because
+angles are periodic: a prediction that has diverged to 1e5° still lands somewhere on
+the unit circle and would otherwise look perfectly plausible.
+
+## 10. If this were taken further
 
 The interesting question this reproduction surfaces is not which regressor wins.
 It is that **the benchmark as constructed cannot distinguish models**, because the
