@@ -1,0 +1,9 @@
+family,model,n_variables,train_seconds,rollout_seconds,in_window_rmse_deg,extrap_rmse_deg,diverged_at_s,guard_corrections,variables
+with time,"time-step, 40 rules",2,7.14,0.009,22.0046,443.3053,,,theta2_init t
+with time,"time-step, 120 rules",2,20.58,0.02,4.3501,20070.3642,,,theta2_init t
+with time,"time-step, 300 rules",2,71.7,0.052,3.1054,338554.9492,,,theta2_init t
+with time,"time-step, 8 harmonics",18,175.81,0.061,20.0722,146.2012,,,theta2_init t sin1w0t cos1w0t sin2w0t cos2w0t sin3w0t cos3w0t sin4w0t cos4w0t sin5w0t cos5w0t sin6w0t cos6w0t sin7w0t cos7w0t sin8w0t cos8w0t
+without time,"state-space, 40 rules",4,14.38,25.92,374.6632,1455.4429,,0,theta_1 omega_1 theta_2 omega_2
+without time,"state-space, 120 rules",4,48.46,47.27,52.1998,1173.2146,,0,theta_1 omega_1 theta_2 omega_2
+without time,"state-space, 120 + guard",4,48.1,46.95,59.0243,91.7142,,3001,theta_1 omega_1 theta_2 omega_2
+without time,physics basis (grey box),5,0.01,0.37,0.0004,0.0004,,0,physics basis terms
