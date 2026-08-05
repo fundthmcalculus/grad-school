@@ -54,8 +54,7 @@ def fis_construct(
     cand_d,
     ceil,
     mean_c,
-    mf_c,
-    mf_s,
+    tab,
     ant,
     cons,
     c_breadth=8,
@@ -84,6 +83,7 @@ def fis_construct(
         where[i] = i
     m = n
     x = np.empty(4, np.float64)
+    mu = np.empty((4, 3), np.float64)
 
     cur = start
     tour[0] = cur
@@ -159,7 +159,7 @@ def fis_construct(
                         cosang = -1.0
                     x[3] = 0.5 * (1.0 + cosang)
 
-            score = fis_eval1(x, mf_c, mf_s, ant, cons)
+            score = fis_eval1(x, mu, tab, ant, cons)
             if score > best_score:
                 best_score = score
                 best = c
@@ -197,12 +197,10 @@ def fis_lk_solve(
     tour_in,
     nn1,
     mean_c,
-    mf_c,
-    mf_s,
+    tab,
     ant,
     cons,
-    ch_mf_c,
-    ch_mf_s,
+    ch_tab,
     ch_ant,
     ch_cons,
     max_depth=10,
@@ -248,6 +246,9 @@ def fis_lk_solve(
     # touched its neighbourhood since
     settled = np.zeros(n, np.uint8)
     x = np.empty(4, np.float64)
+    mu = np.empty((4, 3), np.float64)
+    xc = np.empty(4, np.float64)
+    mu_c = np.empty((4, 3), np.float64)
     out = np.empty(4, np.float64)
 
     cap = n + 1
@@ -334,7 +335,7 @@ def fis_lk_solve(
                 v = 1.0
             x[3] = v
 
-            fis_eval(x, mf_c, mf_s, ant, cons, out)
+            fis_eval(x, mu, tab, ant, cons, out)
             stats[STAT_FIS_CALLS] += 1
 
             breadth = min_breadth + int(out[0] * (k - min_breadth) + 0.5)
@@ -387,10 +388,11 @@ def fis_lk_solve(
             touched,
             stats,
             use_chain,
-            ch_mf_c,
-            ch_mf_s,
+            ch_tab,
             ch_ant,
             ch_cons,
+            xc,
+            mu_c,
         )
         if gain > 1e-9:
             fails[t1] = 0
@@ -424,8 +426,12 @@ def fis_lk_solve(
 # ---------------------------------------------------------------------------
 # end-to-end driver
 # ---------------------------------------------------------------------------
-def construct(inst, cand, cand_d, cons, c_breadth=8, start=0):
-    """The fuzzy next-city ranker, as a one-call helper."""
+def construct(inst, cand, cand_d, cons, c_breadth=8, start=0, tab=None):
+    """The fuzzy next-city ranker, as a one-call helper.
+
+    ``tab`` overrides the membership-function bank, which the optimiser fits along
+    with the consequents; ``None`` keeps the hand-written one.
+    """
     _, mean_c = nn_stats(cand_d)
     return fis_construct(
         inst.coords,
@@ -433,8 +439,7 @@ def construct(inst, cand, cand_d, cons, c_breadth=8, start=0):
         cand_d,
         inst.ceil,
         mean_c,
-        fis_mod.CONSTRUCT_MF_C,
-        fis_mod.CONSTRUCT_MF_S,
+        fis_mod.CONSTRUCT_TAB if tab is None else tab,
         fis_mod.CONSTRUCT_ANT,
         cons,
         c_breadth,
@@ -453,8 +458,14 @@ def local_search(
     or_max=3,
     defer=False,
     use_chain=True,
+    effort_tab=None,
+    chain_tab=None,
 ):
-    """Fuzzy-controlled LK from a given start tour, as a one-call helper."""
+    """Fuzzy-controlled LK from a given start tour, as a one-call helper.
+
+    ``effort_tab`` / ``chain_tab`` override the membership-function banks, which the
+    optimiser fits along with the consequents; ``None`` keeps the hand-written ones.
+    """
     nn1, mean_c = nn_stats(cand_d)
     return fis_lk_solve(
         inst.coords,
@@ -464,12 +475,10 @@ def local_search(
         start_tour,
         nn1,
         mean_c,
-        fis_mod.EFFORT_MF_C,
-        fis_mod.EFFORT_MF_S,
+        fis_mod.EFFORT_TAB if effort_tab is None else effort_tab,
         fis_mod.EFFORT_ANT,
         effort_cons,
-        fis_mod.CHAIN_MF_C,
-        fis_mod.CHAIN_MF_S,
+        fis_mod.CHAIN_TAB if chain_tab is None else chain_tab,
         fis_mod.CHAIN_ANT,
         chain_cons,
         max_depth,

@@ -23,6 +23,14 @@ from scipy.spatial import cKDTree
 
 
 @njit(cache=True, inline="always")
+def dist_raw(coords, a, b):
+    """Un-rounded euclidean distance — used only to break ties that rounding created."""
+    dx = coords[a, 0] - coords[b, 0]
+    dy = coords[a, 1] - coords[b, 1]
+    return np.sqrt(dx * dx + dy * dy)
+
+
+@njit(cache=True, inline="always")
 def dist(coords, a, b, ceil):
     """TSPLIB integer distance between cities a and b."""
     dx = coords[a, 0] - coords[b, 0]
@@ -60,15 +68,21 @@ def build_candidates(coords, k, ceil):
     """The k nearest neighbours of every city, ascending by distance.
 
     A k-d tree is used because it is the same C implementation for both arms and
-    is a small fraction of either arm's runtime. Rounding is monotone in the
-    euclidean distance, so neighbour *order* is unaffected by it.
+    is a small fraction of either arm's runtime.
 
-    Ties are broken by city index, not by whatever order the tree happened to
-    emit. That matters more than it looks: TSPLIB instances are full of exact
-    ties (in pr1002, cities 326 and 328 are both at distance 150 from 327), and
-    a tie order that shifts with k makes the k=8 list stop being a prefix of the
-    k=20 list. Nearest-neighbour tours then change length with k, and every
-    comparison downstream picks up that noise.
+    Getting the tie handling right took three attempts, and it matters because the
+    baseline is reported as a sweep over k — so anything that makes the k=8 list
+    disagree with the first 8 of the k=24 list turns that sweep into a measurement of
+    tie-break luck. TSPLIB instances are full of ties: exact ones (in pr1002, cities
+    326 and 328 are both at distance 150 from 327) and, because distances are rounded
+    to integers, many more that rounding creates. What is needed is
+    (a) a deterministic key, since the tree's own order is arbitrary;
+    (b) enough queried neighbours that a tie group straddling the k-th place is fully
+        seen, since otherwise the returned *set* is k-dependent even if the key is not;
+    (c) the same key the exact-scan fallback in :func:`nn_tour` uses, or the two paths
+        disagree whenever the fallback fires.
+    See the ordering comment below for the key, and ``test_invariants.py`` for the
+    checks that hold all three.
 
     Returns (cand (n,k) int32, cand_d (n,k) float64) — the neighbour indices and
     the rounded distances to them, which is what the fuzzy features scale by.
@@ -76,14 +90,44 @@ def build_candidates(coords, k, ceil):
     n = coords.shape[0]
     k = min(k, n - 1)
     tree = cKDTree(coords)
-    dd, idx = tree.query(coords, k=k + 1, workers=-1)
-    # Drop the point itself (for coincident points its index can land anywhere
-    # in the tied block, so mask by index rather than assuming column 0), then
-    # order each row by (distance, index).
-    dd = np.where(idx == np.arange(n)[:, None], np.inf, dd)
-    order = np.lexsort((idx, dd), axis=1)
-    cand = np.take_along_axis(idx, order, axis=1)[:, :k].astype(np.int32)
-    cand = np.ascontiguousarray(cand)
+
+    # Query a margin beyond k and resolve ties inside the larger set. Ordering by
+    # (distance, index) is not on its own enough to make the k=8 list a prefix of the
+    # k=24 list: when a tie group straddles the cut, the *set* the tree returns is
+    # itself k-dependent, so the tree may hand back one member of the tie at k=8 and a
+    # different one at k=24. Widening the query until no tie spans the boundary removes
+    # the last of that k-dependence, which is what lets a sweep over k measure k rather
+    # than tie-break luck.
+    margin = 8
+    while True:
+        kq = min(n - 1, k + margin)
+        dd, idx = tree.query(coords, k=kq + 1, workers=-1)
+        # drop the point itself; for coincident points its index can land anywhere in
+        # the tied block, so mask by index rather than assuming column 0
+        dd = np.where(idx == np.arange(n)[:, None], np.inf, dd)
+        # Order by (rounded distance, euclidean distance, index), in that order.
+        #
+        # The rounded distance has to come first because that is the metric the solver
+        # optimises, and it is what the exact-scan fallback in `nn_tour` compares. But
+        # rounding creates ties the euclidean order does not have — 10.4 and 10.6 both
+        # round to 10 — and breaking those by index alone would order the candidate list
+        # by city number rather than by proximity, which is geometrically worse for every
+        # move that walks the list. So euclidean distance breaks the rounded ties, and the
+        # index breaks the remaining exact ones. `nn_tour`'s fallback compares the same
+        # three keys, so the candidate path and the scan path can never disagree.
+        dd_round = np.where(
+            np.isinf(dd), np.inf, np.ceil(dd) if ceil else np.floor(dd + 0.5)
+        )
+        order = np.lexsort((idx, dd, dd_round), axis=1)
+        dd_s = np.take_along_axis(dd_round, order, axis=1)
+        idx_s = np.take_along_axis(idx, order, axis=1)
+        if kq >= n - 1 or dd_s.shape[1] <= k:
+            break
+        # a tie spanning the cut means the k-th neighbour is not yet determined
+        if not np.any(dd_s[:, k - 1] == dd_s[:, k]):
+            break
+        margin *= 2
+    cand = np.ascontiguousarray(idx_s[:, :k].astype(np.int32))
     cand_d = np.zeros(cand.shape, dtype=np.float64)
     _cand_dist_kernel(coords, cand, ceil, cand_d)
     return cand, cand_d
@@ -163,6 +207,7 @@ def reverse_exact(tour, pos, n, i, j):
         tour[b] = ca
         pos[cb] = a
         pos[ca] = b
+    return inside // 2
 
 
 @njit(cache=True)
@@ -176,11 +221,13 @@ def block_swap(tour, pos, n, i, j, m, rev_a, rev_b):
     This is the surgery behind an Or-opt move: relocating a short segment is a
     swap of that segment with the run of cities between it and its destination.
     """
+    w = 0
     if not rev_a:
-        reverse_exact(tour, pos, n, i, j)
+        w += reverse_exact(tour, pos, n, i, j)
     if not rev_b:
-        reverse_exact(tour, pos, n, (j + 1) % n, m)
-    reverse_exact(tour, pos, n, i, m)
+        w += reverse_exact(tour, pos, n, (j + 1) % n, m)
+    w += reverse_exact(tour, pos, n, i, m)
+    return w
 
 
 @njit(cache=True, inline="always")
@@ -196,6 +243,11 @@ def reverse(tour, pos, n, i, j):
     Reverses whichever of the segment and its complement is shorter — the two
     give the same set of tour edges, so this is free correctness-wise and is what
     keeps a 2-opt move sub-linear on average instead of O(n).
+
+    Returns the number of element swaps performed. That count is the solver's real
+    memory-traffic cost and the single hardest part of its runtime to predict from
+    move counts alone, so it is accumulated into the stats and used by the cost
+    model in ``costmodel.py``.
     """
     inside = (j - i + n) % n + 1
     if 2 * inside > n:  # complement is shorter
@@ -210,6 +262,7 @@ def reverse(tour, pos, n, i, j):
         tour[b] = ca
         pos[cb] = a
         pos[ca] = b
+    return inside // 2
 
 
 # ---------------------------------------------------------------------------
@@ -258,14 +311,20 @@ def nn_tour(coords, cand, ceil, start=0):
                 break
         if nxt < 0:  # exact fallback over what is left
             best = 1e300
+            best_raw = 1e300
             for u in range(m):
                 c = unvisited[u]
                 d = dist(coords, cur, c, ceil)
-                # ties go to the lower city index: the unvisited array's order
-                # depends on the compaction history, so without this the tour
-                # would depend on k through which steps take this branch
-                if d < best or (d == best and c < nxt):
+                if d > best:
+                    continue
+                # Same three keys the candidate list is ordered by: rounded distance,
+                # then true distance, then index. Without this the two paths break
+                # rounding ties differently and the tour depends on k through which
+                # steps happen to take this branch.
+                r = dist_raw(coords, cur, c)
+                if d < best or r < best_raw or (r == best_raw and c < nxt):
                     best = d
+                    best_raw = r
                     nxt = c
         tour[step] = nxt
         visited[nxt] = 1

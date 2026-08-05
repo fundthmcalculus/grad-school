@@ -144,11 +144,17 @@ def lkh_reference(inst, runs=1):
 
 def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
     c_cons, e_cons, h_cons = fis.CONSTRUCT_CONS, fis.EFFORT_CONS, fis.CHAIN_CONS
+    c_tab = e_tab = h_tab = None  # None keeps the hand-written membership functions
     if tuned is not None:
         z = np.load(tuned)
         c_cons = np.ascontiguousarray(z["construct_cons"])
         e_cons = np.ascontiguousarray(z["effort_cons"])
         h_cons = np.ascontiguousarray(z["chain_cons"])
+        # tune_opt.py fits the membership functions too and stores them compiled
+        if "construct_tab" in z:
+            c_tab = np.ascontiguousarray(z["construct_tab"])
+            e_tab = np.ascontiguousarray(z["effort_tab"])
+            h_tab = np.ascontiguousarray(z["chain_tab"])
     rows = []
 
     for name in names:
@@ -170,7 +176,7 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
         (nn_t, t_nn) = _tmin(lambda: nn_tour(inst.coords, cand, inst.ceil, 0), reps)
         (gr_t, t_gr) = _tmin(lambda: greedy_edge_tour(inst.coords, cand, inst.ceil), reps)
         (fc_t, t_fc) = _tmin(
-            lambda: fis_build(inst, cand, cand_d, c_cons, FIS_C_BREADTH), reps
+            lambda: fis_build(inst, cand, cand_d, c_cons, FIS_C_BREADTH, 0, c_tab), reps
         )
         for tag, tour, t in (
             ("nn", nn_t, t_nn),
@@ -202,25 +208,38 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
         # so the table separates the ranker from the effort controller from the
         # chain-continuation rules, and the tuned rule base from the hand-written one.
         arms = [
-            ("fis_effort_greedy", gr_t, t_gr, e_cons, h_cons, False, False),
-            ("fis_effort_chain_greedy", gr_t, t_gr, e_cons, h_cons, True, False),
-            ("fis_full", fc_t, t_fc, e_cons, h_cons, False, False),
-            ("fis_effort_nn", nn_t, t_nn, e_cons, h_cons, False, False),
-            ("fis_defer", gr_t, t_gr, e_cons, h_cons, False, True),
+            ("fis_effort_greedy", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, False, False),
+            ("fis_effort_chain_greedy", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, True, False),
+            ("fis_full", fc_t, t_fc, e_cons, h_cons, e_tab, h_tab, True, False),
+            ("fis_effort_nn", nn_t, t_nn, e_cons, h_cons, e_tab, h_tab, True, False),
+            ("fis_defer", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, True, True),
             (
                 "fis_effort_greedy_handwritten",
                 gr_t,
                 t_gr,
                 fis.EFFORT_CONS,
                 fis.CHAIN_CONS,
+                None,
+                None,
                 False,
                 False,
             ),
+            (
+                "fis_chain_greedy_handwritten",
+                gr_t,
+                t_gr,
+                fis.EFFORT_CONS,
+                fis.CHAIN_CONS,
+                None,
+                None,
+                True,
+                False,
+            ),
         ]
-        for tag, start, t_start, ec, hc, use_chain, defer in arms:
+        for tag, start, t_start, ec, hc, et, ht, use_chain, defer in arms:
             (res, t_run) = _tmin(
-                lambda s=start, ec=ec, hc=hc, u=use_chain, d=defer: fis_ls(
-                    inst, cand, cand_d, s, ec, hc, FIS_DEPTH, FIS_OR, d, u
+                lambda s=start, ec=ec, hc=hc, et=et, ht=ht, u=use_chain, d=defer: fis_ls(
+                    inst, cand, cand_d, s, ec, hc, FIS_DEPTH, FIS_OR, d, u, et, ht
                 ),
                 reps,
             )

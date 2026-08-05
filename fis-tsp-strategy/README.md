@@ -50,22 +50,31 @@ did not work.
 | `lk.py` | the baseline Lin-Kernighan, shared by both arms |
 | `fis.py` | the inference engine and the three rule bases |
 | `fis_lk.py` | fuzzy construction, and the fuzzy-controlled local search |
-| `tune.py` | fits the rule consequents; two stages, with a held-out validation split |
+| `costmodel.py` | a deterministic cost proxy, fitted to measured wall clock, that the tuner optimises against |
+| `tune_opt.py` | fits consequents *and* membership functions with the `optimizers` GA / PSO / ACO |
+| `tune.py` | the earlier hand-rolled (1+1)-ES tuner, kept for comparison |
 | `benchmark.py` | the reported comparison |
 | `lkh_reference.py` | LKH numbers, in a subprocess with a timeout |
 | `figures.py` | the time-versus-quality plane, and where the effort goes |
+| `figures_tuning.py` | which optimiser won, and what fitting did to the membership functions |
 
 ## Running it
 
 ```bash
 pip install numpy scipy matplotlib numba elkai
+pip install -e ../tribble-opt          # the optimizers library used by tune_opt.py
 cd fis-tsp-strategy
 
-python tune.py --construct-seconds 150 --seconds 900   # writes tuned.npz
-python benchmark.py --reps 3                           # writes results.json
-python lkh_reference.py --max-n 3000 --timeout 120     # optional external reference
-python figures.py                                      # writes figures/
+python costmodel.py                                    # writes costmodel.npz
+python tune_opt.py --generations 25 --population 24    # writes tuned_opt.npz
+python benchmark.py --reps 3 --tuned tuned_opt.npz     # writes results.json
+python lkh_reference.py --max-n 2500 --timeout 90      # optional external reference
+python figures.py && python figures_tuning.py          # writes figures/
 ```
+
+`costmodel.py` has to run before `tune_opt.py`: the tuner's objective is the fitted cost
+proxy, not wall clock, so that the search is deterministic, reproducible, and not
+corrupted by its own CPU contention. Wall clock is what `benchmark.py` reports.
 
 Instances come from `../ClusteringExperiments/tsplib/`, which already carries 111
 TSPLIB files and the published-optimum index. The training, validation and test

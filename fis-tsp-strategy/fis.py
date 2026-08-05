@@ -1,27 +1,32 @@
-"""A small Takagi-Sugeno fuzzy inference engine, and the two rule bases that drive
+"""A small Takagi-Sugeno fuzzy inference engine, and the three rule bases that drive
 the TSP strategy engine.
 
-The engine is deliberately plain: gaussian membership functions, three linguistic
-terms per input (LOW / MED / HIGH), a product t-norm, singleton consequents and a
-weighted-average defuzzification. All of it is nopython-jitted and allocation-free
-so it can sit in the innermost loop of a local search and be evaluated tens of
-millions of times.
+The engine is deliberately plain: three linguistic terms per input (LOW / MED / HIGH),
+a product t-norm, singleton consequents, weighted-average defuzzification. All of it is
+nopython-jitted, and — because the cost model measured a rule-base evaluation at
+comparable cost to the whole city scan it was deciding about — allocation-free, with the
+membership bank compiled to a lookup table and every scratch buffer owned by the caller.
+A consequence worth having: the membership functions' *shape* is then just data, so
+their centres, widths and functional form are all things the optimiser can move.
 
-Two rule bases live here.
+Three rule bases live here.
 
-``CONSTRUCT`` ranks candidate next-cities during tour construction — the "which
-city is next" question. Its antecedents are the four things a human looks at when
-tracing a tour by hand: how near the candidate is, whether it is about to be
-stranded, whether it continues the direction of travel, and whether it leads into
-thinner ground.
+``CONSTRUCT`` ranks candidate next-cities during tour construction — the "which city is
+next" question. Its antecedents are the four things a human looks at when tracing a tour
+by hand: how much worse than the nearest option the candidate is, whether it is about to
+be stranded, what coming back for it later would cost, and whether it continues the
+direction of travel.
 
 ``EFFORT`` allocates Lin-Kernighan search effort per city — the "which parameters"
-question. Its consequents are the LK parameters themselves: how many candidates to
-back-track over, how deep to push the gain chain, and how much Or-opt to attempt.
-A conventional LK uses one setting everywhere; this one reads four cheap features
-of the city about to be searched and spends accordingly.
+question. Its consequents are the LK parameters themselves: how far to back-track at the
+first level, how many candidates to weigh at deeper ones, how deep to push the gain
+chain, and how much Or-opt to attempt. A conventional LK uses one setting everywhere.
 
-Every antecedent is a scale-free ratio, so one tuned rule base transfers between
+``CHAIN`` decides, at every level of every gain chain, whether to deepen or cut, from the
+chain's own gain trajectory rather than at a fixed depth. Depth is where this solver's
+time actually goes, so this is the rule base that buys the most.
+
+Every antecedent is a scale-free ratio, so one fitted rule base transfers between
 instances whose coordinates differ by orders of magnitude.
 """
 
@@ -50,23 +55,88 @@ def default_mf(n_in, sigma=0.30):
     return np.ascontiguousarray(c), np.ascontiguousarray(s)
 
 
-@njit(cache=True, inline="always")
-def _mf(x, c, s):
-    z = (x - c) / s
+MF_RES = 64  # lookup-table resolution per input; (MF_RES + 1) samples over [0, 1]
+
+
+def _mf_gaussian(xs, c, w):
+    z = (xs - c) / max(w, 1e-6)
     return np.exp(-0.5 * z * z)
 
 
+def _mf_triangular(xs, c, w):
+    return np.maximum(0.0, 1.0 - np.abs(xs - c) / max(w, 1e-6))
+
+
+MF_KINDS = {"gaussian": _mf_gaussian, "triangular": _mf_triangular}
+
+
+def mf_table(mf_c, mf_w, kind="gaussian"):
+    """Compile a membership-function bank into a lookup table over [0, 1].
+
+    Every fuzzy input here is already normalised to [0, 1] by its feature extractor,
+    which means the membership functions can be tabulated once and evaluated in the
+    hot path by a table lookup and a lerp — no exponentials, and no dependence on the
+    functional form. Two things fall out of that:
+
+    * it is much cheaper. The cost model measured a rule-base evaluation at ~580ns
+      against ~870ns for the whole city scan it was deciding about, and the twelve
+      exponentials were most of it;
+    * the *shape* of the membership functions stops being hard-coded. Centres, widths
+      and the functional form all become parameters the optimiser can move, because
+      the hot path never knows which it got.
+    """
+    fn = MF_KINDS[kind]
+    n_in, n_terms = mf_c.shape
+    xs = np.linspace(0.0, 1.0, MF_RES + 1)
+    tab = np.empty((n_in, n_terms, MF_RES + 1), dtype=np.float64)
+    for i in range(n_in):
+        for t in range(n_terms):
+            tab[i, t] = fn(xs, mf_c[i, t], mf_w[i, t])
+    return np.ascontiguousarray(tab)
+
+
+@njit(cache=True, inline="always")
+def _memberships(x, tab, mu):
+    """Fill ``mu[i, t]`` with input i's membership in term t, by table lerp.
+
+    Every rule that constrains input i needs the same terms, so they are computed
+    once per evaluation rather than once per rule — 12 lookups instead of up to 72.
+    """
+    n_in = mu.shape[0]
+    n_terms = mu.shape[1]
+    for i in range(n_in):
+        xi = x[i]
+        if xi < 0.0:
+            xi = 0.0
+        elif xi > 1.0:
+            xi = 1.0
+        f = xi * MF_RES
+        j = int(f)
+        if j >= MF_RES:
+            j = MF_RES - 1
+        a = f - j
+        for t in range(n_terms):
+            v0 = tab[i, t, j]
+            mu[i, t] = v0 + a * (tab[i, t, j + 1] - v0)
+
+
 @njit(cache=True)
-def fis_eval(x, mf_c, mf_s, ant, cons, out):
+def fis_eval(x, mu, tab, ant, cons, out):
     """Evaluate a TSK-0 rule base. ``out`` is filled with the defuzzified outputs.
 
     ``ant[r, i]`` is the term index required of input i by rule r, or ANY (-1).
     ``cons[r, j]`` is rule r's singleton for output j. Firing strength is the
     product of the memberships the rule actually constrains.
+
+    ``mu`` is a caller-owned (n_in, N_TERMS) scratch buffer. It is an argument rather
+    than a local because a local would be a heap allocation on every call, and at
+    this call frequency that allocation costs about as much as the exponentials it
+    was introduced to save — measured, not assumed.
     """
     n_rules = ant.shape[0]
     n_in = ant.shape[1]
     n_out = cons.shape[1]
+    _memberships(x, tab, mu)
     for j in range(n_out):
         out[j] = 0.0
     den = 0.0
@@ -75,7 +145,7 @@ def fis_eval(x, mf_c, mf_s, ant, cons, out):
         for i in range(n_in):
             a = ant[r, i]
             if a >= 0:
-                w *= _mf(x[i], mf_c[i, a], mf_s[i, a])
+                w *= mu[i, a]
                 if w < 1e-12:
                     break
         if w < 1e-12:
@@ -92,11 +162,12 @@ def fis_eval(x, mf_c, mf_s, ant, cons, out):
 
 
 @njit(cache=True)
-def fis_eval1(x, mf_c, mf_s, ant, cons):
-    """Single-output fast path — used by the construction ranker, which is the
-    hottest call in the whole system (once per candidate per city)."""
+def fis_eval1(x, mu, tab, ant, cons):
+    """Single-output fast path — used by the construction ranker and the chain
+    cut-off, the two hottest calls in the system. ``mu`` is caller-owned scratch."""
     n_rules = ant.shape[0]
     n_in = ant.shape[1]
+    _memberships(x, tab, mu)
     num = 0.0
     den = 0.0
     for r in range(n_rules):
@@ -104,7 +175,7 @@ def fis_eval1(x, mf_c, mf_s, ant, cons):
         for i in range(n_in):
             a = ant[r, i]
             if a >= 0:
-                w *= _mf(x[i], mf_c[i, a], mf_s[i, a])
+                w *= mu[i, a]
                 if w < 1e-12:
                     break
         if w < 1e-12:
@@ -185,6 +256,7 @@ CONSTRUCT_RULES = [
 
 CONSTRUCT_ANT, CONSTRUCT_CONS = _pack(CONSTRUCT_RULES, C_N_IN, 1)
 CONSTRUCT_MF_C, CONSTRUCT_MF_S = default_mf(C_N_IN)
+CONSTRUCT_TAB = mf_table(CONSTRUCT_MF_C, CONSTRUCT_MF_S)
 
 
 # ---------------------------------------------------------------------------
@@ -244,6 +316,7 @@ EFFORT_RULES = [
 
 EFFORT_ANT, EFFORT_CONS = _pack(EFFORT_RULES, E_N_IN, E_N_OUT)
 EFFORT_MF_C, EFFORT_MF_S = default_mf(E_N_IN)
+EFFORT_TAB = mf_table(EFFORT_MF_C, EFFORT_MF_S)
 
 
 # ---------------------------------------------------------------------------
@@ -295,11 +368,13 @@ CHAIN_RULES = [
 
 CHAIN_ANT, CHAIN_CONS = _pack(CHAIN_RULES, CH_N_IN, 1)
 CHAIN_MF_C, CHAIN_MF_S = default_mf(CH_N_IN)
+CHAIN_TAB = mf_table(CHAIN_MF_C, CHAIN_MF_S)
 
 # Passed to the shared LK chain by the baseline arm, which does not consult a rule
 # base at all; never read, because the ``use_chain`` flag is false there.
 NO_CHAIN_ANT = np.full((1, CH_N_IN), ANY, dtype=np.int8)
 NO_CHAIN_CONS = np.full((1, 1), 0.5, dtype=np.float64)
+NO_CHAIN_TAB = CHAIN_TAB
 
 
 # ---------------------------------------------------------------------------

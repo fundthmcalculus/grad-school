@@ -30,13 +30,7 @@ from __future__ import annotations
 import numpy as np
 from numba import njit
 
-from fis import (
-    CHAIN_MF_C as NO_MF_C,
-    CHAIN_MF_S as NO_MF_S,
-    NO_CHAIN_ANT,
-    NO_CHAIN_CONS,
-    fis_eval1,
-)
+from fis import NO_CHAIN_ANT, NO_CHAIN_CONS, NO_CHAIN_TAB, fis_eval1
 from core import (
     block_swap,
     dist,
@@ -55,7 +49,8 @@ STAT_EVALS = 1
 STAT_SCANS = 2
 STAT_DEPTH = 3
 STAT_CHAIN_CALLS = 4  # continuation decisions taken by the CHAIN rule base
-N_STATS = 5
+STAT_REV_WORK = 5  # element swaps performed by segment reversal — the real memory cost
+N_STATS = 6
 
 
 @njit(cache=True, inline="always")
@@ -95,10 +90,11 @@ def _lk_chain(
     touched,
     stats,
     use_chain,
-    ch_mf_c,
-    ch_mf_s,
+    ch_tab,
     ch_ant,
     ch_cons,
+    xc,
+    mu,
 ):
     """Run one LK gain chain anchored at (t1, t2) whose first added edge is
     (t2, u0), with ``g0`` the gain after breaking (t1,t2) and adding (t2,u0).
@@ -124,7 +120,6 @@ def _lk_chain(
     n_touched = 0
     g_next = 0.0
     nxt_score = 0.0
-    xc = np.empty(4, np.float64)
 
     while level < max_depth:
         d_now = _free_end_dir(tour, pos, n, t1, cur_t2)
@@ -144,7 +139,7 @@ def _lk_chain(
         else:
             ri = pos[t4]
             rj = pos[cur_t2]
-        reverse(tour, pos, n, ri, rj)
+        stats[STAT_REV_WORK] += reverse(tour, pos, n, ri, rj)
         rev_i[level] = ri
         rev_j[level] = rj
 
@@ -218,7 +213,7 @@ def _lk_chain(
             elif xc[3] < 0.0:
                 xc[3] = 0.0
             stats[STAT_CHAIN_CALLS] += 1
-            if fis_eval1(xc, ch_mf_c, ch_mf_s, ch_ant, ch_cons) < 0.5:
+            if fis_eval1(xc, mu, ch_tab, ch_ant, ch_cons) < 0.5:
                 break  # cut it here
 
         u = nxt
@@ -226,7 +221,7 @@ def _lk_chain(
 
     # unwind every reversal deeper than the best closing depth
     for lv in range(level - 1, best_level - 1, -1):
-        reverse(tour, pos, n, rev_i[lv], rev_j[lv])
+        stats[STAT_REV_WORK] += reverse(tour, pos, n, rev_i[lv], rev_j[lv])
     stats[STAT_DEPTH] += level
     if best_level <= 0:
         return 0.0, 0
@@ -322,16 +317,17 @@ def or_opt_city(
                 fwd = span_len(n, i, pos[c])
                 bwd = span_len(n, pos[cn], j)
                 if fwd <= bwd:
-                    block_swap(tour, pos, n, i, j, pos[c], False, False)
+                    w = block_swap(tour, pos, n, i, j, pos[c], False, False)
                 else:
-                    block_swap(tour, pos, n, pos[cn], im1, j, False, False)
+                    w = block_swap(tour, pos, n, pos[cn], im1, j, False, False)
             else:
                 fwd = span_len(n, i, pos[cp])
                 bwd = span_len(n, pos[c], j)
                 if fwd <= bwd:
-                    block_swap(tour, pos, n, i, j, pos[cp], True, False)
+                    w = block_swap(tour, pos, n, i, j, pos[cp], True, False)
                 else:
-                    block_swap(tour, pos, n, pos[c], im1, j, False, True)
+                    w = block_swap(tour, pos, n, pos[c], im1, j, False, True)
+            stats[STAT_REV_WORK] += w
 
             nt = 0
             if touched.shape[0] >= 6:
@@ -366,10 +362,11 @@ def improve_city(
     touched,
     stats,
     use_chain,
-    ch_mf_c,
-    ch_mf_s,
+    ch_tab,
     ch_ant,
     ch_cons,
+    xc,
+    mu,
 ):
     """Try to improve the tour with a chain anchored at t1, then by Or-opt.
 
@@ -416,10 +413,11 @@ def improve_city(
                 touched,
                 stats,
                 use_chain,
-                ch_mf_c,
-                ch_mf_s,
+                ch_tab,
                 ch_ant,
                 ch_cons,
+                xc,
+                mu,
             )
             if gain > 1e-9:
                 stats[STAT_MOVES] += 1
@@ -461,6 +459,8 @@ def lk_solve(
     if tsize < 8:
         tsize = 8
     touched = np.empty(tsize, np.int32)
+    xc = np.empty(4, np.float64)
+    mu = np.empty((4, 3), np.float64)
 
     cap = n + 1
     queue = np.empty(cap, np.int32)
@@ -496,10 +496,11 @@ def lk_solve(
             touched,
             stats,
             False,
-            NO_MF_C,
-            NO_MF_S,
+            NO_CHAIN_TAB,
             NO_CHAIN_ANT,
             NO_CHAIN_CONS,
+            xc,
+            mu,
         )
         if gain > 1e-9:
             for s in range(nt):
