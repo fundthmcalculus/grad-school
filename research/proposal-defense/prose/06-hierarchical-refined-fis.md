@@ -86,7 +86,7 @@ Three qualifications, none small. The study ran on a **different host** from thi
 >
 > This does not invalidate Table 6.1, and the asymmetry is now measured. `REPRO_SPLIT_FIRST=1` refits the target scale, the output partition and the feature scaler inside each training fold; `outputs/splitfirst-2026-08-03/` is that run, read in `outputs/SPLIT_FIRST_LEAK.md`. Every exposed row moves inside its own seed spread, and the three closed-form arms move *upward* when the leak is removed, by +0.005, +0.005 and +0.018, the direction an inflating artifact cannot take. All eight control rows move by exactly 0.000, which is what makes the rest mean anything: they never touch the output partition, so anything else would indict the variant. The largest single move is −0.032, on the 1st-order refined arm, inside one standard deviation but not zero and the same order as gaps this chapter reasons from. So the row ordering still reads as **level rather than as a ranking**, now on the seed spreads alone. It does not rehabilitate the control this chapter leaned on: Chapter 4 §4.3 offers CART's and Random Forest's invariance to the transform as evidence that the preprocessing is "not smuggling information into the problem," and that control does not transfer here. A rank-invariant model is *precisely* the control that cannot detect leakage through a monotone scaler or a target partition, so its silence is uninformative.
 >
-> **TODO — repeatable performance (board-wide standard):** the training-time, accuracy, and speedup numbers here need the fixed reproducibility protocol and the full baseline suite before citation (see `ACTION_ITEMS.md` §A/§C and Ch 7 Goal G4/G3).
+> **TODO — repeatable performance (board-wide standard):** the training-time, accuracy, and speedup numbers here need the fixed reproducibility protocol and the full baseline suite before citation (see Ch 7 Goal G4/G3).
 
 **What is measured today.** Table 6.1 compares the three models on Concrete, on shared splits and seeds but *not* under a single protocol, and the table takes up what that licenses. On PhiUSIIL classification the mixture now reaches 1.000 ± 0.001 accuracy, level with CART and the random forest, the flat model 0.997 ± 0.001 and the tree 0.970 on interpretable splits, though as Table 6.2 notes the gaps there carry no weight. And the memory result above.
 
@@ -175,4 +175,4 @@ That warning has to be honoured elsewhere, and is not. Chapter 8 describes the a
 
 ---
 
-*Draft — Chapter 6 prose; built vs. proposed marked throughout. Citations in bracketed shorthand pending the consolidated `references.bib`. Three tables (6.1–6.3) and two figure placeholders (6.1–6.2) inline. Open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 6 prose; built vs. proposed marked throughout. Citations in bracketed shorthand pending the consolidated `references.bib`. Three tables (6.1–6.3) and two figure placeholders (6.1–6.2) inline. Open items in `../CHECKLIST.md`.*

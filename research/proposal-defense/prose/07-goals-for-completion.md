@@ -161,7 +161,7 @@ The runway is oversubscribed, not merely tight, so the de-scoping plan is an ord
 
 ## 7.5 Goals, mapped
 
-**Table 7.1 — Goals for completion, mapped.** Read the **Kind** column first: it says what "done" means. A *protocol* is discharged when every table complies or is named as an exception; an *experiment* by a measurement against §7.2's threshold, and can be refuted; a *build* by working, verified code; an *open question* may end in a negative result, and two of them probably will. Quarters are relative to the confirmed December 2026 proposal, with the final defense in March 2028 (Chapter 10); rows are ordered by target quarter and the cut order is §10.6's. Items are also tracked in `CHECKLIST.md` and `ACTION_ITEMS.md`, with the identifier in each status cell.
+**Table 7.1 — Goals for completion, mapped.** Read the **Kind** column first: it says what "done" means. A *protocol* is discharged when every table complies or is named as an exception; an *experiment* by a measurement against §7.2's threshold, and can be refuted; a *build* by working, verified code; an *open question* may end in a negative result, and two of them probably will. Quarters are relative to the confirmed December 2026 proposal, with the final defense in March 2028 (Chapter 10); rows are ordered by target quarter and the cut order is §10.6's. Items are also tracked in `CHECKLIST.md`, with the identifier in each status cell.
 
 | Goal | Kind | Feeds | Current status | Priority | Target |
 |---|---|---|---|---|---|
@@ -187,4 +187,4 @@ The runway is oversubscribed, not merely tight, so the de-scoping plan is an ord
 
 ---
 
-*Draft — Chapter 7 prose. One table. Goals tracked in `../ACTION_ITEMS.md` and `../CHECKLIST.md`, and mapped to the Chapter 10 timeline.*
+*Draft — Chapter 7 prose. One table. Goals tracked in `../CHECKLIST.md`, and mapped to the Chapter 10 timeline.*

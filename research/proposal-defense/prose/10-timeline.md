@@ -1,6 +1,6 @@
 # Chapter 10 — Timeline
 
-The plan runs from the proposal defense at the end of 2026 to the final defense in **March 2028**: fifteen months of research runway. It is deliberately aggressive, and the risk is managed in Chapter 7, where the completed Chapters 3 and 4 are the floor and §7.4 points at the de-scoping order §10.6 carries in full. Quarters are calendar quarters; goal labels match Table 7.1, `CHECKLIST.md` and `ACTION_ITEMS.md`.
+The plan runs from the proposal defense at the end of 2026 to the final defense in **March 2028**: fifteen months of research runway. It is deliberately aggressive, and the risk is managed in Chapter 7, where the completed Chapters 3 and 4 are the floor and §7.4 points at the de-scoping order §10.6 carries in full. Quarters are calendar quarters; goal labels match Table 7.1 and `CHECKLIST.md`.
 
 Three things changed here, all of them cases of the schedule having assumed the hard parts were done.
 
@@ -155,4 +155,4 @@ Two caveats. Q1 2027 is the densest quarter, carrying five research items and a 
   - Whether the M5 branch may be a *build*, writing an M5′ implementation against a current scikit-learn. Dated 31 March 2027, not decided.
   - Whether either Fumanal-Idocin et al. (2025) or the deep TSK fuzzy classifier must be reimplemented: §7.2 de-scopes both, and taking one on displaces G3b.
 
-*Draft — Chapter 10 prose + Gantt. Goals map to Table 7.1, `../CHECKLIST.md` and `../ACTION_ITEMS.md`.*
+*Draft — Chapter 10 prose + Gantt. Goals map to Table 7.1 and `../CHECKLIST.md`.*

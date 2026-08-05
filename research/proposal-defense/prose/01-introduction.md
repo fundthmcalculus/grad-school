@@ -50,4 +50,4 @@ The remainder follows the pipeline in order, separating work already done from w
 
 ---
 
-*Draft — Chapter 1 prose. Two figure placeholders (1.1–1.2) inline. Open items in `../ACTION_ITEMS.md`.*
+*Draft — Chapter 1 prose. Two figure placeholders (1.1–1.2) inline. Open items in `../CHECKLIST.md`.*
