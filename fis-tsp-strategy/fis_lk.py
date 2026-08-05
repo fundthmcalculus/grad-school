@@ -270,7 +270,6 @@ def fis_lk_solve(
     bn = 0
 
     pops = 0
-    work_scale = 2.0 * n  # a converged run pops roughly this many cities
 
     while an > 0 or bn > 0:
         if an > 0:
@@ -296,11 +295,51 @@ def fis_lk_solve(
             or_seg = or_max
             stats[STAT_FULL_ATTEMPTS] += 1
         else:
-            # --- features of the city about to be searched
+            # --- features of the city about to be searched.
+            # All five were selected by measured predictive power in
+            # `features_probe.py`, and all read the same way: higher means more to find.
             s1 = succ(tour, pos, n, t1)
             p1 = pred(tour, pos, n, t1)
             d_s = dist(coords, t1, s1, ceil)
             d_p = dist(coords, t1, p1, ceil)
+            d_long = d_s if d_s > d_p else d_p
+
+            # The probe. One level of the search is run *as a look-ahead* over both
+            # directions of the broken edge, counting how many candidates pass the
+            # positive-gain test and how large the best gain is. This is the single most
+            # informative thing available about the city (AUC 0.858 and 0.795), and it is
+            # cheap for the same reason the search itself is: candidate distances ascend,
+            # so the loop breaks at the first non-passing candidate, which for a city
+            # already sitting on short edges is the very first one.
+            best_g1 = 0.0
+            n_pass = 0
+            for side in range(2):
+                d_break = d_s if side == 0 else d_p
+                t2 = s1 if side == 0 else p1
+                for t in range(k):
+                    g1 = d_break - cand_d[t2, t]
+                    if g1 <= 1e-9:
+                        break
+                    n_pass += 1
+                    if g1 > best_g1:
+                        best_g1 = g1
+            v = n_pass / (2.0 * k)
+            if v > 1.0:
+                v = 1.0
+            x[0] = v
+            v = best_g1 / d_long if d_long > 0.0 else 0.0
+            if v > 1.0:
+                v = 1.0
+            x[2] = v
+
+            # rank of the worse incident edge within the candidate list: how many strictly
+            # nearer neighbours it is currently ignoring
+            r = 0
+            for t in range(k):
+                if cand_d[t1, t] >= d_long:
+                    break
+                r += 1
+            x[1] = r / k
 
             # excess: how much longer this city's edges are than its shortest possible
             v = (0.5 * (d_s + d_p) / nn1[t1] - 1.0) * 0.5
@@ -308,51 +347,11 @@ def fis_lk_solve(
                 v = 0.0
             elif v > 1.0:
                 v = 1.0
-            x[0] = v
-
-            # how often this city has already been searched without result
-            v = fails[t1] / 3.0
-            if v > 1.0:
-                v = 1.0
-            x[1] = v
-
-            # turn sharpness: 0 for a straight pass-through, 1 for doubling back
-            ax = coords[t1, 0] - coords[p1, 0]
-            ay = coords[t1, 1] - coords[p1, 1]
-            bx = coords[s1, 0] - coords[t1, 0]
-            by = coords[s1, 1] - coords[t1, 1]
-            na = np.sqrt(ax * ax + ay * ay)
-            nb = np.sqrt(bx * bx + by * by)
-            if na <= 0.0 or nb <= 0.0:
-                x[2] = 0.5
-            else:
-                cosang = (ax * bx + ay * by) / (na * nb)
-                if cosang > 1.0:
-                    cosang = 1.0
-                elif cosang < -1.0:
-                    cosang = -1.0
-                x[2] = 0.5 * (1.0 - cosang)
-
-            v = pops / work_scale
-            if v > 1.0:
-                v = 1.0
             x[3] = v
 
-            # rank of the worse incident tour edge within this city's candidate list:
-            # how many strictly nearer neighbours it is currently ignoring. The list is
-            # ascending, so this is a short scan that stops at the first candidate no
-            # nearer than the edge.
-            d_long = d_s if d_s > d_p else d_p
-            r = 0
-            for t in range(k):
-                if cand_d[t1, t] >= d_long:
-                    break
-                r += 1
-            x[4] = r / k
-
-            # peakedness of the neighbourhood: nearest-neighbour distance over the mean
-            # candidate distance. Both are precomputed, so this is two loads and a divide.
-            x[5] = nn1[t1] / mean_c[t1]
+            # asymmetry: one long edge and one short is a better prospect than two medium
+            tot = d_s + d_p
+            x[4] = (d_s - d_p if d_s > d_p else d_p - d_s) / tot if tot > 0.0 else 0.0
 
             fis_eval(x, mu, tab, ant, cons, out)
             stats[STAT_FIS_CALLS] += 1

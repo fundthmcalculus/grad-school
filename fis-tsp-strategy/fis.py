@@ -269,21 +269,22 @@ CONSTRUCT_TAB = mf_table(CONSTRUCT_MF_C, CONSTRUCT_MF_S)
 # EFFORT: allocate LK search effort to the city about to be searched
 # ---------------------------------------------------------------------------
 # inputs
-E_EXCESS = 0  # mean incident edge / nearest-neighbour distance  (HIGH = bad edges)
-E_FAIL = 1  # how often this city has already come up empty     (HIGH = give up)
-E_TURN = 2  # local turn sharpness at the city                  (HIGH = kinked)
-E_PROGRESS = 3  # fraction of the search's work already spent    (HIGH = late)
-# Rank of this city's worse tour edge within its own candidate list: 0 if that edge
-# already goes to its nearest neighbour, 1 if every candidate is closer than it. This is
-# the most direct statement of "is there anything here to find" the solver can make
-# cheaply, and unlike E_EXCESS it is scale-free without dividing by anything — it asks how
-# many strictly better neighbours exist rather than how much longer the edge is.
-E_RANK = 4  # (HIGH = many nearer neighbours going unused)
-# Peakedness of the neighbourhood: nearest-neighbour distance over the mean candidate
-# distance. LOW means one dominant close neighbour with the rest far away (a clustered or
-# isolated city, where the candidate list is mostly useless); HIGH means a uniform field.
-E_PEAK = 5  # (LOW = one close neighbour and a lot of nothing)
-E_N_IN = 6
+# Inputs, chosen by measured predictive power rather than by argument. `features_probe.py`
+# scores each candidate on how well it predicts whether a city search will yield an improving
+# move (AUC) and, among those that do, how large the gain is (rank correlation). The five
+# kept here all clear AUC 0.74; the ones dropped — turn sharpness 0.69, neighbourhood
+# peakedness 0.59, run progress 0.58, and prior failure count 0.49 — did not earn their
+# runtime or their parameters. Prior failure count is the striking one: at AUC 0.488 it is
+# indistinguishable from noise for this purpose, because the don't-look-bit queue already
+# removes settled cities structurally and the count adds nothing on top.
+#
+# All five read in the same direction: higher means there is more here to find.
+E_PROBEF = 0  # fraction of candidates passing the depth-1 gain test   (AUC 0.858)
+E_RANK = 1  # nearer neighbours the worse tour edge ignores, / k       (AUC 0.833)
+E_PROBE = 2  # best depth-1 gain available, over the broken edge       (AUC 0.795)
+E_EXCESS = 3  # mean incident edge / nearest-neighbour distance        (AUC 0.759)
+E_ASYM = 4  # |d_succ - d_pred| / (d_succ + d_pred)                    (AUC 0.741)
+E_N_IN = 5
 
 # outputs, each in [0, 1] and rescaled to a real LK parameter by the caller
 E_BREADTH = 0  # how far into the candidate list to back-track at the first level
@@ -292,56 +293,39 @@ E_DEPTH = 2  # how deep to push the gain chain — the parameter that costs real
 E_ORSEG = 3  # longest Or-opt segment to try
 E_N_OUT = 4
 
-# Consequents are [breadth, deep_breadth, depth, or_seg].
+# Three rules per input, no interactions. That is a deliberate simplification: the previous
+# base carried 27 rules with nine two-input interactions, and the interactions were where
+# most of the 108 fitted consequents lived and therefore where most of the overfitting did.
+# A purely additive base cannot express "long edge but already failed twice", but it has 60
+# consequents instead of 108, every one of them reads as a sentence, and the GA has a
+# correspondingly easier target.
 #
-# The ordering of those four matters, and it is not the one intuition suggests.
-# Measured on the baseline, sweeping the first-level breadth from 2 to 32 barely
-# moves the clock — the sequential gain criterion truncates most scans long before
-# the cap bites. Sweeping the chain *depth* from 4 to 10 costs 2.6x. Depth is
-# therefore the parameter worth being clever about, and these rules exist mainly to
-# decide which cities deserve a deep chain: a city already sitting on
-# near-minimal edges gets 2 or 3 levels, one carrying a long or sharply kinked edge
-# gets the full chain.
+# Consequents are [breadth, deep_breadth, depth, or_seg]. Depth carries the widest spread
+# because depth is the parameter that costs time (§3 of the findings); breadth barely moves
+# the clock, so it is kept generous throughout.
 EFFORT_RULES = [
-    # a city whose edges are already about as short as they can be is not worth
-    # a deep search; one carrying long edges is worth everything
-    ({E_EXCESS: LOW}, [0.30, 0.20, 0.05, 0.30]),
-    ({E_EXCESS: MED}, [0.60, 0.45, 0.35, 0.70]),
-    ({E_EXCESS: HIGH}, [1.00, 0.90, 0.95, 1.00]),
-    # repeated failure is the cheapest evidence there is that a city is done
-    ({E_FAIL: HIGH}, [0.35, 0.20, 0.05, 0.20]),
-    ({E_FAIL: LOW}, [0.70, 0.55, 0.45, 0.70]),
-    # a sharp kink is a strong local signal that a move exists nearby
-    ({E_TURN: HIGH}, [0.85, 0.70, 0.75, 0.90]),
-    ({E_TURN: LOW}, [0.45, 0.30, 0.15, 0.40]),
-    # late in the run the queue holds mostly stragglers; stay cheap unless the
-    # city itself looks bad
-    ({E_PROGRESS: HIGH}, [0.50, 0.35, 0.20, 0.50]),
-    ({E_PROGRESS: LOW}, [0.65, 0.50, 0.40, 0.65]),
-    # interactions
-    ({E_EXCESS: HIGH, E_FAIL: LOW}, [1.00, 0.95, 1.00, 1.00]),
-    ({E_EXCESS: HIGH, E_FAIL: HIGH}, [0.55, 0.50, 0.30, 0.60]),
-    ({E_EXCESS: LOW, E_FAIL: HIGH}, [0.25, 0.10, 0.02, 0.10]),
-    ({E_EXCESS: LOW, E_TURN: HIGH}, [0.65, 0.45, 0.40, 0.70]),
-    ({E_EXCESS: HIGH, E_TURN: HIGH}, [1.00, 0.90, 1.00, 1.00]),
-    ({E_EXCESS: MED, E_PROGRESS: HIGH}, [0.50, 0.35, 0.20, 0.50]),
-    ({E_EXCESS: HIGH, E_PROGRESS: HIGH}, [0.90, 0.75, 0.85, 0.90]),
-    ({E_TURN: LOW, E_FAIL: HIGH}, [0.25, 0.10, 0.02, 0.10]),
-    ({E_TURN: LOW, E_PROGRESS: HIGH}, [0.35, 0.20, 0.08, 0.30]),
-    # edge rank: if the worse tour edge already runs to the nearest neighbour there is
-    # nothing a wider or deeper search can find here, whatever the other cues say
+    # the probe is the strongest signal there is: if a single level of search can already
+    # see gain here, commit; if it can see none, there is very little point going deeper
+    ({E_PROBEF: LOW}, [0.30, 0.20, 0.05, 0.25]),
+    ({E_PROBEF: MED}, [0.65, 0.50, 0.45, 0.65]),
+    ({E_PROBEF: HIGH}, [1.00, 0.90, 0.95, 1.00]),
+    # how many strictly better neighbours the current edge is ignoring
     ({E_RANK: LOW}, [0.25, 0.15, 0.05, 0.25]),
     ({E_RANK: MED}, [0.65, 0.50, 0.45, 0.65]),
     ({E_RANK: HIGH}, [0.95, 0.85, 0.90, 0.95]),
-    # rank is evidence about *where* the move is, so it earns breadth more than depth
-    ({E_RANK: HIGH, E_EXCESS: LOW}, [0.90, 0.70, 0.45, 0.75]),
-    ({E_RANK: LOW, E_EXCESS: HIGH}, [0.45, 0.35, 0.60, 0.60]),
-    ({E_RANK: LOW, E_FAIL: HIGH}, [0.15, 0.05, 0.02, 0.08]),
-    # a peaked neighbourhood means the candidate list runs out of useful entries early,
-    # so breadth is wasted there while depth may still pay
-    ({E_PEAK: LOW}, [0.35, 0.30, 0.50, 0.55]),
-    ({E_PEAK: HIGH}, [0.70, 0.60, 0.50, 0.65]),
-    ({E_PEAK: LOW, E_RANK: HIGH}, [0.55, 0.45, 0.85, 0.80]),
+    # the size of the best gain a single level can see, not just whether one exists
+    ({E_PROBE: LOW}, [0.35, 0.25, 0.10, 0.35]),
+    ({E_PROBE: MED}, [0.65, 0.50, 0.50, 0.65]),
+    ({E_PROBE: HIGH}, [0.95, 0.85, 0.95, 0.95]),
+    # a city whose edges are already near-minimal is not worth a deep chain
+    ({E_EXCESS: LOW}, [0.30, 0.20, 0.05, 0.30]),
+    ({E_EXCESS: MED}, [0.60, 0.45, 0.35, 0.65]),
+    ({E_EXCESS: HIGH}, [1.00, 0.90, 0.90, 1.00]),
+    # one long edge and one short one is a stronger signal than two medium ones, because the
+    # long one is what a 2-opt move can actually remove
+    ({E_ASYM: LOW}, [0.45, 0.30, 0.20, 0.45]),
+    ({E_ASYM: MED}, [0.65, 0.50, 0.50, 0.65]),
+    ({E_ASYM: HIGH}, [0.90, 0.80, 0.85, 0.90]),
 ]
 
 EFFORT_ANT, EFFORT_CONS = _pack(EFFORT_RULES, E_N_IN, E_N_OUT)
@@ -377,38 +361,29 @@ CH_REVCOST = 4  # (HIGH = each level here is shifting a lot of array)
 CH_N_IN = 5
 
 # One output: a continuation score. The chain deepens while it is above 0.5.
+# Three rules per input, no interactions, for the same reason as EFFORT: the previous base
+# carried 24 rules of which ten were interactions, and they were where the overfitting lived.
 CHAIN_RULES = [
-    # gain credit is the chain's own evidence that it is worth continuing
-    ({CH_CREDIT: HIGH}, [0.90]),
+    # gain credit is the chain's own evidence that continuing is worth it
+    ({CH_CREDIT: LOW}, [0.12]),
     ({CH_CREDIT: MED}, [0.55]),
-    ({CH_CREDIT: LOW}, [0.15]),
-    # depth is the cost; the deeper we are, the better the news has to be
-    ({CH_DEPTH: LOW}, [0.80]),
+    ({CH_CREDIT: HIGH}, [0.92]),
+    # depth is the cost, so the deeper we already are the better the news has to be
+    ({CH_DEPTH: LOW}, [0.82]),
     ({CH_DEPTH: MED}, [0.50]),
-    ({CH_DEPTH: HIGH}, [0.20]),
+    ({CH_DEPTH: HIGH}, [0.18]),
     # a move already banked is a reason to stop and take it
-    ({CH_BANKED: HIGH}, [0.30]),
-    ({CH_BANKED: LOW}, [0.60]),
+    ({CH_BANKED: LOW}, [0.62]),
+    ({CH_BANKED: MED}, [0.45]),
+    ({CH_BANKED: HIGH}, [0.28]),
     # still trading long edges for short ones? then there is more to find
-    ({CH_TRADE: HIGH}, [0.85]),
-    ({CH_TRADE: LOW}, [0.25]),
-    # interactions
-    ({CH_CREDIT: HIGH, CH_DEPTH: HIGH}, [0.60]),
-    ({CH_CREDIT: LOW, CH_DEPTH: HIGH}, [0.02]),
-    ({CH_CREDIT: LOW, CH_DEPTH: LOW}, [0.40]),
-    ({CH_CREDIT: HIGH, CH_TRADE: HIGH}, [0.95]),
-    ({CH_CREDIT: LOW, CH_TRADE: LOW}, [0.05]),
-    ({CH_BANKED: HIGH, CH_DEPTH: HIGH}, [0.10]),
-    ({CH_BANKED: LOW, CH_TRADE: HIGH}, [0.90]),
-    ({CH_BANKED: HIGH, CH_CREDIT: LOW}, [0.08]),
+    ({CH_TRADE: LOW}, [0.22]),
+    ({CH_TRADE: MED}, [0.55]),
+    ({CH_TRADE: HIGH}, [0.88]),
     # reversal traffic is real time that the gain trajectory says nothing about
-    ({CH_REVCOST: LOW}, [0.70]),
-    ({CH_REVCOST: HIGH}, [0.35]),
-    # expensive surgery needs better news to justify continuing
-    ({CH_REVCOST: HIGH, CH_CREDIT: LOW}, [0.05]),
-    ({CH_REVCOST: HIGH, CH_CREDIT: HIGH}, [0.70]),
-    ({CH_REVCOST: LOW, CH_CREDIT: MED}, [0.65]),
-    ({CH_REVCOST: HIGH, CH_DEPTH: HIGH}, [0.08]),
+    ({CH_REVCOST: LOW}, [0.72]),
+    ({CH_REVCOST: MED}, [0.50]),
+    ({CH_REVCOST: HIGH}, [0.30]),
 ]
 
 CHAIN_ANT, CHAIN_CONS = _pack(CHAIN_RULES, CH_N_IN, 1)

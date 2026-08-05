@@ -15,21 +15,22 @@ non-negative least-squares fit of the solver's own work counters to measured wal
 clock, accurate to ~3% relative and 0.998 rank correlation. The search optimises that;
 ``benchmark.py`` still reports real seconds.
 
-**2. More is fitted.** ``tune.py`` moved only the rule consequents. Here the
-membership functions move too — every term's centre and width on every input — which
-is what decides where one linguistic term stops and the next begins. That is 72 extra
-parameters on top of the 110 consequents. Because the membership bank is
-compiled to a lookup table (``fis.mf_table``), the functional form is a free choice as
-well; triangular terms beat gaussian ones on every run that compared them, so they are
-the default and gaussian is left selectable rather than swept.
+**2. Membership functions are fitted too**, not just consequents — every term's centre and
+width, which is what decides where one linguistic term stops and the next begins. Because the
+bank is compiled to a lookup table (``fis.mf_table``) the functional form is free as well;
+triangular beat gaussian on every run that compared them, so it is the default.
 
-**3. The instance pool is larger and size-weighted.** 18 training and 13 validation
-instances reaching n = 5934, against the previous 12 and 6, and deliberately weighted
-toward the larger ones for the reason given at ``TRAIN``. Overfitting has been the
-dominant failure mode of every attempt at this — the first reached 2.44% on 8 training
-instances and 4.67% on unseen ones — so on top of more instances there is a shrinkage
-term toward the hand-written rules and a validation split that the search never
-optimises against and that all selection goes through.
+**3. Two stages, global then local.** The GA finds the basin; a derivative-free compass search
+(``refine.py``) then descends inside it. The GA needs the second stage rather than more of
+itself — its own final vector consistently scored worse on validation than the best vector it
+passed through, which is what a search without a descent step looks like.
+
+**4. The pool is 20 training and 14 validation instances**, of which 11 and 7 are synthetic
+(``synth.py``). Overfitting has been the dominant failure mode throughout, and TSPLIB simply
+does not contain enough instances at n >= 1000 outside the test set. Synthetic ones are usable
+because the objective is a ratio of two tours on one instance, so no optimum is needed.
+On top of that: a shrinkage prior toward the hand-written rules, a 87-parameter vector rather
+than 170 (only what the reported arms use), and all selection routed through validation.
 
 Every training instance is disjoint from ``benchmark.TEST``; the assertion at import
 time enforces it rather than trusting the lists to stay right.
@@ -59,10 +60,12 @@ from optimizers.continuous.variables import InputContinuousVariable
 
 import benchmark as bench_mod
 import fis
+import synth
 from core import build_candidates, greedy_edge_tour, nn_stats
 from costmodel import features_from_stats
-from fis_lk import fis_construct, fis_lk_solve
+from fis_lk import fis_lk_solve
 from lk import lk_solve
+from refine import compass_refine
 from tsplib import load, reference_length, validate_tour
 
 HERE = Path(__file__).resolve().parent
@@ -89,16 +92,28 @@ HERE = Path(__file__).resolve().parent
 # family out of training shows up immediately on test.
 MIN_N = 1000
 
-TRAIN = [
+# TSPLIB instances at that size which are not in the test set. There are only sixteen, which
+# is what motivated `synth.py`: nine training instances against a fitted vector of this size
+# is the whole reason overfitting has dominated every attempt.
+TRAIN_REAL = [
     "pr1002", "u1060", "d1291", "rl1304", "u1432", "d1655", "u1817", "rl1889", "rl5934",
 ]
-VALID = [
-    "dsj1000", "vm1084", "nrw1379", "fl1400", "vm1748", "u2152", "u2319",
-]
+VALID_REAL = ["dsj1000", "vm1084", "nrw1379", "fl1400", "vm1748", "u2152", "u2319"]
 
-assert not (set(TRAIN) & set(VALID)), "train and validation overlap"
-assert not (set(TRAIN) & set(bench_mod.TEST)), "training instance is in the test set"
-assert not (set(VALID) & set(bench_mod.TEST)), "validation instance is in the test set"
+assert not (set(TRAIN_REAL) & set(VALID_REAL)), "train and validation overlap"
+assert not (set(TRAIN_REAL) & set(bench_mod.TEST)), "training instance is in the test set"
+assert not (set(VALID_REAL) & set(bench_mod.TEST)), "validation instance is in the test set"
+
+
+def train_instances():
+    """20 instances: 9 real and 11 synthetic, spanning four structural families."""
+    return [load(n) for n in TRAIN_REAL] + synth.train_pool()
+
+
+def valid_instances():
+    """14 instances: 7 real and 7 synthetic, disjoint in seed and size from training."""
+    return [load(n) for n in VALID_REAL] + synth.valid_pool()
+
 
 K = 32
 FIS_DEPTH = 10
@@ -127,8 +142,11 @@ class ParamSpace:
         self.mf_scope = mf_scope
         self.blocks = []
         off = 0
+        # CONSTRUCT is deliberately absent. Fuzzy construction is a measured failure (it
+        # reaches 48% over optimum against greedy-edge's 17%), it appears in none of the
+        # reported arms, and every parameter spent on it is a parameter the GA can overfit
+        # with. Fitting only what is used takes the vector from 170 to 87.
         for name, cons, ant in (
-            ("construct", fis.CONSTRUCT_CONS, fis.CONSTRUCT_ANT),
             ("effort", fis.EFFORT_CONS, fis.EFFORT_ANT),
             ("chain", fis.CHAIN_CONS, fis.CHAIN_ANT),
         ):
@@ -155,7 +173,6 @@ class ParamSpace:
         """The hand-written rule bases, as a vector — the point to beat."""
         theta = np.empty(self.size)
         defaults = {
-            "construct": (fis.CONSTRUCT_CONS, fis.CONSTRUCT_MF_C, fis.CONSTRUCT_MF_S),
             "effort": (fis.EFFORT_CONS, fis.EFFORT_MF_C, fis.EFFORT_MF_S),
             "chain": (fis.CHAIN_CONS, fis.CHAIN_MF_C, fis.CHAIN_MF_S),
         }
@@ -244,13 +261,12 @@ ABORT_FACTOR = 2.0
 class Objective:
     """Scores a rule-base vector against the swept LK effort frontier, per instance."""
 
-    def __init__(self, names, space, coef, verbose=False):
+    def __init__(self, instances, space, coef, verbose=False):
         self.space = space
         self.coef = coef
         self.items = []
-        for name in sorted(names, key=lambda nm: load(nm).n):
-            inst = load(name)
-            assert inst.n >= MIN_N, f"{name}: n={inst.n} is below the fitting floor {MIN_N}"
+        for inst in sorted(instances, key=lambda it: it.n):
+            assert inst.n >= MIN_N, f"{inst.name}: n={inst.n} below the fitting floor {MIN_N}"
             cand, cand_d = build_candidates(inst.coords, SWEEP_K, inst.ceil)
             nn1, mean_c = nn_stats(cand_d)
             start = greedy_edge_tour(inst.coords, cand, inst.ceil)
@@ -259,9 +275,9 @@ class Objective:
         self.abort_cost = np.array([f["cost"][-1] for f in self.fronts]) * ABORT_FACTOR
         if verbose:
             for it, f in zip(self.items, self.fronts):
-                print(f"  {it[0].name:>9s} n={it[0].n:6d} frontier "
-                      f"{f['gap'][-1]:.3f}%..{f['gap'][0]:.3f}% over "
-                      f"{1e3 * f['cost'][0]:.1f}..{1e3 * f['cost'][-1]:.1f}ms")
+                print(f"  {it[0].name:>18s} n={it[0].n:6d} frontier spans "
+                      f"{1e3 * f['cost'][0]:7.1f}..{1e3 * f['cost'][-1]:7.1f}ms, "
+                      f"length {f['length'][0]:.0f}..{f['length'][-1]:.0f}")
 
     def _front(self, item):
         """The instance's baseline effort frontier as ascending-cost arrays.
@@ -278,10 +294,13 @@ class Objective:
                 SWEEP_K, depth, deep, OR_SEG_BASE,
             )
             validate_tour(tour, inst.n)
+            # tour *lengths*, not gaps. The metric is a ratio of two tours on one instance,
+            # so the optimum cancels and is never needed — which is what lets synthetic
+            # instances, for which no optimum exists, into the training pool at all.
             pts.append(
                 (
                     float(features_from_stats(st, inst.n) @ self.coef),
-                    inst.gap(reference_length(tour, inst)),
+                    float(reference_length(tour, inst)),
                 )
             )
         keep = [
@@ -290,15 +309,15 @@ class Objective:
         ]
         keep.sort()
         cost = np.array([p[0] for p in keep])
-        gap = np.array([p[1] for p in keep])
+        length = np.array([p[1] for p in keep])
         # enforce strict monotonicity in cost so np.interp behaves
         for i in range(1, len(cost)):
             if cost[i] <= cost[i - 1]:
                 cost[i] = cost[i - 1] * (1 + 1e-9)
-        return {"cost": cost, "gap": gap, "best_gap": float(min(p[1] for p in pts))}
+        return {"cost": cost, "length": length, "best": float(min(p[1] for p in pts))}
 
     def bar(self, i, cost):
-        """The gap the baseline frontier achieves at this cost on instance i.
+        """The tour length the baseline frontier achieves at this cost on instance i.
 
         Outside the swept range the nearer endpoint is used: cheaper than every baseline
         configuration means the baseline cannot operate there at all, so the weakest
@@ -307,28 +326,21 @@ class Objective:
         credit for a budget the baseline was not measured at.
         """
         f = self.fronts[i]
-        return float(np.interp(cost, f["cost"], f["gap"]))
+        return float(np.interp(cost, f["cost"], f["length"]))
 
-    def measure(self, theta, use_chain=True, construct=False, abort=False):
+    def measure(self, theta, use_chain=True, abort=False):
         """(mean frontier ratio, per-instance ratios, total cost).
 
         The mean ratio is the number the search minimises; below 1.0 means the candidate
         beat the baseline frontier at its own chosen budget, averaged over instances.
         """
         d = self.space.decode(theta)
-        c_cons, c_tab = d["construct"]
         e_cons, e_tab = d["effort"]
         h_cons, h_tab = d["chain"]
         ratios = []
         total = 0.0
         for i, (inst, cand, cand_d, nn1, mean_c, start) in enumerate(self.items):
-            if construct:
-                tour = fis_construct(
-                    inst.coords, cand, cand_d, inst.ceil, mean_c,
-                    c_tab, fis.CONSTRUCT_ANT, c_cons, C_BREADTH, 0,
-                )
-            else:
-                tour = start
+            tour = start
             tour, _, st = fis_lk_solve(
                 inst.coords, cand, cand_d, inst.ceil, tour, nn1, mean_c,
                 e_tab, fis.EFFORT_ANT, e_cons,
@@ -340,18 +352,22 @@ class Objective:
             total += cost
             if abort and cost > self.abort_cost[i]:
                 return float("nan"), None, cost / self.abort_cost[i]
-            # a length ratio, not a gap ratio: gaps are 0 on instances the baseline
-            # solves exactly, and gap = 100 (L/L* - 1) makes the conversion trivial
-            gap = inst.gap(reference_length(tour, inst))
-            ratios.append((1.0 + gap / 100.0) / (1.0 + self.bar(i, cost) / 100.0))
+            ratios.append(float(reference_length(tour, inst)) / max(self.bar(i, cost), 1e-9))
         return float(np.mean(ratios)), np.array(ratios), total
 
     def report(self, theta, **kw):
-        """(mean frontier ratio, mean gap, total cost) — for printing, never for search."""
+        """(mean frontier ratio, mean gap over instances that have an optimum, total cost).
+
+        For printing, never for search. The gap is reported only over the instances whose
+        optimum is published — the synthetic ones have none — so it is a rough companion to
+        the frontier ratio rather than the number anything is decided on.
+        """
         mean_ratio, ratios, total = self.measure(theta, **kw)
         d = self.space.decode(theta)
         gaps = []
         for i, (inst, cand, cand_d, nn1, mean_c, start) in enumerate(self.items):
+            if not inst.opt:
+                continue
             tour, _, _ = fis_lk_solve(
                 inst.coords, cand, cand_d, inst.ceil, start, nn1, mean_c,
                 d["effort"][1], fis.EFFORT_ANT, d["effort"][0],
@@ -359,7 +375,7 @@ class Objective:
                 FIS_DEPTH, OR_SEG, 1, False, kw.get("use_chain", True),
             )
             gaps.append(inst.gap(reference_length(tour, inst)))
-        return mean_ratio, float(np.mean(gaps)), total
+        return mean_ratio, float(np.mean(gaps)) if gaps else float("nan"), total
 
     def scalar(self, theta):
         mean_ratio, _, over = self.measure(theta, abort=True)
@@ -463,13 +479,14 @@ def build_optimizer(kind, space, fcn, seed_theta, generations, population, jobs)
     raise ValueError(f"unknown optimizer {kind!r}")
 
 
-def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink, log):
+def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink, log,
+            polish_evals=2500):
     """Fit with one optimiser / MF form / MF scope, selecting on the validation split."""
     set_seed(seed)
     space = ParamSpace(mf_kind, mf_scope)
     coef = np.load(HERE / "costmodel.npz")["coef"]
-    train = Objective(TRAIN, space, coef)
-    valid = Objective(VALID, space, coef)
+    train = Objective(train_instances(), space, coef)
+    valid = Objective(valid_instances(), space, coef)
 
     seed_theta = space.default()
     hand_tr = train.report(seed_theta)
@@ -483,6 +500,23 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
 
     # keep the pool member that generalises best, not the one with the best training score
     theta = tracked.select()
+
+    # Then polish it with derivative-free stepwise refinement. The GA finds the basin and
+    # then wanders inside it — its own final vector scored worse on validation than the best
+    # vector it passed through — so a method that only ever accepts improvements is the
+    # natural second stage. It descends on the *training* objective, so it can overfit too,
+    # and its result is put back through the same validation selection rather than trusted.
+    t_polish = time.perf_counter()
+    polished, ptrain, pevals, psweeps = compass_refine(
+        train.scalar, theta, max_evals=polish_evals
+    )
+    t_polish = time.perf_counter() - t_polish
+    v_before = valid.measure(theta)[0]
+    v_after = valid.measure(polished)[0]
+    took_polish = np.isfinite(v_after) and v_after < v_before
+    if took_polish:
+        theta = polished
+
     tr = train.report(theta)
     va = valid.report(theta)
     raw = np.clip(np.asarray(result.solution_vector, dtype=np.float64), 0.0, 1.0)
@@ -496,6 +530,13 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
         "generations": int(result.generations_completed),
         "stop_reason": str(result.stop_reason),
         "evaluations": tracked.n_calls,
+        "polish_evals": int(pevals),
+        "polish_sweeps": int(psweeps),
+        "polish_seconds": t_polish,
+        "polish_train": float(ptrain),
+        "valid_before_polish": float(v_before),
+        "valid_after_polish": float(v_after),
+        "polish_kept": bool(took_polish),
         "train_ratio": tr[0],
         "train_gap": tr[1],
         "valid_ratio": va[0],
@@ -510,10 +551,14 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
     }
     log.append(rec)
     print(
-        f"  {kind:>4s}/{mf_kind:<10s} {dt:6.1f}s evals={tracked.n_calls:5d}  "
-        f"train q={tr[0]:.4f} ({tr[1]:.3f}%)  valid q={va[0]:.4f} ({va[1]:.3f}%)  "
-        f"| hand-written valid q={hand_va[0]:.4f} ({hand_va[1]:.3f}%)  "
-        f"| unpooled q={raw_va[0]:.4f}",
+        f"  {kind:>4s}/{mf_kind:<10s} GA {dt:5.1f}s/{tracked.n_calls} evals  "
+        f"polish {t_polish:5.1f}s/{pevals} evals ({psweeps} sweeps, "
+        f"{'kept' if took_polish else 'rejected'}: valid {v_before:.4f} -> {v_after:.4f})",
+        flush=True,
+    )
+    print(
+        f"       train q={tr[0]:.4f}  valid q={va[0]:.4f}  "
+        f"| hand-written valid q={hand_va[0]:.4f}  | GA-unpooled q={raw_va[0]:.4f}",
         flush=True,
     )
     return theta, rec, valid
@@ -525,6 +570,7 @@ def main():
     ap.add_argument("--mf-kinds", nargs="*", default=["triangular"])
     ap.add_argument("--mf-scopes", nargs="*", default=["base"])
     ap.add_argument("--shrink", type=float, default=0.3)
+    ap.add_argument("--polish-evals", type=int, default=2500)
     ap.add_argument("--generations", type=int, default=30)
     ap.add_argument("--population", type=int, default=30)
     ap.add_argument("--jobs", type=int, default=1)
@@ -533,14 +579,17 @@ def main():
     ap.add_argument("--log", default=str(HERE / "tune_opt_log.json"))
     args = ap.parse_args()
 
-    print(f"{len(TRAIN)} training and {len(VALID)} validation instances, "
-          f"disjoint from the {len(bench_mod.TEST)} test instances")
+    n_tr = len(TRAIN_REAL) + len(synth.TRAIN_SPEC)
+    n_va = len(VALID_REAL) + len(synth.VALID_SPEC)
+    print(f"{n_tr} training ({len(TRAIN_REAL)} TSPLIB + {len(synth.TRAIN_SPEC)} synthetic) "
+          f"and {n_va} validation instances, disjoint from the "
+          f"{len(bench_mod.TEST)} test instances")
     space0 = ParamSpace(mf_scope=args.mf_scopes[0])
     n_cons = sum(int(np.prod(b["cons_shape"])) for b in space0.blocks)
     print(f"fitting {space0.size} parameters ({n_cons} rule consequents + "
           f"{space0.size - n_cons} membership-function centres/widths)")
-    print(f"objective: mean over instances of (gap / the swept k={SWEEP_K} LK frontier's "
-          f"gap at the same cost)")
+    print(f"objective: mean over instances of (tour length / the swept k={SWEEP_K} LK "
+          f"frontier's length at the same cost)")
     print(f"           below 1.0 means outside the frontier; "
           f"fitted only on n >= {MIN_N}\n")
 
@@ -551,7 +600,7 @@ def main():
             for kind in args.optimizers:
                 theta, rec, valid = run_one(
                     kind, mf_kind, mf_scope, args.generations, args.population,
-                    args.jobs, args.seed, args.shrink, log,
+                    args.jobs, args.seed, args.shrink, log, args.polish_evals,
                 )
                 # selection across runs, on the validation split
                 score = rec["valid_ratio"]
@@ -570,14 +619,12 @@ def main():
         mf_kind=mf_kind,
         mf_scope=mf_scope,
         optimizer=rec["optimizer"],
-        construct_cons=d["construct"][0],
-        construct_tab=d["construct"][1],
         effort_cons=d["effort"][0],
         effort_tab=d["effort"][1],
         chain_cons=d["chain"][0],
         chain_tab=d["chain"][1],
-        train=np.array(TRAIN),
-        valid=np.array(VALID),
+        train=np.array(TRAIN_REAL),
+        valid=np.array(VALID_REAL),
         **{k: v for k, v in rec.items() if isinstance(v, (int, float))},
     )
     Path(args.log).write_text(json.dumps(log, indent=1))
