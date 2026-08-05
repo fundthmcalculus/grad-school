@@ -719,34 +719,36 @@ candidates rather than reading absolute times off it, which is what the fit's 0.
 correlation measures. The shares above are unaffected; the totals should be recalibrated by
 re-running `costmodel.py` before anyone quotes them as absolute.
 
-### Cython: measured, and it loses
+### Cython: measured, and it loses — so numba stays
 
-The question is not whether Cython beats Python — nothing in the hot path is Python. It is
+The question was never whether Cython beats Python; nothing in the hot path is Python. It is
 whether Cython beats **numba**, which already emits LLVM-optimised machine code with bounds
-checking off. So `experiments/cython_fis_eval.pyx` is a faithful C transcription of
-`fis_eval1` — the smallest and hottest kernel in the system, the chain cut-off — with typed
-memoryviews, `boundscheck=False`, `wraparound=False`, `cdivision=True`, `-O3 -ffast-math
--march=native`, and the benchmark loop *inside* the C function so neither side pays a
-per-call boundary cost.
+checking off. A faithful C transcription of `fis_eval1` — the smallest and hottest kernel in the
+system, the chain cut-off — with typed memoryviews, `boundscheck=False`, `wraparound=False`,
+`cdivision=True`, `-O3 -ffast-math -march=native`, and the benchmark loop *inside* the C
+function so neither side paid a per-call boundary cost:
 
 | | ns per call |
 |---|---|
 | numba `@njit` | **54.0** |
 | Cython + gcc `-O3 -march=native` | 61.9 (0.87x) |
 
-Outputs agree exactly. **Cython is 13% slower**, on the kernel most favourable to it, with the
-algorithm held fixed so the only variable is code generation. Porting the solver would cost a
-build toolchain, a compilation step, and platform-specific artifacts, in exchange for a loss.
+Outputs agreed exactly. **Cython was 13% slower**, on the kernel most favourable to it, with the
+algorithm held fixed so the only variable was code generation. Porting the solver would have
+cost a build toolchain, a compilation step and platform-specific artifacts, in exchange for a
+loss — so the decision is numba, and the Cython harness has been deleted rather than left to
+rot. This section is the record; `experiments/profile_kernels.py` still reports the two
+measurements that explain the result.
 
-Two measurements make it clear why there was never much room. Membership evaluation — the part
-that was an exponential before §4 tabulated it — is now **17.6 ns of the 54**, so a third of
-the kernel is a table lerp that neither compiler can improve on. And one Python-level call into
-nopython mode costs **381 ns**, seven times the kernel itself; the only way Cython could have
-won was on boundary crossings, and there is one per *solve*, not one per call.
+Those two make it clear there was never much room. Membership evaluation — the part that was an
+exponential before §4 tabulated it — is now **17.6 ns of the 54**, so a third of the kernel is a
+table lerp neither compiler can improve on. And one Python-level call into nopython mode costs
+**~375 ns**, seven times the kernel itself; the only place Cython could have won was on boundary
+crossings, and there is one per *solve*, not one per call.
 
 The measurement that would change this answer is not a different compiler. It is removing the
-reversal cost, which is 45% of the baseline and belongs to the data structure rather than to
-any kernel's code generation.
+reversal cost, which is 45% of the baseline and belongs to the tour representation rather than
+to any kernel's code generation.
 
 ## 12. Worth doing next
 

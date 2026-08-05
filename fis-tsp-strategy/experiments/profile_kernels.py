@@ -1,4 +1,4 @@
-"""Where the solver's time actually goes, and whether Cython could take any of it back.
+"""Where the solver's time actually goes.
 
 Ordinary Python profilers are useless here and it is worth saying why before trusting any
 number below. A whole solve is *one* ``@njit`` call: ``lk_solve`` and ``iterated_lk`` enter
@@ -21,15 +21,18 @@ So the time is attributed three ways, each of which checks the others:
 3. **Ablation.** The same solve with a component switched off, differenced. This catches costs
    the counters cannot see, since a counter only exists where somebody thought to add one.
 
-**On Cython.** The question is not "is Cython faster than Python" — nothing in the hot path is
-Python. It is "is Cython faster than numba", and numba already emits LLVM-optimised machine
-code with bounds checking off (which FINDINGS §10.4 records the hard way: ``xc[4]`` on a 4-wide
-buffer was a silent out-of-bounds write, not an exception). ``--cython`` builds a hand-written
-C translation of the hottest kernel and times it against numba's on identical inputs, which is
-the measurement that settles it rather than the argument.
+**Ahead-of-time compilation was measured and rejected**, so that it does not get proposed again
+on the strength of the argument that "compiled would be faster". The hot path is not Python:
+numba already emits LLVM-optimised machine code with bounds checking off (which FINDINGS §10.4
+records the hard way — ``xc[4]`` on a 4-wide buffer was a silent out-of-bounds write, not an
+exception). A faithful Cython transcription of ``fis_eval1``, the smallest and hottest kernel
+here, compiled with ``-O3 -ffast-math -march=native`` and typed memoryviews, ran at **61.9 ns
+against numba's 54.0** on identical inputs with identical outputs. The harness that measured it
+has been removed; the numbers are in FINDINGS §11 and the reasons they were never going to be
+close are visible below — a third of that kernel is a table lerp neither compiler improves on,
+and the Python boundary is crossed once per *solve*, not once per call.
 
 Run:  python experiments/profile_kernels.py
-      python experiments/profile_kernels.py --cython      # also build and race the C version
       python experiments/profile_kernels.py --asm         # dump numba's generated assembly
 """
 
@@ -252,76 +255,11 @@ def ablation(inst_name=PROFILE_INSTANCE, reps=3):
     return inst, rows
 
 
-# --------------------------------------------------------------------------------------
-# the Cython question
-# --------------------------------------------------------------------------------------
-def cython_race(reps=2_000_000):
-    """Build a C translation of ``fis_eval1`` and race it against numba's.
-
-    ``fis_eval1`` is the right kernel to test: it is the smallest and hottest thing in the
-    system (the chain cut-off, taken many times per city scan), so if Cython has an advantage
-    anywhere it is here, and if it does not have one here it does not have one at all.
-
-    Both sides loop internally over the same inputs, so neither pays a per-call boundary cost.
-    """
-    import cython_fis_eval as cy  # built by build_cython()
-
-    h_ant, h_cons, _, _, h_tab = fis.chain_base()
-    x = np.full(h_ant.shape[1], 0.5)
-    mu = np.zeros((h_ant.shape[1], fis.N_TERMS))
-
-    ns_numba, _ = _bench(_loop_eval1, reps, x, mu, h_tab, h_ant, h_cons)
-    cy.loop_eval1(2, x, mu, h_tab, h_ant.astype(np.int8), h_cons)
-    best = float("inf")
-    for _ in range(5):
-        t0 = time.perf_counter()
-        cy.loop_eval1(reps, x, mu, h_tab, h_ant.astype(np.int8), h_cons)
-        best = min(best, time.perf_counter() - t0)
-    ns_cython = best / reps * 1e9
-
-    # and check they agree, because a faster wrong kernel is not a result
-    a = _loop_eval1(1000, x.copy(), mu, h_tab, h_ant, h_cons)
-    b = cy.loop_eval1(1000, x.copy(), mu, h_tab, h_ant.astype(np.int8), h_cons)
-    return ns_numba, ns_cython, abs(a - b)
-
-
-def build_cython():
-    """Compile ``cython_fis_eval.pyx`` in place. Returns (ok, message)."""
-    import subprocess
-
-    here = Path(__file__).resolve().parent
-    src = here / "cython_fis_eval.pyx"
-    if not src.exists():
-        return False, f"{src.name} is missing"
-    setup = here / "_cython_setup.py"
-    setup.write_text(
-        "from setuptools import setup, Extension\n"
-        "from Cython.Build import cythonize\n"
-        "import numpy as np\n"
-        "ext = Extension('cython_fis_eval', ['cython_fis_eval.pyx'],\n"
-        "                include_dirs=[np.get_include()],\n"
-        "                extra_compile_args=['-O3', '-ffast-math', '-march=native'])\n"
-        "setup(ext_modules=cythonize([ext], language_level=3,\n"
-        "      compiler_directives={'boundscheck': False, 'wraparound': False,\n"
-        "                           'cdivision': True, 'initializedcheck': False}),\n"
-        "      script_args=['build_ext', '--inplace'])\n",
-        encoding="utf-8",
-    )
-    r = subprocess.run(
-        [sys.executable, str(setup), "build_ext", "--inplace", "--compiler=mingw32"],
-        cwd=str(here), capture_output=True, text=True,
-    )
-    if r.returncode != 0:
-        return False, (r.stderr or r.stdout)[-2000:]
-    return True, "built"
-
-
 def main():
     paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--instance", default=PROFILE_INSTANCE)
     ap.add_argument("--reps", type=int, default=2_000_000)
-    ap.add_argument("--cython", action="store_true")
     ap.add_argument("--asm", action="store_true")
     args = ap.parse_args()
 
@@ -383,21 +321,6 @@ def main():
         for sig, asm in fis.fis_eval1.inspect_asm().items():
             print("\n".join(asm.splitlines()[:60]))
             break
-
-    print("\n" + "=" * 78)
-    print("4. could Cython take any of this back?")
-    print("=" * 78)
-    if not args.cython:
-        print("  not measured — pass --cython to build the C translation and race it.")
-        return
-    ok, msg = build_cython()
-    if not ok:
-        print(f"  build failed, so this question stays unanswered:\n{msg}")
-        return
-    ns_numba, ns_cython, disagreement = cython_race(args.reps)
-    print(f"  numba  {ns_numba:8.1f} ns/call")
-    print(f"  cython {ns_cython:8.1f} ns/call   ({ns_numba / ns_cython:.2f}x)")
-    print(f"  outputs agree to {disagreement:.3e}")
 
 
 if __name__ == "__main__":

@@ -11,8 +11,7 @@ superseded is not the same as a thing that was measured once and does not need m
 | `tune_es.py` | **superseded** | The original hand-rolled (1+1)-ES tuner, before `tune_opt.py` and the `optimizers` GA. It fits consequents only — not membership functions — against a wall-clock objective rather than the deterministic cost proxy, so its runs are not reproducible and its results are not comparable with the current ones. Kept because it is the control that says the GA was worth adopting. Writes `results/legacy/tuned_es.npz`. |
 | `features_probe.py` | **one-off, frozen** | The feature screen of FINDINGS §7: it instruments a fixed-parameter LK run, records candidate antecedents before each city scan and the outcome after, and scores every feature by AUC. It produced `results/feature_screen.json` over 12 278 city scans, and `feature_registry.py` checks itself against that file. Re-running it is only necessary if a new antecedent is proposed — the numbers for the existing ones will not change. |
 | `figures_tours.py` | **illustrative** | Draws actual tours side by side. It supports no claim; it exists because a 1% length difference is invisible in a scalar and obvious in a picture. Expensive (it re-solves each instance at a large kick budget) for something that is not evidence. |
-| `profile_kernels.py` | **diagnostic** | Where the solver's time goes, three ways that check each other (counter attribution, jitted microbenchmarks, ablation), plus `--cython` to build a C translation of the hottest kernel and race it against numba. Its findings are written up in FINDINGS §11; re-run it after any change to the hot path, or on new hardware, since both the cost model's calibration and the compiler comparison are machine-specific. |
-| `cython_fis_eval.pyx` | **diagnostic** | The C translation `--cython` builds. Deliberately a transcription rather than an improvement, so the only variable between it and numba is code generation. |
+| `profile_kernels.py` | **diagnostic** | Where the solver's time goes, three ways that check each other: counter attribution through the fitted cost model, microbenchmarks with the loop inside nopython mode, and ablation. Its findings are written up in FINDINGS §11. Re-run after any change to the hot path, or on new hardware — the cost model's calibration is machine-specific and the profile's *shares* are the durable part, not its totals. |
 
 ## Running them
 
@@ -24,12 +23,8 @@ python experiments/features_probe.py       # rewrites results/feature_screen.jso
 python experiments/figures_tours.py        # rewrites results/figures/fis_tsp_tours.png
 python experiments/tune_es.py --seconds 600
 python experiments/profile_kernels.py            # where the time goes
-python experiments/profile_kernels.py --cython   # ...and whether Cython would help (it does not)
+python experiments/profile_kernels.py --asm      # numba's generated assembly for fis_eval1
 ```
-
-`--cython` needs Cython and a C compiler; it builds in place and reports the build error rather
-than the answer if either is missing. The build products are gitignored — a compiled extension
-is machine-specific and regenerated on demand.
 
 ## What is deliberately *not* here
 
