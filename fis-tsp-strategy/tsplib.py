@@ -22,7 +22,7 @@ from pathlib import Path
 
 import numpy as np
 
-TSPLIB_DIR = Path(__file__).resolve().parent.parent / "ClusteringExperiments" / "tsplib"
+from paths import TSPLIB_DIR
 
 
 @dataclass(frozen=True)

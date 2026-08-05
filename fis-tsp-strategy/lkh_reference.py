@@ -22,7 +22,7 @@ import sys
 import time
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
+import paths
 
 _CHILD = r"""
 import json, sys, time
@@ -46,14 +46,14 @@ print(json.dumps({{"gap": inst.gap(reference_length(tour, inst)), "s": dt}}))
 
 def lkh_one(name, timeout):
     """(gap, seconds) or None if LKH did not finish inside ``timeout``."""
-    code = _CHILD.format(here=str(HERE), name=name)
+    code = _CHILD.format(here=str(paths.ROOT), name=name)
     try:
         proc = subprocess.run(
             [sys.executable, "-c", code],
             capture_output=True,
             text=True,
             timeout=timeout,
-            cwd=str(HERE),
+            cwd=str(paths.ROOT),
         )
     except subprocess.TimeoutExpired:
         return None
@@ -75,7 +75,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max-n", type=int, default=3000)
     ap.add_argument("--timeout", type=float, default=120.0)
-    ap.add_argument("--out", default=str(HERE / "lkh.json"))
+    ap.add_argument("--out", default=str(paths.LKH_REFERENCE))
     args = ap.parse_args()
 
     out = {}

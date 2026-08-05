@@ -30,7 +30,19 @@ import argparse
 import time
 from pathlib import Path
 
-import matplotlib
+# ``experiments/`` sits one level below the modules it imports, so the project root goes
+# on sys.path before any of them. ``paths`` also owns every output location, so an
+# experiment writes into the same results/ tree as the reported pipeline.
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import paths  # noqa: E402
+
+paths.on_path()
+
+import matplotlib  # noqa: E402
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -43,7 +55,6 @@ from kick import iterated_lk  # noqa: E402
 from lk import lk_solve  # noqa: E402
 from tsplib import load, reference_length, validate_tour  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
 
 K = 32
 LONG_EDGE = 3.0  # an edge this many times the mean is drawn as "long"
@@ -107,7 +118,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--instances", nargs="*", default=["fl1577", "pr2392", "pcb3038"])
     ap.add_argument("--kicks", type=int, default=25600)
-    ap.add_argument("--out", default=str(HERE / "figures" / "fis_tsp_tours.png"))
+    ap.add_argument("--out", default=str(paths.FIGURES / "fis_tsp_tours.png"))
     args = ap.parse_args()
 
     # warm the JITs so the reported times are steady-state

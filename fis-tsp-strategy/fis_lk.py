@@ -198,7 +198,7 @@ def city_features(x, n_in, coords, cand, cand_d, ceil, tour, pos, n, k, t1, nn1,
     a second place for them to drift, and a rule base fitted against one definition and aimed
     with another would be quietly wrong rather than broken.
 
-    x[0:5] are the five inputs that cleared AUC 0.74 in `features_probe.py`; x[5:8] are the
+    x[0:5] are the five inputs that cleared AUC 0.74 in `experiments/features_probe.py`; x[5:8] are the
     middling band, computed only when ``n_in`` says the rule base references them, because the
     turn calculation needs two square roots and is the most expensive feature here.
     """
@@ -295,8 +295,20 @@ def effort_scores_kernel(coords, cand, cand_d, ceil, tour, pos, nn1, mean_c, tab
     return scores
 
 
-def effort_scores(inst, cand, cand_d, tour, scale=None):
-    """Per-city EFFORT depth scores, as a plain helper for ``kick.py``."""
+def effort_scores(inst, cand, cand_d, tour, scale=None, tuned=None):
+    """Per-city EFFORT depth scores, as a plain helper for ``kick.py``.
+
+    ``tuned`` is a :class:`fis.Tuned` record; passing one aims the scores with the *fitted*
+    rule base instead of the hand-written one, which matters wherever these scores are used
+    to steer something rather than to describe it — kick targeting is the case that exists.
+    Its own ``scale`` wins, since its consequents are only meaningful against that scale's
+    antecedents.
+    """
+    if tuned is not None:
+        return effort_scores_kernel(
+            inst.coords, cand, cand_d, inst.ceil, tour, make_pos(tour),
+            *nn_stats(cand_d), tuned.effort_tab, tuned.effort_ant, tuned.effort_cons,
+        )
     scale = fis_mod.DEFAULT_SCALE if scale is None else scale
     ant, cons, _, _, tab = fis_mod.effort_base(scale)
     nn1, mean_c = nn_stats(cand_d)

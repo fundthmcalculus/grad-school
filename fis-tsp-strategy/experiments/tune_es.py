@@ -27,9 +27,21 @@ from __future__ import annotations
 import argparse
 import time
 
-import numpy as np
+# ``experiments/`` sits one level below the modules it imports, so the project root goes
+# on sys.path before any of them. ``paths`` also owns every output location, so an
+# experiment writes into the same results/ tree as the reported pipeline.
+import sys
+from pathlib import Path
 
-import fis
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import paths  # noqa: E402
+
+paths.on_path()
+
+import numpy as np  # noqa: E402
+
+import fis  # noqa: E402
 from core import build_candidates, greedy_edge_tour, nn_stats
 from fis_lk import construct as fis_build
 from fis_lk import local_search as fis_ls
@@ -284,7 +296,7 @@ def main():
     ap.add_argument("--seconds", type=float, default=600.0)
     ap.add_argument("--construct-seconds", type=float, default=120.0)
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--out", default="tuned.npz")
+    ap.add_argument("--out", default=str(paths.LEGACY / "tuned_es.npz"))
     args = ap.parse_args()
 
     theta, bench, valid, gap, t = tune(

@@ -46,20 +46,41 @@ did not work.
 
 ## Layout
 
+Three kinds of thing live here, in three places, and the split is the point: a reader should be
+able to tell a reported result from an exploration without reading the code.
+
+**Library** — imported, never an entry point.
+
 | file | |
 |---|---|
+| `paths.py` | every input and output location, in one place |
 | `tsplib.py` | instance loading, TSPLIB distance rounding, published optima, tour validation |
 | `core.py` | distances, candidate lists, nearest-neighbour and greedy-edge constructions, tour surgery |
-| `lk.py` | the baseline Lin-Kernighan, shared by both arms |
-| `fis.py` | the inference engine and the three rule bases |
+| `lk.py` | the baseline Lin-Kernighan, shared by every arm |
+| `fis.py` | the inference engine, the three rule bases, and the fitted-rule-base record |
 | `fis_lk.py` | fuzzy construction, and the fuzzy-controlled local search |
-| `costmodel.py` | a deterministic cost proxy, fitted to measured wall clock, that the tuner optimises against |
-| `tune_opt.py` | fits consequents *and* membership functions with the `optimizers` GA |
-| `tune.py` | the earlier hand-rolled (1+1)-ES tuner, kept for comparison |
-| `benchmark.py` | the reported comparison |
-| `lkh_reference.py` | LKH numbers, in a subprocess with a timeout |
-| `figures.py` | the time-versus-quality plane, and where the effort goes |
-| `figures_tuning.py` | what fitting bought, and what it did to the membership functions |
+| `kick.py` | the double-bridge move and the iterated loop; the EFFORT base can aim its kicks |
+| `synth.py` | synthetic instance families, which is what made the training pool large enough |
+| `refine.py` | the compass search that polishes what the GA hands over |
+| `feature_registry.py` | the master record of every antecedent tried and where it ended up |
+
+**Pipeline** — each stage writes an artifact the next one reads. `run_all.py` runs them in order.
+
+| stage | writes |
+|---|---|
+| `test_invariants.py` | nothing; it either passes or stops the run |
+| `costmodel.py` | `results/costmodel.npz` — the deterministic time proxy the tuner optimises against |
+| `tune_opt.py --scale small\|large` | `results/tuned_<scale>.npz`, `results/tune_<scale>.json` |
+| `benchmark.py --scale small\|large` | `results/results_<scale>.json` — the frontier-relative test-set comparison |
+| `lkh_reference.py` | `results/lkh.json` — LKH once per test instance, as a yardstick |
+| `lkh_compare.py` | `results/lkh_compare.json` — every arm and LKH, curve against curve, across a size ladder |
+| `figures.py`, `figures_tuning.py`, `figures_lkh.py` | `results/figures/*.png` |
+
+**`experiments/`** — superseded, one-off, or illustrative. Nothing reported depends on it; see
+[experiments/README.md](experiments/README.md).
+
+**`results/`** — every artifact any of the above writes, including `results/legacy/` for data
+that has been superseded but still backs a claim in FINDINGS.md.
 
 ## Running it
 
@@ -68,19 +89,39 @@ pip install numpy scipy matplotlib numba elkai
 pip install -e ../tribble-opt          # the optimizers library used by tune_opt.py
 cd fis-tsp-strategy
 
-python costmodel.py                                    # writes costmodel.npz
-python tune_opt.py --generations 40 --population 32    # writes tuned_opt.npz
-python benchmark.py --reps 3 --tuned tuned_opt.npz     # writes results.json
-python lkh_reference.py --max-n 2500 --timeout 90      # optional external reference
-python figures.py && python figures_tuning.py          # writes figures/
+python run_all.py                      # every stage, in order, except the full LKH ladder
+python run_all.py --list               # what the stages are and what each writes
+python run_all.py --dry-run            # the same, plus what the LKH stage would cost
+python run_all.py --quick              # a small GA budget: proves it runs, not the result
+python run_all.py --stages figs figs-lkh   # redraw from results already on disk
 ```
 
-`costmodel.py` has to run before `tune_opt.py`: the tuner's objective is the fitted cost
-proxy, not wall clock, so that the search is deterministic, reproducible, and not
-corrupted by its own CPU contention. Wall clock is what `benchmark.py` reports.
+Or one stage at a time — every script is runnable on its own and takes `--help`.
 
-Instances come from `../ClusteringExperiments/tsplib/`, which already carries 111
-TSPLIB files and the published-optimum index. The training, validation and test instance
-lists are disjoint — `tune_opt.py` asserts it at import rather than trusting the lists to
-stay right — and `test_invariants.py` holds the properties whose quiet violation would
-otherwise produce good-looking wrong numbers.
+Two ordering constraints are real rather than conventional. `costmodel.py` must run before
+`tune_opt.py`, and again after any change to the solver's hot path: the tuner's objective is the
+fitted cost proxy rather than wall clock, so that the search is deterministic and not corrupted
+by its own CPU contention, and stale coefficients mean it is optimising against code that no
+longer exists. And `test_invariants.py` runs first, because four of the bugs recorded in
+FINDINGS §10 produced *plausible numbers* rather than crashes.
+
+Wall clock is what `benchmark.py` and `lkh_compare.py` report. The proxy is only what the
+search spends.
+
+### The expensive stage
+
+`lkh_compare.py` dominates everything else, and not because of our solver: LKH's cost grows as
+roughly n^3.5, so one run on the largest instance of the ladder costs more than every other
+stage combined. `--dry-run` prices it per instance before it starts, `--ladder` opts into the
+full size range, and results are written after each instance so an interrupted run keeps
+everything it measured. `--skip-lkh` re-measures our arms against an LKH curve already on disk.
+
+## Instances
+
+Instances come from `../ClusteringExperiments/tsplib/`, which already carries 111 TSPLIB files
+and the published-optimum index. Training, validation and test lists are disjoint —
+`tune_opt.py` asserts it at import rather than trusting the lists to stay right, and
+`lkh_compare.py` refuses outright to measure on an instance the rule base was fitted or
+selected on. `synth.py` generates four structural families, which is what took the training
+pool from 9 instances to 20; the frontier-relative objective is a ratio of two tours on one
+instance, so synthetic instances need no known optimum.

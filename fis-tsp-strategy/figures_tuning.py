@@ -27,7 +27,7 @@ import numpy as np  # noqa: E402
 
 import fis  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
+import paths  # noqa: E402
 
 MARKER = {"ga": "o", "pso": "s", "aco": "^"}
 COLOUR = {"gaussian": "tab:blue", "triangular": "tab:red"}
@@ -109,13 +109,18 @@ def figure(log, tuned, out):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--log", default=str(HERE / "tune_opt_log.json"))
-    ap.add_argument("--tuned", default=str(HERE / "tuned_opt.npz"))
-    ap.add_argument("--out", default=str(HERE / "figures" / "fis_tsp_tuning.png"))
+    ap.add_argument("--scale", default="small", choices=("small", "large"))
+    ap.add_argument("--log", default=None, help="default: results/tune_<scale>.json")
+    ap.add_argument("--tuned", default=None, help="default: results/tuned_<scale>.npz")
+    ap.add_argument("--out", default=str(paths.FIGURES / "fis_tsp_tuning.png"))
     args = ap.parse_args()
+    if args.log is None:
+        args.log = str(paths.tune_log(args.scale))
+    if args.tuned is None:
+        args.tuned = str(paths.tuned(args.scale))
     log = json.loads(Path(args.log).read_text())
     tuned = np.load(args.tuned) if Path(args.tuned).exists() else None
-    Path(args.out).parent.mkdir(exist_ok=True)
+    paths.ensure()
     print(f"wrote {figure(log, tuned, args.out)}")
 
 

@@ -210,17 +210,23 @@ def iterated_lk(
     return best, best_len, stats
 
 
-def effort_weights(inst, cand, cand_d, tour):
+def effort_weights(inst, cand, cand_d, tour, tuned=None):
     """A cumulative distribution over cities, weighted by how much the EFFORT rule base thinks
     there is to find at each.
 
     This is the fuzzy engine aiming the perturbation. The weight is the rule base's own depth
     output — the parameter it uses to say "this city is worth working on" — so a kick lands
-    preferentially where the tour is judged weakest rather than uniformly.
+    preferentially where the tour is judged weakest rather than uniformly. Pass a
+    :class:`fis.Tuned` to aim with the fitted rule base rather than the hand-written one.
+
+    The floor of ``1e-3`` above the minimum is deliberate: a city the rule base scores lowest
+    must still be reachable, because the scores are computed once on the starting tour and a
+    kick elsewhere can make a previously settled region worth revisiting. A distribution with
+    exact zeros in it would make those cities permanently unkickable.
     """
     from fis_lk import effort_scores
 
-    s = effort_scores(inst, cand, cand_d, tour)
+    s = effort_scores(inst, cand, cand_d, tour, tuned=tuned)
     s = np.asarray(s, dtype=np.float64)
     s = s - s.min() + 1e-3
     c = np.cumsum(s)

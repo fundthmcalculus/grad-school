@@ -47,15 +47,26 @@ import argparse
 import json
 from pathlib import Path
 
-import numpy as np
+# ``experiments/`` sits one level below the modules it imports, so the project root goes
+# on sys.path before any of them. ``paths`` also owns every output location, so an
+# experiment writes into the same results/ tree as the reported pipeline.
+import sys
+from pathlib import Path
 
-import fis
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import paths  # noqa: E402
+
+paths.on_path()
+
+import numpy as np  # noqa: E402
+
+import fis  # noqa: E402
 import synth
 from core import build_candidates, dist, greedy_edge_tour, make_pos, nn_stats, pred, succ
 from lk import N_STATS, improve_city
 from tsplib import load
 
-HERE = Path(__file__).resolve().parent
 
 # Candidate features. The first six are what `EFFORT` reads today; the rest are proposals.
 # Each is a name, a short description, and the direction a rule base would be expected to
@@ -256,7 +267,7 @@ def spearman(a, b):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=str(HERE / "feature_screen.json"))
+    ap.add_argument("--out", default=str(paths.FEATURE_SCREEN))
     args = ap.parse_args()
 
     # A spread of families and both real and synthetic instances, so a feature that only

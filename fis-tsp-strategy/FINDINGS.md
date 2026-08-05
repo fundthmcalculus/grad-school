@@ -372,7 +372,7 @@ directly observable — run the search and record whether the city yielded an im
 Effort allocation is then a monotone response to predicted payoff, and a candidate feature can
 be scored on the prediction task alone, for the cost of one instrumented run.
 
-`features_probe.py` does that over **12 278 city scans** on six instances, three TSPLIB and
+`experiments/features_probe.py` does that over **12 278 city scans** on six instances, three TSPLIB and
 three synthetic, of which 10.9% yielded an improving move. AUC is for predicting that event;
 ρ is the rank correlation with realised gain over the paying cities only, which is a different
 question and worth separating.
@@ -625,13 +625,15 @@ holds them.
 pip install numpy scipy matplotlib numba elkai
 pip install -e ../tribble-opt
 
-python test_invariants.py                              # correctness first
-python costmodel.py                                    # writes costmodel.npz
-python tune_opt.py                                     # writes tuned_opt.npz
-python benchmark.py --reps 3 --tuned tuned_opt.npz     # writes results.json
-python lkh_reference.py --max-n 2500 --timeout 90
-python figures.py && python figures_tuning.py
+python run_all.py            # every stage in dependency order, into results/
+python run_all.py --list     # what those stages are and what each one writes
+python run_all.py --dry-run  # the same, plus what the LKH stage would cost
 ```
 
+`run_all.py --ladder` adds the full LKH size ladder, which is hours rather than minutes and is
+off by default; `--dry-run` prices it first. Every stage is also a standalone script with
+`--help`, and each writes into `results/`.
+
 `costmodel.py` must run before `tune_opt.py`, and again after any change to the solver's hot
-path — its fitted coefficients are what the objective spends.
+path — its fitted coefficients are what the objective spends. `test_invariants.py` runs first,
+because four of the bugs in §10 produced plausible numbers rather than crashes.

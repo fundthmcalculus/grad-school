@@ -46,7 +46,7 @@ from lk import (
 from fis_lk import STAT_FIS_CALLS
 from tsplib import load
 
-HERE = Path(__file__).resolve().parent
+import paths
 
 # The counters the cost model is allowed to use, and the intercept. ``n`` is included
 # because both arms pay an O(n) setup (pos array, queue seeding, final tour length)
@@ -221,7 +221,7 @@ def predict(coef, stats, n):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--reps", type=int, default=3)
-    ap.add_argument("--out", default=str(HERE / "costmodel.npz"))
+    ap.add_argument("--out", default=str(paths.COSTMODEL))
     args = ap.parse_args()
 
     # warm the JIT so compilation never lands inside a timed sample

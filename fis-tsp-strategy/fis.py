@@ -32,6 +32,8 @@ instances whose coordinates differ by orders of magnitude.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 from numba import njit
 
@@ -228,7 +230,7 @@ C_N_IN = 4
 
 # Each rule is ({input: term}, [consequent]) with the consequent a desirability in
 # [0, 1]; the city with the highest defuzzified score is taken next. The starting
-# consequents below are the hand-written strategy — `tune.py` then fits them.
+# consequents below are the hand-written strategy — `tune_opt.py` then fits them.
 #
 # The shape of the rule base matters: it has to reduce to nearest-neighbour when
 # the other cues are neutral, and only override that when deferring a city is
@@ -273,7 +275,7 @@ CONSTRUCT_TAB = mf_table(CONSTRUCT_MF_C, CONSTRUCT_MF_S)
 # EFFORT: allocate LK search effort to the city about to be searched
 # ---------------------------------------------------------------------------
 # inputs
-# Inputs, chosen by measured predictive power rather than by argument. `features_probe.py`
+# Inputs, chosen by measured predictive power rather than by argument. `experiments/features_probe.py`
 # scores each candidate on how well it predicts whether a city search will yield an improving
 # move (AUC) and, among those that do, how large the gain is. `feature_registry.py` is the
 # master record of what was tried, what was rejected, and which scale each survivor is in.
@@ -486,6 +488,56 @@ CHAIN_ANT, CHAIN_CONS, CHAIN_MF_C, CHAIN_MF_S, CHAIN_TAB = chain_base(DEFAULT_SC
 NO_CHAIN_ANT = np.full((1, CH_N_IN), ANY, dtype=np.int8)
 NO_CHAIN_CONS = np.full((1, 1), 0.5, dtype=np.float64)
 NO_CHAIN_TAB = CHAIN_TAB
+
+
+@dataclass(frozen=True)
+class Tuned:
+    """A fitted rule base, with the antecedent arrays its consequents are indexed against.
+
+    The pairing is the whole point of the type. A fitted consequent table is meaningless on
+    its own: rule *i* of the ``small`` EFFORT base and rule *i* of the ``large`` one read
+    different inputs, so loading one scale's consequents against the other's antecedents
+    silently produces a rule base that runs, terminates, and means nothing. The scale is
+    recorded in the ``.npz`` at fitting time and the antecedents are rebuilt from it here,
+    so the two cannot be paired up wrongly by a caller.
+    """
+
+    scale: str
+    effort_ant: np.ndarray
+    effort_cons: np.ndarray
+    effort_tab: np.ndarray
+    chain_ant: np.ndarray
+    chain_cons: np.ndarray
+    chain_tab: np.ndarray
+
+
+def load_tuned(path):
+    """Read a ``tuned_<scale>.npz`` written by ``tune_opt.py``.
+
+    ``CONSTRUCT`` is deliberately absent: fuzzy construction is a measured failure (FINDINGS
+    §8) and appears in no reported arm, so it is no longer fitted and the ranker keeps its
+    hand-written rules.
+    """
+    z = np.load(path)
+    scale = str(z["scale"]) if "scale" in z else DEFAULT_SCALE
+    e_ant = effort_base(scale)[0]
+    h_ant = chain_base(scale)[0]
+    return Tuned(
+        scale=scale,
+        effort_ant=e_ant,
+        effort_cons=np.ascontiguousarray(z["effort_cons"]),
+        effort_tab=np.ascontiguousarray(z["effort_tab"]),
+        chain_ant=h_ant,
+        chain_cons=np.ascontiguousarray(z["chain_cons"]),
+        chain_tab=np.ascontiguousarray(z["chain_tab"]),
+    )
+
+
+def hand_written(scale=DEFAULT_SCALE):
+    """The same record, holding the hand-written rules — the control for any fitted one."""
+    e_ant, e_cons, _, _, e_tab = effort_base(scale)
+    h_ant, h_cons, _, _, h_tab = chain_base(scale)
+    return Tuned(scale, e_ant, e_cons, e_tab, h_ant, h_cons, h_tab)
 
 
 # ---------------------------------------------------------------------------

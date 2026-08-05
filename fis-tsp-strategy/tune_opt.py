@@ -68,7 +68,7 @@ from lk import lk_solve
 from refine import compass_refine
 from tsplib import load, reference_length, validate_tour
 
-HERE = Path(__file__).resolve().parent
+import paths
 
 # --- instance splits -------------------------------------------------------
 # Every fitting instance has n >= MIN_N. That is a deliberate restriction of scope, not a
@@ -485,7 +485,7 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
     """Fit with one optimiser / MF form / MF scope, selecting on the validation split."""
     set_seed(seed)
     space = ParamSpace(mf_kind, mf_scope, scale)
-    coef = np.load(HERE / "costmodel.npz")["coef"]
+    coef = np.load(paths.COSTMODEL)["coef"]
     train = Objective(train_instances(), space, coef)
     valid = Objective(valid_instances(), space, coef)
 
@@ -579,9 +579,17 @@ def main():
     ap.add_argument("--population", type=int, default=30)
     ap.add_argument("--jobs", type=int, default=1)
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--out", default=str(HERE / "tuned_opt.npz"))
-    ap.add_argument("--log", default=str(HERE / "tune_opt_log.json"))
+    # Both outputs are named after the scale, because the two scales are a reported
+    # comparison rather than a default and a variant, and a fitted vector means something
+    # different under each — the antecedent arrays it indexes are not the same.
+    ap.add_argument("--out", default=None)
+    ap.add_argument("--log", default=None)
     args = ap.parse_args()
+    paths.ensure()
+    if args.out is None:
+        args.out = str(paths.tuned(args.scale))
+    if args.log is None:
+        args.log = str(paths.tune_log(args.scale))
 
     n_tr = len(TRAIN_REAL) + len(synth.TRAIN_SPEC)
     n_va = len(VALID_REAL) + len(synth.VALID_SPEC)

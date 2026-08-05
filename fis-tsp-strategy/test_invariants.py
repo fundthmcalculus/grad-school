@@ -32,7 +32,7 @@ from tsplib import load, reference_length, validate_tour
 SMALL = ["berlin52", "a280", "pr1002"]
 
 # Instances whose coordinates are grid-like or clustered, so exactly-equidistant
-# neighbours are common: 933 of rl5915's 5915 cities have a distance tie straddling the
+# neighbors are common: 933 of rl5915's 5915 cities have a distance tie straddling the
 # 32nd-nearest place. These are what break tie handling, and what made an earlier
 # "widen the query until no row is contested" approach degenerate into querying every
 # city — a 90x slowdown in candidate building that the quality checks could not see.
@@ -43,7 +43,7 @@ def test_candidate_lists_are_prefix_stable_in_k():
     """The k=8 list must be the first 8 of the k=24 list.
 
     TSPLIB instances are full of exact distance ties, and a tie order that depends on k
-    makes nearest-neighbour tour length depend on k — for a construction that provably
+    makes nearest-neighbor tour length depend on k — for a construction that provably
     cannot. That bug made every early parameter sweep partly a measurement of luck.
     """
     for name in SMALL + TIE_HEAVY:

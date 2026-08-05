@@ -14,7 +14,7 @@ after a warm-up call that pays all the JIT compilation.
 
 Test instances are disjoint from the sets ``tune.py`` fits and validates on.
 
-Run:  python benchmark.py [--reps 3] [--max-n 20000] [--tuned tuned.npz] [--lkh]
+Run:  python benchmark.py [--scale small|large] [--reps 3] [--max-n 20000] [--lkh]
 """
 
 from __future__ import annotations
@@ -27,14 +27,13 @@ from pathlib import Path
 import numpy as np
 
 import fis
+import paths
 from core import build_candidates, greedy_edge_tour, nn_stats, nn_tour
 from fis_lk import STAT_BREADTH_SUM, STAT_DEPTH_SUM
 from fis_lk import construct as fis_build
 from fis_lk import local_search as fis_ls
 from lk import STAT_SCANS, lk_solve
 from tsplib import load, reference_length, validate_tour
-
-HERE = Path(__file__).resolve().parent
 
 # Disjoint from tune.TRAIN and tune.VALID.
 TEST = [
@@ -368,11 +367,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--max-n", type=int, default=20000)
-    ap.add_argument("--tuned", default=str(HERE / "tuned.npz"))
+    ap.add_argument("--scale", default=fis.DEFAULT_SCALE,
+                    choices=sorted(fis.EFFORT_RULES_BY_SCALE))
+    ap.add_argument("--tuned", default=None, help="default: results/tuned_<scale>.npz")
     ap.add_argument("--lkh", action="store_true")
-    ap.add_argument("--out", default=str(HERE / "results.json"))
+    ap.add_argument("--out", default=None, help="default: results/results_<scale>.json")
     ap.add_argument("--names", nargs="*", default=None)
     args = ap.parse_args()
+    paths.ensure()
+    # The rule base and the file it is reported into are both named after the scale, so
+    # the two cannot be mismatched by forgetting one of the two flags.
+    if args.tuned is None:
+        args.tuned = str(paths.tuned(args.scale))
+    if args.out is None:
+        args.out = str(paths.benchmark(args.scale))
 
     tuned = args.tuned if Path(args.tuned).exists() else None
     print(f"warming JIT...  (tuned rule base: {tuned})")

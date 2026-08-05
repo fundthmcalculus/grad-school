@@ -28,7 +28,7 @@ import numpy as np  # noqa: E402
 
 from benchmark import _instance_frontier as instance_frontier  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
+import paths  # noqa: E402
 
 
 def pareto_front(points):
@@ -230,11 +230,14 @@ def figure(results, out):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--results", default=str(HERE / "results.json"))
-    ap.add_argument("--out", default=str(HERE / "figures" / "fis_tsp_pareto.png"))
+    ap.add_argument("--scale", default="small", choices=("small", "large"))
+    ap.add_argument("--results", default=None, help="default: results/results_<scale>.json")
+    ap.add_argument("--out", default=str(paths.FIGURES / "fis_tsp_pareto.png"))
     args = ap.parse_args()
+    if args.results is None:
+        args.results = str(paths.benchmark(args.scale))
     results = json.loads(Path(args.results).read_text())
-    Path(args.out).parent.mkdir(exist_ok=True)
+    paths.ensure()
     print(f"wrote {figure(results, args.out)}")
 
 
