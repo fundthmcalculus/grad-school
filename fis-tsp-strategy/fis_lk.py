@@ -32,7 +32,7 @@ from numba import njit
 
 from core import dist, make_pos, nn_stats, pred, succ, tour_length
 import fis as fis_mod
-from fis import fis_eval, fis_eval1
+from fis import N_TERMS as N_TERMS_LOCAL, fis_eval, fis_eval1
 from lk import N_STATS, improve_city
 
 # extra diagnostics, appended after lk.py's stats (which occupy 0..N_STATS-1)
@@ -189,6 +189,122 @@ def fis_construct(
 # ---------------------------------------------------------------------------
 # fuzzy effort control over the LK queue
 # ---------------------------------------------------------------------------
+@njit(cache=True, inline="always")
+def city_features(x, n_in, coords, cand, cand_d, ceil, tour, pos, n, k, t1, nn1, mean_c, pops):
+    """Fill ``x`` with the EFFORT antecedents for city ``t1``. Returns the longer tour edge.
+
+    Shared by the solver and by :func:`effort_scores`, which aims the perturbation in
+    ``kick.py`` at the cities this scores highest. A second copy of these six formulas would be
+    a second place for them to drift, and a rule base fitted against one definition and aimed
+    with another would be quietly wrong rather than broken.
+
+    x[0:5] are the five inputs that cleared AUC 0.74 in `features_probe.py`; x[5:8] are the
+    middling band, computed only when ``n_in`` says the rule base references them, because the
+    turn calculation needs two square roots and is the most expensive feature here.
+    """
+    s1 = succ(tour, pos, n, t1)
+    p1 = pred(tour, pos, n, t1)
+    d_s = dist(coords, t1, s1, ceil)
+    d_p = dist(coords, t1, p1, ceil)
+    d_long = d_s if d_s > d_p else d_p
+
+    # The probe: one level of search run as a look-ahead over both directions of the broken
+    # edge. Candidate distances ascend, so the loop breaks at the first candidate that fails.
+    best_g1 = 0.0
+    n_pass = 0
+    for side in range(2):
+        d_break = d_s if side == 0 else d_p
+        t2 = s1 if side == 0 else p1
+        for t in range(k):
+            g1 = d_break - cand_d[t2, t]
+            if g1 <= 1e-9:
+                break
+            n_pass += 1
+            if g1 > best_g1:
+                best_g1 = g1
+    v = n_pass / (2.0 * k)
+    if v > 1.0:
+        v = 1.0
+    x[0] = v
+    v = best_g1 / d_long if d_long > 0.0 else 0.0
+    if v > 1.0:
+        v = 1.0
+    x[2] = v
+
+    r = 0
+    for t in range(k):
+        if cand_d[t1, t] >= d_long:
+            break
+        r += 1
+    x[1] = r / k
+
+    v = (0.5 * (d_s + d_p) / nn1[t1] - 1.0) * 0.5
+    if v < 0.0:
+        v = 0.0
+    elif v > 1.0:
+        v = 1.0
+    x[3] = v
+
+    tot = d_s + d_p
+    x[4] = (d_s - d_p if d_s > d_p else d_p - d_s) / tot if tot > 0.0 else 0.0
+
+    if n_in > 5:
+        ax = coords[t1, 0] - coords[p1, 0]
+        ay = coords[t1, 1] - coords[p1, 1]
+        bx = coords[s1, 0] - coords[t1, 0]
+        by = coords[s1, 1] - coords[t1, 1]
+        na = np.sqrt(ax * ax + ay * ay)
+        nb = np.sqrt(bx * bx + by * by)
+        if na <= 0.0 or nb <= 0.0:
+            x[5] = 0.5
+        else:
+            cosang = (ax * bx + ay * by) / (na * nb)
+            if cosang > 1.0:
+                cosang = 1.0
+            elif cosang < -1.0:
+                cosang = -1.0
+            x[5] = 0.5 * (1.0 - cosang)
+        x[6] = nn1[t1] / mean_c[t1]
+        v = pops / (3.0 * n)
+        if v > 1.0:
+            v = 1.0
+        x[7] = v
+    return d_long
+
+
+@njit(cache=True)
+def effort_scores_kernel(coords, cand, cand_d, ceil, tour, pos, nn1, mean_c, tab, ant, cons):
+    """The EFFORT base's depth output for every city, on the tour as it stands.
+
+    Depth is the output the rule base uses to say "this city is worth working on", so it is the
+    natural thing to aim a perturbation with.
+    """
+    n = tour.shape[0]
+    k = cand.shape[1]
+    n_in = ant.shape[1]
+    x = np.empty(n_in, np.float64)
+    mu = np.empty((n_in, N_TERMS_LOCAL), np.float64)
+    out = np.empty(cons.shape[1], np.float64)
+    scores = np.empty(n, np.float64)
+    for t1 in range(n):
+        city_features(
+            x, n_in, coords, cand, cand_d, ceil, tour, pos, n, k, t1, nn1, mean_c, 0
+        )
+        fis_eval(x, mu, tab, ant, cons, out)
+        scores[t1] = out[2]  # E_DEPTH
+    return scores
+
+
+def effort_scores(inst, cand, cand_d, tour, scale=None):
+    """Per-city EFFORT depth scores, as a plain helper for ``kick.py``."""
+    scale = fis_mod.DEFAULT_SCALE if scale is None else scale
+    ant, cons, _, _, tab = fis_mod.effort_base(scale)
+    nn1, mean_c = nn_stats(cand_d)
+    return effort_scores_kernel(
+        inst.coords, cand, cand_d, inst.ceil, tour, make_pos(tour), nn1, mean_c, tab, ant, cons
+    )
+
+
 @njit(cache=True)
 def fis_lk_solve(
     coords,
@@ -295,89 +411,9 @@ def fis_lk_solve(
             or_seg = or_max
             stats[STAT_FULL_ATTEMPTS] += 1
         else:
-            # --- features of the city about to be searched.
-            # All five were selected by measured predictive power in
-            # `features_probe.py`, and all read the same way: higher means more to find.
-            s1 = succ(tour, pos, n, t1)
-            p1 = pred(tour, pos, n, t1)
-            d_s = dist(coords, t1, s1, ceil)
-            d_p = dist(coords, t1, p1, ceil)
-            d_long = d_s if d_s > d_p else d_p
-
-            # The probe. One level of the search is run *as a look-ahead* over both
-            # directions of the broken edge, counting how many candidates pass the
-            # positive-gain test and how large the best gain is. This is the single most
-            # informative thing available about the city (AUC 0.858 and 0.795), and it is
-            # cheap for the same reason the search itself is: candidate distances ascend,
-            # so the loop breaks at the first non-passing candidate, which for a city
-            # already sitting on short edges is the very first one.
-            best_g1 = 0.0
-            n_pass = 0
-            for side in range(2):
-                d_break = d_s if side == 0 else d_p
-                t2 = s1 if side == 0 else p1
-                for t in range(k):
-                    g1 = d_break - cand_d[t2, t]
-                    if g1 <= 1e-9:
-                        break
-                    n_pass += 1
-                    if g1 > best_g1:
-                        best_g1 = g1
-            v = n_pass / (2.0 * k)
-            if v > 1.0:
-                v = 1.0
-            x[0] = v
-            v = best_g1 / d_long if d_long > 0.0 else 0.0
-            if v > 1.0:
-                v = 1.0
-            x[2] = v
-
-            # rank of the worse incident edge within the candidate list: how many strictly
-            # nearer neighbours it is currently ignoring
-            r = 0
-            for t in range(k):
-                if cand_d[t1, t] >= d_long:
-                    break
-                r += 1
-            x[1] = r / k
-
-            # excess: how much longer this city's edges are than its shortest possible
-            v = (0.5 * (d_s + d_p) / nn1[t1] - 1.0) * 0.5
-            if v < 0.0:
-                v = 0.0
-            elif v > 1.0:
-                v = 1.0
-            x[3] = v
-
-            # asymmetry: one long edge and one short is a better prospect than two medium
-            tot = d_s + d_p
-            x[4] = (d_s - d_p if d_s > d_p else d_p - d_s) / tot if tot > 0.0 else 0.0
-
-            # The middling-AUC inputs, computed only when the rule base is wide enough to
-            # reference them, so the small scale does not pay for what it never reads. The
-            # turn calculation is the most expensive feature in the system (two square roots),
-            # which is most of the reason this branch exists.
-            if n_e > 5:
-                ax = coords[t1, 0] - coords[p1, 0]
-                ay = coords[t1, 1] - coords[p1, 1]
-                bx = coords[s1, 0] - coords[t1, 0]
-                by = coords[s1, 1] - coords[t1, 1]
-                na = np.sqrt(ax * ax + ay * ay)
-                nb = np.sqrt(bx * bx + by * by)
-                if na <= 0.0 or nb <= 0.0:
-                    x[5] = 0.5
-                else:
-                    cosang = (ax * bx + ay * by) / (na * nb)
-                    if cosang > 1.0:
-                        cosang = 1.0
-                    elif cosang < -1.0:
-                        cosang = -1.0
-                    x[5] = 0.5 * (1.0 - cosang)
-                x[6] = nn1[t1] / mean_c[t1]
-                v = pops / (3.0 * n)
-                if v > 1.0:
-                    v = 1.0
-                x[7] = v
+            city_features(
+                x, n_e, coords, cand, cand_d, ceil, tour, pos, n, k, t1, nn1, mean_c, pops
+            )
 
             fis_eval(x, mu, tab, ant, cons, out)
             stats[STAT_FIS_CALLS] += 1
