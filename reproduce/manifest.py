@@ -187,6 +187,28 @@ EXPERIMENTS = [
               "pairs are an opt-in advanced setting and are deliberately not swept.",
     ),
     Experiment(
+        id="table-4-8-mf-dedup",
+        title="MF deduplication: reduction vs. tolerance across six problems, "
+              "plus the correction-rule pass quantified (Glass)",
+        chapter="Ch4", produces="Tables 4.8 and 4.9, Fig 4.3",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_8_mf_dedup.py"),
+        hardware="any",
+        datasets=["Glass", "Wine", "BreastCancer", "Digits", "Concrete", "Diabetes"],
+        outputs=["reproduce/outputs/table_4_8_mf_dedup.md",
+                 "reproduce/outputs/table_4_8_mf_dedup_sweep.md",
+                 "reproduce/outputs/table_4_9_correction_pass.md"],
+        notes="Wine/BreastCancer/Digits/Diabetes are scikit-learn-bundled (no network, no "
+              "missing-file risk) rather than the dissertation's other named datasets "
+              "(PhiUSIIL, RT-IOT2022), which are not in this repository. Max-lossless "
+              "tolerance is dataset-dependent: 2x (Diabetes) to 10x (Wine, Concrete); "
+              "reduction at that boundary ranges 0% (BreastCancer) to 44.2% (Digits). "
+              "Table 4.9's cascade-flatten row isolates the mechanism cost (dropping the "
+              "gating logic) from the dedup-tolerance cost by running at rtol=atol=0. "
+              "Filed upstream as tribble-fis#85 (dedup tolerance is a hardcoded module "
+              "constant with no parameter to sweep it).",
+    ),
+    Experiment(
         id="table-4-1-mog-baselines",
         title="MoG FIS vs sklearn baselines (train time + accuracy/R2)",
         chapter="Ch4", produces="Tables 4.4 and 4.5",

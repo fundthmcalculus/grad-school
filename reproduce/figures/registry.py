@@ -28,12 +28,19 @@ here fixes both, and puts the answer to "which run is this figure from" in the
 inventory instead of in the environment.
 
 **`skip` is a first-class outcome.** A figure whose experiment has not been run
-is not a bug in this harness and must not look like one. Figure 4.3 wants a
-before/after confusion matrix for a correction pass whose effect Chapter 4 says
-in as many words it has not yet isolated; drawing it would mean inventing the
-result. Those rows carry a `skip` reason, keep their placeholder PNG, and are
-reported as skipped rather than failed -- the same discipline the table harness
-applies when it prints `N/A` instead of guessing.
+is not a bug in this harness and must not look like one. A row with a `skip`
+reason keeps its placeholder PNG and is reported as skipped rather than
+failed -- the same discipline the table harness applies when it prints `N/A`
+instead of guessing. Figure 4.3 was the one example of this for most of the
+document's life: it wanted a before/after confusion matrix for a correction
+pass whose effect Chapter 4 said, in as many words, it had not yet isolated.
+That RT-IOT2022 confusion matrix still cannot be drawn -- the dataset is still
+not one the harness can load -- but the claim it was standing in for has since
+been measured on Glass instead (`table_4_9_correction_pass.py`), so the figure
+was retargeted to that measurement rather than left waiting on a dataset that
+was never going to arrive. No row currently carries a `skip` reason as a
+result, which is a fact about today's inventory, not a promise that the
+mechanism has nothing left to do.
 
 **`project` is the uv environment, not an import.** Chapter 3's and Chapter 5's
 figures need the pinned submodules; the schematics need nothing but matplotlib.
@@ -105,13 +112,9 @@ FIGURES = [
            "The open-set operating curve of Table 4.6",
            module="fig_04_anomaly_sweep", extras=("matplotlib",)),
     Figure("04-rtiot-confusion", "4.3",
-           "RT-IOT2022 confusion, before and after the correction-rule pass",
-           skip="The experiment does not exist yet. §4.3.1 states plainly that the "
-                "accuracy contribution of the correction pass 'has not yet been "
-                "isolated' and calls the before/after comparison an experiment the "
-                "author owes; RT-IOT2022 is also not among the datasets the harness "
-                "can load. Drawing this would mean inventing both halves of the "
-                "comparison it is supposed to report."),
+           "The correction-rule pass, quantified on Glass (MF count and accuracy)",
+           module="fig_04_correction_pass", extras=("matplotlib",),
+           archive="mf-dedup-2026-08-05"),
 
     # -- Chapter 5 ---------------------------------------------------------- #
     Figure("05-minimax-transform", "5.1",
