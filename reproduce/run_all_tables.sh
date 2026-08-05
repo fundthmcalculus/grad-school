@@ -150,6 +150,7 @@ FIS_TABLES=(
   table_norm_conorm_matrix
   table_4_4_openset
   table_a1_feature_scoring
+  table_4_8_mf_dedup
 )
 CLUSTER_TABLES=(
   table_3_1_pvat_scaling
