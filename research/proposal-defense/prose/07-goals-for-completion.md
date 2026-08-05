@@ -26,7 +26,7 @@ One protocol governs every performance and scaling number, for scalability and s
 
 The protocol covers *accuracy* claims too, because an accuracy failure set the floor: moving §4.3.2's sweep from three seeds to ten turned its apparent crossover into a null result and exposed a split diverging far outside the target's range (Chapter 6 §6.4). Ten seeds is the floor for any *estimate*; a mean without a spread, over a sample too small to contain the failure modes, is not evidence. The one deliberate exception, single-shot scale demonstrations recorded with hardware, precision and footprint instead, is stated in Appendix A.5.
 
-Two measurements break that floor: the **§6.3.5 optimizer study**'s undeclared host and **Appendix A.3**'s unseeded speedups. Appendix A.5 names them in full, because a board-wide rule with unnamed violations is worse than a narrower rule stated plainly. One boundary sits inside the rule rather than outside it: Appendix A.4's Table A.2, bit-for-bit reproducible within one host and not portable off it. That is the protocol working.
+Two measurements break that floor: the **§6.3.5 optimizer study**'s undeclared host and **Appendix A.3**'s unseeded speedups. Appendix A.5 names them in full, because a board-wide rule with unnamed violations is worse than a narrower rule stated plainly. One boundary sits inside the rule rather than outside it: Appendix A.4's Table A.2, bit-for-bit reproducible within one host and not portable off it — the protocol working as intended, not a third violation.
 
 The hardware half is not a formality either, and Chapter 3 §3.4 measures why. The same generator at the same commit and the same ten seeds, on two hosts, agrees to 6% within each and disagrees by 40% between them, because the two arms of that ratio are not scaled by a common factor when the machine changes. **Repeatability establishes that a measurement is not noise; it says nothing about whether it is a property of the code or of the host.** Only a second host distinguishes those, which is why the harness now records the numeric stack (numpy, scipy, scikit-learn and the BLAS build) alongside the CPU and RAM.
 
@@ -161,7 +161,7 @@ The runway is oversubscribed, not merely tight, so the de-scoping plan is an ord
 
 ## 7.5 Goals, mapped
 
-**Table 7.1 — Goals for completion, mapped.** Read the **Kind** column first: it says what "done" means. A *protocol* is discharged when every table complies or is named as an exception; an *experiment* by a measurement against §7.2's threshold, and can be refuted; a *build* by working, verified code; an *open question* may end in a negative result, and two of them probably will. Quarters are relative to the confirmed December 2026 proposal, with the final defense in March 2028 (Chapter 10); rows are ordered by target quarter and the cut order is §10.6's. Items are also tracked in `CHECKLIST.md` and `ACTION_ITEMS.md`, with the identifier in each status cell.
+**Table 7.1 — Goals for completion, mapped.** Read the **Kind** column first: it says what "done" means. A *protocol* is discharged when every table complies or is named as an exception; an *experiment* by a measurement against §7.2's threshold, and can be refuted; a *build* by working, verified code; an *open question* may end in a negative result, and two of them probably will. Quarters are relative to the confirmed December 2026 proposal, with the final defense in March 2028 (Chapter 10); rows are ordered by target quarter and the cut order is §10.6's. Items are also tracked in `CHECKLIST.md`, with the identifier in each status cell.
 
 | Goal | Kind | Feeds | Current status | Priority | Target |
 |---|---|---|---|---|---|
@@ -187,4 +187,4 @@ The runway is oversubscribed, not merely tight, so the de-scoping plan is an ord
 
 ---
 
-*Draft — Chapter 7 prose. One table. Goals tracked in `../ACTION_ITEMS.md` and `../CHECKLIST.md`, and mapped to the Chapter 10 timeline.*
+*Draft — Chapter 7 prose. One table. Goals tracked in `../CHECKLIST.md`, and mapped to the Chapter 10 timeline.*

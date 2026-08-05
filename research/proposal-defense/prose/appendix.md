@@ -4,7 +4,7 @@
 
 Fifteen figures are called out in the main text and stay there. Several are load-bearing: Figure 1.2 (the pipeline roadmap) orients the document, and Figure 5.2 (band discovery on the log-birth spectrum) carries Chapter 5's contribution. This appendix takes the *supplementary* material: galleries, per-fold and per-dataset repetitions, diagnostic plots a reader may want to check but need not walk through.
 
-Fourteen of the fifteen are produced today, through `reproduce/figures/`, in PNG for the Markdown and EPS for the LaTeX build, against one style module; nine of those fourteen are computed, running the same code and reading the same table CSVs as their chapters. One is undrawn, deliberately, with the reason recorded in `reproduce/figures/registry.py`: **Figure 4.3** waits on a correction-pass experiment that has not been run. Everything below is separate supplementary material, undrawn, tracked in `ACTION_ITEMS.md`.
+Fourteen of the fifteen are produced today, through `reproduce/figures/`, in PNG for the Markdown and EPS for the LaTeX build, against one style module; nine of those fourteen are computed, running the same code and reading the same table CSVs as their chapters. One is undrawn, deliberately, with the reason recorded in `reproduce/figures/registry.py`: **Figure 4.3** waits on a correction-pass experiment that has not been run. Everything below is separate supplementary material, undrawn, tracked in `CHECKLIST.md`.
 
 - **A.1.1 VAT / iVAT reordered-dissimilarity galleries.** Reordered images for the NASA shuttle set (58K), the psychiatric-evaluation set (135K), and the synthetic circular-cities construction; the Prim/MST block diagram (`vat_prim_mst_block_diagram_v2.svg`).
 - **A.1.2 Selection and multi-scale figures.** Figures `fig1`–`fig11` from `gated-minimax-selection/outputs/`: the synthetic datasets, the minimax-transform heatmaps, the persistence curves, the membership-function plots, the ConiVAT bridge repair, the multi-scale hierarchy, the selection-method comparison.
@@ -174,7 +174,7 @@ The missing axis was **zeroth order**, and it was one line of the generator away
 
 Two lessons, and the second is the expensive one. A defect can be real, load-bearing and invisible to every aggregate metric in the study designed to find it. And an experiment can be run three times, at ten seeds, across 126 cells, and still not vary the axis its own question depends on. The failure was not too few seeds or too few configurations but a regime never entered. What made it visible in the end was reading the coefficients instead of the scores.
 
-An earlier belief about this arm is withdrawn: that the pinned values were discarded before reaching inference, because the closed-form solve re-derives its own bucket means. It does re-derive the *free* ones. `pin_extremes` defaults to true and no generator here overrides it, so the two ends survive the solve, which the coefficients above show and which the hybrid's differing scores already implied. `ACTION_ITEMS.md` §H5 carries the working record, including the earlier corrected bound. It first recorded the two arms as bit-identical in all eighteen configurations, a claim that holds in no archive.
+An earlier belief about this arm is withdrawn: that the pinned values were discarded before reaching inference, because the closed-form solve re-derives its own bucket means. It does re-derive the *free* ones. `pin_extremes` defaults to true and no generator here overrides it, so the two ends survive the solve, which the coefficients above show and which the hybrid's differing scores already implied. `CHECKLIST.md` §F carries the working record of this saga (labelled H5 there), including the earlier corrected bound. It first recorded the two arms as bit-identical in all eighteen configurations, a claim that holds in no archive.
 
 #### The z-score collapse, and the third explanation nobody tested (Chapter 4 §4.1)
 
@@ -226,4 +226,4 @@ Three goals are narrowed rather than dropped. Each narrowing's reason is here; C
 
 ---
 
-*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility) and A.6 (side quests) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../ACTION_ITEMS.md`.*
+*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility) and A.6 (side quests) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../CHECKLIST.md`.*
