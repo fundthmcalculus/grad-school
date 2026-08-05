@@ -15,12 +15,15 @@ measures what that buys.
 | **how hard to search a city** | one (breadth, deep breadth, depth, Or-opt) everywhere | `EFFORT`: edge excess, past failures, turn sharpness, progress |
 | **deepen this chain or cut it** | run to a fixed depth | `CHAIN`: gain credit carried, depth so far, gain already banked, next step's trade |
 
-The engine is small and plain on purpose: gaussian membership functions, three
-linguistic terms per input, product t-norm, singleton consequents, weighted-average
-defuzzification. All of it is nopython-jitted and allocation-free, because it runs in
-the innermost loop of a local search. Every antecedent is a scale-free *ratio*, which
-is what lets one tuned rule base transfer from a 52-city instance to an 85 900-city
-one.
+The engine is small and plain on purpose: three linguistic terms per input, product
+t-norm, singleton consequents, weighted-average defuzzification. All of it is
+nopython-jitted and allocation-free, because it runs in the innermost loop of a local
+search — the cost model priced a rule-base evaluation at roughly what the whole city scan
+it decides about costs, so the membership bank is compiled to a lookup table and every
+scratch buffer is owned by the caller. A useful consequence: membership shape is then
+just data, so centres, widths and functional form (gaussian or triangular) are all things
+the optimiser can fit. Every antecedent is a scale-free *ratio*, which is what lets one
+fitted rule base transfer from a 52-city instance to an 85 900-city one.
 
 ## What is measured, and against what
 
@@ -51,12 +54,12 @@ did not work.
 | `fis.py` | the inference engine and the three rule bases |
 | `fis_lk.py` | fuzzy construction, and the fuzzy-controlled local search |
 | `costmodel.py` | a deterministic cost proxy, fitted to measured wall clock, that the tuner optimises against |
-| `tune_opt.py` | fits consequents *and* membership functions with the `optimizers` GA / PSO / ACO |
+| `tune_opt.py` | fits consequents *and* membership functions with the `optimizers` GA |
 | `tune.py` | the earlier hand-rolled (1+1)-ES tuner, kept for comparison |
 | `benchmark.py` | the reported comparison |
 | `lkh_reference.py` | LKH numbers, in a subprocess with a timeout |
 | `figures.py` | the time-versus-quality plane, and where the effort goes |
-| `figures_tuning.py` | which optimiser won, and what fitting did to the membership functions |
+| `figures_tuning.py` | what fitting bought, and what it did to the membership functions |
 
 ## Running it
 
@@ -66,7 +69,7 @@ pip install -e ../tribble-opt          # the optimizers library used by tune_opt
 cd fis-tsp-strategy
 
 python costmodel.py                                    # writes costmodel.npz
-python tune_opt.py --generations 25 --population 24    # writes tuned_opt.npz
+python tune_opt.py --generations 40 --population 32    # writes tuned_opt.npz
 python benchmark.py --reps 3 --tuned tuned_opt.npz     # writes results.json
 python lkh_reference.py --max-n 2500 --timeout 90      # optional external reference
 python figures.py && python figures_tuning.py          # writes figures/
@@ -77,5 +80,7 @@ proxy, not wall clock, so that the search is deterministic, reproducible, and no
 corrupted by its own CPU contention. Wall clock is what `benchmark.py` reports.
 
 Instances come from `../ClusteringExperiments/tsplib/`, which already carries 111
-TSPLIB files and the published-optimum index. The training, validation and test
-instance lists are disjoint; the split is in `tune.py` and `benchmark.py`.
+TSPLIB files and the published-optimum index. The training, validation and test instance
+lists are disjoint — `tune_opt.py` asserts it at import rather than trusting the lists to
+stay right — and `test_invariants.py` holds the properties whose quiet violation would
+otherwise produce good-looking wrong numbers.

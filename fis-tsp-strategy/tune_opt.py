@@ -1,4 +1,9 @@
-"""Fit the rule bases with the `optimizers` library (GA / PSO / ACO).
+"""Fit the rule bases with the `optimizers` library.
+
+The genetic algorithm is the default and is what the reported results use. Drivers for
+`ParticleSwarmOptimizer` and `AntColonyOptimizer` are kept and selectable with
+``--optimizers``, since the objective is the same for all three; they are simply not part
+of the reported comparison.
 
 This replaces the hand-rolled (1+1) evolution strategy in ``tune.py`` and widens what
 is fitted. Three things changed, in order of how much they matter:
@@ -28,8 +33,8 @@ optimises against and that all selection goes through.
 Every training instance is disjoint from ``benchmark.TEST``; the assertion at import
 time enforces it rather than trusting the lists to stay right.
 
-Run:  python tune_opt.py [--optimizers ga pso aco] [--mf-kinds gaussian triangular]
-                        [--mf-scopes base input] [--generations 25] [--out tuned_opt.npz]
+Run:  python tune_opt.py [--mf-kinds gaussian triangular] [--mf-scopes base input]
+                        [--optimizers ga|pso|aco] [--generations 40] [--out tuned_opt.npz]
 """
 
 from __future__ import annotations
@@ -482,7 +487,7 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--optimizers", nargs="*", default=["ga", "pso", "aco"])
+    ap.add_argument("--optimizers", nargs="*", default=["ga"])
     ap.add_argument("--mf-kinds", nargs="*", default=["gaussian", "triangular"])
     ap.add_argument("--mf-scopes", nargs="*", default=["base"])
     ap.add_argument("--shrink", type=float, default=0.3)
