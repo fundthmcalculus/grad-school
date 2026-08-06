@@ -23,8 +23,8 @@ This repository uses automated code style checking on pull requests to `main`, m
 To check code style before pushing:
 
 ```bash
-# Install development dependencies
-pip install -e ".[dev]"
+# Install linting tools
+pip install black flake8 Flake8-pyproject mypy
 
 # Check formatting (without modifying)
 black --check .
@@ -41,12 +41,12 @@ mypy .
 
 ## Current Enforcement Level
 
-We start with **very lax controls** — all checks are informational and don't block merges:
-- **Black**: Reports formatting issues but doesn't prevent merge
-- **Flake8**: Reports style violations but doesn't prevent merge
-- **mypy**: Type checking is informational; ignores missing type hints and imports
+We now use **casual enforcement** — checks enforce but with lenient rules:
+- **Black**: Enforces consistent formatting (88-char line length)
+- **Flake8**: Enforces basic linting with lenient configuration (120-char max, E203 ignored)
+- **mypy**: Type checking enforced but lenient (ignores missing imports and type hints)
 
-This allows the repository to adopt consistent practices gradually without being disruptive.
+New code must pass these checks, but the lenient configuration means only the most obvious issues block merges. As the codebase stabilizes, rules can be tightened incrementally.
 
 ## Future Tightening
 
