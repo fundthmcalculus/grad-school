@@ -1,0 +1,31 @@
+name: Style Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    name: Check Code Style
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install linting tools
+        run: |
+          pip install ruff
+
+      - name: Run Ruff formatter check
+        run: ruff format --check . --exclude ".git,__pycache__,.venv"
+        continue-on-error: true
+
+      - name: Run Ruff linter (informational)
+        run: ruff check . --exclude ".git,__pycache__,.venv"
+        continue-on-error: true
