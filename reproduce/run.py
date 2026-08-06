@@ -54,8 +54,10 @@ def select(args):
     if args.id:
         e = by_id(args.id)
         if e is None:
-            sys.exit(f"unknown experiment id: {args.id}\n"
-                     f"try: python reproduce/run.py --list")
+            sys.exit(
+                f"unknown experiment id: {args.id}\n"
+                f"try: python reproduce/run.py --list"
+            )
         picked = [e]
     elif args.chapter:
         want = args.chapter.lower()
@@ -78,8 +80,9 @@ def run_one(e, dry_run=False):
 
     t0 = time.perf_counter()
     try:
-        p = subprocess.run(e.command, cwd=cwd, capture_output=True,
-                           text=True, timeout=3600)
+        p = subprocess.run(
+            e.command, cwd=cwd, capture_output=True, text=True, timeout=3600
+        )
     except FileNotFoundError:
         return "no-runner", None
     except subprocess.TimeoutExpired:
@@ -100,12 +103,23 @@ def main():
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--list", action="store_true", help="show the registry and exit")
     g.add_argument("--all", action="store_true", help="run everything")
-    g.add_argument("--tables", action="store_true", help="run the proposal-table generators")
-    g.add_argument("--chapter", metavar="CH", help="run everything feeding a chapter (Ch3, Ch5, ...)")
+    g.add_argument(
+        "--tables", action="store_true", help="run the proposal-table generators"
+    )
+    g.add_argument(
+        "--chapter",
+        metavar="CH",
+        help="run everything feeding a chapter (Ch3, Ch5, ...)",
+    )
     g.add_argument("--id", metavar="ID", help="run one experiment by id")
-    ap.add_argument("--include-hardware", action="store_true",
-                    help="also run gpu / big-mem experiments (skipped by default)")
-    ap.add_argument("--dry-run", action="store_true", help="print commands without running")
+    ap.add_argument(
+        "--include-hardware",
+        action="store_true",
+        help="also run gpu / big-mem experiments (skipped by default)",
+    )
+    ap.add_argument(
+        "--dry-run", action="store_true", help="print commands without running"
+    )
     args = ap.parse_args()
 
     if args.list or not (args.all or args.tables or args.chapter or args.id):
@@ -117,8 +131,10 @@ def main():
         print("nothing selected")
         return
 
-    print(f"\nrunning {len(picked)} experiment(s)"
-          f"{' [dry run]' if args.dry_run else ''}\n")
+    print(
+        f"\nrunning {len(picked)} experiment(s)"
+        f"{' [dry run]' if args.dry_run else ''}\n"
+    )
     print(f"  {'CH':<5} {'ID':<34} {'HARDWARE':<12} {'STATUS':<12} TIME")
     print("  " + "-" * 80)
 
@@ -137,11 +153,17 @@ def main():
         for e, status in bad:
             print(f"    {e.id:<34} {status}")
         print(f"\n  logs: reproduce/outputs/logs/<id>.log")
-    skipped = [e for e in EXPERIMENTS if e.hardware in GATED] if not args.include_hardware else []
+    skipped = (
+        [e for e in EXPERIMENTS if e.hardware in GATED]
+        if not args.include_hardware
+        else []
+    )
     if skipped:
-        print(f"\n  {len(skipped)} hardware-gated experiment(s) skipped "
-              f"(--include-hardware to attempt): "
-              f"{', '.join(e.id for e in skipped)}")
+        print(
+            f"\n  {len(skipped)} hardware-gated experiment(s) skipped "
+            f"(--include-hardware to attempt): "
+            f"{', '.join(e.id for e in skipped)}"
+        )
     print()
     sys.exit(1 if bad else 0)
 

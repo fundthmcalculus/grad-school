@@ -8,8 +8,12 @@ from sklearn.model_selection import train_test_split
 from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
 from tribblefis.gauss_math import simple_gaussian_predict
 from tribblefis.scaling import UnitScalar
-from tribblefis.gauss_plot import report_figures_of_merit, plot_confusion_matrix, plot_classification_report, \
-    plot_membership_functions
+from tribblefis.gauss_plot import (
+    report_figures_of_merit,
+    plot_confusion_matrix,
+    plot_classification_report,
+    plot_membership_functions,
+)
 
 
 def load_data():
@@ -39,7 +43,9 @@ def main():
     print(f"Number of unique values in y: {n_unique}")
 
     # Split dataset into train/test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # BEHAVIOUR CHANGE. This used to be two explicit, pre-split `log_transform`
@@ -78,7 +84,7 @@ def main():
         n_gaussians={
             "LineOfCode": 3,
             "NoOfExternalRef": 2,
-        }
+        },
     )
     clf.fit(X_train, y_train)
 
@@ -86,7 +92,13 @@ def main():
     gaussian_memberships = clf.model_
 
     cm_train, top_confusion_train, confused_data_train = report_figures_of_merit(
-        X_train, y_train, gaussian_memberships, n_unique, start_time, top_n_todo, label="train"
+        X_train,
+        y_train,
+        gaussian_memberships,
+        n_unique,
+        start_time,
+        top_n_todo,
+        label="train",
     )
 
     print("1-pass Total Model Stats:")
@@ -104,7 +116,13 @@ def main():
     #     gaussian_memberships = gaussian_memberships.augment(new_gaussian_memberships)
 
     cm_test, top_confusion_test, confused_data_test = report_figures_of_merit(
-        X_test, y_test, gaussian_memberships, n_unique, start_time, top_n_todo, label="test"
+        X_test,
+        y_test,
+        gaussian_memberships,
+        n_unique,
+        start_time,
+        top_n_todo,
+        label="test",
     )
 
     # print("2-pass Total Model Stats:")
@@ -125,14 +143,17 @@ def main():
     y_pred_simple = simple_gaussian_predict(X_test[top_n_todo], simple_model)
     simple_accuracy = np.mean(y_pred_simple == y_test)
     print(f"Simple Model Accuracy (test): {simple_accuracy:.4f}")
-    plot_confusion_matrix(y_test, y_pred_simple, title=f"TSK Model Confusion Matrix (Simple Set)")
-    plot_classification_report(y_test, y_pred_simple, title=f"TSK Model Classification Report (Simple Set)")
+    plot_confusion_matrix(
+        y_test, y_pred_simple, title=f"TSK Model Confusion Matrix (Simple Set)"
+    )
+    plot_classification_report(
+        y_test, y_pred_simple, title=f"TSK Model Classification Report (Simple Set)"
+    )
 
     # Plot membership functions
     plot_membership_functions(gaussian_memberships)
     # Plot membership functions of the simple model
     plot_membership_functions(simple_model)
-
 
 
 if __name__ == "__main__":

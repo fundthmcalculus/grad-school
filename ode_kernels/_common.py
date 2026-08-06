@@ -20,7 +20,7 @@ MAX_FACTOR = 10.0
 
 
 def rms_norm(x: np.ndarray) -> float:
-    return float(np.linalg.norm(x) / x.size ** 0.5)
+    return float(np.linalg.norm(x) / x.size**0.5)
 
 
 def select_initial_step(

@@ -74,16 +74,18 @@ def test_empirical_order_at_least_claimed_order(method):
     exact = np.exp(-tf)
 
     hs = np.array(_STEP_SIZES[method])
-    errors = np.array([
-        abs(_fixed_step_integrate(method, _decay, t0, tf, [1.0], h)[1][0] - exact)
-        for h in hs
-    ])
+    errors = np.array(
+        [
+            abs(_fixed_step_integrate(method, _decay, t0, tf, [1.0], h)[1][0] - exact)
+            for h in hs
+        ]
+    )
 
     usable = errors > _ROUNDOFF_FLOOR
     hs_fit, err_fit = hs[usable], errors[usable]
-    assert len(hs_fit) >= 2, (
-        f"{method}: errors hit the roundoff floor too fast to fit a slope: {errors}"
-    )
+    assert (
+        len(hs_fit) >= 2
+    ), f"{method}: errors hit the roundoff floor too fast to fit a slope: {errors}"
 
     slope = np.polyfit(np.log(hs_fit), np.log(err_fit), 1)[0]
     assert slope >= tab.order - 0.5, (

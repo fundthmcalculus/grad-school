@@ -19,6 +19,7 @@ from scipy.stats import chi2
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import battery as B
@@ -30,9 +31,10 @@ import auto_select_mf_v2 as ASM
 @dataclass
 class FeatureSpaceMF:
     """Surrogate MF in feature space."""
+
     cluster_id: int
     center: np.ndarray  # d-dimensional feature-space center
-    cov: np.ndarray     # d×d covariance matrix
+    cov: np.ndarray  # d×d covariance matrix
     widths: np.ndarray  # Per-feature standard deviations
     members: Set[int]
     feature_names: Optional[List[str]] = None
@@ -53,8 +55,13 @@ class FeatureSpaceExtractor:
     def __init__(self, verbose: bool = False):
         self.verbose = verbose
 
-    def extract_feature_space_mfs(self, X: np.ndarray, Dstar: np.ndarray, blocks: List[Dict],
-                                 feature_names: Optional[List[str]] = None) -> List[FeatureSpaceMF]:
+    def extract_feature_space_mfs(
+        self,
+        X: np.ndarray,
+        Dstar: np.ndarray,
+        blocks: List[Dict],
+        feature_names: Optional[List[str]] = None,
+    ) -> List[FeatureSpaceMF]:
         """
         Extract feature-space MFs from clusters.
 
@@ -70,12 +77,12 @@ class FeatureSpaceExtractor:
         n, d = X.shape
 
         if feature_names is None:
-            feature_names = [f'x{i}' for i in range(d)]
+            feature_names = [f"x{i}" for i in range(d)]
 
         mf_list = []
 
         for cluster_id, block in enumerate(blocks):
-            members = np.array(sorted(list(block['members'])))
+            members = np.array(sorted(list(block["members"])))
             X_block = X[members, :]
 
             # Compute feature-space statistics
@@ -98,7 +105,7 @@ class FeatureSpaceExtractor:
                 cov=cov,
                 widths=widths,
                 members=set(members),
-                feature_names=feature_names
+                feature_names=feature_names,
             )
             mf_list.append(mf)
 
@@ -109,7 +116,9 @@ class FeatureSpaceExtractor:
 
         return mf_list
 
-    def evaluate_feature_space_membership(self, mf: FeatureSpaceMF, x: np.ndarray) -> float:
+    def evaluate_feature_space_membership(
+        self, mf: FeatureSpaceMF, x: np.ndarray
+    ) -> float:
         """
         Evaluate membership of a feature vector using Mahalanobis distance.
 
@@ -128,7 +137,7 @@ class FeatureSpaceExtractor:
             # Map to membership: exp(-α·mahal_dist²)
             # Calibrate α so that membership = 0.5 at distance = 1 std
             alpha = 0.693  # -ln(0.5) for μ=0.5 at mahal_dist=1
-            membership = np.exp(-alpha * mahal_dist ** 2)
+            membership = np.exp(-alpha * mahal_dist**2)
 
             return float(np.clip(membership, 0.0, 1.0))
         except np.linalg.LinAlgError:
@@ -137,8 +146,14 @@ class FeatureSpaceExtractor:
             max_width = np.max(mf.widths)
             return float(max(0.0, 1.0 - eucl_dist / max(max_width, 1e-6)))
 
-    def compare_surrogates(self, X: np.ndarray, Dstar: np.ndarray, blocks: List[Dict],
-                          dissimilarity_mfs: List, feature_space_mfs: List) -> Dict:
+    def compare_surrogates(
+        self,
+        X: np.ndarray,
+        Dstar: np.ndarray,
+        blocks: List[Dict],
+        dissimilarity_mfs: List,
+        feature_space_mfs: List,
+    ) -> Dict:
         """
         Compare dissimilarity-space MFs vs feature-space surrogates.
 
@@ -163,11 +178,12 @@ class FeatureSpaceExtractor:
 
         # Dissimilarity-space (requires D* and medoids)
         for cluster_id, block in enumerate(blocks):
-            medoid_idx = block.get('medoid_idx', list(block['members'])[0])
+            medoid_idx = block.get("medoid_idx", list(block["members"])[0])
             mf = dissimilarity_mfs[cluster_id]
 
             # Evaluate using the prototype's evaluate method
             from auto_select_mf_v2 import AutoTunedRuspiniExtractor
+
             extractor = AutoTunedRuspiniExtractor()
 
             for i in range(n):
@@ -178,18 +194,26 @@ class FeatureSpaceExtractor:
                 if dissim_val <= center_dissim:
                     mu_dissim[i, cluster_id] = 1.0
                 elif dissim_val <= center_dissim + support_width:
-                    mu_dissim[i, cluster_id] = (center_dissim + support_width - dissim_val) / support_width
+                    mu_dissim[i, cluster_id] = (
+                        center_dissim + support_width - dissim_val
+                    ) / support_width
                 else:
                     mu_dissim[i, cluster_id] = 0.0
 
         # Feature-space
         for cluster_id, mf in enumerate(feature_space_mfs):
             for i in range(n):
-                mu_feature[i, cluster_id] = self.evaluate_feature_space_membership(mf, X[i, :])
+                mu_feature[i, cluster_id] = self.evaluate_feature_space_membership(
+                    mf, X[i, :]
+                )
 
         # Normalize both to partition of unity
-        mu_dissim = mu_dissim / np.maximum(np.sum(mu_dissim, axis=1, keepdims=True), 1e-10)
-        mu_feature = mu_feature / np.maximum(np.sum(mu_feature, axis=1, keepdims=True), 1e-10)
+        mu_dissim = mu_dissim / np.maximum(
+            np.sum(mu_dissim, axis=1, keepdims=True), 1e-10
+        )
+        mu_feature = mu_feature / np.maximum(
+            np.sum(mu_feature, axis=1, keepdims=True), 1e-10
+        )
 
         # L2 error
         error_per_point = np.sqrt(np.mean((mu_dissim - mu_feature) ** 2, axis=1))
@@ -198,15 +222,16 @@ class FeatureSpaceExtractor:
         l2_error_std = float(np.std(error_per_point))
 
         return {
-            'l2_error_max': l2_error_max,
-            'l2_error_mean': l2_error_mean,
-            'l2_error_std': l2_error_std,
-            'mu_dissim': mu_dissim,
-            'mu_feature': mu_feature,
+            "l2_error_max": l2_error_max,
+            "l2_error_mean": l2_error_mean,
+            "l2_error_std": l2_error_std,
+            "mu_dissim": mu_dissim,
+            "mu_feature": mu_feature,
         }
 
-    def generate_linguistic_rules(self, feature_space_mfs: List[FeatureSpaceMF],
-                                 threshold: float = 0.5) -> List[str]:
+    def generate_linguistic_rules(
+        self, feature_space_mfs: List[FeatureSpaceMF], threshold: float = 0.5
+    ) -> List[str]:
         """
         Generate human-readable linguistic rules from feature-space MFs.
 
@@ -239,43 +264,50 @@ class FeatureSpaceExtractor:
 
         return rules
 
-    def print_feature_space_summary(self, feature_space_mfs: List[FeatureSpaceMF]) -> None:
+    def print_feature_space_summary(
+        self, feature_space_mfs: List[FeatureSpaceMF]
+    ) -> None:
         """Print summary of feature-space MFs."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("FEATURE-SPACE MEMBERSHIP FUNCTIONS")
-        print("="*80)
+        print("=" * 80)
 
         for mf in feature_space_mfs:
             print(f"\nCluster {mf.cluster_id}:")
-            print(f"  Center: {', '.join([f'{name}={c:.3f}' for name, c in zip(mf.feature_names, mf.center)])}")
-            print(f"  Widths: {', '.join([f'{name}={w:.3f}' for name, w in zip(mf.feature_names, mf.widths)])}")
+            print(
+                f"  Center: {', '.join([f'{name}={c:.3f}' for name, c in zip(mf.feature_names, mf.center)])}"
+            )
+            print(
+                f"  Widths: {', '.join([f'{name}={w:.3f}' for name, w in zip(mf.feature_names, mf.widths)])}"
+            )
             print(f"  Members: {len(mf.members)}")
 
-        print("="*80)
+        print("=" * 80)
 
     def print_linguistic_rules(self, rules: List[str]) -> None:
         """Print generated linguistic rules."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("LINGUISTIC RULES")
-        print("="*80)
+        print("=" * 80)
 
         for rule in rules:
             print(rule)
 
-        print("="*80)
+        print("=" * 80)
 
 
 # ============================================================================
 # Integration test on battery
 # ============================================================================
 
+
 def test_feature_space_on_battery():
     """Test feature-space MF extraction on synthetic battery."""
     datasets = [
-        ('two_gaussians', B.two_gaussians),
-        ('bridged_gaussians', B.bridged_gaussians),
-        ('concentric_rings', B.concentric_rings),
-        ('varying_density', B.varying_density),
+        ("two_gaussians", B.two_gaussians),
+        ("bridged_gaussians", B.bridged_gaussians),
+        ("concentric_rings", B.concentric_rings),
+        ("varying_density", B.varying_density),
     ]
 
     results = {}
@@ -308,7 +340,9 @@ def test_feature_space_on_battery():
         feature_mfs = extractor_feature.extract_feature_space_mfs(X, Dstar, blocks)
 
         # Compare surrogates
-        comparison = extractor_feature.compare_surrogates(X, Dstar, blocks, dissim_mfs, feature_mfs)
+        comparison = extractor_feature.compare_surrogates(
+            X, Dstar, blocks, dissim_mfs, feature_mfs
+        )
 
         print(f"Surrogate fidelity (L2 error):")
         print(f"  Max:  {comparison['l2_error_max']:.4f}")
@@ -325,34 +359,36 @@ def test_feature_space_on_battery():
             print(f"  ... ({len(rules) - 2} more)")
 
         results[name] = {
-            'l2_error_max': comparison['l2_error_max'],
-            'l2_error_mean': comparison['l2_error_mean'],
-            'num_rules': len(rules),
+            "l2_error_max": comparison["l2_error_max"],
+            "l2_error_mean": comparison["l2_error_mean"],
+            "num_rules": len(rules),
         }
 
     return results
 
 
-if __name__ == '__main__':
-    print("\n" + "="*80)
+if __name__ == "__main__":
+    print("\n" + "=" * 80)
     print("FEATURE-SPACE MEMBERSHIP FUNCTION EXTRACTION (Option C)")
-    print("="*80)
+    print("=" * 80)
 
     results = test_feature_space_on_battery()
 
     # Summary
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("FEATURE-SPACE EXTRACTION SUMMARY")
-    print("="*80)
+    print("=" * 80)
     print(f"{'Dataset':<20} {'L2 Error (Mean)':<20} {'L2 Error (Max)':<20}")
-    print("-"*60)
+    print("-" * 60)
 
     for name, result in results.items():
-        print(f"{name:<20} {result['l2_error_mean']:<20.4f} {result['l2_error_max']:<20.4f}")
+        print(
+            f"{name:<20} {result['l2_error_mean']:<20.4f} {result['l2_error_max']:<20.4f}"
+        )
 
-    print("="*80)
+    print("=" * 80)
     print("\nInterpretation:")
     print("- L2 error < 0.1: Surrogate matches dissimilarity-space MF closely")
     print("- L2 error 0.1-0.3: Good approximation, some loss")
     print("- L2 error > 0.3: Significant difference, use with caution")
-    print("="*80)
+    print("=" * 80)

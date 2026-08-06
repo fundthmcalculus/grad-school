@@ -143,8 +143,16 @@ def integrate(
         h_abs = 0.0
     elif first_step is None:
         h_abs = select_initial_step(
-            py_fun, t0, y, tf, max_step, f_current, direction,
-            tab.error_order, rtol_arr, atol_arr,
+            py_fun,
+            t0,
+            y,
+            tf,
+            max_step,
+            f_current,
+            direction,
+            tab.error_order,
+            rtol_arr,
+            atol_arr,
         )
         nfev += 1
     else:
@@ -206,14 +214,14 @@ def integrate(
                 if error_norm == 0:
                     factor = MAX_FACTOR
                 else:
-                    factor = min(MAX_FACTOR, SAFETY * error_norm ** error_exponent)
+                    factor = min(MAX_FACTOR, SAFETY * error_norm**error_exponent)
                 if step_rejected:
                     factor = min(1.0, factor)
                 h_abs *= factor
                 step_accepted = True
                 naccept += 1
             else:
-                h_abs *= max(MIN_FACTOR, SAFETY * error_norm ** error_exponent)
+                h_abs *= max(MIN_FACTOR, SAFETY * error_norm**error_exponent)
                 step_rejected = True
                 nreject += 1
 

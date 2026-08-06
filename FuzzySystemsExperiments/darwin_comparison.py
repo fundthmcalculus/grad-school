@@ -71,14 +71,14 @@ def evaluate_classifier(clf, X_train, X_test, y_train, y_test, name):
     print(f"Confusion Matrix Shape: {cm.shape}")
 
     return {
-        'name': name,
-        'train_time': train_time,
-        'train_acc': train_acc,
-        'test_acc': test_acc,
-        'y_pred': y_test_pred,
-        'y_proba': y_test_proba,
-        'model': model,
-        'top_features': clf.top_features_,
+        "name": name,
+        "train_time": train_time,
+        "train_acc": train_acc,
+        "test_acc": test_acc,
+        "y_pred": y_test_pred,
+        "y_proba": y_test_proba,
+        "model": model,
+        "top_features": clf.top_features_,
     }
 
 
@@ -122,32 +122,46 @@ def main():
 
     print(f"\n{'Metric':<30} {'Gaussian':>20} {'Trapezoid':>20}")
     print("-" * 70)
-    print(f"{'Training Time (seconds)':<30} {results_gauss['train_time']:>20.2f} {results_trapz['train_time']:>20.2f}")
-    print(f"{'Training Accuracy':<30} {results_gauss['train_acc']:>20.4f} {results_trapz['train_acc']:>20.4f}")
-    print(f"{'Test Accuracy':<30} {results_gauss['test_acc']:>20.4f} {results_trapz['test_acc']:>20.4f}")
+    print(
+        f"{'Training Time (seconds)':<30} {results_gauss['train_time']:>20.2f} {results_trapz['train_time']:>20.2f}"
+    )
+    print(
+        f"{'Training Accuracy':<30} {results_gauss['train_acc']:>20.4f} {results_trapz['train_acc']:>20.4f}"
+    )
+    print(
+        f"{'Test Accuracy':<30} {results_gauss['test_acc']:>20.4f} {results_trapz['test_acc']:>20.4f}"
+    )
 
-    model_gauss = results_gauss['model']
-    model_trapz = results_trapz['model']
+    model_gauss = results_gauss["model"]
+    model_trapz = results_trapz["model"]
     print(f"\n{'Model Complexity':<30} {'Gaussian':>20} {'Trapezoid':>20}")
     print("-" * 70)
-    print(f"{'Features Selected':<30} {len(results_gauss['top_features']):>20} {len(results_trapz['top_features']):>20}")
-    print(f"{'Total MFs':<30} {model_gauss.n_membership_functions:>20} {model_trapz.n_membership_functions:>20}")
-    print(f"{'Possible Rules':<30} {model_gauss.possible_rules:>20.0f} {model_trapz.possible_rules:>20.0f}")
+    print(
+        f"{'Features Selected':<30} {len(results_gauss['top_features']):>20} {len(results_trapz['top_features']):>20}"
+    )
+    print(
+        f"{'Total MFs':<30} {model_gauss.n_membership_functions:>20} {model_trapz.n_membership_functions:>20}"
+    )
+    print(
+        f"{'Possible Rules':<30} {model_gauss.possible_rules:>20.0f} {model_trapz.possible_rules:>20.0f}"
+    )
 
     # Winner
     print("\n" + "=" * 80)
-    if results_gauss['test_acc'] > results_trapz['test_acc']:
-        acc_diff = results_gauss['test_acc'] - results_trapz['test_acc']
+    if results_gauss["test_acc"] > results_trapz["test_acc"]:
+        acc_diff = results_gauss["test_acc"] - results_trapz["test_acc"]
         print(f"✓ GAUSSIAN wins by {acc_diff:.4f} ({acc_diff*100:.2f}%)")
-    elif results_trapz['test_acc'] > results_gauss['test_acc']:
-        acc_diff = results_trapz['test_acc'] - results_gauss['test_acc']
+    elif results_trapz["test_acc"] > results_gauss["test_acc"]:
+        acc_diff = results_trapz["test_acc"] - results_gauss["test_acc"]
         print(f"✓ TRAPEZOID wins by {acc_diff:.4f} ({acc_diff*100:.2f}%)")
     else:
         print(f"✓ TIE: Both achieve {results_gauss['test_acc']:.4f} accuracy")
 
     print("\nKey Takeaways:")
     print("- Gaussian MFs: Sharp peaks, excellent classification performance")
-    print(f"- Trapezoid MFs (Fast): Broader regions, {results_trapz['train_time']/results_gauss['train_time']:.1f}x faster training")
+    print(
+        f"- Trapezoid MFs (Fast): Broader regions, {results_trapz['train_time']/results_gauss['train_time']:.1f}x faster training"
+    )
     print("- Trapezoids use fast histogram-based method for speed")
     print("=" * 80)
 

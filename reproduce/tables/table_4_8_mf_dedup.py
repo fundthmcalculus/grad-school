@@ -79,7 +79,8 @@ import common as C  # noqa: E402
 import _mf_dedup as D  # noqa: E402
 
 from tribblefis.gaussian_classifier import (  # noqa: E402
-    MixtureOfGaussiansFuzzyClassifier, MixtureOfGaussiansFuzzySequenceClassifier,
+    MixtureOfGaussiansFuzzyClassifier,
+    MixtureOfGaussiansFuzzySequenceClassifier,
 )
 from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor  # noqa: E402
 from tribblefis.regression import predict_tsk  # noqa: E402
@@ -100,7 +101,9 @@ def _max_lossless(rows):
         if _ci_excludes_zero(r["delta_mean"], r["delta_std"], r["n"]):
             break
         best = r
-    hit_ceiling = best is rows[-1] and not _ci_excludes_zero(best["delta_mean"], best["delta_std"], best["n"])
+    hit_ceiling = best is rows[-1] and not _ci_excludes_zero(
+        best["delta_mean"], best["delta_std"], best["n"]
+    )
     return best, hit_ceiling
 
 
@@ -114,9 +117,12 @@ def _sweep_classification(name, loader):
     for seed in C.SEEDS:
         try:
             X_tr, X_te, y_tr, y_te = train_test_split(
-                X, y, test_size=0.3, random_state=seed, stratify=y)
+                X, y, test_size=0.3, random_state=seed, stratify=y
+            )
         except ValueError:
-            X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3, random_state=seed)
+            X_tr, X_te, y_tr, y_te = train_test_split(
+                X, y, test_size=0.3, random_state=seed
+            )
         top_n = min(5, X.shape[1])
         clf = MixtureOfGaussiansFuzzyClassifier(top_n=top_n, random_state=seed)
         clf.fit(X_tr, y_tr)
@@ -140,9 +146,12 @@ def _sweep_regression(name, loader):
     per_mult = {m: {"dedup_mf": [], "delta": []} for m in D.MULTIPLIERS}
     raw_mf_list, r2_raw_list = [], []
     for seed in C.SEEDS:
-        X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3, random_state=seed)
+        X_tr, X_te, y_tr, y_te = train_test_split(
+            X, y, test_size=0.3, random_state=seed
+        )
         reg = MixtureOfGaussiansFuzzyRegressor(
-            n_output_buckets=3, tsk_order="1st", top_n=-1, random_state=seed)
+            n_output_buckets=3, tsk_order="1st", top_n=-1, random_state=seed
+        )
         reg.fit(X_tr, y_tr)
         raw_mf = reg.model_.n_membership_functions
         r2_raw = r2_score(y_te, reg.predict(X_te))
@@ -152,8 +161,14 @@ def _sweep_regression(name, loader):
             deduped = D.build_deduped_model(reg.model_, D.LIB_RTOL * m, D.LIB_ATOL * m)
             n_dedup = len({mf.id for mf in deduped.all_membership_fcns})
             pred = predict_tsk(
-                X_te, deduped, reg.top_features_, reg.y_bucket_mean_, reg.corr_terms_,
-                order=reg.tsk_order, basis=reg.consequent_basis, norms=reg._norms(),
+                X_te,
+                deduped,
+                reg.top_features_,
+                reg.y_bucket_mean_,
+                reg.corr_terms_,
+                order=reg.tsk_order,
+                basis=reg.consequent_basis,
+                norms=reg._norms(),
             )
             r2_dedup = r2_score(y_te, pred)
             per_mult[m]["dedup_mf"].append(n_dedup)
@@ -169,18 +184,30 @@ def _finish(task, name, raw_mf_list, metric_raw_list, per_mult):
     for m in D.MULTIPLIERS:
         dm_mean, dm_std = C.agg(per_mult[m]["dedup_mf"])
         d_mean, d_std = C.agg(per_mult[m]["delta"])
-        rows.append(dict(
-            multiplier=m, n=n, raw_mf_mean=raw_mf_mean,
-            dedup_mf_mean=dm_mean, dedup_mf_std=dm_std,
-            delta_mean=d_mean, delta_std=d_std,
-        ))
+        rows.append(
+            dict(
+                multiplier=m,
+                n=n,
+                raw_mf_mean=raw_mf_mean,
+                dedup_mf_mean=dm_mean,
+                dedup_mf_std=dm_std,
+                delta_mean=d_mean,
+                delta_std=d_std,
+            )
+        )
     lossless, hit_ceiling = _max_lossless(rows)
     default_row = next(r for r in rows if r["multiplier"] == 1.0)
     return dict(
-        task=task, name=name, n=n, raw_mf_mean=raw_mf_mean,
-        metric_raw_mean=metric_mean, metric_raw_std=metric_std,
-        rows=rows, default_row=default_row,
-        lossless_row=lossless, lossless_multiplier=lossless["multiplier"],
+        task=task,
+        name=name,
+        n=n,
+        raw_mf_mean=raw_mf_mean,
+        metric_raw_mean=metric_mean,
+        metric_raw_std=metric_std,
+        rows=rows,
+        default_row=default_row,
+        lossless_row=lossless,
+        lossless_multiplier=lossless["multiplier"],
         hit_ceiling=hit_ceiling,
     )
 
@@ -208,7 +235,8 @@ def run_glass_cascade():
     n_experts_list = []
     for seed in C.SEEDS:
         X_tr, X_te, y_tr, y_te = train_test_split(
-            X, y, test_size=0.3, random_state=seed, stratify=y)
+            X, y, test_size=0.3, random_state=seed, stratify=y
+        )
 
         base = MixtureOfGaussiansFuzzyClassifier(top_n=5, random_state=seed)
         base.fit(X_tr, y_tr)
@@ -218,107 +246,165 @@ def run_glass_cascade():
         casc = MixtureOfGaussiansFuzzySequenceClassifier(top_n=5, random_state=seed)
         casc.fit(X_tr, y_tr)
         acc_casc.append(accuracy_score(y_te, casc.predict(X_te).astype(int)))
-        raw_mf_casc.append(sum(layer.model_.n_membership_functions for layer in casc.layers_))
+        raw_mf_casc.append(
+            sum(layer.model_.n_membership_functions for layer in casc.layers_)
+        )
         n_experts_list.append(len(casc.experts_))
 
         combined = casc.layers_[0].model_
         for layer in casc.layers_[1:]:
             combined = combined.augment(layer.model_)
         simple_flat = D.to_simple_model_tol(combined, 0.0, 0.0)
-        acc_flat.append(accuracy_score(y_te, simple_gaussian_predict(X_te, simple_flat).astype(int)))
+        acc_flat.append(
+            accuracy_score(y_te, simple_gaussian_predict(X_te, simple_flat).astype(int))
+        )
         dedup_mf_flat.append(len(simple_flat.input_mfs))
 
     delta_casc = [c - b for c, b in zip(acc_casc, acc_base)]
     delta_flat = [f - b for f, b in zip(acc_flat, acc_base)]
     return dict(
-        acc_base=C.agg(acc_base), acc_casc=C.agg(acc_casc), acc_flat=C.agg(acc_flat),
-        raw_mf_base=C.agg(raw_mf_base), raw_mf_casc=C.agg(raw_mf_casc),
-        dedup_mf_flat=C.agg(dedup_mf_flat), n_experts=C.agg(n_experts_list),
-        delta_casc=C.agg(delta_casc), delta_flat=C.agg(delta_flat),
+        acc_base=C.agg(acc_base),
+        acc_casc=C.agg(acc_casc),
+        acc_flat=C.agg(acc_flat),
+        raw_mf_base=C.agg(raw_mf_base),
+        raw_mf_casc=C.agg(raw_mf_casc),
+        dedup_mf_flat=C.agg(dedup_mf_flat),
+        n_experts=C.agg(n_experts_list),
+        delta_casc=C.agg(delta_casc),
+        delta_flat=C.agg(delta_flat),
     )
 
 
 def main():
     results = []
     for name, loader in D.CLASSIFICATION_DATASETS:
-        print(f"  [table-4-8] fitting {name} (classification, {len(C.SEEDS)} seeds x "
-              f"{len(D.MULTIPLIERS)} tolerances)...")
+        print(
+            f"  [table-4-8] fitting {name} (classification, {len(C.SEEDS)} seeds x "
+            f"{len(D.MULTIPLIERS)} tolerances)..."
+        )
         r = _sweep_classification(name, loader)
         if r:
             results.append(r)
     for name, loader in D.REGRESSION_DATASETS:
-        print(f"  [table-4-8] fitting {name} (regression, {len(C.SEEDS)} seeds x "
-              f"{len(D.MULTIPLIERS)} tolerances)...")
+        print(
+            f"  [table-4-8] fitting {name} (regression, {len(C.SEEDS)} seeds x "
+            f"{len(D.MULTIPLIERS)} tolerances)..."
+        )
         r = _sweep_regression(name, loader)
         if r:
             results.append(r)
 
     # --- Table 4.8: summary, one row per problem ---
-    header = ["Dataset", "Task", "Raw MF", "MF @ 1x (Δ)", "Reduction @ 1x",
-              "Max-lossless ×", "MF @ max-lossless (Δ)", "Reduction @ max-lossless"]
+    header = [
+        "Dataset",
+        "Task",
+        "Raw MF",
+        "MF @ 1x (Δ)",
+        "Reduction @ 1x",
+        "Max-lossless ×",
+        "MF @ max-lossless (Δ)",
+        "Reduction @ max-lossless",
+    ]
     rows = []
     for r in results:
         d = r["default_row"]
         lr = r["lossless_row"]
         metric = "acc" if r["task"] == "classification" else "R²"
-        rows.append([
-            r["name"], r["task"], f"{r['raw_mf_mean']:.1f}",
-            f"{d['dedup_mf_mean']:.1f} ({_fmt_delta(d['delta_mean'], d['delta_std'])} {metric})",
-            f"{_reduction_pct(r['raw_mf_mean'], d['dedup_mf_mean']):.1f}%",
-            f"{lr['multiplier']:g}×" + (" (grid ceiling)" if r["hit_ceiling"] else ""),
-            f"{lr['dedup_mf_mean']:.1f} ({_fmt_delta(lr['delta_mean'], lr['delta_std'])} {metric})",
-            f"{_reduction_pct(r['raw_mf_mean'], lr['dedup_mf_mean']):.1f}%",
-        ])
+        rows.append(
+            [
+                r["name"],
+                r["task"],
+                f"{r['raw_mf_mean']:.1f}",
+                f"{d['dedup_mf_mean']:.1f} ({_fmt_delta(d['delta_mean'], d['delta_std'])} {metric})",
+                f"{_reduction_pct(r['raw_mf_mean'], d['dedup_mf_mean']):.1f}%",
+                f"{lr['multiplier']:g}×"
+                + (" (grid ceiling)" if r["hit_ceiling"] else ""),
+                f"{lr['dedup_mf_mean']:.1f} ({_fmt_delta(lr['delta_mean'], lr['delta_std'])} {metric})",
+                f"{_reduction_pct(r['raw_mf_mean'], lr['dedup_mf_mean']):.1f}%",
+            ]
+        )
     note = (
-        "\"Max-lossless ×\" is the largest tolerance multiplier (relative to the library "
-        "default rtol=1e-2/atol=1e-3) reachable by an unbroken run of \"95% CI for the paired "
-        "delta contains zero\" starting from 0.1x. \"(grid ceiling)\" means the delta never left "
+        '"Max-lossless ×" is the largest tolerance multiplier (relative to the library '
+        'default rtol=1e-2/atol=1e-3) reachable by an unbroken run of "95% CI for the paired '
+        'delta contains zero" starting from 0.1x. "(grid ceiling)" means the delta never left '
         "the CI anywhere in the swept grid (0.1x-100x) -- the true boundary is unmeasured past "
         "100x, not proven absent. See `table_4_8_mf_dedup_sweep.csv` for the full per-multiplier "
         "detail behind every row."
     )
-    C.emit("table_4_8_mf_dedup", "Table 4.8 — MF deduplication: reduction vs. tolerance, six problems",
-           header, rows, note=note)
+    C.emit(
+        "table_4_8_mf_dedup",
+        "Table 4.8 — MF deduplication: reduction vs. tolerance, six problems",
+        header,
+        rows,
+        note=note,
+    )
 
     # --- companion: full per-(dataset, multiplier) sweep, for the record ---
-    sweep_header = ["Dataset", "Task", "Multiplier", "Raw MF", "Dedup MF (mean±std)",
-                     "Delta (mean±std)", "CI excludes zero"]
+    sweep_header = [
+        "Dataset",
+        "Task",
+        "Multiplier",
+        "Raw MF",
+        "Dedup MF (mean±std)",
+        "Delta (mean±std)",
+        "CI excludes zero",
+    ]
     sweep_rows = []
     for r in results:
         for row in r["rows"]:
             excl = _ci_excludes_zero(row["delta_mean"], row["delta_std"], row["n"])
-            sweep_rows.append([
-                r["name"], r["task"], f"{row['multiplier']:g}",
-                f"{row['raw_mf_mean']:.1f}",
-                f"{row['dedup_mf_mean']:.2f} ± {row['dedup_mf_std']:.2f}",
-                f"{row['delta_mean']:+.5f} ± {row['delta_std']:.5f}",
-                "yes" if excl else "no",
-            ])
-    C.emit("table_4_8_mf_dedup_sweep",
-           "Table 4.8 (detail) — full per-multiplier sweep",
-           sweep_header, sweep_rows,
-           note="Full grid behind Table 4.8's summary row per dataset. "
-                "\"CI excludes zero\" is the per-step version of the max-lossless rule.")
+            sweep_rows.append(
+                [
+                    r["name"],
+                    r["task"],
+                    f"{row['multiplier']:g}",
+                    f"{row['raw_mf_mean']:.1f}",
+                    f"{row['dedup_mf_mean']:.2f} ± {row['dedup_mf_std']:.2f}",
+                    f"{row['delta_mean']:+.5f} ± {row['delta_std']:.5f}",
+                    "yes" if excl else "no",
+                ]
+            )
+    C.emit(
+        "table_4_8_mf_dedup_sweep",
+        "Table 4.8 (detail) — full per-multiplier sweep",
+        sweep_header,
+        sweep_rows,
+        note="Full grid behind Table 4.8's summary row per dataset. "
+        '"CI excludes zero" is the per-step version of the max-lossless rule.',
+    )
 
     # --- Glass cascade: the correction-rule pass, quantified ---
     casc = run_glass_cascade()
     if casc:
-        (ab_m, ab_s) = casc["acc_base"]
-        (ac_m, ac_s) = casc["acc_casc"]
-        (af_m, af_s) = casc["acc_flat"]
-        (rb_m, rb_s) = casc["raw_mf_base"]
-        (rc_m, rc_s) = casc["raw_mf_casc"]
-        (df_m, df_s) = casc["dedup_mf_flat"]
-        (ne_m, ne_s) = casc["n_experts"]
-        (dc_m, dc_s) = casc["delta_casc"]
-        (df2_m, df2_s) = casc["delta_flat"]
+        ab_m, ab_s = casc["acc_base"]
+        ac_m, ac_s = casc["acc_casc"]
+        af_m, af_s = casc["acc_flat"]
+        rb_m, rb_s = casc["raw_mf_base"]
+        rc_m, rc_s = casc["raw_mf_casc"]
+        df_m, df_s = casc["dedup_mf_flat"]
+        ne_m, ne_s = casc["n_experts"]
+        dc_m, dc_s = casc["delta_casc"]
+        df2_m, df2_s = casc["delta_flat"]
         casc_header = ["Arm", "MF count", "Accuracy", "Paired Δ vs. base"]
         casc_rows = [
-            ["Base (no correction pass)", f"{rb_m:.1f} ± {rb_s:.1f}", f"{ab_m:.4f} ± {ab_s:.4f}", "—"],
-            ["Gated cascade (base + experts, routed)", f"{rc_m:.1f} ± {rc_s:.1f} raw",
-             f"{ac_m:.4f} ± {ac_s:.4f}", _fmt_delta(dc_m, dc_s)],
-            ["Cascade → one flat FIS (union, dedup @ exact tol., argmax)",
-             f"{df_m:.1f} ± {df_s:.1f} deduped", f"{af_m:.4f} ± {af_s:.4f}", _fmt_delta(df2_m, df2_s)],
+            [
+                "Base (no correction pass)",
+                f"{rb_m:.1f} ± {rb_s:.1f}",
+                f"{ab_m:.4f} ± {ab_s:.4f}",
+                "—",
+            ],
+            [
+                "Gated cascade (base + experts, routed)",
+                f"{rc_m:.1f} ± {rc_s:.1f} raw",
+                f"{ac_m:.4f} ± {ac_s:.4f}",
+                _fmt_delta(dc_m, dc_s),
+            ],
+            [
+                "Cascade → one flat FIS (union, dedup @ exact tol., argmax)",
+                f"{df_m:.1f} ± {df_s:.1f} deduped",
+                f"{af_m:.4f} ± {af_s:.4f}",
+                _fmt_delta(df2_m, df2_s),
+            ],
         ]
         casc_note = (
             f"Glass only, {len(C.SEEDS)} seeds, top_n=5, mean {ne_m:.1f} experts per fit. "
@@ -328,11 +414,17 @@ def main():
             "correction pass as one flat rule base recovers part, not all, of the gated "
             "cascade's accuracy gain over the base alone."
         )
-        C.emit("table_4_9_correction_pass",
-               "Table 4.9 — The correction-rule pass, quantified (Glass)",
-               casc_header, casc_rows, note=casc_note)
+        C.emit(
+            "table_4_9_correction_pass",
+            "Table 4.9 — The correction-rule pass, quantified (Glass)",
+            casc_header,
+            casc_rows,
+            note=casc_note,
+        )
 
-    print("\nDone. Emitted table_4_8_mf_dedup, table_4_8_mf_dedup_sweep, table_4_9_correction_pass.")
+    print(
+        "\nDone. Emitted table_4_8_mf_dedup, table_4_8_mf_dedup_sweep, table_4_9_correction_pass."
+    )
 
 
 if __name__ == "__main__":

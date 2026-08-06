@@ -31,7 +31,7 @@ from ._common import (
 
 _ORDER = 2
 _ERROR_EXPONENT = -1.0 / (_ORDER + 1)
-_RICHARDSON_DENOM = 2.0 ** _ORDER - 1.0
+_RICHARDSON_DENOM = 2.0**_ORDER - 1.0
 
 
 def _finite_diff_jacobian(f, t, y, fy):
@@ -124,7 +124,9 @@ def odeexp(
     else:
         f = lambda t, y: np.asarray(fun(t, y), dtype=np.float64)
 
-    rtol_arr = np.maximum(np.broadcast_to(np.asarray(rtol, dtype=float), (n,)), 100 * EPS)
+    rtol_arr = np.maximum(
+        np.broadcast_to(np.asarray(rtol, dtype=float), (n,)), 100 * EPS
+    )
     atol_arr = np.broadcast_to(np.asarray(atol, dtype=float), (n,)).astype(float)
 
     y = y0.copy()
@@ -189,14 +191,14 @@ def odeexp(
                 if error_norm == 0:
                     factor = MAX_FACTOR
                 else:
-                    factor = min(MAX_FACTOR, SAFETY * error_norm ** _ERROR_EXPONENT)
+                    factor = min(MAX_FACTOR, SAFETY * error_norm**_ERROR_EXPONENT)
                 if step_rejected:
                     factor = min(1.0, factor)
                 h_abs *= factor
                 step_accepted = True
                 naccept += 1
             else:
-                h_abs *= max(MIN_FACTOR, SAFETY * error_norm ** _ERROR_EXPONENT)
+                h_abs *= max(MIN_FACTOR, SAFETY * error_norm**_ERROR_EXPONENT)
                 step_rejected = True
                 nreject += 1
 

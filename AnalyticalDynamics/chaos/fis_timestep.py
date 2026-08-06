@@ -352,7 +352,9 @@ def _metrics(y_true_scaled, y_pred_scaled, rng):
     """
     out = {
         "rmse": float(np.sqrt(mean_squared_error(y_true_scaled, y_pred_scaled))),
-        "r2": float(r2_score(y_true_scaled, y_pred_scaled, multioutput="uniform_average")),
+        "r2": float(
+            r2_score(y_true_scaled, y_pred_scaled, multioutput="uniform_average")
+        ),
     }
     span = (rng[:, 1] - rng[:, 0])[None, :]
     resid_deg = (y_pred_scaled - y_true_scaled) * span
@@ -394,7 +396,9 @@ def horizon_metrics(split, y_true_scaled, y_pred_scaled):
         out["t_break"] = float(split.holdout_t[never_back[0]])
     else:
         first = np.flatnonzero(over)
-        out["t_break"] = float(split.holdout_t[first[0]]) if first.size else float("inf")
+        out["t_break"] = (
+            float(split.holdout_t[first[0]]) if first.size else float("inf")
+        )
     return out
 
 
@@ -411,10 +415,19 @@ class Result:
     fit_seconds: float = 0.0
 
     def flat(self):
-        row = {"dataset": self.label, "config": self.config, "n_rules": self.n_rules,
-               "fit_seconds": round(self.fit_seconds, 2), "t_break": self.t_break}
-        for fam, d in (("pooled", self.pooled), ("trained", self.trained_ic),
-                       ("holdout", self.holdout_ic), ("extrap", self.extrap_ic)):
+        row = {
+            "dataset": self.label,
+            "config": self.config,
+            "n_rules": self.n_rules,
+            "fit_seconds": round(self.fit_seconds, 2),
+            "t_break": self.t_break,
+        }
+        for fam, d in (
+            ("pooled", self.pooled),
+            ("trained", self.trained_ic),
+            ("holdout", self.holdout_ic),
+            ("extrap", self.extrap_ic),
+        ):
             for k, v in d.items():
                 row[f"{fam}_{k}"] = v
         return row
@@ -453,15 +466,18 @@ def run(split, cfg, test_fraction=0.2, seed=42, verbose=False):
     res = Result(split.label, cfg.key(), n_rules=model.n_rules, fit_seconds=fit_s)
     res.pooled = _metrics(Y[te], model.predict(X[te]), mean_range)
 
-    k = int(np.argmin(np.abs(split.ic_deg[:, split.swept_index] - TRAINED_IC_THETA_DEG)))
-    Xk, _ = encode(split.ic_deg[k: k + 1], split.t, cfg.encoding, cfg.n_harmonics)
+    k = int(
+        np.argmin(np.abs(split.ic_deg[:, split.swept_index] - TRAINED_IC_THETA_DEG))
+    )
+    Xk, _ = encode(split.ic_deg[k : k + 1], split.t, cfg.encoding, cfg.n_harmonics)
     res.trained_ic = _metrics(split.theta_scaled[k], model.predict(Xk), split.ranges[k])
 
     # The holdout is evaluated over the full 20 s, then split at the training
     # window edge: `holdout_ic` stays the 0-10 s number every earlier table quotes,
     # `extrap_ic` is the 10-20 s continuation.
-    Xh, _ = encode(split.holdout_ic_deg[None, :], split.holdout_t,
-                   cfg.encoding, cfg.n_harmonics)
+    Xh, _ = encode(
+        split.holdout_ic_deg[None, :], split.holdout_t, cfg.encoding, cfg.n_harmonics
+    )
     seg = horizon_metrics(split, split.holdout_theta_scaled, model.predict(Xh))
     res.holdout_ic = seg["holdout"]
     res.extrap_ic = seg["extrap"]
@@ -499,11 +515,13 @@ def baseline_bracket_midpoint(split, lower_deg=2.0, upper_deg=2.1):
     swept = split.ic_deg[:, split.swept_index]
     i_lo = int(np.argmin(np.abs(swept - lower_deg)))
     i_hi = int(np.argmin(np.abs(swept - upper_deg)))
-    assert abs(swept[i_lo] - lower_deg) < 1e-6 and abs(swept[i_hi] - upper_deg) < 1e-6, (
-        f"{split.label}: bracketing ICs {lower_deg}/{upper_deg} are not in the training grid"
-    )
+    assert (
+        abs(swept[i_lo] - lower_deg) < 1e-6 and abs(swept[i_hi] - upper_deg) < 1e-6
+    ), f"{split.label}: bracketing ICs {lower_deg}/{upper_deg} are not in the training grid"
     pred = 0.5 * (split.theta_scaled[i_lo] + split.theta_scaled[i_hi])
-    return _metrics(split.holdout_theta_scaled[split.in_window], pred, split.holdout_range)
+    return _metrics(
+        split.holdout_theta_scaled[split.in_window], pred, split.holdout_range
+    )
 
 
 def baseline_nearest(split):
@@ -514,8 +532,11 @@ def baseline_nearest(split):
     swept = split.ic_deg[:, split.swept_index]
     target = split.holdout_ic_deg[split.swept_index]
     k = int(np.argmin(np.abs(swept - target)))
-    return _metrics(split.holdout_theta_scaled[split.in_window],
-                    split.theta_scaled[k], split.holdout_range)
+    return _metrics(
+        split.holdout_theta_scaled[split.in_window],
+        split.theta_scaled[k],
+        split.holdout_range,
+    )
 
 
 def predictions_for(split, model, cfg, which="holdout"):
@@ -530,8 +551,10 @@ def predictions_for(split, model, cfg, which="holdout"):
         truth, rng, t = split.holdout_theta_scaled, split.holdout_range, split.holdout_t
         t_end = split.train_t_end
     else:
-        k = int(np.argmin(np.abs(split.ic_deg[:, split.swept_index] - TRAINED_IC_THETA_DEG)))
-        ic = split.ic_deg[k: k + 1]
+        k = int(
+            np.argmin(np.abs(split.ic_deg[:, split.swept_index] - TRAINED_IC_THETA_DEG))
+        )
+        ic = split.ic_deg[k : k + 1]
         truth, rng, t = split.theta_scaled[k], split.ranges[k], split.t
         t_end = None
     X, _ = encode(ic, t, cfg.encoding, cfg.n_harmonics)

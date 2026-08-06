@@ -34,7 +34,7 @@ def _all_blocks(Dstar):
     """Enumerate every internal node of the SL dendrogram as a candidate block.
     (Shared utility from selection.py)"""
     n = Dstar.shape[0]
-    Z = linkage(squareform(Dstar, checks=False), method='single')
+    Z = linkage(squareform(Dstar, checks=False), method="single")
     members = {i: {i} for i in range(n)}
     heights = {i: 0.0 for i in range(n)}
     parent_h = {}
@@ -55,19 +55,24 @@ def _all_blocks(Dstar):
             continue
         birth = heights[nid]
         death = parent_h.get(nid, birth)
-        blocks.append({
-            'node_id': nid, 'members': members[nid],
-            'birth': birth, 'death': death,
-            'persistence': death - birth,
-            'rel_persistence': death / (birth + 1e-12),
-            'size': len(members[nid]),
-        })
+        blocks.append(
+            {
+                "node_id": nid,
+                "members": members[nid],
+                "birth": birth,
+                "death": death,
+                "persistence": death - birth,
+                "rel_persistence": death / (birth + 1e-12),
+                "size": len(members[nid]),
+            }
+        )
     return blocks, n
 
 
 # ===========================================================================
 # METHOD 1: PERSISTENCE-GAP / KNEE-SELECTION
 # ===========================================================================
+
 
 def select_persistence_gap(Dstar, gap_sigma=2.0, max_size_frac=0.6):
     """
@@ -85,24 +90,29 @@ def select_persistence_gap(Dstar, gap_sigma=2.0, max_size_frac=0.6):
     """
     blocks, n = _all_blocks(Dstar)
     ceiling = max_size_frac * n
-    persist = np.array([b['persistence'] for b in blocks])
+    persist = np.array([b["persistence"] for b in blocks])
     med = np.median(persist)
     mad = np.median(np.abs(persist - med)) + 1e-12
     sigma = 1.4826 * mad
     gap_threshold = med + gap_sigma * sigma
 
-    elig = [b for b in blocks
-            if b['size'] >= 3
-            and b['size'] <= ceiling
-            and b['persistence'] >= gap_threshold]
+    elig = [
+        b
+        for b in blocks
+        if b["size"] >= 3 and b["size"] <= ceiling and b["persistence"] >= gap_threshold
+    ]
 
     if not elig:
-        return 0, [], {
-            'method': 'persistence_gap',
-            'threshold': float(gap_threshold),
-            'max_persistence': float(np.max(persist)),
-            'reason': 'no_outliers'
-        }
+        return (
+            0,
+            [],
+            {
+                "method": "persistence_gap",
+                "threshold": float(gap_threshold),
+                "max_persistence": float(np.max(persist)),
+                "reason": "no_outliers",
+            },
+        )
 
     covered = set()
     sel = []
@@ -112,26 +122,34 @@ def select_persistence_gap(Dstar, gap_sigma=2.0, max_size_frac=0.6):
         for b in elig:
             if b in sel:
                 continue
-            gain = len(b['members'] - covered)
-            if gain > best_gain or (gain == best_gain and best is not None
-                                    and b['persistence'] > best['persistence']):
+            gain = len(b["members"] - covered)
+            if gain > best_gain or (
+                gain == best_gain
+                and best is not None
+                and b["persistence"] > best["persistence"]
+            ):
                 best, best_gain = b, gain
         if best is None or best_gain == 0:
             break
         sel.append(best)
-        covered |= best['members']
+        covered |= best["members"]
 
-    return len(sel), sel, {
-        'method': 'persistence_gap',
-        'threshold': float(gap_threshold),
-        'coverage': len(covered) / n,
-        'gap_sigma': gap_sigma,
-    }
+    return (
+        len(sel),
+        sel,
+        {
+            "method": "persistence_gap",
+            "threshold": float(gap_threshold),
+            "coverage": len(covered) / n,
+            "gap_sigma": gap_sigma,
+        },
+    )
 
 
 # ===========================================================================
 # METHOD 2: BETA-PLATEAU (Bonis & Oudot)
 # ===========================================================================
+
 
 def select_beta_plateau(Dstar, n_betas=20, plateau_patience=3, max_size_frac=0.6):
     """
@@ -156,10 +174,10 @@ def select_beta_plateau(Dstar, n_betas=20, plateau_patience=3, max_size_frac=0.6
     """
     blocks, n = _all_blocks(Dstar)
     ceiling = max_size_frac * n
-    persist = np.array([b['persistence'] for b in blocks if 3 <= b['size'] <= ceiling])
+    persist = np.array([b["persistence"] for b in blocks if 3 <= b["size"] <= ceiling])
 
     if len(persist) < 2:
-        return 0, [], {'method': 'beta_plateau', 'reason': 'too_few_blocks'}
+        return 0, [], {"method": "beta_plateau", "reason": "too_few_blocks"}
 
     persist_sorted = np.sort(persist)[::-1]
     med = np.median(persist_sorted)
@@ -188,12 +206,14 @@ def select_beta_plateau(Dstar, n_betas=20, plateau_patience=3, max_size_frac=0.6
             j += 1
         plateau_len = j - i
         if plateau_len >= plateau_patience:
-            plateaus.append({
-                'value': cluster_counts[i],
-                'start': i,
-                'length': plateau_len,
-                'threshold': thresholds[i],
-            })
+            plateaus.append(
+                {
+                    "value": cluster_counts[i],
+                    "start": i,
+                    "length": plateau_len,
+                    "threshold": thresholds[i],
+                }
+            )
         i = j
 
     if not plateaus:
@@ -205,22 +225,28 @@ def select_beta_plateau(Dstar, n_betas=20, plateau_patience=3, max_size_frac=0.6
     else:
         # Select the plateau with highest cluster count (most structure)
         # if there are multiple, use the one with longest duration
-        best_plateau = max(plateaus, key=lambda p: (p['value'], p['length']))
-        best_count = best_plateau['value']
-        selected_threshold = best_plateau['threshold']
+        best_plateau = max(plateaus, key=lambda p: (p["value"], p["length"]))
+        best_count = best_plateau["value"]
+        selected_threshold = best_plateau["threshold"]
 
     # Apply threshold to select blocks
     blocks_full, _ = _all_blocks(Dstar)
-    elig_blocks = [b for b in blocks_full
-                   if 3 <= b['size'] <= ceiling
-                   and b['persistence'] >= selected_threshold]
+    elig_blocks = [
+        b
+        for b in blocks_full
+        if 3 <= b["size"] <= ceiling and b["persistence"] >= selected_threshold
+    ]
 
     if not elig_blocks:
-        return 0, [], {
-            'method': 'beta_plateau',
-            'selected_threshold': float(selected_threshold),
-            'reason': 'no_eligible_blocks'
-        }
+        return (
+            0,
+            [],
+            {
+                "method": "beta_plateau",
+                "selected_threshold": float(selected_threshold),
+                "reason": "no_eligible_blocks",
+            },
+        )
 
     # Greedy set-cover among eligible blocks
     covered = set()
@@ -231,28 +257,36 @@ def select_beta_plateau(Dstar, n_betas=20, plateau_patience=3, max_size_frac=0.6
         for b in elig_blocks:
             if b in sel:
                 continue
-            gain = len(b['members'] - covered)
-            if gain > best_gain or (gain == best_gain and best is not None
-                                    and b['persistence'] > best['persistence']):
+            gain = len(b["members"] - covered)
+            if gain > best_gain or (
+                gain == best_gain
+                and best is not None
+                and b["persistence"] > best["persistence"]
+            ):
                 best, best_gain = b, gain
         if best is None or best_gain == 0:
             break
         sel.append(best)
-        covered |= best['members']
+        covered |= best["members"]
 
-    return len(sel), sel, {
-        'method': 'beta_plateau',
-        'selected_threshold': float(selected_threshold),
-        'plateaus_found': len(plateaus),
-        'plateau_value': int(best_count) if plateaus else None,
-        'cluster_counts_curve': cluster_counts.tolist(),
-        'coverage': len(covered) / n,
-    }
+    return (
+        len(sel),
+        sel,
+        {
+            "method": "beta_plateau",
+            "selected_threshold": float(selected_threshold),
+            "plateaus_found": len(plateaus),
+            "plateau_value": int(best_count) if plateaus else None,
+            "cluster_counts_curve": cluster_counts.tolist(),
+            "coverage": len(covered) / n,
+        },
+    )
 
 
 # ===========================================================================
 # METHOD 3: BOTTLENECK-BOOTSTRAP (AuToMATo)
 # ===========================================================================
+
 
 def select_bottleneck_bootstrap(X, n_boots=100, boot_frac=0.8, max_size_frac=0.6):
     """
@@ -289,8 +323,9 @@ def select_bottleneck_bootstrap(X, n_boots=100, boot_frac=0.8, max_size_frac=0.6
         # Extract persistence values
         blocks_boot, n_boot = _all_blocks(Ds_boot)
         ceiling = max_size_frac * n_boot
-        persist_boot = np.array([b['persistence'] for b in blocks_boot
-                                 if 3 <= b['size'] <= ceiling])
+        persist_boot = np.array(
+            [b["persistence"] for b in blocks_boot if 3 <= b["size"] <= ceiling]
+        )
 
         if len(persist_boot) < 2:
             continue
@@ -302,7 +337,7 @@ def select_bottleneck_bootstrap(X, n_boots=100, boot_frac=0.8, max_size_frac=0.6
             gap_counts[largest_gap_idx] = gap_counts.get(largest_gap_idx, 0) + 1
 
     if not gap_counts:
-        return 0, [], {'method': 'bottleneck_bootstrap', 'reason': 'no_valid_boots'}
+        return 0, [], {"method": "bottleneck_bootstrap", "reason": "no_valid_boots"}
 
     # Select the most common gap index
     most_stable_gap_idx = max(gap_counts, key=gap_counts.get)
@@ -314,24 +349,29 @@ def select_bottleneck_bootstrap(X, n_boots=100, boot_frac=0.8, max_size_frac=0.6
     blocks_full, n_full = _all_blocks(Ds_full)
     ceiling = max_size_frac * n_full
 
-    persist_full = np.array([b['persistence'] for b in blocks_full
-                             if 3 <= b['size'] <= ceiling])
+    persist_full = np.array(
+        [b["persistence"] for b in blocks_full if 3 <= b["size"] <= ceiling]
+    )
 
     if len(persist_full) < 2:
-        return 0, [], {'method': 'bottleneck_bootstrap', 'reason': 'too_few_blocks'}
+        return 0, [], {"method": "bottleneck_bootstrap", "reason": "too_few_blocks"}
 
     # Use the stable gap index to determine threshold
     if most_stable_gap_idx < len(persist_full) - 1:
-        threshold = (persist_full[most_stable_gap_idx] + persist_full[most_stable_gap_idx + 1]) / 2
+        threshold = (
+            persist_full[most_stable_gap_idx] + persist_full[most_stable_gap_idx + 1]
+        ) / 2
     else:
         threshold = persist_full[-1]
 
-    elig_blocks = [b for b in blocks_full
-                   if 3 <= b['size'] <= ceiling
-                   and b['persistence'] >= threshold]
+    elig_blocks = [
+        b
+        for b in blocks_full
+        if 3 <= b["size"] <= ceiling and b["persistence"] >= threshold
+    ]
 
     if not elig_blocks:
-        return 0, [], {'method': 'bottleneck_bootstrap', 'reason': 'no_eligible'}
+        return 0, [], {"method": "bottleneck_bootstrap", "reason": "no_eligible"}
 
     # Greedy set-cover
     covered = set()
@@ -342,30 +382,40 @@ def select_bottleneck_bootstrap(X, n_boots=100, boot_frac=0.8, max_size_frac=0.6
         for b in elig_blocks:
             if b in sel:
                 continue
-            gain = len(b['members'] - covered)
-            if gain > best_gain or (gain == best_gain and best is not None
-                                    and b['persistence'] > best['persistence']):
+            gain = len(b["members"] - covered)
+            if gain > best_gain or (
+                gain == best_gain
+                and best is not None
+                and b["persistence"] > best["persistence"]
+            ):
                 best, best_gain = b, gain
         if best is None or best_gain == 0:
             break
         sel.append(best)
-        covered |= best['members']
+        covered |= best["members"]
 
-    return len(sel), sel, {
-        'method': 'bottleneck_bootstrap',
-        'most_stable_gap_idx': int(most_stable_gap_idx),
-        'gap_frequency': float(gap_frequency),
-        'n_boots': n_boots,
-        'boot_frac': boot_frac,
-        'selected_threshold': float(threshold),
-        'coverage': len(covered) / n_full,
-        'gap_frequency_dist': dict(sorted(gap_counts.items(), key=lambda x: x[1], reverse=True)[:5]),
-    }
+    return (
+        len(sel),
+        sel,
+        {
+            "method": "bottleneck_bootstrap",
+            "most_stable_gap_idx": int(most_stable_gap_idx),
+            "gap_frequency": float(gap_frequency),
+            "n_boots": n_boots,
+            "boot_frac": boot_frac,
+            "selected_threshold": float(threshold),
+            "coverage": len(covered) / n_full,
+            "gap_frequency_dist": dict(
+                sorted(gap_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+            ),
+        },
+    )
 
 
 # ===========================================================================
 # UNIFIED INTERFACE FOR COMPARISON
 # ===========================================================================
+
 
 def compare_all_methods(X, y_true=None, verbose=False):
     """
@@ -386,29 +436,29 @@ def compare_all_methods(X, y_true=None, verbose=False):
 
     # Method 1: Persistence-gap
     k1, sel1, meta1 = select_persistence_gap(Ds)
-    results['persistence_gap'] = {
-        'n_clusters': k1,
-        'blocks': sel1,
-        'coverage': meta1.get('coverage', 0),
-        'metadata': meta1,
+    results["persistence_gap"] = {
+        "n_clusters": k1,
+        "blocks": sel1,
+        "coverage": meta1.get("coverage", 0),
+        "metadata": meta1,
     }
 
     # Method 2: Beta-plateau
     k2, sel2, meta2 = select_beta_plateau(Ds)
-    results['beta_plateau'] = {
-        'n_clusters': k2,
-        'blocks': sel2,
-        'coverage': meta2.get('coverage', 0),
-        'metadata': meta2,
+    results["beta_plateau"] = {
+        "n_clusters": k2,
+        "blocks": sel2,
+        "coverage": meta2.get("coverage", 0),
+        "metadata": meta2,
     }
 
     # Method 3: Bottleneck-bootstrap
     k3, sel3, meta3 = select_bottleneck_bootstrap(X)
-    results['bottleneck_bootstrap'] = {
-        'n_clusters': k3,
-        'blocks': sel3,
-        'coverage': meta3.get('coverage', 0),
-        'metadata': meta3,
+    results["bottleneck_bootstrap"] = {
+        "n_clusters": k3,
+        "blocks": sel3,
+        "coverage": meta3.get("coverage", 0),
+        "metadata": meta3,
     }
 
     if verbose:
@@ -417,11 +467,12 @@ def compare_all_methods(X, y_true=None, verbose=False):
             print(f"  {method}: k={res['n_clusters']}, coverage={res['coverage']:.3f}")
         if y_true is not None:
             from sklearn.metrics import adjusted_rand_score
+
             for method, res in results.items():
-                if res['blocks']:
+                if res["blocks"]:
                     lab = np.zeros(len(X), dtype=int)
-                    for bi, b in enumerate(res['blocks']):
-                        for idx in b['members']:
+                    for bi, b in enumerate(res["blocks"]):
+                        for idx in b["members"]:
                             lab[idx] = bi
                     m = y_true >= 0
                     if m.sum() > 0:

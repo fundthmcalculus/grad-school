@@ -60,11 +60,10 @@ NAME = "08-identification"
 # against itself the moment either is re-archived.
 AUTO = "opt-identification-kmbic-2026-08-03"
 PINNED = "opt-identification-kmbic-pinned-2026-08-03"
-PREFIX = "opt-identification-2026-08-02"     # same sweep, before the library fix
+PREFIX = "opt-identification-2026-08-02"  # same sweep, before the library fix
 
 CLASSICAL = ["classical-kmeans", "classical-fcm"]
-COLOUR = {"construction": F.BLUE, "classical-kmeans": F.ORANGE,
-          "classical-fcm": F.AQUA}
+COLOUR = {"construction": F.BLUE, "classical-kmeans": F.ORANGE, "classical-fcm": F.AQUA}
 LABEL = {"classical-kmeans": "k-means", "classical-fcm": "fuzzy c-means"}
 
 
@@ -73,16 +72,20 @@ def _load(label):
     by = defaultdict(lambda: defaultdict(list))
     for r in rows:
         by[r["route"]][int(r["rules"])].append(
-            (float(r["r2"]), float(r["seconds"]), int(r["n_params"])))
+            (float(r["r2"]), float(r["seconds"]), int(r["n_params"]))
+        )
     return by, src
 
 
 def _stats(by, route, index):
     cs = sorted(by[route])
     vals = [[v[index] for v in by[route][c]] for c in cs]
-    return (cs, np.array([np.mean(v) for v in vals]),
-            np.array([np.std(v) for v in vals]),
-            np.array([np.median(v) for v in vals]))
+    return (
+        cs,
+        np.array([np.mean(v) for v in vals]),
+        np.array([np.std(v) for v in vals]),
+        np.array([np.median(v) for v in vals]),
+    )
 
 
 def build():
@@ -101,43 +104,96 @@ def build():
     # -- (a) accuracy ------------------------------------------------------- #
     for route in CLASSICAL:
         cs, mean, sd, _ = _stats(pinned, route, 0)
-        ax.plot(cs, mean, lw=1.8, marker="o", ms=4.5, color=COLOUR[route],
-                label=LABEL[route], zorder=4)
-        ax.fill_between(cs, mean - sd, mean + sd,
-                        color=F.tint(COLOUR[route], 0.88), lw=0, zorder=2)
+        ax.plot(
+            cs,
+            mean,
+            lw=1.8,
+            marker="o",
+            ms=4.5,
+            color=COLOUR[route],
+            label=LABEL[route],
+            zorder=4,
+        )
+        ax.fill_between(
+            cs, mean - sd, mean + sd, color=F.tint(COLOUR[route], 0.88), lw=0, zorder=2
+        )
     # Distinct markers, not just distinct dashes: a legend swatch is short
     # enough that a marker sits on top of the dash pattern and the two blue
     # entries become indistinguishable.
-    for src, ls, mk, name in ((pinned, "solid", "o", "construction (pinned)"),
-                              (auto, (0, (4, 2)), "^", "construction (auto)")):
+    for src, ls, mk, name in (
+        (pinned, "solid", "o", "construction (pinned)"),
+        (auto, (0, (4, 2)), "^", "construction (auto)"),
+    ):
         cs, mean, sd, _ = _stats(src, "construction", 0)
-        ax.plot(cs, mean, lw=1.8, ls=ls, marker=mk, ms=4.5, color=F.BLUE,
-                label=name, zorder=4)
+        ax.plot(
+            cs,
+            mean,
+            lw=1.8,
+            ls=ls,
+            marker=mk,
+            ms=4.5,
+            color=F.BLUE,
+            label=name,
+            zorder=4,
+        )
         if ls == "solid":
-            ax.fill_between(cs, mean - sd, mean + sd,
-                            color=F.tint(F.BLUE, 0.88), lw=0, zorder=2)
-    F.style_axes(ax, title="(a)  accuracy at matched rule count",
-                 xlabel="rules", ylabel="held-out $R^2$")
+            ax.fill_between(
+                cs, mean - sd, mean + sd, color=F.tint(F.BLUE, 0.88), lw=0, zorder=2
+            )
+    F.style_axes(
+        ax,
+        title="(a)  accuracy at matched rule count",
+        xlabel="rules",
+        ylabel="held-out $R^2$",
+    )
     F.legend(ax, loc="lower right", handlelength=2.8)
     ax.set_xticks(rules)
 
     # -- (b) cost ----------------------------------------------------------- #
     for route in CLASSICAL:
         cs, _, _, med = _stats(pinned, route, 1)
-        tx.plot(cs, 1000 * med, lw=1.8, marker="o", ms=4.5,
-                color=COLOUR[route], label=LABEL[route], zorder=4)
-    for src, ls, mk, name in ((pinned, "solid", "o", "construction (pinned)"),
-                              (auto, (0, (4, 2)), "^", "construction (auto)")):
+        tx.plot(
+            cs,
+            1000 * med,
+            lw=1.8,
+            marker="o",
+            ms=4.5,
+            color=COLOUR[route],
+            label=LABEL[route],
+            zorder=4,
+        )
+    for src, ls, mk, name in (
+        (pinned, "solid", "o", "construction (pinned)"),
+        (auto, (0, (4, 2)), "^", "construction (auto)"),
+    ):
         cs, _, _, med = _stats(src, "construction", 1)
-        tx.plot(cs, 1000 * med, lw=1.8, ls=ls, marker=mk, ms=4.5,
-                color=F.BLUE, label=name, zorder=4)
+        tx.plot(
+            cs,
+            1000 * med,
+            lw=1.8,
+            ls=ls,
+            marker=mk,
+            ms=4.5,
+            color=F.BLUE,
+            label=name,
+            zorder=4,
+        )
     # The same automatic construction before the selector was fixed. Drawn faint
     # because it is not a competitor -- it is the same code path paying for four
     # EM fits it discarded.
     if before is not None:
         cs, _, _, med = _stats(before, "construction", 1)
-        tx.plot(cs, 1000 * med, lw=1.4, ls=(0, (1, 2)), marker="v", ms=4.0,
-                color=F.FAINT, label="auto, before the\nlibrary fix", zorder=3)
+        tx.plot(
+            cs,
+            1000 * med,
+            lw=1.4,
+            ls=(0, (1, 2)),
+            marker="v",
+            ms=4.0,
+            color=F.FAINT,
+            label="auto, before the\nlibrary fix",
+            zorder=3,
+        )
     tx.set_yscale("log")
     lo, hi = tx.get_ylim()
     tx.set_ylim(lo * 0.55, hi * 3.0)
@@ -147,14 +203,22 @@ def build():
     if before is not None:
         cs, _, _, med = _stats(before, "construction", 1)
         _cs, _, _, med_auto = _stats(auto, "construction", 1)
-        tx.annotate(f"auto, before the library fix\n"
-                    f"({med[-1] / med_auto[-1]:.1f}× dearer at 12 rules)",
-                    xy=(cs[-2], 1000 * med[-2] * 1.06),
-                    xytext=(cs[0] + 0.05, 1000 * med[-1] * 2.4),
-                    fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.5,
-                    arrowprops=dict(arrowstyle="->", lw=0.8, color=F.AXIS))
-    F.style_axes(tx, title="(b)  identification cost",
-                 xlabel="rules", ylabel="milliseconds, single-threaded (log)")
+        tx.annotate(
+            f"auto, before the library fix\n"
+            f"({med[-1] / med_auto[-1]:.1f}× dearer at 12 rules)",
+            xy=(cs[-2], 1000 * med[-2] * 1.06),
+            xytext=(cs[0] + 0.05, 1000 * med[-1] * 2.4),
+            fontsize=F.FS_SMALL,
+            color=F.MUTED,
+            linespacing=1.5,
+            arrowprops=dict(arrowstyle="->", lw=0.8, color=F.AXIS),
+        )
+    F.style_axes(
+        tx,
+        title="(b)  identification cost",
+        xlabel="rules",
+        ylabel="milliseconds, single-threaded (log)",
+    )
     tx.set_xticks(rules)
 
     # -- (c) parameters ----------------------------------------------------- #
@@ -162,39 +226,71 @@ def build():
     # parameter counts by construction (one Gaussian per feature per rule), so
     # they are drawn with different dashes -- otherwise three lines sit exactly
     # on top of each other and two of them look absent.
-    for route, ls in (("classical-kmeans", (0, (4, 2))),
-                      ("classical-fcm", "solid")):
+    for route, ls in (("classical-kmeans", (0, (4, 2))), ("classical-fcm", "solid")):
         cs, mean, _, _ = _stats(pinned, route, 2)
-        px.plot(cs, mean, lw=1.8, ls=ls, marker="o", ms=4.5,
-                color=COLOUR[route], label=LABEL[route], zorder=4)
+        px.plot(
+            cs,
+            mean,
+            lw=1.8,
+            ls=ls,
+            marker="o",
+            ms=4.5,
+            color=COLOUR[route],
+            label=LABEL[route],
+            zorder=4,
+        )
     cs, mean, _, _ = _stats(pinned, "construction", 2)
-    px.plot(cs, mean, lw=1.4, ls=(0, (1, 2)), marker="s", ms=3.6,
-            color=F.BLUE, label="construction (pinned)", zorder=5)
+    px.plot(
+        cs,
+        mean,
+        lw=1.4,
+        ls=(0, (1, 2)),
+        marker="s",
+        ms=3.6,
+        color=F.BLUE,
+        label="construction (pinned)",
+        zorder=5,
+    )
     cs, mean, _, _ = _stats(auto, "construction", 2)
-    px.plot(cs, mean, lw=1.8, marker="^", ms=4.5, color=F.BLUE,
-            label="construction (auto)", zorder=4)
-    F.style_axes(px, title="(c)  free antecedent parameters",
-                 xlabel="rules", ylabel="parameters")
+    px.plot(
+        cs,
+        mean,
+        lw=1.8,
+        marker="^",
+        ms=4.5,
+        color=F.BLUE,
+        label="construction (auto)",
+        zorder=4,
+    )
+    F.style_axes(
+        px, title="(c)  free antecedent parameters", xlabel="rules", ylabel="parameters"
+    )
     F.legend(px, loc="upper left", handlelength=2.8)
     px.set_xticks(rules)
 
-    fig.text(0.5, -0.02,
-             "Same data, same split, same closed-form ridge-TSK consequent solve in "
-             "every row — what differs is only how the rules are identified. Bands in "
-             "(a) are ±1 s.d. over seeds and they\noverlap everywhere: three seeds "
-             "cannot separate these curves, and the accuracy ordering is not a result. "
-             "The gap between the two solid blue\nlines and the classical ones in (b) "
-             "is now tens of percent rather than the orders of magnitude this study "
-             "first reported: that gap was an unmatched\nparameter count plus a "
-             "model-selection search the classical route is never asked to do, and (c) "
-             "shows the first of those — on the pinned run all\nthree routes carry "
-             "identical parameter counts, which is why those lines coincide. Timing is "
-             "wall-clock, single-threaded, median of repeats — the one\nplace in this "
-             "study where time rather than iteration count is the quantity of interest. "
-             f"auto: {H.provenance_note(auto_src)} · pinned: {pinned_src}"
-             + (f" · before: {before_src}" if before is not None else ""),
-             ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
-             linespacing=1.6)
+    fig.text(
+        0.5,
+        -0.02,
+        "Same data, same split, same closed-form ridge-TSK consequent solve in "
+        "every row — what differs is only how the rules are identified. Bands in "
+        "(a) are ±1 s.d. over seeds and they\noverlap everywhere: three seeds "
+        "cannot separate these curves, and the accuracy ordering is not a result. "
+        "The gap between the two solid blue\nlines and the classical ones in (b) "
+        "is now tens of percent rather than the orders of magnitude this study "
+        "first reported: that gap was an unmatched\nparameter count plus a "
+        "model-selection search the classical route is never asked to do, and (c) "
+        "shows the first of those — on the pinned run all\nthree routes carry "
+        "identical parameter counts, which is why those lines coincide. Timing is "
+        "wall-clock, single-threaded, median of repeats — the one\nplace in this "
+        "study where time rather than iteration count is the quantity of interest. "
+        f"auto: {H.provenance_note(auto_src)} · pinned: {pinned_src}"
+        + (f" · before: {before_src}" if before is not None else ""),
+        ha="center",
+        va="top",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.6,
+    )
     fig.tight_layout()
     return fig
 

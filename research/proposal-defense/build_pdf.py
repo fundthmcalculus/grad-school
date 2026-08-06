@@ -39,7 +39,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BUILD = os.path.join(HERE, "build")
 
 SECTIONS = [
-    "prose/00-acknowledgements.md",   # front matter; author-written, not generated
+    "prose/00-acknowledgements.md",  # front matter; author-written, not generated
     "prose/01-introduction.md",
     "prose/02-background.md",
     "prose/03-scalable-structure-discovery-pvat.md",
@@ -48,7 +48,7 @@ SECTIONS = [
     "prose/06-hierarchical-refined-fis.md",
     "prose/07-goals-for-completion.md",
     "prose/08-conclusion.md",
-    "chapters/09-publications.md",     # still outline-only (awaiting NAFIPS details)
+    "chapters/09-publications.md",  # still outline-only (awaiting NAFIPS details)
     "prose/10-timeline.md",
     "prose/bibliography.md",
     "prose/appendix.md",
@@ -57,12 +57,17 @@ SECTIONS = [
 TITLE = "Reproducing Like Tribbles"
 SUBTITLE = "Scaling Fuzzy Inference Systems from Hundreds to Hundreds of Thousands"
 AUTHOR = "Scott Phillips"
-COMMITTEE = ("Dr. Kelly Cohen (chair) · Dr. Vladik Kreinovich · Dr. Manish Kumar · "
-             "Dr. Ali Minai · Dr. Justin Zhan")
-DEPT = ("Department of Aerospace Engineering and Engineering Mechanics \\\\ "
-        "College of Engineering and Applied Sciences \\\\ University of Cincinnati")
+COMMITTEE = (
+    "Dr. Kelly Cohen (chair) · Dr. Vladik Kreinovich · Dr. Manish Kumar · "
+    "Dr. Ali Minai · Dr. Justin Zhan"
+)
+DEPT = (
+    "Department of Aerospace Engineering and Engineering Mechanics \\\\ "
+    "College of Engineering and Applied Sciences \\\\ University of Cincinnati"
+)
 
 LATEX_ENGINES = ["xelatex", "lualatex", "pdflatex", "tectonic"]
+
 
 # Map from the harness output names to the prose figure names.
 # Key: basename as output by reproduce/tables via common.save_figure()
@@ -77,10 +82,15 @@ def _figure_copies():
     try:
         sys.path.insert(0, os.path.abspath(figures_dir))
         import registry
+
         return registry.figure_copies()
-    except Exception as exc:  # noqa: BLE001 -- report and fall back, never abort a build
-        print(f"  [warn] figure registry unavailable ({exc.__class__.__name__}); "
-              f"copying only the Chapter 3 complexity fit")
+    except (
+        Exception
+    ) as exc:  # noqa: BLE001 -- report and fall back, never abort a build
+        print(
+            f"  [warn] figure registry unavailable ({exc.__class__.__name__}); "
+            f"copying only the Chapter 3 complexity fit"
+        )
         return {"fig_03_complexity_fit": "03-complexity-fit"}
 
 
@@ -138,8 +148,10 @@ def read(rel):
 def replace_mermaid(md):
     """Mermaid source is meaningless in print; the ASCII quarter grid that follows
     it in Ch. 10 is the print rendering of the same schedule."""
-    note = ("*The Gantt chart is maintained as an interactive figure; the quarter "
-            "grid below is the print rendering of the same schedule.*")
+    note = (
+        "*The Gantt chart is maintained as an interactive figure; the quarter "
+        "grid below is the print rendering of the same schedule.*"
+    )
     return re.sub(r"```mermaid.*?```", note, md, flags=re.DOTALL)
 
 
@@ -166,18 +178,21 @@ def strip_editorial(md, src_dir=None, image_status=None):
     md = strip_html_comments(replace_mermaid(md))
     if image_status is None:
         image_status = {}
-    included = image_status.setdefault('included', [])
-    missing = image_status.setdefault('missing', [])
+    included = image_status.setdefault("included", [])
+    missing = image_status.setdefault("missing", [])
 
     out = []
     for line in md.split("\n"):
         s = line.strip()
-        if re.match(r"^\*\*(Status|Repo|Mirrors|Length target|Name|Role note|"
-                    r"One-line claim):", s):
+        if re.match(
+            r"^\*\*(Status|Repo|Mirrors|Length target|Name|Role note|"
+            r"One-line claim):",
+            s,
+        ):
             continue
         if s.startswith("*Draft —") or s.startswith("*Source of truth:"):
             continue
-        m = re.match(r"^`!\[.*\]\((.*)\)`$", s)      # image reference lines
+        m = re.match(r"^`!\[.*\]\((.*)\)`$", s)  # image reference lines
         if m:
             # Strip the line only while the figure is still a PLACEHOLDER. Once
             # the file exists, emit it as a real image so a generated figure
@@ -199,13 +214,16 @@ def strip_editorial(md, src_dir=None, image_status=None):
 def assemble():
     os.makedirs(BUILD, exist_ok=True)
     parts = []
-    image_status = {'included': [], 'missing': []}
+    image_status = {"included": [], "missing": []}
     for rel in SECTIONS:
         md = read(rel)
         if md is None:
             continue
-        parts.append(strip_editorial(md, os.path.dirname(os.path.join(HERE, rel)),
-                                    image_status=image_status))
+        parts.append(
+            strip_editorial(
+                md, os.path.dirname(os.path.join(HERE, rel)), image_status=image_status
+            )
+        )
         print(f"  + {rel}")
     combined = "\n\n\n".join(parts)
     md_path = os.path.join(BUILD, "proposal-combined.md")
@@ -214,13 +232,13 @@ def assemble():
     print(f"  wrote {md_path}")
 
     # Report image injection status
-    if image_status['included'] or image_status['missing']:
+    if image_status["included"] or image_status["missing"]:
         print(f"\n  image injection:")
-        if image_status['included']:
-            for img in image_status['included']:
+        if image_status["included"]:
+            for img in image_status["included"]:
                 print(f"    ✓ {img}")
-        if image_status['missing']:
-            for img in image_status['missing']:
+        if image_status["missing"]:
+            for img in image_status["missing"]:
                 print(f"    ✗ {img} (placeholder stripped)")
 
     return md_path
@@ -235,6 +253,7 @@ def pandoc_bin():
         return "pandoc"
     try:
         import pypandoc
+
         return pypandoc.get_pandoc_path()
     except Exception:
         return None
@@ -301,13 +320,22 @@ def build_with_latex(md_path, pandoc, engine):
     with open(src, "w", encoding="utf-8") as f:
         f.write(title_page + body)
     prose_dir = os.path.join(HERE, "prose")
-    cmd = [pandoc, src, "-o", pdf,
-           f"--pdf-engine={engine}",
-           "--from", "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks",
-           "-V", "linkcolor=blue",
-           "--wrap=preserve",
-           "--resource-path", prose_dir,
-           "-V", "titlepage=true"]
+    cmd = [
+        pandoc,
+        src,
+        "-o",
+        pdf,
+        f"--pdf-engine={engine}",
+        "--from",
+        "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks",
+        "-V",
+        "linkcolor=blue",
+        "--wrap=preserve",
+        "--resource-path",
+        prose_dir,
+        "-V",
+        "titlepage=true",
+    ]
     print(f"  pandoc + {engine} ...")
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
@@ -326,10 +354,21 @@ def build_with_weasyprint(md_path, pandoc):
 
     html_path = os.path.join(BUILD, "proposal.html")
     prose_dir = os.path.join(HERE, "prose")
-    cmd = [pandoc, md_path, "-o", html_path, "--standalone", "--mathml",
-           "--from", "markdown+tex_math_dollars+pipe_tables", "--wrap=preserve",
-           "--metadata", f"title={TITLE}",
-           "--resource-path", prose_dir]
+    cmd = [
+        pandoc,
+        md_path,
+        "-o",
+        html_path,
+        "--standalone",
+        "--mathml",
+        "--from",
+        "markdown+tex_math_dollars+pipe_tables",
+        "--wrap=preserve",
+        "--metadata",
+        f"title={TITLE}",
+        "--resource-path",
+        prose_dir,
+    ]
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         print(res.stderr[-1500:])
@@ -350,7 +389,9 @@ def build_with_weasyprint(md_path, pandoc):
     # the interim PDF at least shows each formula once. (The real fix is a LaTeX
     # engine -- see main().)
     html = re.sub(r"<annotation\b[^>]*>.*?</annotation>", "", html, flags=re.DOTALL)
-    with open(html_path, "w", encoding="utf-8") as f:      # keep the on-disk HTML in sync with the PDF
+    with open(
+        html_path, "w", encoding="utf-8"
+    ) as f:  # keep the on-disk HTML in sync with the PDF
         f.write(html)
 
     css = CSS(string="""
@@ -393,6 +434,7 @@ def page_count(pdf):
     """Extract page count from PDF using pdfinfo or fallback parsing."""
     try:
         import subprocess
+
         result = subprocess.run(["pdfinfo", pdf], capture_output=True, text=True)
         if result.returncode == 0:
             for line in result.stdout.split("\n"):
@@ -442,19 +484,29 @@ def main():
         # and every image resolves on this host; only the PDF stage is blocked, so the
         # instruction is the whole value of this branch.
         print("  [note] No LaTeX engine found (xelatex/lualatex/pdflatex/tectonic).")
-        print("         The combined Markdown above is complete; only the PDF needs one.")
+        print(
+            "         The combined Markdown above is complete; only the PDF needs one."
+        )
         print("         For publication-grade math, install one:")
         if sys.platform == "win32":
             print("           winget install MiKTeX.MiKTeX      (or TeX Live, or")
-            print("           tectonic -- a single self-contained binary, smallest option)")
+            print(
+                "           tectonic -- a single self-contained binary, smallest option)"
+            )
             print("         WeasyPrint is NOT a usable fallback here: it needs the GTK")
             print("         libraries (libgobject-2.0-0), which Windows does not ship.")
         elif sys.platform == "darwin":
-            print("           brew install --cask mactex-no-gui   (or `brew install tectonic`)")
+            print(
+                "           brew install --cask mactex-no-gui   (or `brew install tectonic`)"
+            )
         else:
-            print("           apt:    sudo apt install texlive-xetex texlive-latex-recommended")
-            print("           zypper: sudo zypper install texlive-xetex texlive-latex "
-                  "texlive-collection-fontsrecommended")
+            print(
+                "           apt:    sudo apt install texlive-xetex texlive-latex-recommended"
+            )
+            print(
+                "           zypper: sudo zypper install texlive-xetex texlive-latex "
+                "texlive-collection-fontsrecommended"
+            )
             print("           or:     cargo install tectonic")
         print("         Falling back to pandoc --mathml + WeasyPrint for now.")
 

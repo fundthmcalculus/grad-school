@@ -62,81 +62,133 @@ from typing import Optional
 
 @dataclass(frozen=True)
 class Figure:
-    name: str                       # prose/fig/<name>.png
-    number: str                     # as cited in the text, e.g. "5.2"
-    title: str                      # one line, for the driver's output
-    module: Optional[str] = None    # reproduce/figures/<module>.py
-    project: Optional[str] = None   # uv --project, or None for a bare env
-    extras: tuple = ()              # uv --with packages
-    skip: Optional[str] = None      # why this one is not drawn, if it is not
-    owner: Optional[str] = None     # generator, when it is not `module`
-    archive: Optional[str] = None   # REPRO_ARCHIVE label to read; None = newest
+    name: str  # prose/fig/<name>.png
+    number: str  # as cited in the text, e.g. "5.2"
+    title: str  # one line, for the driver's output
+    module: Optional[str] = None  # reproduce/figures/<module>.py
+    project: Optional[str] = None  # uv --project, or None for a bare env
+    extras: tuple = ()  # uv --with packages
+    skip: Optional[str] = None  # why this one is not drawn, if it is not
+    owner: Optional[str] = None  # generator, when it is not `module`
+    archive: Optional[str] = None  # REPRO_ARCHIVE label to read; None = newest
     document: Optional[str] = None  # where it appears, if not the numbered prose
 
 
 FIGURES = [
     # -- Chapter 1 ---------------------------------------------------------- #
-    Figure("01-structure-before-search", "1.1",
-           "Conventional search-first route against the structure-first route",
-           module="fig_01_structure_before_search", extras=("matplotlib",)),
-    Figure("01-pipeline-roadmap", "1.2",
-           "The end-to-end pipeline, annotated with chapters and claims",
-           module="fig_01_pipeline_roadmap", extras=("matplotlib",)),
-
+    Figure(
+        "01-structure-before-search",
+        "1.1",
+        "Conventional search-first route against the structure-first route",
+        module="fig_01_structure_before_search",
+        extras=("matplotlib",),
+    ),
+    Figure(
+        "01-pipeline-roadmap",
+        "1.2",
+        "The end-to-end pipeline, annotated with chapters and claims",
+        module="fig_01_pipeline_roadmap",
+        extras=("matplotlib",),
+    ),
     # -- Chapter 2 ---------------------------------------------------------- #
-    Figure("02-fis-components", "2.1",
-           "FIS anatomy: what this work generates against what is fixed by design",
-           module="fig_02_fis_components", extras=("matplotlib",)),
-    Figure("02-vat-rdi", "2.2",
-           "A dissimilarity matrix before and after VAT reordering",
-           module="fig_02_vat_rdi", project="tribble-cluster",
-           extras=("matplotlib", "scipy")),
-    Figure("02-persistence", "2.3",
-           "Single-linkage dendrogram and its persistence diagram",
-           module="fig_02_persistence", extras=("matplotlib", "scipy", "numpy")),
-
+    Figure(
+        "02-fis-components",
+        "2.1",
+        "FIS anatomy: what this work generates against what is fixed by design",
+        module="fig_02_fis_components",
+        extras=("matplotlib",),
+    ),
+    Figure(
+        "02-vat-rdi",
+        "2.2",
+        "A dissimilarity matrix before and after VAT reordering",
+        module="fig_02_vat_rdi",
+        project="tribble-cluster",
+        extras=("matplotlib", "scipy"),
+    ),
+    Figure(
+        "02-persistence",
+        "2.3",
+        "Single-linkage dendrogram and its persistence diagram",
+        module="fig_02_persistence",
+        extras=("matplotlib", "scipy", "numpy"),
+    ),
     # -- Chapter 3 ---------------------------------------------------------- #
-    Figure("03-pvat-reorder", "3.1",
-           "The mergeVAT reorder against the classical linear-scan argmin",
-           module="fig_03_pvat_reorder", extras=("matplotlib",)),
-    Figure("03-complexity-fit", "3.2",
-           "Measured reorder growth against the reference complexity curves",
-           owner="reproduce/tables/table_3_1_reorder_three_arm.py"),
-
+    Figure(
+        "03-pvat-reorder",
+        "3.1",
+        "The mergeVAT reorder against the classical linear-scan argmin",
+        module="fig_03_pvat_reorder",
+        extras=("matplotlib",),
+    ),
+    Figure(
+        "03-complexity-fit",
+        "3.2",
+        "Measured reorder growth against the reference complexity curves",
+        owner="reproduce/tables/table_3_1_reorder_three_arm.py",
+    ),
     # -- Chapter 4 ---------------------------------------------------------- #
-    Figure("04-mog-classification", "4.1",
-           "Per-feature Gaussian mixtures and the fuzzy-OR that forms a class rule",
-           module="fig_04_mog_classification", project="tribble-fis",
-           extras=("matplotlib",)),
-    Figure("04-anomaly-sweep", "4.2",
-           "The open-set operating curve of Table 4.6",
-           module="fig_04_anomaly_sweep", extras=("matplotlib",)),
-    Figure("04-rtiot-confusion", "4.3",
-           "The correction-rule pass, quantified on Glass (MF count and accuracy)",
-           module="fig_04_correction_pass", extras=("matplotlib",),
-           archive="mf-dedup-2026-08-05"),
-
+    Figure(
+        "04-mog-classification",
+        "4.1",
+        "Per-feature Gaussian mixtures and the fuzzy-OR that forms a class rule",
+        module="fig_04_mog_classification",
+        project="tribble-fis",
+        extras=("matplotlib",),
+    ),
+    Figure(
+        "04-anomaly-sweep",
+        "4.2",
+        "The open-set operating curve of Table 4.6",
+        module="fig_04_anomaly_sweep",
+        extras=("matplotlib",),
+    ),
+    Figure(
+        "04-rtiot-confusion",
+        "4.3",
+        "The correction-rule pass, quantified on Glass (MF count and accuracy)",
+        module="fig_04_correction_pass",
+        extras=("matplotlib",),
+        archive="mf-dedup-2026-08-05",
+    ),
     # -- Chapter 5 ---------------------------------------------------------- #
-    Figure("05-minimax-transform", "5.1",
-           "Concentric rings: raw dissimilarity against the minimax transform",
-           module="fig_05_minimax_transform",
-           extras=("matplotlib", "scipy", "numpy", "scikit-learn")),
-    Figure("05-band-discovery", "5.2",
-           "Band discovery on the log-birth spectrum, and the partitions it yields",
-           module="fig_05_band_discovery",
-           extras=("matplotlib", "scipy", "numpy", "scikit-learn")),
-    Figure("05-persistence-ramp", "5.3",
-           "A block's persistence ramp, read off the hierarchy",
-           module="fig_05_persistence_ramp", extras=("matplotlib", "scipy", "numpy")),
-
+    Figure(
+        "05-minimax-transform",
+        "5.1",
+        "Concentric rings: raw dissimilarity against the minimax transform",
+        module="fig_05_minimax_transform",
+        extras=("matplotlib", "scipy", "numpy", "scikit-learn"),
+    ),
+    Figure(
+        "05-band-discovery",
+        "5.2",
+        "Band discovery on the log-birth spectrum, and the partitions it yields",
+        module="fig_05_band_discovery",
+        extras=("matplotlib", "scipy", "numpy", "scikit-learn"),
+    ),
+    Figure(
+        "05-persistence-ramp",
+        "5.3",
+        "A block's persistence ramp, read off the hierarchy",
+        module="fig_05_persistence_ramp",
+        extras=("matplotlib", "scipy", "numpy"),
+    ),
     # -- Chapter 6 ---------------------------------------------------------- #
-    Figure("06-fuzzy-tree", "6.1",
-           "A trained fuzzy tree on Concrete and on PhiUSIIL, as rules",
-           module="fig_06_fuzzy_tree", project="tribble-fis",
-           extras=("matplotlib",)),
-    Figure("06-hme-structure", "6.2",
-           "Hierarchical mixture: gates over named inputs routing to TSK experts",
-           module="fig_06_hme_structure", extras=("matplotlib",)),
+    Figure(
+        "06-fuzzy-tree",
+        "6.1",
+        "A trained fuzzy tree on Concrete and on PhiUSIIL, as rules",
+        module="fig_06_fuzzy_tree",
+        project="tribble-fis",
+        extras=("matplotlib",),
+    ),
+    Figure(
+        "06-hme-structure",
+        "6.2",
+        "Hierarchical mixture: gates over named inputs routing to TSK experts",
+        module="fig_06_hme_structure",
+        extras=("matplotlib",),
+    ),
     # -- The §6.3.5 studies -------------------------------------------------- #
     #
     # Not numbered prose figures. They illustrate `reproduce/optimizers/
@@ -151,26 +203,42 @@ FIGURES = [
     # two `fit_gaussians` defects were fixed (RESULTS Addendum 4; the fix is
     # tribble-fis PR #72, which the parent repo now pins), and the pre-fix
     # archives are superseded. The `kmbic` labels are the post-fix runs.
-    Figure("07-optimizer-hotstart", "-",
-           "Held-out R2 against evaluation budget, hot start against cold",
-           module="fig_07_optimizer_hotstart", extras=("matplotlib",),
-           archive="opt-hotcold-kmbic-2026-08-03",
-           document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 5"),
-    Figure("08-identification", "-",
-           "Concrete: the classical identification route against the construction",
-           module="fig_08_identification", extras=("matplotlib",),
-           archive="opt-identification-kmbic-pinned-2026-08-03",
-           document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 4"),
-    Figure("09-phishing-scaling", "-",
-           "PhiUSIIL: how the identification routes scale, and where the cost is",
-           module="fig_09_phishing_scaling", extras=("matplotlib",),
-           archive="opt-phishing-kmbic-pinned-2026-08-03",
-           document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 4"),
-    Figure("10-convergence", "-",
-           "Full convergence traces, and how much of the objective gain converts",
-           module="fig_10_convergence", extras=("matplotlib",),
-           archive="opt-hotcold-kmbic-2026-08-03",
-           document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 6"),
+    Figure(
+        "07-optimizer-hotstart",
+        "-",
+        "Held-out R2 against evaluation budget, hot start against cold",
+        module="fig_07_optimizer_hotstart",
+        extras=("matplotlib",),
+        archive="opt-hotcold-kmbic-2026-08-03",
+        document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 5",
+    ),
+    Figure(
+        "08-identification",
+        "-",
+        "Concrete: the classical identification route against the construction",
+        module="fig_08_identification",
+        extras=("matplotlib",),
+        archive="opt-identification-kmbic-pinned-2026-08-03",
+        document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 4",
+    ),
+    Figure(
+        "09-phishing-scaling",
+        "-",
+        "PhiUSIIL: how the identification routes scale, and where the cost is",
+        module="fig_09_phishing_scaling",
+        extras=("matplotlib",),
+        archive="opt-phishing-kmbic-pinned-2026-08-03",
+        document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 4",
+    ),
+    Figure(
+        "10-convergence",
+        "-",
+        "Full convergence traces, and how much of the objective gain converts",
+        module="fig_10_convergence",
+        extras=("matplotlib",),
+        archive="opt-hotcold-kmbic-2026-08-03",
+        document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 6",
+    ),
     # Addendum 8 re-ran the HOT arms at ten seeds (`opt-phishing-hot10-2026-08-03`)
     # and found the first real arm ordering. These two figures stay on the
     # three-seed hot/cold run because they draw a cold column beside every hot one
@@ -178,16 +246,24 @@ FIGURES = [
     # seeds wide where a ten-seed measurement now exists for half the panel. Worth
     # a redraw once a ten-seed cold arm is run; not worth mixing two seed counts
     # into one panel before then.
-    Figure("11-phishing-optimizer", "-",
-           "PhiUSIIL: objective and test error per arm, with seed spreads",
-           module="fig_11_phishing_optimizer", extras=("matplotlib",),
-           archive="opt-phishing-hotcold-2026-08-03",
-           document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 7"),
-    Figure("12-phishing-timing", "-",
-           "PhiUSIIL: what construction costs against what searching costs",
-           module="fig_12_phishing_timing", extras=("matplotlib",),
-           archive="opt-phishing-hotcold-2026-08-03",
-           document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 7"),
+    Figure(
+        "11-phishing-optimizer",
+        "-",
+        "PhiUSIIL: objective and test error per arm, with seed spreads",
+        module="fig_11_phishing_optimizer",
+        extras=("matplotlib",),
+        archive="opt-phishing-hotcold-2026-08-03",
+        document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 7",
+    ),
+    Figure(
+        "12-phishing-timing",
+        "-",
+        "PhiUSIIL: what construction costs against what searching costs",
+        module="fig_12_phishing_timing",
+        extras=("matplotlib",),
+        archive="opt-phishing-hotcold-2026-08-03",
+        document="reproduce/optimizers/RESULTS_2026-08-02.md, Addendum 7",
+    ),
 ]
 
 BY_NAME = {f.name: f for f in FIGURES}
@@ -217,5 +293,4 @@ def figure_copies():
     cannot drift apart -- adding a figure here is the only edit needed to get it
     into the built document.
     """
-    return {harness_name(f.name): f.name
-            for f in prose_figures() if f.skip is None}
+    return {harness_name(f.name): f.name for f in prose_figures() if f.skip is None}

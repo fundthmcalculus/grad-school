@@ -49,6 +49,7 @@ SIGMA_FLOOR_FRAC = 0.02
 def _slot_groups(model):
     """{(feature, label): [(slot_index, component_index), ...]} in slot order."""
     from tribblefis.refine import _iter_gaussian_slots
+
     groups, n = {}, 0
     for pos, (fname, label, i, _mf) in enumerate(_iter_gaussian_slots(model)):
         groups.setdefault((fname, label), []).append((pos, i))
@@ -58,11 +59,13 @@ def _slot_groups(model):
 
 def _kmeans_1d(values, k, seed):
     from sklearn.cluster import KMeans
+
     km = KMeans(n_clusters=k, n_init=10, random_state=seed).fit(values.reshape(-1, 1))
     centres = km.cluster_centers_.ravel()
     labels = km.labels_
-    spreads = np.array([values[labels == j].std() if np.any(labels == j) else 0.0
-                        for j in range(k)])
+    spreads = np.array(
+        [values[labels == j].std() if np.any(labels == j) else 0.0 for j in range(k)]
+    )
     return centres, spreads
 
 
@@ -74,16 +77,23 @@ def _fcm_1d(values, k, m=2.0):
     the algorithm uses to place the centre it is being measured around.
     """
     from tribbleclustering.fcm import fuzzy_c_means
+
     centres, u = fuzzy_c_means(values.reshape(-1, 1), k, m)
     centres = np.asarray(centres, dtype=float).ravel()
     u = np.asarray(u, dtype=float)
-    if u.shape[0] != len(values):          # tolerate (k, n) orientation
+    if u.shape[0] != len(values):  # tolerate (k, n) orientation
         u = u.T
-    w = u ** m
-    spreads = np.array([
-        float(np.sqrt(np.average((values - centres[j]) ** 2,
-                                 weights=w[:, j]))) if w[:, j].sum() > 0 else 0.0
-        for j in range(k)])
+    w = u**m
+    spreads = np.array(
+        [
+            (
+                float(np.sqrt(np.average((values - centres[j]) ** 2, weights=w[:, j])))
+                if w[:, j].sum() > 0
+                else 0.0
+            )
+            for j in range(k)
+        ]
+    )
     return centres, spreads
 
 
@@ -112,8 +122,11 @@ def cluster_params(model, X_train, y_train, method, seed=0, bounds=None):
             # study needs a valid starting point from every method on every
             # seed, and a degenerate slot is a fair thing for the method to be
             # judged on rather than a reason to drop the cell.
-            centres = np.linspace(values.min(), values.max(), k) if len(values) \
+            centres = (
+                np.linspace(values.min(), values.max(), k)
+                if len(values)
                 else np.linspace(col.min(), col.max(), k)
+            )
             spreads = np.full(k, floor)
         elif method == "kmeans":
             centres, spreads = _kmeans_1d(values, k, seed)
@@ -122,9 +135,9 @@ def cluster_params(model, X_train, y_train, method, seed=0, bounds=None):
         else:
             raise ValueError(f"unknown method {method!r}")
 
-        order = np.argsort(centres)         # stable slot->component assignment
+        order = np.argsort(centres)  # stable slot->component assignment
         centres, spreads = centres[order], spreads[order]
-        for (pos, i) in members:
+        for pos, i in members:
             j = min(i, k - 1)
             vec[2 * pos] = centres[j]
             vec[2 * pos + 1] = max(float(spreads[j]), floor)

@@ -23,14 +23,19 @@ import os
 import pandas as pd
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DATA_DIR = os.environ.get("PILOT_DATA_DIR",
-                           os.path.join(REPO_ROOT, "data", "regression_scale"))
+DATA_DIR = os.environ.get(
+    "PILOT_DATA_DIR", os.path.join(REPO_ROOT, "data", "regression_scale")
+)
 
-HOUSING_URL = ("https://raw.githubusercontent.com/ageron/handson-ml2/master/"
-               "datasets/housing/housing.csv")
-SUPERCONDUCT_URL = ("https://raw.githubusercontent.com/monica110394/"
-                     "Predicting-the-Critical-Temperature-of-a-Superconductor/"
-                     "master/train.csv")
+HOUSING_URL = (
+    "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
+    "datasets/housing/housing.csv"
+)
+SUPERCONDUCT_URL = (
+    "https://raw.githubusercontent.com/monica110394/"
+    "Predicting-the-Critical-Temperature-of-a-Superconductor/"
+    "master/train.csv"
+)
 
 
 def _cached(name, url):
@@ -39,8 +44,10 @@ def _cached(name, url):
         os.makedirs(DATA_DIR, exist_ok=True)
         df = pd.read_csv(url)
         df.to_csv(path, index=False)
-        print(f"  [{name}] fetched from mirror, cached -> "
-              f"{os.path.relpath(path, REPO_ROOT)}")
+        print(
+            f"  [{name}] fetched from mirror, cached -> "
+            f"{os.path.relpath(path, REPO_ROOT)}"
+        )
     return pd.read_csv(path)
 
 

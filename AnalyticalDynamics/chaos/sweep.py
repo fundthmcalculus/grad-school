@@ -56,12 +56,18 @@ def configs(quick=False):
     out.append(FisConfig(n_output_buckets=300, tsk_order="2nd"))
     out.append(FisConfig(n_output_buckets=300, tsk_order="full-2nd", l2_reg=1e-4))
     out.append(FisConfig(n_output_buckets=300, tsk_order="full-2nd", l2_reg=1e-9))
-    out.append(FisConfig(n_output_buckets=300, tsk_order="full-2nd", output_partition="quantile"))
+    out.append(
+        FisConfig(
+            n_output_buckets=300, tsk_order="full-2nd", output_partition="quantile"
+        )
+    )
     # Low-capacity / coarse-membership region: the only place held-out-IC score
     # on the frictionless problems ever improved.
     for ng in (4, 8):
         out.append(FisConfig(n_output_buckets=40, n_gaussians=ng))
-        out.append(FisConfig(n_output_buckets=120, n_gaussians=ng, tsk_order="full-2nd"))
+        out.append(
+            FisConfig(n_output_buckets=120, n_gaussians=ng, tsk_order="full-2nd")
+        )
     # Retained to document the failure, not because it is expected to win.
     out.append(FisConfig(n_output_buckets=120, encoding="harmonic", n_harmonics=8))
     return out
@@ -70,10 +76,19 @@ def configs(quick=False):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--quick", action="store_true", help="4-config smoke subset")
-    ap.add_argument("--n", type=int, nargs="+", default=list(N_LINKS),
-                    metavar="N", help=f"chain lengths to sweep (default {list(N_LINKS)})")
-    ap.add_argument("--out", metavar="NAME",
-                    help="output CSV name under results/ (default sweep.csv)")
+    ap.add_argument(
+        "--n",
+        type=int,
+        nargs="+",
+        default=list(N_LINKS),
+        metavar="N",
+        help=f"chain lengths to sweep (default {list(N_LINKS)})",
+    )
+    ap.add_argument(
+        "--out",
+        metavar="NAME",
+        help="output CSV name under results/ (default sweep.csv)",
+    )
     args = ap.parse_args()
 
     quick = args.quick
@@ -87,8 +102,11 @@ def main():
     total = len(datasets) * len(cfgs)
     done = 0
     t_start = time.perf_counter()
-    print(f"sweeping {[pdata.system_name(n) for n in args.n]} x "
-          f"{{frictionless, friction}} x {len(cfgs)} configs -> {path.name}", flush=True)
+    print(
+        f"sweeping {[pdata.system_name(n) for n in args.n]} x "
+        f"{{frictionless, friction}} x {len(cfgs)} configs -> {path.name}",
+        flush=True,
+    )
 
     for n_links, friction in datasets:
         split = load(n_links, friction)
@@ -111,8 +129,13 @@ def main():
                     f"FAILED {type(exc).__name__}: {exc}",
                     flush=True,
                 )
-                rows.append({"dataset": split.label, "config": cfg.key(),
-                             "error": f"{type(exc).__name__}: {exc}"})
+                rows.append(
+                    {
+                        "dataset": split.label,
+                        "config": cfg.key(),
+                        "error": f"{type(exc).__name__}: {exc}",
+                    }
+                )
 
     fields = []
     for r in rows:

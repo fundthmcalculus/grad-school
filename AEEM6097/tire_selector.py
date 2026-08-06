@@ -42,22 +42,22 @@ plt.figure(figsize=(14, 10))
 
 # Plot 1: Cost matrix heatmap (VAT visualization)
 plt.subplot(2, 2, 1)
-plt.imshow(cost_matrix, cmap='viridis', interpolation='nearest')
-plt.colorbar(label='Stagger magnitude')
-plt.title('Stagger Cost Matrix')
-plt.xlabel('Right Tire Index')
-plt.ylabel('Left Tire Index')
+plt.imshow(cost_matrix, cmap="viridis", interpolation="nearest")
+plt.colorbar(label="Stagger magnitude")
+plt.title("Stagger Cost Matrix")
+plt.xlabel("Right Tire Index")
+plt.ylabel("Left Tire Index")
 
 # Plot 2: Optimal pairings
 plt.subplot(2, 2, 2)
-plt.scatter(tires_l, tires_r, alpha=0.3, label='All possible pairs')
+plt.scatter(tires_l, tires_r, alpha=0.3, label="All possible pairs")
 for i in range(N_tires):
-    plt.plot([tires_l[row_ind[i]], tires_r[col_ind[i]]], [i, i], 'r-', alpha=0.7)
-    plt.text(tires_l[row_ind[i]]-3, i, f"{tires_l[row_ind[i]]}", fontsize=8)
-    plt.text(tires_r[col_ind[i]]+3, i, f"{tires_r[col_ind[i]]}", fontsize=8)
-plt.title('Optimal Tire Pairings')
-plt.xlabel('Tire Circumference')
-plt.ylabel('Pair Index')
+    plt.plot([tires_l[row_ind[i]], tires_r[col_ind[i]]], [i, i], "r-", alpha=0.7)
+    plt.text(tires_l[row_ind[i]] - 3, i, f"{tires_l[row_ind[i]]}", fontsize=8)
+    plt.text(tires_r[col_ind[i]] + 3, i, f"{tires_r[col_ind[i]]}", fontsize=8)
+plt.title("Optimal Tire Pairings")
+plt.xlabel("Tire Circumference")
+plt.ylabel("Pair Index")
 plt.grid(True, alpha=0.3)
 
 # Plot 3: Stagger by pair
@@ -65,13 +65,13 @@ plt.subplot(2, 2, 3)
 bars = plt.bar(range(N_tires), sorted_stagger)
 for i, bar in enumerate(bars):
     if sorted_stagger[i] < 0:
-        bar.set_color('blue')
+        bar.set_color("blue")
     else:
-        bar.set_color('red')
-plt.axhline(y=0, color='k', linestyle='-', alpha=0.3)
-plt.title(f'Stagger by Pair (Avg: {avg_stagger:.2f}, Max: {max_stagger:.2f})')
-plt.xlabel('Sorted Pair Index')
-plt.ylabel('Stagger (Left - Right)')
+        bar.set_color("red")
+plt.axhline(y=0, color="k", linestyle="-", alpha=0.3)
+plt.title(f"Stagger by Pair (Avg: {avg_stagger:.2f}, Max: {max_stagger:.2f})")
+plt.xlabel("Sorted Pair Index")
+plt.ylabel("Stagger (Left - Right)")
 plt.grid(True, alpha=0.3)
 
 # Plot 4: Comparison with naive approach
@@ -94,12 +94,12 @@ alt_avg_stagger = np.mean(np.abs(alt_stagger))
 width = 0.25
 x = np.arange(3)
 plt.bar(x, [avg_stagger, naive_avg_stagger, alt_avg_stagger])
-plt.xticks(x, ['Optimal', 'Naive\n(Both Sorted)', 'Alternative\n(Opposite Sorted)'])
-plt.ylabel('Average Absolute Stagger')
-plt.title('Comparison of Pairing Strategies')
+plt.xticks(x, ["Optimal", "Naive\n(Both Sorted)", "Alternative\n(Opposite Sorted)"])
+plt.ylabel("Average Absolute Stagger")
+plt.title("Comparison of Pairing Strategies")
 
 plt.tight_layout()
-plt.savefig('tire_stagger_analysis.png', dpi=300)
+plt.savefig("tire_stagger_analysis.png", dpi=300)
 plt.show()
 
 # Print results
@@ -109,4 +109,6 @@ print(f"Maximum Stagger: {max_stagger}")
 print(f"Minimum Stagger: {min_stagger}")
 print("\nOptimal Pairings (Left, Right, Stagger):")
 for i in range(N_tires):
-    print(f"Pair {i+1}: Left={optimal_pairs[i,0]}, Right={optimal_pairs[i,1]}, Stagger={pair_stagger[i]}")
+    print(
+        f"Pair {i+1}: Left={optimal_pairs[i,0]}, Right={optimal_pairs[i,1]}, Stagger={pair_stagger[i]}"
+    )

@@ -37,12 +37,25 @@ import harness_data as H  # noqa: E402
 
 NAME = "12-phishing-timing"
 
-ARM_ORDER = ["scipy-lbfgsb", "scipy-powell", "scipy-de",
-             "opt-ga", "opt-pso", "opt-aco", "opt-gd"]
+ARM_ORDER = [
+    "scipy-lbfgsb",
+    "scipy-powell",
+    "scipy-de",
+    "opt-ga",
+    "opt-pso",
+    "opt-aco",
+    "opt-gd",
+]
 COLOUR = {a: F.SERIES[i % len(F.SERIES)] for i, a in enumerate(ARM_ORDER)}
-LABEL = {"scipy-lbfgsb": "L-BFGS-B", "scipy-powell": "Powell",
-         "scipy-de": "DE (scipy)", "opt-ga": "GA", "opt-pso": "PSO",
-         "opt-aco": "ACO", "opt-gd": "GD"}
+LABEL = {
+    "scipy-lbfgsb": "L-BFGS-B",
+    "scipy-powell": "Powell",
+    "scipy-de": "DE (scipy)",
+    "opt-ga": "GA",
+    "opt-pso": "PSO",
+    "opt-aco": "ACO",
+    "opt-gd": "GD",
+}
 INIT_ORDER = ["hot", "cold", "classical-kmeans"]
 INIT_SHORT = {"hot": "hot", "cold": "cold", "classical-kmeans": "k-means"}
 
@@ -68,8 +81,9 @@ def build():
     arms = [a for a in ARM_ORDER if any((a, i) in by for i in inits)]
     n_seeds = len({r["seed"] for r in rows})
 
-    fig, (ax, rx) = F.grid_figure(1, 2, width=F.W_WIDE + 1.6, height=5.6,
-                                 gridspec_kw={"width_ratios": [1.35, 1]})
+    fig, (ax, rx) = F.grid_figure(
+        1, 2, width=F.W_WIDE + 1.6, height=5.6, gridspec_kw={"width_ratios": [1.35, 1]}
+    )
 
     # -- (a) absolute wall-clock -------------------------------------------- #
     ticks, means, sds, colours, matched = [], [], [], [], []
@@ -97,42 +111,82 @@ def build():
                 matched.append(None)
 
     y = np.arange(len(ticks))
-    ax.barh(y, means, xerr=sds, height=0.74, color=colours, zorder=3,
-            error_kw=dict(ecolor=F.INK_2, elinewidth=0.9, capsize=2))
+    ax.barh(
+        y,
+        means,
+        xerr=sds,
+        height=0.74,
+        color=colours,
+        zorder=3,
+        error_kw=dict(ecolor=F.INK_2, elinewidth=0.9, capsize=2),
+    )
     # Labels go past the end of the whisker, not the end of the bar, or they sit
     # on top of it.
     for yi, (m, sd, hit) in enumerate(zip(means, sds, matched)):
         end = (m + sd) * 1.12
         if hit is None:
-            ax.text(end, yi, "never matched", va="center", ha="left",
-                    fontsize=F.FS_SMALL, color=F.MUTED)
+            ax.text(
+                end,
+                yi,
+                "never matched",
+                va="center",
+                ha="left",
+                fontsize=F.FS_SMALL,
+                color=F.MUTED,
+            )
         elif hit[0] == "start":
-            ax.text(end, yi, "starts matched", va="center", ha="left",
-                    fontsize=F.FS_SMALL, color=F.MUTED)
+            ax.text(
+                end,
+                yi,
+                "starts matched",
+                va="center",
+                ha="left",
+                fontsize=F.FS_SMALL,
+                color=F.MUTED,
+            )
         else:
             _kind, secs, k, n = hit
             ax.plot([secs], [yi], marker="o", ms=5.2, color=F.INK, zorder=6)
-            ax.text(end, yi, f"matched at {secs:.0f}s"
-                             + ("" if k == n else f", {k}/{n} seeds"),
-                    va="center", ha="left", fontsize=F.FS_SMALL, color=F.MUTED)
+            ax.text(
+                end,
+                yi,
+                f"matched at {secs:.0f}s" + ("" if k == n else f", {k}/{n} seeds"),
+                va="center",
+                ha="left",
+                fontsize=F.FS_SMALL,
+                color=F.MUTED,
+            )
     if np.isfinite(constr_mean) and constr_mean > 0:
         ax.axvline(constr_mean, lw=1.5, color=F.RED, zorder=5)
         # Horizontal, above the plot area: rotated inside the axes it crossed
         # every bar it was meant to be a reference for.
         # Inside the axes, below the top edge: above it, the label collided with
         # the panel title.
-        ax.annotate(f"the construction: {1000 * constr_mean:.0f} ms",
-                    xy=(constr_mean, 1.0), xycoords=("data", "axes fraction"),
-                    xytext=(4, -4), textcoords="offset points",
-                    ha="left", va="top", fontsize=F.FS_SMALL, color=F.RED)
+        ax.annotate(
+            f"the construction: {1000 * constr_mean:.0f} ms",
+            xy=(constr_mean, 1.0),
+            xycoords=("data", "axes fraction"),
+            xytext=(4, -4),
+            textcoords="offset points",
+            ha="left",
+            va="top",
+            fontsize=F.FS_SMALL,
+            color=F.RED,
+        )
     ax.set_yticks(y)
     ax.set_yticklabels(ticks, fontsize=F.FS_SMALL)
     ax.invert_yaxis()
     ax.set_xscale("log")
-    ax.set_xlim(min(constr_mean * 0.35, min(means) * 0.5),
-                max(m + s for m, s in zip(means, sds)) * 16.0)
-    F.style_axes(ax, title="(a)  wall-clock spent, mean ±1 s.d.",
-                 xlabel="seconds, single-threaded (log)", grid_axis="x")
+    ax.set_xlim(
+        min(constr_mean * 0.35, min(means) * 0.5),
+        max(m + s for m, s in zip(means, sds)) * 16.0,
+    )
+    F.style_axes(
+        ax,
+        title="(a)  wall-clock spent, mean ±1 s.d.",
+        xlabel="seconds, single-threaded (log)",
+        grid_axis="x",
+    )
 
     # -- (b) the portable version: cost of matching, as a multiple ---------- #
     labels, ratios, errs, cols = [], [], [], []
@@ -140,7 +194,7 @@ def build():
         for arm in arms:
             sel = by.get((arm, init))
             if not sel or init == "hot":
-                continue          # a hot arm starts at the construction
+                continue  # a hot arm starts at the construction
             reach = np.array([_f(r, "seconds_to_heuristic") for r in sel])
             reach = reach[np.isfinite(reach) & (reach > 0)]
             if not len(reach) or not np.isfinite(constr_mean) or constr_mean <= 0:
@@ -156,11 +210,25 @@ def build():
         errs = [errs[i] for i in order]
         cols = [cols[i] for i in order]
         y = np.arange(len(labels))
-        rx.barh(y, ratios, xerr=errs, height=0.7, color=cols, zorder=3,
-                error_kw=dict(ecolor=F.INK_2, elinewidth=0.9, capsize=2))
+        rx.barh(
+            y,
+            ratios,
+            xerr=errs,
+            height=0.7,
+            color=cols,
+            zorder=3,
+            error_kw=dict(ecolor=F.INK_2, elinewidth=0.9, capsize=2),
+        )
         for yi, v, e in zip(y, ratios, errs):
-            rx.text((v + e) * 1.10, yi, f"{v:,.0f}×", va="center", ha="left",
-                    fontsize=F.FS_SMALL, color=F.INK_2)
+            rx.text(
+                (v + e) * 1.10,
+                yi,
+                f"{v:,.0f}×",
+                va="center",
+                ha="left",
+                fontsize=F.FS_SMALL,
+                color=F.INK_2,
+            )
         rx.set_yticks(y)
         rx.set_yticklabels(labels, fontsize=F.FS_SMALL)
         rx.invert_yaxis()
@@ -168,30 +236,54 @@ def build():
         rx.set_xscale("log")
         rx.set_xlim(0.5, max(v + e for v, e in zip(ratios, errs)) * 3.0)
     else:
-        rx.text(0.5, 0.5, "no arm reached the construction's\nobjective inside "
-                          "the budget",
-                transform=rx.transAxes, ha="center", va="center",
-                fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.6)
-    F.style_axes(rx, title="(b)  cost of matching the construction,\n"
-                           "÷ the construction's own cost",
-                 xlabel="multiple of the construction's cost (log)",
-                 grid_axis="x")
+        rx.text(
+            0.5,
+            0.5,
+            "no arm reached the construction's\nobjective inside " "the budget",
+            transform=rx.transAxes,
+            ha="center",
+            va="center",
+            fontsize=F.FS_SMALL,
+            color=F.MUTED,
+            linespacing=1.6,
+        )
+    F.style_axes(
+        rx,
+        title="(b)  cost of matching the construction,\n"
+        "÷ the construction's own cost",
+        xlabel="multiple of the construction's cost (log)",
+        grid_axis="x",
+    )
 
-    note = (f"Mean over {n_seeds} seeds. In (a) the whisker is ±1 s.d. of the "
-            f"time spent and the black dot is the mean moment that arm first "
-            f"reached the construction's own\nobjective value; bars with no dot "
-            f"never reached it, which is an answer rather than a gap. (b) drops "
-            f"the hot arms, which start at the construction, and drops any arm "
-            f"that\nnever matched — its cost is a lower bound, not a number. ")
+    note = (
+        f"Mean over {n_seeds} seeds. In (a) the whisker is ±1 s.d. of the "
+        f"time spent and the black dot is the mean moment that arm first "
+        f"reached the construction's own\nobjective value; bars with no dot "
+        f"never reached it, which is an answer rather than a gap. (b) drops "
+        f"the hot arms, which start at the construction, and drops any arm "
+        f"that\nnever matched — its cost is a lower bound, not a number. "
+    )
     if len(screen) and np.isfinite(np.mean(screen)):
-        note += (f"Feature engineering, shared by every route and charged to none "
-                 f"of them, cost {1000 * float(np.mean(screen)):.0f} ms.\n")
-    note += (f"Absolute seconds are machine-dependent and the machine is in the "
-             f"archive; the ratio in (b) is the portable part. Single-threaded "
-             f"throughout, so an arm that\nparallelises well gets no credit. "
-             f"{H.provenance_note(label)}")
-    fig.text(0.5, -0.02, note, ha="center", va="top", fontsize=F.FS_SMALL,
-             color=F.MUTED, linespacing=1.6)
+        note += (
+            f"Feature engineering, shared by every route and charged to none "
+            f"of them, cost {1000 * float(np.mean(screen)):.0f} ms.\n"
+        )
+    note += (
+        f"Absolute seconds are machine-dependent and the machine is in the "
+        f"archive; the ratio in (b) is the portable part. Single-threaded "
+        f"throughout, so an arm that\nparallelises well gets no credit. "
+        f"{H.provenance_note(label)}"
+    )
+    fig.text(
+        0.5,
+        -0.02,
+        note,
+        ha="center",
+        va="top",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.6,
+    )
     fig.tight_layout()
     return fig
 

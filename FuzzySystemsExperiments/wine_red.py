@@ -38,8 +38,10 @@ def main():
     start_time = time.time()
     X, y = load_data()
 
-    print(f"Target 'quality' range: [{y.min():.2f}, {y.max():.2f}], "
-          f"mean={y.mean():.3f}, std={y.std():.3f}")
+    print(
+        f"Target 'quality' range: [{y.min():.2f}, {y.max():.2f}], "
+        f"mean={y.mean():.3f}, std={y.std():.3f}"
+    )
 
     # Feature scaling now lives in a pipeline in front of each estimator (see
     # below) rather than a bare pre-split log. BEHAVIOUR CHANGE, twice over:
@@ -88,7 +90,9 @@ def main():
         y_pred_test = np.round(reg.predict(X_test))
         print(f"\n{order}-order on TEST set:")
         print("=" * 80)
-        r2, rmse = report_regression_performance(start_time, y_test_frame, y_pred_test, n_order=label)
+        r2, rmse = report_regression_performance(
+            start_time, y_test_frame, y_pred_test, n_order=label
+        )
 
         r2_list.append(r2)
         rmse_list.append(rmse)
@@ -108,7 +112,9 @@ def main():
     y_pred_rf = np.round(rf.predict(X_test))
     print("\nRandomForest on TEST set:")
     print("=" * 80)
-    r2_rf, rmse_rf = report_regression_performance(start_time, y_test_frame, y_pred_rf, n_order="RandomForest")
+    r2_rf, rmse_rf = report_regression_performance(
+        start_time, y_test_frame, y_pred_rf, n_order="RandomForest"
+    )
 
     r2_list.append(r2_rf)
     rmse_list.append(rmse_rf)

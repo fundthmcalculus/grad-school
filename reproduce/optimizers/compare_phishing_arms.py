@@ -55,8 +55,10 @@ OUTPUTS = os.path.join(ROOT, "reproduce", "outputs")
 
 #: Arms whose numbers are not a measurement of the named method. Reported, but
 #: never called separable -- see Addendum 7 and fundthmcalculus/optimizers#101.
-SUSPECT = {"opt-pso": "optimizers#101: velocities collapse, swarm restarts each "
-                      "generation -- this row is random sampling"}
+SUSPECT = {
+    "opt-pso": "optimizers#101: velocities collapse, swarm restarts each "
+    "generation -- this row is random sampling"
+}
 
 
 def _sign_test(d):
@@ -67,18 +69,21 @@ def _sign_test(d):
     if n == 0:
         return 1.0, 0, 0
     k = max(pos, neg)
-    tail = sum(math.comb(n, i) for i in range(k, n + 1)) / 2 ** n
+    tail = sum(math.comb(n, i) for i in range(k, n + 1)) / 2**n
     return min(1.0, 2 * tail), pos, neg
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--archive", default="opt-phishing-hot10-2026-08-03")
     ap.add_argument("--init", default="hot")
-    ap.add_argument("--metric", default="acc",
-                    help="column to compare; `acc` (higher better) or `obj` "
-                         "(lower better)")
+    ap.add_argument(
+        "--metric",
+        default="acc",
+        help="column to compare; `acc` (higher better) or `obj` " "(lower better)",
+    )
     args = ap.parse_args()
 
     path = os.path.join(OUTPUTS, args.archive, "table_opt_phishing_seeds.csv")
@@ -100,31 +105,50 @@ def main():
     floor = 2.0 / 2 ** len(seeds)
     print(f"archive: {args.archive}   init: {args.init}   metric: {args.metric}")
     print(f"seeds:   {len(seeds)} common to every arm")
-    print(f"sign-test floor at {len(seeds)} seeds: p >= {floor:.4f}"
-          + ("  -- ABOVE 0.05, so no pair can clear the threshold however clean "
-             "the sweep; this run cannot certify separability"
-             if floor > 0.05 else "  (a clean sweep can clear 0.05)"))
+    print(
+        f"sign-test floor at {len(seeds)} seeds: p >= {floor:.4f}"
+        + (
+            "  -- ABOVE 0.05, so no pair can clear the threshold however clean "
+            "the sweep; this run cannot certify separability"
+            if floor > 0.05
+            else "  (a clean sweep can clear 0.05)"
+        )
+    )
     print()
 
     ref = by.get("none", {})
-    print(f"{'arm':<16}{'mean':>10}{'s.d.':>10}{'errors':>10}"
-          f"{'vs construction (paired)':>28}{'seeds':>8}")
-    for arm in sorted(arms, key=lambda a: -np.mean([by[a][s] for s in seeds])
-                      if higher_better else np.mean([by[a][s] for s in seeds])):
+    print(
+        f"{'arm':<16}{'mean':>10}{'s.d.':>10}{'errors':>10}"
+        f"{'vs construction (paired)':>28}{'seeds':>8}"
+    )
+    for arm in sorted(
+        arms,
+        key=lambda a: (
+            -np.mean([by[a][s] for s in seeds])
+            if higher_better
+            else np.mean([by[a][s] for s in seeds])
+        ),
+    ):
         v = np.array([by[arm][s] for s in seeds])
         d = np.array([by[arm][s] - ref[s] for s in seeds]) if ref else np.zeros(0)
         err = (1.0 - v.mean()) * n_test if higher_better and n_test else None
         won = int(np.sum(d > 0)) if higher_better else int(np.sum(d < 0))
         flag = "  <- see note" if arm in SUSPECT else ""
-        print(f"{arm:<16}{v.mean():>10.5f}{v.std():>10.5f}"
-              f"{('—' if err is None else f'{err:.0f}'):>10}"
-              f"{f'{d.mean():+.5f} ± {d.std():.5f}':>28}"
-              f"{f'{won}/{len(seeds)}':>8}{flag}")
+        print(
+            f"{arm:<16}{v.mean():>10.5f}{v.std():>10.5f}"
+            f"{('—' if err is None else f'{err:.0f}'):>10}"
+            f"{f'{d.mean():+.5f} ± {d.std():.5f}':>28}"
+            f"{f'{won}/{len(seeds)}':>8}{flag}"
+        )
 
-    print("\npairwise, paired over seeds "
-          "(effect = |mean|/s.d.; sign test = exact two-sided binomial)")
-    print(f"{'pair':<30}{'mean Δ':>12}{'s.d.':>10}{'effect':>9}"
-          f"{'signs':>9}{'p':>8}   verdict")
+    print(
+        "\npairwise, paired over seeds "
+        "(effect = |mean|/s.d.; sign test = exact two-sided binomial)"
+    )
+    print(
+        f"{'pair':<30}{'mean Δ':>12}{'s.d.':>10}{'effect':>9}"
+        f"{'signs':>9}{'p':>8}   verdict"
+    )
     verdicts = []
     for a, b in itertools.combinations(sorted(arms), 2):
         d = np.array([by[a][s] - by[b][s] for s in seeds])
@@ -142,16 +166,20 @@ def main():
         else:
             verdict = "not separable"
         verdicts.append((sep, effect, p, a, b, d))
-        print(f"{f'{a} − {b}':<30}{d.mean():>+12.5f}{sd:>10.5f}"
-              f"{effect:>9.2f}{f'{pos}/{pos + neg}':>9}{p:>8.3f}   {verdict}")
+        print(
+            f"{f'{a} − {b}':<30}{d.mean():>+12.5f}{sd:>10.5f}"
+            f"{effect:>9.2f}{f'{pos}/{pos + neg}':>9}{p:>8.3f}   {verdict}"
+        )
 
     sep = [v for v in verdicts if v[0]]
     print()
     if not sep and floor > 0.05:
-        print(f"No pair clears both bars — but at {len(seeds)} seeds none could. "
-              f"Re-read this as 'the run was too small', not 'the arms are the "
-              f"same'.\nThe pairs to watch are those with a large effect and a "
-              f"clean sweep:")
+        print(
+            f"No pair clears both bars — but at {len(seeds)} seeds none could. "
+            f"Re-read this as 'the run was too small', not 'the arms are the "
+            f"same'.\nThe pairs to watch are those with a large effect and a "
+            f"clean sweep:"
+        )
         for _s, effect, p, a, b, _d in sorted(verdicts, key=lambda v: -v[1])[:4]:
             if a in SUSPECT or b in SUSPECT:
                 continue
@@ -160,11 +188,15 @@ def main():
         print(f"{len(sep)} pair(s) clear both bars:")
         for _s, effect, p, a, b, d in sorted(sep, key=lambda v: -v[1]):
             n = abs(float(d.mean())) * n_test if n_test else float("nan")
-            print(f"  {a} − {b}: effect {effect:.2f}, p = {p:.3f}"
-                  + (f", {n:.0f} test errors" if n_test else ""))
+            print(
+                f"  {a} − {b}: effect {effect:.2f}, p = {p:.3f}"
+                + (f", {n:.0f} test errors" if n_test else "")
+            )
     else:
-        print("No pair clears both bars, and the seed count was sufficient for "
-              "one to. The ordering is not a result.")
+        print(
+            "No pair clears both bars, and the seed count was sufficient for "
+            "one to. The ordering is not a result."
+        )
     if any(a in SUSPECT for a in arms):
         print()
         for arm, why in SUSPECT.items():

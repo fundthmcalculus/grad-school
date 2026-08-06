@@ -29,7 +29,6 @@ from sklearn.cluster import KMeans
 
 import ivat_mf as im
 
-
 rng = np.random.default_rng(42)
 
 
@@ -42,6 +41,7 @@ def _rng(seed):
 # ---------------------------------------------------------------------------
 # datasets
 # ---------------------------------------------------------------------------
+
 
 def two_gaussians(n=120, seed=101):
     rng = _rng(seed)
@@ -98,6 +98,7 @@ def uniform_noise(n=120, seed=105):
 # metrics
 # ---------------------------------------------------------------------------
 
+
 def score_ari(U, y_true, Dblock=None):
     """ARI on non-ambiguous points (ground-truth label >= 0)."""
     if Dblock is not None:
@@ -126,8 +127,12 @@ def univariate_convexity(U, X, axis=0, nbins=20):
     idx = np.clip(np.digitize(x, bins) - 1, 0, nbins - 1)
     unimodal_flags = []
     for k in range(U.shape[0]):
-        prof = np.array([U[k, idx == b].mean() if np.any(idx == b) else np.nan
-                         for b in range(nbins)])
+        prof = np.array(
+            [
+                U[k, idx == b].mean() if np.any(idx == b) else np.nan
+                for b in range(nbins)
+            ]
+        )
         prof = prof[~np.isnan(prof)]
         if len(prof) < 3:
             unimodal_flags.append(True)
@@ -156,6 +161,7 @@ def c_sensitivity(Dstar, y_true, c_true):
 # ---------------------------------------------------------------------------
 # baseline for comparison: k-means argmax (vector-space) as a sanity anchor
 # ---------------------------------------------------------------------------
+
 
 def kmeans_ari(X, y_true, c):
     mask = y_true >= 0

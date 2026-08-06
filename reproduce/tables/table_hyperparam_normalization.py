@@ -54,14 +54,17 @@ warnings.filterwarnings("ignore")
 _TABLES = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_TABLES))
 sys.path.insert(0, _TABLES)
-import common as C            # noqa: E402
-import _fuzzy_models as F     # noqa: E402
+import common as C  # noqa: E402
+import _fuzzy_models as F  # noqa: E402
+
 # One definition, shared with table_4_1: a second copy that drifted would make
 # the two tables quietly incomparable, which is the failure this harness exists
 # to catch.
 from _fuzzy_models import normalize  # noqa: E402
 
-ORDERS = [o.strip() for o in os.environ.get("REPRO_ORDERS", "1st,2nd,full-2nd").split(",")]
+ORDERS = [
+    o.strip() for o in os.environ.get("REPRO_ORDERS", "1st,2nd,full-2nd").split(",")
+]
 N_BUCKETS = 3
 L2 = 1e-2
 
@@ -103,9 +106,15 @@ def mog(X, y_raw, seed, order, scaler):
     one variable this table exists to isolate.
     """
     from tribblefis.gauss_math import (
-        calculate_gaussian_correlation, create_gaussian_membership_dict,
-        take_top_features)
-    from tribblefis.regression import partition_output, predict_tsk, solve_tsk_consequents
+        calculate_gaussian_correlation,
+        create_gaussian_membership_dict,
+        take_top_features,
+    )
+    from tribblefis.regression import (
+        partition_output,
+        predict_tsk,
+        solve_tsk_consequents,
+    )
 
     yt = F.unit_scale(y_raw)
     y, ybm = partition_output(N_BUCKETS, yt)
@@ -114,16 +123,28 @@ def mog(X, y_raw, seed, order, scaler):
     Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=0.2, random_state=seed)
     diffs = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
     _, top_vars = take_top_features(diffs, top_n=len(Xt.columns))
-    memb = create_gaussian_membership_dict(Xtr, ytr["y_bucket"],
-                                           top_n_var_names=top_vars, n_gaussians=-1)
-    corr, ybm2 = solve_tsk_consequents(Xtr, memb, top_vars, ybm, ytr,
-                                       n_output_buckets=N_BUCKETS, order=order,
-                                       l2_reg=L2, basis="raw", cross_pairs=None)
-    pred = predict_tsk(Xte, memb, top_vars, ybm2, corr,
-                       order=order, basis="raw", cross_pairs=None)
+    memb = create_gaussian_membership_dict(
+        Xtr, ytr["y_bucket"], top_n_var_names=top_vars, n_gaussians=-1
+    )
+    corr, ybm2 = solve_tsk_consequents(
+        Xtr,
+        memb,
+        top_vars,
+        ybm,
+        ytr,
+        n_output_buckets=N_BUCKETS,
+        order=order,
+        l2_reg=L2,
+        basis="raw",
+        cross_pairs=None,
+    )
+    pred = predict_tsk(
+        Xte, memb, top_vars, ybm2, corr, order=order, basis="raw", cross_pairs=None
+    )
 
-    truth = np.asarray(yte["y_value"] if "y_value" in getattr(yte, "columns", []) else yte,
-                       dtype=float).ravel()
+    truth = np.asarray(
+        yte["y_value"] if "y_value" in getattr(yte, "columns", []) else yte, dtype=float
+    ).ravel()
     pred = np.asarray(pred, dtype=float).ravel()
     span = float(np.asarray(y_raw, float).max() - np.asarray(y_raw, float).min())
     return r2_score(truth, pred), _rmse(truth, pred) * span
@@ -135,6 +156,7 @@ def mog(X, y_raw, seed, order, scaler):
 def tree_hme_builders():
     """{(label, setting): factory} -- factories take no args and return an estimator."""
     import importlib
+
     ft = importlib.import_module("fuzzytree")
     T = getattr(ft, "FuzzyRegressionTree", None)
     H = getattr(ft, "HierarchicalFuzzyExpertsRegressor", None)
@@ -142,14 +164,24 @@ def tree_hme_builders():
     if T is not None:
         b[("fuzzy tree", "library default")] = lambda: T()
         b[("fuzzy tree", "demo-tuned")] = lambda: T(
-            tsk_order="1st", criterion="variance", max_depth=3,
-            n_terms=2, top_n=4, min_soft_count=20)
+            tsk_order="1st",
+            criterion="variance",
+            max_depth=3,
+            n_terms=2,
+            top_n=4,
+            min_soft_count=20,
+        )
     if H is not None:
         b[("mixture of experts", "library default")] = lambda: H()
         b[("mixture of experts", "demo-tuned")] = lambda: H(
-            criterion="variance", max_depth=2, n_gate_terms=2, top_n=4,
-            min_soft_count=40, min_expert_samples=60,
-            expert_kwargs={"n_output_buckets": 3, "tsk_order": "1st"})
+            criterion="variance",
+            max_depth=2,
+            n_gate_terms=2,
+            top_n=4,
+            min_soft_count=40,
+            min_expert_samples=60,
+            expert_kwargs={"n_output_buckets": 3, "tsk_order": "1st"},
+        )
     return b
 
 
@@ -178,7 +210,9 @@ def main():
                     r2, rmse = mog(X, y, seed, order, scaler)
                     add((f"flat MoG-TSK {order}", "pipeline default", tag), r2, rmse)
                 except Exception as exc:  # noqa: BLE001
-                    print(f"    [MoG {order}/{tag}] seed {seed}: {exc.__class__.__name__}")
+                    print(
+                        f"    [MoG {order}/{tag}] seed {seed}: {exc.__class__.__name__}"
+                    )
             print(f"  done: MoG {order:<9} {tag}")
 
     # tree / HME / references: all three normalizations, both hyperparameter settings
@@ -186,16 +220,26 @@ def main():
     for tag, scaler in ARMS:
         Xu = normalize(X, scaler=scaler)[0] if scaler else X
         for seed in C.SEEDS:
-            Xtr, Xte, ytr, yte = train_test_split(Xu, y, test_size=0.2, random_state=seed)
+            Xtr, Xte, ytr, yte = train_test_split(
+                Xu, y, test_size=0.2, random_state=seed
+            )
             for (label, setting), make in builders.items():
                 try:
-                    p = np.asarray(make().fit(Xtr, ytr).predict(Xte), dtype=float).ravel()
+                    p = np.asarray(
+                        make().fit(Xtr, ytr).predict(Xte), dtype=float
+                    ).ravel()
                     add((label, setting, tag), r2_score(yte, p), _rmse(yte, p))
                 except Exception as exc:  # noqa: BLE001
-                    print(f"    [{label}/{setting}/{tag}] seed {seed}: {exc.__class__.__name__}")
-            for label, est in (("CART (reference)", DecisionTreeRegressor(random_state=seed)),
-                               ("Random Forest (reference)",
-                                RandomForestRegressor(n_estimators=200, random_state=seed))):
+                    print(
+                        f"    [{label}/{setting}/{tag}] seed {seed}: {exc.__class__.__name__}"
+                    )
+            for label, est in (
+                ("CART (reference)", DecisionTreeRegressor(random_state=seed)),
+                (
+                    "Random Forest (reference)",
+                    RandomForestRegressor(n_estimators=200, random_state=seed),
+                ),
+            ):
                 p = est.fit(Xtr, ytr).predict(Xte)
                 add((label, "sklearn default", tag), r2_score(yte, p), _rmse(yte, p))
         print(f"  done: tree/HME/references {tag}")
@@ -218,46 +262,68 @@ def main():
         r2c = {tag: (C.cell(got[tag]["r2"]) if got[tag] else C.NA) for tag, _ in ARMS}
         rmc = {tag: (C.cell(got[tag]["rmse"]) if got[tag] else C.NA) for tag, _ in ARMS}
         m = {tag: _mean(got[tag]) for tag, _ in ARMS}
-        rows.append([model, setting,
-                     r2c[RAW], r2c[MINMAX], r2c[ZSCORE],
-                     _delta(m[RAW], m[MINMAX]),      # Δ from log+min-max
-                     _delta(m[RAW], m[ZSCORE]),      # Δ from log+z-score
-                     _delta(m[MINMAX], m[ZSCORE]),   # z-score vs min-max: which normalization
-                     rmc[RAW], rmc[MINMAX], rmc[ZSCORE]])
+        rows.append(
+            [
+                model,
+                setting,
+                r2c[RAW],
+                r2c[MINMAX],
+                r2c[ZSCORE],
+                _delta(m[RAW], m[MINMAX]),  # Δ from log+min-max
+                _delta(m[RAW], m[ZSCORE]),  # Δ from log+z-score
+                _delta(m[MINMAX], m[ZSCORE]),  # z-score vs min-max: which normalization
+                rmc[RAW],
+                rmc[MINMAX],
+                rmc[ZSCORE],
+            ]
+        )
 
-    C.emit("table_hyperparam_normalization",
-           "Concrete — hyperparameters × normalization, three arms "
-           "(R² and RMSE, mean ± std over seeds)",
-           ["Model", "Hyperparameters",
-            "raw features", "log + min-max", "log + z-score",
-            "Δ min-max − raw", "Δ z-score − raw", "Δ z-score − min-max",
-            "RMSE raw (MPa)", "RMSE log+min-max (MPa)", "RMSE log+z-score (MPa)"],
-           rows,
-           note=("**The normalization axis now has three levels, and the middle one has been "
-                 "renamed rather than changed.** Every prior run of this table labelled its "
-                 "second column *log + standardized*; the transform behind it was "
-                 "`gauss_math.standard_transform`, which min-max scaled to [0,1] **despite its "
-                 "name** — it never z-scored. That column is now labelled **log + min-max** and "
-                 "its numbers are unchanged (verified byte-identical against "
-                 "`outputs/full-14900hx-r2/`). **log + z-score** is a genuinely new "
-                 "measurement: `tribblefis.scaling.StandardScalar` (μ=0, σ=1), which had never "
-                 "been run against this pipeline. Both arms log-transform the same "
-                 "high-dynamic-range features first (%s), detected at "
-                 "`log_dynamic_range=2`.\n\n"
-                 "**CART and Random Forest are the control.** Both split on rank, and both "
-                 "transforms are strictly monotone per feature, so both reference rows must "
-                 "read ≈0.000 in the *Δ z-score − min-max* column. A reference row that moves "
-                 "there indicts the plumbing, not the transform.\n\n"
-                 "The **target** is min-max scaled in all three arms and deliberately does not "
-                 "vary — `partition_output` and the pinned extreme bucket means both assume a "
-                 "target on [0,1], so varying it too would confound the feature transform this "
-                 "table isolates. Demo-tuned settings are taken verbatim from "
-                 "`tribble-tree/demo_concrete.py` (tree: max_depth=3, n_terms=2, top_n=4, "
-                 "min_soft_count=20; HME: max_depth=2, n_gate_terms=2, top_n=4, "
-                 "min_soft_count=40, min_expert_samples=60, 1st-order experts) — that script "
-                 "passes no random_state, so those arms are built as written and vary only with "
-                 "the split. Identical splits and seeds throughout."
-                 % (", ".join(map(str, logged)) or "none")))
+    C.emit(
+        "table_hyperparam_normalization",
+        "Concrete — hyperparameters × normalization, three arms "
+        "(R² and RMSE, mean ± std over seeds)",
+        [
+            "Model",
+            "Hyperparameters",
+            "raw features",
+            "log + min-max",
+            "log + z-score",
+            "Δ min-max − raw",
+            "Δ z-score − raw",
+            "Δ z-score − min-max",
+            "RMSE raw (MPa)",
+            "RMSE log+min-max (MPa)",
+            "RMSE log+z-score (MPa)",
+        ],
+        rows,
+        note=(
+            "**The normalization axis now has three levels, and the middle one has been "
+            "renamed rather than changed.** Every prior run of this table labelled its "
+            "second column *log + standardized*; the transform behind it was "
+            "`gauss_math.standard_transform`, which min-max scaled to [0,1] **despite its "
+            "name** — it never z-scored. That column is now labelled **log + min-max** and "
+            "its numbers are unchanged (verified byte-identical against "
+            "`outputs/full-14900hx-r2/`). **log + z-score** is a genuinely new "
+            "measurement: `tribblefis.scaling.StandardScalar` (μ=0, σ=1), which had never "
+            "been run against this pipeline. Both arms log-transform the same "
+            "high-dynamic-range features first (%s), detected at "
+            "`log_dynamic_range=2`.\n\n"
+            "**CART and Random Forest are the control.** Both split on rank, and both "
+            "transforms are strictly monotone per feature, so both reference rows must "
+            "read ≈0.000 in the *Δ z-score − min-max* column. A reference row that moves "
+            "there indicts the plumbing, not the transform.\n\n"
+            "The **target** is min-max scaled in all three arms and deliberately does not "
+            "vary — `partition_output` and the pinned extreme bucket means both assume a "
+            "target on [0,1], so varying it too would confound the feature transform this "
+            "table isolates. Demo-tuned settings are taken verbatim from "
+            "`tribble-tree/demo_concrete.py` (tree: max_depth=3, n_terms=2, top_n=4, "
+            "min_soft_count=20; HME: max_depth=2, n_gate_terms=2, top_n=4, "
+            "min_soft_count=40, min_expert_samples=60, 1st-order experts) — that script "
+            "passes no random_state, so those arms are built as written and vary only with "
+            "the split. Identical splits and seeds throughout."
+            % (", ".join(map(str, logged)) or "none")
+        ),
+    )
 
 
 if __name__ == "__main__":

@@ -28,6 +28,7 @@ def _dataset(name):
     an explicit error naming the search path beats a stack trace from read_csv.
     """
     import os
+
     here = Path(__file__).resolve().parent
     roots = []
     if os.environ.get("GRAD_SCHOOL_DATA"):
@@ -45,6 +46,7 @@ def _dataset(name):
         f"It is gitignored, so a fresh clone will not have it; place it at the "
         f"repo root or set GRAD_SCHOOL_DATA to the directory holding it."
     )
+
 
 import ivat_mf as im
 from nerfcm import nerfcm
@@ -129,20 +131,24 @@ def main():
 
     # Define test datasets
     test_cases = [
-        (load_iris(), 3),      # 3 iris species
-        (load_glass(), 6),     # 6 glass types
-        (load_heart(), 2),     # 2 heart conditions
+        (load_iris(), 3),  # 3 iris species
+        (load_glass(), 6),  # 6 glass types
+        (load_heart(), 2),  # 2 heart conditions
     ]
 
     results = []
 
     for (X, y, name), c in test_cases:
-        print(f"Testing {name} dataset (n={X.shape[0]}, features={X.shape[1]}, c={c})...")
+        print(
+            f"Testing {name} dataset (n={X.shape[0]}, features={X.shape[1]}, c={c})..."
+        )
         result = test_nerfcm_beta_spread(X, y, name, c, n_seeds=5)
         results.append(result)
 
         # Print details
-        print(f"  Beta values across 5 seeds: {[f'{b:.4f}' for b in result['beta_values']]}")
+        print(
+            f"  Beta values across 5 seeds: {[f'{b:.4f}' for b in result['beta_values']]}"
+        )
         print(f"  Mean beta: {result['beta_mean']:.4f}")
         print(f"  Max beta:  {result['beta_max']:.4f}")
         print(f"  Activated: {'YES ✓' if result['any_activated'] else 'NO'}")
@@ -152,25 +158,31 @@ def main():
     print("SUMMARY")
     print("=" * 70)
     print()
-    print(f"{'Dataset':<20}{'n_samples':<12}{'beta_mean':<12}{'beta_max':<12}{'Activated'}")
+    print(
+        f"{'Dataset':<20}{'n_samples':<12}{'beta_mean':<12}{'beta_max':<12}{'Activated'}"
+    )
     print("-" * 70)
 
     for r in results:
-        activated = "YES ✓" if r['any_activated'] else "NO"
-        print(f"{r['name']:<20}{r['n_samples']:<12}{r['beta_mean']:<12.4f}{r['beta_max']:<12.4f}{activated}")
+        activated = "YES ✓" if r["any_activated"] else "NO"
+        print(
+            f"{r['name']:<20}{r['n_samples']:<12}{r['beta_mean']:<12.4f}{r['beta_max']:<12.4f}{activated}"
+        )
 
     print()
     print("FINDINGS:")
     print("-" * 70)
 
-    activated_count = sum(1 for r in results if r['any_activated'])
+    activated_count = sum(1 for r in results if r["any_activated"])
 
     if activated_count == len(results):
         print("✓ CONFIRMED: Beta-spread activates on ALL real datasets tested.")
         print("  This indicates that real-world data exhibits non-Euclidean properties")
         print("  that trigger the beta-spread transform, validating its importance.")
     elif activated_count > 0:
-        print(f"✓ PARTIAL: Beta-spread activates on {activated_count}/{len(results)} datasets.")
+        print(
+            f"✓ PARTIAL: Beta-spread activates on {activated_count}/{len(results)} datasets."
+        )
         print("  The spread is needed for some but not all real datasets.")
     else:
         print("✗ NOT OBSERVED: Beta-spread did not activate on any dataset.")
@@ -182,12 +194,22 @@ def main():
     print("-" * 70)
     if activated_count > 0:
         print("The beta-spread mechanism is actively needed on real data.")
-        print("On synthetic datasets, beta stayed at 0 (correct - clean, separable data).")
-        print("On real data with measurement noise and complex structure, beta activates")
-        print("to restore metric admissibility and enable proper relational clustering.")
+        print(
+            "On synthetic datasets, beta stayed at 0 (correct - clean, separable data)."
+        )
+        print(
+            "On real data with measurement noise and complex structure, beta activates"
+        )
+        print(
+            "to restore metric admissibility and enable proper relational clustering."
+        )
     else:
-        print("Consider testing on additional datasets or those known to be non-Euclidean.")
-        print("Graph-based, string-based, or tree-structured data may show stronger effects.")
+        print(
+            "Consider testing on additional datasets or those known to be non-Euclidean."
+        )
+        print(
+            "Graph-based, string-based, or tree-structured data may show stronger effects."
+        )
 
 
 if __name__ == "__main__":

@@ -58,10 +58,14 @@ N_STEPS = int(round(DURATION / pdata.H))
 WITH_TIME = [
     ("time-step, 40 rules", fts.FisConfig(n_output_buckets=40)),
     ("time-step, 120 rules", fts.FisConfig(n_output_buckets=120, tsk_order="full-2nd")),
-    ("time-step, 300 rules", fts.FisConfig(n_output_buckets=300, tsk_order="full-2nd",
-                                           l2_reg=1e-9)),
-    ("time-step, 8 harmonics", fts.FisConfig(n_output_buckets=120, encoding="harmonic",
-                                             n_harmonics=8)),
+    (
+        "time-step, 300 rules",
+        fts.FisConfig(n_output_buckets=300, tsk_order="full-2nd", l2_reg=1e-9),
+    ),
+    (
+        "time-step, 8 harmonics",
+        fts.FisConfig(n_output_buckets=120, encoding="harmonic", n_harmonics=8),
+    ),
 ]
 
 
@@ -83,7 +87,9 @@ def run_with_time(split, truth_deg, t, inw):
         model.fit(X[tr], names, Y[tr])
         fit_s = time.perf_counter() - t0
 
-        Xh, _ = fts.encode(split.holdout_ic_deg[None, :], t, cfg.encoding, cfg.n_harmonics)
+        Xh, _ = fts.encode(
+            split.holdout_ic_deg[None, :], t, cfg.encoding, cfg.n_harmonics
+        )
         t0 = time.perf_counter()
         pred_scaled = model.predict(Xh)
         query_s = time.perf_counter() - t0
@@ -92,19 +98,24 @@ def run_with_time(split, truth_deg, t, inw):
         lo = split.holdout_range[:, 0][None, :]
         pred_deg = pred_scaled * span + lo
 
-        rows.append({
-            "family": "with time",
-            "model": label,
-            "n_variables": len(model.names_),
-            "variables": " ".join(model.names_),
-            "train_seconds": round(fit_s, 2),
-            "rollout_seconds": round(query_s, 3),
-            "in_window_rmse_deg": round(_rmse_deg(pred_deg, truth_deg, inw), 4),
-            "extrap_rmse_deg": round(_rmse_deg(pred_deg, truth_deg, ~inw), 4),
-        })
-        print(f"  {label:26s} vars={rows[-1]['n_variables']:2d} "
-              f"train={fit_s:7.1f}s  in-window {rows[-1]['in_window_rmse_deg']:10.3f} deg  "
-              f"past 10s {rows[-1]['extrap_rmse_deg']:12.3f} deg", flush=True)
+        rows.append(
+            {
+                "family": "with time",
+                "model": label,
+                "n_variables": len(model.names_),
+                "variables": " ".join(model.names_),
+                "train_seconds": round(fit_s, 2),
+                "rollout_seconds": round(query_s, 3),
+                "in_window_rmse_deg": round(_rmse_deg(pred_deg, truth_deg, inw), 4),
+                "extrap_rmse_deg": round(_rmse_deg(pred_deg, truth_deg, ~inw), 4),
+            }
+        )
+        print(
+            f"  {label:26s} vars={rows[-1]['n_variables']:2d} "
+            f"train={fit_s:7.1f}s  in-window {rows[-1]['in_window_rmse_deg']:10.3f} deg  "
+            f"past 10s {rows[-1]['extrap_rmse_deg']:12.3f} deg",
+            flush=True,
+        )
     return rows
 
 
@@ -114,7 +125,11 @@ def run_without_time(truth_deg, t, inw, state0):
     specs = [
         ("state-space, 40 rules", lambda: se.DynamicsFIS(n_output_buckets=40), False),
         ("state-space, 120 rules", lambda: se.DynamicsFIS(n_output_buckets=120), False),
-        ("state-space, 120 + guard", lambda: se.DynamicsFIS(n_output_buckets=120), True),
+        (
+            "state-space, 120 + guard",
+            lambda: se.DynamicsFIS(n_output_buckets=120),
+            True,
+        ),
         ("physics basis (grey box)", se.PhysicsFIS, False),
     ]
     rows = []
@@ -125,8 +140,9 @@ def run_without_time(truth_deg, t, inw, state0):
         fit_s = time.perf_counter() - t0
 
         t0 = time.perf_counter()
-        pred, diverged, n_corr = se.rollout(model, state0, N_STEPS,
-                                            dissipation_guard=guard)
+        pred, diverged, n_corr = se.rollout(
+            model, state0, N_STEPS, dissipation_guard=guard
+        )
         roll_s = time.perf_counter() - t0
         pred_deg = np.rad2deg(pred[:, [0, 2]])
 
@@ -134,24 +150,32 @@ def run_without_time(truth_deg, t, inw, state0):
         # alpha_1 and four for alpha_2. Report the larger, and name them, so the
         # variable count is not silently comparing different things.
         n_vars = 5 if isinstance(model, se.PhysicsFIS) else 4
-        names = ("physics basis terms" if isinstance(model, se.PhysicsFIS)
-                 else " ".join(se.STATE_LABELS))
+        names = (
+            "physics basis terms"
+            if isinstance(model, se.PhysicsFIS)
+            else " ".join(se.STATE_LABELS)
+        )
 
-        rows.append({
-            "family": "without time",
-            "model": label,
-            "n_variables": n_vars,
-            "variables": names,
-            "train_seconds": round(fit_s, 2),
-            "rollout_seconds": round(roll_s, 2),
-            "in_window_rmse_deg": round(_rmse_deg(pred_deg, truth_deg, inw), 4),
-            "extrap_rmse_deg": round(_rmse_deg(pred_deg, truth_deg, ~inw), 4),
-            "diverged_at_s": diverged,
-            "guard_corrections": n_corr,
-        })
-        print(f"  {label:26s} vars={n_vars:2d} train={fit_s:7.1f}s  "
-              f"in-window {rows[-1]['in_window_rmse_deg']:10.3f} deg  "
-              f"past 10s {rows[-1]['extrap_rmse_deg']:12.3f} deg", flush=True)
+        rows.append(
+            {
+                "family": "without time",
+                "model": label,
+                "n_variables": n_vars,
+                "variables": names,
+                "train_seconds": round(fit_s, 2),
+                "rollout_seconds": round(roll_s, 2),
+                "in_window_rmse_deg": round(_rmse_deg(pred_deg, truth_deg, inw), 4),
+                "extrap_rmse_deg": round(_rmse_deg(pred_deg, truth_deg, ~inw), 4),
+                "diverged_at_s": diverged,
+                "guard_corrections": n_corr,
+            }
+        )
+        print(
+            f"  {label:26s} vars={n_vars:2d} train={fit_s:7.1f}s  "
+            f"in-window {rows[-1]['in_window_rmse_deg']:10.3f} deg  "
+            f"past 10s {rows[-1]['extrap_rmse_deg']:12.3f} deg",
+            flush=True,
+        )
     return rows
 
 
@@ -172,8 +196,16 @@ def _bars(rows, key, title, ylabel, name, logy=True, sort_asc=True):
     x = np.arange(len(labels), dtype=float)
     ax.bar(x, vals, 0.66, color=cols, edgecolor=plots.INK, linewidth=0.6)
     for xi, v, r in zip(x, vals, data):
-        ax.text(xi, v, f" {r[key]:.4g}", ha="center", va="bottom",
-                fontsize=plots.FS_SMALL, color=plots.INK_2, rotation=90)
+        ax.text(
+            xi,
+            v,
+            f" {r[key]:.4g}",
+            ha="center",
+            va="bottom",
+            fontsize=plots.FS_SMALL,
+            color=plots.INK_2,
+            rotation=90,
+        )
     if logy:
         ax.set_yscale("log")
         ax.set_ylim(FLOOR, max(vals) * 60)
@@ -181,12 +213,22 @@ def _bars(rows, key, title, ylabel, name, logy=True, sort_asc=True):
         ax.set_ylim(0, max(vals) * 1.35)
     plots._style(ax, title=title, ylabel=ylabel)
     ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=plots.FS_TICK, color=plots.INK_2,
-                       rotation=30, ha="right")
-    handles = [plots.plt.Rectangle((0, 0), 1, 1, facecolor=c, edgecolor=plots.INK)
-               for c in FAM_COLOUR.values()]
-    ax.legend(handles, [f"{k} variable" for k in FAM_COLOUR], loc="upper center",
-              bbox_to_anchor=(0.5, -0.34), fontsize=plots.FS_SMALL, frameon=False, ncol=2)
+    ax.set_xticklabels(
+        labels, fontsize=plots.FS_TICK, color=plots.INK_2, rotation=30, ha="right"
+    )
+    handles = [
+        plots.plt.Rectangle((0, 0), 1, 1, facecolor=c, edgecolor=plots.INK)
+        for c in FAM_COLOUR.values()
+    ]
+    ax.legend(
+        handles,
+        [f"{k} variable" for k in FAM_COLOUR],
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.34),
+        fontsize=plots.FS_SMALL,
+        frameon=False,
+        ncol=2,
+    )
     return plots._save(fig, name)
 
 
@@ -201,19 +243,42 @@ def _paired(rows):
     fig.patch.set_facecolor(plots.SURFACE)
     x = np.arange(len(labels), dtype=float)
     w = 0.38
-    ax.bar(x - w / 2, a, w, color=plots.AQUA, edgecolor=plots.INK, linewidth=0.6,
-           label="0-10 s (inside training window)")
-    ax.bar(x + w / 2, b, w, color=plots.RED, edgecolor=plots.INK, linewidth=0.6,
-           label="10-20 s (past the window)")
+    ax.bar(
+        x - w / 2,
+        a,
+        w,
+        color=plots.AQUA,
+        edgecolor=plots.INK,
+        linewidth=0.6,
+        label="0-10 s (inside training window)",
+    )
+    ax.bar(
+        x + w / 2,
+        b,
+        w,
+        color=plots.RED,
+        edgecolor=plots.INK,
+        linewidth=0.6,
+        label="10-20 s (past the window)",
+    )
     ax.set_yscale("log")
     ax.set_ylim(FLOOR, max(b) * 60)
-    plots._style(ax, title="Friction double pendulum: error inside vs past the training window",
-                 ylabel="angle RMSE (deg, log)")
+    plots._style(
+        ax,
+        title="Friction double pendulum: error inside vs past the training window",
+        ylabel="angle RMSE (deg, log)",
+    )
     ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=plots.FS_TICK, color=plots.INK_2,
-                       rotation=30, ha="right")
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.34), fontsize=plots.FS_SMALL,
-              frameon=False, ncol=2)
+    ax.set_xticklabels(
+        labels, fontsize=plots.FS_TICK, color=plots.INK_2, rotation=30, ha="right"
+    )
+    ax.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.34),
+        fontsize=plots.FS_SMALL,
+        frameon=False,
+        ncol=2,
+    )
     return plots._save(fig, "fig_family_inwindow_vs_extrap")
 
 
@@ -223,37 +288,70 @@ def _tradeoff(rows):
     fig.patch.set_facecolor(plots.SURFACE)
     for fam, colour in FAM_COLOUR.items():
         sub = [r for r in rows if r["family"] == fam]
-        ax.scatter([r["train_seconds"] for r in sub],
-                   [max(r["extrap_rmse_deg"], FLOOR) for r in sub],
-                   s=[28 * r["n_variables"] for r in sub],
-                   color=colour, edgecolor=plots.INK, linewidth=0.7, label=f"{fam} variable",
-                   zorder=5)
+        ax.scatter(
+            [r["train_seconds"] for r in sub],
+            [max(r["extrap_rmse_deg"], FLOOR) for r in sub],
+            s=[28 * r["n_variables"] for r in sub],
+            color=colour,
+            edgecolor=plots.INK,
+            linewidth=0.7,
+            label=f"{fam} variable",
+            zorder=5,
+        )
     # Number the markers and key them off to the side. Several models sit within a
     # factor of two of each other on both axes, so per-point text labels overprint
     # however the offsets are alternated; an index plus a key cannot collide.
     by_x = sorted(rows, key=lambda r: r["train_seconds"])
     for i, r in enumerate(by_x, 1):
-        ax.annotate(str(i), (r["train_seconds"], max(r["extrap_rmse_deg"], FLOOR)),
-                    textcoords="offset points", xytext=(0, -3), ha="center",
-                    fontsize=plots.FS_SMALL, color="white", weight="bold", zorder=7)
+        ax.annotate(
+            str(i),
+            (r["train_seconds"], max(r["extrap_rmse_deg"], FLOOR)),
+            textcoords="offset points",
+            xytext=(0, -3),
+            ha="center",
+            fontsize=plots.FS_SMALL,
+            color="white",
+            weight="bold",
+            zorder=7,
+        )
     key = "\n".join(
         f"{i}. {r['model']}  —  {r['n_variables']} vars, {r['train_seconds']:.4g} s"
         for i, r in enumerate(by_x, 1)
     )
     # Placed right of the leftmost marker: the physics-basis point sits at the
     # bottom-left, which is otherwise the emptiest corner.
-    ax.text(0.28, 0.42, key, transform=ax.transAxes, ha="left", va="top",
-            fontsize=plots.FS_SMALL, color=plots.INK_2, linespacing=1.5)
+    ax.text(
+        0.28,
+        0.42,
+        key,
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=plots.FS_SMALL,
+        color=plots.INK_2,
+        linespacing=1.5,
+    )
     ax.set_yscale("log")
     ax.set_xscale("log")
-    ax.set_xlim(min(r["train_seconds"] for r in rows) * 0.35,
-                max(r["train_seconds"] for r in rows) * 9)
-    plots._style(ax, title="Cost against extrapolation accuracy (marker area = input variables)",
-                 xlabel="training time (s, log)", ylabel="10-20 s angle RMSE (deg, log)")
+    ax.set_xlim(
+        min(r["train_seconds"] for r in rows) * 0.35,
+        max(r["train_seconds"] for r in rows) * 9,
+    )
+    plots._style(
+        ax,
+        title="Cost against extrapolation accuracy (marker area = input variables)",
+        xlabel="training time (s, log)",
+        ylabel="10-20 s angle RMSE (deg, log)",
+    )
     # Legend below the axes: the interesting corner is bottom-left and an inset
     # legend covered the physics-basis point sitting in it.
-    ax.legend(fontsize=plots.FS_SMALL, frameon=False, loc="upper center",
-              bbox_to_anchor=(0.5, -0.16), ncol=2)
+    ax.legend(
+        fontsize=plots.FS_SMALL,
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.16),
+        ncol=2,
+    )
     return plots._save(fig, "fig_family_tradeoff")
 
 
@@ -262,15 +360,18 @@ def main():
     split = fts.load(2, friction=True)
     t = np.arange(N_STEPS) * pdata.H
     inw = t < pdata.T_END
-    state0 = np.array([np.deg2rad(pdata.THETA1_DEG), 0.0,
-                       np.deg2rad(pdata.TEST_THETA2_DEG), 0.0])
+    state0 = np.array(
+        [np.deg2rad(pdata.THETA1_DEG), 0.0, np.deg2rad(pdata.TEST_THETA2_DEG), 0.0]
+    )
     # One reference for both families, DOP853 so neither shares an integrator with
     # it. RK4 at the paper's step differs from this by 0.0018 deg here, so the
     # choice does not move any number -- it removes an objection.
     truth_deg = np.rad2deg(se.truth(state0, N_STEPS)[:, [0, 2]])
 
-    print(f"Friction double pendulum, trained on {pdata.T_END:.0f} s, "
-          f"scored to {DURATION:.0f} s against a DOP853 reference.\n")
+    print(
+        f"Friction double pendulum, trained on {pdata.T_END:.0f} s, "
+        f"scored to {DURATION:.0f} s against a DOP853 reference.\n"
+    )
     print("WITH the time variable (time-step operator):")
     rows = run_with_time(split, truth_deg, t, inw)
     print("\nWITHOUT the time variable (learned dynamics + RK4):")
@@ -278,33 +379,68 @@ def main():
 
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
     fields = sorted({k for r in rows for k in r})
-    order = ["family", "model", "n_variables", "train_seconds", "rollout_seconds",
-             "in_window_rmse_deg", "extrap_rmse_deg"]
+    order = [
+        "family",
+        "model",
+        "n_variables",
+        "train_seconds",
+        "rollout_seconds",
+        "in_window_rmse_deg",
+        "extrap_rmse_deg",
+    ]
     fields = order + [f for f in fields if f not in order]
-    with open(RESULT_DIR / "family_comparison.csv", "w", newline="",
-              encoding="utf-8") as fh:
+    with open(
+        RESULT_DIR / "family_comparison.csv", "w", newline="", encoding="utf-8"
+    ) as fh:
         w = csv.DictWriter(fh, fieldnames=fields)
         w.writeheader()
         w.writerows(rows)
 
     paths = [
-        _bars(rows, "extrap_rmse_deg",
-              "Friction double pendulum: error 10-20 s, past the training window",
-              "angle RMSE (deg, log)", "fig_family_extrap_rmse"),
-        _bars(rows, "in_window_rmse_deg",
-              "Friction double pendulum: error 0-10 s, inside the training window",
-              "angle RMSE (deg, log)", "fig_family_inwindow_rmse"),
-        _bars(rows, "train_seconds", "Training time", "seconds (log)",
-              "fig_family_train_time"),
-        _bars(rows, "n_variables", "Input variables consumed", "count",
-              "fig_family_variables", logy=False, sort_asc=False),
-        _bars(rows, "rollout_seconds", "Time to produce one 20 s trajectory",
-              "seconds (log)", "fig_family_rollout_time"),
+        _bars(
+            rows,
+            "extrap_rmse_deg",
+            "Friction double pendulum: error 10-20 s, past the training window",
+            "angle RMSE (deg, log)",
+            "fig_family_extrap_rmse",
+        ),
+        _bars(
+            rows,
+            "in_window_rmse_deg",
+            "Friction double pendulum: error 0-10 s, inside the training window",
+            "angle RMSE (deg, log)",
+            "fig_family_inwindow_rmse",
+        ),
+        _bars(
+            rows,
+            "train_seconds",
+            "Training time",
+            "seconds (log)",
+            "fig_family_train_time",
+        ),
+        _bars(
+            rows,
+            "n_variables",
+            "Input variables consumed",
+            "count",
+            "fig_family_variables",
+            logy=False,
+            sort_asc=False,
+        ),
+        _bars(
+            rows,
+            "rollout_seconds",
+            "Time to produce one 20 s trajectory",
+            "seconds (log)",
+            "fig_family_rollout_time",
+        ),
         _paired(rows),
         _tradeoff(rows),
     ]
-    print(f"\nwrote {RESULT_DIR / 'family_comparison.csv'} and "
-          f"{len(paths)} figures to {plots.FIG_DIR}")
+    print(
+        f"\nwrote {RESULT_DIR / 'family_comparison.csv'} and "
+        f"{len(paths)} figures to {plots.FIG_DIR}"
+    )
     return rows
 
 

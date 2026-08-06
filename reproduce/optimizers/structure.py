@@ -43,16 +43,21 @@ sys.path.insert(0, os.path.join(ROOT, "reproduce", "tables"))
 # because `n_gaussians = -1` means "let the fitter choose per feature" and is a
 # genuine option that no interval contains.
 SPACE = {
-    "n_buckets": [2, 3, 4, 5, 6, 8],          # == the rule count
-    "n_gaussians": [-1, 1, 2, 3, 4],          # -1 = automatic, per feature
-    "top_n": [2, 3, 4, 5, 6, 7, 8],           # features retained
-    "order": ["0th", "1st", "2nd"],           # consequent order
-    "log10_l2": (-4.0, 0.0),                  # ridge strength, continuous
+    "n_buckets": [2, 3, 4, 5, 6, 8],  # == the rule count
+    "n_gaussians": [-1, 1, 2, 3, 4],  # -1 = automatic, per feature
+    "top_n": [2, 3, 4, 5, 6, 7, 8],  # features retained
+    "order": ["0th", "1st", "2nd"],  # consequent order
+    "log10_l2": (-4.0, 0.0),  # ridge strength, continuous
 }
 
 # What the pipeline uses today when nobody searches: Chapter 6's configuration.
-DEFAULT = {"n_buckets": 3, "n_gaussians": -1, "top_n": 8, "order": "2nd",
-           "log10_l2": -2.0}
+DEFAULT = {
+    "n_buckets": 3,
+    "n_gaussians": -1,
+    "top_n": 8,
+    "order": "2nd",
+    "log10_l2": -2.0,
+}
 
 
 def decode(vec):
@@ -78,31 +83,40 @@ def decode(vec):
 def encode(structure):
     """A structure dict -> the vector the optimizer sees. Inverse of `decode`."""
     return np.array(
-        [SPACE["n_buckets"].index(structure["n_buckets"]),
-         SPACE["n_gaussians"].index(structure["n_gaussians"]),
-         SPACE["top_n"].index(structure["top_n"]),
-         SPACE["order"].index(structure["order"]),
-         structure["log10_l2"]], dtype=float)
+        [
+            SPACE["n_buckets"].index(structure["n_buckets"]),
+            SPACE["n_gaussians"].index(structure["n_gaussians"]),
+            SPACE["top_n"].index(structure["top_n"]),
+            SPACE["order"].index(structure["order"]),
+            structure["log10_l2"],
+        ],
+        dtype=float,
+    )
 
 
 def variables():
     """Bounded variables for the `optimizers` package, in `decode` order."""
     from optimizers.continuous.variables import InputContinuousVariable
+
     lo, hi = SPACE["log10_l2"]
-    return [InputContinuousVariable("n_buckets", 0, len(SPACE["n_buckets"]) - 1),
-            InputContinuousVariable("n_gaussians", 0, len(SPACE["n_gaussians"]) - 1),
-            InputContinuousVariable("top_n", 0, len(SPACE["top_n"]) - 1),
-            InputContinuousVariable("order", 0, len(SPACE["order"]) - 1),
-            InputContinuousVariable("log10_l2", lo, hi)]
+    return [
+        InputContinuousVariable("n_buckets", 0, len(SPACE["n_buckets"]) - 1),
+        InputContinuousVariable("n_gaussians", 0, len(SPACE["n_gaussians"]) - 1),
+        InputContinuousVariable("top_n", 0, len(SPACE["top_n"]) - 1),
+        InputContinuousVariable("order", 0, len(SPACE["order"]) - 1),
+        InputContinuousVariable("log10_l2", lo, hi),
+    ]
 
 
 def bounds():
     lo, hi = SPACE["log10_l2"]
-    return [(0, len(SPACE["n_buckets"]) - 1),
-            (0, len(SPACE["n_gaussians"]) - 1),
-            (0, len(SPACE["top_n"]) - 1),
-            (0, len(SPACE["order"]) - 1),
-            (lo, hi)]
+    return [
+        (0, len(SPACE["n_buckets"]) - 1),
+        (0, len(SPACE["n_gaussians"]) - 1),
+        (0, len(SPACE["top_n"]) - 1),
+        (0, len(SPACE["order"]) - 1),
+        (lo, hi),
+    ]
 
 
 class StructureProblem:
@@ -110,8 +124,10 @@ class StructureProblem:
 
     def __init__(self, seed=0, n_folds=3, test_size=0.2):
         from sklearn.model_selection import train_test_split
-        from tribblefis.gauss_math import (detect_and_apply_log_transform,
-                                           standard_transform)
+        from tribblefis.gauss_math import (
+            detect_and_apply_log_transform,
+            standard_transform,
+        )
         import _fuzzy_models as FM
 
         data = FM.load_concrete()
@@ -123,21 +139,22 @@ class StructureProblem:
         # output partition is NOT done here: its bucket count is a decision
         # variable, so it moves inside the objective.
         self.y_t = standard_transform(y_raw)
-        Xt, self.logged = detect_and_apply_log_transform(X.copy(),
-                                                         min_dynamic_range=2)
+        Xt, self.logged = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
         self.X_t = standard_transform(Xt, column=Xt.columns)
         yr = np.asarray(y_raw, dtype=float)
         self.span = float(yr.max() - yr.min())
 
         idx = np.arange(len(self.X_t))
-        self.tr_idx, self.te_idx = train_test_split(idx, test_size=test_size,
-                                                    random_state=seed)
+        self.tr_idx, self.te_idx = train_test_split(
+            idx, test_size=test_size, random_state=seed
+        )
         self.seed, self.n_folds = seed, n_folds
 
     # -- the two things the study needs ------------------------------------- #
     def cv_mse(self, structure):
         """k-fold held-out MSE on the training split, for one structure."""
         from sklearn.model_selection import KFold
+
         kf = KFold(n_splits=self.n_folds, shuffle=True, random_state=self.seed)
         total, n = 0.0, 0
         for tr, val in kf.split(self.tr_idx):
@@ -152,6 +169,7 @@ class StructureProblem:
     def test_score(self, structure):
         """(R^2, RMSE in MPa, rule count, membership-function count)."""
         from sklearn.metrics import r2_score
+
         got = self._fit_predict(self.tr_idx, self.te_idx, structure, count=True)
         if got is None:
             return float("nan"), float("nan"), 0, 0
@@ -161,11 +179,16 @@ class StructureProblem:
 
     # -- one build ----------------------------------------------------------- #
     def _fit_predict(self, tr, te, structure, count=False):
-        from tribblefis.gauss_math import (calculate_gaussian_correlation,
-                                           create_gaussian_membership_dict,
-                                           take_top_features)
-        from tribblefis.regression import (partition_output, predict_tsk,
-                                           solve_tsk_consequents)
+        from tribblefis.gauss_math import (
+            calculate_gaussian_correlation,
+            create_gaussian_membership_dict,
+            take_top_features,
+        )
+        from tribblefis.regression import (
+            partition_output,
+            predict_tsk,
+            solve_tsk_consequents,
+        )
 
         X_tr, X_te = self.X_t.iloc[tr], self.X_t.iloc[te]
         try:
@@ -174,21 +197,41 @@ class StructureProblem:
             # the whole set would leak the test target distribution into the
             # rule centres, which is the classic way this kind of search
             # flatters itself.
-            y_tr_all, y_bucket_mean = partition_output(structure["n_buckets"],
-                                                       self.y_t.iloc[tr])
+            y_tr_all, y_bucket_mean = partition_output(
+                structure["n_buckets"], self.y_t.iloc[tr]
+            )
             diffs = calculate_gaussian_correlation(X_tr, y_tr_all["y_bucket"])
             _, top_vars = take_top_features(diffs, top_n=structure["top_n"])
             model = create_gaussian_membership_dict(
-                X_tr, y_tr_all["y_bucket"], top_n_var_names=top_vars,
-                n_gaussians=structure["n_gaussians"])
+                X_tr,
+                y_tr_all["y_bucket"],
+                top_n_var_names=top_vars,
+                n_gaussians=structure["n_gaussians"],
+            )
             l2 = 10.0 ** structure["log10_l2"]
             corr, ybm = solve_tsk_consequents(
-                X_tr, model, top_vars, y_bucket_mean, y_tr_all,
-                n_output_buckets=structure["n_buckets"], order=structure["order"],
-                l2_reg=l2, basis="raw", cross_pairs=None, verbose=False)
-            pred = predict_tsk(X_te, model, top_vars, ybm, corr,
-                               order=structure["order"], basis="raw",
-                               cross_pairs=None)
+                X_tr,
+                model,
+                top_vars,
+                y_bucket_mean,
+                y_tr_all,
+                n_output_buckets=structure["n_buckets"],
+                order=structure["order"],
+                l2_reg=l2,
+                basis="raw",
+                cross_pairs=None,
+                verbose=False,
+            )
+            pred = predict_tsk(
+                X_te,
+                model,
+                top_vars,
+                ybm,
+                corr,
+                order=structure["order"],
+                basis="raw",
+                cross_pairs=None,
+            )
         except Exception:  # noqa: BLE001 -- an infeasible shape scores as bad
             return None
 
@@ -199,13 +242,17 @@ class StructureProblem:
             return None
         if not count:
             return truth[keep], pred[keep]
-        n_mfs = sum(len(lm.memberships)
-                    for fm in model.feature_models.values()
-                    for lm in fm.label_models.values())
+        n_mfs = sum(
+            len(lm.memberships)
+            for fm in model.feature_models.values()
+            for lm in fm.label_models.values()
+        )
         return truth[keep], pred[keep], structure["n_buckets"], n_mfs
 
     def objective(self):
         """The callable the optimizers minimize: raw vector -> CV MSE."""
+
         def fn(vec):
             return self.cv_mse(decode(vec))
+
         return fn
