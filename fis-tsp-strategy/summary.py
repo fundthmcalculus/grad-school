@@ -108,7 +108,10 @@ def _from_lkh_compare(path):
             for r in d.get(arm, []):
                 add(arm, r["gap"], r["s"], f"{r['kicks']} kicks")
         for r in d.get("lkh", []):
-            add("LKH", r.get("gap"), r.get("s"), f"{r['runs']} runs")
+            # ``cfg`` since LKH is swept over its own parameter file rather than over elkai's
+            # run count; ``runs`` is the pre-sweep schema, still present in results/legacy/.
+            detail = r.get("cfg") or f"{r.get('runs')} runs"
+            add("LKH", r.get("gap"), r.get("s"), detail)
     return rows
 
 

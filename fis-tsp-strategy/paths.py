@@ -8,7 +8,7 @@ results somewhere different depending on which folder it happened to be in.
 
 Artifact names are parameterised by the rule-base **scale** (``small`` or ``large``) rather
 than fixed, because the two scales are a reported comparison and not a default plus a
-variant — see FINDINGS.md §3b. There is deliberately no unscaled ``results.json``: the
+variant — see FINDINGS.md §4.3. There is deliberately no unscaled ``results.json``: the
 previous layout had one, it was a byte-identical copy of the ``small`` file, and a copy that
 can silently go stale is worse than no copy.
 """

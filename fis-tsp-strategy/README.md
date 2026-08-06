@@ -41,21 +41,38 @@ independently of the solver's own bookkeeping.
 Reference values are the published TSPLIB optima. **LKH** (via `elkai`) is measured as a
 separate question by `lkh_compare.py`, curve against curve rather than point against point,
 because a solver whose premise is choosing its own operating point cannot be judged at
-somebody else's. The answer there is unambiguous and negative — see below and FINDINGS §9b.
+somebody else's. The answer there is unambiguous and negative — see below and FINDINGS §6.2.
 
 See **[FINDINGS.md](FINDINGS.md)** for the results, including the components that did not work.
 
-## Where this stands, in three sentences
+## What this claims
 
-Against the *same* LK under fixed parameters, adaptive effort improves monotonically with
-instance size and reaches the frontier at the top of the range — the size trend is solid, the
-margin at the top is nine parts in ten thousand and is not (FINDINGS §2). Against **LKH** it
-loses outright: on four held-out instances LKH reaches the published optimum exactly at its
-cheapest available setting, and no arm here beats it at any budget — what exists is a speed
-window below LKH's floor, partly an artefact of `elkai` taking a run count rather than a time
-limit (§9b). The rule bases' real contribution is *cheapness*: they run the solver in 0.43x the
-baseline's wall clock, which is where the frontier result comes from and why the picture
-improves with n.
+One claim, and it is narrow:
+
+> A **small, readable, scale-free** rule base can allocate Lin-Kernighan search effort per
+> decision. It **transfers across instance families without refitting**. Against a properly
+> configured LKH it loses on the instances LKH finds easy, and wins a bounded window on the
+> instances LKH cannot solve.
+
+* **It transfers.** Fitting on one structural family and testing on another costs −0.0006 in q
+  against a ±0.0006 noise floor; on two of four families a family's own fit scored *worse* on it
+  than a foreign one. The scale-free ratios are doing the work, not the 87 fitted parameters —
+  the **hand-written** rules are best or near-best on three of four synthetic families
+  (FINDINGS §4.2).
+* **It wins where uniform perturbation has stopped working.** On the two TSPLIB instances
+  whose uniform-kick control has *plateaued* — four times the budget returning the identical
+  tour — an `EFFORT`-aimed perturbation is the best of a 2×2 factorial on both, by 5.3× at
+  matched budget on fl1577. On d2103 it reaches a shorter tour than any measured LKH
+  configuration below 39 s. Where the control still has headroom it wins 2 of 11 (§6.3).
+  Instance size and kick density were each tried as the criterion first and neither survived —
+  the retractions are in §6.3, and they are worth reading before trusting this one.
+* **It loses elsewhere.** On the instances LKH finds easy, LKH reaches 10–100× better quality
+  *inside our own time budget*, on six of seven (§6.2).
+
+**Not claimed:** that this beats LKH in general, or that it is competitive with the learned-LKH
+line — NeuroLKH reports 0.05–0.09% where these arms sit at 0.3–1.3%, under a stricter protocol.
+See [references/BENCHMARKS.md](references/BENCHMARKS.md) for what that literature measures and
+[references/PRIOR_ART.md](references/PRIOR_ART.md) for what is and is not novel here.
 
 ### Size, quality and time at a glance
 
@@ -98,14 +115,20 @@ able to tell a reported result from an exploration without reading the code.
 | `benchmark.py --scale small\|large` | `results/results_<scale>.json` — the frontier-relative test-set comparison |
 | `lkh_reference.py` | `results/lkh.json` — LKH once per test instance, as a yardstick |
 | `lkh_compare.py` | `results/lkh_compare.json` — every arm and LKH, curve against curve, across a size ladder |
-| `figures.py`, `figures_tuning.py`, `figures_fis.py`, `figures_lkh.py` | `results/figures/*.png` |
+| `figures.py`, `figures_tuning.py`, `figures_fis.py`, `figures_lkh.py`, `figures_aim.py` | `results/figures/*.png` |
 | `summary.py` | `results/summary.csv` — one flat size / quality / time row per (instance, arm) |
 
-**`experiments/`** — superseded, one-off, or illustrative. Nothing reported depends on it; see
+**`experiments/`** — superseded, one-off, or illustrative, plus two that produce reported
+findings but re-fit from scratch and so do not belong in `run_all.py`
+(`transfer.py` → §4.2, `profile_kernels.py` → §8). See
 [experiments/README.md](experiments/README.md).
 
 **`results/`** — every artifact any of the above writes, including `results/legacy/` for data
 that has been superseded but still backs a claim in FINDINGS.md.
+
+**`references/`** — what the comparable literature measures
+([BENCHMARKS.md](references/BENCHMARKS.md)) and what is actually novel here
+([PRIOR_ART.md](references/PRIOR_ART.md)). The PDFs themselves are gitignored.
 
 ## Running it
 
@@ -128,7 +151,7 @@ Two ordering constraints are real rather than conventional. `costmodel.py` must 
 fitted cost proxy rather than wall clock, so that the search is deterministic and not corrupted
 by its own CPU contention, and stale coefficients mean it is optimising against code that no
 longer exists. And `test_invariants.py` runs first, because four of the bugs recorded in
-FINDINGS §10 produced *plausible numbers* rather than crashes.
+FINDINGS §9 produced *plausible numbers* rather than crashes.
 
 Wall clock is what `benchmark.py` and `lkh_compare.py` report. The proxy is only what the
 search spends.

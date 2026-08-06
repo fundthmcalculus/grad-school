@@ -9,9 +9,10 @@ superseded is not the same as a thing that was measured once and does not need m
 | script | status | why it is here, not up a level |
 |---|---|---|
 | `tune_es.py` | **superseded** | The original hand-rolled (1+1)-ES tuner, before `tune_opt.py` and the `optimizers` GA. It fits consequents only — not membership functions — against a wall-clock objective rather than the deterministic cost proxy, so its runs are not reproducible and its results are not comparable with the current ones. Kept because it is the control that says the GA was worth adopting. Writes `results/legacy/tuned_es.npz`. |
-| `features_probe.py` | **one-off, frozen** | The feature screen of FINDINGS §7: it instruments a fixed-parameter LK run, records candidate antecedents before each city scan and the outcome after, and scores every feature by AUC. It produced `results/feature_screen.json` over 12 278 city scans, and `feature_registry.py` checks itself against that file. Re-running it is only necessary if a new antecedent is proposed — the numbers for the existing ones will not change. |
+| `features_probe.py` | **one-off, frozen** | The feature screen of FINDINGS §3.2: it instruments a fixed-parameter LK run, records candidate antecedents before each city scan and the outcome after, and scores every feature by AUC. It produced `results/feature_screen.json` over 12 278 city scans, and `feature_registry.py` checks itself against that file. Re-running it is only necessary if a new antecedent is proposed — the numbers for the existing ones will not change. |
 | `figures_tours.py` | **illustrative** | Draws actual tours side by side. It supports no claim; it exists because a 1% length difference is invisible in a scalar and obvious in a picture. Expensive (it re-solves each instance at a large kick budget) for something that is not evidence. |
-| `profile_kernels.py` | **diagnostic** | Where the solver's time goes, three ways that check each other: counter attribution through the fitted cost model, microbenchmarks with the loop inside nopython mode, and ablation. Its findings are written up in FINDINGS §11. Re-run after any change to the hot path, or on new hardware — the cost model's calibration is machine-specific and the profile's *shares* are the durable part, not its totals. |
+| `transfer.py` | **reported** (FINDINGS §4.2) | Fits a rule base on one structural family and tests it on all four plus held-out TSPLIB, producing the transfer matrix that turns "it works on the test set" into "it generalises". Lives here rather than in the pipeline only because it re-fits from scratch and so is not something `run_all.py` should do on every run; its result is a reported finding. Reuses `tune_opt.run_one` rather than reimplementing the fitting. |
+| `profile_kernels.py` | **diagnostic** | Where the solver's time goes, three ways that check each other: counter attribution through the fitted cost model, microbenchmarks with the loop inside nopython mode, and ablation. Its findings are written up in FINDINGS §8. Re-run after any change to the hot path, or on new hardware — the cost model's calibration is machine-specific and the profile's *shares* are the durable part, not its totals. |
 
 ## Running them
 
@@ -33,6 +34,6 @@ diagnostics rather than reported stages. They are library modules the pipeline i
 the file would move the library with it, and splitting the CLI off from the code it exercises
 puts a diagnostic one edit away from silently not matching what it diagnoses.
 
-`kick.py --instance … --kicks …` is the plateau probe of FINDINGS §9: it carries the
+`kick.py --instance … --kicks …` is the plateau probe of FINDINGS §6.1: it carries the
 `accept_equal` and `patience` switches that exist to tell a repertoire limit apart from an
 accept-rule limit.

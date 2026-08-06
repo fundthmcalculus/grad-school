@@ -23,12 +23,12 @@ So the time is attributed three ways, each of which checks the others:
 
 **Ahead-of-time compilation was measured and rejected**, so that it does not get proposed again
 on the strength of the argument that "compiled would be faster". The hot path is not Python:
-numba already emits LLVM-optimised machine code with bounds checking off (which FINDINGS §10.4
+numba already emits LLVM-optimised machine code with bounds checking off (which FINDINGS §9.4
 records the hard way — ``xc[4]`` on a 4-wide buffer was a silent out-of-bounds write, not an
 exception). A faithful Cython transcription of ``fis_eval1``, the smallest and hottest kernel
 here, compiled with ``-O3 -ffast-math -march=native`` and typed memoryviews, ran at **61.9 ns
 against numba's 54.0** on identical inputs with identical outputs. The harness that measured it
-has been removed; the numbers are in FINDINGS §11 and the reasons they were never going to be
+has been removed; the numbers are in FINDINGS §8 and the reasons they were never going to be
 close are visible below — a third of that kernel is a table lerp neither compiler improves on,
 and the Python boundary is crossed once per *solve*, not once per call.
 
