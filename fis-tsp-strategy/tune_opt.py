@@ -481,13 +481,21 @@ def build_optimizer(kind, space, fcn, seed_theta, generations, population, jobs)
 
 
 def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink, log,
-            polish_evals=2500, scale=fis.DEFAULT_SCALE):
-    """Fit with one optimiser / MF form / MF scope, selecting on the validation split."""
+            polish_evals=2500, scale=fis.DEFAULT_SCALE,
+            train_pool=None, valid_pool=None):
+    """Fit with one optimiser / MF form / MF scope, selecting on the validation split.
+
+    ``train_pool`` / ``valid_pool`` override the standard splits with explicit instance lists.
+    They exist so that a transfer study can fit on one structural family and test on another
+    *through this same function* — a second copy of the fitting procedure would drift from this
+    one, and then any difference between a transfer run and the reported run would be
+    uninterpretable.
+    """
     set_seed(seed)
     space = ParamSpace(mf_kind, mf_scope, scale)
     coef = np.load(paths.COSTMODEL)["coef"]
-    train = Objective(train_instances(), space, coef)
-    valid = Objective(valid_instances(), space, coef)
+    train = Objective(train_instances() if train_pool is None else train_pool, space, coef)
+    valid = Objective(valid_instances() if valid_pool is None else valid_pool, space, coef)
 
     seed_theta = space.default()
     hand_tr = train.report(seed_theta)
