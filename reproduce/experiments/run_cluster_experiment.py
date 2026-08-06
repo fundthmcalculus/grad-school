@@ -44,8 +44,8 @@ DEFAULT_OUT = ROOT / "reproduce" / "outputs" / "figures" / "cluster"
 # under `if __name__ == "__main__":` rather than exposing a single main(), so the
 # call sequence has to be named here; importing alone runs nothing.
 EXPERIMENTS = {
-    "adversarial_eval": ("run",),        # Table 3.4
-    "principled_stitch": ("run",),       # Table 3.5
+    "adversarial_eval": ("run",),  # Table 3.4
+    "principled_stitch": ("run",),  # Table 3.5
     "hardening_eval": ("part_a", "part_b"),  # Table 3.6
 }
 
@@ -53,15 +53,17 @@ EXPERIMENTS = {
 def run_one(name: str, out_dir: Path) -> int:
     """Import one experiment with FIG_DIR redirected, then call its entry points."""
     if name not in EXPERIMENTS:
-        print(f"  [error] unknown experiment {name!r}; "
-              f"known: {', '.join(sorted(EXPERIMENTS))}")
+        print(
+            f"  [error] unknown experiment {name!r}; "
+            f"known: {', '.join(sorted(EXPERIMENTS))}"
+        )
         return 1
 
     # Their own directory, so the sibling imports resolve from any cwd.
     if str(CLUSTER) not in sys.path:
         sys.path.insert(0, str(CLUSTER))
 
-    mod = importlib.import_module(name)   # sibling module, not a package
+    mod = importlib.import_module(name)  # sibling module, not a package
 
     # The scripts call FIG_DIR.mkdir(exist_ok=True), which is NOT recursive, so
     # the parents have to exist before the rebind or they raise FileNotFoundError.
@@ -74,8 +76,10 @@ def run_one(name: str, out_dir: Path) -> int:
     for entry in EXPERIMENTS[name]:
         fn = getattr(mod, entry, None)
         if fn is None:
-            print(f"  [error] {name}.{entry}() not found -- the API has drifted; "
-                  f"update EXPERIMENTS in this file")
+            print(
+                f"  [error] {name}.{entry}() not found -- the API has drifted; "
+                f"update EXPERIMENTS in this file"
+            )
             return 1
         fn()
     return 0
@@ -84,7 +88,9 @@ def run_one(name: str, out_dir: Path) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("experiment", nargs="?", help="experiment module name")
-    ap.add_argument("--all", action="store_true", help="run every registered experiment")
+    ap.add_argument(
+        "--all", action="store_true", help="run every registered experiment"
+    )
     args = ap.parse_args()
 
     if not args.all and not args.experiment:

@@ -20,6 +20,7 @@ from scipy.spatial.distance import squareform
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import battery as B
@@ -30,6 +31,7 @@ import selection as S
 @dataclass
 class ScaleBand:
     """A height range in the dendrogram."""
+
     band_id: int
     h_low: float
     h_high: float
@@ -39,6 +41,7 @@ class ScaleBand:
 @dataclass
 class MultiScaleBlock:
     """Block with multi-scale ranking info."""
+
     block_id: int
     members: Set[int]
     birth_height: float
@@ -70,9 +73,12 @@ class MultiScalePersistenceSelector:
         self.num_bands = num_bands
         self.verbose = verbose
 
-    def select_blocks_multi_scale(self, Dstar: np.ndarray,
-                                  coverage_blocks: List[Dict],
-                                  method: str = 'local_ranking') -> Tuple[List[Dict], Dict]:
+    def select_blocks_multi_scale(
+        self,
+        Dstar: np.ndarray,
+        coverage_blocks: List[Dict],
+        method: str = "local_ranking",
+    ) -> Tuple[List[Dict], Dict]:
         """
         Select blocks using multi-scale persistence.
 
@@ -94,11 +100,13 @@ class MultiScalePersistenceSelector:
         n = Dstar.shape[0]
 
         # Step 1: Build dendrogram to understand scale structure
-        Z = linkage(squareform(Dstar, checks=False), method='single')
+        Z = linkage(squareform(Dstar, checks=False), method="single")
         heights = Z[:, 2]
 
         # Step 2: Identify natural scale bands from height quantiles
-        height_percentiles = np.percentile(heights, np.linspace(0, 100, self.num_bands + 1))
+        height_percentiles = np.percentile(
+            heights, np.linspace(0, 100, self.num_bands + 1)
+        )
         scale_bands = []
 
         for band_id in range(self.num_bands):
@@ -115,13 +123,15 @@ class MultiScalePersistenceSelector:
         multi_scale_blocks = []
 
         for block_id, block in enumerate(coverage_blocks):
-            h_b = block.get('birth', 0.0)
-            h_d = block.get('death', np.inf)
+            h_b = block.get("birth", 0.0)
+            h_d = block.get("death", np.inf)
 
             global_persistence = h_d - h_b
 
             # Find which band this block belongs to
-            band_id = min(self.num_bands - 1, int(np.searchsorted(height_percentiles, h_b)))
+            band_id = min(
+                self.num_bands - 1, int(np.searchsorted(height_percentiles, h_b))
+            )
             band = scale_bands[band_id]
             band.blocks.append(block_id)
 
@@ -131,7 +141,7 @@ class MultiScalePersistenceSelector:
 
             msb = MultiScaleBlock(
                 block_id=block_id,
-                members=set(block['members']),
+                members=set(block["members"]),
                 birth_height=h_b,
                 death_height=h_d,
                 global_persistence=global_persistence,
@@ -139,7 +149,7 @@ class MultiScalePersistenceSelector:
                 local_persistence=local_persistence,
                 local_rank=-1,  # Will fill in
                 global_rank=-1,  # Will fill in
-                synthesis_score=0.0  # Will fill in
+                synthesis_score=0.0,  # Will fill in
             )
             multi_scale_blocks.append(msb)
 
@@ -158,20 +168,24 @@ class MultiScalePersistenceSelector:
         if self.verbose:
             print(f"\nLocal rankings by scale band:")
             for band in scale_bands:
-                band_blocks = sorted([multi_scale_blocks[bid] for bid in band.blocks],
-                                   key=lambda b: b.local_rank)
+                band_blocks = sorted(
+                    [multi_scale_blocks[bid] for bid in band.blocks],
+                    key=lambda b: b.local_rank,
+                )
                 for msb in band_blocks:
-                    print(f"  Band {band.band_id}: Block {msb.block_id} local_rank={msb.local_rank} "
-                          f"local_persist={msb.local_persistence:.4f}")
+                    print(
+                        f"  Band {band.band_id}: Block {msb.block_id} local_rank={msb.local_rank} "
+                        f"local_persist={msb.local_persistence:.4f}"
+                    )
 
         # Step 5: Keep all blocks from coverage_cover (it's already good!)
         # The multi-scale analysis is informational, not prescriptive
         selected_blocks = coverage_blocks
 
         return selected_blocks, {
-            'scale_bands': scale_bands,
-            'multi_scale_blocks': multi_scale_blocks,
-            'note': 'Keeping all coverage_cover blocks; scale analysis is for understanding',
+            "scale_bands": scale_bands,
+            "multi_scale_blocks": multi_scale_blocks,
+            "note": "Keeping all coverage_cover blocks; scale analysis is for understanding",
         }
 
     def _find_knee_gap(self, sorted_blocks: List[MultiScaleBlock]) -> int:
@@ -215,13 +229,14 @@ class MultiScalePersistenceSelector:
 # Integration test on battery
 # ============================================================================
 
+
 def test_multi_scale_on_battery():
     """Test multi-scale persistence on battery."""
     datasets = [
-        ('two_gaussians', B.two_gaussians),
-        ('bridged_gaussians', B.bridged_gaussians),
-        ('concentric_rings', B.concentric_rings),
-        ('varying_density', B.varying_density),
+        ("two_gaussians", B.two_gaussians),
+        ("bridged_gaussians", B.bridged_gaussians),
+        ("concentric_rings", B.concentric_rings),
+        ("varying_density", B.varying_density),
     ]
 
     from sklearn.metrics import adjusted_rand_score
@@ -244,7 +259,9 @@ def test_multi_scale_on_battery():
 
         # Multi-scale: our approach
         selector = MultiScalePersistenceSelector(num_bands=5, verbose=False)
-        multi_scale_blocks, analysis = selector.select_blocks_multi_scale(Dstar, baseline_blocks)
+        multi_scale_blocks, analysis = selector.select_blocks_multi_scale(
+            Dstar, baseline_blocks
+        )
 
         # Evaluate both
         def evaluate_blocks(blocks, Dstar, y_true):
@@ -262,7 +279,7 @@ def test_multi_scale_on_battery():
                 best_cluster = 0
 
                 for cluster_id, block in enumerate(blocks):
-                    medoid_idx = block.get('medoid_idx', list(block['members'])[0])
+                    medoid_idx = block.get("medoid_idx", list(block["members"])[0])
                     dist = Dstar[medoid_idx, i]
 
                     if dist < best_dist:
@@ -286,35 +303,39 @@ def test_multi_scale_on_battery():
         print(f"  Improvement: {multi_scale_ari - baseline_ari:+.4f}")
 
         results[name] = {
-            'baseline_k': len(baseline_blocks),
-            'baseline_ari': float(baseline_ari),
-            'multi_scale_k': len(multi_scale_blocks),
-            'multi_scale_ari': float(multi_scale_ari),
-            'improvement': float(multi_scale_ari - baseline_ari),
+            "baseline_k": len(baseline_blocks),
+            "baseline_ari": float(baseline_ari),
+            "multi_scale_k": len(multi_scale_blocks),
+            "multi_scale_ari": float(multi_scale_ari),
+            "improvement": float(multi_scale_ari - baseline_ari),
         }
 
     return results
 
 
-if __name__ == '__main__':
-    print("\n" + "="*80)
+if __name__ == "__main__":
+    print("\n" + "=" * 80)
     print("MULTI-SCALE PERSISTENCE CLUSTERING (Option D)")
-    print("="*80)
+    print("=" * 80)
 
     results = test_multi_scale_on_battery()
 
     # Summary
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("MULTI-SCALE PERSISTENCE SUMMARY")
-    print("="*80)
-    print(f"{'Dataset':<20} {'Baseline ARI':<15} {'Multi-Scale ARI':<18} {'Improvement':<15}")
-    print("-"*80)
+    print("=" * 80)
+    print(
+        f"{'Dataset':<20} {'Baseline ARI':<15} {'Multi-Scale ARI':<18} {'Improvement':<15}"
+    )
+    print("-" * 80)
 
     for name, result in results.items():
-        print(f"{name:<20} {result['baseline_ari']:<15.4f} {result['multi_scale_ari']:<18.4f} {result['improvement']:<15.4f}")
+        print(
+            f"{name:<20} {result['baseline_ari']:<15.4f} {result['multi_scale_ari']:<18.4f} {result['improvement']:<15.4f}"
+        )
 
-    print("="*80)
+    print("=" * 80)
     print("\nKey insight:")
     print("Multi-scale persistence aims to solve the varying_density scale gap")
     print("by ranking clusters fairly within their own scale bands.")
-    print("="*80)
+    print("=" * 80)

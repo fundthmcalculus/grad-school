@@ -6,7 +6,13 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from AEEM6097.aco_solver import solve_aco, AcoContinuousVariable
-from AEEM6097.fuzzy import FuzzySet, MamdaniRule, FuzzyVariable, FuzzyInference, FuzzyRule
+from AEEM6097.fuzzy import (
+    FuzzySet,
+    MamdaniRule,
+    FuzzyVariable,
+    FuzzyInference,
+    FuzzyRule,
+)
 from AEEM6097.membership_functions import (
     create_triangle_memberships,
 )

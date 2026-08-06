@@ -96,7 +96,7 @@ def config_from_key(key):
     )
     for tail in parts[6:]:
         if tail.startswith("harmonic"):
-            cfg.encoding, cfg.n_harmonics = "harmonic", int(tail[len("harmonic"):])
+            cfg.encoding, cfg.n_harmonics = "harmonic", int(tail[len("harmonic") :])
         elif tail.startswith("l2"):
             cfg.l2_reg = float(tail[2:])
     assert cfg.key() == key, f"config round-trip failed: {cfg.key()!r} != {key!r}"
@@ -117,10 +117,14 @@ def draw_dataset(split, system, friction, base, trained, holdout):
     error-against-time figure across all datasets.
     """
     bars = {
-        "bracket midpoint": (base["bracket midpoint (no learning)"]["rmse"],
-                             base["bracket midpoint (no learning)"]["r2"]),
-        "nearest trained IC": (base["nearest trained IC (no learning)"]["rmse"],
-                               base["nearest trained IC (no learning)"]["r2"]),
+        "bracket midpoint": (
+            base["bracket midpoint (no learning)"]["rmse"],
+            base["bracket midpoint (no learning)"]["r2"],
+        ),
+        "nearest trained IC": (
+            base["nearest trained IC (no learning)"]["rmse"],
+            base["nearest trained IC (no learning)"]["r2"],
+        ),
     }
     holdout_pred = None
     for setting, (model, cfg, res) in (("trained", trained), ("holdout", holdout)):
@@ -133,8 +137,14 @@ def draw_dataset(split, system, friction, base, trained, holdout):
         # The no-learning baselines only exist for the held-out IC: they are
         # defined by interpolating *between* trained ICs, so on a trained IC they
         # would just be that trajectory itself.
-        plots.compare_cell(system, friction, setting, metrics["rmse"], metrics["r2"],
-                           baselines=bars if setting == "holdout" else None)
+        plots.compare_cell(
+            system,
+            friction,
+            setting,
+            metrics["rmse"],
+            metrics["r2"],
+            baselines=bars if setting == "holdout" else None,
+        )
     return holdout_pred
 
 
@@ -161,7 +171,8 @@ def main():
         pts = [
             (r["n_rules"] // n_links, r["holdout_r2"])
             for r in rows
-            if r["dataset"] == label and r["config"].endswith("_1st_g0_uniform_raw_probability")
+            if r["dataset"] == label
+            and r["config"].endswith("_1st_g0_uniform_raw_probability")
         ]
         if pts:
             capacity[label] = ([p[0] for p in pts], [p[1] for p in pts])
@@ -180,35 +191,39 @@ def main():
         # configurations are named.
         cfg_h = config_from_key(by_hold["config"])
         res_h, model_h = run(split, cfg_h)
-        assert abs(res_h.holdout_ic["rmse"] - by_hold["holdout_rmse"]) < 1e-9, (
-            "refit did not reproduce the swept holdout score"
-        )
+        assert (
+            abs(res_h.holdout_ic["rmse"] - by_hold["holdout_rmse"]) < 1e-9
+        ), "refit did not reproduce the swept holdout score"
         if by_train["config"] == by_hold["config"]:
             cfg_t, res_t, model_t = cfg_h, res_h, model_h
         else:
             cfg_t = config_from_key(by_train["config"])
             res_t, model_t = run(split, cfg_t)
-            assert abs(res_t.trained_ic["rmse"] - by_train["trained_rmse"]) < 1e-9, (
-                "refit did not reproduce the swept trained-IC score"
-            )
+            assert (
+                abs(res_t.trained_ic["rmse"] - by_train["trained_rmse"]) < 1e-9
+            ), "refit did not reproduce the swept trained-IC score"
 
         # Extrapolation is a property of the reported model, not of every swept
         # configuration -- the sweeps score 0-10 s only, and selection never sees
         # the 10-20 s segment. So it is recorded here, from the refit, rather than
         # being back-filled into best.csv from rows that never measured it.
-        extrap_rows.append({
-            "dataset": label,
-            "config": cfg_h.key(),
-            "train_t_end_s": split.train_t_end,
-            "test_t_end_s": round(float(split.holdout_t[-1] + (split.t[1] - split.t[0])), 3),
-            "in_window_rmse": res_h.holdout_ic["rmse"],
-            "in_window_r2": res_h.holdout_ic["r2"],
-            "in_window_rmse_deg": res_h.holdout_ic["rmse_deg"],
-            "extrap_rmse": res_h.extrap_ic["rmse"],
-            "extrap_r2": res_h.extrap_ic["r2"],
-            "extrap_rmse_deg": res_h.extrap_ic["rmse_deg"],
-            "t_break_s": res_h.t_break,
-        })
+        extrap_rows.append(
+            {
+                "dataset": label,
+                "config": cfg_h.key(),
+                "train_t_end_s": split.train_t_end,
+                "test_t_end_s": round(
+                    float(split.holdout_t[-1] + (split.t[1] - split.t[0])), 3
+                ),
+                "in_window_rmse": res_h.holdout_ic["rmse"],
+                "in_window_r2": res_h.holdout_ic["r2"],
+                "in_window_rmse_deg": res_h.holdout_ic["rmse_deg"],
+                "extrap_rmse": res_h.extrap_ic["rmse"],
+                "extrap_r2": res_h.extrap_ic["r2"],
+                "extrap_rmse_deg": res_h.extrap_ic["rmse_deg"],
+                "t_break_s": res_h.t_break,
+            }
+        )
 
         fis_holdout_rmse[system] = res_h.holdout_ic["rmse"]
         fis_trained[(system, friction)] = {
@@ -221,8 +236,13 @@ def main():
         }
 
         holdout_preds[label] = draw_dataset(
-            split, system, friction, baselines[(system, friction)],
-            trained=(model_t, cfg_t, res_t), holdout=(model_h, cfg_h, res_h))
+            split,
+            system,
+            friction,
+            baselines[(system, friction)],
+            trained=(model_t, cfg_t, res_t),
+            holdout=(model_h, cfg_h, res_h),
+        )
 
         print(
             f"{label}:\n"
@@ -235,8 +255,12 @@ def main():
         )
 
     plots.error_vs_time(holdout_preds, t_end=pdata.T_END)
-    plots.rmse_heatmap(fis_holdout_rmse, setting="holdout", friction=True,
-                       systems=[pdata.system_name(n) for n in N_LINKS])
+    plots.rmse_heatmap(
+        fis_holdout_rmse,
+        setting="holdout",
+        friction=True,
+        systems=[pdata.system_name(n) for n in N_LINKS],
+    )
     plots.capacity_curve(capacity, best_paper=pr.best("double", True, "holdout")[2])
 
     fields = []
@@ -249,15 +273,19 @@ def main():
         w.writeheader()
         w.writerows(best_rows)
 
-    with open(RESULT_DIR / "extrapolation.csv", "w", newline="", encoding="utf-8") as fh:
+    with open(
+        RESULT_DIR / "extrapolation.csv", "w", newline="", encoding="utf-8"
+    ) as fh:
         w = csv.DictWriter(fh, fieldnames=list(extrap_rows[0]))
         w.writeheader()
         w.writerows(extrap_rows)
     print("\nPast the training window (held-out IC, holdout-winning config):")
     for r in extrap_rows:
-        print(f"  {r['dataset']:24s} 0-{r['train_t_end_s']:.0f}s R2={r['in_window_r2']:+.4f}"
-              f"  {r['train_t_end_s']:.0f}-{r['test_t_end_s']:.0f}s R2={r['extrap_r2']:+.3e}"
-              f"  RMSE={r['extrap_rmse']:.4g}  breaks at {r['t_break_s']:.2f}s")
+        print(
+            f"  {r['dataset']:24s} 0-{r['train_t_end_s']:.0f}s R2={r['in_window_r2']:+.4f}"
+            f"  {r['train_t_end_s']:.0f}-{r['test_t_end_s']:.0f}s R2={r['extrap_r2']:+.3e}"
+            f"  RMSE={r['extrap_rmse']:.4g}  breaks at {r['t_break_s']:.2f}s"
+        )
 
     write_comparison(fis_trained, baselines)
     print(f"\nwrote {RESULT_DIR / 'best.csv'} and {RESULT_DIR / 'comparison.md'}")
@@ -290,7 +318,9 @@ def write_comparison(fis, baselines):
     for (system, friction), per_setting in fis.items():
         for setting in ("trained", "holdout"):
             metrics, cfg_key = per_setting[setting]
-            cell = {k: v for k, v in pr.RESULTS[(system, friction, setting)].items() if v}
+            cell = {
+                k: v for k, v in pr.RESULTS[(system, friction, setting)].items() if v
+            }
             fric = "friction" if friction else "frictionless"
             rows = [(f"{k} (paper)", v) for k, v in cell.items()]
             rows.append(("**FIS (ours)**", (metrics["rmse"], metrics["r2"])))
@@ -299,8 +329,12 @@ def write_comparison(fis, baselines):
                     rows.append((f"_{bname}_", (bm["rmse"], bm["r2"])))
             merged = sorted(rows, key=lambda kv: kv[1][0])
 
-            lines += [f"## {system} pendulum, {fric}, {setting} IC", "",
-                      "| Rank | Model | RMSE | R^2 |", "|---|---|---|---|"]
+            lines += [
+                f"## {system} pendulum, {fric}, {setting} IC",
+                "",
+                "| Rank | Model | RMSE | R^2 |",
+                "|---|---|---|---|",
+            ]
             for i, (name, (rm, r2)) in enumerate(merged, 1):
                 lines.append(f"| {i} | {name} | {rm:.4g} | {r2:.6f} |")
             rank = [n for n, _ in merged].index("**FIS (ours)**") + 1

@@ -64,10 +64,12 @@ def _cluster_joint(J, c, method, seed):
     """(hard labels, centres) for the joint-space clustering."""
     if method == "kmeans":
         from sklearn.cluster import KMeans
+
         km = KMeans(n_clusters=c, n_init=10, random_state=seed).fit(J)
         return km.labels_, km.cluster_centers_
     if method == "fcm":
         from tribbleclustering.fcm import fuzzy_c_means
+
         centres, u = fuzzy_c_means(J, c)
         centres = np.asarray(centres, dtype=float)
         u = np.asarray(u, dtype=float)
@@ -84,8 +86,12 @@ def identify(X_train, y_train_values, c, method="kmeans", seed=0):
     `seconds` is the honest cost of this identification: the clustering and the
     projection, with nothing inherited from the Gaussian construction.
     """
-    from tribblefis.gauss_data import (FeatureModel, GaussianMembership,
-                                       GaussianMixtureModel, LabelModel)
+    from tribblefis.gauss_data import (
+        FeatureModel,
+        GaussianMembership,
+        GaussianMixtureModel,
+        LabelModel,
+    )
 
     features = list(X_train.columns)
     start = time.perf_counter()
@@ -108,19 +114,30 @@ def identify(X_train, y_train_values, c, method="kmeans", seed=0):
             mu = float(member.mean()) if member.size else float(col.mean())
             sigma = float(member.std()) if member.size > 1 else floor
             label_models[k] = LabelModel(
-                memberships=[GaussianMembership.create(mu, max(sigma, floor))])
+                memberships=[GaussianMembership.create(mu, max(sigma, floor))]
+            )
         feature_models[f] = FeatureModel(label_models=label_models)
     model = GaussianMixtureModel(feature_models=feature_models)
 
     # The cluster assignment plays the role the output partition plays in the
     # MoG pipeline: it is what the consequent solver fits one consequent per.
-    y_vals = pd.Series(np.asarray(y_train_values, dtype=float).ravel(),
-                       index=X_train.index, name="y_value")
+    y_vals = pd.Series(
+        np.asarray(y_train_values, dtype=float).ravel(),
+        index=X_train.index,
+        name="y_value",
+    )
     bucket = pd.Series(labels, index=X_train.index, name="y_bucket")
     y_df = pd.concat([bucket, y_vals], axis=1)
-    bucket_mean = np.array([
-        float(y_vals.to_numpy()[labels == k].mean()) if np.any(labels == k)
-        else float(y_vals.mean()) for k in range(c)])
+    bucket_mean = np.array(
+        [
+            (
+                float(y_vals.to_numpy()[labels == k].mean())
+                if np.any(labels == k)
+                else float(y_vals.mean())
+            )
+            for k in range(c)
+        ]
+    )
 
     seconds = time.perf_counter() - start
     return model, y_df, bucket_mean, features, seconds

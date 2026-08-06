@@ -22,8 +22,10 @@ _TABLES = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_TABLES))
 import common as C  # noqa: E402
 
-N_GRID = [int(n) for n in os.environ.get("REPRO_N_GRID", "256,512,1024,2048,4096").split(",")]
-NAIVE_CAP = int(os.environ.get("REPRO_NAIVE_CAP", "1024"))   # skip cubic ref above this
+N_GRID = [
+    int(n) for n in os.environ.get("REPRO_N_GRID", "256,512,1024,2048,4096").split(",")
+]
+NAIVE_CAP = int(os.environ.get("REPRO_NAIVE_CAP", "1024"))  # skip cubic ref above this
 
 
 def classical_vat_order(D):
@@ -39,8 +41,8 @@ def classical_vat_order(D):
         for b in range(n):
             if chosen[b]:
                 continue
-            d = np.inf                      # min dist from b to the current tree
-            for a in order:                 # <-- the O(N) rescan that makes it cubic
+            d = np.inf  # min dist from b to the current tree
+            for a in order:  # <-- the O(N) rescan that makes it cubic
                 if D[a, b] < d:
                     d = D[a, b]
             if d < best_d:
@@ -68,7 +70,9 @@ def _resolve_pvat():
         except Exception:  # noqa: BLE001
             continue
     print("  [pVAT] could not resolve the repo entry point; pVAT column -> N/A")
-    print("         (edit _resolve_pvat() to point at the actual tribbleclustering API)")
+    print(
+        "         (edit _resolve_pvat() to point at the actual tribbleclustering API)"
+    )
     return None
 
 
@@ -76,7 +80,7 @@ def main():
     print("Table 3.1 -- pVAT vs. classical VAT reorder time")
     pvat = _resolve_pvat()
     rows = []
-    means = []   # (classical_mean, pvat_mean) per N, for the normalized view
+    means = []  # (classical_mean, pvat_mean) per N, for the normalized view
     for n in N_GRID:
         classical_t, pvat_t = [], []
         for seed in C.SEEDS:
@@ -94,7 +98,11 @@ def main():
                     pvat_t.append(t.seconds)
                 except Exception as exc:  # noqa: BLE001
                     print(f"    [pVAT n={n}] failed ({exc.__class__.__name__})")
-        c_cell = (C.cell(classical_t, fmt="{:.3f}") + " s") if classical_t else "infeasible (>cap)"
+        c_cell = (
+            (C.cell(classical_t, fmt="{:.3f}") + " s")
+            if classical_t
+            else "infeasible (>cap)"
+        )
         p_cell = (C.cell(pvat_t, fmt="{:.3f}") + " s") if pvat_t else C.NA
         cm, _ = C.agg(classical_t)
         pm, _ = C.agg(pvat_t)
@@ -116,20 +124,24 @@ def main():
             cn, pn = "infeasible (>cap)", "ran (no reference to normalize against)"
         md_rows.append([r[0], cn, pn])
 
-    C.emit("table_3_1", "Table 3.1 -- Reorder time: classical VAT vs. pVAT",
-           ["N (points)", "classical VAT (s)", "pVAT (s)", "speedup"], rows,
-           md_header=["N (points)", "classical VAT", "pVAT"],
-           md_rows=md_rows,
-           note=f"Random 2-D point sets; classical reference capped at N<={NAIVE_CAP} "
-                "(it is genuinely cubic). **The Markdown columns are normalized against "
-                "the worst arm in each row**: the slower arm is the 1.0x baseline and the "
-                "faster one reads as 'this many times faster'. Ratios survive a change of "
-                "machine and absolute seconds do not, so the chapters quote these and the "
-                "companion CSV keeps the seconds with their per-seed spreads. Rows where "
-                "the cubic reference exceeds its cap have nothing to normalize against, so "
-                "they say pVAT 'ran' rather than printing either a lone 1.0x (which would "
-                "read as a comparison) or N/A (which would read as 'did not run'). "
-                "Re-run under the G4 protocol on stable hardware for the citable version.")
+    C.emit(
+        "table_3_1",
+        "Table 3.1 -- Reorder time: classical VAT vs. pVAT",
+        ["N (points)", "classical VAT (s)", "pVAT (s)", "speedup"],
+        rows,
+        md_header=["N (points)", "classical VAT", "pVAT"],
+        md_rows=md_rows,
+        note=f"Random 2-D point sets; classical reference capped at N<={NAIVE_CAP} "
+        "(it is genuinely cubic). **The Markdown columns are normalized against "
+        "the worst arm in each row**: the slower arm is the 1.0x baseline and the "
+        "faster one reads as 'this many times faster'. Ratios survive a change of "
+        "machine and absolute seconds do not, so the chapters quote these and the "
+        "companion CSV keeps the seconds with their per-seed spreads. Rows where "
+        "the cubic reference exceeds its cap have nothing to normalize against, so "
+        "they say pVAT 'ran' rather than printing either a lone 1.0x (which would "
+        "read as a comparison) or N/A (which would read as 'did not run'). "
+        "Re-run under the G4 protocol on stable hardware for the citable version.",
+    )
 
 
 if __name__ == "__main__":

@@ -61,8 +61,11 @@ def main():
     total = len(datasets) * len(cfgs)
     done = 0
     t0 = time.perf_counter()
-    print(f"low-capacity sweep: {[pdata.system_name(n) for n in args.n]} x "
-          f"{{frictionless, friction}} x {len(cfgs)} configs", flush=True)
+    print(
+        f"low-capacity sweep: {[pdata.system_name(n) for n in args.n]} x "
+        f"{{frictionless, friction}} x {len(cfgs)} configs",
+        flush=True,
+    )
     for n_links, friction in datasets:
         split = load(n_links, friction)
         for cfg in cfgs:
@@ -77,10 +80,18 @@ def main():
                     flush=True,
                 )
             except Exception as exc:
-                print(f"[{done:3d}/{total}] {split.label:20s} {cfg.key():44s} "
-                      f"FAILED {type(exc).__name__}: {exc}", flush=True)
-                rows.append({"dataset": split.label, "config": cfg.key(),
-                             "error": f"{type(exc).__name__}: {exc}"})
+                print(
+                    f"[{done:3d}/{total}] {split.label:20s} {cfg.key():44s} "
+                    f"FAILED {type(exc).__name__}: {exc}",
+                    flush=True,
+                )
+                rows.append(
+                    {
+                        "dataset": split.label,
+                        "config": cfg.key(),
+                        "error": f"{type(exc).__name__}: {exc}",
+                    }
+                )
 
     fields = []
     for r in rows:

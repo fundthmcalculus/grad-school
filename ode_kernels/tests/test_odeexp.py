@@ -25,6 +25,7 @@ def test_exact_on_linear_autonomous_system():
 def test_matches_scipy_on_forced_linear_system():
     """A time-dependent forcing term exercises the non-autonomous correction
     (the augmented df/dt term) -- without it this drifts off scipy's answer."""
+
     def f(t, y):
         return np.array([-50.0 * (y[0] - np.cos(t))])
 

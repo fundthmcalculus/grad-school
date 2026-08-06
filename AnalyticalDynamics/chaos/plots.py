@@ -99,9 +99,10 @@ def tint(color, amount=0.55, toward=SURFACE):
     so a de-emphasised line stays a real colour rather than a transparency that
     flattens differently per backend.
     """
+
     def rgb(h):
         h = h.lstrip("#")
-        return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+        return tuple(int(h[i : i + 2], 16) for i in (0, 2, 4))
 
     a, b = rgb(color), rgb(toward)
     mix = tuple(round(x + (y - x) * amount) for x, y in zip(a, b))
@@ -166,7 +167,11 @@ def metric_bars(system, friction, setting, metric, fis_value, baselines=None):
     values = [e[1] for e in scored]
     kinds = [e[2] for e in scored]
 
-    face = {"paper": BLUE if metric == "rmse" else ORANGE, "fis": VIOLET, "baseline": AQUA}
+    face = {
+        "paper": BLUE if metric == "rmse" else ORANGE,
+        "fis": VIOLET,
+        "baseline": AQUA,
+    }
     fig, ax = plt.subplots(figsize=(0.72 * len(labels) + 2.0, 4.2))
     fig.patch.set_facecolor(SURFACE)
 
@@ -181,27 +186,63 @@ def metric_bars(system, friction, setting, metric, fis_value, baselines=None):
 
     x = np.arange(len(labels), dtype=float)
     for i, (v, k) in enumerate(zip(values, kinds)):
-        ax.bar(x[i], v - bottom, 0.68, bottom=bottom, color=face[k],
-               edgecolor=INK if k != "paper" else "none",
-               linewidth=1.0 if k != "paper" else 0,
-               hatch="..." if k == "baseline" else None)
+        ax.bar(
+            x[i],
+            v - bottom,
+            0.68,
+            bottom=bottom,
+            color=face[k],
+            edgecolor=INK if k != "paper" else "none",
+            linewidth=1.0 if k != "paper" else 0,
+            hatch="..." if k == "baseline" else None,
+        )
         off = (top - bottom) * 0.015
         above = v + off if v >= bottom else bottom + off
-        ax.text(x[i], above, f"{v:.4g}", ha="center", va="bottom",
-                fontsize=FS_SMALL, color=INK_2, rotation=90)
+        ax.text(
+            x[i],
+            above,
+            f"{v:.4g}",
+            ha="center",
+            va="bottom",
+            fontsize=FS_SMALL,
+            color=INK_2,
+            rotation=90,
+        )
     for j in range(len(missing)):
         i = len(values) + j
-        ax.bar(x[i], top - bottom, 0.68, bottom=bottom, color="none", edgecolor=FAINT,
-               linewidth=0.9, hatch="///")
-        ax.text(x[i], bottom + (top - bottom) * 0.5, "not run\nin paper", ha="center",
-                va="center", fontsize=FS_SMALL, color=FAINT, rotation=90)
+        ax.bar(
+            x[i],
+            top - bottom,
+            0.68,
+            bottom=bottom,
+            color="none",
+            edgecolor=FAINT,
+            linewidth=0.9,
+            hatch="///",
+        )
+        ax.text(
+            x[i],
+            bottom + (top - bottom) * 0.5,
+            "not run\nin paper",
+            ha="center",
+            va="center",
+            fontsize=FS_SMALL,
+            color=FAINT,
+            rotation=90,
+        )
 
     sysname = system.capitalize()
     fric = "with friction" if friction else "frictionless"
-    which = ("trained initial condition" if setting == "trained"
-             else 'unknown "in-between" initial condition')
-    what = ("RMSE — scaled units, lower is better" if metric == "rmse"
-            else "$R^2$ — higher is better")
+    which = (
+        "trained initial condition"
+        if setting == "trained"
+        else 'unknown "in-between" initial condition'
+    )
+    what = (
+        "RMSE — scaled units, lower is better"
+        if metric == "rmse"
+        else "$R^2$ — higher is better"
+    )
     _style(ax, title=f"{sysname} pendulum, {fric}\n{which}", ylabel=what)
     ax.set_ylim(bottom, top)
     ax.set_xticks(x)
@@ -209,14 +250,25 @@ def metric_bars(system, friction, setting, metric, fis_value, baselines=None):
     if metric == "r2" and bottom < 0 < top:
         ax.axhline(0.0, color=AXIS, linewidth=0.9)
 
-    handles = [plt.Rectangle((0, 0), 1, 1, facecolor=face["paper"]),
-               plt.Rectangle((0, 0), 1, 1, facecolor=VIOLET, edgecolor=INK)]
+    handles = [
+        plt.Rectangle((0, 0), 1, 1, facecolor=face["paper"]),
+        plt.Rectangle((0, 0), 1, 1, facecolor=VIOLET, edgecolor=INK),
+    ]
     names = ["paper", "FIS (ours)"]
     if baselines:
-        handles.append(plt.Rectangle((0, 0), 1, 1, facecolor=AQUA, edgecolor=INK, hatch="..."))
+        handles.append(
+            plt.Rectangle((0, 0), 1, 1, facecolor=AQUA, edgecolor=INK, hatch="...")
+        )
         names.append("no-learning baseline")
-    ax.legend(handles, names, loc="upper center", bbox_to_anchor=(0.5, -0.32),
-              fontsize=FS_SMALL, frameon=False, ncol=len(names))
+    ax.legend(
+        handles,
+        names,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.32),
+        fontsize=FS_SMALL,
+        frameon=False,
+        ncol=len(names),
+    )
 
     fr = "friction" if friction else "frictionless"
     return _save(fig, f"fig_{metric}_{system}_{fr}_{setting}")
@@ -250,8 +302,14 @@ def angles_overlay(pred, system, friction, setting, extra=""):
     axes = np.atleast_1d(axes)
     for j, ax in enumerate(axes):
         ax.plot(t, truth[:, j], color=BLUE, linewidth=1.5, label="actual (RK4)")
-        ax.plot(t, fis[:, j], color=ORANGE, linewidth=1.2, linestyle="--",
-                label="FIS prediction")
+        ax.plot(
+            t,
+            fis[:, j],
+            color=ORANGE,
+            linewidth=1.2,
+            linestyle="--",
+            label="FIS prediction",
+        )
         _style(ax, ylabel=rf"$\theta_{j + 1}$ (deg)")
 
         if t_end is not None:
@@ -260,16 +318,30 @@ def angles_overlay(pred, system, friction, setting, extra=""):
             ax.set_ylim(lo - pad, hi + pad)
             ax.axvline(t_end, color=INK, linewidth=1.1, linestyle=":")
             if j == 0:
-                ax.text(t_end, hi + pad, " training data ends", ha="left", va="top",
-                        fontsize=FS_SMALL, color=INK)
+                ax.text(
+                    t_end,
+                    hi + pad,
+                    " training data ends",
+                    ha="left",
+                    va="top",
+                    fontsize=FS_SMALL,
+                    color=INK,
+                )
             worst = float(np.max(np.abs(fis[:, j])))
             if worst > 3.0 * max(abs(lo), abs(hi), 1.0):
                 # Solid background, not alpha: the diverging trace runs underneath
                 # this label and would otherwise strike through it.
-                ax.text(0.99, 0.03, f"prediction leaves the axis; peaks at {worst:.3g}°",
-                        transform=ax.transAxes, ha="right", va="bottom",
-                        fontsize=FS_SMALL, color=ORANGE,
-                        bbox=dict(facecolor=SURFACE, edgecolor="none", pad=1.5))
+                ax.text(
+                    0.99,
+                    0.03,
+                    f"prediction leaves the axis; peaks at {worst:.3g}°",
+                    transform=ax.transAxes,
+                    ha="right",
+                    va="bottom",
+                    fontsize=FS_SMALL,
+                    color=ORANGE,
+                    bbox=dict(facecolor=SURFACE, edgecolor="none", pad=1.5),
+                )
         if j == 0:
             ax.legend(loc="upper left", fontsize=FS_SMALL, frameon=False, ncol=2)
     axes[-1].set_xlabel("t (seconds)", fontsize=FS_LABEL, color=INK)
@@ -278,10 +350,14 @@ def angles_overlay(pred, system, friction, setting, extra=""):
     which = "trained IC" if setting == "trained" else "unknown IC"
     axes[0].set_title(
         f"{system.capitalize()} pendulum, {fric} — {which} [{ic}]°{extra}",
-        fontsize=FS_TITLE, color=INK,
+        fontsize=FS_TITLE,
+        color=INK,
     )
     fig.tight_layout()
-    return _save(fig, f"fig_angles_{system}_{'friction' if friction else 'frictionless'}_{setting}")
+    return _save(
+        fig,
+        f"fig_angles_{system}_{'friction' if friction else 'frictionless'}_{setting}",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -308,20 +384,54 @@ def trajectory_overlay(pred, system, friction, setting):
     fig, ax = plt.subplots(figsize=(5.2, 5.2))
     fig.patch.set_facecolor(SURFACE)
     for j in range(n):
-        ax.plot(xt[inw, j], yt[inw, j], color=BLUE, linewidth=0.7,
-                label="actual" if j == 0 else None)
-        ax.plot(xp[inw, j], yp[inw, j], color=ORANGE, linewidth=0.7,
-                label="FIS prediction" if j == 0 else None)
+        ax.plot(
+            xt[inw, j],
+            yt[inw, j],
+            color=BLUE,
+            linewidth=0.7,
+            label="actual" if j == 0 else None,
+        )
+        ax.plot(
+            xp[inw, j],
+            yp[inw, j],
+            color=ORANGE,
+            linewidth=0.7,
+            label="FIS prediction" if j == 0 else None,
+        )
         if not inw.all():
-            ax.plot(xt[~inw, j], yt[~inw, j], color=tint(BLUE, 0.55), linewidth=0.6,
-                    label="actual, past training window" if j == 0 else None)
-            ax.plot(xp[~inw, j], yp[~inw, j], color=tint(ORANGE, 0.55), linewidth=0.6,
-                    label="FIS, past training window" if j == 0 else None)
+            ax.plot(
+                xt[~inw, j],
+                yt[~inw, j],
+                color=tint(BLUE, 0.55),
+                linewidth=0.6,
+                label="actual, past training window" if j == 0 else None,
+            )
+            ax.plot(
+                xp[~inw, j],
+                yp[~inw, j],
+                color=tint(ORANGE, 0.55),
+                linewidth=0.6,
+                label="FIS, past training window" if j == 0 else None,
+            )
     end = np.flatnonzero(inw)[-1]
-    ax.plot(np.r_[0, xt[end]], np.r_[0, yt[end]], "-o", color=BLUE, linewidth=2.2,
-            markersize=5, label=f"actual at t={t_last:.0f} s")
-    ax.plot(np.r_[0, xp[end]], np.r_[0, yp[end]], "-o", color=ORANGE, linewidth=2.2,
-            markersize=5, label=f"predicted at t={t_last:.0f} s")
+    ax.plot(
+        np.r_[0, xt[end]],
+        np.r_[0, yt[end]],
+        "-o",
+        color=BLUE,
+        linewidth=2.2,
+        markersize=5,
+        label=f"actual at t={t_last:.0f} s",
+    )
+    ax.plot(
+        np.r_[0, xp[end]],
+        np.r_[0, yp[end]],
+        "-o",
+        color=ORANGE,
+        linewidth=2.2,
+        markersize=5,
+        label=f"predicted at t={t_last:.0f} s",
+    )
     ax.plot([0], [0], marker="x", color=INK, markersize=7)
 
     lim = n + 0.35
@@ -332,10 +442,17 @@ def trajectory_overlay(pred, system, friction, setting):
     fric = "with friction" if friction else "frictionless"
     which = "trained IC" if setting == "trained" else "unknown IC"
     span = f"{t[-1] + (t[1] - t[0]):.0f} s"
-    _style(ax, title=f"{system.capitalize()} pendulum, {fric}\n{which} [{ic}]°, {span} of trajectory",
-           xlabel="x (m)", ylabel="y (m)")
+    _style(
+        ax,
+        title=f"{system.capitalize()} pendulum, {fric}\n{which} [{ic}]°, {span} of trajectory",
+        xlabel="x (m)",
+        ylabel="y (m)",
+    )
     ax.legend(loc="upper left", fontsize=FS_SMALL, frameon=False)
-    return _save(fig, f"fig_trajectory_{system}_{'friction' if friction else 'frictionless'}_{setting}")
+    return _save(
+        fig,
+        f"fig_trajectory_{system}_{'friction' if friction else 'frictionless'}_{setting}",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -353,22 +470,50 @@ def error_vs_time(preds, t_end, threshold=0.10):
     colors = regime_colors(preds)
     for label, p in sorted(preds.items()):
         err = np.max(np.abs(p["pred_scaled"] - p["truth_scaled"]), axis=1)
-        ax.semilogy(p["t"], np.maximum(err, 1e-6), color=colors[label], linewidth=1.2,
-                    label=label.replace("_", " "))
+        ax.semilogy(
+            p["t"],
+            np.maximum(err, 1e-6),
+            color=colors[label],
+            linewidth=1.2,
+            label=label.replace("_", " "),
+        )
     ax.axvline(t_end, color=INK, linewidth=1.2, linestyle=":")
     ax.axhline(threshold, color=FAINT, linewidth=1.0, linestyle="--")
-    ax.text(t_end, ax.get_ylim()[1], " training data ends", ha="left", va="top",
-            fontsize=FS_SMALL, color=INK)
+    ax.text(
+        t_end,
+        ax.get_ylim()[1],
+        " training data ends",
+        ha="left",
+        va="top",
+        fontsize=FS_SMALL,
+        color=INK,
+    )
     # Right edge with a solid background: at the left the in-window traces cross
     # this level repeatedly and strike the label through.
-    ax.text(0.985, threshold, f"{threshold:.0%} of the training-window range ",
-            transform=ax.get_yaxis_transform(), ha="right", va="bottom",
-            fontsize=FS_SMALL, color=FAINT,
-            bbox=dict(facecolor=SURFACE, edgecolor="none", pad=1.5))
-    _style(ax, title="Prediction error against time, held-out initial condition",
-           xlabel="t (seconds)", ylabel="max abs error (scaled units, log)")
-    ax.legend(fontsize=FS_SMALL, frameon=False, loc="upper center",
-              bbox_to_anchor=(0.5, -0.14), ncol=3)
+    ax.text(
+        0.985,
+        threshold,
+        f"{threshold:.0%} of the training-window range ",
+        transform=ax.get_yaxis_transform(),
+        ha="right",
+        va="bottom",
+        fontsize=FS_SMALL,
+        color=FAINT,
+        bbox=dict(facecolor=SURFACE, edgecolor="none", pad=1.5),
+    )
+    _style(
+        ax,
+        title="Prediction error against time, held-out initial condition",
+        xlabel="t (seconds)",
+        ylabel="max abs error (scaled units, log)",
+    )
+    ax.legend(
+        fontsize=FS_SMALL,
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.14),
+        ncol=3,
+    )
     return _save(fig, "fig_error_vs_time")
 
 
@@ -395,11 +540,26 @@ def rmse_heatmap(fis_rmse, setting="holdout", friction=True, systems=None):
     for i in range(M.shape[0]):
         for j in range(M.shape[1]):
             if np.isnan(M[i, j]):
-                ax.text(j, i, "n/a", ha="center", va="center", fontsize=FS_SMALL, color=FAINT)
+                ax.text(
+                    j,
+                    i,
+                    "n/a",
+                    ha="center",
+                    va="center",
+                    fontsize=FS_SMALL,
+                    color=FAINT,
+                )
                 continue
             norm = (M[i, j] - np.nanmin(M)) / max(np.nanmax(M) - np.nanmin(M), 1e-12)
-            ax.text(j, i, f"{M[i, j]:.4g}", ha="center", va="center", fontsize=FS_SMALL,
-                    color="white" if norm > 0.55 else INK)
+            ax.text(
+                j,
+                i,
+                f"{M[i, j]:.4g}",
+                ha="center",
+                va="center",
+                fontsize=FS_SMALL,
+                color="white" if norm > 0.55 else INK,
+            )
     ax.set_xticks(range(len(systems)))
     ax.set_xticklabels([s.capitalize() for s in systems], fontsize=FS_TICK, color=INK_2)
     ax.set_yticks(range(len(labels)))
@@ -407,7 +567,8 @@ def rmse_heatmap(fis_rmse, setting="holdout", friction=True, systems=None):
     ax.set_title(
         f"RMSE, time-step approach\n{'friction' if friction else 'frictionless'}, "
         f"{'unknown' if setting == 'holdout' else 'trained'} initial angle",
-        fontsize=FS_TITLE, color=INK,
+        fontsize=FS_TITLE,
+        color=INK,
     )
     for side in ax.spines.values():
         side.set_visible(False)
@@ -415,7 +576,9 @@ def rmse_heatmap(fis_rmse, setting="holdout", friction=True, systems=None):
     cb = fig.colorbar(im, ax=ax, fraction=0.045)
     cb.set_label("RMSE (scaled units)", fontsize=FS_LABEL, color=INK)
     cb.ax.tick_params(labelsize=FS_TICK, colors=INK_2)
-    return _save(fig, f"fig_rmse_heatmap_{'friction' if friction else 'frictionless'}_{setting}")
+    return _save(
+        fig, f"fig_rmse_heatmap_{'friction' if friction else 'frictionless'}_{setting}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -433,20 +596,41 @@ def capacity_curve(curves, best_paper=None):
     colors = regime_colors(curves)
     for label, (rules, r2) in sorted(curves.items()):
         order = np.argsort(rules)
-        ax.plot(np.asarray(rules)[order], np.asarray(r2)[order], "-o",
-                color=colors.get(label, FAINT), markersize=4, linewidth=1.4,
-                label=label.replace("_", " "))
+        ax.plot(
+            np.asarray(rules)[order],
+            np.asarray(r2)[order],
+            "-o",
+            color=colors.get(label, FAINT),
+            markersize=4,
+            linewidth=1.4,
+            label=label.replace("_", " "),
+        )
     if best_paper is not None:
         ax.axhline(best_paper, color=FAINT, linestyle=":", linewidth=1.2)
         # Name the cell: with three chain lengths on the axes, an unqualified
         # "paper best" reads as if it applied to all of them, and the paper has no
         # n=5 result at all.
-        ax.text(ax.get_xlim()[1], best_paper, " paper best (n=2, friction)", va="center",
-                fontsize=FS_SMALL, color=FAINT)
-    _style(ax, title="Held-out initial condition: score against FIS capacity",
-           xlabel="rules per output (n_output_buckets)", ylabel="$R^2$ on unknown IC")
+        ax.text(
+            ax.get_xlim()[1],
+            best_paper,
+            " paper best (n=2, friction)",
+            va="center",
+            fontsize=FS_SMALL,
+            color=FAINT,
+        )
+    _style(
+        ax,
+        title="Held-out initial condition: score against FIS capacity",
+        xlabel="rules per output (n_output_buckets)",
+        ylabel="$R^2$ on unknown IC",
+    )
     # Legend below the axes: with six curves the low-left and low-right corners are
     # both occupied, and an inset legend covered the n=5 frictionless trace.
-    ax.legend(fontsize=FS_SMALL, frameon=False, loc="upper center",
-              bbox_to_anchor=(0.5, -0.14), ncol=3)
+    ax.legend(
+        fontsize=FS_SMALL,
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.14),
+        ncol=3,
+    )
     return _save(fig, "fig_capacity_vs_holdout")

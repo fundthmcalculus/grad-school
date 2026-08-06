@@ -120,7 +120,10 @@ def rhs_double_reference(r, _t, damping1=0.0, damping2=0.0):
     fomega1 = (
         -G * (2 * M1 + M2) * sin(theta1)
         - M2 * G * sin(theta1 - 2 * theta2)
-        - 2 * sin(theta1 - theta2) * M2 * (omega2**2 * L2 + omega1**2 * L1 * cos(theta1 - theta2))
+        - 2
+        * sin(theta1 - theta2)
+        * M2
+        * (omega2**2 * L2 + omega1**2 * L1 * cos(theta1 - theta2))
         - damping1 * omega1
     ) / (L1 * denom)
 
@@ -329,7 +332,11 @@ def save(ds, out_dir=DATA_DIR):
     out_dir.mkdir(parents=True, exist_ok=True)
     npz = out_dir / f"{ds.label}.npz"
     np.savez_compressed(
-        npz, ic_deg=ds.ic_deg, theta_deg=ds.theta_deg, t=ds.t, n_links=ds.n_links,
+        npz,
+        ic_deg=ds.ic_deg,
+        theta_deg=ds.theta_deg,
+        t=ds.t,
+        n_links=ds.n_links,
         friction=ds.friction,
     )
 
@@ -411,8 +418,9 @@ def rhs_for(n_links, friction):
     return make_rhs_n(n_links, damping)
 
 
-def cross_check_integrators(n_links, friction, duration=TEST_T_END,
-                            rtol=1e-12, atol=1e-14):
+def cross_check_integrators(
+    n_links, friction, duration=TEST_T_END, rtol=1e-12, atol=1e-14
+):
     """Max angular disagreement (deg) between RK4 at h=0.005 and DOP853.
 
     Returns (max_delta_deg, t_first_exceeds_10deg). For a converged reference this
@@ -433,8 +441,9 @@ def cross_check_integrators(n_links, friction, duration=TEST_T_END,
     return float(np.max(delta)), (float(t[over[0]]) if over.size else float("inf"))
 
 
-def reference_convergence(n_links, friction, duration=TEST_T_END, refinements=3,
-                          threshold_deg=10.0):
+def reference_convergence(
+    n_links, friction, duration=TEST_T_END, refinements=3, threshold_deg=10.0
+):
     """How long the reference trajectory itself is trustworthy.
 
     Energy drift says the integrator is self-consistent; it says nothing about
@@ -473,8 +482,13 @@ def reference_convergence(n_links, friction, duration=TEST_T_END, refinements=3,
         else:
             delta = np.abs(theta - prev)
             over = np.flatnonzero(np.max(delta, axis=1) > threshold_deg)
-            out.append((H / div, float(np.max(delta)),
-                        float(over[0] * H) if over.size else float("inf")))
+            out.append(
+                (
+                    H / div,
+                    float(np.max(delta)),
+                    float(over[0] * H) if over.size else float("inf"),
+                )
+            )
         prev = theta
     return out
 
@@ -490,18 +504,26 @@ def main():
 
     print("Energy conservation of the undamped [120, 0, ...] run over 10 s:")
     e0, drift = energy_drift(2, use_reference_rhs=True)
-    print(f"  n=2 (paper's closed form): E0 = {e0:+.6f} J, max drift / PE swing = {drift:.3e}")
+    print(
+        f"  n=2 (paper's closed form): E0 = {e0:+.6f} J, max drift / PE swing = {drift:.3e}"
+    )
     for n_links in N_LINKS:
         e0, drift = energy_drift(n_links, use_reference_rhs=False)
-        print(f"  n={n_links} (symbolic)          : E0 = {e0:+.6f} J, "
-              f"max drift / PE swing = {drift:.3e}")
+        print(
+            f"  n={n_links} (symbolic)          : E0 = {e0:+.6f} J, "
+            f"max drift / PE swing = {drift:.3e}"
+        )
 
     worst_n = max(N_LINKS)
     steps = rk4_order_check(worst_n)
     ratios = [a[1] / b[1] for a, b in zip(steps, steps[1:])]
-    print(f"  n={worst_n} h-refinement drift: "
-          + " -> ".join(f"{d:.2e}" for _, d in steps)
-          + "  (ratios " + ", ".join(f"{r:.1f}x" for r in ratios) + ", RK4 expects ~16x)")
+    print(
+        f"  n={worst_n} h-refinement drift: "
+        + " -> ".join(f"{d:.2e}" for _, d in steps)
+        + "  (ratios "
+        + ", ".join(f"{r:.1f}x" for r in ratios)
+        + ", RK4 expects ~16x)"
+    )
     assert min(ratios) > 8.0, (
         f"n={worst_n} energy drift is not converging at RK4's order "
         f"(ratios {ratios}); suspect the derivation, not the step size"
@@ -517,8 +539,13 @@ def main():
             test = generate(n_links, friction, [TEST_THETA2_DEG], n_steps=TEST_N_STEPS)
             tnpz = DATA_DIR / f"{test.label}_holdout.npz"
             np.savez_compressed(
-                tnpz, ic_deg=test.ic_deg, theta_deg=test.theta_deg, t=test.t,
-                n_links=n_links, friction=friction, train_t_end=T_END,
+                tnpz,
+                ic_deg=test.ic_deg,
+                theta_deg=test.theta_deg,
+                t=test.t,
+                n_links=n_links,
+                friction=friction,
+                train_t_end=T_END,
             )
             print(
                 f"  {train.label}: train {train.theta_deg.shape} over "

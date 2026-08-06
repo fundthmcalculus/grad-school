@@ -68,9 +68,11 @@ ORDER_N = int(os.environ.get("REPRO_ORDER_N", "2000"))
 DTYPES = [("float64", np.float64), ("float32", np.float32)]
 
 # (label, matrices held).  k = 0 marks a scheme with no N^2 term at all.
-SCHEMES = [("classical (D + copy + work)", 3),
-           ("in-place (D only)", 1),
-           ("on-demand (vat_prim_mst_seq) — DEFECTIVE", 0)]
+SCHEMES = [
+    ("classical (D + copy + work)", 3),
+    ("in-place (D only)", 1),
+    ("on-demand (vat_prim_mst_seq) — DEFECTIVE", 0),
+]
 
 
 # --------------------------------------------------------------------------- #
@@ -91,7 +93,7 @@ def distance_matrix(P):
 # --------------------------------------------------------------------------- #
 def footprint(n, k, itemsize):
     """Bytes held by the N^2 term. k = 0 means the scheme holds no matrix."""
-    return None if k == 0 else k * (n ** 2) * itemsize
+    return None if k == 0 else k * (n**2) * itemsize
 
 
 def ceiling(k, itemsize, budget):
@@ -126,9 +128,11 @@ def agreement(a, b):
 
 
 def main():
-    print(f"Table 3.2 -- memory x precision  (budgets "
-          f"{', '.join(f'{b:.0f} GB' for b in BUDGETS)}, "
-          f"footprint at N={REF_N:,}, ordering at N={ORDER_N:,}, seeds={C.SEEDS})")
+    print(
+        f"Table 3.2 -- memory x precision  (budgets "
+        f"{', '.join(f'{b:.0f} GB' for b in BUDGETS)}, "
+        f"footprint at N={REF_N:,}, ordering at N={ORDER_N:,}, seeds={C.SEEDS})"
+    )
 
     # ---- measured arm: does the ordering survive the precision? ----
     ref = {}
@@ -139,8 +143,10 @@ def main():
         try:
             ref[seed] = orderings(P, D64, np.float64, 1)
         except Exception as exc:  # noqa: BLE001
-            print(f"  [fatal] float64 in-place reference failed on seed {seed}: "
-                  f"{exc.__class__.__name__}: {exc}")
+            print(
+                f"  [fatal] float64 in-place reference failed on seed {seed}: "
+                f"{exc.__class__.__name__}: {exc}"
+            )
             return
         for name, dtype in DTYPES:
             for label, k in SCHEMES:
@@ -151,8 +157,10 @@ def main():
                 except Exception as exc:  # noqa: BLE001
                     measured.setdefault(key, [])
                     if seed == C.SEEDS[0]:
-                        print(f"  [skip] {name:<8} {label:<28} "
-                              f"{exc.__class__.__name__}")
+                        print(
+                            f"  [skip] {name:<8} {label:<28} "
+                            f"{exc.__class__.__name__}"
+                        )
         print(f"  done: seed {seed}")
 
     # ---- emit ----
@@ -172,21 +180,28 @@ def main():
             for b in BUDGETS:
                 cl = ceiling(k, itemsize, b)
                 ceilings.append(f"{cl:,}" if cl is not None else "not memory-bound")
-            rows.append([
-                name,
-                label,
-                str(itemsize),
-                gb(fp) if fp is not None else "no N^2 term",
-                *ceilings,
-                order,
-            ])
+            rows.append(
+                [
+                    name,
+                    label,
+                    str(itemsize),
+                    gb(fp) if fp is not None else "no N^2 term",
+                    *ceilings,
+                    order,
+                ]
+            )
 
     C.emit(
         "table_3_2_memory_precision",
         "Table 3.3 — memory footprint and reachable N, by precision and scheme",
-        ["precision", "scheme", "bytes/entry", f"footprint at N={REF_N:,}",
-         *(f"largest N in {b:.0f} GB" for b in BUDGETS),
-         f"ordering vs float64 (N={ORDER_N:,})"],
+        [
+            "precision",
+            "scheme",
+            "bytes/entry",
+            f"footprint at N={REF_N:,}",
+            *(f"largest N in {b:.0f} GB" for b in BUDGETS),
+            f"ordering vs float64 (N={ORDER_N:,})",
+        ],
         rows,
         note=(
             "The memory columns are EXACT ARITHMETIC, not measurements: "

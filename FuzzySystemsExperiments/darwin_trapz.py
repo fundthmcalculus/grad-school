@@ -41,12 +41,16 @@ def main():
     print(f"Number of unique values in y: {n_unique}")
 
     # Split dataset into train/test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.1, random_state=42, stratify=y
+    )
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # Initialize and fit the TRAPEZOID Mixture Classifier (using fast method by default)
     print("\nTraining trapezoid-based classifier (fast method)...")
-    clf = MixtureOfGaussiansFuzzyClassifier(member_function="trap", trapz_method="em")  # trapz_method="fast" is now default
+    clf = MixtureOfGaussiansFuzzyClassifier(
+        member_function="trap", trapz_method="em"
+    )  # trapz_method="fast" is now default
     clf.fit(X_train, y_train)
 
     top_n_todo = clf.top_features_
@@ -54,7 +58,15 @@ def main():
 
     # Create the actual fuzzy model and predict on test set
     print("\nEvaluating trapezoid classifier on test set...")
-    report_figures_of_merit(X_test, y_test, trapz_memberships, n_unique, start_time, top_n_todo, label="test (trapezoid-fast)")
+    report_figures_of_merit(
+        X_test,
+        y_test,
+        trapz_memberships,
+        n_unique,
+        start_time,
+        top_n_todo,
+        label="test (trapezoid-fast)",
+    )
 
     # Now, plot a set of distributions for the most-differentiating variables
     # plot_var_gauss_dist(X_train, y_train, top_n_todo, trapz_memberships)

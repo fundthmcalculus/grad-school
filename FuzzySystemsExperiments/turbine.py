@@ -111,16 +111,23 @@ def main():
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # Calculate correlation coefficient between Gaussian distributions using training data
-    feature_differentiators = calculate_gaussian_correlation(X_train, y_train["y_bucket"])
+    feature_differentiators = calculate_gaussian_correlation(
+        X_train, y_train["y_bucket"]
+    )
 
     # Take the top-n variables so that the normalized differentiation value encompasses 90-95%
     top_n, top_n_todo = take_top_features(feature_differentiators, top_n=n_top_vars)
 
-    print(f"Selected Top-{top_n} Variables ({top_n/len(feature_differentiators):.2%} coverage):")
+    print(
+        f"Selected Top-{top_n} Variables ({top_n/len(feature_differentiators):.2%} coverage):"
+    )
 
     # Compute memberships using training data
     gaussian_memberships = create_gaussian_membership_dict(
-        X_train, y_train["y_bucket"], top_n_var_names=top_n_todo, n_gaussians=n_gaussians
+        X_train,
+        y_train["y_bucket"],
+        top_n_var_names=top_n_todo,
+        n_gaussians=n_gaussians,
     )
 
     duplicates = gaussian_memberships.identify_duplicate_membership_fcns()
@@ -189,8 +196,12 @@ def main():
     # Now, we need to evaluate the model
     print("\nEvaluating Multi-Order TSK Model on TEST set:")
     print("=" * 80)
-    firing_strengths, labels = tsk_firing_strengths(X_test[top_n_todo], gaussian_memberships)
-    norm_firing_strength = firing_strengths / firing_strengths.sum(axis=1)[:, np.newaxis]
+    firing_strengths, labels = tsk_firing_strengths(
+        X_test[top_n_todo], gaussian_memberships
+    )
+    norm_firing_strength = (
+        firing_strengths / firing_strengths.sum(axis=1)[:, np.newaxis]
+    )
 
     # Evaluate optimized order-0 model
     y_test_pred_zeroth_opt = np.dot(norm_firing_strength, y_bucket_mean_opt_0)

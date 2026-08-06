@@ -17,6 +17,7 @@ from dataclasses import dataclass
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import battery as B
@@ -27,6 +28,7 @@ import selection as S
 @dataclass
 class AutoTunedRuspiniMF:
     """Ruspini MF with auto-tuned support width."""
+
     cluster_id: int
     medoid_idx: int
     members: Set[int]
@@ -49,7 +51,9 @@ class AutoTunedRuspiniExtractor:
     def __init__(self, verbose: bool = False):
         self.verbose = verbose
 
-    def extract_partition(self, Dstar: np.ndarray, blocks: List[Dict]) -> Tuple[List[AutoTunedRuspiniMF], np.ndarray]:
+    def extract_partition(
+        self, Dstar: np.ndarray, blocks: List[Dict]
+    ) -> Tuple[List[AutoTunedRuspiniMF], np.ndarray]:
         """
         Extract auto-tuned Ruspini partition.
 
@@ -69,10 +73,10 @@ class AutoTunedRuspiniExtractor:
         mf_list = []
 
         for cluster_id, block in enumerate(blocks):
-            members = set(block['members'])
-            medoid_idx = block.get('medoid_idx', list(members)[0])
-            h_b = block.get('birth', 0.0)
-            h_d = block.get('death', np.inf)
+            members = set(block["members"])
+            medoid_idx = block.get("medoid_idx", list(members)[0])
+            h_b = block.get("birth", 0.0)
+            h_d = block.get("death", np.inf)
 
             dissim_ramp = Dstar[medoid_idx, :]
 
@@ -87,13 +91,17 @@ class AutoTunedRuspiniExtractor:
 
             # Auto-tune support width
             spread = h_d - center_dissim
-            tuning_factor = self._compute_tuning_factor(dissim_ramp, members, center_dissim, h_d)
+            tuning_factor = self._compute_tuning_factor(
+                dissim_ramp, members, center_dissim, h_d
+            )
             support_width = tuning_factor * spread
 
             if self.verbose:
                 print(f"Cluster {cluster_id}:")
-                print(f"  Spread: {spread:.4f}, Tuning factor: {tuning_factor:.3f}, "
-                      f"Support width: {support_width:.4f}")
+                print(
+                    f"  Spread: {spread:.4f}, Tuning factor: {tuning_factor:.3f}, "
+                    f"Support width: {support_width:.4f}"
+                )
 
             # Build membership ramp
             for i in range(n):
@@ -101,7 +109,9 @@ class AutoTunedRuspiniExtractor:
                 if d <= center_dissim:
                     mu[i, cluster_id] = 1.0
                 elif d <= center_dissim + support_width:
-                    mu[i, cluster_id] = (center_dissim + support_width - d) / support_width
+                    mu[i, cluster_id] = (
+                        center_dissim + support_width - d
+                    ) / support_width
                 else:
                     mu[i, cluster_id] = 0.0
 
@@ -111,7 +121,7 @@ class AutoTunedRuspiniExtractor:
                 members=members,
                 center_dissim=float(center_dissim),
                 support_width=float(support_width),
-                tuning_factor=float(tuning_factor)
+                tuning_factor=float(tuning_factor),
             )
             mf_list.append(mf)
 
@@ -126,8 +136,13 @@ class AutoTunedRuspiniExtractor:
 
         return mf_list, mu
 
-    def _compute_tuning_factor(self, dissim_ramp: np.ndarray, members: Set[int],
-                               center_dissim: float, h_d: float) -> float:
+    def _compute_tuning_factor(
+        self,
+        dissim_ramp: np.ndarray,
+        members: Set[int],
+        center_dissim: float,
+        h_d: float,
+    ) -> float:
         """
         Compute automatic support width tuning factor.
 
@@ -171,7 +186,9 @@ class AutoTunedRuspiniExtractor:
         row_sums = np.maximum(row_sums, 1e-10)
         return mu / row_sums
 
-    def defuzzify(self, mf_list: List[AutoTunedRuspiniMF], mu: np.ndarray) -> np.ndarray:
+    def defuzzify(
+        self, mf_list: List[AutoTunedRuspiniMF], mu: np.ndarray
+    ) -> np.ndarray:
         """Defuzzify to hard assignments."""
         return np.argmax(mu, axis=1)
 
@@ -191,14 +208,15 @@ class AutoTunedRuspiniExtractor:
 # Test on battery
 # ============================================================================
 
+
 def run_auto_tuned_battery() -> Dict:
     """Run auto-tuned Ruspini on battery."""
     datasets = [
-        ('two_gaussians', B.two_gaussians),
-        ('bridged_gaussians', B.bridged_gaussians),
-        ('concentric_rings', B.concentric_rings),
-        ('varying_density', B.varying_density),
-        ('uniform_noise', B.uniform_noise),
+        ("two_gaussians", B.two_gaussians),
+        ("bridged_gaussians", B.bridged_gaussians),
+        ("concentric_rings", B.concentric_rings),
+        ("varying_density", B.varying_density),
+        ("uniform_noise", B.uniform_noise),
     ]
 
     from sklearn.metrics import adjusted_rand_score
@@ -219,7 +237,11 @@ def run_auto_tuned_battery() -> Dict:
 
         if not blocks:
             print("  No clusters selected")
-            results[name] = {'ari': np.nan, 'coverage': np.nan, 'partition_error': np.nan}
+            results[name] = {
+                "ari": np.nan,
+                "coverage": np.nan,
+                "partition_error": np.nan,
+            }
             continue
 
         extractor = AutoTunedRuspiniExtractor(verbose=False)
@@ -235,29 +257,29 @@ def run_auto_tuned_battery() -> Dict:
         print(f"  Partition error: max={max_err:.6f}, mean={mean_err:.6f}")
 
         results[name] = {
-            'ari': float(ari),
-            'coverage': float(cov),
-            'partition_error_max': float(max_err),
-            'partition_error_mean': float(mean_err),
+            "ari": float(ari),
+            "coverage": float(cov),
+            "partition_error_max": float(max_err),
+            "partition_error_mean": float(mean_err),
         }
 
     return results
 
 
-if __name__ == '__main__':
-    print("\n" + "="*70)
+if __name__ == "__main__":
+    print("\n" + "=" * 70)
     print("AUTO-TUNED RUSPINI PARTITIONING (Option A, Revised)")
-    print("="*70)
+    print("=" * 70)
 
     results = run_auto_tuned_battery()
 
     # Compare to baseline
     baseline = {
-        'two_gaussians': 1.00,
-        'bridged_gaussians': 0.98,
-        'concentric_rings': 1.00,
-        'varying_density': 0.98,
-        'uniform_noise': np.nan,
+        "two_gaussians": 1.00,
+        "bridged_gaussians": 0.98,
+        "concentric_rings": 1.00,
+        "varying_density": 0.98,
+        "uniform_noise": np.nan,
     }
 
     print(f"\n{'='*90}")
@@ -268,7 +290,7 @@ if __name__ == '__main__':
 
     gaps = []
     for name, result in results.items():
-        auto_ari = result['ari']
+        auto_ari = result["ari"]
         baseline_ari = baseline[name]
 
         if np.isnan(auto_ari):

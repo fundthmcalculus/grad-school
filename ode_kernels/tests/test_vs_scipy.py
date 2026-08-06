@@ -24,8 +24,15 @@ def _van_der_pol(t, y, mu=1.0):
 def test_same_tableau_matches_scipy_closely(ours, scipy_method):
     t_span = (0.0, 10.0)
     y0 = [2.0, 0.0]
-    ref = solve_ivp(_van_der_pol, t_span, y0, method=scipy_method,
-                     rtol=1e-8, atol=1e-10, dense_output=True)
+    ref = solve_ivp(
+        _van_der_pol,
+        t_span,
+        y0,
+        method=scipy_method,
+        rtol=1e-8,
+        atol=1e-10,
+        dense_output=True,
+    )
     res = ours(_van_der_pol, t_span, y0, rtol=1e-8, atol=1e-10)
 
     assert res.success
@@ -45,8 +52,15 @@ def test_same_tableau_matches_scipy_closely(ours, scipy_method):
 def test_higher_order_methods_agree_with_dop853(ours):
     t_span = (0.0, 10.0)
     y0 = [2.0, 0.0]
-    ref = solve_ivp(_van_der_pol, t_span, y0, method="DOP853",
-                     rtol=1e-11, atol=1e-13, dense_output=True)
+    ref = solve_ivp(
+        _van_der_pol,
+        t_span,
+        y0,
+        method="DOP853",
+        rtol=1e-11,
+        atol=1e-13,
+        dense_output=True,
+    )
     res = ours(_van_der_pol, t_span, y0, rtol=1e-8, atol=1e-10)
 
     assert res.success

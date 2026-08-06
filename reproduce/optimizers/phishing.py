@@ -73,6 +73,7 @@ def load(sample_size):
     """
     import pandas as pd
     import _fuzzy_models as FM
+
     out = FM.load_phiusiil(sample_size=sample_size)
     if out is None:
         raise SystemExit("PhiUSIIL unavailable; see data/.gitignore for recovery.")
@@ -82,8 +83,8 @@ def load(sample_size):
 
 def screen(X, y, top_n):
     """The construction's feature screening. Timed separately and charged to it."""
-    from tribblefis.gauss_math import (calculate_gaussian_correlation,
-                                       take_top_features)
+    from tribblefis.gauss_math import calculate_gaussian_correlation, take_top_features
+
     start = time.perf_counter()
     diffs = calculate_gaussian_correlation(X, y)
     _, features = take_top_features(diffs, top_n=top_n)
@@ -98,10 +99,11 @@ def construction(X, y, features, n_gaussians=-1, max_samples=None):
     report, which is what `--max-samples` in the sweep is for.
     """
     from tribblefis.gauss_math import create_gaussian_membership_dict
+
     start = time.perf_counter()
-    model = create_gaussian_membership_dict(X, y, top_n_var_names=features,
-                                            n_gaussians=n_gaussians,
-                                            max_samples=max_samples)
+    model = create_gaussian_membership_dict(
+        X, y, top_n_var_names=features, n_gaussians=n_gaussians, max_samples=max_samples
+    )
     return model, time.perf_counter() - start
 
 
@@ -123,8 +125,12 @@ def classical(X, y, features, c, method="kmeans", seed=0, max_samples=None):
     order, as the construction takes them; the split is shuffled and stratified
     upstream, so a prefix is an unbiased sample.
     """
-    from tribblefis.gauss_data import (FeatureModel, GaussianMembership,
-                                       GaussianMixtureModel, LabelModel)
+    from tribblefis.gauss_data import (
+        FeatureModel,
+        GaussianMembership,
+        GaussianMixtureModel,
+        LabelModel,
+    )
 
     y_arr = np.asarray(y)
     classes = list(dict.fromkeys(y_arr))
@@ -143,9 +149,11 @@ def classical(X, y, features, c, method="kmeans", seed=0, max_samples=None):
             continue
         if method == "kmeans":
             from sklearn.cluster import KMeans
+
             labels = KMeans(n_clusters=k, n_init=3, random_state=seed).fit_predict(rows)
         elif method == "fcm":
             from tribbleclustering.fcm import fuzzy_c_means
+
             _centres, u = fuzzy_c_means(rows, k)
             u = np.asarray(u, dtype=float)
             if u.shape[0] != len(rows):
@@ -179,10 +187,14 @@ def classical(X, y, features, c, method="kmeans", seed=0, max_samples=None):
 def accuracy(model, X_te, y_te, features):
     """Argmax over the class rules — the shipped prediction path, not a stand-in."""
     from tribblefis.gauss_math import simple_gaussian_predict
+
     pred = simple_gaussian_predict(X_te[features], model.to_simple_model())
     return float(np.mean(np.asarray(pred).astype(str) == np.asarray(y_te).astype(str)))
 
 
 def n_membership_fns(model):
-    return sum(len(lm.memberships) for fm in model.feature_models.values()
-               for lm in fm.label_models.values())
+    return sum(
+        len(lm.memberships)
+        for fm in model.feature_models.values()
+        for lm in fm.label_models.values()
+    )

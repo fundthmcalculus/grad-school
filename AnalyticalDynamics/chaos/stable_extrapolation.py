@@ -128,25 +128,36 @@ def physics_basis(states):
     den = 2 * m1 + m2 - m2 * np.cos(2 * th1 - 2 * th2)
     d1, d2 = l1 * den, l2 * den
 
-    f1 = np.column_stack([
-        np.sin(th1) / d1,                      # -g(2m1+m2)
-        np.sin(th1 - 2 * th2) / d1,            # -m2 g
-        np.sin(delta) * om2**2 / d1,           # -2 m2 L2
-        np.sin(delta) * om1**2 * np.cos(delta) / d1,   # -2 m2 L1
-        om1 / d1,                              # -damping1
-    ])
-    f2 = np.column_stack([
-        np.sin(delta) * om1**2 / d2,           # 2 L1 (m1+m2)
-        np.sin(delta) * np.cos(th1) / d2,      # 2 g (m1+m2)
-        np.sin(delta) * om2**2 * np.cos(delta) / d2,   # 2 L2 m2
-        om2 / d2,                              # -damping2
-    ])
+    f1 = np.column_stack(
+        [
+            np.sin(th1) / d1,  # -g(2m1+m2)
+            np.sin(th1 - 2 * th2) / d1,  # -m2 g
+            np.sin(delta) * om2**2 / d1,  # -2 m2 L2
+            np.sin(delta) * om1**2 * np.cos(delta) / d1,  # -2 m2 L1
+            om1 / d1,  # -damping1
+        ]
+    )
+    f2 = np.column_stack(
+        [
+            np.sin(delta) * om1**2 / d2,  # 2 L1 (m1+m2)
+            np.sin(delta) * np.cos(th1) / d2,  # 2 g (m1+m2)
+            np.sin(delta) * om2**2 * np.cos(delta) / d2,  # 2 L2 m2
+            om2 / d2,  # -damping2
+        ]
+    )
     return f1, f2
 
 
 #: True coefficients of `physics_basis`, for checking what the fit recovers.
 def true_coefficients():
-    g, m1, m2, l1, l2, c = pdata.G, pdata.M1, pdata.M2, pdata.L1, pdata.L2, pdata.DAMPING
+    g, m1, m2, l1, l2, c = (
+        pdata.G,
+        pdata.M1,
+        pdata.M2,
+        pdata.L1,
+        pdata.L2,
+        pdata.DAMPING,
+    )
     return (
         np.array([-g * (2 * m1 + m2), -m2 * g, -2 * m2 * l2, -2 * m2 * l1, -c]),
         np.array([2 * l1 * (m1 + m2), 2 * g * (m1 + m2), 2 * l2 * m2, -c]),
@@ -210,11 +221,23 @@ class DynamicsFIS:
     constraining energy rather than inputs.
     """
 
-    def __init__(self, n_output_buckets=60, tsk_order="full-2nd", l2_reg=1e-9,
-                 output_partition="quantile", clip_inputs=False, random_state=42):
-        self.kw = dict(n_output_buckets=n_output_buckets, tsk_order=tsk_order,
-                       l2_reg=l2_reg, output_partition=output_partition,
-                       top_p=1.0, random_state=random_state)
+    def __init__(
+        self,
+        n_output_buckets=60,
+        tsk_order="full-2nd",
+        l2_reg=1e-9,
+        output_partition="quantile",
+        clip_inputs=False,
+        random_state=42,
+    ):
+        self.kw = dict(
+            n_output_buckets=n_output_buckets,
+            tsk_order=tsk_order,
+            l2_reg=l2_reg,
+            output_partition=output_partition,
+            top_p=1.0,
+            random_state=random_state,
+        )
         self.clip_inputs = clip_inputs
 
     def fit(self, X, Y):
@@ -239,9 +262,11 @@ class DynamicsFIS:
 
     @property
     def label(self):
-        return (f"nb{self.kw['n_output_buckets']}_{self.kw['tsk_order']}"
-                f"_{self.kw['output_partition']}"
-                f"{'_clipped' if self.clip_inputs else ''}")
+        return (
+            f"nb{self.kw['n_output_buckets']}_{self.kw['tsk_order']}"
+            f"_{self.kw['output_partition']}"
+            f"{'_clipped' if self.clip_inputs else ''}"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -250,8 +275,7 @@ def mechanical_energy(state):
     th1, om1, th2, om2 = np.asarray(state, float)
     m1, m2, l1, l2, g = pdata.M1, pdata.M2, pdata.L1, pdata.L2, pdata.G
     ke = 0.5 * m1 * (l1 * om1) ** 2 + 0.5 * m2 * (
-        (l1 * om1) ** 2 + (l2 * om2) ** 2
-        + 2 * l1 * l2 * om1 * om2 * np.cos(th1 - th2)
+        (l1 * om1) ** 2 + (l2 * om2) ** 2 + 2 * l1 * l2 * om1 * om2 * np.cos(th1 - th2)
     )
     pe = -(m1 + m2) * g * l1 * np.cos(th1) - m2 * g * l2 * np.cos(th2)
     return ke + pe, ke, pe
@@ -352,10 +376,16 @@ def evaluate(pred, true_traj, t, train_t_end=pdata.T_END):
         return {
             "rmse_deg": float(np.sqrt(np.mean((th_p[mask] - th_t[mask]) ** 2))),
             "max_err_deg": float(np.max(err[mask])),
-            "r2": float(r2_score(th_t[mask], th_p[mask], multioutput="uniform_average")),
+            "r2": float(
+                r2_score(th_t[mask], th_p[mask], multioutput="uniform_average")
+            ),
         }
 
-    out = {"in_window": block(inw), "extrap": block(~inw), "full": block(np.ones_like(inw))}
+    out = {
+        "in_window": block(inw),
+        "extrap": block(~inw),
+        "full": block(np.ones_like(inw)),
+    }
     worst = np.max(err, axis=1)
     over = np.flatnonzero(worst > 10.0)
     out["t_10deg"] = float(t[over[0]]) if over.size else float("inf")
@@ -368,7 +398,8 @@ def evaluate(pred, true_traj, t, train_t_end=pdata.T_END):
         np.max(np.abs(th_p[tail])) / max(np.max(np.abs(th_t[tail])), 1e-9)
     )
     out["tail_activity_ratio"] = float(
-        np.mean(np.std(th_p[tail], axis=0)) / max(np.mean(np.std(th_t[tail], axis=0)), 1e-9)
+        np.mean(np.std(th_p[tail], axis=0))
+        / max(np.mean(np.std(th_t[tail], axis=0)), 1e-9)
     )
     return out
 
@@ -403,7 +434,9 @@ def error_decomposition(model, state0, n_steps, h=pdata.H):
     dop_learn = pdata.integrate_dop853(model.rhs, state0, t)
 
     def diff(a, b):
-        return float(np.max(np.abs(np.rad2deg(a[:, [0, 2]]) - np.rad2deg(b[:, [0, 2]]))))
+        return float(
+            np.max(np.abs(np.rad2deg(a[:, [0, 2]]) - np.rad2deg(b[:, [0, 2]])))
+        )
 
     return {
         "integrator_only_deg": diff(rk4_true, dop_true),
@@ -418,13 +451,16 @@ def main(duration=20.0, n_buckets=120):
 
     n_steps = int(round(duration / pdata.H))
     t = np.arange(n_steps) * pdata.H
-    s0 = np.array([np.deg2rad(pdata.THETA1_DEG), 0.0,
-                   np.deg2rad(pdata.TEST_THETA2_DEG), 0.0])
+    s0 = np.array(
+        [np.deg2rad(pdata.THETA1_DEG), 0.0, np.deg2rad(pdata.TEST_THETA2_DEG), 0.0]
+    )
     true_traj = truth(s0, n_steps)
 
-    print(f"Friction double pendulum, trained on {pdata.T_END:.0f} s, "
-          f"rolled out to {duration:.0f} s from the held-out IC "
-          f"[{pdata.THETA1_DEG:g}, {pdata.TEST_THETA2_DEG:g}] deg\n")
+    print(
+        f"Friction double pendulum, trained on {pdata.T_END:.0f} s, "
+        f"rolled out to {duration:.0f} s from the held-out IC "
+        f"[{pdata.THETA1_DEG:g}, {pdata.TEST_THETA2_DEG:g}] deg\n"
+    )
 
     X, Y, _ = training_pairs()
     black = DynamicsFIS(n_output_buckets=n_buckets).fit(X, Y)
@@ -443,29 +479,34 @@ def main(duration=20.0, n_buckets=120):
         pred, diverged, n_corr = rollout(model, s0, n_steps, dissipation_guard=guard)
         m = evaluate(pred, true_traj, t)
         curves[name] = pred
-        rows.append({
-            "model": name,
-            "config": model.label,
-            "dissipation_guard": guard,
-            "train_t_end_s": pdata.T_END,
-            "rollout_t_end_s": duration,
-            "in_window_rmse_deg": round(m["in_window"]["rmse_deg"], 4),
-            "extrap_rmse_deg": round(m["extrap"]["rmse_deg"], 4),
-            "extrap_r2": round(m["extrap"]["r2"], 6),
-            "tail_amplitude_ratio": round(m["tail_amp_ratio"], 4),
-            "tail_activity_ratio": round(m["tail_activity_ratio"], 4),
-            "t_error_10deg_s": m["t_10deg"],
-            "guard_corrections": n_corr,
-            "diverged_at_s": diverged,
-        })
-        print(f"  {name:36s} in-window {m['in_window']['rmse_deg']:9.3f} deg | "
-              f"past {pdata.T_END:.0f}s {m['extrap']['rmse_deg']:11.3f} deg | "
-              f"amplitude x{m['tail_amp_ratio']:.3f} | "
-              f"still moving {m['tail_activity_ratio']:.3f}")
+        rows.append(
+            {
+                "model": name,
+                "config": model.label,
+                "dissipation_guard": guard,
+                "train_t_end_s": pdata.T_END,
+                "rollout_t_end_s": duration,
+                "in_window_rmse_deg": round(m["in_window"]["rmse_deg"], 4),
+                "extrap_rmse_deg": round(m["extrap"]["rmse_deg"], 4),
+                "extrap_r2": round(m["extrap"]["r2"], 6),
+                "tail_amplitude_ratio": round(m["tail_amp_ratio"], 4),
+                "tail_activity_ratio": round(m["tail_activity_ratio"], 4),
+                "t_error_10deg_s": m["t_10deg"],
+                "guard_corrections": n_corr,
+                "diverged_at_s": diverged,
+            }
+        )
+        print(
+            f"  {name:36s} in-window {m['in_window']['rmse_deg']:9.3f} deg | "
+            f"past {pdata.T_END:.0f}s {m['extrap']['rmse_deg']:11.3f} deg | "
+            f"amplitude x{m['tail_amp_ratio']:.3f} | "
+            f"still moving {m['tail_activity_ratio']:.3f}"
+        )
 
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
-    with open(RESULT_DIR / "extrapolation_models.csv", "w", newline="",
-              encoding="utf-8") as fh:
+    with open(
+        RESULT_DIR / "extrapolation_models.csv", "w", newline="", encoding="utf-8"
+    ) as fh:
         w = csv.DictWriter(fh, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
@@ -474,15 +515,18 @@ def main(duration=20.0, n_buckets=120):
     print("\n  physics-basis error decomposition (max deg over the rollout):")
     for k, v in dec.items():
         print(f"    {k:30s} {v:.3e}")
-    with open(RESULT_DIR / "error_decomposition.csv", "w", newline="",
-              encoding="utf-8") as fh:
+    with open(
+        RESULT_DIR / "error_decomposition.csv", "w", newline="", encoding="utf-8"
+    ) as fh:
         w = csv.DictWriter(fh, fieldnames=["quantity", "max_deg"])
         w.writeheader()
         w.writerows([{"quantity": k, "max_deg": v} for k, v in dec.items()])
 
     path = _plot(t, true_traj, curves, duration)
-    print(f"\nwrote {RESULT_DIR / 'extrapolation_models.csv'}, "
-          f"{RESULT_DIR / 'error_decomposition.csv'} and {path}")
+    print(
+        f"\nwrote {RESULT_DIR / 'extrapolation_models.csv'}, "
+        f"{RESULT_DIR / 'error_decomposition.csv'} and {path}"
+    )
     return rows
 
 
@@ -499,25 +543,46 @@ def _plot(t, true_traj, curves, duration):
     }
     th_true = np.rad2deg(true_traj[:, [0, 2]])
     for j, ax in enumerate(axes):
-        ax.plot(t, th_true[:, j], color=plots.BLUE, linewidth=3.0, label="actual (RK4)",
-                zorder=2)
+        ax.plot(
+            t,
+            th_true[:, j],
+            color=plots.BLUE,
+            linewidth=3.0,
+            label="actual (RK4)",
+            zorder=2,
+        )
         for name, pred in curves.items():
-            ax.plot(t, np.rad2deg(pred[:, [0, 2]])[:, j], color=colour[name],
-                    linewidth=1.1, linestyle="--", label=name, zorder=5)
+            ax.plot(
+                t,
+                np.rad2deg(pred[:, [0, 2]])[:, j],
+                color=colour[name],
+                linewidth=1.1,
+                linestyle="--",
+                label=name,
+                zorder=5,
+            )
         lo, hi = th_true[:, j].min(), th_true[:, j].max()
         pad = (hi - lo) * 0.35
         ax.set_ylim(lo - pad, hi + pad)
         ax.axvline(pdata.T_END, color=plots.INK, linewidth=1.1, linestyle=":")
         plots._style(ax, ylabel=rf"$\theta_{j + 1}$ (deg)")
         if j == 0:
-            ax.text(pdata.T_END, hi + pad, " training data ends", ha="left", va="top",
-                    fontsize=plots.FS_SMALL, color=plots.INK)
+            ax.text(
+                pdata.T_END,
+                hi + pad,
+                " training data ends",
+                ha="left",
+                va="top",
+                fontsize=plots.FS_SMALL,
+                color=plots.INK,
+            )
             ax.legend(loc="lower left", fontsize=plots.FS_SMALL, frameon=False, ncol=2)
     axes[-1].set_xlabel("t (seconds)", fontsize=plots.FS_LABEL, color=plots.INK)
     axes[0].set_title(
         f"Friction double pendulum: {pdata.T_END:.0f} s of training, "
         f"{duration:.0f} s of rollout",
-        fontsize=plots.FS_TITLE, color=plots.INK,
+        fontsize=plots.FS_TITLE,
+        color=plots.INK,
     )
     fig.tight_layout()
     return plots._save(fig, "fig_extrapolation_models")

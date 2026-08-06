@@ -16,10 +16,10 @@ import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from scipy.cluster.hierarchy import linkage
 
-
 # ---------------------------------------------------------------------------
 # iVAT core
 # ---------------------------------------------------------------------------
+
 
 def minimax_transform(D):
     """
@@ -91,7 +91,7 @@ def minimax_transform_fast(D):
 
     coo = minimum_spanning_tree(csr_matrix(D)).tocoo()
     ii, jj, ww = coo.row, coo.col, coo.data
-    order = np.argsort(ww, kind='stable')
+    order = np.argsort(ww, kind="stable")
 
     Dstar = np.zeros((n, n))
     parent = np.arange(n)
@@ -101,7 +101,7 @@ def minimax_transform_fast(D):
         root = x
         while parent[root] != root:
             root = parent[root]
-        while parent[x] != root:      # path compression
+        while parent[x] != root:  # path compression
             parent[x], x = root, parent[x]
         return root
 
@@ -114,7 +114,7 @@ def minimax_transform_fast(D):
         B = np.fromiter(members[rb], dtype=int)
         Dstar[np.ix_(A, B)] = w
         Dstar[np.ix_(B, A)] = w
-        if len(members[ra]) < len(members[rb]):   # union by size
+        if len(members[ra]) < len(members[rb]):  # union by size
             ra, rb = rb, ra
         members[ra].extend(members[rb])
         parent[rb] = ra
@@ -154,6 +154,7 @@ def vat_order(D):
 # Mapping 1: naive medoid / minimax-distance fuzzification
 # ---------------------------------------------------------------------------
 
+
 def mapping1_medoid(Dstar, medoid_indices):
     """
     mu_k(x) = 1 - D*(x, v_k) / sum_j D*(x, v_j)   (normalized, monotone-decreasing)
@@ -164,7 +165,7 @@ def mapping1_medoid(Dstar, medoid_indices):
     Dstar = np.asarray(Dstar, dtype=float)
     meds = np.asarray(medoid_indices, dtype=int)
     # distance from every point to each medoid
-    dist_to_med = Dstar[meds, :]              # (c, n)
+    dist_to_med = Dstar[meds, :]  # (c, n)
     eps = 1e-12
     denom = dist_to_med.sum(axis=0, keepdims=True) + eps
     U = 1.0 - dist_to_med / denom
@@ -176,6 +177,7 @@ def mapping1_medoid(Dstar, medoid_indices):
 # Mapping 2: persistence-of-block membership from the SL dendrogram
 # ---------------------------------------------------------------------------
 
+
 def single_linkage_from_Dstar(Dstar):
     """
     Single-linkage dendrogram. Because D* is the minimax transform, SL on the
@@ -183,7 +185,7 @@ def single_linkage_from_Dstar(Dstar):
     condensed original-equivalent form via D* to keep heights in minimax units.
     """
     condensed = squareform(Dstar, checks=False)
-    Z = linkage(condensed, method='single')
+    Z = linkage(condensed, method="single")
     return Z
 
 
@@ -203,9 +205,15 @@ def _cluster_members_at_merge(Z, n):
         mem = members[a] | members[b]
         members[node_id] = mem
         heights[node_id] = h
-        nodes.append({'members': mem, 'birth': min(heights[a], 0.0) if False else heights[a],
-                      'merge_height': h, 'node_id': node_id,
-                      'child_births': (heights[a], heights[b])})
+        nodes.append(
+            {
+                "members": mem,
+                "birth": min(heights[a], 0.0) if False else heights[a],
+                "merge_height": h,
+                "node_id": node_id,
+                "child_births": (heights[a], heights[b]),
+            }
+        )
     return members, heights, nodes
 
 
@@ -246,20 +254,27 @@ def mapping2_persistence(Dstar, n_clusters, min_persistence=0.0):
     # candidate internal nodes with >= 2 members
     cands = []
     for nd in nodes:
-        nid = nd['node_id']
-        birth = nd['merge_height']         # height at which this block formed
+        nid = nd["node_id"]
+        birth = nd["merge_height"]  # height at which this block formed
         death = parent_height.get(nid, birth)
         persistence = death - birth
-        cands.append({'node_id': nid, 'members': nd['members'],
-                      'birth': birth, 'death': death,
-                      'persistence': persistence, 'size': len(nd['members'])})
+        cands.append(
+            {
+                "node_id": nid,
+                "members": nd["members"],
+                "birth": birth,
+                "death": death,
+                "persistence": persistence,
+                "size": len(nd["members"]),
+            }
+        )
 
     # pick the c most persistent blocks whose persistence exceeds threshold,
     # BUT require the selected blocks to be mutually disjoint (an antichain in
     # the tree). Selecting nested ancestor/descendant blocks would just give
     # the whole set multiple times. Greedy: take highest-persistence blocks,
     # skipping any that overlap an already-selected block.
-    cands = [c for c in cands if c['persistence'] > min_persistence and c['size'] >= 2]
+    cands = [c for c in cands if c["persistence"] > min_persistence and c["size"] >= 2]
     # Scale-invariant selection. Two guards against the failure modes found in
     # testing: (1) rank by RELATIVE persistence (death/birth ratio) so clusters
     # at different absolute height scales compete fairly; (2) exclude blocks
@@ -267,12 +282,12 @@ def mapping2_persistence(Dstar, n_clusters, min_persistence=0.0):
     # (essentially the whole dataset) can never be selected as "a cluster".
     size_ceiling = 0.9 * n
     for c in cands:
-        c['score'] = c['death'] / (c['birth'] + 1e-12)
-    cands = [c for c in cands if c['size'] <= size_ceiling]
-    cands.sort(key=lambda c: c['score'], reverse=True)
+        c["score"] = c["death"] / (c["birth"] + 1e-12)
+    cands = [c for c in cands if c["size"] <= size_ceiling]
+    cands.sort(key=lambda c: c["score"], reverse=True)
     selected = []
     for cand in cands:
-        if any(cand['members'] & s['members'] for s in selected):
+        if any(cand["members"] & s["members"] for s in selected):
             continue  # overlaps an already chosen block -> skip
         selected.append(cand)
         if len(selected) == n_clusters:
@@ -280,16 +295,16 @@ def mapping2_persistence(Dstar, n_clusters, min_persistence=0.0):
 
     if len(selected) == 0:
         # degenerate; fall back to whole-set
-        selected = sorted(cands, key=lambda c: c['size'], reverse=True)[:n_clusters]
+        selected = sorted(cands, key=lambda c: c["size"], reverse=True)[:n_clusters]
 
     U = np.zeros((len(selected), n))
-    Dblock = np.zeros((len(selected), n))   # minimax distance to each block
+    Dblock = np.zeros((len(selected), n))  # minimax distance to each block
     eps = 1e-12
     for k, blk in enumerate(selected):
-        mem = np.array(sorted(blk['members']), dtype=int)
-        d_to_block = Dstar[:, mem].min(axis=1)   # (n,)
+        mem = np.array(sorted(blk["members"]), dtype=int)
+        d_to_block = Dstar[:, mem].min(axis=1)  # (n,)
         Dblock[k] = d_to_block
-        h_b, h_d = blk['birth'], blk['death']
+        h_b, h_d = blk["birth"], blk["death"]
         mu = (h_d - d_to_block) / (h_d - h_b + eps)
         mu = np.clip(mu, 0.0, 1.0)
         core = d_to_block <= h_b + eps
@@ -303,7 +318,8 @@ def mapping2_persistence(Dstar, n_clusters, min_persistence=0.0):
 # helpers
 # ---------------------------------------------------------------------------
 
-def dissimilarity(X, metric='euclidean'):
+
+def dissimilarity(X, metric="euclidean"):
     return squareform(pdist(X, metric=metric))
 
 

@@ -63,8 +63,16 @@ def _wrap(method: str):
         args: Optional[Sequence] = None,
     ) -> OdeResult:
         return integrate(
-            method, fun, t_span, y0, rtol=rtol, atol=atol, max_step=max_step,
-            first_step=first_step, dense_output=dense_output, t_eval=t_eval,
+            method,
+            fun,
+            t_span,
+            y0,
+            rtol=rtol,
+            atol=atol,
+            max_step=max_step,
+            first_step=first_step,
+            dense_output=dense_output,
+            t_eval=t_eval,
             args=args,
         )
 
@@ -75,8 +83,7 @@ ode12 = _wrap("ode12")
 ode12.__doc__ = (
     "Heun-Euler embedded Runge-Kutta pair, order 2(1).\n"
     "Cheapest, lowest-order member of the family; mainly useful as a "
-    "worked reference / for very smooth, loose-tolerance problems.\n"
-    + _COMMON_DOC
+    "worked reference / for very smooth, loose-tolerance problems.\n" + _COMMON_DOC
 )
 
 ode23 = _wrap("ode23")
@@ -90,8 +97,7 @@ ode45 = _wrap("ode45")
 ode45.__doc__ = (
     "Dormand-Prince embedded Runge-Kutta pair, order 5(4).\n"
     "Same Butcher tableau as scipy.integrate.solve_ivp's default "
-    "method='RK45'.\n"
-    + _COMMON_DOC
+    "method='RK45'.\n" + _COMMON_DOC
 )
 
 ode56 = _wrap("ode56")

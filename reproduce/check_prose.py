@@ -103,7 +103,7 @@ _PRECISE = re.compile(rf"(?<![\d.])({_NUM}\.\d{{3,}})(?![\d])")
 # Prose that is deliberately not a harness cell. Kept as substrings of the source line
 # rather than as numbers, so the reason travels with the exemption.
 _SKIP_LINE = (
-    "REPRO_NAIVE_CAP",     # the cited NAFIPS row explains itself on its own line
+    "REPRO_NAIVE_CAP",  # the cited NAFIPS row explains itself on its own line
 )
 
 
@@ -122,8 +122,9 @@ def read_archive(label):
     """{(mean, std): [files]} and {mean: [files]} for one archive's CSVs."""
     path = os.path.join(OUTPUTS, label)
     if not os.path.isdir(path):
-        raise SystemExit(f"error: no archive {label!r} under "
-                         f"{os.path.relpath(OUTPUTS, ROOT)}")
+        raise SystemExit(
+            f"error: no archive {label!r} under " f"{os.path.relpath(OUTPUTS, ROOT)}"
+        )
     pairs, singles = defaultdict(list), defaultdict(list)
     for name in sorted(os.listdir(path)):
         if not name.endswith(".csv"):
@@ -192,7 +193,7 @@ def near_miss(mean, std, pairs):
     except ValueError:
         return []
     decimals = len(mean.split(".")[1]) if "." in mean else 0
-    tol = 0.5 * (10 ** -decimals) if decimals else 0.5
+    tol = 0.5 * (10**-decimals) if decimals else 0.5
     hits = []
     for (m, s), files in pairs.items():
         try:
@@ -226,7 +227,8 @@ def near_miss(mean, std, pairs):
 # leading guard still excludes identifiers, since `_` is a word character, so `fig_07`
 # and `table_5_x` do not match at all.
 _TOKEN = re.compile(
-    r"(?<![\w.])[-+−]?\d+(?:,\d{3})*(?:\.\d+)?(?:[eE][-+]?\d+)?(?!\d)(?!\.\d)")
+    r"(?<![\w.])[-+−]?\d+(?:,\d{3})*(?:\.\d+)?(?:[eE][-+]?\d+)?(?!\d)(?!\.\d)"
+)
 
 
 def numeric_tokens(text):
@@ -240,8 +242,8 @@ def numeric_tokens(text):
     one and this document has cells of both signs.
     """
     from collections import Counter
-    return Counter(t.lstrip("+").replace("−", "-")
-                   for t in _TOKEN.findall(text))
+
+    return Counter(t.lstrip("+").replace("−", "-") for t in _TOKEN.findall(text))
 
 
 def since(ref, chapter=None):
@@ -265,15 +267,21 @@ def since(ref, chapter=None):
     so a 2 -> 1 duplicate reads differently from a 1 -> 0 deletion.
     """
     import subprocess
+
     out = []
     for name in sorted(os.listdir(PROSE)):
         if not name.endswith(".md") or (chapter and not name.startswith(chapter)):
             continue
         rel = os.path.relpath(os.path.join(PROSE, name), ROOT).replace(os.sep, "/")
-        proc = subprocess.run(["git", "show", f"{ref}:{rel}"], cwd=ROOT,
-                              capture_output=True, text=True, encoding="utf-8")
+        proc = subprocess.run(
+            ["git", "show", f"{ref}:{rel}"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
         if proc.returncode != 0:
-            out.append((name, None, None))          # not present at that ref
+            out.append((name, None, None))  # not present at that ref
             continue
         with open(os.path.join(PROSE, name), encoding="utf-8") as f:
             now = numeric_tokens(f.read())
@@ -284,25 +292,47 @@ def since(ref, chapter=None):
 
 def main():
     ap = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("archive", nargs="?",
-                    help="archive label the prose claims to quote; omit with --since")
-    ap.add_argument("--against", metavar="LABEL",
-                    help="second archive; untraceable pairs found here are named as "
-                         "coming from a superseded run")
-    ap.add_argument("--chapter", metavar="PREFIX",
-                    help="restrict to prose files starting with this, e.g. 06")
-    ap.add_argument("--show-ok", action="store_true",
-                    help="list the pairs that match, not only the ones that do not")
-    ap.add_argument("--singles", action="store_true",
-                    help="also check bare numbers carrying 3+ decimals (noisier)")
-    ap.add_argument("--ignore-file", metavar="PATH",
-                    help="file of 'mean ± std' pairs that are cited rather than "
-                         "harness-produced; one per line, # comments allowed")
-    ap.add_argument("--since", metavar="GIT_REF",
-                    help="instead of checking against an archive, report numeric "
-                         "literals present in the prose at GIT_REF and missing now -- "
-                         "the check that an editing pass changed voice and not facts")
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    ap.add_argument(
+        "archive",
+        nargs="?",
+        help="archive label the prose claims to quote; omit with --since",
+    )
+    ap.add_argument(
+        "--against",
+        metavar="LABEL",
+        help="second archive; untraceable pairs found here are named as "
+        "coming from a superseded run",
+    )
+    ap.add_argument(
+        "--chapter",
+        metavar="PREFIX",
+        help="restrict to prose files starting with this, e.g. 06",
+    )
+    ap.add_argument(
+        "--show-ok",
+        action="store_true",
+        help="list the pairs that match, not only the ones that do not",
+    )
+    ap.add_argument(
+        "--singles",
+        action="store_true",
+        help="also check bare numbers carrying 3+ decimals (noisier)",
+    )
+    ap.add_argument(
+        "--ignore-file",
+        metavar="PATH",
+        help="file of 'mean ± std' pairs that are cited rather than "
+        "harness-produced; one per line, # comments allowed",
+    )
+    ap.add_argument(
+        "--since",
+        metavar="GIT_REF",
+        help="instead of checking against an archive, report numeric "
+        "literals present in the prose at GIT_REF and missing now -- "
+        "the check that an editing pass changed voice and not facts",
+    )
     args = ap.parse_args()
 
     if args.since:
@@ -314,6 +344,7 @@ def main():
         # appendix section -- is exactly the case the per-file view cannot judge, so it
         # is the aggregate that decides whether anything actually went missing.
         from collections import Counter
+
         doc_was, doc_now = Counter(), Counter()
         print(f"prose numeric literals: {args.since} -> working tree")
         print(f"{'':-<78}")
@@ -345,9 +376,11 @@ def main():
         if not doc_lost and not doc_gained:
             print("  WHOLE DOCUMENT: identical")
         else:
-            print(f"  WHOLE DOCUMENT: {len(gone)} token(s) gone, "
-                  f"{len(doc_lost) - len(gone)} de-duplicated, "
-                  f"{len(doc_gained)} new")
+            print(
+                f"  WHOLE DOCUMENT: {len(gone)} token(s) gone, "
+                f"{len(doc_lost) - len(gone)} de-duplicated, "
+                f"{len(doc_gained)} new"
+            )
             for tok in sorted(gone):
                 print(f"      GONE   {tok:>14s}   {doc_was[tok]} -> 0")
         print("")
@@ -393,8 +426,11 @@ def main():
                 ok.append((key, where, pairs[key]))
             else:
                 nm = near_miss(key[0], key[1], pairs)
-                same_mean = [(m, s, f) for (m, s), f in pairs.items()
-                             if m == key[0] and _spread_compatible(key[1], s)]
+                same_mean = [
+                    (m, s, f)
+                    for (m, s), f in pairs.items()
+                    if m == key[0] and _spread_compatible(key[1], s)
+                ]
                 if same_mean or nm:
                     drifted.append((key, where, same_mean, nm))
                 else:
@@ -402,12 +438,16 @@ def main():
                     untraceable.append((key, where, in_other))
 
     label = args.archive
-    print(f"prose vs {label}"
-          + (f"  (also checked against {args.against})" if args.against else ""))
+    print(
+        f"prose vs {label}"
+        + (f"  (also checked against {args.against})" if args.against else "")
+    )
     print(f"{'':-<78}")
     print(f"{len(ok):5d} pairs match a cell in {label}")
-    print(f"{len(drifted):5d} pairs DRIFTED -- same mean, different spread, or a "
-          f"rounding difference")
+    print(
+        f"{len(drifted):5d} pairs DRIFTED -- same mean, different spread, or a "
+        f"rounding difference"
+    )
     print(f"{len(untraceable):5d} pairs UNTRACEABLE -- in no CSV of {label}")
     if cited:
         print(f"{len(cited):5d} pairs skipped as cited (--ignore-file)")
@@ -423,11 +463,15 @@ def main():
             # module docstring). Check the filename before believing a suggestion: a
             # mean matching across two unrelated experiments is a coincidence.
             for m, s, files in same:
-                print(f"      same mean in {m} ± {s}   "
-                      f"({', '.join(sorted(set(files)))})")
+                print(
+                    f"      same mean in {m} ± {s}   "
+                    f"({', '.join(sorted(set(files)))})"
+                )
             for m, s, files in nm:
-                print(f"      rounds to?   {m} ± {s}   "
-                      f"({', '.join(sorted(set(files)))})")
+                print(
+                    f"      rounds to?   {m} ± {s}   "
+                    f"({', '.join(sorted(set(files)))})"
+                )
             print(f"      | {line}")
         print()
 
@@ -437,8 +481,10 @@ def main():
         for (mean, std), (name, lineno, line), in_other in untraceable:
             tag = ""
             if in_other:
-                tag = (f"  <- IS in {args.against} "
-                       f"({', '.join(sorted(set(in_other)))}): superseded run")
+                tag = (
+                    f"  <- IS in {args.against} "
+                    f"({', '.join(sorted(set(in_other)))}): superseded run"
+                )
             print(f"  {name}:{lineno}  {mean} ± {std}{tag}")
             print(f"      | {line}")
         print()
@@ -449,7 +495,9 @@ def main():
             for cell in _PRECISE.findall(line):
                 if norm(cell) not in singles:
                     in_other = other_singles.get(norm(cell))
-                    miss.append((norm(cell), name, lineno, line.strip()[:110], in_other))
+                    miss.append(
+                        (norm(cell), name, lineno, line.strip()[:110], in_other)
+                    )
         print(f"BARE NUMBERS (3+ decimals) not in {label}: {len(miss)}")
         print(f"{'':-<78}")
         for cell, name, lineno, line, in_other in miss:
@@ -462,8 +510,10 @@ def main():
         print("OK")
         print(f"{'':-<78}")
         for (mean, std), (name, lineno, _), files in ok:
-            print(f"  {name}:{lineno}  {mean} ± {std}   "
-                  f"({', '.join(sorted(set(files)))})")
+            print(
+                f"  {name}:{lineno}  {mean} ± {std}   "
+                f"({', '.join(sorted(set(files)))})"
+            )
         print()
 
     # Non-zero when the document quotes something this run does not contain, so this can

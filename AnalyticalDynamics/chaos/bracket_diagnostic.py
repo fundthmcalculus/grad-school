@@ -43,9 +43,9 @@ LOWER_DEG, UPPER_DEG = 2.0, 2.1
 
 def _row(split, value):
     idx = int(np.argmin(np.abs(split.ic_deg[:, split.swept_index] - value)))
-    assert abs(split.ic_deg[idx, split.swept_index] - value) < 1e-6, (
-        f"{split.label}: no trained IC at {value} deg"
-    )
+    assert (
+        abs(split.ic_deg[idx, split.swept_index] - value) < 1e-6
+    ), f"{split.label}: no trained IC at {value} deg"
     return idx
 
 
@@ -131,8 +131,13 @@ def main():
     fig.patch.set_facecolor(plots.SURFACE)
     colors = plots.regime_colors(curves)
     for label, (t, sep) in sorted(curves.items()):
-        ax.semilogy(t, np.maximum(sep, 1e-6), color=colors[label], linewidth=1.3,
-                    label=label.replace("_", " "))
+        ax.semilogy(
+            t,
+            np.maximum(sep, 1e-6),
+            color=colors[label],
+            linewidth=1.3,
+            label=label.replace("_", " "),
+        )
     plots._style(
         ax,
         title="Separation of the two trained ICs bracketing the 2.05° holdout",

@@ -50,23 +50,39 @@ from budget import BudgetExhausted
 def scipy_lbfgsb(obj, problem, seed, **hp):
     """`refine_antecedents_local`'s optimizer: L-BFGS-B from the hot start."""
     from scipy.optimize import minimize
-    minimize(obj, problem.x0, method="L-BFGS-B", bounds=problem.bounds,
-             options={"maxiter": hp.get("maxiter", 10_000),
-                      "maxfun": obj.max_evals,
-                      "ftol": hp.get("ftol", 1e-10),
-                      "eps": hp.get("eps", 1e-4)})
+
+    minimize(
+        obj,
+        problem.x0,
+        method="L-BFGS-B",
+        bounds=problem.bounds,
+        options={
+            "maxiter": hp.get("maxiter", 10_000),
+            "maxfun": obj.max_evals,
+            "ftol": hp.get("ftol", 1e-10),
+            "eps": hp.get("eps", 1e-4),
+        },
+    )
 
 
 def scipy_de(obj, problem, seed, **hp):
     """`refine_antecedents_de`'s optimizer: differential evolution, x0 seeded."""
     from scipy.optimize import differential_evolution
+
     differential_evolution(
-        obj, problem.bounds, x0=problem.x0, seed=seed,
-        maxiter=hp.get("maxiter", 10_000), popsize=hp.get("popsize", 8),
-        tol=hp.get("tol", 1e-6), mutation=hp.get("mutation", (0.5, 1.0)),
+        obj,
+        problem.bounds,
+        x0=problem.x0,
+        seed=seed,
+        maxiter=hp.get("maxiter", 10_000),
+        popsize=hp.get("popsize", 8),
+        tol=hp.get("tol", 1e-6),
+        mutation=hp.get("mutation", (0.5, 1.0)),
         recombination=hp.get("recombination", 0.7),
-        init=hp.get("init", "sobol"), updating="immediate",
-        polish=hp.get("polish", False))
+        init=hp.get("init", "sobol"),
+        updating="immediate",
+        polish=hp.get("polish", False),
+    )
 
 
 def scipy_powell(obj, problem, seed, **hp):
@@ -78,9 +94,19 @@ def scipy_powell(obj, problem, seed, **hp):
     "gradient estimation is affordable".
     """
     from scipy.optimize import minimize
-    minimize(obj, problem.x0, method="Powell", bounds=problem.bounds,
-             options={"maxiter": hp.get("maxiter", 10_000),
-                      "maxfev": obj.max_evals, "xtol": 1e-8, "ftol": 1e-10})
+
+    minimize(
+        obj,
+        problem.x0,
+        method="Powell",
+        bounds=problem.bounds,
+        options={
+            "maxiter": hp.get("maxiter", 10_000),
+            "maxfev": obj.max_evals,
+            "xtol": 1e-8,
+            "ftol": 1e-10,
+        },
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -95,10 +121,17 @@ def _variables(problem, perturbation=0.0):
     incumbent in every coordinate at once.
     """
     from optimizers.continuous.variables import InputContinuousVariable
-    return [InputContinuousVariable(f"p{i}", float(lo), float(hi),
-                                    initial_value=float(c),
-                                    perturbation=perturbation)
-            for i, ((lo, hi), c) in enumerate(zip(problem.bounds, problem.x0))]
+
+    return [
+        InputContinuousVariable(
+            f"p{i}",
+            float(lo),
+            float(hi),
+            initial_value=float(c),
+            perturbation=perturbation,
+        )
+        for i, ((lo, hi), c) in enumerate(zip(problem.bounds, problem.x0))
+    ]
 
 
 def _generations(obj, population):
@@ -126,48 +159,74 @@ def _common(config_cls, name, obj, population, archive, **extra):
         # The budget is the stop condition. Early stopping on stagnation would
         # end an arm before it had spent what the others spent, which is exactly
         # the asymmetry this study is set up to avoid.
-        stop_after_iterations=10 ** 6,
+        stop_after_iterations=10**6,
         target_score=-np.inf,
         n_jobs=1,
         joblib_prefer="threads",
-        **extra)
+        **extra,
+    )
 
 
 def opt_ga(obj, problem, seed, **hp):
-    from optimizers import (GeneticAlgorithmOptimizer,
-                            GeneticAlgorithmOptimizerConfig, set_seed)
+    from optimizers import (
+        GeneticAlgorithmOptimizer,
+        GeneticAlgorithmOptimizerConfig,
+        set_seed,
+    )
+
     set_seed(seed)
     population = hp.get("population_size", 30)
     archive = hp.get("archive", 100)
-    cfg = _common(GeneticAlgorithmOptimizerConfig, "ga", obj, population, archive,
-                  local_grad_optim=hp.get("local_grad_optim", "none"))
-    opt = GeneticAlgorithmOptimizer(config=cfg, variables=_variables(problem),
-                                    fcn=obj)
+    cfg = _common(
+        GeneticAlgorithmOptimizerConfig,
+        "ga",
+        obj,
+        population,
+        archive,
+        local_grad_optim=hp.get("local_grad_optim", "none"),
+    )
+    opt = GeneticAlgorithmOptimizer(config=cfg, variables=_variables(problem), fcn=obj)
     _solve_with_injection(opt, problem, archive)
 
 
 def opt_pso(obj, problem, seed, **hp):
-    from optimizers import (ParticleSwarmOptimizer,
-                            ParticleSwarmOptimizerConfig, set_seed)
+    from optimizers import (
+        ParticleSwarmOptimizer,
+        ParticleSwarmOptimizerConfig,
+        set_seed,
+    )
+
     set_seed(seed)
     population = hp.get("population_size", 30)
     archive = hp.get("archive", 100)
-    cfg = _common(ParticleSwarmOptimizerConfig, "pso", obj, population, archive,
-                  local_grad_optim=hp.get("local_grad_optim", "none"))
+    cfg = _common(
+        ParticleSwarmOptimizerConfig,
+        "pso",
+        obj,
+        population,
+        archive,
+        local_grad_optim=hp.get("local_grad_optim", "none"),
+    )
     opt = ParticleSwarmOptimizer(config=cfg, variables=_variables(problem), fcn=obj)
     _solve_with_injection(opt, problem, archive)
 
 
 def opt_aco(obj, problem, seed, **hp):
-    from optimizers import (AntColonyOptimizer, AntColonyOptimizerConfig,
-                            set_seed)
+    from optimizers import AntColonyOptimizer, AntColonyOptimizerConfig, set_seed
+
     set_seed(seed)
     population = hp.get("population_size", 30)
     archive = hp.get("archive", 100)
-    cfg = _common(AntColonyOptimizerConfig, "aco", obj, population, archive,
-                  learning_rate=hp.get("learning_rate", 0.5),
-                  q=hp.get("q", 1.0),
-                  local_grad_optim=hp.get("local_grad_optim", "none"))
+    cfg = _common(
+        AntColonyOptimizerConfig,
+        "aco",
+        obj,
+        population,
+        archive,
+        learning_rate=hp.get("learning_rate", 0.5),
+        q=hp.get("q", 1.0),
+        local_grad_optim=hp.get("local_grad_optim", "none"),
+    )
     opt = AntColonyOptimizer(config=cfg, variables=_variables(problem), fcn=obj)
     _solve_with_injection(opt, problem, archive)
 
@@ -175,14 +234,17 @@ def opt_aco(obj, problem, seed, **hp):
 def opt_gd(obj, problem, seed, **hp):
     """The package's own gradient descent -- one of the two arms that reads
     `initial_value`, so its hot start needs no injection."""
-    from optimizers import (GradientDescentOptimizer,
-                            GradientDescentOptimizerConfig, set_seed)
+    from optimizers import (
+        GradientDescentOptimizer,
+        GradientDescentOptimizerConfig,
+        set_seed,
+    )
+
     set_seed(seed)
     population = hp.get("population_size", 10)
     archive = hp.get("archive", 30)
     cfg = _common(GradientDescentOptimizerConfig, "gd", obj, population, archive)
-    opt = GradientDescentOptimizer(config=cfg, variables=_variables(problem),
-                                   fcn=obj)
+    opt = GradientDescentOptimizer(config=cfg, variables=_variables(problem), fcn=obj)
     _solve_with_injection(opt, problem, archive)
 
 
@@ -190,7 +252,7 @@ def opt_gd(obj, problem, seed, **hp):
 # registry
 # --------------------------------------------------------------------------- #
 ARMS = {
-    "none": None,                      # the hot start itself, scored as the reference
+    "none": None,  # the hot start itself, scored as the reference
     "scipy-lbfgsb": scipy_lbfgsb,
     "scipy-powell": scipy_powell,
     "scipy-de": scipy_de,

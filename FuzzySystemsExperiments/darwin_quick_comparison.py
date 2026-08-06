@@ -93,24 +93,32 @@ def main():
     print("=" * 80)
     print(f"\n{'Metric':<25} {'Gaussian':<20} {'Trap (EM)':<20} {'Trap (Fast)':<20}")
     print("-" * 85)
-    print(f"{'Training Time (sec)':<25} {results['Gaussian (EM)']['time']:>19.3f} {results['Trapezoid (EM)']['time']:>19.3f} {results['Trapezoid (Fast)']['time']:>19.3f}")
-    print(f"{'Train Accuracy':<25} {results['Gaussian (EM)']['train_acc']:>19.4f} {results['Trapezoid (EM)']['train_acc']:>19.4f} {results['Trapezoid (Fast)']['train_acc']:>19.4f}")
-    print(f"{'Test Accuracy':<25} {results['Gaussian (EM)']['test_acc']:>19.4f} {results['Trapezoid (EM)']['test_acc']:>19.4f} {results['Trapezoid (Fast)']['test_acc']:>19.4f}")
+    print(
+        f"{'Training Time (sec)':<25} {results['Gaussian (EM)']['time']:>19.3f} {results['Trapezoid (EM)']['time']:>19.3f} {results['Trapezoid (Fast)']['time']:>19.3f}"
+    )
+    print(
+        f"{'Train Accuracy':<25} {results['Gaussian (EM)']['train_acc']:>19.4f} {results['Trapezoid (EM)']['train_acc']:>19.4f} {results['Trapezoid (Fast)']['train_acc']:>19.4f}"
+    )
+    print(
+        f"{'Test Accuracy':<25} {results['Gaussian (EM)']['test_acc']:>19.4f} {results['Trapezoid (EM)']['test_acc']:>19.4f} {results['Trapezoid (Fast)']['test_acc']:>19.4f}"
+    )
 
     # Speedup calculation
-    em_time = results['Trapezoid (EM)']['time']
-    fast_time = results['Trapezoid (Fast)']['time']
-    speedup = em_time / fast_time if fast_time > 0 else float('inf')
-    print(f"\n{'Speedup (Fast vs EM)':<25} {'N/A':>19} {'N/A':>19} {f'{speedup:.1f}x':>19}")
+    em_time = results["Trapezoid (EM)"]["time"]
+    fast_time = results["Trapezoid (Fast)"]["time"]
+    speedup = em_time / fast_time if fast_time > 0 else float("inf")
+    print(
+        f"\n{'Speedup (Fast vs EM)':<25} {'N/A':>19} {'N/A':>19} {f'{speedup:.1f}x':>19}"
+    )
 
     # Winner analysis
     print("\n" + "=" * 80)
     print("PERFORMANCE ANALYSIS")
     print("=" * 80)
 
-    gauss_acc = results['Gaussian (EM)']['test_acc']
-    em_acc = results['Trapezoid (EM)']['test_acc']
-    fast_acc = results['Trapezoid (Fast)']['test_acc']
+    gauss_acc = results["Gaussian (EM)"]["test_acc"]
+    em_acc = results["Trapezoid (EM)"]["test_acc"]
+    fast_acc = results["Trapezoid (Fast)"]["test_acc"]
 
     print(f"\nAccuracy Comparison:")
     print(f"  Gaussian:       {gauss_acc:.4f}")

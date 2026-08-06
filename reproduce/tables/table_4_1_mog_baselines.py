@@ -22,8 +22,8 @@ from sklearn.model_selection import train_test_split
 _TABLES = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_TABLES))
 sys.path.insert(0, _TABLES)
-import common as C            # noqa: E402
-import _fuzzy_models as _fm   # noqa: E402
+import common as C  # noqa: E402
+import _fuzzy_models as _fm  # noqa: E402
 
 # Optional baselines -- resolve once; None => the column renders as N/A.
 (anfis_fit_predict,) = C.optional_import("_baseline_anfis", ["fit_predict"])
@@ -69,8 +69,7 @@ def _bench(kind, X, y, mog_factory, score, norm=False):
     # outputs/full-14900hx-r2/table_4_1.csv -- only the time cells moved.
     _warm = mog_factory(C.SEEDS[0])
     if _warm is not None:
-        Xw, Xwte, yw, _ = train_test_split(X, y, test_size=0.2,
-                                           random_state=C.SEEDS[0])
+        Xw, Xwte, yw, _ = train_test_split(X, y, test_size=0.2, random_state=C.SEEDS[0])
         _rng_state = np.random.get_state()
         try:
             _warm.fit(Xw, yw).predict(Xwte)
@@ -114,10 +113,12 @@ def _bench(kind, X, y, mog_factory, score, norm=False):
 
 def _row(label, metric_name, cols):
     order = ["mog", "anfis", "gafis", "rf"]
-    return [label,
-            C.cell(cols["mog"]["t"], fmt="{:.2f}") + " s" if cols["mog"]["t"] else C.NA,
-            f"{metric_name}=" + C.cell(cols["mog"]["s"]) if cols["mog"]["s"] else C.NA,
-            *[C.cell(cols[k]["s"]) if k != "mog" else "" for k in order if k != "mog"]]
+    return [
+        label,
+        C.cell(cols["mog"]["t"], fmt="{:.2f}") + " s" if cols["mog"]["t"] else C.NA,
+        f"{metric_name}=" + C.cell(cols["mog"]["s"]) if cols["mog"]["s"] else C.NA,
+        *[C.cell(cols[k]["s"]) if k != "mog" else "" for k in order if k != "mog"],
+    ]
 
 
 def main():
@@ -137,9 +138,14 @@ def main():
         # read `*pending*`. Measuring it here -- same split, same seeds, same
         # normalization, same timer as the 1st-order row -- makes the two rows
         # comparable, which borrowing the 1st-order seconds would not have.
-        cols2 = _bench("reg", X, y,
-                       lambda s: _fm.mog_regressor(s, tsk_order="full-2nd"),
-                       r2_score, norm=True)
+        cols2 = _bench(
+            "reg",
+            X,
+            y,
+            lambda s: _fm.mog_regressor(s, tsk_order="full-2nd"),
+            r2_score,
+            norm=True,
+        )
         rows.append(_row("Concrete (regression, full 2nd order)", "R2", cols2))
     else:
         rows.append(["Concrete (regression)", C.NA, C.NA, C.NA, C.NA, C.NA])
@@ -154,12 +160,23 @@ def main():
     else:
         rows.append(["PhiUSIIL (classification)", C.NA, C.NA, C.NA, C.NA, C.NA])
 
-    header = ["Dataset (task)", "MoG train time", "MoG accuracy / R2",
-              "ANFIS", "GA-tuned FIS", "tree / RF ref"]
-    C.emit("table_4_1", "Table 4.1 -- Training time and accuracy", header, rows,
-           note="MoG columns measured; ANFIS / GA-FIS fill in only if their adapters "
-                "(reproduce/tables/_baseline_anfis.py, _baseline_gafis.py) are present. "
-                "The RF reference is scikit-learn. Times are wall-clock training seconds.")
+    header = [
+        "Dataset (task)",
+        "MoG train time",
+        "MoG accuracy / R2",
+        "ANFIS",
+        "GA-tuned FIS",
+        "tree / RF ref",
+    ]
+    C.emit(
+        "table_4_1",
+        "Table 4.1 -- Training time and accuracy",
+        header,
+        rows,
+        note="MoG columns measured; ANFIS / GA-FIS fill in only if their adapters "
+        "(reproduce/tables/_baseline_anfis.py, _baseline_gafis.py) are present. "
+        "The RF reference is scikit-learn. Times are wall-clock training seconds.",
+    )
 
 
 if __name__ == "__main__":

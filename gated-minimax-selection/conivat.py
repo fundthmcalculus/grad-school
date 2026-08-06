@@ -41,13 +41,16 @@ def generate_constraints(y, n_constraints=40, seed=0):
 def transitive_closure_ml(S, n):
     """Expand must-link via transitive closure (union-find)."""
     parent = list(range(n))
+
     def find(a):
         while parent[a] != a:
             parent[a] = parent[parent[a]]
             a = parent[a]
         return a
+
     def union(a, b):
         parent[find(a)] = find(b)
+
     for i, j in S:
         union(i, j)
     groups = {}
@@ -71,7 +74,7 @@ def learn_metric_diag(X, S, Dc, lr=0.1, iters=200, eps=1e-6):
     d = X.shape[1]
     if len(S) == 0 or len(Dc) == 0:
         return np.ones(d)
-    S_diff2 = np.array([(X[i] - X[j]) ** 2 for i, j in S])   # (|S|, d)
+    S_diff2 = np.array([(X[i] - X[j]) ** 2 for i, j in S])  # (|S|, d)
     D_diff2 = np.array([(X[i] - X[j]) ** 2 for i, j in Dc])  # (|D|, d)
     w = np.ones(d)
     s_sum = S_diff2.sum(0)  # constraint gradient is constant in w for diag case
@@ -102,10 +105,12 @@ def minimax_mtd(D):
     in_tree = np.zeros(n, bool)
     in_tree[0] = True
     for _ in range(1, n):
-        best = np.inf; bi = bj = -1
+        best = np.inf
+        bi = bj = -1
         tn = np.where(in_tree)[0]
         for i in tn:
-            row = D[i].copy(); row[in_tree] = np.inf
+            row = D[i].copy()
+            row[in_tree] = np.inf
             j = np.argmin(row)
             if row[j] < best:
                 best, bi, bj = row[j], i, j
@@ -129,7 +134,7 @@ def conivat(X, y, n_constraints=40, seed=0):
     S = transitive_closure_ml(S, n)
 
     w = learn_metric_diag(X, S, Dc)
-    Xt = X * np.sqrt(np.clip(w, 0, None))[None, :]   # transform: A = diag(w)
+    Xt = X * np.sqrt(np.clip(w, 0, None))[None, :]  # transform: A = diag(w)
 
     D = squareform(pdist(Xt))
     # impose must-link: zero those distances
@@ -145,5 +150,6 @@ def sl_labels_from_mtd(Dprime, k):
     """Cut the k-1 longest MST edges of the MTD matrix -> k SL clusters.
     Equivalent to single-linkage fcluster on the minimax matrix."""
     from scipy.cluster.hierarchy import linkage, fcluster
-    Z = linkage(squareform(Dprime, checks=False), method='single')
-    return fcluster(Z, t=k, criterion='maxclust') - 1
+
+    Z = linkage(squareform(Dprime, checks=False), method="single")
+    return fcluster(Z, t=k, criterion="maxclust") - 1

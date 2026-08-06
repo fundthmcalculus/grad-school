@@ -91,10 +91,17 @@ _TABLES = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_TABLES))
 import common as C  # noqa: E402
 
-VAT_N = [int(x) for x in os.environ.get("REPRO_GPU_VAT_N", "4000,8000,16000,32000").split(",")]
+VAT_N = [
+    int(x)
+    for x in os.environ.get("REPRO_GPU_VAT_N", "4000,8000,16000,32000").split(",")
+]
 PW_N = int(os.environ.get("REPRO_GPU_PW_N", "16000"))
-PW_DIMS = [int(x) for x in os.environ.get("REPRO_GPU_PW_DIMS", "10,50,200,784").split(",")]
-FCM_N = [int(x) for x in os.environ.get("REPRO_GPU_FCM_N", "50000,200000,500000").split(",")]
+PW_DIMS = [
+    int(x) for x in os.environ.get("REPRO_GPU_PW_DIMS", "10,50,200,784").split(",")
+]
+FCM_N = [
+    int(x) for x in os.environ.get("REPRO_GPU_FCM_N", "50000,200000,500000").split(",")
+]
 _demo = os.environ.get("REPRO_GPU_DEMO_N", "48000").strip()
 DEMO_N = int(_demo) if _demo else None
 
@@ -141,19 +148,28 @@ def gpu_state():
         free, total = cp.cuda.runtime.memGetInfo()
         rt = cp.cuda.runtime.runtimeGetVersion()
     except Exception as exc:  # noqa: BLE001
-        return False, (f"CUDA device present but unusable "
-                       f"({exc.__class__.__name__}: {exc})")
+        return False, (
+            f"CUDA device present but unusable " f"({exc.__class__.__name__}: {exc})"
+        )
     try:
         smi = subprocess.run(
-            ["nvidia-smi", "--query-gpu=name,memory.total,driver_version",
-             "--format=csv,noheader"],
-            capture_output=True, text=True, timeout=10).stdout.strip()
+            [
+                "nvidia-smi",
+                "--query-gpu=name,memory.total,driver_version",
+                "--format=csv,noheader",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout.strip()
     except (OSError, subprocess.SubprocessError):
         smi = "nvidia-smi unavailable"
-    return True, (f"{smi}; compute capability {cc}; VRAM free "
-                  f"{free / 1e9:.1f}/{total / 1e9:.1f} GB at start; "
-                  f"CuPy {cp.__version__}; CUDA runtime "
-                  f"{rt // 1000}.{(rt % 1000) // 10}")
+    return True, (
+        f"{smi}; compute capability {cc}; VRAM free "
+        f"{free / 1e9:.1f}/{total / 1e9:.1f} GB at start; "
+        f"CuPy {cp.__version__}; CUDA runtime "
+        f"{rt // 1000}.{(rt % 1000) // 10}"
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -184,7 +200,7 @@ def fcm_gram_cpu(x, k, m=2.0, initial_guess=None, max_iter=100, tol=1e-5):
     iters = max_iter
     for i in range(max_iter):
         u = memb(C0)
-        um = u ** m
+        um = u**m
         c_new = (um.T @ x) / np.sum(um, axis=0)[:, None]
         if np.all(np.abs(c_new - C0) <= (1e-8 + tol * np.abs(C0))):
             C0, iters = c_new, i + 1
@@ -216,7 +232,9 @@ class Runner:
         from tribbleclustering import gpu_vat as tgpu_vat
         from tribbleclustering.fcm import fuzzy_c_means
         from tribbleclustering.pcvat import (
-            compute_vat_c, pairwise_distances_c, vat_prim_mst_c,
+            compute_vat_c,
+            pairwise_distances_c,
+            vat_prim_mst_c,
         )
         import cupy as cp
 
@@ -227,8 +245,8 @@ class Runner:
         self.pdist_c = pairwise_distances_c
         self.prim_c = vat_prim_mst_c
         self.vat_c = compute_vat_c
-        self.rows = []       # CSV rows (absolute seconds)
-        self.pairs = []      # (cpu_mean, gpu_mean) per row, for the Markdown view
+        self.rows = []  # CSV rows (absolute seconds)
+        self.pairs = []  # (cpu_mean, gpu_mean) per row, for the Markdown view
 
     # -- plumbing ---------------------------------------------------------- #
     def sync(self):
@@ -260,13 +278,12 @@ class Runner:
             self.gpu.pairwise_distances_gpu(X, high_precision=True)
             self.gpu.pairwise_distances_gpu(X, high_precision=False)
             Xf = blobs(2048, FCM_D, FCM_K, 0, dtype=dt)
-            g0 = Xf[:2 * FCM_K].reshape(FCM_K, 2, FCM_D).mean(axis=1)
+            g0 = Xf[: 2 * FCM_K].reshape(FCM_K, 2, FCM_D).mean(axis=1)
             self.gpu.fuzzy_c_means_gpu(Xf, FCM_K, m=2.0, initial_guess=g0)
         self.sync()
         self.free()
 
-    def add(self, kernel, conditions, cpu_arm, gpu_arm, cpu_t, gpu_t, exact,
-            kind=EST):
+    def add(self, kernel, conditions, cpu_arm, gpu_arm, cpu_t, gpu_t, exact, kind=EST):
         cm, _ = C.agg(cpu_t)
         gm, _ = C.agg(gpu_t)
         speed = f"{cm / gm:.2f}x" if (cm and gm) else C.NA
@@ -275,15 +292,24 @@ class Runner:
         # from which a reader re-deriving the ratio gets 6.0x against the 5.56x
         # this row actually measured. The CSV is the record the Markdown ratios
         # are checked against, so it has to carry enough digits to check them.
-        self.rows.append([
-            kernel, conditions, cpu_arm, gpu_arm,
-            (C.cell(cpu_t, fmt="{:.5f}") if cpu_t else C.NA),
-            (C.cell(gpu_t, fmt="{:.5f}") if gpu_t else C.NA),
-            speed, exact, kind,
-        ])
+        self.rows.append(
+            [
+                kernel,
+                conditions,
+                cpu_arm,
+                gpu_arm,
+                (C.cell(cpu_t, fmt="{:.5f}") if cpu_t else C.NA),
+                (C.cell(gpu_t, fmt="{:.5f}") if gpu_t else C.NA),
+                speed,
+                exact,
+                kind,
+            ]
+        )
         self.pairs.append((cm, gm))
-        print(f"    {kernel:<22} {conditions:<34} CPU {cm if cm else float('nan'):8.3f}s "
-              f"GPU {gm if gm else float('nan'):8.3f}s  ->  {speed:>8}   {exact}")
+        print(
+            f"    {kernel:<22} {conditions:<34} CPU {cm if cm else float('nan'):8.3f}s "
+            f"GPU {gm if gm else float('nan'):8.3f}s  ->  {speed:>8}   {exact}"
+        )
 
     # -- rows -------------------------------------------------------------- #
     def vat_rows(self):
@@ -313,7 +339,8 @@ class Runner:
                 w = self.cp.asnumpy(Dg[mu, mv])
                 src = int(self.cp.argmax(Dg).get()) // n
                 o_g, _ = self.gpu_vat._order_from_mst(
-                    self.cp.asnumpy(mu), self.cp.asnumpy(mv), w, n, src)
+                    self.cp.asnumpy(mu), self.cp.asnumpy(mv), w, n, src
+                )
                 agree_mst.append(float(np.mean(o_g == order_cpu)))
                 del Dg, mu, mv
                 self.free()
@@ -324,17 +351,33 @@ class Runner:
                 agree_e2e.append(float(np.mean(o_e2e == order_cpu)))
                 del D
                 self.free()
-            self.add("Boruvka MST (device)", f"N={n:,}, float64, matrix resident",
-                     "pcvat.vat_prim_mst_c (Cython dense Prim)",
-                     "gpu_vat.boruvka_mst_device", cpu_mst, gpu_mst,
-                     exactness(agree_mst))
-            self.add("VAT front end", f"N={n:,}, float64, order only",
-                     "pairwise_distances_c + vat_prim_mst_c",
-                     "gpu_vat.vat_gpu", cpu_e2e, gpu_e2e, exactness(agree_e2e))
-            self.add("VAT front end", f"N={n:,}, float64, UNMATCHED work",
-                     "pairwise_distances_c + compute_vat_c (also reorders D)",
-                     "gpu_vat.vat_gpu (order only)", cpu_e2e_gather, gpu_e2e,
-                     exactness(agree_e2e))
+            self.add(
+                "Boruvka MST (device)",
+                f"N={n:,}, float64, matrix resident",
+                "pcvat.vat_prim_mst_c (Cython dense Prim)",
+                "gpu_vat.boruvka_mst_device",
+                cpu_mst,
+                gpu_mst,
+                exactness(agree_mst),
+            )
+            self.add(
+                "VAT front end",
+                f"N={n:,}, float64, order only",
+                "pairwise_distances_c + vat_prim_mst_c",
+                "gpu_vat.vat_gpu",
+                cpu_e2e,
+                gpu_e2e,
+                exactness(agree_e2e),
+            )
+            self.add(
+                "VAT front end",
+                f"N={n:,}, float64, UNMATCHED work",
+                "pairwise_distances_c + compute_vat_c (also reorders D)",
+                "gpu_vat.vat_gpu (order only)",
+                cpu_e2e_gather,
+                gpu_e2e,
+                exactness(agree_e2e),
+            )
 
     def fcm_rows(self):
         """FCM, swept over N, against BOTH CPU arms."""
@@ -356,7 +399,8 @@ class Runner:
                 t_gram.append(t.seconds)
                 iters.append(it)
                 (c_g, u_g), tg = self.time_gpu(
-                    self.gpu.fuzzy_c_means_gpu, X, FCM_K, m=2.0, initial_guess=g0)
+                    self.gpu.fuzzy_c_means_gpu, X, FCM_K, m=2.0, initial_guess=g0
+                )
                 t_gpu.append(tg)
 
                 lab_b.append(float(np.mean(u_b.argmax(1) == u_g.argmax(1))))
@@ -366,20 +410,36 @@ class Runner:
                 cdiff_b.append(float(np.abs(c_b - c_g).max()))
                 cdiff_g.append(float(np.abs(c_r - c_g).max()))
                 self.free()
-            self.add("Fuzzy C-Means", f"N={n:,}, k={FCM_K}, d={FCM_D}",
-                     "fcm.fuzzy_c_means (NumPy broadcasting -- DIFFERENT algorithm)",
-                     "gpu.fuzzy_c_means_gpu (gram + 2 GEMM)",
-                     t_bcast, t_gpu,
-                     f"labels {C.cell(lab_b)}; max abs Δcentre "
-                     f"{max(cdiff_b):.1e}" if cdiff_b else C.NA)
-            self.add("Fuzzy C-Means", f"N={n:,}, k={FCM_K}, d={FCM_D}, MATCHED formulation",
-                     "gram + 2 GEMM in NumPy/BLAS (this file)",
-                     "gpu.fuzzy_c_means_gpu (gram + 2 GEMM)",
-                     t_gram, t_gpu,
-                     f"labels {C.cell(lab_g)}; max abs Δcentre "
-                     f"{max(cdiff_g):.1e}" if cdiff_g else C.NA)
-            print(f"      (matched-formulation CPU arm converged in "
-                  f"{min(iters)}-{max(iters)} iterations)")
+            self.add(
+                "Fuzzy C-Means",
+                f"N={n:,}, k={FCM_K}, d={FCM_D}",
+                "fcm.fuzzy_c_means (NumPy broadcasting -- DIFFERENT algorithm)",
+                "gpu.fuzzy_c_means_gpu (gram + 2 GEMM)",
+                t_bcast,
+                t_gpu,
+                (
+                    f"labels {C.cell(lab_b)}; max abs Δcentre " f"{max(cdiff_b):.1e}"
+                    if cdiff_b
+                    else C.NA
+                ),
+            )
+            self.add(
+                "Fuzzy C-Means",
+                f"N={n:,}, k={FCM_K}, d={FCM_D}, MATCHED formulation",
+                "gram + 2 GEMM in NumPy/BLAS (this file)",
+                "gpu.fuzzy_c_means_gpu (gram + 2 GEMM)",
+                t_gram,
+                t_gpu,
+                (
+                    f"labels {C.cell(lab_g)}; max abs Δcentre " f"{max(cdiff_g):.1e}"
+                    if cdiff_g
+                    else C.NA
+                ),
+            )
+            print(
+                f"      (matched-formulation CPU arm converged in "
+                f"{min(iters)}-{max(iters)} iterations)"
+            )
 
     def pairwise_rows(self):
         """The row the chapter expects to lose: distances by dimension and precision."""
@@ -388,7 +448,7 @@ class Runner:
             for d in PW_DIMS:
                 for hp in (True, False):
                     if dt == np.float64 and not hp:
-                        continue   # the fast path only differs for float32
+                        continue  # the fast path only differs for float32
                     t_c, t_g, diffs = [], [], []
                     for seed in C.SEEDS:
                         X = blobs(PW_N, d, 25, seed, dtype=dt)
@@ -396,18 +456,29 @@ class Runner:
                             Dc = self.pdist_c(X)
                         t_c.append(t.seconds)
                         Dg, tg = self.time_gpu(
-                            self.gpu.pairwise_distances_gpu, X, high_precision=hp)
+                            self.gpu.pairwise_distances_gpu, X, high_precision=hp
+                        )
                         t_g.append(tg)
-                        diffs.append(float(np.abs(
-                            Dc.astype(np.float64) - np.asarray(Dg, dtype=np.float64)
-                        ).max()))
+                        diffs.append(
+                            float(
+                                np.abs(
+                                    Dc.astype(np.float64)
+                                    - np.asarray(Dg, dtype=np.float64)
+                                ).max()
+                            )
+                        )
                         del Dc, Dg
                         self.free()
                     mode = "high_precision" if hp else "fast (native acc)"
-                    self.add("Pairwise distances", f"N={PW_N:,}, d={d}, {dtname}, {mode}",
-                             "pcvat.pairwise_distances_c (C/OpenMP)",
-                             "gpu.pairwise_distances_gpu (tiled -> host)",
-                             t_c, t_g, f"max abs Δ = {max(diffs):.1e}")
+                    self.add(
+                        "Pairwise distances",
+                        f"N={PW_N:,}, d={d}, {dtname}, {mode}",
+                        "pcvat.pairwise_distances_c (C/OpenMP)",
+                        "gpu.pairwise_distances_gpu (tiled -> host)",
+                        t_c,
+                        t_g,
+                        f"max abs Δ = {max(diffs):.1e}",
+                    )
 
     def demo_row(self):
         """Single-shot reachable-scale DEMONSTRATION, not an estimate."""
@@ -415,8 +486,10 @@ class Runner:
             return
         n = DEMO_N
         nbytes = n * n * 4
-        print(f"  reachable-scale demonstration: N={n:,} float32 "
-              f"({nbytes / 1e9:.2f} GB resident)")
+        print(
+            f"  reachable-scale demonstration: N={n:,} float32 "
+            f"({nbytes / 1e9:.2f} GB resident)"
+        )
         X = blobs(n, VAT_D, 25, C.SEEDS[0], dtype=np.float32)
         with C.timed() as t:
             D = self.pdist_c(X)
@@ -432,13 +505,22 @@ class Runner:
             # MSTs or a genuinely different tree. This is the whole reason the
             # exactness column exists.
             a, b = prim_total(D, order_cpu), prim_total(D, o_g)
-            exact += (f"; Prim total CPU {a:.6f} vs GPU {b:.6f} "
-                      f"(rel {abs(a - b) / a:.2e})")
+            exact += (
+                f"; Prim total CPU {a:.6f} vs GPU {b:.6f} "
+                f"(rel {abs(a - b) / a:.2e})"
+            )
         del D
         self.free()
-        self.add("VAT front end", f"N={n:,}, float32, {nbytes / 1e9:.2f} GB resident",
-                 "pairwise_distances_c + vat_prim_mst_c",
-                 "gpu_vat.vat_gpu", [cpu], [gpu_t], exact, kind=DEMO)
+        self.add(
+            "VAT front end",
+            f"N={n:,}, float32, {nbytes / 1e9:.2f} GB resident",
+            "pairwise_distances_c + vat_prim_mst_c",
+            "gpu_vat.vat_gpu",
+            [cpu],
+            [gpu_t],
+            exact,
+            kind=DEMO,
+        )
 
 
 def exactness(agrees):
@@ -453,24 +535,32 @@ def exactness(agrees):
 # --------------------------------------------------------------------------- #
 # emit
 # --------------------------------------------------------------------------- #
-HEADER = ["kernel", "conditions", "CPU arm", "GPU arm", "CPU (s)", "GPU (s)",
-          "GPU speedup (CPU/GPU)", "exactness vs CPU", "kind"]
+HEADER = [
+    "kernel",
+    "conditions",
+    "CPU arm",
+    "GPU arm",
+    "CPU (s)",
+    "GPU (s)",
+    "GPU speedup (CPU/GPU)",
+    "exactness vs CPU",
+    "kind",
+]
 MD_HEADER = ["kernel", "conditions", "CPU", "GPU", "exactness vs CPU", "kind"]
 
 
 def note(gpu_desc, blocked=False):
-    head = (
-        "**Device.** " + gpu_desc + ". "
-    )
+    head = "**Device.** " + gpu_desc + ". "
     if blocked:
-        return (head +
-                "** Every cell is N/A: the device path could not run at all, for "
-                "the reason above, so no arm was timed and the table is a record "
-                "of the blocker rather than of a measurement. ** Nothing here is "
-                "estimated, extrapolated, or carried over from the findings files "
-                "the chapter previously quoted. Install a working CuPy/CUDA "
-                "runtime for the device and re-run; the generator needs no other "
-                "change.")
+        return (
+            head + "** Every cell is N/A: the device path could not run at all, for "
+            "the reason above, so no arm was timed and the table is a record "
+            "of the blocker rather than of a measurement. ** Nothing here is "
+            "estimated, extrapolated, or carried over from the findings files "
+            "the chapter previously quoted. Install a working CuPy/CUDA "
+            "runtime for the device and re-run; the generator needs no other "
+            "change."
+        )
     return head + (
         "**The Markdown arms are normalized against the slower arm in each row**: "
         "the loser is the 1.0x baseline and the winner reads as 'this many times "
@@ -541,21 +631,42 @@ def main():
         # named, rather than skipping the table (silence is not success) or
         # carrying numbers over from a findings file.
         print("  [BLOCKED] the GPU arm cannot run; emitting N/A rows with the reason")
-        rows = [[k, cond, "(not run: GPU arm unavailable)", arm, C.NA, C.NA,
-                 C.NA, C.NA, "not measured (no device)"]
-                for k, cond, arm in (
-                    ("Boruvka MST (device)", "float64, matrix resident",
-                     "gpu_vat.boruvka_mst_device"),
-                    ("VAT front end", "float64, order only", "gpu_vat.vat_gpu"),
-                    ("Fuzzy C-Means", f"k={FCM_K}, d={FCM_D}",
-                     "gpu.fuzzy_c_means_gpu"),
-                    ("Pairwise distances", "float64/float32 x dimension",
-                     "gpu.pairwise_distances_gpu"))]
-        C.emit("table_3_4_gpu_speedups",
-               "Table 3.4 — GPU speedups over the CPU (NOT MEASURED: no usable device)",
-               HEADER, rows, md_header=MD_HEADER,
-               md_rows=[[r[0], r[1], C.NA, C.NA, C.NA, r[8]] for r in rows],
-               note=note(desc, blocked=True))
+        rows = [
+            [
+                k,
+                cond,
+                "(not run: GPU arm unavailable)",
+                arm,
+                C.NA,
+                C.NA,
+                C.NA,
+                C.NA,
+                "not measured (no device)",
+            ]
+            for k, cond, arm in (
+                (
+                    "Boruvka MST (device)",
+                    "float64, matrix resident",
+                    "gpu_vat.boruvka_mst_device",
+                ),
+                ("VAT front end", "float64, order only", "gpu_vat.vat_gpu"),
+                ("Fuzzy C-Means", f"k={FCM_K}, d={FCM_D}", "gpu.fuzzy_c_means_gpu"),
+                (
+                    "Pairwise distances",
+                    "float64/float32 x dimension",
+                    "gpu.pairwise_distances_gpu",
+                ),
+            )
+        ]
+        C.emit(
+            "table_3_4_gpu_speedups",
+            "Table 3.4 — GPU speedups over the CPU (NOT MEASURED: no usable device)",
+            HEADER,
+            rows,
+            md_header=MD_HEADER,
+            md_rows=[[r[0], r[1], C.NA, C.NA, C.NA, r[8]] for r in rows],
+            note=note(desc, blocked=True),
+        )
         return
 
     r = Runner()
@@ -570,10 +681,15 @@ def main():
         cn, gn = C.normalized_worst([cm, gm])
         md_rows.append([row[0], row[1], cn, gn, row[7], row[8]])
 
-    C.emit("table_3_4_gpu_speedups",
-           "Table 3.4 — GPU speedups over the CPU (RTX 4080 Laptop, 12 GB)",
-           HEADER, r.rows, md_header=MD_HEADER, md_rows=md_rows,
-           note=note(desc))
+    C.emit(
+        "table_3_4_gpu_speedups",
+        "Table 3.4 — GPU speedups over the CPU (RTX 4080 Laptop, 12 GB)",
+        HEADER,
+        r.rows,
+        md_header=MD_HEADER,
+        md_rows=md_rows,
+        note=note(desc),
+    )
 
 
 if __name__ == "__main__":

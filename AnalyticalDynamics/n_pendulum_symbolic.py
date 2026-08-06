@@ -17,6 +17,7 @@ n, a numeric solve is always O(n^3).
 State convention matches DoublePendulum: interleaved
 [theta_1, omega_1, theta_2, omega_2, ..., theta_n, omega_n].
 """
+
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -55,11 +56,11 @@ def build_n_pendulum(n: int) -> NPendulumModel:
     if n < 1:
         raise ValueError("n must be >= 1")
 
-    t = symbols('t')
-    g = symbols('g', positive=True)
-    m = symbols(f'm1:{n + 1}', positive=True)
-    l = symbols(f'l1:{n + 1}', positive=True)
-    theta = list(dynamicsymbols(f'theta1:{n + 1}'))
+    t = symbols("t")
+    g = symbols("g", positive=True)
+    m = symbols(f"m1:{n + 1}", positive=True)
+    l = symbols(f"l1:{n + 1}", positive=True)
+    theta = list(dynamicsymbols(f"theta1:{n + 1}"))
     thetad = [sp.diff(th, t) for th in theta]
 
     # Cumulative bob positions: bob i hangs off the chain of rods 1..i.
@@ -68,7 +69,11 @@ def build_n_pendulum(n: int) -> NPendulumModel:
     xd = [sp.diff(xi, t) for xi in x]
     yd = [sp.diff(yi, t) for yi in y]
 
-    T = sp.expand_trig(sp.expand(sum(Rational(1, 2) * m[i] * (xd[i]**2 + yd[i]**2) for i in range(n))))
+    T = sp.expand_trig(
+        sp.expand(
+            sum(Rational(1, 2) * m[i] * (xd[i] ** 2 + yd[i] ** 2) for i in range(n))
+        )
+    )
     T = sp.trigsimp(T)
     V = sum(m[i] * g * y[i] for i in range(n))
     L = T - V
@@ -76,8 +81,20 @@ def build_n_pendulum(n: int) -> NPendulumModel:
     lm = LagrangesMethod(L, theta)
     lm.form_lagranges_equations()
 
-    return NPendulumModel(n=n, t=t, g=g, m=m, l=l, theta=theta, thetad=thetad,
-                           T=T, V=V, L=L, M=sp.simplify(lm.mass_matrix), f=sp.simplify(lm.forcing))
+    return NPendulumModel(
+        n=n,
+        t=t,
+        g=g,
+        m=m,
+        l=l,
+        theta=theta,
+        thetad=thetad,
+        T=T,
+        V=V,
+        L=L,
+        M=sp.simplify(lm.mass_matrix),
+        f=sp.simplify(lm.forcing),
+    )
 
 
 def make_state_space(n: int, m_vals, l_vals, g_val: float = 9.81):
@@ -89,14 +106,15 @@ def make_state_space(n: int, m_vals, l_vals, g_val: float = 9.81):
     NPendulumModel for inspection (M, f, L, ...).
     """
     model = build_n_pendulum(n)
-    subs_params = (list(zip(model.m, m_vals)) + list(zip(model.l, l_vals))
-                   + [(model.g, g_val)])
+    subs_params = (
+        list(zip(model.m, m_vals)) + list(zip(model.l, l_vals)) + [(model.g, g_val)]
+    )
     M_num = model.M.subs(subs_params)
     f_num = model.f.subs(subs_params)
 
     all_syms = model.theta + model.thetad
-    M_func = lambdify(all_syms, M_num, 'numpy')
-    f_func = lambdify(all_syms, f_num, 'numpy')
+    M_func = lambdify(all_syms, M_num, "numpy")
+    f_func = lambdify(all_syms, f_num, "numpy")
 
     def rhs(state, _t):
         theta = state[0::2]
@@ -116,14 +134,14 @@ def make_state_space(n: int, m_vals, l_vals, g_val: float = 9.81):
 def state_labels(n: int) -> list[str]:
     labels = []
     for i in range(1, n + 1):
-        labels += [f'theta_{i}', f'omega_{i}']
+        labels += [f"theta_{i}", f"omega_{i}"]
     return labels
 
 
 def derivative_labels(n: int) -> list[str]:
     labels = []
     for i in range(1, n + 1):
-        labels += [f'omega_{i}', f'alpha_{i}']
+        labels += [f"omega_{i}", f"alpha_{i}"]
     return labels
 
 
@@ -154,7 +172,7 @@ class NPendulum(OdeSystem):
         return list(self._rhs(np.asarray(state, dtype=float), t))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Building and displaying the n=2 (double pendulum) model...")
     model2 = build_n_pendulum(2)
     print("Mass matrix M(q):")

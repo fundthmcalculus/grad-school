@@ -19,9 +19,9 @@ warnings.filterwarnings("ignore")
 
 # --- locate repo root and put the fuzzytree package on the path --------------
 _HERE = os.path.dirname(os.path.abspath(__file__))
-REPO_ROOT = os.path.dirname(os.path.dirname(_HERE))          # .../grad-school
+REPO_ROOT = os.path.dirname(os.path.dirname(_HERE))  # .../grad-school
 FIS = os.path.join(REPO_ROOT, "tribble-fis")
-sys.path.insert(0, os.path.join(FIS, "tribble-tree"))       # for `import fuzzytree`
+sys.path.insert(0, os.path.join(FIS, "tribble-tree"))  # for `import fuzzytree`
 
 # Datasets live HERE, never in the submodule. tribble-fis used to carry
 # `gaussian_mixture/` with the benchmark data in it; upstream removed that
@@ -42,8 +42,17 @@ def _first_attr(mod, *names):
 
 
 # --- datasets ----------------------------------------------------------------
-CONCRETE_COLS = ["Cement", "Slag", "FlyAsh", "Water", "Superplasticizer",
-                 "CoarseAgg", "FineAgg", "Age", "Strength"]
+CONCRETE_COLS = [
+    "Cement",
+    "Slag",
+    "FlyAsh",
+    "Water",
+    "Superplasticizer",
+    "CoarseAgg",
+    "FineAgg",
+    "Age",
+    "Strength",
+]
 
 
 def load_concrete():
@@ -59,27 +68,32 @@ def load_concrete():
 
     if not os.path.exists(csv_path):
         df = None
-        try:                                    # 2. authoritative source
+        try:  # 2. authoritative source
             from ucimlrepo import fetch_ucirepo
+
             ds = fetch_ucirepo(id=165)
             df = ds.data.features.copy()
             df["Strength"] = np.asarray(ds.data.targets).ravel()
             df.columns = CONCRETE_COLS[: len(df.columns)]
             print("  [concrete] fetched from UCI (id 165)")
-        except Exception as exc:                # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001
             print(f"  [concrete] UCI fetch unavailable ({exc.__class__.__name__})")
 
-        if df is None:                          # 3. local spreadsheet
-            xls = os.path.join(REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls")
+        if df is None:  # 3. local spreadsheet
+            xls = os.path.join(
+                REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls"
+            )
             if os.path.exists(xls):
                 try:
                     df = pd.read_excel(xls)
                     df.columns = CONCRETE_COLS[: len(df.columns)]
                     print("  [concrete] read from the local .xls")
                 except ImportError:
-                    print("  [concrete] the local file is a legacy .xls and needs `xlrd`; "
-                          "either `pip install xlrd` or let the UCI fetch handle it")
-                except Exception as exc:        # noqa: BLE001
+                    print(
+                        "  [concrete] the local file is a legacy .xls and needs `xlrd`; "
+                        "either `pip install xlrd` or let the UCI fetch handle it"
+                    )
+                except Exception as exc:  # noqa: BLE001
                     print(f"  [concrete] .xls unreadable ({exc.__class__.__name__})")
 
         if df is None:
@@ -112,18 +126,25 @@ def load_phiusiil(sample_size=20000):
     try:
         sys.path.insert(0, os.path.join(FIS, "tribble-tree"))
         import demo_phishing  # noqa: E402  -- repo loader, exact same features
+
         if os.path.exists(local):
             demo_phishing.DATA_PATH = local
         X, y = demo_phishing.load_data(sample_size=sample_size, random_state=42)
-        print(f"  [phiusiil] repo loader, data from {os.path.relpath(local, REPO_ROOT)}"
-              if os.path.exists(local) else "  [phiusiil] repo loader, bundled path")
+        print(
+            f"  [phiusiil] repo loader, data from {os.path.relpath(local, REPO_ROOT)}"
+            if os.path.exists(local)
+            else "  [phiusiil] repo loader, bundled path"
+        )
         return X, np.asarray(y)
     except Exception as exc:  # noqa: BLE001
-        print(f"  [phiusiil] repo loader unavailable ({exc.__class__.__name__}); "
-              f"FALLING BACK to ucimlrepo -- NOTE: different feature set, "
-              f"results are not comparable to a repo-loader run")
+        print(
+            f"  [phiusiil] repo loader unavailable ({exc.__class__.__name__}); "
+            f"FALLING BACK to ucimlrepo -- NOTE: different feature set, "
+            f"results are not comparable to a repo-loader run"
+        )
     try:
         from ucimlrepo import fetch_ucirepo
+
         ds = fetch_ucirepo(id=967)
         X = ds.data.features.select_dtypes(include=[np.number]).dropna(axis=1)
         y = np.asarray(ds.data.targets).ravel()
@@ -173,6 +194,7 @@ SCALERS = ("unit", "standard")
 
 def _scaler(kind, log_dynamic_range):
     from tribblefis.scaling import StandardScalar, UnitScalar
+
     if kind == "unit":
         return UnitScalar(log_dynamic_range=log_dynamic_range)
     if kind == "standard":
@@ -191,8 +213,11 @@ def unit_scale(X, column=None):
         scaled = _scaler("unit", None).fit_transform(X.to_frame()).ravel()
         return pd.Series(scaled, index=X.index, name=X.name)
 
-    cols = list(X.columns) if column is None else (
-        [column] if isinstance(column, str) else list(column))
+    cols = (
+        list(X.columns)
+        if column is None
+        else ([column] if isinstance(column, str) else list(column))
+    )
     out = X.copy()
     out[cols] = _scaler("unit", None).fit_transform(X[cols].copy())
     return out
@@ -265,35 +290,44 @@ def mog_regressor(seed, tsk_order="1st"):
     second copy of this constructor, which is how two tables drift apart.
     """
     from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
-    return _try(lambda: MixtureOfGaussiansFuzzyRegressor(
-        n_output_buckets=3, tsk_order=tsk_order, top_n=-1, random_state=seed))
+
+    return _try(
+        lambda: MixtureOfGaussiansFuzzyRegressor(
+            n_output_buckets=3, tsk_order=tsk_order, top_n=-1, random_state=seed
+        )
+    )
 
 
 def mog_classifier(seed):
     from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+
     return _try(lambda: MixtureOfGaussiansFuzzyClassifier(top_n=5, random_state=seed))
 
 
 def tree_regressor(seed):
     import fuzzytree
+
     cls = _first_attr(fuzzytree, "FuzzyRegressionTree")
     return _try(lambda: cls(random_state=seed)) if cls else None
 
 
 def tree_classifier(seed):
     import fuzzytree
+
     cls = _first_attr(fuzzytree, "FuzzyClassificationTree", "FuzzyTreeClassifier")
     return _try(lambda: cls(random_state=seed)) if cls else None
 
 
 def hme_regressor(seed):
     import fuzzytree
+
     cls = _first_attr(fuzzytree, "HierarchicalFuzzyExpertsRegressor")
     return _try(lambda: cls(random_state=seed)) if cls else None
 
 
 def hme_classifier(seed):
     import fuzzytree
+
     cls = _first_attr(fuzzytree, "HierarchicalFuzzyExpertsClassifier")
     return _try(lambda: cls(random_state=seed)) if cls else None
 
