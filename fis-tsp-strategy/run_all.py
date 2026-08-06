@@ -17,7 +17,7 @@ knowing before skipping a stage:
 
 Both rule-base scales are built. They are a reported comparison, not a default and a variant:
 ``small`` is better over the whole test set and ``large`` is better above n ~ 5000 (FINDINGS
-§3b), so a run that produced only one of them could not state the result.
+§4.3), so a run that produced only one of them could not state the result.
 
 The stages differ in cost by three orders of magnitude, and the expensive one is not ours —
 LKH's cost grows steeply in n, so ``lkh-compare`` over the full size ladder dominates everything
@@ -63,6 +63,7 @@ def _stages(args):
         ("figs-tuning", [PY, "figures_tuning.py"], paths.FIGURES / "fis_tsp_tuning.png"),
         ("figs-rules", [PY, "figures_fis.py"], paths.FIGURES / "fis_tsp_rulebase.png"),
         ("figs-lkh", [PY, "figures_lkh.py"], paths.FIGURES / "fis_tsp_vs_lkh.png"),
+        ("figs-aim", [PY, "figures_aim.py"], paths.FIGURES / "fis_tsp_aimed_kicks.png"),
         ("summary", [PY, "summary.py", "--limit", "0"], paths.RESULTS / "summary.csv"),
     ]
 
