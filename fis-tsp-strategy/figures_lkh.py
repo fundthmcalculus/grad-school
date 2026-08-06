@@ -182,14 +182,20 @@ def _scaling_panels(ax_time, ax_gap, rows):
 def figure(data, out):
     rows = scaling(data)
     names = sorted(data, key=lambda k: data[k].get("n", 0))
-    ncol = max(len(names), 2)
-    fig = plt.figure(figsize=(5.6 * ncol, 10.0))
-    gs = fig.add_gridspec(2, ncol, height_ratios=[1.0, 0.85], hspace=0.32)
+    # Wrapped at four columns rather than one row per instance. A seven-instance ladder in a
+    # single row is 4000 px wide, which every viewer scales down until the axes are unreadable —
+    # the ladder is the point of the figure, so it has to survive being long.
+    ncol = min(4, max(len(names), 2))
+    nrow = -(-len(names) // ncol)  # ceiling division
+    fig = plt.figure(figsize=(5.6 * ncol, 4.6 * nrow + 4.8))
+    gs = fig.add_gridspec(
+        nrow + 1, ncol, height_ratios=[1.0] * nrow + [0.95], hspace=0.34, wspace=0.26
+    )
     for i, name in enumerate(names):
-        _panel(fig.add_subplot(gs[0, i]), name, data[name])
-    half = ncol // 2
+        _panel(fig.add_subplot(gs[i // ncol, i % ncol]), name, data[name])
+    half = max(ncol // 2, 1)
     _scaling_panels(
-        fig.add_subplot(gs[1, :half or 1]), fig.add_subplot(gs[1, half or 1:]), rows
+        fig.add_subplot(gs[nrow, :half]), fig.add_subplot(gs[nrow, half:]), rows
     )
 
     fig.suptitle(
