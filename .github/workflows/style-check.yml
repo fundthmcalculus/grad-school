@@ -20,10 +20,10 @@ jobs:
 
       - name: Install linting tools
         run: |
-          pip install ruff
+          pip install black ruff
 
-      - name: Run Ruff formatter check
-        run: ruff format --check . --exclude ".git,__pycache__,.venv"
+      - name: Run Black formatter check
+        run: black --check . --exclude ".git|__pycache__|.venv"
         continue-on-error: true
 
       - name: Run Ruff linter (informational)

@@ -6,6 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "grad-school"
 description = "Graduate school research and coursework"
 
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
 [tool.ruff]
 # Start with very lax controls - will tighten over time
 line-length = 100
@@ -15,13 +19,3 @@ target-version = "py311"
 # Very lax initial configuration - only flag obvious formatting issues
 select = ["F", "W291", "W292", "W293"]
 ignore = []
-
-[tool.ruff.format]
-# Code formatting preferences
-quote-style = "double"
-indent-width = 4
-line-ending = "auto"
-
-[tool.ruff.lint.isort]
-# Import sorting
-known-first-party = []

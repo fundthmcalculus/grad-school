@@ -12,9 +12,12 @@ Most checks are run in **informational mode** and do not block merges. This allo
 
 ## Tools
 
-- **Ruff**: Modern Python linter and formatter
-  - Fast, zero-config setup
-  - Provides automatic formatting suggestions
+- **Black**: Python code formatter
+  - Consistent, opinionated formatting
+  - Configuration: `pyproject.toml`
+  
+- **Ruff**: Modern Python linter
+  - Fast linting for error detection
   - Configuration: `pyproject.toml`
 
 ## Running Checks Locally
@@ -22,14 +25,14 @@ Most checks are run in **informational mode** and do not block merges. This allo
 To check code style before pushing:
 
 ```bash
-# Install ruff
-pip install ruff
+# Install tools
+pip install black ruff
 
 # Check formatting (without modifying)
-ruff format --check .
+black --check .
 
 # Auto-fix formatting issues
-ruff format .
+black .
 
 # Run linter checks
 ruff check .
