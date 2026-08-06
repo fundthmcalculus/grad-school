@@ -41,10 +41,12 @@ mypy .
 
 ## Current Enforcement Level
 
-We start with **lax controls**:
-- **Black**: Formats consistently but doesn't block merges
-- **Flake8**: Checks for obvious errors and style violations (lenient configuration)
+We start with **very lax controls** — all checks are informational and don't block merges:
+- **Black**: Reports formatting issues but doesn't prevent merge
+- **Flake8**: Reports style violations but doesn't prevent merge
 - **mypy**: Type checking is informational; ignores missing type hints and imports
+
+This allows the repository to adopt consistent practices gradually without being disruptive.
 
 ## Future Tightening
 
