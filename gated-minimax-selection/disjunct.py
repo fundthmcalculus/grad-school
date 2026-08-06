@@ -48,7 +48,7 @@ def _components_feature(X, members, radius):
         return np.zeros(m, dtype=int), 1
     P = X[members]
     diff = P[:, None, :] - P[None, :, :]
-    d = np.sqrt((diff ** 2).sum(-1))
+    d = np.sqrt((diff**2).sum(-1))
     A = (d <= radius).astype(int)
     np.fill_diagonal(A, 0)
     ncomp, labels = connected_components(csr_matrix(A), directed=False)
@@ -93,7 +93,7 @@ def axis_multimodality(X, members, nbins=15, min_gap_bins=1):
     return max_modes
 
 
-def block_arity(Dstar, X, block, mode='dstar', feature_radius_factor=2.5):
+def block_arity(Dstar, X, block, mode="dstar", feature_radius_factor=2.5):
     """
     Return (n_disjuncts, component_labels_over_members) for one block.
 
@@ -102,10 +102,10 @@ def block_arity(Dstar, X, block, mode='dstar', feature_radius_factor=2.5):
     (this is what lets a tight blob and a diffuse blob be judged on their own
     terms rather than a global radius).
     """
-    members = np.asarray(sorted(block['members']), dtype=int)
-    h_birth = block['birth']
+    members = np.asarray(sorted(block["members"]), dtype=int)
+    h_birth = block["birth"]
 
-    if mode == 'dstar':
+    if mode == "dstar":
         labels, ncomp = _components_dstar(Dstar, members, h_birth)
         return ncomp, labels
 
@@ -113,25 +113,25 @@ def block_arity(Dstar, X, block, mode='dstar', feature_radius_factor=2.5):
     P = X[members]
     if len(P) > 1:
         diff = P[:, None, :] - P[None, :, :]
-        d = np.sqrt((diff ** 2).sum(-1))
+        d = np.sqrt((diff**2).sum(-1))
         np.fill_diagonal(d, np.inf)
         nn = d.min(axis=1)
         radius = np.median(nn) * feature_radius_factor
     else:
         radius = np.inf
 
-    if mode == 'feature':
+    if mode == "feature":
         nmodes = _components_feature_axis(X, members)
         return nmodes, None
 
-    if mode == 'hybrid':
+    if mode == "hybrid":
         _, nc_d = _components_dstar(Dstar, members, h_birth)
         nmodes = _components_feature_axis(X, members)
         # hybrid: report topological components, but flag projection modes too.
         # arity = max(topology, projection) because BOTH kinds of split need OR
         return max(nc_d, nmodes), None
 
-    if mode == 'geometric':
+    if mode == "geometric":
         nc, labels = geometric_nonconvexity(X, members)
         return nc, labels
 
@@ -171,6 +171,7 @@ def geometric_nonconvexity(X, members, occupancy_thresh=0.75, split_k_max=4):
     def occupancy(points):
         try:
             from scipy.spatial import ConvexHull, Delaunay
+
             if points.shape[0] < points.shape[1] + 2:
                 return 1.0
             hull = ConvexHull(points)
@@ -181,7 +182,9 @@ def geometric_nonconvexity(X, members, occupancy_thresh=0.75, split_k_max=4):
         span = np.where(hi > lo, hi - lo, 1.0)
         g = 12
         axes = [np.linspace(lo[d], hi[d], g) for d in range(points.shape[1])]
-        mesh = np.stack(np.meshgrid(*axes, indexing='ij'), -1).reshape(-1, points.shape[1])
+        mesh = np.stack(np.meshgrid(*axes, indexing="ij"), -1).reshape(
+            -1, points.shape[1]
+        )
         inside = dela.find_simplex(mesh) >= 0
         n_inside = max(1, inside.sum())
         cell = np.floor((points - lo) / span * (g - 1)).astype(int)
@@ -207,7 +210,7 @@ def geometric_nonconvexity(X, members, occupancy_thresh=0.75, split_k_max=4):
         pick = rng.integers(0, nsimp, size=n_samp)
         w = rng.random((n_samp, pts_in.shape[1]))
         w /= w.sum(1, keepdims=True)
-        samp = np.einsum('ij,ijk->ik', w, pts_in[pick])
+        samp = np.einsum("ij,ijk->ik", w, pts_in[pick])
         scell = np.clip(np.floor((samp - lo) / span * (g - 1)).astype(int), 0, g - 1)
         samp_cells = set(map(tuple, scell))
         base = len(samp_cells & inside_cells) / len(inside_cells)
@@ -220,9 +223,10 @@ def geometric_nonconvexity(X, members, occupancy_thresh=0.75, split_k_max=4):
     # non-convex: find smallest k whose pieces are each convex-ish
     from scipy.cluster.hierarchy import linkage, fcluster
     from scipy.spatial.distance import pdist
-    Z = linkage(pdist(P), method='ward')
+
+    Z = linkage(pdist(P), method="ward")
     for k in range(2, split_k_max + 1):
-        labels = fcluster(Z, t=k, criterion='maxclust') - 1
+        labels = fcluster(Z, t=k, criterion="maxclust") - 1
         ok = True
         for c in range(k):
             pc = P[labels == c]
@@ -231,12 +235,11 @@ def geometric_nonconvexity(X, members, occupancy_thresh=0.75, split_k_max=4):
                 break
         if ok:
             return k, labels
-    labels = fcluster(Z, t=split_k_max, criterion='maxclust') - 1
+    labels = fcluster(Z, t=split_k_max, criterion="maxclust") - 1
     return split_k_max, labels
 
 
-def disjunctive_memberships(Dstar, X, block, mode='dstar', conorm='max',
-                            yager_q=2.0):
+def disjunctive_memberships(Dstar, X, block, mode="dstar", conorm="max", yager_q=2.0):
     """
     Build the disjunctive membership function for one block.
 
@@ -248,9 +251,9 @@ def disjunctive_memberships(Dstar, X, block, mode='dstar', conorm='max',
 
     Returns (mu_combined (n,), n_disjuncts, per_disjunct (k, n)).
     """
-    members = np.asarray(sorted(block['members']), dtype=int)
+    members = np.asarray(sorted(block["members"]), dtype=int)
     ncomp, comp_labels = block_arity(Dstar, X, block, mode=mode)
-    h_b, h_d = block['birth'], block['death']
+    h_b, h_d = block["birth"], block["death"]
     eps = 1e-12
     n = Dstar.shape[0]
 
@@ -274,12 +277,12 @@ def _tconorm(per, conorm, q=2.0):
     """Combine disjunct memberships (k, n) into (n,) via a fixed t-conorm."""
     if per.shape[0] == 0:
         return np.zeros(per.shape[1])
-    if conorm == 'max':
+    if conorm == "max":
         return per.max(axis=0)
-    if conorm == 'probabilistic':   # 1 - prod(1 - mu)
+    if conorm == "probabilistic":  # 1 - prod(1 - mu)
         return 1.0 - np.prod(1.0 - per, axis=0)
-    if conorm == 'lukasiewicz':     # min(1, sum)
+    if conorm == "lukasiewicz":  # min(1, sum)
         return np.minimum(1.0, per.sum(axis=0))
-    if conorm == 'yager':           # min(1, (sum mu^q)^(1/q))
-        return np.minimum(1.0, (np.sum(per ** q, axis=0)) ** (1.0 / q))
+    if conorm == "yager":  # min(1, (sum mu^q)^(1/q))
+        return np.minimum(1.0, (np.sum(per**q, axis=0)) ** (1.0 / q))
     raise ValueError(f"unknown conorm {conorm}")

@@ -17,13 +17,15 @@ theta=[120,60,0] deg, sweep theta_3 by [1.5,3.0] deg in 0.1 deg steps for
 16 training trajectories, test at +2.05 deg -- so the comparison against
 that study's black-box result (0.48s to 0.5rad error) is apples-to-apples.
 """
+
 import time
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
@@ -71,7 +73,9 @@ def build_dataset(trajectories, basis, theta_cols, omega_cols):
     return X_per_output, y
 
 
-def rollout(regressor, basis, test_trajectory, theta_cols, omega_cols, dt, n_steps=None):
+def rollout(
+    regressor, basis, test_trajectory, theta_cols, omega_cols, dt, n_steps=None
+):
     n = basis.n
     theta = test_trajectory[theta_cols].iloc[0].values.astype(float)
     omega = test_trajectory[omega_cols].iloc[0].values.astype(float)
@@ -99,78 +103,127 @@ def time_to_threshold(t, err, threshold=0.5):
     return t[idx[0]] if len(idx) else None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     n = 3
     dt = 0.01
     theta_cols, omega_cols = state_cols(n)
 
     print("Deriving physics basis terms for n=3 (Cramer's rule + known denominator)...")
     t0 = time.perf_counter()
-    basis = derive_physics_basis(n, m_vals=(1.0, 1.0, 1.0), l_vals=(1.0, 1.0, 1.0), g_val=9.81)
-    print(f"  derived in {time.perf_counter() - t0:.2f}s; "
-          f"term counts per output: {[len(t) for t in basis.per_output_terms]}")
+    basis = derive_physics_basis(
+        n, m_vals=(1.0, 1.0, 1.0), l_vals=(1.0, 1.0, 1.0), g_val=9.81
+    )
+    print(
+        f"  derived in {time.perf_counter() - t0:.2f}s; "
+        f"term counts per output: {[len(t) for t in basis.per_output_terms]}"
+    )
 
-    print("\nGenerating n=3 training set (same fan-configuration scenario as the original study)...")
-    family = generate_family(n, base_thetas_deg=[120.0, 60.0, 0.0], sweep_index=2,
-                              sweep_deltas_deg=np.arange(1.5, 3.00001, 0.1), test_delta_deg=2.05,
-                              dt=dt, duration=30.0)
+    print(
+        "\nGenerating n=3 training set (same fan-configuration scenario as the original study)..."
+    )
+    family = generate_family(
+        n,
+        base_thetas_deg=[120.0, 60.0, 0.0],
+        sweep_index=2,
+        sweep_deltas_deg=np.arange(1.5, 3.00001, 0.1),
+        test_delta_deg=2.05,
+        dt=dt,
+        duration=30.0,
+    )
 
     print("\nBuilding physics-basis features...")
-    X_train, y_train = build_dataset(family.train_trajectories, basis, theta_cols, omega_cols)
-    X_test, y_test = build_dataset([family.test_trajectory], basis, theta_cols, omega_cols)
-    print(f"  training rows: {X_train[0].shape[0]}, feature counts per output: {[x.shape[1] for x in X_train]}")
+    X_train, y_train = build_dataset(
+        family.train_trajectories, basis, theta_cols, omega_cols
+    )
+    X_test, y_test = build_dataset(
+        [family.test_trajectory], basis, theta_cols, omega_cols
+    )
+    print(
+        f"  training rows: {X_train[0].shape[0]}, feature counts per output: {[x.shape[1] for x in X_train]}"
+    )
 
     print("\nFitting n physics-structured consequent equations...")
     t1 = time.perf_counter()
     regressor = PhysicsConsequentRegressorN(n).fit(X_train, y_train)
     print(f"  fit time {time.perf_counter() - t1:.2f}s")
 
-    print("\nCross-sectional (single-step delta-omega) fit on held-out test trajectory:")
+    print(
+        "\nCross-sectional (single-step delta-omega) fit on held-out test trajectory:"
+    )
     for i, col in enumerate(omega_cols):
         pred = regressor.models[i].predict(X_test[i])
         mse = mean_squared_error(y_test[:, i], pred)
-        print(f"  {col}: R2={r2_score(y_test[:, i], pred):.6f}  RMSE={np.sqrt(mse):.6f}  "
-              f"MAE={mean_absolute_error(y_test[:, i], pred):.6f}")
+        print(
+            f"  {col}: R2={r2_score(y_test[:, i], pred):.6f}  RMSE={np.sqrt(mse):.6f}  "
+            f"MAE={mean_absolute_error(y_test[:, i], pred):.6f}"
+        )
 
     print("\nRunning corrected open-loop rollout...")
-    predicted = rollout(regressor, basis, family.test_trajectory, theta_cols, omega_cols, dt)
+    predicted = rollout(
+        regressor, basis, family.test_trajectory, theta_cols, omega_cols, dt
+    )
     t = np.arange(len(predicted)) * dt
-    actual = family.test_trajectory[theta_cols + omega_cols].iloc[:len(predicted)].reset_index(drop=True)
-    err_theta1 = np.abs(predicted['theta_1'].values - actual['theta_1'].values)
+    actual = (
+        family.test_trajectory[theta_cols + omega_cols]
+        .iloc[: len(predicted)]
+        .reset_index(drop=True)
+    )
+    err_theta1 = np.abs(predicted["theta_1"].values - actual["theta_1"].values)
 
     ttt = time_to_threshold(t, err_theta1)
-    print(f"  time to 0.5 rad error (theta_1): {ttt:.2f}s" if ttt is not None else "  never exceeded 0.5 rad")
-    valid = ~predicted['theta_1'].isna()
+    print(
+        f"  time to 0.5 rad error (theta_1): {ttt:.2f}s"
+        if ttt is not None
+        else "  never exceeded 0.5 rad"
+    )
+    valid = ~predicted["theta_1"].isna()
     if valid.sum() > 2:
         for col in theta_cols + omega_cols:
             a = actual[col].values[valid.values]
             p = predicted[col].values[valid.values]
-            print(f"  {col}: MAE={np.mean(np.abs(a - p)):.4f}  R2={r2_score(a, p):.4f}  "
-                  f"(valid={valid.sum()}/{len(predicted)})")
+            print(
+                f"  {col}: MAE={np.mean(np.abs(a - p)):.4f}  R2={r2_score(a, p):.4f}  "
+                f"(valid={valid.sum()}/{len(predicted)})"
+            )
 
     fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
-    axes[0].plot(t, actual['theta_1'].values, color='#00d4ff', lw=2, label='Actual')
-    axes[0].plot(t[valid.values], predicted['theta_1'].values[valid.values], color='#ff1744', lw=1.6,
-                 label='Predicted (physics-informed, n=3)', alpha=0.85)
-    axes[0].set_xlabel('Time (s)')
-    axes[0].set_ylabel(r'$\theta_1$ (rad)')
-    axes[0].set_title('Rollout: Actual vs. Predicted')
+    axes[0].plot(t, actual["theta_1"].values, color="#00d4ff", lw=2, label="Actual")
+    axes[0].plot(
+        t[valid.values],
+        predicted["theta_1"].values[valid.values],
+        color="#ff1744",
+        lw=1.6,
+        label="Predicted (physics-informed, n=3)",
+        alpha=0.85,
+    )
+    axes[0].set_xlabel("Time (s)")
+    axes[0].set_ylabel(r"$\theta_1$ (rad)")
+    axes[0].set_title("Rollout: Actual vs. Predicted")
     axes[0].legend()
     axes[0].grid(alpha=0.3)
 
-    axes[1].semilogy(t, np.maximum(err_theta1, 1e-8), color='#2ca02c', lw=1.6,
-                      label='physics-informed rational, n=3')
-    axes[1].axhline(0.5, color='#888', linestyle='--', lw=1, label='0.5 rad threshold')
+    axes[1].semilogy(
+        t,
+        np.maximum(err_theta1, 1e-8),
+        color="#2ca02c",
+        lw=1.6,
+        label="physics-informed rational, n=3",
+    )
+    axes[1].axhline(0.5, color="#888", linestyle="--", lw=1, label="0.5 rad threshold")
     if ttt is not None:
-        axes[1].axvline(ttt, color='#2ca02c', linestyle=':', lw=1, alpha=0.6)
-    axes[1].set_xlabel('Time (s)')
-    axes[1].set_ylabel(r'$|\theta_1^{pred}-\theta_1^{actual}|$ (rad, log)')
-    axes[1].set_title('Rollout Error Growth')
+        axes[1].axvline(ttt, color="#2ca02c", linestyle=":", lw=1, alpha=0.6)
+    axes[1].set_xlabel("Time (s)")
+    axes[1].set_ylabel(r"$|\theta_1^{pred}-\theta_1^{actual}|$ (rad, log)")
+    axes[1].set_title("Rollout Error Growth")
     axes[1].legend()
-    axes[1].grid(alpha=0.3, which='both')
+    axes[1].grid(alpha=0.3, which="both")
 
-    fig.suptitle('n=3: Physics-Inspired Consequent Equations (Automated via Symbolic Cramer\'s Rule)',
-                 fontweight='bold')
+    fig.suptitle(
+        "n=3: Physics-Inspired Consequent Equations (Automated via Symbolic Cramer's Rule)",
+        fontweight="bold",
+    )
     plt.tight_layout()
-    fig.savefig(FIG_DIR / 'n3_physics_informed_rollout.png', dpi=200, bbox_inches='tight')
+    fig.savefig(
+        FIG_DIR / "n3_physics_informed_rollout.png", dpi=200, bbox_inches="tight"
+    )
     print("\nSaved figures/n3_physics_informed_rollout.png")

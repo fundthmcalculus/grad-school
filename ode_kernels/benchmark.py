@@ -36,8 +36,12 @@ from ode_kernels import ode12, ode23, ode45, ode56, ode67, ode78  # noqa: E402
 
 FIG_DIR = Path(__file__).parent / "figures"
 METHODS = {
-    "ode12": ode12, "ode23": ode23, "ode45": ode45,
-    "ode56": ode56, "ode67": ode67, "ode78": ode78,
+    "ode12": ode12,
+    "ode23": ode23,
+    "ode45": ode45,
+    "ode56": ode56,
+    "ode67": ode67,
+    "ode78": ode78,
 }
 SCIPY_EQUIV = {"ode23": "RK23", "ode45": "RK45"}
 
@@ -53,7 +57,7 @@ def _van_der_pol(t, y, mu=5.0):
 def _pleiades(t, y):
     # 7 bodies, planar, masses = body index (Hairer, Norsett & Wanner test).
     n = 7
-    x, yy, vx, vy = y[:n], y[n:2 * n], y[2 * n:3 * n], y[3 * n:4 * n]
+    x, yy, vx, vy = y[:n], y[n : 2 * n], y[2 * n : 3 * n], y[3 * n : 4 * n]
     ax = np.zeros(n)
     ay = np.zeros(n)
     for i in range(n):
@@ -78,13 +82,19 @@ def _pleiades_ic():
 
 
 PROBLEMS = {
-    "decay20": dict(f=_decay20, t_span=(0.0, 5.0), y0=np.ones(20), rtol=1e-8, atol=1e-11),
-    "van_der_pol": dict(f=_van_der_pol, t_span=(0.0, 20.0), y0=[2.0, 0.0], rtol=1e-8, atol=1e-11),
+    "decay20": dict(
+        f=_decay20, t_span=(0.0, 5.0), y0=np.ones(20), rtol=1e-8, atol=1e-11
+    ),
+    "van_der_pol": dict(
+        f=_van_der_pol, t_span=(0.0, 20.0), y0=[2.0, 0.0], rtol=1e-8, atol=1e-11
+    ),
     # Looser than the other two: the Pleiades problem has close gravitational
     # encounters, and ode12 (order 2) is excluded below because it needs an
     # impractically large step count to hold even this tolerance through
     # them -- exactly the regime a 2nd-order method isn't for.
-    "pleiades": dict(f=_pleiades, t_span=(0.0, 2.0), y0=_pleiades_ic(), rtol=1e-8, atol=1e-10),
+    "pleiades": dict(
+        f=_pleiades, t_span=(0.0, 2.0), y0=_pleiades_ic(), rtol=1e-8, atol=1e-10
+    ),
 }
 PROBLEM_SKIP = {"pleiades": {"ode12"}}
 
@@ -104,10 +114,16 @@ def _time_call(fn, repeats=3):
 def run():
     rows = []
     for prob_name, spec in PROBLEMS.items():
-        f, t_span, y0, rtol, atol = (spec["f"], spec["t_span"], spec["y0"],
-                                      spec["rtol"], spec["atol"])
-        ref = solve_ivp(f, t_span, y0, method="DOP853", rtol=1e-13, atol=1e-13,
-                         dense_output=True)
+        f, t_span, y0, rtol, atol = (
+            spec["f"],
+            spec["t_span"],
+            spec["y0"],
+            spec["rtol"],
+            spec["atol"],
+        )
+        ref = solve_ivp(
+            f, t_span, y0, method="DOP853", rtol=1e-13, atol=1e-13, dense_output=True
+        )
         y_ref_end = ref.sol(t_span[1])
 
         print(f"\n=== {prob_name} (n={np.size(y0)}, rtol={rtol:.0e}) ===")
@@ -126,7 +142,9 @@ def run():
 
         for ode_name, scipy_name in SCIPY_EQUIV.items():
             ms, res = _time_call(
-                lambda: solve_ivp(f, t_span, y0, method=scipy_name, rtol=rtol, atol=atol)
+                lambda: solve_ivp(
+                    f, t_span, y0, method=scipy_name, rtol=rtol, atol=atol
+                )
             )
             err = np.max(np.abs(res.y[:, -1] - y_ref_end))
             label = f"scipy.{scipy_name}"
@@ -146,7 +164,9 @@ def _plot(rows):
     for ax, prob_name in zip(axes, problems):
         names = [r[1] for r in rows if r[0] == prob_name]
         times = [r[2] for r in rows if r[0] == prob_name]
-        colors = ["tab:blue" if not n.startswith("scipy") else "tab:orange" for n in names]
+        colors = [
+            "tab:blue" if not n.startswith("scipy") else "tab:orange" for n in names
+        ]
         ax.bar(names, times, color=colors)
         ax.set_ylabel("wall time (ms)")
         ax.set_title(prob_name)

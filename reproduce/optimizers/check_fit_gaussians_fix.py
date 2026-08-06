@@ -40,8 +40,12 @@ import sys
 import time
 import warnings
 
-for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
-           "NUMEXPR_NUM_THREADS"):
+for _v in (
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+):
     os.environ.setdefault(_v, "1")
 
 import numpy as np  # noqa: E402
@@ -202,28 +206,39 @@ def run(name, groups):
 
     total = agree + disagree
     print(f"  groups                {total}")
-    print(f"  same component count  {agree}/{total} ({100.0 * agree / max(total, 1):.0f}%)")
+    print(
+        f"  same component count  {agree}/{total} ({100.0 * agree / max(total, 1):.0f}%)"
+    )
     if deltas:
         costs = np.array([c for *_r, c in deltas if np.isfinite(c)])
-        print(f"  disagreements         {len(deltas)}  "
-              f"(EM-BIC given up, as a fraction of that group's own BIC range: "
-              f"median {np.median(costs):.3f}, worst {costs.max():.3f})")
+        print(
+            f"  disagreements         {len(deltas)}  "
+            f"(EM-BIC given up, as a fraction of that group's own BIC range: "
+            f"median {np.median(costs):.3f}, worst {costs.max():.3f})"
+        )
         for key, ko, kn, cost in deltas[:12]:
-            print(f"    {key:<40} EM {ko} -> k-means {kn}   costs {cost:+.3f} of the BIC range")
+            print(
+                f"    {key:<40} EM {ko} -> k-means {kn}   costs {cost:+.3f} of the BIC range"
+            )
         if len(deltas) > 12:
             print(f"    ... and {len(deltas) - 12} more")
     if moved:
         arr = np.array([m for m in moved if np.isfinite(m)])
-        print(f"  centre shift where counts agree: median {np.median(arr):.4f} s.d., "
-              f"max {arr.max():.4f} s.d.")
-    print(f"  selection time        EM {1000 * t_old:8.1f} ms   "
-          f"k-means {1000 * t_new:8.1f} ms   ({t_old / max(t_new, 1e-9):.1f}x)")
+        print(
+            f"  centre shift where counts agree: median {np.median(arr):.4f} s.d., "
+            f"max {arr.max():.4f} s.d."
+        )
+    print(
+        f"  selection time        EM {1000 * t_old:8.1f} ms   "
+        f"k-means {1000 * t_new:8.1f} ms   ({t_old / max(t_new, 1e-9):.1f}x)"
+    )
     return total, agree, t_old, t_new
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--phishing-rows", type=int, default=50_000)
     ap.add_argument("--buckets", type=int, default=3)
     args = ap.parse_args()

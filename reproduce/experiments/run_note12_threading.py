@@ -185,7 +185,7 @@ def parse_a2(path: Path) -> dict[str, dict[int, tuple[float, float]]]:
         k = int(row[0])
         for scorer, cellstr in zip(scorers, row[1:]):
             if "/" not in cellstr:
-                continue          # N/A column
+                continue  # N/A column
             acc, secs = cellstr.split("/")
             out[scorer][k] = (float(acc.strip()), float(secs.strip()))
     return out
@@ -223,8 +223,12 @@ def run_one(setting, out_dir: Path, skip_existing: bool, axis: str = "threads") 
     with open(log, "w", encoding="utf-8") as lf:
         proc = subprocess.run(
             [sys.executable, str(GENERATOR)],
-            cwd=str(ROOT), env=env, stdout=lf,
-            stderr=subprocess.STDOUT, text=True)
+            cwd=str(ROOT),
+            env=env,
+            stdout=lf,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
     if proc.returncode != 0:
         print(f"[{axis}={setting}] FAILED rc={proc.returncode}; see {log}")
         return csv_path
@@ -260,21 +264,28 @@ def compare(results: dict, axis: str = "threads") -> tuple[int, bool]:
 
     for scorer in scorers:
         ks = sorted(parsed[reference][scorer])
-        print(f"\n  {scorer}: accuracy vs {label} "
-              f"(reference = {reference})")
-        print("    k    " + "".join(f"{str(t):>14}" for t in counts)
-              + f"{'max |Δ|':>12}")
+        print(f"\n  {scorer}: accuracy vs {label} " f"(reference = {reference})")
+        print(
+            "    k    " + "".join(f"{str(t):>14}" for t in counts) + f"{'max |Δ|':>12}"
+        )
         col_max = 0.0
         for k in ks:
-            accs = [parsed[t][scorer].get(k, (float('nan'), 0))[0] for t in counts]
+            accs = [parsed[t][scorer].get(k, (float("nan"), 0))[0] for t in counts]
             base = accs[0]
             delta = max(abs(a - base) for a in accs)
             col_max = max(col_max, delta)
-            print(f"    {k:<5}" + "".join(f"{a:>14.4f}" for a in accs)
-                  + f"{delta:>12.4f}")
-        verdict = ("identical" if col_max <= TIED else
-                   "moved (below the 0.001 materiality floor)"
-                   if col_max < MATERIAL else "MOVED")
+            print(
+                f"    {k:<5}" + "".join(f"{a:>14.4f}" for a in accs) + f"{delta:>12.4f}"
+            )
+        verdict = (
+            "identical"
+            if col_max <= TIED
+            else (
+                "moved (below the 0.001 materiality floor)"
+                if col_max < MATERIAL
+                else "MOVED"
+            )
+        )
         print(f"    max |Δ| over the whole column: {col_max:.6f}  -> {verdict}")
         if col_max >= MATERIAL:
             moved_any = True
@@ -285,24 +296,29 @@ def compare(results: dict, axis: str = "threads") -> tuple[int, bool]:
     # failure looks exactly like the finding. Total fit seconds per run is the
     # falsifier: if it does not respond to the setting, the knob never bit and
     # the accuracy invariance says nothing.
-    print("\n  Manipulation check -- total A.2 fit seconds per run "
-          "(sum over scorers and k, mean per seed):")
+    print(
+        "\n  Manipulation check -- total A.2 fit seconds per run "
+        "(sum over scorers and k, mean per seed):"
+    )
     totals = {}
     for t in counts:
-        totals[t] = sum(secs for sc in parsed[t].values()
-                        for _, secs in sc.values())
+        totals[t] = sum(secs for sc in parsed[t].values() for _, secs in sc.values())
         print(f"    {str(t):<14} {totals[t]:8.2f} s")
     lo, hi = min(totals.values()), max(totals.values())
     spread = (hi - lo) / lo if lo else 0.0
-    print(f"    spread {spread * 100:.1f}%  "
-          f"({'PASS' if spread >= MANIPULATION_FLOOR else 'FAIL'}: needs "
-          f">= {MANIPULATION_FLOOR * 100:.0f}% for the invariance to mean "
-          f"anything)")
+    print(
+        f"    spread {spread * 100:.1f}%  "
+        f"({'PASS' if spread >= MANIPULATION_FLOOR else 'FAIL'}: needs "
+        f">= {MANIPULATION_FLOOR * 100:.0f}% for the invariance to mean "
+        f"anything)"
+    )
     if spread < MANIPULATION_FLOOR:
-        print(f"    {label} loaded but did not measurably change execution, so"
-              "\n    an unchanged accuracy is WEAK evidence rather than a"
-              "\n    refutation -- the workload may simply not exercise what this"
-              "\n    variable controls.")
+        print(
+            f"    {label} loaded but did not measurably change execution, so"
+            "\n    an unchanged accuracy is WEAK evidence rather than a"
+            "\n    refutation -- the workload may simply not exercise what this"
+            "\n    variable controls."
+        )
 
     return (1 if moved_any else 0), spread >= MANIPULATION_FLOOR
 
@@ -313,8 +329,10 @@ def compare_to_archive(results: dict, axis: str = "threads") -> None:
         print(f"\n  [skip] archive not found: {ARCHIVE}")
         return
     arch = parse_a2(ARCHIVE)
-    print(f"\n  Against the archive ({ARCHIVE.parent.name}): "
-          f"max |Δ accuracy| per column")
+    print(
+        f"\n  Against the archive ({ARCHIVE.parent.name}): "
+        f"max |Δ accuracy| per column"
+    )
     print(f"    {axis:<14}" + "".join(f"{s:>18}" for s in arch))
     for setting, path in results.items():
         if not path.is_file():
@@ -325,8 +343,11 @@ def compare_to_archive(results: dict, axis: str = "threads") -> None:
             if scorer not in here or not here[scorer]:
                 cells.append("n/a")
                 continue
-            d = max(abs(here[scorer][k][0] - arch[scorer][k][0])
-                    for k in arch[scorer] if k in here[scorer])
+            d = max(
+                abs(here[scorer][k][0] - arch[scorer][k][0])
+                for k in arch[scorer]
+                if k in here[scorer]
+            )
             cells.append(f"{d:.4f}")
         print(f"    {str(setting):<14}" + "".join(f"{c:>18}" for c in cells))
 
@@ -351,34 +372,49 @@ def blas_report() -> None:
         print(f"  [blas] cannot report the backend ({exc})")
         return
     for info in threadpoolctl.threadpool_info():
-        print(f"  [blas] {info.get('internal_api')} "
-              f"{info.get('version')} arch={info.get('architecture')} "
-              f"threads={info.get('num_threads')} "
-              f"prefix={info.get('prefix')}")
+        print(
+            f"  [blas] {info.get('internal_api')} "
+            f"{info.get('version')} arch={info.get('architecture')} "
+            f"threads={info.get('num_threads')} "
+            f"prefix={info.get('prefix')}"
+        )
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--vary", choices=("threads", "coretype"), default="threads",
-                    help="which single variable to sweep")
-    ap.add_argument("--threads", default=",".join(str(t) for t in DEFAULT_THREADS),
-                    help="comma-separated thread counts (default 1,2,8,32)")
-    ap.add_argument("--coretypes", default=",".join(CORETYPES),
-                    help="comma-separated OPENBLAS_CORETYPE values, native first. "
-                         "Never name a family your CPU cannot execute.")
+    ap.add_argument(
+        "--vary",
+        choices=("threads", "coretype"),
+        default="threads",
+        help="which single variable to sweep",
+    )
+    ap.add_argument(
+        "--threads",
+        default=",".join(str(t) for t in DEFAULT_THREADS),
+        help="comma-separated thread counts (default 1,2,8,32)",
+    )
+    ap.add_argument(
+        "--coretypes",
+        default=",".join(CORETYPES),
+        help="comma-separated OPENBLAS_CORETYPE values, native first. "
+        "Never name a family your CPU cannot execute.",
+    )
     ap.add_argument("--out", default=str(DEFAULT_OUT))
     ap.add_argument("--skip-existing", action="store_true")
-    ap.add_argument("--compare-only", action="store_true",
-                    help="do not run anything; compare CSVs already on disk")
+    ap.add_argument(
+        "--compare-only",
+        action="store_true",
+        help="do not run anything; compare CSVs already on disk",
+    )
     args = ap.parse_args()
 
     axis = "threads" if args.vary == "threads" else "core"
     if axis == "threads":
         settings = [int(t) for t in args.threads.split(",") if t.strip()]
-        subdir = lambda s: f"threads-{int(s):02d}"   # noqa: E731
+        subdir = lambda s: f"threads-{int(s):02d}"  # noqa: E731
     else:
         settings = [c.strip() for c in args.coretypes.split(",") if c.strip()]
-        subdir = lambda s: f"core-{s}"               # noqa: E731
+        subdir = lambda s: f"core-{s}"  # noqa: E731
     out_dir = Path(args.out).resolve()
 
     seeds = os.environ.get("REPRO_SEEDS", "0,1,2,3,4,5,6,7,8,9")
@@ -396,14 +432,20 @@ def main() -> int:
     if reduced:
         # Loud, because a reduced run reads exactly like a protocol run once the
         # numbers are out of the shell and into a document.
-        print("  *** REDUCED RUN -- NOT THE TEN-SEED PROTOCOL: "
-              + "; ".join(reduced) + " ***")
+        print(
+            "  *** REDUCED RUN -- NOT THE TEN-SEED PROTOCOL: "
+            + "; ".join(reduced)
+            + " ***"
+        )
 
     results: dict = {}
     for s in settings:
         dest = out_dir / subdir(s) / "table_a2_feature_count.csv"
-        results[s] = dest if args.compare_only else run_one(
-            s, out_dir, args.skip_existing, axis=axis)
+        results[s] = (
+            dest
+            if args.compare_only
+            else run_one(s, out_dir, args.skip_existing, axis=axis)
+        )
 
     print(f"\n--- A.2 accuracy across {args.vary} settings ---")
     moved, manipulated = compare(results, axis=axis)
@@ -416,9 +458,14 @@ def main() -> int:
             ranks[s] = rp.read_text(encoding="utf-8")
     if len(ranks) >= 2:
         distinct = len(set(ranks.values()))
-        print(f"\n  A.1 ranking (input control): "
-              + ("identical at every setting" if distinct == 1
-                 else f"*** {distinct} DISTINCT RANKINGS ***"))
+        print(
+            f"\n  A.1 ranking (input control): "
+            + (
+                "identical at every setting"
+                if distinct == 1
+                else f"*** {distinct} DISTINCT RANKINGS ***"
+            )
+        )
 
     compare_to_archive(results, axis=axis)
 
@@ -426,22 +473,28 @@ def main() -> int:
     if moved == 2:
         print("  inconclusive: not enough usable runs")
     elif moved:
-        print(f"  at least one accuracy column moved by >= {MATERIAL} with "
-              f"{args.vary}.\n  Consistent with the note-12 numerical-environment"
-              "\n  hypothesis -- check WHICH column moved before concluding it"
-              "\n  (see the registered outcomes in this file's docstring).")
+        print(
+            f"  at least one accuracy column moved by >= {MATERIAL} with "
+            f"{args.vary}.\n  Consistent with the note-12 numerical-environment"
+            "\n  hypothesis -- check WHICH column moved before concluding it"
+            "\n  (see the registered outcomes in this file's docstring)."
+        )
     elif not manipulated:
-        print(f"  INCONCLUSIVE. Every accuracy column is invariant to {args.vary},"
-              "\n  but the manipulation check failed: the variable loaded and"
-              "\n  changed no measurable amount of work, so this workload does not"
-              "\n  exercise what it controls and the invariance is not evidence"
-              "\n  either way. Do not record this as a refutation.")
+        print(
+            f"  INCONCLUSIVE. Every accuracy column is invariant to {args.vary},"
+            "\n  but the manipulation check failed: the variable loaded and"
+            "\n  changed no measurable amount of work, so this workload does not"
+            "\n  exercise what it controls and the invariance is not evidence"
+            "\n  either way. Do not record this as a refutation."
+        )
     else:
-        print(f"  every A.2 accuracy column is invariant to {args.vary} on this"
-              "\n  host, to the fourth decimal the table prints, while the"
-              "\n  manipulation check confirms the variable really changed the"
-              "\n  work done. That branch of note 12's hypothesis is REFUTED; it"
-              "\n  does not become more likely by elimination, it is removed.")
+        print(
+            f"  every A.2 accuracy column is invariant to {args.vary} on this"
+            "\n  host, to the fourth decimal the table prints, while the"
+            "\n  manipulation check confirms the variable really changed the"
+            "\n  work done. That branch of note 12's hypothesis is REFUTED; it"
+            "\n  does not become more likely by elimination, it is removed."
+        )
     if reduced:
         print("  *** reduced run; do not quote these as the ten-seed result ***")
     return 0

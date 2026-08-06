@@ -13,11 +13,11 @@ def compute_ordered_dis_njit2(matrix_of_pairwise_distance: np.ndarray):
 
     index_of_maximum_value = np.argmax(matrix_of_pairwise_distance)
 
-    column_index_of_maximum_value = (index_of_maximum_value // N)
+    column_index_of_maximum_value = index_of_maximum_value // N
 
     list_of_int[0] = column_index_of_maximum_value
 
-    K = np.linspace(0,N - 1,N).astype(np.int32)
+    K = np.linspace(0, N - 1, N).astype(np.int32)
 
     J = np.delete(K, column_index_of_maximum_value)
 
@@ -45,11 +45,11 @@ def compute_ordered_dis_njit2(matrix_of_pairwise_distance: np.ndarray):
 
     for column_index_of_maximum_value in range(N):
         for j in range(N):
-            ordered_matrix[
-                column_index_of_maximum_value, j
-            ] = matrix_of_pairwise_distance[
-                list_of_int[column_index_of_maximum_value], list_of_int[j]
-            ]
+            ordered_matrix[column_index_of_maximum_value, j] = (
+                matrix_of_pairwise_distance[
+                    list_of_int[column_index_of_maximum_value], list_of_int[j]
+                ]
+            )
     # print("Max Col: ", list_of_int[0])
     # print("Sequence: ", mst_pairs)
 
@@ -67,11 +67,9 @@ def compute_ordered_dis_njit_merge(matrix_of_pairwise_distance: np.ndarray):
     # Step 3:
     for column_index_of_maximum_value in range(N):
         for j in range(N):
-            ordered_matrix[
-                column_index_of_maximum_value, j
-            ] = matrix_of_pairwise_distance[
-                p[column_index_of_maximum_value], p[j]
-            ]
+            ordered_matrix[column_index_of_maximum_value, j] = (
+                matrix_of_pairwise_distance[p[column_index_of_maximum_value], p[j]]
+            )
 
     # Step 4 :
     return ordered_matrix, p
@@ -158,7 +156,7 @@ def top_down_merge_2d(begin, mid, end, A, direction=0):
     L = np.zeros((n1, n1))
     R = np.zeros((n2, n2))
     # Copy from the A matrix into the source arrays.
-    np.copyto(L, A[begin:mid + 1, begin:mid + 1])
+    np.copyto(L, A[begin : mid + 1, begin : mid + 1])
     np.copyto(R, A[mid:end, mid:end])
 
     ij = 0
@@ -191,7 +189,9 @@ def top_down_merge_2d(begin, mid, end, A, direction=0):
         kl += 1
 
 
-def _get_2d_offset(ij: int, jk: int, kl: int, n0: int, n1: int, n2: int) -> tuple[int, int, int, int, int, int]:
+def _get_2d_offset(
+    ij: int, jk: int, kl: int, n0: int, n1: int, n2: int
+) -> tuple[int, int, int, int, int, int]:
     ij_r = ij // n1
     ij_c = ij % n1
     jk_r = jk // n2
@@ -203,7 +203,9 @@ def _get_2d_offset(ij: int, jk: int, kl: int, n0: int, n1: int, n2: int) -> tupl
 
 def compute_ordered_dissimilarity_matrix2(x: np.ndarray) -> tuple[np.ndarray, list]:
     matrix_of_pairwise_distance = pairwise_distances(x)
-    dis_matrix, observation_path = compute_ordered_dis_njit2(matrix_of_pairwise_distance)
+    dis_matrix, observation_path = compute_ordered_dis_njit2(
+        matrix_of_pairwise_distance
+    )
     return dis_matrix, observation_path
 
 
@@ -261,7 +263,12 @@ def compute_ivat_ordered_dissimilarity_matrix2(x: np.ndarray):
             # re_ordered_matrix[r, c] = max(om_rj, rom_jc)
             re_ordered_matrix[c, r] = re_ordered_matrix[r, c]
 
-    return re_ordered_matrix, re_ordered_observation_path, ordered_matrix, observation_path
+    return (
+        re_ordered_matrix,
+        re_ordered_observation_path,
+        ordered_matrix,
+        observation_path,
+    )
 
 
 def exchange(j, r, re_ordered_observation_path):

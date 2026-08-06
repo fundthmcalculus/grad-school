@@ -37,13 +37,13 @@ sys.path.insert(0, _HERE)
 import _datasets as D  # noqa: E402
 
 FIS_ROOT = os.environ.get("PILOT_TRIBBLE_FIS", os.path.join(REPO_ROOT, "tribble-fis"))
-sys.path.insert(0, os.path.join(FIS_ROOT, "src"))          # tribblefis
+sys.path.insert(0, os.path.join(FIS_ROOT, "src"))  # tribblefis
 sys.path.insert(0, os.path.join(FIS_ROOT, "tribble-tree"))  # fuzzytree
 
 sys.path.insert(0, os.path.join(REPO_ROOT, "reproduce"))
 sys.path.insert(0, os.path.join(REPO_ROOT, "reproduce", "tables"))
-import common as C            # noqa: E402
-import _fuzzy_models as _fm   # noqa: E402
+import common as C  # noqa: E402
+import _fuzzy_models as _fm  # noqa: E402
 
 (M5Prime,) = C.optional_import("m5py", ["M5Prime"])
 
@@ -65,7 +65,9 @@ def run(name, loader):
         "fuzzy tree": lambda: _fm.tree_regressor(SEED),
         "HME": lambda: _fm.hme_regressor(SEED),
         "CART": lambda: DecisionTreeRegressor(random_state=SEED),
-        "Random Forest": lambda: RandomForestRegressor(n_estimators=200, random_state=SEED),
+        "Random Forest": lambda: RandomForestRegressor(
+            n_estimators=200, random_state=SEED
+        ),
     }
     if M5Prime:
         models["M5"] = lambda: M5Prime()
@@ -90,7 +92,9 @@ def run(name, loader):
 
 
 if __name__ == "__main__":
-    print(f"tribble-fis commit: {os.popen(f'git -C {FIS_ROOT} rev-parse HEAD').read().strip()}")
+    print(
+        f"tribble-fis commit: {os.popen(f'git -C {FIS_ROOT} rev-parse HEAD').read().strip()}"
+    )
     print(f"m5py available: {M5Prime is not None}")
     run("California Housing, raw features, model family", D.load_housing)
     run("Superconductivity, raw features, model family", D.load_superconduct)

@@ -31,6 +31,7 @@ def _dataset(name):
     an explicit error naming the search path beats a stack trace from read_csv.
     """
     import os
+
     here = Path(__file__).resolve().parent
     roots = []
     if os.environ.get("GRAD_SCHOOL_DATA"):
@@ -48,6 +49,7 @@ def _dataset(name):
         f"It is gitignored, so a fresh clone will not have it; place it at the "
         f"repo root or set GRAD_SCHOOL_DATA to the directory holding it."
     )
+
 
 from nerfcm import nerfcm
 import ivat_mf as im
@@ -163,11 +165,15 @@ def main():
 
     # Iris with Euclidean distance
     df_iris = pd.read_csv(_dataset("IRIS.csv"))
-    X_iris = df_iris[["sepal_length", "sepal_width", "petal_length", "petal_width"]].values.astype(float)
+    X_iris = df_iris[
+        ["sepal_length", "sepal_width", "petal_length", "petal_width"]
+    ].values.astype(float)
     X_iris = (X_iris - X_iris.mean(axis=0)) / (X_iris.std(axis=0) + 1e-9)
     D_iris_euclidean = im.dissimilarity(X_iris)
     result_iris = test_matrix(D_iris_euclidean, "Iris (Euclidean)", c=3)
-    print(f"  Iris: beta_mean={result_iris['beta_mean']:.6f}, activated={result_iris['any_activated']}")
+    print(
+        f"  Iris: beta_mean={result_iris['beta_mean']:.6f}, activated={result_iris['any_activated']}"
+    )
 
     # Test 2: Non-Euclidean constructions (should ACTIVATE)
     print()
@@ -180,25 +186,33 @@ def main():
     D1 = create_strongly_non_euclidean(40, seed=0)
     r1 = test_matrix(D1, "Strong triangle-inequality violations", c=4)
     results.append(r1)
-    print(f"  Non-metric (violations): beta_mean={r1['beta_mean']:.6f}, activated={r1['any_activated']}")
+    print(
+        f"  Non-metric (violations): beta_mean={r1['beta_mean']:.6f}, activated={r1['any_activated']}"
+    )
 
     # Non-Euclidean 2: Graph shortest paths
     D2 = create_non_embeddable_metric(40, seed=0)
     r2 = test_matrix(D2, "Graph shortest-path metric", c=4)
     results.append(r2)
-    print(f"  Graph metric: beta_mean={r2['beta_mean']:.6f}, activated={r2['any_activated']}")
+    print(
+        f"  Graph metric: beta_mean={r2['beta_mean']:.6f}, activated={r2['any_activated']}"
+    )
 
     # Non-Euclidean 3: Correlation-based (real data structure)
     D3 = create_correlation_based_dissimilarity(X_iris)
     r3 = test_matrix(D3, "Correlation-based (Iris)", c=3)
     results.append(r3)
-    print(f"  Correlation-dissimilarity: beta_mean={r3['beta_mean']:.6f}, activated={r3['any_activated']}")
+    print(
+        f"  Correlation-dissimilarity: beta_mean={r3['beta_mean']:.6f}, activated={r3['any_activated']}"
+    )
 
     # Non-Euclidean 4: Larger non-metric matrix
     D4 = create_strongly_non_euclidean(60, seed=1)
     r4 = test_matrix(D4, "Large non-metric matrix", c=5)
     results.append(r4)
-    print(f"  Large non-metric: beta_mean={r4['beta_mean']:.6f}, activated={r4['any_activated']}")
+    print(
+        f"  Large non-metric: beta_mean={r4['beta_mean']:.6f}, activated={r4['any_activated']}"
+    )
 
     print()
     print("=" * 80)
@@ -208,9 +222,11 @@ def main():
     print(f"{'Dataset':<35}{'Type':<20}{'beta_mean':<12}{'Activated'}")
     print("-" * 80)
 
-    print(f"{'Iris (Euclidean)':<35}{'Control':<20}{result_iris['beta_mean']:<12.6f}{'NO'}")
+    print(
+        f"{'Iris (Euclidean)':<35}{'Control':<20}{result_iris['beta_mean']:<12.6f}{'NO'}"
+    )
     for r in results:
-        activated = "YES ✓" if r['any_activated'] else "NO"
+        activated = "YES ✓" if r["any_activated"] else "NO"
         print(f"{r['name']:<35}{'Non-Euclidean':<20}{r['beta_mean']:<12.6f}{activated}")
 
     print()
@@ -219,22 +235,30 @@ def main():
     print("=" * 80)
     print()
 
-    activated_count = sum(1 for r in results if r['any_activated'])
+    activated_count = sum(1 for r in results if r["any_activated"])
 
     if activated_count > 0:
         print("✓ CONFIRMED: NERFCM beta-spread ACTIVATES on non-Euclidean data.")
         print()
         print("Evidence:")
-        print(f"  • Euclidean control (Iris):        beta = {result_iris['beta_mean']:.6f} (stays 0)")
-        print(f"  • Non-Euclidean test cases:        {activated_count}/{len(results)} showed activation")
+        print(
+            f"  • Euclidean control (Iris):        beta = {result_iris['beta_mean']:.6f} (stays 0)"
+        )
+        print(
+            f"  • Non-Euclidean test cases:        {activated_count}/{len(results)} showed activation"
+        )
         print()
         print("Conclusion:")
         print("  The beta-spread mechanism works as designed:")
         print("  1. On Euclidean data: beta = 0 (no correction needed)")
-        print("  2. On non-Euclidean data: beta > 0 (activates to restore admissibility)")
+        print(
+            "  2. On non-Euclidean data: beta > 0 (activates to restore admissibility)"
+        )
         print()
         print("  This validates the NERFCM implementation's handling of non-Euclidean")
-        print("  dissimilarity matrices in real scenarios where metric properties break down.")
+        print(
+            "  dissimilarity matrices in real scenarios where metric properties break down."
+        )
     else:
         print("✗ INCONCLUSIVE: Beta did not activate strongly enough.")
         print("  This may indicate the test matrices were still too metric-preserving.")

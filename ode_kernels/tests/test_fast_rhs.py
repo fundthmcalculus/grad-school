@@ -11,8 +11,14 @@ from numba import cfunc, types  # noqa: E402
 from ode_kernels import ode45
 
 
-@cfunc(types.void(types.double, types.CPointer(types.double),
-                   types.CPointer(types.double), types.intc))
+@cfunc(
+    types.void(
+        types.double,
+        types.CPointer(types.double),
+        types.CPointer(types.double),
+        types.intc,
+    )
+)
 def _decay_cfunc(t, y, dy, n):
     dy[0] = -y[0]
 

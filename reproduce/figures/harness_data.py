@@ -43,9 +43,13 @@ def archives():
             text = f.read()
         stamp = _STAMP.search(text)
         label = _LABEL.search(text)
-        found.append(((label.group(1) if label else entry),
-                      os.path.join(OUTPUTS, entry),
-                      stamp.group(1) if stamp else ""))
+        found.append(
+            (
+                (label.group(1) if label else entry),
+                os.path.join(OUTPUTS, entry),
+                stamp.group(1) if stamp else "",
+            )
+        )
     return sorted(found, key=lambda r: r[2], reverse=True)
 
 
@@ -59,7 +63,8 @@ def archive(label=None):
                 return name, path
         raise FileNotFoundError(
             f"no archive labelled {label!r} under {os.path.relpath(OUTPUTS, ROOT)}; "
-            f"have: {', '.join(n for n, _, _ in found) or '(none)'}")
+            f"have: {', '.join(n for n, _, _ in found) or '(none)'}"
+        )
     if found:
         return found[0][0], found[0][1]
     return "(unarchived)", OUTPUTS
@@ -85,7 +90,8 @@ def table(basename, label=None):
             f"{basename}.csv is in neither archive {name!r} nor "
             f"{os.path.relpath(OUTPUTS, ROOT)}. Run the generator that produces "
             f"it (see reproduce/PROVENANCE_MAP.md) before drawing a figure "
-            f"from it.")
+            f"from it."
+        )
     return _read(csv_path), name
 
 

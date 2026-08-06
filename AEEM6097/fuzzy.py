@@ -6,16 +6,15 @@ from numpy.typing import NDArray
 
 from AEEM6097.membership_functions import MembershipFunction, FuzzyVariable
 
-
 # TODO - This is a terrible inversion of control, but without resorting to Python metaclass magic, it's the easiest way to do this.
 # TODO - Set the internal workings of different mathematical methods.
-AND_MIN = 'min'
-AND_MULT = 'mult'
-AND_OPERATION = AND_MIN # Or mult
+AND_MIN = "min"
+AND_MULT = "mult"
+AND_OPERATION = AND_MIN  # Or mult
 
-OR_MAX = 'max'
-OR_SUM_MULT = 'sum-mult'
-OR_OPERATION = OR_MAX # Or sum-mult
+OR_MAX = "max"
+OR_SUM_MULT = "sum-mult"
+OR_OPERATION = OR_MAX  # Or sum-mult
 
 
 class FuzzySet(abc.ABC):
@@ -107,7 +106,9 @@ class FuzzySet(abc.ABC):
 
 
 class FuzzyInference(FuzzyVariable):
-    def __init__(self, output_set: FuzzySet, var_name: str, mu_value: NDArray[np.float64]):
+    def __init__(
+        self, output_set: FuzzySet, var_name: str, mu_value: NDArray[np.float64]
+    ):
         super().__init__(var_name, mu_value)
         self.output_set: FuzzySet = output_set
 
@@ -156,7 +157,7 @@ class FuzzyAnd(FuzzyOperator):
         if AND_OPERATION == AND_MIN:
             return np.minimum(a1, b1)
         elif AND_OPERATION == AND_MULT:
-            return a1*b1
+            return a1 * b1
         else:
             raise NotImplementedError(f"Operation {AND_OPERATION} not implemented")
 
@@ -177,7 +178,7 @@ class FuzzyOr(FuzzyOperator):
         if OR_OPERATION == OR_MAX:
             return np.maximum(a1, b1)
         elif OR_OPERATION == OR_SUM_MULT:
-            return a1+b1-a1*b1
+            return a1 + b1 - a1 * b1
         else:
             raise NotImplementedError(f"Operation {OR_OPERATION} not implemented")
 
@@ -231,12 +232,12 @@ class FuzzyRule:
     def __str__(self) -> str:
         return f"{self.rule_name}: IF {self.antecedent} THEN {self.consequent}"
 
-    def __call__(
-        self, x: NDArray[np.float64] | list[FuzzyVariable]
-    ) -> FuzzyInference:
+    def __call__(self, x: NDArray[np.float64] | list[FuzzyVariable]) -> FuzzyInference:
         return self.evaluate(x)
 
-    def evaluate(self, x: NDArray[np.float64] | list[FuzzyVariable]) -> FuzzyInference | NDArray[np.float64]:
+    def evaluate(
+        self, x: NDArray[np.float64] | list[FuzzyVariable]
+    ) -> FuzzyInference | NDArray[np.float64]:
         raise NotImplementedError("evaluate() must be implemented in subclass")
 
 
@@ -277,12 +278,16 @@ class TSKRule(FuzzyRule):
     def __str__(self) -> str:
         return f"{self.rule_name}: IF ({self.antecedent}) THEN {self.consequent_var_name} = {self.consequent}"
 
-    def __call__(self, x: NDArray[np.float64] | list[FuzzyVariable]) -> NDArray[np.float64]:
+    def __call__(
+        self, x: NDArray[np.float64] | list[FuzzyVariable]
+    ) -> NDArray[np.float64]:
         return self.evaluate(x)
 
-    def evaluate(self, x: NDArray[np.float64] | list[FuzzyVariable]) -> NDArray[np.float64]:
+    def evaluate(
+        self, x: NDArray[np.float64] | list[FuzzyVariable]
+    ) -> NDArray[np.float64]:
         mu_x = self.antecedent(x)
-        return mu_x*self.consequent_function(x)
+        return mu_x * self.consequent_function(x)
 
 
 class FuzzySystem(abc.ABC):

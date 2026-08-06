@@ -54,7 +54,18 @@ def load_data():
     return X, y
 
 
-def run_model(model_type, X_train, X_test, y_train, y_test, y_bucket_mean, top_n_todo, n_top_vars, start_time, n_output_buckets):
+def run_model(
+    model_type,
+    X_train,
+    X_test,
+    y_train,
+    y_test,
+    y_bucket_mean,
+    top_n_todo,
+    n_top_vars,
+    start_time,
+    n_output_buckets,
+):
     """Run either Gaussian or Trapz model with full optimization."""
     print(f"\n{'=' * 80}")
     print(f"EVALUATING {model_type.upper()} MEMBERSHIP FUNCTION MODEL")
@@ -67,11 +78,15 @@ def run_model(model_type, X_train, X_test, y_train, y_test, y_bucket_mean, top_n
         )
     elif model_type == "trapz-fast":
         memberships = create_trapz_membership_dict_fast(
-            X_train, y_train["y_bucket"], top_n_var_names=top_n_todo,
+            X_train,
+            y_train["y_bucket"],
+            top_n_var_names=top_n_todo,
         )
     elif model_type == "trapz":
         memberships = create_trapz_membership_dict(
-            X_train, y_train["y_bucket"], top_n_var_names=top_n_todo,
+            X_train,
+            y_train["y_bucket"],
+            top_n_var_names=top_n_todo,
         )
 
     duplicates = memberships.identify_duplicate_membership_fcns()
@@ -108,24 +123,58 @@ def run_model(model_type, X_train, X_test, y_train, y_test, y_bucket_mean, top_n
     l2_reg = 1e-4 if model_type in ("trapz", "trapz-fast") else 0.0
     print("\nOptimizing TSK output coefficients...")
     corr_terms_1, y_bucket_mean_1 = optimize_tsk_coefficients(
-        X_train, memberships, top_n_todo, y_bucket_mean, y_train,
-        n_output_buckets=n_output_buckets, initial_corr_terms=corr_terms_1, order="1st", l2_reg=l2_reg,
+        X_train,
+        memberships,
+        top_n_todo,
+        y_bucket_mean,
+        y_train,
+        n_output_buckets=n_output_buckets,
+        initial_corr_terms=corr_terms_1,
+        order="1st",
+        l2_reg=l2_reg,
     )
     corr_terms_2, y_bucket_mean_2 = optimize_tsk_coefficients(
-        X_train, memberships, top_n_todo, y_bucket_mean, y_train,
-        n_output_buckets=n_output_buckets, initial_corr_terms=corr_terms_2, order="2nd", l2_reg=l2_reg,
+        X_train,
+        memberships,
+        top_n_todo,
+        y_bucket_mean,
+        y_train,
+        n_output_buckets=n_output_buckets,
+        initial_corr_terms=corr_terms_2,
+        order="2nd",
+        l2_reg=l2_reg,
     )
     corr_terms_2f, y_bucket_mean_2f = optimize_tsk_coefficients(
-        X_train, memberships, top_n_todo, y_bucket_mean, y_train,
-        n_output_buckets=n_output_buckets, initial_corr_terms=corr_terms_2f, order="full-2nd", l2_reg=l2_reg,
+        X_train,
+        memberships,
+        top_n_todo,
+        y_bucket_mean,
+        y_train,
+        n_output_buckets=n_output_buckets,
+        initial_corr_terms=corr_terms_2f,
+        order="full-2nd",
+        l2_reg=l2_reg,
     )
     corr_terms_3, y_bucket_mean_3 = optimize_tsk_coefficients(
-        X_train, memberships, top_n_todo, y_bucket_mean, y_train,
-        n_output_buckets=n_output_buckets, initial_corr_terms=corr_terms_3, order="3rd", l2_reg=l2_reg,
+        X_train,
+        memberships,
+        top_n_todo,
+        y_bucket_mean,
+        y_train,
+        n_output_buckets=n_output_buckets,
+        initial_corr_terms=corr_terms_3,
+        order="3rd",
+        l2_reg=l2_reg,
     )
     _, y_bucket_mean_0 = optimize_tsk_coefficients(
-        X_train, memberships, top_n_todo, y_bucket_mean, y_train,
-        n_output_buckets=n_output_buckets, order="0th", l2_reg=l2_reg,
+        X_train,
+        memberships,
+        top_n_todo,
+        y_bucket_mean,
+        y_train,
+        n_output_buckets=n_output_buckets,
+        order="0th",
+        l2_reg=l2_reg,
     )
 
     # Evaluate on test set
@@ -203,14 +252,32 @@ def run_model(model_type, X_train, X_test, y_train, y_test, y_bucket_mean, top_n
     )
 
     results = {
-        'model_type': model_type,
-        'r2': [r2_0, r2_1, r2_2, r2_2f, r2_3],
-        'rmse': [rmse_0, rmse_1, rmse_2, rmse_2f, rmse_3],
-        'predictions': [y_test_pred_0, y_test_pred_1, y_test_pred_2, y_test_pred_2f, y_test_pred_3],
-        'labels': ["0 Optimized", "1 Optimized", "2 Optimized", "2-full Optimized", "3 Optimized"],
+        "model_type": model_type,
+        "r2": [r2_0, r2_1, r2_2, r2_2f, r2_3],
+        "rmse": [rmse_0, rmse_1, rmse_2, rmse_2f, rmse_3],
+        "predictions": [
+            y_test_pred_0,
+            y_test_pred_1,
+            y_test_pred_2,
+            y_test_pred_2f,
+            y_test_pred_3,
+        ],
+        "labels": [
+            "0 Optimized",
+            "1 Optimized",
+            "2 Optimized",
+            "2-full Optimized",
+            "3 Optimized",
+        ],
     }
 
-    plot_tsk_order_comparison(results['r2'], results['rmse'], y_test, results['predictions'], results['labels'])
+    plot_tsk_order_comparison(
+        results["r2"],
+        results["rmse"],
+        y_test,
+        results["predictions"],
+        results["labels"],
+    )
 
     return results
 
@@ -256,33 +323,65 @@ def main():
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}\n")
 
     # Feature selection
-    feature_differentiators = calculate_gaussian_correlation(X_train, y_train["y_bucket"])
+    feature_differentiators = calculate_gaussian_correlation(
+        X_train, y_train["y_bucket"]
+    )
     top_n, top_n_todo = take_top_features(feature_differentiators, top_n=n_top_vars)
-    print(f"Selected Top-{top_n} Variables ({top_n/len(feature_differentiators):.2%} coverage):\n")
+    print(
+        f"Selected Top-{top_n} Variables ({top_n/len(feature_differentiators):.2%} coverage):\n"
+    )
 
     # Run both models
-    gaussian_results = run_model("gaussian", X_train, X_test, y_train, y_test, y_bucket_mean, top_n_todo, n_top_vars, start_time, n_output_buckets)
-    trapz_results = run_model("trapz", X_train, X_test, y_train, y_test, y_bucket_mean, top_n_todo, n_top_vars, start_time, n_output_buckets)
+    gaussian_results = run_model(
+        "gaussian",
+        X_train,
+        X_test,
+        y_train,
+        y_test,
+        y_bucket_mean,
+        top_n_todo,
+        n_top_vars,
+        start_time,
+        n_output_buckets,
+    )
+    trapz_results = run_model(
+        "trapz",
+        X_train,
+        X_test,
+        y_train,
+        y_test,
+        y_bucket_mean,
+        top_n_todo,
+        n_top_vars,
+        start_time,
+        n_output_buckets,
+    )
 
     # Summary comparison
     print("\n" + "=" * 80)
     print("MODEL COMPARISON SUMMARY")
     print("=" * 80)
     print("\nGAUSSIAN MODEL:")
-    for i, label in enumerate(gaussian_results['labels']):
-        print(f"  {label:20s}: R² = {gaussian_results['r2'][i]:.4f}, RMSE = {gaussian_results['rmse'][i]:.2f}")
+    for i, label in enumerate(gaussian_results["labels"]):
+        print(
+            f"  {label:20s}: R² = {gaussian_results['r2'][i]:.4f}, RMSE = {gaussian_results['rmse'][i]:.2f}"
+        )
 
     print("\nTRAPEZOID MODEL:")
-    for i, label in enumerate(trapz_results['labels']):
-        print(f"  {label:20s}: R² = {trapz_results['r2'][i]:.4f}, RMSE = {trapz_results['rmse'][i]:.2f}")
+    for i, label in enumerate(trapz_results["labels"]):
+        print(
+            f"  {label:20s}: R² = {trapz_results['r2'][i]:.4f}, RMSE = {trapz_results['rmse'][i]:.2f}"
+        )
 
     print("\nPERFORMANCE DELTA (Trapz - Gaussian):")
-    for i, label in enumerate(gaussian_results['labels']):
-        r2_delta = trapz_results['r2'][i] - gaussian_results['r2'][i]
-        rmse_delta = trapz_results['rmse'][i] - gaussian_results['rmse'][i]
+    for i, label in enumerate(gaussian_results["labels"]):
+        r2_delta = trapz_results["r2"][i] - gaussian_results["r2"][i]
+        rmse_delta = trapz_results["rmse"][i] - gaussian_results["rmse"][i]
         r2_sign = "+" if r2_delta >= 0 else ""
         rmse_sign = "+" if rmse_delta >= 0 else ""
-        print(f"  {label:20s}: ΔR² = {r2_sign}{r2_delta:+.4f}, ΔRMSE = {rmse_sign}{rmse_delta:+.2f}")
+        print(
+            f"  {label:20s}: ΔR² = {r2_sign}{r2_delta:+.4f}, ΔRMSE = {rmse_sign}{rmse_delta:+.2f}"
+        )
 
     print("\n" + "=" * 80)
 

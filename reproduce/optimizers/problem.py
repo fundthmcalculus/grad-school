@@ -50,7 +50,7 @@ DATASETS = {
     "concrete": {
         "kind": "reg",
         "note": "UCI Concrete, 1030 x 8 -> compressive strength. ~100 antecedent "
-                "parameters. The rung §6.3.5's existing claim is measured on.",
+        "parameters. The rung §6.3.5's existing claim is measured on.",
     },
 }
 
@@ -58,12 +58,13 @@ DATASETS = {
 @dataclass
 class HotStartProblem:
     """One (dataset, seed) instance, with everything the arms share."""
+
     dataset: str
     seed: int
     x0: np.ndarray
     bounds: list
     fitness: object
-    score: object                      # vec -> (r2, rmse)
+    score: object  # vec -> (r2, rmse)
     n_params: int
     order: str
     radius: float
@@ -100,8 +101,9 @@ def _trust_region(bounds, x0, radius):
     return out
 
 
-def _scorer(model, X_tr, X_te, y_tr, y_te, features, bucket_mean, n_buckets,
-            order, l2_reg, span):
+def _scorer(
+    model, X_tr, X_te, y_tr, y_te, features, bucket_mean, n_buckets, order, l2_reg, span
+):
     """A closure scoring one antecedent vector on the test split.
 
     A factory rather than an inline closure because the study needs *two* of
@@ -120,11 +122,27 @@ def _scorer(model, X_tr, X_te, y_tr, y_te, features, bucket_mean, n_buckets,
         candidate = apply_gaussian_params(model, _np.asarray(vec, dtype=float))
         try:
             corr, ybm = solve_tsk_consequents(
-                X_tr, candidate, features, bucket_mean, y_tr,
-                n_output_buckets=n_buckets, order=order, l2_reg=l2_reg,
-                basis="raw", cross_pairs=None)
-            pred = predict_tsk(X_te, candidate, features, ybm, corr, order=order,
-                               basis="raw", cross_pairs=None)
+                X_tr,
+                candidate,
+                features,
+                bucket_mean,
+                y_tr,
+                n_output_buckets=n_buckets,
+                order=order,
+                l2_reg=l2_reg,
+                basis="raw",
+                cross_pairs=None,
+            )
+            pred = predict_tsk(
+                X_te,
+                candidate,
+                features,
+                ybm,
+                corr,
+                order=order,
+                basis="raw",
+                cross_pairs=None,
+            )
         except Exception:  # noqa: BLE001
             return float("nan"), float("nan")
         truth = _np.asarray(y_te["y_value"], dtype=float).ravel()
@@ -141,8 +159,17 @@ def _scorer(model, X_tr, X_te, y_tr, y_te, features, bucket_mean, n_buckets,
 _CACHE = {}
 
 
-def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
-          l2_reg=1e-2, test_size=0.2, init="hot", n_rules=None):
+def build(
+    dataset="concrete",
+    seed=0,
+    order="2nd",
+    radius=1.0,
+    n_folds=3,
+    l2_reg=1e-2,
+    test_size=0.2,
+    init="hot",
+    n_rules=None,
+):
     """Fit the heuristic model and return everything the arms need.
 
     Cached on the full key. Every arm at a given seed must face the *identical*
@@ -177,8 +204,7 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
     """
     if dataset not in DATASETS:
         raise KeyError(f"unknown dataset {dataset!r}; have {sorted(DATASETS)}")
-    key = (dataset, seed, order, radius, n_folds, l2_reg, test_size, init,
-           n_rules)
+    key = (dataset, seed, order, radius, n_folds, l2_reg, test_size, init, n_rules)
     if key in _CACHE:
         return _CACHE[key]
 
@@ -200,17 +226,19 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
     from tribblefis.regression import predict_tsk, solve_tsk_consequents
 
     import _fuzzy_models as FM
+
     data = FM.load_concrete()
     if data is None:
-        raise RuntimeError("Concrete is unavailable: no data/Concrete_Data.csv and "
-                           "no reachable UCI mirror.")
+        raise RuntimeError(
+            "Concrete is unavailable: no data/Concrete_Data.csv and "
+            "no reachable UCI mirror."
+        )
     prep = TCR.prepare(*data)
     Xt, y = prep["Xt"], prep["y"]
     y_bucket_mean, span = prep["y_bucket_mean"], prep["span"]
     n_buckets = TCR.N_BUCKETS
 
-    Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=test_size,
-                                          random_state=seed)
+    Xtr, Xte, ytr, yte = train_test_split(Xt, y, test_size=test_size, random_state=seed)
 
     # Timed: the construction that every init is compared against. This covers
     # feature screening and the per-(feature, bucket) mixture fit -- i.e. both
@@ -218,17 +246,19 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
     # their own timer covers placement only and the two are NOT interchangeable;
     # `clusterinit` says so at more length.
     import time as _time
+
     _t0 = _time.perf_counter()
     diffs = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
     _, top_vars = take_top_features(diffs, top_n=len(Xt.columns))
-    model = create_gaussian_membership_dict(Xtr, ytr["y_bucket"],
-                                            top_n_var_names=top_vars,
-                                            n_gaussians=-1)
+    model = create_gaussian_membership_dict(
+        Xtr, ytr["y_bucket"], top_n_var_names=top_vars, n_gaussians=-1
+    )
     construction_seconds = _time.perf_counter() - _t0
 
     folds = _make_folds(len(Xtr), n_folds, test_size, seed)
-    fitness = _make_kfold_fitness(model, Xtr, ytr, folds, top_vars, n_buckets,
-                                  order, l2_reg, "raw", None)
+    fitness = _make_kfold_fitness(
+        model, Xtr, ytr, folds, top_vars, n_buckets, order, l2_reg, "raw", None
+    )
 
     # The classical route discards the construction's model and builds its own.
     # The construction is still fitted above, but only to supply the reference
@@ -241,9 +271,22 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
     construction_bounds = build_param_bounds(model, Xtr)
     heuristic = np.clip(
         extract_gaussian_params(model),
-        [b[0] for b in construction_bounds], [b[1] for b in construction_bounds])
-    reference = _scorer(model, Xtr, Xte, ytr, yte, top_vars, y_bucket_mean,
-                        n_buckets, order, l2_reg, span)
+        [b[0] for b in construction_bounds],
+        [b[1] for b in construction_bounds],
+    )
+    reference = _scorer(
+        model,
+        Xtr,
+        Xte,
+        ytr,
+        yte,
+        top_vars,
+        y_bucket_mean,
+        n_buckets,
+        order,
+        l2_reg,
+        span,
+    )
     heuristic_r2, heuristic_rmse = reference(heuristic)
     heuristic_cv = fitness(heuristic)
 
@@ -253,20 +296,26 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
         # its own rule count, its own consequent buckets. Nothing above this
         # point carries over except the preprocessing and the data split.
         import classical as CL
+
         c_rules = int(n_rules or n_buckets)
         model, ytr, y_bucket_mean, top_vars, classical_seconds = CL.identify(
-            Xtr, ytr["y_value"], c_rules, init.split("-", 1)[1], seed=seed)
+            Xtr, ytr["y_value"], c_rules, init.split("-", 1)[1], seed=seed
+        )
         n_buckets = c_rules
-        fitness = _make_kfold_fitness(model, Xtr, ytr, folds, top_vars,
-                                      n_buckets, order, l2_reg, "raw", None)
+        fitness = _make_kfold_fitness(
+            model, Xtr, ytr, folds, top_vars, n_buckets, order, l2_reg, "raw", None
+        )
 
     full_bounds = build_param_bounds(model, Xtr)
 
     init_seconds = classical_seconds
     if init.startswith("classical-"):
         # Its own model's parameters ARE its starting point.
-        x0 = np.clip(extract_gaussian_params(model),
-                     [b[0] for b in full_bounds], [b[1] for b in full_bounds])
+        x0 = np.clip(
+            extract_gaussian_params(model),
+            [b[0] for b in full_bounds],
+            [b[1] for b in full_bounds],
+        )
     elif init == "hot":
         x0 = heuristic
     elif init == "cold":
@@ -279,8 +328,10 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
         x0 = lo + rng.random(len(lo)) * (hi - lo)
     elif init in ("kmeans", "fcm"):
         import clusterinit
+
         x0, init_seconds = clusterinit.cluster_params(
-            model, Xtr, ytr, init, seed=seed, bounds=full_bounds)
+            model, Xtr, ytr, init, seed=seed, bounds=full_bounds
+        )
     else:
         raise ValueError(f"init must be hot, cold, kmeans or fcm, not {init!r}")
 
@@ -289,21 +340,46 @@ def build(dataset="concrete", seed=0, order="2nd", radius=1.0, n_folds=3,
     # answer through the bounds, which is the comparison this is meant to make.
     bounds = _trust_region(full_bounds, x0, radius)
 
-    score = _scorer(model, Xtr, Xte, ytr, yte, top_vars, y_bucket_mean,
-                    n_buckets, order, l2_reg, span)
+    score = _scorer(
+        model,
+        Xtr,
+        Xte,
+        ytr,
+        yte,
+        top_vars,
+        y_bucket_mean,
+        n_buckets,
+        order,
+        l2_reg,
+        span,
+    )
 
     problem = HotStartProblem(
-        dataset=dataset, seed=seed, x0=x0, bounds=bounds, fitness=fitness,
-        score=score, n_params=len(x0), order=order, radius=radius, init=init,
-        heuristic_x=heuristic, heuristic_r2=heuristic_r2,
+        dataset=dataset,
+        seed=seed,
+        x0=x0,
+        bounds=bounds,
+        fitness=fitness,
+        score=score,
+        n_params=len(x0),
+        order=order,
+        radius=radius,
+        init=init,
+        heuristic_x=heuristic,
+        heuristic_r2=heuristic_r2,
         heuristic_cv=heuristic_cv,
-        meta={"n_train": len(Xtr), "n_test": len(Xte), "n_folds": n_folds,
-              "n_buckets": n_buckets, "l2_reg": l2_reg,
-              "heuristic_rmse": heuristic_rmse,
-              "n_rules": n_buckets,
-              "init_seconds": init_seconds,
-              "construction_seconds": construction_seconds,
-              "logged": list(prep.get("logged") or [])},
+        meta={
+            "n_train": len(Xtr),
+            "n_test": len(Xte),
+            "n_folds": n_folds,
+            "n_buckets": n_buckets,
+            "l2_reg": l2_reg,
+            "heuristic_rmse": heuristic_rmse,
+            "n_rules": n_buckets,
+            "init_seconds": init_seconds,
+            "construction_seconds": construction_seconds,
+            "logged": list(prep.get("logged") or []),
+        },
     )
     _CACHE[key] = problem
     return problem

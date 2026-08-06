@@ -32,7 +32,7 @@ import os
 import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(_HERE))          # reproduce/ -> `import common`
+sys.path.insert(0, os.path.dirname(_HERE))  # reproduce/ -> `import common`
 import common as C  # noqa: E402
 
 # Matplotlib stamps a %%CreationDate into every EPS, so re-running an unchanged
@@ -41,41 +41,55 @@ import common as C  # noqa: E402
 # Matplotlib honours SOURCE_DATE_EPOCH for its PS/PDF metadata, so pinning it
 # makes the output byte-reproducible. `setdefault`, so a caller that has set it
 # for its own reasons wins.
-os.environ.setdefault("SOURCE_DATE_EPOCH", "1735689600")   # 2025-01-01T00:00:00Z
+os.environ.setdefault("SOURCE_DATE_EPOCH", "1735689600")  # 2025-01-01T00:00:00Z
 
 # --------------------------------------------------------------------------- #
 # palette -- validated categorical slots, light mode (references/palette.md)
 # --------------------------------------------------------------------------- #
 # Fixed order, never cycled. A figure needing a ninth series does not get a
 # ninth hue; it gets faceted or folded into "other".
-SERIES = ["#2a78d6",   # 1 blue
-          "#eb6834",   # 2 orange
-          "#1baf7a",   # 3 aqua
-          "#eda100",   # 4 yellow
-          "#e87ba4",   # 5 magenta
-          "#008300",   # 6 green
-          "#4a3aa7",   # 7 violet
-          "#e34948"]   # 8 red
+SERIES = [
+    "#2a78d6",  # 1 blue
+    "#eb6834",  # 2 orange
+    "#1baf7a",  # 3 aqua
+    "#eda100",  # 4 yellow
+    "#e87ba4",  # 5 magenta
+    "#008300",  # 6 green
+    "#4a3aa7",  # 7 violet
+    "#e34948",
+]  # 8 red
 
 BLUE, ORANGE, AQUA, YELLOW, MAGENTA, GREEN, VIOLET, RED = SERIES
 
 # Sequential blue ramp, light -> dark. Used for magnitude (the VAT images).
-SEQ_BLUE = ["#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec", "#5598e7",
-            "#3987e5", "#2a78d6", "#256abf", "#1c5cab", "#184f95", "#104281",
-            "#0d366b"]
+SEQ_BLUE = [
+    "#cde2fb",
+    "#b7d3f6",
+    "#9ec5f4",
+    "#86b6ef",
+    "#6da7ec",
+    "#5598e7",
+    "#3987e5",
+    "#2a78d6",
+    "#256abf",
+    "#1c5cab",
+    "#184f95",
+    "#104281",
+    "#0d366b",
+]
 
-SURFACE = "#fcfcfb"     # chart surface
-INK = "#0b0b0b"         # primary text
-INK_2 = "#3d3d39"       # tick labels
-MUTED = "#6b6b63"       # annotation text
-GRID = "#e2e2dc"        # gridlines
-AXIS = "#c9c9c1"        # spines, connectors
-FAINT = "#9a9a92"       # reference curves, de-emphasised marks
+SURFACE = "#fcfcfb"  # chart surface
+INK = "#0b0b0b"  # primary text
+INK_2 = "#3d3d39"  # tick labels
+MUTED = "#6b6b63"  # annotation text
+GRID = "#e2e2dc"  # gridlines
+AXIS = "#c9c9c1"  # spines, connectors
+FAINT = "#9a9a92"  # reference curves, de-emphasised marks
 
 # Figure widths, in inches, matched to the document's text block. Two sizes
 # only -- a figure that needs a third is usually two figures.
-W_COL = 5.4             # single column, the complexity-fit width
-W_WIDE = 7.2            # full text width, for side-by-side panels
+W_COL = 5.4  # single column, the complexity-fit width
+W_WIDE = 7.2  # full text width, for side-by-side panels
 
 DPI = 200
 
@@ -93,7 +107,7 @@ FS_SMALL = 7
 # --------------------------------------------------------------------------- #
 def _hex_to_rgb(h):
     h = h.lstrip("#")
-    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return tuple(int(h[i : i + 2], 16) for i in (0, 2, 4))
 
 
 def _rgb_to_hex(rgb):
@@ -124,6 +138,7 @@ def blue_cmap(reverse=True):
     a dark diagonal block is a set of mutually *close* points.
     """
     from matplotlib.colors import LinearSegmentedColormap
+
     steps = list(reversed(SEQ_BLUE)) if reverse else list(SEQ_BLUE)
     return LinearSegmentedColormap.from_list("tribble_blue", steps)
 
@@ -139,8 +154,10 @@ def _pyplot():
     matplotlib installed.
     """
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+
     return plt
 
 
@@ -177,8 +194,7 @@ def canvas(width=W_WIDE, height=4.0, xlim=(0, 100), ylim=(0, 100)):
     return fig, ax
 
 
-def style_axes(ax, title=None, xlabel=None, ylabel=None, grid=True,
-               grid_axis="both"):
+def style_axes(ax, title=None, xlabel=None, ylabel=None, grid=True, grid_axis="both"):
     """The recessive-furniture treatment: no top/right spine, faint grid, small type."""
     if title:
         ax.set_title(title, fontsize=FS_TITLE, color=INK, pad=8)
@@ -212,75 +228,178 @@ def legend(ax, **kwargs):
 
 def panel_label(ax, text, x=0.0, y=1.02):
     """The '(a)' / '(b)' marker above a panel in a multi-panel figure."""
-    ax.text(x, y, text, transform=ax.transAxes, fontsize=FS_LABEL,
-            color=INK, va="bottom", ha="left", fontweight="bold")
+    ax.text(
+        x,
+        y,
+        text,
+        transform=ax.transAxes,
+        fontsize=FS_LABEL,
+        color=INK,
+        va="bottom",
+        ha="left",
+        fontweight="bold",
+    )
 
 
 # --------------------------------------------------------------------------- #
 # schematic primitives
 # --------------------------------------------------------------------------- #
-def box(ax, x, y, w, h, title, body=None, color=BLUE, fill_amount=0.88,
-        edge_amount=0.0, title_size=FS_LABEL, body_size=FS_SMALL,
-        radius=1.6, lw=1.2, zorder=2, title_weight="bold", dashed=False):
+def box(
+    ax,
+    x,
+    y,
+    w,
+    h,
+    title,
+    body=None,
+    color=BLUE,
+    fill_amount=0.88,
+    edge_amount=0.0,
+    title_size=FS_LABEL,
+    body_size=FS_SMALL,
+    radius=1.6,
+    lw=1.2,
+    zorder=2,
+    title_weight="bold",
+    dashed=False,
+):
     """A rounded box with a bold title and optional body text, centred on (x, y).
 
     `x, y` is the CENTRE, which makes a hand-laid-out diagram far easier to keep
     aligned than corner coordinates would.
     """
     from matplotlib.patches import FancyBboxPatch
+
     patch = FancyBboxPatch(
-        (x - w / 2, y - h / 2), w, h,
+        (x - w / 2, y - h / 2),
+        w,
+        h,
         boxstyle=f"round,pad=0,rounding_size={radius}",
         facecolor=tint(color, fill_amount),
         edgecolor=color if edge_amount == 0.0 else shade(color, edge_amount),
-        linewidth=lw, zorder=zorder,
-        linestyle=(0, (3, 2)) if dashed else "solid")
+        linewidth=lw,
+        zorder=zorder,
+        linestyle=(0, (3, 2)) if dashed else "solid",
+    )
     ax.add_patch(patch)
 
     if body:
-        ax.text(x, y + h * 0.20, title, ha="center", va="center",
-                fontsize=title_size, color=INK, fontweight=title_weight,
-                zorder=zorder + 1)
-        ax.text(x, y - h * 0.20, body, ha="center", va="center",
-                fontsize=body_size, color=MUTED, zorder=zorder + 1,
-                linespacing=1.35)
+        ax.text(
+            x,
+            y + h * 0.20,
+            title,
+            ha="center",
+            va="center",
+            fontsize=title_size,
+            color=INK,
+            fontweight=title_weight,
+            zorder=zorder + 1,
+        )
+        ax.text(
+            x,
+            y - h * 0.20,
+            body,
+            ha="center",
+            va="center",
+            fontsize=body_size,
+            color=MUTED,
+            zorder=zorder + 1,
+            linespacing=1.35,
+        )
     else:
-        ax.text(x, y, title, ha="center", va="center", fontsize=title_size,
-                color=INK, fontweight=title_weight, zorder=zorder + 1,
-                linespacing=1.35)
+        ax.text(
+            x,
+            y,
+            title,
+            ha="center",
+            va="center",
+            fontsize=title_size,
+            color=INK,
+            fontweight=title_weight,
+            zorder=zorder + 1,
+            linespacing=1.35,
+        )
     return patch
 
 
-def arrow(ax, start, end, color=AXIS, lw=1.4, label=None, label_offset=(0, 2.2),
-          label_color=MUTED, style="-|>", zorder=1, connection="arc3,rad=0",
-          label_size=FS_SMALL):
+def arrow(
+    ax,
+    start,
+    end,
+    color=AXIS,
+    lw=1.4,
+    label=None,
+    label_offset=(0, 2.2),
+    label_color=MUTED,
+    style="-|>",
+    zorder=1,
+    connection="arc3,rad=0",
+    label_size=FS_SMALL,
+):
     """A connector between two points, optionally labelled at its midpoint."""
     from matplotlib.patches import FancyArrowPatch
-    patch = FancyArrowPatch(start, end, arrowstyle=style, mutation_scale=11,
-                            color=color, lw=lw, zorder=zorder,
-                            connectionstyle=connection,
-                            shrinkA=1.5, shrinkB=1.5)
+
+    patch = FancyArrowPatch(
+        start,
+        end,
+        arrowstyle=style,
+        mutation_scale=11,
+        color=color,
+        lw=lw,
+        zorder=zorder,
+        connectionstyle=connection,
+        shrinkA=1.5,
+        shrinkB=1.5,
+    )
     ax.add_patch(patch)
     if label:
         mx, my = (start[0] + end[0]) / 2, (start[1] + end[1]) / 2
-        ax.text(mx + label_offset[0], my + label_offset[1], label, ha="center",
-                va="center", fontsize=label_size, color=label_color, zorder=zorder + 2)
+        ax.text(
+            mx + label_offset[0],
+            my + label_offset[1],
+            label,
+            ha="center",
+            va="center",
+            fontsize=label_size,
+            color=label_color,
+            zorder=zorder + 2,
+        )
     return patch
 
 
 def badge(ax, x, y, text, color=BLUE, size=FS_SMALL, pad=0.32):
     """A small filled pill -- for the '(Ch. 3)' and 'ARI 1.00' annotations."""
-    return ax.text(x, y, text, ha="center", va="center", fontsize=size,
-                   color=shade(color, 0.35), zorder=6,
-                   bbox=dict(boxstyle=f"round,pad={pad}",
-                             facecolor=tint(color, 0.86),
-                             edgecolor=tint(color, 0.55), linewidth=0.7))
+    return ax.text(
+        x,
+        y,
+        text,
+        ha="center",
+        va="center",
+        fontsize=size,
+        color=shade(color, 0.35),
+        zorder=6,
+        bbox=dict(
+            boxstyle=f"round,pad={pad}",
+            facecolor=tint(color, 0.86),
+            edgecolor=tint(color, 0.55),
+            linewidth=0.7,
+        ),
+    )
 
 
 def caption(ax, text, y=-0.02, size=FS_SMALL, color=MUTED):
     """A note under a panel, in figure-relative coordinates."""
-    ax.text(0.5, y, text, transform=ax.transAxes, ha="center", va="top",
-            fontsize=size, color=color, linespacing=1.4)
+    ax.text(
+        0.5,
+        y,
+        text,
+        transform=ax.transAxes,
+        ha="center",
+        va="top",
+        fontsize=size,
+        color=color,
+        linespacing=1.4,
+    )
 
 
 def imshow_matrix(ax, M, cmap=None, title=None, vmin=None, vmax=None):
@@ -291,8 +410,14 @@ def imshow_matrix(ax, M, cmap=None, title=None, vmin=None, vmax=None):
     tens of megabytes. Rasterising the image while leaving the frame and labels
     vector keeps the EPS small and the type sharp.
     """
-    im = ax.imshow(M, cmap=cmap or blue_cmap(), interpolation="nearest",
-                   vmin=vmin, vmax=vmax, rasterized=True)
+    im = ax.imshow(
+        M,
+        cmap=cmap or blue_cmap(),
+        interpolation="nearest",
+        vmin=vmin,
+        vmax=vmax,
+        rasterized=True,
+    )
     ax.set_xticks([])
     ax.set_yticks([])
     for s in ax.spines.values():

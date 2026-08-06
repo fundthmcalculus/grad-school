@@ -14,8 +14,8 @@ from tribblefis.gaussian_regressor_memory import MemoryWindowFeatureExtractor
 # moving average, and the average over the steps preceding that window -- and
 # predicts the angular velocities. Accelerations are never modelled: the Euler
 # step integrates theta directly from the predicted omega.
-THETA_FEATURES = ['theta_1', 'theta_2']
-OMEGA_TARGETS = ['omega_1', 'omega_2']
+THETA_FEATURES = ["theta_1", "theta_2"]
+OMEGA_TARGETS = ["omega_1", "omega_2"]
 WINDOW_SIZE = 50  # short-term moving average spans this many steps
 MEMORY_SIZE = 25  # long-term average spans the MEMORY_SIZE steps before that window
 # Rows of history needed before a feature row has a fully populated long-term average.
@@ -30,7 +30,7 @@ HISTORY_LEN = WINDOW_SIZE + MEMORY_SIZE
 # 0th still leads on the horizon over seven held-out initial conditions: theta_1
 # holds 1 rad for 3.67 s past the seed against 2.99 s, with theta_2 MAE 10.2
 # against 21.7. Widening the window is what supplies the velocity information.
-TSK_ORDER = '0th'
+TSK_ORDER = "0th"
 
 # Rejected: feeding differences instead of raw averages, i.e. replacing
 # (theta, MA_short, MA_long) with (theta, theta - MA_short, MA_short - MA_long) to
@@ -62,9 +62,9 @@ TSK_ORDER = '0th'
 PROJECT_ENERGY = True
 
 # Categorical slots 1 and 2 of the validated light-mode palette.
-COLOR_ACTUAL = '#2a78d6'
-COLOR_PREDICTED = '#eb6834'
-COLOR_MUTED = '#52514e'
+COLOR_ACTUAL = "#2a78d6"
+COLOR_PREDICTED = "#eb6834"
+COLOR_MUTED = "#52514e"
 
 
 def project_onto_energy_shell(model, theta, omega, e0):
@@ -113,7 +113,7 @@ class DataSimulation:
     model: OdeSystem
     trajectories: list[pd.DataFrame]
 
-    def get_combined_data(self: 'DataSimulation') -> tuple[DataFrame, DataFrame]:
+    def get_combined_data(self: "DataSimulation") -> tuple[DataFrame, DataFrame]:
         """Angles and their moving averages as inputs, angular velocities as targets.
 
         Both sides are taken at the same time step, so the fitted model is a
@@ -124,17 +124,19 @@ class DataSimulation:
         `include_time` is deliberately off: `time_step` is an absolute row index,
         which would sit far outside its training range during a rollout.
         """
-        extractor = MemoryWindowFeatureExtractor(window_size=WINDOW_SIZE, memory_size=MEMORY_SIZE)
+        extractor = MemoryWindowFeatureExtractor(
+            window_size=WINDOW_SIZE, memory_size=MEMORY_SIZE
+        )
         all_x = []
         all_y = []
         for trajectory in self.trajectories:
-            features = extractor.prepare_sequences(trajectory, THETA_FEATURES, include_time=False)
+            features = extractor.prepare_sequences(
+                trajectory, THETA_FEATURES, include_time=False
+            )
             valid = ~features.isna().any(axis=1).values
             all_x.append(features[valid])
             all_y.append(trajectory[OMEGA_TARGETS][valid])
         return pd.concat(all_x, ignore_index=True), pd.concat(all_y, ignore_index=True)
-
-
 
 
 class DoublePendulum(OdeSystem):
@@ -156,7 +158,7 @@ class DoublePendulum(OdeSystem):
 
     @property
     def state_labels(self) -> list[str]:
-        return ['theta_1', 'omega_1', 'theta_2', 'omega_2']
+        return ["theta_1", "omega_1", "theta_2", "omega_2"]
 
     @property
     def derivative_labels(self) -> list[str]:
@@ -164,19 +166,23 @@ class DoublePendulum(OdeSystem):
 
     def potential_energy(self, theta1, theta2):
         """Gravitational potential, measured from the pivot: zero with both arms horizontal."""
-        return -self.m1 * self.g * self.l1 * np.cos(theta1) \
-            - self.m2 * self.g * (self.l1 * np.cos(theta1) + self.l2 * np.cos(theta2))
+        return -self.m1 * self.g * self.l1 * np.cos(theta1) - self.m2 * self.g * (
+            self.l1 * np.cos(theta1) + self.l2 * np.cos(theta2)
+        )
 
     def kinetic_energy(self, theta1, omega1, theta2, omega2):
         """Kinetic energy, including the l1*l2 cross term between the two arms."""
-        return 0.5 * self.m1 * self.l1**2 * omega1**2 \
-            + 0.5 * self.m2 * (self.l1**2 * omega1**2 + self.l2**2 * omega2**2
-                               + 2 * self.l1 * self.l2 * omega1 * omega2 * np.cos(theta1 - theta2))
+        return 0.5 * self.m1 * self.l1**2 * omega1**2 + 0.5 * self.m2 * (
+            self.l1**2 * omega1**2
+            + self.l2**2 * omega2**2
+            + 2 * self.l1 * self.l2 * omega1 * omega2 * np.cos(theta1 - theta2)
+        )
 
     def energy(self, theta1, omega1, theta2, omega2):
         """Total energy. Conserved exactly by this system, so it scores a rollout."""
-        return self.kinetic_energy(theta1, omega1, theta2, omega2) \
-            + self.potential_energy(theta1, theta2)
+        return self.kinetic_energy(
+            theta1, omega1, theta2, omega2
+        ) + self.potential_energy(theta1, theta2)
 
     def equations_of_motion(self, state, t):
         """
@@ -190,17 +196,22 @@ class DoublePendulum(OdeSystem):
         delta_theta = theta1 - theta2
 
         # Common terms
-        denom1 = self.l1 *(2*self.m1 + self.m2 - self.m2 *np.cos(2*delta_theta))
-        num11 = -self.g*(2*self.m1 + self.m2)*np.sin(theta1)
-        num12 = -self.m2*self.g*np.sin(delta_theta - theta2) # theta1-2theta2
-        num13 = -2*np.sin(delta_theta)*self.m2*(omega2**2 * self.l2 + omega1**2 *self.l1 * np.cos(delta_theta))
+        denom1 = self.l1 * (2 * self.m1 + self.m2 - self.m2 * np.cos(2 * delta_theta))
+        num11 = -self.g * (2 * self.m1 + self.m2) * np.sin(theta1)
+        num12 = -self.m2 * self.g * np.sin(delta_theta - theta2)  # theta1-2theta2
+        num13 = (
+            -2
+            * np.sin(delta_theta)
+            * self.m2
+            * (omega2**2 * self.l2 + omega1**2 * self.l1 * np.cos(delta_theta))
+        )
         alpha1 = (num11 + num12 + num13) / denom1
 
-        num21 = omega1**2 *self.l1 *(self.m1+self.m2)
-        num22 = self.g*(self.m1+self.m2)*np.cos(theta1)
-        num23 = omega2**2 * self.l2*self.m2 * np.cos(delta_theta)
-        denom2 = self.l2 *(2*self.m1 + self.m2 - self.m2 * np.cos(2*delta_theta))
-        alpha2 = 2*np.sin(delta_theta)*(num21 + num22 + num23) / denom2
+        num21 = omega1**2 * self.l1 * (self.m1 + self.m2)
+        num22 = self.g * (self.m1 + self.m2) * np.cos(theta1)
+        num23 = omega2**2 * self.l2 * self.m2 * np.cos(delta_theta)
+        denom2 = self.l2 * (2 * self.m1 + self.m2 - self.m2 * np.cos(2 * delta_theta))
+        alpha2 = 2 * np.sin(delta_theta) * (num21 + num22 + num23) / denom2
 
         return [omega1, alpha1, omega2, alpha2]
 
@@ -219,7 +230,7 @@ class DoublePendulumDamped(OdeSystem):
 
     @property
     def state_labels(self) -> list[str]:
-        return ['theta_1', 'omega_1', 'theta_2', 'omega_2']
+        return ["theta_1", "omega_1", "theta_2", "omega_2"]
 
     @property
     def derivative_labels(self) -> list[str]:
@@ -238,13 +249,15 @@ class DoublePendulumDamped(OdeSystem):
         delta_theta = theta1 - theta2
 
         # Common denominator term: μ = m₁ + m₂*sin²(Δ)
-        mu = self.m1 + self.m2 * np.sin(delta_theta)**2
+        mu = self.m1 + self.m2 * np.sin(delta_theta) ** 2
 
         # Isolated equation for α₁ (upper pendulum angular acceleration)
         num1_1 = -self.g * (self.m1 + self.m2) * np.sin(theta1)
         num1_2 = self.m2 * self.g * np.sin(theta2) * np.cos(delta_theta)
         num1_3 = -self.m2 * self.l2 * omega2**2 * np.sin(delta_theta)
-        num1_4 = -self.m2 * self.l1 * omega1**2 * np.sin(delta_theta) * np.cos(delta_theta)
+        num1_4 = (
+            -self.m2 * self.l1 * omega1**2 * np.sin(delta_theta) * np.cos(delta_theta)
+        )
         num1_5 = -(self.c1 * omega1) / self.l1
         num1_6 = (self.c2 * omega2 * np.cos(delta_theta)) / self.l2
         alpha1 = (num1_1 + num1_2 + num1_3 + num1_4 + num1_5 + num1_6) / (self.l1 * mu)
@@ -253,7 +266,9 @@ class DoublePendulumDamped(OdeSystem):
         num2_1 = self.g * (self.m1 + self.m2) * np.sin(theta1) * np.cos(delta_theta)
         num2_2 = -self.g * (self.m1 + self.m2) * np.sin(theta2)
         num2_3 = self.l1 * omega1**2 * (self.m1 + self.m2) * np.sin(delta_theta)
-        num2_4 = self.m2 * self.l2 * omega2**2 * np.sin(delta_theta) * np.cos(delta_theta)
+        num2_4 = (
+            self.m2 * self.l2 * omega2**2 * np.sin(delta_theta) * np.cos(delta_theta)
+        )
         num2_5 = (self.c1 * omega1 * np.cos(delta_theta)) / self.l1
         num2_6 = -(self.c2 * omega2 * (self.m1 + self.m2)) / (self.m2 * self.l2)
         alpha2 = (num2_1 + num2_2 + num2_3 + num2_4 + num2_5 + num2_6) / (self.l2 * mu)
@@ -274,7 +289,9 @@ def test_tribble_ode():
 
     # 2) Euler rollout: theta_{n+1} = theta_n + omega_hat_n * dt. Only theta is
     # integrated, and only theta feeds back in, so the accelerations never enter.
-    extractor = MemoryWindowFeatureExtractor(window_size=WINDOW_SIZE, memory_size=MEMORY_SIZE)
+    extractor = MemoryWindowFeatureExtractor(
+        window_size=WINDOW_SIZE, memory_size=MEMORY_SIZE
+    )
     actual_trajectory = test_results.trajectories[0]
     dt = test_results.params.dt
 
@@ -293,7 +310,9 @@ def test_tribble_ode():
 
     for _ in range(len(actual_trajectory) - HISTORY_LEN):
         history = pd.DataFrame(theta_rows[-HISTORY_LEN:], columns=THETA_FEATURES)
-        features = extractor.prepare_sequences(history, THETA_FEATURES, include_time=False)
+        features = extractor.prepare_sequences(
+            history, THETA_FEATURES, include_time=False
+        )
         omega = ode_m.predict(features.iloc[-1:]).values.flatten()
         if PROJECT_ENERGY:
             omega = project_onto_energy_shell(model, theta_rows[-1], omega, e0)
@@ -308,9 +327,11 @@ def test_tribble_ode():
 
     predicted = pd.DataFrame(theta_rows, columns=THETA_FEATURES)
     predicted[OMEGA_TARGETS] = np.array(omega_rows)
-    print(f"Euler rollout produced {len(predicted)} of {len(actual_trajectory)} steps "
-          f"({HISTORY_LEN} seeded from truth, energy projection "
-          f"{'on' if PROJECT_ENERGY else 'off'}).")
+    print(
+        f"Euler rollout produced {len(predicted)} of {len(actual_trajectory)} steps "
+        f"({HISTORY_LEN} seeded from truth, energy projection "
+        f"{'on' if PROJECT_ENERGY else 'off'})."
+    )
 
     # 3) Score the rollout on tracking and on energy. Horizons are measured from the
     # end of the seed window, not from t=0: HISTORY_LEN rows are copied from the true
@@ -320,20 +341,31 @@ def test_tribble_ode():
     seed_end = HISTORY_LEN * dt
     print("\nRollout accuracy past the seed window:")
     for col in THETA_FEATURES + OMEGA_TARGETS:
-        error = np.abs(actual_trajectory[col].values[HISTORY_LEN:n] - predicted[col].values[HISTORY_LEN:n])
+        error = np.abs(
+            actual_trajectory[col].values[HISTORY_LEN:n]
+            - predicted[col].values[HISTORY_LEN:n]
+        )
         print(f"  {col:8s} MAE={np.nanmean(error):8.4f}")
-    theta1_error = np.abs(actual_trajectory['theta_1'].values[HISTORY_LEN:n]
-                          - predicted['theta_1'].values[HISTORY_LEN:n])
+    theta1_error = np.abs(
+        actual_trajectory["theta_1"].values[HISTORY_LEN:n]
+        - predicted["theta_1"].values[HISTORY_LEN:n]
+    )
     for tol in (0.01, 0.1, 0.5, 1.0):
         exceeded = np.flatnonzero(theta1_error > tol)
-        when = f"{exceeded[0] * dt:6.2f} s past seed" if exceeded.size else "        never"
+        when = (
+            f"{exceeded[0] * dt:6.2f} s past seed" if exceeded.size else "        never"
+        )
         print(f"  |theta_1 error| first exceeds {tol:>4}: {when}")
 
     # Total energy is a constant of motion, so its drift measures whether the rollout
     # is a trajectory this system could have taken at all -- independently of whether
     # it is the right one. A rollout that sheds all of it parks the pendulum at rest.
-    rollout_energy = model.energy(predicted['theta_1'].values, predicted['omega_1'].values,
-                                 predicted['theta_2'].values, predicted['omega_2'].values)
+    rollout_energy = model.energy(
+        predicted["theta_1"].values,
+        predicted["omega_1"].values,
+        predicted["theta_2"].values,
+        predicted["omega_2"].values,
+    )
     drift = np.abs(rollout_energy[HISTORY_LEN:n] - e0)
     print(f"\nEnergy (E0 = {e0:.6f}, conserved exactly by the true system):")
     print(f"  |E - E0|  mean={np.nanmean(drift):.4f}  max={np.nanmax(drift):.4f}")
@@ -341,51 +373,90 @@ def test_tribble_ode():
     # 4) Plot the traces: one panel per state, plus energy across the bottom.
     fig = plt.figure(figsize=(14, 11))
     grid = fig.add_gridspec(3, 2)
-    axes = [fig.add_subplot(grid[0, 0]), fig.add_subplot(grid[0, 1]),
-            fig.add_subplot(grid[1, 0]), fig.add_subplot(grid[1, 1])]
+    axes = [
+        fig.add_subplot(grid[0, 0]),
+        fig.add_subplot(grid[0, 1]),
+        fig.add_subplot(grid[1, 0]),
+        fig.add_subplot(grid[1, 1]),
+    ]
     ax_energy = fig.add_subplot(grid[2, :])
-    fig.suptitle('Memory-augmented FIS rollout: angles, angular velocities, energy',
-                 fontsize=14, fontweight='bold')
+    fig.suptitle(
+        "Memory-augmented FIS rollout: angles, angular velocities, energy",
+        fontsize=14,
+        fontweight="bold",
+    )
 
     t_actual = np.arange(len(actual_trajectory)) * dt
     t_predicted = np.arange(len(predicted)) * dt
     for ax, col in zip(axes, THETA_FEATURES + OMEGA_TARGETS):
-        ax.plot(t_actual, actual_trajectory[col].values, '-',
-                color=COLOR_ACTUAL, linewidth=2, label='Actual')
-        ax.plot(t_predicted, predicted[col].values, '-',
-                color=COLOR_PREDICTED, linewidth=2, label='FIS rollout')
-        ax.axvline(HISTORY_LEN * dt, color=COLOR_MUTED, linestyle=':', linewidth=1,
-                   label='end of seed window')
-        units = 'rad' if col.startswith('theta') else 'rad/s'
+        ax.plot(
+            t_actual,
+            actual_trajectory[col].values,
+            "-",
+            color=COLOR_ACTUAL,
+            linewidth=2,
+            label="Actual",
+        )
+        ax.plot(
+            t_predicted,
+            predicted[col].values,
+            "-",
+            color=COLOR_PREDICTED,
+            linewidth=2,
+            label="FIS rollout",
+        )
+        ax.axvline(
+            HISTORY_LEN * dt,
+            color=COLOR_MUTED,
+            linestyle=":",
+            linewidth=1,
+            label="end of seed window",
+        )
+        units = "rad" if col.startswith("theta") else "rad/s"
         ax.set_title(col, fontsize=11)
-        ax.set_xlabel('Time (s)', fontsize=10)
-        ax.set_ylabel(f'{col} ({units})', fontsize=10)
+        ax.set_xlabel("Time (s)", fontsize=10)
+        ax.set_ylabel(f"{col} ({units})", fontsize=10)
         ax.grid(True, alpha=0.25)
-        for spine in ('top', 'right'):
+        for spine in ("top", "right"):
             ax.spines[spine].set_visible(False)
-        ax.legend(loc='best', fontsize=9, framealpha=0.9)
+        ax.legend(loc="best", fontsize=9, framealpha=0.9)
 
     # Energy: the true value is a flat line, so any departure is model error rather
     # than dynamics. Signed, so shedding energy reads differently from gaining it --
     # the collapse to a fixed point shows up as a one-way slide toward -E0.
-    ax_energy.axhline(0.0, color=COLOR_ACTUAL, linewidth=2,
-                      label=f'Actual (E0 = {e0:.4f}, constant)')
-    ax_energy.plot(t_predicted, rollout_energy - e0, '-',
-                   color=COLOR_PREDICTED, linewidth=2, label='FIS rollout')
-    ax_energy.axvline(HISTORY_LEN * dt, color=COLOR_MUTED, linestyle=':', linewidth=1,
-                      label='end of seed window')
-    ax_energy.set_title(f'Energy drift from E0  (mean |E-E0| past seed = {np.nanmean(drift):.4f}, '
-                        f"projection {'on' if PROJECT_ENERGY else 'off'})", fontsize=11)
-    ax_energy.set_xlabel('Time (s)', fontsize=10)
-    ax_energy.set_ylabel('E - E0', fontsize=10)
+    ax_energy.axhline(
+        0.0, color=COLOR_ACTUAL, linewidth=2, label=f"Actual (E0 = {e0:.4f}, constant)"
+    )
+    ax_energy.plot(
+        t_predicted,
+        rollout_energy - e0,
+        "-",
+        color=COLOR_PREDICTED,
+        linewidth=2,
+        label="FIS rollout",
+    )
+    ax_energy.axvline(
+        HISTORY_LEN * dt,
+        color=COLOR_MUTED,
+        linestyle=":",
+        linewidth=1,
+        label="end of seed window",
+    )
+    ax_energy.set_title(
+        f"Energy drift from E0  (mean |E-E0| past seed = {np.nanmean(drift):.4f}, "
+        f"projection {'on' if PROJECT_ENERGY else 'off'})",
+        fontsize=11,
+    )
+    ax_energy.set_xlabel("Time (s)", fontsize=10)
+    ax_energy.set_ylabel("E - E0", fontsize=10)
     ax_energy.grid(True, alpha=0.25)
-    for spine in ('top', 'right'):
+    for spine in ("top", "right"):
         ax_energy.spines[spine].set_visible(False)
-    ax_energy.legend(loc='best', fontsize=9, framealpha=0.9)
+    ax_energy.legend(loc="best", fontsize=9, framealpha=0.9)
 
     fig.tight_layout()
     output_file = Path(__file__).parent / "tribble_ode_traces.png"
-    fig.savefig(output_file, dpi=150, bbox_inches='tight')
+    fig.savefig(output_file, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"\nTraces saved to: {output_file}")
 
@@ -396,16 +467,20 @@ def initialize_model() -> tuple[DataSimulation, DataSimulation]:
     pendulum = DoublePendulum()
     trajectories = []
     theta2s = np.arange(1.5, 3.00001, 0.1)  # TODO - 0.1
-    train_params = PendulumParameters(theta1=120 * np.pi / 180,
-                                omega1=0.0,
-                                omega2=0.0,
-                                dt=0.01,
-                                duration=30.0,
-                                theta2=0.0)
+    train_params = PendulumParameters(
+        theta1=120 * np.pi / 180,
+        omega1=0.0,
+        omega2=0.0,
+        dt=0.01,
+        duration=30.0,
+        theta2=0.0,
+    )
     for ij in range(len(theta2s)):
         theta2 = theta2s[ij]
         theta2 *= np.pi / 180
-        ic = tuple([train_params.theta1, train_params.omega1, theta2, train_params.omega2])
+        ic = tuple(
+            [train_params.theta1, train_params.omega1, theta2, train_params.omega2]
+        )
         df = pendulum.simulate(ic, duration=train_params.duration, dt=train_params.dt)
         trajectories.append(df)
 
@@ -419,11 +494,20 @@ def initialize_model() -> tuple[DataSimulation, DataSimulation]:
     )
 
     # Test trajectory
-    test_params = PendulumParameters(theta1=train_params.theta1, theta2=2.05 * np.pi / 180.0,
-                                     omega1=train_params.omega1, omega2=train_params.omega2,
-                                     dt=train_params.dt, duration=train_params.duration)
-    test_ic = np.array([test_params.theta1, test_params.omega1, test_params.theta2, test_params.omega2])
-    actual_trajectory = pendulum.simulate(test_ic, duration=train_params.duration, dt=train_params.dt)
+    test_params = PendulumParameters(
+        theta1=train_params.theta1,
+        theta2=2.05 * np.pi / 180.0,
+        omega1=train_params.omega1,
+        omega2=train_params.omega2,
+        dt=train_params.dt,
+        duration=train_params.duration,
+    )
+    test_ic = np.array(
+        [test_params.theta1, test_params.omega1, test_params.theta2, test_params.omega2]
+    )
+    actual_trajectory = pendulum.simulate(
+        test_ic, duration=train_params.duration, dt=train_params.dt
+    )
     test_results = DataSimulation(
         trajectories=[actual_trajectory],
         params=test_params,

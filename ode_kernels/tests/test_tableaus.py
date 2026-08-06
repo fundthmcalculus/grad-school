@@ -45,7 +45,9 @@ def test_fsal_flag_matches_last_row_of_a():
         A, b, e, c = tab.as_arrays()
         if tab.fsal:
             np.testing.assert_allclose(
-                A[-1, :], b, atol=0,
+                A[-1, :],
+                b,
+                atol=0,
                 err_msg=f"{method}: fsal=True but last row of A != b",
             )
             assert c[-1] == 1.0, f"{method}: fsal=True but c[-1] != 1"
@@ -53,6 +55,11 @@ def test_fsal_flag_matches_last_row_of_a():
 
 def test_orders_strictly_increase_across_the_family():
     order_by_method = {m: t.order for m, t in tableaus.TABLEAUS.items()}
-    assert order_by_method["ode12"] < order_by_method["ode23"] < \
-        order_by_method["ode45"] < order_by_method["ode56"] < \
-        order_by_method["ode67"] < order_by_method["ode78"]
+    assert (
+        order_by_method["ode12"]
+        < order_by_method["ode23"]
+        < order_by_method["ode45"]
+        < order_by_method["ode56"]
+        < order_by_method["ode67"]
+        < order_by_method["ode78"]
+    )

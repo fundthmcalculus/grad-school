@@ -15,6 +15,7 @@ recovered the true double-pendulum equations exactly for n=2 (a 4-term and
 3-term decomposition matching the by-hand derivation in
 DOUBLE_PENDULUM_REPORT.md); for n=3 it produces 18 terms per output.
 """
+
 from dataclasses import dataclass
 
 import numpy as np
@@ -37,16 +38,19 @@ def _term_name(term, idx):
     return f"t{idx}"
 
 
-def derive_physics_basis(n: int, m_vals, l_vals, g_val: float = 9.81) -> PhysicsBasisModel:
+def derive_physics_basis(
+    n: int, m_vals, l_vals, g_val: float = 9.81
+) -> PhysicsBasisModel:
     model = build_n_pendulum(n)
-    subs_params = (list(zip(model.m, m_vals)) + list(zip(model.l, l_vals))
-                   + [(model.g, g_val)])
+    subs_params = (
+        list(zip(model.m, m_vals)) + list(zip(model.l, l_vals)) + [(model.g, g_val)]
+    )
     M_num = model.M.subs(subs_params)
     f_num = model.f.subs(subs_params)
     all_syms = model.theta + model.thetad
 
     detM_expr = sp.expand(M_num.det())
-    detM_func = sp.lambdify(all_syms, detM_expr, 'numpy')
+    detM_func = sp.lambdify(all_syms, detM_expr, "numpy")
 
     per_output_terms = []
     per_output_names = []
@@ -55,12 +59,16 @@ def derive_physics_basis(n: int, m_vals, l_vals, g_val: float = 9.81) -> Physics
         Mi[:, i] = f_num
         Ni = sp.expand(Mi.det())
         terms = sp.Add.make_args(Ni)
-        term_entries = [(t, sp.lambdify(all_syms, t, 'numpy')) for t in terms]
+        term_entries = [(t, sp.lambdify(all_syms, t, "numpy")) for t in terms]
         per_output_terms.append(term_entries)
         per_output_names.append([_term_name(t, k) for k, t in enumerate(terms)])
 
-    return PhysicsBasisModel(n=n, detM_func=detM_func, per_output_terms=per_output_terms,
-                              per_output_names=per_output_names)
+    return PhysicsBasisModel(
+        n=n,
+        detM_func=detM_func,
+        per_output_terms=per_output_terms,
+        per_output_names=per_output_names,
+    )
 
 
 def compute_features(basis: PhysicsBasisModel, theta_arrs, omega_arrs):
@@ -73,10 +81,15 @@ def compute_features(basis: PhysicsBasisModel, theta_arrs, omega_arrs):
     denom = np.asarray(basis.detM_func(*args), dtype=float)
     feats = []
     for i in range(basis.n):
-        cols = [np.asarray(tf(*args), dtype=float) / denom for (_expr, tf) in basis.per_output_terms[i]]
+        cols = [
+            np.asarray(tf(*args), dtype=float) / denom
+            for (_expr, tf) in basis.per_output_terms[i]
+        ]
         feats.append(np.column_stack(cols) if cols else np.zeros((len(denom), 0)))
     return denom, feats
 
 
 def state_cols(n):
-    return [f'theta_{i}' for i in range(1, n + 1)], [f'omega_{i}' for i in range(1, n + 1)]
+    return [f"theta_{i}" for i in range(1, n + 1)], [
+        f"omega_{i}" for i in range(1, n + 1)
+    ]

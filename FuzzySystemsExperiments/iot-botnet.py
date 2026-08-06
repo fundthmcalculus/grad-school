@@ -12,8 +12,12 @@ from tribblefis.gauss_math import (
     take_top_features,
     simple_gaussian_predict,
 )
-from tribblefis.gauss_plot import report_figures_of_merit, plot_anomaly_threshold_sweep, plot_confusion_matrix, \
-    plot_classification_report
+from tribblefis.gauss_plot import (
+    report_figures_of_merit,
+    plot_anomaly_threshold_sweep,
+    plot_confusion_matrix,
+    plot_classification_report,
+)
 from tribblefis.scaling import UnitScalar
 
 gauss_math.NORM_CONORM = "min/max"
@@ -25,7 +29,9 @@ def load_data():
     benign_doorbell = pd.read_csv("iot-botnet/Danmini_Doorbell/benign_traffic.csv")
     benign_doorbell["Traffic_type"] = "regular"
 
-    attack_doorbell = pd.read_csv("iot-botnet/Danmini_Doorbell/gafgyt_attacks/combo.csv")
+    attack_doorbell = pd.read_csv(
+        "iot-botnet/Danmini_Doorbell/gafgyt_attacks/combo.csv"
+    )
     attack_doorbell["Traffic_type"] = "anomaly"
 
     X = pd.concat([benign_doorbell, attack_doorbell], ignore_index=True)
@@ -111,7 +117,9 @@ def main():
     # Take the top-n variables so that the normalized differentiation value encompasses 90-95%
     top_n, top_n_todo = take_top_features(feature_differentiators, top_p=1.0)
 
-    print(f"Selected Top-{top_n} Variables ({top_n/len(feature_differentiators):.2%} coverage):")
+    print(
+        f"Selected Top-{top_n} Variables ({top_n/len(feature_differentiators):.2%} coverage):"
+    )
 
     # Compute memberships using training data
     gaussian_details = {}
@@ -124,7 +132,9 @@ def main():
     gaussian_memberships = create_gaussian_membership_dict(
         X_train, y_train, top_n_var_names=top_n_todo, n_gaussians=gaussian_details
     )
-    anomaly_details = AnomalyParameters(include_anomaly=True, threshold=0.95, label="anomaly")
+    anomaly_details = AnomalyParameters(
+        include_anomaly=True, threshold=0.95, label="anomaly"
+    )
 
     cm_train, top_confusion_train, confused_data_train = report_figures_of_merit(
         X_train,
@@ -188,13 +198,15 @@ def main():
     y_pred_simple = simple_gaussian_predict(X_test[top_n_todo], simple_model)
     simple_accuracy = np.mean(y_pred_simple == y_test)
     print(f"Simple Model Accuracy (test): {simple_accuracy:.4f}")
-    plot_confusion_matrix(y_test, y_pred_simple, title=f"TSK Model Confusion Matrix (Simple Set)")
-    plot_classification_report(y_test, y_pred_simple, title=f"TSK Model Classification Report (Simple Set)")
+    plot_confusion_matrix(
+        y_test, y_pred_simple, title=f"TSK Model Confusion Matrix (Simple Set)"
+    )
+    plot_classification_report(
+        y_test, y_pred_simple, title=f"TSK Model Classification Report (Simple Set)"
+    )
 
     # Plot membership functions of the simple model
     # plot_membership_functions(simple_model)
-
-
 
 
 if __name__ == "__main__":

@@ -26,6 +26,7 @@ def _dataset(name, required=True):
     an explicit error naming the search path beats a stack trace from read_csv.
     """
     import os
+
     here = Path(__file__).resolve().parent
     roots = []
     if os.environ.get("GRAD_SCHOOL_DATA"):
@@ -44,6 +45,7 @@ def _dataset(name, required=True):
         f"It is gitignored, so a fresh clone will not have it; place it at the "
         f"repo data/ directory, or set GRAD_SCHOOL_DATA to hold it."
     )
+
 
 from nerfcm import nerfcm
 
@@ -142,9 +144,15 @@ def main():
     print()
 
     test_cases = [
-        (create_non_euclidean_dissimilarity_matrix(50, seed=0), "Non-Euclidean (perturbed)"),
+        (
+            create_non_euclidean_dissimilarity_matrix(50, seed=0),
+            "Non-Euclidean (perturbed)",
+        ),
         (create_graph_distance_matrix(50, seed=0), "Graph shortest-paths"),
-        (create_non_euclidean_dissimilarity_matrix(80, seed=1), "Non-Euclidean (larger)"),
+        (
+            create_non_euclidean_dissimilarity_matrix(80, seed=1),
+            "Non-Euclidean (larger)",
+        ),
     ]
 
     results = []
@@ -154,7 +162,9 @@ def main():
         result = test_beta_spread_on_matrix(D, name, c=3, n_seeds=5)
         results.append(result)
 
-        print(f"  Beta values across 5 seeds: {[f'{b:.6f}' for b in result['beta_values']]}")
+        print(
+            f"  Beta values across 5 seeds: {[f'{b:.6f}' for b in result['beta_values']]}"
+        )
         print(f"  Mean beta: {result['beta_mean']:.6f}")
         print(f"  Max beta:  {result['beta_max']:.6f}")
         print(f"  Activated: {'YES ✓' if result['any_activated'] else 'NO'}")
@@ -168,22 +178,28 @@ def main():
     print("-" * 75)
 
     for r in results:
-        activated = "YES ✓" if r['any_activated'] else "NO"
-        print(f"{r['name']:<35}{r['n']:<6}{r['beta_mean']:<15.6f}{r['beta_max']:<15.6f}{activated}")
+        activated = "YES ✓" if r["any_activated"] else "NO"
+        print(
+            f"{r['name']:<35}{r['n']:<6}{r['beta_mean']:<15.6f}{r['beta_max']:<15.6f}{activated}"
+        )
 
     print()
     print("FINDINGS:")
     print("-" * 75)
 
-    activated_count = sum(1 for r in results if r['any_activated'])
+    activated_count = sum(1 for r in results if r["any_activated"])
 
     if activated_count == len(results):
         print("✓ CONFIRMED: Beta-spread activates on non-Euclidean matrices.")
         print("  This validates that the beta-spread mechanism is essential for")
         print("  handling non-metric/non-Euclidean relational data.")
     elif activated_count > 0:
-        print(f"✓ PARTIAL: Beta-spread activates on {activated_count}/{len(results)} matrices.")
-        print("  The mechanism activates specifically when needed for non-Euclidean structure.")
+        print(
+            f"✓ PARTIAL: Beta-spread activates on {activated_count}/{len(results)} matrices."
+        )
+        print(
+            "  The mechanism activates specifically when needed for non-Euclidean structure."
+        )
     else:
         print("✗ NOT OBSERVED: Beta-spread did not activate on any matrix.")
 
@@ -204,7 +220,9 @@ def main():
         print("  2) Activates when needed to handle non-Euclidean dissimilarities")
     else:
         print("The test matrices may not have been sufficiently non-Euclidean.")
-        print("Even after perturbation, the relational update may not produce negatives.")
+        print(
+            "Even after perturbation, the relational update may not produce negatives."
+        )
 
 
 if __name__ == "__main__":

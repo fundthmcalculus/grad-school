@@ -39,9 +39,9 @@ ROOT = os.path.dirname(os.path.dirname(_HERE))
 sys.path.insert(0, _HERE)
 sys.path.insert(0, os.path.join(ROOT, "reproduce"))
 
-import arms as A          # noqa: E402
-import common as C        # noqa: E402
-import problem as P       # noqa: E402
+import arms as A  # noqa: E402
+import common as C  # noqa: E402
+import problem as P  # noqa: E402
 from budget import BudgetedObjective  # noqa: E402
 
 
@@ -53,10 +53,10 @@ def checkpoints_for(budget):
 
 def run_one(arm, dataset, seed, budget, radius, order, hp, init="hot"):
     """One (arm, seed, init) measurement. Returns a record dict, never raises."""
-    prob = P.build(dataset=dataset, seed=seed, order=order, radius=radius,
-                   init=init)
-    obj = BudgetedObjective(prob.fitness, max_evals=budget, x0=prob.x0,
-                            checkpoints=checkpoints_for(budget)).start()
+    prob = P.build(dataset=dataset, seed=seed, order=order, radius=radius, init=init)
+    obj = BudgetedObjective(
+        prob.fitness, max_evals=budget, x0=prob.x0, checkpoints=checkpoints_for(budget)
+    ).start()
 
     error = None
     try:
@@ -89,16 +89,24 @@ def run_one(arm, dataset, seed, budget, radius, order, hp, init="hot"):
         "heuristic_cv": prob.heuristic_cv,
         "heuristic_r2": prob.heuristic_r2,
         "evals_to_heuristic": evals_to_heuristic,
-        "arm": arm, "dataset": dataset, "seed": seed,
+        "arm": arm,
+        "dataset": dataset,
+        "seed": seed,
         "n_params": prob.n_params,
-        "cv_mse_0": obj.f0, "cv_mse": obj.best_f,
+        "cv_mse_0": obj.f0,
+        "cv_mse": obj.best_f,
         "improvement": obj.improvement(),
         "beat_start": obj.beat_start(),
-        "r2_0": r2_0, "r2": r2, "rmse_0": rmse_0, "rmse": rmse,
-        "evals": obj.n_evals, "seconds": obj.seconds,
+        "r2_0": r2_0,
+        "r2": r2,
+        "rmse_0": rmse_0,
+        "rmse": rmse,
+        "evals": obj.n_evals,
+        "seconds": obj.seconds,
         "init_seconds": prob.meta.get("init_seconds", 0.0),
         "construction_seconds": prob.meta.get("construction_seconds", 0.0),
-        "trace": obj.trace, "error": error,
+        "trace": obj.trace,
+        "error": error,
     }
 
 
@@ -116,85 +124,127 @@ def _agg(records, key):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--dataset", default="concrete", choices=sorted(P.DATASETS))
     ap.add_argument("--arms", default=",".join(A.ARMS))
     ap.add_argument("--seeds", default=None)
     ap.add_argument("--budget", type=int, default=2000)
     ap.add_argument("--radius", type=float, default=1.0)
     ap.add_argument("--order", default="2nd")
-    ap.add_argument("--init", default="hot",
-                    help="comma-separated: hot, cold, kmeans, fcm")
+    ap.add_argument(
+        "--init", default="hot", help="comma-separated: hot, cold, kmeans, fcm"
+    )
     ap.add_argument("--smoke", action="store_true")
-    ap.add_argument("--archive", metavar="LABEL",
-                    help="copy the outputs into reproduce/outputs/<LABEL>/ with a "
-                         "PROVENANCE.txt — labelled archives are tracked, loose "
-                         "files in outputs/ are scratch")
+    ap.add_argument(
+        "--archive",
+        metavar="LABEL",
+        help="copy the outputs into reproduce/outputs/<LABEL>/ with a "
+        "PROVENANCE.txt — labelled archives are tracked, loose "
+        "files in outputs/ are scratch",
+    )
     args = ap.parse_args()
 
     if args.smoke:
         args.seeds, args.budget = args.seeds or "0,1,2", min(args.budget, 300)
-    seeds = ([int(s) for s in args.seeds.split(",")] if args.seeds else C.SEEDS)
+    seeds = [int(s) for s in args.seeds.split(",")] if args.seeds else C.SEEDS
     arm_names = [a.strip() for a in args.arms.split(",") if a.strip()]
     unknown = [a for a in arm_names if a not in A.ARMS]
     if unknown:
-        print(f"unknown arm(s): {', '.join(unknown)}; have {', '.join(A.ARMS)}",
-              file=sys.stderr)
+        print(
+            f"unknown arm(s): {', '.join(unknown)}; have {', '.join(A.ARMS)}",
+            file=sys.stderr,
+        )
         return 2
 
-    print(f"hot-start study: {args.dataset}, order={args.order}, "
-          f"radius={args.radius}, budget={args.budget} evals/arm/seed, "
-          f"seeds={seeds}")
+    print(
+        f"hot-start study: {args.dataset}, order={args.order}, "
+        f"radius={args.radius}, budget={args.budget} evals/arm/seed, "
+        f"seeds={seeds}"
+    )
 
     inits = [i.strip() for i in args.init.split(",") if i.strip()]
     rows, records = [], []
     for init in inits:
-      for arm in arm_names:
-        per_arm = []
-        for seed in seeds:
-            rec = run_one(arm, args.dataset, seed, args.budget, args.radius,
-                          args.order, hp={}, init=init)
-            per_arm.append(rec)
-            records.append(rec)
-            flag = "" if rec["error"] is None else f"  [{rec['error']}]"
-            reach = ("" if rec["evals_to_heuristic"] is None
-                     else f"  reached heuristic @{rec['evals_to_heuristic']}")
-            print(f"  [{init}] {arm:<14} seed {seed}: cv {rec['cv_mse_0']:.5f} -> "
-                  f"{rec['cv_mse']:.5f}   R2 {rec['r2_0']:.3f} -> {rec['r2']:.3f}   "
-                  f"{rec['evals']:>5} evals{reach}{flag}")
+        for arm in arm_names:
+            per_arm = []
+            for seed in seeds:
+                rec = run_one(
+                    arm,
+                    args.dataset,
+                    seed,
+                    args.budget,
+                    args.radius,
+                    args.order,
+                    hp={},
+                    init=init,
+                )
+                per_arm.append(rec)
+                records.append(rec)
+                flag = "" if rec["error"] is None else f"  [{rec['error']}]"
+                reach = (
+                    ""
+                    if rec["evals_to_heuristic"] is None
+                    else f"  reached heuristic @{rec['evals_to_heuristic']}"
+                )
+                print(
+                    f"  [{init}] {arm:<14} seed {seed}: cv {rec['cv_mse_0']:.5f} -> "
+                    f"{rec['cv_mse']:.5f}   R2 {rec['r2_0']:.3f} -> {rec['r2']:.3f}   "
+                    f"{rec['evals']:>5} evals{reach}{flag}"
+                )
 
-        imp_mean, _ = _agg(per_arm, "improvement")
-        beat = sum(1 for r in per_arm if r["beat_start"])
-        # Paired, per seed. Every arm faced the identical problem at each seed,
-        # so the seed-to-seed spread of the *start* (0.755-0.872 in R^2 here) is
-        # common to all of them and swamps the between-arm differences when the
-        # columns are compared as independent means. The paired delta removes it,
-        # and it is the statistic the ordering should be read from.
-        # Paired against the HEURISTIC in both modes, not against each run's own
-        # start. A cold run's own start is a random point, so "improvement on the
-        # start" flatters it enormously and means nothing; the question is
-        # whether it caught up with the construction.
-        d_r2 = [r["r2"] - r["heuristic_r2"] for r in per_arm
-                if np.isfinite(r["r2"]) and np.isfinite(r["heuristic_r2"])]
-        won = sum(1 for d in d_r2 if d > 0)
-        reached = [r["evals_to_heuristic"] for r in per_arm
-                   if r["evals_to_heuristic"] is not None]
-        rows.append([
-            init,
-            arm,
-            STARTED_FROM.get(init, init),
-            C.cell([r["cv_mse"] for r in per_arm], fmt="{:.5f}"),
-            C.cell([r["r2"] for r in per_arm]),
-            C.cell(d_r2, fmt="{:+.3f}") if d_r2 else C.NA,
-            f"{won}/{len(d_r2)}",
-            (C.cell(reached, fmt="{:.0f}") if len(reached) == len(per_arm)
-             else f"{len(reached)}/{len(per_arm)} seeds" if reached else "never"),
-            f"{beat}/{len(per_arm)}",
-            C.cell([r["evals"] for r in per_arm], fmt="{:.0f}"),
-            C.cell([1000 * (r["construction_seconds"] + r["init_seconds"])
-                    for r in per_arm], fmt="{:.0f}"),
-        ])
+            imp_mean, _ = _agg(per_arm, "improvement")
+            beat = sum(1 for r in per_arm if r["beat_start"])
+            # Paired, per seed. Every arm faced the identical problem at each seed,
+            # so the seed-to-seed spread of the *start* (0.755-0.872 in R^2 here) is
+            # common to all of them and swamps the between-arm differences when the
+            # columns are compared as independent means. The paired delta removes it,
+            # and it is the statistic the ordering should be read from.
+            # Paired against the HEURISTIC in both modes, not against each run's own
+            # start. A cold run's own start is a random point, so "improvement on the
+            # start" flatters it enormously and means nothing; the question is
+            # whether it caught up with the construction.
+            d_r2 = [
+                r["r2"] - r["heuristic_r2"]
+                for r in per_arm
+                if np.isfinite(r["r2"]) and np.isfinite(r["heuristic_r2"])
+            ]
+            won = sum(1 for d in d_r2 if d > 0)
+            reached = [
+                r["evals_to_heuristic"]
+                for r in per_arm
+                if r["evals_to_heuristic"] is not None
+            ]
+            rows.append(
+                [
+                    init,
+                    arm,
+                    STARTED_FROM.get(init, init),
+                    C.cell([r["cv_mse"] for r in per_arm], fmt="{:.5f}"),
+                    C.cell([r["r2"] for r in per_arm]),
+                    C.cell(d_r2, fmt="{:+.3f}") if d_r2 else C.NA,
+                    f"{won}/{len(d_r2)}",
+                    (
+                        C.cell(reached, fmt="{:.0f}")
+                        if len(reached) == len(per_arm)
+                        else (
+                            f"{len(reached)}/{len(per_arm)} seeds"
+                            if reached
+                            else "never"
+                        )
+                    ),
+                    f"{beat}/{len(per_arm)}",
+                    C.cell([r["evals"] for r in per_arm], fmt="{:.0f}"),
+                    C.cell(
+                        [
+                            1000 * (r["construction_seconds"] + r["init_seconds"])
+                            for r in per_arm
+                        ],
+                        fmt="{:.0f}",
+                    ),
+                ]
+            )
 
     ref = [r for r in records if r["arm"] == arm_names[0]]
     n_params = ref[0]["n_params"] if ref else 0
@@ -204,40 +254,53 @@ def main():
         "table_opt_hotstart",
         f"Optimizer study — the Gaussian construction as a starting point "
         f"({args.dataset}, order {args.order})",
-        ["init", "arm", "started from", "CV MSE", "test R²",
-         "Δ R² vs heuristic (paired)", "R² wins", "evals to reach heuristic",
-         "beat own start", "evals", "start-up cost (ms)"],
+        [
+            "init",
+            "arm",
+            "started from",
+            "CV MSE",
+            "test R²",
+            "Δ R² vs heuristic (paired)",
+            "R² wins",
+            "evals to reach heuristic",
+            "beat own start",
+            "evals",
+            "start-up cost (ms)",
+        ],
         rows,
-        note=(f"Every arm optimizes the same k-fold held-out MSE inside the same "
-              f"box over the same {n_params} antecedent parameters, and is cut off "
-              f"at exactly {args.budget} objective evaluations by a wrapper that "
-              f"raises — no arm's own stopping rule is trusted to make the budgets "
-              f"equal. **The budget is evaluations, not time.** Wall-clock is kept "
-              f"per seed in the companion CSV but is not a variable this study "
-              f"controls, and every arm runs single-threaded, so parallelism is "
-              f"deliberately out of scope. `init=hot` starts from the Gaussian "
-              f"construction's own antecedents; `init=cold` from a uniform random "
-              f"point in the same box, everything else identical. Both are scored "
-              f"against the SAME reference — the heuristic model, R² "
-              f"{r2_start:.3f} ± {r2_start_sd:.3f} — because a cold run's own start "
-              f"is a random point and improvement on it means nothing. `evals to "
-              f"reach heuristic` is how many evaluations a run needed before its "
-              f"objective matched what the construction supplies for free: the "
-              f"price of not having it, and the number this study exists to "
-              f"produce. Trust-region radius {args.radius} (1.0 = the full box from "
-              f"`build_param_bounds`), centred on whichever point that run starts "
-              f"from.\n>\n"
-              f"> **`start-up cost` is not a pipeline comparison, and cannot be "
-              f"read as one.** Every init in this table needs the Gaussian "
-              f"construction first: it supplies the structure (which features, how "
-              f"many components per bucket) and the box that `build_param_bounds` "
-              f"derives. The k-means and FCM inits then *replace the placement* "
-              f"inside that structure, so their cost is construction + clustering "
-              f"and they are strictly more expensive than the construction alone. "
-              f"Showing k-means as a cheaper alternative would require the "
-              f"classical joint-space identification, where clustering chooses the "
-              f"rules instead of inheriting them — that changes the structure and "
-              f"belongs with `run_structure_study.py`."))
+        note=(
+            f"Every arm optimizes the same k-fold held-out MSE inside the same "
+            f"box over the same {n_params} antecedent parameters, and is cut off "
+            f"at exactly {args.budget} objective evaluations by a wrapper that "
+            f"raises — no arm's own stopping rule is trusted to make the budgets "
+            f"equal. **The budget is evaluations, not time.** Wall-clock is kept "
+            f"per seed in the companion CSV but is not a variable this study "
+            f"controls, and every arm runs single-threaded, so parallelism is "
+            f"deliberately out of scope. `init=hot` starts from the Gaussian "
+            f"construction's own antecedents; `init=cold` from a uniform random "
+            f"point in the same box, everything else identical. Both are scored "
+            f"against the SAME reference — the heuristic model, R² "
+            f"{r2_start:.3f} ± {r2_start_sd:.3f} — because a cold run's own start "
+            f"is a random point and improvement on it means nothing. `evals to "
+            f"reach heuristic` is how many evaluations a run needed before its "
+            f"objective matched what the construction supplies for free: the "
+            f"price of not having it, and the number this study exists to "
+            f"produce. Trust-region radius {args.radius} (1.0 = the full box from "
+            f"`build_param_bounds`), centred on whichever point that run starts "
+            f"from.\n>\n"
+            f"> **`start-up cost` is not a pipeline comparison, and cannot be "
+            f"read as one.** Every init in this table needs the Gaussian "
+            f"construction first: it supplies the structure (which features, how "
+            f"many components per bucket) and the box that `build_param_bounds` "
+            f"derives. The k-means and FCM inits then *replace the placement* "
+            f"inside that structure, so their cost is construction + clustering "
+            f"and they are strictly more expensive than the construction alone. "
+            f"Showing k-means as a cheaper alternative would require the "
+            f"classical joint-space identification, where clustering chooses the "
+            f"rules instead of inheriting them — that changes the structure and "
+            f"belongs with `run_structure_study.py`."
+        ),
+    )
 
     _write_traces(records)
     _write_seeds(records)
@@ -247,9 +310,13 @@ def main():
     return 0
 
 
-ARTIFACTS = ["table_opt_hotstart.md", "table_opt_hotstart.csv",
-             "table_opt_hotstart_seeds.csv", "table_opt_hotstart_traces.csv",
-             "table_opt_hotstart_budget.csv"]
+ARTIFACTS = [
+    "table_opt_hotstart.md",
+    "table_opt_hotstart.csv",
+    "table_opt_hotstart_seeds.csv",
+    "table_opt_hotstart_traces.csv",
+    "table_opt_hotstart_budget.csv",
+]
 
 
 def _archive(label, args, seeds, arm_names, n_params=0):
@@ -271,9 +338,12 @@ def _archive(label, args, seeds, arm_names, n_params=0):
 
     def sha(path):
         try:
-            return subprocess.run(["git", "-C", path, "rev-parse", "HEAD"],
-                                  capture_output=True, text=True,
-                                  check=True).stdout.strip()
+            return subprocess.run(
+                ["git", "-C", path, "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
         except Exception:  # noqa: BLE001
             return "unknown"
 
@@ -313,18 +383,38 @@ def _archive(label, args, seeds, arm_names, n_params=0):
         if os.path.exists(src):
             shutil.copy2(src, os.path.join(dest, name))
             copied += 1
-    print(f"  archived {copied} artifact(s) -> "
-          f"{os.path.relpath(dest, ROOT)}")
+    print(f"  archived {copied} artifact(s) -> " f"{os.path.relpath(dest, ROOT)}")
 
 
 def _write_curve(records):
     """Held-out R² as a function of the evaluation budget, per arm and seed."""
     path = os.path.join(C.OUTPUT_DIR, "table_opt_hotstart_budget.csv")
-    header = ["arm", "init", "seed", "budget", "cv_mse", "r2", "r2_0",
-              "heuristic_r2", "seconds"]
-    rows = [[r["arm"], r["init"], r["seed"], cp, f"{f:.6f}", f"{r2:.6f}",
-             f"{r['r2_0']:.6f}", f"{r['heuristic_r2']:.6f}", f"{secs:.2f}"]
-            for r in records for (cp, f, r2, secs) in r["curve"]]
+    header = [
+        "arm",
+        "init",
+        "seed",
+        "budget",
+        "cv_mse",
+        "r2",
+        "r2_0",
+        "heuristic_r2",
+        "seconds",
+    ]
+    rows = [
+        [
+            r["arm"],
+            r["init"],
+            r["seed"],
+            cp,
+            f"{f:.6f}",
+            f"{r2:.6f}",
+            f"{r['r2_0']:.6f}",
+            f"{r['heuristic_r2']:.6f}",
+            f"{secs:.2f}",
+        ]
+        for r in records
+        for (cp, f, r2, secs) in r["curve"]
+    ]
     C.write_csv(path, header, rows)
     print(f"  wrote {path}")
 
@@ -336,19 +426,51 @@ def _write_seeds(records):
     the run log, which is not an artifact anyone should be quoting from.
     """
     path = os.path.join(C.OUTPUT_DIR, "table_opt_hotstart_seeds.csv")
-    header = ["arm", "init", "seed", "cv_mse_0", "cv_mse", "improvement",
-              "beat_start", "r2_0", "r2", "heuristic_r2", "heuristic_cv",
-              "evals_to_heuristic", "rmse_0", "rmse", "evals", "seconds",
-              "init_seconds", "construction_seconds", "error"]
-    rows = [[r["arm"], r["init"], r["seed"], f"{r['cv_mse_0']:.6f}", f"{r['cv_mse']:.6f}",
-             "" if r["improvement"] is None else f"{r['improvement']:.6f}",
-             int(r["beat_start"]), f"{r['r2_0']:.6f}", f"{r['r2']:.6f}",
-             f"{r['heuristic_r2']:.6f}", f"{r['heuristic_cv']:.6f}",
-             "" if r["evals_to_heuristic"] is None else r["evals_to_heuristic"],
-             f"{r['rmse_0']:.4f}", f"{r['rmse']:.4f}", r["evals"],
-             f"{r['seconds']:.2f}", f"{r['init_seconds']:.4f}",
-             f"{r['construction_seconds']:.4f}", r["error"] or ""]
-            for r in records]
+    header = [
+        "arm",
+        "init",
+        "seed",
+        "cv_mse_0",
+        "cv_mse",
+        "improvement",
+        "beat_start",
+        "r2_0",
+        "r2",
+        "heuristic_r2",
+        "heuristic_cv",
+        "evals_to_heuristic",
+        "rmse_0",
+        "rmse",
+        "evals",
+        "seconds",
+        "init_seconds",
+        "construction_seconds",
+        "error",
+    ]
+    rows = [
+        [
+            r["arm"],
+            r["init"],
+            r["seed"],
+            f"{r['cv_mse_0']:.6f}",
+            f"{r['cv_mse']:.6f}",
+            "" if r["improvement"] is None else f"{r['improvement']:.6f}",
+            int(r["beat_start"]),
+            f"{r['r2_0']:.6f}",
+            f"{r['r2']:.6f}",
+            f"{r['heuristic_r2']:.6f}",
+            f"{r['heuristic_cv']:.6f}",
+            "" if r["evals_to_heuristic"] is None else r["evals_to_heuristic"],
+            f"{r['rmse_0']:.4f}",
+            f"{r['rmse']:.4f}",
+            r["evals"],
+            f"{r['seconds']:.2f}",
+            f"{r['init_seconds']:.4f}",
+            f"{r['construction_seconds']:.4f}",
+            r["error"] or "",
+        ]
+        for r in records
+    ]
     C.write_csv(path, header, rows)
     print(f"  wrote {path}")
 
@@ -357,8 +479,11 @@ def _write_traces(records):
     """Per-evaluation convergence traces, for the figure and for re-analysis."""
     path = os.path.join(C.OUTPUT_DIR, "table_opt_hotstart_traces.csv")
     header = ["arm", "init", "seed", "eval", "seconds", "best_cv_mse"]
-    rows = [[r["arm"], r["init"], r["seed"], e, f"{s:.4f}", f"{v:.6f}"]
-            for r in records for (e, s, v) in r["trace"]]
+    rows = [
+        [r["arm"], r["init"], r["seed"], e, f"{s:.4f}", f"{v:.6f}"]
+        for r in records
+        for (e, s, v) in r["trace"]
+    ]
     C.write_csv(path, header, rows)
     print(f"  wrote {path}")
 

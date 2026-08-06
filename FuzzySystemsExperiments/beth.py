@@ -36,7 +36,9 @@ def main():
     print(f"Number of unique values in y: {n_unique}")
 
     # Split dataset into train/test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # BEHAVIOUR CHANGE. This used to be
@@ -66,7 +68,13 @@ def main():
     gaussian_memberships = clf.model_
 
     cm_train, top_confusion_train, confused_data_train = report_figures_of_merit(
-        X_train, y_train, gaussian_memberships, n_unique, start_time, top_n_todo, label="train"
+        X_train,
+        y_train,
+        gaussian_memberships,
+        n_unique,
+        start_time,
+        top_n_todo,
+        label="train",
     )
 
     for (true_class, confused_class), confusion_data in confused_data_train.items():
@@ -78,7 +86,13 @@ def main():
     gaussian_memberships = clf.model_
 
     cm_test, top_confusion_test, confused_data_test = report_figures_of_merit(
-        X_test, y_test, gaussian_memberships, n_unique, start_time, top_n_todo, label="test"
+        X_test,
+        y_test,
+        gaussian_memberships,
+        n_unique,
+        start_time,
+        top_n_todo,
+        label="test",
     )
 
 

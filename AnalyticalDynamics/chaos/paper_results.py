@@ -38,8 +38,13 @@ RESULTS = {
     # narrative that reports the experiment, so it is used.
     ("double", False, "holdout"): {
         "LSTM": (0.26, 0.23),
-        "FFNN": None, "AR": None, "VRNN": None, "GRU": None,
-        "BIRNN": None, "SRNN": None, "MLP": None,
+        "FFNN": None,
+        "AR": None,
+        "VRNN": None,
+        "GRU": None,
+        "BIRNN": None,
+        "SRNN": None,
+        "MLP": None,
     },
     # --- Double pendulum, friction (paper Fig. 12) ---
     ("double", True, "trained"): {

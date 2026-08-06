@@ -54,8 +54,12 @@ import os
 import sys
 import time
 
-for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
-           "NUMEXPR_NUM_THREADS"):
+for _v in (
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+):
     os.environ.setdefault(_v, "1")
 
 # The optimizers package draws a tqdm bar per generation. Across 100+ arm-runs
@@ -87,15 +91,22 @@ STARTED_FROM = {
 
 
 def _one(arm, init, seed, args):
-    prob = PC.build(seed=seed, radius=args.radius, n_train=args.train_rows,
-                    n_test=args.test_rows, top_n=args.top_n, init=init,
-                    components=args.components)
+    prob = PC.build(
+        seed=seed,
+        radius=args.radius,
+        n_train=args.train_rows,
+        n_test=args.test_rows,
+        top_n=args.top_n,
+        init=init,
+        components=args.components,
+    )
     checkpoints = tuple(c for c in CHECKPOINTS if c <= args.budget) or (args.budget,)
     # `.start()` is not optional: it begins the clock and scores x0 off-budget,
     # which is what fills `f0` and `best_x`. Without it every arm reports a
     # 0-dimensional best point and no starting objective.
-    obj = BudgetedObjective(prob.fitness, args.budget, x0=prob.x0,
-                            checkpoints=checkpoints).start()
+    obj = BudgetedObjective(
+        prob.fitness, args.budget, x0=prob.x0, checkpoints=checkpoints
+    ).start()
     error = None
     try:
         A.run(arm, obj, prob, seed)
@@ -121,55 +132,107 @@ def _one(arm, init, seed, args):
             break
 
     return {
-        "arm": arm, "init": init, "seed": seed, "curve": curve,
-        "n_params": prob.n_params, "n_mfs": prob.meta["n_mfs"],
+        "arm": arm,
+        "init": init,
+        "seed": seed,
+        "curve": curve,
+        "n_params": prob.n_params,
+        "n_mfs": prob.meta["n_mfs"],
         "n_train": prob.meta["n_train"],
         "heuristic_obj": prob.heuristic_obj,
         "heuristic_acc": prob.heuristic_score,
         "evals_to_heuristic": evals_to_heuristic,
         "seconds_to_heuristic": seconds_to_heuristic,
-        "obj_0": obj.f0, "obj": obj.best_f,
-        "improvement": obj.improvement(), "beat_start": obj.beat_start(),
-        "acc_0": acc_0, "acc": acc, "err_0": err_0, "err": err,
+        "obj_0": obj.f0,
+        "obj": obj.best_f,
+        "improvement": obj.improvement(),
+        "beat_start": obj.beat_start(),
+        "acc_0": acc_0,
+        "acc": acc,
+        "err_0": err_0,
+        "err": err,
         "n_test": prob.meta["n_test"],
         # The count, not just the rate. Two errors in 48,000 is a rate of
         # 0.00004 and reads as a precise measurement; as "2 errors" it reads as
         # what it is.
         "errors": err * prob.meta["n_test"],
         "errors_0": err_0 * prob.meta["n_test"],
-        "evals": obj.n_evals, "seconds": obj.seconds,
+        "evals": obj.n_evals,
+        "seconds": obj.seconds,
         "construction_seconds": prob.meta["construction_seconds"],
         "screen_seconds": prob.meta["screen_seconds"],
         "init_seconds": prob.meta["init_seconds"],
-        "trace": obj.trace, "error": error,
+        "trace": obj.trace,
+        "error": error,
     }
 
 
 def _write_seeds(records):
     path = os.path.join(C.OUTPUT_DIR, "table_opt_phishing_seeds.csv")
-    C.write_csv(path,
-                ["arm", "init", "seed", "n_train", "n_test", "n_params", "n_mfs",
-                 "obj_0", "obj", "improvement", "beat_start",
-                 "acc_0", "acc", "errors_0", "errors",
-                 "heuristic_acc", "heuristic_obj",
-                 "evals_to_heuristic", "seconds_to_heuristic",
-                 "evals", "seconds", "construction_seconds", "screen_seconds",
-                 "init_seconds", "error"],
-                [[r["arm"], r["init"], r["seed"], r["n_train"], r["n_test"],
-                  r["n_params"],
-                  r["n_mfs"], f"{r['obj_0']:.6f}", f"{r['obj']:.6f}",
-                  f"{r['improvement']:.6f}", int(r["beat_start"]),
-                  f"{r['acc_0']:.6f}", f"{r['acc']:.6f}",
-                  f"{r['errors_0']:.0f}", f"{r['errors']:.0f}",
-                  f"{r['heuristic_acc']:.6f}", f"{r['heuristic_obj']:.6f}",
-                  "" if r["evals_to_heuristic"] is None else r["evals_to_heuristic"],
-                  "" if r["seconds_to_heuristic"] is None
-                  else f"{r['seconds_to_heuristic']:.4f}",
-                  r["evals"], f"{r['seconds']:.3f}",
-                  f"{r['construction_seconds']:.6f}",
-                  f"{r['screen_seconds']:.6f}", f"{r['init_seconds']:.6f}",
-                  r["error"] or ""]
-                 for r in records])
+    C.write_csv(
+        path,
+        [
+            "arm",
+            "init",
+            "seed",
+            "n_train",
+            "n_test",
+            "n_params",
+            "n_mfs",
+            "obj_0",
+            "obj",
+            "improvement",
+            "beat_start",
+            "acc_0",
+            "acc",
+            "errors_0",
+            "errors",
+            "heuristic_acc",
+            "heuristic_obj",
+            "evals_to_heuristic",
+            "seconds_to_heuristic",
+            "evals",
+            "seconds",
+            "construction_seconds",
+            "screen_seconds",
+            "init_seconds",
+            "error",
+        ],
+        [
+            [
+                r["arm"],
+                r["init"],
+                r["seed"],
+                r["n_train"],
+                r["n_test"],
+                r["n_params"],
+                r["n_mfs"],
+                f"{r['obj_0']:.6f}",
+                f"{r['obj']:.6f}",
+                f"{r['improvement']:.6f}",
+                int(r["beat_start"]),
+                f"{r['acc_0']:.6f}",
+                f"{r['acc']:.6f}",
+                f"{r['errors_0']:.0f}",
+                f"{r['errors']:.0f}",
+                f"{r['heuristic_acc']:.6f}",
+                f"{r['heuristic_obj']:.6f}",
+                "" if r["evals_to_heuristic"] is None else r["evals_to_heuristic"],
+                (
+                    ""
+                    if r["seconds_to_heuristic"] is None
+                    else f"{r['seconds_to_heuristic']:.4f}"
+                ),
+                r["evals"],
+                f"{r['seconds']:.3f}",
+                f"{r['construction_seconds']:.6f}",
+                f"{r['screen_seconds']:.6f}",
+                f"{r['init_seconds']:.6f}",
+                r["error"] or "",
+            ]
+            for r in records
+        ],
+    )
     return path
 
 
@@ -178,8 +241,9 @@ def _write_traces(records):
     rows = []
     for r in records:
         for n, secs, value in r["trace"]:
-            rows.append([r["arm"], r["init"], r["seed"], n, f"{secs:.4f}",
-                         f"{value:.6f}"])
+            rows.append(
+                [r["arm"], r["init"], r["seed"], n, f"{secs:.4f}", f"{value:.6f}"]
+            )
     C.write_csv(path, ["arm", "init", "seed", "eval", "seconds", "best_obj"], rows)
     return path
 
@@ -189,45 +253,86 @@ def _write_curve(records):
     rows = []
     for r in records:
         for cp, f_cp, a_cp, secs in r["curve"]:
-            rows.append([r["arm"], r["init"], r["seed"], cp, f"{f_cp:.6f}",
-                         f"{a_cp:.6f}", f"{r['acc_0']:.6f}",
-                         f"{r['heuristic_acc']:.6f}", f"{secs:.3f}"])
-    C.write_csv(path, ["arm", "init", "seed", "budget", "obj", "acc", "acc_0",
-                       "heuristic_acc", "seconds"], rows)
+            rows.append(
+                [
+                    r["arm"],
+                    r["init"],
+                    r["seed"],
+                    cp,
+                    f"{f_cp:.6f}",
+                    f"{a_cp:.6f}",
+                    f"{r['acc_0']:.6f}",
+                    f"{r['heuristic_acc']:.6f}",
+                    f"{secs:.3f}",
+                ]
+            )
+    C.write_csv(
+        path,
+        [
+            "arm",
+            "init",
+            "seed",
+            "budget",
+            "obj",
+            "acc",
+            "acc_0",
+            "heuristic_acc",
+            "seconds",
+        ],
+        rows,
+    )
     return path
 
 
 def _agg(records, key):
-    vals = [r[key] for r in records
-            if r.get(key) is not None and np.isfinite(r[key])]
+    vals = [r[key] for r in records if r.get(key) is not None and np.isfinite(r[key])]
     return C.agg(vals)
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--arms", default=",".join(A.ARMS))
-    ap.add_argument("--init", default="hot,cold",
-                    help="comma-separated: hot, cold, classical-kmeans, classical-fcm")
+    ap.add_argument(
+        "--init",
+        default="hot,cold",
+        help="comma-separated: hot, cold, classical-kmeans, classical-fcm",
+    )
     ap.add_argument("--seeds", default="0,1,2,3,4")
     ap.add_argument("--budget", type=int, default=2000)
     ap.add_argument("--radius", type=float, default=1.0)
-    ap.add_argument("--train-rows", type=int, default=16_000,
-                    help="training rows; sets the cost of an objective "
-                         "evaluation. See problem_cls.py on why this is capped.")
-    ap.add_argument("--test-rows", type=int, default=48_000,
-                    help="test rows, sized independently: PhiUSIIL is saturated, "
-                         "so a small test set cannot resolve the accuracy column")
+    ap.add_argument(
+        "--train-rows",
+        type=int,
+        default=16_000,
+        help="training rows; sets the cost of an objective "
+        "evaluation. See problem_cls.py on why this is capped.",
+    )
+    ap.add_argument(
+        "--test-rows",
+        type=int,
+        default=48_000,
+        help="test rows, sized independently: PhiUSIIL is saturated, "
+        "so a small test set cannot resolve the accuracy column",
+    )
     ap.add_argument("--top-n", type=int, default=10)
-    ap.add_argument("--components", type=int, default=None,
-                    help="pin components per (feature, class); default lets the "
-                         "construction choose by BIC")
+    ap.add_argument(
+        "--components",
+        type=int,
+        default=None,
+        help="pin components per (feature, class); default lets the "
+        "construction choose by BIC",
+    )
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--archive", metavar="LABEL")
-    ap.add_argument("--reemit-timing", metavar="LABEL",
-                    help="rebuild the timing table from an existing archive's "
-                         "seeds CSV and write it back, without re-running "
-                         "anything. Every column it needs is in that CSV.")
+    ap.add_argument(
+        "--reemit-timing",
+        metavar="LABEL",
+        help="rebuild the timing table from an existing archive's "
+        "seeds CSV and write it back, without re-running "
+        "anything. Every column it needs is in that CSV.",
+    )
     args = ap.parse_args()
 
     if args.reemit_timing:
@@ -245,10 +350,12 @@ def main():
     if unknown:
         raise SystemExit(f"unknown arms: {unknown}; have {sorted(A.ARMS)}")
 
-    print(f"phishing optimizer study: train={args.train_rows}, "
-          f"test={args.test_rows}, top_n={args.top_n}, "
-          f"budget={args.budget}, radius={args.radius}, seeds={seeds}, "
-          f"arms={arm_names}, init={inits}, threads=1")
+    print(
+        f"phishing optimizer study: train={args.train_rows}, "
+        f"test={args.test_rows}, top_n={args.top_n}, "
+        f"budget={args.budget}, radius={args.radius}, seeds={seeds}, "
+        f"arms={arm_names}, init={inits}, threads=1"
+    )
 
     records = []
     wall0 = time.perf_counter()
@@ -258,15 +365,20 @@ def main():
                 rec = _one(arm, init, seed, args)
                 records.append(rec)
                 _write_seeds(records)
-                match = ("—" if rec["seconds_to_heuristic"] is None
-                         else f"{rec['seconds_to_heuristic']:.1f}s"
-                              f" @{rec['evals_to_heuristic']}")
-                print(f"  [{init}] {arm:<14} seed {seed}: "
-                      f"obj {rec['obj_0']:.5f} -> {rec['obj']:.5f}   "
-                      f"acc {rec['acc_0']:.4f} -> {rec['acc']:.4f}   "
-                      f"{rec['seconds']:6.1f}s / {rec['evals']} evals   "
-                      f"match {match}"
-                      + (f"   ERROR {rec['error']}" if rec["error"] else ""))
+                match = (
+                    "—"
+                    if rec["seconds_to_heuristic"] is None
+                    else f"{rec['seconds_to_heuristic']:.1f}s"
+                    f" @{rec['evals_to_heuristic']}"
+                )
+                print(
+                    f"  [{init}] {arm:<14} seed {seed}: "
+                    f"obj {rec['obj_0']:.5f} -> {rec['obj']:.5f}   "
+                    f"acc {rec['acc_0']:.4f} -> {rec['acc']:.4f}   "
+                    f"{rec['seconds']:6.1f}s / {rec['evals']} evals   "
+                    f"match {match}"
+                    + (f"   ERROR {rec['error']}" if rec["error"] else "")
+                )
     print(f"  total wall-clock: {(time.perf_counter() - wall0) / 60:.1f} min")
 
     _write_traces(records)
@@ -278,10 +390,15 @@ def main():
     return 0
 
 
-ARTIFACTS = ["table_opt_phishing.md", "table_opt_phishing.csv",
-             "table_opt_phishing_timing.md", "table_opt_phishing_timing.csv",
-             "table_opt_phishing_seeds.csv", "table_opt_phishing_traces.csv",
-             "table_opt_phishing_budget.csv"]
+ARTIFACTS = [
+    "table_opt_phishing.md",
+    "table_opt_phishing.csv",
+    "table_opt_phishing_timing.md",
+    "table_opt_phishing_timing.csv",
+    "table_opt_phishing_seeds.csv",
+    "table_opt_phishing_traces.csv",
+    "table_opt_phishing_budget.csv",
+]
 
 
 def _emit(records, args, seeds, inits, arm_names):
@@ -299,49 +416,74 @@ def _emit(records, args, seeds, inits, arm_names):
             paired = [r["acc"] - r["heuristic_acc"] for r in sel]
             wins = sum(1 for d in paired if d > 0)
             reached = [r for r in sel if r["seconds_to_heuristic"] is not None]
-            rows.append([
-                init, arm, STARTED_FROM.get(init, init),
-                C.cell([r["obj"] for r in sel], fmt="{:.5f}"),
-                C.cell([r["acc"] for r in sel], fmt="{:.4f}"),
-                C.cell([r["errors"] for r in sel], fmt="{:.0f}"),
-                C.cell(paired, fmt="{:+.4f}"),
-                f"{wins}/{len(sel)}",
-                (C.cell([r["seconds_to_heuristic"] for r in reached], fmt="{:.1f}")
-                 + (f" ({len(reached)}/{len(sel)})" if len(reached) < len(sel) else "")
-                 if reached else "never"),
-                C.cell([r["seconds"] for r in sel], fmt="{:.1f}"),
-            ])
+            rows.append(
+                [
+                    init,
+                    arm,
+                    STARTED_FROM.get(init, init),
+                    C.cell([r["obj"] for r in sel], fmt="{:.5f}"),
+                    C.cell([r["acc"] for r in sel], fmt="{:.4f}"),
+                    C.cell([r["errors"] for r in sel], fmt="{:.0f}"),
+                    C.cell(paired, fmt="{:+.4f}"),
+                    f"{wins}/{len(sel)}",
+                    (
+                        C.cell(
+                            [r["seconds_to_heuristic"] for r in reached], fmt="{:.1f}"
+                        )
+                        + (
+                            f" ({len(reached)}/{len(sel)})"
+                            if len(reached) < len(sel)
+                            else ""
+                        )
+                        if reached
+                        else "never"
+                    ),
+                    C.cell([r["seconds"] for r in sel], fmt="{:.1f}"),
+                ]
+            )
 
     C.emit(
         "table_opt_phishing",
         f"Optimizer study on PhiUSIIL — the construction as a starting point "
         f"({n_train:,} training rows, {args.top_n} features)",
-        ["init", "arm", "started from", "objective", "test accuracy",
-         "test errors", "Δ accuracy vs construction (paired)", "acc wins",
-         "seconds to match the construction", "seconds spent"],
+        [
+            "init",
+            "arm",
+            "started from",
+            "objective",
+            "test accuracy",
+            "test errors",
+            "Δ accuracy vs construction (paired)",
+            "acc wins",
+            "seconds to match the construction",
+            "seconds spent",
+        ],
         rows,
-        note=(f"Binary classification, so the construction gives **one rule per "
-              f"class** and the rule count is not a free parameter; what is free "
-              f"is the {n_mfs} membership functions' placement, i.e. "
-              f"{n_params} antecedent parameters. The objective is the shipped "
-              f"classifier fitness — `refine._make_classifier_fitness`, training "
-              f"cross-entropy plus a ridge shrink toward each arm's own `x0` at "
-              f"`l2_shrink={PC.L2_SHRINK}` — imported rather than reimplemented, "
-              f"because an optimizer measured against a target the shipped code "
-              f"does not use is measuring nothing anybody runs. **It is a "
-              f"training loss**, so `test accuracy` is the only outcome column to "
-              f"quote and the gap between the two is the point. Budget: "
-              f"**{args.budget} objective evaluations** per arm per seed, "
-              f"enforced by a wrapper that raises. Trust-region radius "
-              f"{args.radius} ({'the full box' if args.radius >= 1.0 else 'shrunk around x0'}). "
-              f"{args.train_rows:,} training rows and {args.test_rows:,} test "
-              f"rows, sized independently over one stratified split: training "
-              f"size sets the cost of an evaluation, test size sets the "
-              f"resolution of the accuracy column, and PhiUSIIL is saturated "
-              f"enough that a small test set cannot separate two good models. "
-              f"Applied identically to every arm and reported — not the "
-              f"invisible cap `fit_gaussians` used to apply. Single-threaded. "
-              f"Seeds: {','.join(map(str, seeds))}."))
+        note=(
+            f"Binary classification, so the construction gives **one rule per "
+            f"class** and the rule count is not a free parameter; what is free "
+            f"is the {n_mfs} membership functions' placement, i.e. "
+            f"{n_params} antecedent parameters. The objective is the shipped "
+            f"classifier fitness — `refine._make_classifier_fitness`, training "
+            f"cross-entropy plus a ridge shrink toward each arm's own `x0` at "
+            f"`l2_shrink={PC.L2_SHRINK}` — imported rather than reimplemented, "
+            f"because an optimizer measured against a target the shipped code "
+            f"does not use is measuring nothing anybody runs. **It is a "
+            f"training loss**, so `test accuracy` is the only outcome column to "
+            f"quote and the gap between the two is the point. Budget: "
+            f"**{args.budget} objective evaluations** per arm per seed, "
+            f"enforced by a wrapper that raises. Trust-region radius "
+            f"{args.radius} ({'the full box' if args.radius >= 1.0 else 'shrunk around x0'}). "
+            f"{args.train_rows:,} training rows and {args.test_rows:,} test "
+            f"rows, sized independently over one stratified split: training "
+            f"size sets the cost of an evaluation, test size sets the "
+            f"resolution of the accuracy column, and PhiUSIIL is saturated "
+            f"enough that a small test set cannot separate two good models. "
+            f"Applied identically to every arm and reported — not the "
+            f"invisible cap `fit_gaussians` used to apply. Single-threaded. "
+            f"Seeds: {','.join(map(str, seeds))}."
+        ),
+    )
 
     _emit_timing(records, inits, arm_names)
 
@@ -359,12 +501,22 @@ def _emit_timing(records, inits, arm_names):
     # property of the method.
     trows = []
     if ref:
-        trows.append(["the construction itself", "—",
-                      C.cell([1000 * r["construction_seconds"] for r in ref],
-                             fmt="{:.0f}"), "—"])
-        trows.append(["feature engineering (shared, not training)", "—",
-                      C.cell([1000 * r["screen_seconds"] for r in ref],
-                             fmt="{:.0f}"), "—"])
+        trows.append(
+            [
+                "the construction itself",
+                "—",
+                C.cell([1000 * r["construction_seconds"] for r in ref], fmt="{:.0f}"),
+                "—",
+            ]
+        )
+        trows.append(
+            [
+                "feature engineering (shared, not training)",
+                "—",
+                C.cell([1000 * r["screen_seconds"] for r in ref], fmt="{:.0f}"),
+                "—",
+            ]
+        )
     for init in inits:
         for arm in arm_names:
             if arm == "none":
@@ -377,41 +529,62 @@ def _emit_timing(records, inits, arm_names):
             if init == "hot":
                 # A hot arm begins at the construction. "0x" is arithmetically
                 # true and reads as a measured speedup, which it is not.
-                trows.append([f"{init} · {arm}", "starts there",
-                              C.cell([1000 * r["seconds"] for r in sel],
-                                     fmt="{:.0f}"), "—"])
+                trows.append(
+                    [
+                        f"{init} · {arm}",
+                        "starts there",
+                        C.cell([1000 * r["seconds"] for r in sel], fmt="{:.0f}"),
+                        "—",
+                    ]
+                )
                 continue
             if reached and ref:
                 base = float(np.mean([r["construction_seconds"] for r in ref]))
                 mean = float(np.mean([r["seconds_to_heuristic"] for r in reached]))
                 if base > 0:
                     ratio = f"{mean / base:,.0f}×"
-            trows.append([
-                f"{init} · {arm}",
-                C.cell([1000 * r["seconds_to_heuristic"] for r in reached],
-                       fmt="{:.0f}") if reached else "never",
-                C.cell([1000 * r["seconds"] for r in sel], fmt="{:.0f}"),
-                ratio,
-            ])
+            trows.append(
+                [
+                    f"{init} · {arm}",
+                    (
+                        C.cell(
+                            [1000 * r["seconds_to_heuristic"] for r in reached],
+                            fmt="{:.0f}",
+                        )
+                        if reached
+                        else "never"
+                    ),
+                    C.cell([1000 * r["seconds"] for r in sel], fmt="{:.0f}"),
+                    ratio,
+                ]
+            )
 
     C.emit(
         "table_opt_phishing_timing",
         "PhiUSIIL optimizer study — wall-clock, single-threaded",
-        ["what", "to match the construction (ms)", "full budget (ms)",
-         "cost of matching, ÷ the construction"],
+        [
+            "what",
+            "to match the construction (ms)",
+            "full budget (ms)",
+            "cost of matching, ÷ the construction",
+        ],
         trows,
-        note=("The construction's own cost against what a search costs to reach "
-              "the same objective value — the same quantity in the same units, "
-              "which is the comparison the 'how much faster' claim needs. "
-              "`never` means the arm did not reach the construction's objective "
-              "inside the budget, which for a **hot** start is expected: it "
-              "begins there. Read the hot rows as the cost of *improving on* the "
-              "construction and the cold rows as the cost of *reaching* it. "
-              "Absolute milliseconds are machine-dependent and the machine is "
-              "recorded below; the ratio column is the portable part. "
-              "Single-threaded throughout, so no arm can buy time with cores — "
-              "which also means an optimizer that parallelises well gets no "
-              "credit here."))
+        note=(
+            "The construction's own cost against what a search costs to reach "
+            "the same objective value — the same quantity in the same units, "
+            "which is the comparison the 'how much faster' claim needs. "
+            "`never` means the arm did not reach the construction's objective "
+            "inside the budget, which for a **hot** start is expected: it "
+            "begins there. Read the hot rows as the cost of *improving on* the "
+            "construction and the cold rows as the cost of *reaching* it. "
+            "Absolute milliseconds are machine-dependent and the machine is "
+            "recorded below; the ratio column is the portable part. "
+            "Single-threaded throughout, so no arm can buy time with cores — "
+            "which also means an optimizer that parallelises well gets no "
+            "credit here."
+        ),
+    )
+
 
 def _reemit_timing(label, args):
     """Rebuild one archive's timing table from its own seeds CSV.
@@ -441,14 +614,20 @@ def _reemit_timing(label, args):
     records = []
     for r in rows:
         stoh = num(r, "seconds_to_heuristic")
-        records.append({
-            "arm": r["arm"], "init": r["init"], "seed": r["seed"],
-            "seconds": num(r, "seconds") or 0.0,
-            "seconds_to_heuristic": stoh,
-            "construction_seconds": num(r, "construction_seconds") or 0.0,
-            "screen_seconds": num(r, "screen_seconds") or 0.0,
-            "n_params": 0, "n_mfs": 0, "n_train": 0,
-        })
+        records.append(
+            {
+                "arm": r["arm"],
+                "init": r["init"],
+                "seed": r["seed"],
+                "seconds": num(r, "seconds") or 0.0,
+                "seconds_to_heuristic": stoh,
+                "construction_seconds": num(r, "construction_seconds") or 0.0,
+                "screen_seconds": num(r, "screen_seconds") or 0.0,
+                "n_params": 0,
+                "n_mfs": 0,
+                "n_train": 0,
+            }
+        )
     inits = list(dict.fromkeys(r["init"] for r in records))
     arm_names = list(dict.fromkeys(r["arm"] for r in records))
     _emit_timing(records, inits, arm_names)
@@ -457,15 +636,17 @@ def _reemit_timing(label, args):
         if os.path.exists(out):
             shutil.copy2(out, os.path.join(dest, name))
     with open(os.path.join(dest, "PROVENANCE.txt"), "a") as f:
-        f.write("\n"
-                "NOTE, appended after the run\n"
-                "---------------------------\n"
-                "table_opt_phishing_timing.{md,csv} were re-emitted from this\n"
-                "archive's own table_opt_phishing_seeds.csv via --reemit-timing.\n"
-                "No measurement changed. Two rendering faults were fixed: the\n"
-                "ratio column used medians while the column beside it used\n"
-                "mean +/- s.d., and the hot rows read '0'/'0x' where the truth is\n"
-                "that a hot arm starts at the construction.\n")
+        f.write(
+            "\n"
+            "NOTE, appended after the run\n"
+            "---------------------------\n"
+            "table_opt_phishing_timing.{md,csv} were re-emitted from this\n"
+            "archive's own table_opt_phishing_seeds.csv via --reemit-timing.\n"
+            "No measurement changed. Two rendering faults were fixed: the\n"
+            "ratio column used medians while the column beside it used\n"
+            "mean +/- s.d., and the hot rows read '0'/'0x' where the truth is\n"
+            "that a hot arm starts at the construction.\n"
+        )
     print(f"  re-emitted timing table -> {os.path.relpath(dest, ROOT)}")
     return 0
 
@@ -473,21 +654,27 @@ def _reemit_timing(label, args):
 def _archive(label, args, seeds, inits, arm_names):
     import shutil
     import subprocess
+
     dest = os.path.join(C.OUTPUT_DIR, label)
     os.makedirs(dest, exist_ok=True)
 
     def sha(path):
         try:
-            rev = subprocess.run(["git", "-C", path, "rev-parse", "HEAD"],
-                                 capture_output=True, text=True,
-                                 check=True).stdout.strip()
+            rev = subprocess.run(
+                ["git", "-C", path, "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
         except Exception:  # noqa: BLE001
             return "unknown"
         try:
-            dirty = subprocess.run(["git", "-C", path, "status", "--porcelain",
-                                    "--untracked-files=no"],
-                                   capture_output=True, text=True,
-                                   check=True).stdout.strip()
+            dirty = subprocess.run(
+                ["git", "-C", path, "status", "--porcelain", "--untracked-files=no"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
         except Exception:  # noqa: BLE001
             return rev
         return f"{rev}-dirty" if dirty else rev

@@ -39,7 +39,9 @@ class OdeSystem(ABC):
         """
         pass
 
-    def simulate(self, state0, duration: float, dt: float, include_derivatives: bool = False) -> pd.DataFrame:
+    def simulate(
+        self, state0, duration: float, dt: float, include_derivatives: bool = False
+    ) -> pd.DataFrame:
         """
         Simulate the ODE system from initial conditions.
 

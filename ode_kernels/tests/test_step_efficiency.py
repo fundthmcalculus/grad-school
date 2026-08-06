@@ -34,8 +34,13 @@ def _decay(t, y):
 def test_higher_order_methods_are_not_pathologically_conservative():
     rtol, atol = 1e-8, 1e-11
     naccept = {}
-    for name, solver in [("ode23", ode23), ("ode45", ode45), ("ode56", ode56),
-                          ("ode67", ode67), ("ode78", ode78)]:
+    for name, solver in [
+        ("ode23", ode23),
+        ("ode45", ode45),
+        ("ode56", ode56),
+        ("ode67", ode67),
+        ("ode78", ode78),
+    ]:
         res = solver(_decay, (0.0, 5.0), [1.0], rtol=rtol, atol=atol)
         assert res.success
         naccept[name] = res.naccept

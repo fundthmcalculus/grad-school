@@ -32,6 +32,7 @@ roughly 10-15 more -- expect ~15-20 minutes end to end. A `timeout 590`
 wrapper will kill this mid-part-3; run detached/backgrounded or with a
 longer or no wrapper timeout if reproducing the full output.
 """
+
 import time
 from pathlib import Path
 
@@ -40,18 +41,30 @@ import pandas as pd
 from sklearn.metrics import r2_score
 
 from test_fuzzy_ode import initialize_model
-from n_pendulum_fuzzy_regression import (generate_family, load_mimo_data, train_mimo,
-                                          run_iterative_prediction)
-from n2_moving_average_fuzzy import (generate_training_set as ma_generate_training_set,
-                                      build_dataset as ma_build_dataset,
-                                      rollout as ma_rollout, INPUT_COLS as MA_INPUT_COLS,
-                                      FEATURE_NAMES as MA_FEATURE_NAMES)
-from n2_physics_informed_v2_rational import (build_dataset as phys2_build_dataset,
-                                              rational_basis_features, ALPHA1_COLS, ALPHA2_COLS,
-                                              RATIONAL_BASIS_COLS)
+from n_pendulum_fuzzy_regression import (
+    generate_family,
+    load_mimo_data,
+    train_mimo,
+    run_iterative_prediction,
+)
+from n2_moving_average_fuzzy import (
+    generate_training_set as ma_generate_training_set,
+    build_dataset as ma_build_dataset,
+    rollout as ma_rollout,
+    INPUT_COLS as MA_INPUT_COLS,
+    FEATURE_NAMES as MA_FEATURE_NAMES,
+)
+from n2_physics_informed_v2_rational import (
+    build_dataset as phys2_build_dataset,
+    rational_basis_features,
+    ALPHA1_COLS,
+    ALPHA2_COLS,
+    RATIONAL_BASIS_COLS,
+)
 from n_pendulum_physics_basis import derive_physics_basis, compute_features, state_cols
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "tribble-fis" / "src"))
 from tribblefis.gaussian_regressor import MimoGaussianPredictor
 
@@ -79,11 +92,18 @@ def part1_physics_basis_r2_vs_buckets():
     X_test_df = pd.DataFrame(X_test, columns=RATIONAL_BASIS_COLS)[ALPHA1_COLS]
 
     for nb in [2, 3, 5] + BUCKET_COUNTS[1:]:
-        reg = MimoGaussianPredictor(n_output_buckets=nb, tsk_order="1st",
-                                     optimize_coefficients=True, random_state=42, top_p=1.0)
-        reg.fit(X_train_df, pd.DataFrame(y_train[:, 0], columns=['omega_1']))
+        reg = MimoGaussianPredictor(
+            n_output_buckets=nb,
+            tsk_order="1st",
+            optimize_coefficients=True,
+            random_state=42,
+            top_p=1.0,
+        )
+        reg.fit(X_train_df, pd.DataFrame(y_train[:, 0], columns=["omega_1"]))
         pred = reg.predict(X_test_df)
-        print(f"  n_output_buckets={nb}: R2={r2_score(y_test[:, 0], pred['omega_1']):.4f}")
+        print(
+            f"  n_output_buckets={nb}: R2={r2_score(y_test[:, 0], pred['omega_1']):.4f}"
+        )
 
 
 def part2_blackbox_sweep():
@@ -94,46 +114,76 @@ def part2_blackbox_sweep():
     tst = test_results.trajectories[0]
 
     def sweep(feature_names, label):
-        Xtr, ytr = load_mimo_data(train_results.trajectories, feature_names, window_size=1)
+        Xtr, ytr = load_mimo_data(
+            train_results.trajectories, feature_names, window_size=1
+        )
         Xte, yte = load_mimo_data([tst], feature_names, window_size=1)
         seed = tst[feature_names].iloc[:1].reset_index(drop=True)
         print(f"\n  {label}:")
         for nb in BUCKET_COUNTS:
-            res = train_mimo(feature_names, Xtr, ytr, Xte, yte, window_size=1, n_bins=nb)
-            pred = run_iterative_prediction(res['regressor'], seed, feature_names, len(tst) - 1, window_size=1)
+            res = train_mimo(
+                feature_names, Xtr, ytr, Xte, yte, window_size=1, n_bins=nb
+            )
+            pred = run_iterative_prediction(
+                res["regressor"], seed, feature_names, len(tst) - 1, window_size=1
+            )
             t = np.arange(len(pred)) * DT
-            err = np.abs(pred['theta_1'].values - tst['theta_1'].values[:len(pred)])
+            err = np.abs(pred["theta_1"].values - tst["theta_1"].values[: len(pred)])
             print(f"    n_bins={nb}: time-to-0.5rad={time_to_threshold(t, err)}")
 
-    sweep(['theta_1', 'theta_2'], 'n=2 angle-only')
-    sweep(['theta_1', 'omega_1', 'theta_2', 'omega_2'], 'n=2 angle+velocity')
+    sweep(["theta_1", "theta_2"], "n=2 angle-only")
+    sweep(["theta_1", "omega_1", "theta_2", "omega_2"], "n=2 angle+velocity")
 
     print("\n  n=2 moving-average (101 traj):")
     pendulum, trajectories, test_trajectory, _grid = ma_generate_training_set()
     X_train, y_train = ma_build_dataset(trajectories)
     X_test, y_test = ma_build_dataset([test_trajectory])
     for nb in BUCKET_COUNTS:
-        regr = MimoGaussianPredictor(n_output_buckets=nb, tsk_order="1st",
-                                      optimize_coefficients=True, random_state=42)
-        regr.fit(pd.DataFrame(X_train, columns=MA_INPUT_COLS), pd.DataFrame(y_train, columns=MA_FEATURE_NAMES))
+        regr = MimoGaussianPredictor(
+            n_output_buckets=nb,
+            tsk_order="1st",
+            optimize_coefficients=True,
+            random_state=42,
+        )
+        regr.fit(
+            pd.DataFrame(X_train, columns=MA_INPUT_COLS),
+            pd.DataFrame(y_train, columns=MA_FEATURE_NAMES),
+        )
         pred = ma_rollout(regr, test_trajectory, dt=DT)
         t = np.arange(len(pred)) * DT
-        err = np.abs(pred['theta_1'].values - test_trajectory['theta_1'].values[:len(pred)])
+        err = np.abs(
+            pred["theta_1"].values - test_trajectory["theta_1"].values[: len(pred)]
+        )
         print(f"    n_bins={nb}: time-to-0.5rad={time_to_threshold(t, err)}")
 
     print("\n  n=3 angle-only (fan configuration):")
-    family = generate_family(3, [120.0, 60.0, 0.0], 2, np.arange(1.5, 3.00001, 0.1),
-                              test_delta_deg=2.05, dt=DT, duration=30.0)
-    feature_names = ['theta_1', 'theta_2', 'theta_3']
+    family = generate_family(
+        3,
+        [120.0, 60.0, 0.0],
+        2,
+        np.arange(1.5, 3.00001, 0.1),
+        test_delta_deg=2.05,
+        dt=DT,
+        duration=30.0,
+    )
+    feature_names = ["theta_1", "theta_2", "theta_3"]
     Xtr, ytr = load_mimo_data(family.train_trajectories, feature_names, window_size=1)
     Xte, yte = load_mimo_data([family.test_trajectory], feature_names, window_size=1)
     seed = family.test_trajectory[feature_names].iloc[:1].reset_index(drop=True)
     for nb in BUCKET_COUNTS:
         res = train_mimo(feature_names, Xtr, ytr, Xte, yte, window_size=1, n_bins=nb)
-        pred = run_iterative_prediction(res['regressor'], seed, feature_names,
-                                         len(family.test_trajectory) - 1, window_size=1)
+        pred = run_iterative_prediction(
+            res["regressor"],
+            seed,
+            feature_names,
+            len(family.test_trajectory) - 1,
+            window_size=1,
+        )
         t = np.arange(len(pred)) * DT
-        err = np.abs(pred['theta_1'].values - family.test_trajectory['theta_1'].values[:len(pred)])
+        err = np.abs(
+            pred["theta_1"].values
+            - family.test_trajectory["theta_1"].values[: len(pred)]
+        )
         print(f"    n_bins={nb}: time-to-0.5rad={time_to_threshold(t, err)}")
 
 
@@ -149,40 +199,60 @@ def part3_physics_informed_fuzzy_sweep():
     l1, l2, m1, m2 = pendulum.l1, pendulum.l2, pendulum.m1, pendulum.m2
     X_train, y_train = phys2_build_dataset(train_results.trajectories, l1, l2, m1, m2)
     X_train_df = pd.DataFrame(X_train, columns=RATIONAL_BASIS_COLS)
-    y_train_df = pd.DataFrame(y_train, columns=['omega_1', 'omega_2'])
+    y_train_df = pd.DataFrame(y_train, columns=["omega_1", "omega_2"])
 
     class FuzzyPhysicsRegressor2:
         def __init__(self, nb):
-            self.r1 = MimoGaussianPredictor(n_output_buckets=nb, tsk_order="1st",
-                                             optimize_coefficients=True, random_state=42, top_p=1.0)
-            self.r2 = MimoGaussianPredictor(n_output_buckets=nb, tsk_order="1st",
-                                             optimize_coefficients=True, random_state=42, top_p=1.0)
+            self.r1 = MimoGaussianPredictor(
+                n_output_buckets=nb,
+                tsk_order="1st",
+                optimize_coefficients=True,
+                random_state=42,
+                top_p=1.0,
+            )
+            self.r2 = MimoGaussianPredictor(
+                n_output_buckets=nb,
+                tsk_order="1st",
+                optimize_coefficients=True,
+                random_state=42,
+                top_p=1.0,
+            )
 
         def fit(self, Xdf, ydf):
-            self.r1.fit(Xdf[ALPHA1_COLS], ydf[['omega_1']])
-            self.r2.fit(Xdf[ALPHA2_COLS], ydf[['omega_2']])
+            self.r1.fit(Xdf[ALPHA1_COLS], ydf[["omega_1"]])
+            self.r2.fit(Xdf[ALPHA2_COLS], ydf[["omega_2"]])
             return self
 
         def predict(self, Xdf):
             p1 = self.r1.predict(Xdf[ALPHA1_COLS])
             p2 = self.r2.predict(Xdf[ALPHA2_COLS])
-            return pd.DataFrame({'omega_1': p1['omega_1'].values, 'omega_2': p2['omega_2'].values})
+            return pd.DataFrame(
+                {"omega_1": p1["omega_1"].values, "omega_2": p2["omega_2"].values}
+            )
 
     def rollout2(regressor, test_trajectory, n_steps=None):
-        state_cols_ = ['theta_1', 'omega_1', 'theta_2', 'omega_2']
+        state_cols_ = ["theta_1", "omega_1", "theta_2", "omega_2"]
         state = test_trajectory[state_cols_].iloc[0].copy()
         total_steps = n_steps if n_steps is not None else len(test_trajectory) - 1
         rows = [state.to_dict()]
         for step in range(total_steps):
-            x_now = rational_basis_features(pd.DataFrame([state.to_dict()]), l1, l2, m1, m2)
+            x_now = rational_basis_features(
+                pd.DataFrame([state.to_dict()]), l1, l2, m1, m2
+            )
             delta_omega = regressor.predict(x_now).iloc[0]
-            omega1_new = state['omega_1'] + delta_omega['omega_1']
-            omega2_new = state['omega_2'] + delta_omega['omega_2']
-            theta1_new = state['theta_1'] + omega1_new * DT
-            theta2_new = state['theta_2'] + omega2_new * DT
-            new_state = {'theta_1': theta1_new, 'omega_1': omega1_new,
-                         'theta_2': theta2_new, 'omega_2': omega2_new}
-            if not np.isfinite(list(new_state.values())).all() or any(abs(v) > 1e4 for v in new_state.values()):
+            omega1_new = state["omega_1"] + delta_omega["omega_1"]
+            omega2_new = state["omega_2"] + delta_omega["omega_2"]
+            theta1_new = state["theta_1"] + omega1_new * DT
+            theta2_new = state["theta_2"] + omega2_new * DT
+            new_state = {
+                "theta_1": theta1_new,
+                "omega_1": omega1_new,
+                "theta_2": theta2_new,
+                "omega_2": omega2_new,
+            }
+            if not np.isfinite(list(new_state.values())).all() or any(
+                abs(v) > 1e4 for v in new_state.values()
+            ):
                 for _ in range(total_steps - step):
                     rows.append({c: np.nan for c in state_cols_})
                 break
@@ -194,15 +264,22 @@ def part3_physics_informed_fuzzy_sweep():
         reg = FuzzyPhysicsRegressor2(nb).fit(X_train_df, y_train_df)
         pred = rollout2(reg, tst)
         t = np.arange(len(pred)) * DT
-        err = np.abs(pred['theta_1'].values - tst['theta_1'].values[:len(pred)])
+        err = np.abs(pred["theta_1"].values - tst["theta_1"].values[: len(pred)])
         print(f"    n_output_buckets={nb}: time-to-0.5rad={time_to_threshold(t, err)}")
 
     print("\n  n=3:")
     n = 3
     theta_cols, omega_cols = state_cols(n)
     basis = derive_physics_basis(n, (1.0, 1.0, 1.0), (1.0, 1.0, 1.0), 9.81)
-    family = generate_family(n, [120.0, 60.0, 0.0], 2, np.arange(1.5, 3.00001, 0.1),
-                              test_delta_deg=2.05, dt=DT, duration=30.0)
+    family = generate_family(
+        n,
+        [120.0, 60.0, 0.0],
+        2,
+        np.arange(1.5, 3.00001, 0.1),
+        test_delta_deg=2.05,
+        dt=DT,
+        duration=30.0,
+    )
 
     def build3(trajectories):
         all_X = [[] for _ in range(n)]
@@ -221,14 +298,24 @@ def part3_physics_informed_fuzzy_sweep():
     class FuzzyPhysicsRegressorN:
         def __init__(self, n, nb):
             self.n = n
-            self.models = [MimoGaussianPredictor(n_output_buckets=nb, tsk_order="1st",
-                                                  optimize_coefficients=True, random_state=42, top_p=1.0)
-                           for _ in range(n)]
+            self.models = [
+                MimoGaussianPredictor(
+                    n_output_buckets=nb,
+                    tsk_order="1st",
+                    optimize_coefficients=True,
+                    random_state=42,
+                    top_p=1.0,
+                )
+                for _ in range(n)
+            ]
 
         def fit(self, Xs, y):
             for i in range(self.n):
-                cols = [f'f{j}' for j in range(Xs[i].shape[1])]
-                self.models[i].fit(pd.DataFrame(Xs[i], columns=cols), pd.DataFrame(y[:, i], columns=['omega']))
+                cols = [f"f{j}" for j in range(Xs[i].shape[1])]
+                self.models[i].fit(
+                    pd.DataFrame(Xs[i], columns=cols),
+                    pd.DataFrame(y[:, i], columns=["omega"]),
+                )
             return self
 
         def predict_row(self, theta_row, omega_row):
@@ -237,9 +324,9 @@ def part3_physics_informed_fuzzy_sweep():
             _denom, feats = compute_features(basis, theta_arrs, omega_arrs)
             out = []
             for i in range(self.n):
-                cols = [f'f{j}' for j in range(feats[i].shape[1])]
+                cols = [f"f{j}" for j in range(feats[i].shape[1])]
                 p = self.models[i].predict(pd.DataFrame(feats[i], columns=cols))
-                out.append(p['omega'].values[0])
+                out.append(p["omega"].values[0])
             return np.array(out)
 
     def rollout3(reg, test_trajectory, n_steps=None):
@@ -264,11 +351,14 @@ def part3_physics_informed_fuzzy_sweep():
         reg = FuzzyPhysicsRegressorN(n, nb).fit(X_train3, y_train3)
         pred = rollout3(reg, family.test_trajectory)
         t = np.arange(len(pred)) * DT
-        err = np.abs(pred['theta_1'].values - family.test_trajectory['theta_1'].values[:len(pred)])
+        err = np.abs(
+            pred["theta_1"].values
+            - family.test_trajectory["theta_1"].values[: len(pred)]
+        )
         print(f"    n_output_buckets={nb}: time-to-0.5rad={time_to_threshold(t, err)}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     t0 = time.perf_counter()
     part1_physics_basis_r2_vs_buckets()
     part2_blackbox_sweep()

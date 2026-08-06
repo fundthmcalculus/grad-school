@@ -75,8 +75,9 @@ PROBE = fts.FisConfig(n_output_buckets=120, tsk_order="full-2nd", l2_reg=1e-9)
 #: 300). Quantile partitioning is the documented workaround, and it is applied to
 #: every representation rather than only to sin/cos so that the partition is not a
 #: second thing changing between rows.
-PROBE_REPR = fts.FisConfig(n_output_buckets=120, tsk_order="full-2nd",
-                           l2_reg=1e-9, output_partition="quantile")
+PROBE_REPR = fts.FisConfig(
+    n_output_buckets=120, tsk_order="full-2nd", l2_reg=1e-9, output_partition="quantile"
+)
 
 DATASETS = [(2, False), (3, False), (5, False), (5, True), (2, True), (3, True)]
 
@@ -226,15 +227,19 @@ def evaluate(split, limit_deg, cfg=PROBE):
         "wrap_limit_deg": "none" if limit_deg is None else f"{limit_deg:.0f}",
         "config": cfg.key(),
         "train_seconds": round(fit_s, 1),
-        "target_range_deg": round(float(np.max(ws.ranges[:, :, 1] - ws.ranges[:, :, 0])), 1),
+        "target_range_deg": round(
+            float(np.max(ws.ranges[:, :, 1] - ws.ranges[:, :, 0])), 1
+        ),
         "wrap_events_train": discontinuities(ws.theta_deg),
         "wrap_events_holdout": discontinuities(ws.holdout_theta_deg),
         "inwindow_rmse_scaled": round(res.holdout_ic["rmse"], 5),
         "inwindow_r2": round(res.holdout_ic["r2"], 5),
         "inwindow_rmse_circ_deg": round(
-            circular_rmse_deg(pred["pred_deg"][inw], truth_unwrapped[inw]), 3),
+            circular_rmse_deg(pred["pred_deg"][inw], truth_unwrapped[inw]), 3
+        ),
         "extrap_rmse_circ_deg": round(
-            circular_rmse_deg(pred["pred_deg"][~inw], truth_unwrapped[~inw]), 3),
+            circular_rmse_deg(pred["pred_deg"][~inw], truth_unwrapped[~inw]), 3
+        ),
     }
 
 
@@ -247,8 +252,12 @@ def wrapped_split_hyst(split, limit_deg):
     lo, hi = h_range[:, 0][None, :], h_range[:, 1][None, :]
     span = np.where(hi - lo == 0.0, 1.0, hi - lo)
     return dataclasses.replace(
-        split, theta_deg=theta, theta_scaled=scaled, ranges=ranges,
-        holdout_theta_deg=h_deg, holdout_theta_scaled=(h_deg - lo) / span,
+        split,
+        theta_deg=theta,
+        theta_scaled=scaled,
+        ranges=ranges,
+        holdout_theta_deg=h_deg,
+        holdout_theta_scaled=(h_deg - lo) / span,
         holdout_range=h_range,
     )
 
@@ -266,15 +275,19 @@ def evaluate_hysteresis(split, limit_deg, cfg=PROBE_REPR):
         "representation": "hysteresis",
         "wrap_limit_deg": "none" if limit_deg is None else f"{limit_deg:.0f}",
         "train_seconds": round(fit_s, 1),
-        "target_range_deg": round(float(np.max(ws.ranges[:, :, 1] - ws.ranges[:, :, 0])), 1),
+        "target_range_deg": round(
+            float(np.max(ws.ranges[:, :, 1] - ws.ranges[:, :, 0])), 1
+        ),
         "wrap_events_train": discontinuities(ws.theta_deg),
         "wrap_events_holdout": discontinuities(ws.holdout_theta_deg),
         "inwindow_rmse_scaled": round(res.holdout_ic["rmse"], 5),
         "inwindow_r2": round(res.holdout_ic["r2"], 5),
         "inwindow_rmse_circ_deg": round(
-            circular_rmse_deg(pred["pred_deg"][inw], truth[inw]), 3),
+            circular_rmse_deg(pred["pred_deg"][inw], truth[inw]), 3
+        ),
         "extrap_rmse_circ_deg": round(
-            circular_rmse_deg(pred["pred_deg"][~inw], truth[~inw]), 3),
+            circular_rmse_deg(pred["pred_deg"][~inw], truth[~inw]), 3
+        ),
     }
 
 
@@ -300,8 +313,9 @@ def evaluate_sincos(split, cfg=PROBE_REPR, seed=42):
     model.fit(X[tr], names, Y[tr])
     fit_s = time.perf_counter() - t0
 
-    Xh, _ = fts.encode(split.holdout_ic_deg[None, :], split.holdout_t,
-                       cfg.encoding, cfg.n_harmonics)
+    Xh, _ = fts.encode(
+        split.holdout_ic_deg[None, :], split.holdout_t, cfg.encoding, cfg.n_harmonics
+    )
     P = model.predict(Xh)
     pred_deg = np.rad2deg(np.arctan2(P[:, :n], P[:, n:]))
     inw = split.in_window
@@ -321,9 +335,11 @@ def evaluate_sincos(split, cfg=PROBE_REPR, seed=42):
         "inwindow_rmse_scaled": "",
         "inwindow_r2": "",
         "inwindow_rmse_circ_deg": round(
-            circular_rmse_deg(pred_deg[inw], truth[inw]), 3),
+            circular_rmse_deg(pred_deg[inw], truth[inw]), 3
+        ),
         "extrap_rmse_circ_deg": round(
-            circular_rmse_deg(pred_deg[~inw], truth[~inw]), 3),
+            circular_rmse_deg(pred_deg[~inw], truth[~inw]), 3
+        ),
         "mean_unit_radius": round(float(np.mean(radius[inw])), 4),
     }
 
@@ -333,14 +349,18 @@ def main_representations():
     rows = []
     for n_links, friction in [(2, False), (3, False), (5, False), (5, True)]:
         split = fts.load(n_links, friction)
-        print(f"\n{split.label}  (|theta| max = {np.abs(split.theta_deg).max():.0f} deg)")
+        print(
+            f"\n{split.label}  (|theta| max = {np.abs(split.theta_deg).max():.0f} deg)"
+        )
 
         r = evaluate(split, None, PROBE_REPR)
         r["representation"] = "pointwise"
         rows.append(r)
-        print(f"  {'no wrap':22s} jumps={r['wrap_events_train']:5d}  "
-              f"circErr in/out={r['inwindow_rmse_circ_deg']:7.2f}/"
-              f"{r['extrap_rmse_circ_deg']:7.2f} deg")
+        print(
+            f"  {'no wrap':22s} jumps={r['wrap_events_train']:5d}  "
+            f"circErr in/out={r['inwindow_rmse_circ_deg']:7.2f}/"
+            f"{r['extrap_rmse_circ_deg']:7.2f} deg"
+        )
 
         for limit in [180.0, 360.0]:
             p = evaluate(split, limit, PROBE_REPR)
@@ -348,21 +368,27 @@ def main_representations():
             rows.append(p)
             h = evaluate_hysteresis(split, limit)
             rows.append(h)
-            print(f"  {'pointwise +-' + str(int(limit)):22s} "
-                  f"jumps={p['wrap_events_train']:5d}  "
-                  f"circErr in/out={p['inwindow_rmse_circ_deg']:7.2f}/"
-                  f"{p['extrap_rmse_circ_deg']:7.2f} deg")
-            print(f"  {'hysteresis +-' + str(int(limit)):22s} "
-                  f"jumps={h['wrap_events_train']:5d}  "
-                  f"circErr in/out={h['inwindow_rmse_circ_deg']:7.2f}/"
-                  f"{h['extrap_rmse_circ_deg']:7.2f} deg")
+            print(
+                f"  {'pointwise +-' + str(int(limit)):22s} "
+                f"jumps={p['wrap_events_train']:5d}  "
+                f"circErr in/out={p['inwindow_rmse_circ_deg']:7.2f}/"
+                f"{p['extrap_rmse_circ_deg']:7.2f} deg"
+            )
+            print(
+                f"  {'hysteresis +-' + str(int(limit)):22s} "
+                f"jumps={h['wrap_events_train']:5d}  "
+                f"circErr in/out={h['inwindow_rmse_circ_deg']:7.2f}/"
+                f"{h['extrap_rmse_circ_deg']:7.2f} deg"
+            )
 
         s = evaluate_sincos(split)
         rows.append(s)
-        print(f"  {'sin/cos':22s} jumps={s['wrap_events_train']:5d}  "
-              f"circErr in/out={s['inwindow_rmse_circ_deg']:7.2f}/"
-              f"{s['extrap_rmse_circ_deg']:7.2f} deg   "
-              f"mean|(sin,cos)|={s['mean_unit_radius']:.3f}")
+        print(
+            f"  {'sin/cos':22s} jumps={s['wrap_events_train']:5d}  "
+            f"circErr in/out={s['inwindow_rmse_circ_deg']:7.2f}/"
+            f"{s['extrap_rmse_circ_deg']:7.2f} deg   "
+            f"mean|(sin,cos)|={s['mean_unit_radius']:.3f}"
+        )
 
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
     fields = []
@@ -389,11 +415,14 @@ def main():
             r = evaluate(split, limit)
             rows.append(r)
             tag = "no wrap" if limit is None else f"+-{limit:.0f} deg"
-            print(f"  {tag:12s} range={r['target_range_deg']:7.1f}  "
-                  f"jumps(train/hold)={r['wrap_events_train']:5d}/{r['wrap_events_holdout']:3d}  "
-                  f"scaledRMSE={r['inwindow_rmse_scaled']:.4f} R2={r['inwindow_r2']:+.4f}  "
-                  f"circErr in/out={r['inwindow_rmse_circ_deg']:7.2f}/"
-                  f"{r['extrap_rmse_circ_deg']:8.2f} deg", flush=True)
+            print(
+                f"  {tag:12s} range={r['target_range_deg']:7.1f}  "
+                f"jumps(train/hold)={r['wrap_events_train']:5d}/{r['wrap_events_holdout']:3d}  "
+                f"scaledRMSE={r['inwindow_rmse_scaled']:.4f} R2={r['inwindow_r2']:+.4f}  "
+                f"circErr in/out={r['inwindow_rmse_circ_deg']:7.2f}/"
+                f"{r['extrap_rmse_circ_deg']:8.2f} deg",
+                flush=True,
+            )
 
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
     path = RESULT_DIR / "wrap_sweep.csv"

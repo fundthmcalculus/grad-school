@@ -7,15 +7,16 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
 
+
 def set_axes_style(ax: Axes):
-    ax.set_facecolor('#16213e')
+    ax.set_facecolor("#16213e")
     ax.set_xlim(-2.2, 2.2)
     ax.set_ylim(-2.2, 0.5)
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
     ax.grid(True, alpha=0.2)
-    ax.tick_params(colors='white')
+    ax.tick_params(colors="white")
     for spine in ax.spines.values():
-        spine.set_edgecolor('#444')
+        spine.set_edgecolor("#444")
 
 
 def angles_to_xy(theta1, theta2, l1, l2):
@@ -27,7 +28,13 @@ def angles_to_xy(theta1, theta2, l1, l2):
     return x1, y1, x2, y2
 
 
-def load_and_prepare_data(trajectories: list[pd.DataFrame], input_features: list[str], output_features:list[str], window_size=1,file_glob: str = 'simulation_0*.csv'):
+def load_and_prepare_data(
+    trajectories: list[pd.DataFrame],
+    input_features: list[str],
+    output_features: list[str],
+    window_size=1,
+    file_glob: str = "simulation_0*.csv",
+):
     """
     Load all simulation files and prepare data for prediction.
 
@@ -60,10 +67,10 @@ def load_and_prepare_data(trajectories: list[pd.DataFrame], input_features: list
             y = []
             for j in range(len(df) - window_size):
                 # Take last window_size timesteps as features
-                window = df[input_features].iloc[j:j+window_size].values.flatten()
+                window = df[input_features].iloc[j : j + window_size].values.flatten()
                 X.append(window)
                 # Next timestep as target
-                y.append(df[output_features].iloc[j+window_size].values)
+                y.append(df[output_features].iloc[j + window_size].values)
 
             if X:
                 X = np.array(X)
@@ -80,7 +87,9 @@ def load_and_prepare_data(trajectories: list[pd.DataFrame], input_features: list
     return X_combined, y_combined
 
 
-def train_and_evaluate_single_step(n_bins:int, output_features: list[str], X_train, y_train, X_test, y_test):
+def train_and_evaluate_single_step(
+    n_bins: int, output_features: list[str], X_train, y_train, X_test, y_test
+):
     """
     Train regressor for single-step prediction (current state -> next state).
 
@@ -94,17 +103,19 @@ def train_and_evaluate_single_step(n_bins:int, output_features: list[str], X_tra
     Returns:
         dict with evaluation metrics
     """
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("SINGLE-STEP PREDICTION MODEL")
-    print("="*60)
+    print("=" * 60)
 
     # Train regressor on continuous target (first output feature)
     y_train_scalar = y_train[:, 0] if y_train.ndim > 1 else y_train
     y_test_scalar = y_test[:, 0] if y_test.ndim > 1 else y_test
 
     regressor = MixtureOfGaussiansFuzzyRegressor(
-        n_output_buckets=n_bins, tsk_order="2nd", optimize_coefficients=True,
-        random_state=42
+        n_output_buckets=n_bins,
+        tsk_order="2nd",
+        optimize_coefficients=True,
+        random_state=42,
     )
     regressor.fit(X_train, y_train_scalar)
 
@@ -124,19 +135,28 @@ def train_and_evaluate_single_step(n_bins:int, output_features: list[str], X_tra
     print(f"  R²:   {r2:.6f}")
 
     return {
-        'model_type': 'single_step',
-        'regressor': regressor,
-        'mse': mse,
-        'rmse': rmse,
-        'mae': mae,
-        'r2': r2,
-        'n_test_samples': len(X_test),
-        'y_test': y_test_scalar,
-        'y_pred': y_pred,
+        "model_type": "single_step",
+        "regressor": regressor,
+        "mse": mse,
+        "rmse": rmse,
+        "mae": mae,
+        "r2": r2,
+        "n_test_samples": len(X_test),
+        "y_test": y_test_scalar,
+        "y_pred": y_pred,
     }
 
 
-def train_and_evaluate_window(n_bins:int, output_features: list[str], X_train, y_train, X_test, y_test, window_size=3, test_size=0.2):
+def train_and_evaluate_window(
+    n_bins: int,
+    output_features: list[str],
+    X_train,
+    y_train,
+    X_test,
+    y_test,
+    window_size=3,
+    test_size=0.2,
+):
     """
     Train regressor for multi-step prediction using sliding window.
 
@@ -151,17 +171,19 @@ def train_and_evaluate_window(n_bins:int, output_features: list[str], X_train, y
     Returns:
         dict with evaluation metrics
     """
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print(f"MULTI-STEP WINDOW PREDICTION MODEL (window_size={window_size})")
-    print("="*60)
+    print("=" * 60)
 
     y_train_scalar = y_train[:, 0] if y_train.ndim > 1 else y_train
     y_test_scalar = y_test[:, 0] if y_test.ndim > 1 else y_test
 
     # Train regressor
     regressor = MixtureOfGaussiansFuzzyRegressor(
-        n_output_buckets=n_bins, tsk_order="1st", optimize_coefficients=True,
-        random_state=42
+        n_output_buckets=n_bins,
+        tsk_order="1st",
+        optimize_coefficients=True,
+        random_state=42,
     )
     regressor.fit(X_train, y_train_scalar)
 
@@ -181,89 +203,115 @@ def train_and_evaluate_window(n_bins:int, output_features: list[str], X_train, y
     print(f"  R²:   {r2:.6f}")
 
     return {
-        'model_type': 'multi_window',
-        'window_size': window_size,
-        'regressor': regressor,
-        'mse': mse,
-        'rmse': rmse,
-        'mae': mae,
-        'r2': r2,
-        'n_test_samples': len(X_test),
-        'y_test': y_test_scalar,
-        'y_pred': y_pred,
+        "model_type": "multi_window",
+        "window_size": window_size,
+        "regressor": regressor,
+        "mse": mse,
+        "rmse": rmse,
+        "mae": mae,
+        "r2": r2,
+        "n_test_samples": len(X_test),
+        "y_test": y_test_scalar,
+        "y_pred": y_pred,
     }
 
 
-def plot_prediction_comparison(output_features: list[str], results_single, results_window):
+def plot_prediction_comparison(
+    output_features: list[str], results_single, results_window
+):
     """
     Plot comparison of predicted vs actual values for both models.
     Returns the figure object.
     """
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle('Double Pendulum Prediction Comparison', fontsize=16, fontweight='bold')
+    fig.suptitle(
+        "Double Pendulum Prediction Comparison", fontsize=16, fontweight="bold"
+    )
 
     # Single-step actual vs predicted scatter
     ax = axes[0, 0]
-    y_test = results_single['y_test']
-    y_pred = results_single['y_pred']
-    ax.scatter(y_test, y_pred, alpha=0.5, s=20, edgecolors='k', linewidth=0.3)
+    y_test = results_single["y_test"]
+    y_pred = results_single["y_pred"]
+    ax.scatter(y_test, y_pred, alpha=0.5, s=20, edgecolors="k", linewidth=0.3)
     min_val = min(y_test.min(), y_pred.min())
     max_val = max(y_test.max(), y_pred.max())
-    ax.plot([min_val, max_val], [min_val, max_val], 'r--', lw=2, label='Perfect Prediction')
-    ax.set_xlabel(f'Actual {output_features[0]} (rad)', fontsize=11)
-    ax.set_ylabel(f'Predicted {output_features[0]} (rad)', fontsize=11)
-    ax.set_title(f'Single-Step: Actual vs Predicted\nR²={results_single["r2"]:.4f}, RMSE={results_single["rmse"]:.4f}', fontsize=11)
+    ax.plot(
+        [min_val, max_val], [min_val, max_val], "r--", lw=2, label="Perfect Prediction"
+    )
+    ax.set_xlabel(f"Actual {output_features[0]} (rad)", fontsize=11)
+    ax.set_ylabel(f"Predicted {output_features[0]} (rad)", fontsize=11)
+    ax.set_title(
+        f'Single-Step: Actual vs Predicted\nR²={results_single["r2"]:.4f}, RMSE={results_single["rmse"]:.4f}',
+        fontsize=11,
+    )
     ax.legend()
     ax.grid(True, alpha=0.3)
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
 
     # Single-step residuals
     ax = axes[0, 1]
     residuals_single = y_test - y_pred
-    ax.scatter(y_pred, residuals_single, alpha=0.5, s=20, edgecolors='k', linewidth=0.3)
-    ax.axhline(y=0, color='r', linestyle='--', lw=2)
-    ax.set_xlabel(f'Predicted {output_features[0]} (rad)', fontsize=11)
-    ax.set_ylabel('Residual (Actual - Predicted)', fontsize=11)
-    ax.set_title('Single-Step: Residual Plot', fontsize=11)
+    ax.scatter(y_pred, residuals_single, alpha=0.5, s=20, edgecolors="k", linewidth=0.3)
+    ax.axhline(y=0, color="r", linestyle="--", lw=2)
+    ax.set_xlabel(f"Predicted {output_features[0]} (rad)", fontsize=11)
+    ax.set_ylabel("Residual (Actual - Predicted)", fontsize=11)
+    ax.set_title("Single-Step: Residual Plot", fontsize=11)
     ax.grid(True, alpha=0.3)
 
     # Multi-step actual vs predicted scatter
     ax = axes[1, 0]
-    y_test = results_window['y_test']
-    y_pred = results_window['y_pred']
-    ax.scatter(y_test, y_pred, alpha=0.5, s=20, edgecolors='k', linewidth=0.3, color='green')
+    y_test = results_window["y_test"]
+    y_pred = results_window["y_pred"]
+    ax.scatter(
+        y_test, y_pred, alpha=0.5, s=20, edgecolors="k", linewidth=0.3, color="green"
+    )
     min_val = min(y_test.min(), y_pred.min())
     max_val = max(y_test.max(), y_pred.max())
-    ax.plot([min_val, max_val], [min_val, max_val], 'r--', lw=2, label='Perfect Prediction')
-    ax.set_xlabel(f'Actual {output_features[0]} (rad)', fontsize=11)
-    ax.set_ylabel(f'Predicted {output_features[0]} (rad)', fontsize=11)
-    ax.set_title(f'Multi-Step (window=3): Actual vs Predicted\nR²={results_window["r2"]:.4f}, RMSE={results_window["rmse"]:.4f}', fontsize=11)
+    ax.plot(
+        [min_val, max_val], [min_val, max_val], "r--", lw=2, label="Perfect Prediction"
+    )
+    ax.set_xlabel(f"Actual {output_features[0]} (rad)", fontsize=11)
+    ax.set_ylabel(f"Predicted {output_features[0]} (rad)", fontsize=11)
+    ax.set_title(
+        f'Multi-Step (window=3): Actual vs Predicted\nR²={results_window["r2"]:.4f}, RMSE={results_window["rmse"]:.4f}',
+        fontsize=11,
+    )
     ax.legend()
     ax.grid(True, alpha=0.3)
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
 
     # Multi-step residuals
     ax = axes[1, 1]
     residuals_window = y_test - y_pred
-    ax.scatter(y_pred, residuals_window, alpha=0.5, s=20, edgecolors='k', linewidth=0.3, color='green')
-    ax.axhline(y=0, color='r', linestyle='--', lw=2)
-    ax.set_xlabel(f'Predicted {output_features[0]} (rad)', fontsize=11)
-    ax.set_ylabel(f'Residual (Actual - Predicted)', fontsize=11)
-    ax.set_title('Multi-Step: Residual Plot', fontsize=11)
+    ax.scatter(
+        y_pred,
+        residuals_window,
+        alpha=0.5,
+        s=20,
+        edgecolors="k",
+        linewidth=0.3,
+        color="green",
+    )
+    ax.axhline(y=0, color="r", linestyle="--", lw=2)
+    ax.set_xlabel(f"Predicted {output_features[0]} (rad)", fontsize=11)
+    ax.set_ylabel(f"Residual (Actual - Predicted)", fontsize=11)
+    ax.set_title("Multi-Step: Residual Plot", fontsize=11)
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
     return fig
 
 
-def plot_second_pendulum_position(output_features: list[str], results_single, results_window, dt=0.01):
+def plot_second_pendulum_position(
+    output_features: list[str], results_single, results_window, dt=0.01
+):
     """
     Plot the actual and predicted position of the second pendulum ({OUTPUT_FEATURES[0]}) as a function of time.
     Shows detailed comparison between actual and predicted trajectories.
     Returns the figure object.
     """
     fig, axes = plt.subplots(4, 1, figsize=(10, 15))
-    fig.suptitle(f'{output_features[0]} Over Time', fontsize=16, fontweight='bold')
+    fig.suptitle(f"{output_features[0]} Over Time", fontsize=16, fontweight="bold")
 
     # Convert sample indices to time (assuming dt = 0.01 seconds between samples)
     def sample_to_time(indices, dt):
@@ -271,40 +319,50 @@ def plot_second_pendulum_position(output_features: list[str], results_single, re
 
     # Single-step model - full trace
     ax = axes[0]
-    y_test = results_single['y_test']
-    y_pred = results_single['y_pred']
+    y_test = results_single["y_test"]
+    y_pred = results_single["y_pred"]
     time_indices = sample_to_time(np.arange(len(y_test)), dt)
 
-    ax.plot(time_indices, y_test, 'b-', linewidth=2, label='Actual', alpha=0.8)
-    ax.plot(time_indices, y_pred, 'r--', linewidth=1.5, label='Predicted', alpha=0.8)
-    ax.fill_between(time_indices, y_test, y_pred, alpha=0.1, color='gray', label='Error')
-    ax.set_xlabel('Time (seconds)', fontsize=11)
-    ax.set_ylabel(f'{output_features[0]} (radians)', fontsize=11)
-    ax.set_title(f'Single-Step Model: {output_features[0]} Position Over Time (R²={results_single["r2"]:.4f}, MAE={results_single["mae"]:.4f})', fontsize=12)
-    ax.legend(loc='upper right')
+    ax.plot(time_indices, y_test, "b-", linewidth=2, label="Actual", alpha=0.8)
+    ax.plot(time_indices, y_pred, "r--", linewidth=1.5, label="Predicted", alpha=0.8)
+    ax.fill_between(
+        time_indices, y_test, y_pred, alpha=0.1, color="gray", label="Error"
+    )
+    ax.set_xlabel("Time (seconds)", fontsize=11)
+    ax.set_ylabel(f"{output_features[0]} (radians)", fontsize=11)
+    ax.set_title(
+        f'Single-Step Model: {output_features[0]} Position Over Time (R²={results_single["r2"]:.4f}, MAE={results_single["mae"]:.4f})',
+        fontsize=12,
+    )
+    ax.legend(loc="upper right")
     ax.grid(True, alpha=0.3)
 
     # Multi-step model - full trace
     ax = axes[1]
-    y_test = results_window['y_test']
-    y_pred = results_window['y_pred']
+    y_test = results_window["y_test"]
+    y_pred = results_window["y_pred"]
     time_indices = sample_to_time(np.arange(len(y_test)), dt)
 
-    ax.plot(time_indices, y_test, 'b-', linewidth=2, label='Actual', alpha=0.8)
-    ax.plot(time_indices, y_pred, 'g--', linewidth=1.5, label='Predicted', alpha=0.8)
-    ax.fill_between(time_indices, y_test, y_pred, alpha=0.1, color='gray', label='Error')
-    ax.set_xlabel('Time (seconds)', fontsize=11)
-    ax.set_ylabel(f'{output_features[0]} (radians)', fontsize=11)
-    ax.set_title(f'Multi-Step Window Model: {output_features[0]} Position Over Time (R²={results_window["r2"]:.4f}, MAE={results_window["mae"]:.4f})', fontsize=12)
-    ax.legend(loc='upper right')
+    ax.plot(time_indices, y_test, "b-", linewidth=2, label="Actual", alpha=0.8)
+    ax.plot(time_indices, y_pred, "g--", linewidth=1.5, label="Predicted", alpha=0.8)
+    ax.fill_between(
+        time_indices, y_test, y_pred, alpha=0.1, color="gray", label="Error"
+    )
+    ax.set_xlabel("Time (seconds)", fontsize=11)
+    ax.set_ylabel(f"{output_features[0]} (radians)", fontsize=11)
+    ax.set_title(
+        f'Multi-Step Window Model: {output_features[0]} Position Over Time (R²={results_window["r2"]:.4f}, MAE={results_window["mae"]:.4f})',
+        fontsize=12,
+    )
+    ax.legend(loc="upper right")
     ax.grid(True, alpha=0.3)
 
     # Error over time
     ax = axes[2]
-    y_test_single = results_single['y_test']
-    y_pred_single = results_single['y_pred']
-    y_test_window = results_window['y_test']
-    y_pred_window = results_window['y_pred']
+    y_test_single = results_single["y_test"]
+    y_pred_single = results_single["y_pred"]
+    y_test_window = results_window["y_test"]
+    y_pred_window = results_window["y_pred"]
 
     error_single = np.abs(y_test_single - y_pred_single)
     error_window = np.abs(y_test_window - y_pred_window)
@@ -312,37 +370,81 @@ def plot_second_pendulum_position(output_features: list[str], results_single, re
     time_single = sample_to_time(np.arange(len(error_single)), dt)
     time_window = sample_to_time(np.arange(len(error_window)), dt)
 
-    ax.plot(time_single, error_single, 'r-', linewidth=1, label='Single-Step Error', alpha=0.7)
-    ax.plot(time_window, error_window, 'g-', linewidth=1, label='Multi-Step Error', alpha=0.7)
-    ax.axhline(y=np.mean(error_single), color='r', linestyle=':', linewidth=2, label=f'Single-Step Mean Error: {np.mean(error_single):.4f}')
-    ax.axhline(y=np.mean(error_window), color='g', linestyle=':', linewidth=2, label=f'Multi-Step Mean Error: {np.mean(error_window):.4f}')
-    ax.set_xlabel('Time (seconds)', fontsize=11)
-    ax.set_ylabel('Absolute Error (radians)', fontsize=11)
-    ax.set_title('Prediction Error Over Time', fontsize=12)
-    ax.legend(loc='upper right')
+    ax.plot(
+        time_single,
+        error_single,
+        "r-",
+        linewidth=1,
+        label="Single-Step Error",
+        alpha=0.7,
+    )
+    ax.plot(
+        time_window,
+        error_window,
+        "g-",
+        linewidth=1,
+        label="Multi-Step Error",
+        alpha=0.7,
+    )
+    ax.axhline(
+        y=np.mean(error_single),
+        color="r",
+        linestyle=":",
+        linewidth=2,
+        label=f"Single-Step Mean Error: {np.mean(error_single):.4f}",
+    )
+    ax.axhline(
+        y=np.mean(error_window),
+        color="g",
+        linestyle=":",
+        linewidth=2,
+        label=f"Multi-Step Mean Error: {np.mean(error_window):.4f}",
+    )
+    ax.set_xlabel("Time (seconds)", fontsize=11)
+    ax.set_ylabel("Absolute Error (radians)", fontsize=11)
+    ax.set_title("Prediction Error Over Time", fontsize=12)
+    ax.legend(loc="upper right")
     ax.grid(True, alpha=0.3)
 
     # Actual compared positions.
     ax = axes[3]
-    y_test_single = results_single['y_test']
-    y_pred_single = results_single['y_pred']
-    y_test_window = results_window['y_test']
-    y_pred_window = results_window['y_pred']
+    y_test_single = results_single["y_test"]
+    y_pred_single = results_single["y_pred"]
+    y_test_window = results_window["y_test"]
+    y_pred_window = results_window["y_pred"]
 
-    ax.plot(y_test_single, y_pred_single, 'r-', linewidth=1, label='Single-Step predictions', alpha=0.7)
-    ax.plot(y_test_window, y_pred_window, 'g-', linewidth=1, label='Multi-Step predictions', alpha=0.7)
-    ax.set_xlabel('Angle', fontsize=11)
-    ax.set_ylabel('Angle', fontsize=11)
-    ax.set_title('Phasing plot', fontsize=12)
-    ax.legend(loc='upper right')
+    ax.plot(
+        y_test_single,
+        y_pred_single,
+        "r-",
+        linewidth=1,
+        label="Single-Step predictions",
+        alpha=0.7,
+    )
+    ax.plot(
+        y_test_window,
+        y_pred_window,
+        "g-",
+        linewidth=1,
+        label="Multi-Step predictions",
+        alpha=0.7,
+    )
+    ax.set_xlabel("Angle", fontsize=11)
+    ax.set_ylabel("Angle", fontsize=11)
+    ax.set_title("Phasing plot", fontsize=12)
+    ax.legend(loc="upper right")
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
     return fig
 
 
-def find_nearest_trajectories(test_trajectory: pd.DataFrame, train_trajectories: list[pd.DataFrame],
-                               k: int = 2, features: list[str] | None = None) -> list[tuple[int, float, pd.DataFrame]]:
+def find_nearest_trajectories(
+    test_trajectory: pd.DataFrame,
+    train_trajectories: list[pd.DataFrame],
+    k: int = 2,
+    features: list[str] | None = None,
+) -> list[tuple[int, float, pd.DataFrame]]:
     """
     Find the k nearest training trajectories to the test trajectory based on Euclidean distance.
 
@@ -379,9 +481,14 @@ def find_nearest_trajectories(test_trajectory: pd.DataFrame, train_trajectories:
     return distances[:k]
 
 
-def plot_test_vs_nearest_training(test_trajectory: pd.DataFrame, train_trajectories: list[pd.DataFrame],
-                                   dt: float = 0.01, features: list[str] | None = None, k: int = 2,
-                                   predicted_trajectory: pd.DataFrame | None = None) -> plt.Figure:
+def plot_test_vs_nearest_training(
+    test_trajectory: pd.DataFrame,
+    train_trajectories: list[pd.DataFrame],
+    dt: float = 0.01,
+    features: list[str] | None = None,
+    k: int = 2,
+    predicted_trajectory: pd.DataFrame | None = None,
+) -> plt.Figure:
     """
     Plot the test trajectory alongside the k nearest training trajectories to visualize stability.
 
@@ -404,7 +511,9 @@ def plot_test_vs_nearest_training(test_trajectory: pd.DataFrame, train_trajector
         features = test_trajectory.columns.tolist()
 
     # Find nearest trajectories
-    nearest = find_nearest_trajectories(test_trajectory, train_trajectories, k=k, features=features)
+    nearest = find_nearest_trajectories(
+        test_trajectory, train_trajectories, k=k, features=features
+    )
 
     # Create subplots
     ncols = min(len(features), 2)
@@ -413,20 +522,41 @@ def plot_test_vs_nearest_training(test_trajectory: pd.DataFrame, train_trajector
     axes_flat = axes.flatten()
 
     if predicted_trajectory is not None:
-        fig.suptitle(f'Test Reference & Predicted vs {k} Nearest Training Trajectories', fontsize=14, fontweight='bold')
+        fig.suptitle(
+            f"Test Reference & Predicted vs {k} Nearest Training Trajectories",
+            fontsize=14,
+            fontweight="bold",
+        )
     else:
-        fig.suptitle(f'Test vs {k} Nearest Training Trajectories', fontsize=14, fontweight='bold')
+        fig.suptitle(
+            f"Test vs {k} Nearest Training Trajectories", fontsize=14, fontweight="bold"
+        )
 
     t_test = np.arange(len(test_trajectory)) * dt
 
-    colors = ['#00DD00', '#00AA00', '#00FF00', '#009900', '#00CC00']  # colors for nearest training trajectories (green shades)
+    colors = [
+        "#00DD00",
+        "#00AA00",
+        "#00FF00",
+        "#009900",
+        "#00CC00",
+    ]  # colors for nearest training trajectories (green shades)
 
     for feat_idx, feat in enumerate(features):
         ax = axes_flat[feat_idx]
 
         # Plot test reference trajectory
         test_values = test_trajectory[feat].values
-        ax.plot(t_test, test_values, '-', color='#00d4ff', linewidth=2.5, label='Test (reference)', alpha=0.9, zorder=10)
+        ax.plot(
+            t_test,
+            test_values,
+            "-",
+            color="#00d4ff",
+            linewidth=2.5,
+            label="Test (reference)",
+            alpha=0.9,
+            zorder=10,
+        )
 
         # Plot predicted trajectory if provided
         if predicted_trajectory is not None:
@@ -434,8 +564,16 @@ def plot_test_vs_nearest_training(test_trajectory: pd.DataFrame, train_trajector
             t_pred = np.arange(len(predicted_trajectory)) * dt
             valid_mask = ~np.isnan(pred_values)
             if valid_mask.any():
-                ax.plot(t_pred[valid_mask], pred_values[valid_mask], '-', color='#ff1744', linewidth=2.5,
-                       label='Test (predicted)', alpha=0.9, zorder=9)
+                ax.plot(
+                    t_pred[valid_mask],
+                    pred_values[valid_mask],
+                    "-",
+                    color="#ff1744",
+                    linewidth=2.5,
+                    label="Test (predicted)",
+                    alpha=0.9,
+                    zorder=9,
+                )
 
         # Plot nearest training trajectories (dashed)
         for rank, (train_idx, distance, train_traj) in enumerate(nearest):
@@ -443,15 +581,22 @@ def plot_test_vs_nearest_training(test_trajectory: pd.DataFrame, train_trajector
             t_train = np.arange(len(train_traj)) * dt
 
             color = colors[rank % len(colors)]
-            label = f'Train {train_idx} (d={distance:.4f})'
-            ax.plot(t_train, train_values, color=color, linestyle='--', linewidth=1.5,
-                   label=label, alpha=0.7)
+            label = f"Train {train_idx} (d={distance:.4f})"
+            ax.plot(
+                t_train,
+                train_values,
+                color=color,
+                linestyle="--",
+                linewidth=1.5,
+                label=label,
+                alpha=0.7,
+            )
 
-        ax.set_xlabel('Time (s)', fontsize=10)
+        ax.set_xlabel("Time (s)", fontsize=10)
         ax.set_ylabel(feat, fontsize=10)
-        ax.set_title(f'{feat} Over Time', fontsize=11)
+        ax.set_title(f"{feat} Over Time", fontsize=11)
         ax.grid(True, alpha=0.3)
-        ax.legend(loc='best', fontsize=9)
+        ax.legend(loc="best", fontsize=9)
 
     # Hide unused subplots
     for idx in range(len(features), len(axes_flat)):

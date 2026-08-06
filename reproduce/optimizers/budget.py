@@ -58,7 +58,7 @@ class BudgetedObjective:
         self.n_evals = 0
         self.best_x = None
         self.best_f = np.inf
-        self.trace = []            # (eval_index, seconds, best_so_far)
+        self.trace = []  # (eval_index, seconds, best_so_far)
         self._t0 = None
         # Checkpoints answer the question the study is actually asked: not "what
         # does this optimizer find", but "how much does it find *in finite
@@ -68,7 +68,7 @@ class BudgetedObjective:
         # Keeping a copy at each checkpoint turns one run into the whole
         # budget curve, instead of one run per budget.
         self.checkpoints = sorted(int(c) for c in checkpoints)
-        self.snapshots = {}        # eval budget -> best_x as of that budget
+        self.snapshots = {}  # eval budget -> best_x as of that budget
         self._next_cp = 0
         # The hot start is scored outside the budget, deliberately. Every arm
         # begins from it, so charging one evaluation for it to some arms and not
@@ -108,12 +108,16 @@ class BudgetedObjective:
             self.trace.append((self.n_evals, self.seconds, value))
         # Snapshot after the update, so a checkpoint reflects everything the
         # budget bought including the evaluation that reached it.
-        while (self._next_cp < len(self.checkpoints)
-               and self.n_evals >= self.checkpoints[self._next_cp]):
+        while (
+            self._next_cp < len(self.checkpoints)
+            and self.n_evals >= self.checkpoints[self._next_cp]
+        ):
             cp = self.checkpoints[self._next_cp]
-            self.snapshots[cp] = (None if self.best_x is None
-                                  else self.best_x.copy(), self.best_f,
-                                  self.seconds)
+            self.snapshots[cp] = (
+                None if self.best_x is None else self.best_x.copy(),
+                self.best_f,
+                self.seconds,
+            )
             self._next_cp += 1
         return value
 
@@ -129,7 +133,9 @@ class BudgetedObjective:
             if cp not in self.snapshots:
                 self.snapshots[cp] = (
                     None if self.best_x is None else self.best_x.copy(),
-                    self.best_f, self.seconds)
+                    self.best_f,
+                    self.seconds,
+                )
         return self
 
     def improvement(self):
