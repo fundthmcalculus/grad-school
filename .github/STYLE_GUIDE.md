@@ -41,12 +41,16 @@ mypy .
 
 ## Current Enforcement Level
 
-We now use **casual enforcement** — checks enforce but with lenient rules:
-- **Black**: Enforces consistent formatting (88-char line length)
-- **Flake8**: Enforces basic linting with lenient configuration (120-char max, E203 ignored)
-- **mypy**: Type checking enforced but lenient (ignores missing imports and type hints)
+We use a **phased enforcement approach**:
 
-New code must pass these checks, but the lenient configuration means only the most obvious issues block merges. As the codebase stabilizes, rules can be tightened incrementally.
+**Enforced (blocks PRs):**
+- **Black**: Consistent formatting (88-char line length) is required for all new code
+
+**Informational (reports but doesn't block):**
+- **Flake8**: Linting with lenient configuration (120-char max, E203 ignored) — reported for awareness
+- **mypy**: Type checking with lenient baseline (ignores missing imports/hints) — reported for awareness
+
+This staged approach allows the codebase to be formatted first, then linting issues addressed in a follow-up PR for easier diffing.
 
 ## Future Tightening
 
