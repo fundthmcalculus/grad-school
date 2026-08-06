@@ -10,6 +10,7 @@
 !FIX_IMPACT.md
 !NOTE12_THREADING.md
 !NORMALIZATION_THREE_ARM.md
+!SPLIT_FIRST_LEAK.md
 
 # Labelled run archives (reproduce/run_all_tables.sh <label>) ARE tracked: they
 # are the evidence behind the write-ups, and they have to survive the machine

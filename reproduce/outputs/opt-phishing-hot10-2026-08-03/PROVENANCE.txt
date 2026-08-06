@@ -1,0 +1,25 @@
+label:       opt-phishing-hot10-2026-08-03
+generated:   2026-08-03T14:50:03Z
+tribble-fis: 10205dfe6d5a577a91232b3d68559a2f5029d26f
+tribble-opt: 94547ff7f9794584a06352efb2889f77abfde466
+tribble-cluster: e3c27e67ae2a41d636dfb472110ae2ded2e4ef82
+grad-school: edcb1cc19d56f3efe7bb406dc0ab9692a3d78573
+seeds:       0,1,2,3,4,5,6,7,8,9
+
+study:       reproduce/optimizers/run_phishing_opt_study.py
+dataset:     PhiUSIIL (binary classification)
+train rows:  16000
+test rows:   48000
+top_n:       10 features
+components:  chosen by BIC
+radius:      1.0
+budget:      2000 objective evaluations per arm per seed
+objective:   refine._make_classifier_fitness, l2_shrink=0.05
+arms:        none,scipy-lbfgsb,scipy-powell,scipy-de,opt-ga,opt-pso,opt-aco,opt-gd
+init:        hot
+threads:     1 (OMP/BLAS pinned before numpy import)
+
+> **Machine.** host: vm · os: Linux-6.18.5-x86_64-with-glibc2.39 · cpu: Intel(R) Xeon(R) Processor @ 2.10GHz · cores: 4 logical · ram: 15.7 GiB · gpu: none detected · python: 3.11.15
+>
+> Wall-clock times are machine-dependent; ratios are not. Markdown tables report normalized ratios where a timing is involved, and the companion CSV carries the absolute seconds.
+

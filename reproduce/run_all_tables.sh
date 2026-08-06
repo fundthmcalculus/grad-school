@@ -2,7 +2,13 @@
 # Run every table generator and archive reproduce/outputs/ under a label.
 #
 #   reproduce/run_all_tables.sh baseline-d0d6714
-#   reproduce/run_all_tables.sh --fast smoke-check     # minutes, NOT citable
+#   reproduce/run_all_tables.sh --fast smoke-check          # minutes, NOT citable
+#   reproduce/run_all_tables.sh --archive-only my-label     # runs nothing; see below
+#
+# Never edit this file while it is running. Bash reads a script incrementally, so an
+# insert shifts every later byte offset out from under the interpreter and it resumes
+# mid-token. That happened once: thirteen generators finished green and the archive step
+# died on a syntax error in code that parses fine. --archive-only exists to recover it.
 #
 # Each script runs in its own submodule environment, with its stdout kept
 # alongside the tables it produced. A script that fails does not stop the run --
@@ -18,7 +24,7 @@
 set -uo pipefail
 
 usage() {
-  sed -n '2,17p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  sed -n '2,23p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
@@ -31,6 +37,25 @@ esac
 
 FAST=0
 if [ "${1:-}" = "--fast" ]; then FAST=1; shift; fi
+
+# --archive-only: snapshot the CURRENT loose outputs under a label, running nothing.
+#
+# This exists because a run can complete its whole numeric phase and then fail before
+# archiving, which is precisely the Chapter 5 `run_all.py` defect this project already
+# fixed once: results written after the figures, a crash in a figure, and every
+# invocation silently discarding an hour of correct computation. The same shape bit this
+# script on 2026-08-03 -- thirteen generators finished green, including a 1380 s GPU
+# sweep, and the archive step died of a syntax error because the file had been edited
+# WHILE bash was reading it (bash reads a script incrementally, so an insert shifts every
+# later byte offset out from under it).
+#
+# Re-running 48 minutes of compute to recover a `cp` and a heredoc is the wrong trade.
+# Archiving outputs this pass did not produce is a provenance risk, so the archive says
+# so, loudly, in the place a reader looks: PROVENANCE.txt records that the generators
+# were not run here and that the SHAs are the CURRENT ones rather than necessarily the
+# ones that produced the tables. Check them before citing.
+ARCHIVE_ONLY=0
+if [ "${1:-}" = "--archive-only" ]; then ARCHIVE_ONLY=1; shift; fi
 
 case "${1:-}" in
   -*) echo "error: unknown option '$1'" >&2; usage 2 ;;
@@ -51,6 +76,16 @@ FAST_SEEDS="${REPRO_FAST_SEEDS:-0,1,2}"
 # and then die in the f.write that emits it. The emitters now pin UTF-8
 # explicitly; this covers the generators' own stdout for the same reason.
 export PYTHONIOENCODING=utf-8
+
+# Unbuffer the generators' stdout. Python buffers when stdout is a file rather than a
+# terminal, and every generator here is run with `>"$log"` -- so a long one shows an
+# EMPTY log for its whole duration and then dumps everything at exit. That is bad in
+# two ways this project already has scars from. Watching a 25-minute GPU sweep, an
+# empty log is indistinguishable from a hung process: on the run that prompted this
+# line the only way to tell it was alive was to notice a python.exe holding 12.9 GB.
+# And if a generator is killed or dies hard, the buffer goes with it -- so the log of
+# the run that failed is blank, which is the exact opposite of what a log is for.
+export PYTHONUNBUFFERED=1
 
 # Table 4.4b, the theta operating curve, is emitted by table_4_4_openset ONLY when
 # this is set -- so every sweep so far produced 4.4 and silently omitted 4.4b,
@@ -115,6 +150,7 @@ FIS_TABLES=(
   table_norm_conorm_matrix
   table_4_4_openset
   table_a1_feature_scoring
+  table_4_8_mf_dedup
 )
 CLUSTER_TABLES=(
   table_3_1_pvat_scaling
@@ -308,14 +344,23 @@ run_one() {
 check_submodule_shas
 
 echo "=== $LABEL ==="
-echo "tribble-fis:"
-for t in "${FIS_TABLES[@]}"; do run_one tribble-fis "$t"; done
-echo "tribble-cluster:"
-EXTRA_DEPS="--with scipy"
-for t in "${CLUSTER_TABLES[@]}"; do run_one tribble-cluster "$t"; done
-EXTRA_DEPS=""
-echo "no submodule env:"
-for t in "${PLAIN_TABLES[@]}"; do run_one - "$t"; done
+if [ $ARCHIVE_ONLY -eq 1 ]; then
+  echo "--archive-only: running no generators; snapshotting the loose outputs in"
+  echo "                $(basename "$OUT")/ as they stand."
+  for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}"; do
+    STATUS[$t]="archived-not-run"
+    SEEDS_USED[$t]="$FULL_SEEDS (not verified -- see the notice in PROVENANCE.txt)"
+  done
+else
+  echo "tribble-fis:"
+  for t in "${FIS_TABLES[@]}"; do run_one tribble-fis "$t"; done
+  echo "tribble-cluster:"
+  EXTRA_DEPS="--with scipy"
+  for t in "${CLUSTER_TABLES[@]}"; do run_one tribble-cluster "$t"; done
+  EXTRA_DEPS=""
+  echo "no submodule env:"
+  for t in "${PLAIN_TABLES[@]}"; do run_one - "$t"; done
+fi
 
 # Archive the tables themselves next to the logs.
 find "$OUT" -maxdepth 1 -type f \( -name '*.md' -o -name '*.csv' \) \
@@ -331,6 +376,26 @@ PROV="$DEST/PROVENANCE.txt"
   else
     echo "label:       $LABEL"
     echo "generated:   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  fi
+  if [ $ARCHIVE_ONLY -eq 1 ]; then
+    echo
+    echo "########################################################################"
+    echo "## ARCHIVE ONLY -- NO GENERATOR RAN IN THIS PASS                      ##"
+    echo "##                                                                    ##"
+    echo "## The tables here were copied from reproduce/outputs/ as they stood.  ##"
+    echo "## They were produced by an EARLIER invocation. That invocation may or ##"
+    echo "## may not have run at the SHAs recorded below -- this pass reads the  ##"
+    echo "## SHAs as they are NOW, and cannot know what produced the files.      ##"
+    echo "##                                                                    ##"
+    echo "## Use this only to recover a run whose numeric phase completed and    ##"
+    echo "## whose archive step failed. Confirm the SHAs and the logs/ contents  ##"
+    echo "## match the run you think this is before quoting any number from it.  ##"
+    echo "##                                                                    ##"
+    echo "## THIS BANNER IS NOT A VERDICT. If an addendum below establishes what ##"
+    echo "## produced these tables, read it: the archive may well be citable.    ##"
+    echo "## Two independent readers stopped here and concluded it was not.      ##"
+    echo "########################################################################"
+    echo
   fi
   if [ $FAST -eq 1 ]; then
     echo

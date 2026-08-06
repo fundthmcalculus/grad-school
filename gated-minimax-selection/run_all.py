@@ -1149,6 +1149,33 @@ def main(high_res=False, svg=False, scaling=False):
     print("Generating selection-method comparison figures...")
     fig_selection_comparison(persistence_methods)
     fig_persistence_thresholds(persistence_methods)
+    # Record the seed sets this run actually used, so a downstream renderer can state
+    # them instead of assuming. `reproduce/tables/table_5_x_ch5_selection.py` does no
+    # computation -- it renders this JSON -- and `reproduce/common.py` was stamping its
+    # own ten-seed default into the footer of all three Chapter 5 tables, over a run
+    # made at five. That is the same defect as a PROVENANCE.txt reporting a seed list
+    # it did not use, and it is worse in a table footer, because the footer is what
+    # gets quoted into a chapter.
+    #
+    # It is a dict rather than a single list because the seeding here is genuinely
+    # heterogeneous, and flattening it to one number would be the same lie in a
+    # different shape.
+    #
+    # The first version of this block asserted a structure instead of reading the code,
+    # and got it wrong twice: it claimed a separate `NERFCM_SEEDS` drove the NERFCM
+    # restarts (that name is local to `fig_relational_memberships`, a *figure*
+    # function, and reaching for it here raised NameError), and it described the
+    # multi-scale generators as merely "fixed per-generator". What the code actually
+    # does: module-scope SEEDS drives `nerfcm_ari` AND `conivat_ari`, which are the only
+    # columns in the battery carrying a spread; everything else is one deterministic
+    # pass. Worth stating, because asserting a seed list rather than deriving it is the
+    # exact bug this block exists to fix.
+    results["seeds"] = {
+        "nerfcm_and_conivat_restarts": list(SEEDS),
+        "set_cover_multiscale_and_selection":
+            "single deterministic run per cell; the generators are seeded per dataset "
+            "and no spread is computed, so these cells have no error bar",
+    }
     with open(f"{OUT}/results.json", "w") as f:
         json.dump(results, f, indent=2)
     print("Done. Results and figures written to", OUT)

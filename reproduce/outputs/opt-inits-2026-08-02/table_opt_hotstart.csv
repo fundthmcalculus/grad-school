@@ -1,0 +1,13 @@
+init,arm,started from,CV MSE,test R²,Δ R² vs heuristic (paired),R² wins,evals to reach heuristic,beat own start,evals,start-up cost (ms)
+hot,none,Gaussian construction,0.00639 ± 0.00049,0.841 ± 0.034,+0.000,0/10,0,0/10,0,745 ± 28
+hot,opt-ga,Gaussian construction,0.00448 ± 0.00019,0.875 ± 0.021,+0.034 ± +0.023,10/10,0,10/10,2000,745 ± 28
+hot,scipy-lbfgsb,Gaussian construction,0.00445 ± 0.00138,0.854 ± 0.044,+0.013 ± +0.029,9/10,0,10/10,2000,745 ± 28
+cold,none,random point in the box,0.00619 ± 0.00035,0.851 ± 0.023,+0.010 ± +0.032,6/10,5/10 seeds,0/10,0,717 ± 54
+cold,opt-ga,random point in the box,0.00455 ± 0.00014,0.869 ± 0.025,+0.028 ± +0.032,9/10,3 ± 8,10/10,2000,717 ± 54
+cold,scipy-lbfgsb,random point in the box,0.00515 ± 0.00037,0.869 ± 0.020,+0.028 ± +0.038,8/10,272 ± 303,10/10,2000,717 ± 54
+kmeans,none,"1-D k-means per (feature, bucket)",0.00631 ± 0.00048,0.833 ± 0.042,-0.008 ± +0.012,3/10,5/10 seeds,0/10,0,1025 ± 53
+kmeans,opt-ga,"1-D k-means per (feature, bucket)",0.00454 ± 0.00019,0.872 ± 0.022,+0.031 ± +0.030,10/10,1 ± 1,10/10,2000,1025 ± 53
+kmeans,scipy-lbfgsb,"1-D k-means per (feature, bucket)",0.00423 ± 0.00085,0.855 ± 0.051,+0.014 ± +0.049,7/10,72 ± 72,10/10,2000,1025 ± 53
+fcm,none,1-D fuzzy c-means,0.00672 ± 0.00076,0.819 ± 0.040,-0.022 ± +0.044,3/10,3/10 seeds,0/10,0,836 ± 43
+fcm,opt-ga,1-D fuzzy c-means,0.00450 ± 0.00018,0.875 ± 0.017,+0.034 ± +0.029,10/10,4 ± 8,10/10,2000,836 ± 43
+fcm,scipy-lbfgsb,1-D fuzzy c-means,0.00559 ± 0.00066,0.829 ± 0.046,-0.012 ± +0.048,5/10,7/10 seeds,10/10,2000,836 ± 43

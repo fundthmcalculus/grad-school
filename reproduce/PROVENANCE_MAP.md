@@ -25,7 +25,7 @@ as having no generator yet.
 | 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1; re-taken on one host — note 11 |
 | 3.2 Complexity fit | `reproduce/tables/table_3_1_reorder_three_arm.py` | `outputs/table_3_1_complexity_fit.{md,csv}` | **reproduced** — exponents confirm; stage-two plateau does **not** reproduce, note 11 |
 | 3.3 Memory footprint | `reproduce/tables/table_3_2_memory_precision.py` | `outputs/table_3_2_memory_precision.{md,csv}` | **reproduced** — all 32 cells identical to `main-d0efefc` |
-| 3.4 GPU speedups | `reproduce/tables/table_3_4_gpu_speedups.py` | `outputs/table_3_4_gpu_speedups.{md,csv}` | **drifted** — measured on the card the chapter names; the exactness claim holds, three of the four speedup rows do not read as quoted — note 15 |
+| 3.4 GPU speedups | `reproduce/tables/table_3_4_gpu_speedups.py` | `outputs/table_3_4_gpu_speedups.{md,csv}` | **drifted** — measured twice on the card the chapter names, hours apart and now inside the sweep; the exactness claim holds, three of the four speedup rows do not read as quoted — notes 15, 18 |
 | 3.5 Adversarial ARI | `ClusteringExperiments/adversarial_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — two cells corrected, note 10 |
 | 3.6 Stitch ablation | `ClusteringExperiments/principled_stitch.py` | `ClusteringExperiments/findings/…` | **reproduced** — re-quoted, note 10 |
 | 3.7 Non-metric agreement | `ClusteringExperiments/hardening_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — cells match |
@@ -100,8 +100,8 @@ N ≈ 750, and the parity band where stage two loses to stage one** are properti
 of the laptop, not the kernel. Across four independent runs here stage two is
 monotone in N (0.5 ms at N=750, 8.4 ms at N=3,000) and beats stage one by
 8.1–17.7x at every size, including 17.3x in the band said to collapse. The fitted
-exponents are 3.14–3.19 (classical), 1.84–1.87 (stage one) and **1.93–1.95**
-(stage two) — the last a *cleaner* confirmation of the quadratic claim than the
+exponents are 3.14–3.20 (classical), 1.84–**1.88** (stage one) and **1.93–1.97**
+(stage two), across five runs now including `full-2026-08-03` — the last a *cleaner* confirmation of the quadratic claim than the
 laptop's 2.12, which the chapter itself calls "right for the wrong reason"
 because the plateau contaminated the fit. **CHECKLIST C2b, which asks what the
 10 ms is, should be rescoped: the thing to explain is why the laptop had it.**
@@ -146,7 +146,7 @@ the CPU arm additionally materialise the reordered n × n matrix
 5.6–11.8×, i.e. *above* the quoted band. The chapter's cell therefore matches
 neither arm: it sits between a comparison that is fair and one that is not.
 
-*Row 3 — Fuzzy C-Means, the row to fix.* Quoted **30–56×**. Measured 14.4×,
+*Row 3 — Fuzzy C-Means, now fixed in the chapter.* Quoted **30–56×** until 2026-08-04; §3.4 now prints the matched arm, 1.24× / 2.35× / 3.71× at `uniform-2026-08-03`, and reports the unmatched pair separately as the reformulation result it is. Measured 14.4×,
 24.1×, 41.0× at N = 50,000 / 200,000 / 500,000 against `fcm.fuzzy_c_means` —
 below the quoted range at the two smaller sizes. More importantly, that ratio is
 **not a device speedup**: `fcm.fuzzy_c_means` is a NumPy broadcasting
@@ -197,12 +197,12 @@ estimates or extrapolates it, and the generator does not model it.
 | Table | Generator | Output | Status |
 |---|---|---|---|
 | 4.1 Value of the transform | `table_hyperparam_normalization.py` | `outputs/table_hyperparam_normalization.{md,csv}` | **reproduced** at 10 seeds; **now three arms, and the prose's column label is wrong — note 16** |
-| 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** — claim retracted, note 3 |
+| 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** at three consequent orders; **G5 settled on the 0th-order rows — note 19** |
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
 | 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
-| 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **reproduced** — note 6 |
-| 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **reproduced** — note 6 |
+| 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
+| 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
 
 **Note 2.** Re-quoted at 10 seeds: 1st order 0.658 → 0.783 (Δ +0.125), 2nd order
@@ -270,11 +270,21 @@ the bucket means pinned at 0.0/1.0 are already correct and already say min-max.
 **Note 3 — the claim was retracted, not just re-quoted.** The prose read a
 crossover near four buckets off this table ("at three buckets uniform wins
 outright; by six, quantile is ahead"). It does not survive. At 10 seeds the
-largest gap anywhere in the 18-configuration sweep is 0.012 in R², against
-seed-to-seed deviations of 0.02–0.03, and the 6-bucket/2nd-order pair agrees to
-three decimals. The `min bucket n` diagnostic (132/343/75/257/39/171) reproduces
-exactly, so the bucket-starvation *mechanism* is intact — Concrete's skew of
-+0.42 is simply too mild for it to reach the aggregate error.
+largest gap anywhere in the 18-configuration sweep is 0.022 in R² (3 buckets /
+1st order, uniform 0.795 ± 0.035 against quantile 0.773 ± 0.033), against
+seed-to-seed deviations of ±0.023–0.043 — so even the widest separation sits
+inside one standard deviation of the arms producing it. The `min bucket n`
+diagnostic (132/343/75/257/39/171) reproduces exactly, so the bucket-starvation
+*mechanism* is intact — Concrete's skew of +0.42 is simply too mild for it to
+reach the aggregate error.
+
+*This note said 0.012 and "the 6-bucket/2nd-order pair agrees to three decimals",
+and both were wrong against the run of record: the maximum is 0.022 and that pair
+reads 0.840 against 0.849. The prose had it right and the map did not, which is
+note 5's failure mode in the opposite direction — worth recording, because a reader
+who trusts this file over the chapter would have been misled. The retraction itself
+is unaffected: an effect below the noise floor is not a crossover whether it is
+0.012 or 0.022.*
 
 **Note 4 — the hypothesis was refuted, and Goal G5 is reopened.** The prose
 claimed quantile's advantage "grows monotonically with skew (+0.003 → +0.201)".
@@ -432,7 +442,8 @@ renderer emits both so the choice is visible rather than implicit.
 | 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7 |
 | 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **reproduced** at 10 seeds — note 8 |
 | 6.3 Interpretability | *none* | — | **ungenerated** — structural by design; the counts row is checklist C9 / Goal G6 |
-| 6.4 Memory augmentation | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **ungenerated** — entry point now located, but single-seed and outside the harness — note 13 |
+| ~~6.4 Memory augmentation~~ | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **DESCOPED 2026-08-04 — no longer a table in the document.** §6.3.6, Table 6.4, Figure 6.3 and Goal C7 are removed; that work continues outside the proposal. Notes 13 and 17 stay as the record of why it was never quotable |
+| §6.3.5 refinement study | `reproduce/optimizers/run_study.py` | `outputs/table_opt_hotstart.{md,csv}`, `…_traces.csv` | **reproduced** — new; supersedes the two-optimizer evidence behind §6.3.5 |
 
 **Note 7 — one seed in ten destroys this cell, and that is the finding.** Table
 6.1 is re-quoted at 10 seeds: flat 2nd-refined 0.875 ± 0.019, fuzzy tree
@@ -462,7 +473,9 @@ row unattended, but `m5py` does not load against scikit-learn 1.9.0 —
 pinning an older scikit-learn to rescue two cells would move every other number
 in the chapter. Measured on this host 2026-08-02.
 
-**Note 13 — Table 6.4's entry point is located, and it is still not quotable.**
+**Note 13 — Table 6.4's entry point is located, and it is still not quotable.** *(Retained
+as a record; Table 6.4 was descoped from the document on 2026-08-04, so nothing below is
+owed to the proposal.)*
 This row said `tribble-fis/tests/test_double_pendulum.py`, and Chapter 6's
 reproduction paragraph said the experiment lived in `tribble-fis`. **Neither is
 true** — no such file exists in that submodule. The scripts are in *this*
@@ -480,6 +493,17 @@ double-pendulum pairs disagree about the target's scale (0.92/0.045 implies
 σ ≈ 0.159, 0.96/0.028 implies σ ≈ 0.140), so the headline "38% error reduction"
 should be read as an order of magnitude and not as two significant figures until
 both rows are re-measured under one protocol.
+
+**Note 17 — Table 6.4 is also blocked on a defect, not just on effort.** *(Retained as a
+record of a live upstream bug; the table itself was descoped on 2026-08-04.)*
+`MimoGaussianPredictorMemory.predict_trajectory` returns its initial window
+unchanged for every `(window_size, memory_size)` pair: it slices exactly
+`window_size` rows of history, `prepare_sequences` then computes the last row's
+long-term average over an interval that is empty at exactly that row, and the
+method's own NaN guard breaks the loop at step zero. Verified at (3,1), (4,2),
+(10,4), (2,1). The one-step `predict` path is unaffected. Until the slice is
+widened to `window_size + memory_size` there is no iterated rollout to measure,
+which is also why Figure 6.3 is a placeholder.
 
 ---
 
@@ -569,7 +593,53 @@ exactly zero.
 | Ten-table sweep, 10 seeds | `outputs/seeds10-2026-08-01/` | The run the chapters are now quoted at. |
 | Ch5 driver | `gated-minimax-selection/outputs/` | Runs to completion after the `fig_membership` fix; `results.json` reproduces the 2026-07-20 file exactly. |
 | Workstation sweep, 10 seeds | `outputs/full-14900hx-2026-08-02/` | First pass on the i9-14900HX. 13 generators green. Superseded by r2 for citation: its tables carry a degraded machine block (`ram: unknown`), and it lacks Table 4.4b. |
-| **Workstation sweep, 10 seeds (run of record)** | `outputs/full-14900hx-r2/` | **The citable run.** All 13 generators green in one pass, 14 tables including the θ curve, correct machine block on every table, and the numeric stack recorded. This is the single-host re-take checklist B5 asked for — note 11. |
+| Workstation sweep, 10 seeds | `outputs/full-14900hx-r2/` | The previous run of record, at `tribble-fis d0efefc`. Superseded by `full-2026-08-03` — note 18. |
+| Full trace, 10 seeds | `outputs/full-2026-08-03/` | The previous run of record, at `tribble-fis 4b33a0d`. Superseded by `uniform-2026-08-03` — note 19.  <!-- superseded; the original entry follows -->
+| &nbsp; | &nbsp; | **Was the citable run.** All 13 table generators green, the GPU table included in the same pass for the first time (1380 s of the 48 min), 19 of 19 drawable figures, the Chapter 5 driver and its opt-in scaling benchmark, and the Chapter 3 cluster experiments. At `tribble-fis 4b33a0d`, which is three functional PRs past the previous run of record — note 18. Read its `PROVENANCE.txt` in full: the archive step was recovered with `--archive-only` and says so. |
+| **Full trace, 10 seeds (run of record)** | `outputs/uniform-2026-08-03/` | **The citable run.** All 14 table generators green at ten seeds, at `tribble-fis 6ddb802`. Differs from `full-2026-08-03` by one library default: `partition_output` cuts the target at equal width rather than equal frequency with pinned extremes — note 19. Its `table_g5_output_partitioning` was backfilled to add 0th order, the axis that settled G5. Read its `PROVENANCE.txt` addendum: the header records `tribble-fis 1a83df8`, a squash-merged branch commit, and the run spans two SHAs whose `src/` trees are identical. |
+| Preprocessing control | `outputs/splitfirst-2026-08-03/` | Table 6.1's flat arms with the target scale, output partition and feature scaler fit on the training fold only. Bounds the transductive-preprocessing defect at inside-the-seed-spread on every exposed row — `outputs/SPLIT_FIRST_LEAK.md`. |
+
+**Note 18 — the 2026-08-03 full trace, and the one result in it that changes a
+chapter's claim.** `tribble-fis` moved `d0efefc` → `4b33a0d` between the previous run
+of record and this one: PR #67 and #73 (the scaling split and `log_features`, both
+byte-identical without `log_features`), #68 (the Ruspini guard), and **#72**, which is
+the one that moves numbers — `find_optimal_gaussians` now scores each candidate
+component count off the k-means partition it implies instead of fitting four EM
+mixtures and discarding them. Full cell-by-cell diff in `outputs/FIX_IMPACT.md`.
+
+*Mostly it is good news.* Chapter 4 and 6 accuracies rose and their spreads tightened:
+flat 2nd-refined 0.864 ± 0.046 → **0.877 ± 0.037**, flat 1st-refined 0.836 ± 0.054 →
+**0.866 ± 0.029**, flat full-2nd under log+min-max 0.859 ± 0.039 → **0.873 ± 0.020**.
+Training time roughly halved — Concrete 1.04 ± 0.62 s → **0.43 ± 0.01 s**, PhiUSIIL
+0.64 → **0.28 s** — and Table 4.1 now carries a timed full-2nd row on the estimator
+path, which fills note 14's `*pending*` cell. `table_3_2_memory_precision` (32 cells),
+`table_a1_feature_ranking` (20) and all three Chapter 5 tables are byte-identical.
+Exponents hold: classical 3.20 exactly, stage two 1.97 → 1.95, stage one 1.86 →
+**1.88** — which puts stage one just outside the 1.84–1.87 range §3.4 quotes, so that
+range needs widening to 1.84–1.88 across five runs.
+
+*The exception is Table 4.6, and it is not cosmetic.* The θ operating curve moved at
+every θ: detection rate up 0.084–0.152, false-alarm rate up **0.151–0.221**, and the
+net J therefore *down* 0.040–0.103. The band §4.4 quotes as **+0.222…+0.239 peaking
+at θ = 0.60** now reads **+0.119…+0.154 peaking at θ = 0.80**. About 35% of the
+achievable separation is gone and the operating point has moved two steps along the
+sweep. The chapter's qualitative reading survives — there is still no sharp optimum, so
+the knob is still forgiving — but every figure in it is superseded, and the honest
+summary is now weaker: the complement rule detects less cleanly than the previous run
+suggested. Table 4.7's ranking should be re-read on the same basis, and note 6's
+standing instruction not to quote a winner from it still applies.
+
+*Table 3.4 is no longer drifted, it is measured.* The GPU table ran inside the sweep
+for the first time and reproduces note 15 throughout: the MST ratio is non-monotone
+(5.4 / 8.4 / 7.4 / 6.5 across the grid, so "growing with N" remains wrong), the matched
+front end grows (2.3 / 3.5 / 3.9 / 5.0) while the unmatched pair reads 5.7–12.2, FCM
+against the NumPy-broadcasting arm reads 13.1 / 24.7 / 38.9 against **1.2 / 2.3 / 3.8**
+for its own formulation on the CPU — so the order of magnitude between "device" and
+"rewrite" reproduces — and the pairwise-distance loss is intact, with the GPU losing at
+d = 10 and d = 50 in both precisions. The N = 48,000 float32 demonstration reads 3.7×
+at ordering agreement **0.99992**, with the two Prim totals identical to every printed
+digit (42023.180315, relative difference 0.0e+00). That is the tie-break case §3.2 now
+states as an assumption rather than a hypothetical.
 
 **The two workstation sweeps are also the determinism test, and they pass.**
 Comparing them cell by cell: `table_concrete_reconciliation` (34),
@@ -638,3 +708,67 @@ dying on import — all produced output that looked plausible or exited zero. So
 did `REPRO_THETA_SWEEP=1`, which is a valid θ list of one and emits a table of
 zeros that reads exactly like a null result. Check the provenance, not the exit
 status.
+
+**Note 19 — the output partition, and the two chapter claims that were artifacts
+of it.** `partition_output` cut the target with `pd.qcut` and then overwrote the two
+extreme bucket centroids with the observed min and max. `uniform-2026-08-03` is the
+same sweep with equal-width cuts and per-bucket centroids, one library default
+different (`tribble-fis` #81), and it moves two claims that three prior studies had
+looked straight at.
+
+**Why three studies missed it.** `table_g5_output_partitioning` ran 126 cells over
+three schemes and six configurations — at 1st and 2nd consequent order only. There
+the three arms span 0.009 in R² against seed spreads of ±0.018 to ±0.027, so G5 was
+left open with no scheme recommended, correctly given what was measured.
+`solve_tsk_consequents` holds the first and last rules' *constant* terms at the
+centroids it is handed, as an exact equality constraint. At 0th order that constant
+is a rule's entire output, so the same three arms span **0.828**: uniform
+0.394 ± 0.065, pure quantile 0.242 ± 0.070, pinned quantile −0.434 ± 0.241, ordering
+preserved at three, four and six buckets. Decomposed, the boundary scheme is worth
+0.152 and the pinning 0.676. The generator now runs 0th order by default.
+
+**Claim 1, Chapter 4's consequent-order ladder.** §4.3 read −0.434 at 0th order as
+evidence that first-order consequents were a requirement rather than a refinement.
+They are not: the flat arm is 0.394 ± 0.065 under equal-width cuts, and the ladder
+0.394 / 0.796 / 0.841 / 0.861 has its knee between first and second order. Chapter 1
+and Chapter 2 both carried the negative figure in their opening arguments and are
+re-quoted.
+
+**Claim 2, Chapter 4's boundedness argument.** §4.1 reported that real z-scoring
+collapsed the first-order model to 0.014 ± 0.195, below its raw-feature score, and
+built the case that a bounded input domain was load-bearing. Under equal-width cuts
+that cell is 0.713 ± 0.035 and Δ z-score − raw flips from −0.651 to +0.018. The
+interaction was the two pinned extreme rules against features z-scoring leaves
+unbounded. What survives is a preference worth 0.083 at first order, plus a real
+variance cost at full second order (±0.115 against ±0.026). The `n_gaussians`-pinned
+figures −0.407/−0.524/−0.634 quoted from the old arm are withdrawn.
+
+**What did not move.** `table_g5_output_partitioning` and `table_g5b_skew_sweep` are
+identical across all 174 cells, since both implement their own arms and are the
+evidence for the change rather than consumers of the default. The four rank-based
+control rows of `table_concrete_reconciliation` move by exactly 0.000, which is the
+check that the switch touched only what it claimed to. Chapter 3's movement is
+timing variance plus two fitted exponents (classical 3.20 → 3.15, stage one
+1.88 → 1.86). Chapter 5 is untouched.
+
+**The lesson is not "more seeds".** This survived ten seeds, three schemes, six
+configurations and four archives. It was a regime never entered, and no amount of
+repetition inside the wrong regime finds that. What found it was reading the solved
+coefficients instead of the scores.
+
+**Note 20 — why the Table 3.4 diagnosis sat here for four archives without
+reaching the chapter.** Note 11 above identified all three defective rows,
+including the FCM row's order-of-magnitude formulation confound, and the chapter
+went on printing **30–56×** anyway. The gap is mechanical, not editorial:
+`check_prose` compares `mean ± std` pairs against archive CSVs, and every
+defective cell in Table 3.4 was written as a *range* — "30–56×",
+"≈4.8–6.6×", "1.3–2.5×", "≈5× ... growing with N". None of them is a
+mean-and-spread pair, so the archive checker never looked at any of them, and the
+one check that would have caught a four-archive-stale headline number ran clean the
+whole time.
+
+Two consequences worth acting on. Ranges are now avoided in that table in favour of
+per-condition values, which the checker can see. And a note in `PROVENANCE_MAP.md`
+is not a correction: it records that someone knew, which is worse than not knowing
+if the chapter is what gets read. Findings belong in the prose or in a tracked
+checklist item, not only here.

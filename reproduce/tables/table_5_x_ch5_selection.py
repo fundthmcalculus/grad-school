@@ -50,6 +50,29 @@ def _f(value, fmt="{:.3f}"):
     return C.NA if value is None else fmt.format(value)
 
 
+def seed_note(results):
+    """What to put in the footer's `seeds =` slot, taken from the driver's own record.
+
+    This script computes nothing, so the harness's `common.SEEDS` describes nothing
+    about these three tables -- and the footer used to print it anyway, stamping ten
+    seeds onto a run made at five. `run_all.py` now records the seed sets it used, so
+    the footer can state them.
+
+    A JSON written before that change has no `seeds` key, and the honest thing to print
+    then is that the run did not record it. Substituting `common.SEEDS` is what created
+    the problem; substituting the values we happen to believe the driver uses would
+    recreate it one step removed, because the next time a driver default moves the
+    footer would go stale again silently.
+    """
+    seeds = results.get("seeds")
+    if not seeds:
+        return ("unrecorded -- this results.json predates the driver recording its "
+                "own seed sets; re-run `run_all.py` to fill it in")
+    if isinstance(seeds, dict):
+        return "; ".join(f"{k.replace('_', ' ')} {v}" for k, v in seeds.items())
+    return str(seeds)
+
+
 def table_5_1(results):
     """The battery: baselines given k, versus the gate discovering it.
 
@@ -95,6 +118,7 @@ def table_5_1(results):
               "the covered-points column is diagnostic. On uniform_noise there is no "
               "ground-truth partition, so ARI is null by construction and the "
               "abstention has to be read off coverage (0.125) instead."),
+        seeds=seed_note(results),
     )
 
 
@@ -121,6 +145,7 @@ def table_5_2(results):
               "ms_granularities. Averaging over ALL ground-truth levels is what makes the "
               "flat column look bad -- a flat cover lands one level exactly and misses the "
               "rest, so its per-level scores are recorded in flat_ari_per_level."),
+        seeds=seed_note(results),
     )
 
 
@@ -150,6 +175,7 @@ def table_5_3(results):
               "coverage instead. Low coverage at any k IS the abstention: the gate blocks "
               "the blocks rather than reporting none. No universal winner; bridge-"
               "robustness and noise-conservatism trade off against one another."),
+        seeds=seed_note(results),
     )
 
 
