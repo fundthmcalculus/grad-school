@@ -301,15 +301,15 @@ test window.
 
 | Dataset             | $s(20)$ | $s/\rho$ | $\lambda$ (s⁻¹) | Midpoint RMSE |
 |---------------------|---------|----------|-----------------|---------------|
-| 2-link, friction    | 8.8°    | 3.3 %    | 0.56            | 0.00250       |
-| 3-link, friction    | 8.2°    | 4.0 %    | 0.23            | 0.000359      |
-| 5-link, friction    | 105°    | 23.7 %   | 1.25            | 0.0515        |
-| 2-link, no friction | 628°    | 67 %     | 1.81            | 0.226         |
-| 3-link, no friction | 649°    | 112 %    | 0.83            | 0.166         |
-| 5-link, no friction | 709°    | 62 %     | 1.40            | 0.227         |
+| 2-link, friction    | 1.7°    | 0.6 %    | 0.56            | 0.00250       |
+| 3-link, friction    | 12.3°   | 6.0 %    | 0.34            | 0.000359      |
+| 5-link, friction    | 31.4°   | 7.0 %    | 1.25            | 0.0515        |
+| 2-link, no friction | 1780°   | 129 %    | 1.85            | 0.226         |
+| 3-link, no friction | 2267°   | 243 %    | 0.87            | 0.166         |
+| 5-link, no friction | 844°    | 70 %     | 1.41            | 0.227         |
 
-With damping the pair never separates by more than 4 % of the target's range at
-$n = 2, 3$; the interpolation problem is genuinely easy.
+With damping the pair stays under 7 % separation across $n = 2, 3, 5$; the
+interpolation problem is genuinely easy at every chain length we tested.
 
 ![Separation of the two trained ICs bracketing the 2.05° holdout, showing how damping keeps
 the trajectories coherent while frictionless systems diverge exponentially.](figures/trajectory_snapshots.png)
@@ -331,10 +331,11 @@ grow three orders of magnitude.](figures/fig_bracket.png)
 ### 5.3 The degeneracy is chain-length-dependent
 
 Extending the protocol to $n = 5$ — which the original work does not attempt —
-shows that the benchmark's two chain lengths are the two where the degeneracy is
-most extreme. By $n = 5$ the bracketing pair separates to 23.7 % of the range and
-the midpoint baseline degrades twentyfold, from 0.0025 to 0.0515. It remains
-ahead of our FIS (0.0672), but by 1.3× rather than 4.8×. Across all three chain
+shows the degeneracy continuing to grow with chain length, though the separation
+metric grows more gently than the RMSE it produces: by $n = 5$ the bracketing pair
+separates to 7.0 % of the range (up from 6.0 % at $n = 3$ and 0.6 % at $n = 2$),
+while the midpoint baseline's RMSE degrades twentyfold, from 0.0025 to 0.0515. It
+remains ahead of our FIS (0.0672), but by 1.3× rather than 4.8×. Across all three chain
 lengths the FIS loses to the baseline on every friction holdout and beats both
 baselines on every frictionless one: it wins where the answer is a blend over
 many training conditions and loses where it is one nearby trajectory copied
@@ -566,9 +567,9 @@ corroborates the rest of the paper.
 
 | rules | in-window | past-window | mean radius | $\mathrm{corr}(1-r, \lvert e \rvert)$ |
 |-------|-----------|-------------|-------------|---------------------------------------|
-| 40    | **67.8°** | 102.4°      | 0.723       | **0.365**                             |
-| 120   | 74.1°     | **92.1°**   | 0.843       | 0.252                                 |
-| 300   | 74.0°     | 110.1°      | 0.835       | 0.218                                 |
+| 40    | **67.8°** | 102.3°      | 0.723       | **0.541**                             |
+| 120   | 74.1°     | **92.1°**   | 0.843       | 0.287                                 |
+| 300   | 74.0°     | 110.1°      | 0.835       | 0.240                                 |
 
 The radius rises from $0.72$ to $0.84$ between 40 and 120 rules and then
 *saturates* — 300 rules gives $0.835$, not something approaching $1$. The residual
@@ -577,8 +578,8 @@ model hedging toward the conditional mean, the same behavior identified in §5.2
 bracket decorrelation. A shrunken radius is how the sine–cosine representation displays it.
 
 The per-sample correlation between radius shortfall and angular error is positive
-at every capacity ($+0.22$ to $+0.37$), so low-radius samples really are the wrong
-ones — but it explains only 5–13 % of error variance. That is a usable soft flag,
+at every capacity ($+0.24$ to $+0.54$), so low-radius samples really are the wrong
+ones — but it explains only 6–29 % of error variance. That is a usable soft flag,
 not calibrated uncertainty, and we record it as such rather than as a free
 confidence estimate.
 
