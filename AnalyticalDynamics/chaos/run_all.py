@@ -26,6 +26,8 @@ import ast
 import csv
 import sys
 
+import numpy as np
+
 import paper_results as pr
 import pendulum_data as pdata
 import plots

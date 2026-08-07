@@ -9,12 +9,10 @@ two chain lengths to n = 2, 3 and 5.
 
 Read in this order:
 
-| File | What it is |
-|---|---|
-| `METHOD_AND_PARAMETERS.md` | The paper's method, step by step, and every training parameter — separating what the PDF says from what the authors' code does. §7 covers the n=5 extension. Read first. |
-| `REPRODUCTION_REPORT.md` | What worked, what didn't, and how the FIS compares to the paper's reported numbers. §8 is the n=5 extension. |
-| `results/comparison.md` | Generated cell-by-cell ranking tables: FIS vs the paper's models vs two no-learning baselines. |
-| `paper.md` | Write-up as a NAFIPS-length paper (~5,400 words, 9 sections, 12 equations), with `references.bib` alongside. Lives here rather than under `papers/` on purpose: it is a draft against live code, and its figure links point at `figures/` in this directory. Move both to `papers/` when drafting for submission. |
+| File                    | What it is                                                                                                                                                                                                                                                                                                        |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `results/comparison.md` | Generated cell-by-cell ranking tables: FIS vs the paper's models vs two no-learning baselines.                                                                                                                                                                                                                    |
+| `paper.md`              | Write-up as a NAFIPS-length paper (~5,400 words, 9 sections, 12 equations), with `references.bib` alongside. Lives here rather than under `papers/` on purpose: it is a draft against live code, and its figure links point at `figures/` in this directory. Move both to `papers/` when drafting for submission. |
 
 **Short version:** the FIS beats all eight of the paper's time-step models in six of
 the seven cells the paper reports and places second in the seventh. But on the
