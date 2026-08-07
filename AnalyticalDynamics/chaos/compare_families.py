@@ -6,7 +6,7 @@ conditions and both scored on the same held-out [120, 2.05] deg trajectory out t
 
   WITH the time variable -- the paper's time-step operator (fis_timestep.py):
       (theta_1(0), theta_2(0), t) -> (theta_1(t), theta_2(t))
-      One vectorised query answers any t. Time is an input, so the model's domain
+      One vectorized query answers any t. Time is an input, so the model's domain
       of validity is the training window and nothing carries across its edge.
 
   WITHOUT the time variable -- a learned right-hand side (stable_extrapolation.py):
@@ -20,7 +20,7 @@ are not converged past about 11.5 s (pendulum_data.reference_convergence), so a
 property of the step size. Friction at n=2 agrees with DOP853 to 0.0018 deg over
 20 s, so the comparison is meaningful.
 
-Three axes are recorded besides accuracy, because they are where the two families
+Three axes are recorded as well as accuracy, because they are where the two families
 genuinely trade against each other:
 
   * training time     -- seconds to fit, measured

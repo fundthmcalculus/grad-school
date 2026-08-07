@@ -212,10 +212,10 @@ class DynamicsFIS:
 
     Measured, it does the opposite: tail amplitude ratio 41 unclipped versus 1468
     clipped on the 20 s rollout, twenty-five times *worse*. Clipping freezes the
-    acceleration at the boundary value, so once the state leaves the box the
+    acceleration at the boundary value, so once the state leaves the box, the
     restoring term stops growing with displacement while the rate keeps
     integrating -- the clip removes precisely the feedback that would have pulled
-    the state back. Saturating the input is not the same as saturating the output.
+    back the state. Saturating the input is different from saturating the output.
     Kept as an ablation because the intuition is appealing and wrong; use
     `dissipation_guard` in `rollout` instead, which bounds the rollout by
     constraining energy rather than inputs.
@@ -291,7 +291,7 @@ def apply_dissipation_guard(prev_state, new_state):
     Kinetic energy is homogeneous of degree 2 in the angular rates, so rescaling
     both rates by lambda scales KE by lambda^2 and the correction is closed-form:
     lambda = sqrt((E_prev - PE_new) / KE_new). Angles are untouched, so the
-    configuration the integrator produced is kept and only its speed is bled off.
+    configuration the integrator produced is kept, and only its speed is bled off.
 
     This bounds the rollout but does not aim it: it constrains the *magnitude* of
     the state, not its direction on the energy surface. This repository measured

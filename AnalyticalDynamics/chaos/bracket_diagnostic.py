@@ -2,7 +2,7 @@
 
 The paper's time-step operator interpolates between initial conditions: the
 held-out IC [120, 2.05] sits exactly between the trained ICs [120, 2.0] and
-[120, 2.1]. Interpolation can only work while those two neighbours still
+[120, 2.1]. Interpolation can only work while those two neighbors still
 resemble each other. This script measures how long that holds.
 
 Once the two bracketing training trajectories have separated by a large fraction
