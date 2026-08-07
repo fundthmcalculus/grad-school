@@ -23,7 +23,7 @@ damping keeps them within 4% of the target's range for the whole window. The
 benchmark's friction variant at n=2 and n=3 is an interpolation problem, not a
 chaos problem.
 
-Extending to n=5 (`REPRODUCTION_REPORT.md` §8) shows that dominance is
+Extending to n=5 (paper.md §5.3, `results/bracket.json`) shows that dominance is
 chain-length-dependent: at five links the same baseline is 20× worse, because the
 bracketing pair separates by 24% of the target's range instead of 3%. It is still
 ahead of the FIS, but by 1.3× rather than 4.8×. Across all three chain lengths the
@@ -34,21 +34,31 @@ initial conditions and loses where it is one nearby trajectory copied accurately
 ## Layout
 
 ```
-pendulum_data.py       RK4 generator (paper-faithful) + a provenance check that
-                       cross-validates the n=2 equations against this repo's
-                       independent symbolic model every run
-fis_timestep.py        the FIS operator, the paper's preprocessing protocol, the
-                       three metric families, and the no-learning baselines
-sweep.py               main hyperparameter sweep, --n/--out -> results/sweep*.csv
-sweep_lowcap.py        low-capacity follow-up sweep, --n/--out
-bracket_diagnostic.py  measures why the frictionless holdout is unlearnable
-plots.py               figure generators (paper figure formats)
-paper_results.py       the paper's reported numbers, transcribed
-run_all.py             picks the winner per dataset, refits, emits all outputs
-data/                  generated datasets (.npz + tidy .csv)
-results/               sweep{,_lowcap,_n5,_lowcap_n5}.csv, best.csv, comparison.md,
-                       bracket.csv, extrapolation.csv  (tracked -- the evidence)
-figures/               PNGs
+pipeline_cache.py       content-hash freshness helpers run_all.py's stages use
+pendulum_data.py        RK4 generator (paper-faithful) + a provenance check that
+                        cross-validates the n=2 equations against this repo's
+                        independent symbolic model every run
+fis_timestep.py         the FIS operator, the paper's preprocessing protocol, the
+                        three metric families, and the no-learning baselines
+sweep.py                main + low-capacity grids (--lowcap), --n/--out for a
+                        chain length outside the pipeline
+bracket_diagnostic.py   why the frictionless holdout is unlearnable (Tables 2-3)
+compare_families.py     time-as-input vs state-as-input; run_all.py only uses its
+                        time-as-input half (Table 4) via gen_n2_rollout_comparison.py
+wrap_sweep.py           wrap / hysteresis / sin-cos representation study (Tables 6-8)
+gen_n2_rollout_comparison.py / gen_rollout_error_vs_n.py
+                        Table 4 / Table 7's figures, fitted or read from real
+                        pipeline output (not synthesized or hardcoded)
+plots.py                figure generators (paper figure formats)
+paper_results.py        the paper's reported numbers, transcribed
+run_all.py              the one entry point -- see Running, below
+stable_extrapolation.py state-as-input surrogate; a comparison point for
+                        compare_families.py, not part of the reproduction
+                        run_all.py drives (paper.md doesn't cite its numbers)
+data/                   generated datasets (.npz + tidy .csv)
+results/                one JSON per stage (data, sweep, sweep_lowcap, select,
+                        bracket, capacity, representation) + comparison.md
+figures/                PNGs
 ```
 
 ## Running
@@ -60,34 +70,48 @@ convention of the sibling scripts.
 
 ```sh
 cd AnalyticalDynamics/chaos
-../../.venv/Scripts/python pendulum_data.py       #  33 s  -> data/  (includes the n=5 checks)
-../../.venv/Scripts/python bracket_diagnostic.py  #  10 s  -> results/bracket.csv, fig_bracket
-../../.venv/Scripts/python sweep.py               # ~2.5 h, 6 datasets x 19 configs
-../../.venv/Scripts/python sweep_lowcap.py        #   7 min, 6 datasets x 24 configs
-../../.venv/Scripts/python run_all.py             #  20 min, refits winners -> figures + tables
+../../.venv/Scripts/python run_all.py           # everything, from scratch, cached
 ```
 
-To add a chain length without re-running what is already scored, sweep it into its
-own file — `run_all.py` merges every sweep CSV it finds:
+That one command runs seven stages in order -- data generation, the main sweep,
+the low-capacity sweep, refit-and-select (Table 1), the bracket diagnostic
+(Tables 2-3), the capacity/extrapolation comparison (Table 4), and the
+wrap/representation study (Tables 6-8) -- and leaves one JSON file per stage in
+`results/`, plus every figure paper.md links to, in `figures/`. Each stage is
+skipped if its cached JSON already matches a hash of that stage's inputs (fits
+are deterministic, `random_state` fixed throughout), so a second run does
+nothing:
 
 ```sh
-../../.venv/Scripts/python sweep.py --n 5 --out sweep_n5.csv                # 72 min
-../../.venv/Scripts/python sweep_lowcap.py --n 5 --out sweep_lowcap_n5.csv  #  3 min
+../../.venv/Scripts/python run_all.py                      # skip anything unchanged
+../../.venv/Scripts/python run_all.py --fresh               # force every stage
+../../.venv/Scripts/python run_all.py --fresh sweep lowcap   # force just these two
+../../.venv/Scripts/python run_all.py --stage bracket        # run one stage alone
 ```
 
-Timings are measured on 32 cores, though the FIS fit is single-threaded, so they
-are effectively single-core numbers. The two sweeps are independent and can run
-concurrently. `sweep.py --quick` runs a 4-config subset if you only want the
-pipeline exercised.
+The main sweep, low-capacity sweep, and representation stages are the expensive
+ones (~2.5 h, ~10 min, and ~90 min respectively -- the representation stage's
+cost comes from dozens of full-2nd-order 120-rule fits across the wrap/
+hysteresis grid, not from any single slow step). `data`, `select`, and
+`bracket`/`capacity` are seconds to a few minutes. `python sweep.py --quick` runs a
+4-config smoke subset of the main grid if you only want the pipeline exercised
+without paying for the full sweep; `python sweep.py --n 5 --out sweep_n5.csv`
+sweeps an additional chain length outside the pipeline (which always requests
+the fixed n in {2, 3, 5} grid paper.md reports).
 
-`run_all.py` merges every sweep CSV named in its `SWEEP_FILES`, picks a winner per
-(dataset, metric-family), refits it, and **asserts the refit reproduces the swept
-score to 1e-9** before reporting it. 253 scored configurations at present.
+The `select` stage picks a winner per (dataset, metric family) from the merged
+sweep + low-capacity rows, refits it, and **asserts the refit reproduces the
+swept score to 1e-9** before reporting it -- 253 scored configurations at
+present. Five `triple_friction` configurations fail by design and are recorded
+as error rows: `output_partition="uniform"` at 300 buckets leaves empty buckets
+on that target and the library's consequent indexing raises `IndexError`. Use
+`quantile` there.
 
-Five `triple_friction` configurations fail by design and are recorded as error
-rows: `output_partition="uniform"` at 300 buckets leaves empty buckets on that
-target and the library's consequent indexing raises `IndexError`. Use `quantile`
-there — see `REPRODUCTION_REPORT.md` §4.3.
+Every module above still has its own `if __name__ == "__main__":` for standalone
+debugging (`python bracket_diagnostic.py`, `python wrap_sweep.py`, ...) -- it
+computes the same thing run_all.py's matching stage does and writes a plain
+(non-cached) JSON dump of its own results, so it's never gated behind the
+pipeline's freshness check.
 
 ## Datasets
 
@@ -136,7 +160,7 @@ extension.
    (R² +0.998 → −6.3e7 on the double pendulum). The time-step formulation makes
    `t` an input feature rather than integrating a state, which is why it is
    accurate inside the window and has no horizon at all outside it.
-   `REPRODUCTION_REPORT.md` §9, `results/extrapolation.csv`.
+   paper.md §6, `results/select.json` (each dataset's `extrapolation` field).
 
 Figures are per-metric: `fig_rmse_*` and `fig_r2_*`, each a bar chart sorted
 best-first, rather than the paper's dual-axis combined chart.

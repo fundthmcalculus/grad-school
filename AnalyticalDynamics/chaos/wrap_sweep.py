@@ -49,8 +49,8 @@ Run: python wrap_sweep.py
 
 from __future__ import annotations
 
-import csv
 import dataclasses
+import json
 import time
 
 import numpy as np
@@ -324,10 +324,22 @@ def evaluate_sincos(split, cfg=PROBE_REPR, seed=42):
     # diagnostic: the FIS is not constrained to produce a valid angle, and the
     # radius tells you how much of its output is inadmissible.
     radius = np.sqrt(P[:, :n] ** 2 + P[:, n:] ** 2)
+
+    # Per-sample, per-link: does a shrunken radius flag the wrong predictions?
+    # Correlated in-window only, matching every other in-window figure in this
+    # module. Not calibrated uncertainty -- Table 8's note on this -- just
+    # whether low radius and high error co-occur.
+    abs_err_inw = np.abs((pred_deg[inw] - truth[inw] + 180.0) % 360.0 - 180.0)
+    radius_shortfall_inw = 1.0 - radius[inw]
+    radius_error_corr = float(
+        np.corrcoef(radius_shortfall_inw.ravel(), abs_err_inw.ravel())[0, 1]
+    )
+
     return {
         "dataset": split.label,
         "representation": "sin/cos",
         "wrap_limit_deg": "n/a",
+        "n_output_buckets": cfg.n_output_buckets,
         "train_seconds": round(fit_s, 1),
         "target_range_deg": 2.0,
         "wrap_events_train": 0,
@@ -341,11 +353,40 @@ def evaluate_sincos(split, cfg=PROBE_REPR, seed=42):
             circular_rmse_deg(pred_deg[~inw], truth[~inw]), 3
         ),
         "mean_unit_radius": round(float(np.mean(radius[inw])), 4),
+        "radius_error_corr": round(radius_error_corr, 3),
     }
 
 
-def main_representations():
-    """Compare pointwise wrap, hysteresis wrap, and sin/cos on one footing."""
+def main_sincos_capacity(n_output_buckets=(40, 120, 300), n_links=2, friction=False, log=print):
+    """Table 8: sin/cos accuracy against capacity, frictionless double pendulum.
+
+    `evaluate_sincos` above is normally called once at a fixed probe capacity
+    (matching the other representations for comparability); this is the sweep
+    that actually varies n_output_buckets for the sin/cos representation, which
+    is what shows it saturating rather than improving with capacity.
+    """
+    split = fts.load(n_links, friction)
+    rows = []
+    for nb in n_output_buckets:
+        cfg = fts.FisConfig(
+            n_output_buckets=nb,
+            tsk_order="full-2nd",
+            l2_reg=1e-9,
+            output_partition="quantile",
+        )
+        r = evaluate_sincos(split, cfg)
+        rows.append(r)
+        log(
+            f"  {nb:4d} rules  in-window {r['inwindow_rmse_circ_deg']:6.1f} deg  "
+            f"past-window {r['extrap_rmse_circ_deg']:6.1f} deg  "
+            f"mean radius {r['mean_unit_radius']:.3f}  "
+            f"corr(1-r,|e|) {r['radius_error_corr']:+.3f}"
+        )
+    return rows
+
+
+def build_representation_rows():
+    """Table 7: pointwise wrap, hysteresis wrap, and sin/cos on one footing."""
     rows = []
     for n_links, friction in [(2, False), (3, False), (5, False), (5, True)]:
         split = fts.load(n_links, friction)
@@ -390,49 +431,62 @@ def main_representations():
             f"mean|(sin,cos)|={s['mean_unit_radius']:.3f}"
         )
 
+    return rows
+
+
+def build_wrap_sweep_rows(datasets=DATASETS, limits=WRAP_LIMITS, log=print):
+    """Table 6-adjacent raw grid: every (dataset, wrap limit), pointwise wrap only."""
+    rows = []
+    for n_links, friction in datasets:
+        split = fts.load(n_links, friction)
+        raw_max = float(np.abs(split.theta_deg).max())
+        log(f"\n{split.label}  (|theta| max = {raw_max:.0f} deg)")
+        for limit in limits:
+            r = evaluate(split, limit)
+            rows.append(r)
+            tag = "no wrap" if limit is None else f"+-{limit:.0f} deg"
+            log(
+                f"  {tag:12s} range={r['target_range_deg']:7.1f}  "
+                f"jumps(train/hold)={r['wrap_events_train']:5d}/{r['wrap_events_holdout']:3d}  "
+                f"scaledRMSE={r['inwindow_rmse_scaled']:.4f} R2={r['inwindow_r2']:+.4f}  "
+                f"circErr in/out={r['inwindow_rmse_circ_deg']:7.2f}/"
+                f"{r['extrap_rmse_circ_deg']:8.2f} deg"
+            )
+    return rows
+
+
+def main_representations():
+    """Standalone CLI: Table 7's comparison, written to results/representation.json."""
+    rows = build_representation_rows()
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
-    fields = []
-    for r in rows:
-        for k in r:
-            if k not in fields:
-                fields.append(k)
-    path = RESULT_DIR / "representation_sweep.csv"
-    with open(path, "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=fields)
-        w.writeheader()
-        w.writerows(rows)
+    path = RESULT_DIR / "representation.json"
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump({"representations": rows}, fh, indent=2)
     print(f"\nwrote {path} ({len(rows)} rows)")
     return rows
 
 
 def main():
-    rows = []
-    for n_links, friction in DATASETS:
-        split = fts.load(n_links, friction)
-        raw_max = float(np.abs(split.theta_deg).max())
-        print(f"\n{split.label}  (|theta| max = {raw_max:.0f} deg)")
-        for limit in WRAP_LIMITS:
-            r = evaluate(split, limit)
-            rows.append(r)
-            tag = "no wrap" if limit is None else f"+-{limit:.0f} deg"
-            print(
-                f"  {tag:12s} range={r['target_range_deg']:7.1f}  "
-                f"jumps(train/hold)={r['wrap_events_train']:5d}/{r['wrap_events_holdout']:3d}  "
-                f"scaledRMSE={r['inwindow_rmse_scaled']:.4f} R2={r['inwindow_r2']:+.4f}  "
-                f"circErr in/out={r['inwindow_rmse_circ_deg']:7.2f}/"
-                f"{r['extrap_rmse_circ_deg']:8.2f} deg",
-                flush=True,
-            )
-
+    """Standalone CLI: Table 6's raw wrap grid, written to results/wrap_sweep.json."""
+    rows = build_wrap_sweep_rows()
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
-    path = RESULT_DIR / "wrap_sweep.csv"
-    with open(path, "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
-        w.writeheader()
-        w.writerows(rows)
+    path = RESULT_DIR / "wrap_sweep.json"
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump({"rows": rows}, fh, indent=2)
     print(f"\nwrote {path} ({len(rows)} rows)")
     return rows
 
 
 if __name__ == "__main__":
     main()
+    main_representations()
+    sincos_rows = main_sincos_capacity()
+    # Fold Table 8 into the file main_representations() just wrote, so a
+    # standalone run leaves one complete results/representation.json behind
+    # (same three keys run_all.py's `representation` stage writes, just without
+    # its cache envelope).
+    path = RESULT_DIR / "representation.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["sincos_capacity"] = sincos_rows
+    path.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    print(f"added sincos_capacity to {path}")

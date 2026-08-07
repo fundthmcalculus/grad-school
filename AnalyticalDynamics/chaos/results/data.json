@@ -1,0 +1,396 @@
+{
+  "stage": "data",
+  "hash": "fe97bf7ed293d7eb",
+  "hash_of": {
+    "theta1_deg": 120.0,
+    "train_theta2_grid": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      1.1,
+      1.2,
+      1.3,
+      1.4,
+      1.5,
+      1.6,
+      1.7,
+      1.8,
+      1.9,
+      2.0,
+      2.1,
+      2.2,
+      2.3,
+      2.4,
+      2.5,
+      2.6,
+      2.7,
+      2.8,
+      2.9,
+      3.0
+    ],
+    "test_theta2_deg": 2.05,
+    "damping": 0.15,
+    "t_end": 10.0,
+    "n_steps": 2000,
+    "test_t_end": 20.0,
+    "n_links": [
+      2,
+      3,
+      5
+    ]
+  },
+  "payload": {
+    "provenance": {
+      "symbolic_vs_reference_max_error": 1.0658141036401503e-14,
+      "energy_drift": {
+        "double_closed_form": {
+          "E0": -3.552713678800501e-15,
+          "drift_ratio": 6.58195546790979e-07
+        },
+        "n2_symbolic": {
+          "E0": -3.552713678800501e-15,
+          "drift_ratio": 6.58195551442884e-07
+        },
+        "n3_symbolic": {
+          "E0": -14.715000000000007,
+          "drift_ratio": 1.8342217892088748e-06
+        },
+        "n5_symbolic": {
+          "E0": -73.57500000000002,
+          "drift_ratio": 5.20608263627475e-05
+        }
+      },
+      "rk4_order_check_n": 5,
+      "rk4_step_sizes": [
+        0.005,
+        0.0025,
+        0.00125
+      ],
+      "rk4_drifts": [
+        5.20608263627475e-05,
+        3.2635126982087173e-06,
+        2.2951047974569513e-07
+      ],
+      "rk4_order_ratios": [
+        15.952389703071399,
+        14.219449594740913
+      ]
+    },
+    "datasets": [
+      {
+        "label": "double_frictionless",
+        "n_links": 2,
+        "friction": false,
+        "npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\double_frictionless.npz",
+        "csv": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\double_frictionless.csv",
+        "holdout_npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\double_frictionless_holdout.npz",
+        "train_shape": [
+          31,
+          2000,
+          2
+        ],
+        "holdout_shape": [
+          1,
+          4000,
+          2
+        ],
+        "ic_grid_deg": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9,
+          1.0,
+          1.1,
+          1.2,
+          1.3,
+          1.4,
+          1.5,
+          1.6,
+          1.7,
+          1.8,
+          1.9,
+          2.0,
+          2.1,
+          2.2,
+          2.3,
+          2.4,
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0
+        ]
+      },
+      {
+        "label": "double_friction",
+        "n_links": 2,
+        "friction": true,
+        "npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\double_friction.npz",
+        "csv": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\double_friction.csv",
+        "holdout_npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\double_friction_holdout.npz",
+        "train_shape": [
+          31,
+          2000,
+          2
+        ],
+        "holdout_shape": [
+          1,
+          4000,
+          2
+        ],
+        "ic_grid_deg": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9,
+          1.0,
+          1.1,
+          1.2,
+          1.3,
+          1.4,
+          1.5,
+          1.6,
+          1.7,
+          1.8,
+          1.9,
+          2.0,
+          2.1,
+          2.2,
+          2.3,
+          2.4,
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0
+        ]
+      },
+      {
+        "label": "triple_frictionless",
+        "n_links": 3,
+        "friction": false,
+        "npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\triple_frictionless.npz",
+        "csv": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\triple_frictionless.csv",
+        "holdout_npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\triple_frictionless_holdout.npz",
+        "train_shape": [
+          31,
+          2000,
+          3
+        ],
+        "holdout_shape": [
+          1,
+          4000,
+          3
+        ],
+        "ic_grid_deg": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9,
+          1.0,
+          1.1,
+          1.2,
+          1.3,
+          1.4,
+          1.5,
+          1.6,
+          1.7,
+          1.8,
+          1.9,
+          2.0,
+          2.1,
+          2.2,
+          2.3,
+          2.4,
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0
+        ]
+      },
+      {
+        "label": "triple_friction",
+        "n_links": 3,
+        "friction": true,
+        "npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\triple_friction.npz",
+        "csv": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\triple_friction.csv",
+        "holdout_npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\triple_friction_holdout.npz",
+        "train_shape": [
+          31,
+          2000,
+          3
+        ],
+        "holdout_shape": [
+          1,
+          4000,
+          3
+        ],
+        "ic_grid_deg": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9,
+          1.0,
+          1.1,
+          1.2,
+          1.3,
+          1.4,
+          1.5,
+          1.6,
+          1.7,
+          1.8,
+          1.9,
+          2.0,
+          2.1,
+          2.2,
+          2.3,
+          2.4,
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0
+        ]
+      },
+      {
+        "label": "quintuple_frictionless",
+        "n_links": 5,
+        "friction": false,
+        "npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\quintuple_frictionless.npz",
+        "csv": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\quintuple_frictionless.csv",
+        "holdout_npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\quintuple_frictionless_holdout.npz",
+        "train_shape": [
+          31,
+          2000,
+          5
+        ],
+        "holdout_shape": [
+          1,
+          4000,
+          5
+        ],
+        "ic_grid_deg": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9,
+          1.0,
+          1.1,
+          1.2,
+          1.3,
+          1.4,
+          1.5,
+          1.6,
+          1.7,
+          1.8,
+          1.9,
+          2.0,
+          2.1,
+          2.2,
+          2.3,
+          2.4,
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0
+        ]
+      },
+      {
+        "label": "quintuple_friction",
+        "n_links": 5,
+        "friction": true,
+        "npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\quintuple_friction.npz",
+        "csv": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\quintuple_friction.csv",
+        "holdout_npz": "C:\\personal\\grad-school\\AnalyticalDynamics\\chaos\\data\\quintuple_friction_holdout.npz",
+        "train_shape": [
+          31,
+          2000,
+          5
+        ],
+        "holdout_shape": [
+          1,
+          4000,
+          5
+        ],
+        "ic_grid_deg": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9,
+          1.0,
+          1.1,
+          1.2,
+          1.3,
+          1.4,
+          1.5,
+          1.6,
+          1.7,
+          1.8,
+          1.9,
+          2.0,
+          2.1,
+          2.2,
+          2.3,
+          2.4,
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0
+        ]
+      }
+    ]
+  }
+}

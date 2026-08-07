@@ -44,7 +44,7 @@ sys.path.insert(0, str(HERE.parent.parent / "tribble-fis" / "src"))
 from sklearn.metrics import r2_score  # noqa: E402
 from sklearn.preprocessing import MinMaxScaler  # noqa: E402
 
-from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor  # noqa: E402
+from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 
 import pendulum_data as pdata  # noqa: E402
 
@@ -246,7 +246,7 @@ class DynamicsFIS:
         self.models_ = []
         with _quiet():
             for j in range(Y.shape[1]):
-                m = MixtureOfGaussiansFuzzyRegressor(**self.kw)
+                m = TribbleRegressor(**self.kw)
                 m.fit(Xs, Y[:, j])
                 self.models_.append(m)
         return self
