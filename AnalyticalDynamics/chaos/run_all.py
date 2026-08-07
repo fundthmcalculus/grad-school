@@ -148,6 +148,90 @@ def draw_dataset(split, system, friction, base, trained, holdout):
     return holdout_pred
 
 
+def draw_bracket_separation():
+    """Generate trajectory_snapshots.png: bracket separation over time for both regimes.
+
+    Shows how the two bracketing training ICs (2.0 and 2.1 deg) diverge over time,
+    illustrating why the frictionless benchmark is unlearnable while damped systems
+    are interpolation-dominated.
+    """
+    import matplotlib.pyplot as plt
+
+    theta1_rad = np.radians(pdata.THETA1_DEG)
+    ic_lower = np.array([theta1_rad, 0.0, np.radians(2.0), 0.0])  # 2.0 deg
+    ic_upper = np.array([theta1_rad, 0.0, np.radians(2.1), 0.0])  # 2.1 deg
+
+    configs = [
+        ("friction", pdata.DAMPING),
+        ("frictionless", 0.0),
+    ]
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    for idx, (regime, damping) in enumerate(configs):
+        ax = axes[idx]
+
+        # Integrate to t=20 for both trajectories
+        n_steps = int(round((pdata.TEST_T_END - pdata.T_START) / pdata.H))
+        traj_lower = pdata.rk4_integrate(
+            lambda r, t: pdata.rhs_double_reference(
+                r, t, damping1=damping, damping2=damping
+            ),
+            ic_lower,
+            n_steps=n_steps,
+        )
+        traj_upper = pdata.rk4_integrate(
+            lambda r, t: pdata.rhs_double_reference(
+                r, t, damping1=damping, damping2=damping
+            ),
+            ic_upper,
+            n_steps=n_steps,
+        )
+
+        # Get time vector
+        t_all = pdata.time_points(t_end=pdata.TEST_T_END)
+
+        # Calculate separation: max angle difference across both joints (in degrees)
+        sep_1 = np.abs(np.degrees(traj_lower[:, 0] - traj_upper[:, 0]))
+        sep_2 = np.abs(np.degrees(traj_lower[:, 2] - traj_upper[:, 2]))
+        separation = np.maximum(sep_1, sep_2)
+
+        # Plot on log scale
+        ax.semilogy(
+            t_all, separation, linewidth=2.5, color="#1f77b4", label="Separation"
+        )
+        ax.axvline(
+            x=10,
+            color="red",
+            linestyle=":",
+            linewidth=1.5,
+            alpha=0.7,
+            label="Training edge",
+        )
+        ax.set_xlabel("Time (s)", fontsize=12)
+        ax.set_ylabel("Max angle separation (°)", fontsize=12)
+        ax.set_title(
+            f"Double pendulum, {regime}",
+            fontsize=13,
+            fontweight="bold",
+        )
+        ax.grid(True, alpha=0.3, which="both")
+        ax.set_ylim([1e-2, 1e3])
+        ax.legend(loc="best", fontsize=11)
+
+    plt.suptitle(
+        "Bracket Separation: How Two Training ICs Diverge Over Time",
+        fontsize=14,
+        fontweight="bold",
+        y=1.00,
+    )
+    plt.tight_layout()
+    output_path = plots.FIG_DIR / "trajectory_snapshots.png"
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    print(f"  {output_path}")
+    plt.close()
+
+
 def main():
     rows = read_sweep()
 
@@ -262,6 +346,7 @@ def main():
         systems=[pdata.system_name(n) for n in N_LINKS],
     )
     plots.capacity_curve(capacity, best_paper=pr.best("double", True, "holdout")[2])
+    draw_bracket_separation()
 
     fields = []
     for r in best_rows:
