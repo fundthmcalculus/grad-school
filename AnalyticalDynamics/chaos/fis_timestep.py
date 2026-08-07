@@ -58,7 +58,7 @@ sys.path.insert(0, str(HERE.parent.parent / "tribble-fis" / "src"))
 from sklearn.metrics import mean_squared_error, r2_score  # noqa: E402
 from sklearn.preprocessing import MinMaxScaler  # noqa: E402
 
-from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor  # noqa: E402
+from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 
 import pendulum_data as pdata  # noqa: E402
 
@@ -285,7 +285,7 @@ class FisConfig:
 class FisOperator:
     """A collection of TSK fuzzy inference systems, one per output angle.
 
-    Wraps `MixtureOfGaussiansFuzzyRegressor` per output rather than using
+    Wraps `TribbleRegressor` per output rather than using
     `MimoGaussianPredictor`, because that wrapper does not forward
     output_partition / l2_reg / consequent_basis / norm arguments and would
     silently substitute library defaults for anything swept here.
@@ -300,7 +300,7 @@ class FisOperator:
 
     def _make(self):
         c = self.cfg
-        return MixtureOfGaussiansFuzzyRegressor(
+        return TribbleRegressor(
             n_output_buckets=c.n_output_buckets,
             tsk_order=c.tsk_order,
             n_gaussians=c.n_gaussians,

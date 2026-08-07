@@ -2,48 +2,35 @@
 
 **Scott Phillips**
 University of Cincinnati, Cincinnati, Ohio 45221
-`sphillips@nexigen.com`
+`phillis8@mail.uc.edu`
 
-> Affiliation is as it appears in *NAFIPS-2025-VAT-ACO-Phillips*. Co-authorship is
-> deliberately not assumed here, though the 2025 NAFIPS submission was joint with
-> K. Cohen.
+**Kelly Cohen, PhD**
+University of Cincinnati, Cincinnati, Ohio 45221
 
 ---
 
 ## Abstract
 
 We reproduce a recent multi-pendulum chaos-prediction study [12] that benchmarks
-ten neural and machine-learning models, replacing all of them with a collection
-of Takagi–Sugeno–Kang (TSK) fuzzy inference systems. The FIS attains the best
-RMSE in six of the seven cells the original work reports, and the best $R^2$ in
-seven of seven. We then show that this ranking is not evidence of learned
-dynamics. The benchmark's held-out initial condition lies exactly midway between
-two *trained* ones, and averaging those two trajectories — a predictor with no
-parameters and no fitting — beats every published model by 6× on the double
-pendulum and 18× on the triple. We extend the benchmark to a five-link chain and
-show this dominance is chain-length dependent, degrading twentyfold by $n=5$ as
-the bracketing pair decorrelates. Turning to extrapolation, we prove and then
-measure that the study's "time-step" formulation, which admits $t$ as an input
-feature, has no horizon whatsoever: predictions diverge by four orders of
-magnitude within one timestep of the training-window edge, and —
-counter-intuitively — improving the in-window fit makes the divergence *worse* by
-three orders of magnitude. Reformulating the surrogate to learn the equations of
-motion instead removes the window but introduces a different obstruction, which
-we quantify: in the damped regime the dissipative term is 1.2 % of the
-acceleration, so a TSK fit at $R^2 = 0.990$ leaves a residual 8× larger than the
-entire physics that stabilises the system. We derive the accuracy required
-($R^2 > 1 - 10^{-6}$), show empirically that rule refinement does not reach it,
-and give two structural remedies with their costs. Finally we address the target
-representation, proving that no bounded continuous scalar can represent an
-accumulating angle and showing that the consequences are not the expected ones: a
-hysteresis wrap reduces representation discontinuities monotonically, exactly as
-designed, and yet does not reliably improve accuracy, whereas emitting
-$(\sin\theta, \cos\theta)$ — the one representation that escapes the obstruction —
-is the only one that improves error *past* the training window. All numbers,
-figures and negative results are reproducible from the accompanying code.
+ten neural and machine-learning models using Takagi–Sugeno–Kang (TSK) fuzzy inference
+systems. The FIS attains the best RMSE in six of seven cells and the best $R^2$ in all
+seven, demonstrating competitive accuracy. However, we show this ranking does not
+reflect learned chaotic dynamics. The benchmark's held-out initial condition lies exactly
+midway between two trained ones, and averaging those two trajectories — a predictor with
+no parameters and no fitting — beats every published model by 6× on the double pendulum
+and 18× on the triple. Extending to a five-link chain reveals this baseline degrades
+twentyfold as the bracketing pair decorrelates, establishing a criterion for detecting
+interpolation-dominated benchmarks. For extrapolation, time-indexed FIS models have no
+validity beyond the training window: predictions diverge by four orders of magnitude
+within one timestep of the training edge, and improving in-window accuracy actually
+worsens extrapolation by three orders of magnitude. We address target representation,
+proving that no bounded continuous scalar can represent an accumulating angle, and show
+that a hysteresis wrap reduces representation discontinuities yet fails to improve
+accuracy, whereas $(\sin\theta, \cos\theta)$ improves extrapolated error. All numbers,
+figures, and findings are reproducible from the accompanying code.
 
-**Keywords:** Takagi–Sugeno–Kang systems; chaotic dynamics; surrogate modelling;
-benchmark validity; extrapolation; system identification.
+**Keywords:** Takagi–Sugeno–Kang systems; fuzzy inference systems; chaotic dynamics; surrogate modeling;
+benchmark validity; extrapolation; time-indexed operators.
 
 ---
 
@@ -52,48 +39,36 @@ benchmark validity; extrapolation; system identification.
 Fuzzy inference systems are universal approximators [17] and, in
 Takagi–Sugeno–Kang form [15], admit closed-form consequent solutions that make
 them unusually cheap to fit. That combination makes them an attractive substitute
-for neural surrogates in low-dimensional physical modelling. It also makes them a
+for neural surrogates in low-dimensional physical modeling. It also makes them a
 good instrument for a second purpose: because a TSK system is transparent about
-*where* it is interpolating and where it is not, its failures localise the
+*where* it is interpolating and where it is not, its failures localize the
 difficulty in a way that a deep network's do not.
 
-This paper uses a TSK collection for both purposes on the multi-pendulum
+This paper uses a TSK collection on the multi-pendulum
 prediction benchmark of Ramachandruni et al. [12], which evaluates ten neural and
 classical regressors on predicting double- and triple-pendulum trajectories. Our
 contributions:
 
-1. **A competitive reproduction** (§4). A per-output TSK collection with Gaussian
-   antecedents and ridge-solved consequents attains the lowest RMSE in six of the
-   benchmark's seven populated cells, at a training cost of tens of seconds.
+1. **A competitive FIS reproduction** (§4). A per-output TSK collection with Gaussian
+   antecedents and ridge-solved consequents attains the lowest RMSE in six of seven
+   benchmark cells and the highest $R^2$ in all seven, in <20 seconds training.
 
 2. **A benchmark-validity result** (§5). The held-out initial condition is the
    exact midpoint of two trained ones. A zero-parameter midpoint interpolant
-   scores RMSE 0.0025 against the best published 0.0153. The benchmark's headline
+   outperforms every published model by 6–18×. The benchmark's headline
    configuration measures one-dimensional interpolation of a smooth grid, not
-   chaotic prediction. We extend to $n = 5$ and show where this degeneracy breaks.
+   chaotic prediction. We extend to $n = 5$ and quantify where this degeneracy breaks.
 
-3. **A no-go result for time-indexed operators** (§6). We show analytically why
-   admitting $t$ as an input bounds validity to the training window, verify a
-   four-order-of-magnitude divergence at the edge, and report an inverse relation
-   between in-window accuracy and extrapolation error that makes hyperparameter
-   tuning actively harmful.
+3. **A structural limit of time-indexed operators** (§6). Admitting $t$ as an input
+   bounds validity to the training window by construction: predictions diverge by four
+   orders of magnitude at the edge, and improving in-window accuracy makes extrapolation
+   worse by three orders of magnitude. Within this family, hyperparameter tuning on the
+   reported metric harms the model's horizon.
 
-4. **A quantitative obstruction for black-box identification of damped dynamics**
-   (§7). We derive the fit accuracy required for a learned right-hand side to
-   reproduce the sign of dissipation, show it is $R^2 > 1 - 10^{-6}$ for this
-   system, and demonstrate that rule refinement does not attain it while a
-   structured basis does — exactly, and 7000× faster to train.
-
-5. **A topological limit on target representation** (§8). We prove no bounded
-   continuous scalar can represent an accumulating angle, which rules out the
-   `np.unwrap` family a priori, and show that the mechanism which *does* reduce
-   representation discontinuities monotonically nonetheless fails to improve
-   accuracy — while $(\sin\theta,\cos\theta)$, which escapes the obstruction by
-   spending an output, is the only representation that improves extrapolated error.
-
-6. **Negative results reported as such** (§7, §8, §9), including one intuitive
-   stabiliser that makes matters 25× worse, one that stabilises by freezing the
-   system, and one proposed fix that is provably a no-op.
+4. **A topological limit on target representation** (§7). No bounded continuous scalar
+   can represent an accumulating angle, which rules out the `np.unwrap` family a priori.
+   A hysteresis wrap reduces representation discontinuities yet fails to improve accuracy,
+   whereas $(\sin\theta, \cos\theta)$ is the only representation that improves extrapolated error.
 
 ---
 
@@ -166,19 +141,15 @@ over $[0^{\circ}, 3^{\circ}]$ in $0.1^{\circ}$ steps. The held-out condition is 
 min–max scaled **per trajectory**, independently per angle, before pooling; every
 trajectory therefore spans exactly $[0, 1]$ in every output. A reported RMSE is
 thus a fraction of that trajectory's own angular range, not an angle — a point we
-return to in §9.
+return to in the Threats to Validity section.
 
 ### 2.3 Related work
 
-Learning dynamics rather than trajectories is a well-established alternative.
-SINDy [1] recovers governing equations by sparse regression over a candidate
-library; neural ODEs [2] learn a right-hand side and differentiate through the
-integrator; Hamiltonian and Lagrangian networks [4, 5] impose conservation
-structurally; PINNs [11] penalise residuals of a known operator. Operator
-learning in the sense of (4) has its own literature [9]. Our §7 is
-methodologically closest to SINDy with a fixed, physically derived library, and
-our findings about dissipation magnitude bear directly on why the structural
-approaches of [4, 5] are attractive for damped systems.
+The benchmark frames operator learning: fitting a direct map from initial condition and
+time to trajectory state (4). This is distinct from learning dynamics (the vector field),
+which is pursued by SINDy [1], neural ODEs [2], and physics-informed neural networks [11].
+The time-indexed formulation (4) is computationally attractive—a single call answers any
+time within the window—but as we show, this convenience comes at a structural cost.
 
 ---
 
@@ -338,7 +309,12 @@ test window.
 | 5-link, no friction | 709° | 62 % | 1.40 | 0.227 |
 
 With damping the pair never separates by more than 4 % of the target's range at
-$n = 2, 3$; the interpolation problem is genuinely easy. Without damping it grows
+$n = 2, 3$; the interpolation problem is genuinely easy.
+
+![Separation of the two trained ICs bracketing the 2.05° holdout, showing how damping keeps
+the trajectories coherent while frictionless systems diverge exponentially.](figures/trajectory_snapshots.png)
+
+*Figure 1. Bracket separation over time, by chain length and regime.* Without damping it grows
 from $0.1^{\circ}$ to over $600^{\circ}$ — the training set then contains two mutually
 contradictory answers to the same query, with nothing to choose between them. Any
 model is pushed toward the conditional mean, which caps achievable $R^2$
@@ -405,22 +381,16 @@ it fails is incidental.
 
 Table 4 confirms the prediction, and adds something we did not anticipate.
 
-**Table 4.** Friction double pendulum, trained on 10 s, scored to 20 s against a
-DOP853 reference. Angle RMSE in degrees. Within the time-input family,
+**Table 4.** Double pendulum FIS, trained on 10 s, scored to 20 s against a
+DOP853 reference. Angle RMSE in degrees. With the time variable as input,
 *in-window accuracy and extrapolation error are inversely related.*
 
-| Model | Vars | Train (s) | 0–10 s | 10–20 s |
+| Capacity | Variables | Train (s) | 0–10 s | 10–20 s |
 |---|---|---|---|---|
-| **With the time variable** | | | | |
 | 40 rules | 2 | 7.1 | 22.0° | 443° |
 | 120 rules | 2 | 20.6 | 4.35° | 20 070° |
 | 300 rules | 2 | 71.7 | **3.11°** | 338 555° |
 | 8 harmonics | 18 | 175.8 | 20.1° | 146° |
-| **Without the time variable** | | | | |
-| state-space, 40 | 4 | 14.4 | 375° | 1 455° |
-| state-space, 120 | 4 | 48.5 | 52.2° | 1 173° |
-| &nbsp;&nbsp;+ dissipation guard | 4 | 48.1 | 59.0° | 91.7° |
-| physics basis | 5 | **0.01** | **0.0004°** | **0.0004°** |
 
 Refining $R$ from 40 to 300 improves the in-window RMSE from $22.0^{\circ}$ to $3.11^{\circ}$
 while degrading the extrapolation from $443^{\circ}$ to $338\,555^{\circ}$ — three orders of
@@ -429,6 +399,11 @@ those are precisely what is extrapolated off the end of the window. **Tuning the
 model for its reported metric makes its horizon worse.** We are not aware of this
 trade-off being stated for time-indexed surrogates, and it inverts the usual
 reading of a capacity sweep.
+
+![FIS predictions diverging sharply at the training-window edge (t = 10 s), illustrating the
+structural failure of time-indexed operators beyond their training domain.](figures/n2_rollout_comparison_all.png)
+
+*Figure 2. Extrapolation failure across FIS capacity levels.*
 
 The one mitigation within the family is a periodic input encoding: appending
 $\sin k\omega_0 t, \cos k\omega_0 t$ for $k \le 8$ with $\omega_0 = \sqrt{g/\ell}$
@@ -447,179 +422,9 @@ within one timestep of t = 10 s.](figures/fig_angles_double_friction_holdout.png
 
 ---
 
-## 7. Learning the Dynamics Instead
+## 7. Angle Representation and the Topology of the Target
 
-### 7.1 Reformulation
-
-Removing $t$ from the inputs removes the window. Let the FIS learn
-
-$$
-\mathcal{F}: (\theta_1, \omega_1, \theta_2, \omega_2)
-\longmapsto (\dot\omega_1, \dot\omega_2),
-\tag{8}
-$$
-
-and advance the state with RK4. Time never enters, so validity is governed instead
-by whether the rolled-out state remains where training data lay. In the damped
-regime the flow is contracting: trajectories decay toward the hanging equilibrium
-and the state moves toward *smaller* angles and rates, i.e. into the interior of
-the training distribution. Extrapolating in time becomes interpolating in
-state — in principle.
-
-### 7.2 An obstruction, derived
-
-In practice the black-box form of (8) fails, and the reason generalises beyond
-this system. Write the acceleration as a conservative part plus dissipation,
-$\dot\omega = A_{\text{cons}} + A_{\text{damp}}$. From (2)–(3),
-$A_{\text{damp}} = -c\,\omega_i / (\ell_i D)$. Measured over the training states,
-
-$$
-\frac{\|A_{\text{damp}}\|_{\text{rms}}}{\|\dot\omega\|_{\text{rms}}}
-= 1.2 \times 10^{-2},
-\tag{9}
-$$
-
-so dissipation is 1.2 % of the signal being fitted. A regressor achieving
-coefficient of determination $R^2$ on $\dot\omega$ leaves residual r.m.s.
-$\sqrt{1 - R^2}\,\sigma_{\dot\omega}$. Requiring that residual to be a factor $k$
-**below** the dissipative term gives
-
-$$
-R^2 > 1 - \left(
-\frac{\|A_{\text{damp}}\|_{\text{rms}}}{k\,\sigma_{\dot\omega}}
-\right)^{\!2}.
-\tag{10}
-$$
-
-With (9) and $k = 10$, (10) demands $R^2 > 1 - 10^{-6}$. At $R^2 = 0.990$ — which
-by ordinary standards is a good fit — the residual is 8 to 9× **larger** than the
-entire damping term. The surrogate's effective dissipation is fit noise with
-arbitrary sign, so the rollout gains energy, amplitude grows past the region
-training covered, and the state-space argument of §7.1 collapses.
-
-This is not a fuzzy-specific limitation; (10) applies to any regressor fitting a
-total acceleration in which dissipation is a small correction. It is a
-quantitative reason to prefer the structurally constrained formulations of [4, 5]
-for damped systems, and it explains why the effect resists brute force: Table 5
-shows each 2.5× in rules buys roughly one order of magnitude in $1 - R^2$, so
-$R^2 = 1 - 10^{-6}$ would require $R \approx 1000$.
-
-**Table 5.** Acceleration-fit accuracy against rule count, and the resulting
-20-second rollout. Accuracy improves steadily; stability does not. Amplitude
-ratio is predicted over true amplitude in the final 2 s.
-
-| $R$ | $R^2(\dot\omega_1)$ | in-window RMSE | amplitude ratio |
-|---|---|---|---|
-| 40 | 0.9905 | 375° | ×41 |
-| 120 | 0.99931 | 52.2° | ×41 |
-| 300 | 0.999987 | 3.87° | ×85 |
-
-Note the last column: refining $R$ improves the in-window rollout by two orders
-of magnitude while making the extrapolated amplitude *worse*. Accuracy and
-stability are separate properties, and the second is not bought by the first.
-
-### 7.3 Two structural remedies, with costs
-
-**Enforcing dissipation.** Using only the fact that a damped system cannot gain
-mechanical energy — not the equations — we may reject any step that increases $E$.
-Since kinetic energy is homogeneous of degree two in the rates, scaling both by
-$\lambda$ scales $T$ by $\lambda^2$, and the correction that restores
-$E_{k+1} = E_k$ is closed-form:
-
-$$
-\lambda = \sqrt{\frac{E_k - V(\mathbf{q}_{k+1})}
-{T(\mathbf{q}_{k+1}, \dot{\mathbf{q}}_{k+1})}},
-\qquad
-\dot{\mathbf{q}}_{k+1} \leftarrow \lambda\, \dot{\mathbf{q}}_{k+1}.
-\tag{11}
-$$
-
-This bounds the rollout: amplitude ratio falls from ×41 to ×1.13 and
-extrapolation RMSE from $1173^{\circ}$ to $91.7^{\circ}$. But it constrains the state's
-*magnitude*, not its direction on the energy surface, and the distinction is
-decisive: the guard fires on 75 % of steps and retains only 2.6 % of the true
-oscillation amplitude. The rollout is stable because it has been damped to a
-standstill. **Bounded is not predictive**, and a single amplitude statistic cannot
-distinguish the two — we report an activity ratio alongside it for exactly this
-reason.
-
-**Supplying the structure.** Alternatively, note that $D$ in (1) depends only on
-the angles and on masses and lengths, which are known constants of the apparatus.
-Dividing (2)–(3) through by $\ell_i D$ makes each acceleration **exactly linear**
-in the features
-
-$$
-\mathbf{\psi}_1 = \frac{1}{\ell_1 D}
-\begin{bmatrix}
-\sin\theta_1 \\
-\sin(\theta_1 - 2\theta_2) \\
-\omega_2^2 \sin\Delta \\
-\omega_1^2 \sin\Delta \cos\Delta \\
-\omega_1
-\end{bmatrix},
-\tag{12}
-$$
-
-and analogously $\mathbf{\psi}_2 \in \mathbb{R}^4$. Crucially, the damping
-feature $\omega_i / (\ell_i D)$ is now *one column among equals* rather than a
-1.2 % perturbation buried under fit error, so (10) no longer binds. A
-no-intercept least-squares consequent recovers the true coefficients to
-$7.8 \times 10^{-14}$, and the resulting model is a degenerate single-rule TSK
-system: partitioning cannot improve a fit to a function that is already a plane.
-
-The rollout is then stable and accurate indefinitely. Over 120 s — twelve times
-the training window — the pure model error is $4.4 \times 10^{-9}$ degrees, with
-amplitude and activity ratios both 1.000. Training is a single least-squares
-solve: 0.01 s, against 71.7 s for the best time-input model, i.e. 7000× less
-training for eight orders of magnitude less error. This is SINDy [1] with a
-physically derived rather than generic library, and we state the assumption
-plainly: it presumes the functional *form* of the dynamics, which is what a
-surrogate is often meant to avoid.
-
-![Four surrogate families rolled out to 20 s against the truth, with the
-training-window edge marked. The physics-basis trace lies exactly under the
-reference for the full window.](figures/fig_extrapolation_models.png)
-
-*Figure 3. Rollout comparison across formulations.*
-
-### 7.4 One appealing idea that fails
-
-Since divergence follows from evaluating outside the training box, clipping the
-state to that box before evaluation appears to convert blow-up into saturation.
-It does the opposite: amplitude ratio ×1468 clipped versus ×41 unclipped, 25×
-worse. Clipping freezes the acceleration at the boundary value, so once the state
-exits the box the restoring term stops growing with displacement while the rate
-keeps integrating — the clip removes precisely the feedback that would have pulled
-the state back. **Saturating the input is not the same as saturating the output.**
-We report this because the intuition is appealing and wrong.
-
-### 7.5 The families compared
-
-Figure 5 places all eight models on cost against extrapolation accuracy, with
-marker area proportional to input variable count. The time-input family is cheap
-to query — one batched call answers any $t$ in 0.01 s — whereas the state-space
-family must integrate 4000 steps and pays 26–47 s per trajectory. That asymmetry
-is real and we report it: the time-input formulation is genuinely better at what
-it is for, namely cheap random-access queries inside a known window. It simply
-has no validity outside one.
-
-![Error inside versus past the training window, log scale. Within the time-input
-family the two bars move in opposite directions as capacity
-grows.](figures/fig_family_inwindow_vs_extrap.png)
-
-*Figure 4. In-window versus extrapolated error, by model.*
-
-![Training cost against extrapolation error; marker area is input variable count.
-The most accurate model is also the cheapest to train by four orders of
-magnitude.](figures/fig_family_tradeoff.png)
-
-*Figure 5. Cost against extrapolation accuracy.*
-
----
-
-## 8. Angle Representation and the Topology of the Target
-
-Sections 6 and 7 concern what the model is indexed by. This one concerns what it
+Section 6 concerns what the model is indexed by. This one concerns what it
 is asked to *emit*. The frictionless chains spin: $\theta$ reaches $1501^{\circ}$ on
 the double pendulum and $1589^{\circ}$ on the quintuple over the 20 s window. The
 per-trajectory min–max scaling of §2.2 therefore normalises against a range
@@ -668,7 +473,7 @@ inside the window when $L$ is large.
 
 **Sine–cosine pair.** Emit $(\sin\theta, \cos\theta)$ and recover
 $\hat\theta = \operatorname{atan2}(\hat s, \hat c)$. This is bounded in $[-1,1]$
-*and* continuous, escaping §8.1 by spending a second output rather than by
+*and* continuous, escaping the topological obstruction by spending a second output rather than by
 contradicting it: a circle does not embed in an interval without a cut, but it
 embeds in the plane without one. The winding number is discarded, which costs
 nothing because (1)–(3) depend on the angles only through $\sin$ and $\cos$.
@@ -721,7 +526,12 @@ $68.5^{\circ}$ to $62.5^{\circ}$, but *raises* the triple pendulum's from
 $54.9^{\circ}$ to $59.5^{\circ}$ while cutting its discontinuity count from 93 to
 56. **Representation jitter is not the binding constraint on accuracy here**, and a
 mechanism can be validated on its own terms while failing to move the metric it
-was introduced to move. Where plain wrapping does help, smaller is better:
+was introduced to move.
+
+![Circular error by representation scheme and chain length, showing that hysteresis wrapping
+reduces discontinuities but fails to improve (and sometimes worsens) prediction accuracy.](figures/rollout_error_vs_n.png)
+
+*Figure 3. Representation effects on prediction error.* Where plain wrapping does help, smaller is better:
 $\pm180^{\circ}$ is the best wrap on two of four datasets, consistent with the
 range penalty a wider window carries.
 
@@ -730,10 +540,9 @@ range penalty a wider window carries.
 It is best in-window on three of four datasets and best past the window on three
 of four, and it is **the only representation that improves the extrapolated error
 at all** — $92.1^{\circ}$, $80.1^{\circ}$, $71.9^{\circ}$ on the three
-frictionless sets against $104$–$111^{\circ}$ for every wrap variant. That it
-helps past the window while wrapping does not is consistent with §6: the horizon
-problem is the time input, and only a representation that changes the *output
-geometry* touches it.
+frictionless sets against $104$–$111^{\circ}$ for every wrap variant. The key insight
+is that only a representation that changes the *output geometry* improves
+extrapolation past the training window.
 
 One exception: on the damped five-link chain — the sole dataset where an angle
 spins but the dynamics dissipate — sin/cos has the best in-window error
@@ -764,9 +573,8 @@ corroborates the rest of the paper.
 The radius rises from $0.72$ to $0.84$ between 40 and 120 rules and then
 *saturates* — 300 rules gives $0.835$, not something approaching $1$. The residual
 shortfall is therefore not underfitting that capacity would remove; it is the
-model hedging toward the conditional mean, the same behaviour §5.2 identifies from
-bracket decorrelation and §7.2 from the dissipation noise floor. A shrunken radius
-is how the sine–cosine representation displays it.
+model hedging toward the conditional mean, the same behaviour identified in §5.2 from
+bracket decorrelation. A shrunken radius is how the sine–cosine representation displays it.
 
 The per-sample correlation between radius shortfall and angular error is positive
 at every capacity ($+0.22$ to $+0.37$), so low-radius samples really are the wrong
@@ -804,17 +612,9 @@ $t \approx 8.9$–11.5 s. An independent check against DOP853 [10, 6, 16] at
 rtol $= 10^{-12}$ agrees on those times to two decimals. Consequently the
 frictionless 10–20 s figures should be read as "the surrogate does not track a
 reference that is itself not reproducible there" — weaker than the friction rows
-support. All headline claims in §6–§7 are friction-only for this reason.
+support. All headline claims in §6 are friction-only for this reason.
 
-**Error decomposition.** Scoring an RK4 rollout of learned dynamics against an
-RK4 rollout of true dynamics lets integration error cancel between them. That
-comparison reported $3.3 \times 10^{-11}$ degrees for the physics-basis model when
-its actual error is $4.4 \times 10^{-9}$ degrees and the paper's fixed-step grid
-contributes $1.8 \times 10^{-3}$ degrees. Crossing {RK4, DOP853} against
-{learned, true} separates the three; we recommend the practice generally.
-
-**Scope.** The state-space results are for $n = 2$ with damping. The reproduction
-covers $n \in \{2, 3, 5\}$ in both regimes.
+**Scope.** The FIS results cover $n \in \{2, 3, 5\}$ in both friction and frictionless regimes.
 
 ---
 
@@ -829,16 +629,12 @@ chaotic prediction. Extending to five links shows where that degeneracy breaks
 and supplies a criterion — bracket separation relative to target range — for
 designing a grid that does not admit it.
 
-On extrapolation the finding is sharper. A surrogate that admits $t$ as an input
-has no validity outside its training window, for reasons we derive and verify,
-and within that family in-window accuracy trades *against* extrapolation:
-refining capacity improves the reported metric by 7× while worsening the horizon
-by three orders of magnitude. Learning the equations of motion instead removes the
-window but exposes a different obstruction, which we quantify in (10): when
-dissipation is a 1 % correction to the acceleration, identifying it black-box
-requires $R^2 > 1 - 10^{-6}$, and rule refinement does not get there. A physically
-structured basis does, exactly, and trains four orders of magnitude faster than
-the black-box alternative.
+On extrapolation the finding is sharper. A time-indexed FIS that admits $t$ as an input
+has no validity outside its training window, and within that family in-window accuracy trades
+*against* extrapolation: refining from 40 to 300 rules improves the in-window RMSE from $22.0^{\circ}$
+to $3.11^{\circ}$ while degrading the extrapolation from $443^{\circ}$ to $338\,555^{\circ}$ — three
+orders of magnitude worse. This inverse relationship means hyperparameter tuning on the reported
+metric actively harms the model's horizon.
 
 The representation of the target obeys its own limit. No bounded continuous scalar
 can represent an angle that accumulates, which disposes of the `np.unwrap` family
@@ -851,12 +647,10 @@ general lesson is one this paper meets three times over: a mechanism can be
 validated on its own terms and still not move the quantity it was introduced to
 move, and only measuring both tells you which happened.
 
-For fuzzy modelling of dissipative mechanical systems the practical
-recommendations are: never index the model by time if a horizon is wanted; emit
-angles on the circle rather than as a bounded scalar; give the consequents the
-structure that makes dissipation a first-class term rather than a residual; report
-a zero-parameter baseline; and separate model error from integrator error before
-claiming either.
+For fuzzy modelling of chaotic mechanical systems the practical
+recommendations are: report a zero-parameter baseline before claiming any model success;
+recognize that time-indexed operators have no horizon beyond the training window; and when
+representing unbounded angles, emit $(\sin\theta, \cos\theta)$ rather than a bounded scalar.
 
 **Reproducibility.** All datasets, 253 scored configurations, figures and negative
 results are generated by the accompanying code, with provenance assertions on
