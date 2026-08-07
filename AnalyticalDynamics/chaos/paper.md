@@ -175,8 +175,8 @@ $$
 $$
 
 For fixed antecedents, (5) is linear in $(\bar y_r, \mathbf{a}_r)$, so a single
-firing-weighted ridge least-squares solve yields the exact minimiser of the
-weighted MSE — no iterative optimiser, unlike gradient-trained TSK variants [19]
+firing-weighted ridge least-squares solution yields the exact minimizer of the
+weighted MSE — no iterative optimizer, unlike gradient-trained TSK variants [19]
 or ANFIS [8]. Antecedent placement from data rather than a grid follows the
 cluster-estimation tradition [3, 18].
 
@@ -192,16 +192,16 @@ failure past the window being visible rather than disguised as a plateau.
 
 Third, the **target** scaler is fitted on the training window and then applied to
 the whole test span. Per-trajectory min–max only makes training and test
-commensurable when both are normalised over the same duration: training targets
+commensurable when both are normalized over the same duration: training targets
 span exactly $[0,1]$ by construction, so fitting a 20 s holdout's scaler over its
 full length would leave its first 10 s spanning only $[0, 0.678]$ on the
 frictionless double pendulum, and a model trained to emit over $[0,1]$ would
 overshoot by ${\sim}1.5\times$ for reasons unrelated to its dynamics. Fitting on
-the window keeps every in-window number comparable to the 10 s protocol, and leaks
+the window keeps every in-window number comparable to the 10 s protocol and leaks
 nothing the protocol does not already leak — whereas fitting over 20 s would
 additionally leak the range of the region being extrapolated into. Scaled truth
 beyond 10 s may consequently exceed $[0,1]$, which is correct: the chain does leave
-the window it was normalised against. Friction datasets are indifferent to the
+the window it was normalized against. Friction datasets are indifferent to the
 choice, their 20 s and 10 s ranges being bitwise equal; only the frictionless ones
 move.
 
@@ -224,20 +224,20 @@ benchmark's scaled units. The FIS attains the lowest RMSE in six of seven
 populated cells and the highest $R^2$ in all seven. Cell 6 was not run in the
 original study.
 
-| Cell | Best published | FIS | Winner |
-|---|---|---|---|
-| 2-link, no friction, trained | LSTM 0.0270 | **0.0126** | FIS |
-| 2-link, no friction, holdout | LSTM 0.26 | **0.184** | FIS |
-| 2-link, friction, trained | LSTM 0.00955 | **0.00550** | FIS |
-| 2-link, friction, holdout | LSTM 0.0153 | **0.0120** | FIS |
-| 3-link, no friction, trained | GRU 0.0170 | 0.0191 | GRU |
-| 3-link, no friction, holdout | — | 0.162 | — |
-| 3-link, friction, trained | GRU 0.00911 | **0.00718** | FIS |
-| 3-link, friction, holdout | GRU 0.00650 | **0.00477** | FIS |
+| Cell                         | Best published | FIS         | Winner |
+|------------------------------|----------------|-------------|--------|
+| 2-link, no friction, trained | LSTM 0.0270    | **0.0126**  | FIS    |
+| 2-link, no friction, holdout | LSTM 0.26      | **0.184**   | FIS    |
+| 2-link, friction, trained    | LSTM 0.00955   | **0.00550** | FIS    |
+| 2-link, friction, holdout    | LSTM 0.0153    | **0.0120**  | FIS    |
+| 3-link, no friction, trained | GRU 0.0170     | 0.0191      | GRU    |
+| 3-link, no friction, holdout | —              | 0.162       | —      |
+| 3-link, friction, trained    | GRU 0.00911    | **0.00718** | FIS    |
+| 3-link, friction, holdout    | GRU 0.00650    | **0.00477** | FIS    |
 
 The single loss is the frictionless triple-pendulum trained cell, where the
-published GRU records a lower RMSE (0.0170 vs 0.0191) but a lower $R^2$ (0.985 vs
-0.994). The two metrics disagree because the original work's Fig. 18B bar labels
+published GRU records a lower RMSE (0.0170 vs. 0.0191) but a lower $R^2$ (0.985 vs. 0.994).
+The two metrics disagree because the original work's Fig. 18B bar labels
 and its Fig. 22 summary heatmap disagree with one another for that panel; we used
 the heatmap.
 
@@ -267,12 +267,12 @@ published model and our own FIS.
 **Table 2.** Held-out-IC RMSE with friction, benchmark units. The zero-parameter
 midpoint interpolant (6) outperforms every learned model.
 
-| Predictor | 2-link | 3-link | 5-link |
-|---|---|---|---|
-| Midpoint (6) | **0.00250** | **0.000359** | **0.0515** |
-| Nearest trained IC | 0.0111 | 0.00187 | 0.0520 |
-| FIS (ours) | 0.0120 | 0.00477 | 0.0672 |
-| Best published | 0.0153 | 0.00650 | — |
+| Predictor          | 2-link      | 3-link       | 5-link     |
+|--------------------|-------------|--------------|------------|
+| Midpoint (6)       | **0.00250** | **0.000359** | **0.0515** |
+| Nearest trained IC | 0.0111      | 0.00187      | 0.0520     |
+| FIS (ours)         | 0.0120      | 0.00477      | 0.0672     |
+| Best published     | 0.0153      | 0.00650      | —          |
 
 The margin is 6× on the double pendulum and 18× on the triple. Even *copying a
 single neighbouring trajectory verbatim* beats the best published model in both
@@ -299,14 +299,14 @@ the held-out trajectory's range, with the fitted exponential rate $\lambda$.
 Damping keeps the pair coherent; without it the pair decorrelates well inside the
 test window.
 
-| Dataset | $s(20)$ | $s/\rho$ | $\lambda$ (s⁻¹) | Midpoint RMSE |
-|---|---|---|---|---|
-| 2-link, friction | 8.8° | 3.3 % | 0.56 | 0.00250 |
-| 3-link, friction | 8.2° | 4.0 % | 0.23 | 0.000359 |
-| 5-link, friction | 105° | 23.7 % | 1.25 | 0.0515 |
-| 2-link, no friction | 628° | 67 % | 1.81 | 0.226 |
-| 3-link, no friction | 649° | 112 % | 0.83 | 0.166 |
-| 5-link, no friction | 709° | 62 % | 1.40 | 0.227 |
+| Dataset             | $s(20)$ | $s/\rho$ | $\lambda$ (s⁻¹) | Midpoint RMSE |
+|---------------------|---------|----------|-----------------|---------------|
+| 2-link, friction    | 8.8°    | 3.3 %    | 0.56            | 0.00250       |
+| 3-link, friction    | 8.2°    | 4.0 %    | 0.23            | 0.000359      |
+| 5-link, friction    | 105°    | 23.7 %   | 1.25            | 0.0515        |
+| 2-link, no friction | 628°    | 67 %     | 1.81            | 0.226         |
+| 3-link, no friction | 649°    | 112 %    | 0.83            | 0.166         |
+| 5-link, no friction | 709°    | 62 %     | 1.40            | 0.227         |
 
 With damping the pair never separates by more than 4 % of the target's range at
 $n = 2, 3$; the interpolation problem is genuinely easy.
@@ -314,7 +314,7 @@ $n = 2, 3$; the interpolation problem is genuinely easy.
 ![Separation of the two trained ICs bracketing the 2.05° holdout, showing how damping keeps
 the trajectories coherent while frictionless systems diverge exponentially.](figures/trajectory_snapshots.png)
 
-*Figure 1. Bracket separation over time, by chain length and regime.* Without damping it grows
+*Figure 1. Bracket separation over time, by chain length and regime.* Without damping, it grows
 from $0.1^{\circ}$ to over $600^{\circ}$ — the training set then contains two mutually
 contradictory answers to the same query, with nothing to choose between them. Any
 model is pushed toward the conditional mean, which caps achievable $R^2$
@@ -328,7 +328,7 @@ grow three orders of magnitude.](figures/fig_bracket.png)
 
 *Figure 1. Bracket separation against time.*
 
-### 5.3 The degeneracy is chain-length dependent
+### 5.3 The degeneracy is chain-length-dependent
 
 Extending the protocol to $n = 5$ — which the original work does not attempt —
 shows that the benchmark's two chain lengths are the two where the degeneracy is
@@ -379,18 +379,18 @@ it fails is incidental.
 
 ### 6.2 Measured
 
-Table 4 confirms the prediction, and adds something we did not anticipate.
+Table 4 confirms the prediction and adds something we did not expect.
 
 **Table 4.** Double pendulum FIS, trained on 10 s, scored to 20 s against a
 DOP853 reference. Angle RMSE in degrees. With the time variable as input,
 *in-window accuracy and extrapolation error are inversely related.*
 
-| Capacity | Variables | Train (s) | 0–10 s | 10–20 s |
-|---|---|---|---|---|
-| 40 rules | 2 | 7.1 | 22.0° | 443° |
-| 120 rules | 2 | 20.6 | 4.35° | 20 070° |
-| 300 rules | 2 | 71.7 | **3.11°** | 338 555° |
-| 8 harmonics | 18 | 175.8 | 20.1° | 146° |
+| Capacity    | Variables | Train (s) | 0–10 s    | 10–20 s  |
+|-------------|-----------|-----------|-----------|----------|
+| 40 rules    | 2         | 7.1       | 22.0°     | 443°     |
+| 120 rules   | 2         | 20.6      | 4.35°     | 20 070°  |
+| 300 rules   | 2         | 71.7      | **3.11°** | 338 555° |
+| 8 harmonics | 18        | 175.8     | 20.1°     | 146°     |
 
 Refining $R$ from 40 to 300 improves the in-window RMSE from $22.0^{\circ}$ to $3.11^{\circ}$
 while degrading the extrapolation from $443^{\circ}$ to $338\,555^{\circ}$ — three orders of
@@ -495,13 +495,13 @@ rate and which are therefore artefacts.
 Pointwise wrapping gets *worse* as the overlap band widens; hysteresis gets
 better.
 
-| $L$ | pointwise | hysteresis |
-|---|---|---|
-| $180^{\circ}$ | 66 | 66 |
-| $240^{\circ}$ | 76 | **53** |
-| $300^{\circ}$ | 94 | **51** |
-| $360^{\circ}$ | 111 | **48** |
-| $420^{\circ}$ | 93 | **47** |
+| $L$           | pointwise | hysteresis |
+|---------------|-----------|------------|
+| $180^{\circ}$ | 66        | 66         |
+| $240^{\circ}$ | 76        | **53**     |
+| $300^{\circ}$ | 94        | **51**     |
+| $360^{\circ}$ | 111       | **48**     |
+| $420^{\circ}$ | 93        | **47**     |
 
 The pointwise trend is explained by its statelessness: a trajectory oscillating
 inside the overlap band flips branch on every crossing, and a wider band is a
@@ -514,17 +514,17 @@ It does not follow that accuracy improves, and Table 7 shows it does not.
 **Table 7.** Circular error, in-window / past-window, in degrees. 120 rules,
 quantile partitioning throughout so the partition is not a second variable.
 
-| dataset | no wrap | $\pm180^{\circ}$ | pointwise $\pm360^{\circ}$ | hysteresis $\pm360^{\circ}$ | sin/cos |
-|---|---|---|---|---|---|
-| 2-link, no fric. | 81.9 / 107.4 | 73.7 / 106.9 | 68.5 / 108.0 | **62.5** / 108.9 | 74.1 / **92.1** |
-| 3-link, no fric. | 59.0 / 108.7 | **49.8** / 106.9 | 54.9 / 108.3 | 59.5 / 109.1 | 48.0 / **80.1** |
-| 5-link, no fric. | 51.9 / 107.7 | 50.5 / 111.4 | 59.0 / 103.7 | 51.2 / 104.2 | **43.6** / **71.9** |
-| 5-link, friction | **12.3** / 92.2 | 13.7 / 107.2 | 38.3 / 92.8 | 15.8 / 95.8 | 12.1 / 109.1 |
+| dataset          | no wrap         | $\pm180^{\circ}$ | pointwise $\pm360^{\circ}$ | hysteresis $\pm360^{\circ}$ | sin/cos             |
+|------------------|-----------------|------------------|----------------------------|-----------------------------|---------------------|
+| 2-link, no fric. | 81.9 / 107.4    | 73.7 / 106.9     | 68.5 / 108.0               | **62.5** / 108.9            | 74.1 / **92.1**     |
+| 3-link, no fric. | 59.0 / 108.7    | **49.8** / 106.9 | 54.9 / 108.3               | 59.5 / 109.1                | 48.0 / **80.1**     |
+| 5-link, no fric. | 51.9 / 107.7    | 50.5 / 111.4     | 59.0 / 103.7               | 51.2 / 104.2                | **43.6** / **71.9** |
+| 5-link, friction | **12.3** / 92.2 | 13.7 / 107.2     | 38.3 / 92.8                | 15.8 / 95.8                 | 12.1 / 109.1        |
 
 Hysteresis at $\pm360^{\circ}$ cuts the double pendulum's in-window error from
 $68.5^{\circ}$ to $62.5^{\circ}$, but *raises* the triple pendulum's from
-$54.9^{\circ}$ to $59.5^{\circ}$ while cutting its discontinuity count from 93 to
-56. **Representation jitter is not the binding constraint on accuracy here**, and a
+$54.9^{\circ}$ to $59.5^{\circ}$ while cutting its discontinuity count from 93 to 56.
+**Representation jitter is not the binding constraint on accuracy here**, and a
 mechanism can be validated on its own terms while failing to move the metric it
 was introduced to move.
 
@@ -565,15 +565,15 @@ corroborates the rest of the paper.
 **Table 8.** Sine–cosine targets, frictionless double pendulum, against capacity.
 
 | rules | in-window | past-window | mean radius | $\mathrm{corr}(1-r, \lvert e \rvert)$ |
-|---|---|---|---|---|
-| 40 | **67.8°** | 102.4° | 0.723 | **0.365** |
-| 120 | 74.1° | **92.1°** | 0.843 | 0.252 |
-| 300 | 74.0° | 110.1° | 0.835 | 0.218 |
+|-------|-----------|-------------|-------------|---------------------------------------|
+| 40    | **67.8°** | 102.4°      | 0.723       | **0.365**                             |
+| 120   | 74.1°     | **92.1°**   | 0.843       | 0.252                                 |
+| 300   | 74.0°     | 110.1°      | 0.835       | 0.218                                 |
 
 The radius rises from $0.72$ to $0.84$ between 40 and 120 rules and then
 *saturates* — 300 rules gives $0.835$, not something approaching $1$. The residual
 shortfall is therefore not underfitting that capacity would remove; it is the
-model hedging toward the conditional mean, the same behaviour identified in §5.2 from
+model hedging toward the conditional mean, the same behavior identified in §5.2 from
 bracket decorrelation. A shrunken radius is how the sine–cosine representation displays it.
 
 The per-sample correlation between radius shortfall and angular error is positive
@@ -596,8 +596,8 @@ holdout spans $225^{\circ}$ and $937^{\circ}$ in its two angles, so the original
 0.26 corresponds to roughly $177^{\circ}$. We report degrees throughout alongside scaled
 values.
 
-**The normalisation assumes fixed-length trajectories.** Per-trajectory min–max
-scaling is only well-posed when every trajectory is normalised over the same
+**The normalization assumes fixed-length trajectories.** Per-trajectory min–max
+scaling is only well-posed when every trajectory is normalized over the same
 duration, and the benchmark never has to confront this because all its trajectories
 are 10 s. Testing on a longer horizon does, and §3 explains how we resolve it —
 fit the target scaler on the training window. We flag the assumption because it is
@@ -647,12 +647,12 @@ general lesson is one this paper meets three times over: a mechanism can be
 validated on its own terms and still not move the quantity it was introduced to
 move, and only measuring both tells you which happened.
 
-For fuzzy modelling of chaotic mechanical systems the practical
+For fuzzy modelling of chaotic mechanical systems, the practical
 recommendations are: report a zero-parameter baseline before claiming any model success;
 recognize that time-indexed operators have no horizon beyond the training window; and when
 representing unbounded angles, emit $(\sin\theta, \cos\theta)$ rather than a bounded scalar.
 
-**Reproducibility.** All datasets, 253 scored configurations, figures and negative
+**Reproducibility.** All datasets, 253 scored configurations, figures, and negative
 results are generated by the accompanying code, with provenance assertions on
 every run: agreement between two independent derivations of the equations of
 motion ($1.07 \times 10^{-14}$), RK4 convergence order (≈16× per halving), and
@@ -693,11 +693,11 @@ taken from working knowledge, to be spot-checked at proof stage.
    universal approximation theorem of operators. *Nature Machine Intelligence*
    3:218–229, 2021. doi:10.1038/s42256-021-00302-5
 10. **[S]** `prince1981high` — P. J. Prince, J. R. Dormand. High order embedded
-    Runge–Kutta formulae. *J. Computational and Applied Mathematics* 7(1):67–75,
-    1981. doi:10.1016/0771-050X(81)90010-3
+    Runge–Kutta formulae. *J. Computational and Applied Mathematics* 7(1):67–75, 1981.
+    doi:10.1016/0771-050X(81)90010-3
 11. **[S]** `raissi2019pinn` — M. Raissi, P. Perdikaris, G. E. Karniadakis.
-    Physics-informed neural networks. *J. Computational Physics* 378:686–707,
-    2019. doi:10.1016/j.jcp.2018.10.045
+    Physics-informed neural networks. *J. Computational Physics* 378:686–707, 2019.
+    doi:10.1016/j.jcp.2018.10.045
 12. **[V]** `ramachandruni2025chaos` — V. Ramachandruni, S. H. R. Nara, G. Lalu,
     S. Yang, M. Ramesh Kumar, A. Jain, P. Mehta, H. Koo, J. Damonte, M. Akl.
     Using machine learning and neural networks to analyze and predict chaos in
