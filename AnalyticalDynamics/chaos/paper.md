@@ -741,3 +741,11 @@ Keys in brackets match `references.bib`.
     formulation of a pendulum containing N-point masses. arXiv:1910.12610
     [physics.class-ph], 2019.
     https://arxiv.org/pdf/1910.12610
+
+
+### Paper Action Items
+> To be removed before publication, but captured here for completeness at this stage.
+
+1. Implement complete reproducibility harness in conjunction with proposal defense.
+2. Evaluate performance optimizations on auto-derivation.
+3. Compare training time of LSTM/GRU with FIS (Tribble) approach.
