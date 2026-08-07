@@ -17,13 +17,13 @@ Mirrors the paper's own figure formats:
   fig_bracket          not in the paper: written by bracket_diagnostic.py
 
 The paper draws RMSE and R^2 as one dual-axis grouped chart (its Figs. 11-13,
-18B-D). That packs two scales, two sort orders and rotated in-bar labels onto one
+18B-D). That packs two scales, two sort orders, and rotated in-bar labels onto one
 figure. Here they are two charts, each sorted best-first on its own axis, so the
 ranking is readable straight off the bar heights.
 
 No animations, by request.
 
-Colours are categorical slots 1 and 2 of this repo's validated light-mode
+Colors are categorical slots 1 and 2 of this repo's validated light-mode
 palette (reproduce/figures/figstyle.py), inlined the way test_fuzzy_ode.py:64
 does it rather than importing figstyle, which is coupled to the proposal figure
 registry and its own save path.
