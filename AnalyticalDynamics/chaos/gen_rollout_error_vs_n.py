@@ -1,150 +1,161 @@
-"""Generate rollout_error_vs_n.png: Circular error by representation and chain length.
+"""Generate rollout_error_vs_n{,_lines}.png: Table 7's circular error, plotted.
 
-Shows Table 7 results visually: how different angle representations (no wrap, pointwise wrap,
-hysteresis wrap, sin/cos) affect prediction error across chain lengths.
+Shows how different angle representations (no wrap, pointwise wrap, hysteresis
+wrap, sin/cos) affect prediction error across chain lengths -- read from
+results/representation.json (written by wrap_sweep.build_representation_rows,
+via run_all.py's `representation` stage or `python wrap_sweep.py`), not from a
+transcription of the paper's own table. Run the representation stage first if
+that file doesn't exist yet.
 """
 
+from __future__ import annotations
+
+import json
+import sys
 from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Data from Table 7: Circular error, in-window / past-window, in degrees
-# Format: {dataset: {representation: (in_window, past_window)}}
-data = {
-    "2-link, no fric.": {
-        "no wrap": (81.9, 107.4),
-        "±180°": (73.7, 106.9),
-        "±360°": (68.5, 108.0),
-        "hysteresis": (62.5, 108.9),
-        "sin/cos": (74.1, 92.1),
-    },
-    "3-link, no fric.": {
-        "no wrap": (59.0, 108.7),
-        "±180°": (49.8, 106.9),
-        "±360°": (54.9, 108.3),
-        "hysteresis": (59.5, 109.1),
-        "sin/cos": (48.0, 80.1),
-    },
-    "5-link, no fric.": {
-        "no wrap": (51.9, 107.7),
-        "±180°": (50.5, 111.4),
-        "±360°": (59.0, 103.7),
-        "hysteresis": (51.2, 104.2),
-        "sin/cos": (43.6, 71.9),
-    },
-    "5-link, friction": {
-        "no wrap": (12.3, 92.2),
-        "±180°": (13.7, 107.2),
-        "±360°": (38.3, 92.8),
-        "hysteresis": (15.8, 95.8),
-        "sin/cos": (12.1, 109.1),
-    },
+from fis_timestep import RESULT_DIR
+
+REPR_PATH = RESULT_DIR / "representation.json"
+
+representations = ["no wrap", "±180°", "±360°", "hysteresis", "sin/cos"]
+
+#: (representation, wrap_limit_deg) each column reads from the JSON rows.
+#: "±180°" is scored on the pointwise wrap -- pointwise and hysteresis agree at
+#: L=180 by construction (no overlap band yet), so either would read the same
+#: value; pointwise is what the paper's table uses at that column.
+COLUMNS = {
+    "no wrap": ("pointwise", "none"),
+    "±180°": ("pointwise", "180"),
+    "±360°": ("pointwise", "360"),
+    "hysteresis": ("hysteresis", "360"),
+    "sin/cos": ("sin/cos", "n/a"),
 }
 
-datasets = list(data.keys())
-representations = ["no wrap", "±180°", "±360°", "hysteresis", "sin/cos"]
-colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
+_SYSTEM_N = {"double": 2, "triple": 3, "quintuple": 5}
 
-fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-axes = axes.flatten()
 
-for idx, dataset in enumerate(datasets):
-    ax = axes[idx]
+def _display_label(dataset):
+    """'quintuple_friction' -> '5-link, friction'."""
+    system, _, regime = dataset.rpartition("_")
+    n = _SYSTEM_N[system]
+    fric = "no fric." if regime == "frictionless" else "friction"
+    return f"{n}-link, {fric}"
 
-    in_window = [data[dataset][rep][0] for rep in representations]
-    past_window = [data[dataset][rep][1] for rep in representations]
 
-    x = np.arange(len(representations))
-    width = 0.35
+def load_table7(path=REPR_PATH):
+    """{display_label: {column: (in_window_deg, past_window_deg)}} from the JSON."""
+    if not path.exists():
+        sys.exit(
+            f"{path} not found -- run `python wrap_sweep.py` or "
+            f"`python run_all.py --stage representation` first"
+        )
+    # run_all.py's stage writes the cache envelope ({"payload": {...}}); wrap_sweep.py
+    # run standalone writes the plain dict directly. Accept either.
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    rows = doc.get("payload", doc).get("representations")
+    if rows is None:
+        sys.exit(f"{path} has no 'representations' data (keys found: {list(doc.keys())})")
+    by_key = {
+        (r["dataset"], r["representation"], r["wrap_limit_deg"]): r for r in rows
+    }
+    data = {}
+    for dataset in sorted({r["dataset"] for r in rows}):
+        label = _display_label(dataset)
+        cols = {}
+        for col, (repr_, limit) in COLUMNS.items():
+            r = by_key.get((dataset, repr_, limit))
+            if r is None:
+                continue
+            cols[col] = (r["inwindow_rmse_circ_deg"], r["extrap_rmse_circ_deg"])
+        data[label] = cols
+    return data
 
-    bars1 = ax.bar(x - width / 2, in_window, width, label="In-window (0-10s)", alpha=0.8)
-    bars2 = ax.bar(x + width / 2, past_window, width, label="Past-window (10-20s)", alpha=0.8)
 
-    # Color the bars
-    for bar, color in zip(bars1, colors):
-        bar.set_color(color)
-    for bar, color in zip(bars2, colors):
-        bar.set_color(color)
-        bar.set_alpha(0.4)
+def main():
+    data = load_table7()
+    datasets = list(data.keys())
+    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
 
-    ax.set_xlabel("Representation", fontsize=11)
-    ax.set_ylabel("Circular error (°)", fontsize=11)
-    ax.set_title(dataset, fontsize=12, fontweight="bold")
-    ax.set_xticks(x)
-    ax.set_xticklabels(representations, rotation=45, ha="right", fontsize=10)
-    ax.legend(fontsize=10)
-    ax.grid(True, alpha=0.3, axis="y")
-    ax.set_ylim([0, 120])
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    axes = axes.flatten()
 
-    # Add value labels on bars
-    for bar in bars1:
-        height = bar.get_height()
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            height + 2,
-            f"{height:.0f}°",
-            ha="center",
-            va="bottom",
-            fontsize=8,
+    for idx, dataset in enumerate(datasets):
+        ax = axes[idx]
+        cols = [c for c in representations if c in data[dataset]]
+        in_window = [data[dataset][c][0] for c in cols]
+        past_window = [data[dataset][c][1] for c in cols]
+
+        x = np.arange(len(cols))
+        width = 0.35
+        bars1 = ax.bar(x - width / 2, in_window, width, label="In-window (0-10s)", alpha=0.8)
+        bars2 = ax.bar(x + width / 2, past_window, width, label="Past-window (10-20s)", alpha=0.8)
+        for bar, color in zip(bars1, colors):
+            bar.set_color(color)
+        for bar, color in zip(bars2, colors):
+            bar.set_color(color)
+            bar.set_alpha(0.4)
+
+        ax.set_xlabel("Representation", fontsize=11)
+        ax.set_ylabel("Circular error (°)", fontsize=11)
+        ax.set_title(dataset, fontsize=12, fontweight="bold")
+        ax.set_xticks(x)
+        ax.set_xticklabels(cols, rotation=45, ha="right", fontsize=10)
+        ax.legend(fontsize=10)
+        ax.grid(True, alpha=0.3, axis="y")
+        ax.set_ylim([0, max(past_window + in_window) * 1.15])
+
+        for bar in bars1:
+            height = bar.get_height()
+            ax.text(
+                bar.get_x() + bar.get_width() / 2, height + 2, f"{height:.0f}°",
+                ha="center", va="bottom", fontsize=8,
+            )
+
+    plt.suptitle(
+        "Angle Representation Effects: Circular Error Across Representations",
+        fontsize=14, fontweight="bold", y=0.995,
+    )
+    plt.tight_layout()
+    out1 = Path(__file__).parent / "figures" / "rollout_error_vs_n.png"
+    out1.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(out1, dpi=150, bbox_inches="tight")
+    print(f"wrote {out1}")
+    plt.close()
+
+    fig, ax = plt.subplots(figsize=(14, 7))
+    for dataset in datasets:
+        cols = [c for c in representations if c in data[dataset]]
+        in_window = [data[dataset][c][0] for c in cols]
+        linestyle = "-" if "no fric" in dataset else "--"
+        marker = "o" if "5-link" not in dataset or "no fric" in dataset else "s"
+        label_prefix = "Frictionless" if "no fric" in dataset else "Friction"
+        chain = dataset.split("-")[0]
+        ax.plot(
+            np.arange(len(cols)), in_window,
+            label=f"{label_prefix} n={chain} (in-window)",
+            marker=marker, linestyle=linestyle, linewidth=2, markersize=7,
         )
 
-plt.suptitle(
-    "Angle Representation Effects: Circular Error Across Representations",
-    fontsize=14,
-    fontweight="bold",
-    y=0.995,
-)
-plt.tight_layout()
-output_path = Path(__file__).parent / "figures" / "rollout_error_vs_n.png"
-output_path.parent.mkdir(parents=True, exist_ok=True)
-plt.savefig(output_path, dpi=150, bbox_inches="tight")
-print(f"✓ Created {output_path}")
-plt.close()
-
-# Also create a line plot version showing the trend more clearly
-fig, ax = plt.subplots(figsize=(14, 7))
-
-chain_lengths = [2, 3, 5, 5]  # Last 5 is friction
-x_pos = np.arange(len(representations))
-
-for i, dataset in enumerate(datasets):
-    in_window = [data[dataset][rep][0] for rep in representations]
-    past_window = [data[dataset][rep][1] for rep in representations]
-
-    linestyle = "-" if "no fric" in dataset else "--"
-    marker = "o" if i < 3 else "s"
-    label_prefix = "Frictionless" if "no fric" in dataset else "Friction"
-    chain = int(dataset.split("-")[0])
-
-    ax.plot(
-        x_pos,
-        in_window,
-        label=f"{label_prefix} n={chain} (in-window)",
-        marker=marker,
-        linestyle=linestyle,
-        linewidth=2,
-        markersize=7,
+    ax.set_xlabel("Representation Scheme", fontsize=12)
+    ax.set_ylabel("Circular Error (°)", fontsize=12)
+    ax.set_title(
+        "In-Window Error by Representation: sin/cos Best Only on Some Datasets",
+        fontsize=13, fontweight="bold",
     )
-
-ax.set_xlabel("Representation Scheme", fontsize=12)
-ax.set_ylabel("Circular Error (°)", fontsize=12)
-ax.set_title(
-    "In-Window Error by Representation: sin/cos Best Only on Some Datasets",
-    fontsize=13,
-    fontweight="bold",
-)
-ax.set_xticks(x_pos)
-ax.set_xticklabels(representations, fontsize=11)
-ax.legend(fontsize=10, loc="best")
-ax.grid(True, alpha=0.3)
-
-plt.tight_layout()
-output_path2 = Path(__file__).parent / "figures" / "rollout_error_vs_n_lines.png"
-plt.savefig(output_path2, dpi=150, bbox_inches="tight")
-print(f"✓ Created {output_path2}")
-plt.close()
+    ax.set_xticks(np.arange(len(representations)))
+    ax.set_xticklabels(representations, fontsize=11)
+    ax.legend(fontsize=10, loc="best")
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    out2 = Path(__file__).parent / "figures" / "rollout_error_vs_n_lines.png"
+    plt.savefig(out2, dpi=150, bbox_inches="tight")
+    print(f"wrote {out2}")
+    plt.close()
 
 
 if __name__ == "__main__":
-    print("Generated angle representation comparison figures")
+    main()
