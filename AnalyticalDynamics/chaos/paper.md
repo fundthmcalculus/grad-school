@@ -6,6 +6,7 @@ University of Cincinnati, Cincinnati, Ohio 45221
 
 **Kelly Cohen, PhD**
 University of Cincinnati, Cincinnati, Ohio 45221
+`cohenky@ucmail.uc.edu`
 
 ---
 
@@ -111,8 +112,8 @@ $$
 
 For $n > 2$ links we use a symbolic Lagrangian construction, forming
 $M(q)\ddot q = f(q, \dot q)$ and solving numerically per evaluation; this
-reproduces (1) at $n = 2$ and generalises the $n$-point-mass formulation of
-Yesilyurt [20]. Agreement between the two derivations is $1.07 \times 10^{-14}$
+reproduces (1) at $n = 2$ and generalizes the $n$-point-mass formulation of
+Yesilyurt [19]. Agreement between the two derivations is $1.07 \times 10^{-14}$
 in $\max|\dot{\mathbf{x}}|$ over 200 random states, asserted on every
 data-generation run.
 
@@ -176,7 +177,7 @@ $$
 
 For fixed antecedents, (5) is linear in $(\bar y_r, \mathbf{a}_r)$, so a single
 firing-weighted ridge least-squares solution yields the exact minimizer of the
-weighted MSE — no iterative optimizer, unlike gradient-trained TSK variants [19]
+weighted MSE — no iterative optimizer, unlike gradient-trained TSK variants
 or ANFIS [8]. Antecedent placement from data rather than a grid follows the
 cluster-estimation tradition [3, 18].
 
@@ -375,7 +376,7 @@ diverges rather than saturating.
 Note the direction of failure is an accident of the consequent, not a property of
 TSK systems. Where a rolled-out state leaves antecedent support and the surviving
 rule contributes $\approx 0$, the same mechanism produces *flat-lining* instead.
-Outside the antecedents' support a TSK model has no defined behaviour; which way
+Outside the antecedents' support a TSK model has no defined behavior; which way
 it fails is incidental.
 
 ### 6.2 Measured
@@ -663,75 +664,80 @@ refit reproduction of every swept score to $10^{-9}$.
 
 ## References
 
-Keys in brackets match `references.bib`. Verification status: **[V]** checked
-against a publisher index or arXiv listing this session; **[S]** seminal work
-taken from working knowledge, to be spot-checked at proof stage.
+Keys in brackets match `references.bib`.
 
 1. **[S]** `brunton2016sindy` — S. L. Brunton, J. L. Proctor, J. N. Kutz.
    Discovering governing equations from data by sparse identification of
    nonlinear dynamical systems. *PNAS* 113(15):3932–3937, 2016.
    doi:10.1073/pnas.1517384113
+   https://www.pnas.org/doi/10.1073/pnas.1517384113
 2. **[S]** `chen2018neuralode` — R. T. Q. Chen, Y. Rubanova, J. Bettencourt,
    D. Duvenaud. Neural ordinary differential equations. *NeurIPS* 31, 2018.
+   https://papers.nips.cc/paper_files/paper/2018/file/69386f6bb1dfed68692a24c8686939b9-Paper.pdf
 3. **[S]** `chiu1994fuzzy` — S. L. Chiu. Fuzzy model identification based on
    cluster estimation. *J. Intelligent and Fuzzy Systems* 2(3):267–278, 1994.
    doi:10.3233/IFS-1994-2306
 4. **[S]** `greydanus2019hamiltonian` — S. Greydanus, M. Dzamba, J. Yosinski.
    Hamiltonian neural networks. *NeurIPS* 32, 2019.
+   https://proceedings.neurips.cc/paper_files/paper/2019/file/26cd8ecadce0d4efd6cc8a8725cbd1f8-Paper.pdf
 5. **[S]** `cranmer2020lagrangian` — M. Cranmer, S. Greydanus, S. Hoyer,
    P. Battaglia, D. Spergel, S. Ho. Lagrangian neural networks. *ICLR 2020 Deep
    Differential Equations Workshop*, 2020.
+   https://hunterheidenreich.com/notes/machine-learning/model-architectures/lagrangian-neural-networks/
 6. **[S]** `hairer1993solving` — E. Hairer, S. P. Nørsett, G. Wanner. *Solving
    Ordinary Differential Equations I: Nonstiff Problems*, 2nd ed. Springer, 1993.
    doi:10.1007/978-3-540-78862-1
+   https://link.springer.com/book/10.1007/978-3-540-78862-1
 7. **[S]** `hochreiter1997lstm` — S. Hochreiter, J. Schmidhuber. Long short-term
    memory. *Neural Computation* 9(8):1735–1780, 1997.
    doi:10.1162/neco.1997.9.8.1735
+   https://dl.acm.org/doi/10.1162/neco.1997.9.8.1735
 8. **[V]** `jang1993anfis` — J.-S. R. Jang. ANFIS: adaptive-network-based fuzzy
    inference system. *IEEE Trans. SMC* 23(3):665–685, 1993. doi:10.1109/21.256541
+   https://www.researchgate.net/publication/3113825_ANFIS_adaptive-network-based_fuzzy_inference_system
 9. **[S]** `lu2021deeponet` — L. Lu, P. Jin, G. Pang, Z. Zhang,
    G. E. Karniadakis. Learning nonlinear operators via DeepONet based on the
    universal approximation theorem of operators. *Nature Machine Intelligence*
    3:218–229, 2021. doi:10.1038/s42256-021-00302-5
+   https://arxiv.org/pdf/1910.03193
 10. **[S]** `prince1981high` — P. J. Prince, J. R. Dormand. High order embedded
     Runge–Kutta formulae. *J. Computational and Applied Mathematics* 7(1):67–75, 1981.
     doi:10.1016/0771-050X(81)90010-3
+    https://www.sciencedirect.com/science/article/pii/0771050X81900103
 11. **[S]** `raissi2019pinn` — M. Raissi, P. Perdikaris, G. E. Karniadakis.
     Physics-informed neural networks. *J. Computational Physics* 378:686–707, 2019.
     doi:10.1016/j.jcp.2018.10.045
+    https://www.sciencedirect.com/science/article/abs/pii/S0021999118307125
 12. **[V]** `ramachandruni2025chaos` — V. Ramachandruni, S. H. R. Nara, G. Lalu,
     S. Yang, M. Ramesh Kumar, A. Jain, P. Mehta, H. Koo, J. Damonte, M. Akl.
     Using machine learning and neural networks to analyze and predict chaos in
     multi-pendulum and chaotic systems. arXiv:2504.13453 [cs.LG], 2025.
+    https://arxiv.org/pdf/2504.13453
 13. **[V]** `shinbrot1992chaos` — T. Shinbrot, C. Grebogi, J. Wisdom,
     J. A. Yorke. Chaos in a double pendulum. *American Journal of Physics*
     60(6):491–499, 1992. doi:10.1119/1.16860
+    https://www.researchgate.net/publication/245641141_Chaos_in_a_Double_Pendulum
 14. **[S]** `stachowiak2006numerical` — T. Stachowiak, T. Okada. A numerical
     analysis of chaos in the double pendulum. *Chaos, Solitons & Fractals*
     29(2):417–422, 2006. doi:10.1016/j.chaos.2005.08.032
+    https://www.sciencedirect.com/science/article/abs/pii/S0960077905006703
 15. **[V]** `takagi1985fuzzy` — T. Takagi, M. Sugeno. Fuzzy identification of
     systems and its applications to modeling and control. *IEEE Trans. SMC*
     SMC-15(1):116–132, 1985. doi:10.1109/TSMC.1985.6313399
+    https://ieeexplore.ieee.org/document/6313399
 16. **[S]** `virtanen2020scipy` — P. Virtanen, R. Gommers, T. E. Oliphant, et al.
     SciPy 1.0: fundamental algorithms for scientific computing in Python.
     *Nature Methods* 17:261–272, 2020. doi:10.1038/s41592-019-0686-2
+    https://pubmed.ncbi.nlm.nih.gov/32015543/
 17. **[S]** `wang1998universal` — L.-X. Wang. Universal approximation by
     hierarchical fuzzy systems. *Fuzzy Sets and Systems* 93(2):223–230, 1998.
     doi:10.1016/S0165-0114(96)00197-2
+    https://www.sciencedirect.com/science/article/abs/pii/S0165011496001972
 18. **[V]** `wang1992generating` — L.-X. Wang, J. M. Mendel. Generating fuzzy
     rules by learning from examples. *IEEE Trans. SMC* 22(6):1414–1427, 1992.
     doi:10.1109/21.199466
-19. **[S]** `wu2020optimize` — D. Wu, Y. Yuan, J. Huang, Y. Tan. Optimize
-    Takagi–Sugeno–Kang fuzzy systems for regression problems (MBGD-RDA).
-    *IEEE Trans. Fuzzy Systems* 28(5):1003–1015, 2020.
-    doi:10.1109/TFUZZ.2019.2958559
-20. **[V]** `yesilyurt2019npendulum` — B. Yesilyurt. Equations of motion
+    https://ieeexplore.ieee.org/document/199466
+19. **[V]** `yesilyurt2019npendulum` — B. Yesilyurt. Equations of motion
     formulation of a pendulum containing N-point masses. arXiv:1910.12610
     [physics.class-ph], 2019.
-
-Two further entries are present in `references.bib` but not cited in this draft
-and should be dropped or cited before submission: `hairer2006geometric`
-(structure-preserving integrators) and `benettin1980lyapunov` (Lyapunov exponent
-computation). The $\lambda$ values in Table 3 are fitted from bracket separation
-rather than computed by the Benettin method, so the latter is background rather
-than method.
+    https://arxiv.org/pdf/1910.12610
