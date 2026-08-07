@@ -19,13 +19,14 @@ the seven cells the paper reports and places second in the seventh. But on the
 friction holdout cells, *averaging the two nearest training trajectories* — no
 parameters, no fitting — beats every model in the paper by 6–18×, because the
 held-out initial condition sits exactly halfway between two trained ones and
-damping keeps them within 4% of the target's range for the whole window. The
+damping keeps them within 6% of the target's range for the whole window. The
 benchmark's friction variant at n=2 and n=3 is an interpolation problem, not a
 chaos problem.
 
 Extending to n=5 (paper.md §5.3, `results/bracket.json`) shows that dominance is
-chain-length-dependent: at five links the same baseline is 20× worse, because the
-bracketing pair separates by 24% of the target's range instead of 3%. It is still
+chain-length-dependent: at five links the same baseline's RMSE is 20× worse,
+while the bracketing pair's own separation grows more gently, from 0.6% (n=2)
+to 6.0% (n=3) to 7.0% (n=5) of the target's range. The baseline is still
 ahead of the FIS, but by 1.3× rather than 4.8×. Across all three chain lengths the
 FIS loses to the baseline on every friction holdout and beats both baselines on
 every frictionless one — it wins where the answer is a blend over many training
