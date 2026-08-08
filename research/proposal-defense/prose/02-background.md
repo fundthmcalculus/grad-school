@@ -8,7 +8,7 @@ A Fuzzy Inference System replaces the crisp true/false of classical logic with a
 
 There are two common flavors. A **Mamdani** system uses fuzzy sets on the output side and requires a defuzzification step to turn the aggregated output set back into a number. A **Takagi–Sugeno–Kang (TSK)** system instead makes each rule's consequent a function of the inputs: a constant (order 0), a linear function (order 1), or a polynomial (higher orders). I use the TSK form throughout, for one reason that matters a great deal later. *For a fixed set of firing strengths, the TSK output is linear in the consequent coefficients.* That linearity is what lets me solve for the consequents in closed form rather than searching for them, and it is the hinge of Chapters 4 and 6.
 
-**Figure 2.1 — The components of a fuzzy inference system, and which of them this work generates.** Crisp inputs are fuzzified by membership functions, the rule base fires, the results are aggregated, and defuzzification returns a number. Shaded blue: generated from the data by this work, meaning the membership functions (Ch. 4, Ch. 5), the antecedents and their disjunctions (Ch. 4, Ch. 6), and the consequents, solved in closed form rather than searched. Grey: fixed by design, the analyzability constraints set out below (triangular Ruspini memberships, the product t-norm, weighted-average defuzzification). Shading the whole diagram would be claiming the constraint set as a result.
+**Figure 2.1 — The components of a fuzzy inference system, and which of them this work generates.** Crisp inputs are fuzzified by membership functions, the rule base fires, the results are aggregated, and defuzzification returns a number. Shaded blue: generated from the data by this work, meaning the membership functions (Ch. 4, Ch. 5), the antecedents and their disjunctions (Ch. 4, Ch. 6), and the consequents, solved in closed form rather than searched. Grey: fixed by design, the analyzability constraints set out below (the product t-norm, weighted-average defuzzification). Shading the whole diagram would be claiming the constraint set as a result.
 `![fis-components](fig/02-fis-components.png)`
 
 ### Combining memberships: t-norms, t-conorms, and the complement
@@ -23,7 +23,7 @@ The **fuzzy complement** is the negation, standardly $\neg a = 1 - a$. It is the
 
 ### Constraints for analyzability
 
-To keep the systems tractable I adopt constraints that are standard in this literature. Membership functions are triangular. They form a **Ruspini partition** [Ruspini 1969; de Oliveira 1999]: the endpoints of one function coincide with the centers of its neighbors, so that at any input the memberships of adjacent sets sum to unity. Inputs and outputs are normalized. Rules combine input memberships by the product t-norm, and the system defuzzifies by a weighted average. Arnett (2018) in this department uses the same constraint set in the same combination; I note the parallel without claiming it as a source. These constraints are not free, since they restrict the shapes the model can take, but they buy a clean property: under a Ruspini partition exactly two adjacent sets are active at any input, which keeps both the algebra and the resulting rules tractable.
+Rules combine input memberships by the product t-norm, and the system defuzzifies by a weighted average.
 
 The problem I keep running into is the rule base. If I build a FIS by partitioning each input independently and forming a rule for every combination of sets, the number of rules is the product of the per-input set counts,
 
