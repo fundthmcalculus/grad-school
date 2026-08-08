@@ -17,6 +17,7 @@ data/
 figures/
 results/*.log
 *.pdf
+build/
 
 # LaTeX/pandoc build leftovers, in case a preview is built here.
 *.aux
