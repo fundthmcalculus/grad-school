@@ -259,9 +259,9 @@ A.5 above answers *is this dataset public, and is it present in this repository.
 | Dataset | Size | Status | Role |
 |---|---|---|---|
 | Glass, leave-one-class-out | 214 × 9, 6 classes | measured (Tables 4.6–4.7, Fig 4.2) — explicitly called "a stress test, not a demonstration," i.e. a substitute standing in for the missing large set | small / fast |
-| BETH (host telemetry) | not stated in the document | named — `FuzzySystemsExperiments/beth.py` and `beth-anomaly.py` both exist (one is the source of the inherited θ = 0.99 default) but both need a local `beth_data/` file that is absent; also structurally blocked, since leave-one-class-out needs at least three classes and BETH is binary | large — never measured, and not just a data-availability gap: the experiment protocol itself needs a one-class path that does not exist yet (Ch10, 2027 Q2) |
+| BETH (host telemetry) | binary | named — loaders exist but no local data; also blocked by design constraint: leave-one-class-out requires ≥3 classes. See Ch 7 §7.3 for the fallback (use Glass as stress test) and 2027 Q2 decision point. | large — never measured |
 
-**Gap.** No large anomaly dataset exists in any form; A.5 already says this plainly. Worth restating here because it is the cleanest single-category case of a missing large partner: the small side is not a stopgap awaiting data, it is standing in for an experiment design that has not been decided yet.
+**Gap.** No large anomaly dataset exists in any form; A.5 already says this plainly. Worth restating here because it is the cleanest single-category case of a missing large partner: the small side is not a stopgap awaiting data, it is standing in for an experiment design that has not been decided yet (Ch 7 §7.3).
 
 ### A.7.4 Clustering / structure discovery (Ch3)
 
