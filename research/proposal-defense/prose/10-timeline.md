@@ -4,7 +4,7 @@ The plan runs from the proposal defense at the end of 2026 to the final defense 
 
 Three things changed here, all of them cases of the schedule having assumed the hard parts were done.
 
-- **The baseline adapters come first.** §7.4 calls the ANFIS and GA-tuned-FIS tables the first experiments owed. Eleven cells across Tables 4.5 and 6.2 read `N/A` until they exist, and the speed argument in the title and in Chapters 1, 4 and 8 has no conventional fuzzy method measured beside it. That is the reason they open the schedule (checklist **C1**).
+- **The baseline adapters come first.** C1 (ANFIS and GA-tuned-FIS) fill the initial baseline gap; see §7.4 for the impact on Tables 4.5 and 6.2.
 - **Every blocker the evidence names now has a bar or an explicit de-scope.** The M5 dependency fault gets a decision date; BETH's one-class path gets a slot and a stated fallback; eVAT and clusiVAT get their own bar. Fumanal-Idocin et al. (2025) and the deep TSK fuzzy classifier, itemized in Chapter 6's baseline list and nowhere here, are de-scoped in §7.2 instead of silently carried.
 - **Goal G8 is absent deliberately.** §7.2 retargets the construction post-defense, since the 2028 Q1 quarter it would need already carries the capstone, G6, G7, the write-up and the defense, and keeps only the disjunct count over G2's datasets, which rides inside G2.
 
@@ -128,18 +128,13 @@ The cost of that choice should be named too: the EUSFLAT paper would report clus
 
 ## 10.6 The runway is oversubscribed, and here is what I would cut
 
-With everything the evidence requires now scheduled — the baseline adapters, the eVAT and clusiVAT implementations, the M5 branch, the trajectory fix, the BETH decision, the broadened suite, the merge composition test, G2 at its real two-quarter size — the fifteen-month runway has no slack left. **It is oversubscribed, not merely tight, and cutting G7 alone does not fix it.** G7 is roughly thirty days of a stretch goal; the items above are considerably more. So the plan is an ordered list, the same one as §7.4's.
+With everything the evidence requires now scheduled — the baseline adapters, the eVAT and clusiVAT implementations, the M5 decision, the BETH branch, the broadened suite, the merge composition test, G2 at its real two-quarter size — the fifteen-month runway has no slack left. **It is oversubscribed, not merely tight, and cutting G7 alone does not fix it.** 
 
-1. **G7, adaptive multi-scale.** Already the designated first cut. Its likeliest outcome, on the phase-four evidence, is a negative result G1 would reach anyway.
-2. **G3b, the broadened dataset suite**, narrowed from six datasets (turbine, wave-energy, wine and the IoT sets) to Concrete, PhiUSIIL and one added regression set. Chapter 6 §6.4 promises "characterized across more than two problems," which three satisfy; six against six baselines at ten seeds is a quarter of engineering.
-3. **G6's metric half beyond the counts.** The counts are owed and read off a fitted model; the semantic-constraint criteria on top are not load-bearing. The expert-audience study is already dropped in §7.2, having never been scheduled or scoped.
-4. **The VAT complexity note (§9.3).** Conditional on two blocking full-text reads, and §3.3.1 concedes it is a modest correction to a problem someone else solved better. The cheapest paper to drop.
-5. **G4d, the matrix-free reorder.** Nothing in Chapter 3 depends on it, and it buys the regime past about 155,000 points, which no result here occupies. Listed unscheduled in Table 7.1, so cutting it means not adding it back.
-6. **G4e narrows to the composition test alone**, error-growth bound and block-boundary question named as future work. If even that goes, Chapter 3 withdraws the half-million-point distributed target.
+**De-scoping priority order** (§7.4): G7 (adaptive multi-scale, first cut), then G3b (broadened dataset suite), then G6's metric half beyond the counts, then the VAT complexity note, then G4d (matrix-free reorder), then G4e narrowed to composition test alone. See §7.4 for the full rationale on each cut.
 
-**G9 is on neither list, and that is a choice.** It is three weeks on machinery that already exists, and it is the only measurement behind a contribution Chapter 3 §3.3.5 now claims, so putting it on the cut list would mean planning to claim the estimator and never test it. If the quarter overruns anyway, the fallback is stated in §7.4: the claim narrows to what the code proves, and Chapter 3 says so.
+**G9 is on neither list, and that is a choice.** It is three weeks on machinery that already exists, and it is the only measurement behind a contribution Chapter 3 §3.3.5 now claims. If the quarter overruns anyway, the fallback is stated in §7.4: the claim narrows to what the code proves.
 
-What I will not cut, and would rather move the final defense than lose: **C1**, **G2**, **G4a**, and the capstone. If G3's EM or G2 overruns, Chapter 7's fallbacks apply (the one-shot mixture, and a synthetic-plus-one-real-domain result), and Chapters 3 and 4 remain a defensible floor. Defense preparation is carved out in Feb 2028 so the final month is not a scramble.
+**What I will not cut, and would rather move the final defense than lose:** **C1**, **G2**, **G4a**, and the capstone. If G3's EM or G2 overruns, Chapter 7's fallbacks apply (the one-shot mixture, and a synthetic-plus-one-real-domain result), and Chapters 3 and 4 remain a defensible floor. Defense preparation is carved out in Feb 2028 so the final month is not a scramble.
 
 Two caveats. Q1 2027 is the densest quarter, carrying five research items and a conference submission; inside it, the item I would let slip is the Chapter 3 journal, a write-up rather than a build. And throughput is unconfirmed while the teaching and RA load per semester is unsettled, the one open item that could move every bar.
 

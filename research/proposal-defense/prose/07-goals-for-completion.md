@@ -70,6 +70,8 @@ The method is named after the merge, and **the merge itself is unfinished.** §3
 
 **Estimated effort: about three weeks.** The estimator, both baselines and the timing harness all exist; what is missing is a driver, a size ladder and two tables.
 
+**Timeline:** Ch 10 shows 2027 Q2 (three-week bar). **Status:** Not on de-scoping list (§7.4) because it is the only measurement behind a stated contribution.
+
 ### G1 — Direct one-pass membership generation (build + experiment; partly built)
 
 Collapse Chapter 5's two-stage select-then-fit pipeline into a single pass: each block emits its native membership function, the disjunction recombines them, the surviving envelope is the model. The differentiator, and it feeds the capstone.
@@ -79,6 +81,8 @@ Phases one to three of `MEMBERSHIP_ROADMAP.md` are built: memberships come strai
 *Decision rule.* Three fixed-structure families from `battery_hierarchical.SCALABLE` — `single_scale`, `many_scale`, `log_separated` — at $n$ = 100, 250, 500, 1,000, 2,000 and 5,000, the one-pass generator against both the two-stage selector and the flat set-cover on identical data. Metrics: recovered granularity vector, per-level adjusted Rand index of the defuzzified partition against each ground-truth level, partition-of-unity error under Ruspini normalization. Thresholds: `many_scale` must not regress from granularities [8, 4, 2] at ARI 1.00 at any $n$; partition-of-unity error must stay at machine precision; `log_separated` at $n \le 500$ must reach ARI ≥ 0.95 with a single band of three clusters, the flat cover's answer and the number phase four failed to reach. Below 0.95 is *not* fixed, leaving no room for partial success.
 
 If soft bands land where phase four landed, the conclusion is not that the kernel needs tuning. It is that birth height is a clean band coordinate only where each cluster occupies a narrow birth range, that the flat set-cover is simply correct for single-level widely-varying-spread data, and that the deliverable is a **single-versus-multi-level gate** detecting one antichain and deferring to the flat cover. G1 then ships as phases one to three plus five, the fix relabelled a gate; Chapter 5 §5.5 needs the same correction.
+
+**Timeline:** Ch 10 grid shows 2027 Q2. **Evidence:** Appendix A.6 has the phase-four investigation and findings.
 
 ### G2 — Real non-coordinate benchmarks (experiment; not started, datasets verified)
 
@@ -93,15 +97,19 @@ Everything topological is so far demonstrated on synthetic data with known groun
 3. **Downstream usefulness against the baselines that can run.** NERFCM given $k$, ConiVAT, single-linkage, beta-plateau and bottleneck-bootstrap all run on a dissimilarity matrix. The gated set-cover, discovering $k$, must land within 0.05 adjusted Rand index of NERFCM-given-$k$ on at least three of the five DTW sets, and `select_coverage_cover` and `select_multiscale` must run on those matrices at all, which per §5.4 they never have, Chapter 5's relational block evaluating only NERFCM. Refuted if the set-cover misses 0.05 on every real non-coordinate set: the coordinate-free property stays true, being provable from the code, and becomes *useless*, narrowing Chapter 5's niche claim to "cannot use coordinates," a proof obligation and not a result.
 4. **Reachable size on real relational data.** Crop at 24,000 objects is about 4.6 GB as a float64 dissimilarity matrix, and the natural place to exercise on-demand distance computation, since materializing 288 million DTW pairs is what one wants to avoid. A demonstration in G4a's sense, with hardware, precision and footprint.
 
+**Timeline:** Ch 10 shows 2027 Q2–Q3 (two-quarter run). **Datasets:** Appendix A.7.7 lists verified loadable datasets; A.5 explains why there are no baseline competitors.
+
 ### G3 — The hierarchical mixture, finished and compared (build + experiment; one-shot built)
 
 Implement the EM refinement of the mixture of experts, and benchmark the family against the baselines a reviewer will demand on identical splits.
 
 **The baseline list is narrowed deliberately, and Chapter 6 §6.4's version should narrow to match.** To be built: ANFIS and a genetic-algorithm-tuned FIS (checklist **C1**, first in the schedule), CART, Random Forest, flat TSK, and M5 model trees *if* the M5 decision goes that way. Not to be built: Fumanal-Idocin et al. (2025) or the deep TSK fuzzy classifier, for the reasons Appendix A.6 sets out. Reimplementing one, the closest being Fumanal-Idocin et al., displaces G3b: the price, named rather than absorbed.
 
-**M5 is a dependency fault, not an unrun experiment, so it needs a decision date.** Chapter 6 §6.4 records the fault itself. Three branches: patch or upgrade `m5py`; write an M5′ implementation, potentially a month rather than an afternoon; or drop the row and say in Table 6.2 that M5 is unavailable here. Chapter 10 carries **31 March 2027** as the date, before G3's suite is built, because deciding later means discovering mid-suite that one of four baselines is a build.
+**M5 decision:** A dependency fault (m5py incompatible with current scikit-learn) requires a go/no-go decision by **31 March 2027**, before G3's suite is built. See Appendix A.6 for the fault details and three resolution branches (patch, write M5′, or drop the row).
 
 *Decision rule for the EM, stated in advance because otherwise every outcome is a win.* The document has pre-absorbed all three answers, and Appendix A.6 shows how, along with the outcome here that would embarrass the thesis. So the prediction goes first. **I expect EM ≈ one-shot at second order on Concrete, and I expect what it buys to be stability rather than level.** Metric: $R^2$ and its ten-seed standard deviation at matched capacity on shared splits, plus the divergence rate, the fraction of seeds whose predictions leave the target's observed range, the failure the seed-9 episode exposed. Threshold: a positive result moves the mean by at least 0.02 $R^2$ over the one-shot fit *or* cuts the ten-seed spread by at least a third, with zero divergent seeds. Anything inside that band is the predicted null result, reported as a confirmed prediction: a third instance of *structure before search*, beside §6.3.5's population-method finding and §6.4's refinement decay.
+
+**Timeline:** Ch 10 shows 2027 Q3–Q4. **Critical path:** M5 decision dates it; see Ch 10 §10.4 dependencies.
 
 ### G5 — Output partitioning: settled (decision; four studies run)
 
@@ -124,6 +132,8 @@ The interpretability claim should be measured, not asserted, and the earlier dis
 **The expert-audience study is dropped**, and stays post-defense work; Appendix A.6 sets out why it would not be defensible as things stand. The consequence is stated rather than absorbed. §6.2 lists "whether a rule base mixing one- and two-dimensional antecedents reads coherently to a domain expert" as a question only a person can answer and points at G6 as its home; that question is now unanswered here, and §6.2's bound has to hold for the hierarchy as built. §2.6's position on post-hoc explanation is reframed instead of tested, since "post-hoc answers a different question" needs no experiment.
 
 *Decision rule.* Counts and the four semantic criteria on the flat FIS, the fuzzy tree, the mixture and the Ruspini export, on Concrete and one G3b dataset, at matched accuracy. Threshold, for the claim that the hierarchy buys a readable path at comparable accuracy: at accuracies within one pooled standard deviation of each other, the hierarchy's mean root-to-leaf path must mention strictly fewer variables than the flat model's rules do, and the Ruspini export must satisfy coverage and partition-of-unity exactly. Refuted if the paths are no shorter at matched accuracy, in which case the interpretability-for-accuracy trade is a loss and not a trade, and §6.5 has to say so.
+
+**Timeline:** Ch 10 shows 2028 Q1 (third-cut goal). **Scoping:** §10.6 narrows to counts and semantic criteria, dropping the expert-study half.
 
 ### G7 — Adaptive multi-scale (open question; stretch, first cut)
 
@@ -157,7 +167,7 @@ One risk has no goal above it: the prior-art overlap in Chapter 5 with Bonis and
 
 Two exposures a committee will find. My selection gate in Chapter 5 loses outright to more aggressive selectors on the bridge case, and Table 5.3's coverage column weakens even the conservatism defence I recorded: bottleneck-bootstrap repairs the bridge while still declining three-quarters of the noise. And Chapter 3's non-metric claim rests on synthetic matrices built from coordinate data until G2 runs.
 
-The runway is oversubscribed, not merely tight, so the de-scoping plan is an ordered list rather than one designated victim: **G7** first, then **G3b** narrowed to three datasets, then **G6's** semantic-criteria half beyond the counts, then the §9.3 **VAT complexity note**, then **G4d**, then **G4e** narrowed to the composition test alone. Chapter 10 §10.6 carries that list with the reason for each cut, and the two must not drift apart. What I will not cut, and would rather extend the timeline than lose: the **C1** adapters, **G2**, **G4a**, and the capstone. Those four carry the two headline claims and the pipeline argument. **G9** is on neither list, and the reason is stated rather than left to the schedule: it is about three weeks on machinery that already exists, and it is the only measurement there will be behind a contribution §3.3.5 now claims, so if it slips the claim narrows to the properties provable from the code and Chapter 3 says that instead of absorbing the loss quietly. Chapters 3 and 4 remain the floor: done, and defensible on their own.
+The runway is oversubscribed, not merely tight, so the de-scoping plan is an ordered list rather than one designated victim. See §10.6 for the priority order and rationale; in brief: **G7** first, then **G3b** narrowed to three datasets, then **G6's** semantic-criteria half beyond the counts, then the §9.3 **VAT complexity note**, then **G4d**, then **G4e** narrowed to the composition test alone. What I will not cut, and would rather extend the timeline than lose: the **C1** adapters, **G2**, **G4a**, and the capstone. Those four carry the two headline claims and the pipeline argument. **G9** is on neither list, and the reason is stated rather than left to the schedule: it is about three weeks on machinery that already exists, and it is the only measurement there will be behind a contribution §3.3.5 now claims, so if it slips the claim narrows to the properties provable from the code and Chapter 3 says that instead of absorbing the loss quietly. Chapters 3 and 4 remain the floor: done, and defensible on their own.
 
 ## 7.5 Goals, mapped
 
