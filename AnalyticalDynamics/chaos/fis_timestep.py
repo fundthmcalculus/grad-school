@@ -1,6 +1,6 @@
 """Fuzzy-inference-system reproduction of the time-step operator in arXiv:2504.13453.
 
-The paper's "time-step based approach" is not autoregressive. It fits a direct
+The paper's "time-step-based approach" is not autoregressive. It fits a direct
 operator
 
     (theta_1(0), ..., theta_n(0), t)  ->  (theta_1(t), ..., theta_n(t))
@@ -58,7 +58,7 @@ sys.path.insert(0, str(HERE.parent.parent / "tribble-fis" / "src"))
 from sklearn.metrics import mean_squared_error, r2_score  # noqa: E402
 from sklearn.preprocessing import MinMaxScaler  # noqa: E402
 
-from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor  # noqa: E402
+from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 
 import pendulum_data as pdata  # noqa: E402
 
@@ -139,10 +139,10 @@ def load(n_links, friction):
     # holdout's first 10 s -- and then applied to all 20 s.
     #
     # Per-trajectory min-max only makes training and test commensurable when both
-    # are normalised over the same duration. Training targets span exactly [0, 1]
+    # are normalized over the same duration. Training targets span exactly [0, 1]
     # by construction, so fitting the holdout's scaler over its full 20 s would
     # leave its first 10 s spanning only [0, 0.678] on the frictionless double
-    # pendulum, and a model trained to emit over [0, 1] would overshoot by ~1.5x
+    # pendulum. A model trained to emit over [0, 1] would overshoot by ~1.5x
     # for reasons having nothing to do with its dynamics. Fitting on the window
     # keeps the two commensurable and keeps every in-window number comparable to
     # the 10 s protocol.
@@ -152,7 +152,7 @@ def load(n_links, friction):
     # fitting over 20 s would additionally leak the range of the region being
     # extrapolated into. Scaled truth beyond 10 s may therefore fall outside
     # [0, 1], which is correct -- the chain genuinely leaves the window it was
-    # normalised against.
+    # normalized against.
     #
     # Friction datasets are indifferent to the choice (their 20 s range equals
     # their 10 s range bitwise); only the frictionless ones move.
@@ -285,7 +285,7 @@ class FisConfig:
 class FisOperator:
     """A collection of TSK fuzzy inference systems, one per output angle.
 
-    Wraps `MixtureOfGaussiansFuzzyRegressor` per output rather than using
+    Wraps `TribbleRegressor` per output rather than using
     `MimoGaussianPredictor`, because that wrapper does not forward
     output_partition / l2_reg / consequent_basis / norm arguments and would
     silently substitute library defaults for anything swept here.
@@ -294,13 +294,13 @@ class FisOperator:
     def __init__(self, cfg):
         self.cfg = cfg
         self.models_ = []
-        self.x_scaler_ = None
+        self.x_scaler_: MinMaxScaler = None
         self.keep_ = None
         self.names_ = None
 
     def _make(self):
         c = self.cfg
-        return MixtureOfGaussiansFuzzyRegressor(
+        return TribbleRegressor(
             n_output_buckets=c.n_output_buckets,
             tsk_order=c.tsk_order,
             n_gaussians=c.n_gaussians,

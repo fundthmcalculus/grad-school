@@ -1,0 +1,57 @@
+{
+  "stage": "capacity",
+  "hash": "7cdb346901285a21",
+  "hash_of": {
+    "data_hash": "fe97bf7ed293d7eb",
+    "configs": [
+      "nb40_1st_g0_uniform_raw_probability",
+      "nb120_full-2nd_g0_uniform_raw_probability",
+      "nb300_full-2nd_g0_uniform_raw_probability_l21e-09",
+      "nb120_1st_g0_uniform_raw_probability_harmonic8"
+    ]
+  },
+  "payload": {
+    "rows": [
+      {
+        "family": "with time",
+        "model": "time-step, 40 rules",
+        "n_variables": 2,
+        "variables": "theta2_init t",
+        "train_seconds": 7.69,
+        "rollout_seconds": 0.009,
+        "in_window_rmse_deg": 22.0046,
+        "extrap_rmse_deg": 443.3053
+      },
+      {
+        "family": "with time",
+        "model": "time-step, 120 rules",
+        "n_variables": 2,
+        "variables": "theta2_init t",
+        "train_seconds": 22.96,
+        "rollout_seconds": 0.021,
+        "in_window_rmse_deg": 4.3501,
+        "extrap_rmse_deg": 20070.3642
+      },
+      {
+        "family": "with time",
+        "model": "time-step, 300 rules",
+        "n_variables": 2,
+        "variables": "theta2_init t",
+        "train_seconds": 77.14,
+        "rollout_seconds": 0.053,
+        "in_window_rmse_deg": 3.1054,
+        "extrap_rmse_deg": 338554.9492
+      },
+      {
+        "family": "with time",
+        "model": "time-step, 8 harmonics",
+        "n_variables": 18,
+        "variables": "theta2_init t sin1w0t cos1w0t sin2w0t cos2w0t sin3w0t cos3w0t sin4w0t cos4w0t sin5w0t cos5w0t sin6w0t cos6w0t sin7w0t cos7w0t sin8w0t cos8w0t",
+        "train_seconds": 189.95,
+        "rollout_seconds": 0.064,
+        "in_window_rmse_deg": 20.0722,
+        "extrap_rmse_deg": 146.2012
+      }
+    ]
+  }
+}

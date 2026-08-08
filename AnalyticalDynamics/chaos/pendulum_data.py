@@ -497,47 +497,56 @@ def reference_convergence(
 N_LINKS = (2, 3, 5)
 
 
-def main():
-    print("Validating the symbolic n=2 model against the paper's closed form ...")
-    worst = validate_against_reference()
-    print(f"  max |d(state)/dt| disagreement over 200 random states: {worst:.3e}")
+def collect_provenance(n_trials=200, seed=42, tol=1e-9):
+    """The correctness checks `main()` prints, as a dict for the pipeline's log.
 
-    print("Energy conservation of the undamped [120, 0, ...] run over 10 s:")
+    Raises AssertionError under the same conditions main() would: symbolic/
+    reference disagreement above `tol`, or RK4 convergence slower than order 3
+    (ratio <= 8x per halving, versus the ~16x order-4 expects).
+    """
+    worst = validate_against_reference(n_trials=n_trials, seed=seed, tol=tol)
+
+    energy = {}
     e0, drift = energy_drift(2, use_reference_rhs=True)
-    print(
-        f"  n=2 (paper's closed form): E0 = {e0:+.6f} J, max drift / PE swing = {drift:.3e}"
-    )
+    energy["double_closed_form"] = {"E0": e0, "drift_ratio": drift}
     for n_links in N_LINKS:
         e0, drift = energy_drift(n_links, use_reference_rhs=False)
-        print(
-            f"  n={n_links} (symbolic)          : E0 = {e0:+.6f} J, "
-            f"max drift / PE swing = {drift:.3e}"
-        )
+        energy[f"n{n_links}_symbolic"] = {"E0": e0, "drift_ratio": drift}
 
     worst_n = max(N_LINKS)
     steps = rk4_order_check(worst_n)
     ratios = [a[1] / b[1] for a, b in zip(steps, steps[1:])]
-    print(
-        f"  n={worst_n} h-refinement drift: "
-        + " -> ".join(f"{d:.2e}" for _, d in steps)
-        + "  (ratios "
-        + ", ".join(f"{r:.1f}x" for r in ratios)
-        + ", RK4 expects ~16x)"
-    )
     assert min(ratios) > 8.0, (
         f"n={worst_n} energy drift is not converging at RK4's order "
         f"(ratios {ratios}); suspect the derivation, not the step size"
     )
+    return {
+        "symbolic_vs_reference_max_error": worst,
+        "energy_drift": energy,
+        "rk4_order_check_n": worst_n,
+        "rk4_step_sizes": [h for h, _ in steps],
+        "rk4_drifts": [d for _, d in steps],
+        "rk4_order_ratios": ratios,
+    }
 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    for n_links in N_LINKS:
+
+def generate_all(n_links_list=N_LINKS, out_dir=DATA_DIR):
+    """Build and save every (n_links, friction) train + holdout dataset.
+
+    The holdout runs to TEST_T_END, double the training window, so its second
+    half is extrapolation in time as well as to an unseen angle. Returns one
+    summary dict per dataset (paths, shapes, the swept IC grid), for the
+    pipeline's stage_data JSON log.
+    """
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    datasets = []
+    for n_links in n_links_list:
         for friction in (False, True):
             train = generate(n_links, friction)
-            npz, csv = save(train)
-            # The holdout runs to TEST_T_END, double the training window, so the
-            # second half is extrapolation in time as well as to an unseen angle.
+            npz, csv = save(train, out_dir)
             test = generate(n_links, friction, [TEST_THETA2_DEG], n_steps=TEST_N_STEPS)
-            tnpz = DATA_DIR / f"{test.label}_holdout.npz"
+            tnpz = out_dir / f"{test.label}_holdout.npz"
             np.savez_compressed(
                 tnpz,
                 ic_deg=test.ic_deg,
@@ -547,11 +556,58 @@ def main():
                 friction=friction,
                 train_t_end=T_END,
             )
-            print(
-                f"  {train.label}: train {train.theta_deg.shape} over "
-                f"{train.t[-1] + H:.0f}s -> {npz.name}, {csv.name}; "
-                f"holdout {test.theta_deg.shape} over {test.t[-1] + H:.0f}s -> {tnpz.name}"
+            datasets.append(
+                {
+                    "label": train.label,
+                    "n_links": n_links,
+                    "friction": friction,
+                    "npz": str(npz),
+                    "csv": str(csv),
+                    "holdout_npz": str(tnpz),
+                    "train_shape": list(train.theta_deg.shape),
+                    "holdout_shape": list(test.theta_deg.shape),
+                    "ic_grid_deg": train.ic_deg[:, -1].tolist(),
+                }
             )
+    return datasets
+
+
+def main():
+    print("Validating the symbolic n=2 model against the paper's closed form ...")
+    prov = collect_provenance()
+    print(
+        f"  max |d(state)/dt| disagreement over 200 random states: "
+        f"{prov['symbolic_vs_reference_max_error']:.3e}"
+    )
+
+    print("Energy conservation of the undamped [120, 0, ...] run over 10 s:")
+    d = prov["energy_drift"]["double_closed_form"]
+    print(
+        f"  n=2 (paper's closed form): E0 = {d['E0']:+.6f} J, "
+        f"max drift / PE swing = {d['drift_ratio']:.3e}"
+    )
+    for n_links in N_LINKS:
+        d = prov["energy_drift"][f"n{n_links}_symbolic"]
+        print(
+            f"  n={n_links} (symbolic)          : E0 = {d['E0']:+.6f} J, "
+            f"max drift / PE swing = {d['drift_ratio']:.3e}"
+        )
+
+    print(
+        f"  n={prov['rk4_order_check_n']} h-refinement drift: "
+        + " -> ".join(f"{d:.2e}" for d in prov["rk4_drifts"])
+        + "  (ratios "
+        + ", ".join(f"{r:.1f}x" for r in prov["rk4_order_ratios"])
+        + ", RK4 expects ~16x)"
+    )
+
+    datasets = generate_all()
+    for ds in datasets:
+        print(
+            f"  {ds['label']}: train {tuple(ds['train_shape'])} -> "
+            f"{Path(ds['npz']).name}, {Path(ds['csv']).name}; "
+            f"holdout {tuple(ds['holdout_shape'])} -> {Path(ds['holdout_npz']).name}"
+        )
 
 
 if __name__ == "__main__":
