@@ -48,7 +48,7 @@ SECTIONS = [
     "prose/06-hierarchical-refined-fis.md",
     "prose/07-goals-for-completion.md",
     "prose/08-conclusion.md",
-    "chapters/09-publications.md",  # still outline-only (awaiting NAFIPS details)
+    "prose/09-publications.md",  # still outline-only (awaiting NAFIPS details)
     "prose/10-timeline.md",
     "prose/bibliography.md",
     "prose/appendix.md",
