@@ -2,7 +2,7 @@
 
 The paper's time-step operator interpolates between initial conditions: the
 held-out IC [120, 2.05] sits exactly between the trained ICs [120, 2.0] and
-[120, 2.1]. Interpolation can only work while those two neighbours still
+[120, 2.1]. Interpolation can only work while those two neighbors still
 resemble each other. This script measures how long that holds.
 
 Once the two bracketing training trajectories have separated by a large fraction
@@ -24,12 +24,18 @@ Two reference errors are reported for scale, neither of which is a lower bound:
 `midpoint_rmse_scaled` (average the two bracketing trained trajectories) and
 `constant_mean_rmse_scaled` (predict the trajectory's own mean, i.e. R^2 = 0).
 
-Writes results/bracket.csv and figures/fig_bracket.png.
+`draw_bracket_separation` is a second, independent diagnostic of the same
+phenomenon at n=2 only: it integrates the bracketing pair itself (rather than
+reading it out of the sweep dataset) so the divergence is visible without going
+through `measure()`'s bookkeeping, across both regimes side by side.
+
+Standalone run prints the table, writes results/bracket.json (a plain dump, not
+gated by run_all.py's cache -- see pipeline_cache.py), and both figures.
 """
 
 from __future__ import annotations
 
-import csv
+import json
 
 import numpy as np
 
@@ -49,10 +55,24 @@ def _row(split, value):
     return idx
 
 
+def _extend_to_holdout(split, ic_row_deg):
+    """Integrate one trained IC out to the holdout's full 20 s.
+
+    `split.theta_deg` only holds the 10 s training window; comparing the
+    bracketing pair against the holdout at t = 20 s (Table 3) needs the same
+    two initial conditions continued to 20 s, not the truncated array.
+    """
+    rhs = pdata.rhs_for(split.n_links, split.friction)
+    state0 = np.zeros(2 * split.n_links)
+    state0[0::2] = np.deg2rad(ic_row_deg)
+    traj = pdata.rk4_integrate(rhs, state0, n_steps=split.holdout_t.size)
+    return np.rad2deg(traj[:, 0::2])
+
+
 def measure(split):
     """Separation of the bracketing pair, and the holdout's distance from each."""
-    lo = split.theta_deg[_row(split, LOWER_DEG)]
-    hi = split.theta_deg[_row(split, UPPER_DEG)]
+    lo = _extend_to_holdout(split, split.ic_deg[_row(split, LOWER_DEG)])
+    hi = _extend_to_holdout(split, split.ic_deg[_row(split, UPPER_DEG)])
     mid = split.holdout_theta_deg
 
     # Largest angular disagreement across links, at each time.
@@ -68,19 +88,21 @@ def measure(split):
     # First time the bracket is wider than a tenth of the holdout's own range.
     thresh = 0.1 * span
     over = np.nonzero(sep > thresh)[0]
-    t_decorrelate = float(split.t[over[0]]) if over.size else float("inf")
+    t_decorrelate = float(split.holdout_t[over[0]]) if over.size else float("inf")
 
     # Exponential divergence rate fitted to the bracket separation while it is
     # still growing, i.e. the finite-time Lyapunov estimate this dataset implies.
     growing = sep > 0
     if t_decorrelate < np.inf and np.isfinite(t_decorrelate):
-        fit_to = max(int(t_decorrelate / (split.t[1] - split.t[0])), 10)
+        fit_to = max(int(t_decorrelate / (split.holdout_t[1] - split.holdout_t[0])), 10)
     else:
         fit_to = sep.size
     m = growing[:fit_to]
     lam = float("nan")
     if m.sum() > 10:
-        lam = float(np.polyfit(split.t[:fit_to][m], np.log(sep[:fit_to][m]), 1)[0])
+        lam = float(
+            np.polyfit(split.holdout_t[:fit_to][m], np.log(sep[:fit_to][m]), 1)[0]
+        )
 
     return {
         "dataset": split.label,
@@ -99,21 +121,25 @@ def measure(split):
         "constant_mean_rmse_scaled": round(
             float(np.mean(np.std(split.holdout_theta_scaled, axis=0))), 4
         ),
-        "t": split.t,
+        "t": split.holdout_t,
         "sep": sep,
     }
 
 
-def main():
-    RESULT_DIR.mkdir(parents=True, exist_ok=True)
+def measure_all(n_links_list=pdata.N_LINKS, log=print):
+    """Every (n_links, friction) dataset's bracket measurement. Pure: no file I/O.
+
+    Returns (rows, curves): `rows` are `measure()`'s scalar fields (its `t`/`sep`
+    arrays popped out), `curves` maps label -> (t, sep) for the figure.
+    """
     rows, curves = [], {}
-    for n_links in pdata.N_LINKS:
+    for n_links in n_links_list:
         for friction in (True, False):
             split = load(n_links, friction)
             m = measure(split)
             curves[split.label] = (m.pop("t"), m.pop("sep"))
             rows.append(m)
-            print(
+            log(
                 f"{m['dataset']:20s} holdout range {m['holdout_range_deg']:8.1f} deg | "
                 f"bracket [2.0, 2.1] separates to {m['bracket_sep_final_deg']:8.1f} deg | "
                 f"decorrelates at t={m['t_decorrelate_s']:.2f} s | "
@@ -121,12 +147,11 @@ def main():
                 f"midpoint RMSE {m['midpoint_rmse_scaled']:.4f} | "
                 f"R2=0 RMSE {m['constant_mean_rmse_scaled']:.4f}"
             )
+    return rows, curves
 
-    with open(RESULT_DIR / "bracket.csv", "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
-        w.writeheader()
-        w.writerows(rows)
 
+def draw_fig_bracket(curves):
+    """figures/fig_bracket.png: bracket separation against time, all datasets."""
     fig, ax = plots.plt.subplots(figsize=(6.6, 4.2))
     fig.patch.set_facecolor(plots.SURFACE)
     colors = plots.regime_colors(curves)
@@ -145,8 +170,80 @@ def main():
         ylabel="max angular separation (deg, log scale)",
     )
     ax.legend(fontsize=plots.FS_SMALL, frameon=False, loc="lower right")
-    path = plots._save(fig, "fig_bracket")
-    print(f"\nwrote {RESULT_DIR / 'bracket.csv'} and {path}")
+    return plots._save(fig, "fig_bracket")
+
+
+def draw_bracket_separation():
+    """figures/trajectory_snapshots.png: bracket separation, friction vs frictionless.
+
+    A second view of the same n=2 phenomenon `measure_all` reports on every chain
+    length: integrates the [2.0, 2.1] deg bracketing pair directly (rather than
+    reading it out of the sweep dataset) so the two regimes sit side by side on
+    one plot. Physics comes from `pendulum_data`, matching every other script here
+    -- there is exactly one derivation of the equations of motion in this
+    repository, not one per figure.
+    """
+    theta1_rad = np.radians(pdata.THETA1_DEG)
+    ic_lower = np.array([theta1_rad, 0.0, np.radians(LOWER_DEG), 0.0])
+    ic_upper = np.array([theta1_rad, 0.0, np.radians(UPPER_DEG), 0.0])
+
+    configs = [("friction", pdata.DAMPING), ("frictionless", 0.0)]
+    n_steps = int(round((pdata.TEST_T_END - pdata.T_START) / pdata.H))
+    t_all = pdata.time_points(t_end=pdata.TEST_T_END)
+
+    fig, axes = plots.plt.subplots(1, 2, figsize=(14, 5))
+    fig.patch.set_facecolor(plots.SURFACE)
+    for ax, (regime, damping) in zip(axes, configs):
+        rhs = lambda r, t: pdata.rhs_double_reference(  # noqa: E731
+            r, t, damping1=damping, damping2=damping
+        )
+        traj_lower = pdata.rk4_integrate(rhs, ic_lower, n_steps=n_steps)
+        traj_upper = pdata.rk4_integrate(rhs, ic_upper, n_steps=n_steps)
+
+        sep_1 = np.abs(np.degrees(traj_lower[:, 0] - traj_upper[:, 0]))
+        sep_2 = np.abs(np.degrees(traj_lower[:, 2] - traj_upper[:, 2]))
+        separation = np.maximum(sep_1, sep_2)
+
+        ax.semilogy(
+            t_all, separation, linewidth=2.5, color=plots.BLUE, label="Separation"
+        )
+        ax.axvline(
+            x=pdata.T_END,
+            color=plots.RED,
+            linestyle=":",
+            linewidth=1.5,
+            alpha=0.7,
+            label="Training edge",
+        )
+        ax.set_ylim([1e-2, 1e3])
+        plots._style(
+            ax,
+            title=f"Double pendulum, {regime}",
+            xlabel="Time (s)",
+            ylabel="Max angle separation (°)",
+        )
+        ax.legend(loc="best", fontsize=plots.FS_SMALL, frameon=False)
+
+    fig.suptitle(
+        "Bracket Separation: How Two Training ICs Diverge Over Time",
+        fontsize=plots.FS_TITLE,
+        color=plots.INK,
+        y=1.00,
+    )
+    fig.tight_layout()
+    return plots._save(fig, "trajectory_snapshots")
+
+
+def main():
+    RESULT_DIR.mkdir(parents=True, exist_ok=True)
+    rows, curves = measure_all()
+
+    with open(RESULT_DIR / "bracket.json", "w", encoding="utf-8") as fh:
+        json.dump({"rows": rows}, fh, indent=2)
+
+    fig_path = draw_fig_bracket(curves)
+    snap_path = draw_bracket_separation()
+    print(f"\nwrote {RESULT_DIR / 'bracket.json'}, {fig_path} and {snap_path}")
 
 
 if __name__ == "__main__":

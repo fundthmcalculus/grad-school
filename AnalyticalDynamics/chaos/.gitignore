@@ -6,10 +6,9 @@
 # figures/ 3.8 MB, rebuilt by run_all.py, bracket_diagnostic.py,
 #          compare_families.py and stable_extrapolation.py
 #
-# results/ IS tracked. The sweep CSVs are the evidence behind every number in
-# REPRODUCTION_REPORT.md and paper.md -- 253 scored configurations that take
-# ~2 hours to reproduce -- and they are small. Same reasoning as
-# reproduce/outputs/.
+# results/ IS tracked. Its JSON files are the evidence behind every number in
+# paper.md -- 253 scored configurations that take ~2.5 h to reproduce (see
+# run_all.py) -- and they are small. Same reasoning as reproduce/outputs/.
 #
 # paper.md and references.bib ARE tracked: they are the draft, not an artifact.
 # Any PDF built from them is not -- there is no LaTeX source in this directory
@@ -18,6 +17,7 @@ data/
 figures/
 results/*.log
 *.pdf
+build/
 
 # LaTeX/pandoc build leftovers, in case a preview is built here.
 *.aux

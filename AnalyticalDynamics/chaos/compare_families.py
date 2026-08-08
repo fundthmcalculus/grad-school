@@ -6,7 +6,7 @@ conditions and both scored on the same held-out [120, 2.05] deg trajectory out t
 
   WITH the time variable -- the paper's time-step operator (fis_timestep.py):
       (theta_1(0), theta_2(0), t) -> (theta_1(t), theta_2(t))
-      One vectorised query answers any t. Time is an input, so the model's domain
+      One vectorized query answers any t. Time is an input, so the model's domain
       of validity is the training window and nothing carries across its edge.
 
   WITHOUT the time variable -- a learned right-hand side (stable_extrapolation.py):
@@ -20,7 +20,7 @@ are not converged past about 11.5 s (pendulum_data.reference_convergence), so a
 property of the step size. Friction at n=2 agrees with DOP853 to 0.0018 deg over
 20 s, so the comparison is meaningful.
 
-Three axes are recorded besides accuracy, because they are where the two families
+Three axes are recorded as well as accuracy, because they are where the two families
 genuinely trade against each other:
 
   * training time     -- seconds to fit, measured
@@ -74,8 +74,15 @@ def _rmse_deg(pred_deg, true_deg, mask):
 
 
 def run_with_time(split, truth_deg, t, inw):
-    """Fit and score each time-as-input model over the full 20 s."""
-    rows = []
+    """Fit and score each time-as-input model over the full 20 s.
+
+    Returns (rows, preds): `preds[label]` is that model's real predicted
+    trajectory in degrees over the full 20 s, always built (not gated behind a
+    flag) since it costs nothing beyond what scoring already computes and lets
+    a caller like gen_n2_rollout_comparison.py plot genuine model output instead
+    of re-deriving or, worse, synthesizing it.
+    """
+    rows, preds = [], {}
     for label, cfg in WITH_TIME:
         X, names, Y = fts.build_pooled(split, cfg)
         rng = np.random.default_rng(42)
@@ -97,6 +104,7 @@ def run_with_time(split, truth_deg, t, inw):
         span = (split.holdout_range[:, 1] - split.holdout_range[:, 0])[None, :]
         lo = split.holdout_range[:, 0][None, :]
         pred_deg = pred_scaled * span + lo
+        preds[label] = pred_deg
 
         rows.append(
             {
@@ -116,7 +124,7 @@ def run_with_time(split, truth_deg, t, inw):
             f"past 10s {rows[-1]['extrap_rmse_deg']:12.3f} deg",
             flush=True,
         )
-    return rows
+    return rows, preds
 
 
 def run_without_time(truth_deg, t, inw, state0):
@@ -373,7 +381,7 @@ def main():
         f"scored to {DURATION:.0f} s against a DOP853 reference.\n"
     )
     print("WITH the time variable (time-step operator):")
-    rows = run_with_time(split, truth_deg, t, inw)
+    rows, _ = run_with_time(split, truth_deg, t, inw)
     print("\nWITHOUT the time variable (learned dynamics + RK4):")
     rows += run_without_time(truth_deg, t, inw, state0)
 

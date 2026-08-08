@@ -1,34 +1,51 @@
-"""Select the best FIS per dataset, refit, and emit every figure and table.
+"""One-command reproduction of every number and figure paper.md cites.
 
-Reads results/sweep.csv (written by sweep.py), picks a winner per dataset,
-refits it, writes results/best.csv and results/comparison.md, and generates the
-figures in plots.py.
+Runs seven stages in order, each writing one JSON file under results/ plus
+whatever PNGs belong to it. A stage is skipped if its cached JSON already
+matches a hash of that stage's declared inputs (see pipeline_cache.py) --
+fits are deterministic (random_state is fixed throughout), so re-running an
+unchanged pipeline reproduces the same hash and does no work.
 
-Selection rule: **lowest RMSE on the held-out initial condition**, with the
-paper-protocol trained-IC numbers reported alongside. The paper names RMSE its
-preferred metric (section 2, "We consider RMSE as the preferred analysis
-metric"), and the held-out IC is the only setting that tests what the paper
-claims its time-step approach delivers -- prediction at an initial condition
-never trained on. Selecting on trained-IC score instead would reward memorising
-the 31 training trajectories, which is exactly the failure mode section 4 of the
-report documents.
+    data            pendulum_data.generate_all() + provenance checks -> data/*.npz
+    sweep           main hyperparameter grid, n in {2,3,5} x friction         (~2.5 h)
+    lowcap          low-capacity follow-up grid                               (~10 min)
+    select          refit each dataset's winner, Table 1                    (~20 min)
+    bracket         bracket-decorrelation diagnostic, Tables 2-3               (~10 s)
+    capacity        capacity/extrapolation comparison, Table 4                (~5 min)
+    representation  wrap / hysteresis / sin-cos study, Tables 6-8            (~90 min)
 
-Because the frictionless problems have no paper holdout baseline for anything but
-the LSTM, and because their holdout optimum sits at a *different* capacity from
-their trained-IC optimum, both winners are reported for every dataset.
+Run:
+    python run_all.py                       # reproduce everything, cached
+    python run_all.py --fresh               # ignore every cache
+    python run_all.py --fresh sweep lowcap  # force just these; downstream stages
+                                             # only redo their own work if these
+                                             # stages' *output* actually changed
+    python run_all.py --stage bracket       # run one stage in isolation (its
+                                             # upstream JSON must already exist)
 
-Run: python run_all.py
+sweep, lowcap, and representation are the expensive stages (~2.5 h, ~10 min, and
+~90 min respectively) -- data/select/bracket/capacity are seconds to a few
+minutes. Timings are for the fixed n in {2, 3, 5} grid this pipeline always
+requests; sweep.py's own `--n`/`--out` flags remain for exploring an additional
+chain length outside the pipeline.
 """
 
 from __future__ import annotations
 
-import ast
-import csv
-import sys
+import argparse
 
+import numpy as np
+
+import bracket_diagnostic
+import compare_families
+import gen_n2_rollout_comparison
+import gen_rollout_error_vs_n
 import paper_results as pr
 import pendulum_data as pdata
+import pipeline_cache
 import plots
+import sweep
+import wrap_sweep
 from fis_timestep import (
     FisConfig,
     RESULT_DIR,
@@ -39,45 +56,93 @@ from fis_timestep import (
     run,
 )
 
-#: Chain lengths reported, and the (n_links, friction) datasets they expand to.
-N_LINKS = (2, 3, 5)
-DATASETS = [(n, f) for n in N_LINKS for f in (False, True)]
+STAGE_ORDER = [
+    "data",
+    "sweep",
+    "lowcap",
+    "select",
+    "bracket",
+    "capacity",
+    "representation",
+]
+
+DATA_PATH = RESULT_DIR / "data.json"
+SWEEP_PATH = RESULT_DIR / "sweep.json"
+LOWCAP_PATH = RESULT_DIR / "sweep_lowcap.json"
+SELECT_PATH = RESULT_DIR / "select.json"
+BRACKET_PATH = RESULT_DIR / "bracket.json"
+CAPACITY_PATH = RESULT_DIR / "capacity.json"
+REPRESENTATION_PATH = RESULT_DIR / "representation.json"
+
+DATASETS = [(n, f) for n in pdata.N_LINKS for f in (False, True)]
 
 
-#: Every sweep whose rows are candidates for selection. sweep.csv is required;
-#: sweep_lowcap.csv extends the grid downward for the frictionless problems,
-#: whose held-out optimum sits below the main grid's floor.
-SWEEP_FILES = ("sweep.csv", "sweep_lowcap.csv", "sweep_n5.csv", "sweep_lowcap_n5.csv")
+# ---------------------------------------------------------------------------
+# Stage 1: data
+# ---------------------------------------------------------------------------
+def stage_data(fresh):
+    hash_of = {
+        "theta1_deg": pdata.THETA1_DEG,
+        "train_theta2_grid": pdata.TRAIN_THETA2_DEG.tolist(),
+        "test_theta2_deg": pdata.TEST_THETA2_DEG,
+        "damping": pdata.DAMPING,
+        "t_end": pdata.T_END,
+        "n_steps": pdata.N_STEPS,
+        "test_t_end": pdata.TEST_T_END,
+        "n_links": list(pdata.N_LINKS),
+    }
+    h = pipeline_cache.stage_hash(hash_of)
+    if "data" not in fresh:
+        cached = pipeline_cache.load_if_fresh(DATA_PATH, h)
+        if cached is not None:
+            print("[data] cached")
+            return cached, h
+
+    print("[data] generating datasets from scratch, with provenance checks ...")
+    provenance = pdata.collect_provenance()
+    datasets = pdata.generate_all()
+    payload = {"provenance": provenance, "datasets": datasets}
+    pipeline_cache.write_stage(DATA_PATH, "data", h, hash_of, payload)
+    print(f"[data] wrote {DATA_PATH.name}: {len(datasets)} datasets")
+    return payload, h
 
 
-def read_sweep(names=SWEEP_FILES):
-    rows = []
-    found = []
-    for name in names:
-        path = RESULT_DIR / name
-        if not path.exists():
-            continue
-        found.append(name)
-        with open(path, newline="", encoding="utf-8") as fh:
-            for r in csv.DictReader(fh):
-                if r.get("error"):
-                    continue
-                out = {}
-                for k, v in r.items():
-                    if v in (None, ""):
-                        continue
-                    try:
-                        out[k] = ast.literal_eval(v)
-                    except (ValueError, SyntaxError):
-                        out[k] = v
-                out["source"] = name
-                rows.append(out)
-    if not rows:
-        sys.exit(f"none of {names} found in {RESULT_DIR} -- run sweep.py first")
-    print(f"read {len(rows)} scored configs from {', '.join(found)}")
-    return rows
+# ---------------------------------------------------------------------------
+# Stages 2-3: sweep, lowcap
+# ---------------------------------------------------------------------------
+def _run_sweep_stage(name, path, lowcap, data_hash, fresh):
+    cfgs = sweep.configs(lowcap=lowcap)
+    hash_of = {
+        "data_hash": data_hash,
+        "n_links": list(pdata.N_LINKS),
+        "configs": [c.key() for c in cfgs],
+    }
+    h = pipeline_cache.stage_hash(hash_of)
+    if name not in fresh:
+        cached = pipeline_cache.load_if_fresh(path, h)
+        if cached is not None:
+            print(f"[{name}] cached ({len(cached['rows'])} rows)")
+            return cached, h
+
+    print(f"[{name}] scoring {len(cfgs)} configs x {len(DATASETS)} datasets ...")
+    rows = sweep.run_sweep(cfgs, DATASETS, log=lambda m: print(f"  {m}", flush=True))
+    payload = {"rows": rows}
+    pipeline_cache.write_stage(path, name, h, hash_of, payload)
+    print(f"[{name}] wrote {path.name} ({len(rows)} rows)")
+    return payload, h
 
 
+def stage_sweep(data_hash, fresh):
+    return _run_sweep_stage("sweep", SWEEP_PATH, False, data_hash, fresh)
+
+
+def stage_lowcap(data_hash, fresh):
+    return _run_sweep_stage("lowcap", LOWCAP_PATH, True, data_hash, fresh)
+
+
+# ---------------------------------------------------------------------------
+# Stage 4: select -- refit each dataset's winner (Table 1)
+# ---------------------------------------------------------------------------
 def config_from_key(key):
     """Rebuild a FisConfig from the key sweep.py wrote.
 
@@ -148,16 +213,17 @@ def draw_dataset(split, system, friction, base, trained, holdout):
     return holdout_pred
 
 
-def main():
-    rows = read_sweep()
+def _compute_select(sweep_payload, lowcap_payload):
+    rows = [
+        r for r in sweep_payload["rows"] + lowcap_payload["rows"] if not r.get("error")
+    ]
+    print(f"  {len(rows)} scored configs (sweep + lowcap, error rows dropped)")
 
-    best_rows = []
+    datasets_out = {}
+    selection_rows = []
     fis_holdout_rmse = {}
-    fis_trained = {}
-    baselines = {}
     capacity = {}
     holdout_preds = {}
-    extrap_rows = []
 
     for n_links, friction in DATASETS:
         split = load(n_links, friction)
@@ -180,15 +246,11 @@ def main():
         for tag, r in (("best_holdout", by_hold), ("best_trained", by_train)):
             if r is None:
                 continue
-            best_rows.append({"dataset": label, "selected_by": tag, **r})
+            selection_rows.append({"dataset": label, "selected_by": tag, **r})
 
-        # Two winners per dataset, not one. The trained-IC and held-out-IC optima
-        # sit at opposite ends of the capacity range -- on the frictionless
-        # problems, the configuration that fits the training initial conditions
-        # best is among the worst on the unseen one. Reporting a single model in
-        # both of the paper's cells would understate it in one of them, so each
-        # cell is scored with the configuration that wins that cell, and both
-        # configurations are named.
+        # Two winners per dataset, not one -- see the module docstring in the
+        # original run_all.py history: the trained-IC and held-out-IC optima sit
+        # at opposite ends of the capacity range on the frictionless problems.
         cfg_h = config_from_key(by_hold["config"])
         res_h, model_h = run(split, cfg_h)
         assert (
@@ -203,13 +265,36 @@ def main():
                 abs(res_t.trained_ic["rmse"] - by_train["trained_rmse"]) < 1e-9
             ), "refit did not reproduce the swept trained-IC score"
 
-        # Extrapolation is a property of the reported model, not of every swept
-        # configuration -- the sweeps score 0-10 s only, and selection never sees
-        # the 10-20 s segment. So it is recorded here, from the refit, rather than
-        # being back-filled into best.csv from rows that never measured it.
-        extrap_rows.append(
-            {
-                "dataset": label,
+        baselines = {
+            "bracket midpoint (no learning)": baseline_bracket_midpoint(split),
+            "nearest trained IC (no learning)": baseline_nearest(split),
+        }
+
+        holdout_preds[label] = draw_dataset(
+            split,
+            system,
+            friction,
+            baselines,
+            trained=(model_t, cfg_t, res_t),
+            holdout=(model_h, cfg_h, res_h),
+        )
+
+        fis_holdout_rmse[system] = res_h.holdout_ic["rmse"]
+        datasets_out[label] = {
+            "system": system,
+            "friction": friction,
+            "holdout_winner": {"config": cfg_h.key(), "metrics": res_h.holdout_ic},
+            "trained_winner": {"config": cfg_t.key(), "metrics": res_t.trained_ic},
+            "baselines": baselines,
+            "capacity_curve": (
+                {
+                    "rules_per_output": capacity[label][0],
+                    "holdout_r2": capacity[label][1],
+                }
+                if label in capacity
+                else None
+            ),
+            "extrapolation": {
                 "config": cfg_h.key(),
                 "train_t_end_s": split.train_t_end,
                 "test_t_end_s": round(
@@ -222,27 +307,8 @@ def main():
                 "extrap_r2": res_h.extrap_ic["r2"],
                 "extrap_rmse_deg": res_h.extrap_ic["rmse_deg"],
                 "t_break_s": res_h.t_break,
-            }
-        )
-
-        fis_holdout_rmse[system] = res_h.holdout_ic["rmse"]
-        fis_trained[(system, friction)] = {
-            "trained": (res_t.trained_ic, cfg_t.key()),
-            "holdout": (res_h.holdout_ic, cfg_h.key()),
+            },
         }
-        baselines[(system, friction)] = {
-            "bracket midpoint (no learning)": baseline_bracket_midpoint(split),
-            "nearest trained IC (no learning)": baseline_nearest(split),
-        }
-
-        holdout_preds[label] = draw_dataset(
-            split,
-            system,
-            friction,
-            baselines[(system, friction)],
-            trained=(model_t, cfg_t, res_t),
-            holdout=(model_h, cfg_h, res_h),
-        )
 
         print(
             f"{label}:\n"
@@ -259,41 +325,28 @@ def main():
         fis_holdout_rmse,
         setting="holdout",
         friction=True,
-        systems=[pdata.system_name(n) for n in N_LINKS],
+        systems=[pdata.system_name(n) for n in pdata.N_LINKS],
     )
     plots.capacity_curve(capacity, best_paper=pr.best("double", True, "holdout")[2])
 
-    fields = []
-    for r in best_rows:
-        for k in r:
-            if k not in fields:
-                fields.append(k)
-    with open(RESULT_DIR / "best.csv", "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=fields)
-        w.writeheader()
-        w.writerows(best_rows)
-
-    with open(
-        RESULT_DIR / "extrapolation.csv", "w", newline="", encoding="utf-8"
-    ) as fh:
-        w = csv.DictWriter(fh, fieldnames=list(extrap_rows[0]))
-        w.writeheader()
-        w.writerows(extrap_rows)
     print("\nPast the training window (held-out IC, holdout-winning config):")
-    for r in extrap_rows:
+    for label, d in datasets_out.items():
+        e = d["extrapolation"]
         print(
-            f"  {r['dataset']:24s} 0-{r['train_t_end_s']:.0f}s R2={r['in_window_r2']:+.4f}"
-            f"  {r['train_t_end_s']:.0f}-{r['test_t_end_s']:.0f}s R2={r['extrap_r2']:+.3e}"
-            f"  RMSE={r['extrap_rmse']:.4g}  breaks at {r['t_break_s']:.2f}s"
+            f"  {label:24s} 0-{e['train_t_end_s']:.0f}s R2={e['in_window_r2']:+.4f}"
+            f"  {e['train_t_end_s']:.0f}-{e['test_t_end_s']:.0f}s R2={e['extrap_r2']:+.3e}"
+            f"  RMSE={e['extrap_rmse']:.4g}  breaks at {e['t_break_s']:.2f}s"
         )
 
-    write_comparison(fis_trained, baselines)
-    print(f"\nwrote {RESULT_DIR / 'best.csv'} and {RESULT_DIR / 'comparison.md'}")
-    print(f"figures in {plots.FIG_DIR}")
+    return {"datasets": datasets_out, "selection": selection_rows}
 
 
-def write_comparison(fis, baselines):
-    """results/comparison.md: FIS and no-learning baselines against the paper."""
+def _write_comparison_md(payload):
+    """results/comparison.md: FIS and no-learning baselines against the paper.
+
+    Regenerated from `payload` on every run regardless of caching -- it is pure
+    formatting over already-computed numbers, effectively free.
+    """
     lines = [
         "# FIS vs the models reported in arXiv:2504.13453",
         "",
@@ -307,17 +360,17 @@ def write_comparison(fis, baselines):
         "trajectories and `nearest trained IC` copies one of them. Any learned model",
         "that does not beat them has demonstrated grid interpolation, not dynamics.",
         "",
-    ]
-    lines += [
         "Each cell is scored with the FIS configuration that wins *that* cell; the",
         "configuration is named under the table. The trained-IC and held-out-IC optima",
         "are at opposite ends of the rule-count range, so no single configuration is",
         "best in both.",
         "",
     ]
-    for (system, friction), per_setting in fis.items():
+    for label, d in payload["datasets"].items():
+        system, friction = d["system"], d["friction"]
         for setting in ("trained", "holdout"):
-            metrics, cfg_key = per_setting[setting]
+            winner = d[f"{setting}_winner"]
+            metrics, cfg_key = winner["metrics"], winner["config"]
             cell = {
                 k: v for k, v in pr.RESULTS[(system, friction, setting)].items() if v
             }
@@ -325,7 +378,7 @@ def write_comparison(fis, baselines):
             rows = [(f"{k} (paper)", v) for k, v in cell.items()]
             rows.append(("**FIS (ours)**", (metrics["rmse"], metrics["r2"])))
             if setting == "holdout":
-                for bname, bm in baselines.get((system, friction), {}).items():
+                for bname, bm in d["baselines"].items():
                     rows.append((f"_{bname}_", (bm["rmse"], bm["r2"])))
             merged = sorted(rows, key=lambda kv: kv[1][0])
 
@@ -348,6 +401,203 @@ def write_comparison(fis, baselines):
             note += f"RMSE in degrees: {metrics['rmse_deg']:.2f}."
             lines += ["", note, ""]
     (RESULT_DIR / "comparison.md").write_text("\n".join(lines), encoding="utf-8")
+
+
+def stage_select(sweep_payload, lowcap_payload, sweep_hash, lowcap_hash, fresh):
+    hash_of = {"sweep_hash": sweep_hash, "lowcap_hash": lowcap_hash}
+    h = pipeline_cache.stage_hash(hash_of)
+    if "select" not in fresh:
+        cached = pipeline_cache.load_if_fresh(SELECT_PATH, h)
+        if cached is not None:
+            print("[select] cached")
+            _write_comparison_md(cached)
+            return cached, h
+
+    print("[select] refitting each dataset's winner and drawing Table 1 figures ...")
+    payload = _compute_select(sweep_payload, lowcap_payload)
+    pipeline_cache.write_stage(SELECT_PATH, "select", h, hash_of, payload)
+    _write_comparison_md(payload)
+    print(f"[select] wrote {SELECT_PATH.name} and comparison.md")
+    return payload, h
+
+
+# ---------------------------------------------------------------------------
+# Stage 5: bracket -- decorrelation diagnostic (Tables 2-3)
+# ---------------------------------------------------------------------------
+def stage_bracket(data_hash, fresh):
+    hash_of = {
+        "data_hash": data_hash,
+        "lower_deg": bracket_diagnostic.LOWER_DEG,
+        "upper_deg": bracket_diagnostic.UPPER_DEG,
+    }
+    h = pipeline_cache.stage_hash(hash_of)
+    if "bracket" not in fresh:
+        cached = pipeline_cache.load_if_fresh(BRACKET_PATH, h)
+        if cached is not None:
+            print("[bracket] cached")
+            return cached, h
+
+    print("[bracket] measuring bracket decorrelation ...")
+    rows, curves = bracket_diagnostic.measure_all(log=lambda m: print(f"  {m}"))
+    bracket_diagnostic.draw_fig_bracket(curves)
+    bracket_diagnostic.draw_bracket_separation()
+    payload = {"rows": rows}
+    pipeline_cache.write_stage(BRACKET_PATH, "bracket", h, hash_of, payload)
+    print(
+        f"[bracket] wrote {BRACKET_PATH.name}, fig_bracket.png, trajectory_snapshots.png"
+    )
+    return payload, h
+
+
+# ---------------------------------------------------------------------------
+# Stage 6: capacity -- capacity/extrapolation comparison (Table 4)
+# ---------------------------------------------------------------------------
+def stage_capacity(data_hash, fresh):
+    hash_of = {
+        "data_hash": data_hash,
+        "configs": [cfg.key() for _, cfg in compare_families.WITH_TIME],
+    }
+    h = pipeline_cache.stage_hash(hash_of)
+    if "capacity" not in fresh:
+        cached = pipeline_cache.load_if_fresh(CAPACITY_PATH, h)
+        if cached is not None:
+            print("[capacity] cached")
+            return cached, h
+
+    print("[capacity] fitting Table 4's capacity/extrapolation comparison ...")
+    rows = gen_n2_rollout_comparison.main()
+    payload = {"rows": rows}
+    pipeline_cache.write_stage(CAPACITY_PATH, "capacity", h, hash_of, payload)
+    print(f"[capacity] wrote {CAPACITY_PATH.name}, n2_rollout_comparison_all.png")
+    return payload, h
+
+
+# ---------------------------------------------------------------------------
+# Stage 7: representation -- wrap / hysteresis / sin-cos study (Tables 6-8)
+# ---------------------------------------------------------------------------
+def stage_representation(data_hash, fresh):
+    hash_of = {
+        "data_hash": data_hash,
+        "wrap_limits": wrap_sweep.WRAP_LIMITS,
+        "sincos_buckets": [40, 120, 300],
+    }
+    h = pipeline_cache.stage_hash(hash_of)
+    if "representation" not in fresh:
+        cached = pipeline_cache.load_if_fresh(REPRESENTATION_PATH, h)
+        if cached is not None:
+            print("[representation] cached")
+            return cached, h
+
+    print("[representation] scoring wrap/representation schemes (Tables 6-8) ...")
+    wrap_rows = wrap_sweep.build_wrap_sweep_rows(log=lambda m: print(f"  {m}"))
+    repr_rows = wrap_sweep.build_representation_rows()
+    sincos_rows = wrap_sweep.main_sincos_capacity(log=lambda m: print(f"  {m}"))
+    payload = {
+        "wrap_sweep": wrap_rows,
+        "representations": repr_rows,
+        "sincos_capacity": sincos_rows,
+    }
+    # gen_rollout_error_vs_n.py reads results/representation.json off disk, so the
+    # file has to exist before it runs.
+    pipeline_cache.write_stage(
+        REPRESENTATION_PATH, "representation", h, hash_of, payload
+    )
+    gen_rollout_error_vs_n.main()
+    print(
+        f"[representation] wrote {REPRESENTATION_PATH.name}, "
+        f"rollout_error_vs_n.png, rollout_error_vs_n_lines.png"
+    )
+    return payload, h
+
+
+# ---------------------------------------------------------------------------
+# Orchestration
+# ---------------------------------------------------------------------------
+def _require(path, stage_name):
+    if not path.exists():
+        raise SystemExit(
+            f"{path} does not exist -- run `python run_all.py --stage {stage_name}` "
+            f"(or a full `python run_all.py`) first"
+        )
+    return pipeline_cache.load_payload(path)
+
+
+def _require_hash(path, stage_name):
+    import json as _json
+
+    _require(path, stage_name)
+    return _json.loads(path.read_text(encoding="utf-8"))["hash"]
+
+
+def main():
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    ap.add_argument(
+        "--fresh",
+        nargs="*",
+        default=None,
+        metavar="STAGE",
+        help="force recompute. Bare --fresh forces every stage; "
+        "--fresh sweep lowcap forces only those (downstream stages still "
+        "recompute only if what they depend on actually changed).",
+    )
+    ap.add_argument(
+        "--stage",
+        choices=STAGE_ORDER,
+        help="run only this stage; its upstream JSON must already exist",
+    )
+    args = ap.parse_args()
+
+    if args.fresh is None:
+        fresh = set()
+    elif len(args.fresh) == 0:
+        fresh = set(STAGE_ORDER)
+    else:
+        fresh = set(args.fresh)
+
+    if args.stage:
+        _run_one(args.stage, fresh)
+    else:
+        _run_all(fresh)
+
+
+def _run_one(stage, fresh):
+    """Run a single stage, loading (never recomputing) whatever it depends on."""
+    if stage == "data":
+        stage_data(fresh)
+        return
+
+    data_hash = _require_hash(DATA_PATH, "data")
+    if stage == "sweep":
+        stage_sweep(data_hash, fresh)
+    elif stage == "lowcap":
+        stage_lowcap(data_hash, fresh)
+    elif stage == "select":
+        sweep_payload = _require(SWEEP_PATH, "sweep")
+        lowcap_payload = _require(LOWCAP_PATH, "lowcap")
+        sweep_hash = _require_hash(SWEEP_PATH, "sweep")
+        lowcap_hash = _require_hash(LOWCAP_PATH, "lowcap")
+        stage_select(sweep_payload, lowcap_payload, sweep_hash, lowcap_hash, fresh)
+    elif stage == "bracket":
+        stage_bracket(data_hash, fresh)
+    elif stage == "capacity":
+        stage_capacity(data_hash, fresh)
+    elif stage == "representation":
+        stage_representation(data_hash, fresh)
+
+
+def _run_all(fresh):
+    _, data_hash = stage_data(fresh)
+    sweep_payload, sweep_hash = stage_sweep(data_hash, fresh)
+    lowcap_payload, lowcap_hash = stage_lowcap(data_hash, fresh)
+    stage_select(sweep_payload, lowcap_payload, sweep_hash, lowcap_hash, fresh)
+    stage_bracket(data_hash, fresh)
+    stage_capacity(data_hash, fresh)
+    stage_representation(data_hash, fresh)
+    print(
+        f"\nDone. results/*.json + comparison.md in {RESULT_DIR}, figures in {plots.FIG_DIR}"
+    )
 
 
 if __name__ == "__main__":
