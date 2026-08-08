@@ -175,7 +175,7 @@ def grid_figure(nrows, ncols, width=W_WIDE, height=4.0, **kwargs):
     plt = _pyplot()
     fig, axes = plt.subplots(nrows, ncols, figsize=(width, height), dpi=DPI, **kwargs)
     fig.patch.set_facecolor(SURFACE)
-    for ax in (axes.ravel() if hasattr(axes, "ravel") else [axes]):
+    for ax in axes.ravel() if hasattr(axes, "ravel") else [axes]:
         ax.set_facecolor(SURFACE)
     return fig, axes
 

@@ -204,7 +204,9 @@ def draw_bracket_separation():
         sep_2 = np.abs(np.degrees(traj_lower[:, 2] - traj_upper[:, 2]))
         separation = np.maximum(sep_1, sep_2)
 
-        ax.semilogy(t_all, separation, linewidth=2.5, color=plots.BLUE, label="Separation")
+        ax.semilogy(
+            t_all, separation, linewidth=2.5, color=plots.BLUE, label="Separation"
+        )
         ax.axvline(
             x=pdata.T_END,
             color=plots.RED,
