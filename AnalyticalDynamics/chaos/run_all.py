@@ -56,7 +56,15 @@ from fis_timestep import (
     run,
 )
 
-STAGE_ORDER = ["data", "sweep", "lowcap", "select", "bracket", "capacity", "representation"]
+STAGE_ORDER = [
+    "data",
+    "sweep",
+    "lowcap",
+    "select",
+    "bracket",
+    "capacity",
+    "representation",
+]
 
 DATA_PATH = RESULT_DIR / "data.json"
 SWEEP_PATH = RESULT_DIR / "sweep.json"
@@ -279,7 +287,10 @@ def _compute_select(sweep_payload, lowcap_payload):
             "trained_winner": {"config": cfg_t.key(), "metrics": res_t.trained_ic},
             "baselines": baselines,
             "capacity_curve": (
-                {"rules_per_output": capacity[label][0], "holdout_r2": capacity[label][1]}
+                {
+                    "rules_per_output": capacity[label][0],
+                    "holdout_r2": capacity[label][1],
+                }
                 if label in capacity
                 else None
             ),
@@ -432,7 +443,9 @@ def stage_bracket(data_hash, fresh):
     bracket_diagnostic.draw_bracket_separation()
     payload = {"rows": rows}
     pipeline_cache.write_stage(BRACKET_PATH, "bracket", h, hash_of, payload)
-    print(f"[bracket] wrote {BRACKET_PATH.name}, fig_bracket.png, trajectory_snapshots.png")
+    print(
+        f"[bracket] wrote {BRACKET_PATH.name}, fig_bracket.png, trajectory_snapshots.png"
+    )
     return payload, h
 
 
@@ -486,7 +499,9 @@ def stage_representation(data_hash, fresh):
     }
     # gen_rollout_error_vs_n.py reads results/representation.json off disk, so the
     # file has to exist before it runs.
-    pipeline_cache.write_stage(REPRESENTATION_PATH, "representation", h, hash_of, payload)
+    pipeline_cache.write_stage(
+        REPRESENTATION_PATH, "representation", h, hash_of, payload
+    )
     gen_rollout_error_vs_n.main()
     print(
         f"[representation] wrote {REPRESENTATION_PATH.name}, "
@@ -515,7 +530,9 @@ def _require_hash(path, stage_name):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument(
         "--fresh",
         nargs="*",
@@ -578,7 +595,9 @@ def _run_all(fresh):
     stage_bracket(data_hash, fresh)
     stage_capacity(data_hash, fresh)
     stage_representation(data_hash, fresh)
-    print(f"\nDone. results/*.json + comparison.md in {RESULT_DIR}, figures in {plots.FIG_DIR}")
+    print(
+        f"\nDone. results/*.json + comparison.md in {RESULT_DIR}, figures in {plots.FIG_DIR}"
+    )
 
 
 if __name__ == "__main__":

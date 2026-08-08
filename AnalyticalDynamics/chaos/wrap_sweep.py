@@ -357,7 +357,9 @@ def evaluate_sincos(split, cfg=PROBE_REPR, seed=42):
     }
 
 
-def main_sincos_capacity(n_output_buckets=(40, 120, 300), n_links=2, friction=False, log=print):
+def main_sincos_capacity(
+    n_output_buckets=(40, 120, 300), n_links=2, friction=False, log=print
+):
     """Table 8: sin/cos accuracy against capacity, frictionless double pendulum.
 
     `evaluate_sincos` above is normally called once at a fixed probe capacity

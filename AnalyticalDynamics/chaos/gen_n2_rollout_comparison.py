@@ -56,14 +56,24 @@ def main():
     for ax, (label, _cfg), row in zip(axes, cf.WITH_TIME, rows):
         pred_deg = np.clip(preds[label][:, 0], lo, hi)
         ax.plot(
-            t, truth_deg[:, 0], color=plots.INK, linewidth=2.5,
-            label="Truth (DOP853)", zorder=3,
+            t,
+            truth_deg[:, 0],
+            color=plots.INK,
+            linewidth=2.5,
+            label="Truth (DOP853)",
+            zorder=3,
         )
         ax.plot(
-            t, pred_deg, color=plots.RED, linewidth=1.6,
-            label="FIS prediction (clipped)", zorder=2,
+            t,
+            pred_deg,
+            color=plots.RED,
+            linewidth=1.6,
+            label="FIS prediction (clipped)",
+            zorder=2,
         )
-        ax.axvline(pdata.T_END, color=plots.RED, linestyle=":", linewidth=1.5, alpha=0.7)
+        ax.axvline(
+            pdata.T_END, color=plots.RED, linestyle=":", linewidth=1.5, alpha=0.7
+        )
         ax.fill_between([pdata.T_END, t[-1]], lo, hi, alpha=0.08, color=plots.RED)
         ax.set_ylim(lo, hi)
         plots._style(

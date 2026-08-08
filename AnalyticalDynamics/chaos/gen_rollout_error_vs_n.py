@@ -58,10 +58,10 @@ def load_table7(path=REPR_PATH):
     doc = json.loads(path.read_text(encoding="utf-8"))
     rows = doc.get("payload", doc).get("representations")
     if rows is None:
-        sys.exit(f"{path} has no 'representations' data (keys found: {list(doc.keys())})")
-    by_key = {
-        (r["dataset"], r["representation"], r["wrap_limit_deg"]): r for r in rows
-    }
+        sys.exit(
+            f"{path} has no 'representations' data (keys found: {list(doc.keys())})"
+        )
+    by_key = {(r["dataset"], r["representation"], r["wrap_limit_deg"]): r for r in rows}
     data = {}
     for dataset in sorted({r["dataset"] for r in rows}):
         label = _display_label(dataset)
@@ -91,8 +91,12 @@ def main():
 
         x = np.arange(len(cols))
         width = 0.35
-        bars1 = ax.bar(x - width / 2, in_window, width, label="In-window (0-10s)", alpha=0.8)
-        bars2 = ax.bar(x + width / 2, past_window, width, label="Past-window (10-20s)", alpha=0.8)
+        bars1 = ax.bar(
+            x - width / 2, in_window, width, label="In-window (0-10s)", alpha=0.8
+        )
+        bars2 = ax.bar(
+            x + width / 2, past_window, width, label="Past-window (10-20s)", alpha=0.8
+        )
         for bar, color in zip(bars1, colors):
             bar.set_color(color)
         for bar, color in zip(bars2, colors):
@@ -111,13 +115,19 @@ def main():
         for bar in bars1:
             height = bar.get_height()
             ax.text(
-                bar.get_x() + bar.get_width() / 2, height + 2, f"{height:.0f}°",
-                ha="center", va="bottom", fontsize=8,
+                bar.get_x() + bar.get_width() / 2,
+                height + 2,
+                f"{height:.0f}°",
+                ha="center",
+                va="bottom",
+                fontsize=8,
             )
 
     plt.suptitle(
         "Angle Representation Effects: Circular Error Across Representations",
-        fontsize=14, fontweight="bold", y=0.995,
+        fontsize=14,
+        fontweight="bold",
+        y=0.995,
     )
     plt.tight_layout()
     out1 = Path(__file__).parent / "figures" / "rollout_error_vs_n.png"
@@ -135,16 +145,21 @@ def main():
         label_prefix = "Frictionless" if "no fric" in dataset else "Friction"
         chain = dataset.split("-")[0]
         ax.plot(
-            np.arange(len(cols)), in_window,
+            np.arange(len(cols)),
+            in_window,
             label=f"{label_prefix} n={chain} (in-window)",
-            marker=marker, linestyle=linestyle, linewidth=2, markersize=7,
+            marker=marker,
+            linestyle=linestyle,
+            linewidth=2,
+            markersize=7,
         )
 
     ax.set_xlabel("Representation Scheme", fontsize=12)
     ax.set_ylabel("Circular Error (°)", fontsize=12)
     ax.set_title(
         "In-Window Error by Representation: sin/cos Best Only on Some Datasets",
-        fontsize=13, fontweight="bold",
+        fontsize=13,
+        fontweight="bold",
     )
     ax.set_xticks(np.arange(len(representations)))
     ax.set_xticklabels(representations, fontsize=11)
