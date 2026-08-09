@@ -220,7 +220,7 @@ The asymmetry runs the uncomfortable way too, and the outcome that would embarra
 
 Three goals are narrowed rather than dropped. Each narrowing's reason is here; Chapter 7 states its price.
 
-- **G3's baselines.** Fumanal-Idocin et al. (2025) and the deep TSK fuzzy classifier are complete published architectures with no implementation the harness can reach, and neither is load-bearing: ANFIS and GA-FIS answer "faster than conventional fuzzy training", CART, Random Forest, M5 and flat TSK answer "competitive with standard regressors". Both stay cited in §6.2.
+- **G3's baselines.** Fumanal-Idocin et al. [@fumanal2025fast] and the deep TSK fuzzy classifier are complete published architectures with no implementation the harness can reach, and neither is load-bearing: ANFIS and GA-FIS answer "faster than conventional fuzzy training", CART, Random Forest, M5 and flat TSK answer "competitive with standard regressors". Both stay cited in §6.2.
 - **G6's expert-audience study.** No protocol, no computed sample size, no institutional-review timeline, and "six domain experts preferred the hierarchy" would not be defensible in a dissertation whose interpretability bibliography is one XAI entry deep.
 - **G8's construction.** It had held one quarter, 2028 Q1, which Chapter 10's Gantt omitted and which already carries the capstone, G6, G7, the write-up and the defense. It spends interpretability, the dissertation's own thesis, making it the one goal whose success would weaken the argument around it, a tension §6.2 flags. And the §5.3.5 disjunct counter that decides whether it is worth having has never returned a value other than one, in either mode on any recorded run.
 

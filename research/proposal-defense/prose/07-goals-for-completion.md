@@ -34,7 +34,7 @@ The hardware half is not a formality either, and Chapter 3 §3.4 measures why. T
 
 ### G4b — The eVAT and clusiVAT head-to-head (experiment; not started)
 
-Chapter 3 owes a direct comparison against eVAT (Meng and Yuan 2018) and clusiVAT on identical datasets. Checklist **C5**, not started in a specific sense: neither implementation is in hand, so this is obtain-or-write before it is measurement, and Chapter 10 gives it its own bar.
+Chapter 3 owes a direct comparison against eVAT [@meng2018evat] and clusiVAT on identical datasets. Checklist **C5**, not started in a specific sense: neither implementation is in hand, so this is obtain-or-write before it is measurement, and Chapter 10 gives it its own bar.
 
 *Decision rule.* Exact VAT ordering on shared datasets across the swept grid, ten seeds, run-of-record host. Metrics: wall clock, peak memory, ordering agreement against the serial reference. Two thresholds, since the competitors fail differently. clusiVAT samples and is approximate: agreement 1.000 where it does not reach it, within one order of magnitude on wall clock. eVAT is already exact on a GPU (§3.2 concedes I am not claiming the first), so the claim is in-place footprint at matched $N$. Refuted if eVAT matches the in-place ceiling, collapsing Chapter 3's memory contribution to a constant factor.
 

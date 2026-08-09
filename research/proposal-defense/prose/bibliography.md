@@ -37,12 +37,6 @@ Two distinctions matter more than the arithmetic. **`[V]` is metadata-verified, 
 - **Optimization, TSP, and quality-diversity.** `lin1973effective`, `helsgaun2000effective`, `croes1958method`, `dorigo1996ant`, `kennedy1995particle`, `deb2002nsga2`, `mouret2015illuminating`, `vassiliades2018cvt`.
 - **Interpretability / XAI.** `lundberg2017shap`.
 
-## On the reference proposals
-
-Two dissertation proposals from this department sit in `research/proposal-defense/` (Pickering 2024, Arnett 2018). They informed this proposal's *document structure and format*. Neither is a source for any method or framing here; the work was developed independently, and the interpretability position in §2.6 is my own, predating any awareness of Pickering's treatment.
-
-One qualification, for the record. Arnett (2018) *is* cited once, in §2.1, because the FIS constraint set I adopt (triangular membership functions, Ruspini partition, product t-norm, weighted-average defuzzification) appears there in the same combination. That marks a parallel in the same department, not a debt: the constraints trace to Ruspini (1969) and de Oliveira (1999), which is what §2.1 cites for them.
-
 ---
 
 *Source of truth: `../references.bib`. Citation shorthand in the prose chapters (e.g. `[Bezdek and Hathaway 2002]`) will be replaced by `\cite{}` keys against this file when the document is assembled in LaTeX.*
