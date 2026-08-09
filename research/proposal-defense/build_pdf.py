@@ -50,10 +50,11 @@ SECTIONS = [
     "prose/08-conclusion.md",
     "prose/09-publications.md",  # still outline-only (awaiting NAFIPS details)
     "prose/10-timeline.md",
-    "prose/bibliography.md",
     "prose/appendix.md",
-    "CHECKLIST.md",  # burn-down checklist with timeline overlay
+    "prose/bibliography.md",
 ]
+
+CHECKLIST_FILE = "CHECKLIST.md"  # burn-down checklist appended after references
 
 TITLE = "Reproducing Like Tribbles"
 SUBTITLE = "Scaling Fuzzy Inference Systems from Hundreds to Hundreds of Thousands"
@@ -402,6 +403,14 @@ def assemble():
     # Add a bibliography section at the end for LaTeX/pandoc to populate
     # Pandoc will replace this with the actual bibliography entries from references.bib
     combined += "\n\n---\n\n# References\n"
+
+    # Add the burn-down checklist after references
+    checklist_path = os.path.join(HERE, CHECKLIST_FILE)
+    if os.path.exists(checklist_path):
+        with open(checklist_path, "r", encoding="utf-8") as f:
+            checklist_md = f.read()
+        combined += "\n\n---\n\n" + checklist_md
+        print(f"  + {CHECKLIST_FILE}")
 
     md_path = os.path.join(BUILD, "proposal-combined.md")
     with open(md_path, "w", encoding="utf-8") as f:
