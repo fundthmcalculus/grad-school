@@ -50,8 +50,8 @@ SECTIONS = [
     "prose/08-conclusion.md",
     "prose/09-publications.md",  # still outline-only (awaiting NAFIPS details)
     "prose/10-timeline.md",
-    "prose/appendix.md",
     "prose/bibliography.md",
+    "prose/appendix.md",
 ]
 
 CHECKLIST_FILE = "CHECKLIST.md"  # burn-down checklist appended after references
@@ -60,8 +60,11 @@ TITLE = "Reproducing Like Tribbles"
 SUBTITLE = "Scaling Fuzzy Inference Systems from Hundreds to Hundreds of Thousands"
 AUTHOR = "Scott Phillips"
 COMMITTEE = (
-    "Dr. Kelly Cohen (chair) · Dr. Vladik Kreinovich · Dr. Manish Kumar · "
-    "Dr. Ali Minai · Dr. Justin Zhan"
+    "Dr. Kelly Cohen (chair) \\\\ "
+    "Dr. Vladik Kreinovich \\\\ "
+    "Dr. Manish Kumar \\\\ "
+    "Dr. Ali Minai \\\\ "
+    "Dr. Justin Zhan"
 )
 DEPT = (
     "Department of Aerospace Engineering and Engineering Mechanics \\\\ "
@@ -389,6 +392,11 @@ def assemble():
         )
         print(f"  + {rel}")
 
+        # Insert References section after bibliography.md but before appendix.md
+        # The ::: {#refs} ::: div tells pandoc/citeproc where to place the bibliography
+        if rel == "prose/bibliography.md":
+            parts.append("# References\n\n::: {#refs}\n:::\n")
+
     # Build registry after all files are read
     registry = build_section_registry(sections_by_file)
 
@@ -400,17 +408,42 @@ def assemble():
 
     combined = "\n\n\n".join(parts)
 
-    # Add a bibliography section at the end for LaTeX/pandoc to populate
-    # Pandoc will replace this with the actual bibliography entries from references.bib
-    combined += "\n\n---\n\n# References\n"
-
-    # Add the burn-down checklist after references
+    # Add the burn-down checklist after references (open items only)
     checklist_path = os.path.join(HERE, CHECKLIST_FILE)
     if os.path.exists(checklist_path):
         with open(checklist_path, "r", encoding="utf-8") as f:
             checklist_md = f.read()
-        combined += "\n\n---\n\n" + checklist_md
-        print(f"  + {CHECKLIST_FILE}")
+        # Filter to show only open items ([ ] ⬜) and section headers
+        filtered_lines = []
+        in_section = False
+        section_header = None
+        for line in checklist_md.split("\n"):
+            # Keep section headers (##, #)
+            if line.startswith("#"):
+                filtered_lines.append(line)
+                in_section = True
+                continue
+            # Keep empty lines and context
+            if not line.strip():
+                filtered_lines.append(line)
+                continue
+            # Skip completed items ([x])
+            if line.startswith("- [x]"):
+                continue
+            # Keep open items ([ ])
+            if line.startswith("- [ ]"):
+                filtered_lines.append(line)
+                continue
+            # Keep other content (descriptions, tables, etc.)
+            if line.startswith("  ") or line.startswith("|"):
+                filtered_lines.append(line)
+                continue
+            # Keep legend and other introductory content
+            if in_section or "Legend:" in line or "Tier" in line:
+                filtered_lines.append(line)
+        checklist_filtered = "\n".join(filtered_lines)
+        combined += "\n\n" + checklist_filtered
+        print(f"  + {CHECKLIST_FILE} (open items only)")
 
     md_path = os.path.join(BUILD, "proposal-combined.md")
     with open(md_path, "w", encoding="utf-8") as f:
