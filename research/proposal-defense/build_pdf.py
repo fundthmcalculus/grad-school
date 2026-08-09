@@ -233,9 +233,16 @@ def check_cross_references(md, registry, filename, warnings=None):
     # Gantt lines can be standalone or inline: ":done, g5a, 2026-08-03, 1d" or "goal_id, 2027-01-04, 45d"
     md_for_validation = md
     # Remove inline Gantt parts: ":done, ..., YYYY-MM-DD, ..."
-    md_for_validation = re.sub(r":\w+,\s*[a-z0-9_]*,\s*\d{4}-\d{2}-\d{2}[^}]*", "", md_for_validation)
+    md_for_validation = re.sub(
+        r":\w+,\s*[a-z0-9_]*,\s*\d{4}-\d{2}-\d{2}[^}]*", "", md_for_validation
+    )
     # Remove standalone Gantt lines
-    md_for_validation = re.sub(r"^\s*[a-z0-9_]+,\s*\d{4}-\d{2}-\d{2}.*$", "", md_for_validation, flags=re.MULTILINE)
+    md_for_validation = re.sub(
+        r"^\s*[a-z0-9_]+,\s*\d{4}-\d{2}-\d{2}.*$",
+        "",
+        md_for_validation,
+        flags=re.MULTILINE,
+    )
 
     # Known checklist items from Chapter 7 Table 7.1 and prose
     known_checklists = {"c1", "c3", "c5", "c8", "c10"}
@@ -273,14 +280,28 @@ def check_cross_references(md, registry, filename, warnings=None):
     for match in re.finditer(r"Appendix\s+A\.(\d+)", md_for_validation):
         appendix_num = match.group(1)
         if appendix_num not in known_appendices:
-            warnings.append(f"  ⚠ {filename}: Appendix A.{appendix_num} not found (known: A.1–A.7)")
+            warnings.append(
+                f"  ⚠ {filename}: Appendix A.{appendix_num} not found (known: A.1–A.7)"
+            )
 
     # Pattern 3: Goal references like G1, G2, G1a, etc.
     # Known goals from Table 7.1 (including parent goals and sub-goals)
     known_goals = {
-        "g1", "g2", "g3", "g3b",
-        "g4", "g4a", "g4b", "g4c", "g4d", "g4e",
-        "g5", "g6", "g7", "g8", "g9"
+        "g1",
+        "g2",
+        "g3",
+        "g3b",
+        "g4",
+        "g4a",
+        "g4b",
+        "g4c",
+        "g4d",
+        "g4e",
+        "g5",
+        "g6",
+        "g7",
+        "g8",
+        "g9",
     }
 
     for match in re.finditer(r"\bG(\d+)([a-z]?)\b", md_for_validation, re.IGNORECASE):
@@ -290,7 +311,9 @@ def check_cross_references(md, registry, filename, warnings=None):
 
         # Check against known goals
         if goal_key not in known_goals:
-            warnings.append(f"  ⚠ {filename}: Goal {goal_key.upper()} not found in Chapter 7 Table 7.1")
+            warnings.append(
+                f"  ⚠ {filename}: Goal {goal_key.upper()} not found in Chapter 7 Table 7.1"
+            )
 
     # Pattern 4: Chapter X references
     for match in re.finditer(r"Chapter\s+(\d+)", md_for_validation, re.IGNORECASE):
@@ -308,8 +331,22 @@ def check_cross_references(md, registry, filename, warnings=None):
         checklist_key = f"c{checklist_num}"
         if checklist_key not in known_checklists:
             # Only warn if it's a clear typo (unusual number)
-            if checklist_num not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "13"]:
-                warnings.append(f"  ⚠ {filename}: Checklist item C{checklist_num} not found in Chapter 7")
+            if checklist_num not in [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "13",
+            ]:
+                warnings.append(
+                    f"  ⚠ {filename}: Checklist item C{checklist_num} not found in Chapter 7"
+                )
 
     # Pattern 6: Cross-reference links [text](§X.Y) or [text](#section-id)
     for match in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", md_for_validation):
@@ -317,7 +354,9 @@ def check_cross_references(md, registry, filename, warnings=None):
         if target.startswith("#"):
             section_id = target[1:].lower()
             if section_id not in registry:
-                warnings.append(f"  ⚠ {filename}: Link target '#{section_id}' not found in section registry")
+                warnings.append(
+                    f"  ⚠ {filename}: Link target '#{section_id}' not found in section registry"
+                )
 
     return warnings
 
@@ -385,11 +424,7 @@ def assemble():
         file_sections = extract_section_headers(md, rel)
         sections_by_file[rel] = file_sections
 
-        parts.append(
-            strip_editorial(
-                md, src_dir, image_status=image_status
-            )
-        )
+        parts.append(strip_editorial(md, src_dir, image_status=image_status))
         print(f"  + {rel}")
 
         # Insert References section after bibliography.md but before appendix.md
@@ -532,9 +567,7 @@ def build_with_latex(md_path, pandoc, engine):
     # DEPT has \\\\ which should become \\ (newline) in LaTeX output
     dept_for_latex = DEPT.replace("\\\\", "\\\\\\par")
 
-    title_page = (
-        TITLE_BLOCK
-        + f"""
+    title_page = TITLE_BLOCK + f"""
 ```{{=latex}}
 \\begin{{titlepage}}
 \\centering
@@ -554,7 +587,6 @@ def build_with_latex(md_path, pandoc, engine):
 \\end{{titlepage}}
 ```
 """
-    )
 
     with open(src, "w", encoding="utf-8") as f:
         f.write(title_page + body)
@@ -583,10 +615,12 @@ def build_with_latex(md_path, pandoc, engine):
 
     # Add bibliography if the file exists
     if os.path.exists(bib_file):
-        cmd.extend([
-            "--bibliography",
-            bib_file,
-        ])
+        cmd.extend(
+            [
+                "--bibliography",
+                bib_file,
+            ]
+        )
     print(f"  pandoc + {engine} ...")
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
@@ -625,10 +659,12 @@ def build_with_weasyprint(md_path, pandoc):
 
     # Add bibliography if the file exists
     if os.path.exists(bib_file):
-        cmd.extend([
-            "--bibliography",
-            bib_file,
-        ])
+        cmd.extend(
+            [
+                "--bibliography",
+                bib_file,
+            ]
+        )
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         print(res.stderr[-1500:])
@@ -654,8 +690,7 @@ def build_with_weasyprint(md_path, pandoc):
     ) as f:  # keep the on-disk HTML in sync with the PDF
         f.write(html)
 
-    css = CSS(
-        string="""
+    css = CSS(string="""
     @page { size: letter; margin: 1in 1.05in;
             @bottom-center { content: counter(page);
                              font-family: Georgia, serif; font-size: 9.5pt; color:#555; } }
@@ -684,8 +719,7 @@ def build_with_weasyprint(md_path, pandoc):
           white-space:pre-wrap; page-break-inside:avoid; text-align:left; }
     code { font-family:Menlo,Consolas,monospace; font-size:8.8pt; }
     math { font-family:"Latin Modern Math","STIX Two Math","Cambria Math",serif; }
-    """
-    )
+    """)
     pdf = os.path.join(BUILD, "proposal.pdf")
     doc = HTML(string=html, base_url=HERE).render(stylesheets=[css])
     doc.write_pdf(pdf)
