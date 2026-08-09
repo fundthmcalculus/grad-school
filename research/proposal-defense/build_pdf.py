@@ -52,6 +52,7 @@ SECTIONS = [
     "prose/10-timeline.md",
     "prose/bibliography.md",
     "prose/appendix.md",
+    "CHECKLIST.md",  # burn-down checklist with timeline overlay
 ]
 
 TITLE = "Reproducing Like Tribbles"
