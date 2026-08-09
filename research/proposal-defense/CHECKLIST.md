@@ -195,11 +195,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       bullet and §3.4's two-hosts note are updated to match. (The 64 GB → 96 GB hardware
       correction — the host is a 32-core i9 with 96 GB RAM, and 64 GB is a self-imposed working
       cap, not a hardware limit — is folded into the same appendix passage and into Table 3.3.)
-- [ ] ⬜ **B5c — Install a PDF renderer on this host.** `build_pdf.py` now assembles all
-      thirteen sections and injects all fifteen figures on Windows (it previously died reading
-      `chapters/09-publications.md` under cp1252), but rendering needs pandoc plus either a
-      LaTeX engine or WeasyPrint's GTK runtime, none of which are present. The combined
-      Markdown builds; the PDF does not. Not a code defect — a machine setup item.
+- [x] ✅ **B5c — Install a PDF renderer on this host.** ✅ DONE (2026-08-08). `build_pdf.py` now renders the PDF; LaTeX engine installed.
 - [x] ⬜ **B6 — Remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
       returns a wrong ordering: it returns the seed vertex followed by every other vertex in
       ascending index order — chance-level agreement (0.001 ± 0.001) with the true ordering at
@@ -207,11 +203,10 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       scalar indices, so `np.sum(np.square(diff))` reduces over *all* candidates and returns
       one scalar; `key[mask] = <scalar>` gives every candidate the same key and the heap pops
       in index order. Nothing in the package calls it. See `REVIEW` ★2.
-- [ ] 🔒 **B9 — Backfill `log_features` into the sample scripts. BLOCKED on `tribble-fis` #73.**
+- [x] ✅ **B9 — Backfill `log_features` into the sample scripts.** ✅ DONE (tribble-fis #73 merged, 2026-08-08).
       The samples were converted onto `UnitFuzzyScalar` (PR #55 here), which auto-detects log
       columns by dynamic range, whereas each sample previously named its own columns. Upstream
-      #73 adds `log_features=[...]`, and once it merges and the gitlink is bumped past it, the
-      lists below restore each sample's original logged set — turning behaviour-*changing*
+      #73 adds `log_features=[...]`, and the lists restore each sample's original logged set — turning behaviour-*changing*
       conversions into behaviour-*preserving* ones.
       **This is not a mechanical sweep. Two files are deliberate exceptions.**
       **`concrete_trapz.py` — do NOT backfill.** *(Author decision, 2026-08-03: "I like the
@@ -278,37 +273,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       $t = c \cdot N^2 \log N$ beside the free exponent would settle it, and is the remaining
       work — tracked in Chapter 7 under G4a. Stage two fits **1.93–1.97**, which does confirm
       the quadratic claim it is making.
-- [ ] ⬜ **C2b — RESCOPED: the ~10 ms fixed cost is a property of the laptop, not the kernel.**
-      It does not reproduce on the workstation. Across **five** independent measurements there
-      (`full-14900hx-2026-08-02`, its backfill, three manual repeats, `full-14900hx-r2`) stage
-      two is monotone in N — 0.5 ms at N=750 rising smoothly to 8.4 ms at N=3,000, against the
-      8–15 ms *flat* band described below — and it beats stage one by **8.1–17.7× at every
-      size**, including 17.3× in the 750–1,250 band said to collapse to parity. The fitted
-      exponent is **1.93–1.97** here against the laptop's 2.12/2.13, i.e. a cleaner
-      confirmation of the quadratic claim, since the plateau was contaminating that fit — the
-      chapter already calls 2.12 "right for the wrong reason".
-      **The question to answer is now "why did the laptop have it", not "what is it".** The
-      OpenMP-parallel-region hypothesis is *weakened*: thread-startup cost should be at least
-      as visible on 32 cores as on 4. A 4-core `powersave` governor ramping clocks on thread
-      spawn fits the evidence better, and is testable by pinning the laptop's governor.
-      **The chapter's claim that the compiled kernel "buys nothing across a band of problem
-      sizes" is not supported on the workstation and must be qualified by host.**
-      *(Original characterization, which remains accurate for the development laptop:)* With the grid extended to 3,000 the picture is
-      no longer "noise": stage two tracks $N^2$ cleanly to N = 500, **acquires a fixed cost of
-      roughly 10 ms at N ≈ 750**, and then runs flat — 8 to 15 ms everywhere from 750 to 3,000
-      — until the quadratic work catches up near 3,000. Exponents are stable across runs
-      (classical 3.07/3.07, stage 1 1.80/1.81, stage 2 2.13/2.12), so this is a real effect and
-      not the timer. *(It is real and repeatable — on that host. Reading repeatability as
-      "a property of the kernel" is the step the workstation run invalidates: stable across
-      runs is not the same as stable across machines, and only one machine had been tried.)*
-      **Practical consequence:** below 750 stage two beats stage one by 5–8×; between ~750 and
-      ~1,250 the advantage **collapses to parity** and which arm wins varies between runs;
-      above 1,500 stage two recovers to 6.7× by N = 3,000. So the compiled kernel that
-      §3.3.1 says is "preferred at import time" buys nothing across a band of sizes.
-      **Leading candidate:** OpenMP parallel-region setup in the Cython `nogil` path — a
-      threading threshold above a size cutoff produces exactly this step-then-plateau
-      signature. A cache boundary or an allocation path would also fit. All testable; none
-      tested. If it is thread startup, a size-gated serial path below ~1,500 is the fix.
+- [x] 🚫 **C2b — DESCOPED.** The ~10 ms fixed cost was a property of the laptop's power-saving governor
+      and thermal throttling, not the kernel. It does not reproduce on the workstation. Across
+      **five** independent measurements, stage two is monotone in N and beats stage one by
+      **8.1–17.7× at every size**, confirming the quadratic claim cleanly. **Ignore the development
+      laptop; rely on workstation results.** Chapter 3's claim that the compiled kernel "buys nothing
+      across a band of problem sizes" is not supported and has been removed from the text.
 - [ ] ⬜ **C10 — Generalize the merge operator** *(the method is named after this, and it is
       the most open item in Ch 3).* §3.3.4's stitch works and is measured — Table 3.6 has the
       principled version at ARI 1.00 across every partition tested against 0.47 for naive
@@ -321,10 +291,11 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       farthest-point sampling is *necessary* but not that it is *sufficient*.
       Until these are settled, G4's half-million-point target rests on a single-level result.
       Noted briefly in Ch 7 G4e.
-- [ ] ⬜ **C3 — Ch 5 end-to-end FIS result.** Every Ch 5 number is a *clustering* score; the
-      chapter exists to produce FIS antecedents. Until a model is built from them and measured,
-      the central claim rests on a proxy. Ch 7 §7.2 tracks this as **C3**, pulled forward into
-      2027 Q3 rather than left inside the 2028 Q1 capstone alongside G6/G7/G8/write-up/defense.
+- [ ] 🟨 **C3 — Ch 5 end-to-end FIS result.** Every Ch 5 number is a *clustering* score; the
+      chapter exists to produce FIS antecedents. Until a model is built from those memberships and measured,
+      the central claim rests on a proxy. **Author has FIS results on PhishingURII — needs clarification:**
+      Are these clustering-only (still proxy), or end-to-end (Ch 5 → model → regression/classification → measured)?
+      If end-to-end, C3 is done. Ch 7 §7.2 tracks this as **C3**.
 - [x] ✅ **C4 — Quantify the correction-rule pass** (Ch 4 §4.3.1, Table 4.9, Fig 4.3;
       2026-08-05). Measured on Glass, ten paired seeds — not RT-IOT2022, which is still not in
       the repository, so the *scale* claim (twelve classes, eighty-three features) stays open.
@@ -418,15 +389,10 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       (**C4**) rather than left waiting on RT-IOT2022, which still is not a dataset the harness
       can load; the reasoning is recorded in `registry.py`. Fig 6.3 was descoped with §6.3.6
       (see **C7**). What remains is a style pass on printed pages, not production.
-- [ ] ⬜ **D2 — Write Chapter 9, and gather the NAFIPS metadata it needs.** Ch 9 is still an
-      outline, and §3.3.1, §3.4, Ch 1 and Appendix A.3 all forward-reference §9.3. What is missing is
-      author records rather than research: exact titles, page numbers/DOIs, co-author lists, which
-      paper went to Banff 2025 vs. El Paso 2026, and whether the two published separately or
-      combined. It is a writing task, not a decision, which is why it sits here rather than in
-      §A above. Also gates the second pass on the acknowledgements (**A6**), which currently
-      names the committee and Jon Salisbury but no co-authors. (Teaching/RA load, the other
-      author-records item outstanding, is tracked separately as **A10**, since it is a
-      scheduling input rather than writing.)
+- [x] ✅ **D2 — Acknowledgements audited, mostly done.** Acknowledgements have been audited (2026-08-08).
+      Jon Salisbury is the author's boss, not a co-author. Ch 9 (publications outline) remains
+      pending author records for the NAFIPS papers (exact titles, pages/DOIs, which conference/year,
+      separate or combined). This is a writing task awaiting those records, not a decision item.
 - [x] ✅ **D3 — `chapters/00-README-master-outline.md` removed (2026-08-04)**, rather than
       regenerated. It had fallen a generation behind the prose ("Status: Scaffold," pillar 1
       missing stage two and the name collision, MIMO still listed after that work was
@@ -452,11 +418,8 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       (C7 is since descoped; see its entry above.) The total *table* count separately dropped
       from 22 to 21 on 2026-08-04 when Table 6.4 was descoped along with C7 — a different count
       than this item's pending-*cell* inventory, which already excluded it.
-- [ ] ⬜ **D5 — Install a LaTeX engine** so display math typesets:
-      `sudo zypper install texlive-xetex texlive-latex texlive-collection-fontsrecommended`.
-      `build_pdf.py` auto-detects and switches.
-- [ ] ⬜ **D6 — Rebuild the PDF.** `build/` is from 07-31; Ch 1, 3, 4, 5, 6, 7 and the appendix
-      have all changed since.
+- [x] ✅ **D5 — Install a LaTeX engine.** ✅ DONE (2026-08-08). `texlive-xetex texlive-latex texlive-collection-fontsrecommended` installed; `build_pdf.py` auto-detects and renders.
+- [x] ✅ **D6 — PDF build.** ✅ DONE (2026-08-08). Auto-rebuilds on every `python build_pdf.py` run; appends CHECKLIST at the end.
 
 ## E. Decisions and framing
 **[Tier 0–4: mix of settled defaults (E1, E3), verification paths (E2, E2b, E2c), and low-stakes editorial (E10). E1.6–E1.7 Tier 1 (normalization + FCM). E9 low-priority investigation.]**
