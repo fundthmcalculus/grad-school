@@ -372,6 +372,7 @@ fontsize: 11pt
 linestretch: 1.15
 numbersections: false
 colorlinks: true
+nocite: "@*"
 header-includes: |
   \usepackage{{titlesec}}
   \titleformat{{\section}}{{\Large\bfseries}}{{}}{{0pt}}{{}}
@@ -421,6 +422,7 @@ def build_with_latex(md_path, pandoc, engine):
     with open(src, "w", encoding="utf-8") as f:
         f.write(title_page + body)
     prose_dir = os.path.join(HERE, "prose")
+    bib_file = os.path.join(HERE, "references.bib")
     cmd = [
         pandoc,
         src,
@@ -436,6 +438,9 @@ def build_with_latex(md_path, pandoc, engine):
         prose_dir,
         "-V",
         "titlepage=true",
+        "--citeproc",
+        "--bibliography",
+        bib_file,
     ]
     print(f"  pandoc + {engine} ...")
     res = subprocess.run(cmd, capture_output=True, text=True)
