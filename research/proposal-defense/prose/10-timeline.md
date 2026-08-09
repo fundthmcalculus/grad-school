@@ -5,7 +5,7 @@ The plan runs from the proposal defense at the end of 2026 to the final defense 
 Three things changed here, all of them cases of the schedule having assumed the hard parts were done.
 
 - **The baseline adapters come first.** C1 (ANFIS and GA-tuned-FIS) fill the initial baseline gap; see §7.4 for the impact on Tables 4.5 and 6.2.
-- **Every blocker the evidence names now has a bar or an explicit de-scope.** The M5 dependency fault gets a decision date; BETH's one-class path gets a slot and a stated fallback; eVAT and clusiVAT get their own bar. Fumanal-Idocin et al. (2025) and the deep TSK fuzzy classifier, itemized in Chapter 6's baseline list and nowhere here, are de-scoped in §7.2 instead of silently carried.
+- **Every blocker the evidence names now has a bar or an explicit de-scope.** The M5 dependency fault gets a decision date; BETH's one-class path gets a slot and a stated fallback; eVAT and clusiVAT get their own bar. Fumanal-Idocin et al. [@fumanal2025fast] and the deep TSK fuzzy classifier, itemized in Chapter 6's baseline list and nowhere here, are de-scoped in §7.2 instead of silently carried.
 - **Goal G8 is absent deliberately.** §7.2 retargets the construction post-defense, since the 2028 Q1 quarter it would need already carries the capstone, G6, G7, the write-up and the defense, and keeps only the disjunct count over G2's datasets, which rides inside G2.
 
 ## 10.1 Gantt
@@ -148,6 +148,6 @@ Two caveats. Q1 2027 is the densest quarter, carrying five research items and a 
 - **Confirm teaching/RA load per semester**, which sets realistic throughput.
 - **Two calls that are yours, not the schedule's.**
   - Whether the M5 branch may be a *build*, writing an M5′ implementation against a current scikit-learn. Dated 31 March 2027, not decided.
-  - Whether either Fumanal-Idocin et al. (2025) or the deep TSK fuzzy classifier must be reimplemented: §7.2 de-scopes both, and taking one on displaces G3b.
+  - Whether either Fumanal-Idocin et al. [@fumanal2025fast] or the deep TSK fuzzy classifier must be reimplemented: §7.2 de-scopes both, and taking one on displaces G3b.
 
 *Draft — Chapter 10 prose + Gantt. Goals map to Table 7.1 and `../CHECKLIST.md`.*
