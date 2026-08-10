@@ -57,7 +57,7 @@ def build():
     result = tc.compute_ivat(D.copy())
     RIV = result[0]  # iVAT returns (reordered_matrix, ordering, rdi_curve)
 
-    fig, axes = F.grid_figure(1, 4, width=F.W_WIDE, height=2.6)
+    fig, axes = F.grid_figure(1, 4, width=9.8, height=2.6)
     scatter, before, after, ivat = axes
 
     for k in range(N_CLUSTERS):
