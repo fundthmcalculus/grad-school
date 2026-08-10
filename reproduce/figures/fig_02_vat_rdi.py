@@ -85,12 +85,8 @@ def build():
 
     vmax = float(D.max())
     F.imshow_matrix(before, D, title="(b)  raw order — speckle", vmin=0, vmax=vmax)
-    F.imshow_matrix(
-        after, RV, title="(c)  after VAT", vmin=0, vmax=vmax
-    )
-    im = F.imshow_matrix(
-        ivat, RIV, title="(d)  after IVAT", vmin=0, vmax=vmax
-    )
+    F.imshow_matrix(after, RV, title="(c)  after VAT", vmin=0, vmax=vmax)
+    im = F.imshow_matrix(ivat, RIV, title="(d)  after IVAT", vmin=0, vmax=vmax)
 
     # One shared colourbar. All panels hold the same numbers.
     cbar = fig.colorbar(im, ax=list(axes), fraction=0.022, pad=0.012, shrink=0.82)
