@@ -1,19 +1,19 @@
 #!/usr/bin/env python
-"""Quick baseline: UCI Shuttle (classification)."""
+"""Quick baseline: BETH host telemetry anomaly detection (classification)."""
 
 import os
 import sys
 import time
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tables"))
 import _fuzzy_models as F  # noqa: E402
 
-X, y = F.load_shuttle()
-Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
+splits = F.load_beth()
+Xtr, ytr = splits["train"]
+Xte, yte = splits["test"]
 
 for name, model in [
     ("Random Forest", RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)),
