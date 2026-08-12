@@ -65,25 +65,24 @@ def load_concrete():
 
     if not os.path.exists(csv_path):
         df = None
-        try:  # try local spreadsheet
-
-            xls = os.path.join(
-                REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls"
-            )
-            if os.path.exists(xls):
-                try:
-                    df = pd.read_excel(xls)
-                    df.columns = CONCRETE_COLS[: len(df.columns)]
-                    print("  [concrete] read from the local .xls")
-                except ImportError:
-                    print(
-                        "  [concrete] the local file is a legacy .xls and needs `xlrd`; "
-                        "either `pip install xlrd` or let the UCI fetch handle it"
-                    )
-                except Exception as exc:  # noqa: BLE001
-                    print(f"  [concrete] .xls unreadable ({exc.__class__.__name__})")
+        xls = os.path.join(
+            REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls"
+        )
+        if os.path.exists(xls):
+            try:
+                df = pd.read_excel(xls)
+                df.columns = CONCRETE_COLS[: len(df.columns)]
+                print("  [concrete] read from the local .xls")
+            except ImportError:
+                print(
+                    "  [concrete] the local file is a legacy .xls and needs `xlrd`; "
+                    "install it or provide data/Concrete_Data.csv"
+                )
+            except Exception as exc:  # noqa: BLE001
+                print(f"  [concrete] .xls unreadable ({exc.__class__.__name__})")
 
         if df is None:
+            print(f"  [concrete] file not found at {os.path.relpath(csv_path, REPO_ROOT)}")
             return None
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
         df.to_csv(csv_path, index=False)
@@ -152,38 +151,46 @@ def load_rt_iot2022(sample_size=None):
         return None
 
 
-def load_beth(combine=True):
-    """BETH host telemetry: binary classification. Reads from data/beth/*.csv.
+def load_beth():
+    """BETH host telemetry: 3.8M rows binary anomaly detection dataset.
 
-    If combine=True (default), concatenates all CSV files in the directory.
-    Returns (X, y) or None if directory not found.
+    Returns explicit train/validate/test splits:
+      dict with keys 'train', 'val', 'test'; each maps to (X, y).
+      Returns None if any split is missing.
+
+    Splits are loaded from:
+      - data/beth/labelled_training_data.csv
+      - data/beth/labelled_validation_data.csv
+      - data/beth/labelled_testing_data.csv
     """
     beth_dir = os.path.join(DATA_DIR, "beth")
+    splits = {
+        "train": "labelled_training_data.csv",
+        "val": "labelled_validation_data.csv",
+        "test": "labelled_testing_data.csv",
+    }
+
     try:
-        if not os.path.isdir(beth_dir):
-            print(f"  [beth] directory not found at {os.path.relpath(beth_dir, REPO_ROOT)}")
-            return None
+        result = {}
+        for split_name, filename in splits.items():
+            path = os.path.join(beth_dir, filename)
+            if not os.path.exists(path):
+                print(f"  [beth] missing {split_name} split at {os.path.relpath(path, REPO_ROOT)}")
+                return None
 
-        csv_files = sorted([f for f in os.listdir(beth_dir) if f.endswith(".csv")])
-        if not csv_files:
-            print(f"  [beth] no CSV files found in {os.path.relpath(beth_dir, REPO_ROOT)}")
-            return None
+            df = pd.read_csv(path)
+            y = df.iloc[:, -1]
+            X = df.iloc[:, :-1]
+            X = X.select_dtypes(include=[np.number]).astype(float)
+            y = np.asarray(y)
+            result[split_name] = (X, y)
 
-        dfs = []
-        for csv_file in csv_files:
-            path = os.path.join(beth_dir, csv_file)
-            dfs.append(pd.read_csv(path))
-
-        df = pd.concat(dfs, ignore_index=True) if combine else dfs[0]
-        y = df.iloc[:, -1]  # last column is the target
-        X = df.iloc[:, :-1]
-        X = X.select_dtypes(include=[np.number]).astype(float)
-        y = np.asarray(y)
+        total_rows = sum(len(result[s][0]) for s in splits.keys())
         print(
-            f"  [beth] loaded {len(csv_files)} file(s) from "
-            f"{os.path.relpath(beth_dir, REPO_ROOT)}: {len(X)} rows × {X.shape[1]} features"
+            f"  [beth] loaded train/val/test from {os.path.relpath(beth_dir, REPO_ROOT)}: "
+            f"{total_rows} total rows × {result['train'][0].shape[1]} features"
         )
-        return X, y
+        return result
     except Exception as exc:  # noqa: BLE001
         print(f"  [beth] failed to load ({exc.__class__.__name__}); column -> N/A")
         return None
