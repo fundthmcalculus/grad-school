@@ -55,25 +55,50 @@ import _fuzzy_models as F  # noqa: E402
 THRESHOLD = float(os.environ.get("REPRO_ANOM_THRESHOLD", "0.99"))
 CONORM = os.environ.get("REPRO_ANOM_CONORM", "hamacher")
 
+# One-class SVM training is O(n^2)-O(n^3) (libsvm); on RT-IOT2022's ~80-90k-row
+# leave-one-class-out training folds a single fit measured at ~100-130s, x120
+# (12 classes x 10 seeds) is several hours for one baseline arm. The complement
+# rule and Isolation Forest both fit the full training set; only the SVM baseline
+# is capped, and the cap is recorded in the table's note rather than left silent.
+OCSVM_TRAIN_CAP = int(os.environ.get("REPRO_OCSVM_TRAIN_CAP", "20000"))
+# theta_sweep (Fig 4.2) is a supplementary sensitivity curve, not the headline
+# table -- it reruns the complement rule alone, so its cost is (#thetas x
+# #classes x #seeds) fits with no SVM involved. On a large dataset the default
+# 10-seed x 7-theta grid is still (7 x 12 x 10) fits; REPRO_THETA_SWEEP_SEEDS lets
+# it use a named subset instead of quietly changing the seed count elsewhere.
+_theta_seeds_env = os.environ.get("REPRO_THETA_SWEEP_SEEDS", "")
+THETA_SWEEP_SEEDS = (
+    [int(s) for s in _theta_seeds_env.split(",")] if _theta_seeds_env else None
+)
+
 
 def load_openset_data():
-    """(X, y) for the leave-one-class-out protocol. BETH if present, else Glass."""
-    # Under data/, not the submodule: tribble-fis dropped `gaussian_mixture/` in
-    # 8484fd6 and is now a pure library. See _fuzzy_models.DATA_DIR.
-    beth = os.path.join(F.DATA_DIR, "beth_data", "labelled_training_data.csv")
-    if os.path.exists(beth):
-        print("  [data] BETH found -- using it")
-        df = pd.read_csv(beth)
-        y = pd.Series(np.where(df.get("evil", 0) == 1, "anomaly", "regular"))
-        X = df.select_dtypes(include=[np.number]).drop(
-            columns=[c for c in ("sus", "evil") if c in df.columns], errors="ignore"
-        )
+    """(X, y) for the leave-one-class-out protocol.
+
+    Priority: RT-IOT2022 (123k) > BETH (3.8M) > Glass (214).
+    """
+    # Try RT-IOT2022 first (large-scale public dataset)
+    iot = F.load_rt_iot2022()
+    if iot is not None:
+        X, y = iot
+        print("  [data] RT-IOT2022 found (123k × 83, 12 classes) -- using it")
+        return X, y, "RT-IOT2022"
+
+    # Try BETH (explicit train split for anomaly detection)
+    beth_splits = F.load_beth()
+    if beth_splits is not None:
+        X, y = beth_splits["train"]
+        print("  [data] BETH found (training split, 763k × 10) -- using it")
         return X, y, "BETH"
+
+    # Fall back to Glass (small public dataset)
     path = os.path.join(F.REPO_ROOT, "glass.csv")
     if not os.path.exists(path):
         return None
     df = pd.read_csv(path).dropna()
-    print("  [data] BETH absent -- leave-one-class-out on Glass (public, in-repo)")
+    print(
+        "  [data] RT-IOT2022 and BETH absent -- leave-one-class-out on Glass (214 × 9)"
+    )
     return (df.drop(columns=["Type"]).astype(float), df["Type"].astype(int), "Glass")
 
 
@@ -109,12 +134,13 @@ def rates(flagged, is_unknown):
     return det, fa
 
 
-def theta_sweep(X, y, classes, thetas):
+def theta_sweep(X, y, classes, thetas, seeds=None):
     """Operating curve: detection and false-alarm as functions of the boost theta.
 
     This is the experiment Figure 4.2 needs. A single theta says almost nothing --
     the question is whether the knob buys a usable trade at ANY setting.
     """
+    seeds = seeds if seeds is not None else C.SEEDS
     print("\n  theta sweep (Figure 4.2):")
     print(f"    {'theta':>8} {'detection':>12} {'false alarm':>13} {'J':>8}")
     rows = []
@@ -128,7 +154,7 @@ def theta_sweep(X, y, classes, thetas):
             Xk, yk = X[known], pd.Series(y)[known]
             if len(np.unique(yk)) < 2 or len(Xk) < 40:
                 continue
-            for seed in C.SEEDS:
+            for seed in seeds:
                 Xtr, Xte_k, ytr, _ = train_test_split(
                     Xk, yk, test_size=0.3, random_state=seed
                 )
@@ -157,7 +183,15 @@ def theta_sweep(X, y, classes, thetas):
             ["θ", "detection rate", "false-alarm rate", "detection − false alarm"],
             rows,
             note=(
-                "Averaged over held-out classes × seeds. This is the curve a user picks an "
+                "Averaged over held-out classes × seeds"
+                + (
+                    f" (seeds={seeds}, a named subset of the ten-seed floor -- "
+                    f"this sweep is a supplementary sensitivity curve, not the "
+                    f"headline table)"
+                    if seeds != C.SEEDS
+                    else ""
+                )
+                + ". This is the curve a user picks an "
                 "operating point on; a single θ in isolation says little. If J stays near "
                 "zero across the whole sweep, the knob does not buy a usable trade on this "
                 "dataset and the claim needs a better testbed than a 214-sample set."
@@ -221,7 +255,13 @@ def main():
                 ),
             ):
                 try:
-                    est.fit(Xtr)
+                    Xfit = Xtr
+                    if arm == "One-class SVM" and len(Xtr) > OCSVM_TRAIN_CAP:
+                        idx = np.random.RandomState(seed).choice(
+                            len(Xtr), OCSVM_TRAIN_CAP, replace=False
+                        )
+                        Xfit = Xtr.iloc[idx]
+                    est.fit(Xfit)
                     add(arm, *rates(est.predict(Xte) == -1, is_unknown))
                 except Exception as exc:  # noqa: BLE001
                     print(
@@ -251,7 +291,19 @@ def main():
 
     sweep = os.environ.get("REPRO_THETA_SWEEP", "")
     if sweep:
-        theta_sweep(X, y, classes, [float(t) for t in sweep.split(",")])
+        theta_sweep(
+            X, y, classes, [float(t) for t in sweep.split(",")], seeds=THETA_SWEEP_SEEDS
+        )
+
+    svm_note = ""
+    if len(X) > OCSVM_TRAIN_CAP:
+        svm_note = (
+            f" One-class SVM is trained on a random {OCSVM_TRAIN_CAP}-row subsample of "
+            f"each fold's training set (libsvm's O(n^2)-O(n^3) fit time makes the full "
+            f"~{int(len(X) * 0.7):,}-row fold intractable at ten seeds x {len(classes)} "
+            f"held-out classes); the complement rule and Isolation Forest see the full "
+            f"training set."
+        )
 
     C.emit(
         "table_4_4_openset",
@@ -271,8 +323,9 @@ def main():
             f"at a matched operating point rather than at whatever default each ships with. "
             f"'Detection − false alarm' is Youden's J: higher is better, 0 means the "
             f"detector is no better than flagging at random. Complement rule at θ={THRESHOLD}, "
-            f"{CONORM} conorm. Chapter 4 describes this experiment on BETH; those files are "
-            f"not in the repository, so the same protocol runs on public in-repo data."
+            f"{CONORM} conorm.{svm_note} Chapter 4 describes this experiment on BETH; those "
+            f"files are present locally but binary (BETH), so RT-IOT2022's {len(classes)} "
+            f"classes are used when available, falling back to BETH then Glass."
         ),
     )
 

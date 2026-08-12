@@ -112,9 +112,7 @@ def _figure(rows):
         ax.axvline(
             ktrue - 0.5, color="green", ls=":", lw=1.5, label=f"true k-1={ktrue-1}"
         )
-        ax.axvline(
-            krepo - 0.5, color="red", ls="--", lw=1, label=f"repo k̂-1={krepo-1}"
-        )
+        ax.axvline(krepo - 0.5, color="red", ls="--", lw=1, label=f"repo k̂-1={krepo-1}")
         ax.axvline(ksil - 0.5, color="blue", ls="-.", lw=1, label=f"sil k̂-1={ksil-1}")
         ax.set_xlim(0, min(20, len(s)))
         ax.set_title(

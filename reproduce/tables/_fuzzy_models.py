@@ -58,45 +58,31 @@ CONCRETE_COLS = [
 def load_concrete():
     """UCI Concrete: 8 mixture/age features -> compressive strength (MPa).
 
-    Resolution order, so this works on a fresh clone without manual setup:
-      1. the repo CSV, if a previous run already cached it;
-      2. UCI via ``ucimlrepo`` (id 165) -- then cached as that CSV;
-      3. the legacy ``.xls`` in AEEM6097 (needs ``xlrd``, often absent).
-    Returns (X, y) or None, printing which route it took.
+    Loads from ``data/Concrete_Data.csv`` or local spreadsheet fallback.
+    Returns (X, y) or None.
     """
     csv_path = os.path.join(DATA_DIR, "Concrete_Data.csv")
 
     if not os.path.exists(csv_path):
         df = None
-        try:  # 2. authoritative source
-            from ucimlrepo import fetch_ucirepo
-
-            ds = fetch_ucirepo(id=165)
-            df = ds.data.features.copy()
-            df["Strength"] = np.asarray(ds.data.targets).ravel()
-            df.columns = CONCRETE_COLS[: len(df.columns)]
-            print("  [concrete] fetched from UCI (id 165)")
-        except Exception as exc:  # noqa: BLE001
-            print(f"  [concrete] UCI fetch unavailable ({exc.__class__.__name__})")
-
-        if df is None:  # 3. local spreadsheet
-            xls = os.path.join(
-                REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls"
-            )
-            if os.path.exists(xls):
-                try:
-                    df = pd.read_excel(xls)
-                    df.columns = CONCRETE_COLS[: len(df.columns)]
-                    print("  [concrete] read from the local .xls")
-                except ImportError:
-                    print(
-                        "  [concrete] the local file is a legacy .xls and needs `xlrd`; "
-                        "either `pip install xlrd` or let the UCI fetch handle it"
-                    )
-                except Exception as exc:  # noqa: BLE001
-                    print(f"  [concrete] .xls unreadable ({exc.__class__.__name__})")
+        xls = os.path.join(REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls")
+        if os.path.exists(xls):
+            try:
+                df = pd.read_excel(xls)
+                df.columns = CONCRETE_COLS[: len(df.columns)]
+                print("  [concrete] read from the local .xls")
+            except ImportError:
+                print(
+                    "  [concrete] the local file is a legacy .xls and needs `xlrd`; "
+                    "install it or provide data/Concrete_Data.csv"
+                )
+            except Exception as exc:  # noqa: BLE001
+                print(f"  [concrete] .xls unreadable ({exc.__class__.__name__})")
 
         if df is None:
+            print(
+                f"  [concrete] file not found at {os.path.relpath(csv_path, REPO_ROOT)}"
+            )
             return None
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
         df.to_csv(csv_path, index=False)
@@ -114,14 +100,10 @@ def load_concrete():
 
 
 def load_phiusiil(sample_size=20000):
-    """PhiUSIIL phishing. Reuse the repo's own loader if importable; else fetch
-    via ucimlrepo (id 967); else return None so the column shows N/A."""
-    # The repo loader reads a CSV that used to live in the tribble-fis submodule
-    # and was deleted with gaussian_mixture/ (8484fd6). Point it at data/ before
-    # importing, so it finds the file rather than silently failing through to the
-    # ucimlrepo fallback -- which returns a DIFFERENT feature set (numeric-only,
-    # dropna) and drops accuracy from ~0.997 to ~0.913. A fallback that quietly
-    # changes the experiment is worse than no fallback.
+    """PhiUSIIL phishing. Loads from repo loader or data/PhiUSIIL_Phishing_URL_Dataset.csv.
+
+    Returns (X, y) or None if unavailable.
+    """
     local = os.path.join(DATA_DIR, "PhiUSIIL_Phishing_URL_Dataset.csv")
     try:
         sys.path.insert(0, os.path.join(FIS, "tribble-tree"))
@@ -137,23 +119,168 @@ def load_phiusiil(sample_size=20000):
         )
         return X, np.asarray(y)
     except Exception as exc:  # noqa: BLE001
-        print(
-            f"  [phiusiil] repo loader unavailable ({exc.__class__.__name__}); "
-            f"FALLING BACK to ucimlrepo -- NOTE: different feature set, "
-            f"results are not comparable to a repo-loader run"
-        )
-    try:
-        from ucimlrepo import fetch_ucirepo
+        print(f"  [phiusiil] unavailable ({exc.__class__.__name__}); column -> N/A")
+        return None
 
-        ds = fetch_ucirepo(id=967)
-        X = ds.data.features.select_dtypes(include=[np.number]).dropna(axis=1)
-        y = np.asarray(ds.data.targets).ravel()
+
+def load_rt_iot2022(sample_size=None):
+    """RT-IOT2022: 123k rows × 83 features, 12 classes (open-set detection).
+
+    Returns (X, y) or None if file not found.
+    """
+    local = os.path.join(DATA_DIR, "RT_IOT2022.csv")
+    try:
+        df = pd.read_csv(local)
+        y = df.iloc[:, -1]  # last column is the target
+        X = df.iloc[:, :-1]
+        X = X.select_dtypes(include=[np.number]).astype(float)
+        y = np.asarray(y)
         if sample_size and len(X) > sample_size:
             idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
             X, y = X.iloc[idx], y[idx]
+        print(
+            f"  [rt-iot2022] loaded {os.path.relpath(local, REPO_ROOT)}: "
+            f"{len(X)} rows × {X.shape[1]} features"
+        )
         return X, y
+    except FileNotFoundError:
+        print(f"  [rt-iot2022] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
     except Exception as exc:  # noqa: BLE001
-        print(f"  [phiusiil] unavailable ({exc.__class__.__name__}); column -> N/A")
+        print(
+            f"  [rt-iot2022] failed to load ({exc.__class__.__name__}); column -> N/A"
+        )
+        return None
+
+
+def load_beth():
+    """BETH host telemetry: 3.8M rows binary anomaly detection dataset.
+
+    Returns explicit train/validate/test splits:
+      dict with keys 'train', 'val', 'test'; each maps to (X, y).
+      Returns None if any split is missing.
+
+    Splits are loaded from:
+      - data/beth/labelled_training_data.csv
+      - data/beth/labelled_validation_data.csv
+      - data/beth/labelled_testing_data.csv
+    """
+    beth_dir = os.path.join(DATA_DIR, "beth")
+    splits = {
+        "train": "labelled_training_data.csv",
+        "val": "labelled_validation_data.csv",
+        "test": "labelled_testing_data.csv",
+    }
+
+    try:
+        result = {}
+        for split_name, filename in splits.items():
+            path = os.path.join(beth_dir, filename)
+            if not os.path.exists(path):
+                print(
+                    f"  [beth] missing {split_name} split at {os.path.relpath(path, REPO_ROOT)}"
+                )
+                return None
+
+            df = pd.read_csv(path)
+            y = df.iloc[:, -1]
+            X = df.iloc[:, :-1]
+            X = X.select_dtypes(include=[np.number]).astype(float)
+            y = np.asarray(y)
+            result[split_name] = (X, y)
+
+        total_rows = sum(len(result[s][0]) for s in splits.keys())
+        print(
+            f"  [beth] loaded train/val/test from {os.path.relpath(beth_dir, REPO_ROOT)}: "
+            f"{total_rows} total rows × {result['train'][0].shape[1]} features"
+        )
+        return result
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [beth] failed to load ({exc.__class__.__name__}); column -> N/A")
+        return None
+
+
+def load_shuttle(sample_size=None):
+    """Shuttle: 58k rows × 7 features, 7 classes (structure discovery flagship).
+
+    Loads from data/shuttle.csv. Returns (X, y) or None if file not found.
+    """
+    local = os.path.join(DATA_DIR, "shuttle.csv")
+
+    if os.path.exists(local):
+        try:
+            df = pd.read_csv(local)
+            y = df.iloc[:, -1]
+            X = df.iloc[:, :-1]
+            X = X.select_dtypes(include=[np.number]).astype(float)
+            y = np.asarray(y)
+            if sample_size and len(X) > sample_size:
+                idx = np.random.RandomState(42).choice(
+                    len(X), sample_size, replace=False
+                )
+                X, y = X.iloc[idx], y[idx]
+            print(
+                f"  [shuttle] loaded {os.path.relpath(local, REPO_ROOT)}: "
+                f"{len(X)} rows × {X.shape[1]} features"
+            )
+            return X, y
+        except Exception as exc:  # noqa: BLE001
+            print(
+                f"  [shuttle] failed to load ({exc.__class__.__name__}); column -> N/A"
+            )
+            return None
+    else:
+        print(f"  [shuttle] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+
+
+def load_bikeshare(target_col="cnt", sample_size=None):
+    """Bike Sharing Demand: 17.4k rows × 16 features, regression (demand prediction).
+
+    Kaggle dataset: https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619
+    File: bikeshare-hour.csv (extracted from the Kaggle zip)
+
+    Args:
+        target_col: column name for the target (default 'cnt' = count of bikes rented).
+        sample_size: if set, randomly sample to this size (for quick tests).
+
+    Returns (X, y) or None if file not found.
+    """
+    local = os.path.join(DATA_DIR, "bikeshare-hour.csv")
+    try:
+        df = pd.read_csv(local)
+        if target_col not in df.columns:
+            print(
+                f"  [bikeshare] target column '{target_col}' not found; "
+                f"available: {list(df.columns)}"
+            )
+            return None
+
+        y = df[target_col].astype(float)
+        y.name = "y_value"
+        # Drop non-numeric and index columns (dteday, instant, etc.)
+        X = df.select_dtypes(include=[np.number]).drop(
+            columns=[target_col], errors="ignore"
+        )
+        # Drop obvious ID/index columns if present
+        X = X.drop(columns=["instant"], errors="ignore").astype(float)
+
+        if sample_size and len(X) > sample_size:
+            idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
+            X, y = X.iloc[idx].reset_index(drop=True), y.iloc[idx].reset_index(
+                drop=True
+            )
+
+        print(
+            f"  [bikeshare] loaded {os.path.relpath(local, REPO_ROOT)}: "
+            f"{len(X)} rows × {X.shape[1]} features"
+        )
+        return X, y
+    except FileNotFoundError:
+        print(f"  [bikeshare] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [bikeshare] failed to load ({exc.__class__.__name__}); column -> N/A")
         return None
 
 
@@ -289,19 +416,19 @@ def mog_regressor(seed, tsk_order="1st"):
     seconds. Same object, same preprocessing, one keyword: the alternative was a
     second copy of this constructor, which is how two tables drift apart.
     """
-    from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
+    from tribblefis.gaussian_regressor import TribbleRegressor
 
     return _try(
-        lambda: MixtureOfGaussiansFuzzyRegressor(
+        lambda: TribbleRegressor(
             n_output_buckets=3, tsk_order=tsk_order, top_n=-1, random_state=seed
         )
     )
 
 
 def mog_classifier(seed):
-    from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+    from tribblefis.gaussian_classifier import TribbleClassifier
 
-    return _try(lambda: MixtureOfGaussiansFuzzyClassifier(top_n=5, random_state=seed))
+    return _try(lambda: TribbleClassifier(top_n=5, random_state=seed))
 
 
 def tree_regressor(seed):

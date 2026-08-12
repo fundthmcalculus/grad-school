@@ -251,6 +251,20 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       seed set, and reports what it cannot run rather than substituting a guess. Remaining
       work is the ANFIS/GA-FIS adapters (**C1**) and re-quoting drifted tables as they're found
       (`reproduce/PROVENANCE_MAP.md` is the place that tracks drift), not harness plumbing.
+- [x] ✅ **B12 — Two upstream/harness defects caught and fixed during the 2026-08-11/12 full
+      evaluation pass.** (a) `table_a1_feature_scoring.py` and `_mf_dedup.py` /
+      `table_4_8_mf_dedup.py` both called `tribblefis.gaussian_classifier`'s
+      `MixtureOfGaussiansFuzzyClassifier` / `SequenceClassifier` and
+      `gaussian_regressor.MixtureOfGaussiansFuzzyRegressor`, all three renamed upstream to
+      `TribbleClassifier`, `TribbleSequenceClassifier`, `TribbleRegressor` at the currently
+      pinned `tribble-fis` SHA (`80e98d7`) — both tables were silently failing every run under
+      the current pin until this pass. Fixed, signature-compatible, backfilled at ten seeds.
+      (b) `run_all_tables.sh`'s own archive step hit the exact mid-run-edit failure mode its
+      header already warns about (a concurrent change to the script while it was running
+      shifted byte offsets bash reads incrementally, crashing the PROVENANCE-writing heredoc
+      with a syntax error) — recovered via the script's own documented `--archive-only` path;
+      the numeric phase itself was unaffected. Full account:
+      `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`.
 
 ## C. Experiments owed
 **[Tier 1: critical before defense (C1, C4). Tier 2: real research (C2–C3, C5–C6, C8–C11–C13). Tier 3: defensive (C5–C6, C8). Tier 1.5: reduced scope (C4 done). Tier 4 (C7 descoped)]**
@@ -297,8 +311,16 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       Are these clustering-only (still proxy), or end-to-end (Ch 5 → model → regression/classification → measured)?
       If end-to-end, C3 is done. Ch 7 §7.2 tracks this as **C3**.
 - [x] ✅ **C4 — Quantify the correction-rule pass** (Ch 4 §4.3.1, Table 4.9, Fig 4.3;
-      2026-08-05). Measured on Glass, ten paired seeds — not RT-IOT2022, which is still not in
-      the repository, so the *scale* claim (twelve classes, eighty-three features) stays open.
+      2026-08-05). Measured on Glass, ten paired seeds — not RT-IOT2022. **RT-IOT2022 is now in
+      the repository (2026-08-12), and two of its three related-but-distinct scale claims are now
+      measured.** Table 4.4's plain classification/timing claim (twelve classes, eighty-two
+      features): MoG trains in $37.42 \pm 0.64$ s at $0.927 \pm 0.002$ accuracy against Random
+      Forest's $0.999 \pm 0.000$ (ten seeds, `table_4_1_mog_baselines.py`). The open-set scale
+      claim (§4.3.5, Table 4.7b): the complement rule loses to Isolation Forest at scale
+      (+0.394 vs +0.537 Youden's $J$, five seeds). **The *correction-rule cascade's own* scale
+      claim is the one still open** — that specific experiment (the gated cascade below, on
+      RT-IOT2022 rather than Glass) has not been run — but "RT-IOT2022 is absent" is no longer
+      the reason for any of the three.
       The gated cascade gains +0.031 ± 0.027 accuracy over the flat base at a cost of raising
       raw membership functions from 81.4 to 109.0; collapsing it into one deployable FIS
       (union every layer, dedup at exact tolerance, predict by plain argmax) keeps +0.014 ±
@@ -315,19 +337,21 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       independence → incremental-update property (new labeled data for one class updates only
       that class's rules) is stated as a structural consequence, not a measured result. Needs a
       controlled streaming or partial-label experiment before it can be promoted to a claim.
-- [ ] ⬜ **C13 — Large-scale regression benchmark, pilot started** (Appendix A.7's regression
-      gap: no large dataset exists in any form). `reproduce/regression_scale/RESULTS_2026-08-05.md`
-      piloted California Housing (20,433 × 8) and Superconductivity (21,263 × 81), single seed,
-      not yet canonically sourced (both come from a GitHub mirror; UCI/figshare are unreachable
-      from the session that ran this). Findings so far: California Housing works out of the box
-      (R² = 0.660); Superconductivity's raw fit is badly broken (R² = −0.644) from feature
-      collinearity that the library's own `top_p` selector cannot see, fixed by
-      `sklearn.cluster.FeatureAgglomeration` decorrelation first (R² = 0.685 at the tuned peak).
-      Table 6.1's model family run on both shows Random Forest beating every FIS-family arm by a
-      wide margin on both datasets, and fuzzy tree beating tuned MoG on Superconductivity with no
-      tuning at all. No decision yet on which dataset or model family, if any, is worth promoting
-      to a `reproduce/tables/` generator — this item stays open until one is made and the chosen
-      dataset is re-sourced from its canonical location.
+- [x] ✅ **C13 — Large-scale regression benchmark, promoted to a generator and measured at
+      ten seeds** (2026-08-12; Appendix A.7.1). `reproduce/tables/table_a7_regression_scale.py`
+      supersedes the single-seed pilot (`reproduce/regression_scale/RESULTS_2026-08-05.md`).
+      Both datasets are now canonically sourced: California Housing via
+      `sklearn.fetch_california_housing()` (no mirror needed), Superconductivity via UCI id 464
+      direct download (the mirror-vs-canonical question the pilot left open is resolved for
+      both). Ten-seed results: California Housing RF $R^2 = 0.809 \pm 0.008$, flat MoG
+      $0.631 \pm 0.020$; Superconductivity (decorrelated) RF $R^2 = 0.923 \pm 0.004$, flat MoG
+      $-0.261 \pm 1.431$. Random Forest wins both cleanly, confirming the single-seed pilot's
+      finding at the document's own protocol. **New finding the pilot's one seed could not
+      show:** flat MoG and HME are wildly unstable on Superconductivity even after
+      decorrelation — occasionally catastrophically negative R², echoing the seed-9 HME
+      divergence `table_concrete_reconciliation` already documents on Concrete. This is now the
+      dataset/model-family decision the item was waiting on: both datasets are promoted, and the
+      instability is itself worth a sentence in Chapter 6, not merely a caveat here.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because
@@ -407,7 +431,9 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       triaged rather than re-derived.
       ANFIS / GA-FIS, 11 cells across Tables 4.5 and 6.2 → `N/A (C1)`. Table 3.7's
       non-coordinate row → Goal G2. Table 6.3's counts → C9 / G6.
-      Table 4.4's RT-IOT2022 accuracy → dataset absent from the repository. Table 6.2's M5 row
+      Table 4.4's RT-IOT2022 accuracy → dataset absent from the repository *(as of 2026-08-02;
+      the dataset is present since 2026-08-12 and the cell now marks a different blocker — see
+      C4 above and Table 4.7b — rather than resolving this historical note)*. Table 6.2's M5 row
       → **a dependency fault, not an unrun experiment**: the generator already imports `m5py`
       optionally and would fill it unattended, but `m5py` does not load against scikit-learn
       1.9.0. Table 4.5's full-2nd training time → deliberately left empty; see note 14 in

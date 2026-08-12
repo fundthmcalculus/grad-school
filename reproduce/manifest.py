@@ -256,6 +256,29 @@ EXPERIMENTS = [
         notes="ANFIS / GA-FIS / M5 columns fill in only if those adapters are available; else N/A.",
     ),
     Experiment(
+        id="table-a7-regression-scale",
+        title="Large-scale regression benchmark: model family on California Housing / Superconductivity",
+        chapter="App",
+        produces="Appendix A.7.1",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_a7_regression_scale.py"),
+        hardware="any",
+        datasets=["California Housing", "Superconductivity"],
+        outputs=[
+            "reproduce/outputs/table_a7_regression_scale.md",
+            "reproduce/outputs/table_a7_regression_scale.csv",
+        ],
+        notes="Supersedes the single-seed pilot in reproduce/regression_scale/ "
+        "(CHECKLIST C13) -- ten seeds, canonically sourced (California Housing via "
+        "sklearn.fetch_california_housing(), Superconductivity via UCI id 464 "
+        "direct download, both resolved 2026-08-12). VERIFIED RUNNING. Random "
+        "Forest wins both datasets cleanly. Flat MoG and HME are unstable on "
+        "Superconductivity even after the FeatureAgglomeration decorrelation the "
+        "pilot found necessary -- occasionally catastrophic negative R2, echoing "
+        "the seed-9 HME divergence table_concrete_reconciliation already documents "
+        "on Concrete.",
+    ),
+    Experiment(
         id="table-6-1-model-family",
         title="Flat / fuzzy-tree / HME vs CART/M5 baselines",
         chapter="Ch6",
@@ -357,6 +380,30 @@ EXPERIMENTS = [
         "regenerating. Stdlib only; no submodule environment required. Exists so "
         "the Ch5 tables stop being hand-transcribed: drift now shows as a diff.",
     ),
+    Experiment(
+        id="table-5-4-ch5-g1-scaling",
+        title="Goal G1 scaling decision rule: two-stage selector vs. flat "
+        "set-cover, n=100..5000, ten seeds (one-pass arm not yet built)",
+        chapter="Ch5",
+        produces="Table 5.4",
+        repo=".",
+        command=["python", "reproduce/tables/table_5_4_ch5_g1_scaling.py"],
+        hardware="any",
+        outputs=[
+            "reproduce/outputs/table_5_4_ch5_g1_scaling.md",
+            "reproduce/outputs/table_5_4_ch5_g1_scaling.csv",
+            "reproduce/outputs/table_5_4_ch5_g1_scaling_raw.csv",
+        ],
+        notes="Does its OWN computation (unlike table-5-x above) -- imports "
+        "ivat_mf/selection/multiscale_persistence/battery_hierarchical directly "
+        "from gated-minimax-selection/ on the root .venv. Runs the two arms of "
+        "Goal G1's decision rule that exist today (07-goals-for-completion.md: "
+        "'Phase five, the one-pass refactor, is plumbing and unattempted') at the "
+        "full size grid the decision rule names, extending "
+        "gated-minimax-selection/notes/SCALING_STUDY.md (single seed, two-stage "
+        "only) with the flat baseline, partition-of-unity error, and a ten-seed "
+        "spread. Takes ~3 minutes on the 2026-08 workstation.",
+    ),
     # ---- Ch3 pVAT / clustering experiments ----
     Experiment(
         id="ch3-adversarial-eval",
@@ -398,6 +445,75 @@ EXPERIMENTS = [
         ],
         notes="Fractional Minkowski p=0.5 (14.1% triangle violations), cosine, and "
         "kNN-geodesic all reproduce the exact ordering (agreement 1.0).",
+    ),
+    Experiment(
+        id="table-3-7-g2-dtw-nonmetric",
+        title="Goal G2: exact reorder + triangle-inequality rate on real DTW dissimilarity matrices",
+        chapter="Ch3",
+        produces="Table 3.7 (last row)",
+        repo="tribble-cluster",
+        command=[
+            "uv",
+            "run",
+            "--with",
+            "aeon",
+            "python",
+            "../reproduce/tables/table_3_7_g2_dtw_nonmetric.py",
+        ],
+        hardware="any",
+        datasets=["ECG5000, FordA, Crop (UCR/UEA via aeon)"],
+        outputs=[
+            "reproduce/outputs/table_3_7_g2_dtw_nonmetric.md",
+            "reproduce/outputs/table_3_7_g2_dtw_nonmetric.csv",
+        ],
+        notes="Fills Table 3.7's 'not run -- no non-coordinate dataset in the harness "
+        "(Goal G2)' row, the single most important credibility gap per Chapter 7's "
+        "Goal G2. VERIFIED RUNNING on all three datasets (2026-08-12): exactness 1.000 "
+        "on ECG5000/FordA/Crop; triangle-inequality violations 20.9%/0.4%/23.6% "
+        "(FordA below the 14% synthetic proxy, the other two above it). Covers "
+        "decision-rule items 1 (exactness), 2 (triangle-inequality rate) and 4 (Crop "
+        "at 24,000 points, the scale target, ~4.6 GB, 1597s matrix + 4.7s reorder). "
+        "Item 3 (downstream usefulness) is a separate script, see "
+        "table-3-7-g2-downstream below. `uv pip install aeon` does not persist under "
+        "this project's lockfile resync, hence --with aeon on the invocation. "
+        "REPRO_G2_DATASETS selects which datasets run (default ECG5000 only); FordA "
+        "(~2h matrix) and Crop (~27min matrix) both took a separate, flagged, "
+        "explicitly-approved run given their cost.",
+    ),
+    Experiment(
+        id="table-3-7-g2-downstream",
+        title="Goal G2 decision-rule item 3: set-cover vs. NERFCM-given-k on real DTW matrices",
+        chapter="Ch3",
+        produces="Table 3.7 companion (downstream usefulness)",
+        repo="tribble-cluster",
+        command=[
+            "uv",
+            "run",
+            "--with",
+            "aeon",
+            "python",
+            "../reproduce/tables/table_3_7_g2_downstream.py",
+        ],
+        hardware="any",
+        datasets=["ECG5000, Crop, FordA (UCR/UEA via aeon)"],
+        outputs=[
+            "reproduce/outputs/table_3_7_g2_downstream.md",
+            "reproduce/outputs/table_3_7_g2_downstream.csv",
+        ],
+        notes="Reuses NERFCM and Chapter 5's select_coverage_cover/select_multiscale "
+        "unmodified from gated-minimax-selection/ -- both already matrix-only and "
+        "already discover k, so this is a new caller, not new algorithm code. "
+        "VERIFIED RUNNING on all three datasets (2026-08-12). Result is mixed, not a "
+        "clean pass: on ECG5000 (the one dataset with real recoverable structure) the "
+        "set-cover BEATS NERFCM-given-k by 0.122 ARI (0.715 vs 0.593), which fails the "
+        "decision rule's +/-0.05 tolerance in the favorable direction; on Crop and "
+        "FordA both methods score low in absolute terms and land within 0.05 of each "
+        "other, a low-information pass. Only 2 of 3 tested sets meet the criterion "
+        "literally, so the 'at least three of five' threshold is not yet satisfied. "
+        "ConiVAT and bottleneck-bootstrap are N/A -- genuine implementation gaps, not "
+        "missing call sites (see the script's docstring). REPRO_G2_DOWNSTREAM_DATASETS "
+        "selects which dataset(s) run; each rebuilds its own DTW matrix rather than "
+        "sharing one with the sibling script.",
     ),
     Experiment(
         id="ch3-autok-eval",
