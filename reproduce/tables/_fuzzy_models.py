@@ -58,28 +58,15 @@ CONCRETE_COLS = [
 def load_concrete():
     """UCI Concrete: 8 mixture/age features -> compressive strength (MPa).
 
-    Resolution order, so this works on a fresh clone without manual setup:
-      1. the repo CSV, if a previous run already cached it;
-      2. UCI via ``ucimlrepo`` (id 165) -- then cached as that CSV;
-      3. the legacy ``.xls`` in AEEM6097 (needs ``xlrd``, often absent).
-    Returns (X, y) or None, printing which route it took.
+    Loads from ``data/Concrete_Data.csv`` or local spreadsheet fallback.
+    Returns (X, y) or None.
     """
     csv_path = os.path.join(DATA_DIR, "Concrete_Data.csv")
 
     if not os.path.exists(csv_path):
         df = None
-        try:  # 2. authoritative source
-            from ucimlrepo import fetch_ucirepo
+        try:  # try local spreadsheet
 
-            ds = fetch_ucirepo(id=165)
-            df = ds.data.features.copy()
-            df["Strength"] = np.asarray(ds.data.targets).ravel()
-            df.columns = CONCRETE_COLS[: len(df.columns)]
-            print("  [concrete] fetched from UCI (id 165)")
-        except Exception as exc:  # noqa: BLE001
-            print(f"  [concrete] UCI fetch unavailable ({exc.__class__.__name__})")
-
-        if df is None:  # 3. local spreadsheet
             xls = os.path.join(
                 REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls"
             )
@@ -114,14 +101,10 @@ def load_concrete():
 
 
 def load_phiusiil(sample_size=20000):
-    """PhiUSIIL phishing. Reuse the repo's own loader if importable; else fetch
-    via ucimlrepo (id 967); else return None so the column shows N/A."""
-    # The repo loader reads a CSV that used to live in the tribble-fis submodule
-    # and was deleted with gaussian_mixture/ (8484fd6). Point it at data/ before
-    # importing, so it finds the file rather than silently failing through to the
-    # ucimlrepo fallback -- which returns a DIFFERENT feature set (numeric-only,
-    # dropna) and drops accuracy from ~0.997 to ~0.913. A fallback that quietly
-    # changes the experiment is worse than no fallback.
+    """PhiUSIIL phishing. Loads from repo loader or data/PhiUSIIL_Phishing_URL_Dataset.csv.
+
+    Returns (X, y) or None if unavailable.
+    """
     local = os.path.join(DATA_DIR, "PhiUSIIL_Phishing_URL_Dataset.csv")
     try:
         sys.path.insert(0, os.path.join(FIS, "tribble-tree"))
@@ -136,22 +119,6 @@ def load_phiusiil(sample_size=20000):
             else "  [phiusiil] repo loader, bundled path"
         )
         return X, np.asarray(y)
-    except Exception as exc:  # noqa: BLE001
-        print(
-            f"  [phiusiil] repo loader unavailable ({exc.__class__.__name__}); "
-            f"FALLING BACK to ucimlrepo -- NOTE: different feature set, "
-            f"results are not comparable to a repo-loader run"
-        )
-    try:
-        from ucimlrepo import fetch_ucirepo
-
-        ds = fetch_ucirepo(id=967)
-        X = ds.data.features.select_dtypes(include=[np.number]).dropna(axis=1)
-        y = np.asarray(ds.data.targets).ravel()
-        if sample_size and len(X) > sample_size:
-            idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
-            X, y = X.iloc[idx], y[idx]
-        return X, y
     except Exception as exc:  # noqa: BLE001
         print(f"  [phiusiil] unavailable ({exc.__class__.__name__}); column -> N/A")
         return None
@@ -225,15 +192,10 @@ def load_beth(combine=True):
 def load_shuttle(sample_size=None):
     """Shuttle: 58k rows × 7 features, 7 classes (structure discovery flagship).
 
-    Resolution order:
-      1. local CSV if present;
-      2. ucimlrepo (UCI id 148);
-      3. None.
-    Returns (X, y) or None.
+    Loads from data/shuttle.csv. Returns (X, y) or None if file not found.
     """
     local = os.path.join(DATA_DIR, "shuttle.csv")
 
-    # Try local first
     if os.path.exists(local):
         try:
             df = pd.read_csv(local)
@@ -250,28 +212,10 @@ def load_shuttle(sample_size=None):
             )
             return X, y
         except Exception as exc:  # noqa: BLE001
-            print(f"  [shuttle] local file unreadable ({exc.__class__.__name__})")
-
-    # Fall back to ucimlrepo
-    try:
-        from ucimlrepo import fetch_ucirepo
-
-        ds = fetch_ucirepo(id=148)
-        X = ds.data.features.select_dtypes(include=[np.number]).astype(float)
-        y = np.asarray(ds.data.targets).ravel()
-        if sample_size and len(X) > sample_size:
-            idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
-            X, y = X.iloc[idx], y[idx]
-        print(
-            f"  [shuttle] fetched from UCI (id 148) and cached to "
-            f"{os.path.relpath(local, REPO_ROOT)}: {len(X)} rows × {X.shape[1]} features"
-        )
-        # Cache locally
-        os.makedirs(os.path.dirname(local), exist_ok=True)
-        pd.concat([X, pd.DataFrame(y, columns=["target"])], axis=1).to_csv(local, index=False)
-        return X, y
-    except Exception as exc:  # noqa: BLE001
-        print(f"  [shuttle] unavailable ({exc.__class__.__name__}); column -> N/A")
+            print(f"  [shuttle] failed to load ({exc.__class__.__name__}); column -> N/A")
+            return None
+    else:
+        print(f"  [shuttle] file not found at {os.path.relpath(local, REPO_ROOT)}")
         return None
 
 
