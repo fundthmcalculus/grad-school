@@ -96,7 +96,9 @@ def load_openset_data():
     if not os.path.exists(path):
         return None
     df = pd.read_csv(path).dropna()
-    print("  [data] RT-IOT2022 and BETH absent -- leave-one-class-out on Glass (214 × 9)")
+    print(
+        "  [data] RT-IOT2022 and BETH absent -- leave-one-class-out on Glass (214 × 9)"
+    )
     return (df.drop(columns=["Type"]).astype(float), df["Type"].astype(int), "Glass")
 
 
@@ -182,9 +184,13 @@ def theta_sweep(X, y, classes, thetas, seeds=None):
             rows,
             note=(
                 "Averaged over held-out classes × seeds"
-                + (f" (seeds={seeds}, a named subset of the ten-seed floor -- "
-                   f"this sweep is a supplementary sensitivity curve, not the "
-                   f"headline table)" if seeds != C.SEEDS else "")
+                + (
+                    f" (seeds={seeds}, a named subset of the ten-seed floor -- "
+                    f"this sweep is a supplementary sensitivity curve, not the "
+                    f"headline table)"
+                    if seeds != C.SEEDS
+                    else ""
+                )
                 + ". This is the curve a user picks an "
                 "operating point on; a single θ in isolation says little. If J stays near "
                 "zero across the whole sweep, the knob does not buy a usable trade on this "

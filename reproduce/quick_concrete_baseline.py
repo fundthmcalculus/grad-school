@@ -22,12 +22,21 @@ ss_x.set_output(transform="pandas")
 Xtr = ss_x.fit_transform(Xtr)
 Xte = ss_x.transform(Xte)
 ss_y = StandardScaler()
-ytr = pd.Series(ss_y.fit_transform(ytr.values.reshape(-1, 1)).ravel(), index=ytr.index, name=ytr.name)
-yte = pd.Series(ss_y.transform(yte.values.reshape(-1, 1)).ravel(), index=yte.index, name=yte.name)
+ytr = pd.Series(
+    ss_y.fit_transform(ytr.values.reshape(-1, 1)).ravel(),
+    index=ytr.index,
+    name=ytr.name,
+)
+yte = pd.Series(
+    ss_y.transform(yte.values.reshape(-1, 1)).ravel(), index=yte.index, name=yte.name
+)
 
 mog_model = F.mog_regressor(seed=42)
 for name, model in [
-    ("Random Forest", RandomForestRegressor(n_estimators=200, random_state=42, n_jobs=-1)),
+    (
+        "Random Forest",
+        RandomForestRegressor(n_estimators=200, random_state=42, n_jobs=-1),
+    ),
     ("Tribble (MoG)", mog_model),
 ]:
     t0 = time.time()
@@ -40,5 +49,7 @@ t0 = time.time()
 rm, bucket_mean = F.ruspinize_regressor(mog_model, Xtr, ytr)
 ruspini_time = time.time() - t0
 r2 = r2_score(yte, F.ruspini_predict_regression(rm, bucket_mean, Xte))
-print(f"Tribble (Ruspini): R2={r2:.4f}  train={ruspini_time:.2f}s  rules={len(rm.rules)}")
+print(
+    f"Tribble (Ruspini): R2={r2:.4f}  train={ruspini_time:.2f}s  rules={len(rm.rules)}"
+)
 F.plot_membership_functions(rm, Xtr, "quick_concrete_ruspini_mfs")

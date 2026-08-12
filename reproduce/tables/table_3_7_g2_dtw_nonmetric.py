@@ -87,7 +87,12 @@ DATASETS = [
 # 4,921x4,921 matrix, against ECG5000's measured ~14-15 min for 5,000x5,000 at a
 # shorter series length (140 vs 500). Crossing this without a heads-up would be
 # the kind of multi-hour unattended compute this harness asks to flag first.
-_KNOWN_SLOW = {"FordA": "~2.7-3h", "ElectricDevices": "unmeasured, likely hours", "StarLightCurves": "unmeasured, likely hours", "Crop": "explicitly out of scope (see docstring)"}
+_KNOWN_SLOW = {
+    "FordA": "~2.7-3h",
+    "ElectricDevices": "unmeasured, likely hours",
+    "StarLightCurves": "unmeasured, likely hours",
+    "Crop": "explicitly out of scope (see docstring)",
+}
 
 
 def _resolve_pvat():
