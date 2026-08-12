@@ -26,7 +26,10 @@ Xte = ss_x.transform(Xte)
 
 mog_model = F.mog_classifier(seed=42)
 for name, model in [
-    ("Random Forest", RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)),
+    (
+        "Random Forest",
+        RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1),
+    ),
     ("Tribble (MoG)", mog_model),
 ]:
     t0 = time.time()
@@ -39,5 +42,7 @@ t0 = time.time()
 rm = F.ruspinize_classifier(mog_model, Xtr, ytr)
 ruspini_time = time.time() - t0
 acc = accuracy_score(yte, rm.predict(Xte))
-print(f"Tribble (Ruspini): acc={acc:.4f}  train={ruspini_time:.2f}s  rules={len(rm.rules)}")
+print(
+    f"Tribble (Ruspini): acc={acc:.4f}  train={ruspini_time:.2f}s  rules={len(rm.rules)}"
+)
 F.plot_membership_functions(rm, Xtr, "quick_phishing_ruspini_mfs")

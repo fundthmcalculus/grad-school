@@ -168,7 +168,9 @@ def single_linkage_given_k_ari(Ds, y, k):
 
 
 def main():
-    print("Table 3.7 (Goal G2) companion -- decision-rule item 3: downstream usefulness")
+    print(
+        "Table 3.7 (Goal G2) companion -- decision-rule item 3: downstream usefulness"
+    )
     rows = []
     for name in DATASETS:
         print(f"\n== {name} ==")

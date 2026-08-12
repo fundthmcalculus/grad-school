@@ -67,9 +67,7 @@ def load_concrete():
 
     if not os.path.exists(csv_path):
         df = None
-        xls = os.path.join(
-            REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls"
-        )
+        xls = os.path.join(REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls")
         if os.path.exists(xls):
             try:
                 df = pd.read_excel(xls)
@@ -84,7 +82,9 @@ def load_concrete():
                 print(f"  [concrete] .xls unreadable ({exc.__class__.__name__})")
 
         if df is None:
-            print(f"  [concrete] file not found at {os.path.relpath(csv_path, REPO_ROOT)}")
+            print(
+                f"  [concrete] file not found at {os.path.relpath(csv_path, REPO_ROOT)}"
+            )
             return None
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
         df.to_csv(csv_path, index=False)
@@ -149,7 +149,9 @@ def load_rt_iot2022(sample_size=None):
         print(f"  [rt-iot2022] file not found at {os.path.relpath(local, REPO_ROOT)}")
         return None
     except Exception as exc:  # noqa: BLE001
-        print(f"  [rt-iot2022] failed to load ({exc.__class__.__name__}); column -> N/A")
+        print(
+            f"  [rt-iot2022] failed to load ({exc.__class__.__name__}); column -> N/A"
+        )
         return None
 
 
@@ -177,7 +179,9 @@ def load_beth():
         for split_name, filename in splits.items():
             path = os.path.join(beth_dir, filename)
             if not os.path.exists(path):
-                print(f"  [beth] missing {split_name} split at {os.path.relpath(path, REPO_ROOT)}")
+                print(
+                    f"  [beth] missing {split_name} split at {os.path.relpath(path, REPO_ROOT)}"
+                )
                 return None
 
             df = pd.read_csv(path)
@@ -213,7 +217,9 @@ def load_shuttle(sample_size=None):
             X = X.select_dtypes(include=[np.number]).astype(float)
             y = np.asarray(y)
             if sample_size and len(X) > sample_size:
-                idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
+                idx = np.random.RandomState(42).choice(
+                    len(X), sample_size, replace=False
+                )
                 X, y = X.iloc[idx], y[idx]
             print(
                 f"  [shuttle] loaded {os.path.relpath(local, REPO_ROOT)}: "
@@ -221,7 +227,9 @@ def load_shuttle(sample_size=None):
             )
             return X, y
         except Exception as exc:  # noqa: BLE001
-            print(f"  [shuttle] failed to load ({exc.__class__.__name__}); column -> N/A")
+            print(
+                f"  [shuttle] failed to load ({exc.__class__.__name__}); column -> N/A"
+            )
             return None
     else:
         print(f"  [shuttle] file not found at {os.path.relpath(local, REPO_ROOT)}")
@@ -253,13 +261,17 @@ def load_bikeshare(target_col="cnt", sample_size=None):
         y = df[target_col].astype(float)
         y.name = "y_value"
         # Drop non-numeric and index columns (dteday, instant, etc.)
-        X = df.select_dtypes(include=[np.number]).drop(columns=[target_col], errors="ignore")
+        X = df.select_dtypes(include=[np.number]).drop(
+            columns=[target_col], errors="ignore"
+        )
         # Drop obvious ID/index columns if present
         X = X.drop(columns=["instant"], errors="ignore").astype(float)
 
         if sample_size and len(X) > sample_size:
             idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
-            X, y = X.iloc[idx].reset_index(drop=True), y.iloc[idx].reset_index(drop=True)
+            X, y = X.iloc[idx].reset_index(drop=True), y.iloc[idx].reset_index(
+                drop=True
+            )
 
         print(
             f"  [bikeshare] loaded {os.path.relpath(local, REPO_ROOT)}: "
@@ -430,13 +442,17 @@ def mog_classifier(seed):
 # combinations, instead of the marginal Cartesian product, is the whole point
 # of exercising this path in the quick scripts.
 
+
 def ruspinize_classifier(model, X, y, cluster_joint_terms=True, min_cluster_frac=0.05):
     """Derive a RuspiniPartitionModel from a fitted TribbleClassifier."""
     from tribblefis.ruspini import ruspinize_model
 
     return ruspinize_model(
-        model.model_, X, y,
-        cluster_joint_terms=cluster_joint_terms, min_cluster_frac=min_cluster_frac,
+        model.model_,
+        X,
+        y,
+        cluster_joint_terms=cluster_joint_terms,
+        min_cluster_frac=min_cluster_frac,
     )
 
 
@@ -464,10 +480,15 @@ def ruspinize_regressor(model, X, y, cluster_joint_terms=True, min_cluster_frac=
     from tribblefis.regression import partition_output
 
     y_series = pd.Series(np.asarray(y).flatten(), name="y_value")
-    y_partitioned, bucket_mean = partition_output(model.n_output_buckets, y_series, method=model.output_partition)
+    y_partitioned, bucket_mean = partition_output(
+        model.n_output_buckets, y_series, method=model.output_partition
+    )
     rm = ruspinize_model(
-        model.model_, X, y_partitioned["y_bucket"],
-        cluster_joint_terms=cluster_joint_terms, min_cluster_frac=min_cluster_frac,
+        model.model_,
+        X,
+        y_partitioned["y_bucket"],
+        cluster_joint_terms=cluster_joint_terms,
+        min_cluster_frac=min_cluster_frac,
     )
     return rm, bucket_mean
 
@@ -488,6 +509,7 @@ def ruspini_predict_regression(rm, bucket_mean, X):
 # `method="optimizers"`'s population search. That's the "basic" refinement
 # these quick scripts want: a fast pass to report alongside the unrefined
 # Ruspini numbers, not a tuned search.
+
 
 def refine_classifier(rm, X, y, **kwargs):
     """Refine a classifier's Ruspini partition. Returns (refined_rm, info)."""
@@ -512,7 +534,9 @@ def refine_regressor(model, rm, X, y, **kwargs):
     from tribblefis.regression import partition_output
 
     y_series = pd.Series(np.asarray(y).flatten(), name="y_value")
-    y_partitioned, _ = partition_output(model.n_output_buckets, y_series, method=model.output_partition)
+    y_partitioned, _ = partition_output(
+        model.n_output_buckets, y_series, method=model.output_partition
+    )
     kwargs.setdefault("method", "coordinate")
     kwargs.setdefault("seed", 42)
     kwargs.setdefault("verbose", False)
@@ -526,12 +550,15 @@ def plot_membership_functions(rm, X, basename, max_features=6):
     Returns the path(s) written (see `common.save_figure`).
     """
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     features = rm.feature_order[:max_features]
     terms = rm.feature_terms()
-    fig, axes = plt.subplots(len(features), 1, figsize=(6, 2.0 * len(features)), squeeze=False)
+    fig, axes = plt.subplots(
+        len(features), 1, figsize=(6, 2.0 * len(features)), squeeze=False
+    )
     for ax, f in zip(axes[:, 0], features):
         col = X[f].to_numpy(dtype=float) if f in X.columns else np.asarray(rm.apexes[f])
         lo, hi = float(np.min(col)), float(np.max(col))

@@ -41,7 +41,9 @@ for name, loader, kwargs in LOADERS:
         print(f"  [FAILED] {name}: loader returned None")
     elif name == "BETH":
         # BETH returns a dict with train/val/test splits
-        if isinstance(result, dict) and all(k in result for k in ["train", "val", "test"]):
+        if isinstance(result, dict) and all(
+            k in result for k in ["train", "val", "test"]
+        ):
             total_rows = sum(len(result[s][0]) for s in ["train", "val", "test"])
             features = result["train"][0].shape[1]
             results[name] = f"OK ({total_rows} total rows, {features} features)"
@@ -69,7 +71,9 @@ print()
 
 failed = [name for name, status in results.items() if not status.startswith("OK")]
 if failed:
-    print(f"ERROR: {len(failed)} loader(s) failed. Check file paths and data integrity.")
+    print(
+        f"ERROR: {len(failed)} loader(s) failed. Check file paths and data integrity."
+    )
     sys.exit(1)
 else:
     print("SUCCESS: All loaders passed!")
