@@ -3,6 +3,8 @@
 
 import os
 import sys
+import os
+
 import time
 
 from sklearn.ensemble import RandomForestClassifier
@@ -13,7 +15,23 @@ from sklearn.preprocessing import StandardScaler
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tables"))
 import _fuzzy_models as F  # noqa: E402
 
+print("=" * 70)
+print("RT-IOT2022 Open-Set Detection — Single Example Baseline")
+print("=" * 70)
+print()
+
+# Load data
 X, y = F.load_rt_iot2022()
+if X is None:
+    print("ERROR: Could not load RT-IOT2022")
+    sys.exit(1)
+
+print(f"Dataset: {len(X)} rows × {X.shape[1]} features, {len(np.unique(y))} classes")
+classes = np.unique(y)
+print(f"Classes: {classes}")
+print()
+
+# Simple train/test split (80/20, one seed)
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
 # Easy unit scalar
 ss_x = StandardScaler()
