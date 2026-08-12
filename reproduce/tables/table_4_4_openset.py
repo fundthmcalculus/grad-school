@@ -57,23 +57,30 @@ CONORM = os.environ.get("REPRO_ANOM_CONORM", "hamacher")
 
 
 def load_openset_data():
-    """(X, y) for the leave-one-class-out protocol. BETH if present, else Glass."""
-    # Under data/, not the submodule: tribble-fis dropped `gaussian_mixture/` in
-    # 8484fd6 and is now a pure library. See _fuzzy_models.DATA_DIR.
-    beth = os.path.join(F.DATA_DIR, "beth_data", "labelled_training_data.csv")
-    if os.path.exists(beth):
-        print("  [data] BETH found -- using it")
-        df = pd.read_csv(beth)
-        y = pd.Series(np.where(df.get("evil", 0) == 1, "anomaly", "regular"))
-        X = df.select_dtypes(include=[np.number]).drop(
-            columns=[c for c in ("sus", "evil") if c in df.columns], errors="ignore"
-        )
+    """(X, y) for the leave-one-class-out protocol.
+
+    Priority: RT-IOT2022 (123k) > BETH (3.8M) > Glass (214).
+    """
+    # Try RT-IOT2022 first (large-scale public dataset)
+    iot = F.load_rt_iot2022()
+    if iot is not None:
+        X, y = iot
+        print("  [data] RT-IOT2022 found (123k × 83, 12 classes) -- using it")
+        return X, y, "RT-IOT2022"
+
+    # Try BETH (explicit train split for anomaly detection)
+    beth_splits = F.load_beth()
+    if beth_splits is not None:
+        X, y = beth_splits["train"]
+        print("  [data] BETH found (training split, 763k × 10) -- using it")
         return X, y, "BETH"
+
+    # Fall back to Glass (small public dataset)
     path = os.path.join(F.REPO_ROOT, "glass.csv")
     if not os.path.exists(path):
         return None
     df = pd.read_csv(path).dropna()
-    print("  [data] BETH absent -- leave-one-class-out on Glass (public, in-repo)")
+    print("  [data] RT-IOT2022 and BETH absent -- leave-one-class-out on Glass (214 × 9)")
     return (df.drop(columns=["Type"]).astype(float), df["Type"].astype(int), "Glass")
 
 
