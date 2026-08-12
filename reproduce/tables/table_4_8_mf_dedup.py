@@ -79,10 +79,10 @@ import common as C  # noqa: E402
 import _mf_dedup as D  # noqa: E402
 
 from tribblefis.gaussian_classifier import (  # noqa: E402
-    MixtureOfGaussiansFuzzyClassifier,
-    MixtureOfGaussiansFuzzySequenceClassifier,
+    TribbleClassifier,
+    TribbleSequenceClassifier,
 )
-from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor  # noqa: E402
+from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 from tribblefis.regression import predict_tsk  # noqa: E402
 from tribblefis.gauss_math import simple_gaussian_predict  # noqa: E402
 
@@ -124,7 +124,7 @@ def _sweep_classification(name, loader):
                 X, y, test_size=0.3, random_state=seed
             )
         top_n = min(5, X.shape[1])
-        clf = MixtureOfGaussiansFuzzyClassifier(top_n=top_n, random_state=seed)
+        clf = TribbleClassifier(top_n=top_n, random_state=seed)
         clf.fit(X_tr, y_tr)
         raw_mf = clf.model_.n_membership_functions
         acc_raw = accuracy_score(y_te, clf.predict(X_te))
@@ -149,7 +149,7 @@ def _sweep_regression(name, loader):
         X_tr, X_te, y_tr, y_te = train_test_split(
             X, y, test_size=0.3, random_state=seed
         )
-        reg = MixtureOfGaussiansFuzzyRegressor(
+        reg = TribbleRegressor(
             n_output_buckets=3, tsk_order="1st", top_n=-1, random_state=seed
         )
         reg.fit(X_tr, y_tr)
@@ -238,12 +238,12 @@ def run_glass_cascade():
             X, y, test_size=0.3, random_state=seed, stratify=y
         )
 
-        base = MixtureOfGaussiansFuzzyClassifier(top_n=5, random_state=seed)
+        base = TribbleClassifier(top_n=5, random_state=seed)
         base.fit(X_tr, y_tr)
         acc_base.append(accuracy_score(y_te, base.predict(X_te)))
         raw_mf_base.append(base.model_.n_membership_functions)
 
-        casc = MixtureOfGaussiansFuzzySequenceClassifier(top_n=5, random_state=seed)
+        casc = TribbleSequenceClassifier(top_n=5, random_state=seed)
         casc.fit(X_tr, y_tr)
         acc_casc.append(accuracy_score(y_te, casc.predict(X_te).astype(int)))
         raw_mf_casc.append(
