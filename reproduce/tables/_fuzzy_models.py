@@ -65,9 +65,7 @@ def load_concrete():
 
     if not os.path.exists(csv_path):
         df = None
-        xls = os.path.join(
-            REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls"
-        )
+        xls = os.path.join(REPO_ROOT, "AEEM6097", "project-data", "Concrete_Data.xls")
         if os.path.exists(xls):
             try:
                 df = pd.read_excel(xls)
@@ -82,7 +80,9 @@ def load_concrete():
                 print(f"  [concrete] .xls unreadable ({exc.__class__.__name__})")
 
         if df is None:
-            print(f"  [concrete] file not found at {os.path.relpath(csv_path, REPO_ROOT)}")
+            print(
+                f"  [concrete] file not found at {os.path.relpath(csv_path, REPO_ROOT)}"
+            )
             return None
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)
         df.to_csv(csv_path, index=False)
@@ -147,7 +147,9 @@ def load_rt_iot2022(sample_size=None):
         print(f"  [rt-iot2022] file not found at {os.path.relpath(local, REPO_ROOT)}")
         return None
     except Exception as exc:  # noqa: BLE001
-        print(f"  [rt-iot2022] failed to load ({exc.__class__.__name__}); column -> N/A")
+        print(
+            f"  [rt-iot2022] failed to load ({exc.__class__.__name__}); column -> N/A"
+        )
         return None
 
 
@@ -175,7 +177,9 @@ def load_beth():
         for split_name, filename in splits.items():
             path = os.path.join(beth_dir, filename)
             if not os.path.exists(path):
-                print(f"  [beth] missing {split_name} split at {os.path.relpath(path, REPO_ROOT)}")
+                print(
+                    f"  [beth] missing {split_name} split at {os.path.relpath(path, REPO_ROOT)}"
+                )
                 return None
 
             df = pd.read_csv(path)
@@ -211,7 +215,9 @@ def load_shuttle(sample_size=None):
             X = X.select_dtypes(include=[np.number]).astype(float)
             y = np.asarray(y)
             if sample_size and len(X) > sample_size:
-                idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
+                idx = np.random.RandomState(42).choice(
+                    len(X), sample_size, replace=False
+                )
                 X, y = X.iloc[idx], y[idx]
             print(
                 f"  [shuttle] loaded {os.path.relpath(local, REPO_ROOT)}: "
@@ -219,7 +225,9 @@ def load_shuttle(sample_size=None):
             )
             return X, y
         except Exception as exc:  # noqa: BLE001
-            print(f"  [shuttle] failed to load ({exc.__class__.__name__}); column -> N/A")
+            print(
+                f"  [shuttle] failed to load ({exc.__class__.__name__}); column -> N/A"
+            )
             return None
     else:
         print(f"  [shuttle] file not found at {os.path.relpath(local, REPO_ROOT)}")
@@ -251,13 +259,17 @@ def load_bikeshare(target_col="cnt", sample_size=None):
         y = df[target_col].astype(float)
         y.name = "y_value"
         # Drop non-numeric and index columns (dteday, instant, etc.)
-        X = df.select_dtypes(include=[np.number]).drop(columns=[target_col], errors="ignore")
+        X = df.select_dtypes(include=[np.number]).drop(
+            columns=[target_col], errors="ignore"
+        )
         # Drop obvious ID/index columns if present
         X = X.drop(columns=["instant"], errors="ignore").astype(float)
 
         if sample_size and len(X) > sample_size:
             idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
-            X, y = X.iloc[idx].reset_index(drop=True), y.iloc[idx].reset_index(drop=True)
+            X, y = X.iloc[idx].reset_index(drop=True), y.iloc[idx].reset_index(
+                drop=True
+            )
 
         print(
             f"  [bikeshare] loaded {os.path.relpath(local, REPO_ROOT)}: "

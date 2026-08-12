@@ -41,7 +41,9 @@ try:
 
     y = df["Total_Power"].astype(float)
     # Keep only spatial coordinates (X/Y columns), exclude Power columns and qW
-    exclude_cols = ["Total_Power", "qW"] + [c for c in df.columns if c.startswith("Power")]
+    exclude_cols = ["Total_Power", "qW"] + [
+        c for c in df.columns if c.startswith("Power")
+    ]
     X = df.drop(columns=exclude_cols).select_dtypes(include=[np.number]).astype(float)
 
     print(f"Features: {X.shape[1]} numeric columns")

@@ -113,7 +113,9 @@ try:
     print(f"  Prediction: {mog_nr_pred_time:.4f}s")
     print(f"  Accuracy: {mog_nr_acc:.4f}")
     print()
-    print(f"Speedup (feature ranking removed): {mog_train_time / mog_nr_train_time:.2f}x")
+    print(
+        f"Speedup (feature ranking removed): {mog_train_time / mog_nr_train_time:.2f}x"
+    )
 except Exception as exc:
     print(f"  [failed: {exc.__class__.__name__}: {exc}]")
 
