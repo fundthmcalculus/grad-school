@@ -20,7 +20,7 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Role:** Open-set detection testbed (planned); intended to replace Glass (214 samples) as the large-scale anomaly/open-set partner
 - **Source:** [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 952
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_rt_iot2022()` (not yet wired)
-- **Status:** In the repository and wired (2026-08-12). `load_openset_data()` prefers RT-IOT2022 over BETH over Glass. Open-set claim measured at five seeds (Table 4.7b): complement rule loses to Isolation Forest at this scale. Plain classification/timing (Table 4.4's own row) still not run at the ten-seed protocol — only a single-split sanity check exists.
+- **Status:** In the repository and wired (2026-08-12), both roles measured. Open-set claim at five seeds (Table 4.7b): complement rule loses to Isolation Forest at this scale. Plain classification/timing at ten seeds (Table 4.4, `table_4_1_mog_baselines.py`): MoG trains in 37.42 ± 0.64 s at 92.7 ± 0.2% accuracy against Random Forest's 99.9 ± 0.0%.
 
 #### Glass (UCI) (Tables 4.6–4.7, Fig 4.2, §4.4)
 - **File:** Auto-fetched via sklearn or `ucimlrepo` (id 41)
@@ -194,7 +194,7 @@ The proposal currently has only one regression benchmark (**Concrete**, 1,030 ro
 |---|---|---|---|---|
 | **Regression** | Concrete (1,030) | Bike Sharing (17,379); California Housing (20,433); Superconductivity (21,263) | **Yes** (2026-08-12, 10 seeds) | Bike Sharing in Table 4.1; California Housing/Superconductivity in new Appendix A.7.1 generator — RF wins both, flat MoG/HME unstable on Superconductivity |
 | **Classification** | Glass (214) | PhiUSIIL (235k) | Yes | Fixed; was broken, now working |
-| **Classification (open-set)** | Glass (214) | RT-IOT2022 (123k) | **Partially** (2026-08-12, 5 seeds) | Open-set measured (Table 4.7b): complement rule loses to Isolation Forest at scale. Plain classification/timing not yet at the ten-seed protocol |
+| **Classification (open-set)** | Glass (214) | RT-IOT2022 (123k) | **Yes** (2026-08-12, both roles) | Open-set (5 seeds, Table 4.7b): complement rule loses to Isolation Forest. Classification/timing (10 seeds, Table 4.4): MoG 92.7% / 37.4s vs. RF 99.9% |
 | **Anomaly** | Glass (214) | BETH (3.8M) | No | BETH in place; no measurements yet; still blocked on the one-class-protocol decision (§7.3) |
 | **Clustering** | Synthetic (120–1.5k) | Shuttle (58k) | Demonstrated | Shuttle in place; demo not repeatable |
 | **Membership Gen** | Synthetic (120–160) | Scalable batteries (100–5,000) | **Yes** (2026-08-12, 10 seeds) | `many_scale` solid, `single_scale` less stable than believed, `log_separated` gradual — see Ch5 §5.4, Goal G1 |

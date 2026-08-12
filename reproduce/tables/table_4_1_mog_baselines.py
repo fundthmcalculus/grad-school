@@ -170,6 +170,22 @@ def main():
     else:
         rows.append(["PhiUSIIL (classification)", C.NA, C.NA, C.NA, C.NA, C.NA])
 
+    iot = _fm.load_rt_iot2022()
+    if iot is not None:
+        X, y = iot
+        # RT-IOT2022: raw features, left unnormalized -- matches the open-set
+        # measurement (table_4_4_openset.py) and the single-split sanity check
+        # (quick_iot_baseline.py), neither of which normalizes, so this row is
+        # comparable to both rather than introducing a third convention.
+        # top_n=5 (mog_classifier's default) -- NOT the open-set experiment's
+        # all-82-feature antecedent screen, so this is materially cheaper and
+        # answers a different question (the plain classification/timing claim
+        # Table 4.4's row names, not the open-set complement-rule claim).
+        cols = _bench("clf", X, y, _fm.mog_classifier, accuracy_score, norm=False)
+        rows.append(_row("RT-IOT2022 (12-class)", "acc", cols))
+    else:
+        rows.append(["RT-IOT2022 (12-class)", C.NA, C.NA, C.NA, C.NA, C.NA])
+
     header = [
         "Dataset (task)",
         "MoG train time",

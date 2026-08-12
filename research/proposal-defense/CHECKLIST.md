@@ -312,12 +312,15 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       If end-to-end, C3 is done. Ch 7 §7.2 tracks this as **C3**.
 - [x] ✅ **C4 — Quantify the correction-rule pass** (Ch 4 §4.3.1, Table 4.9, Fig 4.3;
       2026-08-05). Measured on Glass, ten paired seeds — not RT-IOT2022. **RT-IOT2022 is now in
-      the repository (2026-08-12)**, and the *related but distinct* open-set scale claim (§4.3.5,
-      Table 4.7b) is now measured there: the complement rule loses to Isolation Forest at scale
-      (+0.394 vs +0.537 Youden's $J$), at five seeds rather than the ten-seed floor. The
-      *correction-rule cascade's own* scale claim (twelve classes, eighty-three features) is
-      still open — that specific experiment has not been run on RT-IOT2022 — but "RT-IOT2022 is
-      absent" is no longer the reason.
+      the repository (2026-08-12), and two of its three related-but-distinct scale claims are now
+      measured.** Table 4.4's plain classification/timing claim (twelve classes, eighty-two
+      features): MoG trains in $37.42 \pm 0.64$ s at $0.927 \pm 0.002$ accuracy against Random
+      Forest's $0.999 \pm 0.000$ (ten seeds, `table_4_1_mog_baselines.py`). The open-set scale
+      claim (§4.3.5, Table 4.7b): the complement rule loses to Isolation Forest at scale
+      (+0.394 vs +0.537 Youden's $J$, five seeds). **The *correction-rule cascade's own* scale
+      claim is the one still open** — that specific experiment (the gated cascade below, on
+      RT-IOT2022 rather than Glass) has not been run — but "RT-IOT2022 is absent" is no longer
+      the reason for any of the three.
       The gated cascade gains +0.031 ± 0.027 accuracy over the flat base at a cost of raising
       raw membership functions from 81.4 to 109.0; collapsing it into one deployable FIS
       (union every layer, dedup at exact tolerance, predict by plain argmax) keeps +0.014 ±
