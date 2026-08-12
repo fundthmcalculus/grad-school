@@ -157,6 +157,7 @@ CLUSTER_TABLES=(
   table_3_1_reorder_three_arm
   table_3_2_memory_precision
   table_3_4_gpu_speedups
+  table_3_7_g2_dtw_nonmetric
 )
 
 # Per-table dependency overrides, for a table needing something the group's
@@ -172,6 +173,11 @@ CLUSTER_TABLES=(
 # is a real deliverable, and a resolution error that emits nothing is not.
 declare -A TABLE_DEPS=(
   [table_3_4_gpu_speedups]="--with scipy --with cupy-cuda12x"
+  # Goal G2: real non-coordinate (DTW) data via aeon. `uv pip install` does not
+  # persist here -- `uv run --project` re-syncs from the lockfile and drops it --
+  # so, like the CuPy row above, the dependency has to ride on the invocation.
+  # This table also downloads UCR/UEA archives on first run (network + disk).
+  [table_3_7_g2_dtw_nonmetric]="--with aeon"
 )
 declare -A TABLE_DEPS_FALLBACK=(
   [table_3_4_gpu_speedups]="--with scipy"

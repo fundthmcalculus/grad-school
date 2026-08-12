@@ -238,10 +238,10 @@ A.5 above answers *is this dataset public, and is it present in this repository.
 |---|---|---|---|
 | UCI Concrete Compressive Strength | 1,030 × 8 | measured (Ch1, Ch2, Ch4 §4.3.2–4.4, Ch6, every table generator that touches regression) | small / fast — the *only* regression benchmark in the document, at every consequent order |
 | Diabetes (sklearn) | 442 × 10 | measured (Table 4.8, dedup sweep only) | small / fast — chosen for the tolerance sweep, not a modeling flagship |
+| California Housing (sklearn, canonical) | 20,433 × 8 | measured, ten seeds (`table_a7_regression_scale.py`, 2026-08-12): RF $R^2 = 0.809 \pm 0.008$; flat MoG $0.631 \pm 0.020$ | large / scale — first large regression partner |
+| Superconductivity (UCI id 464) | 21,263 × 81, decorrelated | measured, ten seeds, same generator: RF $R^2 = 0.923 \pm 0.004$; flat MoG and HME **unstable** ($-0.261 \pm 1.431$, $-0.766 \pm 2.411$) | large / scale — same generator, second dataset |
 
-**Gap.** No large regression dataset appears anywhere. Concrete carries the entire regression story, including Chapter 6's model-family comparison and the optimizer study's hot-start problem (A.7.6). There is no regression counterpart to classification's PhiUSIIL/RT-IOT2022 pairing below.
-
-*A pilot investigation of this gap exists*, `reproduce/regression_scale/RESULTS_2026-08-05.md`: single-seed, not canonically sourced, and not yet a decision about which dataset or model family to carry forward — see CHECKLIST **C13**. Filed as a start, not a close.
+**Gap, narrowed but not closed.** Concrete still carries the entire *small* regression story. A large partner now exists at this document's own ten-seed floor: `reproduce/tables/table_a7_regression_scale.py` (2026-08-12) measures California Housing (`sklearn.fetch_california_housing()`, canonical, 20,433 × 8) and Superconductivity (UCI id 464, direct download, 21,263 × 81, decorrelated via `sklearn.cluster.FeatureAgglomeration` before every model — raw features break the flat MoG's closed-form solve, per the pilot's own finding) across the flat/fuzzy-tree/HME/CART/Random Forest family. Random Forest wins both cleanly (California Housing $R^2 = 0.809 \pm 0.008$; Superconductivity $R^2 = 0.923 \pm 0.004$). The more interesting finding is a caveat, not a win: the flat MoG and HME mixture are **wildly unstable on Superconductivity even after decorrelation** — $R^2 = -0.261 \pm 1.431$ and $-0.766 \pm 2.411$ respectively, occasionally catastrophically negative — echoing the seed-9 HME divergence Chapter 6's `table_concrete_reconciliation` already documents on Concrete. So the *pairing* exists now; what it demonstrates is that the flat/HME instability generalizes to a second, larger, unrelated dataset, which is itself worth a sentence in Chapter 6, not that this construction scales cleanly to large regression data. Superseded: `reproduce/regression_scale/RESULTS_2026-08-05.md`'s single-seed pilot (CHECKLIST **C13**), which this generator formalizes at ten seeds and canonical sourcing for both datasets.
 
 ### A.7.2 Classification
 
@@ -250,9 +250,9 @@ A.5 above answers *is this dataset public, and is it present in this repository.
 | Glass (UCI) | 214 × 9, 6 classes | measured — also the anomaly substitute (A.7.3) and the Table 4.8/4.9 dedup and correction-pass testbed | small / fast |
 | Wine, Breast Cancer, Digits (sklearn) | 178×13 / 569×30 / 1,797×64 | measured (Table 4.8, dedup sweep only) | small / fast |
 | PhiUSIIL phishing URL | 235,000 × 54, binary | measured historically (Table 4.1: 0.997 ± 0.001 acc, 0.28–0.64 s) — **but no longer reproducible from a clean checkout.** The repo loader's bundled copy lived at `tribble-fis/gaussian_mixture/phishing_data/`, and `gaussian_mixture/` was deleted upstream (commit `8484fd6`, per `_fuzzy_models.py`'s own comment); `data/` in this repository holds only `Concrete_Data.csv`. A fresh run falls through to a `ucimlrepo` fetch that returns a *different* feature set, which the loader's own comment flags as producing results "not comparable" to every number quoted from it | large / scale — the one role currently filled, on a fragile path |
-| RT-IOT2022 | 123,000 × 83, 12 classes | named — `FuzzySystemsExperiments/iot.py` exists but its own comment states the `rt-iot2022/` data directory "is not in this repo"; Table 4.4 marks the row unrun | large / scale — the *intended* flagship, never measured |
+| RT-IOT2022 | 123,000 × 83, 12 classes | **in the repository as of 2026-08-12.** Its *open-set* role is measured at the harness's protocol, five seeds (Table 4.7b): the complement rule loses to Isolation Forest at this scale (+0.394 vs +0.537 Youden's $J$). Its plain classification/timing role (Table 4.4's row) is still `not run` at the ten-seed protocol — only a single-split sanity check exists (93.2% acc., `quick_iot_baseline.py`) | large / scale — the open-set half is now measured (unfavorably); the classification/timing half is still a named, unmeasured claim |
 
-**Gap, of a different shape than A.7.1's.** Both roles are nominally filled, but the large role has no solid representative today: PhiUSIIL's measured numbers are real but sit on a reproduction path this pass found to be broken, and RT-IOT2022, the dataset actually named as the chapter's scale target, has never been run at all. A.5 states "Concrete, PhiUSIIL and the shuttle set are public and present, a reader can reproduce those results directly" — that sentence is no longer accurate for PhiUSIIL and is worth revisiting there.
+**Gap, of a different shape than A.7.1's, and partly closed.** The large role is no longer entirely unfilled: RT-IOT2022 is present and its open-set behavior is measured, at reduced seed count and without the θ-sweep Table 4.6 runs on Glass. What remains unmeasured is the plain accuracy/timing claim this table's row was originally about, and PhiUSIIL's reproduction path is unchanged — its measured numbers are real but sit on a path this pass found to be broken. A.5 states "Concrete, PhiUSIIL and the shuttle set are public and present, a reader can reproduce those results directly" — that sentence is still not accurate for PhiUSIIL and is worth revisiting there.
 
 ### A.7.3 Anomaly / open-set detection
 
@@ -280,26 +280,26 @@ A.5 above answers *is this dataset public, and is it present in this repository.
 | two_gaussians, bridged_gaussians, concentric_rings, varying_density, uniform_noise | 120–160 pts | measured (Table 5.1) | small / fast |
 | nested_gaussians, three_level_hierarchy, density_hierarchy | n = 96–120, single fixed realization | measured, but with no seed spread — "singly-realized" (Table 5.2, Fig 5.2) | small |
 | three_clusters_tree, chain_then_ring, multi_scale_hierarchy | n = 30, 40, 39 | measured — the chapter's only coordinate-free experiment, and it scores NERFCM rather than the chapter's own selector | small |
-| scalable_single_scale, scalable_many_scale, scalable_log_separated | n = 100…5,000, generator-swept | named only. §5.4's own text is explicit: "no recorded run of the [8, 4, 2] recovery exists at any size other than 96... the 'unchanged from 100 up to 5,000' sentence describes a table never written" | large / scale — the generators exist and run (`battery_hierarchical.SCALABLE`), but no output has ever been produced or registered in `reproduce/manifest.py` |
+| scalable_single_scale, scalable_many_scale, scalable_log_separated | n = 100…5,000, generator-swept | **measured, ten seeds, 2026-08-12** (`table_5_4_ch5_g1_scaling.py`, registered in `reproduce/manifest.py`). `many_scale`: [8,4,2] at ARI 1.00, every seed, every $n$. `single_scale`: granularity mode agrees only 5–7/10 seeds — less stable than the single n=96 run implied. `log_separated`: gradual ARI climb 0.73→0.99 from $n=100$ to $n\ge2{,}000$, not a sharp threshold | large / scale — measured against a flat set-cover baseline, not yet against the one-pass generator (phase five, still unbuilt) |
 
-**Gap.** This is the one category where the chapter has already caught and stated its own gap in the prose: every dataset actually scored is small (≤160 points, several at a single fixed size with no seed spread), and the large/scaling regime this chapter needs to support its own invariance claim exists only as an unrun generator.
+**Gap, narrowed.** The scaling regime this chapter needed to support its own invariance claim is no longer an unrun generator — it is measured, at ten seeds, with a genuine mixed result: `many_scale` confirms cleanly, `single_scale` turns out less stable than the single-seed study suggested, and `log_separated` shows a gradual rather than sharp size-dependence. What is still missing is timing for the full pipeline at these sizes and the one-pass construction itself (Goal G1's phase five), so this closes the *measurement* gap the chapter's own prose flagged, not the *construction* gap Goal G1 is ultimately about.
 
 ### A.7.6 Optimizer / identification benchmarks — a role reuse, not a separate pool
 
 `reproduce/optimizers/` and Chapter 6 §6.3.5 do not introduce new datasets; they put Concrete and PhiUSIIL through a different task (antecedent-refinement search, classical-vs-construction identification at scale) and inherit both datasets' status from A.7.1 and A.7.2 above — Concrete filling the small/fast rung, PhiUSIIL the large/scale one, on the same fragile reproduction path noted there. Appendix A.3's TSP timings reuse the two_moons/circles synthetics from A.7.4 for the same reason.
 
-### A.7.7 Non-coordinate / relational family for Goal G2 — verified loadable, not yet wired in
+### A.7.7 Non-coordinate / relational family for Goal G2 — three of six now measured
 
 | Dataset | Size | Status |
 |---|---|---|
-| ECG5000 | 5,000 series × 140 | unwired — verified loadable via `aeon.datasets.load_classification` (network fetch), no `reproduce/` generator uses it |
-| FordA | 4,921 × 500 | unwired, same verification path |
-| ElectricDevices | 16,637 × 96 | unwired, same verification path |
-| StarLightCurves | 9,236 × 1,024 | unwired, same verification path |
-| Crop | 24,000 × 46, 24 classes | unwired — named in `NEXT_STEPS.md` as "the scale target," ≈4.6 GB as a float64 dissimilarity matrix |
-| TUDataset graphs (MUTAG, PROTEINS, ENZYMES, NCI1); Duin–Pękalska dissimilarity collection | not stated | unwired, and one step earlier than the row above: `NEXT_STEPS.md` calls this family "to confirm," with verification still in progress |
+| ECG5000 | 5,000 series × 140 | **measured, 2026-08-12** (`table_3_7_g2_dtw_nonmetric.py`, registered in `reproduce/manifest.py`): exactness 1.000 (N≤1024, 10 seeds), triangle-inequality violations 20.9%. Downstream comparison also run: set-cover beats NERFCM-given-$k$ by 0.122 ARI (0.715 vs 0.593) |
+| FordA | 4,921 × 500 | **measured, same generator**: exactness 1.000, violations 0.4% (below the synthetic proxy). Downstream: every method scores ≈0 ARI (k_true=2 not recoverable from DTW dissimilarities by NERFCM, the set-cover, single-linkage, or beta-plateau) |
+| Crop | 24,000 × 46, 24 classes | **measured, same generator, the scale target**: exactness 1.000, violations 23.6%, matrix build 1,597s + reorder 4.7s. Downstream: NERFCM 0.029 ARI, set-cover 0.064 — both weak in absolute terms, technically within 0.05 of each other |
+| ElectricDevices | 16,637 × 96 | unwired — verified loadable via `aeon.datasets.load_classification`, no run attempted this pass |
+| StarLightCurves | 9,236 × 1,024 | unwired, same status |
+| TUDataset graphs (MUTAG, PROTEINS, ENZYMES, NCI1); Duin–Pękalska dissimilarity collection | not stated | unwired, and one step earlier: verification still in progress |
 
-**Not a gap in the same sense as the others — a different state entirely, worth distinguishing.** Both a small/mid representative (ECG5000, FordA) and a large one (Crop) have already been identified and confirmed loadable; what has not happened is a single generator or manifest entry that uses either. This is a category where the small/large pairing is *planned*, not missing — closer to A.7.5's gap than to A.7.1's or A.7.3's, but one step earlier: nothing has been run yet, including the small side.
+**No longer a gap of the "nothing has been run" kind — it is now a partial-evidence gap, and an honest one.** Exactness holds at 1.000 on every real DTW dataset tested, closing that half of Goal G2's decision rule. The downstream-usefulness half is not closed: the decision rule needs the set-cover within 0.05 ARI of NERFCM-given-$k$ on at least three of the five DTW sets, and while three sets are now measured, only two show the criterion literally met, and both of those passes are low-information — Crop because both methods are weak, FordA because every method tested is at chance level. ECG5000, the one dataset with real recoverable structure, fails the criterion because the set-cover *outperforms* NERFCM by more than the tolerance, not because it underperforms. See §3.4's Table 3.7 and §7.2's Goal G2 entry for the full reading.
 
 ### A.7.8 Named in the prose or in a script, with no working path today
 
@@ -316,14 +316,14 @@ These four are not placed into A.7.1–A.7.5's categories because none has ever 
 
 Sorted by how complete the gap is, not by chapter:
 
-1. **Regression (A.7.1) has no large dataset in any form.** Not named, not attempted, not demonstrated.
-2. **Anomaly detection (A.7.3) has no large dataset in any form**, and the reason is partly a research decision (a one-class protocol) rather than only a missing file.
-3. **Topological membership generation (A.7.5) has no large *measurement*.** The generators exist; the run does not, by the chapter's own admission.
-4. **Classification (A.7.2) has a named large dataset that was never measured** (RT-IOT2022) **and a measured large dataset whose reproduction path is now broken** (PhiUSIIL) — a category that looks complete until either row is checked.
-5. **Clustering (A.7.4) has two large representatives, and zero large *measurements*** — both are single-shot demonstrations by design, one of them permanently non-reproducible by a third party.
-6. **The non-coordinate/relational family (A.7.7) has a full small-and-large pairing already identified and confirmed loadable, run zero times.** This is the one row where "wire it in" is closer to true than "find a dataset."
+1. **Regression (A.7.1) now has a large dataset, measured at ten seeds (2026-08-12)** — California Housing and Superconductivity, Random Forest winning both, flat MoG/HME unstable on the second. Closed as a *pairing*; the instability finding is a new small caveat, not a gap.
+2. **Anomaly detection (A.7.3) has no large dataset in any form**, and the reason is partly a research decision (a one-class protocol) rather than only a missing file. Unchanged.
+3. **Topological membership generation (A.7.5) now has a large measurement (2026-08-12)**, ten seeds across three fixed-structure families, with a genuine mixed result (`many_scale` solid, `single_scale` less stable than believed). What is still missing is the one-pass construction itself, not the scaling measurement.
+4. **Classification (A.7.2)'s named large dataset is now measured for its open-set role, unfavorably** (RT-IOT2022, Table 4.7b: the complement rule loses to Isolation Forest at scale) **— and its plain classification/timing role is still unmeasured. The other measured large dataset's reproduction path is still broken** (PhiUSIIL).
+5. **Clustering (A.7.4) has two large representatives, and zero large *measurements*** — both are single-shot demonstrations by design, one of them permanently non-reproducible by a third party. Unchanged.
+6. **The non-coordinate/relational family (A.7.7) now has three of its identified datasets measured (2026-08-12), exactness 1.000 on every one, up to the named 24,000-point scale target.** The downstream-usefulness half of Goal G2's decision rule is not yet met on the evidence gathered — a real, disclosed partial result, not the "run zero times" state this row described before.
 
-None of the above is filled in here. That is the point of the exercise: A.5 already says which datasets are public and present; this section says, by category, which small/large pairing is real and which is a name.
+Two categories (A.7.3, A.7.4) are unchanged from the earlier pass. Four (A.7.1, A.7.2, A.7.5, A.7.7) moved, three of them substantially, over one session (2026-08-11/12) — see `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md` for the full run log, every real number, and what was deliberately not attempted. That is still the point of this section: A.5 says which datasets are public and present; this section says, by category, which small/large pairing is real, which is a name, and — now, for four of six categories — what the real pairing actually showed.
 
 ---
 

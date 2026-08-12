@@ -36,10 +36,10 @@ from tribblefis.gauss_data import (  # noqa: E402
 )
 from tribblefis.gauss_math import simple_gaussian_predict  # noqa: E402
 from tribblefis.gaussian_classifier import (  # noqa: E402
-    MixtureOfGaussiansFuzzyClassifier,
-    MixtureOfGaussiansFuzzySequenceClassifier,
+    TribbleClassifier,
+    TribbleSequenceClassifier,
 )
-from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor  # noqa: E402
+from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 from tribblefis.regression import predict_tsk  # noqa: E402
 
 # Library default: rtol=1e-2, atol=1e-3 (gauss_data.py, GaussianMixtureModel._is_close).
