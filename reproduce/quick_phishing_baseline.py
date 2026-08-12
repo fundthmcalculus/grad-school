@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Quick baseline: UCI Shuttle (classification)."""
+"""Quick baseline: PhiUSIIL phishing URL detection (classification)."""
 
 import os
 import sys
@@ -12,7 +12,7 @@ from sklearn.metrics import accuracy_score
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tables"))
 import _fuzzy_models as F  # noqa: E402
 
-X, y = F.load_shuttle()
+X, y = F.load_phiusiil()
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
 
 for name, model in [
