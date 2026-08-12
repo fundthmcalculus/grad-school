@@ -4,8 +4,11 @@
 PhiUSIIL_Phishing_URL_Dataset.csv
 
 # reproduce/regression_scale/'s pilot data: fetched and cached by _datasets.py
-# on first run, from a GitHub mirror rather than the canonical UCI/figshare
-# source (see reproduce/regression_scale/README.md's provenance section).
-# housing.csv is ~1.4 MB; superconduct_train.csv is ~24 MB, too large to
-# vendor for a pilot that isn't a committed measurement yet.
+# on first run. Superconductivity now comes from UCI's own static-file host
+# (dataset id 464) directly; California Housing comes from sklearn's own
+# fetcher, cached under sklearn's data_home rather than here (see
+# reproduce/regression_scale/README.md's provenance section, updated
+# 2026-08-11 once archive.ics.uci.edu became reachable again).
+# superconduct_train.csv is ~24 MB, too large to vendor for a pilot that
+# isn't a committed measurement yet.
 regression_scale/

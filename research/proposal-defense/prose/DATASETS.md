@@ -20,7 +20,7 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Role:** Open-set detection testbed (planned); intended to replace Glass (214 samples) as the large-scale anomaly/open-set partner
 - **Source:** [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 952
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_rt_iot2022()` (not yet wired)
-- **Status:** Not started; no generator uses it yet. Chapter 7 §7.3 names this as the intended flagship for open-set validation; fallback is Glass as a stress test.
+- **Status:** In the repository and wired (2026-08-12). `load_openset_data()` prefers RT-IOT2022 over BETH over Glass. Open-set claim measured at five seeds (Table 4.7b): complement rule loses to Isolation Forest at this scale. Plain classification/timing (Table 4.4's own row) still not run at the ten-seed protocol — only a single-split sanity check exists.
 
 #### Glass (UCI) (Tables 4.6–4.7, Fig 4.2, §4.4)
 - **File:** Auto-fetched via sklearn or `ucimlrepo` (id 41)
@@ -45,7 +45,7 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Role:** Large-scale regression benchmark; scale partner for Concrete (1,030 rows)
 - **Source:** [Kaggle Bike Sharing Demand](https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619)
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_bikeshare()`
-- **Status:** In place; 17.3× larger than Concrete, demonstrating fuzzy regression scaling on real urban dynamics
+- **Status:** Measured at ten seeds (2026-08-12), wired into Table 4.1 alongside Concrete and PhiUSIIL; 17.3× larger than Concrete, demonstrating fuzzy regression scaling on real urban dynamics
 
 ### Clustering / Structure Discovery
 
@@ -77,25 +77,26 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Status:** Already available; all stored in `battery_hierarchical.SCALABLE` generator
 
 #### Scalable Membership Batteries (Goal G1, §7.2)
-- **Status:** Generators exist (`battery_hierarchical.SCALABLE`); **no measurements exist yet** (see Chapter 7 §7.2 Goal G1). Chapter 5 §5.4 is explicit: "no recorded run of the [8, 4, 2] recovery exists at any size other than 96... the 'unchanged from 100 up to 5,000' sentence describes a table never written."
+- **Status:** **Measured at ten seeds (2026-08-12)** across `single_scale`/`many_scale`/`log_separated` at $n=100$–$5{,}000$ (see Chapter 7 §7.2 Goal G1, and `reproduce/tables/table_5_4_ch5_g1_scaling.py`). `many_scale` confirmed solid (ARI 1.00 every seed/n); `single_scale` less stable than the earlier single-seed run implied (granularity agrees only 5–7/10 seeds); `log_separated` shows a gradual, not sharp, size transition. The one-pass generator itself (Goal G1's phase five) remains unbuilt, so this measures the existing two-stage selector, not the construction G1 is ultimately about.
 - **Role:** Evidence for the one-pass membership claim; needed for integration capstone
 
 ### Non-Coordinate / Relational Data (Goal G2, Chapter 7 §7.2, A.5)
 
-Goal G2 requires demonstration on genuinely non-metric domains: time series under dynamic time warping, sequences under edit distance, graphs under a kernel dissimilarity. These datasets are **verified loadable but unwired** (not yet wired into `reproduce/manifest.py`).
+Goal G2 requires demonstration on genuinely non-metric domains: time series under dynamic time warping, sequences under edit distance, graphs under a kernel dissimilarity. Three of the UCR/UEA time-series datasets below are now **measured** (2026-08-12); the rest remain verified loadable but unwired.
 
 #### UCR/UEA Time Series (via `aeon`)
 - **Files:** Auto-fetched via `aeon.datasets.load_classification()`
 - **Source:** [UCR/UEA Time Series Archive](https://www.cs.ucr.edu/~eamonn/time_series_data_2018/)
-- **Verified datasets:**
-  - **ECG5000:** 5,000 series × 140 timesteps
-  - **FordA:** 4,921 × 500
+- **Measured (`reproduce/tables/table_3_7_g2_dtw_nonmetric.py` + `table_3_7_g2_downstream.py`, 2026-08-12):**
+  - **ECG5000:** 5,000 series × 140 timesteps — exactness 1.000, triangle-inequality violations 20.9%, downstream set-cover beats NERFCM-given-k by 0.122 ARI (fails the ±0.05 parity threshold in the favorable direction)
+  - **FordA:** 4,921 × 500 — exactness 1.000, violations 0.4% (below the synthetic proxy), downstream: every method scores ≈0 ARI (degenerate)
+  - **Crop:** 24,000 × 46, 24 classes (the large-scale target, ≈4.6 GB as float64 dissimilarity matrix) — exactness 1.000, violations 23.6%, matrix build 1,597 s + reorder **4.7 s**, downstream both methods weak (NERFCM 0.029, set-cover 0.064 ARI)
+- **Verified loadable, not yet attempted:**
   - **ElectricDevices:** 16,637 × 96
   - **StarLightCurves:** 9,236 × 1,024
-  - **Crop:** 24,000 × 46, 24 classes (the large-scale target, ≈4.6 GB as float64 dissimilarity matrix)
 - **Distance metric:** Dynamic Time Warping (DTW)
-- **Status:** Verified loadable via `aeon`; not yet integrated into reproduce harness
-- **Role:** Core to Goal G2 — demonstrates coordinate-free regime on real non-metric data
+- **Status:** Three of five wired and measured; two verified loadable, unattempted
+- **Role:** Core to Goal G2 — demonstrates coordinate-free regime on real non-metric data; exactness (decision-rule item 1) now confirmed on all three attempted, downstream usefulness (item 3) partially evidenced, not yet closed
 
 #### Graph Kernels (TUDataset, via `aeon`)
 - **Source:** [TUDataset](https://www.tu-dortmund.de/en/university/news/2023/the-turing-university-graph-kernel-benchmarks-dataset/)
@@ -191,13 +192,13 @@ The proposal currently has only one regression benchmark (**Concrete**, 1,030 ro
 
 | Category | Small / Fast | Large / Scale | Measured? | Status |
 |---|---|---|---|---|
-| **Regression** | Concrete (1,030) | Bike Sharing (17,379) | No | Loaders in place, awaiting measurement |
+| **Regression** | Concrete (1,030) | Bike Sharing (17,379); California Housing (20,433); Superconductivity (21,263) | **Yes** (2026-08-12, 10 seeds) | Bike Sharing in Table 4.1; California Housing/Superconductivity in new Appendix A.7.1 generator — RF wins both, flat MoG/HME unstable on Superconductivity |
 | **Classification** | Glass (214) | PhiUSIIL (235k) | Yes | Fixed; was broken, now working |
-| **Classification (open-set)** | Glass (214) | RT-IOT2022 (123k) | No | Not started; RT-IOT2022 in place, loader unwired |
-| **Anomaly** | Glass (214) | BETH (3.8M) | No | BETH in place; no measurements yet |
+| **Classification (open-set)** | Glass (214) | RT-IOT2022 (123k) | **Partially** (2026-08-12, 5 seeds) | Open-set measured (Table 4.7b): complement rule loses to Isolation Forest at scale. Plain classification/timing not yet at the ten-seed protocol |
+| **Anomaly** | Glass (214) | BETH (3.8M) | No | BETH in place; no measurements yet; still blocked on the one-class-protocol decision (§7.3) |
 | **Clustering** | Synthetic (120–1.5k) | Shuttle (58k) | Demonstrated | Shuttle in place; demo not repeatable |
-| **Membership Gen** | Synthetic (120–160) | *[generators exist, zero runs]* | No | **Gap: large measurements needed** |
-| **Non-coordinate (G2)** | *[unwired]* | Crop (24k, DTW) | No | **Datasets verified loadable, not yet wired** |
+| **Membership Gen** | Synthetic (120–160) | Scalable batteries (100–5,000) | **Yes** (2026-08-12, 10 seeds) | `many_scale` solid, `single_scale` less stable than believed, `log_separated` gradual — see Ch5 §5.4, Goal G1 |
+| **Non-coordinate (G2)** | *[unwired]* | ECG5000, FordA, Crop (up to 24k, DTW) | **Partially** (2026-08-12, exactness only) | Exactness = 1.000 on 3 of 5 named datasets; downstream-usefulness threshold not yet met (2 of 3 tested, both low-information) |
 
 ---
 

@@ -89,7 +89,7 @@ def _sweep(scorer, X, y):
                 Xtr, Xte, ytr, yte = train_test_split(
                     X, y, test_size=0.2, random_state=seed
                 )
-                model = gc.MixtureOfGaussiansFuzzyClassifier(top_n=k, random_state=seed)
+                model = gc.TribbleClassifier(top_n=k, random_state=seed)
                 start = time.perf_counter()
                 model.fit(Xtr, ytr)
                 secs.append(time.perf_counter() - start)
