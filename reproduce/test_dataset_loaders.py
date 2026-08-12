@@ -38,25 +38,39 @@ for name, loader, kwargs in LOADERS:
     result = loader(**kwargs)
     if result is None:
         results[name] = "FAILED (returned None)"
-        print(f"  ✗ {name}: loader returned None")
+        print(f"  [FAILED] {name}: loader returned None")
+    elif name == "BETH":
+        # BETH returns a dict with train/val/test splits
+        if isinstance(result, dict) and all(k in result for k in ["train", "val", "test"]):
+            total_rows = sum(len(result[s][0]) for s in ["train", "val", "test"])
+            features = result["train"][0].shape[1]
+            results[name] = f"OK ({total_rows} total rows, {features} features)"
+            print(
+                f"  [OK] {name}: train={len(result['train'][0])}, "
+                f"val={len(result['val'][0])}, test={len(result['test'][0])} "
+                f"({total_rows} total, {features} features)"
+            )
+        else:
+            results[name] = "FAILED (invalid format)"
+            print(f"  [FAILED] {name}: invalid return format")
     else:
         X, y = result
-        results[name] = f"OK ({len(X)} rows × {X.shape[1]} features)"
-        print(f"  ✓ {name}: {len(X)} rows × {X.shape[1]} features, target shape {y.shape}")
+        results[name] = f"OK ({len(X)} rows, {X.shape[1]} features)"
+        print(f"  [OK] {name}: {len(X)} rows, {X.shape[1]} features")
     print()
 
 print("=" * 70)
 print("Summary")
 print("=" * 70)
 for name, status in results.items():
-    status_icon = "✓" if status.startswith("OK") else "✗"
-    print(f"{status_icon} {name:15} {status}")
+    status_icon = "PASS" if status.startswith("OK") else "FAIL"
+    print(f"[{status_icon}] {name:15} {status}")
 print()
 
 failed = [name for name, status in results.items() if not status.startswith("OK")]
 if failed:
-    print(f"⚠ {len(failed)} loader(s) failed. Check file paths and data integrity.")
+    print(f"ERROR: {len(failed)} loader(s) failed. Check file paths and data integrity.")
     sys.exit(1)
 else:
-    print("✓ All loaders passed!")
+    print("SUCCESS: All loaders passed!")
     sys.exit(0)
