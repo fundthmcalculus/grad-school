@@ -230,9 +230,7 @@ def main():
                 )
             flat_k_cell = C.cell([r["flat_k"] for r in per_seed], fmt="{:.1f}")
             flat_ari_cell = fmt_levels([r["flat_ari"] for r in per_seed])
-            flat_pou_cell = C.cell(
-                [r["flat_pou_max"] for r in per_seed], fmt="{:.2e}"
-            )
+            flat_pou_cell = C.cell([r["flat_pou_max"] for r in per_seed], fmt="{:.2e}")
             mode_vec, agree, total = _mode_vector([r["ms_gran"] for r in per_seed])
             ms_gran_cell = f"{mode_vec} ({agree}/{total})"
             ms_ari_cell = fmt_levels([r["ms_ari"] for r in per_seed])
