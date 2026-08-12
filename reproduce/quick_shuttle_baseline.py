@@ -32,3 +32,9 @@ ruspini_time = time.time() - t0
 acc = accuracy_score(yte, rm.predict(Xte))
 print(f"Tribble (Ruspini): acc={acc:.4f}  train={ruspini_time:.2f}s  rules={len(rm.rules)}")
 F.plot_membership_functions(rm, Xtr, "quick_shuttle_ruspini_mfs")
+
+t0 = time.time()
+refined_rm, info = F.refine_classifier(rm, Xtr, ytr)
+refine_time = time.time() - t0
+acc = accuracy_score(yte, refined_rm.predict(Xte))
+print(f"Tribble (Ruspini, refined): acc={acc:.4f}  train={refine_time:.2f}s  refined={info['refined']}")
