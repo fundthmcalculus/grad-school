@@ -320,7 +320,7 @@ def _scaler(kind, log_dynamic_range):
 
 
 def unit_scale(X, column=None):
-    """Min-max to [0, 1] with no log step: the exact behaviour of the deleted
+    """Min-max to [0, 1] with no log step: the exact behavior of the deleted
     `gauss_math.standard_transform`, verified bit-for-bit against it.
 
     Accepts a Series (returns a Series), or a DataFrame with an optional
@@ -479,6 +479,44 @@ def ruspini_predict_regression(rm, bucket_mean, X):
     proba, labels = rm.class_proba(X)
     values = np.array([bucket_mean[int(lab)] for lab in labels])
     return proba @ values
+
+
+# --- Ruspini refinement ---------------------------------------------------------
+# `refine_ruspini_partition` moves the partition's apex knots against a
+# cross-entropy objective (see tribblefis.refine); `method="coordinate"` -- its
+# default -- is the cheap one-knot-at-a-time L-BFGS search, as opposed to
+# `method="optimizers"`'s population search. That's the "basic" refinement
+# these quick scripts want: a fast pass to report alongside the unrefined
+# Ruspini numbers, not a tuned search.
+
+def refine_classifier(rm, X, y, **kwargs):
+    """Refine a classifier's Ruspini partition. Returns (refined_rm, info)."""
+    from tribblefis.refine import refine_ruspini_partition
+
+    kwargs.setdefault("method", "coordinate")
+    kwargs.setdefault("seed", 42)
+    kwargs.setdefault("verbose", False)
+    return refine_ruspini_partition(rm, X, y, **kwargs)
+
+
+def refine_regressor(model, rm, X, y, **kwargs):
+    """Refine a regressor's Ruspini partition.
+
+    `model` supplies the output-bucket partition scheme
+    (n_output_buckets/output_partition) so `y` gets bucketed exactly the way
+    `ruspinize_regressor` bucketed it -- refine_ruspini_partition scores
+    against discrete labels, and those labels have to be the same ones the
+    partition's rules were built against. Returns (refined_rm, info).
+    """
+    from tribblefis.refine import refine_ruspini_partition
+    from tribblefis.regression import partition_output
+
+    y_series = pd.Series(np.asarray(y).flatten(), name="y_value")
+    y_partitioned, _ = partition_output(model.n_output_buckets, y_series, method=model.output_partition)
+    kwargs.setdefault("method", "coordinate")
+    kwargs.setdefault("seed", 42)
+    kwargs.setdefault("verbose", False)
+    return refine_ruspini_partition(rm, X, y_partitioned["y_bucket"], **kwargs)
 
 
 def plot_membership_functions(rm, X, basename, max_features=6):
