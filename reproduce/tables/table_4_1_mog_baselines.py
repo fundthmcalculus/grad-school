@@ -150,6 +150,16 @@ def main():
     else:
         rows.append(["Concrete (regression)", C.NA, C.NA, C.NA, C.NA, C.NA])
 
+    bikeshare = _fm.load_bikeshare()
+    if bikeshare is not None:
+        X, y = bikeshare
+        # Bike Sharing: normalized, for scale comparison with Concrete.
+        # 17.3× larger (17,379 vs 1,030 rows) while maintaining regression task.
+        cols = _bench("reg", X, y, _fm.mog_regressor, r2_score, norm=True)
+        rows.append(_row("Bike Sharing (regression)", "R2", cols))
+    else:
+        rows.append(["Bike Sharing (regression)", C.NA, C.NA, C.NA, C.NA, C.NA])
+
     phi = _fm.load_phiusiil()
     if phi is not None:
         X, y = phi

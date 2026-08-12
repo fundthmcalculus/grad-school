@@ -157,6 +157,170 @@ def load_phiusiil(sample_size=20000):
         return None
 
 
+def load_rt_iot2022(sample_size=None):
+    """RT-IOT2022: 123k rows × 83 features, 12 classes (open-set detection).
+
+    Returns (X, y) or None if file not found.
+    """
+    local = os.path.join(DATA_DIR, "RT_IOT2022.csv")
+    try:
+        df = pd.read_csv(local)
+        y = df.iloc[:, -1]  # last column is the target
+        X = df.iloc[:, :-1]
+        X = X.select_dtypes(include=[np.number]).astype(float)
+        y = np.asarray(y)
+        if sample_size and len(X) > sample_size:
+            idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
+            X, y = X.iloc[idx], y[idx]
+        print(
+            f"  [rt-iot2022] loaded {os.path.relpath(local, REPO_ROOT)}: "
+            f"{len(X)} rows × {X.shape[1]} features"
+        )
+        return X, y
+    except FileNotFoundError:
+        print(f"  [rt-iot2022] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [rt-iot2022] failed to load ({exc.__class__.__name__}); column -> N/A")
+        return None
+
+
+def load_beth(combine=True):
+    """BETH host telemetry: binary classification. Reads from data/beth/*.csv.
+
+    If combine=True (default), concatenates all CSV files in the directory.
+    Returns (X, y) or None if directory not found.
+    """
+    beth_dir = os.path.join(DATA_DIR, "beth")
+    try:
+        if not os.path.isdir(beth_dir):
+            print(f"  [beth] directory not found at {os.path.relpath(beth_dir, REPO_ROOT)}")
+            return None
+
+        csv_files = sorted([f for f in os.listdir(beth_dir) if f.endswith(".csv")])
+        if not csv_files:
+            print(f"  [beth] no CSV files found in {os.path.relpath(beth_dir, REPO_ROOT)}")
+            return None
+
+        dfs = []
+        for csv_file in csv_files:
+            path = os.path.join(beth_dir, csv_file)
+            dfs.append(pd.read_csv(path))
+
+        df = pd.concat(dfs, ignore_index=True) if combine else dfs[0]
+        y = df.iloc[:, -1]  # last column is the target
+        X = df.iloc[:, :-1]
+        X = X.select_dtypes(include=[np.number]).astype(float)
+        y = np.asarray(y)
+        print(
+            f"  [beth] loaded {len(csv_files)} file(s) from "
+            f"{os.path.relpath(beth_dir, REPO_ROOT)}: {len(X)} rows × {X.shape[1]} features"
+        )
+        return X, y
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [beth] failed to load ({exc.__class__.__name__}); column -> N/A")
+        return None
+
+
+def load_shuttle(sample_size=None):
+    """Shuttle: 58k rows × 7 features, 7 classes (structure discovery flagship).
+
+    Resolution order:
+      1. local CSV if present;
+      2. ucimlrepo (UCI id 148);
+      3. None.
+    Returns (X, y) or None.
+    """
+    local = os.path.join(DATA_DIR, "shuttle.csv")
+
+    # Try local first
+    if os.path.exists(local):
+        try:
+            df = pd.read_csv(local)
+            y = df.iloc[:, -1]
+            X = df.iloc[:, :-1]
+            X = X.select_dtypes(include=[np.number]).astype(float)
+            y = np.asarray(y)
+            if sample_size and len(X) > sample_size:
+                idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
+                X, y = X.iloc[idx], y[idx]
+            print(
+                f"  [shuttle] loaded {os.path.relpath(local, REPO_ROOT)}: "
+                f"{len(X)} rows × {X.shape[1]} features"
+            )
+            return X, y
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [shuttle] local file unreadable ({exc.__class__.__name__})")
+
+    # Fall back to ucimlrepo
+    try:
+        from ucimlrepo import fetch_ucirepo
+
+        ds = fetch_ucirepo(id=148)
+        X = ds.data.features.select_dtypes(include=[np.number]).astype(float)
+        y = np.asarray(ds.data.targets).ravel()
+        if sample_size and len(X) > sample_size:
+            idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
+            X, y = X.iloc[idx], y[idx]
+        print(
+            f"  [shuttle] fetched from UCI (id 148) and cached to "
+            f"{os.path.relpath(local, REPO_ROOT)}: {len(X)} rows × {X.shape[1]} features"
+        )
+        # Cache locally
+        os.makedirs(os.path.dirname(local), exist_ok=True)
+        pd.concat([X, pd.DataFrame(y, columns=["target"])], axis=1).to_csv(local, index=False)
+        return X, y
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [shuttle] unavailable ({exc.__class__.__name__}); column -> N/A")
+        return None
+
+
+def load_bikeshare(target_col="cnt", sample_size=None):
+    """Bike Sharing Demand: 17.4k rows × 16 features, regression (demand prediction).
+
+    Kaggle dataset: https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619
+    File: bikeshare-hour.csv (extracted from the Kaggle zip)
+
+    Args:
+        target_col: column name for the target (default 'cnt' = count of bikes rented).
+        sample_size: if set, randomly sample to this size (for quick tests).
+
+    Returns (X, y) or None if file not found.
+    """
+    local = os.path.join(DATA_DIR, "bikeshare-hour.csv")
+    try:
+        df = pd.read_csv(local)
+        if target_col not in df.columns:
+            print(
+                f"  [bikeshare] target column '{target_col}' not found; "
+                f"available: {list(df.columns)}"
+            )
+            return None
+
+        y = df[target_col].astype(float)
+        y.name = "y_value"
+        # Drop non-numeric and index columns (dteday, instant, etc.)
+        X = df.select_dtypes(include=[np.number]).drop(columns=[target_col], errors="ignore")
+        # Drop obvious ID/index columns if present
+        X = X.drop(columns=["instant"], errors="ignore").astype(float)
+
+        if sample_size and len(X) > sample_size:
+            idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
+            X, y = X.iloc[idx].reset_index(drop=True), y.iloc[idx].reset_index(drop=True)
+
+        print(
+            f"  [bikeshare] loaded {os.path.relpath(local, REPO_ROOT)}: "
+            f"{len(X)} rows × {X.shape[1]} features"
+        )
+        return X, y
+    except FileNotFoundError:
+        print(f"  [bikeshare] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [bikeshare] failed to load ({exc.__class__.__name__}); column -> N/A")
+        return None
+
+
 # --- model factories (return a fitted-predict callable, or None) -------------
 def _try(build):
     """Return the constructed estimator, or None if construction fails."""
@@ -289,19 +453,19 @@ def mog_regressor(seed, tsk_order="1st"):
     seconds. Same object, same preprocessing, one keyword: the alternative was a
     second copy of this constructor, which is how two tables drift apart.
     """
-    from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
+    from tribblefis.gaussian_regressor import TribbleRegressor
 
     return _try(
-        lambda: MixtureOfGaussiansFuzzyRegressor(
+        lambda: TribbleRegressor(
             n_output_buckets=3, tsk_order=tsk_order, top_n=-1, random_state=seed
         )
     )
 
 
 def mog_classifier(seed):
-    from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+    from tribblefis.gaussian_classifier import TribbleClassifier
 
-    return _try(lambda: MixtureOfGaussiansFuzzyClassifier(top_n=5, random_state=seed))
+    return _try(lambda: TribbleClassifier(top_n=5, random_state=seed))
 
 
 def tree_regressor(seed):
