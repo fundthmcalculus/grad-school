@@ -1159,3 +1159,70 @@ confirming again that no covariance trick cracks it — the few-shot direction
 
 Shipped as the `cov="ledoit_wolf"` option in tribblefis #113 (issue #112). The
 relative-MD negative is documented in #112 so it is not re-attempted.
+
+---
+
+# Part 16 — System-prompt shift: the monitor's biggest operational risk
+
+The highest-risk inference axis (PLAN_INFERENCE_SENSITIVITY §system-prompt). A
+deployed monitor is fit on benign activations under one system prompt; production
+may use a different one. The same deepset battery was captured under four system
+prompts (default / helpful / support / terse) on Qwen-3B; for each (train A,
+test B) the detector is fit on benign-A, thresholded at 1% FPR on benign-A, and
+applied to benign-B (realized FPR) and injection-B (detection).
+
+## Mean-pooled features: catastrophic under any shift
+
+Realized FPR (rows = train prompt, cols = test prompt):
+
+| train ↓ / test → | default | helpful | support | terse |
+|---|---|---|---|---|
+| default | **0.02** | 1.00 | 0.91 | 0.95 |
+| helpful | 0.95 | **0.04** | 1.00 | 1.00 |
+| support | 1.00 | 1.00 | **0.02** | 1.00 |
+| terse | 0.99 | 1.00 | 0.87 | **0.02** |
+
+The diagonal (matched) holds ~1-2%; **every off-diagonal blows up to 0.87-1.00**.
+Changing the system prompt makes essentially *all* benign traffic look
+anomalous. Detection collapses in step (off-diagonal det@1%FP mostly <0.2 vs
+~0.57 matched). The mechanism is direct: mean-pooling averages the system-prompt
+tokens into the feature, so a new system prompt is literally a new mean.
+
+## Last-token readout: partially transfers, at a detection cost
+
+Using the last-token activation (fixed readout position) instead of the mean, the
+off-diagonal FPR drops from ~1.0 to 0.03-0.59 — better, but "terse" (the most
+different prompt) still reaches 0.4-0.6, and matched detection is weaker
+(det@1%FP ~0.25 vs mean-pool's 0.57). Not robust on its own.
+
+## The mitigation: pool benign across system prompts + last-token
+
+Leave-one-system-prompt-out (fit benign pooled from three prompts, test the
+unseen fourth):
+
+| variant | realized FPR on unseen prompt | det@1%FP |
+|---|---|---|
+| mean-pool | 0.60 / 1.00 / 0.73 / 0.99 | 0.02-0.43 |
+| **last-token** | **0.001 / 0.008 / 0.002 / 0.148** | 0.09-0.18 |
+
+**Last-token features fit on benign pooled across a diversity of system prompts
+hold the FPR near target on an unseen system prompt** (≤0.15) — a genuine
+robustness fix. The cost is detection: pooling diverse prompts widens the normal
+manifold, so det@1%FP drops to 0.1-0.18. Mean-pooling does not generalise even
+when pooled.
+
+## Operational conclusion
+
+The monitor is **highly system-prompt-specific** — the single largest deployment
+risk found. Two viable practices, a tradeoff:
+
+* **Recalibrate per system prompt** (recommended default). Refit on benign
+  captured under the *exact* deployment system prompt. Best detection; requires
+  recapture on any prompt change — but that is benign-only, no labels, cheap.
+* **Robust blunt monitor.** Last-token features + benign pooled across a
+  diversity of system prompts hold FPR on unseen prompts, at a detection cost —
+  for settings where the system prompt is not fixed or not known.
+
+Either way, a monitor cannot be trained once under one wrapper and left in place
+across system-prompt changes: that silently drives the false-positive rate to
+~100% with mean-pooled features. This is the operational caveat that matters most.

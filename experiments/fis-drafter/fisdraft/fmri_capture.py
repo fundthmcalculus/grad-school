@@ -42,6 +42,7 @@ class Cfg:
     seed: int = 0
     chat_template: bool = True
     dtype: str = "float32"
+    system_prompt: str = ""
     mode: str = "battery"  # or "dose"
     out: str = "runs/fmri"
 
@@ -70,9 +71,11 @@ def run(cfg: Cfg) -> Path:
     # encode
     def encode(p):
         if cfg.chat_template and tok.chat_template:
+            msgs = ([{"role": "system", "content": cfg.system_prompt}]
+                    if cfg.system_prompt else [])
+            msgs.append({"role": "user", "content": p.text})
             t = tok.apply_chat_template(
-                [{"role": "user", "content": p.text}],
-                tokenize=False, add_generation_prompt=True,
+                msgs, tokenize=False, add_generation_prompt=True,
             )
             return tok(t, add_special_tokens=False)["input_ids"]
         return tok(p.text, add_special_tokens=True)["input_ids"]

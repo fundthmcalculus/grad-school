@@ -24,7 +24,7 @@ prompt activations or the "normal" manifold, not the decoding knobs.
 |---|---|---|
 | **Precision** fp32 / bf16 / fp16 | numerical drift in activations | **done — no effect** (det@1%FP 0.572/0.572/0.571, wl-AUROC 0.867 all three, SmolLM2-360M/deepset) |
 | **Quantization** int8 / int4 (bitsandbytes, GPTQ, AWQ) | large activation perturbation, realistic serving | TODO — the real precision question; bf16↔fp16↔fp32 already shown equivalent |
-| **System prompt / chat template** | the wrapper shifts every activation; the benign manifold is conditioned on it | TODO — highest-risk axis. Fit "normal" under one system prompt, test under another; does FPR blow up? |
+| **System prompt / chat template** | the wrapper shifts every activation | **DONE (Part 16) — highest risk realised.** Mean-pool FPR blows up to ~1.0 under any shift; last-token+pooled-prompts holds FPR on unseen prompts at a detection cost. Recalibrate per system prompt. |
 | **Attention backend** sdpa / eager / flash-attn | should be numerically ~equivalent | TODO — quick equivalence check |
 | **Prompt context / position** injection embedded in a long benign document vs bare | realistic deployment; does the signal survive dilution? | TODO — construct embedded-injection probes |
 | **Batch / padding side** | left vs right padding, batch size | TODO — expected null, worth confirming |
