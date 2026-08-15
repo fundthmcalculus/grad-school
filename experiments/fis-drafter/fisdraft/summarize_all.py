@@ -28,6 +28,7 @@ SIZE = {
     "LFM2.5-1.2B": ("LFM2.5-1.2B", 1.2), "Qwen2.5-3B": ("Qwen2.5-3B", 3.0),
     "Qwen2.5-7B": ("Qwen2.5-7B", 7.0), "Qwen2.5-14B": ("Qwen2.5-14B", 14.0),
     "pythia": ("pythia-410m (base)", 0.41),
+    "Supra-50M": ("Supra-50M (inst)", 0.05), "Qwen2.5-0.5B": ("Qwen2.5-0.5B (base)", 0.5),
 }
 
 

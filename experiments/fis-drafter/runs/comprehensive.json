@@ -1,5 +1,14 @@
 [
   {
+    "model": "Supra-50M (inst)",
+    "params": 0.05,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.074,
+    "fis_trim_wlAUC": 0.771,
+    "mahal_wlAUC": 0.774,
+    "surface_wlAUC": 0.804
+  },
+  {
     "model": "SmolLM2-135M",
     "params": 0.135,
     "dataset": "deepset",
@@ -34,6 +43,15 @@
     "fis_trim_wlAUC": 0.838,
     "mahal_wlAUC": 0.853,
     "surface_wlAUC": 0.811
+  },
+  {
+    "model": "Qwen2.5-0.5B (base)",
+    "params": 0.5,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.506,
+    "fis_trim_wlAUC": 0.874,
+    "mahal_wlAUC": 0.895,
+    "surface_wlAUC": 0.843
   },
   {
     "model": "TinyLlama-1.1B",
