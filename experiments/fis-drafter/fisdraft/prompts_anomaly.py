@@ -242,6 +242,36 @@ def build_anomaly_battery(
     return probes
 
 
+def injection_battery(seed: int = 0, source: str = "deepset") -> list[Probe]:
+    """Real benign / prompt-injection prompts from a public corpus.
+
+    label is "benign" or "injection". These carry a severe length confound --
+    injections are markedly longer than benign prompts in every public set --
+    so the detector evaluation must stratify on length; that is enforced
+    downstream, not here. The raw prompts are returned faithfully.
+    """
+    from datasets import load_dataset
+
+    probes: list[Probe] = []
+    if source == "deepset":
+        d = load_dataset("deepset/prompt-injections", split="train")
+        for r in d:
+            lab = "injection" if str(r["label"]) == "1" else "benign"
+            t = r["text"].strip()
+            if t:
+                probes.append(Probe(t, lab))
+    elif source == "jailbreak":
+        d = load_dataset("jackhhao/jailbreak-classification", split="train")
+        for r in d:
+            lab = "injection" if r["type"] == "jailbreak" else "benign"
+            t = r["prompt"].strip()
+            if t:
+                probes.append(Probe(t, lab))
+    else:
+        raise ValueError(source)
+    return probes
+
+
 def dose_response_battery(seed: int = 0, n_base: int = 80) -> list[Probe]:
     """For the 'micro dose': one base question corrupted at increasing strength.
 

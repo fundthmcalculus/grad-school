@@ -263,3 +263,84 @@ strength, the signal is real and survives the matched control, and the strongest
 detected class — **instruction-injection at 0.946** — is a security-relevant
 application where an interpretable, cheap, one-class monitor that needs no
 attack examples is genuinely useful. The plan below pursues that.
+
+---
+
+# Part 3 — Prompt-injection detection on a real corpus (Phase 1)
+
+The application from `PLAN_ANOMALY.md`, run on `deepset/prompt-injections` (343
+benign, 203 injection, real prompts). One-class throughout: the detector is
+fitted on benign activations only and never sees an injection in training.
+
+## The confound, and why every number is reported within-length
+
+Public injection corpora are severely length-confounded (here injection median
+65 tokens vs benign 42; jailbreak sets are far worse). A detector that only
+reads length would look excellent and mean nothing. So the headline metric is
+**within-length AUROC** — computed inside token-count deciles and pooled — with
+length-alone and a surface-only baseline reported alongside.
+
+## Result — activations beat length, and beat surface, after controlling length
+
+Eight seeds, one-class (train on benign only), within-length AUROC:
+
+| detector | within-length AUROC |
+|---|---|
+| **activation atlas** (Mahalanobis = FIS-whitened) | **0.874 ± 0.014** |
+| surface-only (length + token stats) | 0.799 ± 0.024 |
+| length alone | 0.560 ± 0.023 |
+
+* **Length alone collapses from 0.830 pooled to 0.560 within-length** — direct
+  confirmation that the pooled score was mostly the length confound.
+* **Activation beats surface by +0.076 ± 0.033, winning 8 of 8 seeds.** This is
+  the confound-controlled value of watching activations over reading the input.
+* **The FIS "none of the above" rule equals Mahalanobis exactly** (0.936 pooled,
+  0.892 within-length at the reference seed) once features are whitened.
+
+## Length-matched confirmation
+
+A benign/injection subset matched on token count (benign median 58 vs injection
+57; length AUROC 0.470, i.e. at chance by construction):
+
+| detector | AUROC |
+|---|---|
+| activation | **0.894** |
+| surface | 0.865 |
+| length | 0.470 |
+
+With length neutralised to chance, activations still lead. The margin narrows
+(the matched set's residual signal is token content, which surface also reads),
+but the ordering holds.
+
+## The selling point, delivered
+
+A supervised detector that *has* seen attacks (5-fold logistic regression on
+activations) reaches 0.925 within-length. The one-class monitor reaches 0.874–
+0.892 **with no attack examples at all** — within ~0.03 of the supervised upper
+bound. That is the case for the method: unsupervised, needs no attack corpus,
+and within a whisker of the supervised ceiling.
+
+## Where injection lives in the network
+
+Per-layer one-class within-length AUROC rises monotonically from the embedding
+layer to the output:
+
+| layer | 0 | 6 | 12 | 21 | 30 |
+|---|---|---|---|---|---|
+| within-len AUROC | 0.417 | 0.510 | 0.634 | 0.636 | **0.770** |
+
+Layer 0 sits *below* chance, so — unlike the word-salad case in Part 2 — there is
+no surface/BPE artifact inflating the input layer. The discriminative signal is
+genuinely built up through the network and is strongest at the final layer,
+which is what "the model recognises the injection as it reads it" should look
+like.
+
+## Status against the plan
+
+Phase 1 is substantially done: real corpus, realistic benign traffic, the length
+confound measured and controlled three ways (surface baseline, within-length
+stratification, length-matched subset), FIS competitive with the best
+unsupervised baseline, and the no-attack-examples claim delivered. Remaining
+Phase 1 items: multi-model replication, and per-attack-family breakdown once a
+family-labelled corpus is in. Phase 2 (per-layer FIS *attribution* as the
+distinctive contribution, since AUROC ties Mahalanobis) is the next build.

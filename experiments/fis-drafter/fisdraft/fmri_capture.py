@@ -28,7 +28,11 @@ import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from .prompts_anomaly import build_anomaly_battery, dose_response_battery
+from .prompts_anomaly import (
+    build_anomaly_battery,
+    dose_response_battery,
+    injection_battery,
+)
 
 
 @dataclass
@@ -55,6 +59,10 @@ def run(cfg: Cfg) -> Path:
 
     if cfg.mode == "dose":
         probes = dose_response_battery(seed=cfg.seed)
+    elif cfg.mode == "injection":
+        probes = injection_battery(seed=cfg.seed, source="deepset")
+    elif cfg.mode == "jailbreak":
+        probes = injection_battery(seed=cfg.seed, source="jailbreak")
     else:
         probes = build_anomaly_battery(seed=cfg.seed, tokenizer=tok)
 
