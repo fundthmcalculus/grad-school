@@ -1049,3 +1049,81 @@ cross-entropy objective sharpens exactly the tail separation calibration cannot
 manufacture. Few-shot attack examples, or an interval-consequent (IT2-TSK) score
 that models score uncertainty directly, are the score-level directions worth
 trying next; EVT/conditional thresholding is closed.
+
+---
+
+# Part 14 — Tail-separation round: a few labelled attacks solve the strict gate
+
+Three parallel evaluations (deep literature research + two empirical benchmarks
+on captured features), synthesised. The question was how to improve TPR at 1% FPR
+where the score's *tail separation* — not the threshold — is the bottleneck.
+
+## What the round established
+
+**1. The bottleneck is direction, not magnitude.** The one-class detector scores
+distance-from-normal (a magnitude) and discards the *direction* attacks point in.
+Logistic regression on the whitened features (directional) hugely beats logistic
+on the per-component surprisal (magnitude): safeguard det@1%FP 0.84 vs 0.27. That
+is the whole story of the strict-gate failure.
+
+**2. Unsupervised score changes help only a little.** Benchmarking 10 one-class
+score families (independently re-verified): the best, a **One-Class SVM (rbf)**,
+lifts safeguard det@1%FP from 0.06 to ~0.10 and deepset 0.66→0.69 — real but
+small. kNN mean-distance is a consistent minor gain. GMMs overfit; the naive
+relative-Mahalanobis implementation failed (subtracting a same-fit background
+cancels the signal). No unsupervised score closes the hard-corpus gap; the
+literature (OpenOOD v1.5) agrees no single score dominates, and of all OOD scores
+only Mahalanobis / relative-Mahalanobis / KNN are even applicable to a fixed
+feature vector.
+
+**3. A handful of labelled attacks closes it — decisively.** Logistic regression
+on the whitened features, benign as negatives, N few-shot attacks as positives.
+det@1%FP by N (independently verified, 8 seeds):
+
+| model | corpus | N=0 (unsup) | N=5 | N=10 | N=25 |
+|---|---|---|---|---|---|
+| Qwen2.5-3B | deepset | 0.618 | 0.781 | 0.766 | 0.824 |
+| Qwen2.5-14B | deepset | 0.706 | 0.805 | 0.785 | 0.819 |
+| gemma-3-270m-it | deepset | 0.329 | 0.653 | 0.646 | 0.709 |
+| LFM2.5-1.2B | deepset | 0.357 | 0.717 | 0.728 | 0.737 |
+| **Qwen2.5-3B (2000 benign)** | **safeguard** | **0.065** | **0.756** | **0.840** | **0.876** |
+| TinyLlama-1.1B | safeguard | 0.030 | 0.467 | 0.502 | 0.485 |
+| Qwen2.5-14B | safeguard | 0.057 | 0.608 | 0.608 | 0.616 |
+| Qwen2.5-3B | SPML | 0.916 | 0.938 | 0.951 | 0.977 |
+
+**Ten attacks turn the hard corpus from unusable (0.06) into strongly deployable
+(0.5–0.84).** Few-shot also *widens model applicability*: gemma and LFM2, which
+*lost to surface features* unsupervised, become 0.7+ detectors with 25 attacks.
+More benign data compounds with few-shot (Qwen-3B safeguard: 0.54 with 400 benign
+→ 0.84 with 2000).
+
+**4. Fancy low-FPR losses do not beat plain logistic regression.** A top-push /
+partial-AUC surrogate (restricting negatives to the benign tail) wins slightly on
+the *easy* corpus but loses on the *hard* one (0.75 vs 0.82). Plain balanced
+logistic regression on the whitened features is the robust choice — the recurring
+lesson that the simple method wins once the representation is right.
+
+## Literature grounding
+
+The few-shot logistic discriminant is the score-level form of **Deep SAD**
+(Ruff et al., ICLR 2020) — pull normal to the centre, push known anomalies away —
+without retraining the feature extractor. The verified shortlist also flagged
+**relative Mahalanobis** (Ren et al., 2021) as the top *zero-shot* idea, but it
+needs a properly regularised background covariance (diagonal/shrinkage), not the
+naive per-component version that failed here — the one unsupervised lead still
+worth implementing correctly. EVT-for-discrimination is a confirmed literature
+gap (all verified open-set/EVT methods are calibration, not separation),
+matching Part 13.
+
+## The recommendation
+
+Ship a **few-shot mode** for the monitor: benign-only whitening as before, plus,
+when a handful of known attacks exist, an L2-logistic discriminant on the
+whitened features added to (or replacing) the one-class score. It needs 5–25
+attack examples — a trivial ask versus a full attack corpus — and it is what
+turns the monitor from "narrow, one-class, hard corpora fail" into "strong across
+all corpora and models". In TribbleFIS terms this is the semi-supervised
+extension of the one-class rule: the "none of the above" density plus a
+discriminative direction from a few labels — the same insight as the supervised
+`TribbleClassifier(refine=True)` result (Part 11), delivered by the cheapest
+sufficient mechanism.
