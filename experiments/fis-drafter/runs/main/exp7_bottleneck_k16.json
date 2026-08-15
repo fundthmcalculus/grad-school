@@ -1,0 +1,10 @@
+{
+  "k": 16,
+  "n_features": 63,
+  "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+  "e2e_linear": 0.2118430887858073,
+  "oracle_code_same_decoder": 0.5740908203125,
+  "gbm": 0.19663909912109376,
+  "fis": 0.1299581298828125,
+  "linear_same_targets": 0.18133619689941408
+}

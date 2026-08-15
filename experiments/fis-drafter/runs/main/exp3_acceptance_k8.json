@@ -1,0 +1,757 @@
+{
+  "k": 8,
+  "n_steps_scanned": 20000,
+  "n_steps_scored": 7988,
+  "hit_rate_true_argmax_in_candidates": {
+    "unigram": 0.23347521281922884,
+    "bigram": 0.41086629944917374,
+    "prompt_lookup": 0.4913620430645969,
+    "oracle_ranker": 1.0
+  },
+  "acceptance": {
+    "bigram|oracle": {
+      "mean_alpha": 0.3467353334048331,
+      "median_alpha": 0.17979542165994644,
+      "tokens_per_pass_gamma4": 1.523101260762697
+    },
+    "bigram|zipf_top1_0.30": {
+      "mean_alpha": 0.11810044607460096,
+      "median_alpha": 0.07011972740292549,
+      "tokens_per_pass_gamma4": 1.1338899316075626
+    },
+    "bigram|zipf_top1_0.56": {
+      "mean_alpha": 0.1571413500710027,
+      "median_alpha": 0.0740990899503231,
+      "tokens_per_pass_gamma4": 1.1863248729964446
+    },
+    "bigram|zipf_top1_0.80": {
+      "mean_alpha": 0.19128958779871424,
+      "median_alpha": 0.08498382195830345,
+      "tokens_per_pass_gamma4": 1.236219859610341
+    },
+    "oracle_ranker|oracle": {
+      "mean_alpha": 0.8307458498964294,
+      "median_alpha": 0.9000452160835266,
+      "tokens_per_pass_gamma4": 3.5705057304340455
+    },
+    "oracle_ranker|zipf_top1_0.30": {
+      "mean_alpha": 0.44283624703757574,
+      "median_alpha": 0.4607694745063782,
+      "tokens_per_pass_gamma4": 1.764238878241802
+    },
+    "oracle_ranker|zipf_top1_0.56": {
+      "mean_alpha": 0.6524950031687319,
+      "median_alpha": 0.6591849327087402,
+      "tokens_per_pass_gamma4": 2.5373071350862952
+    },
+    "oracle_ranker|zipf_top1_0.80": {
+      "mean_alpha": 0.7658530138890013,
+      "median_alpha": 0.8075221478939056,
+      "tokens_per_pass_gamma4": 3.145598688429795
+    },
+    "prompt_lookup|oracle": {
+      "mean_alpha": 0.41646465563149315,
+      "median_alpha": 0.2900828421115875,
+      "tokens_per_pass_gamma4": 1.6922226730354093
+    },
+    "prompt_lookup|zipf_top1_0.30": {
+      "mean_alpha": 0.1431564884551308,
+      "median_alpha": 0.09765715897083282,
+      "tokens_per_pass_gamma4": 1.1670040812749942
+    },
+    "prompt_lookup|zipf_top1_0.56": {
+      "mean_alpha": 0.20345135416198132,
+      "median_alpha": 0.11020003259181976,
+      "tokens_per_pass_gamma4": 1.2549784935986976
+    },
+    "prompt_lookup|zipf_top1_0.80": {
+      "mean_alpha": 0.255968756139931,
+      "median_alpha": 0.1309974119067192,
+      "tokens_per_pass_gamma4": 1.3425527051564505
+    },
+    "unigram|oracle": {
+      "mean_alpha": 0.19996468272502108,
+      "median_alpha": 0.046874046325683594,
+      "tokens_per_pass_gamma4": 1.2495451898842036
+    },
+    "unigram|zipf_top1_0.30": {
+      "mean_alpha": 0.0524902658247386,
+      "median_alpha": 0.030562808737158775,
+      "tokens_per_pass_gamma4": 1.0553977077629184
+    },
+    "unigram|zipf_top1_0.56": {
+      "mean_alpha": 0.060146550030323175,
+      "median_alpha": 0.01230598147958517,
+      "tokens_per_pass_gamma4": 1.0639948312040757
+    },
+    "unigram|zipf_top1_0.80": {
+      "mean_alpha": 0.0738437456117415,
+      "median_alpha": 0.011212878860533237,
+      "tokens_per_pass_gamma4": 1.079729040951986
+    }
+  },
+  "hit_rate_by_category": {
+    "bigram|brainstorming": {
+      "hit": 0.4311774461028192,
+      "n": 1206
+    },
+    "bigram|classification": {
+      "hit": 0.40301724137931033,
+      "n": 1392
+    },
+    "bigram|closed_qa": {
+      "hit": 0.44482758620689655,
+      "n": 580
+    },
+    "bigram|creative_writing": {
+      "hit": 0.3899803536345776,
+      "n": 1018
+    },
+    "bigram|general_qa": {
+      "hit": 0.4154870940882598,
+      "n": 1201
+    },
+    "bigram|high_entropy": {
+      "hit": 0.5,
+      "n": 68
+    },
+    "bigram|information_extraction": {
+      "hit": 0.35428571428571426,
+      "n": 525
+    },
+    "bigram|low_entropy": {
+      "hit": 0.4166666666666667,
+      "n": 132
+    },
+    "bigram|mid_word": {
+      "hit": 0.3783783783783784,
+      "n": 74
+    },
+    "bigram|open_qa": {
+      "hit": 0.4096185737976783,
+      "n": 1206
+    },
+    "bigram|summarization": {
+      "hit": 0.42662116040955633,
+      "n": 586
+    },
+    "prompt_lookup|brainstorming": {
+      "hit": 0.4792703150912106,
+      "n": 1206
+    },
+    "prompt_lookup|classification": {
+      "hit": 0.47413793103448276,
+      "n": 1392
+    },
+    "prompt_lookup|closed_qa": {
+      "hit": 0.6120689655172413,
+      "n": 580
+    },
+    "prompt_lookup|creative_writing": {
+      "hit": 0.43320235756385067,
+      "n": 1018
+    },
+    "prompt_lookup|general_qa": {
+      "hit": 0.4646128226477935,
+      "n": 1201
+    },
+    "prompt_lookup|high_entropy": {
+      "hit": 0.5,
+      "n": 68
+    },
+    "prompt_lookup|information_extraction": {
+      "hit": 0.5466666666666666,
+      "n": 525
+    },
+    "prompt_lookup|low_entropy": {
+      "hit": 0.4772727272727273,
+      "n": 132
+    },
+    "prompt_lookup|mid_word": {
+      "hit": 0.4189189189189189,
+      "n": 74
+    },
+    "prompt_lookup|open_qa": {
+      "hit": 0.47180762852404645,
+      "n": 1206
+    },
+    "prompt_lookup|summarization": {
+      "hit": 0.5955631399317406,
+      "n": 586
+    },
+    "unigram|brainstorming": {
+      "hit": 0.23217247097844113,
+      "n": 1206
+    },
+    "unigram|classification": {
+      "hit": 0.22341954022988506,
+      "n": 1392
+    },
+    "unigram|closed_qa": {
+      "hit": 0.24310344827586206,
+      "n": 580
+    },
+    "unigram|creative_writing": {
+      "hit": 0.224950884086444,
+      "n": 1018
+    },
+    "unigram|general_qa": {
+      "hit": 0.24063280599500417,
+      "n": 1201
+    },
+    "unigram|high_entropy": {
+      "hit": 0.29411764705882354,
+      "n": 68
+    },
+    "unigram|information_extraction": {
+      "hit": 0.22095238095238096,
+      "n": 525
+    },
+    "unigram|low_entropy": {
+      "hit": 0.2727272727272727,
+      "n": 132
+    },
+    "unigram|mid_word": {
+      "hit": 0.2702702702702703,
+      "n": 74
+    },
+    "unigram|open_qa": {
+      "hit": 0.22802653399668324,
+      "n": 1206
+    },
+    "unigram|summarization": {
+      "hit": 0.2525597269624573,
+      "n": 586
+    }
+  },
+  "acceptance_by_category": {
+    "bigram|oracle|brainstorming": {
+      "mean_alpha": 0.3652359839497801,
+      "n": 1206
+    },
+    "bigram|oracle|classification": {
+      "mean_alpha": 0.3460796051473446,
+      "n": 1392
+    },
+    "bigram|oracle|closed_qa": {
+      "mean_alpha": 0.377962827922953,
+      "n": 580
+    },
+    "bigram|oracle|creative_writing": {
+      "mean_alpha": 0.3277582646617243,
+      "n": 1018
+    },
+    "bigram|oracle|general_qa": {
+      "mean_alpha": 0.3542305200665348,
+      "n": 1201
+    },
+    "bigram|oracle|high_entropy": {
+      "mean_alpha": 0.35161835550388787,
+      "n": 68
+    },
+    "bigram|oracle|information_extraction": {
+      "mean_alpha": 0.3065716855512749,
+      "n": 525
+    },
+    "bigram|oracle|low_entropy": {
+      "mean_alpha": 0.35083773946759966,
+      "n": 132
+    },
+    "bigram|oracle|mid_word": {
+      "mean_alpha": 0.2953568480160037,
+      "n": 74
+    },
+    "bigram|oracle|open_qa": {
+      "mean_alpha": 0.3358723137455433,
+      "n": 1206
+    },
+    "bigram|oracle|summarization": {
+      "mean_alpha": 0.36025263853190365,
+      "n": 586
+    },
+    "bigram|zipf_top1_0.30|brainstorming": {
+      "mean_alpha": 0.11942114167594965,
+      "n": 1206
+    },
+    "bigram|zipf_top1_0.30|classification": {
+      "mean_alpha": 0.12336666087122236,
+      "n": 1392
+    },
+    "bigram|zipf_top1_0.30|closed_qa": {
+      "mean_alpha": 0.13043643846047667,
+      "n": 580
+    },
+    "bigram|zipf_top1_0.30|creative_writing": {
+      "mean_alpha": 0.11106599068324932,
+      "n": 1018
+    },
+    "bigram|zipf_top1_0.30|general_qa": {
+      "mean_alpha": 0.11651896154065121,
+      "n": 1201
+    },
+    "bigram|zipf_top1_0.30|high_entropy": {
+      "mean_alpha": 0.15748386861506494,
+      "n": 68
+    },
+    "bigram|zipf_top1_0.30|information_extraction": {
+      "mean_alpha": 0.1044214930728915,
+      "n": 525
+    },
+    "bigram|zipf_top1_0.30|low_entropy": {
+      "mean_alpha": 0.11676349540291332,
+      "n": 132
+    },
+    "bigram|zipf_top1_0.30|mid_word": {
+      "mean_alpha": 0.1372533776227863,
+      "n": 74
+    },
+    "bigram|zipf_top1_0.30|open_qa": {
+      "mean_alpha": 0.11748745679171262,
+      "n": 1206
+    },
+    "bigram|zipf_top1_0.30|summarization": {
+      "mean_alpha": 0.11295375027279972,
+      "n": 586
+    },
+    "bigram|zipf_top1_0.56|brainstorming": {
+      "mean_alpha": 0.16137999674585737,
+      "n": 1206
+    },
+    "bigram|zipf_top1_0.56|classification": {
+      "mean_alpha": 0.1593983531500362,
+      "n": 1392
+    },
+    "bigram|zipf_top1_0.56|closed_qa": {
+      "mean_alpha": 0.1786425391641351,
+      "n": 580
+    },
+    "bigram|zipf_top1_0.56|creative_writing": {
+      "mean_alpha": 0.14799541256078544,
+      "n": 1018
+    },
+    "bigram|zipf_top1_0.56|general_qa": {
+      "mean_alpha": 0.15961541543649457,
+      "n": 1201
+    },
+    "bigram|zipf_top1_0.56|high_entropy": {
+      "mean_alpha": 0.19554072378388596,
+      "n": 68
+    },
+    "bigram|zipf_top1_0.56|information_extraction": {
+      "mean_alpha": 0.13766292667506258,
+      "n": 525
+    },
+    "bigram|zipf_top1_0.56|low_entropy": {
+      "mean_alpha": 0.16070386655614624,
+      "n": 132
+    },
+    "bigram|zipf_top1_0.56|mid_word": {
+      "mean_alpha": 0.1495329445681548,
+      "n": 74
+    },
+    "bigram|zipf_top1_0.56|open_qa": {
+      "mean_alpha": 0.1538451183305586,
+      "n": 1206
+    },
+    "bigram|zipf_top1_0.56|summarization": {
+      "mean_alpha": 0.1525304391701134,
+      "n": 586
+    },
+    "bigram|zipf_top1_0.80|brainstorming": {
+      "mean_alpha": 0.19914091115257,
+      "n": 1206
+    },
+    "bigram|zipf_top1_0.80|classification": {
+      "mean_alpha": 0.19318037559928403,
+      "n": 1392
+    },
+    "bigram|zipf_top1_0.80|closed_qa": {
+      "mean_alpha": 0.2195339593716152,
+      "n": 580
+    },
+    "bigram|zipf_top1_0.80|creative_writing": {
+      "mean_alpha": 0.1790980142627203,
+      "n": 1018
+    },
+    "bigram|zipf_top1_0.80|general_qa": {
+      "mean_alpha": 0.19484670193697198,
+      "n": 1201
+    },
+    "bigram|zipf_top1_0.80|high_entropy": {
+      "mean_alpha": 0.2228063469025836,
+      "n": 68
+    },
+    "bigram|zipf_top1_0.80|information_extraction": {
+      "mean_alpha": 0.16792011712088087,
+      "n": 525
+    },
+    "bigram|zipf_top1_0.80|low_entropy": {
+      "mean_alpha": 0.19009902049699026,
+      "n": 132
+    },
+    "bigram|zipf_top1_0.80|mid_word": {
+      "mean_alpha": 0.1738091832176048,
+      "n": 74
+    },
+    "bigram|zipf_top1_0.80|open_qa": {
+      "mean_alpha": 0.18632432621032308,
+      "n": 1206
+    },
+    "bigram|zipf_top1_0.80|summarization": {
+      "mean_alpha": 0.18654754423113287,
+      "n": 586
+    },
+    "prompt_lookup|oracle|brainstorming": {
+      "mean_alpha": 0.4072874369411456,
+      "n": 1206
+    },
+    "prompt_lookup|oracle|classification": {
+      "mean_alpha": 0.40612551321291696,
+      "n": 1392
+    },
+    "prompt_lookup|oracle|closed_qa": {
+      "mean_alpha": 0.5236472338646716,
+      "n": 580
+    },
+    "prompt_lookup|oracle|creative_writing": {
+      "mean_alpha": 0.3637496218731577,
+      "n": 1018
+    },
+    "prompt_lookup|oracle|general_qa": {
+      "mean_alpha": 0.39765450855924545,
+      "n": 1201
+    },
+    "prompt_lookup|oracle|high_entropy": {
+      "mean_alpha": 0.3537825722981806,
+      "n": 68
+    },
+    "prompt_lookup|oracle|information_extraction": {
+      "mean_alpha": 0.4774711519039868,
+      "n": 525
+    },
+    "prompt_lookup|oracle|low_entropy": {
+      "mean_alpha": 0.40402104915737064,
+      "n": 132
+    },
+    "prompt_lookup|oracle|mid_word": {
+      "mean_alpha": 0.3170242389487858,
+      "n": 74
+    },
+    "prompt_lookup|oracle|open_qa": {
+      "mean_alpha": 0.3897160697945118,
+      "n": 1206
+    },
+    "prompt_lookup|oracle|summarization": {
+      "mean_alpha": 0.5069812429076688,
+      "n": 586
+    },
+    "prompt_lookup|zipf_top1_0.30|brainstorming": {
+      "mean_alpha": 0.1338889639563352,
+      "n": 1206
+    },
+    "prompt_lookup|zipf_top1_0.30|classification": {
+      "mean_alpha": 0.148218704877021,
+      "n": 1392
+    },
+    "prompt_lookup|zipf_top1_0.30|closed_qa": {
+      "mean_alpha": 0.17886213971547038,
+      "n": 580
+    },
+    "prompt_lookup|zipf_top1_0.30|creative_writing": {
+      "mean_alpha": 0.12378380062661486,
+      "n": 1018
+    },
+    "prompt_lookup|zipf_top1_0.30|general_qa": {
+      "mean_alpha": 0.13023729303097326,
+      "n": 1201
+    },
+    "prompt_lookup|zipf_top1_0.30|high_entropy": {
+      "mean_alpha": 0.14792545413622385,
+      "n": 68
+    },
+    "prompt_lookup|zipf_top1_0.30|information_extraction": {
+      "mean_alpha": 0.1616034384727079,
+      "n": 525
+    },
+    "prompt_lookup|zipf_top1_0.30|low_entropy": {
+      "mean_alpha": 0.14347774738945934,
+      "n": 132
+    },
+    "prompt_lookup|zipf_top1_0.30|mid_word": {
+      "mean_alpha": 0.1473822294407197,
+      "n": 74
+    },
+    "prompt_lookup|zipf_top1_0.30|open_qa": {
+      "mean_alpha": 0.13724194577584448,
+      "n": 1206
+    },
+    "prompt_lookup|zipf_top1_0.30|summarization": {
+      "mean_alpha": 0.16948241081440338,
+      "n": 586
+    },
+    "prompt_lookup|zipf_top1_0.56|brainstorming": {
+      "mean_alpha": 0.18998331353469206,
+      "n": 1206
+    },
+    "prompt_lookup|zipf_top1_0.56|classification": {
+      "mean_alpha": 0.20418951683657022,
+      "n": 1392
+    },
+    "prompt_lookup|zipf_top1_0.56|closed_qa": {
+      "mean_alpha": 0.27000385187323017,
+      "n": 580
+    },
+    "prompt_lookup|zipf_top1_0.56|creative_writing": {
+      "mean_alpha": 0.16989845386447025,
+      "n": 1018
+    },
+    "prompt_lookup|zipf_top1_0.56|general_qa": {
+      "mean_alpha": 0.18519635686612498,
+      "n": 1201
+    },
+    "prompt_lookup|zipf_top1_0.56|high_entropy": {
+      "mean_alpha": 0.18649509549408427,
+      "n": 68
+    },
+    "prompt_lookup|zipf_top1_0.56|information_extraction": {
+      "mean_alpha": 0.24131343852318032,
+      "n": 525
+    },
+    "prompt_lookup|zipf_top1_0.56|low_entropy": {
+      "mean_alpha": 0.20687169346060866,
+      "n": 132
+    },
+    "prompt_lookup|zipf_top1_0.56|mid_word": {
+      "mean_alpha": 0.1663445497271479,
+      "n": 74
+    },
+    "prompt_lookup|zipf_top1_0.56|open_qa": {
+      "mean_alpha": 0.19014445733459578,
+      "n": 1206
+    },
+    "prompt_lookup|zipf_top1_0.56|summarization": {
+      "mean_alpha": 0.25859394417993664,
+      "n": 586
+    },
+    "prompt_lookup|zipf_top1_0.80|brainstorming": {
+      "mean_alpha": 0.24034349762536972,
+      "n": 1206
+    },
+    "prompt_lookup|zipf_top1_0.80|classification": {
+      "mean_alpha": 0.255428944553253,
+      "n": 1392
+    },
+    "prompt_lookup|zipf_top1_0.80|closed_qa": {
+      "mean_alpha": 0.3467028092239926,
+      "n": 580
+    },
+    "prompt_lookup|zipf_top1_0.80|creative_writing": {
+      "mean_alpha": 0.20837234699361767,
+      "n": 1018
+    },
+    "prompt_lookup|zipf_top1_0.80|general_qa": {
+      "mean_alpha": 0.23082152027146727,
+      "n": 1201
+    },
+    "prompt_lookup|zipf_top1_0.80|high_entropy": {
+      "mean_alpha": 0.21789249054160442,
+      "n": 68
+    },
+    "prompt_lookup|zipf_top1_0.80|information_extraction": {
+      "mean_alpha": 0.3104132795931212,
+      "n": 525
+    },
+    "prompt_lookup|zipf_top1_0.80|low_entropy": {
+      "mean_alpha": 0.2517979630465044,
+      "n": 132
+    },
+    "prompt_lookup|zipf_top1_0.80|mid_word": {
+      "mean_alpha": 0.19353982001539682,
+      "n": 74
+    },
+    "prompt_lookup|zipf_top1_0.80|open_qa": {
+      "mean_alpha": 0.23711311224778478,
+      "n": 1206
+    },
+    "prompt_lookup|zipf_top1_0.80|summarization": {
+      "mean_alpha": 0.33709624289875406,
+      "n": 586
+    },
+    "unigram|oracle|brainstorming": {
+      "mean_alpha": 0.20208697617508914,
+      "n": 1206
+    },
+    "unigram|oracle|classification": {
+      "mean_alpha": 0.20027315034132237,
+      "n": 1392
+    },
+    "unigram|oracle|closed_qa": {
+      "mean_alpha": 0.20484231471457956,
+      "n": 580
+    },
+    "unigram|oracle|creative_writing": {
+      "mean_alpha": 0.1893288148422169,
+      "n": 1018
+    },
+    "unigram|oracle|general_qa": {
+      "mean_alpha": 0.2061166537970862,
+      "n": 1201
+    },
+    "unigram|oracle|high_entropy": {
+      "mean_alpha": 0.21464061045502175,
+      "n": 68
+    },
+    "unigram|oracle|information_extraction": {
+      "mean_alpha": 0.1984501530792442,
+      "n": 525
+    },
+    "unigram|oracle|low_entropy": {
+      "mean_alpha": 0.2213417609199303,
+      "n": 132
+    },
+    "unigram|oracle|mid_word": {
+      "mean_alpha": 0.21510521037271246,
+      "n": 74
+    },
+    "unigram|oracle|open_qa": {
+      "mean_alpha": 0.1886744655342907,
+      "n": 1206
+    },
+    "unigram|oracle|summarization": {
+      "mean_alpha": 0.2120668847954705,
+      "n": 586
+    },
+    "unigram|zipf_top1_0.30|brainstorming": {
+      "mean_alpha": 0.05264501434529958,
+      "n": 1206
+    },
+    "unigram|zipf_top1_0.30|classification": {
+      "mean_alpha": 0.06268956342212774,
+      "n": 1392
+    },
+    "unigram|zipf_top1_0.30|closed_qa": {
+      "mean_alpha": 0.045638759832178855,
+      "n": 580
+    },
+    "unigram|zipf_top1_0.30|creative_writing": {
+      "mean_alpha": 0.05163144007355506,
+      "n": 1018
+    },
+    "unigram|zipf_top1_0.30|general_qa": {
+      "mean_alpha": 0.047619152930485666,
+      "n": 1201
+    },
+    "unigram|zipf_top1_0.30|high_entropy": {
+      "mean_alpha": 0.07260921827486634,
+      "n": 68
+    },
+    "unigram|zipf_top1_0.30|information_extraction": {
+      "mean_alpha": 0.04947514020067285,
+      "n": 525
+    },
+    "unigram|zipf_top1_0.30|low_entropy": {
+      "mean_alpha": 0.05691109666021833,
+      "n": 132
+    },
+    "unigram|zipf_top1_0.30|mid_word": {
+      "mean_alpha": 0.07990572431024064,
+      "n": 74
+    },
+    "unigram|zipf_top1_0.30|open_qa": {
+      "mean_alpha": 0.04851921069233834,
+      "n": 1206
+    },
+    "unigram|zipf_top1_0.30|summarization": {
+      "mean_alpha": 0.050282018013330945,
+      "n": 586
+    },
+    "unigram|zipf_top1_0.56|brainstorming": {
+      "mean_alpha": 0.05925334429971697,
+      "n": 1206
+    },
+    "unigram|zipf_top1_0.56|classification": {
+      "mean_alpha": 0.07020781366315873,
+      "n": 1392
+    },
+    "unigram|zipf_top1_0.56|closed_qa": {
+      "mean_alpha": 0.052408084721470176,
+      "n": 580
+    },
+    "unigram|zipf_top1_0.56|creative_writing": {
+      "mean_alpha": 0.06129896931315112,
+      "n": 1018
+    },
+    "unigram|zipf_top1_0.56|general_qa": {
+      "mean_alpha": 0.05796286825250414,
+      "n": 1201
+    },
+    "unigram|zipf_top1_0.56|high_entropy": {
+      "mean_alpha": 0.08046982886181094,
+      "n": 68
+    },
+    "unigram|zipf_top1_0.56|information_extraction": {
+      "mean_alpha": 0.0586743363199964,
+      "n": 525
+    },
+    "unigram|zipf_top1_0.56|low_entropy": {
+      "mean_alpha": 0.07563715709413758,
+      "n": 132
+    },
+    "unigram|zipf_top1_0.56|mid_word": {
+      "mean_alpha": 0.08064581929554422,
+      "n": 74
+    },
+    "unigram|zipf_top1_0.56|open_qa": {
+      "mean_alpha": 0.05156791201180372,
+      "n": 1206
+    },
+    "unigram|zipf_top1_0.56|summarization": {
+      "mean_alpha": 0.058755315607533935,
+      "n": 586
+    },
+    "unigram|zipf_top1_0.80|brainstorming": {
+      "mean_alpha": 0.07235919858873167,
+      "n": 1206
+    },
+    "unigram|zipf_top1_0.80|classification": {
+      "mean_alpha": 0.08495155216272375,
+      "n": 1392
+    },
+    "unigram|zipf_top1_0.80|closed_qa": {
+      "mean_alpha": 0.06611779589717276,
+      "n": 580
+    },
+    "unigram|zipf_top1_0.80|creative_writing": {
+      "mean_alpha": 0.07475551498392041,
+      "n": 1018
+    },
+    "unigram|zipf_top1_0.80|general_qa": {
+      "mean_alpha": 0.07252839461286302,
+      "n": 1201
+    },
+    "unigram|zipf_top1_0.80|high_entropy": {
+      "mean_alpha": 0.09892321360670099,
+      "n": 68
+    },
+    "unigram|zipf_top1_0.80|information_extraction": {
+      "mean_alpha": 0.07240095881573054,
+      "n": 525
+    },
+    "unigram|zipf_top1_0.80|low_entropy": {
+      "mean_alpha": 0.09394984178405447,
+      "n": 132
+    },
+    "unigram|zipf_top1_0.80|mid_word": {
+      "mean_alpha": 0.09655296162131946,
+      "n": 74
+    },
+    "unigram|zipf_top1_0.80|open_qa": {
+      "mean_alpha": 0.06274909634923584,
+      "n": 1206
+    },
+    "unigram|zipf_top1_0.80|summarization": {
+      "mean_alpha": 0.07309054207826642,
+      "n": 586
+    }
+  }
+}

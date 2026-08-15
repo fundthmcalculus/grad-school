@@ -1,0 +1,7 @@
+# Captured artefacts are regenerable from `fisdraft.capture` in ~51 s and the
+# log-prob dump alone is ~2 GB. The JSON result files are small and ARE tracked,
+# so a table can always be traced to the run that produced it.
+.venv/
+runs/**/*.npy
+runs/**/*.parquet
+__pycache__/
