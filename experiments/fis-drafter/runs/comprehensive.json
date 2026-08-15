@@ -1,0 +1,83 @@
+[
+  {
+    "model": "SmolLM2-135M",
+    "params": 0.135,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.508,
+    "fis_trim_wlAUC": 0.86,
+    "mahal_wlAUC": 0.871,
+    "surface_wlAUC": 0.801
+  },
+  {
+    "model": "gemma-3-270m-it",
+    "params": 0.27,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.281,
+    "fis_trim_wlAUC": 0.736,
+    "mahal_wlAUC": 0.746,
+    "surface_wlAUC": 0.856
+  },
+  {
+    "model": "SmolLM2-360M",
+    "params": 0.36,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.572,
+    "fis_trim_wlAUC": 0.867,
+    "mahal_wlAUC": 0.872,
+    "surface_wlAUC": 0.801
+  },
+  {
+    "model": "pythia-410m (base)",
+    "params": 0.41,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.102,
+    "fis_trim_wlAUC": 0.838,
+    "mahal_wlAUC": 0.853,
+    "surface_wlAUC": 0.811
+  },
+  {
+    "model": "TinyLlama-1.1B",
+    "params": 1.1,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.601,
+    "fis_trim_wlAUC": 0.92,
+    "mahal_wlAUC": 0.924,
+    "surface_wlAUC": 0.832
+  },
+  {
+    "model": "LFM2.5-1.2B",
+    "params": 1.2,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.315,
+    "fis_trim_wlAUC": 0.843,
+    "mahal_wlAUC": 0.87,
+    "surface_wlAUC": 0.856
+  },
+  {
+    "model": "SmolLM2-135M",
+    "params": 0.135,
+    "dataset": "jailbreak",
+    "fis_trim_det1": 0.012,
+    "fis_trim_wlAUC": 0.726,
+    "mahal_wlAUC": 0.723,
+    "surface_wlAUC": 0.548
+  },
+  {
+    "model": "SmolLM2-360M",
+    "params": 0.36,
+    "dataset": "safeguard",
+    "fis_trim_det1": 0.023,
+    "fis_trim_wlAUC": 0.684,
+    "mahal_wlAUC": 0.663,
+    "surface_wlAUC": 0.746
+  },
+  {
+    "model": "TinyLlama-1.1B",
+    "params": 1.1,
+    "dataset": "safeguard",
+    "fis_trim_det1": 0.034,
+    "fis_trim_wlAUC": 0.674,
+    "mahal_wlAUC": 0.681,
+    "surface_wlAUC": 0.746
+  }
+]

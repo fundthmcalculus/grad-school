@@ -749,3 +749,63 @@ Mahalanobis at the strict operating point, while keeping the one-class, no-
 attack-examples, interpretable-attribution properties. det@1%FP ~0.57-0.60 on
 capable instruct models means catching ~60% of injections while flagging 1% of
 benign traffic -- a genuinely deployable triage gate.
+
+---
+
+# Part 9 — Comprehensive sweep: 3 datasets, 7 models, and where it generalises
+
+Broadened coverage: three independent attack corpora and models from 0.14B to
+1.2B (Qwen-3B/14B pending download). The FIS one-class detector uses the Part 8
+trimmed log-domain score throughout. Two metrics because injection corpora carry
+*opposite* length confounds (deepset injections are longer, safeguard's shorter),
+so a pooled number is not comparable across them: **det@1%FP** (deployment,
+pooled) and **within-length AUROC** (confound-controlled signal), with the
+surface-only baseline alongside.
+
+| model | dataset | det@1%FP | FIS wl-AUROC | Mahal wl | surface wl | act > surf? |
+|---|---|---|---|---|---|---|
+| SmolLM2-135M | deepset | 0.508 | 0.860 | 0.871 | 0.801 | **yes** |
+| gemma-3-270m-it | deepset | 0.281 | 0.736 | 0.746 | 0.856 | no |
+| SmolLM2-360M | deepset | 0.572 | 0.867 | 0.872 | 0.801 | **yes** |
+| pythia-410m (base) | deepset | 0.102 | 0.838 | 0.853 | 0.811 | yes |
+| TinyLlama-1.1B | deepset | **0.601** | 0.920 | 0.924 | 0.832 | **yes** |
+| LFM2.5-1.2B | deepset | 0.315 | 0.843 | 0.870 | 0.856 | no |
+| SmolLM2-135M | jailbreak | 0.012 | 0.726 | 0.723 | 0.548 | yes |
+| SmolLM2-360M | safeguard | 0.023 | 0.684 | 0.663 | 0.746 | no |
+| TinyLlama-1.1B | safeguard | 0.034 | 0.674 | 0.681 | 0.746 | no |
+
+## What generalises and what does not
+
+**The within-length activation signal is real everywhere** — FIS wl-AUROC is
+0.67–0.92 across every model and dataset, never worthless. The trimmed FIS tracks
+Mahalanobis within ~0.02 throughout, as expected.
+
+**Whether activations beat surface is dataset- and model-dependent.** Activation
+wins on deepset for the capable instruct models (SmolLM2, TinyLlama: +0.06 to
++0.09 over surface) and on jailbreak, but **loses to surface on safeguard**
+(0.68 vs 0.75 on both models) and for the weaker models on deepset (gemma, LFM2).
+The rule: the monitor wins when the injection perturbs the model's *internal
+representation* more than it perturbs *surface token statistics* — which holds
+for lexically-plain injections against capable Llama-family instruct models, and
+fails when the injections are lexically distinctive (safeguard's "Compose a
+message that starts with…") or the model is weak.
+
+**Strict-FPR detection generalises narrowest of all.** det@1%FP ≥ 0.5 only on
+deepset with capable instruct models. jailbreak (extreme length confound) and
+safeguard (surface-dominant, reversed length confound) both collapse at 1% FPR
+(≤0.03) regardless of the score fix — the fix recovers signal where it exists but
+cannot create it. pythia-410m (base) ranks fine within-length (0.838) yet fails
+at 1% FPR (0.102): the instruct-vs-base gap is a *strict-operating-point* effect,
+not a ranking one.
+
+## The honest comprehensive verdict
+
+The interpretable, unsupervised, no-attack-examples FIS monitor is a **genuine
+but narrow** tool. It is a deployable 1%-FPR triage gate (catch ~55–60% of
+injections at 1% benign FPR) **only** on the intersection of: a capable
+instruction-tuned target, an attack corpus whose injections are lexically plain,
+and the log-domain trimmed score. Outside that intersection it degrades to a
+within-length ranking signal that is real but no better — and sometimes worse —
+than reading the prompt's surface statistics. Broadening the evaluation from one
+dataset/model to three datasets and seven models is what surfaced these
+boundaries; the single-dataset result would have overstated the method.

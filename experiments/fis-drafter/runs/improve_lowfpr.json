@@ -1,46 +1,91 @@
 [
   {
-    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
     "arms": {
       "1:baseline_1-maxfiring": {
         "det@1%FP": 0.0,
-        "det@5%FP": 0.384,
-        "auroc": 0.9
+        "det@5%FP": 0.074,
+        "auroc": 0.414
       },
       "1:surprisal_sum(=Mahal)": {
-        "det@1%FP": 0.015,
-        "det@5%FP": 0.388,
-        "auroc": 0.898
+        "det@1%FP": 0.021,
+        "det@5%FP": 0.103,
+        "auroc": 0.414
       },
       "1:trimmed_sum_top2": {
-        "det@1%FP": 0.012,
-        "det@5%FP": 0.453,
-        "auroc": 0.897
+        "det@1%FP": 0.023,
+        "det@5%FP": 0.095,
+        "auroc": 0.43
       },
       "1:trimmed_sum_top4": {
-        "det@1%FP": 0.017,
-        "det@5%FP": 0.424,
-        "auroc": 0.892
+        "det@1%FP": 0.026,
+        "det@5%FP": 0.095,
+        "auroc": 0.439
       },
       "1:topk_mean_16": {
-        "det@1%FP": 0.016,
-        "det@5%FP": 0.374,
-        "auroc": 0.897
+        "det@1%FP": 0.018,
+        "det@5%FP": 0.101,
+        "auroc": 0.411
       },
       "2:bagged_15": {
-        "det@1%FP": 0.032,
-        "det@5%FP": 0.367,
-        "auroc": 0.89
+        "det@1%FP": 0.021,
+        "det@5%FP": 0.095,
+        "auroc": 0.431
       },
       "3:local_calib(Mahal)": {
-        "det@1%FP": 0.063,
-        "det@5%FP": 0.294,
-        "auroc": 0.881
+        "det@1%FP": 0.015,
+        "det@5%FP": 0.113,
+        "auroc": 0.572
       },
       "1+3:local_trimmed": {
-        "det@1%FP": 0.067,
-        "det@5%FP": 0.285,
-        "auroc": 0.875
+        "det@1%FP": 0.008,
+        "det@5%FP": 0.097,
+        "auroc": 0.598
+      }
+    }
+  },
+  {
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "arms": {
+      "1:baseline_1-maxfiring": {
+        "det@1%FP": 0.0,
+        "det@5%FP": 0.081,
+        "auroc": 0.561
+      },
+      "1:surprisal_sum(=Mahal)": {
+        "det@1%FP": 0.034,
+        "det@5%FP": 0.081,
+        "auroc": 0.561
+      },
+      "1:trimmed_sum_top2": {
+        "det@1%FP": 0.034,
+        "det@5%FP": 0.084,
+        "auroc": 0.548
+      },
+      "1:trimmed_sum_top4": {
+        "det@1%FP": 0.037,
+        "det@5%FP": 0.083,
+        "auroc": 0.544
+      },
+      "1:topk_mean_16": {
+        "det@1%FP": 0.031,
+        "det@5%FP": 0.086,
+        "auroc": 0.565
+      },
+      "2:bagged_15": {
+        "det@1%FP": 0.04,
+        "det@5%FP": 0.081,
+        "auroc": 0.573
+      },
+      "3:local_calib(Mahal)": {
+        "det@1%FP": 0.016,
+        "det@5%FP": 0.091,
+        "auroc": 0.61
+      },
+      "1+3:local_trimmed": {
+        "det@1%FP": 0.019,
+        "det@5%FP": 0.077,
+        "auroc": 0.583
       }
     }
   }

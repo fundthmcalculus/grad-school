@@ -1,0 +1,18 @@
+{
+  "config": {
+    "model_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "batch_size": 32,
+    "seed": 0,
+    "chat_template": true,
+    "dtype": "float32",
+    "mode": "safeguard",
+    "out": "runs/sg_smol360"
+  },
+  "n_probes": 650,
+  "n_layers": 32,
+  "hidden": 960,
+  "labels": {
+    "benign": 400,
+    "injection": 250
+  }
+}

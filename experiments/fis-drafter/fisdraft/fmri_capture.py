@@ -62,8 +62,8 @@ def run(cfg: Cfg) -> Path:
         probes = dose_response_battery(seed=cfg.seed)
     elif cfg.mode == "injection":
         probes = injection_battery(seed=cfg.seed, source="deepset")
-    elif cfg.mode == "jailbreak":
-        probes = injection_battery(seed=cfg.seed, source="jailbreak")
+    elif cfg.mode in ("jailbreak","safeguard","spml"):
+        probes = injection_battery(seed=cfg.seed, source=cfg.mode)
     else:
         probes = build_anomaly_battery(seed=cfg.seed, tokenizer=tok)
 
