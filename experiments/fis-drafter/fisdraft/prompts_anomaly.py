@@ -280,7 +280,9 @@ def injection_battery(seed: int = 0, source: str = "deepset") -> list[Probe]:
         rng = random.Random(seed)
         ben = [r["text"].strip() for r in d if r["label"] == 0 and r["text"].strip()]
         inj = [r["text"].strip() for r in d if r["label"] == 1 and r["text"].strip()]
-        ben = rng.sample(ben, min(400, len(ben)))
+        import os
+        nb = int(os.environ.get("SG_NBEN", "400"))
+        ben = rng.sample(ben, min(nb, len(ben)))
         inj = rng.sample(inj, min(250, len(inj)))
         probes += [Probe(t, "benign") for t in ben] + [Probe(t, "injection") for t in inj]
     elif source == "spml":

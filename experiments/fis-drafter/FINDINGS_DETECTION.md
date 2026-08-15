@@ -881,3 +881,68 @@ The published figure shows both curves. The honest one-line verdict: a genuine,
 cheap, interpretable triage gate on capable instruct models against plain
 injections, whose ranking scales with model size but whose strict-FPR
 deployability does not generalise to lexically-distinct attacks.
+
+---
+
+# Part 11 — More benign data, and TribbleClassifier parameter sweeps
+
+Two questions on Qwen2.5-3B: does more baseline (benign) data help, and how do the
+real classifier's knobs move detection.
+
+## More benign data — helps ranking, saturates, does not fix the hard-corpus tail
+
+Sweeping the number of benign prompts used to fit the one-class detector, fixed
+test set, trimmed log-domain score, 6 seeds:
+
+**deepset (easy corpus):**
+
+| n_benign | det@1%FP | wl-AUROC |
+|---|---|---|
+| 50 | 0.608 | 0.927 |
+| 100 | 0.626 | 0.938 |
+| 200 | **0.670** | 0.948 |
+| 240 | 0.640 | 0.940 |
+
+**safeguard (hard corpus, up to 2000 benign):**
+
+| n_benign | det@1%FP | wl-AUROC |
+|---|---|---|
+| 50 | 0.036 | 0.726 |
+| 200 | 0.045 | 0.772 |
+| 800 | 0.069 | 0.794 |
+| 1600 | 0.050 | **0.801** |
+
+**Yes, more benign data improves quality — with strong diminishing returns.**
+Within-length AUROC rises monotonically on both corpora (+0.02 deepset, +0.075
+safeguard) and saturates by ~200 (easy) / ~800 (hard) examples. det@1%FP improves
+with data **only where the score tails are already separable**: on deepset it
+climbs 0.61 → 0.67 then saturates at ~200; on safeguard it stays pinned at ~0.05
+no matter how much benign data is added. The hard-corpus low-FPR failure is a
+tail-overlap problem, not a data-quantity one — the same ranking/operating-point
+dissociation seen in Part 10, now shown to be immune to more data too.
+
+## TribbleClassifier parameter sweep (supervised, deepset, 5-fold CV)
+
+One-factor-at-a-time from a baseline (top_n=16, n_gaussians=2, probability,
+gaussian, refine=False; wl-AUROC 0.834, det@1%FP 0.409):
+
+| parameter | best value | effect on det@1%FP |
+|---|---|---|
+| **top_n** | 32 (max) | 0.28 → **0.61** — the dominant lever; more features monotonically better |
+| **refine** | True | 0.41 → **0.69** — big win (adds ~5× fit time) |
+| n_gaussians | 3–4 | 0.41 → 0.55–0.57 |
+| norm_conorm | probability/einstein | min/max best for AUROC (0.850) but worst for det@1%FP (0.310) |
+| member_function | gaussian | trap is broken here (det@1%FP 0.000) |
+
+**Two levers matter: `top_n` (feature budget) and `refine=True`.** Combined
+(top_n=32, n_gaussians=4, einstein, refine=True) the supervised classifier
+reaches **wl-AUROC 0.937, det@1%FP 0.768** — beating the one-class detector's
+0.66. Notably, **`refine=True` helps here even though optimizer refinement failed
+in the one-class setting (Part 5/7)**: the classifier's refinement has a
+*discriminative* cross-entropy objective (both classes), which the one-class
+density fit lacked. It is the same mechanism succeeding because it finally has a
+gradient toward the thing being measured.
+
+The trade-off: this is *supervised* (needs labelled attacks) and 5× slower to
+fit. It is the ceiling if you have attack examples; the one-class detector (0.66,
+no attacks) is what you deploy when you do not.
