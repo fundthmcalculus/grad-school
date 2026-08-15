@@ -1127,3 +1127,35 @@ extension of the one-class rule: the "none of the above" density plus a
 discriminative direction from a few labels — the same insight as the supervised
 `TribbleClassifier(refine=True)` result (Part 11), delivered by the cheapest
 sufficient mechanism.
+
+---
+
+# Part 15 — Regularized background covariance, explored properly
+
+Following the tail-separation round, a focused exploration of regularized
+covariance for the zero-shot score (the user's request). The relative-Mahalanobis
+idea is score = MD_foreground − MD_background with a regularized background;
+covariances use shrinkage `Σ(λ) = (1−λ)S + λ·(tr S/d)·I`. Zero-shot, benign-only,
+on RAW per-layer features (whitening sets Σ=I and degenerates the construction).
+
+| corpus (Qwen-3B) | trimmed PCA-32 | **Ledoit-Wolf Maha** | best relative-MD |
+|---|---|---|---|
+| deepset | 0.663 / 0.945 | **0.682 / 0.962** | 0.671 |
+| safeguard | 0.059 / 0.821 | 0.055 / 0.820 | 0.067 |
+| SPML | 0.885 / 0.935 | **0.895 / 0.968** | 0.888 |
+
+**The regularization pays on the foreground, not as a background subtraction.**
+A Ledoit-Wolf shrunk full-covariance Mahalanobis (`maha_lw`) modestly but
+consistently beats the PCA-rank-32 trimmed score (deepset +0.02 det@1%FP, SPML
++0.01, best within-length AUROC on all three) and needs no rank hyperparameter.
+The relative-MD background subtraction — the thing the exploration set out to
+test — never beats the plain Ledoit-Wolf foreground at any background shrinkage
+λ ∈ {0.3…0.99}; subtracting a background term only discards signal. The
+foreground-covariance shrinkage is the whole win.
+
+The hard corpus (safeguard) stays ~0.05–0.07 for every zero-shot variant,
+confirming again that no covariance trick cracks it — the few-shot direction
+(Part 14) is the only lever there.
+
+Shipped as the `cov="ledoit_wolf"` option in tribblefis #113 (issue #112). The
+relative-MD negative is documented in #112 so it is not re-attempted.
