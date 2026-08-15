@@ -830,3 +830,54 @@ lexically distinctive. The strict operating point on safeguard is still weak
 1%-FPR gate does -- but the direction is unambiguous, and it says the method's
 narrowness is partly a small-model artefact. (Qwen2.5-14B pending to confirm the
 trend continues.)
+
+---
+
+# Part 10 — Scaling to 14B: a ranking/operating-point dissociation
+
+The size ladder now runs 50M → 14B across ten models. Qwen2.5-14B-Instruct
+completes it and reveals a clean dissociation between the two metrics.
+
+| model | deepset det@1%FP | deepset FIS-wl | safeguard FIS-wl / surf | safeguard margin |
+|---|---|---|---|---|
+| SmolLM2-360M | 0.572 | 0.867 | 0.684 / 0.746 | −0.062 |
+| TinyLlama-1.1B | 0.601 | 0.920 | 0.674 / 0.746 | −0.072 |
+| Qwen2.5-3B | 0.663 | 0.945 | 0.762 / 0.745 | +0.017 |
+| **Qwen2.5-14B** | **0.673** | 0.943 | **0.860 / 0.745** | **+0.115** |
+
+**Two things scale differently.** The deployable 1%-FPR gate on the *easy* corpus
+**plateaus** at ~0.67 (3B→14B: 0.663→0.673, and wl-AUROC is flat at 0.94) — 3B was
+already near the ceiling. But on the *hard* corpus the within-length ranking
+**keeps climbing steeply**: the activation-over-surface margin goes
+−0.06 → −0.07 → +0.02 → **+0.12** from 360M to 14B. A 14B model's representation
+carries injection signal that surface tokens miss by a wide margin, even on the
+corpus where every model ≤1.2B lost.
+
+**But the strict operating point on safeguard stays stuck** (det@1%FP 0.023 →
+0.054 across 360M→14B, still unusable). So scale buys *ranking* (AUROC) on hard
+corpora but not the *low-FPR gate* — the benign/injection score tails overlap
+regardless of how well the middle of the distribution separates. This is the
+same AUROC-vs-operating-point gap seen throughout, now shown to persist under
+14× more parameters.
+
+## Final synthesis
+
+The interpretable, unsupervised, no-attack-examples FIS monitor, across 10 models
+(50M–14B, 5 architecture families) and 3 attack corpora:
+
+* **det@1%FP scales with capability then plateaus** — 0.07 (50M) → 0.5 (~0.4B) →
+  0.67 (3B–14B) on the easy corpus. Deployable as a ~0.67-recall / 1%-FP triage
+  gate on capable instruct models against lexically-plain injections.
+* **Ranking (within-length AUROC) keeps improving with scale on hard corpora** —
+  14B decisively beats surface features everywhere, so the method's small-model
+  narrowness is largely an artefact of capability, not a fundamental limit.
+* **The 1%-FPR gate does not generalise to hard corpora at any tested scale** —
+  ranking and operating point dissociate; a better score threshold or a
+  conformal/tail-calibrated approach is the open problem, not more parameters.
+* **The log-domain trimmed score (issue #108) is what makes any of the 1%-FPR
+  numbers non-zero** — the fix is necessary throughout.
+
+The published figure shows both curves. The honest one-line verdict: a genuine,
+cheap, interpretable triage gate on capable instruct models against plain
+injections, whose ranking scales with model size but whose strict-FPR
+deployability does not generalise to lexically-distinct attacks.

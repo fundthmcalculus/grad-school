@@ -81,6 +81,15 @@
     "surface_wlAUC": 0.843
   },
   {
+    "model": "Qwen2.5-14B",
+    "params": 14.0,
+    "dataset": "deepset",
+    "fis_trim_det1": 0.673,
+    "fis_trim_wlAUC": 0.943,
+    "mahal_wlAUC": 0.946,
+    "surface_wlAUC": 0.843
+  },
+  {
     "model": "SmolLM2-135M",
     "params": 0.135,
     "dataset": "jailbreak",
@@ -114,6 +123,15 @@
     "fis_trim_det1": 0.046,
     "fis_trim_wlAUC": 0.762,
     "mahal_wlAUC": 0.772,
+    "surface_wlAUC": 0.745
+  },
+  {
+    "model": "Qwen2.5-14B",
+    "params": 14.0,
+    "dataset": "safeguard",
+    "fis_trim_det1": 0.054,
+    "fis_trim_wlAUC": 0.86,
+    "mahal_wlAUC": 0.872,
     "surface_wlAUC": 0.745
   }
 ]

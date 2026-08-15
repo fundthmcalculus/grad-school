@@ -44,14 +44,14 @@
   <p class="eyebrow">One-class activation monitor · prompt injection</p>
   <h1>Detection scales with model capability</h1>
   <p class="lede">The interpretable, unsupervised <b>TribbleFIS one-class detector</b> (log-domain trimmed score,
-  benign-only fit) tested across nine models from 50M to 3B parameters. Two questions: does the strict
+  benign-only fit) tested across ten models from 50M to 14B parameters. Two questions: does the strict
   1%-false-positive gate improve with scale, and when do internal activations beat reading the prompt's surface?</p>
   <p class="meta" id="meta">deepset/prompt-injections + xTRam1/safe-guard · 6 seeds · within-length controlled</p>
 
   <section>
     <h2>1. Deployable detection vs model size</h2>
     <p class="sub">Detection rate at a 1% benign false-positive rate — the deployment metric. It climbs with
-    capability: unusable at 50M, a usable triage gate (≥0.5) from ~0.4B, best at 3B. Hollow points are base
+    capability: unusable at 50M, a usable triage gate (≥0.5) from ~0.4B, then plateauing near 0.67 by 3B. Hollow points are base
     (non-instruction-tuned) models; filled are instruction-tuned.</p>
     <figure><div class="cw"><svg id="pA" viewBox="0 0 720 380" role="img" aria-label="det@1%FP vs model size"></svg></div></figure>
   </section>
@@ -60,23 +60,23 @@
     <h2>2. When do activations beat the surface baseline?</h2>
     <p class="sub">Within-length AUROC of the activation monitor minus the surface-only (token-statistics)
     baseline. Above zero, watching the model's internals wins; below, just reading the prompt wins. On the
-    easy corpus most models win; on the hard corpus (safeguard, lexically-distinct injections) only the 3B
-    model crosses over — capability widens where the method applies.</p>
+    easy corpus most models win. On the hard corpus (safeguard, lexically-distinct injections) small models
+    lose, but scale keeps buying separation — the margin crosses zero at 3B and reaches +0.12 at 14B.</p>
     <figure><div class="cw"><svg id="pB" viewBox="0 0 720 340" role="img" aria-label="activation minus surface margin vs size"></svg></div>
       <div class="legend" id="legB"></div>
     </figure>
   </section>
 
   <div class="note" id="note"></div>
-  <footer>Regenerate: <span style="color:var(--ink-2)">python -m fisdraft.comprehensive</span> · 9 models × 3 corpora</footer>
+  <footer>Regenerate: <span style="color:var(--ink-2)">python -m fisdraft.comprehensive</span> · 10 models × 3 corpora</footer>
 </div>
 
 <script>
-const D = {"deepset":[{"model":"Supra-50M (inst)","p":0.05,"det1":0.074,"fis":0.771,"surf":0.804,"base":false},{"model":"SmolLM2-135M","p":0.135,"det1":0.508,"fis":0.86,"surf":0.801,"base":false},{"model":"gemma-3-270m-it","p":0.27,"det1":0.281,"fis":0.736,"surf":0.856,"base":false},{"model":"SmolLM2-360M","p":0.36,"det1":0.572,"fis":0.867,"surf":0.801,"base":false},{"model":"pythia-410m (base)","p":0.41,"det1":0.102,"fis":0.838,"surf":0.811,"base":true},{"model":"Qwen2.5-0.5B (base)","p":0.5,"det1":0.506,"fis":0.874,"surf":0.843,"base":true},{"model":"TinyLlama-1.1B","p":1.1,"det1":0.601,"fis":0.92,"surf":0.832,"base":false},{"model":"LFM2.5-1.2B","p":1.2,"det1":0.315,"fis":0.843,"surf":0.856,"base":false},{"model":"Qwen2.5-3B","p":3.0,"det1":0.663,"fis":0.945,"surf":0.843,"base":false}],"safeguard":[{"model":"SmolLM2-360M","p":0.36,"det1":0.023,"fis":0.684,"surf":0.746,"base":false},{"model":"TinyLlama-1.1B","p":1.1,"det1":0.034,"fis":0.674,"surf":0.746,"base":false},{"model":"Qwen2.5-3B","p":3.0,"det1":0.046,"fis":0.762,"surf":0.745,"base":false}]};
+const D = {"deepset":[{"model":"Supra-50M (inst)","p":0.05,"det1":0.074,"fis":0.771,"surf":0.804,"base":false},{"model":"SmolLM2-135M","p":0.135,"det1":0.508,"fis":0.86,"surf":0.801,"base":false},{"model":"gemma-3-270m-it","p":0.27,"det1":0.281,"fis":0.736,"surf":0.856,"base":false},{"model":"SmolLM2-360M","p":0.36,"det1":0.572,"fis":0.867,"surf":0.801,"base":false},{"model":"pythia-410m (base)","p":0.41,"det1":0.102,"fis":0.838,"surf":0.811,"base":true},{"model":"Qwen2.5-0.5B (base)","p":0.5,"det1":0.506,"fis":0.874,"surf":0.843,"base":true},{"model":"TinyLlama-1.1B","p":1.1,"det1":0.601,"fis":0.92,"surf":0.832,"base":false},{"model":"LFM2.5-1.2B","p":1.2,"det1":0.315,"fis":0.843,"surf":0.856,"base":false},{"model":"Qwen2.5-3B","p":3.0,"det1":0.663,"fis":0.945,"surf":0.843,"base":false},{"model":"Qwen2.5-14B","p":14.0,"det1":0.673,"fis":0.943,"surf":0.843,"base":false}],"safeguard":[{"model":"SmolLM2-360M","p":0.36,"det1":0.023,"fis":0.684,"surf":0.746,"base":false},{"model":"TinyLlama-1.1B","p":1.1,"det1":0.034,"fis":0.674,"surf":0.746,"base":false},{"model":"Qwen2.5-3B","p":3.0,"det1":0.046,"fis":0.762,"surf":0.745,"base":false},{"model":"Qwen2.5-14B","p":14.0,"det1":0.054,"fis":0.86,"surf":0.745,"base":false}]};
 const NS='http://www.w3.org/2000/svg';
 const el=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
 const lx=p=>Math.log10(p);                       // log model size
-const X0=lx(0.045), X1=lx(3.4);
+const X0=lx(0.045), X1=lx(20);
 
 /* ===== Panel A: det@1%FP vs size ===== */
 (function(){
@@ -87,7 +87,7 @@ const X0=lx(0.045), X1=lx(3.4);
     svg.appendChild(el('line',{x1:mL,y1:y,x2:W-mR,y2:y,stroke:'var(--line)','stroke-width':1}));
     const t=el('text',{x:mL-10,y:y+4,'text-anchor':'end',fill:'var(--ink-3)','font-size':12,'font-family':'var(--mono)'});t.textContent=g.toFixed(1);svg.appendChild(t);}
   // x ticks (log)
-  [0.05,0.1,0.3,1,3].forEach(v=>{const x=px(v);
+  [0.05,0.1,0.3,1,3,10].forEach(v=>{const x=px(v);
     svg.appendChild(el('line',{x1:x,y1:mT,x2:x,y2:H-mB,stroke:'var(--line)','stroke-width':1,opacity:.5}));
     const t=el('text',{x:x,y:H-mB+20,'text-anchor':'middle',fill:'var(--ink-3)','font-size':12,'font-family':'var(--mono)'});t.textContent=v<1?v+'B':v+'B';svg.appendChild(t);});
   // deployable threshold
@@ -124,7 +124,7 @@ const X0=lx(0.045), X1=lx(3.4);
   const z=el('text',{x:W-mR-4,y:py(0)-6,'text-anchor':'end',fill:'var(--ink-3)','font-size':11,'font-family':'var(--mono)'});z.textContent='tie';svg.appendChild(z);
   // y ticks
   [-0.1,0,0.1].forEach(g=>{const t=el('text',{x:mL-10,y:py(g)+4,'text-anchor':'end',fill:'var(--ink-3)','font-size':12,'font-family':'var(--mono)'});t.textContent=(g>0?'+':'')+g.toFixed(1);svg.appendChild(t);});
-  [0.05,0.1,0.3,1,3].forEach(v=>{const x=px(v);const t=el('text',{x:x,y:H-mB+20,'text-anchor':'middle',fill:'var(--ink-3)','font-size':12,'font-family':'var(--mono)'});t.textContent=v+'B';svg.appendChild(t);});
+  [0.05,0.1,0.3,1,3,10].forEach(v=>{const x=px(v);const t=el('text',{x:x,y:H-mB+20,'text-anchor':'middle',fill:'var(--ink-3)','font-size':12,'font-family':'var(--mono)'});t.textContent=v+'B';svg.appendChild(t);});
   // region labels
   const up=el('text',{x:mL+4,y:py(0.13),fill:'var(--pos)','font-size':11.5,'font-weight':600});up.textContent='activations win';svg.appendChild(up);
   const dn=el('text',{x:mL+4,y:py(-0.11),fill:'var(--neg)','font-size':11.5,'font-weight':600});dn.textContent='surface wins';svg.appendChild(dn);
@@ -146,7 +146,8 @@ const X0=lx(0.045), X1=lx(3.4);
 
 document.getElementById('note').innerHTML =
   '<b>The method’s narrowness is partly a small-model artefact.</b> Detection at 1% FPR rises from 0.07 (50M) '+
-  'to 0.66 (3B), and the point where activations overtake surface features moves right with the harder corpus: '+
-  'on safeguard, only the 3B model wins. Base models (pythia, Qwen-0.5B) rank well within-length but the base '+
-  'pythia fails at the strict operating point — the instruct advantage is a low-FPR effect. Qwen-14B is pending.';
+  'to a plateau at 0.67 (3B–14B) — the strict gate saturates. But on the hard corpus the ranking keeps climbing: '+
+  'the activation-over-surface margin grows from +0.02 (3B) to +0.12 (14B), so scale keeps buying separation '+
+  'even where the deployable 1%-FPR gate does not. Base models rank well within-length but base pythia fails at '+
+  '1% FPR — the instruct advantage is a low-FPR effect.';
 </script>
