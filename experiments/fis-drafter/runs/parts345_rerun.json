@@ -1,0 +1,134 @@
+[
+  {
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "n_injection": 203,
+    "n_benign": 343,
+    "within_len_auroc": {
+      "tribble_oneclass": {
+        "mean": 0.8526705791711842,
+        "std": 0.017983244835582755
+      },
+      "mahalanobis": {
+        "mean": 0.870946036221687,
+        "std": 0.015200815297660727
+      },
+      "surface": {
+        "mean": 0.8011332401581237,
+        "std": 0.026676836466896642
+      },
+      "length": {
+        "mean": 0.5637900031277453,
+        "std": 0.025494618641560118
+      }
+    },
+    "operating_points": {
+      "tribble_oneclass": {
+        "det@1%FP": 0.11904761904761905,
+        "det@5%FP": 0.7142857142857143
+      },
+      "mahalanobis": {
+        "det@1%FP": 0.5254515599343185,
+        "det@5%FP": 0.7142857142857143
+      }
+    }
+  },
+  {
+    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "n_injection": 203,
+    "n_benign": 343,
+    "within_len_auroc": {
+      "tribble_oneclass": {
+        "mean": 0.8440044504553055,
+        "std": 0.03448459400405031
+      },
+      "mahalanobis": {
+        "mean": 0.871560201561634,
+        "std": 0.023874137945331504
+      },
+      "surface": {
+        "mean": 0.8011332401581237,
+        "std": 0.026676836466896642
+      },
+      "length": {
+        "mean": 0.5637900031277453,
+        "std": 0.025494618641560118
+      }
+    },
+    "operating_points": {
+      "tribble_oneclass": {
+        "det@1%FP": 0.0,
+        "det@5%FP": 0.5935960591133005
+      },
+      "mahalanobis": {
+        "det@1%FP": 0.5525451559934319,
+        "det@5%FP": 0.7003284072249589
+      }
+    }
+  },
+  {
+    "model": "google/gemma-3-270m-it",
+    "n_injection": 203,
+    "n_benign": 343,
+    "within_len_auroc": {
+      "tribble_oneclass": {
+        "mean": 0.7457960971491598,
+        "std": 0.028521434712853417
+      },
+      "mahalanobis": {
+        "mean": 0.7463455092043151,
+        "std": 0.027895620107730754
+      },
+      "surface": {
+        "mean": 0.8558180904863542,
+        "std": 0.02903925345425513
+      },
+      "length": {
+        "mean": 0.6091468248110096,
+        "std": 0.024768589423303154
+      }
+    },
+    "operating_points": {
+      "tribble_oneclass": {
+        "det@1%FP": 0.15435139573070608,
+        "det@5%FP": 0.4688013136288998
+      },
+      "mahalanobis": {
+        "det@1%FP": 0.2865353037766831,
+        "det@5%FP": 0.4688013136288998
+      }
+    }
+  },
+  {
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "n_injection": 203,
+    "n_benign": 343,
+    "within_len_auroc": {
+      "tribble_oneclass": {
+        "mean": 0.9119763338158786,
+        "std": 0.015759594293015638
+      },
+      "mahalanobis": {
+        "mean": 0.9235787054887221,
+        "std": 0.010652825215064521
+      },
+      "surface": {
+        "mean": 0.8321642189067756,
+        "std": 0.027704208264039475
+      },
+      "length": {
+        "mean": 0.6121766985377146,
+        "std": 0.018844099147333548
+      }
+    },
+    "operating_points": {
+      "tribble_oneclass": {
+        "det@1%FP": 0.10344827586206896,
+        "det@5%FP": 0.7487684729064039
+      },
+      "mahalanobis": {
+        "det@1%FP": 0.5837438423645319,
+        "det@5%FP": 0.7504105090311987
+      }
+    }
+  }
+]

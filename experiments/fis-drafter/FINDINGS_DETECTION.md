@@ -547,3 +547,80 @@ instruct-vs-base result that the signal tracks instruction-following capability.
 * And the load-bearing finding: **AUROC is the wrong target**; the current
   detector is already at the best deployment operating point, and the metric to
   refine against is det@low-FPR, not AUROC.
+
+---
+
+# Part 6 — Parts 3–5 re-run through the genuine tribblefis library
+
+`CORRECTION.md` established that Parts 2–5 used a reimplementation. This re-runs
+the core injection result with the real
+`tribblefis.one_class.TribbleOneClassDetector` (PR #105/#106, `whiten=True`) as
+the FIS arm — a true one-class fit on benign activations only, no attack
+examples. Same confound controls as Part 3 (surface baseline, within-length
+stratification, operating points). These numbers supersede the reimplementation's
+as the authoritative ones.
+
+## Within-length AUROC, one-class, four instruct models (6 seeds)
+
+| model | **tribble one-class** | Mahalanobis | surface | length |
+|---|---|---|---|---|
+| SmolLM2-135M-Instruct | **0.853 ± 0.018** | 0.871 | 0.801 | 0.564 |
+| SmolLM2-360M-Instruct | **0.844 ± 0.034** | 0.872 | 0.801 | 0.564 |
+| gemma-3-270m-it | 0.746 ± 0.029 | 0.746 | **0.856** | 0.609 |
+| TinyLlama-1.1B-Chat | **0.912 ± 0.016** | 0.924 | 0.832 | 0.612 |
+
+**The core claim holds with the real library on 3 of 4 models.** The genuine
+one-class FIS detector beats the surface-only and length baselines after
+controlling length (by +0.05 to +0.08), with no attack examples — which is the
+Part 3 result, now honestly attributable to `tribblefis`.
+
+It is **consistently a little below Mahalanobis** (0.84–0.91 vs 0.87–0.92) — the
+fuzzy per-component Gaussians are a slightly weaker density model than the exact
+joint quadratic, even after whitening. That gap is the honest price of the
+rule-based form.
+
+## Two caveats the re-run surfaced, both real
+
+**1. gemma-3-270m-it is a counterexample.** On the smallest model, *both*
+activation detectors (tribble 0.746, Mahalanobis 0.746) **lose to surface token
+statistics** (0.856). The earlier Part 4 write-up compared gemma's activations
+only to *length* (which it beats, 0.746 vs 0.609) and never to the full surface
+baseline. It should have. "Watch the activations" is **model-dependent**, and the
+weakest instruct model breaks it — surface features are the better injection
+detector there. This qualifies the whole approach: it needs a model whose
+activations actually encode the injection, and capability seems to matter
+(TinyLlama-1.1B strongest, gemma-270m the failure).
+
+**2. The FIS detector is worse at the strict operating point.** Detection at a
+fixed benign false-positive rate:
+
+| model | detector | det@1%FP | det@5%FP |
+|---|---|---|---|
+| SmolLM2-135M | tribble one-class | 0.12 | 0.71 |
+| SmolLM2-135M | Mahalanobis | **0.53** | 0.71 |
+| SmolLM2-360M | tribble one-class | 0.00 | 0.59 |
+| SmolLM2-360M | Mahalanobis | **0.55** | 0.70 |
+| TinyLlama-1.1B | tribble one-class | 0.10 | 0.75 |
+| TinyLlama-1.1B | Mahalanobis | **0.58** | 0.75 |
+
+At **5% FPR the two match** (both ~0.71 catch), but at **1% FPR the fuzzy
+detector collapses** (0.00–0.12 vs Mahalanobis 0.53–0.58). The `1 − max firing`
+score gives benign prompts a heavy upper tail, so the strict 1%-FPR threshold
+sits high and catches almost no injections. For a deployment that needs very low
+false positives, Mahalanobis is the better score; the fuzzy detector is usable
+only at the more permissive 5% operating point. This is the mirror image of the
+Part 5 finding (there a high-dim *Mahalanobis* had the heavy tail) and it
+reinforces the same lesson: rank the detector by the operating point you will
+deploy at, not by AUROC.
+
+## Net, stated honestly
+
+Through the real library, the one-class FIS injection monitor is a **genuine but
+modest** result: it beats surface/length on the larger instruct models with no
+attack examples, trails Mahalanobis slightly on AUROC and badly at 1% FPR, and
+fails outright on the smallest model where surface wins. Its live advantages
+remain the ones AUROC does not show — it is unsupervised, and (Part 4) it yields
+faithful per-layer attribution. The honest headline is not "the FIS detects
+injections best" but "an interpretable, unsupervised FIS monitor is competitive
+at a 5%-FPR operating point on capable instruct models, and says which layers
+fired."
