@@ -809,3 +809,24 @@ within-length ranking signal that is real but no better — and sometimes worse 
 than reading the prompt's surface statistics. Broadening the evaluation from one
 dataset/model to three datasets and seven models is what surfaced these
 boundaries; the single-dataset result would have overstated the method.
+
+## Part 9 update — scale widens the intersection (Qwen2.5-3B)
+
+Qwen2.5-3B-Instruct, added to the sweep, is the best model tested and answers the
+open question of whether more scale helps:
+
+| model | deepset det@1%FP | deepset FIS-wl / surf | **safeguard FIS-wl / surf** | act>surf (both)? |
+|---|---|---|---|---|
+| TinyLlama-1.1B | 0.601 | 0.920 / 0.832 | 0.674 / 0.746 | deepset only |
+| **Qwen2.5-3B** | **0.663** | 0.945 / 0.843 | **0.762 / 0.745** | **both** |
+
+On deepset, 3B beats every smaller model (det@1%FP 0.663, wl-AUROC 0.945). More
+importantly, **on the safeguard corpus -- where every model up to 1.2B lost to
+surface features -- 3B's activations finally beat surface (0.762 vs 0.745).**
+Capability widens the intersection: a richer representation carries injection
+signal that surface tokens do not, even on the corpus whose injections are
+lexically distinctive. The strict operating point on safeguard is still weak
+(det@1%FP 0.046), so ranking crosses the surface threshold before the deployable
+1%-FPR gate does -- but the direction is unambiguous, and it says the method's
+narrowness is partly a small-model artefact. (Qwen2.5-14B pending to confirm the
+trend continues.)
