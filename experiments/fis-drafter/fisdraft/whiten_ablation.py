@@ -51,15 +51,15 @@ def transform(kind, Xtr, Xall, k=32):
     Xc = Xtr - mu
     # eigdecomposition of the covariance
     cov = np.cov(Xc.T) + 1e-6 * np.eye(Xc.shape[1])
-    w, V = np.linalg.eigh(cov)         # ascending
+    w, V = np.linalg.eigh(cov)  # ascending
     order = np.argsort(w)[::-1]
     w, V = w[order], V[:, order]
     if kind.startswith("pca"):
         kk = Xc.shape[1] if kind == "pca_full" else min(k, Xc.shape[1])
-        Wm = V[:, :kk] / np.sqrt(w[:kk] + 1e-9)      # PCA-whiten to kk comps
+        Wm = V[:, :kk] / np.sqrt(w[:kk] + 1e-9)  # PCA-whiten to kk comps
         return (Xall - mu) @ Wm
     if kind == "zca":
-        Wm = V @ np.diag(1.0 / np.sqrt(w + 1e-9)) @ V.T   # ZCA (symmetric)
+        Wm = V @ np.diag(1.0 / np.sqrt(w + 1e-9)) @ V.T  # ZCA (symmetric)
         return (Xall - mu) @ Wm
     raise ValueError(kind)
 
@@ -85,30 +85,41 @@ def run(rundir: Path, seeds=6, k=32) -> dict:
 
     for seed in range(seeds):
         rng = np.random.default_rng(seed)
-        ben = np.where(y == 0)[0]; rng.shuffle(ben); inj = np.where(y == 1)[0]
-        fit = ben[: int(0.6 * len(ben))]; tb = ben[int(0.6 * len(ben)):]
+        ben = np.where(y == 0)[0]
+        rng.shuffle(ben)
+        inj = np.where(y == 1)[0]
+        fit = ben[: int(0.6 * len(ben))]
+        tb = ben[int(0.6 * len(ben)) :]
         X, _ = layer_features(act, fit, 8)
-        ti = np.r_[tb, inj]; yt = np.r_[np.zeros(len(tb)), np.ones(len(inj))]
+        ti = np.r_[tb, inj]
+        yt = np.r_[np.zeros(len(tb)), np.ones(len(inj))]
         tlt = np.r_[tl[tb], tl[inj]]
-        fit_pos = np.arange(len(fit))                 # fit rows are first in X? no
+        fit_pos = np.arange(len(fit))  # fit rows are first in X? no
         for kk in kinds:
             kind = "pca" if kk == "pca_16" or kk == "pca_32" else kk
             kv = 16 if kk == "pca_16" else k
-            Z = transform("pca" if kk in ("pca_16", "pca_32") else kk,
-                          X[fit], X, k=kv)
+            Z = transform("pca" if kk in ("pca_16", "pca_32") else kk, X[fit], X, k=kv)
             s = trimmed_score(Z, fit)  # fit indices are 0..len(fit)-1 in X order
             acc[kk]["d1"].append(det_at(yt, s[ti], 0.01))
             acc[kk]["wl"].append(within_len_auc(yt, s[ti], tlt))
-    return {"model": mid, "dataset": rundir.name,
-            "arms": {kk: {"det@1%FP": round(float(np.mean(v["d1"])), 3),
-                          "wl_auroc": round(float(np.mean(v["wl"])), 3)}
-                     for kk, v in acc.items()}}
+    return {
+        "model": mid,
+        "dataset": rundir.name,
+        "arms": {
+            kk: {
+                "det@1%FP": round(float(np.mean(v["d1"])), 3),
+                "wl_auroc": round(float(np.mean(v["wl"])), 3),
+            }
+            for kk, v in acc.items()
+        },
+    }
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", nargs="+",
-                    default=["runs/injection_qwen3b", "runs/sg_qwen3b"])
+    ap.add_argument(
+        "--runs", nargs="+", default=["runs/injection_qwen3b", "runs/sg_qwen3b"]
+    )
     a = ap.parse_args()
     allout = []
     print("Whitening / PCA ablation (trimmed log-domain score, one-class):\n")
@@ -116,7 +127,11 @@ def main():
     for r in a.runs:
         res = run(Path(r))
         allout.append(res)
-        ds = "deepset" if "sg_" not in r and "spml" not in r else r.split("_")[0].split("/")[-1]
+        ds = (
+            "deepset"
+            if "sg_" not in r and "spml" not in r
+            else r.split("_")[0].split("/")[-1]
+        )
         for kk, v in res["arms"].items():
             print("%-22s %-14s %10.3f %10.3f" % (kk, ds, v["det@1%FP"], v["wl_auroc"]))
         print()

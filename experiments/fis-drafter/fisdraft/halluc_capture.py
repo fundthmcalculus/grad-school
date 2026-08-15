@@ -150,8 +150,11 @@ def run(cfg: Cfg) -> Path:
 
         for t in range(cfg.max_new_tokens):
             o = model(
-                input_ids=cur, attention_mask=attn, past_key_values=past,
-                use_cache=True, output_hidden_states=True,
+                input_ids=cur,
+                attention_mask=attn,
+                past_key_values=past,
+                use_cache=True,
+                output_hidden_states=True,
             )
             past = o.past_key_values
             logits = o.logits[:, -1, :]
@@ -186,9 +189,12 @@ def run(cfg: Cfg) -> Path:
             txt = tok.decode(gen[r_], skip_special_tokens=True).strip()
             P = pd.DataFrame(per[r_])
             rec = {
-                "item_id": x["item_id"], "cond": x["cond"],
-                "question": x["question"], "reference": x["reference"],
-                "answer": txt, "n_tokens": len(gen[r_]),
+                "item_id": x["item_id"],
+                "cond": x["cond"],
+                "question": x["question"],
+                "reference": x["reference"],
+                "answer": txt,
+                "n_tokens": len(gen[r_]),
                 "prompt_len": len(x["ids"]),
                 "f1": token_f1(txt, x["reference"]),
                 "ref_recall": recall_of_ref(txt, x["reference"]),
@@ -218,7 +224,9 @@ def run(cfg: Cfg) -> Path:
     np.save(outdir / "hid_mean.npy", np.stack(hid_mean))
     np.save(outdir / "hid_last.npy", np.stack(hid_last))
     np.save(outdir / "layer_norm_mean.npy", np.stack(step_rows))
-    (outdir / "meta.json").write_text(json.dumps({"config": asdict(cfg), "n": len(df)}, indent=2))
+    (outdir / "meta.json").write_text(
+        json.dumps({"config": asdict(cfg), "n": len(df)}, indent=2)
+    )
 
     print(df.groupby("cond")[["f1", "ref_recall", "n_tokens"]].mean().round(3))
     return outdir

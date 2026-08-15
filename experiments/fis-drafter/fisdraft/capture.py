@@ -104,9 +104,7 @@ def distribution_stats(logits: torch.Tensor) -> dict[str, torch.Tensor]:
     # Power-law slope of the sorted tail. Zipfian structure in next-token
     # distributions is folklore; fitting the exponent lets experiment 0 check
     # it rather than assume it.
-    ranks = torch.arange(
-        TAIL_LO, TAIL_HI, device=logits.device, dtype=torch.float32
-    )
+    ranks = torch.arange(TAIL_LO, TAIL_HI, device=logits.device, dtype=torch.float32)
     lr = torch.log(ranks)
     lp = srt[:, TAIL_LO:TAIL_HI]
     lr_c = lr - lr.mean()
@@ -310,7 +308,10 @@ def run_capture(cfg: CaptureConfig) -> Path:
                 break
             cur = nxt.unsqueeze(-1)
             attn = torch.cat(
-                [attn, torch.ones((len(batch), 1), dtype=torch.long, device=cfg.device)],
+                [
+                    attn,
+                    torch.ones((len(batch), 1), dtype=torch.long, device=cfg.device),
+                ],
                 dim=1,
             )
 

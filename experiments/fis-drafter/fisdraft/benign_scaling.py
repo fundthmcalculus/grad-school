@@ -37,7 +37,8 @@ def run(rundir: Path, seeds=6, n_pca=32) -> dict:
     curve = {n: {"d1": [], "wl": []} for n in SIZES}
     for seed in range(seeds):
         rng = np.random.default_rng(seed)
-        ben = ben_all.copy(); rng.shuffle(ben)
+        ben = ben_all.copy()
+        rng.shuffle(ben)
         # fixed held-out benign test (last 400), train pool is the rest
         test_ben = ben[-400:]
         pool = ben[:-400]
@@ -52,23 +53,36 @@ def run(rundir: Path, seeds=6, n_pca=32) -> dict:
             Xdf = pd.DataFrame(X, columns=[f"f{i}" for i in range(X.shape[1])])
             with contextlib.redirect_stdout(io.StringIO()):
                 det = TribbleOneClassDetector(
-                    whiten=True, whiten_components=min(n_pca, n - 1),
-                    n_gaussians=1, norm_conorm="probability", random_state=seed).fit(Xdf.iloc[fit])
+                    whiten=True,
+                    whiten_components=min(n_pca, n - 1),
+                    n_gaussians=1,
+                    norm_conorm="probability",
+                    random_state=seed,
+                ).fit(Xdf.iloc[fit])
             S = surprisals(det, Xdf)
             trim = np.sort(S, 1)[:, : S.shape[1] - 2].sum(1)
             curve[n]["d1"].append(det_at(yt, trim[ti], 0.01))
             curve[n]["wl"].append(within_len_auc(yt, trim[ti], tlt))
 
-    out = {"model": mid, "n_benign_pool": len(ben_all), "n_test_benign": 400,
-           "n_injection": len(inj), "curve": {}}
+    out = {
+        "model": mid,
+        "n_benign_pool": len(ben_all),
+        "n_test_benign": 400,
+        "n_injection": len(inj),
+        "curve": {},
+    }
     print(f"{mid}: benign pool {len(ben_all)}, test 400 benign + {len(inj)} inj\n")
     print("%8s %10s %12s" % ("n_benign", "det@1%FP", "wl-AUROC"))
     for n in SIZES:
         if curve[n]["d1"]:
-            d1 = float(np.mean(curve[n]["d1"])); wl = float(np.mean(curve[n]["wl"]))
+            d1 = float(np.mean(curve[n]["d1"]))
+            wl = float(np.mean(curve[n]["wl"]))
             sd = float(np.std(curve[n]["d1"]))
-            out["curve"][n] = {"det@1%FP": round(d1, 3), "det@1%FP_sd": round(sd, 3),
-                               "wl_auroc": round(wl, 3)}
+            out["curve"][n] = {
+                "det@1%FP": round(d1, 3),
+                "det@1%FP_sd": round(sd, 3),
+                "wl_auroc": round(wl, 3),
+            }
             print("%8d %10.3f %12.3f  (±%.3f)" % (n, d1, wl, sd))
     return out
 

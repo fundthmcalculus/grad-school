@@ -72,7 +72,7 @@ _MID_WORD = [
 
 _STRUCTURED = [
     "def fibonacci(n):\n    if n <= 1:\n        return n\n    return",
-    "{\n  \"name\": \"Alice\",\n  \"age\":",
+    '{\n  "name": "Alice",\n  "age":',
     "| Name | Age |\n|------|-----|\n| Bob  |",
     "import numpy as np\nimport pandas as",
 ]

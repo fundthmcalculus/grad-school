@@ -145,8 +145,14 @@ class LearnedFoUIT2Regressor(BaseEstimator, RegressorMixin):
         b = self._base
         preds = [
             apply_tsk_consequents(
-                X, b.top_features_, f, labels, b.y_bucket_mean_, b.corr_terms_,
-                order=b.tsk_order, basis=b.consequent_basis,
+                X,
+                b.top_features_,
+                f,
+                labels,
+                b.y_bucket_mean_,
+                b.corr_terms_,
+                order=b.tsk_order,
+                basis=b.consequent_basis,
                 cross_pairs=b.cross_pairs_,
             )
             for f in (fu, fl)
@@ -215,8 +221,15 @@ class LearnedFoUIT2Regressor(BaseEstimator, RegressorMixin):
         )
         b = self._base
         return apply_tsk_consequents(
-            X, b.top_features_, fc, labels, b.y_bucket_mean_, b.corr_terms_,
-            order=b.tsk_order, basis=b.consequent_basis, cross_pairs=b.cross_pairs_,
+            X,
+            b.top_features_,
+            fc,
+            labels,
+            b.y_bucket_mean_,
+            b.corr_terms_,
+            order=b.tsk_order,
+            basis=b.consequent_basis,
+            cross_pairs=b.cross_pairs_,
         )
 
     def predict_intervals(self, X):
@@ -232,8 +245,11 @@ class LearnedFoUIT2Regressor(BaseEstimator, RegressorMixin):
                 "width", ascending=False
             )
         rows = [
-            {"feature": names[i], "bucket": j,
-             "width": self.widths_[i * self._n_labels + j]}
+            {
+                "feature": names[i],
+                "bucket": j,
+                "width": self.widths_[i * self._n_labels + j],
+            }
             for i in range(len(names))
             for j in range(self._n_labels)
         ]

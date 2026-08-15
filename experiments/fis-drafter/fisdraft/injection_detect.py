@@ -34,7 +34,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
-from .fmri_detect import FISAnomaly, Mahalanobis, IForest, layer_features, surface_features
+from .fmri_detect import (
+    FISAnomaly,
+    Mahalanobis,
+    IForest,
+    layer_features,
+    surface_features,
+)
 
 warnings.filterwarnings("ignore")
 
@@ -65,14 +71,16 @@ def run(rundir: Path, variant="mean", seed=0) -> dict:
     rng = np.random.default_rng(seed)
     rng.shuffle(benign)
     cut = int(0.6 * len(benign))
-    fit_idx = benign[:cut]                      # train: benign only
+    fit_idx = benign[:cut]  # train: benign only
     test_benign = benign[cut:]
     inj_idx = np.where(y == 1)[0]
     test_idx = np.r_[test_benign, inj_idx]
     yt = np.r_[np.zeros(len(test_benign)), np.ones(len(inj_idx))]
 
     tl = df.tok_len.to_numpy()
-    decile = pd.qcut(pd.Series(tl[test_idx]), 8, labels=False, duplicates="drop").to_numpy()
+    decile = pd.qcut(
+        pd.Series(tl[test_idx]), 8, labels=False, duplicates="drop"
+    ).to_numpy()
 
     X, layer_of = layer_features(act, fit_idx, per_layer_pca=8)
     Xs = surface_features(df, fit_idx)
@@ -102,9 +110,11 @@ def run(rundir: Path, variant="mean", seed=0) -> dict:
                 "auroc": round(roc_auc_score(yt, st), 3),
                 "auroc_within_len": round(stratified_auc(yt, st, decile), 3),
             }
-            print(f"  {tag:12s} {dn:14s} pooled {container[f'{tag}:{dn}']['auroc']:.3f}"
-                  f"  within-len {container[f'{tag}:{dn}']['auroc_within_len']:.3f}",
-                  flush=True)
+            print(
+                f"  {tag:12s} {dn:14s} pooled {container[f'{tag}:{dn}']['auroc']:.3f}"
+                f"  within-len {container[f'{tag}:{dn}']['auroc_within_len']:.3f}",
+                flush=True,
+            )
 
     print("ONE-CLASS (train on benign only):")
     block(X, "activation", out["one_class"])
@@ -116,8 +126,10 @@ def run(rundir: Path, variant="mean", seed=0) -> dict:
         "auroc": round(roc_auc_score(yt, sl), 3),
         "auroc_within_len": round(stratified_auc(yt, sl, decile), 3),
     }
-    print(f"  {'length':12s} {'n_tokens':14s} pooled {out['one_class']['length_only']['auroc']:.3f}"
-          f"  within-len {out['one_class']['length_only']['auroc_within_len']:.3f}")
+    print(
+        f"  {'length':12s} {'n_tokens':14s} pooled {out['one_class']['length_only']['auroc']:.3f}"
+        f"  within-len {out['one_class']['length_only']['auroc_within_len']:.3f}"
+    )
 
     # supervised upper bound (HAS seen injections; cross-validated)
     print("\nSUPERVISED reference (5-fold, has seen attacks -- unfair upper bound):")
@@ -127,24 +139,37 @@ def run(rundir: Path, variant="mean", seed=0) -> dict:
         nn = min(n_w, featmat.shape[1], int(0.8 * len(df)) - 1)
         for tr, te in skf.split(featmat, y):
             sc = PCA(n_components=nn, whiten=True, random_state=0).fit(featmat[tr])
-            m = LogisticRegression(max_iter=2000, C=1.0).fit(sc.transform(featmat[tr]), y[tr])
+            m = LogisticRegression(max_iter=2000, C=1.0).fit(
+                sc.transform(featmat[tr]), y[tr]
+            )
             preds[te] = m.predict_proba(sc.transform(featmat[te]))[:, 1]
         out["supervised_reference"][tag] = {
             "auroc": round(roc_auc_score(y, preds), 3),
             "auroc_within_len": round(
-                stratified_auc(y, preds,
-                               pd.qcut(pd.Series(tl), 8, labels=False,
-                                       duplicates="drop").to_numpy()), 3),
+                stratified_auc(
+                    y,
+                    preds,
+                    pd.qcut(
+                        pd.Series(tl), 8, labels=False, duplicates="drop"
+                    ).to_numpy(),
+                ),
+                3,
+            ),
         }
-        print(f"  {tag:12s} logreg         pooled {out['supervised_reference'][tag]['auroc']:.3f}"
-              f"  within-len {out['supervised_reference'][tag]['auroc_within_len']:.3f}")
+        print(
+            f"  {tag:12s} logreg         pooled {out['supervised_reference'][tag]['auroc']:.3f}"
+            f"  within-len {out['supervised_reference'][tag]['auroc_within_len']:.3f}"
+        )
 
     # per-layer one-class (where does injection show up)
     out["per_layer"] = {}
     for l in sorted(set(layer_of)):
         cols = np.where(layer_of == l)[0]
-        sc = Mahalanobis(n_pca=min(8, len(fit_idx) - 1)).fit(
-            X[np.ix_(fit_idx, cols)]).score(X[:, cols])
+        sc = (
+            Mahalanobis(n_pca=min(8, len(fit_idx) - 1))
+            .fit(X[np.ix_(fit_idx, cols)])
+            .score(X[:, cols])
+        )
         out["per_layer"][int(l)] = {
             "auroc": round(roc_auc_score(yt, sc[test_idx]), 3),
             "within_len": round(stratified_auc(yt, sc[test_idx], decile), 3),
@@ -160,8 +185,10 @@ def main():
     rundir = Path(a.run)
     r = run(rundir, variant=a.variant)
     (rundir / f"detect_{a.variant}.json").write_text(json.dumps(r, indent=2))
-    print("\nlen(benign) median %d vs len(injection) median %d"
-          % (r["median_len_benign"], r["median_len_injection"]))
+    print(
+        "\nlen(benign) median %d vs len(injection) median %d"
+        % (r["median_len_benign"], r["median_len_injection"])
+    )
     print("per-layer within-length AUROC:")
     for l, v in r["per_layer"].items():
         if l % 3 == 0 or v["within_len"] > 0.7:

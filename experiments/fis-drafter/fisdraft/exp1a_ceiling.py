@@ -77,9 +77,7 @@ def run(rundir: Path, device: str = "cuda", max_rank: int = 512, seed: int = 0) 
             recon = (Xte_c @ Vk) @ Vk.T + mu
         Q = torch.softmax(recon, dim=-1)
         tv = total_variation(P, Q)
-        explained = (
-            float((S[:k] ** 2).sum()) / total_energy if k > 0 else 0.0
-        )
+        explained = float((S[:k] ** 2).sum()) / total_energy if k > 0 else 0.0
         results.append(
             {
                 "rank": k,

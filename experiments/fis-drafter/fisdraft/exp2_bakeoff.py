@@ -49,6 +49,7 @@ NORMS = ["probability", "einstein", "hamacher", "min/max"]
 # Hyperparameter spaces. Each returns one sampled config.
 # --------------------------------------------------------------------------
 
+
 def space_ridge(r):
     return {"alpha": float(10 ** r.uniform(-4, 3))}
 
@@ -109,7 +110,11 @@ def make_fitter(arm):
     if arm == "mlp":
         return (lambda c: MLPRegressor(random_state=0, **c)), False, True
     if arm == "gbm":
-        return (lambda c: HistGradientBoostingRegressor(random_state=0, **c)), False, False
+        return (
+            (lambda c: HistGradientBoostingRegressor(random_state=0, **c)),
+            False,
+            False,
+        )
     if arm == "t1_fis":
         from tribblefis.gaussian_regressor import TribbleRegressor
 
@@ -172,8 +177,9 @@ def run_arm(arm, Xtr, ytr, Xva, yva, Xte, yte, cols, budget, seed):
         "arm": arm,
         "test_r2": float(r2_score(yte, pred)),
         "val_r2": best["val_r2"],
-        "cfg": {k: (list(v) if isinstance(v, tuple) else v)
-                for k, v in best["cfg"].items()},
+        "cfg": {
+            k: (list(v) if isinstance(v, tuple) else v) for k, v in best["cfg"].items()
+        },
         "budget": budget,
         "n_failed_cfgs": n_failed,
         "search_s": search_s,
@@ -218,7 +224,8 @@ def run(rundir: Path, target="entropy", budget=32, seed=0) -> dict:
     # --- zero/low-budget reference arms -------------------------------------
     d = DummyRegressor(strategy="mean").fit(X[m_tr], y[m_tr])
     out["arms"]["constant"] = {
-        "arm": "constant", "test_r2": float(r2_score(y[m_te], d.predict(X[m_te]))),
+        "arm": "constant",
+        "test_r2": float(r2_score(y[m_te], d.predict(X[m_te]))),
         "budget": 0,
     }
 
@@ -239,18 +246,34 @@ def run(rundir: Path, target="entropy", budget=32, seed=0) -> dict:
         "budget": X.shape[1],
     }
     print(f"  constant       {out['arms']['constant']['test_r2']:+.4f}")
-    print(f"  single_feature {out['arms']['single_feature']['test_r2']:+.4f} "
-          f"({cols[best_j]})", flush=True)
+    print(
+        f"  single_feature {out['arms']['single_feature']['test_r2']:+.4f} "
+        f"({cols[best_j]})",
+        flush=True,
+    )
 
     for arm in ["ridge", "mlp", "gbm", "t1_fis", "it2_fis"]:
-        res = run_arm(arm, X[m_tr], y[m_tr], X[m_va], y[m_va], X[m_te], y[m_te],
-                      cols, budget, seed)
+        res = run_arm(
+            arm,
+            X[m_tr],
+            y[m_tr],
+            X[m_va],
+            y[m_va],
+            X[m_te],
+            y[m_te],
+            cols,
+            budget,
+            seed,
+        )
         out["arms"][arm] = res
         if "test_r2" in res:
-            print(f"  {arm:14s} {res['test_r2']:+.4f}  "
-                  f"({res['search_s']:.0f}s search, "
-                  f"{res['predict_us_per_row']:.2f} us/row, "
-                  f"{res['n_failed_cfgs']} cfg failures)", flush=True)
+            print(
+                f"  {arm:14s} {res['test_r2']:+.4f}  "
+                f"({res['search_s']:.0f}s search, "
+                f"{res['predict_us_per_row']:.2f} us/row, "
+                f"{res['n_failed_cfgs']} cfg failures)",
+                flush=True,
+            )
         else:
             print(f"  {arm:14s} FAILED: {res}", flush=True)
     return out
@@ -290,7 +313,9 @@ def main() -> None:
         ]
         summary[arm] = {
             "mean_test_r2": float(np.mean(vals)) if vals else float("nan"),
-            "std_test_r2": float(np.std(vals, ddof=1)) if len(vals) > 1 else float("nan"),
+            "std_test_r2": (
+                float(np.std(vals, ddof=1)) if len(vals) > 1 else float("nan")
+            ),
             "min_test_r2": float(np.min(vals)) if vals else float("nan"),
             "n_seeds": len(vals),
             "mean_predict_us_per_row": float(np.mean(us)) if us else None,
@@ -304,7 +329,8 @@ def main() -> None:
         if arm == "t1_fis":
             continue
         d = [
-            per_seed[i]["arms"]["t1_fis"]["test_r2"] - per_seed[i]["arms"][arm]["test_r2"]
+            per_seed[i]["arms"]["t1_fis"]["test_r2"]
+            - per_seed[i]["arms"][arm]["test_r2"]
             for i in range(len(per_seed))
             if "test_r2" in per_seed[i]["arms"].get(arm, {})
             and "test_r2" in per_seed[i]["arms"].get("t1_fis", {})
@@ -328,8 +354,10 @@ def main() -> None:
     (rundir / f"exp2_bakeoff_{a.target}.json").write_text(json.dumps(out, indent=2))
     print(f"\n== {a.target}: mean +/- sd over {a.seeds} seeds ==")
     for arm, s in sorted(summary.items(), key=lambda kv: -kv[1]["mean_test_r2"]):
-        print(f"  {arm:16s} {s['mean_test_r2']:+.4f} +/- {s['std_test_r2']:.4f} "
-              f"(worst {s['min_test_r2']:+.4f})")
+        print(
+            f"  {arm:16s} {s['mean_test_r2']:+.4f} +/- {s['std_test_r2']:.4f} "
+            f"(worst {s['min_test_r2']:+.4f})"
+        )
 
 
 if __name__ == "__main__":

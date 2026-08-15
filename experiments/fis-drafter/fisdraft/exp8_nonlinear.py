@@ -88,7 +88,9 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=4000, seed=0) -> d
     D = H.shape[1]
 
     feat, _, _ = build_context_features(rundir, df, Ein, device)
-    row_by = {(int(p), int(s)): int(r) for r, p, s in zip(df.row, df.prompt_id, df.step)}
+    row_by = {
+        (int(p), int(s)): int(r) for r, p, s in zip(df.row, df.prompt_id, df.step)
+    }
     ridx = {int(r): i for i, r in enumerate(df.row.to_numpy())}
     prev = np.full(len(df), -1, dtype=np.int64)
     for i, (p, s) in enumerate(zip(df.prompt_id.to_numpy(), df.step.to_numpy())):
@@ -107,7 +109,10 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=4000, seed=0) -> d
 
     Htr, Hte = H[tr_i], H[te_i]
     Pte = torch.cat(
-        [torch.softmax(Hte[i : i + 2048] @ E.T, dim=-1) for i in range(0, len(Hte), 2048)]
+        [
+            torch.softmax(Hte[i : i + 2048] @ E.T, dim=-1)
+            for i in range(0, len(Hte), 2048)
+        ]
     )
     mu = Htr.mean(0, keepdim=True)
 
@@ -116,8 +121,11 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=4000, seed=0) -> d
     p_ctx = PCA(n_components=32, random_state=seed).fit(ctx_np[tr_i])
     p_prev = PCA(n_components=16, random_state=seed).fit(prev_np[tr_i])
     red = np.hstack(
-        [p_ctx.transform(ctx_np), p_prev.transform(prev_np),
-         df[TIER_A].to_numpy(dtype=np.float64)]
+        [
+            p_ctx.transform(ctx_np),
+            p_prev.transform(prev_np),
+            df[TIER_A].to_numpy(dtype=np.float64),
+        ]
     )
     banks = {
         "reduced": torch.tensor(red, dtype=torch.float32, device=device),
@@ -125,7 +133,9 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=4000, seed=0) -> d
     }
     # standardise each bank on train
     for name, B in banks.items():
-        m, s = B[tr_i].mean(0, keepdim=True), B[tr_i].std(0, keepdim=True).clamp_min(1e-6)
+        m, s = B[tr_i].mean(0, keepdim=True), B[tr_i].std(0, keepdim=True).clamp_min(
+            1e-6
+        )
         banks[name] = (B - m) / s
 
     _, _, V = torch.pca_lowrank(Htr - mu, q=min(128, len(Htr) - 1), niter=4)

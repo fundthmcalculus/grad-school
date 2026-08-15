@@ -56,14 +56,16 @@ def run(cfg: Cfg) -> Path:
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
     tok.padding_side = "left"
-    model = AutoModelForCausalLM.from_pretrained(cfg.model_id, dtype=getattr(torch, cfg.dtype))
+    model = AutoModelForCausalLM.from_pretrained(
+        cfg.model_id, dtype=getattr(torch, cfg.dtype)
+    )
     model.to("cuda").eval()
 
     if cfg.mode == "dose":
         probes = dose_response_battery(seed=cfg.seed)
     elif cfg.mode == "injection":
         probes = injection_battery(seed=cfg.seed, source="deepset")
-    elif cfg.mode in ("jailbreak","safeguard","spml"):
+    elif cfg.mode in ("jailbreak", "safeguard", "spml"):
         probes = injection_battery(seed=cfg.seed, source=cfg.mode)
     else:
         probes = build_anomaly_battery(seed=cfg.seed, tokenizer=tok)
@@ -71,11 +73,16 @@ def run(cfg: Cfg) -> Path:
     # encode
     def encode(p):
         if cfg.chat_template and tok.chat_template:
-            msgs = ([{"role": "system", "content": cfg.system_prompt}]
-                    if cfg.system_prompt else [])
+            msgs = (
+                [{"role": "system", "content": cfg.system_prompt}]
+                if cfg.system_prompt
+                else []
+            )
             msgs.append({"role": "user", "content": p.text})
             t = tok.apply_chat_template(
-                msgs, tokenize=False, add_generation_prompt=True,
+                msgs,
+                tokenize=False,
+                add_generation_prompt=True,
             )
             return tok(t, add_special_tokens=False)["input_ids"]
         return tok(p.text, add_special_tokens=True)["input_ids"]

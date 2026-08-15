@@ -82,8 +82,7 @@ def build_features(rundir: Path, df: pd.DataFrame, train_mask: np.ndarray):
     lnorm = np.load(rundir / "layer_norm_mean.npy")
 
     ent_cols = [
-        c for c in df.columns
-        if "__" in c and not c.startswith(("f1", "ref_recall"))
+        c for c in df.columns if "__" in c and not c.startswith(("f1", "ref_recall"))
     ]
     ent = df[ent_cols].to_numpy(dtype=np.float64)
 
@@ -111,14 +110,15 @@ def build_features(rundir: Path, df: pd.DataFrame, train_mask: np.ndarray):
 
     lnorm_n = lnorm / np.maximum(lnorm[:, -1:], 1e-6)  # shape, not magnitude
 
-    geo = np.column_stack(
-        [h_pca_resid, h_maha, nm, nl, traj_spread, cos_ml, lnorm_n]
-    )
-    geo_names = (
-        ["h_pca_resid", "h_maha", "h_norm_mean", "h_norm_last",
-         "traj_spread", "cos_mean_last"]
-        + [f"lnorm{i}" for i in range(lnorm_n.shape[1])]
-    )
+    geo = np.column_stack([h_pca_resid, h_maha, nm, nl, traj_spread, cos_ml, lnorm_n])
+    geo_names = [
+        "h_pca_resid",
+        "h_maha",
+        "h_norm_mean",
+        "h_norm_last",
+        "traj_spread",
+        "cos_mean_last",
+    ] + [f"lnorm{i}" for i in range(lnorm_n.shape[1])]
     return ent, ent_cols, geo, geo_names
 
 
@@ -184,7 +184,9 @@ def run(rundir: Path, thresh=0.5, budget=24, seed=0) -> dict:
         }
     best = max(
         out["single_features"].items(),
-        key=lambda kv: (kv[1]["within_cond"] if np.isfinite(kv[1]["within_cond"]) else 0),
+        key=lambda kv: (
+            kv[1]["within_cond"] if np.isfinite(kv[1]["within_cond"]) else 0
+        ),
     )
     out["best_single_feature"] = {"name": best[0], **best[1]}
 
@@ -194,7 +196,8 @@ def run(rundir: Path, thresh=0.5, budget=24, seed=0) -> dict:
         "geometric": (geo, geo_names),
         "entropy+geometric": (np.hstack([ent, geo]), ent_names + geo_names),
         "entropy+geo+ntok": (
-            np.hstack([ent, geo, ntok[:, None]]), ent_names + geo_names + ["n_tokens"]
+            np.hstack([ent, geo, ntok[:, None]]),
+            ent_names + geo_names + ["n_tokens"],
         ),
     }
     for bname, (X, names) in banks.items():

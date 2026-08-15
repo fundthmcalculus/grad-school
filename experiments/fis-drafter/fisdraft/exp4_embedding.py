@@ -166,8 +166,12 @@ def run(rundir: Path, device="cuda", n_eval=8000, seed=0) -> dict:
     d_idx = df.set_index("row")
     pid_te = d_idx.loc[te_rows, "prompt_id"].to_numpy()
     step_te = d_idx.loc[te_rows, "step"].to_numpy()
-    row_by = {(int(p), int(s)): int(r) for r, p, s in
-              zip(df.row.to_numpy(), df.prompt_id.to_numpy(), df.step.to_numpy())}
+    row_by = {
+        (int(p), int(s)): int(r)
+        for r, p, s in zip(
+            df.row.to_numpy(), df.prompt_id.to_numpy(), df.step.to_numpy()
+        )
+    }
     ok, prev_rows = [], []
     for i, (p_, s_) in enumerate(zip(pid_te, step_te)):
         r = row_by.get((int(p_), int(s_) - 1))

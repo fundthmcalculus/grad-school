@@ -49,35 +49,50 @@ def run(rundir: Path, n_atts=(0, 5, 10, 25), seeds=8, n_pca=32) -> dict:
     acc = {n: {"d1": [], "wl": []} for n in n_atts}
     for seed in range(seeds):
         rng = np.random.default_rng(seed)
-        ben = np.where(y == 0)[0]; rng.shuffle(ben)
-        inj = np.where(y == 1)[0]; rng.shuffle(inj)
+        ben = np.where(y == 0)[0]
+        rng.shuffle(ben)
+        inj = np.where(y == 1)[0]
+        rng.shuffle(inj)
         fitb = ben[: int(0.5 * len(ben))]
-        bval = ben[int(0.5 * len(ben)): int(0.65 * len(ben))]
-        btest = ben[int(0.65 * len(ben)):]
+        bval = ben[int(0.5 * len(ben)) : int(0.65 * len(ben))]
+        btest = ben[int(0.65 * len(ben)) :]
         X, _ = layer_features(act, fitb, 8)
-        Z = PCA(n_components=min(n_pca, len(fitb) - 1), whiten=True,
-                random_state=seed).fit(X[fitb]).transform(X)
+        Z = (
+            PCA(n_components=min(n_pca, len(fitb) - 1), whiten=True, random_state=seed)
+            .fit(X[fitb])
+            .transform(X)
+        )
         for n in n_atts:
             aval, atest = inj[:n], inj[n:]
             ti = np.r_[btest, atest]
             yt = np.r_[np.zeros(len(btest)), np.ones(len(atest))]
             tlt = np.r_[tl[btest], tl[atest]]
             if n == 0:
-                S = 0.5 * Z ** 2
-                s = np.sort(S, 1)[:, : S.shape[1] - 2].sum(1)   # trimmed baseline
+                S = 0.5 * Z**2
+                s = np.sort(S, 1)[:, : S.shape[1] - 2].sum(1)  # trimmed baseline
             else:
                 Xtr = np.vstack([Z[bval], Z[aval]])
                 ytr = np.r_[np.zeros(len(bval)), np.ones(len(aval))]
-                m = LogisticRegression(class_weight="balanced", max_iter=1000).fit(Xtr, ytr)
+                m = LogisticRegression(class_weight="balanced", max_iter=1000).fit(
+                    Xtr, ytr
+                )
                 s = m.decision_function(Z)
             acc[n]["d1"].append(det_at(yt, s[ti]))
             acc[n]["wl"].append(within_len_auc(yt, s[ti], tlt))
     name, params = label(mid)
-    return {"model": name, "params": params, "dataset": rundir.name,
-            "curve": {n: {"det@1%FP": round(float(np.mean(v["d1"])), 3),
-                          "det@1%FP_sd": round(float(np.std(v["d1"])), 3),
-                          "wl_auroc": round(float(np.mean(v["wl"])), 3)}
-                      for n, v in acc.items()}}
+    return {
+        "model": name,
+        "params": params,
+        "dataset": rundir.name,
+        "curve": {
+            n: {
+                "det@1%FP": round(float(np.mean(v["d1"])), 3),
+                "det@1%FP_sd": round(float(np.std(v["d1"])), 3),
+                "wl_auroc": round(float(np.mean(v["wl"])), 3),
+            }
+            for n, v in acc.items()
+        },
+    }
 
 
 def dataset_of(name):
@@ -94,8 +109,12 @@ def main():
     if a.runs:
         runs = [Path(r) for r in a.runs]
     else:
-        runs = ([Path("runs/injection")] + sorted(Path("runs").glob("injection_*"))
-                + sorted(Path("runs").glob("sg_*")) + sorted(Path("runs").glob("spml_*")))
+        runs = (
+            [Path("runs/injection")]
+            + sorted(Path("runs").glob("injection_*"))
+            + sorted(Path("runs").glob("sg_*"))
+            + sorted(Path("runs").glob("spml_*"))
+        )
     runs = [r for r in runs if (r / "act_mean.npy").exists()]
     res = []
     for r in runs:
@@ -104,14 +123,27 @@ def main():
         except Exception as e:
             print(f"skip {r.name}: {e}")
     res.sort(key=lambda d: (dataset_of(d["dataset"]), d["params"]))
-    print("\nFew-shot injection detection: det@1%FP by #attack examples "
-          "(N=0 is the unsupervised trimmed baseline):\n")
-    print("%-20s %-10s %8s %8s %8s %8s" % ("model", "dataset", "N=0", "N=5", "N=10", "N=25"))
+    print(
+        "\nFew-shot injection detection: det@1%FP by #attack examples "
+        "(N=0 is the unsupervised trimmed baseline):\n"
+    )
+    print(
+        "%-20s %-10s %8s %8s %8s %8s"
+        % ("model", "dataset", "N=0", "N=5", "N=10", "N=25")
+    )
     for d in res:
         c = d["curve"]
-        print("%-20s %-10s %8.3f %8.3f %8.3f %8.3f"
-              % (d["model"], dataset_of(d["dataset"]),
-                 c[0]["det@1%FP"], c[5]["det@1%FP"], c[10]["det@1%FP"], c[25]["det@1%FP"]))
+        print(
+            "%-20s %-10s %8.3f %8.3f %8.3f %8.3f"
+            % (
+                d["model"],
+                dataset_of(d["dataset"]),
+                c[0]["det@1%FP"],
+                c[5]["det@1%FP"],
+                c[10]["det@1%FP"],
+                c[25]["det@1%FP"],
+            )
+        )
     Path("runs/fewshot.json").write_text(json.dumps(res, indent=2))
 
 

@@ -76,8 +76,9 @@ def _optimize(fitness, bounds, x0, method, seed, pop=30, gens=20):
     hi = np.array([b[1] for b in bounds])
     x0c = np.clip(x0, lo, hi)
     variables = [
-        InputContinuousVariable(f"p{i}", float(lo[i]), float(hi[i]),
-                                initial_value=float(x0c[i]))
+        InputContinuousVariable(
+            f"p{i}", float(lo[i]), float(hi[i]), initial_value=float(x0c[i])
+        )
         for i in range(len(bounds))
     ]
 
@@ -87,8 +88,9 @@ def _optimize(fitness, bounds, x0, method, seed, pop=30, gens=20):
         except Exception:
             return 1e6
 
-    cfg = cfg_cls(name=f"{method}-oneclass", num_generations=gens,
-                  population_size=pop, n_jobs=1)
+    cfg = cfg_cls(
+        name=f"{method}-oneclass", num_generations=gens, population_size=pop, n_jobs=1
+    )
     opt = opt_cls(config=cfg, fcn=fcn, variables=variables)
     res = opt.solve()
     best_x = np.clip(np.asarray(res.solution_vector, dtype=float), lo, hi)
@@ -125,9 +127,11 @@ def refine_detector(det, Zval_ben, Zval_att, objective, method, seed):
     # bounds need a frame in the whitened feature space
     Zval = pd.DataFrame(
         np.vstack([Zval_ben, Zval_att]),
-        columns=det._transform(pd.DataFrame(
-            np.zeros((1, len(det.feature_names_in_))),
-            columns=det.feature_names_in_)).columns,
+        columns=det._transform(
+            pd.DataFrame(
+                np.zeros((1, len(det.feature_names_in_))), columns=det.feature_names_in_
+            )
+        ).columns,
     )
     bounds = build_param_bounds(model0, Zval)
     yv = np.r_[np.zeros(len(Zval_ben)), np.ones(len(Zval_att))]
@@ -155,8 +159,10 @@ def refine_detector(det, Zval_ben, Zval_att, objective, method, seed):
             return -roc_auc_score(yv, s) + shrink
         # blend: the low-FPR tail is degenerate (pAUC@1%FP starts at 0), so
         # anchor it with AUROC so the search has a gradient to follow.
-        return -(0.5 * roc_auc_score(yv, s)
-                 + 0.5 * partial_auc_lowfpr(yv, s, 0.02)) + shrink
+        return (
+            -(0.5 * roc_auc_score(yv, s) + 0.5 * partial_auc_lowfpr(yv, s, 0.02))
+            + shrink
+        )
 
     t0 = time.time()
     with contextlib.redirect_stdout(io.StringIO()):
@@ -165,16 +171,22 @@ def refine_detector(det, Zval_ben, Zval_att, objective, method, seed):
     info = {}
     refined = TribbleOneClassDetector(**det.get_params())
     # copy fitted state, swap the refined antecedents in
-    for attr in ("feature_names_in_", "top_features_", "_pca_", "offset_",
-                 "is_fitted_"):
+    for attr in (
+        "feature_names_in_",
+        "top_features_",
+        "_pca_",
+        "offset_",
+        "is_fitted_",
+    ):
         if hasattr(det, attr):
             setattr(refined, attr, getattr(det, attr))
     refined.model_ = apply_gaussian_params(model0, best_x)
     return refined, secs, info
 
 
-def run(rundir: Path, objective="lowfpr", methods=("ga", "pso"), n_att=40,
-        seeds=4, n_pca=32) -> dict:
+def run(
+    rundir: Path, objective="lowfpr", methods=("ga", "pso"), n_att=40, seeds=4, n_pca=32
+) -> dict:
     df = pd.read_parquet(rundir / "probes.parquet").reset_index(drop=True)
     act = np.load(rundir / "act_mean.npy")
     y = (df.label == "injection").to_numpy().astype(int)
@@ -187,8 +199,10 @@ def run(rundir: Path, objective="lowfpr", methods=("ga", "pso"), n_att=40,
 
     for seed in range(seeds):
         rng = np.random.default_rng(seed)
-        ben = np.where(y == 0)[0]; rng.shuffle(ben)
-        inj = np.where(y == 1)[0]; rng.shuffle(inj)
+        ben = np.where(y == 0)[0]
+        rng.shuffle(ben)
+        inj = np.where(y == 1)[0]
+        rng.shuffle(inj)
         fit = ben[: int(0.5 * len(ben))]
         ben_val = ben[int(0.5 * len(ben)) : int(0.65 * len(ben))]
         ben_test = ben[int(0.65 * len(ben)) :]
@@ -198,8 +212,11 @@ def run(rundir: Path, objective="lowfpr", methods=("ga", "pso"), n_att=40,
         Xdf = pd.DataFrame(X, columns=[f"f{i}" for i in range(X.shape[1])])
         with contextlib.redirect_stdout(io.StringIO()):
             det = TribbleOneClassDetector(
-                whiten=True, whiten_components=min(n_pca, len(fit) - 1),
-                n_gaussians=1, norm_conorm="probability", random_state=seed,
+                whiten=True,
+                whiten_components=min(n_pca, len(fit) - 1),
+                n_gaussians=1,
+                norm_conorm="probability",
+                random_state=seed,
             ).fit(Xdf.iloc[fit])
 
         Zall = det._transform(Xdf)
@@ -221,15 +238,20 @@ def run(rundir: Path, objective="lowfpr", methods=("ga", "pso"), n_att=40,
             acc[m]["secs"].append(secs)
 
     def summ(d):
-        out = {"within_len_auroc": round(float(np.mean(d["auc"])), 3),
-               "det@1%FP": round(float(np.mean(d["d1"])), 3)}
+        out = {
+            "within_len_auroc": round(float(np.mean(d["auc"])), 3),
+            "det@1%FP": round(float(np.mean(d["d1"])), 3),
+        }
         if "secs" in d:
             out["refine_s"] = round(float(np.mean(d["secs"])), 2)
         return out
 
-    return {"model": model_id, "objective": objective,
-            "n_attack_val": n_att,
-            "arms": {k: summ(v) for k, v in acc.items()}}
+    return {
+        "model": model_id,
+        "objective": objective,
+        "n_attack_val": n_att,
+        "arms": {k: summ(v) for k, v in acc.items()},
+    }
 
 
 def main():
@@ -241,19 +263,35 @@ def main():
     ap.add_argument("--seeds", type=int, default=4)
     a = ap.parse_args()
     allout = []
-    print(f"Optimizers-package refinement of TribbleOneClassDetector "
-          f"(objective={a.objective}, {a.n_att} attack-val examples):\n")
-    print("%-24s %-12s %12s %10s %9s"
-          % ("model", "arm", "within-AUC", "det@1%FP", "refine_s"))
+    print(
+        f"Optimizers-package refinement of TribbleOneClassDetector "
+        f"(objective={a.objective}, {a.n_att} attack-val examples):\n"
+    )
+    print(
+        "%-24s %-12s %12s %10s %9s"
+        % ("model", "arm", "within-AUC", "det@1%FP", "refine_s")
+    )
     for r in a.runs:
-        res = run(Path(r), objective=a.objective, methods=tuple(a.methods),
-                  n_att=a.n_att, seeds=a.seeds)
+        res = run(
+            Path(r),
+            objective=a.objective,
+            methods=tuple(a.methods),
+            n_att=a.n_att,
+            seeds=a.seeds,
+        )
         allout.append(res)
         m = res["model"].split("/")[-1]
         for arm, v in res["arms"].items():
-            print("%-24s %-12s %12.3f %10.3f %9s"
-                  % (m, arm, v["within_len_auroc"], v["det@1%FP"],
-                     ("%.1f" % v["refine_s"]) if "refine_s" in v else "-"))
+            print(
+                "%-24s %-12s %12.3f %10.3f %9s"
+                % (
+                    m,
+                    arm,
+                    v["within_len_auroc"],
+                    v["det@1%FP"],
+                    ("%.1f" % v["refine_s"]) if "refine_s" in v else "-",
+                )
+            )
         print()
     Path("runs/optimizer_refine.json").write_text(json.dumps(allout, indent=2))
 

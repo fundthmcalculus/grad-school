@@ -77,8 +77,11 @@ def run(rundir: Path, variant="mean", seeds=6, n_pca=32) -> dict:
         # FIS arm: the real library, one-class, built-in whitening, benign only
         with contextlib.redirect_stdout(io.StringIO()):
             det = TribbleOneClassDetector(
-                whiten=True, whiten_components=min(n_pca, len(fit) - 1),
-                n_gaussians=1, norm_conorm="probability", random_state=seed,
+                whiten=True,
+                whiten_components=min(n_pca, len(fit) - 1),
+                n_gaussians=1,
+                norm_conorm="probability",
+                random_state=seed,
             ).fit(Xdf.iloc[fit])
         s_fis = det.anomaly_score(Xdf)
 
@@ -119,10 +122,14 @@ def main():
     ap.add_argument("--seeds", type=int, default=6)
     a = ap.parse_args()
     allout = []
-    print("Parts 3-5 through the REAL tribblefis (TribbleOneClassDetector, "
-          "whiten=True, one-class):\n")
-    print("%-26s %-18s %8s %8s %10s %10s"
-          % ("model", "detector", "within-AUC", "±", "det@1%FP", "det@5%FP"))
+    print(
+        "Parts 3-5 through the REAL tribblefis (TribbleOneClassDetector, "
+        "whiten=True, one-class):\n"
+    )
+    print(
+        "%-26s %-18s %8s %8s %10s %10s"
+        % ("model", "detector", "within-AUC", "±", "det@1%FP", "det@5%FP")
+    )
     for r in a.runs:
         res = run(Path(r), variant=a.variant, seeds=a.seeds)
         allout.append(res)
@@ -130,10 +137,17 @@ def main():
         for det in ("tribble_oneclass", "mahalanobis", "surface", "length"):
             wl = res["within_len_auroc"][det]
             op = res["operating_points"].get(det, {})
-            print("%-26s %-18s %8.3f %8.3f %10s %10s"
-                  % (m, det, wl["mean"], wl["std"],
-                     ("%.2f" % op["det@1%FP"]) if op else "-",
-                     ("%.2f" % op["det@5%FP"]) if op else "-"))
+            print(
+                "%-26s %-18s %8.3f %8.3f %10s %10s"
+                % (
+                    m,
+                    det,
+                    wl["mean"],
+                    wl["std"],
+                    ("%.2f" % op["det@1%FP"]) if op else "-",
+                    ("%.2f" % op["det@5%FP"]) if op else "-",
+                )
+            )
         print()
     Path("runs/parts345_rerun.json").write_text(json.dumps(allout, indent=2))
 

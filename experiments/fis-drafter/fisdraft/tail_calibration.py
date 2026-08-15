@@ -96,19 +96,25 @@ def run(rundir: Path, alpha=0.01, seeds=10, n_pca=32) -> dict:
 
     for seed in range(seeds):
         rng = np.random.default_rng(seed)
-        ben = np.where(y == 0)[0]; rng.shuffle(ben); inj = np.where(y == 1)[0]
+        ben = np.where(y == 0)[0]
+        rng.shuffle(ben)
+        inj = np.where(y == 1)[0]
         n = len(ben)
-        fit = ben[: int(0.4 * n)]           # density fit
-        cal = ben[int(0.4 * n): int(0.7 * n)]  # threshold calibration
-        te_b = ben[int(0.7 * n):]           # held-out benign (measure FPR)
+        fit = ben[: int(0.4 * n)]  # density fit
+        cal = ben[int(0.4 * n) : int(0.7 * n)]  # threshold calibration
+        te_b = ben[int(0.7 * n) :]  # held-out benign (measure FPR)
         X, _ = layer_features(act, fit, 8)
         Xdf = pd.DataFrame(X, columns=[f"f{i}" for i in range(X.shape[1])])
         with contextlib.redirect_stdout(io.StringIO()):
             det = TribbleOneClassDetector(
-                whiten=True, whiten_components=min(n_pca, len(fit) - 1),
-                n_gaussians=1, norm_conorm="probability", random_state=seed).fit(Xdf.iloc[fit])
+                whiten=True,
+                whiten_components=min(n_pca, len(fit) - 1),
+                n_gaussians=1,
+                norm_conorm="probability",
+                random_state=seed,
+            ).fit(Xdf.iloc[fit])
         S = surprisals(det, Xdf)
-        s = np.sort(S, 1)[:, : S.shape[1] - 2].sum(1)   # trimmed score
+        s = np.sort(S, 1)[:, : S.shape[1] - 2].sum(1)  # trimmed score
 
         ti = np.r_[te_b, inj]
         yt = np.r_[np.zeros(len(te_b)), np.ones(len(inj))]
@@ -116,10 +122,13 @@ def run(rundir: Path, alpha=0.01, seeds=10, n_pca=32) -> dict:
 
         s_cal = s[cal]
         # empirical + evt (global)
-        for name, tau in (("empirical", thr_empirical(s_cal, alpha)),
-                          ("evt", thr_evt(s_cal, alpha))):
+        for name, tau in (
+            ("empirical", thr_empirical(s_cal, alpha)),
+            ("evt", thr_evt(s_cal, alpha)),
+        ):
             fpr, tpr = realized(s[ti], yt, None, tau)
-            acc[name]["fpr"].append(fpr); acc[name]["tpr"].append(tpr)
+            acc[name]["fpr"].append(fpr)
+            acc[name]["tpr"].append(tpr)
         # length-conditional empirical (deciles fit on calib, applied to test)
         edges = np.quantile(tl[cal], np.linspace(0, 1, 6))
         edges[0], edges[-1] = -np.inf, np.inf
@@ -128,14 +137,25 @@ def run(rundir: Path, alpha=0.01, seeds=10, n_pca=32) -> dict:
         thr_by = {}
         for v in np.unique(dcal):
             sv = s_cal[dcal == v]
-            thr_by[v] = thr_empirical(sv, alpha) if len(sv) >= 10 else thr_empirical(s_cal, alpha)
-        thr_vec = {v: thr_by.get(v, thr_empirical(s_cal, alpha)) for v in np.unique(dte)}
+            thr_by[v] = (
+                thr_empirical(sv, alpha)
+                if len(sv) >= 10
+                else thr_empirical(s_cal, alpha)
+            )
+        thr_vec = {
+            v: thr_by.get(v, thr_empirical(s_cal, alpha)) for v in np.unique(dte)
+        }
         fpr, tpr = realized(s[ti], yt, dte, thr_vec, decile=dte)
-        acc["length_cond"]["fpr"].append(fpr); acc["length_cond"]["tpr"].append(tpr)
+        acc["length_cond"]["fpr"].append(fpr)
+        acc["length_cond"]["tpr"].append(tpr)
 
-    out = {"model": mid, "dataset": rundir.name, "alpha": alpha,
-           "oracle_det@1%FP": round(float(np.mean(oracle)), 3),
-           "methods": {}}
+    out = {
+        "model": mid,
+        "dataset": rundir.name,
+        "alpha": alpha,
+        "oracle_det@1%FP": round(float(np.mean(oracle)), 3),
+        "methods": {},
+    }
     for k, v in acc.items():
         out["methods"][k] = {
             "realized_FPR": round(float(np.mean(v["fpr"])), 4),
@@ -148,22 +168,36 @@ def run(rundir: Path, alpha=0.01, seeds=10, n_pca=32) -> dict:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", nargs="+",
-                    default=["runs/injection_qwen3b", "runs/sg_qwen3b_big", "runs/spml_qwen3b"])
+    ap.add_argument(
+        "--runs",
+        nargs="+",
+        default=["runs/injection_qwen3b", "runs/sg_qwen3b_big", "runs/spml_qwen3b"],
+    )
     ap.add_argument("--alpha", type=float, default=0.01)
     a = ap.parse_args()
     allout = []
-    print(f"Tail calibration @ target FPR={a.alpha} (trimmed score, one-class, "
-          f"threshold from benign calibration only):\n")
+    print(
+        f"Tail calibration @ target FPR={a.alpha} (trimmed score, one-class, "
+        f"threshold from benign calibration only):\n"
+    )
     for r in a.runs:
         res = run(Path(r), alpha=a.alpha)
         allout.append(res)
-        print(f"== {res['model'].split('/')[-1]} · {Path(r).name} · oracle det@1%FP={res['oracle_det@1%FP']} ==")
+        print(
+            f"== {res['model'].split('/')[-1]} · {Path(r).name} · oracle det@1%FP={res['oracle_det@1%FP']} =="
+        )
         print("  %-13s %14s %16s" % ("method", "realized FPR", "detection TPR"))
         for k, v in res["methods"].items():
-            print("  %-13s %7.4f±%.4f %8.3f±%.3f"
-                  % (k, v["realized_FPR"], v["realized_FPR_sd"],
-                     v["detection_TPR"], v["detection_TPR_sd"]))
+            print(
+                "  %-13s %7.4f±%.4f %8.3f±%.3f"
+                % (
+                    k,
+                    v["realized_FPR"],
+                    v["realized_FPR_sd"],
+                    v["detection_TPR"],
+                    v["detection_TPR_sd"],
+                )
+            )
         print()
     Path("runs/tail_calibration.json").write_text(json.dumps(allout, indent=2))
 

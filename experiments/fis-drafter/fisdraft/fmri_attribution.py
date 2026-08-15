@@ -116,20 +116,24 @@ def compare(runs: dict[str, Path], variant="mean", seed=0):
         r = run(rd, variant=variant, seed=seed)
         g = np.array(r["per_layer_gap"])
         gn = g / (np.abs(g).max() + 1e-9)
-        prof = "".join(
-            " .:-=+*#@"[min(8, int(max(0, v) * 8))] for v in gn
+        prof = "".join(" .:-=+*#@"[min(8, int(max(0, v) * 8))] for v in gn)
+        print(
+            f"  {name:16s} faith={r['faithfulness_corr_gap_vs_auroc']:+.2f} "
+            f"peak L{r['argmax_layer_injection']:2d} "
+            f"deep%={r['frac_peak_deep_injection']:.2f}  |{prof}|"
         )
-        print(f"  {name:16s} faith={r['faithfulness_corr_gap_vs_auroc']:+.2f} "
-              f"peak L{r['argmax_layer_injection']:2d} "
-              f"deep%={r['frac_peak_deep_injection']:.2f}  |{prof}|")
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", default="runs/injection")
     ap.add_argument("--variant", default="mean")
-    ap.add_argument("--compare", nargs="*", default=None,
-                    help="name=path pairs for signature comparison")
+    ap.add_argument(
+        "--compare",
+        nargs="*",
+        default=None,
+        help="name=path pairs for signature comparison",
+    )
     a = ap.parse_args()
     if a.compare:
         runs = {kv.split("=")[0]: Path(kv.split("=")[1]) for kv in a.compare}
@@ -138,8 +142,7 @@ def main():
     rundir = Path(a.run)
     r = run(rundir, variant=a.variant)
     (rundir / f"attribution_{a.variant}.json").write_text(json.dumps(r, indent=2))
-    print(json.dumps({k: v for k, v in r.items()
-                      if not isinstance(v, list)}, indent=2))
+    print(json.dumps({k: v for k, v in r.items() if not isinstance(v, list)}, indent=2))
     print("\nper-layer AUROC (attribution) and gap:")
     for l, (au, g) in enumerate(zip(r["per_layer_auroc"], r["per_layer_gap"])):
         if l % 3 == 0 or au > 0.7:

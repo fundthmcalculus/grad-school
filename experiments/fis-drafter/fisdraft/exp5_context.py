@@ -161,8 +161,7 @@ def run(rundir: Path, device="cuda", n_eval=6000, seed=0, lam=10.0) -> dict:
 
     # previous-step row for each step (None at step 0)
     row_by = {
-        (int(p), int(s)): int(r)
-        for r, p, s in zip(df.row, df.prompt_id, df.step)
+        (int(p), int(s)): int(r) for r, p, s in zip(df.row, df.prompt_id, df.step)
     }
     row_index = {int(r): i for i, r in enumerate(df.row.to_numpy())}
     prev_i = np.full(len(df), -1, dtype=np.int64)
@@ -188,16 +187,20 @@ def run(rundir: Path, device="cuda", n_eval=6000, seed=0, lam=10.0) -> dict:
 
     Htr = H[tr_i]
     mu = Htr.mean(0, keepdim=True)
-    res: dict = {"n_train": len(tr_i), "n_test": len(te_i),
-                 "tied_embeddings": bool(tied), "arms": {}}
+    res: dict = {
+        "n_train": len(tr_i),
+        "n_test": len(te_i),
+        "tied_embeddings": bool(tied),
+        "arms": {},
+    }
 
     def record(name, H_hat):
         a, agree = alpha_of(H_hat, P, E)
-        rel = float(
-            ((H_hat - Hte).norm(dim=-1) / Hte.norm(dim=-1)).median()
-        )
+        rel = float(((H_hat - Hte).norm(dim=-1) / Hte.norm(dim=-1)).median())
         relc = float(
-            (((H_hat - mu) - (Hte - mu)).norm(dim=-1) / (Hte - mu).norm(dim=-1)).median()
+            (
+                ((H_hat - mu) - (Hte - mu)).norm(dim=-1) / (Hte - mu).norm(dim=-1)
+            ).median()
         )
         res["arms"][name] = {
             "alpha": a,
@@ -223,8 +226,10 @@ def run(rundir: Path, device="cuda", n_eval=6000, seed=0, lam=10.0) -> dict:
             n_keys = V
         else:
             # bigram key, hashed into a bounded table with backoff to unigram
-            kt = (torch.from_numpy(prev_tok).to(device).long() * 1000003
-                  + torch.from_numpy(last_tok).to(device).long()) % (1 << 22)
+            kt = (
+                torch.from_numpy(prev_tok).to(device).long() * 1000003
+                + torch.from_numpy(last_tok).to(device).long()
+            ) % (1 << 22)
             key_tr, key_te, n_keys = kt[tr_i], kt[te_i], 1 << 22
         tab = torch.zeros((n_keys, D), device=device)
         cnt = torch.zeros(n_keys, device=device)
@@ -264,7 +269,9 @@ def run(rundir: Path, device="cuda", n_eval=6000, seed=0, lam=10.0) -> dict:
     record("ridge_bag_prev", ridge_apply(W, Fte2))
 
     res["reference_precision_budget"] = {
-        "rel_l2_0.10": 0.894, "rel_l2_0.20": 0.788, "rel_l2_0.40": 0.598,
+        "rel_l2_0.10": 0.894,
+        "rel_l2_0.20": 0.788,
+        "rel_l2_0.40": 0.598,
     }
     return res
 

@@ -25,8 +25,13 @@ from tribblefis.gaussian_classifier import TribbleClassifier
 from .fmri_detect import layer_features
 from .injection_detect_v2 import within_len_auc
 
-BASE = dict(top_n=16, n_gaussians=2, norm_conorm="probability",
-            member_function="gaussian", refine=False)
+BASE = dict(
+    top_n=16,
+    n_gaussians=2,
+    norm_conorm="probability",
+    member_function="gaussian",
+    refine=False,
+)
 
 SWEEP = {
     "top_n": [4, 8, 16, 24, 32],
@@ -52,7 +57,9 @@ def cv_score(X, y, tl, params, seed=0):
         Xte = pd.DataFrame(X[te], columns=[f"f{i}" for i in range(X.shape[1])])
         t0 = time.time()
         with contextlib.redirect_stdout(io.StringIO()):
-            clf = TribbleClassifier(random_state=seed, **params).fit(Xtr, y[tr].astype(int))
+            clf = TribbleClassifier(random_state=seed, **params).fit(
+                Xtr, y[tr].astype(int)
+            )
             p = clf.predict_proba(Xte)
         fit_s += time.time() - t0
         ic = list(clf.classes_).index(1) if 1 in clf.classes_ else 1
@@ -73,19 +80,31 @@ def run(rundir: Path, seed=0) -> dict:
     out = {"model": mid, "baseline": BASE, "one_factor": {}, "grid_best": None}
 
     a0, d0, t0 = cv_score(X, y, tl, BASE, seed)
-    out["baseline_score"] = {"wl_auroc": round(a0, 3), "det@1%FP": round(d0, 3),
-                             "fit_s": round(t0, 3)}
+    out["baseline_score"] = {
+        "wl_auroc": round(a0, 3),
+        "det@1%FP": round(d0, 3),
+        "fit_s": round(t0, 3),
+    }
     print(f"baseline {BASE}: wlAUC {a0:.3f} det@1%FP {d0:.3f} ({t0*1000:.0f} ms/fit)\n")
 
     for param, vals in SWEEP.items():
         rows = []
         for v in vals:
-            p = dict(BASE); p[param] = v
+            p = dict(BASE)
+            p[param] = v
             try:
                 a, d, ft = cv_score(X, y, tl, p, seed)
-                rows.append({"value": v, "wl_auroc": round(a, 3),
-                             "det@1%FP": round(d, 3), "fit_ms": round(ft * 1000)})
-                print(f"  {param}={v!s:14s} wlAUC {a:.3f}  det@1%FP {d:.3f}  {ft*1000:.0f} ms")
+                rows.append(
+                    {
+                        "value": v,
+                        "wl_auroc": round(a, 3),
+                        "det@1%FP": round(d, 3),
+                        "fit_ms": round(ft * 1000),
+                    }
+                )
+                print(
+                    f"  {param}={v!s:14s} wlAUC {a:.3f}  det@1%FP {d:.3f}  {ft*1000:.0f} ms"
+                )
             except Exception as e:
                 rows.append({"value": v, "error": str(e)[:60]})
                 print(f"  {param}={v!s:14s} ERROR {str(e)[:50]}")

@@ -35,14 +35,31 @@ from sklearn.linear_model import RidgeCV
 from sklearn.metrics import r2_score
 
 TIER_A = [
-    "prev1_entropy", "prev2_entropy", "prev3_entropy",
-    "prev1_varentropy", "prev2_varentropy", "prev3_varentropy",
-    "prev1_top1_prob", "prev2_top1_prob", "prev3_top1_prob",
-    "prev1_log_margin_12", "prev2_log_margin_12", "prev3_log_margin_12",
-    "ent_ema_short", "ent_ema_long", "ent_cummax",
+    "prev1_entropy",
+    "prev2_entropy",
+    "prev3_entropy",
+    "prev1_varentropy",
+    "prev2_varentropy",
+    "prev3_varentropy",
+    "prev1_top1_prob",
+    "prev2_top1_prob",
+    "prev3_top1_prob",
+    "prev1_log_margin_12",
+    "prev2_log_margin_12",
+    "prev3_log_margin_12",
+    "ent_ema_short",
+    "ent_ema_long",
+    "ent_cummax",
 ]
-TIER_B = ["step", "prompt_len", "tok_len", "tok_is_space", "tok_is_punct",
-          "tok_is_alpha", "tok_logfreq"]
+TIER_B = [
+    "step",
+    "prompt_len",
+    "tok_len",
+    "tok_is_space",
+    "tok_is_punct",
+    "tok_is_alpha",
+    "tok_logfreq",
+]
 
 TARGETS = ["entropy", "top1_prob", "log_margin_12", "nucleus_90"]
 
@@ -66,8 +83,12 @@ def add_tier_b(df: pd.DataFrame, model_id: str) -> pd.DataFrame:
     df["tok_len"] = s.str.len().astype(float)
     # SmolLM2 uses the GPT-2 byte-level convention: 'Ġ' marks a leading space.
     df["tok_is_space"] = s.str.startswith("Ġ").astype(float)
-    df["tok_is_punct"] = s.str.strip("Ġ").str.match(r"^[^\w\s]+$").fillna(False).astype(float)
-    df["tok_is_alpha"] = s.str.strip("Ġ").str.match(r"^[A-Za-z]+$").fillna(False).astype(float)
+    df["tok_is_punct"] = (
+        s.str.strip("Ġ").str.match(r"^[^\w\s]+$").fillna(False).astype(float)
+    )
+    df["tok_is_alpha"] = (
+        s.str.strip("Ġ").str.match(r"^[A-Za-z]+$").fillna(False).astype(float)
+    )
     df["tok_logfreq"] = np.log([freq_map.get(int(i), 1e-9) for i in ids])
     return df
 
@@ -88,9 +109,9 @@ def evaluate(Xtr, ytr, Xte, yte, seed=0) -> dict:
     # learned detector in the anomaly study.
     best, best_r2 = None, -np.inf
     for j in range(Xtr.shape[1]):
-        m = HistGradientBoostingRegressor(
-            max_iter=100, random_state=seed
-        ).fit(Xtr[:, [j]], ytr)
+        m = HistGradientBoostingRegressor(max_iter=100, random_state=seed).fit(
+            Xtr[:, [j]], ytr
+        )
         r = r2_score(yte, m.predict(Xte[:, [j]]))
         if r > best_r2:
             best, best_r2 = j, r
@@ -159,17 +180,33 @@ def run(rundir: Path, seed: int = 0) -> dict:
         per_combo = {}
         for name, keys in combos.items():
             X = np.hstack([banks[k] for k in keys])
-            names = sum([TIER_A if k == "A" else TIER_B if k == "B" else
-                         [f"C{i}" for i in range(banks["C"].shape[1])] for k in keys], [])
+            names = sum(
+                [
+                    (
+                        TIER_A
+                        if k == "A"
+                        else (
+                            TIER_B
+                            if k == "B"
+                            else [f"C{i}" for i in range(banks["C"].shape[1])]
+                        )
+                    )
+                    for k in keys
+                ],
+                [],
+            )
             ok = np.isfinite(X).all(1)
             r = evaluate(X[tr_m & ok], y[tr_m & ok], X[te_m & ok], y[te_m & ok], seed)
             r["single_best_feature_name"] = names[r.pop("single_best_feature_idx")]
             r["n_features"] = int(X.shape[1])
             per_combo[name] = r
-            print(f"  {tgt:16s} {name:18s} "
-                  f"1feat={r['single_best_feature']:+.3f} "
-                  f"ridge={r['ridge']:+.3f} gbm={r['gbm']:+.3f} "
-                  f"({r['single_best_feature_name']})", flush=True)
+            print(
+                f"  {tgt:16s} {name:18s} "
+                f"1feat={r['single_best_feature']:+.3f} "
+                f"ridge={r['ridge']:+.3f} gbm={r['gbm']:+.3f} "
+                f"({r['single_best_feature_name']})",
+                flush=True,
+            )
         results["targets"][tgt] = per_combo
     return results
 

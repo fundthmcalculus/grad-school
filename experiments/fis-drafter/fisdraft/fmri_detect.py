@@ -118,8 +118,9 @@ def layer_features(act, fit_idx, per_layer_pca=8):
     feats, layer_of = [], []
     for l in range(Lp1):
         A = act[:, l, :]
-        p = PCA(n_components=min(per_layer_pca, D, len(fit_idx) - 1),
-                random_state=0).fit(A[fit_idx])
+        p = PCA(
+            n_components=min(per_layer_pca, D, len(fit_idx) - 1), random_state=0
+        ).fit(A[fit_idx])
         Z = p.transform(A)
         norm = np.linalg.norm(A, axis=1, keepdims=True)
         block = np.hstack([Z, norm])
@@ -151,8 +152,12 @@ def surface_features(df, fit_idx):
     ]
     mean_wlen = [np.mean([len(w) for w in tk]) if tk else 0.0 for tk in toks]
     return np.column_stack(
-        [df.tok_len.to_numpy(dtype=float), np.array(logp),
-         np.array(frac_alpha), np.array(mean_wlen)]
+        [
+            df.tok_len.to_numpy(dtype=float),
+            np.array(logp),
+            np.array(frac_alpha),
+            np.array(mean_wlen),
+        ]
     )
 
 
@@ -175,8 +180,8 @@ def run(rundir: Path, variant="mean", seed=0, per_layer_pca=8) -> dict:
     innoc_idx = np.where(is_innoc)[0]
     rng.shuffle(innoc_idx)
     cut = int(0.6 * len(innoc_idx))
-    fit_idx = innoc_idx[:cut]           # train (normal only)
-    test_innoc = innoc_idx[cut:]        # held-out normal
+    fit_idx = innoc_idx[:cut]  # train (normal only)
+    test_innoc = innoc_idx[cut:]  # held-out normal
 
     X, layer_of = layer_features(act, fit_idx, per_layer_pca)
     Xs = surface_features(df, fit_idx)
@@ -203,22 +208,32 @@ def run(rundir: Path, variant="mean", seed=0, per_layer_pca=8) -> dict:
                 y = np.r_[np.zeros(len(test_innoc)), np.ones(len(ti))]
                 s = np.r_[s_all[test_innoc], s_all[ti]]
                 per_type[t] = evaluate(s, y)
-                all_y.append(y[len(test_innoc):])
-                all_s.append(s[len(test_innoc):])
-            yv = np.r_[np.zeros(len(test_innoc)),
-                       np.ones(sum(len(np.where(df.label.to_numpy() == t)[0]) for t in types))]
-            sv = np.r_[s_all[test_innoc],
-                       np.concatenate([s_all[np.where(df.label.to_numpy() == t)[0]] for t in types])]
+                all_y.append(y[len(test_innoc) :])
+                all_s.append(s[len(test_innoc) :])
+            yv = np.r_[
+                np.zeros(len(test_innoc)),
+                np.ones(sum(len(np.where(df.label.to_numpy() == t)[0]) for t in types)),
+            ]
+            sv = np.r_[
+                s_all[test_innoc],
+                np.concatenate(
+                    [s_all[np.where(df.label.to_numpy() == t)[0]] for t in types]
+                ),
+            ]
             struct_types = [t for t in types if t in STRUCTURAL]
             surf_types = [t for t in types if t in SURFACE]
             res[dname] = {
-                "per_type": {k: (None if np.isnan(v) else round(v, 3))
-                             for k, v in per_type.items()},
+                "per_type": {
+                    k: (None if np.isnan(v) else round(v, 3))
+                    for k, v in per_type.items()
+                },
                 "auroc_all": round(evaluate(sv, yv), 3),
                 "auroc_structural": round(
-                    np.nanmean([per_type[t] for t in struct_types]), 3),
+                    np.nanmean([per_type[t] for t in struct_types]), 3
+                ),
                 "auroc_surface": round(
-                    np.nanmean([per_type[t] for t in surf_types]), 3),
+                    np.nanmean([per_type[t] for t in surf_types]), 3
+                ),
             }
         container.update(res)
 
@@ -253,8 +268,12 @@ def main():
     rundir = Path(a.run)
     r = run(rundir, variant=a.variant, per_layer_pca=a.pca)
     (rundir / f"detect_{a.variant}.json").write_text(json.dumps(r, indent=2))
-    print(json.dumps({k: v for k, v in r.items()
-                      if k not in ("per_layer_mahalanobis",)}, indent=2))
+    print(
+        json.dumps(
+            {k: v for k, v in r.items() if k not in ("per_layer_mahalanobis",)},
+            indent=2,
+        )
+    )
     print("\nper-layer Mahalanobis (structural | surface):")
     for l, v in r["per_layer_mahalanobis"].items():
         print(f"  layer {l:2d}: {v['structural']:.3f} | {v['surface']:.3f}")

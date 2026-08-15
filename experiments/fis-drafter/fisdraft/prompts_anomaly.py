@@ -273,18 +273,23 @@ def injection_battery(seed: int = 0, source: str = "deepset") -> list[Probe]:
         # balanced subsample keeps captures fast and the class ratio sane.
         from datasets import concatenate_datasets
 
-        d = concatenate_datasets([
-            load_dataset("xTRam1/safe-guard-prompt-injection", split="train"),
-            load_dataset("xTRam1/safe-guard-prompt-injection", split="test"),
-        ])
+        d = concatenate_datasets(
+            [
+                load_dataset("xTRam1/safe-guard-prompt-injection", split="train"),
+                load_dataset("xTRam1/safe-guard-prompt-injection", split="test"),
+            ]
+        )
         rng = random.Random(seed)
         ben = [r["text"].strip() for r in d if r["label"] == 0 and r["text"].strip()]
         inj = [r["text"].strip() for r in d if r["label"] == 1 and r["text"].strip()]
         import os
+
         nb = int(os.environ.get("SG_NBEN", "400"))
         ben = rng.sample(ben, min(nb, len(ben)))
         inj = rng.sample(inj, min(250, len(inj)))
-        probes += [Probe(t, "benign") for t in ben] + [Probe(t, "injection") for t in inj]
+        probes += [Probe(t, "benign") for t in ben] + [
+            Probe(t, "injection") for t in inj
+        ]
     elif source == "spml":
         d = load_dataset("reshabhs/SPML_Chatbot_Prompt_Injection", split="train")
         rng = random.Random(seed)
@@ -293,7 +298,9 @@ def injection_battery(seed: int = 0, source: str = "deepset") -> list[Probe]:
         inj = [r["User Prompt"].strip() for r in rows if r["Prompt injection"] == 1]
         ben = rng.sample(ben, min(400, len(ben)))
         inj = rng.sample(inj, min(250, len(inj)))
-        probes += [Probe(t, "benign") for t in ben] + [Probe(t, "injection") for t in inj]
+        probes += [Probe(t, "benign") for t in ben] + [
+            Probe(t, "injection") for t in inj
+        ]
     else:
         raise ValueError(source)
     return probes
@@ -325,7 +332,5 @@ def dose_response_battery(seed: int = 0, n_base: int = 80) -> list[Probe]:
                 rng.shuffle(vals)
                 for i, v in zip(sub, vals):
                     perm[i] = v
-            probes.append(
-                Probe(" ".join(w[i] for i in perm), f"dose::{bi}::{dose}")
-            )
+            probes.append(Probe(" ".join(w[i] for i in perm), f"dose::{bi}::{dose}"))
     return probes

@@ -41,7 +41,6 @@ import torch
 
 from .prompts import build_battery
 
-
 # --------------------------------------------------------------------------
 # Context reconstruction
 # --------------------------------------------------------------------------
@@ -271,8 +270,11 @@ def run(rundir: Path, k: int = 8, device: str = "cuda", limit: int = 20000) -> d
             hit_cat[(r.name, cat)].append(float(true_top in cand))
             for sname, sp in shapes.items():
                 if sp is None:
-                    head = p[torch.tensor(cand, device=device)].cpu().numpy().astype(
-                        np.float64
+                    head = (
+                        p[torch.tensor(cand, device=device)]
+                        .cpu()
+                        .numpy()
+                        .astype(np.float64)
                     )
                 else:
                     head = shape_zipf(len(cand), sp[0], sp[1])
@@ -286,8 +288,11 @@ def run(rundir: Path, k: int = 8, device: str = "cuda", limit: int = 20000) -> d
         hit["oracle_ranker"].append(1.0)
         for sname, sp in shapes.items():
             if sp is None:
-                head = p[torch.tensor(ocand, device=device)].cpu().numpy().astype(
-                    np.float64
+                head = (
+                    p[torch.tensor(ocand, device=device)]
+                    .cpu()
+                    .numpy()
+                    .astype(np.float64)
                 )
             else:
                 head = shape_zipf(len(ocand), sp[0], sp[1])

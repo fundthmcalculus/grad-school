@@ -70,8 +70,9 @@ def kl_loss(H_hat, P, E):
 LOSSES = {"alpha": alpha_loss, "kl": kl_loss}
 
 
-def _minibatch_opt(params, forward, Htr_true, Etr, P_fn, loss_fn,
-                   steps=300, bs=256, lr=1e-3, seed=0):
+def _minibatch_opt(
+    params, forward, Htr_true, Etr, P_fn, loss_fn, steps=300, bs=256, lr=1e-3, seed=0
+):
     """Adam on `params`; `forward(idx)` returns predicted h for those rows."""
     g = torch.Generator(device="cpu").manual_seed(seed)
     opt = torch.optim.Adam(params, lr=lr)
@@ -106,7 +107,10 @@ def run(rundir: Path, device="cuda", n_eval=6000, seed=0, steps=400) -> dict:
 
     Htr, Hte = H[tr_i], H[te_i]
     Pte = torch.cat(
-        [torch.softmax(Hte[i : i + 2048] @ E.T, dim=-1) for i in range(0, len(Hte), 2048)]
+        [
+            torch.softmax(Hte[i : i + 2048] @ E.T, dim=-1)
+            for i in range(0, len(Hte), 2048)
+        ]
     )
     mu = Htr.mean(0, keepdim=True)
     P_tr = lambda idx: torch.softmax(Htr[idx.to(device)] @ E.T, dim=-1)
@@ -122,21 +126,27 @@ def run(rundir: Path, device="cuda", n_eval=6000, seed=0, steps=400) -> dict:
 
         row = {"pca": a_pca}
         for lname, lfn in LOSSES.items():
-            B = Vk.clone().requires_grad_(True)   # encoder
+            B = Vk.clone().requires_grad_(True)  # encoder
             A = Vk.T.clone().requires_grad_(True)  # decoder
             fwd = lambda idx, B=B, A=A: ((Htr[idx.to(device)] - mu) @ B) @ A + mu
-            _minibatch_opt([B, A], fwd, Htr, E, P_tr, lfn,
-                           steps=steps, lr=3e-3, seed=seed)
+            _minibatch_opt(
+                [B, A], fwd, Htr, E, P_tr, lfn, steps=steps, lr=3e-3, seed=seed
+            )
             with torch.no_grad():
                 hat = ((Hte - mu) @ B) @ A + mu
                 row[lname], _ = alpha_of(hat, Pte, E)
         out["T1"][f"rank_{k}"] = row
-        print(f"  T1 rank {k:3d}: pca {row['pca']:.4f} -> "
-              f"alpha-opt {row['alpha']:.4f}  kl-opt {row['kl']:.4f}", flush=True)
+        print(
+            f"  T1 rank {k:3d}: pca {row['pca']:.4f} -> "
+            f"alpha-opt {row['alpha']:.4f}  kl-opt {row['kl']:.4f}",
+            flush=True,
+        )
 
     # ---------------- T2: refine the context predictor ---------------------
     feat, _, _ = build_context_features(rundir, df, Ein, device)
-    row_by = {(int(p), int(s)): int(r) for r, p, s in zip(df.row, df.prompt_id, df.step)}
+    row_by = {
+        (int(p), int(s)): int(r) for r, p, s in zip(df.row, df.prompt_id, df.step)
+    }
     ridx = {int(r): i for i, r in enumerate(df.row.to_numpy())}
     prev = np.full(len(df), -1, dtype=np.int64)
     for i, (p, s) in enumerate(zip(df.prompt_id.to_numpy(), df.step.to_numpy())):
@@ -151,7 +161,10 @@ def run(rundir: Path, device="cuda", n_eval=6000, seed=0, steps=400) -> dict:
     Xtr, Xte = X[tr2], X[te2]
     Ytr, Yte = H[tr2], H[te2]
     Pte2 = torch.cat(
-        [torch.softmax(Yte[i : i + 2048] @ E.T, dim=-1) for i in range(0, len(Yte), 2048)]
+        [
+            torch.softmax(Yte[i : i + 2048] @ E.T, dim=-1)
+            for i in range(0, len(Yte), 2048)
+        ]
     )
     P_tr2 = lambda idx: torch.softmax(Ytr[idx.to(device)] @ E.T, dim=-1)
 

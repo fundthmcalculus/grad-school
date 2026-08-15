@@ -60,7 +60,8 @@ def run(seeds=6, n_pca=32) -> tuple[dict, dict]:
 
         for seed in range(seeds):
             rng = np.random.default_rng(seed)
-            ben = np.where(y == 0)[0]; rng.shuffle(ben)
+            ben = np.where(y == 0)[0]
+            rng.shuffle(ben)
             inj = np.where(y == 1)[0]
             fit = ben[: int(0.6 * len(ben))]
             tb = ben[int(0.6 * len(ben)) :]
@@ -77,8 +78,11 @@ def run(seeds=6, n_pca=32) -> tuple[dict, dict]:
                 t0 = time.time()
                 with contextlib.redirect_stdout(io.StringIO()):
                     det = TribbleOneClassDetector(
-                        whiten=True, whiten_components=min(n_pca, len(fit) - 1),
-                        n_gaussians=1, norm_conorm="probability", random_state=seed,
+                        whiten=True,
+                        whiten_components=min(n_pca, len(fit) - 1),
+                        n_gaussians=1,
+                        norm_conorm="probability",
+                        random_state=seed,
                     ).fit(Xdf.iloc[fit])
                 reps.append(time.time() - t0)
             fit_ms.append(1000 * np.median(reps))
@@ -90,17 +94,20 @@ def run(seeds=6, n_pca=32) -> tuple[dict, dict]:
             score_us.append(1e6 * (time.time() - t0) / (5 * len(Xdf)))
 
             f, t, _ = roc_curve(yt, s_fis[ti])
-            fis_curves.append((f, t)); fis_auc.append(within_len_auc(yt, s_fis[ti], tlt))
+            fis_curves.append((f, t))
+            fis_auc.append(within_len_auc(yt, s_fis[ti], tlt))
 
             s_mah = Mahalanobis(n_pca=min(n_pca, len(fit) - 1)).fit(X[fit]).score(X)
             f, t, _ = roc_curve(yt, s_mah[ti])
-            mah_curves.append((f, t)); mah_auc.append(within_len_auc(yt, s_mah[ti], tlt))
+            mah_curves.append((f, t))
+            mah_auc.append(within_len_auc(yt, s_mah[ti], tlt))
 
         fm, fs = mean_roc(fis_curves, grid)
         mm, ms = mean_roc(mah_curves, grid)
         roc_out[name] = {
             "fpr_grid": grid.tolist(),
-            "fis_tpr": fm.tolist(), "fis_tpr_std": fs.tolist(),
+            "fis_tpr": fm.tolist(),
+            "fis_tpr_std": fs.tolist(),
             "mah_tpr": mm.tolist(),
             "fis_auroc": float(np.mean(fis_auc)),
             "mah_auroc": float(np.mean(mah_auc)),
@@ -116,9 +123,12 @@ def run(seeds=6, n_pca=32) -> tuple[dict, dict]:
             "infer_us_per_prompt": round(float(np.median(score_us)), 1),
             "within_len_auroc": round(float(np.mean(fis_auc)), 3),
         }
-        print(f"{name:18s} AUROC fis {np.mean(fis_auc):.3f} mah {np.mean(mah_auc):.3f}"
-              f" | construct {np.median(fit_ms):.0f} ms"
-              f" | infer {np.median(score_us):.1f} us/prompt", flush=True)
+        print(
+            f"{name:18s} AUROC fis {np.mean(fis_auc):.3f} mah {np.mean(mah_auc):.3f}"
+            f" | construct {np.median(fit_ms):.0f} ms"
+            f" | infer {np.median(score_us):.1f} us/prompt",
+            flush=True,
+        )
 
     Path("runs/sweep_roc.json").write_text(json.dumps(roc_out))
     Path("runs/timing.json").write_text(json.dumps(timing_out, indent=2))

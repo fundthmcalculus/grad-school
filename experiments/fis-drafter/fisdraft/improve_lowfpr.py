@@ -77,10 +77,11 @@ def surprisals(det, Xdf):
 # Idea 1: aggregations
 # --------------------------------------------------------------------------
 
+
 def agg_scores(S):
     n_comp = S.shape[1]
     out = {
-        "baseline_1-maxfiring": 1.0 - np.exp(-S.sum(1)),   # == library score
+        "baseline_1-maxfiring": 1.0 - np.exp(-S.sum(1)),  # == library score
         "surprisal_sum(=Mahal)": S.sum(1),
         "trimmed_sum_top2": np.sort(S, 1)[:, : n_comp - 2].sum(1),
         "trimmed_sum_top4": np.sort(S, 1)[:, : n_comp - 4].sum(1),
@@ -93,15 +94,19 @@ def agg_scores(S):
 # Idea 2: bagging
 # --------------------------------------------------------------------------
 
+
 def bagged_score(act, fit, Xdf, n_pca, n_bags, seed):
     rng = np.random.default_rng(seed)
     scores = []
     for b in range(n_bags):
-        sub = rng.choice(fit, size=len(fit), replace=True)          # bootstrap benign
+        sub = rng.choice(fit, size=len(fit), replace=True)  # bootstrap benign
         with contextlib.redirect_stdout(io.StringIO()):
             det = TribbleOneClassDetector(
-                whiten=True, whiten_components=min(n_pca, len(np.unique(sub)) - 1),
-                n_gaussians=1, norm_conorm="probability", random_state=seed + b,
+                whiten=True,
+                whiten_components=min(n_pca, len(np.unique(sub)) - 1),
+                n_gaussians=1,
+                norm_conorm="probability",
+                random_state=seed + b,
             ).fit(Xdf.iloc[sub])
         S = surprisals(det, Xdf)
         # random component subset per bag
@@ -115,6 +120,7 @@ def bagged_score(act, fit, Xdf, n_pca, n_bags, seed):
 # --------------------------------------------------------------------------
 # Idea 3: local calibration
 # --------------------------------------------------------------------------
+
 
 def local_calibrated(det, Xdf, fit_idx, base_score, k=20):
     """z-score each prompt's base score against its k nearest benign-train
@@ -143,11 +149,14 @@ def run(rundir: Path, seeds=6, n_pca=32) -> dict:
 
     def rec(name, d1, d5, au):
         arms.setdefault(name, {"d1": [], "d5": [], "auc": []})
-        arms[name]["d1"].append(d1); arms[name]["d5"].append(d5); arms[name]["auc"].append(au)
+        arms[name]["d1"].append(d1)
+        arms[name]["d5"].append(d5)
+        arms[name]["auc"].append(au)
 
     for seed in range(seeds):
         rng = np.random.default_rng(seed)
-        ben = np.where(y == 0)[0]; rng.shuffle(ben)
+        ben = np.where(y == 0)[0]
+        rng.shuffle(ben)
         inj = np.where(y == 1)[0]
         fit = ben[: int(0.6 * len(ben))]
         tb = ben[int(0.6 * len(ben)) :]
@@ -158,37 +167,62 @@ def run(rundir: Path, seeds=6, n_pca=32) -> dict:
         Xdf = pd.DataFrame(X, columns=[f"f{i}" for i in range(X.shape[1])])
         with contextlib.redirect_stdout(io.StringIO()):
             det = TribbleOneClassDetector(
-                whiten=True, whiten_components=min(n_pca, len(fit) - 1),
-                n_gaussians=1, norm_conorm="probability", random_state=seed,
+                whiten=True,
+                whiten_components=min(n_pca, len(fit) - 1),
+                n_gaussians=1,
+                norm_conorm="probability",
+                random_state=seed,
             ).fit(Xdf.iloc[fit])
         S = surprisals(det, Xdf)
 
         # Idea 1
         for name, sc in agg_scores(S).items():
-            rec(f"1:{name}", det_at(yt, sc[ti], 0.01), det_at(yt, sc[ti], 0.05),
-                roc_auc_score(yt, sc[ti]))
+            rec(
+                f"1:{name}",
+                det_at(yt, sc[ti], 0.01),
+                det_at(yt, sc[ti], 0.05),
+                roc_auc_score(yt, sc[ti]),
+            )
 
         # Idea 2
         bag = bagged_score(act, fit, Xdf, n_pca, n_bags=15, seed=seed)
-        rec("2:bagged_15", det_at(yt, bag[ti], 0.01), det_at(yt, bag[ti], 0.05),
-            roc_auc_score(yt, bag[ti]))
+        rec(
+            "2:bagged_15",
+            det_at(yt, bag[ti], 0.01),
+            det_at(yt, bag[ti], 0.05),
+            roc_auc_score(yt, bag[ti]),
+        )
 
         # Idea 3 (on the best non-saturating base: surprisal_sum)
         base = S.sum(1)
         loc = local_calibrated(det, Xdf, fit, base, k=20)
-        rec("3:local_calib(Mahal)", det_at(yt, loc[ti], 0.01), det_at(yt, loc[ti], 0.05),
-            roc_auc_score(yt, loc[ti]))
+        rec(
+            "3:local_calib(Mahal)",
+            det_at(yt, loc[ti], 0.01),
+            det_at(yt, loc[ti], 0.05),
+            roc_auc_score(yt, loc[ti]),
+        )
         # Idea 1+3 combined: local-calibrated trimmed sum
         base_t = np.sort(S, 1)[:, : S.shape[1] - 4].sum(1)
         loc_t = local_calibrated(det, Xdf, fit, base_t, k=20)
-        rec("1+3:local_trimmed", det_at(yt, loc_t[ti], 0.01), det_at(yt, loc_t[ti], 0.05),
-            roc_auc_score(yt, loc_t[ti]))
+        rec(
+            "1+3:local_trimmed",
+            det_at(yt, loc_t[ti], 0.01),
+            det_at(yt, loc_t[ti], 0.05),
+            roc_auc_score(yt, loc_t[ti]),
+        )
 
-    return {"model": model_id,
-            "arms": {k: {"det@1%FP": round(float(np.mean(v["d1"])), 3),
-                         "det@5%FP": round(float(np.mean(v["d5"])), 3),
-                         "auroc": round(float(np.mean(v["auc"])), 3)}
-                     for k, v in arms.items()}}
+    return {
+        "model": model_id,
+        "arms": {
+            k: {
+                "det@1%FP": round(float(np.mean(v["d1"])), 3),
+                "det@5%FP": round(float(np.mean(v["d5"])), 3),
+                "auroc": round(float(np.mean(v["auc"])), 3),
+            }
+            for k, v in arms.items()
+        },
+    }
 
 
 def main():
@@ -196,9 +230,16 @@ def main():
     ap.add_argument("--runs", nargs="+", default=["runs/injection"])
     ap.add_argument("--seeds", type=int, default=6)
     a = ap.parse_args()
-    order = ["1:baseline_1-maxfiring", "1:surprisal_sum(=Mahal)", "1:trimmed_sum_top2",
-             "1:trimmed_sum_top4", "1:topk_mean_16", "2:bagged_15",
-             "3:local_calib(Mahal)", "1+3:local_trimmed"]
+    order = [
+        "1:baseline_1-maxfiring",
+        "1:surprisal_sum(=Mahal)",
+        "1:trimmed_sum_top2",
+        "1:trimmed_sum_top4",
+        "1:topk_mean_16",
+        "2:bagged_15",
+        "3:local_calib(Mahal)",
+        "1+3:local_trimmed",
+    ]
     allout = []
     print("Three ideas for better 1%-FPR (det@1%FP | det@5%FP | AUROC), one-class:\n")
     for r in a.runs:
@@ -208,9 +249,16 @@ def main():
         for k in order:
             if k in res["arms"]:
                 v = res["arms"][k]
-                mark = " *" if v["det@1%FP"] > res["arms"]["1:baseline_1-maxfiring"]["det@1%FP"] + 0.03 else ""
-                print("  %-26s %.3f | %.3f | %.3f%s"
-                      % (k, v["det@1%FP"], v["det@5%FP"], v["auroc"], mark))
+                mark = (
+                    " *"
+                    if v["det@1%FP"]
+                    > res["arms"]["1:baseline_1-maxfiring"]["det@1%FP"] + 0.03
+                    else ""
+                )
+                print(
+                    "  %-26s %.3f | %.3f | %.3f%s"
+                    % (k, v["det@1%FP"], v["det@5%FP"], v["auroc"], mark)
+                )
         print()
     Path("runs/improve_lowfpr.json").write_text(json.dumps(allout, indent=2))
 

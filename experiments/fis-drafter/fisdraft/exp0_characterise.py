@@ -126,7 +126,9 @@ def run(rundir: Path) -> dict:
     syn = df[df.source == "synthetic"]
     if len(syn):
         out["synthetic_regimes"] = (
-            syn.groupby("category")[["entropy", "top1_prob", "nucleus_90", "tail_slope"]]
+            syn.groupby("category")[
+                ["entropy", "top1_prob", "nucleus_90", "tail_slope"]
+            ]
             .agg(["mean", "std", "count"])
             .round(4)
             .to_dict()

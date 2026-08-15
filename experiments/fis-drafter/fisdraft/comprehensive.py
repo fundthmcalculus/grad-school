@@ -46,16 +46,24 @@ def evaluate(rundir: Path, seeds=6, n_pca=32) -> dict:
     fis_d1, fis_wl, mah_wl, srf_wl = [], [], [], []
     for seed in range(seeds):
         rng = np.random.default_rng(seed)
-        ben = np.where(y == 0)[0]; rng.shuffle(ben); inj = np.where(y == 1)[0]
-        fit = ben[: int(0.6 * len(ben))]; tb = ben[int(0.6 * len(ben)):]
-        ti = np.r_[tb, inj]; yt = np.r_[np.zeros(len(tb)), np.ones(len(inj))]
+        ben = np.where(y == 0)[0]
+        rng.shuffle(ben)
+        inj = np.where(y == 1)[0]
+        fit = ben[: int(0.6 * len(ben))]
+        tb = ben[int(0.6 * len(ben)) :]
+        ti = np.r_[tb, inj]
+        yt = np.r_[np.zeros(len(tb)), np.ones(len(inj))]
         tlt = np.r_[tl[tb], tl[inj]]
         X, _ = layer_features(act, fit, 8)
         Xdf = pd.DataFrame(X, columns=[f"f{i}" for i in range(X.shape[1])])
         with contextlib.redirect_stdout(io.StringIO()):
             det = TribbleOneClassDetector(
-                whiten=True, whiten_components=min(n_pca, len(fit) - 1),
-                n_gaussians=1, norm_conorm="probability", random_state=seed).fit(Xdf.iloc[fit])
+                whiten=True,
+                whiten_components=min(n_pca, len(fit) - 1),
+                n_gaussians=1,
+                norm_conorm="probability",
+                random_state=seed,
+            ).fit(Xdf.iloc[fit])
         S = surprisals(det, Xdf)
         trim = np.sort(S, 1)[:, : S.shape[1] - 2].sum(1)
         fis_d1.append(det_at(yt, trim[ti], 0.01))
@@ -66,16 +74,24 @@ def evaluate(rundir: Path, seeds=6, n_pca=32) -> dict:
         srf = Mahalanobis(n_pca=4).fit(Xs[fit]).score(Xs)
         srf_wl.append(within_len_auc(yt, srf[ti], tlt))
     name, params = label(mid)
-    return {"model": name, "params": params, "dataset": dataset_of(rundir.name),
-            "fis_trim_det1": round(float(np.mean(fis_d1)), 3),
-            "fis_trim_wlAUC": round(float(np.mean(fis_wl)), 3),
-            "mahal_wlAUC": round(float(np.mean(mah_wl)), 3),
-            "surface_wlAUC": round(float(np.mean(srf_wl)), 3)}
+    return {
+        "model": name,
+        "params": params,
+        "dataset": dataset_of(rundir.name),
+        "fis_trim_det1": round(float(np.mean(fis_d1)), 3),
+        "fis_trim_wlAUC": round(float(np.mean(fis_wl)), 3),
+        "mahal_wlAUC": round(float(np.mean(mah_wl)), 3),
+        "surface_wlAUC": round(float(np.mean(srf_wl)), 3),
+    }
 
 
 def main():
-    runs = [Path("runs/injection")] + sorted(Path("runs").glob("injection_*")) \
-        + [Path("runs/jailbreak")] + sorted(Path("runs").glob("sg_*"))
+    runs = (
+        [Path("runs/injection")]
+        + sorted(Path("runs").glob("injection_*"))
+        + [Path("runs/jailbreak")]
+        + sorted(Path("runs").glob("sg_*"))
+    )
     runs = [r for r in runs if (r / "act_mean.npy").exists()]
     res = []
     for r in runs:
@@ -84,15 +100,38 @@ def main():
         except Exception as e:
             print(f"skip {r.name}: {e}")
     res.sort(key=lambda d: (d["dataset"], d["params"]))
-    print("\nComprehensive summary -- FIS one-class (trimmed log-domain score), "
-          "within-length AUROC is confound-controlled:\n")
-    print("%-20s %-10s %5s %9s %9s %9s %9s  %s"
-          % ("model", "dataset", "prm", "det@1FP", "FIS-wlAUC", "Mahal-wl", "surf-wl", "act>surf?"))
+    print(
+        "\nComprehensive summary -- FIS one-class (trimmed log-domain score), "
+        "within-length AUROC is confound-controlled:\n"
+    )
+    print(
+        "%-20s %-10s %5s %9s %9s %9s %9s  %s"
+        % (
+            "model",
+            "dataset",
+            "prm",
+            "det@1FP",
+            "FIS-wlAUC",
+            "Mahal-wl",
+            "surf-wl",
+            "act>surf?",
+        )
+    )
     for d in res:
         win = "YES" if d["fis_trim_wlAUC"] > d["surface_wlAUC"] else "no"
-        print("%-20s %-10s %5.2f %9.3f %9.3f %9.3f %9.3f  %s"
-              % (d["model"], d["dataset"], d["params"], d["fis_trim_det1"],
-                 d["fis_trim_wlAUC"], d["mahal_wlAUC"], d["surface_wlAUC"], win))
+        print(
+            "%-20s %-10s %5.2f %9.3f %9.3f %9.3f %9.3f  %s"
+            % (
+                d["model"],
+                d["dataset"],
+                d["params"],
+                d["fis_trim_det1"],
+                d["fis_trim_wlAUC"],
+                d["mahal_wlAUC"],
+                d["surface_wlAUC"],
+                win,
+            )
+        )
     Path("runs/comprehensive.json").write_text(json.dumps(res, indent=2))
 
 

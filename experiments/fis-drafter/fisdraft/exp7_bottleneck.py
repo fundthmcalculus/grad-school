@@ -64,7 +64,9 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=1500, seed=0) -> d
     D = H.shape[1]
 
     feat, _, _ = build_context_features(rundir, df, Ein, device)
-    row_by = {(int(p), int(s)): int(r) for r, p, s in zip(df.row, df.prompt_id, df.step)}
+    row_by = {
+        (int(p), int(s)): int(r) for r, p, s in zip(df.row, df.prompt_id, df.step)
+    }
     ridx = {int(r): i for i, r in enumerate(df.row.to_numpy())}
     prev = np.full(len(df), -1, dtype=np.int64)
     for i, (p, s) in enumerate(zip(df.prompt_id.to_numpy(), df.step.to_numpy())):
@@ -83,7 +85,10 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=1500, seed=0) -> d
 
     Htr, Hte = H[tr_i], H[te_i]
     Pte = torch.cat(
-        [torch.softmax(Hte[i : i + 2048] @ E.T, dim=-1) for i in range(0, len(Hte), 2048)]
+        [
+            torch.softmax(Hte[i : i + 2048] @ E.T, dim=-1)
+            for i in range(0, len(Hte), 2048)
+        ]
     )
     mu = Htr.mean(0, keepdim=True)
 
@@ -101,15 +106,17 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=1500, seed=0) -> d
     Xtr = torch.tensor(Xtr_np, dtype=torch.float32, device=device)
     Xte = torch.tensor(Xte_np, dtype=torch.float32, device=device)
 
-    out: dict = {"k": k, "n_features": Xall.shape[1], "model": meta["config"]["model_id"]}
+    out: dict = {
+        "k": k,
+        "n_features": Xall.shape[1],
+        "model": meta["config"]["model_id"],
+    }
 
     # ---- end-to-end: learn code space + decoder + linear predictor --------
     _, _, V = torch.pca_lowrank(Htr - mu, q=min(128, len(Htr) - 1), niter=4)
-    A = V[:, :k].T.clone().requires_grad_(True)          # decoder  k -> D
+    A = V[:, :k].T.clone().requires_grad_(True)  # decoder  k -> D
     Wp = torch.zeros((Xtr.shape[1] + 1, k), device=device)
-    Wp[: Xtr.shape[1]] = (
-        torch.linalg.lstsq(Xtr, (Htr - mu) @ V[:, :k]).solution
-    )
+    Wp[: Xtr.shape[1]] = torch.linalg.lstsq(Xtr, (Htr - mu) @ V[:, :k]).solution
     Wp = Wp.clone().requires_grad_(True)
 
     def pred_code(X, W):
@@ -172,12 +179,14 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=1500, seed=0) -> d
     # ---- gbm ---------------------------------------------------------------
     from sklearn.ensemble import HistGradientBoostingRegressor
 
-    Zg = np.column_stack([
-        HistGradientBoostingRegressor(max_iter=200, random_state=seed)
-        .fit(Xtr_np, Ztr_tgt[:, j])
-        .predict(Xte_np)
-        for j in range(k)
-    ])
+    Zg = np.column_stack(
+        [
+            HistGradientBoostingRegressor(max_iter=200, random_state=seed)
+            .fit(Xtr_np, Ztr_tgt[:, j])
+            .predict(Xte_np)
+            for j in range(k)
+        ]
+    )
     out["gbm"] = decode_and_score(Zg)
     print(f"  gbm  (k={k} models)        : {out['gbm']:.4f}", flush=True)
 
@@ -186,14 +195,21 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=1500, seed=0) -> d
 
     Xtr_df = pd.DataFrame(Xtr_np, columns=names)
     Xte_df = pd.DataFrame(Xte_np, columns=names)
-    Zf = np.column_stack([
-        TribbleRegressor(top_n=8, n_gaussians=3, n_output_buckets=7,
-                         tsk_order="1st", norm_conorm="probability",
-                         random_state=seed)
-        .fit(Xtr_df, Ztr_tgt[:, j])
-        .predict(Xte_df)
-        for j in range(k)
-    ])
+    Zf = np.column_stack(
+        [
+            TribbleRegressor(
+                top_n=8,
+                n_gaussians=3,
+                n_output_buckets=7,
+                tsk_order="1st",
+                norm_conorm="probability",
+                random_state=seed,
+            )
+            .fit(Xtr_df, Ztr_tgt[:, j])
+            .predict(Xte_df)
+            for j in range(k)
+        ]
+    )
     out["fis"] = decode_and_score(Zf)
     print(f"  fis  (k={k} TribbleRegr.)  : {out['fis']:.4f}", flush=True)
 
@@ -203,7 +219,9 @@ def run(rundir: Path, k=16, device="cuda", n_eval=6000, steps=1500, seed=0) -> d
     )[0]
     Zl = np.hstack([Xte_np, np.ones((len(Xte_np), 1))]) @ Wl
     out["linear_same_targets"] = decode_and_score(Zl)
-    print(f"  linear (same targets)      : {out['linear_same_targets']:.4f}", flush=True)
+    print(
+        f"  linear (same targets)      : {out['linear_same_targets']:.4f}", flush=True
+    )
     return out
 
 

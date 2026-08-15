@@ -60,23 +60,34 @@ def run(rundir: Path, seeds=6) -> dict:
     mid = json.loads((rundir / "meta.json").read_text())["config"]["model_id"]
     bg_lams = [0.3, 0.5, 0.7, 0.9, 0.99]
     fg_lams = [0.05, 0.2, 0.5]
-    arms = ["trimmed_pca32", "maha_lw"] + [f"maha_shrink_{l}" for l in fg_lams] \
+    arms = (
+        ["trimmed_pca32", "maha_lw"]
+        + [f"maha_shrink_{l}" for l in fg_lams]
         + [f"rmd_bg_{l}" for l in bg_lams]
+    )
     acc = {a: {"d1": [], "wl": []} for a in arms}
 
     for seed in range(seeds):
         rng = np.random.default_rng(seed)
-        ben = np.where(y == 0)[0]; rng.shuffle(ben); inj = np.where(y == 1)[0]
-        fit = ben[: int(0.6 * len(ben))]; tb = ben[int(0.6 * len(ben)):]
-        ti = np.r_[tb, inj]; yt = np.r_[np.zeros(len(tb)), np.ones(len(inj))]
+        ben = np.where(y == 0)[0]
+        rng.shuffle(ben)
+        inj = np.where(y == 1)[0]
+        fit = ben[: int(0.6 * len(ben))]
+        tb = ben[int(0.6 * len(ben)) :]
+        ti = np.r_[tb, inj]
+        yt = np.r_[np.zeros(len(tb)), np.ones(len(inj))]
         tlt = np.r_[tl[tb], tl[inj]]
         X, _ = layer_features(act, fit, 8)
         mu = X[fit].mean(0)
         Xc = X - mu
 
         # baseline: PCA-whiten 32 + trimmed surprisal
-        Z = PCA(n_components=32, whiten=True, random_state=seed).fit(X[fit]).transform(X)
-        S2 = 0.5 * Z ** 2
+        Z = (
+            PCA(n_components=32, whiten=True, random_state=seed)
+            .fit(X[fit])
+            .transform(X)
+        )
+        S2 = 0.5 * Z**2
         trim = np.sort(S2, 1)[:, : S2.shape[1] - 2].sum(1)
         acc["trimmed_pca32"]["d1"].append(d1(yt, trim[ti]))
         acc["trimmed_pca32"]["wl"].append(within_len_auc(yt, trim[ti], tlt))
@@ -106,23 +117,39 @@ def run(rundir: Path, seeds=6) -> dict:
             acc[f"rmd_bg_{l}"]["d1"].append(d1(yt, rmd[ti]))
             acc[f"rmd_bg_{l}"]["wl"].append(within_len_auc(yt, rmd[ti], tlt))
 
-    return {"model": mid, "dataset": rundir.name,
-            "arms": {a: {"det@1%FP": round(float(np.mean(v["d1"])), 3),
-                         "wl_auroc": round(float(np.mean(v["wl"])), 3)}
-                     for a, v in acc.items()}}
+    return {
+        "model": mid,
+        "dataset": rundir.name,
+        "arms": {
+            a: {
+                "det@1%FP": round(float(np.mean(v["d1"])), 3),
+                "wl_auroc": round(float(np.mean(v["wl"])), 3),
+            }
+            for a, v in acc.items()
+        },
+    }
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", nargs="+",
-                    default=["runs/injection_qwen3b", "runs/sg_qwen3b_big", "runs/spml_qwen3b"])
+    ap.add_argument(
+        "--runs",
+        nargs="+",
+        default=["runs/injection_qwen3b", "runs/sg_qwen3b_big", "runs/spml_qwen3b"],
+    )
     a = ap.parse_args()
     allout = []
-    print("Regularized-background-covariance exploration (zero-shot, det@1%FP | wl-AUROC):\n")
+    print(
+        "Regularized-background-covariance exploration (zero-shot, det@1%FP | wl-AUROC):\n"
+    )
     for r in a.runs:
         res = run(Path(r))
         allout.append(res)
-        ds = "deepset" if ("sg_" not in r and "spml" not in r) else r.split("/")[-1].split("_")[0]
+        ds = (
+            "deepset"
+            if ("sg_" not in r and "spml" not in r)
+            else r.split("/")[-1].split("_")[0]
+        )
         print(f"== {res['model'].split('/')[-1]} · {ds} ==")
         for aa, v in res["arms"].items():
             print("  %-18s %.3f | %.3f" % (aa, v["det@1%FP"], v["wl_auroc"]))
