@@ -1,0 +1,47 @@
+Loading weights:   0%|          | 0/236 [00:00<?, ?it/s]Loading weights:  75%|███████▌  | 178/236 [00:00<00:00, 1758.79it/s]Loading weights: 100%|██████████| 236/236 [00:00<00:00, 1866.43it/s]
+[fmri] 32/546
+[fmri] 64/546
+[fmri] 96/546
+[fmri] 128/546
+[fmri] 160/546
+[fmri] 192/546
+[fmri] 224/546
+[fmri] 256/546
+[fmri] 288/546
+[fmri] 320/546
+[fmri] 352/546
+[fmri] 384/546
+[fmri] 416/546
+[fmri] 448/546
+[fmri] 480/546
+[fmri] 512/546
+[fmri] 544/546
+[fmri] 546/546
+{
+  "benign": 343,
+  "injection": 203
+}
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights:  90%|████████▉ | 180/201 [00:00<00:00, 1798.91it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 1844.25it/s]
+[fmri] 32/546
+[fmri] 64/546
+[fmri] 96/546
+[fmri] 128/546
+[fmri] 160/546
+[fmri] 192/546
+[fmri] 224/546
+[fmri] 256/546
+[fmri] 288/546
+[fmri] 320/546
+[fmri] 352/546
+[fmri] 384/546
+[fmri] 416/546
+[fmri] 448/546
+[fmri] 480/546
+[fmri] 512/546
+[fmri] 544/546
+[fmri] 546/546
+{
+  "benign": 343,
+  "injection": 203
+}
+CAPDONE

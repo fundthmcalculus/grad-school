@@ -1,0 +1,774 @@
+{
+  "per_seed": [
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "n_layers": 31,
+      "unsupervised": {
+        "gmm_k=1": {
+          "test_auroc": 0.783,
+          "test_within_len": 0.606,
+          "build_ms": 38.0
+        },
+        "gmm_k=2": {
+          "test_auroc": 0.829,
+          "test_within_len": 0.7,
+          "build_ms": 125.8
+        },
+        "gmm_k=3": {
+          "test_auroc": 0.864,
+          "test_within_len": 0.786,
+          "build_ms": 117.6
+        },
+        "gmm_k=5": {
+          "test_auroc": 0.902,
+          "test_within_len": 0.865,
+          "build_ms": 126.6
+        }
+      },
+      "few_shot": {
+        "n_val=10": {
+          "uniform": {
+            "test_auroc": 0.784,
+            "within_len": 0.598,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.818,
+            "within_len": 0.67,
+            "refine_ms": 1.9
+          },
+          "lda": {
+            "test_auroc": 0.793,
+            "within_len": 0.625,
+            "refine_ms": 0.2
+          },
+          "lbfgs": {
+            "test_auroc": 0.784,
+            "within_len": 0.598,
+            "refine_ms": 0.5
+          },
+          "neldermead": {
+            "test_auroc": 0.784,
+            "within_len": 0.598,
+            "refine_ms": 0.3
+          },
+          "powell": {
+            "test_auroc": 0.825,
+            "within_len": 0.698,
+            "refine_ms": 13.5
+          },
+          "diffevo": {
+            "test_auroc": 0.807,
+            "within_len": 0.639,
+            "refine_ms": 379.9
+          },
+          "coord": {
+            "test_auroc": 0.784,
+            "within_len": 0.598,
+            "refine_ms": 1.0
+          }
+        },
+        "n_val=25": {
+          "uniform": {
+            "test_auroc": 0.798,
+            "within_len": 0.602,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.839,
+            "within_len": 0.687,
+            "refine_ms": 0.9
+          },
+          "lda": {
+            "test_auroc": 0.789,
+            "within_len": 0.602,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.798,
+            "within_len": 0.602,
+            "refine_ms": 0.6
+          },
+          "neldermead": {
+            "test_auroc": 0.798,
+            "within_len": 0.602,
+            "refine_ms": 0.5
+          },
+          "powell": {
+            "test_auroc": 0.809,
+            "within_len": 0.668,
+            "refine_ms": 25.2
+          },
+          "diffevo": {
+            "test_auroc": 0.813,
+            "within_len": 0.627,
+            "refine_ms": 486.9
+          },
+          "coord": {
+            "test_auroc": 0.798,
+            "within_len": 0.602,
+            "refine_ms": 1.5
+          }
+        },
+        "n_val=50": {
+          "uniform": {
+            "test_auroc": 0.794,
+            "within_len": 0.607,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.839,
+            "within_len": 0.69,
+            "refine_ms": 1.1
+          },
+          "lda": {
+            "test_auroc": 0.789,
+            "within_len": 0.593,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.794,
+            "within_len": 0.607,
+            "refine_ms": 0.8
+          },
+          "neldermead": {
+            "test_auroc": 0.794,
+            "within_len": 0.607,
+            "refine_ms": 0.7
+          },
+          "powell": {
+            "test_auroc": 0.838,
+            "within_len": 0.708,
+            "refine_ms": 37.2
+          },
+          "diffevo": {
+            "test_auroc": 0.813,
+            "within_len": 0.634,
+            "refine_ms": 682.1
+          },
+          "coord": {
+            "test_auroc": 0.794,
+            "within_len": 0.607,
+            "refine_ms": 2.3
+          }
+        }
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "n_layers": 31,
+      "unsupervised": {
+        "gmm_k=1": {
+          "test_auroc": 0.788,
+          "test_within_len": 0.646,
+          "build_ms": 39.1
+        },
+        "gmm_k=2": {
+          "test_auroc": 0.829,
+          "test_within_len": 0.703,
+          "build_ms": 117.2
+        },
+        "gmm_k=3": {
+          "test_auroc": 0.858,
+          "test_within_len": 0.765,
+          "build_ms": 117.9
+        },
+        "gmm_k=5": {
+          "test_auroc": 0.883,
+          "test_within_len": 0.801,
+          "build_ms": 123.9
+        }
+      },
+      "few_shot": {
+        "n_val=10": {
+          "uniform": {
+            "test_auroc": 0.784,
+            "within_len": 0.639,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.818,
+            "within_len": 0.704,
+            "refine_ms": 1.7
+          },
+          "lda": {
+            "test_auroc": 0.8,
+            "within_len": 0.656,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.784,
+            "within_len": 0.639,
+            "refine_ms": 0.5
+          },
+          "neldermead": {
+            "test_auroc": 0.784,
+            "within_len": 0.639,
+            "refine_ms": 0.3
+          },
+          "powell": {
+            "test_auroc": 0.861,
+            "within_len": 0.793,
+            "refine_ms": 12.7
+          },
+          "diffevo": {
+            "test_auroc": 0.849,
+            "within_len": 0.769,
+            "refine_ms": 375.0
+          },
+          "coord": {
+            "test_auroc": 0.784,
+            "within_len": 0.639,
+            "refine_ms": 1.0
+          }
+        },
+        "n_val=25": {
+          "uniform": {
+            "test_auroc": 0.788,
+            "within_len": 0.644,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.838,
+            "within_len": 0.731,
+            "refine_ms": 0.9
+          },
+          "lda": {
+            "test_auroc": 0.801,
+            "within_len": 0.66,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.788,
+            "within_len": 0.644,
+            "refine_ms": 0.6
+          },
+          "neldermead": {
+            "test_auroc": 0.788,
+            "within_len": 0.644,
+            "refine_ms": 0.5
+          },
+          "powell": {
+            "test_auroc": 0.861,
+            "within_len": 0.813,
+            "refine_ms": 16.3
+          },
+          "diffevo": {
+            "test_auroc": 0.851,
+            "within_len": 0.769,
+            "refine_ms": 490.3
+          },
+          "coord": {
+            "test_auroc": 0.788,
+            "within_len": 0.644,
+            "refine_ms": 1.5
+          }
+        },
+        "n_val=50": {
+          "uniform": {
+            "test_auroc": 0.782,
+            "within_len": 0.615,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.833,
+            "within_len": 0.723,
+            "refine_ms": 1.1
+          },
+          "lda": {
+            "test_auroc": 0.792,
+            "within_len": 0.628,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.782,
+            "within_len": 0.615,
+            "refine_ms": 0.8
+          },
+          "neldermead": {
+            "test_auroc": 0.782,
+            "within_len": 0.615,
+            "refine_ms": 0.7
+          },
+          "powell": {
+            "test_auroc": 0.85,
+            "within_len": 0.802,
+            "refine_ms": 25.6
+          },
+          "diffevo": {
+            "test_auroc": 0.845,
+            "within_len": 0.765,
+            "refine_ms": 684.1
+          },
+          "coord": {
+            "test_auroc": 0.782,
+            "within_len": 0.615,
+            "refine_ms": 2.4
+          }
+        }
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "n_layers": 31,
+      "unsupervised": {
+        "gmm_k=1": {
+          "test_auroc": 0.79,
+          "test_within_len": 0.631,
+          "build_ms": 40.3
+        },
+        "gmm_k=2": {
+          "test_auroc": 0.835,
+          "test_within_len": 0.698,
+          "build_ms": 114.9
+        },
+        "gmm_k=3": {
+          "test_auroc": 0.886,
+          "test_within_len": 0.787,
+          "build_ms": 126.2
+        },
+        "gmm_k=5": {
+          "test_auroc": 0.907,
+          "test_within_len": 0.836,
+          "build_ms": 126.2
+        }
+      },
+      "few_shot": {
+        "n_val=10": {
+          "uniform": {
+            "test_auroc": 0.786,
+            "within_len": 0.649,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.812,
+            "within_len": 0.691,
+            "refine_ms": 1.5
+          },
+          "lda": {
+            "test_auroc": 0.783,
+            "within_len": 0.643,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.786,
+            "within_len": 0.649,
+            "refine_ms": 0.5
+          },
+          "neldermead": {
+            "test_auroc": 0.786,
+            "within_len": 0.649,
+            "refine_ms": 0.3
+          },
+          "powell": {
+            "test_auroc": 0.844,
+            "within_len": 0.772,
+            "refine_ms": 11.7
+          },
+          "diffevo": {
+            "test_auroc": 0.786,
+            "within_len": 0.641,
+            "refine_ms": 377.3
+          },
+          "coord": {
+            "test_auroc": 0.786,
+            "within_len": 0.649,
+            "refine_ms": 1.0
+          }
+        },
+        "n_val=25": {
+          "uniform": {
+            "test_auroc": 0.785,
+            "within_len": 0.644,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.814,
+            "within_len": 0.694,
+            "refine_ms": 0.9
+          },
+          "lda": {
+            "test_auroc": 0.777,
+            "within_len": 0.629,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.785,
+            "within_len": 0.644,
+            "refine_ms": 0.6
+          },
+          "neldermead": {
+            "test_auroc": 0.785,
+            "within_len": 0.644,
+            "refine_ms": 0.5
+          },
+          "powell": {
+            "test_auroc": 0.818,
+            "within_len": 0.721,
+            "refine_ms": 19.6
+          },
+          "diffevo": {
+            "test_auroc": 0.816,
+            "within_len": 0.707,
+            "refine_ms": 490.3
+          },
+          "coord": {
+            "test_auroc": 0.785,
+            "within_len": 0.644,
+            "refine_ms": 1.5
+          }
+        },
+        "n_val=50": {
+          "uniform": {
+            "test_auroc": 0.787,
+            "within_len": 0.638,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.822,
+            "within_len": 0.696,
+            "refine_ms": 1.2
+          },
+          "lda": {
+            "test_auroc": 0.775,
+            "within_len": 0.608,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.787,
+            "within_len": 0.638,
+            "refine_ms": 0.8
+          },
+          "neldermead": {
+            "test_auroc": 0.787,
+            "within_len": 0.638,
+            "refine_ms": 0.7
+          },
+          "powell": {
+            "test_auroc": 0.867,
+            "within_len": 0.823,
+            "refine_ms": 16.4
+          },
+          "diffevo": {
+            "test_auroc": 0.817,
+            "within_len": 0.696,
+            "refine_ms": 682.5
+          },
+          "coord": {
+            "test_auroc": 0.787,
+            "within_len": 0.638,
+            "refine_ms": 2.3
+          }
+        }
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "n_layers": 31,
+      "unsupervised": {
+        "gmm_k=1": {
+          "test_auroc": 0.749,
+          "test_within_len": 0.614,
+          "build_ms": 39.7
+        },
+        "gmm_k=2": {
+          "test_auroc": 0.795,
+          "test_within_len": 0.684,
+          "build_ms": 114.1
+        },
+        "gmm_k=3": {
+          "test_auroc": 0.838,
+          "test_within_len": 0.741,
+          "build_ms": 127.5
+        },
+        "gmm_k=5": {
+          "test_auroc": 0.885,
+          "test_within_len": 0.83,
+          "build_ms": 120.9
+        }
+      },
+      "few_shot": {
+        "n_val=10": {
+          "uniform": {
+            "test_auroc": 0.748,
+            "within_len": 0.612,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.787,
+            "within_len": 0.679,
+            "refine_ms": 1.5
+          },
+          "lda": {
+            "test_auroc": 0.742,
+            "within_len": 0.602,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.748,
+            "within_len": 0.612,
+            "refine_ms": 0.5
+          },
+          "neldermead": {
+            "test_auroc": 0.748,
+            "within_len": 0.612,
+            "refine_ms": 0.3
+          },
+          "powell": {
+            "test_auroc": 0.803,
+            "within_len": 0.699,
+            "refine_ms": 11.7
+          },
+          "diffevo": {
+            "test_auroc": 0.765,
+            "within_len": 0.638,
+            "refine_ms": 370.5
+          },
+          "coord": {
+            "test_auroc": 0.748,
+            "within_len": 0.612,
+            "refine_ms": 1.0
+          }
+        },
+        "n_val=25": {
+          "uniform": {
+            "test_auroc": 0.752,
+            "within_len": 0.611,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.801,
+            "within_len": 0.698,
+            "refine_ms": 1.1
+          },
+          "lda": {
+            "test_auroc": 0.761,
+            "within_len": 0.634,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.752,
+            "within_len": 0.611,
+            "refine_ms": 0.6
+          },
+          "neldermead": {
+            "test_auroc": 0.752,
+            "within_len": 0.611,
+            "refine_ms": 0.5
+          },
+          "powell": {
+            "test_auroc": 0.85,
+            "within_len": 0.793,
+            "refine_ms": 14.5
+          },
+          "diffevo": {
+            "test_auroc": 0.804,
+            "within_len": 0.714,
+            "refine_ms": 491.1
+          },
+          "coord": {
+            "test_auroc": 0.752,
+            "within_len": 0.611,
+            "refine_ms": 1.5
+          }
+        },
+        "n_val=50": {
+          "uniform": {
+            "test_auroc": 0.753,
+            "within_len": 0.599,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.807,
+            "within_len": 0.703,
+            "refine_ms": 1.2
+          },
+          "lda": {
+            "test_auroc": 0.75,
+            "within_len": 0.603,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.753,
+            "within_len": 0.599,
+            "refine_ms": 0.8
+          },
+          "neldermead": {
+            "test_auroc": 0.753,
+            "within_len": 0.599,
+            "refine_ms": 0.7
+          },
+          "powell": {
+            "test_auroc": 0.827,
+            "within_len": 0.757,
+            "refine_ms": 21.6
+          },
+          "diffevo": {
+            "test_auroc": 0.811,
+            "within_len": 0.713,
+            "refine_ms": 689.1
+          },
+          "coord": {
+            "test_auroc": 0.753,
+            "within_len": 0.599,
+            "refine_ms": 2.4
+          }
+        }
+      }
+    },
+    {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "n_layers": 31,
+      "unsupervised": {
+        "gmm_k=1": {
+          "test_auroc": 0.788,
+          "test_within_len": 0.664,
+          "build_ms": 39.6
+        },
+        "gmm_k=2": {
+          "test_auroc": 0.835,
+          "test_within_len": 0.745,
+          "build_ms": 110.2
+        },
+        "gmm_k=3": {
+          "test_auroc": 0.869,
+          "test_within_len": 0.806,
+          "build_ms": 112.2
+        },
+        "gmm_k=5": {
+          "test_auroc": 0.915,
+          "test_within_len": 0.882,
+          "build_ms": 129.5
+        }
+      },
+      "few_shot": {
+        "n_val=10": {
+          "uniform": {
+            "test_auroc": 0.786,
+            "within_len": 0.651,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.833,
+            "within_len": 0.742,
+            "refine_ms": 4.1
+          },
+          "lda": {
+            "test_auroc": 0.798,
+            "within_len": 0.675,
+            "refine_ms": 0.2
+          },
+          "lbfgs": {
+            "test_auroc": 0.786,
+            "within_len": 0.651,
+            "refine_ms": 1.2
+          },
+          "neldermead": {
+            "test_auroc": 0.786,
+            "within_len": 0.651,
+            "refine_ms": 0.8
+          },
+          "powell": {
+            "test_auroc": 0.826,
+            "within_len": 0.733,
+            "refine_ms": 18.9
+          },
+          "diffevo": {
+            "test_auroc": 0.837,
+            "within_len": 0.758,
+            "refine_ms": 370.5
+          },
+          "coord": {
+            "test_auroc": 0.786,
+            "within_len": 0.651,
+            "refine_ms": 1.0
+          }
+        },
+        "n_val=25": {
+          "uniform": {
+            "test_auroc": 0.778,
+            "within_len": 0.626,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.833,
+            "within_len": 0.74,
+            "refine_ms": 1.0
+          },
+          "lda": {
+            "test_auroc": 0.794,
+            "within_len": 0.663,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.778,
+            "within_len": 0.626,
+            "refine_ms": 0.6
+          },
+          "neldermead": {
+            "test_auroc": 0.778,
+            "within_len": 0.626,
+            "refine_ms": 0.5
+          },
+          "powell": {
+            "test_auroc": 0.844,
+            "within_len": 0.763,
+            "refine_ms": 18.2
+          },
+          "diffevo": {
+            "test_auroc": 0.826,
+            "within_len": 0.723,
+            "refine_ms": 496.6
+          },
+          "coord": {
+            "test_auroc": 0.778,
+            "within_len": 0.626,
+            "refine_ms": 1.5
+          }
+        },
+        "n_val=50": {
+          "uniform": {
+            "test_auroc": 0.778,
+            "within_len": 0.613,
+            "refine_ms": 0.0
+          },
+          "logistic": {
+            "test_auroc": 0.839,
+            "within_len": 0.742,
+            "refine_ms": 1.2
+          },
+          "lda": {
+            "test_auroc": 0.796,
+            "within_len": 0.659,
+            "refine_ms": 0.1
+          },
+          "lbfgs": {
+            "test_auroc": 0.778,
+            "within_len": 0.613,
+            "refine_ms": 0.8
+          },
+          "neldermead": {
+            "test_auroc": 0.778,
+            "within_len": 0.613,
+            "refine_ms": 0.7
+          },
+          "powell": {
+            "test_auroc": 0.846,
+            "within_len": 0.767,
+            "refine_ms": 26.5
+          },
+          "diffevo": {
+            "test_auroc": 0.824,
+            "within_len": 0.706,
+            "refine_ms": 685.8
+          },
+          "coord": {
+            "test_auroc": 0.778,
+            "within_len": 0.613,
+            "refine_ms": 2.4
+          }
+        }
+      }
+    }
+  ]
+}

@@ -422,3 +422,128 @@ whose FIS form adds faithful per-layer attribution for free. Its limits are
 stated: it needs an instruction-tuned target, and its operating points make it a
 strong triage signal rather than a standalone gate. That is a defensible thesis
 chapter.
+
+---
+
+# Part 5 — Refinement, optimizers, and the metric that actually matters
+
+Restricting to instruction-tuned targets (justified in Part 4). Question: can an
+optimizer refinement stage, applied after the FIS is constructed, beat the
+Part 3/4 detector? Answer: **no on AUROC by refinement, yes on AUROC by
+representation — but that "yes" makes deployment worse**, which is the finding.
+
+## Construction is free, so refinement is affordable
+
+FIS anomaly construction on 200 benign prompts, 279 features: fit (moment
+match) **0.04 ms**, score **0.3 us/prompt**. The per-layer PCA feature build
+(48 ms) dominates and is shared by every detector. Refinement can cost thousands
+of times more than construction and still be negligible against a forward pass —
+the constraint is whether it helps, not whether it fits.
+
+## Optimizer refinement does not beat the unrefined detector
+
+Baseline to beat: the Part 3 detector — single-Gaussian Mahalanobis in the
+joint whitened activation space, equivalently the whitened FIS "none of the
+above" rule — at **0.871 ± 0.015** within-length AUROC (6 seeds), no attacks.
+
+Everything tried lands at or below it:
+
+| refinement | within-len AUROC | note |
+|---|---|---|
+| **single Gaussian (current)** | **0.871 ± 0.015** | the baseline |
+| joint 2-comp GMM | 0.866 ± 0.035 | no gain |
+| joint 3-comp GMM | 0.859 | overfitting begins |
+| joint 5-comp GMM | 0.780 | overfits |
+| robust covariance (MCD) | 0.815 | worse |
+| per-layer 5-GMM + Powell layer weights (25 attacks) | 0.851 | below baseline |
+| stacked few-shot [joint + per-layer], Powell (10 attacks) | 0.819 | below baseline |
+
+The mechanism: in the joint whitened space the benign activation distribution is
+effectively **unimodal Gaussian**, so a single Gaussian is the maximum-likelihood
+one-class model. Mixtures add parameters that fit the benign sample's noise;
+few-shot weighting fits a small attack set that does not generalise — and adding
+*more* attack examples made it worse, not better (n_val 10 → 50: Powell stacked
+0.819 → 0.792). This is the same lesson as the acceleration study's guard
+experiment: a construction that looks improvable often is not.
+
+**One place refinement does pay:** the *per-layer* (interpretable) FIS, whose
+single-Gaussian uniform-weight form is only 0.62, is lifted to **0.85** by an
+unsupervised per-layer 5-component GMM (no attacks). That does not beat the joint
+detector, but it nearly closes the gap while keeping the per-layer attribution
+of Part 4 — so if you want the interpretability *and* competitive accuracy, GMM
+refinement of the per-layer detector is worth its ~130 ms.
+
+## The optimizer comparison itself (when refinement is applied)
+
+Learning per-layer weights on a small attack set, same objective (soft-AUROC),
+same data:
+
+| optimizer | within-len AUROC (n_val=50) | time | verdict |
+|---|---|---|---|
+| Powell | **0.771** | 26 ms | best derivative-free |
+| logistic (convex proxy) | 0.711 | 1 ms | fast, close |
+| differential evolution | 0.703 | 685 ms | global, no better, 25× slower |
+| LDA (closed form) | 0.618 | 0.1 ms | barely moves |
+| **L-BFGS-B** | 0.614 | 1 ms | **fails — stuck at init** |
+| **Nelder-Mead** | 0.614 | 1 ms | **fails — stuck at init** |
+| coordinate descent | 0.614 | 2 ms | fails |
+
+The gradient methods (L-BFGS-B) and Nelder-Mead **fail outright**, stuck at the
+flat uniform initialisation because the soft-AUROC gradient there is near-zero;
+Powell's coordinate line-searches escape it and win. This mirrors the
+acceleration study's "an analytic gradient will just be faster" — false under a
+badly-conditioned objective. If a refinement stage is used, use Powell or a
+convex logistic proxy, not off-the-shelf gradient descent.
+
+## The real finding: AUROC is the wrong objective
+
+Chasing AUROC through the *representation* (last-token readout instead of
+mean-pool, more joint-PCA components) does raise it substantially — and makes
+the deployable operating point worse:
+
+| model | representation | within-AUROC | det@1%FP | det@5%FP |
+|---|---|---|---|---|
+| 135M | **mean-pool, jpca=32 (current)** | 0.871 | **0.53** | **0.71** |
+| 135M | last-token, jpca=128 | **0.934** | 0.25 | 0.47 |
+| 360M | **mean-pool, jpca=32 (current)** | 0.872 | **0.55** | 0.70 |
+| 360M | last-token, jpca=128 | **0.965** | 0.36 | 0.68 |
+
+The high-dimensional last-token Mahalanobis ranks better on average (higher
+AUROC) but its benign scores are heavy-tailed (chi-squared with many dof), so
+the strict 1%-FPR threshold sits high and catches *fewer* injections. Sweeping
+the dimension budget confirms no last-token setting reaches the mean-pool
+det@1%FP of 0.53 (last-token peaks at 0.28 around jpca=48).
+
+**So the +0.06 AUROC "improvement" is a regression on the metric that matters.**
+The unrefined mean-pool detector is already at its best deployment operating
+point. For an injection monitor the objective is detection at a fixed low
+false-positive rate, not AUROC, and optimising AUROC actively hurt it.
+
+## Multi-model confirmation (four instruct architectures)
+
+Activation vs length, within-length AUROC:
+
+| model | activation | length alone |
+|---|---|---|
+| SmolLM2-135M-Instruct | 0.874 | 0.560 |
+| SmolLM2-360M-Instruct | 0.863 | 0.562 |
+| gemma-3-270m-it | 0.741 | 0.582 |
+| TinyLlama-1.1B-Chat | **0.935** | 0.630 |
+
+The activation-over-length signal holds across four instruct architectures, and
+is strongest on the largest (TinyLlama-1.1B) — consistent with the Part 4
+instruct-vs-base result that the signal tracks instruction-following capability.
+
+## Bottom line for the user's question
+
+* FIS construction: **~0.04 ms**, negligible.
+* Optimizer refinement (GMM, robust cov, few-shot layer weights across Powell /
+  logistic / L-BFGS / Nelder-Mead / diff-evo / coordinate): **does not beat the
+  unrefined single-Gaussian detector** — the benign density is unimodal.
+* Optimizer choice, when refining, matters: Powell/logistic work, gradient and
+  simplex methods fail from the flat init, global search is slow for no gain.
+* The one useful refinement is unsupervised per-layer GMM to make the
+  *interpretable* per-layer FIS competitive (0.62 → 0.85).
+* And the load-bearing finding: **AUROC is the wrong target**; the current
+  detector is already at the best deployment operating point, and the metric to
+  refine against is det@low-FPR, not AUROC.

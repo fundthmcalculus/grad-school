@@ -1,0 +1,126 @@
+{
+  "variant": "mean",
+  "n_benign_train": 205,
+  "n_benign_test": 138,
+  "n_injection": 203,
+  "median_len_benign": 18,
+  "median_len_injection": 37,
+  "one_class": {
+    "activation:mahalanobis": {
+      "auroc": 0.85,
+      "auroc_within_len": 0.741
+    },
+    "activation:iforest": {
+      "auroc": 0.885,
+      "auroc_within_len": 0.778
+    },
+    "activation:fis_whitened": {
+      "auroc": 0.85,
+      "auroc_within_len": 0.741
+    },
+    "surface:mahalanobis": {
+      "auroc": 0.86,
+      "auroc_within_len": 0.872
+    },
+    "surface:iforest": {
+      "auroc": 0.857,
+      "auroc_within_len": 0.743
+    },
+    "surface:fis_whitened": {
+      "auroc": 0.86,
+      "auroc_within_len": 0.872
+    },
+    "length_only": {
+      "auroc": 0.859,
+      "auroc_within_len": 0.582
+    }
+  },
+  "supervised_reference": {
+    "activation": {
+      "auroc": 0.986,
+      "auroc_within_len": 0.973
+    },
+    "surface": {
+      "auroc": 0.944,
+      "auroc_within_len": 0.922
+    }
+  },
+  "per_layer": {
+    "0": {
+      "auroc": 0.629,
+      "within_len": 0.481
+    },
+    "1": {
+      "auroc": 0.797,
+      "within_len": 0.634
+    },
+    "2": {
+      "auroc": 0.726,
+      "within_len": 0.598
+    },
+    "3": {
+      "auroc": 0.703,
+      "within_len": 0.581
+    },
+    "4": {
+      "auroc": 0.732,
+      "within_len": 0.663
+    },
+    "5": {
+      "auroc": 0.778,
+      "within_len": 0.712
+    },
+    "6": {
+      "auroc": 0.811,
+      "within_len": 0.75
+    },
+    "7": {
+      "auroc": 0.82,
+      "within_len": 0.734
+    },
+    "8": {
+      "auroc": 0.877,
+      "within_len": 0.827
+    },
+    "9": {
+      "auroc": 0.886,
+      "within_len": 0.832
+    },
+    "10": {
+      "auroc": 0.864,
+      "within_len": 0.78
+    },
+    "11": {
+      "auroc": 0.886,
+      "within_len": 0.792
+    },
+    "12": {
+      "auroc": 0.811,
+      "within_len": 0.713
+    },
+    "13": {
+      "auroc": 0.746,
+      "within_len": 0.524
+    },
+    "14": {
+      "auroc": 0.744,
+      "within_len": 0.543
+    },
+    "15": {
+      "auroc": 0.728,
+      "within_len": 0.531
+    },
+    "16": {
+      "auroc": 0.69,
+      "within_len": 0.533
+    },
+    "17": {
+      "auroc": 0.687,
+      "within_len": 0.499
+    },
+    "18": {
+      "auroc": 0.801,
+      "within_len": 0.728
+    }
+  }
+}
