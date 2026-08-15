@@ -1,0 +1,17 @@
+{
+  "config": {
+    "model_id": "EleutherAI/pythia-410m",
+    "batch_size": 32,
+    "seed": 0,
+    "chat_template": false,
+    "mode": "injection",
+    "out": "runs/injection_pythia"
+  },
+  "n_probes": 546,
+  "n_layers": 24,
+  "hidden": 1024,
+  "labels": {
+    "benign": 343,
+    "injection": 203
+  }
+}

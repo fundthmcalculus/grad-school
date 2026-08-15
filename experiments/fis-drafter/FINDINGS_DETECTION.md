@@ -344,3 +344,81 @@ unsupervised baseline, and the no-attack-examples claim delivered. Remaining
 Phase 1 items: multi-model replication, and per-attack-family breakdown once a
 family-labelled corpus is in. Phase 2 (per-layer FIS *attribution* as the
 distinctive contribution, since AUROC ties Mahalanobis) is the next build.
+
+---
+
+# Part 4 — Phase 2: multi-model, operating points, and the FIS's distinctive contribution
+
+## Replication across models and a second attack corpus
+
+Within-length AUROC, one-class (benign only), activation vs surface vs length:
+
+| model / corpus | activation | surface | length alone |
+|---|---|---|---|
+| SmolLM2-135M · deepset | 0.874 ± 0.014 | 0.799 | 0.560 |
+| SmolLM2-360M · deepset | 0.863 | 0.805 | 0.562 |
+| SmolLM2-135M · jailbreak | 0.708 | 0.573 | 0.541 |
+| pythia-410m · deepset | see below | 0.62 | 0.56 |
+
+The activation-over-surface gap holds on both instruct models and both attack
+corpora (deepset's terse overrides, jailbreak's long role-play), after
+controlling length. Length alone collapses to ~0.55 within-length everywhere,
+confirming the confound was real and is removed.
+
+## The instruct-vs-base result (a finding and a limit)
+
+Operating points — detection rate at a fixed benign false-positive rate:
+
+| model | det @ 1% FPR | det @ 5% FPR | FPR @ 95% TPR |
+|---|---|---|---|
+| SmolLM2-135M (instruct) | **0.71** | 0.80 | 0.43 |
+| SmolLM2-360M (instruct) | **0.61** | 0.73 | 0.37 |
+| pythia-410m (base) | 0.16 | 0.33 | 0.71 |
+| surface baseline (any) | ~0.13 | ~0.36 | ~0.63 |
+
+On instruction-tuned models the monitor catches **71% of injections while
+flagging only 1% of benign traffic**. On the **base** model it collapses to the
+surface baseline. This is mechanistically sensible: an instruction-tuned model
+has learned to treat instructions as special, so "ignore previous instructions"
+disturbs its representation; a base model just continues text. **The method
+needs an instruction-following target** — which is also the only kind you would
+deploy an injection monitor in front of, so the limit is tolerable, but it must
+be stated.
+
+It also sets the honest ceiling: within-length AUROC 0.87 is a *useful* signal,
+not a solved problem. FPR@95%TPR of 0.43 is too high for "catch everything"; the
+usable operating point is det@5%FP = 0.80 — flag 5% of benign to catch 80% of
+injections, on an instruct model, with no attack examples.
+
+## The FIS's distinctive contribution: faithful per-layer attribution
+
+AUROC ties Mahalanobis, so the FIS must justify itself another way, and its
+mechanism does: the "none of the above" score is a **sum of per-feature
+contributions**, so it decomposes by layer into a per-prompt anomaly signature
+that a single Mahalanobis quadratic does not provide.
+
+1. **The attribution is faithful.** Correlation between a layer's attribution
+   gap (injection minus benign) and that layer's own one-class AUROC is **0.90**
+   (deepset) and **0.96** (jailbreak). The rule weights the layers that actually
+   discriminate, not arbitrary ones.
+2. **Injections peak deep.** The most-anomalous layer is in the deep half of the
+   network for **83%** of deepset injections and **94%** of jailbreaks, against
+   ~53% of benign prompts. Layer 0 sits below chance — no surface/BPE artifact,
+   unlike the word-order probe in Part 2.
+3. **Attack styles have distinct signatures.** deepset's terse
+   instruction-overrides light up a broad mid-to-deep band; jailbreak's long
+   role-play prompts are near-silent early and concentrated in the last few
+   layers. Two attack families, two visibly different layer profiles — an
+   interpretability output Mahalanobis' scalar cannot produce, and the kind of
+   readable result the thesis argues for elsewhere.
+
+## Status
+
+Phase 1 and most of Phase 2 are done and hold up under the project's confound
+discipline. The result is real and honest: a cheap, unsupervised,
+self-explaining injection monitor that works on instruction-tuned models, needs
+no attack examples, lands within ~0.03 AUROC of a supervised detector, and
+whose FIS form adds faithful per-layer attribution for free. Its limits are
+stated: it needs an instruction-tuned target, and its operating points make it a
+strong triage signal rather than a standalone gate. That is a defensible thesis
+chapter.
