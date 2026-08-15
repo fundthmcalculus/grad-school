@@ -1004,3 +1004,48 @@ So "removing PCA" is not advisable: the decorrelation is essential and the rank
 truncation specifically buys the low-FPR operating point. If PCA must be avoided
 (e.g. to stay in the original feature basis for interpretability), ZCA recovers
 the ranking but not the strict gate.
+
+---
+
+# Part 13 — Tail calibration: not the bottleneck (the score is)
+
+The strict-FPR gate was the one thing scale, data, and whitening did not fix, so
+the natural next lever is *tail calibration*: set the 1%-FPR threshold from a
+benign calibration set with an extreme-value model rather than a noisy empirical
+quantile. Threshold from calibration benign only (never test benign, never
+injections); measure realized FPR and detection on held-out.
+
+| corpus (Qwen-3B) | oracle det@1%FP | empirical: realized FPR / TPR | EVT: realized FPR / TPR |
+|---|---|---|---|
+| deepset | 0.599 | 0.0175 ± 0.015 / **0.617** | 0.0165 ± 0.014 / 0.620 |
+| safeguard | 0.077 | 0.0102 ± 0.006 / 0.059 | 0.0100 ± 0.005 / 0.058 |
+| SPML | 0.913 | 0.0150 ± 0.016 / **0.916** | 0.0150 / 0.916 |
+
+**Tail calibration does not help, and the experiment says exactly why.**
+
+1. **Calibration is already near-oracle.** The empirical-quantile threshold
+   realizes a detection TPR essentially equal to the oracle det@1%FP on every
+   corpus (deepset 0.617 vs 0.599, safeguard 0.059 vs 0.077, SPML 0.916 vs
+   0.913). There is almost no oracle-vs-deployable gap to close.
+2. **EVT (Peaks-Over-Threshold / Generalized Pareto) matches the empirical
+   quantile** even with the anchor lowered so it genuinely engages — because the
+   bottleneck is not extreme-quantile *variance*, which is what EVT reduces.
+3. **The strict-FPR limit is tail *separation*, a score/ranking problem.** On
+   safeguard, a perfectly calibrated 1%-FPR threshold still catches only ~6% of
+   injections, because benign and injection scores overlap in the upper tail —
+   no thresholding method can separate what the score does not.
+
+The one residual deployment concern tail calibration *could* address is the
+**variance of the realized FPR** (deepset ±0.015 — a target of 1% can land
+anywhere 0–3%), driven by tiny calibration sets. EVT reduces it only marginally;
+more calibration benign (cheap) is the better fix, and it changes reliability,
+not detection.
+
+**Redirect.** Improving the strict gate needs a better tail-*separating score*,
+not better threshold calibration. The demonstrated lever is a discriminative
+signal: the supervised `TribbleClassifier` with `refine=True` reaches det@1%FP
+0.77 on deepset (Part 11) versus the one-class 0.66 — the refinement's
+cross-entropy objective sharpens exactly the tail separation calibration cannot
+manufacture. Few-shot attack examples, or an interval-consequent (IT2-TSK) score
+that models score uncertainty directly, are the score-level directions worth
+trying next; EVT/conditional thresholding is closed.
