@@ -1,0 +1,137 @@
+[
+  {
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "arms": {
+      "1:baseline_1-maxfiring": {
+        "det@1%FP": 0.119,
+        "det@5%FP": 0.714,
+        "auroc": 0.916
+      },
+      "1:surprisal_sum(=Mahal)": {
+        "det@1%FP": 0.525,
+        "det@5%FP": 0.714,
+        "auroc": 0.922
+      },
+      "1:trimmed_sum_top2": {
+        "det@1%FP": 0.508,
+        "det@5%FP": 0.679,
+        "auroc": 0.918
+      },
+      "1:trimmed_sum_top4": {
+        "det@1%FP": 0.517,
+        "det@5%FP": 0.67,
+        "auroc": 0.916
+      },
+      "1:topk_mean_16": {
+        "det@1%FP": 0.523,
+        "det@5%FP": 0.702,
+        "auroc": 0.922
+      },
+      "2:bagged_15": {
+        "det@1%FP": 0.505,
+        "det@5%FP": 0.681,
+        "auroc": 0.92
+      },
+      "3:local_calib(Mahal)": {
+        "det@1%FP": 0.498,
+        "det@5%FP": 0.675,
+        "auroc": 0.921
+      },
+      "1+3:local_trimmed": {
+        "det@1%FP": 0.515,
+        "det@5%FP": 0.65,
+        "auroc": 0.916
+      }
+    }
+  },
+  {
+    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "arms": {
+      "1:baseline_1-maxfiring": {
+        "det@1%FP": 0.0,
+        "det@5%FP": 0.594,
+        "auroc": 0.915
+      },
+      "1:surprisal_sum(=Mahal)": {
+        "det@1%FP": 0.553,
+        "det@5%FP": 0.7,
+        "auroc": 0.921
+      },
+      "1:trimmed_sum_top2": {
+        "det@1%FP": 0.572,
+        "det@5%FP": 0.697,
+        "auroc": 0.92
+      },
+      "1:trimmed_sum_top4": {
+        "det@1%FP": 0.548,
+        "det@5%FP": 0.695,
+        "auroc": 0.919
+      },
+      "1:topk_mean_16": {
+        "det@1%FP": 0.548,
+        "det@5%FP": 0.704,
+        "auroc": 0.921
+      },
+      "2:bagged_15": {
+        "det@1%FP": 0.559,
+        "det@5%FP": 0.695,
+        "auroc": 0.923
+      },
+      "3:local_calib(Mahal)": {
+        "det@1%FP": 0.513,
+        "det@5%FP": 0.656,
+        "auroc": 0.92
+      },
+      "1+3:local_trimmed": {
+        "det@1%FP": 0.475,
+        "det@5%FP": 0.669,
+        "auroc": 0.913
+      }
+    }
+  },
+  {
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "arms": {
+      "1:baseline_1-maxfiring": {
+        "det@1%FP": 0.103,
+        "det@5%FP": 0.749,
+        "auroc": 0.942
+      },
+      "1:surprisal_sum(=Mahal)": {
+        "det@1%FP": 0.584,
+        "det@5%FP": 0.75,
+        "auroc": 0.948
+      },
+      "1:trimmed_sum_top2": {
+        "det@1%FP": 0.601,
+        "det@5%FP": 0.781,
+        "auroc": 0.947
+      },
+      "1:trimmed_sum_top4": {
+        "det@1%FP": 0.575,
+        "det@5%FP": 0.759,
+        "auroc": 0.944
+      },
+      "1:topk_mean_16": {
+        "det@1%FP": 0.584,
+        "det@5%FP": 0.753,
+        "auroc": 0.947
+      },
+      "2:bagged_15": {
+        "det@1%FP": 0.557,
+        "det@5%FP": 0.739,
+        "auroc": 0.943
+      },
+      "3:local_calib(Mahal)": {
+        "det@1%FP": 0.554,
+        "det@5%FP": 0.774,
+        "auroc": 0.945
+      },
+      "1+3:local_trimmed": {
+        "det@1%FP": 0.604,
+        "det@5%FP": 0.78,
+        "auroc": 0.937
+      }
+    }
+  }
+]

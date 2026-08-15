@@ -41,6 +41,7 @@ class Cfg:
     batch_size: int = 32
     seed: int = 0
     chat_template: bool = True
+    dtype: str = "float32"
     mode: str = "battery"  # or "dose"
     out: str = "runs/fmri"
 
@@ -54,7 +55,7 @@ def run(cfg: Cfg) -> Path:
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
     tok.padding_side = "left"
-    model = AutoModelForCausalLM.from_pretrained(cfg.model_id, dtype=torch.float32)
+    model = AutoModelForCausalLM.from_pretrained(cfg.model_id, dtype=getattr(torch, cfg.dtype))
     model.to("cuda").eval()
 
     if cfg.mode == "dose":

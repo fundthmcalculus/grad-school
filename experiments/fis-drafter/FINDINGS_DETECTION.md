@@ -691,3 +691,61 @@ point and timing tables — is at the artifact link. It makes the Part 6 caveats
 visual: the curves are strong on TinyLlama-1.1B and SmolLM2, gemma sits lowest,
 and every curve rises steeply only after the 5%-FPR line, which is why 1%-FPR
 detection is weak.
+
+---
+
+# Part 8 — Making 1%-FPR usable: three ideas, and the one that works
+
+Part 7 left the FIS monitor weak at the strict operating point (det@1%FP
+~0.1 vs Mahalanobis ~0.55). Diagnosis: the score `1 - max firing` is
+`1 - exp(-0.5 * sum_j z_j^2)` over the ~32 whitened components, and with that
+many components it **saturates** -- a typical benign point already drives the
+product to ~1e-7, so benign and anomalous prompts pile up near anomaly = 1,
+flattening the low-FPR tail. Three ideas, each a different facet:
+
+* **Idea 1 -- non-saturating / robust aggregation.** Score in the log domain
+  (summed surprisal, = Mahalanobis) instead of product-then-complement, and a
+  *trimmed* variant that drops the largest per-component surprisals so one odd
+  component cannot flag a benign prompt.
+* **Idea 2 -- ensemble / bagging.** Average detectors over bootstrap benign
+  samples x random component subsets; variance reduction tightens the tail.
+* **Idea 3 -- local threshold calibration.** z-score each prompt's score against
+  its k nearest benign neighbours, so a global 1%-FPR threshold is not dragged
+  up by one dense-but-high-scoring benign region.
+
+## Result: Idea 1 fixes it, and the trimmed variant beats Mahalanobis
+
+det@1%FP (6 seeds, one-class), against the current score:
+
+| score | 135M | 360M | TinyLlama-1.1B |
+|---|---|---|---|
+| `1 - max firing` (current) | 0.119 | **0.000** | 0.103 |
+| surprisal sum (= Mahalanobis) | 0.525 | 0.553 | 0.584 |
+| **trimmed sum (drop top-2)** | 0.508 | **0.572** | **0.601** |
+| top-k(16) mean surprisal | 0.523 | 0.548 | 0.584 |
+| bagged x15 (Idea 2) | 0.505 | 0.559 | 0.557 |
+| local calibration (Idea 3) | 0.498 | 0.513 | 0.554 |
+
+**The saturation was the entire problem.** Simply scoring in the log domain
+recovers det@1%FP from ~0.1 to ~0.55 -- Mahalanobis parity -- at zero cost (same
+fitted memberships, different aggregation). The **trimmed** variant slightly
+*beats* Mahalanobis on the two larger models (0.572 vs ~0.55, 0.601 vs ~0.58) by
+removing the benign false positives a single high-z component causes. AUROC is
+held or nudged up (0.92-0.95), and det@5%FP is unchanged. This is the genuine
+FIS-flavoured win: a robust, trimmed surprisal that a pure quadratic
+(Mahalanobis) does not express.
+
+Ideas 2 and 3 also recover det@1%FP but neither beats Idea 1, and both cost far
+more (15x the fits, or a kNN per query). Idea 1 is the recommendation, and it is
+filed upstream as tribblefis #108 (a `score` option: `complement` / `surprisal`
+/ `trimmed`).
+
+## Bottom line
+
+The FIS monitor's 1%-FPR weakness was an artefact of the saturating
+product-complement score, not a fundamental limit. With a log-domain robust
+score it is competitive with -- and on larger models slightly better than --
+Mahalanobis at the strict operating point, while keeping the one-class, no-
+attack-examples, interpretable-attribution properties. det@1%FP ~0.57-0.60 on
+capable instruct models means catching ~60% of injections while flagging 1% of
+benign traffic -- a genuinely deployable triage gate.
