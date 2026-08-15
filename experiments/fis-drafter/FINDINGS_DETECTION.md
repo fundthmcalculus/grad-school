@@ -946,3 +946,61 @@ gradient toward the thing being measured.
 The trade-off: this is *supervised* (needs labelled attacks) and 5× slower to
 fit. It is the ceiling if you have attack examples; the one-class detector (0.66,
 no attacks) is what you deploy when you do not.
+
+---
+
+# Part 12 — A fourth corpus (SPML) and the PCA/whitening ablation
+
+## SPML — a third corpus where the monitor works strongly
+
+`reshabhs/SPML_Chatbot_Prompt_Injection` (system+user chatbot prompts), Qwen-3B,
+one-class trimmed score. Baseline `1-max firing` again gives det@1%FP 0.000
+(saturation), and the log-domain fix recovers it dramatically:
+
+| metric | value |
+|---|---|
+| pooled det@1%FP (trimmed) | 0.889 |
+| pooled AUROC | 0.994 |
+| **within-length det@1%FP** | **0.885** |
+| within-length FIS wl-AUROC | 0.935 |
+| within-length surface wl-AUROC | 0.726 (activations win by +0.21) |
+
+SPML has an extreme raw length confound (length-AUROC 0.991), but the
+within-length numbers confirm the signal is genuine and large. So across four
+corpora the picture is: **strong deployable gate on deepset and SPML**
+(det@1%FP 0.66 and 0.89), **struggles on jailbreak** (length) and **safeguard**
+(surface-dominant until 3B+). Two of four is a real, not universal, tool.
+
+## PCA / whitening ablation — decorrelation is essential, rank reduction helps
+
+Replacing the detector's PCA-whitening with alternatives, trimmed score, Qwen-3B:
+
+| transform | deepset det@1%FP / wl | safeguard det@1%FP / wl |
+|---|---|---|
+| raw (no decorrelation) | 0.438 / 0.756 | 0.015 / 0.480 |
+| standardize (z-score, no rotation) | 0.438 / 0.756 | 0.015 / 0.480 |
+| **PCA-whiten k=32 (current)** | **0.663 / 0.945** | **0.046 / 0.762** |
+| PCA-whiten k=16 | 0.579 / 0.874 | 0.031 / 0.567 |
+| PCA-whiten full rank | 0.588 / 0.905 | 0.023 / 0.813 |
+| ZCA-whiten (full rank) | 0.606 / 0.915 | 0.015 / 0.855 |
+
+Three findings:
+
+* **You cannot remove decorrelation.** raw and standardize are identical (the
+  trimmed sum of z² is per-feature scale-invariant, so standardizing changes
+  nothing) and both crater — det@1%FP 0.44 vs 0.66, wl-AUROC 0.76 vs 0.95. The
+  whitening is load-bearing, exactly because the product-t-norm rule assumes
+  independent features.
+* **Rank reduction is part of the win, not just decorrelation.** PCA-whiten at
+  k=32 beats *full-rank* PCA-whiten (0.663 vs 0.588 det@1%FP) — truncating the
+  low-variance noise directions helps the operating point. PCA is doing two
+  jobs: decorrelate, and drop noise.
+* **ZCA is a viable substitute for ranking, not for the gate.** ZCA (stays in the
+  original basis, full rank) gives the best hard-corpus wl-AUROC (0.855) but the
+  worst det@1%FP (0.015) — full-rank whitening ranks well but its score tail is
+  heavy. For the deployable metric, rank-reduced PCA remains the best choice.
+
+So "removing PCA" is not advisable: the decorrelation is essential and the rank
+truncation specifically buys the low-FPR operating point. If PCA must be avoided
+(e.g. to stay in the original feature basis for interpretability), ZCA recovers
+the ranking but not the strict gate.

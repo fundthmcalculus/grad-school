@@ -1,0 +1,62 @@
+[
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "dataset": "injection_qwen3b",
+    "arms": {
+      "raw": {
+        "det@1%FP": 0.438,
+        "wl_auroc": 0.756
+      },
+      "standardize": {
+        "det@1%FP": 0.438,
+        "wl_auroc": 0.756
+      },
+      "pca_16": {
+        "det@1%FP": 0.579,
+        "wl_auroc": 0.874
+      },
+      "pca_32": {
+        "det@1%FP": 0.663,
+        "wl_auroc": 0.945
+      },
+      "pca_full": {
+        "det@1%FP": 0.588,
+        "wl_auroc": 0.905
+      },
+      "zca": {
+        "det@1%FP": 0.606,
+        "wl_auroc": 0.915
+      }
+    }
+  },
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "dataset": "sg_qwen3b",
+    "arms": {
+      "raw": {
+        "det@1%FP": 0.015,
+        "wl_auroc": 0.48
+      },
+      "standardize": {
+        "det@1%FP": 0.015,
+        "wl_auroc": 0.48
+      },
+      "pca_16": {
+        "det@1%FP": 0.031,
+        "wl_auroc": 0.567
+      },
+      "pca_32": {
+        "det@1%FP": 0.046,
+        "wl_auroc": 0.762
+      },
+      "pca_full": {
+        "det@1%FP": 0.023,
+        "wl_auroc": 0.813
+      },
+      "zca": {
+        "det@1%FP": 0.015,
+        "wl_auroc": 0.855
+      }
+    }
+  }
+]
