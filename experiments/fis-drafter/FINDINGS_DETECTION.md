@@ -624,3 +624,70 @@ faithful per-layer attribution. The honest headline is not "the FIS detects
 injections best" but "an interpretable, unsupervised FIS monitor is competitive
 at a 5%-FPR operating point on capable instruct models, and says which layers
 fired."
+
+---
+
+# Part 7 — Optimizer refinement, timing, and the ROC sweep
+
+## Construction and inference performance
+
+The genuine `TribbleOneClassDetector`, one-class, whitened, 32 components:
+
+| model | layers | hidden | features | train (benign) | construct (ms) | infer (µs/prompt) |
+|---|---|---|---|---|---|---|
+| SmolLM2-135M | 30 | 576 | 32 | 205 | 110 | 11.1 |
+| SmolLM2-360M | 32 | 960 | 32 | 205 | 110 | 10.9 |
+| gemma-3-270m-it | 18 | 640 | 32 | 205 | 116 | 10.9 |
+| TinyLlama-1.1B | 22 | 2048 | 32 | 205 | 115 | 10.8 |
+
+Construction is ~110 ms, dominated by the shared per-layer PCA feature build;
+the fuzzy fit itself is ~0.04 ms (Part 5). Inference is ~11 µs/prompt. Both are
+negligible against a model forward pass — the detector is effectively free.
+
+## Refining TribbleFIS with the `optimizers` package — it does not help
+
+The `refine_method="optimizers"` idea (population + local-polish GA/PSO/ACO from
+the `optimizers` package), applied to the one-class detector: extract the
+model's Gaussian antecedent parameters and search them against a validation
+objective (AUROC, and a low-FPR-weighted objective aimed at the det@1%FP
+weakness), with L2 shrinkage toward the heuristic and a disjoint test split.
+
+Two implementation notes worth recording:
+* The installed `optimizers` build uses a **keyword-only** constructor, so
+  tribblefis's own `_run_optimizer_search` (positional) does not drive it — the
+  same incompatibility behind that repo's 5 pre-existing `optimizers_backend`
+  test failures. The package had to be called directly against its current API.
+* The low-FPR objective is **degenerate at the start** (pAUC@1%FP = 0 for the
+  heuristic), so the derivative-free search has no gradient to follow there and
+  wanders; only an AUROC-anchored objective is searchable.
+
+The result, across seeds and shrinkage settings:
+
+| l2 shrink | unrefined (AUROC / det@1%FP) | refined (AUROC / det@1%FP) |
+|---|---|---|
+| 0.00 | 0.847 / 0.224 | 0.847 / 0.224 |
+| 0.02–0.15 | 0.847 / 0.224 | 0.847 / 0.224 |
+
+**Refinement is a no-op with the guard, harmful without it.** Removing the
+"never worse than heuristic" fallback, the GA moves *away* from the
+moment-matched start and its validation AUROC gets **worse** (0.883 → 0.792 at
+l2=0, → 0.493 with shrinkage), dragging test with it (0.942 → 0.768). The
+moment-matched Gaussians on whitened components are already a strong local
+optimum; population search around them finds worse points, and the guard
+correctly falls back to the heuristic.
+
+This is the third independent confirmation of the project's recurring result —
+Part 5 (few-shot layer weights), tribblefis's own refinement-guard evaluation,
+and now the `optimizers`-package antecedent search — that **good construction is
+not improved by a refinement stage here**. The lever that raised performance was
+never the optimizer; it was the representation (Part 5) and, for the one-class
+detector specifically, whitening (Part 6 / PR #106).
+
+## The sweep
+
+A published figure — ROC curves (detection quality vs false-positive rate) for
+all four models, with the 5%-FPR operating point marked, plus the operating-
+point and timing tables — is at the artifact link. It makes the Part 6 caveats
+visual: the curves are strong on TinyLlama-1.1B and SmolLM2, gemma sits lowest,
+and every curve rises steeply only after the 5%-FPR line, which is why 1%-FPR
+detection is weak.
