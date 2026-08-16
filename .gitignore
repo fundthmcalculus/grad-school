@@ -20,6 +20,10 @@ presentations/node_modules/
 /NASA-CMAPSS/*.h5
 /NASA-CMAPSS/*.crdownload
 
+# cmapss_rul.py's own resume checkpoint (pickled agg_cache) -- regenerated
+# from the .h5 file above on every fresh run, not meant to be tracked.
+/FuzzySystemsExperiments/.cmapss_rul_cache.pkl
+
 # Figures the AnalyticalDynamics simulations regenerate on every run. None has
 # ever been tracked; the chapter figures live under research/ instead.
 /AnalyticalDynamics/*.png

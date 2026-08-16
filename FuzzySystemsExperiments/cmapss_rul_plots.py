@@ -176,7 +176,10 @@ def plot_stage3(predictions: dict, out_path: str):
     plt.close(fig)
 
 
-REFINE_COLORS = {"baseline": INK_MUTED, "coordinate": "#2a78d6", "local": "#4a3aa7"}
+REFINE_COLORS = {
+    "baseline": INK_MUTED, "coordinate": "#2a78d6", "local": "#4a3aa7",
+    "optimizers_ga": "#1baf7a",
+}
 
 
 def plot_stage4(stage4_df: pd.DataFrame, out_path: str):
@@ -205,9 +208,13 @@ def plot_stage4(stage4_df: pd.DataFrame, out_path: str):
     ax.set_xticks(x)
     ax.set_xticklabels([p.replace("_", " ") for p in pipelines], fontsize=8.5)
     ax.set_ylabel("Test RMSE, true RUL (cycles)")
+    fastest = stage4_df.loc[stage4_df.groupby("refiner")["refine_seconds"].idxmax()]
+    cost_note = " / ".join(
+        f"{row.refiner} up to {row.refine_seconds:,.0f}s" for row in fastest.itertuples()
+    )
     ax.set_title(
-        "Stage 4: refinement helps where there's enough data/parameters to support it --\n"
-        "at 200-3,000x the baseline fit time, and it hurts the smallest pipeline (CV-overfit)",
+        f"Stage 4: refinement helps where there's enough data/parameters to support it --\n"
+        f"cost varies a lot by method ({cost_note})",
         fontsize=11.5, pad=14, loc="left",
     )
     ax.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
@@ -219,7 +226,104 @@ def plot_stage4(stage4_df: pd.DataFrame, out_path: str):
     plt.close(fig)
 
 
-def make_plots(stage1_df, stage2_df, stage3_predictions, top_pipelines, stage4_df=None):
+def _compact_config_label(refiner: str, config_str: str) -> str:
+    import ast
+
+    cfg = ast.literal_eval(config_str)
+    if refiner == "coordinate":
+        return f"coordinate  sweeps={cfg['n_sweeps']}"
+    scale = cfg.get("local_scale")
+    scale_s = "global" if scale is None else str(scale)
+    return f"ga  pop={cfg['population_size']} gens={cfg['num_generations']} scale={scale_s}"
+
+
+def plot_stage4b(stage4b_df: pd.DataFrame, baseline_rmse: float, out_path: str):
+    df = stage4b_df.reset_index(drop=True)
+    labels = [_compact_config_label(row.refiner, row.config) for row in df.itertuples()]
+    colors = [REFINE_COLORS.get(r, INK_MUTED) for r in df["refiner"]]
+
+    fig, ax = plt.subplots(figsize=(10, 6), facecolor=SURFACE)
+    y = np.arange(len(df))
+    ax.barh(y, df["rmse_refined"], color=colors, height=0.6, zorder=3)
+    ax.axvline(baseline_rmse, color=INK, linewidth=1.5, linestyle="--", zorder=2)
+    ax.text(baseline_rmse + 0.15, 0.15, "heuristic\nbaseline",
+            fontsize=8, color=INK, ha="left", va="top", style="italic")
+    xmax = max(df["rmse_refined"].max(), baseline_rmse)
+    ax.set_xlim(0, xmax * 1.18)
+    for yi, v, s in zip(y, df["rmse_refined"], df["refine_seconds"]):
+        ax.text(v + xmax * 0.01, yi, f"{v:.2f} ({s:.1f}s)", va="center", fontsize=8, color=INK_SECONDARY)
+
+    ax.set_yticks(y)
+    ax.set_yticklabels(labels, fontsize=9, color=INK, fontfamily="monospace")
+    ax.set_xlabel("Test RMSE, true RUL (cycles) -- A1_whole_cycle/B1/C3_physical")
+    ax.set_title(
+        "Stage 4b: sweeping each refiner's own hyperparameters on the small pipeline",
+        fontsize=12, pad=14, loc="left",
+    )
+    ax.grid(axis="x", color=GRID, linewidth=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    _style_axes(ax)
+    ax.invert_yaxis()
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=160, facecolor=SURFACE)
+    plt.close(fig)
+
+
+def plot_stage5(onset_df: pd.DataFrame, cap_results_df: pd.DataFrame, out_path: str):
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5), facecolor=SURFACE)
+
+    ax = axes[0]
+    lo = min(onset_df["true_onset"].min(), onset_df["detected_onset"].min()) - 3
+    hi = max(onset_df["true_onset"].max(), onset_df["detected_onset"].max()) + 3
+    ax.plot([lo, hi], [lo, hi], color=BASELINE, linewidth=1, linestyle="--", zorder=1)
+    ax.scatter(onset_df["true_onset"], onset_df["detected_onset"], s=70, color=CAT["A3_raw_memory"], zorder=3)
+    for row in onset_df.itertuples():
+        ax.annotate(str(row.unit), (row.true_onset, row.detected_onset),
+                    xytext=(6, 4), textcoords="offset points", fontsize=8, color=INK_SECONDARY)
+    ax.set_xlim(lo, hi)
+    ax.set_ylim(lo, hi)
+    ax.set_xlabel("True onset (oracle hs), cycle")
+    ax.set_ylabel("Detected onset (moving avg.), cycle")
+    mae = onset_df["error"].abs().mean()
+    ax.set_title(f"Onset detection: MAE = {mae:.1f} cycles", fontsize=11.5, pad=12, loc="left")
+    ax.grid(color=GRID, linewidth=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    _style_axes(ax)
+
+    ax2 = axes[1]
+    pipelines = list(cap_results_df["pipeline"].unique())
+    cap_sources = ["oracle_hs", "detected_ma"]
+    cap_colors = {"oracle_hs": INK_MUTED, "detected_ma": CAT["A3_raw_memory"]}
+    x = np.arange(len(pipelines))
+    width = 0.35
+    for i, cs in enumerate(cap_sources):
+        vals = [
+            cap_results_df[(cap_results_df["pipeline"] == p) & (cap_results_df["cap_source"] == cs)]["rmse_test_true"].iloc[0]
+            for p in pipelines
+        ]
+        ax2.bar(x + (i - 0.5) * width, vals, width=width * 0.9, color=cap_colors[cs], label=cs, zorder=3)
+    ax2.set_xticks(x)
+    ax2.set_xticklabels([p.replace("_", " ") for p in pipelines], fontsize=8)
+    ax2.set_ylabel("Test RMSE, true RUL (cycles)")
+    ax2.set_title("Cost of using the detected onset instead of the oracle", fontsize=11.5, pad=12, loc="left")
+    ax2.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
+    ax2.set_axisbelow(True)
+    _style_axes(ax2)
+    ax2.legend(loc="upper left", frameon=False, fontsize=8.5, labelcolor=INK_SECONDARY)
+
+    fig.suptitle(
+        "Stage 5: can a moving-average detector replace the oracle hs flag?",
+        fontsize=12.5, color=INK, x=0.01, ha="left",
+    )
+    fig.tight_layout(rect=[0, 0, 1, 0.94])
+    fig.savefig(out_path, dpi=160, facecolor=SURFACE)
+    plt.close(fig)
+
+
+def make_plots(
+    stage1_df, stage2_df, stage3_predictions, top_pipelines,
+    stage4_df=None, stage4b_df=None, stage5_onsets=None, stage5_results=None,
+):
     plot_stage1(stage1_df, "FuzzySystemsExperiments/cmapss_rul_stage1.png")
     print("wrote FuzzySystemsExperiments/cmapss_rul_stage1.png")
     plot_stage2(stage2_df, top_pipelines, "FuzzySystemsExperiments/cmapss_rul_stage2.png")
@@ -229,3 +333,10 @@ def make_plots(stage1_df, stage2_df, stage3_predictions, top_pipelines, stage4_d
     if stage4_df is not None and not stage4_df.empty:
         plot_stage4(stage4_df, "FuzzySystemsExperiments/cmapss_rul_stage4.png")
         print("wrote FuzzySystemsExperiments/cmapss_rul_stage4.png")
+    if stage4b_df is not None and not stage4b_df.empty:
+        baseline_rmse = stage4b_df["rmse_baseline"].iloc[0]
+        plot_stage4b(stage4b_df, baseline_rmse, "FuzzySystemsExperiments/cmapss_rul_stage4b.png")
+        print("wrote FuzzySystemsExperiments/cmapss_rul_stage4b.png")
+    if stage5_onsets is not None and stage5_results is not None and not stage5_onsets.empty:
+        plot_stage5(stage5_onsets, stage5_results, "FuzzySystemsExperiments/cmapss_rul_stage5.png")
+        print("wrote FuzzySystemsExperiments/cmapss_rul_stage5.png")
