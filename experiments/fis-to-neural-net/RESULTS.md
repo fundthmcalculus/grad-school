@@ -611,6 +611,36 @@ cost, not epochs-to-target, and epochs-to-target is what a warm start saves.
   joint lift, and `detect_interactions=True` exposes it. Ranking the subspace by
   interaction rather than by importance is a one-line change with a real chance
   of moving the 17–30%.
+* **A slow-converging problem has been found and measured** —
+  `find_slow_problem.py`, `slow_problems.md`. Ranking candidates by *minibatch
+  updates* to reach R2 >= 0.9 (updates, not seconds: they are what an
+  initialization skips, and they are comparable across dataset sizes):
+
+  | problem | updates | note |
+  |---|---|---|
+  | PhiUSIIL (Part 4) | **25** | why the warm start could not repay 2 s |
+  | `illcond` (cond 1e4) | 36 | Adam absorbs conditioning entirely — dead end |
+  | Concrete | 386 | the Part 1 reference |
+  | **`pendulum-n2-fric`** | **3,444** | 62k real rows, the chaos time-step operator |
+  | `chirp-k4` | 8,018 | synthetic spectral-bias probe |
+  | `sine2d-k2` | 8,699 | synthetic, with interactions |
+
+  Two results worth keeping. **Ill-conditioning is refuted as a route** — 36
+  updates, because Adam's per-parameter scaling absorbs a condition number of
+  1e4. And the oscillatory problems do not degrade gracefully: at 128 hidden
+  units they jump from a few thousand updates to *never* (chirp at k>=8,
+  sine2d at k>=4, and the frictionless pendulum at 0.76 R2). That is a
+  **capacity** wall, not a convergence cost, and it means the benchmark's
+  difficulty knob has to be frequency *and* width together.
+
+  The recommended target is `pendulum-n2-fric`: 3,444 updates is 138x PhiUSIIL,
+  the data is real rather than synthetic, it is in the author's own domain, and
+  `AnalyticalDynamics/chaos` already applies TRIBBLE to exactly this operator —
+  where the FIS beats all eight of the reference paper's time-step models in six
+  of seven cells. That last point matters most: every part of this experiment
+  ended up bounded by the FIS's own quality, so the one problem worth testing is
+  one where the FIS is already known to be good.
+
 * **Test the regime where a warm start can pay** (unchanged from Part 1, and
   still the biggest open question). Every rung here trains in under 13 s, so a
   0.2–1.6 s FIS fit is 4–34% overhead. The claim needs a problem where training

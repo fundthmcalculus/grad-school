@@ -1,0 +1,362 @@
+[
+ {
+  "problem": "chirp-k8",
+  "note": "sin(2*pi*8*x^2), 1 input",
+  "rows": 4000,
+  "features": 1,
+  "lr": 0.01,
+  "updates_to_r2": null,
+  "best_r2": 0.62435402525688,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.19841088833726844
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.5744383753716884
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.62435402525688
+   }
+  ],
+  "seconds": 57.169325500000014
+ },
+ {
+  "problem": "chirp-k16",
+  "note": "sin(2*pi*16*x^2), 1 input",
+  "rows": 4000,
+  "features": 1,
+  "lr": 0.01,
+  "updates_to_r2": null,
+  "best_r2": 0.34110244916450233,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.0496255778834665
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.16525041445406008
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.34110244916450233
+   }
+  ],
+  "seconds": 57.18546743799993
+ },
+ {
+  "problem": "chirp-k40",
+  "note": "sin(2*pi*40*x^2), 1 input",
+  "rows": 4000,
+  "features": 1,
+  "lr": 0.01,
+  "updates_to_r2": null,
+  "best_r2": 0.18247883677147042,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.023079631516523813
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.08110447719356745
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.18247883677147042
+   }
+  ],
+  "seconds": 57.48090137400004
+ },
+ {
+  "problem": "sine2d-k4",
+  "note": "sin(4x)sin(4y), 2 inputs",
+  "rows": 8000,
+  "features": 2,
+  "lr": 0.01,
+  "updates_to_r2": null,
+  "best_r2": 0.7316778002901185,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.20730561693072386
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.3501168490853053
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.7316778002901185
+   }
+  ],
+  "seconds": 60.46294346699983
+ },
+ {
+  "problem": "sine2d-k8",
+  "note": "sin(8x)sin(8y), 2 inputs",
+  "rows": 8000,
+  "features": 2,
+  "lr": 0.001,
+  "updates_to_r2": null,
+  "best_r2": 0.013458085370214978,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.013458085370214978
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.013134847733812793
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.005953318590276979
+   }
+  ],
+  "seconds": 60.81772741099985
+ },
+ {
+  "problem": "pendulum-n2",
+  "note": "n=2 time-step operator",
+  "rows": 62000,
+  "features": 3,
+  "lr": 0.01,
+  "updates_to_r2": null,
+  "best_r2": 0.7643508092293072,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.1813467902805732
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.44061913263804414
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.7643508092293072
+   }
+  ],
+  "seconds": 55.94150082600004
+ },
+ {
+  "problem": "pendulum-n3",
+  "note": "n=3 time-step operator",
+  "rows": 62000,
+  "features": 4,
+  "lr": 0.01,
+  "updates_to_r2": null,
+  "best_r2": 0.6881207164031493,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.39069062711407104
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.6529960788004854
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.6881207164031493
+   }
+  ],
+  "seconds": 58.71747061199994
+ },
+ {
+  "problem": "sine2d-k2",
+  "note": "sin(2x)sin(2y), 2 inputs",
+  "rows": 8000,
+  "features": 2,
+  "lr": 0.01,
+  "updates_to_r2": 8699.0,
+  "best_r2": 0.9950876167592886,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.615646396083423
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.6610975662718779
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 2,
+    "updates": 8699.0,
+    "r2": 0.9950876167592886
+   }
+  ],
+  "seconds": 59.59939051599986
+ },
+ {
+  "problem": "chirp-k4",
+  "note": "sin(2*pi*4*x^2), 1 input",
+  "rows": 4000,
+  "features": 1,
+  "lr": 0.01,
+  "updates_to_r2": 8018.0,
+  "best_r2": 0.9590097711376777,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.5859387412389947
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.7312283084741158
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 2,
+    "updates": 8018.0,
+    "r2": 0.9590097711376777
+   }
+  ],
+  "seconds": 56.65851761499994
+ },
+ {
+  "problem": "pendulum-n2-fric",
+  "note": "n=2 + friction time-step operator",
+  "rows": 62000,
+  "features": 3,
+  "lr": 0.01,
+  "updates_to_r2": 3443.5,
+  "best_r2": 0.9791797148632269,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 0,
+    "updates": null,
+    "r2": 0.3324366536677697
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 2,
+    "updates": 13725.5,
+    "r2": 0.9660287670304231
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 2,
+    "updates": 3443.5,
+    "r2": 0.9791797148632269
+   }
+  ],
+  "seconds": 59.369233212999916
+ },
+ {
+  "problem": "concrete",
+  "note": "reference (Part 1 workhorse)",
+  "rows": 1030,
+  "features": 8,
+  "lr": 0.01,
+  "updates_to_r2": 386.5,
+  "best_r2": 0.9408257484437607,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 2,
+    "updates": 2055.0,
+    "r2": 0.9335857864970074
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 2,
+    "updates": 773.0,
+    "r2": 0.9341604845058167
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 2,
+    "updates": 386.5,
+    "r2": 0.9408257484437607
+   }
+  ],
+  "seconds": 56.18444315800002
+ },
+ {
+  "problem": "illcond",
+  "note": "20 inputs, condition number 10000",
+  "rows": 8000,
+  "features": 20,
+  "lr": 0.01,
+  "updates_to_r2": 36.0,
+  "best_r2": 0.9999999997887885,
+  "sweep": [
+   {
+    "lr": 0.001,
+    "n_arrived": 2,
+    "updates": 199.0,
+    "r2": 0.9999999997887885
+   },
+   {
+    "lr": 0.003,
+    "n_arrived": 2,
+    "updates": 68.0,
+    "r2": 0.9999999991187463
+   },
+   {
+    "lr": 0.01,
+    "n_arrived": 2,
+    "updates": 36.0,
+    "r2": 0.9999999984779138
+   }
+  ],
+  "seconds": 68.05931019000002
+ }
+]
