@@ -621,6 +621,47 @@ class TrainHistory:
     seconds: list[float]
 
 
+def sigmoid(z: np.ndarray) -> np.ndarray:
+    """Numerically stable logistic, used for the binary-classification arms."""
+    z = np.asarray(z, dtype=float)
+    out = np.empty_like(z)
+    pos = z >= 0
+    out[pos] = 1.0 / (1.0 + np.exp(-z[pos]))
+    ez = np.exp(z[~pos])
+    out[~pos] = ez / (1.0 + ez)
+    return out
+
+
+def logit(p: np.ndarray, eps: float = 1e-6) -> np.ndarray:
+    """Inverse of :func:`sigmoid`, clipped away from the asymptotes.
+
+    The conversion seeds a *logit*, not a probability: the network's scalar
+    output is what a sigmoid is applied to, so backing the FIS out in
+    probability space and then squashing it again would compose two sigmoids
+    and misplace every weight. A FIS that returns a hard 0 or 1 -- which
+    `TribbleClassifier` does routinely, since a normalized firing strength can
+    saturate -- would otherwise map to an infinite target.
+    """
+    p = np.clip(np.asarray(p, dtype=float), eps, 1.0 - eps)
+    return np.log(p / (1.0 - p))
+
+
+def error_rate(y_true: np.ndarray, logits: np.ndarray) -> float:
+    """Misclassification rate at a 0 logit threshold."""
+    return float(
+        np.mean(
+            (np.asarray(logits).ravel() > 0.0) != (np.asarray(y_true).ravel() > 0.5)
+        )
+    )
+
+
+def log_loss(y_true: np.ndarray, logits: np.ndarray) -> float:
+    """Mean binary cross-entropy, computed from logits without forming p."""
+    z = np.asarray(logits, dtype=float).ravel()
+    t = np.asarray(y_true, dtype=float).ravel()
+    return float(np.mean(np.maximum(z, 0.0) - z * t + np.log1p(np.exp(-np.abs(z)))))
+
+
 def rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     d = (
         np.asarray(y_true, dtype=float).ravel()
@@ -654,14 +695,33 @@ def train_adam(
     eps: float = 1e-8,
     seed: int = 0,
     eval_every: int = 1,
+    eval_batches: int | None = None,
+    track_train: bool = True,
     y_scale: float = 1.0,
     y_center: float = 0.0,
+    loss: str = "mse",
+    metric_fn=None,
 ) -> tuple[ReLUNet, TrainHistory]:
     """Minibatch Adam on the MSE, identical for every arm.
 
     ``y_scale``/``y_center`` map the network's (standardized) output back to the
     target's own units for reporting, so an arm is never scored in a frame of
     its own choosing.
+
+    ``loss="bce"`` treats the network's scalar output as a **logit** and
+    optimizes binary cross-entropy instead. Only the output-layer gradient
+    changes -- ``sigmoid(pred) - y`` in place of ``2 * (pred - y)`` -- because
+    everything below it is the same network; keeping one training loop for both
+    is what stops the regression and classification arms differing by an
+    optimizer detail nobody meant to introduce. ``metric_fn(y_true, raw_pred)``
+    overrides the reported curve (error rate rather than RMSE, for instance).
+
+    ``eval_batches`` records the curve every N *minibatches* instead of every
+    epoch, and the recorded "epoch" becomes fractional. At 160k rows an epoch is
+    313 updates and a network can cross every quality target inside the first
+    one, which makes an epoch-resolution time-to-target table read as a row of
+    ties. This is the knob that makes the comparison measurable at scale rather
+    than a statement about the granularity of the ruler.
     """
     import time
 
@@ -678,27 +738,38 @@ def train_adam(
 
     hist = TrainHistory([], [], [], [], [])
 
+    if loss not in ("mse", "bce"):
+        raise ValueError(f"loss must be 'mse' or 'bce', got {loss!r}")
+
     def _score(Xe, ye):
         if Xe is None or ye is None:
             return float("nan")
+        if metric_fn is not None:
+            return float(metric_fn(np.asarray(ye).ravel(), net.predict(Xe)))
         return rmse(
             np.asarray(ye).ravel() * y_scale + y_center,
             net.predict(Xe) * y_scale + y_center,
         )
 
-    def record(epoch: int, elapsed: float) -> None:
+    def record(epoch: float, elapsed: float) -> None:
         hist.epochs.append(epoch)
         hist.seconds.append(elapsed)
-        hist.train_rmse.append(_score(X, y))
+        # Scoring the training set is the most expensive part of a record, and
+        # at sub-epoch cadence on 160k rows it costs more than the training it
+        # is measuring. Nothing in this experiment selects on the train curve.
+        hist.train_rmse.append(_score(X, y) if track_train else float("nan"))
         hist.test_rmse.append(_score(X_test, y_test))
         hist.val_rmse.append(_score(X_val, y_val))
 
     start = time.perf_counter()
-    record(0, 0.0)
+    record(0.0, 0.0)
+    n_batches = max(1, int(np.ceil(n / batch_size)))
 
     for epoch in range(1, epochs + 1):
         order = rng.permutation(n)
-        for lo in range(0, n, batch_size):
+        # `bi` and not `b`: `b` is the batch *size* three lines down, and
+        # letting the index share the name silently disabled sub-epoch eval.
+        for bi, lo in enumerate(range(0, n, batch_size)):
             idx = order[lo : lo + batch_size]
             Xb, yb = X[idx], y[idx]
             b = Xb.shape[0]
@@ -706,8 +777,10 @@ def train_adam(
             z = Xb @ net.W1 + net.b1
             h = np.maximum(z, 0.0)
             pred = h @ net.w2 + Xb @ net.v + net.c
-            resid = pred - yb
-            g_out = (2.0 / b) * resid
+            if loss == "bce":
+                g_out = (sigmoid(pred) - yb) / b
+            else:
+                g_out = (2.0 / b) * (pred - yb)
 
             grads = {
                 "w2": h.T @ g_out,
@@ -731,7 +804,12 @@ def train_adam(
                 else:
                     setattr(net, p, getattr(net, p) - step)
 
-        if epoch % eval_every == 0 or epoch == epochs:
-            record(epoch, time.perf_counter() - start)
+            if eval_batches and (bi + 1) % eval_batches == 0:
+                record(epoch - 1 + (bi + 1) / n_batches, time.perf_counter() - start)
+
+        if eval_batches is None and (epoch % eval_every == 0 or epoch == epochs):
+            record(float(epoch), time.perf_counter() - start)
+    if eval_batches:
+        record(float(epochs), time.perf_counter() - start)
 
     return net, hist

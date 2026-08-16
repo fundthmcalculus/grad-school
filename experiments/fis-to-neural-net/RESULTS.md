@@ -51,6 +51,13 @@ tetrahedral rules than training rows, so the rules have no data behind them. The
 usable form is a hybrid — additive main effects, tetrahedral interactions on a
 few features — which improves the conversion by 17–30% on every dataset.
 
+**Part 4 settled the open question.** PhiUSIIL at 235,795 rows was chosen as the
+regime where a warm start should finally pay, and it does not: the conversion is
+excellent — the seeded network starts at 0.0035 error against the FIS's own
+0.0060, with no labels, in 0.5 s — but a from-scratch network reaches 2% error in
+**0.03 s of training** against the FIS's **2 s** of setup. Scale buys per-epoch
+cost, not epochs-to-target, and epochs-to-target is what a warm start saves.
+
 **Part 3 removed the hybrid's two arbitrary choices** — a bounding-box lattice,
 and a subspace ranked by main effects. Putting the vertices on the FIS's own
 knots does not lower the best fidelity but makes it *robust*: the lattice arm
@@ -74,6 +81,7 @@ found from the other side: **the ceiling is the FIS**.
 | H8 | gating no longer reaches the conversion | **confirmed in 1-D, falsified above it** |
 | T1–T5 | the tetrahedral construction (Part 2) | 2 confirmed, 2 falsified, 1 partial |
 | W1–W2 | FIS-aligned vertices, interaction subspaces (Part 3) | both partial |
+| P1–P4 | PhiUSIIL at full scale (Part 4) | 2 confirmed, 2 falsified |
 
 Six of eight in Part 1 came back wrong or partly wrong, four of five in Part 2,
 and both in Part 3. Several are more useful that way.
@@ -478,6 +486,94 @@ all three, the best achievable conversion fidelity improved from Part 2's
 0.257 / 1.226 / 0.959 to 0.255 / 1.066 / 0.932. **The ceiling is the FIS**, not
 the conversion — which is the same conclusion Part 1 reached from the other
 direction, and the reason WEC keeps being the dataset that breaks things.
+
+---
+
+# Part 4 — PhiUSIIL at full scale, the regime the warm start needed
+
+Parts 1-3 all ended at the same wall: every dataset trained in under 13 s, so a
+0.2-1.6 s TRIBBLE fit was 4-34% overhead and no warm start could amortize.
+PhiUSIIL is 235,795 x 50, 17x bikeshare and 229x Concrete. `run_phiusiil.py`,
+three seeds; the data is recovered into `data/` from `tribble-fis` history by the
+command in `data/.gitignore` (57 MB, not vendored).
+
+First classification rung, so the conversion seeds a **logit** and training
+minimizes cross-entropy (`fis2nn.train_adam(loss="bce")`).
+
+## The 99% premise reproduces, and it is preprocessing
+
+TRIBBLE reaches **0.9940 accuracy in 2.1 s** at `top_n=5` — but only on scaled
+inputs. On raw features the same fit scores **0.730**. The repository's own log +
+min-max treatment is load-bearing, not incidental, and every arm here gets it.
+
+## Two things had to be fixed before the comparison meant anything
+
+**The partial-dependence seed fails on a saturating classifier.** 53.7% of the
+FIS's logits are clipped extremes, so the profile averages are dominated by them
+and the additive decomposition's `(F-1) * baseline` centering compounds it. The
+seed's *ranking* survives — AUC 0.996 — but its level does not: raw error 0.574,
+and still 0.032 after a two-parameter Platt rescale.
+
+Projecting the FIS's logit onto the same ReLU basis by one ridge solve fixes it
+completely, and still uses no labels:
+
+| conversion route | seeded error | FIS's own |
+|---|---|---|
+| partial-dependence (Parts 1-3) | 0.5721 | 0.0060 |
+| **logit projection** | **0.0035** | 0.0060 |
+
+The converted network starts *better than the FIS it came from*, in 0.5 s, 63-72
+hidden units, before a single gradient step. That is the cleanest confirmation
+of the hot start in the whole experiment.
+
+**`URLSimilarityIndex` alone scores 0.9914.** With it present every arm lands
+within a fraction of a point of every other and the dataset cannot distinguish
+initializations at all. `--drop-dominant` removes it; both runs are reported
+(`phiusiil.md`, `phiusiil_hard.md`).
+
+**The five-feature cap is a confound, not a result.** `hot` trains on the columns
+TRIBBLE kept while `he-all` trains on all 49, so they differ in inputs as well as
+initialization — and without the dominant feature that difference dominates
+everything (5 columns cap the model at 1.16% error; 49 reach 0.01%). `hot-all`
+removes it: same knots, same read-out target, embedded in the full feature space
+with the linear skip covering the rest at zero initial weight. It starts where
+`hot` starts (0.0435) and finishes where `he-all` finishes (0.0002).
+
+## And the answer is still no — decisively, and for a measurable reason
+
+Epoch resolution was too coarse to see anything (every arm crossed every target
+inside one epoch), so the curves are recorded every 25 minibatches. Separating
+setup cost from training cost, without the dominant feature:
+
+| arm | setup (scale + FIS + convert) | training time to reach 2% error |
+|---|---|---|
+| `hot` | 3.07 s | **0.025 s** |
+| `hot-all` | 2.86 s | 0.031 s |
+| `quantile` | 1.15 s | 0.040 s |
+| `he` | 1.15 s | 0.088 s |
+| `he-all` | 1.15 s | 0.031 s |
+
+**Training from scratch reaches 2% error in 0.03 seconds. The FIS fit that would
+warm-start it costs 2 seconds** — roughly 60x the work it saves. The gap is not
+close and it does not close by scaling the dataset: at 235k rows a from-scratch
+network crosses every target inside the first 25 minibatches, so the setup cost
+has nothing to amortize against.
+
+That refutes the hypothesis the whole ladder was built to test, in the regime
+chosen to give it the best chance. The reason is now precise: **a warm start pays
+only when reaching the target takes longer than building the warm start, and
+gradient descent on a well-conditioned problem reaches these targets in
+milliseconds regardless of how many rows there are.** Row count buys per-epoch
+cost, not epochs-to-target, and epochs-to-target is what a warm start saves.
+
+## Scoring
+
+| | hypothesis | verdict |
+|---|---|---|
+| P1 | the 99% FIS premise reproduces | **confirmed** — 0.9940, and preprocessing-dependent |
+| P2 | the conversion works for classification | **confirmed** — seeds 0.0035 against the FIS's 0.0060, no labels |
+| P3 | the partial-dependence route transfers | **falsified** — saturation breaks it; projection is the fix |
+| P4 | at 235k rows the warm start finally pays | **falsified** — 2 s setup against 0.03 s of training |
 
 ## What I would do next
 
