@@ -58,12 +58,16 @@ def metrics_over(plant, u_fn, z0s):
     ok = [m for m in ms if m.settled]
     if len(ok) < len(ms):
         return None, sum(1 for m in ms if m.settled), len(ms)
-    return Metrics(
-        float(np.mean([m.settling_time for m in ok])),
-        float(np.max([m.peak_force for m in ok])),
-        float(np.mean([m.energy for m in ok])),
-        True,
-    ), len(ok), len(ms)
+    return (
+        Metrics(
+            float(np.mean([m.settling_time for m in ok])),
+            float(np.max([m.peak_force for m in ok])),
+            float(np.mean([m.energy for m in ok])),
+            True,
+        ),
+        len(ok),
+        len(ms),
+    )
 
 
 def main() -> None:
@@ -95,16 +99,21 @@ def main() -> None:
         weights = np.concatenate(ws)
 
     print("Held-out initial conditions, including two larger than any in training.")
-    print(f"{'controller':>22} {'train':>9} {'test':>9} {'test settled':>13} "
-          f"{'degradation':>12}")
+    print(
+        f"{'controller':>22} {'train':>9} {'test':>9} {'test settled':>13} "
+        f"{'degradation':>12}"
+    )
 
     def report(name, fn):
         mt, _, _ = metrics_over(plant, fn, Z0_TRAIN)
         me, n_ok, n_all = metrics_over(plant, fn, Z0_TEST)
         s_tr = "inf" if mt is None else f"{mt.score(ref_tr):.4f}"
         s_te = "inf" if me is None else f"{me.score(ref_te):.4f}"
-        deg = ("--" if mt is None or me is None
-               else f"{100 * (me.score(ref_te) / mt.score(ref_tr) - 1):+.1f}%")
+        deg = (
+            "--"
+            if mt is None or me is None
+            else f"{100 * (me.score(ref_te) / mt.score(ref_tr) - 1):+.1f}%"
+        )
         print(f"{name:>22} {s_tr:>9} {s_te:>9} {f'{n_ok}/{n_all}':>13} {deg:>12}")
 
     report("best LQR", lqr_fn)

@@ -59,7 +59,8 @@ def metrics_over(plant, fn):
     return Metrics(
         float(np.mean([m.settling_time for m in ok])),
         float(np.max([m.peak_force for m in ok])),
-        float(np.mean([m.energy for m in ok])), True,
+        float(np.mean([m.energy for m in ok])),
+        True,
     )
 
 
@@ -70,8 +71,9 @@ def best_certificate(ctrl, plant, a_mat, b_mat, candidates):
     for name, p_lyap in candidates:
         if p_lyap is None:
             continue
-        rho = max_certified_rho(rat, a_mat, b_mat.ravel(), p_lyap,
-                                lo=1e-3, hi=1e3, iters=14)
+        rho = max_certified_rho(
+            rat, a_mat, b_mat.ravel(), p_lyap, lo=1e-3, hi=1e3, iters=14
+        )
         if rho <= 0:
             continue
         rho *= 0.95
@@ -107,8 +109,10 @@ def main() -> None:
     print("   which is where §8b said the method converges anyway.")
 
     print("\nB. Certified controllers (pi MFs, u(0)=0, multiplier degree 4, CLARABEL)")
-    print(f"   {'controller':>18} {'score':>8} {'u(0)':>11} {'V from':>12} "
-          f"{'ball':>7} {'unsat':>7} {'rel':>9}")
+    print(
+        f"   {'controller':>18} {'score':>8} {'u(0)':>11} {'V from':>12} "
+        f"{'ball':>7} {'unsat':>7} {'rel':>9}"
+    )
 
     radius_opt = 0.0
     rows = []
@@ -122,8 +126,9 @@ def main() -> None:
     warm = TskController(cen, wid, order=1, mf="pi")
     fit_consequents(warm, d["z"], d["u"], d["w"])
     t = time.time()
-    opt, _, nev = policy_optimize(plant, warm, Z0S, ref, maxfev=600,
-                                  preserve_origin=True)
+    opt, _, nev = policy_optimize(
+        plant, warm, Z0S, ref, maxfev=600, preserve_origin=True
+    )
     opt_time = time.time() - t
     rows.append(("direct opt N=2", opt))
 
@@ -139,23 +144,34 @@ def main() -> None:
             radius_opt = radius
         r_sat = unsaturated_radius(ctrl, plant.u_max)
         if radius <= 0:
-            print(f"   {tag:>18} {score:>8} {ctrl(np.zeros(4)):+11.1e} "
-                  f"{'--':>12} {'none':>7} {r_sat:7.3f} {'--':>9}")
+            print(
+                f"   {tag:>18} {score:>8} {ctrl(np.zeros(4)):+11.1e} "
+                f"{'--':>12} {'none':>7} {r_sat:7.3f} {'--':>9}"
+            )
         else:
-            print(f"   {tag:>18} {score:>8} {ctrl(np.zeros(4)):+11.1e} "
-                  f"{name:>12} {radius:7.3f} {r_sat:7.3f} {rel:9.1e}")
+            print(
+                f"   {tag:>18} {score:>8} {ctrl(np.zeros(4)):+11.1e} "
+                f"{name:>12} {radius:7.3f} {r_sat:7.3f} {rel:9.1e}"
+            )
     print(f"   (direct optimization: {nev} evals, {opt_time:.0f}s)")
 
     print("\nC. What the subspace restriction actually buys")
-    free, _, _ = policy_optimize(plant, warm, Z0S, ref, maxfev=200,
-                                 preserve_origin=False)
-    cands_f = [("Riccati", p_riccati),
-               ("lin", lyapunov_from_linearization(free, a_mat, b_mat.ravel()))]
+    free, _, _ = policy_optimize(
+        plant, warm, Z0S, ref, maxfev=200, preserve_origin=False
+    )
+    cands_f = [
+        ("Riccati", p_riccati),
+        ("lin", lyapunov_from_linearization(free, a_mat, b_mat.ravel())),
+    ]
     r_free, n_free, _, _ = best_certificate(free, plant, a_mat, b_mat, cands_f)
-    print(f"   unconstrained search: u(0) = {free(np.zeros(4)):+.3e}, "
-          f"certified ball {r_free:.3f} ({n_free})")
-    print(f"   constrained search:   u(0) = {opt(np.zeros(4)):+.3e}, "
-          f"certified ball {radius_opt:.3f}")
+    print(
+        f"   unconstrained search: u(0) = {free(np.zeros(4)):+.3e}, "
+        f"certified ball {r_free:.3f} ({n_free})"
+    )
+    print(
+        f"   constrained search:   u(0) = {opt(np.zeros(4)):+.3e}, "
+        f"certified ball {radius_opt:.3f}"
+    )
     print("   The unconstrained optimum still certifies here, and to a LARGER")
     print("   ball -- because starting from a constrained warm start it drifts")
     print("   only to u(0) ~ 1e-9, which is below what the SDP can resolve.")

@@ -59,22 +59,26 @@ class TwoCart:
         d = float(np.clip(x2 - x1, -1e3, 1e3))
         spring = self.k_lin * d + self.k_nl * d**3
         u_sat = float(np.clip(u, -self.u_max, self.u_max)) if np.isfinite(u) else 0.0
-        return np.array([
-            v1,
-            v2,
-            (spring - self.damping * v1 + u_sat) / self.m1,
-            (-spring - self.damping * v2) / self.m2,
-        ])
+        return np.array(
+            [
+                v1,
+                v2,
+                (spring - self.damping * v1 + u_sat) / self.m1,
+                (-spring - self.damping * v2) / self.m2,
+            ]
+        )
 
     def linearization(self) -> tuple[af64, af64]:
         """(A, B) about the origin; exact when k_nl = 0."""
         k, c = self.k_lin, self.damping
-        a = np.array([
-            [0.0, 0.0, 1.0, 0.0],
-            [0.0, 0.0, 0.0, 1.0],
-            [-k / self.m1, k / self.m1, -c / self.m1, 0.0],
-            [k / self.m2, -k / self.m2, 0.0, -c / self.m2],
-        ])
+        a = np.array(
+            [
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+                [-k / self.m1, k / self.m1, -c / self.m1, 0.0],
+                [k / self.m2, -k / self.m2, 0.0, -c / self.m2],
+            ]
+        )
         b = np.array([[0.0], [0.0], [1.0 / self.m1], [0.0]])
         return a, b
 
@@ -149,32 +153,54 @@ def simulate(
     diverged.direction = 1.0
 
     try:
-        sol = solve_ivp(f, (0.0, t_end), z0, t_eval=ts, rtol=1e-8, atol=1e-10,
-                        method="LSODA", events=diverged)
+        sol = solve_ivp(
+            f,
+            (0.0, t_end),
+            z0,
+            t_eval=ts,
+            rtol=1e-8,
+            atol=1e-10,
+            method="LSODA",
+            events=diverged,
+        )
     except _Exhausted:
-        return Metrics(float("inf"), float("inf"), float("inf"), False), \
-            ts, np.zeros((len(ts), len(z0))), np.zeros(len(ts))
+        return (
+            Metrics(float("inf"), float("inf"), float("inf"), False),
+            ts,
+            np.zeros((len(ts), len(z0))),
+            np.zeros(len(ts)),
+        )
     zs = sol.y.T
     if sol.t_events is not None and len(sol.t_events[0]) > 0:
-        return Metrics(float("inf"), float("inf"), float("inf"), False), \
-            sol.t, zs, np.zeros(len(zs))
+        return (
+            Metrics(float("inf"), float("inf"), float("inf"), False),
+            sol.t,
+            zs,
+            np.zeros(len(zs)),
+        )
     if len(zs) < len(ts) or not np.all(np.isfinite(zs)):
-        return Metrics(float("inf"), float("inf"), float("inf"), False), ts, zs, \
-            np.zeros(len(zs))
-    us = np.array([
-        float(np.clip(u_fn(z), -plant.u_max, plant.u_max)) for z in zs
-    ])
+        return (
+            Metrics(float("inf"), float("inf"), float("inf"), False),
+            ts,
+            zs,
+            np.zeros(len(zs)),
+        )
+    us = np.array([float(np.clip(u_fn(z), -plant.u_max, plant.u_max)) for z in zs])
     norms = np.linalg.norm(zs, axis=1)
     thresh = tol * max(np.linalg.norm(z0), 1e-12)
     outside = np.where(norms > thresh)[0]
     settled = bool(sol.success and norms[-1] <= thresh)
-    t_settle = float(ts[outside[-1]]) if outside.size and settled else (
-        0.0 if settled else float("inf")
+    t_settle = (
+        float(ts[outside[-1]])
+        if outside.size and settled
+        else (0.0 if settled else float("inf"))
     )
     energy = float(np.trapezoid(us**2, ts))
     return (
         Metrics(t_settle, float(np.max(np.abs(us))), energy, settled),
-        ts, zs, us,
+        ts,
+        zs,
+        us,
     )
 
 
@@ -237,13 +263,16 @@ def optimal_trajectory(
         u_init = np.zeros(n_knots)
     u_init = np.asarray(u_init, dtype=float)
     if len(u_init) != n_knots:
-        u_init = np.interp(np.linspace(0, 1, n_knots),
-                           np.linspace(0, 1, len(u_init)), u_init)
+        u_init = np.interp(
+            np.linspace(0, 1, n_knots), np.linspace(0, 1, len(u_init)), u_init
+        )
     best = None
     for trial in range(n_restarts):
         start = u_init if trial == 0 else u_init + rng.normal(0, 0.2, n_knots)
         res = minimize(
-            objective, np.clip(start, -plant.u_max, plant.u_max), method="L-BFGS-B",
+            objective,
+            np.clip(start, -plant.u_max, plant.u_max),
+            method="L-BFGS-B",
             bounds=[(-plant.u_max, plant.u_max)] * n_knots,
             options={"maxiter": maxiter, "ftol": 1e-12},
         )
@@ -311,8 +340,9 @@ class TskController:
         if self.mf == "pi":
             mu = 1.0 / self._denominators(z)
         else:
-            mu = np.exp(-np.sum(((z[None, :] - self.centers) / self.widths) ** 2,
-                                axis=1))
+            mu = np.exp(
+                -np.sum(((z[None, :] - self.centers) / self.widths) ** 2, axis=1)
+            )
         s = mu.sum()
         return mu / s if s > 1e-300 else np.full(len(mu), 1.0 / len(mu))
 
@@ -345,12 +375,17 @@ class TskController:
             for combo in combinations_with_replacement(range(n_state), deg):
                 cols.append(np.prod(zs[:, combo], axis=1, keepdims=True))
         basis = np.hstack(cols)
-        return np.einsum("nr,nb,rb->n", phi, basis,
-                         self.theta.reshape(len(self.centers), basis.shape[1]))
+        return np.einsum(
+            "nr,nb,rb->n",
+            phi,
+            basis,
+            self.theta.reshape(len(self.centers), basis.shape[1]),
+        )
 
 
-def place_rules(samples: af64, weights: af64, n_rules: int, seed: int = 0
-                ) -> tuple[af64, af64]:
+def place_rules(
+    samples: af64, weights: af64, n_rules: int, seed: int = 0
+) -> tuple[af64, af64]:
     """Weighted k-means rule placement on the occupation-weighted state samples.
 
     Placing rules where the closed loop actually spends time is the multi-input
@@ -397,8 +432,13 @@ def label_state(
     trajectory's controls is what keeps this affordable at hundreds of labels.
     """
     _, _, us, _ = optimal_trajectory(
-        plant, np.asarray(z, dtype=float), n_knots=n_knots, t_end=t_end,
-        u_init=u_init, n_restarts=1, maxiter=120,
+        plant,
+        np.asarray(z, dtype=float),
+        n_knots=n_knots,
+        t_end=t_end,
+        u_init=u_init,
+        n_restarts=1,
+        maxiter=120,
     )
     return float(us[0])
 
@@ -489,25 +529,36 @@ def shaped_cost(
     ts = np.linspace(0.0, t_end, n_out)
     total = 0.0
     for z0 in z0s:
+
         def f(_t, z):
             return plant.rhs(np.asarray(z), u_fn(np.asarray(z)))
 
         try:
-            sol = solve_ivp(f, (0.0, t_end), z0, t_eval=ts, rtol=1e-6, atol=1e-8,
-                            method="RK45", max_step=0.5)
+            sol = solve_ivp(
+                f,
+                (0.0, t_end),
+                z0,
+                t_eval=ts,
+                rtol=1e-6,
+                atol=1e-8,
+                method="RK45",
+                max_step=0.5,
+            )
         except Exception:
             return 1e6
-        if not sol.success or sol.y.shape[1] != len(ts) or \
-                not np.all(np.isfinite(sol.y)):
+        if (
+            not sol.success
+            or sol.y.shape[1] != len(ts)
+            or not np.all(np.isfinite(sol.y))
+        ):
             return 1e6
         zs = sol.y.T
-        us = np.array([float(np.clip(u_fn(z), -plant.u_max, plant.u_max))
-                       for z in zs])
+        us = np.array([float(np.clip(u_fn(z), -plant.u_max, plant.u_max)) for z in zs])
         norms = np.linalg.norm(zs, axis=1)
         thresh = tol * max(float(np.linalg.norm(z0)), 1e-12)
-        soft_settle = float(np.trapezoid(
-            1.0 / (1.0 + np.exp(-10.0 * (norms / thresh - 1.0))), ts
-        ))
+        soft_settle = float(
+            np.trapezoid(1.0 / (1.0 + np.exp(-10.0 * (norms / thresh - 1.0))), ts)
+        )
         peak = float(np.log(np.sum(np.exp(20.0 * np.abs(us)))) / 20.0)
         energy = float(np.trapezoid(us**2, ts))
         terminal = float(norms[-1] / thresh)
@@ -566,17 +617,17 @@ def policy_optimize(
     def unpack(p: af64) -> TskController:
         if basis is not None:
             theta = ctrl.theta + basis @ p
-            return TskController(ctrl.centers, ctrl.widths, theta, ctrl.order,
-                                 ctrl.mf)
+            return TskController(ctrl.centers, ctrl.widths, theta, ctrl.order, ctrl.mf)
         n_theta = len(ctrl.theta)
-        c = TskController(ctrl.centers, ctrl.widths, p[:n_theta].copy(),
-                          ctrl.order, ctrl.mf)
+        c = TskController(
+            ctrl.centers, ctrl.widths, p[:n_theta].copy(), ctrl.order, ctrl.mf
+        )
         if tune_antecedents:
             n_rules = len(ctrl.centers)
             rest = p[n_theta:]
             c.centers = rest[: n_rules * n_state].reshape(n_rules, n_state)
             c.widths = np.maximum(
-                rest[n_rules * n_state:].reshape(n_rules, n_state), 1e-3
+                rest[n_rules * n_state :].reshape(n_rules, n_state), 1e-3
             )
         return c
 
@@ -597,8 +648,9 @@ def policy_optimize(
         )
 
     base = obj(p0)
-    res = minimize(obj, p0, method="Powell",
-                   options={"maxfev": maxfev, "xtol": 1e-3, "ftol": 1e-4})
+    res = minimize(
+        obj, p0, method="Powell", options={"maxfev": maxfev, "xtol": 1e-3, "ftol": 1e-4}
+    )
     # Never return something worse than the warm start.
     if res.fun < base:
         return unpack(res.x), float(res.fun), evals["n"]
@@ -619,16 +671,22 @@ def distribution_shift(closed_loop_states: af64, training_samples: af64) -> floa
     scale = training_samples.std(axis=0) + 1e-9
     a = closed_loop_states / scale
     b = training_samples / scale
-    d = np.sqrt(np.maximum(
-        ((a**2).sum(axis=1)[:, None] + (b**2).sum(axis=1)[None, :]
-         - 2.0 * a @ b.T), 0.0
-    ))
+    d = np.sqrt(
+        np.maximum(
+            ((a**2).sum(axis=1)[:, None] + (b**2).sum(axis=1)[None, :] - 2.0 * a @ b.T),
+            0.0,
+        )
+    )
     return float(np.max(np.min(d, axis=1)))
 
 
 def fit_consequents(
-    ctrl: TskController, samples: af64, targets: af64, weights: af64,
-    ridge: float = 1e-8, hold_origin: bool = True,
+    ctrl: TskController,
+    samples: af64,
+    targets: af64,
+    weights: af64,
+    ridge: float = 1e-8,
+    hold_origin: bool = True,
 ) -> af64:
     """Occupation-weighted variable projection for the consequents.
 

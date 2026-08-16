@@ -95,14 +95,18 @@ def main() -> None:
         m = metrics_of(plant, ct)
         return float("inf") if m is None else m.score(ref)
 
-    print(f"reference (best LQR): score 1.0000, settle {ref.settling_time:.3f}, "
-          f"peak {ref.peak_force:.4f}, energy {ref.energy:.4f}")
+    print(
+        f"reference (best LQR): score 1.0000, settle {ref.settling_time:.3f}, "
+        f"peak {ref.peak_force:.4f}, energy {ref.energy:.4f}"
+    )
     print(f"best imitation result (§9f): 0.8487   |   open-loop reference: 0.8183")
     print(f"budget: {BUDGET} closed-loop evaluations per optimization")
 
     rule("AA. Direct policy optimization, warm-started from the imitation fit")
-    print(f"{'rules':>6} {'params':>7} {'imitation':>10} {'direct':>9} "
-          f"{'improve':>9} {'evals':>7} {'sec':>6}")
+    print(
+        f"{'rules':>6} {'params':>7} {'imitation':>10} {'direct':>9} "
+        f"{'improve':>9} {'evals':>7} {'sec':>6}"
+    )
     best_overall = None
     for n_rules in (2, 3, 4):
         cen, wid = place_rules(samples, weights, n_rules)
@@ -112,8 +116,10 @@ def main() -> None:
         t0 = time.time()
         opt, _, n_ev = policy_optimize(plant, ctrl, Z0S, ref, maxfev=BUDGET)
         s1 = score(opt)
-        print(f"{n_rules:>6} {opt.n_params():>7} {s0:10.4f} {s1:9.4f} "
-              f"{100 * (1 - s1 / s0):8.1f}% {n_ev:>7} {time.time() - t0:6.0f}")
+        print(
+            f"{n_rules:>6} {opt.n_params():>7} {s0:10.4f} {s1:9.4f} "
+            f"{100 * (1 - s1 / s0):8.1f}% {n_ev:>7} {time.time() - t0:6.0f}"
+        )
         if best_overall is None or s1 < best_overall[0]:
             best_overall = (s1, n_rules, opt)
 
@@ -126,8 +132,10 @@ def main() -> None:
     cold = TskController(cen, wid, np.zeros(15), order=1)
     t0 = time.time()
     cold_opt, _, n_ev = policy_optimize(plant, cold, Z0S, ref, maxfev=BUDGET)
-    print(f"  cold start: {score(cold):.4f} -> {score(cold_opt):.4f} "
-          f"({n_ev} evals, {time.time() - t0:.0f} s)")
+    print(
+        f"  cold start: {score(cold):.4f} -> {score(cold_opt):.4f} "
+        f"({n_ev} evals, {time.time() - t0:.0f} s)"
+    )
 
     rule("AC. Tuning the antecedents as well")
     print("  Rule centres and widths join the search: 15 + 24 = 39 parameters.")
@@ -135,11 +143,14 @@ def main() -> None:
     ctrl = TskController(cen, wid, order=1)
     fit_consequents(ctrl, samples, targets, weights)
     t0 = time.time()
-    full, _, n_ev = policy_optimize(plant, ctrl, Z0S, ref, maxfev=BUDGET,
-                                    tune_antecedents=True)
+    full, _, n_ev = policy_optimize(
+        plant, ctrl, Z0S, ref, maxfev=BUDGET, tune_antecedents=True
+    )
     print(f"  consequents only: {best_overall[0]:.4f}")
-    print(f"  + antecedents:    {score(full):.4f}  ({n_ev} evals, "
-          f"{time.time() - t0:.0f} s)")
+    print(
+        f"  + antecedents:    {score(full):.4f}  ({n_ev} evals, "
+        f"{time.time() - t0:.0f} s)"
+    )
     print("  (equal evaluation budget over 2.6x the parameters, so a worse result")
     print("   here is a budget statement, not a capacity statement)")
 
@@ -150,12 +161,18 @@ def main() -> None:
     fit_consequents(imit, samples, targets, weights)
     mi, mo = metrics_of(plant, imit), metrics_of(plant, best_ctrl)
     print(f"{'':>14} {'settle':>9} {'peak |u|':>9} {'energy':>9} {'score':>8}")
-    print(f"{'best LQR':>14} {ref.settling_time:9.3f} {ref.peak_force:9.4f} "
-          f"{ref.energy:9.4f} {1.0:8.4f}")
-    print(f"{'imitation':>14} {mi.settling_time:9.3f} {mi.peak_force:9.4f} "
-          f"{mi.energy:9.4f} {mi.score(ref):8.4f}")
-    print(f"{'direct opt':>14} {mo.settling_time:9.3f} {mo.peak_force:9.4f} "
-          f"{mo.energy:9.4f} {mo.score(ref):8.4f}")
+    print(
+        f"{'best LQR':>14} {ref.settling_time:9.3f} {ref.peak_force:9.4f} "
+        f"{ref.energy:9.4f} {1.0:8.4f}"
+    )
+    print(
+        f"{'imitation':>14} {mi.settling_time:9.3f} {mi.peak_force:9.4f} "
+        f"{mi.energy:9.4f} {mi.score(ref):8.4f}"
+    )
+    print(
+        f"{'direct opt':>14} {mo.settling_time:9.3f} {mo.peak_force:9.4f} "
+        f"{mo.energy:9.4f} {mo.score(ref):8.4f}"
+    )
     print()
     print(f"  vs best LQR:        {100 * (1 - mo.score(ref)):.1f}% better")
     print(f"  vs best imitation:  {100 * (1 - mo.score(ref) / 0.8487):.1f}% better")

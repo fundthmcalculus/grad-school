@@ -48,24 +48,35 @@ def main() -> None:
     for label, part in [
         ("4 sets, touching (gap=0)", OutputPartition.uniform(4, gap=0.0)),
         ("4 sets, separated (gap=0.3)", OutputPartition.uniform(4, gap=0.3)),
-        ("4 sets, overlapping", OutputPartition(
-            cores=np.array([0.15, 0.38, 0.62, 0.85]), half_widths=np.full(4, 0.22))),
+        (
+            "4 sets, overlapping",
+            OutputPartition(
+                cores=np.array([0.15, 0.38, 0.62, 0.85]), half_widths=np.full(4, 0.22)
+            ),
+        ),
     ]:
         worst = 0.0
         for _ in range(400):
             alpha = rng.random(4)
             worst = max(
                 worst,
-                float(np.max(np.abs(
-                    aggregate_max(alpha, part, y_grid) - aggregate_sum(alpha, part, y_grid)
-                ))),
+                float(
+                    np.max(
+                        np.abs(
+                            aggregate_max(alpha, part, y_grid)
+                            - aggregate_sum(alpha, part, y_grid)
+                        )
+                    )
+                ),
             )
         print(f"{label:>28} {str(part.supports_are_disjoint()):>9} {worst:22.3e}")
     print("  -> the identity is exactly the disjointness condition, nothing weaker.")
 
     rule("I. Centroid defuzzification over disjoint sets IS an order-0 TSK model")
     part = OutputPartition.uniform(4, gap=0.0)
-    areas = np.array([np.trapezoid(part.membership(y_grid)[i], y_grid) for i in range(4)])
+    areas = np.array(
+        [np.trapezoid(part.membership(y_grid)[i], y_grid) for i in range(4)]
+    )
     worst = 0.0
     for _ in range(400):
         alpha = rng.random(4)
@@ -75,8 +86,12 @@ def main() -> None:
         # clipping at alpha_i rescales area but not the centroid of a symmetric set.
         closed = float((alpha * areas) @ part.cores / ((alpha * areas).sum()))
         worst = max(worst, abs(numeric - closed))
-    print(f"  sup |numeric centroid - closed-form TSK-0| over 400 random alphas: {worst:.3e}")
-    print("  (small residual is the alpha-clipping area correction, not a modelling gap;")
+    print(
+        f"  sup |numeric centroid - closed-form TSK-0| over 400 random alphas: {worst:.3e}"
+    )
+    print(
+        "  (small residual is the alpha-clipping area correction, not a modelling gap;"
+    )
     print("   with un-clipped `prod` implication it is exact to machine precision.)")
     worst_prod = 0.0
     for _ in range(400):
@@ -95,16 +110,22 @@ def main() -> None:
     lo = defuzz_mom(alpha_tie + np.array([0, -eps, 0, 0]), part)
     hi = defuzz_mom(alpha_tie + np.array([0, +eps, 0, 0]), part)
     print(f"  MOM across a tie: {lo:.4f} -> {hi:.4f} for a {eps:.0e} change in alpha_2")
-    print(f"  jump = {abs(hi - lo):.4f} (= the core spacing).  MOM is piecewise constant.")
+    print(
+        f"  jump = {abs(hi - lo):.4f} (= the core spacing).  MOM is piecewise constant."
+    )
     print()
-    print(f"{'beta':>7} {'|annealed - MOM|':>18} {'margin bound':>14} {'bound holds':>12}")
+    print(
+        f"{'beta':>7} {'|annealed - MOM|':>18} {'margin bound':>14} {'bound holds':>12}"
+    )
     alpha = np.array([0.82, 0.55, 0.30, 0.11])
     for beta in (1, 2, 4, 8, 16, 32, 64):
         got = abs(defuzz_annealed(alpha, part, beta) - defuzz_mom(alpha, part))
         bnd = mom_gap_bound(alpha, part, beta)
         print(f"{beta:7d} {got:18.3e} {bnd:14.3e} {str(got <= bnd + 1e-12):>12}")
-    print("  convergence is geometric in r = alpha_(2)/alpha_(1) = "
-          f"{np.sort(alpha)[::-1][1] / np.sort(alpha)[::-1][0]:.3f}.")
+    print(
+        "  convergence is geometric in r = alpha_(2)/alpha_(1) = "
+        f"{np.sort(alpha)[::-1][1] / np.sort(alpha)[::-1][0]:.3f}."
+    )
 
     rule("K. Differentiability of the score in the input variable")
     centers = np.array([0.0, 3.0, 6.0, 9.0])

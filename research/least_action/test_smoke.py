@@ -28,8 +28,17 @@ class TestFit:
     def test_fits_a_smooth_target_to_low_action(self):
         yd_fn, dyd_fn = _sine_targets()
         f = fit(
-            yd_fn, dyd_fn, n_rules=4, x_lo=-3.0, x_hi=3.0, lam=0.1, order=1,
-            n_quad=60, n_restarts=2, polish_rounds=1, seed=0,
+            yd_fn,
+            dyd_fn,
+            n_rules=4,
+            x_lo=-3.0,
+            x_hi=3.0,
+            lam=0.1,
+            order=1,
+            n_quad=60,
+            n_restarts=2,
+            polish_rounds=1,
+            seed=0,
         )
         assert np.isfinite(f.action)
         assert f.action >= 0.0
@@ -40,8 +49,17 @@ class TestFit:
     def test_output_and_derivative_are_finite_on_and_off_the_quadrature_grid(self):
         yd_fn, dyd_fn = _sine_targets()
         f = fit(
-            yd_fn, dyd_fn, n_rules=3, x_lo=-2.0, x_hi=2.0, lam=0.1, order=1,
-            n_quad=40, n_restarts=1, polish_rounds=1, seed=0,
+            yd_fn,
+            dyd_fn,
+            n_rules=3,
+            x_lo=-2.0,
+            x_hi=2.0,
+            lam=0.1,
+            order=1,
+            n_quad=40,
+            n_restarts=1,
+            polish_rounds=1,
+            seed=0,
         )
         x = np.linspace(-2.0, 2.0, 25)
         assert np.all(np.isfinite(f(x)))
@@ -51,8 +69,17 @@ class TestFit:
         yd_fn, dyd_fn = _sine_targets()
         n_rules = 5
         f = fit(
-            yd_fn, dyd_fn, n_rules=n_rules, x_lo=-1.0, x_hi=1.0, lam=0.1,
-            order=1, n_quad=40, n_restarts=1, polish_rounds=1, seed=0,
+            yd_fn,
+            dyd_fn,
+            n_rules=n_rules,
+            x_lo=-1.0,
+            x_hi=1.0,
+            lam=0.1,
+            order=1,
+            n_quad=40,
+            n_restarts=1,
+            polish_rounds=1,
+            seed=0,
         )
         assert np.all(np.diff(f.centers) >= f.min_gap - 1e-9)
         assert np.all(f.centers >= -1.0 - 1e-9)
@@ -61,8 +88,15 @@ class TestFit:
     def test_deterministic_given_seed(self):
         yd_fn, dyd_fn = _sine_targets()
         kwargs = dict(
-            n_rules=3, x_lo=-2.0, x_hi=2.0, lam=0.1, order=1,
-            n_quad=40, n_restarts=2, polish_rounds=1, seed=0,
+            n_rules=3,
+            x_lo=-2.0,
+            x_hi=2.0,
+            lam=0.1,
+            order=1,
+            n_quad=40,
+            n_restarts=2,
+            polish_rounds=1,
+            seed=0,
         )
         f1 = fit(yd_fn, dyd_fn, **kwargs)
         f2 = fit(yd_fn, dyd_fn, **kwargs)
@@ -74,9 +108,19 @@ class TestFit:
         # way to reproduce the rank-deficient failure mode. It must not raise.
         yd_fn, dyd_fn = _sine_targets()
         f = fit(
-            yd_fn, dyd_fn, n_rules=3, x_lo=-2.0, x_hi=2.0, lam=0.1, order=1,
-            n_quad=40, n_restarts=1, polish_rounds=1, seed=0,
-            min_gap=0.0, width_bounds=(1e-3, 10.0),
+            yd_fn,
+            dyd_fn,
+            n_rules=3,
+            x_lo=-2.0,
+            x_hi=2.0,
+            lam=0.1,
+            order=1,
+            n_quad=40,
+            n_restarts=1,
+            polish_rounds=1,
+            seed=0,
+            min_gap=0.0,
+            width_bounds=(1e-3, 10.0),
         )
         assert np.isfinite(f.action)
 
@@ -85,8 +129,17 @@ class TestGalerkinResidual:
     def test_residual_is_small_at_a_converged_fit(self):
         yd_fn, dyd_fn = _sine_targets()
         f = fit(
-            yd_fn, dyd_fn, n_rules=4, x_lo=-3.0, x_hi=3.0, lam=0.1, order=1,
-            n_quad=80, n_restarts=3, polish_rounds=2, seed=0,
+            yd_fn,
+            dyd_fn,
+            n_rules=4,
+            x_lo=-3.0,
+            x_hi=3.0,
+            lam=0.1,
+            order=1,
+            n_quad=80,
+            n_restarts=3,
+            polish_rounds=2,
+            seed=0,
         )
         quad = Quadrature.legendre(-3.0, 3.0, 80)
         residual = galerkin_residual(f, yd_fn, dyd_fn, quad)
@@ -100,8 +153,17 @@ class TestOptimalityCertificate:
     def test_returns_the_documented_keys_and_finite_values(self):
         yd_fn, dyd_fn = _sine_targets()
         f = fit(
-            yd_fn, dyd_fn, n_rules=3, x_lo=-2.0, x_hi=2.0, lam=0.1, order=1,
-            n_quad=60, n_restarts=2, polish_rounds=1, seed=0,
+            yd_fn,
+            dyd_fn,
+            n_rules=3,
+            x_lo=-2.0,
+            x_hi=2.0,
+            lam=0.1,
+            order=1,
+            n_quad=60,
+            n_restarts=2,
+            polish_rounds=1,
+            seed=0,
         )
         quad = Quadrature.legendre(-2.0, 2.0, 60)
         cert = optimality_certificate(f, yd_fn, dyd_fn, quad)

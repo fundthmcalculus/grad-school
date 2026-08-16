@@ -42,22 +42,29 @@ def main() -> None:
 
     print("1. Rational form")
     rng = np.random.default_rng(1)
-    worst = max(abs(rat.evaluate(z) - ctrl(z))
-                for z in (rng.normal(size=4) * 1.2 for _ in range(200)))
+    worst = max(
+        abs(rat.evaluate(z) - ctrl(z))
+        for z in (rng.normal(size=4) * 1.2 for _ in range(200))
+    )
     print(f"   deg P = {rat.degrees()[0]}, deg Q = {rat.degrees()[1]}")
     print(f"   max |P/Q - u_TSK| over 200 states = {worst:.3e}")
 
     print("2. Origin is an equilibrium")
-    print(f"   u(0) = {ctrl(np.zeros(4)):+.3e}   (enforced by the linear "
-          f"constraint in fit_consequents)")
+    print(
+        f"   u(0) = {ctrl(np.zeros(4)):+.3e}   (enforced by the linear "
+        f"constraint in fit_consequents)"
+    )
 
     print("3. Solver comparison on the identical SDP")
-    print(f"   {'solver':>10} {'sigma deg':>10} {'certified':>10} "
-          f"{'min eig':>12} {'relative':>10}")
+    print(
+        f"   {'solver':>10} {'sigma deg':>10} {'certified':>10} "
+        f"{'min eig':>12} {'relative':>10}"
+    )
     for solver in ("SCS", "CLARABEL"):
         for sd in (2, 4):
-            ok, eg, rel = certify_roa(rat, a_mat, b_mat.ravel(), p_lyap, 0.6,
-                                      sigma_degree=sd, solver=solver)
+            ok, eg, rel = certify_roa(
+                rat, a_mat, b_mat.ravel(), p_lyap, 0.6, sigma_degree=sd, solver=solver
+            )
             print(f"   {solver:>10} {sd:>10} {str(ok):>10} {eg:+12.3e} {rel:10.2e}")
     print("   SCS is first-order and bottoms out around 1e-5 relative; the")
     print("   absolute eigenvalue makes that look like gross infeasibility.")
@@ -77,11 +84,15 @@ def main() -> None:
     print(f"   bisection boundary rho     = {rho:.4f}   ({time.time() - t:.0f}s)")
     print(f"   reported rho (5% margin)   = {rho_report:.4f}")
     print(f"   inscribed ball radius      = {np.sqrt(rho_report / lam):.4f}")
-    print(f"   unsaturated radius         = {r_sat:.4f} "
-          f"(sublevel set fits for rho <= {lam * r_sat**2:.4f})")
+    print(
+        f"   unsaturated radius         = {r_sat:.4f} "
+        f"(sublevel set fits for rho <= {lam * r_sat**2:.4f})"
+    )
     print(f"   binding constraint         = Lyapunov, not saturation")
-    print(f"   VERIFIED at reported rho   = {ok}, Gram min eig {eg:+.2e}, "
-          f"relative {rel:.2e}")
+    print(
+        f"   VERIFIED at reported rho   = {ok}, Gram min eig {eg:+.2e}, "
+        f"relative {rel:.2e}"
+    )
 
 
 if __name__ == "__main__":
