@@ -84,18 +84,20 @@ def build():
     Z = linkage(pdist(X), method="single")
     feats = _persistence(Z, n)
 
-    ceiling = float(Z[:, 2].max()) * 1.12       # where the root's death is drawn
+    ceiling = float(Z[:, 2].max()) * 1.12  # where the root's death is drawn
     finite = [(b, d, s) for b, d, s in feats if d is not None]
     # "Real" here means what §2.3 says it means: persistence far above the rest.
     persistences = sorted((d - b for b, d, _ in finite), reverse=True)
     cut = persistences[1] if len(persistences) > 1 else 0.0
 
-    fig, (dend_ax, diag_ax) = F.grid_figure(1, 2, width=F.W_WIDE, height=3.4,
-                                            gridspec_kw={"width_ratios": [1.35, 1]})
+    fig, (dend_ax, diag_ax) = F.grid_figure(
+        1, 2, width=F.W_WIDE, height=3.4, gridspec_kw={"width_ratios": [1.35, 1]}
+    )
 
     # -- left: the dendrogram -------------------------------------------------
-    dd = dendrogram(Z, ax=dend_ax, no_labels=True, color_threshold=0,
-                    above_threshold_color=F.FAINT)
+    dd = dendrogram(
+        Z, ax=dend_ax, no_labels=True, color_threshold=0, above_threshold_color=F.FAINT
+    )
     for coll in dend_ax.collections:
         coll.set_linewidth(1.0)
     # scipy draws each merge as one polyline; recolour the two that matter.
@@ -104,50 +106,93 @@ def build():
         node = min(range(len(Z)), key=lambda i: abs(Z[i, 2] - birth))
         b, d, _ = feats[node]
         if d is not None and (d - b) >= cut:
-            dend_ax.plot(xs, ys, color=F.BLUE, lw=1.8, zorder=4,
-                         solid_capstyle="round")
+            dend_ax.plot(xs, ys, color=F.BLUE, lw=1.8, zorder=4, solid_capstyle="round")
 
-    F.style_axes(dend_ax, title="(a)  single-linkage dendrogram",
-                 ylabel="merge height", grid=True, grid_axis="y")
+    F.style_axes(
+        dend_ax,
+        title="(a)  single-linkage dendrogram",
+        ylabel="merge height",
+        grid=True,
+        grid_axis="y",
+    )
     dend_ax.set_xticks([])
     dend_ax.spines["bottom"].set_visible(False)
     # -- right: the persistence diagram --------------------------------------
     lim = ceiling * 1.05
     diag_ax.plot([0, lim], [0, lim], lw=1.0, ls="--", color=F.FAINT, zorder=1)
-    diag_ax.text(lim * 0.62, lim * 0.58, "birth = death", rotation=45,
-                 ha="center", va="center", fontsize=F.FS_SMALL, color=F.MUTED,
-                 rotation_mode="anchor")
+    diag_ax.text(
+        lim * 0.62,
+        lim * 0.58,
+        "birth = death",
+        rotation=45,
+        ha="center",
+        va="center",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        rotation_mode="anchor",
+    )
 
     noise_b = [b for b, d, _ in finite if (d - b) < cut]
     noise_d = [d for b, d, _ in finite if (d - b) < cut]
     real_b = [b for b, d, _ in finite if (d - b) >= cut]
     real_d = [d for b, d, _ in finite if (d - b) >= cut]
 
-    diag_ax.scatter(noise_b, noise_d, s=22, color=F.FAINT, linewidths=0,
-                    zorder=3, label="short persistence — noise")
-    diag_ax.scatter(real_b, real_d, s=42, color=F.BLUE, linewidths=0,
-                    zorder=4, label="long persistence — the two clusters")
+    diag_ax.scatter(
+        noise_b,
+        noise_d,
+        s=22,
+        color=F.FAINT,
+        linewidths=0,
+        zorder=3,
+        label="short persistence — noise",
+    )
+    diag_ax.scatter(
+        real_b,
+        real_d,
+        s=42,
+        color=F.BLUE,
+        linewidths=0,
+        zorder=4,
+        label="long persistence — the two clusters",
+    )
 
     root_b = next(b for b, d, _ in feats if d is None)
-    diag_ax.scatter([root_b], [ceiling], s=42, facecolor=F.SURFACE,
-                    edgecolor=F.BLUE, linewidths=1.3, zorder=4,
-                    label="the root — dies at $\\infty$")
+    diag_ax.scatter(
+        [root_b],
+        [ceiling],
+        s=42,
+        facecolor=F.SURFACE,
+        edgecolor=F.BLUE,
+        linewidths=1.3,
+        zorder=4,
+        label="the root — dies at $\\infty$",
+    )
 
-    F.style_axes(diag_ax, title="(b)  persistence diagram",
-                 xlabel="birth height", ylabel="death height")
+    F.style_axes(
+        diag_ax,
+        title="(b)  persistence diagram",
+        xlabel="birth height",
+        ylabel="death height",
+    )
     diag_ax.set_xlim(0, lim)
     diag_ax.set_ylim(0, lim)
     diag_ax.set_aspect("equal")
     F.legend(diag_ax, loc="lower right", handletextpad=0.4)
 
-    fig.text(0.5, -0.01,
-             "Persistence is death minus birth: the vertical distance off the "
-             "diagonal. The two clusters form early and survive until the merge "
-             "that joins them,\nso they stand well off it; a noise merge is "
-             "absorbed almost as soon as it forms and sits on it. This is the "
-             "quantity Chapter 5 gates on.",
-             ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
-             linespacing=1.5)
+    fig.text(
+        0.5,
+        -0.01,
+        "Persistence is death minus birth: the vertical distance off the "
+        "diagonal. The two clusters form early and survive until the merge "
+        "that joins them,\nso they stand well off it; a noise merge is "
+        "absorbed almost as soon as it forms and sits on it. This is the "
+        "quantity Chapter 5 gates on.",
+        ha="center",
+        va="top",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.5,
+    )
     fig.tight_layout()
     return fig
 

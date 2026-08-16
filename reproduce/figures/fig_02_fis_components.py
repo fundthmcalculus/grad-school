@@ -36,7 +36,12 @@ def build():
 
     # generated == recovered from the data by this work; fixed == chosen a priori
     stages = [
-        ("Fuzzification", "membership functions\nover each input", True, "Ch. 4, Ch. 5"),
+        (
+            "Fuzzification",
+            "membership functions\nover each input",
+            True,
+            "Ch. 4, Ch. 5",
+        ),
         ("Rule base", "antecedents and\ntheir disjunctions", True, "Ch. 4, Ch. 6"),
         ("Inference and\naggregation", "t-norm, t-conorm\ncomplement", False, "§2.1"),
         ("Defuzzification", "weighted average\nover consequents", False, "§2.1"),
@@ -44,41 +49,84 @@ def build():
 
     for x, (title, body, generated, tag) in zip(xs, stages):
         color = F.BLUE if generated else F.FAINT
-        F.box(ax, x, Y, W, HBOX, title, body, color=color,
-              title_size=F.FS_ANNOT, body_size=F.FS_SMALL - 0.5,
-              fill_amount=0.86 if generated else 0.93)
-        ax.text(x, Y - HBOX / 2 - 4, tag, ha="center", va="center",
-                fontsize=F.FS_SMALL, color=F.MUTED)
+        F.box(
+            ax,
+            x,
+            Y,
+            W,
+            HBOX,
+            title,
+            body,
+            color=color,
+            title_size=F.FS_ANNOT,
+            body_size=F.FS_SMALL - 0.5,
+            fill_amount=0.86 if generated else 0.93,
+        )
+        ax.text(
+            x,
+            Y - HBOX / 2 - 4,
+            tag,
+            ha="center",
+            va="center",
+            fontsize=F.FS_SMALL,
+            color=F.MUTED,
+        )
 
     for a, b in zip(xs, xs[1:]):
         F.arrow(ax, (a + W / 2, Y), (b - W / 2, Y))
 
     # The crisp ends. Drawn as bare labels rather than boxes: they are the
     # signal entering and leaving, not components of the system.
-    ax.text(3.5, Y, "crisp\ninputs", ha="center", va="center", fontsize=F.FS_ANNOT,
-            color=F.INK_2, linespacing=1.4)
+    ax.text(
+        3.5,
+        Y,
+        "crisp\ninputs",
+        ha="center",
+        va="center",
+        fontsize=F.FS_ANNOT,
+        color=F.INK_2,
+        linespacing=1.4,
+    )
     F.arrow(ax, (3.5, Y - 8), (xs[0] - W / 2 - 0.5, Y), connection="arc3,rad=-0.25")
-    ax.text(97, Y, "crisp\noutput", ha="center", va="center", fontsize=F.FS_ANNOT,
-            color=F.INK_2, linespacing=1.4)
+    ax.text(
+        97,
+        Y,
+        "crisp\noutput",
+        ha="center",
+        va="center",
+        fontsize=F.FS_ANNOT,
+        color=F.INK_2,
+        linespacing=1.4,
+    )
     F.arrow(ax, (xs[-1] + W / 2, Y), (97, Y - 8), connection="arc3,rad=0.25")
 
     # The consequents are solved for, but they are not a *stage* -- they hang off
     # the last two boxes, which is where the closed-form solve of §2.1 lands.
-    F.box(ax, (xs[2] + xs[3]) / 2, 27, 2 * W + GAP, 14,
-          "Consequents: closed form, not searched",
-          "TSK output is linear in the coefficients\nfor fixed firing strengths (§2.1)",
-          color=F.BLUE, title_size=F.FS_ANNOT, fill_amount=0.86)
+    F.box(
+        ax,
+        (xs[2] + xs[3]) / 2,
+        27,
+        2 * W + GAP,
+        14,
+        "Consequents: closed form, not searched",
+        "TSK output is linear in the coefficients\nfor fixed firing strengths (§2.1)",
+        color=F.BLUE,
+        title_size=F.FS_ANNOT,
+        fill_amount=0.86,
+    )
     for x in (xs[2], xs[3]):
         F.arrow(ax, (x, Y - HBOX / 2 - 8), (x, 34.5), color=F.GRID, lw=1.0)
 
     # -- legend: two fills, named --------------------------------------------
-    for i, (color, text, fill) in enumerate([
+    for i, (color, text, fill) in enumerate(
+        [
             (F.BLUE, "generated from the data by this work", 0.86),
-            (F.FAINT, "fixed by design — the §2.1 constraints", 0.93)]):
+            (F.FAINT, "fixed by design — the §2.1 constraints", 0.93),
+        ]
+    ):
         y = 11 - i * 7
         F.box(ax, 12, y, 6, 4.2, "", None, color=color, fill_amount=fill, radius=0.9)
-        ax.text(17, y, text, ha="left", va="center", fontsize=F.FS_SMALL,
-                color=F.MUTED)
+        ax.text(17, y, text, ha="left", va="center", fontsize=F.FS_SMALL, color=F.MUTED)
 
     ax.set_ylim(0, 88)
     return fig

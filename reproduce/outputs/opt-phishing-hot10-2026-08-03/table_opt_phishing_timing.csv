@@ -1,0 +1,10 @@
+what,to match the construction (ms),full budget (ms),"cost of matching, ÷ the construction"
+the construction itself,—,114 ± 9,—
+"feature engineering (shared, not training)",—,197 ± 10,—
+hot · scipy-lbfgsb,starts there,63493 ± 1394,—
+hot · scipy-powell,starts there,61771 ± 1318,—
+hot · scipy-de,starts there,26606 ± 17186,—
+hot · opt-ga,starts there,51942 ± 7180,—
+hot · opt-pso,starts there,37800 ± 587,—
+hot · opt-aco,starts there,37558 ± 866,—
+hot · opt-gd,starts there,63482 ± 1147,—

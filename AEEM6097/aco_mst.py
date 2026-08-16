@@ -12,19 +12,41 @@ from numba.cuda.random import create_xoroshiro128p_states, xoroshiro128p_uniform
 from numpy._typing import NDArray
 
 
-def _cuda_ant_mst_solve(n_iter: np.int32, n_ants: np.int32,
-                        alpha: np.float64, beta: np.float64, H: np.float64, L: np.float64,
-                        network_routes: NDArray, city_indices: NDArray, city_links: NDArray, mst_dist: NDArray,
-                        visited_cities: NDArray,
-                        p_mat: NDArray, tau: NDArray, optimal_tour_lengths: NDArray, optimal_links: NDArray):
+def _cuda_ant_mst_solve(
+    n_iter: np.int32,
+    n_ants: np.int32,
+    alpha: np.float64,
+    beta: np.float64,
+    H: np.float64,
+    L: np.float64,
+    network_routes: NDArray,
+    city_indices: NDArray,
+    city_links: NDArray,
+    mst_dist: NDArray,
+    visited_cities: NDArray,
+    p_mat: NDArray,
+    tau: NDArray,
+    optimal_tour_lengths: NDArray,
+    optimal_links: NDArray,
+):
     blocks_per_grid, rng_states, threads_per_block = get_cuda_details(n_ants)
     blk, tpb = compute_cuda_details(p_mat.size)
     for generation in tqdm(range(n_iter), desc="ACO Iteration"):
         _cuda_update_p_mat[blk, tpb](p_mat, tau, network_routes, alpha, beta)
         cuda.synchronize()
-        _cuda_ant_mst[blocks_per_grid, threads_per_block](rng_states, network_routes, p_mat, city_indices, city_links, mst_dist, visited_cities)
+        _cuda_ant_mst[blocks_per_grid, threads_per_block](
+            rng_states,
+            network_routes,
+            p_mat,
+            city_indices,
+            city_links,
+            mst_dist,
+            visited_cities,
+        )
         cuda.synchronize()
-        _cuda_find_optimal_tour_links[blocks_per_grid, threads_per_block](generation, optimal_tour_lengths, city_links, mst_dist, optimal_links)
+        _cuda_find_optimal_tour_links[blocks_per_grid, threads_per_block](
+            generation, optimal_tour_lengths, city_links, mst_dist, optimal_links
+        )
         cuda.synchronize()
         _cuda_update_pheromone[blk, tpb](H, L, optimal_links, tau)
         cuda.synchronize()
@@ -43,13 +65,15 @@ def _cuda_min_mst_dist(mst_dist, chunk=16, stride=1):
 
 
 @cuda.jit
-def _cuda_find_optimal_tour_links(generation, optimal_tour_lengths, city_links, mst_dist, optimal_links):
+def _cuda_find_optimal_tour_links(
+    generation, optimal_tour_lengths, city_links, mst_dist, optimal_links
+):
     pos = get_cuda_pos()
     # Post in-place min, we know only the first call matters
     if pos >= mst_dist.size:
         return
 
-    old_optimal_len = optimal_tour_lengths[generation-1]
+    old_optimal_len = optimal_tour_lengths[generation - 1]
 
     # Get minimum mst_dist using reduction
     optimal_ant_len = mst_dist[0]
@@ -79,11 +103,28 @@ def _cuda_update_p_mat(p_mat, tau, network_routes, alpha, beta):
 
 
 @cuda.jit
-def _cuda_ant_mst(rng_states, network_routes, p_mat, city_indices, city_links2, mst_dist2, visited_cities):
+def _cuda_ant_mst(
+    rng_states,
+    network_routes,
+    p_mat,
+    city_indices,
+    city_links2,
+    mst_dist2,
+    visited_cities,
+):
     pos = get_cuda_pos()
 
     if pos < city_links2.shape[0]:
-        run_ant_mst(rng_states, network_routes, p_mat, city_indices, city_links2, mst_dist2, visited_cities)
+        run_ant_mst(
+            rng_states,
+            network_routes,
+            p_mat,
+            city_indices,
+            city_links2,
+            mst_dist2,
+            visited_cities,
+        )
+
 
 @cuda.jit
 def get_cuda_pos():
@@ -99,7 +140,15 @@ def get_cuda_pos():
 
 
 @cuda.jit
-def run_ant_mst(rng_states, network_routes: NDArray, p_mat: NDArray, city_indices: NDArray, city_links: NDArray, mst_dist: NDArray, visited_cities: NDArray):
+def run_ant_mst(
+    rng_states,
+    network_routes: NDArray,
+    p_mat: NDArray,
+    city_indices: NDArray,
+    city_links: NDArray,
+    mst_dist: NDArray,
+    visited_cities: NDArray,
+):
     pos = get_cuda_pos()
     # Start at city 1, and join each city to the ever-growing spanning tree.
     eta_shape_ = network_routes.shape[0]
@@ -120,7 +169,9 @@ def run_ant_mst(rng_states, network_routes: NDArray, p_mat: NDArray, city_indice
         # Randomly pick a city off the allowlist
         # Do the weighted choice array of where to join to exist
         # Choose which city to attach
-        to_city = _np_choice2(rng_states, city_indices, p_mat[from_city, :], visited_cities[pos, :])
+        to_city = _np_choice2(
+            rng_states, city_indices, p_mat[from_city, :], visited_cities[pos, :]
+        )
         if visited_cities[pos, to_city] == 0:
             # Store in the city-links in low-high order, since we have a bidirectional graph
             city_links[pos, cur_row, 0] = from_city
@@ -137,7 +188,8 @@ def run_ant_mst(rng_states, network_routes: NDArray, p_mat: NDArray, city_indice
 def _np_choice(rng_states, options):
     thread_id = cuda.grid(1)
     r = xoroshiro128p_uniform_float32(rng_states, thread_id)
-    return options[int(len(options)*r)]
+    return options[int(len(options) * r)]
+
 
 @cuda.jit
 def _np_choice2(rng_states, options, p, visited_cities):
@@ -168,7 +220,7 @@ def _np_choice2(rng_states, options, p, visited_cities):
 
 
 @cuda.jit
-def _cuda_update_pheromone(H,L, city_order, tau):
+def _cuda_update_pheromone(H, L, city_order, tau):
     pos = get_cuda_pos()
     if pos >= tau.size:
         return
@@ -177,8 +229,8 @@ def _cuda_update_pheromone(H,L, city_order, tau):
     tau[i, j] = L
     # TODO - This only needs to be done once, but it's a bit tricky to do it in Numba'
     for i in range(len(city_order)):
-        tau[city_order[i,0], city_order[i,1]] = H
-        tau[city_order[i,1], city_order[i,0]] = H
+        tau[city_order[i, 0], city_order[i, 1]] = H
+        tau[city_order[i, 1], city_order[i, 0]] = H
 
 
 def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10):
@@ -191,12 +243,12 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10):
     # H = N^3 * L
     L = 1.0
     N = network_routes.shape[0]
-    H = N ** 3 * L
+    H = N**3 * L
     # Prenormalize
     L /= H
     H = 1.0
     # Default trail level
-    tau = L*np.ones(network_routes.shape)
+    tau = L * np.ones(network_routes.shape)
     # If we have a hot start, preload it 4x
     tour_lengths = []
 
@@ -205,8 +257,8 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10):
     mst_dist = np.zeros(n_ants, dtype=np.float64)
     city_indices = np.arange(N, dtype=np.int32)
     visited_cities = np.zeros((n_ants, N), dtype=np.int32)
-    optimal_links = np.zeros((N-1,2), dtype=np.int32)
-    optimal_tour_lengths = np.inf*np.ones(n_iter, dtype=np.float64)
+    optimal_links = np.zeros((N - 1, 2), dtype=np.int32)
+    optimal_tour_lengths = np.inf * np.ones(n_iter, dtype=np.float64)
     p_mat = np.zeros_like(tau)
 
     nv_city_links = numba.cuda.to_device(city_links)
@@ -230,9 +282,22 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10):
     # nv_tau = (tau)
 
     _cuda_ant_mst_solve(
-         n_iter, n_ants, alpha, beta, H, L,
-        nv_network_routes, nv_city_indices, nv_city_links, nv_mst_dist, nv_visited_cities,
-        nv_p_mat, nv_tau, nv_optimal_tour_lengths, nv_optimal_links)
+        n_iter,
+        n_ants,
+        alpha,
+        beta,
+        H,
+        L,
+        nv_network_routes,
+        nv_city_indices,
+        nv_city_links,
+        nv_mst_dist,
+        nv_visited_cities,
+        nv_p_mat,
+        nv_tau,
+        nv_optimal_tour_lengths,
+        nv_optimal_links,
+    )
 
     # Copy back results from GPU
     # city_links = nv_city_links.copy_to_host()
@@ -247,7 +312,9 @@ def aco_mst_solve(network_routes: np.ndarray, n_ants=10, n_iter=10):
 
 def get_cuda_details(n_ants):
     blocks_per_grid, threads_per_block = compute_cuda_details(n_ants)
-    rng_states = create_xoroshiro128p_states(int(threads_per_block * blocks_per_grid), seed=1)
+    rng_states = create_xoroshiro128p_states(
+        int(threads_per_block * blocks_per_grid), seed=1
+    )
     return blocks_per_grid, rng_states, threads_per_block
 
 

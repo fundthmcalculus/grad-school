@@ -1,0 +1,5 @@
+model,config,dissipation_guard,train_t_end_s,rollout_t_end_s,in_window_rmse_deg,extrap_rmse_deg,extrap_r2,tail_amplitude_ratio,tail_activity_ratio,t_error_10deg_s,guard_corrections,diverged_at_s
+state-space FIS,nb120_full-2nd_quantile,False,10.0,20.0,52.1998,1173.2146,-319.612452,41.0106,5.0131,3.41,0,
+state-space FIS + clipped inputs,nb120_full-2nd_quantile_clipped,False,10.0,20.0,52.1998,32395.8823,-243165.922794,1468.4722,280.0745,3.41,0,
+state-space FIS + dissipation guard,nb120_full-2nd_quantile,True,10.0,20.0,59.0243,91.7142,-1.647464,1.1331,0.0263,2.325,3001,
+physics-basis FIS (grey box),physics-basis-lstsq,False,10.0,20.0,0.0004,0.0004,1.0,1.0,1.0,inf,0,

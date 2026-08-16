@@ -2,3 +2,13 @@
 #   git -C tribble-fis show 8484fd6^:gaussian_mixture/phishing_data/PhiUSIIL_Phishing_URL_Dataset.csv > data/PhiUSIIL_Phishing_URL_Dataset.csv
 # 57 MB, too large to vendor here.
 PhiUSIIL_Phishing_URL_Dataset.csv
+
+# reproduce/regression_scale/'s pilot data: fetched and cached by _datasets.py
+# on first run. Superconductivity now comes from UCI's own static-file host
+# (dataset id 464) directly; California Housing comes from sklearn's own
+# fetcher, cached under sklearn's data_home rather than here (see
+# reproduce/regression_scale/README.md's provenance section, updated
+# 2026-08-11 once archive.ics.uci.edu became reachable again).
+# superconduct_train.csv is ~24 MB, too large to vendor for a pilot that
+# isn't a committed measurement yet.
+regression_scale/

@@ -51,21 +51,64 @@ def _acc(model_factory, Xtr, ytr, Xte, yte):
 
 
 def main():
-    print(f"{'dataset':16s}{'gaussian':>10s}{'TRIBBLE':>10s}{'+coord':>10s}{'+optim':>10s}")
+    print(
+        f"{'dataset':16s}{'gaussian':>10s}{'TRIBBLE':>10s}{'+coord':>10s}{'+optim':>10s}"
+    )
     print("-" * 56)
     for name, (loader, kw) in DATASETS.items():
         d = loader(as_frame=True)
         X, y = d.data, pd.Series(d.target)
         g, t, c, o = [], [], [], []
         for s in SEEDS:
-            Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.33, random_state=s, stratify=y)
-            Xtr = Xtr.reset_index(drop=True); ytr = np.asarray(ytr)
-            g.append(_acc(lambda: MixtureOfGaussiansFuzzyClassifier(random_state=s, **kw), Xtr, ytr, Xte, yte))
-            t.append(_acc(lambda: RuspiniFuzzyClassifier(random_state=s, refine=False, **kw), Xtr, ytr, Xte, yte))
-            c.append(_acc(lambda: RuspiniFuzzyClassifier(random_state=s, refine=True, refine_method="coordinate", **kw), Xtr, ytr, Xte, yte))
-            o.append(_acc(lambda: RuspiniFuzzyClassifier(random_state=s, refine=True, refine_method="optimizers", **kw), Xtr, ytr, Xte, yte))
-        print(f"{name:16s}{np.mean(g):>10.4f}{np.mean(t):>10.4f}{np.mean(c):>10.4f}{np.mean(o):>10.4f}   "
-              f"(refine +{np.mean(c)-np.mean(t):.3f}/+{np.mean(o)-np.mean(t):.3f})")
+            Xtr, Xte, ytr, yte = train_test_split(
+                X, y, test_size=0.33, random_state=s, stratify=y
+            )
+            Xtr = Xtr.reset_index(drop=True)
+            ytr = np.asarray(ytr)
+            g.append(
+                _acc(
+                    lambda: MixtureOfGaussiansFuzzyClassifier(random_state=s, **kw),
+                    Xtr,
+                    ytr,
+                    Xte,
+                    yte,
+                )
+            )
+            t.append(
+                _acc(
+                    lambda: RuspiniFuzzyClassifier(random_state=s, refine=False, **kw),
+                    Xtr,
+                    ytr,
+                    Xte,
+                    yte,
+                )
+            )
+            c.append(
+                _acc(
+                    lambda: RuspiniFuzzyClassifier(
+                        random_state=s, refine=True, refine_method="coordinate", **kw
+                    ),
+                    Xtr,
+                    ytr,
+                    Xte,
+                    yte,
+                )
+            )
+            o.append(
+                _acc(
+                    lambda: RuspiniFuzzyClassifier(
+                        random_state=s, refine=True, refine_method="optimizers", **kw
+                    ),
+                    Xtr,
+                    ytr,
+                    Xte,
+                    yte,
+                )
+            )
+        print(
+            f"{name:16s}{np.mean(g):>10.4f}{np.mean(t):>10.4f}{np.mean(c):>10.4f}{np.mean(o):>10.4f}   "
+            f"(refine +{np.mean(c)-np.mean(t):.3f}/+{np.mean(o)-np.mean(t):.3f})"
+        )
 
 
 if __name__ == "__main__":

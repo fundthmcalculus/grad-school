@@ -94,31 +94,69 @@ def memory_reduction():
     print("wrote memory_reduction.png")
 
 
-# 3. GPU FCM — documented (benchmarks/gpu_fcm.md), m=2, k=10, d=20.
+# 3. GPU FCM, m=2, k=10, d=20. Ten seeds, from
+# reproduce/outputs/uniform-2026-08-03/table_3_4_gpu_speedups.csv.
+#
+# This used to plot one CPU arm at [1480, 4759, 15933] ms against the GPU and
+# annotate 32x/44x/56x, titled "30-56x". Two things were wrong with that. The
+# single-run numbers do not reproduce -- ten seeds give 13.2x/25.3x/39.2x against
+# the SAME CPU arm across three archives -- and, more importantly, that arm is
+# `fcm.fuzzy_c_means`, which computes distances by NumPy broadcasting and
+# materialises (n,k,d) and (n,k,k) temporaries. The legend said "NumPy/BLAS",
+# which described the arm that was NOT being plotted: run the GPU kernel's own
+# gram-plus-two-GEMM formulation on the CPU and the device win is 1.2x-3.7x.
+#
+# So both CPU arms are drawn now, because the gap between them IS the finding:
+# most of the apparent GPU advantage was a formulation available on the CPU for
+# free. Error bars are the ten-seed standard deviation, and they are wide on the
+# broadcasting arm on purpose -- iteration count to the fixed point ranges from 11
+# to the 100-iteration cap, so its spread is as large as its mean and no single
+# run of it means anything.
 def gpu_fcm():
     n = [50000, 200000, 500000]
-    cpu = [1480, 4759, 15933]
-    gpu = [46, 108, 286]
+    cpu_bcast = [2314.8, 10563.6, 29186.8]  # fcm.fuzzy_c_means (broadcasting)
+    cpu_bcast_sd = [2009.5, 10554.9, 25994.9]
+    cpu_blas = [217.1, 981.9, 2762.6]  # gram + 2 GEMM, the GPU's formulation
+    cpu_blas_sd = [180.4, 985.6, 2440.3]
+    gpu = [175.7, 417.2, 745.4]
+    gpu_sd = [115.6, 174.7, 410.6]
     fig, ax = plt.subplots(figsize=(7.5, 5))
-    ax.plot(n, cpu, "o-", label="CPU FCM (NumPy/BLAS, 32 cores)")
-    ax.plot(n, gpu, "v-", label="GPU FCM (CuPy, data-resident)")
+    ax.errorbar(
+        n,
+        cpu_bcast,
+        yerr=cpu_bcast_sd,
+        fmt="o-",
+        capsize=3,
+        label="CPU FCM (NumPy broadcasting — different formulation)",
+    )
+    ax.errorbar(
+        n,
+        cpu_blas,
+        yerr=cpu_blas_sd,
+        fmt="s-",
+        capsize=3,
+        label="CPU FCM (gram + 2 GEMM — matched formulation)",
+    )
+    ax.errorbar(
+        n, gpu, yerr=gpu_sd, fmt="v-", capsize=3, label="GPU FCM (CuPy, data-resident)"
+    )
     ax.set_xscale("log")
     ax.set_yscale("log")
-    for x, c, g in zip(n, cpu, gpu):
+    for x, c, g in zip(n, cpu_blas, gpu):
         ax.annotate(
-            f"{c/g:.0f}x",
+            f"{c/g:.2f}x",
             (x, g),
             textcoords="offset points",
-            xytext=(0, -15),
+            xytext=(0, -16),
             ha="center",
             fontsize=10,
             color="tab:green",
         )
     ax.set_xlabel("n (samples)")
     ax.set_ylabel("fit time (ms)")
-    ax.set_title("GPU Fuzzy-C-Means — 30–56× (data-resident iteration, k=10, d=20)")
+    ax.set_title("GPU Fuzzy-C-Means — 1.2–3.7× at matched work (k=10, d=20, 10 seeds)")
     ax.grid(True, which="both", alpha=0.3)
-    ax.legend()
+    ax.legend(fontsize=8)
     fig.tight_layout()
     fig.savefig(FIG_DIR / "gpu_fcm_speedup.png", dpi=120)
     plt.close(fig)

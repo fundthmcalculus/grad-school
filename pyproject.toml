@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "grad-school"
+version = "0.1.0"
+description = "Graduate school research and coursework"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.4.6",
+    "plotly~=6.0.1",
+    "scipy~=1.15.2",
+    "sympy~=1.14.0",
+    "tqdm~=4.67.1",
+    "joblib~=1.5.0",
+    "pandas~=2.2.3",
+    "scikit-learn~=1.6.1",
+    "fuzzy-c-means",
+    "xlrd",
+    "matplotlib~=3.10.1",
+    "ucimlrepo",
+    "cvxpy",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "Flake8-pyproject",
+    "mypy",
+]
+cuda = [
+    "numba-cuda[cu12]",
+]
+
+[tool.black]
+target-version = ["py311"]
+
+[tool.flake8]
+max-line-length = 120
+exclude = [".git", "__pycache__", "build", "dist", ".eggs", ".tox", ".venv", ".hatch"]
+extend-ignore = ["E203"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_redundant_casts = true
+
+# This repo is a collection of research/coursework scripts, not an importable
+# `grad_school` package -- there's no directory matching that name for
+# hatchling's default wheel builder to select, so `pip install -e .` /
+# `uv sync` fail outright without this. `bypass-selection` tells hatchling
+# the wheel has no package content of its own; `[project.dependencies]`
+# above is still installed normally, which is the only thing this file is
+# actually used for.
+[tool.hatch.build.targets.wheel]
+bypass-selection = true

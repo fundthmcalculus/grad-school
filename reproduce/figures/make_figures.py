@@ -29,11 +29,19 @@ import shutil
 import subprocess
 import sys
 
+# This driver prints figure titles and skip reasons straight from registry.py,
+# which is prose and will acquire a ± or a ² the moment someone writes one.
+# Windows defaults stdout to cp1252, so that would kill the driver in its own
+# progress print after drawing the figures -- the failure shape `build_pdf.py`,
+# the harness emitters and the Chapter 5 driver each hit separately.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 
-from registry import FIGURES, BY_NAME, harness_name  # noqa: E402
+from registry import FIGURES, BY_NAME, harness_name, prose_figures  # noqa: E402
 
 FIG_OUT = os.path.join(ROOT, "reproduce", "outputs", "figures")
 PROSE_FIG = os.path.join(ROOT, "research", "proposal-defense", "prose", "fig")
@@ -50,6 +58,38 @@ def command(fig):
     return cmd
 
 
+def environment(fig):
+    """The subprocess environment for one generator.
+
+    A figure that declares an `archive` gets it as `REPRO_ARCHIVE`, which is how
+    `harness_data` pins the run it reads. Unpinned, that module resolves to the
+    newest archive by `generated:` stamp and then to the loose files in
+    `reproduce/outputs/` -- correct for a figure drawn from `run_all_tables.sh`,
+    and wrong for one drawn from a study the sweep does not run, because the
+    newest sweep archive never carries that study's tables and the loose files are
+    gitignored. That combination is why the six study generators raised
+    FileNotFoundError from a clean checkout.
+
+    A registry pin BEATS an ambient `REPRO_ARCHIVE`, and that ordering is
+    deliberate. It used to be the other way round, so
+    `REPRO_ARCHIVE=<sweep-label> make_figures.py` -- the obvious way to redraw a
+    document against one run -- silently repointed all six pinned study figures at
+    a sweep archive that does not contain their tables. Here that failed loudly,
+    five FileNotFoundErrors in a row. It would not have: a study CSV whose name
+    collides with a sweep table would have been read instead, and the figure would
+    have been drawn from the wrong experiment without a word.
+
+    A pin means the figure comes from a study the sweep does not run, so no sweep
+    label can be the right answer for it. Unpinned figures still follow the
+    caller's `REPRO_ARCHIVE`, which is the case that override exists for. Use
+    `--only <name>` to redraw a pinned figure against something else.
+    """
+    env = dict(os.environ)
+    if fig.archive:
+        env["REPRO_ARCHIVE"] = fig.archive
+    return env
+
+
 def show_inventory():
     width = max(len(f.name) for f in FIGURES)
     print(f"{'fig':>5}  {'file':<{width}}  status")
@@ -62,10 +102,26 @@ def show_inventory():
         else:
             env = f.project or "bare env"
             status = f"{f.module}.py  [{env}]"
+        # The archive is part of the status, not a footnote: two of these figures
+        # would draw silently from a different run if it were unset.
+        if f.archive:
+            status += f"  <- {f.archive}"
         print(f"{f.number:>5}  {f.name:<{width}}  {status}")
+        if f.document:
+            print(f"{'':>5}  {'':<{width}}  illustrates {f.document}")
+
+    prose = prose_figures()
+    study = [f for f in FIGURES if f.document is not None]
     drawn = sum(1 for f in FIGURES if f.skip is None)
-    print(f"\n{drawn} of {len(FIGURES)} figures have a generator; "
-          f"{len(FIGURES) - drawn} skipped.")
+    print(
+        f"\n{drawn} of {len(FIGURES)} figures have a generator; "
+        f"{len(FIGURES) - drawn} skipped."
+    )
+    print(
+        f"{len(prose)} are the proposal's own (installed into prose/fig/); "
+        f"{len(study)} illustrate a study write-up and stay under "
+        f"{os.path.relpath(FIG_OUT, ROOT)}."
+    )
 
 
 def install(names):
@@ -82,12 +138,16 @@ def install(names):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("only", nargs="*", help="figure names; default is all of them")
     ap.add_argument("--list", action="store_true", help="show the inventory and exit")
-    ap.add_argument("--no-install", action="store_true",
-                    help="do not copy the result into prose/fig/")
+    ap.add_argument(
+        "--no-install",
+        action="store_true",
+        help="do not copy the result into prose/fig/",
+    )
     args = ap.parse_args()
 
     if args.list:
@@ -96,8 +156,11 @@ def main():
 
     unknown = [n for n in args.only if n not in BY_NAME]
     if unknown:
-        print(f"unknown figure(s): {', '.join(unknown)}\n"
-              f"run with --list to see the inventory", file=sys.stderr)
+        print(
+            f"unknown figure(s): {', '.join(unknown)}\n"
+            f"run with --list to see the inventory",
+            file=sys.stderr,
+        )
         return 2
 
     wanted = [BY_NAME[n] for n in args.only] if args.only else list(FIGURES)
@@ -115,17 +178,30 @@ def main():
             continue
 
         print(f"[run ] {fig.name} (Fig {fig.number}) -- {fig.title}")
-        proc = subprocess.run(command(fig), cwd=ROOT)
+        proc = subprocess.run(command(fig), cwd=ROOT, env=environment(fig))
         if proc.returncode == 0:
             made.append(fig)
         else:
             failed.append(fig)
             print(f"[FAIL] {fig.name} exited {proc.returncode}", file=sys.stderr)
 
+    # Only the proposal's own figures are installed. A study figure lives beside
+    # the write-up it illustrates, under reproduce/outputs/figures/; copying it
+    # into prose/fig/ would commit twelve files the document never cites.
     if made and not args.no_install:
-        n = install([f.name for f in made])
-        print(f"\ninstalled {n} file(s) into "
-              f"{os.path.relpath(PROSE_FIG, ROOT)}")
+        prose_names = {f.name for f in prose_figures()}
+        installable = [f.name for f in made if f.name in prose_names]
+        n = install(installable)
+        held = len(made) - len(installable)
+        print(
+            f"\ninstalled {n} file(s) into "
+            f"{os.path.relpath(PROSE_FIG, ROOT)}"
+            + (
+                f"; {held} study figure(s) left in " f"{os.path.relpath(FIG_OUT, ROOT)}"
+                if held
+                else ""
+            )
+        )
 
     print(f"\n{len(made)} drawn, {len(skipped)} skipped, {len(failed)} failed")
     for f in failed:

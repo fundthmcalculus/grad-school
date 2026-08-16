@@ -22,6 +22,7 @@ from scipy.spatial.distance import squareform
 @dataclass
 class RuspiniMF:
     """A Ruspini membership function with partition properties."""
+
     cluster_id: int
     medoid_idx: int
     members: Set[int]
@@ -44,9 +45,15 @@ class RuspiniPartitionExtractor:
     def __init__(self, verbose: bool = False):
         self.verbose = verbose
 
-    def extract_partition(self, Dstar: np.ndarray, blocks: List[Set[int]],
-                         medoids: List[int], birth_death: Dict[int, Tuple[float, float]],
-                         normalize: bool = True, extend_support: bool = True) -> Tuple[List[RuspiniMF], np.ndarray]:
+    def extract_partition(
+        self,
+        Dstar: np.ndarray,
+        blocks: List[Set[int]],
+        medoids: List[int],
+        birth_death: Dict[int, Tuple[float, float]],
+        normalize: bool = True,
+        extend_support: bool = True,
+    ) -> Tuple[List[RuspiniMF], np.ndarray]:
         """
         Extract a Ruspini partition from VAT blocks.
 
@@ -109,13 +116,15 @@ class RuspiniPartitionExtractor:
                 birth_height=h_b,
                 death_height=h_d,
                 center_dissim=float(center_dissim),
-                support_width=float(support_width)
+                support_width=float(support_width),
             )
             mf_list.append(mf)
 
             if self.verbose:
-                print(f"Cluster {cluster_id}: center_d={center_dissim:.4f}, "
-                      f"support_width={support_width:.4f}, coverage={np.sum(mu[:, cluster_id] > 0)}")
+                print(
+                    f"Cluster {cluster_id}: center_d={center_dissim:.4f}, "
+                    f"support_width={support_width:.4f}, coverage={np.sum(mu[:, cluster_id] > 0)}"
+                )
 
         # Step 2 (optional): Extend support to ensure every point has membership
         if extend_support:
@@ -124,7 +133,9 @@ class RuspiniPartitionExtractor:
                 row_sum = np.sum(mu[i, :])
                 if row_sum == 0:
                     # Point is outside all supports; assign to nearest cluster
-                    distances_to_medoids = np.array([Dstar[mf.medoid_idx, i] for mf in mf_list])
+                    distances_to_medoids = np.array(
+                        [Dstar[mf.medoid_idx, i] for mf in mf_list]
+                    )
                     nearest = np.argmin(distances_to_medoids)
                     # Give it a small non-zero membership to the nearest cluster
                     mu[i, nearest] = 0.01
@@ -152,8 +163,13 @@ class RuspiniPartitionExtractor:
         mu_normalized = mu / row_sums
         return mu_normalized
 
-    def evaluate_membership(self, mf_list: List[RuspiniMF], Dstar: np.ndarray,
-                           point_idx: int, mu_normalized: np.ndarray = None) -> np.ndarray:
+    def evaluate_membership(
+        self,
+        mf_list: List[RuspiniMF],
+        Dstar: np.ndarray,
+        point_idx: int,
+        mu_normalized: np.ndarray = None,
+    ) -> np.ndarray:
         """
         Evaluate membership of a single point across all clusters.
 
@@ -199,8 +215,9 @@ class RuspiniPartitionExtractor:
         """
         return np.argmax(mu, axis=1)
 
-    def defuzzify_proximity_tiebreak(self, mu: np.ndarray, Dstar: np.ndarray,
-                                      mf_list: List[RuspiniMF]) -> np.ndarray:
+    def defuzzify_proximity_tiebreak(
+        self, mu: np.ndarray, Dstar: np.ndarray, mf_list: List[RuspiniMF]
+    ) -> np.ndarray:
         """
         Defuzzify using max membership, with distance-based tie-breaking.
 
@@ -230,7 +247,9 @@ class RuspiniPartitionExtractor:
                 assignments[i] = candidates[0]
             else:
                 # Tie-break by distance to medoid
-                distances = np.array([Dstar[mf_list[c].medoid_idx, i] for c in candidates])
+                distances = np.array(
+                    [Dstar[mf_list[c].medoid_idx, i] for c in candidates]
+                )
                 assignments[i] = candidates[np.argmin(distances)]
 
         return assignments
@@ -263,8 +282,12 @@ class RuspiniPartitionExtractor:
         max_per_point = np.max(mu, axis=1)
         return float(np.mean(max_per_point >= threshold))
 
-    def ruspini_parameters(self, mf_list: List[RuspiniMF], X: np.ndarray = None,
-                          feature_names: List[str] = None) -> Dict:
+    def ruspini_parameters(
+        self,
+        mf_list: List[RuspiniMF],
+        X: np.ndarray = None,
+        feature_names: List[str] = None,
+    ) -> Dict:
         """
         Extract Ruspini parameters for linguistic interpretation.
 
@@ -280,24 +303,24 @@ class RuspiniPartitionExtractor:
 
         for mf in mf_list:
             cluster_params = {
-                'cluster_id': mf.cluster_id,
-                'medoid_idx': mf.medoid_idx,
-                'center_dissim': mf.center_dissim,
-                'support_width': mf.support_width,
-                'birth_height': mf.birth_height,
-                'death_height': mf.death_height,
-                'num_members': len(mf.members),
+                "cluster_id": mf.cluster_id,
+                "medoid_idx": mf.medoid_idx,
+                "center_dissim": mf.center_dissim,
+                "support_width": mf.support_width,
+                "birth_height": mf.birth_height,
+                "death_height": mf.death_height,
+                "num_members": len(mf.members),
             }
 
             # If feature data provided, compute feature-space statistics
             if X is not None:
                 members_array = np.array(sorted(list(mf.members)))
                 X_block = X[members_array, :]
-                cluster_params['center_features'] = np.mean(X_block, axis=0).tolist()
-                cluster_params['std_features'] = np.std(X_block, axis=0).tolist()
+                cluster_params["center_features"] = np.mean(X_block, axis=0).tolist()
+                cluster_params["std_features"] = np.std(X_block, axis=0).tolist()
 
                 if feature_names is not None:
-                    cluster_params['feature_names'] = feature_names
+                    cluster_params["feature_names"] = feature_names
 
             params[mf.cluster_id] = cluster_params
 
@@ -320,10 +343,12 @@ class RuspiniPartitionExtractor:
         desc += f" center_dissim={p.get('center_dissim', np.nan):.4f}"
         desc += f" support_width={p.get('support_width', np.nan):.4f}"
 
-        if 'center_features' in p and 'feature_names' in p:
-            center_feat = p['center_features']
-            feature_names = p['feature_names']
-            feat_str = ", ".join([f"{name}={c:.2f}" for name, c in zip(feature_names, center_feat)])
+        if "center_features" in p and "feature_names" in p:
+            center_feat = p["center_features"]
+            feature_names = p["feature_names"]
+            feat_str = ", ".join(
+                [f"{name}={c:.2f}" for name, c in zip(feature_names, center_feat)]
+            )
             desc += f" [features: {feat_str}]"
 
         return desc
@@ -333,8 +358,10 @@ class RuspiniPartitionExtractor:
 # Integration with existing selection module
 # ============================================================================
 
-def extract_ruspini_from_blocks(Dstar: np.ndarray, blocks: List[Dict],
-                                 X: np.ndarray = None) -> Tuple[List[RuspiniMF], np.ndarray]:
+
+def extract_ruspini_from_blocks(
+    Dstar: np.ndarray, blocks: List[Dict], X: np.ndarray = None
+) -> Tuple[List[RuspiniMF], np.ndarray]:
     """
     Convenience function: extract Ruspini partition from selection.py blocks.
 
@@ -350,14 +377,15 @@ def extract_ruspini_from_blocks(Dstar: np.ndarray, blocks: List[Dict],
         (mf_list, mu_normalized) from RuspiniPartitionExtractor
     """
     # Convert block dicts to the format expected by RuspiniPartitionExtractor
-    block_sets = [set(b['members']) for b in blocks]
-    medoids = [b.get('medoid_idx', list(b['members'])[0]) for b in blocks]
+    block_sets = [set(b["members"]) for b in blocks]
+    medoids = [b.get("medoid_idx", list(b["members"])[0]) for b in blocks]
     birth_death = {
-        i: (b.get('birth', 0.0), b.get('death', np.inf))
-        for i, b in enumerate(blocks)
+        i: (b.get("birth", 0.0), b.get("death", np.inf)) for i, b in enumerate(blocks)
     }
 
     extractor = RuspiniPartitionExtractor(verbose=False)
-    mf_list, mu = extractor.extract_partition(Dstar, block_sets, medoids, birth_death, normalize=True)
+    mf_list, mu = extractor.extract_partition(
+        Dstar, block_sets, medoids, birth_death, normalize=True
+    )
 
     return mf_list, mu

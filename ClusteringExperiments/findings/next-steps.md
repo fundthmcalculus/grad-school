@@ -51,7 +51,7 @@ built ⇒ fast/parallel/approximate VAT = fast/parallel/approximate MST.
 |---|---|---|
 | In-place iVAT 3→1 matrices; n=64k f64 now runs; max n 52k→89k | exact, tested | PR #17/#18, `performance-report.md` §2 |
 | Silent correctness bug in old in-place permutation, fixed | fixed | PR #18, `HARDENING`/commit |
-| GPU FCM 30–56× | same fixed point | PR #20, `benchmarks/gpu_fcm.md` |
+| GPU FCM 1.24–3.71× (matched) | same fixed point | PR #20, `benchmarks/gpu_fcm.md` |
 | GPU pairwise wins only high-d/f32 (honest negative elsewhere) | exact | PR #19, `benchmarks/gpu_pairwise.md` |
 | Exact GPU-Borůvka MST ~5× (grows with n); on-device front-end 4.8–6.6× | exact | PR #22/#23, `experiments/findings/BORUVKA_VAT_FINDINGS.md` |
 | Divide-and-conquer spectrum (naive ~N² but quality collapses) | measured | PR #25, `experiments/findings/DC_VAT_SCALING_FINDINGS.md` |

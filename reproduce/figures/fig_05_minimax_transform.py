@@ -44,8 +44,8 @@ sys.path.insert(0, os.path.join(REPO, "gated-minimax-selection"))
 
 
 def build():
-    import battery as B          # noqa: E402  -- needs the path insert above
-    import ivat_mf as im         # noqa: E402
+    import battery as B  # noqa: E402  -- needs the path insert above
+    import ivat_mf as im  # noqa: E402
 
     X, y = B.concentric_rings()
     D = im.dissimilarity(X)
@@ -61,43 +61,58 @@ def build():
 
     for k, color in enumerate((F.BLUE, F.ORANGE)):
         pts = X[y == k]
-        scatter.scatter(pts[:, 0], pts[:, 1], s=6, linewidths=0, color=color,
-                        zorder=3)
+        scatter.scatter(pts[:, 0], pts[:, 1], s=6, linewidths=0, color=color, zorder=3)
     scatter.set_aspect("equal")
     scatter.set_xticks([])
     scatter.set_yticks([])
     for s in scatter.spines.values():
         s.set_color(F.AXIS)
         s.set_linewidth(0.8)
-    scatter.set_title(f"(a)  two rings, $n$ = {len(X)}", fontsize=F.FS_LABEL,
-                      color=F.INK, pad=6)
+    scatter.set_title(
+        f"(a)  two rings, $n$ = {len(X)}", fontsize=F.FS_LABEL, color=F.INK, pad=6
+    )
 
     F.imshow_matrix(raw, D, title="(b)  raw dissimilarity $D$")
     F.imshow_matrix(star, Dstar, title="(c)  minimax transform $D^*$")
 
-    for ax, ari, text in ((raw, ari_raw, "relational FCM"),
-                          (star, ari_star, "relational FCM")):
-        ax.text(0.5, -0.09, f"{text}   ARI = {ari:.2f}", transform=ax.transAxes,
-                ha="center", va="top", fontsize=F.FS_ANNOT,
-                color=F.shade(F.BLUE if ari > 0.5 else F.ORANGE, 0.25),
-                fontweight="bold")
+    for ax, ari, text in (
+        (raw, ari_raw, "relational FCM"),
+        (star, ari_star, "relational FCM"),
+    ):
+        ax.text(
+            0.5,
+            -0.09,
+            f"{text}   ARI = {ari:.2f}",
+            transform=ax.transAxes,
+            ha="center",
+            va="top",
+            fontsize=F.FS_ANNOT,
+            color=F.shade(F.BLUE if ari > 0.5 else F.ORANGE, 0.25),
+            fontweight="bold",
+        )
 
     # The measurable reason the raw panel fails, rather than an assertion about it.
     outer = y == 1
     within_outer = D[np.ix_(outer, outer)].max()
     across = D[np.ix_(~outer, outer)].min()
 
-    fig.text(0.5, -0.05,
-             "Same points, same ordering, same algorithm — only the dissimilarity "
-             "changes. Under $D$ the inner ring reads as a block and the outer one "
-             f"does not: its own\nwithin-ring distances reach {within_outer:.1f} while "
-             f"the nearest inner-to-outer distance is {across:.1f}, which is the "
-             "configuration no Euclidean prototype can resolve. Under the\nbottleneck "
-             "ultrametric $D^*$ both separate, and the score moves from chance to "
-             f"exact. The transform, not the selector, is what does this. "
-             f"{H.provenance_note(label)}",
-             ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
-             linespacing=1.5)
+    fig.text(
+        0.5,
+        -0.05,
+        "Same points, same ordering, same algorithm — only the dissimilarity "
+        "changes. Under $D$ the inner ring reads as a block and the outer one "
+        f"does not: its own\nwithin-ring distances reach {within_outer:.1f} while "
+        f"the nearest inner-to-outer distance is {across:.1f}, which is the "
+        "configuration no Euclidean prototype can resolve. Under the\nbottleneck "
+        "ultrametric $D^*$ both separate, and the score moves from chance to "
+        f"exact. The transform, not the selector, is what does this. "
+        f"{H.provenance_note(label)}",
+        ha="center",
+        va="top",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.5,
+    )
     return fig
 
 

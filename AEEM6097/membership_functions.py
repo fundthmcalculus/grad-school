@@ -147,7 +147,9 @@ def create_uniform_triangle_memberships(
     if isinstance(name, str):
         name = [f"{name}-{i}" for i in range(n_fcns)]
     spacing = (x1 - x0) / (n_fcns - 1)
-    all_mus: list[LeftShoulderMF | TriangularMF | RightShoulderMF] = [LeftShoulderMF(name[0], x0, x0 + spacing)]
+    all_mus: list[LeftShoulderMF | TriangularMF | RightShoulderMF] = [
+        LeftShoulderMF(name[0], x0, x0 + spacing)
+    ]
     for ij in range(1, n_fcns - 1):
         all_mus.append(
             TriangularMF(
@@ -209,7 +211,7 @@ class GuassianMF(MembershipFunction):
         self.b = b
 
     def mu(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        return np.exp(-((x-self.a) / self.b)**2)
+        return np.exp(-(((x - self.a) / self.b) ** 2))
 
     def domain(self) -> NDArray[np.float64]:
         # TODO - Handle the long-tail of the distribution, since the domain is technically [-inf, inf]
@@ -222,9 +224,9 @@ class GuassianMF(MembershipFunction):
     def inverse_mu(self, y: NDArray[np.float64]) -> NDArray[np.float64]:
         # Y = exp(- (x-a)^2 /b^2)
         # TODO - Handle the other side option.
-        return np.sqrt(-self.b**2 * np.log(y))+self.a
+        return np.sqrt(-self.b**2 * np.log(y)) + self.a
 
     def d_dx(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        return self.mu(x) * -2.0*(x-self.a)/self.b
+        return self.mu(x) * -2.0 * (x - self.a) / self.b
 
     # TODO - Gradient and Hessian!
