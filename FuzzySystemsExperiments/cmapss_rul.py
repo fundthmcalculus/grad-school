@@ -356,10 +356,15 @@ D_GRID = dict(
     # excluded here rather than included as a guaranteed-bad grid point.
     # n_output_buckets>2 and output_partition='quantile' were also probed
     # and consistently hurt (16+ RMSE) -- left at their defaults, not swept.
-    # consequent_basis='gaussian-rbf' has a separate, serious bug: combined
-    # with any tsk_order other than '0th' it tries to build an O(n_rules *
-    # n_firing_rows) center array and OOMs requesting tens of terabytes --
-    # filed as tribble-fis#130; excluded from this grid entirely.
+    # consequent_basis='gaussian-rbf' isn't in this grid, but not because
+    # it's still broken -- tribble-fis#130 (compute_rbf_centers exploding to
+    # n_centers**n_features) was fixed upstream (058501f) and confirmed
+    # working here: no more OOM, ~0.65s fits. Manually tuned rbf_gamma
+    # (0.003-0.01) and rbf_n_centers=8 across all 3 pipelines afterward, and
+    # it's a real, safe basis option now -- just not a winner on this
+    # dataset, landing close behind but consistently behind the raw/
+    # orthogonal-basis champion above (12.48 vs. 8.83; 19.35 vs. 19.12;
+    # 21.91 vs. 21.66). Left out of the grid on merit, not on the old bug.
     norm_conorm=["probability", "hamacher"],
     l2_reg=[1e-6, 0.01],
 )
