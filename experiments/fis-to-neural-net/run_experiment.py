@@ -33,7 +33,6 @@ import platform
 import subprocess
 import sys
 import time
-from dataclasses import asdict
 
 import numpy as np
 import pandas as pd
@@ -49,7 +48,9 @@ from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 from tribblefis.triangle_fit import fit_triangles_to_mixture  # noqa: E402
 from tribblefis.regression import predict_tsk  # noqa: E402
 
-SEEDS = [int(s) for s in os.environ.get("FIS2NN_SEEDS", "0,1,2,3,4,5,6,7,8,9").split(",")]
+SEEDS = [
+    int(s) for s in os.environ.get("FIS2NN_SEEDS", "0,1,2,3,4,5,6,7,8,9").split(",")
+]
 
 # Learning rates swept per arm, on an inner validation split of the training
 # fold of the *first* seed only, then pinned for the rest of that dataset's
@@ -70,8 +71,8 @@ LR_GRID = (3e-4, 1e-3, 3e-3, 1e-2)
 # did: on WEC that is 8 columns out of 301, handed to the control for free.
 # `quantile-all` and `he-all` therefore run on every raw column, which is the
 # from-scratch baseline a practitioner actually faces.
-ARMS = ("hot", "quantile", "elm", "he", "quantile-all", "he-all")
-FIS_FEATURE_ARMS = {"hot", "quantile", "elm", "he"}
+ARMS = ("hot-analytic", "hot", "quantile", "elm", "he", "he-all")
+FIS_FEATURE_ARMS = {"hot-analytic", "hot", "quantile", "elm", "he"}
 
 # `fis_kwargs` reaches TribbleRegressor untouched.
 #
@@ -82,14 +83,35 @@ FIS_FEATURE_ARMS = {"hot", "quantile", "elm", "he"}
 # hidden layer with 2.6M parameters in W1, ~300x the training set. Capping the
 # FIS's own feature selection is the natural knob, and it is the FIS's knob,
 # not one this experiment invented.
+# Ordered smallest first. `synth1d` is where the conversion is an identity
+# rather than a projection, so it is the rung that proves the process before
+# anything is claimed about the rungs above it.
 DATASETS = {
-    "concrete": dict(loader=fm.load_concrete, buckets=4, order="1st", sample=None,
-                     fis_kwargs={}),
-    "bikeshare": dict(loader=None, buckets=5, order="1st", sample=None,
-                      fis_kwargs={}),
-    "wec": dict(loader=None, buckets=4, order="1st", sample=None,
-                fis_kwargs={"top_n": 12}),
+    "synth1d": dict(loader=None, buckets=6, order="1st", sample=None, fis_kwargs={}),
+    "concrete": dict(
+        loader=fm.load_concrete, buckets=4, order="1st", sample=None, fis_kwargs={}
+    ),
+    "wec": dict(
+        loader=None, buckets=4, order="1st", sample=None, fis_kwargs={"top_n": 12}
+    ),
+    "bikeshare": dict(loader=None, buckets=5, order="1st", sample=None, fis_kwargs={}),
 }
+
+
+def load_synth1d(n=600, noise=0.05, seed=12345):
+    """One input, one output, known shape: the rung where the theorem bites.
+
+    With a single feature the partial-dependence profile the seed is backed out
+    of *is* the FIS's own function, so `hot-analytic` should land on the FIS
+    almost exactly, with no labels consulted. If it does not, the conversion is
+    wrong and nothing measured on the wider datasets means anything.
+    """
+    rng = np.random.default_rng(seed)
+    x = rng.uniform(0.0, 1.0, size=n)
+    y = np.sin(6.0 * x) * np.exp(-x) + 0.5 * x + rng.normal(0.0, noise, size=n)
+    X = pd.DataFrame({"x": x})
+    ys = pd.Series(y, name="y_value")
+    return X, ys
 
 
 # `cnt`, bikeshare's target, is *exactly* `casual + registered`, and
@@ -128,10 +150,15 @@ def load_wec():
     df = pd.read_csv(path).dropna()
     y = df["Total_Power"].astype(float)
     y.name = "y_value"
-    X = df.drop(columns=["Total_Power"]).select_dtypes(include=[np.number]).astype(float)
+    X = (
+        df.drop(columns=["Total_Power"])
+        .select_dtypes(include=[np.number])
+        .astype(float)
+    )
     return X, y
 
 
+DATASETS["synth1d"]["loader"] = load_synth1d
 DATASETS["bikeshare"]["loader"] = load_bikeshare_noleak
 DATASETS["wec"]["loader"] = load_wec
 
@@ -197,7 +224,9 @@ def inner_split(n, seed, val_frac=0.15):
     return idx[:cut], idx[cut:]
 
 
-def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
+def run_one(
+    name, cfg, seed, epochs, batch_size, l2, lr_cache, background=256, quiet=True
+):
     """One (dataset, seed) cell: fit the FIS, convert it, train every arm."""
     X, y = cfg["loader"]()
     if cfg["sample"] and len(X) > cfg["sample"]:
@@ -207,8 +236,13 @@ def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
     X_tr, y_tr, X_te, y_te = split(X, y, seed)
     Xtr, Xte, y_center, y_scale = prepare(X_tr, y_tr, X_te, y_te)
 
-    out = {"dataset": name, "seed": seed, "n_train": len(Xtr), "n_test": len(Xte),
-           "n_features_raw": Xtr.shape[1]}
+    out = {
+        "dataset": name,
+        "seed": seed,
+        "n_train": len(Xtr),
+        "n_test": len(Xte),
+        "n_features_raw": Xtr.shape[1],
+    }
 
     # --- 1. the FIS ---------------------------------------------------------
     t0 = time.perf_counter()
@@ -218,7 +252,8 @@ def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
         random_state=seed,
         **cfg.get("fis_kwargs", {}),
     )
-    import contextlib, io
+    import contextlib
+    import io
 
     sink = io.StringIO()
     with contextlib.redirect_stdout(sink if quiet else sys.stdout):
@@ -258,31 +293,48 @@ def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
     ytr_s = (np.asarray(y_tr, dtype=float) - y_center) / y_scale
     yte_s = (np.asarray(y_te, dtype=float) - y_center) / y_scale
 
+    knots = fis2nn.fis_knots(reg.model_, feats)
+    n_hidden = sum(int(knots[f].size) for f in feats)
+
+    # The seed proper: weights backed out of the FIS's own response, no labels.
+    # `predict_fn` works on the *whole* scaled frame because that is what the
+    # regressor expects; only the FIS's own features carry knots, so only those
+    # are ever varied.
+    def fis_fn(frame):
+        with contextlib.redirect_stdout(io.StringIO()):
+            return np.asarray(reg.predict(frame), dtype=float).ravel()
+
+    def scaled_fis_fn(frame):
+        return (fis_fn(frame) - y_center) / y_scale
+
     t0 = time.perf_counter()
-    net_hot, knots = fis2nn.warm_start_from_fis(reg.model_, feats, Xtr_a, ytr_s, l2=l2)
-    convert_seconds = time.perf_counter() - t0
+    net_analytic = fis2nn.analytic_seed_from_fis(
+        scaled_fis_fn, Xtr, feats, knots, background_size=background, seed=seed
+    )
+    analytic_seconds = time.perf_counter() - t0
 
-    n_hidden = net_hot.n_hidden
+    # And the same seed given one closed-form ridge polish against the labels --
+    # a single linear solve, the same step `solve_tsk_consequents` takes. Timed
+    # on the full training fold here; the arm itself re-solves on the inner fold
+    # so the polish never sees the rows it is validated on.
+    t0 = time.perf_counter()
+    fis2nn.solve_readout(net_analytic, Xtr_a, ytr_s, l2=l2)
+    polish_seconds = time.perf_counter() - t0
+
+    a_te = net_analytic.predict(Xte_a) * y_scale + y_center
     out["conversion"] = {
-        "seconds": convert_seconds,
+        "analytic_seconds": analytic_seconds,
+        "polish_seconds": polish_seconds,
         "n_hidden": n_hidden,
-        "n_parameters": net_hot.n_parameters(),
+        "n_parameters": net_analytic.n_parameters(),
         "knots_per_feature": {f: int(knots[f].size) for f in feats},
+        # How faithfully the analytic seed reproduces the FIS it came from. In
+        # 1-D this is the equivalence and should be ~0; above it, it is the size
+        # of the FIS's non-additive part, which no additive seed can carry.
+        "fidelity_rmse_vs_fis": fis2nn.rmse(y_fis_te, a_te),
+        "fidelity_relative": fis2nn.rmse(y_fis_te, a_te)
+        / (float(np.std(y_fis_te)) or 1.0),
     }
-
-    # Fidelity of the conversion *as a conversion*: the same layer 1, with the
-    # read-out solved against the FIS's own predictions instead of the labels.
-    net_distill = fis2nn.solve_readout(
-        fis2nn._axis_aligned_net(len(feats), [(i, knots[f]) for i, f in enumerate(feats) if knots[f].size]),
-        Xtr_a,
-        (y_fis_tr - y_center) / y_scale,
-        l2=l2,
-    )
-    d_te = net_distill.predict(Xte_a) * y_scale + y_center
-    out["conversion"]["fidelity_rmse_vs_fis"] = fis2nn.rmse(y_fis_te, d_te)
-    out["conversion"]["fidelity_relative"] = fis2nn.rmse(y_fis_te, d_te) / (
-        float(np.std(y_fis_te)) or 1.0
-    )
 
     # --- 4. the arms --------------------------------------------------------
     # Everything from here trains on the inner-train fold only; `val` picks the
@@ -297,9 +349,10 @@ def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
     # FIS and are not refitted here.
     Xall_in, Xall_val, Xall_te = Xtr_all[i_tr], Xtr_all[i_val], Xte_all
 
-    net_hot_in, _ = fis2nn.warm_start_from_fis(reg.model_, feats, Xin, yin, l2=l2)
+    net_hot_in = fis2nn.solve_readout(net_analytic, Xin, yin, l2=l2)
     r_init = np.random.default_rng(1000 + seed)
     starts = {
+        "hot-analytic": net_analytic,
         "hot": net_hot_in,
         "quantile": fis2nn.quantile_start(Xin, n_hidden, yin, l2=l2),
         "elm": fis2nn.random_feature_start(r_init, Xin, yin, n_hidden, l2=l2),
@@ -307,7 +360,14 @@ def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
         "quantile-all": fis2nn.quantile_start(Xall_in, n_hidden, yin, l2=l2),
         "he-all": fis2nn.he_start(r_init, Xall_in.shape[1], n_hidden),
     }
-    setup_seconds = {a: (fis_seconds + convert_seconds if a == "hot" else 0.0) for a in ARMS}
+    setup_seconds = {
+        "hot-analytic": fis_seconds + analytic_seconds,
+        "hot": fis_seconds + analytic_seconds + polish_seconds,
+        "quantile": 0.0,
+        "elm": 0.0,
+        "he": 0.0,
+        "he-all": 0.0,
+    }
 
     def train(net0, lr, arm):
         on_fis_feats = arm in FIS_FEATURE_ARMS
@@ -315,11 +375,19 @@ def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
             (Xin, Xval, Xte_a) if on_fis_feats else (Xall_in, Xall_val, Xall_te)
         )
         return fis2nn.train_adam(
-            net0, Xa, yin,
-            X_test=Xt, y_test=yte_s,
-            X_val=Xv, y_val=yval,
-            epochs=epochs, batch_size=batch_size, lr=lr, seed=seed,
-            y_scale=y_scale, y_center=y_center,
+            net0,
+            Xa,
+            yin,
+            X_test=Xt,
+            y_test=yte_s,
+            X_val=Xv,
+            y_val=yval,
+            epochs=epochs,
+            batch_size=batch_size,
+            lr=lr,
+            seed=seed,
+            y_scale=y_scale,
+            y_center=y_center,
         )
 
     out["arms"] = {}
@@ -348,7 +416,9 @@ def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
             "selected_epoch": int(hist.epochs[stop]),
             "selected_test_rmse": float(test_curve[stop]),
             "final_test_rmse": float(test_curve[-1]),
-            "final_test_r2": fis2nn.r2(y_te, trained.predict(X_score) * y_scale + y_center),
+            "final_test_r2": fis2nn.r2(
+                y_te, trained.predict(X_score) * y_scale + y_center
+            ),
             "setup_seconds": setup_seconds[arm],
             "train_seconds": train_seconds,
             "seconds_per_epoch": train_seconds / max(epochs, 1),
@@ -373,10 +443,16 @@ def run_one(name, cfg, seed, epochs, batch_size, l2, lr_cache, quiet=True):
     # What the better of the two randomly-initialized arms eventually reaches:
     # the honest "when do you get what training from scratch would have given
     # you" line, rather than a threshold chosen to flatter the warm start.
-    baseline_target = min(out["arms"][a]["selected_test_rmse"] for a in ("he", "he-all"))
+    baseline_target = min(
+        out["arms"][a]["selected_test_rmse"] for a in ("he", "he-all")
+    )
     for rec in out["arms"].values():
-        rec["epochs_to_fis_parity"], rec["seconds_to_fis_parity"] = first_hit(rec, fis_target)
-        rec["epochs_to_baseline"], rec["seconds_to_baseline"] = first_hit(rec, baseline_target)
+        rec["epochs_to_fis_parity"], rec["seconds_to_fis_parity"] = first_hit(
+            rec, fis_target
+        )
+        rec["epochs_to_baseline"], rec["seconds_to_baseline"] = first_hit(
+            rec, baseline_target
+        )
     out["baseline_target_rmse"] = baseline_target
 
     return out
@@ -391,7 +467,9 @@ def provenance():
 
     return {
         "grad_school_commit": git("rev-parse", "--short", "HEAD"),
-        "tribble_fis_commit": git("rev-parse", "--short", "HEAD", cwd=os.path.join(REPO, "tribble-fis")),
+        "tribble_fis_commit": git(
+            "rev-parse", "--short", "HEAD", cwd=os.path.join(REPO, "tribble-fis")
+        ),
         "python": platform.python_version(),
         "numpy": np.__version__,
         "platform": platform.platform(),
@@ -409,9 +487,11 @@ def agg(values):
 def summarize(results, cfg_meta):
     """Render the tables that the write-up quotes."""
     lines = ["# FIS -> ReLU network: measured results", ""]
-    lines.append(f"Seeds: {cfg_meta['seeds']} · epochs: {cfg_meta['epochs']} · "
-                 f"batch: {cfg_meta['batch_size']} · commit `{cfg_meta['provenance']['grad_school_commit']}` · "
-                 f"tribble-fis `{cfg_meta['provenance']['tribble_fis_commit']}`")
+    lines.append(
+        f"Seeds: {cfg_meta['seeds']} · epochs: {cfg_meta['epochs']} · "
+        f"batch: {cfg_meta['batch_size']} · commit `{cfg_meta['provenance']['grad_school_commit']}` · "
+        f"tribble-fis `{cfg_meta['provenance']['tribble_fis_commit']}`"
+    )
     lines.append("")
 
     by_ds: dict[str, list] = {}
@@ -434,21 +514,40 @@ def summarize(results, cfg_meta):
         m, s = agg([r["fis"]["test_rmse"] for r in rows])
         m2, s2 = agg([r["fis"]["test_r2"] for r in rows])
         t, ts = agg([r["fis"]["seconds"] for r in rows])
-        lines.append(f"| tribble FIS | {m:.3f} ± {s:.3f} | {m2:.3f} ± {s2:.3f} | — | — | {t:.2f} ± {ts:.2f} |")
+        lines.append(
+            f"| tribble FIS | {m:.3f} ± {s:.3f} | {m2:.3f} ± {s2:.3f} | — | — | {t:.2f} ± {ts:.2f} |"
+        )
 
         if "test_rmse" in rows[0].get("fis_triangular", {}):
             m, s = agg([r["fis_triangular"]["test_rmse"] for r in rows])
             m2, s2 = agg([r["fis_triangular"]["test_r2"] for r in rows])
-            lines.append(f"| tribble FIS (triangularized) | {m:.3f} ± {s:.3f} | {m2:.3f} ± {s2:.3f} | — | — | — |")
+            lines.append(
+                f"| tribble FIS (triangularized) | {m:.3f} ± {s:.3f} | {m2:.3f} ± {s2:.3f} | — | — | — |"
+            )
+
+        # R2 is derived from the *same* epoch the RMSE is quoted at. Reading it
+        # off `final_test_r2` while quoting the early-stopped RMSE next to it
+        # mixes two different networks in one row -- and does so most visibly
+        # for whichever arm's curve diverges after its stopping point, which is
+        # exactly the arm a reader would then draw the wrong conclusion about.
+        def r2_at(rec, row):
+            var = row["fis"]["test_rmse"] ** 2 / (1.0 - row["fis"]["test_r2"])
+            return (
+                1.0 - rec["selected_test_rmse"] ** 2 / var if var > 0 else float("nan")
+            )
 
         for arm in ARMS:
             recs = [r["arms"][arm] for r in rows]
             m, s = agg([x["selected_test_rmse"] for x in recs])
-            m2, s2 = agg([x["final_test_r2"] for x in recs])
+            m2, s2 = agg([r2_at(r["arms"][arm], r) for r in rows])
             e0, e0s = agg([x["epoch0_test_rmse"] for x in recs])
             par = [x["epochs_to_fis_parity"] for x in recs]
             hit = [p for p in par if p is not None]
-            par_txt = (f"{np.mean(hit):.0f} ({len(hit)}/{len(par)})" if hit else f"never (0/{len(par)})")
+            par_txt = (
+                f"{np.mean(hit):.0f} ({len(hit)}/{len(par)})"
+                if hit
+                else f"never (0/{len(par)})"
+            )
             t, ts = agg([x["setup_seconds"] + x["train_seconds"] for x in recs])
             lines.append(
                 f"| nn-{arm} (lr {recs[0]['lr']:g}) | {m:.3f} ± {s:.3f} | {m2:.3f} ± {s2:.3f} | "
@@ -480,9 +579,9 @@ def summarize(results, cfg_meta):
         f, fs = agg([r["conversion"]["fidelity_relative"] for r in rows])
         lines += [
             "",
-            f"Conversion fidelity (read-out solved against the FIS's own predictions rather "
-            f"than the labels): relative RMSE {f:.3f} ± {fs:.3f} of the FIS output's own "
-            f"standard deviation.",
+            f"Analytic seed's fidelity to the FIS it was backed out of: relative RMSE "
+            f"{f:.3f} ± {fs:.3f} of the FIS output's own standard deviation "
+            f"(0 would mean the seed reproduces the FIS exactly).",
             "",
         ]
     return "\n".join(lines) + "\n"
@@ -494,8 +593,28 @@ def main() -> int:
     ap.add_argument("--epochs", type=int, default=200)
     ap.add_argument("--batch-size", type=int, default=128)
     ap.add_argument("--l2", type=float, default=1e-6)
+    ap.add_argument(
+        "--background",
+        type=int,
+        default=256,
+        help="rows averaged over when backing out partial-dependence profiles",
+    )
     ap.add_argument("--out", default=os.path.join(HERE, "results.json"))
+    ap.add_argument(
+        "--from-json",
+        action="store_true",
+        help="re-emit results_summary.md from an existing results.json",
+    )
     args = ap.parse_args()
+
+    if args.from_json:
+        with open(args.out) as fh:
+            blob = json.load(fh)
+        path = os.path.join(HERE, "results_summary.md")
+        with open(path, "w") as fh:
+            fh.write(summarize(blob["results"], blob["meta"]))
+        print(f"re-emitted {os.path.relpath(path, REPO)}")
+        return 0
 
     results = []
     lr_cache: dict[tuple[str, str], float] = {}
@@ -504,7 +623,16 @@ def main() -> int:
         for seed in SEEDS:
             t0 = time.perf_counter()
             try:
-                res = run_one(name, cfg, seed, args.epochs, args.batch_size, args.l2, lr_cache)
+                res = run_one(
+                    name,
+                    cfg,
+                    seed,
+                    args.epochs,
+                    args.batch_size,
+                    args.l2,
+                    lr_cache,
+                    background=args.background,
+                )
             except Exception as exc:  # noqa: BLE001
                 print(f"  [{name} seed {seed}] FAILED {type(exc).__name__}: {exc}")
                 continue
@@ -512,6 +640,7 @@ def main() -> int:
             arms = res["arms"]
             print(
                 f"  [{name} seed {seed}] fis {res['fis']['test_rmse']:.3f} | "
+                f"seed {arms['hot-analytic']['epoch0_test_rmse']:.3f} | "
                 f"hot {arms['hot']['epoch0_test_rmse']:.3f}->{arms['hot']['selected_test_rmse']:.3f} | "
                 f"he {arms['he']['epoch0_test_rmse']:.3f}->{arms['he']['selected_test_rmse']:.3f} | "
                 f"{time.perf_counter() - t0:.1f}s"
@@ -531,7 +660,9 @@ def main() -> int:
     summary_path = os.path.join(HERE, "results_summary.md")
     with open(summary_path, "w") as fh:
         fh.write(summarize(results, meta))
-    print(f"\nwrote {os.path.relpath(args.out, REPO)} and {os.path.relpath(summary_path, REPO)}")
+    print(
+        f"\nwrote {os.path.relpath(args.out, REPO)} and {os.path.relpath(summary_path, REPO)}"
+    )
     return 0
 
 

@@ -1,6 +1,6 @@
 # Experiment: converting a TRIBBLE-built FIS into a ReLU network, and training on from there
 
-**Status:** running · **Started:** 2026-08-16 · Results in [`RESULTS.md`](RESULTS.md)
+**Status:** measured · **Started:** 2026-08-16 · Results in [`RESULTS.md`](RESULTS.md)
 
 ## Question
 
@@ -27,51 +27,76 @@ above the FIS's accuracy for the price of a FIS fit, and then improves under
 ordinary gradient training instead of spending its first hundred epochs
 discovering structure the FIS already had.
 
-## Why the conversion is not simply "apply the theorem"
+## Backing the equivalence out into the weights
 
 The identity the papers turn on is exact and small — a triangular membership
-function is a sum of three ReLUs of the input, with the membership function's
-knots as the ReLU biases:
+function is a sum of three ReLUs of the input, with the term's knots as the ReLU
+biases:
 
 ```
 T(x; a, b, c) = s_a * relu(x - a) - (s_a + s_c) * relu(x - b) + s_c * relu(x - c)
+s_a = 1 / (b - a),   s_c = 1 / (c - b)
 ```
 
-but the *system-level* equivalence needs two more things, and a TRIBBLE
-regressor supplies neither:
+Taken literally at the level of the FIS's *internal gates*, the system-level
+equivalence then needs two more things, and a TRIBBLE regressor supplies
+neither:
 
-1. **Partition of unity.** The equivalence needs the terms to sum to 1
-   everywhere, so that TSK's firing-strength normalization is a division by 1
-   and vanishes. Division is not piecewise linear, so nothing survives without
-   it. TRIBBLE's `GaussianMixtureModel` gives every `(feature, class)` pair its
-   own private Gaussians which overlap arbitrarily and "do not sum to anything
-   in particular" (`tribblefis.ruspini`'s own words).
+1. **Partition of unity**, so TSK's firing-strength normalization is a division
+   by 1 and vanishes — division is not piecewise linear. TRIBBLE's
+   `GaussianMixtureModel` gives every `(feature, class)` pair its own private
+   Gaussians, which overlap arbitrarily and "do not sum to anything in
+   particular" (`tribblefis.ruspini`'s own words).
 2. **Piecewise-linear firing strengths.** TRIBBLE defaults to the
-   probabilistic-sum/product norm pair. A product of piecewise-linear functions
+   probabilistic-sum/product pair, and a product of piecewise-linear functions
    is piecewise *multi*linear, which no finite ReLU network reproduces exactly.
-   This is precisely why the 2025 sequel had to replace triangles with
-   *tetrahedral* membership functions — a simplicial partition, whose
-   barycentric coordinates are piecewise linear and sum to one by construction —
-   to get past one dimension.
+   This is exactly why the 2025 sequel replaces triangles with *tetrahedral*
+   membership functions — a simplicial partition, whose barycentric coordinates
+   are piecewise linear and sum to one by construction — to get past one
+   dimension.
 
-So the honest structure of this experiment is a ladder, not a single claim:
+**So this experiment does not convert the gates. It converts the function.**
 
-* **In one dimension, on a Ruspini partition, the conversion is an identity.**
-  No data, no fitting, machine precision. That is H1, and `test_fis2nn.py` pins
-  it against `tribblefis.ruspini`'s own partition builder.
-* **In n dimensions the conversion is a warm start**, and the experiment's job
-  is to measure exactly what that warm start is worth and what it costs.
+The equivalence says a continuous piecewise-linear function of one variable *is*
+a one-hidden-layer ReLU network, with the slope change at each knot as that
+knot's output weight. It says nothing about how the piecewise-linear function
+arose. So rather than demanding piecewise-linear firing strengths, we take the
+FIS's own one-dimensional profiles — which we can evaluate exactly, whatever the
+gating — and convert those:
 
-## What gets converted
+* For each feature, sample the FIS's **partial-dependence profile**
+  `g_f(t) = mean_i FIS(x_i with x_i[f] := t)` at that feature's own knots. This
+  is the first-order term of the FIS's functional ANOVA decomposition; under
+  independent inputs it is the exact projection of the FIS onto functions of
+  that feature alone, which is the most any additive seed can carry.
+* Convert each profile by second differences: slope changes become hidden-unit
+  output weights, leading slopes become the linear skip, constants fold into the
+  bias (`fis2nn.pwl_to_relu_weights`, exact — `test_fis2nn.py` pins it at knots
+  *and* between them).
 
-The FIS's membership functions are expanded into ReLU knots (Gaussians first
-fitted to triangles by the package's own `tribblefis.triangle_fit`), those knots
-become hidden layer 1 — one unit per knot, each reading a single feature, so the
-initial network is additive across inputs — and the read-out is then solved in
-closed form by ridge least squares. That last step is not a training run: for
-fixed hidden units the output is linear in the read-out, the same argument
-`regression.solve_tsk_consequents` makes for TSK consequents at fixed firing
-strengths. The whole conversion is one linear solve.
+No labels are consulted anywhere in that. The seed is a conversion of the FIS,
+not a refit against `y`, and `analytic_seed_from_fis` takes no `y` argument so
+it cannot become one by accident.
+
+Two consequences worth stating:
+
+* **In one dimension there is nothing to average over, so the profile is the FIS
+  itself and the seed reproduces it exactly.** That is the rung where the
+  process is *proved* rather than merely measured — `synth1d` exists for it.
+* **The gating choice stops being load-bearing.** A product t-norm no longer
+  blocks the conversion; it only shapes the function being converted.
+  `analysis_gating.py` measures whether it still matters empirically now that it
+  no longer matters structurally.
+
+### The two hot arms
+
+`hot-analytic` is the seed exactly as backed out — every weight a function of
+the FIS's parameters. `hot` gives it one closed-form ridge polish against the
+labels, which is a single linear solve, not an epoch. That polish fits the
+*residual* of the seed and adds the correction, so the ridge penalty shrinks
+toward the backed-out weights rather than toward zero: a plain least-squares
+read-out would solve the seed away and keep only the knots, discarding the
+information the seed exists to carry.
 
 Architecture, identical for every arm:
 
@@ -80,8 +105,8 @@ y = relu(X @ W1 + b1) @ w2 + X @ v + c
 ```
 
 The linear skip is not decoration: a ReLU layer whose knots all sit inside the
-data range cannot express a slope to the left of its first knot, and the exact
-1-D conversion needs one.
+data range cannot express a slope to the left of its first knot, and both the
+exact 1-D conversion and the profile decomposition need one.
 
 ## Hypotheses
 
@@ -99,17 +124,16 @@ costs little test accuracy, so the exactly-convertible model is a fair stand-in
 for the Gaussian one that TRIBBLE actually builds.
 *Falsified by* a large accuracy gap between the Gaussian and triangularized FIS.
 
-**H3 — The converted network starts hot.**
-At epoch 0 the converted network is dramatically better than He-random
-initialization, and at least as good as the FIS it came from.
-*Falsified by* an epoch-0 test RMSE worse than the FIS's.
+**H3 — The backed-out seed reproduces the FIS.**
+`hot-analytic`, having seen no labels, matches the FIS it came from: exactly in
+one dimension, and closely enough elsewhere to start at the FIS's accuracy.
+*Falsified by* a seed materially worse than its own FIS.
 
 **H4 — The hot start is cheaper, not just earlier.**
 Counting the FIS fit against it, the converted network reaches the quality a
 from-scratch network eventually attains in less wall-clock time than training
 from scratch takes to get there.
-*Falsified by* the from-scratch arm reaching its own final quality sooner in
-seconds.
+*Falsified by* the from-scratch arm reaching its own final quality sooner.
 
 **H5 — It is the FIS's *placement* that helps.**
 The converted network beats an identically-shaped network whose knots are placed
@@ -124,11 +148,17 @@ converted network is no worse than the from-scratch network.
 *Falsified by* the from-scratch arm ending materially better.
 
 **H7 — The advantage grows with input dimension.**
-On WEC (301 raw features, of which TRIBBLE keeps a handful) the margin over a
-from-scratch network trained on all raw columns is larger than on Concrete
+On WEC (301 raw features, of which TRIBBLE is asked to keep 12) the margin over
+a from-scratch network trained on all raw columns is larger than on Concrete
 (8 features, all kept), because feature selection is part of what the FIS
 contributes.
 *Falsified by* the margin failing to widen with dimension.
+
+**H8 — Gating no longer reaches the conversion.**
+Because the seed is backed out of the FIS's response rather than its gates, the
+t-norm/t-conorm family changes the FIS's own accuracy but not the seed's
+*fidelity* to whichever FIS it converted.
+*Falsified by* seed fidelity varying materially across norm families.
 
 ## Arms
 
@@ -137,18 +167,18 @@ width (the number of knots the FIS produced), so no arm has a capacity edge.
 
 | arm | layer 1 | read-out at epoch 0 | features | what it isolates |
 |---|---|---|---|---|
-| `hot` | FIS knots | closed-form ridge | FIS-selected | the conversion |
-| `quantile` | per-feature quantiles | closed-form ridge | FIS-selected | knot *placement* (H5) |
-| `elm` | He-random | closed-form ridge | FIS-selected | the closed-form read-out alone |
+| `hot-analytic` | FIS knots | **backed out of the FIS**, no labels | FIS-selected | the equivalence itself (H3) |
+| `hot` | FIS knots | seed + one anchored ridge solve | FIS-selected | the recommended conversion |
+| `quantile` | per-feature quantiles | ridge, from zero | FIS-selected | knot *placement* (H5) |
+| `elm` | He-random | ridge, from zero | FIS-selected | the closed-form read-out alone |
 | `he` | He-random | random | FIS-selected | standard NN training |
-| `quantile-all` | per-feature quantiles | closed-form ridge | **all raw** | from-scratch, no FIS at all |
 | `he-all` | He-random | random | **all raw** | from-scratch, no FIS at all |
 
-The `-all` arms exist because of a trap: running the controls on the features
-TRIBBLE kept makes them differ from `hot` only in knot placement — which is what
-H5 needs — but it also hands them the FIS's feature selection for free, which
-would make them dishonest stand-ins for "what you would have done without a
-FIS". On WEC that is 8 columns out of 301. Both families are therefore reported.
+`quantile` and `elm` run on the features TRIBBLE kept, so they differ from `hot`
+in knot placement and nothing else — which is what H5 needs. But that also hands
+them the FIS's feature selection for free, so they are not honest stand-ins for
+"what you would have done without a FIS"; on WEC that is 12 columns out of 301.
+`he-all` is the arm that gets no FIS output of any kind.
 
 ## Protocol
 
@@ -164,27 +194,48 @@ FIS". On WEC that is 8 columns out of 301. Both families are therefore reported.
   arm because a warm-started net and a random one are not at comparable points
   on the loss surface; pinned because re-selecting per seed would let every arm
   draw four samples of its own noise.
-* Wall clock for `hot` is charged the FIS fit *and* the conversion solve. A warm
-  start you cannot afford is not a warm start.
+* Wall clock for the hot arms is charged the FIS fit *and* the conversion. A
+  warm start you cannot afford is not a warm start.
 
-## Datasets
+## Datasets — smallest first
 
-All already in `data/`; see `research/proposal-defense/prose/DATASETS.md`.
+The ladder is deliberate: the process is proved where the conversion is an
+identity, and only then carried upward to where it is a projection.
 
-| dataset | rows × features | why it is here |
-|---|---|---|
-| Concrete compressive strength | 1,030 × 8 | the proposal's regression workhorse; small, all features informative |
-| Bike sharing (hourly) | 17,379 × 14 | the scale partner, 17× larger |
-| WEC Sydney (100 buoys) | 2,319 × 301 | the high-dimensional case, where feature selection is most of the work (H7) |
+| rung | dataset | rows × features | why it is here |
+|---|---|---|---|
+| 1 | `synth1d` (generated) | 600 × 1 | one input: the seed *is* the FIS, exactly. Proves the process. |
+| 2 | Concrete compressive strength | 1,030 × 8 | the proposal's regression workhorse; small, all features informative |
+| 3 | WEC Sydney (100 buoys) | 2,319 × 301 | the high-dimensional case, where feature selection is most of the work (H7) |
+| 4 | Bike sharing (hourly) | 17,379 × 12 | the scale partner, 17× larger than Concrete |
+
+Two dataset notes the driver encodes rather than works around:
+
+* **Bikeshare leaks.** Its target `cnt` is exactly `casual + registered`, and
+  `_fuzzy_models.load_bikeshare` leaves both columns in `X`. The first run of
+  this experiment scored 0.897 RMSE against the FIS's 33.9 on a target with a
+  standard deviation of ~181 — a linear model finding a sum, not a demand model.
+  This experiment uses its own leak-free loader. The shared loader is *not*
+  patched: proposal Tables 4.1 and 6.1 quote it, and silently changing what it
+  returns would move archived numbers with no table announcing it.
+  **This needs a decision upstream** — see `RESULTS.md`.
+* **WEC needs `top_n=12`,** and the reason is a finding rather than a
+  convenience: the converted network's width is the FIS's membership-function
+  count, and nothing bounds it. At the default `top_p=0.95`, TRIBBLE keeps 300
+  of 301 columns and builds 3,686 membership functions — an 8,751-unit hidden
+  layer, 2.6M parameters in `W1` for 1,854 training rows.
 
 ## Running it
 
 ```bash
-python experiments/fis-to-neural-net/test_fis2nn.py          # H1, seconds
-python experiments/fis-to-neural-net/run_experiment.py       # everything else
+python experiments/fis-to-neural-net/test_fis2nn.py                  # H1, H3, seconds
+python experiments/fis-to-neural-net/run_experiment.py               # the ladder
+python experiments/fis-to-neural-net/analysis_triangularization.py   # H2's mechanism
+python experiments/fis-to-neural-net/analysis_gating.py              # H8
+
 FIS2NN_SEEDS=0,1 python experiments/fis-to-neural-net/run_experiment.py \
-    --datasets concrete --epochs 150                          # a quick look
+    --datasets synth1d concrete --epochs 150                          # a quick look
 ```
 
-Writes `results.json` (every curve, every seed, every arm) and
-`results_summary.md` (the tables `RESULTS.md` quotes).
+`run_experiment.py` writes `results.json` (every curve, every seed, every arm)
+and `results_summary.md` (the tables `RESULTS.md` quotes).
