@@ -27,7 +27,12 @@ CAT = {
     "A3_raw_memory": "#eb6834",   # orange
     "A2_phase_split": "#1baf7a",  # aqua
 }
-LIT_BAND = (5.0, 12.5)  # published N-CMAPSS RMSE range (see DOE references)
+# DS02-specific references (Custode, Mo, Ferigo & Iacca 2022, re-running Arias
+# Chao's own baselines on the actual released N-CMAPSS_DS02-006.h5 -- the
+# original paper's ~4-5 RMSE was measured on a lower-noise pre-release file
+# and is not reproducible on the file this DOE uses).
+LIT_BAND = (7.22, 8.34)  # published CNN / MLP RMSE on DS02-006
+CONST_MEAN_RMSE = 18.97  # naive constant-mean-predictor baseline, DS02-006
 
 
 def _style_axes(ax):
@@ -52,8 +57,13 @@ def plot_stage1(stage1_df: pd.DataFrame, out_path: str):
     ax.barh(y, df["rmse_test_true"], color=colors, height=0.62, zorder=3)
     ax.axvspan(LIT_BAND[0], LIT_BAND[1], color=INK_MUTED, alpha=0.12, zorder=1)
     ax.text(
-        sum(LIT_BAND) / 2, len(df) - 0.3, "published DL RMSE range",
+        sum(LIT_BAND) / 2, len(df) - 0.3, "published CNN/MLP (DS02-006)",
         ha="center", va="top", fontsize=8.5, color=INK_MUTED, style="italic",
+    )
+    ax.axvline(CONST_MEAN_RMSE, color=INK_MUTED, linewidth=1, linestyle="--", zorder=1)
+    ax.text(
+        CONST_MEAN_RMSE + 0.4, len(df) - 0.3, "constant-mean baseline",
+        ha="left", va="top", fontsize=8, color=INK_MUTED, style="italic",
     )
     for yi, v in zip(y, df["rmse_test_true"]):
         ax.text(v + 0.4, yi, f"{v:.1f}", va="center", fontsize=8, color=INK_SECONDARY)
@@ -166,10 +176,56 @@ def plot_stage3(predictions: dict, out_path: str):
     plt.close(fig)
 
 
-def make_plots(stage1_df, stage2_df, stage3_predictions, top_pipelines):
+REFINE_COLORS = {"baseline": INK_MUTED, "coordinate": "#2a78d6", "local": "#4a3aa7"}
+
+
+def plot_stage4(stage4_df: pd.DataFrame, out_path: str):
+    pipelines = list(stage4_df["pipeline"].unique())
+    refiners = list(stage4_df["refiner"].unique())
+    series = ["baseline"] + refiners
+
+    fig, ax = plt.subplots(figsize=(9, 5.5), facecolor=SURFACE)
+    n_series = len(series)
+    width = 0.8 / n_series
+    x = np.arange(len(pipelines))
+
+    for i, name in enumerate(series):
+        if name == "baseline":
+            vals = [stage4_df[stage4_df["pipeline"] == p]["rmse_baseline"].iloc[0] for p in pipelines]
+        else:
+            vals = [
+                stage4_df[(stage4_df["pipeline"] == p) & (stage4_df["refiner"] == name)]["rmse_refined"].iloc[0]
+                if not stage4_df[(stage4_df["pipeline"] == p) & (stage4_df["refiner"] == name)].empty
+                else np.nan
+                for p in pipelines
+            ]
+        offset = (i - (n_series - 1) / 2) * width
+        ax.bar(x + offset, vals, width=width * 0.9, color=REFINE_COLORS[name], label=name, zorder=3)
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([p.replace("_", " ") for p in pipelines], fontsize=8.5)
+    ax.set_ylabel("Test RMSE, true RUL (cycles)")
+    ax.set_title(
+        "Stage 4: refinement helps where there's enough data/parameters to support it --\n"
+        "at 200-3,000x the baseline fit time, and it hurts the smallest pipeline (CV-overfit)",
+        fontsize=11.5, pad=14, loc="left",
+    )
+    ax.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    _style_axes(ax)
+    ax.legend(loc="upper left", frameon=False, fontsize=9, labelcolor=INK_SECONDARY)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=160, facecolor=SURFACE)
+    plt.close(fig)
+
+
+def make_plots(stage1_df, stage2_df, stage3_predictions, top_pipelines, stage4_df=None):
     plot_stage1(stage1_df, "FuzzySystemsExperiments/cmapss_rul_stage1.png")
     print("wrote FuzzySystemsExperiments/cmapss_rul_stage1.png")
     plot_stage2(stage2_df, top_pipelines, "FuzzySystemsExperiments/cmapss_rul_stage2.png")
     print("wrote FuzzySystemsExperiments/cmapss_rul_stage2.png")
     plot_stage3(stage3_predictions, "FuzzySystemsExperiments/cmapss_rul_stage3.png")
     print("wrote FuzzySystemsExperiments/cmapss_rul_stage3.png")
+    if stage4_df is not None and not stage4_df.empty:
+        plot_stage4(stage4_df, "FuzzySystemsExperiments/cmapss_rul_stage4.png")
+        print("wrote FuzzySystemsExperiments/cmapss_rul_stage4.png")
