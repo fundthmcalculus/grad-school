@@ -11,7 +11,10 @@ global model (see cmapss_rul_full_analysis.py for the pooled comparison).
 For every engine -- training and held-out test, across all files -- it
 reports predicted vs. actual RUL. Whole-cycle aggregation gives one
 prediction per flight cycle, so each engine's predicted-RUL curve overlays
-cleanly on its true run-to-failure descent.
+cleanly on its true run-to-failure descent. Each panel shows both the raw
+per-cycle prediction (thin) and a centered moving average over MA_WINDOW
+cycles (bold) -- the raw prediction is noisy flight-to-flight around the
+slowly-varying true RUL, and the moving average recovers the trend.
 
 Outputs (all under FuzzySystemsExperiments/outputs/, gitignored):
   cmapss_rul_engine_predictions.csv        every engine, all files, metrics
@@ -57,6 +60,10 @@ GRID = "#e1e0d9"
 TRUE_C = "#52514e"  # true RUL
 PRED_TRAIN_C = "#2a78d6"  # predicted RUL, training engine (blue)
 PRED_TEST_C = "#eb6834"  # predicted RUL, test engine (orange)
+MA_WINDOW = 7  # cycles, centered -- moving-average smoothing of the per-cycle
+# prediction. The raw per-cycle prediction is noisy flight-to-flight around a
+# slowly-varying true RUL; a moving average recovers the trend the model is
+# actually tracking. Reported alongside the raw prediction, never instead of it.
 
 
 def fit_one_file(h5_path, dataset):
@@ -99,9 +106,11 @@ def engine_rows(tab, dataset, split):
     rows = []
     for unit, sub in tab.groupby("unit"):
         sub = sub.sort_values("cycle")
+        ma = sub["RUL_pred"].rolling(MA_WINDOW, center=True, min_periods=1).mean()
         true_f = float(sub["RUL"].iloc[-1])
         pred_f = float(sub["RUL_pred"].iloc[-1])
         rmse = float(np.sqrt(mean_squared_error(sub["RUL"], sub["RUL_pred"])))
+        ma_rmse = float(np.sqrt(mean_squared_error(sub["RUL"], ma)))
         # endpoint NASA: the score's asymmetric penalty at this engine's
         # last cycle (the C-MAPSS truncation-point convention).
         endpoint_nasa = m.nasa_score([true_f], [pred_f])
@@ -109,6 +118,7 @@ def engine_rows(tab, dataset, split):
         # trajectory (total score / n cycles) -- a length-independent
         # per-sample figure, unlike the raw summed score.
         avg_nasa = m.nasa_score(sub["RUL"], sub["RUL_pred"]) / len(sub)
+        avg_nasa_ma = m.nasa_score(sub["RUL"], ma) / len(sub)
         rows.append(
             dict(
                 dataset=dataset,
@@ -119,8 +129,10 @@ def engine_rows(tab, dataset, split):
                 final_pred_RUL=round(pred_f, 1),
                 final_abs_err=round(abs(true_f - pred_f), 1),
                 trajectory_rmse=round(rmse, 2),
+                trajectory_rmse_ma=round(ma_rmse, 2),
                 endpoint_nasa=round(endpoint_nasa, 3),
                 avg_nasa=round(avg_nasa, 3),
+                avg_nasa_ma=round(avg_nasa_ma, 3),
             )
         )
     return rows
@@ -143,9 +155,16 @@ def plot_file(dataset, train_tab, test_tab, out_path):
         tab = train_tab if split == "train" else test_tab
         pred_c = PRED_TRAIN_C if split == "train" else PRED_TEST_C
         sub = tab[tab["unit"] == unit].sort_values("cycle")
+        ma = sub["RUL_pred"].rolling(MA_WINDOW, center=True, min_periods=1).mean()
         rmse = float(np.sqrt(mean_squared_error(sub["RUL"], sub["RUL_pred"])))
+        ma_rmse = float(np.sqrt(mean_squared_error(sub["RUL"], ma)))
         ax.plot(sub["cycle"], sub["RUL"], color=TRUE_C, lw=1.8, zorder=3)
-        ax.plot(sub["cycle"], sub["RUL_pred"], color=pred_c, lw=1.4, zorder=4)
+        # raw per-cycle prediction: thin and translucent behind the MA
+        ax.plot(
+            sub["cycle"], sub["RUL_pred"], color=pred_c, lw=0.9, alpha=0.4, zorder=4
+        )
+        # moving-average prediction: bold
+        ax.plot(sub["cycle"], ma, color=pred_c, lw=2.0, zorder=5)
         ax.set_facecolor(SURFACE)
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
@@ -154,25 +173,22 @@ def plot_file(dataset, train_tab, test_tab, out_path):
         ax.set_axisbelow(True)
         tag = "TEST " if split == "test" else ""
         ax.set_title(
-            f"{tag}unit {unit}  (RMSE {rmse:.1f})",
-            fontsize=9,
+            f"{tag}unit {unit}  (RMSE {rmse:.1f} raw / {ma_rmse:.1f} MA{MA_WINDOW})",
+            fontsize=8.5,
             color=(PRED_TEST_C if split == "test" else INK),
             loc="left",
         )
     handles = [
         plt.Line2D([0], [0], color=TRUE_C, lw=2, label="true RUL"),
         plt.Line2D(
-            [0], [0], color=PRED_TRAIN_C, lw=2, label="predicted (train engine)"
+            [0], [0], color=INK_SECONDARY, lw=1, alpha=0.5, label="per-cycle prediction"
         ),
-        plt.Line2D([0], [0], color=PRED_TEST_C, lw=2, label="predicted (test engine)"),
+        plt.Line2D(
+            [0], [0], color=INK_SECONDARY, lw=2.2, label=f"moving avg ({MA_WINDOW} cyc)"
+        ),
+        plt.Line2D([0], [0], color=PRED_TRAIN_C, lw=2.2, label="train engine"),
+        plt.Line2D([0], [0], color=PRED_TEST_C, lw=2.2, label="test engine"),
     ]
-    fig.legend(
-        handles=handles,
-        loc="upper right",
-        frameon=False,
-        fontsize=9,
-        labelcolor=INK_SECONDARY,
-    )
     fig.suptitle(
         f"{dataset}: per-engine predicted vs. true RUL (per-file honest fit)",
         fontsize=13,
@@ -180,7 +196,19 @@ def plot_file(dataset, train_tab, test_tab, out_path):
         x=0.01,
         ha="left",
     )
-    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    # Horizontal legend in its own reserved strip below the title, clear of
+    # every panel.
+    top = 1 - 0.9 / (2.9 * nrow)  # reserve ~0.9in strip regardless of grid height
+    fig.legend(
+        handles=handles,
+        loc="upper center",
+        bbox_to_anchor=(0.5, top + 0.5 * (1 - top)),
+        ncol=5,
+        frameon=False,
+        fontsize=9,
+        labelcolor=INK_SECONDARY,
+    )
+    fig.tight_layout(rect=[0, 0, 1, top])
     fig.savefig(out_path, dpi=150, facecolor=SURFACE)
     plt.close(fig)
 
