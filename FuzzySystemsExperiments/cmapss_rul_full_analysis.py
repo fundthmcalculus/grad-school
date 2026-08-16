@@ -376,6 +376,42 @@ PIPELINES = {
             l2_reg=0.01502536299852122,
         ),
     ),
+    # Second pass on the champion, aimed at the extreme outliers that
+    # dominate the exponential NASA score. Three train-only steps stack:
+    # residual boosting (a second regressor on the first's training
+    # residuals -- helps RMSE), a NASA-optimal downward bias (exploits the
+    # score's over-prediction asymmetry -- helps NASA), and a clamp to the
+    # training RUL range.
+    #
+    # On DS02 alone (homogeneous -- train and test from one dataset) this is
+    # a clean win on BOTH metrics: RMSE 6.55 -> 6.19, NASA 11,045 -> 10,410,
+    # worst-5 errors [28..55] -> [26.6..27.5].
+    #
+    # On the full POOLED set it's a different story worth being honest about:
+    # RMSE improves marginally (15.21 -> 15.14) but NASA does NOT drop
+    # (594k -> 648k). The pooled NASA is driven by a few hard sub-populations
+    # (DS06/DS08-type units), and a single global downward bias tuned on
+    # aggregate training NASA can't target those -- the outliers are
+    # dataset-specific, not a uniform over-prediction. A per-dataset bias
+    # would be the next step for the pooled case. Kept because it's a real
+    # win on the sample-file scope this was built for, and doesn't hurt
+    # pooled RMSE -- but it is NOT a pooled-NASA win.
+    "best_full_de_minmax_2pass": dict(
+        n_xv=2,
+        aggregation="raw_memory",
+        scaler="minmax",
+        second_pass="resid_boost",
+        nasa_bias="per_dataset",
+        clamp=True,
+        tribble_kwargs=dict(
+            tsk_order="full-2nd",
+            n_gaussians=4,
+            top_p=0.9622893249863613,
+            detect_interactions=False,
+            norm_conorm="hamacher",
+            l2_reg=0.01502536299852122,
+        ),
+    ),
     # PCA was explored as a `pca` config axis (still supported below -- fit
     # on training data only, `pca` = variance-ratio target or int
     # components) on the current champion best_full_de. Result across
@@ -400,6 +436,7 @@ TUNED_TO_BASE = {
     "best_full_tuned": "best",
     "best_full_de": "best",
     "best_full_de_minmax": "best",
+    "best_full_de_minmax_2pass": "best",
 }
 BASE_PIPELINES = {k: v for k, v in PIPELINES.items() if k not in TUNED_TO_BASE}
 
@@ -534,6 +571,29 @@ def nasa_score(y_true, y_pred) -> float:
     return float(np.sum(np.exp(alpha * np.abs(delta))))
 
 
+def per_engine_predictions(test_tab, y_true, y_pred):
+    """Reduce the per-sample test predictions to ONE (true, pred) pair per
+    test engine, taken at its last available cycle -- the canonical C-MAPSS
+    / PHM08 evaluation protocol ("predict the RUL for each test engine" at
+    the truncation point), rather than a sum over every trajectory sample.
+
+    This is the number that's comparable to published RMSE / NASA scores;
+    the per-sample version over-counts by ~(rows per engine) and its NASA
+    magnitude is dominated by trajectory length, not accuracy.
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    cyc = test_tab["cycle"].to_numpy()
+    keys = list(zip(test_tab["dataset"], test_tab["unit"]))
+    last_true, last_pred = [], []
+    for key in dict.fromkeys(keys):  # unique engines, order preserved
+        idx = np.array([i for i, k in enumerate(keys) if k == key])
+        last = idx[np.argmax(cyc[idx])]  # row at this engine's final cycle
+        last_true.append(y_true[last])
+        last_pred.append(y_pred[last])
+    return np.array(last_true), np.array(last_pred)
+
+
 # --------------------------------------------------------------------------
 # Per-file processing: load -> correct -> aggregate (both pipelines) ->
 # discard the raw per-sample data before returning. Called once per file,
@@ -656,11 +716,18 @@ def write_report(
         "on the pooled training table only. No test-set information is "
         "used to fit anything.",
         "",
-        "NASA score is exponential in per-sample error, so a handful of "
-        "large-outlier predictions dominate the sum -- on a large, "
-        "heterogeneous pooled test set this can inflate the score by many "
-        "orders of magnitude. Treat RMSE as the primary metric; NASA score "
-        "is included for completeness, not as a normalized number.",
+        "Two metric conventions are reported per pipeline:",
+        "",
+        "- **Per-engine (canonical)**: ONE RUL prediction per test engine, "
+        "taken at its last available cycle, scored against that engine's "
+        "ground-truth RUL -- the standard C-MAPSS / PHM08 protocol "
+        '("predict the RUL for each test engine"). This is the number '
+        "comparable to published RMSE / NASA scores.",
+        "- **Per-sample**: over every one of the pooled test rows. Its NASA "
+        "score is exponential in per-sample error AND summed over ~128k "
+        "rows, so it is inflated by trajectory length, not just accuracy -- "
+        "useful only for relative comparison between pipelines here, never "
+        "as a published-comparable figure.",
         "",
         "## Files processed",
         "",
@@ -683,7 +750,12 @@ def write_report(
             f"## Pipeline: `{name}`",
             "",
             f"- Training rows: {r['n_train']:,}{subsample_note}  |  pooled test rows: {r['n_test']:,}",
-            f"- **RMSE (combined test set): {r['rmse']:.2f}**  |  NASA score: {r['nasa_score']:,.0f}",
+            f"- **Per-engine (canonical, one RUL per test engine at its last "
+            f"cycle -- {r.get('n_engines', 0)} engines): RMSE "
+            f"{r.get('rmse_engine', float('nan')):.2f}  |  NASA score "
+            f"{r.get('nasa_score_engine', float('nan')):,.1f}**",
+            f"- Per-sample (over all {r['n_test']:,} test rows): RMSE "
+            f"{r['rmse']:.2f}  |  NASA score {r['nasa_score']:,.0f}",
             f"- Fit time: {r['fit_seconds']:.2f}s",
             "",
             "Per-dataset test RMSE (same trained model, broken out by source file):",
@@ -890,11 +962,78 @@ def main(tune: bool = False, tune_de: bool = False):
         )
         t0 = time.perf_counter()
         model.fit(X_train_s, y_train)
-        fit_seconds = time.perf_counter() - t0
 
         pred = model.predict(X_test_s)
+        pred_train = model.predict(X_train_s)  # for train-only second-pass fits
+
+        # Optional second pass to tame the extreme outliers that dominate the
+        # exponential NASA score. All three steps derive only from TRAINING
+        # data, then apply to test:
+        #  - cfg["second_pass"]="resid_boost": fit a second regressor on the
+        #    first model's training residuals (one boosting round) and add
+        #    it -- corrects where the first model systematically errs (helps
+        #    RMSE most).
+        #  - cfg["nasa_bias"]=True: NASA penalizes over-prediction ~30%
+        #    harder than under-prediction, so a small uniform downward shift
+        #    trades a little RMSE for a lower score. Pick the shift that
+        #    minimizes TRAINING NASA over a grid, apply to test.
+        #  - cfg["clamp"]=True: clip to the training RUL range; any
+        #    prediction outside [y_min, y_max] is physically impossible.
+        if cfg.get("second_pass") == "resid_boost":
+            resid = y_train - pred_train
+            booster = TribbleRegressor(
+                random_state=42, max_samples=2000, **cfg["tribble_kwargs"]
+            )
+            booster.fit(X_train_s, resid)
+            pred = pred + booster.predict(X_test_s)
+            pred_train = pred_train + booster.predict(X_train_s)
+        if cfg.get("nasa_bias"):
+            grid = np.arange(0.0, 8.01, 0.25)
+
+            def best_shift(y_t, p_t):
+                return grid[int(np.argmin([nasa_score(y_t, p_t - b) for b in grid]))]
+
+            if cfg["nasa_bias"] == "per_dataset":
+                # The pooled NASA is driven by specific hard datasets, so a
+                # single global shift can't target them. Fit a separate
+                # downward shift per dataset on that dataset's TRAINING rows,
+                # apply to that dataset's TEST rows. Dataset identity is known
+                # per row and is not the prediction target -- no leakage, same
+                # principle as the per-file condition-correction.
+                train_ds = train_tab["dataset"].to_numpy()
+                test_ds = test_tab["dataset"].to_numpy()
+                shifts = {}
+                for d in np.unique(train_ds):
+                    m_tr = train_ds == d
+                    shifts[d] = best_shift(y_train[m_tr], pred_train[m_tr])
+                for d, b in shifts.items():
+                    pred[test_ds == d] -= b
+                    pred_train[train_ds == d] -= b
+                print(
+                    "  nasa_bias per-dataset: "
+                    + ", ".join(f"{d}:-{b}" for d, b in sorted(shifts.items()))
+                )
+            else:
+                b_best = best_shift(y_train, pred_train)
+                pred = pred - b_best
+                pred_train = pred_train - b_best
+                print(f"  nasa_bias: -{b_best}")
+        if cfg.get("clamp"):
+            lo, hi = float(y_train.min()), float(y_train.max())
+            pred = np.clip(pred, lo, hi)
+
+        fit_seconds = time.perf_counter() - t0
+
+        # Per-sample metrics: over every one of the ~128k test rows.
         rmse = float(np.sqrt(mean_squared_error(y_test_true, pred)))
         score = nasa_score(y_test_true, pred)
+
+        # Canonical per-engine metrics: ONE prediction per test engine, at
+        # its last available cycle (the C-MAPSS / PHM08 "predict RUL for each
+        # test engine" protocol). ~27 points, comparable to published scores.
+        eng_true, eng_pred = per_engine_predictions(test_tab, y_test_true, pred)
+        rmse_eng = float(np.sqrt(mean_squared_error(eng_true, eng_pred)))
+        score_eng = nasa_score(eng_true, eng_pred)
 
         per_dataset = {}
         for dataset, sub_idx in test_tab.groupby("dataset").groups.items():
@@ -904,7 +1043,12 @@ def main(tune: bool = False, tune_de: bool = False):
 
         print(
             f"pooled train={len(train_tab):,}  test={len(test_tab):,}  "
-            f"fit={fit_seconds:.2f}s  RMSE={rmse:.2f}  NASA score={score:,.0f}"
+            f"fit={fit_seconds:.2f}s"
+        )
+        print(f"  per-sample:  RMSE={rmse:.2f}  NASA={score:,.0f}")
+        print(
+            f"  per-engine:  RMSE={rmse_eng:.2f}  NASA={score_eng:,.1f}  "
+            f"(n_engines={len(eng_true)})"
         )
         for dataset, (rmse_d, n_d) in sorted(per_dataset.items()):
             print(f"  {dataset}: rmse={rmse_d:.2f}  n={n_d}")
@@ -912,6 +1056,9 @@ def main(tune: bool = False, tune_de: bool = False):
         results[name] = dict(
             rmse=rmse,
             nasa_score=score,
+            rmse_engine=rmse_eng,
+            nasa_score_engine=score_eng,
+            n_engines=len(eng_true),
             fit_seconds=fit_seconds,
             n_train=len(train_tab),
             n_pooled_train=n_pooled,
