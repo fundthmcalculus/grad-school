@@ -44,5 +44,10 @@ MILESTONES = [
 ]
 
 if __name__ == "__main__":
-    plot_progression(MILESTONES, "FuzzySystemsExperiments/cmapss_rul_progression.png")
-    print("wrote FuzzySystemsExperiments/cmapss_rul_progression.png")
+    import os
+
+    os.makedirs("FuzzySystemsExperiments/outputs", exist_ok=True)
+    plot_progression(
+        MILESTONES, "FuzzySystemsExperiments/outputs/cmapss_rul_progression.png"
+    )
+    print("wrote FuzzySystemsExperiments/outputs/cmapss_rul_progression.png")

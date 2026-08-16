@@ -12,6 +12,7 @@ cmapss_rul_plots.plot_stage3.
 
 import contextlib
 import io
+import os
 import time
 
 import numpy as np
@@ -119,7 +120,8 @@ def main():
 
     from cmapss_rul_plots import plot_stage3
 
-    out_path = "FuzzySystemsExperiments/cmapss_rul_champion_trajectories.png"
+    os.makedirs("FuzzySystemsExperiments/outputs", exist_ok=True)
+    out_path = "FuzzySystemsExperiments/outputs/cmapss_rul_champion_trajectories.png"
     plot_stage3(
         predictions,
         out_path,

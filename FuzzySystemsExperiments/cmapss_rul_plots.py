@@ -588,23 +588,29 @@ def make_plots(
     stage5_onsets=None,
     stage5_results=None,
 ):
-    plot_stage1(stage1_df, "FuzzySystemsExperiments/cmapss_rul_stage1.png")
-    print("wrote FuzzySystemsExperiments/cmapss_rul_stage1.png")
+    plot_stage1(stage1_df, "FuzzySystemsExperiments/outputs/cmapss_rul_stage1.png")
+    print("wrote FuzzySystemsExperiments/outputs/cmapss_rul_stage1.png")
     plot_stage2(
-        stage2_df, top_pipelines, "FuzzySystemsExperiments/cmapss_rul_stage2.png"
+        stage2_df,
+        top_pipelines,
+        "FuzzySystemsExperiments/outputs/cmapss_rul_stage2.png",
     )
-    print("wrote FuzzySystemsExperiments/cmapss_rul_stage2.png")
-    plot_stage3(stage3_predictions, "FuzzySystemsExperiments/cmapss_rul_stage3.png")
-    print("wrote FuzzySystemsExperiments/cmapss_rul_stage3.png")
+    print("wrote FuzzySystemsExperiments/outputs/cmapss_rul_stage2.png")
+    plot_stage3(
+        stage3_predictions, "FuzzySystemsExperiments/outputs/cmapss_rul_stage3.png"
+    )
+    print("wrote FuzzySystemsExperiments/outputs/cmapss_rul_stage3.png")
     if stage4_df is not None and not stage4_df.empty:
-        plot_stage4(stage4_df, "FuzzySystemsExperiments/cmapss_rul_stage4.png")
-        print("wrote FuzzySystemsExperiments/cmapss_rul_stage4.png")
+        plot_stage4(stage4_df, "FuzzySystemsExperiments/outputs/cmapss_rul_stage4.png")
+        print("wrote FuzzySystemsExperiments/outputs/cmapss_rul_stage4.png")
     if stage4b_df is not None and not stage4b_df.empty:
         baseline_rmse = stage4b_df["rmse_baseline"].iloc[0]
         plot_stage4b(
-            stage4b_df, baseline_rmse, "FuzzySystemsExperiments/cmapss_rul_stage4b.png"
+            stage4b_df,
+            baseline_rmse,
+            "FuzzySystemsExperiments/outputs/cmapss_rul_stage4b.png",
         )
-        print("wrote FuzzySystemsExperiments/cmapss_rul_stage4b.png")
+        print("wrote FuzzySystemsExperiments/outputs/cmapss_rul_stage4b.png")
     if (
         stage5_onsets is not None
         and stage5_results is not None
@@ -613,6 +619,6 @@ def make_plots(
         plot_stage5(
             stage5_onsets,
             stage5_results,
-            "FuzzySystemsExperiments/cmapss_rul_stage5.png",
+            "FuzzySystemsExperiments/outputs/cmapss_rul_stage5.png",
         )
-        print("wrote FuzzySystemsExperiments/cmapss_rul_stage5.png")
+        print("wrote FuzzySystemsExperiments/outputs/cmapss_rul_stage5.png")
