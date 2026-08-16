@@ -127,6 +127,71 @@ def test_readout_solve_recovers_a_linear_target():
     assert fis2nn.rmse(y, fitted.predict(X)) < 1e-8
 
 
+def test_pwl_decomposition_is_exact_at_and_between_knots():
+    """Slope-change weights reproduce the interpolant, not merely the samples."""
+    rng = np.random.default_rng(11)
+    for _ in range(20):
+        t = np.sort(rng.uniform(-5, 5, size=int(rng.integers(2, 12))))
+        if t.size > 1 and np.min(np.diff(t)) < 1e-3:
+            continue
+        v = rng.uniform(-10, 10, size=t.size)
+        base, intercept, coeffs = fis2nn.pwl_to_relu_weights(t, v)
+
+        def g(x):
+            act = np.maximum(x[:, None] - t[None, :], 0.0)
+            return intercept + base * x + act @ coeffs
+
+        assert np.max(np.abs(g(t) - v)) < 1e-10, "knot values not reproduced"
+        if t.size > 1:
+            # A midpoint of each segment must sit on the straight line joining
+            # its endpoints -- this is what distinguishes an exact PWL
+            # decomposition from one that merely interpolates the samples.
+            mid = 0.5 * (t[:-1] + t[1:])
+            want = 0.5 * (v[:-1] + v[1:])
+            assert np.max(np.abs(g(mid) - want)) < 1e-10
+        # The end knots carry no slope change: the function extends linearly.
+        assert coeffs[0] == 0.0 and coeffs[-1] == 0.0
+
+
+def test_analytic_seed_reproduces_a_1d_system_at_its_knots():
+    """The equivalence, backed out into weights: 1-D seed == the system itself.
+
+    With one input there is nothing to average over, so the partial-dependence
+    profile *is* the system's own function and the seed must reproduce it
+    wherever the conversion places a knot -- with no labels involved anywhere.
+    """
+    import pandas as pd
+
+    terms = build_triangular_partition([-3.0, -1.0, 0.5, 2.0, 4.5])
+    singletons = [7.0, -2.0, 11.0, 3.0, -5.0]
+
+    def fis(frame):
+        x = np.asarray(frame["x"], dtype=float)
+        return sum(m * t.evaluate(x) for m, t in zip(singletons, terms))
+
+    knots = {"x": fis2nn.merge_knots([-3.0, -1.0, 0.5, 2.0, 4.5])}
+    X = pd.DataFrame({"x": np.linspace(-3.0, 4.5, 200)})
+    net = fis2nn.analytic_seed_from_fis(fis, X, ["x"], knots, background_size=None)
+
+    at_knots = knots["x"][:, None]
+    assert (
+        np.max(np.abs(net.predict(at_knots) - fis(pd.DataFrame({"x": knots["x"]}))))
+        < 1e-9
+    )
+    # And, because this system is piecewise linear with breakpoints exactly at
+    # those knots, everywhere in between too.
+    dense = np.linspace(-3.0, 4.5, 5001)
+    err = np.max(np.abs(net.predict(dense[:, None]) - fis(pd.DataFrame({"x": dense}))))
+    assert err < 1e-9, f"max abs error {err:.3e}"
+
+
+def test_analytic_seed_uses_no_labels():
+    """The seed takes no target: it converts the FIS, it does not refit it."""
+    import inspect
+
+    assert "y" not in inspect.signature(fis2nn.analytic_seed_from_fis).parameters
+
+
 def test_knot_merging_is_idempotent_and_sorted():
     knots = fis2nn.merge_knots([3.0, 1.0, 1.0 + 1e-15, np.inf, -np.inf, 2.0])
     assert np.all(np.diff(knots) > 0)

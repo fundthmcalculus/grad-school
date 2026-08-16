@@ -18,12 +18,16 @@ bias terms. Everything in this module follows from that:
   partitioned zeroth-order TSK system into a one-hidden-layer ReLU network
   *analytically* -- no data, no fitting, agreement at machine precision. That
   is the theorem, made executable, and ``test_fis2nn.py`` pins it.
-* :func:`warm_start_from_fis` is the practical n-dimensional version: the FIS's
-  knots become the first layer, and the read-out is solved in closed form. In
-  more than one dimension the FIS output is *not* piecewise linear -- the
-  product t-norm and the firing-strength normalization both leave the PWL class
-  -- so this is a warm start rather than an identity, and the experiment
-  measures the gap it leaves.
+* :func:`analytic_seed_from_fis` is the practical n-dimensional version, and is
+  what the experiment actually uses. It backs the equivalence out into *every*
+  weight rather than only the biases: the FIS's own one-dimensional profiles are
+  sampled at its knots and decomposed by second differences, so consequents and
+  gating reach the network too. In more than one dimension the FIS output is not
+  piecewise linear -- the product t-norm and the firing-strength normalization
+  both leave the PWL class -- so what the seed carries is the FIS's additive
+  part, exactly, and the experiment measures the residual.
+* :func:`warm_start_from_fis` is the weaker variant kept for comparison: FIS
+  knots for the first layer, and least squares for everything else.
 
 Written against numpy only, deliberately: the point is that the converted
 network is an ordinary MLP that any framework can consume, and a 60-line Adam
@@ -34,9 +38,12 @@ that would otherwise differ between arms.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Sequence
+from typing import TYPE_CHECKING, Iterable, Sequence
 
 import numpy as np
+
+if TYPE_CHECKING:  # pandas is used only in the partial-dependence path
+    import pandas as pd
 
 from tribblefis.gauss_data import (
     GaussianMembership,
@@ -262,28 +269,40 @@ def _design(net: ReLUNet, X: np.ndarray) -> np.ndarray:
 
 
 def solve_readout(
-    net: ReLUNet, X: np.ndarray, y: np.ndarray, l2: float = 1e-6
+    net: ReLUNet, X: np.ndarray, y: np.ndarray, l2: float = 1e-6, anchor: bool = True
 ) -> ReLUNet:
     """Set ``w2, v, c`` to the ridge least-squares optimum for the current layer 1.
 
     Closed form, no gradient steps: for fixed hidden units the output is linear
     in the read-out, which is the same argument `regression.solve_tsk_consequents`
-    makes for TSK consequents at fixed firing strengths. The warm start inherits
-    that property from the FIS it came from -- it is a *construction*, and its
-    cost is one linear solve rather than an epoch budget.
+    makes for TSK consequents at fixed firing strengths. Its cost is one linear
+    solve rather than an epoch budget.
+
+    ``anchor=True`` (the default) fits the *residual* of whatever read-out the
+    net already carries and adds the correction, so the ridge penalty shrinks
+    toward that read-out instead of toward zero. Applied to an analytic seed
+    that matters: the plain form would solve the backed-out weights away and
+    keep only the knots, which is precisely the information the seed exists to
+    carry. At ``l2 -> 0`` the two forms coincide, as they should.
     """
     Phi = _design(net, X)
     y = np.asarray(y, dtype=float).ravel()
+    target = y - net.predict(X) if anchor else y
     n_cols = Phi.shape[1]
     penalty = l2 * np.eye(n_cols)
     penalty[-1, -1] = 0.0  # never penalize the intercept
-    beta = np.linalg.solve(Phi.T @ Phi + penalty, Phi.T @ y)
+    beta = np.linalg.solve(Phi.T @ Phi + penalty, Phi.T @ target)
     h = net.n_hidden
     n_f = net.W1.shape[0]
     out = net.copy()
-    out.w2 = beta[:h]
-    out.v = beta[h : h + n_f]
-    out.c = float(beta[-1])
+    if anchor:
+        out.w2 = net.w2 + beta[:h]
+        out.v = net.v + beta[h : h + n_f]
+        out.c = float(net.c + beta[-1])
+    else:
+        out.w2 = beta[:h]
+        out.v = beta[h : h + n_f]
+        out.c = float(beta[-1])
     return out
 
 
@@ -388,15 +407,155 @@ def random_feature_start(
     return solve_readout(net, X, y, l2)
 
 
-def he_start(
-    rng: np.random.Generator, n_features: int, n_hidden: int
-) -> ReLUNet:
+def he_start(rng: np.random.Generator, n_features: int, n_hidden: int) -> ReLUNet:
     """The standard baseline: He-normal layer 1, small random read-out."""
     W1 = rng.normal(0.0, np.sqrt(2.0 / n_features), size=(n_features, n_hidden))
     b1 = np.zeros(n_hidden)
     w2 = rng.normal(0.0, np.sqrt(2.0 / n_hidden), size=n_hidden)
     v = np.zeros(n_features)
     return ReLUNet(W1=W1, b1=b1, w2=w2, v=v, c=0.0)
+
+
+# ---------------------------------------------------------------------------
+# Backing the equivalence out into the seed weights
+# ---------------------------------------------------------------------------
+#
+# `warm_start_from_fis` above takes only the FIS's *knots* and then asks least
+# squares for the read-out. That throws away everything the FIS knew about what
+# happens between the knots -- its consequents, its rule weights, its gating.
+# The functions below keep it.
+#
+# The route is the equivalence read at the level of the FIS's input-output
+# function rather than its internal gates. Bede/Kreinovich/Toth's identity says
+# a continuous piecewise-linear function of one variable *is* a one-hidden-layer
+# ReLU network, with slope changes as the output weights; it does not care how
+# the piecewise-linear function was produced. So instead of demanding that the
+# firing strengths themselves be piecewise linear -- which is what forces the
+# min/max-versus-product gating question, and what the tetrahedral construction
+# of the 2025 paper exists to solve -- we take the FIS's own one-dimensional
+# profiles, which are functions we can evaluate exactly, and convert *those*.
+#
+# The consequence worth stating plainly: **the choice of t-norm stops being
+# load-bearing.** A product t-norm makes firing strengths piecewise multilinear
+# and kills any exact gate-level conversion; it does not stop us evaluating the
+# FIS at a knot. `analysis_gating.py` measures whether the choice still matters
+# empirically, now that it no longer matters structurally.
+
+
+def pwl_to_relu_weights(
+    knots: np.ndarray, values: np.ndarray
+) -> tuple[float, float, np.ndarray]:
+    """Exact ReLU decomposition of the piecewise-linear interpolant of ``(t, v)``.
+
+    Returns ``(base_slope, intercept, coeffs)`` such that
+
+        g(x) = intercept + base_slope * x + sum_j coeffs[j] * relu(x - knots[j])
+
+    reproduces every ``(knots[j], values[j])`` pair exactly and is linear
+    between and beyond them. ``coeffs[j]`` is the *change* in slope at knot
+    ``j`` -- the second difference of the sampled values -- which is precisely
+    the output weight the equivalence assigns to that knot's hidden unit. The
+    first and last knots carry no slope change (the function is extended
+    linearly outside the sampled range), so their coefficients are zero.
+    """
+    t = np.asarray(knots, dtype=float)
+    v = np.asarray(values, dtype=float)
+    if t.ndim != 1 or t.shape != v.shape:
+        raise ValueError("knots and values must be matching 1-D arrays")
+    m = t.size
+    coeffs = np.zeros(m, dtype=float)
+    if m == 0:
+        return 0.0, 0.0, coeffs
+    if m == 1:
+        return 0.0, float(v[0]), coeffs
+
+    seg = np.diff(v) / np.diff(t)  # slope of each segment, length m-1
+    base = float(seg[0])
+    coeffs[1:-1] = np.diff(seg)  # slope change at each interior knot
+    intercept = float(v[0] - base * t[0])
+    return base, intercept, coeffs
+
+
+def partial_dependence(
+    predict_fn,
+    X: "pd.DataFrame",
+    feature: str,
+    grid: np.ndarray,
+    background: np.ndarray | None = None,
+) -> np.ndarray:
+    """The FIS's average response to ``feature``, holding the joint data fixed.
+
+    ``g_f(t) = mean_i FIS(x_i with x_i[f] := t)`` over a background sample of
+    rows. This is the first-order term of the functional ANOVA decomposition of
+    the FIS -- under independent inputs it is the exact projection of the FIS
+    onto functions of ``feature`` alone, which is the best any additive seed can
+    do, so it is the right thing to back out rather than a convenient proxy.
+
+    It consumes ``X`` but never ``y``: this is a conversion of the FIS, not a
+    refit against labels.
+    """
+    import pandas as pd  # local: keeps the module's hard dependency numpy-only
+
+    rows = X if background is None else X.iloc[background]
+    n = len(rows)
+    tiled = pd.concat([rows] * len(grid), ignore_index=True)
+    tiled[feature] = np.repeat(np.asarray(grid, dtype=float), n)
+    preds = np.asarray(predict_fn(tiled), dtype=float).reshape(len(grid), n)
+    return preds.mean(axis=1)
+
+
+def analytic_seed_from_fis(
+    predict_fn,
+    X: "pd.DataFrame",
+    features: Sequence[str],
+    knots: dict[str, np.ndarray],
+    background_size: int = 256,
+    seed: int = 0,
+) -> ReLUNet:
+    """Seed weights derived from the FIS's own response, with no label fitting.
+
+    For each feature the FIS's partial-dependence profile is sampled at that
+    feature's knots and converted by :func:`pwl_to_relu_weights`; the slope
+    changes become hidden-unit output weights, the leading slopes become the
+    linear skip, and the constants are summed into the bias with the additive
+    decomposition's centering term.
+
+    In one dimension there is nothing to average over, the profile *is* the FIS,
+    and the seed reproduces it exactly at every knot -- the equivalence, with
+    the FIS's consequents carried into the weights rather than re-estimated.
+    In more dimensions it is the additive part of the FIS, exactly.
+    """
+    rng = np.random.default_rng(seed)
+    n = len(X)
+    background = (
+        rng.choice(n, background_size, replace=False)
+        if background_size and n > background_size
+        else np.arange(n)
+    )
+
+    pairs = [(i, knots[f]) for i, f in enumerate(features) if knots[f].size]
+    net = _axis_aligned_net(len(features), pairs)
+
+    baseline = float(np.mean(np.asarray(predict_fn(X.iloc[background]), dtype=float)))
+
+    w2 = np.zeros(net.n_hidden, dtype=float)
+    v = np.zeros(len(features), dtype=float)
+    c = baseline
+    at = 0
+    for f_idx, ks in pairs:
+        profile = partial_dependence(predict_fn, X, features[f_idx], ks, background)
+        base_slope, intercept, coeffs = pwl_to_relu_weights(ks, profile)
+        w2[at : at + ks.size] = coeffs
+        v[f_idx] = base_slope
+        # Each feature's profile already contains the baseline, so every profile
+        # beyond the first would re-add it; subtract it back out per feature.
+        c += intercept - baseline
+        at += ks.size
+
+    net.w2 = w2
+    net.v = v
+    net.c = float(c)
+    return net
 
 
 # ---------------------------------------------------------------------------
@@ -463,7 +622,10 @@ class TrainHistory:
 
 
 def rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    d = np.asarray(y_true, dtype=float).ravel() - np.asarray(y_pred, dtype=float).ravel()
+    d = (
+        np.asarray(y_true, dtype=float).ravel()
+        - np.asarray(y_pred, dtype=float).ravel()
+    )
     return float(np.sqrt(np.mean(d * d)))
 
 

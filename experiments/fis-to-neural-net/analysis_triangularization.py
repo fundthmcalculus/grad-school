@@ -69,8 +69,13 @@ def one_cell(X, y, seed, top_n, buckets=4, order="1st"):
         with contextlib.redirect_stdout(io.StringIO()):
             return np.asarray(
                 predict_tsk(
-                    Xte, model, feats, reg.y_bucket_mean_, reg.corr_terms_,
-                    order=reg.tsk_order, basis=reg.consequent_basis,
+                    Xte,
+                    model,
+                    feats,
+                    reg.y_bucket_mean_,
+                    reg.corr_terms_,
+                    order=reg.tsk_order,
+                    basis=reg.consequent_basis,
                 )
             ).ravel()
 
@@ -119,8 +124,14 @@ def main() -> int:
         cfg = DATASETS[name]
         Xd, yd = cfg["loader"]()
         cells = [
-            one_cell(Xd, yd, s, cfg.get("fis_kwargs", {}).get("top_n", -1),
-                     buckets=cfg["buckets"], order=cfg["order"])
+            one_cell(
+                Xd,
+                yd,
+                s,
+                cfg.get("fis_kwargs", {}).get("top_n", -1),
+                buckets=cfg["buckets"],
+                order=cfg["order"],
+            )
             for s in SEEDS
         ]
         n_f = int(np.mean([c["n_features"] for c in cells]))
