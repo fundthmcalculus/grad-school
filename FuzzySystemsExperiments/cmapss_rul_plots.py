@@ -192,6 +192,90 @@ def plot_stage2(stage2_df: pd.DataFrame, pipelines: list[str], out_path: str):
     plt.close(fig)
 
 
+GRID_PIPELINE_COLOR = {
+    # Same hues as the aggregation strategy each pipeline actually uses
+    # (CAT above), so this chart reads consistently with every other plot
+    # in this DOE: honest = whole_cycle (blue), best = raw_memory (orange).
+    "honest": CAT["A1_whole_cycle"],
+    "best": CAT["A3_raw_memory"],
+}
+GRID_PIPELINE_LABEL = {
+    "honest": "honest (physical sensors only, 18ch)",
+    "best": "best (physical + 2 virtual, 20ch)",
+}
+
+
+def _short_dataset_label(dataset: str) -> str:
+    name = dataset.replace("N-CMAPSS_", "").replace(".h5", "")
+    return name.split("-")[0]  # "DS08a-009" -> "DS08a", "DS02-006" -> "DS02"
+
+
+def plot_grid_results(
+    grid_df: pd.DataFrame, out_path: str, tuned_dataset: str = "N-CMAPSS_DS02-006.h5"
+):
+    """Grouped bar chart of RMSE per dataset per pipeline (cmapss_rul_best.py
+    --grid). Both pipelines use hyperparameters tuned only on `tuned_dataset`
+    -- every other dataset is a zero-shot generalization check, not a
+    per-dataset best case, so that dataset's bars are highlighted to make
+    the trained-on/untrained-on split visually obvious."""
+    datasets = sorted(grid_df["dataset"].unique())
+    pipelines = ["honest", "best"]
+    x = np.arange(len(datasets))
+    width = 0.34
+
+    fig, ax = plt.subplots(figsize=(10, 6), facecolor=SURFACE)
+
+    for j, pipeline in enumerate(pipelines):
+        offset = (j - 0.5) * width
+        values = [
+            grid_df.loc[
+                (grid_df["dataset"] == d) & (grid_df["pipeline"] == pipeline), "rmse"
+            ].iloc[0]
+            for d in datasets
+        ]
+        bars = ax.bar(
+            x + offset,
+            values,
+            width=width,
+            color=GRID_PIPELINE_COLOR[pipeline],
+            label=GRID_PIPELINE_LABEL[pipeline],
+            zorder=3,
+        )
+        ax.bar_label(bars, fmt="%.1f", fontsize=7.5, color=INK_SECONDARY, padding=2)
+
+    if tuned_dataset in datasets:
+        i = datasets.index(tuned_dataset)
+        ax.axvspan(i - 0.5, i + 0.5, color=INK_MUTED, alpha=0.12, zorder=0)
+        local_max = grid_df.loc[grid_df["dataset"] == tuned_dataset, "rmse"].max()
+        ax.text(
+            i,
+            local_max + ax.get_ylim()[1] * 0.03,
+            "tuned here",
+            ha="center",
+            va="bottom",
+            fontsize=8.5,
+            color=INK_SECONDARY,
+        )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([_short_dataset_label(d) for d in datasets], fontsize=9.5)
+    ax.set_ylabel("Test RMSE, true RUL (cycles)")
+    ax.set_title(
+        "Zero-shot generalization: RMSE across all N-CMAPSS datasets\n"
+        "(config tuned on DS02 only, not re-tuned per dataset)",
+        fontsize=12.5,
+        pad=14,
+        loc="left",
+    )
+    ax.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    _style_axes(ax)
+    ax.legend(loc="upper right", frameon=False, fontsize=9, labelcolor=INK_SECONDARY)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=160, facecolor=SURFACE)
+    plt.close(fig)
+
+
 def plot_stage3(
     predictions: dict, out_path: str, title: str = None, row_labels: dict = None
 ):
