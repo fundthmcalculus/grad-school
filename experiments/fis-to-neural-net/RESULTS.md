@@ -92,7 +92,7 @@ found from the other side: **the ceiling is the FIS**.
 | T1–T5 | the tetrahedral construction (Part 2) | 2 confirmed, 2 falsified, 1 partial |
 | W1–W2 | FIS-aligned vertices, interaction subspaces (Part 3) | both partial |
 | P1–P4 | PhiUSIIL at full scale (Part 4) | 2 confirmed, 2 falsified |
-| S1–S3 | slow-converging problem (Part 5) | 2 confirmed, 1 falsified |
+| S1–S4 | slow-converging problem, damped and undamped (Part 5) | 2 confirmed, 2 falsified |
 
 Six of eight in Part 1 came back wrong or partly wrong, four of five in Part 2,
 and both in Part 3. Several are more useful that way.
@@ -644,13 +644,55 @@ every trajectory, so the operator is effectively a 2-input problem in
 knot basis is nearly the right hypothesis class, which is exactly the condition
 under which Parts 1-3 found the same thing.
 
+## The frictionless chain: a different failure, and a cleaner one
+
+The obvious follow-up was the undamped chain, on the theory that it was
+capacity-limited rather than slow and a wider network would fix it. **It is
+neither.** Widening from 128 to 1024 units moves the from-scratch ceiling only
+from R2 0.725 to 0.771, and the FIS plateaus in the same place — 0.558 at 16
+buckets, 0.757 at 64. Two methods hitting the same ceiling from opposite
+directions is the signature of an irreducible component, not an underpowered
+model: without damping the trajectories separate exponentially, so past some
+horizon in `t` the map `(theta_2(0), t) -> theta_1(t)` is not a function anything
+can learn from a 0.1-degree grid of initial conditions. **R2 0.9 is unreachable
+here, not slow**, and asking for it would have measured nothing.
+
+Re-run at targets the problem admits (2 seeds, 32 buckets, 706 hidden units):
+
+| arm | R2 at start | best R2 | to R2 0.6 | updates |
+|---|---|---|---|---|
+| tribble FIS (3.12 s) | — | 0.6696 | — | — |
+| `hot` | 0.5562 | 0.6254 | 7.95 s | 310 |
+| `hot-anova` | 0.5580 | 0.6672 | 7.75 s | 570 |
+| `quantile` | 0.5682 | 0.6576 | **0.97 s** | 190 |
+| `he` | −1.7690 | 0.6086 | 18.27 s | 3,190 |
+
+The warm start still beats random initialization — 2.3x on wall clock at R2 0.6,
+10x in updates — but the margin is less than half the damped case's 4.7x, and
+`quantile` wins by 8x again.
+
+**The interesting number is 0.5562.** In the damped case the projection seed
+started at R2 0.8747 against the FIS's own 0.8746 — an essentially exact
+conversion. Here it starts at 0.5562 against the FIS's 0.6696, losing 0.11 R2 in
+the conversion alone. That is the additive-projection limit from Parts 1–3
+appearing at its worst: damping makes the operator nearly additive in `t`, and
+removing it makes the interaction between initial condition and time the whole
+problem. **The conversion is exact exactly when the FIS is additive, and this is
+the cleanest demonstration of that in the whole experiment** — the same FIS, the
+same conversion, the same data generator, with damping as the only difference.
+
+It also explains why `quantile` keeps winning and why the tetrahedral work in
+Part 2 mattered: the ceiling on an axis-aligned conversion is the FIS's additive
+part, and no amount of training-time advantage changes where it starts.
+
 ## Scoring
 
 | | hypothesis | verdict |
 |---|---|---|
 | S1 | a slow-converging problem exists and is findable | **confirmed** — 3,444 updates, 138x PhiUSIIL |
 | S2 | on it, the warm start beats random init on wall clock | **confirmed** — 4.7x at R2 0.9, 15.6x in updates |
-| S3 | the FIS's knots beat quantile knots | **falsified again** — quantile wins at every target |
+| S3 | the FIS's knots beat quantile knots | **falsified again** — quantile wins at every target, damped and undamped |
+| S4 | the frictionless chain is capacity-limited and a wider net fixes it | **falsified** — it has an irreducible component; 8x width buys 0.05 R2 |
 
 ## What I would do next
 

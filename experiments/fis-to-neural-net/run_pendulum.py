@@ -72,9 +72,24 @@ BUCKETS = 16
 #: measured 3,444 updates against, so it is the directly comparable row.
 TARGETS = (0.80, 0.85, 0.90, 0.93, 0.95)
 
+#: The frictionless chain is a different problem and needs its own settings.
+#:
+#: It is NOT capacity-limited, which is what a first look suggested: widening
+#: the network from 128 to 1024 units moves its best R2 only from 0.725 to
+#: 0.771, and the FIS plateaus in the same place (0.558 at 16 buckets, 0.757 at
+#: 64). Both methods hit the same ceiling from opposite directions, which is the
+#: signature of an irreducible component rather than an under-powered model:
+#: without damping the double pendulum's trajectories separate exponentially, so
+#: past some horizon in `t` the map (theta_2(0), t) -> theta_1(t) is not a
+#: function anything can learn from a 0.1-degree grid of initial conditions.
+#: R2 0.9 is therefore unreachable here, not slow, and asking for it would
+#: measure nothing. The targets below are the ones this problem admits.
+FRICTIONLESS_BUCKETS = 32
+FRICTIONLESS_TARGETS = (0.40, 0.50, 0.60, 0.65, 0.70)
 
-def prepare(seed):
-    X, y, note = p_pendulum(2, True)
+
+def prepare(seed, friction=True):
+    X, y, note = p_pendulum(2, friction)
     rng = np.random.default_rng(seed)
     idx = rng.permutation(len(X))
     n_te = int(0.15 * len(X))
@@ -98,15 +113,15 @@ def r2_curve(hist, y_true):
     return 1.0 - np.asarray(hist, dtype=float) ** 2 / var
 
 
-def run_cell(seed, epochs, batch_size, eval_batches, l2):
-    scaled, targets, note = prepare(seed)
+def run_cell(seed, epochs, batch_size, eval_batches, l2, friction, buckets, targets_r2):
+    scaled, targets, note = prepare(seed, friction)
     Xtr, Xval, Xte = (scaled[k] for k in ("tr", "val", "te"))
     ytr, yval, yte = (targets[k] for k in ("tr", "val", "te"))
 
     t0 = time.perf_counter()
     with contextlib.redirect_stdout(io.StringIO()):
         reg = TribbleRegressor(
-            n_output_buckets=BUCKETS, tsk_order="1st", random_state=seed
+            n_output_buckets=buckets, tsk_order="1st", random_state=seed
         )
         reg.fit(Xtr, pd.Series(ytr, name="y_value"))
     fis_seconds = time.perf_counter() - t0
@@ -233,7 +248,7 @@ def run_cell(seed, epochs, batch_size, eval_batches, l2):
             "curve_updates": [float(e) * n_batches for e in hist.epochs],
             "curve_r2": [float(v) for v in curve],
         }
-        for tgt in TARGETS:
+        for tgt in targets_r2:
             hit = np.flatnonzero(curve >= tgt)
             if hit.size:
                 u = float(rec["curve_updates"][hit[0]])
@@ -247,25 +262,37 @@ def run_cell(seed, epochs, batch_size, eval_batches, l2):
 
 
 def summarize(rows, meta):
+    TARGETS = tuple(meta["targets"])
+
     def m(fn):
         vals = [fn(r) for r in rows]
         vals = [v for v in vals if v is not None and np.isfinite(v)]
         return float(np.mean(vals)) if vals else None
 
+    kind = "Damped" if meta["friction"] else "Frictionless"
     lines = [
-        "# The warm start on a slow-converging problem",
+        f"# The warm start on a slow-converging problem — {kind.lower()} n=2",
         "",
-        f"Damped n=2 double-pendulum time-step operator, {rows[0]['n_train']:,} train / "
+        f"{kind} n=2 double-pendulum time-step operator, {rows[0]['n_train']:,} train / "
         f"{rows[0]['n_test']:,} test rows, 3 inputs · seeds {meta['seeds']} · "
         f"{meta['epochs']} epochs · batch {meta['batch_size']}.",
         "",
-        "This is the problem `find_slow_problem.py` measured at **3,444 updates** for a "
-        "from-scratch network to reach R2 0.9 — against **25** for PhiUSIIL. The FIS "
-        "fit and the conversion are charged to the hot arms.",
+        (
+            "This is the problem `find_slow_problem.py` measured at **3,444 updates** "
+            "for a from-scratch network to reach R2 0.9 — against **25** for PhiUSIIL."
+            if meta["friction"]
+            else "R2 0.9 is unreachable here, not merely slow: widening the network "
+            "from 128 to 1024 units moves its ceiling only from 0.725 to 0.771, and "
+            "the FIS plateaus in the same place. Without damping the trajectories "
+            "separate exponentially, so past some horizon in `t` the operator is not "
+            "a learnable function of a 0.1-degree initial-condition grid. The targets "
+            "below are the ones this problem admits."
+        )
+        + " The FIS fit and the conversion are charged to the hot arms.",
         "",
         "| model | R2 at start | best R2 | setup s | s/update |",
         "|---|---|---|---|---|",
-        f"| tribble FIS ({BUCKETS} buckets, {m(lambda r: r['fis']['n_mfs']):.0f} MFs) | — | "
+        f"| tribble FIS ({meta['buckets']} buckets, {m(lambda r: r['fis']['n_mfs']):.0f} MFs) | — | "
         f"{m(lambda r: r['fis']['r2']):.4f} | {m(lambda r: r['fis']['seconds']):.2f} | — |",
     ]
     for arm in ARMS:
@@ -355,13 +382,35 @@ def main() -> int:
     ap.add_argument("--batch-size", type=int, default=128)
     ap.add_argument("--eval-batches", type=int, default=20)
     ap.add_argument("--l2", type=float, default=1e-6)
-    ap.add_argument("--out", default=os.path.join(HERE, "pendulum_results.json"))
+    ap.add_argument(
+        "--frictionless",
+        action="store_true",
+        help="the undamped chain: a different problem, see FRICTIONLESS_*",
+    )
+    ap.add_argument("--buckets", type=int, default=None)
+    ap.add_argument("--out", default=None)
     args = ap.parse_args()
+
+    friction = not args.frictionless
+    buckets = args.buckets or (BUCKETS if friction else FRICTIONLESS_BUCKETS)
+    targets_r2 = TARGETS if friction else FRICTIONLESS_TARGETS
+    tag = "" if friction else "_frictionless"
+    out_path = args.out or os.path.join(HERE, f"pendulum{tag}_results.json")
+    md_path = os.path.join(HERE, f"pendulum{tag}.md")
 
     rows = []
     for seed in SEEDS:
         t0 = time.perf_counter()
-        rec = run_cell(seed, args.epochs, args.batch_size, args.eval_batches, args.l2)
+        rec = run_cell(
+            seed,
+            args.epochs,
+            args.batch_size,
+            args.eval_batches,
+            args.l2,
+            friction,
+            buckets,
+            targets_r2,
+        )
         rows.append(rec)
         a = rec["arms"]
         print(
@@ -376,15 +425,15 @@ def main() -> int:
         "seeds": SEEDS,
         "epochs": args.epochs,
         "batch_size": args.batch_size,
-        "buckets": BUCKETS,
-        "targets": list(TARGETS),
+        "buckets": buckets,
+        "targets": list(targets_r2),
+        "friction": friction,
     }
-    with open(args.out, "w") as fh:
+    with open(out_path, "w") as fh:
         json.dump({"meta": meta, "results": rows}, fh, indent=1)
-    path = os.path.join(HERE, "pendulum.md")
-    with open(path, "w") as fh:
+    with open(md_path, "w") as fh:
         fh.write(summarize(rows, meta))
-    print(f"\nwrote {os.path.relpath(path, REPO)}")
+    print(f"\nwrote {os.path.relpath(md_path, REPO)}")
     return 0
 
 
