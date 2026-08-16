@@ -14,6 +14,12 @@ presentations/node_modules/
 /gated-minimax-selection/outputs/
 /dominant-colors.jpg
 
+# N-CMAPSS dataset (28GB across 10 .h5 files) -- downloaded from Kaggle, never
+# tracked. Only FuzzySystemsExperiments/cmapss_rul*.py and their result
+# CSVs/plots are meant to be committed.
+/NASA-CMAPSS/*.h5
+/NASA-CMAPSS/*.crdownload
+
 # Figures the AnalyticalDynamics simulations regenerate on every run. None has
 # ever been tracked; the chapter figures live under research/ instead.
 /AnalyticalDynamics/*.png
