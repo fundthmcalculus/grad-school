@@ -160,6 +160,39 @@ t-norm/t-conorm family changes the FIS's own accuracy but not the seed's
 *fidelity* to whichever FIS it converted.
 *Falsified by* seed fidelity varying materially across norm families.
 
+### Part 2 — the tetrahedral construction
+
+The 2025 IJCCC paper replaces triangular membership functions with **tetrahedral**
+ones, which is exactly the fix for H3/H5's failure mode: an axis-aligned first
+layer can only carry the FIS's additive part. `simplicial.py` implements it on a
+Freudenthal/Kuhn lattice; `run_simplicial.py` measures it.
+
+**T1 — The tetrahedral membership function is a compact exact ReLU circuit.**
+The closed form `phi_v(x) = relu(1 - relu(max_i d_i) - relu(max_i -d_i))`,
+`d = (x-v)/h`, equals the Freudenthal hat exactly, and expands to `O(n)` ReLU
+units at depth `O(log n)`.
+*Falsified by* any disagreement with Kuhn interpolation, or by a unit count that
+grows faster than linearly in `n`.
+
+**T2 — The construction is computationally scalable.**
+Rule count follows the data, not the lattice: `n+1` rules fire at any point, and
+only vertices the data reaches are built, so no `K**n` term ever materializes.
+*Falsified by* the built-rule count tracking the dense grid.
+
+**T3 — It closes the fidelity gap the additive seed left.**
+Carrying interactions should push fidelity materially below the additive seed's
+0.31 / 1.03 / 1.17.
+*Falsified by* the tetrahedral conversion failing to beat the additive one.
+
+**T4 — The paper's `z = f(p)` consequent transfers to this direction.**
+Setting each rule's singleton to the FIS's value at its vertex is the paper's own
+rule and needs no data at all.
+*Falsified by* another estimator of the same consequents beating it.
+
+**T5 — A full-dimensional tetrahedral basis is usable.**
+*Falsified by* fidelity degrading as the lattice refines, or by the support per
+vertex collapsing with dimension.
+
 ## Arms
 
 Six, sharing one architecture, one optimizer, one epoch budget, and one hidden
@@ -229,7 +262,10 @@ Two dataset notes the driver encodes rather than works around:
 
 ```bash
 python experiments/fis-to-neural-net/test_fis2nn.py                  # H1, H3, seconds
+python experiments/fis-to-neural-net/test_simplicial.py              # T1, T2, seconds
 python experiments/fis-to-neural-net/run_experiment.py               # the ladder
+python experiments/fis-to-neural-net/run_simplicial.py               # T3, T4, T5
+python experiments/fis-to-neural-net/time_to_quality.py              # H4, from results.json
 python experiments/fis-to-neural-net/analysis_triangularization.py   # H2's mechanism
 python experiments/fis-to-neural-net/analysis_gating.py              # H8
 

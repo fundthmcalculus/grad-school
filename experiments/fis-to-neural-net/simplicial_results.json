@@ -1,0 +1,3091 @@
+{
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "results": [
+  {
+   "dataset": "synth1d",
+   "seed": 0,
+   "n_train": 480,
+   "n_features": 1,
+   "fis_seconds": 0.037974179999991975,
+   "fis_test_rmse": 0.052878259237907496,
+   "additive": {
+    "seconds": 0.006698749000065618,
+    "n_hidden": 45,
+    "fidelity": 0.03419188486269474,
+    "test_rmse": 0.05226931069019078
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 4,
+     "rows_per_vertex": 120.0,
+     "dense_grid": 3.0,
+     "vertex": 0.5676707296024461,
+     "support": 0.6429825731865781,
+     "project": 0.23757564200957484,
+     "relu_spec": {
+      "relu_units": 12,
+      "depth": 3,
+      "vertices": 4,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 6,
+     "rows_per_vertex": 80.0,
+     "dense_grid": 5.0,
+     "vertex": 0.3366344719854623,
+     "support": 0.41864681907777324,
+     "project": 0.1527820337380587,
+     "relu_spec": {
+      "relu_units": 18,
+      "depth": 3,
+      "vertices": 6,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 10,
+     "rows_per_vertex": 48.0,
+     "dense_grid": 9.0,
+     "vertex": 0.18045595368698197,
+     "support": 0.1598299719098775,
+     "project": 0.09247740680937165,
+     "relu_spec": {
+      "relu_units": 30,
+      "depth": 3,
+      "vertices": 10,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 18.46153846153846,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.003663945000084823,
+     "fidelity": 0.022324107420816176,
+     "train_fidelity": 0.019463598259832796,
+     "test_rmse": 0.052487125856463396,
+     "solve_seconds": 0.00018760099999326485,
+     "fit_test_rmse": 0.049619043491772305,
+     "total_seconds": 0.04852447500013568
+    }
+   ]
+  },
+  {
+   "dataset": "synth1d",
+   "seed": 1,
+   "n_train": 480,
+   "n_features": 1,
+   "fis_seconds": 0.024706007999952817,
+   "fis_test_rmse": 0.0555961352296859,
+   "additive": {
+    "seconds": 0.006316086000083487,
+    "n_hidden": 45,
+    "fidelity": 0.0296246982979071,
+    "test_rmse": 0.052953367774558585
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 4,
+     "rows_per_vertex": 120.0,
+     "dense_grid": 3.0,
+     "vertex": 0.5655185236520711,
+     "support": 0.6515518065357948,
+     "project": 0.2497496012331877,
+     "relu_spec": {
+      "relu_units": 12,
+      "depth": 3,
+      "vertices": 4,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 6,
+     "rows_per_vertex": 80.0,
+     "dense_grid": 5.0,
+     "vertex": 0.40055785451467885,
+     "support": 0.4463078531605479,
+     "project": 0.1654809926565873,
+     "relu_spec": {
+      "relu_units": 18,
+      "depth": 3,
+      "vertices": 6,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 10,
+     "rows_per_vertex": 48.0,
+     "dense_grid": 9.0,
+     "vertex": 0.23840251909813495,
+     "support": 0.19403825671495598,
+     "project": 0.06819657376895304,
+     "relu_spec": {
+      "relu_units": 30,
+      "depth": 3,
+      "vertices": 10,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 18.46153846153846,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.0036062089999404634,
+     "fidelity": 0.019309597690353925,
+     "train_fidelity": 0.02054839479955491,
+     "test_rmse": 0.05382695695385841,
+     "solve_seconds": 0.0001906429999962711,
+     "fit_test_rmse": 0.05101282604787395,
+     "total_seconds": 0.03481894599997304
+    }
+   ]
+  },
+  {
+   "dataset": "synth1d",
+   "seed": 2,
+   "n_train": 480,
+   "n_features": 1,
+   "fis_seconds": 0.02602024599991637,
+   "fis_test_rmse": 0.057878662718945095,
+   "additive": {
+    "seconds": 0.00665098100000705,
+    "n_hidden": 45,
+    "fidelity": 0.029380760773006866,
+    "test_rmse": 0.05601386725604594
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 4,
+     "rows_per_vertex": 120.0,
+     "dense_grid": 3.0,
+     "vertex": 0.5828594431671505,
+     "support": 0.6225877102981422,
+     "project": 0.23763015365158713,
+     "relu_spec": {
+      "relu_units": 12,
+      "depth": 3,
+      "vertices": 4,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 6,
+     "rows_per_vertex": 80.0,
+     "dense_grid": 5.0,
+     "vertex": 0.35043781415297526,
+     "support": 0.3936035295960162,
+     "project": 0.13597703602036423,
+     "relu_spec": {
+      "relu_units": 18,
+      "depth": 3,
+      "vertices": 6,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 10,
+     "rows_per_vertex": 48.0,
+     "dense_grid": 9.0,
+     "vertex": 0.2262957962506413,
+     "support": 0.16302079888465945,
+     "project": 0.07932868362735665,
+     "relu_spec": {
+      "relu_units": 30,
+      "depth": 3,
+      "vertices": 10,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 18.46153846153846,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.004208200999983092,
+     "fidelity": 0.024302659293232998,
+     "train_fidelity": 0.025546597205648308,
+     "test_rmse": 0.057293160347271006,
+     "solve_seconds": 0.00020562600002449472,
+     "fit_test_rmse": 0.05723524492108156,
+     "total_seconds": 0.037085053999931006
+    }
+   ]
+  },
+  {
+   "dataset": "synth1d",
+   "seed": 3,
+   "n_train": 480,
+   "n_features": 1,
+   "fis_seconds": 0.028586987999915436,
+   "fis_test_rmse": 0.05926595064796472,
+   "additive": {
+    "seconds": 0.006340312000020276,
+    "n_hidden": 45,
+    "fidelity": 0.02902777059738072,
+    "test_rmse": 0.05683211578575483
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 4,
+     "rows_per_vertex": 120.0,
+     "dense_grid": 3.0,
+     "vertex": 0.564155708367492,
+     "support": 0.6446541662553064,
+     "project": 0.2593431494095224,
+     "relu_spec": {
+      "relu_units": 12,
+      "depth": 3,
+      "vertices": 4,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 6,
+     "rows_per_vertex": 80.0,
+     "dense_grid": 5.0,
+     "vertex": 0.36592038734916443,
+     "support": 0.4286814224977995,
+     "project": 0.14606888569236473,
+     "relu_spec": {
+      "relu_units": 18,
+      "depth": 3,
+      "vertices": 6,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 10,
+     "rows_per_vertex": 48.0,
+     "dense_grid": 9.0,
+     "vertex": 0.20585247692616976,
+     "support": 0.18009155975039542,
+     "project": 0.09735992585948977,
+     "relu_spec": {
+      "relu_units": 30,
+      "depth": 3,
+      "vertices": 10,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 18.46153846153846,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.0036101290000942754,
+     "fidelity": 0.01997626564777688,
+     "train_fidelity": 0.026228538276925305,
+     "test_rmse": 0.05793764636539575,
+     "solve_seconds": 0.00016095699993456947,
+     "fit_test_rmse": 0.05272969039007975,
+     "total_seconds": 0.03869838599996456
+    }
+   ]
+  },
+  {
+   "dataset": "synth1d",
+   "seed": 4,
+   "n_train": 480,
+   "n_features": 1,
+   "fis_seconds": 0.023974885999905382,
+   "fis_test_rmse": 0.05974789084498271,
+   "additive": {
+    "seconds": 0.006127668999965863,
+    "n_hidden": 42,
+    "fidelity": 0.028785797738565284,
+    "test_rmse": 0.05930302803654029
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 4,
+     "rows_per_vertex": 120.0,
+     "dense_grid": 3.0,
+     "vertex": 0.5634216045334743,
+     "support": 0.6525247356309797,
+     "project": 0.24748505441898846,
+     "relu_spec": {
+      "relu_units": 12,
+      "depth": 3,
+      "vertices": 4,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 6,
+     "rows_per_vertex": 80.0,
+     "dense_grid": 5.0,
+     "vertex": 0.2973259128887589,
+     "support": 0.38912837493109753,
+     "project": 0.15548126554494435,
+     "relu_spec": {
+      "relu_units": 18,
+      "depth": 3,
+      "vertices": 6,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 10,
+     "rows_per_vertex": 48.0,
+     "dense_grid": 9.0,
+     "vertex": 0.1840398862786935,
+     "support": 0.15954123432279513,
+     "project": 0.09345163090762042,
+     "relu_spec": {
+      "relu_units": 30,
+      "depth": 3,
+      "vertices": 10,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 18.46153846153846,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.003858087999901727,
+     "fidelity": 0.021391573489014364,
+     "train_fidelity": 0.029356830339304002,
+     "test_rmse": 0.0588049817782648,
+     "solve_seconds": 0.0002098040000646506,
+     "fit_test_rmse": 0.05708741942708239,
+     "total_seconds": 0.03417044699983762
+    }
+   ]
+  },
+  {
+   "dataset": "concrete",
+   "seed": 0,
+   "n_train": 824,
+   "n_features": 8,
+   "fis_seconds": 0.1168220750000728,
+   "fis_test_rmse": 6.4872789359630305,
+   "additive": {
+    "seconds": 0.07392427499996757,
+    "n_hidden": 244,
+    "fidelity": 0.2926815985004419,
+    "test_rmse": 7.391022895108623
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 1033,
+     "rows_per_vertex": 0.797676669893514,
+     "dense_grid": 6561.0,
+     "vertex": 1.8077661981582125,
+     "support": 0.38416582037940655,
+     "project": 0.6867046137264704,
+     "relu_spec": {
+      "relu_units": 17561,
+      "depth": 5,
+      "vertices": 1033,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 2947,
+     "rows_per_vertex": 0.2796063793688497,
+     "dense_grid": 390625.0,
+     "vertex": 1.8012816597433141,
+     "support": 0.3855649436549543,
+     "project": 0.4025632107357514,
+     "relu_spec": {
+      "relu_units": 50099,
+      "depth": 5,
+      "vertices": 2947,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 5229,
+     "rows_per_vertex": 0.15758271179957928,
+     "dense_grid": 43046721.0,
+     "vertex": 1.5243753021513666,
+     "support": 0.6223824281799406,
+     "project": 0.6826550442821802,
+     "relu_spec": {
+      "relu_units": 88893,
+      "depth": 5,
+      "vertices": 5229,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 31.692307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.005620471999918664,
+     "fidelity": 0.25864701545895585,
+     "train_fidelity": 0.2259176205876635,
+     "test_rmse": 7.109962017009451,
+     "solve_seconds": 0.00033709600006659457,
+     "fit_test_rmse": 6.581205160865923,
+     "total_seconds": 0.19670391800002562
+    },
+    {
+     "k": 2,
+     "resolution": 8,
+     "vertices": 57,
+     "rows_per_vertex": 14.456140350877194,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 285,
+      "depth": 3,
+      "vertices": 57,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.009222583999985545,
+     "fidelity": 0.2574173794335378,
+     "train_fidelity": 0.2095747012287812,
+     "test_rmse": 7.017058480289084,
+     "solve_seconds": 0.0008440919999657126,
+     "fit_test_rmse": 6.267594976771084,
+     "total_seconds": 0.20081302599999162
+    },
+    {
+     "k": 3,
+     "resolution": 3,
+     "vertices": 63,
+     "rows_per_vertex": 13.079365079365079,
+     "dense_grid": 64.0,
+     "relu_spec": {
+      "relu_units": 441,
+      "depth": 4,
+      "vertices": 63,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.008136370999977771,
+     "fidelity": 0.22477106862753118,
+     "train_fidelity": 0.1931662765513951,
+     "test_rmse": 6.732697473480134,
+     "solve_seconds": 0.001111057000002802,
+     "fit_test_rmse": 5.922187646083741,
+     "total_seconds": 0.19999377800002094
+    },
+    {
+     "k": 4,
+     "resolution": 2,
+     "vertices": 90,
+     "rows_per_vertex": 9.155555555555555,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 810,
+      "depth": 4,
+      "vertices": 90,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.009159739999972771,
+     "fidelity": 0.20846066239146024,
+     "train_fidelity": 0.18801378039295075,
+     "test_rmse": 6.593237759226378,
+     "solve_seconds": 0.002267669000048045,
+     "fit_test_rmse": 5.974186150191788,
+     "total_seconds": 0.20217375900006118
+    },
+    {
+     "k": 5,
+     "resolution": 2,
+     "vertices": 210,
+     "rows_per_vertex": 3.9238095238095236,
+     "dense_grid": 243.0,
+     "relu_spec": {
+      "relu_units": 2310,
+      "depth": 5,
+      "vertices": 210,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.01656017699997392,
+     "fidelity": 0.5976492439769963,
+     "train_fidelity": 0.15861496727967844,
+     "test_rmse": 12.060042078290564,
+     "solve_seconds": 0.0055948179999631975,
+     "fit_test_rmse": 37.29561845718023,
+     "total_seconds": 0.21290134499997748
+    }
+   ]
+  },
+  {
+   "dataset": "concrete",
+   "seed": 1,
+   "n_train": 824,
+   "n_features": 8,
+   "fis_seconds": 0.09409365299995898,
+   "fis_test_rmse": 7.4662045972437285,
+   "additive": {
+    "seconds": 0.05710352200003399,
+    "n_hidden": 221,
+    "fidelity": 0.27392578348752555,
+    "test_rmse": 8.211422941109188
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 1025,
+     "rows_per_vertex": 0.8039024390243903,
+     "dense_grid": 6561.0,
+     "vertex": 1.9179457360010495,
+     "support": 0.33716114163017613,
+     "project": 0.33812896325562625,
+     "relu_spec": {
+      "relu_units": 17425,
+      "depth": 5,
+      "vertices": 1025,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 2897,
+     "rows_per_vertex": 0.2844321712115982,
+     "dense_grid": 390625.0,
+     "vertex": 1.7954524665892622,
+     "support": 0.3003869695679926,
+     "project": 0.3124528971787793,
+     "relu_spec": {
+      "relu_units": 49249,
+      "depth": 5,
+      "vertices": 2897,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 5235,
+     "rows_per_vertex": 0.15740210124164278,
+     "dense_grid": 43046721.0,
+     "vertex": 1.3695864541728757,
+     "support": 0.5690068440429026,
+     "project": 0.6254945419811972,
+     "relu_spec": {
+      "relu_units": 88995,
+      "depth": 5,
+      "vertices": 5235,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 31.692307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.00592156300001534,
+     "fidelity": 0.21418511148941172,
+     "train_fidelity": 0.216489287975888,
+     "test_rmse": 7.950933668240451,
+     "solve_seconds": 0.0003091940000103932,
+     "fit_test_rmse": 7.648912700401298,
+     "total_seconds": 0.1574279320000187
+    },
+    {
+     "k": 2,
+     "resolution": 8,
+     "vertices": 55,
+     "rows_per_vertex": 14.981818181818182,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 275,
+      "depth": 3,
+      "vertices": 55,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.009484077000024627,
+     "fidelity": 0.2089507625131047,
+     "train_fidelity": 0.1993817732626223,
+     "test_rmse": 7.9201153041943675,
+     "solve_seconds": 0.0009231159999671945,
+     "fit_test_rmse": 7.348816580509129,
+     "total_seconds": 0.1616043679999848
+    },
+    {
+     "k": 3,
+     "resolution": 3,
+     "vertices": 62,
+     "rows_per_vertex": 13.290322580645162,
+     "dense_grid": 64.0,
+     "relu_spec": {
+      "relu_units": 434,
+      "depth": 4,
+      "vertices": 62,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.008484064000072067,
+     "fidelity": 0.2558288739942392,
+     "train_fidelity": 0.1886688331045317,
+     "test_rmse": 7.881132213634714,
+     "solve_seconds": 0.0011994579999736743,
+     "fit_test_rmse": 6.595024661390863,
+     "total_seconds": 0.1608806970000387
+    },
+    {
+     "k": 4,
+     "resolution": 2,
+     "vertices": 92,
+     "rows_per_vertex": 8.956521739130435,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 828,
+      "depth": 4,
+      "vertices": 92,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.008937522999985958,
+     "fidelity": 0.28452323626868375,
+     "train_fidelity": 0.17421714278771164,
+     "test_rmse": 8.300462013956972,
+     "solve_seconds": 0.00196357300001182,
+     "fit_test_rmse": 6.810787025117529,
+     "total_seconds": 0.16209827099999075
+    },
+    {
+     "k": 5,
+     "resolution": 2,
+     "vertices": 206,
+     "rows_per_vertex": 4.0,
+     "dense_grid": 243.0,
+     "relu_spec": {
+      "relu_units": 2266,
+      "depth": 5,
+      "vertices": 206,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.01559842199992545,
+     "fidelity": 0.26376556583563765,
+     "train_fidelity": 0.14269102828888816,
+     "test_rmse": 8.3092682267701,
+     "solve_seconds": 0.005423035999911008,
+     "fit_test_rmse": 7.686344864171214,
+     "total_seconds": 0.17221863299982942
+    }
+   ]
+  },
+  {
+   "dataset": "concrete",
+   "seed": 2,
+   "n_train": 824,
+   "n_features": 8,
+   "fis_seconds": 0.0871996669999362,
+   "fis_test_rmse": 7.5585479879837045,
+   "additive": {
+    "seconds": 0.05447749200004637,
+    "n_hidden": 219,
+    "fidelity": 0.4074325583405999,
+    "test_rmse": 8.991586392469756
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 1023,
+     "rows_per_vertex": 0.8054740957966764,
+     "dense_grid": 6561.0,
+     "vertex": 1.8538517907761414,
+     "support": 0.39038144524786195,
+     "project": 0.4247627356502716,
+     "relu_spec": {
+      "relu_units": 17391,
+      "depth": 5,
+      "vertices": 1023,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 2889,
+     "rows_per_vertex": 0.28521979923849083,
+     "dense_grid": 390625.0,
+     "vertex": 1.6894858811704947,
+     "support": 0.3649719332467598,
+     "project": 0.36591773192609856,
+     "relu_spec": {
+      "relu_units": 49113,
+      "depth": 5,
+      "vertices": 2889,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 5104,
+     "rows_per_vertex": 0.1614420062695925,
+     "dense_grid": 43046721.0,
+     "vertex": 1.4254276148012697,
+     "support": 0.7003961854942827,
+     "project": 0.7406229335692935,
+     "relu_spec": {
+      "relu_units": 86768,
+      "depth": 5,
+      "vertices": 5104,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 31.692307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.0061492499999076244,
+     "fidelity": 0.29675387135450554,
+     "train_fidelity": 0.265826938562442,
+     "test_rmse": 7.987296958483565,
+     "solve_seconds": 0.000324316000046565,
+     "fit_test_rmse": 7.0711187310293155,
+     "total_seconds": 0.14815072499993676
+    },
+    {
+     "k": 2,
+     "resolution": 8,
+     "vertices": 75,
+     "rows_per_vertex": 10.986666666666666,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 375,
+      "depth": 3,
+      "vertices": 75,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.011418057000014414,
+     "fidelity": 0.26341203655178197,
+     "train_fidelity": 0.20801820277439312,
+     "test_rmse": 7.5682086525233006,
+     "solve_seconds": 0.0012564829999064386,
+     "fit_test_rmse": 6.867133397876969,
+     "total_seconds": 0.15435169899990342
+    },
+    {
+     "k": 3,
+     "resolution": 3,
+     "vertices": 61,
+     "rows_per_vertex": 13.508196721311476,
+     "dense_grid": 64.0,
+     "relu_spec": {
+      "relu_units": 427,
+      "depth": 4,
+      "vertices": 61,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.008554058000072473,
+     "fidelity": 0.28818046256147123,
+     "train_fidelity": 0.21815015293807985,
+     "test_rmse": 7.813510364122335,
+     "solve_seconds": 0.0012426380000079007,
+     "fit_test_rmse": 6.646034880795878,
+     "total_seconds": 0.15147385500006294
+    },
+    {
+     "k": 4,
+     "resolution": 2,
+     "vertices": 94,
+     "rows_per_vertex": 8.76595744680851,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 846,
+      "depth": 4,
+      "vertices": 94,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.00965843300002689,
+     "fidelity": 1.7908596106683863,
+     "train_fidelity": 0.21051637955330638,
+     "test_rmse": 26.60643914286388,
+     "solve_seconds": 0.0024218830000108937,
+     "fit_test_rmse": 103.09246303409981,
+     "total_seconds": 0.15375747500002035
+    },
+    {
+     "k": 5,
+     "resolution": 2,
+     "vertices": 205,
+     "rows_per_vertex": 4.019512195121951,
+     "dense_grid": 243.0,
+     "relu_spec": {
+      "relu_units": 2255,
+      "depth": 5,
+      "vertices": 205,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.016890238999963003,
+     "fidelity": 0.9547735675371264,
+     "train_fidelity": 0.17949072418196335,
+     "test_rmse": 13.959358224587223,
+     "solve_seconds": 0.005403346999969472,
+     "fit_test_rmse": 28.12319169894918,
+     "total_seconds": 0.16397074499991504
+    }
+   ]
+  },
+  {
+   "dataset": "concrete",
+   "seed": 3,
+   "n_train": 824,
+   "n_features": 8,
+   "fis_seconds": 0.11169056099993213,
+   "fis_test_rmse": 7.771476927918619,
+   "additive": {
+    "seconds": 0.058195717999979024,
+    "n_hidden": 216,
+    "fidelity": 0.3099193855745146,
+    "test_rmse": 7.658745576491066
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 1016,
+     "rows_per_vertex": 0.8110236220472441,
+     "dense_grid": 6561.0,
+     "vertex": 1.7544451343230076,
+     "support": 0.42450083804386557,
+     "project": 0.48014931656947324,
+     "relu_spec": {
+      "relu_units": 17272,
+      "depth": 5,
+      "vertices": 1016,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 2864,
+     "rows_per_vertex": 0.2877094972067039,
+     "dense_grid": 390625.0,
+     "vertex": 1.5258659563368118,
+     "support": 0.39042079878351077,
+     "project": 0.39066553861184367,
+     "relu_spec": {
+      "relu_units": 48688,
+      "depth": 5,
+      "vertices": 2864,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 5124,
+     "rows_per_vertex": 0.16081186572989853,
+     "dense_grid": 43046721.0,
+     "vertex": 1.3215269227597244,
+     "support": 0.6605845812343123,
+     "project": 0.7336965830480692,
+     "relu_spec": {
+      "relu_units": 87108,
+      "depth": 5,
+      "vertices": 5124,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 31.692307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.005779381000024841,
+     "fidelity": 0.29716429201105216,
+     "train_fidelity": 0.1912029602151729,
+     "test_rmse": 7.48716858071126,
+     "solve_seconds": 0.00035506500000792585,
+     "fit_test_rmse": 7.0908808755610435,
+     "total_seconds": 0.17602072499994392
+    },
+    {
+     "k": 2,
+     "resolution": 8,
+     "vertices": 55,
+     "rows_per_vertex": 14.981818181818182,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 275,
+      "depth": 3,
+      "vertices": 55,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.009279258999981721,
+     "fidelity": 0.2988497105408521,
+     "train_fidelity": 0.18082573176475045,
+     "test_rmse": 7.345132152312795,
+     "solve_seconds": 0.0008433319999312516,
+     "fit_test_rmse": 6.684760904679481,
+     "total_seconds": 0.18000886999982413
+    },
+    {
+     "k": 3,
+     "resolution": 3,
+     "vertices": 61,
+     "rows_per_vertex": 13.508196721311476,
+     "dense_grid": 64.0,
+     "relu_spec": {
+      "relu_units": 427,
+      "depth": 4,
+      "vertices": 61,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.007959065000022747,
+     "fidelity": 0.2829170024820025,
+     "train_fidelity": 0.1754725235988766,
+     "test_rmse": 7.333881995490486,
+     "solve_seconds": 0.0010605219999888504,
+     "fit_test_rmse": 6.569681230834425,
+     "total_seconds": 0.17890586599992275
+    },
+    {
+     "k": 4,
+     "resolution": 2,
+     "vertices": 91,
+     "rows_per_vertex": 9.054945054945055,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 819,
+      "depth": 4,
+      "vertices": 91,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.008740996999904382,
+     "fidelity": 0.47708698477721173,
+     "train_fidelity": 0.16291783701738596,
+     "test_rmse": 8.997261864683562,
+     "solve_seconds": 0.0018788639999911538,
+     "fit_test_rmse": 6.224501165434334,
+     "total_seconds": 0.1805061399998067
+    },
+    {
+     "k": 5,
+     "resolution": 2,
+     "vertices": 204,
+     "rows_per_vertex": 4.03921568627451,
+     "dense_grid": 243.0,
+     "relu_spec": {
+      "relu_units": 2244,
+      "depth": 5,
+      "vertices": 204,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.014859723000085978,
+     "fidelity": 0.6156342197606869,
+     "train_fidelity": 0.12579331742585315,
+     "test_rmse": 10.631107300986654,
+     "solve_seconds": 0.005098446999909356,
+     "fit_test_rmse": 9.173312268815742,
+     "total_seconds": 0.1898444489999065
+    }
+   ]
+  },
+  {
+   "dataset": "concrete",
+   "seed": 4,
+   "n_train": 824,
+   "n_features": 8,
+   "fis_seconds": 0.0969325910000407,
+   "fis_test_rmse": 6.407299114694206,
+   "additive": {
+    "seconds": 0.0535444990000542,
+    "n_hidden": 221,
+    "fidelity": 0.28279294198267646,
+    "test_rmse": 7.719003164269162
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 1001,
+     "rows_per_vertex": 0.8231768231768232,
+     "dense_grid": 6561.0,
+     "vertex": 1.6946930234115674,
+     "support": 0.3755237285921027,
+     "project": 0.2920400295133041,
+     "relu_spec": {
+      "relu_units": 17017,
+      "depth": 5,
+      "vertices": 1001,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 2832,
+     "rows_per_vertex": 0.2909604519774011,
+     "dense_grid": 390625.0,
+     "vertex": 1.5269631600698816,
+     "support": 0.39155854562852543,
+     "project": 0.38377467581460556,
+     "relu_spec": {
+      "relu_units": 48144,
+      "depth": 5,
+      "vertices": 2832,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 5116,
+     "rows_per_vertex": 0.16106333072713058,
+     "dense_grid": 43046721.0,
+     "vertex": 1.4613919409974485,
+     "support": 0.6622024178510239,
+     "project": 0.7064485361476167,
+     "relu_spec": {
+      "relu_units": 86972,
+      "depth": 5,
+      "vertices": 5116,
+      "n_features": 8,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 31.692307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.005443779000188442,
+     "fidelity": 0.2516334614116806,
+     "train_fidelity": 0.2287985469835486,
+     "test_rmse": 7.385702714994128,
+     "solve_seconds": 0.00029727500009357755,
+     "fit_test_rmse": 7.180735229878803,
+     "total_seconds": 0.15621814400037692
+    },
+    {
+     "k": 2,
+     "resolution": 8,
+     "vertices": 75,
+     "rows_per_vertex": 10.986666666666666,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 375,
+      "depth": 3,
+      "vertices": 75,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.009318296000174087,
+     "fidelity": 0.2583219050398839,
+     "train_fidelity": 0.19111004780252092,
+     "test_rmse": 7.1555502602236425,
+     "solve_seconds": 0.0010593150000204332,
+     "fit_test_rmse": 7.8742119151481065,
+     "total_seconds": 0.16085470100028942
+    },
+    {
+     "k": 3,
+     "resolution": 3,
+     "vertices": 61,
+     "rows_per_vertex": 13.508196721311476,
+     "dense_grid": 64.0,
+     "relu_spec": {
+      "relu_units": 427,
+      "depth": 4,
+      "vertices": 61,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.007836325999960536,
+     "fidelity": 0.27359083059258,
+     "train_fidelity": 0.20117469454653503,
+     "test_rmse": 7.590787710473147,
+     "solve_seconds": 0.0010839779999969323,
+     "fit_test_rmse": 12.517127783599385,
+     "total_seconds": 0.15939739400005237
+    },
+    {
+     "k": 4,
+     "resolution": 2,
+     "vertices": 93,
+     "rows_per_vertex": 8.86021505376344,
+     "dense_grid": 81.0,
+     "relu_spec": {
+      "relu_units": 837,
+      "depth": 4,
+      "vertices": 93,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.008638687000029677,
+     "fidelity": 0.22365046815633519,
+     "train_fidelity": 0.17778681032112548,
+     "test_rmse": 6.992223381449474,
+     "solve_seconds": 0.0019318760000714974,
+     "fit_test_rmse": 7.144198012381812,
+     "total_seconds": 0.16104765300019608
+    },
+    {
+     "k": 5,
+     "resolution": 2,
+     "vertices": 197,
+     "rows_per_vertex": 4.182741116751269,
+     "dense_grid": 243.0,
+     "relu_spec": {
+      "relu_units": 2167,
+      "depth": 5,
+      "vertices": 197,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.014138888999923438,
+     "fidelity": 0.7769866172874199,
+     "train_fidelity": 0.12811510823988417,
+     "test_rmse": 14.015849370345842,
+     "solve_seconds": 0.005046900000024834,
+     "fit_test_rmse": 15.042632365586343,
+     "total_seconds": 0.16966287900004318
+    }
+   ]
+  },
+  {
+   "dataset": "wec",
+   "seed": 0,
+   "n_train": 1854,
+   "n_features": 12,
+   "fis_seconds": 0.8313939300001039,
+   "fis_test_rmse": 810988.7236282758,
+   "additive": {
+    "seconds": 0.6019304180001654,
+    "n_hidden": 349,
+    "fidelity": 1.0428884064970212,
+    "test_rmse": 868145.4613465316
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 619,
+     "rows_per_vertex": 2.995153473344103,
+     "dense_grid": 531441.0,
+     "vertex": 8.757715417156554,
+     "support": 0.9963574688377935,
+     "project": 0.7883868582802331,
+     "relu_spec": {
+      "relu_units": 15475,
+      "depth": 6,
+      "vertices": 619,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 1088,
+     "rows_per_vertex": 1.7040441176470589,
+     "dense_grid": 244140625.0,
+     "vertex": 8.684453474798056,
+     "support": 0.9932031466007922,
+     "project": 0.8331449013768808,
+     "relu_spec": {
+      "relu_units": 27200,
+      "depth": 6,
+      "vertices": 1088,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 2118,
+     "rows_per_vertex": 0.8753541076487252,
+     "dense_grid": 282429536481.0,
+     "vertex": 8.628547483191447,
+     "support": 0.994668904785685,
+     "project": 0.865025961280877,
+     "relu_spec": {
+      "relu_units": 52950,
+      "depth": 6,
+      "vertices": 2118,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 23,
+     "rows_per_vertex": 80.6086956521739,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 69,
+      "depth": 3,
+      "vertices": 23,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.01085067799999706,
+     "fidelity": 0.8961727900369159,
+     "train_fidelity": 0.7628314056023326,
+     "test_rmse": 708067.0579596771,
+     "solve_seconds": 0.0005556049998176604,
+     "fit_test_rmse": 535106.1486419641,
+     "total_seconds": 1.444730631000084
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 79,
+     "rows_per_vertex": 23.468354430379748,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 395,
+      "depth": 3,
+      "vertices": 79,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.02564015500001915,
+     "fidelity": 1.0527737861425166,
+     "train_fidelity": 0.6502851936130354,
+     "test_rmse": 731434.5361478855,
+     "solve_seconds": 0.002599414000087563,
+     "fit_test_rmse": 743722.0245689902,
+     "total_seconds": 1.461563917000376
+    },
+    {
+     "k": 3,
+     "resolution": 16,
+     "vertices": 164,
+     "rows_per_vertex": 11.304878048780488,
+     "dense_grid": 4913.0,
+     "relu_spec": {
+      "relu_units": 1148,
+      "depth": 4,
+      "vertices": 164,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.046926823999910994,
+     "fidelity": 4.279110738840159,
+     "train_fidelity": 0.4841236910531081,
+     "test_rmse": 3562297.788729826,
+     "solve_seconds": 0.006126488000063546,
+     "fit_test_rmse": 1269054.4858037035,
+     "total_seconds": 1.4863776600002438
+    },
+    {
+     "k": 4,
+     "resolution": 8,
+     "vertices": 156,
+     "rows_per_vertex": 11.884615384615385,
+     "dense_grid": 6561.0,
+     "relu_spec": {
+      "relu_units": 1404,
+      "depth": 4,
+      "vertices": 156,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.07306004099996244,
+     "fidelity": 2.5344913381994942,
+     "train_fidelity": 0.528005349731265,
+     "test_rmse": 1555124.0714751952,
+     "solve_seconds": 0.006952597999998034,
+     "fit_test_rmse": 916695.2001225058,
+     "total_seconds": 1.5133369870002298
+    },
+    {
+     "k": 5,
+     "resolution": 4,
+     "vertices": 149,
+     "rows_per_vertex": 12.442953020134228,
+     "dense_grid": 3125.0,
+     "relu_spec": {
+      "relu_units": 1639,
+      "depth": 5,
+      "vertices": 149,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.05254625399993529,
+     "fidelity": 1.5400757791141135,
+     "train_fidelity": 0.5368869010069809,
+     "test_rmse": 1347528.1798485068,
+     "solve_seconds": 0.007584684999983438,
+     "fit_test_rmse": 593081.0031246049,
+     "total_seconds": 1.493455287000188
+    }
+   ]
+  },
+  {
+   "dataset": "wec",
+   "seed": 1,
+   "n_train": 1854,
+   "n_features": 12,
+   "fis_seconds": 0.7809629009998389,
+   "fis_test_rmse": 753500.9242184362,
+   "additive": {
+    "seconds": 0.34659031099999993,
+    "n_hidden": 369,
+    "fidelity": 0.9453528131849815,
+    "test_rmse": 330589.15295596665
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 531,
+     "rows_per_vertex": 3.4915254237288136,
+     "dense_grid": 531441.0,
+     "vertex": 9.571281349066542,
+     "support": 1.0040856434111178,
+     "project": 0.6563759560744274,
+     "relu_spec": {
+      "relu_units": 13275,
+      "depth": 6,
+      "vertices": 531,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 854,
+     "rows_per_vertex": 2.17096018735363,
+     "dense_grid": 244140625.0,
+     "vertex": 9.474666368411704,
+     "support": 1.0027994974298506,
+     "project": 0.7474584042265251,
+     "relu_spec": {
+      "relu_units": 21350,
+      "depth": 6,
+      "vertices": 854,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 1724,
+     "rows_per_vertex": 1.0754060324825987,
+     "dense_grid": 282429536481.0,
+     "vertex": 5.154600650471803,
+     "support": 0.9996925982140732,
+     "project": 0.8457955478904363,
+     "relu_spec": {
+      "relu_units": 43100,
+      "depth": 6,
+      "vertices": 1724,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 14,
+     "rows_per_vertex": 132.42857142857142,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 42,
+      "depth": 3,
+      "vertices": 14,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.010807209999939005,
+     "fidelity": 1.7479864659586815,
+     "train_fidelity": 0.685863516442217,
+     "test_rmse": 965424.2656529142,
+     "solve_seconds": 0.00042922299985548307,
+     "fit_test_rmse": 403200.0501228941,
+     "total_seconds": 1.1387896449996333
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 60,
+     "rows_per_vertex": 30.9,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 300,
+      "depth": 3,
+      "vertices": 60,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.023295641000004252,
+     "fidelity": 0.7277263742834508,
+     "train_fidelity": 0.4164962397221628,
+     "test_rmse": 552599.783843829,
+     "solve_seconds": 0.0018383169999651727,
+     "fit_test_rmse": 222103.58437855012,
+     "total_seconds": 1.1526871699998082
+    },
+    {
+     "k": 3,
+     "resolution": 24,
+     "vertices": 183,
+     "rows_per_vertex": 10.131147540983607,
+     "dense_grid": 15625.0,
+     "relu_spec": {
+      "relu_units": 1281,
+      "depth": 4,
+      "vertices": 183,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.050662885000065216,
+     "fidelity": 0.723091865745822,
+     "train_fidelity": 0.05740681363454816,
+     "test_rmse": 391389.52304717153,
+     "solve_seconds": 0.007558164000101897,
+     "fit_test_rmse": 378335.7193194555,
+     "total_seconds": 1.185774261000006
+    },
+    {
+     "k": 4,
+     "resolution": 8,
+     "vertices": 145,
+     "rows_per_vertex": 12.786206896551723,
+     "dense_grid": 6561.0,
+     "relu_spec": {
+      "relu_units": 1305,
+      "depth": 4,
+      "vertices": 145,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.05366742399996838,
+     "fidelity": 1.2399791327721863,
+     "train_fidelity": 0.08688303658109513,
+     "test_rmse": 598498.4401494048,
+     "solve_seconds": 0.006077403000062986,
+     "fit_test_rmse": 160082.06237681222,
+     "total_seconds": 1.1872980389998702
+    },
+    {
+     "k": 5,
+     "resolution": 6,
+     "vertices": 178,
+     "rows_per_vertex": 10.415730337078651,
+     "dense_grid": 16807.0,
+     "relu_spec": {
+      "relu_units": 1958,
+      "depth": 5,
+      "vertices": 178,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.06513614799996503,
+     "fidelity": 0.7361451087072877,
+     "train_fidelity": 0.09353736480014273,
+     "test_rmse": 348527.45089197246,
+     "solve_seconds": 0.009026271000038832,
+     "fit_test_rmse": 217033.9293810786,
+     "total_seconds": 1.2017156309998427
+    }
+   ]
+  },
+  {
+   "dataset": "wec",
+   "seed": 2,
+   "n_train": 1854,
+   "n_features": 12,
+   "fis_seconds": 0.8581630619999032,
+   "fis_test_rmse": 934075.6212613571,
+   "additive": {
+    "seconds": 0.45790961100010463,
+    "n_hidden": 396,
+    "fidelity": 3.2334346753482177,
+    "test_rmse": 3535762.4175204714
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 707,
+     "rows_per_vertex": 2.6223479490806225,
+     "dense_grid": 531441.0,
+     "vertex": 7.596801570093572,
+     "support": 0.9786620220380295,
+     "project": 2.0440883529442386,
+     "relu_spec": {
+      "relu_units": 17675,
+      "depth": 6,
+      "vertices": 707,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 1210,
+     "rows_per_vertex": 1.5322314049586776,
+     "dense_grid": 244140625.0,
+     "vertex": 7.593313458978884,
+     "support": 0.9970729216409014,
+     "project": 1.3453881715818181,
+     "relu_spec": {
+      "relu_units": 30250,
+      "depth": 6,
+      "vertices": 1210,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 2651,
+     "rows_per_vertex": 0.6993587325537532,
+     "dense_grid": 282429536481.0,
+     "vertex": 6.850324473728313,
+     "support": 1.016704581025723,
+     "project": 0.8541535507685025,
+     "relu_spec": {
+      "relu_units": 66275,
+      "depth": 6,
+      "vertices": 2651,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 16,
+     "rows_per_vertex": 115.875,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 48,
+      "depth": 3,
+      "vertices": 16,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.011398913999983051,
+     "fidelity": 1.4921222497680222,
+     "train_fidelity": 1.253689426820922,
+     "test_rmse": 1995322.9586249585,
+     "solve_seconds": 0.0005214969999087771,
+     "fit_test_rmse": 1240552.1107703594,
+     "total_seconds": 1.3279930839998997
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 67,
+     "rows_per_vertex": 27.671641791044777,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 335,
+      "depth": 3,
+      "vertices": 67,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.025706602999889583,
+     "fidelity": 2.1849360344619635,
+     "train_fidelity": 0.7097211174192709,
+     "test_rmse": 2490264.5336143407,
+     "solve_seconds": 0.002264366999952472,
+     "fit_test_rmse": 1675383.9148001238,
+     "total_seconds": 1.34404364299985
+    },
+    {
+     "k": 3,
+     "resolution": 24,
+     "vertices": 137,
+     "rows_per_vertex": 13.532846715328468,
+     "dense_grid": 15625.0,
+     "relu_spec": {
+      "relu_units": 959,
+      "depth": 4,
+      "vertices": 137,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.04619169599982342,
+     "fidelity": 1.7222074826532523,
+     "train_fidelity": 0.5788265739082316,
+     "test_rmse": 2196434.89860817,
+     "solve_seconds": 0.005385350000096878,
+     "fit_test_rmse": 1637236.6519799756,
+     "total_seconds": 1.3676497189999282
+    },
+    {
+     "k": 4,
+     "resolution": 6,
+     "vertices": 150,
+     "rows_per_vertex": 12.36,
+     "dense_grid": 2401.0,
+     "relu_spec": {
+      "relu_units": 1350,
+      "depth": 4,
+      "vertices": 150,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.04548971300005178,
+     "fidelity": 2.274466214405996,
+     "train_fidelity": 0.5348813884217657,
+     "test_rmse": 2644003.5235006404,
+     "solve_seconds": 0.006816620999870793,
+     "fit_test_rmse": 2444651.4889636096,
+     "total_seconds": 1.3683790069999304
+    },
+    {
+     "k": 5,
+     "resolution": 4,
+     "vertices": 172,
+     "rows_per_vertex": 10.779069767441861,
+     "dense_grid": 3125.0,
+     "relu_spec": {
+      "relu_units": 1892,
+      "depth": 5,
+      "vertices": 172,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.05669022300003235,
+     "fidelity": 2.4370166562839377,
+     "train_fidelity": 0.502719133102445,
+     "test_rmse": 2428924.2002088185,
+     "solve_seconds": 0.008631355000034091,
+     "fit_test_rmse": 2950498.5387230255,
+     "total_seconds": 1.3813942510000743
+    }
+   ]
+  },
+  {
+   "dataset": "wec",
+   "seed": 3,
+   "n_train": 1854,
+   "n_features": 12,
+   "fis_seconds": 0.8368715369999791,
+   "fis_test_rmse": 671917.3572344175,
+   "additive": {
+    "seconds": 0.3158249570001317,
+    "n_hidden": 365,
+    "fidelity": 0.8681932404096914,
+    "test_rmse": 614689.5463201189
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 567,
+     "rows_per_vertex": 3.2698412698412698,
+     "dense_grid": 531441.0,
+     "vertex": 10.709813070732041,
+     "support": 0.9127938790847047,
+     "project": 0.524495718377242,
+     "relu_spec": {
+      "relu_units": 14175,
+      "depth": 6,
+      "vertices": 567,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 861,
+     "rows_per_vertex": 2.153310104529617,
+     "dense_grid": 244140625.0,
+     "vertex": 10.577483646583602,
+     "support": 1.0002730230130539,
+     "project": 0.663074769632114,
+     "relu_spec": {
+      "relu_units": 21525,
+      "depth": 6,
+      "vertices": 861,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 1551,
+     "rows_per_vertex": 1.195357833655706,
+     "dense_grid": 282429536481.0,
+     "vertex": 3.6626314448512827,
+     "support": 0.9988253659169487,
+     "project": 0.7648644349206649,
+     "relu_spec": {
+      "relu_units": 38775,
+      "depth": 6,
+      "vertices": 1551,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 15,
+     "rows_per_vertex": 123.6,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 45,
+      "depth": 3,
+      "vertices": 15,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.011478487999966092,
+     "fidelity": 0.6614020222537512,
+     "train_fidelity": 0.9618643629344829,
+     "test_rmse": 471597.46537862095,
+     "solve_seconds": 0.0004950740001277154,
+     "fit_test_rmse": 315417.61930316186,
+     "total_seconds": 1.1646700560002046
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 94,
+     "rows_per_vertex": 19.72340425531915,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 470,
+      "depth": 3,
+      "vertices": 94,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.027733442999988256,
+     "fidelity": 1.1003551071907536,
+     "train_fidelity": 0.35072470822415414,
+     "test_rmse": 886007.8268119,
+     "solve_seconds": 0.003033048000133931,
+     "fit_test_rmse": 1842204.2794532473,
+     "total_seconds": 1.183462985000233
+    },
+    {
+     "k": 3,
+     "resolution": 16,
+     "vertices": 175,
+     "rows_per_vertex": 10.594285714285714,
+     "dense_grid": 4913.0,
+     "relu_spec": {
+      "relu_units": 1225,
+      "depth": 4,
+      "vertices": 175,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.05171167299999979,
+     "fidelity": 1.068452343473778,
+     "train_fidelity": 0.1543063802280417,
+     "test_rmse": 1072246.2830672385,
+     "solve_seconds": 0.006841455000085261,
+     "fit_test_rmse": 537916.4385406615,
+     "total_seconds": 1.2112496220001958
+    },
+    {
+     "k": 4,
+     "resolution": 8,
+     "vertices": 163,
+     "rows_per_vertex": 11.374233128834355,
+     "dense_grid": 6561.0,
+     "relu_spec": {
+      "relu_units": 1467,
+      "depth": 4,
+      "vertices": 163,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.057951815000024,
+     "fidelity": 0.826812554299203,
+     "train_fidelity": 0.21515632589685524,
+     "test_rmse": 598652.5088981014,
+     "solve_seconds": 0.0069620530000520375,
+     "fit_test_rmse": 451783.05155709764,
+     "total_seconds": 1.2176103620001868
+    },
+    {
+     "k": 5,
+     "resolution": 4,
+     "vertices": 157,
+     "rows_per_vertex": 11.80891719745223,
+     "dense_grid": 3125.0,
+     "relu_spec": {
+      "relu_units": 1727,
+      "depth": 5,
+      "vertices": 157,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.05438525199997457,
+     "fidelity": 0.8765701474443888,
+     "train_fidelity": 0.23321352130184353,
+     "test_rmse": 650108.5421084386,
+     "solve_seconds": 0.007652018000044336,
+     "fit_test_rmse": 407738.1827444531,
+     "total_seconds": 1.2147337640001297
+    }
+   ]
+  },
+  {
+   "dataset": "wec",
+   "seed": 4,
+   "n_train": 1854,
+   "n_features": 12,
+   "fis_seconds": 0.838350433999949,
+   "fis_test_rmse": 1059206.7080218068,
+   "additive": {
+    "seconds": 0.3585823700000219,
+    "n_hidden": 388,
+    "fidelity": 1.2643697721298381,
+    "test_rmse": 559910.7575365121
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 443,
+     "rows_per_vertex": 4.1851015801354405,
+     "dense_grid": 531441.0,
+     "vertex": 6.834197381425417,
+     "support": 0.9773092299282903,
+     "project": 0.4725238664669212,
+     "relu_spec": {
+      "relu_units": 11075,
+      "depth": 6,
+      "vertices": 443,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 560,
+     "rows_per_vertex": 3.3107142857142855,
+     "dense_grid": 244140625.0,
+     "vertex": 6.849195787428485,
+     "support": 1.0194548135375794,
+     "project": 0.5141988461288696,
+     "relu_spec": {
+      "relu_units": 14000,
+      "depth": 6,
+      "vertices": 560,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 895,
+     "rows_per_vertex": 2.071508379888268,
+     "dense_grid": 282429536481.0,
+     "vertex": 4.492740316274254,
+     "support": 1.0206076013151126,
+     "project": 0.7599874667473002,
+     "relu_spec": {
+      "relu_units": 22375,
+      "depth": 6,
+      "vertices": 895,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 12,
+     "rows_per_vertex": 154.5,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 36,
+      "depth": 3,
+      "vertices": 12,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.011012463000042771,
+     "fidelity": 1.0476393576139036,
+     "train_fidelity": 0.7114315501602835,
+     "test_rmse": 434893.4422488009,
+     "solve_seconds": 0.0003829499999028485,
+     "fit_test_rmse": 639407.6009678359,
+     "total_seconds": 1.2083282169999165
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 48,
+     "rows_per_vertex": 38.625,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 240,
+      "depth": 3,
+      "vertices": 48,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.024939130999882764,
+     "fidelity": 1.3218841349620678,
+     "train_fidelity": 0.5107638392171459,
+     "test_rmse": 671895.3638508943,
+     "solve_seconds": 0.0016197229999761475,
+     "fit_test_rmse": 734246.9222819724,
+     "total_seconds": 1.2234916579998298
+    },
+    {
+     "k": 3,
+     "resolution": 24,
+     "vertices": 102,
+     "rows_per_vertex": 18.176470588235293,
+     "dense_grid": 15625.0,
+     "relu_spec": {
+      "relu_units": 714,
+      "depth": 4,
+      "vertices": 102,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.04482385300002534,
+     "fidelity": 0.9263777147239972,
+     "train_fidelity": 0.40501286527809954,
+     "test_rmse": 742863.5055396133,
+     "solve_seconds": 0.0038862470000822213,
+     "fit_test_rmse": 332567.262625669,
+     "total_seconds": 1.2456429040000785
+    },
+    {
+     "k": 4,
+     "resolution": 16,
+     "vertices": 160,
+     "rows_per_vertex": 11.5875,
+     "dense_grid": 83521.0,
+     "relu_spec": {
+      "relu_units": 1440,
+      "depth": 4,
+      "vertices": 160,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.07282694400009859,
+     "fidelity": 1.01750675354185,
+     "train_fidelity": 0.20433590183103081,
+     "test_rmse": 678147.5510175276,
+     "solve_seconds": 0.00695280299987644,
+     "fit_test_rmse": 416762.7334114016,
+     "total_seconds": 1.276712550999946
+    },
+    {
+     "k": 5,
+     "resolution": 8,
+     "vertices": 180,
+     "rows_per_vertex": 10.3,
+     "dense_grid": 59049.0,
+     "relu_spec": {
+      "relu_units": 1980,
+      "depth": 5,
+      "vertices": 180,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 0.07727945100009492,
+     "fidelity": 0.9133594727775072,
+     "train_fidelity": 0.24217709986130023,
+     "test_rmse": 1745466.0427314208,
+     "solve_seconds": 0.008634518000008029,
+     "fit_test_rmse": 438865.1850271818,
+     "total_seconds": 1.2828467730000739
+    }
+   ]
+  },
+  {
+   "dataset": "bikeshare",
+   "seed": 0,
+   "n_train": 13903,
+   "n_features": 12,
+   "fis_seconds": 0.2892510130000119,
+   "fis_test_rmse": 100.95640505949315,
+   "additive": {
+    "seconds": 0.09972542400009843,
+    "n_hidden": 272,
+    "fidelity": 0.8016723204813274,
+    "test_rmse": 150.10073929877976
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 531441.0,
+     "vertex": 1.5853849228159818,
+     "support": 0.5346198653007548,
+     "project": 1.198716994433709,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 244140625.0,
+     "vertex": 1.2979700154903366,
+     "support": 0.6145672083753577,
+     "project": 0.6777768106024453,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 282429536481.0,
+     "vertex": 1.0257162585724473,
+     "support": 0.9133277268998216,
+     "project": 1.8219838900816459,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 534.7307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.10670782600004713,
+     "fidelity": 0.7541064669226161,
+     "train_fidelity": 0.7464411126780703,
+     "test_rmse": 143.66166633455822,
+     "solve_seconds": 0.005231373000015083,
+     "fit_test_rmse": 107.16675343223686,
+     "total_seconds": 0.5009156360001725
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 555,
+     "rows_per_vertex": 25.05045045045045,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 2775,
+      "depth": 3,
+      "vertices": 555,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.45242176099986864,
+     "fidelity": 0.7247264866169746,
+     "train_fidelity": 0.6735268514316334,
+     "test_rmse": 142.62948232101263,
+     "solve_seconds": 0.2021115390000432,
+     "fit_test_rmse": 101.30764210825922,
+     "total_seconds": 1.0435097370000221
+    },
+    {
+     "k": 3,
+     "resolution": 16,
+     "vertices": 924,
+     "rows_per_vertex": 15.046536796536797,
+     "dense_grid": 4913.0,
+     "relu_spec": {
+      "relu_units": 6468,
+      "depth": 4,
+      "vertices": 924,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.8504243579998274,
+     "fidelity": 0.7849590625883659,
+     "train_fidelity": 0.6638115957743911,
+     "test_rmse": 148.80077921618445,
+     "solve_seconds": 0.7078045619998647,
+     "fit_test_rmse": 109.46679220459589,
+     "total_seconds": 1.9472053569998025
+    },
+    {
+     "k": 4,
+     "resolution": 6,
+     "vertices": 785,
+     "rows_per_vertex": 17.710828025477706,
+     "dense_grid": 2401.0,
+     "relu_spec": {
+      "relu_units": 7065,
+      "depth": 4,
+      "vertices": 785,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.9186604550000084,
+     "fidelity": 0.7140558486027934,
+     "train_fidelity": 0.6603964897627357,
+     "test_rmse": 138.94399441814917,
+     "solve_seconds": 0.8154342079999424,
+     "fit_test_rmse": 101.10070082506681,
+     "total_seconds": 2.123071100000061
+    },
+    {
+     "k": 5,
+     "resolution": 4,
+     "vertices": 908,
+     "rows_per_vertex": 15.311674008810572,
+     "dense_grid": 3125.0,
+     "relu_spec": {
+      "relu_units": 9988,
+      "depth": 5,
+      "vertices": 908,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 1.0800012859999697,
+     "fidelity": 0.6768506927812643,
+     "train_fidelity": 0.5789272253967103,
+     "test_rmse": 134.33872833438778,
+     "solve_seconds": 1.1950811819999672,
+     "fit_test_rmse": 94.3090100508402,
+     "total_seconds": 2.664058905000047
+    }
+   ]
+  },
+  {
+   "dataset": "bikeshare",
+   "seed": 1,
+   "n_train": 13903,
+   "n_features": 12,
+   "fis_seconds": 0.3028003520000766,
+   "fis_test_rmse": 105.71438406133348,
+   "additive": {
+    "seconds": 0.0821892190001563,
+    "n_hidden": 240,
+    "fidelity": 2.2743481454676377,
+    "test_rmse": 357.0803928379178
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 531441.0,
+     "vertex": 1.6126911683760758,
+     "support": 0.5220671184864835,
+     "project": 1.1396637052488132,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 244140625.0,
+     "vertex": 1.3138639056789108,
+     "support": 0.6342761512675175,
+     "project": 0.7201565889215128,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 282429536481.0,
+     "vertex": 1.0226115245647989,
+     "support": 0.9248712344116274,
+     "project": 1.7940661293622753,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 534.7307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.10349082100015039,
+     "fidelity": 2.1436330380056146,
+     "train_fidelity": 2.186737037880379,
+     "test_rmse": 338.91743656557014,
+     "solve_seconds": 0.005290980000154377,
+     "fit_test_rmse": 153.97974963540264,
+     "total_seconds": 0.49377137200053767
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 568,
+     "rows_per_vertex": 24.47711267605634,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 2840,
+      "depth": 3,
+      "vertices": 568,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.42233261599994876,
+     "fidelity": 2.0456591383835816,
+     "train_fidelity": 2.02104649368958,
+     "test_rmse": 325.15726153667043,
+     "solve_seconds": 0.2486944479999238,
+     "fit_test_rmse": 182.86691270715966,
+     "total_seconds": 1.0560166350001055
+    },
+    {
+     "k": 3,
+     "resolution": 16,
+     "vertices": 932,
+     "rows_per_vertex": 14.917381974248928,
+     "dense_grid": 4913.0,
+     "relu_spec": {
+      "relu_units": 6524,
+      "depth": 4,
+      "vertices": 932,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.8674173250001331,
+     "fidelity": 2.4256978014964026,
+     "train_fidelity": 1.9923598369072077,
+     "test_rmse": 378.6448137648704,
+     "solve_seconds": 0.41789782899991224,
+     "fit_test_rmse": 256.87570441817184,
+     "total_seconds": 1.6703047250002783
+    },
+    {
+     "k": 4,
+     "resolution": 6,
+     "vertices": 781,
+     "rows_per_vertex": 17.801536491677336,
+     "dense_grid": 2401.0,
+     "relu_spec": {
+      "relu_units": 7029,
+      "depth": 4,
+      "vertices": 781,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 1.3367710249999618,
+     "fidelity": 2.0782173395795605,
+     "train_fidelity": 1.9467678218938407,
+     "test_rmse": 327.4173032500639,
+     "solve_seconds": 0.7493293149998408,
+     "fit_test_rmse": 163.79001537965004,
+     "total_seconds": 2.4710899110000355
+    },
+    {
+     "k": 5,
+     "resolution": 4,
+     "vertices": 897,
+     "rows_per_vertex": 15.499442586399109,
+     "dense_grid": 3125.0,
+     "relu_spec": {
+      "relu_units": 9867,
+      "depth": 5,
+      "vertices": 897,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 1.0179712490000838,
+     "fidelity": 1.997922689186737,
+     "train_fidelity": 1.9177350223926948,
+     "test_rmse": 316.8517499683942,
+     "solve_seconds": 0.9478416819999893,
+     "fit_test_rmse": 139.28522392348796,
+     "total_seconds": 2.350802502000306
+    }
+   ]
+  },
+  {
+   "dataset": "bikeshare",
+   "seed": 2,
+   "n_train": 13903,
+   "n_features": 12,
+   "fis_seconds": 0.2952464819998113,
+   "fis_test_rmse": 106.60238304408087,
+   "additive": {
+    "seconds": 0.11298023900008047,
+    "n_hidden": 282,
+    "fidelity": 0.807784702607586,
+    "test_rmse": 150.6618172840939
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 531441.0,
+     "vertex": 1.6182787864328436,
+     "support": 0.5335772749656861,
+     "project": 1.222459232593427,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 244140625.0,
+     "vertex": 1.3277602470902068,
+     "support": 0.6191245550287329,
+     "project": 0.6803376599512628,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 282429536481.0,
+     "vertex": 1.0357767526059602,
+     "support": 0.9072672333095974,
+     "project": 1.60324161365892,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 534.7307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.10334228900001108,
+     "fidelity": 0.7296522650463398,
+     "train_fidelity": 0.7272810156485853,
+     "test_rmse": 141.51626649197473,
+     "solve_seconds": 0.00516406800011282,
+     "fit_test_rmse": 112.37122477988092,
+     "total_seconds": 0.5167330780000157
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 569,
+     "rows_per_vertex": 24.43409490333919,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 2845,
+      "depth": 3,
+      "vertices": 569,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.4478585900001235,
+     "fidelity": 0.7048239700951177,
+     "train_fidelity": 0.6582558220308157,
+     "test_rmse": 137.7266918851136,
+     "solve_seconds": 0.39498164899987387,
+     "fit_test_rmse": 111.21525551962566,
+     "total_seconds": 1.2510669599998891
+    },
+    {
+     "k": 3,
+     "resolution": 16,
+     "vertices": 933,
+     "rows_per_vertex": 14.90139335476956,
+     "dense_grid": 4913.0,
+     "relu_spec": {
+      "relu_units": 6531,
+      "depth": 4,
+      "vertices": 933,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 0.9486779010001101,
+     "fidelity": 1.2681362386491255,
+     "train_fidelity": 0.6433815012580413,
+     "test_rmse": 208.02771798600543,
+     "solve_seconds": 0.4541396199999781,
+     "fit_test_rmse": 140.33347171736565,
+     "total_seconds": 1.81104424199998
+    },
+    {
+     "k": 4,
+     "resolution": 6,
+     "vertices": 779,
+     "rows_per_vertex": 17.84724005134788,
+     "dense_grid": 2401.0,
+     "relu_spec": {
+      "relu_units": 7011,
+      "depth": 4,
+      "vertices": 779,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 1.2282547329998579,
+     "fidelity": 0.6931109323237264,
+     "train_fidelity": 0.6420713005301529,
+     "test_rmse": 136.29988444443836,
+     "solve_seconds": 0.5577134860000115,
+     "fit_test_rmse": 102.84913402206223,
+     "total_seconds": 2.194194939999761
+    },
+    {
+     "k": 5,
+     "resolution": 4,
+     "vertices": 902,
+     "rows_per_vertex": 15.413525498891353,
+     "dense_grid": 3125.0,
+     "relu_spec": {
+      "relu_units": 9922,
+      "depth": 5,
+      "vertices": 902,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 1.4889330739999878,
+     "fidelity": 0.6607712133104359,
+     "train_fidelity": 0.5449544473762868,
+     "test_rmse": 132.07909391371902,
+     "solve_seconds": 0.6507692759998918,
+     "fit_test_rmse": 99.09642286572988,
+     "total_seconds": 2.5479290709997713
+    }
+   ]
+  },
+  {
+   "dataset": "bikeshare",
+   "seed": 3,
+   "n_train": 13903,
+   "n_features": 12,
+   "fis_seconds": 0.29448656399995343,
+   "fis_test_rmse": 101.13871220669411,
+   "additive": {
+    "seconds": 0.11139159100002871,
+    "n_hidden": 278,
+    "fidelity": 0.671202404760794,
+    "test_rmse": 130.31634950632372
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 531441.0,
+     "vertex": 1.5885100663059006,
+     "support": 0.5424165503619186,
+     "project": 0.9796299666989369,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 244140625.0,
+     "vertex": 1.3047510010873078,
+     "support": 0.6298688863186249,
+     "project": 0.6485296108628209,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 282429536481.0,
+     "vertex": 1.0284253495035725,
+     "support": 0.9159937012614889,
+     "project": 2.3468657703936464,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 534.7307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.12052605200005928,
+     "fidelity": 0.6719336729419787,
+     "train_fidelity": 0.6722385584294269,
+     "test_rmse": 130.45234484983246,
+     "solve_seconds": 0.0054949240000041755,
+     "fit_test_rmse": 104.83143620997026,
+     "total_seconds": 0.5318991310000456
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 555,
+     "rows_per_vertex": 25.05045045045045,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 2775,
+      "depth": 3,
+      "vertices": 555,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.44201144299995576,
+     "fidelity": 0.7255833068160088,
+     "train_fidelity": 0.6025897149919209,
+     "test_rmse": 138.61864452382574,
+     "solve_seconds": 0.6818087579999883,
+     "fit_test_rmse": 103.50077442275283,
+     "total_seconds": 1.5296983559999262
+    },
+    {
+     "k": 3,
+     "resolution": 16,
+     "vertices": 903,
+     "rows_per_vertex": 15.396456256921374,
+     "dense_grid": 4913.0,
+     "relu_spec": {
+      "relu_units": 6321,
+      "depth": 4,
+      "vertices": 903,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 1.1379288880000331,
+     "fidelity": 0.767902567377547,
+     "train_fidelity": 0.5908463819065061,
+     "test_rmse": 146.43500845703556,
+     "solve_seconds": 0.4951982949999092,
+     "fit_test_rmse": 165.1341426421536,
+     "total_seconds": 2.0390053379999244
+    },
+    {
+     "k": 4,
+     "resolution": 6,
+     "vertices": 779,
+     "rows_per_vertex": 17.84724005134788,
+     "dense_grid": 2401.0,
+     "relu_spec": {
+      "relu_units": 7011,
+      "depth": 4,
+      "vertices": 779,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 0.9536928989998614,
+     "fidelity": 0.622331705280498,
+     "train_fidelity": 0.5851168971012538,
+     "test_rmse": 125.46288977713951,
+     "solve_seconds": 0.46820225800001936,
+     "fit_test_rmse": 99.57591253810105,
+     "total_seconds": 1.827773311999863
+    },
+    {
+     "k": 5,
+     "resolution": 4,
+     "vertices": 910,
+     "rows_per_vertex": 15.278021978021979,
+     "dense_grid": 3125.0,
+     "relu_spec": {
+      "relu_units": 10010,
+      "depth": 5,
+      "vertices": 910,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 1.1124185419998867,
+     "fidelity": 0.7039391047514109,
+     "train_fidelity": 0.4925354841305324,
+     "test_rmse": 137.22641265904537,
+     "solve_seconds": 0.6204901059998065,
+     "fit_test_rmse": 95.87412560167449,
+     "total_seconds": 2.1387868029996753
+    }
+   ]
+  },
+  {
+   "dataset": "bikeshare",
+   "seed": 4,
+   "n_train": 13903,
+   "n_features": 12,
+   "fis_seconds": 0.28671156699988387,
+   "fis_test_rmse": 103.91422475069167,
+   "additive": {
+    "seconds": 0.10083752699983961,
+    "n_hidden": 278,
+    "fidelity": 0.9509534756208055,
+    "test_rmse": 167.53164504432053
+   },
+   "consequent_modes": [
+    {
+     "resolution": 2,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 531441.0,
+     "vertex": 1.6228737017196941,
+     "support": 0.537585417503095,
+     "project": 1.1432600603248433,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 4,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 244140625.0,
+     "vertex": 1.3371100962991078,
+     "support": 0.6158775389198308,
+     "project": 0.6965616595518817,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    },
+    {
+     "resolution": 8,
+     "vertices": 8192,
+     "rows_per_vertex": 1.6971435546875,
+     "dense_grid": 282429536481.0,
+     "vertex": 1.0329543664470866,
+     "support": 0.9080477278551219,
+     "project": 1.6403140780425844,
+     "relu_spec": {
+      "relu_units": 204800,
+      "depth": 6,
+      "vertices": 8192,
+      "n_features": 12,
+      "dense_grid_would_be": "K**n"
+     }
+    }
+   ],
+   "hybrid": [
+    {
+     "k": 1,
+     "resolution": 24,
+     "vertices": 26,
+     "rows_per_vertex": 534.7307692307693,
+     "dense_grid": 25.0,
+     "relu_spec": {
+      "relu_units": 78,
+      "depth": 3,
+      "vertices": 26,
+      "n_features": 1,
+      "dense_grid_would_be": "K**n",
+      "subspace": 1
+     },
+     "seconds": 0.10069842099983362,
+     "fidelity": 0.675601764074333,
+     "train_fidelity": 0.6858850158554632,
+     "test_rmse": 133.19659765033418,
+     "solve_seconds": 0.005531474999997954,
+     "fit_test_rmse": 109.5647604314847,
+     "total_seconds": 0.49377898999955505
+    },
+    {
+     "k": 2,
+     "resolution": 24,
+     "vertices": 557,
+     "rows_per_vertex": 24.960502692998205,
+     "dense_grid": 625.0,
+     "relu_spec": {
+      "relu_units": 2785,
+      "depth": 3,
+      "vertices": 557,
+      "n_features": 2,
+      "dense_grid_would_be": "K**n",
+      "subspace": 2
+     },
+     "seconds": 0.4439894390000063,
+     "fidelity": 0.6570620972161969,
+     "train_fidelity": 0.5987405801384754,
+     "test_rmse": 131.85188914971894,
+     "solve_seconds": 0.18305069999996704,
+     "fit_test_rmse": 154.03887314022955,
+     "total_seconds": 1.0145892329996968
+    },
+    {
+     "k": 3,
+     "resolution": 16,
+     "vertices": 920,
+     "rows_per_vertex": 15.111956521739131,
+     "dense_grid": 4913.0,
+     "relu_spec": {
+      "relu_units": 6440,
+      "depth": 4,
+      "vertices": 920,
+      "n_features": 3,
+      "dense_grid_would_be": "K**n",
+      "subspace": 3
+     },
+     "seconds": 1.2520143530000496,
+     "fidelity": 0.6252004496455925,
+     "train_fidelity": 0.5851110862455299,
+     "test_rmse": 127.9997023321032,
+     "solve_seconds": 0.4399539559999539,
+     "fit_test_rmse": 100.63732625983205,
+     "total_seconds": 2.079517402999727
+    },
+    {
+     "k": 4,
+     "resolution": 6,
+     "vertices": 792,
+     "rows_per_vertex": 17.55429292929293,
+     "dense_grid": 2401.0,
+     "relu_spec": {
+      "relu_units": 7128,
+      "depth": 4,
+      "vertices": 792,
+      "n_features": 4,
+      "dense_grid_would_be": "K**n",
+      "subspace": 4
+     },
+     "seconds": 1.444417607000105,
+     "fidelity": 0.6880134251431999,
+     "train_fidelity": 0.5815149701917021,
+     "test_rmse": 135.16610432038297,
+     "solve_seconds": 0.48934275600004185,
+     "fit_test_rmse": 122.89057049652047,
+     "total_seconds": 2.3213094569998702
+    },
+    {
+     "k": 5,
+     "resolution": 4,
+     "vertices": 912,
+     "rows_per_vertex": 15.244517543859649,
+     "dense_grid": 3125.0,
+     "relu_spec": {
+      "relu_units": 10032,
+      "depth": 5,
+      "vertices": 912,
+      "n_features": 5,
+      "dense_grid_would_be": "K**n",
+      "subspace": 5
+     },
+     "seconds": 1.7174242999999478,
+     "fidelity": 0.515260567748932,
+     "train_fidelity": 0.47909906588618373,
+     "test_rmse": 117.57859537383521,
+     "solve_seconds": 0.6195847630001481,
+     "fit_test_rmse": 96.02213030696923,
+     "total_seconds": 2.7245581569998194
+    }
+   ]
+  }
+ ]
+}
