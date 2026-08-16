@@ -89,15 +89,19 @@ def main() -> None:
     assert lqr_ref is not None
     samples, targets, weights = training_set(plant)
     print(f"training set: {len(samples)} on-trajectory samples")
-    print(f"reference (best LQR): settle={lqr_ref.settling_time:.3f} "
-          f"peak={lqr_ref.peak_force:.4f} energy={lqr_ref.energy:.4f}")
+    print(
+        f"reference (best LQR): settle={lqr_ref.settling_time:.3f} "
+        f"peak={lqr_ref.peak_force:.4f} energy={lqr_ref.energy:.4f}"
+    )
     print(f"affine-consequent plateau from 9b: 0.8629 at N=3 (15 parameters)")
 
     results = []
 
     rule("Y. Score vs rule count, by consequent order")
-    print(f"{'order':>6} {'basis':>6}   " + "".join(f"{f'N={n}':>9}" for n in
-                                                    (1, 2, 3, 4, 6, 8, 12)))
+    print(
+        f"{'order':>6} {'basis':>6}   "
+        + "".join(f"{f'N={n}':>9}" for n in (1, 2, 3, 4, 6, 8, 12))
+    )
     for order in (0, 1, 2, 3):
         bsz = basis_size(4, order)
         row = []
@@ -113,8 +117,10 @@ def main() -> None:
             else:
                 sc = agg.score(lqr_ref)
                 row.append(f"{sc:.4f}")
-                shift = max(distribution_shift(simulate(plant, ctrl, z0)[2], samples)
-                            for z0 in Z0S)
+                shift = max(
+                    distribution_shift(simulate(plant, ctrl, z0)[2], samples)
+                    for z0 in Z0S
+                )
                 results.append((order, n_rules, n_par, sc, agg))
         print(f"{order:>6} {bsz:>6}   " + "".join(f"{v:>9}" for v in row))
     print("  order 0 = Sugeno constants, 1 = affine (classic TSK), 2 = quadratic,")
@@ -128,30 +134,42 @@ def main() -> None:
     print()
     ok = [r for r in results if r[3] is not None]
     ok.sort(key=lambda r: r[2])
-    print(f"{'params':>7} {'order':>6} {'rules':>6} {'score':>8} {'settle':>8} "
-          f"{'peak':>7} {'energy':>8}")
+    print(
+        f"{'params':>7} {'order':>6} {'rules':>6} {'score':>8} {'settle':>8} "
+        f"{'peak':>7} {'energy':>8}"
+    )
     for order, n_rules, n_par, sc, agg in ok:
         if n_par > 200:
             continue
-        print(f"{n_par:>7} {order:>6} {n_rules:>6} {sc:8.4f} "
-              f"{agg.settling_time:8.3f} {agg.peak_force:7.4f} {agg.energy:8.4f}")
+        print(
+            f"{n_par:>7} {order:>6} {n_rules:>6} {sc:8.4f} "
+            f"{agg.settling_time:8.3f} {agg.peak_force:7.4f} {agg.energy:8.4f}"
+        )
     print()
     best = min(ok, key=lambda r: r[3])
-    print(f"  BEST OVERALL: order {best[0]}, {best[1]} rules, {best[2]} params, "
-          f"score {best[3]:.4f}")
+    print(
+        f"  BEST OVERALL: order {best[0]}, {best[1]} rules, {best[2]} params, "
+        f"score {best[3]:.4f}"
+    )
     base = 0.8629
     if best[3] < base - 1e-4:
-        print(f"  The plateau MOVED: {base:.4f} -> {best[3]:.4f} "
-              f"({100 * (1 - best[3] / base):.1f}% better).")
+        print(
+            f"  The plateau MOVED: {base:.4f} -> {best[3]:.4f} "
+            f"({100 * (1 - best[3] / base):.1f}% better)."
+        )
     else:
-        print(f"  The plateau did NOT move: best {best[3]:.4f} vs {base:.4f} "
-              f"from affine consequents at 15 parameters.")
+        print(
+            f"  The plateau did NOT move: best {best[3]:.4f} vs {base:.4f} "
+            f"from affine consequents at 15 parameters."
+        )
 
     # Is the limit the fit itself, or the closed loop?
     rule("Z'. Open-loop fit quality vs closed-loop score")
     print("  If higher order fits u* better but does not score better, the model")
     print("  class was never the binding constraint.")
-    print(f"{'order':>6} {'rules':>6} {'params':>7} {'weighted RMS fit':>18} {'score':>8}")
+    print(
+        f"{'order':>6} {'rules':>6} {'params':>7} {'weighted RMS fit':>18} {'score':>8}"
+    )
     for order in (0, 1, 2, 3):
         for n_rules in (3, 8):
             cen, wid = place_rules(samples, weights, n_rules)

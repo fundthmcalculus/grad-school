@@ -58,8 +58,10 @@ def t_euler_lagrange() -> None:
     dL_dep = sp.diff(lag, ep).subs({ee: e, ep: sp.diff(e, x)})
     el = dL_de - sp.diff(dL_dep, x)
     # Claim: E-L  <=>  lam e'' - e = 0  (up to the overall factor -2)
-    check("§1  Euler-Lagrange gives lam*e'' - e = 0",
-          sp.expand(el - (-2) * (lam * sp.diff(e, x, 2) - e)))
+    check(
+        "§1  Euler-Lagrange gives lam*e'' - e = 0",
+        sp.expand(el - (-2) * (lam * sp.diff(e, x, 2) - e)),
+    )
 
 
 # --------------------------------------------------------------------------
@@ -73,8 +75,10 @@ def t_theorem_c1() -> None:
     phis = [m / tot for m in mus]
     # every consequent is the same affine map -K z
     blended = sum(p * (-(k1 * z1 + k2 * z2)) for p in phis)
-    check("§7a Theorem C1: sum_i phi_i(-Kz) = -Kz for ANY membership values",
-          sp.simplify(blended + (k1 * z1 + k2 * z2)))
+    check(
+        "§7a Theorem C1: sum_i phi_i(-Kz) = -Kz for ANY membership values",
+        sp.simplify(blended + (k1 * z1 + k2 * z2)),
+    )
     check("§7a partition of unity: sum_i phi_i = 1", sp.simplify(sum(phis) - 1))
 
 
@@ -98,24 +102,29 @@ def t_theorem_c2_prime() -> None:
     integrand = q + c(u) + vx * (f + g * u)
     bregman = c(u) - c(us) - sp.diff(c(us), us) * (u - us)
 
-    check("§9b Theorem C2': ell + V_x(f+gu) = Bregman divergence D_c(u||u*)",
-          sp.simplify((integrand - bregman).subs(vx, vx_sol)))
+    check(
+        "§9b Theorem C2': ell + V_x(f+gu) = Bregman divergence D_c(u||u*)",
+        sp.simplify((integrand - bregman).subs(vx, vx_sol)),
+    )
 
     # Quadratic specialization: c(u) = R u^2 recovers the classical statement.
     r = sp.Symbol("R", positive=True)
-    breg_qc = (c(u) - c(us) - sp.diff(c(us), us) * (u - us))
+    breg_qc = c(u) - c(us) - sp.diff(c(us), us) * (u - us)
     breg_quad = breg_qc.subs(c, sp.Lambda(sp.Symbol("w"), r * sp.Symbol("w") ** 2))
-    check("§7b Theorem C2 is the c(u)=Ru^2 case: D_c = R(u-u*)^2",
-          sp.simplify(sp.expand(breg_quad) - r * (u - us) ** 2))
+    check(
+        "§7b Theorem C2 is the c(u)=Ru^2 case: D_c = R(u-u*)^2",
+        sp.simplify(sp.expand(breg_quad) - r * (u - us) ** 2),
+    )
 
     # Non-negativity of D_c is exactly convexity of c (checked on a witness).
     w = sp.Symbol("w", real=True)
     for name, fn in (("u^2+u^4", w**2 + w**4), ("cosh(u)-1", sp.cosh(w) - 1)):
-        d = (fn.subs(w, u) - fn.subs(w, us)
-             - sp.diff(fn, w).subs(w, us) * (u - us))
+        d = fn.subs(w, u) - fn.subs(w, us) - sp.diff(fn, w).subs(w, us) * (u - us)
         # second derivative of D_c in u equals c''(u) >= 0 for these
-        check(f"§9b D_c >= 0 via convexity, c(u)={name}",
-              sp.simplify(sp.diff(d, u, 2) - sp.diff(fn, w, 2).subs(w, u)))
+        check(
+            f"§9b D_c >= 0 via convexity, c(u)={name}",
+            sp.simplify(sp.diff(d, u, 2) - sp.diff(fn, w, 2).subs(w, u)),
+        )
 
 
 # --------------------------------------------------------------------------
@@ -131,8 +140,9 @@ def t_lambda_star() -> None:
     i_dd = sp.integrate(sp.simplify(d0 * d1), (x, -sp.oo, sp.oo))
     check("§4d' INT phi0 phi1 dx = 1/k", sp.simplify(i_pp - 1 / k))
     check("§4d' INT phi0' phi1' dx = -k/6", sp.simplify(i_dd + k / 6))
-    check("§4d' lambda* = -INT(pp)/INT(dd) = 6/k^2",
-          sp.simplify(-i_pp / i_dd - 6 / k**2))
+    check(
+        "§4d' lambda* = -INT(pp)/INT(dd) = 6/k^2", sp.simplify(-i_pp / i_dd - 6 / k**2)
+    )
 
 
 # --------------------------------------------------------------------------
@@ -145,10 +155,14 @@ def t_centroid_is_tsk0() -> None:
     den = a1 * ar1 + a2 * ar2
     y = num / den
     w1, w2 = a1 * ar1 / den, a2 * ar2 / den
-    check("§5b centroid = sum_i w_i c_i with w_i = alpha_i A_i / sum",
-          sp.simplify(y - (w1 * c1 + w2 * c2)))
-    check("§5b weights sum to one (=> output is a convex combination)",
-          sp.simplify(w1 + w2 - 1))
+    check(
+        "§5b centroid = sum_i w_i c_i with w_i = alpha_i A_i / sum",
+        sp.simplify(y - (w1 * c1 + w2 * c2)),
+    )
+    check(
+        "§5b weights sum to one (=> output is a convex combination)",
+        sp.simplify(w1 + w2 - 1),
+    )
 
 
 # --------------------------------------------------------------------------
@@ -163,16 +177,21 @@ def t_annealing_bound() -> None:
     y = w1 * c1 + w2 * c2
     # y - c1 = w2 (c2 - c1); with r = a2/a1 and N=2 the bound is D r^b/(1+r^b)
     r = a2 / a1
-    check("§5c y_beta - c_(1) = w_2 (c_2 - c_1)",
-          sp.simplify(y - c1 - w2 * (c2 - c1)))
-    check("§5c off-peak weight w_2 = r^beta/(1+r^beta), r = alpha2/alpha1",
-          sp.simplify(w2 - r**b / (1 + r**b)))
+    check("§5c y_beta - c_(1) = w_2 (c_2 - c_1)", sp.simplify(y - c1 - w2 * (c2 - c1)))
+    check(
+        "§5c off-peak weight w_2 = r^beta/(1+r^beta), r = alpha2/alpha1",
+        sp.simplify(w2 - r**b / (1 + r**b)),
+    )
     # t/(1+t) is increasing, which is what lets alpha_i/alpha_(1) <= r be used
     t = sp.Symbol("t", positive=True)
     mono = sp.simplify(sp.diff(t / (1 + t), t))
-    results.append(("§5c t/(1+t) is increasing (d/dt > 0)",
-                    PASS if sp.ask(sp.Q.positive(mono)) or mono == 1 / (1 + t) ** 2
-                    else FAIL, str(mono)))
+    results.append(
+        (
+            "§5c t/(1+t) is increasing (d/dt > 0)",
+            PASS if sp.ask(sp.Q.positive(mono)) or mono == 1 / (1 + t) ** 2 else FAIL,
+            str(mono),
+        )
+    )
 
 
 # --------------------------------------------------------------------------
@@ -186,17 +205,23 @@ def t_rational_controller() -> None:
     mu1, mu2 = 1 / d1, 1 / d2
     phi1 = mu1 / (mu1 + mu2)
     # phi1 should equal D2 / (D1 + D2)
-    check("§12a phi_i = N_i/Q with N_1 = D_2, Q = D_1 + D_2 (N=2)",
-          sp.simplify(phi1 - d2 / (d1 + d2)))
+    check(
+        "§12a phi_i = N_i/Q with N_1 = D_2, Q = D_1 + D_2 (N=2)",
+        sp.simplify(phi1 - d2 / (d1 + d2)),
+    )
     f1, f2 = sp.symbols("f1 f2", real=True)
     u = phi1 * f1 + (1 - phi1) * f2
     p, q = sp.fraction(sp.cancel(sp.together(u)))
-    check("§12a u = P/Q exactly (P, Q polynomial)",
-          sp.simplify(u - p / q))
+    check("§12a u = P/Q exactly (P, Q polynomial)", sp.simplify(u - p / q))
     # D_i >= 1 for real z, so Q >= N > 0: check the minimum of D over z.
     dmin = sp.minimum(d1, z, sp.S.Reals)
-    results.append(("§12a D_i >= 1 for all real z (=> Q >= N > 0)",
-                    PASS if sp.simplify(dmin - 1) == 0 else FAIL, str(dmin)))
+    results.append(
+        (
+            "§12a D_i >= 1 for all real z (=> Q >= N > 0)",
+            PASS if sp.simplify(dmin - 1) == 0 else FAIL,
+            str(dmin),
+        )
+    )
 
 
 # --------------------------------------------------------------------------
@@ -211,10 +236,14 @@ def t_consequent_convexity() -> None:
     rhs = sp.Matrix([r1, r2])
     s = (theta.T * gram * theta)[0, 0] - 2 * (rhs.T * theta)[0, 0]
     hess = sp.hessian(s, (t1, t2))
-    check("§3a Hessian of the action in theta equals 2G (constant in theta)",
-          sp.simplify(hess - 2 * gram))
+    check(
+        "§3a Hessian of the action in theta equals 2G (constant in theta)",
+        sp.simplify(hess - 2 * gram),
+    )
     grad = sp.Matrix([sp.diff(s, t1), sp.diff(s, t2)])
-    check("§3a stationarity <=> G theta = r", sp.simplify(grad - 2 * (gram * theta - rhs)))
+    check(
+        "§3a stationarity <=> G theta = r", sp.simplify(grad - 2 * (gram * theta - rhs))
+    )
 
 
 # --------------------------------------------------------------------------
@@ -231,14 +260,24 @@ def t_envelope() -> None:
     ds = sp.diff(s, p)
     # claim: dS/dp = -2 (dr/dp) theta + theta^2 (dG/dp)
     claim = -2 * sp.diff(r1, p) * theta + theta**2 * sp.diff(g11, p)
-    check("§3d envelope theorem: dS/dp = -2 theta dr/dp + theta^2 dG/dp",
-          sp.simplify(ds - claim))
+    check(
+        "§3d envelope theorem: dS/dp = -2 theta dr/dp + theta^2 dG/dp",
+        sp.simplify(ds - claim),
+    )
 
 
 def main() -> None:
-    for fn in (t_euler_lagrange, t_theorem_c1, t_theorem_c2_prime, t_lambda_star,
-               t_centroid_is_tsk0, t_annealing_bound, t_rational_controller,
-               t_consequent_convexity, t_envelope):
+    for fn in (
+        t_euler_lagrange,
+        t_theorem_c1,
+        t_theorem_c2_prime,
+        t_lambda_star,
+        t_centroid_is_tsk0,
+        t_annealing_bound,
+        t_rational_controller,
+        t_consequent_convexity,
+        t_envelope,
+    ):
         fn()
     width = max(len(n) for n, _, _ in results)
     print("SYMBOLIC VERIFICATION (sympy; identities, not sampled points)")

@@ -63,9 +63,7 @@ class LqrProblem:
         return float(x @ p @ x)
 
 
-def tsk_represents_affine_exactly(
-    gain: af64, phi_weights: af64, states: af64
-) -> float:
+def tsk_represents_affine_exactly(gain: af64, phi_weights: af64, states: af64) -> float:
     """Max error of a partition-of-unity TSK model reproducing u(x) = -K x.
 
     Setting every consequent to the same affine map makes the blend collapse:
@@ -186,8 +184,13 @@ def simulate(
         return [float(xdot[0]), float(run[0]), float(err[0])]
 
     sol = solve_ivp(
-        rhs, (0.0, t_end), [x0, 0.0, 0.0], rtol=rtol, atol=atol,
-        method="LSODA", dense_output=False,
+        rhs,
+        (0.0, t_end),
+        [x0, 0.0, 0.0],
+        rtol=rtol,
+        atol=atol,
+        method="LSODA",
+        dense_output=False,
     )
     xf = float(sol.y[0, -1])
     stable = bool(sol.success and abs(xf) < 1e-4 * max(1.0, abs(x0)))
@@ -224,19 +227,33 @@ def occupation_density(
     dens = np.zeros_like(grid)
     for x0 in x0_samples:
         sol = solve_ivp(
-            lambda _t, z: [float((prob.f(np.array([z[0]]))
-                                  + prob.g(np.array([z[0]])) * u_fn(np.array([z[0]])))[0])],
-            (0.0, t_end), [float(x0)], rtol=1e-9, atol=1e-11,
-            dense_output=True, method="LSODA",
+            lambda _t, z: [
+                float(
+                    (
+                        prob.f(np.array([z[0]]))
+                        + prob.g(np.array([z[0]])) * u_fn(np.array([z[0]]))
+                    )[0]
+                )
+            ],
+            (0.0, t_end),
+            [float(x0)],
+            rtol=1e-9,
+            atol=1e-11,
+            dense_output=True,
+            method="LSODA",
         )
         ts = np.linspace(0.0, t_end, 4000)
         xs = sol.sol(ts)[0]
         dt = ts[1] - ts[0]
         # Gaussian-smoothed time histogram; the kernel keeps the weight usable as
         # a quadrature weight rather than a spiky empirical measure.
-        dens += dt * np.exp(
-            -0.5 * ((grid[:, None] - xs[None, :]) / bandwidth) ** 2
-        ).sum(axis=1) / (bandwidth * np.sqrt(2 * np.pi))
+        dens += (
+            dt
+            * np.exp(-0.5 * ((grid[:, None] - xs[None, :]) / bandwidth) ** 2).sum(
+                axis=1
+            )
+            / (bandwidth * np.sqrt(2 * np.pi))
+        )
     return dens / len(x0_samples)
 
 
@@ -290,7 +307,9 @@ def stability_certificate(
     return StabilityCertificate(
         verified=bool(radius > 0.0),
         roa_radius=radius,
-        worst_vdot=float(np.max(vdot[inside])) if radius > 0.0 and inside.any() else 0.0,
+        worst_vdot=(
+            float(np.max(vdot[inside])) if radius > 0.0 and inside.any() else 0.0
+        ),
         level_set=float(prob.v(np.array([radius]))[0]),
     )
 
@@ -386,8 +405,9 @@ def simulate_convex(
             float(prob.bregman(u, us)[0]),
         ]
 
-    sol = solve_ivp(rhs, (0.0, t_end), [x0, 0.0, 0.0], rtol=1e-11, atol=1e-13,
-                    method="LSODA")
+    sol = solve_ivp(
+        rhs, (0.0, t_end), [x0, 0.0, 0.0], rtol=1e-11, atol=1e-13, method="LSODA"
+    )
     j = float(sol.y[1, -1])
     v0 = float(prob.v(np.array([x0]))[0])
     breg = float(sol.y[2, -1])
@@ -401,8 +421,9 @@ def simulate_convex(
     }
 
 
-def _invert_monotone(c_prime: Callable[[af64], af64], y: af64,
-                     u0: af64 | None = None, iters: int = 60) -> af64:
+def _invert_monotone(
+    c_prime: Callable[[af64], af64], y: af64, u0: af64 | None = None, iters: int = 60
+) -> af64:
     """Newton inversion of a strictly increasing c'.
 
     Used when the stationarity condition c'(u*) = -g V_x has no closed-form

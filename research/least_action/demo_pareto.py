@@ -75,21 +75,25 @@ def metrics_over(plant, fn, z0s):
     return Metrics(
         float(np.mean([m.settling_time for m in ok])),
         float(np.max([m.peak_force for m in ok])),
-        float(np.mean([m.energy for m in ok])), True,
+        float(np.mean([m.energy for m in ok])),
+        True,
     )
 
 
 def best_certificate(ctrl, a_mat, b_mat, p_riccati):
     """Largest SOS-certified ball over both Lyapunov candidates."""
     rat = to_rational(ctrl)
-    cands = [("Riccati", p_riccati),
-             ("lin", lyapunov_from_linearization(ctrl, a_mat, b_mat.ravel()))]
+    cands = [
+        ("Riccati", p_riccati),
+        ("lin", lyapunov_from_linearization(ctrl, a_mat, b_mat.ravel())),
+    ]
     best = (0.0, "--")
     for name, p_lyap in cands:
         if p_lyap is None:
             continue
-        rho = max_certified_rho(rat, a_mat, b_mat.ravel(), p_lyap,
-                                lo=1e-3, hi=1e3, iters=14)
+        rho = max_certified_rho(
+            rat, a_mat, b_mat.ravel(), p_lyap, lo=1e-3, hi=1e3, iters=14
+        )
         if rho <= 0:
             continue
         rho *= 0.95
@@ -125,8 +129,7 @@ def main() -> None:
         best = proxy_ball_radius(ctrl, plant, p_riccati, cloud, RADIUS_CAP)
         p_lin = lyapunov_from_linearization(ctrl, a_mat, b_mat.ravel())
         if p_lin is not None:
-            best = max(best, proxy_ball_radius(ctrl, plant, p_lin, cloud,
-                                               RADIUS_CAP))
+            best = max(best, proxy_ball_radius(ctrl, plant, p_lin, cloud, RADIUS_CAP))
         return best
 
     print("A. Proxy validation on the warm start")
@@ -136,49 +139,86 @@ def main() -> None:
     t = time.time()
     r_true_warm, name_warm = best_certificate(warm, a_mat, b_mat, p_riccati)
     t_true = time.time() - t
-    print(f"   imitation N=2: proxy ball {r_warm:.4f} in {t_proxy * 1e3:.0f} ms, "
-          f"SOS ball {r_true_warm:.4f} ({name_warm}) in {t_true:.0f} s")
-    print(f"   proxy is {r_warm / r_true_warm:.3f}x optimistic and "
-          f"{t_true / t_proxy:.0f}x faster.  It over-states, which is the safe")
+    print(
+        f"   imitation N=2: proxy ball {r_warm:.4f} in {t_proxy * 1e3:.0f} ms, "
+        f"SOS ball {r_true_warm:.4f} ({name_warm}) in {t_true:.0f} s"
+    )
+    print(
+        f"   proxy is {r_warm / r_true_warm:.3f}x optimistic and "
+        f"{t_true / t_proxy:.0f}x faster.  It over-states, which is the safe"
+    )
     print("   direction for a search and the wrong one for a claim: a sampled")
     print("   Vdot >= 0 proves SOS must fail at that rho, so the proxy upper-")
     print("   bounds what any certificate can deliver.  Optimize against it,")
     print("   never report it -- hence the SOS column below.")
 
     print("\nB. Pareto sweep -- performance vs certified region")
-    print(f"   target radius = warm-start proxy = {r_warm:.4f}; "
-          f"penalty = w * max(0, r_t - r)^2 / r_t^2")
-    print(f"   {'w':>6} {'score':>8} {'holdout':>8} {'shaped':>8} "
-          f"{'proxy r':>8} {'SOS ball':>9} {'V from':>8} {'u(0)':>10} {'evals':>6} {'s':>5}")
+    print(
+        f"   target radius = warm-start proxy = {r_warm:.4f}; "
+        f"penalty = w * max(0, r_t - r)^2 / r_t^2"
+    )
+    print(
+        f"   {'w':>6} {'score':>8} {'holdout':>8} {'shaped':>8} "
+        f"{'proxy r':>8} {'SOS ball':>9} {'V from':>8} {'u(0)':>10} {'evals':>6} {'s':>5}"
+    )
 
     rows = []
     m = metrics_over(plant, warm, Z0S)
     mh = metrics_over(plant, warm, HOLDOUT)
-    rows.append(("none", warm, m, mh, shaped_cost(plant, warm, Z0S, ref),
-                 r_warm, r_true_warm, name_warm, 0, 0.0))
+    rows.append(
+        (
+            "none",
+            warm,
+            m,
+            mh,
+            shaped_cost(plant, warm, Z0S, ref),
+            r_warm,
+            r_true_warm,
+            name_warm,
+            0,
+            0.0,
+        )
+    )
 
     for w in WEIGHTS:
         pen = None
         if w > 0.0:
+
             def pen(c, w=w):
                 return w * max(0.0, r_warm - proxy(c)) ** 2 / r_warm**2
+
         t = time.time()
-        opt, _, nev = policy_optimize(plant, warm, Z0S, ref, maxfev=MAXFEV,
-                                      preserve_origin=True, penalty=pen)
+        opt, _, nev = policy_optimize(
+            plant, warm, Z0S, ref, maxfev=MAXFEV, preserve_origin=True, penalty=pen
+        )
         el = time.time() - t
         m = metrics_over(plant, opt, Z0S)
         mh = metrics_over(plant, opt, HOLDOUT)
         r_p = proxy(opt)
         r_t, nm = best_certificate(opt, a_mat, b_mat, p_riccati)
-        rows.append((f"{w:g}", opt, m, mh, shaped_cost(plant, opt, Z0S, ref),
-                     r_p, r_t, nm, nev, el))
+        rows.append(
+            (
+                f"{w:g}",
+                opt,
+                m,
+                mh,
+                shaped_cost(plant, opt, Z0S, ref),
+                r_p,
+                r_t,
+                nm,
+                nev,
+                el,
+            )
+        )
 
     for tag, ctrl, m, mh, sc, r_p, r_t, nm, nev, el in rows:
         s = "inf" if m is None else f"{m.score(ref):.4f}"
         sh = "inf" if mh is None else f"{mh.score(ref):.4f}"
         ball = "none" if r_t <= 0 else f"{r_t:.4f}"
-        print(f"   {tag:>6} {s:>8} {sh:>8} {sc:>8.4f} {r_p:>8.4f} {ball:>9} "
-              f"{nm:>8} {ctrl(np.zeros(4)):+10.1e} {nev:>6} {el:>5.0f}")
+        print(
+            f"   {tag:>6} {s:>8} {sh:>8} {sc:>8.4f} {r_p:>8.4f} {ball:>9} "
+            f"{nm:>8} {ctrl(np.zeros(4)):+10.1e} {nev:>6} {el:>5.0f}"
+        )
 
     print("\nC. Reading the front")
     real = [r for r in rows if r[2] is not None and r[6] > 0]
@@ -186,36 +226,54 @@ def main() -> None:
     if len(real) >= 2:
         best_score = min(real, key=lambda r: r[2].score(ref))
         best_ball = max(real, key=lambda r: r[6])
-        print(f"   best score {best_score[2].score(ref):.4f} at w={best_score[0]} "
-              f"with ball {best_score[6]:.4f}")
-        print(f"   best ball  {best_ball[6]:.4f} at w={best_ball[0]} "
-              f"with score {best_ball[2].score(ref):.4f}")
+        print(
+            f"   best score {best_score[2].score(ref):.4f} at w={best_score[0]} "
+            f"with ball {best_score[6]:.4f}"
+        )
+        print(
+            f"   best ball  {best_ball[6]:.4f} at w={best_ball[0]} "
+            f"with score {best_ball[2].score(ref):.4f}"
+        )
         ratios = [r[5] / r[6] for r in real]
-        print(f"   proxy/SOS ratio across the front: "
-              f"{min(ratios):.3f} to {max(ratios):.3f}")
+        print(
+            f"   proxy/SOS ratio across the front: "
+            f"{min(ratios):.3f} to {max(ratios):.3f}"
+        )
 
     balls = [r[6] for r in swept]
     breaks = [swept[i][0] for i in range(1, len(balls)) if balls[i] < balls[i - 1]]
-    print("   certified ball vs w: "
-          + " ".join(f"{b:.4f}" for b in balls)
-          + "  (w = " + ", ".join(r[0] for r in swept) + ")")
+    print(
+        "   certified ball vs w: "
+        + " ".join(f"{b:.4f}" for b in balls)
+        + "  (w = "
+        + ", ".join(r[0] for r in swept)
+        + ")"
+    )
     if breaks:
-        print(f"   monotone in w except at w={', '.join(breaks)} -- Powell is a "
-              f"local search on a")
+        print(
+            f"   monotone in w except at w={', '.join(breaks)} -- Powell is a "
+            f"local search on a"
+        )
         print("   non-convex landscape, so each row is a local optimum at its own")
         print("   weight, not the Pareto-optimal point for that trade-off.")
     else:
         print("   monotone in w across every tested weight.")
 
     base = swept[0]
-    dom = [r for r in swept[1:]
-           if r[2].score(ref) <= base[2].score(ref)
-           and r[3].score(ref) <= base[3].score(ref) and r[6] >= base[6]]
+    dom = [
+        r
+        for r in swept[1:]
+        if r[2].score(ref) <= base[2].score(ref)
+        and r[3].score(ref) <= base[3].score(ref)
+        and r[6] >= base[6]
+    ]
     if dom:
         b = min(dom, key=lambda r: r[2].score(ref))
-        print(f"   w={b[0]} DOMINATES w=0 on all three axes: score "
-              f"{b[2].score(ref):.4f} < {base[2].score(ref):.4f}, held out "
-              f"{b[3].score(ref):.4f} < {base[3].score(ref):.4f},")
+        print(
+            f"   w={b[0]} DOMINATES w=0 on all three axes: score "
+            f"{b[2].score(ref):.4f} < {base[2].score(ref):.4f}, held out "
+            f"{b[3].score(ref):.4f} < {base[3].score(ref):.4f},"
+        )
         print(f"   certified ball {b[6]:.4f} > {base[6]:.4f}.  The first increment")
         print("   of certificate-awareness costs nothing: penalizing aggression")
         print("   also regularizes a search that was overfitting six initial")

@@ -54,7 +54,9 @@ class Quadrature:
     def legendre(lo: float, hi: float, n: int = 400) -> "Quadrature":
         t, w = np.polynomial.legendre.leggauss(n)
         half = 0.5 * (hi - lo)
-        return Quadrature(nodes=half * t + 0.5 * (hi + lo), weights=half * w, lo=lo, hi=hi)
+        return Quadrature(
+            nodes=half * t + 0.5 * (hi + lo), weights=half * w, lo=lo, hi=hi
+        )
 
     def integrate(self, values: af64) -> f64:
         return f64(np.dot(self.weights, values))
@@ -158,7 +160,11 @@ MF_TABLE: dict[str, Callable[[af64, f64, f64], tuple[af64, af64]]] = {
 # Rule regressors
 # --------------------------------------------------------------------------
 def normalized_weights(
-    x: af64, centers: af64, widths: af64, kind: MFKind = "gaussian", floor: float = 1e-12
+    x: af64,
+    centers: af64,
+    widths: af64,
+    kind: MFKind = "gaussian",
+    floor: float = 1e-12,
 ) -> tuple[af64, af64, af64]:
     """Return (phi, dphi, mu_sum) with phi[i] = mu_i / sum_j mu_j.
 
@@ -293,7 +299,9 @@ def h1_gram(psi: af64, dpsi: af64, quad: Quadrature, lam: float) -> af64:
     return (psi * w) @ psi.T + lam * ((dpsi * w) @ dpsi.T)
 
 
-def h1_project(psi: af64, dpsi: af64, yd: af64, dyd: af64, quad: Quadrature, lam: float) -> af64:
+def h1_project(
+    psi: af64, dpsi: af64, yd: af64, dyd: af64, quad: Quadrature, lam: float
+) -> af64:
     """r[m] = <y_d, psi_m>_lam."""
     w = quad.weights
     return psi @ (w * yd) + lam * (dpsi @ (w * dyd))
@@ -546,7 +554,9 @@ def fit(
     usable = max(span - min_gap * (n_rules - 1), 0.0)
     z0 = np.concatenate(
         [
-            x_lo + 0.5 * usable / n_rules + np.arange(n_rules) * (usable / n_rules + min_gap),
+            x_lo
+            + 0.5 * usable / n_rules
+            + np.arange(n_rules) * (usable / n_rules + min_gap),
             np.full(n_rules, np.clip(0.6 * pitch, *width_bounds)),
         ]
     )
@@ -569,8 +579,13 @@ def fit(
                 z_try[i] = max(z_try[i], z_try[i - 1] + min_gap)
             z_try[:n_rules] = np.clip(z_try[:n_rules], x_lo, x_hi)
         res = minimize(
-            objective, z_try, method="SLSQP", jac=objective_grad, bounds=bounds,
-            constraints=constraints, options={"maxiter": 300, "ftol": 1e-12},
+            objective,
+            z_try,
+            method="SLSQP",
+            jac=objective_grad,
+            bounds=bounds,
+            constraints=constraints,
+            options={"maxiter": 300, "ftol": 1e-12},
         )
         if res.x is None:
             continue
@@ -605,16 +620,29 @@ def fit(
         for _ in range(8):
             before = objective(z)
             for method, kwargs in (
-                ("SLSQP", {"constraints": constraints,
-                           "options": {"maxiter": 500, "ftol": 1e-14}}),
-                ("L-BFGS-B", {"options": {"maxiter": 1000, "ftol": 1e-18,
-                                          "gtol": 1e-14}}),
+                (
+                    "SLSQP",
+                    {
+                        "constraints": constraints,
+                        "options": {"maxiter": 500, "ftol": 1e-14},
+                    },
+                ),
+                (
+                    "L-BFGS-B",
+                    {"options": {"maxiter": 1000, "ftol": 1e-18, "gtol": 1e-14}},
+                ),
             ):
                 # Accept only genuine improvements: SLSQP will happily return a
                 # worse point than it was handed and report success.
                 cand = clamp(
-                    minimize(objective, z, method=method, jac=objective_grad,
-                             bounds=bounds, **kwargs).x
+                    minimize(
+                        objective,
+                        z,
+                        method=method,
+                        jac=objective_grad,
+                        bounds=bounds,
+                        **kwargs,
+                    ).x
                 )
                 if objective(cand) < objective(z):
                     z = cand
@@ -705,7 +733,9 @@ def galerkin_residual(f: FisFit, yd_fn, dyd_fn, quad: Quadrature) -> af64:
     tangent space.  It is the computable stand-in for the Euler-Lagrange
     equation, which the FIS cannot satisfy pointwise.
     """
-    psi, dpsi, _ = rule_regressors(quad.nodes, f.centers, f.widths, f.order, f.kind, f.x_ref)
+    psi, dpsi, _ = rule_regressors(
+        quad.nodes, f.centers, f.widths, f.order, f.kind, f.x_ref
+    )
     e = yd_fn(quad.nodes) - psi.T @ f.coeffs.ravel()
     de = dyd_fn(quad.nodes) - dpsi.T @ f.coeffs.ravel()
     return h1_project(psi, dpsi, e, de, quad, f.lam)
@@ -729,7 +759,9 @@ def _active_constraint_normals(f: FisFit, tol: float) -> af64:
                 rows.append(r)
     if f.min_gap > 0.0:
         for i in range(n - 1):
-            if abs((f.centers[i + 1] - f.centers[i]) - f.min_gap) <= tol * max(1.0, f.min_gap):
+            if abs((f.centers[i + 1] - f.centers[i]) - f.min_gap) <= tol * max(
+                1.0, f.min_gap
+            ):
                 r = np.zeros(2 * n)
                 r[i] = -1.0
                 r[i + 1] = 1.0
@@ -818,12 +850,12 @@ def optimality_certificate(
     # component inside the critical cone measures failure to converge.
     scaled_grad = reduced_grad * step
     kkt_residual = (
-        float(np.linalg.norm(null_basis.T @ scaled_grad))
-        if null_basis.size
-        else 0.0
+        float(np.linalg.norm(null_basis.T @ scaled_grad)) if null_basis.size else 0.0
     )
 
-    projected = null_basis.T @ scaled @ null_basis if null_basis.size else np.zeros((0, 0))
+    projected = (
+        null_basis.T @ scaled @ null_basis if null_basis.size else np.zeros((0, 0))
+    )
     if projected.size:
         eigs, evecs = np.linalg.eigh(projected)
     else:
@@ -861,11 +893,15 @@ def optimality_certificate(
     floor = noise / (np.min(step) ** 2) * np.max(step) ** 2
 
     grad = galerkin_residual(f, yd_fn, dyd_fn, quad)
-    psi, dpsi, _ = rule_regressors(quad.nodes, f.centers, f.widths, f.order, f.kind, f.x_ref)
+    psi, dpsi, _ = rule_regressors(
+        quad.nodes, f.centers, f.widths, f.order, f.kind, f.x_ref
+    )
     gram_eigs = np.linalg.eigvalsh(h1_gram(psi, dpsi, quad, f.lam))
     return {
         "min_eigenvalue": float(eigs.min()),
-        "max_eigenvalue": float(eigs.max()) if np.isfinite(eigs).all() else float("inf"),
+        "max_eigenvalue": (
+            float(eigs.max()) if np.isfinite(eigs).all() else float("inf")
+        ),
         "n_active_constraints": int(n_active),
         "critical_cone_dim": int(null_basis.shape[1]) if null_basis.size else 0,
         "noise_floor": float(floor),
@@ -880,7 +916,9 @@ def optimality_certificate(
         "reduced_gradient_norm": float(np.linalg.norm(reduced_grad * step)),
         "kkt_residual": kkt_residual,
         "stationary": bool(kkt_residual < 1e-4 * max(abs(reduced(p0)), 1.0)),
-        "residual_h1_norm": float(np.sqrt(f.l2_error**2 + f.lam * f.h1_seminorm_error**2)),
+        "residual_h1_norm": float(
+            np.sqrt(f.l2_error**2 + f.lam * f.h1_seminorm_error**2)
+        ),
     }
 
 
@@ -927,9 +965,7 @@ def sequential_fit(
                 gji = (basis[sj] * quad.weights) @ basis[sl].T + lam * (
                     (dbasis[sj] * quad.weights) @ dbasis[sl].T
                 )
-                c = np.linalg.solve(
-                    gjj + 1e-9 * np.trace(gjj) / w * np.eye(w), gji
-                )
+                c = np.linalg.solve(gjj + 1e-9 * np.trace(gjj) / w * np.eye(w), gji)
                 basis[sl] -= c.T @ basis[sj]
                 dbasis[sl] -= c.T @ dbasis[sj]
                 transform[sj, sl] -= c
@@ -947,7 +983,9 @@ def sequential_fit(
         theta = transform @ theta
     fitted = psi.T @ theta
     dfitted = dpsi.T @ theta
-    action = quad.integrate((yd - fitted) ** 2) + lam * quad.integrate((dyd - dfitted) ** 2)
+    action = quad.integrate((yd - fitted) ** 2) + lam * quad.integrate(
+        (dyd - dfitted) ** 2
+    )
     return theta, float(action)
 
 

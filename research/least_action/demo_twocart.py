@@ -63,9 +63,7 @@ def build_training_set(plant, z0s, t_end=25.0, n_knots=30):
     samples, targets, weights = [], [], []
     per_z0 = {}
     for z0 in z0s:
-        ts, zs, us, _ = optimal_trajectory(
-            plant, z0, n_knots=n_knots, t_end=t_end
-        )
+        ts, zs, us, _ = optimal_trajectory(plant, z0, n_knots=n_knots, t_end=t_end)
         dt = ts[1] - ts[0]
         samples.append(zs)
         targets.append(us)
@@ -73,8 +71,12 @@ def build_training_set(plant, z0s, t_end=25.0, n_knots=30):
         # because the samples already lie along the closed-loop trajectory.
         weights.append(np.full(len(ts), dt))
         per_z0[tuple(z0)] = (ts, zs, us)
-    return (np.vstack(samples), np.concatenate(targets),
-            np.concatenate(weights), per_z0)
+    return (
+        np.vstack(samples),
+        np.concatenate(targets),
+        np.concatenate(weights),
+        per_z0,
+    )
 
 
 def main() -> None:
@@ -100,17 +102,23 @@ def main() -> None:
     print("  the true optimum non-smooth.")
 
     rule("R. Baselines: LQR sweep, and the open-loop training reference")
-    print(f"{'controller':>22} {'settle':>9} {'peak |u|':>9} {'energy':>9} {'all settled':>12}")
+    print(
+        f"{'controller':>22} {'settle':>9} {'peak |u|':>9} {'energy':>9} {'all settled':>12}"
+    )
     lqr_results = {}
     for r_val in (0.1, 0.3, 1.0, 3.0, 10.0):
         k = plant.lqr(q_mat, r_val)
         agg, ms = aggregate(plant, lambda z, k=k: float(-k @ z), Z0S)
         lqr_results[r_val] = agg
         if agg is None:
-            print(f"{'LQR R=' + str(r_val):>22} {'--':>9} {'--':>9} {'--':>9} {'no':>12}")
+            print(
+                f"{'LQR R=' + str(r_val):>22} {'--':>9} {'--':>9} {'--':>9} {'no':>12}"
+            )
         else:
-            print(f"{'LQR R=' + str(r_val):>22} {agg.settling_time:9.3f} "
-                  f"{agg.peak_force:9.4f} {agg.energy:9.4f} {str(agg.settled):>12}")
+            print(
+                f"{'LQR R=' + str(r_val):>22} {agg.settling_time:9.3f} "
+                f"{agg.peak_force:9.4f} {agg.energy:9.4f} {str(agg.settled):>12}"
+            )
     print()
     print("  Open-loop trajectory optimization (full knowledge of z0):")
     samples, targets, weights, per_z0 = build_training_set(plant, Z0S)
@@ -123,14 +131,22 @@ def main() -> None:
         ceil_settle.append(ts[out[-1]] if out.size else 0.0)
         ceil_peak.append(np.max(np.abs(us)))
         ceil_energy.append(np.trapezoid(us**2, ts))
-    ceiling = Metrics(float(np.mean(ceil_settle)), float(np.max(ceil_peak)),
-                      float(np.mean(ceil_energy)), True)
-    print(f"{'open-loop reference':>22} {ceiling.settling_time:9.3f} "
-          f"{ceiling.peak_force:9.4f} {ceiling.energy:9.4f} {'yes':>12}")
+    ceiling = Metrics(
+        float(np.mean(ceil_settle)),
+        float(np.max(ceil_peak)),
+        float(np.mean(ceil_energy)),
+        True,
+    )
+    print(
+        f"{'open-loop reference':>22} {ceiling.settling_time:9.3f} "
+        f"{ceiling.peak_force:9.4f} {ceiling.energy:9.4f} {'yes':>12}"
+    )
     print(f"  training set: {len(samples)} occupation-weighted (state, u*) samples")
 
-    best_lqr = min((v for v in lqr_results.values() if v is not None),
-                   key=lambda m: m.score(ceiling))
+    best_lqr = min(
+        (v for v in lqr_results.values() if v is not None),
+        key=lambda m: m.score(ceiling),
+    )
     print()
     print("  IMPORTANT: this open-loop reference is a local optimum of a SMOOTH")
     print("  SURROGATE of the objective, not a certified optimum of the objective")
@@ -144,26 +160,37 @@ def main() -> None:
     print("  trajectories -> variable-project the consequents (one linear solve,")
     print("  globally optimal for those rule positions) -> simulate.  Nothing else.")
     print()
-    print(f"{'rules':>6} {'params':>7} {'settle':>9} {'peak |u|':>9} {'energy':>9} "
-          f"{'score':>8} {'shift':>7} {'settled':>8}")
-    print(f"{'LQR':>6} {'4':>7} {best_lqr.settling_time:9.3f} {best_lqr.peak_force:9.4f} "
-          f"{best_lqr.energy:9.4f} {1.0:8.4f} {'--':>7} {str(best_lqr.settled):>8}")
-    print(f"{'ref':>6} {'open':>7} {ceiling.settling_time:9.3f} {ceiling.peak_force:9.4f} "
-          f"{ceiling.energy:9.4f} {ceiling.score(best_lqr):8.4f} {'--':>7} {'yes':>8}")
+    print(
+        f"{'rules':>6} {'params':>7} {'settle':>9} {'peak |u|':>9} {'energy':>9} "
+        f"{'score':>8} {'shift':>7} {'settled':>8}"
+    )
+    print(
+        f"{'LQR':>6} {'4':>7} {best_lqr.settling_time:9.3f} {best_lqr.peak_force:9.4f} "
+        f"{best_lqr.energy:9.4f} {1.0:8.4f} {'--':>7} {str(best_lqr.settled):>8}"
+    )
+    print(
+        f"{'ref':>6} {'open':>7} {ceiling.settling_time:9.3f} {ceiling.peak_force:9.4f} "
+        f"{ceiling.energy:9.4f} {ceiling.score(best_lqr):8.4f} {'--':>7} {'yes':>8}"
+    )
     for n_rules in (1, 2, 3, 4, 6, 8, 12, 16):
         cen, wid = place_rules(samples, weights, n_rules)
         ctrl = TskController(cen, wid)
         fit_consequents(ctrl, samples, targets, weights)
         agg, ms = aggregate(plant, ctrl, Z0S)
-        shift = max(distribution_shift(simulate(plant, ctrl, z0)[2], samples)
-                    for z0 in Z0S)
+        shift = max(
+            distribution_shift(simulate(plant, ctrl, z0)[2], samples) for z0 in Z0S
+        )
         if agg is None:
-            print(f"{n_rules:>6} {5 * n_rules:>7} {'--':>9} {'--':>9} {'--':>9} "
-                  f"{'inf':>8} {shift:7.2f} {'no':>8}")
+            print(
+                f"{n_rules:>6} {5 * n_rules:>7} {'--':>9} {'--':>9} {'--':>9} "
+                f"{'inf':>8} {shift:7.2f} {'no':>8}"
+            )
             continue
-        print(f"{n_rules:>6} {5 * n_rules:>7} {agg.settling_time:9.3f} "
-              f"{agg.peak_force:9.4f} {agg.energy:9.4f} {agg.score(best_lqr):8.4f} "
-              f"{shift:7.2f} {str(agg.settled):>8}")
+        print(
+            f"{n_rules:>6} {5 * n_rules:>7} {agg.settling_time:9.3f} "
+            f"{agg.peak_force:9.4f} {agg.energy:9.4f} {agg.score(best_lqr):8.4f} "
+            f"{shift:7.2f} {str(agg.settled):>8}"
+        )
     print("  score < 1 beats the best LQR on the equal-weight three-objective score.")
     print("  'shift' is the max distance from a closed-loop state to the nearest")
     print("  training sample, in units of the training set's own per-axis spread.")
@@ -181,24 +208,32 @@ def main() -> None:
         ceil_s.append(ts[out[-1]] if out.size else 0.0)
         ceil_p.append(np.max(np.abs(us)))
         ceil_e.append(np.trapezoid(us**2, ts))
-    nl_ceiling = Metrics(float(np.mean(ceil_s)), float(np.max(ceil_p)),
-                         float(np.mean(ceil_e)), True)
+    nl_ceiling = Metrics(
+        float(np.mean(ceil_s)), float(np.max(ceil_p)), float(np.mean(ceil_e)), True
+    )
     nl_best = None
     for r_val in (0.3, 1.0, 3.0):
         k = nl.lqr(q_mat, r_val)
         agg, _ = aggregate(nl, lambda z, k=k: float(-k @ z), Z0S)
-        if agg is not None and (nl_best is None
-                                or agg.score(nl_ceiling) < nl_best.score(nl_ceiling)):
+        if agg is not None and (
+            nl_best is None or agg.score(nl_ceiling) < nl_best.score(nl_ceiling)
+        ):
             nl_best = agg
-    print(f"{'controller':>22} {'settle':>9} {'peak |u|':>9} {'energy':>9} {'score':>8}")
+    print(
+        f"{'controller':>22} {'settle':>9} {'peak |u|':>9} {'energy':>9} {'score':>8}"
+    )
     if nl_best is None:
         print("  no linear LQR in the sweep stabilizes the nonlinear plant.")
         return
-    print(f"{'best linear LQR':>22} {nl_best.settling_time:9.3f} "
-          f"{nl_best.peak_force:9.4f} {nl_best.energy:9.4f} {1.0:8.4f}")
-    print(f"{'open-loop reference':>22} {nl_ceiling.settling_time:9.3f} "
-          f"{nl_ceiling.peak_force:9.4f} {nl_ceiling.energy:9.4f} "
-          f"{nl_ceiling.score(nl_best):8.4f}")
+    print(
+        f"{'best linear LQR':>22} {nl_best.settling_time:9.3f} "
+        f"{nl_best.peak_force:9.4f} {nl_best.energy:9.4f} {1.0:8.4f}"
+    )
+    print(
+        f"{'open-loop reference':>22} {nl_ceiling.settling_time:9.3f} "
+        f"{nl_ceiling.peak_force:9.4f} {nl_ceiling.energy:9.4f} "
+        f"{nl_ceiling.score(nl_best):8.4f}"
+    )
     for n_rules in (1, 2, 4, 8, 16):
         cen, wid = place_rules(nl_samples, nl_weights, n_rules)
         ctrl = TskController(cen, wid)
@@ -208,8 +243,10 @@ def main() -> None:
         if agg is None:
             print(f"{label:>22} {'--':>9} {'--':>9} {'--':>9} {'inf':>8}")
         else:
-            print(f"{label:>22} {agg.settling_time:9.3f} {agg.peak_force:9.4f} "
-                  f"{agg.energy:9.4f} {agg.score(nl_best):8.4f}")
+            print(
+                f"{label:>22} {agg.settling_time:9.3f} {agg.peak_force:9.4f} "
+                f"{agg.energy:9.4f} {agg.score(nl_best):8.4f}"
+            )
 
 
 if __name__ == "__main__":

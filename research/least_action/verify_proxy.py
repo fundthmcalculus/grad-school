@@ -27,8 +27,9 @@ warnings.filterwarnings("ignore")
 def main() -> None:
     plant = TwoCart()
     a_mat, b_mat = plant.linearization()
-    p_lyap = solve_continuous_are(a_mat, b_mat, np.diag([1.0, 10.0, 1.0, 1.0]),
-                                  np.array([[10.0]]))
+    p_lyap = solve_continuous_are(
+        a_mat, b_mat, np.diag([1.0, 10.0, 1.0, 1.0]), np.array([[10.0]])
+    )
     d = np.load(".twocart_train.npz")
     cen, wid = place_rules(d["z"], d["w"], 2)
     ctrl = TskController(cen, wid, order=1, mf="pi")
@@ -37,39 +38,48 @@ def main() -> None:
 
     print("1. The descent formulation is degenerate, not badly tuned")
     v0 = _vdot_at(np.zeros(4), ctrl, plant, p_lyap)
-    print(f"   Vdot(0) = {v0:+.3e}  ->  z = 0 SATISFIES the constraint "
-          f"Vdot >= 0,")
+    print(f"   Vdot(0) = {v0:+.3e}  ->  z = 0 SATISFIES the constraint " f"Vdot >= 0,")
     print("   so min{z'Pz : Vdot(z) >= 0} has global optimum 0 at the origin.")
 
     samples = ball_samples()
     vdot = _vdot_batch(samples, ctrl, plant, p_lyap)
     rho = np.einsum("ni,ij,nj->n", samples, p_lyap, samples)
     bad = np.flatnonzero(vdot >= 0.0)
-    print(f"   violations are not rare: {bad.size}/{len(samples)} "
-          f"({100 * bad.size / len(samples):.0f}%) of cloud points have "
-          f"Vdot >= 0,")
+    print(
+        f"   violations are not rare: {bad.size}/{len(samples)} "
+        f"({100 * bad.size / len(samples):.0f}%) of cloud points have "
+        f"Vdot >= 0,"
+    )
     print("   so the cloud estimate is a minimum-order statistic (see 3).")
 
     starts = bad[np.argsort(rho[bad])][:6]
     collapsed = boundary = 0
     for idx in starts:
         res = minimize(
-            lambda z: float(z @ p_lyap @ z), samples[idx], method="SLSQP",
+            lambda z: float(z @ p_lyap @ z),
+            samples[idx],
+            method="SLSQP",
             jac=lambda z: 2.0 * p_lyap @ z,
-            constraints=[{"type": "ineq",
-                          "fun": lambda z: _vdot_at(z, ctrl, plant, p_lyap)}],
+            constraints=[
+                {"type": "ineq", "fun": lambda z: _vdot_at(z, ctrl, plant, p_lyap)}
+            ],
             options={"maxiter": 40, "ftol": 1e-10},
         )
         if np.linalg.norm(res.x) < 1e-6:
             collapsed += 1
         if _vdot_at(res.x, ctrl, plant, p_lyap) < 0.0:
             boundary += 1
-    print(f"   of {len(starts)} local solves from the best sampled starts: "
-          f"{collapsed} collapsed to ||z|| = 0,")
-    print(f"   and {boundary} ended infeasible (on the Vdot = 0 boundary from "
-          f"below), so a")
-    print("   strict feasibility recheck discards every one and the bound "
-          "never moves.")
+    print(
+        f"   of {len(starts)} local solves from the best sampled starts: "
+        f"{collapsed} collapsed to ||z|| = 0,"
+    )
+    print(
+        f"   and {boundary} ended infeasible (on the Vdot = 0 boundary from "
+        f"below), so a"
+    )
+    print(
+        "   strict feasibility recheck discards every one and the bound " "never moves."
+    )
 
     print("\n2. The ray proxy's witnesses are real (necessary condition holds)")
     dirs = sphere_directions(2000)
@@ -89,15 +99,18 @@ def main() -> None:
     v_out = _vdot_batch(z, ctrl, plant, p_lyap)
     rho_out = np.einsum("ni,ij,nj->n", z, p_lyap, z)
     j = int(np.argmin(rho_out))
-    print(f"   every returned endpoint satisfies Vdot >= 0: "
-          f"{int((v_out >= 0).sum())}/{len(v_out)}, "
-          f"min Vdot = {v_out.min():+.3e}")
+    print(
+        f"   every returned endpoint satisfies Vdot >= 0: "
+        f"{int((v_out >= 0).sum())}/{len(v_out)}, "
+        f"min Vdot = {v_out.min():+.3e}"
+    )
     print(f"   the binding witness is a REAL state, not an extrapolation:")
     print(f"     z*   = [{', '.join(f'{x:+.4f}' for x in z[j])}]")
-    print(f"     Vdot = {v_out[j]:+.3e} >= 0,  ball radius "
-          f"{np.sqrt(rho_out[j] / lo):.4f}")
-    print("   so no certificate can reach past it -- necessary, never "
-          "sufficient.")
+    print(
+        f"     Vdot = {v_out[j]:+.3e} >= 0,  ball radius "
+        f"{np.sqrt(rho_out[j] / lo):.4f}"
+    )
+    print("   so no certificate can reach past it -- necessary, never " "sufficient.")
 
     print("\n3. Seed stability of the two estimators")
     print(f"   {'seed':>6} {'cloud':>10} {'ray':>10}")
@@ -121,13 +134,15 @@ def main() -> None:
             hr = np.where(g, m, hr)
             lr = np.where(g, lr, m)
         zz = dd[ii] * hr[:, None]
-        ry.append(float(np.sqrt(
-            np.einsum("ni,ij,nj->n", zz, p_lyap, zz).min() / lo)))
+        ry.append(float(np.sqrt(np.einsum("ni,ij,nj->n", zz, p_lyap, zz).min() / lo)))
         print(f"   {seed:>6} {cl[-1]:>10.4f} {ry[-1]:>10.4f}")
-    print(f"   spread: cloud {(max(cl) - min(cl)) / np.mean(cl):.1%}, "
-          f"ray {(max(ry) - min(ry)) / np.mean(ry):.1%}")
-    print("   Same necessary condition, same controller -- only the estimator "
-          "differs.")
+    print(
+        f"   spread: cloud {(max(cl) - min(cl)) / np.mean(cl):.1%}, "
+        f"ray {(max(ry) - min(ry)) / np.mean(ry):.1%}"
+    )
+    print(
+        "   Same necessary condition, same controller -- only the estimator " "differs."
+    )
 
 
 if __name__ == "__main__":

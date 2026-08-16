@@ -78,8 +78,7 @@ def fit_and_eval(plant, n_rules, samples, targets, weights, seed=0):
     ctrl = TskController(cen, wid)
     fit_consequents(ctrl, samples, targets, weights)
     agg = aggregate(plant, ctrl)
-    shift = max(distribution_shift(simulate(plant, ctrl, z0)[2], samples)
-                for z0 in Z0S)
+    shift = max(distribution_shift(simulate(plant, ctrl, z0)[2], samples) for z0 in Z0S)
     return ctrl, agg, shift
 
 
@@ -90,8 +89,10 @@ def main() -> None:
     lqr_ref = aggregate(plant, lambda z: float(-k_best @ z))
     assert lqr_ref is not None
 
-    print(f"reference (best LQR, R=10): settle={lqr_ref.settling_time:.3f} "
-          f"peak={lqr_ref.peak_force:.4f} energy={lqr_ref.energy:.4f}")
+    print(
+        f"reference (best LQR, R=10): settle={lqr_ref.settling_time:.3f} "
+        f"peak={lqr_ref.peak_force:.4f} energy={lqr_ref.energy:.4f}"
+    )
     base_z, base_u, base_w = build_base(plant)
     print(f"baseline training set: {len(base_z)} on-trajectory samples")
 
@@ -107,11 +108,15 @@ def main() -> None:
     aug_z = np.vstack([base_z, tube_z])
     aug_u = np.concatenate([base_u, tube_u])
     aug_w = np.concatenate([base_w, tube_w])
-    print(f"  +{len(tube_z)} off-trajectory labels in {time.time() - t0:.1f} s "
-          f"(sigma = 0.35 of per-axis spread)")
+    print(
+        f"  +{len(tube_z)} off-trajectory labels in {time.time() - t0:.1f} s "
+        f"(sigma = 0.35 of per-axis spread)"
+    )
     print()
-    print(f"{'rules':>6} {'on-traj score':>14} {'on-traj shift':>14} "
-          f"{'+tube score':>12} {'+tube shift':>12}")
+    print(
+        f"{'rules':>6} {'on-traj score':>14} {'on-traj shift':>14} "
+        f"{'+tube score':>12} {'+tube shift':>12}"
+    )
     for n_rules in (3, 4, 8, 12, 16):
         _, a0, s0 = fit_and_eval(plant, n_rules, base_z, base_u, base_w)
         _, a1, s1 = fit_and_eval(plant, n_rules, aug_z, aug_u, aug_w)
@@ -124,26 +129,34 @@ def main() -> None:
     print("  This makes the training measure equal the deployment measure, which")
     print("  is what README 8d requires and what the on-trajectory fit violates.")
     print()
-    print(f"{'rules':>6} {'round':>6} {'samples':>8} {'score':>9} {'shift':>7} "
-          f"{'settle':>8} {'peak':>7} {'energy':>8}")
+    print(
+        f"{'rules':>6} {'round':>6} {'samples':>8} {'score':>9} {'shift':>7} "
+        f"{'settle':>8} {'peak':>7} {'energy':>8}"
+    )
     for n_rules in (3, 8, 16):
         z, u, w = base_z.copy(), base_u.copy(), base_w.copy()
         for rnd in range(3):
             ctrl, agg, shift = fit_and_eval(plant, n_rules, z, u, w)
             sc = "inf" if agg is None else f"{agg.score(lqr_ref):.4f}"
             if agg is None:
-                print(f"{n_rules:>6} {rnd:>6} {len(z):>8} {sc:>9} {shift:7.2f} "
-                      f"{'--':>8} {'--':>7} {'--':>8}")
+                print(
+                    f"{n_rules:>6} {rnd:>6} {len(z):>8} {sc:>9} {shift:7.2f} "
+                    f"{'--':>8} {'--':>7} {'--':>8}"
+                )
             else:
-                print(f"{n_rules:>6} {rnd:>6} {len(z):>8} {sc:>9} {shift:7.2f} "
-                      f"{agg.settling_time:8.3f} {agg.peak_force:7.4f} "
-                      f"{agg.energy:8.4f}")
+                print(
+                    f"{n_rules:>6} {rnd:>6} {len(z):>8} {sc:>9} {shift:7.2f} "
+                    f"{agg.settling_time:8.3f} {agg.peak_force:7.4f} "
+                    f"{agg.energy:8.4f}"
+                )
             if rnd == 2:
                 break
             new_z, new_w = dagger_states(plant, ctrl, Z0S, n_per_traj=10)
             if len(new_z) == 0:
-                print(f"{n_rules:>6} {rnd:>6} -- controller diverges, no states "
-                      f"to label")
+                print(
+                    f"{n_rules:>6} {rnd:>6} -- controller diverges, no states "
+                    f"to label"
+                )
                 break
             new_u = np.array([label_state(plant, zz) for zz in new_z])
             z = np.vstack([z, new_z])

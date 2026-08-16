@@ -68,8 +68,10 @@ class RationalController:
         return float(self.numerator.subs(sub) / self.denominator.subs(sub))
 
     def degrees(self) -> tuple[int, int]:
-        return (sp.Poly(self.numerator, *self.symbols).total_degree(),
-                sp.Poly(self.denominator, *self.symbols).total_degree())
+        return (
+            sp.Poly(self.numerator, *self.symbols).total_degree(),
+            sp.Poly(self.denominator, *self.symbols).total_degree(),
+        )
 
 
 def to_rational(ctrl, n_state: int = 4) -> RationalController:
@@ -88,8 +90,9 @@ def to_rational(ctrl, n_state: int = 4) -> RationalController:
     for i in range(n_rules):
         d = sp.Integer(1)
         for j in range(n_state):
-            d += ((z[j] - sp.Float(ctrl.centers[i][j]))
-                  / sp.Float(ctrl.widths[i][j])) ** 2
+            d += (
+                (z[j] - sp.Float(ctrl.centers[i][j])) / sp.Float(ctrl.widths[i][j])
+            ) ** 2
         dens.append(sp.expand(d))
 
     # N_i = prod_{k != i} D_k  and  Q = sum_i N_i
@@ -182,8 +185,10 @@ class SosCertificate:
     def summary(self) -> str:
         if not self.feasible:
             return f"INFEASIBLE ({self.solver_status})"
-        return (f"CERTIFIED (V min eig {self.min_eig_v:.3e}, "
-                f"SOS Gram min eig {self.min_eig_gram:.3e})")
+        return (
+            f"CERTIFIED (V min eig {self.min_eig_v:.3e}, "
+            f"SOS Gram min eig {self.min_eig_gram:.3e})"
+        )
 
 
 def certify_quadratic_lyapunov(
@@ -220,7 +225,7 @@ def certify_quadratic_lyapunov(
             e[b_, a] += 1
             v_e = (zv.T @ e @ zv)[0, 0]
             grad = sp.Matrix([sp.diff(v_e, zi) for zi in z])
-            f_expr = (sp.Matrix(a_mat.tolist()) @ zv)
+            f_expr = sp.Matrix(a_mat.tolist()) @ zv
             gv_f = (grad.T @ f_expr)[0, 0]
             gv_g = (grad.T @ sp.Matrix(b_vec.reshape(-1, 1).tolist()))[0, 0]
             expr = sp.expand(rat.denominator * gv_f + gv_g * rat.numerator)
@@ -279,12 +284,14 @@ def certify_quadratic_lyapunov(
     try:
         prob.solve(solver=solver, verbose=False, max_iters=20000)
     except Exception as exc:  # solver failure is not a proof of infeasibility
-        return SosCertificate(False, None, 0.0, 0.0, f"solver error: {exc}",
-                              *rat.degrees(), k)
+        return SosCertificate(
+            False, None, 0.0, 0.0, f"solver error: {exc}", *rat.degrees(), k
+        )
 
     if prob.status not in ("optimal", "optimal_inaccurate") or v_sym.value is None:
-        return SosCertificate(False, None, 0.0, 0.0, str(prob.status),
-                              *rat.degrees(), k)
+        return SosCertificate(
+            False, None, 0.0, 0.0, str(prob.status), *rat.degrees(), k
+        )
     v_val = np.array(v_sym.value)
     g_val = 0.5 * (np.array(gram.value) + np.array(gram.value).T)
     eig_v = float(np.linalg.eigvalsh(0.5 * (v_val + v_val.T)).min())
@@ -301,16 +308,20 @@ def certify_quadratic_lyapunov(
         v_matrix=v_val if feasible else None,
         min_eig_v=eig_v,
         min_eig_gram=eig_g,
-        solver_status=f"{prob.status}, margin={float(margin.value):.3e}"
-                     if margin.value is not None else str(prob.status),
+        solver_status=(
+            f"{prob.status}, margin={float(margin.value):.3e}"
+            if margin.value is not None
+            else str(prob.status)
+        ),
         numerator_degree=rat.degrees()[0],
         denominator_degree=rat.degrees()[1],
         sdp_size=k,
     )
 
 
-def unsaturated_radius(ctrl, u_max: float, x_max: float = 4.0,
-                       n: int = 60000, seed: int = 0) -> float:
+def unsaturated_radius(
+    ctrl, u_max: float, x_max: float = 4.0, n: int = 60000, seed: int = 0
+) -> float:
     """Largest r with |u(z)| <= u_max for all sampled ||z|| <= r.
 
     The SOS certificate uses the rational vector field, which is the true plant
@@ -394,12 +405,12 @@ def certify_roa(
     w_c = {m: c / w_scale for m, c in w_c.items()}
     slack_scale = max(max((abs(c) for c in slack_c.values()), default=1.0), 1e-30)
     slack_c = {m: c / slack_scale for m, c in slack_c.items()}
-    eps_c = _coeff_map(
-        sp.expand(-(epsilon / w_scale) * sum(zi**2 for zi in z)), z
-    )
+    eps_c = _coeff_map(sp.expand(-(epsilon / w_scale) * sum(zi**2 for zi in z)), z)
 
-    deg = max(max((sum(m) for m in w_c), default=0),
-              max((sum(m) for m in slack_c), default=0) + sigma_degree)
+    deg = max(
+        max((sum(m) for m in w_c), default=0),
+        max((sum(m) for m in slack_c), default=0) + sigma_degree,
+    )
     half = (deg + 1) // 2
     mons = _monomials(z, half, min_degree=1)
     mon_exp = [tuple(sp.Poly(m, *z).monoms()[0]) for m in mons]
@@ -419,8 +430,12 @@ def certify_roa(
             prod_terms.setdefault(mono, []).extend((i, j, lc) for i, j in idxs)
 
     margin = cp.Variable()
-    cons = [gram >> margin * np.eye(k), sig_gram >> 0, margin <= 1e3,
-            cp.trace(sig_gram) <= 1e6]
+    cons = [
+        gram >> margin * np.eye(k),
+        sig_gram >> 0,
+        margin <= 1e3,
+        cp.trace(sig_gram) <= 1e6,
+    ]
     for mono in set(w_c) | set(prod_terms) | set(gram_mono) | set(eps_c):
         lhs = w_c.get(mono, 0.0) + eps_c.get(mono, 0.0)
         lhs = lhs - sum(lc * sig_gram[i, j] for i, j, lc in prod_terms.get(mono, []))
@@ -431,8 +446,11 @@ def certify_roa(
     # Solver options are not portable: max_iters/eps_abs/eps_rel are SCS's and
     # the interior-point solvers reject them, which surfaces as a bare failure
     # rather than an informative error.
-    opts = ({"max_iters": 200000, "eps_abs": 1e-9, "eps_rel": 1e-9}
-            if solver == "SCS" else {})
+    opts = (
+        {"max_iters": 200000, "eps_abs": 1e-9, "eps_rel": 1e-9}
+        if solver == "SCS"
+        else {}
+    )
     try:
         prob.solve(solver=solver, verbose=False, **opts)
     except Exception:
@@ -446,17 +464,31 @@ def certify_roa(
     es = float(np.linalg.eigvalsh(sg).min())
     ok = eg > -1e-8 * scale and es > -1e-8 * max(float(np.max(np.abs(sg))), 1e-12)
     if _CAPTURE is not None:
-        _CAPTURE.update(gram=g, sigma_gram=sg, monomials=mons,
-                        sigma_monomials=sig_mons, w_scale=w_scale,
-                        slack_scale=slack_scale, w_expr=w_expr, v_expr=v_expr,
-                        epsilon=epsilon, rho=rho)
+        _CAPTURE.update(
+            gram=g,
+            sigma_gram=sg,
+            monomials=mons,
+            sigma_monomials=sig_mons,
+            w_scale=w_scale,
+            slack_scale=slack_scale,
+            w_expr=w_expr,
+            v_expr=v_expr,
+            epsilon=epsilon,
+            rho=rho,
+        )
     return ok, eg, abs(min(eg, 0.0)) / scale
 
 
 def max_certified_rho(
-    rat: RationalController, a_mat: af64, b_vec: af64, p_lyap: af64,
-    lo: float = 1e-4, hi: float = 1e3, iters: int = 18,
-    sigma_degree: int = 4, solver: str = "CLARABEL",
+    rat: RationalController,
+    a_mat: af64,
+    b_vec: af64,
+    p_lyap: af64,
+    lo: float = 1e-4,
+    hi: float = 1e3,
+    iters: int = 18,
+    sigma_degree: int = 4,
+    solver: str = "CLARABEL",
 ) -> float:
     """Largest sublevel value rho for which `certify_roa` succeeds (bisection).
 
@@ -465,14 +497,16 @@ def max_certified_rho(
     an interior-point method, closes the same SDP to 1e-11 relative in under two
     seconds.  The obstruction was never the relaxation.
     """
-    if not certify_roa(rat, a_mat, b_vec, p_lyap, lo,
-                       sigma_degree=sigma_degree, solver=solver)[0]:
+    if not certify_roa(
+        rat, a_mat, b_vec, p_lyap, lo, sigma_degree=sigma_degree, solver=solver
+    )[0]:
         return 0.0
     best = lo
     for _ in range(iters):
         mid = float(np.sqrt(lo * hi))
-        if certify_roa(rat, a_mat, b_vec, p_lyap, mid,
-                       sigma_degree=sigma_degree, solver=solver)[0]:
+        if certify_roa(
+            rat, a_mat, b_vec, p_lyap, mid, sigma_degree=sigma_degree, solver=solver
+        )[0]:
             best, lo = mid, mid
         else:
             hi = mid
@@ -492,14 +526,14 @@ def lyapunov_from_linearization(
     the SOS step should not be attempted.
     """
     n = len(b_vec)
-    k = np.array([
-        (ctrl(h * np.eye(n)[i]) - ctrl(-h * np.eye(n)[i])) / (2 * h)
-        for i in range(n)
-    ])
+    k = np.array(
+        [(ctrl(h * np.eye(n)[i]) - ctrl(-h * np.eye(n)[i])) / (2 * h) for i in range(n)]
+    )
     a_cl = a_mat + np.outer(b_vec, k)
     if np.max(np.linalg.eigvals(a_cl).real) >= -1e-12:
         return None
     from scipy.linalg import solve_lyapunov
+
     return solve_lyapunov(a_cl.T, -(np.eye(n) if q_mat is None else q_mat))
 
 
@@ -527,20 +561,24 @@ def certified_radius_proxy(
     x1, x2, v1, v2 = samples.T
     d = x2 - x1
     spring = plant.k_lin * d + plant.k_nl * d**3
-    zdot = np.column_stack([
-        v1, v2,
-        (spring - plant.damping * v1 + np.clip(u, -plant.u_max, plant.u_max))
-        / plant.m1,
-        (-spring - plant.damping * v2) / plant.m2,
-    ])
+    zdot = np.column_stack(
+        [
+            v1,
+            v2,
+            (spring - plant.damping * v1 + np.clip(u, -plant.u_max, plant.u_max))
+            / plant.m1,
+            (-spring - plant.damping * v2) / plant.m2,
+        ]
+    )
     vdot = 2.0 * np.einsum("ni,ij,nj->n", samples, p_lyap, zdot)
     rho = np.einsum("ni,ij,nj->n", samples, p_lyap, samples)
     bad = rho[vdot >= 0.0]
     return float(min(bad.min(), rho_cap)) if bad.size else float(rho_cap)
 
 
-def sublevel_samples(p_lyap: af64, n: int = 20000, rho_max: float = 4.0,
-                     seed: int = 0) -> af64:
+def sublevel_samples(
+    p_lyap: af64, n: int = 20000, rho_max: float = 4.0, seed: int = 0
+) -> af64:
     """Points filling {z : z'Pz <= rho_max}, denser near the origin."""
     rng = np.random.default_rng(seed)
     d = rng.normal(size=(n, p_lyap.shape[0]))
@@ -550,8 +588,9 @@ def sublevel_samples(p_lyap: af64, n: int = 20000, rho_max: float = 4.0,
     return d * (scale * frac)[:, None]
 
 
-def ball_samples(n: int = 20000, radius: float = 2.0, dim: int = 4,
-                 seed: int = 0) -> af64:
+def ball_samples(
+    n: int = 20000, radius: float = 2.0, dim: int = 4, seed: int = 0
+) -> af64:
     """Points filling the Euclidean ball of the given radius, denser inside.
 
     A cloud shaped by one particular P cannot be reused for another, and the
@@ -576,12 +615,15 @@ def _vdot_batch(zs: af64, ctrl, plant, p_lyap: af64) -> af64:
     x1, x2, v1, v2 = zs.T
     d = np.clip(x2 - x1, -1e3, 1e3)
     spring = plant.k_lin * d + plant.k_nl * d**3
-    zdot = np.column_stack([
-        v1, v2,
-        (spring - plant.damping * v1 + np.clip(u, -plant.u_max, plant.u_max))
-        / plant.m1,
-        (-spring - plant.damping * v2) / plant.m2,
-    ])
+    zdot = np.column_stack(
+        [
+            v1,
+            v2,
+            (spring - plant.damping * v1 + np.clip(u, -plant.u_max, plant.u_max))
+            / plant.m1,
+            (-spring - plant.damping * v2) / plant.m2,
+        ]
+    )
     return 2.0 * np.einsum("ni,ij,nj->n", zs, p_lyap, zdot)
 
 
@@ -593,8 +635,13 @@ def sphere_directions(n: int = 2000, dim: int = 4, seed: int = 0) -> af64:
 
 
 def ray_radius_proxy(
-    ctrl, plant, p_lyap: af64, dirs: af64, radius_cap: float = 2.0,
-    n_grid: int = 64, n_bisect: int = 22,
+    ctrl,
+    plant,
+    p_lyap: af64,
+    dirs: af64,
+    radius_cap: float = 2.0,
+    n_grid: int = 64,
+    n_bisect: int = 22,
 ) -> float:
     """Sharp necessary condition: search along rays, not over a point cloud.
 
@@ -634,7 +681,7 @@ def ray_radius_proxy(
     any_hit = hit.any(axis=1)
     if not any_hit.any():
         return float(radius_cap)
-    first = np.argmax(hit, axis=1)                      # first crossing index
+    first = np.argmax(hit, axis=1)  # first crossing index
     idx = np.flatnonzero(any_hit)
     first = first[idx]
     dirs_h = dirs[idx]
@@ -653,8 +700,9 @@ def ray_radius_proxy(
     return float(np.sqrt(min(float(rho.min()), lo * radius_cap**2) / lo))
 
 
-def proxy_ball_radius(ctrl, plant, p_lyap: af64, samples: af64,
-                      radius_cap: float) -> float:
+def proxy_ball_radius(
+    ctrl, plant, p_lyap: af64, samples: af64, radius_cap: float
+) -> float:
     """`certified_radius_proxy` reported as a Euclidean ball radius.
 
     Sublevel values of different Lyapunov candidates are not comparable -- rho
@@ -663,6 +711,7 @@ def proxy_ball_radius(ctrl, plant, p_lyap: af64, samples: af64,
     what a certificate-aware objective must be built from.
     """
     lo = float(np.linalg.eigvalsh(p_lyap).min())
-    rho = certified_radius_proxy(ctrl, plant, p_lyap, samples,
-                                 rho_cap=lo * radius_cap**2)
+    rho = certified_radius_proxy(
+        ctrl, plant, p_lyap, samples, rho_cap=lo * radius_cap**2
+    )
     return float(np.sqrt(max(rho, 0.0) / lo))

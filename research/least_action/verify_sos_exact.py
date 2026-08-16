@@ -77,8 +77,7 @@ def exact_psd(mat: sp.Matrix) -> tuple[bool, int, int]:
     for i in range(n):
         for j in range(n):
             common = sp.ilcm(common, sp.Rational(mat[i, j]).q)
-    m_int = sp.Matrix(n, n,
-                      lambda i, j: sp.Integer(sp.Rational(mat[i, j]) * common))
+    m_int = sp.Matrix(n, n, lambda i, j: sp.Integer(sp.Rational(mat[i, j]) * common))
     biggest = 0
     for k in range(1, n + 1):
         minor = m_int[:k, :k].det(method="bareiss")
@@ -101,11 +100,21 @@ def main() -> None:
 
     store: dict = {}
     fis_sos.capture(store)
-    ok, eg, _ = certify_roa(rat_ctrl, a_mat, b_mat.ravel(), p_lyap, float(RHO),
-                            epsilon=1e-8, sigma_degree=2, solver="CLARABEL")
+    ok, eg, _ = certify_roa(
+        rat_ctrl,
+        a_mat,
+        b_mat.ravel(),
+        p_lyap,
+        float(RHO),
+        epsilon=1e-8,
+        sigma_degree=2,
+        solver="CLARABEL",
+    )
     fis_sos.capture(None)
-    print(f"1. numerical SDP at rho={RHO}: certified={ok}, "
-          f"Gram min eig {eg:+.3e}  (strictly positive => room to round)")
+    print(
+        f"1. numerical SDP at rho={RHO}: certified={ok}, "
+        f"Gram min eig {eg:+.3e}  (strictly positive => room to round)"
+    )
     if not ok or eg <= 0:
         raise SystemExit("need a strictly positive margin to round into")
 
@@ -118,13 +127,22 @@ def main() -> None:
     sg = store["sigma_gram"]
     s_hat = sp.Matrix(ks, ks, lambda i, j: rat((sg[i, j] + sg[j, i]) / 2))
     s_pd, _, _ = exact_psd(s_hat)
-    sigma = sp.expand(sum(s_hat[i, j] * sig_mons[i] * sig_mons[j]
-                          for i in range(ks) for j in range(ks)))
+    sigma = sp.expand(
+        sum(
+            s_hat[i, j] * sig_mons[i] * sig_mons[j]
+            for i in range(ks)
+            for j in range(ks)
+        )
+    )
     sigma = to_exact(sigma)
-    print(f"2. multiplier rounded to Q (denominator <= {DENOM}): "
-          f"sigma is SOS over Q = {s_pd}")
-    print(f"   sigma(0) = {sigma.subs({zi: 0 for zi in z})}  "
-          f"(must be 0 or the target cannot be SOS)")
+    print(
+        f"2. multiplier rounded to Q (denominator <= {DENOM}): "
+        f"sigma is SOS over Q = {s_pd}"
+    )
+    print(
+        f"   sigma(0) = {sigma.subs({zi: 0 for zi in z})}  "
+        f"(must be 0 or the target cannot be SOS)"
+    )
 
     # Step 3: exact target over Q, in UNSCALED units.  The SDP solved a version
     # divided by max|coeff|; multiplying the identity through by that positive
@@ -136,17 +154,17 @@ def main() -> None:
     eps = sp.Rational(store["epsilon"])
     sigma_eff = sp.expand(sigma * w_scale / slack_scale)
     target = sp.expand(
-        w_expr
-        - eps * sum(zi**2 for zi in z)
-        - sigma_eff * (RHO - v_expr)
+        w_expr - eps * sum(zi**2 for zi in z) - sigma_eff * (RHO - v_expr)
     )
     tpoly = sp.Poly(target, *z)
-    print(f"3. exact target over Q: {len(tpoly.monoms())} monomials, "
-          f"degrees {sorted({sum(m) for m in tpoly.monoms()})}")
+    print(
+        f"3. exact target over Q: {len(tpoly.monoms())} monomials, "
+        f"degrees {sorted({sum(m) for m in tpoly.monoms()})}"
+    )
 
     # Step 4: round the Gram, then project onto the exact identity.  Each Gram
     # entry contributes to exactly one monomial, so the constraint decouples.
-    g = store["gram"] * float(w_scale)   # undo the solver-side normalization
+    g = store["gram"] * float(w_scale)  # undo the solver-side normalization
     g0 = sp.Matrix(k, k, lambda i, j: rat((g[i, j] + g[j, i]) / 2))
     mon_exp = [tuple(sp.Poly(m, *z).monoms()[0]) for m in mons]
     groups: dict = {}
@@ -157,8 +175,10 @@ def main() -> None:
     tcoef = {m: c for m, c in zip(tpoly.monoms(), tpoly.coeffs())}
     unmatched = [m for m in tcoef if m not in groups]
     if unmatched:
-        print(f"   target has {len(unmatched)} monomials no Gram entry can "
-              f"produce -- identity impossible")
+        print(
+            f"   target has {len(unmatched)} monomials no Gram entry can "
+            f"produce -- identity impossible"
+        )
         raise SystemExit(1)
     g_exact = g0.copy()
     for key, idxs in groups.items():
@@ -169,19 +189,24 @@ def main() -> None:
             g_exact[i, j] = g_exact[i, j] + delta
     g_exact = (g_exact + g_exact.T) / 2
 
-    recon = sp.expand(sum(g_exact[i, j] * mons[i] * mons[j]
-                          for i in range(k) for j in range(k)))
+    recon = sp.expand(
+        sum(g_exact[i, j] * mons[i] * mons[j] for i in range(k) for j in range(k))
+    )
     residual = sp.expand(recon - target)
-    print(f"4. projected onto the exact identity: residual = {residual}  "
-          f"({'EXACT' if residual == 0 else 'NONZERO'})")
+    print(
+        f"4. projected onto the exact identity: residual = {residual}  "
+        f"({'EXACT' if residual == 0 else 'NONZERO'})"
+    )
     if residual != 0:
         raise SystemExit(1)
 
     # Step 5: exact PSD via integer leading principal minors.
     pd, nchecked, bits = exact_psd(g_exact)
     print(f"5. exact integer minors on the {k}x{k} Gram: positive definite = {pd}")
-    print(f"   {nchecked}/{k} leading principal minors verified > 0 "
-          f"(largest is a {bits}-bit integer)")
+    print(
+        f"   {nchecked}/{k} leading principal minors verified > 0 "
+        f"(largest is a {bits}-bit integer)"
+    )
     if not pd:
         raise SystemExit(1)
 
