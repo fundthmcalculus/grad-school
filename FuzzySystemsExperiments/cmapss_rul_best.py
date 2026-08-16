@@ -261,6 +261,10 @@ def run(h5_path: str, pipeline_name: str, verbose: bool = True) -> dict:
     data, var = load_h5(h5_path)
     df_dev = to_frame(data, var, "dev")
     df_test = to_frame(data, var, "test")
+    del data  # to_frame copies into the DataFrames; the raw h5 arrays (a few
+    # GB for the larger datasets) would otherwise sit alive and unused for
+    # the rest of the run, risking OOM when --grid runs one dataset after
+    # another in the same process.
     load_seconds = time.perf_counter() - t0
     p(f"  {len(df_dev):,} dev rows, {len(df_test):,} test rows ({load_seconds:.1f}s)")
 
@@ -350,10 +354,14 @@ def run(h5_path: str, pipeline_name: str, verbose: bool = True) -> dict:
 # Grid mode: run a set of pipelines over every N-CMAPSS .h5 file in a
 # directory, and emit a markdown report (quality + time-to-process).
 #
-# Each (dataset, pipeline) row is appended to a checkpoint CSV immediately,
-# not just collected in memory -- background runs in this DOE have been
-# killed mid-run before with no OOM/reboot evidence to explain it, so a
-# --resume pass over the same checkpoint must not have to redo finished work.
+# Each (dataset, pipeline) pair runs in its OWN subprocess (not just its own
+# loop iteration): the biggest datasets' condition-correction step holds a
+# ~9-10M-row DataFrame (dev+test combined) in memory, and running dataset
+# after dataset in one long-lived process let peak memory compound across
+# iterations -- confirmed OOM-killed (exit 137) partway through a full-grid
+# run. A fresh subprocess per pair gives the OS a hard reset on memory
+# between pairs. Each row is appended to a checkpoint CSV immediately (not
+# just collected in memory) so a --resume pass never redoes finished work.
 # --------------------------------------------------------------------------
 def run_grid(
     h5_dir: str,
@@ -363,6 +371,8 @@ def run_grid(
 ) -> list:
     import glob
     import os
+    import subprocess
+    import sys
 
     rows = []
     done = set()
@@ -380,20 +390,34 @@ def run_grid(
             if (dataset, pipeline_name) in done:
                 print(f"skip (already done): {dataset} / {pipeline_name}")
                 continue
-            print(f"\n{'='*78}\n{dataset} / {pipeline_name}\n{'='*78}")
-            try:
-                result = run(h5_path, pipeline_name, verbose=True)
-                result["dataset"] = dataset
-                result["status"] = "ok"
-            except Exception as e:
-                print(f"  FAILED: {e!r}")
-                result = dict(
-                    dataset=dataset,
-                    pipeline=pipeline_name,
-                    status=f"failed: {e!r}",
+            print(f"\n{'='*78}\n{dataset} / {pipeline_name} (subprocess)\n{'='*78}")
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    "-u",
+                    __file__,
+                    "--h5",
+                    h5_path,
+                    "--pipeline",
+                    pipeline_name,
+                    "--emit-checkpoint-row",
+                    checkpoint_path,
+                ]
+            )
+            if proc.returncode != 0:
+                print(f"  FAILED: subprocess exit code {proc.returncode}")
+                rows.append(
+                    dict(
+                        dataset=dataset,
+                        pipeline=pipeline_name,
+                        status=f"failed: subprocess exit code {proc.returncode}",
+                    )
                 )
-            rows.append(result)
-            pd.DataFrame(rows).to_csv(checkpoint_path, index=False)
+                pd.DataFrame(rows).to_csv(checkpoint_path, index=False)
+            # else: the subprocess itself already appended its row to
+            # checkpoint_path via --emit-checkpoint-row.
+            if os.path.exists(checkpoint_path):
+                rows = pd.read_csv(checkpoint_path).to_dict("records")
     return rows
 
 
@@ -412,6 +436,19 @@ def write_grid_report(rows: list, out_path: str) -> None:
         "matching 20-channel set) pipelines, run across every N-CMAPSS "
         "dataset file available locally.",
         "",
+        "Both pipelines use the exact hyperparameters found by the DOE's "
+        "grid search on DS02 -- **not re-tuned per dataset**. This table is "
+        "a zero-shot generalization check, not a per-dataset best case; a "
+        "dataset-specific sweep would likely do better where RMSE is high.",
+        "",
+        "NASA score is exponential in per-sample error "
+        "(`exp(|error|/13)` or `exp(|error|/10)`), so a handful of "
+        "large-outlier predictions dominate the sum and can inflate the "
+        "score by many orders of magnitude on a dataset the model "
+        "generalizes to poorly. Treat RMSE as the primary comparison "
+        "metric across datasets; NASA score is included for completeness, "
+        "not as a normalized cross-dataset number.",
+        "",
         "| dataset | pipeline | RMSE | NASA score | load (s) | correction (s) "
         "| aggregate (s) | fit (s) | total (s) |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|",
@@ -419,7 +456,7 @@ def write_grid_report(rows: list, out_path: str) -> None:
     for r in ok_rows:
         lines.append(
             f"| {r['dataset']} | {r['pipeline']} | {r['rmse']:.2f} | "
-            f"{r['nasa_score']:.1f} | {r['load_seconds']:.1f} | "
+            f"{r['nasa_score']:,.0f} | {r['load_seconds']:.1f} | "
             f"{r['correction_seconds']:.1f} | {r['aggregate_seconds']:.1f} | "
             f"{r['fit_seconds']:.2f} | {r['total_seconds']:.1f} |"
         )
@@ -461,10 +498,29 @@ if __name__ == "__main__":
         action="store_true",
         help="Skip (dataset, pipeline) pairs already in the checkpoint CSV.",
     )
+    parser.add_argument(
+        "--emit-checkpoint-row",
+        metavar="CHECKPOINT_CSV",
+        help=argparse.SUPPRESS,  # internal: used by run_grid's per-pair subprocess
+    )
     args = parser.parse_args()
     if args.grid:
         rows = run_grid(args.h5_dir, args.pipelines, resume=args.resume)
         write_grid_report(rows, args.report_out)
+    elif args.emit_checkpoint_row:
+        import os
+
+        result = run(args.h5, args.pipeline, verbose=True)
+        result["dataset"] = os.path.basename(args.h5)
+        result["status"] = "ok"
+        prior = (
+            pd.read_csv(args.emit_checkpoint_row)
+            if os.path.exists(args.emit_checkpoint_row)
+            else pd.DataFrame()
+        )
+        pd.concat([prior, pd.DataFrame([result])], ignore_index=True).to_csv(
+            args.emit_checkpoint_row, index=False
+        )
     else:
         if not args.h5:
             parser.error("--h5 is required unless --grid is given")
