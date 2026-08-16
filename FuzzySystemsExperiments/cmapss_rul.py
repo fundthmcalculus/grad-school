@@ -169,10 +169,48 @@ def aggregate_raw_memory(
     return result
 
 
+# --------------------------------------------------------------------------
+# Preprocessing: condition-corrected sensor channels, at raw (pre-aggregation)
+# resolution -- fed to the regressor as *input features*, not just used to
+# find the RUL-cap onset (see Stage 5). Same fix as Stage 5's onset
+# detector: raw per-cycle sensor readings are dominated by flight-to-flight
+# operating-condition swings, not the (much smaller) degradation trend --
+# regressing out W first exposes the signal the regressor is actually
+# supposed to learn from. Fit only on dev/train units' own early cycles
+# (never on test), then applied to both splits with the same fitted models.
+# --------------------------------------------------------------------------
+def fit_raw_condition_correction(
+    df: pd.DataFrame, sensor_cols: list[str], condition_cols: list[str],
+    baseline_cycles: int = 15,
+) -> dict:
+    from sklearn.linear_model import LinearRegression
+
+    order = df.groupby("unit").cumcount()
+    baseline = df[order < baseline_cycles]
+    X_base = baseline[condition_cols].to_numpy(dtype=np.float64)
+    return {
+        col: LinearRegression().fit(X_base, baseline[col].to_numpy(dtype=np.float64))
+        for col in sensor_cols
+    }
+
+
+def apply_raw_condition_correction(
+    df: pd.DataFrame, sensor_cols: list[str], condition_cols: list[str], models: dict,
+) -> pd.DataFrame:
+    df = df.copy()
+    X_all = df[condition_cols].to_numpy(dtype=np.float64)
+    for col in sensor_cols:
+        df[col] = df[col].to_numpy(dtype=np.float64) - models[col].predict(X_all)
+    return df
+
+
 AGGREGATORS = {
-    "A1_whole_cycle": aggregate_whole_cycle,
-    "A2_phase_split": aggregate_phase_split,
-    "A3_raw_memory": aggregate_raw_memory,
+    "A1_whole_cycle": (aggregate_whole_cycle, False),
+    "A2_phase_split": (aggregate_phase_split, False),
+    "A3_raw_memory": (aggregate_raw_memory, False),
+    # Same aggregators, fed the condition-corrected stream instead of raw.
+    "A1_whole_cycle_cc": (aggregate_whole_cycle, True),
+    "A3_raw_memory_cc": (aggregate_raw_memory, True),
 }
 
 
@@ -242,8 +280,23 @@ def run_one(
     caps: dict,
     d_kwargs: dict,
 ) -> dict:
+    """`d_kwargs['scaler']` (popped before reaching TribbleRegressor) is an
+    optional post-aggregation feature scaler -- 'standard' fits sklearn's
+    StandardScaler on train only, transforms both splits. Not a
+    TribbleRegressor constructor arg; a preprocessing step layered on top."""
+    d_kwargs = dict(d_kwargs)
+    scaler_name = d_kwargs.pop("scaler", None)
+
     X_train = train_tab[feat_cols].to_numpy(dtype=np.float64)
     X_test = test_tab[feat_cols].to_numpy(dtype=np.float64)
+    if scaler_name == "standard":
+        from sklearn.preprocessing import StandardScaler
+        sc = StandardScaler()
+        X_train = sc.fit_transform(X_train)
+        X_test = sc.transform(X_test)
+    elif scaler_name is not None:
+        raise ValueError(scaler_name)
+
     y_train = apply_rul_shape(train_tab, rul_mode, caps).to_numpy()
     y_test_target = apply_rul_shape(test_tab, rul_mode, caps).to_numpy()
     y_test_true = test_tab["RUL"].astype(float).to_numpy()
@@ -281,17 +334,28 @@ def stage1():
     print(f"  loaded {len(df_dev):,} dev rows, {len(df_test):,} test rows"
           f" in {time.perf_counter() - t0:.1f}s")
 
+    print("Fitting condition correction (Xs/Xv ~ W, on dev-unit early cycles only) ...")
+    t0 = time.perf_counter()
+    w_cols = [f"W_{n}" for n in var["W"]]
+    xs_cols = [f"Xs_{n}" for n in var["X_s"]]
+    xv_cols = [f"Xv_{n}" for n in var["X_v"]]
+    cc_models = fit_raw_condition_correction(df_dev, xs_cols + xv_cols, w_cols)
+    df_dev_cc = apply_raw_condition_correction(df_dev, xs_cols + xv_cols, w_cols, cc_models)
+    df_test_cc = apply_raw_condition_correction(df_test, xs_cols + xv_cols, w_cols, cc_models)
+    print(f"  ({time.perf_counter() - t0:.1f}s)")
+
     results = []
     agg_cache = {}
-    for a_name, agg_fn in AGGREGATORS.items():
+    for a_name, (agg_fn, use_corrected) in AGGREGATORS.items():
+        src_dev, src_test = (df_dev_cc, df_test_cc) if use_corrected else (df_dev, df_test)
         for b_name in ("B1", "B2"):
             feat_cols = feature_columns(var, b_name)
             key = (a_name, b_name)
             print(f"\nAggregating {a_name} / {b_name} ...")
             t0 = time.perf_counter()
             try:
-                train_tab = agg_fn(df_dev, feat_cols)
-                test_tab = agg_fn(df_test, feat_cols)
+                train_tab = agg_fn(src_dev, feat_cols)
+                test_tab = agg_fn(src_test, feat_cols)
             except Exception as exc:
                 print(f"  SKIPPED ({exc!r})")
                 continue
@@ -367,6 +431,11 @@ D_GRID = dict(
     # 21.91 vs. 21.66). Left out of the grid on merit, not on the old bug.
     norm_conorm=["probability", "hamacher"],
     l2_reg=[1e-6, 0.01],
+    # Post-aggregation StandardScaler stacks a small additional gain on top
+    # of condition-corrected features (see AGGREGATORS' _cc variants) --
+    # not a TribbleRegressor constructor arg, popped out in run_one/stage3
+    # before the model is built.
+    scaler=[None, "standard"],
 )
 
 
@@ -414,12 +483,22 @@ def stage3(agg_cache: dict, pipeline: str, d_kwargs: dict):
     ]
     r = run_one(train_tab, test_tab, agg_feat_cols, c_name, caps, d_kwargs)
 
+    model_kwargs = dict(d_kwargs)
+    scaler_name = model_kwargs.pop("scaler", None)
     X_train = train_tab[agg_feat_cols].to_numpy(dtype=np.float64)
+    X_test = test_tab[agg_feat_cols].to_numpy(dtype=np.float64)
+    if scaler_name == "standard":
+        from sklearn.preprocessing import StandardScaler
+        sc = StandardScaler()
+        X_train = sc.fit_transform(X_train)
+        X_test = sc.transform(X_test)
+    elif scaler_name is not None:
+        raise ValueError(scaler_name)
+
     y_train = apply_rul_shape(train_tab, c_name, caps).to_numpy()
-    model = TribbleRegressor(random_state=42, max_samples=2000, **d_kwargs)
+    model = TribbleRegressor(random_state=42, max_samples=2000, **model_kwargs)
     with contextlib.redirect_stdout(io.StringIO()):
         model.fit(X_train, y_train)
-    X_test = test_tab[agg_feat_cols].to_numpy(dtype=np.float64)
     pred_test = model.predict(X_test)
     y_test_true = test_tab["RUL"].astype(float).to_numpy()
 
@@ -783,20 +862,36 @@ def load_cache():
     return d["agg_cache"], d["stage1_results"], d["stage2_results"]
 
 
+def select_top_pipelines(stage1_results: pd.DataFrame, cheap_family: str = "A1_whole_cycle") -> list[str]:
+    """Pick pipelines dynamically from Stage 1's results rather than
+    hardcoding names -- with condition-corrected aggregation variants added
+    to the matrix, the actual best pipelines may not match any pipeline
+    that was previously the winner. Picks: best overall (any feature set,
+    may include virtual sensors), best real-sensors-only (B1) pipeline, and
+    the cheapest/most-interpretable pipeline from `cheap_family`."""
+    df = stage1_results.sort_values("rmse_test_true")
+    agg_family = df["pipeline"].str.split("/").str[0]
+    picks = [df.iloc[0]["pipeline"]]
+    b1_only = df[df["pipeline"].str.contains("/B1/")]
+    if len(b1_only):
+        picks.append(b1_only.iloc[0]["pipeline"])
+    cheap = df[agg_family == cheap_family]  # exact match: "..._cc" must not count
+    if len(cheap):
+        picks.append(cheap.sort_values("fit_seconds").iloc[0]["pipeline"])
+    return list(dict.fromkeys(picks))  # dedupe, preserve order
+
+
 if __name__ == "__main__":
     import os
-
-    top_pipelines = [
-        "A3_raw_memory/B2/C1_raw",       # best overall (includes virtual sensors -- leakage-flagged)
-        "A3_raw_memory/B1/C3_physical",  # best "real-world" pipeline (W + X_s only)
-        "A1_whole_cycle/B1/C3_physical", # cheapest/most interpretable alternative
-    ]
 
     if "--resume" in sys.argv and os.path.exists(CACHE_PATH):
         print(f"Resuming from cache: {CACHE_PATH}")
         agg_cache, stage1_results, stage2_results = load_cache()
+        top_pipelines = select_top_pipelines(stage1_results)
     else:
         stage1_results, agg_cache = stage1()
+        top_pipelines = select_top_pipelines(stage1_results)
+        print(f"\nSelected pipelines for Stage 2+: {top_pipelines}")
 
         print("\n" + "=" * 78)
         print("STAGE 2")
@@ -875,10 +970,11 @@ if __name__ == "__main__":
     print("\n" + "=" * 78)
     print("STAGE 4b: sweep each refiner's own hyperparameters")
     print("=" * 78)
-    print("Run on the cheapest pipeline only (~5s/config) -- also the one where "
-          "refinement overfits its CV split, the sharpest test of whether a "
-          "hyperparameter choice can rescue that failure mode.")
-    stage4b_results = stage4b_refiner_sweep(refine_fitted["A1_whole_cycle/B1/C3_physical"])
+    cheap_pipeline = top_pipelines[-1]
+    print(f"Run on the cheapest pipeline only ({cheap_pipeline}, ~5s/config) -- also "
+          "the one where refinement overfits its CV split, the sharpest test of "
+          "whether a hyperparameter choice can rescue that failure mode.")
+    stage4b_results = stage4b_refiner_sweep(refine_fitted[cheap_pipeline])
 
     print("\n" + "=" * 78)
     print("STAGE 5: degradation onset from real sensors, not the oracle hs flag")
