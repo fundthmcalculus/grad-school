@@ -41,12 +41,16 @@ warnings.filterwarnings("ignore")
 _TABLES = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_TABLES))
 sys.path.insert(0, _TABLES)
-import common as C            # noqa: E402
-import _fuzzy_models as F     # noqa: E402
+import common as C  # noqa: E402
+import _fuzzy_models as F  # noqa: E402
 
 SAMPLE_N = int(os.environ.get("REPRO_PHIUSIIL_N", "20000"))
-SCORERS = [s.strip() for s in
-           os.environ.get("REPRO_SCORERS", "wasserstein,bhattacharyya,composite").split(",")]
+SCORERS = [
+    s.strip()
+    for s in os.environ.get(
+        "REPRO_SCORERS", "wasserstein,bhattacharyya,composite"
+    ).split(",")
+]
 K_GRID = [1, 2, 3, 4, 5, 7, 10, 15, 20]
 TOP_SHOWN = 5
 
@@ -54,6 +58,7 @@ TOP_SHOWN = 5
 def _rank(scorer, X, y_series):
     """Ranked (feature, score) list under one scorer, or None if unsupported."""
     import tribblefis.gauss_math as gm
+
     try:
         return gm.calculate_gaussian_correlation(X, y_series, method=scorer)
     except (ValueError, TypeError) as exc:
@@ -82,8 +87,9 @@ def _sweep(scorer, X, y):
             accs, secs = [], []
             for seed in C.SEEDS:
                 Xtr, Xte, ytr, yte = train_test_split(
-                    X, y, test_size=0.2, random_state=seed)
-                model = gc.MixtureOfGaussiansFuzzyClassifier(top_n=k, random_state=seed)
+                    X, y, test_size=0.2, random_state=seed
+                )
+                model = gc.TribbleClassifier(top_n=k, random_state=seed)
                 start = time.perf_counter()
                 model.fit(Xtr, ytr)
                 secs.append(time.perf_counter() - start)
@@ -101,8 +107,12 @@ def main():
     print("Appendix A.4 -- feature scoring")
     data = F.load_phiusiil(sample_size=SAMPLE_N)
     if data is None:
-        C.emit("table_a1_feature_ranking", "Table A.1 -- Feature ranking by scorer",
-               ["Rank"], [["(PhiUSIIL unavailable)"]])
+        C.emit(
+            "table_a1_feature_ranking",
+            "Table A.1 -- Feature ranking by scorer",
+            ["Rank"],
+            [["(PhiUSIIL unavailable)"]],
+        )
         return
     X, y = data
     y_series = pd.Series(np.asarray(y).ravel(), index=X.index)
@@ -120,13 +130,18 @@ def main():
             r = rankings[s]
             row.append(f"{r[i][0]} ({r[i][1]:.3f})" if r and i < len(r) else C.NA)
         rows.append(row)
-    C.emit("table_a1_feature_ranking",
-           "Table A.1 -- Feature ranking depends on the scorer (PhiUSIIL)",
-           header, rows,
-           note=("Same data, same model -- only the feature ranking differs. The "
-                 "composite column is the four-metric consensus rule removed by "
-                 "tribble-fis #34; it reports N/A until that is restored as "
-                 "method='composite'."))
+    C.emit(
+        "table_a1_feature_ranking",
+        "Table A.1 -- Feature ranking depends on the scorer (PhiUSIIL)",
+        header,
+        rows,
+        note=(
+            "Same data, same model -- only the feature ranking differs. The "
+            "composite column is the four-metric consensus rule removed by "
+            "tribble-fis #34; it reports N/A until that is restored as "
+            "method='composite'."
+        ),
+    )
 
     # ---- Table A.2: what the ranking costs ----
     sweeps = {s: _sweep(s, X, y) for s in available}
@@ -138,14 +153,19 @@ def main():
             acc, secs = sweeps[s][k]
             row.append(f"{acc:.4f} / {secs:.2f}")
         rows2.append(row)
-    C.emit("table_a2_feature_count",
-           "Table A.2 -- Accuracy and fit time vs features kept (PhiUSIIL)",
-           header2, rows2,
-           note=("A ranking that works reaches ~0.997 on ONE feature; a ranking "
-                 "that does not never gets there at any size tested. This is the "
-                 "evidence that interpretability is a property of the feature "
-                 "ranking rather than of the model architecture -- see Appendix "
-                 "A.4 and tribble-fis #49."))
+    C.emit(
+        "table_a2_feature_count",
+        "Table A.2 -- Accuracy and fit time vs features kept (PhiUSIIL)",
+        header2,
+        rows2,
+        note=(
+            "A ranking that works reaches ~0.997 on ONE feature; a ranking "
+            "that does not never gets there at any size tested. This is the "
+            "evidence that interpretability is a property of the feature "
+            "ranking rather than of the model architecture -- see Appendix "
+            "A.4 and tribble-fis #49."
+        ),
+    )
 
 
 if __name__ == "__main__":

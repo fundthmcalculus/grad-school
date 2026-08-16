@@ -1,0 +1,4 @@
+Dissimilarity,Metric?,Triangle-inequality violations,Agreement with exact,Timing,Note
+"ECG5000 (DTW, N=5000)",no,20.9%,1.000,631s matrix + 0.3s reorder,exactness checked at N<=1024 (10-seed subsamples); full N ran but has no brute-force reference at this size
+"FordA (DTW, N=4921)",no,0.4%,1.000,7222s matrix + 0.2s reorder,exactness checked at N<=1024 (10-seed subsamples); full N ran but has no brute-force reference at this size
+"Crop (DTW, N=24000)",no,23.6%,1.000,1597s matrix + 4.7s reorder,exactness checked at N<=1024 (10-seed subsamples); full N ran but has no brute-force reference at this size

@@ -14,6 +14,11 @@ presentations/node_modules/
 /gated-minimax-selection/outputs/
 /dominant-colors.jpg
 
+# Figures the AnalyticalDynamics simulations regenerate on every run. None has
+# ever been tracked; the chapter figures live under research/ instead.
+/AnalyticalDynamics/*.png
+/AnalyticalDynamics/*.gif
+
 # Python bytecode
 __pycache__/
 *.py[cod]
@@ -36,3 +41,15 @@ __pycache__/
 *.toc
 *.out
 *.synctex.gz
+
+# Local venvs
+.venv*/
+
+# Cython build artifacts (ode_kernels): generated C, compiled extensions,
+# annotation HTML, and the build/ scratch tree are all reproducible via
+# `python ode_kernels/setup.py build_ext --inplace`.
+ode_kernels/build/
+ode_kernels/*.c
+ode_kernels/*.so
+ode_kernels/*.html
+.pytest_cache/

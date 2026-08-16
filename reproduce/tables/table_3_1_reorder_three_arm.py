@@ -52,10 +52,13 @@ import common as C  # noqa: E402
 #         so they are carried out to a size where the runtime is large enough
 #         to measure. The cubic arm cannot follow them there -- N=3000 cubed is
 #         hours -- and that asymmetry is the point of splitting the grid.
-N_BASE = [int(x) for x in
-          os.environ.get("REPRO_N_BASE", "100,200,300,500,750,1000").split(",")]
-N_EXT = [int(x) for x in
-         os.environ.get("REPRO_N_EXT", "1250,1500,2000,2500,3000").split(",")]
+N_BASE = [
+    int(x)
+    for x in os.environ.get("REPRO_N_BASE", "100,200,300,500,750,1000").split(",")
+]
+N_EXT = [
+    int(x) for x in os.environ.get("REPRO_N_EXT", "1250,1500,2000,2500,3000").split(",")
+]
 N_GRID = N_BASE + N_EXT
 CUBIC_CAP = int(os.environ.get("REPRO_CUBIC_CAP", str(max(N_BASE))))
 REPEATS = int(os.environ.get("REPRO_REPEATS", "3"))
@@ -70,7 +73,9 @@ def distance_matrix(n, seed, dim=3):
     P = rng.rand(n, dim)
     G = P @ P.T
     d = np.diag(G)
-    return np.sqrt(np.maximum(d[:, None] - 2.0 * G + d[None, :], 0.0)).astype(np.float64)
+    return np.sqrt(np.maximum(d[:, None] - 2.0 * G + d[None, :], 0.0)).astype(
+        np.float64
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -100,11 +105,11 @@ def _make_classical():
         for k in range(1, n):
             bd = np.inf
             bv = -1
-            for v in range(n):          # every unchosen candidate ...
+            for v in range(n):  # every unchosen candidate ...
                 if chosen[v]:
                     continue
                 dv = np.inf
-                for t in range(k):      # ... rescanned against the whole tree
+                for t in range(k):  # ... rescanned against the whole tree
                     a = order[t]
                     if D[a, v] < dv:
                         dv = D[a, v]
@@ -125,16 +130,23 @@ def _load_arms():
     heap = dense = None
     try:
         from tribbleclustering.pvat import vat_prim_mst
-        heap = lambda D: np.asarray(vat_prim_mst(D.copy())[0], dtype=np.int64)  # noqa: E731
+
+        heap = lambda D: np.asarray(
+            vat_prim_mst(D.copy())[0], dtype=np.int64
+        )  # noqa: E731
     except Exception as exc:  # noqa: BLE001
         print(f"  [arm 1] unavailable ({exc.__class__.__name__})")
     try:
         from tribbleclustering.pcvat import vat_prim_mst_c_64
-        dense = lambda D: np.asarray(                                            # noqa: E731
-            vat_prim_mst_c_64(np.ascontiguousarray(D))[0], dtype=np.int64)
+
+        dense = lambda D: np.asarray(  # noqa: E731
+            vat_prim_mst_c_64(np.ascontiguousarray(D))[0], dtype=np.int64
+        )
     except Exception as exc:  # noqa: BLE001
-        print(f"  [arm 2] unavailable ({exc.__class__.__name__}) -- "
-              f"build the Cython extension: pip install -e '.[dev]'")
+        print(
+            f"  [arm 2] unavailable ({exc.__class__.__name__}) -- "
+            f"build the Cython extension: pip install -e '.[dev]'"
+        )
     return heap, dense
 
 
@@ -165,7 +177,7 @@ def main():
     print("  JIT warm-up complete\n")
 
     rows = []
-    means = []   # (classical, stage1, stage2) means per N, for the normalized view
+    means = []  # (classical, stage1, stage2) means per N, for the normalized view
     for n in N_GRID:
         t_cls, t_heap, t_dense = [], [], []
         agree_cls, agree_heap = [], []
@@ -191,53 +203,81 @@ def main():
         def ratio(x):
             return f"{x / d_mean:.1f}×" if (x and d_mean) else C.NA
 
-        ok = "yes" if (all(agree_heap) if agree_heap else True) and \
-                     (all(agree_cls) if agree_cls else True) else "**NO**"
-        rows.append([
-            f"{n:,}",
-            (C.cell(t_cls, fmt="{:.4f}") + " s") if t_cls else "not run (> cap)",
-            (C.cell(t_heap, fmt="{:.4f}") + " s") if t_heap else C.NA,
-            C.cell(t_dense, fmt="{:.4f}") + " s",
-            ratio(c_mean), ratio(h_mean), ok,
-        ])
+        ok = (
+            "yes"
+            if (all(agree_heap) if agree_heap else True)
+            and (all(agree_cls) if agree_cls else True)
+            else "**NO**"
+        )
+        rows.append(
+            [
+                f"{n:,}",
+                (C.cell(t_cls, fmt="{:.4f}") + " s") if t_cls else "not run (> cap)",
+                (C.cell(t_heap, fmt="{:.4f}") + " s") if t_heap else C.NA,
+                C.cell(t_dense, fmt="{:.4f}") + " s",
+                ratio(c_mean),
+                ratio(h_mean),
+                ok,
+            ]
+        )
         means.append((c_mean, h_mean, d_mean))
         print(f"  n={n:<6} done")
 
-    header = ["N", "classical O(N³) (s)", "stage 1 O(N²logN) (s)", "stage 2 O(N²) (s)",
-              "cls/s2", "s1/s2", "orders identical"]
+    header = [
+        "N",
+        "classical O(N³) (s)",
+        "stage 1 O(N²logN) (s)",
+        "stage 2 O(N²) (s)",
+        "cls/s2",
+        "s1/s2",
+        "orders identical",
+    ]
 
     # CSV keeps absolute seconds; Markdown normalizes each row against its worst
     # (slowest) arm. Where the cubic reference ran, it IS the worst, so the other
     # two read directly as "times faster than classical" -- which is the claim.
     # Past the cubic cap the worst becomes stage one, and the stage-two cell then
     # reads as the s1/s2 ratio, which is why those columns are not repeated here.
-    md_header = ["N", "classical O(N³)", "stage 1 O(N²logN)", "stage 2 O(N²)",
-                 "orders identical"]
+    md_header = [
+        "N",
+        "classical O(N³)",
+        "stage 1 O(N²logN)",
+        "stage 2 O(N²)",
+        "orders identical",
+    ]
     md_rows = []
     for r, (c_m, h_m, d_m) in zip(rows, means):
         cn, hn, dn = C.normalized_worst([c_m, h_m, d_m])
-        md_rows.append([r[0],
-                        cn if r[1] != "not run (> cap)" else "not run (> cap)",
-                        hn, dn, r[6]])
+        md_rows.append(
+            [r[0], cn if r[1] != "not run (> cap)" else "not run (> cap)", hn, dn, r[6]]
+        )
 
-    emit_complexity_fit(N_GRID, [m[0] for m in means],
-                        [m[1] for m in means], [m[2] for m in means])
+    emit_complexity_fit(
+        N_GRID, [m[0] for m in means], [m[1] for m in means], [m[2] for m in means]
+    )
 
-    C.emit("table_3_1_three_arm",
-           "Table 3.1 — Reorder time across the three complexity regimes",
-           header, rows, md_header=md_header, md_rows=md_rows,
-           note=("**The Markdown columns are normalized against the worst arm in each row** "
-                 "-- the slowest arm at that N is the 1.0x baseline and the others read as "
-                 "'this many times faster than the worst'. That is the machine-independent "
-                 "view: absolute seconds move with thermals, governor and host, while the "
-                 "ratio between arms measured in the same pass does not. Absolute seconds, "
-                 "with per-seed spreads, are in the companion CSV. "
-                 "All three arms compiled (the classical reference is numba-jitted so the "
-                 "comparison is algorithmic, not C-vs-Python); JITs warmed before timing; "
-                 "best-of-%d per seed. Every arm's ordering is verified bit-identical to "
-                 "stage two — a timing from a disagreeing arm would be meaningless. The "
-                 "cubic arm is capped at N=%d because it is genuinely O(N³)."
-                 % (REPEATS, CUBIC_CAP)))
+    C.emit(
+        "table_3_1_three_arm",
+        "Table 3.1 — Reorder time across the three complexity regimes",
+        header,
+        rows,
+        md_header=md_header,
+        md_rows=md_rows,
+        note=(
+            "**The Markdown columns are normalized against the worst arm in each row** "
+            "-- the slowest arm at that N is the 1.0x baseline and the others read as "
+            "'this many times faster than the worst'. That is the machine-independent "
+            "view: absolute seconds move with thermals, governor and host, while the "
+            "ratio between arms measured in the same pass does not. Absolute seconds, "
+            "with per-seed spreads, are in the companion CSV. "
+            "All three arms compiled (the classical reference is numba-jitted so the "
+            "comparison is algorithmic, not C-vs-Python); JITs warmed before timing; "
+            "best-of-%d per seed. Every arm's ordering is verified bit-identical to "
+            "stage two — a timing from a disagreeing arm would be meaningless. The "
+            "cubic arm is capped at N=%d because it is genuinely O(N³)."
+            % (REPEATS, CUBIC_CAP)
+        ),
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -262,9 +302,11 @@ def _fit_exponent(ns, ts):
     return sum((x - mx) * (y - my) for x, y in pts) / den, len(pts)
 
 
-REFS = [("N²", lambda n: n * n),
-        ("N² log N", lambda n: n * n * math.log2(n)),
-        ("N³", lambda n: n ** 3)]
+REFS = [
+    ("N²", lambda n: n * n),
+    ("N² log N", lambda n: n * n * math.log2(n)),
+    ("N³", lambda n: n**3),
+]
 
 
 def _plot(ns, series, basename):
@@ -277,6 +319,7 @@ def _plot(ns, series, basename):
     which the measured arms are read, not series competing for identity.
     """
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -286,23 +329,33 @@ def _plot(ns, series, basename):
 
     fig, ax = plt.subplots(figsize=(5.4, 4.0), dpi=200)
 
-    for name, fn in REFS:                       # references first, so they sit behind
+    for name, fn in REFS:  # references first, so they sit behind
         y = _ref(ns, fn)
         ax.plot(x, y, ls="--", lw=1.2, color="#9a9a92", zorder=1)
-        ax.annotate(name, (x[-1], y[-1]), textcoords="offset points",
-                    xytext=(4, 0), va="center", fontsize=8, color="#6b6b63")
+        ax.annotate(
+            name,
+            (x[-1], y[-1]),
+            textcoords="offset points",
+            xytext=(4, 0),
+            va="center",
+            fontsize=8,
+            color="#6b6b63",
+        )
 
     for i, (label, ts) in enumerate(series):
         xs = [n / ns[0] for n, v in zip(ns, ts) if v]
         ys = [v / ts[0] for v in ts if v]
-        ax.plot(xs, ys, marker="o", ms=4.5, lw=1.8, color=COLORS[i],
-                label=label, zorder=3)
+        ax.plot(
+            xs, ys, marker="o", ms=4.5, lw=1.8, color=COLORS[i], label=label, zorder=3
+        )
 
-    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
     ax.set_xlabel("N, normalized  ($N/N_0$)", fontsize=9)
     ax.set_ylabel("time, normalized  ($t/t_0$)", fontsize=9)
-    ax.set_title("Reorder growth against reference complexity curves",
-                 fontsize=10, pad=8)
+    ax.set_title(
+        "Reorder growth against reference complexity curves", fontsize=10, pad=8
+    )
     ax.grid(True, which="both", lw=0.4, color="#e2e2dc", zorder=0)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
@@ -310,9 +363,9 @@ def _plot(ns, series, basename):
         ax.spines[s].set_color("#c9c9c1")
     ax.tick_params(labelsize=8, colors="#3d3d39")
     ax.legend(fontsize=8, frameon=False, loc="upper left")
-    ax.set_xlim(right=x[-1] * 1.55)             # room for the inline ref labels
+    ax.set_xlim(right=x[-1] * 1.55)  # room for the inline ref labels
     fig.tight_layout()
-    C.save_figure(fig, basename)          # PNG for the Markdown, EPS for LaTeX
+    C.save_figure(fig, basename)  # PNG for the Markdown, EPS for LaTeX
     plt.close(fig)
 
 
@@ -340,33 +393,40 @@ def _stage_two_shape(ns, th, td):
     plateau = ""
     for i in range(len(ns)):
         for j in range(len(ns) - 1, i + 1, -1):
-            seg = [t for t in td[i:j + 1] if t]
+            seg = [t for t in td[i : j + 1] if t]
             if len(seg) < 3 or ns[j] < 2 * ns[i]:
                 continue
             if max(seg) <= 1.25 * min(seg):
-                plateau = (f" A PLATEAU is present: stage two holds "
-                           f"{1e3 * min(seg):.1f}-{1e3 * max(seg):.1f} ms across "
-                           f"N={ns[i]:,}-{ns[j]:,}, i.e. a cost constant in N, "
-                           f"which is an overhead rather than the algorithm.")
+                plateau = (
+                    f" A PLATEAU is present: stage two holds "
+                    f"{1e3 * min(seg):.1f}-{1e3 * max(seg):.1f} ms across "
+                    f"N={ns[i]:,}-{ns[j]:,}, i.e. a cost constant in N, "
+                    f"which is an overhead rather than the algorithm."
+                )
                 break
         if plateau:
             break
     if not plateau:
-        monotone = all(a <= b for a, b in zip([t for t in td if t],
-                                             [t for t in td if t][1:]))
-        plateau = (" NO plateau on this host: stage two's time is "
-                   f"{'monotone' if monotone else 'non-monotone but trending'} "
-                   f"in N across the whole grid "
-                   f"({1e3 * min(t for t in td if t):.2f}-"
-                   f"{1e3 * max(t for t in td if t):.1f} ms).")
+        monotone = all(
+            a <= b for a, b in zip([t for t in td if t], [t for t in td if t][1:])
+        )
+        plateau = (
+            " NO plateau on this host: stage two's time is "
+            f"{'monotone' if monotone else 'non-monotone but trending'} "
+            f"in N across the whole grid "
+            f"({1e3 * min(t for t in td if t):.2f}-"
+            f"{1e3 * max(t for t in td if t):.1f} ms)."
+        )
 
-    parity = (f" Stage two never reaches parity with stage one here: the "
-              f"stage1/stage2 ratio stays between {lo_r:.1f}x (N={lo_n:,}) and "
-              f"{hi_r:.1f}x (N={hi_n:,})."
-              if lo_r > 1.5 else
-              f" Stage two's advantage COLLAPSES to {lo_r:.1f}x at N={lo_n:,} "
-              f"(best {hi_r:.1f}x at N={hi_n:,}), so the compiled kernel buys "
-              f"little across a band of sizes.")
+    parity = (
+        f" Stage two never reaches parity with stage one here: the "
+        f"stage1/stage2 ratio stays between {lo_r:.1f}x (N={lo_n:,}) and "
+        f"{hi_r:.1f}x (N={hi_n:,})."
+        if lo_r > 1.5
+        else f" Stage two's advantage COLLAPSES to {lo_r:.1f}x at N={lo_n:,} "
+        f"(best {hi_r:.1f}x at N={hi_n:,}), so the compiled kernel buys "
+        f"little across a band of sizes."
+    )
     return plateau + parity
 
 
@@ -377,9 +437,11 @@ def emit_complexity_fit(ns, tc, th, td):
     produce Table 3.1 are what the exponents are fitted from, so the two tables
     can never disagree about how long anything took.
     """
-    arms = [("classical", tc, "N³", 3.0),
-            ("stage 1", th, "N² log N", None),
-            ("stage 2", td, "N²", 2.0)]
+    arms = [
+        ("classical", tc, "N³", 3.0),
+        ("stage 1", th, "N² log N", None),
+        ("stage 2", td, "N²", 2.0),
+    ]
 
     rows = []
     for i, n in enumerate(ns):
@@ -397,31 +459,46 @@ def emit_complexity_fit(ns, tc, th, td):
     fit += ["2.00", "~2.1", "3.00"]
     rows.append(fit)
 
-    _plot(ns, [(a[0], a[1]) for a in arms if any(v for v in a[1])],
-          "fig_03_complexity_fit")
+    _plot(
+        ns,
+        [(a[0], a[1]) for a in arms if any(v for v in a[1])],
+        "fig_03_complexity_fit",
+    )
 
-    C.emit("table_3_1_complexity_fit",
-           "Table 3.2 — Measured growth against the reference complexity curves",
-           ["N", "N (normalized)", "classical", "stage 1", "stage 2",
-            "N² (ref.)", "N² log N (ref.)", "N³ (ref.)"],
-           rows,
-           note=("**Both axes are normalized**: N as N/N0 and time as t/t0, each against "
-                 "its own value at the smallest N. On those axes a pure O(N^k) arm is a "
-                 "straight line of slope k, independent of machine, language and constant "
-                 "factor, which is what makes the comparison portable. The last row is the "
-                 "least-squares slope of log(time) against log(N) -- the measured exponent "
-                 "-- beside the exponent each arm is supposed to have. The grid is in two "
-                 "parts. Every arm runs the BASE grid, whose ceiling is set by the cubic "
-                 "arm, so all three exponents are fitted from the same samples rather than "
-                 "the cubic one being fitted from whatever happens to fit under a cap. The "
-                 "two quadratic arms then continue onto an EXTENSION, because at the base "
-                 "grid they take milliseconds and the timer rather than the algorithm "
-                 "dominates; carrying them to a size with a measurable runtime is what "
-                 "makes their exponents mean anything. The cubic arm cannot follow -- N=3000 "
-                 "cubed is hours -- and that asymmetry is the reason for the split. NOTE the "
-                 "stage-two column:" + _stage_two_shape(ns, th, td) + " Companion figure: "
-                 "`outputs/figures/fig_03_complexity_fit.{png,eps}` -- PNG for the "
-                 "Markdown, EPS for the LaTeX build."))
+    C.emit(
+        "table_3_1_complexity_fit",
+        "Table 3.2 — Measured growth against the reference complexity curves",
+        [
+            "N",
+            "N (normalized)",
+            "classical",
+            "stage 1",
+            "stage 2",
+            "N² (ref.)",
+            "N² log N (ref.)",
+            "N³ (ref.)",
+        ],
+        rows,
+        note=(
+            "**Both axes are normalized**: N as N/N0 and time as t/t0, each against "
+            "its own value at the smallest N. On those axes a pure O(N^k) arm is a "
+            "straight line of slope k, independent of machine, language and constant "
+            "factor, which is what makes the comparison portable. The last row is the "
+            "least-squares slope of log(time) against log(N) -- the measured exponent "
+            "-- beside the exponent each arm is supposed to have. The grid is in two "
+            "parts. Every arm runs the BASE grid, whose ceiling is set by the cubic "
+            "arm, so all three exponents are fitted from the same samples rather than "
+            "the cubic one being fitted from whatever happens to fit under a cap. The "
+            "two quadratic arms then continue onto an EXTENSION, because at the base "
+            "grid they take milliseconds and the timer rather than the algorithm "
+            "dominates; carrying them to a size with a measurable runtime is what "
+            "makes their exponents mean anything. The cubic arm cannot follow -- N=3000 "
+            "cubed is hours -- and that asymmetry is the reason for the split. NOTE the "
+            "stage-two column:" + _stage_two_shape(ns, th, td) + " Companion figure: "
+            "`outputs/figures/fig_03_complexity_fit.{png,eps}` -- PNG for the "
+            "Markdown, EPS for the LaTeX build."
+        ),
+    )
 
 
 if __name__ == "__main__":

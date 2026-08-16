@@ -12,7 +12,6 @@ methods cannot be applied.
 
 import numpy as np
 
-
 rng = np.random.default_rng(42)
 
 
@@ -48,6 +47,7 @@ def _tree_distance_matrix(tree_edges, leaf_labels, noise_scale=0.0, seed=None):
 
     # Build adjacency list and compute all-pairs shortest paths.
     from collections import defaultdict
+
     adj = defaultdict(list)
     for u, v, w in tree_edges:
         adj[u].append((v, w))
@@ -82,6 +82,7 @@ def _shortest_path(start, end, adj):
     if start == end:
         return 0.0
     from collections import deque
+
     visited = {start}
     queue = deque([(start, 0.0)])
     while queue:
@@ -92,7 +93,7 @@ def _shortest_path(start, end, adj):
             if neighbor not in visited:
                 visited.add(neighbor)
                 queue.append((neighbor, dist + edge_weight))
-    return float('inf')
+    return float("inf")
 
 
 def three_clusters_tree(n=30, seed=106):
@@ -115,9 +116,9 @@ def three_clusters_tree(n=30, seed=106):
 
     edges = [
         # Backbone (inter-cluster)
-        (0, 1, 3.0),   # A root
-        (0, 5, 3.0),   # B root
-        (0, 9, 3.0),   # C root
+        (0, 1, 3.0),  # A root
+        (0, 5, 3.0),  # B root
+        (0, 9, 3.0),  # C root
         # Cluster A
         (1, 2, 0.3),
         (1, 3, 0.3),
@@ -138,9 +139,15 @@ def three_clusters_tree(n=30, seed=106):
     # Expand if n > 13
     node_id = 13
     leaf_labels = {
-        2: 0, 3: 0, 4: 0,      # Cluster A
-        6: 1, 7: 1, 8: 1,      # Cluster B
-        10: 2, 11: 2, 12: 2,   # Cluster C
+        2: 0,
+        3: 0,
+        4: 0,  # Cluster A
+        6: 1,
+        7: 1,
+        8: 1,  # Cluster B
+        10: 2,
+        11: 2,
+        12: 2,  # Cluster C
     }
 
     while len(leaves) < n:
@@ -284,5 +291,7 @@ if __name__ == "__main__":
         ("multi_scale_hierarchy", multi_scale_hierarchy),
     ]:
         D, y = fn()
-        print(f"{name}: D.shape={D.shape}, clusters={np.unique(y)}, "
-              f"D.mean()={D.mean():.3f}, D.std()={D.std():.3f}")
+        print(
+            f"{name}: D.shape={D.shape}, clusters={np.unique(y)}, "
+            f"D.mean()={D.mean():.3f}, D.std()={D.std():.3f}"
+        )

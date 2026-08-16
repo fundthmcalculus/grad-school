@@ -26,6 +26,7 @@ iVAT:
 
 Run:  python ClusteringExperiments/dc_vat.py
 """
+
 from __future__ import annotations
 
 import time
@@ -165,6 +166,7 @@ def minimax_closure(D):
 def cophenetic_single_linkage(D):
     from scipy.cluster.hierarchy import linkage, cophenet
     from scipy.spatial.distance import squareform
+
     Z = linkage(squareform(D, checks=False), method="single")
     return squareform(cophenet(Z))
 
@@ -174,24 +176,32 @@ def cophenetic_single_linkage(D):
 # ---------------------------------------------------------------------------
 def quality_experiment():
     print("\n=== Approach A: recursive-bisection VAT quality vs exact serial ===")
-    print("(boundary count: #adjacent label changes; ideal = k-1. "
-          "contiguity: fraction of same-label neighbours, 1.0 ideal)\n")
-    print(f"{'n':>6} {'k':>3} {'ideal_bnd':>9} "
-          f"{'serial_bnd':>10} {'serial_ctg':>10} "
-          f"{'dc_bnd':>8} {'dc_ctg':>8}")
+    print(
+        "(boundary count: #adjacent label changes; ideal = k-1. "
+        "contiguity: fraction of same-label neighbours, 1.0 ideal)\n"
+    )
+    print(
+        f"{'n':>6} {'k':>3} {'ideal_bnd':>9} "
+        f"{'serial_bnd':>10} {'serial_ctg':>10} "
+        f"{'dc_bnd':>8} {'dc_ctg':>8}"
+    )
     for n, k in [(2000, 10), (4000, 15), (8000, 20), (16000, 30)]:
         X, lbl = make_blobs(n, 12, k, seed=1)
         D = _pdist(X)
         _, _, p_ser = compute_ivat_c(D.copy(), inplace=False)
         o_dc = dc_vat_order(D.copy(), base=max(256, n // 16))
-        print(f"{n:>6} {k:>3} {k-1:>9} "
-              f"{boundary_count(p_ser, lbl):>10} {contiguity(p_ser, lbl):>10.3f} "
-              f"{boundary_count(o_dc, lbl):>8} {contiguity(o_dc, lbl):>8.3f}")
+        print(
+            f"{n:>6} {k:>3} {k-1:>9} "
+            f"{boundary_count(p_ser, lbl):>10} {contiguity(p_ser, lbl):>10.3f} "
+            f"{boundary_count(o_dc, lbl):>8} {contiguity(o_dc, lbl):>8.3f}"
+        )
 
 
 def speed_experiment():
     print("\n=== Approach A: parallel speedup (wall-clock) ===\n")
-    print(f"{'n':>6} {'serial_ms':>10} {'dc_par_ms':>10} {'dc_ser_ms':>10} {'speedup':>8}")
+    print(
+        f"{'n':>6} {'serial_ms':>10} {'dc_par_ms':>10} {'dc_ser_ms':>10} {'speedup':>8}"
+    )
     for n in [8000, 16000, 32000]:
         X, lbl = make_blobs(n, 12, 25, seed=2)
         D = _pdist(X)
@@ -205,8 +215,10 @@ def speed_experiment():
         t0 = time.perf_counter()
         dc_vat_order(D.copy(), base=base, max_workers=1)
         t_dcser = (time.perf_counter() - t0) * 1e3
-        print(f"{n:>6} {t_ser:>10.1f} {t_par:>10.1f} {t_dcser:>10.1f} "
-              f"{t_ser / t_par:>7.2f}x")
+        print(
+            f"{n:>6} {t_ser:>10.1f} {t_par:>10.1f} {t_dcser:>10.1f} "
+            f"{t_ser / t_par:>7.2f}x"
+        )
 
 
 def exactness_experiment():
@@ -223,8 +235,10 @@ def exactness_experiment():
         iu = np.sort(ivat[np.triu_indices(n, 1)])
         uu = np.sort(U[np.triu_indices(n, 1)])
         err_ivat = float(np.max(np.abs(iu - uu)))
-        print(f"  n={n}: max|closure - single_linkage_cophenetic| = {err:.2e}, "
-              f"max|sorted(closure) - sorted(iVAT)| = {err_ivat:.2e}")
+        print(
+            f"  n={n}: max|closure - single_linkage_cophenetic| = {err:.2e}, "
+            f"max|sorted(closure) - sorted(iVAT)| = {err_ivat:.2e}"
+        )
 
 
 if __name__ == "__main__":

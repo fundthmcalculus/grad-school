@@ -63,21 +63,22 @@ from typing import Callable, List, Optional, Sequence
 
 import selection as S
 
-
 # ---------------------------------------------------------------------------
 # data structures
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class BandSelection:
     """One scale band's flat selection of blocks."""
+
     band_id: int
-    log_birth_lo: float          # band edges in log birth-height
+    log_birth_lo: float  # band edges in log birth-height
     log_birth_hi: float
-    birth_lo: float              # same edges in raw height units
+    birth_lo: float  # same edges in raw height units
     birth_hi: float
-    blocks: List[dict]           # selected blocks (selection._all_blocks dicts)
-    n_candidates: int            # significant blocks available in this band
+    blocks: List[dict]  # selected blocks (selection._all_blocks dicts)
+    n_candidates: int  # significant blocks available in this band
 
     @property
     def k(self) -> int:
@@ -87,7 +88,7 @@ class BandSelection:
     def covered(self) -> set:
         cov: set = set()
         for b in self.blocks:
-            cov |= b['members']
+            cov |= b["members"]
         return cov
 
     def coverage_fraction(self, n: int) -> float:
@@ -97,6 +98,7 @@ class BandSelection:
 @dataclass
 class MultiScaleSelection:
     """The full scale hierarchy: bands ordered fine (low birth) -> coarse."""
+
     bands: List[BandSelection] = field(default_factory=list)
     n: int = 0
     n_significant: int = 0
@@ -125,6 +127,7 @@ class MultiScaleSelection:
 # significance gate (shared statistic with coverage_cover)
 # ---------------------------------------------------------------------------
 
+
 def persistence_significance_threshold(persist: np.ndarray, gap_sigma: float) -> float:
     """MAD-scaled outlier threshold: median + gap_sigma * (1.4826 * MAD).
 
@@ -139,10 +142,13 @@ def persistence_significance_threshold(persist: np.ndarray, gap_sigma: float) ->
     return med + gap_sigma * sigma
 
 
-def significant_blocks(blocks: Sequence[dict], n: int,
-                       gap_sigma: float = 2.0,
-                       min_size: int = 3,
-                       max_size_frac: float = 0.6) -> List[dict]:
+def significant_blocks(
+    blocks: Sequence[dict],
+    n: int,
+    gap_sigma: float = 2.0,
+    min_size: int = 3,
+    max_size_frac: float = 0.6,
+) -> List[dict]:
     """Blocks that pass the size window and the persistence-outlier gate.
 
     The MAD threshold is estimated over the *entire* block population (all sizes),
@@ -153,20 +159,24 @@ def significant_blocks(blocks: Sequence[dict], n: int,
     """
     if not blocks:
         return []
-    persist_all = np.array([b['persistence'] for b in blocks])
+    persist_all = np.array([b["persistence"] for b in blocks])
     thr = persistence_significance_threshold(persist_all, gap_sigma)
     ceiling = max_size_frac * n
-    return [b for b in blocks
-            if min_size <= b['size'] <= ceiling and b['persistence'] >= thr]
+    return [
+        b
+        for b in blocks
+        if min_size <= b["size"] <= ceiling and b["persistence"] >= thr
+    ]
 
 
 # ---------------------------------------------------------------------------
 # scale-band discovery
 # ---------------------------------------------------------------------------
 
-def discover_band_edges(sig_blocks: Sequence[dict],
-                        band_gap_factor: float = 3.0,
-                        min_log_gap: float = 0.5) -> List[float]:
+
+def discover_band_edges(
+    sig_blocks: Sequence[dict], band_gap_factor: float = 3.0, min_log_gap: float = 0.5
+) -> List[float]:
     """Find scale-band boundaries as large gaps in the log birth-height axis.
 
     A boundary is placed at the midpoint of any consecutive-birth gap that is
@@ -179,14 +189,17 @@ def discover_band_edges(sig_blocks: Sequence[dict],
     """
     if len(sig_blocks) < 2:
         return []
-    log_births = np.sort(np.log(np.array([b['birth'] for b in sig_blocks]) + 1e-12))
+    log_births = np.sort(np.log(np.array([b["birth"] for b in sig_blocks]) + 1e-12))
     gaps = np.diff(log_births)
     if len(gaps) == 0:
         return []
     med_gap = np.median(gaps)
     thr = max(band_gap_factor * med_gap, min_log_gap)
-    edges = [(log_births[i] + log_births[i + 1]) / 2.0
-             for i in range(len(gaps)) if gaps[i] > thr]
+    edges = [
+        (log_births[i] + log_births[i + 1]) / 2.0
+        for i in range(len(gaps))
+        if gaps[i] > thr
+    ]
     return edges
 
 
@@ -194,13 +207,14 @@ def discover_band_edges(sig_blocks: Sequence[dict],
 # per-band set-cover (same greedy rule as coverage_cover, scoped to a band)
 # ---------------------------------------------------------------------------
 
+
 def _greedy_cover(band_blocks: Sequence[dict]) -> List[dict]:
     """Greedy set-cover of the band's own point universe by uncovered-point gain,
     ties broken by higher persistence. Overlap tolerated (recombined downstream by
     the fixed t-conorm, per the coverage_cover rationale)."""
     if not band_blocks:
         return []
-    universe: set = set().union(*[b['members'] for b in band_blocks])
+    universe: set = set().union(*[b["members"] for b in band_blocks])
     covered: set = set()
     sel: List[dict] = []
     chosen_ids = set()
@@ -209,15 +223,18 @@ def _greedy_cover(band_blocks: Sequence[dict]) -> List[dict]:
         for b in band_blocks:
             if id(b) in chosen_ids:
                 continue
-            gain = len(b['members'] - covered)
-            if gain > best_gain or (gain == best_gain and best is not None
-                                    and b['persistence'] > best['persistence']):
+            gain = len(b["members"] - covered)
+            if gain > best_gain or (
+                gain == best_gain
+                and best is not None
+                and b["persistence"] > best["persistence"]
+            ):
                 best, best_gain = b, gain
         if best is None or best_gain == 0:
             break
         sel.append(best)
         chosen_ids.add(id(best))
-        covered |= best['members']
+        covered |= best["members"]
     return sel
 
 
@@ -225,15 +242,18 @@ def _greedy_cover(band_blocks: Sequence[dict]) -> List[dict]:
 # top-level multi-scale selector
 # ---------------------------------------------------------------------------
 
-def select_multiscale(Dstar: np.ndarray,
-                      gap_sigma: float = 2.0,
-                      max_size_frac: float = 0.6,
-                      min_size: int = 3,
-                      band_gap_factor: float = 3.0,
-                      min_log_gap: float = 0.5,
-                      min_band_coverage: float = 0.15,
-                      merge_antichain: bool = True,
-                      nest_frac_thresh: float = 0.5) -> MultiScaleSelection:
+
+def select_multiscale(
+    Dstar: np.ndarray,
+    gap_sigma: float = 2.0,
+    max_size_frac: float = 0.6,
+    min_size: int = 3,
+    band_gap_factor: float = 3.0,
+    min_log_gap: float = 0.5,
+    min_band_coverage: float = 0.15,
+    merge_antichain: bool = True,
+    nest_frac_thresh: float = 0.5,
+) -> MultiScaleSelection:
     """Discover the scale hierarchy of `Dstar` (minimax / iVAT distance matrix).
 
     Args:
@@ -248,22 +268,24 @@ def select_multiscale(Dstar: np.ndarray,
         MultiScaleSelection with bands ordered fine (low birth) -> coarse.
     """
     blocks, n = S._all_blocks(Dstar)
-    sig = significant_blocks(blocks, n, gap_sigma=gap_sigma,
-                             min_size=min_size, max_size_frac=max_size_frac)
+    sig = significant_blocks(
+        blocks, n, gap_sigma=gap_sigma, min_size=min_size, max_size_frac=max_size_frac
+    )
     if not sig:
         return MultiScaleSelection(bands=[], n=n, n_significant=0, band_edges_log=[])
 
-    edges = discover_band_edges(sig, band_gap_factor=band_gap_factor,
-                                min_log_gap=min_log_gap)
+    edges = discover_band_edges(
+        sig, band_gap_factor=band_gap_factor, min_log_gap=min_log_gap
+    )
     full_edges = [-np.inf] + edges + [np.inf]
 
     # Raw candidate bands: the significant blocks whose birth falls in each
     # birth-gap interval. (Selection/cover happens after the merge pass.)
     raw = []
     for lo, hi in zip(full_edges[:-1], full_edges[1:]):
-        cands = [b for b in sig if lo <= np.log(b['birth'] + 1e-12) < hi]
+        cands = [b for b in sig if lo <= np.log(b["birth"] + 1e-12) < hi]
         if cands:
-            raw.append({'lo': lo, 'hi': hi, 'cands': cands})
+            raw.append({"lo": lo, "hi": hi, "cands": cands})
 
     # Containment-aware merge (Phase 4): a birth-gap is only a genuine SCALE
     # boundary if the coarser band's blocks are ANCESTORS of (contain) the finer
@@ -277,30 +299,37 @@ def select_multiscale(Dstar: np.ndarray,
         while changed and len(raw) > 1:
             changed = False
             for i in range(len(raw) - 1):
-                fine = _greedy_cover(raw[i]['cands'])
-                coarse = _greedy_cover(raw[i + 1]['cands'])
+                fine = _greedy_cover(raw[i]["cands"])
+                coarse = _greedy_cover(raw[i + 1]["cands"])
                 if not fine or not coarse:
                     continue
-                nested = sum(1 for fb in fine
-                             if any(fb['members'] <= cb['members'] for cb in coarse))
+                nested = sum(
+                    1
+                    for fb in fine
+                    if any(fb["members"] <= cb["members"] for cb in coarse)
+                )
                 if nested / len(fine) < nest_frac_thresh:
-                    raw[i] = {'lo': raw[i]['lo'], 'hi': raw[i + 1]['hi'],
-                              'cands': raw[i]['cands'] + raw[i + 1]['cands']}
+                    raw[i] = {
+                        "lo": raw[i]["lo"],
+                        "hi": raw[i + 1]["hi"],
+                        "cands": raw[i]["cands"] + raw[i + 1]["cands"],
+                    }
                     del raw[i + 1]
                     changed = True
                     break
 
     bands: List[BandSelection] = []
     for band in raw:
-        lo, hi = band['lo'], band['hi']
-        sel = _greedy_cover(band['cands'])
+        lo, hi = band["lo"], band["hi"]
+        sel = _greedy_cover(band["cands"])
         bs = BandSelection(
             band_id=len(bands),
-            log_birth_lo=lo, log_birth_hi=hi,
+            log_birth_lo=lo,
+            log_birth_hi=hi,
             birth_lo=float(np.exp(lo)) if lo > -np.inf else 0.0,
-            birth_hi=float(np.exp(hi)) if hi < np.inf else float('inf'),
+            birth_hi=float(np.exp(hi)) if hi < np.inf else float("inf"),
             blocks=sel,
-            n_candidates=len(band['cands']),
+            n_candidates=len(band["cands"]),
         )
         if bs.coverage_fraction(n) >= min_band_coverage and bs.k >= 1:
             bs.band_id = len(bands)
@@ -310,9 +339,12 @@ def select_multiscale(Dstar: np.ndarray,
     # happen when a discovered gap does not actually change the cover).
     deduped: List[BandSelection] = []
     for bs in bands:
-        sig_key = frozenset(frozenset(b['members']) for b in bs.blocks)
-        if deduped and frozenset(
-                frozenset(b['members']) for b in deduped[-1].blocks) == sig_key:
+        sig_key = frozenset(frozenset(b["members"]) for b in bs.blocks)
+        if (
+            deduped
+            and frozenset(frozenset(b["members"]) for b in deduped[-1].blocks)
+            == sig_key
+        ):
             continue
         bs.band_id = len(deduped)
         deduped.append(bs)
@@ -327,13 +359,15 @@ def select_multiscale(Dstar: np.ndarray,
     for i, bs in enumerate(informative):
         bs.band_id = i
 
-    return MultiScaleSelection(bands=informative, n=n, n_significant=len(sig),
-                               band_edges_log=edges)
+    return MultiScaleSelection(
+        bands=informative, n=n, n_significant=len(sig), band_edges_log=edges
+    )
 
 
 # ---------------------------------------------------------------------------
 # defuzzification / evaluation helpers
 # ---------------------------------------------------------------------------
+
 
 def assign(blocks: Sequence[dict], Dstar: np.ndarray) -> np.ndarray:
     """Hard-assign every point to the block it is closest to in minimax distance.
@@ -348,7 +382,7 @@ def assign(blocks: Sequence[dict], Dstar: np.ndarray) -> np.ndarray:
     # (k, n) matrix of minimax distance from each block to each point.
     dist = np.empty((len(blocks), n))
     for k, b in enumerate(blocks):
-        mem = np.fromiter(b['members'], dtype=int)
+        mem = np.fromiter(b["members"], dtype=int)
         dist[k] = Dstar[mem, :].min(axis=0)
     return np.argmin(dist, axis=0)
 
@@ -373,8 +407,10 @@ def assign_band(band: BandSelection, Dstar: np.ndarray) -> np.ndarray:
 # directly, rather than the hard argmin-distance label assign_band returns.
 # ---------------------------------------------------------------------------
 
-def block_membership(block: dict, Dstar: np.ndarray,
-                     kernel: str = 'gaussian') -> np.ndarray:
+
+def block_membership(
+    block: dict, Dstar: np.ndarray, kernel: str = "gaussian"
+) -> np.ndarray:
     """Membership mu_B(x) in [0,1] for one block, length n, from the minimax
     distance d_B(x) = min_{y in B} D*(x, y).
 
@@ -389,20 +425,21 @@ def block_membership(block: dict, Dstar: np.ndarray,
                     is graded 0.5 -> 0. This is what makes the MF genuinely fuzzy;
                     argmax still reproduces the crisp labels.
     """
-    mem = np.fromiter(block['members'], dtype=int)
+    mem = np.fromiter(block["members"], dtype=int)
     d = Dstar[mem, :].min(axis=0)
-    h_b, h_d = block['birth'], block['death']
-    if kernel == 'ramp':
+    h_b, h_d = block["birth"], block["death"]
+    if kernel == "ramp":
         mu = np.clip((h_d - d) / (h_d - h_b + 1e-12), 0.0, 1.0)
         mu[d <= h_b + 1e-12] = 1.0
         return mu
-    if kernel == 'gaussian':
+    if kernel == "gaussian":
         return np.exp(-np.log(2.0) * (d / (h_d + 1e-12)) ** 2)
     raise ValueError(f"unknown kernel {kernel!r}")
 
 
-def band_memberships(band: BandSelection, Dstar: np.ndarray,
-                     kernel: str = 'gaussian') -> np.ndarray:
+def band_memberships(
+    band: BandSelection, Dstar: np.ndarray, kernel: str = "gaussian"
+) -> np.ndarray:
     """Fuzzy partition (k_band x n) for one scale band: one MF per block."""
     n = Dstar.shape[0]
     if not band.blocks:
@@ -410,16 +447,21 @@ def band_memberships(band: BandSelection, Dstar: np.ndarray,
     return np.vstack([block_membership(b, Dstar, kernel=kernel) for b in band.blocks])
 
 
-def defuzzify_memberships(U: np.ndarray, band: BandSelection,
-                          Dstar: np.ndarray) -> np.ndarray:
+def defuzzify_memberships(
+    U: np.ndarray, band: BandSelection, Dstar: np.ndarray
+) -> np.ndarray:
     """Hard labels from a fuzzy partition: argmax membership, ties (common at the
     saturated value 1.0, where several block cores overlap a point) broken by
     minimax proximity to the block -- the ivat_mf.hard_labels_proximity rule."""
     if U.shape[0] == 0:
         return np.zeros(U.shape[1], dtype=int)
     n = U.shape[1]
-    dist = np.vstack([Dstar[np.fromiter(b['members'], dtype=int), :].min(axis=0)
-                      for b in band.blocks])
+    dist = np.vstack(
+        [
+            Dstar[np.fromiter(b["members"], dtype=int), :].min(axis=0)
+            for b in band.blocks
+        ]
+    )
     labels = np.empty(n, dtype=int)
     umax = U.max(axis=0)
     for i in range(n):
@@ -428,7 +470,7 @@ def defuzzify_memberships(U: np.ndarray, band: BandSelection,
     return labels
 
 
-def multiscale_memberships(Dstar: np.ndarray, kernel: str = 'gaussian', **kwargs):
+def multiscale_memberships(Dstar: np.ndarray, kernel: str = "gaussian", **kwargs):
     """Run multi-scale selection and emit a fuzzy partition per scale band.
 
     Returns (MultiScaleSelection, [U_band, ...]) where each U_band is a
@@ -441,6 +483,7 @@ def multiscale_memberships(Dstar: np.ndarray, kernel: str = 'gaussian', **kwargs
 # ---------------------------------------------------------------------------
 # Phase 3: partition-of-unity per scale + the multi-scale fuzzy model
 # ---------------------------------------------------------------------------
+
 
 def normalize_partition(U: np.ndarray, eps: float = 1e-9) -> np.ndarray:
     """Ruspini normalization: scale each point's memberships to sum to 1.
@@ -456,6 +499,7 @@ def normalize_partition(U: np.ndarray, eps: float = 1e-9) -> np.ndarray:
 class FuzzyHierarchy:
     """The multi-scale fuzzy model: one fuzzy partition per discovered scale,
     fine -> coarse. `U[i]` is a (k_i x n) membership matrix for band i."""
+
     bands: List[BandSelection]
     U: List[np.ndarray]
     normalized: bool
@@ -488,8 +532,9 @@ class FuzzyHierarchy:
         return float(np.mean(self.U[i].sum(axis=0) > 1e-9))
 
 
-def build_fuzzy_hierarchy(Dstar: np.ndarray, kernel: str = 'gaussian',
-                          normalize: bool = True, **kwargs) -> FuzzyHierarchy:
+def build_fuzzy_hierarchy(
+    Dstar: np.ndarray, kernel: str = "gaussian", normalize: bool = True, **kwargs
+) -> FuzzyHierarchy:
     """Build the multi-scale fuzzy model: discover scale bands, emit a kernel
     membership partition per band, and (optionally) Ruspini-normalize each to a
     partition of unity. Hard labels (argmax) are identical with or without
@@ -504,7 +549,7 @@ def build_fuzzy_hierarchy(Dstar: np.ndarray, kernel: str = 'gaussian',
 # quick self-test
 # ---------------------------------------------------------------------------
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import ivat_mf as im
     import battery_hierarchical as BH
     from sklearn.metrics import adjusted_rand_score
@@ -518,11 +563,15 @@ if __name__ == '__main__':
     for band, U in zip(msel.bands, Us):
         a = assign_band(band, Dstar)
         graded = float(np.mean((U > 1e-6) & (U < 1 - 1e-6)))
-        print(f"  band {band.band_id}: k={band.k} "
-              f"births[{band.birth_lo:.2f},{band.birth_hi:.2f}] "
-              f"cov={band.coverage_fraction(msel.n):.2f} "
-              f"ARI_fine={adjusted_rand_score(y_fine, a):.3f} "
-              f"ARI_coarse={adjusted_rand_score(y_coarse, a):.3f} "
-              f"graded_frac={graded:.3f}")
-    print("(Phase 1 finding: graded_frac == 0 -- the birth/death ramp is crisp by "
-          "construction; see notes/MF_PROGRESS_LOG.md)")
+        print(
+            f"  band {band.band_id}: k={band.k} "
+            f"births[{band.birth_lo:.2f},{band.birth_hi:.2f}] "
+            f"cov={band.coverage_fraction(msel.n):.2f} "
+            f"ARI_fine={adjusted_rand_score(y_fine, a):.3f} "
+            f"ARI_coarse={adjusted_rand_score(y_coarse, a):.3f} "
+            f"graded_frac={graded:.3f}"
+        )
+    print(
+        "(Phase 1 finding: graded_frac == 0 -- the birth/death ramp is crisp by "
+        "construction; see notes/MF_PROGRESS_LOG.md)"
+    )

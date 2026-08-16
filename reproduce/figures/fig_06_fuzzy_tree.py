@@ -65,39 +65,55 @@ def _rules(est, limit=26):
     which in a two-panel figure runs straight into the other panel."""
     import textwrap
     from fuzzytree.render import render_tree_text
+
     lines = render_tree_text(est).split("\n")
     body = [_shorten(ln) for ln in lines[1:] if ln.strip()]
     if len(body) > limit:
         body = body[:limit] + [f"… {len(body) - limit} further lines"]
     header = textwrap.fill(
         f"{est.n_leaves_} leaves · candidate splits: "
-        f"{', '.join(map(str, est.top_features_))}", width=46)
+        f"{', '.join(map(str, est.top_features_))}",
+        width=46,
+    )
     return header, body
 
 
 def _concrete():
     import _fuzzy_models as FM
     import fuzzytree
+
     data = FM.load_concrete()
     if data is None:
         return None
     X, y = data
     est = fuzzytree.FuzzyRegressionTree(
-        tsk_order="1st", criterion="variance", max_depth=3, n_terms=2,
-        top_n=4, min_soft_count=20, random_state=42).fit(X, y.values)
+        tsk_order="1st",
+        criterion="variance",
+        max_depth=3,
+        n_terms=2,
+        top_n=4,
+        min_soft_count=20,
+        random_state=42,
+    ).fit(X, y.values)
     return _rules(est)
 
 
 def _phiusiil():
     import _fuzzy_models as FM
     import fuzzytree
+
     data = FM.load_phiusiil(sample_size=20000)
     if data is None:
         return None
     X, y = data
     est = fuzzytree.FuzzyClassificationTree(
-        criterion="ambiguity", max_depth=3, n_terms=2, top_n=5,
-        min_soft_count=50, random_state=42).fit(X, y)
+        criterion="ambiguity",
+        max_depth=3,
+        n_terms=2,
+        top_n=5,
+        min_soft_count=50,
+        random_state=42,
+    ).fit(X, y)
     return _rules(est)
 
 
@@ -105,28 +121,60 @@ def _draw(ax, title, rendered, highlight, missing_note=None):
     ax.axis("off")
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
-    ax.text(0, 1.0, title, ha="left", va="top", fontsize=F.FS_LABEL, color=F.INK,
-            fontweight="bold")
+    ax.text(
+        0,
+        1.0,
+        title,
+        ha="left",
+        va="top",
+        fontsize=F.FS_LABEL,
+        color=F.INK,
+        fontweight="bold",
+    )
 
     if rendered is None:
-        ax.text(0.5, 0.5, missing_note, ha="center", va="center",
-                fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.6, style="italic")
+        ax.text(
+            0.5,
+            0.5,
+            missing_note,
+            ha="center",
+            va="center",
+            fontsize=F.FS_SMALL,
+            color=F.MUTED,
+            linespacing=1.6,
+            style="italic",
+        )
         return
 
     header, body = rendered
-    ax.text(0, 0.935, header, ha="left", va="top", fontsize=F.FS_SMALL - 0.5,
-            color=F.MUTED, family="monospace")
+    ax.text(
+        0,
+        0.935,
+        header,
+        ha="left",
+        va="top",
+        fontsize=F.FS_SMALL - 0.5,
+        color=F.MUTED,
+        family="monospace",
+    )
 
     step = 0.86 / max(len(body), 1)
     for i, line in enumerate(body):
         named = next((v for v in highlight if v in line), None)
         is_leaf = "=>" in line
-        color = (F.shade(F.BLUE, 0.25) if named
-                 else F.INK_2 if is_leaf else F.MUTED)
+        color = F.shade(F.BLUE, 0.25) if named else F.INK_2 if is_leaf else F.MUTED
         weight = "bold" if named else "normal"
-        ax.text(0, 0.875 - i * step, line, ha="left", va="top",
-                fontsize=F.FS_SMALL - 0.5, color=color, family="monospace",
-                fontweight=weight)
+        ax.text(
+            0,
+            0.875 - i * step,
+            line,
+            ha="left",
+            va="top",
+            fontsize=F.FS_SMALL - 0.5,
+            color=color,
+            family="monospace",
+            fontweight=weight,
+        )
 
 
 def build():
@@ -135,25 +183,40 @@ def build():
     concrete = _concrete()
     phiusiil = _phiusiil()
 
-    _draw(left, "Concrete — FuzzyRegressionTree", concrete, HIGHLIGHT["concrete"],
-          missing_note="Concrete unavailable: no data/Concrete_Data.csv\nand no "
-                       "network for the UCI fetch.")
-    _draw(right, "PhiUSIIL — FuzzyClassificationTree", phiusiil,
-          HIGHLIGHT["phiusiil"],
-          missing_note="PhiUSIIL is not vendored (57 MB).\nRecover it with the "
-                       "one-liner in data/.gitignore\nand re-run this generator.")
+    _draw(
+        left,
+        "Concrete — FuzzyRegressionTree",
+        concrete,
+        HIGHLIGHT["concrete"],
+        missing_note="Concrete unavailable: no data/Concrete_Data.csv\nand no "
+        "network for the UCI fetch.",
+    )
+    _draw(
+        right,
+        "PhiUSIIL — FuzzyClassificationTree",
+        phiusiil,
+        HIGHLIGHT["phiusiil"],
+        missing_note="PhiUSIIL is not vendored (57 MB).\nRecover it with the "
+        "one-liner in data/.gitignore\nand re-run this generator.",
+    )
 
-    fig.text(0.5, 0.015,
-             "Bold: the variables §6.3.2 names. Both trees are at the "
-             "`tribble-tree/demo_*.py` configuration (max_depth 3, n_terms 2), not "
-             "the library defaults —\nunder the demo settings the Concrete tree "
-             "splits Cement then Age at exactly 28, the standard curing mark; under "
-             "the defaults the second split is Superplasticizer.\nFirst-order leaf "
-             "consequents are shown as their constant plus a note, because printing "
-             "four coefficients per leaf defeats the point of a figure about "
-             "readability.",
-             ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
-             linespacing=1.6)
+    fig.text(
+        0.5,
+        0.015,
+        "Bold: the variables §6.3.2 names. Both trees are at the "
+        "`tribble-tree/demo_*.py` configuration (max_depth 3, n_terms 2), not "
+        "the library defaults —\nunder the demo settings the Concrete tree "
+        "splits Cement then Age at exactly 28, the standard curing mark; under "
+        "the defaults the second split is Superplasticizer.\nFirst-order leaf "
+        "consequents are shown as their constant plus a note, because printing "
+        "four coefficients per leaf defeats the point of a figure about "
+        "readability.",
+        ha="center",
+        va="top",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.6,
+    )
     return fig
 
 

@@ -24,8 +24,9 @@ from contextlib import contextmanager
 # standard the chapters are now quoted at; narrowing it changes what the document
 # can claim, so treat it as part of the protocol rather than a tuning knob.
 # Override with REPRO_SEEDS="0,1,2" for a quick smoke run.
-SEEDS = [int(s) for s in
-         os.environ.get("REPRO_SEEDS", "0,1,2,3,4,5,6,7,8,9").split(",")]
+SEEDS = [
+    int(s) for s in os.environ.get("REPRO_SEEDS", "0,1,2,3,4,5,6,7,8,9").split(",")
+]
 
 # Where emit() writes. `REPRO_OUTPUT_DIR` redirects it, which is what the
 # controlled experiments under reproduce/experiments/ use: they run a *stock*
@@ -35,17 +36,19 @@ SEEDS = [int(s) for s in
 # make is destroyed by the act of making it -- and the loose top-level files are
 # gitignored scratch, so nothing would survive to diff afterwards either.
 OUTPUT_DIR = os.environ.get("REPRO_OUTPUT_DIR") or os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "reproduce", "outputs")
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reproduce", "outputs"
+)
 
-NA = "N/A"          # column that genuinely could not be produced (missing dep/data)
+NA = "N/A"  # column that genuinely could not be produced (missing dep/data)
 
 
 @contextmanager
 def timed():
     """`with timed() as t: ...; t.seconds` -> wall-clock seconds of the block."""
+
     class _T:
         seconds = 0.0
+
     t = _T()
     start = time.perf_counter()
     try:
@@ -115,15 +118,17 @@ def machine():
             import ctypes
 
             class _MemStatus(ctypes.Structure):
-                _fields_ = [("dwLength", ctypes.c_ulong),
-                            ("dwMemoryLoad", ctypes.c_ulong),
-                            ("ullTotalPhys", ctypes.c_ulonglong),
-                            ("ullAvailPhys", ctypes.c_ulonglong),
-                            ("ullTotalPageFile", ctypes.c_ulonglong),
-                            ("ullAvailPageFile", ctypes.c_ulonglong),
-                            ("ullTotalVirtual", ctypes.c_ulonglong),
-                            ("ullAvailVirtual", ctypes.c_ulonglong),
-                            ("ullAvailExtendedVirtual", ctypes.c_ulonglong)]
+                _fields_ = [
+                    ("dwLength", ctypes.c_ulong),
+                    ("dwMemoryLoad", ctypes.c_ulong),
+                    ("ullTotalPhys", ctypes.c_ulonglong),
+                    ("ullAvailPhys", ctypes.c_ulonglong),
+                    ("ullTotalPageFile", ctypes.c_ulonglong),
+                    ("ullAvailPageFile", ctypes.c_ulonglong),
+                    ("ullTotalVirtual", ctypes.c_ulonglong),
+                    ("ullAvailVirtual", ctypes.c_ulonglong),
+                    ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+                ]
 
             st = _MemStatus()
             st.dwLength = ctypes.sizeof(_MemStatus)
@@ -136,23 +141,35 @@ def machine():
             import winreg
 
             with winreg.OpenKey(
-                    winreg.HKEY_LOCAL_MACHINE,
-                    r"HARDWARE\DESCRIPTION\System\CentralProcessor\0") as k:
+                winreg.HKEY_LOCAL_MACHINE,
+                r"HARDWARE\DESCRIPTION\System\CentralProcessor\0",
+            ) as k:
                 cpu = winreg.QueryValueEx(k, "ProcessorNameString")[0].strip()
         except Exception:  # noqa: BLE001
             pass
     gpu = ""
     try:
-        gpu = subprocess.run(
-            ["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"],
-            capture_output=True, text=True, timeout=10,
-        ).stdout.strip().replace("\n", "; ")
+        gpu = (
+            subprocess.run(
+                [
+                    "nvidia-smi",
+                    "--query-gpu=name,memory.total",
+                    "--format=csv,noheader",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            .stdout.strip()
+            .replace("\n", "; ")
+        )
     except (OSError, subprocess.SubprocessError):
         pass
     if not gpu:
         try:
-            for line in subprocess.run(["lspci"], capture_output=True, text=True,
-                                       timeout=10).stdout.splitlines():
+            for line in subprocess.run(
+                ["lspci"], capture_output=True, text=True, timeout=10
+            ).stdout.splitlines():
                 if "VGA compatible controller" in line or "3D controller" in line:
                     gpu = line.split(":", 2)[-1].strip()
                     break
@@ -164,7 +181,9 @@ def machine():
         "cpu": cpu or platform.processor() or "unknown",
         "cores": f"{os.cpu_count()} logical",
         "ram": f"{mem_kb / 1048576:.1f} GiB" if mem_kb else "unknown",
-        "governor": _read("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", "n/a"),
+        "governor": _read(
+            "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", "n/a"
+        ),
         "gpu": gpu or "none detected",
         "python": platform.python_version(),
     }
@@ -173,14 +192,16 @@ def machine():
 def machine_block():
     """The machine stanza appended to every emitted Markdown table."""
     m = machine()
-    return ("> **Machine.** " + " · ".join(
-        f"{k}: {v}" for k, v in m.items() if v and v != "n/a") +
-        "\n>\n> Wall-clock times are machine-dependent; ratios are not. Markdown "
+    return (
+        "> **Machine.** "
+        + " · ".join(f"{k}: {v}" for k, v in m.items() if v and v != "n/a")
+        + "\n>\n> Wall-clock times are machine-dependent; ratios are not. Markdown "
         "tables report normalized ratios where a timing is involved, and the "
-        "companion CSV carries the absolute seconds.")
+        "companion CSV carries the absolute seconds."
+    )
 
 
-def write_markdown(path, title, header, rows, note=""):
+def write_markdown(path, title, header, rows, note="", seeds=None):
     """Write a GitHub-flavored Markdown table.
 
     Encoding is pinned to UTF-8 rather than left to the platform default. Tables
@@ -198,8 +219,22 @@ def write_markdown(path, title, header, rows, note=""):
             f.write("| " + " | ".join(str(c) for c in r) + " |\n")
         if note:
             f.write(f"\n> {note}\n")
-        f.write(f"\n> Generated by `reproduce/`; seeds = {SEEDS}. "
-                f"`{NA}` marks a cell whose method/dataset was unavailable.\n")
+        # `seeds` is an override, not a default, and it exists because the footer used
+        # to state `SEEDS` unconditionally -- including on tables the harness does not
+        # compute. `table_5_x_ch5_selection.py` does no arithmetic at all: it renders
+        # `gated-minimax-selection/outputs/results.json`, whose driver runs at
+        # `SEEDS = [0, 1, 2, 3, 4]` -- five restarts, and only for the NERFCM and
+        # ConiVAT columns, which are the only cells in that battery carrying a
+        # spread. Every other cell is one deterministic pass. So all three Chapter 5
+        # tables carried a footer claiming ten seeds over a five-seed run, on a table
+        # where most cells have no error bar at all. That is the `PROVENANCE.txt`
+        # seed-count bug again -- a file stating a seed list it did not use -- one
+        # directory over, and it is worse here because
+        f.write(
+            f"\n> Generated by `reproduce/`; "
+            f"seeds = {SEEDS if seeds is None else seeds}. "
+            f"`{NA}` marks a cell whose method/dataset was unavailable.\n"
+        )
         f.write(f"\n{machine_block()}\n")
     print(f"  wrote {path}")
 
@@ -237,8 +272,10 @@ def normalized_worst(values, fmt="{:.1f}×", worst_label="1.0× (worst)"):
     if len(real) < 2:
         return [NA] * len(values)
     worst = max(real)
-    return [(worst_label if v == worst else fmt.format(worst / v)) if v else NA
-            for v in values]
+    return [
+        (worst_label if v == worst else fmt.format(worst / v)) if v else NA
+        for v in values
+    ]
 
 
 def normalized(values, fmt="{:.2f}×"):
@@ -294,7 +331,9 @@ def write_csv(path, header, rows):
     print(f"  wrote {path}")
 
 
-def emit(basename, title, header, rows, note="", md_header=None, md_rows=None):
+def emit(
+    basename, title, header, rows, note="", md_header=None, md_rows=None, seeds=None
+):
     """Write both .md and .csv for one table into reproduce/outputs/.
 
     `md_header` / `md_rows` let a timing table present a NORMALIZED view in the
@@ -311,10 +350,14 @@ def emit(basename, title, header, rows, note="", md_header=None, md_rows=None):
     """
     md = os.path.join(OUTPUT_DIR, f"{basename}.md")
     cv = os.path.join(OUTPUT_DIR, f"{basename}.csv")
-    write_markdown(md, title,
-                   header if md_header is None else md_header,
-                   rows if md_rows is None else md_rows,
-                   note)
+    write_markdown(
+        md,
+        title,
+        header if md_header is None else md_header,
+        rows if md_rows is None else md_rows,
+        note,
+        seeds=seeds,
+    )
     write_csv(cv, header, rows)
 
 
@@ -327,6 +370,8 @@ def optional_import(modpath, names):
         mod = __import__(modpath, fromlist=list(names))
         return [getattr(mod, n, None) for n in names]
     except Exception as exc:  # noqa: BLE001 - deliberately broad; report and skip
-        print(f"  [skip] {modpath} unavailable ({exc.__class__.__name__}); "
-              f"columns {names} -> {NA}")
+        print(
+            f"  [skip] {modpath} unavailable ({exc.__class__.__name__}); "
+            f"columns {names} -> {NA}"
+        )
         return [None] * len(names)

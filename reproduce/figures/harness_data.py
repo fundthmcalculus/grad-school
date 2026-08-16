@@ -37,13 +37,19 @@ def archives():
         prov = os.path.join(OUTPUTS, entry, "PROVENANCE.txt")
         if not os.path.isfile(prov):
             continue
-        with open(prov) as f:
+        # UTF-8 pinned for the same reason as `_read` below: this file is
+        # produced by run_all_tables.sh and read back on a cp1252 host.
+        with open(prov, encoding="utf-8", errors="replace") as f:
             text = f.read()
         stamp = _STAMP.search(text)
         label = _LABEL.search(text)
-        found.append(((label.group(1) if label else entry),
-                      os.path.join(OUTPUTS, entry),
-                      stamp.group(1) if stamp else ""))
+        found.append(
+            (
+                (label.group(1) if label else entry),
+                os.path.join(OUTPUTS, entry),
+                stamp.group(1) if stamp else "",
+            )
+        )
     return sorted(found, key=lambda r: r[2], reverse=True)
 
 
@@ -57,23 +63,49 @@ def archive(label=None):
                 return name, path
         raise FileNotFoundError(
             f"no archive labelled {label!r} under {os.path.relpath(OUTPUTS, ROOT)}; "
-            f"have: {', '.join(n for n, _, _ in found) or '(none)'}")
+            f"have: {', '.join(n for n, _, _ in found) or '(none)'}"
+        )
     if found:
         return found[0][0], found[0][1]
     return "(unarchived)", OUTPUTS
 
 
 def table(basename, label=None):
-    """(rows, archive_label) for one table's CSV. Rows are dicts, values strings."""
+    """(rows, source_label) for one table's CSV. Rows are dicts, values strings.
+
+    Falls back to the loose files in `reproduce/outputs/` when the archive does
+    not carry this table -- which is the normal case for a study that is not part
+    of `run_all_tables.sh`, such as the optimizer sweep. The returned label says
+    which it was, and the figure prints it, so "drawn from an archived run" and
+    "drawn from whatever ran last" are never confused. Copying a loose file into
+    an archive directory to make this work would be falsifying provenance.
+    """
     name, path = archive(label)
     csv_path = os.path.join(path, f"{basename}.csv")
     if not os.path.exists(csv_path):
+        loose = os.path.join(OUTPUTS, f"{basename}.csv")
+        if os.path.exists(loose):
+            return _read(loose), "(unarchived — whatever ran last)"
         raise FileNotFoundError(
-            f"{basename}.csv is not in archive {name!r}. Run the generator that "
-            f"produces it (see reproduce/PROVENANCE_MAP.md) before drawing a "
-            f"figure from it.")
-    with open(csv_path, newline="") as f:
-        return list(csv.DictReader(f)), name
+            f"{basename}.csv is in neither archive {name!r} nor "
+            f"{os.path.relpath(OUTPUTS, ROOT)}. Run the generator that produces "
+            f"it (see reproduce/PROVENANCE_MAP.md) before drawing a figure "
+            f"from it."
+        )
+    return _read(csv_path), name
+
+
+def _read(path):
+    # UTF-8 pinned, matching `common.write_csv`, which writes these files with
+    # `encoding="utf-8"` explicitly. Left to the platform this reads cp1252 on Windows,
+    # and every header carrying a non-ASCII character comes back mojibake: `R²` decodes
+    # as `RÂ²`, so `row["R²"]` raises KeyError and the figure dies. That is exactly how
+    # `fig_01_pipeline_roadmap` and `fig_04_anomaly_sweep` failed -- the two figures that
+    # read a table with `R²` or `Δ` in a column name. The writer half of this pair was
+    # already pinned for the same reason; the reader half was not, so the harness could
+    # only round-trip its own output on a UTF-8 locale.
+    with open(path, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
 
 
 def number(text):
@@ -92,4 +124,5 @@ def spread(text):
 
 def provenance_note(label):
     """The one-line source stamp a data figure carries in its corner."""
-    return f"source: reproduce/outputs/{label}"
+    sep = " " if label.startswith("(") else ""
+    return f"source: reproduce/outputs/{sep}{label}"

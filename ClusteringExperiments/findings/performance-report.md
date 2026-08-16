@@ -44,19 +44,35 @@ throughout; a latent in-place-permutation correctness bug was also fixed here.
 
 ---
 
-## 3. GPU Fuzzy-C-Means — the clean GPU win (30–56×)
+## 3. GPU Fuzzy-C-Means — 1.2–3.7× at matched work
 
 FCM is iterative and data-resident, so it amortizes transfer. `FuzzyCMeans(use_gpu="auto")`.
 
+**Corrected 2026-08-04.** This section read "the clean GPU win (30–56×)" and quoted a
+single run. Both halves of that were wrong. Ten seeds give **13.2× / 25.3× / 39.2×**
+against the same CPU arm, consistently across three archives, so the single-run figures
+were high by 2.2×, 1.8× and 1.4×. And that CPU arm, `fcm.fuzzy_c_means`, computes
+distances by NumPy broadcasting while the GPU kernel uses the gram identity and two
+GEMMs. Running the GPU's own formulation on the CPU gives the device win below. About
+an order of magnitude of the original number was the reformulation, which is a real
+result and available on the CPU with no GPU in the machine.
+
 ![gpu fcm](../figures/gpu_fcm_speedup.png)
 
-| n (k=10, d=20) | CPU | GPU | speedup |
-|---|---|---|---|
-| 50 000 | 1480 ms | 46 ms | **32×** |
-| 200 000 | 4759 ms | 108 ms | **44×** |
-| 500 000 | 15933 ms | 286 ms | **56×** |
+Ten seeds, mean ± sd in ms, from `reproduce/outputs/uniform-2026-08-03/table_3_4_gpu_speedups.csv`:
+
+| n (k=10, d=20) | CPU, broadcasting | CPU, gram + 2 GEMM | GPU | device speedup |
+|---|---|---|---|---|
+| 50 000 | 2315 ± 2009 | 217 ± 180 | 176 ± 116 | **1.24×** |
+| 200 000 | 10564 ± 10555 | 982 ± 986 | 417 ± 175 | **2.35×** |
+| 500 000 | 29187 ± 25994 | 2763 ± 2440 | 745 ± 411 | **3.71×** |
 
 Converges to the same fixed point as the CPU (centers ~1e-5, labels >99% identical).
+
+The spreads are why no single run of this benchmark means anything: with identical
+initial centres and convergence test, iterations to the fixed point range from 11 to
+the 100-iteration cap across the ten seeds, so each arm's deviation is as large as its
+mean.
 
 ---
 
@@ -123,10 +139,10 @@ MST-build spectrum — naive (fast/approx) ↔ Borůvka (exact/parallel):
 | Contribution | Metric | Result | Exact? | Source |
 |---|---|---|---|---|
 | In-place iVAT (3→1 matrices) | max n at 64 GB | 52k → **89k**; n=64k f64 now runs | ✅ | PR #17/#18 |
-| GPU FCM | fit speedup | **30–56×** (n=50k–500k) | ~ (same fixed point) | PR #20 |
+| GPU FCM | fit speedup, matched formulation | **1.24–3.71×** (n=50k–500k); 13–39× against a broadcasting CPU arm | ~ (same fixed point) | PR #20 |
 | GPU pairwise distances | speedup | 1.3–2.5× (high-d f32); **<1** low-d/f64 | ✅ | PR #19 |
-| GPU Borůvka MST | MST-build speedup | **~5×**, grows with n | ✅ (bit-identical) | PR #22 |
-| On-device VAT front-end | distances+MST+order | **4.8–6.6×** | ✅ | PR #23 |
+| GPU Borůvka MST | MST-build speedup | **5.4–8.2×**; peaks mid-grid, does NOT grow with n | ✅ (bit-identical) | PR #22 |
+| On-device VAT front-end | distances+MST+order | **2.3–5.0×** matched (5.5–12.1× unmatched) | ✅ | PR #23 |
 | Naive block-decomposition | ideal-parallel speedup | up to **~800×** (N=32) | ✗ (approx) | PR #25 |
 | Principled stitch (fps+top-m) | robustness | ARI 1.0 across partition×N; O(N²r²) | ≈ exact SL | PR #25 |
 

@@ -58,7 +58,10 @@ DATASETS = {
 
 def _eval(X, y, kw, method, seed, **extra):
     Xtr, Xte, ytr, yte = train_test_split(
-        X, y, test_size=0.33, random_state=seed,
+        X,
+        y,
+        test_size=0.33,
+        random_state=seed,
         stratify=y if len(np.unique(y)) > 1 else None,
     )
     Xtr = Xtr.reset_index(drop=True)
@@ -68,15 +71,25 @@ def _eval(X, y, kw, method, seed, **extra):
         clf.fit(Xtr, ytr)
         if method != "baseline":
             clf.model_, _ = refine_classifier_antecedents(
-                clf.model_, Xtr, ytr, method=method, l2_shrink=0.05,
-                seed=seed, verbose=False, **extra,
+                clf.model_,
+                Xtr,
+                ytr,
+                method=method,
+                l2_shrink=0.05,
+                seed=seed,
+                verbose=False,
+                **extra,
             )
     return accuracy_score(yte, clf.predict(Xte))
 
 
 def main():
-    opt_kw = dict(optimizer_method="ga", local_grad_optim="perturb",
-                  population_size=24, num_generations=10)
+    opt_kw = dict(
+        optimizer_method="ga",
+        local_grad_optim="perturb",
+        population_size=24,
+        num_generations=10,
+    )
     print(f"{'dataset':16s}{'baseline':>10s}{'coordinate':>12s}{'optimizers':>12s}")
     print("-" * 50)
     for name, loader in DATASETS.items():
@@ -88,8 +101,10 @@ def main():
         base = np.mean([_eval(X, y, kw, "baseline", s) for s in SEEDS])
         coor = np.mean([_eval(X, y, kw, "coordinate", s) for s in SEEDS])
         opti = np.mean([_eval(X, y, kw, "optimizers", s, **opt_kw) for s in SEEDS])
-        print(f"{name:16s}{base:>10.4f}{coor:>12.4f}{opti:>12.4f}   "
-              f"(+{coor - base:.4f} / +{opti - base:.4f})")
+        print(
+            f"{name:16s}{base:>10.4f}{coor:>12.4f}{opti:>12.4f}   "
+            f"(+{coor - base:.4f} / +{opti - base:.4f})"
+        )
 
 
 if __name__ == "__main__":

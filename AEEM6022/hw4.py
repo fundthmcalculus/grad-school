@@ -6,31 +6,34 @@ import matplotlib.pyplot as plt
 
 # Control function
 def x_k1_fcn(a, b, dt, x_k, u_k):
-    return (1+a*dt)*x_k + b*dt*u_k
+    return (1 + a * dt) * x_k + b * dt * u_k
+
 
 # Performance measure
 def J_perf(x_N, l, dt, u_k):
     # Exclude the final control value.
-    return x_N**2.0+l*dt*np.sum(u_k**2.0)
+    return x_N**2.0 + l * dt * np.sum(u_k**2.0)
 
 
-def problem(a,b,l,N,dt):
+def problem(a, b, l, N, dt):
     admit_pts = integrate_fcn(a, b, dt, l, N)
     plot_J_grid(admit_pts, f"a={a}, lambda={l}, N={N}")
 
+
 def p314():
     # a
-    problem(0.0,1.0,2.0,2,1.0)
-    problem(0.0,1.0,2.0,3,1.0)
-    problem(0.0,1.0,4.0,2,1.0)
-    problem(0.0,1.0,0.5,2,1.0)
+    problem(0.0, 1.0, 2.0, 2, 1.0)
+    problem(0.0, 1.0, 2.0, 3, 1.0)
+    problem(0.0, 1.0, 4.0, 2, 1.0)
+    problem(0.0, 1.0, 0.5, 2, 1.0)
+
 
 def p316():
     # a
-    problem(-0.4,1.0,2.0,2,1.0)
-    problem(-0.4,1.0,2.0,3,1.0)
-    problem(-0.4,1.0,4.0,2,1.0)
-    problem(-0.4,1.0,0.5,2,1.0)
+    problem(-0.4, 1.0, 2.0, 2, 1.0)
+    problem(-0.4, 1.0, 2.0, 3, 1.0)
+    problem(-0.4, 1.0, 4.0, 2, 1.0)
+    problem(-0.4, 1.0, 0.5, 2, 1.0)
 
 
 def integrate_fcn(a, b, dt, l, n_stages):
@@ -51,7 +54,7 @@ def integrate_fcn(a, b, dt, l, n_stages):
             # Integrate
             admissable = True
             minJ = np.inf
-            for stage in range(1,n_stages):
+            for stage in range(1, n_stages):
                 x_tst = x_k1_fcn(a, b, dt, x[stage - 1], u[stage - 1])
                 if 0.0 <= x_tst <= 1.5:
                     x[stage] = x_tst
@@ -75,7 +78,9 @@ def integrate_fcn(a, b, dt, l, n_stages):
     # Plot the results as a function of x and u
     return admit_pts
 
+
 fig_count = 1
+
 
 def plot_J_grid(admit_pts, details_str):
     global fig_count
@@ -88,25 +93,25 @@ def plot_J_grid(admit_pts, details_str):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
     # Plot state vs control
-    ax1.scatter(x_vals, u_vals, c='blue', alpha=0.5)
-    ax1.set_xlabel('State (x)')
-    ax1.set_ylabel('Control (u)')
-    ax1.set_title(f'State vs Control\n{details_str}')
+    ax1.scatter(x_vals, u_vals, c="blue", alpha=0.5)
+    ax1.set_xlabel("State (x)")
+    ax1.set_ylabel("Control (u)")
+    ax1.set_title(f"State vs Control\n{details_str}")
     ax1.grid(True)
 
     # Plot state vs cost
-    ax2.scatter(x_vals, J_vals, c='red', alpha=0.5)
-    ax2.set_xlabel('State (x)')
-    ax2.set_ylabel('Cost (J)')
-    ax2.set_title(f'State vs Cost\n{details_str}')
+    ax2.scatter(x_vals, J_vals, c="red", alpha=0.5)
+    ax2.set_xlabel("State (x)")
+    ax2.set_ylabel("Cost (J)")
+    ax2.set_title(f"State vs Cost\n{details_str}")
     ax2.grid(True)
 
     plt.tight_layout()
 
     # Create output directory if it doesn't exist
-    os.makedirs('hw4_output', exist_ok=True)
+    os.makedirs("hw4_output", exist_ok=True)
     # Save figure with sequential naming
-    plt.savefig(f'hw4_output/fig{fig_count:02d}.png')
+    plt.savefig(f"hw4_output/fig{fig_count:02d}.png")
     fig_count += 1
     plt.show()
 
@@ -114,4 +119,3 @@ def plot_J_grid(admit_pts, details_str):
 if __name__ == "__main__":
     p314()
     p316()
-    

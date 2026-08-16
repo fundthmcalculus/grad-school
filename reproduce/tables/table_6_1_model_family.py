@@ -20,10 +20,10 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 _TABLES = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(_TABLES))   # reproduce/  -> import common
-sys.path.insert(0, _TABLES)                    # reproduce/tables -> import _fuzzy_models
-import common as C            # noqa: E402
-import _fuzzy_models as _fm   # noqa: E402
+sys.path.insert(0, os.path.dirname(_TABLES))  # reproduce/  -> import common
+sys.path.insert(0, _TABLES)  # reproduce/tables -> import _fuzzy_models
+import common as C  # noqa: E402
+import _fuzzy_models as _fm  # noqa: E402
 
 (M5Prime,) = C.optional_import("m5py", ["M5Prime"])
 
@@ -39,8 +39,9 @@ def run_regression():
         na = [C.NA] * 6
         return [["Concrete", "R2", *na], ["Concrete", "RMSE (MPa)", *na]]
     X, y = data
-    acc = {k: {"r2": [], "rmse": []} for k in
-           ["flat", "tree", "hme", "cart", "rf", "m5"]}
+    acc = {
+        k: {"r2": [], "rmse": []} for k in ["flat", "tree", "hme", "cart", "rf", "m5"]
+    }
     for seed in C.SEEDS:
         Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
         preds = {
@@ -48,9 +49,14 @@ def run_regression():
             "tree": _fm.fit_predict(_fm.tree_regressor(seed), Xtr, ytr, Xte),
             "hme": _fm.fit_predict(_fm.hme_regressor(seed), Xtr, ytr, Xte),
             "cart": DecisionTreeRegressor(random_state=seed).fit(Xtr, ytr).predict(Xte),
-            "rf": RandomForestRegressor(n_estimators=200, random_state=seed).fit(Xtr, ytr).predict(Xte),
-            "m5": (M5Prime().fit(np.asarray(Xtr), ytr).predict(np.asarray(Xte))
-                   if M5Prime else None),
+            "rf": RandomForestRegressor(n_estimators=200, random_state=seed)
+            .fit(Xtr, ytr)
+            .predict(Xte),
+            "m5": (
+                M5Prime().fit(np.asarray(Xtr), ytr).predict(np.asarray(Xte))
+                if M5Prime
+                else None
+            ),
         }
         for k, p in preds.items():
             if p is not None:
@@ -74,8 +80,12 @@ def run_classification():
             "flat": _fm.fit_predict(_fm.mog_classifier(seed), Xtr, ytr, Xte),
             "tree": _fm.fit_predict(_fm.tree_classifier(seed), Xtr, ytr, Xte),
             "hme": _fm.fit_predict(_fm.hme_classifier(seed), Xtr, ytr, Xte),
-            "cart": DecisionTreeClassifier(random_state=seed).fit(Xtr, ytr).predict(Xte),
-            "rf": RandomForestClassifier(n_estimators=200, random_state=seed).fit(Xtr, ytr).predict(Xte),
+            "cart": DecisionTreeClassifier(random_state=seed)
+            .fit(Xtr, ytr)
+            .predict(Xte),
+            "rf": RandomForestClassifier(n_estimators=200, random_state=seed)
+            .fit(Xtr, ytr)
+            .predict(Xte),
             "m5": None,  # M5 is a regression model tree; N/A for classification
         }
         for k, p in preds.items():
@@ -88,13 +98,25 @@ def run_classification():
 def main():
     print("Table 6.1 -- model family vs. baselines")
     rows = run_regression() + run_classification()
-    header = ["Dataset", "metric", "flat", "fuzzy tree", "mixture (HME)",
-              "CART", "Random Forest", "M5"]
-    C.emit("table_6_1", "Table 6.1 -- Model family on Concrete and PhiUSIIL",
-           header, rows,
-           note="Model-family columns from tribblefis/fuzzytree; baselines from "
-                "scikit-learn (M5 via m5py if installed). Higher R2/accuracy and "
-                "lower RMSE are better.")
+    header = [
+        "Dataset",
+        "metric",
+        "flat",
+        "fuzzy tree",
+        "mixture (HME)",
+        "CART",
+        "Random Forest",
+        "M5",
+    ]
+    C.emit(
+        "table_6_1",
+        "Table 6.1 -- Model family on Concrete and PhiUSIIL",
+        header,
+        rows,
+        note="Model-family columns from tribblefis/fuzzytree; baselines from "
+        "scikit-learn (M5 via m5py if installed). Higher R2/accuracy and "
+        "lower RMSE are better.",
+    )
 
 
 if __name__ == "__main__":

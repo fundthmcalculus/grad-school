@@ -43,8 +43,20 @@ _CELL = re.compile(rf"(?P<mean>{_NUM})\s*(?:(?:±|\+/-)\s*(?P<std>{_NUM}))?")
 # Matched on whole words, not substrings. Plain `in` tests silently swallow real
 # results: "ms" is a substring of "rmse", so every RMSE column in the harness was
 # being written off as a timing wobble.
-_TIME_WORDS = {"time", "times", "sec", "secs", "second", "seconds",
-               "ms", "wall", "clock", "elapsed", "runtime", "duration"}
+_TIME_WORDS = {
+    "time",
+    "times",
+    "sec",
+    "secs",
+    "second",
+    "seconds",
+    "ms",
+    "wall",
+    "clock",
+    "elapsed",
+    "runtime",
+    "duration",
+}
 
 
 def parse_cell(text):
@@ -118,7 +130,12 @@ def compare_table(name, base_path, new_path):
     bh, brows = base
     nh, nrows = new
     if bh != nh:
-        return {"name": name, "state": "header-changed", "base_header": bh, "new_header": nh}
+        return {
+            "name": name,
+            "state": "header-changed",
+            "base_header": bh,
+            "new_header": nh,
+        }
 
     # Rows are matched by POSITION. Both archives come from the same generator
     # script with the same seed list, so row i corresponds to row i. Matching on
@@ -131,9 +148,9 @@ def compare_table(name, base_path, new_path):
     # silently, which is the one thing this script must not do.
     diffs, added, removed = [], [], []
     if len(brows) != len(nrows):
-        for r in nrows[len(brows):]:
+        for r in nrows[len(brows) :]:
             added.append(describe_row(r))
-        for r in brows[len(nrows):]:
+        for r in brows[len(nrows) :]:
             removed.append(describe_row(r))
 
     n_cells = 0
@@ -142,12 +159,14 @@ def compare_table(name, base_path, new_path):
         # Only the first column is a reliable order check; later columns may hold
         # measurements that legitimately moved between runs.
         if brow and nrow and brow[0].strip() != nrow[0].strip():
-            print(f"  [warn] {name}: row order differs at '{describe_row(brow, 1)}' vs "
-                  f"'{describe_row(nrow, 1)}'; positional matching may be misaligned")
+            print(
+                f"  [warn] {name}: row order differs at '{describe_row(brow, 1)}' vs "
+                f"'{describe_row(nrow, 1)}'; positional matching may be misaligned"
+            )
         for col_idx in range(min(len(bh), len(brow), len(nrow))):
             b_txt, n_txt = brow[col_idx].strip(), nrow[col_idx].strip()
             if parse_cell(b_txt) is None and parse_cell(n_txt) is None:
-                continue                      # a label column, not a measurement
+                continue  # a label column, not a measurement
             n_cells += 1
             if b_txt == n_txt:
                 continue
@@ -194,10 +213,12 @@ def fmt_delta(entry):
 def render(base_label, new_label, results, provenance):
     L = []
     L.append(f"# Fix impact — `{base_label}` → `{new_label}`\n")
-    L.append("Cell-by-cell diff of the archived table runs, produced by "
-             "`reproduce/compare_runs.py`. Every table is listed, including the "
-             "unchanged ones: confining a fix's blast radius is a claim, and it is "
-             "only supported by showing the tables that did *not* move.\n")
+    L.append(
+        "Cell-by-cell diff of the archived table runs, produced by "
+        "`reproduce/compare_runs.py`. Every table is listed, including the "
+        "unchanged ones: confining a fix's blast radius is a claim, and it is "
+        "only supported by showing the tables that did *not* move.\n"
+    )
 
     for label, text in provenance.items():
         L.append(f"<details><summary>Provenance — <code>{label}</code></summary>\n")
@@ -205,7 +226,9 @@ def render(base_label, new_label, results, provenance):
         L.append("</details>\n")
 
     compared = [r for r in results if r["state"] == "compared"]
-    changed = [r for r in compared if r["diffs"] or r["added_rows"] or r["removed_rows"]]
+    changed = [
+        r for r in compared if r["diffs"] or r["added_rows"] or r["removed_rows"]
+    ]
     identical = [r for r in compared if r not in changed]
     problem = [r for r in results if r["state"] != "compared"]
 
@@ -240,10 +263,15 @@ def render(base_label, new_label, results, provenance):
     if problem:
         L.append("## Tables that could not be compared\n")
         for r in sorted(problem, key=lambda x: x["name"]):
-            L.append(f"- `{r['name']}` — **{r['state']}**"
-                     + (f"\n  - baseline header: `{r.get('base_header')}`"
-                        f"\n  - new header: `{r.get('new_header')}`"
-                        if r["state"] == "header-changed" else ""))
+            L.append(
+                f"- `{r['name']}` — **{r['state']}**"
+                + (
+                    f"\n  - baseline header: `{r.get('base_header')}`"
+                    f"\n  - new header: `{r.get('new_header')}`"
+                    if r["state"] == "header-changed"
+                    else ""
+                )
+            )
         L.append("")
 
     if changed:
@@ -251,20 +279,32 @@ def render(base_label, new_label, results, provenance):
         for r in sorted(changed, key=lambda x: x["name"]):
             L.append(f"### `{r['name']}`\n")
             if r["added_rows"]:
-                L.append(f"Rows only in `{new_label}`: "
-                         + ", ".join(f"`{x}`" for x in r["added_rows"]) + "\n")
+                L.append(
+                    f"Rows only in `{new_label}`: "
+                    + ", ".join(f"`{x}`" for x in r["added_rows"])
+                    + "\n"
+                )
             if r["removed_rows"]:
-                L.append(f"Rows only in `{base_label}`: "
-                         + ", ".join(f"`{x}`" for x in r["removed_rows"]) + "\n")
+                L.append(
+                    f"Rows only in `{base_label}`: "
+                    + ", ".join(f"`{x}`" for x in r["removed_rows"])
+                    + "\n"
+                )
             if r["diffs"]:
                 L.append("| Row | Column | Before | After | Δ | |")
                 L.append("|---|---|---|---|---:|---|")
-                for d in sorted(r["diffs"],
-                                key=lambda x: (not x["significant"], x["row"])):
-                    flag = ("**changed**" if d["significant"]
-                            else ("timing" if d["timing"] else "within noise"))
-                    L.append(f"| {d['row']} | {d['column']} | {d['before']} | "
-                             f"{d['after']} | {fmt_delta(d)} | {flag} |")
+                for d in sorted(
+                    r["diffs"], key=lambda x: (not x["significant"], x["row"])
+                ):
+                    flag = (
+                        "**changed**"
+                        if d["significant"]
+                        else ("timing" if d["timing"] else "within noise")
+                    )
+                    L.append(
+                        f"| {d['row']} | {d['column']} | {d['before']} | "
+                        f"{d['after']} | {fmt_delta(d)} | {flag} |"
+                    )
                 L.append("")
 
     if identical:
@@ -275,11 +315,13 @@ def render(base_label, new_label, results, provenance):
         L.append("")
 
     L.append("---\n")
-    L.append("> A cell counts as **changed** only if it moved by more than the "
-             "larger of the two runs' reported standard deviations; smaller moves "
-             "are labelled *within noise*. Wall-clock columns are always reported "
-             "separately and never called a regression — this harness does not "
-             "control clocks or thermals (see G4 in `NEXT_STEPS.md`).\n")
+    L.append(
+        "> A cell counts as **changed** only if it moved by more than the "
+        "larger of the two runs' reported standard deviations; smaller moves "
+        "are labelled *within noise*. Wall-clock columns are always reported "
+        "separately and never called a regression — this harness does not "
+        "control clocks or thermals (see G4 in `NEXT_STEPS.md`).\n"
+    )
     return "\n".join(L)
 
 
@@ -291,18 +333,28 @@ def main():
     new_dir = os.path.join(OUTPUTS, new_label)
     for d in (base_dir, new_dir):
         if not os.path.isdir(d):
-            sys.exit(f"no such run directory: {d}\n"
-                     f"produce one with: reproduce/run_all_tables.sh <label>")
+            sys.exit(
+                f"no such run directory: {d}\n"
+                f"produce one with: reproduce/run_all_tables.sh <label>"
+            )
 
-    names = sorted({f[:-4] for d in (base_dir, new_dir)
-                    for f in os.listdir(d) if f.endswith(".csv")})
+    names = sorted(
+        {
+            f[:-4]
+            for d in (base_dir, new_dir)
+            for f in os.listdir(d)
+            if f.endswith(".csv")
+        }
+    )
     if not names:
         sys.exit(f"no CSVs found in {base_dir} or {new_dir}")
 
-    results = [compare_table(n,
-                             os.path.join(base_dir, f"{n}.csv"),
-                             os.path.join(new_dir, f"{n}.csv"))
-               for n in names]
+    results = [
+        compare_table(
+            n, os.path.join(base_dir, f"{n}.csv"), os.path.join(new_dir, f"{n}.csv")
+        )
+        for n in names
+    ]
 
     provenance = {}
     for label, d in ((base_label, base_dir), (new_label, new_dir)):
@@ -325,10 +377,13 @@ def main():
             sig = sum(1 for d in r["diffs"] if d["significant"])
             extra = ""
             if r["added_rows"] or r["removed_rows"]:
-                extra = (f", +{len(r['added_rows'])} rows"
-                         f"/-{len(r['removed_rows'])} rows")
-            print(f"  {r['name']:<40} "
-                  f"{len(r['diffs'])} cells differ ({sig} beyond noise){extra}")
+                extra = (
+                    f", +{len(r['added_rows'])} rows" f"/-{len(r['removed_rows'])} rows"
+                )
+            print(
+                f"  {r['name']:<40} "
+                f"{len(r['diffs'])} cells differ ({sig} beyond noise){extra}"
+            )
 
 
 if __name__ == "__main__":

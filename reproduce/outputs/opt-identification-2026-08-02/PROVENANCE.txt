@@ -1,0 +1,19 @@
+label:       opt-identification-2026-08-02
+generated:   2026-08-03T01:39:20Z
+tribble-fis: d0efefc409009e772e1478f35430134051b0fa0b
+tribble-cluster: e3c27e67ae2a41d636dfb472110ae2ded2e4ef82
+grad-school: 76a82fb13ff8d809e8a60d0906bb872ed4b447e8
+seeds:       0,1,2
+
+study:       reproduce/optimizers/run_identification_study.py
+dataset:     concrete
+rule grid:   2,3,4,6,8,12
+order:       2nd
+repeats:     3 (median reported)
+kmeans n_init: 10
+threads:     1 (OMP/BLAS pinned before numpy import)
+
+> **Machine.** host: vm · os: Linux-6.18.5-x86_64-with-glibc2.39 · cpu: Intel(R) Xeon(R) Processor @ 2.10GHz · cores: 4 logical · ram: 15.7 GiB · gpu: none detected · python: 3.11.15
+>
+> Wall-clock times are machine-dependent; ratios are not. Markdown tables report normalized ratios where a timing is involved, and the companion CSV carries the absolute seconds.
+
