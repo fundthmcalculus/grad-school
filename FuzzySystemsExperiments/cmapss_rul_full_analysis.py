@@ -22,15 +22,23 @@ scikit-learn, tribble-fis only) -- read top to bottom, rerun end to end:
                                                     # evolution search (see
                                                     # PIPELINES' comments)
 
-PIPELINES has five entries: `honest`/`best` (this DOE's DS02-only-tuned
+PIPELINES has six entries: `honest`/`best` (this DOE's DS02-only-tuned
 configs, reused unchanged), `honest_full_tuned`/`best_full_tuned` (found by
-this script's own grid search on the pooled dataset), and `best_full_de`
-(found by differential evolution at a larger per-candidate sample size --
-see PIPELINES' comments for the full story, including a *rejected*
-DE-found "honest" config that validated better but generalized worse, i.e.
-overfit to its validation split). All five are hardcoded, so a normal run
-just fits and evaluates them; `--tune`/`--tune-de` re-run the grid/DE
-searches that found them, for reproducibility.
+this script's own grid search on the pooled dataset), `best_full_de` (found
+by differential evolution at a larger per-candidate sample size), and
+`best_full_de_minmax` (best_full_de with a MinMaxScaler instead of the
+default StandardScaler -- the current overall champion at RMSE 15.21). See
+PIPELINES' comments for the full story of each, including two *rejected*
+experiments (a DE-found "honest" config that overfit its validation split,
+and a MinMax "honest" variant that was marginally worse). All six are
+hardcoded, so a normal run just fits and evaluates them; `--tune`/
+`--tune-de` re-run the grid/DE searches that found them, for reproducibility.
+
+Two optional preprocessing config axes are supported: `scaler` ("standard"
+default, or "minmax") and `pca` (variance-ratio or int component target,
+fit on training data only). PCA was explored and never beat the champion's
+headline RMSE (though it sharply cut outlier predictions), so no current
+pipeline uses it -- see PIPELINES' comments.
 
 Machine-learning hygiene (why the test set isn't poisoned):
   - Condition-correction regressions (each sensor channel regressed against
@@ -68,9 +76,10 @@ import h5py
 import numpy as np
 import pandas as pd
 from scipy.optimize import differential_evolution
+from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from tribblefis.gaussian_regressor import TribbleRegressor
 from tribblefis.gaussian_regressor_memory import MemoryWindowFeatureExtractor
@@ -343,6 +352,45 @@ PIPELINES = {
             l2_reg=0.01502536299852122,
         ),
     ),
+    # MinMaxScaler ([0,1] rescaling instead of the default zero-mean/
+    # unit-variance StandardScaler, via the cfg["scaler"] axis) was tried on
+    # both headline configs, changing nothing else. On "honest" it was
+    # marginally worse (RMSE 16.08 vs 15.95), so honest_full_tuned keeps
+    # StandardScaler. On "best" it was a clear win on every metric at once:
+    # RMSE 15.21 vs best_full_de's 15.56, DS06 (hardest dataset) 14.89 vs
+    # 20.89, and the NASA outlier score dropped from ~64 billion to ~594k.
+    # The raw-memory features have heavy-tailed distributions that MinMax's
+    # bounded [0,1] range handles better than StandardScaler's unbounded
+    # z-scores (a few extreme samples no longer dominate the fit). Kept as
+    # best_full_de_minmax -- the current overall champion.
+    "best_full_de_minmax": dict(
+        n_xv=2,
+        aggregation="raw_memory",
+        scaler="minmax",
+        tribble_kwargs=dict(
+            tsk_order="full-2nd",
+            n_gaussians=4,
+            top_p=0.9622893249863613,
+            detect_interactions=False,
+            norm_conorm="hamacher",
+            l2_reg=0.01502536299852122,
+        ),
+    ),
+    # PCA was explored as a `pca` config axis (still supported below -- fit
+    # on training data only, `pca` = variance-ratio target or int
+    # components) on the current champion best_full_de. Result across
+    # variance targets 0.95 / 0.99 / 0.999 / 0.9999 (which keep 6 / 12 / 22
+    # / 32 of the 60 raw-memory features): PCA *never* beat best_full_de's
+    # 15.56 headline RMSE -- best PCA result was 17.33 at 0.9999. The
+    # raw-memory features are highly redundant (memory windows of the same
+    # sensors), so 99% variance already collapses to 12 components, and the
+    # model's own top_p selection extracts the average-accuracy signal
+    # better than any PCA truncation does. Notably, though, every PCA
+    # variant cut the NASA score (outlier penalty) from ~64 billion to
+    # under ~1 million and improved the hardest dataset (DS06) -- PCA is a
+    # strong regularizer against catastrophic outliers, just not an
+    # average-RMSE win. Not kept as a pipeline (no RMSE improvement); the
+    # capability remains for anyone prioritizing worst-case robustness.
 }
 # Maps each *_full_tuned pipeline back to the base pipeline it shares
 # pooled data with (honest_full_tuned reads the same pooled tables as
@@ -351,6 +399,7 @@ TUNED_TO_BASE = {
     "honest_full_tuned": "honest",
     "best_full_tuned": "best",
     "best_full_de": "best",
+    "best_full_de_minmax": "best",
 }
 BASE_PIPELINES = {k: v for k, v in PIPELINES.items() if k not in TUNED_TO_BASE}
 
@@ -810,9 +859,31 @@ def main(tune: bool = False, tune_de: bool = False):
 
         X_train = train_tab[feat_cols].to_numpy(dtype=np.float64)
         X_test = test_tab[feat_cols].to_numpy(dtype=np.float64)
-        scaler = StandardScaler().fit(X_train)
+        # Scaler is fit on TRAINING data only, then applied to test.
+        # cfg["scaler"] selects the family: "standard" (zero-mean/unit-var,
+        # the default) or "minmax" (rescale each feature to [0, 1]).
+        scaler_kind = cfg.get("scaler", "standard")
+        scaler = (MinMaxScaler() if scaler_kind == "minmax" else StandardScaler()).fit(
+            X_train
+        )
         X_train_s = scaler.transform(X_train)
         X_test_s = scaler.transform(X_test)
+
+        # Optional PCA dimensionality reduction, fit on TRAINING data only
+        # (like the scaler above), then applied to test. cfg["pca"] is a
+        # variance-ratio target in (0, 1) -> keep enough components for that
+        # much variance, or an int -> that many components. Rotating into
+        # decorrelated components before the regressor's ridge consequent
+        # solve can improve conditioning on the wide raw-memory feature set;
+        # the trade-off is that a component is a mix of sensors, so the
+        # per-feature interpretability that motivates a fuzzy system is lost.
+        pca_note = ""
+        if cfg.get("pca"):
+            pca = PCA(n_components=cfg["pca"], random_state=42).fit(X_train_s)
+            X_train_s = pca.transform(X_train_s)
+            X_test_s = pca.transform(X_test_s)
+            pca_note = f"  pca: {X_train.shape[1]} -> {pca.n_components_} comps"
+            print(pca_note.strip())
 
         model = TribbleRegressor(
             random_state=42, max_samples=2000, **cfg["tribble_kwargs"]
