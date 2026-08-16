@@ -58,6 +58,16 @@ excellent — the seeded network starts at 0.0035 error against the FIS's own
 **0.03 s of training** against the FIS's **2 s** of setup. Scale buys per-epoch
 cost, not epochs-to-target, and epochs-to-target is what a warm start saves.
 
+**Part 5 found the regime and the warm start finally paid.** On the damped
+double-pendulum time-step operator — 3,444 updates to R2 0.9 against PhiUSIIL's
+25 — the converted network reaches R2 0.9 in **2.45 s against 11.62 s** for
+random initialization, 4.7x on wall clock and 15.6x in updates, with the FIS fit
+charged against it. That confirms the Part 4 diagnosis exactly: the variable is
+updates-to-target, not rows. **But the quantile-knot baseline still wins**,
+landing at R2 0.9387 in 0.64 s and zero updates — better than any arm reaches
+after 20 epochs. Three parts of this experiment now say the same thing from
+different directions: the architecture is the contribution, not the knots.
+
 **Part 3 removed the hybrid's two arbitrary choices** — a bounding-box lattice,
 and a subspace ranked by main effects. Putting the vertices on the FIS's own
 knots does not lower the best fidelity but makes it *robust*: the lattice arm
@@ -82,6 +92,7 @@ found from the other side: **the ceiling is the FIS**.
 | T1–T5 | the tetrahedral construction (Part 2) | 2 confirmed, 2 falsified, 1 partial |
 | W1–W2 | FIS-aligned vertices, interaction subspaces (Part 3) | both partial |
 | P1–P4 | PhiUSIIL at full scale (Part 4) | 2 confirmed, 2 falsified |
+| S1–S3 | slow-converging problem (Part 5) | 2 confirmed, 1 falsified |
 
 Six of eight in Part 1 came back wrong or partly wrong, four of five in Part 2,
 and both in Part 3. Several are more useful that way.
@@ -574,6 +585,72 @@ cost, not epochs-to-target, and epochs-to-target is what a warm start saves.
 | P2 | the conversion works for classification | **confirmed** — seeds 0.0035 against the FIS's 0.0060, no labels |
 | P3 | the partial-dependence route transfers | **falsified** — saturation breaks it; projection is the fix |
 | P4 | at 235k rows the warm start finally pays | **falsified** — 2 s setup against 0.03 s of training |
+
+---
+
+# Part 5 — the warm start on a slow-converging problem, and it finally pays
+
+`find_slow_problem.py` located one: the damped n=2 double-pendulum time-step
+operator from `AnalyticalDynamics/chaos`, `(theta_1(0), theta_2(0), t) ->
+theta_1(t)`, 62,000 real rows, **3,444 updates** for a from-scratch network to
+reach R2 0.9 against PhiUSIIL's 25. Friction rather than the frictionless chain
+because it is the better-conditioned of the two — the frictionless one stalls at
+R2 0.76 however long it trains, which measures network width, not convergence.
+
+`run_pendulum.py`, three seeds, 20 epochs. FIS fit and conversion charged to the
+hot arms.
+
+## Against random initialization, the hypothesis is confirmed
+
+| arm | R2 at start | wall clock to R2 0.9 | updates to R2 0.9 |
+|---|---|---|---|
+| tribble FIS (0.84 s) | — | — | — |
+| `hot` | **0.8747** | **2.45 s** | **347** |
+| `he` | −2.1208 | 11.62 s (2/3 seeds) | 5,410 |
+
+**4.7x faster in wall clock and 15.6x fewer updates**, with the 0.84 s FIS fit
+and 0.8 s conversion both charged against it. And at R2 0.93 only the hot arms
+arrive at all inside the budget — `he` never does.
+
+The conversion itself is again near-exact: the projection seed starts at R2
+0.8747 against the FIS's own 0.8746, having seen no labels.
+
+**This is the first rung where the warm start does what it was supposed to do**,
+and it confirms the Part 4 diagnosis rather than contradicting it: the variable
+that matters is updates-to-target, not rows. PhiUSIIL had 235,795 rows and
+needed 25 updates; this has 43,400 and needs 5,410.
+
+## Against the cheap baseline, it still loses
+
+| arm | setup | R2 at start | wall clock to R2 0.93 |
+|---|---|---|---|
+| `quantile` | **0.64 s** | **0.9387** | **0.64 s** |
+| `hot` | 1.65 s | 0.8747 | 7.85 s |
+
+`quantile` — the same axis-aligned ReLU knot layer with knots at per-feature
+quantiles and one closed-form ridge solve — lands at R2 0.9387 immediately, which
+is *better than any arm reaches after 20 epochs of training*, for 0.64 s and zero
+updates. It beats `hot` at every target, by 2.6x at R2 0.9 and 12x at R2 0.93.
+
+One asymmetry to state plainly, because it favours quantile: its ridge solve fits
+the **labels**, while the hot arms fit the FIS's output and never see `y` during
+setup. That is what "no labels" means and it is deliberate, but it means the two
+are not doing the same job. The fair reading is that `quantile` is a *model*, not
+an initialization — and on this problem it is the best model in the table.
+
+The reason it works here is visible in the data: `theta_1(0)` is held at 120° for
+every trajectory, so the operator is effectively a 2-input problem in
+`(theta_2(0), t)` and damping makes it close to additive in `t`. An additive
+knot basis is nearly the right hypothesis class, which is exactly the condition
+under which Parts 1-3 found the same thing.
+
+## Scoring
+
+| | hypothesis | verdict |
+|---|---|---|
+| S1 | a slow-converging problem exists and is findable | **confirmed** — 3,444 updates, 138x PhiUSIIL |
+| S2 | on it, the warm start beats random init on wall clock | **confirmed** — 4.7x at R2 0.9, 15.6x in updates |
+| S3 | the FIS's knots beat quantile knots | **falsified again** — quantile wins at every target |
 
 ## What I would do next
 
