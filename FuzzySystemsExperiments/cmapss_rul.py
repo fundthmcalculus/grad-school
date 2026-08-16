@@ -12,6 +12,7 @@ import contextlib
 import copy
 import io
 import itertools
+import sys
 import time
 
 import h5py
@@ -22,7 +23,7 @@ from sklearn.metrics import mean_squared_error
 from tribblefis.gaussian_regressor import TribbleRegressor
 from tribblefis.gaussian_regressor_memory import MemoryWindowFeatureExtractor
 from tribblefis.regression import partition_output, solve_tsk_consequents
-from tribblefis.refine import refine_antecedents_coordinate, refine_antecedents_local
+from tribblefis.refine import refine_antecedents_coordinate, refine_antecedents_optimizers
 
 H5_PATH = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
 
@@ -178,17 +179,39 @@ AGGREGATORS = {
 # --------------------------------------------------------------------------
 # Factor C: RUL target shaping
 # --------------------------------------------------------------------------
-def unit_physical_caps(table: pd.DataFrame) -> dict[int, float]:
-    """Per-unit cap = RUL at the moment abnormal degradation begins (hs
-    first drops to 0), i.e. only the abnormal-degradation window is treated
-    as learnable. Derived from data, not hardcoded from the PDF's table."""
-    caps = {}
+def true_onset_cycle(table: pd.DataFrame) -> dict[int, int]:
+    """Per-unit abnormal-degradation onset cycle, from the oracle `hs` health
+    flag (first cycle it drops to 0). Not observable by a real onboard
+    system -- `hs` comes from the simulator's latent health parameters, not
+    a sensor reading -- see `detect_onset_moving_average` for the
+    sensor-only estimate."""
+    onsets = {}
     for unit, sub in table.groupby("unit"):
         sub = sub.sort_values("cycle")
         unhealthy = sub[sub["hs"] == 0]
-        cap = unhealthy["RUL"].max() if len(unhealthy) else sub["RUL"].max()
+        onsets[unit] = int(unhealthy["cycle"].min()) if len(unhealthy) else int(sub["cycle"].max())
+    return onsets
+
+
+def unit_caps_from_onset(table: pd.DataFrame, onset_by_unit: dict) -> dict[int, float]:
+    """Per-unit RUL cap = the RUL value at (or just after) that unit's
+    degradation-onset cycle -- only the abnormal-degradation window is
+    treated as learnable, whichever onset estimate is supplied."""
+    caps = {}
+    for unit, sub in table.groupby("unit"):
+        sub = sub.sort_values("cycle")
+        onset = onset_by_unit.get(unit, sub["cycle"].max())
+        at_or_after = sub[sub["cycle"] >= onset]
+        cap = at_or_after["RUL"].max() if len(at_or_after) else sub["RUL"].max()
         caps[unit] = float(cap)
     return caps
+
+
+def unit_physical_caps(table: pd.DataFrame) -> dict[int, float]:
+    """Per-unit cap using the oracle `hs`-derived onset. Derived from data,
+    not hardcoded from the PDF's table. See `unit_caps_from_onset` for the
+    general form this specializes."""
+    return unit_caps_from_onset(table, true_onset_cycle(table))
 
 
 def apply_rul_shape(table: pd.DataFrame, mode: str, caps: dict) -> pd.Series:
@@ -196,7 +219,7 @@ def apply_rul_shape(table: pd.DataFrame, mode: str, caps: dict) -> pd.Series:
         return table["RUL"].astype(float)
     if mode == "C2_fixed125":
         return table["RUL"].clip(upper=125).astype(float)
-    if mode == "C3_physical":
+    if mode in ("C3_physical", "C4_detected"):
         cap_series = table["unit"].map(caps)
         return np.minimum(table["RUL"].astype(float), cap_series)
     raise ValueError(mode)
@@ -408,13 +431,26 @@ def stage3(agg_cache: dict, pipeline: str, d_kwargs: dict):
 # --------------------------------------------------------------------------
 # Stage 4: does iterative antecedent refinement improve on the heuristic fit?
 # --------------------------------------------------------------------------
+# L-BFGS-B ("local") was tried first and dropped: it was both slower and less
+# accurate than every option below at every pipeline scale tested (see PR
+# #110 history) -- coordinate descent beat it on cost, and the optimizers-GA
+# search below beat it on both cost and, on the smallest pipeline, on whether
+# it overfits its own CV split at all. `local_grad_optim="none"` is load-
+# bearing: the default per-candidate local gradient polish
+# ("single-var-grad") didn't finish a single generation in 90s even at
+# population=6 -- disabling it is what makes the population search itself
+# competitive with coordinate descent's cost.
 REFINERS = {
     "coordinate": (refine_antecedents_coordinate, dict(n_sweeps=3)),
-    "local": (refine_antecedents_local, dict(maxiter=80, maxfun=15000)),
+    "optimizers_ga": (
+        refine_antecedents_optimizers,
+        dict(method="ga", population_size=40, num_generations=25,
+             local_scale=0.25, local_grad_optim="none"),
+    ),
 }
 
 
-def refine_and_evaluate(fitted: dict, refiner_name: str) -> dict:
+def refine_and_evaluate(fitted: dict, refiner_name: str, fn=None, kwargs=None) -> dict:
     """Refine a fitted TribbleRegressor's Gaussian antecedents, re-solve the
     TSK consequents against the refined antecedents (exactly what `fit()`
     does at the end of its own heuristic construction), and compare test
@@ -423,7 +459,13 @@ def refine_and_evaluate(fitted: dict, refiner_name: str) -> dict:
     TribbleRegressor has no public `refine=` switch (unlike TribbleClassifier);
     this calls tribblefis.refine's lower-level antecedent refiners directly,
     reproducing the plumbing TribbleClassifier.fit() does internally.
+
+    `fn`/`kwargs` default to the `REFINERS[refiner_name]` entry; pass them
+    explicitly to sweep a refiner's own hyperparameters under a label that
+    isn't itself a REFINERS key (see `stage4b_refiner_sweep`).
     """
+    if fn is None:
+        fn, kwargs = REFINERS[refiner_name]
     model = fitted["model"]
     X_train_df = pd.DataFrame(fitted["X_train"], columns=model.feature_names_in_)
     y_series = pd.Series(fitted["y_train"], name="y_value")
@@ -431,9 +473,8 @@ def refine_and_evaluate(fitted: dict, refiner_name: str) -> dict:
         model.n_output_buckets, y_series, method=model.output_partition
     )
 
-    fn, kwargs = REFINERS[refiner_name]
     t0 = time.perf_counter()
-    with contextlib.redirect_stdout(io.StringIO()):
+    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
         refined_model, info = fn(
             model.model_, X_train_df, y_part, model.top_features_,
             n_output_buckets=model.n_output_buckets, order=model.tsk_order,
@@ -468,17 +509,40 @@ def refine_and_evaluate(fitted: dict, refiner_name: str) -> dict:
     )
 
 
+STAGE4_CSV = "FuzzySystemsExperiments/cmapss_rul_stage4_results.csv"
+
+
 def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
     """Try each refiner on each pipeline's Stage 3 model, skipping (and
     reporting) any that would blow the seconds-scale training budget --
     the DOE's own fallback for a slow grid corner, applied here to
-    refinement instead of the Factor D grid."""
+    refinement instead of the Factor D grid.
+
+    Writes the CSV after *every* (pipeline, refiner) pair, not just at the
+    end: this stage alone runs 20-25 minutes, and a background run has
+    already been killed mid-run once with no OOM/reboot evidence to explain
+    it. Re-running with the CSV already present skips whatever pairs it
+    already has, so a second kill doesn't cost the whole stage again.
+    """
+    import os
+
+    done = set()
     results = []
+    if os.path.exists(STAGE4_CSV):
+        prior = pd.read_csv(STAGE4_CSV)
+        results = prior.to_dict("records")
+        done = set(zip(prior["pipeline"], prior["refiner"]))
+        if done:
+            print(f"Resuming Stage 4: {len(done)} (pipeline, refiner) pairs already done.")
+
     for pipeline, fitted in fitted_by_pipeline.items():
         n_mf = fitted["model"].model_.n_membership_functions
         n_rows = len(fitted["X_train"])
         print(f"\nRefining {pipeline} ({n_mf} membership functions, {n_rows} train rows) ...")
         for refiner_name in REFINERS:
+            if (pipeline, refiner_name) in done:
+                print(f"  {refiner_name:10s} already done -- skipping")
+                continue
             try:
                 r = refine_and_evaluate(fitted, refiner_name)
             except Exception as exc:
@@ -486,6 +550,7 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
                 continue
             r["pipeline"] = pipeline
             results.append(r)
+            pd.DataFrame(results).to_csv(STAGE4_CSV, index=False)
             delta = r["rmse_refined"] - r["rmse_baseline"]
             verdict = "WORSE (CV-overfit)" if delta > 0.01 else (
                 "no real change" if abs(delta) <= 0.01 else "better")
@@ -503,18 +568,221 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
     return results_df
 
 
-if __name__ == "__main__":
-    stage1_results, agg_cache = stage1()
+# --------------------------------------------------------------------------
+# Stage 4b: sweep each refiner's own hyperparameters (not just Factor D)
+# --------------------------------------------------------------------------
+# Run on the cheapest pipeline only (446 rows, ~5s/config) -- it's also the
+# one where refinement overfits its CV split, so it's the sharpest test of
+# whether a hyperparameter choice can rescue that failure mode rather than
+# just moving the needle on an already-working case.
+SWEEP_CONFIGS = [
+    ("coordinate", refine_antecedents_coordinate, dict(n_sweeps=2)),
+    ("coordinate", refine_antecedents_coordinate, dict(n_sweeps=3)),
+    ("coordinate", refine_antecedents_coordinate, dict(n_sweeps=5)),
+    ("optimizers_ga", refine_antecedents_optimizers,
+     dict(method="ga", population_size=20, num_generations=25, local_scale=0.15, local_grad_optim="none")),
+    ("optimizers_ga", refine_antecedents_optimizers,
+     dict(method="ga", population_size=40, num_generations=25, local_scale=0.25, local_grad_optim="none")),
+    ("optimizers_ga", refine_antecedents_optimizers,
+     dict(method="ga", population_size=40, num_generations=25, local_scale=0.5, local_grad_optim="none")),
+    ("optimizers_ga", refine_antecedents_optimizers,
+     dict(method="ga", population_size=40, num_generations=25, local_scale=None, local_grad_optim="none")),
+    ("optimizers_ga", refine_antecedents_optimizers,
+     dict(method="ga", population_size=80, num_generations=40, local_scale=0.25, local_grad_optim="none")),
+]
 
-    print("\n" + "=" * 78)
-    print("STAGE 2")
-    print("=" * 78)
+
+def stage4b_refiner_sweep(fitted: dict) -> pd.DataFrame:
+    results = []
+    for label, fn, kwargs in SWEEP_CONFIGS:
+        try:
+            r = refine_and_evaluate(fitted, label, fn=fn, kwargs=kwargs)
+        except Exception as exc:
+            print(f"  {label} {kwargs}: FAILED ({exc!r})")
+            continue
+        r["config"] = str(kwargs)
+        results.append(r)
+        delta = r["rmse_refined"] - r["rmse_baseline"]
+        verdict = "WORSE (CV-overfit)" if delta > 0.01 else (
+            "no real change" if abs(delta) <= 0.01 else "better")
+        print(
+            f"  {label:14s} {kwargs}  refine={r['refine_seconds']:6.1f}s  "
+            f"rmse {r['rmse_baseline']:.2f} -> {r['rmse_refined']:.2f}  ({verdict})"
+        )
+    results_df = pd.DataFrame(results)
+    results_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage4b_sweep.csv", index=False)
+    return results_df
+
+
+# --------------------------------------------------------------------------
+# Stage 5: estimate degradation onset from real sensors, not the oracle `hs`
+# --------------------------------------------------------------------------
+# `unit_physical_caps`/C3_physical use `hs`, a health-state flag the dataset
+# provides directly from the simulator's latent parameters -- not something a
+# real onboard system could read off a sensor. This tests whether a moving-
+# average changepoint detector over the actual measured channels (W + X_s
+# only) can locate the same onset well enough to use in its place.
+#
+# First attempt used raw per-cycle Xs means directly and it never fired for
+# any unit: baseline-period std was *larger* than each unit's whole-lifetime
+# std (e.g. unit 2's Xs_T24_mean: 8.66 in the first 10 cycles vs. 7.36 over
+# its full 75-cycle life). Flight-to-flight operating-condition variation
+# (different altitude/Mach/route each cycle) swamps the actual degradation
+# trend in raw sensor readings -- exactly the confound Wang et al. 2019
+# ("Remaining Useful Life Estimation Using Functional Data Analysis") correct
+# for before RUL modeling. `condition_corrected_residuals` applies the same
+# fix: regress each Xs channel on the W operating-condition channels using
+# each unit's own presumed-healthy first cycles, then hunt for onset in the
+# *residuals*, where operating-condition variation is gone and a real
+# degradation drift can actually stand out above the noise floor.
+def condition_corrected_residuals(
+    table: pd.DataFrame,
+    sensor_cols: list[str],
+    condition_cols: list[str],
+    baseline_cycles: int = 15,
+) -> pd.DataFrame:
+    from sklearn.linear_model import LinearRegression
+
+    order = table.groupby("unit").cumcount()
+    baseline = table[order < baseline_cycles]
+    X_base = baseline[condition_cols].to_numpy(dtype=np.float64)
+    X_all = table[condition_cols].to_numpy(dtype=np.float64)
+
+    resid = pd.DataFrame(index=table.index)
+    resid["unit"] = table["unit"].to_numpy()
+    resid["cycle"] = table["cycle"].to_numpy()
+    for col in sensor_cols:
+        reg = LinearRegression().fit(X_base, baseline[col].to_numpy(dtype=np.float64))
+        resid[col] = table[col].to_numpy(dtype=np.float64) - reg.predict(X_all)
+    return resid
+
+
+def detect_onset_moving_average(
+    table: pd.DataFrame,
+    sensor_cols: list[str],
+    baseline_cycles: int = 15,
+    window: int = 2,
+    z_thresh: float = 0.5,
+    sustain: int = 2,
+) -> dict[int, int]:
+    """Per unit: z-score each sensor channel's rolling `window`-cycle moving
+    average against that unit's own first-`baseline_cycles` mean/std, average
+    the |z| across channels into one combined signal, and call the onset the
+    first cycle where that signal exceeds `z_thresh` for `sustain` cycles
+    running (a blip isn't onset; a sustained departure from the healthy
+    baseline is). No `hs`, no theta -- only real sensor columns."""
+    onsets = {}
+    for unit, sub in table.groupby("unit"):
+        sub = sub.sort_values("cycle").reset_index(drop=True)
+        signals = sub[sensor_cols].to_numpy(dtype=np.float64)
+        baseline_mean = signals[:baseline_cycles].mean(axis=0)
+        baseline_std = signals[:baseline_cycles].std(axis=0) + 1e-9
+        ma = pd.DataFrame(signals).rolling(window, min_periods=1).mean().to_numpy()
+        z = np.abs((ma - baseline_mean) / baseline_std).mean(axis=1)
+
+        onset_cycle, run = None, 0
+        for i, zi in enumerate(z):
+            if i < baseline_cycles:
+                continue
+            run = run + 1 if zi > z_thresh else 0
+            if run >= sustain:
+                onset_cycle = int(sub["cycle"].iloc[i - sustain + 1])
+                break
+        onsets[unit] = onset_cycle if onset_cycle is not None else int(sub["cycle"].iloc[-1])
+    return onsets
+
+
+def stage5(agg_cache: dict, top_pipelines: list[str]):
+    train_tab, test_tab, _ = agg_cache[("A1_whole_cycle", "B1")]
+    combined = pd.concat([train_tab, test_tab], ignore_index=True)
+    condition_cols = [c for c in combined.columns if c.startswith("W_") and c.endswith("_mean")]
+    sensor_cols = [c for c in combined.columns if c.startswith("Xs_") and c.endswith("_mean")]
+
+    residuals = condition_corrected_residuals(combined, sensor_cols, condition_cols)
+    true_onset = true_onset_cycle(combined)
+    detected_onset = detect_onset_moving_average(residuals, sensor_cols)
+
+    print(f"\nOnset detection using {len(sensor_cols)} real sensor channels "
+          f"(mean per cycle, condition-corrected against {len(condition_cols)} W channels):")
+    rows = []
+    for unit in sorted(true_onset):
+        t, d = true_onset[unit], detected_onset[unit]
+        rows.append(dict(unit=unit, true_onset=t, detected_onset=d, error=d - t))
+        print(f"  unit {unit:3d}: true onset={t:3d}  detected={d:3d}  error={d - t:+4d}")
+    onset_df = pd.DataFrame(rows)
+    mae = onset_df["error"].abs().mean()
+    print(f"  MAE across {len(onset_df)} units: {mae:.1f} cycles")
+    onset_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage5_onsets.csv", index=False)
+
+    # Now: how much does the RUL-prediction pipeline lose using the detected
+    # onset for the physical cap instead of the oracle hs-derived one?
+    detected_caps = unit_caps_from_onset(combined, detected_onset)
+    results = []
+    for pipeline in top_pipelines:
+        a_name, b_name, c_name = pipeline.split("/")
+        if c_name != "C3_physical":
+            continue  # only C3_physical has an onset-derived cap to swap
+        p_train_tab, p_test_tab, _ = agg_cache[(a_name, b_name)]
+        agg_feat_cols = [c for c in p_train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")]
+        oracle_caps = unit_physical_caps(pd.concat([p_train_tab, p_test_tab], ignore_index=True))
+        for cap_name, caps in [("oracle_hs", oracle_caps), ("detected_ma", detected_caps)]:
+            r = run_one(p_train_tab, p_test_tab, agg_feat_cols, "C3_physical", caps, FIXED_D)
+            r.update(pipeline=pipeline, cap_source=cap_name)
+            results.append(r)
+            print(f"{pipeline:32s} cap={cap_name:12s} "
+                  f"rmse_test={r['rmse_test_true']:.2f}  fit={r['fit_seconds']:.2f}s")
+
+    results_df = pd.DataFrame(results)
+    results_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage5_results.csv", index=False)
+    return onset_df, results_df
+
+
+# --------------------------------------------------------------------------
+# Checkpointing: Stage 1/2 (agg_cache + stage2_results) are the cheap, always-
+# reproducible part (deterministic given random_state=42). Stage 4 alone runs
+# 20-25 minutes; a background run got killed mid-Stage-2 with no OOM or
+# reboot evidence, so each phase should be resumable independently rather
+# than re-paying the whole pipeline on any interruption.
+# --------------------------------------------------------------------------
+import pickle
+
+CACHE_PATH = "FuzzySystemsExperiments/.cmapss_rul_cache.pkl"
+
+
+def save_cache(agg_cache, stage1_results, stage2_results):
+    with open(CACHE_PATH, "wb") as f:
+        pickle.dump(dict(agg_cache=agg_cache, stage1_results=stage1_results,
+                          stage2_results=stage2_results), f)
+
+
+def load_cache():
+    with open(CACHE_PATH, "rb") as f:
+        d = pickle.load(f)
+    return d["agg_cache"], d["stage1_results"], d["stage2_results"]
+
+
+if __name__ == "__main__":
+    import os
+
     top_pipelines = [
         "A3_raw_memory/B2/C1_raw",       # best overall (includes virtual sensors -- leakage-flagged)
         "A3_raw_memory/B1/C3_physical",  # best "real-world" pipeline (W + X_s only)
         "A1_whole_cycle/B1/C3_physical", # cheapest/most interpretable alternative
     ]
-    stage2_results = stage2(agg_cache, top_pipelines)
+
+    if "--resume" in sys.argv and os.path.exists(CACHE_PATH):
+        print(f"Resuming from cache: {CACHE_PATH}")
+        agg_cache, stage1_results, stage2_results = load_cache()
+    else:
+        stage1_results, agg_cache = stage1()
+
+        print("\n" + "=" * 78)
+        print("STAGE 2")
+        print("=" * 78)
+        stage2_results = stage2(agg_cache, top_pipelines)
+        save_cache(agg_cache, stage1_results, stage2_results)
+        print(f"(cached Stage 1/2 to {CACHE_PATH})")
+
     print("\n=== Stage 2 top 10 overall ===")
     print(
         stage2_results.head(10)[
@@ -568,7 +836,13 @@ if __name__ == "__main__":
         d_kwargs["tsk_order"] = "1st"
         _, _, fitted = stage3(agg_cache, pipeline, d_kwargs)
         refine_fitted[pipeline] = fitted
-    stage4_results = stage4(refine_fitted)
+
+    stage4_csv = "FuzzySystemsExperiments/cmapss_rul_stage4_results.csv"
+    if "--resume" in sys.argv and os.path.exists(stage4_csv):
+        print(f"Resuming Stage 4 from {stage4_csv} (skipping the 20-25 min refinement rerun)")
+        stage4_results = pd.read_csv(stage4_csv)
+    else:
+        stage4_results = stage4(refine_fitted)
     print("\n=== Stage 4 summary ===")
     print(
         stage4_results[
@@ -577,8 +851,24 @@ if __name__ == "__main__":
     )
 
     print("\n" + "=" * 78)
+    print("STAGE 4b: sweep each refiner's own hyperparameters")
+    print("=" * 78)
+    print("Run on the cheapest pipeline only (~5s/config) -- also the one where "
+          "refinement overfits its CV split, the sharpest test of whether a "
+          "hyperparameter choice can rescue that failure mode.")
+    stage4b_results = stage4b_refiner_sweep(refine_fitted["A1_whole_cycle/B1/C3_physical"])
+
+    print("\n" + "=" * 78)
+    print("STAGE 5: degradation onset from real sensors, not the oracle hs flag")
+    print("=" * 78)
+    stage5_onsets, stage5_results = stage5(agg_cache, top_pipelines)
+
+    print("\n" + "=" * 78)
     print("PLOTS")
     print("=" * 78)
     from cmapss_rul_plots import make_plots
 
-    make_plots(stage1_results, stage2_results, stage3_predictions, top_pipelines, stage4_results)
+    make_plots(
+        stage1_results, stage2_results, stage3_predictions, top_pipelines,
+        stage4_results, stage4b_results, stage5_onsets, stage5_results,
+    )
