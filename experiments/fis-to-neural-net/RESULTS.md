@@ -1,11 +1,14 @@
-# Results
+# Results — the laboratory record
 
-Run of record: `results.json`, ten seeds, 150 epochs, commit `d830022`,
-`tribble-fis` `5b92ec8`. The tetrahedral follow-up is `simplicial_results.json`,
-five seeds, and the Part 3 refinements are `warped_results.json`, five seeds.
-Tables quoted here are generated, not transcribed — `results_summary.md`,
-`time_to_quality.md`, `triangularization.md`, `gating.md`, `simplicial.md`,
-`warped.md`.
+The narrative write-up is [`paper.md`](paper.md). This file is the record it
+draws on: every hypothesis as written *before* its run, and how it scored.
+
+Run of record: `outputs/results.json`, ten seeds, 150 epochs, commit `d830022`,
+`tribble-fis` `5b92ec8`. The tetrahedral follow-up is `outputs/simplicial_results.json`,
+five seeds, and the Part 3 refinements are `outputs/warped_results.json`, five seeds.
+Tables quoted here are generated, not transcribed — `outputs/results_summary.md`,
+`outputs/time_to_quality.md`, `outputs/triangularization.md`, `outputs/gating.md`, `outputs/simplicial.md`,
+`outputs/warped.md`.
 
 ## Short version
 
@@ -116,7 +119,7 @@ and both in Part 3. Several are more useful that way.
 
 ## H2 — triangularization collapses, and the mechanism is dimensional (falsified)
 
-Concrete, sweeping TRIBBLE's own `top_n` (`triangularization.md`):
+Concrete, sweeping TRIBBLE's own `top_n` (`outputs/triangularization.md`):
 
 | features kept | Gaussian RMSE | triangular RMSE | triangular dead rows |
 |---|---|---|---|
@@ -170,7 +173,7 @@ own mean — on bikeshare and WEC the FIS is mostly *not* additive.
 Wall-clock seconds to first reach a target, FIS fit and conversion charged to
 the hot arms, mean over ten seeds. Targets are multiples of the best RMSE any
 arm reached on that seed, so every arm faces the same bar. Full tables in
-`time_to_quality.md`.
+`outputs/time_to_quality.md`.
 
 **synth1d** — the rung where the conversion is exact:
 
@@ -264,7 +267,7 @@ not the one the experiment was designed to find.
 Backing the seed out of the FIS's response rather than its gates was supposed to
 make the t-norm choice structurally irrelevant. It does — a product t-norm no
 longer blocks anything. But it still reaches the seed's *quality*, because the
-norm family changes how additive the FIS is (`gating.md`):
+norm family changes how additive the FIS is (`outputs/gating.md`):
 
 | norm family | concrete FIS RMSE | seed fidelity | synth1d seed fidelity |
 |---|---|---|---|
@@ -314,7 +317,7 @@ to an axis-aligned first layer carrying only the FIS's additive part, and the
 2025 IJCCC paper's fix for exactly that is to replace triangular membership
 functions with **tetrahedral** ones. The paper is now in
 `papers/nn-fis-equivalence/`; the implementation is `simplicial.py`, the tests
-are `test_simplicial.py` (8/8), the measurements are `simplicial.md`.
+are `test_simplicial.py` (8/8), the measurements are `outputs/simplicial.md`.
 
 ## The construction, and one exactness result worth having
 
@@ -427,7 +430,7 @@ by how much data you have.
 # Part 3 — FIS-aligned vertices, and interaction-chosen subspaces
 
 Part 2 left two arbitrary choices inside the hybrid. `run_warped.py` removes
-both, one at a time, five seeds (`warped.md`).
+both, one at a time, five seeds (`outputs/warped.md`).
 
 **Where the vertices sit.** `simplicial.AxisWarp` warps each axis until the
 FIS's own knots land on lattice integers, so a unit cell is one inter-knot
@@ -540,7 +543,7 @@ of the hot start in the whole experiment.
 **`URLSimilarityIndex` alone scores 0.9914.** With it present every arm lands
 within a fraction of a point of every other and the dataset cannot distinguish
 initializations at all. `--drop-dominant` removes it; both runs are reported
-(`phiusiil.md`, `phiusiil_hard.md`).
+(`outputs/phiusiil.md`, `outputs/phiusiil_hard.md`).
 
 **The five-feature cap is a confound, not a result.** `hot` trains on the columns
 TRIBBLE kept while `he-all` trains on all 49, so they differ in inputs as well as
@@ -731,7 +734,7 @@ part, and no amount of training-time advantage changes where it starts.
   interaction rather than by importance is a one-line change with a real chance
   of moving the 17–30%.
 * **A slow-converging problem has been found and measured** —
-  `find_slow_problem.py`, `slow_problems.md`. Ranking candidates by *minibatch
+  `find_slow_problem.py`, `outputs/slow_problems.md`. Ranking candidates by *minibatch
   updates* to reach R2 >= 0.9 (updates, not seconds: they are what an
   initialization skips, and they are comparable across dataset sizes):
 

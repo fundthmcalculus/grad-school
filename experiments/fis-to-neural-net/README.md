@@ -1,6 +1,11 @@
 # Experiment: converting a TRIBBLE-built FIS into a ReLU network, and training on from there
 
-**Status:** measured · **Started:** 2026-08-16 · Results in [`RESULTS.md`](RESULTS.md)
+**Status:** measured · **Started:** 2026-08-16
+
+**Read [`paper.md`](paper.md) first** — the write-up of the whole five-part
+arc. [`RESULTS.md`](RESULTS.md) is the laboratory record behind it: the
+hypotheses as written before each run, and how each one scored. Generated
+tables and raw per-seed curves are in [`outputs/`](outputs/).
 
 ## Question
 
@@ -284,5 +289,5 @@ FIS2NN_SEEDS=0,1 python experiments/fis-to-neural-net/run_experiment.py \
     --datasets synth1d concrete --epochs 150                          # a quick look
 ```
 
-`run_experiment.py` writes `results.json` (every curve, every seed, every arm)
-and `results_summary.md` (the tables `RESULTS.md` quotes).
+`run_experiment.py` writes `outputs/results.json` (every curve, every seed, every arm)
+and `outputs/results_summary.md` (the tables `RESULTS.md` quotes).

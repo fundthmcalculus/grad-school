@@ -18,7 +18,7 @@ egress policy blocks the usual dataset hosts.
     python experiments/fis-to-neural-net/find_slow_problem.py
     python experiments/fis-to-neural-net/find_slow_problem.py --problems chirp pendulum-n2
 
-Writes `slow_problems.md`.
+Writes `outputs/slow_problems.md`.
 
 A candidate is worth taking to a full warm-start experiment when it needs
 *thousands* of updates, not tens -- that is the only regime in which saving the
@@ -40,6 +40,13 @@ REPO = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(REPO, "reproduce", "tables"))
 sys.path.insert(0, os.path.join(REPO, "AnalyticalDynamics", "chaos"))
+
+#: Every generated artifact goes here. Kept out of the source directory so the
+#: scripts and the things they produce never have to be told apart by eye, and
+#: so `outputs/.gitignore` can drop derived CSVs without a rule that could ever
+#: match a hand-written file.
+OUTPUTS = os.path.join(HERE, "outputs")
+os.makedirs(OUTPUTS, exist_ok=True)
 
 import fis2nn  # noqa: E402
 
@@ -200,11 +207,34 @@ def updates_to_target(X, y, lr, seed, max_updates, batch=BATCH, hidden=HIDDEN):
     return float(hist.epochs[hit[0]]) * n_batches, best
 
 
+def guard_output(path, force):
+    """Refuse to overwrite an existing run of record unless asked twice.
+
+    Writing this file cost tens of minutes; a smoke run with the default `--out`
+    costs seconds and silently replaces it. That happened once while this
+    directory was being reorganized -- a one-seed, five-epoch synth1d run landed
+    on top of the ten-seed, 150-epoch `results.json` -- and it is the same
+    failure `WORKINGDOC.md` catalogues under REPRO_OUTPUT_DIR. Recovering it
+    needed `git checkout`, which only worked because the file happened to be
+    staged.
+    """
+    if os.path.exists(path) and not force:
+        raise SystemExit(
+            f"{os.path.relpath(path, REPO)} already exists.\n"
+            "Pass --force to replace it, or --out <path> to write elsewhere "
+            "(which is what a smoke run should do)."
+        )
+    return path
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--problems", nargs="*", default=list(PROBLEMS))
     ap.add_argument("--seeds", type=int, default=2)
     ap.add_argument("--max-updates", type=int, default=MAX_UPDATES)
+    ap.add_argument(
+        "--force", action="store_true", help="overwrite an existing run of record"
+    )
     args = ap.parse_args()
 
     rows = []
@@ -305,10 +335,11 @@ def main() -> int:
         )
     lines.append("")
 
-    path = os.path.join(HERE, "slow_problems.md")
+    path = os.path.join(OUTPUTS, "slow_problems.md")
     with open(path, "w") as fh:
         fh.write("\n".join(lines) + "\n")
-    with open(os.path.join(HERE, "slow_problems.json"), "w") as fh:
+    guarded = guard_output(os.path.join(OUTPUTS, "slow_problems.json"), args.force)
+    with open(guarded, "w") as fh:
         json.dump(rows, fh, indent=1)
     print("\n" + "\n".join(lines))
     print(f"wrote {os.path.relpath(path, REPO)}")
