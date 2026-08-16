@@ -9,6 +9,7 @@ and RUL target shaping (C) at a fixed model configuration (D), per the
 """
 
 import contextlib
+import copy
 import io
 import itertools
 import time
@@ -20,8 +21,23 @@ from sklearn.metrics import mean_squared_error
 
 from tribblefis.gaussian_regressor import TribbleRegressor
 from tribblefis.gaussian_regressor_memory import MemoryWindowFeatureExtractor
+from tribblefis.regression import partition_output, solve_tsk_consequents
+from tribblefis.refine import refine_antecedents_coordinate, refine_antecedents_local
 
 H5_PATH = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+
+# Naive baselines and published DS02 deep-learning references (see PR
+# description for full citations). RMSE is comparable across papers
+# regardless of subsampling rate (it's a per-sample statistic); the NASA
+# score is NOT -- it scales with the number of test samples m*, and
+# different papers subsample DS02 at different rates, so raw score
+# magnitudes across sources are not directly comparable without matching m*.
+BASELINE_RMSE = {
+    "random baseline": 26.85,
+    "constant-mean baseline": 18.97,
+    "published CNN (DS02, released file)": 7.22,   # Custode et al. 2022, re-run
+    "published MLP (DS02, released file)": 8.34,   # Custode et al. 2022, re-run
+}
 
 FIXED_D = dict(
     tsk_order="1st", n_gaussians=0, top_p=0.95, detect_interactions=False
@@ -382,7 +398,109 @@ def stage3(agg_cache: dict, pipeline: str, d_kwargs: dict):
             "RUL_pred": pred_test,
         }
     ).sort_values(["unit", "cycle"])
-    return r, predictions
+    fitted = dict(
+        model=model, X_train=X_train, y_train=y_train,
+        X_test=X_test, y_test_true=y_test_true, fit_seconds=r["fit_seconds"],
+    )
+    return r, predictions, fitted
+
+
+# --------------------------------------------------------------------------
+# Stage 4: does iterative antecedent refinement improve on the heuristic fit?
+# --------------------------------------------------------------------------
+REFINERS = {
+    "coordinate": (refine_antecedents_coordinate, dict(n_sweeps=3)),
+    "local": (refine_antecedents_local, dict(maxiter=80, maxfun=15000)),
+}
+
+
+def refine_and_evaluate(fitted: dict, refiner_name: str) -> dict:
+    """Refine a fitted TribbleRegressor's Gaussian antecedents, re-solve the
+    TSK consequents against the refined antecedents (exactly what `fit()`
+    does at the end of its own heuristic construction), and compare test
+    RMSE against the un-refined baseline.
+
+    TribbleRegressor has no public `refine=` switch (unlike TribbleClassifier);
+    this calls tribblefis.refine's lower-level antecedent refiners directly,
+    reproducing the plumbing TribbleClassifier.fit() does internally.
+    """
+    model = fitted["model"]
+    X_train_df = pd.DataFrame(fitted["X_train"], columns=model.feature_names_in_)
+    y_series = pd.Series(fitted["y_train"], name="y_value")
+    y_part, y_bucket_mean = partition_output(
+        model.n_output_buckets, y_series, method=model.output_partition
+    )
+
+    fn, kwargs = REFINERS[refiner_name]
+    t0 = time.perf_counter()
+    with contextlib.redirect_stdout(io.StringIO()):
+        refined_model, info = fn(
+            model.model_, X_train_df, y_part, model.top_features_,
+            n_output_buckets=model.n_output_buckets, order=model.tsk_order,
+            l2_reg=model.l2_reg, basis=model.consequent_basis,
+            cross_pairs=model.cross_pairs_, **kwargs,
+        )
+        corr_terms, ybm = solve_tsk_consequents(
+            X_train_df, refined_model, model.top_features_, y_bucket_mean, y_part,
+            n_output_buckets=model.n_output_buckets, order=model.tsk_order,
+            l2_reg=model.l2_reg, basis=model.consequent_basis,
+            pin_extremes=model.pin_extremes, norms=model._norms(),
+            cross_pairs=model.cross_pairs_, rbf_centers=model.rbf_centers_,
+            rbf_gamma=model.rbf_gamma, rbf_radius=model.rbf_radius,
+        )
+    refine_seconds = time.perf_counter() - t0
+
+    refined = copy.deepcopy(model)
+    refined.model_, refined.corr_terms_, refined.y_bucket_mean_ = refined_model, corr_terms, ybm
+    pred_refined = refined.predict(fitted["X_test"])
+    rmse_refined = float(np.sqrt(mean_squared_error(fitted["y_test_true"], pred_refined)))
+    rmse_baseline = float(np.sqrt(mean_squared_error(
+        fitted["y_test_true"], model.predict(fitted["X_test"])
+    )))
+
+    return dict(
+        refiner=refiner_name,
+        refine_seconds=refine_seconds,
+        rmse_baseline=rmse_baseline,
+        rmse_refined=rmse_refined,
+        val_mse_before=info["init_val_mse"],
+        val_mse_after=info["val_mse"],
+    )
+
+
+def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
+    """Try each refiner on each pipeline's Stage 3 model, skipping (and
+    reporting) any that would blow the seconds-scale training budget --
+    the DOE's own fallback for a slow grid corner, applied here to
+    refinement instead of the Factor D grid."""
+    results = []
+    for pipeline, fitted in fitted_by_pipeline.items():
+        n_mf = fitted["model"].model_.n_membership_functions
+        n_rows = len(fitted["X_train"])
+        print(f"\nRefining {pipeline} ({n_mf} membership functions, {n_rows} train rows) ...")
+        for refiner_name in REFINERS:
+            try:
+                r = refine_and_evaluate(fitted, refiner_name)
+            except Exception as exc:
+                print(f"  {refiner_name}: FAILED ({exc!r})")
+                continue
+            r["pipeline"] = pipeline
+            results.append(r)
+            delta = r["rmse_refined"] - r["rmse_baseline"]
+            verdict = "WORSE (CV-overfit)" if delta > 0.01 else (
+                "no real change" if abs(delta) <= 0.01 else "better")
+            print(
+                f"  {refiner_name:10s} refine={r['refine_seconds']:6.1f}s  "
+                f"rmse {r['rmse_baseline']:.2f} -> {r['rmse_refined']:.2f}  ({verdict})"
+            )
+            cost_ratio = r["refine_seconds"] / max(fitted["fit_seconds"], 0.01)
+            if r["refine_seconds"] > timeout_seconds:
+                print(f"    NOTE: {cost_ratio:.0f}x the baseline fit time -- "
+                      f"not viable under the seconds budget regardless of accuracy.")
+
+    results_df = pd.DataFrame(results)
+    results_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage4_results.csv", index=False)
+    return results_df
 
 
 if __name__ == "__main__":
@@ -409,6 +527,7 @@ if __name__ == "__main__":
     print("STAGE 3")
     print("=" * 78)
     stage3_predictions = {}
+    stage3_fitted = {}
     for pipeline in top_pipelines:
         sub = stage2_results[stage2_results["pipeline"] == pipeline]
         if sub.empty:
@@ -417,16 +536,49 @@ if __name__ == "__main__":
         d_kwargs = {k: best_row[k] for k in D_GRID.keys()}
         d_kwargs["n_gaussians"] = int(d_kwargs["n_gaussians"])
         d_kwargs["detect_interactions"] = bool(d_kwargs["detect_interactions"])
-        _, preds = stage3(agg_cache, pipeline, d_kwargs)
+        _, preds, fitted = stage3(agg_cache, pipeline, d_kwargs)
         stage3_predictions[pipeline] = preds
+        stage3_fitted[pipeline] = fitted
         preds.to_csv(
             f"FuzzySystemsExperiments/cmapss_rul_stage3_{pipeline.replace('/', '_')}.csv",
             index=False,
         )
 
     print("\n" + "=" * 78)
+    print("STAGE 4: iterative antecedent refinement")
+    print("=" * 78)
+    print(
+        "Two of three Stage 3 configs use tsk_order='full-2nd'; a coordinate-descent "
+        "refinement pass alone took >60s on those (vs a 0.3-0.6s heuristic fit) and "
+        "was killed rather than let it run unbounded. Refinement here is tested "
+        "against each pipeline's Stage 2 config with tsk_order forced to '1st' "
+        "instead -- the cheapest order that keeps refinement itself inside a "
+        "reasonable multiple of the seconds budget -- not the literal Stage 3 "
+        "best-RMSE config."
+    )
+    refine_fitted = {}
+    for pipeline in top_pipelines:
+        sub = stage2_results[stage2_results["pipeline"] == pipeline]
+        if sub.empty:
+            continue
+        best_row = sub.loc[sub["rmse_test_true"].idxmin()]
+        d_kwargs = {k: best_row[k] for k in D_GRID.keys()}
+        d_kwargs["n_gaussians"] = int(d_kwargs["n_gaussians"])
+        d_kwargs["detect_interactions"] = bool(d_kwargs["detect_interactions"])
+        d_kwargs["tsk_order"] = "1st"
+        _, _, fitted = stage3(agg_cache, pipeline, d_kwargs)
+        refine_fitted[pipeline] = fitted
+    stage4_results = stage4(refine_fitted)
+    print("\n=== Stage 4 summary ===")
+    print(
+        stage4_results[
+            ["pipeline", "refiner", "refine_seconds", "rmse_baseline", "rmse_refined"]
+        ].to_string(index=False)
+    )
+
+    print("\n" + "=" * 78)
     print("PLOTS")
     print("=" * 78)
     from cmapss_rul_plots import make_plots
 
-    make_plots(stage1_results, stage2_results, stage3_predictions, top_pipelines)
+    make_plots(stage1_results, stage2_results, stage3_predictions, top_pipelines, stage4_results)
