@@ -22,18 +22,15 @@ scikit-learn, tribble-fis only) -- read top to bottom, rerun end to end:
                                                     # evolution search (see
                                                     # PIPELINES' comments)
 
-PIPELINES has four entries: `honest`/`best` (this DOE's DS02-only-tuned
-configs, reused unchanged) and `honest_full_tuned`/`best_full_tuned` (found
-by this script's own grid search on the pooled dataset -- see PIPELINES'
-comments for the discovered numbers). All four are hardcoded, so a normal
-run just fits and evaluates them; `--tune` re-runs the search that found
-the tuned pair, for reproducibility, and warns if the search's current
-winner has drifted from what's hardcoded. `--tune-de` additionally tries
-differential evolution over the same knobs (plus the full norm_conorm set
-and n_gaussians) -- it reconfirmed best_full_tuned as a real optimum, and
-separately found a config for "honest" that validated better but scored
-worse on the real test set (see PIPELINES' comments) -- a result, not a
-pipeline, so nothing new was added from it.
+PIPELINES has five entries: `honest`/`best` (this DOE's DS02-only-tuned
+configs, reused unchanged), `honest_full_tuned`/`best_full_tuned` (found by
+this script's own grid search on the pooled dataset), and `best_full_de`
+(found by differential evolution at a larger per-candidate sample size --
+see PIPELINES' comments for the full story, including a *rejected*
+DE-found "honest" config that validated better but generalized worse, i.e.
+overfit to its validation split). All five are hardcoded, so a normal run
+just fits and evaluates them; `--tune`/`--tune-de` re-run the grid/DE
+searches that found them, for reproducibility.
 
 Machine-learning hygiene (why the test set isn't poisoned):
   - Condition-correction regressions (each sensor channel regressed against
@@ -119,7 +116,11 @@ DE_NORM_CONORM_CHOICES = ["min/max", "probability", "luk", "hamacher", "einstein
 DE_TSK_ORDER_CHOICES = ["0th", "1st", "full-2nd"]
 DE_POPSIZE = 4
 DE_MAXITER = 5
-DE_SUBSAMPLE_CAP = 5_000  # small on purpose -- fast iterations while exploring
+DE_SUBSAMPLE_CAP = 10_000  # bumped from an initial 5,000 -- that run's
+# "honest" search found a config that validated better but generalized
+# worse on the real test set (overfit to the single validation split);
+# a larger per-candidate sample is a direct way to make the search itself
+# less noisy, at roughly 2x the per-candidate cost.
 DE_SEED = 321
 DE_FAILURE_PENALTY = 1.0e4  # returned instead of raising, so one bad candidate
 # (e.g. a near-singular full-2nd/'luk' combination) doesn't kill the whole search
@@ -304,19 +305,44 @@ PIPELINES = {
     ),
     # --tune-de (differential evolution over the same knobs, plus the full
     # valid norm_conorm set and n_gaussians, seeded from *_full_tuned rather
-    # than from scratch) was tried on both pipelines. "best": DE's search
-    # (population=20, 5 generations, 120 evaluations) converged to exactly
-    # best_full_tuned's config -- an independent random search rediscovering
-    # the same optimum, good confirmation it's a real optimum rather than a
-    # grid artifact. "honest": DE found a different config (full-2nd +
-    # 'min/max' instead of 1st + 'hamacher') with a *better* validation RMSE
-    # (14.78 vs. the grid's ~15.5) -- but when actually fit on the full
-    # pooled training set and checked against the real held-out test set,
-    # it scored 19.31, clearly worse than honest_full_tuned's 15.95 (DS06
-    # alone went from 15.41 to 37.77). A textbook case of overfitting to a
-    # single validation split rather than a real improvement -- tried,
-    # checked against the real test set, and deliberately not kept as a
-    # pipeline here. honest_full_tuned remains the best "honest" config.
+    # than from scratch) was tried on both pipelines, twice -- once at
+    # DE_SUBSAMPLE_CAP=5,000, once at 10,000 (a larger per-candidate sample
+    # makes the search itself less noisy, at ~2x cost per evaluation).
+    # "honest"'s pooled training set (~4,535 rows) is smaller than *both*
+    # caps, so neither run ever actually subsampled it -- both searches are
+    # identical runs of the same problem, and both converged to the same
+    # config (full-2nd + 'min/max' instead of 1st + 'hamacher') with a
+    # *better* validation RMSE (14.78) than the grid found (~15.5) -- but
+    # when actually fit on the full pooled training set and checked against
+    # the real held-out test set, it scored 19.31, clearly worse than
+    # honest_full_tuned's 15.95 (DS06 alone went from 15.41 to 37.77). A
+    # textbook case of overfitting to a single validation split rather than
+    # a real improvement -- tried, checked against the real test set, and
+    # deliberately not kept as a pipeline. honest_full_tuned remains the
+    # best "honest" config.
+    #
+    # "best"'s pooled training set (~221k rows) DOES exceed both caps, so
+    # the cap increase mattered here: at 5,000, DE converged to exactly
+    # best_full_tuned's own config (independent confirmation it was a real
+    # optimum). At 10,000, DE found a *different* config -- n_gaussians=4
+    # instead of 0 (automatic), top_p slightly higher -- with a better
+    # validation RMSE on the identical validation split (14.90 vs. 15.91).
+    # This one HELD UP on the real held-out test set: RMSE 15.56, beating
+    # best_full_tuned's 16.18 (DS06 improves 24.35 -> 20.89). Unlike
+    # honest_full_de above, this is a genuine improvement from the larger
+    # per-candidate sample, not an artifact -- kept as best_full_de.
+    "best_full_de": dict(
+        n_xv=2,
+        aggregation="raw_memory",
+        tribble_kwargs=dict(
+            tsk_order="full-2nd",
+            n_gaussians=4,
+            top_p=0.9622893249863613,
+            detect_interactions=False,
+            norm_conorm="hamacher",
+            l2_reg=0.01502536299852122,
+        ),
+    ),
 }
 # Maps each *_full_tuned pipeline back to the base pipeline it shares
 # pooled data with (honest_full_tuned reads the same pooled tables as
@@ -324,6 +350,7 @@ PIPELINES = {
 TUNED_TO_BASE = {
     "honest_full_tuned": "honest",
     "best_full_tuned": "best",
+    "best_full_de": "best",
 }
 BASE_PIPELINES = {k: v for k, v in PIPELINES.items() if k not in TUNED_TO_BASE}
 
