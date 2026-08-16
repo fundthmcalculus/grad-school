@@ -31,7 +31,7 @@ choice at a time:
     python experiments/fis-to-neural-net/run_warped.py
     python experiments/fis-to-neural-net/run_warped.py --datasets synth1d concrete
 
-Writes `warped_results.json` and `warped.md`. Leaves `run_simplicial.py`'s
+Writes `outputs/warped_results.json` and `outputs/warped.md`. Leaves `run_simplicial.py`'s
 outputs untouched.
 """
 
@@ -52,6 +52,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(REPO, "reproduce", "tables"))
+
+#: Every generated artifact goes here. Kept out of the source directory so the
+#: scripts and the things they produce never have to be told apart by eye, and
+#: so `outputs/.gitignore` can drop derived CSVs without a rule that could ever
+#: match a hand-written file.
+OUTPUTS = os.path.join(HERE, "outputs")
+os.makedirs(OUTPUTS, exist_ok=True)
 
 import fis2nn  # noqa: E402
 import simplicial  # noqa: E402
@@ -284,11 +291,34 @@ def summarize(results):
     return "\n".join(lines) + "\n"
 
 
+def guard_output(path, force):
+    """Refuse to overwrite an existing run of record unless asked twice.
+
+    Writing this file cost tens of minutes; a smoke run with the default `--out`
+    costs seconds and silently replaces it. That happened once while this
+    directory was being reorganized -- a one-seed, five-epoch synth1d run landed
+    on top of the ten-seed, 150-epoch `results.json` -- and it is the same
+    failure `WORKINGDOC.md` catalogues under REPRO_OUTPUT_DIR. Recovering it
+    needed `git checkout`, which only worked because the file happened to be
+    staged.
+    """
+    if os.path.exists(path) and not force:
+        raise SystemExit(
+            f"{os.path.relpath(path, REPO)} already exists.\n"
+            "Pass --force to replace it, or --out <path> to write elsewhere "
+            "(which is what a smoke run should do)."
+        )
+    return path
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--datasets", nargs="*", default=list(DATASETS))
     ap.add_argument("--l2", type=float, default=1e-6)
-    ap.add_argument("--out", default=os.path.join(HERE, "warped_results.json"))
+    ap.add_argument("--out", default=os.path.join(OUTPUTS, "warped_results.json"))
+    ap.add_argument(
+        "--force", action="store_true", help="overwrite an existing run of record"
+    )
     args = ap.parse_args()
 
     results = []
@@ -316,9 +346,9 @@ def main() -> int:
                 flush=True,
             )
 
-    with open(args.out, "w") as fh:
+    with open(guard_output(args.out, args.force), "w") as fh:
         json.dump({"seeds": SEEDS, "results": results}, fh, indent=1)
-    path = os.path.join(HERE, "warped.md")
+    path = os.path.join(OUTPUTS, "warped.md")
     with open(path, "w") as fh:
         fh.write(summarize(results))
     print(f"\nwrote {os.path.relpath(path, REPO)}")

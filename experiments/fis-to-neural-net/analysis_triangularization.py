@@ -17,7 +17,7 @@ features, so the failure is a dimension effect, and this script shows the curve.
 
     python experiments/fis-to-neural-net/analysis_triangularization.py
 
-Writes `triangularization.md` next to this file.
+Writes `outputs/triangularization.md`.
 """
 
 from __future__ import annotations
@@ -33,6 +33,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(REPO, "reproduce", "tables"))
+
+#: Every generated artifact goes here. Kept out of the source directory so the
+#: scripts and the things they produce never have to be told apart by eye, and
+#: so `outputs/.gitignore` can drop derived CSVs without a rule that could ever
+#: match a hand-written file.
+OUTPUTS = os.path.join(HERE, "outputs")
+os.makedirs(OUTPUTS, exist_ok=True)
 
 import _fuzzy_models as fm  # noqa: E402
 import fis2nn  # noqa: E402
@@ -142,7 +149,7 @@ def main() -> int:
         )
         print(lines[-1], flush=True)
 
-    out = os.path.join(HERE, "triangularization.md")
+    out = os.path.join(OUTPUTS, "triangularization.md")
     with open(out, "w") as fh:
         fh.write("\n".join(lines) + "\n")
     print(f"\nwrote {os.path.relpath(out, REPO)}")

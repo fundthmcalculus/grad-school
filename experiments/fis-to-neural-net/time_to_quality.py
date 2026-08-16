@@ -16,13 +16,13 @@ chosen to flatter one:
 plus the FIS's own accuracy, which is the bar the conversion has to clear for
 "the network starts where the FIS left off" to mean anything.
 
-Reads `results.json` (already written by `run_experiment.py`) and needs no
+Reads `outputs/results.json` (already written by `run_experiment.py`) and needs no
 re-run: every arm's per-epoch test curve, per-epoch cost, and setup cost are
 recorded there.
 
     python experiments/fis-to-neural-net/time_to_quality.py
 
-Writes `time_to_quality.md` next to this file.
+Writes `outputs/time_to_quality.md`.
 """
 
 from __future__ import annotations
@@ -34,6 +34,13 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
+
+#: Every generated artifact goes here. Kept out of the source directory so the
+#: scripts and the things they produce never have to be told apart by eye, and
+#: so `outputs/.gitignore` can drop derived CSVs without a rule that could ever
+#: match a hand-written file.
+OUTPUTS = os.path.join(HERE, "outputs")
+os.makedirs(OUTPUTS, exist_ok=True)
 
 TARGET_MULTIPLES = (1.50, 1.25, 1.10, 1.05)
 REFERENCE_ARM = "he-all"  # the arm that got no FIS output of any kind
@@ -64,7 +71,7 @@ def fmt(values, hits, n):
 
 
 def main() -> int:
-    path = os.path.join(HERE, "results.json")
+    path = os.path.join(OUTPUTS, "results.json")
     if not os.path.exists(path):
         print(f"no {path}; run run_experiment.py first")
         return 1
@@ -192,7 +199,7 @@ def main() -> int:
             "",
         ]
 
-    out = os.path.join(HERE, "time_to_quality.md")
+    out = os.path.join(OUTPUTS, "time_to_quality.md")
     with open(out, "w") as fh:
         fh.write("\n".join(lines) + "\n")
     print("\n".join(lines))

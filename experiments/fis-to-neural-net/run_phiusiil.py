@@ -30,7 +30,7 @@ Two measurement notes that the write-up has to carry:
     python experiments/fis-to-neural-net/run_phiusiil.py
     FIS2NN_SEEDS=0 python experiments/fis-to-neural-net/run_phiusiil.py --epochs 20
 
-Writes `phiusiil_results.json` and `phiusiil.md`.
+Writes `outputs/phiusiil_results.json` and `outputs/phiusiil.md`.
 """
 
 from __future__ import annotations
@@ -50,6 +50,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(REPO, "reproduce", "tables"))
+
+#: Every generated artifact goes here. Kept out of the source directory so the
+#: scripts and the things they produce never have to be told apart by eye, and
+#: so `outputs/.gitignore` can drop derived CSVs without a rule that could ever
+#: match a hand-written file.
+OUTPUTS = os.path.join(HERE, "outputs")
+os.makedirs(OUTPUTS, exist_ok=True)
 
 import _fuzzy_models as fm  # noqa: E402
 import fis2nn  # noqa: E402
@@ -430,6 +437,26 @@ def summarize(rows, meta):
     return "\n".join(lines) + "\n"
 
 
+def guard_output(path, force):
+    """Refuse to overwrite an existing run of record unless asked twice.
+
+    Writing this file cost tens of minutes; a smoke run with the default `--out`
+    costs seconds and silently replaces it. That happened once while this
+    directory was being reorganized -- a one-seed, five-epoch synth1d run landed
+    on top of the ten-seed, 150-epoch `results.json` -- and it is the same
+    failure `WORKINGDOC.md` catalogues under REPRO_OUTPUT_DIR. Recovering it
+    needed `git checkout`, which only worked because the file happened to be
+    staged.
+    """
+    if os.path.exists(path) and not force:
+        raise SystemExit(
+            f"{os.path.relpath(path, REPO)} already exists.\n"
+            "Pass --force to replace it, or --out <path> to write elsewhere "
+            "(which is what a smoke run should do)."
+        )
+    return path
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--epochs", type=int, default=30)
@@ -448,12 +475,15 @@ def main() -> int:
         help=f"exclude {DOMINANT_FEATURE}, which alone scores 0.9914 and makes "
         "every arm look identical",
     )
+    ap.add_argument(
+        "--force", action="store_true", help="overwrite an existing run of record"
+    )
     args = ap.parse_args()
 
     drop = (DOMINANT_FEATURE,) if args.drop_dominant else ()
     tag = "_hard" if args.drop_dominant else ""
-    out_path = args.out or os.path.join(HERE, f"phiusiil{tag}_results.json")
-    md_path = os.path.join(HERE, f"phiusiil{tag}.md")
+    out_path = args.out or os.path.join(OUTPUTS, f"phiusiil{tag}_results.json")
+    md_path = os.path.join(OUTPUTS, f"phiusiil{tag}.md")
 
     if not os.path.exists(DATA):
         print(f"missing {DATA}\nRecover it with the command in data/.gitignore.")
@@ -491,7 +521,7 @@ def main() -> int:
         "top_n": FIS_TOP_N,
         "dropped": list(drop),
     }
-    with open(out_path, "w") as fh:
+    with open(guard_output(out_path, args.force), "w") as fh:
         json.dump({"meta": meta, "results": rows}, fh, indent=1)
     with open(md_path, "w") as fh:
         fh.write(summarize(rows, meta))
