@@ -8,22 +8,22 @@ NASA score is exponential in per-sample error, so a handful of large-outlier pre
 
 | dataset | status | seconds |
 |---|---|---:|
-| DS01 | ok | 15.9 |
-| DS02 | ok | 13.0 |
-| DS03 | ok | 20.2 |
-| DS04 | ok | 20.0 |
-| DS05 | ok | 13.7 |
-| DS06 | ok | 13.5 |
-| DS07 | ok | 14.3 |
-| DS08a | ok | 16.4 |
-| DS08c | ok | 12.4 |
+| DS01 | ok | 16.1 |
+| DS02 | ok | 13.2 |
+| DS03 | ok | 20.8 |
+| DS04 | ok | 20.6 |
+| DS05 | ok | 14.1 |
+| DS06 | ok | 13.8 |
+| DS07 | ok | 14.7 |
+| DS08a | ok | 17.8 |
+| DS08c | ok | 13.3 |
 | DS08d | skipped: OSError('Unable to synchronously open file (truncated file: eof = 2885034848, sblock->base_addr = 0, stored_eof = 2885034880)') | nan |
 
 ## Pipeline: `honest`
 
 - Training rows: 4,535  |  pooled test rows: 2,938
 - **RMSE (combined test set): 15.95**  |  NASA score: 14,106
-- Fit time: 0.94s
+- Fit time: 0.97s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -43,7 +43,7 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 
 - Training rows: 50,000 (subsampled from 221,345 pooled rows, seed=42)  |  pooled test rows: 128,208
 - **RMSE (combined test set): 17.70**  |  NASA score: 1,169,750,028,202,100,871,724,246,499,328
-- Fit time: 20.97s
+- Fit time: 23.63s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -63,7 +63,7 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 
 - Training rows: 4,535  |  pooled test rows: 2,938
 - **RMSE (combined test set): 15.95**  |  NASA score: 14,106
-- Fit time: 0.91s
+- Fit time: 0.97s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -83,7 +83,7 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 
 - Training rows: 50,000 (subsampled from 221,345 pooled rows, seed=42)  |  pooled test rows: 128,208
 - **RMSE (combined test set): 16.18**  |  NASA score: 24,123,921,303,008,108,544
-- Fit time: 4.57s
+- Fit time: 5.25s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -99,4 +99,4 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 | DS08a | 12.16 | 18618 |
 | DS08c | 12.98 | 10592 |
 
-Total wall time: 171.6s
+Total wall time: 180.4s
