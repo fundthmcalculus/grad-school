@@ -1,97 +1,96 @@
 # Neural-network / fuzzy-inference-system equivalence (Bede, Kreinovich & Toth)
 
-The source material for `experiments/fis-to-neural-net/`. Two papers, one result,
-extended once:
+The source material for `experiments/fis-to-neural-net/`. **Three** papers, one
+result, extended twice:
 
 | | |
 |---|---|
-| **NAFIPS 2023** | Bede, Kreinovich & Toth, *Equivalence Between 1-D Takagi–Sugeno Fuzzy Systems with Triangular Membership Functions and Neural Networks with ReLU Activation*. In *Fuzzy Information Processing 2023* (NAFIPS 2023), Lecture Notes in Networks and Systems **751**, Springer, pp. 44–56. DOI [`10.1007/978-3-031-46778-3_5`](https://doi.org/10.1007/978-3-031-46778-3_5). Outstanding-paper award at that meeting. |
-| **IJCCC 2025** | Bede, Kreinovich & Toth, *On equivalence between Takagi–Sugeno–Kang fuzzy systems with triangular membership functions and Neural Networks with ReLU activation in two or more dimensions*. *International Journal of Computers Communications & Control* **20**(4). DOI [`10.15837/ijccc.2025.4.7127`](https://doi.org/10.15837/ijccc.2025.4.7127). Open access. |
+| **NAFIPS 2023** | *Equivalence Between 1-D Takagi–Sugeno Fuzzy Systems with Triangular Membership Functions and Neural Networks with ReLU Activation*, pp. 44–56, Springer (LNNS 751). DOI [`10.1007/978-3-031-46778-3_5`](https://doi.org/10.1007/978-3-031-46778-3_5). |
+| **NAFIPS 2024** | *Equivalence between TSK fuzzy systems with triangular membership functions and neural networks with ReLU activation on the real line*, Springer. |
+| **IJCCC 2025** | *On equivalence between Takagi–Sugeno–Kang fuzzy systems with triangular membership functions and Neural Networks with ReLU activation in two or more dimensions*, **20**(4), August 2025, article 7127. DOI [`10.15837/ijccc.2025.4.7127`](https://doi.org/10.15837/ijccc.2025.4.7127). **PDF in this directory** (`bede-kreinovich-toth-2025-ijccc-nd.pdf`, supplied by the author). |
 
-## The PDFs are not in this directory
+**A citation correction worth keeping:** a web search for the "on the real
+line" title returns the 2023 conference and its outstanding-paper award, which
+makes it look like the 2023 and 2024 papers are one paper. The 2025 paper's own
+bibliography settles it — the 1-D paper is [2], 2023, pp. 44–56; "on the real
+line" is [3], 2024. `references.bib` records both separately.
 
-Nothing was downloaded. This session's egress proxy denies every scholarly host
-— `link.springer.com`, `univagora.ro` (the IJCCC publisher, which serves this
-article open access), `scholarworks.utep.edu` (where Kreinovich mirrors
-essentially everything as a UTEP CS technical report), `doi.org`,
-`researchgate.net`, and the Crossref/OpenAlex/Semantic Scholar APIs — with a
-`403` on `CONNECT`. Only GitHub hosts and PyPI are reachable. That is an
-organization egress policy, not a transient failure, so it is reported rather
-than worked around.
+The two NAFIPS PDFs are still missing. This session's egress proxy answers 403
+on CONNECT to every scholarly host (Springer, doi.org, UTEP ScholarWorks,
+Crossref/OpenAlex/Semantic Scholar); only GitHub and PyPI are reachable.
+`./fetch_paper.sh` will retrieve what it can from a normal network.
 
-Run `./fetch_paper.sh` from any machine with normal network access and both
-PDFs land here. The IJCCC one needs no subscription; the NAFIPS chapter needs
-either a Springer subscription, a UTEP ScholarWorks preprint search, or — most
-directly — asking Dr. Kreinovich, who mirrors his own work.
+## What the results say
 
-Everything below and everything in `references.bib` is therefore assembled from
-search-result metadata, not from a fetched copy. Bibliographic fields carry the
-same `[V]`/`[?]` verification markers this repository already uses in
-`papers/least-action-review/references.bib`. **Confirm the two `[?]` fields
-against a real copy before either entry ships in a bibliography.**
-
-## What the result says
-
-The one-dimensional statement, which is what the experiment builds on:
-
-> A Takagi–Sugeno fuzzy system over one input, whose antecedents are triangular
-> membership functions and whose consequents are singletons, computes exactly
-> the same function as a feedforward neural network with one hidden layer of
-> ReLU units — and conversely.
-
-The mechanism is a single identity. A triangular membership function with feet
-`a`, `c` and apex `b` is a sum of three ReLUs of the input:
+**One dimension (2023).** For every TS system with triangular membership
+functions there is a one-hidden-layer ReLU network computing the same function,
+and conversely. The mechanism is a single identity, quoted from the paper:
 
 ```
-T(x; a, b, c) = s_a * relu(x - a) - (s_a + s_c) * relu(x - b) + s_c * relu(x - c)
-s_a = 1 / (b - a),   s_c = 1 / (c - b)
+A(x) = [phi(x-a) - phi(x-b)] / (b-a)  -  [phi(x-b) - phi(x-c)] / (c-b)
 ```
 
-so the fuzzy term *is* a hidden-layer motif, and the membership function's
-knots *are* the ReLU biases. Both sides of the equivalence are the class of
-continuous piecewise-linear functions of one variable; the fuzzy system and the
-network are two coordinate systems on it. The direction the papers emphasize is
-network → rules (an explainability result: a trained ReLU network can be *read*
-as a rule base). `experiments/fis-to-neural-net/` runs it the other way, rules
-→ network, to use a constructed FIS as an initialization.
+which expands to `s_a*relu(x-a) - (s_a+s_c)*relu(x-b) + s_c*relu(x-c)` with
+`s_a = 1/(b-a)`, `s_c = 1/(c-b)`. A fuzzy term is a hidden-layer motif and its
+knots are the ReLU biases. The paper also gives the degenerate `a = b` and
+`b = c` forms, which matter because a Ruspini partition's end terms are
+shoulders. `fis2nn.triangle_to_relu` implements exactly this.
 
-Two preconditions do real work, and are exactly what the n-dimensional sequel
-had to engineer around:
+**Two or more dimensions (2025).** Triangles are replaced by **tetrahedral**
+membership functions. The argument runs network → rules:
 
-1. **Partition of unity.** The terms must sum to 1 everywhere — a Ruspini
-   partition — so that the TSK firing-strength normalization is a division by 1
-   and disappears. Division is not in the piecewise-linear class, so without
-   this the equivalence is false.
-2. **Singleton (or affine) consequents,** so the output is a fixed linear
-   combination of the terms.
+1. A ReLU network is a composition of piecewise-linear maps, so it is affine on
+   each of finitely many polyhedral cells.
+2. Every polyhedron can be triangulated into simplices, and inside a simplex the
+   barycentric coordinates `c_i(x)` are affine and sum to 1.
+3. So a linear function on a simplex is `p+1` TSK rules, `If c_i(x) then z = L(v_i)`.
+4. Collecting, for each vertex `p`, every `c_i` that equals 1 there gives one
+   piecewise-linear membership function `M_p` — a **polyhedral pyramid**, the
+   multi-dimensional analogue of a triangle — and one rule per vertex:
 
-The 2025 paper lifts this to two or more dimensions by replacing triangles with
-**tetrahedral** membership functions — a simplicial partition of the input
-space, whose barycentric coordinates are piecewise linear and sum to 1 by
-construction. That choice is forced: with a product t-norm over per-feature
-triangles, firing strengths become *piecewise multilinear*, not piecewise
-linear, and no finite ReLU network reproduces them exactly.
+   > **If `M_p(x)` then `z = f(p)`**, where `f` is the network's function.
 
-## What this repository does with it
+Theorem 2 states this as a *local* equivalence — exact in the interior of a
+triangle, extended to any bounded polygonal domain — and the conclusions name
+"extend the results from local to global" as future work.
 
-`experiments/fis-to-neural-net/fis2nn.py` implements the identity directly, and
-`test_fis2nn.py` pins it: a Ruspini partition built by `tribblefis.ruspini`'s
-own `build_triangular_partition`, with singleton consequents, converts to a
-one-hidden-layer ReLU network agreeing to better than `1e-10` over a
-24,001-point grid, with one hidden unit per apex knot and no data touched. The
-theorem is executable here, not just cited.
+## What this repository does with it, and where it diverges
 
-The precondition analysis above is also why that experiment reports a *warm
-start* rather than an exact conversion in more than one dimension: TRIBBLE's
-regressor uses the probabilistic-sum/product norm pair over per-feature
-Gaussians, so both preconditions fail, and the experiment measures the size of
-the resulting gap instead of assuming it away.
+`experiments/fis-to-neural-net/` runs the map **backwards**, rules → network, to
+use a constructed FIS as a neural network's initialization. That direction is
+not symmetric with the paper's, and the asymmetry is the whole story of the
+experiment's results:
 
-## Related work worth having alongside these
+* **The paper's triangulation is induced by the network's own linear regions**,
+  so step 3's interpolation is exact by construction — there is nothing to
+  approximate, because the function really is affine on each cell.
+* **A TRIBBLE FIS is not piecewise linear** (Gaussian memberships, product
+  t-norm, a normalization step), so no canonical triangulation exists to
+  convert. `simplicial.py` imposes a regular **Freudenthal/Kuhn** lattice
+  instead, and the equivalence becomes an interpolation with a measurable error.
 
-The equivalence has been rediscovered in several forms; the entries in
-`references.bib` marked "context" are the ones worth reading next to the above,
-in particular Jang & Sun's radial-basis-function/FIS functional equivalence
-(1993), Buckley, Hayashi & Czogała's earlier neural-net/fuzzy-expert-system
-equivalence (1993), and Wu et al.'s survey of TSK functional equivalences
-(arXiv:1903.10572).
+Two consequences the experiment measures rather than assumes:
+
+* The paper's rule `z = f(p)` — implemented as `consequents_from_fis("vertex")`
+  — is exactly right when `f` is the network being decompiled, and is the *worst*
+  of three estimators when `f` is a FIS being converted on a grid: in 8 or 12
+  dimensions the lattice vertices sit off the data manifold, where the FIS's
+  output is extrapolation. Measured fidelity on WEC: 5.8–8.7, against 0.82 for
+  projecting onto the same basis instead.
+* The papers do not discuss how many rules the construction needs.
+  `simplicial.py` shows the count is governed by the data rather than the
+  lattice — `n+1` rules fire at any point, found by a sort, and only the
+  vertices the data reaches are ever built — and `run_simplicial.py` shows the
+  binding constraint is statistical, not computational.
+
+`simplicial.py`'s closed form for the Freudenthal hat,
+
+```
+phi_v(x) = relu( 1 - relu(max_i d_i) - relu(max_i (-d_i)) ),   d = (x - v)/h
+```
+
+is checked against Kuhn interpolation at **zero** error in dimensions 1, 2, 3, 5
+and 8 (`test_simplicial.py`). Since `max(a,b) = a + relu(b-a)`, it is a ReLU
+circuit of `O(n)` units at depth `O(log n)` — the n-dimensional analogue of "a
+triangle is three ReLUs", and the form the polyhedral pyramid takes on this
+particular triangulation.

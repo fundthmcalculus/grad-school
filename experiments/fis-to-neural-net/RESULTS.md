@@ -1,8 +1,10 @@
 # Results
 
 Run of record: `results.json`, ten seeds, 150 epochs, commit `d830022`,
-`tribble-fis` `5b92ec8`. Tables quoted here are generated, not transcribed —
-`results_summary.md`, `time_to_quality.md`, `triangularization.md`, `gating.md`.
+`tribble-fis` `5b92ec8`. The tetrahedral follow-up is `simplicial_results.json`,
+five seeds. Tables quoted here are generated, not transcribed —
+`results_summary.md`, `time_to_quality.md`, `triangularization.md`, `gating.md`,
+`simplicial.md`.
 
 ## Short version
 
@@ -38,6 +40,16 @@ experiment set out to test.
 is not a usable model above ~6 features, and bikeshare's shared loader leaks its
 target. Both are below.
 
+**Part 2 took the obvious next step** — the 2025 paper's tetrahedral
+construction, which removes the additive restriction in principle. It is exactly
+and cheaply representable (`O(n)` ReLU units per rule, `n+1` rules active at any
+point, vertices bounded by the data rather than by `K**n` — 5,162 built where a
+dense partition would need 43 million). But the binding constraint turns out to
+be statistical rather than computational: in eight dimensions there are 6× more
+tetrahedral rules than training rows, so the rules have no data behind them. The
+usable form is a hybrid — additive main effects, tetrahedral interactions on a
+few features — which improves the conversion by 17–30% on every dataset.
+
 ## Hypothesis scoring
 
 | | hypothesis | verdict |
@@ -50,8 +62,10 @@ target. Both are below.
 | H6 | warm start survives training | **partly** — comparable on bikeshare, worse on Concrete and WEC |
 | H7 | advantage grows with dimension | **falsified — it inverts** |
 | H8 | gating no longer reaches the conversion | **confirmed in 1-D, falsified above it** |
+| T1–T5 | the tetrahedral construction (Part 2) | 2 confirmed, 2 falsified, 1 partial |
 
-Six of eight came back wrong or partly wrong. Several are more useful that way.
+Six of eight in Part 1 came back wrong or partly wrong, and four of five in
+Part 2. Several are more useful that way.
 
 ---
 
@@ -261,6 +275,123 @@ tables, which is your call, not mine.
 See H2. At 8 features it produces a model that predicts zero for 71% of inputs
 and its docstring gives no warning. Candidate upstream issue.
 
+---
+
+# Part 2 — the tetrahedral construction
+
+Prompted by the obvious next step above: every failure past one dimension traced
+to an axis-aligned first layer carrying only the FIS's additive part, and the
+2025 IJCCC paper's fix for exactly that is to replace triangular membership
+functions with **tetrahedral** ones. The paper is now in
+`papers/nn-fis-equivalence/`; the implementation is `simplicial.py`, the tests
+are `test_simplicial.py` (8/8), the measurements are `simplicial.md`.
+
+## The construction, and one exactness result worth having
+
+The paper's n-D rule is *one TSK rule per triangulation vertex*: `If M_p(x) then
+z = f(p)`, where `M_p` is a **polyhedral pyramid** — the piecewise-linear hat
+over the simplices meeting at `p`. Their triangulation is the one induced by a
+trained network's own linear regions, so the interpolation is exact by
+construction.
+
+Running the map backwards there is no such canonical triangulation, because a
+TRIBBLE FIS is not piecewise linear. `simplicial.py` imposes a regular
+**Freudenthal/Kuhn** lattice, on which the hat has a closed form:
+
+```
+phi_v(x) = relu( 1 - relu(max_i d_i) - relu(max_i (-d_i)) ),    d = (x - v)/h
+```
+
+Checked against Kuhn interpolation at **zero** error in dimensions 1, 2, 3, 5
+and 8 — not to a tolerance, bit-identical. Since `max(a,b) = a + relu(b-a)`, a
+tetrahedral membership function is `2(n-1) + 3` ReLU units at depth
+`ceil(log2 n) + 2`: **O(n) units, O(log n) depth**, the n-dimensional analogue
+of "a triangle is three ReLUs". Barycentric weights are non-negative and sum to
+1 to `1e-15` at n = 32.
+
+## Computational scaling is a non-issue — this part works
+
+Three facts, all measured:
+
+* **Only `n+1` rules fire at any point**, in any dimension, and which ones is
+  found by sorting the fractional coordinates — `O(n log n)`, no search over
+  simplices.
+* **Only vertices the data reaches are ever built.** A dataset of `N` rows
+  touches at most `N(n+1)` of them, whatever the lattice.
+* The gap that buys is not marginal:
+
+| dataset | features | dense tetrahedral partition at K=8 | vertices actually built |
+|---|---|---|---|
+| concrete | 8 | 43,000,000 | 5,162 |
+| bikeshare | 12 | 282,000,000,000 | 8,192 (capped) |
+| wec | 12 | 282,000,000,000 | 1,788 |
+
+The `K**n` rule explosion that `tribblefis.anfis` raises `RuleExplosionError`
+over simply never materializes.
+
+## The binding constraint is statistical, not computational
+
+**The paper's own consequent rule is the worst of three in high dimension.**
+`c_v = f(p)` is exactly right when `f` is the network being decompiled — it is
+being evaluated at vertices of its own linear regions. When `f` is a FIS being
+converted on an imposed lattice, those vertices sit *off the data manifold*. On
+Concrete the FIS spans 1.4–78.0 on real rows and −3.9–90.2 at lattice vertices,
+with the median vertex 1.12 cells from the nearest datum. Fidelity, full
+dimensional lattice, five seeds:
+
+| dataset | features | rows/vertex | `c_v = FIS(v)` | support-weighted | projected |
+|---|---|---|---|---|---|
+| synth1d | 1 | 48.0 | 0.207 | 0.171 | **0.086** |
+| concrete | 8 | 0.16 | 1.420 | 0.643 | 0.698 |
+| bikeshare | 12 | 1.70 | 1.029 | 0.914 | 1.841 |
+| wec | 12 | 1.18 | 5.758 | 1.006 | 0.818 |
+
+(`K=8` row for each; fidelity 0 means the conversion reproduces the FIS exactly,
+and >1 means it is worse than predicting the FIS's own mean.)
+
+The `rows/vertex` column is the whole explanation. In one dimension a lattice
+vertex has 48 rows behind it and the conversion is excellent. In eight
+dimensions it has 0.16 — there are 6× more tetrahedral rules than training rows,
+and refining the lattice cannot help, because the occupied-vertex count
+saturates near `N(n+1)` while the resolution keeps rising. **You cannot buy
+resolution and support at the same time in high dimension**, which is the curse
+of dimensionality arriving exactly where the theory says it must.
+
+## The construction that does scale: additive main effects + tetrahedral interactions
+
+Main effects go in the first-order additive seed, where every one of the `N`
+rows feeds every 1-D profile. Interactions go in a tetrahedral basis over the
+top `k` features the FIS ranked, at a resolution chosen automatically to keep
+~10 rows behind every vertex (`simplicial.auto_resolution`; the threshold is
+measured, not assumed — fidelity turns erratic below ~5, swinging 0.42 → 1.76 →
+2.51 across neighbouring resolutions once vertices outnumber rows).
+
+Cost is `O(n * knots + K**k)` with `k` small and fixed, so it does not grow with
+the full feature count. Fidelity, best `k` per dataset, five seeds:
+
+| dataset | additive seed | hybrid | best k | K | vertices | ReLU units | improvement |
+|---|---|---|---|---|---|---|---|
+| synth1d | 0.030 | **0.021** | 1 | 24 | 26 | 78 | 30% |
+| concrete | 0.313 | **0.257** | 2 | 8 | 63 | 317 | 18% |
+| wec | 1.471 | **1.169** | 1 | 24 | 16 | 48 | 21% |
+| bikeshare | 1.101 | **0.911** | 5 | 4 | 906 | 9,964 | 17% |
+
+It improves the conversion on every dataset and every seed, for a fixed cost of
+0.04–2.5 s. And the failure mode is visible in the same table — on Concrete,
+`k=4` (9.0 rows/vertex) scores 0.597 and `k=5` (4.0) scores 0.642, both far
+worse than `k=2`. The subspace dimension is not a free parameter; it is bounded
+by how much data you have.
+
+## Scoring
+
+| | hypothesis | verdict |
+|---|---|---|
+| T1 | the tetrahedral hat is a compact exact ReLU circuit | **confirmed** — zero error to n=8, O(n) units, O(log n) depth |
+| T2 | the construction is computationally scalable | **confirmed** — n+1 active rules, data-bounded vertices, no `K**n` |
+| T3 | it closes the fidelity gap the additive seed left | **partly** — 17–30% better via the hybrid, not closed |
+| T4 | the paper's `z = f(p)` consequent transfers to this direction | **falsified** — worst of three estimators above 1-D |
+| T5 | a full-dimensional tetrahedral basis is usable | **falsified** — support per vertex collapses exponentially |
+
 ## What I would do next
 
 * **Test the regime where a warm start can actually pay.** Every rung here trains
@@ -276,9 +407,38 @@ and its docstring gives no warning. Candidate upstream issue.
   Either TRIBBLE's feature selection is picking badly on 301 correlated buoy
   columns, or 12 is simply too few. Worth knowing which, since the FIS's own
   quality is the ceiling on everything downstream.
-* **Try the 2025 paper's tetrahedral construction.** Every failure above 1-D
-  traces to the same place: an axis-aligned first layer can only carry the FIS's
-  additive part. A simplicial partition is exactly the fix the IJCCC paper
-  proposes, and would make the conversion exact in n dimensions rather than a
-  projection. That is the version of this experiment that could confirm H3 and
-  H5 together.
+* ~~**Try the 2025 paper's tetrahedral construction.**~~ Done — Part 2 above.
+  It confirmed the representation and refuted the hope: the construction is
+  exactly and cheaply representable, but a full-dimensional simplicial basis
+  cannot be supported by the data at these sizes.
+
+## After Part 2
+
+* **Triangulate on the FIS's structure, not on a lattice.** The paper's
+  triangulation is induced by the linear regions of the object being converted,
+  which is why its interpolation is exact and why an imposed lattice's is not.
+  The analogue here would be a complex built from TRIBBLE's own membership
+  geometry — its Gaussian centres are already landmarks, and
+  `tribblefis.ruspini` already merges them into shared knots. That puts vertices
+  where the data is by construction, which is the one thing the lattice cannot
+  do, and would address T4 and T5 together.
+* **Choose the interaction subspace properly.** The hybrid currently takes the
+  FIS's top-`k` features by differentiation score, which ranks *main* effects.
+  `gauss_math.calculate_interaction_scores` already scores feature *pairs* for
+  joint lift, and `detect_interactions=True` exposes it. Ranking the subspace by
+  interaction rather than by importance is a one-line change with a real chance
+  of moving the 17–30%.
+* **Test the regime where a warm start can pay** (unchanged from Part 1, and
+  still the biggest open question). Every rung here trains in under 13 s, so a
+  0.2–1.6 s FIS fit is 4–34% overhead. The claim needs a problem where training
+  costs minutes: PhiUSIIL at 235k rows, RT-IOT2022 at 123k, or simply a wider
+  network and a longer budget.
+* **Take the architecture seriously on its own.** `quantile` — axis-aligned
+  ReLU knots plus a closed-form read-out — reaches `1.25x best` on Concrete 22×
+  faster than a standard network and beats every other arm's final RMSE
+  (4.739 vs 5.105). That is a result about a cheap, interpretable regressor that
+  the equivalence pointed at, independent of whether TRIBBLE placed the knots.
+* **Close the loop on WEC.** The FIS at `top_n=12` is broken there (R² −89.7).
+  Either TRIBBLE's feature selection is picking badly on 301 correlated buoy
+  columns, or 12 is simply too few. Worth knowing which, since the FIS's own
+  quality is the ceiling on everything downstream.
