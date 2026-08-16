@@ -23,7 +23,10 @@ from sklearn.metrics import mean_squared_error
 from tribblefis.gaussian_regressor import TribbleRegressor
 from tribblefis.gaussian_regressor_memory import MemoryWindowFeatureExtractor
 from tribblefis.regression import partition_output, solve_tsk_consequents
-from tribblefis.refine import refine_antecedents_coordinate, refine_antecedents_optimizers
+from tribblefis.refine import (
+    refine_antecedents_coordinate,
+    refine_antecedents_optimizers,
+)
 
 H5_PATH = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
 
@@ -36,13 +39,11 @@ H5_PATH = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
 BASELINE_RMSE = {
     "random baseline": 26.85,
     "constant-mean baseline": 18.97,
-    "published CNN (DS02, released file)": 7.22,   # Custode et al. 2022, re-run
-    "published MLP (DS02, released file)": 8.34,   # Custode et al. 2022, re-run
+    "published CNN (DS02, released file)": 7.22,  # Custode et al. 2022, re-run
+    "published MLP (DS02, released file)": 8.34,  # Custode et al. 2022, re-run
 }
 
-FIXED_D = dict(
-    tsk_order="1st", n_gaussians=0, top_p=0.95, detect_interactions=False
-)
+FIXED_D = dict(tsk_order="1st", n_gaussians=0, top_p=0.95, detect_interactions=False)
 
 
 # --------------------------------------------------------------------------
@@ -199,7 +200,9 @@ def aggregate_raw_memory(
 # (never on test), then applied to both splits with the same fitted models.
 # --------------------------------------------------------------------------
 def fit_raw_condition_correction(
-    df: pd.DataFrame, sensor_cols: list[str], condition_cols: list[str],
+    df: pd.DataFrame,
+    sensor_cols: list[str],
+    condition_cols: list[str],
     baseline_cycles: int = 15,
 ) -> dict:
     from sklearn.linear_model import LinearRegression
@@ -214,7 +217,10 @@ def fit_raw_condition_correction(
 
 
 def apply_raw_condition_correction(
-    df: pd.DataFrame, sensor_cols: list[str], condition_cols: list[str], models: dict,
+    df: pd.DataFrame,
+    sensor_cols: list[str],
+    condition_cols: list[str],
+    models: dict,
 ) -> pd.DataFrame:
     df = df.copy()
     X_all = df[condition_cols].to_numpy(dtype=np.float64)
@@ -246,7 +252,9 @@ def true_onset_cycle(table: pd.DataFrame) -> dict[int, int]:
     for unit, sub in table.groupby("unit"):
         sub = sub.sort_values("cycle")
         unhealthy = sub[sub["hs"] == 0]
-        onsets[unit] = int(unhealthy["cycle"].min()) if len(unhealthy) else int(sub["cycle"].max())
+        onsets[unit] = (
+            int(unhealthy["cycle"].min()) if len(unhealthy) else int(sub["cycle"].max())
+        )
     return onsets
 
 
@@ -310,6 +318,7 @@ def run_one(
     X_test = test_tab[feat_cols].to_numpy(dtype=np.float64)
     if scaler_name == "standard":
         from sklearn.preprocessing import StandardScaler
+
         sc = StandardScaler()
         X_train = sc.fit_transform(X_train)
         X_test = sc.transform(X_test)
@@ -350,8 +359,10 @@ def stage1():
     data, var = load_h5(H5_PATH)
     df_dev = to_frame(data, var, "dev")
     df_test = to_frame(data, var, "test")
-    print(f"  loaded {len(df_dev):,} dev rows, {len(df_test):,} test rows"
-          f" in {time.perf_counter() - t0:.1f}s")
+    print(
+        f"  loaded {len(df_dev):,} dev rows, {len(df_test):,} test rows"
+        f" in {time.perf_counter() - t0:.1f}s"
+    )
 
     print("Fitting condition correction (Xs/Xv ~ W, on dev-unit early cycles only) ...")
     t0 = time.perf_counter()
@@ -359,14 +370,20 @@ def stage1():
     xs_cols = [f"Xs_{n}" for n in var["X_s"]]
     xv_cols = [f"Xv_{n}" for n in var["X_v"]]
     cc_models = fit_raw_condition_correction(df_dev, xs_cols + xv_cols, w_cols)
-    df_dev_cc = apply_raw_condition_correction(df_dev, xs_cols + xv_cols, w_cols, cc_models)
-    df_test_cc = apply_raw_condition_correction(df_test, xs_cols + xv_cols, w_cols, cc_models)
+    df_dev_cc = apply_raw_condition_correction(
+        df_dev, xs_cols + xv_cols, w_cols, cc_models
+    )
+    df_test_cc = apply_raw_condition_correction(
+        df_test, xs_cols + xv_cols, w_cols, cc_models
+    )
     print(f"  ({time.perf_counter() - t0:.1f}s)")
 
     results = []
     agg_cache = {}
     for a_name, (agg_fn, use_corrected) in AGGREGATORS.items():
-        src_dev, src_test = (df_dev_cc, df_test_cc) if use_corrected else (df_dev, df_test)
+        src_dev, src_test = (
+            (df_dev_cc, df_test_cc) if use_corrected else (df_dev, df_test)
+        )
         for b_name in ("B1", "B2", "B3"):
             feat_cols = feature_columns(var, b_name)
             key = (a_name, b_name)
@@ -380,8 +397,10 @@ def stage1():
                 continue
             agg_seconds = time.perf_counter() - t0
             agg_cache[key] = (train_tab, test_tab, feat_cols)
-            print(f"  -> {len(train_tab)} train rows, {len(test_tab)} test rows,"
-                  f" {len(feat_cols)} raw channels, {agg_seconds:.1f}s to build")
+            print(
+                f"  -> {len(train_tab)} train rows, {len(test_tab)} test rows,"
+                f" {len(feat_cols)} raw channels, {agg_seconds:.1f}s to build"
+            )
 
     for (a_name, b_name), (train_tab, test_tab, feat_cols) in agg_cache.items():
         caps = unit_physical_caps(pd.concat([train_tab, test_tab], ignore_index=True))
@@ -407,10 +426,18 @@ def stage1():
     print("\n=== Stage 1 ranked by test RMSE (true RUL) ===")
     print(
         results_df[
-            ["pipeline", "fit_seconds", "rmse_test_true", "nasa_score_true", "n_features"]
+            [
+                "pipeline",
+                "fit_seconds",
+                "rmse_test_true",
+                "nasa_score_true",
+                "n_features",
+            ]
         ].to_string(index=False)
     )
-    results_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage1_results.csv", index=False)
+    results_df.to_csv(
+        "FuzzySystemsExperiments/cmapss_rul_stage1_results.csv", index=False
+    )
     return results_df, agg_cache
 
 
@@ -478,15 +505,21 @@ def stage2(agg_cache: dict, pipelines: list[str]):
                 continue
             r.update(pipeline=pipeline, **d_kwargs)
             results.append(r)
-        best = min((r for r in results if r["pipeline"] == pipeline),
-                   key=lambda r: r["rmse_test_true"])
-        print(f"  best: rmse_test={best['rmse_test_true']:.2f} "
-              f"fit={best['fit_seconds']:.2f}s "
-              f"tsk_order={best['tsk_order']} n_gaussians={best['n_gaussians']} "
-              f"top_p={best['top_p']} detect_interactions={best['detect_interactions']}")
+        best = min(
+            (r for r in results if r["pipeline"] == pipeline),
+            key=lambda r: r["rmse_test_true"],
+        )
+        print(
+            f"  best: rmse_test={best['rmse_test_true']:.2f} "
+            f"fit={best['fit_seconds']:.2f}s "
+            f"tsk_order={best['tsk_order']} n_gaussians={best['n_gaussians']} "
+            f"top_p={best['top_p']} detect_interactions={best['detect_interactions']}"
+        )
 
     results_df = pd.DataFrame(results).sort_values("rmse_test_true")
-    results_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage2_results.csv", index=False)
+    results_df.to_csv(
+        "FuzzySystemsExperiments/cmapss_rul_stage2_results.csv", index=False
+    )
     return results_df
 
 
@@ -508,6 +541,7 @@ def stage3(agg_cache: dict, pipeline: str, d_kwargs: dict):
     X_test = test_tab[agg_feat_cols].to_numpy(dtype=np.float64)
     if scaler_name == "standard":
         from sklearn.preprocessing import StandardScaler
+
         sc = StandardScaler()
         X_train = sc.fit_transform(X_train)
         X_test = sc.transform(X_test)
@@ -523,10 +557,12 @@ def stage3(agg_cache: dict, pipeline: str, d_kwargs: dict):
 
     print(f"\n=== Stage 3: final confirmation -- {pipeline} ===")
     print(f"config: {d_kwargs}")
-    print(f"fit_seconds={r['fit_seconds']:.3f}  "
-          f"rmse_test_true={r['rmse_test_true']:.2f}  "
-          f"nasa_score_true={r['nasa_score_true']:.1f}  "
-          f"n_train={r['n_train']}  n_test={r['n_test']}  n_features={r['n_features']}")
+    print(
+        f"fit_seconds={r['fit_seconds']:.3f}  "
+        f"rmse_test_true={r['rmse_test_true']:.2f}  "
+        f"nasa_score_true={r['nasa_score_true']:.1f}  "
+        f"n_train={r['n_train']}  n_test={r['n_test']}  n_features={r['n_features']}"
+    )
 
     for unit in sorted(test_tab["unit"].unique()):
         m = (test_tab["unit"] == unit).to_numpy()
@@ -542,8 +578,12 @@ def stage3(agg_cache: dict, pipeline: str, d_kwargs: dict):
         }
     ).sort_values(["unit", "cycle"])
     fitted = dict(
-        model=model, X_train=X_train, y_train=y_train,
-        X_test=X_test, y_test_true=y_test_true, fit_seconds=r["fit_seconds"],
+        model=model,
+        X_train=X_train,
+        y_train=y_train,
+        X_test=X_test,
+        y_test_true=y_test_true,
+        fit_seconds=r["fit_seconds"],
     )
     return r, predictions, fitted
 
@@ -564,8 +604,13 @@ REFINERS = {
     "coordinate": (refine_antecedents_coordinate, dict(n_sweeps=3)),
     "optimizers_ga": (
         refine_antecedents_optimizers,
-        dict(method="ga", population_size=40, num_generations=25,
-             local_scale=0.25, local_grad_optim="none"),
+        dict(
+            method="ga",
+            population_size=40,
+            num_generations=25,
+            local_scale=0.25,
+            local_grad_optim="none",
+        ),
     ),
 }
 
@@ -594,30 +639,56 @@ def refine_and_evaluate(fitted: dict, refiner_name: str, fn=None, kwargs=None) -
     )
 
     t0 = time.perf_counter()
-    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+    with (
+        contextlib.redirect_stdout(io.StringIO()),
+        contextlib.redirect_stderr(io.StringIO()),
+    ):
         refined_model, info = fn(
-            model.model_, X_train_df, y_part, model.top_features_,
-            n_output_buckets=model.n_output_buckets, order=model.tsk_order,
-            l2_reg=model.l2_reg, basis=model.consequent_basis,
-            cross_pairs=model.cross_pairs_, **kwargs,
+            model.model_,
+            X_train_df,
+            y_part,
+            model.top_features_,
+            n_output_buckets=model.n_output_buckets,
+            order=model.tsk_order,
+            l2_reg=model.l2_reg,
+            basis=model.consequent_basis,
+            cross_pairs=model.cross_pairs_,
+            **kwargs,
         )
         corr_terms, ybm = solve_tsk_consequents(
-            X_train_df, refined_model, model.top_features_, y_bucket_mean, y_part,
-            n_output_buckets=model.n_output_buckets, order=model.tsk_order,
-            l2_reg=model.l2_reg, basis=model.consequent_basis,
-            pin_extremes=model.pin_extremes, norms=model._norms(),
-            cross_pairs=model.cross_pairs_, rbf_centers=model.rbf_centers_,
-            rbf_gamma=model.rbf_gamma, rbf_radius=model.rbf_radius,
+            X_train_df,
+            refined_model,
+            model.top_features_,
+            y_bucket_mean,
+            y_part,
+            n_output_buckets=model.n_output_buckets,
+            order=model.tsk_order,
+            l2_reg=model.l2_reg,
+            basis=model.consequent_basis,
+            pin_extremes=model.pin_extremes,
+            norms=model._norms(),
+            cross_pairs=model.cross_pairs_,
+            rbf_centers=model.rbf_centers_,
+            rbf_gamma=model.rbf_gamma,
+            rbf_radius=model.rbf_radius,
         )
     refine_seconds = time.perf_counter() - t0
 
     refined = copy.deepcopy(model)
-    refined.model_, refined.corr_terms_, refined.y_bucket_mean_ = refined_model, corr_terms, ybm
+    refined.model_, refined.corr_terms_, refined.y_bucket_mean_ = (
+        refined_model,
+        corr_terms,
+        ybm,
+    )
     pred_refined = refined.predict(fitted["X_test"])
-    rmse_refined = float(np.sqrt(mean_squared_error(fitted["y_test_true"], pred_refined)))
-    rmse_baseline = float(np.sqrt(mean_squared_error(
-        fitted["y_test_true"], model.predict(fitted["X_test"])
-    )))
+    rmse_refined = float(
+        np.sqrt(mean_squared_error(fitted["y_test_true"], pred_refined))
+    )
+    rmse_baseline = float(
+        np.sqrt(
+            mean_squared_error(fitted["y_test_true"], model.predict(fitted["X_test"]))
+        )
+    )
 
     return dict(
         refiner=refiner_name,
@@ -653,7 +724,9 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
         results = prior.to_dict("records")
         done = set(zip(prior["pipeline"], prior["refiner"]))
         if done:
-            print(f"Resuming Stage 4: {len(done)} (pipeline, refiner) pairs already done.")
+            print(
+                f"Resuming Stage 4: {len(done)} (pipeline, refiner) pairs already done."
+            )
 
     # coordinate descent's cost scales badly with membership-function count --
     # 150 MFs took 935s; a 313-MF pipeline in this round didn't finish in
@@ -667,14 +740,18 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
     for pipeline, fitted in fitted_by_pipeline.items():
         n_mf = fitted["model"].model_.n_membership_functions
         n_rows = len(fitted["X_train"])
-        print(f"\nRefining {pipeline} ({n_mf} membership functions, {n_rows} train rows) ...")
+        print(
+            f"\nRefining {pipeline} ({n_mf} membership functions, {n_rows} train rows) ..."
+        )
         for refiner_name in REFINERS:
             if (pipeline, refiner_name) in done:
                 print(f"  {refiner_name:10s} already done -- skipping")
                 continue
             if refiner_name == "coordinate" and n_mf > COORDINATE_MAX_MF:
-                print(f"  {refiner_name:10s} skipped -- {n_mf} MFs exceeds "
-                      f"COORDINATE_MAX_MF={COORDINATE_MAX_MF} (see comment above)")
+                print(
+                    f"  {refiner_name:10s} skipped -- {n_mf} MFs exceeds "
+                    f"COORDINATE_MAX_MF={COORDINATE_MAX_MF} (see comment above)"
+                )
                 continue
             try:
                 r = refine_and_evaluate(fitted, refiner_name)
@@ -685,19 +762,26 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
             results.append(r)
             pd.DataFrame(results).to_csv(STAGE4_CSV, index=False)
             delta = r["rmse_refined"] - r["rmse_baseline"]
-            verdict = "WORSE (CV-overfit)" if delta > 0.01 else (
-                "no real change" if abs(delta) <= 0.01 else "better")
+            verdict = (
+                "WORSE (CV-overfit)"
+                if delta > 0.01
+                else ("no real change" if abs(delta) <= 0.01 else "better")
+            )
             print(
                 f"  {refiner_name:10s} refine={r['refine_seconds']:6.1f}s  "
                 f"rmse {r['rmse_baseline']:.2f} -> {r['rmse_refined']:.2f}  ({verdict})"
             )
             cost_ratio = r["refine_seconds"] / max(fitted["fit_seconds"], 0.01)
             if r["refine_seconds"] > timeout_seconds:
-                print(f"    NOTE: {cost_ratio:.0f}x the baseline fit time -- "
-                      f"not viable under the seconds budget regardless of accuracy.")
+                print(
+                    f"    NOTE: {cost_ratio:.0f}x the baseline fit time -- "
+                    f"not viable under the seconds budget regardless of accuracy."
+                )
 
     results_df = pd.DataFrame(results)
-    results_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage4_results.csv", index=False)
+    results_df.to_csv(
+        "FuzzySystemsExperiments/cmapss_rul_stage4_results.csv", index=False
+    )
     return results_df
 
 
@@ -712,16 +796,61 @@ SWEEP_CONFIGS = [
     ("coordinate", refine_antecedents_coordinate, dict(n_sweeps=2)),
     ("coordinate", refine_antecedents_coordinate, dict(n_sweeps=3)),
     ("coordinate", refine_antecedents_coordinate, dict(n_sweeps=5)),
-    ("optimizers_ga", refine_antecedents_optimizers,
-     dict(method="ga", population_size=20, num_generations=25, local_scale=0.15, local_grad_optim="none")),
-    ("optimizers_ga", refine_antecedents_optimizers,
-     dict(method="ga", population_size=40, num_generations=25, local_scale=0.25, local_grad_optim="none")),
-    ("optimizers_ga", refine_antecedents_optimizers,
-     dict(method="ga", population_size=40, num_generations=25, local_scale=0.5, local_grad_optim="none")),
-    ("optimizers_ga", refine_antecedents_optimizers,
-     dict(method="ga", population_size=40, num_generations=25, local_scale=None, local_grad_optim="none")),
-    ("optimizers_ga", refine_antecedents_optimizers,
-     dict(method="ga", population_size=80, num_generations=40, local_scale=0.25, local_grad_optim="none")),
+    (
+        "optimizers_ga",
+        refine_antecedents_optimizers,
+        dict(
+            method="ga",
+            population_size=20,
+            num_generations=25,
+            local_scale=0.15,
+            local_grad_optim="none",
+        ),
+    ),
+    (
+        "optimizers_ga",
+        refine_antecedents_optimizers,
+        dict(
+            method="ga",
+            population_size=40,
+            num_generations=25,
+            local_scale=0.25,
+            local_grad_optim="none",
+        ),
+    ),
+    (
+        "optimizers_ga",
+        refine_antecedents_optimizers,
+        dict(
+            method="ga",
+            population_size=40,
+            num_generations=25,
+            local_scale=0.5,
+            local_grad_optim="none",
+        ),
+    ),
+    (
+        "optimizers_ga",
+        refine_antecedents_optimizers,
+        dict(
+            method="ga",
+            population_size=40,
+            num_generations=25,
+            local_scale=None,
+            local_grad_optim="none",
+        ),
+    ),
+    (
+        "optimizers_ga",
+        refine_antecedents_optimizers,
+        dict(
+            method="ga",
+            population_size=80,
+            num_generations=40,
+            local_scale=0.25,
+            local_grad_optim="none",
+        ),
+    ),
 ]
 
 
@@ -736,14 +865,19 @@ def stage4b_refiner_sweep(fitted: dict) -> pd.DataFrame:
         r["config"] = str(kwargs)
         results.append(r)
         delta = r["rmse_refined"] - r["rmse_baseline"]
-        verdict = "WORSE (CV-overfit)" if delta > 0.01 else (
-            "no real change" if abs(delta) <= 0.01 else "better")
+        verdict = (
+            "WORSE (CV-overfit)"
+            if delta > 0.01
+            else ("no real change" if abs(delta) <= 0.01 else "better")
+        )
         print(
             f"  {label:14s} {kwargs}  refine={r['refine_seconds']:6.1f}s  "
             f"rmse {r['rmse_baseline']:.2f} -> {r['rmse_refined']:.2f}  ({verdict})"
         )
     results_df = pd.DataFrame(results)
-    results_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage4b_sweep.csv", index=False)
+    results_df.to_csv(
+        "FuzzySystemsExperiments/cmapss_rul_stage4b_sweep.csv", index=False
+    )
     return results_df
 
 
@@ -821,27 +955,37 @@ def detect_onset_moving_average(
             if run >= sustain:
                 onset_cycle = int(sub["cycle"].iloc[i - sustain + 1])
                 break
-        onsets[unit] = onset_cycle if onset_cycle is not None else int(sub["cycle"].iloc[-1])
+        onsets[unit] = (
+            onset_cycle if onset_cycle is not None else int(sub["cycle"].iloc[-1])
+        )
     return onsets
 
 
 def stage5(agg_cache: dict, top_pipelines: list[str]):
     train_tab, test_tab, _ = agg_cache[("A1_whole_cycle", "B1")]
     combined = pd.concat([train_tab, test_tab], ignore_index=True)
-    condition_cols = [c for c in combined.columns if c.startswith("W_") and c.endswith("_mean")]
-    sensor_cols = [c for c in combined.columns if c.startswith("Xs_") and c.endswith("_mean")]
+    condition_cols = [
+        c for c in combined.columns if c.startswith("W_") and c.endswith("_mean")
+    ]
+    sensor_cols = [
+        c for c in combined.columns if c.startswith("Xs_") and c.endswith("_mean")
+    ]
 
     residuals = condition_corrected_residuals(combined, sensor_cols, condition_cols)
     true_onset = true_onset_cycle(combined)
     detected_onset = detect_onset_moving_average(residuals, sensor_cols)
 
-    print(f"\nOnset detection using {len(sensor_cols)} real sensor channels "
-          f"(mean per cycle, condition-corrected against {len(condition_cols)} W channels):")
+    print(
+        f"\nOnset detection using {len(sensor_cols)} real sensor channels "
+        f"(mean per cycle, condition-corrected against {len(condition_cols)} W channels):"
+    )
     rows = []
     for unit in sorted(true_onset):
         t, d = true_onset[unit], detected_onset[unit]
         rows.append(dict(unit=unit, true_onset=t, detected_onset=d, error=d - t))
-        print(f"  unit {unit:3d}: true onset={t:3d}  detected={d:3d}  error={d - t:+4d}")
+        print(
+            f"  unit {unit:3d}: true onset={t:3d}  detected={d:3d}  error={d - t:+4d}"
+        )
     onset_df = pd.DataFrame(rows)
     mae = onset_df["error"].abs().mean()
     print(f"  MAE across {len(onset_df)} units: {mae:.1f} cycles")
@@ -856,17 +1000,30 @@ def stage5(agg_cache: dict, top_pipelines: list[str]):
         if c_name != "C3_physical":
             continue  # only C3_physical has an onset-derived cap to swap
         p_train_tab, p_test_tab, _ = agg_cache[(a_name, b_name)]
-        agg_feat_cols = [c for c in p_train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")]
-        oracle_caps = unit_physical_caps(pd.concat([p_train_tab, p_test_tab], ignore_index=True))
-        for cap_name, caps in [("oracle_hs", oracle_caps), ("detected_ma", detected_caps)]:
-            r = run_one(p_train_tab, p_test_tab, agg_feat_cols, "C3_physical", caps, FIXED_D)
+        agg_feat_cols = [
+            c for c in p_train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")
+        ]
+        oracle_caps = unit_physical_caps(
+            pd.concat([p_train_tab, p_test_tab], ignore_index=True)
+        )
+        for cap_name, caps in [
+            ("oracle_hs", oracle_caps),
+            ("detected_ma", detected_caps),
+        ]:
+            r = run_one(
+                p_train_tab, p_test_tab, agg_feat_cols, "C3_physical", caps, FIXED_D
+            )
             r.update(pipeline=pipeline, cap_source=cap_name)
             results.append(r)
-            print(f"{pipeline:32s} cap={cap_name:12s} "
-                  f"rmse_test={r['rmse_test_true']:.2f}  fit={r['fit_seconds']:.2f}s")
+            print(
+                f"{pipeline:32s} cap={cap_name:12s} "
+                f"rmse_test={r['rmse_test_true']:.2f}  fit={r['fit_seconds']:.2f}s"
+            )
 
     results_df = pd.DataFrame(results)
-    results_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage5_results.csv", index=False)
+    results_df.to_csv(
+        "FuzzySystemsExperiments/cmapss_rul_stage5_results.csv", index=False
+    )
     return onset_df, results_df
 
 
@@ -884,8 +1041,14 @@ CACHE_PATH = "FuzzySystemsExperiments/.cmapss_rul_cache.pkl"
 
 def save_cache(agg_cache, stage1_results, stage2_results):
     with open(CACHE_PATH, "wb") as f:
-        pickle.dump(dict(agg_cache=agg_cache, stage1_results=stage1_results,
-                          stage2_results=stage2_results), f)
+        pickle.dump(
+            dict(
+                agg_cache=agg_cache,
+                stage1_results=stage1_results,
+                stage2_results=stage2_results,
+            ),
+            f,
+        )
 
 
 def load_cache():
@@ -894,7 +1057,9 @@ def load_cache():
     return d["agg_cache"], d["stage1_results"], d["stage2_results"]
 
 
-def select_top_pipelines(stage1_results: pd.DataFrame, cheap_family: str = "A1_whole_cycle") -> list[str]:
+def select_top_pipelines(
+    stage1_results: pd.DataFrame, cheap_family: str = "A1_whole_cycle"
+) -> list[str]:
     """Pick pipelines dynamically from Stage 1's results rather than
     hardcoding names -- with condition-corrected aggregation variants added
     to the matrix, the actual best pipelines may not match any pipeline
@@ -942,12 +1107,16 @@ if __name__ == "__main__":
         # Stage 4b keys off it by name, not list position, so appending more
         # pipelines afterward can't silently repoint it.
         cheap_pipeline = top_pipelines[-1]
-        top_pipelines = top_pipelines + [p for p in FORCE_INCLUDE if p not in top_pipelines]
+        top_pipelines = top_pipelines + [
+            p for p in FORCE_INCLUDE if p not in top_pipelines
+        ]
     else:
         stage1_results, agg_cache = stage1()
         top_pipelines = select_top_pipelines(stage1_results)
         cheap_pipeline = top_pipelines[-1]
-        top_pipelines = top_pipelines + [p for p in FORCE_INCLUDE if p not in top_pipelines]
+        top_pipelines = top_pipelines + [
+            p for p in FORCE_INCLUDE if p not in top_pipelines
+        ]
         print(f"\nSelected pipelines for Stage 2+: {top_pipelines}")
 
         print("\n" + "=" * 78)
@@ -960,8 +1129,16 @@ if __name__ == "__main__":
     print("\n=== Stage 2 top 10 overall ===")
     print(
         stage2_results.head(10)[
-            ["pipeline", "tsk_order", "n_gaussians", "top_p", "detect_interactions",
-             "fit_seconds", "rmse_test_true", "nasa_score_true"]
+            [
+                "pipeline",
+                "tsk_order",
+                "n_gaussians",
+                "top_p",
+                "detect_interactions",
+                "fit_seconds",
+                "rmse_test_true",
+                "nasa_score_true",
+            ]
         ].to_string(index=False)
     )
 
@@ -987,16 +1164,20 @@ if __name__ == "__main__":
         )
 
     if "--construction-only" in sys.argv:
-        print("\n--construction-only: stopping after Stage 3 (skipping refinement "
-              "and onset-detection stages).")
+        print(
+            "\n--construction-only: stopping after Stage 3 (skipping refinement "
+            "and onset-detection stages)."
+        )
         print("\n=== Construction-only summary ===")
         for pipeline in top_pipelines:
             sub = stage2_results[stage2_results["pipeline"] == pipeline]
             if sub.empty:
                 continue
             best = sub.loc[sub["rmse_test_true"].idxmin()]
-            print(f"{pipeline:36s} rmse={best['rmse_test_true']:.2f}  "
-                  f"fit={best['fit_seconds']:.2f}s  n_features={best['n_features']}")
+            print(
+                f"{pipeline:36s} rmse={best['rmse_test_true']:.2f}  "
+                f"fit={best['fit_seconds']:.2f}s  n_features={best['n_features']}"
+            )
         raise SystemExit(0)
 
     print("\n" + "=" * 78)
@@ -1026,7 +1207,9 @@ if __name__ == "__main__":
 
     stage4_csv = "FuzzySystemsExperiments/cmapss_rul_stage4_results.csv"
     if "--resume" in sys.argv and os.path.exists(stage4_csv):
-        print(f"Resuming Stage 4 from {stage4_csv} (skipping the 20-25 min refinement rerun)")
+        print(
+            f"Resuming Stage 4 from {stage4_csv} (skipping the 20-25 min refinement rerun)"
+        )
         stage4_results = pd.read_csv(stage4_csv)
     else:
         stage4_results = stage4(refine_fitted)
@@ -1040,9 +1223,11 @@ if __name__ == "__main__":
     print("\n" + "=" * 78)
     print("STAGE 4b: sweep each refiner's own hyperparameters")
     print("=" * 78)
-    print(f"Run on the cheapest pipeline only ({cheap_pipeline}, ~5s/config) -- also "
-          "the one where refinement overfits its CV split, the sharpest test of "
-          "whether a hyperparameter choice can rescue that failure mode.")
+    print(
+        f"Run on the cheapest pipeline only ({cheap_pipeline}, ~5s/config) -- also "
+        "the one where refinement overfits its CV split, the sharpest test of "
+        "whether a hyperparameter choice can rescue that failure mode."
+    )
     stage4b_results = stage4b_refiner_sweep(refine_fitted[cheap_pipeline])
 
     print("\n" + "=" * 78)
@@ -1056,6 +1241,12 @@ if __name__ == "__main__":
     from cmapss_rul_plots import make_plots
 
     make_plots(
-        stage1_results, stage2_results, stage3_predictions, top_pipelines,
-        stage4_results, stage4b_results, stage5_onsets, stage5_results,
+        stage1_results,
+        stage2_results,
+        stage3_predictions,
+        top_pipelines,
+        stage4_results,
+        stage4b_results,
+        stage5_onsets,
+        stage5_results,
     )

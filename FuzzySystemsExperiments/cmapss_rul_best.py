@@ -80,26 +80,41 @@ PIPELINES = {
     # aggregation: "whole_cycle" (one row/cycle, mean/std/min/max/last stats)
     # or "raw_memory" (subsampled raw stream through MemoryWindowFeatureExtractor)
     "honest": dict(
-        feature_set="real", aggregation="whole_cycle",
+        feature_set="real",
+        aggregation="whole_cycle",
         tribble_kwargs=dict(
-            tsk_order="1st", n_gaussians=0, top_p=0.9, detect_interactions=False,
-            norm_conorm="hamacher", l2_reg=0.01,
+            tsk_order="1st",
+            n_gaussians=0,
+            top_p=0.9,
+            detect_interactions=False,
+            norm_conorm="hamacher",
+            l2_reg=0.01,
         ),
         expected_rmse=11.23,
     ),
     "best": dict(
-        feature_set="literature", aggregation="raw_memory",
+        feature_set="literature",
+        aggregation="raw_memory",
         tribble_kwargs=dict(
-            tsk_order="full-2nd", n_gaussians=0, top_p=0.95, detect_interactions=False,
-            norm_conorm="hamacher", l2_reg=0.01,
+            tsk_order="full-2nd",
+            n_gaussians=0,
+            top_p=0.95,
+            detect_interactions=False,
+            norm_conorm="hamacher",
+            l2_reg=0.01,
         ),
         expected_rmse=6.48,
     ),
     "all_sensors": dict(
-        feature_set="all", aggregation="raw_memory",
+        feature_set="all",
+        aggregation="raw_memory",
         tribble_kwargs=dict(
-            tsk_order="full-2nd", n_gaussians=0, top_p=0.95, detect_interactions=False,
-            norm_conorm="hamacher", l2_reg=0.01,
+            tsk_order="full-2nd",
+            n_gaussians=0,
+            top_p=0.95,
+            detect_interactions=False,
+            norm_conorm="hamacher",
+            l2_reg=0.01,
         ),
         expected_rmse=6.54,
     ),
@@ -147,7 +162,9 @@ def to_frame(data: dict, var: dict, split: str) -> pd.DataFrame:
 # --------------------------------------------------------------------------
 # Condition correction: the preprocessing step that matters most
 # --------------------------------------------------------------------------
-def fit_condition_correction(df: pd.DataFrame, sensor_cols, condition_cols, baseline_cycles=15):
+def fit_condition_correction(
+    df: pd.DataFrame, sensor_cols, condition_cols, baseline_cycles=15
+):
     order = df.groupby("unit").cumcount()
     baseline = df[order < baseline_cycles]
     X_base = baseline[condition_cols].to_numpy(dtype=np.float64)
@@ -157,7 +174,9 @@ def fit_condition_correction(df: pd.DataFrame, sensor_cols, condition_cols, base
     }
 
 
-def apply_condition_correction(df: pd.DataFrame, sensor_cols, condition_cols, models) -> pd.DataFrame:
+def apply_condition_correction(
+    df: pd.DataFrame, sensor_cols, condition_cols, models
+) -> pd.DataFrame:
     df = df.copy()
     X_all = df[condition_cols].to_numpy(dtype=np.float64)
     for col in sensor_cols:
@@ -175,7 +194,9 @@ def physical_rul_cap(table: pd.DataFrame) -> dict:
         unhealthy = sub[sub["hs"] == 0]
         onset = unhealthy["cycle"].min() if len(unhealthy) else sub["cycle"].max()
         at_or_after = sub[sub["cycle"] >= onset]
-        caps[unit] = float(at_or_after["RUL"].max() if len(at_or_after) else sub["RUL"].max())
+        caps[unit] = float(
+            at_or_after["RUL"].max() if len(at_or_after) else sub["RUL"].max()
+        )
     return caps
 
 
@@ -198,7 +219,9 @@ def aggregate_whole_cycle(df: pd.DataFrame, feat_cols) -> pd.DataFrame:
     return feat.join(meta).reset_index()
 
 
-def aggregate_raw_memory(df: pd.DataFrame, feat_cols, stride: int = 200) -> pd.DataFrame:
+def aggregate_raw_memory(
+    df: pd.DataFrame, feat_cols, stride: int = 200
+) -> pd.DataFrame:
     extractor = MemoryWindowFeatureExtractor(window_size=5, memory_size=2)
     frames = []
     for unit, sub in df.groupby("unit", sort=True):
@@ -226,20 +249,28 @@ def nasa_score(y_true, y_pred) -> float:
 
 def run(h5_path: str, pipeline_name: str):
     cfg = PIPELINES[pipeline_name]
-    print(f"Pipeline: {pipeline_name!r} ({cfg['feature_set']} sensors, "
-          f"{cfg['aggregation']} aggregation) -- expected RMSE ~{cfg['expected_rmse']}")
+    print(
+        f"Pipeline: {pipeline_name!r} ({cfg['feature_set']} sensors, "
+        f"{cfg['aggregation']} aggregation) -- expected RMSE ~{cfg['expected_rmse']}"
+    )
 
     print(f"Loading {h5_path} ...")
     t0 = time.perf_counter()
     data, var = load_h5(h5_path)
     df_dev = to_frame(data, var, "dev")
     df_test = to_frame(data, var, "test")
-    print(f"  {len(df_dev):,} dev rows, {len(df_test):,} test rows ({time.perf_counter()-t0:.1f}s)")
+    print(
+        f"  {len(df_dev):,} dev rows, {len(df_test):,} test rows ({time.perf_counter()-t0:.1f}s)"
+    )
 
     w_cols = [f"W_{n}" for n in var["W"]]
     xs_cols = [f"Xs_{n}" for n in var["X_s"]]
     n_xv = FEATURE_SET_XV[cfg["feature_set"]]
-    xv_cols = [f"Xv_{n}" for n in var["X_v"]] if n_xv is None else [f"Xv_{n}" for n in var["X_v"][:n_xv]]
+    xv_cols = (
+        [f"Xv_{n}" for n in var["X_v"]]
+        if n_xv is None
+        else [f"Xv_{n}" for n in var["X_v"][:n_xv]]
+    )
     correct_cols = xs_cols + xv_cols
 
     print("Fitting condition correction on dev-unit early cycles ...")
@@ -248,15 +279,23 @@ def run(h5_path: str, pipeline_name: str):
     df_test = apply_condition_correction(df_test, correct_cols, w_cols, models)
 
     feat_cols = w_cols + xs_cols + xv_cols
-    agg_fn = aggregate_whole_cycle if cfg["aggregation"] == "whole_cycle" else aggregate_raw_memory
+    agg_fn = (
+        aggregate_whole_cycle
+        if cfg["aggregation"] == "whole_cycle"
+        else aggregate_raw_memory
+    )
 
     print(f"Aggregating ({cfg['aggregation']}) ...")
     t0 = time.perf_counter()
     train_tab = agg_fn(df_dev, feat_cols)
     test_tab = agg_fn(df_test, feat_cols)
-    print(f"  {len(train_tab)} train rows, {len(test_tab)} test rows ({time.perf_counter()-t0:.1f}s)")
+    print(
+        f"  {len(train_tab)} train rows, {len(test_tab)} test rows ({time.perf_counter()-t0:.1f}s)"
+    )
 
-    agg_feat_cols = [c for c in train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")]
+    agg_feat_cols = [
+        c for c in train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")
+    ]
     caps = physical_rul_cap(pd.concat([train_tab, test_tab], ignore_index=True))
 
     X_train = train_tab[agg_feat_cols].to_numpy(dtype=np.float64)
@@ -278,7 +317,9 @@ def run(h5_path: str, pipeline_name: str):
     score = nasa_score(y_test_true, pred_test)
 
     print(f"\n=== {pipeline_name} pipeline ===")
-    print(f"fit_seconds={fit_seconds:.2f}  rmse_test_true={rmse:.2f}  nasa_score={score:.1f}")
+    print(
+        f"fit_seconds={fit_seconds:.2f}  rmse_test_true={rmse:.2f}  nasa_score={score:.1f}"
+    )
     for unit in sorted(test_tab["unit"].unique()):
         m = (test_tab["unit"] == unit).to_numpy()
         u_rmse = float(np.sqrt(mean_squared_error(y_test_true[m], pred_test[m])))
@@ -287,7 +328,9 @@ def run(h5_path: str, pipeline_name: str):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--h5", required=True, help="Path to N-CMAPSS_DS02-006.h5")
     parser.add_argument("--pipeline", choices=list(PIPELINES), default="best")
     args = parser.parse_args()

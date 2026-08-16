@@ -24,7 +24,7 @@ BASELINE = "#c3c2b7"
 # assigned to Factor A's three levels, used consistently across every chart.
 CAT = {
     "A1_whole_cycle": "#2a78d6",  # blue
-    "A3_raw_memory": "#eb6834",   # orange
+    "A3_raw_memory": "#eb6834",  # orange
     "A2_phase_split": "#1baf7a",  # aqua
     # Condition-corrected variants keep their base family's color -- same
     # aggregation strategy, just fed corrected input.
@@ -61,13 +61,25 @@ def plot_stage1(stage1_df: pd.DataFrame, out_path: str):
     ax.barh(y, df["rmse_test_true"], color=colors, height=0.62, zorder=3)
     ax.axvspan(LIT_BAND[0], LIT_BAND[1], color=INK_MUTED, alpha=0.12, zorder=1)
     ax.text(
-        sum(LIT_BAND) / 2, len(df) - 0.3, "published CNN/MLP (DS02-006)",
-        ha="center", va="top", fontsize=8.5, color=INK_MUTED, style="italic",
+        sum(LIT_BAND) / 2,
+        len(df) - 0.3,
+        "published CNN/MLP (DS02-006)",
+        ha="center",
+        va="top",
+        fontsize=8.5,
+        color=INK_MUTED,
+        style="italic",
     )
     ax.axvline(CONST_MEAN_RMSE, color=INK_MUTED, linewidth=1, linestyle="--", zorder=1)
     ax.text(
-        CONST_MEAN_RMSE + 0.4, len(df) - 0.3, "constant-mean baseline",
-        ha="left", va="top", fontsize=8, color=INK_MUTED, style="italic",
+        CONST_MEAN_RMSE + 0.4,
+        len(df) - 0.3,
+        "constant-mean baseline",
+        ha="left",
+        va="top",
+        fontsize=8,
+        color=INK_MUTED,
+        style="italic",
     )
     for yi, v in zip(y, df["rmse_test_true"]):
         ax.text(v + 0.4, yi, f"{v:.1f}", va="center", fontsize=8, color=INK_SECONDARY)
@@ -77,7 +89,9 @@ def plot_stage1(stage1_df: pd.DataFrame, out_path: str):
     ax.set_xlabel("Test RMSE, true RUL (cycles)  —  lower is better")
     ax.set_title(
         "Stage 1 screen: RMSE across all 18 aggregation / feature / RUL-shaping pipelines",
-        fontsize=12, pad=14, loc="left",
+        fontsize=12,
+        pad=14,
+        loc="left",
     )
     ax.grid(axis="x", color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
@@ -89,8 +103,12 @@ def plot_stage1(stage1_df: pd.DataFrame, out_path: str):
         for c in [CAT["A1_whole_cycle"], CAT["A2_phase_split"], CAT["A3_raw_memory"]]
     ]
     ax.legend(
-        handles, ["A1 whole-cycle", "A2 phase-split", "A3 raw-memory"],
-        loc="upper right", frameon=False, fontsize=9, labelcolor=INK_SECONDARY,
+        handles,
+        ["A1 whole-cycle", "A2 phase-split", "A3 raw-memory"],
+        loc="upper right",
+        frameon=False,
+        fontsize=9,
+        labelcolor=INK_SECONDARY,
     )
     fig.tight_layout()
     fig.savefig(out_path, dpi=160, facecolor=SURFACE)
@@ -104,47 +122,86 @@ def plot_stage2(stage2_df: pd.DataFrame, pipelines: list[str], out_path: str):
         a_name = pipeline.split("/")[0]
         color = CAT[a_name]
         ax.scatter(
-            sub["fit_seconds"], sub["rmse_test_true"], s=22, color=color,
-            alpha=0.55, edgecolors="none", zorder=3,
+            sub["fit_seconds"],
+            sub["rmse_test_true"],
+            s=22,
+            color=color,
+            alpha=0.55,
+            edgecolors="none",
+            zorder=3,
         )
         best = sub.loc[sub["rmse_test_true"].idxmin()]
         ax.scatter(
-            [best["fit_seconds"]], [best["rmse_test_true"]], s=140, facecolors="none",
-            edgecolors=color, linewidths=2, zorder=4,
+            [best["fit_seconds"]],
+            [best["rmse_test_true"]],
+            s=140,
+            facecolors="none",
+            edgecolors=color,
+            linewidths=2,
+            zorder=4,
         )
         ax.annotate(
             pipeline.replace("_", " "),
             (best["fit_seconds"], best["rmse_test_true"]),
-            xytext=(8, 8), textcoords="offset points", fontsize=8.5, color=INK_SECONDARY,
+            xytext=(8, 8),
+            textcoords="offset points",
+            fontsize=8.5,
+            color=INK_SECONDARY,
         )
 
     ax.axhspan(LIT_BAND[0], LIT_BAND[1], color=INK_MUTED, alpha=0.10, zorder=1)
     ax.axvline(1.0, color=BASELINE, linewidth=1, linestyle="--", zorder=1)
-    ax.text(1.05, ax.get_ylim()[1] * 0.97, "1 second", fontsize=8, color=INK_MUTED, va="top")
+    ax.text(
+        1.05, ax.get_ylim()[1] * 0.97, "1 second", fontsize=8, color=INK_MUTED, va="top"
+    )
 
     ax.set_xscale("log")
     ax.set_xlabel("Fit time, log scale (seconds)")
     ax.set_ylabel("Test RMSE, true RUL (cycles)")
     ax.set_title(
         "Stage 2: accuracy vs. training cost across the Factor D grid (54 configs × 3 pipelines)",
-        fontsize=12, pad=14, loc="left",
+        fontsize=12,
+        pad=14,
+        loc="left",
     )
     ax.grid(color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
     _style_axes(ax)
 
-    handles = [plt.Line2D([0], [0], marker="o", color="none", markerfacecolor=CAT[p.split("/")[0]],
-                           markersize=8, label=p.replace("_", " ")) for p in pipelines]
-    ax.legend(handles=handles, loc="upper right", frameon=False, fontsize=8.5, labelcolor=INK_SECONDARY)
+    handles = [
+        plt.Line2D(
+            [0],
+            [0],
+            marker="o",
+            color="none",
+            markerfacecolor=CAT[p.split("/")[0]],
+            markersize=8,
+            label=p.replace("_", " "),
+        )
+        for p in pipelines
+    ]
+    ax.legend(
+        handles=handles,
+        loc="upper right",
+        frameon=False,
+        fontsize=8.5,
+        labelcolor=INK_SECONDARY,
+    )
     fig.tight_layout()
     fig.savefig(out_path, dpi=160, facecolor=SURFACE)
     plt.close(fig)
 
 
-def plot_stage3(predictions: dict, out_path: str, title: str = None, row_labels: dict = None):
+def plot_stage3(
+    predictions: dict, out_path: str, title: str = None, row_labels: dict = None
+):
     pipelines = list(predictions.keys())
     fig, axes = plt.subplots(
-        len(pipelines), 3, figsize=(13, 3.4 * len(pipelines)), facecolor=SURFACE, sharex=False
+        len(pipelines),
+        3,
+        figsize=(13, 3.4 * len(pipelines)),
+        facecolor=SURFACE,
+        sharex=False,
     )
     if len(pipelines) == 1:
         axes = axes[np.newaxis, :]
@@ -157,24 +214,49 @@ def plot_stage3(predictions: dict, out_path: str, title: str = None, row_labels:
         for col, unit in enumerate(units):
             ax = axes[row, col]
             sub = df[df["unit"] == unit].sort_values("cycle")
-            ax.plot(sub["cycle"], sub["RUL_true"], color=INK, linewidth=2, label="true RUL", zorder=3)
-            ax.plot(sub["cycle"], sub["RUL_pred"], color=color, linewidth=2,
-                     linestyle="--", label="predicted", zorder=3)
+            ax.plot(
+                sub["cycle"],
+                sub["RUL_true"],
+                color=INK,
+                linewidth=2,
+                label="true RUL",
+                zorder=3,
+            )
+            ax.plot(
+                sub["cycle"],
+                sub["RUL_pred"],
+                color=color,
+                linewidth=2,
+                linestyle="--",
+                label="predicted",
+                zorder=3,
+            )
             ax.set_title(f"unit {unit}", fontsize=10, color=INK, loc="left")
             ax.grid(color=GRID, linewidth=0.8, zorder=0)
             ax.set_axisbelow(True)
             _style_axes(ax)
             if col == 0:
-                label = (row_labels or {}).get(pipeline, pipeline.split("/", 1)[0].replace("_", " "))
+                label = (row_labels or {}).get(
+                    pipeline, pipeline.split("/", 1)[0].replace("_", " ")
+                )
                 ax.set_ylabel(label + "\nRUL (cycles)", fontsize=8.5)
             if row == len(pipelines) - 1:
                 ax.set_xlabel("cycle")
             if row == 0 and col == 2:
-                ax.legend(loc="upper right", frameon=False, fontsize=8.5, labelcolor=INK_SECONDARY)
+                ax.legend(
+                    loc="upper right",
+                    frameon=False,
+                    fontsize=8.5,
+                    labelcolor=INK_SECONDARY,
+                )
 
     fig.suptitle(
-        title or "Stage 3: predicted vs. true RUL trajectories on the held-out test units",
-        fontsize=12.5, color=INK, x=0.01, ha="left",
+        title
+        or "Stage 3: predicted vs. true RUL trajectories on the held-out test units",
+        fontsize=12.5,
+        color=INK,
+        x=0.01,
+        ha="left",
     )
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     fig.savefig(out_path, dpi=160, facecolor=SURFACE)
@@ -182,7 +264,9 @@ def plot_stage3(predictions: dict, out_path: str, title: str = None, row_labels:
 
 
 REFINE_COLORS = {
-    "baseline": INK_MUTED, "coordinate": "#2a78d6", "local": "#4a3aa7",
+    "baseline": INK_MUTED,
+    "coordinate": "#2a78d6",
+    "local": "#4a3aa7",
     "optimizers_ga": "#1baf7a",
 }
 
@@ -199,28 +283,47 @@ def plot_stage4(stage4_df: pd.DataFrame, out_path: str):
 
     for i, name in enumerate(series):
         if name == "baseline":
-            vals = [stage4_df[stage4_df["pipeline"] == p]["rmse_baseline"].iloc[0] for p in pipelines]
+            vals = [
+                stage4_df[stage4_df["pipeline"] == p]["rmse_baseline"].iloc[0]
+                for p in pipelines
+            ]
         else:
             vals = [
-                stage4_df[(stage4_df["pipeline"] == p) & (stage4_df["refiner"] == name)]["rmse_refined"].iloc[0]
-                if not stage4_df[(stage4_df["pipeline"] == p) & (stage4_df["refiner"] == name)].empty
-                else np.nan
+                (
+                    stage4_df[
+                        (stage4_df["pipeline"] == p) & (stage4_df["refiner"] == name)
+                    ]["rmse_refined"].iloc[0]
+                    if not stage4_df[
+                        (stage4_df["pipeline"] == p) & (stage4_df["refiner"] == name)
+                    ].empty
+                    else np.nan
+                )
                 for p in pipelines
             ]
         offset = (i - (n_series - 1) / 2) * width
-        ax.bar(x + offset, vals, width=width * 0.9, color=REFINE_COLORS[name], label=name, zorder=3)
+        ax.bar(
+            x + offset,
+            vals,
+            width=width * 0.9,
+            color=REFINE_COLORS[name],
+            label=name,
+            zorder=3,
+        )
 
     ax.set_xticks(x)
     ax.set_xticklabels([p.replace("_", " ") for p in pipelines], fontsize=8.5)
     ax.set_ylabel("Test RMSE, true RUL (cycles)")
     fastest = stage4_df.loc[stage4_df.groupby("refiner")["refine_seconds"].idxmax()]
     cost_note = " / ".join(
-        f"{row.refiner} up to {row.refine_seconds:,.0f}s" for row in fastest.itertuples()
+        f"{row.refiner} up to {row.refine_seconds:,.0f}s"
+        for row in fastest.itertuples()
     )
     ax.set_title(
         f"Stage 4: refinement helps where there's enough data/parameters to support it --\n"
         f"cost varies a lot by method ({cost_note})",
-        fontsize=11.5, pad=14, loc="left",
+        fontsize=11.5,
+        pad=14,
+        loc="left",
     )
     ax.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
@@ -251,19 +354,36 @@ def plot_stage4b(stage4b_df: pd.DataFrame, baseline_rmse: float, out_path: str):
     y = np.arange(len(df))
     ax.barh(y, df["rmse_refined"], color=colors, height=0.6, zorder=3)
     ax.axvline(baseline_rmse, color=INK, linewidth=1.5, linestyle="--", zorder=2)
-    ax.text(baseline_rmse + 0.15, 0.15, "heuristic\nbaseline",
-            fontsize=8, color=INK, ha="left", va="top", style="italic")
+    ax.text(
+        baseline_rmse + 0.15,
+        0.15,
+        "heuristic\nbaseline",
+        fontsize=8,
+        color=INK,
+        ha="left",
+        va="top",
+        style="italic",
+    )
     xmax = max(df["rmse_refined"].max(), baseline_rmse)
     ax.set_xlim(0, xmax * 1.18)
     for yi, v, s in zip(y, df["rmse_refined"], df["refine_seconds"]):
-        ax.text(v + xmax * 0.01, yi, f"{v:.2f} ({s:.1f}s)", va="center", fontsize=8, color=INK_SECONDARY)
+        ax.text(
+            v + xmax * 0.01,
+            yi,
+            f"{v:.2f} ({s:.1f}s)",
+            va="center",
+            fontsize=8,
+            color=INK_SECONDARY,
+        )
 
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=9, color=INK, fontfamily="monospace")
     ax.set_xlabel("Test RMSE, true RUL (cycles) -- A1_whole_cycle/B1/C3_physical")
     ax.set_title(
         "Stage 4b: sweeping each refiner's own hyperparameters on the small pipeline",
-        fontsize=12, pad=14, loc="left",
+        fontsize=12,
+        pad=14,
+        loc="left",
     )
     ax.grid(axis="x", color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
@@ -281,25 +401,47 @@ def plot_stage5(onset_df: pd.DataFrame, cap_results_df: pd.DataFrame, out_path: 
     lo = min(onset_df["true_onset"].min(), onset_df["detected_onset"].min()) - 3
     hi = max(onset_df["true_onset"].max(), onset_df["detected_onset"].max()) + 3
     ax.plot([lo, hi], [lo, hi], color=BASELINE, linewidth=1, linestyle="--", zorder=1)
-    ax.scatter(onset_df["true_onset"], onset_df["detected_onset"], s=70, color=CAT["A3_raw_memory"], zorder=3)
+    ax.scatter(
+        onset_df["true_onset"],
+        onset_df["detected_onset"],
+        s=70,
+        color=CAT["A3_raw_memory"],
+        zorder=3,
+    )
     for row in onset_df.itertuples():
-        ax.annotate(str(row.unit), (row.true_onset, row.detected_onset),
-                    xytext=(6, 4), textcoords="offset points", fontsize=8, color=INK_SECONDARY)
+        ax.annotate(
+            str(row.unit),
+            (row.true_onset, row.detected_onset),
+            xytext=(6, 4),
+            textcoords="offset points",
+            fontsize=8,
+            color=INK_SECONDARY,
+        )
     ax.set_xlim(lo, hi)
     ax.set_ylim(lo, hi)
     ax.set_xlabel("True onset (oracle hs), cycle")
     ax.set_ylabel("Detected onset (moving avg.), cycle")
     mae = onset_df["error"].abs().mean()
-    ax.set_title(f"Onset detection: MAE = {mae:.1f} cycles", fontsize=11.5, pad=12, loc="left")
+    ax.set_title(
+        f"Onset detection: MAE = {mae:.1f} cycles", fontsize=11.5, pad=12, loc="left"
+    )
     ax.grid(color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
     _style_axes(ax)
 
     ax2 = axes[1]
     if cap_results_df is None or cap_results_df.empty:
-        ax2.text(0.5, 0.5, "No C3_physical pipeline\nin this run's top picks",
-                  ha="center", va="center", fontsize=11, color=INK_MUTED, style="italic",
-                  transform=ax2.transAxes)
+        ax2.text(
+            0.5,
+            0.5,
+            "No C3_physical pipeline\nin this run's top picks",
+            ha="center",
+            va="center",
+            fontsize=11,
+            color=INK_MUTED,
+            style="italic",
+            transform=ax2.transAxes,
+        )
         ax2.set_xticks([])
         ax2.set_yticks([])
         for spine in ax2.spines.values():
@@ -312,22 +454,42 @@ def plot_stage5(onset_df: pd.DataFrame, cap_results_df: pd.DataFrame, out_path: 
         width = 0.35
         for i, cs in enumerate(cap_sources):
             vals = [
-                cap_results_df[(cap_results_df["pipeline"] == p) & (cap_results_df["cap_source"] == cs)]["rmse_test_true"].iloc[0]
+                cap_results_df[
+                    (cap_results_df["pipeline"] == p)
+                    & (cap_results_df["cap_source"] == cs)
+                ]["rmse_test_true"].iloc[0]
                 for p in pipelines
             ]
-            ax2.bar(x + (i - 0.5) * width, vals, width=width * 0.9, color=cap_colors[cs], label=cs, zorder=3)
+            ax2.bar(
+                x + (i - 0.5) * width,
+                vals,
+                width=width * 0.9,
+                color=cap_colors[cs],
+                label=cs,
+                zorder=3,
+            )
         ax2.set_xticks(x)
         ax2.set_xticklabels([p.replace("_", " ") for p in pipelines], fontsize=8)
         ax2.set_ylabel("Test RMSE, true RUL (cycles)")
         ax2.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
         ax2.set_axisbelow(True)
         _style_axes(ax2)
-        ax2.legend(loc="upper left", frameon=False, fontsize=8.5, labelcolor=INK_SECONDARY)
-    ax2.set_title("Cost of using the detected onset instead of the oracle", fontsize=11.5, pad=12, loc="left")
+        ax2.legend(
+            loc="upper left", frameon=False, fontsize=8.5, labelcolor=INK_SECONDARY
+        )
+    ax2.set_title(
+        "Cost of using the detected onset instead of the oracle",
+        fontsize=11.5,
+        pad=12,
+        loc="left",
+    )
 
     fig.suptitle(
         "Stage 5: can a moving-average detector replace the oracle hs flag?",
-        fontsize=12.5, color=INK, x=0.01, ha="left",
+        fontsize=12.5,
+        color=INK,
+        x=0.01,
+        ha="left",
     )
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(out_path, dpi=160, facecolor=SURFACE)
@@ -347,21 +509,55 @@ def plot_progression(milestones: list[dict], out_path: str):
     x = np.arange(len(milestones))
     labels = [m["label"] for m in milestones]
 
-    for key, name in [("overall", "best overall"),
-                       ("real_sensor", "best real-sensor-only")]:
+    for key, name in [
+        ("overall", "best overall"),
+        ("real_sensor", "best real-sensor-only"),
+    ]:
         vals = [m[key] for m in milestones]
         color = PROGRESSION_COLORS[key]
-        ax.plot(x, vals, color=color, linewidth=2, marker="o", markersize=7, zorder=4, label=name)
+        ax.plot(
+            x,
+            vals,
+            color=color,
+            linewidth=2,
+            marker="o",
+            markersize=7,
+            zorder=4,
+            label=name,
+        )
         for xi, v in zip(x, vals):
-            ax.annotate(f"{v:.2f}", (xi, v), xytext=(0, 10), textcoords="offset points",
-                        ha="center", fontsize=9, color=color, fontweight="bold")
+            ax.annotate(
+                f"{v:.2f}",
+                (xi, v),
+                xytext=(0, 10),
+                textcoords="offset points",
+                ha="center",
+                fontsize=9,
+                color=color,
+                fontweight="bold",
+            )
 
     ax.axhspan(LIT_BAND[0], LIT_BAND[1], color=INK_MUTED, alpha=0.10, zorder=1)
-    ax.text(x[-1] + 0.08, sum(LIT_BAND) / 2, "published\nCNN/MLP\n(DS02-006)",
-            fontsize=8, color=INK_MUTED, style="italic", va="center")
+    ax.text(
+        x[-1] + 0.08,
+        sum(LIT_BAND) / 2,
+        "published\nCNN/MLP\n(DS02-006)",
+        fontsize=8,
+        color=INK_MUTED,
+        style="italic",
+        va="center",
+    )
     ax.axhline(CONST_MEAN_RMSE, color=BASELINE, linewidth=1, linestyle="--", zorder=1)
-    ax.text(x[0] - 0.08, CONST_MEAN_RMSE, "constant-mean baseline", fontsize=8,
-            color=INK_MUTED, style="italic", ha="right", va="center")
+    ax.text(
+        x[0] - 0.08,
+        CONST_MEAN_RMSE,
+        "constant-mean baseline",
+        fontsize=8,
+        color=INK_MUTED,
+        style="italic",
+        ha="right",
+        va="center",
+    )
 
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=9.5, color=INK)
@@ -369,7 +565,9 @@ def plot_progression(milestones: list[dict], out_path: str):
     ax.set_ylabel("Test RMSE, true RUL (cycles)")
     ax.set_title(
         "How we got here: RMSE across successive rounds of this DOE",
-        fontsize=13, pad=16, loc="left",
+        fontsize=13,
+        pad=16,
+        loc="left",
     )
     ax.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
@@ -381,12 +579,20 @@ def plot_progression(milestones: list[dict], out_path: str):
 
 
 def make_plots(
-    stage1_df, stage2_df, stage3_predictions, top_pipelines,
-    stage4_df=None, stage4b_df=None, stage5_onsets=None, stage5_results=None,
+    stage1_df,
+    stage2_df,
+    stage3_predictions,
+    top_pipelines,
+    stage4_df=None,
+    stage4b_df=None,
+    stage5_onsets=None,
+    stage5_results=None,
 ):
     plot_stage1(stage1_df, "FuzzySystemsExperiments/cmapss_rul_stage1.png")
     print("wrote FuzzySystemsExperiments/cmapss_rul_stage1.png")
-    plot_stage2(stage2_df, top_pipelines, "FuzzySystemsExperiments/cmapss_rul_stage2.png")
+    plot_stage2(
+        stage2_df, top_pipelines, "FuzzySystemsExperiments/cmapss_rul_stage2.png"
+    )
     print("wrote FuzzySystemsExperiments/cmapss_rul_stage2.png")
     plot_stage3(stage3_predictions, "FuzzySystemsExperiments/cmapss_rul_stage3.png")
     print("wrote FuzzySystemsExperiments/cmapss_rul_stage3.png")
@@ -395,8 +601,18 @@ def make_plots(
         print("wrote FuzzySystemsExperiments/cmapss_rul_stage4.png")
     if stage4b_df is not None and not stage4b_df.empty:
         baseline_rmse = stage4b_df["rmse_baseline"].iloc[0]
-        plot_stage4b(stage4b_df, baseline_rmse, "FuzzySystemsExperiments/cmapss_rul_stage4b.png")
+        plot_stage4b(
+            stage4b_df, baseline_rmse, "FuzzySystemsExperiments/cmapss_rul_stage4b.png"
+        )
         print("wrote FuzzySystemsExperiments/cmapss_rul_stage4b.png")
-    if stage5_onsets is not None and stage5_results is not None and not stage5_onsets.empty:
-        plot_stage5(stage5_onsets, stage5_results, "FuzzySystemsExperiments/cmapss_rul_stage5.png")
+    if (
+        stage5_onsets is not None
+        and stage5_results is not None
+        and not stage5_onsets.empty
+    ):
+        plot_stage5(
+            stage5_onsets,
+            stage5_results,
+            "FuzzySystemsExperiments/cmapss_rul_stage5.png",
+        )
         print("wrote FuzzySystemsExperiments/cmapss_rul_stage5.png")

@@ -36,7 +36,11 @@ from cmapss_rul_plots import plot_progression
 MILESTONES = [
     {"label": "Raw features,\nfixed defaults", "overall": 13.12, "real_sensor": 19.38},
     {"label": "+ construction\ntuning", "overall": 8.83, "real_sensor": 19.12},
-    {"label": "+ condition correction\n+ scaling (fair)", "overall": 6.48, "real_sensor": 11.23},
+    {
+        "label": "+ condition correction\n+ scaling (fair)",
+        "overall": 6.48,
+        "real_sensor": 11.23,
+    },
 ]
 
 if __name__ == "__main__":
