@@ -291,31 +291,86 @@ def plot_stage5(onset_df: pd.DataFrame, cap_results_df: pd.DataFrame, out_path: 
     _style_axes(ax)
 
     ax2 = axes[1]
-    pipelines = list(cap_results_df["pipeline"].unique())
-    cap_sources = ["oracle_hs", "detected_ma"]
-    cap_colors = {"oracle_hs": INK_MUTED, "detected_ma": CAT["A3_raw_memory"]}
-    x = np.arange(len(pipelines))
-    width = 0.35
-    for i, cs in enumerate(cap_sources):
-        vals = [
-            cap_results_df[(cap_results_df["pipeline"] == p) & (cap_results_df["cap_source"] == cs)]["rmse_test_true"].iloc[0]
-            for p in pipelines
-        ]
-        ax2.bar(x + (i - 0.5) * width, vals, width=width * 0.9, color=cap_colors[cs], label=cs, zorder=3)
-    ax2.set_xticks(x)
-    ax2.set_xticklabels([p.replace("_", " ") for p in pipelines], fontsize=8)
-    ax2.set_ylabel("Test RMSE, true RUL (cycles)")
+    if cap_results_df is None or cap_results_df.empty:
+        ax2.text(0.5, 0.5, "No C3_physical pipeline\nin this run's top picks",
+                  ha="center", va="center", fontsize=11, color=INK_MUTED, style="italic",
+                  transform=ax2.transAxes)
+        ax2.set_xticks([])
+        ax2.set_yticks([])
+        for spine in ax2.spines.values():
+            spine.set_visible(False)
+    else:
+        pipelines = list(cap_results_df["pipeline"].unique())
+        cap_sources = ["oracle_hs", "detected_ma"]
+        cap_colors = {"oracle_hs": INK_MUTED, "detected_ma": CAT["A3_raw_memory"]}
+        x = np.arange(len(pipelines))
+        width = 0.35
+        for i, cs in enumerate(cap_sources):
+            vals = [
+                cap_results_df[(cap_results_df["pipeline"] == p) & (cap_results_df["cap_source"] == cs)]["rmse_test_true"].iloc[0]
+                for p in pipelines
+            ]
+            ax2.bar(x + (i - 0.5) * width, vals, width=width * 0.9, color=cap_colors[cs], label=cs, zorder=3)
+        ax2.set_xticks(x)
+        ax2.set_xticklabels([p.replace("_", " ") for p in pipelines], fontsize=8)
+        ax2.set_ylabel("Test RMSE, true RUL (cycles)")
+        ax2.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
+        ax2.set_axisbelow(True)
+        _style_axes(ax2)
+        ax2.legend(loc="upper left", frameon=False, fontsize=8.5, labelcolor=INK_SECONDARY)
     ax2.set_title("Cost of using the detected onset instead of the oracle", fontsize=11.5, pad=12, loc="left")
-    ax2.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
-    ax2.set_axisbelow(True)
-    _style_axes(ax2)
-    ax2.legend(loc="upper left", frameon=False, fontsize=8.5, labelcolor=INK_SECONDARY)
 
     fig.suptitle(
         "Stage 5: can a moving-average detector replace the oracle hs flag?",
         fontsize=12.5, color=INK, x=0.01, ha="left",
     )
     fig.tight_layout(rect=[0, 0, 1, 0.94])
+    fig.savefig(out_path, dpi=160, facecolor=SURFACE)
+    plt.close(fig)
+
+
+# Series colors distinct from the Factor-A categorical hues used elsewhere,
+# since this chart tracks *pipelines over milestones*, not aggregation family.
+PROGRESSION_COLORS = {"overall": "#4a3aa7", "real_sensor": "#eb6834"}
+
+
+def plot_progression(milestones: list[dict], out_path: str):
+    """milestones: list of {label, overall, real_sensor} in chronological
+    order. 'overall' may use virtual/unmeasurable sensors (leakage-flagged
+    sensitivity arm); 'real_sensor' is the honest deployable number."""
+    fig, ax = plt.subplots(figsize=(10, 6.5), facecolor=SURFACE)
+    x = np.arange(len(milestones))
+    labels = [m["label"] for m in milestones]
+
+    for key, name in [("overall", "best overall (incl. virtual sensors)"),
+                       ("real_sensor", "best real-sensor-only")]:
+        vals = [m[key] for m in milestones]
+        color = PROGRESSION_COLORS[key]
+        ax.plot(x, vals, color=color, linewidth=2, marker="o", markersize=7, zorder=4, label=name)
+        for xi, v in zip(x, vals):
+            ax.annotate(f"{v:.2f}", (xi, v), xytext=(0, 10), textcoords="offset points",
+                        ha="center", fontsize=9, color=color, fontweight="bold")
+
+    ax.axhspan(LIT_BAND[0], LIT_BAND[1], color=INK_MUTED, alpha=0.10, zorder=1)
+    ax.text(x[-1] + 0.08, sum(LIT_BAND) / 2, "published\nCNN/MLP\n(DS02-006)",
+            fontsize=8, color=INK_MUTED, style="italic", va="center")
+    ax.axhline(CONST_MEAN_RMSE, color=BASELINE, linewidth=1, linestyle="--", zorder=1)
+    ax.text(x[0] - 0.08, CONST_MEAN_RMSE, "constant-mean baseline", fontsize=8,
+            color=INK_MUTED, style="italic", ha="right", va="center")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=9.5, color=INK)
+    ax.set_xlim(-0.4, len(milestones) - 1 + 0.6)
+    ax.set_ylabel("Test RMSE, true RUL (cycles)")
+    ax.set_title(
+        "How we got here: RMSE across successive rounds of this DOE",
+        fontsize=13, pad=16, loc="left",
+    )
+    ax.grid(axis="y", color=GRID, linewidth=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    _style_axes(ax)
+    ax.legend(loc="upper right", frameon=False, fontsize=9.5, labelcolor=INK_SECONDARY)
+    fig.tight_layout()
     fig.savefig(out_path, dpi=160, facecolor=SURFACE)
     plt.close(fig)
 
