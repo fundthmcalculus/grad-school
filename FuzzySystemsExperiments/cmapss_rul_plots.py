@@ -26,6 +26,10 @@ CAT = {
     "A1_whole_cycle": "#2a78d6",  # blue
     "A3_raw_memory": "#eb6834",   # orange
     "A2_phase_split": "#1baf7a",  # aqua
+    # Condition-corrected variants keep their base family's color -- same
+    # aggregation strategy, just fed corrected input.
+    "A1_whole_cycle_cc": "#2a78d6",
+    "A3_raw_memory_cc": "#eb6834",
 }
 # DS02-specific references (Custode, Mo, Ferigo & Iacca 2022, re-running Arias
 # Chao's own baselines on the actual released N-CMAPSS_DS02-006.h5 -- the
@@ -137,7 +141,7 @@ def plot_stage2(stage2_df: pd.DataFrame, pipelines: list[str], out_path: str):
     plt.close(fig)
 
 
-def plot_stage3(predictions: dict, out_path: str):
+def plot_stage3(predictions: dict, out_path: str, title: str = None, row_labels: dict = None):
     pipelines = list(predictions.keys())
     fig, axes = plt.subplots(
         len(pipelines), 3, figsize=(13, 3.4 * len(pipelines)), facecolor=SURFACE, sharex=False
@@ -161,14 +165,15 @@ def plot_stage3(predictions: dict, out_path: str):
             ax.set_axisbelow(True)
             _style_axes(ax)
             if col == 0:
-                ax.set_ylabel(pipeline.split("/", 1)[0].replace("_", " ") + "\nRUL (cycles)", fontsize=8.5)
+                label = (row_labels or {}).get(pipeline, pipeline.split("/", 1)[0].replace("_", " "))
+                ax.set_ylabel(label + "\nRUL (cycles)", fontsize=8.5)
             if row == len(pipelines) - 1:
                 ax.set_xlabel("cycle")
             if row == 0 and col == 2:
                 ax.legend(loc="upper right", frameon=False, fontsize=8.5, labelcolor=INK_SECONDARY)
 
     fig.suptitle(
-        "Stage 3: predicted vs. true RUL trajectories on the held-out test units",
+        title or "Stage 3: predicted vs. true RUL trajectories on the held-out test units",
         fontsize=12.5, color=INK, x=0.01, ha="left",
     )
     fig.tight_layout(rect=[0, 0, 1, 0.96])
