@@ -185,6 +185,64 @@ def test_occupied_vertices_are_bounded_by_the_data():
     assert abs(support.sum() - N) < 1e-9, "total support is one unit per row"
 
 
+def test_warp_puts_the_lattice_on_the_knots():
+    """Each feature's knots land exactly on lattice integers, and order survives."""
+    rng = np.random.default_rng(8)
+    for _ in range(20):
+        k = np.sort(rng.uniform(-3, 3, size=int(rng.integers(2, 9))))
+        if np.min(np.diff(k)) < 1e-3:
+            continue
+        w = simplicial.AxisWarp(knots=[k])
+        u = w.forward(k[:, None]).ravel()
+        assert np.max(np.abs(u - np.arange(k.size))) < 1e-9, "knots must map to 0..m-1"
+        # Strictly increasing everywhere, including outside the knot range, so
+        # rows beyond the training extent are not clamped on top of each other.
+        x = np.sort(rng.uniform(k[0] - 2, k[-1] + 2, size=500))
+        assert np.all(np.diff(w.forward(x[:, None]).ravel()) > 0)
+
+
+def test_from_knots_merges_near_duplicates():
+    """Near-duplicate knots must not become full lattice cells.
+
+    The regression this guards: on WEC the FIS's knot gaps span 4.6e4-to-1, and
+    building the warp straight off them put a cell boundary between two points
+    4e-6 apart, driving conversion fidelity to 16.46 against an additive seed's
+    1.47.
+    """
+    knots = {"a": [0.0, 1e-6, 2e-6, 0.5, 1.0], "b": [0.0, 1.0], "c": [0.3]}
+    w = simplicial.AxisWarp.from_knots(knots, ["a", "b", "c"])
+    assert w.knots[0].size == 3, "the three colliding knots must collapse to one"
+    assert np.min(np.diff(w.knots[0])) >= simplicial.AxisWarp.MIN_GAP
+    assert w.knots[1].size == 2
+    assert w.knots[2].size == 0, "a single knot cannot define a warp"
+
+
+def test_warped_lattice_still_partitions_unity():
+    """Warping the axes cannot break the property the equivalence rests on."""
+    rng = np.random.default_rng(9)
+    n = 3
+    knots = [np.sort(rng.uniform(0, 1, size=6)) for _ in range(n)]
+    warp = simplicial.AxisWarp(knots=knots)
+    X = rng.uniform(0.05, 0.95, size=(300, n))
+    U = warp.forward(X)
+    origin, h = simplicial.grid_from_data(U, resolution=3)
+    vertices, _ = simplicial.occupied_vertices(U, origin, h)
+    phi = simplicial.hat(U, vertices, origin, h)
+    assert np.allclose(phi.sum(axis=1), 1.0, atol=1e-12)
+    assert (phi > 1e-12).sum(axis=1).max() <= n + 1
+
+
+def test_warp_is_a_relu_circuit():
+    """The warp costs one ReLU per interior knot per axis -- linear, not free."""
+    knots = [np.linspace(0, 1, 7), np.linspace(0, 1, 4), np.asarray([])]
+    w = simplicial.AxisWarp(knots=knots)
+    assert w.relu_units() == (7 - 2) + (4 - 2)
+    # An axis with no knots passes through untouched.
+    X = np.zeros((5, 3))
+    X[:, 2] = np.arange(5.0)
+    assert np.array_equal(w.forward(X)[:, 2], np.arange(5.0))
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

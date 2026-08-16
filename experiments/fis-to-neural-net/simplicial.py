@@ -505,3 +505,156 @@ def fit_simplicial_correction(
         resolution=res,
         rows_per_vertex=len(S) / max(len(vertices), 1),
     )
+
+
+# ---------------------------------------------------------------------------
+# Triangulating on the FIS's structure instead of on a bounding box
+# ---------------------------------------------------------------------------
+#
+# The 2025 paper's interpolation is exact because its triangulation is induced
+# by the linear regions of the very network being converted -- the vertices sit
+# where the function actually bends. A lattice over the data's bounding box has
+# no such property, and `run_simplicial.py` measured what that costs: vertices
+# land off the data manifold, and resolution is spent uniformly on a space the
+# data occupies unevenly.
+#
+# The fix does not require abandoning the Freudenthal machinery, which needs a
+# *regular* lattice. A non-uniform rectilinear complex is the image of a regular
+# one under a per-axis monotone map, so warping each axis until the FIS's own
+# knots land on integers gives a complex aligned to the FIS's structure while
+# every hat stays exactly the closed form above. And the warp is itself
+# piecewise linear -- built by the same `pwl_to_relu_weights` the first-order
+# seed uses -- so the composition is still a ReLU circuit, just two blocks deep
+# instead of one.
+
+
+@dataclass
+class AxisWarp:
+    """Per-axis monotone piecewise-linear map sending a feature's knots to 0,1,2,...
+
+    ``knots[f]`` are that feature's FIS-derived breakpoints, sorted. After
+    :meth:`forward`, a unit cell of the lattice is one inter-knot interval, so
+    lattice vertices coincide with the FIS's membership geometry rather than
+    with an arbitrary grid. Outside the knot range the map extends linearly, so
+    test rows beyond the training extent still receive distinct coordinates
+    instead of being clamped on top of each other.
+    """
+
+    knots: list
+
+    #: Knots closer together than this (in the unit-scaled feature's own units)
+    #: are merged before the warp is built. Unlike the additive seed -- where a
+    #: near-duplicate knot is just one more nearly-collinear ReLU column, and
+    #: sweeping the tolerance from 1e-9 to 1e-2 moved test RMSE by under 2% --
+    #: here it distorts the *geometry*: two knots 4e-6 apart become a full unit
+    #: cell, so a lattice cell spans a gap no data can resolve. Measured on WEC,
+    #: whose knot gaps span 4.6e4-to-1 (4.17e-06 to 0.19), leaving this at the
+    #: `fis_knots` default drove fidelity to 16.46 against an additive seed's
+    #: 1.47.
+    MIN_GAP: float = 1e-3
+
+    @staticmethod
+    def from_knots(
+        knots_by_feature, feature_names, min_gap: float = MIN_GAP
+    ) -> "AxisWarp":
+        import fis2nn  # local: keeps the two modules independently importable
+
+        cleaned = []
+        for name in feature_names:
+            k = np.asarray(knots_by_feature.get(name, []), dtype=float)
+            k = k[np.isfinite(k)]
+            if k.size:
+                k = fis2nn.merge_knots(k, tol=min_gap)
+            cleaned.append(k if k.size >= 2 else np.asarray([], dtype=float))
+        return AxisWarp(knots=cleaned)
+
+    def forward(self, X: np.ndarray) -> np.ndarray:
+        """Map data into knot-index coordinates. Identity on axes with no knots."""
+        import fis2nn  # local: keeps the two modules independently importable
+
+        X = np.asarray(X, dtype=float)
+        U = np.array(X, dtype=float, copy=True)
+        for f, k in enumerate(self.knots):
+            if k.size < 2:
+                continue
+            base, intercept, coeffs = fis2nn.pwl_to_relu_weights(
+                k, np.arange(k.size, dtype=float)
+            )
+            act = np.maximum(X[:, f : f + 1] - k[None, :], 0.0)
+            U[:, f] = intercept + base * X[:, f] + act @ coeffs
+        return U
+
+    def relu_units(self) -> int:
+        """ReLU units the warp itself costs -- one per interior knot, per axis."""
+        return int(sum(max(k.size - 2, 0) for k in self.knots if k.size >= 2))
+
+
+@dataclass
+class WarpedCorrection:
+    """A tetrahedral correction on a FIS-aligned lattice."""
+
+    columns: np.ndarray
+    warp: AxisWarp
+    net: SimplicialNet
+    resolution: int
+    rows_per_vertex: float
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        S = self.warp.forward(np.asarray(X, dtype=float)[:, self.columns])
+        return self.net.predict(S)
+
+    def to_relu_spec(self) -> dict:
+        spec = self.net.to_relu_spec()
+        spec["subspace"] = int(len(self.columns))
+        spec["warp_units"] = self.warp.relu_units()
+        spec["relu_units"] += spec["warp_units"]
+        return spec
+
+
+def fit_warped_correction(
+    residual: np.ndarray,
+    X_scaled: np.ndarray,
+    subspace,
+    warp: AxisWarp,
+    l2: float = 1e-6,
+    target_rows_per_vertex: float = TARGET_ROWS_PER_VERTEX,
+    candidates=(2, 3, 4, 6, 8, 12, 16, 24),
+):
+    """:func:`fit_simplicial_correction`, but on the FIS-aligned lattice.
+
+    Identical in every other respect, so the pair isolates *where the vertices
+    sit* from everything else about the tetrahedral construction.
+    """
+    subspace = np.asarray(subspace, dtype=int)
+    sub_warp = AxisWarp(knots=[warp.knots[i] for i in subspace])
+    S = sub_warp.forward(np.asarray(X_scaled, dtype=float)[:, subspace])
+    res, origin, h, vertices, _support = auto_resolution(
+        S, candidates=candidates, target_rows_per_vertex=target_rows_per_vertex
+    )
+    c, bias = consequents_from_fis(
+        "project",
+        np.asarray(residual, dtype=float),
+        S,
+        None,
+        None,
+        vertices,
+        origin,
+        h,
+        None,
+        l2=l2,
+    )
+    net = SimplicialNet(
+        vertices=vertices,
+        origin=origin,
+        h=h,
+        c=c,
+        skip=np.zeros(len(subspace)),
+        bias=bias,
+    )
+    return WarpedCorrection(
+        columns=subspace,
+        warp=sub_warp,
+        net=net,
+        resolution=res,
+        rows_per_vertex=len(S) / max(len(vertices), 1),
+    )
