@@ -241,6 +241,7 @@ identity, and only then carried upward to where it is a projection.
 | 2 | Concrete compressive strength | 1,030 × 8 | the proposal's regression workhorse; small, all features informative |
 | 3 | WEC Sydney (100 buoys) | 2,319 × 301 | the high-dimensional case, where feature selection is most of the work (H7) |
 | 4 | Bike sharing (hourly) | 17,379 × 12 | the scale partner, 17× larger than Concrete |
+| 5 | PhiUSIIL phishing URLs | 235,795 × 50 | full scale and the first *classification* rung — the regime a warm start needs (`run_phiusiil.py`) |
 
 Two dataset notes the driver encodes rather than works around:
 
@@ -252,6 +253,13 @@ Two dataset notes the driver encodes rather than works around:
   patched: proposal Tables 4.1 and 6.1 quote it, and silently changing what it
   returns would move archived numbers with no table announcing it.
   **This needs a decision upstream** — see `RESULTS.md`.
+* **PhiUSIIL is not vendored** (57 MB) and is not in `data/` by default.
+  `data/.gitignore` records the exact `git -C tribble-fis show ...` that
+  recovers it from submodule history; `run_phiusiil.py` says so if it is
+  missing. Two further notes that the results depend on: the FIS scores 0.994
+  on log + min-max scaled inputs and **0.730** on raw ones, and
+  `URLSimilarityIndex` alone scores **0.9914**, so `--drop-dominant` exists to
+  make the dataset able to distinguish models at all.
 * **WEC needs `top_n=12`,** and the reason is a finding rather than a
   convenience: the converted network's width is the FIS's membership-function
   count, and nothing bounds it. At the default `top_p=0.95`, TRIBBLE keeps 300
@@ -265,6 +273,9 @@ python experiments/fis-to-neural-net/test_fis2nn.py                  # H1, H3, s
 python experiments/fis-to-neural-net/test_simplicial.py              # T1, T2, seconds
 python experiments/fis-to-neural-net/run_experiment.py               # the ladder
 python experiments/fis-to-neural-net/run_simplicial.py               # T3, T4, T5
+python experiments/fis-to-neural-net/run_warped.py                   # W1, W2
+python experiments/fis-to-neural-net/run_phiusiil.py                 # P1-P4
+python experiments/fis-to-neural-net/run_phiusiil.py --drop-dominant # ... without the giveaway feature
 python experiments/fis-to-neural-net/time_to_quality.py              # H4, from results.json
 python experiments/fis-to-neural-net/analysis_triangularization.py   # H2's mechanism
 python experiments/fis-to-neural-net/analysis_gating.py              # H8
