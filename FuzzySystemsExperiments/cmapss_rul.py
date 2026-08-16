@@ -345,6 +345,23 @@ D_GRID = dict(
     # killed). Some feature selection is in scope for every config now.
     top_p=[0.90, 0.95],
     detect_interactions=[False, True],
+    # norm_conorm/l2_reg added after a one-factor-at-a-time probe on the
+    # A3_raw_memory/B2/C1_raw pipeline (holding the rest of that pipeline's
+    # winning config fixed) turned up a real, zero-extra-cost improvement:
+    # 'hamacher' + l2_reg=0.01 hit RMSE 8.83 vs. the original grid's 9.68 --
+    # better than *any* refinement result found in this DOE, at the same
+    # sub-second fit time. 'min/max' was close behind (8.91); 'luk' was
+    # catastrophic (37.99, presumably a numerical-stability failure of the
+    # Lukasiewicz operators at this order/data combo) and is deliberately
+    # excluded here rather than included as a guaranteed-bad grid point.
+    # n_output_buckets>2 and output_partition='quantile' were also probed
+    # and consistently hurt (16+ RMSE) -- left at their defaults, not swept.
+    # consequent_basis='gaussian-rbf' has a separate, serious bug: combined
+    # with any tsk_order other than '0th' it tries to build an O(n_rules *
+    # n_firing_rows) center array and OOMs requesting tens of terabytes --
+    # filed as tribble-fis#130; excluded from this grid entirely.
+    norm_conorm=["probability", "hamacher"],
+    l2_reg=[1e-6, 0.01],
 )
 
 
