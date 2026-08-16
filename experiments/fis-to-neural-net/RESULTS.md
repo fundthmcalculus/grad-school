@@ -2,9 +2,10 @@
 
 Run of record: `results.json`, ten seeds, 150 epochs, commit `d830022`,
 `tribble-fis` `5b92ec8`. The tetrahedral follow-up is `simplicial_results.json`,
-five seeds. Tables quoted here are generated, not transcribed —
-`results_summary.md`, `time_to_quality.md`, `triangularization.md`, `gating.md`,
-`simplicial.md`.
+five seeds, and the Part 3 refinements are `warped_results.json`, five seeds.
+Tables quoted here are generated, not transcribed — `results_summary.md`,
+`time_to_quality.md`, `triangularization.md`, `gating.md`, `simplicial.md`,
+`warped.md`.
 
 ## Short version
 
@@ -50,6 +51,15 @@ tetrahedral rules than training rows, so the rules have no data behind them. The
 usable form is a hybrid — additive main effects, tetrahedral interactions on a
 few features — which improves the conversion by 17–30% on every dataset.
 
+**Part 3 removed the hybrid's two arbitrary choices** — a bounding-box lattice,
+and a subspace ranked by main effects. Putting the vertices on the FIS's own
+knots does not lower the best fidelity but makes it *robust*: the lattice arm
+collapses when asked for a subspace it cannot support (0.597 at k=4 on
+Concrete), the warped arm holds flat at 0.255–0.265 across every k. Ranking the
+subspace by pair lift instead of importance pays exactly where interactions
+dominate. Neither moves the ceiling, and the reason is the same one Part 1
+found from the other side: **the ceiling is the FIS**.
+
 ## Hypothesis scoring
 
 | | hypothesis | verdict |
@@ -63,9 +73,10 @@ few features — which improves the conversion by 17–30% on every dataset.
 | H7 | advantage grows with dimension | **falsified — it inverts** |
 | H8 | gating no longer reaches the conversion | **confirmed in 1-D, falsified above it** |
 | T1–T5 | the tetrahedral construction (Part 2) | 2 confirmed, 2 falsified, 1 partial |
+| W1–W2 | FIS-aligned vertices, interaction subspaces (Part 3) | both partial |
 
-Six of eight in Part 1 came back wrong or partly wrong, and four of five in
-Part 2. Several are more useful that way.
+Six of eight in Part 1 came back wrong or partly wrong, four of five in Part 2,
+and both in Part 3. Several are more useful that way.
 
 ---
 
@@ -391,6 +402,82 @@ by how much data you have.
 | T3 | it closes the fidelity gap the additive seed left | **partly** — 17–30% better via the hybrid, not closed |
 | T4 | the paper's `z = f(p)` consequent transfers to this direction | **falsified** — worst of three estimators above 1-D |
 | T5 | a full-dimensional tetrahedral basis is usable | **falsified** — support per vertex collapses exponentially |
+
+---
+
+# Part 3 — FIS-aligned vertices, and interaction-chosen subspaces
+
+Part 2 left two arbitrary choices inside the hybrid. `run_warped.py` removes
+both, one at a time, five seeds (`warped.md`).
+
+**Where the vertices sit.** `simplicial.AxisWarp` warps each axis until the
+FIS's own knots land on lattice integers, so a unit cell is one inter-knot
+interval. Every hat stays exactly the closed form — the warped lattice is still
+regular — and the warp is itself piecewise linear, so the composition is still a
+ReLU circuit at a cost of one unit per interior knot per axis (195–275 units
+across all axes here).
+
+**Which features the correction spans.** The hybrid took the top `k` by
+differentiation score, which ranks *main* effects.
+`gauss_math.calculate_interaction_scores` ranks feature *pairs* by joint lift,
+which is the question actually being asked.
+
+## Neither is a uniform win, and the pattern says why
+
+| dataset | additive | best lattice | best warped | best selector |
+|---|---|---|---|---|
+| concrete | 0.313 | 0.257 (k=2) | **0.255** (k=4, interaction) | either |
+| wec | 1.471 | **1.066** (k=4, interaction) | 1.611 (k=4, importance) | interaction, decisively |
+| bikeshare | 1.101 | 0.959 (k=4) | **0.932** (k=2) | no difference |
+
+**Warping's value is robustness, not a lower floor.** On Concrete the best
+lattice and best warped fidelities are within noise of each other (0.257 vs
+0.255) — but the lattice arm *collapses* as the subspace grows (0.597 and 0.628
+at `k=4`, where 9.0 rows per vertex is below the support threshold), while the
+warped arm holds flat at 0.255–0.265 across every `k` and both selectors.
+Putting vertices on the FIS's knots spends resolution where the FIS says
+structure is, so the correction stops falling apart when asked for a subspace
+it cannot support. That is worth having even though it does not move the best
+case.
+
+**Where the FIS's knots are unreliable, warping is actively harmful.** On WEC it
+is much worse than the lattice at every setting (6.442 vs 1.278 at `k=2`). WEC is
+the dataset whose FIS has R² of −89.7 — the knots are being placed by a model
+that does not work, and aligning the geometry to them concentrates resolution in
+the wrong places. The lattice's indifference to the FIS is a liability when the
+FIS is good and a safeguard when it is not.
+
+**Interaction selection pays exactly where interactions dominate.** On WEC — the
+least additive FIS, fidelity 1.471 — it is the difference between +28% and −7%
+at `k=4`. On bikeshare it selects the same features as importance at `k=2` and
+`k=3`, so the arms are identical. On Concrete it is neutral.
+
+## One bug found and fixed on the way
+
+The first warped run scored **16.46** on WEC. Not extrapolation — test rows all
+landed inside the training box. The cause was knot spacing: WEC's FIS knot gaps
+span 4.6×10⁴-to-1 (4.17e-06 to 0.19), so two knots 4 microns apart became a full
+unit cell, and the lattice put a boundary across a gap no data can resolve.
+
+Merging knots below `AxisWarp.MIN_GAP` before building the warp brings it to
+6.44. Worth recording that the *same* near-duplicate knots are harmless in the
+first-order seed — sweeping the merge tolerance from 1e-9 to 1e-2 moved its test
+RMSE by under 2% — because there a duplicate knot is just one more nearly
+collinear ReLU column. In the warped construction it distorts the geometry
+instead. `test_simplicial.py::test_from_knots_merges_near_duplicates` guards it.
+
+## Scoring
+
+| | hypothesis | verdict |
+|---|---|---|
+| W1 | FIS-aligned vertices beat a bounding-box lattice | **partly** — same floor, far more robust to subspace size; harmful when the FIS is bad |
+| W2 | interaction-ranked subspaces beat importance-ranked | **partly** — decisive on the least additive FIS, neutral elsewhere |
+
+Both refinements are worth keeping and neither moves the ceiling much. Across
+all three, the best achievable conversion fidelity improved from Part 2's
+0.257 / 1.226 / 0.959 to 0.255 / 1.066 / 0.932. **The ceiling is the FIS**, not
+the conversion — which is the same conclusion Part 1 reached from the other
+direction, and the reason WEC keeps being the dataset that breaks things.
 
 ## What I would do next
 
