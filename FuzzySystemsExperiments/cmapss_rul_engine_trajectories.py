@@ -102,6 +102,13 @@ def engine_rows(tab, dataset, split):
         true_f = float(sub["RUL"].iloc[-1])
         pred_f = float(sub["RUL_pred"].iloc[-1])
         rmse = float(np.sqrt(mean_squared_error(sub["RUL"], sub["RUL_pred"])))
+        # endpoint NASA: the score's asymmetric penalty at this engine's
+        # last cycle (the C-MAPSS truncation-point convention).
+        endpoint_nasa = m.nasa_score([true_f], [pred_f])
+        # average NASA: the mean per-cycle penalty over this engine's whole
+        # trajectory (total score / n cycles) -- a length-independent
+        # per-sample figure, unlike the raw summed score.
+        avg_nasa = m.nasa_score(sub["RUL"], sub["RUL_pred"]) / len(sub)
         rows.append(
             dict(
                 dataset=dataset,
@@ -112,6 +119,8 @@ def engine_rows(tab, dataset, split):
                 final_pred_RUL=round(pred_f, 1),
                 final_abs_err=round(abs(true_f - pred_f), 1),
                 trajectory_rmse=round(rmse, 2),
+                endpoint_nasa=round(endpoint_nasa, 3),
+                avg_nasa=round(avg_nasa, 3),
             )
         )
     return rows
@@ -198,6 +207,15 @@ def main():
         te_rmse = float(
             np.sqrt(mean_squared_error(test_tab["RUL"], test_tab["RUL_pred"]))
         )
+        # Test-set NASA reported two ways:
+        #  - endpoint: one prediction per test engine at its last cycle
+        #    (C-MAPSS truncation-point convention), summed and per-engine.
+        #  - average: mean per-cycle penalty over all test rows (total score
+        #    / n rows) -- a length-independent per-sample figure.
+        te_last = test_tab.sort_values("cycle").groupby("unit").tail(1)
+        endpoint_nasa_sum = m.nasa_score(te_last["RUL"], te_last["RUL_pred"])
+        endpoint_nasa_mean = endpoint_nasa_sum / len(te_last)
+        avg_nasa = m.nasa_score(test_tab["RUL"], test_tab["RUL_pred"]) / len(test_tab)
         file_summary.append(
             dict(
                 dataset=dataset,
@@ -206,13 +224,18 @@ def main():
                 n_test_units=test_tab["unit"].nunique(),
                 train_rmse=round(tr_rmse, 2),
                 test_rmse=round(te_rmse, 2),
+                test_endpoint_nasa_sum=round(endpoint_nasa_sum, 2),
+                test_endpoint_nasa_mean=round(endpoint_nasa_mean, 3),
+                test_avg_nasa=round(avg_nasa, 3),
             )
         )
         plot_file(
             dataset, train_tab, test_tab, f"{OUT_DIR}/cmapss_rul_engine_{dataset}.png"
         )
         print(
-            f"{dataset}: train_rmse={tr_rmse:.2f}  test_rmse={te_rmse:.2f}  -> plotted"
+            f"{dataset}: test_rmse={te_rmse:.2f}  "
+            f"NASA endpoint(sum={endpoint_nasa_sum:.1f}, mean={endpoint_nasa_mean:.2f})  "
+            f"NASA avg/sample={avg_nasa:.2f}"
         )
 
     eng_df = pd.DataFrame(all_rows)
@@ -220,11 +243,21 @@ def main():
     sum_df = pd.DataFrame(file_summary)
     sum_df.to_csv(f"{OUT_DIR}/cmapss_rul_engine_file_summary.csv", index=False)
 
+    # Fleet-wide test NASA, both conventions, over all files' test engines.
+    test_eng = eng_df[eng_df["split"] == "test"]
+    ok = sum_df[sum_df["status"] == "ok"]
+    fleet_endpoint_sum = float(ok["test_endpoint_nasa_sum"].sum())
+    fleet_endpoint_mean = fleet_endpoint_sum / int(ok["n_test_units"].sum())
+
     print("\n=== per-file summary ===")
     print(sum_df.to_string(index=False))
     print(
-        f"\n{len(eng_df)} engines total across " f"{eng_df['dataset'].nunique()} files"
+        f"\nFLEET test NASA -- endpoint: sum={fleet_endpoint_sum:.1f} over "
+        f"{int(ok['n_test_units'].sum())} test engines "
+        f"(mean {fleet_endpoint_mean:.2f}/engine);  "
+        f"average per-sample: {test_eng['avg_nasa'].mean():.2f}"
     )
+    print(f"{len(eng_df)} engines total across {eng_df['dataset'].nunique()} files")
     print(f"wrote {OUT_DIR}/cmapss_rul_engine_predictions.csv")
     print(f"wrote {OUT_DIR}/cmapss_rul_engine_file_summary.csv")
 
