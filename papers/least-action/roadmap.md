@@ -4,9 +4,14 @@ Companion to `paper.md`. Part 1 is a prioritized work plan; Part 2 identifies
 benchmark control problems; Part 3 identifies the methods we should be measured
 against.
 
-> **Citation caveat.** Author/topic attributions below are from memory and are
-> *pointers, not citations*. Every one needs verification against the actual
-> paper before it appears in a submission.
+> **Citation caveat, updated.** The three memory-attributions below (Tanaka &
+> Wang; Tanaka, Yoshida, Ohtake & Wang; Ahmadi & Majumdar) have since been
+> verified against publisher/arXiv records and now carry real citations in
+> `references.bib`, matching every detail guessed from memory. They still
+> deserve a final spot-check before a submission leans on them — one DOI was
+> reconstructed from a standard pattern rather than read directly off IEEE
+> Xplore (see the `[S]` marker on `tanaka2009sumofsquares`) — but "from memory"
+> no longer applies to them specifically.
 
 ---
 
@@ -72,7 +77,7 @@ $N=8$. Three routes, cheapest first:
 - **Newton-polytope / sparsity reduction** on the monomial basis — often removes
   a large fraction of the basis for free.
 - **DSOS/SDSOS** (diagonally dominant / scaled diagonally dominant relaxations,
-  Ahmadi & Majumdar): replaces the SDP by an LP or SOCP. Weaker, so the certified
+  [@ahmadimajumdar2019dsos]): replaces the SDP by an LP or SOCP. Weaker, so the certified
   region shrinks — but it *scales*, and we can quantify the loss exactly by
   comparing on the $N=2$ case we can already solve both ways.
 - **Exploit the partition-of-unity structure** — $\sum_i\varphi_i=1$ is an
@@ -169,7 +174,7 @@ Performance alone is not the comparison that matters; the claim is
 
 ### Certified baselines (the ones that matter)
 
-1. **PDC with LMI design on a T–S model** (Tanaka & Wang, and the large
+1. **PDC with LMI design on a T–S model** ([@tanakawang2001fuzzy], and the large
    literature following). This is *the* standard certified fuzzy control method
    and the most important comparison in the paper. It gives a quadratic-Lyapunov
    guarantee by construction, where we *fit first and certify after*. The honest
@@ -178,7 +183,7 @@ Performance alone is not the comparison that matters; the claim is
    least-action fit or a directly optimized policy and then certify, which
    admits controllers PDC cannot express — at the cost of the certificate not
    being automatic.
-2. **Polynomial fuzzy systems with SOS** (Tanaka, Yoshida, Wang and successors).
+2. **Polynomial fuzzy systems with SOS** ([@tanaka2009sumofsquares] and successors).
    The closest adjacent work: also SOS, also fuzzy, also beyond LMI. Key
    differences to establish carefully — they *synthesize* via SOS, we certify a
    fitted/optimized controller and, in §9, make the certified radius a design

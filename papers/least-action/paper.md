@@ -9,13 +9,13 @@ Department of Aerospace Engineering and Engineering Mechanics, University of Cin
 
 ## Abstract
 
-We develop a variational formulation of Takagi–Sugeno–Kang (TSK) fuzzy control in which controller fitting is posed as minimization of an $H^1$ (Sobolev) action functional, and we carry the formulation through to closed-loop control with machine-checked stability certificates.
+We develop a variational formulation of Takagi–Sugeno–Kang (TSK) [@takagi1985fuzzy; @sugenokang1988structure] fuzzy control in which controller fitting is posed as minimization of an $H^1$ (Sobolev) action functional, and we carry the formulation through to closed-loop control with machine-checked stability certificates.
 
 Four results are analytic. **First**, with antecedents fixed the consequent block is the *global* minimizer of the action in closed form, so the only non-convexity in the problem is the antecedent placement; variable projection then yields an exact reduced gradient via the envelope theorem. **Second**, the natural design question — when does sequential (greedy) rule identification coincide with the joint fit — has the exact answer "iff the $H^1$ Gram matrix is block-diagonal," and for two equal-width Gaussians the slope weight achieving $H^1$ orthogonality has the closed form $\lambda^{*}=3b^{4}/(8c^{2})$, equivalently $\ell^{*}=\sqrt{6}\,w$ with $w$ the crossover width. A factor-of-four obstruction shows no single $\lambda$ can orthogonalize three or more uniformly spaced rules. **Third**, the closed-loop suboptimality gap is *exactly* an integral of a Bregman divergence for any convex control cost, not merely the quadratic case. **Fourth**, switching to $\pi$-shaped (rational) membership functions makes the closed loop a rational vector field, and a sum-of-squares S-procedure certificate for the region of attraction is then verified in exact rational arithmetic, with no floating-point step in the chain.
 
 Empirically, on a two-mass–spring benchmark scored jointly on settling time, peak force and energy, the least-action fit converges in two rules (10 parameters; score 0.867 against an LQR baseline of 1.000) and then degrades through distribution shift rather than through any deficiency of the fit. Direct policy optimization warm-started from the least-action fit reaches 0.655, improving all three objectives simultaneously, while a cold start fails outright — the variational fit is the initializer that makes the optimizer reachable.
 
-Finally we make the stability certificate an *objective* rather than an afterthought. A sampled necessary condition for the sum-of-squares program, evaluated by ray search, estimates the certified region $2500\times$ faster than the semidefinite program with a residual bias of a single constant $\kappa=0.962$; specifying a certified radius then yields a controller the solver certifies at or above it. The best controller so obtained carries a certified ball of 0.679 at score 0.847, dominating the imitation fit on both axes.
+Finally we make the stability certificate an *objective* rather than an afterthought. A sampled necessary condition for the sum-of-squares program, evaluated by ray search, estimates the certified region $2485\times$ faster than the semidefinite program with a residual bias of a single constant $\kappa=0.962$; specifying a certified radius then yields a controller the solver certifies at or above it. The best controller so obtained carries a certified ball of 0.679 at score 0.847, dominating the imitation fit on both axes.
 
 ---
 
@@ -93,7 +93,7 @@ i.e. **Galerkin orthogonality**: the error is $H^1$-orthogonal to the model subs
 
 Define the $H^1$ Gram matrix and right-hand side $G_{mn}=\langle\psi_m,\psi_n\rangle_{H^1}$, $r_m=\langle y_d,\psi_m\rangle_{H^1}$.
 
-> **Theorem 1 (Variable projection).** For fixed antecedents $(a,b)$, the action (2) is a convex quadratic in $\theta$ with Hessian $2G\succeq0$, and every minimizer satisfies the normal equations $G\theta=r$. If the regressors are linearly independent in $H^1$ then $G\succ0$ and $\theta^{*}=G^{-1}r$ is the unique global minimizer. The reduced action is
+> **Theorem 1 (Variable projection [@golubpereyra1973differentiation; @golubpereyra2003separable]).** For fixed antecedents $(a,b)$, the action (2) is a convex quadratic in $\theta$ with Hessian $2G\succeq0$, and every minimizer satisfies the normal equations $G\theta=r$. If the regressors are linearly independent in $H^1$ then $G\succ0$ and $\theta^{*}=G^{-1}r$ is the unique global minimizer. The reduced action is
 > $$\widehat S(a,b)=\|y_d\|_{H^1}^{2}-r^{\top}G^{-1}r.\tag{5}$$
 
 *Proof.* Substituting (1) into (2), $S=\|y_d\|^2_{H^1}-2\theta^\top r+\theta^\top G\theta$. The Hessian $2G$ is a Gram matrix of an inner product, hence positive semidefinite, so $S$ is convex and stationarity is sufficient. Stationarity is $G\theta=r$, which is (4) written out. Substituting $\theta^{*}$ gives (5). $\blacksquare$
@@ -104,7 +104,7 @@ Theorem 1 is the strongest guarantee in the paper and it is free: no iteration, 
 
 ### 3.2 Exact reduced gradient
 
-Finite differences on (5) are unreliable, because $\widehat S$ is computed only to accuracy $\kappa(G)\,\varepsilon_{\text{mach}}$. In our experiments SciPy's default step produced a gradient dominated by round-off, and L-BFGS-B terminated after *zero* iterations reporting success. The envelope theorem removes the issue.
+Finite differences on (5) are unreliable, because $\widehat S$ is computed only to accuracy $\kappa(G)\,\varepsilon_{\text{mach}}$. In our experiments SciPy's default step produced a gradient dominated by round-off, and L-BFGS-B terminated after *zero* iterations reporting success. The envelope theorem [@milgromsegal2002envelope] removes the issue.
 
 > **Theorem 2 (Analytic reduced gradient).** Let $\theta^{*}(a,b)$ be as in Theorem 1. Then for any antecedent parameter $p\in\{a_i,b_i\}$,
 > $$\frac{\partial\widehat S}{\partial p}=-2\Big\langle e,\ \frac{\partial y_c}{\partial p}\Big\rangle_{H^1},\qquad \frac{\partial y_c}{\partial p}=\theta^{*\top}\frac{\partial\psi}{\partial p},\tag{6}$$
@@ -113,6 +113,8 @@ Finite differences on (5) are unreliable, because $\widehat S$ is computed only 
 *Proof.* $\widehat S(a,b)=S(\theta^{*}(a,b),a,b)$, so $\partial_p\widehat S=\partial_\theta S\cdot\partial_p\theta^{*}+\partial_p S$. At $\theta^{*}$ the first factor vanishes by Theorem 1. The remaining partial is (6). $\blacksquare$
 
 The derivative $\partial\psi/\partial p$ is available in closed form from the membership-function derivatives $(\mu,\partial_x\mu,\partial_a\mu,\partial_b\mu,\partial^2_{xa}\mu,\partial^2_{xb}\mu)$; the $\partial_x$ terms are required because the $H^1$ inner product differentiates the regressors. Replacing finite differences by (6) was the difference between an optimizer that stalled immediately and one that converged.
+
+> **Implementation note.** The solver regularizes with a trace-scaled ridge $\varepsilon=10^{-9}\,\mathrm{tr}(G)/m$ (§3.1), and $\varepsilon$ itself depends on $(a,b)$ through $G$. The code accordingly differentiates the ridge term too, adding an $O(\varepsilon\|\theta\|^2)$ correction to (6) that is not shown above. It is negligible at the ridge scale used — Theorem 2 as stated is the gradient of the idealized (unregularized) reduced action — but it is the gradient of the objective actually being minimized, and dropping it silently would make the implemented gradient inexact for its own objective.
 
 ### 3.3 Second-order conditions, stated correctly
 
@@ -178,7 +180,7 @@ The cost stays below 8% across the sweep and below 2% for sharp crossovers. The 
 
 ### 4.3 The practical alternative
 
-Since exact orthogonality is unavailable for $N\ge3$, the usable route is to orthogonalize the **regressors** rather than the rules: an $H^1$ Gram–Schmidt (orthogonal least squares) pass on $\psi$, selecting rules greedily by residual reduction. This restores the greedy/joint agreement of Proposition 3 by construction, at the cost of rules that are no longer individually interpretable in the original basis.
+Since exact orthogonality is unavailable for $N\ge3$, the usable route is to orthogonalize the **regressors** rather than the rules: an $H^1$ Gram–Schmidt (orthogonal least squares) pass on $\psi$, selecting rules greedily by residual reduction. In exact arithmetic this restores the greedy/joint agreement of Proposition 3 by construction, at the cost of rules that are no longer individually interpretable in the original basis. In floating point the restoration is conditioning-dependent rather than unconditional: at narrow, well-separated rule widths the residual off-block coupling collapses to $10^{-5}$–$10^{-7}$, but at wide, heavily overlapping placements (where the original regressors are most nearly linearly dependent) it can remain of order 1 — "by construction" describes the exact-arithmetic guarantee, not a numerical one at every width.
 
 ---
 
@@ -186,7 +188,7 @@ Since exact orthogonality is unavailable for $N\ge3$, the usable route is to ort
 
 ### 5.1 The degenerate case
 
-> **Theorem 7 (TSK reproduces LQR exactly).** For an LTI plant with quadratic cost, an order-1 TSK controller with any partition of unity and consequents $f_i(x)=-Kx$ for all $i$ satisfies $u(x)=\sum_i\varphi_i(x)f_i(x)=-Kx$, the LQR optimum, identically.
+> **Theorem 7 (TSK reproduces LQR exactly).** For an LTI plant with quadratic cost, an order-1 TSK controller with any partition of unity and consequents $f_i(x)=-Kx$ for all $i$ satisfies $u(x)=\sum_i\varphi_i(x)f_i(x)=-Kx$, the LQR [@kalman1960contributions] optimum, identically.
 
 The proof is $\sum_i\varphi_i\equiv1$. We record Theorem 7 because it is the correct baseline and because it is **vacuous as a recommendation**: it says the model class contains the linear optimum, so any benchmark on which LQR is optimal cannot discriminate. This is why §6 scores on settling time, peak force and energy jointly — objectives under which LQR is not optimal — rather than on the quadratic cost LQR was designed to minimize.
 
@@ -194,9 +196,9 @@ The proof is $\sum_i\varphi_i\equiv1$. We record Theorem 7 because it is the cor
 
 Consider a control-affine plant $\dot x=f(x)+g(x)u$ with running cost $\ell(x,u)=q(x)+c(u)$, optimal value $V^{*}$ and optimal policy $u^{*}$.
 
-> **Theorem 8 (Bregman suboptimality identity).** Let $c$ be convex and differentiable, let $V^{*}$ be differentiable and satisfy the Hamilton–Jacobi–Bellman equation, and let $u(\cdot)$ be admissible (the closed loop converges to the origin with $V^{*}(x(t))\to0$). Then
+> **Theorem 8 (Bregman suboptimality identity).** Let $c$ be convex and differentiable, let $V^{*}$ be differentiable and satisfy the Hamilton–Jacobi–Bellman equation [@kirk1970optimal; @bardicapuzzodolcetta1997optimal], and let $u(\cdot)$ be admissible (the closed loop converges to the origin with $V^{*}(x(t))\to0$). Then
 > $$\boxed{\ J(x_0)-V^{*}(x_0)=\int_0^{\infty} D_c\big(u(t)\,\|\,u^{*}(x(t))\big)\,dt\ }\tag{7}$$
-> where $D_c(u\|v)=c(u)-c(v)-c'(v)(u-v)$ is the Bregman divergence of $c$.
+> where $D_c(u\|v)=c(u)-c(v)-c'(v)(u-v)$ is the Bregman divergence [@bregman1967relaxation] of $c$.
 
 *Proof.* HJB stationarity gives $c'(u^{*})=-g^{\top}\nabla V^{*\top}$. Hence
 
@@ -226,7 +228,7 @@ Three features deserve emphasis. The identity is **exact** — no constants, no 
 
 ### 6.1 Setup
 
-Two unit masses coupled by a unit spring, force applied to the first mass, saturating at $|u|\le1$; state $z=(x_1,x_2,v_1,v_2)$. This is the two-mass–spring system long used as a robust-control benchmark, at its nominal parameter values; §12 discusses exercising its uncertainty specification, which we do not currently do.
+Two unit masses coupled by a unit spring, force applied to the first mass, saturating at $|u|\le1$; state $z=(x_1,x_2,v_1,v_2)$. This is a simplified nominal instance of the two-mass–spring system long used as a robust-control benchmark [@wiebernstein1992benchmark] — that source's canonical form carries an uncertain spring constant and asymmetric masses, which we do not use here; §12 discusses exercising an uncertainty specification, which we do not currently do.
 
 Controllers are scored by the equal-weight normalized scalarization
 
@@ -251,7 +253,7 @@ with the reference the best LQR over a gain sweep, so LQR scores 1.000 by constr
 
 "shift" is the maximum distance from a closed-loop state to the nearest training sample, in units of the training set's per-axis spread.
 
-Ten parameters take the score from 1.031 (worse than LQR) to 0.867; the third rule adds 0.4% and that is the end of it. Two rules close **75%** of the gap between the best LQR and the open-loop reference, $(1.000-0.863)/(1.000-0.818)$. The win is specific rather than uniform: at $N=3$ the fuzzy controller uses **18% less energy than the best LQR** and 21% less than the open-loop reference it was trained on, and 10% less peak force, while being *worse* on settling time (17.2 against 11.0). It trades response speed for actuator economy.
+Ten parameters take the score from 1.031 (worse than LQR) to 0.867; the third rule adds 0.4% and that is the end of it. Two rules close **73%** of the gap between the best LQR and the open-loop reference, $(1.000-0.8666)/(1.000-0.8183)$. The win is specific rather than uniform: at $N=3$ the fuzzy controller uses **18% less energy than the best LQR** and 21% less than the open-loop reference it was trained on, and 10% less peak force, while being *worse* on settling time (17.2 against 11.0). It trades response speed for actuator economy.
 
 ### 6.3 Then it degrades, for a diagnosable reason
 
@@ -259,7 +261,7 @@ Past $N\approx3$ the score degrades monotonically and by $N=8$ the closed loop s
 
 > **Rule count and closed-loop quality are not monotonically related.** The least-action fit is globally optimal *for the data it was given*, and the data is the binding constraint — not the model class and not the optimizer.
 
-Off-trajectory augmentation (perturbed tubes, or one DAgger round) removes the collapse but does not move the plateau near 0.86; nor do higher-order consequents, which shift it by 1.6% while fit accuracy and closed-loop score become *inversely* related. Both experiments point at the objective rather than the model.
+Off-trajectory augmentation (perturbed tubes, or one DAgger [@rossgordonbagnell2011reduction] round) removes the collapse but does not move the plateau near 0.86; nor do higher-order consequents, which shift it by 1.6% while fit accuracy and closed-loop score become *inversely* related. Both experiments point at the objective rather than the model.
 
 ### 6.4 Direct policy optimization breaks the plateau
 
@@ -285,11 +287,11 @@ This rehabilitates variable projection in a specific role. Its value is not that
 
 ### 7.1 Rational membership functions
 
-Replacing Gaussians with $\pi$-shaped (Cauchy) membership functions $\mu_i(z)=\big(1+\|(z-a_i)/b_i\|^{2}\big)^{-1}$ makes every $\mu_i$ rational, hence $\varphi_i$ rational, hence the TSK control law exactly a ratio of polynomials $u(z)=P(z)/Q(z)$ with $Q>0$ structurally. The closed loop is then a rational vector field and the Lyapunov decrease condition becomes a polynomial inequality after clearing denominators — which is what a sum-of-squares (SOS) program can decide.
+Replacing Gaussians with $\pi$-shaped (Cauchy [@viana2021cauchy]) membership functions $\mu_i(z)=\big(1+\|(z-a_i)/b_i\|^{2}\big)^{-1}$ makes every $\mu_i$ rational, hence $\varphi_i$ rational, hence the TSK control law exactly a ratio of polynomials $u(z)=P(z)/Q(z)$ with $Q>0$ structurally. The closed loop is then a rational vector field and the Lyapunov decrease condition becomes a polynomial inequality after clearing denominators — which is what a sum-of-squares (SOS) [@parrilo2000structured; @parrilo2003semidefinite] program can decide.
 
 ### 7.2 The certificate
 
-With $V(z)=z^{\top}Pz$, we certify $\dot V<0$ on $\{V\le\rho\}\setminus\{0\}$ via the S-procedure: find $\sigma$ SOS with
+With $V(z)=z^{\top}Pz$, we certify $\dot V<0$ on $\{V\le\rho\}\setminus\{0\}$ via the S-procedure [@boyd1994linear]: find $\sigma$ SOS with
 
 $$W(z)-\varepsilon\|z\|^{2}-\sigma(z)\big(\rho-V(z)\big)\ \text{ SOS},\tag{8}$$
 
@@ -301,19 +303,21 @@ where $W=-\dot V\cdot Q^{2}$ is the numerator-cleared decrease condition. Two im
 
 ### 7.3 The obstruction was the solver
 
+> **Provenance flag.** The table below has no corresponding entry in `results.txt`; the one recorded solver comparison (`demo_sos.py` §3) runs a single $\rho=0.6$, not the three-point sweep shown here. An attempt to regenerate this exact sweep during review hit a genuine reproducibility blocker rather than producing a replacement: this repository's `requirements.txt` pins `numpy~=1.26.4`, but `fis_twocart.py`'s `simulate` calls `np.trapezoid`, a name that does not exist before NumPy 2.0 (it superseded `np.trapz`) — the pinned environment cannot run the two-cart benchmark at all. Re-running with a NumPy $\ge2$ environment instead (the only way the code executes) reproduces the table of §6.2 to the wrong values, not the recorded ones, so "deterministic... should match `results.txt` exactly" (Reproducibility, below) does not currently hold across NumPy major versions either. Given that, the table below is retained as originally drafted rather than replaced with numbers of equally uncertain provenance; it should be **regenerated and re-transcribed** in an environment first verified to reproduce §6.2, and `requirements.txt` needs a NumPy floor of 2.0 to even attempt that.
+
 | solver | $\sigma$ degree | $\rho=0.5$ | $\rho=0.8$ | $\rho=1.0$ |
 |---|---|---|---|---|
-| SCS (first-order) | 4 | −0.158 | −0.236 | −0.250 |
-| **CLARABEL** (interior-point) | **2** | −1.7e−10 ✓ | −1.6e−10 ✓ | −4.9e−11 ✓ |
-| **CLARABEL** (interior-point) | **4** | −8.2e−10 ✓ | −1.1e−09 ✓ | −1.8e−10 ✓ |
+| SCS (first-order) [@odonoghue2016conic] | 4 | −0.158 | −0.236 | −0.250 |
+| **CLARABEL** (interior-point) [@goulartchen2024clarabel] | **2** | −1.7e−10 ✓ | −1.6e−10 ✓ | −4.9e−11 ✓ |
+| **CLARABEL** (interior-point) [@goulartchen2024clarabel] | **4** | −8.2e−10 ✓ | −1.1e−09 ✓ | −1.8e−10 ✓ |
 
 (Gram minimum eigenvalue; ✓ = certified.) CLARABEL closes at multiplier degree **2** — the degree at which SCS reported a violation of −0.25 — in well under a second. The diagnostic that identified this was the **relative** violation $|\lambda_{\min}|/\max|G|$: SCS bottoms out at $10^{-6}$ to $10^{-5}$, a first-order method's realistic accuracy on this problem, while CLARABEL reaches $10^{-11}$. Reading the *absolute* eigenvalue suggested gross infeasibility; the relative figure showed it was noise. We record this because it cost four hours and because the conclusion generalizes: on small, badly scaled SOS programs, interior-point and first-order solvers are not interchangeable.
 
-The certified region for the two-rule imitation controller is $\{z^{\top}Pz\le1.1144\}$.
+The certified region for the two-rule imitation controller is $\{z^{\top}Pz\le1.1145\}$.
 
 ### 7.4 Exact rational verification
 
-An interior-point SDP certifies only to solver tolerance. We upgrade the result by the standard rounding-and-projection procedure (Peyrl and Parrilo): solve with a strictly positive margin; round both Gram matrices to rationals with bounded denominator; rebuild the target polynomial exactly over $\mathbb{Q}$ (IEEE doubles *are* rationals, so only the deliberate rounding introduces error); project the rounded Gram onto the affine set where the polynomial identity holds exactly, which decouples monomial-by-monomial and is available in closed form; and verify positive definiteness in exact arithmetic.
+An interior-point SDP certifies only to solver tolerance. We upgrade the result by the standard rounding-and-projection procedure [@peyrlparrilo2008computing]: solve with a strictly positive margin; round both Gram matrices to rationals with bounded denominator; rebuild the target polynomial exactly over $\mathbb{Q}$ (IEEE doubles *are* rationals, so only the deliberate rounding introduces error); project the rounded Gram onto the affine set where the polynomial identity holds exactly, which decouples monomial-by-monomial and is available in closed form; and verify positive definiteness in exact arithmetic.
 
 Two practical notes. Rational $LDL^{\top}$ is exact but useless at this size, because denominators square at each elimination step and the $14\times14$ factorization does not finish; integer leading principal minors computed by fraction-free (Bareiss) elimination have no such blow-up. And symbolic "rationalize" helpers that search for *nice* closed forms must be avoided — one returned $2^{818/971}3^{651/971}$ for an ordinary double — in favour of the exact dyadic conversion.
 
@@ -449,11 +453,11 @@ Two obstructions did not yield and should be stated plainly. **G13** is genuinel
 
 Three tiers of checking, weakest to strongest.
 
-**Tier 1 — symbolic identity checking.** The verification suite checks 21 identities in a computer algebra system as *identities* rather than at sampled points; 16 bear on the results in this paper (the Euler–Lagrange equation, the partition-of-unity consequences, Theorem 7, the Bregman identity of Theorem 8 and its quadratic specialization, non-negativity of $D_c$ for two non-quadratic costs, the three $\lambda^{*}$ integrals of Theorem 5, the exact rational form $u=P/Q$ and $Q>0$, the Hessian and stationarity claims of Theorem 1, and the envelope-theorem gradient of Theorem 2). All 21 pass. One subtlety cost two of them for a while: a matrix comparison `Matrix(...) == 0` is `False` even for the zero matrix, and using the correct predicate moved the count from 19/21 to 21/21.
+**Tier 1 — symbolic identity checking.** The verification suite checks 21 identities in a computer algebra system as *identities* rather than at sampled points; 16 bear on the results in this paper (the Euler–Lagrange equation, the partition-of-unity consequences, Theorem 7, the Bregman identity of Theorem 8 and its quadratic specialization, the second-derivative identity $D_c''(u)=c''(u)$ underlying non-negativity of $D_c$ for two non-quadratic costs — convexity itself, $c''\ge0$, is not separately checked by this suite — the three $\lambda^{*}$ integrals of Theorem 5, the exact rational form $u=P/Q$ and $Q>0$, the Hessian and stationarity claims of Theorem 1, and the envelope-theorem gradient of Theorem 2). All 21 pass. One subtlety cost two of them for a while: a matrix comparison `Matrix(...) == 0` is `False` even for the zero matrix, and using the correct predicate moved the count from 19/21 to 21/21.
 
 **Tier 2 — exact rational proof of the SOS certificate**, as described in §7.4: residual exactly zero, all 14 integer leading principal minors positive.
 
-**Tier 3 — proof assistant.** A Lean/Mathlib formalization would close the gap Tier 1 leaves — the analytic hypotheses — but could not be attempted here, as the toolchain host is unreachable under our environment's network policy. Rather than commit unverifiable source we record where it would pay. Theorem 8 is the clear candidate: its content is an integration-by-parts argument plus a limit, and its hypotheses (admissibility, convexity, differentiability of $V^{*}$) are exactly the kind that get quietly dropped — as §5.2 notes, we dropped one empirically. The SOS side should stay in exact integer arithmetic, where it already is: formalizing it would mean formalizing Bareiss determinants to re-derive an answer that is already decidable and decided.
+**Tier 3 — proof assistant.** A from-scratch Lean 4 + Mathlib formalization (`lean/`, alongside this paper) machine-checks the theorems whose entire content is finite-dimensional algebra or single-variable calculus: Theorem 1 (global optimality of the variable-projection solve, and its uniqueness when $G\succ0$), Theorem 7 (TSK reproduces LQR exactly, for any partition of unity and, more generally, any $\mathbb{R}$-module of consequent values), Corollary 6 (the factor-of-four obstruction), and the algebraic core of Theorem 8 — the pointwise HJB identity that produces the Bregman divergence, given HJB stationarity and the HJB equation as hypotheses. All of these compile with zero `sorry`s, and `#print axioms` on every theorem confirms each depends only on Lean's three standard foundational axioms (`propext`, `Classical.choice`, `Quot.sound`) — nothing admitted. Two pieces remain open, for the reason anticipated above: Theorem 8's *temporal* half — integrating the pointwise identity along an actual closed-loop trajectory from $0$ to $\infty$ and using admissibility to discard the boundary term — needs ODE existence/limit machinery beyond what was attempted; and Theorem 5's improper integrals ($\int\sigma'=1$, $\int(\sigma')^2=1/6$) are tractable in principle via Mathlib's `intervalIntegral` limit machinery but were not attempted here. The SOS side is deliberately left alone: it already sits in exact integer arithmetic (§7.4), and formalizing it would mean re-deriving an answer that is already decidable and decided.
 
 ---
 
@@ -472,4 +476,15 @@ A detailed plan addressing these, with candidate comparison benchmarks, is given
 
 ## Reproducibility
 
-All results are produced by a deterministic, seeded implementation; recorded output is stored alongside the source, and the numerical constants that matter (quadrature order, ridge scaling, optimizer schedule, finite-difference steps, definiteness tolerances) are documented individually together with the failure each was chosen to prevent. Every table above is transcribed directly from that recorded output.
+All results are produced by a deterministic, seeded implementation; recorded output is stored alongside the source, and the numerical constants that matter (quadrature order, ridge scaling, optimizer schedule, finite-difference steps, definiteness tolerances) are documented individually together with the failure each was chosen to prevent. Every table above is transcribed directly from that recorded output. Two exceptions are worth naming rather than quietly matching or leaving implicit.
+
+First, the recorded log itself carries two slightly different values for the inscribed-ball radius across two demo scripts that compute it the same way (0.5685 vs. 0.5684); the tables above use the correct 0.5684 throughout, but "deterministic" describes each script against itself, not full agreement between scripts that should agree.
+
+Second, and more consequentially: "deterministic... should match `results.txt` exactly" was checked here across NumPy major versions and does not currently hold. `requirements.txt` pins `numpy~=1.26.4`, but the code calls `np.trapezoid` (`fis_twocart.py`), a name introduced only in NumPy 2.0 (as the replacement for `np.trapz`) — the pinned environment cannot run `demo_twocart.py` at all. Re-running under NumPy $\ge2$ (the only version under which the code executes) reproduces the *shape* of §6.2's table but not its values. Whatever environment actually produced the recorded `results.txt` is not fully pinned down by `requirements.txt` as it stands; fixing the pin and re-verifying every table against a freshly regenerated log is the right next step, and is more urgent than any single number above.
+
+---
+
+## References
+
+::: {#refs}
+:::
