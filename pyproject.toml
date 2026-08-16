@@ -45,3 +45,13 @@ extend-ignore = ["E203"]
 python_version = "3.11"
 ignore_missing_imports = true
 warn_redundant_casts = true
+
+# This repo is a collection of research/coursework scripts, not an importable
+# `grad_school` package -- there's no directory matching that name for
+# hatchling's default wheel builder to select, so `pip install -e .` /
+# `uv sync` fail outright without this ("Unable to determine which files to
+# ship inside the wheel"). `bypass-selection` tells hatchling the wheel has
+# no package content of its own; `[project.dependencies]` above is still
+# installed normally, which is the only thing this file is actually used for.
+[tool.hatch.build.targets.wheel]
+bypass-selection = true
