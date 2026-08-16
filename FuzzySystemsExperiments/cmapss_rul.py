@@ -88,9 +88,28 @@ def to_frame(data: dict, var: dict, split: str) -> pd.DataFrame:
 # Factor B: feature sets
 # --------------------------------------------------------------------------
 def feature_columns(var: dict, feature_set: str) -> list[str]:
+    """B1: W + X_s (18 channels) -- real sensors only, by this repo's
+    original (stricter-than-published) definition of "real."
+    B2: B1 + all of X_v (32 channels) -- every "virtual sensor," most of
+    which genuinely aren't measurable on a real aircraft. A sensitivity/
+    upper-bound arm, not a deployment claim.
+    B3: B1 + X_v[:2] (T40, P30) = 20 channels -- matches the published
+    DS02 CNN/MLP baselines' input set exactly. Confirmed three ways: Arias
+    Chao et al. 2021 (arXiv:2003.00732) Table 2 lists T40/P30 among their
+    20 "condition monitoring signals, [w, xs]"; Custode et al. 2022
+    (Algorithms 15(3):98) cite that same 20-input convention; and co-author
+    Hyunho Mo's own released code (N-CMAPSS_DL) slices `X_v[:, 0:2]` into
+    the model's inputs. T40/P30 sit in the HDF5 file's X_v group only
+    because of how the C-MAPSS simulator organizes its outputs -- the
+    literature itself doesn't treat them as unmeasurable. B1 was, in that
+    light, an unnecessarily strict definition of "real"; B3 is the one
+    that's actually comparable to the published numbers.
+    """
     cols = [f"W_{n}" for n in var["W"]] + [f"Xs_{n}" for n in var["X_s"]]
     if feature_set == "B2":
         cols += [f"Xv_{n}" for n in var["X_v"]]
+    elif feature_set == "B3":
+        cols += [f"Xv_{n}" for n in var["X_v"][:2]]
     return cols
 
 
@@ -348,7 +367,7 @@ def stage1():
     agg_cache = {}
     for a_name, (agg_fn, use_corrected) in AGGREGATORS.items():
         src_dev, src_test = (df_dev_cc, df_test_cc) if use_corrected else (df_dev, df_test)
-        for b_name in ("B1", "B2"):
+        for b_name in ("B1", "B2", "B3"):
             feat_cols = feature_columns(var, b_name)
             key = (a_name, b_name)
             print(f"\nAggregating {a_name} / {b_name} ...")
@@ -636,6 +655,15 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
         if done:
             print(f"Resuming Stage 4: {len(done)} (pipeline, refiner) pairs already done.")
 
+    # coordinate descent's cost scales badly with membership-function count --
+    # 150 MFs took 935s; a 313-MF pipeline in this round didn't finish in
+    # 22+ minutes (still climbing CPU time, not stuck) before being killed
+    # to avoid burning an hour on one already-well-understood data point.
+    # GA is dramatically cheaper at scale (147-197s at 150 MFs) and is kept
+    # unconditionally; coordinate is skipped above this threshold rather
+    # than re-proven slow at every new model size.
+    COORDINATE_MAX_MF = 200
+
     for pipeline, fitted in fitted_by_pipeline.items():
         n_mf = fitted["model"].model_.n_membership_functions
         n_rows = len(fitted["X_train"])
@@ -643,6 +671,10 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
         for refiner_name in REFINERS:
             if (pipeline, refiner_name) in done:
                 print(f"  {refiner_name:10s} already done -- skipping")
+                continue
+            if refiner_name == "coordinate" and n_mf > COORDINATE_MAX_MF:
+                print(f"  {refiner_name:10s} skipped -- {n_mf} MFs exceeds "
+                      f"COORDINATE_MAX_MF={COORDINATE_MAX_MF} (see comment above)")
                 continue
             try:
                 r = refine_and_evaluate(fitted, refiner_name)
@@ -866,15 +898,20 @@ def select_top_pipelines(stage1_results: pd.DataFrame, cheap_family: str = "A1_w
     """Pick pipelines dynamically from Stage 1's results rather than
     hardcoding names -- with condition-corrected aggregation variants added
     to the matrix, the actual best pipelines may not match any pipeline
-    that was previously the winner. Picks: best overall (any feature set,
-    may include virtual sensors), best real-sensors-only (B1) pipeline, and
-    the cheapest/most-interpretable pipeline from `cheap_family`."""
+    that was previously the winner. Picks, in order: best overall (any
+    feature set, may include virtual sensors -- a sensitivity/upper-bound
+    arm), best B3 (matches the published DS02 CNN/MLP baselines' exact
+    20-channel input set -- the fair, literature-comparable "real" number),
+    best B1 (the stricter 18-channel real-only definition, for completeness),
+    and the cheapest/most-interpretable pipeline from `cheap_family` (always
+    last -- see `cheap_pipeline = top_pipelines[-1]` in __main__)."""
     df = stage1_results.sort_values("rmse_test_true")
     agg_family = df["pipeline"].str.split("/").str[0]
     picks = [df.iloc[0]["pipeline"]]
-    b1_only = df[df["pipeline"].str.contains("/B1/")]
-    if len(b1_only):
-        picks.append(b1_only.iloc[0]["pipeline"])
+    for tag in ("/B3/", "/B1/"):
+        matches = df[df["pipeline"].str.contains(tag, regex=False)]
+        if len(matches):
+            picks.append(matches.iloc[0]["pipeline"])
     cheap = df[agg_family == cheap_family]  # exact match: "..._cc" must not count
     if len(cheap):
         picks.append(cheap.sort_values("fit_seconds").iloc[0]["pipeline"])
@@ -884,13 +921,33 @@ def select_top_pipelines(stage1_results: pd.DataFrame, cheap_family: str = "A1_w
 if __name__ == "__main__":
     import os
 
+    # A3_raw_memory_cc/B3/C3_physical is added explicitly, not left to
+    # select_top_pipelines: at Stage 1's fixed-D screen it looks like one of
+    # the *worse* B3 options (25.6 RMSE) -- its potential only shows up
+    # after full construction tuning (a one-off manual probe found 6.48,
+    # on par with the all-virtual-sensor B2 champion, using only the exact
+    # 20-channel input set the published CNN/MLP baselines use). The cheap
+    # fixed-D screen is a useful first-pass filter, not a reliable predictor
+    # of which pipeline benefits most from tuning -- this is the second
+    # time that's bitten the automatic selection (A3_raw_memory_cc/B1 vs.
+    # A1_whole_cycle_cc/B1 was the first), so don't trust it blindly for B3.
+    FORCE_INCLUDE = ["A3_raw_memory_cc/B3/C3_physical"]
+
     if "--resume" in sys.argv and os.path.exists(CACHE_PATH):
         print(f"Resuming from cache: {CACHE_PATH}")
         agg_cache, stage1_results, stage2_results = load_cache()
         top_pipelines = select_top_pipelines(stage1_results)
+        # cheap_pipeline is tracked *before* FORCE_INCLUDE is appended -- it's
+        # select_top_pipelines' last (deduped) entry by construction, and
+        # Stage 4b keys off it by name, not list position, so appending more
+        # pipelines afterward can't silently repoint it.
+        cheap_pipeline = top_pipelines[-1]
+        top_pipelines = top_pipelines + [p for p in FORCE_INCLUDE if p not in top_pipelines]
     else:
         stage1_results, agg_cache = stage1()
         top_pipelines = select_top_pipelines(stage1_results)
+        cheap_pipeline = top_pipelines[-1]
+        top_pipelines = top_pipelines + [p for p in FORCE_INCLUDE if p not in top_pipelines]
         print(f"\nSelected pipelines for Stage 2+: {top_pipelines}")
 
         print("\n" + "=" * 78)
@@ -928,6 +985,19 @@ if __name__ == "__main__":
             f"FuzzySystemsExperiments/cmapss_rul_stage3_{pipeline.replace('/', '_')}.csv",
             index=False,
         )
+
+    if "--construction-only" in sys.argv:
+        print("\n--construction-only: stopping after Stage 3 (skipping refinement "
+              "and onset-detection stages).")
+        print("\n=== Construction-only summary ===")
+        for pipeline in top_pipelines:
+            sub = stage2_results[stage2_results["pipeline"] == pipeline]
+            if sub.empty:
+                continue
+            best = sub.loc[sub["rmse_test_true"].idxmin()]
+            print(f"{pipeline:36s} rmse={best['rmse_test_true']:.2f}  "
+                  f"fit={best['fit_seconds']:.2f}s  n_features={best['n_features']}")
+        raise SystemExit(0)
 
     print("\n" + "=" * 78)
     print("STAGE 4: iterative antecedent refinement")
@@ -970,7 +1040,6 @@ if __name__ == "__main__":
     print("\n" + "=" * 78)
     print("STAGE 4b: sweep each refiner's own hyperparameters")
     print("=" * 78)
-    cheap_pipeline = top_pipelines[-1]
     print(f"Run on the cheapest pipeline only ({cheap_pipeline}, ~5s/config) -- also "
           "the one where refinement overfits its CV split, the sharpest test of "
           "whether a hyperparameter choice can rescue that failure mode.")

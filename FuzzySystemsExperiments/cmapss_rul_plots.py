@@ -342,7 +342,7 @@ def plot_progression(milestones: list[dict], out_path: str):
     x = np.arange(len(milestones))
     labels = [m["label"] for m in milestones]
 
-    for key, name in [("overall", "best overall (incl. virtual sensors)"),
+    for key, name in [("overall", "best overall"),
                        ("real_sensor", "best real-sensor-only")]:
         vals = [m[key] for m in milestones]
         color = PROGRESSION_COLORS[key]

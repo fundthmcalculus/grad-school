@@ -5,22 +5,37 @@ or run on its own, without the rest of the grad-school DOE repo. It only
 needs: h5py, numpy, pandas, scikit-learn, and tribble-fis (`pip install
 tribble-fis`, or `pip install -e /path/to/tribble-fis` for the dev version).
 
-Two pipelines, both training in single-digit seconds:
+Three pipelines, all training in single-digit seconds:
 
-  --pipeline honest  (default)  Real sensors only (W + X_s). RMSE ~11.2 on
-                                 the official held-out test units (11, 14,
-                                 15). This is the number to trust for "could
-                                 this actually fly on an aircraft."
+  --pipeline honest             W + X_s only (18 channels) -- the strictest
+                                 possible "real sensors" definition. RMSE
+                                 ~11.2 on the official held-out test units
+                                 (11, 14, 15).
 
-  --pipeline best                Adds X_v, the dataset's "virtual sensors" --
-                                 simulator-internal quantities the source
-                                 paper explicitly excludes from condition-
-                                 monitoring signals. RMSE ~6.5, better than
-                                 the published CNN baseline (7.22) on this
-                                 dataset -- but NOT reproducible with a real
-                                 aircraft's actual instrumentation. A
-                                 sensitivity/upper-bound result, not a
-                                 deployment claim.
+  --pipeline best    (default)  W + X_s + exactly 2 of the dataset's 14
+                                 "virtual sensor" channels (T40, P30) -- the
+                                 published DS02 CNN/MLP baselines' *exact*
+                                 20-channel input set (confirmed against
+                                 Arias Chao et al. 2021's Table 2, cited by
+                                 Custode et al. 2022, and co-author Hyunho
+                                 Mo's own released code). T40/P30 sit in the
+                                 HDF5 file's "virtual" group only because of
+                                 how the C-MAPSS simulator organizes its
+                                 outputs -- the literature itself treats
+                                 them as legitimate condition-monitoring
+                                 inputs. RMSE ~6.5, fairly beating the
+                                 published CNN (7.22) and MLP (8.34) on
+                                 their own input set -- no caveats needed.
+
+  --pipeline all_sensors         Adds the other 12 virtual-sensor channels
+                                 too (32 total). RMSE ~6.5 -- *not* better
+                                 than `best` despite the extra inputs (and
+                                 costs ~10x the fit time) -- kept only to
+                                 show that the extra channels don't help.
+                                 The 12 excluded ones genuinely aren't
+                                 measurable on a real aircraft; a result
+                                 that depended on them would need this
+                                 caveat, but this one doesn't.
 
 Both pipelines depend on one preprocessing step that turned out to matter
 far more than any model hyperparameter: regressing each real sensor channel
@@ -35,7 +50,7 @@ fired) are in cmapss_rul.py / the grad-school PR history.
 
 Usage:
     python cmapss_rul_best.py --h5 /path/to/N-CMAPSS_DS02-006.h5
-    python cmapss_rul_best.py --h5 /path/to/N-CMAPSS_DS02-006.h5 --pipeline best
+    python cmapss_rul_best.py --h5 /path/to/N-CMAPSS_DS02-006.h5 --pipeline honest
 """
 
 import argparse
@@ -56,6 +71,11 @@ from tribblefis.gaussian_regressor_memory import MemoryWindowFeatureExtractor
 TRAIN_UNITS = (2, 5, 10, 16, 18, 20)
 TEST_UNITS = (11, 14, 15)
 
+# feature_set -> how many leading X_v channels to include (X_v is ordered
+# [T40, P30, P45, W21, ...] -- the first two are the published baselines'
+# "condition monitoring signals", the rest are simulator-internal only).
+FEATURE_SET_XV = {"real": 0, "literature": 2, "all": None}  # None = all X_v
+
 PIPELINES = {
     # aggregation: "whole_cycle" (one row/cycle, mean/std/min/max/last stats)
     # or "raw_memory" (subsampled raw stream through MemoryWindowFeatureExtractor)
@@ -68,6 +88,14 @@ PIPELINES = {
         expected_rmse=11.23,
     ),
     "best": dict(
+        feature_set="literature", aggregation="raw_memory",
+        tribble_kwargs=dict(
+            tsk_order="full-2nd", n_gaussians=0, top_p=0.95, detect_interactions=False,
+            norm_conorm="hamacher", l2_reg=0.01,
+        ),
+        expected_rmse=6.48,
+    ),
+    "all_sensors": dict(
         feature_set="all", aggregation="raw_memory",
         tribble_kwargs=dict(
             tsk_order="full-2nd", n_gaussians=0, top_p=0.95, detect_interactions=False,
@@ -210,15 +238,16 @@ def run(h5_path: str, pipeline_name: str):
 
     w_cols = [f"W_{n}" for n in var["W"]]
     xs_cols = [f"Xs_{n}" for n in var["X_s"]]
-    xv_cols = [f"Xv_{n}" for n in var["X_v"]]
-    correct_cols = xs_cols + (xv_cols if cfg["feature_set"] == "all" else [])
+    n_xv = FEATURE_SET_XV[cfg["feature_set"]]
+    xv_cols = [f"Xv_{n}" for n in var["X_v"]] if n_xv is None else [f"Xv_{n}" for n in var["X_v"][:n_xv]]
+    correct_cols = xs_cols + xv_cols
 
     print("Fitting condition correction on dev-unit early cycles ...")
     models = fit_condition_correction(df_dev, correct_cols, w_cols)
     df_dev = apply_condition_correction(df_dev, correct_cols, w_cols, models)
     df_test = apply_condition_correction(df_test, correct_cols, w_cols, models)
 
-    feat_cols = w_cols + xs_cols + (xv_cols if cfg["feature_set"] == "all" else [])
+    feat_cols = w_cols + xs_cols + xv_cols
     agg_fn = aggregate_whole_cycle if cfg["aggregation"] == "whole_cycle" else aggregate_raw_memory
 
     print(f"Aggregating ({cfg['aggregation']}) ...")
@@ -260,6 +289,6 @@ def run(h5_path: str, pipeline_name: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--h5", required=True, help="Path to N-CMAPSS_DS02-006.h5")
-    parser.add_argument("--pipeline", choices=list(PIPELINES), default="honest")
+    parser.add_argument("--pipeline", choices=list(PIPELINES), default="best")
     args = parser.parse_args()
     run(args.h5, args.pipeline)
