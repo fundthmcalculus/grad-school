@@ -1,23 +1,29 @@
-"""Per-engine RUL predictions: table + trajectory graphs, train and test.
+"""Per-engine RUL predictions: table + trajectory graphs, every engine of
+every N-CMAPSS file, using PER-FILE fits.
 
-Fits the per-engine champion (honest_full_tuned: physical sensors only,
-whole-cycle aggregation, StandardScaler) on DS02 -- the sample file -- and
-reports predicted vs. actual RUL for EVERY engine, both the training units
-(2, 5, 10, 16, 18, 20) and the held-out test units (11, 14, 15).
+Each .h5 file is fit independently: the per-engine champion config
+(honest_full_tuned -- physical sensors only, whole-cycle aggregation,
+StandardScaler) is trained on that file's own training units and evaluated
+on that file's own test units. This per-file setup specializes each model
+to its file's flight conditions and generalizes better than one pooled
+global model (see cmapss_rul_full_analysis.py for the pooled comparison).
 
-Whole-cycle aggregation gives exactly one prediction per flight cycle, so
-each engine's predicted-RUL curve overlays cleanly on its true-RUL line.
+For every engine -- training and held-out test, across all files -- it
+reports predicted vs. actual RUL. Whole-cycle aggregation gives one
+prediction per flight cycle, so each engine's predicted-RUL curve overlays
+cleanly on its true run-to-failure descent.
 
 Outputs (all under FuzzySystemsExperiments/outputs/, gitignored):
-  cmapss_rul_engine_predictions.csv     per-engine summary table
-  cmapss_rul_engine_train.png           trajectory grid, training engines
-  cmapss_rul_engine_test.png            trajectory grid, test engines
+  cmapss_rul_engine_predictions.csv        every engine, all files, metrics
+  cmapss_rul_engine_file_summary.csv       per-file train/test RMSE summary
+  cmapss_rul_engine_<DSxx>.png             trajectory grid per file (train+test)
 
-Fits on TRAINING data only (condition-correction, scaler, RUL cap, model);
-test engines are predicted on, never fit.
+Fits on each file's TRAINING data only (condition-correction, scaler, RUL
+cap, model); that file's test engines are predicted on, never fit.
 """
 
 import contextlib
+import glob
 import io
 import os
 
@@ -33,7 +39,7 @@ from sklearn.preprocessing import StandardScaler
 import cmapss_rul_full_analysis as m
 from tribblefis.gaussian_regressor import TribbleRegressor
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5_DIR = "NASA-CMAPSS"
 OUT_DIR = "FuzzySystemsExperiments/outputs"
 CHAMPION_KW = dict(
     tsk_order="1st",
@@ -44,19 +50,21 @@ CHAMPION_KW = dict(
     l2_reg=0.01,
 )
 
-# Palette (matches cmapss_rul_plots conventions)
 SURFACE = "#fcfcfb"
 INK = "#0b0b0b"
 INK_SECONDARY = "#52514e"
 GRID = "#e1e0d9"
-TRUE_C = "#52514e"  # true RUL: neutral ink
-PRED_C = "#2a78d6"  # predicted RUL: blue
+TRUE_C = "#52514e"  # true RUL
+PRED_TRAIN_C = "#2a78d6"  # predicted RUL, training engine (blue)
+PRED_TEST_C = "#eb6834"  # predicted RUL, test engine (orange)
 
 
-def build():
-    data, var = m.load_h5(H5)
-    df_dev = m.to_frame(data, var, "dev", "DS02")
-    df_test = m.to_frame(data, var, "test", "DS02")
+def fit_one_file(h5_path, dataset):
+    """Fit the honest champion on this file's train units; predict both
+    train and test engines. Returns (train_tab, test_tab) with RUL_pred."""
+    data, var = m.load_h5(h5_path)
+    df_dev = m.to_frame(data, var, "dev", dataset)
+    df_test = m.to_frame(data, var, "test", dataset)
     del data
     w = [f"W_{n}" for n in var["W"]]
     xs = [f"Xs_{n}" for n in var["X_s"]]
@@ -81,12 +89,13 @@ def build():
     mdl = TribbleRegressor(random_state=42, max_samples=2000, **CHAMPION_KW)
     with contextlib.redirect_stdout(io.StringIO()):
         mdl.fit(Xtr, y_train)
-    train_tab = train_tab.assign(RUL_pred=mdl.predict(Xtr))
-    test_tab = test_tab.assign(RUL_pred=mdl.predict(Xte))
-    return train_tab, test_tab
+    return (
+        train_tab.assign(RUL_pred=mdl.predict(Xtr)),
+        test_tab.assign(RUL_pred=mdl.predict(Xte)),
+    )
 
 
-def summarize(tab, split):
+def engine_rows(tab, dataset, split):
     rows = []
     for unit, sub in tab.groupby("unit"):
         sub = sub.sort_values("cycle")
@@ -95,6 +104,7 @@ def summarize(tab, split):
         rmse = float(np.sqrt(mean_squared_error(sub["RUL"], sub["RUL_pred"])))
         rows.append(
             dict(
+                dataset=dataset,
                 split=split,
                 unit=int(unit),
                 n_cycles=len(sub),
@@ -107,76 +117,116 @@ def summarize(tab, split):
     return rows
 
 
-def plot_grid(tab, split, out_path):
-    units = sorted(tab["unit"].unique())
-    ncol = min(3, len(units))
-    nrow = int(np.ceil(len(units) / ncol))
+def plot_file(dataset, train_tab, test_tab, out_path):
+    engines = [("train", u) for u in sorted(train_tab["unit"].unique())] + [
+        ("test", u) for u in sorted(test_tab["unit"].unique())
+    ]
+    ncol = min(5, len(engines))
+    nrow = int(np.ceil(len(engines) / ncol))
     fig, axes = plt.subplots(
-        nrow, ncol, figsize=(4.2 * ncol, 3.2 * nrow), facecolor=SURFACE, squeeze=False
+        nrow, ncol, figsize=(3.6 * ncol, 2.9 * nrow), facecolor=SURFACE, squeeze=False
     )
     for ax in axes.flat:
         ax.set_visible(False)
-    for i, unit in enumerate(units):
+    for i, (split, unit) in enumerate(engines):
         ax = axes.flat[i]
         ax.set_visible(True)
+        tab = train_tab if split == "train" else test_tab
+        pred_c = PRED_TRAIN_C if split == "train" else PRED_TEST_C
         sub = tab[tab["unit"] == unit].sort_values("cycle")
         rmse = float(np.sqrt(mean_squared_error(sub["RUL"], sub["RUL_pred"])))
-        ax.plot(
-            sub["cycle"], sub["RUL"], color=TRUE_C, lw=2, label="true RUL", zorder=3
-        )
-        ax.plot(
-            sub["cycle"],
-            sub["RUL_pred"],
-            color=PRED_C,
-            lw=1.6,
-            label="predicted",
-            zorder=4,
-        )
+        ax.plot(sub["cycle"], sub["RUL"], color=TRUE_C, lw=1.8, zorder=3)
+        ax.plot(sub["cycle"], sub["RUL_pred"], color=pred_c, lw=1.4, zorder=4)
         ax.set_facecolor(SURFACE)
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
-        ax.tick_params(colors=INK_SECONDARY, labelsize=8)
-        ax.grid(color=GRID, linewidth=0.7, zorder=0)
+        ax.tick_params(colors=INK_SECONDARY, labelsize=7)
+        ax.grid(color=GRID, linewidth=0.6, zorder=0)
         ax.set_axisbelow(True)
+        tag = "TEST " if split == "test" else ""
         ax.set_title(
-            f"unit {unit}   (traj RMSE {rmse:.1f})",
-            fontsize=10,
-            color=INK,
+            f"{tag}unit {unit}  (RMSE {rmse:.1f})",
+            fontsize=9,
+            color=(PRED_TEST_C if split == "test" else INK),
             loc="left",
         )
-        if i % ncol == 0:
-            ax.set_ylabel("RUL (cycles)", fontsize=9, color=INK_SECONDARY)
-        ax.set_xlabel("cycle", fontsize=9, color=INK_SECONDARY)
-    axes.flat[0].legend(
-        frameon=False, fontsize=9, labelcolor=INK_SECONDARY, loc="upper right"
+    handles = [
+        plt.Line2D([0], [0], color=TRUE_C, lw=2, label="true RUL"),
+        plt.Line2D(
+            [0], [0], color=PRED_TRAIN_C, lw=2, label="predicted (train engine)"
+        ),
+        plt.Line2D([0], [0], color=PRED_TEST_C, lw=2, label="predicted (test engine)"),
+    ]
+    fig.legend(
+        handles=handles,
+        loc="upper right",
+        frameon=False,
+        fontsize=9,
+        labelcolor=INK_SECONDARY,
     )
     fig.suptitle(
-        f"DS02 {split} engines: predicted vs. true RUL (honest champion)",
+        f"{dataset}: per-engine predicted vs. true RUL (per-file honest fit)",
         fontsize=13,
         color=INK,
         x=0.01,
         ha="left",
     )
-    fig.tight_layout(rect=[0, 0, 1, 0.97])
-    fig.savefig(out_path, dpi=160, facecolor=SURFACE)
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    fig.savefig(out_path, dpi=150, facecolor=SURFACE)
     plt.close(fig)
 
 
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
-    train_tab, test_tab = build()
+    all_rows = []
+    file_summary = []
+    for h5_path in sorted(glob.glob(os.path.join(H5_DIR, "*.h5"))):
+        dataset = (
+            os.path.basename(h5_path).replace("N-CMAPSS_", "").replace(".h5", "")
+        ).split("-")[0]
+        try:
+            train_tab, test_tab = fit_one_file(h5_path, dataset)
+        except Exception as e:
+            print(f"{dataset}: SKIPPED ({e!r})")
+            file_summary.append(dict(dataset=dataset, status=f"skipped: {e!r}"))
+            continue
+        all_rows += engine_rows(train_tab, dataset, "train")
+        all_rows += engine_rows(test_tab, dataset, "test")
+        tr_rmse = float(
+            np.sqrt(mean_squared_error(train_tab["RUL"], train_tab["RUL_pred"]))
+        )
+        te_rmse = float(
+            np.sqrt(mean_squared_error(test_tab["RUL"], test_tab["RUL_pred"]))
+        )
+        file_summary.append(
+            dict(
+                dataset=dataset,
+                status="ok",
+                n_train_units=train_tab["unit"].nunique(),
+                n_test_units=test_tab["unit"].nunique(),
+                train_rmse=round(tr_rmse, 2),
+                test_rmse=round(te_rmse, 2),
+            )
+        )
+        plot_file(
+            dataset, train_tab, test_tab, f"{OUT_DIR}/cmapss_rul_engine_{dataset}.png"
+        )
+        print(
+            f"{dataset}: train_rmse={tr_rmse:.2f}  test_rmse={te_rmse:.2f}  -> plotted"
+        )
 
-    table = summarize(train_tab, "train") + summarize(test_tab, "test")
-    df = pd.DataFrame(table)
-    csv_path = f"{OUT_DIR}/cmapss_rul_engine_predictions.csv"
-    df.to_csv(csv_path, index=False)
-    print(df.to_string(index=False))
-    print(f"\nwrote {csv_path}")
+    eng_df = pd.DataFrame(all_rows)
+    eng_df.to_csv(f"{OUT_DIR}/cmapss_rul_engine_predictions.csv", index=False)
+    sum_df = pd.DataFrame(file_summary)
+    sum_df.to_csv(f"{OUT_DIR}/cmapss_rul_engine_file_summary.csv", index=False)
 
-    plot_grid(train_tab, "train", f"{OUT_DIR}/cmapss_rul_engine_train.png")
-    plot_grid(test_tab, "test", f"{OUT_DIR}/cmapss_rul_engine_test.png")
-    print(f"wrote {OUT_DIR}/cmapss_rul_engine_train.png")
-    print(f"wrote {OUT_DIR}/cmapss_rul_engine_test.png")
+    print("\n=== per-file summary ===")
+    print(sum_df.to_string(index=False))
+    print(
+        f"\n{len(eng_df)} engines total across " f"{eng_df['dataset'].nunique()} files"
+    )
+    print(f"wrote {OUT_DIR}/cmapss_rul_engine_predictions.csv")
+    print(f"wrote {OUT_DIR}/cmapss_rul_engine_file_summary.csv")
 
 
 if __name__ == "__main__":
