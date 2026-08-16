@@ -436,7 +436,7 @@ def stage1():
         ].to_string(index=False)
     )
     results_df.to_csv(
-        "FuzzySystemsExperiments/cmapss_rul_stage1_results.csv", index=False
+        "FuzzySystemsExperiments/outputs/cmapss_rul_stage1_results.csv", index=False
     )
     return results_df, agg_cache
 
@@ -518,7 +518,7 @@ def stage2(agg_cache: dict, pipelines: list[str]):
 
     results_df = pd.DataFrame(results).sort_values("rmse_test_true")
     results_df.to_csv(
-        "FuzzySystemsExperiments/cmapss_rul_stage2_results.csv", index=False
+        "FuzzySystemsExperiments/outputs/cmapss_rul_stage2_results.csv", index=False
     )
     return results_df
 
@@ -700,7 +700,7 @@ def refine_and_evaluate(fitted: dict, refiner_name: str, fn=None, kwargs=None) -
     )
 
 
-STAGE4_CSV = "FuzzySystemsExperiments/cmapss_rul_stage4_results.csv"
+STAGE4_CSV = "FuzzySystemsExperiments/outputs/cmapss_rul_stage4_results.csv"
 
 
 def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
@@ -780,7 +780,7 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
 
     results_df = pd.DataFrame(results)
     results_df.to_csv(
-        "FuzzySystemsExperiments/cmapss_rul_stage4_results.csv", index=False
+        "FuzzySystemsExperiments/outputs/cmapss_rul_stage4_results.csv", index=False
     )
     return results_df
 
@@ -876,7 +876,7 @@ def stage4b_refiner_sweep(fitted: dict) -> pd.DataFrame:
         )
     results_df = pd.DataFrame(results)
     results_df.to_csv(
-        "FuzzySystemsExperiments/cmapss_rul_stage4b_sweep.csv", index=False
+        "FuzzySystemsExperiments/outputs/cmapss_rul_stage4b_sweep.csv", index=False
     )
     return results_df
 
@@ -989,7 +989,9 @@ def stage5(agg_cache: dict, top_pipelines: list[str]):
     onset_df = pd.DataFrame(rows)
     mae = onset_df["error"].abs().mean()
     print(f"  MAE across {len(onset_df)} units: {mae:.1f} cycles")
-    onset_df.to_csv("FuzzySystemsExperiments/cmapss_rul_stage5_onsets.csv", index=False)
+    onset_df.to_csv(
+        "FuzzySystemsExperiments/outputs/cmapss_rul_stage5_onsets.csv", index=False
+    )
 
     # Now: how much does the RUL-prediction pipeline lose using the detected
     # onset for the physical cap instead of the oracle hs-derived one?
@@ -1022,7 +1024,7 @@ def stage5(agg_cache: dict, top_pipelines: list[str]):
 
     results_df = pd.DataFrame(results)
     results_df.to_csv(
-        "FuzzySystemsExperiments/cmapss_rul_stage5_results.csv", index=False
+        "FuzzySystemsExperiments/outputs/cmapss_rul_stage5_results.csv", index=False
     )
     return onset_df, results_df
 
@@ -1036,7 +1038,7 @@ def stage5(agg_cache: dict, top_pipelines: list[str]):
 # --------------------------------------------------------------------------
 import pickle
 
-CACHE_PATH = "FuzzySystemsExperiments/.cmapss_rul_cache.pkl"
+CACHE_PATH = "FuzzySystemsExperiments/outputs/.cmapss_rul_cache.pkl"
 
 
 def save_cache(agg_cache, stage1_results, stage2_results):
@@ -1085,6 +1087,8 @@ def select_top_pipelines(
 
 if __name__ == "__main__":
     import os
+
+    os.makedirs("FuzzySystemsExperiments/outputs", exist_ok=True)
 
     # A3_raw_memory_cc/B3/C3_physical is added explicitly, not left to
     # select_top_pipelines: at Stage 1's fixed-D screen it looks like one of
@@ -1159,7 +1163,7 @@ if __name__ == "__main__":
         stage3_predictions[pipeline] = preds
         stage3_fitted[pipeline] = fitted
         preds.to_csv(
-            f"FuzzySystemsExperiments/cmapss_rul_stage3_{pipeline.replace('/', '_')}.csv",
+            f"FuzzySystemsExperiments/outputs/cmapss_rul_stage3_{pipeline.replace('/', '_')}.csv",
             index=False,
         )
 
@@ -1205,7 +1209,7 @@ if __name__ == "__main__":
         _, _, fitted = stage3(agg_cache, pipeline, d_kwargs)
         refine_fitted[pipeline] = fitted
 
-    stage4_csv = "FuzzySystemsExperiments/cmapss_rul_stage4_results.csv"
+    stage4_csv = "FuzzySystemsExperiments/outputs/cmapss_rul_stage4_results.csv"
     if "--resume" in sys.argv and os.path.exists(stage4_csv):
         print(
             f"Resuming Stage 4 from {stage4_csv} (skipping the 20-25 min refinement rerun)"

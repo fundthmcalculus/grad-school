@@ -247,21 +247,22 @@ def nasa_score(y_true, y_pred) -> float:
     return float(np.sum(np.exp(alpha * np.abs(delta))))
 
 
-def run(h5_path: str, pipeline_name: str):
+def run(h5_path: str, pipeline_name: str, verbose: bool = True) -> dict:
     cfg = PIPELINES[pipeline_name]
-    print(
+    p = print if verbose else (lambda *a, **k: None)
+    p(
         f"Pipeline: {pipeline_name!r} ({cfg['feature_set']} sensors, "
         f"{cfg['aggregation']} aggregation) -- expected RMSE ~{cfg['expected_rmse']}"
     )
 
-    print(f"Loading {h5_path} ...")
+    t_total = time.perf_counter()
+    p(f"Loading {h5_path} ...")
     t0 = time.perf_counter()
     data, var = load_h5(h5_path)
     df_dev = to_frame(data, var, "dev")
     df_test = to_frame(data, var, "test")
-    print(
-        f"  {len(df_dev):,} dev rows, {len(df_test):,} test rows ({time.perf_counter()-t0:.1f}s)"
-    )
+    load_seconds = time.perf_counter() - t0
+    p(f"  {len(df_dev):,} dev rows, {len(df_test):,} test rows ({load_seconds:.1f}s)")
 
     w_cols = [f"W_{n}" for n in var["W"]]
     xs_cols = [f"Xs_{n}" for n in var["X_s"]]
@@ -273,10 +274,12 @@ def run(h5_path: str, pipeline_name: str):
     )
     correct_cols = xs_cols + xv_cols
 
-    print("Fitting condition correction on dev-unit early cycles ...")
+    p("Fitting condition correction on dev-unit early cycles ...")
+    t0 = time.perf_counter()
     models = fit_condition_correction(df_dev, correct_cols, w_cols)
     df_dev = apply_condition_correction(df_dev, correct_cols, w_cols, models)
     df_test = apply_condition_correction(df_test, correct_cols, w_cols, models)
+    correction_seconds = time.perf_counter() - t0
 
     feat_cols = w_cols + xs_cols + xv_cols
     agg_fn = (
@@ -285,12 +288,13 @@ def run(h5_path: str, pipeline_name: str):
         else aggregate_raw_memory
     )
 
-    print(f"Aggregating ({cfg['aggregation']}) ...")
+    p(f"Aggregating ({cfg['aggregation']}) ...")
     t0 = time.perf_counter()
     train_tab = agg_fn(df_dev, feat_cols)
     test_tab = agg_fn(df_test, feat_cols)
-    print(
-        f"  {len(train_tab)} train rows, {len(test_tab)} test rows ({time.perf_counter()-t0:.1f}s)"
+    aggregate_seconds = time.perf_counter() - t0
+    p(
+        f"  {len(train_tab)} train rows, {len(test_tab)} test rows ({aggregate_seconds:.1f}s)"
     )
 
     agg_feat_cols = [
@@ -315,23 +319,153 @@ def run(h5_path: str, pipeline_name: str):
     pred_test = model.predict(X_test)
     rmse = float(np.sqrt(mean_squared_error(y_test_true, pred_test)))
     score = nasa_score(y_test_true, pred_test)
+    total_seconds = time.perf_counter() - t_total
 
-    print(f"\n=== {pipeline_name} pipeline ===")
-    print(
+    p(f"\n=== {pipeline_name} pipeline ===")
+    p(
         f"fit_seconds={fit_seconds:.2f}  rmse_test_true={rmse:.2f}  nasa_score={score:.1f}"
     )
     for unit in sorted(test_tab["unit"].unique()):
         m = (test_tab["unit"] == unit).to_numpy()
         u_rmse = float(np.sqrt(mean_squared_error(y_test_true[m], pred_test[m])))
-        print(f"  unit {unit}: n={m.sum():4d}  rmse={u_rmse:.2f}")
-    return rmse, fit_seconds
+        p(f"  unit {unit}: n={m.sum():4d}  rmse={u_rmse:.2f}")
+
+    return dict(
+        pipeline=pipeline_name,
+        rmse=rmse,
+        nasa_score=score,
+        load_seconds=load_seconds,
+        correction_seconds=correction_seconds,
+        aggregate_seconds=aggregate_seconds,
+        fit_seconds=fit_seconds,
+        total_seconds=total_seconds,
+        n_dev_rows=len(df_dev),
+        n_test_rows=len(df_test),
+        n_train_tab=len(train_tab),
+        n_test_tab=len(test_tab),
+    )
+
+
+# --------------------------------------------------------------------------
+# Grid mode: run a set of pipelines over every N-CMAPSS .h5 file in a
+# directory, and emit a markdown report (quality + time-to-process).
+#
+# Each (dataset, pipeline) row is appended to a checkpoint CSV immediately,
+# not just collected in memory -- background runs in this DOE have been
+# killed mid-run before with no OOM/reboot evidence to explain it, so a
+# --resume pass over the same checkpoint must not have to redo finished work.
+# --------------------------------------------------------------------------
+def run_grid(
+    h5_dir: str,
+    pipeline_names: list,
+    checkpoint_path: str = "FuzzySystemsExperiments/outputs/.cmapss_rul_grid_checkpoint.csv",
+    resume: bool = False,
+) -> list:
+    import glob
+    import os
+
+    rows = []
+    done = set()
+    if resume and os.path.exists(checkpoint_path):
+        prior = pd.read_csv(checkpoint_path)
+        rows = prior.to_dict("records")
+        done = set(zip(prior["dataset"], prior["pipeline"]))
+        print(f"Resuming: {len(done)} (dataset, pipeline) pairs already done.")
+
+    os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
+
+    for h5_path in sorted(glob.glob(os.path.join(h5_dir, "*.h5"))):
+        dataset = os.path.basename(h5_path)
+        for pipeline_name in pipeline_names:
+            if (dataset, pipeline_name) in done:
+                print(f"skip (already done): {dataset} / {pipeline_name}")
+                continue
+            print(f"\n{'='*78}\n{dataset} / {pipeline_name}\n{'='*78}")
+            try:
+                result = run(h5_path, pipeline_name, verbose=True)
+                result["dataset"] = dataset
+                result["status"] = "ok"
+            except Exception as e:
+                print(f"  FAILED: {e!r}")
+                result = dict(
+                    dataset=dataset,
+                    pipeline=pipeline_name,
+                    status=f"failed: {e!r}",
+                )
+            rows.append(result)
+            pd.DataFrame(rows).to_csv(checkpoint_path, index=False)
+    return rows
+
+
+def write_grid_report(rows: list, out_path: str) -> None:
+    ok_rows = sorted(
+        (r for r in rows if r.get("status") == "ok"),
+        key=lambda r: (r["dataset"], r["pipeline"]),
+    )
+    failed_rows = [r for r in rows if r.get("status") != "ok"]
+
+    lines = [
+        "# N-CMAPSS RUL grid results",
+        "",
+        "`cmapss_rul_best.py --grid`: the `honest` (physical sensors only, "
+        "18 channels) and `best` (physical + 2 virtual, the literature-"
+        "matching 20-channel set) pipelines, run across every N-CMAPSS "
+        "dataset file available locally.",
+        "",
+        "| dataset | pipeline | RMSE | NASA score | load (s) | correction (s) "
+        "| aggregate (s) | fit (s) | total (s) |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for r in ok_rows:
+        lines.append(
+            f"| {r['dataset']} | {r['pipeline']} | {r['rmse']:.2f} | "
+            f"{r['nasa_score']:.1f} | {r['load_seconds']:.1f} | "
+            f"{r['correction_seconds']:.1f} | {r['aggregate_seconds']:.1f} | "
+            f"{r['fit_seconds']:.2f} | {r['total_seconds']:.1f} |"
+        )
+    if failed_rows:
+        lines += ["", "## Skipped / failed", ""]
+        for r in failed_rows:
+            lines.append(f"- {r['dataset']} / {r['pipeline']}: {r['status']}")
+
+    with open(out_path, "w") as f:
+        f.write("\n".join(lines) + "\n")
+    print(f"\nwrote {out_path}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--h5", required=True, help="Path to N-CMAPSS_DS02-006.h5")
+    parser.add_argument("--h5", help="Path to a single N-CMAPSS .h5 file")
     parser.add_argument("--pipeline", choices=list(PIPELINES), default="best")
+    parser.add_argument(
+        "--grid",
+        action="store_true",
+        help="Run --pipelines over every *.h5 file in --h5-dir; writes a "
+        "markdown report to --report-out instead of a single run.",
+    )
+    parser.add_argument("--h5-dir", default="NASA-CMAPSS")
+    parser.add_argument(
+        "--pipelines",
+        nargs="+",
+        default=["honest", "best"],
+        choices=list(PIPELINES),
+        help="Pipelines to run in --grid mode (default: honest, best).",
+    )
+    parser.add_argument(
+        "--report-out", default="FuzzySystemsExperiments/cmapss_rul_grid_report.md"
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Skip (dataset, pipeline) pairs already in the checkpoint CSV.",
+    )
     args = parser.parse_args()
-    run(args.h5, args.pipeline)
+    if args.grid:
+        rows = run_grid(args.h5_dir, args.pipelines, resume=args.resume)
+        write_grid_report(rows, args.report_out)
+    else:
+        if not args.h5:
+            parser.error("--h5 is required unless --grid is given")
+        run(args.h5, args.pipeline)
