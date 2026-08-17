@@ -12,6 +12,8 @@ import contextlib
 import copy
 import io
 import itertools
+import os
+import pickle
 import sys
 import time
 
@@ -275,7 +277,18 @@ def unit_caps_from_onset(table: pd.DataFrame, onset_by_unit: dict) -> dict[int, 
 def unit_physical_caps(table: pd.DataFrame) -> dict[int, float]:
     """Per-unit cap using the oracle `hs`-derived onset. Derived from data,
     not hardcoded from the PDF's table. See `unit_caps_from_onset` for the
-    general form this specializes."""
+    general form this specializes.
+
+    **Pass training rows only.** Every call site used to hand this
+    `pd.concat([train_tab, test_tab])`, which built caps for the held-out
+    engines from their own `hs` flag. The headline `rmse_test_true` never
+    touched them, so no published number moved -- but `run_one` did use them
+    for `y_test_target`, so `rmse_test_shaped` was scored against a target
+    shaped by the test engines' own degradation onsets, and that column ships
+    in the results CSVs under a name that does not announce itself.
+    `apply_rul_shape` now leaves any unit without a cap uncapped, so a test
+    table simply passes through at its raw RUL.
+    """
     return unit_caps_from_onset(table, true_onset_cycle(table))
 
 
@@ -285,8 +298,16 @@ def apply_rul_shape(table: pd.DataFrame, mode: str, caps: dict) -> pd.Series:
     if mode == "C2_fixed125":
         return table["RUL"].clip(upper=125).astype(float)
     if mode in ("C3_physical", "C4_detected"):
-        cap_series = table["unit"].map(caps)
-        return np.minimum(table["RUL"].astype(float), cap_series)
+        # A unit with no cap stays uncapped rather than becoming NaN. `caps` is
+        # built from training units only now, so this is the path every test
+        # row takes -- and NaN targets would silently poison the shaped metric
+        # rather than leaving it honest.
+        cap_series = table["unit"].map(caps).astype(float)
+        raw = table["RUL"].astype(float)
+        return pd.Series(
+            np.where(cap_series.isna(), raw, np.minimum(raw, cap_series.fillna(raw))),
+            index=table.index,
+        )
     raise ValueError(mode)
 
 
@@ -403,7 +424,9 @@ def stage1():
             )
 
     for (a_name, b_name), (train_tab, test_tab, feat_cols) in agg_cache.items():
-        caps = unit_physical_caps(pd.concat([train_tab, test_tab], ignore_index=True))
+        caps = unit_physical_caps(
+            train_tab
+        )  # training units only -- see unit_physical_caps
         agg_feat_cols = [
             c for c in train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")
         ]
@@ -444,8 +467,19 @@ def stage1():
 # --------------------------------------------------------------------------
 # Stage 2: grid Factor D on the winning Stage 1 pipelines
 # --------------------------------------------------------------------------
+# NOTE ON SELECTION: `stage2` below picks each pipeline's winner by
+# `rmse_test_true` -- the official held-out engines. That is test-set
+# selection, and it is disclosed rather than hidden because it was checked:
+# re-running this grid against a validation fold (dev engines 18/20 held out)
+# selects the *identical* configuration for the `best` pipeline and reproduces
+# its RMSE 6.48 exactly, so that headline owes nothing to the shortcut. For
+# `honest` the validation protocol picks a worse model (16.06 vs 11.23) -- two
+# engines is too small a fold. See `experiments/nn-cmapss/sweep_fis.py`.
 D_GRID = dict(
     tsk_order=["0th", "1st", "full-2nd"],
+    # 0 means AUTOMATIC (see TribbleRegressor: "Number of Gaussians per feature
+    # per label (0 for automatic)"), not "no Gaussians". Automatic wins on both
+    # pipelines; sitting in a list next to 3 and 5 it reads like an ablation.
     n_gaussians=[0, 3, 5],
     # top_p=1.0 (feature selection off) was tried and dropped: on the wide
     # pipelines (up to 480 raw stat columns) it hands every unselected
@@ -491,7 +525,9 @@ def stage2(agg_cache: dict, pipelines: list[str]):
     for pipeline in pipelines:
         a_name, b_name, c_name = pipeline.split("/")
         train_tab, test_tab, _ = agg_cache[(a_name, b_name)]
-        caps = unit_physical_caps(pd.concat([train_tab, test_tab], ignore_index=True))
+        caps = unit_physical_caps(
+            train_tab
+        )  # training units only -- see unit_physical_caps
         agg_feat_cols = [
             c for c in train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")
         ]
@@ -529,7 +565,9 @@ def stage2(agg_cache: dict, pipelines: list[str]):
 def stage3(agg_cache: dict, pipeline: str, d_kwargs: dict):
     a_name, b_name, c_name = pipeline.split("/")
     train_tab, test_tab, _ = agg_cache[(a_name, b_name)]
-    caps = unit_physical_caps(pd.concat([train_tab, test_tab], ignore_index=True))
+    caps = unit_physical_caps(
+        train_tab
+    )  # training units only -- see unit_physical_caps
     agg_feat_cols = [
         c for c in train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")
     ]
@@ -715,8 +753,6 @@ def stage4(fitted_by_pipeline: dict, timeout_seconds: float = 20.0):
     it. Re-running with the CSV already present skips whatever pairs it
     already has, so a second kill doesn't cost the whole stage again.
     """
-    import os
-
     done = set()
     results = []
     if os.path.exists(STAGE4_CSV):
@@ -995,6 +1031,10 @@ def stage5(agg_cache: dict, top_pipelines: list[str]):
 
     # Now: how much does the RUL-prediction pipeline lose using the detected
     # onset for the physical cap instead of the oracle hs-derived one?
+    # Onset is *detected*, not read off `hs`, so building it over both splits
+    # leaks nothing about the labels -- but the caps that reach a training
+    # target are still restricted to training units, so the two cap sources
+    # below differ only in how onset was found, which is the comparison here.
     detected_caps = unit_caps_from_onset(combined, detected_onset)
     results = []
     for pipeline in top_pipelines:
@@ -1005,9 +1045,7 @@ def stage5(agg_cache: dict, top_pipelines: list[str]):
         agg_feat_cols = [
             c for c in p_train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")
         ]
-        oracle_caps = unit_physical_caps(
-            pd.concat([p_train_tab, p_test_tab], ignore_index=True)
-        )
+        oracle_caps = unit_physical_caps(p_train_tab)  # training units only
         for cap_name, caps in [
             ("oracle_hs", oracle_caps),
             ("detected_ma", detected_caps),
@@ -1036,8 +1074,6 @@ def stage5(agg_cache: dict, top_pipelines: list[str]):
 # reboot evidence, so each phase should be resumable independently rather
 # than re-paying the whole pipeline on any interruption.
 # --------------------------------------------------------------------------
-import pickle
-
 CACHE_PATH = "FuzzySystemsExperiments/outputs/.cmapss_rul_cache.pkl"
 
 
@@ -1086,8 +1122,6 @@ def select_top_pipelines(
 
 
 if __name__ == "__main__":
-    import os
-
     os.makedirs("FuzzySystemsExperiments/outputs", exist_ok=True)
 
     # A3_raw_memory_cc/B3/C3_physical is added explicitly, not left to
