@@ -47,9 +47,18 @@
     <section class="panel">
       <h2>Session</h2>
       <div class="row">
+        <button id="btnChooseFolder">Choose Save Folder&hellip;</button>
+        <span class="pill" id="folderPill">no folder selected (footage kept in memory)</span>
+      </div>
+      <div class="row">
         <button id="btnStart" class="primary">Start Session</button>
         <button id="btnStop" class="danger" disabled>Stop Session</button>
         <span class="pill" id="sessionPill">idle</span>
+        <span class="pill" id="elapsedPill" style="display:none">00:00</span>
+        <label style="flex-direction: row; align-items: center; gap: 6px;">
+          <input type="checkbox" id="beepEnabled" checked style="width:auto" />
+          beep on new rider
+        </label>
       </div>
       <div class="row">
         <button id="btnDownloadVideo" disabled>Download Footage</button>
@@ -112,7 +121,7 @@
 
 <footer>Bib numbers are read from the front as riders approach; the logged time is the last moment each number was legible. See README for the overtake caveat.</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
+<script src="vendor/tesseract/tesseract.min.js"></script>
 <script type="module" src="src/main.js"></script>
 </body>
 </html>

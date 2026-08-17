@@ -4,6 +4,8 @@ import { OcrDetector } from './ocrDetector.js';
 import { NumberTracker } from './tracker.js';
 import { FootageRecorder, triggerDownload } from './recorder.js';
 import { buildSessionJson, buildSessionCsv, triggerTextDownload } from './exporter.js';
+import { LiveFileWriter } from './storage.js';
+import { loadSettings, saveSettings } from './settings.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -14,11 +16,14 @@ const gpuCanvas = $('gpuCanvas');
 const deviceSelect = $('deviceSelect');
 const gpuPill = $('gpuPill');
 const sessionPill = $('sessionPill');
+const elapsedPill = $('elapsedPill');
+const folderPill = $('folderPill');
 const countPill = $('countPill');
 const statusLine = $('statusLine');
 const logBody = $('logBody');
 
 const btnStartCamera = $('btnStartCamera');
+const btnChooseFolder = $('btnChooseFolder');
 const btnStart = $('btnStart');
 const btnStop = $('btnStop');
 const btnDownloadVideo = $('btnDownloadVideo');
@@ -34,6 +39,7 @@ const binarizeInput = $('binarize');
 const thresholdInput = $('threshold');
 const whitelistInput = $('whitelist');
 const upscaleInput = $('upscale');
+const beepEnabledInput = $('beepEnabled');
 
 const overlayCtx = overlay.getContext('2d');
 const cropCtx = cropCanvas.getContext('2d');
@@ -42,6 +48,9 @@ const ocrCtx = ocrCanvas.getContext('2d');
 
 const gpu = new WebGpuPreprocessor();
 let gpuFallbackCtx = null;
+
+const fileWriter = new LiveFileWriter();
+let useLiveFiles = false;
 
 let stream = null;
 let roiFrac = null;
@@ -52,13 +61,70 @@ let tracker = null;
 let recorder = null;
 let running = false;
 let loopHandle = null;
+let elapsedHandle = null;
 let lastSession = null;
 let lastVideoBlob = null;
+let audioCtx = null;
+const recentlyFinalized = new Set();
 
 function setStatus(msg, level = '') {
   statusLine.textContent = msg;
   statusLine.className = 'status-line' + (level ? ` ${level}` : '');
 }
+
+window.addEventListener('unhandledrejection', (e) => {
+  const msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+  setStatus(`Unexpected error: ${msg}`, 'err');
+});
+
+// ---- Settings persistence -------------------------------------------------
+
+function collectSettings() {
+  return {
+    intervalMs: Number(intervalMsInput.value),
+    missThreshold: Number(missThresholdInput.value),
+    minConfidence: Number(minConfidenceInput.value),
+    contrast: Number(contrastInput.value),
+    brightness: Number(brightnessInput.value),
+    binarize: binarizeInput.checked,
+    threshold: Number(thresholdInput.value),
+    whitelist: whitelistInput.value,
+    upscale: Number(upscaleInput.value),
+    beepEnabled: beepEnabledInput.checked,
+    roi: roiFrac,
+  };
+}
+
+function persistSettings() {
+  saveSettings(collectSettings());
+}
+
+function applySavedSettings(saved) {
+  if (!saved) return;
+  if (saved.intervalMs != null) intervalMsInput.value = saved.intervalMs;
+  if (saved.missThreshold != null) missThresholdInput.value = saved.missThreshold;
+  if (saved.minConfidence != null) minConfidenceInput.value = saved.minConfidence;
+  if (saved.contrast != null) contrastInput.value = saved.contrast;
+  if (saved.brightness != null) brightnessInput.value = saved.brightness;
+  if (saved.binarize != null) binarizeInput.checked = saved.binarize;
+  if (saved.threshold != null) thresholdInput.value = saved.threshold;
+  if (saved.whitelist != null) whitelistInput.value = saved.whitelist;
+  if (saved.upscale != null) upscaleInput.value = saved.upscale;
+  if (saved.beepEnabled != null) beepEnabledInput.checked = saved.beepEnabled;
+  if (saved.roi) roiFrac = saved.roi;
+}
+
+const savedSettings = loadSettings();
+applySavedSettings(savedSettings);
+
+[intervalMsInput, missThresholdInput, minConfidenceInput, contrastInput, brightnessInput,
+  binarizeInput, thresholdInput, whitelistInput, beepEnabledInput].forEach((el) => {
+  el.addEventListener('change', persistSettings);
+});
+upscaleInput.addEventListener('change', () => {
+  persistSettings();
+  updateCropCanvasSizeFromRoi();
+});
 
 // ---- Camera setup ----------------------------------------------------
 
@@ -87,7 +153,7 @@ btnStartCamera.addEventListener('click', async () => {
     fitOverlayToVideo();
     applyDefaultRoiIfNeeded();
   } catch (e) {
-    setStatus(`Camera error: ${e.message}`, 'err');
+    setStatus(`Camera error: ${e.message}. Check camera permissions and that no other app is using it.`, 'err');
   }
 });
 
@@ -159,11 +225,12 @@ window.addEventListener('mouseup', (e) => {
   };
   drawRoiOverlay();
   updateCropCanvasSizeFromRoi();
+  persistSettings();
 });
 
 function applyDefaultRoiIfNeeded() {
-  if (roiFrac || !video.videoWidth) return;
-  roiFrac = { x: 0.15, y: 0.4, w: 0.7, h: 0.2 };
+  if (!video.videoWidth) return;
+  if (!roiFrac) roiFrac = { x: 0.15, y: 0.4, w: 0.7, h: 0.2 };
   drawRoiOverlay();
   updateCropCanvasSizeFromRoi();
 }
@@ -195,6 +262,23 @@ function updateCropCanvasSizeFromRoi() {
     gpuFallbackCtx = gpuCanvas.getContext('2d');
   }
 })();
+
+// ---- Save folder (crash-safe live persistence) ---------------------------
+
+if (!fileWriter.supported) {
+  btnChooseFolder.disabled = true;
+  folderPill.textContent = 'live-save unsupported in this browser (footage downloads at end)';
+} else {
+  btnChooseFolder.addEventListener('click', async () => {
+    const ok = await fileWriter.pickDirectory();
+    if (ok) {
+      useLiveFiles = true;
+      folderPill.textContent = `folder: ${fileWriter.directoryName} (footage + log stream live)`;
+      folderPill.classList.add('on');
+      setStatus('Save folder selected. Footage and log entries will be written live during the session.');
+    }
+  });
+}
 
 // ---- Detection loop -------------------------------------------------------
 
@@ -241,6 +325,33 @@ async function loopStep() {
   }
 }
 
+// ---- Audio cue ------------------------------------------------------------
+
+function beep() {
+  if (!beepEnabledInput.checked || !audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.16);
+  } catch (e) {
+    // Autoplay-policy or unsupported-browser edge cases — non-critical, ignore.
+  }
+}
+
+// ---- Elapsed timer ----------------------------------------------------
+
+function formatElapsed(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+  const s = (totalSeconds % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
 // ---- Session lifecycle ----------------------------------------------------
 
 btnStart.addEventListener('click', async () => {
@@ -253,8 +364,25 @@ btnStart.addEventListener('click', async () => {
     return;
   }
   btnStart.disabled = true;
-  setStatus('Loading OCR model (first run downloads ~2MB of language data)…');
 
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+  } catch (e) {
+    audioCtx = null;
+  }
+
+  const baseName = `race-session-${new Date().toISOString().replace(/[:.]/g, '-')}`;
+  if (useLiveFiles) {
+    setStatus('Opening session files on disk…');
+    const opened = await fileWriter.openSessionFiles(baseName);
+    if (!opened) {
+      setStatus('Could not open files in the chosen folder (permission lost?). Falling back to in-memory recording for this session.', 'warn');
+      useLiveFiles = false;
+    }
+  }
+
+  setStatus('Loading OCR model…');
   detector = new OcrDetector({
     whitelist: whitelistInput.value || '0123456789',
     minConfidence: Number(minConfidenceInput.value) || 0,
@@ -262,30 +390,59 @@ btnStart.addEventListener('click', async () => {
   try {
     await detector.init();
   } catch (e) {
-    setStatus(`Failed to load OCR engine: ${e.message}`, 'err');
+    setStatus(`Failed to load OCR engine: ${e.message}. Check that vendor/tesseract/ is present next to this page.`, 'err');
     btnStart.disabled = false;
     return;
   }
 
+  recentlyFinalized.clear();
   tracker = new NumberTracker({
     missThreshold: Number(missThresholdInput.value) || 3,
-    onFinalize: refreshLogTable,
+    onFinalize: (record) => {
+      refreshLogTable();
+      beep();
+      recentlyFinalized.add(record.number);
+      setTimeout(() => {
+        recentlyFinalized.delete(record.number);
+        refreshLogTable();
+      }, 1500);
+      if (useLiveFiles) {
+        fileWriter.appendLogEntry({
+          number: record.number,
+          firstSeenEpochMs: record.firstSeen,
+          lastSeenEpochMs: record.lastSeen,
+          durationMs: record.durationMs,
+          hits: record.hits,
+          confidence: record.confidence,
+        });
+      }
+    },
   });
 
-  recorder = new FootageRecorder();
+  recorder = new FootageRecorder({
+    keepInMemory: !useLiveFiles,
+    onChunk: useLiveFiles ? (chunk) => fileWriter.appendVideoChunk(chunk) : undefined,
+  });
   recorder.start(stream);
 
   running = true;
   btnStop.disabled = false;
   sessionPill.textContent = 'recording';
   sessionPill.classList.add('on');
-  setStatus('Session running.');
+  elapsedPill.style.display = '';
+  elapsedHandle = setInterval(() => {
+    elapsedPill.textContent = formatElapsed(Date.now() - recorder.startEpochMs);
+  }, 500);
+  setStatus(useLiveFiles
+    ? `Session running. Footage streaming to ${fileWriter.videoFilename}.`
+    : 'Session running.');
   loopStep();
 });
 
 btnStop.addEventListener('click', async () => {
   running = false;
   clearTimeout(loopHandle);
+  clearInterval(elapsedHandle);
   btnStop.disabled = true;
   setStatus('Stopping…');
 
@@ -294,6 +451,7 @@ btnStop.addEventListener('click', async () => {
   tracker.flush();
   refreshLogTable();
   await detector.terminate();
+  if (useLiveFiles) await fileWriter.close();
 
   lastSession = {
     recordingStartEpochMs: recorder.startEpochMs,
@@ -310,13 +468,19 @@ btnStop.addEventListener('click', async () => {
   lastVideoBlob = blob;
   window.__lastSession = lastSession; // convenience for console debugging
 
-  btnDownloadVideo.disabled = false;
+  btnDownloadVideo.disabled = !lastVideoBlob;
   btnDownloadJson.disabled = false;
   btnDownloadCsv.disabled = false;
   btnStart.disabled = false;
   sessionPill.textContent = 'stopped';
   sessionPill.classList.remove('on');
-  setStatus(`Session stopped. ${tracker.finalized.length} rider(s) logged.`);
+  elapsedPill.style.display = 'none';
+
+  if (useLiveFiles) {
+    setStatus(`Session stopped. ${tracker.finalized.length} rider(s) logged. Footage saved to "${fileWriter.videoFilename}" and log to "${fileWriter.logFilename}" in your chosen folder.`);
+  } else {
+    setStatus(`Session stopped. ${tracker.finalized.length} rider(s) logged.`);
+  }
 });
 
 btnDownloadVideo.addEventListener('click', () => {
@@ -361,7 +525,7 @@ function refreshLogTable() {
   logBody.innerHTML = '';
   for (const r of rows) {
     const tr = document.createElement('tr');
-    tr.className = r.state;
+    tr.className = r.state + (recentlyFinalized.has(r.number) ? ' flash' : '');
     tr.innerHTML = `
       <td>${r.number}</td>
       <td>${fmtTime(r.firstSeen)}</td>

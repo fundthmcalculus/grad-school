@@ -4,7 +4,9 @@ A browser-based computer-vision timing aid for cyclocross time trials with
 staggered group starts (groups of 3, 15 seconds apart). Bib numbers are
 mounted on the handlebars and read from the front as riders approach a
 camera at the finish/reading line. Everything runs client-side — no server,
-no upload of footage anywhere.
+no upload of footage anywhere, and **no internet connection required**: the
+OCR engine and its trained data are vendored into the repo (see
+`vendor/tesseract/`), since race venues often have no WiFi.
 
 It does three things:
 
@@ -13,8 +15,13 @@ It does three things:
 2. **Logs each sighting**, tracking numbers across frames: if a number is
    read on contiguous cycles, it's treated as one sighting and the logged
    time is the *last* moment it was legible (not the first).
-3. **Records the full camera feed** to a downloadable video file, so you can
-   go back and manually verify or correct any entry afterward.
+3. **Records the full camera feed** the whole time — streamed live to disk
+   when possible, so a crash mid-race doesn't lose the footage — for
+   after-action review.
+
+**Running an actual race? See [`RACE_DAY.md`](RACE_DAY.md)** for a printable
+setup + operator checklist and troubleshooting guide. This README covers the
+architecture and internals.
 
 ## Quick start
 
@@ -27,25 +34,48 @@ python3 -m http.server 8000
 # open http://localhost:8000/capture.html
 ```
 
-Any static file server works — this is plain HTML/JS/CSS with no build step.
-Open `capture.html`, pick a camera, drag a box over the video to mark the
-reading window, then **Start Session**. **Stop Session** finalizes the log
-and unlocks the download buttons (footage, JSON log, CSV log).
+Any static file server works — this is plain HTML/JS/CSS with no build step,
+and it needs no internet access once the page is loaded (see "Fully offline"
+below). On `capture.html`:
 
-Open `review.html` afterward, load the downloaded footage + JSON log, and
-click **First**/**Last** next to any entry to jump the video to that moment
-— useful for confirming or correcting misreads before publishing results.
+1. **Choose Save Folder…** (Chrome/Edge only) — picks a folder that footage
+   and the rider log stream to live, so a crash doesn't lose the session.
+   Skip this and footage is instead held in memory and offered as a download
+   when the session stops.
+2. Pick a camera and click **Start Camera**.
+3. Drag a box over the video to mark the reading window (ROI) — the strip
+   riders' bib numbers will cross as they approach.
+4. **Start Session** / **Stop Session**. Stopping finalizes the log and
+   enables the JSON/CSV download buttons (and the footage download button
+   too, if you skipped step 1).
+
+Open `review.html` afterward, load the footage + JSON log, and click
+**First**/**Last** next to any entry to jump the video to that moment, edit
+misread numbers, and export a corrected log — see `RACE_DAY.md` for the full
+after-action workflow.
+
+## Fully offline
+
+Nothing here calls out to the internet. The OCR engine (Tesseract.js) and
+its English trained-data model are vendored in `vendor/tesseract/` rather
+than fetched from Tesseract.js's default CDN, because race venues frequently
+have no WiFi or cell signal. Run the local static server once while you
+still have a connection (to get the repo itself), and everything after that
+works with the laptop in airplane mode.
 
 ## Architecture
 
 ```
 capture.html / review.html      — pages (no framework, ES modules)
+vendor/tesseract/                — vendored OCR engine + English model (offline)
 src/camera.js                   — getUserMedia device listing + stream setup
 src/webgpuPreprocess.js         — WebGPU render pass: grayscale + contrast/
                                    brightness + optional binarize threshold
 src/ocrDetector.js              — Tesseract.js wrapper, digit-only whitelist
 src/tracker.js                  — contiguous-sighting state machine
-src/recorder.js                 — MediaRecorder wrapper, downloadable footage
+src/recorder.js                 — MediaRecorder wrapper, in-memory or streamed footage
+src/storage.js                  — File System Access API live disk persistence
+src/settings.js                 — localStorage persistence of operator settings
 src/exporter.js                 — JSON/CSV export
 src/main.js                     — capture page wiring (ROI select, loop, UI)
 src/review.js                   — review page wiring (seek-by-entry, corrections)
@@ -71,6 +101,16 @@ Each detection cycle (default every 300ms, configurable):
 The full, unprocessed camera stream is recorded the whole time via
 `MediaRecorder`, independent of the ROI/detection pipeline, so the AAR
 footage always has full context.
+
+**Crash safety.** If a save folder was chosen (Chrome/Edge, via the File
+System Access API), footage chunks and each finalized rider are written
+straight to disk as they happen, rather than held in memory until the
+session ends — a tab crash or accidental close loses at most the last
+second, not the whole race. Without a chosen folder (or on a browser that
+doesn't support the API), footage accumulates in memory and is offered as a
+single download when the session stops, same as before. Either way, ROI and
+all detection/preprocessing settings are saved to `localStorage` as you tune
+them, so they carry over to the next session without re-tuning.
 
 ## The overtake caveat
 

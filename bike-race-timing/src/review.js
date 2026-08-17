@@ -58,7 +58,11 @@ jsonFileInput.addEventListener('change', async () => {
 
 function seekTo(epochMs) {
   if (!session || !session.recordingStartEpochMs) {
-    setStatus('Load both the footage and the log file first.', 'warn');
+    setStatus('Load the log file first.', 'warn');
+    return;
+  }
+  if (!video.src) {
+    setStatus('Load the footage file first.', 'warn');
     return;
   }
   const offsetSeconds = (epochMs - session.recordingStartEpochMs) / 1000;
@@ -67,7 +71,7 @@ function seekTo(epochMs) {
     return;
   }
   video.currentTime = offsetSeconds;
-  video.play().catch(() => {});
+  video.play().catch((e) => setStatus(`Could not play footage: ${e.message}`, 'err'));
 }
 
 function renderTable() {

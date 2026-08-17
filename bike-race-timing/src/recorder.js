@@ -17,7 +17,17 @@ function pickMimeType() {
 }
 
 export class FootageRecorder {
-  constructor() {
+  /**
+   * @param {object} opts
+   * @param {(chunk: Blob) => void} [opts.onChunk] called with each raw chunk as it's produced —
+   *   use this to stream chunks to disk live (see src/storage.js).
+   * @param {boolean} [opts.keepInMemory] when false, chunks are handed to `onChunk` and then
+   *   discarded rather than accumulated, so `stop()` resolves with `null`. Use this once a
+   *   live disk-writer is in place, so long sessions don't hold the whole video in RAM twice.
+   */
+  constructor({ onChunk, keepInMemory = true } = {}) {
+    this.onChunk = onChunk;
+    this.keepInMemory = keepInMemory;
     this.recorder = null;
     this.chunks = [];
     this.mimeType = '';
@@ -32,13 +42,15 @@ export class FootageRecorder {
     this.mimeType = pickMimeType();
     this.recorder = new MediaRecorder(stream, this.mimeType ? { mimeType: this.mimeType } : undefined);
     this.recorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) this.chunks.push(e.data);
+      if (!e.data || e.data.size === 0) return;
+      if (this.keepInMemory) this.chunks.push(e.data);
+      if (this.onChunk) this.onChunk(e.data);
     };
     this.startEpochMs = Date.now();
     this.recorder.start(1000); // gather chunks every second so a crash doesn't lose everything
   }
 
-  /** @returns {Promise<Blob>} */
+  /** @returns {Promise<Blob|null>} null when `keepInMemory` is false */
   stop() {
     return new Promise((resolve) => {
       if (!this.recorder) {
@@ -46,7 +58,7 @@ export class FootageRecorder {
         return;
       }
       this.recorder.onstop = () => {
-        this.blob = new Blob(this.chunks, { type: this.mimeType || 'video/webm' });
+        this.blob = this.keepInMemory ? new Blob(this.chunks, { type: this.mimeType || 'video/webm' }) : null;
         resolve(this.blob);
       };
       this.recorder.stop();
