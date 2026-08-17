@@ -354,7 +354,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       instability is itself worth a sentence in Chapter 6, not merely a caveat here.
 - [ ] ⬜ **C14 — Train-subsample variance study for the turbofan-RUL case study** *(future PR;
       Ch 4 §4.4.1, Table 4.10, Appendix A.7.1).* N-CMAPSS DS02 RUL is currently *demonstrated*
-      (one run on the dataset's own fixed split, `FuzzySystemsExperiments/cmapss_rul_full_analysis.py`
+      (one run on the dataset's own fixed split, `FuzzySystemsExperiments/cmapss_all_datasets.py`
       + `cmapss_rul_full_analysis_report.md`), not *measured*. The reproducibility axis here is **not**
       a ten-seed random split — the train/test split is fixed by the dataset (the held-out engine
       units, the same split the published baselines use), so re-seeding it would measure the wrong
