@@ -118,9 +118,13 @@ TUNE_SEED = 123
 #           history to sometimes blow up numerically at high order -- left
 #           in deliberately since DE penalizes a bad candidate on its own
 #           rather than needing it pre-excluded)
-#   x[3] -> log10(l2_reg)
+#   x[3] -> log10(l2_reg); floored at log10(0.01) so the search cannot pick
+#           the near-singular low-regularization configs that tie on
+#           per-sample RMSE but blow up on end-of-life outliers (the
+#           real-memory DE search demonstrated exactly this failure with
+#           l2_reg~5e-5). l2_reg in [0.01, 1] keeps every candidate robust.
 #   x[4] -> n_gaussians (rounded to int; 0 = automatic)
-DE_BOUNDS = [(0, 3), (0.7, 0.99), (0, 5), (-6, 0), (0, 8)]
+DE_BOUNDS = [(0, 3), (0.7, 0.99), (0, 5), (-2, 0), (0, 8)]
 DE_NORM_CONORM_CHOICES = ["min/max", "probability", "luk", "hamacher", "einstein"]
 DE_TSK_ORDER_CHOICES = ["0th", "1st", "full-2nd"]
 DE_POPSIZE = 4
@@ -365,6 +369,28 @@ PIPELINES = {
     # best_full_de_minmax -- the current overall champion.
     "best_full_de_minmax": dict(
         n_xv=2,
+        aggregation="raw_memory",
+        scaler="minmax",
+        tribble_kwargs=dict(
+            tsk_order="full-2nd",
+            n_gaussians=4,
+            top_p=0.9622893249863613,
+            detect_interactions=False,
+            norm_conorm="hamacher",
+            l2_reg=0.01502536299852122,
+        ),
+    ),
+    # "Physically possible" champion: the best_full_de_minmax pipeline with
+    # the 2 virtual channels (T40, P30) DROPPED -- raw-memory over REAL
+    # measurable sensors only (W + X_s, 18 channels). A dedicated DE search
+    # (cmapss_rul_real_memory_de.py) confirmed this matches the virtual-
+    # channel best across the board when properly regularized: per-sample
+    # RMSE 15.31 vs 15.21, per-engine 18.50 vs 18.73, avg NASA 4.66 -- i.e.
+    # the virtual channels are NOT needed for accuracy. This is a genuine
+    # base pipeline (its own raw-memory aggregation with n_xv=0), so a
+    # normal run fits and reports it alongside the others.
+    "real_memory": dict(
+        n_xv=0,
         aggregation="raw_memory",
         scaler="minmax",
         tribble_kwargs=dict(
@@ -903,8 +929,10 @@ def main(tune: bool = False, tune_de: bool = False):
             tuned_name = f"{name}_full_tuned"
             search_logs[tuned_name] = search_log
             print(f"  winner: {best_kwargs}")
-            hardcoded = PIPELINES[tuned_name]["tribble_kwargs"]
-            if best_kwargs != hardcoded:
+            # bases without a hardcoded _full_tuned twin (e.g. real_memory)
+            # just report the winner; nothing to diff against.
+            hardcoded = PIPELINES.get(tuned_name, {}).get("tribble_kwargs")
+            if hardcoded is not None and best_kwargs != hardcoded:
                 print(
                     f"  NOTE: this differs from the hardcoded {tuned_name} config "
                     f"({hardcoded}) -- update PIPELINES if you want to keep it."
@@ -928,7 +956,11 @@ def main(tune: bool = False, tune_de: bool = False):
                 for c in full_train_tab.columns
                 if c not in ("dataset", "unit", "cycle", "RUL", "hs")
             ]
-            seed_kwargs = PIPELINES[f"{name}_full_tuned"]["tribble_kwargs"]
+            # seed from the base's hardcoded _full_tuned twin if it has one,
+            # else from the base config itself (e.g. real_memory).
+            seed_kwargs = PIPELINES.get(f"{name}_full_tuned", PIPELINES[name])[
+                "tribble_kwargs"
+            ]
             best_kwargs, summary = tune_hyperparameters_de(
                 full_train_tab,
                 feat_cols,
