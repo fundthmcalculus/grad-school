@@ -122,9 +122,95 @@ post-processor, the candidates worth trying next, roughly in order of promise:
 All three are model surgery; the post-hoc projection above is the thing to ship
 first, and the yardstick they would have to beat is the 8.35 / 5.87 oracle.
 
+---
+
+# Monotone by construction: a damage-accumulation model
+
+The next step above was built (`monotone_model.py`). Instead of clamping the
+FIS after the fact, model RUL so it *cannot* rise: predict a non-negative
+per-cycle damage rate and accumulate it.
+
+    delta(t) = softplus(w . phi(x_t) + b)   >= 0        (a damage rate)
+    RUL(t)   = max(A - sum_{s<=t} delta(s), 0)          (accumulated, floored)
+
+`RUL(t) - RUL(t-1) = -delta(t) <= 0` for any weights — monotone by
+construction, causal (the sum runs forward in cycle order), and anchored (`A`,
+a learned scalar, is fit on data so the level is absolute). `phi` is the FIS's
+own selected features; the whole thing is `d+2` parameters trained by the same
+Adam as the rest of the study. Two details earn their place:
+
+* **The floor at zero is load-bearing, not cosmetic.** RUL cannot be negative,
+  and `max(., 0)` of a non-increasing sequence is still non-increasing, so it
+  keeps monotonicity. Without it the longest test engine's small per-cycle
+  damage-rate bias integrates into a −54-cycle overshoot; with it (gradient
+  masked where it bites, so training stops paying for impossible values) that
+  same engine goes from 29.4 to 5.6 RMSE.
+* **A training-time endpoint anchor** (`end_weight`) pins each *training*
+  engine's last cycle — which ran to failure, so true RUL there is 0 — to zero,
+  fixing a systematically-too-steep accumulation slope that an inference-time
+  floor cannot. It helps `best` and hurts `honest`; see below.
+
+## Result
+
+Per-sample RMSE, per-cycle, three test engines. `up%` is the fraction of cycles
+RUL rises. All monotone methods are at 0% by construction.
+
+| method | causal? | `honest` RMSE | `best` RMSE |
+|---|---|---:|---:|
+| raw FIS | — | 10.05 (↑40%) | 6.19 (↑36%) |
+| `cummin` clamp | ✓ | 17.39 | **6.23** |
+| `mean5 → cummin` clamp | ✓ | 10.23 | 6.99 |
+| **monotone-damage model** | ✓ | **8.05** | 20.08 |
+| monotone-damage + endpoint | ✓ | 14.43 | 10.90 |
+| offline oracle (bound) | ✗ | 8.35 | 5.87 |
+
+**On the noisy pipeline it wins outright.** The damage model reaches **8.05**
+on `honest` — better than the causal clamp (10.23) *and* better than the
+offline oracle (8.35). That is not a contradiction: the oracle is the best
+monotone projection *of the raw FIS's noisy predictions*, whereas the damage
+model is a different, better-conditioned model fit directly to RUL, so it is
+not bounded by it. This is the real payoff of building monotonicity in rather
+than bolting it on — and the figure shows why: on unit 14, where the raw FIS
+dips sharply and the clamp adopts that dip as a 40-cycle plateau (18.0 RMSE),
+the damage model simply draws the straight declining line the physics implies
+(5.6).
+
+**On the already-smooth pipeline it loses, and the reason is instructive.** On
+`best` the accumulated damage rate is biased high (1.26/cycle against an ideal
+~1.0), so it over-accumulates and floors to zero a third of the way through the
+longest engine (36.4 RMSE). The endpoint anchor fixes the slope (20.1 → 10.9)
+but still cannot beat the trivial `cummin` clamp, which is essentially free
+here (6.23) because `best`'s memory-window features already produced a smooth,
+nearly-monotone signal. Accumulation models earn their keep only when there is
+real noise to suppress.
+
+![monotone-by-construction vs clamp](figures/monotone_model.png)
+
+## What to use
+
+| your situation | use |
+|---|---|
+| whole-cycle / noisy features (`honest`) | **the damage model** — 8.05, monotone, and the closest to true RUL of anything here |
+| memory-window / already-smooth features (`best`) | **`cummin` clamp** — 6.23, monotone, ~free, no new model |
+| lowest RMSE overall, monotone, deployable | `best` pipeline + `cummin` clamp = **6.23** |
+
+The damage model is the answer to "monotone by construction," and on the pipeline
+where noise is the problem it is also simply the best RUL model in this study.
+Where the features are already smooth, structural monotonicity buys nothing over
+a one-line clamp, and its accumulation is a liability on long trajectories.
+
+Not yet tried, and the natural next moves if the damage model is taken further:
+a validation-selected `end_weight` (it is currently 0 on `honest`, 1 on `best`,
+chosen by inspection, not on a fold); a richer non-negative rate (a small
+monotone network, or the FIS's per-rule firing strengths as `phi` so each rule
+carries an interpretable non-negative damage contribution); and running it on
+the raw-memory rows without the per-cycle collapse that currently blunts it on
+`best`.
+
 ## Reproducing
 
 ```bash
 cd experiments/nn-cmapss
-python monotone.py            # table + monotone.json + figures/monotone.png
+python monotone.py            # post-hoc smoothing/clamp ladder + figures/monotone.png
+python monotone_model.py      # the damage model + figures/monotone_model.png
 ```

@@ -24,7 +24,8 @@ anything worth keeping):
 | `fidelity.py` | why the hot start does not fire — conversion fidelity against FIS dimension, with a best-possible-additive reference. |
 | `external_baselines.py` | sklearn MLP / GBM / random forest, as a check that the hand-rolled NumPy trainer is not the limiting factor. |
 | `trajectories.py` | the FIS-vs-network overlay: predicted RUL against ground truth, per held-out engine, both pipelines. Re-derives each curve from the recorded configuration and asserts its RMSE against the run artifact before drawing. |
-| `monotone.py` | reducing the FIS's cycle-to-cycle noise toward a monotone-decreasing RUL — quantifies the noise, evaluates causal vs. oracle smoothing, writes `MONOTONE.md`. |
+| `monotone.py` | reducing the FIS's cycle-to-cycle noise toward a monotone-decreasing RUL — quantifies the noise, evaluates causal vs. oracle smoothing. |
+| `monotone_model.py` | a RUL model that is monotone by construction (accumulated non-negative damage), vs. post-hoc clamping. Both write into `MONOTONE.md`. |
 | `report.py` | tables and figures from the artifacts. |
 | `write_benchmark.py` | generates `BENCHMARK.md`. Every number is interpolated from JSON; nothing is transcribed. |
 
