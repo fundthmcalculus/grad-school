@@ -37,7 +37,7 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 165
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_concrete()`
 - **Status:** Measured at ten seeds; Chapter 4 §4.3.2 decision rule runs on Concrete; Chapter 6 model family runs on Concrete
-- **Gap:** No large-scale regression partner. Chapter 7 names this as a structural gap (A.7.1).
+- **Gap:** Concrete carries the *measured* small-regression story alone. Large partners now exist at the ten-seed floor (California Housing, Superconductivity; see A.7.1), and a large-scale *physics/prognostics* case study (N-CMAPSS turbofan RUL, below) is demonstrated single-run. Chapter 7 A.7.1 tracks what remains.
 
 #### Bike Sharing Demand (Tables 4.5, 6.1, large regression benchmark)
 - **File:** `data/bikeshare-hour.csv`
@@ -46,6 +46,14 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Source:** [Kaggle Bike Sharing Demand](https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619)
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_bikeshare()`
 - **Status:** Measured at ten seeds (2026-08-12), wired into Table 4.1 alongside Concrete and PhiUSIIL; 17.3× larger than Concrete, demonstrating fuzzy regression scaling on real urban dynamics
+
+#### N-CMAPSS DS02 — Turbofan Remaining Useful Life (Table 4.10, §4.4.1)
+- **File:** `NASA-CMAPSS/N-CMAPSS_DS02-006.h5` (HDF5)
+- **Size:** 5.3M train + 1.2M test rows at 1 Hz → aggregated per `(unit, cycle)`; RUL regression, physics/prognostics domain
+- **Role:** Large-scale physical-engineering regression **case study** — the domain partner Concrete lacks; demonstrates the §4.3.2 answer-first regression construction against published deep-learning baselines on their own benchmark
+- **Source:** Arias Chao, Kulkarni, Goebel, Fink, *Data* 6(1):5, 2021 (DOI 10.3390/data6010005); [Kaggle mirror](https://www.kaggle.com/datasets/bishals098/nasa-cmapss-2-engine-degradation)
+- **Loading:** `FuzzySystemsExperiments/cmapss_rul.py` / `cmapss_rul_full_analysis.py` (not the `reproduce/` harness)
+- **Status:** **DEMONSTRATED, not measured.** One run on the **dataset's own fixed train/test split** (the held-out engine units — the split the published baselines use), not a random seeded split: DS02 per-sample RMSE 6.48 in ~1 s beats the public-file CNN (7.22) / MLP (8.34) re-runs on their 20-channel input set; real-sensors-only matches the virtual-channel best when pooled. The reproducibility axis for a fixed-split benchmark is the **train-set subsample** seed, not the split — a ten-seed *subsample* variance study is `CHECKLIST` **C14** (future PR). **Not redistributable** — the 10 `.h5` files total ~28 GB and are gitignored; only the scripts and the committed report `cmapss_rul_full_analysis_report.md` are tracked. Primary-source verification of the baseline figures is **C15**.
 
 ### Clustering / Structure Discovery
 
@@ -192,7 +200,7 @@ The proposal currently has only one regression benchmark (**Concrete**, 1,030 ro
 
 | Category | Small / Fast | Large / Scale | Measured? | Status |
 |---|---|---|---|---|
-| **Regression** | Concrete (1,030) | Bike Sharing (17,379); California Housing (20,433); Superconductivity (21,263) | **Yes** (2026-08-12, 10 seeds) | Bike Sharing in Table 4.1; California Housing/Superconductivity in new Appendix A.7.1 generator — RF wins both, flat MoG/HME unstable on Superconductivity |
+| **Regression** | Concrete (1,030) | Bike Sharing (17,379); California Housing (20,433); Superconductivity (21,263); N-CMAPSS DS02 turbofan RUL (6.5M raw) | **Yes** (10 seeds) + **demonstrated** (N-CMAPSS, single-run) | Bike Sharing in Table 4.1; California Housing/Superconductivity in Appendix A.7.1 — RF wins both, flat MoG/HME unstable on Superconductivity; N-CMAPSS a physics/prognostics case study (Table 4.10, §4.4.1) beating public-file CNN/MLP baselines |
 | **Classification** | Glass (214) | PhiUSIIL (235k) | Yes | Fixed; was broken, now working |
 | **Classification (open-set)** | Glass (214) | RT-IOT2022 (123k) | **Yes** (2026-08-12, both roles) | Open-set (5 seeds, Table 4.7b): complement rule loses to Isolation Forest. Classification/timing (10 seeds, Table 4.4): MoG 92.7% / 37.4s vs. RF 99.9% |
 | **Anomaly** | Glass (214) | BETH (3.8M) | No | BETH in place; no measurements yet; still blocked on the one-class-protocol decision (§7.3) |
