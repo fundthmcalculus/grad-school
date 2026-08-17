@@ -96,6 +96,16 @@ FIS_CONFIGS = {
         norm_conorm="hamacher",
         l2_reg=0.01,
     ),
+    # `memory18` is `best`'s configuration on the strict 18-sensor memory
+    # pipeline (see cmapss_data.BUNDLES) -- the FIS-quality recommendation.
+    "memory18": dict(
+        tsk_order="full-2nd",
+        n_gaussians=0,
+        top_p=0.95,
+        detect_interactions=False,
+        norm_conorm="hamacher",
+        l2_reg=0.01,
+    ),
 }
 
 
