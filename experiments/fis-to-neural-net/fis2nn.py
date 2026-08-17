@@ -64,6 +64,23 @@ from tribblefis.triangle_fit import (
 KNOT_MERGE_TOL = 1e-9
 
 
+class DegenerateMembership(ValueError):
+    """A membership function with no width, so no exact ReLU expansion exists.
+
+    Separate from a plain ``ValueError`` because the two callers want opposite
+    things. A caller handing in a hand-built term wants the exception: it means
+    the term is malformed. A caller walking a *fitted* FIS wants to skip the
+    term and carry on: a zero-width term is what a feature with (near-)zero
+    variance produces, and there is nothing for an axis-aligned seed to learn
+    from it either way.
+
+    This is not hypothetical. ``fit_triangle_to_gaussian`` collapses to zero
+    width when a Gaussian's sigma is 0, which is what a constant feature gives;
+    N-CMAPSS DS02 has one (``Xs_T30_max``). The first version of this guard
+    assumed the case unreachable and took the benchmark down on contact.
+    """
+
+
 @dataclass(frozen=True)
 class ReLUExpansion:
     """``mu(x) = bias + sum_i coeffs[i] * relu(x - knots[i])``, exactly."""
@@ -89,6 +106,45 @@ def triangle_to_relu(mf: TriangularMembership) -> ReLUExpansion:
     Ruspini partition is exactly one left shoulder, some triangles, and one
     right shoulder, so a converter that only handled interior triangles could
     not convert a partition at all.
+
+    Raises
+    ------
+    DegenerateMembership
+        If a side has zero width -- ``a == b`` with a finite ``a``, or
+        ``b == c`` with a finite ``c``. Such a term steps from 0 to 1 at the
+        apex, and a **finite sum of ReLUs is continuous**, so no expansion of
+        this form can represent it.
+
+        This used to return silently wrong weights. The rising branch below
+        carried the comment "b == a (a vertical rise) contributes no ReLU: the
+        term jumps to 1 at the apex, which the falling side's expansion below
+        reproduces on its own." It does not. With ``T(a=1, b=1, c=2)`` the old
+        code returned ``-fall * relu(x - b) + fall * relu(x - c)`` -- the
+        *negation* of the correct ramp, still falling past ``c``, wrong by a
+        full unit of membership. ``b == c`` mirrored it, returning a right
+        shoulder pinned at 1 instead of dropping to 0.
+
+        **Degenerate terms are reachable from fitted models**, though not the
+        negating branch above. The first version of this guard reasoned that
+        ``fit_triangle_to_gaussian`` yields ``a < b < c`` for any
+        ``sigma > 0``, so the case was unreachable -- and then raised on a real
+        N-CMAPSS DS02 fit within the hour. What that data produces is
+        ``sigma == 0`` exactly, from a feature with no variance
+        (``Xs_T30_max``), which fits the *fully* collapsed ``a == b == c``.
+
+        That form was harmless in value and bad in kind: with no rise, no fall
+        and a zero apex coefficient, the old code emitted no knots and an
+        all-zero expansion, so a collapsed feature entered the seed as silence
+        rather than as a wrong number. Fidelity on DS02 is unchanged by this
+        fix. What changes is that a collapsed feature is now *reported*
+        (:func:`fis_knots` warns with a count) instead of vanishing.
+
+        The negating ``a == b < c`` branch remains a genuine wrong answer for
+        any caller that constructs terms directly; it simply is not what this
+        package's Gaussian fit produces.
+    ValueError
+        If the feet are inverted (``a > b`` or ``b > c``). The old
+        ``elif b > a`` guard silently dropped the rising ReLU in that case.
     """
     a, b, c = float(mf.a), float(mf.b), float(mf.c)
     knots: list[float] = []
@@ -98,22 +154,39 @@ def triangle_to_relu(mf: TriangularMembership) -> ReLUExpansion:
     left_shoulder = np.isneginf(a)
     right_shoulder = np.isposinf(c)
 
+    if not left_shoulder and a == b:
+        raise DegenerateMembership(
+            f"zero-width rising side: a == b == {b!r}. The term steps from 0 to 1 "
+            "at the apex, and a finite sum of ReLUs is continuous, so no exact "
+            "expansion exists. Use a left shoulder (a = -inf) if the term really "
+            "is 1 up to the apex."
+        )
+    if not right_shoulder and b == c:
+        raise DegenerateMembership(
+            f"zero-width falling side: b == c == {b!r}. The term steps from 1 to 0 "
+            "at the apex, and a finite sum of ReLUs is continuous, so no exact "
+            "expansion exists. Use a right shoulder (c = +inf) if the term really "
+            "stays 1 past the apex."
+        )
+    if not left_shoulder and a > b:
+        raise ValueError(f"inverted triangle: need a <= b, got a={a!r}, b={b!r}")
+    if not right_shoulder and b > c:
+        raise ValueError(f"inverted triangle: need b <= c, got b={b!r}, c={c!r}")
+
     # Rising side.
     rise = 0.0
     if left_shoulder:
         bias = 1.0  # membership is already 1 to the left of the apex
-    elif b > a:
+    else:
         rise = 1.0 / (b - a)
         knots.append(a)
         coeffs.append(rise)
-    # b == a (a vertical rise) contributes no ReLU: the term jumps to 1 at the
-    # apex, which the falling side's expansion below reproduces on its own.
 
     # Falling side.
     fall = 0.0
     if right_shoulder:
         pass  # membership stays 1 to the right of the apex
-    elif c > b:
+    else:
         fall = 1.0 / (c - b)
         knots.append(c)
         coeffs.append(fall)
@@ -137,19 +210,56 @@ def triangle_to_relu(mf: TriangularMembership) -> ReLUExpansion:
 
 
 def trapezoid_to_relu(mf: TrapezoidMembership) -> ReLUExpansion:
-    """Exact ReLU expansion of a trapezoidal term (four knots instead of three)."""
+    """Exact ReLU expansion of a trapezoidal term (four knots instead of three).
+
+    Raises ``ValueError`` on a vertical edge (``a == b`` or ``c == d``) for the
+    same reason :func:`triangle_to_relu` does: the term steps from 0 to 1 with
+    no ramp, and a finite sum of ReLUs cannot step. The previous ``if b > a``
+    guard skipped the rising pair in that case and returned an expansion that
+    was 0 through the plateau and negative past it.
+
+    Unlike the triangle, **all four parameters must be finite**. Triangles get
+    shoulder forms because a Ruspini partition needs them; trapezoids in this
+    package never do -- ``trapz_math_fast`` builds them from finite data
+    quantiles -- and ``gauss_data.TrapezoidMembership.evaluate`` cannot
+    represent an infinite foot anyway: with ``a = -inf`` its rising branch
+    computes ``(x - a) / (b - a)`` as ``inf / inf`` and returns NaN across the
+    whole left side. Converting a shape whose own ground truth is NaN would be
+    inventing semantics, so this rejects it instead.
+    """
     a, b, c, d = float(mf.a), float(mf.b), float(mf.c), float(mf.d)
     knots: list[float] = []
     coeffs: list[float] = []
 
-    if b > a:
-        rise = 1.0 / (b - a)
-        knots += [a, b]
-        coeffs += [rise, -rise]
-    if d > c:
-        fall = 1.0 / (d - c)
-        knots += [c, d]
-        coeffs += [-fall, fall]
+    if not all(np.isfinite(v) for v in (a, b, c, d)):
+        raise ValueError(
+            f"trapezoid feet must all be finite, got a={a!r}, b={b!r}, c={c!r}, "
+            f"d={d!r}. Shoulder forms exist for triangles (a Ruspini partition "
+            "needs them) but not for trapezoids, whose own `evaluate` returns "
+            "NaN on an infinite foot."
+        )
+    if a == b:
+        raise DegenerateMembership(
+            f"zero-width rising edge: a == b == {b!r}. A vertical edge is "
+            "discontinuous and has no exact ReLU expansion."
+        )
+    if c == d:
+        raise DegenerateMembership(
+            f"zero-width falling edge: c == d == {c!r}. A vertical edge is "
+            "discontinuous and has no exact ReLU expansion."
+        )
+    if a > b or c > d:
+        raise ValueError(
+            f"inverted trapezoid: need a <= b <= c <= d, got a={a!r}, b={b!r}, "
+            f"c={c!r}, d={d!r}"
+        )
+
+    rise = 1.0 / (b - a)
+    knots += [a, b]
+    coeffs += [rise, -rise]
+    fall = 1.0 / (d - c)
+    knots += [c, d]
+    coeffs += [-fall, fall]
 
     order = np.argsort(np.asarray(knots, dtype=float)) if knots else np.array([], int)
     return ReLUExpansion(
@@ -205,8 +315,21 @@ def fis_knots(
     This is the object the whole "hot start" claim is about: the FIS's answer to
     *where the interesting breakpoints of each input are*, expressed in the only
     currency a ReLU network has.
+
+    Zero-width terms are skipped, and the count is reported through
+    :func:`warnings.warn` rather than swallowed. A fitted FIS really does
+    contain them -- a feature with (near-)zero variance gives a Gaussian whose
+    sigma underflows, and its triangle fit has no width -- and such a term
+    contributes no breakpoint an axis-aligned seed could use. Skipping is the
+    right answer; skipping *silently* is not, because a FIS where most terms
+    are degenerate is a FIS whose conversion means nothing, and the caller
+    should hear about it.
     """
+    import warnings
+
     knots: dict[str, np.ndarray] = {}
+    n_degenerate = 0
+    n_total = 0
     for name in features:
         feature_model = model.feature_models.get(name)
         if feature_model is None:
@@ -215,8 +338,24 @@ def fis_knots(
         raw: list[float] = []
         for label_model in feature_model.label_models.values():
             for mf in label_model.memberships:
-                raw.extend(membership_to_relu(mf, half_width_sigma).knots.tolist())
+                n_total += 1
+                try:
+                    expansion = membership_to_relu(mf, half_width_sigma)
+                except DegenerateMembership:
+                    n_degenerate += 1
+                    continue
+                raw.extend(expansion.knots.tolist())
         knots[name] = merge_knots(raw, tol)
+
+    if n_degenerate:
+        warnings.warn(
+            f"fis_knots: skipped {n_degenerate} of {n_total} membership "
+            f"functions with zero width (a feature with no variance fits a "
+            f"Gaussian whose sigma underflows). Their features contribute no "
+            f"knots to the seed.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     return knots
 
 
@@ -457,6 +596,18 @@ def pwl_to_relu_weights(
     the output weight the equivalence assigns to that knot's hidden unit. The
     first and last knots carry no slope change (the function is extended
     linearly outside the sampled range), so their coefficients are zero.
+
+    **Extrapolation is unbounded, and it is a real error term.** Past the last
+    knot the reconstruction keeps the slope of the last *segment* forever, and
+    likewise below the first. On a FIS whose Gaussian-derived knots do not span
+    the data this is not a corner case: on N-CMAPSS DS02's `honest` pipeline,
+    42% of test rows fall outside at least one FIS feature's knot range, and at
+    the one-feature end of the fidelity sweep that extrapolation is essentially
+    the whole residual (seed 0.070 relative against a best-additive 0.030).
+    Callers who care should either clip inputs into the knot range before the
+    hidden layer or widen the knot set; measuring the outside-range fraction
+    alongside any fidelity number is the minimum, since a good fidelity score
+    on a knot-spanning dataset says nothing about one where it does not span.
     """
     t = np.asarray(knots, dtype=float)
     v = np.asarray(values, dtype=float)
@@ -492,7 +643,22 @@ def partial_dependence(
     do, so it is the right thing to back out rather than a convenient proxy.
 
     It consumes ``X`` but never ``y``: this is a conversion of the FIS, not a
-    refit against labels.
+    refit against labels. (The module docstring's "no data" is about the exact
+    1-D theorem in :func:`fis_to_relu_net_1d`; *this* path is label-free, which
+    is the weaker and accurate claim.)
+
+    **Only sound for a 0th- or 1st-order TSK.** Overwriting one column sends
+    every background row to a point the joint distribution may never visit, and
+    the FIS is then evaluated off its own data manifold. With affine
+    consequents that extrapolates linearly and stays sane. With
+    ``tsk_order="full-2nd"`` the consequent is quadratic and it does not: on
+    N-CMAPSS DS02 the resulting seed sits 31x the FIS's own standard deviation
+    away from it, against 1.3x for the same pipeline converted at 1st order.
+    The failure is in this probe, not in the decomposition downstream -- the
+    best-achievable additive fit computed the same way blows up identically.
+    Restrict the grid to the feature's *conditional* support (an ALE-style
+    profile), or convert a lower-order FIS, before reading anything into a
+    fidelity number from a 2nd-order system.
     """
     import pandas as pd  # local: keeps the module's hard dependency numpy-only
 
@@ -751,18 +917,32 @@ def train_adam(
             net.predict(Xe) * y_scale + y_center,
         )
 
-    def record(epoch: float, elapsed: float) -> None:
+    # Wall clock spent *measuring* rather than training. `hist.seconds` used to
+    # be `perf_counter() - start`, which charged every prior evaluation pass
+    # over X_test/X_val to the training time it was supposed to be reporting.
+    # That cancels between arms of equal width and does not cancel otherwise --
+    # and the comparison this module exists for puts a hot arm whose width is
+    # fixed by the FIS's knot count (264 units on N-CMAPSS DS02) against an `he`
+    # arm free to be narrow (8), a 33x difference in per-evaluation cost billed
+    # to the wrong column. Subtracting it makes every recorded second a second
+    # of gradient descent.
+    eval_seconds = 0.0
+
+    def record(epoch: float) -> None:
+        nonlocal eval_seconds
+        t_rec = time.perf_counter()
         hist.epochs.append(epoch)
-        hist.seconds.append(elapsed)
+        hist.seconds.append(t_rec - start - eval_seconds)
         # Scoring the training set is the most expensive part of a record, and
         # at sub-epoch cadence on 160k rows it costs more than the training it
         # is measuring. Nothing in this experiment selects on the train curve.
         hist.train_rmse.append(_score(X, y) if track_train else float("nan"))
         hist.test_rmse.append(_score(X_test, y_test))
         hist.val_rmse.append(_score(X_val, y_val))
+        eval_seconds += time.perf_counter() - t_rec
 
     start = time.perf_counter()
-    record(0.0, 0.0)
+    record(0.0)
     n_batches = max(1, int(np.ceil(n / batch_size)))
 
     for epoch in range(1, epochs + 1):
@@ -805,11 +985,11 @@ def train_adam(
                     setattr(net, p, getattr(net, p) - step)
 
             if eval_batches and (bi + 1) % eval_batches == 0:
-                record(epoch - 1 + (bi + 1) / n_batches, time.perf_counter() - start)
+                record(epoch - 1 + (bi + 1) / n_batches)
 
         if eval_batches is None and (epoch % eval_every == 0 or epoch == epochs):
-            record(float(epoch), time.perf_counter() - start)
+            record(float(epoch))
     if eval_batches:
-        record(float(epochs), time.perf_counter() - start)
+        record(float(epochs))
 
     return net, hist

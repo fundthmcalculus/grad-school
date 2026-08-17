@@ -88,7 +88,9 @@ def main():
         agg_feat_cols = [
             c for c in train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")
         ]
-        caps = unit_physical_caps(pd.concat([train_tab, test_tab], ignore_index=True))
+        caps = unit_physical_caps(
+            train_tab
+        )  # training units only -- see unit_physical_caps
 
         X_train = train_tab[agg_feat_cols].to_numpy(dtype=np.float64)
         X_test = test_tab[agg_feat_cols].to_numpy(dtype=np.float64)
