@@ -32,6 +32,7 @@ import pandas as pd
 
 import cmapss_data
 import models
+import metrics
 
 OUT = os.path.join(cmapss_data.REPO, "outputs", "nn-cmapss")
 
@@ -115,8 +116,8 @@ def run(which: str, seeds=(0,)) -> None:
             n_features=len(conv.features),
             n_hidden=conv.n_hidden,
             fis_seconds=fis_s,
-            fis_test_rmse=models.evaluate(b.test, pred_fis)["rmse"],
-            seed_test_rmse=models.evaluate(b.test, seed_pred)["rmse"],
+            fis_test_rmse=metrics.evaluate(b.test, pred_fis)["rmse"],
+            seed_test_rmse=metrics.evaluate(b.test, seed_pred)["rmse"],
             fidelity_rmse=float(np.sqrt(np.mean((seed_pred - pred_fis) ** 2))),
             fidelity_relative=float(np.sqrt(np.mean((seed_pred - pred_fis) ** 2)) / sd),
             additive_rmse=float(np.sqrt(np.mean((add_pred - pred_fis) ** 2))),
