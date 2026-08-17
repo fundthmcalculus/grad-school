@@ -26,6 +26,8 @@ anything worth keeping):
 | `trajectories.py` | the FIS-vs-network overlay: predicted RUL against ground truth, per held-out engine, both pipelines. Re-derives each curve from the recorded configuration and asserts its RMSE against the run artifact before drawing. |
 | `monotone.py` | reducing the FIS's cycle-to-cycle noise toward a monotone-decreasing RUL — quantifies the noise, evaluates causal vs. oracle smoothing. |
 | `monotone_model.py` | a RUL model that is monotone by construction (accumulated non-negative damage), vs. post-hoc clamping. Both write into `MONOTONE.md`. |
+| `fis_quality.py` | improving the FIS's RUL on both axes *inside* TribbleRegressor — the memory-feature win, and the trend-augmentation / hyperparameter negatives. Writes `FIS_QUALITY.md`. |
+| `fis_memory_sweep.py` | sweeps the memory-window size for the accuracy/smoothness trade (loads the HDF5 once). |
 | `report.py` | tables and figures from the artifacts. |
 | `write_benchmark.py` | generates `BENCHMARK.md`. Every number is interpolated from JSON; nothing is transcribed. |
 
