@@ -1,11 +1,12 @@
 import { listVideoInputs, startCamera } from './camera.js';
-import { WebGpuPreprocessor } from './webgpuPreprocess.js';
+import { WebGpuPreprocessor, looksLikeBlankFrame } from './webgpuPreprocess.js';
 import { OcrDetector } from './ocrDetector.js';
 import { NumberTracker } from './tracker.js';
 import { FootageRecorder, triggerDownload } from './recorder.js';
 import { buildSessionJson, buildSessionCsv, triggerTextDownload } from './exporter.js';
 import { LiveFileWriter } from './storage.js';
 import { loadSettings, saveSettings } from './settings.js';
+import { runDetectionBenchmark, measureBitrate } from './benchmark.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -29,6 +30,10 @@ const btnStop = $('btnStop');
 const btnDownloadVideo = $('btnDownloadVideo');
 const btnDownloadJson = $('btnDownloadJson');
 const btnDownloadCsv = $('btnDownloadCsv');
+const btnBenchmark = $('btnBenchmark');
+const btnApplyRecommended = $('btnApplyRecommended');
+const benchmarkPill = $('benchmarkPill');
+const benchmarkResults = $('benchmarkResults');
 
 const intervalMsInput = $('intervalMs');
 const missThresholdInput = $('missThreshold');
@@ -40,11 +45,24 @@ const thresholdInput = $('threshold');
 const whitelistInput = $('whitelist');
 const upscaleInput = $('upscale');
 const beepEnabledInput = $('beepEnabled');
+const webgpuEnabledInput = $('webgpuEnabled');
+const hardStopBanner = $('hardStopBanner');
 
 const overlayCtx = overlay.getContext('2d');
 const cropCtx = cropCanvas.getContext('2d');
 const ocrCanvas = document.createElement('canvas');
 const ocrCtx = ocrCanvas.getContext('2d');
+// cropCanvas is deliberately never passed into WebGPU directly — testing
+// found that a WebGPU device loss can corrupt canvas rendering more broadly
+// than just the texture involved (even a software-backed, never-WebGPU
+// canvas came back blank in one environment after a device loss elsewhere
+// on the page). gpuSourceCanvas is a disposable copy fed to the GPU instead,
+// and WebGPU preprocessing itself defaults to OFF (see webgpuEnabledInput)
+// until an operator has confirmed it's stable on their hardware via the
+// performance check. The general canvas-health check further down protects
+// against this class of failure regardless of cause.
+const gpuSourceCanvas = document.createElement('canvas');
+const gpuSourceCtx = gpuSourceCanvas.getContext('2d');
 
 const gpu = new WebGpuPreprocessor();
 let gpuFallbackCtx = null;
@@ -65,7 +83,15 @@ let elapsedHandle = null;
 let lastSession = null;
 let lastVideoBlob = null;
 let audioCtx = null;
+let benchmarkRunning = false;
+let consecutiveBlankCrops = 0;
+let detectionHardStopped = false;
 const recentlyFinalized = new Set();
+
+function showHardStopBanner(message) {
+  hardStopBanner.textContent = `⚠ ${message}`;
+  hardStopBanner.style.display = 'block';
+}
 
 function setStatus(msg, level = '') {
   statusLine.textContent = msg;
@@ -121,6 +147,20 @@ applySavedSettings(savedSettings);
   binarizeInput, thresholdInput, whitelistInput, beepEnabledInput].forEach((el) => {
   el.addEventListener('change', persistSettings);
 });
+// webgpuEnabled is deliberately NOT persisted to localStorage: if it ever
+// causes the canvas-health hard-stop above, the fix is to reload the page —
+// and a persisted "on" would silently re-enable it on that very reload.
+// It always starts unchecked and must be turned on explicitly each session.
+webgpuEnabledInput.addEventListener('change', () => {
+  if (webgpuEnabledInput.checked) {
+    setStatus(gpu.available
+      ? 'WebGPU preprocessing enabled. Recommended: run the performance check below to confirm it behaves correctly on this hardware before racing.'
+      : 'WebGPU preprocessing enabled, but WebGPU isn\'t available on this browser/device — the CPU fallback will be used regardless.', 'warn');
+  } else {
+    setStatus('WebGPU preprocessing disabled — using the CPU path.');
+  }
+});
+
 upscaleInput.addEventListener('change', () => {
   persistSettings();
   updateCropCanvasSizeFromRoi();
@@ -248,15 +288,22 @@ function updateCropCanvasSizeFromRoi() {
   gpuCanvas.height = h;
   ocrCanvas.width = w;
   ocrCanvas.height = h;
+  gpuSourceCanvas.width = w;
+  gpuSourceCanvas.height = h;
 }
 
 // ---- WebGPU init --------------------------------------------------------
 
+gpu.onDisabled = (reason) => {
+  gpuPill.textContent = 'WebGPU: disabled after errors (CPU fallback)';
+  gpuPill.classList.remove('on');
+  setStatus(`WebGPU preprocessing hit repeated errors and has been disabled for the rest of this session — detection continues via the CPU path. (${reason})`, 'warn');
+};
+
 (async () => {
   const ok = await gpu.init(gpuCanvas);
   if (ok) {
-    gpuPill.textContent = 'WebGPU: enabled';
-    gpuPill.classList.add('on');
+    gpuPill.textContent = 'WebGPU: available (off by default — enable above)';
   } else {
     gpuPill.textContent = 'WebGPU: unavailable (CPU fallback)';
     gpuFallbackCtx = gpuCanvas.getContext('2d');
@@ -306,10 +353,45 @@ async function loopStep() {
   try {
     if (roiFrac && video.videoWidth) {
       captureRoiToCropCanvas();
-      if (gpu.available) {
-        gpu.process(cropCanvas, gpuOptsFromUi());
-        ocrCtx.drawImage(gpuCanvas, 0, 0);
+
+      // General health check, independent of WebGPU: a plain video frame
+      // draw should never produce a fully-transparent crop. If it does
+      // (camera died, or — as found during testing — some other failure
+      // corrupted canvas rendering on the page), silently logging zero
+      // riders for the rest of the race is the worst possible outcome.
+      // Hard-stop detection loudly instead; the recording itself is
+      // untouched (MediaRecorder reads the stream directly, not this
+      // canvas), so footage keeps capturing either way.
+      if (looksLikeBlankFrame(cropCtx)) {
+        consecutiveBlankCrops += 1;
+        if (consecutiveBlankCrops >= 3 && !detectionHardStopped) {
+          detectionHardStopped = true;
+          running = false;
+          showHardStopBanner('Detection stopped: camera frames are no longer reaching the detection canvas (this is not a normal OCR miss). Footage is still recording — click Stop Session to save it, then RELOAD THIS PAGE and start a new session.');
+          setStatus('Detection hard-stopped — see the banner above. Recording continues.', 'err');
+          return;
+        }
       } else {
+        consecutiveBlankCrops = 0;
+      }
+
+      const webgpuEnabled = webgpuEnabledInput.checked;
+      if (webgpuEnabled && gpu.available) gpuSourceCtx.drawImage(cropCanvas, 0, 0);
+      let gpuOk = webgpuEnabled && gpu.available && gpu.process(gpuSourceCanvas, gpuOptsFromUi());
+      if (gpuOk) {
+        ocrCtx.drawImage(gpuCanvas, 0, 0);
+        if (looksLikeBlankFrame(ocrCtx)) {
+          // process() didn't throw, but produced nothing (seen in testing:
+          // a dying GPU device can silently no-op a render before its loss
+          // is reported). Treat it exactly like a thrown failure.
+          gpu.reportInvalidFrame('blank frame after a reported-successful render');
+          gpuOk = false;
+        }
+      }
+      if (!gpuOk) {
+        // Either WebGPU isn't available, or this cycle's GPU pass failed
+        // or produced a blank frame — use the plain crop instead of risking
+        // an unreadable image reaching OCR.
         if (gpuFallbackCtx) gpuFallbackCtx.drawImage(cropCanvas, 0, 0);
         ocrCtx.drawImage(cropCanvas, 0, 0);
       }
@@ -324,6 +406,108 @@ async function loopStep() {
     loopHandle = setTimeout(loopStep, Number(intervalMsInput.value) || 300);
   }
 }
+
+// ---- Performance preflight check ------------------------------------------
+
+btnBenchmark.addEventListener('click', async () => {
+  if (!stream) {
+    setStatus('Start the camera first.', 'warn');
+    return;
+  }
+  if (!roiFrac) {
+    setStatus('Draw a reading window (ROI) first.', 'warn');
+    return;
+  }
+  if (running) {
+    setStatus('Stop the current session before running a performance check.', 'warn');
+    return;
+  }
+
+  benchmarkRunning = true;
+  btnBenchmark.disabled = true;
+  btnStart.disabled = true;
+  btnApplyRecommended.disabled = true;
+  benchmarkPill.textContent = 'running…';
+  benchmarkResults.textContent = '';
+
+  try {
+    const detResult = await runDetectionBenchmark({
+      video,
+      roiFrac,
+      gpu,
+      webgpuEnabled: webgpuEnabledInput.checked,
+      gpuOpts: gpuOptsFromUi,
+      cropCanvas,
+      cropCtx,
+      gpuSourceCanvas,
+      gpuSourceCtx,
+      gpuCanvas,
+      gpuFallbackCtx,
+      ocrCanvas,
+      ocrCtx,
+      whitelist: whitelistInput.value || '0123456789',
+      minConfidence: Number(minConfidenceInput.value) || 0,
+    }, {
+      cycles: 15,
+      onProgress: (done, total) => setStatus(`Running performance check… detection cycle ${done}/${total}`),
+    });
+
+    setStatus('Measuring recording bitrate (a few seconds)…');
+    let bitrateResult = null;
+    try {
+      bitrateResult = await measureBitrate(stream, 4000);
+    } catch (e) {
+      // Non-fatal — bitrate estimate just won't be shown.
+    }
+
+    const configuredInterval = Number(intervalMsInput.value) || 300;
+    const keepsUp = configuredInterval >= detResult.cycleMsP95;
+
+    const lines = [
+      `Canvas size: ${detResult.canvasWidth}x${detResult.canvasHeight}px (ROI × upscale)`,
+      `Preprocess (crop + WebGPU/CPU): ${detResult.preprocessMsAvg.toFixed(0)}ms avg`,
+      `OCR recognize: ${detResult.ocrMsAvg.toFixed(0)}ms avg`,
+      `Full cycle: p50=${detResult.cycleMsP50.toFixed(0)}ms  p95=${detResult.cycleMsP95.toFixed(0)}ms  max=${detResult.cycleMsMax.toFixed(0)}ms  (n=${detResult.cycles})`,
+      `Configured interval: ${configuredInterval}ms — ${keepsUp ? 'OK, this hardware keeps up.' : 'TOO LOW — cycles will lag behind real time.'}`,
+      `Recommended interval: ${detResult.recommendedIntervalMs}ms`,
+    ];
+    if (bitrateResult) {
+      lines.push(`Recording: ~${(bitrateResult.bytesPerSec / 1024).toFixed(0)} KB/s → ~${bitrateResult.estGbPerHour.toFixed(2)} GB/hour at this camera/scene`);
+    }
+    if (!webgpuEnabledInput.checked) {
+      lines.push('WebGPU preprocessing is off (default) — this check ran on the CPU path only. Enable it above and re-run if you want to test WebGPU acceleration on this hardware.');
+    } else if (detResult.gpuDisabledDuringRun) {
+      lines.push('⚠ WebGPU preprocessing failed repeatedly during this check and was disabled — detection ran on the CPU fallback path for the rest of the test. Recommendation: leave WebGPU OFF on this machine/browser.');
+    } else if (detResult.gpuFailedAnyCycle) {
+      lines.push('Note: WebGPU preprocessing failed on at least one cycle but recovered — timings above include the CPU-fallback cycle(s). Treat WebGPU as unreliable on this hardware.');
+    } else if (detResult.gpuAvailableAtStart) {
+      lines.push('WebGPU preprocessing ran cleanly for this whole check (no failures or blank frames detected).');
+    }
+    benchmarkResults.textContent = lines.join('\n');
+    benchmarkPill.textContent = keepsUp ? 'OK' : 'interval too low';
+    benchmarkPill.classList.toggle('on', keepsUp);
+    btnApplyRecommended.disabled = false;
+    btnApplyRecommended.dataset.recommended = String(detResult.recommendedIntervalMs);
+    setStatus(keepsUp
+      ? 'Performance check complete — this hardware keeps up with the configured interval.'
+      : 'Performance check complete — the configured interval is too aggressive for this hardware. See the recommendation below.', keepsUp ? '' : 'warn');
+  } catch (e) {
+    setStatus(`Performance check failed: ${e.message}`, 'err');
+    benchmarkPill.textContent = 'failed';
+  } finally {
+    benchmarkRunning = false;
+    btnBenchmark.disabled = false;
+    btnStart.disabled = false;
+  }
+});
+
+btnApplyRecommended.addEventListener('click', () => {
+  const rec = btnApplyRecommended.dataset.recommended;
+  if (!rec) return;
+  intervalMsInput.value = rec;
+  persistSettings();
+  setStatus(`Interval set to the recommended ${rec}ms.`);
+});
 
 // ---- Audio cue ------------------------------------------------------------
 
@@ -361,6 +545,10 @@ btnStart.addEventListener('click', async () => {
   }
   if (!roiFrac) {
     setStatus('Draw a reading window (ROI) on the video first.', 'warn');
+    return;
+  }
+  if (benchmarkRunning) {
+    setStatus('Wait for the performance check to finish first.', 'warn');
     return;
   }
   btnStart.disabled = true;

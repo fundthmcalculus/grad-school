@@ -76,6 +76,7 @@ src/tracker.js                  — contiguous-sighting state machine
 src/recorder.js                 — MediaRecorder wrapper, in-memory or streamed footage
 src/storage.js                  — File System Access API live disk persistence
 src/settings.js                 — localStorage persistence of operator settings
+src/benchmark.js                — on-site performance/preflight self-test
 src/exporter.js                 — JSON/CSV export
 src/main.js                     — capture page wiring (ROI select, loop, UI)
 src/review.js                   — review page wiring (seek-by-entry, corrections)
@@ -85,11 +86,12 @@ Each detection cycle (default every 300ms, configurable):
 
 1. The ROI is cropped out of the live video frame onto a small canvas,
    upscaled for OCR clarity.
-2. If available, a WebGPU render pipeline (full-screen triangle + fragment
-   shader) grayscales and contrast-stretches that crop, and optionally
-   hard-thresholds it to pure black/white — this measurably helps OCR
-   accuracy on faded or glare-heavy bib numbers. Falls back to using the
-   crop as-is on browsers/devices without WebGPU.
+2. **Optionally** (off by default — see "WebGPU is experimental, and off by
+   default" below), a WebGPU render pipeline (full-screen triangle +
+   fragment shader) grayscales and contrast-stretches that crop, and
+   optionally hard-thresholds it to pure black/white — this measurably helps
+   OCR accuracy on faded or glare-heavy bib numbers when it's working. Falls
+   back to using the crop as-is otherwise.
 3. Tesseract.js (running in its own worker, so the UI doesn't stall) reads
    digit strings out of the processed crop.
 4. The tracker matches those digit strings against currently "active"
@@ -111,6 +113,74 @@ doesn't support the API), footage accumulates in memory and is offered as a
 single download when the session stops, same as before. Either way, ROI and
 all detection/preprocessing settings are saved to `localStorage` as you tune
 them, so they carry over to the next session without re-tuning.
+
+## Performance testing
+
+**Run the in-app check, not this section, to decide anything about your
+actual race-day hardware.** Click **Run Performance Check** on the Capture
+page (camera started, ROI drawn) and it will, on *your* laptop and camera:
+
+- Run 15 real detection cycles (crop → preprocess → OCR) and report
+  p50/p95/max cycle time, so you know whether the configured **Interval**
+  is achievable — and offers to set it to a safe recommended value.
+- Record a few seconds of footage to estimate real encoded bitrate/GB-per-hour
+  for *your* camera resolution and scene (synthetic estimates are useless
+  here — real footage compresses very differently from a test pattern).
+- Report whether WebGPU preprocessing (if you've enabled it) is behaving
+  correctly on this machine, or failing/producing bad frames.
+
+### WebGPU is experimental, and off by default
+
+While building this, WebGPU preprocessing was found to fail in a
+non-obvious way in at least one browser/environment: the render pass would
+occasionally cause the GPU device to be lost shortly afterward, and —
+worse — that could leave canvas rendering broken elsewhere on the page even
+after the failure was caught and handled. Because that class of bug could
+silently zero out an entire race's worth of detections if it happened on
+real hardware, WebGPU preprocessing now:
+
+- **Defaults to off.** The "Enable WebGPU preprocessing" checkbox on the
+  Capture page must be checked explicitly, every session (it's deliberately
+  not remembered across page reloads — if enabling it ever causes trouble,
+  reloading the page is the recovery step, and a remembered "on" would
+  immediately undo that).
+- Self-disables and falls back to the CPU path after a couple of failures
+  or a detected blank/garbage frame, rather than erroring every cycle.
+- Never touches the canvas OCR actually reads from — it's fed a disposable
+  copy, specifically so a WebGPU-side failure can't reach the fallback path.
+
+On top of that, the detection loop runs a cheap, WebGPU-independent sanity
+check every cycle: a real camera frame should never crop to a fully
+transparent image. If that happens three cycles in a row — for *any*
+reason, not just WebGPU — detection hard-stops with a visible banner rather
+than continuing to silently log nothing. Recording is unaffected (it reads
+the camera stream directly, not through these canvases), so footage is
+never lost; the fix is to stop the session, save the footage, reload the
+page, and start a fresh session.
+
+If you want the WebGPU acceleration, turn it on and run the performance
+check with it enabled *before* a race — if it reports clean, error-free
+cycles, it's very likely fine on that machine; if it reports any failures,
+leave it off. The CPU fallback path has been the one actually exercised in
+all testing so far and has shown no issues.
+
+### What was measured in a sandboxed test environment
+
+For reference (measured on this project's headless test environment, which
+has neither a real camera nor a real GPU — treat as a rough sanity check,
+not a prediction for your hardware):
+
+- OCR recognize on a 1024×384 crop: ~40–50ms average.
+- Full cycle (crop + preprocess + OCR) on the CPU path: p50 ≈ 35–55ms,
+  p95 ≈ 110ms — well under the default 300ms interval, with room to drop
+  the interval to ~150ms if you want tighter time resolution.
+- A 90-second sustained run showed flat memory usage (no growth) and no
+  cycle-time drift — the loop's self-throttling (it never schedules the
+  next cycle until the current one finishes) held up under continuous load.
+- Synthetic test footage encoded at roughly 0.25–0.3 GB/hour — **do not use
+  this number for planning**; real race footage (grass, motion, riders,
+  variable light) compresses far less efficiently than a synthetic test
+  pattern. Use the in-app check's bitrate estimate instead.
 
 ## The overtake caveat
 

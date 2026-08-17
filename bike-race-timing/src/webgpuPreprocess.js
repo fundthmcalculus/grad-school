@@ -50,6 +50,30 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
 }
 `;
 
+// Failures are treated as recoverable-until-proven-otherwise: a bad frame,
+// a driver hiccup, or (as observed in at least one headless/software-WebGPU
+// environment during testing) a canvas-context render pass that leaves the
+// device unable to do further copyExternalImageToTexture calls. Rather than
+// erroring out every single detection cycle for the rest of a race, this
+// class disables itself after a few consecutive failures so the caller can
+// fall back to the plain 2D-canvas crop — which has no such failure mode —
+// and keeps OCR running instead of silently going dark.
+const MAX_CONSECUTIVE_FAILURES = 2;
+
+/**
+ * Cheap post-hoc sanity check for a canvas the caller just drew a
+ * `WebGpuPreprocessor` output into: the fragment shader above always writes
+ * fully-opaque pixels, so alpha === 0 anywhere means nothing was actually
+ * rendered (the "silent blank frame" failure mode `process()`'s return
+ * value alone can't catch). Checking one pixel is enough and effectively
+ * free — cheaper than a single OCR call by several orders of magnitude.
+ * @param {CanvasRenderingContext2D} ctx a 2D context already drawn into via drawImage(gpuCanvas, ...)
+ */
+export function looksLikeBlankFrame(ctx) {
+  const { data } = ctx.getImageData(0, 0, 1, 1);
+  return data[3] === 0;
+}
+
 export class WebGpuPreprocessor {
   constructor() {
     this.available = false;
@@ -60,6 +84,10 @@ export class WebGpuPreprocessor {
     this.uniformBuffer = null;
     this.canvas = null;
     this.format = 'rgba8unorm';
+    this.consecutiveFailures = 0;
+    this.lastError = null;
+    /** Called once, the moment self-disable happens after repeated failures. */
+    this.onDisabled = null;
   }
 
   /** @param {HTMLCanvasElement} canvas an offscreen canvas dedicated to WebGPU output */
@@ -70,6 +98,10 @@ export class WebGpuPreprocessor {
     if (!adapter) return false;
 
     this.device = await adapter.requestDevice();
+    this.device.lost.then((info) => {
+      if (!this.available) return; // already disabled deliberately
+      this._disable(`GPU device lost (${info.reason}): ${info.message}`);
+    });
     this.canvas = canvas;
     this.context = canvas.getContext('webgpu');
     if (!this.context) return false;
@@ -102,7 +134,10 @@ export class WebGpuPreprocessor {
   }
 
   /**
-   * Render a processed copy of `source` into the WebGPU canvas.
+   * Render a processed copy of `source` into the WebGPU canvas. Returns
+   * false (without throwing) on failure — the caller should treat that
+   * exactly like `available === false` for this cycle, i.e. use the 2D
+   * crop directly instead.
    * @param {CanvasImageSource} source
    * @param {{contrast?: number, brightness?: number, threshold?: number, binarize?: boolean}} opts
    */
@@ -113,43 +148,82 @@ export class WebGpuPreprocessor {
     const width = canvas.width;
     const height = canvas.height;
 
-    const texture = device.createTexture({
-      size: [width, height, 1],
-      format: 'rgba8unorm',
-      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
-    });
+    let texture;
+    try {
+      texture = device.createTexture({
+        size: [width, height, 1],
+        format: 'rgba8unorm',
+        usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
+      });
 
-    device.queue.copyExternalImageToTexture({ source }, { texture }, [width, height]);
+      device.queue.copyExternalImageToTexture({ source }, { texture }, [width, height]);
 
-    const uniformData = new Float32Array([contrast, brightness, threshold, binarize ? 1 : 0]);
-    device.queue.writeBuffer(this.uniformBuffer, 0, uniformData);
+      const uniformData = new Float32Array([contrast, brightness, threshold, binarize ? 1 : 0]);
+      device.queue.writeBuffer(this.uniformBuffer, 0, uniformData);
 
-    const bindGroup = device.createBindGroup({
-      layout: this.pipeline.getBindGroupLayout(0),
-      entries: [
-        { binding: 0, resource: this.sampler },
-        { binding: 1, resource: texture.createView() },
-        { binding: 2, resource: { buffer: this.uniformBuffer } },
-      ],
-    });
+      const bindGroup = device.createBindGroup({
+        layout: this.pipeline.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: this.sampler },
+          { binding: 1, resource: texture.createView() },
+          { binding: 2, resource: { buffer: this.uniformBuffer } },
+        ],
+      });
 
-    const encoder = device.createCommandEncoder();
-    const pass = encoder.beginRenderPass({
-      colorAttachments: [
-        {
-          view: context.getCurrentTexture().createView(),
-          clearValue: { r: 0, g: 0, b: 0, a: 1 },
-          loadOp: 'clear',
-          storeOp: 'store',
-        },
-      ],
-    });
-    pass.setPipeline(this.pipeline);
-    pass.setBindGroup(0, bindGroup);
-    pass.draw(3);
-    pass.end();
-    device.queue.submit([encoder.finish()]);
-    texture.destroy();
+      const encoder = device.createCommandEncoder();
+      const pass = encoder.beginRenderPass({
+        colorAttachments: [
+          {
+            view: context.getCurrentTexture().createView(),
+            clearValue: { r: 0, g: 0, b: 0, a: 1 },
+            loadOp: 'clear',
+            storeOp: 'store',
+          },
+        ],
+      });
+      pass.setPipeline(this.pipeline);
+      pass.setBindGroup(0, bindGroup);
+      pass.draw(3);
+      pass.end();
+      device.queue.submit([encoder.finish()]);
+    } catch (e) {
+      this._recordFailure(e.message);
+      return false;
+    } finally {
+      if (texture) texture.destroy();
+    }
+
+    this.consecutiveFailures = 0;
     return true;
+  }
+
+  /**
+   * Some failure modes here don't throw: in at least one headless/software-
+   * WebGPU environment seen during testing, the device silently stopped
+   * actually rendering (leaving the canvas blank/transparent) shortly before
+   * reporting itself lost, even though the render-pass calls themselves
+   * didn't throw. `process()` returning `true` therefore isn't a complete
+   * correctness guarantee — the caller should sanity-check the resulting
+   * pixels (e.g. alpha === 255, since the shader always writes opaque
+   * output) and call this if the frame looks blank, so it counts the same
+   * as a thrown error toward the self-disable threshold.
+   * @param {string} reason
+   */
+  reportInvalidFrame(reason) {
+    this._recordFailure(reason);
+  }
+
+  _recordFailure(reason) {
+    this.consecutiveFailures += 1;
+    this.lastError = reason;
+    if (this.consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+      this._disable(`repeated WebGPU preprocessing failures (${reason})`);
+    }
+  }
+
+  _disable(reason) {
+    this.available = false;
+    this.lastError = reason;
+    if (this.onDisabled) this.onDisabled(reason);
   }
 }
