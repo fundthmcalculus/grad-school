@@ -23,6 +23,7 @@ import numpy as np
 
 import cmapss_data
 import models
+import metrics
 
 OUT = os.path.join(cmapss_data.REPO, "outputs", "nn-cmapss")
 
@@ -93,7 +94,7 @@ def run(which: str, seeds=(0, 1, 2)) -> list:
                     m = makers[name](best_p, s).fit(b.train.X[:, fc], b.train.y)
                     fit_s = time.perf_counter() - t0
                     per_seed.append(
-                        (fit_s, models.evaluate(b.test, m.predict(b.test.X[:, fc])))
+                        (fit_s, metrics.evaluate(b.test, m.predict(b.test.X[:, fc])))
                     )
             row = dict(
                 model=f"{name} ({space})",

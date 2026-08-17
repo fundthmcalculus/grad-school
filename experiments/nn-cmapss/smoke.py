@@ -13,6 +13,7 @@ import numpy as np
 
 import cmapss_data
 import models
+import metrics
 
 
 def main(which: str = "honest") -> None:
@@ -32,7 +33,7 @@ def main(which: str = "honest") -> None:
 
     fis, fis_s = models.fit_fis(b.fit.X, b.fit.y, names, **fis_kwargs)
     pred_val = models.fis_predict(fis, b.val.X, names)
-    m = models.evaluate(b.val, pred_val)
+    m = metrics.evaluate(b.val, pred_val)
     print(
         f"  FIS: {fis_s:.2f}s  rules={fis.model_.n_rules}  "
         f"mfs={fis.model_.n_membership_functions}  "
@@ -57,7 +58,7 @@ def main(which: str = "honest") -> None:
         f"  seed-vs-FIS fidelity on val: rmse={fid:.3f} cycles "
         f"(relative {fid / (np.std(pred_val) or 1):.3f})"
     )
-    print(f"  seed val: {models.evaluate(b.val, seed_val)['rmse']:.2f} rmse")
+    print(f"  seed val: {metrics.evaluate(b.val, seed_val)['rmse']:.2f} rmse")
 
     y_fit_s = (b.fit.y - y_center) / y_scale
     y_val_s = (b.val.y_true - y_center) / y_scale
@@ -67,11 +68,13 @@ def main(which: str = "honest") -> None:
     )
     for arm, net in nets.items():
         Xf, Xv = models.matrices(conv, space[arm], b.fit.X, b.val.X)
-        start = models.evaluate(b.val, net.predict(Xv) * y_scale + y_center)["rmse"]
+        start = metrics.evaluate(b.val, net.predict(Xv) * y_scale + y_center)["rmse"]
         t0 = time.perf_counter()
         trained, _ = fis2nn_train(net, Xf, y_fit_s, Xv, y_val_s, epochs=3)
         dt = time.perf_counter() - t0
-        after = models.evaluate(b.val, trained.predict(Xv) * y_scale + y_center)["rmse"]
+        after = metrics.evaluate(b.val, trained.predict(Xv) * y_scale + y_center)[
+            "rmse"
+        ]
         print(f"  {arm:14s} {secs[arm]:8.3f} {start:11.2f} {after:9.2f} {dt:8.2f}")
 
 

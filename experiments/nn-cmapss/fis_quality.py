@@ -1,28 +1,25 @@
-"""Improve the FIS's RUL on both axes at once -- accuracy and smoothness --
-without leaving TribbleRegressor.
+"""FIS RUL quality, inside TribbleRegressor -- one study, three questions.
 
-The lead is the benchmark's own contrast: the `best` pipeline is *both* more
-accurate and smoother than `honest`, and the only structural difference is that
-its `MemoryWindowFeatureExtractor` hands the FIS a temporally-coherent signal
-instead of one independent snapshot per cycle. So the question here is whether
-giving the interpretable `honest` pipeline **causal trend features** buys the
-same -- a genuine FIS throughout, no network, no post-hoc clamp.
+Consolidates what were three scripts (fis_quality, fis_memory_sweep,
+fis_monotone) into one driver with three subcommands, because they are one
+investigation:
 
-The distinction that matters, learned the hard way in `monotone.py`: *replacing*
-each feature with its rolling mean blurs the degradation trend and doubled RMSE.
-*Augmenting* -- keeping every sharp per-cycle feature and adding smooth,
-slowly-varying companions -- lets the FIS's own feature selection keep what it
-needs and lean on the smooth signal for the level. That is the thing under test.
+    python fis_quality.py levers        # which FIS-native lever moves both
+                                        # accuracy AND smoothness (memory
+                                        # features do; trend augmentation and
+                                        # hyperparameters do not)
+    python fis_quality.py memory-sweep  # tune the memory-window size for the
+                                        # accuracy/smoothness trade-off
+    python fis_quality.py monotone      # the capstone: the recommended
+                                        # memory18 FIS made hard-monotone, plus
+                                        # the "predict delta then cumsum" arms
 
-Two metrics, both per engine then averaged (each trajectory weighted equally,
-which is the right convention for a smoothness question; it differs from the
-benchmark's pooled per-sample RMSE and both are reported so neither surprises):
-per-engine RMSE against uncapped RUL, and the up-cycle fraction / positive total
-variation from `monotone.py`.
+Write-up in outputs/nn-cmapss/FIS_QUALITY.md.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import warnings
@@ -32,9 +29,17 @@ import pandas as pd
 
 import cmapss_data
 import models
-import monotone as M
+import metrics
+import transforms
+import monotone_model as MM
 import report
 
+OUT = report.OUT
+
+
+# ===========================================================================
+# subcommand: levers
+# ===========================================================================
 OUT = report.OUT
 
 
@@ -127,10 +132,10 @@ def evaluate_featureset(
 
     fis, fit_s = models.fit_fis(Xtr, b.train.y, aug_names, **kw)
     pred = models.fis_predict(fis, Xte, aug_names)
-    g = M.per_cycle(b.test.unit, b.test.cycle, b.test.y_true, pred)
-    agg = M.aggregate(
+    g = metrics.per_cycle(b.test.unit, b.test.cycle, b.test.y_true, pred)
+    agg = metrics.aggregate(
         [
-            M.score_engine(s.true.to_numpy(), s.pred.to_numpy())
+            metrics.score_engine(s.true.to_numpy(), s.pred.to_numpy())
             for _, s in g.groupby("unit")
         ]
     )
@@ -167,7 +172,7 @@ def trend_trials() -> dict:
     }
 
 
-def run() -> dict:
+def run_levers() -> dict:
     # The lever comparison: what actually moves both axes, and what does not.
     levers = {
         # feature mechanism -- the win: memory beats per-cycle on both axes,
@@ -180,7 +185,7 @@ def run() -> dict:
     return {"levers": levers, "trend_aug": trends}
 
 
-def plot(payload, path):
+def plot_levers(payload, path):
     import matplotlib
 
     matplotlib.use("Agg")
@@ -253,8 +258,8 @@ def plot(payload, path):
     plt.close(fig)
 
 
-def main() -> None:
-    payload = run()
+def cmd_levers() -> None:
+    payload = run_levers()
     print("\n=== FIS-quality levers (per-engine RMSE / smoothness) ===")
     print(
         f"  {'pipeline / lever':34s} {'rmse':>6s} {'pooled':>7s} {'up%':>5s} {'pos_tv':>7s}"
@@ -274,7 +279,7 @@ def main() -> None:
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "fis_quality.json"), "w") as f:
         json.dump(payload, f, indent=1)
-    plot(payload, os.path.join(report.FIG, "fis_quality.png"))
+    plot_levers(payload, os.path.join(report.FIG, "fis_quality.png"))
     print(
         f"\nwrote {os.path.relpath(os.path.join(OUT, 'fis_quality.json'), cmapss_data.REPO)}"
     )
@@ -283,5 +288,306 @@ def main() -> None:
     )
 
 
+# ===========================================================================
+# subcommand: memory-sweep
+# ===========================================================================
+OUT = report.OUT
+
+
+def corrected_frames(feature_set="real"):
+    """Load DS02 and condition-correct once; return dev/test frames + columns."""
+    data, var = cmapss_data.load_h5(cmapss_data.DEFAULT_H5)
+    df_dev, df_test = cmapss_data.to_frame(data, var, "dev"), cmapss_data.to_frame(
+        data, var, "test"
+    )
+    del data
+    w = [f"W_{n}" for n in var["W"]]
+    xs = [f"Xs_{n}" for n in var["X_s"]]
+    n_xv = cmapss_data.FEATURE_SET_XV[feature_set]
+    xv = (
+        []
+        if n_xv == 0
+        else (
+            [f"Xv_{n}" for n in var["X_v"]]
+            if n_xv is None
+            else [f"Xv_{n}" for n in var["X_v"][:n_xv]]
+        )
+    )
+    models_cc = cmapss_data.fit_condition_correction(df_dev, xs + xv, w)
+    df_dev = cmapss_data.apply_condition_correction(df_dev, xs + xv, w, models_cc)
+    df_test = cmapss_data.apply_condition_correction(df_test, xs + xv, w, models_cc)
+    return df_dev, df_test, w + xs + xv
+
+
+def memory_tables(df, feat_cols, window, memory, stride):
+    """One row per subsampled sample, with short/long-term memory features."""
+    from tribblefis.gaussian_regressor_memory import MemoryWindowFeatureExtractor
+
+    ext = MemoryWindowFeatureExtractor(window_size=window, memory_size=memory)
+    frames = []
+    for unit, sub in df.groupby("unit", sort=True):
+        sub = sub.iloc[::stride].reset_index(drop=True)
+        mem = ext.prepare_sequences(sub, feat_cols, include_time=False)
+        mem["unit"] = unit
+        mem["cycle"] = sub["cycle"].values
+        mem["RUL"] = sub["RUL"].values
+        mem["hs"] = sub["hs"].values
+        frames.append(mem)
+    out = pd.concat(frames, ignore_index=True)
+    cols = [c for c in out.columns if c not in ("unit", "cycle", "RUL", "hs")]
+    out[cols] = out[cols].bfill().ffill()
+    return out, cols
+
+
+def ms_evaluate(df_dev, df_test, feat_cols, window, memory, stride):
+    from sklearn.preprocessing import StandardScaler
+
+    train_tab, agg_cols = memory_tables(df_dev, feat_cols, window, memory, stride)
+    test_tab, _ = memory_tables(df_test, feat_cols, window, memory, stride)
+
+    caps = cmapss_data.physical_rul_cap(train_tab)  # training units only
+    sc = StandardScaler().fit(train_tab[agg_cols].to_numpy(float))
+    Xtr = sc.transform(train_tab[agg_cols].to_numpy(float))
+    Xte = sc.transform(test_tab[agg_cols].to_numpy(float))
+    ytr = cmapss_data.capped_rul(train_tab, caps)
+
+    fis, fit_s = models.fit_fis(Xtr, ytr, agg_cols, **models.FIS_CONFIGS["best"])
+    pred = models.fis_predict(fis, Xte, agg_cols)
+
+    g = metrics.per_cycle(
+        test_tab["unit"].to_numpy(),
+        test_tab["cycle"].to_numpy(),
+        test_tab["RUL"].astype(float).to_numpy(),
+        pred,
+    )
+    agg = metrics.aggregate(
+        [
+            metrics.score_engine(s.true.to_numpy(), s.pred.to_numpy())
+            for _, s in g.groupby("unit")
+        ]
+    )
+    agg.update(
+        window=window,
+        memory=memory,
+        stride=stride,
+        fit_seconds=fit_s,
+        n_features=Xtr.shape[1],
+        n_train=len(train_tab),
+    )
+    return agg
+
+
+# (window, memory, stride). window=5/memory=2/stride=200 is the shipped `best`.
+MEMORY_GRID = [
+    (5, 2, 200),
+    (10, 5, 200),
+    (20, 10, 200),
+    (40, 20, 200),
+    (20, 10, 100),
+    (40, 20, 100),
+    (80, 40, 100),
+]
+
+
+def cmd_memory_sweep(feature_set="real") -> None:
+    warnings.simplefilter("ignore")
+    print(f"Loading + condition-correcting DS02 ({feature_set}) once ...")
+    df_dev, df_test, feat_cols = corrected_frames(feature_set)
+    print(
+        f"  {len(df_dev):,} dev + {len(df_test):,} test rows, {len(feat_cols)} channels"
+    )
+
+    rows = []
+    for window, memory, stride in MEMORY_GRID:
+        r = ms_evaluate(df_dev, df_test, feat_cols, window, memory, stride)
+        rows.append(r)
+        span = window + memory
+        print(
+            f"  w={window:3d} m={memory:3d} stride={stride:3d}  "
+            f"(~{span} samples/window)  n_train={r['n_train']:6d}  "
+            f"rmse={r['rmse']:6.2f}  up%={r['up_frac']*100:3.0f}  "
+            f"pos_tv={r['pos_tv']:6.1f}  fit={r['fit_seconds']:.2f}s"
+        )
+
+    os.makedirs(OUT, exist_ok=True)
+    path = os.path.join(OUT, "fis_memory_sweep.json")
+    with open(path, "w") as f:
+        json.dump({"feature_set": feature_set, "rows": rows}, f, indent=1)
+    print(f"\nwrote {os.path.relpath(path, cmapss_data.REPO)}")
+
+
+# ===========================================================================
+# subcommand: monotone
+# ===========================================================================
+OUT = report.OUT
+WHICH = "memory18"
+
+
+def mono_build():
+    warnings.simplefilter("ignore")
+    b = cmapss_data.load_or_build(**cmapss_data.BUNDLES[WHICH], verbose=False)
+    names = b.feature_names
+    fis, fit_s = models.fit_fis(
+        b.train.X, b.train.y, names, **models.FIS_CONFIGS[WHICH]
+    )
+    pred = models.fis_predict(fis, b.test.X, names)
+    raw = metrics.per_cycle(b.test.unit, b.test.cycle, b.test.y_true, pred)
+    return b, raw, fit_s
+
+
+def mono_score(g: pd.DataFrame) -> dict:
+    per = [
+        metrics.score_engine(s.true.to_numpy(), s.pred.to_numpy())
+        for _, s in g.groupby("unit")
+    ]
+    a = metrics.aggregate(per)
+    a["pooled_rmse"] = float(np.sqrt(np.mean((g["pred"] - g["true"]) ** 2)))
+    return a
+
+
+def cmd_monotone() -> None:
+    b, raw, fit_s = mono_build()
+
+    methods = {
+        "raw FIS (memory18)": transforms.out_raw,
+        "+ cummin": transforms.out_cummin,
+        "+ mean5->cummin": lambda p: transforms.out_mean_cummin(p, 5),
+        "offline oracle (bound)": transforms.out_iso_offline,
+    }
+    rows = {}
+    for tag, fn in methods.items():
+        g = raw.assign(
+            pred=raw.groupby("unit")["pred"].transform(lambda s: fn(s.to_numpy()))
+        )
+        rows[tag] = mono_score(g)
+
+    # "Predict a per-cycle delta, then cumsum" -- both forms.
+    # Non-negative delta (softplus, floored) = the monotone damage model.
+    dmg = MM.damage_predictions(WHICH, link="softplus", floor=0.0)[0]
+    rows["delta+cumsum, non-neg (=damage)"] = mono_score(dmg)
+    # Signed delta, unconstrained -- the plain version, not monotone.
+    signed = MM.damage_predictions(WHICH, link="identity", floor=-1e9)[0]
+    rows["delta+cumsum, signed"] = mono_score(signed)
+
+    print(
+        f"=== {WHICH}: the recommended FIS, made monotone "
+        f"(FIS fit {fit_s:.2f}s) ==="
+    )
+    print(f"  {'method':26s} {'rmse':>6s} {'pooled':>7s} {'up%':>5s} {'pos_tv':>7s}")
+    for tag, m in rows.items():
+        print(
+            f"  {tag:26s} {m['rmse']:6.2f} {m['pooled_rmse']:7.2f} "
+            f"{m['up_frac']*100:5.0f} {m['pos_tv']:7.1f}"
+        )
+
+    os.makedirs(OUT, exist_ok=True)
+    with open(os.path.join(OUT, "fis_monotone.json"), "w") as f:
+        json.dump(rows, f, indent=1)
+    mono_plot(b, raw, dmg)
+    print(
+        f"\nwrote {os.path.relpath(os.path.join(OUT, 'fis_monotone.json'), cmapss_data.REPO)}"
+    )
+
+
+def mono_plot(b, raw, dmg) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    units = sorted(raw["unit"].unique().tolist())
+    fig, axes = plt.subplots(
+        1,
+        len(units),
+        figsize=(4.7 * len(units), 4.1),
+        facecolor=report.SURFACE,
+        squeeze=False,
+        sharey=False,
+    )
+    C_RAW, C_MONO, C_DMG = report.C[0], report.C[3], report.C[1]
+    for c, u in enumerate(units):
+        ax = axes[0][c]
+        sub = raw[raw.unit == u]
+        cyc, truth, praw = (sub[k].to_numpy() for k in ("cycle", "true", "pred"))
+        pmono = transforms.out_cummin(praw)
+        dsub = dmg[dmg.unit == u]
+        ax.plot(
+            cyc,
+            truth,
+            color=report.INK,
+            linewidth=2.4,
+            zorder=5,
+            label="true RUL",
+            solid_capstyle="round",
+        )
+        ax.plot(
+            cyc,
+            praw,
+            color=C_RAW,
+            linewidth=1.0,
+            alpha=0.5,
+            label="raw FIS (memory18)",
+            zorder=2,
+        )
+        ax.plot(
+            dsub["cycle"].to_numpy(),
+            dsub["pred"].to_numpy(),
+            color=C_DMG,
+            linewidth=1.5,
+            alpha=0.85,
+            label="damage model",
+            zorder=3,
+        )
+        ax.plot(
+            cyc,
+            pmono,
+            color=C_MONO,
+            linewidth=2.2,
+            label="FIS + cummin (recommended)",
+            zorder=4,
+        )
+        ax.axhline(0.0, color=report.GRID, linewidth=1.2, zorder=1)
+        report._style(ax, "flight cycle", "RUL (cycles)" if c == 0 else "", f"unit {u}")
+        e = float(np.sqrt(np.mean((pmono - truth) ** 2)))
+        ax.text(
+            0.03,
+            0.06,
+            f"FIS+cummin  {e:.1f}   (↑0%)",
+            transform=ax.transAxes,
+            fontsize=8.5,
+            color=report.INK2,
+            family="monospace",
+        )
+        if c == 0:
+            ax.legend(
+                frameon=False, fontsize=8.5, labelcolor=report.INK2, loc="upper right"
+            )
+    fig.suptitle(
+        "The recommended FIS (18 sensors + memory), clamped monotone",
+        color=report.INK,
+        fontsize=13,
+        x=0.006,
+        ha="left",
+        y=0.99,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    os.makedirs(report.FIG, exist_ok=True)
+    path = os.path.join(report.FIG, "fis_monotone.png")
+    fig.savefig(path, dpi=150, facecolor=report.SURFACE)
+    plt.close(fig)
+    print(f"wrote {os.path.relpath(path, cmapss_data.REPO)}")
+
+
 if __name__ == "__main__":
-    main()
+    ap = argparse.ArgumentParser(description=__doc__)
+    sub = ap.add_subparsers(dest="cmd")
+    sub.add_parser("levers", help="which FIS-native lever moves both axes")
+    sub.add_parser("memory-sweep", help="tune the memory-window size")
+    sub.add_parser("monotone", help="the recommended FIS made hard-monotone")
+    args = ap.parse_args()
+    if args.cmd == "memory-sweep":
+        cmd_memory_sweep()
+    elif args.cmd == "monotone":
+        cmd_monotone()
+    else:
+        cmd_levers()

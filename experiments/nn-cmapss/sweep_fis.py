@@ -30,6 +30,7 @@ import time
 
 import cmapss_data
 import models
+import metrics
 
 OUT = os.path.join(cmapss_data.REPO, "outputs", "nn-cmapss")
 
@@ -57,7 +58,7 @@ def run(which: str, out_name: str) -> None:
         kwargs = dict(zip(keys, combo))
         try:
             fis, secs = models.fit_fis(b.fit.X, b.fit.y, names, **kwargs)
-            m = models.evaluate(b.val, models.fis_predict(fis, b.val.X, names))
+            m = metrics.evaluate(b.val, models.fis_predict(fis, b.val.X, names))
         except Exception as exc:  # noqa: BLE001
             rows.append(dict(**kwargs, error=f"{type(exc).__name__}: {exc}"))
             continue
@@ -78,14 +79,14 @@ def run(which: str, out_name: str) -> None:
     print(f"    val rmse {best['val_rmse']:.2f}  ({best['fit_seconds']:.2f}s fit)")
 
     fis, secs = models.fit_fis(b.train.X, b.train.y, names, **cfg)
-    test = models.evaluate(b.test, models.fis_predict(fis, b.test.X, names))
+    test = metrics.evaluate(b.test, models.fis_predict(fis, b.test.X, names))
 
     # The DOE's published configuration, refit and scored the same way, for the
     # side-by-side.
     doe_cfg = models.FIS_CONFIGS[which]
     fis_doe, secs_doe = models.fit_fis(b.train.X, b.train.y, names, **doe_cfg)
-    test_doe = models.evaluate(b.test, models.fis_predict(fis_doe, b.test.X, names))
-    val_doe = models.evaluate(
+    test_doe = metrics.evaluate(b.test, models.fis_predict(fis_doe, b.test.X, names))
+    val_doe = metrics.evaluate(
         b.val,
         models.fis_predict(
             models.fit_fis(b.fit.X, b.fit.y, names, **doe_cfg)[0], b.val.X, names

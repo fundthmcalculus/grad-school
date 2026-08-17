@@ -42,6 +42,7 @@ import numpy as np
 
 import cmapss_data
 import models  # noqa: F401  -- puts experiments/fis-to-neural-net on sys.path
+import metrics
 
 import fis2nn  # noqa: E402
 
@@ -188,14 +189,14 @@ def run(
     refs = {}
     const = float(np.mean(b.train.y))
     refs["constant-mean"] = dict(
-        setup_seconds=0.0, test=models.evaluate(b.test, np.full(len(b.test), const))
+        setup_seconds=0.0, test=metrics.evaluate(b.test, np.full(len(b.test), const))
     )
 
     fis_tr, fis_tr_s = models.fit_fis(b.train.X, b.train.y, names, **fis_kwargs)
     pred_test = models.fis_predict(fis_tr, b.test.X, names)
     refs["fis"] = dict(
         setup_seconds=fis_tr_s,
-        test=models.evaluate(b.test, pred_test),
+        test=metrics.evaluate(b.test, pred_test),
         n_rules=int(fis_tr.model_.n_rules),
         n_mfs=int(fis_tr.model_.n_membership_functions),
         n_features_kept=len(fis_tr.top_features_),
@@ -233,7 +234,7 @@ def run(
             setup_seconds=secs + (fis_tr_s if tag == "ridge-fis" else 0.0),
             alpha=float(best_a),
             val_rmse=float(best_r),
-            test=models.evaluate(b.test, m.predict(b.test.X[:, fin_cols])),
+            test=metrics.evaluate(b.test, m.predict(b.test.X[:, fin_cols])),
         )
         print(
             f"  {tag:14s} {refs[tag]['setup_seconds']:6.2f}s  "
@@ -272,7 +273,7 @@ def run(
         fidelity_relative=float(
             np.sqrt(np.mean((seed_test - pred_test) ** 2)) / (np.std(pred_test) or 1.0)
         ),
-        seed_test=models.evaluate(b.test, seed_test),
+        seed_test=metrics.evaluate(b.test, seed_test),
     )
     print(
         f"    seed-vs-FIS fidelity on test: {result['conversion']['fidelity_rmse_vs_fis']:.2f} "
@@ -407,8 +408,8 @@ def run(
                 train_seconds=float(train_seconds),
                 total_seconds=float(setup + train_seconds),
                 n_parameters=int(nets_f[arm].n_parameters()),
-                start_test=models.evaluate(b.test, start_pred),
-                final_test=models.evaluate(b.test, final_pred),
+                start_test=metrics.evaluate(b.test, start_pred),
+                final_test=metrics.evaluate(b.test, final_pred),
                 to_target={
                     k: to_target(ep_f, test_curve, secs_f, setup, v)
                     for k, v in targets.items()

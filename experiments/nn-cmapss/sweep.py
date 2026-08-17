@@ -30,6 +30,7 @@ import numpy as np
 
 import cmapss_data
 import models  # noqa: F401  -- puts experiments/fis-to-neural-net on sys.path
+import metrics
 
 import fis2nn  # noqa: E402  -- only importable after `models` extends sys.path
 
@@ -107,14 +108,14 @@ def run(which: str, epochs: int, spaces, out_name: str) -> None:
     # Grounding numbers every config below has to beat to mean anything.
     const = float(np.mean(b.fit.y))
     base = {
-        "constant_mean": models.evaluate(b.val, np.full(len(b.val), const))["rmse"],
+        "constant_mean": metrics.evaluate(b.val, np.full(len(b.val), const))["rmse"],
     }
     from sklearn.linear_model import RidgeCV
 
     t0 = time.perf_counter()
     ridge = RidgeCV(alphas=np.logspace(-3, 4, 20)).fit(b.fit.X, b.fit.y)
     base["ridge_seconds"] = time.perf_counter() - t0
-    base["ridge"] = models.evaluate(b.val, ridge.predict(b.val.X))["rmse"]
+    base["ridge"] = metrics.evaluate(b.val, ridge.predict(b.val.X))["rmse"]
     print(
         f"baselines (val): constant-mean {base['constant_mean']:.2f}  "
         f"ridge {base['ridge']:.2f} ({base['ridge_seconds']:.2f}s)"
@@ -125,7 +126,7 @@ def run(which: str, epochs: int, spaces, out_name: str) -> None:
     fis, fis_seconds = models.fit_fis(
         b.fit.X, b.fit.y, names, **models.FIS_CONFIGS[which]
     )
-    fis_val = models.evaluate(b.val, models.fis_predict(fis, b.val.X, names))
+    fis_val = metrics.evaluate(b.val, models.fis_predict(fis, b.val.X, names))
     fis_index = np.array([names.index(f) for f in fis.top_features_], dtype=int)
     print(
         f"FIS ({which} config): {fis_seconds:.2f}s  val rmse {fis_val['rmse']:.2f}  "
