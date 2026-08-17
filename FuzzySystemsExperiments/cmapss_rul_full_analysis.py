@@ -438,6 +438,26 @@ PIPELINES = {
             l2_reg=0.01502536299852122,
         ),
     ),
+    # The same second pass (residual boost + per-dataset NASA bias + clamp)
+    # applied to the physically-possible real_memory pipeline -- the
+    # real-sensors-only analog of best_full_de_minmax_2pass. Lets the
+    # "what's physically attainable" comparison include the refined result.
+    "real_memory_2pass": dict(
+        n_xv=0,
+        aggregation="raw_memory",
+        scaler="minmax",
+        second_pass="resid_boost",
+        nasa_bias="per_dataset",
+        clamp=True,
+        tribble_kwargs=dict(
+            tsk_order="full-2nd",
+            n_gaussians=4,
+            top_p=0.9622893249863613,
+            detect_interactions=False,
+            norm_conorm="hamacher",
+            l2_reg=0.01502536299852122,
+        ),
+    ),
     # PCA was explored as a `pca` config axis (still supported below -- fit
     # on training data only, `pca` = variance-ratio target or int
     # components) on the current champion best_full_de. Result across
@@ -463,6 +483,7 @@ TUNED_TO_BASE = {
     "best_full_de": "best",
     "best_full_de_minmax": "best",
     "best_full_de_minmax_2pass": "best",
+    "real_memory_2pass": "real_memory",
 }
 BASE_PIPELINES = {k: v for k, v in PIPELINES.items() if k not in TUNED_TO_BASE}
 
