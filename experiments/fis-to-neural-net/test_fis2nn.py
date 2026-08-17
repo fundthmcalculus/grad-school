@@ -198,6 +198,144 @@ def test_knot_merging_is_idempotent_and_sorted():
     assert np.array_equal(knots, fis2nn.merge_knots(knots))
 
 
+def _raises(fn, *args, exc=ValueError) -> bool:
+    try:
+        fn(*args)
+    except exc:
+        return True
+    return False
+
+
+def test_degenerate_triangle_raises_instead_of_lying():
+    """A vertical side is discontinuous, so no finite ReLU sum represents it.
+
+    This is a regression test with teeth: the old code returned an array rather
+    than raising, and for ``T(1, 1, 2)`` that array was the *negation* of the
+    correct falling ramp -- ``max|err| = 1.0``, a full unit of membership, with
+    nothing to tell the caller. Both orientations are pinned, and so is the
+    inverted-foot case the old `elif b > a` guard also swallowed.
+    """
+    D = fis2nn.DegenerateMembership
+    # Zero width -> DegenerateMembership, which callers walking a fitted FIS
+    # are expected to catch and skip.
+    assert _raises(
+        fis2nn.triangle_to_relu, TriangularMembership(a=1.0, b=1.0, c=2.0), exc=D
+    )
+    assert _raises(
+        fis2nn.triangle_to_relu, TriangularMembership(a=0.0, b=1.0, c=1.0), exc=D
+    )
+    # Inverted feet are a different failure: the caller passed nonsense.
+    assert _raises(fis2nn.triangle_to_relu, TriangularMembership(a=2.0, b=1.0, c=3.0))
+    assert _raises(fis2nn.triangle_to_relu, TriangularMembership(a=0.0, b=3.0, c=1.0))
+    # ...and the shoulder forms, which look degenerate but are not, still work.
+    assert not _raises(
+        fis2nn.triangle_to_relu, TriangularMembership(a=-np.inf, b=1.0, c=2.0)
+    )
+    assert not _raises(
+        fis2nn.triangle_to_relu, TriangularMembership(a=0.0, b=1.0, c=np.inf)
+    )
+
+
+def test_degenerate_trapezoid_raises_instead_of_lying():
+    D = fis2nn.DegenerateMembership
+    assert _raises(
+        fis2nn.trapezoid_to_relu, TrapezoidMembership(a=1.0, b=1.0, c=2.0, d=3.0), exc=D
+    )
+    assert _raises(
+        fis2nn.trapezoid_to_relu, TrapezoidMembership(a=0.0, b=1.0, c=2.0, d=2.0), exc=D
+    )
+
+
+def test_fis_knots_skips_degenerate_terms_and_says_so():
+    """A fitted FIS really does contain zero-width terms; walking it must not die.
+
+    A feature with (near-)zero variance gives a Gaussian whose sigma underflows,
+    and `fit_triangle_to_gaussian` turns that into a zero-width triangle. Real
+    N-CMAPSS DS02 fits produce them. `fis_knots` skips those terms -- but warns,
+    because a FIS that is mostly degenerate converts to a seed that means
+    nothing, and silence would hide that.
+    """
+    import warnings
+
+    from tribblefis.gauss_data import GaussianMixtureModel
+
+    good = GaussianMembership(mu=0.0, sigma=1.0)
+    dead = GaussianMembership(mu=5.0, sigma=0.0)
+
+    class _Label:
+        def __init__(self, mfs):
+            self.memberships = mfs
+
+    class _Feature:
+        def __init__(self, mfs):
+            self.label_models = {"L": _Label(mfs)}
+
+    class _Model:
+        feature_models = {"x": _Feature([good, dead])}
+
+    assert isinstance(_Model(), object) and GaussianMixtureModel is not None
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        knots = fis2nn.fis_knots(_Model(), ["x"])
+    assert knots["x"].size == 3, "the healthy term's three knots survive"
+    assert any("zero width" in str(w.message) for w in caught), "must warn"
+
+
+def test_infinite_trapezoid_foot_is_rejected_not_guessed():
+    """A shouldered trapezoid has no ground truth to convert *to*.
+
+    `gauss_data.TrapezoidMembership.evaluate` computes the rising branch as
+    ``(x - a) / (b - a)``, so an ``a = -inf`` foot gives ``inf / inf`` -- NaN
+    across the entire left side. The old expansion silently returned an
+    all-zero rising side for it; guessing a shoulder instead would have been
+    the same mistake in the other direction. Rejecting is the only answer that
+    does not invent semantics the package does not have.
+    """
+    assert np.isnan(
+        TrapezoidMembership(a=-np.inf, b=-2.0, c=2.0, d=6.0).evaluate(np.array([-5.0]))
+    ).all()
+    assert _raises(
+        fis2nn.trapezoid_to_relu,
+        TrapezoidMembership(a=-np.inf, b=-2.0, c=2.0, d=6.0),
+    )
+    assert _raises(
+        fis2nn.trapezoid_to_relu,
+        TrapezoidMembership(a=-5.0, b=-1.0, c=2.0, d=np.inf),
+    )
+
+
+def test_recorded_seconds_exclude_evaluation_time():
+    """``hist.seconds`` must measure gradient descent, not the ruler.
+
+    Evaluation cost scales with hidden width, and the comparison this module
+    exists for puts arms of very different widths side by side, so charging
+    eval time to training biases exactly the number under test. A wide net
+    evaluated on a large test set every epoch is the case that used to inflate.
+    """
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(256, 4))
+    y = X[:, 0] * 2.0 - X[:, 1]
+    X_big = rng.normal(size=(20_000, 4))
+    y_big = X_big[:, 0] * 2.0 - X_big[:, 1]
+
+    net = fis2nn.he_start(rng, 4, 256)
+    _, hist = fis2nn.train_adam(
+        net,
+        X,
+        y,
+        X_test=X_big,
+        y_test=y_big,
+        epochs=3,
+        batch_size=64,
+        track_train=False,
+    )
+    # Three epochs of 4 minibatches on 256x4 is microseconds of real work; if
+    # eval time leaked in, 4 passes over 20k rows through 256 hidden units would
+    # dominate and push this into the tens of milliseconds.
+    assert hist.seconds[-1] < 0.05, hist.seconds
+    assert all(b >= a for a, b in zip(hist.seconds, hist.seconds[1:]))
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

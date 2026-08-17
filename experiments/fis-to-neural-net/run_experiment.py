@@ -366,14 +366,16 @@ def run_one(
         "quantile-all": fis2nn.quantile_start(Xall_in, n_hidden, yin, l2=l2),
         "he-all": fis2nn.he_start(r_init, Xall_in.shape[1], n_hidden),
     }
-    setup_seconds = {
+    # One entry per key in `starts` -- built from `starts` rather than typed out,
+    # because a hand-written copy of that key list had already drifted: it was
+    # missing "quantile-all", so any consumer indexing setup_seconds[arm] while
+    # iterating starts raised KeyError. Only the hot arms carry a real setup
+    # cost; the rest are zero by construction, so the default is the safe one.
+    hot_setup = {
         "hot-analytic": fis_seconds + analytic_seconds,
         "hot": fis_seconds + analytic_seconds + polish_seconds,
-        "quantile": 0.0,
-        "elm": 0.0,
-        "he": 0.0,
-        "he-all": 0.0,
     }
+    setup_seconds = {arm: hot_setup.get(arm, 0.0) for arm in starts}
 
     def train(net0, lr, arm):
         on_fis_feats = arm in FIS_FEATURE_ARMS
