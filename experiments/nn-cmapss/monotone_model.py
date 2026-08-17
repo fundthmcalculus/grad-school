@@ -39,7 +39,8 @@ import pandas as pd
 
 import cmapss_data
 import models
-import monotone as M
+import metrics
+import transforms
 import report
 
 OUT = report.OUT
@@ -266,14 +267,14 @@ def run(which: str, use_fis_feature=True, anchor="full") -> dict:
 
     g = pd.DataFrame({"unit": ute, "cycle": cte, "true": yte_true, "pred": pred})
     per_engine = [
-        M.score_engine(s["true"].to_numpy(), s["pred"].to_numpy())
+        metrics.score_engine(s["true"].to_numpy(), s["pred"].to_numpy())
         for _, s in g.groupby("unit")
     ]
     return dict(
         bundle=which,
         use_fis_feature=use_fis_feature,
         anchor=anchor,
-        **M.aggregate(per_engine),
+        **metrics.aggregate(per_engine),
     )
 
 
@@ -300,7 +301,7 @@ def damage_predictions(which: str, end_weight=0.0, link="softplus", floor=0.0):
     # per-cycle-averaged features the damage model consumes. Averaging features
     # first and averaging predictions after are not the same on the raw-memory
     # pipeline, and the reference must be the one the rest of the study quotes.
-    raw_ref = M.per_cycle(
+    raw_ref = metrics.per_cycle(
         b.test.unit,
         b.test.cycle,
         b.test.y_true,
@@ -319,19 +320,25 @@ def main(bundles=("honest", "best")) -> None:
 
         # References straight from monotone.py, on the same raw FIS.
         variants = {
-            "raw FIS": M.aggregate(M.apply_output(raw, M.out_raw)),
-            "cummin (clamp)": M.aggregate(M.apply_output(raw, M.out_cummin)),
-            "mean5->cummin (clamp)": M.aggregate(
-                M.apply_output(raw, lambda p: M.out_mean_cummin(p, 5))
+            "raw FIS": metrics.aggregate(
+                transforms.apply_output(raw, transforms.out_raw)
             ),
-            "offline oracle": M.aggregate(M.apply_output(raw, M.out_iso_offline)),
+            "cummin (clamp)": metrics.aggregate(
+                transforms.apply_output(raw, transforms.out_cummin)
+            ),
+            "mean5->cummin (clamp)": metrics.aggregate(
+                transforms.apply_output(raw, lambda p: transforms.out_mean_cummin(p, 5))
+            ),
+            "offline oracle": metrics.aggregate(
+                transforms.apply_output(raw, transforms.out_iso_offline)
+            ),
         }
 
         # The monotone-by-construction model, and its endpoint-anchored variant.
         def _agg(frame):
-            return M.aggregate(
+            return metrics.aggregate(
                 [
-                    M.score_engine(s["true"].to_numpy(), s["pred"].to_numpy())
+                    metrics.score_engine(s["true"].to_numpy(), s["pred"].to_numpy())
                     for _, s in frame.groupby("unit")
                 ]
             )
@@ -382,7 +389,7 @@ def plot(bundles=("honest", "best")) -> None:
             ax = axes[r][c]
             sub = raw[raw.unit == u]
             cyc, truth, praw = (sub[k].to_numpy() for k in ("cycle", "true", "pred"))
-            pclamp = M.out_mean_cummin(praw, 5)
+            pclamp = transforms.out_mean_cummin(praw, 5)
             dsub = dmg[dmg.unit == u]
             pdmg = dsub["pred"].to_numpy()
             ax.plot(

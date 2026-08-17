@@ -24,6 +24,7 @@ import pandas as pd
 
 import cmapss_data
 import models  # noqa: F401  -- puts experiments/fis-to-neural-net on sys.path
+import metrics
 import report
 
 import fis2nn  # noqa: E402
@@ -54,7 +55,7 @@ def rebuild(which: str, arms_file: str, arm: str = "he") -> dict:
 
     fis, _ = models.fit_fis(b.train.X, b.train.y, names, **fis_kwargs)
     pred_fis = models.fis_predict(fis, b.test.X, names)
-    fis_rmse = models.evaluate(b.test, pred_fis)["rmse"]
+    fis_rmse = metrics.evaluate(b.test, pred_fis)["rmse"]
     assert abs(fis_rmse - res["references"]["fis"]["test"]["rmse"]) < 1e-6, (
         f"FIS refit disagrees with {arms_file}: "
         f"{fis_rmse:.4f} vs {res['references']['fis']['test']['rmse']:.4f}"
@@ -79,7 +80,7 @@ def rebuild(which: str, arms_file: str, arm: str = "he") -> dict:
         track_train=False,
     )
     pred_nn = trained.predict(Xte) * y_scale + y_center
-    nn_rmse = models.evaluate(b.test, pred_nn)["rmse"]
+    nn_rmse = metrics.evaluate(b.test, pred_nn)["rmse"]
     assert abs(nn_rmse - row["final_test"]["rmse"]) < 1e-6, (
         f"{arm} refit disagrees with {arms_file}: "
         f"{nn_rmse:.4f} vs {row['final_test']['rmse']:.4f}"

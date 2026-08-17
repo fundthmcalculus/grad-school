@@ -1,4 +1,6 @@
-"""The arms under comparison, and the metrics they are scored on.
+"""The models under comparison: the FIS, and the network's initialization arms.
+
+(Scoring lives in `metrics.py`; this module is only the models.)
 
 One FIS (`TribbleRegressor`, the DOE's own estimator), one ReLU network
 (`experiments/fis-to-neural-net/fis2nn.py`, reused unmodified), and the four
@@ -29,46 +31,6 @@ sys.path.insert(0, os.path.join(REPO, "experiments", "fis-to-neural-net"))
 import fis2nn  # noqa: E402
 
 from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
-
-
-# ---------------------------------------------------------------------------
-# Metrics
-# ---------------------------------------------------------------------------
-def nasa_score(y_true, y_pred) -> float:
-    """The PHM08 asymmetric penalty, summed. Under-prediction (late warning is
-    the dangerous direction) is penalized at exp(|d|/10), over-prediction at
-    exp(|d|/13). It is a *sum*, so it scales with the number of scored rows --
-    only compare it between arms scored on identical rows."""
-    delta = np.asarray(y_true, dtype=float) - np.asarray(y_pred, dtype=float)
-    alpha = np.where(delta > 0, 1.0 / 13.0, 1.0 / 10.0)
-    return float(np.sum(np.exp(alpha * np.abs(delta))))
-
-
-def endpoint_rows(unit: np.ndarray, cycle: np.ndarray) -> np.ndarray:
-    """Index of each engine's last recorded cycle -- the canonical C-MAPSS
-    protocol scores one RUL per test engine, at the end of its trajectory."""
-    df = pd.DataFrame({"unit": unit, "cycle": cycle}).reset_index()
-    return df.sort_values(["unit", "cycle"]).groupby("unit")["index"].last().to_numpy()
-
-
-def evaluate(split, y_pred: np.ndarray) -> dict:
-    """Both scoring conventions the DOE reports, on one prediction vector."""
-    y_pred = np.asarray(y_pred, dtype=float).ravel()
-    y_true = split.y_true
-    err = y_true - y_pred
-    idx = endpoint_rows(split.unit, split.cycle)
-    e_err = y_true[idx] - y_pred[idx]
-    return dict(
-        rmse=float(np.sqrt(np.mean(err**2))),
-        mae=float(np.mean(np.abs(err))),
-        nasa=nasa_score(y_true, y_pred),
-        rmse_endpoint=float(np.sqrt(np.mean(e_err**2))),
-        mae_endpoint=float(np.mean(np.abs(e_err))),
-        nasa_endpoint=nasa_score(y_true[idx], y_pred[idx]),
-        n=int(len(y_true)),
-        n_engines=int(len(idx)),
-    )
-
 
 # ---------------------------------------------------------------------------
 # The FIS
