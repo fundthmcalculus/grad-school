@@ -28,6 +28,7 @@ anything worth keeping):
 | `monotone_model.py` | a RUL model that is monotone by construction (accumulated non-negative damage), vs. post-hoc clamping. Both write into `MONOTONE.md`. |
 | `fis_quality.py` | improving the FIS's RUL on both axes *inside* TribbleRegressor — the memory-feature win, and the trend-augmentation / hyperparameter negatives. Writes `FIS_QUALITY.md`. |
 | `fis_memory_sweep.py` | sweeps the memory-window size for the accuracy/smoothness trade (loads the HDF5 once). |
+| `fis_monotone.py` | the capstone: the recommended `memory18` FIS made hard-monotone (clamp vs delta+cumsum). Appends to `FIS_QUALITY.md`. |
 | `report.py` | tables and figures from the artifacts. |
 | `write_benchmark.py` | generates `BENCHMARK.md`. Every number is interpolated from JSON; nothing is transcribed. |
 

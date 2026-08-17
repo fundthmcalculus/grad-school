@@ -76,7 +76,16 @@ class MonotoneDamageRUL:
         anchor="full",
         floor=0.0,
         end_weight=0.0,
+        link="softplus",
     ):
+        # link="softplus": the increment is forced >= 0, so RUL is monotone
+        # non-increasing by construction (the model this study recommends).
+        # link="identity": the increment is *signed* -- this is the plain
+        # "predict the per-cycle delta in RUL, then cumsum" idea, with no
+        # non-negativity. It is NOT monotone, and it integrates prediction
+        # noise, so it is offered only to measure exactly what the constraint
+        # and the floor are buying.
+        self.link = link
         # end_weight: extra loss on each *training* engine's last cycle, whose
         # true RUL is 0 (CMAPSS runs training units to failure). That pins the
         # total accumulated damage to the start level A, which is the one thing
@@ -115,7 +124,7 @@ class MonotoneDamageRUL:
 
     def _forward(self, X, groups):
         z = X @ self.w_ + self.b_
-        delta = _softplus(z)
+        delta = _softplus(z) if self.link == "softplus" else z
         raw = np.empty(X.shape[0], dtype=float)  # pre-floor, for gradient mask
         for idx in groups:
             d = delta[idx]
@@ -168,7 +177,8 @@ class MonotoneDamageRUL:
             g_w = np.zeros(d)
             g_b = 0.0
             g_A = float(g_pred.sum())  # dpred/dA = 1 everywhere it is unclamped
-            sig = _sigmoid(z)
+            # d delta / d z: sigmoid for softplus, 1 for the signed link.
+            sig = _sigmoid(z) if self.link == "softplus" else np.ones_like(z)
             for idx in groups:
                 gp = g_pred[idx]
                 # dL/ddelta(s) = sum_{t>=s} g_pred(t) * dpred(t)/ddelta(s).
@@ -267,8 +277,13 @@ def run(which: str, use_fis_feature=True, anchor="full") -> dict:
     )
 
 
-def damage_predictions(which: str, end_weight=0.0):
-    """Fit the damage model on a bundle; return the per-cycle test frame."""
+def damage_predictions(which: str, end_weight=0.0, link="softplus", floor=0.0):
+    """Fit the damage model on a bundle; return the per-cycle test frame.
+
+    `link`/`floor` expose the two forms of "predict a per-cycle delta, then
+    cumsum": link="softplus", floor=0 is the non-negative (monotone) damage
+    model; link="identity", floor=-inf is the plain signed-delta version.
+    """
     warnings.simplefilter("ignore")
     b = cmapss_data.load_or_build(**cmapss_data.BUNDLES[which], verbose=False)
     names = b.feature_names
@@ -276,9 +291,9 @@ def damage_predictions(which: str, end_weight=0.0):
     idx = np.array([names.index(f) for f in fis.top_features_], dtype=int)
     Xtr, ytr, _, utr, ctr = to_per_cycle(b.train, names)
     Xte, _, yte_true, ute, cte = to_per_cycle(b.test, names)
-    model = MonotoneDamageRUL(anchor="full", end_weight=end_weight).fit(
-        Xtr[:, idx], ytr, utr, ctr
-    )
+    model = MonotoneDamageRUL(
+        anchor="full", end_weight=end_weight, link=link, floor=floor
+    ).fit(Xtr[:, idx], ytr, utr, ctr)
     pred = model.predict(Xte[:, idx], ute, cte)
     # The FIS reference is computed exactly as monotone.py does it -- on the
     # FULL test rows, then predictions averaged to per-cycle -- not on the

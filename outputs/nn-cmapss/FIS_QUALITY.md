@@ -97,10 +97,75 @@ prediction.
    in [`MONOTONE.md`](MONOTONE.md) is the tool, applied as a wrapper. Within the
    FIS, `raw_memory` is the answer.
 
+---
+
+# The full stack: the recommended FIS, made hard-monotone
+
+Putting it together — the `memory18` FIS (the accuracy+smoothness recommendation
+above) with the monotone post-processing from [`MONOTONE.md`](MONOTONE.md) on
+top. Per test engine, on the same `memory18` predictions
+(`experiments/nn-cmapss/fis_monotone.py`, figure `figures/fis_monotone.png`):
+
+| method | per-engine RMSE | up-cycles | pos_tv |
+|---|---:|---:|---:|
+| raw FIS (`memory18`) | 6.19 | 36% | 52 |
+| **+ `cummin`  (recommended)** | **6.15** | **0%** | **0** |
+| + `mean5 → cummin` | 7.03 | 0% | 0 |
+| offline oracle (bound) | 5.85 | 0% | 0 |
+| delta+cumsum, non-negative (=damage model) | 20.10 | 0% | 0 |
+| delta+cumsum, signed | 17.39 | 10% | 1.4 |
+
+**On the good FIS, a bare running minimum is the whole answer.** `memory18`'s
+raw predictions are already accurate and nearly monotone, so clamping the
+running minimum costs *nothing* — 6.15 against 6.19, and a hair under it, at 0%
+up-cycles. `mean5 → cummin`'s extra smoothing is now counter-productive (7.03);
+it was only needed on the noisy `whole_cycle` pipeline. The result is one model
+that is accurate, smooth, and monotone-decreasing by guarantee.
+
+![recommended FIS clamped monotone](figures/fis_monotone.png)
+
+## "Predict the per-cycle delta, then cumsum?"
+
+Worth answering directly, because it is the natural idea and it is *already* one
+of the arms above. Predicting a per-cycle ΔRUL and accumulating it is exactly
+the damage-model family from [`MONOTONE.md`](MONOTONE.md); the only question is
+whether the increment is constrained:
+
+- **Non-negative** δ (softplus → RUL can only fall) is monotone by construction
+  — the "monotone-damage" model.
+- **Signed** δ (predict the raw ΔRUL, cumsum, no constraint) is the plain
+  version, and is *not* monotone.
+
+Both lose here, and the reason is the mechanism itself: **`cumsum` integrates
+prediction error.** A per-cycle bias of ε compounds to ε·T across a trajectory,
+so a delta model drifts — visible in the figure as the red damage curve hitting
+zero a third of the way through units 14 and 15. The numbers:
+
+| | `memory18` (good FIS) | `honest` (noisy FIS) |
+|---|---:|---:|
+| delta+cumsum, signed | 17.39 | 25.88 |
+| delta+cumsum, non-negative | 20.10 | **8.05** |
+| clamp the absolute prediction (`cummin` / `mean5→cummin`) | **6.15** | 10.23 |
+
+Two things fall out. First, the **non-negativity constraint earns its keep on a
+noisy predictor** (honest: 8.05 vs the signed 25.88) — true RUL deltas are all
+≤ 0, so forcing δ ≥ 0 matches the real structure and halves the model's freedom
+to drift; the signed version integrates noise in both directions and is far
+worse. Second, and decisively for the recommendation: **on a good absolute
+predictor you should not reparametrize to deltas at all.** `memory18` already
+knows the RUL *level*; re-deriving it from predicted increments throws that
+level away and re-accumulates noise from scratch (17–20 vs 6.15 for clamping).
+Delta+cumsum is the right tool only when the absolute predictor is too noisy to
+clamp — which, once memory features are in, this FIS is not.
+
+**Recommendation stands:** `memory18` FIS, then `cummin`. Accurate, smooth,
+hard-monotone, and a one-line post-processor.
+
 ## Reproducing
 
 ```bash
 cd experiments/nn-cmapss
 python fis_quality.py         # lever comparison + figures/fis_quality.png
 python fis_memory_sweep.py    # memory-window sweep (loads the 2.4 GB HDF5 once)
+python fis_monotone.py        # the recommended FIS made monotone + delta+cumsum arms
 ```
