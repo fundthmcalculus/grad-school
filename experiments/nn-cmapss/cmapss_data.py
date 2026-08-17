@@ -336,12 +336,16 @@ def load_or_build(
     return bundle
 
 
-# The two DS02 configurations this experiment runs, named as `cmapss_rul_best.py`
-# names them: `honest` is real sensors only, one row per flight cycle; `best` is
-# the literature's 20-channel set through the memory-window extractor.
+# The DS02 configurations this experiment runs. `honest` and `best` are named
+# as `cmapss_rul_best.py` names them -- real sensors, one row per flight cycle;
+# and the literature's 20-channel set through the memory-window extractor.
+# `memory18` is the FIS-quality recommendation (see FIS_QUALITY.md): the strict
+# 18 real sensors *with* memory features, which matches `best`'s accuracy and
+# smoothness without the two virtual channels.
 BUNDLES = {
     "honest": dict(feature_set="real", aggregation="whole_cycle"),
     "best": dict(feature_set="literature", aggregation="raw_memory"),
+    "memory18": dict(feature_set="real", aggregation="raw_memory"),
 }
 
 
