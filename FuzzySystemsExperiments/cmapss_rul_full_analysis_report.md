@@ -1,5 +1,12 @@
 # N-CMAPSS full-dataset RUL analysis
 
+> **Historical report.** These pooled, multi-configuration numbers were produced
+> by an exploratory design-of-experiments that has since been retired in favour
+> of two clean scripts: `cmapss_ds02_rul.py` (the DS02 best case) and
+> `cmapss_all_datasets.py` (the best pipeline across every dataset, per file,
+> written to `cmapss_all_datasets_report.md`). This file is kept because the
+> dissertation quotes its figures; it is no longer regenerated.
+
 One combined training set and one combined held-out test set, pooled from every N-CMAPSS file's own official train/test unit split. Condition-correction is fit per file on that file's own training units only; the scaler and per-unit RUL cap are fit once on the pooled training table only. No test-set information is used to fit anything.
 
 Two metric conventions are reported per pipeline:
