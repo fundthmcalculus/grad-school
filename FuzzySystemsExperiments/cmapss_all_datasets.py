@@ -19,10 +19,13 @@ the whole point:
     physically measurable sensors; dropping the two "virtual" channels the file
     allows (T40, P30) costs nothing (established on DS02 in `cmapss_ds02_rul.py`).
 
-Condition correction and the RUL cap are fit per file on that file's own
-training engines; the scaler is fit once on the pooled training table. No
-test-set information is used to fit anything. Writes
-`cmapss_all_datasets_report.md`.
+Same engine as the DS02 script -- the reusable `TribblePredictiveHealth`. The
+only twist pooling needs is that condition correction and the RUL cap are fit
+per file on that file's own training engines: so each file is streamed, corrected
+and featurised one at a time (keeping peak memory near a single dataset), then
+the small feature tables are pooled and handed to the estimator's
+`fit_featurized` entry point. No test-set information is used to fit anything.
+Writes `cmapss_all_datasets_report.md`.
 
 Needs: h5py, numpy, pandas, scikit-learn, tribble-fis.  Run:
 
@@ -30,114 +33,71 @@ Needs: h5py, numpy, pandas, scikit-learn, tribble-fis.  Run:
 """
 
 import argparse
-import contextlib
 import gc
 import glob
-import io
 import os
 import time
 
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import StandardScaler
 
-from tribblefis.gaussian_regressor import TribbleRegressor
-
-# Reuse the DS02 pipeline's building blocks so the two scripts can never
-# disagree about what condition correction, memory features, or the RUL cap are.
-from cmapss_ds02_rul import (
+from tribble_predictive_health import TribblePredictiveHealth, load_ncmapss
+from tribble_predictive_health.preprocessing import (
     apply_condition_correction,
     build_memory_features,
-    cap_rul,
+    build_whole_cycle_features,
     fit_condition_correction,
-    load_dataframe,
-    onset_caps,
-    per_cycle,
 )
 
 REPORT = "FuzzySystemsExperiments/cmapss_all_datasets_report.md"
 
-# The two pooled models. `whole_cycle` (one summary row per flight cycle, a
-# first-order fuzzy system) is the best per-engine model; `raw_memory` (the DS02
-# best case, memory features and quadratic consequents) is the best per-sample
-# model. Same 18 real sensors, same condition correction -- only the way the
-# stream is summarised differs.
-AGG_FUNCS = ["mean", "std", "min", "max", "last"]
+# The two pooled models, as estimator keyword arguments. `whole_cycle` (one
+# summary row per flight cycle, a first-order fuzzy system) is the best
+# per-engine model; `raw_memory` (the DS02 best case, memory features and
+# quadratic consequents) is the best per-sample model. Same 18 real sensors, same
+# condition correction -- only the way the stream is summarised differs.
+#
+# The pooled raw-memory table is ~220k rows and its quadratic consequent solve is
+# what would blow up memory, so `max_train_rows` subsamples it to a fixed 30k
+# (seed 42) before fitting -- about the size the single-DS02 fit uses. whole_cycle
+# is only ~4.5k rows, so it trains on all of them.
 CONFIGS = {
     "whole_cycle": dict(
-        tsk_order="1st",
-        n_gaussians=0,
-        top_p=0.9,
-        detect_interactions=False,
-        norm_conorm="hamacher",
-        l2_reg=0.01,
+        aggregation="whole_cycle", tsk_order="1st", top_p=0.9, max_train_rows=None
     ),
     "raw_memory": dict(
+        aggregation="raw_memory",
         tsk_order="full-2nd",
-        n_gaussians=0,
         top_p=0.95,
-        detect_interactions=False,
-        norm_conorm="hamacher",
-        l2_reg=0.01,
+        max_train_rows=30_000,
     ),
 }
-# The pooled raw-memory table is ~220k rows and its quadratic consequent solve
-# is what would blow up memory, so the training table is subsampled to a fixed
-# 30k rows (seed 42) before fitting -- about the size the single-DS02 fit uses.
-# whole_cycle is only ~4.5k rows, so it trains on all of them.
-POOLED_TRAIN_CAP = {"whole_cycle": None, "raw_memory": 30_000}
 
 
-def build_whole_cycle_features(df, sensor_cols):
-    """One row per (unit, cycle): mean/std/min/max/last of each sensor."""
-    g = df.groupby(["unit", "cycle"], sort=True)
-    feat = g[sensor_cols].agg(AGG_FUNCS)
-    feat.columns = ["_".join(c) for c in feat.columns]
-    meta = g.agg(rul=("rul", "first"), health=("health", "min"))
-    return feat.join(meta).reset_index()
-
-
-def nasa_score(y_true, y_pred):
-    """PHM08 asymmetric penalty (late warning punished harder), summed."""
-    d = np.asarray(y_true, float) - np.asarray(y_pred, float)
-    return float(np.sum(np.exp(np.where(d > 0, 1 / 13.0, 1 / 10.0) * np.abs(d))))
-
-
-def per_engine_canonical(test_tab, pred):
-    """Standard C-MAPSS scoring: one RUL per engine at its last cycle.
-
-    `per_cycle` returns the engine id in its `unit` column (it just names its
-    first argument `unit`); we pass the global engine id in there.
-    """
-    df = per_cycle(
-        test_tab["engine"].to_numpy(),
-        test_tab["cycle"].to_numpy(),
-        test_tab["rul"].to_numpy(float),
-        pred,
-    )
-    last = df.sort_values("cycle").groupby("unit").last()
-    return (
-        float(np.sqrt(mean_squared_error(last["true"], last["pred"]))),
-        nasa_score(last["true"], last["pred"]),
-    )
+def _featurize(agg, df, sensors):
+    """Per-file feature table for one aggregation. Returns (table, feature_cols)."""
+    if agg == "whole_cycle":
+        return build_whole_cycle_features(df, sensors)
+    return build_memory_features(df, sensors)
 
 
 # ---------------------------------------------------------------------------
-# Load every file once, build both feature tables, pool
+# Load every file once, correct and featurise it, pool the small tables
 # ---------------------------------------------------------------------------
 def gather(h5_dir):
-    """Return pooled {whole_cycle, raw_memory} -> (train, test, feature_cols),
-    plus the list of processed/skipped datasets. Each file is loaded once and
-    freed before the next, so peak memory stays near one dataset."""
+    """Return pooled {agg -> (train, test, feature_cols)}, plus the lists of
+    processed/skipped datasets. Each file is loaded, corrected against its own
+    baseline, featurised, and freed before the next, so peak memory stays near
+    one dataset."""
     pooled = {agg: {"train": [], "test": []} for agg in CONFIGS}
     feature_cols = {}
     processed, skipped = [], []
     for path in sorted(glob.glob(os.path.join(h5_dir, "*.h5"))):
         name = os.path.basename(path).replace("N-CMAPSS_", "").replace(".h5", "")
         try:
-            dev, cond, sensors = load_dataframe(path, "dev")
-            test, _, _ = load_dataframe(path, "test")
+            dev, cond, sensors = load_ncmapss(path, "dev")
+            test, _, _ = load_ncmapss(path, "test")
         except Exception as exc:  # the one truncated file
             skipped.append((name, f"{type(exc).__name__}"))
             continue
@@ -146,15 +106,8 @@ def gather(h5_dir):
         test = apply_condition_correction(test, sensors, cond, models)
 
         for agg in CONFIGS:
-            if agg == "whole_cycle":
-                tr = build_whole_cycle_features(dev, sensors)
-                te = build_whole_cycle_features(test, sensors)
-                cols = [
-                    c for c in tr.columns if c not in ("unit", "cycle", "rul", "health")
-                ]
-            else:
-                tr, cols = build_memory_features(dev, sensors)
-                te, _ = build_memory_features(test, sensors)
+            tr, cols = _featurize(agg, dev, sensors)
+            te, _ = _featurize(agg, test, sensors)
             feature_cols[agg] = cols
             # Unit numbers repeat across files; make a globally unique engine id.
             for t in (tr, te):
@@ -178,46 +131,31 @@ def gather(h5_dir):
 # Fit one pooled model and score it both ways
 # ---------------------------------------------------------------------------
 def fit_pooled(agg, train, test, feature_cols):
-    caps = onset_caps(train.assign(unit=train["engine"]))  # cap per global engine
-    cap = POOLED_TRAIN_CAP[agg]
-    if cap and len(train) > cap:
-        train = train.sample(cap, random_state=42)
-
-    scaler = StandardScaler().fit(train[feature_cols].to_numpy(float))
-    X_train = scaler.transform(train[feature_cols].to_numpy(float))
-    X_test = scaler.transform(test[feature_cols].to_numpy(float))
-    y_train = cap_rul(train.assign(unit=train["engine"]), caps)
-
-    model = TribbleRegressor(random_state=42, max_samples=2000, **CONFIGS[agg])
+    # `engine` is the globally-unique id; condition correction is already done,
+    # so the estimator only caps, scales, fits, and scores.
+    engine = TribblePredictiveHealth(
+        condition_correction=False, unit_col="engine", **CONFIGS[agg]
+    )
     t0 = time.perf_counter()
-    with contextlib.redirect_stdout(io.StringIO()):
-        model.fit(X_train, y_train)
+    engine.fit_featurized(train, feature_cols)
     fit_seconds = time.perf_counter() - t0
 
-    pred = model.predict(X_test)
-    y_true = test["rul"].to_numpy(float)
-    eng_rmse, eng_nasa = per_engine_canonical(test, pred)
-
-    dataset = test["dataset"].to_numpy()
+    m = engine.score_featurized(test)
+    scored = engine.predict_samples_featurized(test)  # per-row, for the breakdown
     per_dataset = {
-        ds: float(
-            np.sqrt(
-                mean_squared_error(
-                    test["rul"].to_numpy(float)[dataset == ds], pred[dataset == ds]
-                )
-            )
-        )
-        for ds in pd.unique(dataset)
+        ds: float(np.sqrt(mean_squared_error(sub["rul"], sub["predicted_rul"])))
+        for ds, sub in scored.groupby("dataset")
     }
     return dict(
         config=agg,
-        n_train=len(train),
+        n_train=min(len(train), CONFIGS[agg]["max_train_rows"] or len(train)),
         n_test=len(test),
         n_engines=int(test["engine"].nunique()),
+        n_rules=engine.n_rules_,
         fit_seconds=fit_seconds,
-        per_sample_rmse=float(np.sqrt(mean_squared_error(y_true, pred))),
-        per_engine_rmse=eng_rmse,
-        per_engine_nasa=eng_nasa,
+        per_sample_rmse=m["per_sample_rmse"],
+        per_engine_rmse=m["per_engine_rmse"],
+        per_engine_nasa=m["per_engine_nasa"],
         per_dataset=per_dataset,
     )
 
@@ -226,9 +164,10 @@ def write_report(results, processed, skipped):
     lines = [
         "# N-CMAPSS RUL, pooled across all datasets",
         "",
-        "The 18-real-sensor pipeline (see `cmapss_ds02_rul.py`) pooled over every "
-        "usable N-CMAPSS file -- each contributing its own official train/test "
-        "engines -- and scored two ways. Regenerated by `cmapss_all_datasets.py`.",
+        "The 18-real-sensor pipeline (the `TribblePredictiveHealth` engine, see "
+        "`cmapss_ds02_rul.py`) pooled over every usable N-CMAPSS file -- each "
+        "contributing its own official train/test engines -- and scored two ways. "
+        "Regenerated by `cmapss_all_datasets.py`.",
         "",
         f"Datasets pooled: {', '.join(processed)}"
         + (
