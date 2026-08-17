@@ -11,7 +11,7 @@ The references live in a single BibTeX file, [`../references.bib`](../references
 
 ## The state of the file, counted
 
-The file holds **70 entries: 45 `[V]`, 23 `[S]`, and 2 still `[?]`.** An earlier tally elsewhere in the repo read "47 `[V]` + 24 `[S]` across 70 entries, zero unresolved" — wrong on every figure and summing to 71 — and has since been corrected (`CHECKLIST.md` §F) to match this page, which is the source of truth for the count. The `.bib` header legend calls the `[?]` entries "resolved … and promoted to `[V]`", untrue of the two below and needing the same correction.
+The file holds **73 entries: 48 `[V]`, 23 `[S]`, and 2 still `[?]`.** This was 70 (45 `[V]`) until 2026-08-16, when the three prognostics/RUL references for the Chapter 4 §4.4.1 turbofan case study were added (`ariaschao2021ncmapss`, `ariaschao2022fusing`, `custode2022evolutionary`), all metadata-verified `[V]` — with the caveat that `custode2022evolutionary`'s baseline figures are corroborated from snippets, not read from the paper (`CHECKLIST` **C15**), the same "`[V]` is metadata, not content" distinction drawn below. An earlier tally elsewhere in the repo read "47 `[V]` + 24 `[S]` across 70 entries, zero unresolved" — wrong on every figure and summing to 71 — and has since been corrected (`CHECKLIST.md` §F) to match this page, which is the source of truth for the count. The `.bib` header legend calls the `[?]` entries "resolved … and promoted to `[V]`", untrue of the two below and needing the same correction.
 
 Two distinctions matter more than the arithmetic. **`[V]` is metadata-verified, not content-verified**: author list, title, venue, year and DOI resolve against a publisher index, and nothing is claimed about the paper having been read. And `[V]` can coexist with an unresolved field inside the entry; two do.
 
@@ -36,6 +36,7 @@ Two distinctions matter more than the arithmetic. **`[V]` is metadata-verified, 
 - **Persistence and topological data analysis.** `chazal2013persistence` (ToMATo), `bonis2018fuzzy` (the nearest precedent for Chapter 5), `automato2024`.
 - **Optimization, TSP, and quality-diversity.** `lin1973effective`, `helsgaun2000effective`, `croes1958method`, `dorigo1996ant`, `kennedy1995particle`, `deb2002nsga2`, `mouret2015illuminating`, `vassiliades2018cvt`.
 - **Interpretability / XAI.** `lundberg2017shap`.
+- **Prognostics / RUL (Ch 4 §4.4.1 turbofan case study).** The N-CMAPSS dataset (`ariaschao2021ncmapss`) and the two baselines the case study measures against: the physics-plus-deep-learning fusion paper whose CNN/FNN numbers are on a pre-release DS02 cut (`ariaschao2022fusing`, arXiv PDF read) and the public-file CNN/MLP re-runs the comparison actually uses (`custode2022evolutionary`, figures corroborated not read — `CHECKLIST` **C15**).
 
 ---
 

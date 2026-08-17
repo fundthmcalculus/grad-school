@@ -1,0 +1,138 @@
+% Neural-network / fuzzy-inference-system equivalence.
+%
+% Verification markers follow papers/least-action-review/references.bib:
+%   [V] -- field confirmed against a fetched copy or publisher landing page
+%   [?] -- from search-result metadata only; confirm before citing
+%
+% The 2025 IJCCC paper is now in this directory as a PDF (supplied by the
+% author, 2026-08-16), so its entry is fully [V] -- read off the article's own
+% first page. The two NAFIPS entries are [V] for everything that appears in
+% that paper's reference list, which is where they are cited as [2] and [3].
+
+@article{bede2025equivalencend,
+  author  = {Bede, Barnab{\'a}s and Kreinovich, Vladik and Toth, Peter},
+  title   = {On equivalence between {Takagi--Sugeno--Kang} fuzzy systems with
+             triangular membership functions and Neural Networks with {ReLU}
+             activation in two or more dimensions},
+  journal = {International Journal of Computers Communications \& Control},
+  volume  = {20},
+  number  = {4},
+  year    = {2025},
+  month   = {August},
+  doi     = {10.15837/ijccc.2025.4.7127},
+  note    = {Article number 7127; open access}
+}
+% [V] -- every field read from the PDF's first page (ISSN-L 1841-9836,
+% "Volume: 20, Issue: 4, Month: August, Year: 2025, Article Number: 7127").
+% Local copy: bede-kreinovich-toth-2025-ijccc-nd.pdf
+
+@inproceedings{bede2023equivalence1d,
+  author    = {Bede, Barnab{\'a}s and Kreinovich, Vladik and Toth, Peter},
+  title     = {Equivalence Between 1-{D} {Takagi--Sugeno} Fuzzy Systems with
+               Triangular Membership Functions and Neural Networks with {ReLU}
+               Activation},
+  booktitle = {North American Fuzzy Information Processing Society Annual
+               Conference (NAFIPS 2023)},
+  series    = {Lecture Notes in Networks and Systems},
+  volume    = {751},
+  pages     = {44--56},
+  publisher = {Springer},
+  year      = {2023},
+  doi       = {10.1007/978-3-031-46778-3_5}
+}
+% [V] -- title, authors, pages 44--56, publisher and year confirmed against
+% reference [2] of the 2025 paper. LNNS volume 751 and the chapter DOI are
+% still [?]: they come from the Springer book landing page, not from the PDF.
+
+@inproceedings{bede2024equivalencerealline,
+  author    = {Bede, Barnab{\'a}s and Kreinovich, Vladik and Toth, Peter},
+  title     = {Equivalence between {TSK} fuzzy systems with triangular
+               membership functions and neural networks with {ReLU} activation
+               on the real line},
+  booktitle = {North American Fuzzy Information Processing Society Annual
+               Conference (NAFIPS 2024)},
+  publisher = {Springer},
+  year      = {2024}
+}
+% [V] -- reference [3] of the 2025 paper. NOTE: this is a *separate, later*
+% paper from the 2023 one above, and the two are easy to conflate -- a web
+% search for the "on the real line" title returns the 2023 conference and its
+% outstanding-paper award. The 2025 paper's own bibliography settles it: the
+% 1-D paper is 2023 (pp. 44-56), "on the real line" is 2024.
+
+% --- context: the same equivalence, other routes -----------------------------
+
+@article{jang1993functional,
+  author  = {Jang, Jyh-Shing Roger and Sun, Chuen-Tsai},
+  title   = {Functional Equivalence Between Radial Basis Function Networks and
+             Fuzzy Inference Systems},
+  journal = {IEEE Transactions on Neural Networks},
+  volume  = {4},
+  number  = {1},
+  pages   = {156--159},
+  year    = {1993},
+  doi     = {10.1109/72.182710}
+}
+
+@article{buckley1993equivalence,
+  author  = {Buckley, James J. and Hayashi, Yoichi and Czoga{\l}a, Ernest},
+  title   = {On the equivalence of neural nets and fuzzy expert systems},
+  journal = {Fuzzy Sets and Systems},
+  volume  = {53},
+  number  = {2},
+  pages   = {129--134},
+  year    = {1993},
+  doi     = {10.1016/0165-0114(93)90167-G}
+}
+
+@article{wu2019functional,
+  author  = {Wu, Dongrui and Yuan, Ye and Huang, Jian and Tan, Yihua},
+  title   = {On the Functional Equivalence of {TSK} Fuzzy Systems to Neural
+             Networks, Mixture of Experts, {CART}, and Stacking Ensemble
+             Regression},
+  journal = {arXiv preprint arXiv:1903.10572},
+  year    = {2019},
+  doi     = {10.48550/arXiv.1903.10572}
+}
+
+@article{jang1993anfis,
+  author  = {Jang, Jyh-Shing Roger},
+  title   = {{ANFIS}: Adaptive-Network-Based Fuzzy Inference System},
+  journal = {IEEE Transactions on Systems, Man, and Cybernetics},
+  volume  = {23},
+  number  = {3},
+  pages   = {665--685},
+  year    = {1993},
+  doi     = {10.1109/21.256541}
+}
+% [V] -- reference [7] of the 2025 paper, DOI included there.
+
+% --- the triangulation this repository's implementation uses ------------------
+% The 2025 paper triangulates the polyhedral cells on which a *trained network*
+% is already affine, so its interpolation is exact by construction. Running the
+% map the other way (FIS -> network) has no such canonical triangulation,
+% because a TRIBBLE FIS is not piecewise linear; `experiments/fis-to-neural-net`
+% imposes a regular Freudenthal/Kuhn lattice instead. These are the sources for
+% that construction.
+
+@article{freudenthal1942simplizialzerlegungen,
+  author  = {Freudenthal, Hans},
+  title   = {Simplizialzerlegungen von beschr{\"a}nkter {F}lachheit},
+  journal = {Annals of Mathematics},
+  volume  = {43},
+  number  = {3},
+  pages   = {580--582},
+  year    = {1942},
+  doi     = {10.2307/1968813}
+}
+
+@incollection{kuhn1960simplicial,
+  author    = {Kuhn, Harold W.},
+  title     = {Some Combinatorial Lemmas in Topology},
+  journal   = {IBM Journal of Research and Development},
+  volume    = {4},
+  number    = {5},
+  pages     = {518--524},
+  year      = {1960},
+  doi       = {10.1147/rd.45.0518}
+}
