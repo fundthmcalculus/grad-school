@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CX TT Timing &mdash; Capture</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header>
+  <h1>CX TT Timing</h1>
+  <nav>
+    <a href="capture.html" class="active">Capture</a>
+    <a href="review.html">Review</a>
+  </nav>
+  <span style="margin-left:auto" class="pill" id="gpuPill">WebGPU: checking&hellip;</span>
+</header>
+
+<main>
+  <div>
+    <section class="panel">
+      <h2>Camera</h2>
+      <div class="row">
+        <label>Camera
+          <select id="deviceSelect"></select>
+        </label>
+        <button id="btnStartCamera">Start Camera</button>
+      </div>
+      <div class="video-wrap" id="videoWrap">
+        <video id="video" playsinline muted></video>
+        <canvas class="overlay" id="overlay"></canvas>
+      </div>
+      <p class="status-line">Drag on the video to draw the reading window (ROI) &mdash; the box riders' numbers will pass through as they approach the camera.</p>
+
+      <div class="preview-row">
+        <figure>
+          <figcaption>ROI crop</figcaption>
+          <canvas id="cropCanvas" width="320" height="120"></canvas>
+        </figure>
+        <figure>
+          <figcaption>WebGPU preprocessed (fed to OCR)</figcaption>
+          <canvas id="gpuCanvas" width="320" height="120"></canvas>
+        </figure>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Session</h2>
+      <div class="row">
+        <button id="btnStart" class="primary">Start Session</button>
+        <button id="btnStop" class="danger" disabled>Stop Session</button>
+        <span class="pill" id="sessionPill">idle</span>
+      </div>
+      <div class="row">
+        <button id="btnDownloadVideo" disabled>Download Footage</button>
+        <button id="btnDownloadJson" disabled>Download Log (JSON)</button>
+        <button id="btnDownloadCsv" disabled>Download Log (CSV)</button>
+      </div>
+      <div class="status-line" id="statusLine"></div>
+    </section>
+  </div>
+
+  <div>
+    <section class="panel">
+      <h2>Detection settings</h2>
+      <div class="row">
+        <label>Interval (ms)
+          <input type="number" id="intervalMs" value="300" min="100" step="50" />
+        </label>
+        <label>Miss threshold (cycles)
+          <input type="number" id="missThreshold" value="3" min="1" step="1" />
+        </label>
+        <label>Min confidence
+          <input type="number" id="minConfidence" value="45" min="0" max="100" step="5" />
+        </label>
+      </div>
+      <div class="row">
+        <label>Contrast
+          <input type="range" id="contrast" min="0.5" max="3" step="0.1" value="1.5" />
+        </label>
+        <label>Brightness
+          <input type="range" id="brightness" min="-0.5" max="0.5" step="0.05" value="0" />
+        </label>
+        <label>Binarize
+          <input type="checkbox" id="binarize" />
+        </label>
+        <label>Threshold
+          <input type="range" id="threshold" min="0" max="1" step="0.02" value="0.5" />
+        </label>
+      </div>
+      <div class="row">
+        <label>Digit whitelist
+          <input type="text" id="whitelist" value="0123456789" />
+        </label>
+        <label>ROI upscale
+          <input type="number" id="upscale" value="2" min="1" max="4" step="0.5" />
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Live log <span class="pill" id="countPill">0 riders</span></h2>
+      <div class="log-scroll">
+        <table>
+          <thead><tr><th>#</th><th>First seen</th><th>Last seen</th><th>Hits</th><th>Conf</th><th>State</th></tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>Bib numbers are read from the front as riders approach; the logged time is the last moment each number was legible. See README for the overtake caveat.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

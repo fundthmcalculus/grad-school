@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CX TT Timing &mdash; Review</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header>
+  <h1>CX TT Timing</h1>
+  <nav>
+    <a href="capture.html">Capture</a>
+    <a href="review.html" class="active">Review</a>
+  </nav>
+</header>
+
+<main>
+  <div>
+    <section class="panel">
+      <h2>Footage &amp; log</h2>
+      <div class="row">
+        <label>Footage file
+          <input type="file" id="videoFile" accept="video/*" />
+        </label>
+        <label>Log file (JSON)
+          <input type="file" id="jsonFile" accept="application/json" />
+        </label>
+      </div>
+      <div class="video-wrap">
+        <video id="video" controls></video>
+      </div>
+      <div class="status-line" id="statusLine"></div>
+    </section>
+  </div>
+
+  <div>
+    <section class="panel">
+      <h2>Rider log <span class="pill" id="countPill">0 entries</span></h2>
+      <div class="row">
+        <button id="btnExportJson" disabled>Export corrected JSON</button>
+        <button id="btnExportCsv" disabled>Export corrected CSV</button>
+      </div>
+      <div class="log-scroll">
+        <table>
+          <thead><tr><th>#</th><th>First seen</th><th>Last seen</th><th>Conf</th><th>Seek</th><th>OK</th></tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+      <p class="status-line">Click <b>First</b> / <b>Last</b> to jump the video to that moment. Edit the number if OCR misread it, and check it off once you've confirmed it against the footage.</p>
+    </section>
+  </div>
+</main>
+
+<footer>After-action review: correct any misreads here before publishing final results.</footer>
+
+<script type="module" src="src/review.js"></script>
+</body>
+</html>
