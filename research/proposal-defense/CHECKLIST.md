@@ -355,11 +355,11 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 - [ ] ⬜ **C14 — Train-subsample variance study for the turbofan-RUL case study** *(future PR;
       Ch 4 §4.4.1, Table 4.10, Appendix A.7.1).* N-CMAPSS DS02 RUL is currently *demonstrated*
       (one run on the dataset's own fixed split, `FuzzySystemsExperiments/cmapss_all_datasets.py`
-      + `cmapss_rul_full_analysis_report.md`), not *measured*. The reproducibility axis here is **not**
+      + `cmapss_all_datasets_report.md`), not *measured*. The reproducibility axis here is **not**
       a ten-seed random split — the train/test split is fixed by the dataset (the held-out engine
       units, the same split the published baselines use), so re-seeding it would measure the wrong
       thing and break the baseline comparison. What *should* be seeded is the **training-set
-      subsample** (the pooled fit draws 50k of ~221k rows at a fixed seed) plus the model's
+      subsample** (the pooled fit draws 30k of ~221k rows at a fixed seed) plus the model's
       `random_state`: re-draw both across ten seeds on the fixed split and report mean ± s.d., ideally
       via a seeded generator under `reproduce/tables/`. Blocker is redistribution, not compute: the
       10 `.h5` files total ~28 GB and are gitignored, so the generator must document the manual
