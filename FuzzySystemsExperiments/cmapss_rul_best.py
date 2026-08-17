@@ -48,6 +48,32 @@ that confound before the regressor ever sees the data. Full derivation and
 the negative result that led here (a naive raw-mean detector that never
 fired) are in cmapss_rul.py / the grad-school PR history.
 
+How these configurations were chosen, and why that is defensible
+----------------------------------------------------------------
+The `tribble_kwargs` below are the winners of `cmapss_rul.py`'s Stage 2 grid,
+which minimizes `rmse_test_true` -- i.e. **they were selected on the official
+held-out test engines**. A reader is right to discount a number chosen that
+way, so it was checked rather than defended:
+
+  * Re-running the same 72-point Factor-D grid against a *validation* fold
+    instead (dev engines 18 and 20 held out, the other four used to fit)
+    selects the **identical** configuration for `best`, and confirms the
+    identical RMSE 6.48. The headline number owes nothing to test selection.
+  * For `honest`, validation selection picks `n_gaussians=3` and lands at
+    16.06 on test against this configuration's 11.23 -- worse, while scoring
+    *better* on validation (9.54 vs 10.18). Two engines is too small a fold to
+    select on; six engines do not divide well. Leave-one-engine-out over the
+    six dev engines is the protocol that would fit this dataset, and it is
+    still seconds-scale.
+
+See `experiments/nn-cmapss/sweep_fis.py` for that check and
+`outputs/nn-cmapss/REVIEW.md` for the write-up.
+
+A note on `n_gaussians=0`, which reads like an ablation and is not: in
+`TribbleRegressor` it means **automatic** ("Number of Gaussians per feature per
+label (0 for automatic)"). The grid sweeps [0, 3, 5] and automatic wins; it is
+not "zero Gaussians".
+
 Usage:
     python cmapss_rul_best.py --h5 /path/to/N-CMAPSS_DS02-006.h5
     python cmapss_rul_best.py --h5 /path/to/N-CMAPSS_DS02-006.h5 --pipeline honest
@@ -188,6 +214,15 @@ def apply_condition_correction(
 # RUL target: per-unit physical cap, derived from the `hs` health-state flag
 # --------------------------------------------------------------------------
 def physical_rul_cap(table: pd.DataFrame) -> dict:
+    """Per-unit RUL cap at the `hs`-derived degradation onset.
+
+    **Pass training rows only.** This used to be called on
+    `pd.concat([train_tab, test_tab])`, which built caps for the held-out
+    engines from their own health flag. Nothing consumed them here -- only
+    `y_train` is capped, and `y_test_true` is the raw RUL -- so no reported
+    number changes. But computing them at all invites the question, and
+    `cmapss_rul.py` had a metric that did consume the equivalent.
+    """
     caps = {}
     for unit, sub in table.groupby("unit"):
         sub = sub.sort_values("cycle")
@@ -201,8 +236,14 @@ def physical_rul_cap(table: pd.DataFrame) -> dict:
 
 
 def capped_rul(table: pd.DataFrame, caps: dict) -> np.ndarray:
-    cap_series = table["unit"].map(caps)
-    return np.minimum(table["RUL"].astype(float), cap_series).to_numpy()
+    """Cap where a cap is known; leave the raw RUL where it is not.
+
+    `caps` covers training units only, so a table of held-out engines passes
+    through untouched rather than becoming NaN.
+    """
+    cap_series = table["unit"].map(caps).astype(float)
+    raw = table["RUL"].astype(float)
+    return np.where(cap_series.isna(), raw, np.minimum(raw, cap_series.fillna(raw)))
 
 
 # --------------------------------------------------------------------------
@@ -304,7 +345,7 @@ def run(h5_path: str, pipeline_name: str, verbose: bool = True) -> dict:
     agg_feat_cols = [
         c for c in train_tab.columns if c not in ("unit", "cycle", "RUL", "hs")
     ]
-    caps = physical_rul_cap(pd.concat([train_tab, test_tab], ignore_index=True))
+    caps = physical_rul_cap(train_tab)  # training units only -- see physical_rul_cap
 
     X_train = train_tab[agg_feat_cols].to_numpy(dtype=np.float64)
     X_test = test_tab[agg_feat_cols].to_numpy(dtype=np.float64)

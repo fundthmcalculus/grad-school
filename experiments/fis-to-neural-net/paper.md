@@ -58,8 +58,11 @@ A(x) = [phi(x-a) - phi(x-b)] / (b-a)  -  [phi(x-b) - phi(x-c)] / (c-b)
 
 which expands to `s_a·relu(x-a) − (s_a+s_c)·relu(x-b) + s_c·relu(x-c)`. A fuzzy
 term *is* a hidden-layer motif; its knots *are* the ReLU biases.
-`fis2nn.triangle_to_relu` implements exactly this, including the degenerate
-shoulder forms that a Ruspini partition's end terms need.
+`fis2nn.triangle_to_relu` implements exactly this, including the *shoulder*
+forms (`a = -inf`, `c = +inf`) that a Ruspini partition's end terms need. It
+rejects genuinely *degenerate* terms — a vertical side, `a == b` or `b == c` —
+because those are discontinuous and no finite sum of ReLUs is; see §7a.1 for
+what it used to do with them instead.
 
 The 2025 sequel lifts this past one dimension by replacing triangles with
 **tetrahedral** membership functions, giving one TSK rule per triangulation
@@ -74,12 +77,14 @@ what this study spends most of its time measuring.
 
 ## 2. What is exact, and verified
 
-Twenty-five tests across two suites, all passing, all checked at machine precision
+Thirty tests across two suites, all passing, all checked at machine precision
 rather than a tolerance chosen to pass.
 
 | claim | verification |
 |---|---|
 | triangle = 3 ReLUs, trapezoid = 4 | `< 1e-12` over a 24,001-point grid, both shoulder forms |
+| degenerate terms raise rather than lie | both orientations, triangle and trapezoid; `fis_knots` skips and warns (§7a.1) |
+| recorded seconds exclude evaluation | a wide net on a large eval set stays under 50 ms for 3 epochs |
 | 1-D Ruspini TSK = 1-hidden-layer ReLU net | `< 1e-10`, **one hidden unit per apex knot**, no data touched, 25 random partitions |
 | PWL decomposition exact *between* knots | midpoint check — separates an identity from an interpolation that merely hits the samples |
 | Freudenthal hat closed form | **zero** error vs Kuhn interpolation at n = 1, 2, 3, 5, 8 |
@@ -196,9 +201,63 @@ component — without damping, trajectories separate exponentially and past some
 horizon the operator is not a learnable function of a 0.1° grid of initial
 conditions.
 
-## 7. Defects found in the surrounding code
+## 7. Defects
 
-Three, all reported rather than silently patched:
+### 7a. In this module, found on review and since fixed
+
+A later review (`outputs/nn-cmapss/REVIEW.md`) put this code on a dataset it was
+not written against — N-CMAPSS DS02 — and turned up three of its own. All are
+fixed here; `test_fis2nn.py` now runs 18 tests instead of 13.
+
+1. **`triangle_to_relu` mishandled degenerate terms.** For `T(a=1, b=1, c=2)`
+   it produced the *negation* of the correct falling ramp and kept falling past
+   `c` — `max|err| = 1.0`, a full unit of membership, with no signal to the
+   caller. The comment claiming "the falling side's expansion below reproduces
+   it on its own" was simply false.
+
+   The form that actually occurs here is milder and worth stating precisely,
+   because the first attempt at this fix assumed it could not occur at all and
+   broke the DS02 runs on contact. `fit_triangle_to_gaussian` returns a *fully*
+   collapsed `a == b == c` when sigma is 0 — DS02 has one such feature,
+   `Xs_T30_max`, 1 of 109 terms — and on that form the old code emitted no
+   knots and an all-zero expansion. Wrong in kind, not in value: a collapsed
+   feature entered the seed as silence, and every fidelity number here is
+   unchanged by the fix. Zero-width terms now raise `DegenerateMembership`,
+   `fis_knots` skips them and warns with a count, and inverted feet raise a
+   plain `ValueError`. The trapezoidal analogues are covered too.
+2. **`train_adam` charged evaluation time to training.** `hist.seconds` was
+   `perf_counter() - start`, which includes every prior scoring pass over
+   `X_test`/`X_val`. That cancels between arms of equal width and does not
+   cancel otherwise — and §4's headline comparison puts a hot arm whose width is
+   fixed by the FIS's knot count against an `he` arm free to be narrow (264
+   against 8 on DS02). Eval time is now subtracted, so every reported second is
+   a second of gradient descent. **Every wall-clock number in §4 predates this
+   fix and is biased against the wider arm**, which on those runs is the hot
+   one; the direction of the §4 conclusion is unaffected, but the ratios there
+   should be regenerated before being quoted again.
+3. **`analytic_seed_from_fis` is only sound for a 0th- or 1st-order TSK.**
+   `partial_dependence` overwrites one column, which sends background rows off
+   the joint data manifold; an affine consequent extrapolates gracefully there
+   and a quadratic one does not. On DS02's `full-2nd` champion the seed lands
+   31× the FIS's own standard deviation away from it, against 1.3× for the same
+   pipeline at 1st order. Now documented, with the ALE-style fix named. §5's
+   fidelity ladder (0.030 → 0.294 → >1.0) is unaffected — every FIS in it is
+   1st-order.
+
+The review also supplied the measurement §6 was missing: at each dimension, the
+seed is compared not only to the FIS but to the FIS's own ANOVA projection on a
+dense grid — *the best any axis-aligned seed of any width could achieve*. The
+seed tracks that bound everywhere and sometimes beats it, which upgrades
+"fidelity degrades with dimension" to **the conversion is optimal within its
+class, and the residual is irreducible interaction**.
+
+One caveat that belongs beside every fidelity number and was absent: past its
+outermost knot the seed continues with the slope of the outermost segment,
+forever. On DS02's `honest` pipeline 42% of test rows sit outside at least one
+feature's knot range, and at one feature that extrapolation is essentially the
+entire residual (0.070 against a best-additive 0.030).
+
+### 7b. In the surrounding code, reported rather than patched
 
 1. **`triangle_fit.fit_triangles_to_mixture` is unusable above ~6 features.**
    Compact support meets a product t-norm: one feature outside its triangles
