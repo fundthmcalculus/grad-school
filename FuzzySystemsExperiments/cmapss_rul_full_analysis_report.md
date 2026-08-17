@@ -11,15 +11,15 @@ Two metric conventions are reported per pipeline:
 
 | dataset | status | seconds |
 |---|---|---:|
-| DS01 | ok | 15.9 |
-| DS02 | ok | 13.3 |
-| DS03 | ok | 21.2 |
-| DS04 | ok | 20.3 |
-| DS05 | ok | 14.1 |
-| DS06 | ok | 13.7 |
-| DS07 | ok | 14.5 |
-| DS08a | ok | 16.7 |
-| DS08c | ok | 12.7 |
+| DS01 | ok | 22.2 |
+| DS02 | ok | 18.5 |
+| DS03 | ok | 28.7 |
+| DS04 | ok | 28.4 |
+| DS05 | ok | 19.7 |
+| DS06 | ok | 19.5 |
+| DS07 | ok | 20.6 |
+| DS08a | ok | 24.4 |
+| DS08c | ok | 18.6 |
 | DS08d | skipped: OSError('Unable to synchronously open file (truncated file: eof = 2885034848, sblock->base_addr = 0, stored_eof = 2885034880)') | nan |
 
 ## Pipeline: `honest`
@@ -27,7 +27,7 @@ Two metric conventions are reported per pipeline:
 - Training rows: 4,535  |  pooled test rows: 2,938
 - **Per-engine (canonical, one RUL per test engine at its last cycle -- 39 engines): RMSE 8.61  |  NASA score 78.2**
 - Per-sample (over all 2,938 test rows): RMSE 15.95  |  NASA score 14,106
-- Fit time: 1.13s
+- Fit time: 1.02s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -48,7 +48,7 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 - Training rows: 50,000 (subsampled from 221,345 pooled rows, seed=42)  |  pooled test rows: 128,208
 - **Per-engine (canonical, one RUL per test engine at its last cycle -- 39 engines): RMSE 40.64  |  NASA score 5,306,097.8**
 - Per-sample (over all 128,208 test rows): RMSE 17.70  |  NASA score 1,169,750,028,202,100,871,724,246,499,328
-- Fit time: 27.42s
+- Fit time: 27.74s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -69,7 +69,7 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 - Training rows: 4,535  |  pooled test rows: 2,938
 - **Per-engine (canonical, one RUL per test engine at its last cycle -- 39 engines): RMSE 8.61  |  NASA score 78.2**
 - Per-sample (over all 2,938 test rows): RMSE 15.95  |  NASA score 14,106
-- Fit time: 1.01s
+- Fit time: 0.96s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -90,7 +90,7 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 - Training rows: 50,000 (subsampled from 221,345 pooled rows, seed=42)  |  pooled test rows: 128,208
 - **Per-engine (canonical, one RUL per test engine at its last cycle -- 39 engines): RMSE 13.50  |  NASA score 170.4**
 - Per-sample (over all 128,208 test rows): RMSE 16.18  |  NASA score 24,123,921,303,008,108,544
-- Fit time: 6.28s
+- Fit time: 6.55s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -111,7 +111,7 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 - Training rows: 50,000 (subsampled from 221,345 pooled rows, seed=42)  |  pooled test rows: 128,208
 - **Per-engine (canonical, one RUL per test engine at its last cycle -- 39 engines): RMSE 37.00  |  NASA score 493,077.0**
 - Per-sample (over all 128,208 test rows): RMSE 15.56  |  NASA score 63,863,658,777
-- Fit time: 31.85s
+- Fit time: 32.49s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -132,7 +132,7 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 - Training rows: 50,000 (subsampled from 221,345 pooled rows, seed=42)  |  pooled test rows: 128,208
 - **Per-engine (canonical, one RUL per test engine at its last cycle -- 39 engines): RMSE 18.73  |  NASA score 1,600.3**
 - Per-sample (over all 128,208 test rows): RMSE 15.21  |  NASA score 593,988
-- Fit time: 22.23s
+- Fit time: 22.74s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -148,12 +148,33 @@ Per-dataset test RMSE (same trained model, broken out by source file):
 | DS08a | 13.43 | 18618 |
 | DS08c | 12.78 | 10592 |
 
+## Pipeline: `real_memory`
+
+- Training rows: 50,000 (subsampled from 221,345 pooled rows, seed=42)  |  pooled test rows: 128,208
+- **Per-engine (canonical, one RUL per test engine at its last cycle -- 39 engines): RMSE 18.50  |  NASA score 1,658.3**
+- Per-sample (over all 128,208 test rows): RMSE 15.31  |  NASA score 597,396
+- Fit time: 16.31s
+
+Per-dataset test RMSE (same trained model, broken out by source file):
+
+| dataset | RMSE | n |
+|---|---:|---:|
+| DS01 | 13.86 | 13678 |
+| DS02 | 10.65 | 6270 |
+| DS03 | 13.53 | 21261 |
+| DS04 | 19.41 | 18014 |
+| DS05 | 13.53 | 12811 |
+| DS06 | 15.13 | 12613 |
+| DS07 | 20.20 | 14351 |
+| DS08a | 13.18 | 18618 |
+| DS08c | 12.77 | 10592 |
+
 ## Pipeline: `best_full_de_minmax_2pass`
 
 - Training rows: 50,000 (subsampled from 221,345 pooled rows, seed=42)  |  pooled test rows: 128,208
 - **Per-engine (canonical, one RUL per test engine at its last cycle -- 39 engines): RMSE 16.07  |  NASA score 2,176.3**
 - Per-sample (over all 128,208 test rows): RMSE 15.02  |  NASA score 637,693
-- Fit time: 59.91s
+- Fit time: 58.59s
 
 Per-dataset test RMSE (same trained model, broken out by source file):
 
@@ -189,4 +210,4 @@ Note on protocol: N-CMAPSS papers evaluate **continuous prognostics** (RMSE per-
 
 Citations: Arias Chao, Kulkarni, Goebel, Fink (2022), Reliability Eng. & System Safety 217:107961 (arXiv:2003.00732); Custode, Mo, Ferigo, Iacca (2022), Algorithms 15(3):98 (DOI 10.3390/a15030098); Cheng & Miao (2026), CruiseBench (arXiv:2607.19380); de Pater & Mitici (2023), Eng. Appl. of AI 117; dataset: Arias Chao et al. (2021), Data 6(1):5 (DOI 10.3390/data6010005).
 
-Total wall time: 294.8s
+Total wall time: 370.2s
