@@ -352,6 +352,22 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       divergence `table_concrete_reconciliation` already documents on Concrete. This is now the
       dataset/model-family decision the item was waiting on: both datasets are promoted, and the
       instability is itself worth a sentence in Chapter 6, not merely a caveat here.
+- [ ] ⬜ **C14 — Promote the turbofan-RUL case study to the ten-seed harness** *(Ch 4 §4.4.1,
+      Table 4.10, Appendix A.7.1).* N-CMAPSS DS02 RUL is currently *demonstrated* (single-run,
+      `FuzzySystemsExperiments/cmapss_rul_full_analysis.py` + `cmapss_rul_full_analysis_report.md`),
+      not *measured*: it beats the public-file CNN/MLP baselines at seconds-scale on their 20-channel
+      input set, which is exactly why it should not stay a single shot. Needs a seeded generator
+      under `reproduce/tables/` reporting mean ± s.d. under the Goal-G4 protocol. Blocker on
+      redistribution, not compute: the 10 `.h5` files total ~28 GB and are gitignored, so the
+      generator must document the manual `NASA-CMAPSS/` download the way `DATASETS.md` does for
+      RT-IOT2022. Until then §4.4.1 is labelled *demonstrated* and the figure a single-run one.
+- [ ] ⬜ **C15 — Verify the DS02 CNN/MLP baseline figures from the source** *(Ch 4 §4.4.1).* The
+      7.22 / 8.34 public-file re-runs are attributed to `custode2022evolutionary` and corroborated
+      from search snippets and co-author code, but not read from the paper's own table (MDPI blocks
+      automated fetch). Confirm via institutional access before the comparison is cited as settled;
+      the `.bib` entry and §4.4.1 both flag this. Metadata for the entry is `[V]`; the *figures* are
+      not content-verified, the same "`[V]` is metadata, not content" distinction the bibliography
+      draws for `deshpande2024scalable`.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because
