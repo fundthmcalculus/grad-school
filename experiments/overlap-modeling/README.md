@@ -2,11 +2,21 @@
 
 **Status:** measured, negative · **Started:** 2026-08-18
 
-**Verdict in one line:** the mechanism is real and large against per-bucket
-consequent fitting (+0.17 test R² on concrete), and worth nothing against the
-firing-weighted solve TRIBBLE actually ships, which is already a soft-boundary
-fit. The one arm that beat the baseline was reproduced by a random-row control.
+**Verdict in one line:** overlap's mechanism is real and large against per-bucket
+consequent fitting (+0.17 test R² on concrete) and worth nothing against the
+firing-weighted solve TRIBBLE ships, which is already a soft-boundary fit — and
+the follow-ups explain why. Per-bucket solving makes each rule a far better local
+approximator (local R² 0.61 → 0.94) and the blended model worse; compact
+antecedent support does **not** close that gap (flat to four decimals from 93%
+down to 62% of rules firing per row). The only arm that survives its own control
+is blend sharpening on the *global* solve, +0.021 on bikeshare at 60/60 cells.
 See [`RESULTS.md`](RESULTS.md).
+
+Three stages: [`run_experiment.py`](run_experiment.py) (overlap),
+[`run_local.py`](run_local.py) (per-bucket solving — fit or blend?),
+[`run_support.py`](run_support.py) (compact support), with
+[`analyze.py`](analyze.py), [`analyze_local.py`](analyze_local.py) and
+[`analyze_support.py`](analyze_support.py) generating the tables.
 
 [`RESULTS.md`](RESULTS.md) is the laboratory record: the hypotheses as
 registered before the run of record, and how each one scored. Generated tables
