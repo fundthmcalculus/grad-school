@@ -75,6 +75,12 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
         norm_conorm="hamacher",
         l2_reg=0.01,
         detect_interactions=False,
+        select_interactions=False,
+        interaction_top_p=0.95,
+        n_output_buckets=2,
+        member_function="gaussian",
+        trapz_method="fast",
+        trapz_width_reg=0.0,
         max_samples=2000,
         random_state=42,
     ):
@@ -98,6 +104,12 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
         self.norm_conorm = norm_conorm
         self.l2_reg = l2_reg
         self.detect_interactions = detect_interactions
+        self.select_interactions = select_interactions
+        self.interaction_top_p = interaction_top_p
+        self.n_output_buckets = n_output_buckets
+        self.member_function = member_function
+        self.trapz_method = trapz_method
+        self.trapz_width_reg = trapz_width_reg
         self.max_samples = max_samples
         self.random_state = random_state
 
@@ -173,6 +185,12 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
             norm_conorm=self.norm_conorm,
             l2_reg=self.l2_reg,
             detect_interactions=self.detect_interactions,
+            select_interactions=self.select_interactions,
+            interaction_top_p=self.interaction_top_p,
+            n_output_buckets=self.n_output_buckets,
+            member_function=self.member_function,
+            trapz_method=self.trapz_method,
+            trapz_width_reg=self.trapz_width_reg,
         )
         with contextlib.redirect_stdout(io.StringIO()):  # TRIBBLE is chatty
             self.regressor_.fit(X_train, y_train)
