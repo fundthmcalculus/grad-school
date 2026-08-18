@@ -26,7 +26,7 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CELL = ["dataset", "n_buckets", "order", "seed"]
-FAMILIES = ["soft-ante", "local-overlap", "full-overlap"]
+FAMILIES = ["soft-ante", "soft-random", "local-overlap", "full-overlap"]
 
 
 def load(path):
@@ -105,6 +105,35 @@ def headline(df) -> str:
                 f"| fusion | {dataset} | {len(part)} | {_pm(part.r2_test_base)} | "
                 f"{_pm(part.r2_test)} | {_pm(diffs)} | "
                 f"{int((diffs > 0).sum())}/{len(diffs)} | "
+                f"{'--' if p is None else f'{p:.2g}'} |")
+
+    # soft-ante against its own control, cell by cell and with the same number of
+    # validation candidates on each side, which is the comparison that isolates
+    # "the boundary got softer" from "every membership fit got more rows".
+    sr = df[df.arm == "soft-random"]
+    sa = df[df.arm == "soft-ante"]
+    if not sr.empty and not sa.empty:
+        pick_sa = sa.loc[sa.groupby(CELL)["r2_val"].idxmax()].set_index(CELL)
+        pick_sr = (sr.loc[sr.groupby(CELL)["r2_val"].idxmax()].set_index(CELL)
+                   [["r2_test"]].rename(columns={"r2_test": "r2_test_rand"}))
+        joined = pick_sa.join(pick_sr, how="inner").join(base, how="inner")
+        lines += ["", "### soft-ante against its own control", "",
+                  "`soft-random` borrows the same rows-per-fit with the same weights from",
+                  "the same neighbours, drawn uniformly instead of at the shared edge, and",
+                  "is selected over the same 14 candidates. `Δ vs random` is therefore the",
+                  "part of the gain attributable to the *boundary*, with the extra data and",
+                  "the extra selection freedom held fixed.", "",
+                  "| dataset | cells | baseline | soft-random | soft-ante | Δ random−base "
+                  "| Δ ante−random | wins | Wilcoxon p |",
+                  "|---|---:|---|---|---|---|---|---:|---:|"]
+        for dataset, part in joined.groupby(level="dataset"):
+            d_rand = (part.r2_test_rand - part.r2_test_base).to_numpy()
+            d_ante = (part.r2_test - part.r2_test_rand).to_numpy()
+            p = _wilcoxon(d_ante)
+            lines.append(
+                f"| {dataset} | {len(part)} | {_pm(part.r2_test_base)} | "
+                f"{_pm(part.r2_test_rand)} | {_pm(part.r2_test)} | {_pm(d_rand)} | "
+                f"{_pm(d_ante)} | {int((d_ante > 0).sum())}/{len(d_ante)} | "
                 f"{'--' if p is None else f'{p:.2g}'} |")
 
     # The local family's own control: local-overlap against local-hard, which is
@@ -244,8 +273,8 @@ def figure(df, fractions, path) -> str | None:
     fig, axes = plt.subplots(1, len(datasets), figsize=(4.1 * len(datasets), 3.6),
                              sharey=False)
     axes = np.atleast_1d(axes)
-    colors = {"soft-ante": "#1f77b4", "local-overlap": "#d62728",
-              "full-overlap": "#9467bd"}
+    colors = {"soft-ante": "#1f77b4", "soft-random": "#2ca02c",
+              "local-overlap": "#d62728", "full-overlap": "#9467bd"}
     for ax, dataset in zip(axes, datasets):
         part = df[df.dataset == dataset]
         base = part[part.arm == "baseline"].r2_test.mean()

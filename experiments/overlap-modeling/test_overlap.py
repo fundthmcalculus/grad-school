@@ -122,12 +122,44 @@ def test_a_shared_point_counts_fully_in_both_rules():
     np.testing.assert_allclose(W[shared].sum(axis=1), 2.0)
 
 
+def test_random_band_matches_the_adjacent_band_in_everything_but_row_identity():
+    """The control's whole job: same counts, same weights, structure destroyed."""
+    y = np.arange(60, dtype=float)
+    labels = np.repeat([0, 1, 2], 20)
+    for shape in ("flat", "ramp"):
+        adj = overlap_weights(y, labels, 3, 0.4, shape=shape, band="adjacent")
+        rnd = overlap_weights(y, labels, 3, 0.4, shape=shape, band="random",
+                              random_state=11)
+        np.testing.assert_array_equal((adj > 0).sum(axis=0), (rnd > 0).sum(axis=0))
+        for b in range(3):
+            np.testing.assert_allclose(np.sort(adj[adj[:, b] > 0, b]),
+                                       np.sort(rnd[rnd[:, b] > 0, b]))
+        assert not np.array_equal(adj > 0, rnd > 0), "the control did not move any row"
+    # The ends stay single-sided: a random band still only reaches into a real
+    # neighbour, so bucket 0 cannot gain a point from bucket 2.
+    rnd = overlap_weights(y, labels, 3, 1.0, band="random", random_state=11)
+    assert set(np.flatnonzero(rnd[:, 0])) <= set(range(40))
+
+
+def test_random_band_is_reproducible_and_seed_dependent():
+    y = np.arange(60, dtype=float)
+    labels = np.repeat([0, 1, 2], 20)
+    kw = dict(shape="flat", band="random")
+    a = overlap_weights(y, labels, 3, 0.4, random_state=5, **kw)
+    np.testing.assert_array_equal(a, overlap_weights(y, labels, 3, 0.4,
+                                                     random_state=5, **kw))
+    assert not np.array_equal(a, overlap_weights(y, labels, 3, 0.4,
+                                                 random_state=6, **kw))
+
+
 def test_fraction_is_validated():
     y, labels = np.arange(10, dtype=float), np.repeat([0, 1], 5)
     with pytest.raises(ValueError):
         overlap_weights(y, labels, 2, fraction=1.5)
     with pytest.raises(ValueError):
         overlap_weights(y, labels, 2, fraction=0.2, shape="gaussian")
+    with pytest.raises(ValueError):
+        overlap_weights(y, labels, 2, fraction=0.2, band="nearby")
 
 
 def test_weighted_means_move_toward_the_neighbours():

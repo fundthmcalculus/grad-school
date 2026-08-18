@@ -6,14 +6,26 @@ that differs between them is where the overlap is applied and how wide it is:
 
     baseline        hard buckets, global firing-weighted ridge   [the shipped model]
     soft-ante       overlapped membership-function fits, global solve
-    local-hard      per-rule fit on the hard bucket only         [control for "local"]
-    local-overlap   per-rule fit on the overlapped slice         [the literal request]
+    soft-random     same, but the band is drawn at random         [control for soft-ante]
+    local-hard      per-rule fit on the hard bucket only          [control for "local"]
+    local-overlap   per-rule fit on the overlapped slice          [the literal request]
     full-overlap    overlapped antecedents *and* overlapped per-rule fits
     fusion          global solve + adjacent-consequent agreement penalty
+
+Two of the six are controls, and each answers a specific objection.
 
 `local-hard` is what makes the reading of `local-overlap` possible: going local
 is itself a large change, and without that control any difference would be a
 mixture of "local instead of global" and "soft instead of hard".
+
+`soft-random` is what makes `soft-ante` readable. Widening a bucket's fitting
+slice does three things at once -- it softens the boundary, it puts more rows
+into every membership fit, and (because the sweep selects on validation) it hands
+that family 14 candidates where the baseline has one. `soft-random` borrows the
+same number of rows with the same weights from the same neighbours, drawn
+uniformly rather than at the shared edge, so it holds all three of those fixed
+and varies only the boundary structure. Any `soft-ante` gain that `soft-random`
+also shows is not a gain from softening a boundary.
 
 Protocol
 --------
@@ -199,11 +211,13 @@ DEFAULT_DATASETS = ["concrete", "bikeshare", "synth-smooth", "synth-piecewise"]
 def arm_configs():
     """(arm, label, kwargs) for every configuration, in report order."""
     out = [("baseline", "baseline", dict(overlap=0.0, consequent_fit="global"))]
-    for shape in SHAPES:
-        for f in FRACTIONS:
-            out.append(("soft-ante", f"soft-ante/{shape}/{f:g}", dict(
-                overlap=f, overlap_shape=shape, overlap_antecedents=True,
-                overlap_means=True, consequent_fit="global")))
+    for arm, band in (("soft-ante", "adjacent"), ("soft-random", "random")):
+        for shape in SHAPES:
+            for f in FRACTIONS:
+                out.append((arm, f"{arm}/{shape}/{f:g}", dict(
+                    overlap=f, overlap_shape=shape, overlap_band=band,
+                    overlap_antecedents=True, overlap_means=True,
+                    consequent_fit="global")))
     out.append(("local-hard", "local-hard", dict(overlap=0.0, consequent_fit="local")))
     for shape in SHAPES:
         for f in FRACTIONS:

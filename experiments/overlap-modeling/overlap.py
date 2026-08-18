@@ -116,12 +116,17 @@ _SIGMA_FLOOR_FRAC = 1e-3
 # --------------------------------------------------------------------------
 # The overlap membership matrix
 # --------------------------------------------------------------------------
+VALID_BANDS = ("adjacent", "random")
+
+
 def overlap_weights(
     y,
     labels,
     n_buckets: int,
     fraction: float,
     shape: str = "flat",
+    band: str = "adjacent",
+    random_state: int = 42,
 ) -> np.ndarray:
     """Per-(sample, bucket) fitting weights with rank-space overlap bands.
 
@@ -143,9 +148,20 @@ def overlap_weights(
     reproducibly. A band boundary that lands inside a run of equal target values
     therefore takes some of them and not others; on a heavily tied target
     prefer ``shape="flat"``, whose weights do not depend on within-band rank.
+
+    ``band="random"`` is the control, not a mode anyone would deploy. It borrows
+    the same *number* of rows from each neighbour and hands them the same
+    *multiset* of weights, but draws them uniformly from that neighbour instead
+    of from the shared edge. Everything the adjacent band changes except the one
+    thing it is supposed to change is therefore held fixed: rows per fit,
+    weight distribution, the widened slice's effect on BIC component selection,
+    and the number of candidates a validation sweep gets to choose from. A gain
+    that the random band reproduces is not a gain from softening a boundary.
     """
     if not VALID_SHAPES.count(shape):
         raise ValueError(f"shape must be one of {VALID_SHAPES}, got {shape!r}")
+    if band not in VALID_BANDS:
+        raise ValueError(f"band must be one of {VALID_BANDS}, got {band!r}")
     if not (0.0 <= fraction <= 1.0):
         raise ValueError(f"fraction must be in [0, 1], got {fraction!r}")
 
@@ -169,11 +185,18 @@ def overlap_weights(
             if m <= 0:
                 continue
             ordered = src[np.argsort(y[src], kind="stable")]
-            # `band` runs from the shared edge outward, so index 0 is the point
+            # The band runs from the shared edge outward, so index 0 is the point
             # most like this bucket's own and the ramp can decay along it.
-            band = ordered[-m:][::-1] if take_high else ordered[:m]
+            rows = ordered[-m:][::-1] if take_high else ordered[:m]
             w = 1.0 - np.arange(m) / m if shape == "ramp" else np.ones(m)
-            W[band, b] = np.maximum(W[band, b], w)
+            if band == "random":
+                # Same count, same weights, boundary structure destroyed. Seeded
+                # per (bucket, neighbour) so the two sides draw independently and
+                # the whole matrix is reproducible.
+                rng = np.random.default_rng(
+                    (random_state, b, neighbour, n_buckets))
+                rows = rng.choice(src, size=m, replace=False)
+            W[rows, b] = np.maximum(W[rows, b], w)
 
     return W
 
@@ -509,6 +532,10 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         reproduces hard boundaries.
     overlap_shape : {"flat", "ramp"}, default "flat"
         Weight profile across the band. See `overlap_weights`.
+    overlap_band : {"adjacent", "random"}, default "adjacent"
+        ``"random"`` is the control arm: same row count and same weights, drawn
+        anywhere in the neighbour instead of at the shared edge. See
+        `overlap_weights`.
     overlap_antecedents : bool, default True
         Fit each bucket's membership functions on its overlapped slice. The only
         switch that changes predict-time behaviour (via the firing strengths).
@@ -546,6 +573,7 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         max_samples=None,
         overlap=0.0,
         overlap_shape="flat",
+        overlap_band="adjacent",
         overlap_antecedents=True,
         overlap_means=True,
         consequent_fit="global",
@@ -568,6 +596,7 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         self.max_samples = max_samples
         self.overlap = overlap
         self.overlap_shape = overlap_shape
+        self.overlap_band = overlap_band
         self.overlap_antecedents = overlap_antecedents
         self.overlap_means = overlap_means
         self.consequent_fit = consequent_fit
@@ -608,7 +637,8 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
 
         self.overlap_weights_ = overlap_weights(
             y_array, hard_labels, self.n_output_buckets,
-            fraction=self.overlap, shape=self.overlap_shape)
+            fraction=self.overlap, shape=self.overlap_shape,
+            band=self.overlap_band, random_state=self.random_state)
 
         self.feature_differentiators_ = calculate_gaussian_correlation(
             X_df, y_partitioned["y_bucket"], top_n=self.top_n)
