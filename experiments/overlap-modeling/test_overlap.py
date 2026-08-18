@@ -26,6 +26,11 @@ from overlap import (  # noqa: E402
     overlap_weights,
     solve_consequents_fused,
 )
+from tribblefis.gauss_data import (  # noqa: E402
+    FeatureModel,
+    GaussianMixtureModel,
+    LabelModel,
+)
 from tribblefis.gauss_math import (  # noqa: E402
     create_gaussian_membership_dict,
     tsk_firing_strengths,
@@ -603,3 +608,147 @@ def test_sharpening_is_applied_in_the_solve_as_well_as_the_prediction(data):
     assert not np.allclose(a.corr_terms_, b.corr_terms_), \
         "the exponent did not reach the consequent solve"
     assert not np.allclose(a.predict(X), b.predict(X))
+
+
+# --------------------------------------------------------------------------
+# Stage 3: compact support
+# --------------------------------------------------------------------------
+def test_clamped_gaussian_is_not_admitted_to_the_compiled_kernel():
+    """The trap this type exists to avoid, pinned so a rebuild cannot re-open it.
+
+    `kernel.compile_model` admits a model on `isinstance(mf, GaussianMembership)`
+    and then evaluates a *plain* Gaussian. If `ClampedGaussianMembership` were a
+    subclass it would pass that check and the clamp would be silently dropped
+    wherever the Cython extension is built -- which is not this environment, so the
+    failure would never show up here and always show up in production.
+    """
+    from tribblefis import kernel
+    from tribblefis.gauss_data import GaussianMembership as G
+
+    from overlap import ClampedGaussianMembership as C
+
+    assert not isinstance(C.create(0.0, 1.0), G)
+    assert not issubclass(C, G)
+
+    model = GaussianMixtureModel(feature_models={
+        "a": FeatureModel(label_models={0: LabelModel(memberships=[C.create(0.0, 1.0)])})})
+    with pytest.raises(kernel.NotCompilable):
+        kernel.compile_model(model, ["a"])
+
+
+@pytest.mark.parametrize("k", [2.0, 2.75, 3.0])
+def test_clamped_gaussian_reaches_exactly_zero_at_the_cutoff(k):
+    from overlap import ClampedGaussianMembership as C
+
+    grid = np.linspace(-6, 6, 2001)
+    smooth = C.create(0.0, 1.0, k=k, smooth=True)
+    hard = C.create(0.0, 1.0, k=k, smooth=False)
+
+    for mf in (smooth, hard):
+        vals = mf.evaluate(grid)
+        assert np.all(vals >= 0.0)
+        assert mf.evaluate(np.array([0.0]))[0] == pytest.approx(1.0)
+        assert np.all(vals[np.abs(grid) > k] == 0.0), "support is not compact"
+
+    # The smooth form meets the axis continuously; the hard one steps down by
+    # exp(-k^2/2), which is what "non-linear clamp" is there to avoid.
+    just_inside = np.array([k - 1e-6])
+    assert smooth.evaluate(just_inside)[0] == pytest.approx(0.0, abs=1e-5)
+    assert hard.evaluate(just_inside)[0] == pytest.approx(np.exp(-0.5 * k ** 2), rel=1e-3)
+
+
+def test_clamped_gaussian_matches_a_plain_gaussian_well_inside_the_cutoff():
+    """A large k must leave the shape alone where it matters."""
+    from tribblefis.gauss_data import GaussianMembership
+
+    from overlap import ClampedGaussianMembership as C
+
+    grid = np.linspace(-2.0, 2.0, 401)
+    plain = GaussianMembership.create(0.3, 0.8).evaluate(grid)
+    clamped = C.create(0.3, 0.8, k=12.0, smooth=True).evaluate(grid)
+    np.testing.assert_allclose(clamped, plain, atol=1e-10)
+
+
+def test_ruspini_terms_partition_the_axis_but_one_bucket_does_not(data):
+    """The correction to a wrong prediction of mine, kept as a test.
+
+    A Ruspini partition sums to exactly 1 at every point -- so it was tempting to
+    expect a ruspini model to have full *rule* coverage. It does not, and the two
+    statements are different: the partition tiles the axis, but each bucket is
+    given only the term(s) nearest its own centres, so a bucket's own membership
+    covers a fraction of the axis and the AND over features covers less again.
+    Coverage of the axis by the term set does not imply coverage by any one rule.
+    """
+    from tribblefis.ruspini import verify_partition_of_unity
+
+    X, y = data
+    m = OverlapTribbleRegressor(
+        n_output_buckets=5, output_partition="quantile", tsk_order="1st",
+        membership="ruspini", random_state=7).fit(X, y)
+
+    grid = np.linspace(-0.5, 1.5, 1001)
+    for feature_model in m.model_.feature_models.values():
+        terms = {}
+        for lmodel in feature_model.label_models.values():
+            for mf in lmodel.memberships:
+                terms[mf.id] = mf
+        assert verify_partition_of_unity(list(terms.values()), grid), \
+            "the shared term set is not a partition of unity"
+
+    assert m.coverage(X)["uncovered"] > 0.0, \
+        "a per-bucket selection from a partition should still leave gaps"
+
+
+@pytest.mark.parametrize("membership", ["gaussian", "clamped", "trapezoid", "ruspini"])
+def test_every_membership_shape_fits_predicts_and_reports_coverage(data, membership):
+    X, y = data
+    m = OverlapTribbleRegressor(
+        n_output_buckets=5, output_partition="quantile", tsk_order="2nd",
+        l2_reg=1e-2, membership=membership, overlap=0.25, consequent_fit="local",
+        random_state=7).fit(X, y)
+    pred = m.predict(X)
+    assert pred.shape == (len(X),) and np.all(np.isfinite(pred))
+    cov = m.coverage(X)
+    assert 0.0 <= cov["uncovered"] <= 1.0
+    assert 0.0 <= cov["active_frac"] <= 1.0
+
+
+def test_gaussian_membership_covers_everything_and_clamping_reduces_it(data):
+    """The premise of stage 3: an unclamped Gaussian model fires everywhere."""
+    X, y = data
+
+    def cov(**kw):
+        return OverlapTribbleRegressor(
+            n_output_buckets=5, output_partition="quantile", tsk_order="1st",
+            random_state=7, **kw).fit(X, y).coverage(X)
+
+    plain = cov(membership="gaussian")
+    # No row is ever left unanswered: with infinite support the total firing is
+    # strictly positive everywhere.
+    assert plain["uncovered"] == 0.0
+    # `active_frac` counts rules above 1e-6, so it is high but not exactly 1 --
+    # a Gaussian past about 5 sigma is nonzero and still below that floor. The
+    # claim being tested is that clamping *reduces* it, not that it starts at 1.
+    assert plain["active_frac"] > 0.8
+
+    for k in (3.0, 2.0):
+        tight = cov(membership="clamped", clamp_k=k)
+        assert tight["active_frac"] < plain["active_frac"], f"k={k} did not localize"
+    assert cov(membership="clamped", clamp_k=2.0)["active_frac"] < \
+        cov(membership="clamped", clamp_k=3.0)["active_frac"]
+
+
+def test_coverage_report_counts_uncovered_rows():
+    from overlap import coverage_report
+
+    firing = np.array([[0.5, 0.2], [0.0, 0.0], [1e-9, 0.0], [0.9, 0.0]])
+    rep = coverage_report(firing)
+    assert rep["uncovered"] == pytest.approx(0.5)      # rows 1 and 2
+    assert rep["mean_active"] == pytest.approx((2 + 0 + 0 + 1) / 4)
+    assert rep["active_frac"] == pytest.approx(rep["mean_active"] / 2)
+
+
+def test_membership_is_validated(data):
+    X, y = data
+    with pytest.raises(ValueError):
+        OverlapTribbleRegressor(membership="bell").fit(X, y)

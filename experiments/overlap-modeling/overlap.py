@@ -75,6 +75,8 @@ this module measures can be attributed to the overlap.
 
 from __future__ import annotations
 
+import typing
+import uuid
 import warnings
 
 import numpy as np
@@ -316,6 +318,35 @@ def build_overlap_membership_model(
     return GaussianMixtureModel(feature_models=ordered_models)
 
 
+def _build_with_overlap_slices(build_fn, W: np.ndarray, index, feature_names):
+    """Run a whole-model fitter once per bucket, each on that bucket's widened slice.
+
+    `create_trapz_membership_dict` fits every (feature, label) pair in one call,
+    so unlike `fit_gaussians` it cannot be handed a single bucket's support. This
+    calls it once per bucket with a label series that marks only that bucket's
+    overlapped rows -- every other row labelled -1, which is never a bucket -- and
+    keeps the one label model it asked for. That is ``n_buckets`` fits of a
+    ``n_buckets``-label model, so it costs more than the Gaussian path; it is the
+    price of reusing the library's fitter instead of reimplementing a weighted
+    trapezoid EM, and it keeps the two membership families comparable.
+    """
+    n_buckets = W.shape[1]
+    occupied = [b for b in range(n_buckets) if bool((W[:, b] > 0).any())]
+    per_feature: dict = {name: {} for name in feature_names}
+    for b in occupied:
+        support = W[:, b] > 0
+        labels = pd.Series(np.where(support, b, -1), index=index)
+        sub = build_fn(labels)
+        for name in feature_names:
+            fmodel = sub.feature_models.get(name)
+            if fmodel is None or b not in fmodel.label_models:
+                per_feature[name][b] = LabelModel(memberships=[])
+            else:
+                per_feature[name][b] = fmodel.label_models[b]
+    return GaussianMixtureModel(feature_models={
+        name: FeatureModel(label_models=per_feature[name]) for name in feature_names})
+
+
 # --------------------------------------------------------------------------
 # Consequents
 # --------------------------------------------------------------------------
@@ -525,6 +556,23 @@ def solve_consequents_fused(
     return corr, coeffs[:, 0].copy()
 
 
+def _mf_bounds(mf, gaussian_k: float = 4.0) -> tuple[float, float]:
+    """A plotting/scoring range for any membership shape this experiment builds.
+
+    Deliberately not `gauss_data.mf_interval`: that raises `TypeError` on a type
+    it does not know, and this has to keep working for `ClampedGaussianMembership`
+    (and anything added later) without editing the library. Falls back to the
+    `mu +/- gaussian_k * sigma` convention for anything carrying `mu`/`sigma`.
+    """
+    if hasattr(mf, "k") and hasattr(mf, "sigma"):          # clamped Gaussian
+        return mf.mu - mf.k * mf.sigma, mf.mu + mf.k * mf.sigma
+    if hasattr(mf, "d"):                                   # trapezoid
+        return mf.a, mf.d
+    if hasattr(mf, "c") and hasattr(mf, "a"):              # triangle
+        return mf.a, mf.c
+    return mf.mu - gaussian_k * mf.sigma, mf.mu + gaussian_k * mf.sigma
+
+
 def sharpen_firing(firing_strengths: np.ndarray, gamma: float) -> np.ndarray:
     """Raise firing strengths to ``gamma`` before normalization.
 
@@ -610,6 +658,29 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         After solving, fit a per-rule affine recalibration ``(a_r, b_r)`` of the
         blend against the training fold (`solve_blend_recalibration`). Cannot
         change what a rule computes, only how it is combined.
+    membership : str, default "gaussian"
+        Antecedent shape, one of `VALID_MEMBERSHIPS`. ``"gaussian"`` has infinite
+        support, so every rule fires everywhere. ``"clamped"`` keeps the Gaussian
+        fit and zeroes it past `clamp_k` sigma. ``"trapezoid"`` is the library's
+        fast histogram fitter; ``"trapezoid-em"``/``"triangle-em"`` are its EM
+        fitter, kept reachable but ~4000x slower. ``"ruspini"`` re-expresses each
+        feature as a shared triangular partition that is both compactly supported
+        *and* a partition of unity -- see `ruspinize_features`.
+    trapz_ramp : float, default 0.1
+        `ramp_width_ratio` for the fast trapezoid fitter (shoulder width as a
+        fraction of the bin count); `merge_width_ratio` is set to twice it, the
+        library's own default ratio.
+    ruspini_tol : float, default 0.02
+        Apex-merge tolerance for ``membership="ruspini"``, in the feature's units
+        (inputs are unit-scaled, so 0.02 is 2% of the range).
+    clamp_k : float, default 3.0
+        Cutoff in standard deviations for ``membership="clamped"``. 3.0 is the
+        convention `gauss_data.mf_interval` already uses for a Gaussian's
+        effective support.
+    clamp_smooth : bool, default True
+        True subtracts the boundary value and rescales, so membership reaches zero
+        continuously at the cutoff. False truncates, leaving a step of
+        ``exp(-k^2/2)`` there.
     blend_sharpen : float, default 1.0
         Exponent applied to the firing strengths before normalization, in the
         solve and at predict time alike. >1 concentrates the blend on the
@@ -653,6 +724,11 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         blend_recalibrate=False,
         blend_recal_l2=0.0,
         blend_sharpen=1.0,
+        membership="gaussian",
+        clamp_k=3.0,
+        clamp_smooth=True,
+        trapz_ramp=0.1,
+        ruspini_tol=0.02,
     ):
         self.top_n = top_n
         self.top_p = top_p
@@ -680,10 +756,66 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         self.blend_recalibrate = blend_recalibrate
         self.blend_recal_l2 = blend_recal_l2
         self.blend_sharpen = blend_sharpen
+        self.membership = membership
+        self.clamp_k = clamp_k
+        self.clamp_smooth = clamp_smooth
+        self.trapz_ramp = trapz_ramp
+        self.ruspini_tol = ruspini_tol
 
     def _norms(self):
         return resolve_norm_pair(
             self.norm_conorm, self.t_norm, self.t_conorm, self.allow_mixed_norms)
+
+    def _build_antecedents(self, X_df, y_partitioned, soft_ante):
+        """The membership model, with the overlap applied to each bucket's slice.
+
+        Every fitter here takes the same ``(X, labels, features, ...)`` shape, so
+        the overlap reaches all of them the same way: the fitter is handed a
+        synthetic label series marking this bucket's *widened* support instead of
+        its hard one. One implementation of "which rows does this bucket see",
+        across every membership shape, rather than one per shape.
+
+        ``"trapezoid"`` uses the histogram fitter
+        (`trapz_math_fast.create_trapz_membership_dict_fast`): 0.01 s against 42 s
+        for the EM fitter on concrete, which is the difference between a sweep and
+        an afternoon. ``"trapezoid-em"`` and ``"triangle-em"`` keep the EM path
+        reachable for a spot check; they are far too slow for the arm matrix,
+        especially on the overlap path, which fits once per bucket.
+        """
+        if self.membership in ("trapezoid", "trapezoid-em", "triangle-em"):
+            if self.membership == "trapezoid":
+                from tribblefis.trapz_math_fast import (
+                    create_trapz_membership_dict_fast as _fit)
+
+                def build(labels):
+                    return _fit(X_df, labels, top_n_var_names=self.top_features_,
+                                ramp_width_ratio=self.trapz_ramp,
+                                merge_width_ratio=2.0 * self.trapz_ramp)
+            else:
+                from tribblefis.trapz_math import create_trapz_membership_dict
+                shape = ("trapezoid" if self.membership == "trapezoid-em"
+                         else "triangle")
+
+                def build(labels):
+                    return create_trapz_membership_dict(
+                        X_df, labels, top_n_var_names=self.top_features_,
+                        n_trapezoids=self.n_gaussians, max_samples=self.max_samples,
+                        random_state=self.random_state, verbose=False, shape=shape)
+
+            if not soft_ante:
+                return build(y_partitioned["y_bucket"])
+            return _build_with_overlap_slices(
+                build, self.overlap_weights_, X_df.index, self.top_features_)
+
+        if soft_ante:
+            return build_overlap_membership_model(
+                X_df, self.overlap_weights_, self.top_features_,
+                n_gaussians=self.n_gaussians, max_samples=self.max_samples,
+                random_state=self.random_state, shape=self.overlap_shape)
+        return create_gaussian_membership_dict(
+            X_df, y_partitioned["y_bucket"], top_n_var_names=self.top_features_,
+            n_gaussians=self.n_gaussians, max_samples=self.max_samples,
+            random_state=self.random_state)
 
     def fit(self, X, y):
         if self.consequent_fit not in VALID_CONSEQUENT_FITS:
@@ -728,17 +860,18 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         # about which rows each *rule* is fitted from, not about which columns are
         # informative, and letting it move the feature set would confound every
         # arm with a different input space.
+        if self.membership not in VALID_MEMBERSHIPS:
+            raise ValueError(f"membership must be one of {VALID_MEMBERSHIPS}, "
+                             f"got {self.membership!r}")
+
         use_overlap = self.overlap > 0.0
-        if use_overlap and self.overlap_antecedents:
-            self.model_ = build_overlap_membership_model(
-                X_df, self.overlap_weights_, self.top_features_,
-                n_gaussians=self.n_gaussians, max_samples=self.max_samples,
-                random_state=self.random_state, shape=self.overlap_shape)
-        else:
-            self.model_ = create_gaussian_membership_dict(
-                X_df, y_partitioned["y_bucket"], top_n_var_names=self.top_features_,
-                n_gaussians=self.n_gaussians, max_samples=self.max_samples,
-                random_state=self.random_state)
+        soft_ante = use_overlap and self.overlap_antecedents
+        self.model_ = self._build_antecedents(X_df, y_partitioned, soft_ante)
+        if self.membership == "clamped":
+            self.model_ = clamp_model(self.model_, k=self.clamp_k,
+                                      smooth=self.clamp_smooth)
+        elif self.membership == "ruspini":
+            self.model_ = ruspinize_features(self.model_, merge_tol=self.ruspini_tol)
 
         self.n_rules_ = self.model_.n_rules
 
@@ -851,6 +984,15 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         return np.sum(norm_fs * (self.blend_a_[None, :]
                                  + self.blend_b_[None, :] * rule_vals), axis=1)
 
+    def coverage(self, X) -> dict:
+        """`coverage_report` for this model on `X`. See that function."""
+        check_is_fitted(self)
+        X_df = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(
+            X, columns=self.feature_names_in_)
+        firing, _ = tsk_firing_strengths(
+            X_df[self.top_features_], self.model_, norms=self._norms())
+        return coverage_report(sharpen_firing(firing, self.blend_sharpen))
+
     def local_approximation_r2(self, X, y, hard_labels=None) -> float:
         """R2 of each row's own-bucket rule, ignoring the blend. See `local_rule_r2`.
 
@@ -882,19 +1024,20 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
             keys = feature_model.ordered_keys
             envelopes, grids = {}, []
             for k in keys:
-                mfs = feature_model.label_models[k].memberships
-                if mfs:
-                    grids.extend([m.mu - 4 * m.sigma for m in mfs])
-                    grids.extend([m.mu + 4 * m.sigma for m in mfs])
+                for m in feature_model.label_models[k].memberships:
+                    grids.extend(_mf_bounds(m))
+            grids = [g for g in grids if np.isfinite(g)]
             if not grids:
                 continue
             grid = np.linspace(min(grids), max(grids), 512)
             for k in keys:
                 mfs = feature_model.label_models[k].memberships
-                envelopes[k] = (
-                    np.max([np.exp(-0.5 * ((grid - m.mu) / max(m.sigma, 1e-12)) ** 2)
-                            for m in mfs], axis=0)
-                    if mfs else np.zeros_like(grid))
+                # `evaluate`, not a hardcoded Gaussian: the same diagnostic has to
+                # read on trapezoid, triangle and clamped models, and a Gaussian
+                # formula applied to a trapezoid would silently report the wrong
+                # shape's overlap.
+                envelopes[k] = (np.max([m.evaluate(grid) for m in mfs], axis=0)
+                                if mfs else np.zeros_like(grid))
             for a, b in zip(keys[:-1], keys[1:]):
                 lo, hi = envelopes[a], envelopes[b]
                 denom = np.sum(np.maximum(lo, hi))
@@ -1077,3 +1220,187 @@ def solve_consequents_shrunk(
     coeffs = beta.reshape(n_rules, per_rule)
     corr = coeffs[:, 1:].copy() if n_terms > 0 else np.zeros((n_rules, 0))
     return corr, coeffs[:, 0].copy()
+
+
+# --------------------------------------------------------------------------
+# Stage 3: compact support
+#
+# Stage 2's finding was that per-bucket consequent solving makes every rule a
+# much better approximator of its own region while making the blended model
+# worse -- the blend mixes each rule in where it is not competent. Gaussian
+# membership functions are why it can: they are strictly positive everywhere, so
+# *every* rule fires, however faintly, at *every* point of the input space. A
+# local model blended with a nonzero weight a long way from its own data is a
+# local model being asked a question it was never fitted to answer.
+#
+# Compact support removes that by construction. Three ways to get it:
+#
+#   trapezoid / triangle  the library already fits these
+#                         (`trapz_math.create_trapz_membership_dict`), and they
+#                         are exactly zero outside [a, d] / [a, c].
+#   clamped Gaussian      keep the Gaussian fit and zero it past k sigma. The
+#                         library already uses `mu +/- 3 sigma` as a Gaussian's
+#                         "effective support" in `gauss_data.mf_interval`, so
+#                         this makes an existing convention literal.
+#
+# The cost is the mirror image of the benefit, and it has to be measured rather
+# than assumed: compact support can leave points with NO rule covering them.
+# `_normalize_firing_strengths` returns an all-zero row there and the model
+# predicts exactly 0 -- not NaN, so it does not show up as a dropped row, it
+# shows up as a quietly terrible prediction. `coverage_report` measures it.
+# --------------------------------------------------------------------------
+VALID_MEMBERSHIPS = ("gaussian", "clamped", "trapezoid", "trapezoid-em",
+                     "triangle-em", "ruspini")
+
+
+class ClampedGaussianMembership(typing.NamedTuple):
+    """A Gaussian forced to exactly zero beyond ``k`` standard deviations.
+
+    Deliberately **not** a subclass of `GaussianMembership`, and deliberately a
+    distinct type: `kernel.compile_model` admits a model to its compiled fast path
+    on ``isinstance(mf, GaussianMembership)``, and that path evaluates a plain
+    Gaussian. A subclass would pass that check and the clamp would be silently
+    dropped wherever the Cython extension is built -- which is not this
+    environment, so the bug would not appear here and would appear in production.
+    A separate type raises `NotCompilable` and falls back to the polymorphic
+    Python loop, which calls `evaluate` and honours the clamp. Pinned as a test.
+
+    ``smooth=False`` truncates: the membership steps from ``exp(-k^2/2)`` to 0 at
+    the cutoff (0.011 at k=3, 0.023 at k=2.75 -- small, but a discontinuity).
+    ``smooth=True`` subtracts that boundary value and rescales, so membership
+    *reaches* zero continuously at exactly ``k`` sigma and the peak is still 1.
+    The smooth form is the "non-linear clamp": it is the same Gaussian shape with
+    its tail pulled down to meet the axis, not a Gaussian with a hole punched in
+    it.
+    """
+
+    mu: float
+    sigma: float
+    k: float = 3.0
+    smooth: bool = True
+    id: typing.Optional[uuid.UUID] = None
+
+    @staticmethod
+    def create(mu: float, sigma: float, k: float = 3.0,
+               smooth: bool = True) -> "ClampedGaussianMembership":
+        return ClampedGaussianMembership(mu=mu, sigma=sigma, k=k, smooth=smooth,
+                                         id=uuid.uuid4())
+
+    def evaluate(self, x: np.ndarray) -> np.ndarray:
+        x = np.asarray(x, dtype=float)
+        sigma = max(self.sigma, 1e-6)
+        z = (x - self.mu) / sigma
+        inside = np.abs(z) <= self.k
+        bell = np.exp(-0.5 * z ** 2)
+        if not self.smooth:
+            return np.where(inside, bell, 0.0)
+        floor = float(np.exp(-0.5 * self.k ** 2))
+        # (bell - floor) / (1 - floor): 1 at the peak, 0 at the cutoff. The
+        # `inside` mask is still applied so floating point cannot leave a
+        # negative sliver just outside k sigma.
+        return np.where(inside, np.maximum(0.0, (bell - floor) / (1.0 - floor)), 0.0)
+
+
+def clamp_model(model: GaussianMixtureModel, k: float = 3.0,
+                smooth: bool = True) -> GaussianMixtureModel:
+    """Rebuild `model` with every Gaussian replaced by a clamped one.
+
+    Non-Gaussian memberships pass through untouched, so this is a no-op on a
+    trapezoid or triangle model rather than an error -- the arm matrix in
+    `run_support.py` would otherwise need a special case per membership type.
+    """
+    feature_models = {}
+    for name, fmodel in model.feature_models.items():
+        label_models = {}
+        for label, lmodel in fmodel.label_models.items():
+            label_models[label] = LabelModel(memberships=[
+                ClampedGaussianMembership.create(mf.mu, mf.sigma, k=k, smooth=smooth)
+                if isinstance(mf, GaussianMembership) else mf
+                for mf in lmodel.memberships
+            ])
+        feature_models[name] = FeatureModel(label_models=label_models)
+    return GaussianMixtureModel(feature_models=feature_models)
+
+
+def ruspinize_features(model: GaussianMixtureModel, merge_tol: float = 0.02
+                       ) -> GaussianMixtureModel:
+    """Re-express each feature as a shared Ruspini partition of triangular terms.
+
+    Compact support with *guaranteed* coverage, which is the combination the
+    trapezoid fitters do not deliver. Per feature: collect every bucket's fitted
+    membership centres as apex landmarks, merge near-duplicates
+    (`ruspini._merge_close`), build the shared triangular partition
+    (`ruspini.build_triangular_partition` -- terms sum to exactly 1 at every point
+    of the axis, with the first and last shouldered to +/-inf), then give each
+    bucket the term whose apex is nearest each of its own centres.
+
+    Two properties matter and they are the reason this arm exists:
+
+    * every interior term is compactly supported, so a rule goes silent away from
+      its own region -- what a per-bucket local consequent wants;
+    * the terms tile the axis by construction, so no point is left uncovered --
+      what the trapezoid arms fail at, in 1-D before any dimensionality effect.
+
+    This reuses the library's own construction and its "nearest apex" matching
+    heuristic (`ruspini.ruspinize_model` documents it) but emits a
+    `GaussianMixtureModel` rather than the explicit rule layout, so the rest of
+    this pipeline -- firing strengths, consequent solve, prediction -- is unchanged
+    and the arm is comparable to the others.
+
+    ``merge_tol`` is in the feature's own units; inputs here are unit-scaled to
+    [0, 1], so 0.02 merges centres within 2% of the range.
+    """
+    from tribblefis.ruspini import _merge_close, build_triangular_partition
+
+    feature_models = {}
+    for name, fmodel in model.feature_models.items():
+        centres = [mf.mu for lmodel in fmodel.label_models.values()
+                   for mf in lmodel.memberships if hasattr(mf, "mu")]
+        if not centres:
+            feature_models[name] = fmodel
+            continue
+        apexes = _merge_close(centres, merge_tol)
+        terms = build_triangular_partition(apexes)
+        apex_arr = np.asarray(apexes, dtype=float)
+
+        label_models = {}
+        for label, lmodel in fmodel.label_models.items():
+            picked, seen = [], set()
+            for mf in lmodel.memberships:
+                if not hasattr(mf, "mu"):
+                    continue
+                j = int(np.argmin(np.abs(apex_arr - mf.mu)))
+                if j not in seen:
+                    seen.add(j)
+                    picked.append(terms[j])
+            label_models[label] = LabelModel(memberships=picked)
+        feature_models[name] = FeatureModel(label_models=label_models)
+    return GaussianMixtureModel(feature_models=feature_models)
+
+
+def coverage_report(firing_strengths: np.ndarray, threshold: float = 1e-6) -> dict:
+    """How much of the input space each rule set actually covers.
+
+    The quantity compact support trades against accuracy, and the one that does
+    not announce itself: a row no rule covers gets an all-zero normalized firing
+    row and a prediction of exactly 0. That is a finite number, so it survives
+    every NaN filter in the pipeline and lands in the R2 as a large error with no
+    diagnostic attached.
+
+    Returns
+    -------
+    uncovered : fraction of rows where total firing is at or below the floor
+        `_normalize_firing_strengths` uses, i.e. rows the model answers with 0.
+    mean_active : mean number of rules firing above `threshold` per row -- 1.0
+        would mean a genuine partition, `n_rules` means every rule everywhere
+        (which is what an unclamped Gaussian model gives).
+    active_frac : `mean_active` as a fraction of the rule count, so it is
+        comparable across bucket counts.
+    """
+    active = (firing_strengths > threshold).sum(axis=1)
+    n_rules = firing_strengths.shape[1]
+    return dict(
+        uncovered=float(np.mean(firing_strengths.sum(axis=1) <= 1e-6)),
+        mean_active=float(np.mean(active)),
+        active_frac=float(np.mean(active) / n_rules) if n_rules else float("nan"),
+    )
