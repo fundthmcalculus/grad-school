@@ -1,6 +1,12 @@
 # Experiment: overlap modeling — soft output-bucket boundaries for TRIBBLE regression
 
-**Status:** measured · **Started:** 2026-08-18
+**Status:** measured, negative · **Started:** 2026-08-18
+
+**Verdict in one line:** the mechanism is real and large against per-bucket
+consequent fitting (+0.17 test R² on concrete), and worth nothing against the
+firing-weighted solve TRIBBLE actually ships, which is already a soft-boundary
+fit. The one arm that beat the baseline was reproduced by a random-row control.
+See [`RESULTS.md`](RESULTS.md).
 
 [`RESULTS.md`](RESULTS.md) is the laboratory record: the hypotheses as
 registered before the run of record, and how each one scored. Generated tables
