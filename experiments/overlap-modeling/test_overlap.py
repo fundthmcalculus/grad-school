@@ -381,3 +381,225 @@ def test_ramp_and_flat_differ_only_through_the_weights(data):
     np.testing.assert_array_equal(W_flat > 0, W_ramp > 0)   # same support
     assert np.all(W_ramp <= W_flat + 1e-12)                 # ramp only ever lighter
     assert not np.allclose(flat.predict(X), ramp.predict(X))
+
+
+# --------------------------------------------------------------------------
+# Follow-up arms: fit quality vs aggregation
+# --------------------------------------------------------------------------
+def test_shrink_local_reduces_to_the_baseline_at_zero_ridge(data):
+    """With no ridge there is no prior, so the shrunk solve IS the global solve.
+
+    The antecedents have to be held hard for this to be a statement about the
+    consequent solver: `overlap_antecedents` moves the firing strengths, and two
+    solves of different designs have no reason to agree. That is also why the
+    driver runs the `shrink-local` arm with the antecedent overlap off -- otherwise
+    the arm would confound the consequent prior with a different forward pass, the
+    exact confound `soft-random` was added to break.
+    """
+    X, y = data
+    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+                  l2_reg=0.0, random_state=7)
+    base = OverlapTribbleRegressor(consequent_fit="global", **kwargs).fit(X, y)
+    shrunk = OverlapTribbleRegressor(
+        consequent_fit="shrink-local", overlap=0.3, overlap_antecedents=False,
+        overlap_means=False, **kwargs).fit(X, y)
+    np.testing.assert_allclose(shrunk.predict(X), base.predict(X), rtol=1e-6, atol=1e-6)
+
+
+def test_shrink_local_with_soft_antecedents_is_a_different_model(data):
+    """Guards the confound the test above avoids, so nobody re-introduces it."""
+    X, y = data
+    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+                  l2_reg=0.0, consequent_fit="shrink-local", overlap=0.3,
+                  random_state=7)
+    hard_ante = OverlapTribbleRegressor(overlap_antecedents=False, overlap_means=False,
+                                        **kwargs).fit(X, y)
+    soft_ante = OverlapTribbleRegressor(overlap_antecedents=True, **kwargs).fit(X, y)
+    assert not np.allclose(hard_ante.predict(X), soft_ante.predict(X))
+
+
+def test_shrink_local_lands_between_its_two_limits(data):
+    """A big enough ridge pulls the corrections onto the local prior."""
+    X, y = data
+    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+                  overlap=0.3, overlap_antecedents=False, overlap_means=False,
+                  random_state=7)
+    far = OverlapTribbleRegressor(consequent_fit="shrink-local", l2_reg=1e6,
+                                  **kwargs).fit(X, y)
+    prior_corr, _ = far.local_prior_
+    np.testing.assert_allclose(far.corr_terms_, prior_corr, rtol=1e-3, atol=1e-3)
+
+    near = OverlapTribbleRegressor(consequent_fit="shrink-local", l2_reg=1e-8,
+                                   **kwargs).fit(X, y)
+    assert (np.abs(near.corr_terms_ - prior_corr).mean()
+            > np.abs(far.corr_terms_ - prior_corr).mean())
+
+
+def test_residual_form_pins_every_constant_to_the_bucket_centroid(data):
+    """The legacy formulation fixes all the constants, not just the extremes."""
+    X, y = data
+    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+                  l2_reg=1e-3, overlap=0.2, random_state=7)
+    res = OverlapTribbleRegressor(consequent_fit="local-residual", **kwargs).fit(X, y)
+    free = OverlapTribbleRegressor(consequent_fit="local", **kwargs).fit(X, y)
+    # The residual form's means are the centroids it was handed, untouched.
+    np.testing.assert_allclose(res.y_bucket_mean_, res.y_bucket_mean_in_,
+                               rtol=1e-10, atol=1e-10)
+    assert not np.allclose(free.y_bucket_mean_, free.y_bucket_mean_in_), \
+        "the free-intercept form should have moved at least one constant"
+    # A free intercept is a superset of a fixed one, so it cannot fit its own
+    # slices worse. Compared on the training fold, which is what it optimized.
+    hard = res.hard_labels_
+    assert (free.local_approximation_r2(X, y, hard)
+            >= res.local_approximation_r2(X, y, hard) - 1e-9)
+
+
+def test_winner_take_all_uses_exactly_one_rule_per_row(data):
+    X, y = data
+    m = OverlapTribbleRegressor(
+        n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+        l2_reg=1e-3, consequent_fit="local", overlap=0.3, predict_mode="wta",
+        random_state=7).fit(X, y)
+    norm_fs, rule_vals, _ = m._rule_values_and_weights(X)
+    winner = np.argmax(norm_fs, axis=1)
+    np.testing.assert_allclose(
+        m.predict(X), rule_vals[np.arange(len(X)), winner], rtol=1e-12, atol=1e-12)
+    assert not np.allclose(m.predict(X),
+                           OverlapTribbleRegressor(
+                               n_output_buckets=4, output_partition="quantile",
+                               tsk_order="2nd", l2_reg=1e-3, consequent_fit="local",
+                               overlap=0.3, random_state=7).fit(X, y).predict(X))
+
+
+def test_blend_recalibration_is_the_identity_under_an_infinite_prior(data):
+    """lambda -> inf pins (a_r, b_r) at (0, 1), which is the plain blend."""
+    X, y = data
+    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+                  l2_reg=1e-3, consequent_fit="local", overlap=0.3, random_state=7)
+    plain = OverlapTribbleRegressor(**kwargs).fit(X, y)
+    pinned = OverlapTribbleRegressor(blend_recalibrate=True, blend_recal_l2=1e12,
+                                     **kwargs).fit(X, y)
+    np.testing.assert_allclose(pinned.blend_a_, 0.0, atol=1e-6)
+    np.testing.assert_allclose(pinned.blend_b_, 1.0, atol=1e-6)
+    np.testing.assert_allclose(pinned.predict(X), plain.predict(X), rtol=1e-5, atol=1e-5)
+
+    free = OverlapTribbleRegressor(blend_recalibrate=True, blend_recal_l2=0.0,
+                                   **kwargs).fit(X, y)
+    assert not np.allclose(free.predict(X), plain.predict(X))
+
+
+def test_local_r2_measures_the_rule_not_the_blend(data):
+    """The diagnostic must be insensitive to how rules are combined."""
+    X, y = data
+    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+                  l2_reg=1e-3, consequent_fit="local", overlap=0.3, random_state=7)
+    blended = OverlapTribbleRegressor(**kwargs).fit(X, y)
+    wta = OverlapTribbleRegressor(predict_mode="wta", **kwargs).fit(X, y)
+    hard = blended.hard_labels_
+    assert (blended.local_approximation_r2(X, y, hard)
+            == pytest.approx(wta.local_approximation_r2(X, y, hard)))
+    assert not np.allclose(blended.predict(X), wta.predict(X))
+
+
+def test_local_fits_approximate_their_own_buckets_better_than_the_global_solve(data):
+    """The premise of the follow-up, stated as a test rather than assumed.
+
+    A per-bucket solve optimizes exactly this quantity on the training fold, so if
+    it does not win here the implementation is wrong, not the idea.
+    """
+    X, y = data
+    kwargs = dict(n_output_buckets=5, output_partition="quantile", tsk_order="2nd",
+                  l2_reg=1e-3, random_state=7)
+    glob = OverlapTribbleRegressor(consequent_fit="global", **kwargs).fit(X, y)
+    loc = OverlapTribbleRegressor(consequent_fit="local", overlap=0.0,
+                                  **kwargs).fit(X, y)
+    hard = glob.hard_labels_
+    assert (loc.local_approximation_r2(X, y, hard)
+            > glob.local_approximation_r2(X, y, hard))
+
+
+def test_predict_mode_is_validated(data):
+    X, y = data
+    m = OverlapTribbleRegressor(n_output_buckets=3, random_state=7).fit(X, y)
+    m.predict_mode = "argmax"
+    with pytest.raises(ValueError):
+        m.predict(X)
+
+
+def test_sharpening_is_the_identity_at_gamma_one(data):
+    """gamma=1 must take the library's own predict path, byte for byte."""
+    X, y = data
+    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+                  l2_reg=1e-3, consequent_fit="local", overlap=0.3, random_state=7)
+    plain = OverlapTribbleRegressor(**kwargs).fit(X, y)
+    unity = OverlapTribbleRegressor(blend_sharpen=1.0, **kwargs).fit(X, y)
+    np.testing.assert_allclose(unity.predict(X), plain.predict(X), rtol=1e-12, atol=1e-12)
+
+
+def test_large_sharpening_converges_to_winner_take_all(data):
+    """gamma -> inf is WTA, which is what makes the exponent a blend-width knob.
+
+    Coefficients are held fixed and only the exponent varies, because raising
+    gamma also re-solves the consequents -- so comparing two *fitted* models would
+    conflate the aggregation with the fit.
+    """
+    from overlap import sharpen_firing
+    from tribblefis.regression import _normalize_firing_strengths
+
+    X, y = data
+    m = OverlapTribbleRegressor(
+        n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+        l2_reg=1e-3, consequent_fit="local", overlap=0.3, random_state=7).fit(X, y)
+    raw, _, rule_vals = (*tsk_firing_strengths(X[m.top_features_], m.model_),
+                         m._rule_values_and_weights(X)[1])
+
+    gaps, concentration = [], []
+    for gamma in (1.0, 16.0, 256.0, 4096.0):
+        norm = _normalize_firing_strengths(sharpen_firing(raw, gamma))
+        winner = rule_vals[np.arange(len(X)), np.argmax(norm, axis=1)]
+        gaps.append(float(np.abs(np.sum(norm * rule_vals, axis=1) - winner).max()))
+        concentration.append(float(norm.max(axis=1).mean()))
+
+    assert gaps == sorted(gaps, reverse=True), f"blend did not converge to WTA: {gaps}"
+    assert concentration == sorted(concentration), concentration
+    assert concentration[-1] > 0.999
+    # The rate is set by each row's top-two firing ratio: a row whose two
+    # strongest rules are within 0.2% of each other (the worst on this fixture)
+    # needs gamma in the thousands before the runner-up's weight collapses. Those
+    # are exactly the rows sitting on a bucket boundary -- the ones this whole
+    # experiment is about -- so the slow tail is the interesting part, not noise.
+    assert gaps[-1] < 1e-3, f"still {gaps[-1]:.2e} from WTA at gamma=4096"
+
+
+def test_sharpening_does_not_underflow_a_row_to_zero(data):
+    """The guard on `sharpen_firing`, as a test rather than a comment.
+
+    Without the per-row rescale, a large exponent drives whole rows under
+    `_normalize_firing_strengths`' 1e-6 floor, the row is returned as all-zeros,
+    and the model predicts 0 there -- which looks like sharpening making the model
+    worse when it is really an underflow.
+    """
+    from overlap import sharpen_firing
+    from tribblefis.regression import _normalize_firing_strengths
+
+    X, y = data
+    m = OverlapTribbleRegressor(n_output_buckets=5, output_partition="quantile",
+                                tsk_order="1st", random_state=7).fit(X, y)
+    raw, _ = tsk_firing_strengths(X[m.top_features_], m.model_)
+    live = _normalize_firing_strengths(raw).sum(axis=1) > 0
+    for gamma in (2.0, 8.0, 64.0, 256.0):
+        norm = _normalize_firing_strengths(sharpen_firing(raw, gamma))
+        np.testing.assert_array_equal(norm.sum(axis=1) > 0, live,
+                                      err_msg=f"row set changed at gamma={gamma}")
+
+
+def test_sharpening_is_applied_in_the_solve_as_well_as_the_prediction(data):
+    """Fit/predict must share one weighting; this codebase has been bitten before."""
+    X, y = data
+    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
+                  l2_reg=1e-3, consequent_fit="global", random_state=7)
+    a = OverlapTribbleRegressor(blend_sharpen=1.0, **kwargs).fit(X, y)
+    b = OverlapTribbleRegressor(blend_sharpen=3.0, **kwargs).fit(X, y)
+    assert not np.allclose(a.corr_terms_, b.corr_terms_), \
+        "the exponent did not reach the consequent solve"
+    assert not np.allclose(a.predict(X), b.predict(X))

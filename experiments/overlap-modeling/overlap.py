@@ -98,14 +98,17 @@ from tribblefis.gauss_math import (
     tsk_firing_strengths,
 )
 from tribblefis.regression import (
+    _normalize_firing_strengths,
     build_consequent_features,
     partition_output,
     predict_tsk,
+    rule_consequent_values,
     solve_tsk_consequents_from_firing,
 )
 
 VALID_SHAPES = ("flat", "ramp")
-VALID_CONSEQUENT_FITS = ("global", "local")
+VALID_CONSEQUENT_FITS = ("global", "local", "local-residual", "shrink-local")
+VALID_PREDICT_MODES = ("blend", "wta")
 
 # Floor on a fitted sigma, mirroring the guard the library's own mixture fit
 # applies: a component that collapses onto a single repeated value would make
@@ -346,6 +349,7 @@ def solve_consequents_local(
     basis: str = "raw",
     cross_pairs=None,
     pin_extremes: bool = False,
+    residual_form: bool = False,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Fit each rule's consequent on its own (optionally overlapping) slice.
 
@@ -354,6 +358,14 @@ def solve_consequents_local(
     With ``W`` the hard indicator this is the classical per-bucket local TSK fit
     -- a ridge-regularized `compute_*_order_corrections` -- and with an overlap
     band it is that fit with neighbouring data blended in.
+
+    ``residual_form=True`` is the library's literal legacy formulation: the rule's
+    constant is held at ``y_bucket_mean[bucket]`` and the corrections are fitted to
+    the residual ``y - y_bucket_mean[bucket]``, exactly as
+    `regression.compute_{first,second,third,full_second}_order_corrections` do
+    (with a ridge added, which they lack). The default frees the intercept instead,
+    which can only fit at least as well on the slice -- so running both settles
+    whether the local arm's deficit is an artifact of how its constant was chosen.
 
     ``firing_strengths`` is consumed only for its shape and column-to-bucket map
     (``labels``); a local fit does not weight by firing, which is exactly what
@@ -380,8 +392,13 @@ def solve_consequents_local(
         bucket = int(labels[r])
         w = W[:, bucket]
         support = w > 0
-        pin = pin_extremes and n_rules >= 2 and r in (0, n_rules - 1) \
-            and ybm.size > bucket and np.isfinite(ybm[bucket])
+        have_mean = ybm.size > bucket and np.isfinite(ybm[bucket])
+        # `residual_form` fixes every rule's constant, not just the two extremes,
+        # so it subsumes the pin. Both routes go through the same exact-constraint
+        # branch below.
+        pin = have_mean and (
+            residual_form
+            or (pin_extremes and n_rules >= 2 and r in (0, n_rules - 1)))
 
         if not support.any():
             # An empty rule keeps the centroid it was handed and corrects nothing.
@@ -508,6 +525,42 @@ def solve_consequents_fused(
     return corr, coeffs[:, 0].copy()
 
 
+def sharpen_firing(firing_strengths: np.ndarray, gamma: float) -> np.ndarray:
+    """Raise firing strengths to ``gamma`` before normalization.
+
+    Motivated by stage 2's diagnostic rather than by theory. If per-bucket rules
+    are individually good and the blend is what loses accuracy, then the blend's
+    *concentration* is a knob worth having: ``gamma > 1`` sharpens toward the
+    strongest rule (``gamma -> inf`` is winner-take-all), ``gamma < 1`` flattens
+    toward a uniform average, and ``gamma = 1`` is TSK's own weighting. It is one
+    scalar, it costs nothing, and it tests whether the local family's deficit is
+    a *calibration* problem in the weights rather than a structural one.
+
+    Must be applied identically in the solve and at predict time. That is not a
+    style preference here: this codebase has been bitten by a firing-strength
+    convention that differed between fit and evaluation (see
+    `_normalize_firing_strengths`' docstring), so the exponent goes through one
+    function called from both paths.
+
+    Each row is divided by its own maximum before the exponent. Downstream
+    normalization is scale-invariant, so this changes nothing mathematically and
+    everything numerically: raising raw strengths of order 1e-2 to gamma=10
+    underflows the whole row toward zero, `_normalize_firing_strengths` then sees
+    a row sum under its 1e-6 floor and returns all-zeros, and the model silently
+    predicts 0 for that row. Measured before this guard was added: mean maximum
+    weight *fell* from 0.78 at gamma=3 to 0.02 at gamma=150, the opposite of
+    sharpening. Rows that were already below the floor are left alone, so the
+    all-zero convention is preserved rather than resurrected.
+    """
+    if gamma == 1.0:
+        return firing_strengths
+    out = np.clip(firing_strengths, 0.0, None)
+    row_max = out.max(axis=1)
+    live = out.sum(axis=1) > 1e-6
+    scale = np.where(live & (row_max > 0), row_max, 1.0)
+    return np.power(out / scale[:, np.newaxis], gamma) * live[:, np.newaxis]
+
+
 # --------------------------------------------------------------------------
 # The estimator
 # --------------------------------------------------------------------------
@@ -541,9 +594,27 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         switch that changes predict-time behaviour (via the firing strengths).
     overlap_means : bool, default True
         Use overlap-weighted bucket centroids.
-    consequent_fit : {"global", "local"}, default "global"
-        ``"global"`` is the library's exact firing-weighted stacked ridge solve;
-        ``"local"`` fits each rule's polynomial on its own overlapped slice.
+    consequent_fit : {"global", "local", "local-residual", "shrink-local"}, default "global"
+        ``"global"`` is the library's exact firing-weighted stacked ridge solve.
+        ``"local"`` fits each rule's polynomial on its own overlapped slice with a
+        free intercept; ``"local-residual"`` does the same with the intercept held
+        at the bucket centroid, which is the library's legacy
+        `compute_*_order_corrections` formulation. ``"shrink-local"`` keeps the
+        global solve and uses the local fit as the ridge's prior instead of zero.
+    predict_mode : {"blend", "wta"}, default "blend"
+        ``"blend"`` is TSK's firing-weighted average. ``"wta"`` answers each row
+        with its single strongest-firing rule, which is the aggregation a set of
+        good *local* approximators would want. Diagnostic: it makes the model
+        piecewise-discontinuous, which is the thing overlap set out to avoid.
+    blend_recalibrate : bool, default False
+        After solving, fit a per-rule affine recalibration ``(a_r, b_r)`` of the
+        blend against the training fold (`solve_blend_recalibration`). Cannot
+        change what a rule computes, only how it is combined.
+    blend_sharpen : float, default 1.0
+        Exponent applied to the firing strengths before normalization, in the
+        solve and at predict time alike. >1 concentrates the blend on the
+        strongest rule, <1 flattens it. 1.0 is TSK's own weighting.
+        See `sharpen_firing`.
     fusion_reg : float, default 0.0
         Weight on the adjacent-rule correction-difference penalty, for
         ``consequent_fit="global"`` only. See `solve_consequents_fused`.
@@ -578,6 +649,10 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         overlap_means=True,
         consequent_fit="global",
         fusion_reg=0.0,
+        predict_mode="blend",
+        blend_recalibrate=False,
+        blend_recal_l2=0.0,
+        blend_sharpen=1.0,
     ):
         self.top_n = top_n
         self.top_p = top_p
@@ -601,6 +676,10 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         self.overlap_means = overlap_means
         self.consequent_fit = consequent_fit
         self.fusion_reg = fusion_reg
+        self.predict_mode = predict_mode
+        self.blend_recalibrate = blend_recalibrate
+        self.blend_recal_l2 = blend_recal_l2
+        self.blend_sharpen = blend_sharpen
 
     def _norms(self):
         return resolve_norm_pair(
@@ -677,12 +756,27 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
 
         firing, labels = tsk_firing_strengths(
             X_df[self.top_features_], self.model_, norms=self._norms())
+        firing = sharpen_firing(firing, self.blend_sharpen)
         self.rule_labels_ = list(labels)
 
-        if self.consequent_fit == "local":
+        local_args = (firing, labels, X_df, self.top_features_, means_in,
+                      y_partitioned, self.overlap_weights_)
+        local_kw = dict(order=self.tsk_order, l2_reg=self.l2_reg,
+                        basis=self.consequent_basis, pin_extremes=self.pin_extremes)
+
+        if self.consequent_fit in ("local", "local-residual"):
             self.corr_terms_, self.y_bucket_mean_ = solve_consequents_local(
+                *local_args, residual_form=self.consequent_fit == "local-residual",
+                **local_kw)
+        elif self.consequent_fit == "shrink-local":
+            # The prior is the per-bucket local fit, solved first at the same
+            # overlap width and ridge strength, then used as the global solve's
+            # shrinkage target instead of zero.
+            prior_corr, prior_means = solve_consequents_local(*local_args, **local_kw)
+            self.local_prior_ = (prior_corr, prior_means)
+            self.corr_terms_, self.y_bucket_mean_ = solve_consequents_shrunk(
                 firing, labels, X_df, self.top_features_, means_in, y_partitioned,
-                self.overlap_weights_, order=self.tsk_order, l2_reg=self.l2_reg,
+                prior_corr, prior_means, order=self.tsk_order, l2_reg=self.l2_reg,
                 basis=self.consequent_basis, pin_extremes=self.pin_extremes)
         elif self.fusion_reg > 0:
             self.corr_terms_, self.y_bucket_mean_ = solve_consequents_fused(
@@ -697,17 +791,79 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
                 order=self.tsk_order, l2_reg=self.l2_reg, basis=self.consequent_basis,
                 pin_extremes=self.pin_extremes, verbose=False)
 
+        # A recalibrated blend is fitted after the consequents are frozen. It adds
+        # 2*n_rules parameters, so it is scored on validation/test like everything
+        # else rather than on the fold that produced it.
+        self.blend_a_, self.blend_b_ = None, None
+        if self.blend_recalibrate:
+            rule_vals = rule_consequent_values(
+                X_df, self.top_features_, labels, self.y_bucket_mean_,
+                self.corr_terms_, order=self.tsk_order, basis=self.consequent_basis)
+            self.blend_a_, self.blend_b_ = solve_blend_recalibration(
+                rule_vals, _normalize_firing_strengths(firing),
+                y_partitioned["y_value"].to_numpy(dtype=float),
+                l2_reg=self.blend_recal_l2)
+
+        # Kept for the local-approximation diagnostic: which bucket each training
+        # row fell in, before any overlap widened the slices.
+        self.hard_labels_ = hard_labels
         self.is_fitted_ = True
         return self
+
+    def _rule_values_and_weights(self, X_df):
+        firing, labels = tsk_firing_strengths(
+            X_df[self.top_features_], self.model_, norms=self._norms())
+        firing = sharpen_firing(firing, self.blend_sharpen)
+        rule_vals = rule_consequent_values(
+            X_df, self.top_features_, labels, self.y_bucket_mean_, self.corr_terms_,
+            order=self.tsk_order, basis=self.consequent_basis)
+        return _normalize_firing_strengths(firing), rule_vals, labels
 
     def predict(self, X):
         check_is_fitted(self)
         X_df = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(
             X, columns=self.feature_names_in_)
-        return predict_tsk(
-            X_df, self.model_, self.top_features_, self.y_bucket_mean_,
-            self.corr_terms_, order=self.tsk_order, basis=self.consequent_basis,
-            norms=self._norms())
+
+        if self.predict_mode not in VALID_PREDICT_MODES:
+            raise ValueError(f"predict_mode must be one of {VALID_PREDICT_MODES}, "
+                             f"got {self.predict_mode!r}")
+
+        if (self.predict_mode == "blend" and not self.blend_recalibrate
+                and self.blend_sharpen == 1.0):
+            # The library's own path, unchanged, so the default arm stays the
+            # shipped prediction rather than a re-derivation of it.
+            return predict_tsk(
+                X_df, self.model_, self.top_features_, self.y_bucket_mean_,
+                self.corr_terms_, order=self.tsk_order, basis=self.consequent_basis,
+                norms=self._norms())
+
+        norm_fs, rule_vals, _ = self._rule_values_and_weights(X_df)
+        if self.predict_mode == "blend" and not self.blend_recalibrate:
+            return np.sum(norm_fs * rule_vals, axis=1)
+        if self.predict_mode == "wta":
+            # Winner-take-all. Rows where nothing fires stay 0 -- the same
+            # convention `_normalize_firing_strengths` leaves them in, and what the
+            # blended path yields for them.
+            winner = np.argmax(norm_fs, axis=1)
+            out = rule_vals[np.arange(len(rule_vals)), winner]
+            return np.where(norm_fs.sum(axis=1) > 0, out, 0.0)
+
+        return np.sum(norm_fs * (self.blend_a_[None, :]
+                                 + self.blend_b_[None, :] * rule_vals), axis=1)
+
+    def local_approximation_r2(self, X, y, hard_labels=None) -> float:
+        """R2 of each row's own-bucket rule, ignoring the blend. See `local_rule_r2`.
+
+        ``hard_labels`` defaults to the training partition, which is only correct
+        for the training fold; pass the fold's own `partition_output` labels to
+        score a validation or test fold.
+        """
+        check_is_fitted(self)
+        X_df = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(
+            X, columns=self.feature_names_in_)
+        _, rule_vals, labels = self._rule_values_and_weights(X_df)
+        hard = self.hard_labels_ if hard_labels is None else hard_labels
+        return local_rule_r2(rule_vals, y, labels, hard)
 
     # -- diagnostics -------------------------------------------------------
     def membership_overlap_area(self) -> float:
@@ -745,3 +901,179 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
                 if denom > 0:
                     scores.append(float(np.sum(np.minimum(lo, hi)) / denom))
         return float(np.mean(scores)) if scores else float("nan")
+
+
+# --------------------------------------------------------------------------
+# Follow-up: is the local family's deficit the FIT or the AGGREGATION?
+#
+# `solve_consequents_local` makes every rule a good approximator *of y on its own
+# slice*. But prediction is a firing-weighted blend of all rules, and the firing
+# strengths come from x-space membership functions fitted per y-bucket -- they are
+# not indicators of "sample i belongs to bucket r". So a rule can be an excellent
+# local model and still be blended in where it does not apply. Nothing in the
+# first sweep separated those two failure modes, because it only ever scored the
+# blended prediction.
+#
+# The four pieces below separate them:
+#   * `local_rule_r2`      -- measures the local approximation directly.
+#   * `residual_form`      -- the library's literal legacy formulation, so the
+#                             local arm cannot be dismissed as a straw man.
+#   * predict_mode="wta"   -- drops the blend entirely; each row is answered by
+#                             its strongest rule alone.
+#   * blend_recalibrate    -- keeps the local rules and re-solves only the blend.
+#   * consequent_fit=
+#     "shrink-local"       -- keeps the exact global objective and uses the local
+#                             solution as the ridge's prior instead of zero.
+# --------------------------------------------------------------------------
+def local_rule_r2(rule_vals: np.ndarray, y, labels: list, hard_labels) -> float:
+    """R2 of each row's *responsible* rule's own output, ignoring the blend.
+
+    For every row, take the rule whose bucket is that row's hard `y_bucket` and
+    score that rule's crisp consequent output against `y`. This is the number the
+    phrase "each rule consequent function locally approximates better" refers to,
+    and it is not what test R2 measures: test R2 scores
+    ``sum_r w_r q_r(x)``, which can be worse than every ``q_r`` is on its own
+    bucket if the weights ``w_r`` put mass on the wrong rules.
+
+    Returns NaN when no row can be attributed (no overlap between `labels` and
+    the hard bucket labels present).
+    """
+    y = np.asarray(y, dtype=float).ravel()
+    hard = np.asarray(hard_labels).ravel()
+    col_of = {int(lab): j for j, lab in enumerate(labels)}
+    own = np.array([col_of.get(int(b), -1) for b in hard])
+    keep = own >= 0
+    if keep.sum() < 2:
+        return float("nan")
+    pred = rule_vals[np.flatnonzero(keep), own[keep]]
+    yt = y[keep]
+    denom = float(np.sum((yt - yt.mean()) ** 2))
+    if denom == 0 or not np.all(np.isfinite(pred)):
+        return float("nan")
+    return float(1.0 - np.sum((yt - pred) ** 2) / denom)
+
+
+def solve_blend_recalibration(
+    rule_vals: np.ndarray,
+    norm_fs: np.ndarray,
+    y,
+    l2_reg: float = 0.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Per-rule affine recalibration of a frozen set of rule outputs.
+
+    Fits ``y_hat = sum_r w_r * (a_r + b_r * q_r(x))`` for fixed ``q_r`` (the local
+    per-bucket consequents) and fixed ``w_r`` (the firing strengths), which is
+    ``2 * n_rules`` free parameters and linear in all of them. The ridge pulls
+    ``(a_r, b_r)`` toward ``(0, 1)`` -- the identity -- so ``l2_reg -> inf``
+    recovers the plain blend exactly and any departure from it has to be paid for.
+
+    This is the cheapest possible fix for an aggregation mismatch: it cannot
+    change what any rule computes, only how much of it is used and where its zero
+    sits. If it recovers most of the local family's deficit, the deficit was the
+    blend. If it recovers little, the local fit itself was the problem.
+    """
+    y = np.asarray(y, dtype=float).ravel()
+    n_rules = norm_fs.shape[1]
+    design = np.empty((len(y), 2 * n_rules))
+    design[:, 0::2] = norm_fs
+    design[:, 1::2] = norm_fs * rule_vals
+
+    prior = np.tile([0.0, 1.0], n_rules)
+    if l2_reg > 0:
+        root = np.sqrt(l2_reg) * np.ones(2 * n_rules)
+        A = np.vstack([design, np.diag(root)])
+        rhs = np.hstack([y, root * prior])
+    else:
+        A, rhs = design, y
+    beta = np.linalg.lstsq(A, rhs, rcond=None)[0]
+    return beta[0::2].copy(), beta[1::2].copy()
+
+
+def solve_consequents_shrunk(
+    firing_strengths: np.ndarray,
+    labels: list,
+    X_train: pd.DataFrame,
+    top_n_todo: list,
+    y_bucket_mean,
+    y_train: pd.DataFrame,
+    prior_corr: np.ndarray,
+    prior_means: np.ndarray,
+    order: str = "2nd",
+    l2_reg: float = 1e-6,
+    basis: str = "raw",
+    cross_pairs=None,
+    pin_extremes: bool = False,
+) -> tuple[np.ndarray, np.ndarray]:
+    """The exact global firing-weighted ridge, shrunk toward the local solution.
+
+    Identical to `solve_tsk_consequents_from_firing` except that the ridge's
+    prior is the per-bucket local fit rather than zero: it minimizes
+    ``||y - Phi beta||^2 + l2_reg * ||D (beta - beta_local)||^2``.
+
+    This is the one way per-bucket local information can enter without giving up
+    anything. The global solve stays the exact minimizer of the firing-weighted
+    objective the model is scored on; the only thing that changes is *where the
+    regularizer pulls when the data does not pin a coefficient down*. Shrinking
+    toward zero says "in the absence of evidence, correct nothing"; shrinking
+    toward the local fit says "in the absence of evidence, do what this rule's own
+    bucket says". At ``l2_reg=0`` the two are identical, so the arm has the
+    baseline as a limit rather than as a rival.
+
+    Intercepts are unpenalized, as everywhere else, so ``prior_means`` is unused
+    except for shape agreement -- kept in the signature because dropping it would
+    make the asymmetry with `prior_corr` invisible at the call site.
+    """
+    from tribblefis.regression import _normalize_firing_strengths
+
+    norm_fs = _normalize_firing_strengths(firing_strengths)
+    n_rules = norm_fs.shape[1]
+    X_rule = X_train[top_n_todo].to_numpy()
+    feats = build_consequent_features(X_rule, order, basis=basis, cross_pairs=cross_pairs)
+    n_terms = feats.shape[1]
+    per_rule = 1 + n_terms
+
+    phi = np.hstack([np.ones((X_rule.shape[0], 1)), feats])
+    design = (norm_fs[:, :, np.newaxis] * phi[:, np.newaxis, :]).reshape(
+        X_rule.shape[0], n_rules * per_rule)
+    y = np.asarray(y_train["y_value"].values, dtype=float)
+
+    penalty = np.ones(n_rules * per_rule)
+    penalty[::per_rule] = 0.0
+    # The prior vector, laid out to match `design`'s columns: 0 on every
+    # (unpenalized) intercept column, the local fit on every correction column.
+    prior = np.zeros(n_rules * per_rule)
+    if n_terms > 0:
+        prior.reshape(n_rules, per_rule)[:, 1:] = np.asarray(prior_corr, dtype=float)
+
+    pinned_cols: list[int] = []
+    pinned_vals: list[float] = []
+    if pin_extremes and n_rules >= 2 and y_bucket_mean is not None:
+        ybm = np.asarray(y_bucket_mean, dtype=float).ravel()
+        if ybm.size > int(np.max(labels)):
+            for rule_idx in (0, n_rules - 1):
+                value = float(ybm[int(labels[rule_idx])])
+                if np.isfinite(value):
+                    pinned_cols.append(rule_idx * per_rule)
+                    pinned_vals.append(value)
+
+    def _solve(A, rhs, pen, pri):
+        if l2_reg > 0:
+            root = np.sqrt(l2_reg * pen)
+            A = np.vstack([A, np.diag(root)])
+            rhs = np.hstack([rhs, root * pri])
+        return np.linalg.lstsq(A, rhs, rcond=None)[0]
+
+    if pinned_cols:
+        pinned = np.asarray(pinned_cols, dtype=int)
+        values = np.asarray(pinned_vals, dtype=float)
+        free = np.setdiff1d(np.arange(design.shape[1]), pinned)
+        beta = np.zeros(design.shape[1])
+        beta[pinned] = values
+        beta[free] = _solve(design[:, free], y - design[:, pinned] @ values,
+                            penalty[free], prior[free])
+    else:
+        beta = _solve(design, y, penalty, prior)
+
+    coeffs = beta.reshape(n_rules, per_rule)
+    corr = coeffs[:, 1:].copy() if n_terms > 0 else np.zeros((n_rules, 0))
+    return corr, coeffs[:, 0].copy()
