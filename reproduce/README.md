@@ -44,25 +44,35 @@ it; the map says which, and why, rather than leaving the reader to diff by hand.
 
 Check it before citing any table, and update it when a generator changes.
 
-## Before bumping the `tribble-fis` pin
+## The `tribble-fis` pin, and how the last bump was checked
 
-One known behaviour change is queued upstream and worth checking against, because
-it moves numbers rather than breaking anything:
-`tribble-fis` [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170)
-changes `trapz_math_fast.fit_trapezoids_fast`'s geometry and lowers its default
-`n_bins` from 50 to 10.
+Currently `141596e`. The previous pin, `058501f`, was 22 commits behind it; the bump
+was made to pick up
+[#170](https://github.com/fundthmcalculus/tribble-fis/pull/170), which changes
+`trapz_math_fast.fit_trapezoids_fast`'s geometry and lowers its default `n_bins`
+from 50 to 10.
 
 **No table here uses that path** — every generator in `tables/` runs
-`member_function="gaussian"` — so bumping the pin should leave all archived
-proposal tables alone. What it does move is the two sample scripts that take the
-`trapz_method="fast"` default: `FuzzySystemsExperiments/darwin_comparison.py` and
-the default-method configs in `darwin_quick_comparison.py`.
+`member_function="gaussian"`, so no archived proposal table was expected to move,
+and none did. The check that established it, which is the pattern to repeat on the
+next bump:
 
-Use that as a check on the bump, not just a to-do: the trapezoid arms should
-improve sharply (Concrete's fast-trapezoid regression arm goes from R² 0.121 with
-79% of rows uncovered to 0.81–0.84 with none) and **Gaussian arms should not move
-at all**. If a Gaussian number shifts, something other than #170 came in with the
-bump and needs its own explanation.
+```bash
+# before the bump
+python reproduce/tables/table_4_1_mog_baselines.py && cp reproduce/outputs/table_4_1.csv /tmp/before.csv
+# bump the submodule, reinstall it, then
+python reproduce/tables/table_4_1_mog_baselines.py && diff /tmp/before.csv reproduce/outputs/table_4_1.csv
+```
+
+Accuracy columns came back byte-identical (R² 0.808 ± 0.030, 0.867 ± 0.031,
+0.965 ± 0.001); only wall-clock differed. **A Gaussian accuracy number that shifts
+means something in the bump reached the Type-1 path and needs its own
+explanation** — that is what makes this diff worth running rather than skipping.
+
+Still owed from that bump: the two sample scripts that take the
+`trapz_method="fast"` default — `FuzzySystemsExperiments/darwin_comparison.py` and
+the default-method configs in `darwin_quick_comparison.py`. Neither is wired into
+`reproduce/`, so neither has an archived output to diff.
 
 Full scope and provenance: checklist item **B13** in
 `research/proposal-defense/CHECKLIST.md`.
