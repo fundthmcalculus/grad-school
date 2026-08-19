@@ -25,7 +25,7 @@ Start with `reproduce/PROVENANCE_MAP.md` — the per-table index this work produ
 | Run of record | `reproduce/outputs/full-2026-08-02/` — 11 tables, all green, 24 min |
 | Concrete runtime | **369 s**, from 1301 s serial (analytic gradient + parallelism) |
 
-Two things need your judgement, in §5.
+One thing needs your judgement, in §5 (the submodule item below was resolved 2026-08-19).
 
 ---
 
@@ -180,13 +180,17 @@ skew sweep is one of the cheapest tables in the harness (39 s), so this is
 minutes of compute, not hours. **If G5's "complete" status ever reached the
 committee, that needs correcting.**
 
-**`origin/main`'s submodule gitlinks are still broken.** PR #28 added
-`branch = main` to `.gitmodules`, but the recorded SHAs `56ac26e` and `de699c5`
-do not exist on their remotes. `branch = main` only affects
-`git submodule update --remote`; ordinary clone and CI checkout use the recorded
-SHA, so a fresh clone of main still fails. Fix is `git submodule update --remote
-&& git add tribble-fis tribble-cluster && commit`. This branch pins commits that
-resolve.
+**`origin/main`'s submodule gitlinks were broken — resolved 2026-08-19.**
+PR #28 had added `branch = main` to `.gitmodules`, but the recorded SHAs
+`56ac26e` and `de699c5` did not exist on their remotes. `branch = main` only
+affects `git submodule update --remote`; ordinary clone and CI checkout use the
+recorded SHA, so a fresh clone of main failed. main has since re-pinned:
+`deb4a78` (bump submodules to latest main) and `ed0f1c8` (tribble-fis →
+`141596e`) left it recording `tribble-fis 141596e`, `tribble-cluster 635ed6e`,
+`tribble-opt 8049b94` — each the tip of its remote `main`, verified resolvable
+on all three remotes 2026-08-19 via `git ls-remote`. A fresh clone of main now
+resolves all three; the submodules' working trees in this checkout were stale
+commits behind those pins and were fast-forwarded the same day.
 
 ---
 
