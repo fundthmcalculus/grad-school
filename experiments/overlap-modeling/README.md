@@ -12,11 +12,18 @@ down to 62% of rules firing per row). The only arm that survives its own control
 is blend sharpening on the *global* solve, +0.021 on bikeshare at 60/60 cells.
 See [`RESULTS.md`](RESULTS.md).
 
-Three stages: [`run_experiment.py`](run_experiment.py) (overlap),
+Four stages: [`run_experiment.py`](run_experiment.py) (overlap),
 [`run_local.py`](run_local.py) (per-bucket solving — fit or blend?),
-[`run_support.py`](run_support.py) (compact support), with
-[`analyze.py`](analyze.py), [`analyze_local.py`](analyze_local.py) and
-[`analyze_support.py`](analyze_support.py) generating the tables.
+[`run_support.py`](run_support.py) (compact support),
+[`run_trapz.py`](run_trapz.py) (the trapezoid fitter's endpoint defect), with
+`analyze*.py` generating the tables and
+[`diagnose_trapz_defect.py`](diagnose_trapz_defect.py) regenerating the defect
+evidence.
+
+Stage 4 found a defect worth fixing upstream regardless of this experiment's
+conclusions: `trapz_math_fast.fit_trapezoids_fast` puts the fitted support's left
+edge exactly where `TrapezoidMembership.evaluate` returns zero, so any feature with
+a mass point at its minimum loses those rows to every rule.
 
 [`RESULTS.md`](RESULTS.md) is the laboratory record: the hypotheses as
 registered before the run of record, and how each one scored. Generated tables

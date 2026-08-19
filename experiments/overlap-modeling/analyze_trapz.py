@@ -184,8 +184,10 @@ def figure(df, bins, pads, path) -> str | None:
     h, la = axes[0, 0].get_legend_handles_labels()
     fig.legend(h, la, loc="lower center", ncol=7, fontsize=7.5, frameon=False,
                bbox_to_anchor=(0.5, -0.04))
-    fig.suptitle("Trapezoid antecedents: padding is the blocker, bin count is the knob",
-                 fontsize=10)
+    # The title states what the sweep measured, not what was predicted: padding is
+    # the whole effect and the bin count barely moves anything once it is applied.
+    fig.suptitle("Trapezoid antecedents: padding is the whole effect; "
+                 "the bin count barely matters", fontsize=10)
     fig.tight_layout(rect=(0, 0.05, 1, 0.96))
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)

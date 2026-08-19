@@ -11,9 +11,11 @@ Three stages, each answering the objection the previous one raised:
 | **1** | Does overlapping the buckets improve the model? | `run_experiment.py` | mechanism real, no usable gain |
 | **2** | With a real per-bucket consequent solve, is the deficit the fit or the blend? | `run_local.py` | **the blend** — rules get much better locally, the model gets worse |
 | **3** | Does compact antecedent support fix the blend? | `run_support.py` | no — tightening support does not close the gap at all |
+| **4** | Coarsen the histogram to widen trapezoid support? | `run_trapz.py` + `diagnose_trapz_defect.py` | the bin count is not the problem — an **endpoint defect** was, and fixing it takes trapezoids from unusable to parity |
 
-Stage 1 is below; [stage 2](#stage-2--per-bucket-consequent-solving-fit-or-aggregation)
-and [stage 3](#stage-3--compact-support) follow it.
+Stage 1 is below; [stage 2](#stage-2--per-bucket-consequent-solving-fit-or-aggregation),
+[stage 3](#stage-3--compact-support) and
+[stage 4](#stage-4--the-trapezoid-fitters-endpoint-defect) follow it.
 
 **Stage 1 run of record:** [`outputs/results.json`](outputs/results.json) — 15,120 fits,
 240 cells × 63 arms, 0 errors, 21.7 min on 3 workers. Repo `44f59a4`,
@@ -574,3 +576,162 @@ cheapest arm measured, the clamped arms cost the same as Gaussian plus one
   documents. A better assignment (give each bucket every term its samples occupy)
   would raise coverage and is untested — though it would also give up the locality
   the arm existed to test.
+
+
+---
+
+# Stage 4 — the trapezoid fitter's endpoint defect
+
+**Run of record:** [`outputs/trapz_results.json`](outputs/trapz_results.json) —
+12,480 fits, 240 cells × 52 arms, 0 errors, 8.7 min. Tables:
+[`trapz_grid.md`](outputs/trapz_grid.md),
+[`trapz_paired.md`](outputs/trapz_paired.md),
+[`trapz_bins.md`](outputs/trapz_bins.md),
+[`trapz_grid.png`](outputs/trapz_grid.png). Regenerate with `analyze_trapz.py`.
+
+## The question
+
+> For the histogram fit operation, what if we reduced the number of buckets,
+> thereby increasing the effective support?
+
+Stage 3 had left trapezoid antecedents unusable — 77% of concrete's test rows and
+100% of bikeshare's covered by no rule at all — and the natural read is that the
+50-bin histogram is too fine, so the fitted regions are too narrow.
+
+## `n_bins` alone does nothing, and finding out why located a defect
+
+`n_bins=1` and `n_bins=50` produce **byte-identical coverage** — 0.791 uncovered on
+concrete's inner-train fold at every bin count in
+[`trapz_defect.md`](outputs/trapz_defect.md), from the same 40 membership
+functions. The bin count cannot help, because the histogram
+is taken over each bucket's own data, so ``a = bin_edges[0] = data.min()`` at
+*every* bin count. The left edge never moves.
+
+The actual cause: `TrapezoidMembership.evaluate` rises with a strict inequality
+(``x > a``), so membership is **exactly 0 at ``x == a``**. That is correct for an
+open trapezoid, and wrong in combination with a fitter that sets ``a`` to the data
+minimum — the smallest observed value, and everything tied with it, gets zero
+membership from the very term fitted to describe it.
+
+| feature | fraction of scaled inner-train rows sitting exactly at the column min |
+|---|---|
+| FlyAsh | **0.552** |
+| Slag | 0.472 |
+| Superplasticizer | 0.379 |
+| Age | 0.134 |
+| Cement | 0.005 |
+
+Under the ``min`` t-norm one dead feature zeroes the whole rule, so a row that is
+zero on FlyAsh *or* Slag *or* Superplasticizer is covered by nothing. Were those
+three independent that would be 0.853 of rows, against **0.791 measured** on the
+same fold — the same order, the residue being correlation between the columns. On
+bikeshare it is total: **100% uncovered, and the model predicts 0 everywhere.**
+
+All three legs of this diagnosis are regenerable rather than transcribed:
+`diagnose_trapz_defect.py` writes
+[`outputs/trapz_defect.md`](outputs/trapz_defect.md) with the endpoint evaluation,
+the per-feature mass at the minimum, and the uncovered fraction against both knobs.
+
+The same hazard is already handled one module over. `regression.partition_output`
+nudges ``edges[0] -= 1e-9`` so, in its own words, "the smallest value lands in
+bucket 0 rather than becoming NaN -- `include_lowest` alone is not enough once the
+edges are supplied explicitly."
+
+It also explains a loose end from stage 3: `trapz_ramp` saturated because the
+fitter computes ``ramp_width = bin_width * int(n_bins * ratio)``, which is
+approximately ``range * ratio`` at any bin count. It moves the *plateau* and
+cannot widen ``[a, d]``. Pinned as `test_trapz_ramp_cannot_widen_the_support`.
+
+## H11 — padding the fitted support makes compact antecedents usable: **confirmed, and large**
+
+`overlap.pad_trapezoids` re-seats each term so its fitted range becomes the
+plateau and the support extends ``trapz_pad`` times the region width beyond it.
+Paired against the Gaussian model in the same cell, global solve:
+
+| arm | concrete | bikeshare | synth-piecewise | synth-smooth |
+|---|---|---|---|---|
+| trapezoid, **unpadded** | −0.7650 (0/60) | −0.6730 (0/60) | −0.0333 (5/60) | −0.0359 (0/60) |
+| trapezoid, **padded** | −0.0058 (28/60, p=0.11) | −0.0537 (0/60) | −0.0082 (22/60, p=0.049) | **+0.0011** (38/60, p=0.0074) |
+
+On concrete the fix closes a **0.765 R² gap to 0.006** — statistically
+indistinguishable from the Gaussian model (p=0.11, 28 of 60 cells). On
+`synth-smooth` padded trapezoids **beat** Gaussians by a small but consistent
+margin (+0.0011, 38/60, p=0.0074). Bikeshare goes from a dead model (R² −0.000) to
+0.619, still 0.054 behind Gaussians.
+
+So compact support is *usable* after all — stage 3's conclusion that it is not was
+measuring a defect, not the shape. That correction matters more than the accuracy
+number: it means trapezoid antecedents, and the interpretability that comes with
+bounded support, are on the table at roughly Gaussian accuracy.
+
+## H12 — coarsening the histogram widens support and helps: **not confirmed**
+
+Padded configs only, paired against the same cell's `n_bins=50` at the same pad:
+
+| solver | dataset | 1 bin | 3 bins | 5 bins | 12 bins |
+|---|---|---|---|---|---|
+| global | concrete | **+0.0075** | +0.0075 | +0.0056 | +0.0050 |
+| global | bikeshare | −0.0199 | −0.0199 | −0.0199 | −0.0084 |
+| global | synth-piecewise | −0.0020 | −0.0020 | −0.0020 | −0.0015 |
+| global | synth-smooth | −0.0006 | −0.0002 | −0.0003 | −0.0002 |
+| local | concrete | −0.0155 | −0.0155 | −0.0139 | −0.0014 |
+| local | bikeshare | −0.0401 | −0.0401 | −0.0401 | −0.0178 |
+
+The prediction holds on exactly one of eight rows — concrete's global solve — and
+reverses on bikeshare, where **more** bins is better (0.619 at 50 against 0.596 at
+1). That is coherent: bikeshare's informative columns are largely discrete
+(`hr`, `mnth`, `weekday`), and a fine histogram captures real structure there that
+a single bin flattens. Once the endpoint defect is fixed, the bin count is close
+to a no-op — the padded curves in
+[`trapz_grid.png`](outputs/trapz_grid.png) are nearly flat across two orders of
+magnitude in `n_bins`.
+
+**A number of mine to discount.** A single-seed probe on concrete had
+`n_bins=1, pad=0.05` at 0.8902 against Gaussian's 0.8746, and I reported it as
+your intuition being vindicated while flagging it unconfirmed. Over ten seeds that
+same cell is **0.875** — exactly the Gaussian reference, not above it. The
+ordering across bin counts survived on concrete; the margin over Gaussians did not.
+Two single-seed probes in this experiment have now over-read a result the sweep
+then flattened (the other being 2.75σ in stage 3), which is a rate worth
+remembering rather than explaining away.
+
+## H13 — compact support closes the local/global gap: **still falsified**
+
+Stage 3's central null does not change once the defect is fixed. Concrete, padded
+trapezoids: global 0.869, per-bucket 0.618, gap **−0.251** — against the Gaussian
+model's −0.209. The gap is if anything slightly wider, and per-bucket solving is
+worse in absolute terms on every rung (concrete −0.0475 against its own Gaussian
+per-bucket arm, bikeshare −0.1292, `synth-piecewise` −0.2298).
+
+This is the strongest form of the stage-3 finding, because the objection has now
+been given every advantage: genuinely compact support, zero dead zones, and
+accuracy at parity with Gaussians on the global solve. The blend still destroys a
+per-bucket local fit. Whatever is wrong there is not the tails of the membership
+functions.
+
+## What to take from stage 4
+
+1. **A defect worth fixing upstream**, independent of everything else in this
+   experiment: `fit_trapezoids_fast` places the fitted support's left edge exactly
+   on a value that the membership function evaluates to zero. Any dataset with a
+   mass point at a feature minimum — zero-inflated counts, censored measurements,
+   one-hot-ish columns — silently loses those rows to every rule. `concrete_trapz.py`
+   and `darwin_trapz.py` both run this fitter.
+2. **Trapezoid antecedents are viable at Gaussian accuracy** once padded, which
+   stage 3 wrongly concluded otherwise.
+3. **The bin count is not the lever**, and after the fix it barely matters at all.
+4. **The local/global gap is untouched by any of it**, which is now three
+   independent attempts on the same null.
+
+## Caveats
+
+- `pad` is swept over {0.05, 0.15, 0.25, 0.5} and the differences between nonzero
+  pads are small (concrete's global column moves 0.875 → 0.873 across the whole
+  range). The effect is "padded at all", not "padded by the right amount".
+- The padding is applied as a post-processing pass over the fitted model rather
+  than inside the fitter, so it cannot change which *regions* the histogram found —
+  only where their edges sit. A fix inside `fit_trapezoids_fast` could do better by
+  choosing region boundaries with the endpoint semantics in mind.
+- `trapezoid-em` (the EM fitter) is untested against this. It sets its own
+  ``a``/``d`` and may or may not have the same defect; at 42 s a fit it was out of
+  budget for a sweep.
