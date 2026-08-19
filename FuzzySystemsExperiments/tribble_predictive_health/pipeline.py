@@ -68,6 +68,7 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
         stride=200,
         window_size=5,
         memory_size=2,
+        rul_ceiling=None,
         max_train_rows=None,
         tsk_order="full-2nd",
         n_gaussians=0,
@@ -97,6 +98,7 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
         self.stride = stride
         self.window_size = window_size
         self.memory_size = memory_size
+        self.rul_ceiling = rul_ceiling
         self.max_train_rows = max_train_rows
         self.tsk_order = tsk_order
         self.n_gaussians = n_gaussians
@@ -175,6 +177,14 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
         self.scaler_ = StandardScaler().fit(table[self.feature_cols_].to_numpy(float))
         X_train = self.scaler_.transform(table[self.feature_cols_].to_numpy(float))
         y_train = cap_rul(table, caps, unit_col=self.unit_col, rul_col=self.rul_col)
+        if self.rul_ceiling is not None:
+            # A constant RUL ceiling on top of the per-engine health-onset cap
+            # (the classic C-MAPSS piecewise-linear-RUL trick): degradation is
+            # only detectable in roughly the last `rul_ceiling` cycles, so
+            # flattening the long healthy plateau removes samples the model
+            # cannot fit anyway. Applied to the training target only; the test
+            # target is scored uncapped.
+            y_train = np.minimum(y_train, float(self.rul_ceiling))
 
         self.regressor_ = TribbleRegressor(
             random_state=self.random_state,

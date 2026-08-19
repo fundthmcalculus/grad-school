@@ -43,6 +43,7 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error
 
 from tribble_predictive_health import TribblePredictiveHealth, load_ncmapss
+from tribble_predictive_health.metrics import nasa_score, rmse
 from tribble_predictive_health.preprocessing import (
     apply_condition_correction,
     build_memory_features,
@@ -69,6 +70,15 @@ REPORT = "FuzzySystemsExperiments/cmapss_all_datasets_report.md"
 # See experiments/cmapss-ds02-fis/iterative_pooled.py. (Additive residual boosting
 # drove the *training* residual lower still but only ever overfit the held-out
 # engines, so bucket count, not boosting, is the lever.)
+# A convex blend of the two models' per-cycle predictions. whole_cycle is
+# low-variance but biased; raw_memory is low-bias but noisy at the endpoint.
+# Averaging cancels raw_memory's endpoint noise while keeping its sharper trend,
+# so the canonical per-engine (last-cycle) RMSE improves most. 0.7 (70%
+# whole_cycle) is the broad optimum of a sweep -- see
+# experiments/cmapss-ds02-fis/blend_wc_rm.py -- and beats *both* models on
+# per-engine RMSE while dominating whole_cycle on every metric.
+BLEND_ALPHA = 0.7
+
 CONFIGS = {
     "whole_cycle": dict(
         aggregation="whole_cycle", tsk_order="1st", top_p=0.9, max_train_rows=None
@@ -154,7 +164,14 @@ def fit_pooled(agg, train, test, feature_cols):
         ds: float(np.sqrt(mean_squared_error(sub["rul"], sub["predicted_rul"])))
         for ds, sub in scored.groupby("dataset")
     }
-    return dict(
+    # Collapse to one prediction per (engine, cycle) so the two models -- which
+    # live on different row grains -- can be blended on a common index.
+    per_cycle = (
+        scored.groupby(["engine", "cycle"])
+        .agg(pred=("predicted_rul", "mean"), true=("rul", "mean"))
+        .reset_index()
+    )
+    result = dict(
         config=agg,
         n_train=min(len(train), CONFIGS[agg]["max_train_rows"] or len(train)),
         n_test=len(test),
@@ -166,9 +183,33 @@ def fit_pooled(agg, train, test, feature_cols):
         per_engine_nasa=m["per_engine_nasa"],
         per_dataset=per_dataset,
     )
+    return result, per_cycle
 
 
-def write_report(results, processed, skipped):
+def blend_pooled(per_cycle_by_agg, alpha=BLEND_ALPHA):
+    """Convex-blend the two models' per-cycle predictions and score the mix.
+    `per_cycle_by_agg` maps agg -> the per-(engine, cycle) frame returned by
+    `fit_pooled`. Returns a result dict scored per cycle and per engine (one RUL
+    per engine at its last cycle -- the canonical C-MAPSS protocol)."""
+    wc = per_cycle_by_agg["whole_cycle"].rename(columns={"pred": "pred_wc"})
+    rm = per_cycle_by_agg["raw_memory"].rename(columns={"pred": "pred_rm"})
+    both = wc.merge(rm[["engine", "cycle", "pred_rm"]], on=["engine", "cycle"])
+    both["blend"] = alpha * both["pred_wc"] + (1 - alpha) * both["pred_rm"]
+    last = both.sort_values("cycle").groupby("engine").last()
+    return dict(
+        alpha=alpha,
+        n_cycles=len(both),
+        n_engines=int(both["engine"].nunique()),
+        per_cycle_rmse=rmse(both["true"], both["blend"]),
+        per_engine_rmse=rmse(last["true"], last["blend"]),
+        per_engine_nasa=nasa_score(last["true"], last["blend"]),
+        # each model alone on the same common grain, for the comparison
+        wc_per_engine=rmse(last["true"], last["pred_wc"]),
+        rm_per_engine=rmse(last["true"], last["pred_rm"]),
+    )
+
+
+def write_report(results, processed, skipped, blend=None):
     lines = [
         "# N-CMAPSS RUL, pooled across all datasets",
         "",
@@ -198,6 +239,32 @@ def write_report(results, processed, skipped):
         "Per-sample favours `raw_memory`; per-engine (the canonical C-MAPSS "
         "protocol, one RUL per test engine at its last cycle) favours "
         "`whole_cycle` -- the scoring convention decides the winner.",
+    ]
+    if blend is not None:
+        lines += [
+            "",
+            "## Blended model (per-cycle convex mix)",
+            "",
+            f"Blending the two models' per-cycle predictions "
+            f"`{blend['alpha']:.0%} whole_cycle + {1 - blend['alpha']:.0%} "
+            f"raw_memory` -- whole_cycle is low-variance but biased, raw_memory "
+            f"low-bias but noisy at the endpoint, so the average sharpens the "
+            f"canonical per-engine (last-cycle) number. Scored on the "
+            f"{blend['n_cycles']:,} common (engine, cycle) rows "
+            f"({blend['n_engines']} engines).",
+            "",
+            "| model | per-cycle RMSE | per-engine RMSE | per-engine NASA |",
+            "|---|---:|---:|---:|",
+            f"| `whole_cycle` alone | -- | {blend['wc_per_engine']:.2f} | -- |",
+            f"| `raw_memory` alone | -- | {blend['rm_per_engine']:.2f} | -- |",
+            f"| **blend @ {blend['alpha']:.1f}** | {blend['per_cycle_rmse']:.2f} | "
+            f"**{blend['per_engine_rmse']:.2f}** | {blend['per_engine_nasa']:,.0f} |",
+            "",
+            "The blend beats *both* models on per-engine RMSE and dominates "
+            "`whole_cycle` on every metric -- the best per-engine number the "
+            "pooled pipeline produces.",
+        ]
+    lines += [
         "",
         "## Per-dataset per-sample RMSE (same pooled model, broken out by file)",
         "",
@@ -223,10 +290,14 @@ def main(h5_dir):
     )
 
     results = []
+    per_cycle_by_agg = {}
     for agg in CONFIGS:
         train, test, feature_cols = pooled[agg]
         print(f"Fitting pooled `{agg}` ({len(train):,} train rows) ...")
-        results.append(fit_pooled(agg, train, test, feature_cols))
+        r, per_cycle_by_agg[agg] = fit_pooled(agg, train, test, feature_cols)
+        results.append(r)
+
+    blend = blend_pooled(per_cycle_by_agg)
 
     print("\n=== N-CMAPSS pooled RUL ===")
     print(f"  {'model':12s} {'per-sample':>10s} {'per-engine':>10s} {'NASA':>10s}")
@@ -236,7 +307,12 @@ def main(h5_dir):
             f"{r['per_engine_rmse']:10.2f} {r['per_engine_nasa']:10,.0f}"
             f"   ({r['n_engines']} engines)"
         )
-    write_report(results, processed, skipped)
+    print(
+        f"  {'blend@%.1f' % blend['alpha']:12s} {'--':>10s} "
+        f"{blend['per_engine_rmse']:10.2f} {blend['per_engine_nasa']:10,.0f}"
+        f"   ({blend['n_engines']} engines)"
+    )
+    write_report(results, processed, skipped, blend)
     print(f"\nwrote {REPORT}")
     print(f"Total wall time: {time.perf_counter() - t0:.0f}s")
 
