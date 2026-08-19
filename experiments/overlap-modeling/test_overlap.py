@@ -752,3 +752,105 @@ def test_membership_is_validated(data):
     X, y = data
     with pytest.raises(ValueError):
         OverlapTribbleRegressor(membership="bell").fit(X, y)
+
+
+# --------------------------------------------------------------------------
+# Stage 4: the trapezoid fitter's endpoint defect
+# --------------------------------------------------------------------------
+def test_trapezoid_membership_is_zero_at_its_own_endpoints():
+    """The library behaviour the padding fix exists for, pinned as a fact.
+
+    Correct for an open trapezoid, and a defect once the fitter sets ``a`` to the
+    data minimum: the smallest observed value then gets zero membership from the
+    term fitted to describe it.
+    """
+    from tribblefis.gauss_data import TrapezoidMembership
+
+    t = TrapezoidMembership.create(a=0.0, b=0.25, c=0.75, d=1.0)
+    assert t.evaluate(np.array([0.0]))[0] == 0.0
+    assert t.evaluate(np.array([1.0]))[0] == 0.0
+    assert t.evaluate(np.array([0.5]))[0] == pytest.approx(1.0)
+
+
+def test_padding_gives_the_data_range_full_membership(data):
+    """After padding, every point the term was fitted to has membership 1."""
+    from tribblefis.gauss_data import TrapezoidMembership
+
+    from overlap import pad_trapezoids
+
+    X = pd.DataFrame({"a": np.linspace(0.0, 1.0, 50)})
+    model = GaussianMixtureModel(feature_models={
+        "a": FeatureModel(label_models={
+            0: LabelModel(memberships=[TrapezoidMembership.create(0.2, 0.3, 0.7, 0.8)])})})
+    padded = pad_trapezoids(model, X, pad=0.25)
+    mf = padded.feature_models["a"].label_models[0].memberships[0]
+
+    # The old support becomes the plateau...
+    assert (mf.b, mf.c) == pytest.approx((0.2, 0.8))
+    assert mf.evaluate(np.array([0.2, 0.5, 0.8]))[0] == pytest.approx(1.0)
+    np.testing.assert_allclose(mf.evaluate(np.array([0.2, 0.5, 0.8])), 1.0)
+    # ...and the support extends pad * width beyond it, still compact.
+    assert mf.a == pytest.approx(0.2 - 0.25 * 0.6)
+    assert mf.d == pytest.approx(0.8 + 0.25 * 0.6)
+    assert mf.evaluate(np.array([mf.a - 1e-9, mf.d + 1e-9]))[0] == 0.0
+
+
+def test_padding_rescues_a_degenerate_single_value_region():
+    """a == d would otherwise be a delta function that fires nowhere."""
+    from tribblefis.gauss_data import TrapezoidMembership
+
+    from overlap import pad_trapezoids
+
+    X = pd.DataFrame({"a": np.linspace(0.0, 1.0, 50)})
+    model = GaussianMixtureModel(feature_models={
+        "a": FeatureModel(label_models={
+            0: LabelModel(memberships=[TrapezoidMembership.create(0.5, 0.5, 0.5, 0.5)])})})
+    mf = pad_trapezoids(model, X, pad=0.2).feature_models["a"].label_models[0].memberships[0]
+    assert mf.d > mf.a, "a degenerate region was left as a delta"
+    assert mf.evaluate(np.array([0.5]))[0] == pytest.approx(1.0)
+    assert mf.evaluate(np.array([0.45]))[0] > 0.0
+
+
+def test_padding_closes_the_trapezoid_coverage_hole(data):
+    """The measured effect: a mass point at a feature minimum stops killing rules."""
+    X, y = data
+    # A zero-inflated column, which is what triggers the defect on real data
+    # (55% of concrete's scaled FlyAsh sits exactly at its minimum).
+    X = X.copy()
+    X["zeros"] = np.where(np.arange(len(X)) % 2 == 0, 0.0, X["a"].to_numpy())
+
+    def cov(pad):
+        return OverlapTribbleRegressor(
+            n_output_buckets=5, output_partition="quantile", tsk_order="1st",
+            membership="trapezoid", trapz_bins=1, trapz_pad=pad,
+            random_state=7).fit(X, y).coverage(X)
+
+    assert cov(0.0)["uncovered"] > 0.2, "fixture does not reproduce the defect"
+    assert cov(0.1)["uncovered"] == 0.0
+
+
+def test_fewer_bins_widen_the_support(data):
+    """The n_bins mechanism, once padding has removed the endpoint confound."""
+    X, y = data
+
+    def frac(bins):
+        return OverlapTribbleRegressor(
+            n_output_buckets=5, output_partition="quantile", tsk_order="1st",
+            membership="trapezoid", trapz_bins=bins, trapz_pad=0.05,
+            random_state=7).fit(X, y).coverage(X)["active_frac"]
+
+    assert frac(1) >= frac(50), "coarser bins should not narrow the support"
+
+
+def test_trapz_ramp_cannot_widen_the_support(data):
+    """Documents why ramp_width_ratio saturated: it moves the plateau, not [a, d]."""
+    X, y = data
+
+    def bounds(ramp):
+        m = OverlapTribbleRegressor(
+            n_output_buckets=3, output_partition="quantile", tsk_order="1st",
+            membership="trapezoid", trapz_bins=20, trapz_ramp=ramp,
+            random_state=7).fit(X, y)
+        return sorted((mf.a, mf.d) for mf in m.model_.all_membership_fcns)
+
+    np.testing.assert_allclose(bounds(0.1), bounds(0.4), atol=1e-12)

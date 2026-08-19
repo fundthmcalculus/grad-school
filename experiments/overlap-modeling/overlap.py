@@ -86,6 +86,7 @@ from sklearn.utils.validation import check_X_y, check_is_fitted
 
 from tribblefis.gauss_data import (
     FeatureModel,
+    TrapezoidMembership,
     GaussianMembership,
     GaussianMixtureModel,
     LabelModel,
@@ -667,9 +668,30 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         feature as a shared triangular partition that is both compactly supported
         *and* a partition of unity -- see `ruspinize_features`.
     trapz_ramp : float, default 0.1
-        `ramp_width_ratio` for the fast trapezoid fitter (shoulder width as a
-        fraction of the bin count); `merge_width_ratio` is set to twice it, the
-        library's own default ratio.
+        `ramp_width_ratio` for the fast trapezoid fitter -- shoulder width as a
+        fraction of the bin count. Note this moves the *plateau*, not the support:
+        the fitter computes ``ramp_width = bin_width * int(n_bins * ratio)``, which
+        is approximately ``range * ratio`` however many bins there are. It cannot
+        widen ``[a, d]``, so it cannot fix coverage.
+    trapz_bins : int, default 50
+        `n_bins`. This is the knob that governs support. The histogram is taken
+        over each bucket's own data, so ``[a, d]`` can never exceed that bucket's
+        ``[min, max]`` -- but with many bins over few samples, interior bins fall
+        empty, `_find_contiguous_regions` returns several disjoint regions, and
+        the gaps between them are dead zones *inside* the bucket's own range.
+        Fewer bins merges those regions and closes the gaps; ``n_bins=1`` gives a
+        single trapezoid spanning the whole range, which is the widest support the
+        parameterization admits.
+    trapz_pad : float, default 0.0
+        Re-seat fitted trapezoids so their data range is the plateau and the
+        support extends this fraction of the region width beyond it
+        (`pad_trapezoids`). 0 keeps the library's fitted geometry, whose left edge
+        sits exactly on the data minimum and therefore gives zero membership to
+        every value tied with it.
+    trapz_merge : float, default 0.2
+        `merge_width_ratio` -- regions separated by fewer than
+        ``int(n_bins * ratio)`` empty bins are merged. The other lever on support,
+        and the one that closes gaps without coarsening the histogram.
     ruspini_tol : float, default 0.02
         Apex-merge tolerance for ``membership="ruspini"``, in the feature's units
         (inputs are unit-scaled, so 0.02 is 2% of the range).
@@ -728,6 +750,9 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         clamp_k=3.0,
         clamp_smooth=True,
         trapz_ramp=0.1,
+        trapz_bins=50,
+        trapz_merge=0.2,
+        trapz_pad=0.0,
         ruspini_tol=0.02,
     ):
         self.top_n = top_n
@@ -760,6 +785,9 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         self.clamp_k = clamp_k
         self.clamp_smooth = clamp_smooth
         self.trapz_ramp = trapz_ramp
+        self.trapz_bins = trapz_bins
+        self.trapz_merge = trapz_merge
+        self.trapz_pad = trapz_pad
         self.ruspini_tol = ruspini_tol
 
     def _norms(self):
@@ -789,8 +817,9 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
 
                 def build(labels):
                     return _fit(X_df, labels, top_n_var_names=self.top_features_,
+                                n_bins=self.trapz_bins,
                                 ramp_width_ratio=self.trapz_ramp,
-                                merge_width_ratio=2.0 * self.trapz_ramp)
+                                merge_width_ratio=self.trapz_merge)
             else:
                 from tribblefis.trapz_math import create_trapz_membership_dict
                 shape = ("trapezoid" if self.membership == "trapezoid-em"
@@ -872,6 +901,8 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
                                       smooth=self.clamp_smooth)
         elif self.membership == "ruspini":
             self.model_ = ruspinize_features(self.model_, merge_tol=self.ruspini_tol)
+        elif self.membership == "trapezoid" and self.trapz_pad > 0:
+            self.model_ = pad_trapezoids(self.model_, X_df, pad=self.trapz_pad)
 
         self.n_rules_ = self.model_.n_rules
 
@@ -1376,6 +1407,61 @@ def ruspinize_features(model: GaussianMixtureModel, merge_tol: float = 0.02
             label_models[label] = LabelModel(memberships=picked)
         feature_models[name] = FeatureModel(label_models=label_models)
     return GaussianMixtureModel(feature_models=feature_models)
+
+
+def pad_trapezoids(model: GaussianMixtureModel, X: pd.DataFrame,
+                   pad: float = 0.25) -> GaussianMixtureModel:
+    """Re-seat each fitted trapezoid so its observed data range is the *plateau*.
+
+    Fixes a defect in the histogram fitter that makes compactly supported
+    antecedents unusable on any feature with a mass point at its minimum.
+
+    `TrapezoidMembership.evaluate` rises with a strict inequality (``x > a``), so
+    membership is exactly **0 at x == a**, which is correct for an open trapezoid.
+    But `trapz_math_fast.fit_trapezoids_fast` sets ``a = bin_edges[0]``, i.e. the
+    minimum of the data it was fitted to -- so the smallest observed value, and
+    every value tied with it, receives zero membership from the very term fitted
+    to describe it. On concrete's scaled features 55% of rows sit exactly at
+    FlyAsh's minimum, 44% at Slag's and 36% at Superplasticizer's; under the
+    ``min`` t-norm one dead feature zeroes the whole rule, and 77% of test rows
+    end up covered by no rule at all.
+
+    The library already handles the identical hazard one module over:
+    `regression.partition_output` nudges ``edges[0] -= 1e-9`` so "the smallest
+    value lands in bucket 0 rather than becoming NaN -- `include_lowest` alone is
+    not enough once the edges are supplied explicitly". This is that nudge, sized
+    to matter rather than to break a tie: the fitted ``[a, d]`` becomes the plateau
+    ``[b, c]``, and the support extends ``pad`` times the region width beyond it on
+    each side. So every point the term was fitted to gets membership 1, points
+    just outside ramp down, and the term is still compactly supported -- which is
+    the whole reason for using trapezoids here.
+
+    ``pad`` is relative to each region's own width, with a floor taken from the
+    feature's observed range so that a degenerate region (a single repeated value,
+    ``a == d``) still gets a usable support instead of a delta function.
+    """
+    padded = {}
+    for name, fmodel in model.feature_models.items():
+        col = X[name].to_numpy(dtype=float) if name in X else None
+        span = float(np.nanmax(col) - np.nanmin(col)) if col is not None and len(col) else 1.0
+        floor = pad * (span if span > 0 else 1.0)
+        label_models = {}
+        for label, lmodel in fmodel.label_models.items():
+            out = []
+            for mf in lmodel.memberships:
+                if not isinstance(mf, TrapezoidMembership):
+                    out.append(mf)
+                    continue
+                width = float(mf.d - mf.a)
+                margin = max(pad * width, floor if width <= 0 else 0.0)
+                if margin <= 0:
+                    margin = floor
+                out.append(TrapezoidMembership.create(
+                    a=float(mf.a) - margin, b=float(mf.a),
+                    c=float(mf.d), d=float(mf.d) + margin))
+            label_models[label] = LabelModel(memberships=out)
+        padded[name] = FeatureModel(label_models=label_models)
+    return GaussianMixtureModel(feature_models=padded)
 
 
 def coverage_report(firing_strengths: np.ndarray, threshold: float = 1e-6) -> dict:
