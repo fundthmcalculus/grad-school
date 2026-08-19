@@ -35,3 +35,13 @@ be a non-lever.
 
 Orthogonal (Legendre) consequents were also tried here and were a no-op at
 full-2nd (identical to raw monomials), so that probe script was removed.
+
+## Reducing RMSE (upstream + structural sweeps)
+- `sweep_features_target.py`         — #4 memory-feature geometry (stride/window/memory) and #5 the RUL target cap. The cap is the real lever: a constant ceiling Rc≈58–60 on top of the health-onset cap cuts DS02 per-sample test RMSE 6.48 → 6.23 (below ~50 it collapses).
+- `sweep_antecedent_consequent.py`   — #6 antecedent granularity (`n_gaussians`) and #7 RBF consequents. n_gaussians=2 is marginal; RBF consequents are a dead-end (test ~12).
+- `sweep_ceiling_combo.py`           — refine the RUL ceiling and stack the marginal winners: **window 10 + Rc≈60 → 6.14** (−5%), the best DS02 config found.
+- `blend_wc_rm.py`                   — #8 blend the two pooled models. A **70/30 whole_cycle/raw_memory blend** hits per-engine RMSE **8.54** (vs 9.20 / 13.13 alone) and dominates whole_cycle on all three metrics — productionised in `cmapss_all_datasets.py`.
+
+`sweep_features_target.py` / `sweep_ceiling_combo.py` use the harness's
+`load_corrected` (corrected frames before featurisation) so they can re-featurise
+with their own geometry.

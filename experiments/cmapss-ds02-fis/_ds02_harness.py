@@ -50,3 +50,15 @@ def load(h5=H5):
 
 def rmse(a, b):
     return float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+
+
+def load_corrected(h5=H5):
+    """The condition-corrected dev/test frames + sensor list, before any
+    featurisation -- so the feature-geometry / RUL-cap sweeps can re-featurise
+    with their own knobs. Returns (dev, test, sensors)."""
+    dev, cond, sensors = load_ncmapss(h5, "dev")
+    test, _, _ = load_ncmapss(h5, "test")
+    models = fit_condition_correction(dev, sensors, cond)
+    dev = apply_condition_correction(dev, sensors, cond, models)
+    test = apply_condition_correction(test, sensors, cond, models)
+    return dev, test, sensors
