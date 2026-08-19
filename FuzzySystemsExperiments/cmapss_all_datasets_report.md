@@ -7,7 +7,7 @@ Datasets pooled: DS01-005, DS02-006, DS03-012, DS04, DS05, DS06, DS07, DS08a-009
 | model | input | per-sample RMSE | per-engine RMSE | per-engine NASA | fit s |
 |---|---|---:|---:|---:|---:|
 | `whole_cycle` | 18 real | 15.86 | 9.20 | 85 | 1.0 |
-| `raw_memory` | 18 real | 15.80 | 22.69 | 21,793 | 6.2 |
+| `raw_memory` | 18 real | 14.87 | 13.13 | 175 | 24.0 |
 
 Per-sample favours `raw_memory`; per-engine (the canonical C-MAPSS protocol, one RUL per test engine at its last cycle) favours `whole_cycle` -- the scoring convention decides the winner.
 
@@ -15,12 +15,12 @@ Per-sample favours `raw_memory`; per-engine (the canonical C-MAPSS protocol, one
 
 | dataset | `whole_cycle` | `raw_memory` |
 |---|---:|---:|
-| DS01-005 | 13.37 | 13.36 |
-| DS02-006 | 16.13 | 10.61 |
-| DS03-012 | 14.40 | 13.17 |
-| DS04 | 21.70 | 18.39 |
-| DS05 | 14.97 | 13.39 |
-| DS06 | 16.17 | 22.97 |
-| DS07 | 17.61 | 18.74 |
-| DS08a-009 | 13.33 | 13.15 |
-| DS08c-008 | 13.08 | 13.35 |
+| DS01-005 | 13.37 | 13.30 |
+| DS02-006 | 16.13 | 10.38 |
+| DS03-012 | 14.40 | 13.04 |
+| DS04 | 21.70 | 18.24 |
+| DS05 | 14.97 | 13.23 |
+| DS06 | 16.17 | 16.03 |
+| DS07 | 17.61 | 18.89 |
+| DS08a-009 | 13.33 | 13.07 |
+| DS08c-008 | 13.08 | 13.20 |

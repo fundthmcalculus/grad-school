@@ -62,6 +62,13 @@ REPORT = "FuzzySystemsExperiments/cmapss_all_datasets_report.md"
 # what would blow up memory, so `max_train_rows` subsamples it to a fixed 30k
 # (seed 42) before fitting -- about the size the single-DS02 fit uses. whole_cycle
 # is only ~4.5k rows, so it trains on all of them.
+#
+# raw_memory uses 4 output buckets (rules) rather than the default 2: on the
+# pooled per-sample metric a rule-count sweep bottoms out at 4 (per-sample RMSE
+# 15.80 -> 14.87), climbing back by 6-8 -- the honest bias/variance sweet spot.
+# See experiments/cmapss-ds02-fis/iterative_pooled.py. (Additive residual boosting
+# drove the *training* residual lower still but only ever overfit the held-out
+# engines, so bucket count, not boosting, is the lever.)
 CONFIGS = {
     "whole_cycle": dict(
         aggregation="whole_cycle", tsk_order="1st", top_p=0.9, max_train_rows=None
@@ -70,6 +77,7 @@ CONFIGS = {
         aggregation="raw_memory",
         tsk_order="full-2nd",
         top_p=0.95,
+        n_output_buckets=4,
         max_train_rows=30_000,
     ),
 }
