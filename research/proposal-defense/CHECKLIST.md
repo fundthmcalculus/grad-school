@@ -266,14 +266,24 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       the numeric phase itself was unaffected. Full account:
       `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`.
 
-- [ ] ⬜ **B13 — Upstream trapezoid-fitter fix changes the fast-path geometry: nothing owed for
-      the proposal, two sample scripts owed on the next pin bump.** `tribble-fis`
+- [ ] ⬜ **B13 — Upstream trapezoid-fitter fix: pin bumped to `141596e`, no proposal table
+      moved, two sample scripts still owed.** `tribble-fis`
       [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170) fixes a defect in
       `trapz_math_fast.fit_trapezoids_fast` and lowers its default `n_bins` from 50 to 10.
-      **This is recorded because the fix moves numbers, not because anything here is currently
-      wrong** — the submodule is pinned (`058501f`) and `reproduce/README.md`'s rule is that
-      reproducing a proposal result must never dirty a pinned submodule, so no archived table
-      moves until someone bumps the pin.
+      Merged, and the submodule pin moved `058501f` → `141596e` in this same change.
+
+      **Verified before the bump was committed, not assumed.**
+      `reproduce/tables/table_4_1_mog_baselines.py` at ten seeds is byte-identical across the
+      bump — R² 0.808 ± 0.030, 0.867 ± 0.031, 0.965 ± 0.001 and both reference columns
+      unchanged. Only wall-clock moved (0.14 → 0.15 s), which is machine noise. That is the
+      check this item predicted, and it passed.
+
+      **The bump spans 22 upstream commits, not just #170** — the pin was already behind
+      `c27e586`. Two that looked risky and are not: #123 renamed the scaling classes but kept
+      all four old names as aliases bound to the same class objects (`UnitScalar is
+      MinMaxScaler` confirmed), so no import breaks; #138 unified the zero-firing threshold by
+      moving IT2/GT2 onto Type-1's existing `1e-6`, leaving the Type-1 path this repo uses
+      untouched. The table diff is the empirical confirmation of both.
 
       **The defect.** The fitter set each region's `a` to `bin_edges[start]`, i.e. the minimum
       of the data it was fitted to, and inset the plateau from there.
@@ -289,9 +299,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 
       **Scope, checked at the call sites rather than assumed.** The change only reaches callers
       that take the `trapz_method="fast"` **default**:
-      - **Owed on the next pin bump:** `FuzzySystemsExperiments/darwin_comparison.py` (line 113,
-        `member_function="trap"` with no `trapz_method`) and the default-method configs in
-        `darwin_quick_comparison.py`. Both should be re-run and any quoted numbers refreshed.
+      - **Still owed — the reason this item stays unticked:**
+        `FuzzySystemsExperiments/darwin_comparison.py` (line 113, `member_function="trap"` with
+        no `trapz_method`) and the default-method configs in `darwin_quick_comparison.py`. Both
+        now run against the fixed fitter and should be re-run, with any quoted numbers
+        refreshed. Not done here: neither is wired into `reproduce/`, so neither has an archived
+        output to diff against, and the DARWIN data is not on this host.
       - **Not affected — no action:** `concrete_trapz.py`, whose `main()` runs only `"gaussian"`
         and `"trapz"` (the EM fitter); its `"trapz-fast"` branch in `run_model` is never
         invoked. So the `Trapz 1st 0.692 → 0.815` figures under **B9** above come from the EM
