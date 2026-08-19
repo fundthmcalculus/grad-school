@@ -266,6 +266,54 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       the numeric phase itself was unaffected. Full account:
       `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`.
 
+- [ ] ⬜ **B13 — Upstream trapezoid-fitter fix changes the fast-path geometry: nothing owed for
+      the proposal, two sample scripts owed on the next pin bump.** `tribble-fis`
+      [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170) fixes a defect in
+      `trapz_math_fast.fit_trapezoids_fast` and lowers its default `n_bins` from 50 to 10.
+      **This is recorded because the fix moves numbers, not because anything here is currently
+      wrong** — the submodule is pinned (`058501f`) and `reproduce/README.md`'s rule is that
+      reproducing a proposal result must never dirty a pinned submodule, so no archived table
+      moves until someone bumps the pin.
+
+      **The defect.** The fitter set each region's `a` to `bin_edges[start]`, i.e. the minimum
+      of the data it was fitted to, and inset the plateau from there.
+      `TrapezoidMembership.evaluate` rises with a strict inequality (`x > a`), so membership is
+      exactly **0 at `x == a`** — correct for an open trapezoid, and wrong in that combination:
+      the smallest observed value, and everything tied with it, got zero membership from the
+      term fitted to describe it. Under the `min` t-norm one such feature zeroes a rule across
+      every input. On unit-scaled Concrete 55% of rows sit at FlyAsh's minimum, 47% at Slag's
+      and 38% at Superplasticizer's, and **78.6% of held-out rows were covered by no rule at
+      all** — answered with exactly `0.0`, a finite value that passes every non-finite check in
+      the pipeline, so it read as a bad model rather than a broken one. `partition_output`
+      already guards the same hazard on the output side with `edges[0] -= 1e-9`.
+
+      **Scope, checked at the call sites rather than assumed.** The change only reaches callers
+      that take the `trapz_method="fast"` **default**:
+      - **Owed on the next pin bump:** `FuzzySystemsExperiments/darwin_comparison.py` (line 113,
+        `member_function="trap"` with no `trapz_method`) and the default-method configs in
+        `darwin_quick_comparison.py`. Both should be re-run and any quoted numbers refreshed.
+      - **Not affected — no action:** `concrete_trapz.py`, whose `main()` runs only `"gaussian"`
+        and `"trapz"` (the EM fitter); its `"trapz-fast"` branch in `run_model` is never
+        invoked. So the `Trapz 1st 0.692 → 0.815` figures under **B9** above come from the EM
+        path and stand. `darwin_trapz.py` passes `trapz_method="em"` explicitly.
+      - **Not affected — no proposal table touches this path at all:** every table in
+        `reproduce/` uses `member_function="gaussian"`. Verified by grep over
+        `reproduce/tables/`; there is no trapezoid arm in any of them.
+
+      **Expected direction when the pin does move** (Concrete, ten seeds, 5 buckets, 2nd-order
+      consequents, through `solve_tsk_consequents`/`predict_tsk`): the fast trapezoid arm goes
+      from test R² 0.121 with 78.6% of rows uncovered to **0.812** with none, and to **0.839**
+      at the new 10-bin default — from unusable to slightly ahead of the Gaussian arm's 0.831,
+      with roughly half the membership functions. Gaussian numbers are unchanged, so a pin bump
+      should move the trapezoid rows and nothing else; if a Gaussian row moves, something else
+      changed too and the bump is not the explanation.
+
+      Found in `experiments/overlap-modeling` (stage 4);
+      `experiments/overlap-modeling/diagnose_trapz_defect.py` regenerates the three
+      measurements above, and `experiments/overlap-modeling/RESULTS.md` §"Stage 4" is the full
+      account.
+
+
 ## C. Experiments owed
 **[Tier 1: critical before defense (C1, C4). Tier 2: real research (C2–C3, C5–C6, C8–C11–C13). Tier 3: defensive (C5–C6, C8). Tier 1.5: reduced scope (C4 done). Tier 4 (C7 descoped)]**
 

@@ -44,6 +44,29 @@ it; the map says which, and why, rather than leaving the reader to diff by hand.
 
 Check it before citing any table, and update it when a generator changes.
 
+## Before bumping the `tribble-fis` pin
+
+One known behaviour change is queued upstream and worth checking against, because
+it moves numbers rather than breaking anything:
+`tribble-fis` [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170)
+changes `trapz_math_fast.fit_trapezoids_fast`'s geometry and lowers its default
+`n_bins` from 50 to 10.
+
+**No table here uses that path** — every generator in `tables/` runs
+`member_function="gaussian"` — so bumping the pin should leave all archived
+proposal tables alone. What it does move is the two sample scripts that take the
+`trapz_method="fast"` default: `FuzzySystemsExperiments/darwin_comparison.py` and
+the default-method configs in `darwin_quick_comparison.py`.
+
+Use that as a check on the bump, not just a to-do: the trapezoid arms should
+improve sharply (Concrete's fast-trapezoid regression arm goes from R² 0.121 with
+79% of rows uncovered to 0.81–0.84 with none) and **Gaussian arms should not move
+at all**. If a Gaussian number shifts, something other than #170 came in with the
+bump and needs its own explanation.
+
+Full scope and provenance: checklist item **B13** in
+`research/proposal-defense/CHECKLIST.md`.
+
 ## Everything writes into this repository
 
 Reproducing a proposal result must never dirty a pinned submodule. The Chapter 3
