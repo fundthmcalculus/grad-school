@@ -124,6 +124,13 @@ recreates a documented past defect.
 7. **Generated figures are gitignored — regenerate, don't commit.** Only run
    archives and things genuinely worth committing are tracked (force-add with
    `git add -f` when an output is worth keeping, as `outputs/nn-cmapss/` is).
+8. **Never commit data files over 5 MB.** Datasets that size are fetched,
+   or recoverable from a tracked source — `data/.gitignore` records how to
+   restore each one (e.g. the 57 MB PhiUSIIL file is recovered from
+   `tribble-fis` git history, with the command written in the ignore file).
+   The largest tracked dataset is `data/WEC_Sydney_100.csv` at ~4.6 MB. If a
+   dataset belongs under `data/` but is too big to commit, add it to
+   `data/.gitignore` with a recovery note instead of `git add`ing it.
 
 ## Environment-variable quick reference (table knobs)
 
