@@ -811,10 +811,22 @@ def test_padding_rescues_a_degenerate_single_value_region():
     assert mf.evaluate(np.array([0.45]))[0] > 0.0
 
 
-def test_padding_closes_the_trapezoid_coverage_hole(data):
-    """The measured effect: a mass point at a feature minimum stops killing rules."""
+def test_upstream_fitter_covers_a_zero_inflated_column_without_padding(data):
+    """Guards the upstream fix, and is why this test changed shape.
+
+    Until `tribble-fis` #170 this asserted the *defect*: at ``trapz_pad=0`` a
+    zero-inflated column left >20% of rows covered by no rule, and `pad_trapezoids`
+    was what closed the hole. #170 fixed the fitter itself -- the plateau now spans
+    the data region -- so at the pinned SHA `141596e` and later there is no hole to
+    close, and ``uncovered`` is 0.0 with no padding at all.
+
+    Kept as a guard rather than deleted: if the upstream geometry ever regresses,
+    this fails, and `pad_trapezoids` remains available as the local remedy. Stage
+    4's ``pad=0`` measurements in RESULTS.md were taken at the *pre-fix* pin
+    (`058501f`) and cannot be reproduced at the current one -- see the note there.
+    """
     X, y = data
-    # A zero-inflated column, which is what triggers the defect on real data
+    # A zero-inflated column, which is what triggered the defect on real data
     # (55% of concrete's scaled FlyAsh sits exactly at its minimum).
     X = X.copy()
     X["zeros"] = np.where(np.arange(len(X)) % 2 == 0, 0.0, X["a"].to_numpy())
@@ -825,8 +837,10 @@ def test_padding_closes_the_trapezoid_coverage_hole(data):
             membership="trapezoid", trapz_bins=1, trapz_pad=pad,
             random_state=7).fit(X, y).coverage(X)
 
-    assert cov(0.0)["uncovered"] > 0.2, "fixture does not reproduce the defect"
+    assert cov(0.0)["uncovered"] == 0.0, "upstream fitter left rows uncovered"
     assert cov(0.1)["uncovered"] == 0.0
+    # Padding on top of a fixed fitter is now a widening knob, not a repair.
+    assert cov(0.3)["active_frac"] > cov(0.0)["active_frac"]
 
 
 def test_fewer_bins_widen_the_support(data):
@@ -842,8 +856,15 @@ def test_fewer_bins_widen_the_support(data):
     assert frac(1) >= frac(50), "coarser bins should not narrow the support"
 
 
-def test_trapz_ramp_cannot_widen_the_support(data):
-    """Documents why ramp_width_ratio saturated: it moves the plateau, not [a, d]."""
+def test_trapz_ramp_now_widens_the_support(data):
+    """The other half of what `tribble-fis` #170 changed.
+
+    Before the fix the ramps were inset *inside* the fitted region, so
+    `ramp_width_ratio` moved the plateau and could not widen ``[a, d]`` at all --
+    which is why sweeping it saturated in stage 3, and this test asserted the
+    bounds were identical across ramp widths. After the fix the ramps are the
+    outward shoulders, so the parameter is a genuine support knob.
+    """
     X, y = data
 
     def bounds(ramp):
@@ -851,6 +872,11 @@ def test_trapz_ramp_cannot_widen_the_support(data):
             n_output_buckets=3, output_partition="quantile", tsk_order="1st",
             membership="trapezoid", trapz_bins=20, trapz_ramp=ramp,
             random_state=7).fit(X, y)
-        return sorted((mf.a, mf.d) for mf in m.model_.all_membership_fcns)
+        return np.array(sorted((mf.a, mf.d) for mf in m.model_.all_membership_fcns))
 
-    np.testing.assert_allclose(bounds(0.1), bounds(0.4), atol=1e-12)
+    narrow, wide = bounds(0.1), bounds(0.4)
+    assert narrow.shape == wide.shape
+    # Wider ramp: every support's left edge moves left and right edge moves right.
+    assert np.all(wide[:, 0] <= narrow[:, 0] + 1e-12)
+    assert np.all(wide[:, 1] >= narrow[:, 1] - 1e-12)
+    assert np.any(wide[:, 0] < narrow[:, 0] - 1e-9), "ramp width did not widen [a, d]"

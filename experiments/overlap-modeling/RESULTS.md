@@ -589,6 +589,23 @@ cheapest arm measured, the clamped arms cost the same as Gaussian plus one
 [`trapz_bins.md`](outputs/trapz_bins.md),
 [`trapz_grid.png`](outputs/trapz_grid.png). Regenerate with `analyze_trapz.py`.
 
+> [!IMPORTANT]
+> **Stage 4's `pad=0` column is a measurement of a defect that has since been
+> fixed upstream, and cannot be reproduced at the current pin.** Everything below
+> was run against `tribble-fis` `058501f`. The defect it identifies was fixed in
+> [tribble-fis #170](https://github.com/fundthmcalculus/tribble-fis/pull/170)
+> (merged as `141596e`), which the submodule now points at, so re-running
+> `run_trapz.py` today gives `uncovered = 0` in the `pad=0` column instead of 0.79
+> and the whole "unpadded" arm disappears. The `pad>0` numbers still stand as a
+> widening sweep; `trapz_pad` is now a knob on top of a working fitter rather than
+> a repair of a broken one. #170 also made `trapz_ramp` a real support knob, which
+> it was not when stage 3 swept it.
+>
+> Two tests carry this forward rather than leaving it to prose:
+> `test_upstream_fitter_covers_a_zero_inflated_column_without_padding` guards the
+> upstream geometry, and `test_trapz_ramp_now_widens_the_support` pins the
+> parameter's changed meaning.
+
 ## The question
 
 > For the histogram fit operation, what if we reduced the number of buckets,
