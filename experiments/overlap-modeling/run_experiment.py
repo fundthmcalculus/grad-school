@@ -55,6 +55,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import gzip
 import io
 import json
 import os
@@ -334,6 +335,45 @@ def provenance():
     )
 
 
+def dump_payload(payload: dict, path: str) -> str:
+    """Write a run's payload as gzipped compact JSON, returning the path written.
+
+    These files are the run of record and are committed, so their size is a review
+    cost, not just a disk cost. Four stages of per-(cell, arm) records is 19 MB of
+    plain JSON -- 4.5x the largest artifact any other experiment in this repo commits
+    -- and 2.3 MB gzipped, which is below it. Nobody reads these by eye; `analyze*.py`
+    is the reader, and `load_payload` handles either form.
+
+    A ``.json`` path is redirected to ``.json.gz``; the returned path is what to
+    report to the user.
+    """
+    if not path.endswith(".gz"):
+        path += ".gz"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with gzip.open(path, "wt", encoding="utf-8") as fh:
+        json.dump(payload, fh, separators=(",", ":"))
+    return path
+
+
+def load_payload(path: str) -> dict:
+    """Read a run payload, accepting ``.json.gz`` or plain ``.json``.
+
+    Falls back across the two so an older uncompressed artifact, or one a user
+    gunzipped by hand to poke at, still loads.
+    """
+    candidates = [path]
+    if path.endswith(".gz"):
+        candidates.append(path[:-3])
+    else:
+        candidates.insert(0, path + ".gz")
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            opener = gzip.open if candidate.endswith(".gz") else open
+            with opener(candidate, "rt", encoding="utf-8") as fh:
+                return json.load(fh)
+    raise FileNotFoundError(f"no run payload at {' or '.join(candidates)}")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--datasets", default=",".join(DEFAULT_DATASETS))
@@ -368,12 +408,10 @@ def main():
     payload = dict(provenance=provenance(), wall_clock_seconds=elapsed,
                    fractions=list(FRACTIONS), shapes=list(SHAPES),
                    fusion_regs=list(FUSION_REGS), records=records)
-    os.makedirs(os.path.dirname(args.out), exist_ok=True)
-    with open(args.out, "w") as fh:
-        json.dump(payload, fh, indent=1)
+    written = dump_payload(payload, args.out)
 
     n_err = sum("error" in r for r in records)
-    print(f"\n{len(records)} records in {elapsed:.1f}s ({n_err} errors) -> {args.out}")
+    print(f"\n{len(records)} records in {elapsed:.1f}s ({n_err} errors) -> {written}")
     if n_err:
         for r in records:
             if "error" in r:

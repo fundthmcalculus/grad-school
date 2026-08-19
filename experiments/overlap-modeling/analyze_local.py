@@ -16,13 +16,16 @@ Usage: python experiments/overlap-modeling/analyze_local.py
 from __future__ import annotations
 
 import argparse
-import json
 import os
+import sys
 
 import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+from run_experiment import load_payload  # noqa: E402
 CELL = ["dataset", "n_buckets", "order", "seed"]
 
 
@@ -196,8 +199,7 @@ def main():
     ap.add_argument("--results", default=os.path.join(HERE, "outputs",
                                                       "local_results.json"))
     args = ap.parse_args()
-    with open(args.results) as fh:
-        payload = json.load(fh)
+    payload = load_payload(args.results)
     df = pd.DataFrame(payload["records"])
     errors = df[df.get("error").notna()] if "error" in df else df.iloc[:0]
     if "error" in df:

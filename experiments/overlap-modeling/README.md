@@ -28,7 +28,7 @@ a mass point at its minimum loses those rows to every rule.
 [`RESULTS.md`](RESULTS.md) is the laboratory record: the hypotheses as
 registered before the run of record, and how each one scored. Generated tables
 are in [`outputs/`](outputs/); the run of record is
-[`outputs/results.json`](outputs/results.json).
+[`outputs/results.json.gz.gz`](outputs/results.json.gz).
 
 ## Question
 
@@ -179,8 +179,8 @@ selection on test, and it is not what a user would get.
 |---|---|
 | [`overlap.py`](overlap.py) | `overlap_weights`, the overlap-aware antecedent fit, the local and fused consequent solvers, and `OverlapTribbleRegressor` |
 | [`test_overlap.py`](test_overlap.py) | degeneracy against `TribbleRegressor` and the mechanism properties |
-| [`run_experiment.py`](run_experiment.py) | the sweep → `outputs/results.json` |
-| [`analyze.py`](analyze.py) | `results.json` → the generated tables and figure |
+| [`run_experiment.py`](run_experiment.py) | the sweep → `outputs/results.json.gz` |
+| [`analyze.py`](analyze.py) | `results.json.gz` → the generated tables and figure |
 | [`RESULTS.md`](RESULTS.md) | the record |
 
 Nothing in `tribble-fis` is modified. `OverlapTribbleRegressor` is a parallel

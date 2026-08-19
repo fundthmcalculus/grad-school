@@ -48,7 +48,6 @@ from __future__ import annotations
 import argparse
 import contextlib
 import io
-import json
 import os
 import sys
 import time
@@ -59,7 +58,7 @@ sys.path.insert(0, HERE)
 
 from run_experiment import (  # noqa: E402
     BUCKETS, DATASETS, DEFAULT_DATASETS, L2_REG, ORDERS, PARTITION, SEEDS,
-    _r2, prepare, provenance, split3,
+    _r2, dump_payload, prepare, provenance, split3,
 )
 from run_local import train_fold_buckets  # noqa: E402
 from overlap import OverlapTribbleRegressor  # noqa: E402
@@ -174,12 +173,10 @@ def main():
                    clamp_ks=list(CLAMP_KS), hard_ks=list(HARD_KS),
                    ruspini_tols=list(RUSPINI_TOLS), taus=list(TAUS),
                    records=records)
-    os.makedirs(os.path.dirname(args.out), exist_ok=True)
-    with open(args.out, "w") as fh:
-        json.dump(payload, fh, indent=1)
+    written = dump_payload(payload, args.out)
 
     n_err = sum("error" in r for r in records)
-    print(f"\n{len(records)} records in {elapsed:.1f}s ({n_err} errors) -> {args.out}")
+    print(f"\n{len(records)} records in {elapsed:.1f}s ({n_err} errors) -> {written}")
     for r in records:
         if "error" in r:
             print(f"  {r['dataset']}/{r['label']}: {r['error']}")

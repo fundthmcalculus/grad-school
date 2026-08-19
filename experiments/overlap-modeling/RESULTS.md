@@ -17,7 +17,7 @@ Stage 1 is below; [stage 2](#stage-2--per-bucket-consequent-solving-fit-or-aggre
 [stage 3](#stage-3--compact-support) and
 [stage 4](#stage-4--the-trapezoid-fitters-endpoint-defect) follow it.
 
-**Stage 1 run of record:** [`outputs/results.json`](outputs/results.json) — 15,120 fits,
+**Stage 1 run of record:** [`outputs/results.json.gz.gz`](outputs/results.json.gz) — 15,120 fits,
 240 cells × 63 arms, 0 errors, 21.7 min on 3 workers. Repo `44f59a4`,
 `tribble-fis` `058501f`, Python 3.11.15, numpy 2.4.6, pandas 3.0.5, ten seeds
 (`common.SEEDS`' standard), `l2_reg=1e-2`, `output_partition="quantile"`.
@@ -319,7 +319,7 @@ next person to reach for that knob finds out in a second rather than in a sweep.
 
 # Stage 2 — per-bucket consequent solving: fit or aggregation?
 
-**Run of record:** [`outputs/local_results.json`](outputs/local_results.json) —
+**Run of record:** [`outputs/local_results.json.gz.gz`](outputs/local_results.json.gz) —
 10,800 fits, 240 cells × 45 arms, 0 errors, 15.2 min. Same provenance, seeds,
 protocol and `l2_reg` as stage 1. Tables:
 [`local_fit_vs_blend.md`](outputs/local_fit_vs_blend.md),
@@ -402,7 +402,7 @@ question separately: the blend is not merely tolerable, it is load-bearing.
 
 # Stage 3 — compact support
 
-**Run of record:** [`outputs/support_results.json`](outputs/support_results.json)
+**Run of record:** [`outputs/support_results.json.gz.gz`](outputs/support_results.json.gz)
 — 11,520 fits, 240 cells × 48 arms, 0 errors, 17.4 min. Tables:
 [`support_shapes.md`](outputs/support_shapes.md),
 [`support_paired.md`](outputs/support_paired.md),
@@ -582,7 +582,7 @@ cheapest arm measured, the clamped arms cost the same as Gaussian plus one
 
 # Stage 4 — the trapezoid fitter's endpoint defect
 
-**Run of record:** [`outputs/trapz_results.json`](outputs/trapz_results.json) —
+**Run of record:** [`outputs/trapz_results.json.gz.gz`](outputs/trapz_results.json.gz) —
 12,480 fits, 240 cells × 52 arms, 0 errors, 8.7 min. Tables:
 [`trapz_grid.md`](outputs/trapz_grid.md),
 [`trapz_paired.md`](outputs/trapz_paired.md),
