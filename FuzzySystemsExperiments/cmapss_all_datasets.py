@@ -73,11 +73,13 @@ REPORT = "FuzzySystemsExperiments/cmapss_all_datasets_report.md"
 # A convex blend of the two models' per-cycle predictions. whole_cycle is
 # low-variance but biased; raw_memory is low-bias but noisy at the endpoint.
 # Averaging cancels raw_memory's endpoint noise while keeping its sharper trend,
-# so the canonical per-engine (last-cycle) RMSE improves most. 0.7 (70%
-# whole_cycle) is the broad optimum of a sweep -- see
-# experiments/cmapss-ds02-fis/blend_wc_rm.py -- and beats *both* models on
-# per-engine RMSE while dominating whole_cycle on every metric.
-BLEND_ALPHA = 0.7
+# so the canonical per-engine (last-cycle) RMSE improves most. 0.8 is the value
+# a held-out validation split (carved from the training engines) selects -- see
+# experiments/cmapss-ds02-fis/validate_heldout.py; the whole 0.6-0.8 region beats
+# whole_cycle on both validation and the untouched test engines, so the gain is
+# a real generalisation result, not test-set tuning. blend_wc_rm.py is the
+# earlier (test-selected) sweep that first surfaced it.
+BLEND_ALPHA = 0.8
 
 CONFIGS = {
     "whole_cycle": dict(

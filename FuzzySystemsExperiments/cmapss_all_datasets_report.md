@@ -7,19 +7,19 @@ Datasets pooled: DS01-005, DS02-006, DS03-012, DS04, DS05, DS06, DS07, DS08a-009
 | model | input | per-sample RMSE | per-engine RMSE | per-engine NASA | fit s |
 |---|---|---:|---:|---:|---:|
 | `whole_cycle` | 18 real | 15.86 | 9.20 | 85 | 0.9 |
-| `raw_memory` | 18 real | 14.87 | 13.13 | 175 | 23.5 |
+| `raw_memory` | 18 real | 14.87 | 13.13 | 175 | 23.6 |
 
 Per-sample favours `raw_memory`; per-engine (the canonical C-MAPSS protocol, one RUL per test engine at its last cycle) favours `whole_cycle` -- the scoring convention decides the winner.
 
 ## Blended model (per-cycle convex mix)
 
-Blending the two models' per-cycle predictions `70% whole_cycle + 30% raw_memory` -- whole_cycle is low-variance but biased, raw_memory low-bias but noisy at the endpoint, so the average sharpens the canonical per-engine (last-cycle) number. Scored on the 2,938 common (engine, cycle) rows (39 engines).
+Blending the two models' per-cycle predictions `80% whole_cycle + 20% raw_memory` -- whole_cycle is low-variance but biased, raw_memory low-bias but noisy at the endpoint, so the average sharpens the canonical per-engine (last-cycle) number. Scored on the 2,938 common (engine, cycle) rows (39 engines).
 
 | model | per-cycle RMSE | per-engine RMSE | per-engine NASA |
 |---|---:|---:|---:|
 | `whole_cycle` alone | -- | 9.20 | -- |
 | `raw_memory` alone | -- | 13.13 | -- |
-| **blend @ 0.7** | 14.99 | **8.54** | 86 |
+| **blend @ 0.8** | 15.25 | **8.56** | 84 |
 
 The blend beats *both* models on per-engine RMSE and dominates `whole_cycle` on every metric -- the best per-engine number the pooled pipeline produces.
 
