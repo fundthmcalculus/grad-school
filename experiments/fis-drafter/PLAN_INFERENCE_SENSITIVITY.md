@@ -23,12 +23,12 @@ prompt activations or the "normal" manifold, not the decoding knobs.
 | axis | why it could matter | status |
 |---|---|---|
 | **Precision** fp32 / bf16 / fp16 | numerical drift in activations | **done — no effect** (det@1%FP 0.572/0.572/0.571, wl-AUROC 0.867 all three, SmolLM2-360M/deepset) |
-| **Quantization** int8 / int4 (bitsandbytes, GPTQ, AWQ) | large activation perturbation, realistic serving | TODO — the real precision question; bf16↔fp16↔fp32 already shown equivalent |
+| **Quantization** int8 / int4 (bitsandbytes) | large activation perturbation | **DONE (Part 17).** Matched degrades gracefully (int8 0.61, int4 0.50 vs bf16 0.66); mismatched (fit bf16 -> deploy int4) catastrophic (FPR 1.0). Calibrate at deployment precision. |
 | **System prompt / chat template** | the wrapper shifts every activation | **DONE (Part 16) — highest risk realised.** Mean-pool FPR blows up to ~1.0 under any shift; last-token+pooled-prompts holds FPR on unseen prompts at a detection cost. Recalibrate per system prompt. |
-| **Attention backend** sdpa / eager / flash-attn | should be numerically ~equivalent | TODO — quick equivalence check |
-| **Prompt context / position** injection embedded in a long benign document vs bare | realistic deployment; does the signal survive dilution? | TODO — construct embedded-injection probes |
-| **Batch / padding side** | left vs right padding, batch size | TODO — expected null, worth confirming |
-| **Generation-time monitoring** + sampling params | the ONLY place decoding knobs enter; a per-step version of the monitor | TODO — larger build (streaming atlas); Part-4 capture already records per-step hidden states |
+| **Attention backend** sdpa / eager | numerical drift | **DONE (Part 17) — no effect** (0.663 vs 0.656). |
+| **Prompt context / position** injection embedded in a long benign document | realistic deployment | **DONE (Part 18).** Mean-pool collapses to chance under dilution; last-token recovers it (wl-AUROC 0.80, few-shot 0.55) when the injection is near the end. |
+| **Batch / padding side** | left vs right padding | **DONE (Part 17) — expected null** (masked mean and last-token are padding-invariant by construction). |
+| **Generation-time monitoring** + logit shape | the ONLY place decoding knobs enter | **DONE (Part 19) — decisive negative.** Built full per-step streaming capture (`fmri_generate.py`) recording streaming hidden states AND output-logit shape. Logit shape carries weak, non-directional signal (wl-AUROC 0.64/0.60) that adds *exactly nothing* on top of the prompt readout (combined == prompt to 3 dp), as `logits = h·Eᵀ` predicts. Streaming activations never beat the prompt readout; `gen_last` is near-chance. Monitor the prompt, don't decode. |
 
 ## First-cut result
 

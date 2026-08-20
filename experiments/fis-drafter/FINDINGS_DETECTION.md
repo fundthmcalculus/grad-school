@@ -1226,3 +1226,148 @@ risk found. Two viable practices, a tradeoff:
 Either way, a monitor cannot be trained once under one wrapper and left in place
 across system-prompt changes: that silently drives the false-positive rate to
 ~100% with mean-pooled features. This is the operational caveat that matters most.
+
+---
+
+# Part 17 — Attention backend and quantization
+
+Two more inference axes (PLAN_INFERENCE_SENSITIVITY), Qwen-3B / deepset, trimmed
+one-class score.
+
+## Attention backend: no effect
+
+| backend | det@1%FP | wl-AUROC |
+|---|---|---|
+| sdpa (default) | 0.663 | 0.945 |
+| eager | 0.656 | 0.947 |
+
+Within seed noise — the attention implementation does not change the monitor.
+
+## Quantization: graceful when matched, catastrophic when mismatched
+
+| precision (fit == deploy) | det@1%FP | wl-AUROC |
+|---|---|---|
+| bf16 (baseline) | 0.663 | 0.945 |
+| int8 (bitsandbytes) | 0.605 | 0.938 |
+| int4 (nf4) | 0.498 | 0.898 |
+| **cross: fit bf16 → deploy int4** | **realized FPR 0.998** | (det@1%FP 0.523) |
+
+Matched quantization degrades detection *gracefully* — int8 costs ~0.06 det@1%FP,
+int4 ~0.17 — so a monitor fit and run at the same precision stays usable, even at
+4-bit. But a **precision mismatch is catastrophic**: fit on full-precision
+activations, deploy against a 4-bit model, and realized FPR jumps to ~1.0 — the
+same failure mode as the system-prompt shift (Part 16). The ranking still
+transfers (oracle det@1%FP 0.52), so it is a distribution-shift / threshold
+problem, not a loss of signal.
+
+## The unifying operational principle
+
+Parts 16 and 17 give one rule: **the monitor must be calibrated under the exact
+deployment configuration — same system prompt and same quantization.** Anything
+that shifts the activation distribution (the wrapper, the weight precision)
+sends the false-positive rate toward 100%, because the benign manifold moves out
+from under the fitted threshold. The mitigation is the same and cheap:
+recalibrate on benign captured under the deployment config (no labels needed).
+Batch size / padding side are expected-null (masked mean and last-token are
+padding-invariant by construction) and not separately swept.
+
+---
+
+# Part 18 — Embedded injection (context dilution), and the readout that fixes it
+
+The realistic attack: the injection is buried inside a long benign document
+(RAG context, a pasted email), not sent bare. Battery: each probe is ~12 benign
+dolly paragraphs (~1600 tokens) followed by either a benign question or a deepset
+injection. Qwen-3B.
+
+| readout | one-class det@1%FP | one-class wl-AUROC | few-shot (N=10) det@1%FP |
+|---|---|---|---|
+| **mean-pool** | 0.022 | 0.462 | 0.034 |
+| **last-token** | 0.244 | 0.798 | **0.546** |
+
+**Mean-pooling collapses under context dilution** — buried in 1600 benign tokens,
+the injection's contribution to the mean washes out and detection falls to chance
+(wl-AUROC 0.46), even with few-shot labels. **The last-token readout recovers it**
+(one-class wl-AUROC 0.798, few-shot 0.55) because the readout position sits at the
+end of the injection and integrates it. Caveat: the injection here is at the *end*
+of the document; an injection in the *middle* followed by more benign text would
+dilute even the last-token readout — worth a follow-up battery.
+
+# Part 19 — Generation-time monitoring and the logit-shape theory, settled
+
+The original thesis was that **the *shape* of the output logits would tell us
+something** about whether a prompt is an injection. Every part until now monitored
+only the *prompt* forward pass; this part extends the atlas into generation and
+isolates the logit-shape signal to test that thesis head-on. Qwen2.5-3B, greedy
+decode of 24 tokens, capturing at every generated step both the streaming
+per-layer hidden states and the output-distribution shape (entropy, top-1 mass,
+top-5 mass, top1–top2 logit margin, perplexity). Six monitors, benign-only fit,
+det@1%FP | within-length AUROC, 6 seeds, on two sources:
+
+| monitor | what it reads | deepset | safeguard |
+|---|---|---|---|
+| `prompt_readout` | activation at final prompt token (the existing monitor) | 0.033 / **0.938** | 0.002 / 0.692 |
+| `gen_mean` | streaming hidden states, mean over generated tokens | 0.092 / 0.835 | 0.007 / 0.726 |
+| `gen_last` | hidden state at final generated token | 0.001 / 0.515 | 0.002 / 0.380 |
+| `logit_shape` | **output distribution shape only, no hidden states** | 0.021 / 0.636 | 0.017 / 0.595 |
+| `combined` | prompt_readout activations + logit_shape | 0.018 / **0.938** | 0.008 / **0.692** |
+| `prompt_readout` + 10-shot | activations + strict gate | **0.452** / 0.966 | **0.533** / 0.928 |
+| `combined` + 10-shot | activations + shape + strict gate | 0.400 / 0.960 | 0.541 / 0.926 |
+
+**The thesis is confirmed but weak, and the addition is null.** Three findings:
+
+1. **Logit shape carries genuine but weak signal.** On its own it ranks injections
+   above chance (wl-AUROC 0.64 / 0.60) — the shape *does* tell us something. But it
+   is far below the activation monitor (0.94 / 0.69) and not close to deployable.
+
+2. **The shift has no universal direction.** On deepset, injected completions are
+   *sharper* — first-token entropy 3.83→3.52, perplexity 28→21 (a hijacked model
+   commits confidently to the injected instruction). On safeguard, injected
+   completions are *flatter* — entropy 0.96→1.29, perplexity 7.8→10.4 (the safety
+   collision leaves the model less certain). There is no single "injection shape";
+   the one-class detector only sees *deviation from benign*, in whichever direction,
+   which is why the signal is real yet non-transferable.
+
+3. **Logit shape adds exactly nothing on top of activations.** `combined` equals
+   `prompt_readout` in within-length AUROC to three decimals on both datasets
+   (0.938 = 0.938, 0.692 = 0.692), and the few-shot gate is unchanged (within
+   noise: −0.05 deepset, +0.01 safeguard). This is precisely what the tied-embedding
+   factorization predicts: `logits = h · Eᵀ` is a **linear, information-losing image
+   of the very hidden state the monitor already reads**, so the shape can hold no
+   injection signal the readout does not already contain.
+
+**Generation adds cost, not signal.** Streaming activations never beat the prompt
+readout (`gen_mean` loses on deepset 0.835 < 0.938, ties on safeguard; `gen_last`
+is near-chance both — after 24 tokens the model has wandered into content and the
+final position is no longer diagnostic). Every generated token is a full forward
+pass; the single prompt forward pass is not merely adequate but *optimal* — the
+right quantity (the integrated prompt) at the cheapest possible cost. The
+generation-time axis, the last open item from the sensitivity plan, is therefore
+closed as a **decisive negative**: monitor the prompt, at the last-token readout,
+and do not decode to detect.
+
+## Closing synthesis — the readout choice runs through everything
+
+Parts 16-18 converge on one design decision. **Mean-pooling is the fragile
+feature and last-token is the robust one:**
+
+| stressor | mean-pool | last-token |
+|---|---|---|
+| matched (no shift) | best detection (0.66) | weaker (0.25) |
+| system-prompt shift (Part 16) | FPR → ~1.0 | partially transfers; pooled-prompts holds FPR on unseen |
+| embedded / long context (Part 18) | collapses (0.46 wl-AUROC) | recovers (0.80) |
+
+Mean-pooling wins only in the pristine matched case; it is dominated by whatever
+fills the context (the system prompt's tokens, a long benign document). The
+last-token readout — the position the model would generate from — is the
+deployment-robust choice, at a modest cost in matched detection. Combined with
+the Part 16/17 rule (calibrate under the exact deployment config), the deployable
+recipe is: **last-token features, benign calibrated under the live system prompt
+and quantization, with a few labelled attacks for the strict gate.**
+
+Part 19 completes the picture from the other side: the last-token *prompt* readout
+is not just the robust choice among activation poolings, it dominates everything
+downstream of it too. Decoding the model and reading its generated activations or
+its output-logit shape adds cost without adding signal, because both are functions
+of the hidden state the readout already captures. The monitor is a single forward
+pass, read at the last token, calibrated in place — and that is the whole system.
