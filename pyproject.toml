@@ -32,6 +32,18 @@ dev = [
 cuda = [
     "numba-cuda[cu12]",
 ]
+# Semidefinite-programming solver stack. `research/least_action/fis_sos.py`
+# is the only direct importer; six scripts reach it transitively
+# (`demo_calibrate`, `demo_certified_policy`, `demo_pareto`, `demo_sos`,
+# `verify_proxy`, `verify_sos_exact`). Nothing else in the repo -- including
+# `research/least_action/test_smoke.py`, the only pytest suite CI runs --
+# needs it, so it is kept out of `[project.dependencies]`: an ordinary
+# `uv sync`, and the CI `test` job which installs `.[dev]`, should not pull
+# clarabel/osqp/scs/ecos for one research thread. Install with
+# `uv sync --extra sos` or `pip install -e ".[sos]"`.
+sos = [
+    "cvxpy",
+]
 
 [tool.black]
 target-version = ["py311"]

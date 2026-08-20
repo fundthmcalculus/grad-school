@@ -40,10 +40,10 @@ from tribble_predictive_health.preprocessing import (  # noqa: E402
 H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
-N_SUB = 9000       # samples kept for clustering / embedding
+N_SUB = 9000  # samples kept for clustering / embedding
 VAR_KEEP = 0.95
-MIN_CLUSTER = 80   # HDBSCAN min_cluster_size at ~9k points
-N_REGIME = 6       # KMeans-on-W regimes, as a per-sample regime label
+MIN_CLUSTER = 80  # HDBSCAN min_cluster_size at ~9k points
+N_REGIME = 6  # KMeans-on-W regimes, as a per-sample regime label
 
 
 # ---------------------------------------------------------------------------
@@ -77,15 +77,21 @@ def cluster(tab):
     X = StandardScaler().fit_transform(tab[sensors].to_numpy(float))
     Xr = PCA(n_components=VAR_KEEP, svd_solver="full").fit_transform(X)
     labels = HDBSCAN(min_cluster_size=MIN_CLUSTER, copy=True).fit_predict(Xr)
-    emb = TSNE(n_components=2, init="pca", perplexity=40,
-               random_state=42).fit_transform(Xr)
-    knn_r2 = float(cross_val_score(
-        KNeighborsRegressor(n_neighbors=25), Xr, rul, cv=5, scoring="r2"
-    ).mean())
+    emb = TSNE(
+        n_components=2, init="pca", perplexity=40, random_state=42
+    ).fit_transform(Xr)
+    knn_r2 = float(
+        cross_val_score(
+            KNeighborsRegressor(n_neighbors=25), Xr, rul, cv=5, scoring="r2"
+        ).mean()
+    )
     return dict(
-        emb=emb, labels=labels, n_pca=Xr.shape[1],
+        emb=emb,
+        labels=labels,
+        n_pca=Xr.shape[1],
         k=len(set(labels)) - (1 if -1 in labels else 0),
-        noise=float(np.mean(labels == -1)), knn_r2=knn_r2,
+        noise=float(np.mean(labels == -1)),
+        knn_r2=knn_r2,
         ami_regime=adjusted_mutual_info_score(regime, labels),
         ami_unit=adjusted_mutual_info_score(unit, labels),
     )
@@ -96,9 +102,11 @@ for name, tab in (("raw sensors", raw), ("condition-corrected", cor)):
     print(f"\nHDBSCAN on {name} ...")
     r = cluster(tab)
     results[name] = r
-    print(f"  PCA {r['n_pca']} comps; {r['k']} clusters, {r['noise']:.0%} noise; "
-          f"AMI(regime)={r['ami_regime']:.3f}  AMI(engine)={r['ami_unit']:.3f}; "
-          f"k-NN RUL R^2={r['knn_r2']:.3f}")
+    print(
+        f"  PCA {r['n_pca']} comps; {r['k']} clusters, {r['noise']:.0%} noise; "
+        f"AMI(regime)={r['ami_regime']:.3f}  AMI(engine)={r['ami_unit']:.3f}; "
+        f"k-NN RUL R^2={r['knn_r2']:.3f}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -119,18 +127,25 @@ def scat(ax, xy, c, cat=False, cmap=None, cbar=None, legend=False):
     if cat:
         for i, v in enumerate(sorted(pd.unique(c))):
             m = c == v
-            ax.scatter(xy[m, 0], xy[m, 1], s=6,
-                       color="0.8" if v == -1 else plt.get_cmap("tab20")(i % 20),
-                       label=("noise" if v == -1 else str(v)) if legend else None,
-                       alpha=0.7, linewidths=0)
+            ax.scatter(
+                xy[m, 0],
+                xy[m, 1],
+                s=6,
+                color="0.8" if v == -1 else plt.get_cmap("tab20")(i % 20),
+                label=("noise" if v == -1 else str(v)) if legend else None,
+                alpha=0.7,
+                linewidths=0,
+            )
         if legend:
             ax.legend(markerscale=2.0, fontsize=6, ncol=2, loc="best", framealpha=0.9)
     else:
-        sm = ax.scatter(xy[:, 0], xy[:, 1], s=6, c=c, cmap=cmap, alpha=0.75,
-                        linewidths=0)
+        sm = ax.scatter(
+            xy[:, 0], xy[:, 1], s=6, c=c, cmap=cmap, alpha=0.75, linewidths=0
+        )
         if cbar:
             fig.colorbar(sm, ax=ax, fraction=0.046, pad=0.02, label=cbar)
-    ax.set_xticks([]); ax.set_yticks([])
+    ax.set_xticks([])
+    ax.set_yticks([])
 
 
 for row, name in enumerate(("raw sensors", "condition-corrected")):
@@ -138,14 +153,18 @@ for row, name in enumerate(("raw sensors", "condition-corrected")):
     scat(axes[row, 0], r["emb"], r["labels"], cat=True, legend=True)
     axes[row, 0].set_title(
         f"{name}: HDBSCAN cluster\n{r['k']} clusters, {r['noise']:.0%} noise",
-        fontsize=10)
+        fontsize=10,
+    )
     scat(axes[row, 1], r["emb"], alt, cmap="plasma", cbar="altitude (ft)")
     axes[row, 1].set_title(
         f"{name}: altitude (flight regime)\nAMI(cluster, W-regime) = "
-        f"{r['ami_regime']:.2f}", fontsize=10)
+        f"{r['ami_regime']:.2f}",
+        fontsize=10,
+    )
     scat(axes[row, 2], r["emb"], rul, cmap="viridis", cbar="RUL (cycles)")
     axes[row, 2].set_title(
-        f"{name}: true RUL\nk-NN RUL R² = {r['knn_r2']:.2f}", fontsize=10)
+        f"{name}: true RUL\nk-NN RUL R² = {r['knn_r2']:.2f}", fontsize=10
+    )
 
 fig.tight_layout(rect=[0, 0, 1, 0.94])
 path = os.path.join(OUT, "hdbscan_ds02_samples.png")

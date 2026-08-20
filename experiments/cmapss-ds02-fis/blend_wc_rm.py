@@ -14,6 +14,7 @@ alpha. Run from the repo root (needs NASA-CMAPSS/):
 
     python experiments/cmapss-ds02-fis/blend_wc_rm.py
 """
+
 import contextlib
 import csv
 import io
@@ -53,8 +54,9 @@ def main(h5_dir):
     frames = {}
     for agg in ("whole_cycle", "raw_memory"):
         train, test, cols = pooled[agg]
-        eng = TribblePredictiveHealth(condition_correction=False, unit_col="engine",
-                                      **cad.CONFIGS[agg])
+        eng = TribblePredictiveHealth(
+            condition_correction=False, unit_col="engine", **cad.CONFIGS[agg]
+        )
         with contextlib.redirect_stdout(io.StringIO()):
             eng.fit_featurized(train, cols)
         frames[agg] = per_cycle_pred(eng, test)
@@ -62,11 +64,15 @@ def main(h5_dir):
 
     wc = frames["whole_cycle"].rename(columns={"pred": "pred_wc", "true": "true_wc"})
     rm = frames["raw_memory"].rename(columns={"pred": "pred_rm", "true": "true_rm"})
-    both = wc.merge(rm[["engine", "cycle", "pred_rm"]], on=["engine", "cycle"], how="inner")
+    both = wc.merge(
+        rm[["engine", "cycle", "pred_rm"]], on=["engine", "cycle"], how="inner"
+    )
     both = both.rename(columns={"true_wc": "true"})
     cov = len(both) / len(wc)
-    print(f"\njoined {len(both):,} common (engine,cycle) rows "
-          f"({cov:.0%} of whole_cycle's cycles, {both['engine'].nunique()} engines)\n")
+    print(
+        f"\njoined {len(both):,} common (engine,cycle) rows "
+        f"({cov:.0%} of whole_cycle's cycles, {both['engine'].nunique()} engines)\n"
+    )
 
     print("  alpha  per-cycle RMSE   per-engine RMSE   NASA   (alpha=1 -> whole_cycle)")
     for alpha in (0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0):
@@ -78,7 +84,8 @@ def main(h5_dir):
 
     # reference: each model's own per-cycle / per-engine on the COMMON grain
     for tag, col in (("whole_cycle", "pred_wc"), ("raw_memory", "pred_rm")):
-        pc = rmse(both["true"], both[col]); pe, na = per_engine_last(both, col)
+        pc = rmse(both["true"], both[col])
+        pe, na = per_engine_last(both, col)
         print(f"  [{tag:11s}]         {pc:12.2f}   {pe:14.2f}   {na:8,.0f}")
 
     with open(os.path.join(OUT, "blend_wc_rm.csv"), "w", newline="") as f:
@@ -90,6 +97,7 @@ def main(h5_dir):
 
 if __name__ == "__main__":
     import argparse
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--h5-dir", default="NASA-CMAPSS")
     main(ap.parse_args().h5_dir)

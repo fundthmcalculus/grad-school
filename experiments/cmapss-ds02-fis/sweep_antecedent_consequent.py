@@ -15,6 +15,7 @@ Writes CSV to outputs/ds02-iterative/. Run from the repo root:
 
     python experiments/cmapss-ds02-fis/sweep_antecedent_consequent.py
 """
+
 import contextlib
 import csv
 import io
@@ -28,16 +29,23 @@ from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 
 OUT = "outputs/ds02-iterative"
 os.makedirs(OUT, exist_ok=True)
-BASE = dict(top_p=0.95, n_output_buckets=2, norm_conorm="hamacher",
-            l2_reg=0.01, max_samples=2000)
+BASE = dict(
+    top_p=0.95,
+    n_output_buckets=2,
+    norm_conorm="hamacher",
+    l2_reg=0.01,
+    max_samples=2000,
+)
 
 
 def fit_eval(cfg, d):
     reg = TribbleRegressor(random_state=42, **cfg)
     with contextlib.redirect_stdout(io.StringIO()):
         reg.fit(d["X_tr"], d["y_tr"])
-    return (rmse(d["y_tr"], reg.predict(d["X_tr"])),
-            rmse(d["y_te"], reg.predict(d["X_te"])))
+    return (
+        rmse(d["y_tr"], reg.predict(d["X_tr"])),
+        rmse(d["y_te"], reg.predict(d["X_te"])),
+    )
 
 
 def main():
@@ -61,20 +69,32 @@ def main():
     print("\n== #6 n_gaussians ==")
     for order in ("full-2nd", "1st"):
         for ng in (1, 2, 3):
-            run("n_gaussians", f"{order}/ng={ng}",
-                {**BASE, "tsk_order": order, "n_gaussians": ng})
+            run(
+                "n_gaussians",
+                f"{order}/ng={ng}",
+                {**BASE, "tsk_order": order, "n_gaussians": ng},
+            )
 
     # #7 RBF consequents
     print("\n== #7 gaussian-rbf consequents ==")
     for order in ("1st", "2nd"):
         for nc in (2, 3, 5):
             for gamma in (0.5, 1.0, 2.0):
-                run("rbf", f"{order}/nc={nc}/g={gamma}",
-                    {**BASE, "tsk_order": order,
-                     "consequent_basis": "gaussian-rbf",
-                     "rbf_n_centers": nc, "rbf_gamma": gamma})
+                run(
+                    "rbf",
+                    f"{order}/nc={nc}/g={gamma}",
+                    {
+                        **BASE,
+                        "tsk_order": order,
+                        "consequent_basis": "gaussian-rbf",
+                        "rbf_n_centers": nc,
+                        "rbf_gamma": gamma,
+                    },
+                )
 
-    with open(os.path.join(OUT, "sweep_antecedent_consequent.csv"), "w", newline="") as f:
+    with open(
+        os.path.join(OUT, "sweep_antecedent_consequent.csv"), "w", newline=""
+    ) as f:
         w = csv.writer(f)
         w.writerow(["sweep", "param", "train_rmse", "test_rmse"])
         w.writerows(rows)

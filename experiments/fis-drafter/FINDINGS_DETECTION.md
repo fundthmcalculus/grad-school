@@ -1,0 +1,1548 @@
+# A sixth confound: the grader manufactures the result
+
+Hallucination detection, three small models, 5,400 graded generations. The
+headline is not a detector. It is that **the choice of automatic grader moves
+the reported number by more than the gap between competing detectors**, and
+that one popular grader family *creates* the confound that
+`experiments/fuzzy-lm-anomaly.md` lists first.
+
+This is upstream of the five confounds in
+`papers/hallucination-detection-confounds.md`: those contaminate the *features*,
+this one contaminates the *labels*.
+
+---
+
+## Setup
+
+Each dolly `closed_qa` item is asked twice — once with its context paragraph
+(the answer is readable off the page), once without (recall or fabricate).
+Identical question wording, identical answer format, only the evidence differs.
+Greedy decoding, 40-token cap.
+
+**The label is measured correctness, never the condition.** Labelling by
+condition would let any detector win by reading prompt length. Wrong
+`with_context` answers are positives exactly like wrong `no_context` ones.
+AUROC is reported *within condition* throughout, so no arm can score by
+detecting which condition a generation came from.
+
+| model | n | wrong % | mean answer length |
+|---|---|---|---|
+| SmolLM2-360M-Instruct | 1,800 | 51.9 | 30.5 tok |
+| SmolLM2-135M-Instruct | 1,800 | 55.8 | 35.5 tok |
+| gemma-3-270m-it | 1,800 | 64.5 | 40.0 tok (never emits EOS) |
+
+---
+
+## Finding 1 — five defensible graders disagree, and the detector's score moves with them
+
+All five are choices a competent person would make. Agreement between pairs
+runs from **0.543 to 0.902**, and the prevalence of "wrong" swings **0.274 to
+0.731** — a 2.7× range on the same 1,800 generations.
+
+The same detector (`entropy__mean`), scored under each:
+
+| grader | AUROC (within-condition) |
+|---|---|
+| `f1 < 0.5` | **0.686** |
+| `content_word` | 0.647 |
+| `ref_recall < 0.5` | 0.631 |
+| `f1 < 0.3` | 0.621 |
+| `ref_recall < 0.3` | **0.597** |
+
+**Spread: 0.089 from the grading choice alone.** For scale, the detector gaps
+this literature argues over are smaller than that — in
+`experiments/fuzzy-lm-anomaly.md`, isolation forest vs one-class SVM is 0.001,
+FIS vs isolation forest 0.018, Mahalanobis vs `ent_max` 0.094.
+
+A paper reporting a single AUROC without validating its grader is reporting a
+number with roughly ±0.05 of uncontrolled slack.
+
+## Finding 2 — F1-style graders *manufacture* the length confound
+
+The top of the detector ranking is stable across graders. The bottom is not,
+and the arm that moves is the one that matters most:
+
+| detector | rank under `ref_recall` graders | rank under `f1` graders |
+|---|---|---|
+| `renyi2_mean` | 1 | 1–2 |
+| `ent_mean` | 2 | 1–2 |
+| **`n_tokens`** | **6 (last)** | **3** |
+
+Answer length goes from useless to third-best purely by changing the grader:
+
+| model | `n_tokens` AUROC, F1 grader | `n_tokens` AUROC, recall grader | Δ |
+|---|---|---|---|
+| SmolLM2-360M | 0.648 | 0.545 | **0.103** |
+| SmolLM2-135M | 0.669 | 0.558 | **0.111** |
+| gemma-3-270m | 0.500 | 0.500 | — (degenerate, see below) |
+
+**The mechanism is the precision term.** Token-F1 penalises a long answer even
+when it fully contains the reference; recall does not. So an F1 grader writes
+answer length into its own labels:
+
+| grader | corr(length, label) | `n_tokens` AUROC |
+|---|---|---|
+| `ref_recall < 0.3` | 0.016 | 0.518 |
+| `ref_recall < 0.5` | 0.077 | 0.545 |
+| `content_word` | 0.115 | 0.566 |
+| `f1 < 0.3` | 0.201 | 0.619 |
+| `f1 < 0.5` | 0.229 | 0.648 |
+
+corr(`token_f1`, length) = **−0.264** against corr(`ref_recall`, length) =
+**−0.126**: the F1 metric is twice as length-entangled, exactly as its
+definition predicts.
+
+**Consequence for the existing paper.** Confound #1 there is "answer length:
+`n_tokens` alone reaches AUROC 0.843, remedy exact matching on token count."
+Part of that may not be a property of hallucination at all — it may be
+manufactured by a length-sensitive grading metric. The remedy is then not only
+matching on length downstream, but choosing a length-neutral grader upstream.
+**That is worth re-checking before submission**, and it is cheap to check: score
+the same detectors under a recall-based grader and see whether the 0.843 moves.
+
+## Finding 3 — `ent_max` over `ent_mean` does not generalise
+
+That study's one practical recommendation — "use maximum per-token entropy, not
+mean", `ent_max` 0.883 vs `ent_mean` 0.767, better in 61/66 cells, written up
+as "a one-line change for anyone working on hallucination detection" —
+**reverses here**, and does so robustly:
+
+* across all **five graders** (`ent_max − ent_mean` = −0.023, −0.031, −0.032,
+  −0.040, −0.043 — negative every time);
+* across all **four answer-length bins** (−0.015 to −0.065), so it is not a
+  length effect;
+* across models: −0.031 (360M), −0.030 (135M), −0.004 (gemma, neutral).
+
+This is not a refutation of the original result *in its own setting* — different
+task, different label definition, one dataset against six models. It is evidence
+the recommendation is **setting-dependent**, while the write-up states it
+without qualification.
+
+## What did not work (recorded so it is not retried)
+
+Three attempts to beat a single entropy scalar, all failed:
+
+| arm | within-condition AUROC |
+|---|---|
+| `entropy__mean` / `renyi2__mean` (single scalar) | **0.631–0.633** |
+| logistic regression on entropy family | 0.608 |
+| supervised probe on raw hidden state (960-d) | 0.634 |
+| probe + entropy | 0.652 |
+| hand-crafted geometry (manifold dist., Mahalanobis, layer-norm shape) | 0.560 |
+| entropy + geometry | 0.557 |
+
+The geometric family — the new idea this round was built on — is *worse* than
+entropy, and adding it to entropy makes entropy worse. A supervised probe on the
+raw hidden state, which is what the semantic-entropy-probe literature uses, only
+ties. **The prior study's core lesson replicates: a single scalar is at or near
+the ceiling of what is extractable here.**
+
+## Limits
+
+* One task (dolly `closed_qa`, context present/absent), three small models.
+* Automatic graders only. This work shows the graders *disagree* and that one
+  family is length-entangled; it cannot say which is correct. Establishing that
+  needs human labels, and that is the obvious next step.
+* gemma-3-270m never emits EOS inside the 40-token cap, so its `n_tokens` has
+  zero variance and its 0.500 is degenerate rather than a counterexample. It is
+  uninformative for Finding 2 and reported as such.
+* AUROCs here (0.60–0.69) are well below the 0.87 of the prior study. Some of
+  that is label noise, which is precisely Finding 1's point.
+
+---
+
+# Part 2 — "fMRI of an SLM": one-class anomaly detection on the activation atlas
+
+A different regime, and the first one in this project that suits the FIS. Not
+regression (predict a value, where the FIS kept losing) but **one-class anomaly
+detection** — learn "normal" activity from innocuous prompts, flag deviation —
+which is exactly what tribble's "none of the above" rule was built for. And
+unlike hallucination, a malformed prompt is a *large* distribution shift.
+
+## Method
+
+One forward pass per prompt over SmolLM2-135M, capturing at every layer
+l = 0..30 the masked-mean hidden state over the prompt's tokens — an
+`(n_layers+1, hidden)` activation atlas per prompt. Detectors are fitted on
+**innocuous activations only** (true one-class): the FIS anomaly rule
+(per-feature Gaussian memberships, product t-norm, complement), Mahalanobis in
+whitened activation space, and isolation forest. Features are per-layer PCA
+coordinates plus per-layer norms.
+
+The battery is 175 innocuous questions (dolly + hand-written) against nine
+malformation types, split into **surface** (random characters, random vocab
+ids, degenerate repetition — abnormal tokens) and **structural** (a real
+question with its words shuffled, a grammatical-but-absurd sentence, an
+instruction-injection — near-normal tokens, broken arrangement or meaning). The
+structural types are generated from a held-out slice of the innocuous pool, so
+their token content is matched to the normal class.
+
+## Result 1 — it works, and activations add real value over reading the input
+
+One-class AUROC, held-out normal vs each malformation:
+
+| detector | all | structural | surface |
+|---|---|---|---|
+| Mahalanobis (activations) | 0.857 | **0.809** | 0.988 |
+| FIS anomaly (activations, raw) | 0.799 | 0.671 | 0.986 |
+| Mahalanobis (surface-only control) | 0.792 | 0.682 | 0.984 |
+
+Activations beat the surface-only control on **structural** malformation by
+**+0.127** (0.809 vs 0.682). Surface types are easy for everything (~0.99) and
+are a sanity floor, not the result. Per type, the activation-over-surface gain
+concentrates exactly where it should — where the tokens are normal:
+
+| type | activation | surface | gain |
+|---|---|---|---|
+| nonsense (grammatical, absurd) | 0.722 | 0.325 | **+0.397** |
+| char_scramble | 0.904 | 0.677 | +0.227 |
+| word_salad | 0.742 | 0.604 | +0.138 |
+| injection | 0.946 | 0.930 | +0.016 |
+| char_gibberish | 1.000 | 1.000 | 0.000 |
+
+`nonsense` is the sharpest: grammatical sentences with normal words that mean
+nothing score *below* chance on surface features (0.325 — they look more normal
+than normal) yet the activation atlas flags them at 0.722.
+
+## Result 2 — the micro-dose: a clean dose-response, surface held at chance
+
+The definitive control the project's history demands. Eighty base questions,
+each emitted at increasing word-shuffle fraction 0.0 → 1.0. Every dose of a base
+is a **permutation of the same words**, so surface statistics are identical by
+construction. Detector trained on clean prompts only:
+
+| shuffle dose | Mahalanobis AUROC | FIS-whitened AUROC | surface AUROC |
+|---|---|---|---|
+| 0.15 | 0.593 | 0.593 | 0.414 |
+| 0.30 | 0.577 | 0.577 | 0.413 |
+| 0.50 | 0.612 | 0.612 | 0.414 |
+| 0.70 | 0.648 | 0.648 | 0.413 |
+| 1.00 | **0.685** | **0.684** | 0.418 |
+
+The anomaly score **rises monotonically with the degree of disorder** while the
+surface control stays pinned at chance. This is the concept — watch, learn
+normal, flag deviation — demonstrated on perfectly matched content: the internal
+activity encodes syntactic well-formedness that the input tokens cannot reveal,
+and the deviation is graded, not binary.
+
+## Result 3 — the FIS is finally competitive, with one caveat
+
+On raw activation features the FIS anomaly rule loses to Mahalanobis (structural
+0.671 vs 0.809) — its per-feature independence assumption breaks on correlated
+activations, the same weakness seen throughout. Given **decorrelated
+(whitened)** features it matches Mahalanobis exactly (0.809, and identical at
+every dose above).
+
+This is the first regime in the whole investigation where the FIS mechanism is
+competitive with the best baseline. The honest caveat: whitening is itself most
+of what Mahalanobis does, so "the FIS matches Mahalanobis once you whiten" is
+partly circular. What it establishes is narrower but real — the "none of the
+above" rule is a *sound* one-class detector here, not a broken one, provided its
+inputs are decorrelated first.
+
+## Honest limits and one confound found
+
+* **Effect sizes for pure structure are modest** (word-order AUROC 0.59–0.69).
+  The large numbers (gibberish ~1.0, injection ~0.95) are surface-detectable and
+  do not need the atlas.
+* **Word-shuffling is not perfectly token-matched.** Per-layer localization of
+  the word-salad signal peaks at layer 0 (0.688) and the final layer (0.812),
+  not the middle. A layer-0 (embedding) effect on *mean-pooled* activations
+  should be impossible for a pure reordering — mean-pooling is order-invariant —
+  which means shuffling perturbs the BPE token *boundaries* slightly and leaks a
+  small surface signal. The final-layer signal (0.812) substantially exceeds it,
+  so genuine deep detection is present, but the clean "middle-layer semantic"
+  story from the first small run did **not** survive scaling and is withdrawn.
+* One model, automatic battery, one-class Ns of ~100 train / 70 test.
+
+## Why this direction is worth continuing
+
+Unlike drafting (closed) and hallucination (entropy is hard to beat), this
+regime has three things going for it at once: the task suits the FIS's actual
+strength, the signal is real and survives the matched control, and the strongest
+detected class — **instruction-injection at 0.946** — is a security-relevant
+application where an interpretable, cheap, one-class monitor that needs no
+attack examples is genuinely useful. The plan below pursues that.
+
+---
+
+# Part 3 — Prompt-injection detection on a real corpus (Phase 1)
+
+The application from `PLAN_ANOMALY.md`, run on `deepset/prompt-injections` (343
+benign, 203 injection, real prompts). One-class throughout: the detector is
+fitted on benign activations only and never sees an injection in training.
+
+## The confound, and why every number is reported within-length
+
+Public injection corpora are severely length-confounded (here injection median
+65 tokens vs benign 42; jailbreak sets are far worse). A detector that only
+reads length would look excellent and mean nothing. So the headline metric is
+**within-length AUROC** — computed inside token-count deciles and pooled — with
+length-alone and a surface-only baseline reported alongside.
+
+## Result — activations beat length, and beat surface, after controlling length
+
+Eight seeds, one-class (train on benign only), within-length AUROC:
+
+| detector | within-length AUROC |
+|---|---|
+| **activation atlas** (Mahalanobis = FIS-whitened) | **0.874 ± 0.014** |
+| surface-only (length + token stats) | 0.799 ± 0.024 |
+| length alone | 0.560 ± 0.023 |
+
+* **Length alone collapses from 0.830 pooled to 0.560 within-length** — direct
+  confirmation that the pooled score was mostly the length confound.
+* **Activation beats surface by +0.076 ± 0.033, winning 8 of 8 seeds.** This is
+  the confound-controlled value of watching activations over reading the input.
+* **The FIS "none of the above" rule equals Mahalanobis exactly** (0.936 pooled,
+  0.892 within-length at the reference seed) once features are whitened.
+
+## Length-matched confirmation
+
+A benign/injection subset matched on token count (benign median 58 vs injection
+57; length AUROC 0.470, i.e. at chance by construction):
+
+| detector | AUROC |
+|---|---|
+| activation | **0.894** |
+| surface | 0.865 |
+| length | 0.470 |
+
+With length neutralised to chance, activations still lead. The margin narrows
+(the matched set's residual signal is token content, which surface also reads),
+but the ordering holds.
+
+## The selling point, delivered
+
+A supervised detector that *has* seen attacks (5-fold logistic regression on
+activations) reaches 0.925 within-length. The one-class monitor reaches 0.874–
+0.892 **with no attack examples at all** — within ~0.03 of the supervised upper
+bound. That is the case for the method: unsupervised, needs no attack corpus,
+and within a whisker of the supervised ceiling.
+
+## Where injection lives in the network
+
+Per-layer one-class within-length AUROC rises monotonically from the embedding
+layer to the output:
+
+| layer | 0 | 6 | 12 | 21 | 30 |
+|---|---|---|---|---|---|
+| within-len AUROC | 0.417 | 0.510 | 0.634 | 0.636 | **0.770** |
+
+Layer 0 sits *below* chance, so — unlike the word-salad case in Part 2 — there is
+no surface/BPE artifact inflating the input layer. The discriminative signal is
+genuinely built up through the network and is strongest at the final layer,
+which is what "the model recognises the injection as it reads it" should look
+like.
+
+## Status against the plan
+
+Phase 1 is substantially done: real corpus, realistic benign traffic, the length
+confound measured and controlled three ways (surface baseline, within-length
+stratification, length-matched subset), FIS competitive with the best
+unsupervised baseline, and the no-attack-examples claim delivered. Remaining
+Phase 1 items: multi-model replication, and per-attack-family breakdown once a
+family-labelled corpus is in. Phase 2 (per-layer FIS *attribution* as the
+distinctive contribution, since AUROC ties Mahalanobis) is the next build.
+
+---
+
+# Part 4 — Phase 2: multi-model, operating points, and the FIS's distinctive contribution
+
+## Replication across models and a second attack corpus
+
+Within-length AUROC, one-class (benign only), activation vs surface vs length:
+
+| model / corpus | activation | surface | length alone |
+|---|---|---|---|
+| SmolLM2-135M · deepset | 0.874 ± 0.014 | 0.799 | 0.560 |
+| SmolLM2-360M · deepset | 0.863 | 0.805 | 0.562 |
+| SmolLM2-135M · jailbreak | 0.708 | 0.573 | 0.541 |
+| pythia-410m · deepset | see below | 0.62 | 0.56 |
+
+The activation-over-surface gap holds on both instruct models and both attack
+corpora (deepset's terse overrides, jailbreak's long role-play), after
+controlling length. Length alone collapses to ~0.55 within-length everywhere,
+confirming the confound was real and is removed.
+
+## The instruct-vs-base result (a finding and a limit)
+
+Operating points — detection rate at a fixed benign false-positive rate:
+
+| model | det @ 1% FPR | det @ 5% FPR | FPR @ 95% TPR |
+|---|---|---|---|
+| SmolLM2-135M (instruct) | **0.71** | 0.80 | 0.43 |
+| SmolLM2-360M (instruct) | **0.61** | 0.73 | 0.37 |
+| pythia-410m (base) | 0.16 | 0.33 | 0.71 |
+| surface baseline (any) | ~0.13 | ~0.36 | ~0.63 |
+
+On instruction-tuned models the monitor catches **71% of injections while
+flagging only 1% of benign traffic**. On the **base** model it collapses to the
+surface baseline. This is mechanistically sensible: an instruction-tuned model
+has learned to treat instructions as special, so "ignore previous instructions"
+disturbs its representation; a base model just continues text. **The method
+needs an instruction-following target** — which is also the only kind you would
+deploy an injection monitor in front of, so the limit is tolerable, but it must
+be stated.
+
+It also sets the honest ceiling: within-length AUROC 0.87 is a *useful* signal,
+not a solved problem. FPR@95%TPR of 0.43 is too high for "catch everything"; the
+usable operating point is det@5%FP = 0.80 — flag 5% of benign to catch 80% of
+injections, on an instruct model, with no attack examples.
+
+## The FIS's distinctive contribution: faithful per-layer attribution
+
+AUROC ties Mahalanobis, so the FIS must justify itself another way, and its
+mechanism does: the "none of the above" score is a **sum of per-feature
+contributions**, so it decomposes by layer into a per-prompt anomaly signature
+that a single Mahalanobis quadratic does not provide.
+
+1. **The attribution is faithful.** Correlation between a layer's attribution
+   gap (injection minus benign) and that layer's own one-class AUROC is **0.90**
+   (deepset) and **0.96** (jailbreak). The rule weights the layers that actually
+   discriminate, not arbitrary ones.
+2. **Injections peak deep.** The most-anomalous layer is in the deep half of the
+   network for **83%** of deepset injections and **94%** of jailbreaks, against
+   ~53% of benign prompts. Layer 0 sits below chance — no surface/BPE artifact,
+   unlike the word-order probe in Part 2.
+3. **Attack styles have distinct signatures.** deepset's terse
+   instruction-overrides light up a broad mid-to-deep band; jailbreak's long
+   role-play prompts are near-silent early and concentrated in the last few
+   layers. Two attack families, two visibly different layer profiles — an
+   interpretability output Mahalanobis' scalar cannot produce, and the kind of
+   readable result the thesis argues for elsewhere.
+
+## Status
+
+Phase 1 and most of Phase 2 are done and hold up under the project's confound
+discipline. The result is real and honest: a cheap, unsupervised,
+self-explaining injection monitor that works on instruction-tuned models, needs
+no attack examples, lands within ~0.03 AUROC of a supervised detector, and
+whose FIS form adds faithful per-layer attribution for free. Its limits are
+stated: it needs an instruction-tuned target, and its operating points make it a
+strong triage signal rather than a standalone gate. That is a defensible thesis
+chapter.
+
+---
+
+# Part 5 — Refinement, optimizers, and the metric that actually matters
+
+Restricting to instruction-tuned targets (justified in Part 4). Question: can an
+optimizer refinement stage, applied after the FIS is constructed, beat the
+Part 3/4 detector? Answer: **no on AUROC by refinement, yes on AUROC by
+representation — but that "yes" makes deployment worse**, which is the finding.
+
+## Construction is free, so refinement is affordable
+
+FIS anomaly construction on 200 benign prompts, 279 features: fit (moment
+match) **0.04 ms**, score **0.3 us/prompt**. The per-layer PCA feature build
+(48 ms) dominates and is shared by every detector. Refinement can cost thousands
+of times more than construction and still be negligible against a forward pass —
+the constraint is whether it helps, not whether it fits.
+
+## Optimizer refinement does not beat the unrefined detector
+
+Baseline to beat: the Part 3 detector — single-Gaussian Mahalanobis in the
+joint whitened activation space, equivalently the whitened FIS "none of the
+above" rule — at **0.871 ± 0.015** within-length AUROC (6 seeds), no attacks.
+
+Everything tried lands at or below it:
+
+| refinement | within-len AUROC | note |
+|---|---|---|
+| **single Gaussian (current)** | **0.871 ± 0.015** | the baseline |
+| joint 2-comp GMM | 0.866 ± 0.035 | no gain |
+| joint 3-comp GMM | 0.859 | overfitting begins |
+| joint 5-comp GMM | 0.780 | overfits |
+| robust covariance (MCD) | 0.815 | worse |
+| per-layer 5-GMM + Powell layer weights (25 attacks) | 0.851 | below baseline |
+| stacked few-shot [joint + per-layer], Powell (10 attacks) | 0.819 | below baseline |
+
+The mechanism: in the joint whitened space the benign activation distribution is
+effectively **unimodal Gaussian**, so a single Gaussian is the maximum-likelihood
+one-class model. Mixtures add parameters that fit the benign sample's noise;
+few-shot weighting fits a small attack set that does not generalise — and adding
+*more* attack examples made it worse, not better (n_val 10 → 50: Powell stacked
+0.819 → 0.792). This is the same lesson as the acceleration study's guard
+experiment: a construction that looks improvable often is not.
+
+**One place refinement does pay:** the *per-layer* (interpretable) FIS, whose
+single-Gaussian uniform-weight form is only 0.62, is lifted to **0.85** by an
+unsupervised per-layer 5-component GMM (no attacks). That does not beat the joint
+detector, but it nearly closes the gap while keeping the per-layer attribution
+of Part 4 — so if you want the interpretability *and* competitive accuracy, GMM
+refinement of the per-layer detector is worth its ~130 ms.
+
+## The optimizer comparison itself (when refinement is applied)
+
+Learning per-layer weights on a small attack set, same objective (soft-AUROC),
+same data:
+
+| optimizer | within-len AUROC (n_val=50) | time | verdict |
+|---|---|---|---|
+| Powell | **0.771** | 26 ms | best derivative-free |
+| logistic (convex proxy) | 0.711 | 1 ms | fast, close |
+| differential evolution | 0.703 | 685 ms | global, no better, 25× slower |
+| LDA (closed form) | 0.618 | 0.1 ms | barely moves |
+| **L-BFGS-B** | 0.614 | 1 ms | **fails — stuck at init** |
+| **Nelder-Mead** | 0.614 | 1 ms | **fails — stuck at init** |
+| coordinate descent | 0.614 | 2 ms | fails |
+
+The gradient methods (L-BFGS-B) and Nelder-Mead **fail outright**, stuck at the
+flat uniform initialisation because the soft-AUROC gradient there is near-zero;
+Powell's coordinate line-searches escape it and win. This mirrors the
+acceleration study's "an analytic gradient will just be faster" — false under a
+badly-conditioned objective. If a refinement stage is used, use Powell or a
+convex logistic proxy, not off-the-shelf gradient descent.
+
+## The real finding: AUROC is the wrong objective
+
+Chasing AUROC through the *representation* (last-token readout instead of
+mean-pool, more joint-PCA components) does raise it substantially — and makes
+the deployable operating point worse:
+
+| model | representation | within-AUROC | det@1%FP | det@5%FP |
+|---|---|---|---|---|
+| 135M | **mean-pool, jpca=32 (current)** | 0.871 | **0.53** | **0.71** |
+| 135M | last-token, jpca=128 | **0.934** | 0.25 | 0.47 |
+| 360M | **mean-pool, jpca=32 (current)** | 0.872 | **0.55** | 0.70 |
+| 360M | last-token, jpca=128 | **0.965** | 0.36 | 0.68 |
+
+The high-dimensional last-token Mahalanobis ranks better on average (higher
+AUROC) but its benign scores are heavy-tailed (chi-squared with many dof), so
+the strict 1%-FPR threshold sits high and catches *fewer* injections. Sweeping
+the dimension budget confirms no last-token setting reaches the mean-pool
+det@1%FP of 0.53 (last-token peaks at 0.28 around jpca=48).
+
+**So the +0.06 AUROC "improvement" is a regression on the metric that matters.**
+The unrefined mean-pool detector is already at its best deployment operating
+point. For an injection monitor the objective is detection at a fixed low
+false-positive rate, not AUROC, and optimising AUROC actively hurt it.
+
+## Multi-model confirmation (four instruct architectures)
+
+Activation vs length, within-length AUROC:
+
+| model | activation | length alone |
+|---|---|---|
+| SmolLM2-135M-Instruct | 0.874 | 0.560 |
+| SmolLM2-360M-Instruct | 0.863 | 0.562 |
+| gemma-3-270m-it | 0.741 | 0.582 |
+| TinyLlama-1.1B-Chat | **0.935** | 0.630 |
+
+The activation-over-length signal holds across four instruct architectures, and
+is strongest on the largest (TinyLlama-1.1B) — consistent with the Part 4
+instruct-vs-base result that the signal tracks instruction-following capability.
+
+## Bottom line for the user's question
+
+* FIS construction: **~0.04 ms**, negligible.
+* Optimizer refinement (GMM, robust cov, few-shot layer weights across Powell /
+  logistic / L-BFGS / Nelder-Mead / diff-evo / coordinate): **does not beat the
+  unrefined single-Gaussian detector** — the benign density is unimodal.
+* Optimizer choice, when refining, matters: Powell/logistic work, gradient and
+  simplex methods fail from the flat init, global search is slow for no gain.
+* The one useful refinement is unsupervised per-layer GMM to make the
+  *interpretable* per-layer FIS competitive (0.62 → 0.85).
+* And the load-bearing finding: **AUROC is the wrong target**; the current
+  detector is already at the best deployment operating point, and the metric to
+  refine against is det@low-FPR, not AUROC.
+
+---
+
+# Part 6 — Parts 3–5 re-run through the genuine tribblefis library
+
+`CORRECTION.md` established that Parts 2–5 used a reimplementation. This re-runs
+the core injection result with the real
+`tribblefis.one_class.TribbleOneClassDetector` (PR #105/#106, `whiten=True`) as
+the FIS arm — a true one-class fit on benign activations only, no attack
+examples. Same confound controls as Part 3 (surface baseline, within-length
+stratification, operating points). These numbers supersede the reimplementation's
+as the authoritative ones.
+
+## Within-length AUROC, one-class, four instruct models (6 seeds)
+
+| model | **tribble one-class** | Mahalanobis | surface | length |
+|---|---|---|---|---|
+| SmolLM2-135M-Instruct | **0.853 ± 0.018** | 0.871 | 0.801 | 0.564 |
+| SmolLM2-360M-Instruct | **0.844 ± 0.034** | 0.872 | 0.801 | 0.564 |
+| gemma-3-270m-it | 0.746 ± 0.029 | 0.746 | **0.856** | 0.609 |
+| TinyLlama-1.1B-Chat | **0.912 ± 0.016** | 0.924 | 0.832 | 0.612 |
+
+**The core claim holds with the real library on 3 of 4 models.** The genuine
+one-class FIS detector beats the surface-only and length baselines after
+controlling length (by +0.05 to +0.08), with no attack examples — which is the
+Part 3 result, now honestly attributable to `tribblefis`.
+
+It is **consistently a little below Mahalanobis** (0.84–0.91 vs 0.87–0.92) — the
+fuzzy per-component Gaussians are a slightly weaker density model than the exact
+joint quadratic, even after whitening. That gap is the honest price of the
+rule-based form.
+
+## Two caveats the re-run surfaced, both real
+
+**1. gemma-3-270m-it is a counterexample.** On the smallest model, *both*
+activation detectors (tribble 0.746, Mahalanobis 0.746) **lose to surface token
+statistics** (0.856). The earlier Part 4 write-up compared gemma's activations
+only to *length* (which it beats, 0.746 vs 0.609) and never to the full surface
+baseline. It should have. "Watch the activations" is **model-dependent**, and the
+weakest instruct model breaks it — surface features are the better injection
+detector there. This qualifies the whole approach: it needs a model whose
+activations actually encode the injection, and capability seems to matter
+(TinyLlama-1.1B strongest, gemma-270m the failure).
+
+**2. The FIS detector is worse at the strict operating point.** Detection at a
+fixed benign false-positive rate:
+
+| model | detector | det@1%FP | det@5%FP |
+|---|---|---|---|
+| SmolLM2-135M | tribble one-class | 0.12 | 0.71 |
+| SmolLM2-135M | Mahalanobis | **0.53** | 0.71 |
+| SmolLM2-360M | tribble one-class | 0.00 | 0.59 |
+| SmolLM2-360M | Mahalanobis | **0.55** | 0.70 |
+| TinyLlama-1.1B | tribble one-class | 0.10 | 0.75 |
+| TinyLlama-1.1B | Mahalanobis | **0.58** | 0.75 |
+
+At **5% FPR the two match** (both ~0.71 catch), but at **1% FPR the fuzzy
+detector collapses** (0.00–0.12 vs Mahalanobis 0.53–0.58). The `1 − max firing`
+score gives benign prompts a heavy upper tail, so the strict 1%-FPR threshold
+sits high and catches almost no injections. For a deployment that needs very low
+false positives, Mahalanobis is the better score; the fuzzy detector is usable
+only at the more permissive 5% operating point. This is the mirror image of the
+Part 5 finding (there a high-dim *Mahalanobis* had the heavy tail) and it
+reinforces the same lesson: rank the detector by the operating point you will
+deploy at, not by AUROC.
+
+## Net, stated honestly
+
+Through the real library, the one-class FIS injection monitor is a **genuine but
+modest** result: it beats surface/length on the larger instruct models with no
+attack examples, trails Mahalanobis slightly on AUROC and badly at 1% FPR, and
+fails outright on the smallest model where surface wins. Its live advantages
+remain the ones AUROC does not show — it is unsupervised, and (Part 4) it yields
+faithful per-layer attribution. The honest headline is not "the FIS detects
+injections best" but "an interpretable, unsupervised FIS monitor is competitive
+at a 5%-FPR operating point on capable instruct models, and says which layers
+fired."
+
+---
+
+# Part 7 — Optimizer refinement, timing, and the ROC sweep
+
+## Construction and inference performance
+
+The genuine `TribbleOneClassDetector`, one-class, whitened, 32 components:
+
+| model | layers | hidden | features | train (benign) | construct (ms) | infer (µs/prompt) |
+|---|---|---|---|---|---|---|
+| SmolLM2-135M | 30 | 576 | 32 | 205 | 110 | 11.1 |
+| SmolLM2-360M | 32 | 960 | 32 | 205 | 110 | 10.9 |
+| gemma-3-270m-it | 18 | 640 | 32 | 205 | 116 | 10.9 |
+| TinyLlama-1.1B | 22 | 2048 | 32 | 205 | 115 | 10.8 |
+
+Construction is ~110 ms, dominated by the shared per-layer PCA feature build;
+the fuzzy fit itself is ~0.04 ms (Part 5). Inference is ~11 µs/prompt. Both are
+negligible against a model forward pass — the detector is effectively free.
+
+## Refining TribbleFIS with the `optimizers` package — it does not help
+
+The `refine_method="optimizers"` idea (population + local-polish GA/PSO/ACO from
+the `optimizers` package), applied to the one-class detector: extract the
+model's Gaussian antecedent parameters and search them against a validation
+objective (AUROC, and a low-FPR-weighted objective aimed at the det@1%FP
+weakness), with L2 shrinkage toward the heuristic and a disjoint test split.
+
+Two implementation notes worth recording:
+* The installed `optimizers` build uses a **keyword-only** constructor, so
+  tribblefis's own `_run_optimizer_search` (positional) does not drive it — the
+  same incompatibility behind that repo's 5 pre-existing `optimizers_backend`
+  test failures. The package had to be called directly against its current API.
+* The low-FPR objective is **degenerate at the start** (pAUC@1%FP = 0 for the
+  heuristic), so the derivative-free search has no gradient to follow there and
+  wanders; only an AUROC-anchored objective is searchable.
+
+The result, across seeds and shrinkage settings:
+
+| l2 shrink | unrefined (AUROC / det@1%FP) | refined (AUROC / det@1%FP) |
+|---|---|---|
+| 0.00 | 0.847 / 0.224 | 0.847 / 0.224 |
+| 0.02–0.15 | 0.847 / 0.224 | 0.847 / 0.224 |
+
+**Refinement is a no-op with the guard, harmful without it.** Removing the
+"never worse than heuristic" fallback, the GA moves *away* from the
+moment-matched start and its validation AUROC gets **worse** (0.883 → 0.792 at
+l2=0, → 0.493 with shrinkage), dragging test with it (0.942 → 0.768). The
+moment-matched Gaussians on whitened components are already a strong local
+optimum; population search around them finds worse points, and the guard
+correctly falls back to the heuristic.
+
+This is the third independent confirmation of the project's recurring result —
+Part 5 (few-shot layer weights), tribblefis's own refinement-guard evaluation,
+and now the `optimizers`-package antecedent search — that **good construction is
+not improved by a refinement stage here**. The lever that raised performance was
+never the optimizer; it was the representation (Part 5) and, for the one-class
+detector specifically, whitening (Part 6 / PR #106).
+
+## The sweep
+
+A published figure — ROC curves (detection quality vs false-positive rate) for
+all four models, with the 5%-FPR operating point marked, plus the operating-
+point and timing tables — is at the artifact link. It makes the Part 6 caveats
+visual: the curves are strong on TinyLlama-1.1B and SmolLM2, gemma sits lowest,
+and every curve rises steeply only after the 5%-FPR line, which is why 1%-FPR
+detection is weak.
+
+---
+
+# Part 8 — Making 1%-FPR usable: three ideas, and the one that works
+
+Part 7 left the FIS monitor weak at the strict operating point (det@1%FP
+~0.1 vs Mahalanobis ~0.55). Diagnosis: the score `1 - max firing` is
+`1 - exp(-0.5 * sum_j z_j^2)` over the ~32 whitened components, and with that
+many components it **saturates** -- a typical benign point already drives the
+product to ~1e-7, so benign and anomalous prompts pile up near anomaly = 1,
+flattening the low-FPR tail. Three ideas, each a different facet:
+
+* **Idea 1 -- non-saturating / robust aggregation.** Score in the log domain
+  (summed surprisal, = Mahalanobis) instead of product-then-complement, and a
+  *trimmed* variant that drops the largest per-component surprisals so one odd
+  component cannot flag a benign prompt.
+* **Idea 2 -- ensemble / bagging.** Average detectors over bootstrap benign
+  samples x random component subsets; variance reduction tightens the tail.
+* **Idea 3 -- local threshold calibration.** z-score each prompt's score against
+  its k nearest benign neighbours, so a global 1%-FPR threshold is not dragged
+  up by one dense-but-high-scoring benign region.
+
+## Result: Idea 1 fixes it, and the trimmed variant beats Mahalanobis
+
+det@1%FP (6 seeds, one-class), against the current score:
+
+| score | 135M | 360M | TinyLlama-1.1B |
+|---|---|---|---|
+| `1 - max firing` (current) | 0.119 | **0.000** | 0.103 |
+| surprisal sum (= Mahalanobis) | 0.525 | 0.553 | 0.584 |
+| **trimmed sum (drop top-2)** | 0.508 | **0.572** | **0.601** |
+| top-k(16) mean surprisal | 0.523 | 0.548 | 0.584 |
+| bagged x15 (Idea 2) | 0.505 | 0.559 | 0.557 |
+| local calibration (Idea 3) | 0.498 | 0.513 | 0.554 |
+
+**The saturation was the entire problem.** Simply scoring in the log domain
+recovers det@1%FP from ~0.1 to ~0.55 -- Mahalanobis parity -- at zero cost (same
+fitted memberships, different aggregation). The **trimmed** variant slightly
+*beats* Mahalanobis on the two larger models (0.572 vs ~0.55, 0.601 vs ~0.58) by
+removing the benign false positives a single high-z component causes. AUROC is
+held or nudged up (0.92-0.95), and det@5%FP is unchanged. This is the genuine
+FIS-flavoured win: a robust, trimmed surprisal that a pure quadratic
+(Mahalanobis) does not express.
+
+Ideas 2 and 3 also recover det@1%FP but neither beats Idea 1, and both cost far
+more (15x the fits, or a kNN per query). Idea 1 is the recommendation, and it is
+filed upstream as tribblefis #108 (a `score` option: `complement` / `surprisal`
+/ `trimmed`).
+
+## Bottom line
+
+The FIS monitor's 1%-FPR weakness was an artefact of the saturating
+product-complement score, not a fundamental limit. With a log-domain robust
+score it is competitive with -- and on larger models slightly better than --
+Mahalanobis at the strict operating point, while keeping the one-class, no-
+attack-examples, interpretable-attribution properties. det@1%FP ~0.57-0.60 on
+capable instruct models means catching ~60% of injections while flagging 1% of
+benign traffic -- a genuinely deployable triage gate.
+
+---
+
+# Part 9 — Comprehensive sweep: 3 datasets, 7 models, and where it generalises
+
+Broadened coverage: three independent attack corpora and models from 0.14B to
+1.2B (Qwen-3B/14B pending download). The FIS one-class detector uses the Part 8
+trimmed log-domain score throughout. Two metrics because injection corpora carry
+*opposite* length confounds (deepset injections are longer, safeguard's shorter),
+so a pooled number is not comparable across them: **det@1%FP** (deployment,
+pooled) and **within-length AUROC** (confound-controlled signal), with the
+surface-only baseline alongside.
+
+| model | dataset | det@1%FP | FIS wl-AUROC | Mahal wl | surface wl | act > surf? |
+|---|---|---|---|---|---|---|
+| SmolLM2-135M | deepset | 0.508 | 0.860 | 0.871 | 0.801 | **yes** |
+| gemma-3-270m-it | deepset | 0.281 | 0.736 | 0.746 | 0.856 | no |
+| SmolLM2-360M | deepset | 0.572 | 0.867 | 0.872 | 0.801 | **yes** |
+| pythia-410m (base) | deepset | 0.102 | 0.838 | 0.853 | 0.811 | yes |
+| TinyLlama-1.1B | deepset | **0.601** | 0.920 | 0.924 | 0.832 | **yes** |
+| LFM2.5-1.2B | deepset | 0.315 | 0.843 | 0.870 | 0.856 | no |
+| SmolLM2-135M | jailbreak | 0.012 | 0.726 | 0.723 | 0.548 | yes |
+| SmolLM2-360M | safeguard | 0.023 | 0.684 | 0.663 | 0.746 | no |
+| TinyLlama-1.1B | safeguard | 0.034 | 0.674 | 0.681 | 0.746 | no |
+
+## What generalises and what does not
+
+**The within-length activation signal is real everywhere** — FIS wl-AUROC is
+0.67–0.92 across every model and dataset, never worthless. The trimmed FIS tracks
+Mahalanobis within ~0.02 throughout, as expected.
+
+**Whether activations beat surface is dataset- and model-dependent.** Activation
+wins on deepset for the capable instruct models (SmolLM2, TinyLlama: +0.06 to
++0.09 over surface) and on jailbreak, but **loses to surface on safeguard**
+(0.68 vs 0.75 on both models) and for the weaker models on deepset (gemma, LFM2).
+The rule: the monitor wins when the injection perturbs the model's *internal
+representation* more than it perturbs *surface token statistics* — which holds
+for lexically-plain injections against capable Llama-family instruct models, and
+fails when the injections are lexically distinctive (safeguard's "Compose a
+message that starts with…") or the model is weak.
+
+**Strict-FPR detection generalises narrowest of all.** det@1%FP ≥ 0.5 only on
+deepset with capable instruct models. jailbreak (extreme length confound) and
+safeguard (surface-dominant, reversed length confound) both collapse at 1% FPR
+(≤0.03) regardless of the score fix — the fix recovers signal where it exists but
+cannot create it. pythia-410m (base) ranks fine within-length (0.838) yet fails
+at 1% FPR (0.102): the instruct-vs-base gap is a *strict-operating-point* effect,
+not a ranking one.
+
+## The honest comprehensive verdict
+
+The interpretable, unsupervised, no-attack-examples FIS monitor is a **genuine
+but narrow** tool. It is a deployable 1%-FPR triage gate (catch ~55–60% of
+injections at 1% benign FPR) **only** on the intersection of: a capable
+instruction-tuned target, an attack corpus whose injections are lexically plain,
+and the log-domain trimmed score. Outside that intersection it degrades to a
+within-length ranking signal that is real but no better — and sometimes worse —
+than reading the prompt's surface statistics. Broadening the evaluation from one
+dataset/model to three datasets and seven models is what surfaced these
+boundaries; the single-dataset result would have overstated the method.
+
+## Part 9 update — scale widens the intersection (Qwen2.5-3B)
+
+Qwen2.5-3B-Instruct, added to the sweep, is the best model tested and answers the
+open question of whether more scale helps:
+
+| model | deepset det@1%FP | deepset FIS-wl / surf | **safeguard FIS-wl / surf** | act>surf (both)? |
+|---|---|---|---|---|
+| TinyLlama-1.1B | 0.601 | 0.920 / 0.832 | 0.674 / 0.746 | deepset only |
+| **Qwen2.5-3B** | **0.663** | 0.945 / 0.843 | **0.762 / 0.745** | **both** |
+
+On deepset, 3B beats every smaller model (det@1%FP 0.663, wl-AUROC 0.945). More
+importantly, **on the safeguard corpus -- where every model up to 1.2B lost to
+surface features -- 3B's activations finally beat surface (0.762 vs 0.745).**
+Capability widens the intersection: a richer representation carries injection
+signal that surface tokens do not, even on the corpus whose injections are
+lexically distinctive. The strict operating point on safeguard is still weak
+(det@1%FP 0.046), so ranking crosses the surface threshold before the deployable
+1%-FPR gate does -- but the direction is unambiguous, and it says the method's
+narrowness is partly a small-model artefact. (Qwen2.5-14B pending to confirm the
+trend continues.)
+
+---
+
+# Part 10 — Scaling to 14B: a ranking/operating-point dissociation
+
+The size ladder now runs 50M → 14B across ten models. Qwen2.5-14B-Instruct
+completes it and reveals a clean dissociation between the two metrics.
+
+| model | deepset det@1%FP | deepset FIS-wl | safeguard FIS-wl / surf | safeguard margin |
+|---|---|---|---|---|
+| SmolLM2-360M | 0.572 | 0.867 | 0.684 / 0.746 | −0.062 |
+| TinyLlama-1.1B | 0.601 | 0.920 | 0.674 / 0.746 | −0.072 |
+| Qwen2.5-3B | 0.663 | 0.945 | 0.762 / 0.745 | +0.017 |
+| **Qwen2.5-14B** | **0.673** | 0.943 | **0.860 / 0.745** | **+0.115** |
+
+**Two things scale differently.** The deployable 1%-FPR gate on the *easy* corpus
+**plateaus** at ~0.67 (3B→14B: 0.663→0.673, and wl-AUROC is flat at 0.94) — 3B was
+already near the ceiling. But on the *hard* corpus the within-length ranking
+**keeps climbing steeply**: the activation-over-surface margin goes
+−0.06 → −0.07 → +0.02 → **+0.12** from 360M to 14B. A 14B model's representation
+carries injection signal that surface tokens miss by a wide margin, even on the
+corpus where every model ≤1.2B lost.
+
+**But the strict operating point on safeguard stays stuck** (det@1%FP 0.023 →
+0.054 across 360M→14B, still unusable). So scale buys *ranking* (AUROC) on hard
+corpora but not the *low-FPR gate* — the benign/injection score tails overlap
+regardless of how well the middle of the distribution separates. This is the
+same AUROC-vs-operating-point gap seen throughout, now shown to persist under
+14× more parameters.
+
+## Final synthesis
+
+The interpretable, unsupervised, no-attack-examples FIS monitor, across 10 models
+(50M–14B, 5 architecture families) and 3 attack corpora:
+
+* **det@1%FP scales with capability then plateaus** — 0.07 (50M) → 0.5 (~0.4B) →
+  0.67 (3B–14B) on the easy corpus. Deployable as a ~0.67-recall / 1%-FP triage
+  gate on capable instruct models against lexically-plain injections.
+* **Ranking (within-length AUROC) keeps improving with scale on hard corpora** —
+  14B decisively beats surface features everywhere, so the method's small-model
+  narrowness is largely an artefact of capability, not a fundamental limit.
+* **The 1%-FPR gate does not generalise to hard corpora at any tested scale** —
+  ranking and operating point dissociate; a better score threshold or a
+  conformal/tail-calibrated approach is the open problem, not more parameters.
+* **The log-domain trimmed score (issue #108) is what makes any of the 1%-FPR
+  numbers non-zero** — the fix is necessary throughout.
+
+The published figure shows both curves. The honest one-line verdict: a genuine,
+cheap, interpretable triage gate on capable instruct models against plain
+injections, whose ranking scales with model size but whose strict-FPR
+deployability does not generalise to lexically-distinct attacks.
+
+---
+
+# Part 11 — More benign data, and TribbleClassifier parameter sweeps
+
+Two questions on Qwen2.5-3B: does more baseline (benign) data help, and how do the
+real classifier's knobs move detection.
+
+## More benign data — helps ranking, saturates, does not fix the hard-corpus tail
+
+Sweeping the number of benign prompts used to fit the one-class detector, fixed
+test set, trimmed log-domain score, 6 seeds:
+
+**deepset (easy corpus):**
+
+| n_benign | det@1%FP | wl-AUROC |
+|---|---|---|
+| 50 | 0.608 | 0.927 |
+| 100 | 0.626 | 0.938 |
+| 200 | **0.670** | 0.948 |
+| 240 | 0.640 | 0.940 |
+
+**safeguard (hard corpus, up to 2000 benign):**
+
+| n_benign | det@1%FP | wl-AUROC |
+|---|---|---|
+| 50 | 0.036 | 0.726 |
+| 200 | 0.045 | 0.772 |
+| 800 | 0.069 | 0.794 |
+| 1600 | 0.050 | **0.801** |
+
+**Yes, more benign data improves quality — with strong diminishing returns.**
+Within-length AUROC rises monotonically on both corpora (+0.02 deepset, +0.075
+safeguard) and saturates by ~200 (easy) / ~800 (hard) examples. det@1%FP improves
+with data **only where the score tails are already separable**: on deepset it
+climbs 0.61 → 0.67 then saturates at ~200; on safeguard it stays pinned at ~0.05
+no matter how much benign data is added. The hard-corpus low-FPR failure is a
+tail-overlap problem, not a data-quantity one — the same ranking/operating-point
+dissociation seen in Part 10, now shown to be immune to more data too.
+
+## TribbleClassifier parameter sweep (supervised, deepset, 5-fold CV)
+
+One-factor-at-a-time from a baseline (top_n=16, n_gaussians=2, probability,
+gaussian, refine=False; wl-AUROC 0.834, det@1%FP 0.409):
+
+| parameter | best value | effect on det@1%FP |
+|---|---|---|
+| **top_n** | 32 (max) | 0.28 → **0.61** — the dominant lever; more features monotonically better |
+| **refine** | True | 0.41 → **0.69** — big win (adds ~5× fit time) |
+| n_gaussians | 3–4 | 0.41 → 0.55–0.57 |
+| norm_conorm | probability/einstein | min/max best for AUROC (0.850) but worst for det@1%FP (0.310) |
+| member_function | gaussian | trap is broken here (det@1%FP 0.000) |
+
+**Two levers matter: `top_n` (feature budget) and `refine=True`.** Combined
+(top_n=32, n_gaussians=4, einstein, refine=True) the supervised classifier
+reaches **wl-AUROC 0.937, det@1%FP 0.768** — beating the one-class detector's
+0.66. Notably, **`refine=True` helps here even though optimizer refinement failed
+in the one-class setting (Part 5/7)**: the classifier's refinement has a
+*discriminative* cross-entropy objective (both classes), which the one-class
+density fit lacked. It is the same mechanism succeeding because it finally has a
+gradient toward the thing being measured.
+
+The trade-off: this is *supervised* (needs labelled attacks) and 5× slower to
+fit. It is the ceiling if you have attack examples; the one-class detector (0.66,
+no attacks) is what you deploy when you do not.
+
+---
+
+# Part 12 — A fourth corpus (SPML) and the PCA/whitening ablation
+
+## SPML — a third corpus where the monitor works strongly
+
+`reshabhs/SPML_Chatbot_Prompt_Injection` (system+user chatbot prompts), Qwen-3B,
+one-class trimmed score. Baseline `1-max firing` again gives det@1%FP 0.000
+(saturation), and the log-domain fix recovers it dramatically:
+
+| metric | value |
+|---|---|
+| pooled det@1%FP (trimmed) | 0.889 |
+| pooled AUROC | 0.994 |
+| **within-length det@1%FP** | **0.885** |
+| within-length FIS wl-AUROC | 0.935 |
+| within-length surface wl-AUROC | 0.726 (activations win by +0.21) |
+
+SPML has an extreme raw length confound (length-AUROC 0.991), but the
+within-length numbers confirm the signal is genuine and large. So across four
+corpora the picture is: **strong deployable gate on deepset and SPML**
+(det@1%FP 0.66 and 0.89), **struggles on jailbreak** (length) and **safeguard**
+(surface-dominant until 3B+). Two of four is a real, not universal, tool.
+
+## PCA / whitening ablation — decorrelation is essential, rank reduction helps
+
+Replacing the detector's PCA-whitening with alternatives, trimmed score, Qwen-3B:
+
+| transform | deepset det@1%FP / wl | safeguard det@1%FP / wl |
+|---|---|---|
+| raw (no decorrelation) | 0.438 / 0.756 | 0.015 / 0.480 |
+| standardize (z-score, no rotation) | 0.438 / 0.756 | 0.015 / 0.480 |
+| **PCA-whiten k=32 (current)** | **0.663 / 0.945** | **0.046 / 0.762** |
+| PCA-whiten k=16 | 0.579 / 0.874 | 0.031 / 0.567 |
+| PCA-whiten full rank | 0.588 / 0.905 | 0.023 / 0.813 |
+| ZCA-whiten (full rank) | 0.606 / 0.915 | 0.015 / 0.855 |
+
+Three findings:
+
+* **You cannot remove decorrelation.** raw and standardize are identical (the
+  trimmed sum of z² is per-feature scale-invariant, so standardizing changes
+  nothing) and both crater — det@1%FP 0.44 vs 0.66, wl-AUROC 0.76 vs 0.95. The
+  whitening is load-bearing, exactly because the product-t-norm rule assumes
+  independent features.
+* **Rank reduction is part of the win, not just decorrelation.** PCA-whiten at
+  k=32 beats *full-rank* PCA-whiten (0.663 vs 0.588 det@1%FP) — truncating the
+  low-variance noise directions helps the operating point. PCA is doing two
+  jobs: decorrelate, and drop noise.
+* **ZCA is a viable substitute for ranking, not for the gate.** ZCA (stays in the
+  original basis, full rank) gives the best hard-corpus wl-AUROC (0.855) but the
+  worst det@1%FP (0.015) — full-rank whitening ranks well but its score tail is
+  heavy. For the deployable metric, rank-reduced PCA remains the best choice.
+
+So "removing PCA" is not advisable: the decorrelation is essential and the rank
+truncation specifically buys the low-FPR operating point. If PCA must be avoided
+(e.g. to stay in the original feature basis for interpretability), ZCA recovers
+the ranking but not the strict gate.
+
+---
+
+# Part 13 — Tail calibration: not the bottleneck (the score is)
+
+The strict-FPR gate was the one thing scale, data, and whitening did not fix, so
+the natural next lever is *tail calibration*: set the 1%-FPR threshold from a
+benign calibration set with an extreme-value model rather than a noisy empirical
+quantile. Threshold from calibration benign only (never test benign, never
+injections); measure realized FPR and detection on held-out.
+
+| corpus (Qwen-3B) | oracle det@1%FP | empirical: realized FPR / TPR | EVT: realized FPR / TPR |
+|---|---|---|---|
+| deepset | 0.599 | 0.0175 ± 0.015 / **0.617** | 0.0165 ± 0.014 / 0.620 |
+| safeguard | 0.077 | 0.0102 ± 0.006 / 0.059 | 0.0100 ± 0.005 / 0.058 |
+| SPML | 0.913 | 0.0150 ± 0.016 / **0.916** | 0.0150 / 0.916 |
+
+**Tail calibration does not help, and the experiment says exactly why.**
+
+1. **Calibration is already near-oracle.** The empirical-quantile threshold
+   realizes a detection TPR essentially equal to the oracle det@1%FP on every
+   corpus (deepset 0.617 vs 0.599, safeguard 0.059 vs 0.077, SPML 0.916 vs
+   0.913). There is almost no oracle-vs-deployable gap to close.
+2. **EVT (Peaks-Over-Threshold / Generalized Pareto) matches the empirical
+   quantile** even with the anchor lowered so it genuinely engages — because the
+   bottleneck is not extreme-quantile *variance*, which is what EVT reduces.
+3. **The strict-FPR limit is tail *separation*, a score/ranking problem.** On
+   safeguard, a perfectly calibrated 1%-FPR threshold still catches only ~6% of
+   injections, because benign and injection scores overlap in the upper tail —
+   no thresholding method can separate what the score does not.
+
+The one residual deployment concern tail calibration *could* address is the
+**variance of the realized FPR** (deepset ±0.015 — a target of 1% can land
+anywhere 0–3%), driven by tiny calibration sets. EVT reduces it only marginally;
+more calibration benign (cheap) is the better fix, and it changes reliability,
+not detection.
+
+**Redirect.** Improving the strict gate needs a better tail-*separating score*,
+not better threshold calibration. The demonstrated lever is a discriminative
+signal: the supervised `TribbleClassifier` with `refine=True` reaches det@1%FP
+0.77 on deepset (Part 11) versus the one-class 0.66 — the refinement's
+cross-entropy objective sharpens exactly the tail separation calibration cannot
+manufacture. Few-shot attack examples, or an interval-consequent (IT2-TSK) score
+that models score uncertainty directly, are the score-level directions worth
+trying next; EVT/conditional thresholding is closed.
+
+---
+
+# Part 14 — Tail-separation round: a few labelled attacks solve the strict gate
+
+Three parallel evaluations (deep literature research + two empirical benchmarks
+on captured features), synthesised. The question was how to improve TPR at 1% FPR
+where the score's *tail separation* — not the threshold — is the bottleneck.
+
+## What the round established
+
+**1. The bottleneck is direction, not magnitude.** The one-class detector scores
+distance-from-normal (a magnitude) and discards the *direction* attacks point in.
+Logistic regression on the whitened features (directional) hugely beats logistic
+on the per-component surprisal (magnitude): safeguard det@1%FP 0.84 vs 0.27. That
+is the whole story of the strict-gate failure.
+
+**2. Unsupervised score changes help only a little.** Benchmarking 10 one-class
+score families (independently re-verified): the best, a **One-Class SVM (rbf)**,
+lifts safeguard det@1%FP from 0.06 to ~0.10 and deepset 0.66→0.69 — real but
+small. kNN mean-distance is a consistent minor gain. GMMs overfit; the naive
+relative-Mahalanobis implementation failed (subtracting a same-fit background
+cancels the signal). No unsupervised score closes the hard-corpus gap; the
+literature (OpenOOD v1.5) agrees no single score dominates, and of all OOD scores
+only Mahalanobis / relative-Mahalanobis / KNN are even applicable to a fixed
+feature vector.
+
+**3. A handful of labelled attacks closes it — decisively.** Logistic regression
+on the whitened features, benign as negatives, N few-shot attacks as positives.
+det@1%FP by N (independently verified, 8 seeds):
+
+| model | corpus | N=0 (unsup) | N=5 | N=10 | N=25 |
+|---|---|---|---|---|---|
+| Qwen2.5-3B | deepset | 0.618 | 0.781 | 0.766 | 0.824 |
+| Qwen2.5-14B | deepset | 0.706 | 0.805 | 0.785 | 0.819 |
+| gemma-3-270m-it | deepset | 0.329 | 0.653 | 0.646 | 0.709 |
+| LFM2.5-1.2B | deepset | 0.357 | 0.717 | 0.728 | 0.737 |
+| **Qwen2.5-3B (2000 benign)** | **safeguard** | **0.065** | **0.756** | **0.840** | **0.876** |
+| TinyLlama-1.1B | safeguard | 0.030 | 0.467 | 0.502 | 0.485 |
+| Qwen2.5-14B | safeguard | 0.057 | 0.608 | 0.608 | 0.616 |
+| Qwen2.5-3B | SPML | 0.916 | 0.938 | 0.951 | 0.977 |
+
+**Ten attacks turn the hard corpus from unusable (0.06) into strongly deployable
+(0.5–0.84).** Few-shot also *widens model applicability*: gemma and LFM2, which
+*lost to surface features* unsupervised, become 0.7+ detectors with 25 attacks.
+More benign data compounds with few-shot (Qwen-3B safeguard: 0.54 with 400 benign
+→ 0.84 with 2000).
+
+**4. Fancy low-FPR losses do not beat plain logistic regression.** A top-push /
+partial-AUC surrogate (restricting negatives to the benign tail) wins slightly on
+the *easy* corpus but loses on the *hard* one (0.75 vs 0.82). Plain balanced
+logistic regression on the whitened features is the robust choice — the recurring
+lesson that the simple method wins once the representation is right.
+
+## Literature grounding
+
+The few-shot logistic discriminant is the score-level form of **Deep SAD**
+(Ruff et al., ICLR 2020) — pull normal to the centre, push known anomalies away —
+without retraining the feature extractor. The verified shortlist also flagged
+**relative Mahalanobis** (Ren et al., 2021) as the top *zero-shot* idea, but it
+needs a properly regularised background covariance (diagonal/shrinkage), not the
+naive per-component version that failed here — the one unsupervised lead still
+worth implementing correctly. EVT-for-discrimination is a confirmed literature
+gap (all verified open-set/EVT methods are calibration, not separation),
+matching Part 13.
+
+## The recommendation
+
+Ship a **few-shot mode** for the monitor: benign-only whitening as before, plus,
+when a handful of known attacks exist, an L2-logistic discriminant on the
+whitened features added to (or replacing) the one-class score. It needs 5–25
+attack examples — a trivial ask versus a full attack corpus — and it is what
+turns the monitor from "narrow, one-class, hard corpora fail" into "strong across
+all corpora and models". In TribbleFIS terms this is the semi-supervised
+extension of the one-class rule: the "none of the above" density plus a
+discriminative direction from a few labels — the same insight as the supervised
+`TribbleClassifier(refine=True)` result (Part 11), delivered by the cheapest
+sufficient mechanism.
+
+---
+
+# Part 15 — Regularized background covariance, explored properly
+
+Following the tail-separation round, a focused exploration of regularized
+covariance for the zero-shot score (the user's request). The relative-Mahalanobis
+idea is score = MD_foreground − MD_background with a regularized background;
+covariances use shrinkage `Σ(λ) = (1−λ)S + λ·(tr S/d)·I`. Zero-shot, benign-only,
+on RAW per-layer features (whitening sets Σ=I and degenerates the construction).
+
+| corpus (Qwen-3B) | trimmed PCA-32 | **Ledoit-Wolf Maha** | best relative-MD |
+|---|---|---|---|
+| deepset | 0.663 / 0.945 | **0.682 / 0.962** | 0.671 |
+| safeguard | 0.059 / 0.821 | 0.055 / 0.820 | 0.067 |
+| SPML | 0.885 / 0.935 | **0.895 / 0.968** | 0.888 |
+
+**The regularization pays on the foreground, not as a background subtraction.**
+A Ledoit-Wolf shrunk full-covariance Mahalanobis (`maha_lw`) modestly but
+consistently beats the PCA-rank-32 trimmed score (deepset +0.02 det@1%FP, SPML
++0.01, best within-length AUROC on all three) and needs no rank hyperparameter.
+The relative-MD background subtraction — the thing the exploration set out to
+test — never beats the plain Ledoit-Wolf foreground at any background shrinkage
+λ ∈ {0.3…0.99}; subtracting a background term only discards signal. The
+foreground-covariance shrinkage is the whole win.
+
+The hard corpus (safeguard) stays ~0.05–0.07 for every zero-shot variant,
+confirming again that no covariance trick cracks it — the few-shot direction
+(Part 14) is the only lever there.
+
+Shipped as the `cov="ledoit_wolf"` option in tribblefis #113 (issue #112). The
+relative-MD negative is documented in #112 so it is not re-attempted.
+
+---
+
+# Part 16 — System-prompt shift: the monitor's biggest operational risk
+
+The highest-risk inference axis (PLAN_INFERENCE_SENSITIVITY §system-prompt). A
+deployed monitor is fit on benign activations under one system prompt; production
+may use a different one. The same deepset battery was captured under four system
+prompts (default / helpful / support / terse) on Qwen-3B; for each (train A,
+test B) the detector is fit on benign-A, thresholded at 1% FPR on benign-A, and
+applied to benign-B (realized FPR) and injection-B (detection).
+
+## Mean-pooled features: catastrophic under any shift
+
+Realized FPR (rows = train prompt, cols = test prompt):
+
+| train ↓ / test → | default | helpful | support | terse |
+|---|---|---|---|---|
+| default | **0.02** | 1.00 | 0.91 | 0.95 |
+| helpful | 0.95 | **0.04** | 1.00 | 1.00 |
+| support | 1.00 | 1.00 | **0.02** | 1.00 |
+| terse | 0.99 | 1.00 | 0.87 | **0.02** |
+
+The diagonal (matched) holds ~1-2%; **every off-diagonal blows up to 0.87-1.00**.
+Changing the system prompt makes essentially *all* benign traffic look
+anomalous. Detection collapses in step (off-diagonal det@1%FP mostly <0.2 vs
+~0.57 matched). The mechanism is direct: mean-pooling averages the system-prompt
+tokens into the feature, so a new system prompt is literally a new mean.
+
+## Last-token readout: partially transfers, at a detection cost
+
+Using the last-token activation (fixed readout position) instead of the mean, the
+off-diagonal FPR drops from ~1.0 to 0.03-0.59 — better, but "terse" (the most
+different prompt) still reaches 0.4-0.6, and matched detection is weaker
+(det@1%FP ~0.25 vs mean-pool's 0.57). Not robust on its own.
+
+## The mitigation: pool benign across system prompts + last-token
+
+Leave-one-system-prompt-out (fit benign pooled from three prompts, test the
+unseen fourth):
+
+| variant | realized FPR on unseen prompt | det@1%FP |
+|---|---|---|
+| mean-pool | 0.60 / 1.00 / 0.73 / 0.99 | 0.02-0.43 |
+| **last-token** | **0.001 / 0.008 / 0.002 / 0.148** | 0.09-0.18 |
+
+**Last-token features fit on benign pooled across a diversity of system prompts
+hold the FPR near target on an unseen system prompt** (≤0.15) — a genuine
+robustness fix. The cost is detection: pooling diverse prompts widens the normal
+manifold, so det@1%FP drops to 0.1-0.18. Mean-pooling does not generalise even
+when pooled.
+
+## Operational conclusion
+
+The monitor is **highly system-prompt-specific** — the single largest deployment
+risk found. Two viable practices, a tradeoff:
+
+* **Recalibrate per system prompt** (recommended default). Refit on benign
+  captured under the *exact* deployment system prompt. Best detection; requires
+  recapture on any prompt change — but that is benign-only, no labels, cheap.
+* **Robust blunt monitor.** Last-token features + benign pooled across a
+  diversity of system prompts hold FPR on unseen prompts, at a detection cost —
+  for settings where the system prompt is not fixed or not known.
+
+Either way, a monitor cannot be trained once under one wrapper and left in place
+across system-prompt changes: that silently drives the false-positive rate to
+~100% with mean-pooled features. This is the operational caveat that matters most.
+
+---
+
+# Part 17 — Attention backend and quantization
+
+Two more inference axes (PLAN_INFERENCE_SENSITIVITY), Qwen-3B / deepset, trimmed
+one-class score.
+
+## Attention backend: no effect
+
+| backend | det@1%FP | wl-AUROC |
+|---|---|---|
+| sdpa (default) | 0.663 | 0.945 |
+| eager | 0.656 | 0.947 |
+
+Within seed noise — the attention implementation does not change the monitor.
+
+## Quantization: graceful when matched, catastrophic when mismatched
+
+| precision (fit == deploy) | det@1%FP | wl-AUROC |
+|---|---|---|
+| bf16 (baseline) | 0.663 | 0.945 |
+| int8 (bitsandbytes) | 0.605 | 0.938 |
+| int4 (nf4) | 0.498 | 0.898 |
+| **cross: fit bf16 → deploy int4** | **realized FPR 0.998** | (det@1%FP 0.523) |
+
+Matched quantization degrades detection *gracefully* — int8 costs ~0.06 det@1%FP,
+int4 ~0.17 — so a monitor fit and run at the same precision stays usable, even at
+4-bit. But a **precision mismatch is catastrophic**: fit on full-precision
+activations, deploy against a 4-bit model, and realized FPR jumps to ~1.0 — the
+same failure mode as the system-prompt shift (Part 16). The ranking still
+transfers (oracle det@1%FP 0.52), so it is a distribution-shift / threshold
+problem, not a loss of signal.
+
+## The unifying operational principle
+
+Parts 16 and 17 give one rule: **the monitor must be calibrated under the exact
+deployment configuration — same system prompt and same quantization.** Anything
+that shifts the activation distribution (the wrapper, the weight precision)
+sends the false-positive rate toward 100%, because the benign manifold moves out
+from under the fitted threshold. The mitigation is the same and cheap:
+recalibrate on benign captured under the deployment config (no labels needed).
+Batch size / padding side are expected-null (masked mean and last-token are
+padding-invariant by construction) and not separately swept.
+
+---
+
+# Part 18 — Embedded injection (context dilution), and the readout that fixes it
+
+The realistic attack: the injection is buried inside a long benign document
+(RAG context, a pasted email), not sent bare. Battery: each probe is ~12 benign
+dolly paragraphs (~1600 tokens) followed by either a benign question or a deepset
+injection. Qwen-3B.
+
+| readout | one-class det@1%FP | one-class wl-AUROC | few-shot (N=10) det@1%FP |
+|---|---|---|---|
+| **mean-pool** | 0.022 | 0.462 | 0.034 |
+| **last-token** | 0.244 | 0.798 | **0.546** |
+
+**Mean-pooling collapses under context dilution** — buried in 1600 benign tokens,
+the injection's contribution to the mean washes out and detection falls to chance
+(wl-AUROC 0.46), even with few-shot labels. **The last-token readout recovers it**
+(one-class wl-AUROC 0.798, few-shot 0.55) because the readout position sits at the
+end of the injection and integrates it. Caveat: the injection here is at the *end*
+of the document; an injection in the *middle* followed by more benign text would
+dilute even the last-token readout — worth a follow-up battery.
+
+# Part 19 — Generation-time monitoring and the logit-shape theory, settled
+
+The original thesis was that **the *shape* of the output logits would tell us
+something** about whether a prompt is an injection. Every part until now monitored
+only the *prompt* forward pass; this part extends the atlas into generation and
+isolates the logit-shape signal to test that thesis head-on. Qwen2.5-3B, greedy
+decode of 24 tokens, capturing at every generated step both the streaming
+per-layer hidden states and the output-distribution shape (entropy, top-1 mass,
+top-5 mass, top1–top2 logit margin, perplexity). Six monitors, benign-only fit,
+det@1%FP | within-length AUROC, 6 seeds, on two sources:
+
+| monitor | what it reads | deepset | safeguard |
+|---|---|---|---|
+| `prompt_readout` | activation at final prompt token (the existing monitor) | 0.033 / **0.938** | 0.002 / 0.692 |
+| `gen_mean` | streaming hidden states, mean over generated tokens | 0.092 / 0.835 | 0.007 / 0.726 |
+| `gen_last` | hidden state at final generated token | 0.001 / 0.515 | 0.002 / 0.380 |
+| `logit_shape` | **output distribution shape only, no hidden states** | 0.021 / 0.636 | 0.017 / 0.595 |
+| `combined` | prompt_readout activations + logit_shape | 0.018 / **0.938** | 0.008 / **0.692** |
+| `prompt_readout` + 10-shot | activations + strict gate | **0.452** / 0.966 | **0.533** / 0.928 |
+| `combined` + 10-shot | activations + shape + strict gate | 0.400 / 0.960 | 0.541 / 0.926 |
+
+**The thesis is confirmed but weak, and the addition is null.** Three findings:
+
+1. **Logit shape carries genuine but weak signal.** On its own it ranks injections
+   above chance (wl-AUROC 0.64 / 0.60) — the shape *does* tell us something. But it
+   is far below the activation monitor (0.94 / 0.69) and not close to deployable.
+
+2. **The shift has no universal direction.** On deepset, injected completions are
+   *sharper* — first-token entropy 3.83→3.52, perplexity 28→21 (a hijacked model
+   commits confidently to the injected instruction). On safeguard, injected
+   completions are *flatter* — entropy 0.96→1.29, perplexity 7.8→10.4 (the safety
+   collision leaves the model less certain). There is no single "injection shape";
+   the one-class detector only sees *deviation from benign*, in whichever direction,
+   which is why the signal is real yet non-transferable.
+
+3. **Logit shape adds exactly nothing on top of activations.** `combined` equals
+   `prompt_readout` in within-length AUROC to three decimals on both datasets
+   (0.938 = 0.938, 0.692 = 0.692), and the few-shot gate is unchanged (within
+   noise: −0.05 deepset, +0.01 safeguard). This is precisely what the tied-embedding
+   factorization predicts: `logits = h · Eᵀ` is a **linear, information-losing image
+   of the very hidden state the monitor already reads**, so the shape can hold no
+   injection signal the readout does not already contain.
+
+**Generation adds cost, not signal.** Streaming activations never beat the prompt
+readout (`gen_mean` loses on deepset 0.835 < 0.938, ties on safeguard; `gen_last`
+is near-chance both — after 24 tokens the model has wandered into content and the
+final position is no longer diagnostic). Every generated token is a full forward
+pass; the single prompt forward pass is not merely adequate but *optimal* — the
+right quantity (the integrated prompt) at the cheapest possible cost. The
+generation-time axis, the last open item from the sensitivity plan, is therefore
+closed as a **decisive negative**: monitor the prompt, at the last-token readout,
+and do not decode to detect.
+
+## Closing synthesis — the readout choice runs through everything
+
+Parts 16-18 converge on one design decision. **Mean-pooling is the fragile
+feature and last-token is the robust one:**
+
+| stressor | mean-pool | last-token |
+|---|---|---|
+| matched (no shift) | best detection (0.66) | weaker (0.25) |
+| system-prompt shift (Part 16) | FPR → ~1.0 | partially transfers; pooled-prompts holds FPR on unseen |
+| embedded / long context (Part 18) | collapses (0.46 wl-AUROC) | recovers (0.80) |
+
+Mean-pooling wins only in the pristine matched case; it is dominated by whatever
+fills the context (the system prompt's tokens, a long benign document). The
+last-token readout — the position the model would generate from — is the
+deployment-robust choice, at a modest cost in matched detection. Combined with
+the Part 16/17 rule (calibrate under the exact deployment config), the deployable
+recipe is: **last-token features, benign calibrated under the live system prompt
+and quantization, with a few labelled attacks for the strict gate.**
+
+Part 19 completes the picture from the other side: the last-token *prompt* readout
+is not just the robust choice among activation poolings, it dominates everything
+downstream of it too. Decoding the model and reading its generated activations or
+its output-logit shape adds cost without adding signal, because both are functions
+of the hidden state the readout already captures. The monitor is a single forward
+pass, read at the last token, calibrated in place — and that is the whole system.
+
+# Part 20 — Within-sequence shift: a self-calibrating context-change detector
+
+A new positive direction, and a reframing. Every monitor so far compares a *whole
+prompt* against a *corpus* benign manifold — which is precisely why a global
+activation shift (system prompt, quantization; Parts 16–17) breaks it: the corpus
+baseline moves out from under the prompt. This part tests a different idea: feed a
+stream of normal text, let the model establish its resting activation *within that
+very sequence*, then measure the per-token shift when exogenous content is spliced
+in. It is change-point detection inside one forward pass, and it is
+self-normalising — a global shift moves the baseline and the response together.
+
+Construction (`fmri_stream.py`, Qwen2.5-3B, 60 matched bases): a benign preamble of
+four dolly-context sentences, then a boundary, then a payload from a graded ladder
+that deliberately separates *surprise* from *adversarial intent* — `benign_cont`
+(another ordinary sentence, the control), `offtopic` (an unrelated benign
+question), `bizarre` (a fluent but surreal word-salad non-sequitur), `injection`
+(an instruction-override attack). Because the four doses share a preamble, the
+per-token shift is **paired-differenced against `benign_cont`**, cancelling the
+boundary artefact (a new sentence starting after "\n\n" shifts activations
+regardless of content) and isolating the payload's content. The shift is read as an
+RMS per-dimension z-score against the preamble baseline. Raw text, no chat template,
+so the baseline is a genuine within-document rest state.
+
+**Result 1 — it works, and with zero cross-prompt calibration.** At the responsive
+layers (26–31 of 36), the within-sequence shift separates payloads from a benign
+continuation at AUROC **0.93 (off-topic), 0.80 (injection)** — using only the
+preceding text in the same sequence as the baseline. This is the property the
+corpus-baseline monitor lacked: no benign corpus, no per-deployment recalibration,
+immune by construction to the system-prompt and quantization shifts of Parts 16–17.
+
+**Result 2 — it detects *semantic context change*, not surprise or attack.** The
+dose ladder does not order the way "anomaly" would predict:
+
+| payload | rms-z shift (paired, L28) | AUROC vs benign_cont |
+|---|---|---|
+| `offtopic` (unrelated benign question) | **+0.28** | **0.93** |
+| `injection` (attack) | +0.16 | 0.80 |
+| `bizarre` (fluent surreal nonsense) | −0.04 | 0.41 |
+
+An *off-topic benign question* produces the **largest** shift — larger than an
+injection — because it is the biggest change of topic/register. An injection is
+detected because it, too, is a context break (a command intruding on a Q&A
+context), not because it is adversarial. And fluent-but-surreal word salad is
+essentially **invisible** (0.41, below chance): it has normal syntax and introduces
+no coherent new topic, so the running representation treats it as just more text.
+The detector's axis is *semantic discontinuity*, not novelty or malice — a sharp
+limit to state honestly, and the reason this cannot stand alone as an
+injection-vs-benign classifier (it would flag every topic change).
+
+**Result 3 — the response is high-dimensional; there is no single axis to clamp.**
+The natural next step was to find the "direction most responsive to exogenous
+input" and clamp it. PCA on the payload-onset shift vectors at L28 refutes the
+single-direction hypothesis: the top principal component explains only 0.075
+(injection) to 0.17 (bizarre) of the variance, top-3 at most 0.34, and the mean
+onset direction — the most consistent component — has coherence ≤0.44 and explains
+~4% of the per-token variance. The exogenous response is distributed across many
+directions, not concentrated on one clampable axis. Whether a low-*rank* subspace
+clamp can absorb it causally is tested next (Part 21).
+
+**Where this fits.** The within-sequence shift is the natural detector for the
+*embedded-injection* setting of Part 18: the streaming battery here **is** an
+embedded injection with a matched benign control (a benign document, then a spliced
+payload), and the within-sequence shift catches the injection at 0.80 AUROC with no
+calibration, where the corpus mean-pool monitor collapsed to chance under exactly
+this dilution. It is a context-break detector, complementary to — not a replacement
+for — the calibrated last-token prompt monitor: use it to flag *where* a sequence's
+register changes, and the prompt monitor to judge whether that change is an attack.
+
+# Part 21 — Clamping the exogenous-response subspace: a causal test
+
+Part 20 killed the single-direction version of the "clamp it" idea (top-1 PCA
+variance 0.075). This part asks the causal question that idea really wants: is
+there a low-*rank* subspace at the responsive layer that the model uses to carry
+the exogenous response — one that, if projected out, actually suppresses the
+downstream response and changes behaviour? `stream_clamp.py` fits the top-k
+principal directions of the paired differential injection onset vectors at layer 28
+(`B`, k orthonormal rows), installs a forward hook on that decoder block that
+removes the projection `h ← h − (h·Bᵀ)B` at every position, and measures two
+things against a **random orthonormal subspace of equal rank** (the specificity
+control): the injection's within-sequence rms-z shift at downstream layers (>28,
+paired vs benign_cont), and the behavioural KL of the final-token distribution
+against the unclamped run. Qwen2.5-3B, 60 matched pairs. Baseline downstream shift
+= 0.032.
+
+| k | clamp: downstream shift (× baseline) | random: (× baseline) | clamp: behav KL | random KL |
+|---|---|---|---|---|
+| 1 | 1.25 | 0.99 | 0.02 | 0.00 |
+| 2 | 1.58 | 0.99 | 0.25 | 0.00 |
+| 4 | 0.94 | 0.96 | 0.70 | 0.01 |
+| **8** | **0.23** | 1.06 | 0.96 | 0.01 |
+| 16 | 0.23 | 1.06 | 1.05 | 0.02 |
+| 32 | **0.05** | 0.94 | 1.00 | 0.04 |
+
+**There is a causal exogenous-response subspace, and it is ~8-dimensional.**
+Projecting out the top-8 injection-response directions collapses the downstream
+shift to 23% of baseline (5% at rank-32); the behavioural KL rises to ~1.0 nat and
+plateaus there past k=8. Both axes saturate at the same rank — that is the
+effective dimensionality of the response at layer 28. Rank-1 does nothing (it even
+*raises* the downstream shift: removing a single direction perturbs the state and
+the model over-recomputes around it). So Part 20's "no single axis" and this
+part's "yes, a low-rank subspace" are the same fact at two ranks.
+
+**The subspace is specific, not a generic lesion.** A random subspace of equal
+rank leaves the downstream shift fully intact (0.94–1.06× baseline at every k) and
+barely moves behaviour (KL ≤ 0.04 even at rank-32). Removing *these* eight
+directions changes what the model does and suppresses its exogenous response;
+removing eight random directions of the same 2048-dim space does neither. The
+subspace is a real, low-rank, causally load-bearing feature — a candidate steering
+target, exactly the object the "clamp it" intuition was reaching for.
+
+**The subspace generalises out-of-sample.** Refitting `B` on 30 bases and clamping
+the *disjoint* other 30 (`--holdout`) reproduces the effect almost exactly: at
+rank-8 the held-out injection's downstream shift falls to **0.22× baseline** (vs
+0.23× in-sample), rank-16 removes it entirely (−0.09×, a slight over-correction
+below the benign baseline), and the random control stays at 0.93–1.05× at every k
+with KL ≤ 0.04. So the ~8-dimensional exogenous-response subspace is a genuine,
+prompt-general feature of layer 28 — not an in-sample fit. This closes the
+specificity claim from both sides: it is specific to *these* directions (random
+fails) and it transfers to *unseen* prompts (held-out holds).
+
+**One honest caveat remains.** The behavioural KL shows the model's output
+*changes* by ~0.6–1.0 nat — it does **not** yet show the change is *toward benign*
+/ away from following the injection. Whether the clamp is a working defence
+(restores benign behaviour) or merely a targeted disruption needs generation plus
+an injection-compliance judge — deferred (a later part). What is established here is
+the mechanism: a low-rank, layer-localised, prompt-general, specific subspace
+causally carries the model's response to exogenous content.
+
+# Part 22 — Scaling the clamp: the subspace is emergent, mid-to-late, and low-rank
+
+Does the causal exogenous-response subspace of Part 21 exist across models, and is
+its ~8-dimensionality universal? `clamp_scan.py` fits the injection-response
+subspace *per layer* (held-out, on half the bases) and clamps it, using two
+cross-layer-comparable metrics — the behavioural KL of the final-token distribution
+(clamp vs unclamped) against a random equal-rank control, and the injection's
+within-sequence shift at the last layer. Two sweeps per model: a layer sweep at
+fixed rank (where is the response causally central) and a k-sweep at the peak layer
+(its effective dimensionality). **Causal centrality** = clamp KL − random KL.
+
+Size ladder (large models deferred to a later run):
+
+| model | d | subspace? | peak centrality | plateau (frac depth) | eff. rank |
+|---|---|---|---|---|---|
+| SmolLM2-360M-Instruct | 960 | **none (≤ random)** | −0.02 | — | — |
+| Qwen2.5-1.5B-Instruct | 1536 | yes | 0.94 | 0.59–0.93 | **8** |
+| Qwen2.5-3B-Instruct | 2048 | yes | 0.92 | 0.30–0.95 | **16** |
+
+Three findings:
+
+1. **The subspace is emergent, not universal.** In SmolLM2-360M the fitted
+   injection-response subspace is *no more causal than a random subspace* —
+   centrality is ≤ 0 at every layer and the k-sweep KL never leaves ~0.01. The
+   smallest model has no specific, clampable exogenous-response direction. Both
+   Qwen models do (peak centrality ~0.9). *Caveat:* 360M is both the smallest model
+   **and** a different family, so this datapoint alone confounds scale with
+   architecture; the clean within-family comparison (1.5B vs 3B, both positive) and
+   the deferred 7B/14B extend the Qwen ladder to separate the two.
+
+2. **It lives in a broad mid-to-late band, not a single layer.** Centrality is
+   positive across ~0.3–0.95 of depth in the 3B and ~0.6–0.93 in the 1.5B — the
+   exogenous response is causally distributed over most of the network's second
+   half, peaking mid-to-late. This matches Part 20's finding that the *readout*
+   shift also peaks at layers 26–31.
+
+3. **Low-rank, order ~10, a tiny fraction of the width.** Effective rank is 8
+   (1.5B) to 16 (3B) — 0.5–0.8% of the hidden dimension. Whether it stays ~O(10) or
+   scales with width is the question the 7B/14B run answers; the 1.5B→3B step (8→16)
+   is the first hint it may grow slowly with size rather than staying fixed.
+
+The picture: the model's machinery for *responding to exogenous content* is an
+emergent, low-rank, mid-to-late-band feature — present once the model is capable
+enough (≥1.5B here), absent in the smallest. That is a concrete interpretability
+claim about where and how prompt injection acts inside the network, and a bounded
+target (order-10 directions across a dozen layers) for any intervention built on it.

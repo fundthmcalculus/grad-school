@@ -25,7 +25,10 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, "FuzzySystemsExperiments")
-from tribble_predictive_health import TribblePredictiveHealth, load_ncmapss  # noqa: E402
+from tribble_predictive_health import (
+    TribblePredictiveHealth,
+    load_ncmapss,
+)  # noqa: E402
 from tribble_predictive_health.preprocessing import (  # noqa: E402
     apply_condition_correction,
     build_memory_features,
@@ -39,8 +42,8 @@ os.makedirs(OUT, exist_ok=True)
 L2_GRID = [0.02, 0.03, 0.05, 0.075, 0.1, 0.15, 0.2, 0.3, 0.5, 0.75, 1.0, 2.0, 5.0]
 TOP_P_GRID = [0.90, 0.95, 0.99]
 ORDERS = ["1st", "2nd"]
-FULL2ND = 6.48   # DS02 full-2nd per-sample best case, for reference
-CNN = 7.22       # published DS02 CNN
+FULL2ND = 6.48  # DS02 full-2nd per-sample best case, for reference
+CNN = 7.22  # published DS02 CNN
 
 
 # ---------------------------------------------------------------------------
@@ -54,21 +57,33 @@ dev_c = apply_condition_correction(dev, sensors, cond, models)
 test_c = apply_condition_correction(test, sensors, cond, models)
 train_tab, feat_cols = build_memory_features(dev_c, sensors)
 test_tab, _ = build_memory_features(test_c, sensors)
-print(f"  {len(train_tab)} train rows, {len(test_tab)} test rows, "
-      f"{len(feat_cols)} features")
+print(
+    f"  {len(train_tab)} train rows, {len(test_tab)} test rows, "
+    f"{len(feat_cols)} features"
+)
 
 
 def run(order, l2, top_p):
     eng = TribblePredictiveHealth(
-        condition_correction=False, aggregation="raw_memory",
-        tsk_order=order, l2_reg=l2, top_p=top_p,
+        condition_correction=False,
+        aggregation="raw_memory",
+        tsk_order=order,
+        l2_reg=l2,
+        top_p=top_p,
     )
     eng.fit_featurized(train_tab, feat_cols)
     m = eng.score_featurized(test_tab)
-    return dict(order=order, l2_reg=l2, top_p=top_p, p=len(eng.regressor_.top_features_),
-                n_rules=eng.n_rules_, n_params=int(np.asarray(eng.regressor_.corr_terms_).size),
-                per_sample=m["per_sample_rmse"], monotone=m["monotone_cycle_rmse"],
-                per_engine=m["per_engine_rmse"])
+    return dict(
+        order=order,
+        l2_reg=l2,
+        top_p=top_p,
+        p=len(eng.regressor_.top_features_),
+        n_rules=eng.n_rules_,
+        n_params=int(np.asarray(eng.regressor_.corr_terms_).size),
+        per_sample=m["per_sample_rmse"],
+        monotone=m["monotone_cycle_rmse"],
+        per_engine=m["per_engine_rmse"],
+    )
 
 
 rows = []
@@ -89,11 +104,15 @@ for order in ORDERS:
     b = sub.loc[sub.per_sample.idxmin()]
     bm = sub.loc[sub.monotone.idxmin()]
     print(f"\n=== {order} order ===")
-    print(f"  best per-sample : RMSE {b.per_sample:.3f}  "
-          f"(l2_reg={b.l2_reg}, top_p={b.top_p}, p={int(b.p)}, "
-          f"{int(b.n_params)} params, monotone {b.monotone:.2f})")
-    print(f"  best monotone   : RMSE {bm.monotone:.3f}  "
-          f"(l2_reg={bm.l2_reg}, top_p={bm.top_p}, per-sample {bm.per_sample:.2f})")
+    print(
+        f"  best per-sample : RMSE {b.per_sample:.3f}  "
+        f"(l2_reg={b.l2_reg}, top_p={b.top_p}, p={int(b.p)}, "
+        f"{int(b.n_params)} params, monotone {b.monotone:.2f})"
+    )
+    print(
+        f"  best monotone   : RMSE {bm.monotone:.3f}  "
+        f"(l2_reg={bm.l2_reg}, top_p={bm.top_p}, per-sample {bm.per_sample:.2f})"
+    )
     # full grid, compact
     piv = sub.pivot(index="l2_reg", columns="top_p", values="per_sample")
     print("  per-sample RMSE by (l2_reg rows x top_p cols):")
@@ -118,8 +137,14 @@ for c, order in enumerate(ORDERS):
         sub = df[df.order == order]
         for i, tp in enumerate(TOP_P_GRID):
             s = sub[sub.top_p == tp].sort_values("l2_reg")
-            ax.plot(s.l2_reg, s[key], "-o", ms=4,
-                    color=cmap(i / (len(TOP_P_GRID) - 1)), label=f"top_p={tp}")
+            ax.plot(
+                s.l2_reg,
+                s[key],
+                "-o",
+                ms=4,
+                color=cmap(i / (len(TOP_P_GRID) - 1)),
+                label=f"top_p={tp}",
+            )
         ax.axhline(FULL2ND, ls="--", color="#c0392b", lw=1)
         ax.axhline(CNN, ls=":", color="0.5", lw=1)
         ax.set_xscale("log")
@@ -132,10 +157,18 @@ for c, order in enumerate(ORDERS):
             ax.set_xlabel("l2_reg (log scale)")
         if r == 0 and c == 0:
             ax.legend(fontsize=8, loc="best")
-axes[0, 1].text(L2_GRID[-1], FULL2ND, " full-2nd 6.48", color="#c0392b",
-                fontsize=8, va="bottom", ha="right")
-axes[0, 1].text(L2_GRID[-1], CNN, " CNN 7.22", color="0.4",
-                fontsize=8, va="bottom", ha="right")
+axes[0, 1].text(
+    L2_GRID[-1],
+    FULL2ND,
+    " full-2nd 6.48",
+    color="#c0392b",
+    fontsize=8,
+    va="bottom",
+    ha="right",
+)
+axes[0, 1].text(
+    L2_GRID[-1], CNN, " CNN 7.22", color="0.4", fontsize=8, va="bottom", ha="right"
+)
 fig.tight_layout(rect=[0, 0, 1, 0.94])
 path = os.path.join(OUT, "sweep_lowfit_ds02.png")
 fig.savefig(path, bbox_inches="tight")

@@ -1,0 +1,82 @@
+{
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "layer": 28,
+  "arms": {
+    "clamp": {
+      "1": {
+        "downstream_shift_retained": 0.035,
+        "frac_of_baseline": 0.929,
+        "behav_KL_vs_unclamped": 0.06
+      },
+      "2": {
+        "downstream_shift_retained": 0.043,
+        "frac_of_baseline": 1.16,
+        "behav_KL_vs_unclamped": 0.142
+      },
+      "4": {
+        "downstream_shift_retained": 0.029,
+        "frac_of_baseline": 0.764,
+        "behav_KL_vs_unclamped": 0.71
+      },
+      "8": {
+        "downstream_shift_retained": 0.008,
+        "frac_of_baseline": 0.216,
+        "behav_KL_vs_unclamped": 0.643
+      },
+      "16": {
+        "downstream_shift_retained": -0.003,
+        "frac_of_baseline": -0.093,
+        "behav_KL_vs_unclamped": 0.707
+      },
+      "32": {
+        "downstream_shift_retained": -0.021,
+        "frac_of_baseline": -0.573,
+        "behav_KL_vs_unclamped": 0.701
+      }
+    },
+    "random": {
+      "1": {
+        "downstream_shift_retained": 0.037,
+        "frac_of_baseline": 0.995,
+        "behav_KL_vs_unclamped": 0.004
+      },
+      "2": {
+        "downstream_shift_retained": 0.038,
+        "frac_of_baseline": 1.011,
+        "behav_KL_vs_unclamped": 0.003
+      },
+      "4": {
+        "downstream_shift_retained": 0.036,
+        "frac_of_baseline": 0.967,
+        "behav_KL_vs_unclamped": 0.008
+      },
+      "8": {
+        "downstream_shift_retained": 0.039,
+        "frac_of_baseline": 1.043,
+        "behav_KL_vs_unclamped": 0.015
+      },
+      "16": {
+        "downstream_shift_retained": 0.039,
+        "frac_of_baseline": 1.049,
+        "behav_KL_vs_unclamped": 0.021
+      },
+      "32": {
+        "downstream_shift_retained": 0.039,
+        "frac_of_baseline": 1.041,
+        "behav_KL_vs_unclamped": 0.042
+      }
+    }
+  },
+  "baseline_downstream_shift": {
+    "28": 0.105,
+    "29": 0.104,
+    "30": 0.093,
+    "31": 0.091,
+    "32": -0.001,
+    "33": -0.026,
+    "34": -0.022,
+    "35": -0.024,
+    "36": 0.084
+  },
+  "holdout": true
+}

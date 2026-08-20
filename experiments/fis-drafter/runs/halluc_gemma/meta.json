@@ -1,0 +1,12 @@
+{
+  "config": {
+    "model_id": "google/gemma-3-270m-it",
+    "n_items": 900,
+    "max_new_tokens": 40,
+    "batch_size": 24,
+    "seed": 0,
+    "max_ctx_chars": 1200,
+    "out": "runs/halluc_gemma"
+  },
+  "n": 1800
+}

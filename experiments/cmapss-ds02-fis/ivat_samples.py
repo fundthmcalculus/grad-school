@@ -40,7 +40,7 @@ from tribble_predictive_health.preprocessing import (  # noqa: E402
 H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
-N_SUB = 800        # iVAT is O(n^2); a few hundred points is the usual range
+N_SUB = 800  # iVAT is O(n^2); a few hundred points is the usual range
 VAR_KEEP = 0.95
 
 
@@ -101,10 +101,13 @@ for name, tab in (("raw sensors", raw), ("condition-corrected", cor)):
     # near 1 means the path threads that covariate -- the tendency it reflects.
     rho_alt = abs(spearmanr(np.arange(N_SUB), alt[order]).statistic)
     rho_rul = abs(spearmanr(np.arange(N_SUB), rul[order]).statistic)
-    results[name] = dict(img=img, order=order, npc=npc,
-                         rho_alt=rho_alt, rho_rul=rho_rul)
-    print(f"{name}: PCA {npc} comps;  |rho|(order,altitude)={rho_alt:.2f}  "
-          f"|rho|(order,RUL)={rho_rul:.2f}")
+    results[name] = dict(
+        img=img, order=order, npc=npc, rho_alt=rho_alt, rho_rul=rho_rul
+    )
+    print(
+        f"{name}: PCA {npc} comps;  |rho|(order,altitude)={rho_alt:.2f}  "
+        f"|rho|(order,RUL)={rho_rul:.2f}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -112,8 +115,14 @@ for name, tab in (("raw sensors", raw), ("condition-corrected", cor)):
 # ---------------------------------------------------------------------------
 plt.rcParams.update({"font.size": 9, "figure.dpi": 130})
 fig = plt.figure(figsize=(13.5, 7.6))
-gs = fig.add_gridspec(3, 3, width_ratios=[10, 10, 0.35],
-                      height_ratios=[0.55, 0.55, 11], hspace=0.08, wspace=0.14)
+gs = fig.add_gridspec(
+    3,
+    3,
+    width_ratios=[10, 10, 0.35],
+    height_ratios=[0.55, 0.55, 11],
+    hspace=0.08,
+    wspace=0.14,
+)
 fig.suptitle(
     "iVAT on subsampled DS02 1 Hz samples — cluster tendency, raw vs corrected\n"
     f"({N_SUB} samples, {len(sensors)} sensors → PCA {VAR_KEEP:.0%} var; "
@@ -128,32 +137,39 @@ for col, name in enumerate(("raw sensors", "condition-corrected")):
     o = r["order"]
     ax_alt = fig.add_subplot(gs[0, col])
     ax_alt.imshow(alt[o][None, :], aspect="auto", cmap="plasma", norm=alt_norm)
-    ax_alt.set_yticks([]); ax_alt.set_xticks([])
+    ax_alt.set_yticks([])
+    ax_alt.set_xticks([])
     ax_alt.set_title(name, fontsize=11, pad=6)
     ax_alt.set_ylabel("alt", rotation=0, ha="right", va="center", fontsize=8)
 
     ax_rul = fig.add_subplot(gs[1, col])
     ax_rul.imshow(rul[o][None, :], aspect="auto", cmap="viridis", norm=rul_norm)
-    ax_rul.set_yticks([]); ax_rul.set_xticks([])
+    ax_rul.set_yticks([])
+    ax_rul.set_xticks([])
     ax_rul.set_ylabel("RUL", rotation=0, ha="right", va="center", fontsize=8)
 
     ax = fig.add_subplot(gs[2, col])
     # gray: 0 dissimilarity (diagonal / within-cluster) = black, so a cluster
     # reads as a dark block on the diagonal.
     ax.imshow(r["img"], cmap="gray", aspect="equal")
-    ax.set_xticks([]); ax.set_yticks([])
+    ax.set_xticks([])
+    ax.set_yticks([])
     ax.set_xlabel(
         f"VAT order  ·  |ρ|(order, altitude)={r['rho_alt']:.2f}   "
-        f"|ρ|(order, RUL)={r['rho_rul']:.2f}", fontsize=9)
+        f"|ρ|(order, RUL)={r['rho_rul']:.2f}",
+        fontsize=9,
+    )
     strip_axes[name] = (ax_alt, ax_rul)
 
 # shared colorbars for the two strips
 cax_alt = fig.add_subplot(gs[0, 2])
-fig.colorbar(plt.cm.ScalarMappable(norm=alt_norm, cmap="plasma"),
-             cax=cax_alt, label="alt (ft)")
+fig.colorbar(
+    plt.cm.ScalarMappable(norm=alt_norm, cmap="plasma"), cax=cax_alt, label="alt (ft)"
+)
 cax_rul = fig.add_subplot(gs[1, 2])
-fig.colorbar(plt.cm.ScalarMappable(norm=rul_norm, cmap="viridis"),
-             cax=cax_rul, label="RUL")
+fig.colorbar(
+    plt.cm.ScalarMappable(norm=rul_norm, cmap="viridis"), cax=cax_rul, label="RUL"
+)
 
 path = os.path.join(OUT, "ivat_ds02_samples.png")
 fig.savefig(path, bbox_inches="tight")

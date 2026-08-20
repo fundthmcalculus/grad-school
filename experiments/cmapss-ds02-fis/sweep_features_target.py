@@ -16,6 +16,7 @@ Writes CSV to outputs/ds02-iterative/. Run from the repo root:
 
     python experiments/cmapss-ds02-fis/sweep_features_target.py
 """
+
 import contextlib
 import csv
 import io
@@ -37,8 +38,14 @@ from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 
 OUT = "outputs/ds02-iterative"
 os.makedirs(OUT, exist_ok=True)
-REG = dict(tsk_order="full-2nd", top_p=0.95, n_output_buckets=2,
-           norm_conorm="hamacher", l2_reg=0.01, max_samples=2000)
+REG = dict(
+    tsk_order="full-2nd",
+    top_p=0.95,
+    n_output_buckets=2,
+    norm_conorm="hamacher",
+    l2_reg=0.01,
+    max_samples=2000,
+)
 
 
 def fit_eval(X_tr, y_tr, X_te, y_te):
@@ -49,10 +56,12 @@ def fit_eval(X_tr, y_tr, X_te, y_te):
 
 
 def featurize(dev, test, sensors, stride, window, memory):
-    tr, cols = build_memory_features(dev, sensors, stride=stride,
-                                     window_size=window, memory_size=memory)
-    te, _ = build_memory_features(test, sensors, stride=stride,
-                                  window_size=window, memory_size=memory)
+    tr, cols = build_memory_features(
+        dev, sensors, stride=stride, window_size=window, memory_size=memory
+    )
+    te, _ = build_memory_features(
+        test, sensors, stride=stride, window_size=window, memory_size=memory
+    )
     return tr, te, cols
 
 
@@ -61,10 +70,14 @@ def scale_and_cap(tr, te, cols, ceiling=None):
     y_tr = np.asarray(cap_rul(tr, caps), float)
     y_te = te["rul"].to_numpy(float)
     if ceiling is not None:
-        y_tr = np.minimum(y_tr, ceiling)   # test target is left as scored (uncapped)
+        y_tr = np.minimum(y_tr, ceiling)  # test target is left as scored (uncapped)
     scaler = StandardScaler().fit(tr[cols].to_numpy(float))
-    return scaler.transform(tr[cols].to_numpy(float)), y_tr, \
-        scaler.transform(te[cols].to_numpy(float)), y_te
+    return (
+        scaler.transform(tr[cols].to_numpy(float)),
+        y_tr,
+        scaler.transform(te[cols].to_numpy(float)),
+        y_te,
+    )
 
 
 def main():
@@ -75,8 +88,10 @@ def main():
     def run(tag, param, tr, te, cols, ceiling=None):
         X_tr, y_tr, X_te, y_te = scale_and_cap(tr, te, cols, ceiling)
         a, b = fit_eval(X_tr, y_tr, X_te, y_te)
-        print(f"  {tag:16s} {str(param):22s} n={len(X_tr):6d} f={len(cols):2d} "
-              f"cap<={y_tr.max():5.1f}  train {a:5.2f}  test {b:5.2f}")
+        print(
+            f"  {tag:16s} {str(param):22s} n={len(X_tr):6d} f={len(cols):2d} "
+            f"cap<={y_tr.max():5.1f}  train {a:5.2f}  test {b:5.2f}"
+        )
         rows.append((tag, str(param), len(X_tr), len(cols), float(y_tr.max()), a, b))
 
     # baseline (default geometry, onset cap only)
@@ -107,7 +122,17 @@ def main():
 
     with open(os.path.join(OUT, "sweep_features_target.csv"), "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["sweep", "param", "n_train", "n_feat", "cap_max", "train_rmse", "test_rmse"])
+        w.writerow(
+            [
+                "sweep",
+                "param",
+                "n_train",
+                "n_feat",
+                "cap_max",
+                "train_rmse",
+                "test_rmse",
+            ]
+        )
         w.writerows(rows)
     print(f"\nwrote {os.path.join(OUT, 'sweep_features_target.csv')}")
 

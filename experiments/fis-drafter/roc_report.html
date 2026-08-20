@@ -1,0 +1,212 @@
+<title>FIS Injection Monitor Sweep</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#fbfcfd; --surface:#ffffff; --surface-2:#f3f6f9;
+    --ink:#10151a; --ink-2:#54606b; --ink-3:#8b96a2; --line:#e4e9ee;
+    --accent:#2a5d9e;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+    --ref:#b9c2cc;
+    --good:#1baf7a; --warn:#eda100;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --disp:"Helvetica Neue",Arial,system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --bg:#14171a; --surface:#1b1f24; --surface-2:#21262c;
+    --ink:#eef2f5; --ink-2:#aab4bf; --ink-3:#6b7680; --line:#2a3037;
+    --accent:#7ba7dc;
+    --s1:#3987e5; --s2:#e0662f; --s3:#22b47f; --s4:#d59200;
+    --ref:#3a424b;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#14171a; --surface:#1b1f24; --surface-2:#21262c;
+    --ink:#eef2f5; --ink-2:#aab4bf; --ink-3:#6b7680; --line:#2a3037;
+    --accent:#7ba7dc;
+    --s1:#3987e5; --s2:#e0662f; --s3:#22b47f; --s4:#d59200;
+    --ref:#3a424b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:clamp(28px,5vw,64px) clamp(20px,4vw,40px) 80px}
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent); margin:0 0 14px
+  }
+  h1{
+    font-family:var(--disp); font-weight:800; letter-spacing:-.02em;
+    font-size:clamp(30px,5vw,46px); line-height:1.04; margin:0 0 16px;
+    text-wrap:balance
+  }
+  .lede{font-size:clamp(16px,2.2vw,19px); color:var(--ink-2); max-width:62ch; margin:0 0 8px}
+  .lede b{color:var(--ink); font-weight:600}
+  .meta{font-family:var(--mono); font-size:12.5px; color:var(--ink-3); margin-top:14px}
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:34px 0 8px}
+  .stat{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .stat .k{font-family:var(--mono); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3)}
+  .stat .v{font-family:var(--mono); font-size:27px; font-weight:600; margin-top:6px; font-variant-numeric:tabular-nums}
+  .stat .s{font-size:13px; color:var(--ink-2); margin-top:3px}
+
+  section{margin-top:52px}
+  h2{font-family:var(--disp); font-size:22px; font-weight:700; letter-spacing:-.01em; margin:0 0 4px}
+  .sub{color:var(--ink-2); font-size:15px; margin:0 0 20px; max-width:64ch}
+
+  figure{margin:0; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px 18px 12px}
+  .chart-wrap{overflow-x:auto}
+  svg{display:block; width:100%; height:auto; min-width:520px}
+  .legend{display:flex; flex-wrap:wrap; gap:16px 22px; margin:14px 4px 4px; font-size:13.5px}
+  .legend .it{display:flex; align-items:center; gap:8px; color:var(--ink-2)}
+  .legend .sw{width:22px; height:3px; border-radius:2px}
+  .legend b{color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums; font-family:var(--mono); font-size:12.5px}
+
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:14px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; min-width:560px; font-size:14px}
+  th,td{padding:11px 15px; text-align:right; font-variant-numeric:tabular-nums; font-family:var(--mono)}
+  th:first-child,td:first-child{text-align:left; font-family:var(--sans)}
+  thead th{font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); font-family:var(--sans); font-weight:600; border-bottom:1px solid var(--line)}
+  tbody tr+tr td{border-top:1px solid var(--line)}
+  tbody td{color:var(--ink-2)}
+  tbody td.model{color:var(--ink); font-weight:600}
+  .win{color:var(--ink); font-weight:600}
+  .lose{color:var(--ink-3)}
+  .flag{color:var(--warn); font-weight:600}
+  .pillrow{display:flex; align-items:center; gap:7px}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+
+  .note{margin-top:26px; border-left:3px solid var(--accent); padding:4px 0 4px 18px; color:var(--ink-2); font-size:14.5px; max-width:66ch}
+  .note b{color:var(--ink)}
+  footer{margin-top:56px; padding-top:20px; border-top:1px solid var(--line); font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+  a{color:var(--accent)}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">One-class activation monitor · injection detection</p>
+  <h1>Detection quality versus false-positive rate</h1>
+  <p class="lede">A <b>TribbleFIS one-class detector</b> — fit on benign prompt activations only, no attack
+  examples — sweeps its full operating range against prompt injection, across four
+  instruction-tuned models. Quality is detection rate (true-positive rate); the axis it
+  trades against is the benign false-positive rate.</p>
+  <p class="meta" id="provenance">deepset/prompt-injections · 6 seeds · within-length evaluation · genuine tribblefis TribbleOneClassDetector(whiten=True)</p>
+
+  <div class="stats" id="stats"></div>
+
+  <section>
+    <h2>ROC sweep — all models</h2>
+    <p class="sub">Each curve is the FIS detector on one model. The dashed diagonal is chance; the
+    vertical rule marks the <b>5% false-positive</b> operating point, where the detector is usable.
+    Curves bow toward the top-left as detection improves.</p>
+    <figure>
+      <div class="chart-wrap"><svg id="roc" viewBox="0 0 720 460" role="img"
+        aria-label="ROC curves of the FIS injection detector for four models"></svg></div>
+      <div class="legend" id="legend"></div>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Operating points — FIS vs Mahalanobis</h2>
+    <p class="sub">Detection at two fixed benign false-positive rates, and the ranking metric (AUROC).
+    The two detectors match at 5% FPR; at the strict 1% FPR the fuzzy score's heavy benign tail costs it.</p>
+    <div class="tbl-wrap"><table id="optbl"></table></div>
+  </section>
+
+  <section>
+    <h2>Construction &amp; inference performance</h2>
+    <p class="sub">The FIS detector is effectively free to build and run. Construction is dominated by the
+    shared per-layer feature transform; the fuzzy fit itself is microseconds, and scoring is ~10&nbsp;µs per
+    prompt — negligible against a model forward pass.</p>
+    <div class="tbl-wrap"><table id="timetbl"></table></div>
+  </section>
+
+  <div class="note" id="caveat"></div>
+
+  <footer>Regenerate: <span style="color:var(--ink-2)">python -m fisdraft.sweep_and_time</span> · figures from runs/sweep_roc.json, runs/timing.json</footer>
+</div>
+
+<script>
+const DATA = {"models":[{"name":"SmolLM2-135M","fis_auroc":0.853,"mah_auroc":0.871,"fpr":[0.0,0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,0.975,1.0],"fis_tpr":[0.105,0.521,0.716,0.76,0.796,0.837,0.847,0.857,0.867,0.883,0.893,0.905,0.915,0.921,0.927,0.937,0.941,0.943,0.949,0.952,0.957,0.96,0.966,0.968,0.97,0.975,0.977,0.985,0.989,0.991,0.993,0.994,0.995,0.996,0.997,0.997,0.998,0.998,0.999,1.0,1.0],"mah_tpr":[0.428,0.61,0.714,0.76,0.796,0.837,0.847,0.857,0.867,0.883,0.893,0.905,0.915,0.921,0.927,0.937,0.941,0.943,0.949,0.952,0.957,0.96,0.966,0.968,0.97,0.975,0.977,0.985,0.989,0.991,0.993,0.994,0.995,0.996,0.997,0.997,0.998,0.998,0.999,1.0,1.0],"fis_d1":0.277,"fis_d5":0.716,"mah_d1":0.525,"mah_d5":0.714,"model_id":"HuggingFaceTB/SmolLM2-135M-Instruct","n_layers":30,"hidden":576,"n_features":32,"n_train_benign":205,"construct_ms":109.9,"infer_us_per_prompt":11.1},{"name":"SmolLM2-360M","fis_auroc":0.844,"mah_auroc":0.872,"fpr":[0.0,0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,0.975,1.0],"fis_tpr":[0.0,0.571,0.699,0.748,0.764,0.794,0.805,0.842,0.856,0.875,0.885,0.895,0.91,0.92,0.933,0.939,0.947,0.953,0.958,0.959,0.964,0.968,0.974,0.976,0.981,0.981,0.984,0.985,0.989,0.991,0.993,0.993,0.995,0.998,0.999,0.999,1.0,1.0,1.0,1.0,1.0],"mah_tpr":[0.447,0.649,0.7,0.748,0.764,0.794,0.805,0.842,0.856,0.875,0.885,0.895,0.91,0.92,0.933,0.939,0.947,0.953,0.958,0.959,0.964,0.968,0.974,0.976,0.981,0.981,0.984,0.985,0.989,0.991,0.993,0.993,0.995,0.998,0.999,0.999,1.0,1.0,1.0,1.0,1.0],"fis_d1":0.286,"fis_d5":0.699,"mah_d1":0.553,"mah_d5":0.7,"model_id":"HuggingFaceTB/SmolLM2-360M-Instruct","n_layers":32,"hidden":960,"n_features":32,"n_train_benign":205,"construct_ms":110.0,"infer_us_per_prompt":10.9},{"name":"gemma-3-270m-it","fis_auroc":0.746,"mah_auroc":0.746,"fpr":[0.0,0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,0.975,1.0],"fis_tpr":[0.093,0.384,0.469,0.542,0.607,0.662,0.691,0.732,0.762,0.795,0.812,0.832,0.853,0.866,0.878,0.885,0.897,0.904,0.909,0.915,0.92,0.925,0.929,0.939,0.941,0.95,0.951,0.96,0.963,0.967,0.971,0.975,0.978,0.982,0.985,0.985,0.986,0.989,0.993,0.998,1.0],"mah_tpr":[0.228,0.384,0.469,0.542,0.607,0.662,0.691,0.732,0.762,0.795,0.812,0.832,0.853,0.866,0.878,0.885,0.897,0.904,0.909,0.915,0.92,0.925,0.929,0.939,0.941,0.95,0.951,0.96,0.963,0.967,0.971,0.975,0.978,0.982,0.985,0.985,0.986,0.989,0.993,0.998,1.0],"fis_d1":0.253,"fis_d5":0.469,"mah_d1":0.287,"mah_d5":0.469,"model_id":"google/gemma-3-270m-it","n_layers":18,"hidden":640,"n_features":32,"n_train_benign":205,"construct_ms":115.9,"infer_us_per_prompt":10.9},{"name":"TinyLlama-1.1B","fis_auroc":0.912,"mah_auroc":0.924,"fpr":[0.0,0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,0.975,1.0],"fis_tpr":[0.0,0.598,0.751,0.824,0.848,0.876,0.884,0.898,0.905,0.916,0.922,0.937,0.947,0.952,0.96,0.967,0.976,0.981,0.983,0.987,0.989,0.992,0.993,0.997,0.998,0.998,0.998,0.998,0.999,0.999,0.999,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],"mah_tpr":[0.459,0.686,0.75,0.824,0.848,0.876,0.884,0.898,0.905,0.916,0.922,0.937,0.947,0.952,0.96,0.967,0.976,0.981,0.983,0.987,0.989,0.992,0.993,0.997,0.998,0.998,0.998,0.998,0.999,0.999,0.999,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],"fis_d1":0.358,"fis_d5":0.751,"mah_d1":0.584,"mah_d5":0.75,"model_id":"TinyLlama/TinyLlama-1.1B-Chat-v1.0","n_layers":22,"hidden":2048,"n_features":32,"n_train_benign":205,"construct_ms":114.9,"infer_us_per_prompt":10.8}]};
+const COLORS = ['var(--s1)','var(--s2)','var(--s3)','var(--s4)'];
+const M = DATA.models;
+
+/* ---- stat tiles ---- */
+const best = M.reduce((a,b)=>b.fis_auroc>a.fis_auroc?b:a);
+const stats = [
+  ['Models swept', M.length, 'instruction-tuned'],
+  ['Best AUROC', best.fis_auroc.toFixed(3), best.name],
+  ['Detection @ 5% FPR', best.fis_d5.toFixed(2), best.name],
+  ['Inference', '≈10 µs', 'per prompt, one-class'],
+];
+document.getElementById('stats').innerHTML = stats.map(([k,v,s])=>
+  `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+
+/* ---- ROC chart ---- */
+const W=720,H=460, mL=58,mR=128,mT=18,mB=52;
+const px=x=>mL+x*(W-mL-mR), py=y=>H-mB-y*(H-mT-mB);
+const svg=document.getElementById('roc'); const NS='http://www.w3.org/2000/svg';
+const el=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+// grid
+for(let i=0;i<=5;i++){const g=i/5;
+  svg.appendChild(el('line',{x1:px(g),y1:py(0),x2:px(g),y2:py(1),stroke:'var(--line)','stroke-width':1}));
+  svg.appendChild(el('line',{x1:px(0),y1:py(g),x2:px(1),y2:py(g),stroke:'var(--line)','stroke-width':1}));
+  const tx=el('text',{x:px(g),y:H-mB+20,'text-anchor':'middle',fill:'var(--ink-3)','font-size':12,'font-family':'var(--mono)'});tx.textContent=g.toFixed(1);svg.appendChild(tx);
+  const ty=el('text',{x:mL-12,y:py(g)+4,'text-anchor':'end',fill:'var(--ink-3)','font-size':12,'font-family':'var(--mono)'});ty.textContent=g.toFixed(1);svg.appendChild(ty);
+}
+// chance diagonal
+svg.appendChild(el('line',{x1:px(0),y1:py(0),x2:px(1),y2:py(1),stroke:'var(--ref)','stroke-width':1.5,'stroke-dasharray':'5 5'}));
+// 5% FPR operating rule
+svg.appendChild(el('line',{x1:px(0.05),y1:py(0),x2:px(0.05),y2:py(1),stroke:'var(--accent)','stroke-width':1.5,'stroke-dasharray':'2 4',opacity:.7}));
+const opl=el('text',{x:px(0.05)+6,y:py(1)+12,fill:'var(--accent)','font-size':11.5,'font-family':'var(--mono)'});opl.textContent='5% FPR';svg.appendChild(opl);
+// axis labels
+const xl=el('text',{x:px(0.5),y:H-6,'text-anchor':'middle',fill:'var(--ink-2)','font-size':13,'font-family':'var(--sans)','font-weight':600});xl.textContent='False-positive rate (benign flagged)';svg.appendChild(xl);
+const yl=el('text',{x:16,y:py(0.5),'text-anchor':'middle',fill:'var(--ink-2)','font-size':13,'font-family':'var(--sans)','font-weight':600,transform:`rotate(-90 16 ${py(0.5)})`});yl.textContent='Detection rate (quality)';svg.appendChild(yl);
+// curves
+const endYs=[];
+M.forEach((m,i)=>{
+  const d=m.fpr.map((f,j)=>`${px(f)},${py(m.fis_tpr[j])}`).join(' ');
+  svg.appendChild(el('polyline',{points:d,fill:'none',stroke:COLORS[i],'stroke-width':2.4,'stroke-linejoin':'round','stroke-linecap':'round'}));
+  // 5% op-point marker (index 2 == fpr 0.05)
+  const oy=m.fis_tpr[2];
+  svg.appendChild(el('circle',{cx:px(0.05),cy:py(oy),r:4.5,fill:COLORS[i],stroke:'var(--surface)','stroke-width':2}));
+  endYs.push({i,y:m.fis_tpr[m.fis_tpr.length-1],name:m.name});
+});
+// direct end labels, de-collided
+endYs.sort((a,b)=>a.y-b.y); let prev=-99;
+endYs.forEach(e=>{let yy=py(e.y); if(yy>prev-15) yy=prev-15; prev=yy;
+  const t=el('text',{x:px(1)+8,y:yy+4,fill:COLORS[e.i],'font-size':12.5,'font-family':'var(--mono)','font-weight':600});
+  t.textContent=e.name; svg.appendChild(t);
+});
+document.getElementById('legend').innerHTML = M.map((m,i)=>
+  `<span class="it"><span class="sw" style="background:${COLORS[i]}"></span>${m.name} <b>AUROC ${m.fis_auroc.toFixed(3)}</b></span>`).join('');
+
+/* ---- operating-point table ---- */
+const cmp=(a,b)=>{const cl=a>=b?'win':'lose'; return `<span class="${cl}">${a.toFixed(2)}</span>`;};
+document.getElementById('optbl').innerHTML =
+  `<thead><tr><th>Model</th><th>AUROC · FIS</th><th>AUROC · Mahal</th>
+   <th>det @1% FPR · FIS</th><th>· Mahal</th><th>det @5% FPR · FIS</th><th>· Mahal</th></tr></thead><tbody>`+
+  M.map((m,i)=>{
+    const gemma=m.name.includes('gemma');
+    return `<tr><td class="model"><span class="pillrow"><span class="dot" style="background:${COLORS[i]}"></span>${m.name}</span></td>
+    <td class="${gemma?'flag':''}">${m.fis_auroc.toFixed(3)}</td><td>${m.mah_auroc.toFixed(3)}</td>
+    <td>${cmp(m.fis_d1,m.mah_d1)}</td><td>${m.mah_d1.toFixed(2)}</td>
+    <td>${cmp(m.fis_d5,m.mah_d5)}</td><td>${m.mah_d5.toFixed(2)}</td></tr>`;
+  }).join('')+`</tbody>`;
+
+/* ---- timing table ---- */
+document.getElementById('timetbl').innerHTML =
+  `<thead><tr><th>Model</th><th>Layers</th><th>Hidden</th><th>Features</th><th>Train (benign)</th>
+   <th>Construct (ms)</th><th>Infer (µs/prompt)</th></tr></thead><tbody>`+
+  M.map((m,i)=>`<tr><td class="model"><span class="pillrow"><span class="dot" style="background:${COLORS[i]}"></span>${m.name}</span></td>
+   <td>${m.n_layers}</td><td>${m.hidden}</td><td>${m.n_features}</td><td>${m.n_train_benign}</td>
+   <td>${m.construct_ms.toFixed(0)}</td><td>${m.infer_us_per_prompt.toFixed(1)}</td></tr>`).join('')+`</tbody>`;
+
+document.getElementById('caveat').innerHTML =
+  `<b>Read the operating point, not the AUROC.</b> FIS and Mahalanobis are close on AUROC and equal at 5% FPR,
+   but at 1% FPR the fuzzy detector trails (≈0.28 vs ≈0.55) — its <span style="font-family:var(--mono)">1−max&nbsp;firing</span>
+   score gives benign a heavy upper tail. And <b>gemma-3-270m-it</b> (flagged) is a counterexample: there,
+   activations carry no more injection signal than surface token statistics. The monitor needs a capable
+   instruction-tuned target — it is strongest on TinyLlama-1.1B and weakest on the smallest model.`;
+</script>

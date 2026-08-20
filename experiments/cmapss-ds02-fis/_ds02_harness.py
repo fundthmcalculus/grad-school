@@ -6,7 +6,9 @@ onset RUL cap, StandardScaler -- but stops short of the fuzzy system so the
 experiment scripts can drop in their own (boosted / staged) regressors and read
 off the *training* residual directly. Run from the repo root.
 """
+
 import sys as _sys
+
 _sys.path.insert(0, "FuzzySystemsExperiments")
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -34,16 +36,19 @@ def load(h5=H5):
     te, _ = build_memory_features(test, sensors)
 
     caps = onset_caps(tr)
-    y_tr = cap_rul(tr, caps)                       # capped train target
-    y_te = te["rul"].to_numpy(float)               # test target is uncapped (as scored)
+    y_tr = cap_rul(tr, caps)  # capped train target
+    y_te = te["rul"].to_numpy(float)  # test target is uncapped (as scored)
 
     scaler = StandardScaler().fit(tr[cols].to_numpy(float))
     X_tr = scaler.transform(tr[cols].to_numpy(float))
     X_te = scaler.transform(te[cols].to_numpy(float))
     return dict(
-        X_tr=X_tr, y_tr=np.asarray(y_tr, float),
-        X_te=X_te, y_te=y_te,
-        unit_te=te["unit"].to_numpy(), cycle_te=te["cycle"].to_numpy(),
+        X_tr=X_tr,
+        y_tr=np.asarray(y_tr, float),
+        X_te=X_te,
+        y_te=y_te,
+        unit_te=te["unit"].to_numpy(),
+        cycle_te=te["cycle"].to_numpy(),
         cols=cols,
     )
 

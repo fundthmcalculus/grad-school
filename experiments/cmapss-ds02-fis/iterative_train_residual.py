@@ -23,6 +23,7 @@ the repo root:
 
     python experiments/cmapss-ds02-fis/iterative_train_residual.py
 """
+
 import contextlib
 import csv
 import io
@@ -40,11 +41,23 @@ OUT = "outputs/ds02-iterative"
 os.makedirs(OUT, exist_ok=True)
 
 # DS02 default base-learner knobs, shared by baseline and the "strong" booster.
-STRONG = dict(tsk_order="full-2nd", top_p=0.95, n_output_buckets=2,
-              norm_conorm="hamacher", l2_reg=0.01, max_samples=2000)
+STRONG = dict(
+    tsk_order="full-2nd",
+    top_p=0.95,
+    n_output_buckets=2,
+    norm_conorm="hamacher",
+    l2_reg=0.01,
+    max_samples=2000,
+)
 # A deliberately weak stump: 1st-order consequents, 2 buckets, same norm.
-WEAK = dict(tsk_order="1st", top_p=0.95, n_output_buckets=2,
-            norm_conorm="hamacher", l2_reg=0.01, max_samples=2000)
+WEAK = dict(
+    tsk_order="1st",
+    top_p=0.95,
+    n_output_buckets=2,
+    norm_conorm="hamacher",
+    l2_reg=0.01,
+    max_samples=2000,
+)
 
 
 def _fit(cfg, X, y, seed):
@@ -62,7 +75,7 @@ def boost(d, base_cfg, n_stages, eta):
     curve = []
     for m in range(n_stages):
         resid = y_tr - F_tr
-        step = 1.0 if m == 0 else eta          # first stage full-step (fit y itself)
+        step = 1.0 if m == 0 else eta  # first stage full-step (fit y itself)
         reg = _fit(base_cfg, X_tr, resid, seed=42 + m)
         F_tr = F_tr + step * reg.predict(X_tr)
         F_te = F_te + step * reg.predict(X_te)
@@ -76,8 +89,14 @@ def staged_rules(d, base_cfg, bucket_grid):
     for nb in bucket_grid:
         cfg = {**base_cfg, "n_output_buckets": nb}
         reg = _fit(cfg, X_tr, y_tr, seed=42)
-        out.append((nb, int(reg.model_.n_rules),
-                    rmse(y_tr, reg.predict(X_tr)), rmse(y_te, reg.predict(X_te))))
+        out.append(
+            (
+                nb,
+                int(reg.model_.n_rules),
+                rmse(y_tr, reg.predict(X_tr)),
+                rmse(y_te, reg.predict(X_te)),
+            )
+        )
     return out
 
 
@@ -101,17 +120,21 @@ def main():
         for eta in (1.0, 0.5, 0.3):
             curve = boost(d, cfg, N_STAGES, eta)
             best = min(range(len(curve)), key=lambda i: curve[i][0])
-            print(f"  {tag:20s} eta={eta:>3}: "
-                  f"train {curve[0][0]:.2f}->{curve[-1][0]:.2f} "
-                  f"(min {curve[best][0]:.2f}@{best+1})  "
-                  f"test end {curve[-1][1]:.2f}")
+            print(
+                f"  {tag:20s} eta={eta:>3}: "
+                f"train {curve[0][0]:.2f}->{curve[-1][0]:.2f} "
+                f"(min {curve[best][0]:.2f}@{best+1})  "
+                f"test end {curve[-1][1]:.2f}"
+            )
             for m, (tr, te) in enumerate(curve):
                 rows.append((f"boost:{tag}", f"eta={eta}", m + 1, None, tr, te))
 
     print("\n== staged rule growth ==")
     for tag, cfg in (("full-2nd", STRONG), ("1st", WEAK)):
         for nb, nr, tr, te in staged_rules(d, cfg, [2, 3, 4, 6, 8, 12]):
-            print(f"  {tag:9s} buckets={nb:2d} rules={nr:2d}: train {tr:.3f}  test {te:.3f}")
+            print(
+                f"  {tag:9s} buckets={nb:2d} rules={nr:2d}: train {tr:.3f}  test {te:.3f}"
+            )
             rows.append((f"rules:{tag}", f"buckets={nb}", nb, nr, tr, te))
 
     csv_path = os.path.join(OUT, "iterative_train_residual.csv")
@@ -128,6 +151,7 @@ def main():
 def _plot(rows):
     try:
         import matplotlib
+
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except Exception as exc:  # noqa: BLE001
@@ -148,11 +172,13 @@ def _plot(rows):
         st = [p[0] for p in pts]
         ax = axL if "weak" in method else axR
         ax.plot(st, [p[1] for p in pts], "-o", ms=3, label=f"{variant} train")
-        ax.plot(st, [p[2] for p in pts], "--", alpha=.6, label=f"{variant} test")
+        ax.plot(st, [p[2] for p in pts], "--", alpha=0.6, label=f"{variant} test")
     axL.set_title("residual boosting: weak base (1st/2)")
     axR.set_title("residual boosting: strong base (full-2nd/2)")
     for ax in (axL, axR):
-        ax.set_xlabel("boosting stage"); ax.grid(alpha=.3); ax.legend(fontsize=7)
+        ax.set_xlabel("boosting stage")
+        ax.grid(alpha=0.3)
+        ax.legend(fontsize=7)
     axL.set_ylabel("RMSE (cycles)")
     fig.suptitle("DS02: iterative reduction of the training residual", y=1.02)
     fig.tight_layout()
