@@ -1,85 +1,0 @@
-Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  44%|████▍     | 127/290 [00:00<00:00, 1264.23it/s]Loading weights:  97%|█████████▋| 282/290 [00:00<00:00, 1422.78it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1429.03it/s]
-[fmri] 32/546
-[fmri] 64/546
-[fmri] 96/546
-[fmri] 128/546
-[fmri] 160/546
-[fmri] 192/546
-[fmri] 224/546
-[fmri] 256/546
-[fmri] 288/546
-[fmri] 320/546
-[fmri] 352/546
-[fmri] 384/546
-[fmri] 416/546
-[fmri] 448/546
-[fmri] 480/546
-[fmri] 512/546
-[fmri] 544/546
-[fmri] 546/546
-{
-  "benign": 343,
-  "injection": 203
-}
-Loading weights:   0%|          | 0/292 [00:00<?, ?it/s]Loading weights:  62%|██████▏   | 180/292 [00:00<00:00, 1777.86it/s]Loading weights: 100%|██████████| 292/292 [00:00<00:00, 1977.00it/s]
-[fmri] 32/546
-[fmri] 64/546
-[fmri] 96/546
-[fmri] 128/546
-[fmri] 160/546
-[fmri] 192/546
-[fmri] 224/546
-[fmri] 256/546
-[fmri] 288/546
-[fmri] 320/546
-[fmri] 352/546
-[fmri] 384/546
-[fmri] 416/546
-[fmri] 448/546
-[fmri] 480/546
-[fmri] 512/546
-[fmri] 544/546
-[fmri] 546/546
-{
-  "benign": 343,
-  "injection": 203
-}
-Loading weights:   0%|          | 0/272 [00:00<?, ?it/s]Loading weights: 100%|██████████| 272/272 [00:00<00:00, 4111.51it/s]
-[fmri] 32/1044
-[fmri] 64/1044
-[fmri] 96/1044
-[fmri] 128/1044
-[fmri] 160/1044
-[fmri] 192/1044
-[fmri] 224/1044
-[fmri] 256/1044
-[fmri] 288/1044
-[fmri] 320/1044
-[fmri] 352/1044
-[fmri] 384/1044
-[fmri] 416/1044
-[fmri] 448/1044
-[fmri] 480/1044
-[fmri] 512/1044
-[fmri] 544/1044
-[fmri] 576/1044
-[fmri] 608/1044
-[fmri] 640/1044
-[fmri] 672/1044
-[fmri] 704/1044
-[fmri] 736/1044
-[fmri] 768/1044
-[fmri] 800/1044
-[fmri] 832/1044
-[fmri] 864/1044
-[fmri] 896/1044
-[fmri] 928/1044
-[fmri] 960/1044
-[fmri] 992/1044
-[fmri] 1024/1044
-[fmri] 1044/1044
-{
-  "injection": 527,
-  "benign": 517
-}
-ALLDONE

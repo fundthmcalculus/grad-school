@@ -1,4 +1,0 @@
-== target=entropy budget=32/arm seed=0 ==
-  constant       -0.0004
-  single_feature +0.1741 (ent_ema_short)
-  ridge          +0.3012  (0s search, 0.01 us/row, 0 cfg failures)
