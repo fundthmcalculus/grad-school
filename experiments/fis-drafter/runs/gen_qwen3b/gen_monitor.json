@@ -1,0 +1,38 @@
+{
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "dataset": "gen_qwen3b",
+  "arms": {
+    "prompt_readout": {
+      "det@1%FP": 0.033,
+      "wl_auroc": 0.938
+    },
+    "gen_mean": {
+      "det@1%FP": 0.092,
+      "wl_auroc": 0.835
+    },
+    "gen_last": {
+      "det@1%FP": 0.001,
+      "wl_auroc": 0.515
+    },
+    "logit_shape": {
+      "det@1%FP": 0.021,
+      "wl_auroc": 0.636
+    },
+    "combined": {
+      "det@1%FP": 0.018,
+      "wl_auroc": 0.938
+    },
+    "prompt_readout+fs": {
+      "det@1%FP": 0.452,
+      "wl_auroc": 0.966
+    },
+    "logit_shape+fs": {
+      "det@1%FP": 0.026,
+      "wl_auroc": 0.503
+    },
+    "combined+fs": {
+      "det@1%FP": 0.4,
+      "wl_auroc": 0.96
+    }
+  }
+}
