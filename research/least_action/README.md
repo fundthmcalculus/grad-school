@@ -1515,16 +1515,22 @@ cd research/least_action
 ../../.venv/bin/python verify_proxy.py       # ~5 s,    proxy is a valid necessary condition
 ../../.venv/bin/python verify_symbolic.py    # ~1 min,  21 symbolic identities
 ../../.venv/bin/python verify_sos_exact.py   # ~4 min,  exact rational SOS proof
+```
 
-`fis_sos.py` (§12) additionally needs `sympy` and `cvxpy`:
+Six of those go through `fis_sos.py` (§12) — `demo_sos.py`,
+`demo_certified_policy.py`, `demo_pareto.py`, `demo_calibrate.py`,
+`verify_proxy.py` and `verify_sos_exact.py` — which additionally needs `sympy`
+and `cvxpy`. Those are **not** in the root project's required dependencies
+(`uv sync` deliberately does not pull a solver stack for one research thread);
+they are the `sos` extra:
 
 ```bash
-uv pip install --python .venv/bin/python sympy cvxpy
+uv sync --extra sos                                        # from the repo root
+uv pip install --python .venv/bin/python sympy cvxpy       # or into this venv
 ```
 
 Total ~2 hours. `demo_order.py`, `demo_policyopt.py` and `demo_holdout.py` reuse
 a cached training set (`.twocart_train.npz`, gitignored); delete it to rebuild.
-```
 
 Both are deterministic — seeded RNG, no wall-clock dependence — so the output
 should match `results.txt` exactly. Only `numpy` and `scipy` are imported by
