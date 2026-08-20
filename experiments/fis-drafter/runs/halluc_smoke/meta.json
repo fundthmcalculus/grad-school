@@ -1,0 +1,12 @@
+{
+  "config": {
+    "model_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "n_items": 40,
+    "max_new_tokens": 40,
+    "batch_size": 16,
+    "seed": 0,
+    "max_ctx_chars": 1200,
+    "out": "runs/halluc_smoke"
+  },
+  "n": 80
+}

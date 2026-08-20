@@ -1,0 +1,24 @@
+{
+  "config": {
+    "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "batch_size": 32,
+    "seed": 0,
+    "chat_template": true,
+    "mode": "battery",
+    "out": "runs/fmri2"
+  },
+  "n_probes": 747,
+  "n_layers": 30,
+  "hidden": 576,
+  "labels": {
+    "innocuous": 175,
+    "word_salad": 175,
+    "char_scramble": 80,
+    "truncated": 80,
+    "char_gibberish": 80,
+    "token_gibberish": 80,
+    "repeated": 50,
+    "nonsense": 15,
+    "injection": 12
+  }
+}

@@ -1,0 +1,140 @@
+[
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "dataset": "injection_qwen3b",
+    "arms": {
+      "trimmed_pca32": {
+        "det@1%FP": 0.663,
+        "wl_auroc": 0.945
+      },
+      "maha_lw": {
+        "det@1%FP": 0.682,
+        "wl_auroc": 0.962
+      },
+      "maha_shrink_0.05": {
+        "det@1%FP": 0.664,
+        "wl_auroc": 0.951
+      },
+      "maha_shrink_0.2": {
+        "det@1%FP": 0.626,
+        "wl_auroc": 0.92
+      },
+      "maha_shrink_0.5": {
+        "det@1%FP": 0.561,
+        "wl_auroc": 0.88
+      },
+      "rmd_bg_0.3": {
+        "det@1%FP": 0.599,
+        "wl_auroc": 0.873
+      },
+      "rmd_bg_0.5": {
+        "det@1%FP": 0.609,
+        "wl_auroc": 0.873
+      },
+      "rmd_bg_0.7": {
+        "det@1%FP": 0.627,
+        "wl_auroc": 0.879
+      },
+      "rmd_bg_0.9": {
+        "det@1%FP": 0.671,
+        "wl_auroc": 0.929
+      },
+      "rmd_bg_0.99": {
+        "det@1%FP": 0.653,
+        "wl_auroc": 0.95
+      }
+    }
+  },
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "dataset": "sg_qwen3b_big",
+    "arms": {
+      "trimmed_pca32": {
+        "det@1%FP": 0.059,
+        "wl_auroc": 0.821
+      },
+      "maha_lw": {
+        "det@1%FP": 0.055,
+        "wl_auroc": 0.82
+      },
+      "maha_shrink_0.05": {
+        "det@1%FP": 0.037,
+        "wl_auroc": 0.805
+      },
+      "maha_shrink_0.2": {
+        "det@1%FP": 0.031,
+        "wl_auroc": 0.709
+      },
+      "maha_shrink_0.5": {
+        "det@1%FP": 0.011,
+        "wl_auroc": 0.625
+      },
+      "rmd_bg_0.3": {
+        "det@1%FP": 0.067,
+        "wl_auroc": 0.796
+      },
+      "rmd_bg_0.5": {
+        "det@1%FP": 0.056,
+        "wl_auroc": 0.81
+      },
+      "rmd_bg_0.7": {
+        "det@1%FP": 0.055,
+        "wl_auroc": 0.822
+      },
+      "rmd_bg_0.9": {
+        "det@1%FP": 0.043,
+        "wl_auroc": 0.838
+      },
+      "rmd_bg_0.99": {
+        "det@1%FP": 0.021,
+        "wl_auroc": 0.822
+      }
+    }
+  },
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "dataset": "spml_qwen3b",
+    "arms": {
+      "trimmed_pca32": {
+        "det@1%FP": 0.885,
+        "wl_auroc": 0.935
+      },
+      "maha_lw": {
+        "det@1%FP": 0.895,
+        "wl_auroc": 0.968
+      },
+      "maha_shrink_0.05": {
+        "det@1%FP": 0.874,
+        "wl_auroc": 0.96
+      },
+      "maha_shrink_0.2": {
+        "det@1%FP": 0.861,
+        "wl_auroc": 0.931
+      },
+      "maha_shrink_0.5": {
+        "det@1%FP": 0.885,
+        "wl_auroc": 0.829
+      },
+      "rmd_bg_0.3": {
+        "det@1%FP": 0.875,
+        "wl_auroc": 0.91
+      },
+      "rmd_bg_0.5": {
+        "det@1%FP": 0.888,
+        "wl_auroc": 0.95
+      },
+      "rmd_bg_0.7": {
+        "det@1%FP": 0.857,
+        "wl_auroc": 0.965
+      },
+      "rmd_bg_0.9": {
+        "det@1%FP": 0.758,
+        "wl_auroc": 0.957
+      },
+      "rmd_bg_0.99": {
+        "det@1%FP": 0.387,
+        "wl_auroc": 0.869
+      }
+    }
+  }
+]

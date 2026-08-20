@@ -1,0 +1,34 @@
+{
+  "k": 16,
+  "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+  "arms": {
+    "mlp256_reduced": {
+      "alpha": 0.20049757893880207,
+      "argmax_agree": 0.20333333333333334,
+      "n_features": 63,
+      "params": 20496,
+      "us_per_step": 105.83877563476562
+    },
+    "mlp512x512_reduced": {
+      "alpha": 0.21614141845703125,
+      "argmax_agree": 0.20366666666666666,
+      "n_features": 63,
+      "params": 303632,
+      "us_per_step": 107.7413558959961
+    },
+    "mlp256_full": {
+      "alpha": 0.21995462544759115,
+      "argmax_agree": 0.20066666666666666,
+      "n_features": 2880,
+      "params": 741648,
+      "us_per_step": 32.38677978515625
+    },
+    "mlp512x512_full": {
+      "alpha": 0.23403966267903645,
+      "argmax_agree": 0.209,
+      "n_features": 2880,
+      "params": 1745936,
+      "us_per_step": 73.62842559814453
+    }
+  }
+}

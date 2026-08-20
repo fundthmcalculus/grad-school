@@ -1,0 +1,145 @@
+{
+  "n_train_rows": 49391,
+  "n_test_rows": 20746,
+  "n_train_prompts": 855,
+  "n_test_prompts": 367,
+  "tier_c_pca_explained": 0.6177352666854858,
+  "targets": {
+    "entropy": {
+      "A": {
+        "constant": -0.0003397907216879936,
+        "single_best_feature": 0.17253175297975865,
+        "ridge": 0.20773953479928198,
+        "gbm": 0.2196179109526223,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 15
+      },
+      "B": {
+        "constant": -0.00030984000783784715,
+        "single_best_feature": 0.13441254281107573,
+        "ridge": 0.09128563657402033,
+        "gbm": 0.15306319605306462,
+        "single_best_feature_name": "tok_logfreq",
+        "n_features": 7
+      },
+      "A+B (deployable)": {
+        "constant": -0.0003397907216879936,
+        "single_best_feature": 0.17253175297975865,
+        "ridge": 0.2938122902769058,
+        "gbm": 0.3811725065141405,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 22
+      },
+      "A+B+C (ceiling)": {
+        "constant": -0.0003397907216879936,
+        "single_best_feature": 0.17253175297975865,
+        "ridge": 0.4829707845472928,
+        "gbm": 0.6060775837638466,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 85
+      }
+    },
+    "top1_prob": {
+      "A": {
+        "constant": -0.00041888454078131687,
+        "single_best_feature": 0.13962303959440692,
+        "ridge": 0.15252889987763163,
+        "gbm": 0.16548248105057828,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 15
+      },
+      "B": {
+        "constant": -0.0003460554189715914,
+        "single_best_feature": 0.10694423150477173,
+        "ridge": 0.07575520035752814,
+        "gbm": 0.12460456492777983,
+        "single_best_feature_name": "tok_logfreq",
+        "n_features": 7
+      },
+      "A+B (deployable)": {
+        "constant": -0.00041888454078131687,
+        "single_best_feature": 0.13962303959440692,
+        "ridge": 0.2097350477602602,
+        "gbm": 0.2854346639334312,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 22
+      },
+      "A+B+C (ceiling)": {
+        "constant": -0.00041888454078131687,
+        "single_best_feature": 0.13962303959440692,
+        "ridge": 0.3785404022187193,
+        "gbm": 0.4800199781472496,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 85
+      }
+    },
+    "log_margin_12": {
+      "A": {
+        "constant": -0.0003550625240720251,
+        "single_best_feature": 0.144082313833787,
+        "ridge": 0.14633046619907641,
+        "gbm": 0.1738334263848248,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 15
+      },
+      "B": {
+        "constant": -0.0002205327443824956,
+        "single_best_feature": 0.11197671069104964,
+        "ridge": 0.08059748389709953,
+        "gbm": 0.15847112022644205,
+        "single_best_feature_name": "tok_logfreq",
+        "n_features": 7
+      },
+      "A+B (deployable)": {
+        "constant": -0.0003550625240720251,
+        "single_best_feature": 0.144082313833787,
+        "ridge": 0.18447050097012418,
+        "gbm": 0.30797310932782107,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 22
+      },
+      "A+B+C (ceiling)": {
+        "constant": -0.0003550625240720251,
+        "single_best_feature": 0.144082313833787,
+        "ridge": 0.37494490856878826,
+        "gbm": 0.5446656275429785,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 85
+      }
+    },
+    "nucleus_90": {
+      "A": {
+        "constant": -0.0003320801976458565,
+        "single_best_feature": 0.17894534125431516,
+        "ridge": 0.22132055485738977,
+        "gbm": 0.23349701154777502,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 15
+      },
+      "B": {
+        "constant": -0.00030655285147829225,
+        "single_best_feature": 0.13364152877119473,
+        "ridge": 0.09045727053987684,
+        "gbm": 0.15357176378714,
+        "single_best_feature_name": "tok_logfreq",
+        "n_features": 7
+      },
+      "A+B (deployable)": {
+        "constant": -0.0003320801976458565,
+        "single_best_feature": 0.17894534125431516,
+        "ridge": 0.31057199757384824,
+        "gbm": 0.39766251885067005,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 22
+      },
+      "A+B+C (ceiling)": {
+        "constant": -0.0003320801976458565,
+        "single_best_feature": 0.17894534125431516,
+        "ridge": 0.5000504237180767,
+        "gbm": 0.6201780069835034,
+        "single_best_feature_name": "ent_ema_short",
+        "n_features": 85
+      }
+    }
+  }
+}

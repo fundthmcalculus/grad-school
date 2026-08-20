@@ -1,0 +1,12 @@
+{
+  "config": {
+    "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "n_items": 900,
+    "max_new_tokens": 40,
+    "batch_size": 32,
+    "seed": 0,
+    "max_ctx_chars": 1200,
+    "out": "runs/halluc_135m"
+  },
+  "n": 1800
+}

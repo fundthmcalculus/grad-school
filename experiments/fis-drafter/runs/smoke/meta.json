@@ -1,0 +1,25 @@
+{
+  "config": {
+    "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "n_dolly": 0,
+    "max_new_tokens": 8,
+    "batch_size": 8,
+    "temperature": 1.0,
+    "seed": 0,
+    "dtype": "float32",
+    "device": "cuda",
+    "max_full_logprob_rows": 20000,
+    "chat_template": true,
+    "out": "runs/smoke"
+  },
+  "n_rows": 175,
+  "n_prompts": 22,
+  "vocab_size": 49152,
+  "hidden_size": 576,
+  "n_layers": 30,
+  "topk": 128,
+  "n_full_logprob": 55,
+  "elapsed_s": 1.245049238204956,
+  "torch": "2.13.0+cu130",
+  "transformers_model": "HuggingFaceTB/SmolLM2-135M-Instruct"
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "name": "SmolLM2-135M",
+    "params": 0.135,
+    "complement": 0.119,
+    "surprisal": 0.525,
+    "trimmed": 0.508,
+    "local": 0.498,
+    "auroc": 0.922
+  },
+  {
+    "name": "gemma-3-270m-it",
+    "params": 0.27,
+    "complement": 0.154,
+    "surprisal": 0.287,
+    "trimmed": 0.281,
+    "local": 0.307,
+    "auroc": 0.858
+  },
+  {
+    "name": "SmolLM2-360M",
+    "params": 0.36,
+    "complement": 0.0,
+    "surprisal": 0.553,
+    "trimmed": 0.572,
+    "local": 0.513,
+    "auroc": 0.921
+  },
+  {
+    "name": "pythia-410m (base)",
+    "params": 0.41,
+    "complement": 0.0,
+    "surprisal": 0.116,
+    "trimmed": 0.102,
+    "local": 0.232,
+    "auroc": 0.793
+  },
+  {
+    "name": "TinyLlama-1.1B",
+    "params": 1.1,
+    "complement": 0.103,
+    "surprisal": 0.584,
+    "trimmed": 0.601,
+    "local": 0.554,
+    "auroc": 0.948
+  },
+  {
+    "name": "LFM2.5-1.2B",
+    "params": 1.2,
+    "complement": 0.144,
+    "surprisal": 0.306,
+    "trimmed": 0.315,
+    "local": 0.377,
+    "auroc": 0.898
+  }
+]

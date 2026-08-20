@@ -1,0 +1,17 @@
+{
+  "config": {
+    "model_id": "google/gemma-3-270m-it",
+    "batch_size": 32,
+    "seed": 0,
+    "chat_template": true,
+    "mode": "injection",
+    "out": "runs/injection_gemma"
+  },
+  "n_probes": 546,
+  "n_layers": 18,
+  "hidden": 640,
+  "labels": {
+    "benign": 343,
+    "injection": 203
+  }
+}
