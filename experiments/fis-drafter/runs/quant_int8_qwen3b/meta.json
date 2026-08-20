@@ -1,0 +1,21 @@
+{
+  "config": {
+    "model_id": "Qwen/Qwen2.5-3B-Instruct",
+    "batch_size": 8,
+    "seed": 0,
+    "chat_template": true,
+    "dtype": "float32",
+    "system_prompt": "",
+    "attn": "",
+    "quant": "int8",
+    "mode": "injection",
+    "out": "runs/quant_int8_qwen3b"
+  },
+  "n_probes": 546,
+  "n_layers": 36,
+  "hidden": 2048,
+  "labels": {
+    "benign": 343,
+    "injection": 203
+  }
+}
