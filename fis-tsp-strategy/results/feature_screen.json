@@ -1,0 +1,93 @@
+[
+ {
+  "feature": "probe_frac",
+  "auc": 0.8578601380542872,
+  "rho_paid": 0.3265555870604892,
+  "desc": "fraction of candidates passing the depth-1 gain test",
+  "expect": "+"
+ },
+ {
+  "feature": "rank",
+  "auc": 0.8333909242696267,
+  "rho_paid": 0.30064307963374326,
+  "desc": "nearer neighbours the worse tour edge ignores, / k",
+  "expect": "+"
+ },
+ {
+  "feature": "probe",
+  "auc": 0.7952344695758629,
+  "rho_paid": 0.19657908157285786,
+  "desc": "best depth-1 positive gain available, / first broken edge",
+  "expect": "+"
+ },
+ {
+  "feature": "excess",
+  "auc": 0.7586564710897599,
+  "rho_paid": 0.15257098566090554,
+  "desc": "mean incident edge / nearest-neighbour distance",
+  "expect": "+"
+ },
+ {
+  "feature": "edge_asym",
+  "auc": 0.7409388552315525,
+  "rho_paid": 0.15654410584095882,
+  "desc": "|d_succ - d_pred| / (d_succ + d_pred)",
+  "expect": "+"
+ },
+ {
+  "feature": "turn",
+  "auc": 0.6904551391883436,
+  "rho_paid": -0.11631822201477067,
+  "desc": "local turn sharpness",
+  "expect": "+"
+ },
+ {
+  "feature": "peak",
+  "auc": 0.5892839185337607,
+  "rho_paid": 0.23105486853614998,
+  "desc": "nearest-neighbour distance / mean candidate distance",
+  "expect": "?"
+ },
+ {
+  "feature": "progress",
+  "auc": 0.579358773087612,
+  "rho_paid": 0.01792788193678603,
+  "desc": "fraction of the run's work already spent",
+  "expect": "-"
+ },
+ {
+  "feature": "nbr_active",
+  "auc": 0.42614717319363943,
+  "rho_paid": -0.09964214722895527,
+  "desc": "fraction of candidate neighbours still queued",
+  "expect": "+"
+ },
+ {
+  "feature": "in_degree",
+  "auc": 0.4491907209592751,
+  "rho_paid": -0.031310714890814585,
+  "desc": "how many cities hold this one in their candidate list, / k",
+  "expect": "?"
+ },
+ {
+  "feature": "pos_spread",
+  "auc": 0.5473752401330262,
+  "rho_paid": 0.1738757343897179,
+  "desc": "tour-position spread of the candidate neighbours, / n",
+  "expect": "+"
+ },
+ {
+  "feature": "cand_step",
+  "auc": 0.5204316997455888,
+  "rho_paid": -0.1054942394093955,
+  "desc": "(2nd nearest - nearest) / nearest",
+  "expect": "?"
+ },
+ {
+  "feature": "fails",
+  "auc": 0.48813749682327573,
+  "rho_paid": -0.12323602419945626,
+  "desc": "how often this city has already come up empty",
+  "expect": "-"
+ }
+]
