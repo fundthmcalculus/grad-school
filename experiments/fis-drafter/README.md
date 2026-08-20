@@ -29,8 +29,11 @@ ones. Full write-ups are in the findings docs; this README is the runnable index
 | 1 | Can an FIS **draft tokens** by predicting logit *shape*? | **Closed.** The 16-number code ceiling is fine (α=0.57) but cheap features cannot reach it — a feature limit, not a model-class or objective limit, across linear/GBM/FIS/MLP and two architectures. | `RESULTS.md` |
 | 2 | Can an FIS flag **hallucinations** better than a scalar? | **No**, and a *sixth confound* found: the automatic grader manufactures the result; F1 graders create the length confound. A single entropy scalar is at the ceiling. | `FINDINGS_DETECTION.md` Part 1 |
 | 3 | Can an FIS **monitor activations** to flag prompt injection? | **Yes, narrowly.** A one-class, no-attack-examples, interpretable monitor; deployable ~0.66–0.89 recall at 1% FPR on capable instruct models against plain injections. | `FINDINGS_DETECTION.md` Parts 2–12 |
+| 4 | Is the monitor robust to **how the model is run**? | **Calibrate in place.** Sampling/precision/attention are null; quantization and system-prompt shifts move the benign manifold and must be recalibrated; last-token pooling is robust where mean-pool is fragile; generation/logit-shape add cost not signal. | `FINDINGS_DETECTION.md` Parts 16–19 |
+| 5 | Does an **exogenous shift within a sequence** localise (and clamp) the response? | **Yes — a context-change detector + a causal ~8-dim subspace.** Within-sequence baseline needs no cross-prompt calibration (AUROC 0.80–0.93); it tracks semantic context-change (not surprise/attack); the response lives in a specific low-rank subspace that clamping causally suppresses. | `FINDINGS_DETECTION.md` Parts 20–21 |
 
-Investigation 3 is the surviving contribution and the focus of the demos below.
+Investigation 3 is the surviving contribution; 4–5 stress and extend it. They are
+the focus of the demos below.
 
 ## Setup
 
@@ -93,10 +96,12 @@ five architecture families; corpora are deepset / SPML / jailbreak / safeguard.
 
 ## Findings index
 
-`RESULTS.md` (drafting) · `FINDINGS_DETECTION.md` (Parts 1–12: hallucination,
-injection monitor, all sweeps) · `CORRECTION.md` (what used the real library vs a
-reimplementation, and how that was fixed) · `PRIOR_ART.md` · `DESIGN.md` ·
-`PLAN_ANOMALY.md`.
+`RESULTS.md` (drafting) · `FINDINGS_DETECTION.md` (Parts 1–12: hallucination and
+the injection monitor; 13–15: strict-gate/few-shot/covariance; 16–19:
+inference-sensitivity; 20–21: within-sequence shift and the causal clamp) ·
+`PLAN_INFERENCE_SENSITIVITY.md` (all axes resolved) · `CORRECTION.md` (what used
+the real library vs a reimplementation, and how that was fixed) · `PRIOR_ART.md` ·
+`DESIGN.md` · `PLAN_ANOMALY.md`.
 
 ## Method notes worth keeping
 

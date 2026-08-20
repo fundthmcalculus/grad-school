@@ -1,0 +1,27 @@
+{
+  "config": {
+    "model_id": "Qwen/Qwen2.5-3B-Instruct",
+    "batch_size": 8,
+    "seed": 0,
+    "dtype": "bfloat16",
+    "n_base": 60,
+    "n_preamble": 4,
+    "win": 8,
+    "out": "runs/stream_qwen3b"
+  },
+  "n_probes": 240,
+  "n_layers": 36,
+  "hidden": 2048,
+  "win": 8,
+  "doses": [
+    "benign_cont",
+    "offtopic",
+    "bizarre",
+    "injection"
+  ],
+  "curves": [
+    "rms_z",
+    "max_z",
+    "pca_residual"
+  ]
+}
