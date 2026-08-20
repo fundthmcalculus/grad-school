@@ -22,8 +22,8 @@ from sklearn.model_selection import train_test_split
 _TABLES = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_TABLES))
 sys.path.insert(0, _TABLES)
-import common as C            # noqa: E402
-import _fuzzy_models as _fm   # noqa: E402
+import common as C  # noqa: E402
+import _fuzzy_models as _fm  # noqa: E402
 
 # Optional baselines -- resolve once; None => the column renders as N/A.
 (anfis_fit_predict,) = C.optional_import("_baseline_anfis", ["fit_predict"])
@@ -69,8 +69,7 @@ def _bench(kind, X, y, mog_factory, score, norm=False):
     # outputs/full-14900hx-r2/table_4_1.csv -- only the time cells moved.
     _warm = mog_factory(C.SEEDS[0])
     if _warm is not None:
-        Xw, Xwte, yw, _ = train_test_split(X, y, test_size=0.2,
-                                           random_state=C.SEEDS[0])
+        Xw, Xwte, yw, _ = train_test_split(X, y, test_size=0.2, random_state=C.SEEDS[0])
         _rng_state = np.random.get_state()
         try:
             _warm.fit(Xw, yw).predict(Xwte)
@@ -114,10 +113,12 @@ def _bench(kind, X, y, mog_factory, score, norm=False):
 
 def _row(label, metric_name, cols):
     order = ["mog", "anfis", "gafis", "rf"]
-    return [label,
-            C.cell(cols["mog"]["t"], fmt="{:.2f}") + " s" if cols["mog"]["t"] else C.NA,
-            f"{metric_name}=" + C.cell(cols["mog"]["s"]) if cols["mog"]["s"] else C.NA,
-            *[C.cell(cols[k]["s"]) if k != "mog" else "" for k in order if k != "mog"]]
+    return [
+        label,
+        C.cell(cols["mog"]["t"], fmt="{:.2f}") + " s" if cols["mog"]["t"] else C.NA,
+        f"{metric_name}=" + C.cell(cols["mog"]["s"]) if cols["mog"]["s"] else C.NA,
+        *[C.cell(cols[k]["s"]) if k != "mog" else "" for k in order if k != "mog"],
+    ]
 
 
 def main():
@@ -137,12 +138,27 @@ def main():
         # read `*pending*`. Measuring it here -- same split, same seeds, same
         # normalization, same timer as the 1st-order row -- makes the two rows
         # comparable, which borrowing the 1st-order seconds would not have.
-        cols2 = _bench("reg", X, y,
-                       lambda s: _fm.mog_regressor(s, tsk_order="full-2nd"),
-                       r2_score, norm=True)
+        cols2 = _bench(
+            "reg",
+            X,
+            y,
+            lambda s: _fm.mog_regressor(s, tsk_order="full-2nd"),
+            r2_score,
+            norm=True,
+        )
         rows.append(_row("Concrete (regression, full 2nd order)", "R2", cols2))
     else:
         rows.append(["Concrete (regression)", C.NA, C.NA, C.NA, C.NA, C.NA])
+
+    bikeshare = _fm.load_bikeshare()
+    if bikeshare is not None:
+        X, y = bikeshare
+        # Bike Sharing: normalized, for scale comparison with Concrete.
+        # 17.3× larger (17,379 vs 1,030 rows) while maintaining regression task.
+        cols = _bench("reg", X, y, _fm.mog_regressor, r2_score, norm=True)
+        rows.append(_row("Bike Sharing (regression)", "R2", cols))
+    else:
+        rows.append(["Bike Sharing (regression)", C.NA, C.NA, C.NA, C.NA, C.NA])
 
     phi = _fm.load_phiusiil()
     if phi is not None:
@@ -154,12 +170,39 @@ def main():
     else:
         rows.append(["PhiUSIIL (classification)", C.NA, C.NA, C.NA, C.NA, C.NA])
 
-    header = ["Dataset (task)", "MoG train time", "MoG accuracy / R2",
-              "ANFIS", "GA-tuned FIS", "tree / RF ref"]
-    C.emit("table_4_1", "Table 4.1 -- Training time and accuracy", header, rows,
-           note="MoG columns measured; ANFIS / GA-FIS fill in only if their adapters "
-                "(reproduce/tables/_baseline_anfis.py, _baseline_gafis.py) are present. "
-                "The RF reference is scikit-learn. Times are wall-clock training seconds.")
+    iot = _fm.load_rt_iot2022()
+    if iot is not None:
+        X, y = iot
+        # RT-IOT2022: raw features, left unnormalized -- matches the open-set
+        # measurement (table_4_4_openset.py) and the single-split sanity check
+        # (quick_iot_baseline.py), neither of which normalizes, so this row is
+        # comparable to both rather than introducing a third convention.
+        # top_n=5 (mog_classifier's default) -- NOT the open-set experiment's
+        # all-82-feature antecedent screen, so this is materially cheaper and
+        # answers a different question (the plain classification/timing claim
+        # Table 4.4's row names, not the open-set complement-rule claim).
+        cols = _bench("clf", X, y, _fm.mog_classifier, accuracy_score, norm=False)
+        rows.append(_row("RT-IOT2022 (12-class)", "acc", cols))
+    else:
+        rows.append(["RT-IOT2022 (12-class)", C.NA, C.NA, C.NA, C.NA, C.NA])
+
+    header = [
+        "Dataset (task)",
+        "MoG train time",
+        "MoG accuracy / R2",
+        "ANFIS",
+        "GA-tuned FIS",
+        "tree / RF ref",
+    ]
+    C.emit(
+        "table_4_1",
+        "Table 4.1 -- Training time and accuracy",
+        header,
+        rows,
+        note="MoG columns measured; ANFIS / GA-FIS fill in only if their adapters "
+        "(reproduce/tables/_baseline_anfis.py, _baseline_gafis.py) are present. "
+        "The RF reference is scikit-learn. Times are wall-clock training seconds.",
+    )
 
 
 if __name__ == "__main__":

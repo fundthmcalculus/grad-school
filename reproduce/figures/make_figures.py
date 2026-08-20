@@ -113,11 +113,15 @@ def show_inventory():
     prose = prose_figures()
     study = [f for f in FIGURES if f.document is not None]
     drawn = sum(1 for f in FIGURES if f.skip is None)
-    print(f"\n{drawn} of {len(FIGURES)} figures have a generator; "
-          f"{len(FIGURES) - drawn} skipped.")
-    print(f"{len(prose)} are the proposal's own (installed into prose/fig/); "
-          f"{len(study)} illustrate a study write-up and stay under "
-          f"{os.path.relpath(FIG_OUT, ROOT)}.")
+    print(
+        f"\n{drawn} of {len(FIGURES)} figures have a generator; "
+        f"{len(FIGURES) - drawn} skipped."
+    )
+    print(
+        f"{len(prose)} are the proposal's own (installed into prose/fig/); "
+        f"{len(study)} illustrate a study write-up and stay under "
+        f"{os.path.relpath(FIG_OUT, ROOT)}."
+    )
 
 
 def install(names):
@@ -134,12 +138,16 @@ def install(names):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("only", nargs="*", help="figure names; default is all of them")
     ap.add_argument("--list", action="store_true", help="show the inventory and exit")
-    ap.add_argument("--no-install", action="store_true",
-                    help="do not copy the result into prose/fig/")
+    ap.add_argument(
+        "--no-install",
+        action="store_true",
+        help="do not copy the result into prose/fig/",
+    )
     args = ap.parse_args()
 
     if args.list:
@@ -148,8 +156,11 @@ def main():
 
     unknown = [n for n in args.only if n not in BY_NAME]
     if unknown:
-        print(f"unknown figure(s): {', '.join(unknown)}\n"
-              f"run with --list to see the inventory", file=sys.stderr)
+        print(
+            f"unknown figure(s): {', '.join(unknown)}\n"
+            f"run with --list to see the inventory",
+            file=sys.stderr,
+        )
         return 2
 
     wanted = [BY_NAME[n] for n in args.only] if args.only else list(FIGURES)
@@ -182,10 +193,15 @@ def main():
         installable = [f.name for f in made if f.name in prose_names]
         n = install(installable)
         held = len(made) - len(installable)
-        print(f"\ninstalled {n} file(s) into "
-              f"{os.path.relpath(PROSE_FIG, ROOT)}"
-              + (f"; {held} study figure(s) left in "
-                 f"{os.path.relpath(FIG_OUT, ROOT)}" if held else ""))
+        print(
+            f"\ninstalled {n} file(s) into "
+            f"{os.path.relpath(PROSE_FIG, ROOT)}"
+            + (
+                f"; {held} study figure(s) left in " f"{os.path.relpath(FIG_OUT, ROOT)}"
+                if held
+                else ""
+            )
+        )
 
     print(f"\n{len(made)} drawn, {len(skipped)} skipped, {len(failed)} failed")
     for f in failed:

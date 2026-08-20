@@ -44,8 +44,8 @@ DATASET = "three_level_hierarchy"
 
 
 def build():
-    import battery_hierarchical as BH   # noqa: E402
-    import ivat_mf as im                # noqa: E402
+    import battery_hierarchical as BH  # noqa: E402
+    import ivat_mf as im  # noqa: E402
     import multiscale_persistence as MS  # noqa: E402
     from sklearn.metrics import adjusted_rand_score
 
@@ -59,8 +59,9 @@ def build():
 
     fig = F._pyplot().figure(figsize=(F.W_WIDE, 4.4), dpi=F.DPI)
     fig.patch.set_facecolor(F.SURFACE)
-    gs = fig.add_gridspec(len(sel.bands), 2, width_ratios=[1.15, 1],
-                          hspace=0.55, wspace=0.22)
+    gs = fig.add_gridspec(
+        len(sel.bands), 2, width_ratios=[1.15, 1], hspace=0.55, wspace=0.22
+    )
 
     # -- left: the spectrum, spanning the full height ------------------------
     spec = fig.add_subplot(gs[:, 0])
@@ -69,8 +70,9 @@ def build():
     blocks, n = _significant(MS, Dstar)
     births = np.array([b["birth"] for b in blocks])
     sizes = np.array([b["size"] for b in blocks])
-    spec.scatter(births, sizes, s=26, color=F.tint(F.BLUE, 0.35), linewidths=0,
-                 zorder=3)
+    spec.scatter(
+        births, sizes, s=26, color=F.tint(F.BLUE, 0.35), linewidths=0, zorder=3
+    )
 
     edges = [float(np.exp(e)) for e in sel.band_edges_log]
     lo, hi = births.min() / 2.2, births.max() * 2.2
@@ -78,17 +80,26 @@ def build():
     for i, (a, b) in enumerate(zip(bounds[:-1], bounds[1:])):
         if i < len(sel.bands):
             spec.axvspan(a, b, color=F.tint(F.SERIES[i % 8], 0.93), zorder=0)
-            spec.text(np.sqrt(a * b), sizes.max() * 1.32,
-                      f"band {i + 1}\n$k$ = {sel.bands[i].k}", ha="center",
-                      va="center", fontsize=F.FS_SMALL,
-                      color=F.shade(F.SERIES[i % 8], 0.3), linespacing=1.5)
+            spec.text(
+                np.sqrt(a * b),
+                sizes.max() * 1.32,
+                f"band {i + 1}\n$k$ = {sel.bands[i].k}",
+                ha="center",
+                va="center",
+                fontsize=F.FS_SMALL,
+                color=F.shade(F.SERIES[i % 8], 0.3),
+                linespacing=1.5,
+            )
     for e in edges:
         spec.axvline(e, lw=1.1, ls=(0, (3, 2)), color=F.FAINT, zorder=2)
 
     spec.set_xscale("log")
-    F.style_axes(spec, title="(a)  the log-birth spectrum",
-                 xlabel="block birth height  (log scale)",
-                 ylabel="block size (points)")
+    F.style_axes(
+        spec,
+        title="(a)  the log-birth spectrum",
+        xlabel="block birth height  (log scale)",
+        ylabel="block size (points)",
+    )
     spec.set_xlim(lo, hi)
     spec.set_ylim(0, sizes.max() * 1.55)
 
@@ -107,9 +118,15 @@ def build():
                 remap[v] = nxt
                 nxt += 1
         labels = np.array([remap[v] for v in seq])
-        ax.imshow(labels[None, :], aspect="auto", interpolation="nearest",
-                  cmap=_partition_cmap(band.k), vmin=0, vmax=max(band.k - 1, 1),
-                  rasterized=True)
+        ax.imshow(
+            labels[None, :],
+            aspect="auto",
+            interpolation="nearest",
+            cmap=_partition_cmap(band.k),
+            vmin=0,
+            vmax=max(band.k - 1, 1),
+            rasterized=True,
+        )
         # A surface-coloured rule at each boundary: the 2px gap between fills.
         for boundary in np.flatnonzero(np.diff(labels)) + 1:
             ax.axvline(boundary - 0.5, color=F.SURFACE, lw=1.6, zorder=4)
@@ -120,28 +137,41 @@ def build():
             s.set_linewidth(0.8)
 
         name, truth = truths[i] if i < len(truths) else ("", None)
-        ari = adjusted_rand_score(truth, assigned) if truth is not None else float("nan")
+        ari = (
+            adjusted_rand_score(truth, assigned) if truth is not None else float("nan")
+        )
         panel = "(b)  " if i == 0 else ""
-        ax.set_title(f"{panel}band {i + 1} — {band.k} clusters recovered   "
-                     f"(vs {name} truth: ARI {ari:.2f})",
-                     fontsize=F.FS_SMALL, color=F.INK, pad=5)
+        ax.set_title(
+            f"{panel}band {i + 1} — {band.k} clusters recovered   "
+            f"(vs {name} truth: ARI {ari:.2f})",
+            fontsize=F.FS_SMALL,
+            color=F.INK,
+            pad=5,
+        )
 
-    fig.text(0.5, -0.02,
-             f"Left: one dot per persistence-significant block, placed at its birth height. "
-             f"Bands are the runs between gaps in the log-birth axis, and the "
-             f"granularities\n{sel.granularities()} fall out of the selection rather "
-             f"than being asked for. Right: the partition each band recovers, samples "
-             f"ordered by the finest ground-truth label,\nso a recovered cluster is a "
-             f"contiguous run of colour and the nesting is visible. "
-             f"{DATASET}, $n$ = {n}; the same dataset and call as Table 5.2.",
-             ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
-             linespacing=1.6)
+    fig.text(
+        0.5,
+        -0.02,
+        f"Left: one dot per persistence-significant block, placed at its birth height. "
+        f"Bands are the runs between gaps in the log-birth axis, and the "
+        f"granularities\n{sel.granularities()} fall out of the selection rather "
+        f"than being asked for. Right: the partition each band recovers, samples "
+        f"ordered by the finest ground-truth label,\nso a recovered cluster is a "
+        f"contiguous run of colour and the nesting is visible. "
+        f"{DATASET}, $n$ = {n}; the same dataset and call as Table 5.2.",
+        ha="center",
+        va="top",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.6,
+    )
     return fig
 
 
 def _significant(MS, Dstar):
     """The blocks the gate admits -- the population band discovery runs on."""
     import selection as S
+
     blocks, n = S._all_blocks(Dstar)
     return MS.significant_blocks(blocks, n), n
 
@@ -149,6 +179,7 @@ def _significant(MS, Dstar):
 def _partition_cmap(k):
     """Categorical slots in fixed order, as a discrete colormap."""
     from matplotlib.colors import ListedColormap
+
     return ListedColormap([F.SERIES[i % len(F.SERIES)] for i in range(max(k, 2))])
 
 

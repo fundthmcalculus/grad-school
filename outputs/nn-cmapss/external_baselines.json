@@ -1,0 +1,158 @@
+[
+ {
+  "model": "sklearn-MLP (fis)",
+  "bundle": "honest",
+  "params": "{'hidden_layer_sizes': (64,), 'alpha': 1.0, 'learning_rate_init': 0.001, 'max_iter': 1500, 'early_stopping': False}",
+  "val_rmse": 8.023867667833011,
+  "fit_seconds": 0.9906806600047275,
+  "test": {
+   "rmse": 8.108489588119697,
+   "mae": 6.244308824523304,
+   "rmse_endpoint": 3.2851844808540207,
+   "nasa": 396.020565834371
+  }
+ },
+ {
+  "model": "sklearn-MLP (all)",
+  "bundle": "honest",
+  "params": "{'hidden_layer_sizes': (32, 32), 'alpha': 0.0001, 'learning_rate_init': 0.001, 'max_iter': 1500, 'early_stopping': False}",
+  "val_rmse": 8.39915335038152,
+  "fit_seconds": 0.60815667299903,
+  "test": {
+   "rmse": 10.794379301123776,
+   "mae": 7.743772686849376,
+   "rmse_endpoint": 3.9793665356236625,
+   "nasa": 558.1055171525085
+  }
+ },
+ {
+  "model": "hist-gbm (fis)",
+  "bundle": "honest",
+  "params": "{'max_iter': 300, 'learning_rate': 0.1, 'max_leaf_nodes': 7}",
+  "val_rmse": 8.8797644127292,
+  "fit_seconds": 0.11800242999743205,
+  "test": {
+   "rmse": 9.599417283695075,
+   "mae": 7.205647360255695,
+   "rmse_endpoint": 2.270464260658434,
+   "nasa": 468.93722309183227
+  }
+ },
+ {
+  "model": "hist-gbm (all)",
+  "bundle": "honest",
+  "params": "{'max_iter': 300, 'learning_rate': 0.1, 'max_leaf_nodes': 7}",
+  "val_rmse": 8.811255617315974,
+  "fit_seconds": 0.19302728300681338,
+  "test": {
+   "rmse": 9.065542234703301,
+   "mae": 6.953978792614352,
+   "rmse_endpoint": 2.5316040077228465,
+   "nasa": 451.97162250267525
+  }
+ },
+ {
+  "model": "random-forest (fis)",
+  "bundle": "honest",
+  "params": "{'n_estimators': 200, 'min_samples_leaf': 5, 'n_jobs': -1}",
+  "val_rmse": 13.975340400870664,
+  "fit_seconds": 0.18721686900244094,
+  "test": {
+   "rmse": 9.533939524480887,
+   "mae": 7.4487228069802125,
+   "rmse_endpoint": 1.5831985725400528,
+   "nasa": 496.11180632673813
+  }
+ },
+ {
+  "model": "random-forest (all)",
+  "bundle": "honest",
+  "params": "{'n_estimators': 200, 'min_samples_leaf': 1, 'n_jobs': -1}",
+  "val_rmse": 14.278294217672618,
+  "fit_seconds": 0.4288441430107923,
+  "test": {
+   "rmse": 9.495159032344057,
+   "mae": 7.439059405940594,
+   "rmse_endpoint": 1.7779880951982403,
+   "nasa": 500.4216422618178
+  }
+ },
+ {
+  "model": "sklearn-MLP (fis)",
+  "bundle": "best",
+  "params": "{'hidden_layer_sizes': (64,), 'alpha': 1.0, 'learning_rate_init': 0.01, 'max_iter': 1500, 'early_stopping': False}",
+  "val_rmse": 6.6976010417524074,
+  "fit_seconds": 2.5616376499965554,
+  "test": {
+   "rmse": 6.05365090137763,
+   "mae": 4.803761609343389,
+   "rmse_endpoint": 1.2864394647890778,
+   "nasa": 10461.593345273764
+  }
+ },
+ {
+  "model": "sklearn-MLP (all)",
+  "bundle": "best",
+  "params": "{'hidden_layer_sizes': (8,), 'alpha': 1.0, 'learning_rate_init': 0.01, 'max_iter': 1500, 'early_stopping': False}",
+  "val_rmse": 5.848330702322658,
+  "fit_seconds": 3.1081115050037624,
+  "test": {
+   "rmse": 6.186865550187865,
+   "mae": 4.741319225557744,
+   "rmse_endpoint": 1.2881358232535554,
+   "nasa": 10522.44800947886
+  }
+ },
+ {
+  "model": "hist-gbm (fis)",
+  "bundle": "best",
+  "params": "{'max_iter': 300, 'learning_rate': 0.05, 'max_leaf_nodes': 31}",
+  "val_rmse": 6.472013295657676,
+  "fit_seconds": 0.5781478080025408,
+  "test": {
+   "rmse": 7.193349464098003,
+   "mae": 5.4970023315238805,
+   "rmse_endpoint": 1.0665313485125292,
+   "nasa": 11688.732615003646
+  }
+ },
+ {
+  "model": "hist-gbm (all)",
+  "bundle": "best",
+  "params": "{'max_iter': 300, 'learning_rate': 0.05, 'max_leaf_nodes': 31}",
+  "val_rmse": 5.87656434930969,
+  "fit_seconds": 0.9092312940047123,
+  "test": {
+   "rmse": 7.0282078507895855,
+   "mae": 5.361057571152649,
+   "rmse_endpoint": 0.9350826302157353,
+   "nasa": 11558.79930812728
+  }
+ },
+ {
+  "model": "random-forest (fis)",
+  "bundle": "best",
+  "params": "{'n_estimators': 200, 'min_samples_leaf': 5, 'n_jobs': -1}",
+  "val_rmse": 6.703886332360666,
+  "fit_seconds": 10.430929426001967,
+  "test": {
+   "rmse": 7.5081844894773235,
+   "mae": 5.718539480190662,
+   "rmse_endpoint": 1.5840655891413835,
+   "nasa": 12096.738291977144
+  }
+ },
+ {
+  "model": "random-forest (all)",
+  "bundle": "best",
+  "params": "{'n_estimators': 200, 'min_samples_leaf': 1, 'n_jobs': -1}",
+  "val_rmse": 6.287216233888387,
+  "fit_seconds": 32.64495552799781,
+  "test": {
+   "rmse": 7.35020950020948,
+   "mae": 5.609665869218501,
+   "rmse_endpoint": 1.7416180216492172,
+   "nasa": 11987.23683638251
+  }
+ }
+]

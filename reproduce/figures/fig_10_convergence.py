@@ -55,12 +55,25 @@ import harness_data as H  # noqa: E402
 
 NAME = "10-convergence"
 
-ARM_ORDER = ["scipy-lbfgsb", "scipy-powell", "scipy-de",
-             "opt-ga", "opt-pso", "opt-aco", "opt-gd"]
+ARM_ORDER = [
+    "scipy-lbfgsb",
+    "scipy-powell",
+    "scipy-de",
+    "opt-ga",
+    "opt-pso",
+    "opt-aco",
+    "opt-gd",
+]
 COLOUR = {a: F.SERIES[i % len(F.SERIES)] for i, a in enumerate(ARM_ORDER)}
-LABEL = {"scipy-lbfgsb": "L-BFGS-B", "scipy-powell": "Powell",
-         "scipy-de": "DE (scipy)", "opt-ga": "GA", "opt-pso": "PSO",
-         "opt-aco": "ACO", "opt-gd": "GD"}
+LABEL = {
+    "scipy-lbfgsb": "L-BFGS-B",
+    "scipy-powell": "Powell",
+    "scipy-de": "DE (scipy)",
+    "opt-ga": "GA",
+    "opt-pso": "PSO",
+    "opt-aco": "ACO",
+    "opt-gd": "GD",
+}
 
 #: Individuals per generation, from `arms.py`'s own defaults. `scipy-de` is the
 #: exception that makes this panel worth drawing: scipy multiplies `popsize` by
@@ -81,14 +94,16 @@ def _n_params(label):
     for name, path, _ in H.archives():
         if name != label:
             continue
-        with open(os.path.join(path, "PROVENANCE.txt"),
-                  encoding="utf-8", errors="replace") as f:
+        with open(
+            os.path.join(path, "PROVENANCE.txt"), encoding="utf-8", errors="replace"
+        ) as f:
             m = re.search(r"^params:\s*(\d+)", f.read(), re.M)
         if m:
             return int(m.group(1))
     raise RuntimeError(
         f"no `params:` line in {label}'s PROVENANCE.txt; re-run the study with "
-        f"the harness that records it, or panel (b)'s generation axis is a guess")
+        f"the harness that records it, or panel (b)'s generation axis is a guess"
+    )
 
 
 def _traces():
@@ -97,7 +112,8 @@ def _traces():
     series = defaultdict(lambda: defaultdict(list))
     for r in rows:
         series[(r["arm"], r["init"])][int(r["seed"])].append(
-            (int(r["eval"]), float(r["best_cv_mse"])))
+            (int(r["eval"]), float(r["best_cv_mse"]))
+        )
     ref = {}
     for seed, pts in series.get(("none", "hot"), {}).items():
         ref[seed] = min(v for _e, v in pts)
@@ -126,12 +142,14 @@ def _median_curve(per_seed, ref, grid):
     return np.median(np.vstack(stacked), axis=0)
 
 
-def _panel_objective(ax, series, ref, arms, budget, xscale="evals",
-                     n_params=136):
+def _panel_objective(ax, series, ref, arms, budget, xscale="evals", n_params=136):
     grid = np.unique(np.concatenate([[1], np.logspace(0, np.log10(budget), 200)]))
     for arm in arms:
-        pop = (DE_POPSIZE_MULTIPLIER * n_params if arm == "scipy-de"
-               else POPULATION.get(arm, 1))
+        pop = (
+            DE_POPSIZE_MULTIPLIER * n_params
+            if arm == "scipy-de"
+            else POPULATION.get(arm, 1)
+        )
         for init, ls in (("hot", "solid"), ("cold", (0, (4, 2)))):
             per_seed = series.get((arm, init))
             if not per_seed:
@@ -140,9 +158,15 @@ def _panel_objective(ax, series, ref, arms, budget, xscale="evals",
             if med is None:
                 continue
             x = grid / pop if xscale == "gens" else grid
-            ax.plot(x, med, lw=1.7 if init == "hot" else 1.2, ls=ls,
-                    color=COLOUR[arm], zorder=4,
-                    label=LABEL[arm] if init == "hot" else None)
+            ax.plot(
+                x,
+                med,
+                lw=1.7 if init == "hot" else 1.2,
+                ls=ls,
+                color=COLOUR[arm],
+                zorder=4,
+                label=LABEL[arm] if init == "hot" else None,
+            )
     ax.axhline(1.0, lw=1.1, ls=(0, (2, 2)), color=F.FAINT, zorder=2)
     ax.set_xscale("log")
 
@@ -152,20 +176,42 @@ def build():
     if not ref:
         raise RuntimeError("no `none/hot` reference; run run_study.py")
     arms = [a for a in ARM_ORDER if (a, "hot") in series]
-    budget = max(e for per_seed in series.values()
-                 for pts in per_seed.values() for e, _v in pts) or 2000
+    budget = (
+        max(
+            e
+            for per_seed in series.values()
+            for pts in per_seed.values()
+            for e, _v in pts
+        )
+        or 2000
+    )
     n_params = _n_params(label)
 
-    fig, (ax, gx, cx) = F.grid_figure(1, 3, width=F.W_WIDE + 1.8, height=4.0,
-                                      gridspec_kw={"width_ratios": [1.15, 1.15, 1]})
+    fig, (ax, gx, cx) = F.grid_figure(
+        1,
+        3,
+        width=F.W_WIDE + 1.8,
+        height=4.0,
+        gridspec_kw={"width_ratios": [1.15, 1.15, 1]},
+    )
 
     # -- (a) objective against evaluations ---------------------------------- #
     _panel_objective(ax, series, ref, arms, budget, "evals", n_params)
-    ax.text(1.05, 1.0, " the construction", va="bottom", ha="left",
-            fontsize=F.FS_SMALL, color=F.MUTED)
-    F.style_axes(ax, title="(a)  objective against evaluations",
-                 xlabel="objective evaluations (log)",
-                 ylabel="best CV MSE / construction's CV MSE")
+    ax.text(
+        1.05,
+        1.0,
+        " the construction",
+        va="bottom",
+        ha="left",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+    )
+    F.style_axes(
+        ax,
+        title="(a)  objective against evaluations",
+        xlabel="objective evaluations (log)",
+        ylabel="best CV MSE / construction's CV MSE",
+    )
     F.legend(ax, loc="lower left", ncol=2, handlelength=2.4)
 
     # -- (b) objective against generations ---------------------------------- #
@@ -173,19 +219,35 @@ def build():
     _panel_objective(gx, series, ref, gen_arms, budget, "gens", n_params)
     de_gens = budget / (DE_POPSIZE_MULTIPLIER * n_params)
     gx.axvline(de_gens, lw=1.0, ls=(0, (2, 2)), color=F.FAINT, zorder=2)
-    gx.annotate(f"DE's whole budget is\n{de_gens:.1f} generations\n"
-                f"({DE_POPSIZE_MULTIPLIER}×{n_params} per population)",
-                xy=(de_gens, 0.90), xytext=(0.04, 0.24),
-                textcoords="axes fraction", fontsize=F.FS_SMALL,
-                color=F.MUTED, linespacing=1.5,
-                arrowprops=dict(arrowstyle="->", lw=0.8, color=F.AXIS,
-                                connectionstyle="arc3,rad=0.15"))
-    gx.text(0.04, 0.06, "colours as in (a); the two local\nmethods have no "
-            "generation and\nare left out", transform=gx.transAxes,
-            fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.5)
-    F.style_axes(gx, title="(b)  objective against generations",
-                 xlabel="generations = evaluations / population (log)",
-                 ylabel="best CV MSE / construction's CV MSE")
+    gx.annotate(
+        f"DE's whole budget is\n{de_gens:.1f} generations\n"
+        f"({DE_POPSIZE_MULTIPLIER}×{n_params} per population)",
+        xy=(de_gens, 0.90),
+        xytext=(0.04, 0.24),
+        textcoords="axes fraction",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.5,
+        arrowprops=dict(
+            arrowstyle="->", lw=0.8, color=F.AXIS, connectionstyle="arc3,rad=0.15"
+        ),
+    )
+    gx.text(
+        0.04,
+        0.06,
+        "colours as in (a); the two local\nmethods have no "
+        "generation and\nare left out",
+        transform=gx.transAxes,
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.5,
+    )
+    F.style_axes(
+        gx,
+        title="(b)  objective against generations",
+        xlabel="generations = evaluations / population (log)",
+        ylabel="best CV MSE / construction's CV MSE",
+    )
 
     # -- (c) objective removed against R² gained ---------------------------- #
     rows, _ = H.table("table_opt_hotstart_budget")
@@ -194,7 +256,9 @@ def build():
     for r in rows:
         b = int(r["budget"])
         at[(r["arm"], r.get("init", "hot"))][b][int(r["seed"])] = (
-            float(r["cv_mse"]), float(r["r2"]))
+            float(r["cv_mse"]),
+            float(r["r2"]),
+        )
         heur[int(r["seed"])] = float(r.get("heuristic_r2") or r["r2_0"])
     budgets = sorted({int(r["budget"]) for r in rows})
     for arm in arms:
@@ -205,15 +269,32 @@ def build():
             common = [s for s in seeds if s in ref and s in heur]
             if not common:
                 continue
-            xs.append(float(np.median([100.0 * (1.0 - seeds[s][0] / ref[s])
-                                       for s in common])))
+            xs.append(
+                float(np.median([100.0 * (1.0 - seeds[s][0] / ref[s]) for s in common]))
+            )
             ys.append(float(np.median([seeds[s][1] - heur[s] for s in common])))
         if len(xs) < 2:
             continue
-        cx.plot(xs, ys, lw=1.6, marker="o", ms=3.6, color=COLOUR[arm],
-                label=LABEL[arm], zorder=4)
-        cx.plot(xs[-1:], ys[-1:], marker="o", ms=7.0, mfc=F.SURFACE,
-                mec=COLOUR[arm], mew=1.6, zorder=5)
+        cx.plot(
+            xs,
+            ys,
+            lw=1.6,
+            marker="o",
+            ms=3.6,
+            color=COLOUR[arm],
+            label=LABEL[arm],
+            zorder=4,
+        )
+        cx.plot(
+            xs[-1:],
+            ys[-1:],
+            marker="o",
+            ms=7.0,
+            mfc=F.SURFACE,
+            mec=COLOUR[arm],
+            mew=1.6,
+            zorder=5,
+        )
     cx.axhline(0.0, lw=1.0, color=F.AXIS, zorder=3)
     # The flattening is the point of the panel, so it is stated on the panel.
     # Endpoints are read out of the plotted data rather than typed in.
@@ -226,29 +307,45 @@ def build():
         (dx, dy), (lx, ly) = ends["DE (scipy)"], ends["L-BFGS-B"]
         lo, hi = cx.get_ylim()
         cx.set_ylim(lo, hi + 0.28 * (hi - lo))
-        cx.text(0.03, 0.93,
-                f"DE ends at {dx:.0f}% removed for {dy:+.4f} $R^2$;\n"
-                f"L-BFGS-B at {lx:.0f}% for {ly:+.4f}.\n"
-                f"{lx / dx:.1f}× the objective progress, {ly - dy:+.4f} $R^2$.",
-                transform=cx.transAxes, va="top", ha="left",
-                fontsize=F.FS_SMALL, color=F.MUTED, linespacing=1.5)
-    F.style_axes(cx, title="(c)  what the headroom converts to",
-                 xlabel="% of the construction's objective removed",
-                 ylabel="paired gain in held-out $R^2$")
+        cx.text(
+            0.03,
+            0.93,
+            f"DE ends at {dx:.0f}% removed for {dy:+.4f} $R^2$;\n"
+            f"L-BFGS-B at {lx:.0f}% for {ly:+.4f}.\n"
+            f"{lx / dx:.1f}× the objective progress, {ly - dy:+.4f} $R^2$.",
+            transform=cx.transAxes,
+            va="top",
+            ha="left",
+            fontsize=F.FS_SMALL,
+            color=F.MUTED,
+            linespacing=1.5,
+        )
+    F.style_axes(
+        cx,
+        title="(c)  what the headroom converts to",
+        xlabel="% of the construction's objective removed",
+        ylabel="paired gain in held-out $R^2$",
+    )
     F.legend(cx, loc="lower right", ncol=1, handlelength=2.0)
 
-    fig.text(0.5, -0.02,
-             "Best-so-far traces, forward-filled onto a common grid and "
-             "median-ed across ten seeds; each seed is normalized by its own "
-             "construction objective, so 1.0 in (a) and (b) is the\nGaussian "
-             "construction and the y axis is scale-free. Hot solid, cold dashed. "
-             "(b) divides the same budget by each method's population, which is "
-             "the only axis on which\n\"generations\" means the same thing for "
-             "two different optimizers — and it shows they are not comparable at "
-             "a fixed evaluation budget. Hollow markers in (c)\nare the full "
-             f"2,000-evaluation endpoint. {H.provenance_note(label)}",
-             ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
-             linespacing=1.6)
+    fig.text(
+        0.5,
+        -0.02,
+        "Best-so-far traces, forward-filled onto a common grid and "
+        "median-ed across ten seeds; each seed is normalized by its own "
+        "construction objective, so 1.0 in (a) and (b) is the\nGaussian "
+        "construction and the y axis is scale-free. Hot solid, cold dashed. "
+        "(b) divides the same budget by each method's population, which is "
+        'the only axis on which\n"generations" means the same thing for '
+        "two different optimizers — and it shows they are not comparable at "
+        "a fixed evaluation budget. Hollow markers in (c)\nare the full "
+        f"2,000-evaluation endpoint. {H.provenance_note(label)}",
+        ha="center",
+        va="top",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.6,
+    )
     fig.tight_layout()
     return fig
 

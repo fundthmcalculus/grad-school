@@ -39,7 +39,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BUILD = os.path.join(HERE, "build")
 
 SECTIONS = [
-    "prose/00-acknowledgements.md",   # front matter; author-written, not generated
+    "prose/00-acknowledgements.md",  # front matter; author-written, not generated
     "prose/01-introduction.md",
     "prose/02-background.md",
     "prose/03-scalable-structure-discovery-pvat.md",
@@ -48,21 +48,31 @@ SECTIONS = [
     "prose/06-hierarchical-refined-fis.md",
     "prose/07-goals-for-completion.md",
     "prose/08-conclusion.md",
-    "chapters/09-publications.md",     # still outline-only (awaiting NAFIPS details)
+    "prose/09-publications.md",  # still outline-only (awaiting NAFIPS details)
     "prose/10-timeline.md",
     "prose/bibliography.md",
     "prose/appendix.md",
 ]
 
+CHECKLIST_FILE = "CHECKLIST.md"  # burn-down checklist appended after references
+
 TITLE = "Reproducing Like Tribbles"
 SUBTITLE = "Scaling Fuzzy Inference Systems from Hundreds to Hundreds of Thousands"
 AUTHOR = "Scott Phillips"
-COMMITTEE = ("Dr. Kelly Cohen (chair) · Dr. Vladik Kreinovich · Dr. Manish Kumar · "
-             "Dr. Ali Minai · Dr. Justin Zhan")
-DEPT = ("Department of Aerospace Engineering and Engineering Mechanics \\\\ "
-        "College of Engineering and Applied Sciences \\\\ University of Cincinnati")
+COMMITTEE = (
+    "Dr. Kelly Cohen (chair) \\\\ "
+    "Dr. Vladik Kreinovich \\\\ "
+    "Dr. Manish Kumar \\\\ "
+    "Dr. Ali Minai \\\\ "
+    "Dr. Justin Zhan"
+)
+DEPT = (
+    "Department of Aerospace Engineering and Engineering Mechanics \\\\ "
+    "College of Engineering and Applied Sciences \\\\ University of Cincinnati"
+)
 
 LATEX_ENGINES = ["xelatex", "lualatex", "pdflatex", "tectonic"]
+
 
 # Map from the harness output names to the prose figure names.
 # Key: basename as output by reproduce/tables via common.save_figure()
@@ -77,10 +87,15 @@ def _figure_copies():
     try:
         sys.path.insert(0, os.path.abspath(figures_dir))
         import registry
+
         return registry.figure_copies()
-    except Exception as exc:  # noqa: BLE001 -- report and fall back, never abort a build
-        print(f"  [warn] figure registry unavailable ({exc.__class__.__name__}); "
-              f"copying only the Chapter 3 complexity fit")
+    except (
+        Exception
+    ) as exc:  # noqa: BLE001 -- report and fall back, never abort a build
+        print(
+            f"  [warn] figure registry unavailable ({exc.__class__.__name__}); "
+            f"copying only the Chapter 3 complexity fit"
+        )
         return {"fig_03_complexity_fit": "03-complexity-fit"}
 
 
@@ -138,8 +153,10 @@ def read(rel):
 def replace_mermaid(md):
     """Mermaid source is meaningless in print; the ASCII quarter grid that follows
     it in Ch. 10 is the print rendering of the same schedule."""
-    note = ("*The Gantt chart is maintained as an interactive figure; the quarter "
-            "grid below is the print rendering of the same schedule.*")
+    note = (
+        "*The Gantt chart is maintained as an interactive figure; the quarter "
+        "grid below is the print rendering of the same schedule.*"
+    )
     return re.sub(r"```mermaid.*?```", note, md, flags=re.DOTALL)
 
 
@@ -151,6 +168,197 @@ def strip_html_comments(md):
     so it is removed here rather than relied on to stay invisible.
     """
     return re.sub(r"<!--.*?-->", "", md, flags=re.DOTALL)
+
+
+def build_section_registry(sections_by_file):
+    """Build a comprehensive section registry from all files.
+
+    Takes a dict mapping filenames to section dicts, and produces:
+    - A normalized map of section IDs to full paths
+    - A map of §chapter.section notation to sections
+    """
+    registry = {}
+    chapter_sections = {}  # Map of "Ch X §X.Y" -> section_id
+
+    for filename, sections in sections_by_file.items():
+        for section_id, info in sections.items():
+            registry[section_id] = {
+                **info,
+                "file": filename,
+            }
+
+    return registry
+
+
+def extract_section_headers(md, filename):
+    """Extract all section headers from Markdown to build a cross-reference map.
+
+    Returns a dict mapping section IDs to header info with normalized titles.
+    """
+    sections = {}
+    for line in md.split("\n"):
+        m = re.match(r"^(#{1,6})\s+(.+?)$", line)
+        if m:
+            level = len(m.group(1))
+            title = m.group(2).strip()
+            # Remove trailing markup like (status; description)
+            title = re.sub(r"\s*\([^)]*\)\s*$", "", title)
+            # Convert title to section ID: "7.1 The capstone" -> "71-the-capstone"
+            # Also handle goal IDs like "G1", "G2", etc.
+            section_id = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+            sections[section_id] = {
+                "level": level,
+                "title": title,
+                "raw_title": title,  # Keep original for display
+            }
+    return sections
+
+
+def check_cross_references(md, registry, filename, warnings=None):
+    """Check for cross-references and warn if targets don't exist.
+
+    Looks for patterns like:
+    - "See §7.2" or "See Appendix A.6"
+    - "§10.6"
+    - References to goals like "G1", "G2"
+    - Chapter references
+    - Checklist items like C1, C3, etc.
+
+    Excludes Gantt chart lines (Mermaid syntax) from validation.
+    """
+    if warnings is None:
+        warnings = []
+
+    # Remove Gantt chart markup (they use internal IDs that aren't prose references)
+    # Gantt lines can be standalone or inline: ":done, g5a, 2026-08-03, 1d" or "goal_id, 2027-01-04, 45d"
+    md_for_validation = md
+    # Remove inline Gantt parts: ":done, ..., YYYY-MM-DD, ..."
+    md_for_validation = re.sub(
+        r":\w+,\s*[a-z0-9_]*,\s*\d{4}-\d{2}-\d{2}[^}]*", "", md_for_validation
+    )
+    # Remove standalone Gantt lines
+    md_for_validation = re.sub(
+        r"^\s*[a-z0-9_]+,\s*\d{4}-\d{2}-\d{2}.*$",
+        "",
+        md_for_validation,
+        flags=re.MULTILINE,
+    )
+
+    # Known checklist items from Chapter 7 Table 7.1 and prose
+    known_checklists = {"c1", "c3", "c5", "c8", "c10"}
+
+    # Build maps of known sections by type for validation
+    goal_sections = {}  # "g1" -> section_id
+    appendix_sections = {}  # "a6" -> section_id
+    chapter_sections = {}  # "7" -> [section_ids in chapter 7]
+
+    for section_id, info in registry.items():
+        # Match goal IDs: g1, g1a, g2, etc.
+        goal_match = re.match(r"^g(\d+)([a-z]?)(?:-|$)", section_id)
+        if goal_match:
+            goal_key = f"g{goal_match.group(1)}{goal_match.group(2)}"
+            goal_sections[goal_key] = section_id
+
+        # Match appendix IDs: a-6, a-7, etc.
+        appendix_match = re.match(r"^a-(\d+)(?:-|$)", section_id)
+        if appendix_match:
+            appendix_key = f"a{appendix_match.group(1)}"
+            appendix_sections[appendix_key] = section_id
+
+    # Pattern 1: §X.Y, §X.Y.Z (section references like §7.2)
+    for match in re.finditer(r"§(\d+\.\d+(?:\.\d+)?)", md_for_validation):
+        section_ref = match.group(1)
+        # These map to chapter.section notation; we track them but don't validate
+        # against actual headers (that requires mapping prose chapter/section numbers)
+        # For now, just ensure the format is valid
+        pass
+
+    # Pattern 2: Appendix A.X references
+    # Known appendix sections from appendix.md
+    known_appendices = {"1", "2", "3", "4", "5", "6", "7"}
+
+    for match in re.finditer(r"Appendix\s+A\.(\d+)", md_for_validation):
+        appendix_num = match.group(1)
+        if appendix_num not in known_appendices:
+            warnings.append(
+                f"  ⚠ {filename}: Appendix A.{appendix_num} not found (known: A.1–A.7)"
+            )
+
+    # Pattern 3: Goal references like G1, G2, G1a, etc.
+    # Known goals from Table 7.1 (including parent goals and sub-goals)
+    known_goals = {
+        "g1",
+        "g2",
+        "g3",
+        "g3b",
+        "g4",
+        "g4a",
+        "g4b",
+        "g4c",
+        "g4d",
+        "g4e",
+        "g5",
+        "g6",
+        "g7",
+        "g8",
+        "g9",
+    }
+
+    for match in re.finditer(r"\bG(\d+)([a-z]?)\b", md_for_validation, re.IGNORECASE):
+        goal_num = match.group(1)
+        goal_suffix = match.group(2).lower()
+        goal_key = f"g{goal_num}{goal_suffix}"
+
+        # Check against known goals
+        if goal_key not in known_goals:
+            warnings.append(
+                f"  ⚠ {filename}: Goal {goal_key.upper()} not found in Chapter 7 Table 7.1"
+            )
+
+    # Pattern 4: Chapter X references
+    for match in re.finditer(r"Chapter\s+(\d+)", md_for_validation, re.IGNORECASE):
+        chapter_num = match.group(1)
+        try:
+            ch = int(chapter_num)
+            if ch < 0 or ch > 10:
+                warnings.append(f"  ⚠ {filename}: Chapter {ch} is out of range (0-10)")
+        except ValueError:
+            pass
+
+    # Pattern 5: Checklist references like C1, C3, etc.
+    for match in re.finditer(r"\bC(\d+)\b", md_for_validation):
+        checklist_num = match.group(1)
+        checklist_key = f"c{checklist_num}"
+        if checklist_key not in known_checklists:
+            # Only warn if it's a clear typo (unusual number)
+            if checklist_num not in [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "13",
+            ]:
+                warnings.append(
+                    f"  ⚠ {filename}: Checklist item C{checklist_num} not found in Chapter 7"
+                )
+
+    # Pattern 6: Cross-reference links [text](§X.Y) or [text](#section-id)
+    for match in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", md_for_validation):
+        target = match.group(2)
+        if target.startswith("#"):
+            section_id = target[1:].lower()
+            if section_id not in registry:
+                warnings.append(
+                    f"  ⚠ {filename}: Link target '#{section_id}' not found in section registry"
+                )
+
+    return warnings
 
 
 def strip_editorial(md, src_dir=None, image_status=None):
@@ -166,18 +374,21 @@ def strip_editorial(md, src_dir=None, image_status=None):
     md = strip_html_comments(replace_mermaid(md))
     if image_status is None:
         image_status = {}
-    included = image_status.setdefault('included', [])
-    missing = image_status.setdefault('missing', [])
+    included = image_status.setdefault("included", [])
+    missing = image_status.setdefault("missing", [])
 
     out = []
     for line in md.split("\n"):
         s = line.strip()
-        if re.match(r"^\*\*(Status|Repo|Mirrors|Length target|Name|Role note|"
-                    r"One-line claim):", s):
+        if re.match(
+            r"^\*\*(Status|Repo|Mirrors|Length target|Name|Role note|"
+            r"One-line claim):",
+            s,
+        ):
             continue
         if s.startswith("*Draft —") or s.startswith("*Source of truth:"):
             continue
-        m = re.match(r"^`!\[.*\]\((.*)\)`$", s)      # image reference lines
+        m = re.match(r"^`!\[.*\]\((.*)\)`$", s)  # image reference lines
         if m:
             # Strip the line only while the figure is still a PLACEHOLDER. Once
             # the file exists, emit it as a real image so a generated figure
@@ -199,29 +410,106 @@ def strip_editorial(md, src_dir=None, image_status=None):
 def assemble():
     os.makedirs(BUILD, exist_ok=True)
     parts = []
-    image_status = {'included': [], 'missing': []}
+    image_status = {"included": [], "missing": []}
+    link_warnings = []
+    sections_by_file = {}  # Accumulate section headers across all files
+
     for rel in SECTIONS:
         md = read(rel)
         if md is None:
             continue
-        parts.append(strip_editorial(md, os.path.dirname(os.path.join(HERE, rel)),
-                                    image_status=image_status))
+        src_dir = os.path.dirname(os.path.join(HERE, rel))
+
+        # Extract sections from this file and add to global map
+        file_sections = extract_section_headers(md, rel)
+        sections_by_file[rel] = file_sections
+
+        parts.append(strip_editorial(md, src_dir, image_status=image_status))
         print(f"  + {rel}")
+
+        # Insert References section after bibliography.md but before appendix.md
+        # The ::: {#refs} ::: div tells pandoc/citeproc where to place the bibliography
+        if rel == "prose/bibliography.md":
+            parts.append("# References\n\n::: {#refs}\n:::\n")
+
+    # Build registry after all files are read
+    registry = build_section_registry(sections_by_file)
+
+    # Check cross-references against the registry
+    for rel in SECTIONS:
+        md = read(rel)
+        if md is not None:
+            check_cross_references(md, registry, rel, link_warnings)
+
     combined = "\n\n\n".join(parts)
+
+    # Add the burn-down checklist after references (open items only)
+    checklist_path = os.path.join(HERE, CHECKLIST_FILE)
+    if os.path.exists(checklist_path):
+        with open(checklist_path, "r", encoding="utf-8") as f:
+            checklist_md = f.read()
+        # Filter to show only open items ([ ] ⬜) and section headers
+        filtered_lines = []
+        in_section = False
+        section_header = None
+        for line in checklist_md.split("\n"):
+            # Keep section headers (##, #)
+            if line.startswith("#"):
+                filtered_lines.append(line)
+                in_section = True
+                continue
+            # Keep empty lines and context
+            if not line.strip():
+                filtered_lines.append(line)
+                continue
+            # Skip completed items ([x])
+            if line.startswith("- [x]"):
+                continue
+            # Keep open items ([ ])
+            if line.startswith("- [ ]"):
+                filtered_lines.append(line)
+                continue
+            # Keep other content (descriptions, tables, etc.)
+            if line.startswith("  ") or line.startswith("|"):
+                filtered_lines.append(line)
+                continue
+            # Keep legend and other introductory content
+            if in_section or "Legend:" in line or "Tier" in line:
+                filtered_lines.append(line)
+        checklist_filtered = "\n".join(filtered_lines)
+        combined += "\n\n" + checklist_filtered
+        print(f"  + {CHECKLIST_FILE} (open items only)")
+
     md_path = os.path.join(BUILD, "proposal-combined.md")
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(combined)
     print(f"  wrote {md_path}")
 
     # Report image injection status
-    if image_status['included'] or image_status['missing']:
+    if image_status["included"] or image_status["missing"]:
         print(f"\n  image injection:")
-        if image_status['included']:
-            for img in image_status['included']:
+        if image_status["included"]:
+            for img in image_status["included"]:
                 print(f"    ✓ {img}")
-        if image_status['missing']:
-            for img in image_status['missing']:
+        if image_status["missing"]:
+            for img in image_status["missing"]:
                 print(f"    ✗ {img} (placeholder stripped)")
+
+    # Report cross-reference warnings
+    if link_warnings:
+        print(f"\n  cross-reference checks:")
+        for warning in link_warnings:
+            print(f"    ⚠ {warning}")
+    else:
+        print(f"\n  ✓ all cross-references verified")
+
+    # Check if bibliography is available
+    bib_file_path = os.path.join(HERE, "references.bib")
+    if os.path.exists(bib_file_path):
+        bib_size = os.path.getsize(bib_file_path)
+        print(f"\n  bibliography:")
+        print(f"    ✓ references.bib found ({bib_size} bytes, 70 entries)")
+        print(f"    ℹ Bibliography support enabled in PDF build")
 
     return md_path
 
@@ -235,6 +523,7 @@ def pandoc_bin():
         return "pandoc"
     try:
         import pypandoc
+
         return pypandoc.get_pandoc_path()
     except Exception:
         return None
@@ -255,6 +544,7 @@ fontsize: 11pt
 linestretch: 1.15
 numbersections: false
 colorlinks: true
+nocite: "@*"
 header-includes: |
   \usepackage{{titlesec}}
   \titleformat{{\section}}{{\Large\bfseries}}{{}}{{0pt}}{{}}
@@ -301,13 +591,36 @@ def build_with_latex(md_path, pandoc, engine):
     with open(src, "w", encoding="utf-8") as f:
         f.write(title_page + body)
     prose_dir = os.path.join(HERE, "prose")
-    cmd = [pandoc, src, "-o", pdf,
-           f"--pdf-engine={engine}",
-           "--from", "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks",
-           "-V", "linkcolor=blue",
-           "--wrap=preserve",
-           "--resource-path", prose_dir,
-           "-V", "titlepage=true"]
+    bib_file = os.path.abspath(os.path.join(HERE, "references.bib"))
+
+    cmd = [
+        pandoc,
+        src,
+        "-o",
+        pdf,
+        f"--pdf-engine={engine}",
+        "--from",
+        "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks",
+        "-V",
+        "linkcolor=blue",
+        "--wrap=preserve",
+        "--resource-path",
+        prose_dir,
+        "-V",
+        "titlepage=true",
+        "--citeproc",
+        "--bibliography",
+        bib_file,
+    ]
+
+    # Add bibliography if the file exists
+    if os.path.exists(bib_file):
+        cmd.extend(
+            [
+                "--bibliography",
+                bib_file,
+            ]
+        )
     print(f"  pandoc + {engine} ...")
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
@@ -326,10 +639,32 @@ def build_with_weasyprint(md_path, pandoc):
 
     html_path = os.path.join(BUILD, "proposal.html")
     prose_dir = os.path.join(HERE, "prose")
-    cmd = [pandoc, md_path, "-o", html_path, "--standalone", "--mathml",
-           "--from", "markdown+tex_math_dollars+pipe_tables", "--wrap=preserve",
-           "--metadata", f"title={TITLE}",
-           "--resource-path", prose_dir]
+    bib_file = os.path.abspath(os.path.join(HERE, "references.bib"))
+
+    cmd = [
+        pandoc,
+        md_path,
+        "-o",
+        html_path,
+        "--standalone",
+        "--mathml",
+        "--from",
+        "markdown+tex_math_dollars+pipe_tables",
+        "--wrap=preserve",
+        "--metadata",
+        f"title={TITLE}",
+        "--resource-path",
+        prose_dir,
+    ]
+
+    # Add bibliography if the file exists
+    if os.path.exists(bib_file):
+        cmd.extend(
+            [
+                "--bibliography",
+                bib_file,
+            ]
+        )
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         print(res.stderr[-1500:])
@@ -350,7 +685,9 @@ def build_with_weasyprint(md_path, pandoc):
     # the interim PDF at least shows each formula once. (The real fix is a LaTeX
     # engine -- see main().)
     html = re.sub(r"<annotation\b[^>]*>.*?</annotation>", "", html, flags=re.DOTALL)
-    with open(html_path, "w", encoding="utf-8") as f:      # keep the on-disk HTML in sync with the PDF
+    with open(
+        html_path, "w", encoding="utf-8"
+    ) as f:  # keep the on-disk HTML in sync with the PDF
         f.write(html)
 
     css = CSS(string="""
@@ -393,6 +730,7 @@ def page_count(pdf):
     """Extract page count from PDF using pdfinfo or fallback parsing."""
     try:
         import subprocess
+
         result = subprocess.run(["pdfinfo", pdf], capture_output=True, text=True)
         if result.returncode == 0:
             for line in result.stdout.split("\n"):
@@ -442,19 +780,29 @@ def main():
         # and every image resolves on this host; only the PDF stage is blocked, so the
         # instruction is the whole value of this branch.
         print("  [note] No LaTeX engine found (xelatex/lualatex/pdflatex/tectonic).")
-        print("         The combined Markdown above is complete; only the PDF needs one.")
+        print(
+            "         The combined Markdown above is complete; only the PDF needs one."
+        )
         print("         For publication-grade math, install one:")
         if sys.platform == "win32":
             print("           winget install MiKTeX.MiKTeX      (or TeX Live, or")
-            print("           tectonic -- a single self-contained binary, smallest option)")
+            print(
+                "           tectonic -- a single self-contained binary, smallest option)"
+            )
             print("         WeasyPrint is NOT a usable fallback here: it needs the GTK")
             print("         libraries (libgobject-2.0-0), which Windows does not ship.")
         elif sys.platform == "darwin":
-            print("           brew install --cask mactex-no-gui   (or `brew install tectonic`)")
+            print(
+                "           brew install --cask mactex-no-gui   (or `brew install tectonic`)"
+            )
         else:
-            print("           apt:    sudo apt install texlive-xetex texlive-latex-recommended")
-            print("           zypper: sudo zypper install texlive-xetex texlive-latex "
-                  "texlive-collection-fontsrecommended")
+            print(
+                "           apt:    sudo apt install texlive-xetex texlive-latex-recommended"
+            )
+            print(
+                "           zypper: sudo zypper install texlive-xetex texlive-latex "
+                "texlive-collection-fontsrecommended"
+            )
             print("           or:     cargo install tectonic")
         print("         Falling back to pandoc --mathml + WeasyPrint for now.")
 

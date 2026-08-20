@@ -9,20 +9,18 @@ f64 = np.float64
 af64 = NDArray[f64]
 
 
-def plot_all_the_things(
-    x, y, z_true: af64, z_approx: af64, x_mu: af64, y_mu: af64
-):
+def plot_all_the_things(x, y, z_true: af64, z_approx: af64, x_mu: af64, y_mu: af64):
     # Plot the membership functions
     fig = plt.figure()
     plt.subplot(2, 2, 1)
     for ij in range(x_mu.shape[1]):
-        plt.plot(x[0,:],x_mu[:,ij], label=f'Mu-X-{ij}')
+        plt.plot(x[0, :], x_mu[:, ij], label=f"Mu-X-{ij}")
     plt.title("Membership Functions-X")
     plt.ylabel("mu")
     plt.xlabel("x")
     plt.subplot(2, 2, 2)
     for ij in range(y_mu.shape[1]):
-        plt.plot(y[:,0],y_mu[:,ij], label=f'Mu-Y-{ij}')
+        plt.plot(y[:, 0], y_mu[:, ij], label=f"Mu-Y-{ij}")
     plt.title("Membership Functions-Y")
     plt.ylabel("mu")
     plt.xlabel("y")
@@ -50,7 +48,7 @@ def mu_poly(x: af64, a: float, b: float) -> af64:
 
 
 def expsq(x: af64, a: f64, b: f64) -> af64:
-    return np.exp(-((x-a)/b)**2.0)
+    return np.exp(-(((x - a) / b) ** 2.0))
 
 
 def mu_poly_set(s: af64, mu_a: af64, mu_b: af64) -> af64:
@@ -78,6 +76,7 @@ def fuzzy_or(x: af64, y: af64) -> af64:
     # return np.max([x, y], axis=0)
     return x + y - x * y
 
+
 def fuzzy_and(x: af64, y: af64) -> af64:
     # return np.min([x, y], axis=0)
     return x * y
@@ -102,9 +101,7 @@ def eval_rule(rule: af64, mu_x: af64, mu_y: af64, s: af64):
     return r_eval, z_eval
 
 
-def eval_rules(
-    rules: af64, mu_x: af64, mu_y: af64, s: af64
-) -> af64:
+def eval_rules(rules: af64, mu_x: af64, mu_y: af64, s: af64) -> af64:
     n_rules = rules.shape[0]
     sum_R = 0.0
     sum_ZR = 0.0
@@ -115,7 +112,7 @@ def eval_rules(
     return sum_ZR / sum_R
 
 
-def compute_fuzzy_system(x: af64, pts: af64, n_mu: int)-> tuple[f64, af64]:
+def compute_fuzzy_system(x: af64, pts: af64, n_mu: int) -> tuple[f64, af64]:
     mu_x, mu_y = extract_mu_from_args(n_mu, pts, x)
     # Do the rules in order
     rule_idx = 0
@@ -131,14 +128,14 @@ def compute_fuzzy_system(x: af64, pts: af64, n_mu: int)-> tuple[f64, af64]:
             # NOTE - This is magic!
             r_eval_and = fuzzy_and(mu_x[:, ix], mu_y[:, iy])
             # Exclude the third column we don't include the output.
-            z_eval = tsk_rule(pts[:,0:2], x[arg_rule_idx+1:arg_rule_idx+4])
+            z_eval = tsk_rule(pts[:, 0:2], x[arg_rule_idx + 1 : arg_rule_idx + 4])
             r_eval_or = fuzzy_or(mu_x[:, ix], mu_y[:, iy])
-            r_eval = (1-and_c)*r_eval_or+and_c*r_eval_and
+            r_eval = (1 - and_c) * r_eval_or + and_c * r_eval_and
             # Fuzzify!
             sum_R += r_eval
-            sum_ZR += r_eval*z_eval
+            sum_ZR += r_eval * z_eval
 
-            rule_idx+=1
+            rule_idx += 1
 
     # Weighted defuzzy!
     z_defuzzy = sum_ZR / sum_R
@@ -148,10 +145,10 @@ def compute_fuzzy_system(x: af64, pts: af64, n_mu: int)-> tuple[f64, af64]:
 
 
 def extract_mu_from_args(n_mu, pts, x):
-    mu_x_a = x[0:2 * n_mu:2]
-    mu_x_b = x[1:2 * n_mu:2]
-    mu_y_a = x[2 * n_mu:4 * n_mu:2]
-    mu_y_b = x[2 * n_mu + 1:4 * n_mu:2]
+    mu_x_a = x[0 : 2 * n_mu : 2]
+    mu_x_b = x[1 : 2 * n_mu : 2]
+    mu_y_a = x[2 * n_mu : 4 * n_mu : 2]
+    mu_y_b = x[2 * n_mu + 1 : 4 * n_mu : 2]
     mu_x = mu_poly_set(pts[:, 0], mu_x_a, mu_x_b)
     mu_y = mu_poly_set(pts[:, 1], mu_y_a, mu_y_b)
     return mu_x, mu_y
@@ -167,22 +164,18 @@ def aco_optimize(pts: af64, n_mu: int, n_rules: int):
 
     aco_variables = []
     for i in range(n_mu):
-        aco_variables.extend([
-            AcoContinuousVariable(
-                f"mu_x{i}-a", x_min, x_max, x_min + i * dx / 2.0
-            ),
-            AcoContinuousVariable(
-                f"mu_x{i}-b", 0.01, 2*dx,0.05
-            )]
+        aco_variables.extend(
+            [
+                AcoContinuousVariable(f"mu_x{i}-a", x_min, x_max, x_min + i * dx / 2.0),
+                AcoContinuousVariable(f"mu_x{i}-b", 0.01, 2 * dx, 0.05),
+            ]
         )
     for i in range(n_mu):
-        aco_variables.extend([
-            AcoContinuousVariable(
-                f"mu_y{i}-a", y_min, y_max, y_min + i * dy / 2.0
-            ),
-            AcoContinuousVariable(
-                f"mu_y{i}-b", 0.01, 2*dy,0.05
-            )]
+        aco_variables.extend(
+            [
+                AcoContinuousVariable(f"mu_y{i}-a", y_min, y_max, y_min + i * dy / 2.0),
+                AcoContinuousVariable(f"mu_y{i}-b", 0.01, 2 * dy, 0.05),
+            ]
         )
 
     for k in range(n_rules):
@@ -211,7 +204,7 @@ def main():
     # Solve for the optimal system!
     n_mu = 2
     n_vars = 2
-    n_rules = n_mu ** n_vars
+    n_rules = n_mu**n_vars
     # NOTE - full-factorial on rules is bad in general!
 
     best_soln, soln_history = aco_optimize(pts_train, n_mu, n_rules)
@@ -223,7 +216,11 @@ def main():
     # Reshape into the 2D array
     z_defuzzy = z_defuzzy.reshape(X.shape)
     # Plot using plotly
-    mu_x_plot, mu_y_plot = extract_mu_from_args(n_mu, np.hstack((np.reshape(x,(len(X),1)), np.reshape(y,(len(X),1)))), best_soln)
+    mu_x_plot, mu_y_plot = extract_mu_from_args(
+        n_mu,
+        np.hstack((np.reshape(x, (len(X), 1)), np.reshape(y, (len(X), 1)))),
+        best_soln,
+    )
     plot_all_the_things(X, Y, Z, z_defuzzy, mu_x_plot, mu_y_plot)
 
 

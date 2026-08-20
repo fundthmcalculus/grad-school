@@ -137,10 +137,13 @@ def test_ackley(x: np.array) -> np.float64:
     )
 
 
-def print_optimal_solution(x: np.ndarray, variables: list[AcoContinuousVariable]) -> None:
+def print_optimal_solution(
+    x: np.ndarray, variables: list[AcoContinuousVariable]
+) -> None:
     print("Optimal solution:")
     for ij, var in enumerate(variables):
         print(f"{var.name}: {x[ij]}")
+
 
 # TODO - Make this an overload / subclasses?
 def solve_gradiant(
@@ -165,7 +168,7 @@ def solve_aco(
     q: float = 1.0,
     joblib_prefer: str = "processes",
     joblib_n_procs: int = -1,
-    step_explore: bool = False
+    step_explore: bool = False,
 ) -> tuple[np.array, np.array]:
     if solution_archive_size < 0:
         solution_archive_size = len(variables) * 2
@@ -218,7 +221,7 @@ def solve_aco(
                 rng,
                 solution_archive,
                 variables,
-                step_explore
+                step_explore,
             )
             for job in range(n_jobs)
         )
@@ -307,6 +310,7 @@ def run_ants(
         # Step around and find something better?
         if step_explore:
             x0 = new_solution[cv_selector]
+
             def cv_only_fcn(x):
                 new_grad_soln = new_solution.copy()
                 new_grad_soln[cv_selector] = x

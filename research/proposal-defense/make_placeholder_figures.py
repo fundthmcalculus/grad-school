@@ -61,21 +61,39 @@ def make_placeholder(name: str, title: str, path: Path) -> bool:
 
     # Try to use a nice font, fall back to default
     try:
-        title_font = ImageFont.truetype("/usr/share/fonts/liberation/LiberationSans-Bold.ttf", 24)
-        label_font = ImageFont.truetype("/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 14)
+        title_font = ImageFont.truetype(
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf", 24
+        )
+        label_font = ImageFont.truetype(
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 14
+        )
     except OSError:
         title_font = ImageFont.load_default()
         label_font = ImageFont.load_default()
 
     # Draw border
-    draw.rectangle([(10, 10), (width - 10, height - 10)], outline=(200, 200, 200), width=2)
+    draw.rectangle(
+        [(10, 10), (width - 10, height - 10)], outline=(200, 200, 200), width=2
+    )
 
     # Draw title
     draw.text((width // 2, 40), title, fill=(80, 80, 80), font=title_font, anchor="mm")
 
     # Draw label
-    draw.text((width // 2, height // 2), "[Placeholder figure]", fill=(150, 150, 150), font=label_font, anchor="mm")
-    draw.text((width // 2, height // 2 + 30), f"File: {path.name}", fill=(180, 180, 180), font=label_font, anchor="mm")
+    draw.text(
+        (width // 2, height // 2),
+        "[Placeholder figure]",
+        fill=(150, 150, 150),
+        font=label_font,
+        anchor="mm",
+    )
+    draw.text(
+        (width // 2, height // 2 + 30),
+        f"File: {path.name}",
+        fill=(180, 180, 180),
+        font=label_font,
+        anchor="mm",
+    )
 
     path.parent.mkdir(parents=True, exist_ok=True)
     img.save(path, "PNG")
@@ -128,7 +146,9 @@ def main():
 
     print(f"\nCreated {created}, skipped {skipped}")
     if created > 0:
-        print(f"\nRun 'python research/proposal-defense/build_pdf.py' to rebuild the PDF")
+        print(
+            f"\nRun 'python research/proposal-defense/build_pdf.py' to rebuild the PDF"
+        )
         print("and check the image injection diagnostics.")
     return 0
 

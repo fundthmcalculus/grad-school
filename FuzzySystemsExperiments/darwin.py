@@ -35,7 +35,9 @@ def main():
     print(f"Number of unique values in y: {n_unique}")
 
     # Split dataset into train/test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.1, random_state=42, stratify=y
+    )
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # Initialize and fit the Gaussian Mixture Classifier
@@ -46,7 +48,15 @@ def main():
     gaussian_memberships = clf.model_
 
     # Create the actual fuzzy model and predict on test set
-    report_figures_of_merit(X_test, y_test, gaussian_memberships, n_unique, start_time, top_n_todo, label="test")
+    report_figures_of_merit(
+        X_test,
+        y_test,
+        gaussian_memberships,
+        n_unique,
+        start_time,
+        top_n_todo,
+        label="test",
+    )
 
     # Comparison baseline: a Random Forest classifier on the same split.
     print("\nFitting RandomForest classifier (comparison baseline)...")

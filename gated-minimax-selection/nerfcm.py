@@ -45,16 +45,16 @@ def nerfcm(D, c, m=2.0, max_iter=100, tol=1e-5, seed=0, verbose=False):
 
     def relational_update(U, Dbeta):
         """One RFCM relational update; returns new distances d (c,n) and new V."""
-        Um = U ** m                       # (c,n)
+        Um = U**m  # (c,n)
         # v_i = Um_i / sum(Um_i)  (relational "membership vector" per cluster)
-        denom = Um.sum(axis=1, keepdims=True)          # (c,1)
-        V = Um / denom                                  # (c,n), each row sums to 1
+        denom = Um.sum(axis=1, keepdims=True)  # (c,1)
+        V = Um / denom  # (c,n), each row sums to 1
 
         # d_ik = (D v_i)_k - 0.5 * v_i^T D v_i
         d = np.zeros((c, n))
         for i in range(c):
-            vi = V[i]                                   # (n,)
-            Dv = Dbeta @ vi                             # (n,)
+            vi = V[i]  # (n,)
+            Dv = Dbeta @ vi  # (n,)
             quad = 0.5 * (vi @ Dv)
             d[i] = Dv - quad
         return d, V
@@ -73,7 +73,7 @@ def nerfcm(D, c, m=2.0, max_iter=100, tol=1e-5, seed=0, verbose=False):
             deltas = []
             for i in range(c):
                 vi = V[i]
-                factor = 1.0 - 0.5 * np.sum(vi ** 2)
+                factor = 1.0 - 0.5 * np.sum(vi**2)
                 factor = max(factor, 1e-9)
                 neg = d[i][d[i] < 0]
                 if len(neg) > 0:
@@ -91,7 +91,7 @@ def nerfcm(D, c, m=2.0, max_iter=100, tol=1e-5, seed=0, verbose=False):
         Unew = np.zeros((c, n))
         for k in range(n):
             dk = d[:, k]
-            ratios = (dk[:, None] / dk[None, :]) ** power   # (c,c)
+            ratios = (dk[:, None] / dk[None, :]) ** power  # (c,c)
             Unew[:, k] = 1.0 / ratios.sum(axis=1)
         Unew /= Unew.sum(axis=0, keepdims=True)
 

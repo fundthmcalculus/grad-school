@@ -10,6 +10,7 @@ from tribblefis.gauss_math import (
     create_gaussian_membership_dict,
     take_top_features,
 )
+
 # tribble-fis PR #67 deleted gauss_math.detect_and_apply_log_transform and
 # .standard_transform. UnitScalar is standard_transform's behaviour-preserving
 # successor -- despite the name, standard_transform min-max scaled to [0,1], it
@@ -57,7 +58,9 @@ def main():
 
     y_raw = pd.Series(
         UnitScalar(log_dynamic_range=None).fit_transform(y_raw.to_frame()).ravel(),
-        index=y_raw.index, name=y_raw.name)
+        index=y_raw.index,
+        name=y_raw.name,
+    )
 
     n_output_buckets: int = 3
     n_top_vars: int = -1
@@ -65,11 +68,13 @@ def main():
     # Phase 2 antecedent refinement (default path). Each order's Gaussian
     # (mu, sigma) are tuned for that order via local L-BFGS-B; consequents are the
     # closed-form ridge solve at basis="raw", l2=refine_l2, all cross terms.
-    b_refine_antecedents: bool = True     # local (L-BFGS-B) tuning of the Gaussian (mu, sigma)
-    refine_l2: float = 1e-2               # ridge on correction terms (constants unpenalized)
+    b_refine_antecedents: bool = (
+        True  # local (L-BFGS-B) tuning of the Gaussian (mu, sigma)
+    )
+    refine_l2: float = 1e-2  # ridge on correction terms (constants unpenalized)
     # Phase 1 consequent-only path (used when b_refine_antecedents is False):
-    b_sparse_interactions: bool = True    # LassoCV-select cross terms for full-2nd
-    b_cv_hyperparams: bool = True         # CV-select the consequent (order, basis, l2)
+    b_sparse_interactions: bool = True  # LassoCV-select cross terms for full-2nd
+    b_cv_hyperparams: bool = True  # CV-select the consequent (order, basis, l2)
 
     if n_top_vars <= 0 or n_top_vars > len(X.columns):
         n_top_vars = len(X.columns)
@@ -86,20 +91,29 @@ def main():
         print(f"Auto-detected log transform for: {log_transformed_features}")
 
     # Split dataset into train/test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # Calculate correlation coefficient between Gaussian distributions using training data
-    feature_differentiators = calculate_gaussian_correlation(X_train, y_train["y_bucket"])
+    feature_differentiators = calculate_gaussian_correlation(
+        X_train, y_train["y_bucket"]
+    )
 
     # Take the top-n variables so that the normalized differentiation value encompasses 90-95%
     top_n, top_n_todo = take_top_features(feature_differentiators, top_n=n_top_vars)
 
-    print(f"Selected Top-{top_n} Variables ({top_n/len(feature_differentiators):.2%} coverage):")
+    print(
+        f"Selected Top-{top_n} Variables ({top_n/len(feature_differentiators):.2%} coverage):"
+    )
 
     # Compute memberships using training data
     gaussian_memberships = create_gaussian_membership_dict(
-        X_train, y_train["y_bucket"], top_n_var_names=top_n_todo, n_gaussians=n_gaussians
+        X_train,
+        y_train["y_bucket"],
+        top_n_var_names=top_n_todo,
+        n_gaussians=n_gaussians,
     )
 
     duplicates = gaussian_memberships.identify_duplicate_membership_fcns()
@@ -127,7 +141,13 @@ def main():
     print("=" * 80)
 
     orders = ["0th", "1st", "2nd", "full-2nd", "3rd"]
-    order_labels = ["0 Optimized", "1 Optimized", "2 Optimized", "2-full Optimized", "3 Optimized"]
+    order_labels = [
+        "0 Optimized",
+        "1 Optimized",
+        "2 Optimized",
+        "2-full Optimized",
+        "3 Optimized",
+    ]
 
     r2_list, rmse_list, pred_list = [], [], []
     for order, label in zip(orders, order_labels):
@@ -140,31 +160,60 @@ def main():
             # sequence, which scales to these larger models far better than a single
             # high-dimensional L-BFGS-B solve. All cross terms, matched eval config.
             model_o, _ = refine_antecedents_coordinate(
-                gaussian_memberships, X_train, y_train, top_n_todo,
-                n_output_buckets=n_output_buckets, order=order,
-                l2_reg=l2, basis=basis, cross_pairs=pairs,
+                gaussian_memberships,
+                X_train,
+                y_train,
+                top_n_todo,
+                n_output_buckets=n_output_buckets,
+                order=order,
+                l2_reg=l2,
+                basis=basis,
+                cross_pairs=pairs,
             )
         elif b_cv_hyperparams and order != "0th":
             # Phase 1 path: CV-select the consequent (basis, l2); sparse full-2nd.
-            pairs = (select_interaction_terms(X_train, top_n_todo, y_train, y_bucket_mean)
-                     if (b_sparse_interactions and order == "full-2nd") else None)
+            pairs = (
+                select_interaction_terms(X_train, top_n_todo, y_train, y_bucket_mean)
+                if (b_sparse_interactions and order == "full-2nd")
+                else None
+            )
             sel = select_consequent_hyperparams(
-                X_train, gaussian_memberships, top_n_todo, y_bucket_mean, y_train,
+                X_train,
+                gaussian_memberships,
+                top_n_todo,
+                y_bucket_mean,
+                y_train,
                 n_output_buckets=n_output_buckets,
-                candidate_orders=(order,), candidate_bases=("raw", "orthogonal"),
+                candidate_orders=(order,),
+                candidate_bases=("raw", "orthogonal"),
             )
             basis, l2 = sel["basis"], sel["l2_reg"]
 
         corr_terms, y_bucket_mean_opt = solve_tsk_consequents(
-            X_train, model_o, top_n_todo, y_bucket_mean, y_train,
-            n_output_buckets=n_output_buckets, order=order,
-            l2_reg=l2, basis=basis, cross_pairs=pairs,
+            X_train,
+            model_o,
+            top_n_todo,
+            y_bucket_mean,
+            y_train,
+            n_output_buckets=n_output_buckets,
+            order=order,
+            l2_reg=l2,
+            basis=basis,
+            cross_pairs=pairs,
         )
         y_test_pred = predict_tsk(
-            X_test, model_o, top_n_todo, y_bucket_mean_opt, corr_terms,
-            order=order, basis=basis, cross_pairs=pairs,
+            X_test,
+            model_o,
+            top_n_todo,
+            y_bucket_mean_opt,
+            corr_terms,
+            order=order,
+            basis=basis,
+            cross_pairs=pairs,
         )
-        r2, rmse = report_regression_performance(start_time, y_test, y_test_pred, n_order=label)
+        r2, rmse = report_regression_performance(
+            start_time, y_test, y_test_pred, n_order=label
+        )
         r2_list.append(r2)
         rmse_list.append(rmse)
         pred_list.append(y_test_pred)

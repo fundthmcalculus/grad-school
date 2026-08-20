@@ -1,0 +1,4 @@
+Dataset,NERFCM given k (ARI),select_coverage_cover (ARI),select_multiscale (best-band ARI),single-linkage given k (ARI),beta-plateau (ARI),Decision-rule gap
+"ECG5000 (N=5000, k_true=5)",0.593 ± 0.044,"0.715 (k=25, cov=0.94)",0.715 (bands=[25]),0.000,"0.716 (k=23, cov=0.95)","gap=0.122, within 0.05: no"
+"Crop (N=24000, k_true=24)",0.029 ± 0.009,"0.064 (k=671, cov=0.62)",0.064 (bands=[671]),0.000,"0.006 (k=378, cov=0.77)","gap=0.034, within 0.05: yes"
+"FordA (N=4921, k_true=2)",0.000 ± 0.000,"0.002 (k=18, cov=0.59)",0.002 (bands=[18]),-0.000,"0.001 (k=14, cov=0.61)","gap=0.001, within 0.05: yes (degenerate -- all methods ~0)"

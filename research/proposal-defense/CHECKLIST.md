@@ -3,25 +3,40 @@
 Shared working list — merged 2026-08-04 from the former `ACTION_ITEMS.md` and `CHECKLIST.md`
 into one document, since the two had grown into near-duplicates of each other with
 inconsistent bookkeeping (miscounted table totals, a stale bibliography tally) between them.
+Consolidated with timeline information from `NEXT_STEPS.md` on 2026-08-08.
+
 Tick items as they land; each has enough context to start cold. IDs (A1, B6, C1, D2, E7, …)
 are load-bearing — several are cited by ID from the prose chapters (e.g. Ch 7 §7 cites
 **C1**, Ch 6 §6.4 cites **C9**, Ch 9 cites **D2**/**E8**/**E2b**) — so numbering is stable
 across edits; a retired item keeps its ID rather than freeing it for reuse.
 
-Companion docs: [`REVIEW_2026-08-02.md`](REVIEW_2026-08-02.md) (what was found and why,
-dated snapshot — not updated after the fact), [`NEXT_STEPS.md`](NEXT_STEPS.md) (the
-prioritized plan of record, i.e. *what to do next and in what order*; this file is
-*everything*, in one flat list by category). Chapter 7 §7.5's Table 7.1 is the canonical
+**Proposal defense: December 2026 · Final defense: March 2028.**
+
+Companion doc: [`REVIEW_2026-08-02.md`](REVIEW_2026-08-02.md) (what was found and why,
+dated snapshot — not updated after the fact). Chapter 7 §7.5's Table 7.1 is the canonical
 tracker for the research goals themselves (G1–G9, C1, C3, M5); this file does not duplicate
 that table — items below that correspond to a Chapter 7 goal say so and point at it rather
 than re-describing it.
 
-_Opened 2026-08-02, merged 2026-08-04. Legend: ⬜ open · 🟨 in progress · ✅ done ·
-🚫 descoped · 🔒 blocked on you._
+_Opened 2026-08-02, merged 2026-08-04, consolidated with timeline 2026-08-08._
+**Legend: ⬜ open · 🟨 in progress · ✅ done · 🚫 descoped · 🔒 blocked on you.**
+
+---
+
+## Suggested order (from Tier 0 through Tier 4)
+
+**This week:** A (all settled) → start Tier 1 (cheap/high-value, before defense).
+
+**Before the proposal defense (December 2026):** finish Tier 1 items. Get G4's protocol defined even if not fully executed — every number in the document is reported under it, so the committee will ask.
+
+**After:** Tier 2 (real research, 2027 Q1–Q4, 2028 Q1) in the scheduled order, with **G2 started early** since it has no upstream dependency and is the riskiest to leave late. See G2 appendix below for verified non-coordinate datasets (Crop 24K, ElectricDevices, etc.).
+
+**Tier 3 (defensibility, before submission)** and **Tier 4 (editorial, low stakes)** round it out.
 
 ---
 
 ## A. Author decisions — settled 2026-08-02, one reopened since, one new
+**[Tier 0: all cleared by 2026-08-02]**
 
 _Kept as the record of what was decided and why, since several of these changed the document
 materially and a committee may ask. **A9** is the reopened item (narrowed 2026-08-03); **A10**
@@ -123,6 +138,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       Final defense stays March 2028, so the runway is 15 months as planned.
 
 ## B. Reproducibility infrastructure
+**[Tier 0–2: mix of completed and ongoing infrastructure]**
 
 - [x] ✅ **B1 — Machine specs captured in every archive.** `run_all_tables.sh` writes host, OS,
       kernel, CPU, cores, RAM, governor, boost, GPU, Python into `PROVENANCE.txt`, on backfills too.
@@ -179,11 +195,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       bullet and §3.4's two-hosts note are updated to match. (The 64 GB → 96 GB hardware
       correction — the host is a 32-core i9 with 96 GB RAM, and 64 GB is a self-imposed working
       cap, not a hardware limit — is folded into the same appendix passage and into Table 3.3.)
-- [ ] ⬜ **B5c — Install a PDF renderer on this host.** `build_pdf.py` now assembles all
-      thirteen sections and injects all fifteen figures on Windows (it previously died reading
-      `chapters/09-publications.md` under cp1252), but rendering needs pandoc plus either a
-      LaTeX engine or WeasyPrint's GTK runtime, none of which are present. The combined
-      Markdown builds; the PDF does not. Not a code defect — a machine setup item.
+- [x] ✅ **B5c — Install a PDF renderer on this host.** ✅ DONE (2026-08-08). `build_pdf.py` now renders the PDF; LaTeX engine installed.
 - [x] ⬜ **B6 — Remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
       returns a wrong ordering: it returns the seed vertex followed by every other vertex in
       ascending index order — chance-level agreement (0.001 ± 0.001) with the true ordering at
@@ -191,11 +203,10 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       scalar indices, so `np.sum(np.square(diff))` reduces over *all* candidates and returns
       one scalar; `key[mask] = <scalar>` gives every candidate the same key and the heap pops
       in index order. Nothing in the package calls it. See `REVIEW` ★2.
-- [ ] 🔒 **B9 — Backfill `log_features` into the sample scripts. BLOCKED on `tribble-fis` #73.**
+- [x] ✅ **B9 — Backfill `log_features` into the sample scripts.** ✅ DONE (tribble-fis #73 merged, 2026-08-08).
       The samples were converted onto `UnitFuzzyScalar` (PR #55 here), which auto-detects log
       columns by dynamic range, whereas each sample previously named its own columns. Upstream
-      #73 adds `log_features=[...]`, and once it merges and the gitlink is bumped past it, the
-      lists below restore each sample's original logged set — turning behaviour-*changing*
+      #73 adds `log_features=[...]`, and the lists restore each sample's original logged set — turning behaviour-*changing*
       conversions into behaviour-*preserving* ones.
       **This is not a mechanical sweep. Two files are deliberate exceptions.**
       **`concrete_trapz.py` — do NOT backfill.** *(Author decision, 2026-08-03: "I like the
@@ -240,8 +251,84 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       seed set, and reports what it cannot run rather than substituting a guess. Remaining
       work is the ANFIS/GA-FIS adapters (**C1**) and re-quoting drifted tables as they're found
       (`reproduce/PROVENANCE_MAP.md` is the place that tracks drift), not harness plumbing.
+- [x] ✅ **B12 — Two upstream/harness defects caught and fixed during the 2026-08-11/12 full
+      evaluation pass.** (a) `table_a1_feature_scoring.py` and `_mf_dedup.py` /
+      `table_4_8_mf_dedup.py` both called `tribblefis.gaussian_classifier`'s
+      `MixtureOfGaussiansFuzzyClassifier` / `SequenceClassifier` and
+      `gaussian_regressor.MixtureOfGaussiansFuzzyRegressor`, all three renamed upstream to
+      `TribbleClassifier`, `TribbleSequenceClassifier`, `TribbleRegressor` at the currently
+      pinned `tribble-fis` SHA (`80e98d7`) — both tables were silently failing every run under
+      the current pin until this pass. Fixed, signature-compatible, backfilled at ten seeds.
+      (b) `run_all_tables.sh`'s own archive step hit the exact mid-run-edit failure mode its
+      header already warns about (a concurrent change to the script while it was running
+      shifted byte offsets bash reads incrementally, crashing the PROVENANCE-writing heredoc
+      with a syntax error) — recovered via the script's own documented `--archive-only` path;
+      the numeric phase itself was unaffected. Full account:
+      `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`.
+
+- [ ] ⬜ **B13 — Upstream trapezoid-fitter fix: pin bumped to `141596e`, no proposal table
+      moved, two sample scripts still owed.** `tribble-fis`
+      [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170) fixes a defect in
+      `trapz_math_fast.fit_trapezoids_fast` and lowers its default `n_bins` from 50 to 10.
+      Merged, and the submodule pin moved `058501f` → `141596e` in this same change.
+
+      **Verified before the bump was committed, not assumed.**
+      `reproduce/tables/table_4_1_mog_baselines.py` at ten seeds is byte-identical across the
+      bump — R² 0.808 ± 0.030, 0.867 ± 0.031, 0.965 ± 0.001 and both reference columns
+      unchanged. Only wall-clock moved (0.14 → 0.15 s), which is machine noise. That is the
+      check this item predicted, and it passed.
+
+      **The bump spans 22 upstream commits, not just #170** — the pin was already behind
+      `c27e586`. Two that looked risky and are not: #123 renamed the scaling classes but kept
+      all four old names as aliases bound to the same class objects (`UnitScalar is
+      MinMaxScaler` confirmed), so no import breaks; #138 unified the zero-firing threshold by
+      moving IT2/GT2 onto Type-1's existing `1e-6`, leaving the Type-1 path this repo uses
+      untouched. The table diff is the empirical confirmation of both.
+
+      **The defect.** The fitter set each region's `a` to `bin_edges[start]`, i.e. the minimum
+      of the data it was fitted to, and inset the plateau from there.
+      `TrapezoidMembership.evaluate` rises with a strict inequality (`x > a`), so membership is
+      exactly **0 at `x == a`** — correct for an open trapezoid, and wrong in that combination:
+      the smallest observed value, and everything tied with it, got zero membership from the
+      term fitted to describe it. Under the `min` t-norm one such feature zeroes a rule across
+      every input. On unit-scaled Concrete 55% of rows sit at FlyAsh's minimum, 47% at Slag's
+      and 38% at Superplasticizer's, and **78.6% of held-out rows were covered by no rule at
+      all** — answered with exactly `0.0`, a finite value that passes every non-finite check in
+      the pipeline, so it read as a bad model rather than a broken one. `partition_output`
+      already guards the same hazard on the output side with `edges[0] -= 1e-9`.
+
+      **Scope, checked at the call sites rather than assumed.** The change only reaches callers
+      that take the `trapz_method="fast"` **default**:
+      - **Still owed — the reason this item stays unticked:**
+        `FuzzySystemsExperiments/darwin_comparison.py` (line 113, `member_function="trap"` with
+        no `trapz_method`) and the default-method configs in `darwin_quick_comparison.py`. Both
+        now run against the fixed fitter and should be re-run, with any quoted numbers
+        refreshed. Not done here: neither is wired into `reproduce/`, so neither has an archived
+        output to diff against, and the DARWIN data is not on this host.
+      - **Not affected — no action:** `concrete_trapz.py`, whose `main()` runs only `"gaussian"`
+        and `"trapz"` (the EM fitter); its `"trapz-fast"` branch in `run_model` is never
+        invoked. So the `Trapz 1st 0.692 → 0.815` figures under **B9** above come from the EM
+        path and stand. `darwin_trapz.py` passes `trapz_method="em"` explicitly.
+      - **Not affected — no proposal table touches this path at all:** every table in
+        `reproduce/` uses `member_function="gaussian"`. Verified by grep over
+        `reproduce/tables/`; there is no trapezoid arm in any of them.
+
+      **Expected direction when the pin does move** (Concrete, ten seeds, 5 buckets, 2nd-order
+      consequents, through `solve_tsk_consequents`/`predict_tsk`): the fast trapezoid arm goes
+      from test R² 0.121 with 78.6% of rows uncovered to **0.812** with none, and to **0.839**
+      at the new 10-bin default — from unusable to slightly ahead of the Gaussian arm's 0.831,
+      with roughly half the membership functions. Gaussian numbers are unchanged, so a pin bump
+      should move the trapezoid rows and nothing else; if a Gaussian row moves, something else
+      changed too and the bump is not the explanation.
+
+      Found in `experiments/overlap-modeling` (stage 4);
+      `experiments/overlap-modeling/diagnose_trapz_defect.py` regenerates the three
+      measurements above, and `experiments/overlap-modeling/RESULTS.md` §"Stage 4" is the full
+      account.
+
 
 ## C. Experiments owed
+**[Tier 1: critical before defense (C1, C4). Tier 2: real research (C2–C3, C5–C6, C8–C11–C13). Tier 3: defensive (C5–C6, C8). Tier 1.5: reduced scope (C4 done). Tier 4 (C7 descoped)]**
 
 - [ ] ⬜ **C1 — ANFIS and GA-tuned-FIS baselines** (Ch 4, Table 4.5). **The single most
       important experiment in the backlog**: the title, Ch 1, Ch 7 and Ch 8 all claim *orders
@@ -261,37 +348,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       $t = c \cdot N^2 \log N$ beside the free exponent would settle it, and is the remaining
       work — tracked in Chapter 7 under G4a. Stage two fits **1.93–1.97**, which does confirm
       the quadratic claim it is making.
-- [ ] ⬜ **C2b — RESCOPED: the ~10 ms fixed cost is a property of the laptop, not the kernel.**
-      It does not reproduce on the workstation. Across **five** independent measurements there
-      (`full-14900hx-2026-08-02`, its backfill, three manual repeats, `full-14900hx-r2`) stage
-      two is monotone in N — 0.5 ms at N=750 rising smoothly to 8.4 ms at N=3,000, against the
-      8–15 ms *flat* band described below — and it beats stage one by **8.1–17.7× at every
-      size**, including 17.3× in the 750–1,250 band said to collapse to parity. The fitted
-      exponent is **1.93–1.97** here against the laptop's 2.12/2.13, i.e. a cleaner
-      confirmation of the quadratic claim, since the plateau was contaminating that fit — the
-      chapter already calls 2.12 "right for the wrong reason".
-      **The question to answer is now "why did the laptop have it", not "what is it".** The
-      OpenMP-parallel-region hypothesis is *weakened*: thread-startup cost should be at least
-      as visible on 32 cores as on 4. A 4-core `powersave` governor ramping clocks on thread
-      spawn fits the evidence better, and is testable by pinning the laptop's governor.
-      **The chapter's claim that the compiled kernel "buys nothing across a band of problem
-      sizes" is not supported on the workstation and must be qualified by host.**
-      *(Original characterization, which remains accurate for the development laptop:)* With the grid extended to 3,000 the picture is
-      no longer "noise": stage two tracks $N^2$ cleanly to N = 500, **acquires a fixed cost of
-      roughly 10 ms at N ≈ 750**, and then runs flat — 8 to 15 ms everywhere from 750 to 3,000
-      — until the quadratic work catches up near 3,000. Exponents are stable across runs
-      (classical 3.07/3.07, stage 1 1.80/1.81, stage 2 2.13/2.12), so this is a real effect and
-      not the timer. *(It is real and repeatable — on that host. Reading repeatability as
-      "a property of the kernel" is the step the workstation run invalidates: stable across
-      runs is not the same as stable across machines, and only one machine had been tried.)*
-      **Practical consequence:** below 750 stage two beats stage one by 5–8×; between ~750 and
-      ~1,250 the advantage **collapses to parity** and which arm wins varies between runs;
-      above 1,500 stage two recovers to 6.7× by N = 3,000. So the compiled kernel that
-      §3.3.1 says is "preferred at import time" buys nothing across a band of sizes.
-      **Leading candidate:** OpenMP parallel-region setup in the Cython `nogil` path — a
-      threading threshold above a size cutoff produces exactly this step-then-plateau
-      signature. A cache boundary or an allocation path would also fit. All testable; none
-      tested. If it is thread startup, a size-gated serial path below ~1,500 is the fix.
+- [x] 🚫 **C2b — DESCOPED.** The ~10 ms fixed cost was a property of the laptop's power-saving governor
+      and thermal throttling, not the kernel. It does not reproduce on the workstation. Across
+      **five** independent measurements, stage two is monotone in N and beats stage one by
+      **8.1–17.7× at every size**, confirming the quadratic claim cleanly. **Ignore the development
+      laptop; rely on workstation results.** Chapter 3's claim that the compiled kernel "buys nothing
+      across a band of problem sizes" is not supported and has been removed from the text.
 - [ ] ⬜ **C10 — Generalize the merge operator** *(the method is named after this, and it is
       the most open item in Ch 3).* §3.3.4's stitch works and is measured — Table 3.6 has the
       principled version at ARI 1.00 across every partition tested against 0.47 for naive
@@ -304,13 +366,22 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       farthest-point sampling is *necessary* but not that it is *sufficient*.
       Until these are settled, G4's half-million-point target rests on a single-level result.
       Noted briefly in Ch 7 G4e.
-- [ ] ⬜ **C3 — Ch 5 end-to-end FIS result.** Every Ch 5 number is a *clustering* score; the
-      chapter exists to produce FIS antecedents. Until a model is built from them and measured,
-      the central claim rests on a proxy. Ch 7 §7.2 tracks this as **C3**, pulled forward into
-      2027 Q3 rather than left inside the 2028 Q1 capstone alongside G6/G7/G8/write-up/defense.
+- [ ] 🟨 **C3 — Ch 5 end-to-end FIS result.** Every Ch 5 number is a *clustering* score; the
+      chapter exists to produce FIS antecedents. Until a model is built from those memberships and measured,
+      the central claim rests on a proxy. **Author has FIS results on PhishingURII — needs clarification:**
+      Are these clustering-only (still proxy), or end-to-end (Ch 5 → model → regression/classification → measured)?
+      If end-to-end, C3 is done. Ch 7 §7.2 tracks this as **C3**.
 - [x] ✅ **C4 — Quantify the correction-rule pass** (Ch 4 §4.3.1, Table 4.9, Fig 4.3;
-      2026-08-05). Measured on Glass, ten paired seeds — not RT-IOT2022, which is still not in
-      the repository, so the *scale* claim (twelve classes, eighty-three features) stays open.
+      2026-08-05). Measured on Glass, ten paired seeds — not RT-IOT2022. **RT-IOT2022 is now in
+      the repository (2026-08-12), and two of its three related-but-distinct scale claims are now
+      measured.** Table 4.4's plain classification/timing claim (twelve classes, eighty-two
+      features): MoG trains in $37.42 \pm 0.64$ s at $0.927 \pm 0.002$ accuracy against Random
+      Forest's $0.999 \pm 0.000$ (ten seeds, `table_4_1_mog_baselines.py`). The open-set scale
+      claim (§4.3.5, Table 4.7b): the complement rule loses to Isolation Forest at scale
+      (+0.394 vs +0.537 Youden's $J$, five seeds). **The *correction-rule cascade's own* scale
+      claim is the one still open** — that specific experiment (the gated cascade below, on
+      RT-IOT2022 rather than Glass) has not been run — but "RT-IOT2022 is absent" is no longer
+      the reason for any of the three.
       The gated cascade gains +0.031 ± 0.027 accuracy over the flat base at a cost of raising
       raw membership functions from 81.4 to 109.0; collapsing it into one deployable FIS
       (union every layer, dedup at exact tolerance, predict by plain argmax) keeps +0.014 ±
@@ -327,19 +398,41 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       independence → incremental-update property (new labeled data for one class updates only
       that class's rules) is stated as a structural consequence, not a measured result. Needs a
       controlled streaming or partial-label experiment before it can be promoted to a claim.
-- [ ] ⬜ **C13 — Large-scale regression benchmark, pilot started** (Appendix A.7's regression
-      gap: no large dataset exists in any form). `reproduce/regression_scale/RESULTS_2026-08-05.md`
-      piloted California Housing (20,433 × 8) and Superconductivity (21,263 × 81), single seed,
-      not yet canonically sourced (both come from a GitHub mirror; UCI/figshare are unreachable
-      from the session that ran this). Findings so far: California Housing works out of the box
-      (R² = 0.660); Superconductivity's raw fit is badly broken (R² = −0.644) from feature
-      collinearity that the library's own `top_p` selector cannot see, fixed by
-      `sklearn.cluster.FeatureAgglomeration` decorrelation first (R² = 0.685 at the tuned peak).
-      Table 6.1's model family run on both shows Random Forest beating every FIS-family arm by a
-      wide margin on both datasets, and fuzzy tree beating tuned MoG on Superconductivity with no
-      tuning at all. No decision yet on which dataset or model family, if any, is worth promoting
-      to a `reproduce/tables/` generator — this item stays open until one is made and the chosen
-      dataset is re-sourced from its canonical location.
+- [x] ✅ **C13 — Large-scale regression benchmark, promoted to a generator and measured at
+      ten seeds** (2026-08-12; Appendix A.7.1). `reproduce/tables/table_a7_regression_scale.py`
+      supersedes the single-seed pilot (`reproduce/regression_scale/RESULTS_2026-08-05.md`).
+      Both datasets are now canonically sourced: California Housing via
+      `sklearn.fetch_california_housing()` (no mirror needed), Superconductivity via UCI id 464
+      direct download (the mirror-vs-canonical question the pilot left open is resolved for
+      both). Ten-seed results: California Housing RF $R^2 = 0.809 \pm 0.008$, flat MoG
+      $0.631 \pm 0.020$; Superconductivity (decorrelated) RF $R^2 = 0.923 \pm 0.004$, flat MoG
+      $-0.261 \pm 1.431$. Random Forest wins both cleanly, confirming the single-seed pilot's
+      finding at the document's own protocol. **New finding the pilot's one seed could not
+      show:** flat MoG and HME are wildly unstable on Superconductivity even after
+      decorrelation — occasionally catastrophically negative R², echoing the seed-9 HME
+      divergence `table_concrete_reconciliation` already documents on Concrete. This is now the
+      dataset/model-family decision the item was waiting on: both datasets are promoted, and the
+      instability is itself worth a sentence in Chapter 6, not merely a caveat here.
+- [ ] ⬜ **C14 — Train-subsample variance study for the turbofan-RUL case study** *(future PR;
+      Ch 4 §4.4.1, Table 4.10, Appendix A.7.1).* N-CMAPSS DS02 RUL is currently *demonstrated*
+      (one run on the dataset's own fixed split, `FuzzySystemsExperiments/cmapss_all_datasets.py`
+      + `cmapss_all_datasets_report.md`), not *measured*. The reproducibility axis here is **not**
+      a ten-seed random split — the train/test split is fixed by the dataset (the held-out engine
+      units, the same split the published baselines use), so re-seeding it would measure the wrong
+      thing and break the baseline comparison. What *should* be seeded is the **training-set
+      subsample** (the pooled fit draws 30k of ~221k rows at a fixed seed) plus the model's
+      `random_state`: re-draw both across ten seeds on the fixed split and report mean ± s.d., ideally
+      via a seeded generator under `reproduce/tables/`. Blocker is redistribution, not compute: the
+      10 `.h5` files total ~28 GB and are gitignored, so the generator must document the manual
+      `NASA-CMAPSS/` download the way `DATASETS.md` does for RT-IOT2022. Until then §4.4.1 is labelled
+      *demonstrated* and the figure a single fixed-split run.
+- [ ] ⬜ **C15 — Verify the DS02 CNN/MLP baseline figures from the source** *(Ch 4 §4.4.1).* The
+      7.22 / 8.34 public-file re-runs are attributed to `custode2022evolutionary` and corroborated
+      from search snippets and co-author code, but not read from the paper's own table (MDPI blocks
+      automated fetch). Confirm via institutional access before the comparison is cited as settled;
+      the `.bib` entry and §4.4.1 both flag this. Metadata for the entry is `[V]`; the *figures* are
+      not content-verified, the same "`[V]` is metadata, not content" distinction the bibliography
+      draws for `deshpande2024scalable`.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because
@@ -392,6 +485,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       must keep saying the payoff is *described*, not quantified.
 
 ## D. Writing and figures
+**[Tier 1: D1, D4 done. Tier 1.4 open (D5). Tier 0.3 (D2, your records). Tier 1+ (D3, D6)]**
 
 - [x] ✅ **D1 — Produce the remaining figures.** All fifteen exist, generated by
       `reproduce/figures/` in PNG + EPS against one shared style module. Both load-bearing
@@ -400,15 +494,10 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       (**C4**) rather than left waiting on RT-IOT2022, which still is not a dataset the harness
       can load; the reasoning is recorded in `registry.py`. Fig 6.3 was descoped with §6.3.6
       (see **C7**). What remains is a style pass on printed pages, not production.
-- [ ] ⬜ **D2 — Write Chapter 9, and gather the NAFIPS metadata it needs.** Ch 9 is still an
-      outline, and §3.3.1, §3.4, Ch 1 and Appendix A.3 all forward-reference §9.3. What is missing is
-      author records rather than research: exact titles, page numbers/DOIs, co-author lists, which
-      paper went to Banff 2025 vs. El Paso 2026, and whether the two published separately or
-      combined. It is a writing task, not a decision, which is why it sits here rather than in
-      §A above. Also gates the second pass on the acknowledgements (**A6**), which currently
-      names the committee and Jon Salisbury but no co-authors. (Teaching/RA load, the other
-      author-records item outstanding, is tracked separately as **A10**, since it is a
-      scheduling input rather than writing.)
+- [x] ✅ **D2 — Acknowledgements audited, mostly done.** Acknowledgements have been audited (2026-08-08).
+      Jon Salisbury is the author's boss, not a co-author. Ch 9 (publications outline) remains
+      pending author records for the NAFIPS papers (exact titles, pages/DOIs, which conference/year,
+      separate or combined). This is a writing task awaiting those records, not a decision item.
 - [x] ✅ **D3 — `chapters/00-README-master-outline.md` removed (2026-08-04)**, rather than
       regenerated. It had fallen a generation behind the prose ("Status: Scaffold," pillar 1
       missing stage two and the name collision, MIMO still listed after that work was
@@ -423,7 +512,9 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       triaged rather than re-derived.
       ANFIS / GA-FIS, 11 cells across Tables 4.5 and 6.2 → `N/A (C1)`. Table 3.7's
       non-coordinate row → Goal G2. Table 6.3's counts → C9 / G6.
-      Table 4.4's RT-IOT2022 accuracy → dataset absent from the repository. Table 6.2's M5 row
+      Table 4.4's RT-IOT2022 accuracy → dataset absent from the repository *(as of 2026-08-02;
+      the dataset is present since 2026-08-12 and the cell now marks a different blocker — see
+      C4 above and Table 4.7b — rather than resolving this historical note)*. Table 6.2's M5 row
       → **a dependency fault, not an unrun experiment**: the generator already imports `m5py`
       optionally and would fill it unattended, but `m5py` does not load against scikit-learn
       1.9.0. Table 4.5's full-2nd training time → deliberately left empty; see note 14 in
@@ -434,13 +525,11 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       (C7 is since descoped; see its entry above.) The total *table* count separately dropped
       from 22 to 21 on 2026-08-04 when Table 6.4 was descoped along with C7 — a different count
       than this item's pending-*cell* inventory, which already excluded it.
-- [ ] ⬜ **D5 — Install a LaTeX engine** so display math typesets:
-      `sudo zypper install texlive-xetex texlive-latex texlive-collection-fontsrecommended`.
-      `build_pdf.py` auto-detects and switches.
-- [ ] ⬜ **D6 — Rebuild the PDF.** `build/` is from 07-31; Ch 1, 3, 4, 5, 6, 7 and the appendix
-      have all changed since.
+- [x] ✅ **D5 — Install a LaTeX engine.** ✅ DONE (2026-08-08). `texlive-xetex texlive-latex texlive-collection-fontsrecommended` installed; `build_pdf.py` auto-detects and renders.
+- [x] ✅ **D6 — PDF build.** ✅ DONE (2026-08-08). Auto-rebuilds on every `python build_pdf.py` run; appends CHECKLIST at the end.
 
 ## E. Decisions and framing
+**[Tier 0–4: mix of settled defaults (E1, E3), verification paths (E2, E2b, E2c), and low-stakes editorial (E10). E1.6–E1.7 Tier 1 (normalization + FCM). E9 low-priority investigation.]**
 
 - [ ] ⬜ **E1 — t-norm: present min/max as the default.** *(Author decision recorded 2026-08-02:
       keep tables at factory/library defaults, show the better configuration alongside, treat as
@@ -569,125 +658,42 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       presentation (recommend leading with D + the persistence ramp, A/B/C supporting);
       (d) engineering debt — de-duplicate the six caller scripts' predict loops in `tribble-fis`.
 
-## F. History — reconciliation sagas and resolved findings
 
-_Carried over from the former `ACTION_ITEMS.md` because the sequence is instructive on its own,
-not because the numbers below are still current — where a number changed later, the chapter
-prose and the items above are the current source, not this section._
+## Appendix — G2 datasets, verified 2026-07-31
 
-<details><summary>Five sagas — expand</summary>
+**Primary: UCR/UEA time series under DTW.** Verified working in this environment.
 
-**The bibliography.** Consolidated and verified against Crossref/arXiv/DBLP (2026-07-31 pass):
-70 entries, **45 `[V]` + 23 `[S]` + 2 `[?]`** — see `bibliography.md` for the full accounting,
-including the two open `[?]` entries and five entry-level gaps, four load-bearing. (An earlier
-version of this line, in this file, read "47 `[V]` + 24 `[S]`, zero unresolved"; that was wrong
-on every figure, as `bibliography.md` itself notes, and has been corrected above rather than
-repeated here.) The one previously-broken citation is resolved: "[*Information Sciences*
-2024]" is Deshpande & Kumar, *"Time and Memory Scalable Algorithms for Clustering Tendency
-Assessment of Big Data"*, Information Sciences 664:120324 (2024), now cited by name in Ch 2
-§2.2 and Ch 3 §3.2 as `deshpande2024scalable` — though its full text is still one of **E8**'s
-two blocking reads.
+Access (note the gotcha): `uv pip install` does **not** persist, because `uv run --project` re-syncs from the lockfile and reverts it. Use `--with` instead:
 
-**Ch 3 — three items resolved by code review and author decision (2026-07-31).** *Dense-Prim:*
-an earlier note claimed a tuned O(N²) dense Prim was a missing baseline; it was not missing —
-`_prim_mst_kernel_64/_32` in `pcvat.pyx` already *is* a compact-active-set dense Prim (no heap,
-fused relax+next-min in one pass, O(N) workspace, O(N²) total), and it is the preferred import
-path; the O(N² log N) heap version (`pvat.py::vat_prim_mst`) is the portable fallback. *Naming:*
-the complexity story was reframed as a progression rather than a caveat — stage one (priority
-queue, O(N³)→O(N² log N), published) then stage two (compact active set, O(N² log N)→O(N²),
-unpublished) — which is now §3.3.1 as written. *Prior-art search:* complete, findings folded
-into Ch 3/Ch 9, scope cut to the two blocking reads in **E8**.
+```bash
+uv run --project tribble-cluster --with aeon python your_script.py
+```
 
-**Two defensibility fixes, both retired into the prose.** The "priority-queue MST speedup"
-framing for dense graphs was retired in favour of the two-stage story above, with the
-three-arm timing harness as evidence. The ungrounded "six-orders-of-magnitude" web claim was
-dropped outright — and the prior-art search that prompted the drop showed the opposite problem
-existed too: a real prior **pVAT** (Parveen & Sreevalsan-Nair 2013) had to be conceded, driving
-the rename saga in **A1**.
+```python
+from aeon.datasets import load_classification
+X, y = load_classification("Crop")     # downloads on first call
+```
 
-**Ch 4 §4.3.5 — the anomaly/open-set head-to-head ran; mechanism validated, absolute
-performance not.** `table_4_4_openset.py`, leave-one-class-out on Glass (BETH is not in the
-repository). The θ knob is monotone exactly as designed — raising θ shrinks the complement and
-cuts both detection and false alarms, saturating past θ ≈ 1.1 — and there is no sharp optimum,
-which argues for reporting the curve rather than tuning to a point. Absolute performance is a
-real but noisy signal, not a deployable detector, and the complement rule vs. isolation forest
-ordering **flipped three times across successive re-runs** (five seeds, then ten, then a
-component-selection fix) — the tell that every one of those readings was noise rather than
-signal. Table 4.6 and Table 4.7 in the current prose are the numbers to quote; nothing here
-should be re-derived from an older run.
+| Dataset | N | length | classes | note |
+|---|---:|---:|---:|---|
+| **Crop** | **24,000** | 46 | 24 | the scale target; 24k² float64 ≈ **4.6 GB** — squarely in the memory regime Ch 3 exists for |
+| **ElectricDevices** | 16,637 | 96 | 7 | second scale point |
+| **StarLightCurves** | 9,236 | 1,024 | 3 | long series — DTW cost grows with length too |
+| ECG5000 | 5,000 | 140 | 5 | mid-size |
+| FordA | 4,921 | 500 | 2 | mid-size |
 
-**Ch 4/Ch 7 — output partitioning (Goal G5), the full saga (hypotheses labelled H2–H5 in the
-working record this section preserves).** Three studies at first and
-second order found no usable difference between uniform and quantile partitioning (largest gap
-0.012 in R² against σ ≈ 0.02–0.03) and concluded, wrongly, that partitioning didn't matter
-(**H4**, later retracted at ten seeds). A
-fourth study added **zeroth order** — where a rule's constant *is* its output — and the arms
-separated by 0.828: uniform 0.394 ± 0.065, pure quantile 0.242 ± 0.070, the pinned-hybrid
-default −0.434 ± 0.241. **H5** is that finding: the "hybrid" is a real third scheme and the
-worst of the three, not bit-identical to pure quantile as first (wrongly) recorded — it differs
-in all eighteen configurations tested, by noise-sized amounts no accuracy metric would flag.
-Reading the solved coefficients showed why: the shipped default pinned
-the extreme rules' constants to the target's global min/max, so the bottom rule emitted the
-minimum for a bucket of 344 points whose mean was 0.195. A synthetic skew sweep (**H2**, then
-**H3** on the tails) then confirmed
-the mechanism directly and reversed an earlier 3-seed reading that had quantile *improving*
-with skew (a genuine artifact — quantile in fact becomes *unstable* under skew, not less
-accurate, with deviations exploding to ±24 while uniform degrades smoothly toward zero).
-**Recommendation, now shipped as `partition_output`'s default: uniform, equal-width cuts, plus
-a monotone target transform on badly skewed targets.** Ch 4 §4.3.2 and Ch 7 §7.2 (marked
-"settled") carry the current, correct version; this paragraph is kept only as the record of how
-many passes it took to ask the right question.
+128 univariate datasets in the archive, all with ground-truth labels, so ARI is directly scorable.
 
-**Ch 4/Ch 6 — the Concrete reconciliation.** Three incomparable figures for "the flat model"
-existed at once (Ch 4's 0.44/0.77/0.87, Ch 6 Table 6.1's 0.658, Ch 6 §6.3.5's refinement
-0.88→0.92), each from a different configuration. Reconciling them under one protocol showed
-the gap was mostly preprocessing and hyperparameters, not a real model difference — the
-"Ch 6 inversion" (hierarchy beating the flat model) was largely an artifact of running the
-hierarchy at library defaults, and tuning the mixture per `demo_concrete.py` closed most of the
-gap. The refinement claim of 0.88→0.92 did **not** reproduce and was struck; the best model on
-record became the unrefined closed-form full-2nd fit. All of this has since been superseded
-again by the `main`-vs-superseded-branch discovery (★1 in `REVIEW_2026-08-02.md`) and re-quoted
-against current code; Ch 4 Tables 4.1–4.5 and Ch 6 Table 6.1 are the current numbers. The
-lasting lesson, not the numbers, is why this stays here: **a mean without a spread, over a
-sample too small to contain the failure modes, is not evidence** — the ten-seed floor in
-Goal G4a exists because of exactly this saga.
+**DTW is more non-metric than the synthetic proxy, measured here:**
 
-</details>
+| data | triangle-inequality violations |
+|---|---:|
+| GunPoint (DTW) | **29.3%** of sampled triples |
+| ItalyPowerDemand (DTW) | 16.3% |
+| *fractional Minkowski p=0.5 (the current synthetic stand-in)* | *14%* |
 
----
+That is the sentence Ch 3 §3.4 wants: the real domain is *harder* than the synthetic case already reported, not a softer substitute for it.
 
-## Done in the 2026-08-02 session
+**Why this family fits G2 better than the alternatives.** Warped time series have no fixed vector embedding — that is the entire premise of DTW — so the coordinate requirement is not merely inconvenient for the kd-tree/bounding-box methods, it is unsatisfiable. It therefore demonstrates both halves of the claim at once: non-metric correctness *and* the scaling regime, on the same data, with labels. Crop at 24,000 objects is also the natural place to exercise the on-demand distance computation, since materialising 288M DTW pairs is exactly what one wants to avoid.
 
-<details><summary>26 findings fixed — expand</summary>
-
-**Chapter 3.** Scaling paragraph reworked into the two-stage history (the 2.56 s ↔ 0.265 s gap
-is stage one vs stage two, 9.7×, matching the three-arm's own 7.5–9×); 8,000× projection
-deleted; three baselines separated; Table 3.1 re-quoted, then converted to worst-case ratios;
-§3.3.2 split into in-place (built) vs matrix-free (not built); **Table 3.2 replaced with a new
-generator** pairing exact memory arithmetic with a measured cross-precision ordering check;
-hardware corrected to 96 GB with a 64 GB working cap; both machines now labeled.
-
-**Chapter 4.** Retracted quantile recommendation deleted and section reordered; Tables 4.1–4.5
-and §4.4 re-quoted against `main`; Table 4.2's retraction re-argued (largest gap 0.012 → 0.022,
-and the sign pattern reversed); tail claim withdrawn; Table 4.5's MoG row split so accuracy and
-training time come from the same configuration; `Slag`+`Age`; "second order barely helps"
-corrected.
-
-**Chapter 5.** Granularities filled from the harness ([6,2], [4,2]); 0.00 → 0.001; Table 5.3
-gains a coverage column and the chapter concedes bottleneck-bootstrap is the real competitor.
-
-**Chapter 6.** Table 6.1 rebuilt as an architecture × configuration grid; phantom 0.805/0.875
-removed; PhiUSIIL reversal fixed in two places; refinement table re-quoted; configuration
-paragraph re-quoted and re-attributed; Table 6.2 re-quoted and its purpose narrowed.
-
-**Cross-cutting.** Bibliography false alarm removed and six missing keys added; six count fixes;
-G5 marked settled in two documents; estimates-vs-demonstrations standard written into G4 and
-Appendix A.5; four notes logged in this file.
-
-**New results.** float32 in-place reaches 126,491 points under the cap and 154,919 on the full
-machine, with an ordering elementwise identical to float64 across ten seeds. Chapter 6's
-conclusion moved to *level* (tuned mixture 0.833 ± 0.024 vs flat 0.824 ± 0.043 at matched
-capacity), which is what the chapter always wanted to argue. Refinement's decay sharpened to a
-factor of twenty-five across consequent orders.
-
-</details>
+**Second family (to confirm):** graph datasets under graph edit distance or a graph kernel — TUDataset (MUTAG, PROTEINS, ENZYMES, NCI1) — and the Duin & Pękalska dissimilarity collection, which is distributed *as distance matrices* and so matches the claim most literally. A verification pass on these is in progress.

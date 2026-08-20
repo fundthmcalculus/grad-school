@@ -27,14 +27,19 @@ sys.path.insert(0, _TABLES)
 import _fuzzy_models as F  # noqa: E402
 
 from tribblefis.gauss_data import (  # noqa: E402
-    GaussianMixtureModel, FeatureModel, LabelModel, GaussianMembership,
-    Rule, SimpleGaussianClassifierModel,
+    GaussianMixtureModel,
+    FeatureModel,
+    LabelModel,
+    GaussianMembership,
+    Rule,
+    SimpleGaussianClassifierModel,
 )
 from tribblefis.gauss_math import simple_gaussian_predict  # noqa: E402
 from tribblefis.gaussian_classifier import (  # noqa: E402
-    MixtureOfGaussiansFuzzyClassifier, MixtureOfGaussiansFuzzySequenceClassifier,
+    TribbleClassifier,
+    TribbleSequenceClassifier,
 )
-from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor  # noqa: E402
+from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 from tribblefis.regression import predict_tsk  # noqa: E402
 
 # Library default: rtol=1e-2, atol=1e-3 (gauss_data.py, GaussianMixtureModel._is_close).
@@ -47,15 +52,32 @@ LIB_RTOL, LIB_ATOL = 1e-2, 1e-3
 # hundred MFs per fit; even 14 points x 6 datasets x 10 seeds finishes in
 # well under a minute -- see the module docstring in the caller for the
 # measured wall-clock).
-MULTIPLIERS = [0.1, 0.3, 1.0, 2.0, 3.0, 5.0, 7.0, 10.0, 15.0, 20.0, 30.0, 50.0, 70.0, 100.0]
+MULTIPLIERS = [
+    0.1,
+    0.3,
+    1.0,
+    2.0,
+    3.0,
+    5.0,
+    7.0,
+    10.0,
+    15.0,
+    20.0,
+    30.0,
+    50.0,
+    70.0,
+    100.0,
+]
 
 
 def _close(mf, other, rtol, atol):
     if type(mf) != type(other):
         return False
     if isinstance(mf, GaussianMembership):
-        return bool(np.isclose(mf.mu, other.mu, rtol=rtol, atol=atol)
-                    and np.isclose(mf.sigma, other.sigma, rtol=rtol, atol=atol))
+        return bool(
+            np.isclose(mf.mu, other.mu, rtol=rtol, atol=atol)
+            and np.isclose(mf.sigma, other.sigma, rtol=rtol, atol=atol)
+        )
     return False
 
 
@@ -69,7 +91,7 @@ def dedup_map(all_mfs, rtol, atol):
     """
     to_replace = {}
     for i, mf in enumerate(all_mfs):
-        for other in all_mfs[i + 1:]:
+        for other in all_mfs[i + 1 :]:
             if other in to_replace:
                 continue
             if _close(mf, other, rtol, atol):
@@ -84,8 +106,9 @@ def dedup_map(all_mfs, rtol, atol):
     return to_replace
 
 
-def to_simple_model_tol(model: GaussianMixtureModel, rtol, atol,
-                         anomaly_params=None) -> SimpleGaussianClassifierModel:
+def to_simple_model_tol(
+    model: GaussianMixtureModel, rtol, atol, anomaly_params=None
+) -> SimpleGaussianClassifierModel:
     """`GaussianMixtureModel.to_simple_model()`, with the tolerance exposed."""
     dedup_mfs = dedup_map(model.all_membership_fcns, rtol, atol)
     rules = []
@@ -95,14 +118,20 @@ def to_simple_model_tol(model: GaussianMixtureModel, rtol, atol,
             label_model = feature_model.label_models.get(label, None)
             if label_model is None:
                 continue
-            antecedent_ids[feature_name] = [dedup_mfs.get(mf, mf).id for mf in label_model.memberships]
+            antecedent_ids[feature_name] = [
+                dedup_mfs.get(mf, mf).id for mf in label_model.memberships
+            ]
         rules.append(Rule(antecedents=antecedent_ids, consequent=label))
     required_ids = {u for r in rules for lst in r.antecedents.values() for u in lst}
     input_mfs = [mf for mf in model.all_membership_fcns if mf.id in required_ids]
-    return SimpleGaussianClassifierModel(input_mfs=input_mfs, rules=rules, anomaly_params=anomaly_params)
+    return SimpleGaussianClassifierModel(
+        input_mfs=input_mfs, rules=rules, anomaly_params=anomaly_params
+    )
 
 
-def build_deduped_model(model: GaussianMixtureModel, rtol, atol) -> GaussianMixtureModel:
+def build_deduped_model(
+    model: GaussianMixtureModel, rtol, atol
+) -> GaussianMixtureModel:
     """Same feature/label structure, memberships swapped for their dedup
     representative -- for regression, which has no SimpleGaussianClassifierModel
     equivalent (tribble-fis#85, follow-up 3)."""

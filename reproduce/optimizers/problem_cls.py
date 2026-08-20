@@ -66,20 +66,21 @@ sys.path.insert(0, _HERE)
 sys.path.insert(0, os.path.join(ROOT, "reproduce"))
 sys.path.insert(0, os.path.join(ROOT, "reproduce", "tables"))
 
-L2_SHRINK = 0.05          # refine_classifier_antecedents default
-SIGMA_MIN_FRAC = 0.02     # ditto
-SIGMA_MAX_FRAC = 1.0      # ditto
+L2_SHRINK = 0.05  # refine_classifier_antecedents default
+SIGMA_MIN_FRAC = 0.02  # ditto
+SIGMA_MAX_FRAC = 1.0  # ditto
 
 
 @dataclass
 class ClassifierHotStart:
     """One (sample size, seed) instance, shaped like `problem.HotStartProblem`."""
+
     dataset: str
     seed: int
     x0: np.ndarray
     bounds: list
     fitness: object
-    score: object                      # vec -> (accuracy, error_rate)
+    score: object  # vec -> (accuracy, error_rate)
     n_params: int
     radius: float
     init: str = "hot"
@@ -140,8 +141,15 @@ def _scorer(model, X_te, y_te, norms):
 _CACHE = {}
 
 
-def build(seed=0, radius=1.0, n_train=16_000, n_test=48_000, top_n=10,
-          init="hot", components=None):
+def build(
+    seed=0,
+    radius=1.0,
+    n_train=16_000,
+    n_test=48_000,
+    top_n=10,
+    init="hot",
+    components=None,
+):
     """Fit the construction on PhiUSIIL and return everything the arms share.
 
     `init`:
@@ -175,7 +183,8 @@ def build(seed=0, radius=1.0, n_train=16_000, n_test=48_000, top_n=10,
     # An exact count, not a fraction: the two splits are sized for different
     # reasons (see the module docstring) and a fraction would couple them.
     Xtr, Xte, ytr, yte = train_test_split(
-        X, y, train_size=min(n_train, len(X) - 1), random_state=seed, stratify=y)
+        X, y, train_size=min(n_train, len(X) - 1), random_state=seed, stratify=y
+    )
 
     # Feature engineering, timed separately and charged to nobody: every init
     # below consumes the same selected feature set, so folding the screen into
@@ -188,13 +197,11 @@ def build(seed=0, radius=1.0, n_train=16_000, n_test=48_000, top_n=10,
     # the "how much faster" claim rests on, so it is measured on its own and
     # reported on its own.
     t0 = time.perf_counter()
-    model, _inner = P.construction(Xtr, ytr, features,
-                                   n_gaussians=components or -1)
+    model, _inner = P.construction(Xtr, ytr, features, n_gaussians=components or -1)
     construction_seconds = time.perf_counter() - t0
 
     norms = resolve_norm_pair()
-    construction_bounds = build_param_bounds(model, Xtr, SIGMA_MIN_FRAC,
-                                             SIGMA_MAX_FRAC)
+    construction_bounds = build_param_bounds(model, Xtr, SIGMA_MIN_FRAC, SIGMA_MAX_FRAC)
     c_lo = np.array([b[0] for b in construction_bounds])
     c_hi = np.array([b[1] for b in construction_bounds])
     heuristic = np.clip(extract_gaussian_params(model), c_lo, c_hi)
@@ -204,15 +211,15 @@ def build(seed=0, radius=1.0, n_train=16_000, n_test=48_000, top_n=10,
     reference = _scorer(model, Xte, yte, norms)
     heuristic_acc, _err = reference(heuristic)
     heuristic_fitness = _make_classifier_fitness(
-        model, Xtr, ytr, L2_SHRINK, heuristic, c_lo, c_hi, norms)
+        model, Xtr, ytr, L2_SHRINK, heuristic, c_lo, c_hi, norms
+    )
     heuristic_obj = float(heuristic_fitness(heuristic))
 
     init_seconds = 0.0
     if init.startswith("classical-"):
         method = init.split("-", 1)[1]
         t0 = time.perf_counter()
-        model, _inner = P.classical(Xtr, ytr, features,
-                                    components or 3, method, seed)
+        model, _inner = P.classical(Xtr, ytr, features, components or 3, method, seed)
         init_seconds = time.perf_counter() - t0
 
     bounds_full = build_param_bounds(model, Xtr, SIGMA_MIN_FRAC, SIGMA_MAX_FRAC)
@@ -232,20 +239,34 @@ def build(seed=0, radius=1.0, n_train=16_000, n_test=48_000, top_n=10,
     # toward this arm's OWN x0 -- which is what the shipped path does, and which
     # keeps `cold` from being penalised for starting somewhere the construction
     # did not.
-    fitness = _make_classifier_fitness(model, Xtr, ytr, L2_SHRINK, x0,
-                                       b_lo, b_hi, norms)
+    fitness = _make_classifier_fitness(
+        model, Xtr, ytr, L2_SHRINK, x0, b_lo, b_hi, norms
+    )
     score = _scorer(model, Xte, yte, norms)
 
     prob = ClassifierHotStart(
-        dataset="phiusiil", seed=seed, x0=np.asarray(x0, dtype=float),
-        bounds=bounds, fitness=fitness, score=score, n_params=len(x0),
-        radius=radius, init=init, heuristic_x=heuristic,
-        heuristic_score=heuristic_acc, heuristic_obj=heuristic_obj,
-        meta={"construction_seconds": construction_seconds,
-              "init_seconds": init_seconds,
-              "screen_seconds": screen_seconds,
-              "n_train": len(Xtr), "n_test": len(Xte),
-              "n_features": len(features), "features": list(features),
-              "n_mfs": P.n_membership_fns(model)})
+        dataset="phiusiil",
+        seed=seed,
+        x0=np.asarray(x0, dtype=float),
+        bounds=bounds,
+        fitness=fitness,
+        score=score,
+        n_params=len(x0),
+        radius=radius,
+        init=init,
+        heuristic_x=heuristic,
+        heuristic_score=heuristic_acc,
+        heuristic_obj=heuristic_obj,
+        meta={
+            "construction_seconds": construction_seconds,
+            "init_seconds": init_seconds,
+            "screen_seconds": screen_seconds,
+            "n_train": len(Xtr),
+            "n_test": len(Xte),
+            "n_features": len(features),
+            "features": list(features),
+            "n_mfs": P.n_membership_fns(model),
+        },
+    )
     _CACHE[key] = prob
     return prob

@@ -19,8 +19,9 @@ def test_poly_dense_output_matches_scipy():
 
     t_span = (0.0, 6.0)
     y0 = [1.0, 0.0]
-    ref = solve_ivp(f, t_span, y0, method="RK45", rtol=1e-8, atol=1e-10,
-                     dense_output=True)
+    ref = solve_ivp(
+        f, t_span, y0, method="RK45", rtol=1e-8, atol=1e-10, dense_output=True
+    )
     res = ode45(f, t_span, y0, rtol=1e-8, atol=1e-10, dense_output=True)
 
     t_query = np.linspace(0.0, 6.0, 200)

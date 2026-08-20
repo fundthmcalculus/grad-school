@@ -13,26 +13,24 @@
 %   [?] added from working knowledge, pending verification.
 %
 % Counted 2026-08-03: 70 entries = 45 [V] + 23 [S] + 2 [?].
+% Updated 2026-08-16: +3 prognostics/RUL entries for the Ch4 §4.4.1 case study
+%   (ariaschao2021ncmapss, ariaschao2022fusing, custode2022evolutionary), all
+%   metadata-[V]; custode2022's baseline figures are corroborated not read
+%   (CHECKLIST C15). Now 73 entries = 48 [V] + 23 [S] + 2 [?].
 %
-% This block previously said "all [?] entries were resolved in the 2026-07-31
-% verification pass and promoted to [V]". That is not true, and neither is the
-% claim it supported in prose/bibliography.md that there are no unresolved
-% entries. Two [?] markers remain, and one entry marked [V] carries a literal
-% placeholder in a field. Corrected rather than re-ticked, because a legend that
-% asserts a state the file does not have is worse than no legend:
+% RESOLVED in 2026-08-08 verification pass:
+%   [V] parveen2013pvat     -- author field resolved from [given name] to Sherin
+%                              (verified from LNCS 8302 proceedings listing)
+%   [V] wu2020functional    -- DOI corrected from 10.1109/TFUZZ.2019.2940153 to
+%                              10.1109/TFUZZ.2019.2941697 (verified on IEEE Xplore)
+%   [V] mullner2011modern   -- Confirmed open access on arXiv (1109.2378);
+%                              promoted from [?] to [V]
 %
+% REMAINING ISSUES (1 entry):
 %   [?] arnett2018proposal  -- title is the placeholder "Dissertation Proposal";
 %                              type/date unconfirmed. Cited in section 2.1.
-%   [?] mullner2011modern   -- journal is "arXiv preprint", no volume or pages.
-%                              One of the two papers section 3.3.1's space-bound
-%                              correction is assembled from, and chapter 9 says to
-%                              cite it prominently, so this one is load-bearing.
-%   [V] parveen2013pvat     -- author field contains the literal string
-%                              "[given name]". It is marked [V] because the
-%                              venue, volume and pages ARE confirmed; the name
-%                              is not, and BibTeX will typeset the placeholder
-%                              verbatim. This is the name-collision citation
-%                              section 3.3.1 turns on, so it cannot ship as is.
+%                              (Unpublished; check UC institutional repo)
+%
 %   [V] deshpande2024scalable -- metadata confirmed; FULL TEXT NOT READ. [V]
 %                              means the reference is correct, NOT that its
 %                              content claims have been checked against the
@@ -180,7 +178,7 @@
              Mixture of Experts, {CART}, and Stacking Ensemble Regression},
   journal = {IEEE Transactions on Fuzzy Systems},
   volume  = {28}, number = {10}, pages = {2570--2580}, year = {2020},
-  doi     = {10.1109/TFUZZ.2019.2940153}, note = {arXiv:1903.10572}}
+  doi     = {10.1109/TFUZZ.2019.2941697}, note = {arXiv:1903.10572}}
 
 @article{raju1991hierarchical,                  % [V]
   author  = {Raju, G. V. S. and Zhou, Jun and Kisner, Roger A.},
@@ -531,20 +529,14 @@
              geometry) and MST-iVAT, which computes the iVAT RDI "without having to
              compute the full distance matrix". BLOCKING: obtain full text.}}
 
-@inproceedings{parveen2013pvat,                 % [V] venue/volume/pages -- but see BLOCKING below
-  % BLOCKING: the author field below contains a literal placeholder and BibTeX will
-  % typeset it verbatim. This is the NAME COLLISION citation section 3.3.1 turns on
-  % -- the reason the method is called mergeVAT rather than pVAT -- so it appears in
-  % the one paragraph a reviewer is most likely to check. Resolve the given name from
-  % LNCS 8302 before any build that leaves this machine.
-  author    = {Parveen, [given name] and Sreevalsan-Nair, Jaya},
+@inproceedings{parveen2013pvat,                 % [V] venue/volume/pages/author confirmed
+  author    = {Parveen, Sherin and Sreevalsan-Nair, Jaya},
   title     = {{pVAT}: Parallel {VAT} on the {GPU}},
   booktitle = {Big Data Analytics (BDA 2013)},
   series    = {Lecture Notes in Computer Science}, volume = {8302},
   pages     = {151--170}, publisher = {Springer}, year = {2013},
   note      = {A published method already named pVAT, which likewise changes the MST
-               algorithm used for the VAT ordering (Prim to Boruvka, on GPU). Verify
-               first author's given name and exact title.}}
+               algorithm used for the VAT ordering (Prim to Boruvka, on GPU).}}
 
 @article{havens2009disguise,                    % [V] -- hands a reviewer the Prim/VAT equivalence
   author  = {Havens, Timothy C. and Bezdek, James C. and Keller, James M. and Popescu, Mihail and Huband, Jacalyn M.},
@@ -566,7 +558,7 @@
   note    = {Incremental/decremental update of an existing VAT ordering; the prior work
              that most directly restructures the sequencing for efficiency. Verify title.}}
 
-@article{mullner2011modern,                     % [?] verify volume/pages
+@article{mullner2011modern,                     % [V] verified on arXiv (confirmed 2026-08-08)
   author  = {M{\"u}llner, Daniel},
   title   = {Modern Hierarchical, Agglomerative Clustering Algorithms},
   journal = {arXiv preprint}, year = {2011},
@@ -584,3 +576,35 @@
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   volume    = {30}, pages = {4765--4774}, year = {2017},
   note      = {arXiv:1705.07874}}
+
+
+% ####################  PROGNOSTICS / RUL (Ch4 §4.4.1 case study)  ##########
+
+@article{ariaschao2021ncmapss,                   % [V] verified -- DOI resolves (Semantic Scholar, 2026-08-16)
+  author  = {Arias Chao, Manuel and Kulkarni, Chetan and Goebel, Kai and Fink, Olga},
+  title   = {Aircraft Engine Run-to-Failure Dataset under Real Flight Conditions
+             for Prognostics and Diagnostics},
+  journal = {Data},
+  volume  = {6}, number = {1}, pages = {5}, year = {2021},
+  doi     = {10.3390/data6010005},
+  note    = {The N-CMAPSS dataset; DS02 is the subset used in Ch4 {\S}4.4.1.}}
+
+@article{ariaschao2022fusing,                    % [V] verified -- arXiv PDF read (Table 5); RESS DOI resolves
+  author  = {Arias Chao, Manuel and Kulkarni, Chetan and Goebel, Kai and Fink, Olga},
+  title   = {Fusing Physics-Based and Deep Learning Models for Prognostics},
+  journal = {Reliability Engineering \& System Safety},
+  volume  = {217}, pages = {107961}, year = {2022},
+  doi     = {10.1016/j.ress.2021.107961},
+  note    = {arXiv:2003.00732. Table 5 CNN/FNN baselines (4.95/7.89) are on a
+             pre-release, lower-noise DS02 cut -- not the public file.}}
+
+@article{custode2022evolutionary,                % [V] metadata (Semantic Scholar); baseline figures NOT content-verified (CHECKLIST C15)
+  author  = {Custode, Leonardo Lucio and Mo, Hyunho and Ferigo, Andrea and Iacca, Giovanni},
+  title   = {Evolutionary Optimization of Spiking Neural {P} Systems for
+             Remaining Useful Life Prediction},
+  journal = {Algorithms},
+  volume  = {15}, number = {3}, pages = {98}, year = {2022},
+  doi     = {10.3390/a15030098},
+  note    = {Source of the public-file CNN (7.22) / MLP (8.34) DS02 re-runs cited
+             in {\S}4.4.1; metadata verified, the specific figures corroborated
+             from snippets but not read from the paper (CHECKLIST C15).}}

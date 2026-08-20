@@ -114,19 +114,32 @@ def memory_reduction():
 # run of it means anything.
 def gpu_fcm():
     n = [50000, 200000, 500000]
-    cpu_bcast = [2314.8, 10563.6, 29186.8]          # fcm.fuzzy_c_means (broadcasting)
+    cpu_bcast = [2314.8, 10563.6, 29186.8]  # fcm.fuzzy_c_means (broadcasting)
     cpu_bcast_sd = [2009.5, 10554.9, 25994.9]
-    cpu_blas = [217.1, 981.9, 2762.6]               # gram + 2 GEMM, the GPU's formulation
+    cpu_blas = [217.1, 981.9, 2762.6]  # gram + 2 GEMM, the GPU's formulation
     cpu_blas_sd = [180.4, 985.6, 2440.3]
     gpu = [175.7, 417.2, 745.4]
     gpu_sd = [115.6, 174.7, 410.6]
     fig, ax = plt.subplots(figsize=(7.5, 5))
-    ax.errorbar(n, cpu_bcast, yerr=cpu_bcast_sd, fmt="o-", capsize=3,
-                label="CPU FCM (NumPy broadcasting — different formulation)")
-    ax.errorbar(n, cpu_blas, yerr=cpu_blas_sd, fmt="s-", capsize=3,
-                label="CPU FCM (gram + 2 GEMM — matched formulation)")
-    ax.errorbar(n, gpu, yerr=gpu_sd, fmt="v-", capsize=3,
-                label="GPU FCM (CuPy, data-resident)")
+    ax.errorbar(
+        n,
+        cpu_bcast,
+        yerr=cpu_bcast_sd,
+        fmt="o-",
+        capsize=3,
+        label="CPU FCM (NumPy broadcasting — different formulation)",
+    )
+    ax.errorbar(
+        n,
+        cpu_blas,
+        yerr=cpu_blas_sd,
+        fmt="s-",
+        capsize=3,
+        label="CPU FCM (gram + 2 GEMM — matched formulation)",
+    )
+    ax.errorbar(
+        n, gpu, yerr=gpu_sd, fmt="v-", capsize=3, label="GPU FCM (CuPy, data-resident)"
+    )
     ax.set_xscale("log")
     ax.set_yscale("log")
     for x, c, g in zip(n, cpu_blas, gpu):

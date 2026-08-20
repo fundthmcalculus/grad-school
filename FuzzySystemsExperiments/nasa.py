@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gauss_plot import report_figures_of_merit
+
 # tribble-fis PR #67 deleted gauss_math.{standard_transform,log_transform,
 # detect_and_apply_log_transform}. UnitScalar replaces standard_transform's
 # min-max-to-[0,1] behaviour (the name was always a misnomer -- it never
@@ -20,7 +21,7 @@ def load_data():
 
     # data (as pandas dataframes)
     X = statlog_shuttle.data.features.astype(np.float32)
-    y = statlog_shuttle.data.targets['class'].astype(np.str_)
+    y = statlog_shuttle.data.targets["class"].astype(np.str_)
 
     # metadata
     print(statlog_shuttle.metadata)
@@ -38,8 +39,15 @@ def main():
     n_unique = y.nunique()
     print(f"Number of unique values in y: {n_unique}")
 
-    scaled_cols = ["Rad Flow", "Fpv Close", "Fpv Open", "High", "Bypass",
-                   "Bpv Close", "Bpv Open"]
+    scaled_cols = [
+        "Rad Flow",
+        "Fpv Close",
+        "Fpv Open",
+        "High",
+        "Bypass",
+        "Bpv Close",
+        "Bpv Open",
+    ]
     # BEHAVIOUR CHANGE, and the reason is structural rather than cosmetic.
     #
     # This script was the one sample that normalized BEFORE logging: it min-max
@@ -62,11 +70,16 @@ def main():
     # only way to say "log exactly these columns" through this API -- there is no
     # explicit log-column list -- and it is applied to the subset precisely so the
     # logged set stays the seven columns named above.
-    X[scaled_cols] = UnitScalar(log_dynamic_range=0).fit_transform(
-        X[scaled_cols]).astype(X[scaled_cols].dtypes.iloc[0])
+    X[scaled_cols] = (
+        UnitScalar(log_dynamic_range=0)
+        .fit_transform(X[scaled_cols])
+        .astype(X[scaled_cols].dtypes.iloc[0])
+    )
 
     # Split dataset into train/test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # Initialize and fit the Gaussian Mixture Classifier
@@ -77,14 +90,26 @@ def main():
     gaussian_memberships = clf.model_
 
     cm_train, top_confusion_train, confused_data_train = report_figures_of_merit(
-        X_train, y_train, gaussian_memberships, n_unique, start_time, top_n_todo, label="train"
+        X_train,
+        y_train,
+        gaussian_memberships,
+        n_unique,
+        start_time,
+        top_n_todo,
+        label="train",
     )
 
     # Update references after augmentation
     gaussian_memberships = clf.model_
 
     cm_test, top_confusion_test, confused_data_test = report_figures_of_merit(
-        X_test, y_test, gaussian_memberships, n_unique, start_time, top_n_todo, label="test"
+        X_test,
+        y_test,
+        gaussian_memberships,
+        n_unique,
+        start_time,
+        top_n_todo,
+        label="test",
     )
 
 

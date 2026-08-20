@@ -1,0 +1,85 @@
+{
+  "stage": "bracket",
+  "hash": "b97cd8d95bc88e94",
+  "hash_of": {
+    "data_hash": "fe97bf7ed293d7eb",
+    "lower_deg": 2.0,
+    "upper_deg": 2.1
+  },
+  "payload": {
+    "rows": [
+      {
+        "dataset": "double_friction",
+        "holdout_range_deg": 268.1,
+        "bracket_sep_final_deg": 1.68,
+        "bracket_sep_max_deg": 27.95,
+        "t_decorrelate_s": 7.925,
+        "lyapunov_per_s": 0.563,
+        "midpoint_err_final_deg": 1.58,
+        "midpoint_err_rms_deg": 2.36,
+        "midpoint_rmse_scaled": 0.0088,
+        "constant_mean_rmse_scaled": 0.2391
+      },
+      {
+        "dataset": "double_frictionless",
+        "holdout_range_deg": 1380.98,
+        "bracket_sep_final_deg": 1779.59,
+        "bracket_sep_max_deg": 1779.59,
+        "t_decorrelate_s": 4.095,
+        "lyapunov_per_s": 1.85,
+        "midpoint_err_final_deg": 1047.73,
+        "midpoint_err_rms_deg": 645.0,
+        "midpoint_rmse_scaled": 0.4671,
+        "constant_mean_rmse_scaled": 0.3578
+      },
+      {
+        "dataset": "triple_friction",
+        "holdout_range_deg": 205.27,
+        "bracket_sep_final_deg": 12.28,
+        "bracket_sep_max_deg": 59.68,
+        "t_decorrelate_s": 11.53,
+        "lyapunov_per_s": 0.337,
+        "midpoint_err_final_deg": 13.37,
+        "midpoint_err_rms_deg": 11.13,
+        "midpoint_rmse_scaled": 0.0542,
+        "constant_mean_rmse_scaled": 0.17
+      },
+      {
+        "dataset": "triple_frictionless",
+        "holdout_range_deg": 933.81,
+        "bracket_sep_final_deg": 2266.87,
+        "bracket_sep_max_deg": 2323.85,
+        "t_decorrelate_s": 5.855,
+        "lyapunov_per_s": 0.87,
+        "midpoint_err_final_deg": 120.91,
+        "midpoint_err_rms_deg": 178.37,
+        "midpoint_rmse_scaled": 0.191,
+        "constant_mean_rmse_scaled": 0.2797
+      },
+      {
+        "dataset": "quintuple_friction",
+        "holdout_range_deg": 445.04,
+        "bracket_sep_final_deg": 31.35,
+        "bracket_sep_max_deg": 143.77,
+        "t_decorrelate_s": 5.425,
+        "lyapunov_per_s": 1.245,
+        "midpoint_err_final_deg": 18.35,
+        "midpoint_err_rms_deg": 19.64,
+        "midpoint_rmse_scaled": 0.0441,
+        "constant_mean_rmse_scaled": 0.1779
+      },
+      {
+        "dataset": "quintuple_frictionless",
+        "holdout_range_deg": 1199.44,
+        "bracket_sep_final_deg": 843.93,
+        "bracket_sep_max_deg": 844.06,
+        "t_decorrelate_s": 5.23,
+        "lyapunov_per_s": 1.408,
+        "midpoint_err_final_deg": 1157.72,
+        "midpoint_err_rms_deg": 884.82,
+        "midpoint_rmse_scaled": 0.7377,
+        "constant_mean_rmse_scaled": 0.242
+      }
+    ]
+  }
+}

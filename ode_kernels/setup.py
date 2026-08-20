@@ -56,8 +56,10 @@ def _extra_compile_args() -> list[str]:
         if _compiler_supports(candidate):
             args.append(candidate)
         else:
-            print(f"[ode_kernels/setup.py] compiler rejects {candidate!r}, skipping",
-                  file=sys.stderr)
+            print(
+                f"[ode_kernels/setup.py] compiler rejects {candidate!r}, skipping",
+                file=sys.stderr,
+            )
     return args
 
 

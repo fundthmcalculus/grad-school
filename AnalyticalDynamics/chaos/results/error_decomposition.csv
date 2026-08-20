@@ -1,0 +1,5 @@
+quantity,max_deg
+integrator_only_deg,0.001769482752472129
+model_only_deg,4.375152684588102e-09
+model_plus_integrator_deg,0.0017694827798138135
+cancelling_comparison_deg,3.302780271496886e-11

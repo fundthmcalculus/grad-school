@@ -78,8 +78,8 @@ warnings.filterwarnings("ignore")
 _TABLES = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_TABLES))
 sys.path.insert(0, _TABLES)
-import common as C            # noqa: E402
-import _fuzzy_models as F     # noqa: E402
+import common as C  # noqa: E402
+import _fuzzy_models as F  # noqa: E402
 
 ORDERS = [o.strip() for o in os.environ.get("REPRO_ORDERS", "0th,1st,2nd").split(",")]
 REFINE_MODE = os.environ.get("REPRO_REFINE", "both").lower()
@@ -116,7 +116,7 @@ def prepare(X, y_raw):
     """
     from tribblefis.regression import partition_output
 
-    yt = F.unit_scale(y_raw)                            # affine: R^2-invariant
+    yt = F.unit_scale(y_raw)  # affine: R^2-invariant
     y, y_bucket_mean = partition_output(N_BUCKETS, yt)
 
     # log + min-max, i.e. what this table has always measured (see F.normalize).
@@ -128,8 +128,13 @@ def prepare(X, y_raw):
     # the RMSE column means one thing throughout.
     yr = np.asarray(y_raw, dtype=float)
     span = float(yr.max() - yr.min())
-    return {"Xt": Xt, "y": y, "y_bucket_mean": y_bucket_mean, "span": span,
-            "logged": logged}
+    return {
+        "Xt": Xt,
+        "y": y,
+        "y_bucket_mean": y_bucket_mean,
+        "span": span,
+        "logged": logged,
+    }
 
 
 # Opt-in: fit every data-dependent preprocessing step on the training fold only.
@@ -182,8 +187,11 @@ def prepare_split_first(X, y_raw, seed):
     train = np.zeros(len(X), dtype=bool)
     train[itr] = True
 
-    yr = pd.Series(np.asarray(y_raw, dtype=float).ravel(),
-                   index=X.index, name=getattr(y_raw, "name", "y_value"))
+    yr = pd.Series(
+        np.asarray(y_raw, dtype=float).ravel(),
+        index=X.index,
+        name=getattr(y_raw, "name", "y_value"),
+    )
     lo, hi = float(yr[train].min()), float(yr[train].max())
     yt = F.unit_scale_with(lo, hi, yr)
 
@@ -205,8 +213,13 @@ def prepare_split_first(X, y_raw, seed):
     # NumPy 2.0, and this matches `prepare()` above exactly, which is the point.
     _yr = np.asarray(y_raw, dtype=float).ravel()
     span = float(_yr.max() - _yr.min())
-    return {"Xt": Xt, "y": y, "y_bucket_mean": y_bucket_mean, "span": span,
-            "logged": logged}
+    return {
+        "Xt": Xt,
+        "y": y,
+        "y_bucket_mean": y_bucket_mean,
+        "span": span,
+        "logged": logged,
+    }
 
 
 def mog_arm(prep, seed, order, refine):
@@ -230,22 +243,41 @@ def mog_arm(prep, seed, order, refine):
 
     diffs = calculate_gaussian_correlation(Xtr, ytr["y_bucket"])
     _, top_vars = take_top_features(diffs, top_n=len(Xt.columns))
-    memb = create_gaussian_membership_dict(Xtr, ytr["y_bucket"],
-                                           top_n_var_names=top_vars, n_gaussians=-1)
+    memb = create_gaussian_membership_dict(
+        Xtr, ytr["y_bucket"], top_n_var_names=top_vars, n_gaussians=-1
+    )
 
     model = memb
     if refine:
         from tribblefis.refine import refine_antecedents_coordinate
+
         model, _ = refine_antecedents_coordinate(
-            memb, Xtr, ytr, top_vars, n_output_buckets=N_BUCKETS, order=order,
-            l2_reg=REFINE_L2, basis="raw", cross_pairs=None)
+            memb,
+            Xtr,
+            ytr,
+            top_vars,
+            n_output_buckets=N_BUCKETS,
+            order=order,
+            l2_reg=REFINE_L2,
+            basis="raw",
+            cross_pairs=None,
+        )
 
     corr, ybm = solve_tsk_consequents(
-        Xtr, model, top_vars, y_bucket_mean, ytr,
-        n_output_buckets=N_BUCKETS, order=order, l2_reg=REFINE_L2,
-        basis="raw", cross_pairs=None)
-    pred = predict_tsk(Xte, model, top_vars, ybm, corr,
-                       order=order, basis="raw", cross_pairs=None)
+        Xtr,
+        model,
+        top_vars,
+        y_bucket_mean,
+        ytr,
+        n_output_buckets=N_BUCKETS,
+        order=order,
+        l2_reg=REFINE_L2,
+        basis="raw",
+        cross_pairs=None,
+    )
+    pred = predict_tsk(
+        Xte, model, top_vars, ybm, corr, order=order, basis="raw", cross_pairs=None
+    )
 
     yt_true = yte["y_value"] if hasattr(yte, "columns") and "y_value" in yte else yte
     yt_true = np.asarray(yt_true, dtype=float).ravel()
@@ -273,9 +305,12 @@ def preprocess_for_others(X, y, seed, style):
 def other_arms(seed):
     """Tree, mixture, and sklearn references -- all take (Xtr,ytr,Xte)->pred."""
     import importlib
+
     out = {}
-    for label, attr in (("fuzzy tree", "FuzzyRegressionTree"),
-                        ("mixture of experts (HME)", "HierarchicalFuzzyExpertsRegressor")):
+    for label, attr in (
+        ("fuzzy tree", "FuzzyRegressionTree"),
+        ("mixture of experts (HME)", "HierarchicalFuzzyExpertsRegressor"),
+    ):
         try:
             cls = getattr(importlib.import_module("fuzzytree"), attr, None)
             if cls is None:
@@ -288,14 +323,20 @@ def other_arms(seed):
                     except TypeError:
                         m = cls()
                     return np.asarray(m.fit(Xtr, ytr).predict(Xte))
+
                 return run
+
             out[label] = mk()
         except Exception as exc:  # noqa: BLE001
             print(f"    [{attr}] unavailable ({exc.__class__.__name__})")
-    out["CART (reference)"] = lambda a, b, c: DecisionTreeRegressor(
-        random_state=seed).fit(a, b).predict(c)
-    out["Random Forest (reference)"] = lambda a, b, c: RandomForestRegressor(
-        n_estimators=200, random_state=seed).fit(a, b).predict(c)
+    out["CART (reference)"] = (
+        lambda a, b, c: DecisionTreeRegressor(random_state=seed).fit(a, b).predict(c)
+    )
+    out["Random Forest (reference)"] = (
+        lambda a, b, c: RandomForestRegressor(n_estimators=200, random_state=seed)
+        .fit(a, b)
+        .predict(c)
+    )
     return out
 
 
@@ -303,14 +344,18 @@ def main():
     print("Concrete reconciliation -- replicating gaussian_mixture/concrete.py")
     data = F.load_concrete()
     if data is None:
-        C.emit("table_concrete_reconciliation",
-               "Concrete reconciliation — ONE protocol",
-               ["Arm", "Preprocessing", "Refinement", "R²", "RMSE"],
-               [["(dataset unavailable)", C.NA, C.NA, C.NA, C.NA]])
+        C.emit(
+            "table_concrete_reconciliation",
+            "Concrete reconciliation — ONE protocol",
+            ["Arm", "Preprocessing", "Refinement", "R²", "RMSE"],
+            [["(dataset unavailable)", C.NA, C.NA, C.NA, C.NA]],
+        )
         return
     X, y = data
-    print(f"  N={len(X)}  M={X.shape[1]}  seeds={C.SEEDS}  orders={ORDERS}  "
-          f"jobs={N_JOBS}")
+    print(
+        f"  N={len(X)}  M={X.shape[1]}  seeds={C.SEEDS}  orders={ORDERS}  "
+        f"jobs={N_JOBS}"
+    )
 
     refine_flags = {"off": [False], "on": [True], "both": [False, True]}[REFINE_MODE]
     store: dict = {}
@@ -322,31 +367,42 @@ def main():
     prep = prepare(X, y)
     logged_note = ", ".join(map(str, prep["logged"])) if prep["logged"] else ""
     if SPLIT_FIRST:
-        print("  REPRO_SPLIT_FIRST: fitting the target scale, the output partition and "
-              "the feature scaler on each training fold only")
+        print(
+            "  REPRO_SPLIT_FIRST: fitting the target scale, the output partition and "
+            "the feature scaler on each training fold only"
+        )
 
     def prep_for(seed):
         return prepare_split_first(X, y, seed) if SPLIT_FIRST else prep
 
     # --- flat MoG arms, concrete.py pipeline ---
     # Build the full job list first so results can be zipped back in job order.
-    jobs = [(refine, order, seed)
-            for refine in refine_flags
-            for order in ORDERS
-            for seed in C.SEEDS]
+    jobs = [
+        (refine, order, seed)
+        for refine in refine_flags
+        for order in ORDERS
+        for seed in C.SEEDS
+    ]
 
     if N_JOBS > 1 and len(jobs) > 1:
         from joblib import Parallel, delayed
+
         results = Parallel(n_jobs=N_JOBS, backend="loky")(
             delayed(_mog_task)(prep_for(seed), seed, order, refine)
-            for refine, order, seed in jobs)
+            for refine, order, seed in jobs
+        )
     else:
-        results = [_mog_task(prep_for(seed), seed, order, refine)
-                   for refine, order, seed in jobs]
+        results = [
+            _mog_task(prep_for(seed), seed, order, refine)
+            for refine, order, seed in jobs
+        ]
 
     for (refine, order, seed), (res, err) in zip(jobs, results):
-        key = (f"flat MoG-TSK {order}", "log+standardized",
-               "refined" if refine else "closed-form only")
+        key = (
+            f"flat MoG-TSK {order}",
+            "log+standardized",
+            "refined" if refine else "closed-form only",
+        )
         if err is not None:
             print(f"    [{key[0]} {key[2]}] seed {seed} failed: {err}")
             continue
@@ -356,8 +412,10 @@ def main():
         store[key]["rmse"].append(rmse)
     for refine in refine_flags:
         for order in ORDERS:
-            print(f"  done: flat MoG-TSK {order:<10} "
-                  f"{'refined' if refine else 'closed-form only'}")
+            print(
+                f"  done: flat MoG-TSK {order:<10} "
+                f"{'refined' if refine else 'closed-form only'}"
+            )
 
     # --- tree / mixture / references, under BOTH preprocessing styles ---
     for style, style_label in (("raw", "raw"), ("transformed", "log+standardized")):
@@ -371,24 +429,33 @@ def main():
                     store[key]["r2"].append(r2_score(yte, p))
                     store[key]["rmse"].append(_rmse(yte, p))
                 except Exception as exc:  # noqa: BLE001
-                    print(f"    [{label}/{style}] seed {seed} failed: {exc.__class__.__name__}")
+                    print(
+                        f"    [{label}/{style}] seed {seed} failed: {exc.__class__.__name__}"
+                    )
         print(f"  done: other arms under {style_label}")
 
-    rows = [[k[0], k[1], k[2], C.cell(v["r2"]), C.cell(v["rmse"], fmt="{:.2f}")]
-            for k, v in store.items()]
+    rows = [
+        [k[0], k[1], k[2], C.cell(v["r2"]), C.cell(v["rmse"], fmt="{:.2f}")]
+        for k, v in store.items()
+    ]
 
-    C.emit("table_concrete_reconciliation",
-           "Concrete reconciliation — one protocol, preprocessing and refinement separated",
-           ["Model", "Preprocessing", "Refinement", "R²", "RMSE"], rows,
-           note=("Flat MoG arms replicate `gaussian_mixture/concrete.py`: standardized "
-                 "target, quantile output partition (%d buckets), auto log-transform of "
-                 "high-dynamic-range features%s, feature standardization, closed-form ridge "
-                 "consequents (basis=raw, l2=%g), and — where marked — per-order antecedent "
-                 "refinement via `refine_antecedents_coordinate`. Tree/mixture/reference arms "
-                 "are run under BOTH preprocessing styles, because the tree demo deliberately "
-                 "uses raw features to keep split thresholds physically meaningful. Identical "
-                 "splits and seeds throughout; mean ± std across seeds."
-                 % (N_BUCKETS, f" ({logged_note})" if logged_note else "", REFINE_L2)))
+    C.emit(
+        "table_concrete_reconciliation",
+        "Concrete reconciliation — one protocol, preprocessing and refinement separated",
+        ["Model", "Preprocessing", "Refinement", "R²", "RMSE"],
+        rows,
+        note=(
+            "Flat MoG arms replicate `gaussian_mixture/concrete.py`: standardized "
+            "target, quantile output partition (%d buckets), auto log-transform of "
+            "high-dynamic-range features%s, feature standardization, closed-form ridge "
+            "consequents (basis=raw, l2=%g), and — where marked — per-order antecedent "
+            "refinement via `refine_antecedents_coordinate`. Tree/mixture/reference arms "
+            "are run under BOTH preprocessing styles, because the tree demo deliberately "
+            "uses raw features to keep split thresholds physically meaningful. Identical "
+            "splits and seeds throughout; mean ± std across seeds."
+            % (N_BUCKETS, f" ({logged_note})" if logged_note else "", REFINE_L2)
+        ),
+    )
 
 
 if __name__ == "__main__":

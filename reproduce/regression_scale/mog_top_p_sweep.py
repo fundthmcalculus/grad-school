@@ -57,8 +57,10 @@ def normalize(X, log_dynamic_range=2, report=False):
     sc = UnitScalar(log_dynamic_range=log_dynamic_range)
     Xt = pd.DataFrame(sc.fit_transform(X.copy()), index=X.index, columns=X.columns)
     if report:
-        print(f"  log1p-transformed ({len(sc.log_features_)}/{X.shape[1]} features, "
-              f"dynamic range >= {log_dynamic_range} decades): {sc.log_features_}")
+        print(
+            f"  log1p-transformed ({len(sc.log_features_)}/{X.shape[1]} features, "
+            f"dynamic range >= {log_dynamic_range} decades): {sc.log_features_}"
+        )
     return Xt
 
 
@@ -77,8 +79,12 @@ def decorrelate(X, y, corr_threshold=0.9):
     Xc = X - X.mean()
     Xu = Xc / np.linalg.norm(Xc.values, axis=0)
     dist_threshold = np.sqrt(2 * (1 - corr_threshold))
-    agg = FeatureAgglomeration(n_clusters=None, distance_threshold=dist_threshold,
-                                metric="euclidean", linkage="average")
+    agg = FeatureAgglomeration(
+        n_clusters=None,
+        distance_threshold=dist_threshold,
+        metric="euclidean",
+        linkage="average",
+    )
     agg.fit(Xu.values)
 
     corr_y = X.corrwith(y).abs()
@@ -97,8 +103,10 @@ def prepare(name, loader, corr_threshold=0.9, log_dynamic_range=2):
 
     before = X.shape[1]
     X = decorrelate(X, y, corr_threshold=corr_threshold)
-    print(f"  decorrelated (sklearn FeatureAgglomeration, |corr| <= {corr_threshold}): "
-          f"{before} -> {X.shape[1]} features -- {list(X.columns)}")
+    print(
+        f"  decorrelated (sklearn FeatureAgglomeration, |corr| <= {corr_threshold}): "
+        f"{before} -> {X.shape[1]} features -- {list(X.columns)}"
+    )
     return X, y
 
 
@@ -110,10 +118,18 @@ def fit_at(X, y, top_p, warm_up=False):
 
     def new_model():
         return MixtureOfGaussiansFuzzyRegressor(
-            n_output_buckets=3, tsk_order="1st", top_n=-1, top_p=top_p,
-            random_state=SEED)
+            n_output_buckets=3,
+            tsk_order="1st",
+            top_n=-1,
+            top_p=top_p,
+            random_state=SEED,
+        )
 
-    ctx = contextlib.nullcontext() if warm_up else contextlib.redirect_stdout(io.StringIO())
+    ctx = (
+        contextlib.nullcontext()
+        if warm_up
+        else contextlib.redirect_stdout(io.StringIO())
+    )
     with ctx:
         if warm_up:
             # Discarded warm-up fit, same split -- table_4_1's own convention,
@@ -135,36 +151,76 @@ def fit_at(X, y, top_p, warm_up=False):
     r2 = r2_score(yte, p)
     n_mf = getattr(model.model_, "n_membership_functions", None)
     n_kept = getattr(model, "top_n_actual_", None)
-    return {"top_p": top_p, "n_features": n_kept, "fit_s": fit_s, "r2": r2, "n_mf": n_mf}
+    return {
+        "top_p": top_p,
+        "n_features": n_kept,
+        "fit_s": fit_s,
+        "r2": r2,
+        "n_mf": n_mf,
+    }
 
 
 def sweep(name, loader, top_p_grid, corr_threshold=0.9, log_dynamic_range=2):
-    X, y = prepare(name, loader, corr_threshold=corr_threshold,
-                   log_dynamic_range=log_dynamic_range)
+    X, y = prepare(
+        name, loader, corr_threshold=corr_threshold, log_dynamic_range=log_dynamic_range
+    )
     rows = []
     for i, top_p in enumerate(top_p_grid):
         row = fit_at(X, y, top_p, warm_up=(i == 0))
         rows.append(row)
-        print(f"  top_p={top_p:<6} features={row['n_features']:<4} "
-              f"fit={row['fit_s']:.2f}s  R2={row['r2']:.4f}  MF={row['n_mf']}")
+        print(
+            f"  top_p={top_p:<6} features={row['n_features']:<4} "
+            f"fit={row['fit_s']:.2f}s  R2={row['r2']:.4f}  MF={row['n_mf']}"
+        )
     return rows
 
 
 if __name__ == "__main__":
-    print(f"tribble-fis commit: {os.popen(f'git -C {FIS_ROOT} rev-parse HEAD').read().strip()}")
+    print(
+        f"tribble-fis commit: {os.popen(f'git -C {FIS_ROOT} rev-parse HEAD').read().strip()}"
+    )
 
     print("\n" + "#" * 80)
     print("# California Housing: coarse top_p sweep")
     print("#" * 80)
-    sweep("California Housing, decorrelated, top_p sweep",
-          D.load_housing, [0.1, 0.25, 0.5, 0.75, 0.9, 1.0])
+    sweep(
+        "California Housing, decorrelated, top_p sweep",
+        D.load_housing,
+        [0.1, 0.25, 0.5, 0.75, 0.9, 1.0],
+    )
 
     print("\n" + "#" * 80)
     print("# Superconductivity: fine top_p sweep around the coarse-sweep peak")
     print("#" * 80)
-    FINE_GRID = [0.10, 0.12, 0.14, 0.16, 0.18, 0.20, 0.22, 0.24, 0.26, 0.28,
-                 0.30, 0.32, 0.34, 0.36, 0.38, 0.40, 0.45, 0.50]
-    sweep("Superconductivity, decorrelated, fine top_p sweep (log_dynamic_range=2)",
-          D.load_superconduct, FINE_GRID, log_dynamic_range=2)
-    sweep("Superconductivity, decorrelated, fine top_p sweep (log_dynamic_range=1)",
-          D.load_superconduct, FINE_GRID, log_dynamic_range=1)
+    FINE_GRID = [
+        0.10,
+        0.12,
+        0.14,
+        0.16,
+        0.18,
+        0.20,
+        0.22,
+        0.24,
+        0.26,
+        0.28,
+        0.30,
+        0.32,
+        0.34,
+        0.36,
+        0.38,
+        0.40,
+        0.45,
+        0.50,
+    ]
+    sweep(
+        "Superconductivity, decorrelated, fine top_p sweep (log_dynamic_range=2)",
+        D.load_superconduct,
+        FINE_GRID,
+        log_dynamic_range=2,
+    )
+    sweep(
+        "Superconductivity, decorrelated, fine top_p sweep (log_dynamic_range=1)",
+        D.load_superconduct,
+        FINE_GRID,
+        log_dynamic_range=1,
+    )

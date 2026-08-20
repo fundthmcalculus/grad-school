@@ -29,7 +29,7 @@ def _all_blocks(Dstar):
     """Enumerate every internal node of the SL dendrogram as a candidate block,
     with birth (formation height), death (parent merge height), members."""
     n = Dstar.shape[0]
-    Z = linkage(squareform(Dstar, checks=False), method='single')
+    Z = linkage(squareform(Dstar, checks=False), method="single")
     members = {i: {i} for i in range(n)}
     heights = {i: 0.0 for i in range(n)}
     parent_h = {}
@@ -50,23 +50,27 @@ def _all_blocks(Dstar):
             continue
         birth = heights[nid]
         death = parent_h.get(nid, birth)
-        blocks.append({
-            'node_id': nid, 'members': members[nid],
-            'birth': birth, 'death': death,
-            'persistence': death - birth,
-            'rel_persistence': death / (birth + 1e-12),
-            'size': len(members[nid]),
-        })
+        blocks.append(
+            {
+                "node_id": nid,
+                "members": members[nid],
+                "birth": birth,
+                "death": death,
+                "persistence": death - birth,
+                "rel_persistence": death / (birth + 1e-12),
+                "size": len(members[nid]),
+            }
+        )
     return blocks, n
 
 
 def select_topc_disjoint(Dstar, c):
     blocks, n = _all_blocks(Dstar)
-    blocks = [b for b in blocks if b['size'] >= 2]
-    blocks.sort(key=lambda b: b['persistence'], reverse=True)
+    blocks = [b for b in blocks if b["size"] >= 2]
+    blocks.sort(key=lambda b: b["persistence"], reverse=True)
     sel = []
     for b in blocks:
-        if any(b['members'] & s['members'] for s in sel):
+        if any(b["members"] & s["members"] for s in sel):
             continue
         sel.append(b)
         if len(sel) == c:
@@ -77,11 +81,11 @@ def select_topc_disjoint(Dstar, c):
 def select_relpersist(Dstar, c):
     blocks, n = _all_blocks(Dstar)
     ceiling = 0.9 * n
-    blocks = [b for b in blocks if 2 <= b['size'] <= ceiling]
-    blocks.sort(key=lambda b: b['rel_persistence'], reverse=True)
+    blocks = [b for b in blocks if 2 <= b["size"] <= ceiling]
+    blocks.sort(key=lambda b: b["rel_persistence"], reverse=True)
     sel = []
     for b in blocks:
-        if any(b['members'] & s['members'] for s in sel):
+        if any(b["members"] & s["members"] for s in sel):
             continue
         sel.append(b)
         if len(sel) == c:
@@ -110,16 +114,17 @@ def select_coverage_cover(Dstar, gap_sigma=2.0, max_size_frac=0.6):
     """
     blocks, n = _all_blocks(Dstar)
     ceiling = max_size_frac * n
-    persist = np.array([b['persistence'] for b in blocks])
+    persist = np.array([b["persistence"] for b in blocks])
     med = np.median(persist)
     mad = np.median(np.abs(persist - med)) + 1e-12
     sigma = 1.4826 * mad  # MAD -> sigma for normal
     gap_threshold = med + gap_sigma * sigma
 
-    elig = [b for b in blocks
-            if b['size'] >= 3
-            and b['size'] <= ceiling
-            and b['persistence'] >= gap_threshold]
+    elig = [
+        b
+        for b in blocks
+        if b["size"] >= 3 and b["size"] <= ceiling and b["persistence"] >= gap_threshold
+    ]
 
     if not elig:
         # No persistence outliers => no asserted structure.
@@ -133,21 +138,24 @@ def select_coverage_cover(Dstar, gap_sigma=2.0, max_size_frac=0.6):
         for b in elig:
             if b in sel:
                 continue
-            gain = len(b['members'] - covered)
-            if gain > best_gain or (gain == best_gain and best is not None
-                                    and b['persistence'] > best['persistence']):
+            gain = len(b["members"] - covered)
+            if gain > best_gain or (
+                gain == best_gain
+                and best is not None
+                and b["persistence"] > best["persistence"]
+            ):
                 best, best_gain = b, gain
         if best is None or best_gain == 0:
             break
         sel.append(best)
-        covered |= best['members']
+        covered |= best["members"]
     return sel
 
 
 def coverage_of(sel, n):
     cov = set()
     for b in sel:
-        cov |= b['members']
+        cov |= b["members"]
     return len(cov) / n
 
 
@@ -157,7 +165,7 @@ def purity_vs_truth(sel, y):
     selected blocks are as cluster proxies."""
     purities = []
     for b in sel:
-        mem = np.array(sorted(b['members']), dtype=int)
+        mem = np.array(sorted(b["members"]), dtype=int)
         labs = y[mem]
         labs = labs[labs >= 0]
         if len(labs) == 0:

@@ -11,19 +11,18 @@ The references live in a single BibTeX file, [`../references.bib`](../references
 
 ## The state of the file, counted
 
-The file holds **70 entries: 45 `[V]`, 23 `[S]`, and 2 still `[?]`.** An earlier tally elsewhere in the repo read "47 `[V]` + 24 `[S]` across 70 entries, zero unresolved" — wrong on every figure and summing to 71 — and has since been corrected (`CHECKLIST.md` §F) to match this page, which is the source of truth for the count. The `.bib` header legend calls the `[?]` entries "resolved … and promoted to `[V]`", untrue of the two below and needing the same correction.
+The file holds **73 entries: 48 `[V]`, 23 `[S]`, and 2 still `[?]`.** This was 70 (45 `[V]`) until 2026-08-16, when the three prognostics/RUL references for the Chapter 4 §4.4.1 turbofan case study were added (`ariaschao2021ncmapss`, `ariaschao2022fusing`, `custode2022evolutionary`), all metadata-verified `[V]` — with the caveat that `custode2022evolutionary`'s baseline figures are corroborated from snippets, not read from the paper (`CHECKLIST` **C15**), the same "`[V]` is metadata, not content" distinction drawn below. An earlier tally elsewhere in the repo read "47 `[V]` + 24 `[S]` across 70 entries, zero unresolved" — wrong on every figure and summing to 71 — and has since been corrected (`CHECKLIST.md` §F) to match this page, which is the source of truth for the count. The `.bib` header legend calls the `[?]` entries "resolved … and promoted to `[V]`", untrue of the two below and needing the same correction.
 
 Two distinctions matter more than the arithmetic. **`[V]` is metadata-verified, not content-verified**: author list, title, venue, year and DOI resolve against a publisher index, and nothing is claimed about the paper having been read. And `[V]` can coexist with an unresolved field inside the entry; two do.
 
 **Five entries are not clean, and four of them are load-bearing.**
 
-| Entry | Marker | The gap | Stakes |
-|---|---|---|---|
-| `arnett2018proposal` | `[?]` | `title` is literally `Dissertation Proposal`; note asks to confirm title, date, type | the same-department parallel-work citation below, cited once in §2.1; needs a real title to submit |
-| `mullner2011modern` | `[?]` | arXiv record (`arXiv:1109.2378`), `journal = {arXiv preprint}`, no volume or pages | the more serious `[?]`: load-bearing for §3.3.1's space-bound correction, cited prominently and early per Chapter 9 §9.3, so an unresolved venue is not cosmetic |
-| `parveen2013pvat` | `[V]` | author placeholder `{Parveen, [given name] and Sreevalsan-Nair, Jaya}`; note asks to verify that given name and the exact title | the `pVAT` name collision §3.3.1 turns on, which forced this work's rename to mergeVAT; it will be read closely, and it cannot yet be typeset |
-| `deshpande2024scalable` | `[V]` | note reads `FULL TEXT NOT YET READ` / `BLOCKING: obtain full text` | see below |
-| `kumar2016incvat` | `[V]` | note asks to verify the title | smallest of the five, the only genuine proof-stage item |
+| Entry                   | Marker | The gap                                                                                                                         | Stakes                                                                                                                                                           |
+|-------------------------|--------|---------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mullner2011modern`     | `[?]`  | arXiv record (`arXiv:1109.2378`), `journal = {arXiv preprint}`, no volume or pages                                              | the more serious `[?]`: load-bearing for §3.3.1's space-bound correction, cited prominently and early per Chapter 9 §9.3, so an unresolved venue is not cosmetic |
+| `parveen2013pvat`       | `[V]`  | author placeholder `{Parveen, [given name] and Sreevalsan-Nair, Jaya}`; note asks to verify that given name and the exact title | the `pVAT` name collision §3.3.1 turns on, which forced this work's rename to mergeVAT; it will be read closely, and it cannot yet be typeset                    |
+| `deshpande2024scalable` | `[V]`  | note reads `FULL TEXT NOT YET READ` / `BLOCKING: obtain full text`                                                              | see below                                                                                                                                                        |
+| `kumar2016incvat`       | `[V]`  | note asks to verify the title                                                                                                   | smallest of the five, the only genuine proof-stage item                                                                                                          |
 
 **`deshpande2024scalable` in full.** Metadata confirmed (*Information Sciences* 664:120324, DOI 10.1016/j.ins.2024.120324); content not, which makes it the concrete case of `[V]` meaning metadata and nothing more. `CHECKLIST` **E8** lists the full-text read as blocking: if the paper already states the $O(N)$-workspace result for VAT itself and not only for MST-iVAT, the Chapter 9 §9.3 note has no contribution left. Chapter 3's unoccupied-regime argument turns on what this line of work achieves, so until the read is done the entry supports a citation, not a characterization, and this page states no result of the paper's as settled. It is also the formerly broken citation, now resolved as a *citation*: Chapters 2 and 3 once had only "[*Information Sciences* 2024]", a journal name and a year with no author, title, or DOI, for the kd-tree memory methods that §2.2 and §3.2 now cite by name.
 
@@ -37,12 +36,7 @@ Two distinctions matter more than the arithmetic. **`[V]` is metadata-verified, 
 - **Persistence and topological data analysis.** `chazal2013persistence` (ToMATo), `bonis2018fuzzy` (the nearest precedent for Chapter 5), `automato2024`.
 - **Optimization, TSP, and quality-diversity.** `lin1973effective`, `helsgaun2000effective`, `croes1958method`, `dorigo1996ant`, `kennedy1995particle`, `deb2002nsga2`, `mouret2015illuminating`, `vassiliades2018cvt`.
 - **Interpretability / XAI.** `lundberg2017shap`.
-
-## On the reference proposals
-
-Two dissertation proposals from this department sit in `research/proposal-defense/` (Pickering 2024, Arnett 2018). They informed this proposal's *document structure and format*. Neither is a source for any method or framing here; the work was developed independently, and the interpretability position in §2.6 is my own, predating any awareness of Pickering's treatment.
-
-One qualification, for the record. Arnett (2018) *is* cited once, in §2.1, because the FIS constraint set I adopt (triangular membership functions, Ruspini partition, product t-norm, weighted-average defuzzification) appears there in the same combination. That marks a parallel in the same department, not a debt: the constraints trace to Ruspini (1969) and de Oliveira (1999), which is what §2.1 cites for them.
+- **Prognostics / RUL (Ch 4 §4.4.1 turbofan case study).** The N-CMAPSS dataset (`ariaschao2021ncmapss`) and the two baselines the case study measures against: the physics-plus-deep-learning fusion paper whose CNN/FNN numbers are on a pre-release DS02 cut (`ariaschao2022fusing`, arXiv PDF read) and the public-file CNN/MLP re-runs the comparison actually uses (`custode2022evolutionary`, figures corroborated not read — `CHECKLIST` **C15**).
 
 ---
 

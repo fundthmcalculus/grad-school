@@ -14,7 +14,7 @@ def vat_prim_mst(adj: np.ndarray) -> list[int]:
     src_key = np.max(adj)
 
     # Create a list for keys and initialize all keys as infinite (INF)
-    key: list[float] = [float('inf')] * N
+    key: list[float] = [float("inf")] * N
 
     # To store the parent array which, in turn, stores MST
     parent: list[int] = [-1] * N
@@ -23,7 +23,9 @@ def vat_prim_mst(adj: np.ndarray) -> list[int]:
     in_mst: list[bool] = [False] * N
 
     # Insert the source itself into the priority queue and initialize its key as 0
-    pq: list[tuple[float, int]] = [(src_key, src)]  # Priority queue to store vertices that are being processed
+    pq: list[tuple[float, int]] = [
+        (src_key, src)
+    ]  # Priority queue to store vertices that are being processed
     # heapq.heappush(pq, (src_key, src))
     key[src] = src_key
 

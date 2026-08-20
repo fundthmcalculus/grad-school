@@ -53,16 +53,31 @@ import harness_data as H  # noqa: E402
 
 NAME = "11-phishing-optimizer"
 
-ARM_ORDER = ["scipy-lbfgsb", "scipy-powell", "scipy-de",
-             "opt-ga", "opt-pso", "opt-aco", "opt-gd"]
+ARM_ORDER = [
+    "scipy-lbfgsb",
+    "scipy-powell",
+    "scipy-de",
+    "opt-ga",
+    "opt-pso",
+    "opt-aco",
+    "opt-gd",
+]
 COLOUR = {a: F.SERIES[i % len(F.SERIES)] for i, a in enumerate(ARM_ORDER)}
-LABEL = {"scipy-lbfgsb": "L-BFGS-B", "scipy-powell": "Powell",
-         "scipy-de": "DE (scipy)", "opt-ga": "GA", "opt-pso": "PSO",
-         "opt-aco": "ACO", "opt-gd": "GD"}
+LABEL = {
+    "scipy-lbfgsb": "L-BFGS-B",
+    "scipy-powell": "Powell",
+    "scipy-de": "DE (scipy)",
+    "opt-ga": "GA",
+    "opt-pso": "PSO",
+    "opt-aco": "ACO",
+    "opt-gd": "GD",
+}
 INIT_ORDER = ["hot", "cold", "classical-kmeans"]
-INIT_TITLE = {"hot": "hot: from the construction",
-              "cold": "cold: random in the box",
-              "classical-kmeans": "k-means within each class"}
+INIT_TITLE = {
+    "hot": "hot: from the construction",
+    "cold": "cold: random in the box",
+    "classical-kmeans": "k-means within each class",
+}
 
 #: Floor for a zero error rate on a log axis. An arm that makes no test errors
 #: has no place on one, so the point is floored and the caption says so rather
@@ -87,7 +102,8 @@ def _traces():
     out = defaultdict(lambda: defaultdict(list))
     for r in rows:
         out[(r["arm"], r["init"])][int(r["seed"])].append(
-            (int(r["eval"]), float(r["best_obj"])))
+            (int(r["eval"]), float(r["best_obj"]))
+        )
     return out, label
 
 
@@ -127,7 +143,7 @@ def _band(ax, x, mean, sd, colour, ls, label, floor=None):
     """Mean line plus a ±1 s.d. band, widest drawn first by the caller."""
     lo, hi = mean - sd, mean + sd
     if floor is not None:
-        lo = np.maximum(lo, floor)      # a log axis has no room for <= 0
+        lo = np.maximum(lo, floor)  # a log axis has no room for <= 0
     ax.fill_between(x, lo, hi, color=F.tint(colour, BAND_TINT), lw=0, zorder=2)
     ax.plot(x, mean, lw=1.8, ls=ls, color=colour, label=label, zorder=5)
 
@@ -141,8 +157,10 @@ def build():
 
     inits = [i for i in INIT_ORDER if any(k[1] == i for k in traces)]
     arms = [a for a in ARM_ORDER if any((a, i) in traces for i in inits)]
-    max_eval = max(e for per in traces.values() for pts in per.values()
-                   for e, _v in pts) or 2000
+    max_eval = (
+        max(e for per in traces.values() for pts in per.values() for e, _v in pts)
+        or 2000
+    )
     budgets = sorted({b for per in budget_acc.values() for b in per})
 
     ref = [r for r in seed_rows if r["arm"] == "none" and r["init"] == "hot"]
@@ -168,26 +186,41 @@ def build():
             stack = _filled(per_seed, grid)
             if stack is None:
                 continue
-            series.append((float(np.mean(stack.std(axis=0))), arm,
-                           stack.mean(axis=0), stack.std(axis=0)))
+            series.append(
+                (
+                    float(np.mean(stack.std(axis=0))),
+                    arm,
+                    stack.mean(axis=0),
+                    stack.std(axis=0),
+                )
+            )
         # Widest band first: these are solid blends, so a wide one drawn last
         # would bury every narrow one underneath it.
         for _w, arm, mean, sd in sorted(series, reverse=True):
-            _band(ox, grid, mean, sd, COLOUR[arm], "solid", LABEL[arm],
-                  floor=1e-4)
+            _band(ox, grid, mean, sd, COLOUR[arm], "solid", LABEL[arm], floor=1e-4)
         if np.isfinite(heur_obj):
             ox.axhline(heur_obj, lw=1.3, ls=(0, (2, 2)), color=F.INK_2, zorder=6)
         ox.set_xscale("log")
         ox.set_yscale("log")
         obj_axes.append(ox)
-        F.style_axes(ox, title=f"objective — {INIT_TITLE[init]}",
-                     xlabel="objective evaluations (log)",
-                     ylabel="cross-entropy + shrink (log)" if col == 0 else None)
+        F.style_axes(
+            ox,
+            title=f"objective — {INIT_TITLE[init]}",
+            xlabel="objective evaluations (log)",
+            ylabel="cross-entropy + shrink (log)" if col == 0 else None,
+        )
         if col == 0:
             F.legend(ox, loc="lower left", ncol=2, handlelength=2.0)
             if np.isfinite(heur_obj):
-                ox.text(max_eval, heur_obj, "the construction ", va="bottom",
-                        ha="right", fontsize=F.FS_SMALL, color=F.INK_2)
+                ox.text(
+                    max_eval,
+                    heur_obj,
+                    "the construction ",
+                    va="bottom",
+                    ha="right",
+                    fontsize=F.FS_SMALL,
+                    color=F.INK_2,
+                )
 
         # -- error rate ------------------------------------------------------ #
         series = []
@@ -197,31 +230,54 @@ def build():
                 continue
             # Per seed, then aggregate: 1 - mean(acc) and mean(1 - acc) agree,
             # but the s.d. of the error rate must come from per-seed errors.
-            errs = [[1.0 - v for v in per_b[b].values()] if per_b.get(b) else []
-                    for b in budgets]
+            errs = [
+                [1.0 - v for v in per_b[b].values()] if per_b.get(b) else []
+                for b in budgets
+            ]
             mean = np.array([np.mean(e) if e else np.nan for e in errs])
             sd = np.array([np.std(e) if e else np.nan for e in errs])
             series.append((float(np.nanmean(sd)), arm, mean, sd))
         for _w, arm, mean, sd in sorted(series, reverse=True):
-            _band(ax, np.array(budgets, dtype=float),
-                  np.maximum(mean, ERR_FLOOR), sd, COLOUR[arm], "solid",
-                  LABEL[arm], floor=ERR_FLOOR)
+            _band(
+                ax,
+                np.array(budgets, dtype=float),
+                np.maximum(mean, ERR_FLOOR),
+                sd,
+                COLOUR[arm],
+                "solid",
+                LABEL[arm],
+                floor=ERR_FLOOR,
+            )
         if np.isfinite(heur_acc):
-            ax.axhline(max(1.0 - heur_acc, ERR_FLOOR), lw=1.3, ls=(0, (2, 2)),
-                       color=F.INK_2, zorder=6)
+            ax.axhline(
+                max(1.0 - heur_acc, ERR_FLOOR),
+                lw=1.3,
+                ls=(0, (2, 2)),
+                color=F.INK_2,
+                zorder=6,
+            )
         ax.set_xscale("log")
         ax.set_yscale("log")
         ax.set_xticks(budgets)
         ax.set_xticklabels([str(b) for b in budgets], fontsize=F.FS_TICK)
         ax.minorticks_off()
         err_axes.append(ax)
-        F.style_axes(ax, title=f"test error — {INIT_TITLE[init]}",
-                     xlabel="objective evaluations (log)",
-                     ylabel="1 − test accuracy (log)" if col == 0 else None)
+        F.style_axes(
+            ax,
+            title=f"test error — {INIT_TITLE[init]}",
+            xlabel="objective evaluations (log)",
+            ylabel="1 − test accuracy (log)" if col == 0 else None,
+        )
         if col == 0 and np.isfinite(heur_acc):
-            ax.text(budgets[-1], max(1.0 - heur_acc, ERR_FLOOR),
-                    "the construction ", va="bottom", ha="right",
-                    fontsize=F.FS_SMALL, color=F.INK_2)
+            ax.text(
+                budgets[-1],
+                max(1.0 - heur_acc, ERR_FLOOR),
+                "the construction ",
+                va="bottom",
+                ha="right",
+                fontsize=F.FS_SMALL,
+                color=F.INK_2,
+            )
 
     # One scale across the bottom row, so the three columns can be compared.
     # Without it each panel autoscales to its own decade and "cold recovers to
@@ -234,25 +290,31 @@ def build():
         for a in group:
             a.set_ylim(lo if floor is None else max(lo, floor), hi)
 
-    fig.text(0.5, -0.012,
-             f"Lines are the mean over {n_seeds} seeds and bands are ±1 s.d. over "
-             f"the same seeds. Arms that never converge are drawn rather than "
-             f"dropped — on a cold start the two\ngradient-based arms sit at their "
-             f"starting objective for the whole budget, which is a result about "
-             f"the loss surface and not missing data. The dashed line is the "
-             f"Gaussian\nconstruction's own value in every panel. Top row is what "
-             f"the arms minimize — the SHIPPED classifier objective, training "
-             f"cross-entropy plus a ridge shrink toward each\narm's own start — so "
-             f"it is a training loss; the bottom row is the only outcome to quote. "
-             f"That row is ERROR RATE on a shared log axis, not accuracy: "
-             f"PhiUSIIL is saturated enough that a\nlinear accuracy axis puts "
-             f"every good model on one pixel and a ±1 s.d. band around 0.9998 "
-             f"crosses 1.0, which is not a possible accuracy. A floor of "
-             f"{ERR_FLOOR:g} keeps a zero-error\npoint on the axis. Same "
-             f"features, split, box and evaluation budget throughout; only the "
-             f"starting point differs. {H.provenance_note(label)}",
-             ha="center", va="top", fontsize=F.FS_SMALL, color=F.MUTED,
-             linespacing=1.6)
+    fig.text(
+        0.5,
+        -0.012,
+        f"Lines are the mean over {n_seeds} seeds and bands are ±1 s.d. over "
+        f"the same seeds. Arms that never converge are drawn rather than "
+        f"dropped — on a cold start the two\ngradient-based arms sit at their "
+        f"starting objective for the whole budget, which is a result about "
+        f"the loss surface and not missing data. The dashed line is the "
+        f"Gaussian\nconstruction's own value in every panel. Top row is what "
+        f"the arms minimize — the SHIPPED classifier objective, training "
+        f"cross-entropy plus a ridge shrink toward each\narm's own start — so "
+        f"it is a training loss; the bottom row is the only outcome to quote. "
+        f"That row is ERROR RATE on a shared log axis, not accuracy: "
+        f"PhiUSIIL is saturated enough that a\nlinear accuracy axis puts "
+        f"every good model on one pixel and a ±1 s.d. band around 0.9998 "
+        f"crosses 1.0, which is not a possible accuracy. A floor of "
+        f"{ERR_FLOOR:g} keeps a zero-error\npoint on the axis. Same "
+        f"features, split, box and evaluation budget throughout; only the "
+        f"starting point differs. {H.provenance_note(label)}",
+        ha="center",
+        va="top",
+        fontsize=F.FS_SMALL,
+        color=F.MUTED,
+        linespacing=1.6,
+    )
     fig.tight_layout()
     return fig
 
