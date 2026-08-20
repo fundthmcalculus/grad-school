@@ -183,15 +183,17 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
         # it uses, so the cost is inside every reported time
         cands = {}
         for k in sorted({g[0] for g in BASE_GRID} | {FIS_K}):
-            _, t_c = _tmin(lambda k=k: build_candidates(inst.coords, k, inst.ceil), reps)
+            _, t_c = _tmin(
+                lambda k=k: build_candidates(inst.coords, k, inst.ceil), reps
+            )
             cands[k] = build_candidates(inst.coords, k, inst.ceil) + (t_c,)
 
         # --- constructions
         cand, cand_d, t_cand = cands[FIS_K]
         nn1, mean_c = nn_stats(cand_d)
-        (nn_t, t_nn) = _tmin(lambda: nn_tour(inst.coords, cand, inst.ceil, 0), reps)
-        (gr_t, t_gr) = _tmin(lambda: greedy_edge_tour(inst.coords, cand, inst.ceil), reps)
-        (fc_t, t_fc) = _tmin(
+        nn_t, t_nn = _tmin(lambda: nn_tour(inst.coords, cand, inst.ceil, 0), reps)
+        gr_t, t_gr = _tmin(lambda: greedy_edge_tour(inst.coords, cand, inst.ceil), reps)
+        fc_t, t_fc = _tmin(
             lambda: fis_build(inst, cand, cand_d, c_cons, FIS_C_BREADTH, 0, c_tab), reps
         )
         for tag, tour, t in (
@@ -206,10 +208,10 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
         # --- baseline LK frontier, each from the greedy start that suits it best
         for k, depth, deep in BASE_GRID:
             ck, cdk, t_ck = cands[k]
-            (start, t_start) = _tmin(
+            start, t_start = _tmin(
                 lambda ck=ck: greedy_edge_tour(inst.coords, ck, inst.ceil), reps
             )
-            (res, t_lk) = _tmin(
+            res, t_lk = _tmin(
                 lambda ck=ck, cdk=cdk, start=start, k=k, depth=depth, deep=deep: lk_solve(
                     inst.coords, ck, cdk, inst.ceil, start, k, depth, deep, 3
                 ),
@@ -224,13 +226,71 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
         # so the table separates the ranker from the effort controller from the
         # chain-continuation rules, and the tuned rule base from the hand-written one.
         arms = [
-            ("fis_effort_greedy", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant,
-             False, False),
-            ("fis_effort_chain_greedy", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant,
-             True, False),
-            ("fis_full", fc_t, t_fc, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant, True, False),
-            ("fis_effort_nn", nn_t, t_nn, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant, True, False),
-            ("fis_defer", gr_t, t_gr, e_cons, h_cons, e_tab, h_tab, e_ant, h_ant, True, True),
+            (
+                "fis_effort_greedy",
+                gr_t,
+                t_gr,
+                e_cons,
+                h_cons,
+                e_tab,
+                h_tab,
+                e_ant,
+                h_ant,
+                False,
+                False,
+            ),
+            (
+                "fis_effort_chain_greedy",
+                gr_t,
+                t_gr,
+                e_cons,
+                h_cons,
+                e_tab,
+                h_tab,
+                e_ant,
+                h_ant,
+                True,
+                False,
+            ),
+            (
+                "fis_full",
+                fc_t,
+                t_fc,
+                e_cons,
+                h_cons,
+                e_tab,
+                h_tab,
+                e_ant,
+                h_ant,
+                True,
+                False,
+            ),
+            (
+                "fis_effort_nn",
+                nn_t,
+                t_nn,
+                e_cons,
+                h_cons,
+                e_tab,
+                h_tab,
+                e_ant,
+                h_ant,
+                True,
+                False,
+            ),
+            (
+                "fis_defer",
+                gr_t,
+                t_gr,
+                e_cons,
+                h_cons,
+                e_tab,
+                h_tab,
+                e_ant,
+                h_ant,
+                True,
+                True,
+            ),
             (
                 "fis_effort_greedy_handwritten",
                 gr_t,
@@ -259,10 +319,22 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
             ),
         ]
         for tag, start, t_start, ec, hc, et, ht, ea, ha, use_chain, defer in arms:
-            (res, t_run) = _tmin(
-                lambda s=start, ec=ec, hc=hc, et=et, ht=ht, ea=ea, ha=ha,
-                u=use_chain, d=defer: fis_ls(
-                    inst, cand, cand_d, s, ec, hc, FIS_DEPTH, FIS_OR, d, u, et, ht, ea, ha
+            res, t_run = _tmin(
+                lambda s=start, ec=ec, hc=hc, et=et, ht=ht, ea=ea, ha=ha, u=use_chain, d=defer: fis_ls(
+                    inst,
+                    cand,
+                    cand_d,
+                    s,
+                    ec,
+                    hc,
+                    FIS_DEPTH,
+                    FIS_OR,
+                    d,
+                    u,
+                    et,
+                    ht,
+                    ea,
+                    ha,
                 ),
                 reps,
             )
@@ -275,8 +347,10 @@ def run(names, reps=3, max_n=20000, tuned=None, with_lkh=False, lkh_max_n=3000):
             row[f"{tag}_mean_breadth"] = float(st[STAT_BREADTH_SUM]) / scans
 
         # the fuzzy ranker feeding an unmodified LK: the other half of the ablation
-        (res, t_run) = _tmin(
-            lambda: lk_solve(inst.coords, cand, cand_d, inst.ceil, fc_t, FIS_K, 10, 32, 3),
+        res, t_run = _tmin(
+            lambda: lk_solve(
+                inst.coords, cand, cand_d, inst.ceil, fc_t, FIS_K, 10, 32, 3
+            ),
             reps,
         )
         tour, _, _ = res
@@ -307,7 +381,9 @@ def _instance_frontier(row):
         key = f"lk_{k}_{depth}_{deep}"
         if f"{key}_gap" in row:
             pts.append((row[f"{key}_s"], row[f"{key}_gap"]))
-    keep = [p for p in pts if not any(q[0] <= p[0] and q[1] <= p[1] and q != p for q in pts)]
+    keep = [
+        p for p in pts if not any(q[0] <= p[0] and q[1] <= p[1] and q != p for q in pts)
+    ]
     keep.sort()
     t = np.array([p[0] for p in keep])
     g = np.array([p[1] for p in keep])
@@ -368,8 +444,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--max-n", type=int, default=20000)
-    ap.add_argument("--scale", default=fis.DEFAULT_SCALE,
-                    choices=sorted(fis.EFFORT_RULES_BY_SCALE))
+    ap.add_argument(
+        "--scale", default=fis.DEFAULT_SCALE, choices=sorted(fis.EFFORT_RULES_BY_SCALE)
+    )
     ap.add_argument("--tuned", default=None, help="default: results/tuned_<scale>.npz")
     ap.add_argument("--lkh", action="store_true")
     ap.add_argument("--out", default=None, help="default: results/results_<scale>.json")
@@ -392,7 +469,9 @@ def main():
     summary = summarise(rows)
     summary_big = summarise(rows, min_n=1000)
     print(f"\n{'arm':>22s} {'mean gap':>9s} {'total s':>9s} {'n':>4s}")
-    print(f"\n{'arm':>32s} {'mean gap':>9s} {'total s':>9s} {'mean q':>7s} {'q n>=1k':>8s}")
+    print(
+        f"\n{'arm':>32s} {'mean gap':>9s} {'total s':>9s} {'mean q':>7s} {'q n>=1k':>8s}"
+    )
     for key, v in sorted(
         summary.items(), key=lambda kv: kv[1]["mean_q"] if kv[1]["mean_q"] else 9e9
     ):
@@ -406,7 +485,8 @@ def main():
 
     Path(args.out).write_text(
         json.dumps(
-            {"rows": rows, "summary": summary, "summary_n_ge_1000": summary_big}, indent=1
+            {"rows": rows, "summary": summary, "summary_n_ge_1000": summary_big},
+            indent=1,
         )
     )
     print(f"\nwrote {args.out}")

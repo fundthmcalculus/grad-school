@@ -90,7 +90,9 @@ def compass_refine(
                     break  # keep the move, go to the next coordinate
                 theta[i] = old
         if verbose:
-            print(f"    sweep {sweeps:3d} step={step:.4f} best={best:.6f} evals={evals}")
+            print(
+                f"    sweep {sweeps:3d} step={step:.4f} best={best:.6f} evals={evals}"
+            )
         if not improved:
             step *= shrink  # a whole sweep found nothing: refine the resolution
     return theta, best, evals, sweeps
@@ -112,7 +114,9 @@ def library_perturb_refine(fcn, theta, variables, passes=6, start=0.12, shrink=0
     best = float(fcn(theta))
     p = float(start)
     for _ in range(passes):
-        cand, val = local_perturb_optim(fcn, theta.copy(), variables, max_perturbation=p)
+        cand, val = local_perturb_optim(
+            fcn, theta.copy(), variables, max_perturbation=p
+        )
         cand = np.clip(cand, 0.0, 1.0)
         v = float(fcn(cand))
         if v < best:

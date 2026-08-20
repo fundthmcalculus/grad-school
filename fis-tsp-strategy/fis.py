@@ -292,9 +292,15 @@ E_RANK = 1  # nearer neighbours the worse tour edge ignores, / k      (AUC 0.833
 E_PROBE = 2  # best depth-1 gain available, over the broken edge      (AUC 0.795)
 E_EXCESS = 3  # mean incident edge / nearest-neighbour distance       (AUC 0.759)
 E_ASYM = 4  # |d_succ - d_pred| / (d_succ + d_pred)                   (AUC 0.741)
-E_TURN = 5  # local turn sharpness                                   (AUC 0.691, large only)
-E_PEAK = 6  # nearest-neighbour / mean candidate distance            (AUC 0.589, large only)
-E_PROGRESS = 7  # fraction of the run's work already spent           (AUC 0.579, large only)
+E_TURN = (
+    5  # local turn sharpness                                   (AUC 0.691, large only)
+)
+E_PEAK = (
+    6  # nearest-neighbour / mean candidate distance            (AUC 0.589, large only)
+)
+E_PROGRESS = (
+    7  # fraction of the run's work already spent           (AUC 0.579, large only)
+)
 E_N_IN_SMALL = 5
 E_N_IN_LARGE = 8
 
@@ -371,7 +377,14 @@ EFFORT_RULES_BY_SCALE = {
 }
 
 _E_NAMES = (
-    "probe_frac", "rank", "probe", "excess", "edge_asym", "turn", "peak", "progress",
+    "probe_frac",
+    "rank",
+    "probe",
+    "excess",
+    "edge_asym",
+    "turn",
+    "peak",
+    "progress",
 )
 
 
@@ -480,7 +493,9 @@ def chain_base(scale=DEFAULT_SCALE):
 # Module-level defaults, built at the default scale. Everything that does not care about
 # scale — the benchmark's hand-written arms, the invariant tests — reads these; anything that
 # does calls effort_base()/chain_base() with the scale it wants.
-EFFORT_ANT, EFFORT_CONS, EFFORT_MF_C, EFFORT_MF_S, EFFORT_TAB = effort_base(DEFAULT_SCALE)
+EFFORT_ANT, EFFORT_CONS, EFFORT_MF_C, EFFORT_MF_S, EFFORT_TAB = effort_base(
+    DEFAULT_SCALE
+)
 CHAIN_ANT, CHAIN_CONS, CHAIN_MF_C, CHAIN_MF_S, CHAIN_TAB = chain_base(DEFAULT_SCALE)
 
 # Passed to the shared LK chain by the baseline arm, which does not consult a rule

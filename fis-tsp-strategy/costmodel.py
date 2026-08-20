@@ -71,7 +71,9 @@ def features_from_stats(stats, n):
     EFFORT rule base to count — so that column reads zero for it, which is exactly
     the truth rather than a missing value.
     """
-    effort_fis = float(stats[STAT_FIS_CALLS]) if stats.shape[0] > STAT_FIS_CALLS else 0.0
+    effort_fis = (
+        float(stats[STAT_FIS_CALLS]) if stats.shape[0] > STAT_FIS_CALLS else 0.0
+    )
     return np.array(
         [
             float(stats[STAT_SCANS]),

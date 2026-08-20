@@ -58,118 +58,157 @@ class Feature:
 # ---------------------------------------------------------------------------
 EFFORT_FEATURES = [
     Feature(
-        "probe_frac", "EFFORT",
+        "probe_frac",
+        "EFFORT",
         "fraction of candidates passing the depth-1 positive-gain test, both directions",
-        0.858, 0.327,
+        0.858,
+        0.327,
         "a scan that breaks at the first failing candidate; usually 1-3 iterations",
-        "kept", ("small", "large"),
+        "kept",
+        ("small", "large"),
         "Best of everything tried, on both questions. A look-ahead: one level of search run "
         "before committing to any.",
     ),
     Feature(
-        "rank", "EFFORT",
+        "rank",
+        "EFFORT",
         "how many strictly nearer neighbours the worse incident tour edge is ignoring, / k",
-        0.833, 0.301,
+        0.833,
+        0.301,
         "a scan of an ascending list, breaks at the edge length",
-        "kept", ("small", "large"),
+        "kept",
+        ("small", "large"),
         "Scale-free without dividing by anything: counts better options rather than measuring "
         "an excess.",
     ),
     Feature(
-        "probe", "EFFORT",
+        "probe",
+        "EFFORT",
         "size of the best depth-1 gain available, over the broken edge length",
-        0.795, 0.197,
+        0.795,
+        0.197,
         "free alongside probe_frac — same loop",
-        "kept", ("small", "large"),
+        "kept",
+        ("small", "large"),
         "Partly redundant with probe_frac; the marginal contribution of the pair has not been "
         "ablated.",
     ),
     Feature(
-        "excess", "EFFORT",
+        "excess",
+        "EFFORT",
         "mean incident edge length / nearest-neighbour distance",
-        0.759, 0.153,
+        0.759,
+        0.153,
         "two distance evaluations and a divide",
-        "kept", ("legacy", "small", "large"),
+        "kept",
+        ("legacy", "small", "large"),
     ),
     Feature(
-        "edge_asym", "EFFORT",
+        "edge_asym",
+        "EFFORT",
         "|d_succ - d_pred| / (d_succ + d_pred)",
-        0.741, 0.157,
+        0.741,
+        0.157,
         "free — both distances are already computed",
-        "kept", ("small", "large"),
+        "kept",
+        ("small", "large"),
         "One long edge and one short is a better prospect than two medium ones, because the "
         "long one is what a 2-opt can remove.",
     ),
     Feature(
-        "turn", "EFFORT",
+        "turn",
+        "EFFORT",
         "local turn sharpness at the city, 0 straight through to 1 doubling back",
-        0.691, -0.116,
+        0.691,
+        -0.116,
         "two hypots — the most expensive feature here",
-        "dropped", ("legacy", "large"),
+        "dropped",
+        ("legacy", "large"),
         "The signs disagree: it predicts *whether* a city pays (0.691) but among paying cities "
         "sharper turns pay *less* (-0.116). One monotone rule cannot serve both, which is why "
         "`small` drops it and `large` keeps it only to test whether interactions can use it.",
     ),
     Feature(
-        "peak", "EFFORT",
+        "peak",
+        "EFFORT",
         "nearest-neighbour distance / mean candidate distance",
-        0.589, 0.231,
+        0.589,
+        0.231,
         "two loads and a divide, both precomputed per instance",
-        "dropped", ("legacy", "large"),
+        "dropped",
+        ("legacy", "large"),
         "Weak at predicting whether, second-best at ordering by how much. Kept in `large` for "
         "that reason.",
     ),
     Feature(
-        "progress", "EFFORT",
+        "progress",
+        "EFFORT",
         "fraction of the run's total work already spent",
-        0.579, 0.018,
+        0.579,
+        0.018,
         "a divide",
-        "dropped", ("legacy", "large"),
+        "dropped",
+        ("legacy", "large"),
         "Nearly useless on both questions. It is a property of the run, not of the city, which "
         "is probably why.",
     ),
     Feature(
-        "pos_spread", "EFFORT",
+        "pos_spread",
+        "EFFORT",
         "tour-position spread of the candidate neighbours, / n",
-        0.547, 0.174,
+        0.547,
+        0.174,
         "a full k-iteration scan, no early break",
-        "rejected", (),
+        "rejected",
+        (),
         "The idea was to detect geometry/tour mismatch. It does not, and it is one of the more "
         "expensive candidates.",
     ),
     Feature(
-        "cand_step", "EFFORT",
+        "cand_step",
+        "EFFORT",
         "(second-nearest - nearest) / nearest",
-        0.520, -0.106,
+        0.520,
+        -0.106,
         "two loads and a divide",
-        "rejected", (),
+        "rejected",
+        (),
         "Intended as a sharper local version of peak. Indistinguishable from noise.",
     ),
     Feature(
-        "fails", "EFFORT",
+        "fails",
+        "EFFORT",
         "how many times this city has already been searched without result",
-        0.488, -0.123,
+        0.488,
+        -0.123,
         "one load",
-        "dropped", ("legacy",),
+        "dropped",
+        ("legacy",),
         "An *existing* input, and at AUC 0.488 indistinguishable from noise. The don't-look-bit "
         "queue already removes settled cities structurally, so the count adds nothing on top "
         "of the mechanism that produces it. Still used for the queue bookkeeping; just not as "
         "a rule-base input.",
     ),
     Feature(
-        "in_degree", "EFFORT",
+        "in_degree",
+        "EFFORT",
         "how many cities hold this one in their candidate list, / k",
-        0.449, -0.031,
+        0.449,
+        -0.031,
         "one load, precomputed per instance",
-        "rejected", (),
+        "rejected",
+        (),
         "Meant to distinguish hubs from leaves. It does not predict payoff.",
     ),
     Feature(
-        "nbr_active", "EFFORT",
+        "nbr_active",
+        "EFFORT",
         "fraction of this city's candidate neighbours still in the work queue",
-        0.426, -0.100,
+        0.426,
+        -0.100,
         "a full k-iteration scan, no early break",
-        "rejected", (),
+        "rejected",
+        (),
         "Meant to capture whether a neighbourhood is still active. Reads *inverted* (fewer "
         "active neighbours slightly predicts paying off) and is weak either way.",
     ),
@@ -183,35 +222,55 @@ EFFORT_FEATURES = [
 # ---------------------------------------------------------------------------
 CHAIN_FEATURES = [
     Feature(
-        "credit", "CHAIN",
+        "credit",
+        "CHAIN",
         "gain credit carried into the next level, over the first broken edge",
-        None, None, "free — the chain already has it",
-        "kept", ("legacy", "small", "large"),
+        None,
+        None,
+        "free — the chain already has it",
+        "kept",
+        ("legacy", "small", "large"),
     ),
     Feature(
-        "depth", "CHAIN",
+        "depth",
+        "CHAIN",
         "how deep the chain already is, as a fraction of the cap",
-        None, None, "free",
-        "kept", ("legacy", "small", "large"),
+        None,
+        None,
+        "free",
+        "kept",
+        ("legacy", "small", "large"),
         "Depth is what costs time, so this is the input the cut-off exists to weigh against.",
     ),
     Feature(
-        "banked", "CHAIN",
+        "banked",
+        "CHAIN",
         "best closing gain found so far, over the first broken edge",
-        None, None, "free",
-        "kept", ("legacy", "small", "large"),
+        None,
+        None,
+        "free",
+        "kept",
+        ("legacy", "small", "large"),
     ),
     Feature(
-        "trade", "CHAIN",
+        "trade",
+        "CHAIN",
         "next step's break-long-add-short margin, same scale",
-        None, None, "free — computed while choosing the next candidate",
-        "kept", ("legacy", "small", "large"),
+        None,
+        None,
+        "free — computed while choosing the next candidate",
+        "kept",
+        ("legacy", "small", "large"),
     ),
     Feature(
-        "revcost", "CHAIN",
+        "revcost",
+        "CHAIN",
         "how much array this level's reversal moved, over the most it could",
-        None, None, "free — `reverse` already returns its swap count",
-        "kept", ("small", "large"),
+        None,
+        None,
+        "free — `reverse` already returns its swap count",
+        "kept",
+        ("small", "large"),
         "The only input taken from the cost model rather than the search's own logic: reversal "
         "traffic is separately priced at ~4.4ns/element and a chain shuffling half the tour "
         "per level is expensive in a way no gain number reveals.",
@@ -236,7 +295,9 @@ def inputs_for(base, scale):
 
 def as_markdown():
     lines = []
-    lines.append("| feature | AUC | ρ (paying) | cost | verdict | legacy | small | large |")
+    lines.append(
+        "| feature | AUC | ρ (paying) | cost | verdict | legacy | small | large |"
+    )
     lines.append("|---|---|---|---|---|---|---|---|")
     for f in FEATURES:
         auc = f"{f.auc:.3f}" if f.auc is not None else "—"
@@ -260,7 +321,9 @@ def check():
         got_e = fis.effort_inputs(scale)
         got_c = fis.chain_inputs(scale)
         if list(want_e) != list(got_e):
-            problems.append(f"EFFORT/{scale}: registry {want_e} != fis.py {list(got_e)}")
+            problems.append(
+                f"EFFORT/{scale}: registry {want_e} != fis.py {list(got_e)}"
+            )
         if list(want_c) != list(got_c):
             problems.append(f"CHAIN/{scale}: registry {want_c} != fis.py {list(got_c)}")
     names = [f.name for f in FEATURES]
@@ -286,7 +349,11 @@ def main():
         problems = check()
         for p in problems:
             print(f"  MISMATCH {p}")
-        print("registry consistent with fis.py" if not problems else f"{len(problems)} problems")
+        print(
+            "registry consistent with fis.py"
+            if not problems
+            else f"{len(problems)} problems"
+        )
         raise SystemExit(1 if problems else 0)
     for sc in SCALES:
         print(f"{sc:>7s}: {SCALE_NOTES[sc]}")

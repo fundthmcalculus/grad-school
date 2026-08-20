@@ -55,7 +55,6 @@ from kick import iterated_lk  # noqa: E402
 from lk import lk_solve  # noqa: E402
 from tsplib import load, reference_length, validate_tour  # noqa: E402
 
-
 K = 32
 LONG_EDGE = 3.0  # an edge this many times the mean is drawn as "long"
 
@@ -94,23 +93,46 @@ def arms_for(inst, kicks):
     validate_tour(start, inst.n)
 
     t0 = time.perf_counter()
-    lk_tour, lk_len, _ = lk_solve(inst.coords, cand, cand_d, inst.ceil, start, K, 6, 32, 3)
+    lk_tour, lk_len, _ = lk_solve(
+        inst.coords, cand, cand_d, inst.ceil, start, K, 6, 32, 3
+    )
     t_lk = time.perf_counter() - t0
     validate_tour(lk_tour, inst.n)
 
     t0 = time.perf_counter()
     it_tour, it_len, _ = iterated_lk(
-        inst.coords, cand, cand_d, inst.ceil, start, K, 6, 32, 3, kicks, 24, 12345, none,
-        False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS,
+        inst.coords,
+        cand,
+        cand_d,
+        inst.ceil,
+        start,
+        K,
+        6,
+        32,
+        3,
+        kicks,
+        24,
+        12345,
+        none,
+        False,
+        fis.NO_CHAIN_TAB,
+        fis.NO_CHAIN_ANT,
+        fis.NO_CHAIN_CONS,
     )
     t_it = time.perf_counter() - t0
     validate_tour(it_tour, inst.n)
 
     return [
-        (f"greedy-edge start — {inst.gap(reference_length(start, inst)):.2f}%, "
-         f"{t_start:.2f}s", start),
+        (
+            f"greedy-edge start — {inst.gap(reference_length(start, inst)):.2f}%, "
+            f"{t_start:.2f}s",
+            start,
+        ),
         (f"fixed LK k32/d6/b32 — {inst.gap(lk_len):.2f}%, {t_lk:.2f}s", lk_tour),
-        (f"+ {kicks:,} double-bridge kicks — {inst.gap(it_len):.2f}%, {t_it:.2f}s", it_tour),
+        (
+            f"+ {kicks:,} double-bridge kicks — {inst.gap(it_len):.2f}%, {t_it:.2f}s",
+            it_tour,
+        ),
     ]
 
 
@@ -127,9 +149,23 @@ def main():
     wg = greedy_edge_tour(warm.coords, wc, warm.ceil)
     lk_solve(warm.coords, wc, wcd, warm.ceil, wg, K, 6, 32, 3)
     iterated_lk(
-        warm.coords, wc, wcd, warm.ceil, wg, K, 6, 32, 3, 4, 24, 1,
-        np.empty(0, np.float64), False,
-        fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS,
+        warm.coords,
+        wc,
+        wcd,
+        warm.ceil,
+        wg,
+        K,
+        6,
+        32,
+        3,
+        4,
+        24,
+        1,
+        np.empty(0, np.float64),
+        False,
+        fis.NO_CHAIN_TAB,
+        fis.NO_CHAIN_ANT,
+        fis.NO_CHAIN_CONS,
     )
 
     rows = [load(name) for name in args.instances]

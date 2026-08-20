@@ -121,7 +121,11 @@ def build_candidates(coords, k, ceil):
         contested = np.flatnonzero(dd_s[:, k - 1] == dd_s[:, k])
         for i in contested:
             radius = float(dd_s[i, k - 1])
-            ball = [j for j in tree.query_ball_point(coords[i], radius * (1 + 1e-9)) if j != i]
+            ball = [
+                j
+                for j in tree.query_ball_point(coords[i], radius * (1 + 1e-9))
+                if j != i
+            ]
             if len(ball) < k:
                 continue  # window already held everything within the radius
             ball = np.array(ball)

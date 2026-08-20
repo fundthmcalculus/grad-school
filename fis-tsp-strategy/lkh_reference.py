@@ -87,7 +87,10 @@ def main():
         t0 = time.perf_counter()
         res = lkh_one(name, args.timeout)
         if res is None:
-            print(f"  {name:>9s} n={inst.n:6d}  no result within {args.timeout:.0f}s", flush=True)
+            print(
+                f"  {name:>9s} n={inst.n:6d}  no result within {args.timeout:.0f}s",
+                flush=True,
+            )
             out[name] = {"n": inst.n, "gap": None, "s": None}
             continue
         gap, dt = res

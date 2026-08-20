@@ -86,9 +86,14 @@ def double_bridge(tour, pos, n, i, l1, l2, l3, touched):
 
     nt = 0
     for p in (
-        (i - 1 + n) % n, i, (i + l3 - 1) % n, (i + l3) % n,
-        (i + l3 + l2 - 1) % n, (i + l3 + l2) % n,
-        (i + total - 1) % n, (i + total) % n,
+        (i - 1 + n) % n,
+        i,
+        (i + l3 - 1) % n,
+        (i + l3) % n,
+        (i + l3 + l2 - 1) % n,
+        (i + l3 + l2) % n,
+        (i + total - 1) % n,
+        (i + total) % n,
     ):
         c = tour[p]
         dup = False
@@ -104,11 +109,23 @@ def double_bridge(tour, pos, n, i, l1, l2, l3, touched):
 
 @njit(cache=True)
 def iterated_lk(
-    coords, cand, cand_d, ceil, tour_in,
-    breadth, max_depth, deep_breadth, or_seg,
-    n_kicks, window, seed,
+    coords,
+    cand,
+    cand_d,
+    ceil,
+    tour_in,
+    breadth,
+    max_depth,
+    deep_breadth,
+    or_seg,
+    n_kicks,
+    window,
+    seed,
     weights,
-    use_chain, ch_tab, ch_ant, ch_cons,
+    use_chain,
+    ch_tab,
+    ch_ant,
+    ch_cons,
     accept_equal=False,
     patience=0,
 ):
@@ -145,9 +162,24 @@ def iterated_lk(
     for i in range(n):
         seeds[i] = tour[i]
     lk_reopt(
-        tour, pos, n, coords, cand, cand_d, ceil, seeds, n,
-        breadth, max_depth, deep_breadth, or_seg, stats,
-        use_chain, ch_tab, ch_ant, ch_cons,
+        tour,
+        pos,
+        n,
+        coords,
+        cand,
+        cand_d,
+        ceil,
+        seeds,
+        n,
+        breadth,
+        max_depth,
+        deep_breadth,
+        or_seg,
+        stats,
+        use_chain,
+        ch_tab,
+        ch_ant,
+        ch_cons,
     )
     best = tour.copy()
     best_len = tour_length(tour, coords, ceil)
@@ -187,9 +219,24 @@ def iterated_lk(
         if nt == 0:
             continue
         lk_reopt(
-            tour, pos, n, coords, cand, cand_d, ceil, kick_touched, nt,
-            breadth, max_depth, deep_breadth, or_seg, stats,
-            use_chain, ch_tab, ch_ant, ch_cons,
+            tour,
+            pos,
+            n,
+            coords,
+            cand,
+            cand_d,
+            ceil,
+            kick_touched,
+            nt,
+            breadth,
+            max_depth,
+            deep_breadth,
+            or_seg,
+            stats,
+            use_chain,
+            ch_tab,
+            ch_ant,
+            ch_cons,
         )
         stats[N_STATS - 1] += 1
         length = tour_length(tour, coords, ceil)
@@ -248,13 +295,43 @@ def main():
     print(f"{'kicks':>7s} {'gap':>8s} {'seconds':>9s}")
     for nk in args.kicks:
         iterated_lk(  # warm the JIT at this signature
-            inst.coords, cand, cand_d, inst.ceil, start, 8, 6, 16, 3, 1, args.window, 1,
-            none, False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS,
+            inst.coords,
+            cand,
+            cand_d,
+            inst.ceil,
+            start,
+            8,
+            6,
+            16,
+            3,
+            1,
+            args.window,
+            1,
+            none,
+            False,
+            fis.NO_CHAIN_TAB,
+            fis.NO_CHAIN_ANT,
+            fis.NO_CHAIN_CONS,
         )
         t0 = time.perf_counter()
         tour, length, stats = iterated_lk(
-            inst.coords, cand, cand_d, inst.ceil, start, 8, 6, 16, 3, nk, args.window, 1,
-            none, False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS,
+            inst.coords,
+            cand,
+            cand_d,
+            inst.ceil,
+            start,
+            8,
+            6,
+            16,
+            3,
+            nk,
+            args.window,
+            1,
+            none,
+            False,
+            fis.NO_CHAIN_TAB,
+            fis.NO_CHAIN_ANT,
+            fis.NO_CHAIN_CONS,
         )
         dt = time.perf_counter() - t0
         validate_tour(tour, inst.n)

@@ -282,7 +282,9 @@ def _lkh_configs(args):
         # Prefix match, so ``--lkh-labels nn32`` selects the whole family. Exists because the
         # sweep now spans three orders of magnitude in cost and a single decisive control
         # should not require paying for the configurations already measured.
-        cfgs = [c for c in cfgs if any(c["label"].startswith(p) for p in args.lkh_labels)]
+        cfgs = [
+            c for c in cfgs if any(c["label"].startswith(p) for p in args.lkh_labels)
+        ]
         if not cfgs:
             raise SystemExit(
                 f"no config label starts with any of {args.lkh_labels}; available: "
@@ -340,14 +342,25 @@ def lkh_curve(inst, configs, timeout=1800):
         row = {"cfg": label, "params": {k: v for k, v in cfg.items() if k != "label"}}
         try:
             r = subprocess.run(
-                [sys.executable, "-c", code], capture_output=True, text=True, timeout=timeout
+                [sys.executable, "-c", code],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
             )
             if r.returncode != 0:
-                out.append({**row, "gap": None, "s": None,
-                            "why": (r.stderr or "failed").strip()[-200:]})
+                out.append(
+                    {
+                        **row,
+                        "gap": None,
+                        "s": None,
+                        "why": (r.stderr or "failed").strip()[-200:],
+                    }
+                )
                 continue
             length, dt = r.stdout.split()
-            out.append({**row, "gap": inst.gap(float(length)), "s": float(dt), "why": "ok"})
+            out.append(
+                {**row, "gap": inst.gap(float(length)), "s": float(dt), "why": "ok"}
+            )
         except subprocess.TimeoutExpired:
             out.append({**row, "gap": None, "s": None, "why": f"timeout>{timeout}s"})
     return out
@@ -359,7 +372,9 @@ def measure(inst, tuned, kicks=KICKS, reps=3):
     ``tuned`` is a :class:`fis.Tuned`. Candidate-list construction and the starting tour are
     charged to every arm that uses them, so no arm is quietly given free setup.
     """
-    (cand, cand_d), t_cand = _tmin(lambda: build_candidates(inst.coords, K, inst.ceil), reps)
+    (cand, cand_d), t_cand = _tmin(
+        lambda: build_candidates(inst.coords, K, inst.ceil), reps
+    )
     start, t_start = _tmin(lambda: greedy_edge_tour(inst.coords, cand, inst.ceil), reps)
     uniform = np.empty(0, np.float64)
     base = t_cand + t_start
@@ -372,9 +387,11 @@ def measure(inst, tuned, kicks=KICKS, reps=3):
             (c2, cd2), tc2 = _tmin(
                 lambda k=k: build_candidates(inst.coords, k, inst.ceil), reps
             )
-            s2, ts2 = _tmin(lambda c2=c2: greedy_edge_tour(inst.coords, c2, inst.ceil), reps)
+            s2, ts2 = _tmin(
+                lambda c2=c2: greedy_edge_tour(inst.coords, c2, inst.ceil), reps
+            )
             t2 = tc2 + ts2
-        (res, dt) = _tmin(
+        res, dt = _tmin(
             lambda c2=c2, cd2=cd2, s2=s2, k=k, d=depth, b=deep: lk_solve(
                 inst.coords, c2, cd2, inst.ceil, s2, k, d, b, OR_SEG
             ),
@@ -382,15 +399,30 @@ def measure(inst, tuned, kicks=KICKS, reps=3):
         )
         tour, length, _ = res
         validate_tour(tour, inst.n)
-        assert abs(length - reference_length(tour, inst)) < 1e-6, "reported length disagrees"
-        sweep.append({"cfg": f"k{k}/d{depth}/b{deep}", "gap": inst.gap(length), "s": dt + t2})
+        assert (
+            abs(length - reference_length(tour, inst)) < 1e-6
+        ), "reported length disagrees"
+        sweep.append(
+            {"cfg": f"k{k}/d{depth}/b{deep}", "gap": inst.gap(length), "s": dt + t2}
+        )
 
     # --- the FIS local search, one point: the arm benchmark.py reports, on these axes.
-    (res, dt) = _tmin(
+    res, dt = _tmin(
         lambda: fis_ls_run(
-            inst, cand, cand_d, start, tuned.effort_cons, tuned.chain_cons,
-            FIS_DEPTH, OR_SEG, False, True,
-            tuned.effort_tab, tuned.chain_tab, tuned.effort_ant, tuned.chain_ant,
+            inst,
+            cand,
+            cand_d,
+            start,
+            tuned.effort_cons,
+            tuned.chain_cons,
+            FIS_DEPTH,
+            OR_SEG,
+            False,
+            True,
+            tuned.effort_tab,
+            tuned.chain_tab,
+            tuned.effort_ant,
+            tuned.chain_ant,
         ),
         reps,
     )
@@ -400,7 +432,7 @@ def measure(inst, tuned, kicks=KICKS, reps=3):
 
     # --- the iterated 2x2. Identical loop, budgets, seed and starting tour; the two factors
     #     are whether EFFORT aims the kicks and whether CHAIN runs inside re-optimisation.
-    (weights, t_weights) = _tmin(
+    weights, t_weights = _tmin(
         lambda: effort_weights(inst, cand, cand_d, start, tuned=tuned), reps
     )
 
@@ -411,26 +443,41 @@ def measure(inst, tuned, kicks=KICKS, reps=3):
             else (False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS)
         )
         return iterated_lk(
-            inst.coords, cand, cand_d, inst.ceil, start,
-            K, IT_DEPTH, IT_DEEP, OR_SEG, nk, WINDOW, 12345,
-            weights if aim else uniform, *ch,
+            inst.coords,
+            cand,
+            cand_d,
+            inst.ceil,
+            start,
+            K,
+            IT_DEPTH,
+            IT_DEEP,
+            OR_SEG,
+            nk,
+            WINDOW,
+            12345,
+            weights if aim else uniform,
+            *ch,
         )
 
     arms = {}
     for tag, aim, chain in IT_ARMS:
         arms[tag] = []
         for nk in kicks:
-            (res, dt) = _tmin(
+            res, dt = _tmin(
                 lambda nk=nk, a=aim, c=chain: _iterated(nk, a, c),
                 reps=2 if nk > 5000 else reps,
             )
             tour, length, _ = res
             validate_tour(tour, inst.n)
-            assert abs(length - reference_length(tour, inst)) < 1e-6, "reported length disagrees"
+            assert (
+                abs(length - reference_length(tour, inst)) < 1e-6
+            ), "reported length disagrees"
             # The aim is computed once per solve, so an aiming arm carries its cost at every
             # budget rather than having it amortised away by the largest one.
             overhead = t_weights if aim else 0.0
-            arms[tag].append({"kicks": nk, "gap": inst.gap(length), "s": dt + base + overhead})
+            arms[tag].append(
+                {"kicks": nk, "gap": inst.gap(length), "s": dt + base + overhead}
+            )
 
     return {"n": inst.n, "sweep": sweep, "fis_ls": fis_point, **arms}
 
@@ -477,7 +524,9 @@ def verdict(d):
             for t, g in pts
             if not any(lt <= t + 1e-12 and lg <= g + 1e-12 for lt, lg in lkh)
         ]
-        under = [(t, g) for t, g in pts if out["lkh_floor"] is None or t < out["lkh_floor"]]
+        under = [
+            (t, g) for t, g in pts if out["lkh_floor"] is None or t < out["lkh_floor"]
+        ]
         out["arms"][arm] = {
             "non_dominated_by_lkh": bool(nd),
             "n_non_dominated": len(nd),
@@ -600,26 +649,53 @@ def report(data):
     rows = scaling(data)
     it = [a[0] for a in IT_ARMS]
 
-    print("\n--- against LKH -------------------------------------------------------------")
-    print(f"{'instance':>10s} {'n':>6s} {'LKH floor':>10s} {'LKH best':>9s} "
-          f"{'our best':>9s} {'at':>8s}   non-dominated window")
+    print(
+        "\n--- against LKH -------------------------------------------------------------"
+    )
+    print(
+        f"{'instance':>10s} {'n':>6s} {'LKH floor':>10s} {'LKH best':>9s} "
+        f"{'our best':>9s} {'at':>8s}   non-dominated window"
+    )
     for r in rows:
         fl = f"{r['lkh_floor']:9.1f}s" if r["lkh_floor"] else "        —"
-        lb = f"{r['lkh_best_gap']:8.3f}%" if r["lkh_best_gap"] is not None else "       —"
-        ours = [(r[f"{a}_best_gap"], a) for a in OUR_ARMS if r.get(f"{a}_best_gap") is not None]
+        lb = (
+            f"{r['lkh_best_gap']:8.3f}%"
+            if r["lkh_best_gap"] is not None
+            else "       —"
+        )
+        ours = [
+            (r[f"{a}_best_gap"], a)
+            for a in OUR_ARMS
+            if r.get(f"{a}_best_gap") is not None
+        ]
         best, arm = min(ours) if ours else (None, "")
         ob = f"{best:8.3f}%" if best is not None else "       —"
         at = f"{r.get(f'{arm}_s_at_best', 0):7.2f}s" if arm else "      —"
         beats = [a for a in OUR_ARMS if r.get(f"{a}_nd")]
-        print(f"{r['name']:>10s} {r['n']:6d} {fl} {lb} {ob} {at}"
-              f"   {_window(r, beats)}")
-    print("\nA point is non-dominated when *no* measured LKH configuration matches it on both")
-    print("axes. The window is the wall-clock range over which that holds, and it is the only")
-    print("honest form of 'where, if anywhere, do we win' — 'better than some LKH point' is")
-    print("nearly free once LKH is swept, since it can be satisfied by beating a bad config.")
+        print(
+            f"{r['name']:>10s} {r['n']:6d} {fl} {lb} {ob} {at}"
+            f"   {_window(r, beats)}"
+        )
+    print(
+        "\nA point is non-dominated when *no* measured LKH configuration matches it on both"
+    )
+    print(
+        "axes. The window is the wall-clock range over which that holds, and it is the only"
+    )
+    print(
+        "honest form of 'where, if anywhere, do we win' — 'better than some LKH point' is"
+    )
+    print(
+        "nearly free once LKH is swept, since it can be satisfied by beating a bad config."
+    )
 
-    print("\n--- what the FIS contributes to the iterated solver, at a matched budget -----")
-    print(f"{'instance':>10s} {'n':>6s} {'budget':>8s} " + " ".join(f"{a:>15s}" for a in it))
+    print(
+        "\n--- what the FIS contributes to the iterated solver, at a matched budget -----"
+    )
+    print(
+        f"{'instance':>10s} {'n':>6s} {'budget':>8s} "
+        + " ".join(f"{a:>15s}" for a in it)
+    )
     for r in rows:
         if not r.get("matched_budget_s"):
             continue
@@ -627,11 +703,20 @@ def report(data):
         for a in it:
             v = r.get(f"{a}_at_budget")
             cells.append(f"{v:14.3f}%" if v is not None else "        not run")
-        print(f"{r['name']:>10s} {r['n']:6d} {r['matched_budget_s']:7.2f}s " + " ".join(cells))
-    print("\nAll four run the same loop from the same tour with the same seed and budgets.")
-    print("'aim' = EFFORT chooses where kicks land; 'chain' = CHAIN sets re-optimisation depth.")
+        print(
+            f"{r['name']:>10s} {r['n']:6d} {r['matched_budget_s']:7.2f}s "
+            + " ".join(cells)
+        )
+    print(
+        "\nAll four run the same loop from the same tour with the same seed and budgets."
+    )
+    print(
+        "'aim' = EFFORT chooses where kicks land; 'chain' = CHAIN sets re-optimisation depth."
+    )
 
-    print("\n--- how fast is 'good enough': best arm's time to reach each threshold ---")
+    print(
+        "\n--- how fast is 'good enough': best arm's time to reach each threshold ---"
+    )
     head = "  ".join(f"within {th}%".rjust(17) for th in THRESHOLDS)
     print(f"{'instance':>10s} {'n':>6s} {'LKH floor':>10s}  {head}")
     for r in rows:
@@ -645,15 +730,25 @@ def report(data):
             if best is None:
                 cells.append("        never".rjust(17))
             elif r.get("lkh_floor"):
-                cells.append(f"{best[0]:8.2f}s ({r['lkh_floor'] / best[0]:5.0f}x)".rjust(17))
+                cells.append(
+                    f"{best[0]:8.2f}s ({r['lkh_floor'] / best[0]:5.0f}x)".rjust(17)
+                )
             else:
                 cells.append(f"{best[0]:8.2f}s".rjust(17))
         fl = f"{r['lkh_floor']:9.1f}s" if r.get("lkh_floor") else "        —"
         print(f"{r['name']:>10s} {r['n']:6d} {fl}  " + "  ".join(cells))
-    print("\n(Nx) is the ratio to LKH's cheapest measured budget on that instance. Since the")
-    print("sweep now includes capped-trial configurations, that cheapest point is no longer the")
-    print("optimum — on rl5915 it is 18.4%. The ratio is therefore only a statement about the")
-    print("time axis; whether we are ahead at a budget is the non-dominated window above, and")
+    print(
+        "\n(Nx) is the ratio to LKH's cheapest measured budget on that instance. Since the"
+    )
+    print(
+        "sweep now includes capped-trial configurations, that cheapest point is no longer the"
+    )
+    print(
+        "optimum — on rl5915 it is 18.4%. The ratio is therefore only a statement about the"
+    )
+    print(
+        "time axis; whether we are ahead at a budget is the non-dominated window above, and"
+    )
     print("this table should not be read as a speedup against LKH at matched quality.")
     return rows
 
@@ -684,8 +779,11 @@ def _lkh_cost_law(measured_path):
     anchor = "runs=1 (elkai default)"
     pts = []
     for d in data.values():
-        times = [r["s"] for r in d.get("lkh", []) if r.get("s") is not None
-                 and r.get("cfg") == anchor]
+        times = [
+            r["s"]
+            for r in d.get("lkh", [])
+            if r.get("s") is not None and r.get("cfg") == anchor
+        ]
         if times and d.get("n"):
             pts.append((d["n"], min(times)))
     if len(pts) < 2:
@@ -694,7 +792,9 @@ def _lkh_cost_law(measured_path):
     ns = np.log(np.array([p[0] for p in pts], float))
     ss = np.log(np.array([p[1] for p in pts], float))
     slope = float(np.polyfit(ns, ss, 1)[0])
-    n_ref, s_ref = pts[-1]  # anchor at the largest measured point, not an extrapolated one
+    n_ref, s_ref = pts[
+        -1
+    ]  # anchor at the largest measured point, not an extrapolated one
     return slope, n_ref, s_ref, f"{len(pts)} floors measured on this machine"
 
 
@@ -702,37 +802,70 @@ def main():
     paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--instances", nargs="*", default=None)
-    ap.add_argument("--ladder", action="store_true", help=f"the full ladder: {' '.join(LADDER)}")
-    ap.add_argument("--ladder-hard", action="store_true",
-                    help="the held-out instances LKH never solves in 10 runs, per VSR-LKH "
-                         "Table 3: " + " ".join(LADDER_HARD))
-    ap.add_argument("--ladder-xl", action="store_true",
-                    help=f"n=11849..18512: {' '.join(LADDER_XL)} (tens of minutes per LKH run; "
-                         f"implies the larger kick budgets unless --kicks is given)")
-    ap.add_argument("--scale", default=fis.DEFAULT_SCALE,
-                    choices=sorted(fis.EFFORT_RULES_BY_SCALE))
+    ap.add_argument(
+        "--ladder", action="store_true", help=f"the full ladder: {' '.join(LADDER)}"
+    )
+    ap.add_argument(
+        "--ladder-hard",
+        action="store_true",
+        help="the held-out instances LKH never solves in 10 runs, per VSR-LKH "
+        "Table 3: " + " ".join(LADDER_HARD),
+    )
+    ap.add_argument(
+        "--ladder-xl",
+        action="store_true",
+        help=f"n=11849..18512: {' '.join(LADDER_XL)} (tens of minutes per LKH run; "
+        f"implies the larger kick budgets unless --kicks is given)",
+    )
+    ap.add_argument(
+        "--scale", default=fis.DEFAULT_SCALE, choices=sorted(fis.EFFORT_RULES_BY_SCALE)
+    )
     ap.add_argument("--tuned", default=None, help="default: results/tuned_<scale>.npz")
-    ap.add_argument("--hand-written", action="store_true",
-                    help="use the hand-written rules instead of a fitted file")
+    ap.add_argument(
+        "--hand-written",
+        action="store_true",
+        help="use the hand-written rules instead of a fitted file",
+    )
     ap.add_argument("--kicks", nargs="*", type=int, default=None)
-    ap.add_argument("--lkh-runs", nargs="*", type=int, default=None,
-                    help="legacy: sweep RUNS only, leaving MAX_TRIALS at LKH's default of n. "
-                         "That default is what put LKH's cheapest point minutes away; prefer "
-                         "the parameter sweep.")
-    ap.add_argument("--lkh-labels", nargs="*", default=None,
-                    help="only measure configs whose label starts with one of these, e.g. "
-                         "--lkh-labels nn32 alpha")
-    ap.add_argument("--lkh-cheap-candidates", action="store_true",
-                    help="also sweep NEAREST-NEIGHBOR candidate sets, which is the only knob "
-                         "that touches LKH's alpha-nearness preprocessing")
+    ap.add_argument(
+        "--lkh-runs",
+        nargs="*",
+        type=int,
+        default=None,
+        help="legacy: sweep RUNS only, leaving MAX_TRIALS at LKH's default of n. "
+        "That default is what put LKH's cheapest point minutes away; prefer "
+        "the parameter sweep.",
+    )
+    ap.add_argument(
+        "--lkh-labels",
+        nargs="*",
+        default=None,
+        help="only measure configs whose label starts with one of these, e.g. "
+        "--lkh-labels nn32 alpha",
+    )
+    ap.add_argument(
+        "--lkh-cheap-candidates",
+        action="store_true",
+        help="also sweep NEAREST-NEIGHBOR candidate sets, which is the only knob "
+        "that touches LKH's alpha-nearness preprocessing",
+    )
     ap.add_argument("--lkh-timeout", type=int, default=1800)
-    ap.add_argument("--lkh-append", action="store_true",
-                    help="with --lkh-only: measure only configs not already on "
-                         "disk and keep the rest, instead of re-measuring all")
-    ap.add_argument("--lkh-only", action="store_true",
-                    help="re-measure only LKH, keeping our arms already on disk")
-    ap.add_argument("--skip-lkh", action="store_true",
-                    help="measure our arms only, keeping any LKH curve already on disk")
+    ap.add_argument(
+        "--lkh-append",
+        action="store_true",
+        help="with --lkh-only: measure only configs not already on "
+        "disk and keep the rest, instead of re-measuring all",
+    )
+    ap.add_argument(
+        "--lkh-only",
+        action="store_true",
+        help="re-measure only LKH, keeping our arms already on disk",
+    )
+    ap.add_argument(
+        "--skip-lkh",
+        action="store_true",
+        help="measure our arms only, keeping any LKH curve already on disk",
+    )
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--out", default=str(paths.LKH_COMPARE))
@@ -753,14 +886,22 @@ def main():
 
     if args.dry_run:
         print(f"would measure {len(names)} instances: {' '.join(names)}")
-        print(f"our arms: {len(LK_GRID)} sweep configs, 1 FIS local search, "
-              f"{len(IT_ARMS)} x {len(args.kicks)} kick budgets, x{args.reps} reps")
+        print(
+            f"our arms: {len(LK_GRID)} sweep configs, 1 FIS local search, "
+            f"{len(IT_ARMS)} x {len(args.kicks)} kick budgets, x{args.reps} reps"
+        )
         cfgs = _lkh_configs(args)
-        print(f"LKH: {len(cfgs)} parameter sets ({', '.join(c['label'] for c in cfgs)}), "
-              f"timeout {args.lkh_timeout}s each\n")
+        print(
+            f"LKH: {len(cfgs)} parameter sets ({', '.join(c['label'] for c in cfgs)}), "
+            f"timeout {args.lkh_timeout}s each\n"
+        )
         exponent, ref_n, ref_s, source = _lkh_cost_law(args.out)
-        print(f"LKH's cost grows steeply — about n^{exponent:.1f}, from {source}. Extrapolating")
-        print(f"from {ref_s:.1f}s at n={ref_n} (a rough guide; the tail of the ladder is where")
+        print(
+            f"LKH's cost grows steeply — about n^{exponent:.1f}, from {source}. Extrapolating"
+        )
+        print(
+            f"from {ref_s:.1f}s at n={ref_n} (a rough guide; the tail of the ladder is where"
+        )
         print("the budget goes, and LKH's cost varies a lot with instance structure):")
         total = 0.0
         for name in names:
@@ -768,10 +909,14 @@ def main():
             est = ref_s * (n / ref_n) ** exponent
             capped = sum(min(est * w, args.lkh_timeout) for w in _lkh_weights(args))
             total += capped
-            print(f"  {name:>10s} n={n:6d}  ~{est:8.0f}s per run, ~{capped / 60:7.1f} min "
-                  f"over {len(_lkh_configs(args))} parameter sets")
-        print(f"\n  estimated LKH total ~{total / 60:.0f} min "
-              f"(capped at the {args.lkh_timeout}s timeout)")
+            print(
+                f"  {name:>10s} n={n:6d}  ~{est:8.0f}s per run, ~{capped / 60:7.1f} min "
+                f"over {len(_lkh_configs(args))} parameter sets"
+            )
+        print(
+            f"\n  estimated LKH total ~{total / 60:.0f} min "
+            f"(capped at the {args.lkh_timeout}s timeout)"
+        )
         return
 
     out = json.loads(Path(args.out).read_text()) if Path(args.out).exists() else {}
@@ -800,7 +945,9 @@ def main():
                 cfgs = [c for c in cfgs if c["label"] not in have]
                 print(f"    appending {len(cfgs)} new config(s); keeping {len(have)}")
             fresh = lkh_curve(inst, cfgs, args.lkh_timeout)
-            out[name]["lkh"] = (out[name].get("lkh", []) + fresh) if args.lkh_append else fresh
+            out[name]["lkh"] = (
+                (out[name].get("lkh", []) + fresh) if args.lkh_append else fresh
+            )
             for r in fresh:
                 if r["gap"] is None:
                     print(f"    {r['cfg']:>24s}  {r['why']}")
@@ -817,7 +964,11 @@ def main():
         if args.hand_written
         else fis.load_tuned(args.tuned or paths.tuned(args.scale))
     )
-    src = "hand-written" if args.hand_written else str(args.tuned or paths.tuned(args.scale))
+    src = (
+        "hand-written"
+        if args.hand_written
+        else str(args.tuned or paths.tuned(args.scale))
+    )
     print(f"rule base: {src}  (scale {tuned.scale})")
 
     # warm every JIT signature before anything is timed
@@ -825,16 +976,46 @@ def main():
     wc, wcd = build_candidates(warm.coords, K, warm.ceil)
     wg = greedy_edge_tour(warm.coords, wc, warm.ceil)
     lk_solve(warm.coords, wc, wcd, warm.ceil, wg, K, IT_DEPTH, IT_DEEP, OR_SEG)
-    fis_ls_run(warm, wc, wcd, wg, tuned.effort_cons, tuned.chain_cons, FIS_DEPTH, OR_SEG,
-               False, True, tuned.effort_tab, tuned.chain_tab, tuned.effort_ant, tuned.chain_ant)
+    fis_ls_run(
+        warm,
+        wc,
+        wcd,
+        wg,
+        tuned.effort_cons,
+        tuned.chain_cons,
+        FIS_DEPTH,
+        OR_SEG,
+        False,
+        True,
+        tuned.effort_tab,
+        tuned.chain_tab,
+        tuned.effort_ant,
+        tuned.chain_ant,
+    )
     ww = effort_weights(warm, wc, wcd, wg, tuned=tuned)
     for w, ch in (
-        (np.empty(0, np.float64),
-         (False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS)),
+        (
+            np.empty(0, np.float64),
+            (False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS),
+        ),
         (ww, (True, tuned.chain_tab, tuned.chain_ant, tuned.chain_cons)),
     ):
-        iterated_lk(warm.coords, wc, wcd, warm.ceil, wg, K, IT_DEPTH, IT_DEEP, OR_SEG,
-                    2, WINDOW, 1, w, *ch)
+        iterated_lk(
+            warm.coords,
+            wc,
+            wcd,
+            warm.ceil,
+            wg,
+            K,
+            IT_DEPTH,
+            IT_DEEP,
+            OR_SEG,
+            2,
+            WINDOW,
+            1,
+            w,
+            *ch,
+        )
 
     out = json.loads(Path(args.out).read_text()) if Path(args.out).exists() else {}
     for name in names:
@@ -844,7 +1025,9 @@ def main():
         print("  fixed-parameter sweep")
         for r in m["sweep"]:
             print(f"    {r['cfg']:>14s} {r['gap']:7.3f}% {r['s']:8.4f}s")
-        print(f"  FIS local search  {m['fis_ls']['gap']:7.3f}% {m['fis_ls']['s']:8.4f}s")
+        print(
+            f"  FIS local search  {m['fis_ls']['gap']:7.3f}% {m['fis_ls']['s']:8.4f}s"
+        )
         for tag, _, _ in IT_ARMS:
             print(f"  {tag}")
             for r in m[tag]:

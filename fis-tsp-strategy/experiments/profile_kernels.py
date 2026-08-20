@@ -179,24 +179,57 @@ def counter_attribution(inst_name=PROFILE_INSTANCE):
     cand, cand_d = build_candidates(inst.coords, 32, inst.ceil)
     start = greedy_edge_tour(inst.coords, cand, inst.ceil)
 
-    tuned = fis.load_tuned(paths.tuned("small")) if paths.tuned("small").exists() \
+    tuned = (
+        fis.load_tuned(paths.tuned("small"))
+        if paths.tuned("small").exists()
         else fis.hand_written()
+    )
 
     lk_solve(inst.coords, cand, cand_d, inst.ceil, start, 32, 10, 32, 3)  # warm
     t0 = time.perf_counter()
     _, _, st_lk = lk_solve(inst.coords, cand, cand_d, inst.ceil, start, 32, 10, 32, 3)
     t_lk = time.perf_counter() - t0
 
-    fis_ls(inst, cand, cand_d, start, tuned.effort_cons, tuned.chain_cons, 10, 3, False, True,
-           tuned.effort_tab, tuned.chain_tab, tuned.effort_ant, tuned.chain_ant)
+    fis_ls(
+        inst,
+        cand,
+        cand_d,
+        start,
+        tuned.effort_cons,
+        tuned.chain_cons,
+        10,
+        3,
+        False,
+        True,
+        tuned.effort_tab,
+        tuned.chain_tab,
+        tuned.effort_ant,
+        tuned.chain_ant,
+    )
     t0 = time.perf_counter()
-    _, _, st_fis = fis_ls(inst, cand, cand_d, start, tuned.effort_cons, tuned.chain_cons,
-                          10, 3, False, True, tuned.effort_tab, tuned.chain_tab,
-                          tuned.effort_ant, tuned.chain_ant)
+    _, _, st_fis = fis_ls(
+        inst,
+        cand,
+        cand_d,
+        start,
+        tuned.effort_cons,
+        tuned.chain_cons,
+        10,
+        3,
+        False,
+        True,
+        tuned.effort_tab,
+        tuned.chain_tab,
+        tuned.effort_ant,
+        tuned.chain_ant,
+    )
     t_fis = time.perf_counter() - t0
 
     out = {}
-    for tag, st, wall in (("baseline LK", st_lk, t_lk), ("FIS effort+chain", st_fis, t_fis)):
+    for tag, st, wall in (
+        ("baseline LK", st_lk, t_lk),
+        ("FIS effort+chain", st_fis, t_fis),
+    ):
         feats = costmodel.features_from_stats(st, inst.n)
         # ``coef`` is seconds per unit — ``costmodel.py`` fits it that way and prints it
         # scaled by 1e9. Everything below is converted once, here, rather than at each use.
@@ -205,9 +238,15 @@ def counter_attribution(inst_name=PROFILE_INSTANCE):
             "wall_s": wall,
             "predicted_s": float(contrib_s.sum()),
             "rows": sorted(
-                ((costmodel.FEATURES[i], float(feats[i]), float(coef[i]) * 1e9,
-                  float(contrib_s[i]) * 1e3)
-                 for i in range(len(costmodel.FEATURES))),
+                (
+                    (
+                        costmodel.FEATURES[i],
+                        float(feats[i]),
+                        float(coef[i]) * 1e9,
+                        float(contrib_s[i]) * 1e3,
+                    )
+                    for i in range(len(costmodel.FEATURES))
+                ),
                 key=lambda r: -r[3],
             ),
         }
@@ -228,8 +267,11 @@ def ablation(inst_name=PROFILE_INSTANCE, reps=3):
     inst = load(inst_name)
     cand, cand_d = build_candidates(inst.coords, 32, inst.ceil)
     start = greedy_edge_tour(inst.coords, cand, inst.ceil)
-    tuned = fis.load_tuned(paths.tuned("small")) if paths.tuned("small").exists() \
+    tuned = (
+        fis.load_tuned(paths.tuned("small"))
+        if paths.tuned("small").exists()
         else fis.hand_written()
+    )
 
     def t(fn):
         fn()
@@ -241,16 +283,56 @@ def ablation(inst_name=PROFILE_INSTANCE, reps=3):
         return time.perf_counter() - t0
 
     rows = [
-        ("baseline LK, k32/d10/b32",
-         t(lambda: lk_solve(inst.coords, cand, cand_d, inst.ceil, start, 32, 10, 32, 3))),
-        ("FIS EFFORT only",
-         t(lambda: fis_ls(inst, cand, cand_d, start, tuned.effort_cons, tuned.chain_cons,
-                          10, 3, False, False, tuned.effort_tab, tuned.chain_tab,
-                          tuned.effort_ant, tuned.chain_ant))),
-        ("FIS EFFORT + CHAIN",
-         t(lambda: fis_ls(inst, cand, cand_d, start, tuned.effort_cons, tuned.chain_cons,
-                          10, 3, False, True, tuned.effort_tab, tuned.chain_tab,
-                          tuned.effort_ant, tuned.chain_ant))),
+        (
+            "baseline LK, k32/d10/b32",
+            t(
+                lambda: lk_solve(
+                    inst.coords, cand, cand_d, inst.ceil, start, 32, 10, 32, 3
+                )
+            ),
+        ),
+        (
+            "FIS EFFORT only",
+            t(
+                lambda: fis_ls(
+                    inst,
+                    cand,
+                    cand_d,
+                    start,
+                    tuned.effort_cons,
+                    tuned.chain_cons,
+                    10,
+                    3,
+                    False,
+                    False,
+                    tuned.effort_tab,
+                    tuned.chain_tab,
+                    tuned.effort_ant,
+                    tuned.chain_ant,
+                )
+            ),
+        ),
+        (
+            "FIS EFFORT + CHAIN",
+            t(
+                lambda: fis_ls(
+                    inst,
+                    cand,
+                    cand_d,
+                    start,
+                    tuned.effort_cons,
+                    tuned.chain_cons,
+                    10,
+                    3,
+                    False,
+                    True,
+                    tuned.effort_tab,
+                    tuned.chain_tab,
+                    tuned.effort_ant,
+                    tuned.chain_ant,
+                )
+            ),
+        ),
     ]
     return inst, rows
 
@@ -272,25 +354,43 @@ def main():
     else:
         ratios = [d["predicted_s"] / d["wall_s"] for d in attr.values() if d["wall_s"]]
         for tag, d in attr.items():
-            print(f"\n  {tag} on {args.instance}: {d['wall_s'] * 1e3:.2f} ms measured, "
-                  f"{d['predicted_s'] * 1e3:.2f} ms predicted "
-                  f"({d['predicted_s'] / d['wall_s']:.2f}x)")
-            print(f"    {'counter':<26s} {'count':>12s} {'ns each':>9s} {'ms':>8s} {'share':>7s}")
+            print(
+                f"\n  {tag} on {args.instance}: {d['wall_s'] * 1e3:.2f} ms measured, "
+                f"{d['predicted_s'] * 1e3:.2f} ms predicted "
+                f"({d['predicted_s'] / d['wall_s']:.2f}x)"
+            )
+            print(
+                f"    {'counter':<26s} {'count':>12s} {'ns each':>9s} {'ms':>8s} {'share':>7s}"
+            )
             total = sum(r[3] for r in d["rows"]) or 1.0
             for name, count, per_ns, contrib_ms in d["rows"]:
                 if contrib_ms <= 0:
                     continue
                 label = COUNTER_LABEL.get(name, (name, None))[0]
-                print(f"    {label:<26s} {count:12.0f} {per_ns:9.1f} "
-                      f"{contrib_ms:8.3f} {100 * contrib_ms / total:6.1f}%")
+                print(
+                    f"    {label:<26s} {count:12.0f} {per_ns:9.1f} "
+                    f"{contrib_ms:8.3f} {100 * contrib_ms / total:6.1f}%"
+                )
         if ratios and min(ratios) > 1.15:
-            print(f"\n  Note: the shipped coefficients over-predict this machine by "
-                  f"{min(ratios):.2f}-{max(ratios):.2f}x, and by close to the *same* factor on")
-            print("  both arms. A near-uniform scale error is what a cost model fitted on other")
-            print("  hardware looks like, and it is harmless for its actual job: the tuner ranks")
-            print("  candidates rather than reading absolute times off it, and ranking is what")
-            print("  the fit's 0.9995 rank correlation measures. The shares below are unaffected.")
-            print("  Re-run costmodel.py to recalibrate; the shares, not the totals, are the")
+            print(
+                f"\n  Note: the shipped coefficients over-predict this machine by "
+                f"{min(ratios):.2f}-{max(ratios):.2f}x, and by close to the *same* factor on"
+            )
+            print(
+                "  both arms. A near-uniform scale error is what a cost model fitted on other"
+            )
+            print(
+                "  hardware looks like, and it is harmless for its actual job: the tuner ranks"
+            )
+            print(
+                "  candidates rather than reading absolute times off it, and ranking is what"
+            )
+            print(
+                "  the fit's 0.9995 rank correlation measures. The shares below are unaffected."
+            )
+            print(
+                "  Re-run costmodel.py to recalibrate; the shares, not the totals, are the"
+            )
             print("  profile.")
 
     print("\n" + "=" * 78)
@@ -301,8 +401,12 @@ def main():
     for name, n_rules, n_in, ns in rows:
         print(f"  {name:<34s} {n_rules:6d} {n_in:7d} {ns:9.1f}")
     print(f"\n  one Python-level call into nopython mode: {over:.0f} ns")
-    print(f"  ...which is {over / rows[1][3]:.0f}x the CHAIN kernel it would be measuring.")
-    print("  Measuring these kernels from Python would therefore report the dispatch cost,")
+    print(
+        f"  ...which is {over / rows[1][3]:.0f}x the CHAIN kernel it would be measuring."
+    )
+    print(
+        "  Measuring these kernels from Python would therefore report the dispatch cost,"
+    )
     print("  not the kernel. That is why the loops above are jitted.")
 
     print("\n" + "=" * 78)

@@ -63,10 +63,17 @@ import numpy as np  # noqa: E402
 
 import fis  # noqa: E402
 import synth
-from core import build_candidates, dist, greedy_edge_tour, make_pos, nn_stats, pred, succ
+from core import (
+    build_candidates,
+    dist,
+    greedy_edge_tour,
+    make_pos,
+    nn_stats,
+    pred,
+    succ,
+)
 from lk import N_STATS, improve_city
 from tsplib import load
-
 
 # Candidate features. The first six are what `EFFORT` reads today; the rest are proposals.
 # Each is a name, a short description, and the direction a rule base would be expected to
@@ -154,8 +161,10 @@ def collect(inst, k=32, breadth=8, max_depth=6, deep_breadth=16, or_seg=3):
         ax, ay = coords[t1, 0] - coords[p1, 0], coords[t1, 1] - coords[p1, 1]
         bx, by = coords[s1, 0] - coords[t1, 0], coords[s1, 1] - coords[t1, 1]
         na, nb = np.hypot(ax, ay), np.hypot(bx, by)
-        f["turn"] = 0.5 if na <= 0 or nb <= 0 else 0.5 * (
-            1.0 - min(max((ax * bx + ay * by) / (na * nb), -1.0), 1.0)
+        f["turn"] = (
+            0.5
+            if na <= 0 or nb <= 0
+            else 0.5 * (1.0 - min(max((ax * bx + ay * by) / (na * nb), -1.0), 1.0))
         )
         f["progress"] = min(pops / work_scale, 1.0)
 
@@ -189,14 +198,34 @@ def collect(inst, k=32, breadth=8, max_depth=6, deep_breadth=16, or_seg=3):
         f["pos_spread"] = min(span / (k * 0.25 * n), 1.0)
 
         f["edge_asym"] = abs(d_s - d_p) / max(d_s + d_p, 1e-9)
-        f["cand_step"] = min((cand_d[t1, 1] - cand_d[t1, 0]) / max(cand_d[t1, 0], 1e-9), 1.0)
+        f["cand_step"] = min(
+            (cand_d[t1, 1] - cand_d[t1, 0]) / max(cand_d[t1, 0], 1e-9), 1.0
+        )
         f["in_degree"] = min(in_deg[t1] / 3.0, 1.0)
 
         gain, nt = improve_city(
-            tour, pos, n, coords, cand, cand_d, ceil, t1,
-            breadth, max_depth, deep_breadth, or_seg,
-            rev_i, rev_j, touched, stats,
-            False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS, xc, mu,
+            tour,
+            pos,
+            n,
+            coords,
+            cand,
+            cand_d,
+            ceil,
+            t1,
+            breadth,
+            max_depth,
+            deep_breadth,
+            or_seg,
+            rev_i,
+            rev_j,
+            touched,
+            stats,
+            False,
+            fis.NO_CHAIN_TAB,
+            fis.NO_CHAIN_ANT,
+            fis.NO_CHAIN_CONS,
+            xc,
+            mu,
         )
         rows.append([f[name] for name in NAMES])
         gains.append(max(float(gain), 0.0))
@@ -233,7 +262,7 @@ def auc(scores, labels):
         while j + 1 < len(s) and s[j + 1] == s[i]:
             j += 1
         if j > i:
-            ranks[order[i:j + 1]] = (i + j + 2) / 2.0
+            ranks[order[i : j + 1]] = (i + j + 2) / 2.0
         i = j + 1
     return float((ranks[pos].sum() - npos * (npos + 1) / 2.0) / (npos * nneg))
 
@@ -252,7 +281,7 @@ def _tied_ranks(a):
         while j + 1 < len(s) and s[j + 1] == s[i]:
             j += 1
         if j > i:
-            r[order[i:j + 1]] = (i + j + 2) / 2.0
+            r[order[i : j + 1]] = (i + j + 2) / 2.0
         i = j + 1
     return r
 
@@ -282,23 +311,40 @@ def main():
     X, y = [], []
     for inst in targets:
         xi, yi = collect(inst)
-        print(f"  {inst.name:>18s} n={inst.n:6d}  {len(yi):6d} city scans, "
-              f"{100.0 * (yi > 0).mean():5.1f}% paid off", flush=True)
+        print(
+            f"  {inst.name:>18s} n={inst.n:6d}  {len(yi):6d} city scans, "
+            f"{100.0 * (yi > 0).mean():5.1f}% paid off",
+            flush=True,
+        )
         X.append(xi)
         y.append(yi)
     X = np.vstack(X)
     y = np.concatenate(y)
 
-    print(f"\n{len(y)} city scans, {100.0 * (y > 0).mean():.1f}% yielded an improving move\n")
+    print(
+        f"\n{len(y)} city scans, {100.0 * (y > 0).mean():.1f}% yielded an improving move\n"
+    )
     paid = y > 0
-    print(f"{'feature':>12s} {'AUC':>7s} {'|AUC-.5|':>9s} {'rho|paid':>9s}  expect  note")
+    print(
+        f"{'feature':>12s} {'AUC':>7s} {'|AUC-.5|':>9s} {'rho|paid':>9s}  expect  note"
+    )
     res = []
     for i, (name, desc, direction) in enumerate(FEATURES):
         a = auc(X[:, i], y)
         r = spearman(X[paid, i], y[paid])
-        res.append({"feature": name, "auc": a, "rho_paid": r, "desc": desc, "expect": direction})
+        res.append(
+            {
+                "feature": name,
+                "auc": a,
+                "rho_paid": r,
+                "desc": desc,
+                "expect": direction,
+            }
+        )
         new = "" if i < 6 else "  <-- proposal"
-        print(f"{name:>12s} {a:7.4f} {abs(a - 0.5):9.4f} {r:9.4f}  {direction:>6s}{new}")
+        print(
+            f"{name:>12s} {a:7.4f} {abs(a - 0.5):9.4f} {r:9.4f}  {direction:>6s}{new}"
+        )
 
     res.sort(key=lambda d: -abs(d["auc"] - 0.5))
     print("\nranked by |AUC - 0.5|:")

@@ -77,7 +77,9 @@ def _arm(d, key):
     if key == "sweep":
         return [(r["s"], r["gap"]) for r in d.get("sweep", [])]
     if key == "lkh":
-        return [(r["s"], r["gap"]) for r in d.get("lkh", []) if r.get("gap") is not None]
+        return [
+            (r["s"], r["gap"]) for r in d.get("lkh", []) if r.get("gap") is not None
+        ]
     return [(r["s"], r["gap"]) for r in d.get(key, []) if r.get("gap") is not None]
 
 
@@ -85,15 +87,29 @@ def _panel(ax, name, d):
     colour, marker, label = STYLE["sweep"]
     sweep = _arm(d, "sweep")
     if sweep:
-        ax.scatter(*zip(*sweep), marker=marker, s=45, facecolors="none",
-                   edgecolors=colour, label=label, zorder=3)
+        ax.scatter(
+            *zip(*sweep),
+            marker=marker,
+            s=45,
+            facecolors="none",
+            edgecolors=colour,
+            label=label,
+            zorder=3,
+        )
 
     for key in IT_KEYS:
         pts = _arm(d, key)
         if pts:
             colour, marker, label = STYLE[key]
-            ax.plot(*zip(*_front(pts)), marker + "-", color=colour, ms=5, lw=1.6,
-                    label=label, zorder=4)
+            ax.plot(
+                *zip(*_front(pts)),
+                marker + "-",
+                color=colour,
+                ms=5,
+                lw=1.6,
+                label=label,
+                zorder=4,
+            )
 
     pts = _arm(d, "fis_ls")
     if pts:
@@ -103,30 +119,59 @@ def _panel(ax, name, d):
     lkh = _arm(d, "lkh")
     if lkh:
         colour, marker, label = STYLE["lkh"]
-        ax.plot(*zip(*sorted(lkh)), marker + "-", color=colour, ms=8, lw=1.6,
-                label=label, zorder=5)
+        ax.plot(
+            *zip(*sorted(lkh)),
+            marker + "-",
+            color=colour,
+            ms=8,
+            lw=1.6,
+            label=label,
+            zorder=5,
+        )
         floor = min(t for t, _ in lkh)
         left = ax.get_xlim()[0]
         # Deliberately faint. This region is most of the panel — every point of ours is inside
         # it — so shading it at any weight that reads as "highlighted" would say the opposite of
         # what it means. It marks where there is no opponent, not where we are winning. The
         # label sits at the bottom, away from the legend and away from the curves.
-        ax.axvspan(left if left > 0 else 1e-3, floor, color=colour, alpha=0.045, zorder=0)
+        ax.axvspan(
+            left if left > 0 else 1e-3, floor, color=colour, alpha=0.045, zorder=0
+        )
         ax.axvline(floor, color=colour, ls="--", lw=1.2, alpha=0.7)
         # Anchored in axes fraction on y, because ``set_ylim`` below moves the data limits and
         # a data-coordinate annotation placed here would silently fall off the panel.
-        ax.annotate(f"← LKH returns nothing below {floor:.1f}s", xy=(floor, 0.02),
-                    xycoords=("data", "axes fraction"), xytext=(-6, 0),
-                    textcoords="offset points", ha="right", va="bottom",
-                    fontsize=8, color=colour)
+        ax.annotate(
+            f"← LKH returns nothing below {floor:.1f}s",
+            xy=(floor, 0.02),
+            xycoords=("data", "axes fraction"),
+            xytext=(-6, 0),
+            textcoords="offset points",
+            ha="right",
+            va="bottom",
+            fontsize=8,
+            color=colour,
+        )
         if min(g for _, g in lkh) <= 1e-9:
-            ax.annotate("LKH: exactly optimal", xy=(max(t for t, _ in lkh), 0.10),
-                        xycoords=("data", "axes fraction"), xytext=(-4, 0),
-                        textcoords="offset points", ha="right",
-                        fontsize=8, color=colour)
+            ax.annotate(
+                "LKH: exactly optimal",
+                xy=(max(t for t, _ in lkh), 0.10),
+                xycoords=("data", "axes fraction"),
+                xytext=(-4, 0),
+                textcoords="offset points",
+                ha="right",
+                fontsize=8,
+                color=colour,
+            )
     else:
-        ax.text(0.5, 0.5, "LKH did not finish", transform=ax.transAxes,
-                ha="center", color=STYLE["lkh"][0], fontsize=9)
+        ax.text(
+            0.5,
+            0.5,
+            "LKH did not finish",
+            transform=ax.transAxes,
+            ha="center",
+            color=STYLE["lkh"][0],
+            fontsize=9,
+        )
 
     ax.set_xscale("log")
     # Linear in gap, deliberately — see the module docstring.
@@ -143,14 +188,28 @@ def _scaling_panels(ax_time, ax_gap, rows):
 
     floors = [(r["n"], r["lkh_floor"]) for r in rows if r.get("lkh_floor")]
     if floors:
-        ax_time.plot(*zip(*floors), "^-", color=STYLE["lkh"][0], ms=8, lw=1.8,
-                     label="LKH's cheapest available budget")
+        ax_time.plot(
+            *zip(*floors),
+            "^-",
+            color=STYLE["lkh"][0],
+            ms=8,
+            lw=1.8,
+            label="LKH's cheapest available budget",
+        )
     for key in ("iterated", "iterated_fis"):
-        pts = [(r["n"], r[f"{key}_s_at_best"]) for r in rows if r.get(f"{key}_s_at_best")]
+        pts = [
+            (r["n"], r[f"{key}_s_at_best"]) for r in rows if r.get(f"{key}_s_at_best")
+        ]
         if pts:
             colour, marker, label = STYLE[key]
-            ax_time.plot(*zip(*pts), marker + "-", color=colour, ms=5, lw=1.6,
-                         label=f"time to best tour — {label.split(': ')[-1]}")
+            ax_time.plot(
+                *zip(*pts),
+                marker + "-",
+                color=colour,
+                ms=5,
+                lw=1.6,
+                label=f"time to best tour — {label.split(': ')[-1]}",
+            )
     ax_time.set_xscale("log")
     ax_time.set_yscale("log")
     ax_time.set_xlabel("n (log)")
@@ -163,12 +222,21 @@ def _scaling_panels(ax_time, ax_gap, rows):
     # each arm at its *own* best budget would compare different amounts of spending, which is
     # exactly the confound these arms exist to avoid.
     for key in IT_KEYS:
-        pts = [(r["n"], r[f"{key}_at_budget"])
-               for r in rows if r.get(f"{key}_at_budget") is not None]
+        pts = [
+            (r["n"], r[f"{key}_at_budget"])
+            for r in rows
+            if r.get(f"{key}_at_budget") is not None
+        ]
         if pts:
             colour, marker, label = STYLE[key]
-            ax_gap.plot(*zip(*pts), marker + "-", color=colour, ms=5, lw=1.6,
-                        label=label.replace("iterated: ", ""))
+            ax_gap.plot(
+                *zip(*pts),
+                marker + "-",
+                color=colour,
+                ms=5,
+                lw=1.6,
+                label=label.replace("iterated: ", ""),
+            )
     ax_gap.set_xscale("log")
     ax_gap.set_xlabel("n (log)")
     ax_gap.set_ylabel("% over optimum at the matched budget")

@@ -197,12 +197,20 @@ def tune_construction(bench, valid, seconds=120.0, seed=0, verbose=True):
                 keep_v = gv
                 keep = trial.reshape(cons.shape).copy()
                 if verbose:
-                    print(f"  it {it:5d}  construction train {g:.2f}%  valid {gv:.2f}%  <- kept")
+                    print(
+                        f"  it {it:5d}  construction train {g:.2f}%  valid {gv:.2f}%  <- kept"
+                    )
         if window >= 25:
-            sigma = min(sigma * 1.5, 0.6) if wins / window > 0.2 else max(sigma / 1.5, 0.004)
+            sigma = (
+                min(sigma * 1.5, 0.6)
+                if wins / window > 0.2
+                else max(sigma / 1.5, 0.004)
+            )
             wins = window = 0
     if verbose:
-        print(f"  construction fitted: train {best:.2f}%  valid {keep_v:.2f}%  ({it} evals)\n")
+        print(
+            f"  construction fitted: train {best:.2f}%  valid {keep_v:.2f}%  ({it} evals)\n"
+        )
     return np.ascontiguousarray(keep.clip(0.0, 1.0))
 
 
@@ -218,9 +226,15 @@ def tune(seconds=600.0, seed=0, verbose=True, construct_seconds=120.0):
     bench = Bench()
     valid = Bench(names=VALID)
     if verbose:
-        print(f"train    baseline LK: {bench.base_gap:.3f}% mean gap, {bench.base_time:.3f}s")
-        print(f"validate baseline LK: {valid.base_gap:.3f}% mean gap, {valid.base_time:.3f}s")
-        print(f"objective: minimise gap subject to time <= {TIME_TARGET:.2f} x baseline\n")
+        print(
+            f"train    baseline LK: {bench.base_gap:.3f}% mean gap, {bench.base_time:.3f}s"
+        )
+        print(
+            f"validate baseline LK: {valid.base_gap:.3f}% mean gap, {valid.base_time:.3f}s"
+        )
+        print(
+            f"objective: minimise gap subject to time <= {TIME_TARGET:.2f} x baseline\n"
+        )
 
     # stage 1: the ranker, against its own tour length
     theta = fis.DEFAULT_THETA.copy()

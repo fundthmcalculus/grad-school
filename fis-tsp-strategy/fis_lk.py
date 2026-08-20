@@ -190,7 +190,9 @@ def fis_construct(
 # fuzzy effort control over the LK queue
 # ---------------------------------------------------------------------------
 @njit(cache=True, inline="always")
-def city_features(x, n_in, coords, cand, cand_d, ceil, tour, pos, n, k, t1, nn1, mean_c, pops):
+def city_features(
+    x, n_in, coords, cand, cand_d, ceil, tour, pos, n, k, t1, nn1, mean_c, pops
+):
     """Fill ``x`` with the EFFORT antecedents for city ``t1``. Returns the longer tour edge.
 
     Shared by the solver and by :func:`effort_scores`, which aims the perturbation in
@@ -273,7 +275,9 @@ def city_features(x, n_in, coords, cand, cand_d, ceil, tour, pos, n, k, t1, nn1,
 
 
 @njit(cache=True)
-def effort_scores_kernel(coords, cand, cand_d, ceil, tour, pos, nn1, mean_c, tab, ant, cons):
+def effort_scores_kernel(
+    coords, cand, cand_d, ceil, tour, pos, nn1, mean_c, tab, ant, cons
+):
     """The EFFORT base's depth output for every city, on the tour as it stands.
 
     Depth is the output the rule base uses to say "this city is worth working on", so it is the
@@ -306,14 +310,32 @@ def effort_scores(inst, cand, cand_d, tour, scale=None, tuned=None):
     """
     if tuned is not None:
         return effort_scores_kernel(
-            inst.coords, cand, cand_d, inst.ceil, tour, make_pos(tour),
-            *nn_stats(cand_d), tuned.effort_tab, tuned.effort_ant, tuned.effort_cons,
+            inst.coords,
+            cand,
+            cand_d,
+            inst.ceil,
+            tour,
+            make_pos(tour),
+            *nn_stats(cand_d),
+            tuned.effort_tab,
+            tuned.effort_ant,
+            tuned.effort_cons,
         )
     scale = fis_mod.DEFAULT_SCALE if scale is None else scale
     ant, cons, _, _, tab = fis_mod.effort_base(scale)
     nn1, mean_c = nn_stats(cand_d)
     return effort_scores_kernel(
-        inst.coords, cand, cand_d, inst.ceil, tour, make_pos(tour), nn1, mean_c, tab, ant, cons
+        inst.coords,
+        cand,
+        cand_d,
+        inst.ceil,
+        tour,
+        make_pos(tour),
+        nn1,
+        mean_c,
+        tab,
+        ant,
+        cons,
     )
 
 
@@ -424,7 +446,20 @@ def fis_lk_solve(
             stats[STAT_FULL_ATTEMPTS] += 1
         else:
             city_features(
-                x, n_e, coords, cand, cand_d, ceil, tour, pos, n, k, t1, nn1, mean_c, pops
+                x,
+                n_e,
+                coords,
+                cand,
+                cand_d,
+                ceil,
+                tour,
+                pos,
+                n,
+                k,
+                t1,
+                nn1,
+                mean_c,
+                pops,
             )
 
             fis_eval(x, mu, tab, ant, cons, out)
@@ -450,12 +485,7 @@ def fis_lk_solve(
                 or_seg = 0
             elif or_seg > or_max:
                 or_seg = or_max
-            if (
-                breadth >= k
-                and deep >= k
-                and depth >= max_depth
-                and or_seg >= or_max
-            ):
+            if breadth >= k and deep >= k and depth >= max_depth and or_seg >= or_max:
                 full = True  # the rule base asked for everything anyway
                 stats[STAT_FULL_ATTEMPTS] += 1
 

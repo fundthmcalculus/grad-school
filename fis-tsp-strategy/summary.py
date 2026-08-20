@@ -63,16 +63,18 @@ def _from_benchmark(path, scale):
         for key in [k[:-4] for k in r if k.endswith("_gap")]:
             if f"{key}_s" not in r:
                 continue
-            rows.append({
-                "source": f"benchmark/{scale}",
-                "instance": r["name"],
-                "n": r["n"],
-                "arm": RENAME.get(key, key),
-                "gap_pct": r[f"{key}_gap"],
-                "seconds": r[f"{key}_s"],
-                "q_arm_mean": None,
-                "detail": "",
-            })
+            rows.append(
+                {
+                    "source": f"benchmark/{scale}",
+                    "instance": r["name"],
+                    "n": r["n"],
+                    "arm": RENAME.get(key, key),
+                    "gap_pct": r[f"{key}_gap"],
+                    "seconds": r[f"{key}_s"],
+                    "q_arm_mean": None,
+                    "detail": "",
+                }
+            )
     # q lives in the summary block, keyed by arm rather than by instance, so it attaches to the
     # arm's aggregate rather than to any single row — carried on the row whose instance is the
     # whole set, which does not exist. It is joined per arm instead, as a constant column.
@@ -96,9 +98,18 @@ def _from_lkh_compare(path):
         def add(arm, gap, s, detail=""):
             if gap is None or s is None:
                 return
-            rows.append({"source": "lkh_compare", "instance": name, "n": n,
-                         "arm": RENAME.get(arm, arm), "gap_pct": gap, "seconds": s,
-                         "q_arm_mean": None, "detail": detail})
+            rows.append(
+                {
+                    "source": "lkh_compare",
+                    "instance": name,
+                    "n": n,
+                    "arm": RENAME.get(arm, arm),
+                    "gap_pct": gap,
+                    "seconds": s,
+                    "q_arm_mean": None,
+                    "detail": detail,
+                }
+            )
 
         for r in d.get("sweep", []):
             add(f"LK {r['cfg']}", r["gap"], r["s"])
@@ -124,7 +135,16 @@ def collect():
 
 
 def markdown(rows, limit=None):
-    head = ["source", "instance", "n", "arm", "detail", "gap %", "seconds", "q (arm mean)"]
+    head = [
+        "source",
+        "instance",
+        "n",
+        "arm",
+        "detail",
+        "gap %",
+        "seconds",
+        "q (arm mean)",
+    ]
     out = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
     for r in rows[:limit]:
         q = f"{r['q_arm_mean']:.4f}" if r["q_arm_mean"] is not None else ""
@@ -139,9 +159,13 @@ def main():
     paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--sort", default="n", choices=("n", "arm", "gap", "s", "instance"))
-    ap.add_argument("--arms", nargs="*", default=None, help="substring filter on the arm name")
+    ap.add_argument(
+        "--arms", nargs="*", default=None, help="substring filter on the arm name"
+    )
     ap.add_argument("--instances", nargs="*", default=None)
-    ap.add_argument("--limit", type=int, default=None, help="rows printed; the CSV is complete")
+    ap.add_argument(
+        "--limit", type=int, default=None, help="rows printed; the CSV is complete"
+    )
     ap.add_argument("--csv", default=str(paths.RESULTS / "summary.csv"))
     args = ap.parse_args()
     paths.ensure()
@@ -153,11 +177,17 @@ def main():
     if args.instances:
         rows = [r for r in rows if r["instance"] in args.instances]
     if args.arms:
-        rows = [r for r in rows if any(a.lower() in r["arm"].lower() for a in args.arms)]
+        rows = [
+            r for r in rows if any(a.lower() in r["arm"].lower() for a in args.arms)
+        ]
 
-    key = {"n": lambda r: (r["n"], r["arm"]), "arm": lambda r: (r["arm"], r["n"]),
-           "gap": lambda r: r["gap_pct"], "s": lambda r: r["seconds"],
-           "instance": lambda r: (r["instance"], r["arm"])}[args.sort]
+    key = {
+        "n": lambda r: (r["n"], r["arm"]),
+        "arm": lambda r: (r["arm"], r["n"]),
+        "gap": lambda r: r["gap_pct"],
+        "s": lambda r: r["seconds"],
+        "instance": lambda r: (r["instance"], r["arm"]),
+    }[args.sort]
     rows.sort(key=key)
 
     with open(args.csv, "w", newline="", encoding="utf-8") as fh:
@@ -167,7 +197,9 @@ def main():
 
     print(markdown(rows, args.limit))
     if args.limit and len(rows) > args.limit:
-        print(f"\n... {len(rows) - args.limit} more rows; all {len(rows)} are in the CSV")
+        print(
+            f"\n... {len(rows) - args.limit} more rows; all {len(rows)} are in the CSV"
+        )
     print(f"\nwrote {args.csv}  ({len(rows)} rows)")
 
 

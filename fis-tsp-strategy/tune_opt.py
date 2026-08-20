@@ -96,13 +96,25 @@ MIN_N = 1000
 # is what motivated `synth.py`: nine training instances against a fitted vector of this size
 # is the whole reason overfitting has dominated every attempt.
 TRAIN_REAL = [
-    "pr1002", "u1060", "d1291", "rl1304", "u1432", "d1655", "u1817", "rl1889", "rl5934",
+    "pr1002",
+    "u1060",
+    "d1291",
+    "rl1304",
+    "u1432",
+    "d1655",
+    "u1817",
+    "rl1889",
+    "rl5934",
 ]
 VALID_REAL = ["dsj1000", "vm1084", "nrw1379", "fl1400", "vm1748", "u2152", "u2319"]
 
 assert not (set(TRAIN_REAL) & set(VALID_REAL)), "train and validation overlap"
-assert not (set(TRAIN_REAL) & set(bench_mod.TEST)), "training instance is in the test set"
-assert not (set(VALID_REAL) & set(bench_mod.TEST)), "validation instance is in the test set"
+assert not (
+    set(TRAIN_REAL) & set(bench_mod.TEST)
+), "training instance is in the test set"
+assert not (
+    set(VALID_REAL) & set(bench_mod.TEST)
+), "validation instance is in the test set"
 
 
 def train_instances():
@@ -267,7 +279,9 @@ class Objective:
         self.coef = coef
         self.items = []
         for inst in sorted(instances, key=lambda it: it.n):
-            assert inst.n >= MIN_N, f"{inst.name}: n={inst.n} below the fitting floor {MIN_N}"
+            assert (
+                inst.n >= MIN_N
+            ), f"{inst.name}: n={inst.n} below the fitting floor {MIN_N}"
             cand, cand_d = build_candidates(inst.coords, SWEEP_K, inst.ceil)
             nn1, mean_c = nn_stats(cand_d)
             start = greedy_edge_tour(inst.coords, cand, inst.ceil)
@@ -276,9 +290,11 @@ class Objective:
         self.abort_cost = np.array([f["cost"][-1] for f in self.fronts]) * ABORT_FACTOR
         if verbose:
             for it, f in zip(self.items, self.fronts):
-                print(f"  {it[0].name:>18s} n={it[0].n:6d} frontier spans "
-                      f"{1e3 * f['cost'][0]:7.1f}..{1e3 * f['cost'][-1]:7.1f}ms, "
-                      f"length {f['length'][0]:.0f}..{f['length'][-1]:.0f}")
+                print(
+                    f"  {it[0].name:>18s} n={it[0].n:6d} frontier spans "
+                    f"{1e3 * f['cost'][0]:7.1f}..{1e3 * f['cost'][-1]:7.1f}ms, "
+                    f"length {f['length'][0]:.0f}..{f['length'][-1]:.0f}"
+                )
 
     def _front(self, item):
         """The instance's baseline effort frontier as ascending-cost arrays.
@@ -291,8 +307,15 @@ class Objective:
         pts = []
         for depth, deep in SWEEP:
             tour, _, st = lk_solve(
-                inst.coords, cand, cand_d, inst.ceil, start,
-                SWEEP_K, depth, deep, OR_SEG_BASE,
+                inst.coords,
+                cand,
+                cand_d,
+                inst.ceil,
+                start,
+                SWEEP_K,
+                depth,
+                deep,
+                OR_SEG_BASE,
             )
             validate_tour(tour, inst.n)
             # tour *lengths*, not gaps. The metric is a ratio of two tours on one instance,
@@ -305,7 +328,8 @@ class Objective:
                 )
             )
         keep = [
-            p for p in pts
+            p
+            for p in pts
             if not any(q[0] <= p[0] and q[1] <= p[1] and q != p for q in pts)
         ]
         keep.sort()
@@ -343,17 +367,33 @@ class Objective:
         for i, (inst, cand, cand_d, nn1, mean_c, start) in enumerate(self.items):
             tour = start
             tour, _, st = fis_lk_solve(
-                inst.coords, cand, cand_d, inst.ceil, tour, nn1, mean_c,
-                e_tab, self.space.bases['effort'][0], e_cons,
-                h_tab, self.space.bases['chain'][0], h_cons,
-                FIS_DEPTH, OR_SEG, 1, False, use_chain,
+                inst.coords,
+                cand,
+                cand_d,
+                inst.ceil,
+                tour,
+                nn1,
+                mean_c,
+                e_tab,
+                self.space.bases["effort"][0],
+                e_cons,
+                h_tab,
+                self.space.bases["chain"][0],
+                h_cons,
+                FIS_DEPTH,
+                OR_SEG,
+                1,
+                False,
+                use_chain,
             )
             validate_tour(tour, inst.n)
             cost = float(features_from_stats(st, inst.n) @ self.coef)
             total += cost
             if abort and cost > self.abort_cost[i]:
                 return float("nan"), None, cost / self.abort_cost[i]
-            ratios.append(float(reference_length(tour, inst)) / max(self.bar(i, cost), 1e-9))
+            ratios.append(
+                float(reference_length(tour, inst)) / max(self.bar(i, cost), 1e-9)
+            )
         return float(np.mean(ratios)), np.array(ratios), total
 
     def report(self, theta, **kw):
@@ -370,10 +410,24 @@ class Objective:
             if not inst.opt:
                 continue
             tour, _, _ = fis_lk_solve(
-                inst.coords, cand, cand_d, inst.ceil, start, nn1, mean_c,
-                d["effort"][1], self.space.bases['effort'][0], d["effort"][0],
-                d["chain"][1], self.space.bases['chain'][0], d["chain"][0],
-                FIS_DEPTH, OR_SEG, 1, False, kw.get("use_chain", True),
+                inst.coords,
+                cand,
+                cand_d,
+                inst.ceil,
+                start,
+                nn1,
+                mean_c,
+                d["effort"][1],
+                self.space.bases["effort"][0],
+                d["effort"][0],
+                d["chain"][1],
+                self.space.bases["chain"][0],
+                d["chain"][0],
+                FIS_DEPTH,
+                OR_SEG,
+                1,
+                False,
+                kw.get("use_chain", True),
             )
             gaps.append(inst.gap(reference_length(tour, inst)))
         return mean_ratio, float(np.mean(gaps)) if gaps else float("nan"), total
@@ -431,7 +485,7 @@ class TrackedObjective:
             if not any(float(np.max(np.abs(theta - t))) < 1e-3 for _, t in self.pool):
                 self.pool.append((j, theta.copy()))
                 self.pool.sort(key=lambda kv: kv[0])
-                del self.pool[self.pool_size:]
+                del self.pool[self.pool_size :]
         return j
 
     def select(self):
@@ -471,7 +525,12 @@ def build_optimizer(kind, space, fcn, seed_theta, generations, population, jobs)
         return GeneticAlgorithmOptimizer(config=cfg, variables=variables, fcn=fcn)
     if kind == "pso":
         cfg = ParticleSwarmOptimizerConfig(
-            name="PSO", inertia=0.6, cognitive=1.4, social=1.4, velocity_clamp=0.3, **common
+            name="PSO",
+            inertia=0.6,
+            cognitive=1.4,
+            social=1.4,
+            velocity_clamp=0.3,
+            **common,
         )
         return ParticleSwarmOptimizer(config=cfg, variables=variables, fcn=fcn)
     if kind == "aco":
@@ -480,9 +539,21 @@ def build_optimizer(kind, space, fcn, seed_theta, generations, population, jobs)
     raise ValueError(f"unknown optimizer {kind!r}")
 
 
-def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink, log,
-            polish_evals=2500, scale=fis.DEFAULT_SCALE,
-            train_pool=None, valid_pool=None):
+def run_one(
+    kind,
+    mf_kind,
+    mf_scope,
+    generations,
+    population,
+    jobs,
+    seed,
+    shrink,
+    log,
+    polish_evals=2500,
+    scale=fis.DEFAULT_SCALE,
+    train_pool=None,
+    valid_pool=None,
+):
     """Fit with one optimiser / MF form / MF scope, selecting on the validation split.
 
     ``train_pool`` / ``valid_pool`` override the standard splits with explicit instance lists.
@@ -494,8 +565,12 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
     set_seed(seed)
     space = ParamSpace(mf_kind, mf_scope, scale)
     coef = np.load(paths.COSTMODEL)["coef"]
-    train = Objective(train_instances() if train_pool is None else train_pool, space, coef)
-    valid = Objective(valid_instances() if valid_pool is None else valid_pool, space, coef)
+    train = Objective(
+        train_instances() if train_pool is None else train_pool, space, coef
+    )
+    valid = Objective(
+        valid_instances() if valid_pool is None else valid_pool, space, coef
+    )
 
     seed_theta = space.default()
     hand_tr = train.report(seed_theta)
@@ -503,7 +578,9 @@ def run_one(kind, mf_kind, mf_scope, generations, population, jobs, seed, shrink
 
     tracked = TrackedObjective(train, valid, seed_theta, shrink)
     t0 = time.perf_counter()
-    opt = build_optimizer(kind, space, tracked, seed_theta, generations, population, jobs)
+    opt = build_optimizer(
+        kind, space, tracked, seed_theta, generations, population, jobs
+    )
     result = opt.solve()
     dt = time.perf_counter() - t0
 
@@ -582,8 +659,9 @@ def main():
     ap.add_argument("--mf-scopes", nargs="*", default=["base"])
     ap.add_argument("--shrink", type=float, default=0.3)
     ap.add_argument("--polish-evals", type=int, default=2500)
-    ap.add_argument("--scale", default=fis.DEFAULT_SCALE,
-                    choices=sorted(fis.EFFORT_RULES_BY_SCALE))
+    ap.add_argument(
+        "--scale", default=fis.DEFAULT_SCALE, choices=sorted(fis.EFFORT_RULES_BY_SCALE)
+    )
     ap.add_argument("--generations", type=int, default=30)
     ap.add_argument("--population", type=int, default=30)
     ap.add_argument("--jobs", type=int, default=1)
@@ -602,17 +680,25 @@ def main():
 
     n_tr = len(TRAIN_REAL) + len(synth.TRAIN_SPEC)
     n_va = len(VALID_REAL) + len(synth.VALID_SPEC)
-    print(f"{n_tr} training ({len(TRAIN_REAL)} TSPLIB + {len(synth.TRAIN_SPEC)} synthetic) "
-          f"and {n_va} validation instances, disjoint from the "
-          f"{len(bench_mod.TEST)} test instances")
+    print(
+        f"{n_tr} training ({len(TRAIN_REAL)} TSPLIB + {len(synth.TRAIN_SPEC)} synthetic) "
+        f"and {n_va} validation instances, disjoint from the "
+        f"{len(bench_mod.TEST)} test instances"
+    )
     space0 = ParamSpace(mf_scope=args.mf_scopes[0], scale=args.scale)
     n_cons = sum(int(np.prod(b["cons_shape"])) for b in space0.blocks)
-    print(f"fitting {space0.size} parameters ({n_cons} rule consequents + "
-          f"{space0.size - n_cons} membership-function centres/widths)")
-    print(f"objective: mean over instances of (tour length / the swept k={SWEEP_K} LK "
-          f"frontier's length at the same cost)")
-    print(f"           below 1.0 means outside the frontier; "
-          f"fitted only on n >= {MIN_N}\n")
+    print(
+        f"fitting {space0.size} parameters ({n_cons} rule consequents + "
+        f"{space0.size - n_cons} membership-function centres/widths)"
+    )
+    print(
+        f"objective: mean over instances of (tour length / the swept k={SWEEP_K} LK "
+        f"frontier's length at the same cost)"
+    )
+    print(
+        f"           below 1.0 means outside the frontier; "
+        f"fitted only on n >= {MIN_N}\n"
+    )
 
     log = []
     best = None
@@ -620,8 +706,17 @@ def main():
         for mf_kind in args.mf_kinds:
             for kind in args.optimizers:
                 theta, rec, valid = run_one(
-                    kind, mf_kind, mf_scope, args.generations, args.population,
-                    args.jobs, args.seed, args.shrink, log, args.polish_evals, args.scale,
+                    kind,
+                    mf_kind,
+                    mf_scope,
+                    args.generations,
+                    args.population,
+                    args.jobs,
+                    args.seed,
+                    args.shrink,
+                    log,
+                    args.polish_evals,
+                    args.scale,
                 )
                 # selection across runs, on the validation split
                 score = rec["valid_ratio"]
@@ -631,9 +726,11 @@ def main():
     score, theta, rec, mf_kind, mf_scope = best
     space = ParamSpace(mf_kind, mf_scope, rec["scale"])
     d = space.decode(theta)
-    print(f"\nkept: {rec['optimizer']}/{mf_kind}/{mf_scope}/{rec['scale']}  "
-          f"validation q={rec['valid_ratio']:.4f} ({rec['valid_gap']:.3f}%), "
-          f"hand-written q={rec['hand_valid_ratio']:.4f} ({rec['hand_valid_gap']:.3f}%)")
+    print(
+        f"\nkept: {rec['optimizer']}/{mf_kind}/{mf_scope}/{rec['scale']}  "
+        f"validation q={rec['valid_ratio']:.4f} ({rec['valid_gap']:.3f}%), "
+        f"hand-written q={rec['hand_valid_ratio']:.4f} ({rec['hand_valid_gap']:.3f}%)"
+    )
     np.savez(
         args.out,
         theta=theta,

@@ -72,7 +72,9 @@ def _rows(data):
         a = r.get("iterated_aim_at_budget")
         if c is None or a is None:
             continue
-        pts = sorted((p["kicks"], p["gap"]) for p in data[r["name"]]["iterated"] if p["kicks"])
+        pts = sorted(
+            (p["kicks"], p["gap"]) for p in data[r["name"]]["iterated"] if p["kicks"]
+        )
         if len(pts) < 2:
             continue
         headroom = (pts[-2][1] - pts[-1][1]) / pts[-2][1] * 100.0
@@ -96,37 +98,72 @@ def figure(data, out):
     # ---- left: the criterion
     ax.axvspan(-1.2, 1.2, color=HARD_C, alpha=0.07, zorder=0)
     ax.axhline(1.0, color=INK_2, lw=1.4, ls="--", zorder=2)
-    ax.annotate("parity", xy=(0.995, 1.0), xycoords=("axes fraction", "data"),
-                xytext=(0, 5), textcoords="offset points", fontsize=8.5,
-                color=INK_2, va="bottom", ha="right")
+    ax.annotate(
+        "parity",
+        xy=(0.995, 1.0),
+        xycoords=("axes fraction", "data"),
+        xytext=(0, 5),
+        textcoords="offset points",
+        fontsize=8.5,
+        color=INK_2,
+        va="bottom",
+        ha="right",
+    )
 
     for name, n, hard, hr, c, a in rows:
         ratio = c / a
         colour = HARD_C if hard else EASY_C
-        ax.scatter(hr, ratio, s=130, zorder=5, marker="o",
-                   facecolors=colour if ratio > 1.0 else "none",
-                   edgecolors=colour, linewidths=2.0)
+        ax.scatter(
+            hr,
+            ratio,
+            s=130,
+            zorder=5,
+            marker="o",
+            facecolors=colour if ratio > 1.0 else "none",
+            edgecolors=colour,
+            linewidths=2.0,
+        )
 
     # Hand-placed offsets for the crowded band around parity: three hard instances land within
     # 4 points of x and 0.2 of y of each other, so a uniform offset rule collides every time.
     NUDGE = {
-        "fl1577": (0, -30, "center"), "fl3795": (0, -30, "center"),
-        "d2103": (0, 16, "center"), "fnl4461": (0, 16, "center"),
-        "d18512": (-13, -20, "right"), "brd14051": (0, 17, "center"),
-        "d15112": (13, -20, "left"), "rl5915": (0, -20, "center"),
+        "fl1577": (0, -30, "center"),
+        "fl3795": (0, -30, "center"),
+        "d2103": (0, 16, "center"),
+        "fnl4461": (0, 16, "center"),
+        "d18512": (-13, -20, "right"),
+        "brd14051": (0, 17, "center"),
+        "d15112": (13, -20, "left"),
+        "rl5915": (0, -20, "center"),
         "pcb1173": (15, 0, "left"),
     }
     for name, n, hard, hr, c, a in rows:
         if name not in NUDGE:
             continue
         dx, dy, ha = NUDGE[name]
-        ax.annotate(f"{name}\nn={n}", xy=(hr, c / a), xytext=(dx, dy),
-                    textcoords="offset points", ha=ha, va="center", fontsize=8,
-                    color=INK_2, linespacing=1.25)
+        ax.annotate(
+            f"{name}\nn={n}",
+            xy=(hr, c / a),
+            xytext=(dx, dy),
+            textcoords="offset points",
+            ha=ha,
+            va="center",
+            fontsize=8,
+            color=INK_2,
+            linespacing=1.25,
+        )
 
-    ax.annotate("control plateaued —\n4× the budget, same tour", xy=(1.2, 7.6),
-                xytext=(10, 0), textcoords="offset points", ha="left", va="center",
-                fontsize=8.5, color=INK_2, linespacing=1.3)
+    ax.annotate(
+        "control plateaued —\n4× the budget, same tour",
+        xy=(1.2, 7.6),
+        xytext=(10, 0),
+        textcoords="offset points",
+        ha="left",
+        va="center",
+        fontsize=8.5,
+        color=INK_2,
+        linespacing=1.3,
+    )
 
     ax.set_yscale("log")
     ax.set_xlim(-4, 52)
@@ -136,25 +173,77 @@ def figure(data, out):
     # A log axis relabels its minor ticks in scientific notation, which collides with the
     # multiplier labels above and reads as a second, contradictory scale.
     ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-    ax.set_xlabel("what the uniform control still had left to gain\n"
-                  "(% improvement over its final 4× of budget)", fontsize=10, color=INK)
-    ax.set_ylabel("aimed kicks vs uniform control\n(control gap ÷ aimed gap, log)",
-                  fontsize=10, color=INK)
-    ax.set_title("Aiming wins where uniform kicking has stopped working",
-                 fontsize=11.5, color=INK, pad=12)
+    ax.set_xlabel(
+        "what the uniform control still had left to gain\n"
+        "(% improvement over its final 4× of budget)",
+        fontsize=10,
+        color=INK,
+    )
+    ax.set_ylabel(
+        "aimed kicks vs uniform control\n(control gap ÷ aimed gap, log)",
+        fontsize=10,
+        color=INK,
+    )
+    ax.set_title(
+        "Aiming wins where uniform kicking has stopped working",
+        fontsize=11.5,
+        color=INK,
+        pad=12,
+    )
 
     handles = [
-        plt.Line2D([], [], marker="o", ls="", ms=10, mfc=HARD_C, mec=HARD_C, mew=2,
-                   label="LKH-hard, aiming wins"),
-        plt.Line2D([], [], marker="o", ls="", ms=10, mfc="none", mec=HARD_C, mew=2,
-                   label="LKH-hard, aiming loses"),
-        plt.Line2D([], [], marker="o", ls="", ms=10, mfc=EASY_C, mec=EASY_C, mew=2,
-                   label="LKH-easy, aiming wins"),
-        plt.Line2D([], [], marker="o", ls="", ms=10, mfc="none", mec=EASY_C, mew=2,
-                   label="LKH-easy, aiming loses"),
+        plt.Line2D(
+            [],
+            [],
+            marker="o",
+            ls="",
+            ms=10,
+            mfc=HARD_C,
+            mec=HARD_C,
+            mew=2,
+            label="LKH-hard, aiming wins",
+        ),
+        plt.Line2D(
+            [],
+            [],
+            marker="o",
+            ls="",
+            ms=10,
+            mfc="none",
+            mec=HARD_C,
+            mew=2,
+            label="LKH-hard, aiming loses",
+        ),
+        plt.Line2D(
+            [],
+            [],
+            marker="o",
+            ls="",
+            ms=10,
+            mfc=EASY_C,
+            mec=EASY_C,
+            mew=2,
+            label="LKH-easy, aiming wins",
+        ),
+        plt.Line2D(
+            [],
+            [],
+            marker="o",
+            ls="",
+            ms=10,
+            mfc="none",
+            mec=EASY_C,
+            mew=2,
+            label="LKH-easy, aiming loses",
+        ),
     ]
-    ax.legend(handles=handles, fontsize=8.5, loc="upper right", frameon=False,
-              labelcolor=INK_2)
+    ax.legend(
+        handles=handles,
+        fontsize=8.5,
+        loc="upper right",
+        frameon=False,
+        labelcolor=INK_2,
+    )
 
     # ---- right: the mechanism
     d = data.get(MECHANISM_INSTANCE)
@@ -164,45 +253,78 @@ def figure(data, out):
             ("iterated_aim", HARD_C, "EFFORT-aimed kicks", 2.4),
         ):
             pts = sorted((p["kicks"], p["gap"]) for p in d[arm] if p["kicks"] > 0)
-            bx.plot([k for k, _ in pts], [g for _, g in pts], "-o", color=colour,
-                    lw=lw, ms=8, label=label, zorder=4,
-                    markeredgecolor=SURFACE, markeredgewidth=1.5)
+            bx.plot(
+                [k for k, _ in pts],
+                [g for _, g in pts],
+                "-o",
+                color=colour,
+                lw=lw,
+                ms=8,
+                label=label,
+                zorder=4,
+                markeredgecolor=SURFACE,
+                markeredgewidth=1.5,
+            )
 
         ctl = {p["kicks"]: p["gap"] for p in d["iterated"]}
         if 102400 in ctl and 409600 in ctl and abs(ctl[102400] - ctl[409600]) < 1e-9:
-            bx.annotate("identical tour at 4× the budget", xy=(409600, ctl[409600]),
-                        xytext=(-14, 42), textcoords="offset points", ha="right",
-                        fontsize=9, color=INK_2,
-                        arrowprops=dict(arrowstyle="-", color=INK_2, lw=1.0,
-                                        shrinkA=0, shrinkB=7))
+            bx.annotate(
+                "identical tour at 4× the budget",
+                xy=(409600, ctl[409600]),
+                xytext=(-14, 42),
+                textcoords="offset points",
+                ha="right",
+                fontsize=9,
+                color=INK_2,
+                arrowprops=dict(
+                    arrowstyle="-", color=INK_2, lw=1.0, shrinkA=0, shrinkB=7
+                ),
+            )
         aim = {p["kicks"]: p["gap"] for p in d["iterated_aim"]}
         if 409600 in aim:
-            bx.annotate(f"{aim[409600]:.3f}%", xy=(409600, aim[409600]), xytext=(0, -19),
-                        textcoords="offset points", ha="center", fontsize=9.5, color=HARD_C)
+            bx.annotate(
+                f"{aim[409600]:.3f}%",
+                xy=(409600, aim[409600]),
+                xytext=(0, -19),
+                textcoords="offset points",
+                ha="center",
+                fontsize=9.5,
+                color=HARD_C,
+            )
 
     bx.set_xscale("log")
     bx.set_ylim(bottom=0)
     bx.set_xlabel("double-bridge kicks (log)", fontsize=10, color=INK)
     bx.set_ylabel("% over the published optimum", fontsize=10, color=INK)
-    bx.set_title(f"Why — {MECHANISM_INSTANCE}, a clustered drilling instance\n"
-                 f"where the difficulty lives in a few regions",
-                 fontsize=11.5, color=INK, pad=12)
+    bx.set_title(
+        f"Why — {MECHANISM_INSTANCE}, a clustered drilling instance\n"
+        f"where the difficulty lives in a few regions",
+        fontsize=11.5,
+        color=INK,
+        pad=12,
+    )
     bx.legend(fontsize=9.5, loc="lower left", frameon=False, labelcolor=INK_2)
 
     fig.suptitle(
         "EFFORT-aimed perturbation pays off exactly where uniform perturbation has plateaued",
-        fontsize=12.5, color=INK, y=0.985,
+        fontsize=12.5,
+        color=INK,
+        y=0.985,
     )
-    fig.text(0.5, 0.005,
-             "Matched budget = the control's dearest point on that instance. 13 TSPLIB "
-             "instances, one seed, one machine. Both plateaued instances are aiming wins; of "
-             "the eleven with headroom left, aiming wins two and loses nine.",
-             ha="center", fontsize=8.5, color=INK_2)
+    fig.text(
+        0.5,
+        0.005,
+        "Matched budget = the control's dearest point on that instance. 13 TSPLIB "
+        "instances, one seed, one machine. Both plateaued instances are aiming wins; of "
+        "the eleven with headroom left, aiming wins two and loses nine.",
+        ha="center",
+        fontsize=8.5,
+        color=INK_2,
+    )
     fig.tight_layout(rect=[0, 0.035, 1, 0.93])
     fig.savefig(out, dpi=150, facecolor=SURFACE)
     plt.close(fig)
     return out
-
 
 
 # Diverging poles for the outcome regions: blue and red, gray midpoint. Validated as a pair
@@ -245,101 +367,212 @@ def regions_figure(data, out):
     ax.axhspan(YLO, 1.0, color=LOSE_C, alpha=0.075, zorder=0)
     ax.axhline(1.0, color=INK_2, lw=1.6, zorder=3)
 
-    ax.annotate("AIMING WINS", xy=(0.985, 0.965), xycoords="axes fraction",
-                ha="right", va="top", fontsize=13, color=WIN_C, weight="bold")
-    ax.annotate("a shorter tour than uniform kicking, at the same budget",
-                xy=(0.985, 0.925), xycoords="axes fraction", ha="right", va="top",
-                fontsize=9, color=INK_2)
-    ax.annotate("AIMING LOSES", xy=(0.985, 0.045), xycoords="axes fraction",
-                ha="right", va="bottom", fontsize=13, color=LOSE_C, weight="bold")
-    ax.annotate("the fixed cost of computing the aim is not repaid",
-                xy=(0.985, 0.09), xycoords="axes fraction", ha="right", va="bottom",
-                fontsize=9, color=INK_2)
+    ax.annotate(
+        "AIMING WINS",
+        xy=(0.985, 0.965),
+        xycoords="axes fraction",
+        ha="right",
+        va="top",
+        fontsize=13,
+        color=WIN_C,
+        weight="bold",
+    )
+    ax.annotate(
+        "a shorter tour than uniform kicking, at the same budget",
+        xy=(0.985, 0.925),
+        xycoords="axes fraction",
+        ha="right",
+        va="top",
+        fontsize=9,
+        color=INK_2,
+    )
+    ax.annotate(
+        "AIMING LOSES",
+        xy=(0.985, 0.045),
+        xycoords="axes fraction",
+        ha="right",
+        va="bottom",
+        fontsize=13,
+        color=LOSE_C,
+        weight="bold",
+    )
+    ax.annotate(
+        "the fixed cost of computing the aim is not repaid",
+        xy=(0.985, 0.09),
+        xycoords="axes fraction",
+        ha="right",
+        va="bottom",
+        fontsize=9,
+        color=INK_2,
+    )
 
     # the criterion, as a band on the x axis
     ax.axvspan(XLO, 1.6, color=INK_2, alpha=0.07, zorder=1)
-    ax.annotate("control has\nplateaued", xy=(-1.2, 8.4), fontsize=9.5, color=INK_2,
-                ha="center", va="center", linespacing=1.35)
+    ax.annotate(
+        "control has\nplateaued",
+        xy=(-1.2, 8.4),
+        fontsize=9.5,
+        color=INK_2,
+        ha="center",
+        va="center",
+        linespacing=1.35,
+    )
 
     for name, n, hard, hr, c, a in rows:
         ratio = c / a
         won = ratio > 1.0
         colour = WIN_C if won else LOSE_C
-        ax.scatter(hr, ratio, s=190 if hard else 150, zorder=6,
-                   marker="o" if hard else "s",
-                   facecolors=colour if hard else "none",
-                   edgecolors=colour, linewidths=2.2)
+        ax.scatter(
+            hr,
+            ratio,
+            s=190 if hard else 150,
+            zorder=6,
+            marker="o" if hard else "s",
+            facecolors=colour if hard else "none",
+            edgecolors=colour,
+            linewidths=2.2,
+        )
 
     NUDGE = {
-        "fl1577": (14, 0, "left"), "fl3795": (0, -23, "center"),
-        "d2103": (0, 20, "center"), "fnl4461": (0, 21, "center"),
-        "d18512": (0, -21, "center"), "brd14051": (0, 20, "center"),
-        "d15112": (14, 7, "left"), "rl5915": (0, -21, "center"),
-        "pcb1173": (16, 0, "left"), "pcb3038": (0, -21, "center"),
-        "rat783": (0, 20, "center"), "rl1323": (-14, -4, "right"),
+        "fl1577": (14, 0, "left"),
+        "fl3795": (0, -23, "center"),
+        "d2103": (0, 20, "center"),
+        "fnl4461": (0, 21, "center"),
+        "d18512": (0, -21, "center"),
+        "brd14051": (0, 20, "center"),
+        "d15112": (14, 7, "left"),
+        "rl5915": (0, -21, "center"),
+        "pcb1173": (16, 0, "left"),
+        "pcb3038": (0, -21, "center"),
+        "rat783": (0, 20, "center"),
+        "rl1323": (-14, -4, "right"),
         "pr2392": (0, 20, "center"),
     }
     for name, n, hard, hr, c, a in rows:
         dx, dy, ha = NUDGE.get(name, (0, 18, "center"))
-        ax.annotate(f"{name}\nn={n}", xy=(hr, c / a), xytext=(dx, dy),
-                    textcoords="offset points", ha=ha, va="center", fontsize=8.5,
-                    color=INK_2, linespacing=1.25)
+        ax.annotate(
+            f"{name}\nn={n}",
+            xy=(hr, c / a),
+            xytext=(dx, dy),
+            textcoords="offset points",
+            ha=ha,
+            va="center",
+            fontsize=8.5,
+            color=INK_2,
+            linespacing=1.25,
+        )
 
     ax.set_xlim(XLO, XHI)
     ax.set_ylim(YLO, YHI)
     ax.set_yscale("log")
     ax.set_yticks([0.5, 0.7, 1.0, 1.5, 2.0, 3.0, 5.0])
-    ax.set_yticklabels(["0.5\u00d7", "0.7\u00d7", "1\u00d7 parity", "1.5\u00d7", "2\u00d7", "3\u00d7", "5\u00d7"])
+    ax.set_yticklabels(
+        [
+            "0.5\u00d7",
+            "0.7\u00d7",
+            "1\u00d7 parity",
+            "1.5\u00d7",
+            "2\u00d7",
+            "3\u00d7",
+            "5\u00d7",
+        ]
+    )
     ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
     ax.grid(True, axis="x", color=GRID, lw=0.6, alpha=0.7)
     ax.set_axisbelow(False)
-    ax.set_xlabel("what uniform kicking still had left to gain\n"
-                  "(% the control improved over its final 4\u00d7 of budget)",
-                  fontsize=10.5, color=INK)
-    ax.set_ylabel("aimed kicks vs uniform kicks\n(control gap \u00f7 aimed gap, log)",
-                  fontsize=10.5, color=INK)
+    ax.set_xlabel(
+        "what uniform kicking still had left to gain\n"
+        "(% the control improved over its final 4\u00d7 of budget)",
+        fontsize=10.5,
+        color=INK,
+    )
+    ax.set_ylabel(
+        "aimed kicks vs uniform kicks\n(control gap \u00f7 aimed gap, log)",
+        fontsize=10.5,
+        color=INK,
+    )
 
     # Neutral ink, so the legend conveys *shape* only. Colour is the outcome axis here and a
     # coloured legend swatch would assert a link between instance class and outcome that the
     # figure exists to test.
     handles = [
-        plt.Line2D([], [], marker="o", ls="", ms=11, mfc=INK_2, mec=INK_2, mew=2,
-                   label="filled circle: LKH cannot solve it (0/10 runs)"),
-        plt.Line2D([], [], marker="s", ls="", ms=10, mfc="none", mec=INK_2, mew=2,
-                   label="open square: LKH solves it every run"),
+        plt.Line2D(
+            [],
+            [],
+            marker="o",
+            ls="",
+            ms=11,
+            mfc=INK_2,
+            mec=INK_2,
+            mew=2,
+            label="filled circle: LKH cannot solve it (0/10 runs)",
+        ),
+        plt.Line2D(
+            [],
+            [],
+            marker="s",
+            ls="",
+            ms=10,
+            mfc="none",
+            mec=INK_2,
+            mew=2,
+            label="open square: LKH solves it every run",
+        ),
     ]
-    ax.legend(handles=handles, fontsize=9.5, loc="lower left", frameon=False,
-              labelcolor=INK_2, ncol=1, bbox_to_anchor=(0.012, 0.015))
+    ax.legend(
+        handles=handles,
+        fontsize=9.5,
+        loc="lower left",
+        frameon=False,
+        labelcolor=INK_2,
+        ncol=1,
+        bbox_to_anchor=(0.012, 0.015),
+    )
 
-    fig.suptitle("Aimed perturbation wins in one region: where uniform kicking has plateaued",
-                 fontsize=13.5, color=INK, y=0.975)
-    fig.text(0.5, 0.028,
-             "13 TSPLIB instances, matched budget, one seed. Both plateaued instances land in "
-             "the win region;\nof the eleven with headroom left, two do and nine do not. "
-             "Instance size and kick density were each\ntried as the criterion first and "
-             "neither survived \u2014 see FINDINGS \u00a76.3.",
-             ha="center", va="bottom", fontsize=8.5, color=INK_2, linespacing=1.5)
+    fig.suptitle(
+        "Aimed perturbation wins in one region: where uniform kicking has plateaued",
+        fontsize=13.5,
+        color=INK,
+        y=0.975,
+    )
+    fig.text(
+        0.5,
+        0.028,
+        "13 TSPLIB instances, matched budget, one seed. Both plateaued instances land in "
+        "the win region;\nof the eleven with headroom left, two do and nine do not. "
+        "Instance size and kick density were each\ntried as the criterion first and "
+        "neither survived \u2014 see FINDINGS \u00a76.3.",
+        ha="center",
+        va="bottom",
+        fontsize=8.5,
+        color=INK_2,
+        linespacing=1.5,
+    )
     fig.tight_layout(rect=[0, 0.115, 1, 0.945])
     fig.savefig(out, dpi=150, facecolor=SURFACE)
     plt.close(fig)
     return out
+
 
 def main():
     paths.utf8_stdout()
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default=str(paths.LKH_COMPARE))
     ap.add_argument("--out", default=str(paths.FIGURES / "fis_tsp_aimed_kicks.png"))
-    ap.add_argument("--regions-out",
-                    default=str(paths.FIGURES / "fis_tsp_aim_regions.png"))
+    ap.add_argument(
+        "--regions-out", default=str(paths.FIGURES / "fis_tsp_aim_regions.png")
+    )
     args = ap.parse_args()
     paths.ensure()
     data = json.loads(Path(args.data).read_text())
     print(f"wrote {figure(data, args.out)}")
     print(f"wrote {regions_figure(data, args.regions_out)}")
     for name, n, hard, hr, c, a in sorted(_rows(data), key=lambda r: r[3]):
-        print(f"  {name:>9s} n={n:6d} {'hard' if hard else 'easy':>5s} "
-              f"headroom {hr:5.1f}%   control {c:6.3f}%  aimed {a:6.3f}%  "
-              f"{c / a:5.2f}x  {'AIM' if c > a else 'ctl'}")
+        print(
+            f"  {name:>9s} n={n:6d} {'hard' if hard else 'easy':>5s} "
+            f"headroom {hr:5.1f}%   control {c:6.3f}%  aimed {a:6.3f}%  "
+            f"{c / a:5.2f}x  {'AIM' if c > a else 'ctl'}"
+        )
 
 
 if __name__ == "__main__":

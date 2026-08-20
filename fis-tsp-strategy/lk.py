@@ -295,21 +295,13 @@ def or_opt_city(
             mode = 0  # 1: after c, forward orientation; 2: before c, reversed
             cn = succ(tour, pos, n, c)
             if cn != s0:  # else c == p and the move is a no-op
-                add = (
-                    d_c_s0
-                    + dist(coords, s1, cn, ceil)
-                    - dist(coords, c, cn, ceil)
-                )
+                add = d_c_s0 + dist(coords, s1, cn, ceil) - dist(coords, c, cn, ceil)
                 if remove_gain - add > best_gain:
                     best_gain = remove_gain - add
                     mode = 1
             cp = pred(tour, pos, n, c)
             if cp != s1:  # else c == nx and the move is a no-op
-                add = (
-                    dist(coords, cp, s1, ceil)
-                    + d_c_s0
-                    - dist(coords, cp, c, ceil)
-                )
+                add = dist(coords, cp, s1, ceil) + d_c_s0 - dist(coords, cp, c, ceil)
                 if remove_gain - add > best_gain:
                     best_gain = remove_gain - add
                     mode = 2
@@ -464,18 +456,50 @@ def lk_solve(
     for i in range(n):
         seeds[i] = tour[i]
     lk_reopt(
-        tour, pos, n, coords, cand, cand_d, ceil, seeds, n,
-        breadth, max_depth, deep_breadth, or_seg, stats,
-        False, NO_CHAIN_TAB, NO_CHAIN_ANT, NO_CHAIN_CONS, max_moves,
+        tour,
+        pos,
+        n,
+        coords,
+        cand,
+        cand_d,
+        ceil,
+        seeds,
+        n,
+        breadth,
+        max_depth,
+        deep_breadth,
+        or_seg,
+        stats,
+        False,
+        NO_CHAIN_TAB,
+        NO_CHAIN_ANT,
+        NO_CHAIN_CONS,
+        max_moves,
     )
     return tour, tour_length(tour, coords, ceil), stats
 
 
 @njit(cache=True)
 def lk_reopt(
-    tour, pos, n, coords, cand, cand_d, ceil, seeds, n_seeds,
-    breadth, max_depth, deep_breadth, or_seg, stats,
-    use_chain, ch_tab, ch_ant, ch_cons, max_moves=-1,
+    tour,
+    pos,
+    n,
+    coords,
+    cand,
+    cand_d,
+    ceil,
+    seeds,
+    n_seeds,
+    breadth,
+    max_depth,
+    deep_breadth,
+    or_seg,
+    stats,
+    use_chain,
+    ch_tab,
+    ch_ant,
+    ch_cons,
+    max_moves=-1,
 ):
     """Run the work queue to convergence, seeded from ``seeds[:n_seeds]``.
 

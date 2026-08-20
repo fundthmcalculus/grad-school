@@ -50,12 +50,18 @@ def test_candidate_lists_are_prefix_stable_in_k():
         inst = load(name)
         small, _ = build_candidates(inst.coords, 8, inst.ceil)
         large, _ = build_candidates(inst.coords, 24, inst.ceil)
-        assert np.array_equal(small, large[:, :8]), f"{name}: candidate lists differ with k"
+        assert np.array_equal(
+            small, large[:, :8]
+        ), f"{name}: candidate lists differ with k"
         # and therefore the nearest-neighbour tour cannot depend on k either
         a = nn_tour(inst.coords, small, inst.ceil, 0)
         b = nn_tour(inst.coords, large, inst.ceil, 0)
-        assert reference_length(a, inst) == reference_length(b, inst), f"{name}: NN moved"
-    print(f"  prefix-stable in k, NN invariant ({len(SMALL) + len(TIE_HEAVY)} instances)     ok")
+        assert reference_length(a, inst) == reference_length(
+            b, inst
+        ), f"{name}: NN moved"
+    print(
+        f"  prefix-stable in k, NN invariant ({len(SMALL) + len(TIE_HEAVY)} instances)     ok"
+    )
 
 
 def test_candidate_building_stays_cheap():
@@ -73,7 +79,9 @@ def test_candidate_building_stays_cheap():
         build_candidates(inst.coords, 32, inst.ceil)
         dt = time.perf_counter() - t0
         budget = 0.5 + inst.n * 2e-4  # generous: ~4x the observed cost at n=18512
-        assert dt < budget, f"{name}: candidate build took {dt:.2f}s, budget {budget:.2f}s"
+        assert (
+            dt < budget
+        ), f"{name}: candidate build took {dt:.2f}s, budget {budget:.2f}s"
     print("  candidate building stays cheap on tie-heavy instances      ok")
 
 
@@ -106,9 +114,28 @@ def test_every_move_gain_matches_the_tour():
         for _ in range(3):
             for t1 in rng.permutation(n):
                 gain, _ = improve_city(
-                    tour, pos, n, inst.coords, cand, cand_d, inst.ceil, int(t1),
-                    8, 6, 8, 3, rev_i, rev_j, touched, stats,
-                    True, fis.CHAIN_TAB, fis.CHAIN_ANT, fis.CHAIN_CONS, xc, mu,
+                    tour,
+                    pos,
+                    n,
+                    inst.coords,
+                    cand,
+                    cand_d,
+                    inst.ceil,
+                    int(t1),
+                    8,
+                    6,
+                    8,
+                    3,
+                    rev_i,
+                    rev_j,
+                    touched,
+                    stats,
+                    True,
+                    fis.CHAIN_TAB,
+                    fis.CHAIN_ANT,
+                    fis.CHAIN_CONS,
+                    xc,
+                    mu,
                 )
                 if gain <= 1e-9:
                     continue
@@ -119,7 +146,9 @@ def test_every_move_gain_matches_the_tour():
                     f"{length - new_length}"
                 )
                 length = new_length
-                assert np.array_equal(np.sort(tour), np.arange(n)), f"{name}: not a tour"
+                assert np.array_equal(
+                    np.sort(tour), np.arange(n)
+                ), f"{name}: not a tour"
                 assert np.array_equal(make_pos(tour), pos), f"{name}: pos desynced"
         assert moves > 0, f"{name}: no moves were made, so nothing was checked"
         print(f"  {name:>9s}: {moves:4d} moves, gains and tour consistent        ok")
@@ -136,13 +165,15 @@ def test_solvers_return_valid_tours_and_honest_lengths():
             ("lk", lk_solve(inst.coords, cand, cand_d, inst.ceil, start, 24, 8, 24, 3)),
             (
                 "fis",
-                fis_ls(inst, cand, cand_d, start, fis.EFFORT_CONS, fis.CHAIN_CONS, 10, 3),
+                fis_ls(
+                    inst, cand, cand_d, start, fis.EFFORT_CONS, fis.CHAIN_CONS, 10, 3
+                ),
             ),
         ):
             validate_tour(tour, inst.n)
-            assert abs(length - reference_length(tour, inst)) < 1e-6, (
-                f"{name}/{label}: reported length disagrees with an independent rescore"
-            )
+            assert (
+                abs(length - reference_length(tour, inst)) < 1e-6
+            ), f"{name}/{label}: reported length disagrees with an independent rescore"
     print("  both arms: valid permutations, lengths independently agree  ok")
 
 
@@ -159,9 +190,9 @@ def test_deferred_verification_never_returns_a_worse_tour():
         _, deferred, _ = fis_ls(
             inst, cand, cand_d, start, fis.EFFORT_CONS, fis.CHAIN_CONS, 10, 3, True
         )
-        assert deferred <= plain + 1e-9, (
-            f"{name}: verification pass made the tour longer ({deferred} > {plain})"
-        )
+        assert (
+            deferred <= plain + 1e-9
+        ), f"{name}: verification pass made the tour longer ({deferred} > {plain})"
     print("  deferred verification never worsens the tour               ok")
 
 
@@ -194,11 +225,15 @@ def test_double_bridge_is_a_permutation_and_not_a_reversal():
             if nt == 0:
                 continue
             applied += 1
-            assert np.array_equal(np.sort(tour), np.arange(n)), f"{name}: kick broke the tour"
+            assert np.array_equal(
+                np.sort(tour), np.arange(n)
+            ), f"{name}: kick broke the tour"
             assert np.array_equal(make_pos(tour), pos), f"{name}: kick desynced pos"
             assert nt == 8 or nt < 8, "touched count out of range"
             # the four cut points are 8 distinct cities on a large enough instance
-            assert len(set(touched[:nt].tolist())) == nt, f"{name}: duplicate touched city"
+            assert (
+                len(set(touched[:nt].tolist())) == nt
+            ), f"{name}: duplicate touched city"
             assert not np.array_equal(tour, base), f"{name}: kick changed nothing"
         assert applied > 0, f"{name}: no kick was applied, so nothing was checked"
     print("  double bridge: valid tour, pos consistent, non-trivial      ok")
@@ -219,13 +254,28 @@ def test_iterated_lk_never_returns_worse_than_plain_local_search():
         lengths = []
         for nk in (0, 50, 250):
             tour, length, _ = iterated_lk(
-                inst.coords, cand, cand_d, inst.ceil, start, 24, 6, 24, 3, nk, 16, 7,
-                none, False, fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT, fis.NO_CHAIN_CONS,
+                inst.coords,
+                cand,
+                cand_d,
+                inst.ceil,
+                start,
+                24,
+                6,
+                24,
+                3,
+                nk,
+                16,
+                7,
+                none,
+                False,
+                fis.NO_CHAIN_TAB,
+                fis.NO_CHAIN_ANT,
+                fis.NO_CHAIN_CONS,
             )
             validate_tour(tour, inst.n)
-            assert abs(length - reference_length(tour, inst)) < 1e-6, (
-                f"{name}: iterated reported {length}, rescore disagrees"
-            )
+            assert (
+                abs(length - reference_length(tour, inst)) < 1e-6
+            ), f"{name}: iterated reported {length}, rescore disagrees"
             lengths.append(length)
         for a, b in zip(lengths, lengths[1:]):
             assert b <= a + 1e-9, f"{name}: more kicks gave a longer tour ({lengths})"
@@ -248,9 +298,9 @@ def test_scratch_buffers_are_wide_enough_for_every_rule_base():
         ("CHAIN", fis.CHAIN_TAB, fis.CHAIN_ANT),
         ("NO_CHAIN", fis.NO_CHAIN_TAB, fis.NO_CHAIN_ANT),
     ):
-        assert tab.shape[0] == ant.shape[1], (
-            f"{name}: membership bank has {tab.shape[0]} inputs, rules have {ant.shape[1]}"
-        )
+        assert (
+            tab.shape[0] == ant.shape[1]
+        ), f"{name}: membership bank has {tab.shape[0]} inputs, rules have {ant.shape[1]}"
         assert tab.shape[1] == fis.N_TERMS, f"{name}: wrong term count"
         assert int(ant.max()) < fis.N_TERMS, f"{name}: a rule names a nonexistent term"
     # the baseline arm passes the chain rule base through even with use_chain off, so its
@@ -264,7 +314,10 @@ def test_membership_table_matches_the_functions_it_compiled():
     replaced — otherwise the fitted rule bases mean something different at run time than
     they did when they were fitted."""
     c, w = fis.default_mf(4, sigma=0.25)
-    for kind, fn in (("gaussian", fis._mf_gaussian), ("triangular", fis._mf_triangular)):
+    for kind, fn in (
+        ("gaussian", fis._mf_gaussian),
+        ("triangular", fis._mf_triangular),
+    ):
         tab = fis.mf_table(c, w, kind)
         xs = np.linspace(0.0, 1.0, 197)
         mu = np.empty((4, 3), np.float64)
@@ -275,9 +328,9 @@ def test_membership_table_matches_the_functions_it_compiled():
                     want = float(fn(np.array([x]), c[i, t], w[i, t])[0])
                     # linear interpolation between table samples, so allow the
                     # interpolation error of a 64-interval grid on a smooth function
-                    assert abs(mu[i, t] - want) < 2e-3, (
-                        f"{kind}: table {mu[i, t]:.5f} vs closed form {want:.5f} at x={x}"
-                    )
+                    assert (
+                        abs(mu[i, t] - want) < 2e-3
+                    ), f"{kind}: table {mu[i, t]:.5f} vs closed form {want:.5f} at x={x}"
     print("  membership lookup tables match their closed forms          ok")
 
 
@@ -305,7 +358,9 @@ def test_scale_statistics_stay_finite_on_coincident_points():
     cand, cand_d = build_candidates(coords, 3, False)
     nn1, mean_c = nn_stats(cand_d)
     assert np.all(np.isfinite(nn1)) and np.all(nn1 > 0.0), "nn1 must be positive finite"
-    assert np.all(np.isfinite(mean_c)) and np.all(mean_c > 0.0), "mean_c must be positive"
+    assert np.all(np.isfinite(mean_c)) and np.all(
+        mean_c > 0.0
+    ), "mean_c must be positive"
     print("  scale statistics finite with coincident points             ok")
 
 

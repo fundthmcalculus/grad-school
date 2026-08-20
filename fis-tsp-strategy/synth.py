@@ -49,16 +49,26 @@ from tsplib import Instance
 # the RNG produced that afternoon. Train and validation draw on *disjoint seeds and
 # different sizes*, so a validation instance is never a near-duplicate of a training one.
 TRAIN_SPEC = [
-    ("uniform", 1200, 11), ("uniform", 2600, 12), ("uniform", 5200, 13),
-    ("clustered", 1400, 21), ("clustered", 3000, 22), ("clustered", 6000, 23),
-    ("grid", 1600, 31), ("grid", 3400, 32),
-    ("mixed", 1800, 41), ("mixed", 3800, 42), ("mixed", 7000, 43),
+    ("uniform", 1200, 11),
+    ("uniform", 2600, 12),
+    ("uniform", 5200, 13),
+    ("clustered", 1400, 21),
+    ("clustered", 3000, 22),
+    ("clustered", 6000, 23),
+    ("grid", 1600, 31),
+    ("grid", 3400, 32),
+    ("mixed", 1800, 41),
+    ("mixed", 3800, 42),
+    ("mixed", 7000, 43),
 ]
 VALID_SPEC = [
-    ("uniform", 1500, 111), ("uniform", 4000, 112),
-    ("clustered", 2000, 121), ("clustered", 4600, 122),
+    ("uniform", 1500, 111),
+    ("uniform", 4000, 112),
+    ("clustered", 2000, 121),
+    ("clustered", 4600, 122),
     ("grid", 2200, 131),
-    ("mixed", 2800, 141), ("mixed", 5600, 142),
+    ("mixed", 2800, 141),
+    ("mixed", 5600, 142),
 ]
 
 SPREAD = 10000.0  # coordinate range, chosen to match TSPLIB's typical magnitudes

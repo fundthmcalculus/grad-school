@@ -33,7 +33,12 @@ MARKER = {"ga": "o", "pso": "s", "aco": "^"}
 COLOUR = {"gaussian": "tab:blue", "triangular": "tab:red"}
 TERM_NAME = ("LOW", "MED", "HIGH")
 EFFORT_INPUTS = (
-    "edge excess", "past failures", "turn sharpness", "progress", "edge rank", "peakedness",
+    "edge excess",
+    "past failures",
+    "turn sharpness",
+    "progress",
+    "edge rank",
+    "peakedness",
 )
 
 
@@ -44,15 +49,18 @@ def figure(log, tuned, out):
     ax = axes[0]
     labels, hand, fitted = [], [], []
     for rec in log:
-        labels.append(f"{rec['optimizer'].upper()}\n{rec['mf_kind']}\n{rec['evaluations']} evals")
+        labels.append(
+            f"{rec['optimizer'].upper()}\n{rec['mf_kind']}\n{rec['evaluations']} evals"
+        )
         hand.append(rec["hand_valid_ratio"])
         fitted.append(rec["valid_ratio"])
     xs = np.arange(len(labels))
     w = 0.38
     ax.bar(xs - w / 2, hand, w, color="tab:gray", label="hand-written")
     ax.bar(xs + w / 2, fitted, w, color="tab:green", label="GA-fitted")
-    ax.axhline(1.0, color="tab:red", lw=1.4, ls="--",
-               label="the baseline frontier (q = 1)")
+    ax.axhline(
+        1.0, color="tab:red", lw=1.4, ls="--", label="the baseline frontier (q = 1)"
+    )
     ax.set_xticks(xs)
     ax.set_xticklabels(labels, fontsize=7)
     ax.set_ylabel("validation q  (tour length / frontier at equal cost)")

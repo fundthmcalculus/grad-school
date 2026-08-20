@@ -101,12 +101,16 @@ def main():
     # test pools: one per family, plus held-out TSPLIB. Built once and shared by every fitted
     # vector, so a row and a column of the matrix are directly comparable.
     print("building test pools...", flush=True)
-    tests = {f: T.Objective(_pool(f, SIZES_TEST, 900 + 10 * i), space, coef)
-             for i, f in enumerate(args.families)}
+    tests = {
+        f: T.Objective(_pool(f, SIZES_TEST, 900 + 10 * i), space, coef)
+        for i, f in enumerate(args.families)
+    }
     tests["tsplib"] = T.Objective(_tsplib_pool(), space, coef)
     for name, obj in tests.items():
-        print(f"  {name:>10s}: {len(obj.items)} instances "
-              f"({', '.join(str(it[0].n) for it in obj.items)})")
+        print(
+            f"  {name:>10s}: {len(obj.items)} instances "
+            f"({', '.join(str(it[0].n) for it in obj.items)})"
+        )
 
     rows = {}
 
@@ -118,29 +122,47 @@ def main():
         z = np.load(shipped)
         if "theta" in z:
             rows["shipped (all families)"] = {
-                t: tests[t].report(np.asarray(z["theta"], dtype=np.float64))[0] for t in tests
+                t: tests[t].report(np.asarray(z["theta"], dtype=np.float64))[0]
+                for t in tests
             }
 
     for i, fam in enumerate(args.families):
         print(f"\nfitting on {fam} only...", flush=True)
         t0 = time.perf_counter()
         theta, rec, _ = T.run_one(
-            "ga", "triangular", "base", args.generations, args.population, 1,
-            args.seed, 0.3, [], args.polish_evals, args.scale,
+            "ga",
+            "triangular",
+            "base",
+            args.generations,
+            args.population,
+            1,
+            args.seed,
+            0.3,
+            [],
+            args.polish_evals,
+            args.scale,
             train_pool=_pool(fam, SIZES_FIT, 100 + 10 * i),
             valid_pool=_pool(fam, SIZES_TEST, 500 + 10 * i),
         )
-        print(f"  fitted in {time.perf_counter() - t0:.0f}s "
-              f"(train q {rec['train_ratio']:.4f}, valid q {rec['valid_ratio']:.4f})")
+        print(
+            f"  fitted in {time.perf_counter() - t0:.0f}s "
+            f"(train q {rec['train_ratio']:.4f}, valid q {rec['valid_ratio']:.4f})"
+        )
         rows[f"fitted on {fam}"] = {t: tests[t].report(theta)[0] for t in tests}
 
     cols = list(tests)
     print(f"\n{'':>26s} " + " ".join(f"{c:>10s}" for c in cols))
     for name, r in rows.items():
         print(f"{name:>26s} " + " ".join(f"{r[c]:10.4f}" for c in cols))
-    print("\nq = arm's tour length / what the swept LK frontier reaches at the same cost.")
-    print("Lower is better; 1.0 is the frontier. Diagonal cells are home-field (fitted and")
-    print("tested on the same family, different instances); off-diagonal cells are transfer.")
+    print(
+        "\nq = arm's tour length / what the swept LK frontier reaches at the same cost."
+    )
+    print(
+        "Lower is better; 1.0 is the frontier. Diagonal cells are home-field (fitted and"
+    )
+    print(
+        "tested on the same family, different instances); off-diagonal cells are transfer."
+    )
 
     # the number the claim rests on: how much worse is transfer than home field
     print()
@@ -150,12 +172,24 @@ def main():
             continue
         home = row[fam]
         away = [row[c] for c in args.families if c != fam]
-        print(f"  fitted on {fam:>10s}: home {home:.4f}, mean away {np.mean(away):.4f} "
-              f"(+{np.mean(away) - home:+.4f}), TSPLIB {row['tsplib']:.4f}")
+        print(
+            f"  fitted on {fam:>10s}: home {home:.4f}, mean away {np.mean(away):.4f} "
+            f"(+{np.mean(away) - home:+.4f}), TSPLIB {row['tsplib']:.4f}"
+        )
 
-    Path(args.out).write_text(json.dumps(
-        {"rows": rows, "columns": cols, "sizes_fit": SIZES_FIT, "sizes_test": SIZES_TEST,
-         "generations": args.generations, "population": args.population}, indent=1))
+    Path(args.out).write_text(
+        json.dumps(
+            {
+                "rows": rows,
+                "columns": cols,
+                "sizes_fit": SIZES_FIT,
+                "sizes_test": SIZES_TEST,
+                "generations": args.generations,
+                "population": args.population,
+            },
+            indent=1,
+        )
+    )
     print(f"\nwrote {args.out}")
 
 

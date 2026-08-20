@@ -45,7 +45,9 @@ def _rule_labels(ant, names):
     out = []
     for r in range(ant.shape[0]):
         parts = [
-            f"{names[i]} {TERM[ant[r, i]]}" for i in range(ant.shape[1]) if ant[r, i] >= 0
+            f"{names[i]} {TERM[ant[r, i]]}"
+            for i in range(ant.shape[1])
+            if ant[r, i] >= 0
         ]
         out.append(" & ".join(parts) if parts else "(always)")
     return out
@@ -59,7 +61,10 @@ def _draw_mf(ax, tab, names, title):
         ax.axhline(off, color="0.9", lw=0.8, zorder=0)
         for t in range(tab.shape[1]):
             ax.plot(
-                xs, off + 0.85 * tab[i, t], color=TERM_COLOUR[t], lw=1.8,
+                xs,
+                off + 0.85 * tab[i, t],
+                color=TERM_COLOUR[t],
+                lw=1.8,
                 label=TERM[t] if i == 0 else None,
             )
         ax.text(0.012, off + 0.60, names[i], fontsize=8.5, color="black")
@@ -73,7 +78,9 @@ def _draw_mf(ax, tab, names, title):
     ax.legend(fontsize=7, loc="upper right", ncol=3)
 
 
-def _draw_cons(ax, cons, labels, out_names, title, cmap="viridis", vlim=None, diff=False):
+def _draw_cons(
+    ax, cons, labels, out_names, title, cmap="viridis", vlim=None, diff=False
+):
     if diff:
         m = float(np.abs(cons).max()) if vlim is None else vlim
         im = ax.imshow(cons, cmap="coolwarm", vmin=-m, vmax=m, aspect="auto")
@@ -88,8 +95,12 @@ def _draw_cons(ax, cons, labels, out_names, title, cmap="viridis", vlim=None, di
         for c in range(cons.shape[1]):
             v = cons[r, c]
             ax.text(
-                c, r, f"{v:+.2f}" if diff else f"{v:.2f}",
-                ha="center", va="center", fontsize=6,
+                c,
+                r,
+                f"{v:+.2f}" if diff else f"{v:.2f}",
+                ha="center",
+                va="center",
+                fontsize=6,
                 color="white" if (not diff and v < 0.55) else "black",
             )
     return im
@@ -107,29 +118,68 @@ def figure(tuned, scale, out):
     h_tab = np.asarray(tuned["chain_tab"])
 
     fig = plt.figure(figsize=(19.5, 11.0))
-    gs = fig.add_gridspec(2, 4, width_ratios=[1.25, 1.0, 1.0, 1.0], hspace=0.32, wspace=0.42)
+    gs = fig.add_gridspec(
+        2, 4, width_ratios=[1.25, 1.0, 1.0, 1.0], hspace=0.32, wspace=0.42
+    )
 
-    _draw_mf(fig.add_subplot(gs[0, 0]), e_tab, e_names,
-             "EFFORT — fitted membership functions")
+    _draw_mf(
+        fig.add_subplot(gs[0, 0]),
+        e_tab,
+        e_names,
+        "EFFORT — fitted membership functions",
+    )
     e_labels = _rule_labels(e_ant, e_names)
-    _draw_cons(fig.add_subplot(gs[0, 1]), e_hand, e_labels, E_OUT,
-               "EFFORT consequents: hand-written")
-    im = _draw_cons(fig.add_subplot(gs[0, 2]), e_fit, e_labels, E_OUT,
-                    "EFFORT consequents: GA-fitted + polished")
+    _draw_cons(
+        fig.add_subplot(gs[0, 1]),
+        e_hand,
+        e_labels,
+        E_OUT,
+        "EFFORT consequents: hand-written",
+    )
+    im = _draw_cons(
+        fig.add_subplot(gs[0, 2]),
+        e_fit,
+        e_labels,
+        E_OUT,
+        "EFFORT consequents: GA-fitted + polished",
+    )
     fig.colorbar(im, ax=fig.axes[-1], fraction=0.046, label="effort (0 = least)")
-    imd = _draw_cons(fig.add_subplot(gs[0, 3]), e_fit - e_hand, e_labels, E_OUT,
-                     "difference (fitted − hand-written)", diff=True)
+    imd = _draw_cons(
+        fig.add_subplot(gs[0, 3]),
+        e_fit - e_hand,
+        e_labels,
+        E_OUT,
+        "difference (fitted − hand-written)",
+        diff=True,
+    )
     fig.colorbar(imd, ax=fig.axes[-1], fraction=0.046, label="red = more effort")
 
-    _draw_mf(fig.add_subplot(gs[1, 0]), h_tab, h_names,
-             "CHAIN — fitted membership functions")
+    _draw_mf(
+        fig.add_subplot(gs[1, 0]), h_tab, h_names, "CHAIN — fitted membership functions"
+    )
     h_labels = _rule_labels(h_ant, h_names)
-    _draw_cons(fig.add_subplot(gs[1, 1]), h_hand, h_labels, ["keep going"],
-               "CHAIN consequents: hand-written")
-    _draw_cons(fig.add_subplot(gs[1, 2]), h_fit, h_labels, ["keep going"],
-               "CHAIN consequents: GA-fitted + polished")
-    _draw_cons(fig.add_subplot(gs[1, 3]), h_fit - h_hand, h_labels, ["keep going"],
-               "difference (fitted − hand-written)", diff=True)
+    _draw_cons(
+        fig.add_subplot(gs[1, 1]),
+        h_hand,
+        h_labels,
+        ["keep going"],
+        "CHAIN consequents: hand-written",
+    )
+    _draw_cons(
+        fig.add_subplot(gs[1, 2]),
+        h_fit,
+        h_labels,
+        ["keep going"],
+        "CHAIN consequents: GA-fitted + polished",
+    )
+    _draw_cons(
+        fig.add_subplot(gs[1, 3]),
+        h_fit - h_hand,
+        h_labels,
+        ["keep going"],
+        "difference (fitted − hand-written)",
+        diff=True,
+    )
 
     fig.suptitle(
         f"The trained rule bases, '{scale}' scale — {e_ant.shape[0]} EFFORT rules over "
@@ -152,7 +202,8 @@ def describe(tuned, scale):
     print(f"\nEFFORT rules the optimiser disagreed with most ({scale} scale):")
     for r in order[:6]:
         moves = ", ".join(
-            f"{E_OUT[c]} {e_hand[r, c]:.2f}->{e_fit[r, c]:.2f}" for c in range(delta.shape[1])
+            f"{E_OUT[c]} {e_hand[r, c]:.2f}->{e_fit[r, c]:.2f}"
+            for c in range(delta.shape[1])
         )
         print(f"  IF {labels[r]:<28s} {moves}")
 

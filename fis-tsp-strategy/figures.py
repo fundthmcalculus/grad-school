@@ -93,10 +93,25 @@ def figure(results, out):
 
     markers = {
         "fis_defer": ("*", "tab:red", 320, "FIS + deferred verification"),
-        "fis_effort_chain_greedy": ("v", "tab:green", 85, "FIS effort+chain, GA-fitted"),
-        "fis_chain_greedy_handwritten": ("D", "tab:orange", 70, "FIS effort+chain, hand-written"),
+        "fis_effort_chain_greedy": (
+            "v",
+            "tab:green",
+            85,
+            "FIS effort+chain, GA-fitted",
+        ),
+        "fis_chain_greedy_handwritten": (
+            "D",
+            "tab:orange",
+            70,
+            "FIS effort+chain, hand-written",
+        ),
         "fis_effort_greedy": ("s", "tab:olive", 60, "FIS effort, GA-fitted"),
-        "fis_effort_greedy_handwritten": ("P", "tab:gray", 55, "FIS effort, hand-written"),
+        "fis_effort_greedy_handwritten": (
+            "P",
+            "tab:gray",
+            55,
+            "FIS effort, hand-written",
+        ),
         "fis_full": ("^", "tab:purple", 55, "FIS + fuzzy construction"),
         "fis_effort_nn": ("X", "tab:brown", 50, "FIS effort, NN start"),
     }
@@ -111,7 +126,13 @@ def figure(results, out):
         q = v.get("mean_q")
         tag = f"{label}  (q={q:.4f})" if q else label
         ax.scatter(
-            v["total_s"], v["mean_gap"], marker=mk, s=size, color=col, zorder=5, label=tag
+            v["total_s"],
+            v["mean_gap"],
+            marker=mk,
+            s=size,
+            color=col,
+            zorder=5,
+            label=tag,
         )
 
     # The movement fitting produced. Drawn as arrows from the hand-written rule base to
@@ -127,12 +148,25 @@ def figure(results, out):
             "",
             xy=(b["total_s"], b["mean_gap"]),
             xytext=(a["total_s"], a["mean_gap"]),
-            arrowprops=dict(arrowstyle="-|>", color=col, lw=1.6, alpha=0.85,
-                            shrinkA=7, shrinkB=7, linestyle=(0, (4, 2))),
+            arrowprops=dict(
+                arrowstyle="-|>",
+                color=col,
+                lw=1.6,
+                alpha=0.85,
+                shrinkA=7,
+                shrinkB=7,
+                linestyle=(0, (4, 2)),
+            ),
             zorder=4,
         )
-    ax.plot([], [], color="black", ls=(0, (4, 2)), lw=1.6,
-            label="hand-written $\\rightarrow$ GA-fitted")
+    ax.plot(
+        [],
+        [],
+        color="black",
+        ls=(0, (4, 2)),
+        lw=1.6,
+        label="hand-written $\\rightarrow$ GA-fitted",
+    )
 
     # LKH is deliberately absent from this panel. It only finishes on a subset of the
     # test instances, and putting a point measured over a different subset on a shared
@@ -159,15 +193,24 @@ def figure(results, out):
     mb = np.array([r.get(f"{key}_mean_breadth", np.nan) for r in rows])[order]
     ax.plot(ns, md, "o-", color="tab:red", label="FIS mean chain depth (adaptive)")
     ax.axhline(
-        10.0, color="tab:blue", ls="--", lw=1.5, label="baseline chain depth (fixed, 10)"
+        10.0,
+        color="tab:blue",
+        ls="--",
+        lw=1.5,
+        label="baseline chain depth (fixed, 10)",
     )
-    ax.plot(ns, mb, "s-", color="tab:green", alpha=0.8, label="FIS mean first-level breadth")
-    ax.axhline(32.0, color="tab:blue", ls=":", lw=1.5, label="baseline breadth (fixed, 32)")
+    ax.plot(
+        ns, mb, "s-", color="tab:green", alpha=0.8, label="FIS mean first-level breadth"
+    )
+    ax.axhline(
+        32.0, color="tab:blue", ls=":", lw=1.5, label="baseline breadth (fixed, 32)"
+    )
     ax.set_xscale("log")
     ax.set_xlabel("n (cities)")
     ax.set_ylabel("mean parameter value over city searches")
     ax.set_title(
-        "What the rule base spends\n(depth is the parameter that costs time)", fontsize=10
+        "What the rule base spends\n(depth is the parameter that costs time)",
+        fontsize=10,
     )
     ax.grid(alpha=0.3, which="both")
     ax.legend(fontsize=7)
@@ -184,7 +227,12 @@ def figure(results, out):
     series = [
         ("fis_defer", "tab:red", "o", "FIS + deferred verification"),
         ("fis_effort_chain_greedy", "tab:green", "v", "FIS effort+chain, GA-fitted"),
-        ("fis_chain_greedy_handwritten", "tab:orange", "D", "FIS effort+chain, hand-written"),
+        (
+            "fis_chain_greedy_handwritten",
+            "tab:orange",
+            "D",
+            "FIS effort+chain, hand-written",
+        ),
         ("lk_32_2_4", "tab:blue", "s", "LK k32/d2/b4 (best fixed overall)"),
         ("lk_48_10_32", "tab:cyan", "^", "LK k48/d10/b32 (best quality)"),
     ]
@@ -202,16 +250,29 @@ def figure(results, out):
             mus.append(qs.mean())
             ses.append(qs.std(ddof=1) / np.sqrt(len(qs)) if len(qs) > 1 else 0.0)
         ax.errorbar(
-            centres, mus, yerr=ses, fmt=mk + "-", color=col, ms=6, lw=1.5,
-            capsize=3, alpha=0.9, label=label,
+            centres,
+            mus,
+            yerr=ses,
+            fmt=mk + "-",
+            color=col,
+            ms=6,
+            lw=1.5,
+            capsize=3,
+            alpha=0.9,
+            label=label,
         )
     ax.axhline(1.0, color="black", lw=1.6, ls="--", label="the baseline frontier")
     ax.set_xscale("log")
     ax.set_xticks(centres)
-    ax.set_xticklabels([f"<1k\n({sum(1 for r in rows if r['n'] < 1000)})"]
-                       + [f"{a // 1000}k-{b // 1000}k\n"
-                          f"({sum(1 for r in rows if a <= r['n'] < b)})"
-                          for a, b in bands[1:]], fontsize=8)
+    ax.set_xticklabels(
+        [f"<1k\n({sum(1 for r in rows if r['n'] < 1000)})"]
+        + [
+            f"{a // 1000}k-{b // 1000}k\n"
+            f"({sum(1 for r in rows if a <= r['n'] < b)})"
+            for a, b in bands[1:]
+        ],
+        fontsize=8,
+    )
     ax.set_xlabel("instance size band (instances)")
     ax.set_ylabel("mean q  (tour length / frontier at equal wall clock)")
     ax.set_title(
@@ -231,7 +292,9 @@ def figure(results, out):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--scale", default="small", choices=("small", "large"))
-    ap.add_argument("--results", default=None, help="default: results/results_<scale>.json")
+    ap.add_argument(
+        "--results", default=None, help="default: results/results_<scale>.json"
+    )
     ap.add_argument("--out", default=str(paths.FIGURES / "fis_tsp_pareto.png"))
     args = ap.parse_args()
     if args.results is None:
