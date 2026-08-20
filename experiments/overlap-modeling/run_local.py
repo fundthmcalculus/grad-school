@@ -73,8 +73,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from run_experiment import (  # noqa: E402
-    BUCKETS, DATASETS, DEFAULT_DATASETS, L2_REG, ORDERS, PARTITION, SEEDS,
-    _r2, dump_payload, prepare, provenance, split3,
+    BUCKETS,
+    DATASETS,
+    DEFAULT_DATASETS,
+    L2_REG,
+    ORDERS,
+    PARTITION,
+    SEEDS,
+    _r2,
+    dump_payload,
+    prepare,
+    provenance,
+    split3,
 )
 from overlap import OverlapTribbleRegressor  # noqa: E402
 
@@ -95,25 +105,57 @@ def arm_configs():
         ("local-wta", dict(consequent_fit="local", predict_mode="wta")),
         ("local-recal", dict(consequent_fit="local", blend_recalibrate=True)),
         # Antecedents held hard on purpose -- see the module docstring.
-        ("shrink-local", dict(consequent_fit="shrink-local",
-                              overlap_antecedents=False, overlap_means=False)),
+        (
+            "shrink-local",
+            dict(
+                consequent_fit="shrink-local",
+                overlap_antecedents=False,
+                overlap_means=False,
+            ),
+        ),
     ]
     for arm, base in families:
         for f in FRACTIONS:
-            out.append((arm, f"{arm}/{f:g}", dict(overlap=f, overlap_shape="flat", **base)))
+            out.append(
+                (arm, f"{arm}/{f:g}", dict(overlap=f, overlap_shape="flat", **base))
+            )
     # Does concentrating the blend rescue a set of good local approximators?
     for tau in SHARPEN_TAUS:
         for gamma in SHARPEN:
-            out.append(("local-sharp", f"local-sharp/{tau:g}/{gamma:g}", dict(
-                consequent_fit="local", overlap=tau, overlap_shape="flat",
-                blend_sharpen=gamma)))
-    out.append(("global-wta", "global-wta", dict(
-        consequent_fit="global", overlap=0.0, predict_mode="wta")))
-    out.append(("global-recal", "global-recal", dict(
-        consequent_fit="global", overlap=0.0, blend_recalibrate=True)))
+            out.append(
+                (
+                    "local-sharp",
+                    f"local-sharp/{tau:g}/{gamma:g}",
+                    dict(
+                        consequent_fit="local",
+                        overlap=tau,
+                        overlap_shape="flat",
+                        blend_sharpen=gamma,
+                    ),
+                )
+            )
+    out.append(
+        (
+            "global-wta",
+            "global-wta",
+            dict(consequent_fit="global", overlap=0.0, predict_mode="wta"),
+        )
+    )
+    out.append(
+        (
+            "global-recal",
+            "global-recal",
+            dict(consequent_fit="global", overlap=0.0, blend_recalibrate=True),
+        )
+    )
     for gamma in SHARPEN:
-        out.append(("global-sharp", f"global-sharp/{gamma:g}", dict(
-            consequent_fit="global", overlap=0.0, blend_sharpen=gamma)))
+        out.append(
+            (
+                "global-sharp",
+                f"global-sharp/{gamma:g}",
+                dict(consequent_fit="global", overlap=0.0, blend_sharpen=gamma),
+            )
+        )
     return out
 
 
@@ -127,8 +169,9 @@ def train_fold_buckets(y_fit, y_other, n_buckets):
     on the test fold would move the boundaries between arms' scores and make the
     numbers incomparable across folds.
     """
-    edges = np.quantile(np.asarray(y_fit, dtype=float),
-                        np.linspace(0.0, 1.0, n_buckets + 1))[1:-1]
+    edges = np.quantile(
+        np.asarray(y_fit, dtype=float), np.linspace(0.0, 1.0, n_buckets + 1)
+    )[1:-1]
     return np.digitize(np.asarray(y_other, dtype=float), edges)
 
 
@@ -146,25 +189,51 @@ def run_cell(dataset, n_buckets, order, seed, configs):
         try:
             with contextlib.redirect_stdout(io.StringIO()):
                 model = OverlapTribbleRegressor(
-                    n_output_buckets=n_buckets, output_partition=PARTITION,
-                    tsk_order=order, l2_reg=L2_REG, pin_extremes=False,
-                    random_state=seed, **kwargs).fit(Xtr, ytr)
+                    n_output_buckets=n_buckets,
+                    output_partition=PARTITION,
+                    tsk_order=order,
+                    l2_reg=L2_REG,
+                    pin_extremes=False,
+                    random_state=seed,
+                    **kwargs,
+                ).fit(Xtr, ytr)
                 fit_s = time.perf_counter() - t0
                 r2_val, drop_val = _r2(yva, model.predict(Xva))
                 r2_test, drop_test = _r2(yte, model.predict(Xte))
                 local_train = model.local_approximation_r2(Xtr, ytr, hard_tr)
                 local_test = model.local_approximation_r2(Xte, yte, hard_te)
-        except Exception as exc:                       # noqa: BLE001
-            records.append(dict(
-                dataset=dataset, n_buckets=n_buckets, order=order, seed=seed,
-                arm=arm, label=label, error=f"{type(exc).__name__}: {exc}"))
+        except Exception as exc:  # noqa: BLE001
+            records.append(
+                dict(
+                    dataset=dataset,
+                    n_buckets=n_buckets,
+                    order=order,
+                    seed=seed,
+                    arm=arm,
+                    label=label,
+                    error=f"{type(exc).__name__}: {exc}",
+                )
+            )
             continue
-        records.append(dict(
-            dataset=dataset, n_buckets=n_buckets, order=order, seed=seed,
-            arm=arm, label=label, r2_val=r2_val, r2_test=r2_test,
-            local_r2_train=local_train, local_r2_test=local_test,
-            dropped_val=drop_val, dropped_test=drop_test, fit_seconds=fit_s,
-            n_rules=int(model.n_rules_), overlap=kwargs.get("overlap", 0.0)))
+        records.append(
+            dict(
+                dataset=dataset,
+                n_buckets=n_buckets,
+                order=order,
+                seed=seed,
+                arm=arm,
+                label=label,
+                r2_val=r2_val,
+                r2_test=r2_test,
+                local_r2_train=local_train,
+                local_r2_test=local_test,
+                dropped_val=drop_val,
+                dropped_test=drop_test,
+                fit_seconds=fit_s,
+                n_rules=int(model.n_rules_),
+                overlap=kwargs.get("overlap", 0.0),
+            )
+        )
     return records
 
 
@@ -176,7 +245,9 @@ def main():
     ap.add_argument("--orders", default=",".join(ORDERS))
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--quick", action="store_true")
-    ap.add_argument("--out", default=os.path.join(HERE, "outputs", "local_results.json"))
+    ap.add_argument(
+        "--out", default=os.path.join(HERE, "outputs", "local_results.json")
+    )
     args = ap.parse_args()
 
     datasets = args.datasets.split(",")
@@ -187,19 +258,29 @@ def main():
         datasets, seeds, buckets, orders = ["concrete"], [0, 1, 2], [5], ["2nd"]
 
     configs = arm_configs()
-    cells = [(d, b, o, s) for d in datasets for b in buckets for o in orders for s in seeds]
-    print(f"{len(cells)} cells x {len(configs)} arms = {len(cells) * len(configs)} fits "
-          f"on {args.jobs} workers")
+    cells = [
+        (d, b, o, s) for d in datasets for b in buckets for o in orders for s in seeds
+    ]
+    print(
+        f"{len(cells)} cells x {len(configs)} arms = {len(cells) * len(configs)} fits "
+        f"on {args.jobs} workers"
+    )
 
     from joblib import Parallel, delayed
+
     t0 = time.time()
     batches = Parallel(n_jobs=args.jobs, verbose=5)(
-        delayed(run_cell)(d, b, o, s, configs) for d, b, o, s in cells)
+        delayed(run_cell)(d, b, o, s, configs) for d, b, o, s in cells
+    )
     records = [r for batch in batches for r in batch]
     elapsed = time.time() - t0
 
-    payload = dict(provenance=provenance(), wall_clock_seconds=elapsed,
-                   fractions=list(FRACTIONS), records=records)
+    payload = dict(
+        provenance=provenance(),
+        wall_clock_seconds=elapsed,
+        fractions=list(FRACTIONS),
+        records=records,
+    )
     written = dump_payload(payload, args.out)
 
     n_err = sum("error" in r for r in records)

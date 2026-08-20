@@ -46,11 +46,13 @@ from tribblefis.regression import (  # noqa: E402
 def data():
     rng = np.random.default_rng(0)
     n = 400
-    X = pd.DataFrame({
-        "a": rng.uniform(0, 1, n),
-        "b": rng.uniform(0, 1, n),
-        "c": rng.uniform(0, 1, n),
-    })
+    X = pd.DataFrame(
+        {
+            "a": rng.uniform(0, 1, n),
+            "b": rng.uniform(0, 1, n),
+            "c": rng.uniform(0, 1, n),
+        }
+    )
     y = pd.Series(
         2.0 * X["a"] + 0.5 * X["b"] ** 2 - X["a"] * X["c"] + 0.05 * rng.normal(size=n),
         name="y_value",
@@ -87,8 +89,12 @@ def test_endpoints_are_single_sided_at_every_width():
     labels = np.repeat([0, 1, 2], 10)
     for fraction in (0.1, 0.5, 1.0):
         W = overlap_weights(y, labels, 3, fraction=fraction)
-        assert W[:, 0].nonzero()[0].min() == 0, "bucket 0 gained a point below the minimum"
-        assert W[:, -1].nonzero()[0].max() == 29, "last bucket gained a point above the maximum"
+        assert (
+            W[:, 0].nonzero()[0].min() == 0
+        ), "bucket 0 gained a point below the minimum"
+        assert (
+            W[:, -1].nonzero()[0].max() == 29
+        ), "last bucket gained a point above the maximum"
 
 
 def test_flat_band_weights_are_one_and_ramp_weights_decay_outward():
@@ -98,11 +104,11 @@ def test_flat_band_weights_are_one_and_ramp_weights_decay_outward():
     assert set(np.unique(flat[flat > 0])) == {1.0}
 
     ramp = overlap_weights(y, labels, 3, fraction=0.5, shape="ramp")
-    np.testing.assert_allclose(ramp[10:20, 1], 1.0)          # own points keep full weight
-    upper = ramp[20:25, 1]                                    # borrowed from above
+    np.testing.assert_allclose(ramp[10:20, 1], 1.0)  # own points keep full weight
+    upper = ramp[20:25, 1]  # borrowed from above
     assert np.all(np.diff(upper) < 0), "ramp must decay away from the shared edge"
     assert upper[0] == pytest.approx(1.0)
-    lower = ramp[5:10, 1]                                     # borrowed from below
+    lower = ramp[5:10, 1]  # borrowed from below
     assert np.all(np.diff(lower) > 0), "ramp must rise toward the shared edge"
 
 
@@ -133,12 +139,14 @@ def test_random_band_matches_the_adjacent_band_in_everything_but_row_identity():
     labels = np.repeat([0, 1, 2], 20)
     for shape in ("flat", "ramp"):
         adj = overlap_weights(y, labels, 3, 0.4, shape=shape, band="adjacent")
-        rnd = overlap_weights(y, labels, 3, 0.4, shape=shape, band="random",
-                              random_state=11)
+        rnd = overlap_weights(
+            y, labels, 3, 0.4, shape=shape, band="random", random_state=11
+        )
         np.testing.assert_array_equal((adj > 0).sum(axis=0), (rnd > 0).sum(axis=0))
         for b in range(3):
-            np.testing.assert_allclose(np.sort(adj[adj[:, b] > 0, b]),
-                                       np.sort(rnd[rnd[:, b] > 0, b]))
+            np.testing.assert_allclose(
+                np.sort(adj[adj[:, b] > 0, b]), np.sort(rnd[rnd[:, b] > 0, b])
+            )
         assert not np.array_equal(adj > 0, rnd > 0), "the control did not move any row"
     # The ends stay single-sided: a random band still only reaches into a real
     # neighbour, so bucket 0 cannot gain a point from bucket 2.
@@ -151,10 +159,12 @@ def test_random_band_is_reproducible_and_seed_dependent():
     labels = np.repeat([0, 1, 2], 20)
     kw = dict(shape="flat", band="random")
     a = overlap_weights(y, labels, 3, 0.4, random_state=5, **kw)
-    np.testing.assert_array_equal(a, overlap_weights(y, labels, 3, 0.4,
-                                                     random_state=5, **kw))
-    assert not np.array_equal(a, overlap_weights(y, labels, 3, 0.4,
-                                                 random_state=6, **kw))
+    np.testing.assert_array_equal(
+        a, overlap_weights(y, labels, 3, 0.4, random_state=5, **kw)
+    )
+    assert not np.array_equal(
+        a, overlap_weights(y, labels, 3, 0.4, random_state=6, **kw)
+    )
 
 
 def test_fraction_is_validated():
@@ -173,9 +183,9 @@ def test_weighted_means_move_toward_the_neighbours():
     hard = np.array([4.5, 14.5, 24.5])
     W = overlap_weights(y, labels, 3, fraction=0.5, shape="flat")
     soft = overlap_bucket_means(y, W, hard, pin_extremes=False)
-    assert soft[1] == pytest.approx(14.5)          # symmetric overlap: unchanged
-    assert soft[0] > hard[0]                       # pulled up toward bucket 1
-    assert soft[2] < hard[2]                       # pulled down toward bucket 1
+    assert soft[1] == pytest.approx(14.5)  # symmetric overlap: unchanged
+    assert soft[0] > hard[0]  # pulled up toward bucket 1
+    assert soft[2] < hard[2]  # pulled down toward bucket 1
     pinned = overlap_bucket_means(y, W, hard, pin_extremes=True)
     assert pinned[0] == hard[0] and pinned[2] == hard[2]
 
@@ -187,15 +197,21 @@ def test_weighted_means_move_toward_the_neighbours():
 @pytest.mark.parametrize("partition", ["uniform", "quantile"])
 def test_defaults_reproduce_the_library_regressor(data, order, partition):
     X, y = data
-    kwargs = dict(n_output_buckets=3, output_partition=partition, tsk_order=order,
-                  l2_reg=1e-2, pin_extremes=True, random_state=7)
+    kwargs = dict(
+        n_output_buckets=3,
+        output_partition=partition,
+        tsk_order=order,
+        l2_reg=1e-2,
+        pin_extremes=True,
+        random_state=7,
+    )
     base = TribbleRegressor(**kwargs).fit(X, y)
     ours = OverlapTribbleRegressor(overlap=0.0, **kwargs).fit(X, y)
     np.testing.assert_allclose(ours.predict(X), base.predict(X), rtol=1e-10, atol=1e-10)
-    np.testing.assert_allclose(ours.y_bucket_mean_, base.y_bucket_mean_,
-                               rtol=1e-10, atol=1e-10)
-    np.testing.assert_allclose(ours.corr_terms_, base.corr_terms_,
-                               rtol=1e-8, atol=1e-8)
+    np.testing.assert_allclose(
+        ours.y_bucket_mean_, base.y_bucket_mean_, rtol=1e-10, atol=1e-10
+    )
+    np.testing.assert_allclose(ours.corr_terms_, base.corr_terms_, rtol=1e-8, atol=1e-8)
 
 
 def test_zero_overlap_membership_model_matches_the_library_fit(data):
@@ -205,8 +221,9 @@ def test_zero_overlap_membership_model_matches_the_library_fit(data):
     W = overlap_weights(y.to_numpy(), labels, 4, fraction=0.0)
     features = ["a", "b", "c"]
     ours = build_overlap_membership_model(X, W, features, n_gaussians=0, random_state=3)
-    base = create_gaussian_membership_dict(X, y_part["y_bucket"], features,
-                                           n_gaussians=0, random_state=3)
+    base = create_gaussian_membership_dict(
+        X, y_part["y_bucket"], features, n_gaussians=0, random_state=3
+    )
     # Sorted, not as-listed: `rule_ids` reports dict insertion order, and the
     # library keys its labels off `y.unique()` (order of first appearance) while
     # this builder inserts them in bucket order. Nothing downstream reads that
@@ -228,8 +245,9 @@ def test_fused_solver_reduces_to_the_library_solver_at_zero(data, pin):
     X, y = data
     features = ["a", "b", "c"]
     y_part, means = partition_output(3, y, method="quantile")
-    model = create_gaussian_membership_dict(X, y_part["y_bucket"], features,
-                                            n_gaussians=0, random_state=3)
+    model = create_gaussian_membership_dict(
+        X, y_part["y_bucket"], features, n_gaussians=0, random_state=3
+    )
     firing, labels = tsk_firing_strengths(X[features], model)
     args = (firing, labels, X, features, means, y_part)
     kw = dict(order="2nd", l2_reg=1e-3, basis="raw", pin_extremes=pin)
@@ -243,18 +261,29 @@ def test_fusion_shrinks_the_gap_between_adjacent_consequents(data):
     X, y = data
     features = ["a", "b", "c"]
     y_part, means = partition_output(4, y, method="quantile")
-    model = create_gaussian_membership_dict(X, y_part["y_bucket"], features,
-                                            n_gaussians=0, random_state=3)
+    model = create_gaussian_membership_dict(
+        X, y_part["y_bucket"], features, n_gaussians=0, random_state=3
+    )
     firing, labels = tsk_firing_strengths(X[features], model)
 
     def spread(fusion_reg):
         corr, _ = solve_consequents_fused(
-            firing, labels, X, features, means, y_part, order="2nd", l2_reg=1e-3,
-            fusion_reg=fusion_reg)
+            firing,
+            labels,
+            X,
+            features,
+            means,
+            y_part,
+            order="2nd",
+            l2_reg=1e-3,
+            fusion_reg=fusion_reg,
+        )
         return float(np.abs(np.diff(corr, axis=0)).mean())
 
     gaps = [spread(f) for f in (0.0, 1.0, 100.0)]
-    assert gaps[0] > gaps[1] > gaps[2], f"fusion did not pull neighbours together: {gaps}"
+    assert (
+        gaps[0] > gaps[1] > gaps[2]
+    ), f"fusion did not pull neighbours together: {gaps}"
 
 
 # --------------------------------------------------------------------------
@@ -274,10 +303,16 @@ def test_overlap_widens_the_membership_functions_at_a_fixed_component_count(data
 
     def mean_sigma(fraction):
         m = OverlapTribbleRegressor(
-            n_output_buckets=4, output_partition="quantile", tsk_order="1st",
-            n_gaussians=1, overlap=fraction, overlap_shape="flat",
-            random_state=7).fit(X, y)
+            n_output_buckets=4,
+            output_partition="quantile",
+            tsk_order="1st",
+            n_gaussians=1,
+            overlap=fraction,
+            overlap_shape="flat",
+            random_state=7,
+        ).fit(X, y)
         return float(np.mean([g.sigma for g in m.model_.all_membership_fcns]))
+
     assert mean_sigma(0.4) > mean_sigma(0.0)
 
 
@@ -287,9 +322,15 @@ def test_bic_may_spend_a_wider_slice_on_more_components_instead_of_wider_ones(da
 
     def counts(fraction):
         m = OverlapTribbleRegressor(
-            n_output_buckets=4, output_partition="quantile", tsk_order="1st",
-            n_gaussians=0, overlap=fraction, random_state=7).fit(X, y)
+            n_output_buckets=4,
+            output_partition="quantile",
+            tsk_order="1st",
+            n_gaussians=0,
+            overlap=fraction,
+            random_state=7,
+        ).fit(X, y)
         return len(m.model_.all_membership_fcns)
+
     assert counts(0.4) > counts(0.0)
 
 
@@ -297,20 +338,32 @@ def test_overlap_raises_adjacent_membership_overlap(data):
     X, y = data
 
     def area(fraction):
-        return OverlapTribbleRegressor(
-            n_output_buckets=4, output_partition="quantile", tsk_order="1st",
-            overlap=fraction, random_state=7).fit(X, y).membership_overlap_area()
+        return (
+            OverlapTribbleRegressor(
+                n_output_buckets=4,
+                output_partition="quantile",
+                tsk_order="1st",
+                overlap=fraction,
+                random_state=7,
+            )
+            .fit(X, y)
+            .membership_overlap_area()
+        )
+
     assert area(0.4) > area(0.0)
 
 
 def test_only_the_antecedent_switch_moves_the_firing_strengths(data):
     """Firing strengths come from the membership functions and nothing else."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="1st",
-                  random_state=7)
+    kwargs = dict(
+        n_output_buckets=4, output_partition="quantile", tsk_order="1st", random_state=7
+    )
     hard = OverlapTribbleRegressor(overlap=0.0, **kwargs).fit(X, y)
-    for extra in (dict(overlap_antecedents=False),
-                  dict(overlap_antecedents=False, consequent_fit="local")):
+    for extra in (
+        dict(overlap_antecedents=False),
+        dict(overlap_antecedents=False, consequent_fit="local"),
+    ):
         soft = OverlapTribbleRegressor(overlap=0.3, **extra, **kwargs).fit(X, y)
         f_hard, _ = tsk_firing_strengths(X[hard.top_features_], hard.model_)
         f_soft, _ = tsk_firing_strengths(X[soft.top_features_], soft.model_)
@@ -329,21 +382,27 @@ def test_overlap_means_is_inert_under_the_global_solve_without_pinning(data):
     slices regardless.
     """
     X, y = data
-    base = dict(n_output_buckets=4, output_partition="quantile", tsk_order="1st",
-                random_state=7)
+    base = dict(
+        n_output_buckets=4, output_partition="quantile", tsk_order="1st", random_state=7
+    )
     soft = dict(overlap=0.3, overlap_antecedents=False)
 
     inert = dict(consequent_fit="global", pin_extremes=False, **base)
     np.testing.assert_allclose(
         OverlapTribbleRegressor(overlap=0.0, **inert).fit(X, y).predict(X),
         OverlapTribbleRegressor(**soft, **inert).fit(X, y).predict(X),
-        rtol=1e-12, atol=1e-12)
+        rtol=1e-12,
+        atol=1e-12,
+    )
 
-    for live in (dict(consequent_fit="global", pin_extremes=True, **base),
-                 dict(consequent_fit="local", pin_extremes=False, **base)):
+    for live in (
+        dict(consequent_fit="global", pin_extremes=True, **base),
+        dict(consequent_fit="local", pin_extremes=False, **base),
+    ):
         assert not np.allclose(
             OverlapTribbleRegressor(overlap=0.0, **live).fit(X, y).predict(X),
-            OverlapTribbleRegressor(**soft, **live).fit(X, y).predict(X))
+            OverlapTribbleRegressor(**soft, **live).fit(X, y).predict(X),
+        )
 
 
 @pytest.mark.parametrize("shape", ["flat", "ramp"])
@@ -351,9 +410,16 @@ def test_overlap_means_is_inert_under_the_global_solve_without_pinning(data):
 def test_every_arm_fits_and_predicts_finitely(data, shape, fit):
     X, y = data
     m = OverlapTribbleRegressor(
-        n_output_buckets=5, output_partition="quantile", tsk_order="full-2nd",
-        l2_reg=1e-2, overlap=0.25, overlap_shape=shape, consequent_fit=fit,
-        pin_extremes=True, random_state=7).fit(X, y)
+        n_output_buckets=5,
+        output_partition="quantile",
+        tsk_order="full-2nd",
+        l2_reg=1e-2,
+        overlap=0.25,
+        overlap_shape=shape,
+        consequent_fit=fit,
+        pin_extremes=True,
+        random_state=7,
+    ).fit(X, y)
     p = m.predict(X)
     assert p.shape == (len(X),)
     assert np.all(np.isfinite(p))
@@ -362,13 +428,23 @@ def test_every_arm_fits_and_predicts_finitely(data, shape, fit):
 def test_local_fit_at_zero_overlap_is_the_hard_per_bucket_fit(data):
     """The control that separates 'local instead of global' from 'soft instead of hard'."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=1e-3, random_state=7)
-    local_hard = OverlapTribbleRegressor(consequent_fit="local", overlap=0.0,
-                                         **kwargs).fit(X, y)
-    local_soft = OverlapTribbleRegressor(consequent_fit="local", overlap=0.3,
-                                         overlap_antecedents=False, overlap_means=False,
-                                         **kwargs).fit(X, y)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        random_state=7,
+    )
+    local_hard = OverlapTribbleRegressor(
+        consequent_fit="local", overlap=0.0, **kwargs
+    ).fit(X, y)
+    local_soft = OverlapTribbleRegressor(
+        consequent_fit="local",
+        overlap=0.3,
+        overlap_antecedents=False,
+        overlap_means=False,
+        **kwargs,
+    ).fit(X, y)
     # Same antecedents and same centroid inputs; only the consequent slices differ.
     f_a, _ = tsk_firing_strengths(X[local_hard.top_features_], local_hard.model_)
     f_b, _ = tsk_firing_strengths(X[local_soft.top_features_], local_soft.model_)
@@ -378,13 +454,19 @@ def test_local_fit_at_zero_overlap_is_the_hard_per_bucket_fit(data):
 
 def test_ramp_and_flat_differ_only_through_the_weights(data):
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  overlap=0.3, consequent_fit="local", random_state=7)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        overlap=0.3,
+        consequent_fit="local",
+        random_state=7,
+    )
     flat = OverlapTribbleRegressor(overlap_shape="flat", **kwargs).fit(X, y)
     ramp = OverlapTribbleRegressor(overlap_shape="ramp", **kwargs).fit(X, y)
     W_flat, W_ramp = flat.overlap_weights_, ramp.overlap_weights_
-    np.testing.assert_array_equal(W_flat > 0, W_ramp > 0)   # same support
-    assert np.all(W_ramp <= W_flat + 1e-12)                 # ramp only ever lighter
+    np.testing.assert_array_equal(W_flat > 0, W_ramp > 0)  # same support
+    assert np.all(W_ramp <= W_flat + 1e-12)  # ramp only ever lighter
     assert not np.allclose(flat.predict(X), ramp.predict(X))
 
 
@@ -402,23 +484,39 @@ def test_shrink_local_reduces_to_the_baseline_at_zero_ridge(data):
     exact confound `soft-random` was added to break.
     """
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=0.0, random_state=7)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=0.0,
+        random_state=7,
+    )
     base = OverlapTribbleRegressor(consequent_fit="global", **kwargs).fit(X, y)
     shrunk = OverlapTribbleRegressor(
-        consequent_fit="shrink-local", overlap=0.3, overlap_antecedents=False,
-        overlap_means=False, **kwargs).fit(X, y)
+        consequent_fit="shrink-local",
+        overlap=0.3,
+        overlap_antecedents=False,
+        overlap_means=False,
+        **kwargs,
+    ).fit(X, y)
     np.testing.assert_allclose(shrunk.predict(X), base.predict(X), rtol=1e-6, atol=1e-6)
 
 
 def test_shrink_local_with_soft_antecedents_is_a_different_model(data):
     """Guards the confound the test above avoids, so nobody re-introduces it."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=0.0, consequent_fit="shrink-local", overlap=0.3,
-                  random_state=7)
-    hard_ante = OverlapTribbleRegressor(overlap_antecedents=False, overlap_means=False,
-                                        **kwargs).fit(X, y)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=0.0,
+        consequent_fit="shrink-local",
+        overlap=0.3,
+        random_state=7,
+    )
+    hard_ante = OverlapTribbleRegressor(
+        overlap_antecedents=False, overlap_means=False, **kwargs
+    ).fit(X, y)
     soft_ante = OverlapTribbleRegressor(overlap_antecedents=True, **kwargs).fit(X, y)
     assert not np.allclose(hard_ante.predict(X), soft_ante.predict(X))
 
@@ -426,83 +524,138 @@ def test_shrink_local_with_soft_antecedents_is_a_different_model(data):
 def test_shrink_local_lands_between_its_two_limits(data):
     """A big enough ridge pulls the corrections onto the local prior."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  overlap=0.3, overlap_antecedents=False, overlap_means=False,
-                  random_state=7)
-    far = OverlapTribbleRegressor(consequent_fit="shrink-local", l2_reg=1e6,
-                                  **kwargs).fit(X, y)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        overlap=0.3,
+        overlap_antecedents=False,
+        overlap_means=False,
+        random_state=7,
+    )
+    far = OverlapTribbleRegressor(
+        consequent_fit="shrink-local", l2_reg=1e6, **kwargs
+    ).fit(X, y)
     prior_corr, _ = far.local_prior_
     np.testing.assert_allclose(far.corr_terms_, prior_corr, rtol=1e-3, atol=1e-3)
 
-    near = OverlapTribbleRegressor(consequent_fit="shrink-local", l2_reg=1e-8,
-                                   **kwargs).fit(X, y)
-    assert (np.abs(near.corr_terms_ - prior_corr).mean()
-            > np.abs(far.corr_terms_ - prior_corr).mean())
+    near = OverlapTribbleRegressor(
+        consequent_fit="shrink-local", l2_reg=1e-8, **kwargs
+    ).fit(X, y)
+    assert (
+        np.abs(near.corr_terms_ - prior_corr).mean()
+        > np.abs(far.corr_terms_ - prior_corr).mean()
+    )
 
 
 def test_residual_form_pins_every_constant_to_the_bucket_centroid(data):
     """The legacy formulation fixes all the constants, not just the extremes."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=1e-3, overlap=0.2, random_state=7)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        overlap=0.2,
+        random_state=7,
+    )
     res = OverlapTribbleRegressor(consequent_fit="local-residual", **kwargs).fit(X, y)
     free = OverlapTribbleRegressor(consequent_fit="local", **kwargs).fit(X, y)
     # The residual form's means are the centroids it was handed, untouched.
-    np.testing.assert_allclose(res.y_bucket_mean_, res.y_bucket_mean_in_,
-                               rtol=1e-10, atol=1e-10)
-    assert not np.allclose(free.y_bucket_mean_, free.y_bucket_mean_in_), \
-        "the free-intercept form should have moved at least one constant"
+    np.testing.assert_allclose(
+        res.y_bucket_mean_, res.y_bucket_mean_in_, rtol=1e-10, atol=1e-10
+    )
+    assert not np.allclose(
+        free.y_bucket_mean_, free.y_bucket_mean_in_
+    ), "the free-intercept form should have moved at least one constant"
     # A free intercept is a superset of a fixed one, so it cannot fit its own
     # slices worse. Compared on the training fold, which is what it optimized.
     hard = res.hard_labels_
-    assert (free.local_approximation_r2(X, y, hard)
-            >= res.local_approximation_r2(X, y, hard) - 1e-9)
+    assert (
+        free.local_approximation_r2(X, y, hard)
+        >= res.local_approximation_r2(X, y, hard) - 1e-9
+    )
 
 
 def test_winner_take_all_uses_exactly_one_rule_per_row(data):
     X, y = data
     m = OverlapTribbleRegressor(
-        n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-        l2_reg=1e-3, consequent_fit="local", overlap=0.3, predict_mode="wta",
-        random_state=7).fit(X, y)
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        consequent_fit="local",
+        overlap=0.3,
+        predict_mode="wta",
+        random_state=7,
+    ).fit(X, y)
     norm_fs, rule_vals, _ = m._rule_values_and_weights(X)
     winner = np.argmax(norm_fs, axis=1)
     np.testing.assert_allclose(
-        m.predict(X), rule_vals[np.arange(len(X)), winner], rtol=1e-12, atol=1e-12)
-    assert not np.allclose(m.predict(X),
-                           OverlapTribbleRegressor(
-                               n_output_buckets=4, output_partition="quantile",
-                               tsk_order="2nd", l2_reg=1e-3, consequent_fit="local",
-                               overlap=0.3, random_state=7).fit(X, y).predict(X))
+        m.predict(X), rule_vals[np.arange(len(X)), winner], rtol=1e-12, atol=1e-12
+    )
+    assert not np.allclose(
+        m.predict(X),
+        OverlapTribbleRegressor(
+            n_output_buckets=4,
+            output_partition="quantile",
+            tsk_order="2nd",
+            l2_reg=1e-3,
+            consequent_fit="local",
+            overlap=0.3,
+            random_state=7,
+        )
+        .fit(X, y)
+        .predict(X),
+    )
 
 
 def test_blend_recalibration_is_the_identity_under_an_infinite_prior(data):
     """lambda -> inf pins (a_r, b_r) at (0, 1), which is the plain blend."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=1e-3, consequent_fit="local", overlap=0.3, random_state=7)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        consequent_fit="local",
+        overlap=0.3,
+        random_state=7,
+    )
     plain = OverlapTribbleRegressor(**kwargs).fit(X, y)
-    pinned = OverlapTribbleRegressor(blend_recalibrate=True, blend_recal_l2=1e12,
-                                     **kwargs).fit(X, y)
+    pinned = OverlapTribbleRegressor(
+        blend_recalibrate=True, blend_recal_l2=1e12, **kwargs
+    ).fit(X, y)
     np.testing.assert_allclose(pinned.blend_a_, 0.0, atol=1e-6)
     np.testing.assert_allclose(pinned.blend_b_, 1.0, atol=1e-6)
-    np.testing.assert_allclose(pinned.predict(X), plain.predict(X), rtol=1e-5, atol=1e-5)
+    np.testing.assert_allclose(
+        pinned.predict(X), plain.predict(X), rtol=1e-5, atol=1e-5
+    )
 
-    free = OverlapTribbleRegressor(blend_recalibrate=True, blend_recal_l2=0.0,
-                                   **kwargs).fit(X, y)
+    free = OverlapTribbleRegressor(
+        blend_recalibrate=True, blend_recal_l2=0.0, **kwargs
+    ).fit(X, y)
     assert not np.allclose(free.predict(X), plain.predict(X))
 
 
 def test_local_r2_measures_the_rule_not_the_blend(data):
     """The diagnostic must be insensitive to how rules are combined."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=1e-3, consequent_fit="local", overlap=0.3, random_state=7)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        consequent_fit="local",
+        overlap=0.3,
+        random_state=7,
+    )
     blended = OverlapTribbleRegressor(**kwargs).fit(X, y)
     wta = OverlapTribbleRegressor(predict_mode="wta", **kwargs).fit(X, y)
     hard = blended.hard_labels_
-    assert (blended.local_approximation_r2(X, y, hard)
-            == pytest.approx(wta.local_approximation_r2(X, y, hard)))
+    assert blended.local_approximation_r2(X, y, hard) == pytest.approx(
+        wta.local_approximation_r2(X, y, hard)
+    )
     assert not np.allclose(blended.predict(X), wta.predict(X))
 
 
@@ -513,14 +666,21 @@ def test_local_fits_approximate_their_own_buckets_better_than_the_global_solve(d
     it does not win here the implementation is wrong, not the idea.
     """
     X, y = data
-    kwargs = dict(n_output_buckets=5, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=1e-3, random_state=7)
+    kwargs = dict(
+        n_output_buckets=5,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        random_state=7,
+    )
     glob = OverlapTribbleRegressor(consequent_fit="global", **kwargs).fit(X, y)
-    loc = OverlapTribbleRegressor(consequent_fit="local", overlap=0.0,
-                                  **kwargs).fit(X, y)
+    loc = OverlapTribbleRegressor(consequent_fit="local", overlap=0.0, **kwargs).fit(
+        X, y
+    )
     hard = glob.hard_labels_
-    assert (loc.local_approximation_r2(X, y, hard)
-            > glob.local_approximation_r2(X, y, hard))
+    assert loc.local_approximation_r2(X, y, hard) > glob.local_approximation_r2(
+        X, y, hard
+    )
 
 
 def test_predict_mode_is_validated(data):
@@ -534,11 +694,20 @@ def test_predict_mode_is_validated(data):
 def test_sharpening_is_the_identity_at_gamma_one(data):
     """gamma=1 must take the library's own predict path, byte for byte."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=1e-3, consequent_fit="local", overlap=0.3, random_state=7)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        consequent_fit="local",
+        overlap=0.3,
+        random_state=7,
+    )
     plain = OverlapTribbleRegressor(**kwargs).fit(X, y)
     unity = OverlapTribbleRegressor(blend_sharpen=1.0, **kwargs).fit(X, y)
-    np.testing.assert_allclose(unity.predict(X), plain.predict(X), rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(
+        unity.predict(X), plain.predict(X), rtol=1e-12, atol=1e-12
+    )
 
 
 def test_large_sharpening_converges_to_winner_take_all(data):
@@ -553,10 +722,18 @@ def test_large_sharpening_converges_to_winner_take_all(data):
 
     X, y = data
     m = OverlapTribbleRegressor(
-        n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-        l2_reg=1e-3, consequent_fit="local", overlap=0.3, random_state=7).fit(X, y)
-    raw, _, rule_vals = (*tsk_firing_strengths(X[m.top_features_], m.model_),
-                         m._rule_values_and_weights(X)[1])
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        consequent_fit="local",
+        overlap=0.3,
+        random_state=7,
+    ).fit(X, y)
+    raw, _, rule_vals = (
+        *tsk_firing_strengths(X[m.top_features_], m.model_),
+        m._rule_values_and_weights(X)[1],
+    )
 
     gaps, concentration = [], []
     for gamma in (1.0, 16.0, 256.0, 4096.0):
@@ -588,25 +765,34 @@ def test_sharpening_does_not_underflow_a_row_to_zero(data):
     from tribblefis.regression import _normalize_firing_strengths
 
     X, y = data
-    m = OverlapTribbleRegressor(n_output_buckets=5, output_partition="quantile",
-                                tsk_order="1st", random_state=7).fit(X, y)
+    m = OverlapTribbleRegressor(
+        n_output_buckets=5, output_partition="quantile", tsk_order="1st", random_state=7
+    ).fit(X, y)
     raw, _ = tsk_firing_strengths(X[m.top_features_], m.model_)
     live = _normalize_firing_strengths(raw).sum(axis=1) > 0
     for gamma in (2.0, 8.0, 64.0, 256.0):
         norm = _normalize_firing_strengths(sharpen_firing(raw, gamma))
-        np.testing.assert_array_equal(norm.sum(axis=1) > 0, live,
-                                      err_msg=f"row set changed at gamma={gamma}")
+        np.testing.assert_array_equal(
+            norm.sum(axis=1) > 0, live, err_msg=f"row set changed at gamma={gamma}"
+        )
 
 
 def test_sharpening_is_applied_in_the_solve_as_well_as_the_prediction(data):
     """Fit/predict must share one weighting; this codebase has been bitten before."""
     X, y = data
-    kwargs = dict(n_output_buckets=4, output_partition="quantile", tsk_order="2nd",
-                  l2_reg=1e-3, consequent_fit="global", random_state=7)
+    kwargs = dict(
+        n_output_buckets=4,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-3,
+        consequent_fit="global",
+        random_state=7,
+    )
     a = OverlapTribbleRegressor(blend_sharpen=1.0, **kwargs).fit(X, y)
     b = OverlapTribbleRegressor(blend_sharpen=3.0, **kwargs).fit(X, y)
-    assert not np.allclose(a.corr_terms_, b.corr_terms_), \
-        "the exponent did not reach the consequent solve"
+    assert not np.allclose(
+        a.corr_terms_, b.corr_terms_
+    ), "the exponent did not reach the consequent solve"
     assert not np.allclose(a.predict(X), b.predict(X))
 
 
@@ -630,8 +816,13 @@ def test_clamped_gaussian_is_not_admitted_to_the_compiled_kernel():
     assert not isinstance(C.create(0.0, 1.0), G)
     assert not issubclass(C, G)
 
-    model = GaussianMixtureModel(feature_models={
-        "a": FeatureModel(label_models={0: LabelModel(memberships=[C.create(0.0, 1.0)])})})
+    model = GaussianMixtureModel(
+        feature_models={
+            "a": FeatureModel(
+                label_models={0: LabelModel(memberships=[C.create(0.0, 1.0)])}
+            )
+        }
+    )
     with pytest.raises(kernel.NotCompilable):
         kernel.compile_model(model, ["a"])
 
@@ -654,7 +845,7 @@ def test_clamped_gaussian_reaches_exactly_zero_at_the_cutoff(k):
     # exp(-k^2/2), which is what "non-linear clamp" is there to avoid.
     just_inside = np.array([k - 1e-6])
     assert smooth.evaluate(just_inside)[0] == pytest.approx(0.0, abs=1e-5)
-    assert hard.evaluate(just_inside)[0] == pytest.approx(np.exp(-0.5 * k ** 2), rel=1e-3)
+    assert hard.evaluate(just_inside)[0] == pytest.approx(np.exp(-0.5 * k**2), rel=1e-3)
 
 
 def test_clamped_gaussian_matches_a_plain_gaussian_well_inside_the_cutoff():
@@ -683,8 +874,12 @@ def test_ruspini_terms_partition_the_axis_but_one_bucket_does_not(data):
 
     X, y = data
     m = OverlapTribbleRegressor(
-        n_output_buckets=5, output_partition="quantile", tsk_order="1st",
-        membership="ruspini", random_state=7).fit(X, y)
+        n_output_buckets=5,
+        output_partition="quantile",
+        tsk_order="1st",
+        membership="ruspini",
+        random_state=7,
+    ).fit(X, y)
 
     grid = np.linspace(-0.5, 1.5, 1001)
     for feature_model in m.model_.feature_models.values():
@@ -692,20 +887,28 @@ def test_ruspini_terms_partition_the_axis_but_one_bucket_does_not(data):
         for lmodel in feature_model.label_models.values():
             for mf in lmodel.memberships:
                 terms[mf.id] = mf
-        assert verify_partition_of_unity(list(terms.values()), grid), \
-            "the shared term set is not a partition of unity"
+        assert verify_partition_of_unity(
+            list(terms.values()), grid
+        ), "the shared term set is not a partition of unity"
 
-    assert m.coverage(X)["uncovered"] > 0.0, \
-        "a per-bucket selection from a partition should still leave gaps"
+    assert (
+        m.coverage(X)["uncovered"] > 0.0
+    ), "a per-bucket selection from a partition should still leave gaps"
 
 
 @pytest.mark.parametrize("membership", ["gaussian", "clamped", "trapezoid", "ruspini"])
 def test_every_membership_shape_fits_predicts_and_reports_coverage(data, membership):
     X, y = data
     m = OverlapTribbleRegressor(
-        n_output_buckets=5, output_partition="quantile", tsk_order="2nd",
-        l2_reg=1e-2, membership=membership, overlap=0.25, consequent_fit="local",
-        random_state=7).fit(X, y)
+        n_output_buckets=5,
+        output_partition="quantile",
+        tsk_order="2nd",
+        l2_reg=1e-2,
+        membership=membership,
+        overlap=0.25,
+        consequent_fit="local",
+        random_state=7,
+    ).fit(X, y)
     pred = m.predict(X)
     assert pred.shape == (len(X),) and np.all(np.isfinite(pred))
     cov = m.coverage(X)
@@ -718,9 +921,17 @@ def test_gaussian_membership_covers_everything_and_clamping_reduces_it(data):
     X, y = data
 
     def cov(**kw):
-        return OverlapTribbleRegressor(
-            n_output_buckets=5, output_partition="quantile", tsk_order="1st",
-            random_state=7, **kw).fit(X, y).coverage(X)
+        return (
+            OverlapTribbleRegressor(
+                n_output_buckets=5,
+                output_partition="quantile",
+                tsk_order="1st",
+                random_state=7,
+                **kw,
+            )
+            .fit(X, y)
+            .coverage(X)
+        )
 
     plain = cov(membership="gaussian")
     # No row is ever left unanswered: with infinite support the total firing is
@@ -734,8 +945,10 @@ def test_gaussian_membership_covers_everything_and_clamping_reduces_it(data):
     for k in (3.0, 2.0):
         tight = cov(membership="clamped", clamp_k=k)
         assert tight["active_frac"] < plain["active_frac"], f"k={k} did not localize"
-    assert cov(membership="clamped", clamp_k=2.0)["active_frac"] < \
-        cov(membership="clamped", clamp_k=3.0)["active_frac"]
+    assert (
+        cov(membership="clamped", clamp_k=2.0)["active_frac"]
+        < cov(membership="clamped", clamp_k=3.0)["active_frac"]
+    )
 
 
 def test_coverage_report_counts_uncovered_rows():
@@ -743,7 +956,7 @@ def test_coverage_report_counts_uncovered_rows():
 
     firing = np.array([[0.5, 0.2], [0.0, 0.0], [1e-9, 0.0], [0.9, 0.0]])
     rep = coverage_report(firing)
-    assert rep["uncovered"] == pytest.approx(0.5)      # rows 1 and 2
+    assert rep["uncovered"] == pytest.approx(0.5)  # rows 1 and 2
     assert rep["mean_active"] == pytest.approx((2 + 0 + 0 + 1) / 4)
     assert rep["active_frac"] == pytest.approx(rep["mean_active"] / 2)
 
@@ -779,9 +992,17 @@ def test_padding_gives_the_data_range_full_membership(data):
     from overlap import pad_trapezoids
 
     X = pd.DataFrame({"a": np.linspace(0.0, 1.0, 50)})
-    model = GaussianMixtureModel(feature_models={
-        "a": FeatureModel(label_models={
-            0: LabelModel(memberships=[TrapezoidMembership.create(0.2, 0.3, 0.7, 0.8)])})})
+    model = GaussianMixtureModel(
+        feature_models={
+            "a": FeatureModel(
+                label_models={
+                    0: LabelModel(
+                        memberships=[TrapezoidMembership.create(0.2, 0.3, 0.7, 0.8)]
+                    )
+                }
+            )
+        }
+    )
     padded = pad_trapezoids(model, X, pad=0.25)
     mf = padded.feature_models["a"].label_models[0].memberships[0]
 
@@ -802,10 +1023,23 @@ def test_padding_rescues_a_degenerate_single_value_region():
     from overlap import pad_trapezoids
 
     X = pd.DataFrame({"a": np.linspace(0.0, 1.0, 50)})
-    model = GaussianMixtureModel(feature_models={
-        "a": FeatureModel(label_models={
-            0: LabelModel(memberships=[TrapezoidMembership.create(0.5, 0.5, 0.5, 0.5)])})})
-    mf = pad_trapezoids(model, X, pad=0.2).feature_models["a"].label_models[0].memberships[0]
+    model = GaussianMixtureModel(
+        feature_models={
+            "a": FeatureModel(
+                label_models={
+                    0: LabelModel(
+                        memberships=[TrapezoidMembership.create(0.5, 0.5, 0.5, 0.5)]
+                    )
+                }
+            )
+        }
+    )
+    mf = (
+        pad_trapezoids(model, X, pad=0.2)
+        .feature_models["a"]
+        .label_models[0]
+        .memberships[0]
+    )
     assert mf.d > mf.a, "a degenerate region was left as a delta"
     assert mf.evaluate(np.array([0.5]))[0] == pytest.approx(1.0)
     assert mf.evaluate(np.array([0.45]))[0] > 0.0
@@ -832,10 +1066,19 @@ def test_upstream_fitter_covers_a_zero_inflated_column_without_padding(data):
     X["zeros"] = np.where(np.arange(len(X)) % 2 == 0, 0.0, X["a"].to_numpy())
 
     def cov(pad):
-        return OverlapTribbleRegressor(
-            n_output_buckets=5, output_partition="quantile", tsk_order="1st",
-            membership="trapezoid", trapz_bins=1, trapz_pad=pad,
-            random_state=7).fit(X, y).coverage(X)
+        return (
+            OverlapTribbleRegressor(
+                n_output_buckets=5,
+                output_partition="quantile",
+                tsk_order="1st",
+                membership="trapezoid",
+                trapz_bins=1,
+                trapz_pad=pad,
+                random_state=7,
+            )
+            .fit(X, y)
+            .coverage(X)
+        )
 
     assert cov(0.0)["uncovered"] == 0.0, "upstream fitter left rows uncovered"
     assert cov(0.1)["uncovered"] == 0.0
@@ -848,10 +1091,19 @@ def test_fewer_bins_widen_the_support(data):
     X, y = data
 
     def frac(bins):
-        return OverlapTribbleRegressor(
-            n_output_buckets=5, output_partition="quantile", tsk_order="1st",
-            membership="trapezoid", trapz_bins=bins, trapz_pad=0.05,
-            random_state=7).fit(X, y).coverage(X)["active_frac"]
+        return (
+            OverlapTribbleRegressor(
+                n_output_buckets=5,
+                output_partition="quantile",
+                tsk_order="1st",
+                membership="trapezoid",
+                trapz_bins=bins,
+                trapz_pad=0.05,
+                random_state=7,
+            )
+            .fit(X, y)
+            .coverage(X)["active_frac"]
+        )
 
     assert frac(1) >= frac(50), "coarser bins should not narrow the support"
 
@@ -869,9 +1121,14 @@ def test_trapz_ramp_now_widens_the_support(data):
 
     def bounds(ramp):
         m = OverlapTribbleRegressor(
-            n_output_buckets=3, output_partition="quantile", tsk_order="1st",
-            membership="trapezoid", trapz_bins=20, trapz_ramp=ramp,
-            random_state=7).fit(X, y)
+            n_output_buckets=3,
+            output_partition="quantile",
+            tsk_order="1st",
+            membership="trapezoid",
+            trapz_bins=20,
+            trapz_ramp=ramp,
+            random_state=7,
+        ).fit(X, y)
         return np.array(sorted((mf.a, mf.d) for mf in m.model_.all_membership_fcns))
 
     narrow, wide = bounds(0.1), bounds(0.4)

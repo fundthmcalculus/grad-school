@@ -82,13 +82,15 @@ os.environ.setdefault("TRIBBLE_GAUSSIAN_WORKERS", "1")
 import _fuzzy_models as fm  # noqa: E402
 from overlap import OverlapTribbleRegressor  # noqa: E402
 
-SEEDS = [int(s) for s in os.environ.get("OVERLAP_SEEDS", "0,1,2,3,4,5,6,7,8,9").split(",")]
+SEEDS = [
+    int(s) for s in os.environ.get("OVERLAP_SEEDS", "0,1,2,3,4,5,6,7,8,9").split(",")
+]
 FRACTIONS = (0.05, 0.1, 0.2, 0.3, 0.5, 0.75, 1.0)
 SHAPES = ("flat", "ramp")
 FUSION_REGS = (1e-3, 1e-2, 1e-1, 1.0, 10.0)
 BUCKETS = (3, 5, 7)
 ORDERS = ("2nd", "full-2nd")
-L2_REG = 1e-2          # the value `FuzzySystemsExperiments/concrete.py` runs at
+L2_REG = 1e-2  # the value `FuzzySystemsExperiments/concrete.py` runs at
 PARTITION = "quantile"  # the request is about quantiles; see README for why
 
 
@@ -164,14 +166,18 @@ def _synth(seed, kind, n=1500):
     x1, x2, x3 = X.x1.to_numpy(), X.x2.to_numpy(), X.x3.to_numpy()
     noise = 0.05 * rng.normal(size=n)
     if kind == "smooth":
-        y = np.sin(3.0 * x1) + x2 ** 2 + 0.7 * x1 * x3 + noise
+        y = np.sin(3.0 * x1) + x2**2 + 0.7 * x1 * x3 + noise
     else:
-        t = 0.6 * x1 + 0.4 * x2                      # ~uniform index -> even regimes
+        t = 0.6 * x1 + 0.4 * x2  # ~uniform index -> even regimes
         lo, hi = np.quantile(t, [1 / 3, 2 / 3])
-        y = np.where(
-            t < lo, 0.5 + 1.0 * t + 0.4 * x3,
-            np.where(t < hi, 2.0 - 0.8 * t - 0.6 * x3,
-                     3.5 + 2.0 * t + 0.9 * x3)) + noise
+        y = (
+            np.where(
+                t < lo,
+                0.5 + 1.0 * t + 0.4 * x3,
+                np.where(t < hi, 2.0 - 0.8 * t - 0.6 * x3, 3.5 + 2.0 * t + 0.9 * x3),
+            )
+            + noise
+        )
     # x4 and x5 are pure noise columns, left in so feature selection has work.
     return X, pd.Series(y, name="y_value")
 
@@ -215,24 +221,59 @@ def arm_configs():
     for arm, band in (("soft-ante", "adjacent"), ("soft-random", "random")):
         for shape in SHAPES:
             for f in FRACTIONS:
-                out.append((arm, f"{arm}/{shape}/{f:g}", dict(
-                    overlap=f, overlap_shape=shape, overlap_band=band,
-                    overlap_antecedents=True, overlap_means=True,
-                    consequent_fit="global")))
+                out.append(
+                    (
+                        arm,
+                        f"{arm}/{shape}/{f:g}",
+                        dict(
+                            overlap=f,
+                            overlap_shape=shape,
+                            overlap_band=band,
+                            overlap_antecedents=True,
+                            overlap_means=True,
+                            consequent_fit="global",
+                        ),
+                    )
+                )
     out.append(("local-hard", "local-hard", dict(overlap=0.0, consequent_fit="local")))
     for shape in SHAPES:
         for f in FRACTIONS:
-            out.append(("local-overlap", f"local-overlap/{shape}/{f:g}", dict(
-                overlap=f, overlap_shape=shape, overlap_antecedents=False,
-                overlap_means=True, consequent_fit="local")))
+            out.append(
+                (
+                    "local-overlap",
+                    f"local-overlap/{shape}/{f:g}",
+                    dict(
+                        overlap=f,
+                        overlap_shape=shape,
+                        overlap_antecedents=False,
+                        overlap_means=True,
+                        consequent_fit="local",
+                    ),
+                )
+            )
     for shape in SHAPES:
         for f in FRACTIONS:
-            out.append(("full-overlap", f"full-overlap/{shape}/{f:g}", dict(
-                overlap=f, overlap_shape=shape, overlap_antecedents=True,
-                overlap_means=True, consequent_fit="local")))
+            out.append(
+                (
+                    "full-overlap",
+                    f"full-overlap/{shape}/{f:g}",
+                    dict(
+                        overlap=f,
+                        overlap_shape=shape,
+                        overlap_antecedents=True,
+                        overlap_means=True,
+                        consequent_fit="local",
+                    ),
+                )
+            )
     for lam in FUSION_REGS:
-        out.append(("fusion", f"fusion/{lam:g}", dict(
-            overlap=0.0, consequent_fit="global", fusion_reg=lam)))
+        out.append(
+            (
+                "fusion",
+                f"fusion/{lam:g}",
+                dict(overlap=0.0, consequent_fit="global", fusion_reg=lam),
+            )
+        )
     return out
 
 
@@ -268,6 +309,7 @@ def split3(X, y, seed):
 
     def take(ix):
         return X.iloc[ix].reset_index(drop=True), y.iloc[ix].reset_index(drop=True)
+
     return take(inner), take(val), take(test)
 
 
@@ -294,35 +336,62 @@ def run_cell(dataset, n_buckets, order, seed, configs):
             # call; 31 arms x 180 cells of that is not a log.
             with contextlib.redirect_stdout(io.StringIO()):
                 model = OverlapTribbleRegressor(
-                    n_output_buckets=n_buckets, output_partition=PARTITION,
-                    tsk_order=order, l2_reg=L2_REG, pin_extremes=False,
-                    random_state=seed, **kwargs).fit(Xtr, ytr)
+                    n_output_buckets=n_buckets,
+                    output_partition=PARTITION,
+                    tsk_order=order,
+                    l2_reg=L2_REG,
+                    pin_extremes=False,
+                    random_state=seed,
+                    **kwargs,
+                ).fit(Xtr, ytr)
                 fit_s = time.perf_counter() - t0
                 r2_val, drop_val = _r2(yva, model.predict(Xva))
                 r2_test, drop_test = _r2(yte, model.predict(Xte))
                 area = model.membership_overlap_area()
-        except Exception as exc:                       # noqa: BLE001 -- recorded, not hidden
-            records.append(dict(
-                dataset=dataset, n_buckets=n_buckets, order=order, seed=seed,
-                arm=arm, label=label, error=f"{type(exc).__name__}: {exc}"))
+        except Exception as exc:  # noqa: BLE001 -- recorded, not hidden
+            records.append(
+                dict(
+                    dataset=dataset,
+                    n_buckets=n_buckets,
+                    order=order,
+                    seed=seed,
+                    arm=arm,
+                    label=label,
+                    error=f"{type(exc).__name__}: {exc}",
+                )
+            )
             continue
-        records.append(dict(
-            dataset=dataset, n_buckets=n_buckets, order=order, seed=seed,
-            arm=arm, label=label, r2_val=r2_val, r2_test=r2_test,
-            dropped_val=drop_val, dropped_test=drop_test, fit_seconds=fit_s,
-            n_rules=int(model.n_rules_), n_features=len(model.top_features_),
-            overlap_area=area,
-            **{k: v for k, v in kwargs.items()}))
+        records.append(
+            dict(
+                dataset=dataset,
+                n_buckets=n_buckets,
+                order=order,
+                seed=seed,
+                arm=arm,
+                label=label,
+                r2_val=r2_val,
+                r2_test=r2_test,
+                dropped_val=drop_val,
+                dropped_test=drop_test,
+                fit_seconds=fit_s,
+                n_rules=int(model.n_rules_),
+                n_features=len(model.top_features_),
+                overlap_area=area,
+                **{k: v for k, v in kwargs.items()},
+            )
+        )
     return records
 
 
 def provenance():
     def git(path, *args):
         try:
-            return subprocess.run(["git", "-C", path, *args], capture_output=True,
-                                  text=True, check=True).stdout.strip()
-        except Exception:                              # noqa: BLE001
+            return subprocess.run(
+                ["git", "-C", path, *args], capture_output=True, text=True, check=True
+            ).stdout.strip()
+        except Exception:  # noqa: BLE001
             return "unknown"
+
     return dict(
         repo_commit=git(REPO, "rev-parse", "HEAD"),
         tribble_fis_commit=git(os.path.join(REPO, "tribble-fis"), "rev-parse", "HEAD"),
@@ -381,8 +450,11 @@ def main():
     ap.add_argument("--buckets", default=",".join(str(b) for b in BUCKETS))
     ap.add_argument("--orders", default=",".join(ORDERS))
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
-    ap.add_argument("--quick", action="store_true",
-                    help="concrete only, 3 seeds, one bucket count and order")
+    ap.add_argument(
+        "--quick",
+        action="store_true",
+        help="concrete only, 3 seeds, one bucket count and order",
+    )
     ap.add_argument("--out", default=os.path.join(HERE, "outputs", "results.json"))
     args = ap.parse_args()
 
@@ -394,20 +466,31 @@ def main():
         datasets, seeds, buckets, orders = ["concrete"], [0, 1, 2], [5], ["2nd"]
 
     configs = arm_configs()
-    cells = [(d, b, o, s) for d in datasets for b in buckets for o in orders for s in seeds]
-    print(f"{len(cells)} cells x {len(configs)} arms = {len(cells) * len(configs)} fits "
-          f"on {args.jobs} workers")
+    cells = [
+        (d, b, o, s) for d in datasets for b in buckets for o in orders for s in seeds
+    ]
+    print(
+        f"{len(cells)} cells x {len(configs)} arms = {len(cells) * len(configs)} fits "
+        f"on {args.jobs} workers"
+    )
 
     from joblib import Parallel, delayed
+
     t0 = time.time()
     batches = Parallel(n_jobs=args.jobs, verbose=5)(
-        delayed(run_cell)(d, b, o, s, configs) for d, b, o, s in cells)
+        delayed(run_cell)(d, b, o, s, configs) for d, b, o, s in cells
+    )
     records = [r for batch in batches for r in batch]
     elapsed = time.time() - t0
 
-    payload = dict(provenance=provenance(), wall_clock_seconds=elapsed,
-                   fractions=list(FRACTIONS), shapes=list(SHAPES),
-                   fusion_regs=list(FUSION_REGS), records=records)
+    payload = dict(
+        provenance=provenance(),
+        wall_clock_seconds=elapsed,
+        fractions=list(FRACTIONS),
+        shapes=list(SHAPES),
+        fusion_regs=list(FUSION_REGS),
+        records=records,
+    )
     written = dump_payload(payload, args.out)
 
     n_err = sum("error" in r for r in records)
@@ -415,8 +498,10 @@ def main():
     if n_err:
         for r in records:
             if "error" in r:
-                print(f"  {r['dataset']}/{r['n_buckets']}/{r['order']}/"
-                      f"seed{r['seed']}/{r['label']}: {r['error']}")
+                print(
+                    f"  {r['dataset']}/{r['n_buckets']}/{r['order']}/"
+                    f"seed{r['seed']}/{r['label']}: {r['error']}"
+                )
                 break
 
 

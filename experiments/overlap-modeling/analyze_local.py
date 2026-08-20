@@ -26,6 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from run_experiment import load_payload  # noqa: E402
+
 CELL = ["dataset", "n_buckets", "order", "seed"]
 
 
@@ -47,59 +48,95 @@ def _wilcoxon(diffs):
         return None
     try:
         from scipy.stats import wilcoxon
+
         return float(wilcoxon(d).pvalue)
-    except Exception:                                   # noqa: BLE001
+    except Exception:  # noqa: BLE001
         return None
 
 
 def fit_vs_blend(df) -> str:
     """The central table: local approximation quality against blended accuracy."""
-    lines = ["## Fit or aggregation? Local approximation against blended accuracy", "",
-             "`local R²` scores each row's **own-bucket rule alone**, ignoring the blend;",
-             "`test R²` scores the blended model. If per-bucket solving raises the first",
-             "while lowering the second, each rule *is* the better local approximator the",
-             "idea predicts, and the blend is what loses the accuracy.", "",
-             "Means over all cells per dataset. τ is the overlap width.", ""]
+    lines = [
+        "## Fit or aggregation? Local approximation against blended accuracy",
+        "",
+        "`local R²` scores each row's **own-bucket rule alone**, ignoring the blend;",
+        "`test R²` scores the blended model. If per-bucket solving raises the first",
+        "while lowering the second, each rule *is* the better local approximator the",
+        "idea predicts, and the blend is what loses the accuracy.",
+        "",
+        "Means over all cells per dataset. τ is the overlap width.",
+        "",
+    ]
     for dataset, part in df.groupby("dataset"):
-        lines += [f"### {dataset}", "",
-                  "| arm | τ | local R² (train) | local R² (test) | test R² |",
-                  "|---|---:|---|---|---|"]
+        lines += [
+            f"### {dataset}",
+            "",
+            "| arm | τ | local R² (train) | local R² (test) | test R² |",
+            "|---|---:|---|---|---|",
+        ]
         base = part[part.arm == "baseline"]
-        lines.append(f"| baseline (global) | — | {_mean(base.local_r2_train)} | "
-                     f"{_mean(base.local_r2_test)} | **{_mean(base.r2_test)}** |")
-        for arm in ["local-free", "local-residual", "local-wta", "local-recal",
-                    "local-sharp", "shrink-local"]:
+        lines.append(
+            f"| baseline (global) | — | {_mean(base.local_r2_train)} | "
+            f"{_mean(base.local_r2_test)} | **{_mean(base.r2_test)}** |"
+        )
+        for arm in [
+            "local-free",
+            "local-residual",
+            "local-wta",
+            "local-recal",
+            "local-sharp",
+            "shrink-local",
+        ]:
             sub = part[part.arm == arm]
             if sub.empty:
                 continue
             for tau, grp in sub.groupby("overlap"):
-                lines.append(f"| {arm} | {tau:g} | {_mean(grp.local_r2_train)} | "
-                             f"{_mean(grp.local_r2_test)} | {_mean(grp.r2_test)} |")
+                lines.append(
+                    f"| {arm} | {tau:g} | {_mean(grp.local_r2_train)} | "
+                    f"{_mean(grp.local_r2_test)} | {_mean(grp.r2_test)} |"
+                )
         for arm in ["global-wta", "global-recal", "global-sharp"]:
             sub = part[part.arm == arm]
             if not sub.empty:
-                lines.append(f"| {arm} *(control)* | — | {_mean(sub.local_r2_train)} | "
-                             f"{_mean(sub.local_r2_test)} | {_mean(sub.r2_test)} |")
+                lines.append(
+                    f"| {arm} *(control)* | — | {_mean(sub.local_r2_train)} | "
+                    f"{_mean(sub.local_r2_test)} | {_mean(sub.r2_test)} |"
+                )
         lines.append("")
     return "\n".join(lines) + "\n"
 
 
 def aggregation_fixes(df) -> str:
     """Do the three aggregation fixes recover the local family's deficit?"""
-    base = df[df.arm == "baseline"].set_index(CELL)[["r2_test"]].rename(
-        columns={"r2_test": "base"})
-    lines = ["## Do the aggregation fixes recover the deficit?", "",
-             "Each local arm's width (and γ where it has one) is chosen per cell on",
-             "**validation** R², then scored on test and paired against the baseline in",
-             "the same cell. `recovered` is the fraction of `local-free`'s own deficit",
-             "that the fix closes, so 100% would mean the fix reaches the baseline. It",
-             "is left blank for the `global-*` controls, which never had that deficit.", "",
-             "| arm | dataset | selected test R² | Δ vs baseline | recovered | wins | Wilcoxon p |",
-             "|---|---|---|---|---:|---:|---:|"]
+    base = (
+        df[df.arm == "baseline"]
+        .set_index(CELL)[["r2_test"]]
+        .rename(columns={"r2_test": "base"})
+    )
+    lines = [
+        "## Do the aggregation fixes recover the deficit?",
+        "",
+        "Each local arm's width (and γ where it has one) is chosen per cell on",
+        "**validation** R², then scored on test and paired against the baseline in",
+        "the same cell. `recovered` is the fraction of `local-free`'s own deficit",
+        "that the fix closes, so 100% would mean the fix reaches the baseline. It",
+        "is left blank for the `global-*` controls, which never had that deficit.",
+        "",
+        "| arm | dataset | selected test R² | Δ vs baseline | recovered | wins | Wilcoxon p |",
+        "|---|---|---|---|---:|---:|---:|",
+    ]
     ref = {}
-    order = ["local-free", "local-residual", "local-wta", "local-recal",
-             "local-sharp", "shrink-local", "global-wta", "global-recal",
-             "global-sharp"]
+    order = [
+        "local-free",
+        "local-residual",
+        "local-wta",
+        "local-recal",
+        "local-sharp",
+        "shrink-local",
+        "global-wta",
+        "global-recal",
+        "global-sharp",
+    ]
     for arm in order:
         fam = df[df.arm == arm]
         if fam.empty:
@@ -121,22 +158,32 @@ def aggregation_fixes(df) -> str:
             lines.append(
                 f"| {arm} | {dataset} | {_pm(part.r2_test)} | {_pm(diffs)} | {rec} | "
                 f"{int((diffs > 0).sum())}/{len(diffs)} | "
-                f"{'--' if p is None else f'{p:.2g}'} |")
+                f"{'--' if p is None else f'{p:.2g}'} |"
+            )
     return "\n".join(lines) + "\n"
 
 
 def sharpen_table(df, gammas) -> str:
-    lines = ["## The blend-concentration exponent γ", "",
-             "Firing strengths raised to γ before normalization, in the solve and at",
-             "predict time alike. γ→∞ is winner-take-all, γ=1 is TSK's own weighting.",
-             "`global-sharp` is the control: if the global solve likes the same γ, the",
-             "exponent is not a statement about local fitting.", "",
-             "| dataset | arm | γ=1 | " + " | ".join(f"γ={g:g}" for g in gammas) + " |",
-             "|---|---|---|" + "---|" * len(gammas)]
+    lines = [
+        "## The blend-concentration exponent γ",
+        "",
+        "Firing strengths raised to γ before normalization, in the solve and at",
+        "predict time alike. γ→∞ is winner-take-all, γ=1 is TSK's own weighting.",
+        "`global-sharp` is the control: if the global solve likes the same γ, the",
+        "exponent is not a statement about local fitting.",
+        "",
+        "| dataset | arm | γ=1 | " + " | ".join(f"γ={g:g}" for g in gammas) + " |",
+        "|---|---|---|" + "---|" * len(gammas),
+    ]
     for dataset, part in df.groupby("dataset"):
-        for arm, unity_arm, taus in (("local-sharp", "local-free", sorted(
-                part[part.arm == "local-sharp"].overlap.unique())),
-                ("global-sharp", "baseline", [None])):
+        for arm, unity_arm, taus in (
+            (
+                "local-sharp",
+                "local-free",
+                sorted(part[part.arm == "local-sharp"].overlap.unique()),
+            ),
+            ("global-sharp", "baseline", [None]),
+        ):
             for tau in taus:
                 sub = part[part.arm == arm]
                 unity = part[part.arm == unity_arm]
@@ -157,9 +204,10 @@ def figure(df, path) -> str | None:
     """The two curves that tell the story, per dataset."""
     try:
         import matplotlib
+
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
-    except Exception:                                   # noqa: BLE001
+    except Exception:  # noqa: BLE001
         return None
 
     datasets = sorted(df.dataset.unique())
@@ -169,25 +217,56 @@ def figure(df, path) -> str | None:
         part = df[df.dataset == dataset]
         loc = part[part.arm == "local-free"].groupby("overlap")
         taus = sorted(part[part.arm == "local-free"].overlap.unique())
-        ax.plot(taus, [loc.get_group(t).local_r2_test.mean() for t in taus],
-                "-o", ms=3.5, color="#d62728",
-                label="local R² of own-bucket rule\n(per-bucket solve)")
-        ax.plot(taus, [loc.get_group(t).r2_test.mean() for t in taus],
-                "-s", ms=3.5, color="#1f77b4", label="test R² of the blend")
+        ax.plot(
+            taus,
+            [loc.get_group(t).local_r2_test.mean() for t in taus],
+            "-o",
+            ms=3.5,
+            color="#d62728",
+            label="local R² of own-bucket rule\n(per-bucket solve)",
+        )
+        ax.plot(
+            taus,
+            [loc.get_group(t).r2_test.mean() for t in taus],
+            "-s",
+            ms=3.5,
+            color="#1f77b4",
+            label="test R² of the blend",
+        )
         base = part[part.arm == "baseline"]
-        ax.axhline(base.local_r2_test.mean(), ls=":", color="#d62728", lw=1.3,
-                   label="local R², global solve")
-        ax.axhline(base.r2_test.mean(), ls="-", color="k", lw=1.4,
-                   label="test R², global solve (baseline)")
+        ax.axhline(
+            base.local_r2_test.mean(),
+            ls=":",
+            color="#d62728",
+            lw=1.3,
+            label="local R², global solve",
+        )
+        ax.axhline(
+            base.r2_test.mean(),
+            ls="-",
+            color="k",
+            lw=1.4,
+            label="test R², global solve (baseline)",
+        )
         ax.set_title(dataset, fontsize=10)
         ax.set_xlabel("overlap fraction τ")
         ax.grid(alpha=0.25)
     axes[0].set_ylabel("R² (mean over cells)")
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=4, fontsize=7.5,
-               frameon=False, bbox_to_anchor=(0.5, -0.10))
-    fig.suptitle("Per-bucket solving makes every rule a better local approximator "
-                 "and the blended model worse", fontsize=10)
+    fig.legend(
+        handles,
+        labels,
+        loc="lower center",
+        ncol=4,
+        fontsize=7.5,
+        frameon=False,
+        bbox_to_anchor=(0.5, -0.10),
+    )
+    fig.suptitle(
+        "Per-bucket solving makes every rule a better local approximator "
+        "and the blended model worse",
+        fontsize=10,
+    )
     fig.tight_layout(rect=(0, 0.09, 1, 0.96))
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -196,8 +275,9 @@ def figure(df, path) -> str | None:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--results", default=os.path.join(HERE, "outputs",
-                                                      "local_results.json"))
+    ap.add_argument(
+        "--results", default=os.path.join(HERE, "outputs", "local_results.json")
+    )
     args = ap.parse_args()
     payload = load_payload(args.results)
     df = pd.DataFrame(payload["records"])
@@ -207,12 +287,15 @@ def main():
 
     out = os.path.join(HERE, "outputs")
     prov = payload["provenance"]
-    header = (f"<!-- generated by analyze_local.py from "
-              f"{os.path.basename(args.results)}; repo {prov['repo_commit'][:7]}, "
-              f"tribble-fis {prov['tribble_fis_commit'][:7]}, "
-              f"{len(prov['seeds'])} seeds -->\n\n")
+    header = (
+        f"<!-- generated by analyze_local.py from "
+        f"{os.path.basename(args.results)}; repo {prov['repo_commit'][:7]}, "
+        f"tribble-fis {prov['tribble_fis_commit'][:7]}, "
+        f"{len(prov['seeds'])} seeds -->\n\n"
+    )
 
     from run_local import SHARPEN  # noqa: E402  -- one source of truth for the grid
+
     written = {
         "local_fit_vs_blend.md": fit_vs_blend(df),
         "local_aggregation.md": aggregation_fixes(df),

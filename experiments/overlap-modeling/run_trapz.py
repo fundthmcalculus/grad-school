@@ -53,8 +53,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from run_experiment import (  # noqa: E402
-    BUCKETS, DATASETS, DEFAULT_DATASETS, L2_REG, ORDERS, PARTITION, SEEDS,
-    _r2, dump_payload, prepare, provenance, split3,
+    BUCKETS,
+    DATASETS,
+    DEFAULT_DATASETS,
+    L2_REG,
+    ORDERS,
+    PARTITION,
+    SEEDS,
+    _r2,
+    dump_payload,
+    prepare,
+    provenance,
+    split3,
 )
 from run_local import train_fold_buckets  # noqa: E402
 from overlap import OverlapTribbleRegressor  # noqa: E402
@@ -66,13 +76,29 @@ PADS = (0.0, 0.05, 0.15, 0.25, 0.5)
 def arm_configs():
     out = []
     for fit in ("global", "local"):
-        out.append(("gaussian", fit, f"gaussian|{fit}",
-                    dict(membership="gaussian", consequent_fit=fit)))
+        out.append(
+            (
+                "gaussian",
+                fit,
+                f"gaussian|{fit}",
+                dict(membership="gaussian", consequent_fit=fit),
+            )
+        )
         for bins in BINS:
             for pad in PADS:
-                out.append(("trapezoid", fit, f"trapz|b{bins}|p{pad:g}|{fit}",
-                            dict(membership="trapezoid", trapz_bins=bins,
-                                 trapz_pad=pad, consequent_fit=fit)))
+                out.append(
+                    (
+                        "trapezoid",
+                        fit,
+                        f"trapz|b{bins}|p{pad:g}|{fit}",
+                        dict(
+                            membership="trapezoid",
+                            trapz_bins=bins,
+                            trapz_pad=pad,
+                            consequent_fit=fit,
+                        ),
+                    )
+                )
     return out
 
 
@@ -89,28 +115,55 @@ def run_cell(dataset, n_buckets, order, seed, configs):
         try:
             with contextlib.redirect_stdout(io.StringIO()):
                 model = OverlapTribbleRegressor(
-                    n_output_buckets=n_buckets, output_partition=PARTITION,
-                    tsk_order=order, l2_reg=L2_REG, pin_extremes=False,
-                    random_state=seed, **kwargs).fit(Xtr, ytr)
+                    n_output_buckets=n_buckets,
+                    output_partition=PARTITION,
+                    tsk_order=order,
+                    l2_reg=L2_REG,
+                    pin_extremes=False,
+                    random_state=seed,
+                    **kwargs,
+                ).fit(Xtr, ytr)
                 fit_s = time.perf_counter() - t0
                 r2_val, drop_val = _r2(yva, model.predict(Xva))
                 r2_test, drop_test = _r2(yte, model.predict(Xte))
                 cov = model.coverage(Xte)
                 local_test = model.local_approximation_r2(Xte, yte, hard_te)
-        except Exception as exc:                       # noqa: BLE001
-            records.append(dict(
-                dataset=dataset, n_buckets=n_buckets, order=order, seed=seed,
-                shape=shape, fit=fit, label=label,
-                error=f"{type(exc).__name__}: {exc}"))
+        except Exception as exc:  # noqa: BLE001
+            records.append(
+                dict(
+                    dataset=dataset,
+                    n_buckets=n_buckets,
+                    order=order,
+                    seed=seed,
+                    shape=shape,
+                    fit=fit,
+                    label=label,
+                    error=f"{type(exc).__name__}: {exc}",
+                )
+            )
             continue
-        records.append(dict(
-            dataset=dataset, n_buckets=n_buckets, order=order, seed=seed,
-            shape=shape, fit=fit, label=label,
-            trapz_bins=kwargs.get("trapz_bins"), trapz_pad=kwargs.get("trapz_pad"),
-            r2_val=r2_val, r2_test=r2_test, local_r2_test=local_test,
-            uncovered=cov["uncovered"], active_frac=cov["active_frac"],
-            dropped_val=drop_val, dropped_test=drop_test, fit_seconds=fit_s,
-            n_rules=int(model.n_rules_)))
+        records.append(
+            dict(
+                dataset=dataset,
+                n_buckets=n_buckets,
+                order=order,
+                seed=seed,
+                shape=shape,
+                fit=fit,
+                label=label,
+                trapz_bins=kwargs.get("trapz_bins"),
+                trapz_pad=kwargs.get("trapz_pad"),
+                r2_val=r2_val,
+                r2_test=r2_test,
+                local_r2_test=local_test,
+                uncovered=cov["uncovered"],
+                active_frac=cov["active_frac"],
+                dropped_val=drop_val,
+                dropped_test=drop_test,
+                fit_seconds=fit_s,
+                n_rules=int(model.n_rules_),
+            )
+        )
     return records
 
 
@@ -122,8 +175,9 @@ def main():
     ap.add_argument("--orders", default=",".join(ORDERS))
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--quick", action="store_true")
-    ap.add_argument("--out",
-                    default=os.path.join(HERE, "outputs", "trapz_results.json"))
+    ap.add_argument(
+        "--out", default=os.path.join(HERE, "outputs", "trapz_results.json")
+    )
     args = ap.parse_args()
 
     datasets = args.datasets.split(",")
@@ -134,19 +188,30 @@ def main():
         datasets, seeds, buckets, orders = ["concrete"], [0, 1, 2], [5], ["2nd"]
 
     configs = arm_configs()
-    cells = [(d, b, o, s) for d in datasets for b in buckets for o in orders for s in seeds]
-    print(f"{len(cells)} cells x {len(configs)} arms = {len(cells) * len(configs)} fits "
-          f"on {args.jobs} workers")
+    cells = [
+        (d, b, o, s) for d in datasets for b in buckets for o in orders for s in seeds
+    ]
+    print(
+        f"{len(cells)} cells x {len(configs)} arms = {len(cells) * len(configs)} fits "
+        f"on {args.jobs} workers"
+    )
 
     from joblib import Parallel, delayed
+
     t0 = time.time()
     batches = Parallel(n_jobs=args.jobs, verbose=5)(
-        delayed(run_cell)(d, b, o, s, configs) for d, b, o, s in cells)
+        delayed(run_cell)(d, b, o, s, configs) for d, b, o, s in cells
+    )
     records = [r for batch in batches for r in batch]
     elapsed = time.time() - t0
 
-    payload = dict(provenance=provenance(), wall_clock_seconds=elapsed,
-                   bins=list(BINS), pads=list(PADS), records=records)
+    payload = dict(
+        provenance=provenance(),
+        wall_clock_seconds=elapsed,
+        bins=list(BINS),
+        pads=list(PADS),
+        records=records,
+    )
     written = dump_payload(payload, args.out)
 
     n_err = sum("error" in r for r in records)

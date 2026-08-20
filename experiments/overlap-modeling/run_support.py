@@ -57,8 +57,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from run_experiment import (  # noqa: E402
-    BUCKETS, DATASETS, DEFAULT_DATASETS, L2_REG, ORDERS, PARTITION, SEEDS,
-    _r2, dump_payload, prepare, provenance, split3,
+    BUCKETS,
+    DATASETS,
+    DEFAULT_DATASETS,
+    L2_REG,
+    ORDERS,
+    PARTITION,
+    SEEDS,
+    _r2,
+    dump_payload,
+    prepare,
+    provenance,
+    split3,
 )
 from run_local import train_fold_buckets  # noqa: E402
 from overlap import OverlapTribbleRegressor  # noqa: E402
@@ -66,7 +76,7 @@ from overlap import OverlapTribbleRegressor  # noqa: E402
 # 2.75 and 3.0 are the values the counterpoint named; the rest bracket them so the
 # coverage cliff can be located rather than guessed at.
 CLAMP_KS = (2.0, 2.5, 2.75, 3.0, 3.5, 4.0)
-HARD_KS = (2.75, 3.0)          # priced against their smooth twins only where it matters
+HARD_KS = (2.75, 3.0)  # priced against their smooth twins only where it matters
 RUSPINI_TOLS = (0.02, 0.05)
 TAUS = (0.0, 0.5)
 
@@ -75,11 +85,19 @@ def membership_configs():
     """(name, kwargs) for every antecedent shape under test."""
     out = [("gaussian", dict(membership="gaussian"))]
     for k in CLAMP_KS:
-        out.append((f"clamped-smooth/{k:g}",
-                    dict(membership="clamped", clamp_k=k, clamp_smooth=True)))
+        out.append(
+            (
+                f"clamped-smooth/{k:g}",
+                dict(membership="clamped", clamp_k=k, clamp_smooth=True),
+            )
+        )
     for k in HARD_KS:
-        out.append((f"clamped-hard/{k:g}",
-                    dict(membership="clamped", clamp_k=k, clamp_smooth=False)))
+        out.append(
+            (
+                f"clamped-hard/{k:g}",
+                dict(membership="clamped", clamp_k=k, clamp_smooth=False),
+            )
+        )
     out.append(("trapezoid", dict(membership="trapezoid")))
     for tol in RUSPINI_TOLS:
         out.append((f"ruspini/{tol:g}", dict(membership="ruspini", ruspini_tol=tol)))
@@ -91,9 +109,16 @@ def arm_configs():
     for shape, kw in membership_configs():
         for fit in ("global", "local"):
             for tau in TAUS:
-                out.append((shape, fit, f"{shape}|{fit}|t{tau:g}",
-                            dict(consequent_fit=fit, overlap=tau,
-                                 overlap_shape="flat", **kw)))
+                out.append(
+                    (
+                        shape,
+                        fit,
+                        f"{shape}|{fit}|t{tau:g}",
+                        dict(
+                            consequent_fit=fit, overlap=tau, overlap_shape="flat", **kw
+                        ),
+                    )
+                )
     return out
 
 
@@ -111,30 +136,57 @@ def run_cell(dataset, n_buckets, order, seed, configs):
         try:
             with contextlib.redirect_stdout(io.StringIO()):
                 model = OverlapTribbleRegressor(
-                    n_output_buckets=n_buckets, output_partition=PARTITION,
-                    tsk_order=order, l2_reg=L2_REG, pin_extremes=False,
-                    random_state=seed, **kwargs).fit(Xtr, ytr)
+                    n_output_buckets=n_buckets,
+                    output_partition=PARTITION,
+                    tsk_order=order,
+                    l2_reg=L2_REG,
+                    pin_extremes=False,
+                    random_state=seed,
+                    **kwargs,
+                ).fit(Xtr, ytr)
                 fit_s = time.perf_counter() - t0
                 r2_val, drop_val = _r2(yva, model.predict(Xva))
                 r2_test, drop_test = _r2(yte, model.predict(Xte))
                 cov = model.coverage(Xte)
                 local_test = model.local_approximation_r2(Xte, yte, hard_te)
                 local_train = model.local_approximation_r2(Xtr, ytr, hard_tr)
-        except Exception as exc:                       # noqa: BLE001
-            records.append(dict(
-                dataset=dataset, n_buckets=n_buckets, order=order, seed=seed,
-                shape=shape, fit=fit, label=label,
-                error=f"{type(exc).__name__}: {exc}"))
+        except Exception as exc:  # noqa: BLE001
+            records.append(
+                dict(
+                    dataset=dataset,
+                    n_buckets=n_buckets,
+                    order=order,
+                    seed=seed,
+                    shape=shape,
+                    fit=fit,
+                    label=label,
+                    error=f"{type(exc).__name__}: {exc}",
+                )
+            )
             continue
-        records.append(dict(
-            dataset=dataset, n_buckets=n_buckets, order=order, seed=seed,
-            shape=shape, fit=fit, label=label, overlap=kwargs["overlap"],
-            r2_val=r2_val, r2_test=r2_test,
-            local_r2_train=local_train, local_r2_test=local_test,
-            uncovered=cov["uncovered"], mean_active=cov["mean_active"],
-            active_frac=cov["active_frac"],
-            dropped_val=drop_val, dropped_test=drop_test, fit_seconds=fit_s,
-            n_rules=int(model.n_rules_)))
+        records.append(
+            dict(
+                dataset=dataset,
+                n_buckets=n_buckets,
+                order=order,
+                seed=seed,
+                shape=shape,
+                fit=fit,
+                label=label,
+                overlap=kwargs["overlap"],
+                r2_val=r2_val,
+                r2_test=r2_test,
+                local_r2_train=local_train,
+                local_r2_test=local_test,
+                uncovered=cov["uncovered"],
+                mean_active=cov["mean_active"],
+                active_frac=cov["active_frac"],
+                dropped_val=drop_val,
+                dropped_test=drop_test,
+                fit_seconds=fit_s,
+                n_rules=int(model.n_rules_),
+            )
+        )
     return records
 
 
@@ -146,8 +198,9 @@ def main():
     ap.add_argument("--orders", default=",".join(ORDERS))
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--quick", action="store_true")
-    ap.add_argument("--out", default=os.path.join(HERE, "outputs",
-                                                  "support_results.json"))
+    ap.add_argument(
+        "--out", default=os.path.join(HERE, "outputs", "support_results.json")
+    )
     args = ap.parse_args()
 
     datasets = args.datasets.split(",")
@@ -158,21 +211,32 @@ def main():
         datasets, seeds, buckets, orders = ["concrete"], [0, 1, 2], [5], ["2nd"]
 
     configs = arm_configs()
-    cells = [(d, b, o, s) for d in datasets for b in buckets for o in orders for s in seeds]
-    print(f"{len(cells)} cells x {len(configs)} arms = {len(cells) * len(configs)} fits "
-          f"on {args.jobs} workers")
+    cells = [
+        (d, b, o, s) for d in datasets for b in buckets for o in orders for s in seeds
+    ]
+    print(
+        f"{len(cells)} cells x {len(configs)} arms = {len(cells) * len(configs)} fits "
+        f"on {args.jobs} workers"
+    )
 
     from joblib import Parallel, delayed
+
     t0 = time.time()
     batches = Parallel(n_jobs=args.jobs, verbose=5)(
-        delayed(run_cell)(d, b, o, s, configs) for d, b, o, s in cells)
+        delayed(run_cell)(d, b, o, s, configs) for d, b, o, s in cells
+    )
     records = [r for batch in batches for r in batch]
     elapsed = time.time() - t0
 
-    payload = dict(provenance=provenance(), wall_clock_seconds=elapsed,
-                   clamp_ks=list(CLAMP_KS), hard_ks=list(HARD_KS),
-                   ruspini_tols=list(RUSPINI_TOLS), taus=list(TAUS),
-                   records=records)
+    payload = dict(
+        provenance=provenance(),
+        wall_clock_seconds=elapsed,
+        clamp_ks=list(CLAMP_KS),
+        hard_ks=list(HARD_KS),
+        ruspini_tols=list(RUSPINI_TOLS),
+        taus=list(TAUS),
+        records=records,
+    )
     written = dump_payload(payload, args.out)
 
     n_err = sum("error" in r for r in records)

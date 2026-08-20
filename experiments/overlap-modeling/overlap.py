@@ -185,7 +185,7 @@ def overlap_weights(
     for b in range(n_buckets):
         for neighbour, take_high in ((b - 1, True), (b + 1, False)):
             if neighbour < 0 or neighbour >= n_buckets:
-                continue                      # an end bucket: one-sided overlap
+                continue  # an end bucket: one-sided overlap
             src = members[neighbour]
             m = int(round(fraction * len(src)))
             if m <= 0:
@@ -199,16 +199,16 @@ def overlap_weights(
                 # Same count, same weights, boundary structure destroyed. Seeded
                 # per (bucket, neighbour) so the two sides draw independently and
                 # the whole matrix is reproducible.
-                rng = np.random.default_rng(
-                    (random_state, b, neighbour, n_buckets))
+                rng = np.random.default_rng((random_state, b, neighbour, n_buckets))
                 rows = rng.choice(src, size=m, replace=False)
             W[rows, b] = np.maximum(W[rows, b], w)
 
     return W
 
 
-def overlap_bucket_means(y, W: np.ndarray, hard_means: np.ndarray,
-                         pin_extremes: bool) -> np.ndarray:
+def overlap_bucket_means(
+    y, W: np.ndarray, hard_means: np.ndarray, pin_extremes: bool
+) -> np.ndarray:
     """Overlap-weighted bucket centroids, falling back to ``hard_means`` when empty.
 
     ``pin_extremes`` restores the two end centroids to whatever ``hard_means``
@@ -229,8 +229,9 @@ def overlap_bucket_means(y, W: np.ndarray, hard_means: np.ndarray,
 # --------------------------------------------------------------------------
 # Antecedents: membership functions fit on the overlapped slice
 # --------------------------------------------------------------------------
-def _weighted_component_moments(values: np.ndarray, weights: np.ndarray,
-                                components: list) -> list:
+def _weighted_component_moments(
+    values: np.ndarray, weights: np.ndarray, components: list
+) -> list:
     """Re-place fitted components' (mu, sigma) as weighted moments of their members.
 
     The library's `fit_gaussian_mixture_1d` has no sample-weight argument, so the
@@ -297,8 +298,14 @@ def build_overlap_membership_model(
             # bucket label, so this reproduces the hard mask at fraction=0.
             y_synth = pd.Series(np.where(support, b, -1), index=X.index)
             memberships = fit_gaussians(
-                X, y_synth, name, b, n_gaussians,
-                max_samples=max_samples, random_state=random_state, verbose=False,
+                X,
+                y_synth,
+                name,
+                b,
+                n_gaussians,
+                max_samples=max_samples,
+                random_state=random_state,
+                verbose=False,
             )
             if shape == "ramp" and memberships and support.any():
                 col = X[name]
@@ -313,7 +320,8 @@ def build_overlap_membership_model(
                 if numeric:
                     vals = col[support].to_numpy(dtype=float)
                     memberships = _weighted_component_moments(
-                        vals, w[support], memberships)
+                        vals, w[support], memberships
+                    )
             label_models[b] = LabelModel(memberships=memberships)
         ordered_models[name] = FeatureModel(label_models=label_models)
     return GaussianMixtureModel(feature_models=ordered_models)
@@ -344,15 +352,19 @@ def _build_with_overlap_slices(build_fn, W: np.ndarray, index, feature_names):
                 per_feature[name][b] = LabelModel(memberships=[])
             else:
                 per_feature[name][b] = fmodel.label_models[b]
-    return GaussianMixtureModel(feature_models={
-        name: FeatureModel(label_models=per_feature[name]) for name in feature_names})
+    return GaussianMixtureModel(
+        feature_models={
+            name: FeatureModel(label_models=per_feature[name]) for name in feature_names
+        }
+    )
 
 
 # --------------------------------------------------------------------------
 # Consequents
 # --------------------------------------------------------------------------
-def _ridge_lstsq(A: np.ndarray, b: np.ndarray, penalty: np.ndarray,
-                 l2_reg: float) -> np.ndarray:
+def _ridge_lstsq(
+    A: np.ndarray, b: np.ndarray, penalty: np.ndarray, l2_reg: float
+) -> np.ndarray:
     """Ridge solve as augmented rows on the design, matching the library's path.
 
     `solve_tsk_consequents_from_firing` deliberately augments rather than forming
@@ -407,7 +419,9 @@ def solve_consequents_local(
     """
     n_rules = firing_strengths.shape[1]
     X_rule = X_train[top_n_todo].to_numpy()
-    feats = build_consequent_features(X_rule, order, basis=basis, cross_pairs=cross_pairs)
+    feats = build_consequent_features(
+        X_rule, order, basis=basis, cross_pairs=cross_pairs
+    )
     phi = np.hstack([np.ones((X_rule.shape[0], 1)), feats])
     n_terms = feats.shape[1]
 
@@ -418,7 +432,7 @@ def solve_consequents_local(
     means = np.zeros(n_rules)
 
     penalty = np.ones(1 + n_terms)
-    penalty[0] = 0.0                      # the intercept is the bucket mean
+    penalty[0] = 0.0  # the intercept is the bucket mean
 
     for r in range(n_rules):
         bucket = int(labels[r])
@@ -429,8 +443,8 @@ def solve_consequents_local(
         # so it subsumes the pin. Both routes go through the same exact-constraint
         # branch below.
         pin = have_mean and (
-            residual_form
-            or (pin_extremes and n_rules >= 2 and r in (0, n_rules - 1)))
+            residual_form or (pin_extremes and n_rules >= 2 and r in (0, n_rules - 1))
+        )
 
         if not support.any():
             # An empty rule keeps the centroid it was handed and corrects nothing.
@@ -500,7 +514,9 @@ def solve_consequents_fused(
     n_rules = norm_fs.shape[1]
 
     X_rule = X_train[top_n_todo].to_numpy()
-    feats = build_consequent_features(X_rule, order, basis=basis, cross_pairs=cross_pairs)
+    feats = build_consequent_features(
+        X_rule, order, basis=basis, cross_pairs=cross_pairs
+    )
     n_terms = feats.shape[1]
     per_rule = 1 + n_terms
 
@@ -548,7 +564,8 @@ def solve_consequents_fused(
         beta = np.zeros(A.shape[1])
         beta[pinned] = values
         beta[free] = _ridge_lstsq(
-            A[:, free], rhs - A[:, pinned] @ values, penalty[free], l2_reg)
+            A[:, free], rhs - A[:, pinned] @ values, penalty[free], l2_reg
+        )
     else:
         beta = _ridge_lstsq(A, rhs, penalty, l2_reg)
 
@@ -565,11 +582,11 @@ def _mf_bounds(mf, gaussian_k: float = 4.0) -> tuple[float, float]:
     (and anything added later) without editing the library. Falls back to the
     `mu +/- gaussian_k * sigma` convention for anything carrying `mu`/`sigma`.
     """
-    if hasattr(mf, "k") and hasattr(mf, "sigma"):          # clamped Gaussian
+    if hasattr(mf, "k") and hasattr(mf, "sigma"):  # clamped Gaussian
         return mf.mu - mf.k * mf.sigma, mf.mu + mf.k * mf.sigma
-    if hasattr(mf, "d"):                                   # trapezoid
+    if hasattr(mf, "d"):  # trapezoid
         return mf.a, mf.d
-    if hasattr(mf, "c") and hasattr(mf, "a"):              # triangle
+    if hasattr(mf, "c") and hasattr(mf, "a"):  # triangle
         return mf.a, mf.c
     return mf.mu - gaussian_k * mf.sigma, mf.mu + gaussian_k * mf.sigma
 
@@ -792,7 +809,8 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
 
     def _norms(self):
         return resolve_norm_pair(
-            self.norm_conorm, self.t_norm, self.t_conorm, self.allow_mixed_norms)
+            self.norm_conorm, self.t_norm, self.t_conorm, self.allow_mixed_norms
+        )
 
     def _build_antecedents(self, X_df, y_partitioned, soft_ante):
         """The membership model, with the overlap applied to each bucket's slice.
@@ -813,51 +831,76 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         if self.membership in ("trapezoid", "trapezoid-em", "triangle-em"):
             if self.membership == "trapezoid":
                 from tribblefis.trapz_math_fast import (
-                    create_trapz_membership_dict_fast as _fit)
+                    create_trapz_membership_dict_fast as _fit,
+                )
 
                 def build(labels):
-                    return _fit(X_df, labels, top_n_var_names=self.top_features_,
-                                n_bins=self.trapz_bins,
-                                ramp_width_ratio=self.trapz_ramp,
-                                merge_width_ratio=self.trapz_merge)
+                    return _fit(
+                        X_df,
+                        labels,
+                        top_n_var_names=self.top_features_,
+                        n_bins=self.trapz_bins,
+                        ramp_width_ratio=self.trapz_ramp,
+                        merge_width_ratio=self.trapz_merge,
+                    )
+
             else:
                 from tribblefis.trapz_math import create_trapz_membership_dict
-                shape = ("trapezoid" if self.membership == "trapezoid-em"
-                         else "triangle")
+
+                shape = "trapezoid" if self.membership == "trapezoid-em" else "triangle"
 
                 def build(labels):
                     return create_trapz_membership_dict(
-                        X_df, labels, top_n_var_names=self.top_features_,
-                        n_trapezoids=self.n_gaussians, max_samples=self.max_samples,
-                        random_state=self.random_state, verbose=False, shape=shape)
+                        X_df,
+                        labels,
+                        top_n_var_names=self.top_features_,
+                        n_trapezoids=self.n_gaussians,
+                        max_samples=self.max_samples,
+                        random_state=self.random_state,
+                        verbose=False,
+                        shape=shape,
+                    )
 
             if not soft_ante:
                 return build(y_partitioned["y_bucket"])
             return _build_with_overlap_slices(
-                build, self.overlap_weights_, X_df.index, self.top_features_)
+                build, self.overlap_weights_, X_df.index, self.top_features_
+            )
 
         if soft_ante:
             return build_overlap_membership_model(
-                X_df, self.overlap_weights_, self.top_features_,
-                n_gaussians=self.n_gaussians, max_samples=self.max_samples,
-                random_state=self.random_state, shape=self.overlap_shape)
+                X_df,
+                self.overlap_weights_,
+                self.top_features_,
+                n_gaussians=self.n_gaussians,
+                max_samples=self.max_samples,
+                random_state=self.random_state,
+                shape=self.overlap_shape,
+            )
         return create_gaussian_membership_dict(
-            X_df, y_partitioned["y_bucket"], top_n_var_names=self.top_features_,
-            n_gaussians=self.n_gaussians, max_samples=self.max_samples,
-            random_state=self.random_state)
+            X_df,
+            y_partitioned["y_bucket"],
+            top_n_var_names=self.top_features_,
+            n_gaussians=self.n_gaussians,
+            max_samples=self.max_samples,
+            random_state=self.random_state,
+        )
 
     def fit(self, X, y):
         if self.consequent_fit not in VALID_CONSEQUENT_FITS:
             raise ValueError(
                 f"consequent_fit must be one of {VALID_CONSEQUENT_FITS}, "
-                f"got {self.consequent_fit!r}")
+                f"got {self.consequent_fit!r}"
+            )
         if self.fusion_reg < 0:
             raise ValueError(f"fusion_reg must be >= 0, got {self.fusion_reg!r}")
         if self.fusion_reg > 0 and self.consequent_fit != "global":
             warnings.warn(
                 "fusion_reg is a penalty on the global stacked solve and is "
                 f"ignored for consequent_fit={self.consequent_fit!r}.",
-                RuntimeWarning, stacklevel=2)
+                RuntimeWarning,
+                stacklevel=2,
+            )
 
         if isinstance(X, pd.DataFrame):
             self.feature_names_in_ = X.columns.tolist()
@@ -865,40 +908,54 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
             self.feature_names_in_ = [f"feature_{i}" for i in range(X.shape[1])]
             X = pd.DataFrame(X, columns=self.feature_names_in_)
 
-        y_array = (y.values.flatten() if isinstance(y, (pd.Series, pd.DataFrame))
-                   else np.asarray(y).flatten())
+        y_array = (
+            y.values.flatten()
+            if isinstance(y, (pd.Series, pd.DataFrame))
+            else np.asarray(y).flatten()
+        )
         X_array, y_array = check_X_y(X, y_array, multi_output=False, y_numeric=True)
         X_df = pd.DataFrame(X_array, columns=self.feature_names_in_)
         y_series = pd.Series(y_array, name="y_value")
 
         y_partitioned, hard_means = partition_output(
-            self.n_output_buckets, y_series, method=self.output_partition)
+            self.n_output_buckets, y_series, method=self.output_partition
+        )
         hard_labels = y_partitioned["y_bucket"].to_numpy()
 
         self.overlap_weights_ = overlap_weights(
-            y_array, hard_labels, self.n_output_buckets,
-            fraction=self.overlap, shape=self.overlap_shape,
-            band=self.overlap_band, random_state=self.random_state)
+            y_array,
+            hard_labels,
+            self.n_output_buckets,
+            fraction=self.overlap,
+            shape=self.overlap_shape,
+            band=self.overlap_band,
+            random_state=self.random_state,
+        )
 
         self.feature_differentiators_ = calculate_gaussian_correlation(
-            X_df, y_partitioned["y_bucket"], top_n=self.top_n)
+            X_df, y_partitioned["y_bucket"], top_n=self.top_n
+        )
         self.top_n_actual_, self.top_features_ = take_top_features(
-            self.feature_differentiators_, top_p=self.top_p, top_n=self.top_n)
+            self.feature_differentiators_, top_p=self.top_p, top_n=self.top_n
+        )
 
         # Feature ranking stays on the hard partition. The overlap is a statement
         # about which rows each *rule* is fitted from, not about which columns are
         # informative, and letting it move the feature set would confound every
         # arm with a different input space.
         if self.membership not in VALID_MEMBERSHIPS:
-            raise ValueError(f"membership must be one of {VALID_MEMBERSHIPS}, "
-                             f"got {self.membership!r}")
+            raise ValueError(
+                f"membership must be one of {VALID_MEMBERSHIPS}, "
+                f"got {self.membership!r}"
+            )
 
         use_overlap = self.overlap > 0.0
         soft_ante = use_overlap and self.overlap_antecedents
         self.model_ = self._build_antecedents(X_df, y_partitioned, soft_ante)
         if self.membership == "clamped":
-            self.model_ = clamp_model(self.model_, k=self.clamp_k,
-                                      smooth=self.clamp_smooth)
+            self.model_ = clamp_model(
+                self.model_, k=self.clamp_k, smooth=self.clamp_smooth
+            )
         elif self.membership == "ruspini":
             self.model_ = ruspinize_features(self.model_, merge_tol=self.ruspini_tol)
         elif self.membership == "trapezoid" and self.trapz_pad > 0:
@@ -913,25 +970,43 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         # survives into the model is a pinned one. Softening those is therefore
         # the whole content of this switch -- at the cost of some output range,
         # which is the trade the sweep is there to price.
-        means_in = (overlap_bucket_means(y_array, self.overlap_weights_, hard_means,
-                                         pin_extremes=False)
-                    if use_overlap and self.overlap_means else hard_means)
+        means_in = (
+            overlap_bucket_means(
+                y_array, self.overlap_weights_, hard_means, pin_extremes=False
+            )
+            if use_overlap and self.overlap_means
+            else hard_means
+        )
         self.y_bucket_mean_in_ = np.asarray(means_in, dtype=float).copy()
 
         firing, labels = tsk_firing_strengths(
-            X_df[self.top_features_], self.model_, norms=self._norms())
+            X_df[self.top_features_], self.model_, norms=self._norms()
+        )
         firing = sharpen_firing(firing, self.blend_sharpen)
         self.rule_labels_ = list(labels)
 
-        local_args = (firing, labels, X_df, self.top_features_, means_in,
-                      y_partitioned, self.overlap_weights_)
-        local_kw = dict(order=self.tsk_order, l2_reg=self.l2_reg,
-                        basis=self.consequent_basis, pin_extremes=self.pin_extremes)
+        local_args = (
+            firing,
+            labels,
+            X_df,
+            self.top_features_,
+            means_in,
+            y_partitioned,
+            self.overlap_weights_,
+        )
+        local_kw = dict(
+            order=self.tsk_order,
+            l2_reg=self.l2_reg,
+            basis=self.consequent_basis,
+            pin_extremes=self.pin_extremes,
+        )
 
         if self.consequent_fit in ("local", "local-residual"):
             self.corr_terms_, self.y_bucket_mean_ = solve_consequents_local(
-                *local_args, residual_form=self.consequent_fit == "local-residual",
-                **local_kw)
+                *local_args,
+                residual_form=self.consequent_fit == "local-residual",
+                **local_kw,
+            )
         elif self.consequent_fit == "shrink-local":
             # The prior is the per-bucket local fit, solved first at the same
             # overlap width and ridge strength, then used as the global solve's
@@ -939,21 +1014,49 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
             prior_corr, prior_means = solve_consequents_local(*local_args, **local_kw)
             self.local_prior_ = (prior_corr, prior_means)
             self.corr_terms_, self.y_bucket_mean_ = solve_consequents_shrunk(
-                firing, labels, X_df, self.top_features_, means_in, y_partitioned,
-                prior_corr, prior_means, order=self.tsk_order, l2_reg=self.l2_reg,
-                basis=self.consequent_basis, pin_extremes=self.pin_extremes)
+                firing,
+                labels,
+                X_df,
+                self.top_features_,
+                means_in,
+                y_partitioned,
+                prior_corr,
+                prior_means,
+                order=self.tsk_order,
+                l2_reg=self.l2_reg,
+                basis=self.consequent_basis,
+                pin_extremes=self.pin_extremes,
+            )
         elif self.fusion_reg > 0:
             self.corr_terms_, self.y_bucket_mean_ = solve_consequents_fused(
-                firing, labels, X_df, self.top_features_, means_in, y_partitioned,
-                order=self.tsk_order, l2_reg=self.l2_reg, basis=self.consequent_basis,
-                pin_extremes=self.pin_extremes, fusion_reg=self.fusion_reg)
+                firing,
+                labels,
+                X_df,
+                self.top_features_,
+                means_in,
+                y_partitioned,
+                order=self.tsk_order,
+                l2_reg=self.l2_reg,
+                basis=self.consequent_basis,
+                pin_extremes=self.pin_extremes,
+                fusion_reg=self.fusion_reg,
+            )
         else:
             # The library's own solver, called unchanged, so the baseline arm is
             # the shipped code path and not a re-derivation of it.
             self.corr_terms_, self.y_bucket_mean_ = solve_tsk_consequents_from_firing(
-                firing, labels, X_df, self.top_features_, means_in, y_partitioned,
-                order=self.tsk_order, l2_reg=self.l2_reg, basis=self.consequent_basis,
-                pin_extremes=self.pin_extremes, verbose=False)
+                firing,
+                labels,
+                X_df,
+                self.top_features_,
+                means_in,
+                y_partitioned,
+                order=self.tsk_order,
+                l2_reg=self.l2_reg,
+                basis=self.consequent_basis,
+                pin_extremes=self.pin_extremes,
+                verbose=False,
+            )
 
         # A recalibrated blend is fitted after the consequents are frozen. It adds
         # 2*n_rules parameters, so it is scored on validation/test like everything
@@ -961,12 +1064,20 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         self.blend_a_, self.blend_b_ = None, None
         if self.blend_recalibrate:
             rule_vals = rule_consequent_values(
-                X_df, self.top_features_, labels, self.y_bucket_mean_,
-                self.corr_terms_, order=self.tsk_order, basis=self.consequent_basis)
+                X_df,
+                self.top_features_,
+                labels,
+                self.y_bucket_mean_,
+                self.corr_terms_,
+                order=self.tsk_order,
+                basis=self.consequent_basis,
+            )
             self.blend_a_, self.blend_b_ = solve_blend_recalibration(
-                rule_vals, _normalize_firing_strengths(firing),
+                rule_vals,
+                _normalize_firing_strengths(firing),
                 y_partitioned["y_value"].to_numpy(dtype=float),
-                l2_reg=self.blend_recal_l2)
+                l2_reg=self.blend_recal_l2,
+            )
 
         # Kept for the local-approximation diagnostic: which bucket each training
         # row fell in, before any overlap widened the slices.
@@ -976,30 +1087,51 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
 
     def _rule_values_and_weights(self, X_df):
         firing, labels = tsk_firing_strengths(
-            X_df[self.top_features_], self.model_, norms=self._norms())
+            X_df[self.top_features_], self.model_, norms=self._norms()
+        )
         firing = sharpen_firing(firing, self.blend_sharpen)
         rule_vals = rule_consequent_values(
-            X_df, self.top_features_, labels, self.y_bucket_mean_, self.corr_terms_,
-            order=self.tsk_order, basis=self.consequent_basis)
+            X_df,
+            self.top_features_,
+            labels,
+            self.y_bucket_mean_,
+            self.corr_terms_,
+            order=self.tsk_order,
+            basis=self.consequent_basis,
+        )
         return _normalize_firing_strengths(firing), rule_vals, labels
 
     def predict(self, X):
         check_is_fitted(self)
-        X_df = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(
-            X, columns=self.feature_names_in_)
+        X_df = (
+            X.copy()
+            if isinstance(X, pd.DataFrame)
+            else pd.DataFrame(X, columns=self.feature_names_in_)
+        )
 
         if self.predict_mode not in VALID_PREDICT_MODES:
-            raise ValueError(f"predict_mode must be one of {VALID_PREDICT_MODES}, "
-                             f"got {self.predict_mode!r}")
+            raise ValueError(
+                f"predict_mode must be one of {VALID_PREDICT_MODES}, "
+                f"got {self.predict_mode!r}"
+            )
 
-        if (self.predict_mode == "blend" and not self.blend_recalibrate
-                and self.blend_sharpen == 1.0):
+        if (
+            self.predict_mode == "blend"
+            and not self.blend_recalibrate
+            and self.blend_sharpen == 1.0
+        ):
             # The library's own path, unchanged, so the default arm stays the
             # shipped prediction rather than a re-derivation of it.
             return predict_tsk(
-                X_df, self.model_, self.top_features_, self.y_bucket_mean_,
-                self.corr_terms_, order=self.tsk_order, basis=self.consequent_basis,
-                norms=self._norms())
+                X_df,
+                self.model_,
+                self.top_features_,
+                self.y_bucket_mean_,
+                self.corr_terms_,
+                order=self.tsk_order,
+                basis=self.consequent_basis,
+                norms=self._norms(),
+            )
 
         norm_fs, rule_vals, _ = self._rule_values_and_weights(X_df)
         if self.predict_mode == "blend" and not self.blend_recalibrate:
@@ -1012,16 +1144,22 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
             out = rule_vals[np.arange(len(rule_vals)), winner]
             return np.where(norm_fs.sum(axis=1) > 0, out, 0.0)
 
-        return np.sum(norm_fs * (self.blend_a_[None, :]
-                                 + self.blend_b_[None, :] * rule_vals), axis=1)
+        return np.sum(
+            norm_fs * (self.blend_a_[None, :] + self.blend_b_[None, :] * rule_vals),
+            axis=1,
+        )
 
     def coverage(self, X) -> dict:
         """`coverage_report` for this model on `X`. See that function."""
         check_is_fitted(self)
-        X_df = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(
-            X, columns=self.feature_names_in_)
+        X_df = (
+            X.copy()
+            if isinstance(X, pd.DataFrame)
+            else pd.DataFrame(X, columns=self.feature_names_in_)
+        )
         firing, _ = tsk_firing_strengths(
-            X_df[self.top_features_], self.model_, norms=self._norms())
+            X_df[self.top_features_], self.model_, norms=self._norms()
+        )
         return coverage_report(sharpen_firing(firing, self.blend_sharpen))
 
     def local_approximation_r2(self, X, y, hard_labels=None) -> float:
@@ -1032,8 +1170,11 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
         score a validation or test fold.
         """
         check_is_fitted(self)
-        X_df = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(
-            X, columns=self.feature_names_in_)
+        X_df = (
+            X.copy()
+            if isinstance(X, pd.DataFrame)
+            else pd.DataFrame(X, columns=self.feature_names_in_)
+        )
         _, rule_vals, labels = self._rule_values_and_weights(X_df)
         hard = self.hard_labels_ if hard_labels is None else hard_labels
         return local_rule_r2(rule_vals, y, labels, hard)
@@ -1067,8 +1208,11 @@ class OverlapTribbleRegressor(BaseEstimator, RegressorMixin):
                 # read on trapezoid, triangle and clamped models, and a Gaussian
                 # formula applied to a trapezoid would silently report the wrong
                 # shape's overlap.
-                envelopes[k] = (np.max([m.evaluate(grid) for m in mfs], axis=0)
-                                if mfs else np.zeros_like(grid))
+                envelopes[k] = (
+                    np.max([m.evaluate(grid) for m in mfs], axis=0)
+                    if mfs
+                    else np.zeros_like(grid)
+                )
             for a, b in zip(keys[:-1], keys[1:]):
                 lo, hi = envelopes[a], envelopes[b]
                 denom = np.sum(np.maximum(lo, hi))
@@ -1202,13 +1346,16 @@ def solve_consequents_shrunk(
     norm_fs = _normalize_firing_strengths(firing_strengths)
     n_rules = norm_fs.shape[1]
     X_rule = X_train[top_n_todo].to_numpy()
-    feats = build_consequent_features(X_rule, order, basis=basis, cross_pairs=cross_pairs)
+    feats = build_consequent_features(
+        X_rule, order, basis=basis, cross_pairs=cross_pairs
+    )
     n_terms = feats.shape[1]
     per_rule = 1 + n_terms
 
     phi = np.hstack([np.ones((X_rule.shape[0], 1)), feats])
     design = (norm_fs[:, :, np.newaxis] * phi[:, np.newaxis, :]).reshape(
-        X_rule.shape[0], n_rules * per_rule)
+        X_rule.shape[0], n_rules * per_rule
+    )
     y = np.asarray(y_train["y_value"].values, dtype=float)
 
     penalty = np.ones(n_rules * per_rule)
@@ -1243,8 +1390,9 @@ def solve_consequents_shrunk(
         free = np.setdiff1d(np.arange(design.shape[1]), pinned)
         beta = np.zeros(design.shape[1])
         beta[pinned] = values
-        beta[free] = _solve(design[:, free], y - design[:, pinned] @ values,
-                            penalty[free], prior[free])
+        beta[free] = _solve(
+            design[:, free], y - design[:, pinned] @ values, penalty[free], prior[free]
+        )
     else:
         beta = _solve(design, y, penalty, prior)
 
@@ -1280,8 +1428,14 @@ def solve_consequents_shrunk(
 # predicts exactly 0 -- not NaN, so it does not show up as a dropped row, it
 # shows up as a quietly terrible prediction. `coverage_report` measures it.
 # --------------------------------------------------------------------------
-VALID_MEMBERSHIPS = ("gaussian", "clamped", "trapezoid", "trapezoid-em",
-                     "triangle-em", "ruspini")
+VALID_MEMBERSHIPS = (
+    "gaussian",
+    "clamped",
+    "trapezoid",
+    "trapezoid-em",
+    "triangle-em",
+    "ruspini",
+)
 
 
 class ClampedGaussianMembership(typing.NamedTuple):
@@ -1312,28 +1466,31 @@ class ClampedGaussianMembership(typing.NamedTuple):
     id: typing.Optional[uuid.UUID] = None
 
     @staticmethod
-    def create(mu: float, sigma: float, k: float = 3.0,
-               smooth: bool = True) -> "ClampedGaussianMembership":
-        return ClampedGaussianMembership(mu=mu, sigma=sigma, k=k, smooth=smooth,
-                                         id=uuid.uuid4())
+    def create(
+        mu: float, sigma: float, k: float = 3.0, smooth: bool = True
+    ) -> "ClampedGaussianMembership":
+        return ClampedGaussianMembership(
+            mu=mu, sigma=sigma, k=k, smooth=smooth, id=uuid.uuid4()
+        )
 
     def evaluate(self, x: np.ndarray) -> np.ndarray:
         x = np.asarray(x, dtype=float)
         sigma = max(self.sigma, 1e-6)
         z = (x - self.mu) / sigma
         inside = np.abs(z) <= self.k
-        bell = np.exp(-0.5 * z ** 2)
+        bell = np.exp(-0.5 * z**2)
         if not self.smooth:
             return np.where(inside, bell, 0.0)
-        floor = float(np.exp(-0.5 * self.k ** 2))
+        floor = float(np.exp(-0.5 * self.k**2))
         # (bell - floor) / (1 - floor): 1 at the peak, 0 at the cutoff. The
         # `inside` mask is still applied so floating point cannot leave a
         # negative sliver just outside k sigma.
         return np.where(inside, np.maximum(0.0, (bell - floor) / (1.0 - floor)), 0.0)
 
 
-def clamp_model(model: GaussianMixtureModel, k: float = 3.0,
-                smooth: bool = True) -> GaussianMixtureModel:
+def clamp_model(
+    model: GaussianMixtureModel, k: float = 3.0, smooth: bool = True
+) -> GaussianMixtureModel:
     """Rebuild `model` with every Gaussian replaced by a clamped one.
 
     Non-Gaussian memberships pass through untouched, so this is a no-op on a
@@ -1344,17 +1501,25 @@ def clamp_model(model: GaussianMixtureModel, k: float = 3.0,
     for name, fmodel in model.feature_models.items():
         label_models = {}
         for label, lmodel in fmodel.label_models.items():
-            label_models[label] = LabelModel(memberships=[
-                ClampedGaussianMembership.create(mf.mu, mf.sigma, k=k, smooth=smooth)
-                if isinstance(mf, GaussianMembership) else mf
-                for mf in lmodel.memberships
-            ])
+            label_models[label] = LabelModel(
+                memberships=[
+                    (
+                        ClampedGaussianMembership.create(
+                            mf.mu, mf.sigma, k=k, smooth=smooth
+                        )
+                        if isinstance(mf, GaussianMembership)
+                        else mf
+                    )
+                    for mf in lmodel.memberships
+                ]
+            )
         feature_models[name] = FeatureModel(label_models=label_models)
     return GaussianMixtureModel(feature_models=feature_models)
 
 
-def ruspinize_features(model: GaussianMixtureModel, merge_tol: float = 0.02
-                       ) -> GaussianMixtureModel:
+def ruspinize_features(
+    model: GaussianMixtureModel, merge_tol: float = 0.02
+) -> GaussianMixtureModel:
     """Re-express each feature as a shared Ruspini partition of triangular terms.
 
     Compact support with *guaranteed* coverage, which is the combination the
@@ -1385,8 +1550,12 @@ def ruspinize_features(model: GaussianMixtureModel, merge_tol: float = 0.02
 
     feature_models = {}
     for name, fmodel in model.feature_models.items():
-        centres = [mf.mu for lmodel in fmodel.label_models.values()
-                   for mf in lmodel.memberships if hasattr(mf, "mu")]
+        centres = [
+            mf.mu
+            for lmodel in fmodel.label_models.values()
+            for mf in lmodel.memberships
+            if hasattr(mf, "mu")
+        ]
         if not centres:
             feature_models[name] = fmodel
             continue
@@ -1409,8 +1578,9 @@ def ruspinize_features(model: GaussianMixtureModel, merge_tol: float = 0.02
     return GaussianMixtureModel(feature_models=feature_models)
 
 
-def pad_trapezoids(model: GaussianMixtureModel, X: pd.DataFrame,
-                   pad: float = 0.25) -> GaussianMixtureModel:
+def pad_trapezoids(
+    model: GaussianMixtureModel, X: pd.DataFrame, pad: float = 0.25
+) -> GaussianMixtureModel:
     """Re-seat each fitted trapezoid so its observed data range is the *plateau*.
 
     Fixes a defect in the histogram fitter that makes compactly supported
@@ -1443,7 +1613,11 @@ def pad_trapezoids(model: GaussianMixtureModel, X: pd.DataFrame,
     padded = {}
     for name, fmodel in model.feature_models.items():
         col = X[name].to_numpy(dtype=float) if name in X else None
-        span = float(np.nanmax(col) - np.nanmin(col)) if col is not None and len(col) else 1.0
+        span = (
+            float(np.nanmax(col) - np.nanmin(col))
+            if col is not None and len(col)
+            else 1.0
+        )
         floor = pad * (span if span > 0 else 1.0)
         label_models = {}
         for label, lmodel in fmodel.label_models.items():
@@ -1456,9 +1630,14 @@ def pad_trapezoids(model: GaussianMixtureModel, X: pd.DataFrame,
                 margin = max(pad * width, floor if width <= 0 else 0.0)
                 if margin <= 0:
                     margin = floor
-                out.append(TrapezoidMembership.create(
-                    a=float(mf.a) - margin, b=float(mf.a),
-                    c=float(mf.d), d=float(mf.d) + margin))
+                out.append(
+                    TrapezoidMembership.create(
+                        a=float(mf.a) - margin,
+                        b=float(mf.a),
+                        c=float(mf.d),
+                        d=float(mf.d) + margin,
+                    )
+                )
             label_models[label] = LabelModel(memberships=out)
         padded[name] = FeatureModel(label_models=label_models)
     return GaussianMixtureModel(feature_models=padded)
