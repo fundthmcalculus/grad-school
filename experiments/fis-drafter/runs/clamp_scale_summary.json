@@ -1,0 +1,222 @@
+{
+  "rows": [
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "n_layers": 32,
+      "hidden": 960,
+      "subspace": "NONE (<=random)",
+      "peak_centrality": -0.022,
+      "peak_layer": null,
+      "peak_frac": null,
+      "plateau_frac": "-",
+      "eff_rank": null,
+      "eff_rank_frac_of_d": null
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "n_layers": 28,
+      "hidden": 1536,
+      "subspace": "yes",
+      "peak_centrality": 0.943,
+      "peak_layer": 27,
+      "peak_frac": 0.93,
+      "plateau_frac": "0.59-0.93",
+      "eff_rank": 8,
+      "eff_rank_frac_of_d": 0.0052
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "n_layers": 36,
+      "hidden": 2048,
+      "subspace": "yes",
+      "peak_centrality": 0.915,
+      "peak_layer": 17,
+      "peak_frac": 0.46,
+      "plateau_frac": "0.30-0.95",
+      "eff_rank": 16,
+      "eff_rank_frac_of_d": 0.0078
+    }
+  ],
+  "plot": [
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.061,
+      "centrality": -0.059
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.121,
+      "centrality": -0.368
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.212,
+      "centrality": -0.235
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.273,
+      "centrality": -0.195
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.364,
+      "centrality": -0.167
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.455,
+      "centrality": -0.077
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.515,
+      "centrality": -0.209
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.606,
+      "centrality": -0.055
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.697,
+      "centrality": -0.137
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.758,
+      "centrality": -0.056
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.848,
+      "centrality": -0.064
+    },
+    {
+      "model": "SmolLM2-360M-Instruct",
+      "frac_depth": 0.939,
+      "centrality": -0.022
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.069,
+      "centrality": 0.087
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.138,
+      "centrality": 0.348
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.207,
+      "centrality": 0.209
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.276,
+      "centrality": 0.66
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.379,
+      "centrality": 0.479
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.448,
+      "centrality": 0.421
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.517,
+      "centrality": 0.45
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.586,
+      "centrality": 0.918
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.69,
+      "centrality": 0.294
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.759,
+      "centrality": 0.666
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.828,
+      "centrality": 0.537
+    },
+    {
+      "model": "Qwen2.5-1.5B-Instruct",
+      "frac_depth": 0.931,
+      "centrality": 0.943
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.054,
+      "centrality": 0.095
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.135,
+      "centrality": 0.605
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.216,
+      "centrality": 0.39
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.297,
+      "centrality": 0.745
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.378,
+      "centrality": 0.468
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.459,
+      "centrality": 0.915
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.541,
+      "centrality": 0.762
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.622,
+      "centrality": 0.764
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.703,
+      "centrality": 0.736
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.784,
+      "centrality": 0.682
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.865,
+      "centrality": 0.631
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "frac_depth": 0.946,
+      "centrality": 0.673
+    }
+  ]
+}

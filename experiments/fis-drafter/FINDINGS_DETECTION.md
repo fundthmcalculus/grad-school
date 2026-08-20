@@ -1371,3 +1371,178 @@ downstream of it too. Decoding the model and reading its generated activations o
 its output-logit shape adds cost without adding signal, because both are functions
 of the hidden state the readout already captures. The monitor is a single forward
 pass, read at the last token, calibrated in place — and that is the whole system.
+
+# Part 20 — Within-sequence shift: a self-calibrating context-change detector
+
+A new positive direction, and a reframing. Every monitor so far compares a *whole
+prompt* against a *corpus* benign manifold — which is precisely why a global
+activation shift (system prompt, quantization; Parts 16–17) breaks it: the corpus
+baseline moves out from under the prompt. This part tests a different idea: feed a
+stream of normal text, let the model establish its resting activation *within that
+very sequence*, then measure the per-token shift when exogenous content is spliced
+in. It is change-point detection inside one forward pass, and it is
+self-normalising — a global shift moves the baseline and the response together.
+
+Construction (`fmri_stream.py`, Qwen2.5-3B, 60 matched bases): a benign preamble of
+four dolly-context sentences, then a boundary, then a payload from a graded ladder
+that deliberately separates *surprise* from *adversarial intent* — `benign_cont`
+(another ordinary sentence, the control), `offtopic` (an unrelated benign
+question), `bizarre` (a fluent but surreal word-salad non-sequitur), `injection`
+(an instruction-override attack). Because the four doses share a preamble, the
+per-token shift is **paired-differenced against `benign_cont`**, cancelling the
+boundary artefact (a new sentence starting after "\n\n" shifts activations
+regardless of content) and isolating the payload's content. The shift is read as an
+RMS per-dimension z-score against the preamble baseline. Raw text, no chat template,
+so the baseline is a genuine within-document rest state.
+
+**Result 1 — it works, and with zero cross-prompt calibration.** At the responsive
+layers (26–31 of 36), the within-sequence shift separates payloads from a benign
+continuation at AUROC **0.93 (off-topic), 0.80 (injection)** — using only the
+preceding text in the same sequence as the baseline. This is the property the
+corpus-baseline monitor lacked: no benign corpus, no per-deployment recalibration,
+immune by construction to the system-prompt and quantization shifts of Parts 16–17.
+
+**Result 2 — it detects *semantic context change*, not surprise or attack.** The
+dose ladder does not order the way "anomaly" would predict:
+
+| payload | rms-z shift (paired, L28) | AUROC vs benign_cont |
+|---|---|---|
+| `offtopic` (unrelated benign question) | **+0.28** | **0.93** |
+| `injection` (attack) | +0.16 | 0.80 |
+| `bizarre` (fluent surreal nonsense) | −0.04 | 0.41 |
+
+An *off-topic benign question* produces the **largest** shift — larger than an
+injection — because it is the biggest change of topic/register. An injection is
+detected because it, too, is a context break (a command intruding on a Q&A
+context), not because it is adversarial. And fluent-but-surreal word salad is
+essentially **invisible** (0.41, below chance): it has normal syntax and introduces
+no coherent new topic, so the running representation treats it as just more text.
+The detector's axis is *semantic discontinuity*, not novelty or malice — a sharp
+limit to state honestly, and the reason this cannot stand alone as an
+injection-vs-benign classifier (it would flag every topic change).
+
+**Result 3 — the response is high-dimensional; there is no single axis to clamp.**
+The natural next step was to find the "direction most responsive to exogenous
+input" and clamp it. PCA on the payload-onset shift vectors at L28 refutes the
+single-direction hypothesis: the top principal component explains only 0.075
+(injection) to 0.17 (bizarre) of the variance, top-3 at most 0.34, and the mean
+onset direction — the most consistent component — has coherence ≤0.44 and explains
+~4% of the per-token variance. The exogenous response is distributed across many
+directions, not concentrated on one clampable axis. Whether a low-*rank* subspace
+clamp can absorb it causally is tested next (Part 21).
+
+**Where this fits.** The within-sequence shift is the natural detector for the
+*embedded-injection* setting of Part 18: the streaming battery here **is** an
+embedded injection with a matched benign control (a benign document, then a spliced
+payload), and the within-sequence shift catches the injection at 0.80 AUROC with no
+calibration, where the corpus mean-pool monitor collapsed to chance under exactly
+this dilution. It is a context-break detector, complementary to — not a replacement
+for — the calibrated last-token prompt monitor: use it to flag *where* a sequence's
+register changes, and the prompt monitor to judge whether that change is an attack.
+
+# Part 21 — Clamping the exogenous-response subspace: a causal test
+
+Part 20 killed the single-direction version of the "clamp it" idea (top-1 PCA
+variance 0.075). This part asks the causal question that idea really wants: is
+there a low-*rank* subspace at the responsive layer that the model uses to carry
+the exogenous response — one that, if projected out, actually suppresses the
+downstream response and changes behaviour? `stream_clamp.py` fits the top-k
+principal directions of the paired differential injection onset vectors at layer 28
+(`B`, k orthonormal rows), installs a forward hook on that decoder block that
+removes the projection `h ← h − (h·Bᵀ)B` at every position, and measures two
+things against a **random orthonormal subspace of equal rank** (the specificity
+control): the injection's within-sequence rms-z shift at downstream layers (>28,
+paired vs benign_cont), and the behavioural KL of the final-token distribution
+against the unclamped run. Qwen2.5-3B, 60 matched pairs. Baseline downstream shift
+= 0.032.
+
+| k | clamp: downstream shift (× baseline) | random: (× baseline) | clamp: behav KL | random KL |
+|---|---|---|---|---|
+| 1 | 1.25 | 0.99 | 0.02 | 0.00 |
+| 2 | 1.58 | 0.99 | 0.25 | 0.00 |
+| 4 | 0.94 | 0.96 | 0.70 | 0.01 |
+| **8** | **0.23** | 1.06 | 0.96 | 0.01 |
+| 16 | 0.23 | 1.06 | 1.05 | 0.02 |
+| 32 | **0.05** | 0.94 | 1.00 | 0.04 |
+
+**There is a causal exogenous-response subspace, and it is ~8-dimensional.**
+Projecting out the top-8 injection-response directions collapses the downstream
+shift to 23% of baseline (5% at rank-32); the behavioural KL rises to ~1.0 nat and
+plateaus there past k=8. Both axes saturate at the same rank — that is the
+effective dimensionality of the response at layer 28. Rank-1 does nothing (it even
+*raises* the downstream shift: removing a single direction perturbs the state and
+the model over-recomputes around it). So Part 20's "no single axis" and this
+part's "yes, a low-rank subspace" are the same fact at two ranks.
+
+**The subspace is specific, not a generic lesion.** A random subspace of equal
+rank leaves the downstream shift fully intact (0.94–1.06× baseline at every k) and
+barely moves behaviour (KL ≤ 0.04 even at rank-32). Removing *these* eight
+directions changes what the model does and suppresses its exogenous response;
+removing eight random directions of the same 2048-dim space does neither. The
+subspace is a real, low-rank, causally load-bearing feature — a candidate steering
+target, exactly the object the "clamp it" intuition was reaching for.
+
+**The subspace generalises out-of-sample.** Refitting `B` on 30 bases and clamping
+the *disjoint* other 30 (`--holdout`) reproduces the effect almost exactly: at
+rank-8 the held-out injection's downstream shift falls to **0.22× baseline** (vs
+0.23× in-sample), rank-16 removes it entirely (−0.09×, a slight over-correction
+below the benign baseline), and the random control stays at 0.93–1.05× at every k
+with KL ≤ 0.04. So the ~8-dimensional exogenous-response subspace is a genuine,
+prompt-general feature of layer 28 — not an in-sample fit. This closes the
+specificity claim from both sides: it is specific to *these* directions (random
+fails) and it transfers to *unseen* prompts (held-out holds).
+
+**One honest caveat remains.** The behavioural KL shows the model's output
+*changes* by ~0.6–1.0 nat — it does **not** yet show the change is *toward benign*
+/ away from following the injection. Whether the clamp is a working defence
+(restores benign behaviour) or merely a targeted disruption needs generation plus
+an injection-compliance judge — deferred (a later part). What is established here is
+the mechanism: a low-rank, layer-localised, prompt-general, specific subspace
+causally carries the model's response to exogenous content.
+
+# Part 22 — Scaling the clamp: the subspace is emergent, mid-to-late, and low-rank
+
+Does the causal exogenous-response subspace of Part 21 exist across models, and is
+its ~8-dimensionality universal? `clamp_scan.py` fits the injection-response
+subspace *per layer* (held-out, on half the bases) and clamps it, using two
+cross-layer-comparable metrics — the behavioural KL of the final-token distribution
+(clamp vs unclamped) against a random equal-rank control, and the injection's
+within-sequence shift at the last layer. Two sweeps per model: a layer sweep at
+fixed rank (where is the response causally central) and a k-sweep at the peak layer
+(its effective dimensionality). **Causal centrality** = clamp KL − random KL.
+
+Size ladder (large models deferred to a later run):
+
+| model | d | subspace? | peak centrality | plateau (frac depth) | eff. rank |
+|---|---|---|---|---|---|
+| SmolLM2-360M-Instruct | 960 | **none (≤ random)** | −0.02 | — | — |
+| Qwen2.5-1.5B-Instruct | 1536 | yes | 0.94 | 0.59–0.93 | **8** |
+| Qwen2.5-3B-Instruct | 2048 | yes | 0.92 | 0.30–0.95 | **16** |
+
+Three findings:
+
+1. **The subspace is emergent, not universal.** In SmolLM2-360M the fitted
+   injection-response subspace is *no more causal than a random subspace* —
+   centrality is ≤ 0 at every layer and the k-sweep KL never leaves ~0.01. The
+   smallest model has no specific, clampable exogenous-response direction. Both
+   Qwen models do (peak centrality ~0.9). *Caveat:* 360M is both the smallest model
+   **and** a different family, so this datapoint alone confounds scale with
+   architecture; the clean within-family comparison (1.5B vs 3B, both positive) and
+   the deferred 7B/14B extend the Qwen ladder to separate the two.
+
+2. **It lives in a broad mid-to-late band, not a single layer.** Centrality is
+   positive across ~0.3–0.95 of depth in the 3B and ~0.6–0.93 in the 1.5B — the
+   exogenous response is causally distributed over most of the network's second
+   half, peaking mid-to-late. This matches Part 20's finding that the *readout*
+   shift also peaks at layers 26–31.
+
+3. **Low-rank, order ~10, a tiny fraction of the width.** Effective rank is 8
+   (1.5B) to 16 (3B) — 0.5–0.8% of the hidden dimension. Whether it stays ~O(10) or
+   scales with width is the question the 7B/14B run answers; the 1.5B→3B step (8→16)
+   is the first hint it may grow slowly with size rather than staying fixed.
+
+The picture: the model's machinery for *responding to exogenous content* is an
+emergent, low-rank, mid-to-late-band feature — present once the model is capable
+enough (≥1.5B here), absent in the smallest. That is a concrete interpretability
+claim about where and how prompt injection acts inside the network, and a bounded
+target (order-10 directions across a dozen layers) for any intervention built on it.

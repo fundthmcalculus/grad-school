@@ -1,0 +1,81 @@
+{
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "layer": 28,
+  "arms": {
+    "clamp": {
+      "1": {
+        "downstream_shift_retained": 0.04,
+        "frac_of_baseline": 1.253,
+        "behav_KL_vs_unclamped": 0.024
+      },
+      "2": {
+        "downstream_shift_retained": 0.05,
+        "frac_of_baseline": 1.576,
+        "behav_KL_vs_unclamped": 0.254
+      },
+      "4": {
+        "downstream_shift_retained": 0.029,
+        "frac_of_baseline": 0.935,
+        "behav_KL_vs_unclamped": 0.696
+      },
+      "8": {
+        "downstream_shift_retained": 0.007,
+        "frac_of_baseline": 0.233,
+        "behav_KL_vs_unclamped": 0.958
+      },
+      "16": {
+        "downstream_shift_retained": 0.007,
+        "frac_of_baseline": 0.227,
+        "behav_KL_vs_unclamped": 1.05
+      },
+      "32": {
+        "downstream_shift_retained": 0.002,
+        "frac_of_baseline": 0.049,
+        "behav_KL_vs_unclamped": 0.995
+      }
+    },
+    "random": {
+      "1": {
+        "downstream_shift_retained": 0.031,
+        "frac_of_baseline": 0.986,
+        "behav_KL_vs_unclamped": 0.003
+      },
+      "2": {
+        "downstream_shift_retained": 0.031,
+        "frac_of_baseline": 0.99,
+        "behav_KL_vs_unclamped": 0.003
+      },
+      "4": {
+        "downstream_shift_retained": 0.03,
+        "frac_of_baseline": 0.964,
+        "behav_KL_vs_unclamped": 0.008
+      },
+      "8": {
+        "downstream_shift_retained": 0.033,
+        "frac_of_baseline": 1.058,
+        "behav_KL_vs_unclamped": 0.013
+      },
+      "16": {
+        "downstream_shift_retained": 0.033,
+        "frac_of_baseline": 1.055,
+        "behav_KL_vs_unclamped": 0.019
+      },
+      "32": {
+        "downstream_shift_retained": 0.03,
+        "frac_of_baseline": 0.938,
+        "behav_KL_vs_unclamped": 0.04
+      }
+    }
+  },
+  "baseline_downstream_shift": {
+    "28": 0.113,
+    "29": 0.1,
+    "30": 0.099,
+    "31": 0.089,
+    "32": 0.003,
+    "33": -0.024,
+    "34": -0.029,
+    "35": -0.034,
+    "36": 0.049
+  }
+}
