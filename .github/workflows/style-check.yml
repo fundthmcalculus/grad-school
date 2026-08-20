@@ -6,6 +6,10 @@ on:
       - main
 
 jobs:
+  # Despite the historical job id, this only lints/type-checks -- it never
+  # installs requirements.txt or runs a test. See the `test` job below for
+  # that; kept separate because it's fast and has no runtime dependencies of
+  # its own, so it shouldn't wait on a slower dependency install.
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -32,3 +36,43 @@ jobs:
       - name: Type-check with mypy
         run: mypy .
         continue-on-error: true
+
+  # Installs the project's own dependencies (pyproject.toml) and runs the
+  # repo's pytest suites. This is the check that would have caught, e.g., a
+  # `numpy` pin that predates a function (`np.trapezoid`, NumPy>=2.0 only)
+  # the code already calls -- nothing previously verified the dependency
+  # spec was even installable, let alone that the tests behind it pass. See
+  # issue #105.
+  #
+  # Scope is deliberately not "every test file in the repo" yet: reproduce/
+  # test_dataset_loaders.py is a standalone script (calls sys.exit() at
+  # import time) rather than a pytest suite, and ode_kernels/tests needs a
+  # Cython build step (`python setup.py build_ext --inplace`, requiring
+  # Cython, which isn't a project dependency) that hasn't been wired up here.
+  # Both are legitimate follow-ups, tracked in #105.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run research/least_action tests
+        run: |
+          if [ -d research/least_action ]; then
+            pytest research/least_action -v
+          else
+            echo "research/least_action doesn't exist on this branch yet (lands with PR #24) -- nothing to run."
+          fi

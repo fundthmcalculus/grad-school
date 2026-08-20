@@ -13,6 +13,10 @@
 %   [?] added from working knowledge, pending verification.
 %
 % Counted 2026-08-03: 70 entries = 45 [V] + 23 [S] + 2 [?].
+% Updated 2026-08-16: +3 prognostics/RUL entries for the Ch4 §4.4.1 case study
+%   (ariaschao2021ncmapss, ariaschao2022fusing, custode2022evolutionary), all
+%   metadata-[V]; custode2022's baseline figures are corroborated not read
+%   (CHECKLIST C15). Now 73 entries = 48 [V] + 23 [S] + 2 [?].
 %
 % RESOLVED in 2026-08-08 verification pass:
 %   [V] parveen2013pvat     -- author field resolved from [given name] to Sherin
@@ -572,3 +576,35 @@
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   volume    = {30}, pages = {4765--4774}, year = {2017},
   note      = {arXiv:1705.07874}}
+
+
+% ####################  PROGNOSTICS / RUL (Ch4 §4.4.1 case study)  ##########
+
+@article{ariaschao2021ncmapss,                   % [V] verified -- DOI resolves (Semantic Scholar, 2026-08-16)
+  author  = {Arias Chao, Manuel and Kulkarni, Chetan and Goebel, Kai and Fink, Olga},
+  title   = {Aircraft Engine Run-to-Failure Dataset under Real Flight Conditions
+             for Prognostics and Diagnostics},
+  journal = {Data},
+  volume  = {6}, number = {1}, pages = {5}, year = {2021},
+  doi     = {10.3390/data6010005},
+  note    = {The N-CMAPSS dataset; DS02 is the subset used in Ch4 {\S}4.4.1.}}
+
+@article{ariaschao2022fusing,                    % [V] verified -- arXiv PDF read (Table 5); RESS DOI resolves
+  author  = {Arias Chao, Manuel and Kulkarni, Chetan and Goebel, Kai and Fink, Olga},
+  title   = {Fusing Physics-Based and Deep Learning Models for Prognostics},
+  journal = {Reliability Engineering \& System Safety},
+  volume  = {217}, pages = {107961}, year = {2022},
+  doi     = {10.1016/j.ress.2021.107961},
+  note    = {arXiv:2003.00732. Table 5 CNN/FNN baselines (4.95/7.89) are on a
+             pre-release, lower-noise DS02 cut -- not the public file.}}
+
+@article{custode2022evolutionary,                % [V] metadata (Semantic Scholar); baseline figures NOT content-verified (CHECKLIST C15)
+  author  = {Custode, Leonardo Lucio and Mo, Hyunho and Ferigo, Andrea and Iacca, Giovanni},
+  title   = {Evolutionary Optimization of Spiking Neural {P} Systems for
+             Remaining Useful Life Prediction},
+  journal = {Algorithms},
+  volume  = {15}, number = {3}, pages = {98}, year = {2022},
+  doi     = {10.3390/a15030098},
+  note    = {Source of the public-file CNN (7.22) / MLP (8.34) DS02 re-runs cited
+             in {\S}4.4.1; metadata verified, the specific figures corroborated
+             from snippets but not read from the paper (CHECKLIST C15).}}

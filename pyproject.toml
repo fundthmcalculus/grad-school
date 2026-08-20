@@ -1,12 +1,26 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "grad-school"
 version = "0.1.0"
 description = "Graduate school research and coursework"
 requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.4.6",
+    "plotly~=6.0.1",
+    "scipy~=1.15.2",
+    "sympy~=1.14.0",
+    "tqdm~=4.67.1",
+    "joblib~=1.5.0",
+    "pandas~=2.2.3",
+    "scikit-learn~=1.6.1",
+    "fuzzy-c-means",
+    "xlrd",
+    "matplotlib~=3.10.1",
+    "ucimlrepo",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -15,26 +29,41 @@ dev = [
     "Flake8-pyproject",
     "mypy",
 ]
+cuda = [
+    "numba-cuda[cu12]",
+]
+# Semidefinite-programming solver stack. `research/least_action/fis_sos.py`
+# is the only direct importer; six scripts reach it transitively
+# (`demo_calibrate`, `demo_certified_policy`, `demo_pareto`, `demo_sos`,
+# `verify_proxy`, `verify_sos_exact`). Nothing else in the repo -- including
+# `research/least_action/test_smoke.py`, the only pytest suite CI runs --
+# needs it, so it is kept out of `[project.dependencies]`: an ordinary
+# `uv sync`, and the CI `test` job which installs `.[dev]`, should not pull
+# clarabel/osqp/scs/ecos for one research thread. Install with
+# `uv sync --extra sos` or `pip install -e ".[sos]"`.
+sos = [
+    "cvxpy",
+]
 
-# Code style: Black with default line length (88), matching the optimizers repo.
-# target-version is pinned to the project's minimum (py311) so Black does not
-# infer a newer grammar from requires-python and emit a spurious AST-safety
-# warning on older interpreters.
 [tool.black]
 target-version = ["py311"]
 
-# Lint: flake8 (via Flake8-pyproject), settings copied from the optimizers repo.
-# max-line-length is 120 while Black formats to 88, so E501 only trips on lines
-# Black cannot split. E203 is ignored because Black and pycodestyle disagree on
-# whitespace before slice colons.
 [tool.flake8]
 max-line-length = 120
-exclude = ".git,__pycache__,build,dist,.eggs,.tox,.venv,venv"
+exclude = [".git", "__pycache__", "build", "dist", ".eggs", ".tox", ".venv", ".hatch"]
 extend-ignore = ["E203"]
 
-# Types: mypy. Lenient baseline for now — it catches genuine type errors without
-# demanding full annotations. Strictness is intended to be ratcheted up over time.
 [tool.mypy]
 python_version = "3.11"
 ignore_missing_imports = true
 warn_redundant_casts = true
+
+# This repo is a collection of research/coursework scripts, not an importable
+# `grad_school` package -- there's no directory matching that name for
+# hatchling's default wheel builder to select, so `pip install -e .` /
+# `uv sync` fail outright without this ("Unable to determine which files to
+# ship inside the wheel"). `bypass-selection` tells hatchling the wheel has
+# no package content of its own; `[project.dependencies]` above is still
+# installed normally, which is the only thing this file is actually used for.
+[tool.hatch.build.targets.wheel]
+bypass-selection = true

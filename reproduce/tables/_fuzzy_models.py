@@ -22,6 +22,8 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(os.path.dirname(_HERE))  # .../grad-school
 FIS = os.path.join(REPO_ROOT, "tribble-fis")
 sys.path.insert(0, os.path.join(FIS, "tribble-tree"))  # for `import fuzzytree`
+sys.path.insert(0, os.path.dirname(_HERE))  # reproduce/ -> `import common`
+import common as C  # noqa: E402
 
 # Datasets live HERE, never in the submodule. tribble-fis used to carry
 # `gaussian_mixture/` with the benchmark data in it; upstream removed that
@@ -330,7 +332,7 @@ def _scaler(kind, log_dynamic_range):
 
 
 def unit_scale(X, column=None):
-    """Min-max to [0, 1] with no log step: the exact behaviour of the deleted
+    """Min-max to [0, 1] with no log step: the exact behavior of the deleted
     `gauss_math.standard_transform`, verified bit-for-bit against it.
 
     Accepts a Series (returns a Series), or a DataFrame with an optional
@@ -429,6 +431,148 @@ def mog_classifier(seed):
     from tribblefis.gaussian_classifier import TribbleClassifier
 
     return _try(lambda: TribbleClassifier(top_n=5, random_state=seed))
+
+
+# --- Ruspini derivation --------------------------------------------------------
+# Both helpers convert an *already-fitted* MoG model into its explicit Ruspini
+# form (tribblefis.ruspini.ruspinize_model) rather than fitting a second,
+# independent model -- `RuspiniFuzzyClassifier` would otherwise redo the
+# TribbleClassifier fit `mog_classifier` already did. `cluster_joint_terms`
+# defaults on: restricting each rule to actually-observed joint term
+# combinations, instead of the marginal Cartesian product, is the whole point
+# of exercising this path in the quick scripts.
+
+
+def ruspinize_classifier(model, X, y, cluster_joint_terms=True, min_cluster_frac=0.05):
+    """Derive a RuspiniPartitionModel from a fitted TribbleClassifier."""
+    from tribblefis.ruspini import ruspinize_model
+
+    return ruspinize_model(
+        model.model_,
+        X,
+        y,
+        cluster_joint_terms=cluster_joint_terms,
+        min_cluster_frac=min_cluster_frac,
+    )
+
+
+def ruspinize_regressor(model, X, y, cluster_joint_terms=True, min_cluster_frac=0.05):
+    """Derive a RuspiniPartitionModel from a fitted TribbleRegressor's output-
+    bucket mixture.
+
+    Regression has no rule-per-class notion, but `TribbleRegressor.model_` is
+    built the same way as the classifier's -- one Gaussian mixture per output
+    *bucket*, standing in for the class label -- so the same ruspinize_model
+    entry point applies directly. Returns (RuspiniPartitionModel, bucket_mean)
+    where `bucket_mean[b]` is the value bucket `b`'s rule stands for; see
+    `ruspini_predict_regression` for how that's read back into a prediction.
+
+    Deliberately recomputes `bucket_mean` from `partition_output` here rather
+    than reading `model.y_bucket_mean_`: the model's own attribute has by then
+    been overwritten by `solve_tsk_consequents` with intercepts solved jointly
+    against *its* firing strengths (from the original Gaussian mixture) -- not
+    the Ruspini partition's triangular firing, which can differ a lot,
+    especially once `cluster_joint_terms` changes the rule count. The raw
+    per-bucket target mean is the value that actually pairs with this
+    (unrelated) firing computation.
+    """
+    from tribblefis.ruspini import ruspinize_model
+    from tribblefis.regression import partition_output
+
+    y_series = pd.Series(np.asarray(y).flatten(), name="y_value")
+    y_partitioned, bucket_mean = partition_output(
+        model.n_output_buckets, y_series, method=model.output_partition
+    )
+    rm = ruspinize_model(
+        model.model_,
+        X,
+        y_partitioned["y_bucket"],
+        cluster_joint_terms=cluster_joint_terms,
+        min_cluster_frac=min_cluster_frac,
+    )
+    return rm, bucket_mean
+
+
+def ruspini_predict_regression(rm, bucket_mean, X):
+    """Defuzzify a bucket-classification RuspiniPartitionModel into a
+    continuous prediction: each bucket rule's normalised firing weights that
+    bucket's mean value (order-0 TSK; no linear consequent correction)."""
+    proba, labels = rm.class_proba(X)
+    values = np.array([bucket_mean[int(lab)] for lab in labels])
+    return proba @ values
+
+
+# --- Ruspini refinement ---------------------------------------------------------
+# `refine_ruspini_partition` moves the partition's apex knots against a
+# cross-entropy objective (see tribblefis.refine); `method="coordinate"` -- its
+# default -- is the cheap one-knot-at-a-time L-BFGS search, as opposed to
+# `method="optimizers"`'s population search. That's the "basic" refinement
+# these quick scripts want: a fast pass to report alongside the unrefined
+# Ruspini numbers, not a tuned search.
+
+
+def refine_classifier(rm, X, y, **kwargs):
+    """Refine a classifier's Ruspini partition. Returns (refined_rm, info)."""
+    from tribblefis.refine import refine_ruspini_partition
+
+    kwargs.setdefault("method", "coordinate")
+    kwargs.setdefault("seed", 42)
+    kwargs.setdefault("verbose", False)
+    return refine_ruspini_partition(rm, X, y, **kwargs)
+
+
+def refine_regressor(model, rm, X, y, **kwargs):
+    """Refine a regressor's Ruspini partition.
+
+    `model` supplies the output-bucket partition scheme
+    (n_output_buckets/output_partition) so `y` gets bucketed exactly the way
+    `ruspinize_regressor` bucketed it -- refine_ruspini_partition scores
+    against discrete labels, and those labels have to be the same ones the
+    partition's rules were built against. Returns (refined_rm, info).
+    """
+    from tribblefis.refine import refine_ruspini_partition
+    from tribblefis.regression import partition_output
+
+    y_series = pd.Series(np.asarray(y).flatten(), name="y_value")
+    y_partitioned, _ = partition_output(
+        model.n_output_buckets, y_series, method=model.output_partition
+    )
+    kwargs.setdefault("method", "coordinate")
+    kwargs.setdefault("seed", 42)
+    kwargs.setdefault("verbose", False)
+    return refine_ruspini_partition(rm, X, y_partitioned["y_bucket"], **kwargs)
+
+
+def plot_membership_functions(rm, X, basename, max_features=6):
+    """Save a simple per-feature plot of a RuspiniPartitionModel's triangular
+    membership functions, for (up to `max_features` of) its selected inputs.
+
+    Returns the path(s) written (see `common.save_figure`).
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    features = rm.feature_order[:max_features]
+    terms = rm.feature_terms()
+    fig, axes = plt.subplots(
+        len(features), 1, figsize=(6, 2.0 * len(features)), squeeze=False
+    )
+    for ax, f in zip(axes[:, 0], features):
+        col = X[f].to_numpy(dtype=float) if f in X.columns else np.asarray(rm.apexes[f])
+        lo, hi = float(np.min(col)), float(np.max(col))
+        pad = 0.05 * (hi - lo if hi > lo else 1.0)
+        xs = np.linspace(lo - pad, hi + pad, 400)
+        for i, t in enumerate(terms[f]):
+            ax.plot(xs, t.evaluate(xs), label=f"term {i}")
+        ax.set_title(f, fontsize=9)
+        ax.set_ylim(-0.05, 1.05)
+        ax.legend(fontsize=6, ncol=min(len(terms[f]), 4), loc="lower right")
+    fig.tight_layout()
+    written = C.save_figure(fig, basename, formats=("png",))
+    plt.close(fig)
+    return written
 
 
 def tree_regressor(seed):

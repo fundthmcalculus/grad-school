@@ -266,6 +266,67 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       the numeric phase itself was unaffected. Full account:
       `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`.
 
+- [ ] ⬜ **B13 — Upstream trapezoid-fitter fix: pin bumped to `141596e`, no proposal table
+      moved, two sample scripts still owed.** `tribble-fis`
+      [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170) fixes a defect in
+      `trapz_math_fast.fit_trapezoids_fast` and lowers its default `n_bins` from 50 to 10.
+      Merged, and the submodule pin moved `058501f` → `141596e` in this same change.
+
+      **Verified before the bump was committed, not assumed.**
+      `reproduce/tables/table_4_1_mog_baselines.py` at ten seeds is byte-identical across the
+      bump — R² 0.808 ± 0.030, 0.867 ± 0.031, 0.965 ± 0.001 and both reference columns
+      unchanged. Only wall-clock moved (0.14 → 0.15 s), which is machine noise. That is the
+      check this item predicted, and it passed.
+
+      **The bump spans 22 upstream commits, not just #170** — the pin was already behind
+      `c27e586`. Two that looked risky and are not: #123 renamed the scaling classes but kept
+      all four old names as aliases bound to the same class objects (`UnitScalar is
+      MinMaxScaler` confirmed), so no import breaks; #138 unified the zero-firing threshold by
+      moving IT2/GT2 onto Type-1's existing `1e-6`, leaving the Type-1 path this repo uses
+      untouched. The table diff is the empirical confirmation of both.
+
+      **The defect.** The fitter set each region's `a` to `bin_edges[start]`, i.e. the minimum
+      of the data it was fitted to, and inset the plateau from there.
+      `TrapezoidMembership.evaluate` rises with a strict inequality (`x > a`), so membership is
+      exactly **0 at `x == a`** — correct for an open trapezoid, and wrong in that combination:
+      the smallest observed value, and everything tied with it, got zero membership from the
+      term fitted to describe it. Under the `min` t-norm one such feature zeroes a rule across
+      every input. On unit-scaled Concrete 55% of rows sit at FlyAsh's minimum, 47% at Slag's
+      and 38% at Superplasticizer's, and **78.6% of held-out rows were covered by no rule at
+      all** — answered with exactly `0.0`, a finite value that passes every non-finite check in
+      the pipeline, so it read as a bad model rather than a broken one. `partition_output`
+      already guards the same hazard on the output side with `edges[0] -= 1e-9`.
+
+      **Scope, checked at the call sites rather than assumed.** The change only reaches callers
+      that take the `trapz_method="fast"` **default**:
+      - **Still owed — the reason this item stays unticked:**
+        `FuzzySystemsExperiments/darwin_comparison.py` (line 113, `member_function="trap"` with
+        no `trapz_method`) and the default-method configs in `darwin_quick_comparison.py`. Both
+        now run against the fixed fitter and should be re-run, with any quoted numbers
+        refreshed. Not done here: neither is wired into `reproduce/`, so neither has an archived
+        output to diff against, and the DARWIN data is not on this host.
+      - **Not affected — no action:** `concrete_trapz.py`, whose `main()` runs only `"gaussian"`
+        and `"trapz"` (the EM fitter); its `"trapz-fast"` branch in `run_model` is never
+        invoked. So the `Trapz 1st 0.692 → 0.815` figures under **B9** above come from the EM
+        path and stand. `darwin_trapz.py` passes `trapz_method="em"` explicitly.
+      - **Not affected — no proposal table touches this path at all:** every table in
+        `reproduce/` uses `member_function="gaussian"`. Verified by grep over
+        `reproduce/tables/`; there is no trapezoid arm in any of them.
+
+      **Expected direction when the pin does move** (Concrete, ten seeds, 5 buckets, 2nd-order
+      consequents, through `solve_tsk_consequents`/`predict_tsk`): the fast trapezoid arm goes
+      from test R² 0.121 with 78.6% of rows uncovered to **0.812** with none, and to **0.839**
+      at the new 10-bin default — from unusable to slightly ahead of the Gaussian arm's 0.831,
+      with roughly half the membership functions. Gaussian numbers are unchanged, so a pin bump
+      should move the trapezoid rows and nothing else; if a Gaussian row moves, something else
+      changed too and the bump is not the explanation.
+
+      Found in `experiments/overlap-modeling` (stage 4);
+      `experiments/overlap-modeling/diagnose_trapz_defect.py` regenerates the three
+      measurements above, and `experiments/overlap-modeling/RESULTS.md` §"Stage 4" is the full
+      account.
+
+
 ## C. Experiments owed
 **[Tier 1: critical before defense (C1, C4). Tier 2: real research (C2–C3, C5–C6, C8–C11–C13). Tier 3: defensive (C5–C6, C8). Tier 1.5: reduced scope (C4 done). Tier 4 (C7 descoped)]**
 
@@ -352,6 +413,26 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       divergence `table_concrete_reconciliation` already documents on Concrete. This is now the
       dataset/model-family decision the item was waiting on: both datasets are promoted, and the
       instability is itself worth a sentence in Chapter 6, not merely a caveat here.
+- [ ] ⬜ **C14 — Train-subsample variance study for the turbofan-RUL case study** *(future PR;
+      Ch 4 §4.4.1, Table 4.10, Appendix A.7.1).* N-CMAPSS DS02 RUL is currently *demonstrated*
+      (one run on the dataset's own fixed split, `FuzzySystemsExperiments/cmapss_all_datasets.py`
+      + `cmapss_all_datasets_report.md`), not *measured*. The reproducibility axis here is **not**
+      a ten-seed random split — the train/test split is fixed by the dataset (the held-out engine
+      units, the same split the published baselines use), so re-seeding it would measure the wrong
+      thing and break the baseline comparison. What *should* be seeded is the **training-set
+      subsample** (the pooled fit draws 30k of ~221k rows at a fixed seed) plus the model's
+      `random_state`: re-draw both across ten seeds on the fixed split and report mean ± s.d., ideally
+      via a seeded generator under `reproduce/tables/`. Blocker is redistribution, not compute: the
+      10 `.h5` files total ~28 GB and are gitignored, so the generator must document the manual
+      `NASA-CMAPSS/` download the way `DATASETS.md` does for RT-IOT2022. Until then §4.4.1 is labelled
+      *demonstrated* and the figure a single fixed-split run.
+- [ ] ⬜ **C15 — Verify the DS02 CNN/MLP baseline figures from the source** *(Ch 4 §4.4.1).* The
+      7.22 / 8.34 public-file re-runs are attributed to `custode2022evolutionary` and corroborated
+      from search snippets and co-author code, but not read from the paper's own table (MDPI blocks
+      automated fetch). Confirm via institutional access before the comparison is cited as settled;
+      the `.bib` entry and §4.4.1 both flag this. Metadata for the entry is `[V]`; the *figures* are
+      not content-verified, the same "`[V]` is metadata, not content" distinction the bibliography
+      draws for `deshpande2024scalable`.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because

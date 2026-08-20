@@ -5,6 +5,23 @@ can and cannot help inside LLM inference. Three investigations, each carried to 
 falsifiable end, with the negative results kept because they are the load-bearing
 ones. Full write-ups are in the findings docs; this README is the runnable index.
 
+> **⚠️ Submodule-pin caveat (2026-08-20) — regenerate before citing.**
+> Every committed run summary under `runs/` was generated against
+> `tribble-fis` at `1f7bb0d` (the `feat/one-class-scoring-fewshot` branch,
+> where the non-saturating `surprisal`/`trimmed` scores, Ledoit-Wolf
+> whitening, and few-shot mode were developed). That commit was never merged
+> to `tribble-fis` `main` and is divergent from it, so when this branch landed
+> on `grad-school` `main` the submodule pin was **left at `main`'s `141596e`**
+> rather than advancing it. `141596e` carries the same one-class work merged
+> upstream — `TribbleOneClassDetector` with `score ∈ {complement, surprisal,
+> trimmed}` and `cov ∈ {pca, ledoit_wolf}` — so it is a functional superset,
+> **but the numbers here were not re-run against it and may shift.** Re-generate
+> the affected `runs/` and reconcile any moved figures before quoting a number
+> in the proposal. One known behavioural difference: `few_shot` now defaults to
+> `"none"` (was `"logistic"`); harmless for the benign-only fits here, which
+> pass no labels, but pass `few_shot=`/`score=`/`cov=` explicitly to be safe.
+> See grad-school PR #101 for the full pin discussion.
+
 ## What was investigated, and how it ended
 
 | # | Question | Verdict | Write-up |
