@@ -1,0 +1,38 @@
+{
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "n_benign_pool": 2000,
+  "n_test_benign": 400,
+  "n_injection": 250,
+  "curve": {
+    "50": {
+      "det@1%FP": 0.036,
+      "det@1%FP_sd": 0.026,
+      "wl_auroc": 0.726
+    },
+    "100": {
+      "det@1%FP": 0.025,
+      "det@1%FP_sd": 0.017,
+      "wl_auroc": 0.745
+    },
+    "200": {
+      "det@1%FP": 0.045,
+      "det@1%FP_sd": 0.037,
+      "wl_auroc": 0.772
+    },
+    "400": {
+      "det@1%FP": 0.052,
+      "det@1%FP_sd": 0.037,
+      "wl_auroc": 0.779
+    },
+    "800": {
+      "det@1%FP": 0.069,
+      "det@1%FP_sd": 0.038,
+      "wl_auroc": 0.794
+    },
+    "1600": {
+      "det@1%FP": 0.05,
+      "det@1%FP_sd": 0.035,
+      "wl_auroc": 0.801
+    }
+  }
+}

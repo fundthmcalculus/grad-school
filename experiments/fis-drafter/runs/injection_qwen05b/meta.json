@@ -1,0 +1,18 @@
+{
+  "config": {
+    "model_id": "Qwen/Qwen2.5-0.5B",
+    "batch_size": 24,
+    "seed": 0,
+    "chat_template": true,
+    "dtype": "bfloat16",
+    "mode": "injection",
+    "out": "runs/injection_qwen05b"
+  },
+  "n_probes": 546,
+  "n_layers": 24,
+  "hidden": 896,
+  "labels": {
+    "benign": 343,
+    "injection": 203
+  }
+}

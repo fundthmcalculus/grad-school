@@ -1,0 +1,52 @@
+Loading weights:   0%|          | 0/292 [00:00<?, ?it/s]Loading weights: 100%|██████████| 292/292 [00:00<00:00, 3945.89it/s]
+[capture] batch 1/26 rows=2892 elapsed=8s
+[capture] batch 2/26 rows=5809 elapsed=15s
+[capture] batch 3/26 rows=8836 elapsed=22s
+[capture] batch 4/26 rows=11682 elapsed=29s
+[capture] batch 5/26 rows=14754 elapsed=37s
+[capture] batch 6/26 rows=17809 elapsed=44s
+[capture] batch 7/26 rows=20693 elapsed=51s
+[capture] batch 8/26 rows=23724 elapsed=59s
+[capture] batch 9/26 rows=26747 elapsed=66s
+[capture] batch 10/26 rows=29742 elapsed=73s
+[capture] batch 11/26 rows=32644 elapsed=81s
+[capture] batch 12/26 rows=35632 elapsed=88s
+[capture] batch 13/26 rows=38603 elapsed=95s
+[capture] batch 14/26 rows=41577 elapsed=97s
+[capture] batch 15/26 rows=44483 elapsed=104s
+[capture] batch 16/26 rows=47460 elapsed=112s
+[capture] batch 17/26 rows=50304 elapsed=114s
+[capture] batch 18/26 rows=53277 elapsed=117s
+[capture] batch 19/26 rows=56254 elapsed=120s
+[capture] batch 20/26 rows=59326 elapsed=123s
+[capture] batch 21/26 rows=62272 elapsed=126s
+[capture] batch 22/26 rows=65325 elapsed=128s
+[capture] batch 23/26 rows=68276 elapsed=132s
+[capture] batch 24/26 rows=71252 elapsed=135s
+[capture] batch 25/26 rows=74301 elapsed=138s
+[capture] batch 26/26 rows=75659 elapsed=140s
+{
+  "config": {
+    "model_id": "EleutherAI/pythia-410m",
+    "n_dolly": 1200,
+    "max_new_tokens": 64,
+    "batch_size": 48,
+    "temperature": 1.0,
+    "seed": 0,
+    "dtype": "float32",
+    "device": "cuda",
+    "max_full_logprob_rows": 20000,
+    "chat_template": true,
+    "out": "runs/pythia410m"
+  },
+  "n_rows": 75659,
+  "n_prompts": 1222,
+  "vocab_size": 50304,
+  "hidden_size": 1024,
+  "n_layers": 24,
+  "topk": 128,
+  "n_full_logprob": 20000,
+  "elapsed_s": 141.01732730865479,
+  "torch": "2.13.0+cu130",
+  "transformers_model": "EleutherAI/pythia-410m"
+}

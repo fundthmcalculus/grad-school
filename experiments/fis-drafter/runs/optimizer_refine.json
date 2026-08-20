@@ -1,0 +1,23 @@
+[
+  {
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "objective": "auroc",
+    "n_attack_val": 60,
+    "arms": {
+      "unrefined": {
+        "within_len_auroc": 0.847,
+        "det@1%FP": 0.224
+      },
+      "ga": {
+        "within_len_auroc": 0.847,
+        "det@1%FP": 0.224,
+        "refine_s": 1.07
+      },
+      "pso": {
+        "within_len_auroc": 0.847,
+        "det@1%FP": 0.224,
+        "refine_s": 5.13
+      }
+    }
+  }
+]

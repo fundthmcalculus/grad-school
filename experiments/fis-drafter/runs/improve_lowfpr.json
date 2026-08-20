@@ -1,0 +1,47 @@
+[
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "arms": {
+      "1:baseline_1-maxfiring": {
+        "det@1%FP": 0.0,
+        "det@5%FP": 0.978,
+        "auroc": 0.984
+      },
+      "1:surprisal_sum(=Mahal)": {
+        "det@1%FP": 0.879,
+        "det@5%FP": 0.978,
+        "auroc": 0.995
+      },
+      "1:trimmed_sum_top2": {
+        "det@1%FP": 0.885,
+        "det@5%FP": 0.975,
+        "auroc": 0.994
+      },
+      "1:trimmed_sum_top4": {
+        "det@1%FP": 0.889,
+        "det@5%FP": 0.969,
+        "auroc": 0.994
+      },
+      "1:topk_mean_16": {
+        "det@1%FP": 0.877,
+        "det@5%FP": 0.98,
+        "auroc": 0.995
+      },
+      "2:bagged_15": {
+        "det@1%FP": 0.864,
+        "det@5%FP": 0.975,
+        "auroc": 0.994
+      },
+      "3:local_calib(Mahal)": {
+        "det@1%FP": 0.841,
+        "det@5%FP": 0.98,
+        "auroc": 0.993
+      },
+      "1+3:local_trimmed": {
+        "det@1%FP": 0.816,
+        "det@5%FP": 0.961,
+        "auroc": 0.988
+      }
+    }
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "config": {
+    "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "batch_size": 32,
+    "seed": 0,
+    "chat_template": true,
+    "mode": "injection",
+    "out": "runs/injection_tinyllama"
+  },
+  "n_probes": 546,
+  "n_layers": 22,
+  "hidden": 2048,
+  "labels": {
+    "benign": 343,
+    "injection": 203
+  }
+}

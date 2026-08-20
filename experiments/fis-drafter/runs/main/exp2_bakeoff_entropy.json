@@ -1,0 +1,125 @@
+{
+  "target": "entropy",
+  "budget_per_arm": 32,
+  "n_features": 22,
+  "features": [
+    "prev1_entropy",
+    "prev2_entropy",
+    "prev3_entropy",
+    "prev1_varentropy",
+    "prev2_varentropy",
+    "prev3_varentropy",
+    "prev1_top1_prob",
+    "prev2_top1_prob",
+    "prev3_top1_prob",
+    "prev1_log_margin_12",
+    "prev2_log_margin_12",
+    "prev3_log_margin_12",
+    "ent_ema_short",
+    "ent_ema_long",
+    "ent_cummax",
+    "step",
+    "prompt_len",
+    "tok_len",
+    "tok_is_space",
+    "tok_is_punct",
+    "tok_is_alpha",
+    "tok_logfreq"
+  ],
+  "n_train": 40765,
+  "n_val": 13518,
+  "n_test": 13410,
+  "arms": {
+    "constant": {
+      "arm": "constant",
+      "test_r2": -0.00038380304377994,
+      "budget": 0
+    },
+    "single_feature": {
+      "arm": "single_feature",
+      "test_r2": 0.17414653267267777,
+      "val_r2": 0.15714536879177,
+      "feature": "ent_ema_short",
+      "budget": 22
+    },
+    "ridge": {
+      "arm": "ridge",
+      "test_r2": 0.30123218214602465,
+      "val_r2": 0.2931895001046043,
+      "cfg": {
+        "alpha": 0.00010451280436117381
+      },
+      "budget": 32,
+      "n_failed_cfgs": 0,
+      "search_s": 0.08452177047729492,
+      "predict_us_per_row": 0.008711789989542551
+    },
+    "mlp": {
+      "arm": "mlp",
+      "test_r2": 0.3516635474602061,
+      "val_r2": 0.3461143415984097,
+      "cfg": {
+        "hidden_layer_sizes": [
+          32
+        ],
+        "alpha": 0.0035951282685997505,
+        "learning_rate_init": 0.007313400771209621,
+        "max_iter": 400
+      },
+      "budget": 32,
+      "n_failed_cfgs": 0,
+      "search_s": 247.73653984069824,
+      "predict_us_per_row": 0.14383343064367193
+    },
+    "gbm": {
+      "arm": "gbm",
+      "test_r2": 0.3866466560716585,
+      "val_r2": 0.3839623858235539,
+      "cfg": {
+        "max_iter": 800,
+        "learning_rate": 0.034410643563014834,
+        "max_leaf_nodes": 63,
+        "min_samples_leaf": 50,
+        "l2_regularization": 8.535251969335613e-05
+      },
+      "budget": 32,
+      "n_failed_cfgs": 0,
+      "search_s": 24.608213186264038,
+      "predict_us_per_row": 0.9730358251789272
+    },
+    "t1_fis": {
+      "arm": "t1_fis",
+      "test_r2": 0.3068950602434618,
+      "val_r2": 0.3030196729011776,
+      "cfg": {
+        "top_n": -1,
+        "n_gaussians": 0,
+        "n_output_buckets": 7,
+        "tsk_order": "2nd",
+        "norm_conorm": "min/max",
+        "output_partition": "quantile",
+        "l2_reg": 7.268608093786185e-07
+      },
+      "budget": 32,
+      "n_failed_cfgs": 0,
+      "search_s": 34.53926086425781,
+      "predict_us_per_row": 1.5071041098643736
+    },
+    "it2_fis": {
+      "arm": "it2_fis",
+      "test_r2": 0.30778558407243517,
+      "val_r2": 0.30296046036043855,
+      "cfg": {
+        "top_n": 16,
+        "n_gaussians": 2,
+        "n_output_buckets": 10,
+        "uncertainty_width": 0.42859915142034577,
+        "km_iterations": 20
+      },
+      "budget": 32,
+      "n_failed_cfgs": 0,
+      "search_s": 35.333274602890015,
+      "predict_us_per_row": 37.17567918906898
+    }
+  }
+}

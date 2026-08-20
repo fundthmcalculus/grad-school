@@ -1,0 +1,167 @@
+== target=top1_prob budget=32/arm seed=0 ==
+  constant       -0.0005
+  single_feature +0.1375 (ent_ema_short)
+  ridge          +0.2130  (0s search, 0.21 us/row, 0 cfg failures)
+  mlp            +0.2520  (1451s search, 2.19 us/row, 0 cfg failures)
+  gbm            +0.2822  (83s search, 2.51 us/row, 0 cfg failures)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7496
+ 3. prev3_top1_prob                - Score: 0.7133
+ 4. ent_ema_long                   - Score: 0.4594
+ 5. ent_ema_short                  - Score: 0.3242
+ 6. ent_cummax                     - Score: 0.2486
+ 7. prev1_entropy                  - Score: 0.2078
+ 8. prev2_entropy                  - Score: 0.1580
+ 9. prev3_entropy                  - Score: 0.1519
+10. tok_is_alpha                   - Score: 0.1403
+11. tok_is_space                   - Score: 0.1354
+12. tok_is_punct                   - Score: 0.1297
+13. prev1_varentropy               - Score: 0.1179
+14. prev1_log_margin_12            - Score: 0.0935
+15. prev2_varentropy               - Score: 0.0866
+16. prev3_varentropy               - Score: 0.0839
+17. tok_logfreq                    - Score: 0.0796
+18. prev2_log_margin_12            - Score: 0.0657
+19. prev3_log_margin_12            - Score: 0.0608
+20. tok_len                        - Score: 0.0293
+21. step                           - Score: 0.0074
+22. prompt_len                     - Score: 0.0019
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7480
+ 3. prev3_top1_prob                - Score: 0.6670
+ 4. ent_ema_long                   - Score: 0.4205
+ 5. ent_ema_short                  - Score: 0.3086
+ 6. ent_cummax                     - Score: 0.2089
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7606
+ 3. prev3_top1_prob                - Score: 0.6791
+ 4. ent_ema_long                   - Score: 0.4240
+ 5. ent_ema_short                  - Score: 0.3110
+ 6. ent_cummax                     - Score: 0.2090
+ 7. prev1_entropy                  - Score: 0.2053
+ 8. prev2_entropy                  - Score: 0.1596
+ 9. tok_is_space                   - Score: 0.1458
+10. prev3_entropy                  - Score: 0.1436
+11. tok_is_alpha                   - Score: 0.1431
+12. prev1_varentropy               - Score: 0.1108
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7606
+ 3. prev3_top1_prob                - Score: 0.6791
+ 4. ent_ema_long                   - Score: 0.4240
+ 5. ent_ema_short                  - Score: 0.3110
+ 6. ent_cummax                     - Score: 0.2090
+ 7. prev1_entropy                  - Score: 0.2053
+ 8. prev2_entropy                  - Score: 0.1596
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7583
+ 3. prev3_top1_prob                - Score: 0.6912
+ 4. ent_ema_long                   - Score: 0.4372
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7650
+ 3. prev3_top1_prob                - Score: 0.6888
+ 4. ent_ema_long                   - Score: 0.4327
+ 5. ent_ema_short                  - Score: 0.3097
+ 6. ent_cummax                     - Score: 0.2097
+ 7. prev1_entropy                  - Score: 0.2040
+ 8. prev2_entropy                  - Score: 0.1588
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7480
+ 3. prev3_top1_prob                - Score: 0.6670
+ 4. ent_ema_long                   - Score: 0.4205
+ 5. ent_ema_short                  - Score: 0.3086
+ 6. ent_cummax                     - Score: 0.2089
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7511
+ 3. prev3_top1_prob                - Score: 0.6715
+ 4. ent_ema_long                   - Score: 0.4209
+ 5. ent_ema_short                  - Score: 0.3099
+ 6. ent_cummax                     - Score: 0.2117
+ 7. prev1_entropy                  - Score: 0.2063
+ 8. prev2_entropy                  - Score: 0.1585
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7606
+ 3. prev3_top1_prob                - Score: 0.6791
+ 4. ent_ema_long                   - Score: 0.4240
+ 5. ent_ema_short                  - Score: 0.3110
+ 6. ent_cummax                     - Score: 0.2090
+ 7. prev1_entropy                  - Score: 0.2053
+ 8. prev2_entropy                  - Score: 0.1596
+ 9. tok_is_space                   - Score: 0.1458
+10. prev3_entropy                  - Score: 0.1436
+11. tok_is_alpha                   - Score: 0.1431
+12. prev1_varentropy               - Score: 0.1108
+13. tok_is_punct                   - Score: 0.0965
+14. prev1_log_margin_12            - Score: 0.0954
+15. prev2_varentropy               - Score: 0.0843
+16. prev3_varentropy               - Score: 0.0766
+17. prev2_log_margin_12            - Score: 0.0677
+18. tok_logfreq                    - Score: 0.0625
+19. prev3_log_margin_12            - Score: 0.0604
+20. tok_len                        - Score: 0.0234
+21. step                           - Score: 0.0062
+22. prompt_len                     - Score: 0.0021
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7480
+ 3. prev3_top1_prob                - Score: 0.6670
+ 4. ent_ema_long                   - Score: 0.4205
+ 5. ent_ema_short                  - Score: 0.3086
+ 6. ent_cummax                     - Score: 0.2089
+ 7. prev1_entropy                  - Score: 0.2057
+ 8. prev2_entropy                  - Score: 0.1575
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. prev1_top1_prob                - Score: 1.0000
+ 2. prev2_top1_prob                - Score: 0.7575
+ 3. prev3_top1_prob                - Score: 0.6759
+ 4. ent_ema_long                   - Score: 0.4275
+ 5. ent_ema_short                  - Score: 0.3094
+ 6. ent_cummax                     - Score: 0.2075
+ 7. prev1_entropy                  - Score: 0.2046
+ 8. prev2_entropy                  - Score: 0.1587
+ 9. prev3_entropy                  - Score: 0.1428
+10. tok_is_space                   - Score: 0.1427
+11. tok_is_alpha                   - Score: 0.1405
+12. prev1_varentropy               - Score: 0.1106
+13. tok_is_punct                   - Score: 0.0980
+14. prev1_log_margin_12            - Score: 0.0962

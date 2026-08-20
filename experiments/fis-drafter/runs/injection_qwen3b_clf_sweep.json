@@ -1,0 +1,130 @@
+{
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "baseline": {
+    "top_n": 16,
+    "n_gaussians": 2,
+    "norm_conorm": "probability",
+    "member_function": "gaussian",
+    "refine": false
+  },
+  "one_factor": {
+    "top_n": [
+      {
+        "value": 4,
+        "wl_auroc": 0.752,
+        "det@1%FP": 0.281,
+        "fit_ms": 90
+      },
+      {
+        "value": 8,
+        "wl_auroc": 0.808,
+        "det@1%FP": 0.158,
+        "fit_ms": 88
+      },
+      {
+        "value": 16,
+        "wl_auroc": 0.834,
+        "det@1%FP": 0.409,
+        "fit_ms": 98
+      },
+      {
+        "value": 24,
+        "wl_auroc": 0.852,
+        "det@1%FP": 0.478,
+        "fit_ms": 155
+      },
+      {
+        "value": 32,
+        "wl_auroc": 0.901,
+        "det@1%FP": 0.611,
+        "fit_ms": 134
+      }
+    ],
+    "n_gaussians": [
+      {
+        "value": 1,
+        "wl_auroc": 0.819,
+        "det@1%FP": 0.458,
+        "fit_ms": 89
+      },
+      {
+        "value": 2,
+        "wl_auroc": 0.834,
+        "det@1%FP": 0.409,
+        "fit_ms": 105
+      },
+      {
+        "value": 3,
+        "wl_auroc": 0.825,
+        "det@1%FP": 0.552,
+        "fit_ms": 108
+      },
+      {
+        "value": 4,
+        "wl_auroc": 0.813,
+        "det@1%FP": 0.567,
+        "fit_ms": 129
+      }
+    ],
+    "norm_conorm": [
+      {
+        "value": "probability",
+        "wl_auroc": 0.834,
+        "det@1%FP": 0.409,
+        "fit_ms": 102
+      },
+      {
+        "value": "einstein",
+        "wl_auroc": 0.828,
+        "det@1%FP": 0.429,
+        "fit_ms": 138
+      },
+      {
+        "value": "hamacher",
+        "wl_auroc": 0.843,
+        "det@1%FP": 0.355,
+        "fit_ms": 125
+      },
+      {
+        "value": "min/max",
+        "wl_auroc": 0.85,
+        "det@1%FP": 0.31,
+        "fit_ms": 91
+      }
+    ],
+    "member_function": [
+      {
+        "value": "gaussian",
+        "wl_auroc": 0.834,
+        "det@1%FP": 0.409,
+        "fit_ms": 105
+      },
+      {
+        "value": "trap",
+        "wl_auroc": 0.796,
+        "det@1%FP": 0.0,
+        "fit_ms": 71
+      }
+    ],
+    "refine": [
+      {
+        "value": false,
+        "wl_auroc": 0.834,
+        "det@1%FP": 0.409,
+        "fit_ms": 116
+      },
+      {
+        "value": true,
+        "wl_auroc": 0.904,
+        "det@1%FP": 0.69,
+        "fit_ms": 373
+      }
+    ]
+  },
+  "grid_best": null,
+  "baseline_score": {
+    "wl_auroc": 0.834,
+    "det@1%FP": 0.409,
+    "fit_s": 0.095
+  }
+}

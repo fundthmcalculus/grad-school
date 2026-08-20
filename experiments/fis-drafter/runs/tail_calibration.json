@@ -1,0 +1,80 @@
+[
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "dataset": "injection_qwen3b",
+    "alpha": 0.01,
+    "oracle_det@1%FP": 0.599,
+    "methods": {
+      "empirical": {
+        "realized_FPR": 0.0175,
+        "realized_FPR_sd": 0.0149,
+        "detection_TPR": 0.617,
+        "detection_TPR_sd": 0.104
+      },
+      "evt": {
+        "realized_FPR": 0.0175,
+        "realized_FPR_sd": 0.0149,
+        "detection_TPR": 0.617,
+        "detection_TPR_sd": 0.104
+      },
+      "length_cond": {
+        "realized_FPR": 0.0359,
+        "realized_FPR_sd": 0.0288,
+        "detection_TPR": 0.68,
+        "detection_TPR_sd": 0.088
+      }
+    }
+  },
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "dataset": "sg_qwen3b_big",
+    "alpha": 0.01,
+    "oracle_det@1%FP": 0.077,
+    "methods": {
+      "empirical": {
+        "realized_FPR": 0.0102,
+        "realized_FPR_sd": 0.0056,
+        "detection_TPR": 0.059,
+        "detection_TPR_sd": 0.027
+      },
+      "evt": {
+        "realized_FPR": 0.0107,
+        "realized_FPR_sd": 0.0053,
+        "detection_TPR": 0.063,
+        "detection_TPR_sd": 0.02
+      },
+      "length_cond": {
+        "realized_FPR": 0.0168,
+        "realized_FPR_sd": 0.0034,
+        "detection_TPR": 0.096,
+        "detection_TPR_sd": 0.028
+      }
+    }
+  },
+  {
+    "model": "Qwen/Qwen2.5-3B-Instruct",
+    "dataset": "spml_qwen3b",
+    "alpha": 0.01,
+    "oracle_det@1%FP": 0.913,
+    "methods": {
+      "empirical": {
+        "realized_FPR": 0.015,
+        "realized_FPR_sd": 0.0157,
+        "detection_TPR": 0.916,
+        "detection_TPR_sd": 0.045
+      },
+      "evt": {
+        "realized_FPR": 0.015,
+        "realized_FPR_sd": 0.0157,
+        "detection_TPR": 0.916,
+        "detection_TPR_sd": 0.045
+      },
+      "length_cond": {
+        "realized_FPR": 0.0458,
+        "realized_FPR_sd": 0.0332,
+        "detection_TPR": 0.889,
+        "detection_TPR_sd": 0.061
+      }
+    }
+  }
+]

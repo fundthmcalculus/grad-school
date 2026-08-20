@@ -1,0 +1,25 @@
+{
+  "config": {
+    "model_id": "EleutherAI/pythia-410m",
+    "n_dolly": 1200,
+    "max_new_tokens": 64,
+    "batch_size": 48,
+    "temperature": 1.0,
+    "seed": 0,
+    "dtype": "float32",
+    "device": "cuda",
+    "max_full_logprob_rows": 20000,
+    "chat_template": true,
+    "out": "runs/pythia410m"
+  },
+  "n_rows": 75659,
+  "n_prompts": 1222,
+  "vocab_size": 50304,
+  "hidden_size": 1024,
+  "n_layers": 24,
+  "topk": 128,
+  "n_full_logprob": 20000,
+  "elapsed_s": 141.01732730865479,
+  "torch": "2.13.0+cu130",
+  "transformers_model": "EleutherAI/pythia-410m"
+}
