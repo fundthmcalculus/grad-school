@@ -334,3 +334,39 @@ def dose_response_battery(seed: int = 0, n_base: int = 80) -> list[Probe]:
                     perm[i] = v
             probes.append(Probe(" ".join(w[i] for i in perm), f"dose::{bi}::{dose}"))
     return probes
+
+
+def embedded_injection_battery(seed: int = 0, n_filler: int = 12) -> list[Probe]:
+    """Injections buried inside a long benign document (context dilution).
+
+    Each probe is `filler + item`, where filler is a concatenation of benign
+    dolly contexts (a realistic long benign preamble) and item is either a benign
+    question (label benign) or a deepset injection (label injection). Both classes
+    share the same filler distribution, so the only difference is the embedded
+    item -- the test is whether the injection signal survives dilution by a long
+    benign context.
+    """
+    import random as _r
+    from datasets import load_dataset
+
+    rng = _r.Random(seed)
+    dolly = load_dataset("databricks/databricks-dolly-15k", split="train")
+    ctx = [
+        r["context"].strip()
+        for r in dolly
+        if r["context"] and 200 < len(r["context"]) < 900
+    ]
+    ctx = rng.sample(ctx, min(300, len(ctx)))
+    d = load_dataset("deepset/prompt-injections", split="train")
+    inj = [r["text"].strip() for r in d if str(r["label"]) == "1" and r["text"].strip()]
+    ben = [r["text"].strip() for r in d if str(r["label"]) == "0" and r["text"].strip()]
+
+    def filler():
+        return " ".join(rng.sample(ctx, n_filler))
+
+    probes = []
+    for t in rng.sample(ben, min(200, len(ben))):
+        probes.append(Probe(filler() + "\n\n" + t, "benign"))
+    for t in inj:
+        probes.append(Probe(filler() + "\n\n" + t, "injection"))
+    return probes

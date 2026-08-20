@@ -32,6 +32,7 @@ from .prompts_anomaly import (
     build_anomaly_battery,
     dose_response_battery,
     injection_battery,
+    embedded_injection_battery,
 )
 
 
@@ -43,6 +44,8 @@ class Cfg:
     chat_template: bool = True
     dtype: str = "float32"
     system_prompt: str = ""
+    attn: str = ""
+    quant: str = ""
     mode: str = "battery"  # or "dose"
     out: str = "runs/fmri"
 
@@ -56,10 +59,18 @@ def run(cfg: Cfg) -> Path:
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
     tok.padding_side = "left"
-    model = AutoModelForCausalLM.from_pretrained(
-        cfg.model_id, dtype=getattr(torch, cfg.dtype)
-    )
-    model.to("cuda").eval()
+    load_kw = dict(dtype=getattr(torch, cfg.dtype))
+    if cfg.attn:
+        load_kw["attn_implementation"] = cfg.attn
+    if cfg.quant in ("int8", "int4"):
+        from transformers import BitsAndBytesConfig
+
+        load_kw["quantization_config"] = BitsAndBytesConfig(
+            load_in_8bit=(cfg.quant == "int8"), load_in_4bit=(cfg.quant == "int4")
+        )
+        load_kw["device_map"] = "auto"
+    model = AutoModelForCausalLM.from_pretrained(cfg.model_id, **load_kw)
+    (model.eval() if cfg.quant in ("int8", "int4") else model.to("cuda").eval())
 
     if cfg.mode == "dose":
         probes = dose_response_battery(seed=cfg.seed)
@@ -67,6 +78,8 @@ def run(cfg: Cfg) -> Path:
         probes = injection_battery(seed=cfg.seed, source="deepset")
     elif cfg.mode in ("jailbreak", "safeguard", "spml"):
         probes = injection_battery(seed=cfg.seed, source=cfg.mode)
+    elif cfg.mode == "embedded":
+        probes = embedded_injection_battery(seed=cfg.seed)
     else:
         probes = build_anomaly_battery(seed=cfg.seed, tokenizer=tok)
 
