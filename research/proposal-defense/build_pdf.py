@@ -361,6 +361,144 @@ def check_cross_references(md, registry, filename, warnings=None):
     return warnings
 
 
+# --------------------------------------------------------------------------- #
+# section anchors and reference autolinking
+# --------------------------------------------------------------------------- #
+_CH_RE = re.compile(r"^#\s+Chapter\s+(\d+)\b")
+_APP_TOP_RE = re.compile(r"^#\s+Appendix\b")
+_NUMSEC_RE = re.compile(r"^#{2,4}\s+(\d+(?:\.\d+){1,3})\b")
+_APPSEC_RE = re.compile(r"^#{2,4}\s+A\.(\d+(?:\.\d+)?)\b")
+_FENCE_RE = re.compile(r"^\s*(```|~~~)")
+# Protect inline code spans and existing links from reference rewriting.
+_PROTECT_RE = re.compile(r"(`[^`]*`|\[[^\]]*\]\([^)]*\))")
+
+
+def heading_anchor_id(line):
+    """The stable anchor id for a numbered heading, or None for an unnumbered
+    prose header (which nothing references by number)."""
+    m = _CH_RE.match(line)
+    if m:
+        return f"ch-{m.group(1)}"
+    if _APP_TOP_RE.match(line):
+        return "appendix"
+    m = _NUMSEC_RE.match(line)
+    if m:
+        return "sec-" + m.group(1).replace(".", "-")
+    m = _APPSEC_RE.match(line)
+    if m:
+        return "sec-a-" + m.group(1).replace(".", "-")
+    return None
+
+
+def collect_anchors(raw_by_file):
+    """Every anchor id the numbered headings will carry, across all files."""
+    anchors = set()
+    for md in raw_by_file.values():
+        in_fence = False
+        for line in md.split("\n"):
+            if _FENCE_RE.match(line):
+                in_fence = not in_fence
+                continue
+            if in_fence or not line.startswith("#"):
+                continue
+            aid = heading_anchor_id(line)
+            if aid:
+                anchors.add(aid)
+    return anchors
+
+
+def anchor_headings(md):
+    """Attach {#id} to each numbered heading so references can link to it."""
+    out = []
+    in_fence = False
+    for line in md.split("\n"):
+        if _FENCE_RE.match(line):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if (
+            in_fence
+            or not line.startswith("#")
+            or re.search(r"\{#[^}]+\}\s*$", line)  # already anchored
+        ):
+            out.append(line)
+            continue
+        aid = heading_anchor_id(line)
+        out.append(f"{line.rstrip()} {{#{aid}}}" if aid else line)
+    return "\n".join(out)
+
+
+def _protected_sub(line, fn):
+    """Apply fn to the plain-text runs of a line, leaving inline code spans and
+    existing links untouched."""
+    parts = _PROTECT_RE.split(line)
+    for i in range(0, len(parts), 2):  # even indices are unprotected text
+        parts[i] = fn(parts[i])
+    return "".join(parts)
+
+
+def linkify_refs(md, anchors, filename, missing, stats):
+    """Rewrite §X.Y, Chapter N and Appendix A.N references as internal links.
+
+    A reference whose target heading does not exist is left as plain text and
+    recorded in `missing` so the build can warn about it. Code spans, existing
+    links, fenced code blocks and headings are left untouched.
+    """
+
+    def sub_text(text):
+        def sec(m):
+            num = m.group(1)
+            aid = "sec-" + num.replace(".", "-")
+            if aid in anchors:
+                stats["linked"] += 1
+                return f"[§{num}](#{aid})"
+            missing.add((filename, f"§{num}"))
+            return m.group(0)
+
+        def app(m):
+            num = m.group(1)
+            aid = "sec-a-" + num.replace(".", "-")
+            if aid in anchors:
+                stats["linked"] += 1
+                return f"[Appendix A.{num}](#{aid})"
+            missing.add((filename, f"Appendix A.{num}"))
+            return m.group(0)
+
+        def chap(m):
+            lead, body = m.group(1), m.group(2)
+
+            def one(nm):
+                n = nm.group(0)
+                aid = f"ch-{n}"
+                if aid in anchors:
+                    stats["linked"] += 1
+                    return f"[{n}](#{aid})"
+                missing.add((filename, f"Chapter {n}"))
+                return n
+
+            return lead + re.sub(r"\d+", one, body)
+
+        text = re.sub(r"§(\d+(?:\.\d+)+)", sec, text)
+        text = re.sub(r"\bAppendix\s+A\.(\d+(?:\.\d+)?)", app, text)
+        text = re.sub(
+            r"\b(Chapters?\s+)(\d+(?:\s*(?:,|and|to|–|-)\s*\d+)*)", chap, text
+        )
+        return text
+
+    out = []
+    in_fence = False
+    for line in md.split("\n"):
+        if _FENCE_RE.match(line):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if in_fence or line.startswith("#"):
+            out.append(line)
+            continue
+        out.append(_protected_sub(line, sub_text))
+    return "\n".join(out)
+
+
 def strip_editorial(md, src_dir=None, image_status=None):
     """Drop scaffolding that shouldn't appear in a reading copy.
 
@@ -409,37 +547,50 @@ def strip_editorial(md, src_dir=None, image_status=None):
 
 def assemble():
     os.makedirs(BUILD, exist_ok=True)
-    parts = []
     image_status = {"included": [], "missing": []}
     link_warnings = []
     sections_by_file = {}  # Accumulate section headers across all files
+    raw_by_file = {}  # rel -> raw markdown, read once
 
+    # First pass: read every file once.
     for rel in SECTIONS:
         md = read(rel)
         if md is None:
             continue
+        raw_by_file[rel] = md
+        sections_by_file[rel] = extract_section_headers(md, rel)
+
+    # Anchor registry drives both the autolinks and the dangling-reference
+    # warnings: a §X.Y / Chapter N / Appendix A.N reference is a hyperlink when
+    # its target heading exists, and a warning when it does not.
+    anchors = collect_anchors(raw_by_file)
+    missing_refs = set()
+    link_stats = {"linked": 0}
+
+    # Build registry after all files are read
+    registry = build_section_registry(sections_by_file)
+
+    # Second pass: anchor headings, strip editorial scaffolding, autolink refs.
+    parts = []
+    for rel in SECTIONS:
+        md = raw_by_file.get(rel)
+        if md is None:
+            continue
         src_dir = os.path.dirname(os.path.join(HERE, rel))
 
-        # Extract sections from this file and add to global map
-        file_sections = extract_section_headers(md, rel)
-        sections_by_file[rel] = file_sections
-
-        parts.append(strip_editorial(md, src_dir, image_status=image_status))
+        md = anchor_headings(md)
+        part = strip_editorial(md, src_dir, image_status=image_status)
+        part = linkify_refs(part, anchors, rel, missing_refs, link_stats)
+        parts.append(part)
         print(f"  + {rel}")
+
+        # Keep the existing goal/checklist cross-reference checks.
+        check_cross_references(raw_by_file[rel], registry, rel, link_warnings)
 
         # Insert References section after bibliography.md but before appendix.md
         # The ::: {#refs} ::: div tells pandoc/citeproc where to place the bibliography
         if rel == "prose/bibliography.md":
             parts.append("# References\n\n::: {#refs}\n:::\n")
-
-    # Build registry after all files are read
-    registry = build_section_registry(sections_by_file)
-
-    # Check cross-references against the registry
-    for rel in SECTIONS:
-        md = read(rel)
-        if md is not None:
-            check_cross_references(md, registry, rel, link_warnings)
 
     combined = "\n\n\n".join(parts)
 
@@ -477,6 +628,9 @@ def assemble():
             if in_section or "Legend:" in line or "Tier" in line:
                 filtered_lines.append(line)
         checklist_filtered = "\n".join(filtered_lines)
+        checklist_filtered = linkify_refs(
+            checklist_filtered, anchors, CHECKLIST_FILE, missing_refs, link_stats
+        )
         combined += "\n\n" + checklist_filtered
         print(f"  + {CHECKLIST_FILE} (open items only)")
 
@@ -494,6 +648,16 @@ def assemble():
         if image_status["missing"]:
             for img in image_status["missing"]:
                 print(f"    ✗ {img} (placeholder stripped)")
+
+    # Report section-reference autolinking (and any dangling references)
+    print(f"\n  section links:")
+    print(f"    ✓ {link_stats['linked']} section reference(s) hyperlinked")
+    if missing_refs:
+        for fn, ref in sorted(missing_refs):
+            print(
+                f"    ⚠ {fn}: {ref} has no matching section heading "
+                f"(dangling reference, left as plain text)"
+            )
 
     # Report cross-reference warnings
     if link_warnings:
