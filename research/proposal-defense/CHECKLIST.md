@@ -204,13 +204,17 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       correction — the host is a 32-core i9 with 96 GB RAM, and 64 GB is a self-imposed working
       cap, not a hardware limit — is folded into the same appendix passage and into Table 3.3.)
 - [x] ✅ **B5c — Install a PDF renderer on this host.** ✅ DONE (2026-08-08). `build_pdf.py` now renders the PDF; LaTeX engine installed.
-- [x] ⬜ **B6 — Remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
-      returns a wrong ordering: it returns the seed vertex followed by every other vertex in
-      ascending index order — chance-level agreement (0.001 ± 0.001) with the true ordering at
-      both float64 and float32. Cause: `_get_dist(samples, u, vertices[mask])` is typed for
-      scalar indices, so `np.sum(np.square(diff))` reduces over *all* candidates and returns
-      one scalar; `key[mask] = <scalar>` gives every candidate the same key and the heap pops
-      in index order. Nothing in the package calls it. See `REVIEW` ★2.
+- [x] ✅ **B6 — `pvat.vat_prim_mst_seq` fixed and implemented. RESOLVED (author, 2026-08-21).**
+      Resolved by *fix*, not removal: the function now computes the correct VAT/MST ordering and
+      `tribble-cluster` carries a `test_vat_prim_mst_seq.py` regression test plus a compiled fast
+      path, so the silent-wrong-answer hazard this item opened against is closed.
+      **Original defect (kept as the record):** the exported API silently returned a wrong
+      ordering — the seed vertex followed by every other vertex in ascending index order,
+      chance-level agreement (0.001 ± 0.001) with the true ordering at both float64 and float32.
+      Cause: `_get_dist(samples, u, vertices[mask])` was typed for scalar indices, so
+      `np.sum(np.square(diff))` reduced over *all* candidates and returned one scalar;
+      `key[mask] = <scalar>` gave every candidate the same key and the heap popped in index order.
+      See `REVIEW` ★2.
 - [x] ✅ **B9 — Backfill `log_features` into the sample scripts.** ✅ DONE (tribble-fis #73 merged, 2026-08-08).
       The samples were converted onto `UnitFuzzyScalar` (PR #55 here), which auto-detects log
       columns by dynamic range, whereas each sample previously named its own columns. Upstream
