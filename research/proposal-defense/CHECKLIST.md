@@ -96,10 +96,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       across `prose/*.md` returns nothing; the text never states the arithmetic. **No prose
       label has been changed**, deliberately. When you pick, `build/proposal-combined.md` needs
       a rebuild rather than a hand-edit.
-- [ ] ⬜ **A10 — Teaching/RA load per semester** *(needed from author)*. Sets realistic
-      throughput for Chapter 10's timeline; currently unconfirmed, which is the one open item
-      that could move every bar in the Gantt. `10-timeline.md`'s "Open items" section already
-      asks for this; recorded here so it has an ID like everything else waiting on you.
+- [x] ✅ **A10 — Teaching/RA load: none. RESOLVED (author, 2026-08-21).** The author carries **no
+      teaching or RA load** over the runway, so the throughput assumption behind Chapter 10's
+      timeline is full research effort — the one open item that could have moved every bar in the
+      Gantt resolves in the favourable direction, and no bar needs to move. `10-timeline.md`'s
+      intro now states the effort assumption explicitly, which is what a committee asks of a
+      schedule described as "deliberately aggressive," rather than leaving it implicit.
 - [x] ✅ **A1 — Method name settled: `mergeVAT`** (author decision, 2026-08-02).
       The name went round-trip: mergeVAT → `pVAT` (on Dr. Kreinovich's observation that stage one
       is a priority-queue algorithm) → collision → back to **mergeVAT**. `pVAT` is taken by
@@ -150,16 +152,23 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 - [x] ✅ **B3 — Timings reported as ratios, seconds kept in CSV.** `common.normalized_worst()`
       normalizes each row against its slowest arm; `emit(md_header=, md_rows=)` lets Markdown
       and CSV diverge. Applied to `table_3_1_pvat_scaling` and `table_3_1_reorder_three_arm`.
-- [x] ⬜ **B8 — Automate the harness → document figure hop.** `save_figure()` writes to
+- [x] ✅ **B8 — Automate the harness → document figure hop. DONE.** `save_figure()` writes to
       `reproduce/outputs/figures/fig_03_complexity_fit.{png,eps}`; the document references
-      `prose/fig/03-complexity-fit.png`. That copy is **manual today**. `build_pdf.py` now
-      emits an image line when the target exists and still strips it when it does not, so a
-      figure that is not copied across silently reverts to a placeholder — which is the
-      failure mode worth automating away. A name map plus a copy step in the build closes it.
-- [x] ⬜ **B4 — Submodule SHA guard.** The harness should refuse to emit, or loudly stamp, when
-      a submodule SHA differs from the last archive's. **This failure has happened twice** —
-      once with `fix/pin-extreme-bucket-means`, once with `resolve-flm-pr`. Highest-value
-      remaining infra item.
+      `prose/fig/03-complexity-fit.png`. `build_pdf.py` now closes this automatically: `main()`
+      calls `copy_figures()` (unconditionally, as its first step), which walks the `FIGURE_COPIES`
+      name map — sourced from `reproduce/figures/registry.py`, so adding a figure stays a one-file
+      edit — and copies each `fig_*.{png,eps}` to its prose name at build time. It still emits an
+      image line only when the target exists and strips it to a placeholder when it does not, so
+      the "figure silently reverts to a placeholder" failure mode is now governed by whether the
+      harness generated the figure, not by a forgotten manual copy.
+- [x] ✅ **B4 — Submodule SHA guard. DONE.** The harness now loudly stamps when a submodule SHA
+      differs from the last archive's, taking the "loudly stamp" branch rather than refusing to
+      emit (an intentional submodule change should not block a run). `run_all_tables.sh`'s
+      `check_submodule_shas()` compares the most recent archive's recorded `tribble-fis` /
+      `tribble-cluster` / `grad-school` SHAs against the current `git rev-parse HEAD` and prints a
+      boxed divergence banner on any mismatch; it is called before the run. **This failure had
+      happened twice** — once with `fix/pin-extreme-bucket-means`, once with `resolve-flm-pr` —
+      which is what the guard now catches.
 - [x] ✅ **B5 — Chapter 3's timing grid re-taken on the workstation.** Run of record
       `reproduce/outputs/full-14900hx-r2/` (i9-14900HX, 32 logical cores, 96 GB, RTX 4080
       Laptop), 10 seeds, all 13 generators green in one pass; §3.4 no longer spans two hosts.
@@ -536,8 +545,13 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       nominally best for the flat MoG (0.651 vs 0.650) but by 0.001 against σ ≈ 0.05, so the case
       is simplicity rather than accuracy. **The reportable finding is that Łukasiewicz collapses
       the regression models** (−3.761 flat, −3.626 HME) while the other four families sit within
-      0.03. Also: the whole norm/conorm study appears in *no chapter*, while Ch 2 §2.1 promises
-      "Chapter 4 shows" something Chapter 4 does not show — harvest it or drop the reference.
+      0.03. **Dangling-reference sub-item fixed (2026-08-21):** §2.1's "Chapter 4 shows that this
+      choice changes how readily a model declares something familiar" overclaimed exactly what
+      §4.3.2 disclaims (`table_norm_conorm_matrix.py` sweeps the five De Morgan families on
+      *accuracy* only; the open-set comparison across families is untested). The §2.1 sentence now
+      points to §4.3's actual use of the Hamacher conorm and carries §4.3.2's own "untested" hedge.
+      **What remains open in E1:** the min/max-as-default framing decision, and whether to *harvest*
+      the norm/conorm study into a chapter (it still appears in none) rather than only reference it.
 - [x] ✅ **E2 — Table 3.4 now has a generator, and it runs on this host.**
       `reproduce/tables/table_3_4_gpu_speedups.py`, 31 rows, ten seeds, each row one CPU arm
       against one GPU arm timed in the same pass, device timings stream-synchronised and all
