@@ -459,8 +459,8 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       datasets. First comparison a reviewer will demand.
 - [ ] ⬜ **C6 — Ch 5 head-to-head vs. Bonis–Oudot beta-plateau and AuToMATo** on identical data.
       Defensive as much as scientific, given how close that work is.
-- [x] 🚫 **C7 — DESCOPED, not done.** **DESCOPED from the proposal 2026-08-04.** §6.3.6,
-      Table 6.4, Figure 6.3 and Goal C7 are removed from the document. The `MimoGaussian` /
+- [x] 🚫 **C7 — DESCOPED, not done.** **DESCOPED from the proposal 2026-08-04.** The temporal-data
+      subsection, Table 6.4, Figure 6.3 and Goal C7 are removed from the document. The `MimoGaussian` /
       `AnalyticalDynamics` work continues separately and the proposal no longer rests on it, so
       nothing here is owed *to the proposal*. Kept as a record of what was found, not as an open
       item. Original item: **Ch 6 Atwood machine result** (Table 6.4 pending row), and
@@ -492,7 +492,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       figures are done: **Fig 1.2** (pipeline roadmap) and **Fig 5.2** (band discovery).
       **Fig 4.3** was the last holdout — retargeted to the Glass correction-pass measurement
       (**C4**) rather than left waiting on RT-IOT2022, which still is not a dataset the harness
-      can load; the reasoning is recorded in `registry.py`. Fig 6.3 was descoped with §6.3.6
+      can load; the reasoning is recorded in `registry.py`. Fig 6.3 was descoped with the temporal-data subsection
       (see **C7**). What remains is a style pass on printed pages, not production.
 - [x] ✅ **D2 — Acknowledgements audited, mostly done.** Acknowledgements have been audited (2026-08-08).
       Jon Salisbury is the author's boss, not a co-author. Ch 9 (publications outline) remains

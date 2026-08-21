@@ -116,3 +116,24 @@ Legend: `####` a full quarter of scheduled work · `###` a partial quarter, star
 - **The M5 decision gates G3's suite**, hence the dated milestone: one of four baselines may be a *build*, and finding that out in Q4 with the suite half-run is what the date prevents. **G3's EM is the largest single build**, spanning Q3–Q4, with the one-shot mixture as its de-scope path.
 - **Papers track the work**: Ch 5 → EUSFLAT (written Q1, presented Q3) → Ch 3 journal (Q1–Q2, a write-up, so it absorbs slip) → the VAT complexity note if the two blocking full-text reads clear (Q2, the fourth cut) → Ch 6 (Q4) → the capstone journal version alongside the write-up (2028 Q1).
 
+
+## 10.5 What the EUSFLAT schedule costs
+
+The EUSFLAT 2027 deadline is February — 2027 Q1, a quarter before Goal G1, the one-pass membership generator §5.5 names as Chapter 5's differentiator, is scheduled to exist. Writing the Chapter 5 paper to that deadline means submitting without the contribution that would most distinguish it.
+
+The resolution is to submit what §5.4 already supports: multi-scale recovery at ARI 1.00 against the flat cover's 0.58–0.75, the selection bake-off against beta-plateau and bottleneck-bootstrap, and the falsification experiment. G1 becomes the journal or next-year extension rather than part of the conference paper.
+
+The cost, stated plainly: the EUSFLAT paper reports clustering scores rather than end-to-end fuzzy-model accuracy — the same proxy limitation §5.4 already concedes. It is the price of meeting a Q1 deadline with Q2 work still ahead.
+
+## 10.6 The de-scoping order
+
+The runway is oversubscribed, not merely tight, so the plan is an ordered list of cuts rather than one designated victim. In priority order, first to go first:
+
+1. **G7** (adaptive multi-scale) — a stretch goal whose likeliest outcome is a negative result G1 would also produce.
+2. **G3b** (broadened dataset suite) — narrowed to three datasets before it is dropped.
+3. **G6** — its semantic-criteria half beyond the rule, clause and path counts, which are cheap and stay.
+4. The §9.3 **VAT complexity note** — if the two blocking full-text prior-art reads do not clear.
+5. **G4d** (matrix-free reorder) — nothing in Chapter 3 depends on it.
+6. **G4e** (general merge operator) — narrowed to the composition test alone.
+
+What I will not cut, and would extend the timeline rather than lose: the **C1** baseline adapters, **G2**, **G4a**, and the capstone. Those four carry the two headline claims and the pipeline argument. **G9** is on neither list: three weeks on machinery that already exists, and the only measurement behind a contribution §3.3.5 now claims. Chapters 3 and 4 remain the floor — done, and defensible on their own.
