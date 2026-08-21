@@ -19,7 +19,7 @@ Until the exact titles, venues, page numbers, DOI assignments, and co-author att
 
 ## 9.2 Submitted and Under Review
 
-There is currently no work under active review. The next planned submission is the Chapter 5 membership paper to **EUSFLAT 2027** (deadline: February 2027). This section is retained rather than omitted to make clear that the current absence of under-review work is a state statement, not an oversight.
+There is currently no work under active review. The next planned submission is the Chapter 5 membership paper to **EUSFLAT 2027** (deadline: February 2027). The section is kept, rather than omitted, to make that absence explicit.
 
 ## 9.3 In Preparation
 
