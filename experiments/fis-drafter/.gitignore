@@ -5,3 +5,8 @@
 runs/**/*.npy
 runs/**/*.parquet
 __pycache__/
+# Capture/install/run logs and regenerable plots. The JSON result files above
+# stay tracked on purpose; these logs (e.g. bnb_install.log, dl*.log) and plots
+# (clamp_scale.png via plot_clamp_scale.py) regenerate from the run scripts.
+runs/**/*.log
+runs/**/*.png
