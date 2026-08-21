@@ -108,6 +108,15 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013 (LNCS 8302:151–170),
       a GPU VAT that also swaps the MST algorithm, so reading our *p* as parallel/performant
       collided harder rather than less. Acknowledged by citation in §3.3.1.
+      ⚠️ **The pVAT-collision citation does not verify (found 2026-08-21; see E7).** No paper titled
+      *"pVAT: Parallel VAT on the GPU"* by Parveen & Sreevalsan-Nair could be found; their BDA 2013 /
+      LNCS 8302 pp.151–170 slot (DOI 10.1007/978-3-319-03689-2_10) is instead *"Visualization of Small
+      World Networks Using Similarity Matrices"*, and DBLP lists no VAT work for either author. **The
+      rename to mergeVAT stands regardless** — it is a good name and Kreinovich's priority-queue
+      observation is a separate, real reason — but the *stated* "pVAT is already taken" rationale in
+      §3.3.1 rests on a citation that fails. Author to decide: locate the intended paper (different
+      coordinates) or remove/rewrite the collision claim. `parveen2013pvat` is marked `[?]` in the
+      `.bib` with a full note so it cannot be silently typeset.
       **The name is imperfect and §3.3.1 says so**: it describes neither stage one (priority
       queue) nor stage two (compact active set). What it does describe is §3.3.4's
       divide-and-conquer stitch — which is a merge, is measured, and is the least finished part
@@ -628,16 +637,59 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       cell-for-cell and all 35 values trace to harness CSVs, but no chapter yet *cites* a named
       table instead of restating values — which is the mechanism that let the numbers drift in
       the first place.
-- [ ] ⬜ **E7 — Two literature searches**: knot/breakpoint optimization precedent (Ch 6), and a
-      dedicated fuzzy-MoE search to bound the HME nesting claim. Plus the Zhang-2023 attribution
-      fix in the HFIS references (misattributed to "H. Wang et al."; see `bibliography.md` for
-      the full accounting of this and four other reference-level gaps).
-- [ ] ⬜ **E8 — Two blocking reads** before writing the Ch 9 complexity note (short-communication
-      or NAFIPS-style venue, not an algorithms conference; novelty scoped to (a) the
-      heap-vs-dense correction, (b) the measured crossover, (c) iVAT coverage Fast-VAT 2025
-      lacks, (d) the O(N)-workspace regime as a ≈2× constant-factor win — explicitly *not* "a
-      faster MST"): **Deshpande & Kumar 2024** full text and **Wang et al. 2010** (PAKDD). If
-      the former already states the O(N)-workspace result for VAT itself, drop the note.
+- [x] ✅ **E7 — Two literature searches done; attribution pass done (2026-08-21).** Both searches
+      ran and their findings are folded into Ch 6:
+      **(1) Knot/breakpoint optimization.** A strong triangular partition of unity *is* the order-2
+      (linear) B-spline basis, so apex-knot refinement is free-knot linear-spline fitting and the
+      sum-to-one property is intrinsic to the form, not an enforced constraint. Nearest fuzzy
+      precedent is de Oliveira 1999 (semantic constraints incl. sum-to-one during MF tuning).
+      §6.3.4 now credits `deboor2001splines` (added) + `deoliveira1999semantic`; the novelty is
+      framed as a positioning/setting claim (apex-only refinement of an *exported* rule base), not
+      a new mechanism.
+      **(2) Fuzzy mixtures-of-experts.** Wu et al.'s TSK≡MoE equivalence is stated for the *flat*
+      layer only; "hierarchical TSK" in the literature is stacking/widening (Zhang 2024 survey),
+      not recursive gating. The surviving novelty — one shared closed-form ridge-TSK primitive
+      reused across flat FIS, soft-tree leaves and HME experts — is unprecedented as a *composition*
+      only; §6.2/§6.5 already frame it that way. **Fixed a real miscitation:** §6.2 attributed the
+      TSK≡MoE result to `wu2020optimize` (the MBGD-RDA gradient paper) instead of `wu2020functional`
+      (the functional-equivalence paper). Corrected.
+      **Attribution/metadata fixes applied to `references.bib`:** Zhang-2023 already handled (see
+      E1 note); `kumar2016incvat` real title/authors corrected against Crossref ("Adaptive Cluster
+      Tendency Visualization and Anomaly Detection for Streaming Data", 7 authors); `deshpande2024scalable`
+      first author corrected (Kartik Vishal, not Ojas); Kališnik accent confirmed already correctly
+      encoded (`Kali{\v{s}}nik`). **One item escalated, not closed — see A1:** `parveen2013pvat`
+      does not verify; its coordinates (LNCS 8302 pp.151-170) belong to a *small-world-networks*
+      paper, and no "pVAT: Parallel VAT on the GPU" paper exists for those authors, so the
+      pVAT-collision that motivates the mergeVAT rename rests on a citation that fails. Marked `[?]`
+      with a full note in the `.bib`; needs an author decision.
+- [x] ✅ **E8 — Two blocking reads done (2026-08-21); the note-scoping decision is now teed up for
+      the author.** The reads that blocked the Ch 9 complexity note (short-communication /
+      NAFIPS-style venue; novelty scoped to (a) heap-vs-dense correction, (b) measured crossover,
+      (c) iVAT coverage Fast-VAT 2025 lacks, (d) O(N)-workspace as a ≈2× constant-factor win, *not*
+      "a faster MST") are complete:
+      **Deshpande & Kumar 2024 — the decisive read.** The paper states, verbatim, that its ordering
+      methods (BB-VAT, kdT-VAT, TkdT-VAT) "do not even calculate the n × n distance matrix for the
+      input data X" — i.e. the no-full-matrix result is claimed for the **VAT ordering step itself**,
+      not only for MST-iVAT. So claim (d) in its bare form ("we avoid the full matrix for VAT") is
+      **pre-empted**. The escape is that D&K achieve it by a **coordinate-based** kd-tree/bounding-box
+      route that needs Euclidean coordinates, whereas this work's O(N)-working-memory reorder is
+      **coordinate-free** (arbitrary/non-metric dissimilarity) — which is exactly the distinction Ch 3
+      §3.2 already draws ("solved... by a coordinate-based route mine does not require"). D&K's *exact*
+      per-method space bounds are in the paywalled Section 5 and remain unread, so whether they also
+      claim a strict O(N) bound is unconfirmed.
+      **Wang et al. 2010 (PAKDD) + Fast-VAT 2025.** Confirmed: claims (a), (b), (c) survive. Fast-VAT
+      is a Cython/Numba implementation speedup, exact, **VAT-only (no iVAT)**, stores the full N×N
+      matrix and names O(N²) memory as an unsolved bottleneck — so "iVAT coverage Fast-VAT lacks" (c)
+      and the workspace contrast are defensible. Attribution point banked: the O(N²) iVAT *recurrence*
+      is Havens & Bezdek 2012, not Wang 2010; Ch 3 already credits this correctly.
+      **Author decision (the "drop the note" clause):** since D&K pre-empt the bare no-full-matrix
+      claim for VAT itself, the standalone note's surviving content is thin — coordinate-free
+      O(N)-workspace + the "O(N²) space is inherent to Prim" correction-in-print (both already in Ch 3
+      §3.2) + iVAT-coverage-Fast-VAT-lacks. Recommendation: **fold it into Ch 3 §3.2 / the §9.4 systems
+      paper rather than write a standalone short-communication**, unless the paywalled Section 5 turns
+      out *not* to claim what its section openers imply. Left for the author; nothing is deleted here
+      (the note is not yet written into Ch 9). `deshpande2024scalable` first-author metadata fixed in
+      the `.bib` as part of this read.
 - [ ] ⬜ **E9 — `UnitScalar` vs `StandardScalar`: characterize *why* bounded normalization wins.**
       *(Low priority — author 2026-08-03: "I don't need it but it's worth addressing." Nothing in
       the document depends on it; the choice itself is already settled. Data in hand:
