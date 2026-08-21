@@ -124,13 +124,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       a re-run, not a redesign.
 - [x] ✅ **A4 — EUSFLAT 2027 deadline confirmed: February 2027** (author, 2026-08-02);
       conference September 2027. *Decision: "2027-02".*
-      ⚠️ **This broke the Ch 10 schedule and the fix is a decision, now taken and written into
-      §10.5.** The grid had the Ch 5 paper in 2027 Q2 and Goal **G1** — the differentiator §5.5
+      ⚠️ **This broke the Ch 10 schedule and the fix is a decision, now taken.** The grid had the Ch 5 paper in 2027 Q2 and Goal **G1** — the differentiator §5.5
       names — also in Q2. A February deadline is Q1, so the paper was scheduled a quarter late
       *and* its headline contribution would not have existed when it was due. Resolution: submit
       what §5.4 already supports (multi-scale recovery at ARI 1.00 vs 0.58–0.75 flat, the
       selection bake-off, the falsification experiment) and make G1 the journal/next-year
-      extension. Cost, stated in §10.5: the EUSFLAT paper reports clustering scores rather than
+      extension. Cost: the EUSFLAT paper reports clustering scores rather than
       end-to-end accuracy — the same proxy limitation §5.4 already concedes.
 - [x] ✅ **A6 — Acknowledgements written** (author, 2026-08-02). Template replaced with the real page; it renders correctly ahead of Chapter 1 in the build. One residual dependency: it thanks the committee and Jon Salisbury by name but not the NAFIPS co-authors, so give it a second pass once **D2** supplies those author lists.
 - [x] ✅ **A5 — Proposal defense confirmed: December 2026.** *Decision: "Dec 2026. Let's GO!"*

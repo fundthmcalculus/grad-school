@@ -1,11 +1,11 @@
 # Chapter 10 — Timeline
 
-The plan runs from the proposal defense at the end of 2026 to the final defense in **March 2028**: fifteen months of research runway. It is deliberately aggressive, and the risk is managed in Chapter 7, where the completed Chapters 3 and 4 are the floor and §7.4 points at the de-scoping order §10.6 carries in full. Quarters are calendar quarters; goal labels match Table 7.1 and `CHECKLIST.md`.
+The plan runs from the proposal defense at the end of 2026 to the final defense in **March 2028**: fifteen months of research runway. It is deliberately aggressive, and the risk is managed in Chapter 7, where the completed Chapters 3 and 4 are the floor and §7.4 collects the risks. Quarters are calendar quarters; goal labels match Table 7.1 and `CHECKLIST.md`.
 
 Three things changed here, all of them cases of the schedule having assumed the hard parts were done.
 
 - **The baseline adapters come first.** C1 (ANFIS and GA-tuned-FIS) fill the initial baseline gap; see §7.4 for the impact on Tables 4.5 and 6.2.
-- **Every blocker the evidence names now has a bar or an explicit de-scope.** The M5 dependency fault gets a decision date; BETH's one-class path gets a slot and a stated fallback; eVAT and clusiVAT get their own bar. Fumanal-Idocin et al. [@fumanal2025fast] and the deep TSK fuzzy classifier, itemized in Chapter 6's baseline list and nowhere here, are de-scoped in §7.2 instead of silently carried.
+- **Every blocker the evidence names now has a bar or a stated fallback.** The M5 dependency fault gets a decision date; BETH's one-class path gets a slot and a stated fallback; eVAT and clusiVAT get their own bar. Fumanal-Idocin et al. [@fumanal2025fast] and the deep TSK fuzzy classifier, itemized in Chapter 6's baseline list and nowhere here, are left out of the baseline suite in §7.2 rather than silently carried.
 - **Goal G8 is absent deliberately.** §7.2 retargets the construction post-defense, since the 2028 Q1 quarter it would need already carries the capstone, G6, G7, the write-up and the defense, and keeps only the disjunct count over G2's datasets, which rides inside G2.
 
 ## 10.1 Gantt
@@ -54,7 +54,7 @@ gantt
     Defense preparation                       :wp, 2028-02-01, 43d
 ```
 
-The Chapter 5 membership paper targets **EUSFLAT 2027**: written in January and February 2027 against a **February submission deadline**, presented in September. §10.5 sets out what that costs.\* NAFIPS 2025 (Banff, July 2025) and NAFIPS 2026 (El Paso, March 2026) are already published and predate this timeline.
+The Chapter 5 membership paper targets **EUSFLAT 2027**: written in January and February 2027 against a **February submission deadline**,\* presented in September. NAFIPS 2025 (Banff, July 2025) and NAFIPS 2026 (El Paso, March 2026) are already published and predate this timeline.
 
 Two bars deliberately have no dates. **G4c**, the datacenter-GPU re-run, is gated on access to a card with full-rate double precision, not on effort, and §7.4's fallback applies if it never opens. **G4d**, the matrix-free reorder, is a cut candidate nothing in Chapter 3 depends on, listed unscheduled in Table 7.1.
 
@@ -115,25 +115,3 @@ Legend: `####` a full quarter of scheduled work · `###` a partial quarter, star
 - **G1 precedes C3 and the capstone.** C3 is the new intermediate, the first time Chapter 5's memberships reach Chapter 6's models at all, and putting a small version in Q3 is checklist **C3**'s own recommendation. It leaves the capstone an integration rather than a first attempt.
 - **The M5 decision gates G3's suite**, hence the dated milestone: one of four baselines may be a *build*, and finding that out in Q4 with the suite half-run is what the date prevents. **G3's EM is the largest single build**, spanning Q3–Q4, with the one-shot mixture as its de-scope path.
 - **Papers track the work**: Ch 5 → EUSFLAT (written Q1, presented Q3) → Ch 3 journal (Q1–Q2, a write-up, so it absorbs slip) → the VAT complexity note if the two blocking full-text reads clear (Q2, the fourth cut) → Ch 6 (Q4) → the capstone journal version alongside the write-up (2028 Q1).
-
-
-## 10.5 What the EUSFLAT schedule costs
-
-The EUSFLAT 2027 deadline is February — 2027 Q1, a quarter before Goal G1, the one-pass membership generator §5.5 names as Chapter 5's differentiator, is scheduled to exist. Writing the Chapter 5 paper to that deadline means submitting without the contribution that would most distinguish it.
-
-The resolution is to submit what §5.4 already supports: multi-scale recovery at ARI 1.00 against the flat cover's 0.58–0.75, the selection bake-off against beta-plateau and bottleneck-bootstrap, and the falsification experiment. G1 becomes the journal or next-year extension rather than part of the conference paper.
-
-The cost, stated plainly: the EUSFLAT paper reports clustering scores rather than end-to-end fuzzy-model accuracy — the same proxy limitation §5.4 already concedes. It is the price of meeting a Q1 deadline with Q2 work still ahead.
-
-## 10.6 The de-scoping order
-
-The runway is oversubscribed, not merely tight, so the plan is an ordered list of cuts rather than one designated victim. In priority order, first to go first:
-
-1. **G7** (adaptive multi-scale) — a stretch goal whose likeliest outcome is a negative result G1 would also produce.
-2. **G3b** (broadened dataset suite) — narrowed to three datasets before it is dropped.
-3. **G6** — its semantic-criteria half beyond the rule, clause and path counts, which are cheap and stay.
-4. The §9.3 **VAT complexity note** — if the two blocking full-text prior-art reads do not clear.
-5. **G4d** (matrix-free reorder) — nothing in Chapter 3 depends on it.
-6. **G4e** (general merge operator) — narrowed to the composition test alone.
-
-What I will not cut, and would extend the timeline rather than lose: the **C1** baseline adapters, **G2**, **G4a**, and the capstone. Those four carry the two headline claims and the pipeline argument. **G9** is on neither list: three weeks on machinery that already exists, and the only measurement behind a contribution §3.3.5 now claims. Chapters 3 and 4 remain the floor — done, and defensible on their own.
