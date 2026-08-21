@@ -563,7 +563,17 @@ def strip_editorial(md, src_dir=None, image_status=None):
             alt_text = re.match(r"^`!\[(.*?)\]", s)
             label = alt_text.group(1) if alt_text else m.group(1)
             if os.path.exists(target):
-                out.append(s.strip("`"))
+                # Emit the figure as its own block, bounded to the text width.
+                # Two things matter. A blank line detaches the image from the
+                # caption paragraph: glued inline, a wide (low-aspect) figure is
+                # laid mid-flow and overflows the right margin (Figure 4.4).
+                # And width=100% caps it to the column -> LaTeX width=\linewidth,
+                # HTML width:100%. The from-format disables implicit_figures, so
+                # a lone image is not wrapped in a numbered figure with a
+                # duplicate caption; the bold "Figure N —" line above is the
+                # caption.
+                out.append("")
+                out.append(s.strip("`") + "{width=100%}")
                 included.append(label)
             else:
                 missing.append(label)
@@ -791,7 +801,7 @@ def build_with_latex(md_path, pandoc, engine):
         pdf,
         f"--pdf-engine={engine}",
         "--from",
-        "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks",
+        "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks-implicit_figures",
         "-V",
         "linkcolor=blue",
         "--wrap=preserve",
@@ -840,7 +850,7 @@ def build_with_weasyprint(md_path, pandoc):
         "--standalone",
         "--mathml",
         "--from",
-        "markdown+tex_math_dollars+pipe_tables",
+        "markdown+tex_math_dollars+pipe_tables-implicit_figures",
         "--wrap=preserve",
         "--metadata",
         f"title={TITLE}",
