@@ -45,7 +45,6 @@ gantt
     section Papers & conferences
     Ch5 membership paper (write/submit)       :crit, p5, 2027-01-02, 57d
     Ch3 mergeVAT journal                      :p3, 2027-03-01, 90d
-    VAT complexity note (cut 4)               :pk, 2027-04-01, 60d
     EUSFLAT 2027 (present)                    :milestone, e27, 2027-09-15, 0d
     Ch6 hierarchy paper                       :p6, 2027-10-01, 90d
 
@@ -86,7 +85,6 @@ G7  adaptive multi-scale (cut 1)       .       .       .       .       .     ~~~
 ------------------------------------------------------------------------------------
     Ch5 paper -> EUSFLAT 2027          .    SUB#       .    PRES       .       .
     Ch3 mergeVAT journal               .     ###     ###       .       .       .
-    VAT complexity note (cut 4)        .       .     ###       .       .       .
     Ch6 hierarchy paper                .       .       .       .    ####       .
     dissertation writing               .       .       .       .    ....    ####
 ------------------------------------------------------------------------------------
@@ -114,4 +112,4 @@ Legend: `####` a full quarter of scheduled work · `###` a partial quarter, star
 - **G9 follows G4b**, starting the week that bar ends, because it is the same shape of work: a competitor comparison on the run-of-record host, reusing G4b's driver and its timing harness. Three weeks, not a quarter, since the estimator and both baselines already exist.
 - **G1 precedes C3 and the capstone.** C3 is the new intermediate, the first time Chapter 5's memberships reach Chapter 6's models at all, and putting a small version in Q3 is checklist **C3**'s own recommendation. It leaves the capstone an integration rather than a first attempt.
 - **The M5 decision gates G3's suite**, hence the dated milestone: one of four baselines may be a *build*, and finding that out in Q4 with the suite half-run is what the date prevents. **G3's EM is the largest single build**, spanning Q3–Q4, with the one-shot mixture as its de-scope path.
-- **Papers track the work**: Ch 5 → EUSFLAT (written Q1, presented Q3) → Ch 3 journal (Q1–Q2, a write-up, so it absorbs slip) → the VAT complexity note if the two blocking full-text reads clear (Q2, the fourth cut) → Ch 6 (Q4) → the capstone journal version alongside the write-up (2028 Q1).
+- **Papers track the work**: Ch 5 → EUSFLAT (written Q1, presented Q3) → Ch 3 journal (Q1–Q2, a write-up, so it absorbs slip; it also carries the VAT complexity audit — the literature-versus-libraries observation of §3.2 — as a section rather than a separate paper) → Ch 6 (Q4) → the capstone journal version alongside the write-up (2028 Q1).

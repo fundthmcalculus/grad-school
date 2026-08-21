@@ -682,14 +682,17 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       matrix and names O(N²) memory as an unsolved bottleneck — so "iVAT coverage Fast-VAT lacks" (c)
       and the workspace contrast are defensible. Attribution point banked: the O(N²) iVAT *recurrence*
       is Havens & Bezdek 2012, not Wang 2010; Ch 3 already credits this correctly.
-      **Author decision (the "drop the note" clause):** since D&K pre-empt the bare no-full-matrix
-      claim for VAT itself, the standalone note's surviving content is thin — coordinate-free
-      O(N)-workspace + the "O(N²) space is inherent to Prim" correction-in-print (both already in Ch 3
-      §3.2) + iVAT-coverage-Fast-VAT-lacks. Recommendation: **fold it into Ch 3 §3.2 / the §9.4 systems
-      paper rather than write a standalone short-communication**, unless the paywalled Section 5 turns
-      out *not* to claim what its section openers imply. Left for the author; nothing is deleted here
-      (the note is not yet written into Ch 9). `deshpande2024scalable` first-author metadata fixed in
-      the `.bib` as part of this read.
+      **Author decision, taken (2026-08-21):** the complexity note is **not** a standalone
+      short-communication or a novelty claim — it is folded into the **Ch 3 mergeVAT methods paper**
+      as an *observation*: what the literature claims (O(N²) time/space) versus what public libraries
+      actually implement (the cubic re-scan; the full-matrix footprint). This is what D&K's pre-emption
+      leaves standing anyway. Prose reconciled to the decision: the standalone-note framing is removed
+      from §3.2 (now "an audit the methods paper carries, not a novelty claim of its own"), from the
+      Ch 10 Gantt/quarter-grid (the "VAT complexity note" deliverable is dropped and folded into the
+      Ch 3 journal row; G4d moves from fifth to fourth in the cut order), from Appendix A.2.4/A.6, and
+      from `bibliography.md` — this also clears a latent dangling reference, since Ch 9 §9.3 never
+      actually contained a note subsection for the many cross-references that pointed at it.
+      `deshpande2024scalable` first-author metadata fixed in the `.bib` as part of this read.
 - [ ] ⬜ **E9 — `UnitScalar` vs `StandardScalar`: characterize *why* bounded normalization wins.**
       *(Low priority — author 2026-08-03: "I don't need it but it's worth addressing." Nothing in
       the document depends on it; the choice itself is already settled. Data in hand:
