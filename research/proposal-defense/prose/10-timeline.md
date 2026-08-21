@@ -93,7 +93,7 @@ G7  adaptive multi-scale (cut 1)       .       .       .       .       .     ~~~
     milestones                       PROP.                  EUSFLAT         DEFENSE
 ```
 
-Legend: `####` a full quarter of scheduled work · `###` a partial quarter, starting or ending mid-quarter or too short to fill one · `SUB#` write and submit (EUSFLAT deadline **Feb 2027**) · `PRES` present at the conference · `~~~` stretch (first to cut) · `....` ramp-up · `.` idle. Every marker is right-aligned to its quarter column; the Chapter 3 journal row was previously indented four characters further, putting its bar under 2027 Q2 while the text scheduled it in Q1.
+Legend: `####` a full quarter of scheduled work · `###` a partial quarter, starting or ending mid-quarter or too short to fill one · `SUB#` write and submit (EUSFLAT deadline **Feb 2027**) · `PRES` present at the conference · `~~~` stretch (first to cut) · `....` ramp-up · `.` idle. Every marker is right-aligned to its quarter column.
 
 ## 10.3 Milestone table
 

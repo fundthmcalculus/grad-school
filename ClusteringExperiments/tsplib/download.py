@@ -33,7 +33,10 @@ HERE = Path(__file__).resolve().parent
 
 SOURCES = {
     # name -> (url_template, is_gzip)
-    "mirror": ("https://raw.githubusercontent.com/mastqe/tsplib/master/{name}.tsp", False),
+    "mirror": (
+        "https://raw.githubusercontent.com/mastqe/tsplib/master/{name}.tsp",
+        False,
+    ),
     "heidelberg": (
         "http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp/{name}.tsp.gz",
         True,
@@ -54,14 +57,18 @@ def instance_names() -> list[str]:
 
 def fetch_one(name: str, url_tmpl: str, is_gzip: bool, timeout: int) -> bytes:
     url = url_tmpl.format(name=name)
-    with urllib.request.urlopen(url, timeout=timeout) as resp:  # noqa: S310 (trusted host)
+    with urllib.request.urlopen(
+        url, timeout=timeout
+    ) as resp:  # noqa: S310 (trusted host)
         raw = resp.read()
     return gzip.decompress(raw) if is_gzip else raw
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--force", action="store_true", help="re-fetch instances already present")
+    ap.add_argument(
+        "--force", action="store_true", help="re-fetch instances already present"
+    )
     ap.add_argument("--source", choices=list(SOURCES), default="mirror")
     ap.add_argument("--timeout", type=int, default=60)
     args = ap.parse_args()
@@ -85,8 +92,10 @@ def main() -> int:
         fetched += 1
         print(f"  ok   {name} ({len(data)} bytes)")
 
-    print(f"\n{fetched} fetched, {skipped} already present, {failed} failed "
-          f"(of {len(names)} instances) from '{args.source}'.")
+    print(
+        f"\n{fetched} fetched, {skipped} already present, {failed} failed "
+        f"(of {len(names)} instances) from '{args.source}'."
+    )
     return 1 if failed else 0
 
 
