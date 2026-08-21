@@ -368,6 +368,9 @@ _CH_RE = re.compile(r"^#\s+Chapter\s+(\d+)\b")
 _APP_TOP_RE = re.compile(r"^#\s+Appendix\b")
 _NUMSEC_RE = re.compile(r"^#{2,4}\s+(\d+(?:\.\d+){1,3})\b")
 _APPSEC_RE = re.compile(r"^#{2,4}\s+A\.(\d+(?:\.\d+)?)\b")
+# The appendix numbers its A.1.x / A.2.x sub-items as bold list labels rather
+# than headings (`- **A.2.4** ...`); anchor those too so references resolve.
+_APP_LIST_RE = re.compile(r"^\s*[-*]\s+\*\*A\.(\d+(?:\.\d+)*)\*\*")
 _FENCE_RE = re.compile(r"^\s*(```|~~~)")
 # Protect inline code spans and existing links from reference rewriting.
 _PROTECT_RE = re.compile(r"(`[^`]*`|\[[^\]]*\]\([^)]*\))")
@@ -390,8 +393,18 @@ def heading_anchor_id(line):
     return None
 
 
+def list_item_anchor_id(line):
+    """Anchor id for a bold appendix list-item label (`- **A.2.4** ...`), which
+    the appendix uses in place of a heading for its A.1.x / A.2.x sub-items."""
+    m = _APP_LIST_RE.match(line)
+    if m:
+        return "sec-a-" + m.group(1).replace(".", "-")
+    return None
+
+
 def collect_anchors(raw_by_file):
-    """Every anchor id the numbered headings will carry, across all files."""
+    """Every anchor id the document will carry, across all files: one per
+    numbered heading and one per bold appendix list-item label."""
     anchors = set()
     for md in raw_by_file.values():
         in_fence = False
@@ -399,16 +412,22 @@ def collect_anchors(raw_by_file):
             if _FENCE_RE.match(line):
                 in_fence = not in_fence
                 continue
-            if in_fence or not line.startswith("#"):
+            if in_fence:
                 continue
-            aid = heading_anchor_id(line)
+            aid = (
+                heading_anchor_id(line)
+                if line.startswith("#")
+                else list_item_anchor_id(line)
+            )
             if aid:
                 anchors.add(aid)
     return anchors
 
 
-def anchor_headings(md):
-    """Attach {#id} to each numbered heading so references can link to it."""
+def add_anchors(md):
+    """Attach anchors so references can link to them: `{#id}` on each numbered
+    heading, and an inline `[]{#id}` target on each bold appendix list-item
+    label (`- **A.2.4** ...`), which the appendix uses in place of a heading."""
     out = []
     in_fence = False
     for line in md.split("\n"):
@@ -418,13 +437,21 @@ def anchor_headings(md):
             continue
         if (
             in_fence
-            or not line.startswith("#")
-            or re.search(r"\{#[^}]+\}\s*$", line)  # already anchored
+            or re.search(r"\{#[^}]+\}\s*$", line)  # heading already anchored
+            or "]{#" in line  # list item already anchored
         ):
             out.append(line)
             continue
-        aid = heading_anchor_id(line)
-        out.append(f"{line.rstrip()} {{#{aid}}}" if aid else line)
+        if line.startswith("#"):
+            aid = heading_anchor_id(line)
+            out.append(f"{line.rstrip()} {{#{aid}}}" if aid else line)
+            continue
+        aid = list_item_anchor_id(line)
+        if aid:
+            at = line.index("**")  # inject the empty anchor just before the label
+            out.append(f"{line[:at]}[]{{#{aid}}}{line[at:]}")
+            continue
+        out.append(line)
     return "\n".join(out)
 
 
@@ -578,7 +605,7 @@ def assemble():
             continue
         src_dir = os.path.dirname(os.path.join(HERE, rel))
 
-        md = anchor_headings(md)
+        md = add_anchors(md)
         part = strip_editorial(md, src_dir, image_status=image_status)
         part = linkify_refs(part, anchors, rel, missing_refs, link_stats)
         parts.append(part)
