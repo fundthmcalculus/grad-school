@@ -70,7 +70,7 @@ The method is named after the merge, and **the merge itself is unfinished.** §3
 
 **Estimated effort: about three weeks.** The estimator, both baselines and the timing harness all exist; what is missing is a driver, a size ladder and two tables.
 
-**Timeline:** Ch 10 shows 2027 Q2 (three-week bar). **Status:** Not on de-scoping list (§7.4) because it is the only measurement behind a stated contribution.
+**Timeline:** Ch 10 shows 2027 Q2 (three-week bar). **Status:** in scope; it is the only measurement behind a stated contribution.
 
 ### G1 — Direct one-pass membership generation (build + experiment; partly built)
 
@@ -137,21 +137,21 @@ The interpretability claim should be measured, not asserted, and the earlier dis
 
 *Decision rule.* Counts and the four semantic criteria on the flat FIS, the fuzzy tree, the mixture and the Ruspini export, on Concrete and one G3b dataset, at matched accuracy. Threshold, for the claim that the hierarchy buys a readable path at comparable accuracy: at accuracies within one pooled standard deviation of each other, the hierarchy's mean root-to-leaf path must mention strictly fewer variables than the flat model's rules do, and the Ruspini export must satisfy coverage and partition-of-unity exactly. Refuted if the paths are no shorter at matched accuracy, in which case the interpretability-for-accuracy trade is a loss and not a trade, and §6.5 has to say so.
 
-**Timeline:** Ch 10 shows 2028 Q1 (third-cut goal). **Scoping:** §10.6 narrows to counts and semantic criteria, dropping the expert-study half.
+**Timeline:** Ch 10 shows 2028 Q1. **Scoping:** narrowed to counts and named semantic criteria; the expert-study half is dropped.
 
-### G7 — Adaptive multi-scale (open question; stretch, first cut)
+### G7 — Adaptive multi-scale (open question; stretch)
 
-Replace Chapter 5's gap heuristic for band discovery with a model-based criterion, a change-point or barcode-stability test, so that overlapping density scales become tractable. Explicitly a stretch goal and the first thing I cut. "Tractable" needs a criterion, and the evidence to beat exists.
+Replace Chapter 5's gap heuristic for band discovery with a model-based criterion, a change-point or barcode-stability test, so that overlapping density scales become tractable. Explicitly a stretch goal. "Tractable" needs a criterion, and the evidence to beat exists.
 
 *Decision rule.* The same three scaling families as G1, plus one purpose-built family with deliberately overlapping log-birth ranges. Metrics: recovered scale count and per-level adjusted Rand index. Threshold: the correct scale count at every $n$ from 100 to 5,000 — one band for `log_separated`, three for `many_scale`, one for `single_scale`, where the gap heuristic reports a spurious extra coarse band — and per-level ARI ≥ 0.95, against the gap heuristic's granularities of [1, 1, 1] and ARI 0.00 at $n$ = 100 and 500, and 0.57 at $n$ = 250, which is the phase-four kernel band's ceiling too.
 
-Refuted if a change-point or stability criterion cannot beat the flat set-cover's 1.00 on single-level widely-varying-spread data. The phase-four diagnosis of Appendix A.6 would then be the right one, birth height unusable as a band coordinate, and the deliverable is again the single-versus-multi-level gate. A smaller result, still worth reporting, and why this is the designated first cut: its likeliest outcome is a negative result G1 would also produce.
+Refuted if a change-point or stability criterion cannot beat the flat set-cover's 1.00 on single-level widely-varying-spread data. The phase-four diagnosis of Appendix A.6 would then be the right one, birth height unusable as a band coordinate, and the deliverable is again the single-versus-multi-level gate. A smaller result, still worth reporting: its likeliest outcome is a negative result G1 would also produce.
 
 ### G8 — Joint memberships where the structure requires them (retargeted post-defense)
 
 Every membership function here is one-dimensional, which keeps the rule count linear and the clauses readable, and is a hard expressive limit: a ring is not the intersection of per-axis intervals. The proposal extends to joint two-feature memberships *only* for clusters with no faithful axis-aligned description, using the topological disjunct count of §5.3.5 as the detector.
 
-**The construction is retargeted post-defense, to a journal extension**, for three reasons Appendix A.6 sets out: the quarter it had held is already oversubscribed, the construction spends interpretability, and the §5.3.5 detector that would justify building it has never fired.
+**The construction is retargeted post-defense, to a journal extension**, for the reasons Appendix A.6 sets out: the construction spends interpretability, and the §5.3.5 detector that would justify building it has never fired.
 
 **What stays in scope is the measurement, not the construction.** *Decision rule.* Run the disjunct counter over G2's real datasets and report how often a class has no faithful axis-aligned description; it folds into G2's sweep at almost no cost and decides G8's fate. Common such clusters mean this construction is the wrong tool for that data, a limit on scope; rare ones make G8 worth building afterwards. Either way §6.2's claim should hold *without* G8, so the hole is bounded rather than pending.
 
@@ -163,7 +163,7 @@ One limitation belongs here. The shuttle set **has coordinates**, seven sensor c
 
 The **BETH** host-telemetry set needs a sentence, because Chapter 4 describes it as the testbed for the open-set claim while every open-set number there is measured on Glass. The obstacle is a research decision before a coding one: leave-one-class-out needs at least three classes and BETH is binary, so it needs its own one-class path, and the comparison against a one-class SVM and an isolation forest has to be scored on a footing that path defines. Chapter 10 gives the decision a short slot in 2027 Q2 with a fallback: if the one-class path is not settled by the end of that quarter, the open-set claim stands on Glass as a *mechanism* validation and not a performance claim, and Chapter 4 §4.4 says so in those words. Glass at 214 samples across six classes is a stress test, not a demonstration.
 
-## 7.4 Risks and the de-scoping order
+## 7.4 Risks
 
 One risk has no goal above it: the prior-art overlap in Chapter 5 with Bonis and Oudot. If a reviewer collapses the three axes of daylight already stated, the integration and the one-pass membership generation still stand as novel. The EM's fallback is in G3, the GPU's in G4c.
 
@@ -171,11 +171,11 @@ One risk has no goal above it: the prior-art overlap in Chapter 5 with Bonis and
 
 Two exposures a committee will find. My selection gate in Chapter 5 loses outright to more aggressive selectors on the bridge case, and Table 5.3's coverage column weakens even the conservatism defence I recorded: bottleneck-bootstrap repairs the bridge while still declining three-quarters of the noise. And Chapter 3's non-metric claim rests on synthetic matrices built from coordinate data until G2 runs.
 
-The runway is oversubscribed, not merely tight, so the de-scoping plan is an ordered list rather than one designated victim. See §10.6 for the priority order and rationale; in brief: **G7** first, then **G3b** narrowed to three datasets, then **G6's** semantic-criteria half beyond the counts, then the §9.3 **VAT complexity note**, then **G4d**, then **G4e** narrowed to the composition test alone. What I will not cut, and would rather extend the timeline than lose: the **C1** adapters, **G2**, **G4a**, and the capstone. Those four carry the two headline claims and the pipeline argument. **G9** is on neither list: it is about three weeks on machinery that already exists, and it is the only measurement there will be behind a contribution §3.3.5 now claims, so if it slips the claim narrows to the properties provable from the code and Chapter 3 says so. Chapters 3 and 4 remain the floor: done, and defensible on their own.
+The runway is full, and the plan commits to every goal in Table 7.1 — there is no reserved de-scoping order. The load-bearing four are the **C1** adapters, **G2**, **G4a**, and the capstone: they carry the two headline claims and the pipeline argument. **G9** matters for its own reason — three weeks on machinery that already exists, and the only measurement behind a contribution §3.3.5 now claims, so if it slipped the claim would narrow to the properties provable from the code and Chapter 3 would say so. Chapters 3 and 4 remain the floor: done, and defensible on their own.
 
 ## 7.5 Goals, mapped
 
-**Table 7.1 — Goals for completion, mapped.** Read the **Kind** column first: it says what "done" means. A *protocol* is discharged when every table complies or is named as an exception; an *experiment* by a measurement against §7.2's threshold, and can be refuted; a *build* by working, verified code; an *open question* may end in a negative result, and two of them probably will. Quarters are relative to the confirmed December 2026 proposal, with the final defense in March 2028 (Chapter 10); rows are ordered by target quarter and the cut order is §10.6's. Items are also tracked in `CHECKLIST.md`, with the identifier in each status cell.
+**Table 7.1 — Goals for completion, mapped.** Read the **Kind** column first: it says what "done" means. A *protocol* is discharged when every table complies or is named as an exception; an *experiment* by a measurement against §7.2's threshold, and can be refuted; a *build* by working, verified code; an *open question* may end in a negative result, and two of them probably will. Quarters are relative to the confirmed December 2026 proposal, with the final defense in March 2028 (Chapter 10); rows are ordered by target quarter. Items are also tracked in `CHECKLIST.md`, with the identifier in each status cell.
 
 | Goal | Kind | Feeds | Current status | Priority | Target |
 |---|---|---|---|---|---|
@@ -191,11 +191,11 @@ The runway is oversubscribed, not merely tight, so the de-scoping plan is an ord
 | **C3** Ch 5 → Ch 6 minimal end-to-end | experiment | Ch 5, 6, capstone | not started; pulled forward out of the 2028 Q1 capstone (C3) | must | 2027 Q3 |
 | **G3** HME EM + narrowed baseline suite | build + experiment | Ch 6 | one-shot built; EM designed, not implemented; baseline list narrowed in §7.2 | must | 2027 Q3–Q4 |
 | **G4e** general merge operator — composition test | open question | Ch 3 | two-way stitch measured (Table 3.6); composition, error growth and block choice untested (C10) | should | 2027 Q4 |
-| **G3b** broadened dataset suite | experiment | Ch 6, App A.2.3 | not started; no loaders wired | should — **cut 2** | 2027 Q4 |
+| **G3b** broadened dataset suite | experiment | Ch 6, App A.2.3 | not started; no loaders wired | should | 2027 Q4 |
 | **capstone** integrated end-to-end pipeline | integration | Ch 3→5→6 | not started; depends on G1 and C3 | must | 2028 Q1 |
-| **G6** interpretability: counts + named criteria | experiment | Ch 6 | not started; counts computable from a fitted model today; expert study **dropped**, see §7.2 (C9) | should — **cut 3** | 2028 Q1 |
-| **G7** adaptive multi-scale (overlapping scales) | open question | Ch 5 | not started; phase-4 evidence says birth height is the wrong band coordinate | stretch — **cut 1** | 2028 Q1 |
-| **G4d** matrix-free reorder | build | Ch 3 | not started; the one existing implementation is a measured negative result (Table 3.3) | could — **cut 5** | unscheduled |
+| **G6** interpretability: counts + named criteria | experiment | Ch 6 | not started; counts computable from a fitted model today; expert study **dropped**, see §7.2 (C9) | should | 2028 Q1 |
+| **G7** adaptive multi-scale (overlapping scales) | open question | Ch 5 | not started; phase-4 evidence says birth height is the wrong band coordinate | stretch | 2028 Q1 |
+| **G4d** matrix-free reorder | build | Ch 3 | not started; the one existing implementation is a measured negative result (Table 3.3) | could | unscheduled |
 | **G4c** datacenter-GPU re-run | experiment | Ch 3 | **blocked on hardware access**, not on effort (C8) | should | gated, not scheduled |
 | **G8** joint memberships for non-axis-aligned clusters | open question | Ch 5, 6 | detector exists but has never returned a value other than 1; **retargeted post-defense**, see §7.2 (E3, E4) | post-defense | not in the runway |
 
