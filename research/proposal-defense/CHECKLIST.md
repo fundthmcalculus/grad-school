@@ -807,6 +807,17 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       1. **B14** — decisive where its mechanism applies and irrelevant elsewhere. `table_4_1`
          goes 2 cells beyond noise → **0**; `table_6_1` 5 → 1. Worth 11 pairs document-wide (59 → 70).
       2. **The compiler (B15).** Chapter 3's kernels are gcc-built on this host, not MSVC, so
+         ⚠️ **it moves the fitted exponents, not only the seconds.** Stage two:
+         **1.97** (prose) → **1.89** (archive, MSVC) → **1.77** (this pass, gcc). §3.4 calls the
+         exponent "the most portable quantity… invariant to any constant factor", and concedes
+         one host-to-host move (2.12 laptop against 1.97 workstation); a *compiler* change on
+         one host moves it about as far. Two consequences: the archive's own 1.89 already sits
+         **below** the 1.93–1.97 stability band §3.4 claims across five runs, which is a
+         pre-existing drift nobody had noticed; and the quadratic claim should rest on the
+         cubic-versus-quadratic *separation*, which survives every variation, rather than on a
+         decimal that does not. §3.4 updated to say so. **Figure 3.2 was deliberately NOT
+         re-committed from this pass** — a gcc-built figure beside MSVC-built exponents in the
+         table beneath it would be worse than a stale one.
          every Chapter 3 timing moved. Exactness columns did not. Not a defect — but it means
          **no Chapter 3 timing can be re-quoted from `full-2026-08-22`** without a host that can
          rebuild with MSVC, or an explicit note that the compiler changed.
