@@ -777,6 +777,59 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       established metric or a small expert study. Fills Table 6.3's pending row. Until then Ch 6
       must keep saying the payoff is *described*, not quantified.
 
+- [ ] ⬜ **C16 — The complement rule is order-dependent on its feature list, and §4.3.5 says it
+      cannot be.** Found 2026-08-22 while profiling why `table_4_4_openset` takes 3h38m; full
+      account in [`reproduce/outputs/OPENSET_COST_2026-08-22.md`](../../reproduce/outputs/OPENSET_COST_2026-08-22.md),
+      reproduced by `reproduce/experiments/profile_openset_cost.py`.
+
+      Same RT-IOT2022 fold, same 82 features, **only the order differs** — the screen's ranking
+      against plain column order:
+
+      | | agreement | anomaly-flag rate |
+      |---|---:|---:|
+      | ranked vs ranked *(control)* | **1.0000** | 0.4551 |
+      | column vs column *(control)* | **1.0000** | 0.1704 |
+      | **ranked vs column order** | **0.7063** | — |
+
+      The controls are the point: each order is *exactly* deterministic, so 0.7063 is not
+      run-to-run noise. 29% of test rows change classification and the rate at which the detector
+      fires moves by 2.7×. The fitted model is **identical** in both orders (11 rules, 902
+      antecedent terms), so this is *evaluation* order, not what was fitted.
+
+      §4.3.5 derives the rule as $\mu_{	ext{anom}} = 1 - S(c_1, \ldots, c_K)$. A t-conorm is
+      commutative and associative, so that is order-independent **by construction**. The
+      implementation is not.
+
+      **Leading explanation, not yet confirmed:** floating-point accumulation order through an
+      82-term chain, amplified by the knife-edge §4.3.5 itself derives — at $	heta = 0.99$ the
+      clip makes $\mu_{	ext{anom}} > 0$ only when *every* class firing is below 0.01, so the
+      decision sits where the last bits decide. That predicts the sensitivity is worst at the
+      shipped operating point and milder across Table 4.6's swept band. **A 2.7× swing is larger
+      than I would expect from float noise alone, so this must not be written up as settled.**
+
+      **Three consequences.** (a) Table 4.7b's rates depend on an ordering nothing in the prose
+      mentions. (b) The $\mathcal{O}(M \cdot K^2)$ screen has a second, unassigned job — it is
+      fixing an evaluation order the result depends on — which is why it cannot be cut even though
+      `top_n` keeps all 82 features. (c) It is a **candidate explanation for Table 4.7's
+      instability**, which §4.4 already reports as an ordering that "has changed three times
+      across runs" with spreads "roughly five times the largest gap in the table".
+
+      **Owed:** instrument the t-conorm chain to confirm or refute the mechanism; then either
+      state the order dependence in §4.3.5 or remove it — accumulating in a fixed canonical order
+      would make the implementation match the algebra and costs nothing.
+
+- [ ] ⬜ **C17 — Hoist the θ-independent work out of the θ-sweep (≈ 40 min of 3h38m).** θ enters
+      only at `to_simple_model(params)`, but the sweep re-runs the whole fold per θ — including
+      `calculate_gaussian_correlation` (46% of a fold) and `create_gaussian_membership_dict` (8%),
+      neither of which takes θ. Hoisting them is result-identical by construction (the same
+      `memb` object reused) and should cut the sweep by ~54%. Deliberately **not** done in the
+      2026-08-22 pass: it changes the generator's code path, and folding a performance change into
+      a run whose purpose was attributing numeric drift is how the two become impossible to tell
+      apart. Wants its own change and its own before/after. Related knobs that already exist:
+      `REPRO_THETA_SWEEP_SEEDS` (bounding the sweep to one seed is what made it 1h18m rather than
+      ~13h) and `REPRO_OCSVM_TRAIN_CAP`.
+
+
 ## D. Writing and figures
 **[Tier 1: D1, D4 done. Tier 1.4 open (D5). Tier 0.3 (D2, your records). Tier 1+ (D3, D6)]**
 
