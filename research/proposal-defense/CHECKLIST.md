@@ -268,9 +268,10 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       direction. At float32 the ordering is $0.9996 \pm 0.0012$ — tie-breaking, per §3.2, not error.
       **Two residual items, both small:** the 155,000-point figure is an *extrapolation* from a
       ratio stable to 1.62× across an 8× change in $N$, since the in-place arm's matrix is 96 GB
-      at float32 and cannot be run here — one at-scale run on a bigger host closes it; and §3.4's
-      source permalinks still cite `e3c27e6` and should be re-pinned to `635ed6e`, where the line
-      numbers for `vat_prim_mst` have moved (`pvat.py` was rewritten in the same window).
+      at float32 and cannot be run here — one at-scale run on a bigger host closes it. §3.4's source
+      permalinks are **re-pinned** to `635ed6e` (done 2026-08-22): `pcvat.pyx`'s two kernels sit at
+      identical line numbers in both commits, but `vat_prim_mst` moved 141 → 159, so the cited
+      range is now L159–L226.
       Prose updated: §3.1, §3.3.2, Table 3.3, §3.4, A.6 and Ch 7's G4d entry.
       **Original defect (kept as the record):** the exported API silently returned a wrong
       ordering — the seed vertex followed by every other vertex in ascending index order,
