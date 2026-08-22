@@ -11,7 +11,7 @@ are three, not two, of which only the first two are bounded by the matrix at all
   in-place    materialise D once, permute it in place     k = 1  ->  1 N^2 itemsize
   on-demand   never materialise D; compute D_ij as the    k = 0  ->  no N^2 term
               reorder asks for it (pvat.vat_prim_mst_seq)
-              *** DEFECTIVE -- see the ordering column and the note. ***
+              Repaired upstream at clustering c9be437; see the note.
 
 Two kinds of number live in this table, and they are labelled as such:
 
@@ -21,10 +21,18 @@ Two kinds of number live in this table, and they are labelled as such:
             the serial reference") without ever varying the precision.  Every cell
             is compared against the float64 in-place ordering on identical points.
 
-Caveat kept visible rather than buried: the on-demand path is the STAGE-ONE
-heap algorithm, so its residual memory is the priority queue, not a strict O(N).
-The queue is not sized here -- that needs a peak-RSS harness, and is noted as
-unmeasured rather than asserted to be small.
+The on-demand row was a NEGATIVE RESULT until 2026-08-22 and is now a positive
+one: `vat_prim_mst_seq` returned the seed vertex followed by every other vertex
+in ascending index order (chance agreement), and clustering c9be437 repaired it.
+The repair is inside the currently pinned SHA; it is NOT inside e3c27e6, which
+Chapter 3 §3.4's source permalinks still cite.
+
+Its residual memory used to be recorded here as unmeasured -- the heap, not a
+strict O(N), and "not sized here, that needs a peak-RSS harness". That harness
+now exists: reproduce/experiments/check_matrix_free_reorder.py measures peak
+working set per arm in a fresh process, and finds it FLAT at 64.7-65.2 MB from
+N = 2,000 to 12,000 while the implied matrix grows 36x. So the "no N^2 term"
+column is a measurement now, not arithmetic about it.
 
 Half precision is deliberately out of scope here.  pcvat.pyx ships _64 and _32
 kernels only, and reduced precision below float32 belongs with the Boruvka/GPU
@@ -71,7 +79,7 @@ DTYPES = [("float64", np.float64), ("float32", np.float32)]
 SCHEMES = [
     ("classical (D + copy + work)", 3),
     ("in-place (D only)", 1),
-    ("on-demand (vat_prim_mst_seq) — DEFECTIVE", 0),
+    ("on-demand (vat_prim_mst_seq), matrix-free", 0),
 ]
 
 
@@ -221,18 +229,20 @@ def main():
             "of answer. The on-demand scheme has no N^2 term and so no matrix-bound "
             "ceiling; it is the stage-one heap algorithm, so its residual memory is "
             "the priority queue rather than a strict O(N), and that queue is NOT "
-            "sized here. ** The on-demand row is a NEGATIVE RESULT. ** "
-            "`pvat.vat_prim_mst_seq` is the only matrix-free reorder in the package, "
-            "and it does not produce the VAT ordering: it returns the seed vertex "
-            "followed by every other vertex in ascending index order, which is why "
-            "agreement against the float64 reference sits at chance. The cause is a "
-            "vectorised call to `_get_dist(samples, u, vertices[mask])`, a function "
-            "typed for scalar indices -- the reduction collapses to one scalar, every "
-            "candidate is assigned the same key, and the heap then pops in index "
-            "order. Nothing in the package calls this function; it is exported, dead, "
-            "and wrong. Until it is fixed there is no matrix-free path here, so the "
-            "'not memory-bound' ceiling is arithmetic about a scheme that does not "
-            "yet work. Precision below float32 is out of scope: pcvat.pyx ships "
+            "sized here -- but it IS sized in "
+            "`reproduce/experiments/check_matrix_free_reorder.py`, which measures peak "
+            "working set per arm in a fresh process and finds it FLAT at 64.7-65.2 MB "
+            "from N = 2,000 to 12,000, against an implied matrix growing 36x. "
+            "** The on-demand row USED to be a negative result and is now a positive "
+            "one. ** `pvat.vat_prim_mst_seq` returned the seed vertex followed by every "
+            "other vertex in ascending index order -- chance agreement -- because "
+            "`_get_dist(samples, u, vertices[mask])` was typed for scalar indices, so the "
+            "reduction collapsed to one scalar, every candidate got the same key, and the "
+            "heap popped in index order. Repaired upstream at clustering c9be437, with a "
+            "regression test; the repair is inside the pinned SHA and is NOT inside "
+            "e3c27e6, which §3.4's permalinks still cite. Ordering now reads 1.000 at "
+            "float64 and 0.999 at float32, the latter being tie-breaking rather than error. "
+            "Precision below float32 is out of scope: pcvat.pyx ships "
             "_64 and _32 kernels only, and half precision belongs with the Borůvka/GPU "
             "path of §3.3.3, where it would actually pay."
         ),

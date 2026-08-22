@@ -137,3 +137,48 @@ instance of it, and the first where the uncovered half was the headline number.
    table without waiting for upstream.
 4. Extend the pin-bump check to **every column of a table, not the columns that
    happen to be easiest to eyeball** — the concrete change B13 needs.
+
+---
+
+## Independent confirmation, from a table that was not part of the diagnosis
+
+The full ten-seed suite of 2026-08-22 was diffed cell-by-cell against the archived
+run of record (`reproduce/compare_runs.py`, output in `FIX_IMPACT.md`). The drift
+lands exactly where the mechanism above predicts and nowhere else:
+
+| table | cells beyond noise | why |
+|---|---:|---|
+| `table_a1_feature_ranking` | 12 of 20 | **the feature screen itself** |
+| `table_a2_feature_count` | 26 of 36 | accuracy as a function of screen depth |
+| `table_4_8_mf_dedup_sweep` | 126 of 196 | memberships fitted on the screened features |
+| `table_4_8_mf_dedup` | 24 of 28 | same |
+| `table_norm_conorm_matrix` | 20 of 39 | same |
+| `table_hyperparam_normalization` | 18 of 84 | same |
+| `table_5_1` … `table_5_4_raw` | **0** | Chapter 5 never touches `gauss_math` |
+| `table_a7_regression_scale` | **0** | Random Forest / flat MoG, no screen |
+
+**Table A.1 is the direct read-out.** Its `wasserstein` column is the one that
+collapses, and it collapses toward zero — which is what a bounded, scale-invariant
+quantity does when asked to rank features by spread:
+
+| rank | before | after |
+|---:|---|---|
+| 2 | HasSocialNet (0.867) | SpacialCharRatioInURL (**0.247**) |
+| 3 | HasCopyrightInfo (0.743) | DegitRatioInURL (**0.075**) |
+| 4 | HasDescription (0.629) | LetterRatioInURL (**0.051**) |
+| 5 | DomainTitleMatchScore (0.471) | HasSocialNet (**0.049**) |
+
+Rank 1 still reads 1.000 in both, because the top feature is normalised to 1 by
+construction — so the column looks healthy exactly where a reader would glance.
+
+**Table A.2 prices it.** The `wasserstein` arm's accuracy falls 0.9967 → **0.6709**
+at one feature and 0.9997 → **0.8096** at ten; the `bhattacharyya` arm moves the
+other way (0.4267 → 0.9967) as the ranking reshuffles under it.
+
+Appendix **A.4**'s subject is *why the composite metric earned its keep*. At this
+pin, one of the three terms in that composite is not the quantity it is named
+after, so A.4's argument cannot be evaluated as written until the fix lands.
+
+That Chapter 5's seven tables and the regression-scale table are **bit-identical**
+across the same diff is the control: this is not a host effect, a compiler effect,
+or general numerical drift. It is one function.
