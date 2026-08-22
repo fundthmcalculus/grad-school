@@ -206,3 +206,34 @@ after, so A.4's argument cannot be evaluated as written until the fix lands.
 That Chapter 5's seven tables and the regression-scale table are **bit-identical**
 across the same diff is the control: this is not a host effect, a compiler effect,
 or general numerical drift. It is one function.
+
+---
+
+## The sibling defect in the same commit
+
+`5237ebe` (#95) replaced six functions. Two of them changed results, through
+different paths, which is why neither correction alone explains the whole of
+Table 4.1's drift:
+
+| replaced function | reaches | effect |
+|---|---|---|
+| `wasserstein_distance` | `_pairwise_label_distance` → the feature screen | **classification collapse**: PhiUSIIL 0.997 → 0.729 |
+| `_kmeans_labels_1d` | `fit_gaussian_mixture_1d` → the memberships | **regression shift**: Concrete R² 0.795 → 0.804 |
+
+Traced with `reproduce/experiments/diagnose_regression_drift.py`. Restoring
+`_kmeans_labels_1d` alone at the current pin returns the regression rows to
+0.7986 ± 0.0255 and 0.8521 ± 0.0287 — the full-second-order row landing on the
+archive's 0.8517 to within 0.0004 — while every other restoration is inert.
+
+The mechanism is initialization, not arithmetic. `sklearn.cluster.KMeans` seeds
+with **k-means++**; the replacement `kmeans_1d` takes a **single uniform-random
+start** with no restarts. Different 1-D mixture initialization, different fitted
+memberships, different $R^2$.
+
+**This one is not a wrong answer** — the values went *up*, by 0.009 and 0.016 —
+so it needs a different response from the wasserstein defect. What it shares is
+the shape: an unexplained change to a headline number, arriving inside a commit
+whose title is a performance optimization, caught only because someone diffed the
+tables afterwards. A single random start is also a weaker guarantee than
+k-means++ even on a dataset where it happens to score better, which is worth a
+sentence upstream regardless of which number the document ends up quoting.
