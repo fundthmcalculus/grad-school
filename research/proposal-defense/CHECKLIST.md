@@ -195,6 +195,16 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       image line only when the target exists and strips it to a placeholder when it does not, so
       the "figure silently reverts to a placeholder" failure mode is now governed by whether the
       harness generated the figure, not by a forgotten manual copy.
+
+      ⚠️ **One gap, found 2026-08-22.** The copy is *unconditional*: `build_pdf.py` re-installs
+      `03-complexity-fit.png` from `reproduce/outputs/figures/` on every build, so any local run
+      of `table_3_1_reorder_three_arm` silently swaps that figure into the document whether or not
+      Table 3.2 beneath it has been re-quoted from the same run. That bit this pass: the figure
+      regenerated from gcc-built kernels (fitted exponent 1.77) would have sat directly above a
+      table quoting 1.97 from an MSVC build. Reverted by hand, twice, because the build re-copies
+      it. The automation is right; what it needs is to refuse, or at least warn, when the figure
+      it is about to install came from a different archive than the table it illustrates.
+
 - [x] ✅ **B4 — Submodule SHA guard. DONE.** The harness now loudly stamps when a submodule SHA
       differs from the last archive's, taking the "loudly stamp" branch rather than refusing to
       emit (an intentional submodule change should not block a run). `run_all_tables.sh`'s
