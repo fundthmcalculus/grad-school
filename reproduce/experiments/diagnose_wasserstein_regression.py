@@ -179,8 +179,10 @@ def downstream_cost(npz_path: str, seeds: int = 3) -> None:
         setattr(gauss_math, name, originals[name])
 
     print()
-    print(f"  unmodified {base:.4f} vs all-restored {allrestored:.4f}: "
-          f"the gap is {allrestored - base:+.4f}")
+    print(
+        f"  unmodified {base:.4f} vs all-restored {allrestored:.4f}: "
+        f"the gap is {allrestored - base:+.4f}"
+    )
 
 
 def main() -> int:

@@ -74,10 +74,10 @@ MARKS = [
     (
         "05-topological-membership-generation.md",
         "**`many_scale` is the clean confirmation the single n = 96 run could not be.**",
-        "the finding is stated three times against its own history -- \"the "
-        "nine-line paragraph below used to describe as untested\", \"used to call "
+        'the finding is stated three times against its own history -- "the '
+        'nine-line paragraph below used to describe as untested", "used to call '
         "unwritten is now a real, ten-seed-verified table entry, not a retracted "
-        "one\". State the ten-seed result once.",
+        'one". State the ten-seed result once.',
     ),
     (
         "06-hierarchical-refined-fis.md",
@@ -127,7 +127,9 @@ def main() -> int:
             text = text[:insert_at] + marker + "\n" + text[insert_at:]
             io.open(path, "w", encoding="utf-8", newline="\n").write(text)
         marked += 1
-        print(f"  {'would mark' if check_only else 'marked'}: {fname} -- {anchor[:55]}...")
+        print(
+            f"  {'would mark' if check_only else 'marked'}: {fname} -- {anchor[:55]}..."
+        )
 
     print(f"\n{marked} marked, {skipped} already marked, {missing} anchors not found")
     return 1 if missing else 0

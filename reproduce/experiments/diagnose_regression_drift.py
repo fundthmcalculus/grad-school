@@ -76,7 +76,9 @@ def probe() -> int:
     for order in ("1st", "full-2nd"):
         scores = []
         for seed in range(10):
-            xtr, xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
+            xtr, xte, ytr, yte = train_test_split(
+                X, y, test_size=0.2, random_state=seed
+            )
             model = TribbleRegressor(
                 n_output_buckets=3, tsk_order=order, top_n=-1, random_state=seed
             )
@@ -127,7 +129,9 @@ def isolate() -> int:
         for order in ("1st", "full-2nd"):
             s = []
             for seed in range(10):
-                xtr, xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
+                xtr, xte, ytr, yte = train_test_split(
+                    X, y, test_size=0.2, random_state=seed
+                )
                 m = TribbleRegressor(
                     n_output_buckets=3, tsk_order=order, top_n=-1, random_state=seed
                 )
@@ -137,7 +141,9 @@ def isolate() -> int:
             cols.append(f"{order}={a.mean():.4f}+/-{a.std():.4f}")
         print(f"  {label:36s} " + "   ".join(cols))
 
-    print("  archive (tribble-fis 80e98d7)        1st=0.7950+/-0.0249   full-2nd=0.8517+/-0.0297")
+    print(
+        "  archive (tribble-fis 80e98d7)        1st=0.7950+/-0.0249   full-2nd=0.8517+/-0.0297"
+    )
     measure("current pin, unmodified")
     for k in repl:
         setattr(gauss_math, k, repl[k])

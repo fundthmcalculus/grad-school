@@ -53,9 +53,9 @@ import tribblefis.gaussian_regressor as _gr  # noqa: E402
 # pilot still runs against an older pin. Superseded by
 # reproduce/tables/table_a7_regression_scale.py (checklist C13), but a
 # superseded script that raises ImportError is not superseded, it is broken.
-MixtureOfGaussiansFuzzyRegressor = getattr(
-    _gr, "TribbleRegressor", None
-) or _gr.MixtureOfGaussiansFuzzyRegressor
+MixtureOfGaussiansFuzzyRegressor = (
+    getattr(_gr, "TribbleRegressor", None) or _gr.MixtureOfGaussiansFuzzyRegressor
+)
 from tribblefis.scaling import UnitScalar  # noqa: E402
 
 SEED = 0
