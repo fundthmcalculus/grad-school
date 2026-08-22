@@ -153,6 +153,95 @@ which is what made the sweep 1h18m instead of ~13h at ten), and
 
 ---
 
+## 4b. Deeper profile: neither hot stage is slow because of its algorithm
+
+Both are slow for the same reason — **scalar work done through vectorized-array
+APIs, inside a Python loop.** Neither is the mathematics anyone would point at.
+
+### The screen (46%) is ~100% pandas label masking
+
+`cProfile` on one fold's `calculate_gaussian_correlation`, 27.3 s total:
+
+| | tottime | calls |
+|---|---:|---:|
+| `pandas ... missing.py:_isna_string_dtype` | **16.17 s** | 9,020 |
+| `pandas ... string_.py:_cmp_method` (cumulative 23.54 s) | 2.02 s | 9,020 |
+| `stats_numba.wasserstein_distance` (cumulative) | **0.58 s** | 4,510 |
+
+`_differentiation_score` masks with `data[y == unique_labels[ij]]` for every
+(feature, class-pair), so the same $K$ boolean masks are recomputed $M$ times —
+**9,020 comparisons over 92,293 rows** where 11 would do. The distance
+computations everyone would suspect total **0.58 s**.
+
+The cost is entirely the label **dtype**. One comparison, timed directly:
+
+| `y` dtype | one comparison | × 9,020 |
+|---|---:|---:|
+| `str` (what the harness passes) | 2.91 ms | **26.2 s** |
+| `object` | 2.59 ms | 23.4 s |
+| **`category`** | **0.02 ms** | **0.1 s** |
+
+That predicted 26.2 s against 26.22 s measured end-to-end, so the screen *is* the
+masking, to within noise.
+
+**Converting the labels to `category` is bit-identical and 11.5× faster:**
+
+```
+str      : 26.33 s   (82 scores)
+category :  2.29 s   speedup 11.5x
+max |score diff| : 0.000e+00
+ranking identical: True
+```
+
+The ranking being identical matters for more than correctness: it means this
+does **not** disturb the order dependence of §3 above.
+
+End to end on one fold:
+
+| | screen | memb | to_model | predict | total |
+|---|---:|---:|---:|---:|---:|
+| `str` | 26.09 | 4.39 | 23.65 | 0.84 | **54.97 s** |
+| `category` | 2.29 | 1.97 | 23.42 | 0.86 | **28.54 s** |
+
+**1.93× per fold, predictions identical, order identical.** It also halves
+`create_gaussian_membership_dict`, which pays the same masking cost.
+
+### `to_simple_model` (44%) is 2.9M scalar `np.isclose` calls
+
+`gauss_data.py:_is_close` is called **2,800,161** times and calls `np.isclose`
+**2,921,252** times — the membership-function dedup of §4.3.1 (`rtol=1e-2,
+atol=1e-3`), as an $O(T^2)$ scan over 902 antecedent terms with a scalar
+`np.isclose` per attribute per pair.
+
+Appendix A.3 records that cProfile's per-call charge once turned a 9.8% speedup
+into a published 19%, so this one gets a wall clock rather than a profile:
+
+```
+np.isclose(scalar)   8.06 us/call  ->  2.9M calls = 23.4 s
+plain-python equiv   0.12 us/call  ->  2.9M calls =  0.3 s   (70x)
+```
+
+23.4 s against the 23.65 s actually measured for `to_simple_model`. The profile's
+story survives the wall clock: **the stage is its `isclose` calls and nothing
+else.** `np.isclose` on two Python floats allocates arrays, enters an errstate
+context and runs two ufunc reductions, for a comparison that is one subtraction.
+
+**Not proposed as a drop-in yet.** `np.isclose` is
+`|a-b| <= atol + rtol*|b|`, which the plain expression reproduces exactly — but
+it also has NaN and inf semantics the plain form does not, and per §3 this code
+path is dedup, where §4.3.1 already shows the *order* of comparison decides which
+membership function survives. A change here has to be shown bit-identical on real
+data before it is worth 70×, not argued from the formula.
+
+### What the two together would be worth
+
+| | per fold | `table_4_4_openset` |
+|---|---:|---:|
+| today | 55.8 s | 3h 38m |
+| screen as `category` | 28.5 s | **~2h 06m** |
+| + dedup vectorised *(unverified)* | ~5 s | **~20 m** |
+
+
 ## 5. Owed
 
 1. **Pin down the order mechanism** — instrument the t-conorm chain and confirm
