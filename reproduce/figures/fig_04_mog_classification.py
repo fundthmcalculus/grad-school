@@ -36,7 +36,11 @@ import figstyle as F  # noqa: E402
 NAME = "04-mog-classification"
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-GLASS = os.path.join(REPO, "glass.csv")
+# Glass lives in data/; the bare repo-root path is where it used to be, and
+# is kept as a fallback rather than assumed gone.
+GLASS = os.path.join(REPO, "data", "glass.csv")
+if not os.path.exists(GLASS):
+    GLASS = os.path.join(REPO, "glass.csv")
 TARGET_CLASS = 1  # building windows, float processed -- the largest class
 N_FEATURES = 3  # "two or three features stacked", per the caption
 

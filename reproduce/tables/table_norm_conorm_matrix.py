@@ -72,9 +72,16 @@ def _rmse(y, p):
 
 
 def mog_regressor(family, seed):
-    from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
+    # Renamed upstream: MixtureOfGaussiansFuzzyRegressor -> TribbleRegressor.
+    # This file was missed by the B12(a) sweep that fixed the same rename in
+    # table_a1_feature_scoring and table_4_8_mf_dedup, so BOTH flat-MoG rows of
+    # this table have been silently N/A ever since -- the skip path works, which
+    # is why nothing failed and nobody noticed. Try the new name first and keep
+    # the old one as a fallback so the generator still runs against an older pin.
+    import tribblefis.gaussian_regressor as gr
 
-    return MixtureOfGaussiansFuzzyRegressor(
+    cls = getattr(gr, "TribbleRegressor", None) or gr.MixtureOfGaussiansFuzzyRegressor
+    return cls(
         n_output_buckets=3,
         tsk_order="1st",
         top_n=-1,
@@ -84,11 +91,11 @@ def mog_regressor(family, seed):
 
 
 def mog_classifier(family, seed):
-    from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+    # Same rename as above: MixtureOfGaussiansFuzzyClassifier -> TribbleClassifier.
+    import tribblefis.gaussian_classifier as gc
 
-    return MixtureOfGaussiansFuzzyClassifier(
-        top_n=5, norm_conorm=family, random_state=seed
-    )
+    cls = getattr(gc, "TribbleClassifier", None) or gc.MixtureOfGaussiansFuzzyClassifier
+    return cls(top_n=5, norm_conorm=family, random_state=seed)
 
 
 def tree_regressor(family, seed):

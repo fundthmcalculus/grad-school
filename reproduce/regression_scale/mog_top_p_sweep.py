@@ -47,7 +47,15 @@ import _datasets as D  # noqa: E402
 FIS_ROOT = os.environ.get("PILOT_TRIBBLE_FIS", os.path.join(REPO_ROOT, "tribble-fis"))
 sys.path.insert(0, os.path.join(FIS_ROOT, "src"))
 
-from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor  # noqa: E402
+import tribblefis.gaussian_regressor as _gr  # noqa: E402
+
+# Renamed upstream to TribbleRegressor; old name kept as a fallback so this
+# pilot still runs against an older pin. Superseded by
+# reproduce/tables/table_a7_regression_scale.py (checklist C13), but a
+# superseded script that raises ImportError is not superseded, it is broken.
+MixtureOfGaussiansFuzzyRegressor = (
+    getattr(_gr, "TribbleRegressor", None) or _gr.MixtureOfGaussiansFuzzyRegressor
+)
 from tribblefis.scaling import UnitScalar  # noqa: E402
 
 SEED = 0

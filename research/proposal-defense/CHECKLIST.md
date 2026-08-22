@@ -19,6 +19,16 @@ that table — items below that correspond to a Chapter 7 goal say so and point 
 than re-describing it.
 
 _Opened 2026-08-02, merged 2026-08-04, consolidated with timeline 2026-08-08._
+_Overnight reproduction pass against latest `main` and latest submodules, 2026-08-22._
+
+> 🚨 **Read B14 before quoting any Chapter 4 or Chapter 6 accuracy number.** The current
+> `tribble-fis` pin carries a silent wrong-answer defect in `stats_numba.wasserstein_distance`
+> that takes PhiUSIIL from $0.997 \pm 0.001$ to $0.729 \pm 0.023$ and RT-IOT2022 from
+> $0.927 \pm 0.002$ to $0.500 \pm 0.244$. Correcting that one function at the current pin returns
+> **Table 4.1** to its archived values exactly — so those cells are right as written — but it
+> recovers 11 of the ~97 ± pairs the document loses overall. **B14 is the largest single
+> cause of the drift and not the whole of it**; **D8** carries the rest.
+
 **Legend: ⬜ open · 🟨 in progress · ✅ done · 🚫 descoped · 🔒 blocked on you.**
 
 ---
@@ -42,7 +52,20 @@ _Kept as the record of what was decided and why, since several of these changed 
 materially and a committee may ask. **A9** is the reopened item (narrowed 2026-08-03); **A10**
 is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" section._
 
-- [ ] ⬜ **A9 — Decide what the document *calls* its normalization. Narrowed to A or C.**
+- [x] ✅ **A9 — SETTLED IN THE PROSE (2026-08-22): option C in §4.3/Table 4.1, option A
+      everywhere else — the reasonable default this item itself recommended.** Table 4.1 already
+      carried all three arms (raw / log+min-max / log+z-score), which is C. What was missing was
+      A: Chapter 6 still said *"cement ≥ 0.42 after standardization"* and *"the
+      log-and-standardize preprocessing"* four times, in direct contradiction of §4.3's own rule
+      that the one thing this transform is not is standardization. Chapter 6 now follows it.
+      ⚠️ **Two figures this item quotes are stale against the prose it describes.** §4.3 now
+      records the first-order z-score arm at $0.713 \pm 0.035$, not the $0.087 \pm 0.089$ below,
+      and *withdraws* the −0.407/−0.524/−0.634 component sweep rather than re-taking it — the
+      effect those numbers characterised was the output partition, not the transform. Read the
+      body below as the record of what was decided, not as current measurements; **E9** carries
+      the same correction. Original entry:
+
+  ↳ _Record of the decision, as written while it was open._ **A9-orig.**
       *(Opened 2026-08-03; narrowed the same day. **Author confirmed min-max/`UnitScalar` is
       correct**, which rules out option B below — the transform the samples now use is the one
       Ch 4 and Ch 6 have measured all along, so no number in the document is in question and
@@ -172,6 +195,16 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       image line only when the target exists and strips it to a placeholder when it does not, so
       the "figure silently reverts to a placeholder" failure mode is now governed by whether the
       harness generated the figure, not by a forgotten manual copy.
+
+      ⚠️ **One gap, found 2026-08-22.** The copy is *unconditional*: `build_pdf.py` re-installs
+      `03-complexity-fit.png` from `reproduce/outputs/figures/` on every build, so any local run
+      of `table_3_1_reorder_three_arm` silently swaps that figure into the document whether or not
+      Table 3.2 beneath it has been re-quoted from the same run. That bit this pass: the figure
+      regenerated from gcc-built kernels (fitted exponent 1.77) would have sat directly above a
+      table quoting 1.97 from an MSVC build. Reverted by hand, twice, because the build re-copies
+      it. The automation is right; what it needs is to refuse, or at least warn, when the figure
+      it is about to install came from a different archive than the table it illustrates.
+
 - [x] ✅ **B4 — Submodule SHA guard. DONE.** The harness now loudly stamps when a submodule SHA
       differs from the last archive's, taking the "loudly stamp" branch rather than refusing to
       emit (an intentional submodule change should not block a run). `run_all_tables.sh`'s
@@ -230,6 +263,27 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       reachable N under the memory cap, the wall-clock threshold) can actually be run, turning G4d
       from a *build* into an *integrate-and-measure* — **or** keep the current pin and add a "since
       fixed upstream at `<commit>`" note to A.6/G4d. Author to choose; the fix itself is done.
+
+      ✅ **RESOLVED 2026-08-22: the choice is moot and the measurement is taken.** The pin had
+      already moved. Settled by ancestry, not assumption: `c9be437` (the fix, 2026-08-10) is an
+      ancestor of the current submodule pin `635ed6e` and is *not* an ancestor of `e3c27e6` or of
+      the old pin `85b68a8`. So `e3c27e6` — which §3.4's verification permalinks still point at —
+      genuinely lacks the fix, and it is genuinely not what the harness runs.
+      **G4d's decision rule was then run in full** (`reproduce/experiments/check_matrix_free_reorder.py`,
+      outcomes registered in its docstring before the run): ordering $1.000 \pm 0.000$ at
+      $N \in \{1{,}000, 2{,}000, 5{,}000\}$ over ten seeds each against chance levels of
+      0.0010/0.0005/0.0002, with no run showing the old ascending-index signature; peak working
+      set flat at **64.7–65.2 MB** from $N = 2{,}000$ to $12{,}000$ while the implied matrix grows
+      36× (materialising arm: 193.6 MB → 4.67 GB); wall clock **0.14–0.22×** the materialising
+      arm, i.e. passing the "more than an order of magnitude slower" threshold in the opposite
+      direction. At float32 the ordering is $0.9996 \pm 0.0012$ — tie-breaking, per §3.2, not error.
+      **Two residual items, both small:** the 155,000-point figure is an *extrapolation* from a
+      ratio stable to 1.62× across an 8× change in $N$, since the in-place arm's matrix is 96 GB
+      at float32 and cannot be run here — one at-scale run on a bigger host closes it. §3.4's source
+      permalinks are **re-pinned** to `635ed6e` (done 2026-08-22): `pcvat.pyx`'s two kernels sit at
+      identical line numbers in both commits, but `vat_prim_mst` moved 141 → 159, so the cited
+      range is now L159–L226.
+      Prose updated: §3.1, §3.3.2, Table 3.3, §3.4, A.6 and Ch 7's G4d entry.
       **Original defect (kept as the record):** the exported API silently returned a wrong
       ordering — the seed vertex followed by every other vertex in ascending index order,
       chance-level agreement (0.001 ± 0.001) with the true ordering at both float64 and float32.
@@ -300,6 +354,31 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       the numeric phase itself was unaffected. Full account:
       `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`.
 
+      **(c) That rename sweep was incomplete, and the gap was invisible for the same reason the
+      original was.** Swept every generator and study script on 2026-08-22 for upstream APIs that
+      no longer exist. Three more files carried them, all confirmed GONE at the pinned SHA rather
+      than assumed:
+      - `reproduce/tables/table_norm_conorm_matrix.py` → both flat-MoG rows silently `N/A` since
+        at least the 2026-08-11 archive. **This one matters most**, because it is the sole
+        evidence for **E1**, and the failure is *graceful*: the skip path catches the ImportError,
+        prints its reason, emits `N/A`, and the generator exits 0 — so the orchestrator reported
+        *ok* and the run reported green with a third of the table empty. A graceful degradation
+        nobody reads is indistinguishable from a result.
+      - `reproduce/optimizers/structure.py` → imported `gauss_math.standard_transform` and
+        `.detect_and_apply_log_transform`, deleted in tribble-fis #67, with **no fallback**, so
+        `StructureProblem.__init__` raised before doing any work and took the optimizer structure
+        study — §6.3.5's evidence — down with it.
+      - `reproduce/regression_scale/mog_top_p_sweep.py` → same rename. Superseded by C13's
+        generator, but a superseded script that raises `ImportError` is not superseded, it is
+        broken.
+
+      All three fixed 2026-08-22, reusing `_fuzzy_models`' documented successors rather than
+      adding second copies that could drift, and keeping the old names as fallbacks so the
+      generators still run against an older pin. **The lesson is the same one B13 and Ch 8's tally
+      name:** each of these was found by grepping for the *class* of defect rather than by
+      re-checking the instances already known. A fix applied to the files you happened to be
+      looking at is not a sweep.
+
 - [ ] ⬜ **B13 — Upstream trapezoid-fitter fix: pin bumped to `141596e`, no proposal table
       moved, two sample scripts still owed.** `tribble-fis`
       [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170) fixes a defect in
@@ -360,6 +439,169 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       measurements above, and `experiments/overlap-modeling/RESULTS.md` §"Stage 4" is the full
       account.
 
+      ⚠️ **The verification above is sound and its coverage was narrower than the conclusion drawn
+      from it — see B14.** "Byte-identical across the bump" was established on `table_4_1`'s three
+      R² values, which do match, then and now. The same table's two *accuracy* columns were not
+      checked, and they had already collapsed (PhiUSIIL $0.997 \r\rightarrow 0.729$, RT-IOT2022
+      $0.927 \r\rightarrow 0.500$) at tribble-fis #95, inside the same 22-commit window this bump
+      spanned. **The concrete change owed: diff every column of the table, not the columns that are
+      easiest to eyeball.** This item's own rule was right — *"if a Gaussian row moves, something
+      else changed too and the bump is not the explanation"* — and would have caught it applied
+      whole-table.
+
+
+- [ ] 🔒 **B14 — `stats_numba.wasserstein_distance` is not the Wasserstein distance.
+      BLOCKS every Chapter 4 and Chapter 6 accuracy number at the current pin.**
+      Found 2026-08-22 by re-running the suite on latest `main` and latest submodules.
+      Full account: [`reproduce/outputs/WASSERSTEIN_REGRESSION.md`](../../reproduce/outputs/WASSERSTEIN_REGRESSION.md);
+      one-command reproduction: `reproduce/experiments/diagnose_wasserstein_regression.py`.
+
+      **The symptom.** `table_4_1_mog_baselines.py` at ten seeds against the archived run of
+      record moves the two *classification* rows by margins no seed spread covers, while the
+      three *regression* rows move slightly the other way and every training time falls 5–7×:
+      PhiUSIIL $0.997 \pm 0.001 \r\r\rightarrow 0.729 \pm 0.023$; RT-IOT2022
+      $0.927 \pm 0.002 \r\r\rightarrow 0.500 \pm 0.244$. Those are Ch 1 §1.2's and Ch 4 §4.4's
+      headline numbers.
+
+      **Attributed, not guessed.** Data frozen to one `.npz` before either library is imported
+      (and the loader did not move across the bump anyway); old library $0.9952 \pm 0.0014$
+      against new $0.7405 \pm 0.0092$ in the same shell; bisected over the 48 commits in
+      `80e98d7..141596e` to first-bad `5237ebe` (tribble-fis #95, *"Replace scipy/sklearn stats
+      functions with numba-accelerated implementations"*), parent `ce4a0fc` good; then each
+      replaced function restored one at a time at the current pin. Exactly one recovers the
+      accuracy: `wasserstein_distance` (0.9947 ± 0.0017). `norm_fit`, `norm_pdf`,
+      `jensenshannon_distance`, `silhouette_score` and `_kmeans_labels_1d` are all inert.
+
+      **The defect.** $W_1 = \int |F_u(x) - F_v(x)|\,dx$. The implementation returns the *mean*
+      of the CDF gaps over the union support, with no $dx$ weighting — dimensionless, bounded in
+      $[0,1]$, and **completely scale-invariant**: multiply both samples by 1000 and scipy's
+      answer scales by 1000 while this one returns the identical 0.245960. Against the analytic
+      values it is off by 3× to 30,000× depending on scale. Fix is one line.
+
+      **Blast radius.** It feeds `gauss_math._pairwise_label_distance`'s `"composite"` score,
+      which *is* the feature-differentiation screen; `mog_classifier` runs `top_n=5`, so a wrong
+      score picks the wrong five features. Same metric behind **A.4** and **Tables A.1/A.2**.
+      That call site's comment says it "squash[es] the *unbounded* pooled-std-normalized
+      wasserstein distance" — it is already bounded, so the squash and the composite's
+      three-term balance operate on a quantity they were not designed for.
+
+      **Table 4.1 is not wrong; the pin is.** Re-running the generator at the current pin with
+      only this function corrected returns PhiUSIIL to $0.997 \pm 0.001$ *exactly* and
+      RT-IOT2022 to $0.923 \pm 0.011$, and takes the table from 2 cells beyond noise to **0**
+      against the archive. ⚠️ That is *not* the same as restoring the document: over the whole
+      proposal the fix moves `check_prose` from 59 matching pairs to 70, against 156 under the
+      old pin. **D8** carries the remainder. `reproduce/experiments/run_with_reference_stats.py`
+      re-runs any generator that way, so the question can be settled table by table without
+      waiting on upstream. The three regression rows move identically with and without the fix,
+      so their drift has a separate and smaller cause, still untraced.
+
+      **Owed:** (a) file it upstream — *not done here; outward-facing, left to the author*;
+      (b) do not quote the current pin for any Ch 4/Ch 6 accuracy number until it lands;
+      (c) extend B13's pin-bump check to **every column of a table**, which is the concrete
+      change that would have caught this — B13 verified three R² values and concluded
+      "byte-identical", and the two accuracy columns beside them were not looked at. Ch 8's
+      tally already names the lesson: *repetition is not the same thing as coverage.*
+
+- [x] ✅ **B15 — The host lost its C toolchain; the harness now bootstraps one.** `reproduce/`
+      could not run at all: the `Microsoft Visual Studio/2022` directory is present but empty,
+      and all three submodules carry compiled extensions, so every `uv run --project …` failed
+      during resolution before a generator could import numpy. Fixed by
+      `reproduce/hostenv.sh` + `tools/ccshim/`, sourced from `run_all_tables.sh`; a no-op on
+      Linux/macOS and on any Windows host that still has MSVC. Three upstream/tooling defects had
+      to be worked around, each reproduced first:
+      (a) **`optional=True` does not survive `cythonize()`** — tribble-opt declares both
+      extensions optional so a missing compiler degrades to numba, and Cython rebuilds the
+      Extension without carrying the flag (measured: True in, False out). Since Cython is in
+      `build-system.requires`, that documented degradation has never been reachable.
+      (b) **tribble-opt picks MSVC flags by `platform.system()`, not by compiler**, so gcc is
+      handed `/O2 /openmp` and reads them as filenames. (tribble-cluster gets this right.)
+      (c) **`DIST_EXTRA_CONFIG` is honoured by `build_wheel` and ignored by `build_editable`** —
+      tribble-clustering built fine as a git dependency and failed as the project itself, same
+      shell, seconds apart. `UV_NO_EDITABLE=1` forces the wheel path.
+      ⚠️ **Consequence for Chapter 3:** the compiled kernels are now built by **gcc**, not MSVC.
+      Timings taken here are not comparable to archives taken before, and any Ch 3 timing
+      re-quote from this host must say so. This is B5b/§3.4's host hazard, extended to compilers.
+
+- [ ] ⬜ **B16 — Three smaller harness/upstream defects found in the same pass.**
+      (a) **`tribble-cluster`'s committed `uv.lock` is out of sync with its own
+      `pyproject.toml`** — `numba-progress>=1.2.0` is declared and absent from the lock (with its
+      transitive `tqdm`), so `uv run --project tribble-cluster` re-resolves and *dirties a pinned
+      submodule* on every run, which `reproduce/README.md` explicitly forbids. One `uv lock`
+      upstream fixes it.
+      (b) **`run_all_tables.sh --fast` no longer makes the suite fast.** `SLOW_TABLES` names the
+      four tables that dominated runtime in `outputs/seeds10-2026-08-01/`, and that list predates
+      RT-IOT2022 landing (2026-08-12). The two tables that now dominate —
+      `table_4_1_mog_baselines` (530 s) and `table_4_4_openset` (**> 3 h**) — are not in it, so a
+      `--fast` pass runs them at the full ten seeds. Either add them, or say in the header that
+      `--fast` no longer bounds the suite's runtime.
+      (c) **`tribble-opt` cannot be resolved as a project at all**: `requires-python = ">=3.10"`
+      against `numpy>=2.4.6`, which needs $\geq$ 3.11. Introduced by the numpy bump (`8049b94`).
+      The optimizer studies are unaffected — they run `--project tribble-fis --with-editable
+      tribble-opt` — but `uv run --project tribble-opt` is broken for anyone who tries it.
+      ⚠️ Related pin drift, no defect: **tribble-fis's `uv.lock` pins `optimizers` at `7b5958a1`
+      while the `tribble-opt` submodule is at `8049b94`**, so the tables and the optimizer studies
+      run two different revisions of the same library.
+      (d) **`table_3_7_g2_downstream` is not in the orchestrator's table list.** Its output sits in
+      every archive with no log beside it, because it has only ever been hand-run — the exact trap
+      **B12** names for `table_a1_feature_scoring` and `table_3_2_memory_precision`, still open in
+      a third place. It matters more than the others: that table is the evidence for Ch 3's G2
+      downstream claim *and* for §5.4's corrected coordinate-free claim, so a sweep that reports
+      green while silently carrying it forward is asserting a result nobody re-measured. Needs
+      adding to `CLUSTER_TABLES` with `--with aeon`.
+      (e) **Tables 4.6 and 4.7 can no longer be regenerated at all.** `load_openset_data()` prefers
+      RT-IOT2022 whenever it is present, and it has been present since 2026-08-12, so
+      `table_4_4_openset.py` now emits the RT-IOT2022 table (the prose's **4.7b**) under the same
+      output filenames. The Glass-based 4.6 and 4.7 the prose quotes are frozen at
+      `uniform-2026-08-03` with no way to re-derive them short of hiding the dataset. A
+      ✅ **Fixed 2026-08-22:** `REPRO_OPENSET_DATASET` pins the choice
+      (`glass` / `rt-iot2022` / `beth`) instead of taking the priority order, and a pinned-but-
+      absent dataset is an error rather than a reason to quietly use another — substituting one
+      silently is the whole reason the knob exists. Tables 4.6 and 4.7 regenerate again:
+      `REPRO_OPENSET_DATASET=glass`. At the current pin the shape holds and the values move
+      (4.6 peaks at $	heta = 0.90$, +0.162, against the prose's $	heta = 0.80$, +0.154;
+      4.7 keeps its ordering, Isolation Forest +0.157 > complement +0.141 > SVM +0.085, with the
+      gap narrowed from 0.047 to 0.016). Not a re-quote — **D8** applies — but they can be
+      re-derived at all now, which they could not be.
+      (f) **Glass moved into `data/` and three call sites never followed it** — fixed 2026-08-22,
+      see B12(c). Worth repeating here for the consequence: Table 4.8's Glass row and *the whole of
+      Table 4.9* were missing from the run of record, so **C4's headline correction-pass
+      measurement had no regenerable output**. Restored and re-verified; C4's conclusion holds
+      (gated cascade $+0.043 \pm 0.050$ against the prose's $+0.031 \pm 0.027$) once B14 is
+      corrected in the same run.
+
+
+- [x] ✅ **B17 — The harness now fails loudly where it failed quietly.** Every defect the
+      2026-08-22 pass found shared one shape: an upstream function kept its name and changed
+      its behaviour, the generator caught it, printed a reason, emitted `N/A` or a plausible
+      wrong number, **exited 0**, and `run_all_tables.sh` printed *ok*. Graceful degradation is
+      the right design; a graceful degradation nobody reads is indistinguishable from a result.
+      Three changes, aimed at the class rather than the instances:
+
+      **(a) `reproduce/preflight.py` — check the upstream contracts before spending hours.**
+      Five invariants a caller cannot see from a signature: `W1-SCALE` (scaling the data must
+      scale the distance — catches **B14**), `VAT-MATRIXFREE` (**B6**), `SCALER-ALIAS`
+      (`UnitScalar is MinMaxScaler`, which **B13** verified by hand once), `MODEL-NAMES`
+      (**B12**'s renames), `DATASETS` (**B16(f)**'s moved Glass). *An unavailable import is
+      reported SKIP, never PASS* — a check that passes because it could not run is the bug this
+      file exists to catch. `run_all_tables.sh` runs it per submodule environment before the
+      numeric phase; a failure does **not** abort the run but stamps the archive **NOT CITABLE**,
+      the same treatment `--fast` gets and for the same reason. It fails today, on W1-SCALE,
+      which is the point.
+
+      **(b) N/A accounting in the run summary and in `PROVENANCE.txt`.** A table now reports
+      `ok  27s  (10 N/A)` instead of `ok  27s`. Counted from the CSVs that table actually wrote,
+      via the same before/after snapshot the no-output check uses, so it needs no timestamp
+      window. This is the change that would have surfaced **E1**'s evidence base going missing
+      weeks earlier: `table_norm_conorm_matrix` emitted a third of its cells as `N/A` and
+      reported `ok` every run.
+
+      **(c) `build_pdf.py` warns when a figure copy changes the document** — **B8**'s one gap.
+      The copy is unconditional, so any local run of the generator behind a figure swaps it into
+      the document whether or not the table beside it was re-quoted from the same run. The build
+      now names each figure it changed and says a figure and its table must come from one run.
+      Verified by making it fire on `03-complexity-fit.png`, which is exactly the case that
+      caught this: a gcc-built figure (exponent 1.77) above an MSVC-built table quoting 1.97.
+
 
 ## C. Experiments owed
 **[Tier 1: critical before defense (C1, C4). Tier 2: real research (C2–C3, C5–C6, C8–C11–C13). Tier 3: defensive (C5–C6, C8). Tier 1.5: reduced scope (C4 done). Tier 4 (C7 descoped)]**
@@ -412,7 +654,24 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       features): MoG trains in $37.42 \pm 0.64$ s at $0.927 \pm 0.002$ accuracy against Random
       Forest's $0.999 \pm 0.000$ (ten seeds, `table_4_1_mog_baselines.py`). The open-set scale
       claim (§4.3.5, Table 4.7b): the complement rule loses to Isolation Forest at scale
-      (+0.394 vs +0.537 Youden's $J$, five seeds). **The *correction-rule cascade's own* scale
+      (+0.394 vs +0.537 Youden's $J$, five seeds).
+      ✅ **Re-run at the document's own ten-seed floor, 2026-08-22** (3 h 38 m; the five-seed
+      figure was a session-length compromise the prose names). The direction holds and the
+      margin narrows sharply:
+
+      | method | archive, 5 seeds | 2026-08-22, 10 seeds |
+      |---|---:|---:|
+      | Complement rule (this work) | +0.394 | **+0.515** |
+      | One-class SVM | +0.408 | +0.271 |
+      | Isolation Forest | **+0.537** | **+0.579** |
+
+      So the complement rule still loses to Isolation Forest, by **0.064** rather than 0.143, and
+      it now *beats* the one-class SVM rather than trailing it. Two caveats keep this from being a
+      re-quote: the spreads are ±0.27–±0.31, so **no separation in the table clears its own error
+      bar** — the same point §4.4 already makes about Table 4.7 — and the run is at a pin whose
+      membership fitting changed (**D8**, `_kmeans_labels_1d`), so it measures the current code
+      rather than the code the prose quotes. Report it as a ten-seed measurement of the current
+      pin; do not overwrite Table 4.7b from it until D8 is settled. **The *correction-rule cascade's own* scale
       claim is the one still open** — that specific experiment (the gated cascade below, on
       RT-IOT2022 rather than Glass) has not been run — but "RT-IOT2022 is absent" is no longer
       the reason for any of the three.
@@ -562,10 +821,169 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 - [x] ✅ **D5 — Install a LaTeX engine.** ✅ DONE (2026-08-08). `texlive-xetex texlive-latex texlive-collection-fontsrecommended` installed; `build_pdf.py` auto-detects and renders.
 - [x] ✅ **D6 — PDF build.** ✅ DONE (2026-08-08). Auto-rebuilds on every `python build_pdf.py` run; appends CHECKLIST at the end.
 
+- [ ] ⬜ **D7 — Consolidate the seven state-then-walk-it-back passages.** Marked in place, not
+      rewritten, because which to compress is an authorial call. Find them with:
+
+      ```bash
+      grep -rn "CONSOLIDATE" research/proposal-defense/prose/
+      ```
+
+      `research/proposal-defense/mark_consolidations.py` inserts and re-checks them; the markers
+      are HTML comments, which `build_pdf.py` strips, so they are invisible in the PDF and
+      greppable in the source. The pattern in each: a number is reported, then an earlier pass of
+      this same work is reported to have found a different one, then that one is withdrawn. Every
+      retracted value appears nowhere else in the document and none was ever published, so for a
+      first-time reader the retraction is the only place the wrong number lives at all. The seven:
+      §3.3.3/Table 3.4's 30–56× parenthetical; §4.3's withdrawn $0.014 \pm 0.195$ z-score paragraph;
+      §4.4's −0.434 zeroth-order caveat (the same finding as the previous one, told twice);
+      §5.4's Reproduction note on the two-week `NameError` that changed no number; §5.4's
+      `many_scale` paragraph, which states its result three times against its own history; §6.4's
+      superseded ±0.241/±0.210 spreads; and A.6's withdrawal of a belief asserted nowhere else.
+      **Two deliberately NOT marked**, because they are live methodology rather than archaeology:
+      §3.4's retraction of ratio-invariance across machines, and §6.3.5's superseded two-optimizer
+      comparison. Both earn their history.
+
+
+- [ ] ⬜ **D8 — The document does not reproduce against the current pins, and B14 is only the
+      largest cause. Account for the rest, table by table.** `check_prose.py` over the whole
+      proposal, same prose, three archives:
+
+      | archive | ok | drifted | untraceable |
+      |---|---:|---:|---:|
+      | `goal-8h-2026-08-11-fullsuite` (old pin) | **156** | 10 | 44 |
+      | `full-2026-08-22` (current pin, 16/16 green at ten seeds) | **59** | 23 | 128 |
+      | `wasserstein-fixed-2026-08-22` (current pin, B14 corrected in-process) | **70** | 23 | 117 |
+
+      Four causes are identified and three of them are benign:
+      1. **B14** — decisive where its mechanism applies and irrelevant elsewhere. `table_4_1`
+         goes 2 cells beyond noise → **0**; `table_6_1` 5 → 1. Worth 11 pairs document-wide (59 → 70).
+      2. **The compiler (B15).** Chapter 3's kernels are gcc-built on this host, not MSVC, so
+         ⚠️ **it moves the fitted exponents, not only the seconds.** Stage two:
+         **1.97** (prose) → **1.89** (archive, MSVC) → **1.77** (this pass, gcc). §3.4 calls the
+         exponent "the most portable quantity… invariant to any constant factor", and concedes
+         one host-to-host move (2.12 laptop against 1.97 workstation); a *compiler* change on
+         one host moves it about as far. Two consequences: the archive's own 1.89 already sits
+         **below** the 1.93–1.97 stability band §3.4 claims across five runs, which is a
+         pre-existing drift nobody had noticed; and the quadratic claim should rest on the
+         cubic-versus-quadratic *separation*, which survives every variation, rather than on a
+         decimal that does not. §3.4 updated to say so. **Figure 3.2 was deliberately NOT
+         re-committed from this pass** — a gcc-built figure beside MSVC-built exponents in the
+         table beneath it would be worse than a stale one.
+         every Chapter 3 timing moved. Exactness columns did not. Not a defect — but it means
+         **no Chapter 3 timing can be re-quoted from `full-2026-08-22`** without a host that can
+         rebuild with MSVC, or an explicit note that the compiler changed.
+      3. **The landed FCM fix (E2c).** Table 3.4 moved again, exactly as E2c predicted it would.
+      4. **Restored rows.** The norm/conorm flat-MoG rows, Table 4.8's Glass row and the whole of
+         Table 4.9 were *missing* from the archive and now exist, so they register as differences
+         against nothing. See B12(c).
+
+      **What is left over is the actual item.** After correcting B14, `table_a1_feature_ranking`
+      still moves 8 cells beyond noise, `table_a2_feature_count` 21, and
+      `table_g5_output_partitioning` 11 — none of which the compiler, the FCM fix or a restored
+      row explains. The three regression rows of `table_4_1` are the cleanest instance: they moved
+      $0.795 \rightarrow 0.808$, $0.852 \rightarrow 0.867$, $0.939 \rightarrow 0.960$ and move
+      *identically with and without* the B14 correction, so they have a separate cause.
+
+      ✅ **That instance is now traced** (`reproduce/experiments/diagnose_regression_drift.py`,
+      `--freeze` / `--probe` / `--isolate`). Features are frozen once, already normalized, so the
+      probe isolates the model from the scaler. Bisected over the same 48 commits:
+
+      | tribble-fis commit | 1st order | full-2nd |
+      |---|---:|---:|
+      | `80e98d7` (archive pin) | 0.7950 ± 0.0249 | 0.8517 ± 0.0297 |
+      | `ce4a0fc` (#87) | 0.7950 ± 0.0249 | 0.8517 ± 0.0297 |
+      | **`5237ebe` (#95)** | **0.8041 ± 0.0297** | **0.8680 ± 0.0277** |
+      | `141596e` (current) | 0.8078 ± 0.0297 | 0.8666 ± 0.0311 |
+
+      **It is the same commit as B14** — #95, the scipy/sklearn → numba replacement — acting
+      through a *different* function, which is why restoring `wasserstein_distance` never moved
+      these rows. Restoring each replacement one at a time at the current pin, exactly one moves
+      them: **`_kmeans_labels_1d`**, back to 0.7986 ± 0.0255 / 0.8521 ± 0.0287 (the full-2nd row
+      lands on the archive to within 0.0004). The others are inert.
+
+      The mechanism: sklearn's `KMeans` seeds with **k-means++**; the replacement `kmeans_1d` takes
+      a **single uniform-random start** and no restarts. That changes the 1-D mixture
+      initialization, hence the fitted memberships, hence $R^2$. **Unlike B14 this is not a wrong
+      answer** — the values went *up* — but it is an unexplained change to a headline number
+      arriving inside a commit described as a performance optimization, and a single random start
+      is a worse guarantee than k-means++ even where it happens to score better. Worth one
+      sentence upstream and a decision here about which to quote.
+
+      ✅ **The residue is now fully attributed (2026-08-22). Two upstream commits and host
+      noise account for every drifting cell; nothing is left unexplained.**
+      `reproduce/experiments/run_with_reference_stats.py` restores any subset of the six functions
+      #95 replaced (`REPRO_RESTORE=wasserstein,kmeans` / `all` / `none`) and re-runs a generator
+      unmodified. Restoring **all six** at the current pin, against the archive:
+
+      | table | result | cause |
+      |---|---|---|
+      | `table_a1_feature_ranking` | **byte-identical** | #95 |
+      | `table_g5_output_partitioning` | **byte-identical** | #95 |
+      | `table_g5b_skew_sweep` | **byte-identical** | #95 |
+      | `table_a2_feature_count` | every accuracy identical; only wall-clock differs | #95 |
+      | `table_4_1`, classification rows | **exact** ($0.997 \pm 0.001$, $0.927 \pm 0.002$) | #95 (`wasserstein_distance`) |
+      | `table_4_1`, Concrete rows | within 0.004 | #95 (`_kmeans_labels_1d`) |
+      | `table_4_1`, **Bike Sharing** | 0.962 vs 0.939 — **not** recovered | **#102**, below |
+      | `table_6_1`, `table_concrete_reconciliation` | 3rd–4th decimal (9.122 → 9.117 RMSE) | host / BLAS |
+      | `table_norm_conorm_matrix`, `table_4_8_mf_dedup` | extra rows the archive lacks | rows this pass **restored** (B12(c), B16(f)) |
+
+      **Bike Sharing is a second commit, and a pleasing one.** Probed on frozen features: the
+      archive's pin `80e98d7` gives $0.9394 \pm 0.0043$ — the archive's own 0.939 ± 0.004 — and the
+      current pin gives $0.9646 \pm 0.0013$. Bisected in one probe to **`69e0bab`** (#102), whose
+      parent `5b92ec8` reads $0.9348 \pm 0.0035$. The diff is a single default:
+      `pin_extremes=True` → `pin_extremes=False` in `TribbleRegressor`.
+
+      That is **the same parameter §4.3.2's G5 study is about**. G5 measured pinning the extreme
+      bucket centroids to the observed min and max as costing 0.676 $R^2$ at zeroth order on
+      Concrete, and recommended against it; upstream independently flipped the default the same
+      way. So this drift is not a regression at all — it is the library adopting the proposal's own
+      recommendation, worth +0.025 on a heavily skewed count target. **§4.3.2 and G5 should say
+      that the default now matches the recommendation**, which is a stronger position than
+      recommending against a shipped default.
+
+      **Consequence for the archive question:** `full-2026-08-22` remains a *diagnostic* archive
+      and the run of record stays `goal-8h-2026-08-11-fullsuite` — but for a different reason than
+      before. Not "we do not know what moved" any more; rather, one of the two causes (B14) is a
+      defect awaiting an upstream fix (`tribble-fis` PR #171, CI green on both kernels), and the
+      other (#102) is an improvement the prose has not yet absorbed. Once #171 lands, a pin bump
+      plus a re-run should reproduce the archive everywhere except Bike Sharing and the
+      restored rows, both of which are then *expected* moves with a stated reason.
+
+
 ## E. Decisions and framing
 **[Tier 0–4: mix of settled defaults (E1, E3), verification paths (E2, E2b, E2c), and low-stakes editorial (E10). E1.6–E1.7 Tier 1 (normalization + FCM). E9 low-priority investigation.]**
 
-- [ ] ⬜ **E1 — t-norm: present min/max as the default.** *(Author decision recorded 2026-08-02:
+- [ ] ⬜ **E1 — t-norm: present min/max as the default. ⚠️ Its evidence base was broken and is
+      now repaired; the numbers below are superseded.** `table_norm_conorm_matrix.py` imported
+      `MixtureOfGaussiansFuzzyRegressor` and `MixtureOfGaussiansFuzzyClassifier`, renamed upstream
+      to `TribbleRegressor`/`TribbleClassifier` — the **same rename B12(a) swept for, in a file
+      that sweep missed**. Both flat-MoG rows of this table have therefore been silently `N/A`
+      since at least the 2026-08-11 archive, which is why nothing failed: the skip path works
+      exactly as designed, prints its reason, and emits `N/A`, so the table reported *ok* and the
+      run reported green with a third of its rows empty. Fixed 2026-08-22 (new name first, old
+      name as a fallback so the generator still runs against an older pin).
+      **What the restored rows show**, ten seeds on Concrete and PhiUSIIL:
+
+      | model | min/max | probability | **Łukasiewicz** | hamacher | einstein |
+      |---|---:|---:|---:|---:|---:|
+      | flat MoG-TSK, $R^2$ | 0.576 ± 0.037 | 0.605 ± 0.042 | **−0.507 ± 0.254** | 0.588 ± 0.041 | 0.607 ± 0.041 |
+      | HME (experts only), $R^2$ | 0.735 ± 0.040 | 0.745 ± 0.035 | **−1.084 ± 0.397** | 0.741 ± 0.038 | 0.744 ± 0.035 |
+
+      So **the reportable finding survives and is now demonstrable on both models** rather than
+      one: Łukasiewicz collapses the regression models while the other four sit within 0.03 of
+      each other. Two corrections to this item's own text: the magnitudes are not the −3.761 /
+      −3.626 recorded here, and **"min/max is nominally best for the flat MoG (0.651 vs 0.650)"
+      does not reproduce** — min/max is the *worst* of the four non-Łukasiewicz families here
+      (0.576 against einstein's 0.607). ⚠️ **Do not re-quote the absolute values yet**: this table
+      runs through the feature screen and is therefore affected by **B14** (its PhiUSIIL
+      accuracies all sit in the broken ≈0.73 band). The Łukasiewicz collapse is far too large to
+      be a B14 artifact; the finer family ordering is not, and must be re-taken after B14 lands.
+      The rest of this item stands unchanged: the case for min/max is simplicity rather than
+      accuracy, and **the whole study still appears in no chapter** — §4.3.5 says only that the
+      conorm family is "a parameter" and that the family sweep is on accuracy only. Harvest it or
+      drop the reference. Original entry:
+
+  ↳ _As recorded 2026-08-02._ *(Author decision recorded 2026-08-02:
       keep tables at factory/library defaults, show the better configuration alongside, treat as
       future work.)* Upstream `53e89ab` made *probability* the library default. Data: min/max is
       nominally best for the flat MoG (0.651 vs 0.650) but by 0.001 against σ ≈ 0.05, so the case
@@ -618,8 +1036,21 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       rivals the mean (29.16 ± 26.21 s). And the N=48,000 demonstration moved 3.3× between runs
       at the VRAM edge (9.2 of 11.6 GB), cause unknown — likely WDDM memory management; it is
       labelled volatile.
-- [ ] ⬜ **E2c — Upstream fix for the CPU FCM formulation, filed as
-      [clustering#62](https://github.com/fundthmcalculus/clustering/issues/62) (2026-08-04).**
+- [x] ✅ **E2c — LANDED UPSTREAM (verified 2026-08-22). The CPU FCM formulation is fixed;
+      Table 3.4 and §3.3.3 must now be re-measured, which is **E2b**.** `clustering` #75
+      (`bb61851`) replaces the broadcasting distance computation with the gram identity and a
+      GEMM, and #72 (`5f1bb1d`) adds the `n_iter_` and `converged` fields plus a `max_iter`
+      parameter — both halves of what the issue asked for. Confirmed by reading
+      `src/tribbleclustering/fcm.py` at the pinned SHA, not from the commit messages: the
+      distance block now carries the comment *"gram identity"* and `FuzzyCMeansResult`
+      declares `n_iter_: int` and `converged: bool`. The pin (`635ed6e`) contains both.
+      **Consequence:** the warning this item carried — *"Table 3.4's device row moves again
+      once it lands"* — has come due, so the device row is provisional in the same direction
+      twice, exactly as predicted. The ~10× CPU-side win is now real and available with no
+      GPU involved, and still appears in no chapter. Original account, kept as the record:
+
+  ↳ _Record of the filing, kept for the diagnosis; superseded by the line above._ **E2c-orig**,
+      [clustering#62](https://github.com/fundthmcalculus/clustering/issues/62) (2026-08-04).
       This is the root cause **E2b** re-quotes around, not a separate finding: `_get_weights`
       computes distances by NumPy broadcasting, allocating an `(n,k,d)` temporary, then forms an
       `(n,k,k)` ratio tensor to normalise the weights — at n = 500,000, k = 10, d = 20 that is

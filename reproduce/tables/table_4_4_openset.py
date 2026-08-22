@@ -72,11 +72,55 @@ THETA_SWEEP_SEEDS = (
 )
 
 
+def _glass():
+    path = os.path.join(F.DATA_DIR, "glass.csv")
+    if not os.path.exists(path):
+        # Glass moved into data/; this fallback is the pre-move location.
+        path = os.path.join(F.REPO_ROOT, "glass.csv")
+    if not os.path.exists(path):
+        return None
+    df = pd.read_csv(path).dropna()
+    return df.drop(columns=["Type"]).astype(float), df["Type"].astype(int)
+
+
 def load_openset_data():
-    """(X, y) for the leave-one-class-out protocol.
+    """(X, y, name) for the leave-one-class-out protocol.
 
     Priority: RT-IOT2022 (123k) > BETH (3.8M) > Glass (214).
+
+    `REPRO_OPENSET_DATASET` pins the choice instead of taking the priority order.
+    That override exists because the priority silently reassigned what this
+    generator produces: RT-IOT2022 landed in the repository on 2026-08-12, and
+    from that moment the script emitted the RT-IOT2022 table -- the proposal's
+    **Table 4.7b** -- under the same output filenames that Tables 4.6 and 4.7
+    are quoted from. Those two are Glass measurements, and there was no way to
+    re-derive them short of hiding the dataset. Checklist B16(e).
+
+        REPRO_OPENSET_DATASET=glass  ->  Tables 4.6 / 4.7
+        REPRO_OPENSET_DATASET=rt-iot2022 -> Table 4.7b (the current default)
     """
+    pin = os.environ.get("REPRO_OPENSET_DATASET", "").strip().lower()
+    if pin:
+        loaders = {
+            "glass": ("Glass", _glass),
+            "rt-iot2022": ("RT-IOT2022", F.load_rt_iot2022),
+            "beth": ("BETH", lambda: (F.load_beth() or {}).get("train")),
+        }
+        if pin not in loaders:
+            raise SystemExit(
+                f"REPRO_OPENSET_DATASET={pin!r} is not one of {sorted(loaders)}"
+            )
+        name, fn = loaders[pin]
+        got = fn()
+        if got is None:
+            # Pinned and absent is an error, not a reason to quietly use another
+            # dataset -- silently substituting one is the whole reason this knob
+            # exists.
+            raise SystemExit(f"REPRO_OPENSET_DATASET={pin!r} but {name} is unavailable")
+        X, y = got
+        print(f"  [data] REPRO_OPENSET_DATASET={pin} -- using {name}")
+        return X, y, name
+
     # Try RT-IOT2022 first (large-scale public dataset)
     iot = F.load_rt_iot2022()
     if iot is not None:
@@ -92,14 +136,13 @@ def load_openset_data():
         return X, y, "BETH"
 
     # Fall back to Glass (small public dataset)
-    path = os.path.join(F.REPO_ROOT, "glass.csv")
-    if not os.path.exists(path):
+    got = _glass()
+    if got is None:
         return None
-    df = pd.read_csv(path).dropna()
     print(
         "  [data] RT-IOT2022 and BETH absent -- leave-one-class-out on Glass (214 × 9)"
     )
-    return (df.drop(columns=["Type"]).astype(float), df["Type"].astype(int), "Glass")
+    return got[0], got[1], "Glass"
 
 
 def complement_rule(X_tr, y_tr, X_te):

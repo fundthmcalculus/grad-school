@@ -123,14 +123,43 @@ def copy_figures():
 
     os.makedirs(dest_dir, exist_ok=True)
     copied = 0
+    replaced = []
 
     for harness_name, prose_name in FIGURE_COPIES.items():
         for ext in ("png", "eps"):
             source = os.path.join(source_dir, f"{harness_name}.{ext}")
             dest = os.path.join(dest_dir, f"{prose_name}.{ext}")
-            if os.path.exists(source):
-                shutil.copy2(source, dest)
-                copied += 1
+            if not os.path.exists(source):
+                continue
+            # The copy is unconditional, and that is a hazard worth naming rather
+            # than removing. Any local run of the generator behind a figure swaps
+            # it into the document, whether or not the TABLE beside it has been
+            # re-quoted from the same run. It happened on 2026-08-22: a figure
+            # rebuilt from gcc-compiled kernels (fitted exponent 1.77) would have
+            # sat directly above a table quoting 1.97 from an MSVC build.
+            #
+            # The automation is right -- the manual hop it replaced is worse. What
+            # it owes the reader is a warning when it is about to change what the
+            # document shows, so the change is a decision instead of a side effect.
+            differs = not (
+                os.path.exists(dest)
+                and os.path.getsize(dest) == os.path.getsize(source)
+                and open(dest, "rb").read() == open(source, "rb").read()
+            )
+            shutil.copy2(source, dest)
+            copied += 1
+            if differs and ext == "png":
+                replaced.append((prose_name, harness_name))
+
+    if replaced:
+        print("    ⚠ figure(s) CHANGED by this build -- check the table beside each:")
+        for prose_name, harness_name in replaced:
+            print(
+                f"      {prose_name}.png  <- reproduce/outputs/figures/{harness_name}.png"
+            )
+        print(
+            "      A figure and the table it illustrates must come from the same run."
+        )
 
     return copied
 

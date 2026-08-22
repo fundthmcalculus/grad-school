@@ -1,0 +1,3259 @@
+Appendix A.4 -- feature scoring
+  [phiusiil] repo loader, data from data\PhiUSIIL_Phishing_URL_Dataset.csv
+  N=20000  M=50  seeds=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  scorers=['wasserstein', 'bhattacharyya', 'composite']
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2467
+ 3. DegitRatioInURL                - Score: 0.0745
+ 4. LetterRatioInURL               - Score: 0.0506
+ 5. HasSocialNet                   - Score: 0.0493
+ 6. HasCopyrightInfo               - Score: 0.0423
+ 7. CharContinuationRate           - Score: 0.0358
+ 8. HasDescription                 - Score: 0.0358
+ 9. HasSubmitButton                - Score: 0.0265
+10. IsHTTPS                        - Score: 0.0259
+11. IsResponsive                   - Score: 0.0234
+12. HasHiddenFields                - Score: 0.0223
+13. ObfuscationRatio               - Score: 0.0209
+14. HasFavicon                     - Score: 0.0209
+15. HasTitle                       - Score: 0.0173
+16. Robots                         - Score: 0.0165
+17. Pay                            - Score: 0.0145
+18. TLDLegitimateProb              - Score: 0.0110
+19. Bank                           - Score: 0.0072
+20. HasExternalFormSubmit          - Score: 0.0068
+21. HasPasswordField               - Score: 0.0052
+22. Crypto                         - Score: 0.0035
+23. NoOfSelfRedirect               - Score: 0.0030
+24. NoOfQMarkInURL                 - Score: 0.0029
+25. NoOfSubDomain                  - Score: 0.0024
+26. IsDomainIP                     - Score: 0.0020
+27. NoOfURLRedirect                - Score: 0.0018
+28. HasObfuscation                 - Score: 0.0018
+29. URLSimilarityIndex             - Score: 0.0010
+30. NoOfOtherSpecialCharsInURL     - Score: 0.0008
+31. NoOfEqualsInURL                - Score: 0.0007
+32. TLDLength                      - Score: 0.0006
+33. DomainTitleMatchScore          - Score: 0.0005
+34. URLTitleMatchScore             - Score: 0.0004
+35. NoOfiFrame                     - Score: 0.0004
+36. NoOfCSS                        - Score: 0.0003
+37. NoOfJS                         - Score: 0.0003
+38. DomainLength                   - Score: 0.0003
+39. NoOfAmpersandInURL             - Score: 0.0002
+40. NoOfDegitsInURL                - Score: 0.0002
+41. NoOfPopup                      - Score: 0.0001
+42. NoOfObfuscatedChar             - Score: 0.0001
+43. NoOfEmptyRef                   - Score: 0.0001
+44. NoOfImage                      - Score: 0.0001
+45. NoOfLettersInURL               - Score: 0.0001
+46. NoOfSelfRef                    - Score: 0.0001
+47. URLLength                      - Score: 0.0000
+48. NoOfExternalRef                - Score: 0.0000
+49. LineOfCode                     - Score: 0.0000
+50. LargestLineLength              - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9535
+ 3. HasSocialNet                   - Score: 0.8089
+ 4. NoOfQMarkInURL                 - Score: 0.7727
+ 5. IsDomainIP                     - Score: 0.7257
+ 6. NoOfEqualsInURL                - Score: 0.7094
+ 7. HasObfuscation                 - Score: 0.7027
+ 8. HasTitle                       - Score: 0.6919
+ 9. NoOfSelfRef                    - Score: 0.6341
+10. NoOfCSS                        - Score: 0.6285
+11. NoOfImage                      - Score: 0.6165
+12. NoOfAmpersandInURL             - Score: 0.5999
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5852
+14. DegitRatioInURL                - Score: 0.5662
+15. NoOfJS                         - Score: 0.5612
+16. NoOfiFrame                     - Score: 0.5599
+17. NoOfEmptyRef                   - Score: 0.5105
+18. LargestLineLength              - Score: 0.5048
+19. NoOfObfuscatedChar             - Score: 0.5008
+20. ObfuscationRatio               - Score: 0.4507
+21. NoOfExternalRef                - Score: 0.4438
+22. NoOfDegitsInURL                - Score: 0.4382
+23. URLLength                      - Score: 0.4150
+24. NoOfLettersInURL               - Score: 0.4135
+25. LineOfCode                     - Score: 0.4119
+26. HasCopyrightInfo               - Score: 0.4102
+27. HasDescription                 - Score: 0.3852
+28. HasExternalFormSubmit          - Score: 0.3706
+29. NoOfPopup                      - Score: 0.3686
+30. SpacialCharRatioInURL          - Score: 0.2566
+31. CharContinuationRate           - Score: 0.2149
+32. HasSubmitButton                - Score: 0.1994
+33. DomainLength                   - Score: 0.1988
+34. Robots                         - Score: 0.1769
+35. URLCharProb                    - Score: 0.1755
+36. Pay                            - Score: 0.1582
+37. HasHiddenFields                - Score: 0.1528
+38. HasFavicon                     - Score: 0.1504
+39. Crypto                         - Score: 0.1461
+40. DomainTitleMatchScore          - Score: 0.1210
+41. LetterRatioInURL               - Score: 0.1063
+42. IsResponsive                   - Score: 0.1040
+43. Bank                           - Score: 0.0926
+44. NoOfSubDomain                  - Score: 0.0873
+45. URLTitleMatchScore             - Score: 0.0837
+46. HasPasswordField               - Score: 0.0639
+47. NoOfSelfRedirect               - Score: 0.0481
+48. TLDLength                      - Score: 0.0256
+49. NoOfURLRedirect                - Score: 0.0039
+50. TLDLegitimateProb              - Score: 0.0014
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9899
+ 3. DegitRatioInURL                - Score: 0.8638
+ 4. HasTitle                       - Score: 0.8160
+ 5. HasCopyrightInfo               - Score: 0.7119
+ 6. URLSimilarityIndex             - Score: 0.7069
+ 7. NoOfQMarkInURL                 - Score: 0.6978
+ 8. HasDescription                 - Score: 0.6741
+ 9. ObfuscationRatio               - Score: 0.6589
+10. SpacialCharRatioInURL          - Score: 0.6530
+11. IsDomainIP                     - Score: 0.6476
+12. HasObfuscation                 - Score: 0.6263
+13. URLCharProb                    - Score: 0.5829
+14. NoOfEqualsInURL                - Score: 0.5724
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5190
+16. HasExternalFormSubmit          - Score: 0.5143
+17. CharContinuationRate           - Score: 0.5102
+18. NoOfCSS                        - Score: 0.5051
+19. HasSubmitButton                - Score: 0.4823
+20. NoOfiFrame                     - Score: 0.4752
+21. NoOfAmpersandInURL             - Score: 0.4725
+22. NoOfJS                         - Score: 0.4664
+23. NoOfSelfRef                    - Score: 0.4463
+24. NoOfImage                      - Score: 0.4410
+25. Robots                         - Score: 0.4170
+26. HasHiddenFields                - Score: 0.4165
+27. HasFavicon                     - Score: 0.4081
+28. NoOfEmptyRef                   - Score: 0.4041
+29. LetterRatioInURL               - Score: 0.3998
+30. NoOfObfuscatedChar             - Score: 0.3996
+31. Pay                            - Score: 0.3869
+32. NoOfDegitsInURL                - Score: 0.3756
+33. IsResponsive                   - Score: 0.3596
+34. NoOfExternalRef                - Score: 0.3403
+35. NoOfLettersInURL               - Score: 0.3357
+36. URLLength                      - Score: 0.3336
+37. NoOfPopup                      - Score: 0.3248
+38. LargestLineLength              - Score: 0.3131
+39. LineOfCode                     - Score: 0.2944
+40. Crypto                         - Score: 0.2866
+41. Bank                           - Score: 0.2619
+42. DomainLength                   - Score: 0.2505
+43. DomainTitleMatchScore          - Score: 0.2203
+44. NoOfSubDomain                  - Score: 0.2093
+45. HasPasswordField               - Score: 0.2061
+46. URLTitleMatchScore             - Score: 0.1793
+47. NoOfSelfRedirect               - Score: 0.1617
+48. TLDLength                      - Score: 0.0900
+49. TLDLegitimateProb              - Score: 0.0688
+50. NoOfURLRedirect                - Score: 0.0475
+================================================================================
+  wrote C:\personal\grad-school\reproduce\outputs\table_a1_feature_ranking.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_a1_feature_ranking.csv
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2475
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2575
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2508
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2492
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2521
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2509
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2529
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2540
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2527
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2479
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2475
+ 3. DegitRatioInURL                - Score: 0.0768
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2575
+ 3. DegitRatioInURL                - Score: 0.0784
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2508
+ 3. DegitRatioInURL                - Score: 0.0773
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2492
+ 3. DegitRatioInURL                - Score: 0.0758
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2521
+ 3. DegitRatioInURL                - Score: 0.0769
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2509
+ 3. DegitRatioInURL                - Score: 0.0785
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2529
+ 3. DegitRatioInURL                - Score: 0.0768
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2540
+ 3. DegitRatioInURL                - Score: 0.0761
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2527
+ 3. DegitRatioInURL                - Score: 0.0776
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2479
+ 3. DegitRatioInURL                - Score: 0.0763
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2475
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0522
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2575
+ 3. DegitRatioInURL                - Score: 0.0784
+ 4. LetterRatioInURL               - Score: 0.0514
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2508
+ 3. DegitRatioInURL                - Score: 0.0773
+ 4. LetterRatioInURL               - Score: 0.0500
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2492
+ 3. DegitRatioInURL                - Score: 0.0758
+ 4. LetterRatioInURL               - Score: 0.0499
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2521
+ 3. DegitRatioInURL                - Score: 0.0769
+ 4. LetterRatioInURL               - Score: 0.0518
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2509
+ 3. DegitRatioInURL                - Score: 0.0785
+ 4. LetterRatioInURL               - Score: 0.0516
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2529
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0508
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2540
+ 3. DegitRatioInURL                - Score: 0.0761
+ 4. LetterRatioInURL               - Score: 0.0518
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2527
+ 3. DegitRatioInURL                - Score: 0.0776
+ 4. LetterRatioInURL               - Score: 0.0515
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2479
+ 3. DegitRatioInURL                - Score: 0.0763
+ 4. LetterRatioInURL               - Score: 0.0505
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2475
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0522
+ 5. HasSocialNet                   - Score: 0.0493
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2575
+ 3. DegitRatioInURL                - Score: 0.0784
+ 4. LetterRatioInURL               - Score: 0.0514
+ 5. HasSocialNet                   - Score: 0.0498
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2508
+ 3. DegitRatioInURL                - Score: 0.0773
+ 4. LetterRatioInURL               - Score: 0.0500
+ 5. HasSocialNet                   - Score: 0.0483
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2492
+ 3. DegitRatioInURL                - Score: 0.0758
+ 4. LetterRatioInURL               - Score: 0.0499
+ 5. HasSocialNet                   - Score: 0.0491
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2521
+ 3. DegitRatioInURL                - Score: 0.0769
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2509
+ 3. DegitRatioInURL                - Score: 0.0785
+ 4. LetterRatioInURL               - Score: 0.0516
+ 5. HasSocialNet                   - Score: 0.0499
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2529
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0508
+ 5. HasSocialNet                   - Score: 0.0491
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2540
+ 3. DegitRatioInURL                - Score: 0.0761
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0496
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2527
+ 3. DegitRatioInURL                - Score: 0.0776
+ 4. LetterRatioInURL               - Score: 0.0515
+ 5. HasSocialNet                   - Score: 0.0494
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2479
+ 3. DegitRatioInURL                - Score: 0.0763
+ 4. LetterRatioInURL               - Score: 0.0505
+ 5. HasSocialNet                   - Score: 0.0484
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2475
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0522
+ 5. HasSocialNet                   - Score: 0.0493
+ 6. HasCopyrightInfo               - Score: 0.0422
+ 7. CharContinuationRate           - Score: 0.0359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2575
+ 3. DegitRatioInURL                - Score: 0.0784
+ 4. LetterRatioInURL               - Score: 0.0514
+ 5. HasSocialNet                   - Score: 0.0498
+ 6. HasCopyrightInfo               - Score: 0.0427
+ 7. HasDescription                 - Score: 0.0361
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2508
+ 3. DegitRatioInURL                - Score: 0.0773
+ 4. LetterRatioInURL               - Score: 0.0500
+ 5. HasSocialNet                   - Score: 0.0483
+ 6. HasCopyrightInfo               - Score: 0.0416
+ 7. HasDescription                 - Score: 0.0354
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2492
+ 3. DegitRatioInURL                - Score: 0.0758
+ 4. LetterRatioInURL               - Score: 0.0499
+ 5. HasSocialNet                   - Score: 0.0491
+ 6. HasCopyrightInfo               - Score: 0.0420
+ 7. CharContinuationRate           - Score: 0.0367
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2521
+ 3. DegitRatioInURL                - Score: 0.0769
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0497
+ 6. HasCopyrightInfo               - Score: 0.0426
+ 7. HasDescription                 - Score: 0.0359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2509
+ 3. DegitRatioInURL                - Score: 0.0785
+ 4. LetterRatioInURL               - Score: 0.0516
+ 5. HasSocialNet                   - Score: 0.0499
+ 6. HasCopyrightInfo               - Score: 0.0421
+ 7. HasDescription                 - Score: 0.0365
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2529
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0508
+ 5. HasSocialNet                   - Score: 0.0491
+ 6. HasCopyrightInfo               - Score: 0.0420
+ 7. HasDescription                 - Score: 0.0360
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2540
+ 3. DegitRatioInURL                - Score: 0.0761
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0496
+ 6. HasCopyrightInfo               - Score: 0.0427
+ 7. CharContinuationRate           - Score: 0.0361
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2527
+ 3. DegitRatioInURL                - Score: 0.0776
+ 4. LetterRatioInURL               - Score: 0.0515
+ 5. HasSocialNet                   - Score: 0.0494
+ 6. HasCopyrightInfo               - Score: 0.0430
+ 7. HasDescription                 - Score: 0.0363
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2479
+ 3. DegitRatioInURL                - Score: 0.0763
+ 4. LetterRatioInURL               - Score: 0.0505
+ 5. HasSocialNet                   - Score: 0.0484
+ 6. HasCopyrightInfo               - Score: 0.0412
+ 7. HasDescription                 - Score: 0.0355
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2475
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0522
+ 5. HasSocialNet                   - Score: 0.0493
+ 6. HasCopyrightInfo               - Score: 0.0422
+ 7. CharContinuationRate           - Score: 0.0359
+ 8. HasDescription                 - Score: 0.0356
+ 9. HasSubmitButton                - Score: 0.0265
+10. IsHTTPS                        - Score: 0.0262
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2575
+ 3. DegitRatioInURL                - Score: 0.0784
+ 4. LetterRatioInURL               - Score: 0.0514
+ 5. HasSocialNet                   - Score: 0.0498
+ 6. HasCopyrightInfo               - Score: 0.0427
+ 7. HasDescription                 - Score: 0.0361
+ 8. CharContinuationRate           - Score: 0.0358
+ 9. HasSubmitButton                - Score: 0.0273
+10. IsHTTPS                        - Score: 0.0260
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2508
+ 3. DegitRatioInURL                - Score: 0.0773
+ 4. LetterRatioInURL               - Score: 0.0500
+ 5. HasSocialNet                   - Score: 0.0483
+ 6. HasCopyrightInfo               - Score: 0.0416
+ 7. HasDescription                 - Score: 0.0354
+ 8. CharContinuationRate           - Score: 0.0353
+ 9. HasSubmitButton                - Score: 0.0260
+10. IsHTTPS                        - Score: 0.0256
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2492
+ 3. DegitRatioInURL                - Score: 0.0758
+ 4. LetterRatioInURL               - Score: 0.0499
+ 5. HasSocialNet                   - Score: 0.0491
+ 6. HasCopyrightInfo               - Score: 0.0420
+ 7. CharContinuationRate           - Score: 0.0367
+ 8. HasDescription                 - Score: 0.0352
+ 9. HasSubmitButton                - Score: 0.0264
+10. IsHTTPS                        - Score: 0.0255
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2521
+ 3. DegitRatioInURL                - Score: 0.0769
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0497
+ 6. HasCopyrightInfo               - Score: 0.0426
+ 7. HasDescription                 - Score: 0.0359
+ 8. CharContinuationRate           - Score: 0.0358
+ 9. HasSubmitButton                - Score: 0.0266
+10. IsHTTPS                        - Score: 0.0258
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2509
+ 3. DegitRatioInURL                - Score: 0.0785
+ 4. LetterRatioInURL               - Score: 0.0516
+ 5. HasSocialNet                   - Score: 0.0499
+ 6. HasCopyrightInfo               - Score: 0.0421
+ 7. HasDescription                 - Score: 0.0365
+ 8. CharContinuationRate           - Score: 0.0365
+ 9. HasSubmitButton                - Score: 0.0268
+10. IsHTTPS                        - Score: 0.0262
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2529
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0508
+ 5. HasSocialNet                   - Score: 0.0491
+ 6. HasCopyrightInfo               - Score: 0.0420
+ 7. HasDescription                 - Score: 0.0360
+ 8. CharContinuationRate           - Score: 0.0354
+ 9. HasSubmitButton                - Score: 0.0263
+10. IsHTTPS                        - Score: 0.0258
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2540
+ 3. DegitRatioInURL                - Score: 0.0761
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0496
+ 6. HasCopyrightInfo               - Score: 0.0427
+ 7. CharContinuationRate           - Score: 0.0361
+ 8. HasDescription                 - Score: 0.0353
+ 9. HasSubmitButton                - Score: 0.0266
+10. IsHTTPS                        - Score: 0.0257
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2527
+ 3. DegitRatioInURL                - Score: 0.0776
+ 4. LetterRatioInURL               - Score: 0.0515
+ 5. HasSocialNet                   - Score: 0.0494
+ 6. HasCopyrightInfo               - Score: 0.0430
+ 7. HasDescription                 - Score: 0.0363
+ 8. CharContinuationRate           - Score: 0.0360
+ 9. HasSubmitButton                - Score: 0.0268
+10. IsHTTPS                        - Score: 0.0262
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2479
+ 3. DegitRatioInURL                - Score: 0.0763
+ 4. LetterRatioInURL               - Score: 0.0505
+ 5. HasSocialNet                   - Score: 0.0484
+ 6. HasCopyrightInfo               - Score: 0.0412
+ 7. HasDescription                 - Score: 0.0355
+ 8. CharContinuationRate           - Score: 0.0352
+ 9. HasSubmitButton                - Score: 0.0263
+10. IsHTTPS                        - Score: 0.0255
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2475
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0522
+ 5. HasSocialNet                   - Score: 0.0493
+ 6. HasCopyrightInfo               - Score: 0.0422
+ 7. CharContinuationRate           - Score: 0.0359
+ 8. HasDescription                 - Score: 0.0356
+ 9. HasSubmitButton                - Score: 0.0265
+10. IsHTTPS                        - Score: 0.0262
+11. IsResponsive                   - Score: 0.0237
+12. HasHiddenFields                - Score: 0.0224
+13. ObfuscationRatio               - Score: 0.0213
+14. HasFavicon                     - Score: 0.0211
+15. HasTitle                       - Score: 0.0173
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2575
+ 3. DegitRatioInURL                - Score: 0.0784
+ 4. LetterRatioInURL               - Score: 0.0514
+ 5. HasSocialNet                   - Score: 0.0498
+ 6. HasCopyrightInfo               - Score: 0.0427
+ 7. HasDescription                 - Score: 0.0361
+ 8. CharContinuationRate           - Score: 0.0358
+ 9. HasSubmitButton                - Score: 0.0273
+10. IsHTTPS                        - Score: 0.0260
+11. IsResponsive                   - Score: 0.0232
+12. HasHiddenFields                - Score: 0.0225
+13. HasFavicon                     - Score: 0.0211
+14. ObfuscationRatio               - Score: 0.0209
+15. HasTitle                       - Score: 0.0172
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2508
+ 3. DegitRatioInURL                - Score: 0.0773
+ 4. LetterRatioInURL               - Score: 0.0500
+ 5. HasSocialNet                   - Score: 0.0483
+ 6. HasCopyrightInfo               - Score: 0.0416
+ 7. HasDescription                 - Score: 0.0354
+ 8. CharContinuationRate           - Score: 0.0353
+ 9. HasSubmitButton                - Score: 0.0260
+10. IsHTTPS                        - Score: 0.0256
+11. IsResponsive                   - Score: 0.0228
+12. HasHiddenFields                - Score: 0.0221
+13. ObfuscationRatio               - Score: 0.0218
+14. HasFavicon                     - Score: 0.0203
+15. HasTitle                       - Score: 0.0171
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2492
+ 3. DegitRatioInURL                - Score: 0.0758
+ 4. LetterRatioInURL               - Score: 0.0499
+ 5. HasSocialNet                   - Score: 0.0491
+ 6. HasCopyrightInfo               - Score: 0.0420
+ 7. CharContinuationRate           - Score: 0.0367
+ 8. HasDescription                 - Score: 0.0352
+ 9. HasSubmitButton                - Score: 0.0264
+10. IsHTTPS                        - Score: 0.0255
+11. IsResponsive                   - Score: 0.0232
+12. HasHiddenFields                - Score: 0.0219
+13. ObfuscationRatio               - Score: 0.0216
+14. HasFavicon                     - Score: 0.0207
+15. HasTitle                       - Score: 0.0171
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2521
+ 3. DegitRatioInURL                - Score: 0.0769
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0497
+ 6. HasCopyrightInfo               - Score: 0.0426
+ 7. HasDescription                 - Score: 0.0359
+ 8. CharContinuationRate           - Score: 0.0358
+ 9. HasSubmitButton                - Score: 0.0266
+10. IsHTTPS                        - Score: 0.0258
+11. IsResponsive                   - Score: 0.0232
+12. HasHiddenFields                - Score: 0.0223
+13. HasFavicon                     - Score: 0.0209
+14. ObfuscationRatio               - Score: 0.0182
+15. HasTitle                       - Score: 0.0173
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2509
+ 3. DegitRatioInURL                - Score: 0.0785
+ 4. LetterRatioInURL               - Score: 0.0516
+ 5. HasSocialNet                   - Score: 0.0499
+ 6. HasCopyrightInfo               - Score: 0.0421
+ 7. HasDescription                 - Score: 0.0365
+ 8. CharContinuationRate           - Score: 0.0365
+ 9. HasSubmitButton                - Score: 0.0268
+10. IsHTTPS                        - Score: 0.0262
+11. IsResponsive                   - Score: 0.0238
+12. HasHiddenFields                - Score: 0.0228
+13. HasFavicon                     - Score: 0.0213
+14. ObfuscationRatio               - Score: 0.0203
+15. HasTitle                       - Score: 0.0175
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2529
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0508
+ 5. HasSocialNet                   - Score: 0.0491
+ 6. HasCopyrightInfo               - Score: 0.0420
+ 7. HasDescription                 - Score: 0.0360
+ 8. CharContinuationRate           - Score: 0.0354
+ 9. HasSubmitButton                - Score: 0.0263
+10. IsHTTPS                        - Score: 0.0258
+11. IsResponsive                   - Score: 0.0234
+12. HasHiddenFields                - Score: 0.0221
+13. ObfuscationRatio               - Score: 0.0216
+14. HasFavicon                     - Score: 0.0208
+15. HasTitle                       - Score: 0.0172
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2540
+ 3. DegitRatioInURL                - Score: 0.0761
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0496
+ 6. HasCopyrightInfo               - Score: 0.0427
+ 7. CharContinuationRate           - Score: 0.0361
+ 8. HasDescription                 - Score: 0.0353
+ 9. HasSubmitButton                - Score: 0.0266
+10. IsHTTPS                        - Score: 0.0257
+11. IsResponsive                   - Score: 0.0233
+12. HasHiddenFields                - Score: 0.0223
+13. HasFavicon                     - Score: 0.0209
+14. ObfuscationRatio               - Score: 0.0201
+15. HasTitle                       - Score: 0.0171
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2527
+ 3. DegitRatioInURL                - Score: 0.0776
+ 4. LetterRatioInURL               - Score: 0.0515
+ 5. HasSocialNet                   - Score: 0.0494
+ 6. HasCopyrightInfo               - Score: 0.0430
+ 7. HasDescription                 - Score: 0.0363
+ 8. CharContinuationRate           - Score: 0.0360
+ 9. HasSubmitButton                - Score: 0.0268
+10. IsHTTPS                        - Score: 0.0262
+11. IsResponsive                   - Score: 0.0235
+12. HasHiddenFields                - Score: 0.0225
+13. HasFavicon                     - Score: 0.0212
+14. ObfuscationRatio               - Score: 0.0196
+15. HasTitle                       - Score: 0.0174
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2479
+ 3. DegitRatioInURL                - Score: 0.0763
+ 4. LetterRatioInURL               - Score: 0.0505
+ 5. HasSocialNet                   - Score: 0.0484
+ 6. HasCopyrightInfo               - Score: 0.0412
+ 7. HasDescription                 - Score: 0.0355
+ 8. CharContinuationRate           - Score: 0.0352
+ 9. HasSubmitButton                - Score: 0.0263
+10. IsHTTPS                        - Score: 0.0255
+11. IsResponsive                   - Score: 0.0232
+12. HasHiddenFields                - Score: 0.0223
+13. HasFavicon                     - Score: 0.0203
+14. ObfuscationRatio               - Score: 0.0180
+15. HasTitle                       - Score: 0.0170
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2475
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0522
+ 5. HasSocialNet                   - Score: 0.0493
+ 6. HasCopyrightInfo               - Score: 0.0422
+ 7. CharContinuationRate           - Score: 0.0359
+ 8. HasDescription                 - Score: 0.0356
+ 9. HasSubmitButton                - Score: 0.0265
+10. IsHTTPS                        - Score: 0.0262
+11. IsResponsive                   - Score: 0.0237
+12. HasHiddenFields                - Score: 0.0224
+13. ObfuscationRatio               - Score: 0.0213
+14. HasFavicon                     - Score: 0.0211
+15. HasTitle                       - Score: 0.0173
+16. Robots                         - Score: 0.0165
+17. Pay                            - Score: 0.0147
+18. TLDLegitimateProb              - Score: 0.0111
+19. Bank                           - Score: 0.0073
+20. HasExternalFormSubmit          - Score: 0.0069
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2575
+ 3. DegitRatioInURL                - Score: 0.0784
+ 4. LetterRatioInURL               - Score: 0.0514
+ 5. HasSocialNet                   - Score: 0.0498
+ 6. HasCopyrightInfo               - Score: 0.0427
+ 7. HasDescription                 - Score: 0.0361
+ 8. CharContinuationRate           - Score: 0.0358
+ 9. HasSubmitButton                - Score: 0.0273
+10. IsHTTPS                        - Score: 0.0260
+11. IsResponsive                   - Score: 0.0232
+12. HasHiddenFields                - Score: 0.0225
+13. HasFavicon                     - Score: 0.0211
+14. ObfuscationRatio               - Score: 0.0209
+15. HasTitle                       - Score: 0.0172
+16. Robots                         - Score: 0.0165
+17. Pay                            - Score: 0.0147
+18. TLDLegitimateProb              - Score: 0.0120
+19. Bank                           - Score: 0.0072
+20. HasExternalFormSubmit          - Score: 0.0069
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2508
+ 3. DegitRatioInURL                - Score: 0.0773
+ 4. LetterRatioInURL               - Score: 0.0500
+ 5. HasSocialNet                   - Score: 0.0483
+ 6. HasCopyrightInfo               - Score: 0.0416
+ 7. HasDescription                 - Score: 0.0354
+ 8. CharContinuationRate           - Score: 0.0353
+ 9. HasSubmitButton                - Score: 0.0260
+10. IsHTTPS                        - Score: 0.0256
+11. IsResponsive                   - Score: 0.0228
+12. HasHiddenFields                - Score: 0.0221
+13. ObfuscationRatio               - Score: 0.0218
+14. HasFavicon                     - Score: 0.0203
+15. HasTitle                       - Score: 0.0171
+16. Robots                         - Score: 0.0163
+17. Pay                            - Score: 0.0143
+18. TLDLegitimateProb              - Score: 0.0111
+19. Bank                           - Score: 0.0071
+20. HasExternalFormSubmit          - Score: 0.0066
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2492
+ 3. DegitRatioInURL                - Score: 0.0758
+ 4. LetterRatioInURL               - Score: 0.0499
+ 5. HasSocialNet                   - Score: 0.0491
+ 6. HasCopyrightInfo               - Score: 0.0420
+ 7. CharContinuationRate           - Score: 0.0367
+ 8. HasDescription                 - Score: 0.0352
+ 9. HasSubmitButton                - Score: 0.0264
+10. IsHTTPS                        - Score: 0.0255
+11. IsResponsive                   - Score: 0.0232
+12. HasHiddenFields                - Score: 0.0219
+13. ObfuscationRatio               - Score: 0.0216
+14. HasFavicon                     - Score: 0.0207
+15. HasTitle                       - Score: 0.0171
+16. Robots                         - Score: 0.0164
+17. Pay                            - Score: 0.0142
+18. TLDLegitimateProb              - Score: 0.0112
+19. Bank                           - Score: 0.0069
+20. HasExternalFormSubmit          - Score: 0.0067
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2521
+ 3. DegitRatioInURL                - Score: 0.0769
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0497
+ 6. HasCopyrightInfo               - Score: 0.0426
+ 7. HasDescription                 - Score: 0.0359
+ 8. CharContinuationRate           - Score: 0.0358
+ 9. HasSubmitButton                - Score: 0.0266
+10. IsHTTPS                        - Score: 0.0258
+11. IsResponsive                   - Score: 0.0232
+12. HasHiddenFields                - Score: 0.0223
+13. HasFavicon                     - Score: 0.0209
+14. ObfuscationRatio               - Score: 0.0182
+15. HasTitle                       - Score: 0.0173
+16. Robots                         - Score: 0.0162
+17. Pay                            - Score: 0.0145
+18. TLDLegitimateProb              - Score: 0.0113
+19. Bank                           - Score: 0.0071
+20. HasExternalFormSubmit          - Score: 0.0068
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2509
+ 3. DegitRatioInURL                - Score: 0.0785
+ 4. LetterRatioInURL               - Score: 0.0516
+ 5. HasSocialNet                   - Score: 0.0499
+ 6. HasCopyrightInfo               - Score: 0.0421
+ 7. HasDescription                 - Score: 0.0365
+ 8. CharContinuationRate           - Score: 0.0365
+ 9. HasSubmitButton                - Score: 0.0268
+10. IsHTTPS                        - Score: 0.0262
+11. IsResponsive                   - Score: 0.0238
+12. HasHiddenFields                - Score: 0.0228
+13. HasFavicon                     - Score: 0.0213
+14. ObfuscationRatio               - Score: 0.0203
+15. HasTitle                       - Score: 0.0175
+16. Robots                         - Score: 0.0170
+17. Pay                            - Score: 0.0146
+18. TLDLegitimateProb              - Score: 0.0119
+19. Bank                           - Score: 0.0071
+20. HasExternalFormSubmit          - Score: 0.0069
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2529
+ 3. DegitRatioInURL                - Score: 0.0768
+ 4. LetterRatioInURL               - Score: 0.0508
+ 5. HasSocialNet                   - Score: 0.0491
+ 6. HasCopyrightInfo               - Score: 0.0420
+ 7. HasDescription                 - Score: 0.0360
+ 8. CharContinuationRate           - Score: 0.0354
+ 9. HasSubmitButton                - Score: 0.0263
+10. IsHTTPS                        - Score: 0.0258
+11. IsResponsive                   - Score: 0.0234
+12. HasHiddenFields                - Score: 0.0221
+13. ObfuscationRatio               - Score: 0.0216
+14. HasFavicon                     - Score: 0.0208
+15. HasTitle                       - Score: 0.0172
+16. Robots                         - Score: 0.0166
+17. Pay                            - Score: 0.0144
+18. TLDLegitimateProb              - Score: 0.0117
+19. Bank                           - Score: 0.0069
+20. HasExternalFormSubmit          - Score: 0.0067
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2540
+ 3. DegitRatioInURL                - Score: 0.0761
+ 4. LetterRatioInURL               - Score: 0.0518
+ 5. HasSocialNet                   - Score: 0.0496
+ 6. HasCopyrightInfo               - Score: 0.0427
+ 7. CharContinuationRate           - Score: 0.0361
+ 8. HasDescription                 - Score: 0.0353
+ 9. HasSubmitButton                - Score: 0.0266
+10. IsHTTPS                        - Score: 0.0257
+11. IsResponsive                   - Score: 0.0233
+12. HasHiddenFields                - Score: 0.0223
+13. HasFavicon                     - Score: 0.0209
+14. ObfuscationRatio               - Score: 0.0201
+15. HasTitle                       - Score: 0.0171
+16. Robots                         - Score: 0.0165
+17. Pay                            - Score: 0.0148
+18. TLDLegitimateProb              - Score: 0.0112
+19. Bank                           - Score: 0.0071
+20. HasExternalFormSubmit          - Score: 0.0067
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2527
+ 3. DegitRatioInURL                - Score: 0.0776
+ 4. LetterRatioInURL               - Score: 0.0515
+ 5. HasSocialNet                   - Score: 0.0494
+ 6. HasCopyrightInfo               - Score: 0.0430
+ 7. HasDescription                 - Score: 0.0363
+ 8. CharContinuationRate           - Score: 0.0360
+ 9. HasSubmitButton                - Score: 0.0268
+10. IsHTTPS                        - Score: 0.0262
+11. IsResponsive                   - Score: 0.0235
+12. HasHiddenFields                - Score: 0.0225
+13. HasFavicon                     - Score: 0.0212
+14. ObfuscationRatio               - Score: 0.0196
+15. HasTitle                       - Score: 0.0174
+16. Robots                         - Score: 0.0164
+17. Pay                            - Score: 0.0147
+18. TLDLegitimateProb              - Score: 0.0119
+19. Bank                           - Score: 0.0074
+20. HasExternalFormSubmit          - Score: 0.0068
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLCharProb                    - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.2479
+ 3. DegitRatioInURL                - Score: 0.0763
+ 4. LetterRatioInURL               - Score: 0.0505
+ 5. HasSocialNet                   - Score: 0.0484
+ 6. HasCopyrightInfo               - Score: 0.0412
+ 7. HasDescription                 - Score: 0.0355
+ 8. CharContinuationRate           - Score: 0.0352
+ 9. HasSubmitButton                - Score: 0.0263
+10. IsHTTPS                        - Score: 0.0255
+11. IsResponsive                   - Score: 0.0232
+12. HasHiddenFields                - Score: 0.0223
+13. HasFavicon                     - Score: 0.0203
+14. ObfuscationRatio               - Score: 0.0180
+15. HasTitle                       - Score: 0.0170
+16. Robots                         - Score: 0.0164
+17. Pay                            - Score: 0.0144
+18. TLDLegitimateProb              - Score: 0.0113
+19. Bank                           - Score: 0.0072
+20. HasExternalFormSubmit          - Score: 0.0066
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9538
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9533
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9538
+ 3. HasSocialNet                   - Score: 0.8132
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8148
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8083
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9533
+ 3. HasSocialNet                   - Score: 0.8217
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8201
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8026
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8078
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8078
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8076
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8110
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9538
+ 3. HasSocialNet                   - Score: 0.8132
+ 4. NoOfQMarkInURL                 - Score: 0.7744
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8148
+ 4. NoOfQMarkInURL                 - Score: 0.7722
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8083
+ 4. NoOfQMarkInURL                 - Score: 0.7708
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9533
+ 3. HasSocialNet                   - Score: 0.8217
+ 4. NoOfQMarkInURL                 - Score: 0.7703
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8201
+ 4. NoOfQMarkInURL                 - Score: 0.7669
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8026
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7737
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7696
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8076
+ 4. NoOfQMarkInURL                 - Score: 0.7736
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8110
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9538
+ 3. HasSocialNet                   - Score: 0.8132
+ 4. NoOfQMarkInURL                 - Score: 0.7744
+ 5. IsDomainIP                     - Score: 0.7231
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8148
+ 4. NoOfQMarkInURL                 - Score: 0.7722
+ 5. IsDomainIP                     - Score: 0.7306
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8083
+ 4. NoOfQMarkInURL                 - Score: 0.7708
+ 5. IsDomainIP                     - Score: 0.7211
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9533
+ 3. HasSocialNet                   - Score: 0.8217
+ 4. NoOfQMarkInURL                 - Score: 0.7703
+ 5. IsDomainIP                     - Score: 0.7232
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8201
+ 4. NoOfQMarkInURL                 - Score: 0.7669
+ 5. IsDomainIP                     - Score: 0.7271
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8026
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7284
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7737
+ 5. NoOfDegitsInURL                - Score: 0.7442
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7696
+ 5. IsDomainIP                     - Score: 0.7193
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8076
+ 4. NoOfQMarkInURL                 - Score: 0.7736
+ 5. IsDomainIP                     - Score: 0.7340
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8110
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7190
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9538
+ 3. HasSocialNet                   - Score: 0.8132
+ 4. NoOfQMarkInURL                 - Score: 0.7744
+ 5. IsDomainIP                     - Score: 0.7231
+ 6. NoOfEqualsInURL                - Score: 0.7125
+ 7. HasObfuscation                 - Score: 0.7000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8148
+ 4. NoOfQMarkInURL                 - Score: 0.7722
+ 5. IsDomainIP                     - Score: 0.7306
+ 6. NoOfEqualsInURL                - Score: 0.7114
+ 7. HasObfuscation                 - Score: 0.7079
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8083
+ 4. NoOfQMarkInURL                 - Score: 0.7708
+ 5. IsDomainIP                     - Score: 0.7211
+ 6. HasTitle                       - Score: 0.7129
+ 7. NoOfEqualsInURL                - Score: 0.7036
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9533
+ 3. HasSocialNet                   - Score: 0.8217
+ 4. NoOfQMarkInURL                 - Score: 0.7703
+ 5. IsDomainIP                     - Score: 0.7232
+ 6. HasObfuscation                 - Score: 0.7127
+ 7. NoOfEqualsInURL                - Score: 0.7045
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8201
+ 4. NoOfQMarkInURL                 - Score: 0.7669
+ 5. IsDomainIP                     - Score: 0.7271
+ 6. NoOfEqualsInURL                - Score: 0.7041
+ 7. HasObfuscation                 - Score: 0.6946
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8026
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7284
+ 6. NoOfEqualsInURL                - Score: 0.7154
+ 7. HasObfuscation                 - Score: 0.7024
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7737
+ 5. NoOfDegitsInURL                - Score: 0.7442
+ 6. IsDomainIP                     - Score: 0.7233
+ 7. HasObfuscation                 - Score: 0.7080
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7696
+ 5. IsDomainIP                     - Score: 0.7193
+ 6. NoOfEqualsInURL                - Score: 0.7080
+ 7. HasObfuscation                 - Score: 0.6975
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8076
+ 4. NoOfQMarkInURL                 - Score: 0.7736
+ 5. IsDomainIP                     - Score: 0.7340
+ 6. NoOfEqualsInURL                - Score: 0.7120
+ 7. HasObfuscation                 - Score: 0.6883
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8110
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7190
+ 6. NoOfEqualsInURL                - Score: 0.7063
+ 7. HasObfuscation                 - Score: 0.6943
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9538
+ 3. HasSocialNet                   - Score: 0.8132
+ 4. NoOfQMarkInURL                 - Score: 0.7744
+ 5. IsDomainIP                     - Score: 0.7231
+ 6. NoOfEqualsInURL                - Score: 0.7125
+ 7. HasObfuscation                 - Score: 0.7000
+ 8. HasTitle                       - Score: 0.6992
+ 9. NoOfCSS                        - Score: 0.6446
+10. NoOfSelfRef                    - Score: 0.6323
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8148
+ 4. NoOfQMarkInURL                 - Score: 0.7722
+ 5. IsDomainIP                     - Score: 0.7306
+ 6. NoOfEqualsInURL                - Score: 0.7114
+ 7. HasObfuscation                 - Score: 0.7079
+ 8. HasTitle                       - Score: 0.6749
+ 9. NoOfSelfRef                    - Score: 0.6356
+10. NoOfCSS                        - Score: 0.6248
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8083
+ 4. NoOfQMarkInURL                 - Score: 0.7708
+ 5. IsDomainIP                     - Score: 0.7211
+ 6. HasTitle                       - Score: 0.7129
+ 7. NoOfEqualsInURL                - Score: 0.7036
+ 8. HasObfuscation                 - Score: 0.7027
+ 9. NoOfSelfRef                    - Score: 0.6312
+10. NoOfCSS                        - Score: 0.6280
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9533
+ 3. HasSocialNet                   - Score: 0.8217
+ 4. NoOfQMarkInURL                 - Score: 0.7703
+ 5. IsDomainIP                     - Score: 0.7232
+ 6. HasObfuscation                 - Score: 0.7127
+ 7. NoOfEqualsInURL                - Score: 0.7045
+ 8. HasTitle                       - Score: 0.6772
+ 9. NoOfSelfRef                    - Score: 0.6340
+10. NoOfCSS                        - Score: 0.6222
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8201
+ 4. NoOfQMarkInURL                 - Score: 0.7669
+ 5. IsDomainIP                     - Score: 0.7271
+ 6. NoOfEqualsInURL                - Score: 0.7041
+ 7. HasObfuscation                 - Score: 0.6946
+ 8. HasTitle                       - Score: 0.6880
+ 9. NoOfSelfRef                    - Score: 0.6337
+10. NoOfCSS                        - Score: 0.6245
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8026
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7284
+ 6. NoOfEqualsInURL                - Score: 0.7154
+ 7. HasObfuscation                 - Score: 0.7024
+ 8. HasTitle                       - Score: 0.6770
+ 9. NoOfSelfRef                    - Score: 0.6346
+10. NoOfCSS                        - Score: 0.6247
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7737
+ 5. NoOfDegitsInURL                - Score: 0.7442
+ 6. IsDomainIP                     - Score: 0.7233
+ 7. HasObfuscation                 - Score: 0.7080
+ 8. NoOfEqualsInURL                - Score: 0.7078
+ 9. HasTitle                       - Score: 0.7055
+10. NoOfSelfRef                    - Score: 0.6343
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7696
+ 5. IsDomainIP                     - Score: 0.7193
+ 6. NoOfEqualsInURL                - Score: 0.7080
+ 7. HasObfuscation                 - Score: 0.6975
+ 8. HasTitle                       - Score: 0.6861
+ 9. NoOfCSS                        - Score: 0.6396
+10. NoOfSelfRef                    - Score: 0.6356
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8076
+ 4. NoOfQMarkInURL                 - Score: 0.7736
+ 5. IsDomainIP                     - Score: 0.7340
+ 6. NoOfEqualsInURL                - Score: 0.7120
+ 7. HasObfuscation                 - Score: 0.6883
+ 8. HasTitle                       - Score: 0.6875
+ 9. NoOfSelfRef                    - Score: 0.6347
+10. NoOfCSS                        - Score: 0.6196
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8110
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7190
+ 6. NoOfEqualsInURL                - Score: 0.7063
+ 7. HasObfuscation                 - Score: 0.6943
+ 8. HasTitle                       - Score: 0.6930
+ 9. NoOfSelfRef                    - Score: 0.6373
+10. NoOfCSS                        - Score: 0.6223
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9538
+ 3. HasSocialNet                   - Score: 0.8132
+ 4. NoOfQMarkInURL                 - Score: 0.7744
+ 5. IsDomainIP                     - Score: 0.7231
+ 6. NoOfEqualsInURL                - Score: 0.7125
+ 7. HasObfuscation                 - Score: 0.7000
+ 8. HasTitle                       - Score: 0.6992
+ 9. NoOfCSS                        - Score: 0.6446
+10. NoOfSelfRef                    - Score: 0.6323
+11. NoOfImage                      - Score: 0.6140
+12. NoOfAmpersandInURL             - Score: 0.6086
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5863
+14. DegitRatioInURL                - Score: 0.5685
+15. NoOfiFrame                     - Score: 0.5648
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8148
+ 4. NoOfQMarkInURL                 - Score: 0.7722
+ 5. IsDomainIP                     - Score: 0.7306
+ 6. NoOfEqualsInURL                - Score: 0.7114
+ 7. HasObfuscation                 - Score: 0.7079
+ 8. HasTitle                       - Score: 0.6749
+ 9. NoOfSelfRef                    - Score: 0.6356
+10. NoOfCSS                        - Score: 0.6248
+11. NoOfImage                      - Score: 0.6196
+12. NoOfAmpersandInURL             - Score: 0.6089
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5869
+14. DegitRatioInURL                - Score: 0.5623
+15. NoOfiFrame                     - Score: 0.5603
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8083
+ 4. NoOfQMarkInURL                 - Score: 0.7708
+ 5. IsDomainIP                     - Score: 0.7211
+ 6. HasTitle                       - Score: 0.7129
+ 7. NoOfEqualsInURL                - Score: 0.7036
+ 8. HasObfuscation                 - Score: 0.7027
+ 9. NoOfSelfRef                    - Score: 0.6312
+10. NoOfCSS                        - Score: 0.6280
+11. NoOfImage                      - Score: 0.6204
+12. NoOfAmpersandInURL             - Score: 0.5938
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5830
+14. LargestLineLength              - Score: 0.5784
+15. NoOfJS                         - Score: 0.5639
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9533
+ 3. HasSocialNet                   - Score: 0.8217
+ 4. NoOfQMarkInURL                 - Score: 0.7703
+ 5. IsDomainIP                     - Score: 0.7232
+ 6. HasObfuscation                 - Score: 0.7127
+ 7. NoOfEqualsInURL                - Score: 0.7045
+ 8. HasTitle                       - Score: 0.6772
+ 9. NoOfSelfRef                    - Score: 0.6340
+10. NoOfCSS                        - Score: 0.6222
+11. NoOfImage                      - Score: 0.6161
+12. NoOfAmpersandInURL             - Score: 0.6049
+13. NoOfExternalRef                - Score: 0.5904
+14. NoOfOtherSpecialCharsInURL     - Score: 0.5864
+15. DegitRatioInURL                - Score: 0.5646
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8201
+ 4. NoOfQMarkInURL                 - Score: 0.7669
+ 5. IsDomainIP                     - Score: 0.7271
+ 6. NoOfEqualsInURL                - Score: 0.7041
+ 7. HasObfuscation                 - Score: 0.6946
+ 8. HasTitle                       - Score: 0.6880
+ 9. NoOfSelfRef                    - Score: 0.6337
+10. NoOfCSS                        - Score: 0.6245
+11. NoOfImage                      - Score: 0.6117
+12. NoOfAmpersandInURL             - Score: 0.5995
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5800
+14. DegitRatioInURL                - Score: 0.5669
+15. NoOfiFrame                     - Score: 0.5653
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8026
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7284
+ 6. NoOfEqualsInURL                - Score: 0.7154
+ 7. HasObfuscation                 - Score: 0.7024
+ 8. HasTitle                       - Score: 0.6770
+ 9. NoOfSelfRef                    - Score: 0.6346
+10. NoOfCSS                        - Score: 0.6247
+11. NoOfImage                      - Score: 0.6210
+12. NoOfiFrame                     - Score: 0.6005
+13. NoOfAmpersandInURL             - Score: 0.6003
+14. NoOfOtherSpecialCharsInURL     - Score: 0.5891
+15. DegitRatioInURL                - Score: 0.5601
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7737
+ 5. NoOfDegitsInURL                - Score: 0.7442
+ 6. IsDomainIP                     - Score: 0.7233
+ 7. HasObfuscation                 - Score: 0.7080
+ 8. NoOfEqualsInURL                - Score: 0.7078
+ 9. HasTitle                       - Score: 0.7055
+10. NoOfSelfRef                    - Score: 0.6343
+11. NoOfCSS                        - Score: 0.6245
+12. NoOfImage                      - Score: 0.6144
+13. NoOfAmpersandInURL             - Score: 0.5956
+14. NoOfOtherSpecialCharsInURL     - Score: 0.5839
+15. LargestLineLength              - Score: 0.5775
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7696
+ 5. IsDomainIP                     - Score: 0.7193
+ 6. NoOfEqualsInURL                - Score: 0.7080
+ 7. HasObfuscation                 - Score: 0.6975
+ 8. HasTitle                       - Score: 0.6861
+ 9. NoOfCSS                        - Score: 0.6396
+10. NoOfSelfRef                    - Score: 0.6356
+11. NoOfImage                      - Score: 0.6183
+12. NoOfAmpersandInURL             - Score: 0.6113
+13. NoOfJS                         - Score: 0.5888
+14. NoOfOtherSpecialCharsInURL     - Score: 0.5859
+15. NoOfiFrame                     - Score: 0.5645
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8076
+ 4. NoOfQMarkInURL                 - Score: 0.7736
+ 5. IsDomainIP                     - Score: 0.7340
+ 6. NoOfEqualsInURL                - Score: 0.7120
+ 7. HasObfuscation                 - Score: 0.6883
+ 8. HasTitle                       - Score: 0.6875
+ 9. NoOfSelfRef                    - Score: 0.6347
+10. NoOfCSS                        - Score: 0.6196
+11. NoOfImage                      - Score: 0.6182
+12. NoOfAmpersandInURL             - Score: 0.5950
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5851
+14. DegitRatioInURL                - Score: 0.5737
+15. NoOfiFrame                     - Score: 0.5655
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8110
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7190
+ 6. NoOfEqualsInURL                - Score: 0.7063
+ 7. HasObfuscation                 - Score: 0.6943
+ 8. HasTitle                       - Score: 0.6930
+ 9. NoOfSelfRef                    - Score: 0.6373
+10. NoOfCSS                        - Score: 0.6223
+11. NoOfImage                      - Score: 0.6215
+12. NoOfAmpersandInURL             - Score: 0.5990
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5851
+14. NoOfJS                         - Score: 0.5694
+15. DegitRatioInURL                - Score: 0.5663
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9538
+ 3. HasSocialNet                   - Score: 0.8132
+ 4. NoOfQMarkInURL                 - Score: 0.7744
+ 5. IsDomainIP                     - Score: 0.7231
+ 6. NoOfEqualsInURL                - Score: 0.7125
+ 7. HasObfuscation                 - Score: 0.7000
+ 8. HasTitle                       - Score: 0.6992
+ 9. NoOfCSS                        - Score: 0.6446
+10. NoOfSelfRef                    - Score: 0.6323
+11. NoOfImage                      - Score: 0.6140
+12. NoOfAmpersandInURL             - Score: 0.6086
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5863
+14. DegitRatioInURL                - Score: 0.5685
+15. NoOfiFrame                     - Score: 0.5648
+16. NoOfJS                         - Score: 0.5611
+17. LargestLineLength              - Score: 0.5156
+18. NoOfEmptyRef                   - Score: 0.5032
+19. LineOfCode                     - Score: 0.4965
+20. NoOfObfuscatedChar             - Score: 0.4939
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8148
+ 4. NoOfQMarkInURL                 - Score: 0.7722
+ 5. IsDomainIP                     - Score: 0.7306
+ 6. NoOfEqualsInURL                - Score: 0.7114
+ 7. HasObfuscation                 - Score: 0.7079
+ 8. HasTitle                       - Score: 0.6749
+ 9. NoOfSelfRef                    - Score: 0.6356
+10. NoOfCSS                        - Score: 0.6248
+11. NoOfImage                      - Score: 0.6196
+12. NoOfAmpersandInURL             - Score: 0.6089
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5869
+14. DegitRatioInURL                - Score: 0.5623
+15. NoOfiFrame                     - Score: 0.5603
+16. NoOfJS                         - Score: 0.5574
+17. NoOfEmptyRef                   - Score: 0.5226
+18. NoOfObfuscatedChar             - Score: 0.5197
+19. LargestLineLength              - Score: 0.4909
+20. ObfuscationRatio               - Score: 0.4688
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8083
+ 4. NoOfQMarkInURL                 - Score: 0.7708
+ 5. IsDomainIP                     - Score: 0.7211
+ 6. HasTitle                       - Score: 0.7129
+ 7. NoOfEqualsInURL                - Score: 0.7036
+ 8. HasObfuscation                 - Score: 0.7027
+ 9. NoOfSelfRef                    - Score: 0.6312
+10. NoOfCSS                        - Score: 0.6280
+11. NoOfImage                      - Score: 0.6204
+12. NoOfAmpersandInURL             - Score: 0.5938
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5830
+14. LargestLineLength              - Score: 0.5784
+15. NoOfJS                         - Score: 0.5639
+16. DegitRatioInURL                - Score: 0.5620
+17. NoOfiFrame                     - Score: 0.5525
+18. LineOfCode                     - Score: 0.4973
+19. NoOfEmptyRef                   - Score: 0.4963
+20. NoOfObfuscatedChar             - Score: 0.4885
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9533
+ 3. HasSocialNet                   - Score: 0.8217
+ 4. NoOfQMarkInURL                 - Score: 0.7703
+ 5. IsDomainIP                     - Score: 0.7232
+ 6. HasObfuscation                 - Score: 0.7127
+ 7. NoOfEqualsInURL                - Score: 0.7045
+ 8. HasTitle                       - Score: 0.6772
+ 9. NoOfSelfRef                    - Score: 0.6340
+10. NoOfCSS                        - Score: 0.6222
+11. NoOfImage                      - Score: 0.6161
+12. NoOfAmpersandInURL             - Score: 0.6049
+13. NoOfExternalRef                - Score: 0.5904
+14. NoOfOtherSpecialCharsInURL     - Score: 0.5864
+15. DegitRatioInURL                - Score: 0.5646
+16. NoOfJS                         - Score: 0.5639
+17. NoOfiFrame                     - Score: 0.5638
+18. LargestLineLength              - Score: 0.5238
+19. NoOfObfuscatedChar             - Score: 0.5115
+20. NoOfEmptyRef                   - Score: 0.4815
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8201
+ 4. NoOfQMarkInURL                 - Score: 0.7669
+ 5. IsDomainIP                     - Score: 0.7271
+ 6. NoOfEqualsInURL                - Score: 0.7041
+ 7. HasObfuscation                 - Score: 0.6946
+ 8. HasTitle                       - Score: 0.6880
+ 9. NoOfSelfRef                    - Score: 0.6337
+10. NoOfCSS                        - Score: 0.6245
+11. NoOfImage                      - Score: 0.6117
+12. NoOfAmpersandInURL             - Score: 0.5995
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5800
+14. DegitRatioInURL                - Score: 0.5669
+15. NoOfiFrame                     - Score: 0.5653
+16. NoOfJS                         - Score: 0.5605
+17. NoOfPopup                      - Score: 0.5423
+18. NoOfEmptyRef                   - Score: 0.5194
+19. LargestLineLength              - Score: 0.5089
+20. NoOfObfuscatedChar             - Score: 0.4931
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8026
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7284
+ 6. NoOfEqualsInURL                - Score: 0.7154
+ 7. HasObfuscation                 - Score: 0.7024
+ 8. HasTitle                       - Score: 0.6770
+ 9. NoOfSelfRef                    - Score: 0.6346
+10. NoOfCSS                        - Score: 0.6247
+11. NoOfImage                      - Score: 0.6210
+12. NoOfiFrame                     - Score: 0.6005
+13. NoOfAmpersandInURL             - Score: 0.6003
+14. NoOfOtherSpecialCharsInURL     - Score: 0.5891
+15. DegitRatioInURL                - Score: 0.5601
+16. NoOfJS                         - Score: 0.5587
+17. NoOfObfuscatedChar             - Score: 0.5152
+18. NoOfEmptyRef                   - Score: 0.5133
+19. LargestLineLength              - Score: 0.5029
+20. ObfuscationRatio               - Score: 0.4629
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9534
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7737
+ 5. NoOfDegitsInURL                - Score: 0.7442
+ 6. IsDomainIP                     - Score: 0.7233
+ 7. HasObfuscation                 - Score: 0.7080
+ 8. NoOfEqualsInURL                - Score: 0.7078
+ 9. HasTitle                       - Score: 0.7055
+10. NoOfSelfRef                    - Score: 0.6343
+11. NoOfCSS                        - Score: 0.6245
+12. NoOfImage                      - Score: 0.6144
+13. NoOfAmpersandInURL             - Score: 0.5956
+14. NoOfOtherSpecialCharsInURL     - Score: 0.5839
+15. LargestLineLength              - Score: 0.5775
+16. DegitRatioInURL                - Score: 0.5702
+17. NoOfiFrame                     - Score: 0.5617
+18. NoOfJS                         - Score: 0.5528
+19. URLLength                      - Score: 0.5221
+20. NoOfObfuscatedChar             - Score: 0.5155
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8078
+ 4. NoOfQMarkInURL                 - Score: 0.7696
+ 5. IsDomainIP                     - Score: 0.7193
+ 6. NoOfEqualsInURL                - Score: 0.7080
+ 7. HasObfuscation                 - Score: 0.6975
+ 8. HasTitle                       - Score: 0.6861
+ 9. NoOfCSS                        - Score: 0.6396
+10. NoOfSelfRef                    - Score: 0.6356
+11. NoOfImage                      - Score: 0.6183
+12. NoOfAmpersandInURL             - Score: 0.6113
+13. NoOfJS                         - Score: 0.5888
+14. NoOfOtherSpecialCharsInURL     - Score: 0.5859
+15. NoOfiFrame                     - Score: 0.5645
+16. DegitRatioInURL                - Score: 0.5594
+17. LargestLineLength              - Score: 0.5147
+18. NoOfEmptyRef                   - Score: 0.5083
+19. NoOfObfuscatedChar             - Score: 0.5074
+20. ObfuscationRatio               - Score: 0.4597
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9536
+ 3. HasSocialNet                   - Score: 0.8076
+ 4. NoOfQMarkInURL                 - Score: 0.7736
+ 5. IsDomainIP                     - Score: 0.7340
+ 6. NoOfEqualsInURL                - Score: 0.7120
+ 7. HasObfuscation                 - Score: 0.6883
+ 8. HasTitle                       - Score: 0.6875
+ 9. NoOfSelfRef                    - Score: 0.6347
+10. NoOfCSS                        - Score: 0.6196
+11. NoOfImage                      - Score: 0.6182
+12. NoOfAmpersandInURL             - Score: 0.5950
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5851
+14. DegitRatioInURL                - Score: 0.5737
+15. NoOfiFrame                     - Score: 0.5655
+16. NoOfJS                         - Score: 0.5626
+17. LargestLineLength              - Score: 0.5243
+18. NoOfEmptyRef                   - Score: 0.5126
+19. NoOfDegitsInURL                - Score: 0.4517
+20. NoOfExternalRef                - Score: 0.4493
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. URLSimilarityIndex             - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9532
+ 3. HasSocialNet                   - Score: 0.8110
+ 4. NoOfQMarkInURL                 - Score: 0.7745
+ 5. IsDomainIP                     - Score: 0.7190
+ 6. NoOfEqualsInURL                - Score: 0.7063
+ 7. HasObfuscation                 - Score: 0.6943
+ 8. HasTitle                       - Score: 0.6930
+ 9. NoOfSelfRef                    - Score: 0.6373
+10. NoOfCSS                        - Score: 0.6223
+11. NoOfImage                      - Score: 0.6215
+12. NoOfAmpersandInURL             - Score: 0.5990
+13. NoOfOtherSpecialCharsInURL     - Score: 0.5851
+14. NoOfJS                         - Score: 0.5694
+15. DegitRatioInURL                - Score: 0.5663
+16. NoOfiFrame                     - Score: 0.5636
+17. LargestLineLength              - Score: 0.5258
+18. NoOfEmptyRef                   - Score: 0.5199
+19. NoOfObfuscatedChar             - Score: 0.5079
+20. LineOfCode                     - Score: 0.5022
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9942
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9890
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9989
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9976
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9865
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9897
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9908
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9887
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8667
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9942
+ 3. DegitRatioInURL                - Score: 0.8645
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9890
+ 3. DegitRatioInURL                - Score: 0.8634
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9989
+ 3. DegitRatioInURL                - Score: 0.8653
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9976
+ 3. DegitRatioInURL                - Score: 0.8659
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9865
+ 3. DegitRatioInURL                - Score: 0.8619
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9897
+ 3. DegitRatioInURL                - Score: 0.8696
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9908
+ 3. DegitRatioInURL                - Score: 0.8609
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9887
+ 3. DegitRatioInURL                - Score: 0.8718
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8661
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8667
+ 4. HasTitle                       - Score: 0.8198
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9942
+ 3. DegitRatioInURL                - Score: 0.8645
+ 4. HasTitle                       - Score: 0.8047
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9890
+ 3. DegitRatioInURL                - Score: 0.8634
+ 4. HasTitle                       - Score: 0.8289
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9989
+ 3. DegitRatioInURL                - Score: 0.8653
+ 4. HasTitle                       - Score: 0.8080
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9976
+ 3. DegitRatioInURL                - Score: 0.8659
+ 4. HasTitle                       - Score: 0.8140
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9865
+ 3. DegitRatioInURL                - Score: 0.8619
+ 4. HasTitle                       - Score: 0.8071
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9897
+ 3. DegitRatioInURL                - Score: 0.8696
+ 4. HasTitle                       - Score: 0.8246
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9908
+ 3. DegitRatioInURL                - Score: 0.8609
+ 4. HasTitle                       - Score: 0.8121
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9887
+ 3. DegitRatioInURL                - Score: 0.8718
+ 4. HasTitle                       - Score: 0.8130
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8661
+ 4. HasTitle                       - Score: 0.8167
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8667
+ 4. HasTitle                       - Score: 0.8198
+ 5. URLSimilarityIndex             - Score: 0.7073
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9942
+ 3. DegitRatioInURL                - Score: 0.8645
+ 4. HasTitle                       - Score: 0.8047
+ 5. HasCopyrightInfo               - Score: 0.7157
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9890
+ 3. DegitRatioInURL                - Score: 0.8634
+ 4. HasTitle                       - Score: 0.8289
+ 5. HasCopyrightInfo               - Score: 0.7122
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9989
+ 3. DegitRatioInURL                - Score: 0.8653
+ 4. HasTitle                       - Score: 0.8080
+ 5. HasCopyrightInfo               - Score: 0.7129
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9976
+ 3. DegitRatioInURL                - Score: 0.8659
+ 4. HasTitle                       - Score: 0.8140
+ 5. HasCopyrightInfo               - Score: 0.7202
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9865
+ 3. DegitRatioInURL                - Score: 0.8619
+ 4. HasTitle                       - Score: 0.8071
+ 5. URLSimilarityIndex             - Score: 0.7082
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9897
+ 3. DegitRatioInURL                - Score: 0.8696
+ 4. HasTitle                       - Score: 0.8246
+ 5. URLSimilarityIndex             - Score: 0.7084
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9908
+ 3. DegitRatioInURL                - Score: 0.8609
+ 4. HasTitle                       - Score: 0.8121
+ 5. HasCopyrightInfo               - Score: 0.7196
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9887
+ 3. DegitRatioInURL                - Score: 0.8718
+ 4. HasTitle                       - Score: 0.8130
+ 5. HasCopyrightInfo               - Score: 0.7200
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8661
+ 4. HasTitle                       - Score: 0.8167
+ 5. URLSimilarityIndex             - Score: 0.7085
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8667
+ 4. HasTitle                       - Score: 0.8198
+ 5. URLSimilarityIndex             - Score: 0.7073
+ 6. HasCopyrightInfo               - Score: 0.7046
+ 7. NoOfQMarkInURL                 - Score: 0.6977
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9942
+ 3. DegitRatioInURL                - Score: 0.8645
+ 4. HasTitle                       - Score: 0.8047
+ 5. HasCopyrightInfo               - Score: 0.7157
+ 6. URLSimilarityIndex             - Score: 0.7083
+ 7. NoOfQMarkInURL                 - Score: 0.6971
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9890
+ 3. DegitRatioInURL                - Score: 0.8634
+ 4. HasTitle                       - Score: 0.8289
+ 5. HasCopyrightInfo               - Score: 0.7122
+ 6. URLSimilarityIndex             - Score: 0.7076
+ 7. NoOfQMarkInURL                 - Score: 0.6969
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9989
+ 3. DegitRatioInURL                - Score: 0.8653
+ 4. HasTitle                       - Score: 0.8080
+ 5. HasCopyrightInfo               - Score: 0.7129
+ 6. URLSimilarityIndex             - Score: 0.7086
+ 7. NoOfQMarkInURL                 - Score: 0.6989
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9976
+ 3. DegitRatioInURL                - Score: 0.8659
+ 4. HasTitle                       - Score: 0.8140
+ 5. HasCopyrightInfo               - Score: 0.7202
+ 6. URLSimilarityIndex             - Score: 0.7084
+ 7. NoOfQMarkInURL                 - Score: 0.6934
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9865
+ 3. DegitRatioInURL                - Score: 0.8619
+ 4. HasTitle                       - Score: 0.8071
+ 5. URLSimilarityIndex             - Score: 0.7082
+ 6. HasCopyrightInfo               - Score: 0.7013
+ 7. NoOfQMarkInURL                 - Score: 0.6987
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9897
+ 3. DegitRatioInURL                - Score: 0.8696
+ 4. HasTitle                       - Score: 0.8246
+ 5. URLSimilarityIndex             - Score: 0.7084
+ 6. HasCopyrightInfo               - Score: 0.7029
+ 7. NoOfQMarkInURL                 - Score: 0.6991
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9908
+ 3. DegitRatioInURL                - Score: 0.8609
+ 4. HasTitle                       - Score: 0.8121
+ 5. HasCopyrightInfo               - Score: 0.7196
+ 6. URLSimilarityIndex             - Score: 0.7089
+ 7. NoOfQMarkInURL                 - Score: 0.6995
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9887
+ 3. DegitRatioInURL                - Score: 0.8718
+ 4. HasTitle                       - Score: 0.8130
+ 5. HasCopyrightInfo               - Score: 0.7200
+ 6. URLSimilarityIndex             - Score: 0.7077
+ 7. NoOfQMarkInURL                 - Score: 0.6971
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8661
+ 4. HasTitle                       - Score: 0.8167
+ 5. URLSimilarityIndex             - Score: 0.7085
+ 6. HasCopyrightInfo               - Score: 0.7060
+ 7. NoOfQMarkInURL                 - Score: 0.7007
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8667
+ 4. HasTitle                       - Score: 0.8198
+ 5. URLSimilarityIndex             - Score: 0.7073
+ 6. HasCopyrightInfo               - Score: 0.7046
+ 7. NoOfQMarkInURL                 - Score: 0.6977
+ 8. HasDescription                 - Score: 0.6673
+ 9. SpacialCharRatioInURL          - Score: 0.6476
+10. ObfuscationRatio               - Score: 0.6459
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9942
+ 3. DegitRatioInURL                - Score: 0.8645
+ 4. HasTitle                       - Score: 0.8047
+ 5. HasCopyrightInfo               - Score: 0.7157
+ 6. URLSimilarityIndex             - Score: 0.7083
+ 7. NoOfQMarkInURL                 - Score: 0.6971
+ 8. HasDescription                 - Score: 0.6789
+ 9. ObfuscationRatio               - Score: 0.6740
+10. SpacialCharRatioInURL          - Score: 0.6564
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9890
+ 3. DegitRatioInURL                - Score: 0.8634
+ 4. HasTitle                       - Score: 0.8289
+ 5. HasCopyrightInfo               - Score: 0.7122
+ 6. URLSimilarityIndex             - Score: 0.7076
+ 7. NoOfQMarkInURL                 - Score: 0.6969
+ 8. HasDescription                 - Score: 0.6799
+ 9. ObfuscationRatio               - Score: 0.6582
+10. SpacialCharRatioInURL          - Score: 0.6538
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9989
+ 3. DegitRatioInURL                - Score: 0.8653
+ 4. HasTitle                       - Score: 0.8080
+ 5. HasCopyrightInfo               - Score: 0.7129
+ 6. URLSimilarityIndex             - Score: 0.7086
+ 7. NoOfQMarkInURL                 - Score: 0.6989
+ 8. ObfuscationRatio               - Score: 0.6791
+ 9. HasDescription                 - Score: 0.6754
+10. SpacialCharRatioInURL          - Score: 0.6621
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9976
+ 3. DegitRatioInURL                - Score: 0.8659
+ 4. HasTitle                       - Score: 0.8140
+ 5. HasCopyrightInfo               - Score: 0.7202
+ 6. URLSimilarityIndex             - Score: 0.7084
+ 7. NoOfQMarkInURL                 - Score: 0.6934
+ 8. HasDescription                 - Score: 0.6771
+ 9. SpacialCharRatioInURL          - Score: 0.6519
+10. IsDomainIP                     - Score: 0.6491
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9865
+ 3. DegitRatioInURL                - Score: 0.8619
+ 4. HasTitle                       - Score: 0.8071
+ 5. URLSimilarityIndex             - Score: 0.7082
+ 6. HasCopyrightInfo               - Score: 0.7013
+ 7. NoOfQMarkInURL                 - Score: 0.6987
+ 8. HasDescription                 - Score: 0.6790
+ 9. ObfuscationRatio               - Score: 0.6658
+10. SpacialCharRatioInURL          - Score: 0.6532
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9897
+ 3. DegitRatioInURL                - Score: 0.8696
+ 4. HasTitle                       - Score: 0.8246
+ 5. URLSimilarityIndex             - Score: 0.7084
+ 6. HasCopyrightInfo               - Score: 0.7029
+ 7. NoOfQMarkInURL                 - Score: 0.6991
+ 8. HasDescription                 - Score: 0.6804
+ 9. ObfuscationRatio               - Score: 0.6758
+10. SpacialCharRatioInURL          - Score: 0.6613
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9908
+ 3. DegitRatioInURL                - Score: 0.8609
+ 4. HasTitle                       - Score: 0.8121
+ 5. HasCopyrightInfo               - Score: 0.7196
+ 6. URLSimilarityIndex             - Score: 0.7089
+ 7. NoOfQMarkInURL                 - Score: 0.6995
+ 8. HasDescription                 - Score: 0.6654
+ 9. ObfuscationRatio               - Score: 0.6635
+10. SpacialCharRatioInURL          - Score: 0.6573
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9887
+ 3. DegitRatioInURL                - Score: 0.8718
+ 4. HasTitle                       - Score: 0.8130
+ 5. HasCopyrightInfo               - Score: 0.7200
+ 6. URLSimilarityIndex             - Score: 0.7077
+ 7. NoOfQMarkInURL                 - Score: 0.6971
+ 8. HasDescription                 - Score: 0.6771
+ 9. IsDomainIP                     - Score: 0.6554
+10. SpacialCharRatioInURL          - Score: 0.6532
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8661
+ 4. HasTitle                       - Score: 0.8167
+ 5. URLSimilarityIndex             - Score: 0.7085
+ 6. HasCopyrightInfo               - Score: 0.7060
+ 7. NoOfQMarkInURL                 - Score: 0.7007
+ 8. HasDescription                 - Score: 0.6838
+ 9. ObfuscationRatio               - Score: 0.6562
+10. SpacialCharRatioInURL          - Score: 0.6548
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8667
+ 4. HasTitle                       - Score: 0.8198
+ 5. URLSimilarityIndex             - Score: 0.7073
+ 6. HasCopyrightInfo               - Score: 0.7046
+ 7. NoOfQMarkInURL                 - Score: 0.6977
+ 8. HasDescription                 - Score: 0.6673
+ 9. SpacialCharRatioInURL          - Score: 0.6476
+10. ObfuscationRatio               - Score: 0.6459
+11. IsDomainIP                     - Score: 0.6446
+12. HasObfuscation                 - Score: 0.6235
+13. URLCharProb                    - Score: 0.5801
+14. NoOfEqualsInURL                - Score: 0.5736
+15. HasExternalFormSubmit          - Score: 0.5379
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9942
+ 3. DegitRatioInURL                - Score: 0.8645
+ 4. HasTitle                       - Score: 0.8047
+ 5. HasCopyrightInfo               - Score: 0.7157
+ 6. URLSimilarityIndex             - Score: 0.7083
+ 7. NoOfQMarkInURL                 - Score: 0.6971
+ 8. HasDescription                 - Score: 0.6789
+ 9. ObfuscationRatio               - Score: 0.6740
+10. SpacialCharRatioInURL          - Score: 0.6564
+11. IsDomainIP                     - Score: 0.6527
+12. HasObfuscation                 - Score: 0.6315
+13. URLCharProb                    - Score: 0.5799
+14. NoOfEqualsInURL                - Score: 0.5732
+15. HasExternalFormSubmit          - Score: 0.5329
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9890
+ 3. DegitRatioInURL                - Score: 0.8634
+ 4. HasTitle                       - Score: 0.8289
+ 5. HasCopyrightInfo               - Score: 0.7122
+ 6. URLSimilarityIndex             - Score: 0.7076
+ 7. NoOfQMarkInURL                 - Score: 0.6969
+ 8. HasDescription                 - Score: 0.6799
+ 9. ObfuscationRatio               - Score: 0.6582
+10. SpacialCharRatioInURL          - Score: 0.6538
+11. IsDomainIP                     - Score: 0.6430
+12. HasObfuscation                 - Score: 0.6261
+13. URLCharProb                    - Score: 0.5872
+14. NoOfEqualsInURL                - Score: 0.5693
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5205
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9989
+ 3. DegitRatioInURL                - Score: 0.8653
+ 4. HasTitle                       - Score: 0.8080
+ 5. HasCopyrightInfo               - Score: 0.7129
+ 6. URLSimilarityIndex             - Score: 0.7086
+ 7. NoOfQMarkInURL                 - Score: 0.6989
+ 8. ObfuscationRatio               - Score: 0.6791
+ 9. HasDescription                 - Score: 0.6754
+10. SpacialCharRatioInURL          - Score: 0.6621
+11. IsDomainIP                     - Score: 0.6459
+12. HasObfuscation                 - Score: 0.6361
+13. URLCharProb                    - Score: 0.5868
+14. NoOfEqualsInURL                - Score: 0.5718
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5272
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9976
+ 3. DegitRatioInURL                - Score: 0.8659
+ 4. HasTitle                       - Score: 0.8140
+ 5. HasCopyrightInfo               - Score: 0.7202
+ 6. URLSimilarityIndex             - Score: 0.7084
+ 7. NoOfQMarkInURL                 - Score: 0.6934
+ 8. HasDescription                 - Score: 0.6771
+ 9. SpacialCharRatioInURL          - Score: 0.6519
+10. IsDomainIP                     - Score: 0.6491
+11. ObfuscationRatio               - Score: 0.6478
+12. HasObfuscation                 - Score: 0.6192
+13. URLCharProb                    - Score: 0.5818
+14. NoOfEqualsInURL                - Score: 0.5679
+15. HasExternalFormSubmit          - Score: 0.5301
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9865
+ 3. DegitRatioInURL                - Score: 0.8619
+ 4. HasTitle                       - Score: 0.8071
+ 5. URLSimilarityIndex             - Score: 0.7082
+ 6. HasCopyrightInfo               - Score: 0.7013
+ 7. NoOfQMarkInURL                 - Score: 0.6987
+ 8. HasDescription                 - Score: 0.6790
+ 9. ObfuscationRatio               - Score: 0.6658
+10. SpacialCharRatioInURL          - Score: 0.6532
+11. IsDomainIP                     - Score: 0.6502
+12. HasObfuscation                 - Score: 0.6261
+13. URLCharProb                    - Score: 0.5792
+14. NoOfEqualsInURL                - Score: 0.5754
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5225
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9897
+ 3. DegitRatioInURL                - Score: 0.8696
+ 4. HasTitle                       - Score: 0.8246
+ 5. URLSimilarityIndex             - Score: 0.7084
+ 6. HasCopyrightInfo               - Score: 0.7029
+ 7. NoOfQMarkInURL                 - Score: 0.6991
+ 8. HasDescription                 - Score: 0.6804
+ 9. ObfuscationRatio               - Score: 0.6758
+10. SpacialCharRatioInURL          - Score: 0.6613
+11. IsDomainIP                     - Score: 0.6457
+12. HasObfuscation                 - Score: 0.6316
+13. URLCharProb                    - Score: 0.5873
+14. NoOfEqualsInURL                - Score: 0.5734
+15. NoOfDegitsInURL                - Score: 0.5460
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9908
+ 3. DegitRatioInURL                - Score: 0.8609
+ 4. HasTitle                       - Score: 0.8121
+ 5. HasCopyrightInfo               - Score: 0.7196
+ 6. URLSimilarityIndex             - Score: 0.7089
+ 7. NoOfQMarkInURL                 - Score: 0.6995
+ 8. HasDescription                 - Score: 0.6654
+ 9. ObfuscationRatio               - Score: 0.6635
+10. SpacialCharRatioInURL          - Score: 0.6573
+11. IsDomainIP                     - Score: 0.6423
+12. HasObfuscation                 - Score: 0.6223
+13. URLCharProb                    - Score: 0.5800
+14. NoOfEqualsInURL                - Score: 0.5735
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5242
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9887
+ 3. DegitRatioInURL                - Score: 0.8718
+ 4. HasTitle                       - Score: 0.8130
+ 5. HasCopyrightInfo               - Score: 0.7200
+ 6. URLSimilarityIndex             - Score: 0.7077
+ 7. NoOfQMarkInURL                 - Score: 0.6971
+ 8. HasDescription                 - Score: 0.6771
+ 9. IsDomainIP                     - Score: 0.6554
+10. SpacialCharRatioInURL          - Score: 0.6532
+11. ObfuscationRatio               - Score: 0.6307
+12. HasObfuscation                 - Score: 0.6133
+13. URLCharProb                    - Score: 0.5835
+14. NoOfEqualsInURL                - Score: 0.5730
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5197
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8661
+ 4. HasTitle                       - Score: 0.8167
+ 5. URLSimilarityIndex             - Score: 0.7085
+ 6. HasCopyrightInfo               - Score: 0.7060
+ 7. NoOfQMarkInURL                 - Score: 0.7007
+ 8. HasDescription                 - Score: 0.6838
+ 9. ObfuscationRatio               - Score: 0.6562
+10. SpacialCharRatioInURL          - Score: 0.6548
+11. IsDomainIP                     - Score: 0.6416
+12. HasObfuscation                 - Score: 0.6190
+13. URLCharProb                    - Score: 0.5880
+14. NoOfEqualsInURL                - Score: 0.5727
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5208
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8667
+ 4. HasTitle                       - Score: 0.8198
+ 5. URLSimilarityIndex             - Score: 0.7073
+ 6. HasCopyrightInfo               - Score: 0.7046
+ 7. NoOfQMarkInURL                 - Score: 0.6977
+ 8. HasDescription                 - Score: 0.6673
+ 9. SpacialCharRatioInURL          - Score: 0.6476
+10. ObfuscationRatio               - Score: 0.6459
+11. IsDomainIP                     - Score: 0.6446
+12. HasObfuscation                 - Score: 0.6235
+13. URLCharProb                    - Score: 0.5801
+14. NoOfEqualsInURL                - Score: 0.5736
+15. HasExternalFormSubmit          - Score: 0.5379
+16. NoOfOtherSpecialCharsInURL     - Score: 0.5239
+17. NoOfCSS                        - Score: 0.5130
+18. CharContinuationRate           - Score: 0.5059
+19. HasSubmitButton                - Score: 0.4793
+20. NoOfiFrame                     - Score: 0.4771
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9942
+ 3. DegitRatioInURL                - Score: 0.8645
+ 4. HasTitle                       - Score: 0.8047
+ 5. HasCopyrightInfo               - Score: 0.7157
+ 6. URLSimilarityIndex             - Score: 0.7083
+ 7. NoOfQMarkInURL                 - Score: 0.6971
+ 8. HasDescription                 - Score: 0.6789
+ 9. ObfuscationRatio               - Score: 0.6740
+10. SpacialCharRatioInURL          - Score: 0.6564
+11. IsDomainIP                     - Score: 0.6527
+12. HasObfuscation                 - Score: 0.6315
+13. URLCharProb                    - Score: 0.5799
+14. NoOfEqualsInURL                - Score: 0.5732
+15. HasExternalFormSubmit          - Score: 0.5329
+16. NoOfOtherSpecialCharsInURL     - Score: 0.5210
+17. CharContinuationRate           - Score: 0.5089
+18. NoOfCSS                        - Score: 0.5067
+19. HasSubmitButton                - Score: 0.4969
+20. NoOfiFrame                     - Score: 0.4803
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9890
+ 3. DegitRatioInURL                - Score: 0.8634
+ 4. HasTitle                       - Score: 0.8289
+ 5. HasCopyrightInfo               - Score: 0.7122
+ 6. URLSimilarityIndex             - Score: 0.7076
+ 7. NoOfQMarkInURL                 - Score: 0.6969
+ 8. HasDescription                 - Score: 0.6799
+ 9. ObfuscationRatio               - Score: 0.6582
+10. SpacialCharRatioInURL          - Score: 0.6538
+11. IsDomainIP                     - Score: 0.6430
+12. HasObfuscation                 - Score: 0.6261
+13. URLCharProb                    - Score: 0.5872
+14. NoOfEqualsInURL                - Score: 0.5693
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5205
+16. CharContinuationRate           - Score: 0.5116
+17. HasExternalFormSubmit          - Score: 0.5105
+18. NoOfCSS                        - Score: 0.5067
+19. HasSubmitButton                - Score: 0.4777
+20. NoOfiFrame                     - Score: 0.4756
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9989
+ 3. DegitRatioInURL                - Score: 0.8653
+ 4. HasTitle                       - Score: 0.8080
+ 5. HasCopyrightInfo               - Score: 0.7129
+ 6. URLSimilarityIndex             - Score: 0.7086
+ 7. NoOfQMarkInURL                 - Score: 0.6989
+ 8. ObfuscationRatio               - Score: 0.6791
+ 9. HasDescription                 - Score: 0.6754
+10. SpacialCharRatioInURL          - Score: 0.6621
+11. IsDomainIP                     - Score: 0.6459
+12. HasObfuscation                 - Score: 0.6361
+13. URLCharProb                    - Score: 0.5868
+14. NoOfEqualsInURL                - Score: 0.5718
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5272
+16. CharContinuationRate           - Score: 0.5179
+17. HasExternalFormSubmit          - Score: 0.5175
+18. NoOfCSS                        - Score: 0.5036
+19. HasSubmitButton                - Score: 0.4839
+20. NoOfiFrame                     - Score: 0.4787
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9976
+ 3. DegitRatioInURL                - Score: 0.8659
+ 4. HasTitle                       - Score: 0.8140
+ 5. HasCopyrightInfo               - Score: 0.7202
+ 6. URLSimilarityIndex             - Score: 0.7084
+ 7. NoOfQMarkInURL                 - Score: 0.6934
+ 8. HasDescription                 - Score: 0.6771
+ 9. SpacialCharRatioInURL          - Score: 0.6519
+10. IsDomainIP                     - Score: 0.6491
+11. ObfuscationRatio               - Score: 0.6478
+12. HasObfuscation                 - Score: 0.6192
+13. URLCharProb                    - Score: 0.5818
+14. NoOfEqualsInURL                - Score: 0.5679
+15. HasExternalFormSubmit          - Score: 0.5301
+16. NoOfOtherSpecialCharsInURL     - Score: 0.5184
+17. CharContinuationRate           - Score: 0.5086
+18. NoOfCSS                        - Score: 0.5036
+19. HasSubmitButton                - Score: 0.4890
+20. NoOfiFrame                     - Score: 0.4768
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9865
+ 3. DegitRatioInURL                - Score: 0.8619
+ 4. HasTitle                       - Score: 0.8071
+ 5. URLSimilarityIndex             - Score: 0.7082
+ 6. HasCopyrightInfo               - Score: 0.7013
+ 7. NoOfQMarkInURL                 - Score: 0.6987
+ 8. HasDescription                 - Score: 0.6790
+ 9. ObfuscationRatio               - Score: 0.6658
+10. SpacialCharRatioInURL          - Score: 0.6532
+11. IsDomainIP                     - Score: 0.6502
+12. HasObfuscation                 - Score: 0.6261
+13. URLCharProb                    - Score: 0.5792
+14. NoOfEqualsInURL                - Score: 0.5754
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5225
+16. HasExternalFormSubmit          - Score: 0.5224
+17. CharContinuationRate           - Score: 0.5159
+18. NoOfCSS                        - Score: 0.5040
+19. NoOfiFrame                     - Score: 0.5037
+20. HasSubmitButton                - Score: 0.4837
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9897
+ 3. DegitRatioInURL                - Score: 0.8696
+ 4. HasTitle                       - Score: 0.8246
+ 5. URLSimilarityIndex             - Score: 0.7084
+ 6. HasCopyrightInfo               - Score: 0.7029
+ 7. NoOfQMarkInURL                 - Score: 0.6991
+ 8. HasDescription                 - Score: 0.6804
+ 9. ObfuscationRatio               - Score: 0.6758
+10. SpacialCharRatioInURL          - Score: 0.6613
+11. IsDomainIP                     - Score: 0.6457
+12. HasObfuscation                 - Score: 0.6316
+13. URLCharProb                    - Score: 0.5873
+14. NoOfEqualsInURL                - Score: 0.5734
+15. NoOfDegitsInURL                - Score: 0.5460
+16. NoOfOtherSpecialCharsInURL     - Score: 0.5223
+17. HasExternalFormSubmit          - Score: 0.5103
+18. CharContinuationRate           - Score: 0.5056
+19. NoOfCSS                        - Score: 0.5043
+20. NoOfiFrame                     - Score: 0.4774
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9908
+ 3. DegitRatioInURL                - Score: 0.8609
+ 4. HasTitle                       - Score: 0.8121
+ 5. HasCopyrightInfo               - Score: 0.7196
+ 6. URLSimilarityIndex             - Score: 0.7089
+ 7. NoOfQMarkInURL                 - Score: 0.6995
+ 8. HasDescription                 - Score: 0.6654
+ 9. ObfuscationRatio               - Score: 0.6635
+10. SpacialCharRatioInURL          - Score: 0.6573
+11. IsDomainIP                     - Score: 0.6423
+12. HasObfuscation                 - Score: 0.6223
+13. URLCharProb                    - Score: 0.5800
+14. NoOfEqualsInURL                - Score: 0.5735
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5242
+16. HasExternalFormSubmit          - Score: 0.5183
+17. CharContinuationRate           - Score: 0.5142
+18. NoOfCSS                        - Score: 0.5087
+19. HasSubmitButton                - Score: 0.4852
+20. NoOfJS                         - Score: 0.4838
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9887
+ 3. DegitRatioInURL                - Score: 0.8718
+ 4. HasTitle                       - Score: 0.8130
+ 5. HasCopyrightInfo               - Score: 0.7200
+ 6. URLSimilarityIndex             - Score: 0.7077
+ 7. NoOfQMarkInURL                 - Score: 0.6971
+ 8. HasDescription                 - Score: 0.6771
+ 9. IsDomainIP                     - Score: 0.6554
+10. SpacialCharRatioInURL          - Score: 0.6532
+11. ObfuscationRatio               - Score: 0.6307
+12. HasObfuscation                 - Score: 0.6133
+13. URLCharProb                    - Score: 0.5835
+14. NoOfEqualsInURL                - Score: 0.5730
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5197
+16. HasExternalFormSubmit          - Score: 0.5137
+17. CharContinuationRate           - Score: 0.5096
+18. NoOfCSS                        - Score: 0.5008
+19. HasSubmitButton                - Score: 0.4806
+20. NoOfiFrame                     - Score: 0.4795
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. IsHTTPS                        - Score: 1.0000
+ 2. HasSocialNet                   - Score: 0.9913
+ 3. DegitRatioInURL                - Score: 0.8661
+ 4. HasTitle                       - Score: 0.8167
+ 5. URLSimilarityIndex             - Score: 0.7085
+ 6. HasCopyrightInfo               - Score: 0.7060
+ 7. NoOfQMarkInURL                 - Score: 0.7007
+ 8. HasDescription                 - Score: 0.6838
+ 9. ObfuscationRatio               - Score: 0.6562
+10. SpacialCharRatioInURL          - Score: 0.6548
+11. IsDomainIP                     - Score: 0.6416
+12. HasObfuscation                 - Score: 0.6190
+13. URLCharProb                    - Score: 0.5880
+14. NoOfEqualsInURL                - Score: 0.5727
+15. NoOfOtherSpecialCharsInURL     - Score: 0.5208
+16. CharContinuationRate           - Score: 0.5117
+17. HasExternalFormSubmit          - Score: 0.5042
+18. NoOfCSS                        - Score: 0.5035
+19. HasSubmitButton                - Score: 0.4827
+20. NoOfiFrame                     - Score: 0.4795
+================================================================================
+  wrote C:\personal\grad-school\reproduce\outputs\table_a2_feature_count.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_a2_feature_count.csv

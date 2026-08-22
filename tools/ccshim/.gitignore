@@ -1,0 +1,5 @@
+# Built on demand by reproduce/hostenv.sh from cc_shim.c, and regenerated
+# whenever the source is newer. A checked-in binary would be one more thing to
+# verify matches its source.
+cc_shim.exe
+dist-extra.cfg

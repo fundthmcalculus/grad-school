@@ -24,7 +24,16 @@ jobs:
       - name: Install linting tools
         run: |
           python -m pip install --upgrade pip
-          pip install black flake8 Flake8-pyproject mypy
+          # black is PINNED because it is the only gating check here, and an
+          # unpinned formatter turns "did this branch change?" into "did black
+          # release since the last run?". Both happened on 2026-08-22: a file
+          # formatted locally with a newer black failed this job, and two files
+          # this job has always accepted are ones a newer black would rewrite.
+          # Nothing was wrong with either; the versions simply disagreed.
+          #
+          # Bump this deliberately, in its own commit, so the reformat lands
+          # separately from whatever change happens to be in flight.
+          pip install 'black==26.5.1' flake8 Flake8-pyproject mypy
 
       - name: Check code formatting with black
         run: black --check .
