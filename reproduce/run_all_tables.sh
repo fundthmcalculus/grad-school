@@ -116,6 +116,13 @@ declare -A SLOW_TABLES=(
   [table_3_1_pvat_scaling]=1
   [table_norm_conorm_matrix]=1
   [table_hyperparam_normalization]=1
+  # Added 2026-08-22. The list above was sized from outputs/seeds10-2026-08-01/,
+  # which predates RT-IOT2022 landing (2026-08-12). Since then the two tables
+  # that actually dominate the suite are these, and neither was in the list --
+  # so `--fast` ran them at the full ten seeds and stopped bounding the runtime
+  # it exists to bound. Measured on this host: 530 s and 13,084 s.
+  [table_4_1_mog_baselines]=1
+  [table_4_4_openset]=1
   # The GPU table sweeps four N for the MST/front end, three for FCM and eight
   # (dimension x precision) for distances, with a CPU arm beside every one, so ten
   # seeds is ~25 min on its own -- the slowest single table in the suite.
@@ -169,6 +176,14 @@ CLUSTER_TABLES=(
   table_3_2_memory_precision
   table_3_4_gpu_speedups
   table_3_7_g2_dtw_nonmetric
+  # Added 2026-08-22. Its output sat in every archive with NO LOG beside it,
+  # because it had only ever been hand-run -- the same trap B12 records for
+  # table_a1_feature_scoring and table_3_2_memory_precision, in a third place.
+  # It matters more than those two: this table is the evidence for Chapter 3's
+  # Goal G2 downstream claim and for §5.4's corrected coordinate-free claim, so a
+  # sweep reporting green while silently carrying it forward asserts a result
+  # nobody re-measured.
+  table_3_7_g2_downstream
 )
 
 # Per-table dependency overrides, for a table needing something the group's
@@ -189,6 +204,8 @@ declare -A TABLE_DEPS=(
   # so, like the CuPy row above, the dependency has to ride on the invocation.
   # This table also downloads UCR/UEA archives on first run (network + disk).
   [table_3_7_g2_dtw_nonmetric]="--with aeon"
+  # Same DTW datasets, same dependency.
+  [table_3_7_g2_downstream]="--with aeon"
 )
 declare -A TABLE_DEPS_FALLBACK=(
   [table_3_4_gpu_speedups]="--with scipy"

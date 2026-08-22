@@ -603,7 +603,24 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       features): MoG trains in $37.42 \pm 0.64$ s at $0.927 \pm 0.002$ accuracy against Random
       Forest's $0.999 \pm 0.000$ (ten seeds, `table_4_1_mog_baselines.py`). The open-set scale
       claim (§4.3.5, Table 4.7b): the complement rule loses to Isolation Forest at scale
-      (+0.394 vs +0.537 Youden's $J$, five seeds). **The *correction-rule cascade's own* scale
+      (+0.394 vs +0.537 Youden's $J$, five seeds).
+      ✅ **Re-run at the document's own ten-seed floor, 2026-08-22** (3 h 38 m; the five-seed
+      figure was a session-length compromise the prose names). The direction holds and the
+      margin narrows sharply:
+
+      | method | archive, 5 seeds | 2026-08-22, 10 seeds |
+      |---|---:|---:|
+      | Complement rule (this work) | +0.394 | **+0.515** |
+      | One-class SVM | +0.408 | +0.271 |
+      | Isolation Forest | **+0.537** | **+0.579** |
+
+      So the complement rule still loses to Isolation Forest, by **0.064** rather than 0.143, and
+      it now *beats* the one-class SVM rather than trailing it. Two caveats keep this from being a
+      re-quote: the spreads are ±0.27–±0.31, so **no separation in the table clears its own error
+      bar** — the same point §4.4 already makes about Table 4.7 — and the run is at a pin whose
+      membership fitting changed (**D8**, `_kmeans_labels_1d`), so it measures the current code
+      rather than the code the prose quotes. Report it as a ten-seed measurement of the current
+      pin; do not overwrite Table 4.7b from it until D8 is settled. **The *correction-rule cascade's own* scale
       claim is the one still open** — that specific experiment (the gated cascade below, on
       RT-IOT2022 rather than Glass) has not been run — but "RT-IOT2022 is absent" is no longer
       the reason for any of the three.
