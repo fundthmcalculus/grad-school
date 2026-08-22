@@ -343,6 +343,31 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       the numeric phase itself was unaffected. Full account:
       `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`.
 
+      **(c) That rename sweep was incomplete, and the gap was invisible for the same reason the
+      original was.** Swept every generator and study script on 2026-08-22 for upstream APIs that
+      no longer exist. Three more files carried them, all confirmed GONE at the pinned SHA rather
+      than assumed:
+      - `reproduce/tables/table_norm_conorm_matrix.py` → both flat-MoG rows silently `N/A` since
+        at least the 2026-08-11 archive. **This one matters most**, because it is the sole
+        evidence for **E1**, and the failure is *graceful*: the skip path catches the ImportError,
+        prints its reason, emits `N/A`, and the generator exits 0 — so the orchestrator reported
+        *ok* and the run reported green with a third of the table empty. A graceful degradation
+        nobody reads is indistinguishable from a result.
+      - `reproduce/optimizers/structure.py` → imported `gauss_math.standard_transform` and
+        `.detect_and_apply_log_transform`, deleted in tribble-fis #67, with **no fallback**, so
+        `StructureProblem.__init__` raised before doing any work and took the optimizer structure
+        study — §6.3.5's evidence — down with it.
+      - `reproduce/regression_scale/mog_top_p_sweep.py` → same rename. Superseded by C13's
+        generator, but a superseded script that raises `ImportError` is not superseded, it is
+        broken.
+
+      All three fixed 2026-08-22, reusing `_fuzzy_models`' documented successors rather than
+      adding second copies that could drift, and keeping the old names as fallbacks so the
+      generators still run against an older pin. **The lesson is the same one B13 and Ch 8's tally
+      name:** each of these was found by grepping for the *class* of defect rather than by
+      re-checking the instances already known. A fix applied to the files you happened to be
+      looking at is not a sweep.
+
 - [ ] ⬜ **B13 — Upstream trapezoid-fitter fix: pin bumped to `141596e`, no proposal table
       moved, two sample scripts still owed.** `tribble-fis`
       [#170](https://github.com/fundthmcalculus/tribble-fis/pull/170) fixes a defect in
