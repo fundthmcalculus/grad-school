@@ -784,12 +784,37 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       `table_g5_output_partitioning` 11 — none of which the compiler, the FCM fix or a restored
       row explains. The three regression rows of `table_4_1` are the cleanest instance: they moved
       $0.795 \rightarrow 0.808$, $0.852 \rightarrow 0.867$, $0.939 \rightarrow 0.960$ and move
-      *identically with and without* the B14 correction, so they have a separate cause somewhere
-      in the same 48-commit window. Bisecting that is the same exercise B14 took and should be
-      cheaper the second time: the harness, the frozen-data pattern and the per-commit probe all
-      exist now (`reproduce/experiments/diagnose_wasserstein_regression.py` is the template).
-      Until it is done, **`full-2026-08-22` is a diagnostic archive, not a run of record**, and the
-      run of record stays `goal-8h-2026-08-11-fullsuite`.
+      *identically with and without* the B14 correction, so they have a separate cause.
+
+      ✅ **That instance is now traced** (`reproduce/experiments/diagnose_regression_drift.py`,
+      `--freeze` / `--probe` / `--isolate`). Features are frozen once, already normalized, so the
+      probe isolates the model from the scaler. Bisected over the same 48 commits:
+
+      | tribble-fis commit | 1st order | full-2nd |
+      |---|---:|---:|
+      | `80e98d7` (archive pin) | 0.7950 ± 0.0249 | 0.8517 ± 0.0297 |
+      | `ce4a0fc` (#87) | 0.7950 ± 0.0249 | 0.8517 ± 0.0297 |
+      | **`5237ebe` (#95)** | **0.8041 ± 0.0297** | **0.8680 ± 0.0277** |
+      | `141596e` (current) | 0.8078 ± 0.0297 | 0.8666 ± 0.0311 |
+
+      **It is the same commit as B14** — #95, the scipy/sklearn → numba replacement — acting
+      through a *different* function, which is why restoring `wasserstein_distance` never moved
+      these rows. Restoring each replacement one at a time at the current pin, exactly one moves
+      them: **`_kmeans_labels_1d`**, back to 0.7986 ± 0.0255 / 0.8521 ± 0.0287 (the full-2nd row
+      lands on the archive to within 0.0004). The others are inert.
+
+      The mechanism: sklearn's `KMeans` seeds with **k-means++**; the replacement `kmeans_1d` takes
+      a **single uniform-random start** and no restarts. That changes the 1-D mixture
+      initialization, hence the fitted memberships, hence $R^2$. **Unlike B14 this is not a wrong
+      answer** — the values went *up* — but it is an unexplained change to a headline number
+      arriving inside a commit described as a performance optimization, and a single random start
+      is a worse guarantee than k-means++ even where it happens to score better. Worth one
+      sentence upstream and a decision here about which to quote.
+
+      Remaining under this item: `table_a1` (8 cells), `table_a2` (21) and
+      `table_g5_output_partitioning` (11), still unexplained after correcting B14. Until they are,
+      **`full-2026-08-22` is a diagnostic archive, not a run of record**, and the run of record
+      stays `goal-8h-2026-08-11-fullsuite`.
 
 
 ## E. Decisions and framing
