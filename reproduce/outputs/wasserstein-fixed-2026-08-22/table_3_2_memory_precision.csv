@@ -1,0 +1,7 @@
+precision,scheme,bytes/entry,"footprint at N=64,000",largest N in 64 GB,largest N in 96 GB,"ordering vs float64 (N=2,000)"
+float64,classical (D + copy + work),8,98.3 GB,"51,639","63,245",1.000 (exact)
+float64,in-place (D only),8,32.8 GB,"89,442","109,544",1.000 (exact)
+float64,on-demand (vat_prim_mst_seq) — DEFECTIVE,8,no N^2 term,not memory-bound,not memory-bound,1.000 (exact)
+float32,classical (D + copy + work),4,49.2 GB,"73,029","89,442",1.000 (exact)
+float32,in-place (D only),4,16.4 GB,"126,491","154,919",1.000 (exact)
+float32,on-demand (vat_prim_mst_seq) — DEFECTIVE,4,no N^2 term,not memory-bound,not memory-bound,0.999 ± 0.002

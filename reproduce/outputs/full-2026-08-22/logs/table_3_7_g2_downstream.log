@@ -1,0 +1,13 @@
+Table 3.7 (Goal G2) companion -- decision-rule item 3: downstream usefulness
+
+== ECG5000 ==
+  loaded: N=5000 length=140 k_true=5
+  DTW matrix (5000, 5000): 604.2s
+  minimax_transform_fast: 4.27s
+  NERFCM given k=5: ARI=0.593 ± 0.044 (10 seeds, 19.16s total)
+  select_coverage_cover: 0.24s -> k=25 coverage=0.943 ARI=0.715
+  select_multiscale: 0.24s -> 1 band(s), granularities=[25], per-band ARI=[0.7148683815145677], best=0.715
+  single-linkage given k: ARI=0.000  |  beta-plateau: 0.94s -> k=23 coverage=0.948 ARI=0.716
+  decision-rule check: |cover_ARI - NERFCM_ARI| = 0.122 -> within 0.05? no
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_7_g2_downstream.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_7_g2_downstream.csv
