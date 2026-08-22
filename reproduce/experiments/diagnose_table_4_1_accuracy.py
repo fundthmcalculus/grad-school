@@ -94,8 +94,10 @@ def main() -> int:
                 loader = getattr(fm, name)
                 break
     if loader is None:
-        print(f"no loader for {args.dataset}; available: "
-              f"{[n for n in dir(fm) if n.startswith('load')]}")
+        print(
+            f"no loader for {args.dataset}; available: "
+            f"{[n for n in dir(fm) if n.startswith('load')]}"
+        )
         return 2
 
     X, y = loader()
@@ -106,7 +108,9 @@ def main() -> int:
 
     accs = []
     for seed in range(args.seeds):
-        xtr, xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed, stratify=y)
+        xtr, xte, ytr, yte = train_test_split(
+            X, y, test_size=0.2, random_state=seed, stratify=y
+        )
         model = fm.mog_classifier(seed)
         t0 = time.perf_counter()
         model.fit(xtr, ytr)
@@ -118,8 +122,10 @@ def main() -> int:
         # explicitly rather than leaving it to be inferred from the accuracy.
         vals, counts = np.unique(pred, return_counts=True)
         top = counts.max() / counts.sum()
-        print(f"  seed {seed}: acc={acc:.4f}  fit={fit_s:6.2f}s  "
-              f"distinct_preds={len(vals)}  most_common_frac={top:.3f}")
+        print(
+            f"  seed {seed}: acc={acc:.4f}  fit={fit_s:6.2f}s  "
+            f"distinct_preds={len(vals)}  most_common_frac={top:.3f}"
+        )
         print(f"           {describe_model(model)}")
 
     a = np.asarray(accs)

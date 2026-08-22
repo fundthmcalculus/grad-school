@@ -81,7 +81,11 @@ def peak_bytes() -> int:
                 continue
         if fn is None:
             raise RuntimeError("no GetProcessMemoryInfo export found")
-        fn.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESS_MEMORY_COUNTERS), wintypes.DWORD]
+        fn.argtypes = [
+            wintypes.HANDLE,
+            ctypes.POINTER(PROCESS_MEMORY_COUNTERS),
+            wintypes.DWORD,
+        ]
         fn.restype = wintypes.BOOL
 
         counters = PROCESS_MEMORY_COUNTERS()
@@ -154,7 +158,15 @@ def child_measure(arm: str, n: int, d: int, seed: int) -> None:
 
 def run_child(arm: str, n: int, d: int, seed: int) -> dict | None:
     proc = subprocess.run(
-        [sys.executable, os.path.abspath(__file__), "--child", arm, str(n), str(d), str(seed)],
+        [
+            sys.executable,
+            os.path.abspath(__file__),
+            "--child",
+            arm,
+            str(n),
+            str(d),
+            str(seed),
+        ],
         capture_output=True,
         text=True,
     )
@@ -162,7 +174,9 @@ def run_child(arm: str, n: int, d: int, seed: int) -> dict | None:
         line = line.strip()
         if line.startswith("{"):
             return json.loads(line)
-    sys.stderr.write(f"  [{arm} n={n}] child produced no result\n{proc.stderr[-800:]}\n")
+    sys.stderr.write(
+        f"  [{arm} n={n}] child produced no result\n{proc.stderr[-800:]}\n"
+    )
     return None
 
 
@@ -179,7 +193,9 @@ def correctness(sizes, dims, seeds) -> list[tuple]:
             ref = pvat.compute_vat(dm)
             ref = np.asarray(ref[1] if isinstance(ref, tuple) else ref).ravel()
             got = np.asarray(pvat.vat_prim_mst_seq(x)).ravel()
-            agreements.append(float((ref == got).mean()) if ref.shape == got.shape else 0.0)
+            agreements.append(
+                float((ref == got).mean()) if ref.shape == got.shape else 0.0
+            )
             # The old defect's fingerprint: seed vertex, then ascending indices.
             if got.size > 2 and bool(np.all(np.diff(got[1:]) == 1)):
                 ascending += 1
@@ -210,7 +226,9 @@ def main() -> int:
     print(f"{'N':>8} {'agreement':>20} {'chance':>10} {'ascending-index runs':>22}")
     rows = correctness([1000, 2000, 5000], args.dims, seeds)
     for n, mean, std, asc, total, chance in rows:
-        print(f"{n:>8} {mean:>13.4f} +/- {std:<5.4f} {chance:>10.4f} {f'{asc}/{total}':>22}")
+        print(
+            f"{n:>8} {mean:>13.4f} +/- {std:<5.4f} {chance:>10.4f} {f'{asc}/{total}':>22}"
+        )
     all_exact = all(abs(m - 1.0) < 1e-12 and s == 0.0 for _, m, s, _, _, _ in rows)
     print(f"\n  => {'PASS-CORRECT' if all_exact else 'FAIL-CORRECT'}")
 
@@ -218,7 +236,9 @@ def main() -> int:
     print("=" * 78)
     print("B. Memory -- peak working set, one fresh process per arm")
     print("=" * 78)
-    print(f"{'N':>8} {'matrix @ f64':>14} {'matrix-free':>14} {'materialized':>14} {'ratio':>8}")
+    print(
+        f"{'N':>8} {'matrix @ f64':>14} {'matrix-free':>14} {'materialized':>14} {'ratio':>8}"
+    )
     mem_rows = []
     for n in (2000, 4000, 8000, 12000):
         free = run_child("matrix-free", n, args.dims, 0)
@@ -246,7 +266,9 @@ def main() -> int:
             f"materialized peak grew {growth_full:.1f}x; "
             f"matrix-free peak grew {growth_free:.2f}x"
         )
-        verdict_mem = "PASS-MEMORY" if growth_free < 0.25 * growth_full else "FAIL-MEMORY"
+        verdict_mem = (
+            "PASS-MEMORY" if growth_free < 0.25 * growth_full else "FAIL-MEMORY"
+        )
     print(f"\n  => {verdict_mem}")
 
     print()
@@ -283,9 +305,13 @@ def main() -> int:
             print("\n  => PASS-CLOCK (by extrapolation from a stable ratio, not a")
             print("     measurement at 155,000 points -- state it as such)")
         elif worst >= 10.0:
-            print("\n  => FAIL-CLOCK: slower than an order of magnitude; G4d stays a cut candidate")
+            print(
+                "\n  => FAIL-CLOCK: slower than an order of magnitude; G4d stays a cut candidate"
+            )
         else:
-            print("\n  => INCONCLUSIVE-CLOCK: the ratio is not stable enough to extrapolate")
+            print(
+                "\n  => INCONCLUSIVE-CLOCK: the ratio is not stable enough to extrapolate"
+            )
     return 0
 
 
