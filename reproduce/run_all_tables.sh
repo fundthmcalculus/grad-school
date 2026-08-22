@@ -87,6 +87,17 @@ export PYTHONIOENCODING=utf-8
 # the run that failed is blank, which is the exact opposite of what a log is for.
 export PYTHONUNBUFFERED=1
 
+# Windows hosts need a C toolchain to build the three compiled submodules, and
+# this one lost its MSVC. hostenv.sh is a no-op everywhere else; sourced here so
+# the suite bootstraps itself rather than depending on the operator having
+# remembered to. It exports CC/DIST_EXTRA_CONFIG/UV_NO_EDITABLE, so it must come
+# before the first uv invocation. See its header for the three defects involved.
+_hostenv="$(dirname "${BASH_SOURCE[0]}")/hostenv.sh"
+if [ -f "$_hostenv" ]; then
+  # shellcheck source=/dev/null
+  source "$_hostenv" || { echo "error: hostenv.sh failed; no usable compiler" >&2; exit 1; }
+fi
+
 # Table 4.4b, the theta operating curve, is emitted by table_4_4_openset ONLY when
 # this is set -- so every sweep so far produced 4.4 and silently omitted 4.4b,
 # while 4.4b sat in the archives from a hand-run. Defaulted here so the curve is
