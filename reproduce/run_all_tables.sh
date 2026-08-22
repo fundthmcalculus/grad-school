@@ -217,6 +217,12 @@ PLAIN_TABLES=(
 
 declare -A STATUS
 declare -A SEEDS_USED
+# N/A cells emitted per table. A generator that reports what it cannot run is
+# working as designed -- but `table_norm_conorm_matrix` emitted a THIRD of its
+# cells as N/A for weeks, from a class rename it caught and logged, while this
+# script printed a bare "ok" and the run went green. The count belongs next to
+# the status, so "ran" and "produced a table" stop being the same claim.
+declare -A NA_CELLS
 
 # Resolved once, from common.py, so the provenance file reports the seed list the
 # generators will actually use rather than a default repeated here. This line
@@ -369,13 +375,69 @@ run_one() {
   else
     STATUS[$name]=ok
   fi
-  printf '%-10s %4ss\n' "${STATUS[$name]}" "$((t1 - t0))"
+  # Count N/A cells in the CSVs this table just wrote. The changed-file set
+  # comes from the same before/after snapshot the no-output check uses, so it
+  # needs no timestamp window -- consecutive tables finish inside the same
+  # second, and any grace period wide enough to catch that would attribute one
+  # table's output to the next.
+  local na=0 f
+  while read -r f; do
+    [ -n "$f" ] && [ "${f##*.}" = "csv" ] || continue
+    na=$((na + $(grep -o 'N/A' "$f" 2>/dev/null | wc -l)))
+  done < <(comm -13 <(printf '%s\n' "$before") <(printf '%s\n' "$after") | awk '{print $1}')
+  NA_CELLS[$name]=$na
+
+  local na_note=""
+  [ "$na" -gt 0 ] && na_note="  ($na N/A)"
+  printf '%-10s %4ss%s\n' "${STATUS[$name]}" "$((t1 - t0))" "$na_note"
 }
 
 # Check for submodule SHA divergence before running. This call used to sit above
 # the function's own definition, where bash resolves it as an unknown command --
 # `set -e` is off, so the run continued and the guard never once fired.
 check_submodule_shas
+
+# Check the upstream contracts the generators silently assume, BEFORE spending
+# hours producing numbers under a broken one. Every defect the 2026-08-22 pass
+# found had the same shape: an upstream function kept its name and changed its
+# behaviour, the generator emitted N/A or a plausible wrong number, exited 0,
+# and this script printed "ok".
+#
+# A failure does NOT abort the run. It stamps the archive NOT CITABLE, the same
+# treatment --fast gets and for the same reason: the risk is someone quoting the
+# output a month from now, not someone producing it today. Skips are not
+# failures -- but an unavailable import is reported as a skip, never as a pass.
+PREFLIGHT_STATUS="not run"
+run_preflight() {
+  [ $ARCHIVE_ONLY -eq 1 ] && return 0
+  local out="$DEST/preflight.txt" rc=0
+  {
+    for suite in fis cluster; do
+      local proj="tribble-fis"
+      [ "$suite" = "cluster" ] && proj="tribble-cluster"
+      uv run --project "$ROOT/$proj" python "$ROOT/reproduce/preflight.py"           --suite "$suite" 2>&1 || rc=1
+      echo
+    done
+  } >"$out"
+  if [ $rc -ne 0 ]; then
+    PREFLIGHT_STATUS="FAILED -- see preflight.txt"
+    echo
+    echo "########################################################################"
+    echo "## PREFLIGHT FAILED -- AN UPSTREAM INVARIANT IS BROKEN                ##"
+    echo "##                                                                    ##"
+    grep -E "^\s+\[FAIL\]" "$out" | sed 's/^ *//' | cut -c1-66       | while IFS= read -r _l; do printf '## %-68s ##
+' "$_l"; done
+    echo "##                                                                    ##"
+    echo "## The run continues, and its archive is stamped NOT CITABLE.         ##"
+    echo "########################################################################"
+    echo
+  else
+    PREFLIGHT_STATUS="passed"
+    echo "preflight: all invariants hold (detail in $(basename "$DEST")/preflight.txt)"
+  fi
+  return 0
+}
+run_preflight
 
 echo "=== $LABEL ==="
 if [ $ARCHIVE_ONLY -eq 1 ]; then
@@ -428,6 +490,18 @@ PROV="$DEST/PROVENANCE.txt"
     echo "## THIS BANNER IS NOT A VERDICT. If an addendum below establishes what ##"
     echo "## produced these tables, read it: the archive may well be citable.    ##"
     echo "## Two independent readers stopped here and concluded it was not.      ##"
+    echo "########################################################################"
+    echo
+  fi
+  if [ "$PREFLIGHT_STATUS" != "passed" ] && [ $ARCHIVE_ONLY -eq 0 ]; then
+    echo
+    echo "########################################################################"
+    echo "## PREFLIGHT $(printf '%-56s' "$PREFLIGHT_STATUS")##"
+    echo "##                                                                    ##"
+    echo "## An upstream contract this harness relies on does not hold, so the  ##"
+    echo "## generators ran on a library that does not behave as they assume.   ##"
+    echo "## Every number in this archive is suspect. See preflight.txt for     ##"
+    echo "## which invariant broke and what it reaches.                         ##"
     echo "########################################################################"
     echo
   fi
@@ -508,8 +582,10 @@ print("blas", blas)
     # Unset means the filter skipped it; say so rather than claiming a result.
     # The seed set is recorded PER TABLE because --fast makes it vary between
     # them, and a reader must be able to tell which cells are thin.
-    printf '  %-38s %-12s seeds=%s\n' \
-      "$t" "${STATUS[$t]:-not-run-this-pass}" "${SEEDS_USED[$t]:-—}"
+    _na="${NA_CELLS[$t]:-}"
+    printf '  %-38s %-12s seeds=%s%s\n' \
+      "$t" "${STATUS[$t]:-not-run-this-pass}" "${SEEDS_USED[$t]:-—}" \
+      "${_na:+  N/A cells=$_na}"
   done
 } >> "$PROV"
 

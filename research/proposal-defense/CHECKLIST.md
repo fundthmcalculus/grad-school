@@ -553,13 +553,54 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       `table_4_4_openset.py` now emits the RT-IOT2022 table (the prose's **4.7b**) under the same
       output filenames. The Glass-based 4.6 and 4.7 the prose quotes are frozen at
       `uniform-2026-08-03` with no way to re-derive them short of hiding the dataset. A
-      `REPRO_OPENSET_DATASET` override would fix it; there is no knob today.
+      ✅ **Fixed 2026-08-22:** `REPRO_OPENSET_DATASET` pins the choice
+      (`glass` / `rt-iot2022` / `beth`) instead of taking the priority order, and a pinned-but-
+      absent dataset is an error rather than a reason to quietly use another — substituting one
+      silently is the whole reason the knob exists. Tables 4.6 and 4.7 regenerate again:
+      `REPRO_OPENSET_DATASET=glass`. At the current pin the shape holds and the values move
+      (4.6 peaks at $	heta = 0.90$, +0.162, against the prose's $	heta = 0.80$, +0.154;
+      4.7 keeps its ordering, Isolation Forest +0.157 > complement +0.141 > SVM +0.085, with the
+      gap narrowed from 0.047 to 0.016). Not a re-quote — **D8** applies — but they can be
+      re-derived at all now, which they could not be.
       (f) **Glass moved into `data/` and three call sites never followed it** — fixed 2026-08-22,
       see B12(c). Worth repeating here for the consequence: Table 4.8's Glass row and *the whole of
       Table 4.9* were missing from the run of record, so **C4's headline correction-pass
       measurement had no regenerable output**. Restored and re-verified; C4's conclusion holds
       (gated cascade $+0.043 \pm 0.050$ against the prose's $+0.031 \pm 0.027$) once B14 is
       corrected in the same run.
+
+
+- [x] ✅ **B17 — The harness now fails loudly where it failed quietly.** Every defect the
+      2026-08-22 pass found shared one shape: an upstream function kept its name and changed
+      its behaviour, the generator caught it, printed a reason, emitted `N/A` or a plausible
+      wrong number, **exited 0**, and `run_all_tables.sh` printed *ok*. Graceful degradation is
+      the right design; a graceful degradation nobody reads is indistinguishable from a result.
+      Three changes, aimed at the class rather than the instances:
+
+      **(a) `reproduce/preflight.py` — check the upstream contracts before spending hours.**
+      Five invariants a caller cannot see from a signature: `W1-SCALE` (scaling the data must
+      scale the distance — catches **B14**), `VAT-MATRIXFREE` (**B6**), `SCALER-ALIAS`
+      (`UnitScalar is MinMaxScaler`, which **B13** verified by hand once), `MODEL-NAMES`
+      (**B12**'s renames), `DATASETS` (**B16(f)**'s moved Glass). *An unavailable import is
+      reported SKIP, never PASS* — a check that passes because it could not run is the bug this
+      file exists to catch. `run_all_tables.sh` runs it per submodule environment before the
+      numeric phase; a failure does **not** abort the run but stamps the archive **NOT CITABLE**,
+      the same treatment `--fast` gets and for the same reason. It fails today, on W1-SCALE,
+      which is the point.
+
+      **(b) N/A accounting in the run summary and in `PROVENANCE.txt`.** A table now reports
+      `ok  27s  (10 N/A)` instead of `ok  27s`. Counted from the CSVs that table actually wrote,
+      via the same before/after snapshot the no-output check uses, so it needs no timestamp
+      window. This is the change that would have surfaced **E1**'s evidence base going missing
+      weeks earlier: `table_norm_conorm_matrix` emitted a third of its cells as `N/A` and
+      reported `ok` every run.
+
+      **(c) `build_pdf.py` warns when a figure copy changes the document** — **B8**'s one gap.
+      The copy is unconditional, so any local run of the generator behind a figure swaps it into
+      the document whether or not the table beside it was re-quoted from the same run. The build
+      now names each figure it changed and says a figure and its table must come from one run.
+      Verified by making it fire on `03-complexity-fit.png`, which is exactly the case that
+      caught this: a gcc-built figure (exponent 1.77) above an MSVC-built table quoting 1.97.
 
 
 ## C. Experiments owed

@@ -61,7 +61,7 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
-    print(f"[wasserstein-fix] verified: W1=0.5 at unit scale, 500.0 at x1000")
+    print("[wasserstein-fix] verified: W1=0.5 at unit scale, 500.0 at x1000")
 
     sys.argv = [target] + sys.argv[2:]
     sys.path.insert(0, os.path.dirname(target))

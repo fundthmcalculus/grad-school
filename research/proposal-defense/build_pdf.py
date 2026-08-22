@@ -123,14 +123,43 @@ def copy_figures():
 
     os.makedirs(dest_dir, exist_ok=True)
     copied = 0
+    replaced = []
 
     for harness_name, prose_name in FIGURE_COPIES.items():
         for ext in ("png", "eps"):
             source = os.path.join(source_dir, f"{harness_name}.{ext}")
             dest = os.path.join(dest_dir, f"{prose_name}.{ext}")
-            if os.path.exists(source):
-                shutil.copy2(source, dest)
-                copied += 1
+            if not os.path.exists(source):
+                continue
+            # The copy is unconditional, and that is a hazard worth naming rather
+            # than removing. Any local run of the generator behind a figure swaps
+            # it into the document, whether or not the TABLE beside it has been
+            # re-quoted from the same run. It happened on 2026-08-22: a figure
+            # rebuilt from gcc-compiled kernels (fitted exponent 1.77) would have
+            # sat directly above a table quoting 1.97 from an MSVC build.
+            #
+            # The automation is right -- the manual hop it replaced is worse. What
+            # it owes the reader is a warning when it is about to change what the
+            # document shows, so the change is a decision instead of a side effect.
+            differs = not (
+                os.path.exists(dest)
+                and os.path.getsize(dest) == os.path.getsize(source)
+                and open(dest, "rb").read() == open(source, "rb").read()
+            )
+            shutil.copy2(source, dest)
+            copied += 1
+            if differs and ext == "png":
+                replaced.append((prose_name, harness_name))
+
+    if replaced:
+        print("    ⚠ figure(s) CHANGED by this build -- check the table beside each:")
+        for prose_name, harness_name in replaced:
+            print(
+                f"      {prose_name}.png  <- reproduce/outputs/figures/{harness_name}.png"
+            )
+        print(
+            "      A figure and the table it illustrates must come from the same run."
+        )
 
     return copied
 
@@ -768,7 +797,9 @@ def build_with_latex(md_path, pandoc, engine):
     # DEPT has \\\\ which should become \\ (newline) in LaTeX output
     dept_for_latex = DEPT.replace("\\\\", "\\\\\\par")
 
-    title_page = TITLE_BLOCK + f"""
+    title_page = (
+        TITLE_BLOCK
+        + f"""
 ```{{=latex}}
 \\begin{{titlepage}}
 \\centering
@@ -788,6 +819,7 @@ def build_with_latex(md_path, pandoc, engine):
 \\end{{titlepage}}
 ```
 """
+    )
 
     with open(src, "w", encoding="utf-8") as f:
         f.write(title_page + body)
@@ -891,7 +923,8 @@ def build_with_weasyprint(md_path, pandoc):
     ) as f:  # keep the on-disk HTML in sync with the PDF
         f.write(html)
 
-    css = CSS(string="""
+    css = CSS(
+        string="""
     @page { size: letter; margin: 1in 1.05in;
             @bottom-center { content: counter(page);
                              font-family: Georgia, serif; font-size: 9.5pt; color:#555; } }
@@ -920,7 +953,8 @@ def build_with_weasyprint(md_path, pandoc):
           white-space:pre-wrap; page-break-inside:avoid; text-align:left; }
     code { font-family:Menlo,Consolas,monospace; font-size:8.8pt; }
     math { font-family:"Latin Modern Math","STIX Two Math","Cambria Math",serif; }
-    """)
+    """
+    )
     pdf = os.path.join(BUILD, "proposal.pdf")
     doc = HTML(string=html, base_url=HERE).render(stylesheets=[css])
     doc.write_pdf(pdf)
