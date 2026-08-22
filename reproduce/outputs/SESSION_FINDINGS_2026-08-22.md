@@ -164,10 +164,21 @@ indistinguishable from a result.
 ## 6. What is still owed
 
 - **B14** — file upstream; do not quote Ch 4/Ch 6 accuracy from the current pin.
-- **D8** — `table_a1` (8 cells), `table_a2` (21) and `table_g5_output_partitioning`
-  (11) still move after correcting B14, unexplained. Until they are explained,
-  `full-2026-08-22` is a **diagnostic archive, not a run of record**, and the run of
-  record stays `goal-8h-2026-08-11-fullsuite`.
+- **D8 — CLOSED.** Every drifting cell is now attributed. Restoring all six of
+  #95's replacements returns `table_a1`, `table_g5_output_partitioning` and
+  `table_g5b_skew_sweep` **byte-identical** to the archive, `table_a2`'s
+  accuracies identical (only wall-clock differs), and `table_4_1`'s
+  classification rows exact. What is left is **one row and one commit**: Bike
+  Sharing, traced in a single probe to **`69e0bab` (#102)**, a one-line default
+  flip `pin_extremes=True → False` in `TribbleRegressor` — which is the *same*
+  parameter §4.3.2's G5 study measured at 0.676 $R^2$ and recommended against.
+  Upstream independently adopted the proposal's own recommendation. `table_6_1`
+  and `table_concrete_reconciliation` move in the 3rd–4th decimal, which is the
+  host and its BLAS.
+  `full-2026-08-22` stays a **diagnostic archive** and the run of record stays
+  `goal-8h-2026-08-11-fullsuite`, but now because one cause is a defect awaiting
+  an upstream fix and the other is an improvement the prose has not absorbed —
+  not because anything is unexplained.
 - **B13** — extend the pin-bump check to every column of a table. It verified three
   R² values and concluded "byte-identical" while two accuracy columns beside them
   had collapsed. Chapter 8's tally already names the lesson: *repetition is not the

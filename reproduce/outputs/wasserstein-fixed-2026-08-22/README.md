@@ -3,7 +3,7 @@
 Every `gauss_math`-based generator here was run at the current pins with exactly
 one change: `tribblefis.stats_numba.wasserstein_distance` substituted for
 `scipy.stats.wasserstein_distance`, **in process**, by
-`reproduce/experiments/run_with_wasserstein_fix.py`. Nothing on disk was patched
+`reproduce/experiments/run_with_reference_stats.py`. Nothing on disk was patched
 and no submodule was touched.
 
 It exists to answer one question — *are the document's numbers wrong, or is the

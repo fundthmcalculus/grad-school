@@ -490,7 +490,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       RT-IOT2022 to $0.923 \pm 0.011$, and takes the table from 2 cells beyond noise to **0**
       against the archive. ⚠️ That is *not* the same as restoring the document: over the whole
       proposal the fix moves `check_prose` from 59 matching pairs to 70, against 156 under the
-      old pin. **D8** carries the remainder. `reproduce/experiments/run_with_wasserstein_fix.py`
+      old pin. **D8** carries the remainder. `reproduce/experiments/run_with_reference_stats.py`
       re-runs any generator that way, so the question can be settled table by table without
       waiting on upstream. The three regression rows move identically with and without the fix,
       so their drift has a separate and smaller cause, still untraced.
@@ -909,10 +909,45 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       is a worse guarantee than k-means++ even where it happens to score better. Worth one
       sentence upstream and a decision here about which to quote.
 
-      Remaining under this item: `table_a1` (8 cells), `table_a2` (21) and
-      `table_g5_output_partitioning` (11), still unexplained after correcting B14. Until they are,
-      **`full-2026-08-22` is a diagnostic archive, not a run of record**, and the run of record
-      stays `goal-8h-2026-08-11-fullsuite`.
+      ✅ **The residue is now fully attributed (2026-08-22). Two upstream commits and host
+      noise account for every drifting cell; nothing is left unexplained.**
+      `reproduce/experiments/run_with_reference_stats.py` restores any subset of the six functions
+      #95 replaced (`REPRO_RESTORE=wasserstein,kmeans` / `all` / `none`) and re-runs a generator
+      unmodified. Restoring **all six** at the current pin, against the archive:
+
+      | table | result | cause |
+      |---|---|---|
+      | `table_a1_feature_ranking` | **byte-identical** | #95 |
+      | `table_g5_output_partitioning` | **byte-identical** | #95 |
+      | `table_g5b_skew_sweep` | **byte-identical** | #95 |
+      | `table_a2_feature_count` | every accuracy identical; only wall-clock differs | #95 |
+      | `table_4_1`, classification rows | **exact** ($0.997 \pm 0.001$, $0.927 \pm 0.002$) | #95 (`wasserstein_distance`) |
+      | `table_4_1`, Concrete rows | within 0.004 | #95 (`_kmeans_labels_1d`) |
+      | `table_4_1`, **Bike Sharing** | 0.962 vs 0.939 — **not** recovered | **#102**, below |
+      | `table_6_1`, `table_concrete_reconciliation` | 3rd–4th decimal (9.122 → 9.117 RMSE) | host / BLAS |
+      | `table_norm_conorm_matrix`, `table_4_8_mf_dedup` | extra rows the archive lacks | rows this pass **restored** (B12(c), B16(f)) |
+
+      **Bike Sharing is a second commit, and a pleasing one.** Probed on frozen features: the
+      archive's pin `80e98d7` gives $0.9394 \pm 0.0043$ — the archive's own 0.939 ± 0.004 — and the
+      current pin gives $0.9646 \pm 0.0013$. Bisected in one probe to **`69e0bab`** (#102), whose
+      parent `5b92ec8` reads $0.9348 \pm 0.0035$. The diff is a single default:
+      `pin_extremes=True` → `pin_extremes=False` in `TribbleRegressor`.
+
+      That is **the same parameter §4.3.2's G5 study is about**. G5 measured pinning the extreme
+      bucket centroids to the observed min and max as costing 0.676 $R^2$ at zeroth order on
+      Concrete, and recommended against it; upstream independently flipped the default the same
+      way. So this drift is not a regression at all — it is the library adopting the proposal's own
+      recommendation, worth +0.025 on a heavily skewed count target. **§4.3.2 and G5 should say
+      that the default now matches the recommendation**, which is a stronger position than
+      recommending against a shipped default.
+
+      **Consequence for the archive question:** `full-2026-08-22` remains a *diagnostic* archive
+      and the run of record stays `goal-8h-2026-08-11-fullsuite` — but for a different reason than
+      before. Not "we do not know what moved" any more; rather, one of the two causes (B14) is a
+      defect awaiting an upstream fix (`tribble-fis` PR #171, CI green on both kernels), and the
+      other (#102) is an improvement the prose has not yet absorbed. Once #171 lands, a pin bump
+      plus a re-run should reproduce the archive everywhere except Bike Sharing and the
+      restored rows, both of which are then *expected* moves with a stated reason.
 
 
 ## E. Decisions and framing

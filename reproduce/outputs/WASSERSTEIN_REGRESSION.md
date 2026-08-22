@@ -132,7 +132,7 @@ instance of it, and the first where the uncovered half was the headline number.
 3. The archived numbers for **Table 4.1** are **correct**, not wrong: `80e98d7`
    reproduces 0.9952 ± 0.0014 against the archive's 0.997 ± 0.001, and restoring
    only this one function at the current pin recovers 0.9947 ± 0.0017.
-   `reproduce/experiments/run_with_wasserstein_fix.py` re-runs any generator with
+   `reproduce/experiments/run_with_reference_stats.py` re-runs any generator with
    the correction applied in-process, so the question can be settled table by
    table without waiting for upstream.
 
