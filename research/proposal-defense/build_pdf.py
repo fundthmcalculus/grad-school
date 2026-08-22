@@ -797,9 +797,7 @@ def build_with_latex(md_path, pandoc, engine):
     # DEPT has \\\\ which should become \\ (newline) in LaTeX output
     dept_for_latex = DEPT.replace("\\\\", "\\\\\\par")
 
-    title_page = (
-        TITLE_BLOCK
-        + f"""
+    title_page = TITLE_BLOCK + f"""
 ```{{=latex}}
 \\begin{{titlepage}}
 \\centering
@@ -819,7 +817,6 @@ def build_with_latex(md_path, pandoc, engine):
 \\end{{titlepage}}
 ```
 """
-    )
 
     with open(src, "w", encoding="utf-8") as f:
         f.write(title_page + body)
@@ -923,8 +920,7 @@ def build_with_weasyprint(md_path, pandoc):
     ) as f:  # keep the on-disk HTML in sync with the PDF
         f.write(html)
 
-    css = CSS(
-        string="""
+    css = CSS(string="""
     @page { size: letter; margin: 1in 1.05in;
             @bottom-center { content: counter(page);
                              font-family: Georgia, serif; font-size: 9.5pt; color:#555; } }
@@ -953,8 +949,7 @@ def build_with_weasyprint(md_path, pandoc):
           white-space:pre-wrap; page-break-inside:avoid; text-align:left; }
     code { font-family:Menlo,Consolas,monospace; font-size:8.8pt; }
     math { font-family:"Latin Modern Math","STIX Two Math","Cambria Math",serif; }
-    """
-    )
+    """)
     pdf = os.path.join(BUILD, "proposal.pdf")
     doc = HTML(string=html, base_url=HERE).render(stylesheets=[css])
     doc.write_pdf(pdf)
