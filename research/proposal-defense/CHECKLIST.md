@@ -217,6 +217,17 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       Resolved by *fix*, not removal: the function now computes the correct VAT/MST ordering and
       `tribble-cluster` carries a `test_vat_prim_mst_seq.py` regression test plus a compiled fast
       path, so the silent-wrong-answer hazard this item opened against is closed.
+      ⚠️ **The fix landed *after* the pinned commit (`tribble-cluster e3c27e6`).** So the code is
+      resolved but the dissertation still pins the earlier commit where the function is the removed,
+      chance-level negative result — which means Appendix A.6, Table 3.3's negative-result row, and
+      **Goal G4d** (the matrix-free reorder, whose whole premise is "no working matrix-free
+      implementation exists") describe the *pinned* state accurately but are now overtaken by the
+      code. **Downstream decision, tracked at G4d:** bump the pin to include the fix and re-run —
+      Table 3.3's negative row becomes a positive result, the reachable-N ceiling likely moves past
+      155k, and G4d's decision-rule (§7 line 51: elementwise ordering check at N∈{1k,2k,5k},
+      reachable N under the memory cap, the wall-clock threshold) can actually be run, turning G4d
+      from a *build* into an *integrate-and-measure* — **or** keep the current pin and add a "since
+      fixed upstream at `<commit>`" note to A.6/G4d. Author to choose; the fix itself is done.
       **Original defect (kept as the record):** the exported API silently returned a wrong
       ordering — the seed vertex followed by every other vertex in ascending index order,
       chance-level agreement (0.001 ± 0.001) with the true ordering at both float64 and float32.
