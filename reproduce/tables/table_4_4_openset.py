@@ -92,7 +92,10 @@ def load_openset_data():
         return X, y, "BETH"
 
     # Fall back to Glass (small public dataset)
-    path = os.path.join(F.REPO_ROOT, "glass.csv")
+    path = os.path.join(F.DATA_DIR, "glass.csv")
+    if not os.path.exists(path):
+        # Glass moved into data/; this fallback is the pre-move location.
+        path = os.path.join(F.REPO_ROOT, "glass.csv")
     if not os.path.exists(path):
         return None
     df = pd.read_csv(path).dropna()
