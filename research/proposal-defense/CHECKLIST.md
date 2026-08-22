@@ -531,6 +531,25 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       ⚠️ Related pin drift, no defect: **tribble-fis's `uv.lock` pins `optimizers` at `7b5958a1`
       while the `tribble-opt` submodule is at `8049b94`**, so the tables and the optimizer studies
       run two different revisions of the same library.
+      (d) **`table_3_7_g2_downstream` is not in the orchestrator's table list.** Its output sits in
+      every archive with no log beside it, because it has only ever been hand-run — the exact trap
+      **B12** names for `table_a1_feature_scoring` and `table_3_2_memory_precision`, still open in
+      a third place. It matters more than the others: that table is the evidence for Ch 3's G2
+      downstream claim *and* for §5.4's corrected coordinate-free claim, so a sweep that reports
+      green while silently carrying it forward is asserting a result nobody re-measured. Needs
+      adding to `CLUSTER_TABLES` with `--with aeon`.
+      (e) **Tables 4.6 and 4.7 can no longer be regenerated at all.** `load_openset_data()` prefers
+      RT-IOT2022 whenever it is present, and it has been present since 2026-08-12, so
+      `table_4_4_openset.py` now emits the RT-IOT2022 table (the prose's **4.7b**) under the same
+      output filenames. The Glass-based 4.6 and 4.7 the prose quotes are frozen at
+      `uniform-2026-08-03` with no way to re-derive them short of hiding the dataset. A
+      `REPRO_OPENSET_DATASET` override would fix it; there is no knob today.
+      (f) **Glass moved into `data/` and three call sites never followed it** — fixed 2026-08-22,
+      see B12(c). Worth repeating here for the consequence: Table 4.8's Glass row and *the whole of
+      Table 4.9* were missing from the run of record, so **C4's headline correction-pass
+      measurement had no regenerable output**. Restored and re-verified; C4's conclusion holds
+      (gated cascade $+0.043 \pm 0.050$ against the prose's $+0.031 \pm 0.027$) once B14 is
+      corrected in the same run.
 
 
 ## C. Experiments owed
