@@ -24,9 +24,10 @@ _Overnight reproduction pass against latest `main` and latest submodules, 2026-0
 > 🚨 **Read B14 before quoting any Chapter 4 or Chapter 6 accuracy number.** The current
 > `tribble-fis` pin carries a silent wrong-answer defect in `stats_numba.wasserstein_distance`
 > that takes PhiUSIIL from $0.997 \pm 0.001$ to $0.729 \pm 0.023$ and RT-IOT2022 from
-> $0.927 \pm 0.002$ to $0.500 \pm 0.244$. **The document's numbers are correct** — correcting that
-> one function at the current pin returns both to their archived values — but the pin is not, so
-> a run taken today reproduces neither the archive nor the prose until it lands upstream.
+> $0.927 \pm 0.002$ to $0.500 \pm 0.244$. Correcting that one function at the current pin returns
+> **Table 4.1** to its archived values exactly — so those cells are right as written — but it
+> recovers only 11 of the ~90 ± pairs the document loses overall. **B14 is the largest single
+> cause of the drift and not the whole of it**; **D8** carries the rest.
 
 **Legend: ⬜ open · 🟨 in progress · ✅ done · 🚫 descoped · 🔒 blocked on you.**
 
@@ -431,8 +432,8 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       ⚠️ **The verification above is sound and its coverage was narrower than the conclusion drawn
       from it — see B14.** "Byte-identical across the bump" was established on `table_4_1`'s three
       R² values, which do match, then and now. The same table's two *accuracy* columns were not
-      checked, and they had already collapsed (PhiUSIIL $0.997 \rightarrow 0.729$, RT-IOT2022
-      $0.927 \rightarrow 0.500$) at tribble-fis #95, inside the same 22-commit window this bump
+      checked, and they had already collapsed (PhiUSIIL $0.997 \r\rightarrow 0.729$, RT-IOT2022
+      $0.927 \r\rightarrow 0.500$) at tribble-fis #95, inside the same 22-commit window this bump
       spanned. **The concrete change owed: diff every column of the table, not the columns that are
       easiest to eyeball.** This item's own rule was right — *"if a Gaussian row moves, something
       else changed too and the bump is not the explanation"* — and would have caught it applied
@@ -448,8 +449,8 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       **The symptom.** `table_4_1_mog_baselines.py` at ten seeds against the archived run of
       record moves the two *classification* rows by margins no seed spread covers, while the
       three *regression* rows move slightly the other way and every training time falls 5–7×:
-      PhiUSIIL $0.997 \pm 0.001 \r\rightarrow 0.729 \pm 0.023$; RT-IOT2022
-      $0.927 \pm 0.002 \r\rightarrow 0.500 \pm 0.244$. Those are Ch 1 §1.2's and Ch 4 §4.4's
+      PhiUSIIL $0.997 \pm 0.001 \r\r\rightarrow 0.729 \pm 0.023$; RT-IOT2022
+      $0.927 \pm 0.002 \r\r\rightarrow 0.500 \pm 0.244$. Those are Ch 1 §1.2's and Ch 4 §4.4's
       headline numbers.
 
       **Attributed, not guessed.** Data frozen to one `.npz` before either library is imported
@@ -474,9 +475,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       wasserstein distance" — it is already bounded, so the squash and the composite's
       three-term balance operate on a quantity they were not designed for.
 
-      **The document is not wrong; the pin is.** Re-running the generator at the current pin with
+      **Table 4.1 is not wrong; the pin is.** Re-running the generator at the current pin with
       only this function corrected returns PhiUSIIL to $0.997 \pm 0.001$ *exactly* and
-      RT-IOT2022 to $0.923 \pm 0.011$. `reproduce/experiments/run_with_wasserstein_fix.py`
+      RT-IOT2022 to $0.923 \pm 0.011$, and takes the table from 2 cells beyond noise to **0**
+      against the archive. ⚠️ That is *not* the same as restoring the document: over the whole
+      proposal the fix moves `check_prose` from 65 matching pairs to 76, against 156 under the
+      old pin. **D8** carries the remainder. `reproduce/experiments/run_with_wasserstein_fix.py`
       re-runs any generator that way, so the question can be settled table by table without
       waiting on upstream. The three regression rows move identically with and without the fix,
       so their drift has a separate and smaller cause, still untraced.
@@ -751,6 +755,41 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       **Two deliberately NOT marked**, because they are live methodology rather than archaeology:
       §3.4's retraction of ratio-invariance across machines, and §6.3.5's superseded two-optimizer
       comparison. Both earn their history.
+
+
+- [ ] ⬜ **D8 — The document does not reproduce against the current pins, and B14 is only the
+      largest cause. Account for the rest, table by table.** `check_prose.py` over the whole
+      proposal, same prose, three archives:
+
+      | archive | ok | drifted | untraceable |
+      |---|---:|---:|---:|
+      | `goal-8h-2026-08-11-fullsuite` (old pin) | **156** | 10 | 44 |
+      | `full-2026-08-22` (current pin, 15/15 green at ten seeds) | **65** | 23 | 122 |
+      | `wasserstein-fixed-2026-08-22` (current pin, B14 corrected in-process) | **76** | 24 | 110 |
+
+      Four causes are identified and three of them are benign:
+      1. **B14** — decisive where its mechanism applies and irrelevant elsewhere. `table_4_1`
+         goes 2 cells beyond noise → **0**; `table_6_1` 5 → 1. Worth 11 pairs document-wide.
+      2. **The compiler (B15).** Chapter 3's kernels are gcc-built on this host, not MSVC, so
+         every Chapter 3 timing moved. Exactness columns did not. Not a defect — but it means
+         **no Chapter 3 timing can be re-quoted from `full-2026-08-22`** without a host that can
+         rebuild with MSVC, or an explicit note that the compiler changed.
+      3. **The landed FCM fix (E2c).** Table 3.4 moved again, exactly as E2c predicted it would.
+      4. **Restored rows.** The norm/conorm flat-MoG rows, Table 4.8's Glass row and the whole of
+         Table 4.9 were *missing* from the archive and now exist, so they register as differences
+         against nothing. See B12(c).
+
+      **What is left over is the actual item.** After correcting B14, `table_a1_feature_ranking`
+      still moves 8 cells beyond noise, `table_a2_feature_count` 21, and
+      `table_g5_output_partitioning` 11 — none of which the compiler, the FCM fix or a restored
+      row explains. The three regression rows of `table_4_1` are the cleanest instance: they moved
+      $0.795 \rightarrow 0.808$, $0.852 \rightarrow 0.867$, $0.939 \rightarrow 0.960$ and move
+      *identically with and without* the B14 correction, so they have a separate cause somewhere
+      in the same 48-commit window. Bisecting that is the same exercise B14 took and should be
+      cheaper the second time: the harness, the frozen-data pattern and the per-commit probe all
+      exist now (`reproduce/experiments/diagnose_wasserstein_regression.py` is the template).
+      Until it is done, **`full-2026-08-22` is a diagnostic archive, not a run of record**, and the
+      run of record stays `goal-8h-2026-08-11-fullsuite`.
 
 
 ## E. Decisions and framing

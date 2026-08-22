@@ -129,12 +129,36 @@ instance of it, and the first where the uncovered half was the headline number.
    action and is left for the author.
 2. **Do not quote the current pin** for any Chapter 4 or Chapter 6 accuracy
    number until it lands.
-3. The archived numbers appear to be **correct**, not wrong:
-   `80e98d7` reproduces 0.9952 ± 0.0014 against the archive's 0.997 ± 0.001, and
-   restoring only this one function at the current pin recovers 0.9947 ± 0.0017.
+3. The archived numbers for **Table 4.1** are **correct**, not wrong: `80e98d7`
+   reproduces 0.9952 ± 0.0014 against the archive's 0.997 ± 0.001, and restoring
+   only this one function at the current pin recovers 0.9947 ± 0.0017.
    `reproduce/experiments/run_with_wasserstein_fix.py` re-runs any generator with
    the correction applied in-process, so the question can be settled table by
    table without waiting for upstream.
+
+   ⚠️ **Do not read that as "the fix restores the document."** It does not, and
+   the measurement says so. `check_prose.py` over the whole proposal:
+
+   | archive | ok | drifted | untraceable |
+   |---|---:|---:|---:|
+   | `goal-8h-2026-08-11-fullsuite` (old pin) | **156** | 10 | 44 |
+   | `full-2026-08-22` (current pin) | **65** | 23 | 122 |
+   | `wasserstein-fixed-2026-08-22` (current pin, this one function corrected) | **76** | 24 | 110 |
+
+   Correcting the defect recovers **11 pairs of the ~90 lost**. Per table it is
+   decisive where the mechanism applies — `table_4_1` goes from 2 cells beyond
+   noise to **0**, and `table_6_1` from 5 to 1 — and irrelevant where it does not.
+   The rest of the gap has four separate causes, each identified and none of them
+   this defect: the **gcc-vs-MSVC compiler change** on this host (B15), which moves
+   every Chapter 3 timing; the **landed CPU FCM fix** (E2c), which moves Table 3.4
+   again exactly as E2c predicted; **rows that were missing and are now restored**
+   (the norm/conorm flat-MoG rows, Table 4.8's Glass row, Table 4.9 in its
+   entirety), which register as differences because the archive had nothing to
+   compare against; and a genuine **unexplained residue** in the feature-scoring
+   and output-partitioning tables — `table_a1` 8 cells, `table_a2` 21,
+   `table_g5_output_partitioning` 11 — that survives the correction and is owed an
+   explanation of its own. That residue is the honest open item this pass leaves
+   behind.
 4. Extend the pin-bump check to **every column of a table, not the columns that
    happen to be easiest to eyeball** — the concrete change B13 needs.
 

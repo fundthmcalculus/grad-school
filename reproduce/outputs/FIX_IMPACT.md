@@ -1,4 +1,4 @@
-# Fix impact — `goal-8h-2026-08-11-fullsuite` → `full-2026-08-22`
+# Fix impact — `goal-8h-2026-08-11-fullsuite` → `wasserstein-fixed-2026-08-22`
 
 Cell-by-cell diff of the archived table runs, produced by `reproduce/compare_runs.py`. Every table is listed, including the unchanged ones: confining a fix's blast radius is a claim, and it is only supported by showing the tables that did *not* move.
 
@@ -390,52 +390,6 @@ status:
 
 </details>
 
-<details><summary>Provenance — <code>full-2026-08-22</code></summary>
-
-```
-
---- backfill 2026-08-22T07:56:10Z: table_concrete_reconciliation table_hyperparam_normalization table_g5_output_partitioning table_g5b_skew_sweep table_4_1_mog_baselines table_6_1_model_family table_norm_conorm_matrix table_a1_feature_scoring table_4_8_mf_dedup table_3_1_pvat_scaling table_3_1_reorder_three_arm table_3_2_memory_precision table_3_4_gpu_speedups table_3_7_g2_dtw_nonmetric table_5_x_ch5_selection ---
-tribble-fis: 141596e9c88710f78f8eb8b55d073573535f5f0e
-tribble-cluster: 635ed6ed713298b9823ff226de533e68a8917c1b
-grad-school: 851b88b33e7b0091f76b66cf3a83f7fadc0fc8a6
-seeds:       0,1,2,3,4,5,6,7,8,9
-thetas:      0.5,0.6,0.7,0.8,0.9,0.99,1.1 (table_4_4b operating curve)
-
-machine:
-  host             NEX-210200
-  os               MINGW64_NT-10.0-26200
-  kernel           MINGW64_NT-10.0-26200 3.4.10-2e2ef940.x86_64 x86_64
-  cpu              Intel(R) Core(TM) i9-14900HX
-  cores            32 logical
-  ram              95.6 GiB (102.7 GB decimal)
-  governor         n/a
-  boost            n/a
-  gpu              NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 610.74
-  python           Python 3.13.7
-  numpy            2.4.6  scipy 1.17.1  sklearn 1.9.0  python 3.13.7
-  blas             scipy-openblas 0.3.31.188.0
-
-status:
-  table_concrete_reconciliation          ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_hyperparam_normalization         ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_g5_output_partitioning           ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_g5b_skew_sweep                   ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_4_1_mog_baselines                ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_6_1_model_family                 ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_norm_conorm_matrix               ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_4_4_openset                      not-run-this-pass seeds=—
-  table_a1_feature_scoring               ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_4_8_mf_dedup                     ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_3_1_pvat_scaling                 ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_3_1_reorder_three_arm            ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_3_2_memory_precision             ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_3_4_gpu_speedups                 ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_3_7_g2_dtw_nonmetric             ok           seeds=0,1,2,3,4,5,6,7,8,9
-  table_5_x_ch5_selection                ok           seeds=0,1,2,3,4,5,6,7,8,9
-```
-
-</details>
-
 ## Summary
 
 | Table | Cells | Verdict |
@@ -447,25 +401,30 @@ status:
 | `table_3_4_gpu_speedups` | 195 | **37 changed**, 31 within noise, 31 timing |
 | `table_3_7_g2_downstream` | 21 | identical |
 | `table_3_7_g2_dtw_nonmetric` | 5 | **1 changed**, 2 rows removed |
-| `table_4_1` | 17 | **2 changed**, 3 within noise, 5 timing |
+| `table_4_1` | 17 | 4 within noise, 5 timing |
 | `table_4_4_openset` | 9 | identical |
 | `table_4_4b_theta_sweep` | 28 | identical |
-| `table_4_8_mf_dedup` | 30 | **24 changed**, 4 timing |
-| `table_4_8_mf_dedup_sweep` | 280 | **126 changed**, 70 within noise |
+| `table_4_8_mf_dedup` | 30 | **24 changed**, 5 timing, 1 rows added |
+| `table_4_8_mf_dedup_sweep` | 280 | **151 changed**, 51 within noise, 14 rows added |
+| `table_4_9_correction_pass` | — | **new-only** |
 | `table_5_1_battery` | 34 | identical |
 | `table_5_2_multiscale` | 15 | identical |
 | `table_5_3_selection` | 15 | identical |
 | `table_5_4_ch5_g1_scaling` | 126 | identical |
 | `table_5_4_ch5_g1_scaling_raw` | 1800 | identical |
-| `table_6_1` | 16 | **5 changed**, 4 within noise |
-| `table_a1_feature_ranking` | 20 | **12 changed**, 3 within noise |
-| `table_a2_feature_count` | 36 | **26 changed**, 1 within noise |
+| `table_6_1` | 16 | **1 changed**, 4 within noise |
+| `table_a1_feature_ranking` | 20 | **8 changed**, 2 within noise |
+| `table_a2_feature_count` | 36 | **21 changed**, 6 within noise |
 | `table_a7_regression_scale` | 32 | identical |
-| `table_concrete_reconciliation` | 34 | **1 changed**, 17 within noise |
+| `table_concrete_reconciliation` | 34 | **1 changed**, 15 within noise |
 | `table_g5_output_partitioning` | 189 | **11 changed**, 97 within noise |
 | `table_g5b_skew_sweep` | 48 | **3 changed**, 8 within noise |
-| `table_hyperparam_normalization` | 84 | **18 changed**, 30 within noise |
-| `table_norm_conorm_matrix` | 39 | **20 changed**, 4 within noise |
+| `table_hyperparam_normalization` | 84 | **16 changed**, 28 within noise |
+| `table_norm_conorm_matrix` | 57 | **22 changed**, 10 within noise |
+
+## Tables that could not be compared
+
+- `table_4_9_correction_pass` — **new-only**
 
 ## What moved
 
@@ -686,316 +645,317 @@ Rows only in `goal-8h-2026-08-11-fullsuite`: `Crop (DTW, N=24000) / no / 23.6%`,
 
 | Row | Column | Before | After | Δ | |
 |---|---|---|---|---:|---|
-| PhiUSIIL (classification) | MoG accuracy / R2 | acc=0.997 ± 0.001 | acc=0.729 ± 0.023 | -0.2680 | **changed** |
-| RT-IOT2022 (12-class) | MoG accuracy / R2 | acc=0.927 ± 0.002 | acc=0.500 ± 0.244 | -0.4270 | **changed** |
-| Bike Sharing (regression) | MoG train time | 0.82 ± 0.03 s | 0.11 ± 0.00 s | -0.7100 | timing |
-| Bike Sharing (regression) | MoG accuracy / R2 | R2=0.939 ± 0.004 | R2=0.965 ± 0.001 | +0.0000 | within noise |
+| Bike Sharing (regression) | MoG train time | 0.82 ± 0.03 s | 0.19 ± 0.01 s | -0.6300 | timing |
+| Bike Sharing (regression) | MoG accuracy / R2 | R2=0.939 ± 0.004 | R2=0.960 ± 0.003 | +0.0000 | within noise |
 | Concrete (regression) | MoG train time | 0.41 ± 0.02 s | 0.06 ± 0.00 s | -0.3500 | timing |
 | Concrete (regression) | MoG accuracy / R2 | R2=0.795 ± 0.025 | R2=0.808 ± 0.030 | +0.0000 | within noise |
 | Concrete (regression, full 2nd order) | MoG train time | 0.42 ± 0.01 s | 0.07 ± 0.00 s | -0.3500 | timing |
 | Concrete (regression, full 2nd order) | MoG accuracy / R2 | R2=0.852 ± 0.030 | R2=0.867 ± 0.031 | +0.0000 | within noise |
-| PhiUSIIL (classification) | MoG train time | 0.28 ± 0.03 s | 0.17 ± 0.01 s | -0.1100 | timing |
-| RT-IOT2022 (12-class) | MoG train time | 37.42 ± 0.64 s | 33.22 ± 0.12 s | -4.2000 | timing |
+| PhiUSIIL (classification) | MoG train time | 0.28 ± 0.03 s | 0.17 ± 0.00 s | -0.1100 | timing |
+| RT-IOT2022 (12-class) | MoG train time | 37.42 ± 0.64 s | 37.74 ± 0.29 s | +0.3200 | timing |
+| RT-IOT2022 (12-class) | MoG accuracy / R2 | acc=0.927 ± 0.002 | acc=0.923 ± 0.011 | -0.0040 | within noise |
 
 ### `table_4_8_mf_dedup`
 
+Rows only in `wasserstein-fixed-2026-08-22`: `Diabetes / regression / 40.6`
+
 | Row | Column | Before | After | Δ | |
 |---|---|---|---|---:|---|
-| BreastCancer / classification | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification | MF @ 1x (Δ) | 11.1 (+0.0000 ± 0.0000 acc) | 15.3 (-0.0088 ± 0.0316 acc) | +4.2000 | **changed** |
-| BreastCancer / classification | Reduction @ 1x | 0.0% | 23.1% | +23.1000 | **changed** |
-| BreastCancer / classification | MF @ max-lossless (Δ) | 11.1 (+0.0000 ± 0.0000 acc) | 10.5 (-0.0018 ± 0.0217 acc) | -0.6000 | **changed** |
-| BreastCancer / classification | Reduction @ max-lossless | 0.0% | 47.2% | +47.2000 | **changed** |
-| Concrete / regression | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression | MF @ 1x (Δ) | 62.6 (+0.0000 ± 0.0000 R²) | 33.1 (-0.0000 ± 0.0000 R²) | -29.5000 | **changed** |
-| Concrete / regression | Reduction @ 1x | 0.9% | 2.4% | +1.5000 | **changed** |
-| Concrete / regression | MF @ max-lossless (Δ) | 58.4 (-0.0118 ± 0.0305 R²) | 32.0 (-0.0002 ± 0.0022 R²) | -26.4000 | **changed** |
-| Concrete / regression | Reduction @ max-lossless | 7.6% | 5.6% | -2.0000 | **changed** |
-| Diabetes / regression | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression | MF @ 1x (Δ) | 36.2 (+0.0059 ± 0.0167 R²) | 35.2 (+0.0060 ± 0.0177 R²) | -1.0000 | **changed** |
-| Diabetes / regression | Reduction @ 1x | 13.0% | 13.3% | +0.3000 | **changed** |
-| Diabetes / regression | MF @ max-lossless (Δ) | 31.4 (+0.0011 ± 0.0168 R²) | 14.4 (-0.3197 ± 0.7944 R²) | -17.0000 | **changed** |
-| Diabetes / regression | Reduction @ max-lossless | 24.5% | 64.5% | +40.0000 | **changed** |
-| Digits / classification | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification | MF @ 1x (Δ) | 157.5 (+0.0009 ± 0.0028 acc) | 135.6 (-0.0002 ± 0.0010 acc) | -21.9000 | **changed** |
-| Digits / classification | Reduction @ 1x | 8.5% | 18.9% | +10.4000 | **changed** |
-| Digits / classification | MF @ max-lossless (Δ) | 96.1 (-0.0117 ± 0.0211 acc) | 129.1 (+0.0011 ± 0.0034 acc) | +33.0000 | **changed** |
-| Digits / classification | Reduction @ max-lossless | 44.2% | 22.8% | -21.4000 | **changed** |
-| Wine / classification | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification | MF @ 1x (Δ) | 16.6 (+0.0000 ± 0.0000 acc) | 16.2 (+0.0000 ± 0.0000 acc) | -0.4000 | **changed** |
-| Wine / classification | MF @ max-lossless (Δ) | 14.6 (-0.0037 ± 0.0161 acc) | 15.8 (+0.0000 ± 0.0000 acc) | +1.2000 | **changed** |
-| Wine / classification | Reduction @ max-lossless | 12.0% | 2.5% | -9.5000 | **changed** |
-| BreastCancer / classification | Max-lossless × | 5× | 3× | -2.0000 | timing |
-| Diabetes / regression | Max-lossless × | 2× | 7× | +5.0000 | timing |
-| Digits / classification | Max-lossless × | 7× | 2× | -5.0000 | timing |
-| Wine / classification | Max-lossless × | 10× | 7× | -3.0000 | timing |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | MF @ 1x (Δ) | 11.1 (+0.0000 ± 0.0000 acc) | 16.2 (+0.0000 ± 0.0000 acc) | +5.1000 | **changed** |
+| BreastCancer | MF @ max-lossless (Δ) | 11.1 (+0.0000 ± 0.0000 acc) | 14.5 (-0.0111 ± 0.0206 acc) | +3.4000 | **changed** |
+| BreastCancer | Reduction @ max-lossless | 0.0% | 10.5% | +10.5000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | MF @ 1x (Δ) | 62.6 (+0.0000 ± 0.0000 R²) | 143.8 (-0.0015 ± 0.0016 acc) | +81.2000 | **changed** |
+| Concrete | Reduction @ 1x | 0.9% | 17.4% | +16.5000 | **changed** |
+| Concrete | MF @ max-lossless (Δ) | 58.4 (-0.0118 ± 0.0305 R²) | 149.2 (+0.0000 ± 0.0000 acc) | +90.8000 | **changed** |
+| Concrete | Reduction @ max-lossless | 7.6% | 14.3% | +6.7000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | MF @ 1x (Δ) | 36.2 (+0.0059 ± 0.0167 R²) | 64.5 (+0.0002 ± 0.0005 R²) | +28.3000 | **changed** |
+| Diabetes | Reduction @ 1x | 13.0% | 3.9% | -9.1000 | **changed** |
+| Diabetes | MF @ max-lossless (Δ) | 31.4 (+0.0011 ± 0.0168 R²) | 61.9 (-0.0056 ± 0.0116 R²) | +30.5000 | **changed** |
+| Diabetes | Reduction @ max-lossless | 24.5% | 7.7% | -16.8000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | MF @ 1x (Δ) | 157.5 (+0.0009 ± 0.0028 acc) | 11.0 (+0.0000 ± 0.0000 acc) | -146.5000 | **changed** |
+| Digits | Reduction @ 1x | 8.5% | 0.0% | -8.5000 | **changed** |
+| Digits | MF @ max-lossless (Δ) | 96.1 (-0.0117 ± 0.0211 acc) | 11.0 (+0.0000 ± 0.0000 acc) | -85.1000 | **changed** |
+| Digits | Reduction @ max-lossless | 44.2% | 0.0% | -44.2000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | MF @ 1x (Δ) | 16.6 (+0.0000 ± 0.0000 acc) | 65.1 (+0.0000 ± 0.0000 acc) | +48.5000 | **changed** |
+| Wine | Reduction @ 1x | 0.0% | 12.1% | +12.1000 | **changed** |
+| Wine | MF @ max-lossless (Δ) | 14.6 (-0.0037 ± 0.0161 acc) | 56.3 (-0.0046 ± 0.0249 acc) | +41.7000 | **changed** |
+| Wine | Reduction @ max-lossless | 12.0% | 24.0% | +12.0000 | **changed** |
+| BreastCancer | Max-lossless × | 5× | 10× | +5.0000 | timing |
+| Concrete | Max-lossless × | 10× | 0.1× | -9.9000 | timing |
+| Diabetes | Max-lossless × | 2× | 7× | +5.0000 | timing |
+| Digits | Max-lossless × | 7× | 5× | -2.0000 | timing |
+| Wine | Max-lossless × | 10× | 7× | -3.0000 | timing |
 
 ### `table_4_8_mf_dedup_sweep`
 
+Rows only in `wasserstein-fixed-2026-08-22`: `Diabetes / regression / 0.1`, `Diabetes / regression / 0.3`, `Diabetes / regression / 1`, `Diabetes / regression / 10`, `Diabetes / regression / 100`, `Diabetes / regression / 15`, `Diabetes / regression / 2`, `Diabetes / regression / 20`, `Diabetes / regression / 3`, `Diabetes / regression / 30`, `Diabetes / regression / 5`, `Diabetes / regression / 50`, `Diabetes / regression / 7`, `Diabetes / regression / 70`
+
 | Row | Column | Before | After | Δ | |
 |---|---|---|---|---:|---|
-| BreastCancer / classification / 0.1 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 0.1 | Dedup MF (mean±std) | 11.10 ± 0.30 | 19.90 ± 0.54 | +8.8000 | **changed** |
-| BreastCancer / classification / 0.3 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 0.3 | Dedup MF (mean±std) | 11.10 ± 0.30 | 19.60 ± 0.66 | +8.5000 | **changed** |
-| BreastCancer / classification / 1 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 1 | Dedup MF (mean±std) | 11.10 ± 0.30 | 15.30 ± 1.19 | +4.2000 | **changed** |
-| BreastCancer / classification / 10 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 10 | Dedup MF (mean±std) | 10.20 ± 0.60 | 4.10 ± 0.30 | -6.1000 | **changed** |
-| BreastCancer / classification / 10 | Delta (mean±std) | -0.00526 ± 0.00409 | -0.27485 ± 0.11693 | -0.2696 | **changed** |
-| BreastCancer / classification / 100 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 100 | Delta (mean±std) | -0.56257 ± 0.01354 | -0.50351 ± 0.01600 | +0.0591 | **changed** |
-| BreastCancer / classification / 15 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 15 | Dedup MF (mean±std) | 9.20 ± 0.40 | 3.90 ± 0.30 | -5.3000 | **changed** |
-| BreastCancer / classification / 15 | Delta (mean±std) | +0.00117 ± 0.00819 | -0.25380 ± 0.09765 | -0.2550 | **changed** |
-| BreastCancer / classification / 2 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 20 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 20 | Dedup MF (mean±std) | 8.80 ± 0.40 | 1.90 ± 0.30 | -6.9000 | **changed** |
-| BreastCancer / classification / 20 | Delta (mean±std) | -0.00409 ± 0.02157 | -0.31404 ± 0.14547 | -0.3100 | **changed** |
-| BreastCancer / classification / 3 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 30 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 30 | Dedup MF (mean±std) | 7.60 ± 0.49 | 1.60 ± 0.49 | -6.0000 | **changed** |
-| BreastCancer / classification / 30 | Delta (mean±std) | +0.00351 ± 0.00468 | -0.33801 ± 0.16305 | -0.3415 | **changed** |
-| BreastCancer / classification / 5 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 5 | Dedup MF (mean±std) | 11.10 ± 0.30 | 6.80 ± 1.17 | -4.3000 | **changed** |
-| BreastCancer / classification / 5 | Delta (mean±std) | +0.00000 ± 0.00000 | -0.04912 ± 0.04211 | -0.0491 | **changed** |
-| BreastCancer / classification / 50 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 50 | Dedup MF (mean±std) | 5.40 ± 0.49 | 1.00 ± 0.00 | -4.4000 | **changed** |
-| BreastCancer / classification / 50 | Delta (mean±std) | -0.02456 ± 0.02277 | -0.50351 ± 0.01600 | -0.4789 | **changed** |
-| BreastCancer / classification / 7 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 7 | Dedup MF (mean±std) | 10.70 ± 0.64 | 5.20 ± 0.60 | -5.5000 | **changed** |
-| BreastCancer / classification / 7 | Delta (mean±std) | -0.00175 ± 0.00268 | -0.16433 ± 0.11377 | -0.1626 | **changed** |
-| BreastCancer / classification / 70 | Raw MF | 11.1 | 19.9 | +8.8000 | **changed** |
-| BreastCancer / classification / 70 | Dedup MF (mean±std) | 3.80 ± 0.98 | 1.00 ± 0.00 | -2.8000 | **changed** |
-| Concrete / regression / 0.1 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 0.1 | Dedup MF (mean±std) | 62.60 ± 3.77 | 33.20 ± 2.71 | -29.4000 | **changed** |
-| Concrete / regression / 0.3 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 0.3 | Dedup MF (mean±std) | 62.60 ± 3.77 | 33.20 ± 2.71 | -29.4000 | **changed** |
-| Concrete / regression / 1 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 1 | Dedup MF (mean±std) | 62.60 ± 3.77 | 33.10 ± 2.77 | -29.5000 | **changed** |
-| Concrete / regression / 10 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 10 | Dedup MF (mean±std) | 58.40 ± 3.67 | 32.00 ± 3.22 | -26.4000 | **changed** |
-| Concrete / regression / 100 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 100 | Dedup MF (mean±std) | 6.20 ± 1.25 | 3.00 ± 0.63 | -3.2000 | **changed** |
-| Concrete / regression / 15 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 15 | Dedup MF (mean±std) | 50.40 ± 3.50 | 29.60 ± 3.14 | -20.8000 | **changed** |
-| Concrete / regression / 2 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 2 | Dedup MF (mean±std) | 62.50 ± 3.69 | 33.00 ± 2.76 | -29.5000 | **changed** |
-| Concrete / regression / 20 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 20 | Dedup MF (mean±std) | 43.70 ± 3.26 | 26.80 ± 3.37 | -16.9000 | **changed** |
-| Concrete / regression / 3 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 3 | Dedup MF (mean±std) | 62.10 ± 3.67 | 33.00 ± 2.76 | -29.1000 | **changed** |
-| Concrete / regression / 30 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 30 | Dedup MF (mean±std) | 32.90 ± 2.70 | 21.20 ± 4.21 | -11.7000 | **changed** |
-| Concrete / regression / 30 | Delta (mean±std) | -1.18618 ± 0.38488 | -0.34892 ± 0.26860 | +0.8373 | **changed** |
-| Concrete / regression / 5 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 5 | Dedup MF (mean±std) | 61.20 ± 3.87 | 33.00 ± 2.76 | -28.2000 | **changed** |
-| Concrete / regression / 50 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 50 | Dedup MF (mean±std) | 22.80 ± 2.36 | 12.60 ± 2.06 | -10.2000 | **changed** |
-| Concrete / regression / 50 | Delta (mean±std) | -4.00261 ± 1.18617 | -0.78334 ± 0.59160 | +3.2193 | **changed** |
-| Concrete / regression / 7 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 7 | Dedup MF (mean±std) | 60.40 ± 3.83 | 32.90 ± 2.77 | -27.5000 | **changed** |
-| Concrete / regression / 70 | Raw MF | 63.2 | 33.9 | -29.3000 | **changed** |
-| Concrete / regression / 70 | Dedup MF (mean±std) | 13.30 ± 2.33 | 8.60 ± 1.28 | -4.7000 | **changed** |
-| Concrete / regression / 70 | Delta (mean±std) | -5.40018 ± 0.35341 | -2.69400 ± 1.38956 | +2.7062 | **changed** |
-| Diabetes / regression / 0.1 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 0.3 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 1 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 10 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 100 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 15 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 2 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 20 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 3 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 30 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 5 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 50 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 7 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Diabetes / regression / 70 | Raw MF | 41.6 | 40.6 | -1.0000 | **changed** |
-| Digits / classification / 0.1 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 0.1 | Dedup MF (mean±std) | 163.60 ± 3.20 | 138.80 ± 6.10 | -24.8000 | **changed** |
-| Digits / classification / 0.3 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 0.3 | Dedup MF (mean±std) | 163.10 ± 3.11 | 137.80 ± 6.46 | -25.3000 | **changed** |
-| Digits / classification / 1 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 1 | Dedup MF (mean±std) | 157.50 ± 3.29 | 135.60 ± 6.58 | -21.9000 | **changed** |
-| Digits / classification / 10 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 10 | Dedup MF (mean±std) | 75.00 ± 3.87 | 69.60 ± 5.00 | -5.4000 | **changed** |
-| Digits / classification / 100 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 15 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 15 | Dedup MF (mean±std) | 53.10 ± 3.91 | 47.70 ± 2.69 | -5.4000 | **changed** |
-| Digits / classification / 2 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 2 | Dedup MF (mean±std) | 148.30 ± 2.83 | 129.10 ± 7.31 | -19.2000 | **changed** |
-| Digits / classification / 20 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 3 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 3 | Dedup MF (mean±std) | 135.60 ± 4.43 | 121.20 ± 7.81 | -14.4000 | **changed** |
-| Digits / classification / 3 | Delta (mean±std) | -0.00167 ± 0.00552 | +0.00407 ± 0.00474 | +0.0057 | **changed** |
-| Digits / classification / 30 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 5 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 5 | Dedup MF (mean±std) | 115.30 ± 4.75 | 104.70 ± 6.33 | -10.6000 | **changed** |
-| Digits / classification / 50 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 50 | Dedup MF (mean±std) | 12.90 ± 0.94 | 10.10 ± 1.22 | -2.8000 | **changed** |
-| Digits / classification / 7 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 7 | Dedup MF (mean±std) | 96.10 ± 5.92 | 88.40 ± 4.18 | -7.7000 | **changed** |
-| Digits / classification / 70 | Raw MF | 172.2 | 167.3 | -4.9000 | **changed** |
-| Digits / classification / 70 | Dedup MF (mean±std) | 10.20 ± 1.08 | 6.60 ± 1.11 | -3.6000 | **changed** |
-| Digits / classification / 70 | Delta (mean±std) | -0.02333 ± 0.06163 | -0.09000 ± 0.05658 | -0.0667 | **changed** |
-| Wine / classification / 0.1 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 0.3 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 1 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 10 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 100 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 100 | Dedup MF (mean±std) | 2.10 ± 0.54 | 1.20 ± 0.40 | -0.9000 | **changed** |
-| Wine / classification / 100 | Delta (mean±std) | -0.60926 ± 0.03037 | -0.45556 ± 0.05251 | +0.1537 | **changed** |
-| Wine / classification / 15 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 2 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 20 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 20 | Delta (mean±std) | -0.02037 ± 0.02922 | -0.05370 ± 0.02922 | -0.0333 | **changed** |
-| Wine / classification / 3 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 30 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 30 | Dedup MF (mean±std) | 8.70 ± 1.00 | 7.10 ± 1.22 | -1.6000 | **changed** |
-| Wine / classification / 5 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 50 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 50 | Dedup MF (mean±std) | 5.60 ± 0.49 | 3.10 ± 0.94 | -2.5000 | **changed** |
-| Wine / classification / 50 | Delta (mean±std) | -0.20556 ± 0.12463 | -0.34444 ± 0.08811 | -0.1389 | **changed** |
-| Wine / classification / 7 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 70 | Raw MF | 16.6 | 16.2 | -0.4000 | **changed** |
-| Wine / classification / 70 | Dedup MF (mean±std) | 4.70 ± 1.00 | 1.70 ± 0.46 | -3.0000 | **changed** |
-| BreastCancer / classification / 1 | Delta (mean±std) | +0.00000 ± 0.00000 | -0.00877 ± 0.03163 | -0.0088 | within noise |
-| BreastCancer / classification / 2 | Dedup MF (mean±std) | 11.10 ± 0.30 | 11.10 ± 1.04 | +0.0000 | within noise |
-| BreastCancer / classification / 2 | Delta (mean±std) | +0.00000 ± 0.00000 | -0.00409 ± 0.03339 | -0.0041 | within noise |
-| BreastCancer / classification / 3 | Dedup MF (mean±std) | 11.10 ± 0.30 | 10.50 ± 1.20 | -0.6000 | within noise |
-| BreastCancer / classification / 3 | Delta (mean±std) | +0.00000 ± 0.00000 | -0.00175 ± 0.02173 | -0.0018 | within noise |
-| BreastCancer / classification / 70 | Delta (mean±std) | -0.34795 ± 0.26280 | -0.50351 ± 0.01600 | -0.1556 | within noise |
-| Concrete / regression / 1 | Delta (mean±std) | +0.00000 ± 0.00000 | -0.00001 ± 0.00003 | -0.0000 | within noise |
-| Concrete / regression / 10 | Delta (mean±std) | -0.01184 ± 0.03048 | -0.00017 ± 0.00224 | +0.0117 | within noise |
-| Concrete / regression / 100 | Delta (mean±std) | -5.41505 ± 0.33973 | -5.33977 ± 0.34757 | +0.0753 | within noise |
-| Concrete / regression / 15 | Delta (mean±std) | -0.11315 ± 0.09133 | -0.08594 ± 0.08957 | +0.0272 | within noise |
-| Concrete / regression / 2 | Delta (mean±std) | +0.00010 ± 0.00029 | -0.00015 ± 0.00041 | -0.0003 | within noise |
-| Concrete / regression / 20 | Delta (mean±std) | -0.30388 ± 0.34377 | -0.15185 ± 0.11322 | +0.1520 | within noise |
-| Concrete / regression / 3 | Delta (mean±std) | -0.00011 ± 0.00141 | -0.00015 ± 0.00041 | -0.0000 | within noise |
-| Concrete / regression / 5 | Delta (mean±std) | -0.00095 ± 0.00218 | -0.00015 ± 0.00041 | +0.0008 | within noise |
-| Concrete / regression / 7 | Delta (mean±std) | -0.00084 ± 0.00224 | -0.00013 ± 0.00034 | +0.0007 | within noise |
-| Diabetes / regression / 0.1 | Dedup MF (mean±std) | 38.40 ± 1.43 | 37.20 ± 1.47 | -1.2000 | within noise |
-| Diabetes / regression / 0.3 | Dedup MF (mean±std) | 38.40 ± 1.43 | 37.20 ± 1.47 | -1.2000 | within noise |
-| Diabetes / regression / 1 | Dedup MF (mean±std) | 36.20 ± 1.78 | 35.20 ± 1.60 | -1.0000 | within noise |
-| Diabetes / regression / 1 | Delta (mean±std) | +0.00588 ± 0.01667 | +0.00604 ± 0.01771 | +0.0002 | within noise |
-| Diabetes / regression / 10 | Dedup MF (mean±std) | 13.20 ± 1.54 | 11.70 ± 1.42 | -1.5000 | within noise |
-| Diabetes / regression / 10 | Delta (mean±std) | -0.09800 ± 0.08517 | -0.08113 ± 0.07802 | +0.0169 | within noise |
-| Diabetes / regression / 100 | Delta (mean±std) | -1.13442 ± 0.47858 | -0.70208 ± 0.55624 | +0.4323 | within noise |
-| Diabetes / regression / 15 | Dedup MF (mean±std) | 8.90 ± 1.14 | 8.40 ± 1.28 | -0.5000 | within noise |
-| Diabetes / regression / 15 | Delta (mean±std) | -0.55585 ± 0.57566 | -1.09653 ± 1.02229 | -0.5407 | within noise |
-| Diabetes / regression / 2 | Dedup MF (mean±std) | 31.40 ± 2.29 | 31.00 ± 1.90 | -0.4000 | within noise |
-| Diabetes / regression / 2 | Delta (mean±std) | +0.00110 ± 0.01684 | +0.00447 ± 0.01690 | +0.0034 | within noise |
-| Diabetes / regression / 20 | Dedup MF (mean±std) | 5.80 ± 1.08 | 6.40 ± 1.11 | +0.6000 | within noise |
-| Diabetes / regression / 20 | Delta (mean±std) | -0.13452 ± 0.10516 | -0.33312 ± 0.69760 | -0.1986 | within noise |
-| Diabetes / regression / 3 | Dedup MF (mean±std) | 26.80 ± 1.99 | 26.00 ± 1.84 | -0.8000 | within noise |
-| Diabetes / regression / 3 | Delta (mean±std) | -0.01519 ± 0.02420 | +0.00144 ± 0.01861 | +0.0166 | within noise |
-| Diabetes / regression / 30 | Dedup MF (mean±std) | 2.10 ± 0.70 | 2.80 ± 0.98 | +0.7000 | within noise |
-| Diabetes / regression / 30 | Delta (mean±std) | -0.88968 ± 0.56571 | -0.48339 ± 0.60275 | +0.4063 | within noise |
-| Diabetes / regression / 5 | Dedup MF (mean±std) | 20.00 ± 1.61 | 19.10 ± 2.17 | -0.9000 | within noise |
-| Diabetes / regression / 5 | Delta (mean±std) | -0.07262 ± 0.02912 | -0.30375 ± 0.79826 | -0.2311 | within noise |
-| Diabetes / regression / 50 | Delta (mean±std) | -1.08954 ± 0.52218 | -0.65855 ± 0.55875 | +0.4310 | within noise |
-| Diabetes / regression / 7 | Dedup MF (mean±std) | 16.60 ± 2.50 | 14.40 ± 1.36 | -2.2000 | within noise |
-| Diabetes / regression / 7 | Delta (mean±std) | -0.08956 ± 0.05221 | -0.31967 ± 0.79441 | -0.2301 | within noise |
-| Diabetes / regression / 70 | Delta (mean±std) | -1.13442 ± 0.47858 | -0.70208 ± 0.55624 | +0.4323 | within noise |
-| Digits / classification / 0.3 | Delta (mean±std) | +0.00019 ± 0.00056 | +0.00000 ± 0.00000 | -0.0002 | within noise |
-| Digits / classification / 1 | Delta (mean±std) | +0.00093 ± 0.00278 | -0.00019 ± 0.00100 | -0.0011 | within noise |
-| Digits / classification / 10 | Delta (mean±std) | -0.01889 ± 0.02704 | -0.00185 ± 0.02297 | +0.0170 | within noise |
-| Digits / classification / 100 | Dedup MF (mean±std) | 3.50 ± 1.12 | 2.90 ± 0.54 | -0.6000 | within noise |
-| Digits / classification / 100 | Delta (mean±std) | -0.13389 ± 0.08297 | -0.15333 ± 0.03352 | -0.0194 | within noise |
-| Digits / classification / 15 | Delta (mean±std) | -0.02463 ± 0.03230 | -0.01685 ± 0.06467 | +0.0078 | within noise |
-| Digits / classification / 2 | Delta (mean±std) | -0.00093 ± 0.00265 | +0.00111 ± 0.00343 | +0.0020 | within noise |
-| Digits / classification / 20 | Dedup MF (mean±std) | 38.40 ± 2.33 | 36.50 ± 2.29 | -1.9000 | within noise |
-| Digits / classification / 20 | Delta (mean±std) | -0.03056 ± 0.02733 | -0.03093 ± 0.06540 | -0.0004 | within noise |
-| Digits / classification / 30 | Dedup MF (mean±std) | 22.60 ± 2.42 | 22.90 ± 2.55 | +0.3000 | within noise |
-| Digits / classification / 30 | Delta (mean±std) | -0.03556 ± 0.04530 | -0.03389 ± 0.07083 | +0.0017 | within noise |
-| Digits / classification / 5 | Delta (mean±std) | -0.00278 ± 0.01437 | +0.00704 ± 0.00872 | +0.0098 | within noise |
-| Digits / classification / 50 | Delta (mean±std) | -0.02574 ± 0.06344 | -0.08944 ± 0.07553 | -0.0637 | within noise |
-| Digits / classification / 7 | Delta (mean±std) | -0.01167 ± 0.02113 | -0.00167 ± 0.02693 | +0.0100 | within noise |
-| Wine / classification / 0.1 | Dedup MF (mean±std) | 16.60 ± 0.66 | 16.20 ± 0.40 | -0.4000 | within noise |
-| Wine / classification / 0.3 | Dedup MF (mean±std) | 16.60 ± 0.66 | 16.20 ± 0.40 | -0.4000 | within noise |
-| Wine / classification / 1 | Dedup MF (mean±std) | 16.60 ± 0.66 | 16.20 ± 0.40 | -0.4000 | within noise |
-| Wine / classification / 10 | Dedup MF (mean±std) | 14.60 ± 1.11 | 14.20 ± 0.98 | -0.4000 | within noise |
-| Wine / classification / 10 | Delta (mean±std) | -0.00370 ± 0.01614 | -0.02778 ± 0.03015 | -0.0241 | within noise |
-| Wine / classification / 15 | Dedup MF (mean±std) | 13.00 ± 1.61 | 12.60 ± 1.36 | -0.4000 | within noise |
-| Wine / classification / 15 | Delta (mean±std) | -0.01667 ± 0.02103 | -0.03704 ± 0.03884 | -0.0204 | within noise |
-| Wine / classification / 2 | Dedup MF (mean±std) | 16.50 ± 0.81 | 16.10 ± 0.54 | -0.4000 | within noise |
-| Wine / classification / 2 | Delta (mean±std) | +0.00185 ± 0.00556 | +0.00000 ± 0.00000 | -0.0019 | within noise |
-| Wine / classification / 20 | Dedup MF (mean±std) | 11.10 ± 1.37 | 10.70 ± 0.64 | -0.4000 | within noise |
-| Wine / classification / 3 | Dedup MF (mean±std) | 16.50 ± 0.81 | 16.10 ± 0.54 | -0.4000 | within noise |
-| Wine / classification / 3 | Delta (mean±std) | +0.00185 ± 0.00556 | +0.00000 ± 0.00000 | -0.0019 | within noise |
-| Wine / classification / 30 | Delta (mean±std) | -0.07963 ± 0.06524 | -0.07037 ± 0.06667 | +0.0093 | within noise |
-| Wine / classification / 5 | Dedup MF (mean±std) | 16.40 ± 0.80 | 16.00 ± 0.45 | -0.4000 | within noise |
-| Wine / classification / 5 | Delta (mean±std) | +0.00185 ± 0.00556 | +0.00000 ± 0.00000 | -0.0019 | within noise |
-| Wine / classification / 7 | Dedup MF (mean±std) | 16.10 ± 0.54 | 15.80 ± 0.40 | -0.3000 | within noise |
-| Wine / classification / 7 | Delta (mean±std) | +0.00185 ± 0.00556 | +0.00000 ± 0.00000 | -0.0019 | within noise |
-| Wine / classification / 70 | Delta (mean±std) | -0.30000 ± 0.19330 | -0.43519 ± 0.06892 | -0.1352 | within noise |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 11.10 ± 0.30 | 16.20 ± 0.40 | +5.1000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 11.10 ± 0.30 | 16.20 ± 0.40 | +5.1000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 11.10 ± 0.30 | 16.20 ± 0.40 | +5.1000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 11.10 ± 0.30 | 16.10 ± 0.54 | +5.0000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 11.10 ± 0.30 | 16.10 ± 0.54 | +5.0000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 11.10 ± 0.30 | 16.00 ± 0.45 | +4.9000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 10.70 ± 0.64 | 15.80 ± 0.40 | +5.1000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 10.20 ± 0.60 | 14.50 ± 1.20 | +4.3000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 9.20 ± 0.40 | 12.80 ± 1.60 | +3.6000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 8.80 ± 0.40 | 10.80 ± 1.17 | +2.0000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Delta (mean±std) | +0.00351 ± 0.00468 | -0.08704 ± 0.06364 | -0.0906 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Delta (mean±std) | -0.02456 ± 0.02277 | -0.27037 ± 0.03722 | -0.2458 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Raw MF | 11.1 | 16.2 | +5.1000 | **changed** |
+| BreastCancer | Dedup MF (mean±std) | 1.00 ± 0.00 | 1.80 ± 0.40 | +0.8000 | **changed** |
+| BreastCancer | Delta (mean±std) | -0.56257 ± 0.01354 | -0.61111 ± 0.02869 | -0.0485 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 62.60 ± 3.77 | 149.20 ± 4.35 | +86.6000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 62.60 ± 3.77 | 148.00 ± 4.31 | +85.4000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 62.60 ± 3.77 | 143.80 ± 4.21 | +81.2000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 62.50 ± 3.69 | 135.10 ± 5.49 | +72.6000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 62.10 ± 3.67 | 124.80 ± 5.60 | +62.7000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 61.20 ± 3.87 | 104.40 ± 5.97 | +43.2000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 60.40 ± 3.83 | 87.10 ± 4.97 | +26.7000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 58.40 ± 3.67 | 66.10 ± 4.61 | +7.7000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 50.40 ± 3.50 | 44.00 ± 2.83 | -6.4000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 43.70 ± 3.26 | 32.20 ± 1.78 | -11.5000 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 32.90 ± 2.70 | 19.40 ± 1.36 | -13.5000 | **changed** |
+| Concrete | Delta (mean±std) | -1.18618 ± 0.38488 | -0.02204 ± 0.03918 | +1.1641 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 22.80 ± 2.36 | 10.30 ± 1.00 | -12.5000 | **changed** |
+| Concrete | Delta (mean±std) | -4.00261 ± 1.18617 | +0.03074 ± 0.06749 | +4.0333 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 13.30 ± 2.33 | 7.40 ± 1.11 | -5.9000 | **changed** |
+| Concrete | Delta (mean±std) | -5.40018 ± 0.35341 | +0.02556 ± 0.05127 | +5.4257 | **changed** |
+| Concrete | Raw MF | 63.2 | 174.1 | +110.9000 | **changed** |
+| Concrete | Dedup MF (mean±std) | 6.20 ± 1.25 | 4.00 ± 1.26 | -2.2000 | **changed** |
+| Concrete | Delta (mean±std) | -5.41505 ± 0.33973 | -0.07296 ± 0.09531 | +5.3421 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 38.40 ± 1.43 | 64.70 ± 3.29 | +26.3000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 38.40 ± 1.43 | 64.70 ± 3.29 | +26.3000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 36.20 ± 1.78 | 64.50 ± 3.29 | +28.3000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 31.40 ± 2.29 | 64.40 ± 3.07 | +33.0000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 26.80 ± 1.99 | 63.80 ± 3.06 | +37.0000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 20.00 ± 1.61 | 62.70 ± 3.10 | +42.7000 | **changed** |
+| Diabetes | Delta (mean±std) | -0.07262 ± 0.02912 | -0.00487 ± 0.01161 | +0.0678 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 16.60 ± 2.50 | 61.90 ± 2.98 | +45.3000 | **changed** |
+| Diabetes | Delta (mean±std) | -0.08956 ± 0.05221 | -0.00560 ± 0.01156 | +0.0840 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 13.20 ± 1.54 | 59.00 ± 2.90 | +45.8000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 8.90 ± 1.14 | 51.10 ± 3.24 | +42.2000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 5.80 ± 1.08 | 44.50 ± 3.29 | +38.7000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 2.10 ± 0.70 | 33.70 ± 3.35 | +31.6000 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 1.10 ± 0.30 | 18.90 ± 1.81 | +17.8000 | **changed** |
+| Diabetes | Delta (mean±std) | -1.08954 ± 0.52218 | -4.32890 ± 0.99015 | -3.2394 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 1.00 ± 0.00 | 12.70 ± 1.68 | +11.7000 | **changed** |
+| Diabetes | Delta (mean±std) | -1.13442 ± 0.47858 | -5.37694 ± 0.35474 | -4.2425 | **changed** |
+| Diabetes | Raw MF | 41.6 | 67.1 | +25.5000 | **changed** |
+| Diabetes | Dedup MF (mean±std) | 1.00 ± 0.00 | 5.70 ± 1.42 | +4.7000 | **changed** |
+| Diabetes | Delta (mean±std) | -1.13442 ± 0.47858 | -5.43376 ± 0.33668 | -4.2993 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 163.60 ± 3.20 | 11.00 ± 0.00 | -152.6000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 163.10 ± 3.11 | 11.00 ± 0.00 | -152.1000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 157.50 ± 3.29 | 11.00 ± 0.00 | -146.5000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 148.30 ± 2.83 | 11.00 ± 0.00 | -137.3000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 135.60 ± 4.43 | 11.00 ± 0.00 | -124.6000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 115.30 ± 4.75 | 11.00 ± 0.00 | -104.3000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 96.10 ± 5.92 | 10.50 ± 0.50 | -85.6000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 75.00 ± 3.87 | 10.00 ± 0.00 | -65.0000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 53.10 ± 3.91 | 9.10 ± 0.30 | -44.0000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 38.40 ± 2.33 | 8.60 ± 0.49 | -29.8000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 22.60 ± 2.42 | 8.00 ± 0.00 | -14.6000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 12.90 ± 0.94 | 5.40 ± 0.49 | -7.5000 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 10.20 ± 1.08 | 3.80 ± 0.98 | -6.4000 | **changed** |
+| Digits | Delta (mean±std) | -0.02333 ± 0.06163 | -0.34795 ± 0.26280 | -0.3246 | **changed** |
+| Digits | Raw MF | 172.2 | 11.0 | -161.2000 | **changed** |
+| Digits | Dedup MF (mean±std) | 3.50 ± 1.12 | 1.00 ± 0.00 | -2.5000 | **changed** |
+| Digits | Delta (mean±std) | -0.13389 ± 0.08297 | -0.56257 ± 0.01354 | -0.4287 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 16.60 ± 0.66 | 66.10 ± 4.16 | +49.5000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 16.60 ± 0.66 | 66.10 ± 4.16 | +49.5000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 16.60 ± 0.66 | 65.10 ± 4.16 | +48.5000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 16.50 ± 0.81 | 63.70 ± 4.15 | +47.2000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 16.50 ± 0.81 | 62.20 ± 4.24 | +45.7000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 16.40 ± 0.80 | 58.50 ± 3.98 | +42.1000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 16.10 ± 0.54 | 56.30 ± 3.74 | +40.2000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 14.60 ± 1.11 | 51.10 ± 3.56 | +36.5000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 13.00 ± 1.61 | 42.80 ± 2.44 | +29.8000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 11.10 ± 1.37 | 34.80 ± 2.75 | +23.7000 | **changed** |
+| Wine | Delta (mean±std) | -0.02037 ± 0.02922 | -0.09231 ± 0.06192 | -0.0719 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 8.70 ± 1.00 | 23.90 ± 2.47 | +15.2000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Dedup MF (mean±std) | 5.60 ± 0.49 | 10.80 ± 2.14 | +5.2000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Raw MF | 16.6 | 74.1 | +57.5000 | **changed** |
+| Wine | Delta (mean±std) | -0.60926 ± 0.03037 | -0.24923 ± 0.07436 | +0.3600 | **changed** |
+| BreastCancer | Delta (mean±std) | +0.00000 ± 0.00000 | +0.00185 ± 0.00556 | +0.0019 | within noise |
+| BreastCancer | Delta (mean±std) | +0.00000 ± 0.00000 | +0.00185 ± 0.00556 | +0.0019 | within noise |
+| BreastCancer | Delta (mean±std) | +0.00000 ± 0.00000 | +0.00185 ± 0.00556 | +0.0019 | within noise |
+| BreastCancer | Delta (mean±std) | -0.00175 ± 0.00268 | +0.00185 ± 0.00556 | +0.0036 | within noise |
+| BreastCancer | Delta (mean±std) | -0.00526 ± 0.00409 | -0.01111 ± 0.02062 | -0.0059 | within noise |
+| BreastCancer | Delta (mean±std) | +0.00117 ± 0.00819 | -0.01852 ± 0.02485 | -0.0197 | within noise |
+| BreastCancer | Delta (mean±std) | -0.00409 ± 0.02157 | -0.03148 ± 0.04061 | -0.0274 | within noise |
+| BreastCancer | Dedup MF (mean±std) | 7.60 ± 0.49 | 8.40 ± 1.20 | +0.8000 | within noise |
+| BreastCancer | Dedup MF (mean±std) | 5.40 ± 0.49 | 5.00 ± 0.89 | -0.4000 | within noise |
+| BreastCancer | Dedup MF (mean±std) | 3.80 ± 0.98 | 4.10 ± 1.04 | +0.3000 | within noise |
+| BreastCancer | Delta (mean±std) | -0.34795 ± 0.26280 | -0.35741 ± 0.17821 | -0.0095 | within noise |
+| Concrete | Delta (mean±std) | +0.00000 ± 0.00000 | -0.00056 ± 0.00085 | -0.0006 | within noise |
+| Concrete | Delta (mean±std) | +0.00000 ± 0.00000 | -0.00148 ± 0.00161 | -0.0015 | within noise |
+| Concrete | Delta (mean±std) | +0.00010 ± 0.00029 | +0.00019 ± 0.00527 | +0.0001 | within noise |
+| Concrete | Delta (mean±std) | -0.00011 ± 0.00141 | +0.00111 ± 0.00941 | +0.0012 | within noise |
+| Concrete | Delta (mean±std) | -0.00095 ± 0.00218 | +0.00296 ± 0.01552 | +0.0039 | within noise |
+| Concrete | Delta (mean±std) | -0.00084 ± 0.00224 | -0.00593 ± 0.02390 | -0.0051 | within noise |
+| Concrete | Delta (mean±std) | -0.01184 ± 0.03048 | -0.01500 ± 0.02754 | -0.0032 | within noise |
+| Concrete | Delta (mean±std) | -0.11315 ± 0.09133 | -0.02889 ± 0.05270 | +0.0843 | within noise |
+| Concrete | Delta (mean±std) | -0.30388 ± 0.34377 | -0.03426 ± 0.03770 | +0.2696 | within noise |
+| Diabetes | Delta (mean±std) | +0.00000 ± 0.00000 | +0.00001 ± 0.00002 | +0.0000 | within noise |
+| Diabetes | Delta (mean±std) | +0.00000 ± 0.00000 | +0.00001 ± 0.00002 | +0.0000 | within noise |
+| Diabetes | Delta (mean±std) | +0.00588 ± 0.01667 | +0.00018 ± 0.00051 | -0.0057 | within noise |
+| Diabetes | Delta (mean±std) | +0.00110 ± 0.01684 | +0.00016 ± 0.00052 | -0.0009 | within noise |
+| Diabetes | Delta (mean±std) | -0.01519 ± 0.02420 | +0.00011 ± 0.00120 | +0.0153 | within noise |
+| Diabetes | Delta (mean±std) | -0.09800 ± 0.08517 | -0.02648 ± 0.04062 | +0.0715 | within noise |
+| Diabetes | Delta (mean±std) | -0.55585 ± 0.57566 | -0.16418 ± 0.17517 | +0.3917 | within noise |
+| Diabetes | Delta (mean±std) | -0.13452 ± 0.10516 | -0.38670 ± 0.65892 | -0.2522 | within noise |
+| Diabetes | Delta (mean±std) | -0.88968 ± 0.56571 | -0.97588 ± 0.54239 | -0.0862 | within noise |
+| Digits | Delta (mean±std) | +0.00019 ± 0.00056 | +0.00000 ± 0.00000 | -0.0002 | within noise |
+| Digits | Delta (mean±std) | +0.00093 ± 0.00278 | +0.00000 ± 0.00000 | -0.0009 | within noise |
+| Digits | Delta (mean±std) | -0.00093 ± 0.00265 | +0.00000 ± 0.00000 | +0.0009 | within noise |
+| Digits | Delta (mean±std) | -0.00167 ± 0.00552 | +0.00000 ± 0.00000 | +0.0017 | within noise |
+| Digits | Delta (mean±std) | -0.00278 ± 0.01437 | +0.00000 ± 0.00000 | +0.0028 | within noise |
+| Digits | Delta (mean±std) | -0.01167 ± 0.02113 | -0.00175 ± 0.00268 | +0.0099 | within noise |
+| Digits | Delta (mean±std) | -0.01889 ± 0.02704 | -0.00526 ± 0.00409 | +0.0136 | within noise |
+| Digits | Delta (mean±std) | -0.02463 ± 0.03230 | +0.00175 ± 0.00742 | +0.0264 | within noise |
+| Digits | Delta (mean±std) | -0.03056 ± 0.02733 | -0.01813 ± 0.03394 | +0.0124 | within noise |
+| Digits | Delta (mean±std) | -0.03556 ± 0.04530 | +0.00468 ± 0.00510 | +0.0402 | within noise |
+| Digits | Delta (mean±std) | -0.02574 ± 0.06344 | -0.02456 ± 0.02277 | +0.0012 | within noise |
+| Wine | Delta (mean±std) | +0.00185 ± 0.00556 | +0.00000 ± 0.00000 | -0.0019 | within noise |
+| Wine | Delta (mean±std) | +0.00185 ± 0.00556 | -0.00308 ± 0.00923 | -0.0049 | within noise |
+| Wine | Delta (mean±std) | +0.00185 ± 0.00556 | -0.00615 ± 0.02303 | -0.0080 | within noise |
+| Wine | Delta (mean±std) | +0.00185 ± 0.00556 | -0.00462 ± 0.02485 | -0.0065 | within noise |
+| Wine | Delta (mean±std) | -0.00370 ± 0.01614 | -0.02615 ± 0.02756 | -0.0224 | within noise |
+| Wine | Delta (mean±std) | -0.01667 ± 0.02103 | -0.05077 ± 0.05242 | -0.0341 | within noise |
+| Wine | Delta (mean±std) | -0.07963 ± 0.06524 | -0.10615 ± 0.10192 | -0.0265 | within noise |
+| Wine | Delta (mean±std) | -0.20556 ± 0.12463 | -0.24769 ± 0.10888 | -0.0421 | within noise |
+| Wine | Dedup MF (mean±std) | 4.70 ± 1.00 | 5.70 ± 1.27 | +1.0000 | within noise |
+| Wine | Delta (mean±std) | -0.30000 ± 0.19330 | -0.23231 ± 0.10215 | +0.0677 | within noise |
+| Wine | Dedup MF (mean±std) | 2.10 ± 0.54 | 2.00 ± 0.89 | -0.1000 | within noise |
 
 ### `table_6_1`
 
 | Row | Column | Before | After | Δ | |
 |---|---|---|---|---:|---|
-| Concrete / R2 | flat | 0.687 ± 0.049 | 0.605 ± 0.042 | -0.0820 | **changed** |
-| Concrete / RMSE (MPa) | flat | 9.122 ± 0.623 | 10.265 ± 0.521 | +1.1430 | **changed** |
-| PhiUSIIL / accuracy | flat | 0.997 ± 0.001 | 0.729 ± 0.023 | -0.2680 | **changed** |
-| PhiUSIIL / accuracy | fuzzy tree | 0.970 ± 0.003 | 0.735 ± 0.029 | -0.2350 | **changed** |
-| PhiUSIIL / accuracy | mixture (HME) | 1.000 ± 0.001 | 0.600 ± 0.069 | -0.4000 | **changed** |
-| Concrete / R2 | fuzzy tree | 0.583 ± 0.067 | 0.616 ± 0.032 | +0.0330 | within noise |
-| Concrete / R2 | mixture (HME) | 0.636 ± 0.087 | 0.689 ± 0.062 | +0.0530 | within noise |
-| Concrete / RMSE (MPa) | fuzzy tree | 10.531 ± 0.889 | 10.139 ± 0.492 | -0.3920 | within noise |
-| Concrete / RMSE (MPa) | mixture (HME) | 9.785 ± 1.035 | 9.065 ± 0.695 | -0.7200 | within noise |
+| PhiUSIIL / accuracy / 0.997 ± 0.001 | mixture (HME) | 1.000 ± 0.001 | 0.999 ± 0.001 | -0.0010 | **changed** |
+| Concrete / R2 | flat | 0.687 ± 0.049 | 0.675 ± 0.039 | -0.0120 | within noise |
+| Concrete / R2 | mixture (HME) | 0.636 ± 0.087 | 0.703 ± 0.057 | +0.0670 | within noise |
+| Concrete / RMSE (MPa) | flat | 9.122 ± 0.623 | 9.323 ± 0.752 | +0.2010 | within noise |
+| Concrete / RMSE (MPa) | mixture (HME) | 9.785 ± 1.035 | 8.874 ± 0.828 | -0.9110 | within noise |
 
 ### `table_a1_feature_ranking`
 
 | Row | Column | Before | After | Δ | |
 |---|---|---|---|---:|---|
-| 2 | wasserstein | HasSocialNet (0.867) | SpacialCharRatioInURL (0.247) | -0.6200 | **changed** |
-| 2 | bhattacharyya | HasTitle (0.855) | IsHTTPS (0.954) | +0.0990 | **changed** |
-| 2 | composite | URLSimilarityIndex (0.947) | HasSocialNet (0.990) | +0.0430 | **changed** |
-| 3 | wasserstein | HasCopyrightInfo (0.743) | DegitRatioInURL (0.075) | -0.6680 | **changed** |
-| 3 | bhattacharyya | NoOfSelfRef (0.784) | HasSocialNet (0.809) | +0.0250 | **changed** |
-| 3 | composite | HasTitle (0.848) | DegitRatioInURL (0.864) | +0.0160 | **changed** |
-| 4 | wasserstein | HasDescription (0.629) | LetterRatioInURL (0.051) | -0.5780 | **changed** |
-| 4 | bhattacharyya | NoOfCSS (0.777) | NoOfQMarkInURL (0.773) | -0.0040 | **changed** |
-| 4 | composite | NoOfCSS (0.820) | HasTitle (0.816) | -0.0040 | **changed** |
-| 5 | wasserstein | DomainTitleMatchScore (0.471) | HasSocialNet (0.049) | -0.4220 | **changed** |
-| 5 | bhattacharyya | NoOfImage (0.762) | IsDomainIP (0.726) | -0.0360 | **changed** |
-| 5 | composite | NoOfSelfRef (0.815) | HasCopyrightInfo (0.712) | -0.1030 | **changed** |
-| 1 | wasserstein | URLSimilarityIndex (1.000) | URLCharProb (1.000) | +0.0000 | within noise |
-| 1 | bhattacharyya | HasSocialNet (1.000) | URLSimilarityIndex (1.000) | +0.0000 | within noise |
-| 1 | composite | HasSocialNet (1.000) | IsHTTPS (1.000) | +0.0000 | within noise |
+| 2 / HasSocialNet (0.867) | bhattacharyya | HasTitle (0.855) | IsHTTPS (0.954) | +0.0990 | **changed** |
+| 2 / HasSocialNet (0.867) | composite | URLSimilarityIndex (0.947) | IsHTTPS (0.930) | -0.0170 | **changed** |
+| 3 / HasCopyrightInfo (0.743) | bhattacharyya | NoOfSelfRef (0.784) | HasSocialNet (0.809) | +0.0250 | **changed** |
+| 3 / HasCopyrightInfo (0.743) | composite | HasTitle (0.848) | HasSocialNet (0.907) | +0.0590 | **changed** |
+| 4 / HasDescription (0.629) | bhattacharyya | NoOfCSS (0.777) | NoOfQMarkInURL (0.773) | -0.0040 | **changed** |
+| 4 / HasDescription (0.629) | composite | NoOfCSS (0.820) | HasTitle (0.769) | -0.0510 | **changed** |
+| 5 / DomainTitleMatchScore (0.471) | bhattacharyya | NoOfImage (0.762) | IsDomainIP (0.726) | -0.0360 | **changed** |
+| 5 / DomainTitleMatchScore (0.471) | composite | NoOfSelfRef (0.815) | NoOfCSS (0.744) | -0.0710 | **changed** |
+| 1 / URLSimilarityIndex (1.000) | bhattacharyya | HasSocialNet (1.000) | URLSimilarityIndex (1.000) | +0.0000 | within noise |
+| 1 / URLSimilarityIndex (1.000) | composite | HasSocialNet (1.000) | URLSimilarityIndex (1.000) | +0.0000 | within noise |
 
 ### `table_a2_feature_count`
 
 | Row | Column | Before | After | Δ | |
 |---|---|---|---|---:|---|
-| 1 | wasserstein (acc / fit s) | 0.9967 / 0.47 | 0.6709 / 0.13 | -0.3258 | **changed** |
 | 1 | bhattacharyya (acc / fit s) | 0.4267 / 0.18 | 0.9967 / 0.11 | +0.5700 | **changed** |
-| 10 | wasserstein (acc / fit s) | 0.9997 / 0.75 | 0.8096 / 0.20 | -0.1901 | **changed** |
-| 10 | bhattacharyya (acc / fit s) | 0.9701 / 0.85 | 0.9999 / 0.17 | +0.0298 | **changed** |
-| 10 | composite (acc / fit s) | 0.9983 / 0.91 | 0.9989 / 0.17 | +0.0006 | **changed** |
-| 15 | wasserstein (acc / fit s) | 0.9957 / 0.62 | 0.8096 / 0.23 | -0.1861 | **changed** |
-| 15 | bhattacharyya (acc / fit s) | 0.9788 / 0.70 | 0.9999 / 0.23 | +0.0211 | **changed** |
-| 15 | composite (acc / fit s) | 0.9999 / 0.63 | 0.9913 / 0.26 | -0.0086 | **changed** |
-| 2 | wasserstein (acc / fit s) | 0.9967 / 0.38 | 0.7146 / 0.14 | -0.2821 | **changed** |
-| 2 | bhattacharyya (acc / fit s) | 0.4527 / 0.18 | 0.9999 / 0.11 | +0.5472 | **changed** |
-| 2 | composite (acc / fit s) | 0.9967 / 0.58 | 0.4267 / 0.11 | -0.5700 | **changed** |
-| 20 | wasserstein (acc / fit s) | 0.9984 / 0.71 | 0.8083 / 0.27 | -0.1901 | **changed** |
-| 20 | bhattacharyya (acc / fit s) | 0.9796 / 0.74 | 0.9995 / 0.30 | +0.0199 | **changed** |
-| 20 | composite (acc / fit s) | 0.9991 / 1.15 | 0.9918 / 0.28 | -0.0073 | **changed** |
-| 3 | wasserstein (acc / fit s) | 0.9967 / 0.36 | 0.7203 / 0.15 | -0.2764 | **changed** |
-| 3 | bhattacharyya (acc / fit s) | 0.8447 / 0.61 | 0.9999 / 0.11 | +0.1552 | **changed** |
-| 3 | composite (acc / fit s) | 0.9967 / 0.28 | 0.8822 / 0.12 | -0.1145 | **changed** |
-| 4 | wasserstein (acc / fit s) | 0.9967 / 0.31 | 0.7286 / 0.17 | -0.2681 | **changed** |
-| 4 | bhattacharyya (acc / fit s) | 0.9160 / 0.31 | 0.9999 / 0.12 | +0.0839 | **changed** |
-| 4 | composite (acc / fit s) | 0.9966 / 0.34 | 0.8822 / 0.13 | -0.1144 | **changed** |
-| 5 | wasserstein (acc / fit s) | 0.9965 / 0.41 | 0.7286 / 0.17 | -0.2679 | **changed** |
-| 5 | bhattacharyya (acc / fit s) | 0.9467 / 0.33 | 0.9999 / 0.12 | +0.0532 | **changed** |
-| 5 | composite (acc / fit s) | 0.9966 / 0.37 | 0.9292 / 0.14 | -0.0674 | **changed** |
-| 7 | wasserstein (acc / fit s) | 0.9998 / 0.44 | 0.7295 / 0.18 | -0.2703 | **changed** |
-| 7 | bhattacharyya (acc / fit s) | 0.9632 / 0.40 | 0.9999 / 0.13 | +0.0367 | **changed** |
-| 7 | composite (acc / fit s) | 0.9967 / 0.44 | 0.9999 / 0.15 | +0.0032 | **changed** |
-| 1 | composite (acc / fit s) | 0.4267 / 0.25 | 0.4267 / 0.11 | +0.0000 | within noise |
+| 1 | composite (acc / fit s) | 0.4267 / 0.25 | 0.9967 / 0.16 | +0.5700 | **changed** |
+| 10 | wasserstein (acc / fit s) | 0.9997 / 0.75 | 0.9995 / 0.20 | -0.0002 | **changed** |
+| 10 | bhattacharyya (acc / fit s) | 0.9701 / 0.85 | 0.9999 / 0.18 | +0.0298 | **changed** |
+| 10 | composite (acc / fit s) | 0.9983 / 0.91 | 0.9998 / 0.24 | +0.0015 | **changed** |
+| 15 | wasserstein (acc / fit s) | 0.9957 / 0.62 | 0.9929 / 0.27 | -0.0028 | **changed** |
+| 15 | bhattacharyya (acc / fit s) | 0.9788 / 0.70 | 0.9999 / 0.25 | +0.0211 | **changed** |
+| 2 | bhattacharyya (acc / fit s) | 0.4527 / 0.18 | 0.9999 / 0.12 | +0.5472 | **changed** |
+| 2 | composite (acc / fit s) | 0.9967 / 0.58 | 0.9999 / 0.16 | +0.0032 | **changed** |
+| 20 | wasserstein (acc / fit s) | 0.9984 / 0.71 | 0.9980 / 0.34 | -0.0004 | **changed** |
+| 20 | bhattacharyya (acc / fit s) | 0.9796 / 0.74 | 0.9995 / 0.32 | +0.0199 | **changed** |
+| 20 | composite (acc / fit s) | 0.9991 / 1.15 | 0.9997 / 0.34 | +0.0006 | **changed** |
+| 3 | bhattacharyya (acc / fit s) | 0.8447 / 0.61 | 0.9999 / 0.12 | +0.1552 | **changed** |
+| 3 | composite (acc / fit s) | 0.9967 / 0.28 | 0.9999 / 0.17 | +0.0032 | **changed** |
+| 4 | bhattacharyya (acc / fit s) | 0.9160 / 0.31 | 0.9999 / 0.13 | +0.0839 | **changed** |
+| 4 | composite (acc / fit s) | 0.9966 / 0.34 | 0.9999 / 0.17 | +0.0033 | **changed** |
+| 5 | wasserstein (acc / fit s) | 0.9965 / 0.41 | 0.9966 / 0.17 | +0.0001 | **changed** |
+| 5 | bhattacharyya (acc / fit s) | 0.9467 / 0.33 | 0.9999 / 0.13 | +0.0532 | **changed** |
+| 5 | composite (acc / fit s) | 0.9966 / 0.37 | 0.9999 / 0.18 | +0.0033 | **changed** |
+| 7 | bhattacharyya (acc / fit s) | 0.9632 / 0.40 | 0.9999 / 0.14 | +0.0367 | **changed** |
+| 7 | composite (acc / fit s) | 0.9967 / 0.44 | 0.9998 / 0.20 | +0.0031 | **changed** |
+| 1 | wasserstein (acc / fit s) | 0.9967 / 0.47 | 0.9967 / 0.15 | +0.0000 | within noise |
+| 15 | composite (acc / fit s) | 0.9999 / 0.63 | 0.9999 / 0.30 | +0.0000 | within noise |
+| 2 | wasserstein (acc / fit s) | 0.9967 / 0.38 | 0.9967 / 0.15 | +0.0000 | within noise |
+| 3 | wasserstein (acc / fit s) | 0.9967 / 0.36 | 0.9967 / 0.16 | +0.0000 | within noise |
+| 4 | wasserstein (acc / fit s) | 0.9967 / 0.31 | 0.9967 / 0.16 | +0.0000 | within noise |
+| 7 | wasserstein (acc / fit s) | 0.9998 / 0.44 | 0.9998 / 0.17 | +0.0000 | within noise |
 
 ### `table_concrete_reconciliation`
 
@@ -1013,12 +973,10 @@ Rows only in `goal-8h-2026-08-11-fullsuite`: `Crop (DTW, N=24000) / no / 23.6%`,
 | flat MoG-TSK 2nd / log+standardized / closed-form only | RMSE | 6.50 ± 0.43 | 6.28 ± 0.27 | -0.2200 | within noise |
 | flat MoG-TSK 2nd / log+standardized / refined | R² | 0.862 ± 0.033 | 0.869 ± 0.023 | +0.0070 | within noise |
 | flat MoG-TSK 2nd / log+standardized / refined | RMSE | 6.00 ± 0.52 | 5.89 ± 0.37 | -0.1100 | within noise |
-| fuzzy tree / raw / n/a | R² | 0.583 ± 0.067 | 0.616 ± 0.032 | +0.0330 | within noise |
-| fuzzy tree / raw / n/a | RMSE | 10.53 ± 0.89 | 10.14 ± 0.49 | -0.3900 | within noise |
-| mixture of experts (HME) / log+standardized / n/a | R² | 0.747 ± 0.053 | 0.789 ± 0.049 | +0.0420 | within noise |
-| mixture of experts (HME) / log+standardized / n/a | RMSE | 8.18 ± 0.74 | 7.46 ± 0.61 | -0.7200 | within noise |
-| mixture of experts (HME) / raw / n/a | R² | 0.636 ± 0.087 | 0.689 ± 0.062 | +0.0530 | within noise |
-| mixture of experts (HME) / raw / n/a | RMSE | 9.78 ± 1.04 | 9.06 ± 0.69 | -0.7200 | within noise |
+| mixture of experts (HME) / log+standardized / n/a | R² | 0.747 ± 0.053 | 0.788 ± 0.052 | +0.0410 | within noise |
+| mixture of experts (HME) / log+standardized / n/a | RMSE | 8.18 ± 0.74 | 7.47 ± 0.66 | -0.7100 | within noise |
+| mixture of experts (HME) / raw / n/a | R² | 0.636 ± 0.087 | 0.703 ± 0.057 | +0.0670 | within noise |
+| mixture of experts (HME) / raw / n/a | RMSE | 9.78 ± 1.04 | 8.87 ± 0.83 | -0.9100 | within noise |
 
 ### `table_g5_output_partitioning`
 
@@ -1161,16 +1119,14 @@ Rows only in `goal-8h-2026-08-11-fullsuite`: `Crop (DTW, N=24000) / no / 23.6%`,
 | flat MoG-TSK full-2nd / pipeline default | Δ min-max − raw | +0.030 | +0.064 | +0.0340 | **changed** |
 | flat MoG-TSK full-2nd / pipeline default | Δ z-score − raw | -0.021 | +0.044 | +0.0650 | **changed** |
 | flat MoG-TSK full-2nd / pipeline default | Δ z-score − min-max | -0.051 | -0.020 | +0.0310 | **changed** |
-| fuzzy tree / library default | Δ min-max − raw | +0.106 | +0.074 | -0.0320 | **changed** |
-| fuzzy tree / library default | Δ z-score − raw | +0.108 | +0.076 | -0.0320 | **changed** |
 | mixture of experts / demo-tuned | log + z-score | 0.806 ± 0.031 | 0.847 ± 0.023 | +0.0410 | **changed** |
-| mixture of experts / demo-tuned | Δ min-max − raw | +0.060 | +0.092 | +0.0320 | **changed** |
-| mixture of experts / demo-tuned | Δ z-score − raw | +0.032 | +0.092 | +0.0600 | **changed** |
+| mixture of experts / demo-tuned | Δ min-max − raw | +0.060 | +0.061 | +0.0010 | **changed** |
+| mixture of experts / demo-tuned | Δ z-score − raw | +0.032 | +0.061 | +0.0290 | **changed** |
 | mixture of experts / demo-tuned | Δ z-score − min-max | -0.028 | +0.000 | +0.0280 | **changed** |
 | mixture of experts / demo-tuned | RMSE log+z-score (MPa) | 7.188 ± 0.472 | 6.379 ± 0.471 | -0.8090 | **changed** |
-| mixture of experts / library default | Δ min-max − raw | +0.108 | +0.096 | -0.0120 | **changed** |
-| mixture of experts / library default | Δ z-score − raw | +0.096 | +0.093 | -0.0030 | **changed** |
-| mixture of experts / library default | Δ z-score − min-max | -0.012 | -0.003 | +0.0090 | **changed** |
+| mixture of experts / library default | Δ min-max − raw | +0.108 | +10.282 | +10.1740 | **changed** |
+| mixture of experts / library default | Δ z-score − raw | +0.096 | +10.281 | +10.1850 | **changed** |
+| mixture of experts / library default | Δ z-score − min-max | -0.012 | -0.000 | +0.0120 | **changed** |
 | flat MoG-TSK 1st / pipeline default | raw features | 0.695 ± 0.030 | 0.691 ± 0.040 | -0.0040 | within noise |
 | flat MoG-TSK 1st / pipeline default | log + min-max | 0.796 ± 0.018 | 0.803 ± 0.025 | +0.0070 | within noise |
 | flat MoG-TSK 1st / pipeline default | log + z-score | 0.713 ± 0.035 | 0.723 ± 0.042 | +0.0100 | within noise |
@@ -1189,47 +1145,53 @@ Rows only in `goal-8h-2026-08-11-fullsuite`: `Crop (DTW, N=24000) / no / 23.6%`,
 | flat MoG-TSK full-2nd / pipeline default | RMSE raw (MPa) | 6.719 ± 0.444 | 7.036 ± 0.576 | +0.3170 | within noise |
 | flat MoG-TSK full-2nd / pipeline default | RMSE log+min-max (MPa) | 6.072 ± 0.512 | 5.678 ± 0.329 | -0.3940 | within noise |
 | flat MoG-TSK full-2nd / pipeline default | RMSE log+z-score (MPa) | 6.905 ± 1.718 | 6.116 ± 0.523 | -0.7890 | within noise |
-| fuzzy tree / library default | raw features | 0.583 ± 0.067 | 0.616 ± 0.032 | +0.0330 | within noise |
-| fuzzy tree / library default | RMSE raw (MPa) | 10.531 ± 0.889 | 10.139 ± 0.492 | -0.3920 | within noise |
-| mixture of experts / demo-tuned | raw features | 0.774 ± 0.025 | 0.755 ± 0.028 | -0.0190 | within noise |
+| mixture of experts / demo-tuned | raw features | 0.774 ± 0.025 | 0.787 ± 0.024 | +0.0130 | within noise |
 | mixture of experts / demo-tuned | log + min-max | 0.834 ± 0.027 | 0.847 ± 0.023 | +0.0130 | within noise |
-| mixture of experts / demo-tuned | RMSE raw (MPa) | 7.771 ± 0.441 | 8.081 ± 0.414 | +0.3100 | within noise |
+| mixture of experts / demo-tuned | RMSE raw (MPa) | 7.771 ± 0.441 | 7.547 ± 0.419 | -0.2240 | within noise |
 | mixture of experts / demo-tuned | RMSE log+min-max (MPa) | 6.645 ± 0.469 | 6.379 ± 0.471 | -0.2660 | within noise |
-| mixture of experts / library default | raw features | 0.648 ± 0.093 | 0.694 ± 0.065 | +0.0460 | within noise |
-| mixture of experts / library default | log + min-max | 0.756 ± 0.059 | 0.790 ± 0.055 | +0.0340 | within noise |
-| mixture of experts / library default | log + z-score | 0.744 ± 0.066 | 0.787 ± 0.058 | +0.0430 | within noise |
-| mixture of experts / library default | RMSE raw (MPa) | 9.603 ± 1.207 | 8.984 ± 0.699 | -0.6190 | within noise |
-| mixture of experts / library default | RMSE log+min-max (MPa) | 8.024 ± 0.753 | 7.433 ± 0.788 | -0.5910 | within noise |
-| mixture of experts / library default | RMSE log+z-score (MPa) | 8.214 ± 0.804 | 7.485 ± 0.801 | -0.7290 | within noise |
+| mixture of experts / library default | raw features | 0.648 ± 0.093 | -9.493 ± 30.632 | -10.1410 | within noise |
+| mixture of experts / library default | log + min-max | 0.756 ± 0.059 | 0.789 ± 0.059 | +0.0330 | within noise |
+| mixture of experts / library default | log + z-score | 0.744 ± 0.066 | 0.789 ± 0.059 | +0.0450 | within noise |
+| mixture of experts / library default | RMSE raw (MPa) | 9.603 ± 1.207 | 23.672 ± 45.019 | +14.0690 | within noise |
+| mixture of experts / library default | RMSE log+min-max (MPa) | 8.024 ± 0.753 | 7.443 ± 0.831 | -0.5810 | within noise |
+| mixture of experts / library default | RMSE log+z-score (MPa) | 8.214 ± 0.804 | 7.448 ± 0.833 | -0.7660 | within noise |
 
 ### `table_norm_conorm_matrix`
 
 | Row | Column | Before | After | Δ | |
 |---|---|---|---|---:|---|
-| Concrete / HME (experts only) / R2 | min/max | 0.786 ± 0.025 | 0.735 ± 0.040 | -0.0510 | **changed** |
-| Concrete / HME (experts only) / R2 | luk | -3.583 ± 0.465 | -1.084 ± 0.397 | +2.4990 | **changed** |
-| Concrete / HME (experts only) / R2 | hamacher | 0.795 ± 0.024 | 0.741 ± 0.038 | -0.0540 | **changed** |
-| Concrete / HME (experts only) / R2 | Best (mean spread) | **hamacher** (spread 4.378) | **probability** (spread 1.829) | -2.5490 | **changed** |
-| Concrete / HME (experts only) / RMSE (MPa) | min/max | 7.547 ± 0.375 | 8.396 ± 0.457 | +0.8490 | **changed** |
-| Concrete / HME (experts only) / RMSE (MPa) | luk | 34.957 ± 1.253 | 23.536 ± 2.384 | -11.4210 | **changed** |
-| Concrete / HME (experts only) / RMSE (MPa) | hamacher | 7.391 ± 0.366 | 8.299 ± 0.469 | +0.9080 | **changed** |
-| Concrete / HME (experts only) / RMSE (MPa) | Best (mean spread) | **hamacher** (spread 27.566) | **probability** (spread 15.303) | -12.2630 | **changed** |
-| PhiUSIIL / HME (experts only) / accuracy | min/max | 0.998 ± 0.001 | 0.727 ± 0.051 | -0.2710 | **changed** |
-| PhiUSIIL / HME (experts only) / accuracy | probability | 0.998 ± 0.001 | 0.743 ± 0.044 | -0.2550 | **changed** |
-| PhiUSIIL / HME (experts only) / accuracy | luk | 0.968 ± 0.001 | 0.739 ± 0.034 | -0.2290 | **changed** |
-| PhiUSIIL / HME (experts only) / accuracy | hamacher | 0.998 ± 0.001 | 0.741 ± 0.046 | -0.2570 | **changed** |
-| PhiUSIIL / HME (experts only) / accuracy | einstein | 0.998 ± 0.001 | 0.749 ± 0.042 | -0.2490 | **changed** |
-| PhiUSIIL / HME (experts only) / accuracy | Best (mean spread) | **probability** (spread 0.031) | **einstein** (spread 0.022) | -0.0090 | **changed** |
-| PhiUSIIL / fuzzy tree (t-norm only) / accuracy | min/max | 0.967 ± 0.003 | 0.573 ± 0.003 | -0.3940 | **changed** |
-| PhiUSIIL / fuzzy tree (t-norm only) / accuracy | probability | 0.967 ± 0.003 | 0.573 ± 0.003 | -0.3940 | **changed** |
-| PhiUSIIL / fuzzy tree (t-norm only) / accuracy | luk | 0.967 ± 0.003 | 0.589 ± 0.047 | -0.3780 | **changed** |
-| PhiUSIIL / fuzzy tree (t-norm only) / accuracy | hamacher | 0.967 ± 0.003 | 0.573 ± 0.003 | -0.3940 | **changed** |
-| PhiUSIIL / fuzzy tree (t-norm only) / accuracy | einstein | 0.967 ± 0.003 | 0.573 ± 0.003 | -0.3940 | **changed** |
-| PhiUSIIL / fuzzy tree (t-norm only) / accuracy | Best (mean spread) | **min/max** (spread 0.000) | **luk** (spread 0.016) | +0.0160 | **changed** |
-| Concrete / HME (experts only) / R2 | probability | 0.773 ± 0.019 | 0.745 ± 0.035 | -0.0280 | within noise |
-| Concrete / HME (experts only) / R2 | einstein | 0.760 ± 0.024 | 0.744 ± 0.035 | -0.0160 | within noise |
-| Concrete / HME (experts only) / RMSE (MPa) | probability | 7.788 ± 0.385 | 8.233 ± 0.476 | +0.4450 | within noise |
-| Concrete / HME (experts only) / RMSE (MPa) | einstein | 8.009 ± 0.469 | 8.261 ± 0.506 | +0.2520 | within noise |
+| Concrete / HME (experts only) / R2 | Best (mean spread) | **hamacher** (spread 4.378) | **hamacher** (spread 47.260) | +42.8820 | **changed** |
+| Concrete / HME (experts only) / RMSE (MPa) | Best (mean spread) | **hamacher** (spread 27.566) | **hamacher** (spread 58.704) | +31.1380 | **changed** |
+| Concrete / flat MoG-TSK / R2 | min/max | N/A | 0.677 ± 0.037 |  | **changed** |
+| Concrete / flat MoG-TSK / R2 | probability | N/A | 0.675 ± 0.039 |  | **changed** |
+| Concrete / flat MoG-TSK / R2 | luk | N/A | -3.404 ± 0.419 |  | **changed** |
+| Concrete / flat MoG-TSK / R2 | hamacher | N/A | 0.682 ± 0.038 |  | **changed** |
+| Concrete / flat MoG-TSK / R2 | einstein | N/A | 0.672 ± 0.039 |  | **changed** |
+| Concrete / flat MoG-TSK / R2 | Best (mean spread) | N/A | **hamacher** (spread 4.086) |  | **changed** |
+| Concrete / flat MoG-TSK / RMSE (MPa) | min/max | N/A | 9.291 ± 0.727 |  | **changed** |
+| Concrete / flat MoG-TSK / RMSE (MPa) | probability | N/A | 9.323 ± 0.752 |  | **changed** |
+| Concrete / flat MoG-TSK / RMSE (MPa) | luk | N/A | 34.264 ± 0.716 |  | **changed** |
+| Concrete / flat MoG-TSK / RMSE (MPa) | hamacher | N/A | 9.225 ± 0.695 |  | **changed** |
+| Concrete / flat MoG-TSK / RMSE (MPa) | einstein | N/A | 9.372 ± 0.759 |  | **changed** |
+| Concrete / flat MoG-TSK / RMSE (MPa) | Best (mean spread) | N/A | **hamacher** (spread 25.039) |  | **changed** |
+| PhiUSIIL / HME (experts only) / accuracy | luk | 0.968 ± 0.001 | 0.964 ± 0.004 | -0.0040 | **changed** |
+| PhiUSIIL / HME (experts only) / accuracy | Best (mean spread) | **probability** (spread 0.031) | **einstein** (spread 0.034) | +0.0030 | **changed** |
+| PhiUSIIL / flat MoG / accuracy | min/max | N/A | 0.997 ± 0.001 |  | **changed** |
+| PhiUSIIL / flat MoG / accuracy | probability | N/A | 0.997 ± 0.001 |  | **changed** |
+| PhiUSIIL / flat MoG / accuracy | luk | N/A | 0.997 ± 0.001 |  | **changed** |
+| PhiUSIIL / flat MoG / accuracy | hamacher | N/A | 0.997 ± 0.001 |  | **changed** |
+| PhiUSIIL / flat MoG / accuracy | einstein | N/A | 0.997 ± 0.001 |  | **changed** |
+| PhiUSIIL / flat MoG / accuracy | Best (mean spread) | N/A | **luk** (spread 0.000) |  | **changed** |
+| Concrete / HME (experts only) / R2 | min/max | 0.786 ± 0.025 | 0.782 ± 0.034 | -0.0040 | within noise |
+| Concrete / HME (experts only) / R2 | probability | 0.773 ± 0.019 | 0.773 ± 0.045 | +0.0000 | within noise |
+| Concrete / HME (experts only) / R2 | luk | -3.583 ± 0.465 | -46.477 ± 129.343 | -42.8940 | within noise |
+| Concrete / HME (experts only) / R2 | hamacher | 0.795 ± 0.024 | 0.784 ± 0.038 | -0.0110 | within noise |
+| Concrete / HME (experts only) / R2 | einstein | 0.760 ± 0.024 | 0.761 ± 0.049 | +0.0010 | within noise |
+| Concrete / HME (experts only) / RMSE (MPa) | min/max | 7.547 ± 0.375 | 7.620 ± 0.612 | +0.0730 | within noise |
+| Concrete / HME (experts only) / RMSE (MPa) | probability | 7.788 ± 0.385 | 7.759 ± 0.704 | -0.0290 | within noise |
+| Concrete / HME (experts only) / RMSE (MPa) | luk | 34.957 ± 1.253 | 66.286 ± 96.928 | +31.3290 | within noise |
+| Concrete / HME (experts only) / RMSE (MPa) | hamacher | 7.391 ± 0.366 | 7.583 ± 0.674 | +0.1920 | within noise |
+| Concrete / HME (experts only) / RMSE (MPa) | einstein | 8.009 ± 0.469 | 7.951 ± 0.779 | -0.0580 | within noise |
 
 ## Bit-identical
 
