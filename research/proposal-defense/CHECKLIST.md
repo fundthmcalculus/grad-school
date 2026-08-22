@@ -731,7 +731,37 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 ## E. Decisions and framing
 **[Tier 0–4: mix of settled defaults (E1, E3), verification paths (E2, E2b, E2c), and low-stakes editorial (E10). E1.6–E1.7 Tier 1 (normalization + FCM). E9 low-priority investigation.]**
 
-- [ ] ⬜ **E1 — t-norm: present min/max as the default.** *(Author decision recorded 2026-08-02:
+- [ ] ⬜ **E1 — t-norm: present min/max as the default. ⚠️ Its evidence base was broken and is
+      now repaired; the numbers below are superseded.** `table_norm_conorm_matrix.py` imported
+      `MixtureOfGaussiansFuzzyRegressor` and `MixtureOfGaussiansFuzzyClassifier`, renamed upstream
+      to `TribbleRegressor`/`TribbleClassifier` — the **same rename B12(a) swept for, in a file
+      that sweep missed**. Both flat-MoG rows of this table have therefore been silently `N/A`
+      since at least the 2026-08-11 archive, which is why nothing failed: the skip path works
+      exactly as designed, prints its reason, and emits `N/A`, so the table reported *ok* and the
+      run reported green with a third of its rows empty. Fixed 2026-08-22 (new name first, old
+      name as a fallback so the generator still runs against an older pin).
+      **What the restored rows show**, ten seeds on Concrete and PhiUSIIL:
+
+      | model | min/max | probability | **Łukasiewicz** | hamacher | einstein |
+      |---|---:|---:|---:|---:|---:|
+      | flat MoG-TSK, $R^2$ | 0.576 ± 0.037 | 0.605 ± 0.042 | **−0.507 ± 0.254** | 0.588 ± 0.041 | 0.607 ± 0.041 |
+      | HME (experts only), $R^2$ | 0.735 ± 0.040 | 0.745 ± 0.035 | **−1.084 ± 0.397** | 0.741 ± 0.038 | 0.744 ± 0.035 |
+
+      So **the reportable finding survives and is now demonstrable on both models** rather than
+      one: Łukasiewicz collapses the regression models while the other four sit within 0.03 of
+      each other. Two corrections to this item's own text: the magnitudes are not the −3.761 /
+      −3.626 recorded here, and **"min/max is nominally best for the flat MoG (0.651 vs 0.650)"
+      does not reproduce** — min/max is the *worst* of the four non-Łukasiewicz families here
+      (0.576 against einstein's 0.607). ⚠️ **Do not re-quote the absolute values yet**: this table
+      runs through the feature screen and is therefore affected by **B14** (its PhiUSIIL
+      accuracies all sit in the broken ≈0.73 band). The Łukasiewicz collapse is far too large to
+      be a B14 artifact; the finer family ordering is not, and must be re-taken after B14 lands.
+      The rest of this item stands unchanged: the case for min/max is simplicity rather than
+      accuracy, and **the whole study still appears in no chapter** — §4.3.5 says only that the
+      conorm family is "a parameter" and that the family sweep is on accuracy only. Harvest it or
+      drop the reference. Original entry:
+
+  ↳ _As recorded 2026-08-02._ *(Author decision recorded 2026-08-02:
       keep tables at factory/library defaults, show the better configuration alongside, treat as
       future work.)* Upstream `53e89ab` made *probability* the library default. Data: min/max is
       nominally best for the flat MoG (0.651 vs 0.650) but by 0.001 against σ ≈ 0.05, so the case
