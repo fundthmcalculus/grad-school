@@ -17,8 +17,8 @@ explanation.
 | archive | ok | drifted | untraceable |
 |---|---:|---:|---:|
 | `goal-8h-2026-08-11-fullsuite` (the pin the document was written under) | **156** | 10 | 44 |
-| `full-2026-08-22` (current pins, 15/15 generators green at ten seeds) | **65** | 23 | 122 |
-| `wasserstein-fixed-2026-08-22` (current pins, one function corrected) | **76** | 24 | 110 |
+| `full-2026-08-22` (current pins, 16/16 generators green at ten seeds) | **59** | 23 | 128 |
+| `wasserstein-fixed-2026-08-22` (current pins, one function corrected) | **70** | 23 | 117 |
 
 The document reproduces against the pin it was written under and does not
 reproduce against today's. `tribble-fis` **`5237ebe`** (#95, *"Replace

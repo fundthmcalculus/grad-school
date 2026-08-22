@@ -26,7 +26,7 @@ _Overnight reproduction pass against latest `main` and latest submodules, 2026-0
 > that takes PhiUSIIL from $0.997 \pm 0.001$ to $0.729 \pm 0.023$ and RT-IOT2022 from
 > $0.927 \pm 0.002$ to $0.500 \pm 0.244$. Correcting that one function at the current pin returns
 > **Table 4.1** to its archived values exactly — so those cells are right as written — but it
-> recovers only 11 of the ~90 ± pairs the document loses overall. **B14 is the largest single
+> recovers 11 of the ~97 ± pairs the document loses overall. **B14 is the largest single
 > cause of the drift and not the whole of it**; **D8** carries the rest.
 
 **Legend: ⬜ open · 🟨 in progress · ✅ done · 🚫 descoped · 🔒 blocked on you.**
@@ -479,7 +479,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       only this function corrected returns PhiUSIIL to $0.997 \pm 0.001$ *exactly* and
       RT-IOT2022 to $0.923 \pm 0.011$, and takes the table from 2 cells beyond noise to **0**
       against the archive. ⚠️ That is *not* the same as restoring the document: over the whole
-      proposal the fix moves `check_prose` from 65 matching pairs to 76, against 156 under the
+      proposal the fix moves `check_prose` from 59 matching pairs to 70, against 156 under the
       old pin. **D8** carries the remainder. `reproduce/experiments/run_with_wasserstein_fix.py`
       re-runs any generator that way, so the question can be settled table by table without
       waiting on upstream. The three regression rows move identically with and without the fix,
@@ -800,12 +800,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       | archive | ok | drifted | untraceable |
       |---|---:|---:|---:|
       | `goal-8h-2026-08-11-fullsuite` (old pin) | **156** | 10 | 44 |
-      | `full-2026-08-22` (current pin, 15/15 green at ten seeds) | **65** | 23 | 122 |
-      | `wasserstein-fixed-2026-08-22` (current pin, B14 corrected in-process) | **76** | 24 | 110 |
+      | `full-2026-08-22` (current pin, 16/16 green at ten seeds) | **59** | 23 | 128 |
+      | `wasserstein-fixed-2026-08-22` (current pin, B14 corrected in-process) | **70** | 23 | 117 |
 
       Four causes are identified and three of them are benign:
       1. **B14** — decisive where its mechanism applies and irrelevant elsewhere. `table_4_1`
-         goes 2 cells beyond noise → **0**; `table_6_1` 5 → 1. Worth 11 pairs document-wide.
+         goes 2 cells beyond noise → **0**; `table_6_1` 5 → 1. Worth 11 pairs document-wide (59 → 70).
       2. **The compiler (B15).** Chapter 3's kernels are gcc-built on this host, not MSVC, so
          every Chapter 3 timing moved. Exactness columns did not. Not a defect — but it means
          **no Chapter 3 timing can be re-quoted from `full-2026-08-22`** without a host that can

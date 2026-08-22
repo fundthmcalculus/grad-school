@@ -142,10 +142,10 @@ instance of it, and the first where the uncovered half was the headline number.
    | archive | ok | drifted | untraceable |
    |---|---:|---:|---:|
    | `goal-8h-2026-08-11-fullsuite` (old pin) | **156** | 10 | 44 |
-   | `full-2026-08-22` (current pin) | **65** | 23 | 122 |
-   | `wasserstein-fixed-2026-08-22` (current pin, this one function corrected) | **76** | 24 | 110 |
+   | `full-2026-08-22` (current pin) | **59** | 23 | 128 |
+   | `wasserstein-fixed-2026-08-22` (current pin, this one function corrected) | **70** | 23 | 117 |
 
-   Correcting the defect recovers **11 pairs of the ~90 lost**. Per table it is
+   Correcting the defect recovers **11 pairs of the ~97 lost**. Per table it is
    decisive where the mechanism applies — `table_4_1` goes from 2 cells beyond
    noise to **0**, and `table_6_1` from 5 to 1 — and irrelevant where it does not.
    The rest of the gap has four separate causes, each identified and none of them

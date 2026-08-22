@@ -20,15 +20,15 @@ as having no generator yet.
 
 ## 2026-08-22 — whole-document status against latest `main` + latest submodules
 
-A full ten-seed sweep ran on the current pins (`full-2026-08-22`, 15/15 generators
+A full ten-seed sweep ran on the current pins (`full-2026-08-22`, 16/16 generators
 green, zero failures) and `check_prose.py` was run against it and against the
 previous run of record. The two numbers together are the finding:
 
 | ± pairs in the prose | vs `goal-8h-2026-08-11-fullsuite` (old pin) | vs `full-2026-08-22` (current pin) |
 |---|---:|---:|
-| match a cell | **155** | **65** |
+| match a cell | **156** | **59** |
 | drifted | 10 | 23 |
-| untraceable | 39 | 122 |
+| untraceable | 44 | 128 |
 
 **The document reproduces against the pin it was written under and does not
 reproduce against today's.** The cause is a single upstream function — see
