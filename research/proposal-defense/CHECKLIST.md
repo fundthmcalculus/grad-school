@@ -96,16 +96,29 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       across `prose/*.md` returns nothing; the text never states the arithmetic. **No prose
       label has been changed**, deliberately. When you pick, `build/proposal-combined.md` needs
       a rebuild rather than a hand-edit.
-- [ ] ⬜ **A10 — Teaching/RA load per semester** *(needed from author)*. Sets realistic
-      throughput for Chapter 10's timeline; currently unconfirmed, which is the one open item
-      that could move every bar in the Gantt. `10-timeline.md`'s "Open items" section already
-      asks for this; recorded here so it has an ID like everything else waiting on you.
+- [x] ✅ **A10 — Teaching/RA load: none. RESOLVED (author, 2026-08-21).** The author carries **no
+      teaching or RA load** over the runway, so the throughput assumption behind Chapter 10's
+      timeline is full research effort — the one open item that could have moved every bar in the
+      Gantt resolves in the favourable direction, and no bar needs to move. `10-timeline.md`'s
+      intro now states the effort assumption explicitly, which is what a committee asks of a
+      schedule described as "deliberately aggressive," rather than leaving it implicit.
 - [x] ✅ **A1 — Method name settled: `mergeVAT`** (author decision, 2026-08-02).
       The name went round-trip: mergeVAT → `pVAT` (on Dr. Kreinovich's observation that stage one
       is a priority-queue algorithm) → collision → back to **mergeVAT**. `pVAT` is taken by
       Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013 (LNCS 8302:151–170),
       a GPU VAT that also swaps the MST algorithm, so reading our *p* as parallel/performant
       collided harder rather than less. Acknowledged by citation in §3.3.1.
+      ✅ **The pVAT collision is genuine; the citation had the wrong title, now fixed (2026-08-21;
+      deep research, see E7).** "pVAT" is not a paper title — it is a method named inside Parveen &
+      Sreevalsan-Nair's *"Visualization of Small World Networks Using Similarity Matrices"* (BDA 2013,
+      LNCS 8302:151–170, DOI 10.1007/978-3-319-03689-2_10), whose **Algorithm 1 is captioned "pVAT:
+      Parallel implementation of VAT"** — a GPU/CUDA parallel VAT built on **Borůvka's MST**
+      (contribution 1, confirmed against the authors' preprint). So the prior use of the name is real,
+      and it collides *harder* than first stated: their pVAT and this work's GPU path both swap Prim
+      for Borůvka. The `.bib` had lifted the algorithm caption as the paper title and carried the wrong
+      given name ("Sherin"); corrected to the real title and "Saima", restored to `[V]`, DOI added.
+      §3.3.1's prose already describes it correctly (it never used the bogus title). No journal version
+      exists — the BDA chapter is the only publication. **The rename to mergeVAT is fully supported.**
       **The name is imperfect and §3.3.1 says so**: it describes neither stage one (priority
       queue) nor stage two (compact active set). What it does describe is §3.3.4's
       divide-and-conquer stitch — which is a merge, is measured, and is the least finished part
@@ -150,16 +163,23 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 - [x] ✅ **B3 — Timings reported as ratios, seconds kept in CSV.** `common.normalized_worst()`
       normalizes each row against its slowest arm; `emit(md_header=, md_rows=)` lets Markdown
       and CSV diverge. Applied to `table_3_1_pvat_scaling` and `table_3_1_reorder_three_arm`.
-- [x] ⬜ **B8 — Automate the harness → document figure hop.** `save_figure()` writes to
+- [x] ✅ **B8 — Automate the harness → document figure hop. DONE.** `save_figure()` writes to
       `reproduce/outputs/figures/fig_03_complexity_fit.{png,eps}`; the document references
-      `prose/fig/03-complexity-fit.png`. That copy is **manual today**. `build_pdf.py` now
-      emits an image line when the target exists and still strips it when it does not, so a
-      figure that is not copied across silently reverts to a placeholder — which is the
-      failure mode worth automating away. A name map plus a copy step in the build closes it.
-- [x] ⬜ **B4 — Submodule SHA guard.** The harness should refuse to emit, or loudly stamp, when
-      a submodule SHA differs from the last archive's. **This failure has happened twice** —
-      once with `fix/pin-extreme-bucket-means`, once with `resolve-flm-pr`. Highest-value
-      remaining infra item.
+      `prose/fig/03-complexity-fit.png`. `build_pdf.py` now closes this automatically: `main()`
+      calls `copy_figures()` (unconditionally, as its first step), which walks the `FIGURE_COPIES`
+      name map — sourced from `reproduce/figures/registry.py`, so adding a figure stays a one-file
+      edit — and copies each `fig_*.{png,eps}` to its prose name at build time. It still emits an
+      image line only when the target exists and strips it to a placeholder when it does not, so
+      the "figure silently reverts to a placeholder" failure mode is now governed by whether the
+      harness generated the figure, not by a forgotten manual copy.
+- [x] ✅ **B4 — Submodule SHA guard. DONE.** The harness now loudly stamps when a submodule SHA
+      differs from the last archive's, taking the "loudly stamp" branch rather than refusing to
+      emit (an intentional submodule change should not block a run). `run_all_tables.sh`'s
+      `check_submodule_shas()` compares the most recent archive's recorded `tribble-fis` /
+      `tribble-cluster` / `grad-school` SHAs against the current `git rev-parse HEAD` and prints a
+      boxed divergence banner on any mismatch; it is called before the run. **This failure had
+      happened twice** — once with `fix/pin-extreme-bucket-means`, once with `resolve-flm-pr` —
+      which is what the guard now catches.
 - [x] ✅ **B5 — Chapter 3's timing grid re-taken on the workstation.** Run of record
       `reproduce/outputs/full-14900hx-r2/` (i9-14900HX, 32 logical cores, 96 GB, RTX 4080
       Laptop), 10 seeds, all 13 generators green in one pass; §3.4 no longer spans two hosts.
@@ -195,13 +215,28 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       correction — the host is a 32-core i9 with 96 GB RAM, and 64 GB is a self-imposed working
       cap, not a hardware limit — is folded into the same appendix passage and into Table 3.3.)
 - [x] ✅ **B5c — Install a PDF renderer on this host.** ✅ DONE (2026-08-08). `build_pdf.py` now renders the PDF; LaTeX engine installed.
-- [x] ⬜ **B6 — Remove `pvat.vat_prim_mst_seq`.** Exported public API that silently
-      returns a wrong ordering: it returns the seed vertex followed by every other vertex in
-      ascending index order — chance-level agreement (0.001 ± 0.001) with the true ordering at
-      both float64 and float32. Cause: `_get_dist(samples, u, vertices[mask])` is typed for
-      scalar indices, so `np.sum(np.square(diff))` reduces over *all* candidates and returns
-      one scalar; `key[mask] = <scalar>` gives every candidate the same key and the heap pops
-      in index order. Nothing in the package calls it. See `REVIEW` ★2.
+- [x] ✅ **B6 — `pvat.vat_prim_mst_seq` fixed and implemented. RESOLVED (author, 2026-08-21).**
+      Resolved by *fix*, not removal: the function now computes the correct VAT/MST ordering and
+      `tribble-cluster` carries a `test_vat_prim_mst_seq.py` regression test plus a compiled fast
+      path, so the silent-wrong-answer hazard this item opened against is closed.
+      ⚠️ **The fix landed *after* the pinned commit (`tribble-cluster e3c27e6`).** So the code is
+      resolved but the dissertation still pins the earlier commit where the function is the removed,
+      chance-level negative result — which means Appendix A.6, Table 3.3's negative-result row, and
+      **Goal G4d** (the matrix-free reorder, whose whole premise is "no working matrix-free
+      implementation exists") describe the *pinned* state accurately but are now overtaken by the
+      code. **Downstream decision, tracked at G4d:** bump the pin to include the fix and re-run —
+      Table 3.3's negative row becomes a positive result, the reachable-N ceiling likely moves past
+      155k, and G4d's decision-rule (§7 line 51: elementwise ordering check at N∈{1k,2k,5k},
+      reachable N under the memory cap, the wall-clock threshold) can actually be run, turning G4d
+      from a *build* into an *integrate-and-measure* — **or** keep the current pin and add a "since
+      fixed upstream at `<commit>`" note to A.6/G4d. Author to choose; the fix itself is done.
+      **Original defect (kept as the record):** the exported API silently returned a wrong
+      ordering — the seed vertex followed by every other vertex in ascending index order,
+      chance-level agreement (0.001 ± 0.001) with the true ordering at both float64 and float32.
+      Cause: `_get_dist(samples, u, vertices[mask])` was typed for scalar indices, so
+      `np.sum(np.square(diff))` reduced over *all* candidates and returned one scalar;
+      `key[mask] = <scalar>` gave every candidate the same key and the heap popped in index order.
+      See `REVIEW` ★2.
 - [x] ✅ **B9 — Backfill `log_features` into the sample scripts.** ✅ DONE (tribble-fis #73 merged, 2026-08-08).
       The samples were converted onto `UnitFuzzyScalar` (PR #55 here), which auto-detects log
       columns by dynamic range, whereas each sample previously named its own columns. Upstream
@@ -536,8 +571,13 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       nominally best for the flat MoG (0.651 vs 0.650) but by 0.001 against σ ≈ 0.05, so the case
       is simplicity rather than accuracy. **The reportable finding is that Łukasiewicz collapses
       the regression models** (−3.761 flat, −3.626 HME) while the other four families sit within
-      0.03. Also: the whole norm/conorm study appears in *no chapter*, while Ch 2 §2.1 promises
-      "Chapter 4 shows" something Chapter 4 does not show — harvest it or drop the reference.
+      0.03. **Dangling-reference sub-item fixed (2026-08-21):** §2.1's "Chapter 4 shows that this
+      choice changes how readily a model declares something familiar" overclaimed exactly what
+      §4.3.2 disclaims (`table_norm_conorm_matrix.py` sweeps the five De Morgan families on
+      *accuracy* only; the open-set comparison across families is untested). The §2.1 sentence now
+      points to §4.3's actual use of the Hamacher conorm and carries §4.3.2's own "untested" hedge.
+      **What remains open in E1:** the min/max-as-default framing decision, and whether to *harvest*
+      the norm/conorm study into a chapter (it still appears in none) rather than only reference it.
 - [x] ✅ **E2 — Table 3.4 now has a generator, and it runs on this host.**
       `reproduce/tables/table_3_4_gpu_speedups.py`, 31 rows, ten seeds, each row one CPU arm
       against one GPU arm timed in the same pass, device timings stream-synchronised and all
@@ -610,16 +650,63 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       cell-for-cell and all 35 values trace to harness CSVs, but no chapter yet *cites* a named
       table instead of restating values — which is the mechanism that let the numbers drift in
       the first place.
-- [ ] ⬜ **E7 — Two literature searches**: knot/breakpoint optimization precedent (Ch 6), and a
-      dedicated fuzzy-MoE search to bound the HME nesting claim. Plus the Zhang-2023 attribution
-      fix in the HFIS references (misattributed to "H. Wang et al."; see `bibliography.md` for
-      the full accounting of this and four other reference-level gaps).
-- [ ] ⬜ **E8 — Two blocking reads** before writing the Ch 9 complexity note (short-communication
-      or NAFIPS-style venue, not an algorithms conference; novelty scoped to (a) the
-      heap-vs-dense correction, (b) the measured crossover, (c) iVAT coverage Fast-VAT 2025
-      lacks, (d) the O(N)-workspace regime as a ≈2× constant-factor win — explicitly *not* "a
-      faster MST"): **Deshpande & Kumar 2024** full text and **Wang et al. 2010** (PAKDD). If
-      the former already states the O(N)-workspace result for VAT itself, drop the note.
+- [x] ✅ **E7 — Two literature searches done; attribution pass done (2026-08-21).** Both searches
+      ran and their findings are folded into Ch 6:
+      **(1) Knot/breakpoint optimization.** A strong triangular partition of unity *is* the order-2
+      (linear) B-spline basis, so apex-knot refinement is free-knot linear-spline fitting and the
+      sum-to-one property is intrinsic to the form, not an enforced constraint. Nearest fuzzy
+      precedent is de Oliveira 1999 (semantic constraints incl. sum-to-one during MF tuning).
+      §6.3.4 now credits `deboor2001splines` (added) + `deoliveira1999semantic`; the novelty is
+      framed as a positioning/setting claim (apex-only refinement of an *exported* rule base), not
+      a new mechanism.
+      **(2) Fuzzy mixtures-of-experts.** Wu et al.'s TSK≡MoE equivalence is stated for the *flat*
+      layer only; "hierarchical TSK" in the literature is stacking/widening (Zhang 2024 survey),
+      not recursive gating. The surviving novelty — one shared closed-form ridge-TSK primitive
+      reused across flat FIS, soft-tree leaves and HME experts — is unprecedented as a *composition*
+      only; §6.2/§6.5 already frame it that way. **Fixed a real miscitation:** §6.2 attributed the
+      TSK≡MoE result to `wu2020optimize` (the MBGD-RDA gradient paper) instead of `wu2020functional`
+      (the functional-equivalence paper). Corrected.
+      **Attribution/metadata fixes applied to `references.bib`:** Zhang-2023 already handled (see
+      E1 note); `kumar2016incvat` real title/authors corrected against Crossref ("Adaptive Cluster
+      Tendency Visualization and Anomaly Detection for Streaming Data", 7 authors); `deshpande2024scalable`
+      first author corrected (Kartik Vishal, not Ojas); Kališnik accent confirmed already correctly
+      encoded (`Kali{\v{s}}nik`). **One item, now resolved by deep research (2026-08-21; see A1):** the pVAT
+      collision is **genuine** — "pVAT" is a method named inside Parveen & Sreevalsan-Nair's
+      small-world-networks paper (Algorithm 1: "pVAT: Parallel implementation of VAT"; GPU/CUDA,
+      Borůvka MST), not a separate paper title. The `.bib` had lifted the algorithm caption as the
+      title and carried the wrong given name; corrected to the real title + "Saima", restored to
+      `[V]`, DOI added. No journal version exists. The mergeVAT rename is fully supported.
+- [x] ✅ **E8 — Two blocking reads done (2026-08-21); the note-scoping decision is now teed up for
+      the author.** The reads that blocked the Ch 9 complexity note (short-communication /
+      NAFIPS-style venue; novelty scoped to (a) heap-vs-dense correction, (b) measured crossover,
+      (c) iVAT coverage Fast-VAT 2025 lacks, (d) O(N)-workspace as a ≈2× constant-factor win, *not*
+      "a faster MST") are complete:
+      **Deshpande & Kumar 2024 — the decisive read.** The paper states, verbatim, that its ordering
+      methods (BB-VAT, kdT-VAT, TkdT-VAT) "do not even calculate the n × n distance matrix for the
+      input data X" — i.e. the no-full-matrix result is claimed for the **VAT ordering step itself**,
+      not only for MST-iVAT. So claim (d) in its bare form ("we avoid the full matrix for VAT") is
+      **pre-empted**. The escape is that D&K achieve it by a **coordinate-based** kd-tree/bounding-box
+      route that needs Euclidean coordinates, whereas this work's O(N)-working-memory reorder is
+      **coordinate-free** (arbitrary/non-metric dissimilarity) — which is exactly the distinction Ch 3
+      §3.2 already draws ("solved... by a coordinate-based route mine does not require"). D&K's *exact*
+      per-method space bounds are in the paywalled Section 5 and remain unread, so whether they also
+      claim a strict O(N) bound is unconfirmed.
+      **Wang et al. 2010 (PAKDD) + Fast-VAT 2025.** Confirmed: claims (a), (b), (c) survive. Fast-VAT
+      is a Cython/Numba implementation speedup, exact, **VAT-only (no iVAT)**, stores the full N×N
+      matrix and names O(N²) memory as an unsolved bottleneck — so "iVAT coverage Fast-VAT lacks" (c)
+      and the workspace contrast are defensible. Attribution point banked: the O(N²) iVAT *recurrence*
+      is Havens & Bezdek 2012, not Wang 2010; Ch 3 already credits this correctly.
+      **Author decision, taken (2026-08-21):** the complexity note is **not** a standalone
+      short-communication or a novelty claim — it is folded into the **Ch 3 mergeVAT methods paper**
+      as an *observation*: what the literature claims (O(N²) time/space) versus what public libraries
+      actually implement (the cubic re-scan; the full-matrix footprint). This is what D&K's pre-emption
+      leaves standing anyway. Prose reconciled to the decision: the standalone-note framing is removed
+      from §3.2 (now "an audit the methods paper carries, not a novelty claim of its own"), from the
+      Ch 10 Gantt/quarter-grid (the "VAT complexity note" deliverable is dropped and folded into the
+      Ch 3 journal row; G4d moves from fifth to fourth in the cut order), from Appendix A.2.4/A.6, and
+      from `bibliography.md` — this also clears a latent dangling reference, since Ch 9 §9.3 never
+      actually contained a note subsection for the many cross-references that pointed at it.
+      `deshpande2024scalable` first-author metadata fixed in the `.bib` as part of this read.
 - [ ] ⬜ **E9 — `UnitScalar` vs `StandardScalar`: characterize *why* bounded normalization wins.**
       *(Low priority — author 2026-08-03: "I don't need it but it's worth addressing." Nothing in
       the document depends on it; the choice itself is already settled. Data in hand:

@@ -224,6 +224,16 @@
   volume  = {29}, number = {1}, pages = {128--138}, year = {1999},
   doi     = {10.1109/3468.736369}}
 
+@book{deboor2001splines,                        % [V] canonical free-knot spline reference (added for E7 knot-refinement lineage)
+  author    = {de Boor, Carl},
+  title     = {A Practical Guide to Splines},
+  series    = {Applied Mathematical Sciences}, volume = {27},
+  edition   = {Revised}, publisher = {Springer}, year = {2001},
+  note      = {Free-knot spline fitting. A strong triangular partition of unity is the
+               order-2 (linear) B-spline basis, so refining triangle apex knots is
+               free-knot linear-spline fitting and the sum-to-one property is intrinsic
+               to the form -- grounds Ch 6's antecedent-refinement lineage (E7).}}
+
 @article{guillaume2006expert,                   % [S]
   author  = {Guillaume, Serge and Charnomordic, Brigitte},
   title   = {Expert Guided Integration of Induced Knowledge into a Fuzzy Knowledge Base},
@@ -518,25 +528,38 @@
 % Surfaced by the 2026-07-31 prior-art search. These are load-bearing for Ch3 and
 % for the planned complexity note (Ch9) -- read before writing either.
 
-@article{deshpande2024scalable,                 % [V] title/venue/DOI confirmed; FULL TEXT NOT YET READ
-  author  = {Deshpande, Ojas and Kumar, Dheeraj},
+@article{deshpande2024scalable,                 % [V] title/venue/DOI/authors confirmed (Crossref); abstract + Sec 3-5 openers read (E8), Sec 5 exact bounds paywalled
+  author  = {Deshpande, Kartik Vishal and Kumar, Dheeraj},
   title   = {Time and Memory Scalable Algorithms for Clustering Tendency Assessment of Big Data},
   journal = {Information Sciences},
   volume  = {664}, pages = {120324}, year = {2024},
   doi     = {10.1016/j.ins.2024.120324},
   note    = {Closest prior art to the planned Ch9 note. Proposes BB-VAT, kdT-VAT,
              TkdT-VAT (attacking the VAT EMST/ordering step itself, sub-quadratic via
-             geometry) and MST-iVAT, which computes the iVAT RDI "without having to
-             compute the full distance matrix". BLOCKING: obtain full text.}}
+             geometry, coordinate/kd-tree based) and MST-iVAT. E8 read (2026-08-21):
+             the paper states its ordering methods "do not even calculate the n x n
+             distance matrix for the input data X" -- so the no-full-matrix result is
+             claimed for the VAT ordering step itself, not only MST-iVAT, but by a
+             coordinate-based route. Exact per-method space bounds sit in the paywalled
+             Section 5 and remain unread; this bounds the Ch9 note (see E8).}}
 
-@inproceedings{parveen2013pvat,                 % [V] venue/volume/pages/author confirmed
-  author    = {Parveen, Sherin and Sreevalsan-Nair, Jaya},
-  title     = {{pVAT}: Parallel {VAT} on the {GPU}},
+@inproceedings{parveen2013pvat,                 % [V] title/authors/DOI verified (Crossref + DBLP + author preprint, 2026-08-21)
+  author    = {Parveen, Saima and Sreevalsan-Nair, Jaya},
+  title     = {Visualization of Small World Networks Using Similarity Matrices},
   booktitle = {Big Data Analytics (BDA 2013)},
+  editor    = {Bhatnagar, Vasudha and Srinivasa, Srinath},
   series    = {Lecture Notes in Computer Science}, volume = {8302},
-  pages     = {151--170}, publisher = {Springer}, year = {2013},
-  note      = {A published method already named pVAT, which likewise changes the MST
-               algorithm used for the VAT ordering (Prim to Boruvka, on GPU).}}
+  pages     = {151--170}, publisher = {Springer}, address = {Cham}, year = {2013},
+  doi       = {10.1007/978-3-319-03689-2_10}, isbn = {978-3-319-03688-5},
+  note      = {The pVAT name-collision behind the mergeVAT rename (A1, S3.3.1). "pVAT" is
+               NOT this paper's title -- it is a method named inside it (Algorithm 1:
+               "pVAT: Parallel implementation of VAT"), a GPU/CUDA parallel VAT built on
+               Boruvka's MST (contribution 1). The prior use of the name is genuine, and
+               the Boruvka detail matches this work's own GPU path (S3.3.3), so the
+               collision is real. Earlier metadata (title "pVAT: Parallel VAT on the GPU",
+               author "Sherin") was the Algorithm-1 caption mistaken for the paper title;
+               corrected 2026-08-21. No journal version exists; this BDA chapter is the
+               only publication.}}
 
 @article{havens2009disguise,                    % [V] -- hands a reviewer the Prim/VAT equivalence
   author  = {Havens, Timothy C. and Bezdek, James C. and Keller, James M. and Popescu, Mihail and Huband, Jacalyn M.},
@@ -548,15 +571,15 @@
              "almost line-for-line similarity". Bezdek's own group established the
              equivalence, so a reviewer need not construct it.}}
 
-@article{kumar2016incvat,                       % [V]
-  author  = {Kumar, Dheeraj and Bezdek, James C. and Palaniswami, Marimuthu and Rajasegarar, Sutharshan and Leckie, Christopher},
-  title   = {A Scalable Framework for Clustering Tendency Assessment of Big Data:
-             {inc-VAT}, {dec-VAT}, {inc-iVAT}, {dec-iVAT}},
+@article{kumar2016incvat,                       % [V] title/authors corrected against Crossref (2026-08-21)
+  author  = {Kumar, Dheeraj and Bezdek, James C. and Rajasegarar, Sutharshan and Palaniswami, Marimuthu and Leckie, Christopher and Chan, Jeffrey and Gubbi, Jayavardhana},
+  title   = {Adaptive Cluster Tendency Visualization and Anomaly Detection for Streaming Data},
   journal = {ACM Transactions on Knowledge Discovery from Data},
   volume  = {11}, number = {2}, year = {2016},
   doi     = {10.1145/2997656},
-  note    = {Incremental/decremental update of an existing VAT ordering; the prior work
-             that most directly restructures the sequencing for efficiency. Verify title.}}
+  note    = {Incremental/decremental update of an existing VAT ordering (inc-VAT/dec-VAT,
+             inc-iVAT/dec-iVAT) via efficient MST edge insertion for streaming data; the
+             prior work that most directly restructures the sequencing for efficiency.}}
 
 @article{mullner2011modern,                     % [V] verified on arXiv (confirmed 2026-08-08)
   author  = {M{\"u}llner, Daniel},
