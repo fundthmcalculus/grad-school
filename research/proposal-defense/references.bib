@@ -543,21 +543,23 @@
              coordinate-based route. Exact per-method space bounds sit in the paywalled
              Section 5 and remain unread; this bounds the Ch9 note (see E8).}}
 
-@inproceedings{parveen2013pvat,                 % [?] TITLE DOES NOT VERIFY -- see note; load-bearing for the mergeVAT rename (A1, S3.3.1)
-  author    = {Parveen, Sherin and Sreevalsan-Nair, Jaya},
-  title     = {{pVAT}: Parallel {VAT} on the {GPU}},
+@inproceedings{parveen2013pvat,                 % [V] title/authors/DOI verified (Crossref + DBLP + author preprint, 2026-08-21)
+  author    = {Parveen, Saima and Sreevalsan-Nair, Jaya},
+  title     = {Visualization of Small World Networks Using Similarity Matrices},
   booktitle = {Big Data Analytics (BDA 2013)},
+  editor    = {Bhatnagar, Vasudha and Srinivasa, Srinath},
   series    = {Lecture Notes in Computer Science}, volume = {8302},
-  pages     = {151--170}, publisher = {Springer}, year = {2013},
-  note      = {UNVERIFIED / LIKELY WRONG (checked 2026-08-21, Crossref + DBLP). No paper
-               titled "pVAT: Parallel VAT on the GPU" could be found for these authors.
-               BDA 2013 / LNCS 8302 pp.151-170 (DOI 10.1007/978-3-319-03689-2_10) is
-               instead Saima Parveen & Jaya Sreevalsan-Nair, "Visualization of Small
-               World Networks Using Similarity Matrices" -- not a VAT paper; DBLP lists
-               no VAT/pVAT work for either author. The pVAT name-collision this citation
-               supports (A1, S3.3.1) DOES NOT CHECK OUT: either the intended paper has
-               different coordinates and must be located, or the collision claim must be
-               removed/rewritten. AUTHOR DECISION NEEDED before this is typeset.}}
+  pages     = {151--170}, publisher = {Springer}, address = {Cham}, year = {2013},
+  doi       = {10.1007/978-3-319-03689-2_10}, isbn = {978-3-319-03688-5},
+  note      = {The pVAT name-collision behind the mergeVAT rename (A1, S3.3.1). "pVAT" is
+               NOT this paper's title -- it is a method named inside it (Algorithm 1:
+               "pVAT: Parallel implementation of VAT"), a GPU/CUDA parallel VAT built on
+               Boruvka's MST (contribution 1). The prior use of the name is genuine, and
+               the Boruvka detail matches this work's own GPU path (S3.3.3), so the
+               collision is real. Earlier metadata (title "pVAT: Parallel VAT on the GPU",
+               author "Sherin") was the Algorithm-1 caption mistaken for the paper title;
+               corrected 2026-08-21. No journal version exists; this BDA chapter is the
+               only publication.}}
 
 @article{havens2009disguise,                    % [V] -- hands a reviewer the Prim/VAT equivalence
   author  = {Havens, Timothy C. and Bezdek, James C. and Keller, James M. and Popescu, Mihail and Huband, Jacalyn M.},

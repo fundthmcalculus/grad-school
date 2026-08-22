@@ -108,15 +108,17 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       Parveen & Sreevalsan-Nair, *"pVAT: Parallel VAT on the GPU"*, BDA 2013 (LNCS 8302:151–170),
       a GPU VAT that also swaps the MST algorithm, so reading our *p* as parallel/performant
       collided harder rather than less. Acknowledged by citation in §3.3.1.
-      ⚠️ **The pVAT-collision citation does not verify (found 2026-08-21; see E7).** No paper titled
-      *"pVAT: Parallel VAT on the GPU"* by Parveen & Sreevalsan-Nair could be found; their BDA 2013 /
-      LNCS 8302 pp.151–170 slot (DOI 10.1007/978-3-319-03689-2_10) is instead *"Visualization of Small
-      World Networks Using Similarity Matrices"*, and DBLP lists no VAT work for either author. **The
-      rename to mergeVAT stands regardless** — it is a good name and Kreinovich's priority-queue
-      observation is a separate, real reason — but the *stated* "pVAT is already taken" rationale in
-      §3.3.1 rests on a citation that fails. Author to decide: locate the intended paper (different
-      coordinates) or remove/rewrite the collision claim. `parveen2013pvat` is marked `[?]` in the
-      `.bib` with a full note so it cannot be silently typeset.
+      ✅ **The pVAT collision is genuine; the citation had the wrong title, now fixed (2026-08-21;
+      deep research, see E7).** "pVAT" is not a paper title — it is a method named inside Parveen &
+      Sreevalsan-Nair's *"Visualization of Small World Networks Using Similarity Matrices"* (BDA 2013,
+      LNCS 8302:151–170, DOI 10.1007/978-3-319-03689-2_10), whose **Algorithm 1 is captioned "pVAT:
+      Parallel implementation of VAT"** — a GPU/CUDA parallel VAT built on **Borůvka's MST**
+      (contribution 1, confirmed against the authors' preprint). So the prior use of the name is real,
+      and it collides *harder* than first stated: their pVAT and this work's GPU path both swap Prim
+      for Borůvka. The `.bib` had lifted the algorithm caption as the paper title and carried the wrong
+      given name ("Sherin"); corrected to the real title and "Saima", restored to `[V]`, DOI added.
+      §3.3.1's prose already describes it correctly (it never used the bogus title). No journal version
+      exists — the BDA chapter is the only publication. **The rename to mergeVAT is fully supported.**
       **The name is imperfect and §3.3.1 says so**: it describes neither stage one (priority
       queue) nor stage two (compact active set). What it does describe is §3.3.4's
       divide-and-conquer stitch — which is a merge, is measured, and is the least finished part
@@ -668,11 +670,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       E1 note); `kumar2016incvat` real title/authors corrected against Crossref ("Adaptive Cluster
       Tendency Visualization and Anomaly Detection for Streaming Data", 7 authors); `deshpande2024scalable`
       first author corrected (Kartik Vishal, not Ojas); Kališnik accent confirmed already correctly
-      encoded (`Kali{\v{s}}nik`). **One item escalated, not closed — see A1:** `parveen2013pvat`
-      does not verify; its coordinates (LNCS 8302 pp.151-170) belong to a *small-world-networks*
-      paper, and no "pVAT: Parallel VAT on the GPU" paper exists for those authors, so the
-      pVAT-collision that motivates the mergeVAT rename rests on a citation that fails. Marked `[?]`
-      with a full note in the `.bib`; needs an author decision.
+      encoded (`Kali{\v{s}}nik`). **One item, now resolved by deep research (2026-08-21; see A1):** the pVAT
+      collision is **genuine** — "pVAT" is a method named inside Parveen & Sreevalsan-Nair's
+      small-world-networks paper (Algorithm 1: "pVAT: Parallel implementation of VAT"; GPU/CUDA,
+      Borůvka MST), not a separate paper title. The `.bib` had lifted the algorithm caption as the
+      title and carried the wrong given name; corrected to the real title + "Saima", restored to
+      `[V]`, DOI added. No journal version exists. The mergeVAT rename is fully supported.
 - [x] ✅ **E8 — Two blocking reads done (2026-08-21); the note-scoping decision is now teed up for
       the author.** The reads that blocked the Ch 9 complexity note (short-communication /
       NAFIPS-style venue; novelty scoped to (a) heap-vs-dense correction, (b) measured crossover,
