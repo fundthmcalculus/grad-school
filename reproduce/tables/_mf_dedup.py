@@ -156,12 +156,12 @@ def build_deduped_model(
 # Regression: Concrete (in-repo CSV, via `_fuzzy_models.load_concrete`),
 # Diabetes (bundled).
 def load_glass():
-# Glass moved into data/ when the loaders were refactored; three call sites
-# kept looking for it at the repo root, where it has not been since. The
-# failure is silent in two of them (load_glass returns None and the rows are
-# dropped), which is why Table 4.8's Glass row and Table 4.9 -- checklist C4's
-# headline correction-pass measurement -- have been absent from every archive
-# since the move. Prefer data/, fall back to the old root path.
+    # Glass moved into data/ when the loaders were refactored; three call sites
+    # kept looking for it at the repo root, where it has not been since. The
+    # failure is silent in two of them (load_glass returns None and the rows are
+    # dropped), which is why Table 4.8's Glass row and Table 4.9 -- checklist C4's
+    # headline correction-pass measurement -- have been absent from every archive
+    # since the move. Prefer data/, fall back to the old root path.
     path = os.path.join(F.DATA_DIR, "glass.csv")
     if not os.path.exists(path):
         path = os.path.join(F.REPO_ROOT, "glass.csv")
