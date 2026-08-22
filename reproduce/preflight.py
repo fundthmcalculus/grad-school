@@ -175,12 +175,61 @@ def _datasets():
     return PASS, f"{len(required)} required dataset(s) present{note}"
 
 
+def _install_fresh():
+    """The imported package must match the submodule source it was built from.
+
+    `UV_NO_EDITABLE=1` (which hostenv.sh sets, because the editable build path
+    ignores DIST_EXTRA_CONFIG) installs the submodules as built wheels. uv can
+    then serve a CACHED wheel after the submodule pin moves, so a pin bump
+    silently does not take effect and the whole suite re-measures the old code
+    under the new SHA -- which the archive's PROVENANCE would then record as the
+    new one. Caught exactly that way on 2026-08-22: the tribble-fis pin moved to
+    pick up the wasserstein fix and `W1-SCALE` still failed, because the venv was
+    serving the pre-fix build.
+
+    Remedy is `uv run --project <sub> --reinstall-package <name> ...` once.
+    """
+    import importlib
+    import filecmp
+
+    stale = []
+    for pkg, sub in (
+        ("tribblefis", "tribble-fis"),
+        ("tribbleclustering", "tribble-cluster"),
+    ):
+        try:
+            mod = importlib.import_module(pkg)
+        except Exception:  # noqa: BLE001
+            continue
+        installed = os.path.dirname(getattr(mod, "__file__", "") or "")
+        source = os.path.join(ROOT, sub, "src", pkg)
+        if not installed or not os.path.isdir(source):
+            continue
+        if os.path.normcase(installed) == os.path.normcase(source):
+            continue  # editable install: nothing can be stale
+        for name in sorted(os.listdir(source)):
+            if not name.endswith(".py"):
+                continue
+            a, b = os.path.join(source, name), os.path.join(installed, name)
+            if os.path.exists(b) and not filecmp.cmp(a, b, shallow=False):
+                stale.append(f"{pkg}/{name}")
+                break
+    if stale:
+        return FAIL, (
+            f"installed build is STALE against the submodule source ({', '.join(stale)}). "
+            "A pin bump has not taken effect. Re-run once with "
+            "`uv run --project <submodule> --reinstall-package <package> ...`"
+        )
+    return PASS, "installed builds match the submodule sources"
+
+
 CHECKS = [
     ("W1-SCALE", "fis", _w1_scale),
     ("SCALER-ALIAS", "fis", _scaler_aliases),
     ("MODEL-NAMES", "fis", _model_names),
     ("VAT-MATRIXFREE", "cluster", _vat_matrix_free),
     ("DATASETS", "any", _datasets),
+    ("INSTALL-FRESH", "any", _install_fresh),
 ]
 
 
