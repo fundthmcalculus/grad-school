@@ -58,12 +58,18 @@ def timed():
 
 
 def agg(values):
-    """(mean, std) of a list; std=0 for a single value. Returns (None, None) if empty."""
+    """(mean, sample std) of a list; std=0 for a single value, (None, None) if empty.
+
+    Uses the SAMPLE standard deviation (statistics.stdev, ddof=1), not the
+    population one: the chapters read these ± as the seed-to-seed dispersion of an
+    estimate over a finite seed sample, which is an inferential quantity. pstdev
+    (÷n) understated it by ~sqrt(n/(n-1)) (~5% at the ten-seed floor).
+    """
     vals = [v for v in values if v is not None]
     if not vals:
         return None, None
     mean = statistics.fmean(vals)
-    std = statistics.pstdev(vals) if len(vals) > 1 else 0.0
+    std = statistics.stdev(vals) if len(vals) > 1 else 0.0
     return mean, std
 
 

@@ -42,7 +42,7 @@ divergence) already showed can hide.
 
 THE "MAX-LOSSLESS" TOLERANCE, DEFINED. For each dataset, sweep the multiplier
 grid in `_mf_dedup.MULTIPLIERS` (0.1x to 100x the library default) and compute
-the paired delta's 95% CI (`mean +/- 1.96 * std / sqrt(n)`) at each step. The
+the paired delta's 95% CI (`mean +/- t_{.975,n-1} * std / sqrt(n)`, sample std) at each step. The
 max-lossless multiplier is the LARGEST one reachable by an unbroken run of
 "CI contains zero" starting from the smallest multiplier tested -- i.e. the
 point past which the sweep first gives real evidence of a cost, not merely the
@@ -69,6 +69,7 @@ import math
 import os
 import sys
 
+from scipy import stats as _spstats
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.model_selection import train_test_split
 
@@ -88,8 +89,17 @@ from tribblefis.gauss_math import simple_gaussian_predict  # noqa: E402
 
 
 def _ci_excludes_zero(mean, std, n):
-    """95% CI for a paired mean, via the normal approximation (n=10)."""
-    half = 1.96 * std / math.sqrt(n)
+    """Whether the 95% CI for a paired mean excludes zero.
+
+    Uses Student's t (t_{0.975, n-1}) with the SAMPLE std (from C.agg, ddof=1),
+    not the normal 1.96 with a population std -- at the ten-seed floor the t/normal
+    and sample/population corrections together widen the interval ~22%, so the old
+    formula declared "excludes zero" one grid step too early and reported a smaller
+    max-lossless tolerance than the data supports.
+    """
+    if n < 2:
+        return False
+    half = float(_spstats.t.ppf(0.975, n - 1)) * std / math.sqrt(n)
     return (mean - half > 0) or (mean + half < 0)
 
 
