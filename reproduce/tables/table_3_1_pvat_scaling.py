@@ -53,32 +53,32 @@ def classical_vat_order(D):
 
 
 def _resolve_pvat():
-    """Find the repo's pVAT reorder entry point; return a callable D -> order/RDI."""
-    candidates = [
-        ("tribbleclustering", "compute_vat"),
-        ("tribbleclustering.pvat", "vat_prim_mst"),
-        ("tribbleclustering.pvat", "compute_vat"),
-        ("tribbleclustering", "vat"),
-    ]
-    for mod, name in candidates:
-        try:
-            m = __import__(mod, fromlist=[name])
-            fn = getattr(m, name, None)
-            if callable(fn):
-                print(f"  using pVAT: {mod}.{name}")
-                return fn
-        except Exception:  # noqa: BLE001
-            continue
-    print("  [pVAT] could not resolve the repo entry point; pVAT column -> N/A")
-    print(
-        "         (edit _resolve_pvat() to point at the actual tribbleclustering API)"
-    )
-    return None
+    """Return (callable D -> order, label) for the pVAT reorder entry point.
+
+    Pinned to `tribbleclustering.pvat.vat_prim_mst`, the priority-queue MST reorder
+    that IS the O(N^2 log N) claim: it takes the distance matrix, computes the VAT
+    ordering only, and its order is elementwise identical to `classical_vat_order`
+    (verified), so the comparison is reorder-vs-reorder on the same output. The
+    resolver used to try `compute_vat` first, which additionally *materializes* the
+    reordered image (extra O(N^2) work), so the "pVAT (s)" column and speedup
+    silently measured more than the reorder. A single pin (N/A if absent) rather
+    than a fall-through avoids that class of drift; see review finding H2.
+    """
+    mod, name = "tribbleclustering.pvat", "vat_prim_mst"
+    try:
+        fn = getattr(__import__(mod, fromlist=[name]), name, None)
+        if callable(fn):
+            print(f"  using pVAT: {mod}.{name}")
+            return fn, f"{mod}.{name}"
+    except Exception:  # noqa: BLE001
+        pass
+    print(f"  [pVAT] {mod}.{name} not resolvable; pVAT column -> N/A")
+    return None, None
 
 
 def main():
     print("Table 3.1 -- pVAT vs. classical VAT reorder time")
-    pvat = _resolve_pvat()
+    pvat, pvat_name = _resolve_pvat()
     rows = []
     means = []  # (classical_mean, pvat_mean) per N, for the normalized view
     for n in N_GRID:
@@ -131,7 +131,9 @@ def main():
         rows,
         md_header=["N (points)", "classical VAT", "pVAT"],
         md_rows=md_rows,
-        note=f"Random 2-D point sets; classical reference capped at N<={NAIVE_CAP} "
+        note=f"Timed pVAT entry point: `{pvat_name}` (recorded so a reader knows "
+        f"which reorder was measured; several candidates resolve and they do "
+        f"different amounts of work). Random 2-D point sets; classical reference capped at N<={NAIVE_CAP} "
         "(it is genuinely cubic). **The Markdown columns are normalized against "
         "the worst arm in each row**: the slower arm is the 1.0x baseline and the "
         "faster one reads as 'this many times faster'. Ratios survive a change of "

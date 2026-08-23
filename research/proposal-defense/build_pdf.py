@@ -123,14 +123,43 @@ def copy_figures():
 
     os.makedirs(dest_dir, exist_ok=True)
     copied = 0
+    replaced = []
 
     for harness_name, prose_name in FIGURE_COPIES.items():
         for ext in ("png", "eps"):
             source = os.path.join(source_dir, f"{harness_name}.{ext}")
             dest = os.path.join(dest_dir, f"{prose_name}.{ext}")
-            if os.path.exists(source):
-                shutil.copy2(source, dest)
-                copied += 1
+            if not os.path.exists(source):
+                continue
+            # The copy is unconditional, and that is a hazard worth naming rather
+            # than removing. Any local run of the generator behind a figure swaps
+            # it into the document, whether or not the TABLE beside it has been
+            # re-quoted from the same run. It happened on 2026-08-22: a figure
+            # rebuilt from gcc-compiled kernels (fitted exponent 1.77) would have
+            # sat directly above a table quoting 1.97 from an MSVC build.
+            #
+            # The automation is right -- the manual hop it replaced is worse. What
+            # it owes the reader is a warning when it is about to change what the
+            # document shows, so the change is a decision instead of a side effect.
+            differs = not (
+                os.path.exists(dest)
+                and os.path.getsize(dest) == os.path.getsize(source)
+                and open(dest, "rb").read() == open(source, "rb").read()
+            )
+            shutil.copy2(source, dest)
+            copied += 1
+            if differs and ext == "png":
+                replaced.append((prose_name, harness_name))
+
+    if replaced:
+        print("    ⚠ figure(s) CHANGED by this build -- check the table beside each:")
+        for prose_name, harness_name in replaced:
+            print(
+                f"      {prose_name}.png  <- reproduce/outputs/figures/{harness_name}.png"
+            )
+        print(
+            "      A figure and the table it illustrates must come from the same run."
+        )
 
     return copied
 
@@ -214,7 +243,20 @@ def extract_section_headers(md, filename):
     return sections
 
 
-def check_cross_references(md, registry, filename, warnings=None):
+def parse_checklist_ids(checklist_md):
+    """Every checklist item ID defined in CHECKLIST.md, e.g. {"C1", …, "C15", "B6"}.
+
+    An item is defined as a bold ID followed by an em-dash -- ``**C14 — …``.
+    Inline cross-references use double-bold with no dash (``**C10**``), so the
+    dash is what tells a definition from a mention. Parsing the file makes the
+    checklist cross-reference check self-maintaining: adding C16 to the checklist
+    stops it being flagged as a dangling reference, with no second list to keep
+    in sync -- which is exactly what went stale and flagged the real C14/C15.
+    """
+    return set(re.findall(r"\*\*([A-E]\d+)\s*[—-]", checklist_md))
+
+
+def check_cross_references(md, registry, filename, warnings=None, checklist_ids=None):
     """Check for cross-references and warn if targets don't exist.
 
     Looks for patterns like:
@@ -244,8 +286,13 @@ def check_cross_references(md, registry, filename, warnings=None):
         flags=re.MULTILINE,
     )
 
-    # Known checklist items from Chapter 7 Table 7.1 and prose
-    known_checklists = {"c1", "c3", "c5", "c8", "c10"}
+    # Checklist item IDs actually defined in CHECKLIST.md, parsed and passed in.
+    # The fallback list is only for callers that do not supply the parsed set;
+    # it is a lower bound and deliberately not the source of truth, because a
+    # hand-maintained list here is what went stale and flagged the real C14/C15.
+    if checklist_ids is None:
+        checklist_ids = {f"C{n}" for n in range(1, 16)}
+    known_c = {cid for cid in checklist_ids if cid.startswith("C")}
 
     # Build maps of known sections by type for validation
     goal_sections = {}  # "g1" -> section_id
@@ -325,28 +372,15 @@ def check_cross_references(md, registry, filename, warnings=None):
         except ValueError:
             pass
 
-    # Pattern 5: Checklist references like C1, C3, etc.
+    # Pattern 5: Checklist references like C1, C14. Validated against the IDs
+    # actually defined in CHECKLIST.md, so a reference is dangling only when no
+    # item defines it -- not merely because a second list here was not updated.
     for match in re.finditer(r"\bC(\d+)\b", md_for_validation):
-        checklist_num = match.group(1)
-        checklist_key = f"c{checklist_num}"
-        if checklist_key not in known_checklists:
-            # Only warn if it's a clear typo (unusual number)
-            if checklist_num not in [
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "13",
-            ]:
-                warnings.append(
-                    f"  ⚠ {filename}: Checklist item C{checklist_num} not found in Chapter 7"
-                )
+        cid = f"C{match.group(1)}"
+        if cid not in known_c:
+            warnings.append(
+                f"  ⚠ {filename}: Checklist item {cid} not found in {CHECKLIST_FILE}"
+            )
 
     # Pattern 6: Cross-reference links [text](§X.Y) or [text](#section-id)
     for match in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", md_for_validation):
@@ -359,6 +393,171 @@ def check_cross_references(md, registry, filename, warnings=None):
                 )
 
     return warnings
+
+
+# --------------------------------------------------------------------------- #
+# section anchors and reference autolinking
+# --------------------------------------------------------------------------- #
+_CH_RE = re.compile(r"^#\s+Chapter\s+(\d+)\b")
+_APP_TOP_RE = re.compile(r"^#\s+Appendix\b")
+_NUMSEC_RE = re.compile(r"^#{2,4}\s+(\d+(?:\.\d+){1,3})\b")
+_APPSEC_RE = re.compile(r"^#{2,4}\s+A\.(\d+(?:\.\d+)?)\b")
+# The appendix numbers its A.1.x / A.2.x sub-items as bold list labels rather
+# than headings (`- **A.2.4** ...`); anchor those too so references resolve.
+_APP_LIST_RE = re.compile(r"^\s*[-*]\s+\*\*A\.(\d+(?:\.\d+)*)\*\*")
+_FENCE_RE = re.compile(r"^\s*(```|~~~)")
+# Protect inline code spans and existing links from reference rewriting.
+_PROTECT_RE = re.compile(r"(`[^`]*`|\[[^\]]*\]\([^)]*\))")
+
+
+def heading_anchor_id(line):
+    """The stable anchor id for a numbered heading, or None for an unnumbered
+    prose header (which nothing references by number)."""
+    m = _CH_RE.match(line)
+    if m:
+        return f"ch-{m.group(1)}"
+    if _APP_TOP_RE.match(line):
+        return "appendix"
+    m = _NUMSEC_RE.match(line)
+    if m:
+        return "sec-" + m.group(1).replace(".", "-")
+    m = _APPSEC_RE.match(line)
+    if m:
+        return "sec-a-" + m.group(1).replace(".", "-")
+    return None
+
+
+def list_item_anchor_id(line):
+    """Anchor id for a bold appendix list-item label (`- **A.2.4** ...`), which
+    the appendix uses in place of a heading for its A.1.x / A.2.x sub-items."""
+    m = _APP_LIST_RE.match(line)
+    if m:
+        return "sec-a-" + m.group(1).replace(".", "-")
+    return None
+
+
+def collect_anchors(raw_by_file):
+    """Every anchor id the document will carry, across all files: one per
+    numbered heading and one per bold appendix list-item label."""
+    anchors = set()
+    for md in raw_by_file.values():
+        in_fence = False
+        for line in md.split("\n"):
+            if _FENCE_RE.match(line):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+            aid = (
+                heading_anchor_id(line)
+                if line.startswith("#")
+                else list_item_anchor_id(line)
+            )
+            if aid:
+                anchors.add(aid)
+    return anchors
+
+
+def add_anchors(md):
+    """Attach anchors so references can link to them: `{#id}` on each numbered
+    heading, and an inline `[]{#id}` target on each bold appendix list-item
+    label (`- **A.2.4** ...`), which the appendix uses in place of a heading."""
+    out = []
+    in_fence = False
+    for line in md.split("\n"):
+        if _FENCE_RE.match(line):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if (
+            in_fence
+            or re.search(r"\{#[^}]+\}\s*$", line)  # heading already anchored
+            or "]{#" in line  # list item already anchored
+        ):
+            out.append(line)
+            continue
+        if line.startswith("#"):
+            aid = heading_anchor_id(line)
+            out.append(f"{line.rstrip()} {{#{aid}}}" if aid else line)
+            continue
+        aid = list_item_anchor_id(line)
+        if aid:
+            at = line.index("**")  # inject the empty anchor just before the label
+            out.append(f"{line[:at]}[]{{#{aid}}}{line[at:]}")
+            continue
+        out.append(line)
+    return "\n".join(out)
+
+
+def _protected_sub(line, fn):
+    """Apply fn to the plain-text runs of a line, leaving inline code spans and
+    existing links untouched."""
+    parts = _PROTECT_RE.split(line)
+    for i in range(0, len(parts), 2):  # even indices are unprotected text
+        parts[i] = fn(parts[i])
+    return "".join(parts)
+
+
+def linkify_refs(md, anchors, filename, missing, stats):
+    """Rewrite §X.Y, Chapter N and Appendix A.N references as internal links.
+
+    A reference whose target heading does not exist is left as plain text and
+    recorded in `missing` so the build can warn about it. Code spans, existing
+    links, fenced code blocks and headings are left untouched.
+    """
+
+    def sub_text(text):
+        def sec(m):
+            num = m.group(1)
+            aid = "sec-" + num.replace(".", "-")
+            if aid in anchors:
+                stats["linked"] += 1
+                return f"[§{num}](#{aid})"
+            missing.add((filename, f"§{num}"))
+            return m.group(0)
+
+        def app(m):
+            num = m.group(1)
+            aid = "sec-a-" + num.replace(".", "-")
+            if aid in anchors:
+                stats["linked"] += 1
+                return f"[Appendix A.{num}](#{aid})"
+            missing.add((filename, f"Appendix A.{num}"))
+            return m.group(0)
+
+        def chap(m):
+            lead, body = m.group(1), m.group(2)
+
+            def one(nm):
+                n = nm.group(0)
+                aid = f"ch-{n}"
+                if aid in anchors:
+                    stats["linked"] += 1
+                    return f"[{n}](#{aid})"
+                missing.add((filename, f"Chapter {n}"))
+                return n
+
+            return lead + re.sub(r"\d+", one, body)
+
+        text = re.sub(r"§(\d+(?:\.\d+)+)", sec, text)
+        text = re.sub(r"\bAppendix\s+A\.(\d+(?:\.\d+)?)", app, text)
+        text = re.sub(
+            r"\b(Chapters?\s+)(\d+(?:\s*(?:,|and|to|–|-)\s*\d+)*)", chap, text
+        )
+        return text
+
+    out = []
+    in_fence = False
+    for line in md.split("\n"):
+        if _FENCE_RE.match(line):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if in_fence or line.startswith("#"):
+            out.append(line)
+            continue
+        out.append(_protected_sub(line, sub_text))
+    return "\n".join(out)
 
 
 def strip_editorial(md, src_dir=None, image_status=None):
@@ -398,7 +597,17 @@ def strip_editorial(md, src_dir=None, image_status=None):
             alt_text = re.match(r"^`!\[(.*?)\]", s)
             label = alt_text.group(1) if alt_text else m.group(1)
             if os.path.exists(target):
-                out.append(s.strip("`"))
+                # Emit the figure as its own block, bounded to the text width.
+                # Two things matter. A blank line detaches the image from the
+                # caption paragraph: glued inline, a wide (low-aspect) figure is
+                # laid mid-flow and overflows the right margin (Figure 4.4).
+                # And width=100% caps it to the column -> LaTeX width=\linewidth,
+                # HTML width:100%. The from-format disables implicit_figures, so
+                # a lone image is not wrapped in a numbered figure with a
+                # duplicate caption; the bold "Figure N —" line above is the
+                # caption.
+                out.append("")
+                out.append(s.strip("`") + "{width=100%}")
                 included.append(label)
             else:
                 missing.append(label)
@@ -409,37 +618,60 @@ def strip_editorial(md, src_dir=None, image_status=None):
 
 def assemble():
     os.makedirs(BUILD, exist_ok=True)
-    parts = []
     image_status = {"included": [], "missing": []}
     link_warnings = []
     sections_by_file = {}  # Accumulate section headers across all files
+    raw_by_file = {}  # rel -> raw markdown, read once
 
+    # First pass: read every file once.
     for rel in SECTIONS:
         md = read(rel)
         if md is None:
             continue
+        raw_by_file[rel] = md
+        sections_by_file[rel] = extract_section_headers(md, rel)
+
+    # Anchor registry drives both the autolinks and the dangling-reference
+    # warnings: a §X.Y / Chapter N / Appendix A.N reference is a hyperlink when
+    # its target heading exists, and a warning when it does not.
+    anchors = collect_anchors(raw_by_file)
+    missing_refs = set()
+    link_stats = {"linked": 0}
+
+    # Build registry after all files are read
+    registry = build_section_registry(sections_by_file)
+
+    # Parse the checklist IDs once, so the cross-reference check validates C-refs
+    # against the items that actually exist rather than a hardcoded list.
+    checklist_path = os.path.join(HERE, CHECKLIST_FILE)
+    checklist_ids = set()
+    if os.path.exists(checklist_path):
+        with open(checklist_path, "r", encoding="utf-8") as f:
+            checklist_ids = parse_checklist_ids(f.read())
+
+    # Second pass: anchor headings, strip editorial scaffolding, autolink refs.
+    parts = []
+    for rel in SECTIONS:
+        md = raw_by_file.get(rel)
+        if md is None:
+            continue
         src_dir = os.path.dirname(os.path.join(HERE, rel))
 
-        # Extract sections from this file and add to global map
-        file_sections = extract_section_headers(md, rel)
-        sections_by_file[rel] = file_sections
-
-        parts.append(strip_editorial(md, src_dir, image_status=image_status))
+        md = add_anchors(md)
+        part = strip_editorial(md, src_dir, image_status=image_status)
+        part = linkify_refs(part, anchors, rel, missing_refs, link_stats)
+        parts.append(part)
         print(f"  + {rel}")
+
+        # Keep the existing goal/checklist cross-reference checks.
+        check_cross_references(
+            raw_by_file[rel], registry, rel, link_warnings, checklist_ids
+        )
 
         # Insert References section after bibliography.md but before appendix.md
         # The ::: {#refs} ::: div tells pandoc/citeproc where to place the bibliography
         if rel == "prose/bibliography.md":
             parts.append("# References\n\n::: {#refs}\n:::\n")
-
-    # Build registry after all files are read
-    registry = build_section_registry(sections_by_file)
-
-    # Check cross-references against the registry
-    for rel in SECTIONS:
-        md = read(rel)
-        if md is not None:
-            check_cross_references(md, registry, rel, link_warnings)
 
     combined = "\n\n\n".join(parts)
 
@@ -477,6 +709,9 @@ def assemble():
             if in_section or "Legend:" in line or "Tier" in line:
                 filtered_lines.append(line)
         checklist_filtered = "\n".join(filtered_lines)
+        checklist_filtered = linkify_refs(
+            checklist_filtered, anchors, CHECKLIST_FILE, missing_refs, link_stats
+        )
         combined += "\n\n" + checklist_filtered
         print(f"  + {CHECKLIST_FILE} (open items only)")
 
@@ -494,6 +729,16 @@ def assemble():
         if image_status["missing"]:
             for img in image_status["missing"]:
                 print(f"    ✗ {img} (placeholder stripped)")
+
+    # Report section-reference autolinking (and any dangling references)
+    print(f"\n  section links:")
+    print(f"    ✓ {link_stats['linked']} section reference(s) hyperlinked")
+    if missing_refs:
+        for fn, ref in sorted(missing_refs):
+            print(
+                f"    ⚠ {fn}: {ref} has no matching section heading "
+                f"(dangling reference, left as plain text)"
+            )
 
     # Report cross-reference warnings
     if link_warnings:
@@ -600,7 +845,7 @@ def build_with_latex(md_path, pandoc, engine):
         pdf,
         f"--pdf-engine={engine}",
         "--from",
-        "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks",
+        "markdown+tex_math_dollars+pipe_tables+fenced_code_blocks-implicit_figures",
         "-V",
         "linkcolor=blue",
         "--wrap=preserve",
@@ -649,7 +894,7 @@ def build_with_weasyprint(md_path, pandoc):
         "--standalone",
         "--mathml",
         "--from",
-        "markdown+tex_math_dollars+pipe_tables",
+        "markdown+tex_math_dollars+pipe_tables-implicit_figures",
         "--wrap=preserve",
         "--metadata",
         f"title={TITLE}",

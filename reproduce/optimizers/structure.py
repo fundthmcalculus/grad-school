@@ -124,11 +124,23 @@ class StructureProblem:
 
     def __init__(self, seed=0, n_folds=3, test_size=0.2):
         from sklearn.model_selection import train_test_split
-        from tribblefis.gauss_math import (
-            detect_and_apply_log_transform,
-            standard_transform,
-        )
+
         import _fuzzy_models as FM
+
+        # `gauss_math.standard_transform` and `.detect_and_apply_log_transform`
+        # were DELETED upstream in tribble-fis #67 (a385a1a), so this file could
+        # not be imported at the current pin at all -- it raised ImportError in
+        # StructureProblem.__init__, with no fallback, which took the whole
+        # optimizer structure study (and §6.3.5's evidence) down with it.
+        #
+        # `_fuzzy_models` already carries the behaviour-preserving successors and
+        # documents them as verified bit-for-bit against the deleted pair, so
+        # this reuses them rather than adding a second copy that could drift:
+        #   standard_transform(y)                     -> FM.unit_scale(y)
+        #   detect_and_apply_log_transform + scale    -> FM.normalize(X)
+        # FM.normalize pins log_dynamic_range=2, matching the old
+        # min_dynamic_range=2 -- UnitScalar's own default is 3.0, which on
+        # Concrete drops `Slag` from the logged set and moves every cell.
 
         data = FM.load_concrete()
         if data is None:
@@ -138,9 +150,8 @@ class StructureProblem:
         # Same preprocessing as `table_concrete_reconciliation.prepare`, but the
         # output partition is NOT done here: its bucket count is a decision
         # variable, so it moves inside the objective.
-        self.y_t = standard_transform(y_raw)
-        Xt, self.logged = detect_and_apply_log_transform(X.copy(), min_dynamic_range=2)
-        self.X_t = standard_transform(Xt, column=Xt.columns)
+        self.y_t = FM.unit_scale(y_raw)
+        self.X_t, self.logged = FM.normalize(X)
         yr = np.asarray(y_raw, dtype=float)
         self.span = float(yr.max() - yr.min())
 

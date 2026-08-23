@@ -1,0 +1,11 @@
+Table 3.7 (Goal G2) -- exact reorder on real DTW dissimilarity matrices
+  using pVAT: tribbleclustering.compute_vat
+
+== ECG5000 ==
+  loaded: N=5000 length=140 classes=5
+  exactness @ N=1024 (10 seeds, random subsamples): 1.000
+  full DTW matrix (5000, 5000): 600.2s
+  full-N reorder: 0.2s
+  triangle-inequality violation rate: 20.880%
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_7_g2_dtw_nonmetric.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_3_7_g2_dtw_nonmetric.csv

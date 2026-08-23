@@ -87,6 +87,17 @@ export PYTHONIOENCODING=utf-8
 # the run that failed is blank, which is the exact opposite of what a log is for.
 export PYTHONUNBUFFERED=1
 
+# Windows hosts need a C toolchain to build the three compiled submodules, and
+# this one lost its MSVC. hostenv.sh is a no-op everywhere else; sourced here so
+# the suite bootstraps itself rather than depending on the operator having
+# remembered to. It exports CC/DIST_EXTRA_CONFIG/UV_NO_EDITABLE, so it must come
+# before the first uv invocation. See its header for the three defects involved.
+_hostenv="$(dirname "${BASH_SOURCE[0]}")/hostenv.sh"
+if [ -f "$_hostenv" ]; then
+  # shellcheck source=/dev/null
+  source "$_hostenv" || { echo "error: hostenv.sh failed; no usable compiler" >&2; exit 1; }
+fi
+
 # Table 4.4b, the theta operating curve, is emitted by table_4_4_openset ONLY when
 # this is set -- so every sweep so far produced 4.4 and silently omitted 4.4b,
 # while 4.4b sat in the archives from a hand-run. Defaulted here so the curve is
@@ -105,6 +116,13 @@ declare -A SLOW_TABLES=(
   [table_3_1_pvat_scaling]=1
   [table_norm_conorm_matrix]=1
   [table_hyperparam_normalization]=1
+  # Added 2026-08-22. The list above was sized from outputs/seeds10-2026-08-01/,
+  # which predates RT-IOT2022 landing (2026-08-12). Since then the two tables
+  # that actually dominate the suite are these, and neither was in the list --
+  # so `--fast` ran them at the full ten seeds and stopped bounding the runtime
+  # it exists to bound. Measured on this host: 530 s and 13,084 s.
+  [table_4_1_mog_baselines]=1
+  [table_4_4_openset]=1
   # The GPU table sweeps four N for the MST/front end, three for FCM and eight
   # (dimension x precision) for distances, with a CPU arm beside every one, so ten
   # seeds is ~25 min on its own -- the slowest single table in the suite.
@@ -158,6 +176,14 @@ CLUSTER_TABLES=(
   table_3_2_memory_precision
   table_3_4_gpu_speedups
   table_3_7_g2_dtw_nonmetric
+  # Added 2026-08-22. Its output sat in every archive with NO LOG beside it,
+  # because it had only ever been hand-run -- the same trap B12 records for
+  # table_a1_feature_scoring and table_3_2_memory_precision, in a third place.
+  # It matters more than those two: this table is the evidence for Chapter 3's
+  # Goal G2 downstream claim and for §5.4's corrected coordinate-free claim, so a
+  # sweep reporting green while silently carrying it forward asserts a result
+  # nobody re-measured.
+  table_3_7_g2_downstream
 )
 
 # Per-table dependency overrides, for a table needing something the group's
@@ -178,6 +204,8 @@ declare -A TABLE_DEPS=(
   # so, like the CuPy row above, the dependency has to ride on the invocation.
   # This table also downloads UCR/UEA archives on first run (network + disk).
   [table_3_7_g2_dtw_nonmetric]="--with aeon"
+  # Same DTW datasets, same dependency.
+  [table_3_7_g2_downstream]="--with aeon"
 )
 declare -A TABLE_DEPS_FALLBACK=(
   [table_3_4_gpu_speedups]="--with scipy"
@@ -189,6 +217,12 @@ PLAIN_TABLES=(
 
 declare -A STATUS
 declare -A SEEDS_USED
+# N/A cells emitted per table. A generator that reports what it cannot run is
+# working as designed -- but `table_norm_conorm_matrix` emitted a THIRD of its
+# cells as N/A for weeks, from a class rename it caught and logged, while this
+# script printed a bare "ok" and the run went green. The count belongs next to
+# the status, so "ran" and "produced a table" stop being the same claim.
+declare -A NA_CELLS
 
 # Resolved once, from common.py, so the provenance file reports the seed list the
 # generators will actually use rather than a default repeated here. This line
@@ -341,13 +375,69 @@ run_one() {
   else
     STATUS[$name]=ok
   fi
-  printf '%-10s %4ss\n' "${STATUS[$name]}" "$((t1 - t0))"
+  # Count N/A cells in the CSVs this table just wrote. The changed-file set
+  # comes from the same before/after snapshot the no-output check uses, so it
+  # needs no timestamp window -- consecutive tables finish inside the same
+  # second, and any grace period wide enough to catch that would attribute one
+  # table's output to the next.
+  local na=0 f
+  while read -r f; do
+    [ -n "$f" ] && [ "${f##*.}" = "csv" ] || continue
+    na=$((na + $(grep -o 'N/A' "$f" 2>/dev/null | wc -l)))
+  done < <(comm -13 <(printf '%s\n' "$before") <(printf '%s\n' "$after") | awk '{print $1}')
+  NA_CELLS[$name]=$na
+
+  local na_note=""
+  [ "$na" -gt 0 ] && na_note="  ($na N/A)"
+  printf '%-10s %4ss%s\n' "${STATUS[$name]}" "$((t1 - t0))" "$na_note"
 }
 
 # Check for submodule SHA divergence before running. This call used to sit above
 # the function's own definition, where bash resolves it as an unknown command --
 # `set -e` is off, so the run continued and the guard never once fired.
 check_submodule_shas
+
+# Check the upstream contracts the generators silently assume, BEFORE spending
+# hours producing numbers under a broken one. Every defect the 2026-08-22 pass
+# found had the same shape: an upstream function kept its name and changed its
+# behaviour, the generator emitted N/A or a plausible wrong number, exited 0,
+# and this script printed "ok".
+#
+# A failure does NOT abort the run. It stamps the archive NOT CITABLE, the same
+# treatment --fast gets and for the same reason: the risk is someone quoting the
+# output a month from now, not someone producing it today. Skips are not
+# failures -- but an unavailable import is reported as a skip, never as a pass.
+PREFLIGHT_STATUS="not run"
+run_preflight() {
+  [ $ARCHIVE_ONLY -eq 1 ] && return 0
+  local out="$DEST/preflight.txt" rc=0
+  {
+    for suite in fis cluster; do
+      local proj="tribble-fis"
+      [ "$suite" = "cluster" ] && proj="tribble-cluster"
+      uv run --project "$ROOT/$proj" python "$ROOT/reproduce/preflight.py"           --suite "$suite" 2>&1 || rc=1
+      echo
+    done
+  } >"$out"
+  if [ $rc -ne 0 ]; then
+    PREFLIGHT_STATUS="FAILED -- see preflight.txt"
+    echo
+    echo "########################################################################"
+    echo "## PREFLIGHT FAILED -- AN UPSTREAM INVARIANT IS BROKEN                ##"
+    echo "##                                                                    ##"
+    grep -E "^\s+\[FAIL\]" "$out" | sed 's/^ *//' | cut -c1-66       | while IFS= read -r _l; do printf '## %-68s ##
+' "$_l"; done
+    echo "##                                                                    ##"
+    echo "## The run continues, and its archive is stamped NOT CITABLE.         ##"
+    echo "########################################################################"
+    echo
+  else
+    PREFLIGHT_STATUS="passed"
+    echo "preflight: all invariants hold (detail in $(basename "$DEST")/preflight.txt)"
+  fi
+  return 0
+}
+run_preflight
 
 echo "=== $LABEL ==="
 if [ $ARCHIVE_ONLY -eq 1 ]; then
@@ -400,6 +490,18 @@ PROV="$DEST/PROVENANCE.txt"
     echo "## THIS BANNER IS NOT A VERDICT. If an addendum below establishes what ##"
     echo "## produced these tables, read it: the archive may well be citable.    ##"
     echo "## Two independent readers stopped here and concluded it was not.      ##"
+    echo "########################################################################"
+    echo
+  fi
+  if [ "$PREFLIGHT_STATUS" != "passed" ] && [ $ARCHIVE_ONLY -eq 0 ]; then
+    echo
+    echo "########################################################################"
+    echo "## PREFLIGHT $(printf '%-56s' "$PREFLIGHT_STATUS")##"
+    echo "##                                                                    ##"
+    echo "## An upstream contract this harness relies on does not hold, so the  ##"
+    echo "## generators ran on a library that does not behave as they assume.   ##"
+    echo "## Every number in this archive is suspect. See preflight.txt for     ##"
+    echo "## which invariant broke and what it reaches.                         ##"
     echo "########################################################################"
     echo
   fi
@@ -480,8 +582,10 @@ print("blas", blas)
     # Unset means the filter skipped it; say so rather than claiming a result.
     # The seed set is recorded PER TABLE because --fast makes it vary between
     # them, and a reader must be able to tell which cells are thin.
-    printf '  %-38s %-12s seeds=%s\n' \
-      "$t" "${STATUS[$t]:-not-run-this-pass}" "${SEEDS_USED[$t]:-—}"
+    _na="${NA_CELLS[$t]:-}"
+    printf '  %-38s %-12s seeds=%s%s\n' \
+      "$t" "${STATUS[$t]:-not-run-this-pass}" "${SEEDS_USED[$t]:-—}" \
+      "${_na:+  N/A cells=$_na}"
   done
 } >> "$PROV"
 

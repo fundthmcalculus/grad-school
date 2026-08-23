@@ -1,11 +1,11 @@
 # Chapter 10 — Timeline
 
-The plan runs from the proposal defense at the end of 2026 to the final defense in **March 2028**: fifteen months of research runway. It is deliberately aggressive, and the risk is managed in Chapter 7, where the completed Chapters 3 and 4 are the floor and §7.4 points at the de-scoping order §10.6 carries in full. Quarters are calendar quarters; goal labels match Table 7.1 and `CHECKLIST.md`.
+The plan runs from the proposal defense at the end of 2026 to the final defense in **March 2028**: fifteen months of research runway. It is deliberately aggressive, and the risk is managed in Chapter 7, where the completed Chapters 3 and 4 are the floor and §7.4 collects the risks. Quarters are calendar quarters; goal labels match Table 7.1 and `CHECKLIST.md`. The plan assumes full research effort over the runway: the author carries no teaching or RA load, so throughput is bounded by the work itself rather than by competing duties.
 
 Three things changed here, all of them cases of the schedule having assumed the hard parts were done.
 
 - **The baseline adapters come first.** C1 (ANFIS and GA-tuned-FIS) fill the initial baseline gap; see §7.4 for the impact on Tables 4.5 and 6.2.
-- **Every blocker the evidence names now has a bar or an explicit de-scope.** The M5 dependency fault gets a decision date; BETH's one-class path gets a slot and a stated fallback; eVAT and clusiVAT get their own bar. Fumanal-Idocin et al. [@fumanal2025fast] and the deep TSK fuzzy classifier, itemized in Chapter 6's baseline list and nowhere here, are de-scoped in §7.2 instead of silently carried.
+- **Every blocker the evidence names now has a bar or a stated fallback.** The M5 dependency fault gets a decision date; BETH's one-class path gets a slot and a stated fallback; eVAT and clusiVAT get their own bar. Fumanal-Idocin et al. [@fumanal2025fast] and the deep TSK fuzzy classifier, itemized in Chapter 6's baseline list and nowhere here, are left out of the baseline suite in §7.2 rather than silently carried.
 - **Goal G8 is absent deliberately.** §7.2 retargets the construction post-defense, since the 2028 Q1 quarter it would need already carries the capstone, G6, G7, the write-up and the defense, and keeps only the disjunct count over G2's datasets, which rides inside G2.
 
 ## 10.1 Gantt
@@ -45,7 +45,6 @@ gantt
     section Papers & conferences
     Ch5 membership paper (write/submit)       :crit, p5, 2027-01-02, 57d
     Ch3 mergeVAT journal                      :p3, 2027-03-01, 90d
-    VAT complexity note (cut 4)               :pk, 2027-04-01, 60d
     EUSFLAT 2027 (present)                    :milestone, e27, 2027-09-15, 0d
     Ch6 hierarchy paper                       :p6, 2027-10-01, 90d
 
@@ -54,7 +53,7 @@ gantt
     Defense preparation                       :wp, 2028-02-01, 43d
 ```
 
-The Chapter 5 membership paper targets **EUSFLAT 2027**: written in January and February 2027 against a **February submission deadline**, presented in September. §10.5 sets out what that costs.\* NAFIPS 2025 (Banff, July 2025) and NAFIPS 2026 (El Paso, March 2026) are already published and predate this timeline.
+The Chapter 5 membership paper targets **EUSFLAT 2027**: written in January and February 2027 against a **February submission deadline**,\* presented in September. NAFIPS 2025 (Banff, July 2025) and NAFIPS 2026 (El Paso, March 2026) are already published and predate this timeline.
 
 Two bars deliberately have no dates. **G4c**, the datacenter-GPU re-run, is gated on access to a card with full-rate double precision, not on effort, and §7.4's fallback applies if it never opens. **G4d**, the matrix-free reorder, is a cut candidate nothing in Chapter 3 depends on, listed unscheduled in Table 7.1.
 
@@ -86,14 +85,13 @@ G7  adaptive multi-scale (cut 1)       .       .       .       .       .     ~~~
 ------------------------------------------------------------------------------------
     Ch5 paper -> EUSFLAT 2027          .    SUB#       .    PRES       .       .
     Ch3 mergeVAT journal               .     ###     ###       .       .       .
-    VAT complexity note (cut 4)        .       .     ###       .       .       .
     Ch6 hierarchy paper                .       .       .       .    ####       .
     dissertation writing               .       .       .       .    ....    ####
 ------------------------------------------------------------------------------------
     milestones                       PROP.                  EUSFLAT         DEFENSE
 ```
 
-Legend: `####` a full quarter of scheduled work · `###` a partial quarter, starting or ending mid-quarter or too short to fill one · `SUB#` write and submit (EUSFLAT deadline **Feb 2027**) · `PRES` present at the conference · `~~~` stretch (first to cut) · `....` ramp-up · `.` idle. Every marker is right-aligned to its quarter column; the Chapter 3 journal row was previously indented four characters further, putting its bar under 2027 Q2 while the text scheduled it in Q1.
+Legend: `####` a full quarter of scheduled work · `###` a partial quarter, starting or ending mid-quarter or too short to fill one · `SUB#` write and submit (EUSFLAT deadline **Feb 2027**) · `PRES` present at the conference · `~~~` stretch (first to cut) · `....` ramp-up · `.` idle. Every marker is right-aligned to its quarter column.
 
 ## 10.3 Milestone table
 
@@ -114,5 +112,4 @@ Legend: `####` a full quarter of scheduled work · `###` a partial quarter, star
 - **G9 follows G4b**, starting the week that bar ends, because it is the same shape of work: a competitor comparison on the run-of-record host, reusing G4b's driver and its timing harness. Three weeks, not a quarter, since the estimator and both baselines already exist.
 - **G1 precedes C3 and the capstone.** C3 is the new intermediate, the first time Chapter 5's memberships reach Chapter 6's models at all, and putting a small version in Q3 is checklist **C3**'s own recommendation. It leaves the capstone an integration rather than a first attempt.
 - **The M5 decision gates G3's suite**, hence the dated milestone: one of four baselines may be a *build*, and finding that out in Q4 with the suite half-run is what the date prevents. **G3's EM is the largest single build**, spanning Q3–Q4, with the one-shot mixture as its de-scope path.
-- **Papers track the work**: Ch 5 → EUSFLAT (written Q1, presented Q3) → Ch 3 journal (Q1–Q2, a write-up, so it absorbs slip) → the VAT complexity note if the two blocking full-text reads clear (Q2, the fourth cut) → Ch 6 (Q4) → the capstone journal version alongside the write-up (2028 Q1).
-
+- **Papers track the work**: Ch 5 → EUSFLAT (written Q1, presented Q3) → Ch 3 journal (Q1–Q2, a write-up, so it absorbs slip; it also carries the VAT complexity audit — the literature-versus-libraries observation of §3.2 — as a section rather than a separate paper) → Ch 6 (Q4) → the capstone journal version alongside the write-up (2028 Q1).

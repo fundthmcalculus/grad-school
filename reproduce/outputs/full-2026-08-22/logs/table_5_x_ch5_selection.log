@@ -1,0 +1,8 @@
+Chapter 5 tables from the gated-minimax results of record
+  source: C:\personal\grad-school\gated-minimax-selection\outputs\results.json
+  wrote C:\personal\grad-school\reproduce\outputs\table_5_1_battery.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_5_1_battery.csv
+  wrote C:\personal\grad-school\reproduce\outputs\table_5_2_multiscale.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_5_2_multiscale.csv
+  wrote C:\personal\grad-school\reproduce\outputs\table_5_3_selection.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_5_3_selection.csv

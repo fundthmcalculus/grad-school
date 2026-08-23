@@ -1,0 +1,7 @@
+Dataset,Task,Raw MF,MF @ 1x (Δ),Reduction @ 1x,Max-lossless ×,MF @ max-lossless (Δ),Reduction @ max-lossless
+Glass,classification,76.0,47.7 (-0.1231 ± 0.0928 acc),37.2%,0.1×,59.1 (-0.0308 ± 0.0413 acc),22.2%
+Wine,classification,16.2,16.2 (+0.0000 ± 0.0000 acc),0.0%,7×,15.8 (+0.0000 ± 0.0000 acc),2.5%
+BreastCancer,classification,19.9,15.3 (-0.0088 ± 0.0316 acc),23.1%,3×,10.5 (-0.0018 ± 0.0217 acc),47.2%
+Digits,classification,167.3,135.6 (-0.0002 ± 0.0010 acc),18.9%,2×,129.1 (+0.0011 ± 0.0034 acc),22.8%
+Concrete,regression,33.9,33.1 (-0.0000 ± 0.0000 R²),2.4%,10×,32.0 (-0.0002 ± 0.0022 R²),5.6%
+Diabetes,regression,40.6,35.2 (+0.0060 ± 0.0177 R²),13.3%,7×,14.4 (-0.3197 ± 0.7944 R²),64.5%

@@ -18,6 +18,58 @@ as having no generator yet.
 
 ---
 
+## 2026-08-22 — whole-document status against latest `main` + latest submodules
+
+A full ten-seed sweep ran on the current pins (`full-2026-08-22`, 16/16 generators
+green, zero failures) and `check_prose.py` was run against it and against the
+previous run of record. The two numbers together are the finding:
+
+| ± pairs in the prose | vs `goal-8h-2026-08-11-fullsuite` (old pin) | vs `full-2026-08-22` (current pin) |
+|---|---:|---:|
+| match a cell | **156** | **59** |
+| drifted | 10 | 23 |
+| untraceable | 44 | 128 |
+
+**The document reproduces against the pin it was written under and does not
+reproduce against today's.** The cause is a single upstream function — see
+checklist **B14** and [`outputs/WASSERSTEIN_REGRESSION.md`](outputs/WASSERSTEIN_REGRESSION.md).
+`stats_numba.wasserstein_distance` drops the $dx$ weighting, making it
+dimensionless and scale-invariant, which corrupts the feature-differentiation
+screen every `gauss_math`-based table runs through. Correcting that one function
+at the current pin returns PhiUSIIL to $0.997 \pm 0.001$ exactly. **Do not
+re-quote any Chapter 4 or Chapter 6 accuracy cell from `full-2026-08-22`.**
+
+Unaffected and re-confirmed identical across the same diff: every Chapter 5 table
+(they never touch `gauss_math`) and `table_a7_regression_scale`. That is the
+control that makes the rest attributable.
+
+**Two rows change status on their own merits, independent of B14:**
+
+- **Table 3.3** moves from *reproduced* to *reproduced, and two cells are new
+  results*: the matrix-free rows read 1.000 (exact) at float64 and 0.999 ± 0.002
+  at float32, against 0.001 ± 0.001 before. Upstream repaired
+  `vat_prim_mst_seq`; the repair is inside the pinned SHA and is *not* inside
+  `e3c27e6`, which §3.4's source permalinks still cite. Prose and generator both
+  updated; see B6/G4d.
+- **Table 3.4** stays **drifted**, and the reason has changed. The CPU FCM fix
+  E2c was waiting for has landed (clustering #75/#72), so the device row has moved
+  again, as E2c predicted it would. On this host the matched FCM arm now reads
+  **2.03× / 3.02× / 2.86×** against the prose's 1.24× / 2.35× / 3.71× and the
+  archive's 2.64× / 2.86× / 4.22× — three runs, three answers, every one with a
+  spread of the same order as its mean. **The FCM rows are not quotable at
+  single-run precision and the fix has not changed that.** What would: `n_iter_`
+  and `converged` are now exposed (E2c's second ask), so the generator can control
+  for iteration count instead of letting an 11-to-100-iteration spread dominate
+  the timing. That is the concrete next step for **E2b**.
+
+⚠️ **Also on this host:** the compiled kernels are built by **gcc/mingw**, not
+MSVC, because the host lost its Visual C++ toolchain (checklist **B15**). Chapter 3
+timings from `full-2026-08-22` are therefore not comparable to earlier archives —
+compiler, compiler flags and library code all moved at once. Exactness columns are
+unaffected and reproduce.
+
+---
+
 ## Chapter 3 — pVAT
 
 | Table | Generator | Output | Status |

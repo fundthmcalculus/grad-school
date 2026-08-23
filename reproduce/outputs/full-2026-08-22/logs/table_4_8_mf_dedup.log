@@ -1,0 +1,542 @@
+  [table-4-8] fitting Glass (classification, 10 seeds x 14 tolerances)...
+  [table-4-8] fitting Wine (classification, 10 seeds x 14 tolerances)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.8764
+ 3. od280/od315_of_diluted_wines   - Score: 0.3932
+ 4. flavanoids                     - Score: 0.3697
+ 5. total_phenols                  - Score: 0.3469
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.7862
+ 3. od280/od315_of_diluted_wines   - Score: 0.4295
+ 4. flavanoids                     - Score: 0.3837
+ 5. total_phenols                  - Score: 0.3808
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.7646
+ 3. od280/od315_of_diluted_wines   - Score: 0.3936
+ 4. flavanoids                     - Score: 0.3888
+ 5. total_phenols                  - Score: 0.3433
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.6282
+ 3. od280/od315_of_diluted_wines   - Score: 0.3840
+ 4. flavanoids                     - Score: 0.3740
+ 5. total_phenols                  - Score: 0.3024
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.8571
+ 3. od280/od315_of_diluted_wines   - Score: 0.4265
+ 4. total_phenols                  - Score: 0.3978
+ 5. flavanoids                     - Score: 0.3964
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.7766
+ 3. od280/od315_of_diluted_wines   - Score: 0.4253
+ 4. flavanoids                     - Score: 0.3516
+ 5. total_phenols                  - Score: 0.3180
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.8551
+ 3. od280/od315_of_diluted_wines   - Score: 0.3905
+ 4. flavanoids                     - Score: 0.3668
+ 5. total_phenols                  - Score: 0.3268
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.6456
+ 3. total_phenols                  - Score: 0.4005
+ 4. od280/od315_of_diluted_wines   - Score: 0.3708
+ 5. flavanoids                     - Score: 0.3534
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.7107
+ 3. od280/od315_of_diluted_wines   - Score: 0.3737
+ 4. flavanoids                     - Score: 0.3460
+ 5. total_phenols                  - Score: 0.3459
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. hue                            - Score: 1.0000
+ 2. nonflavanoid_phenols           - Score: 0.9330
+ 3. od280/od315_of_diluted_wines   - Score: 0.4513
+ 4. flavanoids                     - Score: 0.4479
+ 5. total_phenols                  - Score: 0.3851
+================================================================================
+  [table-4-8] fitting BreastCancer (classification, 10 seeds x 14 tolerances)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fractal dimension error        - Score: 1.0000
+ 2. concave points error           - Score: 0.8955
+ 3. mean concave points            - Score: 0.2955
+ 4. mean smoothness                - Score: 0.2901
+ 5. compactness error              - Score: 0.2341
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.9164
+ 3. mean smoothness                - Score: 0.3411
+ 4. mean concave points            - Score: 0.3147
+ 5. smoothness error               - Score: 0.2643
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.8337
+ 3. mean concave points            - Score: 0.3354
+ 4. mean smoothness                - Score: 0.3093
+ 5. smoothness error               - Score: 0.2533
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.7776
+ 3. mean concave points            - Score: 0.3365
+ 4. mean smoothness                - Score: 0.2979
+ 5. smoothness error               - Score: 0.2750
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.9305
+ 3. mean concave points            - Score: 0.3371
+ 4. mean smoothness                - Score: 0.3275
+ 5. smoothness error               - Score: 0.2550
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.7019
+ 3. mean smoothness                - Score: 0.3749
+ 4. mean concave points            - Score: 0.3733
+ 5. smoothness error               - Score: 0.2713
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.8513
+ 3. mean smoothness                - Score: 0.3517
+ 4. mean concave points            - Score: 0.3481
+ 5. smoothness error               - Score: 0.2499
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.9733
+ 3. mean concave points            - Score: 0.3870
+ 4. smoothness error               - Score: 0.3437
+ 5. mean smoothness                - Score: 0.3096
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.9714
+ 3. mean smoothness                - Score: 0.3367
+ 4. smoothness error               - Score: 0.3366
+ 5. mean concave points            - Score: 0.3130
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. concave points error           - Score: 1.0000
+ 2. fractal dimension error        - Score: 0.8947
+ 3. mean concave points            - Score: 0.3961
+ 4. smoothness error               - Score: 0.3843
+ 5. mean smoothness                - Score: 0.3539
+================================================================================
+  [table-4-8] fitting Digits (classification, 10 seeds x 14 tolerances)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px42                           - Score: 0.8735
+ 3. px34                           - Score: 0.8709
+ 4. px26                           - Score: 0.8464
+ 5. px21                           - Score: 0.7972
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px42                           - Score: 0.9142
+ 3. px34                           - Score: 0.8859
+ 4. px21                           - Score: 0.8565
+ 5. px26                           - Score: 0.8328
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px42                           - Score: 0.8616
+ 3. px34                           - Score: 0.8586
+ 4. px21                           - Score: 0.8487
+ 5. px26                           - Score: 0.8375
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px42                           - Score: 0.8656
+ 3. px34                           - Score: 0.8480
+ 4. px26                           - Score: 0.8359
+ 5. px21                           - Score: 0.8182
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px34                           - Score: 0.9730
+ 3. px42                           - Score: 0.9505
+ 4. px26                           - Score: 0.8740
+ 5. px30                           - Score: 0.8625
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px26                           - Score: 0.9046
+ 3. px42                           - Score: 0.8947
+ 4. px34                           - Score: 0.8719
+ 5. px21                           - Score: 0.8341
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px42                           - Score: 0.9081
+ 3. px34                           - Score: 0.8868
+ 4. px21                           - Score: 0.8498
+ 5. px30                           - Score: 0.8375
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px42                           - Score: 0.8925
+ 3. px34                           - Score: 0.8654
+ 4. px26                           - Score: 0.8077
+ 5. px21                           - Score: 0.8040
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px42                           - Score: 0.9233
+ 3. px34                           - Score: 0.8967
+ 4. px26                           - Score: 0.8781
+ 5. px21                           - Score: 0.8265
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. px33                           - Score: 1.0000
+ 2. px42                           - Score: 0.9430
+ 3. px34                           - Score: 0.9211
+ 4. px26                           - Score: 0.9050
+ 5. px21                           - Score: 0.8693
+================================================================================
+  [table-4-8] fitting Concrete (regression, 10 seeds x 14 tolerances)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.2744
+ 3. Cement                         - Score: 0.0689
+ 4. Age                            - Score: 0.0662
+ 5. CoarseAgg                      - Score: 0.0319
+ 6. FlyAsh                         - Score: 0.0289
+ 7. Slag                           - Score: 0.0254
+ 8. FineAgg                        - Score: 0.0241
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.2759
+ 3. Age                            - Score: 0.0689
+ 4. Cement                         - Score: 0.0640
+ 5. CoarseAgg                      - Score: 0.0348
+ 6. Slag                           - Score: 0.0260
+ 7. FlyAsh                         - Score: 0.0233
+ 8. FineAgg                        - Score: 0.0214
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.3207
+ 3. Cement                         - Score: 0.0905
+ 4. Age                            - Score: 0.0786
+ 5. CoarseAgg                      - Score: 0.0355
+ 6. FlyAsh                         - Score: 0.0349
+ 7. FineAgg                        - Score: 0.0337
+ 8. Slag                           - Score: 0.0248
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.3059
+ 3. Age                            - Score: 0.0773
+ 4. Cement                         - Score: 0.0769
+ 5. FlyAsh                         - Score: 0.0389
+ 6. CoarseAgg                      - Score: 0.0287
+ 7. FineAgg                        - Score: 0.0241
+ 8. Slag                           - Score: 0.0206
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.3143
+ 3. Cement                         - Score: 0.0868
+ 4. Age                            - Score: 0.0798
+ 5. FlyAsh                         - Score: 0.0500
+ 6. CoarseAgg                      - Score: 0.0389
+ 7. Slag                           - Score: 0.0300
+ 8. FineAgg                        - Score: 0.0290
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.3270
+ 3. Age                            - Score: 0.0805
+ 4. Cement                         - Score: 0.0779
+ 5. CoarseAgg                      - Score: 0.0321
+ 6. FlyAsh                         - Score: 0.0308
+ 7. FineAgg                        - Score: 0.0261
+ 8. Slag                           - Score: 0.0236
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.2562
+ 3. Cement                         - Score: 0.0700
+ 4. Age                            - Score: 0.0690
+ 5. CoarseAgg                      - Score: 0.0301
+ 6. FineAgg                        - Score: 0.0275
+ 7. FlyAsh                         - Score: 0.0227
+ 8. Slag                           - Score: 0.0190
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.2670
+ 3. Age                            - Score: 0.0809
+ 4. Cement                         - Score: 0.0665
+ 5. Slag                           - Score: 0.0343
+ 6. FineAgg                        - Score: 0.0303
+ 7. CoarseAgg                      - Score: 0.0284
+ 8. FlyAsh                         - Score: 0.0278
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.2979
+ 3. Age                            - Score: 0.0794
+ 4. Cement                         - Score: 0.0767
+ 5. CoarseAgg                      - Score: 0.0340
+ 6. FlyAsh                         - Score: 0.0328
+ 7. FineAgg                        - Score: 0.0277
+ 8. Slag                           - Score: 0.0218
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. Water                          - Score: 0.3068
+ 3. Age                            - Score: 0.1136
+ 4. Cement                         - Score: 0.0823
+ 5. FlyAsh                         - Score: 0.0433
+ 6. CoarseAgg                      - Score: 0.0312
+ 7. Slag                           - Score: 0.0288
+ 8. FineAgg                        - Score: 0.0240
+================================================================================
+  [table-4-8] fitting Diabetes (regression, 10 seeds x 14 tolerances)...
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. s5                             - Score: 1.0000
+ 2. bmi                            - Score: 0.9937
+ 3. bp                             - Score: 0.7197
+ 4. s4                             - Score: 0.6243
+ 5. s3                             - Score: 0.5217
+ 6. s6                             - Score: 0.4855
+ 7. s1                             - Score: 0.3290
+ 8. age                            - Score: 0.2768
+ 9. s2                             - Score: 0.2292
+10. sex                            - Score: 0.1370
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. bmi                            - Score: 1.0000
+ 2. s5                             - Score: 0.8740
+ 3. bp                             - Score: 0.6706
+ 4. s4                             - Score: 0.5362
+ 5. s3                             - Score: 0.4766
+ 6. s6                             - Score: 0.4235
+ 7. age                            - Score: 0.2827
+ 8. s1                             - Score: 0.2559
+ 9. s2                             - Score: 0.2360
+10. sex                            - Score: 0.0263
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. s5                             - Score: 1.0000
+ 2. bmi                            - Score: 0.9996
+ 3. s4                             - Score: 0.6883
+ 4. bp                             - Score: 0.6830
+ 5. s3                             - Score: 0.5554
+ 6. s6                             - Score: 0.4466
+ 7. age                            - Score: 0.3013
+ 8. s1                             - Score: 0.3011
+ 9. s2                             - Score: 0.2814
+10. sex                            - Score: 0.0888
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. bmi                            - Score: 1.0000
+ 2. s5                             - Score: 0.9800
+ 3. bp                             - Score: 0.7429
+ 4. s4                             - Score: 0.6728
+ 5. s3                             - Score: 0.6160
+ 6. s6                             - Score: 0.5755
+ 7. age                            - Score: 0.3286
+ 8. s1                             - Score: 0.2804
+ 9. s2                             - Score: 0.2142
+10. sex                            - Score: 0.0916
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. s5                             - Score: 1.0000
+ 2. bmi                            - Score: 0.9655
+ 3. bp                             - Score: 0.7538
+ 4. s4                             - Score: 0.6412
+ 5. s3                             - Score: 0.5696
+ 6. s6                             - Score: 0.4654
+ 7. age                            - Score: 0.3387
+ 8. s1                             - Score: 0.2828
+ 9. s2                             - Score: 0.2343
+10. sex                            - Score: 0.1514
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. bmi                            - Score: 1.0000
+ 2. s5                             - Score: 0.9884
+ 3. bp                             - Score: 0.7322
+ 4. s4                             - Score: 0.6796
+ 5. s6                             - Score: 0.5025
+ 6. s3                             - Score: 0.4908
+ 7. s1                             - Score: 0.3150
+ 8. s2                             - Score: 0.2908
+ 9. age                            - Score: 0.2382
+10. sex                            - Score: 0.1214
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. bmi                            - Score: 1.0000
+ 2. s5                             - Score: 0.8786
+ 3. bp                             - Score: 0.6569
+ 4. s4                             - Score: 0.5453
+ 5. s3                             - Score: 0.4872
+ 6. s6                             - Score: 0.3941
+ 7. s1                             - Score: 0.2794
+ 8. age                            - Score: 0.2434
+ 9. s2                             - Score: 0.2140
+10. sex                            - Score: 0.0611
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. s5                             - Score: 1.0000
+ 2. bmi                            - Score: 0.9992
+ 3. bp                             - Score: 0.6974
+ 4. s4                             - Score: 0.5927
+ 5. s3                             - Score: 0.5546
+ 6. s6                             - Score: 0.4813
+ 7. s1                             - Score: 0.2817
+ 8. age                            - Score: 0.2698
+ 9. s2                             - Score: 0.2656
+10. sex                            - Score: 0.0444
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. bmi                            - Score: 1.0000
+ 2. s5                             - Score: 0.8800
+ 3. bp                             - Score: 0.7479
+ 4. s6                             - Score: 0.5424
+ 5. s4                             - Score: 0.4884
+ 6. s3                             - Score: 0.4765
+ 7. age                            - Score: 0.2647
+ 8. s1                             - Score: 0.2162
+ 9. s2                             - Score: 0.1771
+10. sex                            - Score: 0.0812
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. s5                             - Score: 1.0000
+ 2. bmi                            - Score: 0.8721
+ 3. bp                             - Score: 0.6920
+ 4. s4                             - Score: 0.6084
+ 5. s3                             - Score: 0.5328
+ 6. s6                             - Score: 0.4776
+ 7. s1                             - Score: 0.2555
+ 8. s2                             - Score: 0.2358
+ 9. age                            - Score: 0.2146
+10. sex                            - Score: 0.0715
+================================================================================
+  wrote C:\personal\grad-school\reproduce\outputs\table_4_8_mf_dedup.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_4_8_mf_dedup.csv
+  wrote C:\personal\grad-school\reproduce\outputs\table_4_8_mf_dedup_sweep.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_4_8_mf_dedup_sweep.csv
+
+Done. Emitted table_4_8_mf_dedup, table_4_8_mf_dedup_sweep, table_4_9_correction_pass.

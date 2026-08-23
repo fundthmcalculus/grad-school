@@ -72,11 +72,55 @@ THETA_SWEEP_SEEDS = (
 )
 
 
+def _glass():
+    path = os.path.join(F.DATA_DIR, "glass.csv")
+    if not os.path.exists(path):
+        # Glass moved into data/; this fallback is the pre-move location.
+        path = os.path.join(F.REPO_ROOT, "glass.csv")
+    if not os.path.exists(path):
+        return None
+    df = pd.read_csv(path).dropna()
+    return df.drop(columns=["Type"]).astype(float), df["Type"].astype(int)
+
+
 def load_openset_data():
-    """(X, y) for the leave-one-class-out protocol.
+    """(X, y, name) for the leave-one-class-out protocol.
 
     Priority: RT-IOT2022 (123k) > BETH (3.8M) > Glass (214).
+
+    `REPRO_OPENSET_DATASET` pins the choice instead of taking the priority order.
+    That override exists because the priority silently reassigned what this
+    generator produces: RT-IOT2022 landed in the repository on 2026-08-12, and
+    from that moment the script emitted the RT-IOT2022 table -- the proposal's
+    **Table 4.7b** -- under the same output filenames that Tables 4.6 and 4.7
+    are quoted from. Those two are Glass measurements, and there was no way to
+    re-derive them short of hiding the dataset. Checklist B16(e).
+
+        REPRO_OPENSET_DATASET=glass  ->  Tables 4.6 / 4.7
+        REPRO_OPENSET_DATASET=rt-iot2022 -> Table 4.7b (the current default)
     """
+    pin = os.environ.get("REPRO_OPENSET_DATASET", "").strip().lower()
+    if pin:
+        loaders = {
+            "glass": ("Glass", _glass),
+            "rt-iot2022": ("RT-IOT2022", F.load_rt_iot2022),
+            "beth": ("BETH", lambda: (F.load_beth() or {}).get("train")),
+        }
+        if pin not in loaders:
+            raise SystemExit(
+                f"REPRO_OPENSET_DATASET={pin!r} is not one of {sorted(loaders)}"
+            )
+        name, fn = loaders[pin]
+        got = fn()
+        if got is None:
+            # Pinned and absent is an error, not a reason to quietly use another
+            # dataset -- silently substituting one is the whole reason this knob
+            # exists.
+            raise SystemExit(f"REPRO_OPENSET_DATASET={pin!r} but {name} is unavailable")
+        X, y = got
+        print(f"  [data] REPRO_OPENSET_DATASET={pin} -- using {name}")
+        return X, y, name
+
     # Try RT-IOT2022 first (large-scale public dataset)
     iot = F.load_rt_iot2022()
     if iot is not None:
@@ -92,14 +136,13 @@ def load_openset_data():
         return X, y, "BETH"
 
     # Fall back to Glass (small public dataset)
-    path = os.path.join(F.REPO_ROOT, "glass.csv")
-    if not os.path.exists(path):
+    got = _glass()
+    if got is None:
         return None
-    df = pd.read_csv(path).dropna()
     print(
         "  [data] RT-IOT2022 and BETH absent -- leave-one-class-out on Glass (214 × 9)"
     )
-    return (df.drop(columns=["Type"]).astype(float), df["Type"].astype(int), "Glass")
+    return got[0], got[1], "Glass"
 
 
 def complement_rule(X_tr, y_tr, X_te):
@@ -126,6 +169,46 @@ def complement_rule(X_tr, y_tr, X_te):
     return np.asarray([str(p) == "anomaly" for p in pred], dtype=bool)
 
 
+def complement_rule_sweep(X_tr, y_tr, X_te, thetas):
+    """`complement_rule` at every theta, building the model once.
+
+    The boost theta enters only at the anomaly step of prediction; the screen,
+    the membership dict and the fitted rule base are all theta-independent, and so
+    is the class rule firing. So this builds the model once and calls
+    `simple_gaussian_predict_sweep`, which reuses one class-firing pass across all
+    thetas. Bit-identical to calling `complement_rule` once per theta (verified in
+    tribble-fis test_predict_theta_sweep and end-to-end on an RT-IOT2022 fold),
+    at about 5.7x on the sweep.
+
+    Returns {theta: bool 'flagged unknown'}.
+    """
+    from tribblefis.gauss_data import AnomalyParameters
+    from tribblefis.gauss_math import (
+        calculate_gaussian_correlation,
+        create_gaussian_membership_dict,
+        simple_gaussian_predict_sweep,
+        take_top_features,
+    )
+
+    diffs = calculate_gaussian_correlation(X_tr, y_tr)
+    _, top_vars = take_top_features(diffs, top_n=len(X_tr.columns))
+    memb = create_gaussian_membership_dict(X_tr, y_tr, top_n_var_names=top_vars)
+    thetas = list(thetas)
+    params = AnomalyParameters(
+        include_anomaly=True,
+        threshold=thetas[0],  # overridden per-theta by the sweep; build ignores it
+        label="anomaly",
+        norm_conorm=CONORM,
+        member_function="gaussian",
+    )
+    model = memb.to_simple_model(params)
+    preds = simple_gaussian_predict_sweep(X_te, model, thetas)
+    return {
+        th: np.asarray([str(p) == "anomaly" for p in preds[th]], dtype=bool)
+        for th in thetas
+    }
+
+
 def rates(flagged, is_unknown):
     """(detection rate on unknowns, false-alarm rate on knowns)."""
     unk, kn = is_unknown, ~is_unknown
@@ -144,38 +227,42 @@ def theta_sweep(X, y, classes, thetas, seeds=None):
     print("\n  theta sweep (Figure 4.2):")
     print(f"    {'theta':>8} {'detection':>12} {'false alarm':>13} {'J':>8}")
     rows = []
-    global THRESHOLD
-    keep = THRESHOLD
-    for th in thetas:
-        THRESHOLD = th
-        det, fa = [], []
-        for held in classes:
-            known = pd.Series(y).values != held
-            Xk, yk = X[known], pd.Series(y)[known]
-            if len(np.unique(yk)) < 2 or len(Xk) < 40:
+    thetas = list(thetas)
+
+    # Build the model once per (held-out class, seed) and sweep theta over the
+    # anomaly step only -- the fold is the same for every theta, so rebuilding it
+    # per theta (the old loop) redid the screen, the membership dict and the
+    # dedup 7x for nothing. Accumulate per-theta so the aggregation is unchanged.
+    det = {th: [] for th in thetas}
+    fa = {th: [] for th in thetas}
+    for held in classes:
+        known = pd.Series(y).values != held
+        Xk, yk = X[known], pd.Series(y)[known]
+        if len(np.unique(yk)) < 2 or len(Xk) < 40:
+            continue
+        for seed in seeds:
+            Xtr, Xte_k, ytr, _ = train_test_split(
+                Xk, yk, test_size=0.3, random_state=seed
+            )
+            Xte = pd.concat([Xte_k, X[~known]], ignore_index=True)
+            unk = np.r_[np.zeros(len(Xte_k), bool), np.ones(int((~known).sum()), bool)]
+            try:
+                flags = complement_rule_sweep(Xtr, ytr, Xte, thetas)
+            except Exception:  # noqa: BLE001
                 continue
-            for seed in seeds:
-                Xtr, Xte_k, ytr, _ = train_test_split(
-                    Xk, yk, test_size=0.3, random_state=seed
-                )
-                Xte = pd.concat([Xte_k, X[~known]], ignore_index=True)
-                unk = np.r_[
-                    np.zeros(len(Xte_k), bool), np.ones(int((~known).sum()), bool)
-                ]
-                try:
-                    d, f = rates(complement_rule(Xtr, ytr, Xte), unk)
-                    if np.isfinite(d) and np.isfinite(f):
-                        det.append(d)
-                        fa.append(f)
-                except Exception:  # noqa: BLE001
-                    pass
-        dm, _ = C.agg(det)
-        fm, _ = C.agg(fa)
+            for th in thetas:
+                d, f = rates(flags[th], unk)
+                if np.isfinite(d) and np.isfinite(f):
+                    det[th].append(d)
+                    fa[th].append(f)
+
+    for th in thetas:
+        dm, _ = C.agg(det[th])
+        fm, _ = C.agg(fa[th])
         if dm is None:
             continue
         print(f"    {th:8.3f} {dm:12.3f} {fm:13.3f} {dm-fm:+8.3f}")
         rows.append([f"{th:.3f}", f"{dm:.3f}", f"{fm:.3f}", f"{dm-fm:+.3f}"])
-    THRESHOLD = keep
     if rows:
         C.emit(
             "table_4_4b_theta_sweep",
