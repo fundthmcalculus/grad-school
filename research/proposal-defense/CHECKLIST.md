@@ -726,6 +726,36 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       the `.bib` entry and §4.4.1 both flag this. Metadata for the entry is `[V]`; the *figures* are
       not content-verified, the same "`[V]` is metadata, not content" distinction the bibliography
       draws for `deshpande2024scalable`.
+- [x] ✅ **C16 — The open-set order dependence is dedup, not the t-conorm** (2026-08-23;
+      `reproduce/outputs/OPENSET_COST_2026-08-22.md` §6, `reproduce/experiments/diagnose_openset_order.py`).
+      `profile_openset_cost.py` had established that feeding the antecedent screen's features in
+      ranked vs column order changes 29% of open-set predictions deterministically, and
+      OPENSET_COST *speculated* the cause was floating-point accumulation order in the complement
+      rule's t-conorm chain, flagged as unconfirmed. **Refuted:** holding one fold's boosted
+      matrix fixed and reducing the same columns four ways (column, reversed, sorted, pairwise)
+      gives identical predictions at every θ (agreement 1.0000), so the t-conorm reduction is
+      order-invariant and §4.3.5's commutative-associative claim needs no caveat. The divergence
+      is one stage earlier, in the model **build**: ranked vs column order gives the same 11 rules
+      / 2367 terms but max |firing difference| = 0.86 on 98.5% of rows — a different fitted model,
+      because the O(T²) cross-feature dedup in `to_simple_model` (§4.3.1) is first-occurrence-wins,
+      so the surviving representative MF depends on feature order. **Real but latent:** the shipped
+      table always uses the screen's ranked order, so it stays deterministic and reproducible. A
+      fix (canonical dedup representative instead of first-seen) would change results and is left
+      as the author's call, not made here.
+- [x] ✅ **C17 — Hoist the θ-independent work out of the open-set sweep** (2026-08-23;
+      tribble-fis #176 pin `1435811`, `reproduce/tables/table_4_4_openset.py`). Table 4.4b's
+      operating-curve sweep rebuilt the whole complement-rule model for every θ — screen,
+      membership dict, dedup — though θ enters only at the anomaly step of prediction.
+      (OPENSET_COST had this wrong too, corrected in place: it said θ enters at `to_simple_model`
+      and estimated a 54% saving from hoisting only screen+memb; θ enters at *predict*, so the
+      entire model build **and** the class rule firing are θ-independent.) `simple_gaussian_predict_sweep`
+      computes the class firing once and sweeps θ over the anomaly step; `simple_gaussian_predict`
+      is unchanged bit-for-bit (it composes the same helpers), and `theta_sweep` now builds once
+      per (held-out class, seed). **~6× on the sweep, result-identical:** the restructured
+      `theta_sweep` emits rows bit-identical to the old per-θ path (2 classes × 2 seeds, 6.13×),
+      flags bit-identical across 2 seeds × 6 θ on a full RT-IOT2022 fold, preflight fis 5/5 at the
+      new pin. The headline Table 4.7b (single θ) is untouched. Verified on single folds by
+      construction, so no 120-fold rerun was needed.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because
