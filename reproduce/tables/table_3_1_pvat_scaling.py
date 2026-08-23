@@ -66,19 +66,19 @@ def _resolve_pvat():
             fn = getattr(m, name, None)
             if callable(fn):
                 print(f"  using pVAT: {mod}.{name}")
-                return fn
+                return fn, f"{mod}.{name}"
         except Exception:  # noqa: BLE001
             continue
     print("  [pVAT] could not resolve the repo entry point; pVAT column -> N/A")
     print(
         "         (edit _resolve_pvat() to point at the actual tribbleclustering API)"
     )
-    return None
+    return None, None
 
 
 def main():
     print("Table 3.1 -- pVAT vs. classical VAT reorder time")
-    pvat = _resolve_pvat()
+    pvat, pvat_name = _resolve_pvat()
     rows = []
     means = []  # (classical_mean, pvat_mean) per N, for the normalized view
     for n in N_GRID:
@@ -131,7 +131,9 @@ def main():
         rows,
         md_header=["N (points)", "classical VAT", "pVAT"],
         md_rows=md_rows,
-        note=f"Random 2-D point sets; classical reference capped at N<={NAIVE_CAP} "
+        note=f"Timed pVAT entry point: `{pvat_name}` (recorded so a reader knows "
+        f"which reorder was measured; several candidates resolve and they do "
+        f"different amounts of work). Random 2-D point sets; classical reference capped at N<={NAIVE_CAP} "
         "(it is genuinely cubic). **The Markdown columns are normalized against "
         "the worst arm in each row**: the slower arm is the 1.0x baseline and the "
         "faster one reads as 'this many times faster'. Ratios survive a change of "
