@@ -243,7 +243,20 @@ def extract_section_headers(md, filename):
     return sections
 
 
-def check_cross_references(md, registry, filename, warnings=None):
+def parse_checklist_ids(checklist_md):
+    """Every checklist item ID defined in CHECKLIST.md, e.g. {"C1", …, "C15", "B6"}.
+
+    An item is defined as a bold ID followed by an em-dash -- ``**C14 — …``.
+    Inline cross-references use double-bold with no dash (``**C10**``), so the
+    dash is what tells a definition from a mention. Parsing the file makes the
+    checklist cross-reference check self-maintaining: adding C16 to the checklist
+    stops it being flagged as a dangling reference, with no second list to keep
+    in sync -- which is exactly what went stale and flagged the real C14/C15.
+    """
+    return set(re.findall(r"\*\*([A-E]\d+)\s*[—-]", checklist_md))
+
+
+def check_cross_references(md, registry, filename, warnings=None, checklist_ids=None):
     """Check for cross-references and warn if targets don't exist.
 
     Looks for patterns like:
@@ -273,8 +286,13 @@ def check_cross_references(md, registry, filename, warnings=None):
         flags=re.MULTILINE,
     )
 
-    # Known checklist items from Chapter 7 Table 7.1 and prose
-    known_checklists = {"c1", "c3", "c5", "c8", "c10"}
+    # Checklist item IDs actually defined in CHECKLIST.md, parsed and passed in.
+    # The fallback list is only for callers that do not supply the parsed set;
+    # it is a lower bound and deliberately not the source of truth, because a
+    # hand-maintained list here is what went stale and flagged the real C14/C15.
+    if checklist_ids is None:
+        checklist_ids = {f"C{n}" for n in range(1, 16)}
+    known_c = {cid for cid in checklist_ids if cid.startswith("C")}
 
     # Build maps of known sections by type for validation
     goal_sections = {}  # "g1" -> section_id
@@ -354,28 +372,15 @@ def check_cross_references(md, registry, filename, warnings=None):
         except ValueError:
             pass
 
-    # Pattern 5: Checklist references like C1, C3, etc.
+    # Pattern 5: Checklist references like C1, C14. Validated against the IDs
+    # actually defined in CHECKLIST.md, so a reference is dangling only when no
+    # item defines it -- not merely because a second list here was not updated.
     for match in re.finditer(r"\bC(\d+)\b", md_for_validation):
-        checklist_num = match.group(1)
-        checklist_key = f"c{checklist_num}"
-        if checklist_key not in known_checklists:
-            # Only warn if it's a clear typo (unusual number)
-            if checklist_num not in [
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "13",
-            ]:
-                warnings.append(
-                    f"  ⚠ {filename}: Checklist item C{checklist_num} not found in Chapter 7"
-                )
+        cid = f"C{match.group(1)}"
+        if cid not in known_c:
+            warnings.append(
+                f"  ⚠ {filename}: Checklist item {cid} not found in {CHECKLIST_FILE}"
+            )
 
     # Pattern 6: Cross-reference links [text](§X.Y) or [text](#section-id)
     for match in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", md_for_validation):
@@ -636,6 +641,14 @@ def assemble():
     # Build registry after all files are read
     registry = build_section_registry(sections_by_file)
 
+    # Parse the checklist IDs once, so the cross-reference check validates C-refs
+    # against the items that actually exist rather than a hardcoded list.
+    checklist_path = os.path.join(HERE, CHECKLIST_FILE)
+    checklist_ids = set()
+    if os.path.exists(checklist_path):
+        with open(checklist_path, "r", encoding="utf-8") as f:
+            checklist_ids = parse_checklist_ids(f.read())
+
     # Second pass: anchor headings, strip editorial scaffolding, autolink refs.
     parts = []
     for rel in SECTIONS:
@@ -651,7 +664,9 @@ def assemble():
         print(f"  + {rel}")
 
         # Keep the existing goal/checklist cross-reference checks.
-        check_cross_references(raw_by_file[rel], registry, rel, link_warnings)
+        check_cross_references(
+            raw_by_file[rel], registry, rel, link_warnings, checklist_ids
+        )
 
         # Insert References section after bibliography.md but before appendix.md
         # The ::: {#refs} ::: div tells pandoc/citeproc where to place the bibliography
