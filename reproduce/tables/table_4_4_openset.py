@@ -145,28 +145,43 @@ def load_openset_data():
     return got[0], got[1], "Glass"
 
 
-def complement_rule(X_tr, y_tr, X_te):
-    """MoG classifier with the anomaly rule on. Returns a bool 'flagged unknown'."""
-    from tribblefis.gauss_data import AnomalyParameters
+def _fit_complement(X_tr, y_tr):
+    """Fit the MoG membership dict. Independent of the anomaly threshold theta,
+    which enters only at score time (see `_score_complement`), so a theta sweep
+    can fit once here and re-score across the whole grid."""
     from tribblefis.gauss_math import (
         calculate_gaussian_correlation,
         create_gaussian_membership_dict,
-        simple_gaussian_predict,
         take_top_features,
     )
 
     diffs = calculate_gaussian_correlation(X_tr, y_tr)
     _, top_vars = take_top_features(diffs, top_n=len(X_tr.columns))
-    memb = create_gaussian_membership_dict(X_tr, y_tr, top_n_var_names=top_vars)
+    return create_gaussian_membership_dict(X_tr, y_tr, top_n_var_names=top_vars)
+
+
+def _score_complement(memb, X_te, threshold):
+    """Score a fitted membership dict at one anomaly threshold. Returns a bool
+    'flagged unknown'. theta enters here only, via AnomalyParameters; the fit does
+    not see it, so `_score_complement(memb, X_te, th)` for varying `th` on a fixed
+    `memb` reproduces refitting at each `th` exactly."""
+    from tribblefis.gauss_data import AnomalyParameters
+    from tribblefis.gauss_math import simple_gaussian_predict
+
     params = AnomalyParameters(
         include_anomaly=True,
-        threshold=THRESHOLD,
+        threshold=threshold,
         label="anomaly",
         norm_conorm=CONORM,
         member_function="gaussian",
     )
     pred = simple_gaussian_predict(X_te, memb.to_simple_model(params))
     return np.asarray([str(p) == "anomaly" for p in pred], dtype=bool)
+
+
+def complement_rule(X_tr, y_tr, X_te):
+    """MoG classifier with the anomaly rule on. Returns a bool 'flagged unknown'."""
+    return _score_complement(_fit_complement(X_tr, y_tr), X_te, THRESHOLD)
 
 
 def rates(flagged, is_unknown):
@@ -182,43 +197,57 @@ def theta_sweep(X, y, classes, thetas, seeds=None):
 
     This is the experiment Figure 4.2 needs. A single theta says almost nothing --
     the question is whether the knob buys a usable trade at ANY setting.
+
+    theta enters the complement rule only at score time, so the MoG fit is the same
+    at every theta on the grid. We fit once per (held-out class, seed) and re-score
+    across the whole grid rather than refitting for each theta -- identical numbers,
+    with the sweep's fit cost cut from (#thetas x #classes x #seeds) to
+    (#classes x #seeds). A fit that raises is theta-independent, so it would have
+    contributed nothing at any theta in the refitting version either; skipping it
+    once here matches that.
     """
     seeds = seeds if seeds is not None else C.SEEDS
     print("\n  theta sweep (Figure 4.2):")
     print(f"    {'theta':>8} {'detection':>12} {'false alarm':>13} {'J':>8}")
-    rows = []
-    global THRESHOLD
-    keep = THRESHOLD
-    for th in thetas:
-        THRESHOLD = th
-        det, fa = [], []
-        for held in classes:
-            known = pd.Series(y).values != held
-            Xk, yk = X[known], pd.Series(y)[known]
-            if len(np.unique(yk)) < 2 or len(Xk) < 40:
+
+    # Fit once per (held-out class, seed); theta is applied at score time below.
+    fits = []
+    for held in classes:
+        known = pd.Series(y).values != held
+        Xk, yk = X[known], pd.Series(y)[known]
+        if len(np.unique(yk)) < 2 or len(Xk) < 40:
+            continue
+        for seed in seeds:
+            Xtr, Xte_k, ytr, _ = train_test_split(
+                Xk, yk, test_size=0.3, random_state=seed
+            )
+            Xte = pd.concat([Xte_k, X[~known]], ignore_index=True)
+            unk = np.r_[
+                np.zeros(len(Xte_k), bool), np.ones(int((~known).sum()), bool)
+            ]
+            try:
+                memb = _fit_complement(Xtr, ytr)
+            except Exception:  # noqa: BLE001
                 continue
-            for seed in seeds:
-                Xtr, Xte_k, ytr, _ = train_test_split(
-                    Xk, yk, test_size=0.3, random_state=seed
-                )
-                Xte = pd.concat([Xte_k, X[~known]], ignore_index=True)
-                unk = np.r_[
-                    np.zeros(len(Xte_k), bool), np.ones(int((~known).sum()), bool)
-                ]
-                try:
-                    d, f = rates(complement_rule(Xtr, ytr, Xte), unk)
-                    if np.isfinite(d) and np.isfinite(f):
-                        det.append(d)
-                        fa.append(f)
-                except Exception:  # noqa: BLE001
-                    pass
+            fits.append((memb, Xte, unk))
+
+    rows = []
+    for th in thetas:
+        det, fa = [], []
+        for memb, Xte, unk in fits:
+            try:
+                d, f = rates(_score_complement(memb, Xte, th), unk)
+                if np.isfinite(d) and np.isfinite(f):
+                    det.append(d)
+                    fa.append(f)
+            except Exception:  # noqa: BLE001
+                pass
         dm, _ = C.agg(det)
         fm, _ = C.agg(fa)
         if dm is None:
             continue
         print(f"    {th:8.3f} {dm:12.3f} {fm:13.3f} {dm-fm:+8.3f}")
         rows.append([f"{th:.3f}", f"{dm:.3f}", f"{fm:.3f}", f"{dm-fm:+.3f}"])
-    THRESHOLD = keep
     if rows:
         C.emit(
             "table_4_4b_theta_sweep",
