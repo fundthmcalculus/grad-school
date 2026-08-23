@@ -98,8 +98,7 @@ Three qualifications, none small. The study ran on a **different host** from thi
 | 1st | 0.796 ± 0.018 | **0.834 ± 0.045** | +0.038 |
 | 2nd | 0.841 ± 0.021 | **0.862 ± 0.033** | +0.021 |
 
-<!-- CONSOLIDATE: carries the superseded spreads (+/-0.241, +/-0.210) to make the point that the current arms clear theirs. The current spreads already show that on their own. -->
-Refinement helps most where the consequent model has least capacity, and the gradient across the range is the finding: +0.326 at zeroth order against +0.038 and +0.021, a factor of nine. A flat consequent can only place a constant per rule, so moving the membership functions is the only way left to improve the fit; once the consequent carries linear and quadratic terms it can absorb most of what better-placed antecedents would have bought.Every arm here clears its own spread, which was not true under the previous output partition: the zeroth-order arms then carried ±0.241 and ±0.210 and could not support a claim in either direction.
+Refinement helps most where the consequent model has least capacity, and the gradient across the range is the finding: +0.326 at zeroth order against +0.038 and +0.021, a factor of nine. A flat consequent can only place a constant per rule, so moving the membership functions is the only way left to improve the fit; once the consequent carries linear and quadratic terms it can absorb most of what better-placed antecedents would have bought. The zeroth-order gain dwarfs its spread; the higher-order gains are within a spread of it.
 
 A lift from roughly 0.88 to 0.92 does not reproduce, and 0.92 appears nowhere in a controlled run. The refined second-order arm's 0.862 ± 0.033 and the full-second-order basis's 0.861 ± 0.026 are this chapter's two best fuzzy $R^2$ values and they are the same number to within a thousandth, so the chapter has two routes to the same ceiling rather than a best one.
 
