@@ -32,10 +32,18 @@ OUTPUTS = os.path.join(HERE, "outputs")
 
 # "0.859", "0.859 ± 0.017", "+0.155", "1.2e-3 ± 4e-4"
 _NUM = r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
+# The number must not begin *inside* an identifier. Without this, `search`
+# takes the leftmost match and reads "R2=0.939" as the number 2 -- both sides
+# of a comparison parse as 2.0, so every R2 cell in every report came back
+# "within noise" with a delta of exactly zero, and regression drift was
+# invisible. "acc=0.729" was unaffected only because "acc" has no digit in it.
+_NOT_MID_IDENT = r"(?<![A-Za-z0-9_])"
 # Tolerant of the prefixes and units the tables actually use -- "R2=0.644 ± 0.015",
 # "0.60 ± 0.04 s", "7.78 ± 0.50 MPa". A strict full-string match silently treats
 # every one of those as an opaque string and reports no delta for it.
-_CELL = re.compile(rf"(?P<mean>{_NUM})\s*(?:(?:±|\+/-)\s*(?P<std>{_NUM}))?")
+_CELL = re.compile(
+    rf"{_NOT_MID_IDENT}(?P<mean>{_NUM})\s*(?:(?:±|\+/-)\s*{_NOT_MID_IDENT}(?P<std>{_NUM}))?"
+)
 
 # Cells whose value is a wall clock: expected to wobble between runs, so a
 # change there is reported but never called a regression.
