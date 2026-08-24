@@ -15,7 +15,6 @@ import report
 import write_artifact
 import write_benchmark
 
-
 # ---------------------------------------------------------------------------
 # report.md_table
 # ---------------------------------------------------------------------------
@@ -175,7 +174,12 @@ def test_fidelity_html_filters_zero_top_n():
 
 
 def _to_target_entry(total_seconds):
-    return dict(epoch=1.0, train_seconds=total_seconds - 0.1, total_seconds=total_seconds, rmse=9.0)
+    return dict(
+        epoch=1.0,
+        train_seconds=total_seconds - 0.1,
+        total_seconds=total_seconds,
+        rmse=9.0,
+    )
 
 
 def test_to_target_table_median_vs_never_branches():
