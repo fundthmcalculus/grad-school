@@ -15,7 +15,6 @@ smooth regressor, not a bank of regime models, is the right tool.
 """
 
 import os
-import sys
 
 import matplotlib
 
@@ -31,7 +30,9 @@ from sklearn.model_selection import cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
 
-sys.path.insert(0, "FuzzySystemsExperiments")
+from _ds02_harness import bootstrap  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments")
 from tribble_predictive_health import load_ncmapss  # noqa: E402
 from tribble_predictive_health.preprocessing import (  # noqa: E402
     apply_condition_correction,

@@ -15,7 +15,6 @@ order changes (feature selection is independent of it, so p is constant). If
 """
 
 import os
-import sys
 import time
 
 import matplotlib
@@ -24,7 +23,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, "FuzzySystemsExperiments")
+from _ds02_harness import bootstrap  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments")
 from tribble_predictive_health import (
     TribblePredictiveHealth,
     load_ncmapss,

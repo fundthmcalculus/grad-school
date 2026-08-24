@@ -2,14 +2,16 @@
 vs trapezoid (fast histogram + EM) vs triangular, on the winning full-2nd config
 and the lean 2nd-order config. Featurise once; write rows incrementally."""
 
-import os, sys, time
+import os, time
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np, pandas as pd
 
-sys.path.insert(0, "FuzzySystemsExperiments")
+from _ds02_harness import bootstrap
+
+bootstrap("FuzzySystemsExperiments")
 from tribble_predictive_health import TribblePredictiveHealth, load_ncmapss
 from tribble_predictive_health.preprocessing import (
     apply_condition_correction,

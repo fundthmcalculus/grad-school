@@ -20,16 +20,15 @@ import contextlib
 import csv
 import io
 import os
-import sys
 import time
 
-sys.path.insert(0, "FuzzySystemsExperiments")
-sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
 
+from _ds02_harness import bootstrap, rmse  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments", os.path.dirname(__file__))
 import cmapss_all_datasets as cad  # noqa: E402
-from _ds02_harness import rmse  # noqa: E402
 from tribble_predictive_health.preprocessing import cap_rul, onset_caps  # noqa: E402
 from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 

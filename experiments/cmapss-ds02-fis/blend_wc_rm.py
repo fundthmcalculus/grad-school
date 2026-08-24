@@ -19,15 +19,14 @@ import contextlib
 import csv
 import io
 import os
-import sys
 
-sys.path.insert(0, "FuzzySystemsExperiments")
-sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
+from _ds02_harness import bootstrap, rmse  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments", os.path.dirname(__file__))
 import cmapss_all_datasets as cad  # noqa: E402
-from _ds02_harness import rmse  # noqa: E402
 from tribble_predictive_health import TribblePredictiveHealth  # noqa: E402
 from tribble_predictive_health.metrics import nasa_score  # noqa: E402
 
