@@ -17,6 +17,14 @@
 %   (ariaschao2021ncmapss, ariaschao2022fusing, custode2022evolutionary), all
 %   metadata-[V]; custode2022's baseline figures are corroborated not read
 %   (CHECKLIST C15). Now 73 entries = 48 [V] + 23 [S] + 2 [?].
+% Updated 2026-08-21: +1 entry (deboor2001splines, [V]) from the E7/E8
+%   literature pass. Now 74 entries = 50 [V] + 23 [S] + 1 [?].
+% Updated 2026-08-24: +5 entries for the verification/validation and
+%   certifiable-AI framing pass (rudin2019stop [V]; rtca2011do178c,
+%   rtca2011do333 [S]; easa2023airoadmap, easa2024mlconcept [?] -- EASA's site
+%   was unreachable from the drafting environment, so both EASA entries rest on
+%   index listings rather than a title page, tracked as CHECKLIST E11).
+%   Now 79 entries = 51 [V] + 25 [S] + 3 [?].
 %
 % RESOLVED in 2026-08-08 verification pass:
 %   [V] parveen2013pvat     -- author field resolved from [given name] to Sherin
@@ -631,3 +639,65 @@
   note    = {Source of the public-file CNN (7.22) / MLP (8.34) DS02 re-runs cited
              in {\S}4.4.1; metadata verified, the specific figures corroborated
              from snippets but not read from the paper (CHECKLIST C15).}}
+
+% ---------------------------------------------------------------------------
+% Verification, validation, and certifiable AI (Ch1 {\S}1.1, Ch2 {\S}2.6,
+% Ch4 {\S}4.3.5, Ch6 {\S}6.3.4, Ch7 {\S}7.4, Ch8). Added 2026-08-24 with the
+% V&V framing pass. These entries support a *motivating* framing only -- no
+% objective in any of them is claimed as satisfied anywhere in the proposal.
+% ---------------------------------------------------------------------------
+
+@article{rudin2019stop,                          % [V] verified -- Nature MI 1:206-215, DOI resolves
+  author  = {Rudin, Cynthia},
+  title   = {Stop Explaining Black Box Machine Learning Models for High Stakes
+             Decisions and Use Interpretable Models Instead},
+  journal = {Nature Machine Intelligence},
+  volume  = {1}, number = {5}, pages = {206--215}, year = {2019},
+  doi     = {10.1038/s42256-019-0048-x},
+  note    = {The canonical statement of the interpretable-by-construction
+             position {\S}2.6 argues against post-hoc attribution.}}
+
+@techreport{rtca2011do178c,                      % [S] standards document; approval date verified, page count not
+  author      = {{RTCA, Inc.}},
+  title       = {{DO-178C}: Software Considerations in Airborne Systems and
+                 Equipment Certification},
+  institution = {RTCA, Inc.},
+  address     = {Washington, DC},
+  year        = {2011}, month = dec,
+  note        = {Approved December 2011; issued jointly with EUROCAE
+                 {ED-12C}. Cited for its objectives-and-traceability structure,
+                 not for any objective claimed satisfied here.}}
+
+@techreport{rtca2011do333,                       % [S] standards document; 13 Dec 2011 approval verified
+  author      = {{RTCA, Inc.}},
+  title       = {{DO-333}: Formal Methods Supplement to {DO-178C} and {DO-278A}},
+  institution = {RTCA, Inc.},
+  address     = {Washington, DC},
+  year        = {2011}, month = dec,
+  note        = {Approved 13 December 2011. Cited for admitting analysis over
+                 the whole input space in place of test sampling.}}
+
+@techreport{easa2023airoadmap,                   % [?] published 10 May 2023 per EASA newsroom; document number not confirmed
+  author      = {{European Union Aviation Safety Agency}},
+  title       = {Artificial Intelligence Roadmap 2.0: A Human-Centric Approach
+                 to {AI} in Aviation},
+  institution = {European Union Aviation Safety Agency},
+  address     = {Cologne, Germany},
+  year        = {2023}, month = may,
+  note        = {Roadmap 1.0 was February 2020; 2.0 published 10 May 2023.
+                 Verify the exact title page and any document number at proof
+                 stage (CHECKLIST E11) -- easa.europa.eu was unreachable from
+                 the drafting environment.}}
+
+@techreport{easa2024mlconcept,                   % [?] Issue 02 title/date from index listings only, not the title page
+  author      = {{European Union Aviation Safety Agency}},
+  title       = {{EASA} Concept Paper: Guidance for Level 1 \& 2 Machine
+                 Learning Applications, Issue 02},
+  institution = {European Union Aviation Safety Agency},
+  address     = {Cologne, Germany},
+  year        = {2024},
+  note        = {Issue 01 was titled ``First usable guidance for Level 1
+                 machine learning applications''; Issue 02 extends it to
+                 Level 2 and deepens learning assurance, AI explainability and
+                 ethics-based assessment. Exact issue date unconfirmed
+                 (CHECKLIST E11).}}

@@ -1280,12 +1280,41 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       sharper claim, *"bounded normalization helps, centred normalization actively hurts, and the
       bounded-input assumption is load-bearing"*, is a better answer to the obvious committee
       question and is already 90% measured. Pairs naturally with **A9** option C.
-- [ ] ⬜ **E10 — Low-stakes editorial decisions**, bundled since none is blocking and none
+- [ ] 🟨 **E10 — Low-stakes editorial decisions**, bundled since none is blocking and none
       needs a research answer: (a) Ch 1 — how heavily to invoke the XAI/regulation framing
       (secondary per author); (b) Ch 2 — whether to include a formal-methods/verification
       subsection (possible Kreinovich nod); (c) Ch 5 — consolidate the Options A–D membership
       presentation (recommend leading with D + the persistence ramp, A/B/C supporting);
       (d) engineering debt — de-duplicate the six caller scripts' predict loops in `tribble-fis`.
+      **(a) and (b) are decided as of 2026-08-24** (V&V framing pass; review in
+      `reviews/2026-08-24-prose-review-vv.md`). (a) *Lightly in Ch 1, substantively in Ch 2.*
+      §1.1 keeps two clauses and a pointer; the argument itself lives in §2.6's new
+      "Verification, validation, and certifiable AI" subsection, so the framing is stated once
+      where the interpretability definition already is, and Ch 1 does not carry an argument it
+      cannot finish. (b) *No separate formal-methods subsection; folded into §2.6.* The
+      DO-333 nod is one sentence inside that subsection — formal methods enter as the reason an
+      analysable rule base is worth more to a certification argument than a weight matrix, which
+      is the only load the document needs them to carry. **The Kreinovich nod is dropped for now,
+      and for a stated reason:** a search for a single citable Kreinovich paper joining fuzzy
+      systems to formal verification or certification turned up the interval-computations line
+      (Kearfott & Kreinovich) and the avionics formal-methods line separately, with nothing
+      spanning both. Rather than hang a subsection on a citation that does not exist, §2.6 cites
+      the standards directly. If a specific paper is wanted, it needs a real search, not a
+      remembered one. **(c) and (d) remain open.**
+- [ ] ⬜ **E11 — Verify the two EASA entries at proof stage, and re-check the V&V framing's
+      boundary language.** Two halves. *The citations:* `easa2023airoadmap` and
+      `easa2024mlconcept` are `[?]` because `easa.europa.eu` is unreachable from the drafting
+      environment, so both rest on index and news listings rather than a title page. The
+      Roadmap 2.0 date (10 May 2023) is corroborated twice; the Concept Paper Issue 02's exact
+      issue date is **not** established, and its entry carries a year with no month for that
+      reason. Both are cited only for what a standard or roadmap *asks for*, never for a number,
+      so a metadata correction cannot move a result — which is why this is proof-stage work and
+      not blocking. *The framing:* the V&V and certifiable-AI material added 2026-08-24 spans
+      §1.1, §2.6, §4.3.5, §6.3.4, §7.4 and Ch 8, and every one of those passages states the same
+      boundary — no certification artifact, no DO-178C or DO-333 objective claimed, no assurance
+      case. A committee will test that boundary, so any later edit to one of those six passages
+      needs the other five re-read. §7.4 is the load-bearing one: it is where the framing is
+      recorded as an exposure with nothing in the runway behind it.
 
 
 ## Appendix — G2 datasets, verified 2026-07-31
