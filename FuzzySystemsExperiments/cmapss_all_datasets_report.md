@@ -6,8 +6,8 @@ Datasets pooled: DS01-005, DS02-006, DS03-012, DS04, DS05, DS06, DS07, DS08a-009
 
 | model | input | per-sample RMSE | per-engine RMSE | per-engine NASA | fit s |
 |---|---|---:|---:|---:|---:|
-| `whole_cycle` | 18 real | 15.86 | 9.20 | 85 | 0.9 |
-| `raw_memory` | 18 real | 14.87 | 13.13 | 175 | 23.6 |
+| `whole_cycle` | 18 real | 15.44 | 12.07 | 320 | 1.0 |
+| `raw_memory` | 18 real | 15.58 | 17.00 | 655 | 19.1 |
 
 Per-sample favours `raw_memory`; per-engine (the canonical C-MAPSS protocol, one RUL per test engine at its last cycle) favours `whole_cycle` -- the scoring convention decides the winner.
 
@@ -17,9 +17,9 @@ Blending the two models' per-cycle predictions `80% whole_cycle + 20% raw_memory
 
 | model | per-cycle RMSE | per-engine RMSE | per-engine NASA |
 |---|---:|---:|---:|
-| `whole_cycle` alone | -- | 9.20 | -- |
-| `raw_memory` alone | -- | 13.13 | -- |
-| **blend @ 0.8** | 15.25 | **8.56** | 84 |
+| `whole_cycle` alone | -- | 12.07 | -- |
+| `raw_memory` alone | -- | 17.00 | -- |
+| **blend @ 0.8** | 14.89 | **11.14** | 216 |
 
 The blend beats *both* models on per-engine RMSE and dominates `whole_cycle` on every metric -- the best per-engine number the pooled pipeline produces.
 
@@ -27,12 +27,12 @@ The blend beats *both* models on per-engine RMSE and dominates `whole_cycle` on 
 
 | dataset | `whole_cycle` | `raw_memory` |
 |---|---:|---:|
-| DS01-005 | 13.37 | 13.30 |
-| DS02-006 | 16.13 | 10.38 |
-| DS03-012 | 14.40 | 13.04 |
-| DS04 | 21.70 | 18.24 |
-| DS05 | 14.97 | 13.23 |
-| DS06 | 16.17 | 16.03 |
-| DS07 | 17.61 | 18.89 |
-| DS08a-009 | 13.33 | 13.07 |
-| DS08c-008 | 13.08 | 13.20 |
+| DS01-005 | 12.86 | 13.06 |
+| DS02-006 | 14.43 | 9.67 |
+| DS03-012 | 13.97 | 12.78 |
+| DS04 | 20.58 | 18.19 |
+| DS05 | 14.11 | 13.16 |
+| DS06 | 17.02 | 22.75 |
+| DS07 | 17.35 | 19.02 |
+| DS08a-009 | 13.42 | 12.42 |
+| DS08c-008 | 12.89 | 13.53 |
