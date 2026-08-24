@@ -25,6 +25,13 @@
 %   was unreachable from the drafting environment, so both EASA entries rest on
 %   index listings rather than a title page, tracked as CHECKLIST E11).
 %   Now 79 entries = 51 [V] + 25 [S] + 3 [?].
+% Updated 2026-08-24 (second pass, E10(b) restored on author instruction):
+%   +3 entries for the Kreinovich nod and the formal-verification line --
+%   cohen2022whyfuzzy [V], arnett2021formal [V] (both on their SpringerLink
+%   indexed records; the pages are egress-blocked, so E11 re-checks them), and
+%   arnett2019iteratively [?], which is the completed dissertation that the
+%   file's oldest [?] (arnett2018proposal) was the proposal for.
+%   Now 82 entries = 53 [V] + 25 [S] + 4 [?].
 %
 % RESOLVED in 2026-08-08 verification pass:
 %   [V] parveen2013pvat     -- author field resolved from [given name] to Sherin
@@ -701,3 +708,53 @@
                  Level 2 and deepens learning assurance, AI explainability and
                  ethics-based assessment. Exact issue date unconfirmed
                  (CHECKLIST E11).}}
+
+@incollection{cohen2022whyfuzzy,                 % [V] metadata from the SpringerLink indexed record (page egress-blocked; two independent listings agree)
+  author    = {Cohen, Kelly and Bokati, Laxman and Ceberio, Martine and
+               Kosheleva, Olga and Kreinovich, Vladik},
+  title     = {Why Fuzzy Techniques in Explainable {AI}? Which Fuzzy
+               Techniques in Explainable {AI}?},
+  booktitle = {Explainable {AI} and Other Applications of Fuzzy Techniques
+               (NAFIPS 2021)},
+  series    = {Lecture Notes in Networks and Systems},
+  volume    = {258}, pages = {74--78}, year = {2022},
+  publisher = {Springer}, address = {Cham},
+  doi       = {10.1007/978-3-030-82099-2_7},
+  note      = {The Kreinovich nod {\S}2.6 owed (CHECKLIST E10(b)): the general
+               case for fuzzy techniques as the route to explainable AI, plus
+               the caveat that *which* fuzzy operations are right is
+               problem-dependent -- which lands on {\S}4.3.5's untested
+               conorm-family question. Re-confirm at proof stage (E11).}}
+
+@incollection{arnett2021formal,                  % [V] metadata from the SpringerLink indexed record (page egress-blocked)
+  author    = {Arnett, Timothy and Ernest, Nicholas and Kunkel, Brandon and
+               Boronat, Hector},
+  title     = {Formal Verification of a Genetic Fuzzy System for Unmanned
+               Aerial Vehicle Navigation and Target Capture in a Safety
+               Corridor},
+  booktitle = {Fuzzy Information Processing 2020 (NAFIPS 2020)},
+  editor    = {Bede, Barnab{\'a}s and Ceberio, Martine and De Cock, Martine
+               and Kreinovich, Vladik},
+  series    = {Advances in Intelligent Systems and Computing},
+  volume    = {1337}, pages = {361--372}, year = {2021},
+  publisher = {Springer}, address = {Cham},
+  doi       = {10.1007/978-3-030-81561-5_30},
+  note      = {A fuzzy controller actually taken through formal verification
+               against a behavioural safety specification, in aerospace, on the
+               analyzability constraint set {\S}2.1 shares. Conference was
+               NAFIPS 2020; volume published 2021. Re-confirm at proof stage
+               (E11).}}
+
+@phdthesis{arnett2019iteratively,                % [?] title/year from search listings + an OhioLINK accession number; the ETD record itself was egress-blocked
+  author  = {Arnett, Timothy J.},
+  title   = {Iteratively Increasing Complexity During Optimization for
+             Formally Verifiable Fuzzy Systems},
+  school  = {University of Cincinnati},
+  type    = {PhD dissertation},
+  year    = {2019},
+  note    = {The completed dissertation that {\tt arnett2018proposal} was the
+             April 2018 proposal for -- which is what resolves what that
+             placeholder-titled entry was pointing at. OhioLINK accession
+             {\tt ucin156387481300899} surfaced in search; the ETD record was
+             unreachable from the drafting environment, so title and year rest
+             on index listings (CHECKLIST E11).}}

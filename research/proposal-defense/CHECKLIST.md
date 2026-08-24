@@ -1294,13 +1294,24 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       cannot finish. (b) *No separate formal-methods subsection; folded into §2.6.* The
       DO-333 nod is one sentence inside that subsection — formal methods enter as the reason an
       analysable rule base is worth more to a certification argument than a weight matrix, which
-      is the only load the document needs them to carry. **The Kreinovich nod is dropped for now,
-      and for a stated reason:** a search for a single citable Kreinovich paper joining fuzzy
-      systems to formal verification or certification turned up the interval-computations line
-      (Kearfott & Kreinovich) and the avionics formal-methods line separately, with nothing
-      spanning both. Rather than hang a subsection on a citation that does not exist, §2.6 cites
-      the standards directly. If a specific paper is wanted, it needs a real search, not a
-      remembered one. **(c) and (d) remain open.**
+      is the only load the document needs them to carry. **The Kreinovich nod is in, and it is
+      load-bearing rather than decorative** (a first pass dropped it after a bad search; the
+      author overruled that, correctly). The citation is Cohen, Bokati, Ceberio, Kosheleva &
+      Kreinovich, *"Why Fuzzy Techniques in Explainable AI? Which Fuzzy Techniques in Explainable
+      AI?"* (NAFIPS 2021; LNNS 258:74–78) — `cohen2022whyfuzzy`. It earns its place twice: it is
+      the general argument that fuzzy technique is the route to explainable AI, and its second
+      half — *which* fuzzy operations are right is problem-dependent — lands directly on §4.3.5's
+      own untested conorm-family question, so §2.6 cites it as a caveat this work owes rather
+      than as an endorsement it collects. Two further finds came out of the same search and are
+      worth more than the nod: **`arnett2021formal`** (Arnett, Ernest, Kunkel & Boronat, NAFIPS
+      2020; AISC 1337:361–372) is a fuzzy UAV navigation controller *actually taken through formal
+      verification* against a behavioural safety specification — an existence proof for the model
+      family, in aerospace, on the constraint set §2.1 shares — and the volume is one Kreinovich
+      co-edited. And **`arnett2019iteratively`** resolves what this file's lone `[?]`,
+      `arnett2018proposal`, was a proposal *for*: the completed UC dissertation
+      *"Iteratively Increasing Complexity During Optimization for Formally Verifiable Fuzzy
+      Systems"* (2019). Both are now cited in §2.1, where the `.bib` header had claimed
+      `arnett2018proposal` was cited all along and it was not. **(c) and (d) remain open.**
 - [ ] ⬜ **E11 — Verify the two EASA entries at proof stage, and re-check the V&V framing's
       boundary language.** Two halves. *The citations:* `easa2023airoadmap` and
       `easa2024mlconcept` are `[?]` because `easa.europa.eu` is unreachable from the drafting
@@ -1309,7 +1320,15 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       issue date is **not** established, and its entry carries a year with no month for that
       reason. Both are cited only for what a standard or roadmap *asks for*, never for a number,
       so a metadata correction cannot move a result — which is why this is proof-stage work and
-      not blocking. *The framing:* the V&V and certifiable-AI material added 2026-08-24 spans
+      not blocking. Three more entries from the same pass need the same proof-stage pass, for the
+      same egress reason: `cohen2022whyfuzzy` and `arnett2021formal` are `[V]` on their
+      SpringerLink *indexed records* (title, authors, series, volume, pages, DOI, two independent
+      listings agreeing) with the pages themselves unreachable, and `arnett2019iteratively` is
+      `[?]` — its title and year come from index listings plus an OhioLINK accession number
+      (`ucin156387481300899`) that surfaced in search but whose ETD record was blocked. That last
+      one is the interesting item: if it confirms, this file's lone long-standing `[?]`
+      (`arnett2018proposal`, placeholder title *"Dissertation Proposal"*) is resolvable to a real
+      document rather than merely re-checked, so **verify these two together, not separately**. *The framing:* the V&V and certifiable-AI material added 2026-08-24 spans
       §1.1, §2.6, §4.3.5, §6.3.4, §7.4 and Ch 8, and every one of those passages states the same
       boundary — no certification artifact, no DO-178C or DO-333 objective claimed, no assurance
       case. A committee will test that boundary, so any later edit to one of those six passages

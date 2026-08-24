@@ -5,8 +5,8 @@ Scope: all thirteen `research/proposal-defense/prose/*.md` (≈65,500 words), `r
 asked to check the document's treatment of **verification and validation**, specifically to
 include **certifiable AI**. Findings below are marked ✅ fixed in this pass or ⬜ left open.
 
-`build_pdf.py` re-run after every edit: **661 section references hyperlinked, all
-cross-references verified, 79 bibliography entries.** (No PDF — `pandoc` is not installed in
+`build_pdf.py` re-run after every edit: **all cross-references verified, 82 bibliography
+entries.** (No PDF — `pandoc` is not installed in
 this environment. The assembly and validation stage, which is the part these edits could break,
 runs clean.)
 
@@ -112,11 +112,11 @@ Two temptations declined, recorded here because the absence is a decision:
    best flat figures quoted here include it." Claiming seed-determinism would have been exactly
    the kind of plausible-sounding, unverified sentence `WORKINGDOC.md` §7 is about. The
    subsection uses the *bounded-failure* property instead, which is measured.
-2. **A Kreinovich formal-methods subsection.** `CHECKLIST` E10(b) suggested one. A search for a
-   single citable Kreinovich paper joining fuzzy systems to formal verification or certification
-   found the interval-computations line (Kearfott & Kreinovich) and the avionics formal-methods
-   line separately, with nothing spanning both. Rather than hang a subsection on a citation that
-   does not exist, DO-333 is cited directly and E10(b) records the search and its result.
+2. **A Kreinovich formal-methods subsection**, as a *separate section*. `CHECKLIST` E10(b)
+   floated one; the material is folded into §2.6 instead, so the interpretability definition and
+   the V&V argument sit together rather than in two places that have to be kept consistent. The
+   Kreinovich citation itself is **in** — see V11, which supersedes an earlier version of this
+   entry that dropped it on a bad search.
 
 ### ✅ V7 — `build_pdf.py` printed a hardcoded, stale bibliography count
 
@@ -163,19 +163,68 @@ which is part of why V6.1 declined the determinism claim.
 
 ---
 
+### ✅ V11 — The Kreinovich nod E10(b) asked for is real, and it is load-bearing
+
+A first pass of this review dropped it, reporting that no single Kreinovich paper spans fuzzy
+systems and formal verification. That was a bad search, and the author overruled it. A proper one
+finds the paper immediately:
+
+> Cohen, K., Bokati, L., Ceberio, M., Kosheleva, O. & Kreinovich, V., **"Why Fuzzy Techniques in
+> Explainable AI? Which Fuzzy Techniques in Explainable AI?"** *Explainable AI and Other
+> Applications of Fuzzy Techniques* (NAFIPS 2021), LNNS **258**:74–78, Springer, 2022.
+> DOI 10.1007/978-3-030-82099-2_7.
+
+It earns a citation twice over rather than serving as a name-drop. The first half is the general
+argument §2.6 needs — fuzzy technique as the route to explainable AI. The second half is a
+caveat this dissertation should own rather than inherit quietly: **which** fuzzy operations are
+the right ones is problem-dependent, not settled once. That lands directly on an open question
+already in this document — §4.3.5 runs a Hamacher conorm inherited from `beth-anomaly.py` and
+states outright that whether the family matters to detection is untested. So §2.6 cites it as a
+debt, not an endorsement. The venue is also this author's own (NAFIPS 2025 Banff, NAFIPS 2026
+El Paso, per §1.3).
+
+### ✅ V12 — The same search turned up two things worth more than the nod
+
+**An existence proof.** Arnett, T., Ernest, N., Kunkel, B. & Boronat, H., "Formal Verification of
+a Genetic Fuzzy System for Unmanned Aerial Vehicle Navigation and Target Capture in a Safety
+Corridor," *Fuzzy Information Processing 2020* (NAFIPS 2020), AISC **1337**:361–372, Springer,
+2021, DOI 10.1007/978-3-030-81561-5_30 — in a volume Kreinovich co-edited. This is a fuzzy
+controller **actually taken through formal verification** against a behavioural safety
+specification, in aerospace, on the analyzability constraint set §2.1 adopts. It changes what
+§2.6 can say: the model family is not reviewable only in principle, someone has verified a member
+of it. §2.6 now says exactly that, and then the sentence that keeps it honest — "What nobody has
+verified is one of mine." The boundary paragraph was tightened accordingly: "an interpretable rule
+base makes a review possible, and Arnett et al. show the family admits one, but neither fact is
+evidence about a model I built."
+
+**A resolved `[?]`, and an uncited entry.** `arnett2018proposal` has been this file's oldest
+unresolved entry — placeholder title *"Dissertation Proposal"*, and a `.bib` header note saying
+it was "Cited in section 2.1." It was **not cited anywhere in the prose**, and §2.1's
+analyzability constraints were asserted with no citation and no stated reason — so the entry's
+recorded purpose ("parallel use of the same FIS constraint set") existed only in the `.bib`.
+Both halves fixed: §2.1 now cites it, and gives the constraints their reason. And the proposal now
+has a document to be a proposal *for* — Arnett's completed UC dissertation, *"Iteratively
+Increasing Complexity During Optimization for Formally Verifiable Fuzzy Systems"* (2019), added
+as `arnett2019iteratively`. **E11 says to verify the two together**, since confirming the 2019
+title is what would resolve the 2018 placeholder rather than merely re-check it.
+
+This is the finding that justifies the whole detour: the document's link to the formal-methods
+literature was already half-present, as a bibliography entry pointing at a section that never
+cited it.
+
 ## What changed
 
 | File | Change |
 |---|---|
 | `prose/01-introduction.md` | §1.1: the "regulators and safety engineers" clause now names explainability-as-certification-objective and points to §2.6, with the boundary stated in the same sentence. Light, per E10(a). |
-| `prose/02-background.md` | §2.6: `rudin2019stop` added to the SHAP paragraph; **new subsection "Verification, validation, and certifiable AI"** — terminology, DO-178C/DO-333, EASA learning assurance, why a rule base is the artifact those frameworks want, the two properties the document already reports that read as V&V arguments, and the boundary in bold. |
+| `prose/02-background.md` | §2.1: the analyzability constraints now state *why* they are made, and credit Arnett's constraint set and the formally-verified UAV controller (V12). §2.6: `rudin2019stop` added to the SHAP paragraph; **new subsection "Verification, validation, and certifiable AI"** — terminology, DO-178C/DO-333, EASA learning assurance, why a rule base is the artifact those frameworks want, the two properties the document already reports that read as V&V arguments, the Kreinovich nod and the Arnett existence proof (V11, V12), and the boundary in bold. |
 | `prose/04-fast-fis-synthesis-mog.md` | §4.3.5: one paragraph reading the *none of the above* rule as an operational-design-domain monitor that is part of the model — with §4.4's limits attached (max-membership degeneracy at the shipped θ, level with an isolation forest on Glass, 214 samples supports no monitoring claim). |
 | `prose/06-hierarchical-refined-fis.md` | §6.3.4: the Ruspini export named as the one output a V&V process could take as an input, with "no such process has been run on it" and the G6-measures-something-else caveat. §6.4: metaphorical "certified" → "passed" (V4). |
-| `prose/07-goals-for-completion.md` | §7.4: new lead risk paragraph — the framing is motivation with nothing measured behind it, G6 is not it, and if a committee wants it inside this dissertation something in Table 7.1 comes out. |
+| `prose/07-goals-for-completion.md` | §7.4: new lead risk paragraph (seven invocation sites named) — the framing is motivation with nothing measured behind it, G6 is not it, and if a committee wants it inside this dissertation something in Table 7.1 comes out. |
 | `prose/08-conclusion.md` | The "regulated domains, safety engineering, aerospace" sentence now names V&V in the systems sense and carries the same boundary, pointing at §7.4. |
-| `references.bib` | +5 entries (79 total): `rudin2019stop` `[V]`; `rtca2011do178c`, `rtca2011do333` `[S]`; `easa2023airoadmap`, `easa2024mlconcept` `[?]`. Header count note updated, including the 2026-08-21 `deboor` entry the header had not recorded. |
-| `prose/bibliography.md` | 2026-08-24 update block (79 = 51 `[V]` + 25 `[S]` + 3 `[?]`), new "Verification, validation, and certifiable AI" reading-guide group, `rudin2019stop` added to the XAI group. |
-| `CHECKLIST.md` | **E10** → 🟨: (a) and (b) decided and recorded, including the Kreinovich search result; (c)/(d) still open. New **E11** for the EASA proof-stage verification and for keeping the six boundary passages consistent. |
+| `references.bib` | +8 entries (82 total): `rudin2019stop` `[V]`; `rtca2011do178c`, `rtca2011do333` `[S]`; `easa2023airoadmap`, `easa2024mlconcept` `[?]`; `cohen2022whyfuzzy`, `arnett2021formal` `[V]` on their SpringerLink indexed records; `arnett2019iteratively` `[?]`. Header count note updated, including the 2026-08-21 `deboor` entry the header had not recorded. |
+| `prose/bibliography.md` | 2026-08-24 update block (82 = 53 `[V]` + 25 `[S]` + 4 `[?]`), new "Verification, validation, and certifiable AI" reading-guide group, `rudin2019stop` added to the XAI group, and the `arnett2018proposal` was-never-actually-cited note (V12). |
+| `CHECKLIST.md` | **E10** → 🟨: (a) and (b) decided and recorded — (b) with the Kreinovich citation in, plus the two Arnett finds; (c)/(d) still open. New **E11** for the proof-stage verification of five entries (the two EASA, the two Springer, and the Arnett dissertation — the last paired with the long-standing `arnett2018proposal` `[?]`) and for keeping the seven boundary passages consistent. |
 | `build_pdf.py` | Bibliography entry count no longer hardcoded (V7). |
 
 ## Verdict
@@ -184,8 +233,9 @@ The document's V&V treatment was not weak, it was **missing** — and it was mis
 tracked checklist item, in a document whose central argument needs it. The gap is now closed on
 the terms the rest of the proposal is written on: the framing is stated once where the
 interpretability definition lives, invoked briefly in five other places, cited to the actual
-standards rather than to a remembered paper, bounded explicitly everywhere it appears, and
-recorded in §7.4 as an exposure with nothing in the runway behind it. Nothing here is a new
+standards *and* to the fuzzy-systems literature that has been making the same case (Kreinovich et
+al. for the argument, Arnett et al. for a fuzzy controller actually verified), bounded explicitly
+everywhere it appears, and recorded in §7.4 as an exposure with nothing in the runway behind it. Nothing here is a new
 result and nothing here is scheduled as one. The honest one-line position for the defense, and
 the one the prose now states: **this work makes a certifiable model family available; it
 certifies nothing.**
