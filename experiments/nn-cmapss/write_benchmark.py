@@ -88,7 +88,7 @@ def to_target_table(res: dict) -> str:
     for arm, g in df.groupby("arm", sort=False):
         row = {"model": report.ARM_LABEL.get(arm, arm)}
         for t in targets:
-            vals = [r["to_target"].get(t) for _, r in g.iterrows()]
+            vals = [v.get(t) for v in g["to_target"]]
             got = [v["total_seconds"] for v in vals if v]
             row[t] = f"{np.median(got):.3f}" if len(got) > len(vals) / 2 else "never"
         rows.append(row)
