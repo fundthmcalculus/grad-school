@@ -855,3 +855,15 @@ the baselines on RT-IOT2022: J peaks at **θ = 0.80 (+0.391**, detection 0.901,
 false alarm 0.510), still below Isolation Forest's **+0.534** at θ = 0.99. That
 answers the open question §4.4 and Figure 4.2 both flag as the missing RT-IOT2022
 row. Curve in `table_4_4b_theta_sweep.{md,csv}`; headline in `table_4_4_openset.{md,csv}`.
+
+*Caveat — these are current-pin measurements, not a re-quote.* Per **D8**,
+`_kmeans_labels_1d` swapped k-means++ for a uniform-random start (tribble-fis
+#95), and it reaches the complement rule through
+`create_gaussian_membership_dict → fit_gaussians → fit_gaussian_mixture_1d`. So
+these digits measure the current code, not the code the prose's Table 4.7b quotes;
+**do not overwrite Table 4.7b from this archive until D8 is settled.** The
+qualitative reading (the complement rule loses to isolation forest and no swept θ
+closes the gap) is robust to any plausible D8 shift — the deficit is 0.14–0.17
+against an init effect that moved the five-seed headline by ~0.03 — but the exact
+values are not. C4/D8 in `research/proposal-defense/CHECKLIST.md` carry the
+decision.
