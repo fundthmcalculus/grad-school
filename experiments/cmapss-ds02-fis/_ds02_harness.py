@@ -9,7 +9,20 @@ off the *training* residual directly. Run from the repo root.
 
 import sys as _sys
 
-_sys.path.insert(0, "FuzzySystemsExperiments")
+
+def bootstrap(*paths):
+    """Insert repo-root-relative sys.path entries needed by this experiments
+    directory's scripts (e.g. "FuzzySystemsExperiments",
+    "gated-minimax-selection", or a script's own ``os.path.dirname(__file__)``
+    to reach sibling modules like this one). Paths are inserted at position 0
+    in the given order -- same paths, same order, same relative-vs-absolute
+    semantics as the inline ``sys.path.insert(0, ...)`` calls this replaces.
+    """
+    for p in paths:
+        _sys.path.insert(0, p)
+
+
+bootstrap("FuzzySystemsExperiments")
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 

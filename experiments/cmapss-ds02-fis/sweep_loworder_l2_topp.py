@@ -15,7 +15,6 @@ fit_featurized, so each of the ~80 fits is just cap/scale/solve.
 """
 
 import os
-import sys
 
 import matplotlib
 
@@ -24,7 +23,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, "FuzzySystemsExperiments")
+from _ds02_harness import bootstrap  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments")
 from tribble_predictive_health import (
     TribblePredictiveHealth,
     load_ncmapss,
