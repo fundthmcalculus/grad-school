@@ -185,6 +185,17 @@ that is what `--archive-only` recovers).
   docstring *before* running, and print evidence that the variable you claim
   to have varied actually changed something — an invariance result is
   worthless if the knob never bit.
+- **`fis-tsp-strategy`'s test suite failing locally is a missing dataset, not
+  a regression.** `test_invariants.py` reads `.tsp` instance files out of
+  `ClusteringExperiments/tsplib/`, which are fetched on demand (see that
+  directory's `download.py`), not vendored. A `FileNotFoundError` on a
+  `berlin52.tsp`-style path means fetch the instances first, not that the
+  solver code broke.
+- **The `# TODO`/`# HACK` markers in `FuzzySystemsExperiments/{iot,turbine,wec-p1,wec}.py`
+  are live open research questions, not dead code.** ("Handle 3rd-order
+  optimization?", "top-n=3!") Resolving them is a methods decision, not a
+  cleanup — a refactoring pass should leave them alone rather than guess at
+  the answer or delete the marker.
 
 ## Submodule conventions
 
