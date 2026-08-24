@@ -84,17 +84,34 @@ def test_insertion_order_most_recent_first(saved_sys_path):
     """Mirrors find_slow_problem.py's real usage of two subpaths.
 
     Each new path is inserted at position 0, so the *last* subpath tuple
-    passed ends up at ``sys.path[0]``, the first subpath tuple next, and the
-    caller's own directory (``here``) after that -- most-recently-inserted
+    passed ends up ahead of the first subpath tuple, which in turn ends up
+    ahead of the caller's own directory (``here``) -- most-recently-inserted
     first.
+
+    Other test modules collected in the same pytest session (e.g. pytest's
+    own rootdir-based sys.path insertion, or unrelated fixtures) can leave
+    entries anywhere in ``sys.path`` before this test runs, so asserting
+    exact absolute indices (``sys.path[0]``, ``sys.path[2]``, ...) is not
+    reliable outside this file's own isolated run. Instead, scrub any
+    pre-existing copies of the three paths under test right before calling
+    ``add_repo_paths``, so their *relative* order after the call is
+    unambiguous regardless of what else shares the session.
     """
+    expected_here = os.path.dirname(os.path.abspath(__file__))
+    expected_repo = os.path.dirname(os.path.dirname(expected_here))
+    tables_path = os.path.join(expected_repo, "reproduce", "tables")
+    chaos_path = os.path.join(expected_repo, "AnalyticalDynamics", "chaos")
+
+    for stale in (expected_here, tables_path, chaos_path):
+        while stale in sys.path:
+            sys.path.remove(stale)
+
     here, repo = add_repo_paths(
         __file__, ("reproduce", "tables"), ("AnalyticalDynamics", "chaos")
     )
+    assert here == expected_here
+    assert repo == expected_repo
 
-    tables_path = os.path.join(repo, "reproduce", "tables")
-    chaos_path = os.path.join(repo, "AnalyticalDynamics", "chaos")
-
-    assert sys.path[0] == chaos_path
-    assert sys.path[1] == tables_path
-    assert sys.path[2] == here
+    assert sys.path.index(chaos_path) < sys.path.index(tables_path) < sys.path.index(
+        here
+    )
