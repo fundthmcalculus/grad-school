@@ -651,6 +651,7 @@ exactly zero.
 | &nbsp; | &nbsp; | **Was the citable run.** All 13 table generators green, the GPU table included in the same pass for the first time (1380 s of the 48 min), 19 of 19 drawable figures, the Chapter 5 driver and its opt-in scaling benchmark, and the Chapter 3 cluster experiments. At `tribble-fis 4b33a0d`, which is three functional PRs past the previous run of record — note 18. Read its `PROVENANCE.txt` in full: the archive step was recovered with `--archive-only` and says so. |
 | **Full trace, 10 seeds (run of record)** | `outputs/uniform-2026-08-03/` | **The citable run.** All 14 table generators green at ten seeds, at `tribble-fis 6ddb802`. Differs from `full-2026-08-03` by one library default: `partition_output` cuts the target at equal width rather than equal frequency with pinned extremes — note 19. Its `table_g5_output_partitioning` was backfilled to add 0th order, the axis that settled G5. Read its `PROVENANCE.txt` addendum: the header records `tribble-fis 1a83df8`, a squash-merged branch commit, and the run spans two SHAs whose `src/` trees are identical. |
 | Preprocessing control | `outputs/splitfirst-2026-08-03/` | Table 6.1's flat arms with the target scale, output partition and feature scaler fit on the training fold only. Bounds the transductive-preprocessing defect at inside-the-seed-spread on every exposed row — `outputs/SPLIT_FIRST_LEAK.md`. |
+| Full trace, 10 seeds | `outputs/verify-fis1435811-2026-08-23/` | First full sweep at the current pin (`tribble-fis 1435811`, grad-school `fc64728`), and the first citable ten-seed archive there. All 17 generators green; preflight all-invariants-pass — its `preflight.txt` records the `INSTALL-FRESH` guard passing on a freshly rebuilt wheel, which the first attempt caught stale (note 21). Every table byte-identical to `bumped-0764bc5-2026-08-22` except the timing tables (noise) and RT-IOT2022's `table_4_4b`, which is a **correction**, not a regression — note 21. |
 
 **Note 18 — the 2026-08-03 full trace, and the one result in it that changes a
 chapter's claim.** `tribble-fis` moved `d0efefc` → `4b33a0d` between the previous run
@@ -825,3 +826,44 @@ per-condition values, which the checker can see. And a note in `PROVENANCE_MAP.m
 is not a correction: it records that someone knew, which is worse than not knowing
 if the chapter is what gets read. Findings belong in the prose or in a tracked
 checklist item, not only here.
+
+**Note 21 — the RT-IOT2022 operating curve now exists at ten seeds, and it
+corrects an inconsistency in the prior archive rather than regressing.** C17
+(grad-school #139) hoisted the θ-independent work out of `theta_sweep` — the
+screen, the membership dict and the class-rule firing are all θ-independent, so
+the sweep now builds the model once per (held-out class, seed) and varies θ over
+the anomaly step alone via `simple_gaussian_predict_sweep` (tribble-fis #176).
+`table_4_4_openset` fell from **3h38m to 82 min** on the workstation of record, so
+the ten-seed RT-IOT2022 curve that §4.4 calls "roughly a day of compute" and
+skips is now part of a routine full sweep.
+
+*The restructure is bit-identical, proven at scale.* `complement_rule_sweep`
+matched per-θ `complement_rule` on **0 of 182,867 rows per θ**, across all 7 θ and
+3 held-out classes, at the current pin — the check C17's own verification ran only
+at 2 classes × 2 seeds. So the θ-sweep optimisation itself moves nothing.
+
+*The prior RT-IOT2022 `table_4_4b` was internally inconsistent with its own
+headline.* In `bumped-0764bc5-2026-08-22`, the operating curve read detection
+**0.777** at θ = 0.99 while Table 4.7b's complement-rule row read **0.798** over
+the same leave-one-class-out folds; false-alarm agreed (0.431) but detection did
+not. The new sweep makes them agree — both 0.798 — so the 17-cell "beyond noise"
+move `compare_runs` reports for `table_4_4b` against `bumped-0764bc5` is that
+correction. Full cell diff in this archive's `FIX_IMPACT.md`.
+
+*The finding §4.4 was missing.* Tuning θ **narrows but does not close** the gap to
+the baselines on RT-IOT2022: J peaks at **θ = 0.80 (+0.391**, detection 0.901,
+false alarm 0.510), still below Isolation Forest's **+0.534** at θ = 0.99. That
+answers the open question §4.4 and Figure 4.2 both flag as the missing RT-IOT2022
+row. Curve in `table_4_4b_theta_sweep.{md,csv}`; headline in `table_4_4_openset.{md,csv}`.
+
+*Caveat — these are current-pin measurements, not a re-quote.* Per **D8**,
+`_kmeans_labels_1d` swapped k-means++ for a uniform-random start (tribble-fis
+#95), and it reaches the complement rule through
+`create_gaussian_membership_dict → fit_gaussians → fit_gaussian_mixture_1d`. So
+these digits measure the current code, not the code the prose's Table 4.7b quotes;
+**do not overwrite Table 4.7b from this archive until D8 is settled.** The
+qualitative reading (the complement rule loses to isolation forest and no swept θ
+closes the gap) is robust to any plausible D8 shift — the deficit is 0.14–0.17
+against an init effect that moved the five-seed headline by ~0.03 — but the exact
+values are not. C4/D8 in `research/proposal-defense/CHECKLIST.md` carry the
+decision.
