@@ -35,11 +35,9 @@ import time
 
 import numpy as np
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.dirname(os.path.dirname(HERE))
-sys.path.insert(0, HERE)
-sys.path.insert(0, os.path.join(REPO, "reproduce", "tables"))
-sys.path.insert(0, os.path.join(REPO, "AnalyticalDynamics", "chaos"))
+from _bootstrap import add_repo_paths
+
+HERE, REPO = add_repo_paths(__file__, ("reproduce", "tables"), ("AnalyticalDynamics", "chaos"))
 
 #: Every generated artifact goes here. Kept out of the source directory so the
 #: scripts and the things they produce never have to be told apart by eye, and
