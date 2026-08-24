@@ -11,7 +11,6 @@ import pytest
 
 import run_all
 
-
 # ---------------------------------------------------------------------------
 # _print_summary
 # ---------------------------------------------------------------------------
@@ -93,7 +92,9 @@ def test_print_summary_prints_expected_values(capsys, saved_results):
         }
     }
 
-    run_all._print_summary(table, relational_table, multiscale_table, persistence_methods)
+    run_all._print_summary(
+        table, relational_table, multiscale_table, persistence_methods
+    )
 
     out = capsys.readouterr().out
 
@@ -119,7 +120,10 @@ def test_print_summary_prints_expected_values(capsys, saved_results):
     assert "dataset_a: M1=0.8 M2=0.82 kmeans=0.7 M2cov=0.95 M2convex=0.5" in out
 
     # persistence selection methods
-    assert "pm_a (k_true=3): gap: k=3 cov=0.98 ARI=0.88 | beta_plateau: k=3 cov=0.97 ARI=0.85" in out
+    assert (
+        "pm_a (k_true=3): gap: k=3 cov=0.98 ARI=0.88 | beta_plateau: k=3 cov=0.97 ARI=0.85"
+        in out
+    )
 
     # membership variants: ruspini + feature-space, including noise-rejection branch
     assert "dataset_a: RuspiniARI=0.77 POU_err(max)=0.02" in out

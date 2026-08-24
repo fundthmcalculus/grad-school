@@ -112,6 +112,6 @@ def test_insertion_order_most_recent_first(saved_sys_path):
     assert here == expected_here
     assert repo == expected_repo
 
-    assert sys.path.index(chaos_path) < sys.path.index(tables_path) < sys.path.index(
-        here
+    assert (
+        sys.path.index(chaos_path) < sys.path.index(tables_path) < sys.path.index(here)
     )

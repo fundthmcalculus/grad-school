@@ -14,7 +14,9 @@ import os
 import sys
 
 
-def add_repo_paths(caller_file: str, *repo_subpaths: tuple[str, ...]) -> tuple[str, str]:
+def add_repo_paths(
+    caller_file: str, *repo_subpaths: tuple[str, ...]
+) -> tuple[str, str]:
     """Insert the caller's directory and repo-relative subpaths into sys.path.
 
     ``caller_file`` is the calling script's ``__file__``. Each entry in
