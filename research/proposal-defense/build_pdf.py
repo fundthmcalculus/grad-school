@@ -752,8 +752,10 @@ def assemble():
     bib_file_path = os.path.join(HERE, "references.bib")
     if os.path.exists(bib_file_path):
         bib_size = os.path.getsize(bib_file_path)
+        with open(bib_file_path, encoding="utf-8") as bf:
+            bib_entries = len(re.findall(r"^@", bf.read(), flags=re.MULTILINE))
         print(f"\n  bibliography:")
-        print(f"    ✓ references.bib found ({bib_size} bytes, 70 entries)")
+        print(f"    ✓ references.bib found ({bib_size} bytes, {bib_entries} entries)")
         print(f"    ℹ Bibliography support enabled in PDF build")
 
     return md_path
