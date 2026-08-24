@@ -63,6 +63,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          submodules: true
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -85,3 +87,30 @@ jobs:
           else
             echo "research/least_action doesn't exist on this branch yet (lands with PR #24) -- nothing to run."
           fi
+
+      # FuzzySystemsExperiments/, experiments/, and gated-minimax-selection/'s
+      # pytest suites transitively import `tribblefis` from the pinned
+      # tribble-fis submodule. It's its own independent uv project (own
+      # pyproject.toml + uv.lock, per AGENTS.md's Environment section) --
+      # not installed by `pip install -e ".[dev]"` above -- and its
+      # tribble-clustering dependency has a known -march=native SIGILL on
+      # some Actions runners (tribble-fis#124) that only the git-sourced
+      # override recorded in tribble-fis's own uv.lock avoids. A plain
+      # `pip install ./tribble-fis` would ignore that lock and fetch the
+      # SIGILL-prone PyPI wheel instead, so this must go through `uv sync`.
+      - name: Install uv
+        run: pip install uv
+
+      - name: Build the tribble-fis environment
+        run: uv sync --project tribble-fis --extra dev
+
+      # pandas/scipy/h5py aren't tribble-fis dependencies -- they're pulled
+      # in here only because the root-level suites below need them and this
+      # is the venv that also has tribblefis importable.
+      - name: Add the extra packages the root-level suites need
+        run: uv pip install --python tribble-fis/.venv/bin/python pandas scipy h5py
+
+      - name: Run tribble-fis-dependent test suites
+        run: |
+          tribble-fis/.venv/bin/python -m pytest \
+            FuzzySystemsExperiments experiments gated-minimax-selection -v
