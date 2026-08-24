@@ -36,7 +36,9 @@ import numpy as np
 
 from _bootstrap import add_repo_paths
 
-HERE, REPO = add_repo_paths(__file__, ("reproduce", "tables"), ("AnalyticalDynamics", "chaos"))
+HERE, REPO = add_repo_paths(
+    __file__, ("reproduce", "tables"), ("AnalyticalDynamics", "chaos")
+)
 
 #: Every generated artifact goes here. Kept out of the source directory so the
 #: scripts and the things they produce never have to be told apart by eye, and
