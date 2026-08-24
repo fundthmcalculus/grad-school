@@ -756,6 +756,35 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       flags bit-identical across 2 seeds × 6 θ on a full RT-IOT2022 fold, preflight fis 5/5 at the
       new pin. The headline Table 4.7b (single θ) is untouched. Verified on single folds by
       construction, so no 120-fold rerun was needed.
+- [x] ✅ **C18 — Table 4.10's 6.48/9.20/85 were never reproduced by the scripts that claim to
+      produce them** (2026-08-23; Ch 4 §4.4.1, Table 4.10). Two independent causes, found by
+      direct re-run rather than reasoning about it:
+      (1) **Real bug.** The design-of-experiments' winning DS02 config (deleted `cmapss_rul_best.py`)
+      used 20 channels — the 18 real sensors *plus* two "virtual" ones, T40/P30 — to reach RMSE 6.48.
+      The 2026-08-17 consolidation into `cmapss_ds02_rul.py`/`cmapss_all_datasets.py` asserted,
+      without re-testing, that dropping T40/P30 "does not change the result"; its loader
+      (`tribble_predictive_health/data.py::load_ncmapss`) does not read the HDF5 `X_v` group at
+      all, so the claim was never actually checkable from that script. Re-running the original DOE
+      script's `best` pipeline with T40/P30 (same-era `tribble-fis` pin) gives RMSE 6.65 — close to
+      6.48 — versus the current real-sensors-only pipeline's 7.23. Decision: kept real-sensors-only
+      deliberately (simplicity over the last ~0.7 RMSE); the false "costs nothing" claim is removed
+      from both scripts' docstrings.
+      (2) **Residual, unexplained by any pinnable dependency.** Re-running the *exact* commit
+      (`0ab0ad6`) and *exact* `tribble-fis` pin (`058501f`) that produced the committed
+      `cmapss_all_datasets_report.md`, on this same host, with `numba`/`llvmlite`/`scipy`/
+      `tribble-clustering`/`optimizers` pinned to that pin's own lockfile versions and `pandas`
+      pinned to both 2.2.3 and 3.0.5, reproduces neither run-to-run randomness nor the committed
+      `whole_cycle` 9.20/85 — it deterministically gives 11.11/142 instead, every time, regardless
+      of thread count. `whole_cycle` never used T40/P30, so cause (1) does not apply here. Likely
+      culprit: this host is openSUSE Tumbleweed, a rolling-release distro whose system snapshot
+      moved from the report's commit date (2026-08-17) to `20260818` the very next day — i.e. "same
+      host" does not mean "same glibc/libm state" days apart. This is the same fragile
+      near-degenerate-arm sensitivity `tribble-fis`#179 already documents, previously attributed to
+      Windows-vs-Linux; it is better described as sensitivity to *any* environment perturbation,
+      including routine OS package updates on a single machine. Not fixed (no PR to point to); the
+      committed report and Table 4.10 are regenerated with what this host reproducibly measures now
+      (`whole_cycle` 15.44/12.07/320, `raw_memory` 15.58/17.00/655, blend 11.14/216, DS02 solo 7.23),
+      and both scripts' docstrings and §4.4.1 say so instead of citing the unreproduced numbers.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because
