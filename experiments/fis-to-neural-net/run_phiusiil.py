@@ -40,7 +40,6 @@ import contextlib
 import io
 import json
 import os
-import sys
 import time
 
 import numpy as np
