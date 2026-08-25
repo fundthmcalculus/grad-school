@@ -33,16 +33,17 @@ Four findings, in decreasing order of importance:
    sensitive; mean aggregation is average-case robust. The same property that
    makes D* topology-adaptive (elongated/nested clusters) makes it bridge-fragile.
 
-3. **Beta-spread almost never fires — "non-Euclidean" and "beta-activating" are
-   very different thresholds.** Every realistic non-Euclidean family here is
-   formally inadmissible (negative Gram eigenvalues), yet NERFCM's relational
-   update never goes negative on any of them, at any (c, m) probed. This also
-   resolves the open question `verify_beta_nonmetric.py` left ("the test matrices
-   may not have been sufficiently non-Euclidean"): activation requires a
-   *spike-type* violation — one entry several times larger than its tightest
-   two-hop bound (`spiked_random` control: neg-eig 0.90, beta = 11.6). Mild,
-   diffuse violations distort the geometry NERFCM optimizes over without ever
-   exposing a negative relational distance along the iterate path.
+3. **Beta-spread activation tracks violation *depth*, not violation fraction or
+   the Gram spectrum.** Every synthetic non-Euclidean family here is formally
+   inadmissible (negative Gram eigenvalues up to 0.35), yet NERFCM's relational
+   update never goes negative on any of them, at any (c, m) probed — resolving
+   the open question `verify_beta_nonmetric.py` left ("the test matrices may not
+   have been sufficiently non-Euclidean"). What fires it is *deep* violations:
+   synthetic stretch caps the depth at ~1.0 (a pair at most 2x its two-hop
+   bound) and never activates; **real flight-profile DTW reaches depth 1.98 and
+   activates on every restart seed at every c** (beta 0.04–0.22); the spiked
+   control (depth >> 1) fires at beta = 11.6. The activation boundary sits
+   between depth ~1 and ~2 — and in every case, beta(D*) = 0.
 
 4. **The standing `multi_scale_hierarchy` "open problem" (NERFCM ARI 0.29 in
    RELATIONDATA.md) is solved — and was partly an artifact.** Its declared
@@ -180,13 +181,44 @@ a mechanism.
   here because `run_all.py`'s relational table/figures currently depend on the
   generator's exact output.
 
+## E5 — Real-data DTW: N-CMAPSS DS01 flight altitude profiles
+
+75 flights (25 per flight class) from DS01-005 dev (DS02's dev units are all
+class 3, so DS01 is the multi-class set), altitude subsampled at a fixed
+~5-minute rate — NOT length-normalized, so sequence length carries flight
+duration, which is what the class labels bin. DTW dissimilarity.
+
+Diagnostics: **69.6% of pairs violate the triangle inequality** with max depth
+1.98 (real DTW is far more non-metric than any synthetic family), neg-eig 0.29,
+and **beta-spread activates on every restart at every c** (0.04–0.22) — the
+only naturally occurring activation in the whole study. D* is, as everywhere,
+ultrametric and admissible.
+
+Clustering (the class bins genuinely overlap — class 2 spans 1.3–3.3h against
+class 1's 0.9–1.6h and class 3's 2.6–5.2h — so the reference ceiling is
+**duration-only 3-means at ARI 0.60**, not 1.0):
+
+| method | k | ARI |
+|---|---|---|
+| duration-only k-means (ceiling) | 3 (given) | 0.60 |
+| NERFCM(D) | 3 (given) | 0.45 |
+| NERFCM(D*) | 3 (given) | 0.51 |
+| SL @ k=3 | 3 (given) | 0.45 |
+| gap-cover / beta-plateau / bootstrap | 2 (discovered) | 0.46 |
+
+Every method lands within ~0.15 of the duration ceiling; the k-discovering
+selectors all choose k=2, which is defensible — the class-2/class-3 duration
+overlap makes the 3-way split weakly supported in this sample. The value of E5
+is less the clustering score than the diagnostics: it is the one dataset where
+the beta-spread mechanism is *actually needed* on raw D, and D* still
+eliminates it.
+
 ## What was NOT established (honest gaps)
 
-- No *real-world* non-Euclidean dataset yet (all generators are synthetic with
-  planted truth). Natural candidates wired to the dissertation: DTW over
-  N-CMAPSS degradation traces (per-unit RUL trajectories), edit distance over
-  event logs. The DTW generator's family 2 (ramp-with-knee) is shaped for
-  exactly that hand-off.
+- E5 uses flight class as truth, which is a duration *bin*, not a cluster; a
+  real dataset with genuinely cluster-shaped truth under DTW (e.g. fault-mode
+  families of degradation trajectories) would be a stronger test. The DTW
+  generator's family 2 (ramp-with-knee) is shaped for that hand-off.
 - The battery's three clean families are *easy* for everything; they establish
   transfer, not superiority. The two hard families split the methods — but a
   wider hard set (hub-dominated kNN graphs, heavy-tailed noise) would map the

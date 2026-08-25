@@ -12,7 +12,7 @@ deterministically from seed and writes
   - outputs/fig14_violation_sweep.png
   - outputs/fig15_relational_multiscale.png
 
-The four experiments:
+The five experiments:
 
 E1 Diagnostics -- makes "non-Euclidean" quantitative. For each dataset:
    triangle-violation fraction and classical-MDS negative-eigenvalue ratio of
@@ -39,6 +39,11 @@ E4 Relational multi-scale -- Option D's select_multiscale on distance-matrix-
    only nested hierarchies, including the multi_scale_hierarchy dataset whose
    NERFCM ARI of 0.29 has stood in notes/RELATIONDATA.md as an open problem,
    plus a clean two-level relational hierarchy and non-metric variants of it.
+
+E5 Real-data DTW -- the battery on DTW over N-CMAPSS DS01 flight altitude
+   profiles (truth = flight class; DS02's dev units are all one class).
+   Skipped gracefully when the gitignored .h5 is absent. The one dataset in
+   the study where beta-spread activates naturally on raw D.
 """
 
 from __future__ import annotations
@@ -504,6 +509,114 @@ def run_relational_multiscale():
 
 
 # ---------------------------------------------------------------------------
+# E5: real-data DTW -- N-CMAPSS DS01 flight altitude profiles
+# ---------------------------------------------------------------------------
+
+NCMAPSS_DS01 = "../NASA-CMAPSS/N-CMAPSS_DS01-005.h5"
+E5_STRIDE = 300  # one altitude sample every ~5 min of flight (data is 1 Hz)
+E5_PER_CLASS = 25
+
+
+def load_flight_traces(path=NCMAPSS_DS01, stride=E5_STRIDE, per_class=E5_PER_CLASS):
+    """Altitude traces per flight from N-CMAPSS DS01 dev, labeled by flight class.
+
+    DS01 is used rather than the dissertation's usual DS02 because DS02's dev
+    units are ALL flight class 3; DS01 has all three classes (195/194/164
+    flights). Traces are subsampled at a fixed rate -- NOT length-normalized --
+    so sequence length carries flight duration, which is what the class labels
+    bin (~1-1.6h / 1.3-3.3h / 2.6-5.2h in this sample; the bins genuinely
+    overlap, so no method should be expected to reach ARI 1.0). Altitude is
+    scaled by 1e4 ft to O(1). Selection of `per_class` flights per class is
+    deterministic (seeded permutation).
+    """
+    import h5py
+
+    with h5py.File(path, "r") as f:
+        A = f["A_dev"][:]
+        alt = f["W_dev"][:, 0]
+    key = (A[:, 0] * 10000 + A[:, 1]).astype(np.int64)
+    order = np.argsort(key, kind="stable")
+    key_s, alt_s, fc_s = key[order], alt[order], A[order, 2]
+    uk, starts = np.unique(key_s, return_index=True)
+    ends = np.append(starts[1:], len(key_s))
+    rng = np.random.default_rng(0)
+    traces, labels, durations = [], [], []
+    counts = {1: 0, 2: 0, 3: 0}
+    for i in rng.permutation(len(uk)):
+        fc = int(fc_s[starts[i]])
+        if counts[fc] >= per_class:
+            continue
+        traces.append(alt_s[starts[i] : ends[i] : stride] / 1e4)
+        labels.append(fc - 1)
+        durations.append(int(ends[i] - starts[i]))
+        counts[fc] += 1
+    return traces, np.asarray(labels, dtype=int), np.asarray(durations, dtype=float)
+
+
+def run_real_dtw():
+    """The battery on a REAL non-metric dissimilarity: DTW over N-CMAPSS DS01
+    flight altitude profiles, truth = flight class. Skipped (with a stub row in
+    the JSON) when the gitignored .h5 is absent, so a fresh clone still runs."""
+    import os
+
+    if not os.path.exists(NCMAPSS_DS01):
+        results["real_dtw_ncmapss"] = {
+            "skipped": f"{NCMAPSS_DS01} not present (gitignored dataset)"
+        }
+        return None
+
+    traces, y, durations = load_flight_traces()
+    D = ND.pairwise(traces, ND.dtw_distance)
+    Dstar = im.minimax_transform_fast(D)
+
+    tv = ND.triangle_violation_stats(D)
+    em_d = ND.euclidean_embeddability(D)
+    em_s = ND.euclidean_embeddability(Dstar)
+
+    m_d, s_d, beta_d = nerfcm_score(D, y, 3)
+    m_ds, s_ds, _ = nerfcm_score(Dstar, y, 3)
+    k_gap, sel_gap, _ = SC.select_persistence_gap(Dstar)
+    k_bp, sel_bp, _ = SC.select_beta_plateau(Dstar)
+    _, sel_bb, meta_bb = select_bottleneck_bootstrap_relational(D)
+    kg, covg, arig = score_selection(Dstar, y, sel_gap)
+    kb, covb, arib = score_selection(Dstar, y, sel_bp)
+    kbb, covbb, aribb = score_selection(Dstar, y, sel_bb)
+
+    # Reference ceiling: the class labels are duration BINS, so cluster on
+    # duration alone. Methods can only be judged against this, not against 1.0.
+    from sklearn.cluster import KMeans
+
+    km = KMeans(3, n_init=10, random_state=0).fit(durations.reshape(-1, 1))
+    dur_ari = float(adjusted_rand_score(y, km.labels_))
+
+    table = {
+        "dataset": "N-CMAPSS DS01-005 dev, altitude/1e4, stride 300, 25 flights/class",
+        "n": int(D.shape[0]),
+        "k_true": 3,
+        "ti_violation_pair_fraction": round(tv["pair_violation_fraction"], 4),
+        "neg_eig_ratio_D": round(em_d["neg_ratio"], 4),
+        "neg_eig_ratio_Dstar": float(em_s["neg_ratio"]),
+        "ultrametric_Dstar": bool(ND.is_ultrametric(Dstar)),
+        "beta_max_D": round(beta_d, 6),
+        "duration_only_kmeans_ari(reference ceiling)": round(dur_ari, 3),
+        "NERFCM_D_ari": round(m_d, 3),
+        "NERFCM_D_std": round(s_d, 3),
+        "NERFCM_Dstar_ari": round(m_ds, 3),
+        "NERFCM_Dstar_std": round(s_ds, 3),
+        "SL_at_ktrue_ari": round(sl_ari_at_k(Dstar, y, 3), 3),
+        "persistence_gap": {"k": kg, "coverage": round(covg, 3), "ari": _r(arig)},
+        "beta_plateau": {"k": kb, "coverage": round(covb, 3), "ari": _r(arib)},
+        "bottleneck_bootstrap": {
+            "k": kbb,
+            "coverage": round(covbb, 3),
+            "ari": _r(aribb),
+        },
+    }
+    results["real_dtw_ncmapss"] = table
+    return table
+
+
+# ---------------------------------------------------------------------------
 # figures
 # ---------------------------------------------------------------------------
 
@@ -718,6 +831,8 @@ def main():
     sweep = run_violation_sweep()
     print("E4: relational multi-scale...")
     msc = run_relational_multiscale()
+    print("E5: real-data DTW (N-CMAPSS DS01 flight profiles)...")
+    real = run_real_dtw()
 
     results["seeds"] = {
         "nerfcm_restarts": list(SEEDS),
@@ -763,6 +878,23 @@ def main():
                 f"(k={e['flat'][lname]['k']}) multiscale={e['multiscale']['per_level'][lname]} "
                 f"(bands={e['multiscale']['band_granularities']})"
             )
+    if real is not None:
+        print("\nREAL-DATA DTW (N-CMAPSS DS01 flight classes):")
+        print(
+            f"  TIviol={real['ti_violation_pair_fraction']} "
+            f"negeig D={real['neg_eig_ratio_D']} ultra(D*)={real['ultrametric_Dstar']} "
+            f"beta(D)={real['beta_max_D']}"
+        )
+        print(
+            f"  duration-only ceiling={real['duration_only_kmeans_ari(reference ceiling)']} | "
+            f"NERFCM(D)={real['NERFCM_D_ari']} NERFCM(D*)={real['NERFCM_Dstar_ari']} "
+            f"SL@k={real['SL_at_ktrue_ari']} | gap: k={real['persistence_gap']['k']} "
+            f"ARI={real['persistence_gap']['ari']} | plateau: k={real['beta_plateau']['k']} "
+            f"ARI={real['beta_plateau']['ari']} | boot: k={real['bottleneck_bootstrap']['k']} "
+            f"ARI={real['bottleneck_bootstrap']['ari']}"
+        )
+    else:
+        print("\nREAL-DATA DTW: skipped (N-CMAPSS DS01 .h5 not present)")
 
 
 if __name__ == "__main__":
