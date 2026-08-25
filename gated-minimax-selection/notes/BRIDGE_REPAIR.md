@@ -78,11 +78,37 @@ python -m pytest test_metric_repair.py -q
 Same seed conventions as run_nonmetric.py (NERFCM restarts [0..4], sweep
 dataset seeds [0..2]).
 
-## Follow-ups this opens
+## R4 — Auto-q: the quantile set from the data itself
 
-- A corruption-rate estimator to set q automatically (the 2r(1−r) bound makes
-  this a one-line plug-in once r is estimated, e.g. from the fraction of
-  entries whose median witness bound exceeds them).
+`metric_repair.auto_repair(D)` closes the "how do I pick q" loop:
+
+1. **Estimate** r̂ = `estimate_corruption_rate(D)`: the fraction of pairs whose
+   *median* witness bound exceeds the entry. Exactly 0 on metric data; tracks
+   planted shortcut corruption monotonically but conservatively (~0.6× —
+   deflated intra-cluster pairs are invisible, and only the cross-cluster
+   deflations that actually threaten the minimax transform are counted).
+2. **Calibrate** q = clip(1 − 2r̂(1−r̂) − margin, 0.5, 0.9) — the
+   corrupted-witness bound with a 0.1 margin.
+3. **Decline** when r̂ > 0.35: a matrix where the median witness disagrees with
+   over a third of the entries is not "metric plus sparse corruption"; it is
+   intrinsically non-metric, and auto_repair returns it unchanged. The
+   threshold is calibrated between the sweep's largest accepted r̂ (~0.28 at
+   true rate 0.4) and real flight-DTW's reading (0.51 → declined).
+
+Result on the shortcut rate sweep at strength 1.0: **auto = 1.0 at every
+rate** — matching or beating both fixed quantiles (q=0.5 dips to 0.85 and
+q=0.75 to 0.97–0.98 at rate 0.2, where auto's calibrated q=0.68 threads the
+needle). Every battery family gets q=0.9 (free: identity on all of them);
+real DTW is declined rather than half-rewritten.
+
+One estimator quirk worth recording: r̂ is *not* monotone in dense
+inflation-type violation (uniform 4× inflation of 70% of pairs reads r̂=0.12,
+less than 50% of pairs at 0.26) — dense inflation shifts the median witness
+itself. The decline test therefore exercises the mechanism with an explicit
+threshold, and the default's calibration rests on the measured regimes above,
+not on a synthetic reconstruction of real DTW.
+
+## Follow-ups this opens
 - The chapter framing writes itself as a 2×2: {mean vs bottleneck aggregation}
   × {raw vs repaired}, with each cell's failure mode now measured.
 - ConiVAT comparison on *geometric* bridges (bridged_gaussians), where this

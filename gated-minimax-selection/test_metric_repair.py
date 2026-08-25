@@ -138,3 +138,63 @@ def test_deeply_nonmetric_input_is_out_of_scope():
     D[iu[1][hit], iu[0][hit]] = D[iu[0][hit], iu[1][hit]]
     R = reverse_ti_repair(D, 0.5)
     assert np.mean(R > D + 1e-12) > 0.05  # a nontrivial fraction lifted
+
+
+# ---------------------------------------------------------------------------
+# auto-q: estimator + calibrated repair + decline
+# ---------------------------------------------------------------------------
+
+from metric_repair import auto_repair, estimate_corruption_rate  # noqa: E402
+
+
+def test_estimator_zero_on_metric_and_monotone_under_corruption():
+    D0, _, _ = ND.euclidean_blobs(n_per=10, seed=4)
+    assert estimate_corruption_rate(D0) == 0.0
+    prev = -1.0
+    for rate in (0.05, 0.2, 0.4):
+        Dv = ND.violate_pairs(D0, rate, 1.0, "shortcut", seed=5)
+        est = estimate_corruption_rate(Dv)
+        assert est > prev
+        prev = est
+
+
+def test_auto_repair_identity_on_clean_and_repairs_corruption():
+    D0, y, _ = ND.euclidean_blobs(n_per=10, seed=6)
+    R, info = auto_repair(D0)
+    assert not info["declined"] and info["q"] == 0.9
+    assert np.allclose(R, D0)
+    Dv = ND.violate_pairs(D0, 0.2, 1.0, "shortcut", seed=7)
+    R, info = auto_repair(Dv)
+    assert not info["declined"] and info["q"] < 0.9
+    # the corrupted entries must be substantially lifted back
+    corrupted = ~np.isclose(Dv, D0)
+    assert np.median(R[corrupted] / np.maximum(Dv[corrupted], 1e-12)) > 1.5
+
+
+def test_auto_repair_declines_when_flagged_fraction_is_high():
+    """The decline mechanism: when estimate_corruption_rate exceeds the
+    threshold, the matrix comes back unchanged with declined=True. The
+    threshold is passed explicitly here because synthetic uniform inflation
+    does not reproduce the real-DTW regime's r_hat (structured violations
+    there read ~0.51; see run_bridge_repair R4); the default decline_above of
+    0.35 is calibrated between the sweep's largest accepted r_hat (~0.28 at
+    true corruption rate 0.4) and that real-DTW reading."""
+    rng = np.random.default_rng(1)
+    n = 25
+    D = rng.uniform(1.0, 2.0, size=(n, n))
+    D = (D + D.T) / 2.0
+    np.fill_diagonal(D, 0.0)
+    iu = np.triu_indices(n, k=1)
+    hit = rng.choice(len(iu[0]), size=len(iu[0]) // 2, replace=False)
+    D[iu[0][hit], iu[1][hit]] *= 4.0
+    D[iu[1][hit], iu[0][hit]] = D[iu[0][hit], iu[1][hit]]
+    r = estimate_corruption_rate(D)
+    assert r > 0.2  # densely inconsistent by construction
+    R, info = auto_repair(D, decline_above=0.2)
+    assert info["declined"]
+    assert info["q"] is None
+    assert np.array_equal(R, D)
+    # and with a permissive threshold the same matrix is repaired, not copied
+    R2, info2 = auto_repair(D, decline_above=0.9)
+    assert not info2["declined"]
+    assert np.any(R2 > D)
