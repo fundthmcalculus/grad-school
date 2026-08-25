@@ -171,9 +171,39 @@ def load_dataset(name):
 
 
 def dtw_matrix(X):
+    """All-pairs DTW. REPRO_G2_DTW_IMPL=simd swaps in the OpenMP+SIMD Cython
+    kernel from experiments/dtw-simd (measured 10-12x aeon's single-core
+    numba build; see its bench.py), after VERIFYING it agrees with aeon on a
+    seeded subsample of THIS X -- the swap must never silently change what
+    these tables measure. Any disagreement raises rather than proceeding.
+    """
     from aeon.distances import dtw_pairwise_distance
 
-    return dtw_pairwise_distance(X).astype(np.float64)
+    if os.environ.get("REPRO_G2_DTW_IMPL", "").lower() != "simd":
+        return dtw_pairwise_distance(X).astype(np.float64)
+
+    _simd_dir = os.path.join(
+        os.path.dirname(os.path.dirname(_TABLES)), "experiments", "dtw-simd"
+    )
+    sys.path.insert(0, _simd_dir)
+    import dtw_simd  # noqa: E402
+
+    X = np.ascontiguousarray(X, dtype=np.float64)
+    n_check = min(300, X.shape[0])
+    idx = np.random.RandomState(0).choice(X.shape[0], n_check, replace=False)
+    D_ref = dtw_pairwise_distance(X[idx]).astype(np.float64)
+    D_new = dtw_simd.dtw_pairwise(np.ascontiguousarray(X[idx]))
+    if not np.allclose(D_ref, D_new, rtol=1e-9, atol=1e-9):
+        raise AssertionError(
+            f"dtw_simd disagrees with aeon on the {n_check}-point verification "
+            f"subsample (max |diff| = {np.abs(D_ref - D_new).max():.3e}); "
+            "refusing to substitute implementations."
+        )
+    print(
+        f"  [dtw] REPRO_G2_DTW_IMPL=simd: verified equal to aeon on a seeded "
+        f"{n_check}-point subsample (max |diff| = {np.abs(D_ref - D_new).max():.2e})"
+    )
+    return dtw_simd.dtw_pairwise(X)
 
 
 def exactness_at_cap(X, pvat, cap, seeds):
