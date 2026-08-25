@@ -60,6 +60,31 @@ def dtw_distance(a: np.ndarray, b: np.ndarray) -> float:
     return float(prev[lb])
 
 
+def dtw_distance_multivariate(a: np.ndarray, b: np.ndarray) -> float:
+    """DTW for (length, d) trajectories with Euclidean local cost.
+
+    Reduces exactly to :func:`dtw_distance` at d = 1. Used for the fault-mode
+    experiment, where a degradation trajectory is a sequence of
+    condition-corrected residual vectors over several sensors.
+    """
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    if a.ndim == 1:
+        a = a.reshape(-1, 1)
+    if b.ndim == 1:
+        b = b.reshape(-1, 1)
+    la, lb = len(a), len(b)
+    prev = np.full(lb + 1, np.inf)
+    prev[0] = 0.0
+    for i in range(1, la + 1):
+        cur = np.full(lb + 1, np.inf)
+        cost_row = np.sqrt(((a[i - 1][None, :] - b) ** 2).sum(axis=1))
+        for j in range(1, lb + 1):
+            cur[j] = cost_row[j - 1] + min(prev[j], cur[j - 1], prev[j - 1])
+        prev = cur
+    return float(prev[lb])
+
+
 def levenshtein(s: str, t: str) -> int:
     """Edit distance (insert/delete/substitute, unit costs). Metric, but the
     resulting distance matrix is generally not Euclidean-embeddable."""

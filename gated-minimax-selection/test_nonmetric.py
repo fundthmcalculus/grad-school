@@ -207,3 +207,24 @@ def test_relational_nested_hierarchy_structure():
     diff_coarse = y_coarse[:, None] != y_coarse[None, :]
     assert D[same_fine].max() < D[same_coarse_diff_fine].min()
     assert D[same_coarse_diff_fine].max() < D[diff_coarse].min()
+
+
+def test_dtw_multivariate_reduces_to_univariate():
+    a = np.array([0.0, 1.0, 3.0, 2.0])
+    b = np.array([0.0, 2.0, 2.5, 2.0])
+    assert ND.dtw_distance_multivariate(a, b) == pytest.approx(ND.dtw_distance(a, b))
+    # and as explicit column vectors
+    assert ND.dtw_distance_multivariate(
+        a.reshape(-1, 1), b.reshape(-1, 1)
+    ) == pytest.approx(ND.dtw_distance(a, b))
+
+
+def test_dtw_multivariate_basic_invariants():
+    rng = np.random.default_rng(0)
+    a = rng.normal(size=(12, 3))
+    b = rng.normal(size=(15, 3))
+    assert ND.dtw_distance_multivariate(a, a) == 0.0
+    assert ND.dtw_distance_multivariate(a, b) == pytest.approx(
+        ND.dtw_distance_multivariate(b, a)
+    )
+    assert ND.dtw_distance_multivariate(a, b) > 0
