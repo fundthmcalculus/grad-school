@@ -231,3 +231,22 @@ def test_heavy_tailed_blobs_invariants():
     assert np.all(D >= 0)
     D2, y2 = ND.heavy_tailed_blobs(n_per=8, df=1.5, seed=4)
     assert np.array_equal(D, D2)
+
+
+def test_constrained_minimax_and_hub_drop_helpers():
+    """H3 helpers: constraint injection produces a valid symmetric transform
+    with must-link pairs at minimax distance ~0; hub-drop keeps shapes and
+    ordering consistent."""
+    from run_hard_cases import constrained_minimax, drop_low_mean_rows
+
+    D, y = ND.knn_graph_hubs(n_per=8, n_hubs=2, seed=3)
+    ml = [(0, 1), (1, 2)]
+    cl = [(0, 8)]
+    Dstar = constrained_minimax(D, ml, cl)
+    assert np.allclose(Dstar, Dstar.T)
+    tiny_ceiling = 1e-6 * D.max()
+    assert Dstar[0, 1] < tiny_ceiling and Dstar[0, 2] < tiny_ceiling  # closure
+    Dk, keep = drop_low_mean_rows(D, 2)
+    assert Dk.shape == (D.shape[0] - 2, D.shape[0] - 2)
+    assert len(keep) == D.shape[0] - 2
+    assert np.array_equal(Dk, D[np.ix_(keep, keep)])
