@@ -207,3 +207,18 @@ def test_relational_nested_hierarchy_structure():
     diff_coarse = y_coarse[:, None] != y_coarse[None, :]
     assert D[same_fine].max() < D[same_coarse_diff_fine].min()
     assert D[same_coarse_diff_fine].max() < D[diff_coarse].min()
+
+
+def test_bootstrap_jackknife_variant():
+    """The jackknife (replace=False) path must run, discover the same k as the
+    with-replacement original on a clean structured case, and be deterministic
+    under a fixed seed."""
+    from run_nonmetric import select_bottleneck_bootstrap_relational
+
+    D, y = ND.edit_strings(n_per=8, seed=12)
+    k_w, sel_w, meta_w = select_bottleneck_bootstrap_relational(D, replace=True)
+    k_j, sel_j, meta_j = select_bottleneck_bootstrap_relational(D, replace=False)
+    assert k_w == k_j == 3
+    k_j2, _, meta_j2 = select_bottleneck_bootstrap_relational(D, replace=False)
+    assert k_j2 == k_j
+    assert meta_j2["gap_frequency"] == meta_j["gap_frequency"]
