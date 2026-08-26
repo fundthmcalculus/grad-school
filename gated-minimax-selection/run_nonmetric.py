@@ -481,17 +481,19 @@ def _multiscale_case(D, levels):
 def run_relational_multiscale():
     table = {}
 
-    # (a) The standing open problem: relationdata.multi_scale_hierarchy was
-    # reported at NERFCM ARI 0.29 in notes/RELATIONDATA.md -- scored with c=3
-    # against its 6 fine labels. Two confounds are separated here:
+    # (a) The formerly standing open problem: relationdata.multi_scale_hierarchy
+    # was reported at NERFCM ARI 0.29 in notes/RELATIONDATA.md -- scored with
+    # c=3 against its 6 fine labels. Two confounds were separated here:
     #   granularity mismatch -- score against both levels, not just fine;
-    #   label noise -- the generator's leaf-expansion loop assigns
-    #     rng.integers(0, 4) labels regardless of where a leaf attaches
-    #     (relationdata.py:271), so ~18% of DECLARED labels disagree with the
-    #     sub-cluster the distances actually encode. "structural" labels below
-    #     are the connected components of {D < 2.0} (unambiguous, because the
-    #     construction's scales are ~0.8 / ~4.6 / ~12.6) and represent what a
-    #     clustering method could possibly recover.
+    #   label noise -- the generator's leaf-expansion loop used to assign
+    #     rng.integers(0, 4) labels regardless of where a leaf attached, so
+    #     ~18% of DECLARED labels disagreed with the sub-cluster the distances
+    #     encode. FIXED per issue #160: declared and structural labels now
+    #     coincide, and declared_label_noise below reads 0. The structural
+    #     scoring (connected components of {D < 2.0}; unambiguous, because the
+    #     construction's scales are ~0.8 / ~4.6 / ~12.6) is kept both as the
+    #     regression instrument and as the historical record of the
+    #     decomposition.
     D, y_fine = RD.multi_scale_hierarchy()
     y_coarse = y_fine // 2
     from scipy.sparse.csgraph import connected_components

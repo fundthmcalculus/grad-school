@@ -421,6 +421,79 @@ def relational_nested_hierarchy(seed: int = 207, leaf_noise: float = 0.05):
     return D, y_fine, y_coarse
 
 
+def knn_graph_hubs(n_per: int = 20, n_hubs: int = 3, k_local: int = 4, seed: int = 209):
+    """Hub-dominated kNN-graph shortest paths: the GEOMETRIC bridge regime.
+
+    Three communities of local-kNN structure plus `n_hubs` hub nodes each
+    wired to 12 random members across ALL communities -- the exaggerated form
+    of what hubness does to kNN graphs in high dimension. D is metric (real
+    shortest paths), so the reverse-TI repair is correctly inert here; the
+    damage is the hub NODES themselves sitting between communities as cluster
+    members, not any inconsistent path value. Measured dose-response (masked
+    scoring, method sees hubs): 0 hubs -> every method 1.0; ONE hub already
+    halves the gap-cover; 3+ hubs break everything including NERFCM on raw D
+    -- unlike random shortcut corruption, geometric hubs defeat both
+    aggregation strategies.
+
+    Hubs are labeled -1 (noise) and, following run_all.py's convention,
+    should be masked from ARI while the method sees the full matrix.
+    Components are reconnected to the largest one as in graph_communities.
+    """
+    from scipy.sparse.csgraph import connected_components, shortest_path
+
+    rng = np.random.default_rng(seed)
+    n = 3 * n_per + n_hubs
+    y = np.concatenate([np.repeat(np.arange(3), n_per), np.full(n_hubs, -1)])
+    A = np.zeros((n, n))
+    for c in range(3):
+        idx = np.where(y == c)[0]
+        for i in idx:
+            nbrs = rng.choice(idx[idx != i], size=k_local, replace=False)
+            for j in nbrs:
+                A[i, j] = A[j, i] = rng.uniform(1.0, 2.0)
+    for h in range(3 * n_per, n):
+        targets = rng.choice(3 * n_per, size=12, replace=False)
+        for j in targets:
+            A[h, j] = A[j, h] = rng.uniform(1.0, 2.0)
+    n_comp, comp = connected_components(A > 0, directed=False)
+    if n_comp > 1:
+        main = int(np.argmax(np.bincount(comp)))
+        for c in range(n_comp):
+            if c == main:
+                continue
+            a = int(rng.choice(np.where(comp == c)[0]))
+            b = int(rng.choice(np.where(comp == main)[0]))
+            A[a, b] = A[b, a] = rng.uniform(4.0, 6.0)
+    D = shortest_path(A, method="D", directed=False)
+    return np.asarray(D, dtype=float), y
+
+
+def heavy_tailed_blobs(
+    n_per: int = 20,
+    df: float = 1.5,
+    sep: float = 6.5,
+    seed: int = 210,
+    return_X: bool = False,
+):
+    """Three clusters with Student-t noise: outliers as natural bridge points.
+
+    At low degrees of freedom the tails throw genuine cluster members into
+    the inter-cluster void, where they chain single-linkage blocks -- the
+    geometric analogue of shortcut corruption, except every distance is a
+    real Euclidean distance, so there is nothing for a metric repair to fix
+    (r_hat = 0 by construction). Every point keeps its true cluster label:
+    a tail draw still belongs to the cluster that drew it.
+    """
+    rng = np.random.default_rng(seed)
+    centers = np.array([[0.0, 0.0], [sep, 0.0], [sep / 2.0, sep * np.sqrt(3) / 2.0]])
+    X = np.vstack([c + rng.standard_t(df, size=(n_per, 2)) for c in centers])
+    y = np.repeat(np.arange(3), n_per)
+    D = squareform(pdist(X))
+    if return_X:
+        return D, y, X
+    return D, y
+
+
 # The non-Euclidean battery run by run_nonmetric.py: name -> (generator, k_true).
 BATTERY = {
     "dtw_traces": (dtw_traces, 3),

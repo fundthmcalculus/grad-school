@@ -179,7 +179,12 @@ a mechanism.
   the dataset retired in favor of `relational_nested_hierarchy`, which has
   exact two-level truth by construction. Tracked as a repo issue; not fixed
   here because `run_all.py`'s relational table/figures currently depend on the
-  generator's exact output.
+  generator's exact output. **[FIXED 2026-08-25, issue #160]** — declared
+  labels now match structure exactly (pinned in `test_relationdata.py`),
+  `run_all.py`'s relational row moved 0.285 → 0.551 (the c=3-vs-6-labels
+  ceiling; the only numbers in results.json that changed), and E4's
+  declared-vs-structural split now coincides: multi-scale recovers the dataset
+  at 1.0/1.0 against its own declared labels.
 
 ## E5 — Real-data DTW: N-CMAPSS DS01 flight altitude profiles
 
@@ -223,9 +228,13 @@ eliminates it.
   transfer, not superiority. The two hard families split the methods — but a
   wider hard set (hub-dominated kNN graphs, heavy-tailed noise) would map the
   boundary better.
-- Shortcut fragility was characterized, not repaired. The obvious next
-  experiment: ConiVAT-style bridge pruning (or the E3 observation that dense
-  shortcuts self-heal) as a pre-transform defense, measured on the same sweep.
+- ~~Shortcut fragility was characterized, not repaired.~~ **Done** — see
+  `notes/BRIDGE_REPAIR.md`: one-sided reverse-TI metric repair
+  (`metric_repair.py`) restores the collapse (0.11 → 0.98) and the broken
+  multi-scale cells (→ 1.0/1.0), is provably identity on metric inputs, and
+  its scope boundary (inert on geometric bridges, out-of-scope on densely
+  non-metric data like real DTW) is measured and pinned in tests. ConiVAT
+  remains the route for *geometric* bridges.
 - ~~`bottleneck_bootstrap_relational` resamples with replacement like the
   coordinate original... A jackknife variant may behave differently;
   untested.~~ **Tested (E6, `run_bootstrap_variants`)**: the two schemes make

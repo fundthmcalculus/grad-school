@@ -222,3 +222,46 @@ def test_bootstrap_jackknife_variant():
     k_j2, _, meta_j2 = select_bottleneck_bootstrap_relational(D, replace=False)
     assert k_j2 == k_j
     assert meta_j2["gap_frequency"] == meta_j["gap_frequency"]
+
+
+def test_knn_graph_hubs_invariants():
+    D, y = ND.knn_graph_hubs(n_per=8, n_hubs=2, seed=3)
+    assert D.shape[0] == len(y) == 26
+    assert (y == -1).sum() == 2  # hubs are noise-labeled
+    assert set(np.unique(y)) == {-1, 0, 1, 2}
+    assert np.all(np.isfinite(D))
+    assert np.allclose(D, D.T)
+    D2, y2 = ND.knn_graph_hubs(n_per=8, n_hubs=2, seed=3)
+    assert np.array_equal(D, D2) and np.array_equal(y, y2)
+    # zero hubs must reduce to a clean 3-community graph
+    D0, y0 = ND.knn_graph_hubs(n_per=8, n_hubs=0, seed=3)
+    assert (y0 == -1).sum() == 0
+
+
+def test_heavy_tailed_blobs_invariants():
+    D, y = ND.heavy_tailed_blobs(n_per=8, df=1.5, seed=4)
+    assert D.shape[0] == len(y) == 24
+    assert set(np.unique(y)) == {0, 1, 2}  # every point keeps its true label
+    assert np.allclose(D, D.T)
+    assert np.all(D >= 0)
+    D2, y2 = ND.heavy_tailed_blobs(n_per=8, df=1.5, seed=4)
+    assert np.array_equal(D, D2)
+
+
+def test_constrained_minimax_and_hub_drop_helpers():
+    """H3 helpers: constraint injection produces a valid symmetric transform
+    with must-link pairs at minimax distance ~0; hub-drop keeps shapes and
+    ordering consistent."""
+    from run_hard_cases import constrained_minimax, drop_low_mean_rows
+
+    D, y = ND.knn_graph_hubs(n_per=8, n_hubs=2, seed=3)
+    ml = [(0, 1), (1, 2)]
+    cl = [(0, 8)]
+    Dstar = constrained_minimax(D, ml, cl)
+    assert np.allclose(Dstar, Dstar.T)
+    tiny_ceiling = 1e-6 * D.max()
+    assert Dstar[0, 1] < tiny_ceiling and Dstar[0, 2] < tiny_ceiling  # closure
+    Dk, keep = drop_low_mean_rows(D, 2)
+    assert Dk.shape == (D.shape[0] - 2, D.shape[0] - 2)
+    assert len(keep) == D.shape[0] - 2
+    assert np.array_equal(Dk, D[np.ix_(keep, keep)])
