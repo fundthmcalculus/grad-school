@@ -77,7 +77,39 @@ The 2×2 the thesis can now draw, every cell measured:
 | geometric bridges: few hubs | NERFCM on raw D | H1 (1 hub: 1.00 vs 0.37) |
 | geometric bridges: many hubs / heavy tails | nothing here survives; point-level defenses needed | H1 (≥2 hubs), H2 |
 
-Follow-ups: ConiVAT-style constraint pruning is the natural candidate for the
-last row (its whole design targets chaining through real points); hub detection
-via degree/centrality of the kNN graph is the cheaper heuristic. Neither is
-attempted here.
+## H3 — Can side information rescue the geometric-bridge regimes?
+
+Measured, with a positive control so the negatives are results rather than
+harness failures:
+
+| defense | case | result |
+|---|---|---|
+| **ConiVAT (full, metric learning)** | bridged_gaussians (directional bridge — its design case) | **1.000** ✓ control |
+| constraint injection into the matrix (ML→tiny, CL→large, then minimax; no coordinates needed) | hubs n=3 / heavy tails df=1.5 | weak dose-response on hubs (0.27 → 0.34 over budgets 10–40, vs 0.22 unrepaired); flat 0.00 on heavy tails |
+| ConiVAT (full) | heavy tails df=1.5 | ≈ 0.00 at budgets 20–40 |
+| hub-drop by lowest row-mean (unsupervised, matrix-only) | hubs n=1/3/6 | partial: 0.57 / 0.55 / 0.78, flags ≠ true hubs |
+
+The mechanisms are instructive and worth carrying to the chapter:
+
+- **Pairwise constraints barely dent a point-bridge.** Inflating any sampled
+  cannot-link pair leaves the bottleneck path free to route *through the
+  bridge node* via other pairs; a hub is a point whose entire row is
+  plausible, so no O(constraints) set of edited entries disconnects it. The
+  must-link merges buy a weak dose-response on hubs (0.27 → 0.34) by gluing
+  fragments back together — nowhere near the 1.0 the structure supports.
+  (Implementation note, caught by a test: must-links must be set to a tiny
+  positive value, not exact 0 — `minimax_transform_fast` goes through a
+  sparse-graph MST, where a zero entry is an ABSENT edge.)
+- **Diagonal metric learning cannot fix isotropic outliers.** ConiVAT's Xing
+  step reweights axes; Student-t tail draws leave in all directions, so no
+  axis reweighting separates them — its 1.000 on the *directional* bridge
+  shows the machinery working exactly where its geometry assumption holds.
+- **Row-mean hub-dropping is directionally right but unreliable** (partial
+  recovery, wrong flags): hub identification needs a sharper relational
+  statistic (e.g., how often a node is the best two-hop witness) — a real
+  follow-up, not attempted here.
+
+Bottom line for the 2×2's last row: geometric point-bridges resist every
+matrix-level defense tried; genuine point-level defenses (full-matrix metric
+learning with coordinates, density-based outlier removal, better relational
+hub statistics) remain the open route.

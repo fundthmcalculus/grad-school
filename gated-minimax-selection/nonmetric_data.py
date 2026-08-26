@@ -469,7 +469,11 @@ def knn_graph_hubs(n_per: int = 20, n_hubs: int = 3, k_local: int = 4, seed: int
 
 
 def heavy_tailed_blobs(
-    n_per: int = 20, df: float = 1.5, sep: float = 6.5, seed: int = 210
+    n_per: int = 20,
+    df: float = 1.5,
+    sep: float = 6.5,
+    seed: int = 210,
+    return_X: bool = False,
 ):
     """Three clusters with Student-t noise: outliers as natural bridge points.
 
@@ -485,6 +489,8 @@ def heavy_tailed_blobs(
     X = np.vstack([c + rng.standard_t(df, size=(n_per, 2)) for c in centers])
     y = np.repeat(np.arange(3), n_per)
     D = squareform(pdist(X))
+    if return_X:
+        return D, y, X
     return D, y
 
 

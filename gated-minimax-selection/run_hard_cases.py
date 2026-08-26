@@ -139,6 +139,127 @@ def run_tail_sweep():
     return table
 
 
+# ---------------------------------------------------------------------------
+# H3: can point-level side information rescue the geometric-bridge regimes?
+# ---------------------------------------------------------------------------
+
+CONSTRAINT_BUDGETS = [10, 20, 40]
+CONSTRAINT_SEEDS = [0, 1, 2]
+
+
+def constrained_minimax(D, ml_pairs, cl_pairs, big=None):
+    """ConiVAT's constraint step transplanted to matrix-only data: force
+    must-link entries to 0, cannot-link entries to a large value, then take
+    the minimax transform. This is the constraint-injection essence WITHOUT
+    the metric-learning step (which needs coordinates). H3 measures whether
+    that essence is enough -- it is not, and the mechanism is instructive:
+    a geometric bridge is a POINT, so inflating any sampled pair leaves the
+    bottleneck path free to route through the bridge node via other pairs."""
+    from conivat import transitive_closure_ml
+
+    Dc = np.asarray(D, dtype=float).copy()
+    big = big if big is not None else 3.0 * float(D.max())
+    # Must-link entries get a tiny POSITIVE value, not exact 0:
+    # minimax_transform_fast builds a sparse-graph MST, and a zero entry in a
+    # sparse matrix is an ABSENT edge -- exact zeros silently delete the very
+    # links the constraint asserts (caught by test_nonmetric).
+    tiny = 1e-9 * float(D.max())
+    for i, j in transitive_closure_ml(ml_pairs, D.shape[0]):
+        Dc[i, j] = Dc[j, i] = tiny
+    for i, j in cl_pairs:
+        Dc[i, j] = Dc[j, i] = big
+    return im.minimax_transform_fast(Dc)
+
+
+def drop_low_mean_rows(D, n_drop):
+    """Naive relational hub heuristic: a hub is close to everyone, so its row
+    mean is anomalously low. Drop the n_drop lowest-mean rows. H3 measures
+    this as a partial defense -- the flag set does NOT reliably equal the true
+    hubs, and recovery is partial."""
+    means = D.sum(axis=1) / (D.shape[0] - 1)
+    keep = np.sort(np.argsort(means)[n_drop:])
+    return D[np.ix_(keep, keep)], keep
+
+
+def _cover_masked_ari(Dstar, y):
+    sel = S.select_coverage_cover(Dstar)
+    n = Dstar.shape[0]
+    if not sel:
+        return 0, None
+    Db = np.zeros((len(sel), n))
+    for k, b in enumerate(sel):
+        mem = np.array(sorted(b["members"]), dtype=int)
+        Db[k] = Dstar[:, mem].min(axis=1)
+    return len(sel), round(_masked_ari(y, np.argmin(Db, axis=0)), 3)
+
+
+def run_side_information():
+    from conivat import conivat, generate_constraints, sl_labels_from_mtd
+
+    import battery as B
+
+    table = {}
+
+    # Positive control: ConiVAT on the directional bridge it was designed for.
+    X, y = B.bridged_gaussians()
+    ctl = []
+    for cs in CONSTRAINT_SEEDS:
+        mtd = conivat(X, y, n_constraints=40, seed=cs)
+        lab = sl_labels_from_mtd(mtd, 2)
+        ctl.append(_masked_ari(y, lab))
+    table["control_conivat_bridged_gaussians"] = {
+        "ari_mean": round(float(np.mean(ctl)), 3),
+        "ari_std": round(float(np.std(ctl)), 3),
+    }
+
+    # (a) Constraint injection into the matrix (no coordinates needed).
+    for case, gen in (
+        ("knn_graph_hubs(n_hubs=3)", lambda: ND.knn_graph_hubs(n_hubs=3, seed=209)),
+        ("heavy_tailed_blobs(df=1.5)", lambda: ND.heavy_tailed_blobs(df=1.5, seed=210)),
+    ):
+        D, y = gen()
+        row = {}
+        for nc in CONSTRAINT_BUDGETS:
+            aris = []
+            for cs in CONSTRAINT_SEEDS:
+                ml, cl = generate_constraints(y, n_constraints=nc, seed=cs)
+                Dstar = constrained_minimax(D, ml, cl)
+                _, ari = _cover_masked_ari(Dstar, y)
+                aris.append(0.0 if ari is None else ari)
+            row[f"nc={nc}"] = round(float(np.mean(aris)), 3)
+        table[f"constraint_injection[{case}]"] = row
+
+    # (b) Full ConiVAT (metric learning; needs coordinates) on heavy tails.
+    D, y, X = ND.heavy_tailed_blobs(df=1.5, seed=210, return_X=True)
+    row = {}
+    for nc in (20, 40):
+        aris = []
+        for cs in CONSTRAINT_SEEDS:
+            mtd = conivat(X, y, n_constraints=nc, seed=cs)
+            lab = sl_labels_from_mtd(mtd, 3)
+            aris.append(_masked_ari(y, lab))
+        row[f"nc={nc}"] = round(float(np.mean(aris)), 3)
+    table["full_conivat[heavy_tailed_blobs(df=1.5)]"] = row
+
+    # (c) Naive relational hub-dropping (unsupervised, matrix-only).
+    row = {}
+    for n_hubs in (1, 3, 6):
+        D, y = ND.knn_graph_hubs(n_hubs=n_hubs, seed=209)
+        Dk, keep = drop_low_mean_rows(D, n_hubs)
+        flagged = set(range(D.shape[0])) - set(keep.tolist())
+        true_hubs = set(np.where(y == -1)[0].tolist())
+        _, ari = _cover_masked_ari(im.minimax_transform_fast(Dk), y[keep])
+        row[f"n_hubs={n_hubs}"] = {
+            "cover_ari_after_drop": ari,
+            "flagged_equals_true_hubs": flagged == true_hubs,
+            "n_true_hubs_flagged": len(flagged & true_hubs),
+        }
+    table["hub_drop_low_mean[knn_graph_hubs]"] = row
+
+    results["side_information"] = table
+    return table
+
+
 def fig_hard_cases(hub, tail):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11.5, 4.4))
     series = [
@@ -193,6 +314,8 @@ def main():
     hub = run_hub_sweep()
     print("H2: heavy-tail dose-response...")
     tail = run_tail_sweep()
+    print("H3: side-information defenses (constraints / ConiVAT / hub-drop)...")
+    side = run_side_information()
 
     results["params"] = {
         "hub_grid": HUB_GRID,
@@ -223,6 +346,9 @@ def main():
             f"cover={e['cover_ari']} (k={e['cover_k']}, cov={e['cover_coverage']}, "
             f"abstained {e['cover_abstained']}/3) r_hat={e['repair_r_hat']}"
         )
+    print("\nH3 SIDE INFORMATION:")
+    for name, e in side.items():
+        print(f"  {name}: {e}")
 
 
 if __name__ == "__main__":
