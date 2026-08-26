@@ -223,9 +223,13 @@ eliminates it.
   transfer, not superiority. The two hard families split the methods — but a
   wider hard set (hub-dominated kNN graphs, heavy-tailed noise) would map the
   boundary better.
-- Shortcut fragility was characterized, not repaired. The obvious next
-  experiment: ConiVAT-style bridge pruning (or the E3 observation that dense
-  shortcuts self-heal) as a pre-transform defense, measured on the same sweep.
+- ~~Shortcut fragility was characterized, not repaired.~~ **Done** — see
+  `notes/BRIDGE_REPAIR.md`: one-sided reverse-TI metric repair
+  (`metric_repair.py`) restores the collapse (0.11 → 0.98) and the broken
+  multi-scale cells (→ 1.0/1.0), is provably identity on metric inputs, and
+  its scope boundary (inert on geometric bridges, out-of-scope on densely
+  non-metric data like real DTW) is measured and pinned in tests. ConiVAT
+  remains the route for *geometric* bridges.
 - `bottleneck_bootstrap_relational` resamples with replacement like the
   coordinate original (duplicate indices give zero-distance duplicate rows).
   A jackknife (without-replacement) variant may behave differently on
