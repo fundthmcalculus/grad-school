@@ -179,7 +179,12 @@ a mechanism.
   the dataset retired in favor of `relational_nested_hierarchy`, which has
   exact two-level truth by construction. Tracked as a repo issue; not fixed
   here because `run_all.py`'s relational table/figures currently depend on the
-  generator's exact output.
+  generator's exact output. **[FIXED 2026-08-25, issue #160]** — declared
+  labels now match structure exactly (pinned in `test_relationdata.py`),
+  `run_all.py`'s relational row moved 0.285 → 0.551 (the c=3-vs-6-labels
+  ceiling; the only numbers in results.json that changed), and E4's
+  declared-vs-structural split now coincides: multi-scale recovers the dataset
+  at 1.0/1.0 against its own declared labels.
 
 ## E5 — Real-data DTW: N-CMAPSS DS01 flight altitude profiles
 
