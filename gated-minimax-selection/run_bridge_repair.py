@@ -214,6 +214,72 @@ def run_multiscale_restoration():
 
 
 # ---------------------------------------------------------------------------
+# R4: auto-q -- set the quantile from the data's own estimated corruption
+# ---------------------------------------------------------------------------
+
+
+def run_auto_q():
+    """auto_repair vs the fixed quantiles on the shortcut rate sweep, plus the
+    decline behavior on clean/battery/real data. The question: does estimating
+    r and applying q = 1 - 2r(1-r) - margin match or beat hand-picked q?"""
+    import os
+
+    from metric_repair import auto_repair, estimate_corruption_rate
+
+    table = {"sweep": {}, "estimator": {}, "decline": {}}
+
+    for rate in SWEEP_RATES:
+        accum = {"auto": [], "r_hat": [], "q_used": []}
+        for ds in DATASET_SEEDS:
+            D0, y, _ = ND.euclidean_blobs(seed=206 + 100 * ds)
+            Dv = ND.violate_pairs(D0, rate, FIXED_STRENGTH, "shortcut", seed=1 + ds)
+            Dr, info = auto_repair(Dv)
+            Dstar = im.minimax_transform_fast(Dr)
+            _, _, ari_c = _cover(Dstar, y)
+            accum["auto"].append(0.0 if ari_c is None else ari_c)
+            accum["r_hat"].append(info["r_hat"])
+            accum["q_used"].append(info["q"] if info["q"] is not None else -1.0)
+        table["sweep"][str(rate)] = {
+            "cover_ari": round(float(np.mean(accum["auto"])), 4),
+            "cover_ari_std": round(float(np.std(accum["auto"])), 4),
+            "r_hat_mean": round(float(np.mean(accum["r_hat"])), 4),
+            "q_used_mean": round(float(np.mean(accum["q_used"])), 4),
+        }
+
+    # estimator calibration (true rate vs r_hat) at full strength
+    for rate in SWEEP_RATES:
+        ests = []
+        for ds in DATASET_SEEDS:
+            D0, _, _ = ND.euclidean_blobs(seed=206 + 100 * ds)
+            Dv = ND.violate_pairs(D0, rate, 1.0, "shortcut", seed=1 + ds)
+            ests.append(estimate_corruption_rate(Dv))
+        table["estimator"][str(rate)] = round(float(np.mean(ests)), 4)
+
+    # decline behavior: every battery family should repair-as-identity with a
+    # high q; real DTW should be DECLINED outright.
+    for name, (fn, _) in ND.BATTERY.items():
+        D, _ = fn()
+        _, info = auto_repair(D)
+        table["decline"][name] = {
+            "r_hat": round(info["r_hat"], 4),
+            "q": info["q"],
+            "declined": info["declined"],
+        }
+    if os.path.exists(NCMAPSS_DS01):
+        traces, _, _ = load_flight_traces()
+        D = ND.pairwise(traces, ND.dtw_distance)
+        _, info = auto_repair(D)
+        table["decline"]["real_dtw_ncmapss"] = {
+            "r_hat": round(info["r_hat"], 4),
+            "q": info["q"],
+            "declined": info["declined"],
+        }
+
+    results["auto_q"] = table
+    return table
+
+
+# ---------------------------------------------------------------------------
 # figures
 # ---------------------------------------------------------------------------
 
@@ -331,6 +397,8 @@ def main():
     noharm = run_noharm()
     print("R3: multi-scale restoration...")
     ms = run_multiscale_restoration()
+    print("R4: auto-q (estimate corruption, set the quantile, decline out-of-scope)...")
+    auto = run_auto_q()
 
     with open(f"{OUT}/bridge_repair_results.json", "w") as f:
         json.dump(results, f, indent=2)
@@ -363,6 +431,18 @@ def main():
             f"q.5={e['q0.5']['per_level']} (bands={e['q0.5']['bands']}) "
             f"q.75={e['q0.75']['per_level']} (bands={e['q0.75']['bands']})"
         )
+    print("\nAUTO-Q (shortcut rate sweep at strength 1.0):")
+    for rate in SWEEP_RATES:
+        cell = auto["sweep"][str(rate)]
+        fixed = dose["by_rate"]["shortcut"][str(rate)]
+        print(
+            f"  rate={rate}: auto={cell['cover_ari']} (r_hat={cell['r_hat_mean']}, "
+            f"q={cell['q_used_mean']}) vs raw={fixed['raw']['cover_ari']} "
+            f"q.5={fixed['q0.5']['cover_ari']} q.75={fixed['q0.75']['cover_ari']}"
+        )
+    print("\nAUTO-Q decline behavior:")
+    for name, e in auto["decline"].items():
+        print(f"  {name}: r_hat={e['r_hat']} q={e['q']} declined={e['declined']}")
 
 
 if __name__ == "__main__":

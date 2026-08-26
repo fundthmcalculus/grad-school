@@ -79,3 +79,57 @@ def reverse_ti_repair(D: np.ndarray, q: float = 0.5) -> np.ndarray:
     R = (R + R.T) / 2.0
     np.fill_diagonal(R, 0.0)
     return R
+
+
+def estimate_corruption_rate(D: np.ndarray, rtol: float = 1e-9) -> float:
+    """Fraction of pairs whose MEDIAN witness bound exceeds the entry itself.
+
+    On metric data this is exactly 0 (every witness bound is <= D_ij). Under
+    planted shortcut corruption it tracks the true corruption rate
+    monotonically but conservatively (~0.6x on the blob benchmark): deflated
+    intra-cluster pairs are invisible -- their witness bounds are ~0 anyway --
+    and only deflated CROSS-cluster pairs, the ones that actually matter to
+    the minimax transform, are counted. On densely non-metric data (real
+    flight-profile DTW) it reads ~0.5, which is the "decline" signal
+    auto_repair uses.
+    """
+    LB = witness_lower_bounds(D, 0.5)
+    n = D.shape[0]
+    iu = np.triu_indices(n, k=1)
+    return float(np.mean(LB[iu] > D[iu] * (1.0 + rtol) + 1e-12))
+
+
+def auto_repair(
+    D: np.ndarray,
+    margin: float = 0.1,
+    q_min: float = 0.5,
+    q_max: float = 0.9,
+    decline_above: float = 0.35,
+) -> tuple:
+    """Repair with the quantile set from the data's own estimated corruption.
+
+    The corrupted-witness argument in the module doc says q must sit below
+    ~1 - 2r(1-r) when a fraction r of pairs is corrupted; with r estimated by
+    :func:`estimate_corruption_rate`, set
+
+        q = clip(1 - 2*r_hat*(1 - r_hat) - margin, q_min, q_max).
+
+    Clean or metric data (r_hat = 0) gets q_max, which is free (the repair is
+    identity there at any q). Heavily flagged data (r_hat > decline_above) is
+    DECLINED -- returned unchanged -- because a matrix where the median
+    witness disagrees with half the entries is not "metric plus sparse
+    corruption", it is intrinsically non-metric (the real-DTW regime), and
+    the repair's premises do not hold.
+
+    Returns (repaired_or_original, info) where info carries r_hat, the q
+    used (None if declined), and the declined flag.
+    """
+    r_hat = estimate_corruption_rate(D)
+    if r_hat > decline_above:
+        return np.asarray(D, dtype=float).copy(), {
+            "r_hat": r_hat,
+            "q": None,
+            "declined": True,
+        }
+    q = float(np.clip(1.0 - 2.0 * r_hat * (1.0 - r_hat) - margin, q_min, q_max))
+    return reverse_ti_repair(D, q), {"r_hat": r_hat, "q": q, "declined": False}
