@@ -41,7 +41,12 @@ def nerfcm(D, c, m=2.0, max_iter=100, tol=1e-5, seed=0, verbose=False):
     U /= U.sum(axis=0, keepdims=True)
 
     beta = 0.0
-    Dbeta = D.copy()
+    # A reference, not a copy: Dbeta is never written in place -- the only
+    # other assignment (the beta-spread activation below) builds a brand-new
+    # array from D -- and relational_update only reads it. The copy was pure
+    # memory waste, and at Crop's N=24,000 (4.6 GB) it was the difference
+    # between the G2 downstream run fitting in RAM and being OOM-killed.
+    Dbeta = D
 
     def relational_update(U, Dbeta):
         """One RFCM relational update; returns new distances d (c,n) and new V."""
