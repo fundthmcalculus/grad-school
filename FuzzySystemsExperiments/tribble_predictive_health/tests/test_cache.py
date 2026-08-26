@@ -17,7 +17,7 @@ _FSE = pathlib.Path(__file__).resolve().parents[2]
 
 from tribble_predictive_health import cache  # noqa: E402
 
-DS02 = _FSE.parent / "NASA-CMAPSS" / "N-CMAPSS_DS02-006.h5"
+DS02 = _FSE.parent / "data" / "nasa-cmapps2" / "N-CMAPSS_DS02-006.h5"
 
 
 # --- pure plumbing (no h5, no tribblefis) ----------------------------------

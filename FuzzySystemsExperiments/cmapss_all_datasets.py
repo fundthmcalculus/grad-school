@@ -35,7 +35,7 @@ Writes `cmapss_all_datasets_report.md`.
 
 Needs: h5py, numpy, pandas, scikit-learn, tribble-fis.  Run:
 
-    python cmapss_all_datasets.py --h5-dir NASA-CMAPSS
+    python cmapss_all_datasets.py --h5-dir data/nasa-cmapps2
 """
 
 import argparse
@@ -313,7 +313,7 @@ def main(h5_dir, rebuild_cache=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--h5-dir", default="NASA-CMAPSS")
+    parser.add_argument("--h5-dir", default="data/nasa-cmapps2")
     parser.add_argument(
         "--rebuild-cache",
         action="store_true",

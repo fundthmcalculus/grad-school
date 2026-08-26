@@ -848,7 +848,7 @@ def main():
     A("")
     A(
         "The DS02 HDF5 file is not tracked (2.4 GB); it is the Kaggle N-CMAPSS "
-        "release, expected at `NASA-CMAPSS/N-CMAPSS_DS02-006.h5`."
+        "release, expected at `data/nasa-cmapps2/N-CMAPSS_DS02-006.h5`."
     )
 
     path = os.path.join(OUT, "BENCHMARK.md")

@@ -57,7 +57,7 @@ DATASETS = {
     "N-CMAPSS_DS04": "fan",
     "N-CMAPSS_DS07": "LPT",
 }
-DATA_DIR = "../NASA-CMAPSS"
+DATA_DIR = "../data/nasa-cmapps2"
 CH_ALL = [
     "T24",
     "T30",

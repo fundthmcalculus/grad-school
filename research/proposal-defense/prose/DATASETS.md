@@ -48,7 +48,7 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Status:** Measured at ten seeds (2026-08-12), wired into Table 4.1 alongside Concrete and PhiUSIIL; 17.3× larger than Concrete, demonstrating fuzzy regression scaling on real urban dynamics
 
 #### N-CMAPSS DS02 — Turbofan Remaining Useful Life (Table 4.10, §4.4.1)
-- **File:** `NASA-CMAPSS/N-CMAPSS_DS02-006.h5` (HDF5)
+- **File:** `data/nasa-cmapps2/N-CMAPSS_DS02-006.h5` (HDF5)
 - **Size:** 5.3M train + 1.2M test rows at 1 Hz → aggregated per `(unit, cycle)`; RUL regression, physics/prognostics domain
 - **Role:** Large-scale physical-engineering regression **case study** — the domain partner Concrete lacks; demonstrates the §4.3.2 answer-first regression construction against published deep-learning baselines on their own benchmark
 - **Source:** Arias Chao, Kulkarni, Goebel, Fink, *Data* 6(1):5, 2021 (DOI 10.3390/data6010005); [Kaggle mirror](https://www.kaggle.com/datasets/bishals098/nasa-cmapss-2-engine-degradation)
