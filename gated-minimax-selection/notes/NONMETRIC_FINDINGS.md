@@ -235,10 +235,18 @@ eliminates it.
   its scope boundary (inert on geometric bridges, out-of-scope on densely
   non-metric data like real DTW) is measured and pinned in tests. ConiVAT
   remains the route for *geometric* bridges.
-- `bottleneck_bootstrap_relational` resamples with replacement like the
-  coordinate original (duplicate indices give zero-distance duplicate rows).
-  A jackknife (without-replacement) variant may behave differently on
-  relational data; untested.
+- ~~`bottleneck_bootstrap_relational` resamples with replacement like the
+  coordinate original... A jackknife variant may behave differently;
+  untested.~~ **Tested (E6, `run_bootstrap_variants`)**: the two schemes make
+  the SAME final selection on 6/7 cases (the full-matrix threshold step
+  absorbs the vote differences), but the jackknife (`replace=False`) turns
+  the gap-consensus frequency into a one-sided confidence signal — ≥ 0.47 on
+  every clean structured family (dtw 0.21 → 0.75) and ≤ 0.27 on every
+  hard/ambiguous case, where with-replacement reads an uninformative
+  0.15–0.34 everywhere. Duplicate rows (distance 0) inject spurious
+  tiny-persistence blocks into every boot, scattering the vote; true
+  submatrices don't. High jackknife frequency ⇒ trustworthy discovery; low
+  frequency is inconclusive, never a false alarm in the tested battery.
 
 ## Reproduction
 
