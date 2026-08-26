@@ -228,17 +228,26 @@ def multi_scale_hierarchy(n=45, seed=108):
 
     # Create 3 large clusters
     cluster_roots = []
+    # Every sub-cluster root with its fine-grained label, across ALL large
+    # clusters. The previous version kept only the LAST large cluster's
+    # sub_roots in scope for the top-up loop below, and labeled the extra
+    # leaves rng.integers(0, 4) -- random, unrelated to where they attached,
+    # and not even spanning the full label range {0..5}. That put ~18% label
+    # noise into the declared ground truth (grad-school issue #160); the
+    # dataset's long-standing "NERFCM stuck at ARI 0.285" was substantially
+    # that noise, not method failure.
+    all_subs = []
     for large_c in range(3):
         root = node_id
         cluster_roots.append(root)
         node_id += 1
 
         # Each large cluster has 2 sub-clusters
-        sub_roots = []
         for sub_c in range(2):
             sub_root = node_id
             node_id += 1
-            sub_roots.append(sub_root)
+            label = large_c * 2 + sub_c
+            all_subs.append((sub_root, label))
 
             # Connect sub_root to root with intermediate distance
             edges.append((root, sub_root, 2.0))
@@ -249,8 +258,6 @@ def multi_scale_hierarchy(n=45, seed=108):
                 leaf_node = node_id
                 node_id += 1
                 edges.append((sub_root, leaf_node, 0.4))
-                # Label: we'll assign a sub-cluster ID for fine-grained truth
-                label = large_c * 2 + sub_c
                 leaf_labels[leaf_node] = label
 
     # Connect large clusters far apart
@@ -258,19 +265,15 @@ def multi_scale_hierarchy(n=45, seed=108):
     edges.append((cluster_roots[1], cluster_roots[2], 6.0))
     edges.append((cluster_roots[0], cluster_roots[2], 6.5))
 
-    # If we haven't reached n points, add more to random sub-clusters
-    while node_id - len(cluster_roots) < n:
-        sub_root = rng_local.choice([r for roots in [sub_roots] for r in roots])
+    # Top up to exactly n LEAVES (the old loop counted internal nodes toward
+    # n, so n=45 silently produced 39 leaves), attaching each extra leaf to a
+    # randomly chosen sub-cluster anywhere in the tree and labeling it by
+    # where it actually attached.
+    while len(leaf_labels) < n:
+        sub_root, label = all_subs[rng_local.integers(len(all_subs))]
         leaf_node = node_id
         node_id += 1
         edges.append((sub_root, leaf_node, 0.4))
-        # Find the cluster ID from the root's children
-        label = None
-        for lbl, lid in list(leaf_labels.items())[:5]:
-            if label is None:
-                label = rng_local.integers(0, 4)
-        if label is None:
-            label = 0
         leaf_labels[leaf_node] = label
 
     # Trim to exactly n leaves

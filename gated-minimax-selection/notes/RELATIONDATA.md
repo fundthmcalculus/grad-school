@@ -72,12 +72,22 @@ Running `python3 run_all.py` on these datasets shows:
 dataset                             NERFCM(D)          NERFCM(D*)
 three_clusters_tree                 1.00±0.00           1.00±0.00
 chain_then_ring                     1.00±0.00           1.00±0.00
-multi_scale_hierarchy               0.29±0.00           0.29±0.00
+multi_scale_hierarchy               0.55±0.00           0.55±0.00
 ```
 
 **Interpretation:**
 - `three_clusters_tree` and `chain_then_ring`: NERFCM already recovers structure well from D alone. No gap = NERFCM is robust to tree distances.
-- `multi_scale_hierarchy`: Both NERFCM(D) and NERFCM(D*) struggle with ARI 0.29. This suggests the scale-adaptation problem is *harder* than NERFCM's simple approach can handle. This is actually the *real* problem to solve.
+- `multi_scale_hierarchy`: 0.55 at c=3 against 6 fine labels is the ceiling for
+  *any* three-cluster partition — a granularity mismatch, not a method failure.
+  The multi-scale selector recovers both truth levels at ARI 1.0
+  (`run_nonmetric.py` E4, `notes/NONMETRIC_FINDINGS.md` §E4).
+
+**History:** this dataset previously reported **0.29** here and was framed as
+"the *real* problem to solve." That number was substantially an artifact: the
+generator's leaf-expansion loop assigned ~18% of the declared labels at random
+(issue #160). Fixed 2026-08-25 — declared labels now provably match the
+structural sub-clusters (`test_relationdata.py`), n went from a silent 39 to
+the documented 45, and the NERFCM score moved 0.29 → 0.55.
 
 ## Why These Datasets Matter
 
