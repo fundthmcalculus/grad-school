@@ -131,25 +131,15 @@ _KNOWN_SKIPPED = {
 }
 
 
-def minimax_transform_lowmem(D):
-    """Memory-lite exact equivalent of `ivat_mf.minimax_transform_fast`.
-
-    The library version converts the dense matrix to CSR for scipy's MST --
-    at N=16,637 that is a ~3.3 GB spike on top of D and D*, and it OOM-killed
-    the first full-N ElectricDevices run on this 15 GB machine (the pipeline's
-    exit code was tee's, so the death was silent -- caught by the truncated
-    log). This version runs Prim's MST directly on the dense matrix in O(n)
-    extra memory, then applies the same ascending-edge union-find fill; the
-    result is verified equal to the library version on a seeded subsample at
-    every call, the same gate convention as REPRO_G2_DTW_IMPL.
-    """
+def _prim_edges(D):
+    """Prim's MST on the dense matrix: O(n^2) time, O(n) extra memory.
+    Returns (n-1, 3) rows of (weight, a, b)."""
     n = D.shape[0]
-    # Prim on the dense matrix: O(n^2) time, O(n) extra memory.
     in_tree = np.zeros(n, dtype=bool)
     in_tree[0] = True
     best_w = D[0].copy()
     best_from = np.zeros(n, dtype=np.int64)
-    edges = np.empty((n - 1, 3), dtype=np.float64)  # (weight, a, b)
+    edges = np.empty((n - 1, 3), dtype=np.float64)
     for t in range(n - 1):
         w = np.where(in_tree, np.inf, best_w)
         j = int(np.argmin(w))
@@ -158,7 +148,11 @@ def minimax_transform_lowmem(D):
         improved = D[j] < best_w
         best_w = np.where(improved, D[j], best_w)
         best_from = np.where(improved, j, best_from)
-    # Ascending-edge union-find fill (same recurrence as minimax_transform_fast).
+    return edges
+
+
+def _fill_from_edges(edges, n):
+    """Ascending-edge union-find fill (same recurrence as minimax_transform_fast)."""
     order = np.argsort(edges[:, 0], kind="stable")
     Dstar = np.zeros((n, n))
     parent = np.arange(n)
@@ -187,6 +181,55 @@ def minimax_transform_lowmem(D):
         parent[rb] = ra
         del members[rb]
     return Dstar
+
+
+def minimax_transform_lowmem_consuming(holder):
+    """Split-phase transform that FREES the input between phases.
+
+    `holder` is a one-element list [D]; after Prim extracts the MST edges the
+    reference is dropped, so D and D* never coexist -- peak memory is
+    max(|D|, |D*|), not |D| + |D*|. At Crop's N=24,000 that is 4.6 GB instead
+    of 9.2 GB, which is the difference between finishing and the OOM that
+    killed run 5 during exactly this phase (compounded there by the previous
+    dataset's D* still being bound by the loop variable).
+    """
+    D = holder[0]
+    n = D.shape[0]
+    edges = _prim_edges(D)
+    holder[0] = None
+    del D
+    return _fill_from_edges(edges, n)
+
+
+def minimax_transform_lowmem(D):
+    """Memory-lite exact equivalent of `ivat_mf.minimax_transform_fast`
+    (see minimax_transform_lowmem_consuming for the split-phase variant and
+    the OOM history; see minimax_lowmem_verified for why the equality gate
+    checks the O(n^3) reference rather than _fast)."""
+    return _fill_from_edges(_prim_edges(D), D.shape[0])
+
+
+def _verify_lowmem_on_subsample(D):
+    """The equality gate from minimax_lowmem_verified, standalone: verify the
+    lowmem transform against the O(n^3) reference on a seeded 300-point
+    subsample of THIS matrix, and raise on any disagreement."""
+    n_check = min(300, D.shape[0])
+    idx = np.random.RandomState(0).choice(D.shape[0], n_check, replace=False)
+    sub = np.ascontiguousarray(D[np.ix_(idx, idx)])
+    ref = im.minimax_transform(sub)  # the O(n^3) reference, NOT _fast
+    new = minimax_transform_lowmem(sub)
+    if not np.allclose(ref, new, rtol=1e-12, atol=1e-12):
+        raise AssertionError(
+            f"minimax_transform_lowmem disagrees with the O(n^3) reference on "
+            f"the {n_check}-point verification subsample "
+            f"(max |diff| = {np.abs(ref - new).max():.3e})"
+        )
+    n_zero = int((sub[np.triu_indices(n_check, 1)] == 0).sum())
+    print(
+        f"  [minimax] lowmem path verified equal to the O(n^3) reference on a "
+        f"{n_check}-point subsample (max |diff| = {np.abs(ref - new).max():.2e}; "
+        f"{n_zero} zero off-diagonal pairs present)"
+    )
 
 
 def minimax_lowmem_verified(D):
@@ -306,17 +349,34 @@ def main():
         print(f"  loaded: N={X.shape[0]} length={X.shape[1]} k_true={k_true}")
 
         t0 = time.time()
-        D = dtw_matrix(X)
-        t_dtw = time.time() - t0
-        print(f"  DTW matrix {D.shape}: {t_dtw:.1f}s")
+        _cache_dir = os.environ.get("REPRO_G2_DTW_CACHE", "")
+        _cache_path = (
+            os.path.join(_cache_dir, f"dtw_{name}_N{X.shape[0]}.npy")
+            if _cache_dir
+            else ""
+        )
+        if _cache_path and os.path.exists(_cache_path):
+            D = np.load(_cache_path)
+            print(f"  DTW matrix {D.shape}: loaded from cache ({_cache_path})")
+        else:
+            D = dtw_matrix(X)
+            t_dtw = time.time() - t0
+            print(f"  DTW matrix {D.shape}: {t_dtw:.1f}s")
+            if _cache_path:
+                os.makedirs(_cache_dir, exist_ok=True)
+                np.save(_cache_path, D)
+                print(f"  cached -> {_cache_path}")
 
         t0 = time.time()
-        Ds = minimax_lowmem_verified(D)
-        t_mm = time.time() - t0
-        print(f"  minimax transform (lowmem, verified): {t_mm:.2f}s")
-        # D is never used again; at N=16,637 it is 2.2 GB better freed before
-        # NERFCM makes its own working copy of Ds.
+        # verification gate on a subsample first (cheap), then the split-phase
+        # transform, which frees D between Prim and the fill so D and D* never
+        # coexist -- the OOM that killed run 5 at Crop's N=24,000.
+        _verify_lowmem_on_subsample(D)
+        holder = [D]
         del D
+        Ds = minimax_transform_lowmem_consuming(holder)
+        t_mm = time.time() - t0
+        print(f"  minimax transform (lowmem, split-phase, verified): {t_mm:.2f}s")
 
         # --- NERFCM given k (the decision rule's comparison anchor) ---------
         aris_n, secs_n = nerfcm_given_k_ari(Ds, y, k_true, SEEDS)
@@ -347,15 +407,29 @@ def main():
         )
 
         # --- bonus context: single-linkage-given-k, beta-plateau ------------
-        ari_sl = single_linkage_given_k_ari(Ds, y, k_true)
-        t0 = time.time()
-        k_bp, sel_bp, meta_bp = select_beta_plateau(Ds)
-        t_bp = time.time() - t0
-        ari_bp, _, cov_bp = cover_ari(sel_bp, Ds, y)
-        print(
-            f"  single-linkage given k: ARI={ari_sl:.3f}  |  "
-            f"beta-plateau: {t_bp:.2f}s -> k={k_bp} coverage={cov_bp:.3f} ARI={ari_bp:.3f}"
-        )
+        # NOT on the decision rule's hard threshold (which names only
+        # NERFCM-given-k vs. the set-cover), so above REPRO_G2_BONUS_NMAX they
+        # are skipped with a stamped n/a: at Crop's N=24,000 the extra
+        # squareform copy + linkage internals on top of the held D* is what
+        # OOM-killed run 7 AFTER both decision-rule quantities had printed.
+        _bonus_nmax = int(os.environ.get("REPRO_G2_BONUS_NMAX", "20000"))
+        if X.shape[0] <= _bonus_nmax:
+            ari_sl = single_linkage_given_k_ari(Ds, y, k_true)
+            t0 = time.time()
+            k_bp, sel_bp, meta_bp = select_beta_plateau(Ds)
+            t_bp = time.time() - t0
+            ari_bp, _, cov_bp = cover_ari(sel_bp, Ds, y)
+            print(
+                f"  single-linkage given k: ARI={ari_sl:.3f}  |  "
+                f"beta-plateau: {t_bp:.2f}s -> k={k_bp} coverage={cov_bp:.3f} ARI={ari_bp:.3f}"
+            )
+        else:
+            ari_sl = float("nan")
+            k_bp, sel_bp, ari_bp, cov_bp = 0, [], float("nan"), 0.0
+            print(
+                f"  bonus metrics skipped: N={X.shape[0]} > REPRO_G2_BONUS_NMAX={_bonus_nmax} "
+                "(memory; not on the decision rule's hard threshold)"
+            )
 
         gap_to_nerfcm = (
             abs(ari_cover - nerfcm_mean) if not np.isnan(ari_cover) else float("nan")
@@ -374,12 +448,24 @@ def main():
                 C.cell(aris_n),
                 f"{ari_cover:.3f} (k={k_cover}, cov={cov_cover:.2f})",
                 f"{ari_multi:.3f} (bands={granularities})" if msel.bands else C.NA,
-                f"{ari_sl:.3f}",
+                f"{ari_sl:.3f}" if not np.isnan(ari_sl) else "n/a (N > bonus cap)",
                 f"{ari_bp:.3f} (k={k_bp}, cov={cov_bp:.2f})" if sel_bp else C.NA,
                 f"gap={gap_to_nerfcm:.3f}, within 0.05: {within_threshold}",
             ]
         )
+        # free this dataset's transform BEFORE the next dataset's DTW build --
+        # run 5's Crop OOM was compounded by StarLightCurves' D* still bound.
+        del Ds
+        _emit(rows)
 
+    _emit(rows)
+
+
+def _emit(rows):
+    """Emit the table with the rows finished SO FAR -- called after every
+    dataset, not only at the end, so a crash in a later dataset's phase can
+    never again discard finished rows (run 5 died in Crop's transform with
+    four completed datasets living only in a scratch log)."""
     C.emit(
         "table_3_7_g2_downstream",
         "Table 3.7 (Goal G2) companion -- decision-rule item 3: downstream usefulness "
@@ -412,17 +498,23 @@ def main():
             "to reweight, which DTW time series do not have (a genuine implementation "
             "gap, not a missing call site); bottleneck-bootstrap recomputes a distance "
             "matrix from scratch per bootstrap resample and would need ~100 DTW "
-            "rebuilds, many hours at this scale. Single-linkage-given-k and "
+            "rebuilds. Single-linkage-given-k and "
             "beta-plateau are included as bonus context; the decision rule's hard "
-            "threshold names only NERFCM-given-k vs. the set-cover. FordA and Crop are "
-            "NOT attempted here -- their DTW matrices cost ~7200s and ~1600s "
-            "respectively (measured by the sibling table_3_7_g2_dtw_nonmetric.py run) "
-            "and are not rebuilt without a separate flagged decision, so the decision "
-            "rule's 'at least three of the five DTW sets' threshold cannot yet be "
-            "fully evaluated -- only ECG5000 is measured here. A quick timing probe "
-            "(n=1024 subsample) confirmed before this run that the downstream "
-            "algorithms themselves are cheap at full N (single-digit seconds); the "
-            "DTW matrix build is the entire cost."
+            "threshold names only NERFCM-given-k vs. the set-cover. As of 2026-08-25 "
+            "all five named datasets run in one pass: REPRO_G2_DTW_IMPL=simd swaps in "
+            "the experiments/dtw-simd OpenMP+AVX-512 kernel (10-12x aeon's "
+            "single-threaded numba build; equality-verified against aeon on a seeded "
+            "300-point subsample of the actual data at every call), which turned "
+            "StarLightCurves' full 9,236x1,024 build from ~30h (infeasible) into "
+            "~4.6h and made FordA/Crop re-measurement cheap. The minimax transform "
+            "is the lowmem split-phase implementation, equality-verified per call "
+            "against the O(n^3) REFERENCE -- deliberately not against "
+            "minimax_transform_fast, whose csr conversion drops exact-zero entries "
+            "(duplicate points) and inflates D* for them (repo issue; ED has 40 such "
+            "pairs in its verification subsample, Crop 2, so those datasets are "
+            "re-measured here on the corrected transform; ECG5000/FordA have none "
+            "and reproduce their 2026-08-12 rows exactly). The table is re-emitted "
+            "after every dataset so a crash cannot discard finished rows."
         ),
         seeds=SEEDS,
     )
