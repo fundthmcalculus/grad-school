@@ -207,3 +207,27 @@ def test_relational_nested_hierarchy_structure():
     diff_coarse = y_coarse[:, None] != y_coarse[None, :]
     assert D[same_fine].max() < D[same_coarse_diff_fine].min()
     assert D[same_coarse_diff_fine].max() < D[diff_coarse].min()
+
+
+def test_knn_graph_hubs_invariants():
+    D, y = ND.knn_graph_hubs(n_per=8, n_hubs=2, seed=3)
+    assert D.shape[0] == len(y) == 26
+    assert (y == -1).sum() == 2  # hubs are noise-labeled
+    assert set(np.unique(y)) == {-1, 0, 1, 2}
+    assert np.all(np.isfinite(D))
+    assert np.allclose(D, D.T)
+    D2, y2 = ND.knn_graph_hubs(n_per=8, n_hubs=2, seed=3)
+    assert np.array_equal(D, D2) and np.array_equal(y, y2)
+    # zero hubs must reduce to a clean 3-community graph
+    D0, y0 = ND.knn_graph_hubs(n_per=8, n_hubs=0, seed=3)
+    assert (y0 == -1).sum() == 0
+
+
+def test_heavy_tailed_blobs_invariants():
+    D, y = ND.heavy_tailed_blobs(n_per=8, df=1.5, seed=4)
+    assert D.shape[0] == len(y) == 24
+    assert set(np.unique(y)) == {0, 1, 2}  # every point keeps its true label
+    assert np.allclose(D, D.T)
+    assert np.all(D >= 0)
+    D2, y2 = ND.heavy_tailed_blobs(n_per=8, df=1.5, seed=4)
+    assert np.array_equal(D, D2)

@@ -198,3 +198,18 @@ def test_auto_repair_declines_when_flagged_fraction_is_high():
     R2, info2 = auto_repair(D, decline_above=0.9)
     assert not info2["declined"]
     assert np.any(R2 > D)
+
+
+def test_repair_inert_on_geometric_bridge_regimes():
+    """The hard-case map's defining property: hub graphs and heavy-tailed
+    blobs are METRIC (real shortest paths / real Euclidean distances), so the
+    corruption estimator must read 0 and auto_repair must be identity --
+    geometric bridges are not corruption, and the repair must not touch them."""
+    D_hub, _ = ND.knn_graph_hubs(n_per=8, n_hubs=3, seed=5)
+    assert estimate_corruption_rate(D_hub) == 0.0
+    R, info = auto_repair(D_hub)
+    assert not info["declined"] and np.allclose(R, D_hub)
+    D_tail, _ = ND.heavy_tailed_blobs(n_per=8, df=1.2, seed=6)
+    assert estimate_corruption_rate(D_tail) == 0.0
+    R2, _ = auto_repair(D_tail)
+    assert np.allclose(R2, D_tail)
