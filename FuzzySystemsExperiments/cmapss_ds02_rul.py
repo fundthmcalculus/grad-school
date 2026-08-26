@@ -36,7 +36,7 @@ full account.
 
 Needs: h5py, numpy, pandas, scikit-learn, tribble-fis.  Run:
 
-    python cmapss_ds02_rul.py --h5 NASA-CMAPSS/N-CMAPSS_DS02-006.h5
+    python cmapss_ds02_rul.py --h5 data/nasa-cmapps2/N-CMAPSS_DS02-006.h5
 """
 
 import argparse
@@ -116,7 +116,7 @@ def main(h5_path, rebuild_cache=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--h5", default="NASA-CMAPSS/N-CMAPSS_DS02-006.h5")
+    parser.add_argument("--h5", default="data/nasa-cmapps2/N-CMAPSS_DS02-006.h5")
     parser.add_argument(
         "--rebuild-cache",
         action="store_true",

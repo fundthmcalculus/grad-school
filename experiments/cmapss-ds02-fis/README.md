@@ -5,7 +5,7 @@ condition-correction step is doing real work, and (b) how the TRIBBLE fuzzy
 system's structure (consequent order, rule count, regularization, antecedent
 membership-function shape) affects remaining-useful-life quality.
 
-**Run from the repository root** (paths to `NASA-CMAPSS/`, `FuzzySystemsExperiments/`,
+**Run from the repository root** (paths to `data/nasa-cmapps2/`, `FuzzySystemsExperiments/`,
 and `outputs/` are relative to it); figures/CSVs are written to the gitignored
 `outputs/hdbscan-ds02/`. Needs the same deps as the CMAPSS drivers plus
 matplotlib/seaborn.

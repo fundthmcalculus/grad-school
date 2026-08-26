@@ -10,7 +10,7 @@ cycle), inner-join on (engine, cycle), and blend
 sweeping alpha. Coverage of the join is reported (the blend is only defined
 where raw_memory has a sample). Per-cycle RMSE and the canonical per-engine
 RMSE/NASA (one RUL per engine at its last *common* cycle) are scored for each
-alpha. Run from the repo root (needs NASA-CMAPSS/):
+alpha. Run from the repo root (needs data/nasa-cmapps2/):
 
     python experiments/cmapss-ds02-fis/blend_wc_rm.py
 """
@@ -98,5 +98,5 @@ if __name__ == "__main__":
     import argparse
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--h5-dir", default="NASA-CMAPSS")
+    ap.add_argument("--h5-dir", default="data/nasa-cmapps2")
     main(ap.parse_args().h5_dir)

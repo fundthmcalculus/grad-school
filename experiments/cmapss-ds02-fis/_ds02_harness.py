@@ -35,7 +35,7 @@ from tribble_predictive_health.preprocessing import (
     onset_caps,
 )
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5 = "data/nasa-cmapps2/N-CMAPSS_DS02-006.h5"
 
 
 def load(h5=H5):

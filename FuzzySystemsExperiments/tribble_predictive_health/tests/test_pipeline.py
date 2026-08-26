@@ -20,7 +20,10 @@ from tribble_predictive_health import TribblePredictiveHealth  # noqa: E402
 
 # tests/ -> tribble_predictive_health/ -> FuzzySystemsExperiments/ -> repo root
 DS02 = (
-    pathlib.Path(__file__).resolve().parents[3] / "NASA-CMAPSS" / "N-CMAPSS_DS02-006.h5"
+    pathlib.Path(__file__).resolve().parents[3]
+    / "data"
+    / "nasa-cmapps2"
+    / "N-CMAPSS_DS02-006.h5"
 )
 
 

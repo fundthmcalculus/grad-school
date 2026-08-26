@@ -20,7 +20,7 @@ from tribble_predictive_health.preprocessing import (
     fit_condition_correction,
 )
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5 = "data/nasa-cmapps2/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
 CSV = f"{OUT}/sweep_rules_ds02.csv"

@@ -9,7 +9,7 @@ hyperparameter on validation, then reports on the untouched official test
 engines. A gain is only real if the validation-selected setting also wins on
 test.
 
-Run from the repo root (needs NASA-CMAPSS/):
+Run from the repo root (needs data/nasa-cmapps2/):
     python experiments/cmapss-ds02-fis/validate_heldout.py
 """
 
@@ -141,5 +141,5 @@ if __name__ == "__main__":
     import argparse
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--h5-dir", default="NASA-CMAPSS")
+    ap.add_argument("--h5-dir", default="data/nasa-cmapps2")
     main(ap.parse_args().h5_dir)

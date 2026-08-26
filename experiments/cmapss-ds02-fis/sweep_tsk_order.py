@@ -32,7 +32,7 @@ from tribble_predictive_health import (
 )  # noqa: E402
 from tribble_predictive_health.metrics import rmse  # noqa: E402
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5 = "data/nasa-cmapps2/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
 TEST_UNITS = (11, 14, 15)

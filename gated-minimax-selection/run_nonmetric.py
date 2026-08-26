@@ -566,7 +566,7 @@ def run_relational_multiscale():
 # E5: real-data DTW -- N-CMAPSS DS01 flight altitude profiles
 # ---------------------------------------------------------------------------
 
-NCMAPSS_DS01 = "../NASA-CMAPSS/N-CMAPSS_DS01-005.h5"
+NCMAPSS_DS01 = "../data/nasa-cmapps2/N-CMAPSS_DS01-005.h5"
 E5_STRIDE = 300  # one altitude sample every ~5 min of flight (data is 1 Hz)
 E5_PER_CLASS = 25
 

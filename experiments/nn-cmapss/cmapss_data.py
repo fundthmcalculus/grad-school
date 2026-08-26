@@ -40,7 +40,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DEFAULT_H5 = os.path.join(REPO, "NASA-CMAPSS", "N-CMAPSS_DS02-006.h5")
+DEFAULT_H5 = os.path.join(REPO, "data", "nasa-cmapps2", "N-CMAPSS_DS02-006.h5")
 CACHE_DIR = os.path.join(REPO, "outputs", "nn-cmapss", "cache")
 
 # DS02's official split, as published (and as `cmapss_rul_best.py` hardcodes).

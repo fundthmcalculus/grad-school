@@ -717,7 +717,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       `random_state`: re-draw both across ten seeds on the fixed split and report mean ± s.d., ideally
       via a seeded generator under `reproduce/tables/`. Blocker is redistribution, not compute: the
       10 `.h5` files total ~28 GB and are gitignored, so the generator must document the manual
-      `NASA-CMAPSS/` download the way `DATASETS.md` does for RT-IOT2022. Until then §4.4.1 is labelled
+      `data/nasa-cmapps2/` download the way `DATASETS.md` does for RT-IOT2022. Until then §4.4.1 is labelled
       *demonstrated* and the figure a single fixed-split run.
 - [ ] ⬜ **C15 — Verify the DS02 CNN/MLP baseline figures from the source** *(Ch 4 §4.4.1).* The
       7.22 / 8.34 public-file re-runs are attributed to `custode2022evolutionary` and corroborated
