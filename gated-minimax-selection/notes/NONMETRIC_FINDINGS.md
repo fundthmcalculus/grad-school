@@ -218,12 +218,50 @@ is less the clustering score than the diagnostics: it is the one dataset where
 the beta-spread mechanism is *actually needed* on raw D, and D* still
 eliminates it.
 
+## E7 — Real fault-mode clustering (run_fault_modes.py)
+
+Closes the gap E5 named: fault modes ARE cluster-shaped truth. 30 units pooled
+from DS01 (HPT efficiency), DS04 (fan), DS07 (LPT); per-unit degradation
+trajectories = condition-corrected sensor residuals (per-unit ridge on the
+operating conditions over the first 10 healthy cycles — without this step the
+trajectories are flight regime, not degradation: raw-trajectory ARI ≈ 0.03,
+the same lesson as the CMAPSS cluster-tendency memo), 4 mode-informative
+channels (T48, T50, P15, P21), median-smoothed, final 40% of life,
+multivariate DTW.
+
+| comparison | ARI |
+|---|---|
+| NERFCM(D), 3 fault modes | **0.47** |
+| NERFCM(D), fan vs turbine (2-way) | **0.74** |
+| endpoint-fingerprint reference (no trajectory), 3-way | 0.26 |
+| NERFCM(D*), 3-way | 0.12 |
+| gap-cover | abstains (k=1, cov 0.10) |
+
+- **Trajectory shape carries real fault information**: DTW at 0.47 beats the
+  static endpoint fingerprint at 0.26, and the physically meaningful
+  fan-vs-turbine split reaches 0.74 from shape alone (fig19: turbine faults
+  raise turbine temps with flat fan pressures; the fan fault does the
+  opposite).
+- **The honest limit**: HPT vs LPT are near-indistinguishable in this
+  representation (their residual signatures are visually identical), which is
+  where the 3-way score goes to die. Separating them likely needs
+  station-ratio features, not more clustering.
+- The method taxonomy holds on real data once again: NERFCM on raw D is the
+  right tool for this (deeply non-metric, 7.6% TI-violated) dissimilarity;
+  D*-based methods chain or abstain, as E5 and the real-DTW battery predicted.
+
 ## What was NOT established (honest gaps)
 
-- E5 uses flight class as truth, which is a duration *bin*, not a cluster; a
+- ~~E5 uses flight class as truth, which is a duration *bin*, not a cluster; a
   real dataset with genuinely cluster-shaped truth under DTW (e.g. fault-mode
-  families of degradation trajectories) would be a stronger test. The DTW
-  generator's family 2 (ramp-with-knee) is shaped for that hand-off.
+  families of degradation trajectories) would be a stronger test.~~ **Done
+  (E7, `run_fault_modes.py`)**: 30 N-CMAPSS units pooled across DS01/DS04/DS07,
+  each dataset planting a distinct failure mode, clustered on multivariate DTW
+  over condition-corrected degradation trajectories — NERFCM(D) reaches ARI
+  0.47 three-way and 0.74 fan-vs-turbine, against 0.26 for a no-trajectory
+  endpoint fingerprint. Residual gap: the HPT and LPT residual signatures are
+  near-identical, so the three-way score is bounded by that pair, not by the
+  clustering; separating them likely needs station-ratio features.
 - The battery's three clean families are *easy* for everything; they establish
   transfer, not superiority. The two hard families split the methods — but a
   wider hard set (hub-dominated kNN graphs, heavy-tailed noise) would map the
