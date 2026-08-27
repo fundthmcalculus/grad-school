@@ -7,20 +7,17 @@ skipped where either is missing.
 """
 
 import pathlib
-import sys
 
 import numpy as np
 import pandas as pd
 import pytest
 
-# Import the package the way the drivers do, independent of pytest's cwd.
+# conftest.py (collected first, same directory) already puts this on sys.path.
 _FSE = pathlib.Path(__file__).resolve().parents[2]
-if str(_FSE) not in sys.path:
-    sys.path.insert(0, str(_FSE))
 
 from tribble_predictive_health import cache  # noqa: E402
 
-DS02 = _FSE.parent / "NASA-CMAPSS" / "N-CMAPSS_DS02-006.h5"
+DS02 = _FSE.parent / "data" / "nasa-cmapps2" / "N-CMAPSS_DS02-006.h5"
 
 
 # --- pure plumbing (no h5, no tribblefis) ----------------------------------

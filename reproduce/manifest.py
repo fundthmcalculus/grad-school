@@ -164,6 +164,163 @@ EXPERIMENTS = [
         "zero. Use REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1 for Fig 4.2.",
     ),
     Experiment(
+        id="table-4-11-beth-anomaly",
+        title="BETH host telemetry: one-class anomaly detection on the full 763k training split",
+        chapter="Ch4",
+        produces="Table 4.11 + Table 4.11(b) (BETH false-alarm operating curve)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_11_beth_anomaly.py"),
+        hardware="any",
+        datasets=["BETH (data/beth/, gitignored -- see data/.gitignore)"],
+        outputs=[
+            "reproduce/outputs/table_4_11_beth_anomaly.md",
+            "reproduce/outputs/table_4_11_beth_fa_sweep.md",
+        ],
+        notes="VERIFIED RUNNING (10 seeds, 1m39s). This is the BETH experiment "
+        "table_4_4_openset.py could not run: leave-one-class-out needs >=3 classes and "
+        "BETH is binary. ONE-CLASS BY NECESSITY -- all 158,432 positives are in the "
+        "test split, train (763,144) and val (188,967) are 100% benign, so a supervised "
+        "RF fits without error and predicts constant 0. NO supervised rows are emitted; "
+        "ISOLATION FOREST IS THE RF-FAMILY ONE-CLASS DETECTOR and is the RF-shaped arm "
+        "this task admits. The fuzzy arms use the library API -- "
+        "tribblefis.one_class.TribbleOneClassDetector -- NOT a hand-assembly of the "
+        "multi-class gauss_math path (an earlier revision did that; both give the same "
+        "operating point, but the hand-rolled one could only emit a hard label). "
+        "TWO SCORE MODES ARE REPORTED AND ONLY ONE IS READABLE: score=surprisal gives "
+        "AUC 0.990, score=complement (the library default, and Chapter 4's "
+        "formulation) gives 0.928 on the SAME model -- they are monotone transforms in "
+        "exact arithmetic, so the gap is pure float64 resolution loss. BETH resolves "
+        "4,002 distinct feature vectors; surprisal recovers 3,997 of them, complement "
+        "only 1,508. The library docstring puts complement saturation past ~60 "
+        "features; BETH hits it at 8 because the log-scaled pid/tid columns are "
+        "heavy-tailed. At a 0.1% budget the complement collapses to det=0.000 while "
+        "surprisal holds 0.993. Two columns are dropped before any fit: `sus` is BETH's "
+        "second LABEL (1 for 100% of evil rows) and `timestamp` separates the files, "
+        "not the behaviour -- the drop is here, not in load_beth(), so "
+        "table_4_4_openset's archived numbers do not move. The threshold is the "
+        "(1-budget) quantile of benign-VALIDATION scores (REPRO_BETH_FA_BUDGET, default "
+        "0.01), and the finding is that it DOES NOT TRANSFER: 0.0100 val false alarm "
+        "becomes 0.1500 on test, 15x. Table 4.11(b) sweeps the budget and shows the "
+        "TIGHTEST budget is the best operating point (J +0.870 at 0.1% vs +0.843 at "
+        "1%), so the default is not optimal. n_jobs capped at 8 (REPRO_BETH_N_JOBS) and "
+        "BLAS threads at 8 (REPRO_BLAS_THREADS, set before the numpy import) because "
+        "n_jobs=-1 on a 32-core host hung the machine and segfaulted the process; that "
+        "was thread oversubscription, never memory (peak RSS 521 MB of 95.6 GB).",
+    ),
+    Experiment(
+        id="table-4-11c-beth-feature-reduction",
+        title="BETH: quality / train / inference time vs feature reduction (2..8 features)",
+        chapter="Ch4",
+        produces="Table 4.11(c)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_11c_beth_feature_reduction.py"),
+        hardware="any",
+        datasets=["BETH (data/beth/, gitignored)"],
+        outputs=[
+            "reproduce/outputs/table_4_11c_beth_feature_reduction.md",
+            "reproduce/outputs/table_4_11c_beth_feature_reduction.csv",
+        ],
+        notes="VERIFIED RUNNING (10 seeds, ~4 min). Sweeps top_n 2..8; k=8 is the "
+        "no-reduction control and is the sweep's own endpoint, not a separate path. "
+        "Feature reduction is TribbleOneClassDetector(feature_selection='variance') -- "
+        "unsupervised, because with one class there is no separation to rank on -- and "
+        "the selected names are read off the fitted detector and handed to the baselines, "
+        "so all arms see IDENTICAL columns at each k. Variance order: eventId, "
+        "mountNamespace, argsNum, parentProcessId, processId, threadId, userId, "
+        "returnValue. Unlike Table 4.11 this uses ONE calibration for every arm (the "
+        "(1-budget) quantile of that arm's own benign-validation scores) instead of "
+        "matching contamination/nu. HEADLINE: AUC and the operating point DISAGREE about "
+        "how many features to keep -- AUC says 8 (0.9905), Youden's J at a 1% budget says "
+        "6 (+0.914 vs +0.843), because adding userId at k=7 lifts detection 0.933->0.993 "
+        "but pushes false alarms 0.019->0.137. Also: the one-class SVM INVERTS under "
+        "reduction (AUC 0.069 at 3 features -- worse than chance, not merely weak), so "
+        "reduction must be re-validated per estimator. DO NOT read this table's train-time "
+        "column across arms -- each arm trains on its own protocol's sample count; "
+        "table-4-11d is the matched comparison and is the one to quote for timing.",
+    ),
+    Experiment(
+        id="table-4-11d-beth-sample-scaling",
+        title="BETH: matched training-set size (1k..20k) across every one-class arm",
+        chapter="Ch4",
+        produces="Table 4.11(d)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_11d_beth_sample_scaling.py"),
+        hardware="any",
+        datasets=["BETH (data/beth/, gitignored)"],
+        outputs=[
+            "reproduce/outputs/table_4_11d_beth_sample_scaling.md",
+            "reproduce/outputs/table_4_11d_beth_sample_scaling.csv",
+        ],
+        notes="VERIFIED RUNNING (10 seeds, ~8 min). EXISTS TO CORRECT 4.11(c)'s "
+        "training-time column, which compared three different experiments: Tribble on all "
+        "763,144 rows, one-class SVM on a 20,000-row cap, Isolation Forest on 763,144 "
+        "nominally but max_samples=256 so each tree saw 256. Here ONE subsample is drawn "
+        "per (n, seed) and handed to ALL FIVE arms -- same rows, same count, same work. n "
+        "tops out at 20,000 because that is where the SVM's cap sat; higher drops it from "
+        "the comparison. ISOLATION FOREST APPEARS TWICE ON PURPOSE: max_samples=256 (the "
+        "library default, so 4.11(c) stays traceable) and max_samples=n (matched work). "
+        "That default was costing it a lot -- AUC 0.896 -> 0.978 at n=20,000 -- so its "
+        "weak showing in (c) was substantially the default, not the algorithm. FINDINGS: "
+        "(1) Tribble reaches full quality on 1,000 rows (AUC 0.9903 vs 0.9905 on all "
+        "763k), so the full-split fit buys nothing measurable; (2) two earlier claims were "
+        "WRONG -- Tribble is not the slowest to train (0.081s at n=1k vs both forests' "
+        "~0.15s), and its 10x inference advantage over the SVM exists only at the SVM's "
+        "cap, since SVM scoring grows 11x (0.117->1.280s) with support-vector count while "
+        "everyone else is flat in n; (3) best operating point measured anywhere is "
+        "Isolation Forest max_samples=n at n=2,000, J +0.879; (4) at n=1,000 two arms are "
+        "COIN FLIPS -- iForest matched-work detection 0.563 +/- 0.470 and Tribble's "
+        "complement 0.794 +/- 0.419 -- a single-seed run would have reported either as a "
+        "clean number. Every arm is stochastic here, including the fuzzy ones, because "
+        "which n rows are drawn is itself random.",
+    ),
+    Experiment(
+        id="table-4-11e-beth-boost-sweep",
+        title="BETH: does each arm's operating-point knob beat a plain score threshold?",
+        chapter="Ch4",
+        produces="Table 4.11(e)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_11e_beth_boost_sweep.py"),
+        hardware="any",
+        datasets=["BETH (data/beth/, gitignored)"],
+        outputs=[
+            "reproduce/outputs/table_4_11e_beth_boost_sweep.md",
+            "reproduce/outputs/table_4_11e_beth_boost_sweep.csv",
+        ],
+        notes="VERIFIED RUNNING (10 seeds, ~9 min). Asks the one question that decides "
+        "whether an operating-point knob is a contribution or a reparameterisation: at a "
+        "MATCHED false-alarm rate, does turning it detect more than moving the threshold "
+        "on the same arm's continuous score? ANSWER ON BETH: no, for all three. Largest "
+        "abs delta-detection is 0.0012 (boost theta), 0.0003 (iForest contamination), "
+        "0.0006 (OC-SVM nu) -- each at or below that arm's own detection seed-spread. "
+        "FOR THETA THIS IS PROVABLE, and the table measures the derivation rather than "
+        "asserting it: gauss_math._anomaly_argmax forms the anomaly column as "
+        "complement(conorm(clip(class_firing + theta, 0, 1))), and with ONE known class "
+        "there is exactly one class column while t_conorm(x, None, ...) aggregates "
+        "column-wise -- so the conorm is the IDENTITY, the anomaly label wins exactly "
+        "when firing < (1-theta)/2, and theta is therefore a hard threshold on firing "
+        "strength. TWO CONSEQUENCES FOR CH4: (a) theta should be described as a threshold "
+        "parameterisation, not a mechanism -- Ch4 4.3 argues the weaker multi-class "
+        "version (theta=0.99 degenerates to a max-membership rejector) and the one-class "
+        "reduction makes it total at EVERY theta; (b) REPRO_ANOM_CONORM IS INERT in the "
+        "one-class configuration -- there is one column to aggregate -- so a conorm sweep "
+        "here measures nothing, which matters because table_norm_conorm_matrix.py exists "
+        "to sweep conorms on multi-class data. iForest contamination is the METHOD'S "
+        "CONTROL, not a result: it provably only sets offset_ from a training-score "
+        "quantile and never touches the trees, so its delta MUST be ~0, and that it is "
+        "licenses reading a non-zero delta elsewhere as real (one fit per seed is "
+        "correct, not a shortcut). nu is the informative negative -- it enters libsvm's "
+        "QP objective so every value is a DIFFERENT fitted model, the only knob here that "
+        "could have traded one decision surface for another; it does not. SECONDARY: "
+        "theta's J is MONOTONE (+0.160 at 0 -> +0.769 at 0.999), so on BETH there is no "
+        "interior optimum and the shipped 0.99 default is near-best -- the proposal's "
+        "usable band of theta=0.5-0.8 came from Glass/RT-IOT2022 and does NOT transfer. "
+        "Best operating point in the table is iForest contamination=0.005 at J +0.864; "
+        "contamination=0.001 is a coin flip (detection 0.464 +/- 0.481). Every arm is "
+        "fitted on the SAME 20,000-row benign subsample per seed, so 4.11(d)'s "
+        "sample-count confound is not re-introduced; NO wall-clock is reported -- this "
+        "table is about decision curves and timing belongs to (d).",
+    ),
+    Experiment(
         id="table-g5-output-partitioning",
         title="G5: uniform vs quantile vs hybrid output partitioning",
         chapter="Ch4",
@@ -368,7 +525,7 @@ EXPERIMENTS = [
         chapter="Ch5",
         produces="Tables 5.1, 5.2, 5.3",
         repo=".",
-        command=["python3", "reproduce/tables/table_5_x_ch5_selection.py"],
+        command=["python3", "reproduce/tables/table_5_1_3_ch5_tables.py"],
         hardware="any",
         outputs=[
             "reproduce/outputs/table_5_1_battery.md",
@@ -403,6 +560,35 @@ EXPERIMENTS = [
         "gated-minimax-selection/notes/SCALING_STUDY.md (single seed, two-stage "
         "only) with the flat baseline, partition-of-unity error, and a ten-seed "
         "spread. Takes ~3 minutes on the 2026-08 workstation.",
+    ),
+    Experiment(
+        id="table-5-5-7-ch5-hdbscan-baselines",
+        title="HDBSCAN* head-to-head: gated set-cover and band selector vs. "
+        "excess-of-mass, leaf, and a dbscan_clustering(eps) sweep",
+        chapter="Ch5",
+        produces="Tables A.3, A.4, A.5 (Appendix A.8)",
+        repo=".",
+        command=["python", "gated-minimax-selection/run_hdbscan_baselines.py"],
+        hardware="any",
+        outputs=[
+            "gated-minimax-selection/outputs/hdbscan_baselines.json",
+            "gated-minimax-selection/outputs/hdbscan_baselines.md",
+        ],
+        notes="REQUIRES THE `hdbscan` CONTRIB PACKAGE, which is in no repo venv -- "
+        "scikit-learn's HDBSCAN has eom/leaf but no cut-distance accessor, and the "
+        "eps sweep is the whole point. Install it into a throwaway venv rather than "
+        "the root .venv (see AGENTS.md on that venv being hand-built). The "
+        "library-dependent calls import lazily, so test_hdbscan_baselines.py "
+        "collects in CI without it. Feeds APPENDIX A.8, not the Chapter 5 body: "
+        "the comparison came out at parity, which is why Ch5 reports its "
+        "selection machinery as machinery rather than as a contribution. "
+        "Discharges the blocking prior-art item in "
+        "research/proposal-defense/PRIOR_ART_CH5.md and corrects that document's "
+        "own EOM numbers, which were its min_cluster_size=3 rows; findings and "
+        "caveats in gated-minimax-selection/notes/HDBSCAN_BASELINES.md. Ten seeds by "
+        "default (--seeds 1 reproduces the original single-seed run byte for "
+        "byte); the ten-seed pass is what removed the apparent accuracy edge. "
+        "Runs in a few minutes.",
     ),
     # ---- Ch3 pVAT / clustering experiments ----
     Experiment(

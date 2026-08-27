@@ -114,7 +114,7 @@ and possibly a journal submission rather than a conference one.
 
 **Content.** Paper §4 in full: Proposition 3 (greedy = joint iff block-diagonal
 Gram), Proposition 4 (overlap is not the obstruction), Theorem 5
-($\lambda^{*}=3b^{4}/(8c^{2})$, $\ell^{*}=\sqrt6\,w$), Corollary 6 (the
+($\lambda^{*}=3b^{4}/(8a^{2})$, $\ell^{*}=\sqrt6\,\omega$), Corollary 6 (the
 factor-of-four obstruction for $N\ge3$), the cost table, and the OLS alternative.
 
 **Why it might be separate.** It answers a question practitioners actually ask —

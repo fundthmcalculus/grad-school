@@ -37,24 +37,21 @@ def table_html(df: pd.DataFrame, fis_rmse: float) -> str:
         "<th class='n'>test RMSE</th><th class='n'>MAE</th>"
         "<th class='n'>endpoint</th><th class='n'>total s</th></tr></thead><tbody>",
     ]
-    for _, r in df.iterrows():
-        is_fis = r["arm"] == "fis"
-        is_hot = str(r["arm"]).startswith("hot")
+    for r in df.itertuples(index=False):
+        is_fis = r.arm == "fis"
+        is_hot = str(r.arm).startswith("hot")
         cls = "fis" if is_fis else ("hot" if is_hot else "")
-        beats = "" if is_fis else (" win" if r["rmse"] < fis_rmse else "")
-        params = (
-            "--"
-            if not np.isfinite(r.get("n_parameters", np.nan))
-            else f"{r['n_parameters']:,.0f}"
-        )
+        beats = "" if is_fis else (" win" if r.rmse < fis_rmse else "")
+        n_parameters = getattr(r, "n_parameters", np.nan)
+        params = "--" if not np.isfinite(n_parameters) else f"{n_parameters:,.0f}"
         out.append(
             f"<tr class='{cls}'>"
-            f"<td>{report.ARM_LABEL.get(r['arm'], r['arm'])}</td>"
+            f"<td>{report.ARM_LABEL.get(r.arm, r.arm)}</td>"
             f"<td class='n'>{params}</td>"
-            f"<td class='n{beats}'>{r['rmse']:.2f}</td>"
-            f"<td class='n'>{r['mae']:.2f}</td>"
-            f"<td class='n'>{r['rmse_endpoint']:.2f}</td>"
-            f"<td class='n'>{r['total_s']:.3f}</td></tr>"
+            f"<td class='n{beats}'>{r.rmse:.2f}</td>"
+            f"<td class='n'>{r.mae:.2f}</td>"
+            f"<td class='n'>{r.rmse_endpoint:.2f}</td>"
+            f"<td class='n'>{r.total_s:.3f}</td></tr>"
         )
     out.append("</tbody></table></div>")
     return "\n".join(out)
@@ -69,14 +66,14 @@ def fidelity_html(fid: dict) -> str:
         "<th class='n'>seed vs FIS</th><th class='n'>best additive</th>"
         "<th class='n'>rows outside knots</th></tr></thead><tbody>",
     ]
-    for _, r in df.iterrows():
-        bad = " bad" if r["fidelity_relative"] > 1 else ""
+    for r in df.itertuples(index=False):
+        bad = " bad" if r.fidelity_relative > 1 else ""
         out.append(
-            f"<tr><td class='n'>{r['n_features']:.0f}</td>"
-            f"<td class='n'>{r['n_hidden']:.0f}</td>"
-            f"<td class='n{bad}'>{r['fidelity_relative']:.3f}</td>"
-            f"<td class='n'>{r['additive_relative']:.3f}</td>"
-            f"<td class='n'>{r['frac_rows_outside_knots']:.1%}</td></tr>"
+            f"<tr><td class='n'>{r.n_features:.0f}</td>"
+            f"<td class='n'>{r.n_hidden:.0f}</td>"
+            f"<td class='n{bad}'>{r.fidelity_relative:.3f}</td>"
+            f"<td class='n'>{r.additive_relative:.3f}</td>"
+            f"<td class='n'>{r.frac_rows_outside_knots:.1%}</td></tr>"
         )
     out.append("</tbody></table></div>")
     return "\n".join(out)
@@ -538,11 +535,11 @@ a:focus-visible,:focus-visible{outline:2px solid var(--accent);outline-offset:2p
             "<th class='n'>val RMSE</th><th class='n'>test RMSE</th>"
             "<th class='n'>fit s</th></tr></thead><tbody>"
         )
-        for _, r in df.sort_values(["bundle", "rmse"]).iterrows():
+        for r in df.sort_values(["bundle", "rmse"]).itertuples(index=False):
             a(
-                f"<tr><td>{r['bundle']}</td><td>{r['model']}</td>"
-                f"<td class='n'>{r['val']:.2f}</td><td class='n'>{r['rmse']:.2f}</td>"
-                f"<td class='n'>{r['fit']:.3f}</td></tr>"
+                f"<tr><td>{r.bundle}</td><td>{r.model}</td>"
+                f"<td class='n'>{r.val:.2f}</td><td class='n'>{r.rmse:.2f}</td>"
+                f"<td class='n'>{r.fit:.3f}</td></tr>"
             )
         a("</tbody></table></div>")
         a(

@@ -20,15 +20,23 @@ already-featurised tables, the fit runs through `fit_featurized` with
 `condition_correction=False` -- byte-identical numbers to the uncached path
 (`test_cache.py` checks this).
 
-Result on the official held-out engines (11, 14, 15): per-sample RMSE ~6.5
-cycles, which beats the published DS02 CNN (7.22) and MLP (8.34); after the
-monotone clamp the per-cycle curve rises on zero cycles. Uses the 18 real
-sensors only -- adding the two "virtual" channels the literature also allows
-(T40, P30) does not change the result.
+Result on the official held-out engines (11, 14, 15): per-sample RMSE ~7.2
+cycles, in line with the published DS02 CNN (7.22) and beating the MLP (8.34);
+after the monotone clamp the per-cycle curve rises on zero cycles. Uses the 18
+real sensors only. This is *not* the same result as the design-of-experiments'
+original "best" pipeline (the now-deleted `cmapss_rul_best.py`), which reached
+RMSE ~6.5 by adding two "virtual" channels (T40, P30) to the same model -- this
+consolidated loader never reads that HDF5 group, so those channels are not
+available here. An earlier version of this docstring claimed dropping them
+"does not change the result"; that was asserted, not measured, and it is
+wrong -- confirmed by re-running the original DOE script with T40/P30, which
+reproduces ~6.5. Kept real-sensors-only as a deliberate simplification; see
+`research/proposal-defense/prose/04-fast-fis-synthesis-mog.md` §4.4.1 for the
+full account.
 
 Needs: h5py, numpy, pandas, scikit-learn, tribble-fis.  Run:
 
-    python cmapss_ds02_rul.py --h5 NASA-CMAPSS/N-CMAPSS_DS02-006.h5
+    python cmapss_ds02_rul.py --h5 data/nasa-cmapps2/N-CMAPSS_DS02-006.h5
 """
 
 import argparse
@@ -108,7 +116,7 @@ def main(h5_path, rebuild_cache=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--h5", default="NASA-CMAPSS/N-CMAPSS_DS02-006.h5")
+    parser.add_argument("--h5", default="data/nasa-cmapps2/N-CMAPSS_DS02-006.h5")
     parser.add_argument(
         "--rebuild-cache",
         action="store_true",

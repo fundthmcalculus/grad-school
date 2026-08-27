@@ -10,7 +10,7 @@ cycle), inner-join on (engine, cycle), and blend
 sweeping alpha. Coverage of the join is reported (the blend is only defined
 where raw_memory has a sample). Per-cycle RMSE and the canonical per-engine
 RMSE/NASA (one RUL per engine at its last *common* cycle) are scored for each
-alpha. Run from the repo root (needs NASA-CMAPSS/):
+alpha. Run from the repo root (needs data/nasa-cmapps2/):
 
     python experiments/cmapss-ds02-fis/blend_wc_rm.py
 """
@@ -19,15 +19,14 @@ import contextlib
 import csv
 import io
 import os
-import sys
 
-sys.path.insert(0, "FuzzySystemsExperiments")
-sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
+from _ds02_harness import bootstrap, rmse  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments", os.path.dirname(__file__))
 import cmapss_all_datasets as cad  # noqa: E402
-from _ds02_harness import rmse  # noqa: E402
 from tribble_predictive_health import TribblePredictiveHealth  # noqa: E402
 from tribble_predictive_health.metrics import nasa_score  # noqa: E402
 
@@ -99,5 +98,5 @@ if __name__ == "__main__":
     import argparse
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--h5-dir", default="NASA-CMAPSS")
+    ap.add_argument("--h5-dir", default="data/nasa-cmapps2")
     main(ap.parse_args().h5_dir)

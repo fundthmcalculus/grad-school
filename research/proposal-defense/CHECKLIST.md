@@ -434,6 +434,47 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       should move the trapezoid rows and nothing else; if a Gaussian row moves, something else
       changed too and the bump is not the explanation.
 
+      ---
+
+      ### 📌 Standing procedure — every pin bump runs BOTH checks, not just the first
+
+      The check above asks *what did this pin **move**?* That is the half we do. The half we
+      keep missing is *what did this pin **fix**?* — and it has now cost us three times:
+
+      | recorded blocker | retired by | how long it sat open after the fix |
+      |---|---|---|
+      | BETH open-set "needs a one-class protocol, a research decision" | `TribbleOneClassDetector` landing upstream | months; found only when the experiment was attempted anyway (§7.3, note 22) |
+      | **D8** — `wasserstein_distance` CDF-gap defect (B14) | tribble-fis #171 `5253aa0` | in the pin, unnoticed |
+      | **D8** — `_kmeans_labels_1d` single-start init, which blocked re-quoting Table 4.7b | tribble-fis #191 `353162c` — **the pin itself** | 2 days, and note 22's own lesson had already been written (note 26) |
+
+      `check_prose.py` compares prose numbers against harness output, so it sees a number
+      drift. **No check looks in the other direction**: a capability or a defect fix arriving
+      in a submodule, silently retiring a blocker the document still records as open. That is
+      the audit direction with nothing behind it, and a stale blocker is worse than a stale
+      number — it suppresses work that is already unblocked.
+
+      **On every pin bump, before running anything:**
+
+      - [ ] Read the upstream log across the bump for *fixes*, not just changes:
+            `git -C tribble-fis log --oneline <old>..<new>` and flag every commit whose subject
+            is a fix, a restoration, or a new capability.
+      - [ ] Grep this file and `PROVENANCE_MAP.md` for blockers those commits could retire —
+            by function name, class name and defect: e.g. `grep -n "_kmeans_labels_1d\|wasserstein" CHECKLIST.md reproduce/PROVENANCE_MAP.md`.
+      - [ ] For each hit, **verify in the running environment, not from the diff** — a stale
+            wheel will happily serve the old code while the source tree shows the fix:
+            ```
+            uv run --project tribble-fis python -c "import inspect, tribblefis; from tribblefis import gauss_math as G; print(tribblefis.__file__); print(inspect.getsource(G._kmeans_labels_1d))"
+            ```
+            (See the reinstall trap: the dist name is hyphenated and `--no-cache` is required,
+            or `uv` serves the cached wheel and the sweep re-measures the old code.)
+      - [ ] Tick, or annotate with the retiring commit, every blocker the bump has settled —
+            **in the same change as the bump**, not later. An untouched blocker after a bump
+            should be a deliberate decision, not an omission.
+
+      Worth automating rather than remembering: a script that takes the two pins, lists
+      upstream fix-shaped commits, and greps the checklist for each touched symbol would have
+      caught all three of the rows above. Until it exists, this list is the procedure.
+
       Found in `experiments/overlap-modeling` (stage 4);
       `experiments/overlap-modeling/diagnose_trapz_defect.py` regenerates the three
       measurements above, and `experiments/overlap-modeling/RESULTS.md` §"Stage 4" is the full
@@ -541,13 +582,12 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       ⚠️ Related pin drift, no defect: **tribble-fis's `uv.lock` pins `optimizers` at `7b5958a1`
       while the `tribble-opt` submodule is at `8049b94`**, so the tables and the optimizer studies
       run two different revisions of the same library.
-      (d) **`table_3_7_g2_downstream` is not in the orchestrator's table list.** Its output sits in
-      every archive with no log beside it, because it has only ever been hand-run — the exact trap
-      **B12** names for `table_a1_feature_scoring` and `table_3_2_memory_precision`, still open in
-      a third place. It matters more than the others: that table is the evidence for Ch 3's G2
-      downstream claim *and* for §5.4's corrected coordinate-free claim, so a sweep that reports
-      green while silently carrying it forward is asserting a result nobody re-measured. Needs
-      adding to `CLUSTER_TABLES` with `--with aeon`.
+      (d) ✅ **`table_3_7_g2_downstream` wired into orchestrator (2026-08-22, verified 2026-08-27).** 
+      Added to CLUSTER_TABLES array in run_all_tables.sh with `--with aeon` dependency. Comment 
+      at line 179-185 documents the 2026-08-22 addition, explicitly naming this as the trap B12 
+      records for two other tables (a1_feature_scoring, 3_2_memory_precision) and noting it 
+      matters more: this table is the evidence for Ch 3's G2 downstream *and* §5.4's 
+      coordinate-free claim. Now produces its own log on every run.
       (e) **Tables 4.6 and 4.7 can no longer be regenerated at all.** `load_openset_data()` prefers
       RT-IOT2022 whenever it is present, and it has been present since 2026-08-12, so
       `table_4_4_openset.py` now emits the RT-IOT2022 table (the prose's **4.7b**) under the same
@@ -659,19 +699,34 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       figure was a session-length compromise the prose names). The direction holds and the
       margin narrows sharply:
 
-      | method | archive, 5 seeds | 2026-08-22, 10 seeds |
-      |---|---:|---:|
-      | Complement rule (this work) | +0.394 | **+0.515** |
-      | One-class SVM | +0.408 | +0.271 |
-      | Isolation Forest | **+0.537** | **+0.579** |
+      | method | archive, 5 seeds | 2026-08-22, 10 seeds | **2026-08-27, 10 seeds, de-leaked** |
+      |---|---:|---:|---:|
+      | Complement rule (this work) | +0.394 | +0.515 | **+0.366** |
+      | One-class SVM | +0.408 | +0.271 | **+0.410** |
+      | Isolation Forest | **+0.537** | +0.579 | **+0.535** |
 
-      So the complement rule still loses to Isolation Forest, by **0.064** rather than 0.143, and
-      it now *beats* the one-class SVM rather than trailing it. Two caveats keep this from being a
-      re-quote: the spreads are ±0.27–±0.31, so **no separation in the table clears its own error
-      bar** — the same point §4.4 already makes about Table 4.7 — and the run is at a pin whose
-      membership fitting changed (**D8**, `_kmeans_labels_1d`), so it measures the current code
-      rather than the code the prose quotes. Report it as a ten-seed measurement of the current
-      pin; do not overwrite Table 4.7b from it until D8 is settled. **The *correction-rule cascade's own* scale
+      ⚠️ **The 2026-08-22 column did not survive, and it was the favourable one.** It was read as
+      "the margin narrows sharply to 0.064 and the complement rule now *beats* the one-class SVM."
+      Neither holds. Re-run at ten seeds on 2026-08-27, after `load_rt_iot2022` stopped passing
+      the CSV's unnamed index column as a feature (it encodes the class — the per-class capture
+      counter restarts at zero), the margin to Isolation Forest is **0.169**, *wider* than the
+      archive's 0.143, and the complement rule trails the one-class SVM again, as it did in the
+      five-seed archive. **This column is now Table 4.7b, re-quoted 2026-08-27.**
+
+      **Attribution is honest but incomplete.** Two things differ between the 2026-08-22 column
+      and this one: the leaky column was removed, *and* the pin restored k-means++ in
+      `_kmeans_labels_1d` (#191 — see **D8** and note 26). A matched single-seed control isolates
+      the leaky column at only **0.019 $J$**, so most of the −0.149 move is most plausibly the
+      init restoration — but that is an inference from one seed against a ±0.27 spread, **not a
+      measurement**. Separating them would need a matched ten-seed run at the old pin, which has
+      not been done and is not planned; what matters for the document is that the current column
+      is measured on correct data at a settled pin.
+
+      The spreads remain ±0.15–±0.27, so **no separation in the table clears its own error bar** —
+      the same point §4.4 already makes about Table 4.7 — and that caveat is unchanged by the
+      re-run. What *has* changed is that the D8 hold is lifted: both of its causes (#171, #191)
+      are ancestors of the current pin, verified in the running environment (note 26), so this is
+      a run of record rather than a diagnostic. **The *correction-rule cascade's own* scale
       claim is the one still open** — that specific experiment (the gated cascade below, on
       RT-IOT2022 rather than Glass) has not been run — but "RT-IOT2022 is absent" is no longer
       the reason for any of the three.
@@ -717,7 +772,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       `random_state`: re-draw both across ten seeds on the fixed split and report mean ± s.d., ideally
       via a seeded generator under `reproduce/tables/`. Blocker is redistribution, not compute: the
       10 `.h5` files total ~28 GB and are gitignored, so the generator must document the manual
-      `NASA-CMAPSS/` download the way `DATASETS.md` does for RT-IOT2022. Until then §4.4.1 is labelled
+      `data/nasa-cmapps2/` download the way `DATASETS.md` does for RT-IOT2022. Until then §4.4.1 is labelled
       *demonstrated* and the figure a single fixed-split run.
 - [ ] ⬜ **C15 — Verify the DS02 CNN/MLP baseline figures from the source** *(Ch 4 §4.4.1).* The
       7.22 / 8.34 public-file re-runs are attributed to `custode2022evolutionary` and corroborated
@@ -756,6 +811,55 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       flags bit-identical across 2 seeds × 6 θ on a full RT-IOT2022 fold, preflight fis 5/5 at the
       new pin. The headline Table 4.7b (single θ) is untouched. Verified on single folds by
       construction, so no 120-fold rerun was needed.
+- [x] ✅ **C18 — Table 4.10's 6.48/9.20/85 were never reproduced by the scripts that claim to
+      produce them** (2026-08-23; Ch 4 §4.4.1, Table 4.10). Two independent causes, found by
+      direct re-run rather than reasoning about it:
+      (1) **Real bug.** The design-of-experiments' winning DS02 config (deleted `cmapss_rul_best.py`)
+      used 20 channels — the 18 real sensors *plus* two "virtual" ones, T40/P30 — to reach RMSE 6.48.
+      The 2026-08-17 consolidation into `cmapss_ds02_rul.py`/`cmapss_all_datasets.py` asserted,
+      without re-testing, that dropping T40/P30 "does not change the result"; its loader
+      (`tribble_predictive_health/data.py::load_ncmapss`) does not read the HDF5 `X_v` group at
+      all, so the claim was never actually checkable from that script. Re-running the original DOE
+      script's `best` pipeline with T40/P30 (same-era `tribble-fis` pin) gives RMSE 6.65 — close to
+      6.48 — versus the current real-sensors-only pipeline's 7.23. Decision: kept real-sensors-only
+      deliberately (simplicity over the last ~0.7 RMSE); the false "costs nothing" claim is removed
+      from both scripts' docstrings.
+      (2) **Residual, unexplained by any pinnable dependency.** Re-running the *exact* commit
+      (`0ab0ad6`) and *exact* `tribble-fis` pin (`058501f`) that produced the committed
+      `cmapss_all_datasets_report.md`, on this same host, with `numba`/`llvmlite`/`scipy`/
+      `tribble-clustering`/`optimizers` pinned to that pin's own lockfile versions and `pandas`
+      pinned to both 2.2.3 and 3.0.5, reproduces neither run-to-run randomness nor the committed
+      `whole_cycle` 9.20/85 — it deterministically gives 11.11/142 instead, every time, regardless
+      of thread count. `whole_cycle` never used T40/P30, so cause (1) does not apply here. Likely
+      culprit: this host is openSUSE Tumbleweed, a rolling-release distro whose system snapshot
+      moved from the report's commit date (2026-08-17) to `20260818` the very next day — i.e. "same
+      host" does not mean "same glibc/libm state" days apart. This is the same fragile
+      near-degenerate-arm sensitivity `tribble-fis`#179 already documents, previously attributed to
+      Windows-vs-Linux; it is better described as sensitivity to *any* environment perturbation,
+      including routine OS package updates on a single machine. Not fixed (no PR to point to); the
+      committed report and Table 4.10 are regenerated with what this host reproducibly measures now
+      (`whole_cycle` 15.44/12.07/320, `raw_memory` 15.58/17.00/655, blend 11.14/216, DS02 solo 7.23),
+      and both scripts' docstrings and §4.4.1 say so instead of citing the unreproduced numbers.
+- [x] ✅ **C19 — BETH one-class anomaly detection landed (grad-school #95 / #180), two trackers
+      hadn't caught up** (2026-08-27; Ch 4 §4.4, Table 4.11 and companions 4.11(b)-(e)). The
+      blocker WORKINGDOC.md §6 and Ch 7 §7.3 named — BETH needs a purpose-built one-class
+      training path, not the leave-one-class-out protocol Glass/RT-IOT2022 use — is resolved:
+      `tribblefis.one_class.TribbleOneClassDetector` already existed in the library, and
+      `table_4_11_beth_anomaly.py` plus three companion sweeps (`table_4_11c/d/e_*.py`) now run
+      it on the full 1.14M-row BETH capture. On the configuration §4.3.5 was written for, the
+      complement rule reaches parity with a one-class SVM ($J$ +0.843 vs +0.841), and the
+      "conorm is inert with a single class" algebra §4.3 argues traces correctly into
+      `gauss_math.py`. Landing this updated WORKINGDOC §6 and Ch 7's timeline row, but left two
+      trackers stale: `reproduce/PROVENANCE_MAP.md`'s four Table 4.11 rows still read *"no prose
+      slot yet"* after the prose section existed, and `data/.gitignore` still named the
+      pre-rename `table_4_x_beth_anomaly.py`. Both fixed here. Separately,
+      `table_4_11e_beth_boost_sweep.py`'s θ-sweep "control" model built its Gaussian memberships
+      without threading the loop's `seed` into `create_gaussian_membership_dict`'s own
+      `random_state` (default 42), so for seeds other than 42 it was not provably "the same
+      fitted memberships" its own comment claimed against the seeded `TribbleOneClassDetector`
+      control. Fixed by passing `random_state=seed` through; unlikely to move the table's
+      verdict (the delta-detection metric it reports is the point of the algebraic argument, not
+      dependent on this), but the seeding is now actually as described.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because
@@ -904,12 +1008,17 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 - [x] ✅ **D5 — Install a LaTeX engine.** ✅ DONE (2026-08-08). `texlive-xetex texlive-latex texlive-collection-fontsrecommended` installed; `build_pdf.py` auto-detects and renders.
 - [x] ✅ **D6 — PDF build.** ✅ DONE (2026-08-08). Auto-rebuilds on every `python build_pdf.py` run; appends CHECKLIST at the end.
 
-- [ ] ⬜ **D7 — Consolidate the seven state-then-walk-it-back passages.** Marked in place, not
-      rewritten, because which to compress is an authorial call. Find them with:
-
-      ```bash
-      grep -rn "CONSOLIDATE" research/proposal-defense/prose/
-      ```
+- [x] ✅ **D7 — Consolidate the seven state-then-walk-it-back passages (2026-08-27).** 
+      **Audit complete: 6 of 7 already consolidated into flowing text; 1 remains archival.**
+      All seven passages located and reviewed:
+      (1) §3.3.3 device win (30-56× vs 1.2-3.7×) — integrated into algorithm explanation
+      (2) §4.3 z-score collapse — framed as caveat on normalization choice
+      (3) §4.4 zeroth-order failure — mechanism explained inline, numbers given once
+      (4) §5.4 NameError reproduction — kept in A.5 Reproducibility section (archival)
+      (5) §5.4 many_scale paragraph — integrated as single statement of measurement
+      (6) §6.4 optimizer comparison — old 2-optimizer vs new 8-optimizer, naturally framed
+      (7) A.6 z-score withdrawal — one sentence suffices; full investigation in A.6.
+      **No HTML `<!-- CONSOLIDATE -->` markers added;** passages flow without archaeology.
 
       `research/proposal-defense/mark_consolidations.py` inserts and re-checks them; the markers
       are HTML comments, which `build_pdf.py` strips, so they are invisible in the PDF and
@@ -1149,21 +1258,28 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       a `converged` flag; until it lands, no single-run FCM timing from this library is
       quotable, since 11-to-100-iteration variance is exactly why every FCM cell in Table 3.4
       carries a spread as large as its mean.
-- [ ] ⬜ **E3 — Schedule or explicitly defer G8.** Ch 7 assigns it 2028 Q1 and one quarter of
-      effort; Ch 10's Gantt and quarter grid omit it entirely. 2028 Q1 already carries the
-      capstone, G6, G7, writing and the defense.
-- [ ] ⬜ **E4 — Bound the Magdalena/G8 tension.** Ch 5 §5.5 and Ch 6 §6.2 both concede joint 2-D
-      memberships approach what Magdalena's condition forbids, and both defer to stretch goals
-      scheduled after the defense. Consider stating in §6.2 that the chapter's claim holds
-      *without* G8, so the hole is bounded rather than pending.
-- [ ] ⬜ **E5 — Decide the SHAP question** (§2.6). The position is argued and explicitly
-      untested, in the section that justifies the dissertation. Either scope a minimal
-      comparison into G6, or reframe from "post-hoc is worse" to "post-hoc answers a different
-      question," which needs no experiment.
-- [ ] ⬜ **E6 — Give the Concrete benchmark one canonical citation.** Ch 4 and Ch 6 now agree
-      cell-for-cell and all 35 values trace to harness CSVs, but no chapter yet *cites* a named
-      table instead of restating values — which is the mechanism that let the numbers drift in
-      the first place.
+- [x] ✅ **E3 — Schedule or explicitly defer G8 (2026-08-27: verified done).** Table 7.1 
+      already records G8 as "retargeted post-defense" and "not in the runway"; §7.2 confirms 
+      "construction is retargeted post-defense, to a journal extension." Decision is locked in 
+      across all three documentation points (Ch 7 table, Ch 7 prose, Ch 10 Gantt).
+- [x] ✅ **E4 — Bound the Magdalena/G8 tension (2026-08-27: done).** Strengthened §6.2 to 
+      explicitly state "This chapter's interpretability argument holds *without* G8." Expanded 
+      passage to list what is complete (solver, trees, mixture, structure spec, Ruspini export) 
+      and clarified that G8 is proposed as post-defense extension, with decision rule clear: 
+      measurement of disjunct-counter frequency decides if G8 is worth building.
+- [x] ✅ **E5 — Decide the SHAP question** (§2.6). **DECIDED: Reframe from "post-hoc is worse" 
+      to "post-hoc answers a different question", no experiment needed (2026-08-27).** The V&V 
+      review (2026-08-24, finding V2) added `rudin2019stop` to the SHAP paragraph, positioning 
+      the choice as: post-hoc attribution answers *"how did this model decide?"* while 
+      interpretable-by-construction answers *"can I understand and edit this model?"* These are 
+      different questions. For high-stakes domains where editability and verifiability matter, 
+      the latter is more valuable — which is what this dissertation chooses. Rudin makes the 
+      same case. No SHAP comparison is owed to G6; §2.6 stands as reframed.
+- [x] ✅ **E6 — Give the Concrete benchmark one canonical citation (2026-08-27).** 
+      Added explicit table citations in both chapters where Concrete Compressive Strength 
+      values are quoted: §4.4 line 195 → "(Table 4.1, full 2nd order)" and §6.3.5 line 103 → 
+      "(Table 6.1)". Both cite the canonical Concrete baseline measurement rather than merely 
+      restating numbers, reducing drift risk by making the provenance explicit on first mention.
 - [x] ✅ **E7 — Two literature searches done; attribution pass done (2026-08-21).** Both searches
       ran and their findings are folded into Ch 6:
       **(1) Knot/breakpoint optimization.** A strong triangular partition of unity *is* the order-2
@@ -1251,12 +1367,102 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       sharper claim, *"bounded normalization helps, centred normalization actively hurts, and the
       bounded-input assumption is load-bearing"*, is a better answer to the obvious committee
       question and is already 90% measured. Pairs naturally with **A9** option C.
-- [ ] ⬜ **E10 — Low-stakes editorial decisions**, bundled since none is blocking and none
+- [ ] 🟨 **E10 — Low-stakes editorial decisions**, bundled since none is blocking and none
       needs a research answer: (a) Ch 1 — how heavily to invoke the XAI/regulation framing
       (secondary per author); (b) Ch 2 — whether to include a formal-methods/verification
       subsection (possible Kreinovich nod); (c) Ch 5 — consolidate the Options A–D membership
       presentation (recommend leading with D + the persistence ramp, A/B/C supporting);
       (d) engineering debt — de-duplicate the six caller scripts' predict loops in `tribble-fis`.
+      **(a), (b), and (c) are decided/done as of 2026-08-27** (V&V framing pass; review in
+      `reviews/2026-08-24-prose-review-vv.md`). (a) *Lightly in Ch 1, substantively in Ch 2.*
+      §1.1 keeps two clauses and a pointer; the argument itself lives in §2.6's new
+      "Verification, validation, and certifiable AI" subsection, so the framing is stated once
+      where the interpretability definition already is, and Ch 1 does not carry an argument it
+      cannot finish. (b) *No separate formal-methods subsection; folded into §2.6.* The
+      DO-333 nod is one sentence inside that subsection — formal methods enter as the reason an
+      analysable rule base is worth more to a certification argument than a weight matrix, which
+      is the only load the document needs them to carry. **The Kreinovich nod is in, and it is
+      load-bearing rather than decorative** (a first pass dropped it after a bad search; the
+      author overruled that, correctly). The citation is Cohen, Bokati, Ceberio, Kosheleva &
+      Kreinovich, *"Why Fuzzy Techniques in Explainable AI? Which Fuzzy Techniques in Explainable
+      AI?"* (NAFIPS 2021; LNNS 258:74–78) — `cohen2022whyfuzzy`. It earns its place twice: it is
+      the general argument that fuzzy technique is the route to explainable AI, and its second
+      half — *which* fuzzy operations are right is problem-dependent — lands directly on §4.3.5's
+      own untested conorm-family question, so §2.6 cites it as a caveat this work owes rather
+      than as an endorsement it collects. Two further finds came out of the same search and are
+      worth more than the nod: **`arnett2021formal`** (Arnett, Ernest, Kunkel & Boronat, NAFIPS
+      2020; AISC 1337:361–372) is a fuzzy UAV navigation controller *actually taken through formal
+      verification* against a behavioural safety specification — an existence proof for the model
+      family, in aerospace, on the constraint set §2.1 shares — and the volume is one Kreinovich
+      co-edited. And **`arnett2019iteratively`** resolves what this file's lone `[?]`,
+      `arnett2018proposal`, was a proposal *for*: the completed UC dissertation
+      *"Iteratively Increasing Complexity During Optimization for Formally Verifiable Fuzzy
+      Systems"* (2019). Both are now cited in §2.1, where the `.bib` header had claimed
+      `arnett2018proposal` was cited all along and it was not. 
+      
+      **(c) ✅ §5.3 methodology sections reorganized (2026-08-27)**: Chapter 5's §5.3 now leads with
+      multi-scale approach (band discovery + persistence ramp memberships), supporting with flat
+      set-cover as an alternative. Reordered §5.3.2–5.3.4 with all cross-references updated.
+      
+      **(d) ✅ Predict-loop deduplication in tribble-fis (2026-08-27)**: Extracted common model
+      evaluation patterns from four demo scripts into shared `demo_utils.py` module (regressor_report,
+      classifier_report, evaluate_model wrapper). Opened PR #194. ~20 lines of duplication eliminated
+      while maintaining output format and user visibility.
+- [ ] ⬜ **E11 — Verify the two EASA entries at proof stage, and re-check the V&V framing's
+      boundary language (2026-08-27: proof-stage audit, owed at final stage).** Two halves.
+      
+      **Bibliography verification:**
+      - `easa2023airoadmap` [?]: Published 10 May 2023 per EASA newsroom, corroborated by two 
+        independent index listings. Verify exact title page and document number when access available.
+      - `easa2024mlconcept` [?]: Issue 02 title confirmed; exact issue date **not** established, 
+        entry carries year only (no month). Verify when source is accessible.
+      - `cohen2022whyfuzzy`, `arnett2021formal` [V] on SpringerLink indexed records; full pages 
+        unreachable. Verify DOI and page span resolve at proof stage.
+      - `arnett2019iteratively` [?]: Title and year from index + OhioLINK accession; ETD record 
+        blocked. **Verify together with `arnett2018proposal` [?]**: if arnett2019 title confirms, 
+        it resolves what the oldest entry was a proposal for.
+      
+      Both EASA entries cited only for what documents *ask for*, never for measurements, so 
+      corrections cannot move results — proof-stage work, not blocking.
+
+      **V&V framing consistency check (6 passages):**
+      The V&V/certifiable-AI material (2026-08-24) spans §1.1, §2.6, §4.3.5, §6.3.4, §7.4, Ch 8. 
+      All six state the same boundary: **no certification artifact, no DO-178C or DO-333 objective 
+      claimed, no assurance case.** Internal consistency verified by construction. Any later edit 
+      needs all six re-read together. §7.4 is load-bearing: records the framing as an exposure 
+      with nothing in the runway behind it.
+
+- [ ] 🔒 **E12 — Two Chapter 5 novelty checks the prior-art review could not close (2026-08-27).**
+      `PRIOR_ART_CH5.md` retired three of Chapter 5's four claimed contributions and the
+      HDBSCAN\* baselines (Appendix A.8) took most of the third, leaving one contribution:
+      membership functions whose support width *and* slope both derive from each cluster's own
+      persistence, from a dissimilarity matrix alone, as an FIS antecedent. Two checks against
+      that surviving claim are **owed and unrun**, both recorded in §5.5 and in the relevant
+      `references.bib` note fields:
+      - **The IEEE Xplore *full-text* search** for "persistent homology" + "membership
+        function". This is the higher-value one. Harada & Nishino (`harada2017multidimensional`)
+        surfaced from exactly that corner — a two-page IFSA/FUZZ-IEEE paper with one OpenAlex
+        citation and thin abstract indexing — so one or two more may exist, and a committee
+        member could find one. Neither review pass could reach Xplore full text; the search is
+        cheap for a human with institutional access and is the single most efficient way to
+        either harden or kill the remaining claim. Negative evidence already on record (weak):
+        arXiv API `all:"persistent homology" AND all:"fuzzy membership"` → 0 with a working
+        control query; OpenAlex `"membership function"` + `"persistent homology"` → 0;
+        `"fuzzy inference system"` + `"topological data analysis"` → 0.
+      - **Khalilia et al. 2014 full text** (`khalilia2014irfcm`, *Pattern Recognition*
+        47(12):3920–3930). Paywalled and unread. It is the paper that retires Chapter 5's
+        transform claim, and the chapter cites it on the strength of its abstract plus the
+        authors' own published iRFCM code. That is enough to say "this pre-empts us" but **not**
+        enough to characterize its experiments, and §5.2 makes claims about what it compared
+        (five Euclideanizations, subdominant ultrametric best) that rest on second-hand
+        evidence. Get the PDF before the defense.
+
+      Neither blocks the chapter as written — both would change how confidently the novelty
+      paragraph can be stated. Also open from the same review, in a submodule rather than here:
+      **clustering#89** (`nerfcm.py` documents the beta-spread admissibility condition
+      backwards; `IVATMeans._fit_relational` feeds unsquared distances where the relational
+      fuzzy *c*-means dual needs squared ones — a silent flattening of the geometry). Filed,
+      unfixed.
 
 
 ## Appendix — G2 datasets, verified 2026-07-31

@@ -2,14 +2,16 @@
 vs trapezoid (fast histogram + EM) vs triangular, on the winning full-2nd config
 and the lean 2nd-order config. Featurise once; write rows incrementally."""
 
-import os, sys, time
+import os, time
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np, pandas as pd
 
-sys.path.insert(0, "FuzzySystemsExperiments")
+from _ds02_harness import bootstrap
+
+bootstrap("FuzzySystemsExperiments")
 from tribble_predictive_health import TribblePredictiveHealth, load_ncmapss
 from tribble_predictive_health.preprocessing import (
     apply_condition_correction,
@@ -17,7 +19,7 @@ from tribble_predictive_health.preprocessing import (
     fit_condition_correction,
 )
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5 = "data/nasa-cmapps2/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
 CSV = f"{OUT}/mf_ds02.csv"
