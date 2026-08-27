@@ -6,51 +6,7 @@ Advisor: Dr Kelly Cohen
 
 ---
 
-## What is Tribble?
-
-<div style="display: flex;">
-<div style="flex: 1; padding: 10px;">
-
-* Structure-first FIS: read membership functions and rules off the data's own
-  structure — no GA, no gradient descent
-* Deterministic, closed-form construction — same data, same model, every run
-* Scales from hundreds to hundreds of thousands of samples, in seconds
-
-</div>
-<div style="flex: 1; padding: 10px;">
-
-![pipeline-roadmap](img/01-pipeline-roadmap.png)
-
-</div>
-</div>
-
----
-
-## Result 1 — mergeVAT: cluster structure at scale
-
-<div style="display: flex;">
-<div style="flex: 1; padding: 10px;">
-
-* Classical VAT: $O(N^3)$. mergeVAT: exact $O(N^2)$ reorder — same result, not
-  an approximation
-* **673× faster** at $N=1{,}024$; measured to **135,000 points**; ~65 MB flat
-  memory
-* NASA shuttle-reentry telemetry, 58,000 samples: **~4 days → ~1 minute**
-* Fast *and* exact together: rebuilding the model is cheap enough to be
-  routine — **repeatable construction doubles as a verification check**, not
-  just faster training
-
-</div>
-<div style="flex: 1; padding: 10px;">
-
-![complexity-fit](img/03-complexity-fit.png)
-
-</div>
-</div>
-
----
-
-## Result 2 — Fast, interpretable FIS synthesis
+## Result 1 — Fast, interpretable FIS synthesis
 
 <div style="display: flex;">
 <div style="flex: 1; padding: 10px;">
@@ -76,7 +32,7 @@ Advisor: Dr Kelly Cohen
 
 ---
 
-## Result 3 — open-set detection, for free, at scale
+## Result 2 — open-set detection, for free, at scale
 
 <div style="display: flex;">
 <div style="flex: 1; padding: 10px;">
