@@ -203,9 +203,17 @@ commits behind those pins and were fast-forwarded the same day.
 - **Table 6.3** is structural; **6.4**'s entry point is unconfirmed (moved to
   `AnalyticalDynamics/`).
 - **ANFIS and GA-FIS adapters** absent, so those cells stay `N/A`.
-- **BETH** — unchanged from `research/proposal-defense/HANDOFF_LOCAL_SESSION.md`
-  §1. LOCO needs ≥3 classes and BETH is binary, so it needs its own one-class
-  path; a research decision before a coding one.
+- **BETH** — **CLOSED.** This entry read, from
+  `research/proposal-defense/HANDOFF_LOCAL_SESSION.md` §1, that LOCO needs ≥3
+  classes and BETH is binary, so it needed its own one-class path — "a research
+  decision before a coding one". The path already existed:
+  `tribblefis.one_class.TribbleOneClassDetector`, a scikit-learn `OutlierMixin`
+  built for exactly this setting. The decision had been taken upstream in the
+  pinned submodule and this document went on recording it as open. Measured as
+  Table 4.11 + 4.11(b)–(e) (`PROVENANCE_MAP.md` notes 22–24). The trap worth
+  keeping: `check_prose.py` catches numbers drifting, not a capability arriving
+  in a submodule and retiring a stated blocker — so a pin bump (B13) should also
+  ask which blockers the new pin has removed.
 - **Appendix A.4's composite column** is measured against the *restored*
   `composite`, which is not the pre-#34 blend — the blend ranked
   `URLSimilarityIndex` first, the restored one ranks it second. The section says
