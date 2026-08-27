@@ -55,7 +55,11 @@ _, counts = np.unique(yte, return_counts=True)
 majority = counts.max() / len(yte)
 for label, mod in (("ANFIS", A), ("GA-FIS", G)):
     acc = accuracy_score(yte, mod.fit_predict(Xtr, ytr, Xte, kind="clf", seed=0))
-    check(f"{label} PhiUSIIL acc", acc > majority, f"acc={acc:.3f} > majority {majority:.3f}")
+    check(
+        f"{label} PhiUSIIL acc",
+        acc > majority,
+        f"acc={acc:.3f} > majority {majority:.3f}",
+    )
 
 print()
 if failures:

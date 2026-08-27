@@ -144,11 +144,11 @@ class _ANFIS:
             # where the data is. Gradient of 0.5*||err||^2 wrt each (c, s).
             gc, gs = self._premise_grad(X, err, wn)
 
-            for (p, g, m, v) in ((self.c, gc, mc, vc), (self.s, gs, ms, vs)):
+            for p, g, m, v in ((self.c, gc, mc, vc), (self.s, gs, ms, vs)):
                 m[:] = b1 * m + (1 - b1) * g
                 v[:] = b2 * v + (1 - b2) * g * g
-                mhat = m / (1 - b1 ** t)
-                vhat = v / (1 - b2 ** t)
+                mhat = m / (1 - b1**t)
+                vhat = v / (1 - b2**t)
                 p -= LR * mhat / (np.sqrt(vhat) + eps)
             self.s = np.maximum(self.s, 1e-3)
 
@@ -174,7 +174,7 @@ class _ANFIS:
         diff = X[:, None, :] - self.c[None, :, :]  # (N,R,M)
         s2 = np.maximum(self.s[None, :, :], 1e-6) ** 2
         dc = dL[:, :, None] * (diff / s2)  # (N,R,M)
-        ds = dL[:, :, None] * (diff ** 2 / (np.maximum(self.s[None, :, :], 1e-6) ** 3))
+        ds = dL[:, :, None] * (diff**2 / (np.maximum(self.s[None, :, :], 1e-6) ** 3))
         return dc.sum(axis=0), ds.sum(axis=0)
 
     def predict(self, X):
@@ -219,7 +219,7 @@ def fit_predict(X_train, y_train, X_test, *, kind, seed):
     Xtr, Xte = sx.transform(Xtr), sx.transform(Xte)
 
     M = Xtr.shape[1]
-    grid_rules = MF_PER_FEATURE ** M if M <= 20 else np.inf
+    grid_rules = MF_PER_FEATURE**M if M <= 20 else np.inf
     use_grid = grid_rules <= RULE_CAP
 
     if use_grid:
@@ -234,7 +234,9 @@ def fit_predict(X_train, y_train, X_test, *, kind, seed):
         Ytr = sy.transform(ytr.reshape(-1, 1))
         net = _ANFIS(centres, widths, n_outputs=1, seed=seed).fit(Xtr, Ytr)
         pred = sy.inverse_transform(net.predict(Xte)).ravel()
-        print(f"  [anfis] {Xtr.shape[0]}x{M}: {mode} partition, {centres.shape[0]} rules")
+        print(
+            f"  [anfis] {Xtr.shape[0]}x{M}: {mode} partition, {centres.shape[0]} rules"
+        )
         return pred
 
     # classification: one-hot regression targets, argmax at predict.
@@ -242,8 +244,10 @@ def fit_predict(X_train, y_train, X_test, *, kind, seed):
     Y = (ytr[:, None] == classes[None, :]).astype(float)
     net = _ANFIS(centres, widths, n_outputs=len(classes), seed=seed).fit(Xtr, Y)
     scores = net.predict(Xte)
-    print(f"  [anfis] {Xtr.shape[0]}x{M}: {mode} partition, {centres.shape[0]} rules, "
-          f"{len(classes)} classes")
+    print(
+        f"  [anfis] {Xtr.shape[0]}x{M}: {mode} partition, {centres.shape[0]} rules, "
+        f"{len(classes)} classes"
+    )
     return classes[np.argmax(scores, axis=1)]
 
 
@@ -267,4 +271,6 @@ if __name__ == "__main__":
     )
     p = fit_predict(Xtr, ytr, Xte, kind="reg", seed=0)
     r2 = r2_score(yte, p)
-    print(f"Concrete ANFIS (grid) test R^2 = {r2:.3f}  {'OK' if r2 > 0.75 else 'TOO LOW'}")
+    print(
+        f"Concrete ANFIS (grid) test R^2 = {r2:.3f}  {'OK' if r2 > 0.75 else 'TOO LOW'}"
+    )

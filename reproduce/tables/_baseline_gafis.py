@@ -62,15 +62,17 @@ def _evolve(centres0, widths0, X, Y, seed):
 
     def unpack(g):
         c = g[: R * M].reshape(R, M)
-        s = np.maximum(g[R * M:].reshape(R, M), 1e-3)
+        s = np.maximum(g[R * M :].reshape(R, M), 1e-3)
         return c, s
 
     base = np.concatenate([centres0.ravel(), widths0.ravel()])
     # spread the initial population around the grid/scatter seed.
-    scale = np.concatenate([
-        np.full(R * M, 0.3),           # centre jitter (inputs are standardised)
-        np.full(R * M, 0.3),           # width jitter
-    ])
+    scale = np.concatenate(
+        [
+            np.full(R * M, 0.3),  # centre jitter (inputs are standardised)
+            np.full(R * M, 0.3),  # width jitter
+        ]
+    )
     pop = base[None, :] + rng.normal(0, 1, (POP, dim)) * scale[None, :]
     pop[0] = base  # keep the unperturbed seed as one individual
 
@@ -112,7 +114,7 @@ def fit_predict(X_train, y_train, X_test, *, kind, seed):
     Xtr, Xte = sx.transform(Xtr), sx.transform(Xte)
 
     M = Xtr.shape[1]
-    grid_rules = MF_PER_FEATURE ** M if M <= 20 else np.inf
+    grid_rules = MF_PER_FEATURE**M if M <= 20 else np.inf
     if grid_rules <= RULE_CAP:
         centres, widths = _grid_partition(Xtr, MF_PER_FEATURE)
         mode = "grid"
@@ -123,7 +125,9 @@ def fit_predict(X_train, y_train, X_test, *, kind, seed):
     # fitness on a subsample keeps POP*GENERATIONS solves affordable at scale;
     # the winning system's consequents are refit on all of Xtr before predicting.
     if len(Xtr) > FITNESS_SUBSAMPLE:
-        idx = np.random.RandomState(seed).choice(len(Xtr), FITNESS_SUBSAMPLE, replace=False)
+        idx = np.random.RandomState(seed).choice(
+            len(Xtr), FITNESS_SUBSAMPLE, replace=False
+        )
         Xfit = Xtr[idx]
     else:
         idx = slice(None)
@@ -133,11 +137,13 @@ def fit_predict(X_train, y_train, X_test, *, kind, seed):
         sy = StandardScaler().fit(ytr.reshape(-1, 1))
         Ytr = sy.transform(ytr.reshape(-1, 1))
         net = _evolve(centres, widths, Xfit, Ytr[idx], seed)
-        wn = net._firing(Xtr)               # refit consequents on the full train set
+        wn = net._firing(Xtr)  # refit consequents on the full train set
         net._solve_consequents(Xtr, Ytr, wn)
         pred = sy.inverse_transform(net.predict(Xte)).ravel()
-        print(f"  [gafis] {Xtr.shape[0]}x{M}: {mode}, {centres.shape[0]} rules, "
-              f"pop {POP} x {GENERATIONS} gen")
+        print(
+            f"  [gafis] {Xtr.shape[0]}x{M}: {mode}, {centres.shape[0]} rules, "
+            f"pop {POP} x {GENERATIONS} gen"
+        )
         return pred
 
     classes = np.unique(ytr)
@@ -146,8 +152,10 @@ def fit_predict(X_train, y_train, X_test, *, kind, seed):
     wn = net._firing(Xtr)
     net._solve_consequents(Xtr, Y, wn)
     scores = net.predict(Xte)
-    print(f"  [gafis] {Xtr.shape[0]}x{M}: {mode}, {centres.shape[0]} rules, "
-          f"{len(classes)} classes, pop {POP} x {GENERATIONS} gen")
+    print(
+        f"  [gafis] {Xtr.shape[0]}x{M}: {mode}, {centres.shape[0]} rules, "
+        f"{len(classes)} classes, pop {POP} x {GENERATIONS} gen"
+    )
     return classes[np.argmax(scores, axis=1)]
 
 
@@ -167,4 +175,6 @@ if __name__ == "__main__":
     )
     p = fit_predict(Xtr, ytr, Xte, kind="reg", seed=0)
     r2 = r2_score(yte, p)
-    print(f"Concrete GA-FIS (grid) test R^2 = {r2:.3f}  {'OK' if r2 > 0.6 else 'TOO LOW'}")
+    print(
+        f"Concrete GA-FIS (grid) test R^2 = {r2:.3f}  {'OK' if r2 > 0.6 else 'TOO LOW'}"
+    )
