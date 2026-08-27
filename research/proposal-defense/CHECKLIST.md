@@ -841,6 +841,26 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       committed report and Table 4.10 are regenerated with what this host reproducibly measures now
       (`whole_cycle` 15.44/12.07/320, `raw_memory` 15.58/17.00/655, blend 11.14/216, DS02 solo 7.23),
       and both scripts' docstrings and §4.4.1 say so instead of citing the unreproduced numbers.
+- [x] ✅ **C19 — BETH one-class anomaly detection landed (grad-school #95 / #180), two trackers
+      hadn't caught up** (2026-08-27; Ch 4 §4.4, Table 4.11 and companions 4.11(b)-(e)). The
+      blocker WORKINGDOC.md §6 and Ch 7 §7.3 named — BETH needs a purpose-built one-class
+      training path, not the leave-one-class-out protocol Glass/RT-IOT2022 use — is resolved:
+      `tribblefis.one_class.TribbleOneClassDetector` already existed in the library, and
+      `table_4_11_beth_anomaly.py` plus three companion sweeps (`table_4_11c/d/e_*.py`) now run
+      it on the full 1.14M-row BETH capture. On the configuration §4.3.5 was written for, the
+      complement rule reaches parity with a one-class SVM ($J$ +0.843 vs +0.841), and the
+      "conorm is inert with a single class" algebra §4.3 argues traces correctly into
+      `gauss_math.py`. Landing this updated WORKINGDOC §6 and Ch 7's timeline row, but left two
+      trackers stale: `reproduce/PROVENANCE_MAP.md`'s four Table 4.11 rows still read *"no prose
+      slot yet"* after the prose section existed, and `data/.gitignore` still named the
+      pre-rename `table_4_x_beth_anomaly.py`. Both fixed here. Separately,
+      `table_4_11e_beth_boost_sweep.py`'s θ-sweep "control" model built its Gaussian memberships
+      without threading the loop's `seed` into `create_gaussian_membership_dict`'s own
+      `random_state` (default 42), so for seeds other than 42 it was not provably "the same
+      fitted memberships" its own comment claimed against the seeded `TribbleOneClassDetector`
+      control. Fixed by passing `random_state=seed` through; unlikely to move the table's
+      verdict (the delta-detection metric it reports is the point of the algebraic argument, not
+      dependent on this), but the seeding is now actually as described.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because

@@ -18,6 +18,7 @@ regression_scale/
 # (AGENTS.md non-negotiable 8). Public download:
 #   https://www.kaggle.com/datasets/katehighnam/beth-dataset
 # Place the three labelled_*.csv files in data/beth/. Used by
-# reproduce/tables/table_4_x_beth_anomaly.py; NOTE that `sus` in those files is
-# a second LABEL, not a feature -- see PROVENANCE_MAP.md note 22.
+# reproduce/tables/table_4_11_beth_anomaly.py (and the table_4_11c/d/e
+# companion sweeps); NOTE that `sus` in those files is a second LABEL, not a
+# feature -- see PROVENANCE_MAP.md note 22.
 beth/
