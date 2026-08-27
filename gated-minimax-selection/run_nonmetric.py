@@ -17,11 +17,15 @@ The five experiments:
 E1 Diagnostics -- makes "non-Euclidean" quantitative. For each dataset:
    triangle-violation fraction and classical-MDS negative-eigenvalue ratio of
    raw D and of D* = minimax(D); an ultrametricity check of D*; and whether
-   NERFCM's beta-spread ever activates on either. The theory being tested:
-   D* of ANY symmetric dissimilarity is an ultrametric, finite ultrametrics
-   are isometrically Euclidean-embeddable (Lemin), therefore D* should always
-   be admissible (neg-eig ~ 0, beta never fires) -- the minimax transform is
-   a canonical Euclideanizer, subsuming the beta-spread repair.
+   NERFCM's beta-spread ever activates on either. The theory being VERIFIED
+   here is published, not ours: D* of ANY symmetric dissimilarity is the
+   subdominant ultrametric (Johnson 1967), finite ultrametrics are
+   isometrically Euclidean-embeddable (Lemin 1985), hence D* is always
+   admissible and beta never fires -- stated as Chehreghani AAAI-17 Thm 3,
+   and already applied to relational FCM in place of beta-spread by Khalilia,
+   Bezdek, Popescu & Keller, Pattern Recognition 47(12), 2014 (iRFCM). This
+   experiment confirms it on our data; it does not discover it. See
+   notes/NONMETRIC_FINDINGS.md finding 1 for the full citation trail.
 
 E2 Method battery -- NERFCM(D), NERFCM(D*), single-linkage at true k, and the
    three k-discovering selectors (persistence-gap cover, beta-plateau, and a

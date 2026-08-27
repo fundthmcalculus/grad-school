@@ -341,7 +341,7 @@ def write_markdown(path, title, header, rows, note="", seeds=None):
             f.write(f"\n> {note}\n")
         # `seeds` is an override, not a default, and it exists because the footer used
         # to state `SEEDS` unconditionally -- including on tables the harness does not
-        # compute. `table_5_x_ch5_selection.py` does no arithmetic at all: it renders
+        # compute. `table_5_1_3_ch5_tables.py` does no arithmetic at all: it renders
         # `gated-minimax-selection/outputs/results.json`, whose driver runs at
         # `SEEDS = [0, 1, 2, 3, 4]` -- five restarts, and only for the NERFCM and
         # ConiVAT columns, which are the only cells in that battery carrying a

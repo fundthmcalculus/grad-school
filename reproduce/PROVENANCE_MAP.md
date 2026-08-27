@@ -255,7 +255,210 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
+| 4.11 BETH anomaly detection *(number reserved; no prose slot yet)* | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95) — note 22 |
+| 4.11(c) BETH feature reduction *(no prose slot yet)* | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95) — note 23 |
+| 4.11(d) BETH matched sample size *(no prose slot yet)* | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing — note 23 |
+| 4.11(e) BETH knob validation *(no prose slot yet)* | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95) - note 24 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
+
+**Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
+not have been produced, and the library's default anomaly score is unreadable on it.**
+
+*Why there are no supervised arms.* grad-school #95 specified "train on the BETH
+training split, report AUC vs. RF / ANFIS." Counting `evil` per shipped split settles
+it: **train 763,144 rows / 0 positives, val 188,967 / 0, test 188,967 / 158,432.** Every
+positive BETH ships is in the test split. A supervised RF fits the training split
+without raising anything and predicts the constant 0 — 16.2% accuracy, AUC 0.5 — so the
+failure mode is a *plausible-looking number*, not a crash, which is the class of defect
+this map exists for. `table_4_11_beth_anomaly.py` runs the one-class protocol BETH
+supports and emits **no supervised rows at all**. **Isolation Forest is the
+Random-Forest family's one-class detector** — an unlabelled forest of random trees
+scoring by isolation depth — and is the RF-shaped comparison a one-class task admits.
+(A literal `RandomForestClassifier` can be pressed into one-class service by the
+Shi–Horvath synthetic-contrast construction; that is a different estimator and is
+deliberately not implemented.)
+
+*The fuzzy arm is the library's own estimator.* `tribblefis.one_class.TribbleOneClassDetector`
+(an sklearn `OutlierMixin`), not a hand-assembly of `create_gaussian_membership_dict` +
+`AnomalyParameters` + `simple_gaussian_predict`. The first revision of this generator
+did assemble it by hand, bending the *multi-class* path into single-class use. The two
+agree exactly on the operating point (det 0.9930 / false alarm 0.1502 either way), so
+nothing was wrong — but a second copy of a library capability is how two tables drift
+apart, and the hand-rolled version could only emit a hard label, which cost the table a
+real ROC-AUC and concealed the next paragraph.
+
+*The default score saturates at eight features, not sixty.* `TribbleOneClassDetector`
+offers `score="complement"` (`1 − max firing`, the library default and the formulation
+Chapter 4 argues for) and `score="surprisal"` (`Σ −log membership`). Under the product
+t-norm these are **monotone transforms of one another, so in exact arithmetic their
+ROC-AUC is identical**. Measured on BETH: **complement 0.928, surprisal 0.990**, with
+Spearman between the two scores of only **0.812**. The diagnostic is score resolution
+against the ceiling the data sets — the test split holds **4,002 distinct feature
+vectors**, so 4,002 is the most distinct scores anything can produce; surprisal
+recovers **3,997 (99.9%)**, the complement only **1,508 (37.7%)**. The library's
+docstring puts the onset of this "past roughly 60 features"; BETH reaches it at
+**eight**, because the log-scaled process/thread identifiers are heavy-tailed enough
+that a typical point's summed z² already exceeds float64's resolution against 1.0. **So
+the saturation threshold is a property of the tails, not of the feature count.** Read
+the surprisal row. Both are emitted, because dropping the complement row would hide a
+caveat Chapter 4's own default walks into. (Note that most test *rows* are tied at the
+maximum under both scores — 75% and 85% — but that is BETH repeating itself, not a
+numerical fault. The distinct-score count is the diagnostic; the tied-row fraction is
+not, and an earlier draft of this note had that backwards.)
+
+*Two of the ten columns `load_beth()` returns are not features.* `sus` is BETH's second
+**label** — the heuristic suspicion annotation — and it is 1 for **158,432 of 158,432**
+evil rows, so alone it detects at 1.000/0.427 and any arm given it is scoring the
+annotator. `timestamp` is a per-capture session clock whose ranges separate the three
+files rather than the behaviour. Both are dropped before any fit, matching
+`FuzzySystemsExperiments/beth-anomaly.py`, leaving 8 features. The drop is in the
+generator, **not** in `load_beth()`, because `table_4_4_openset.py` shares that loader
+and narrowing it would silently move an already-archived table.
+
+*The calibration does not transfer.* The threshold is the (1 − budget) quantile of the
+detector's scores on the benign validation split — exact, and it touches no positive
+label. At a 1% budget it realizes **0.0100 on validation and 0.1500 on test, 15×**. Both
+splits are benign-only draws from one capture, so this is a property of BETH's benign
+test rows, not of any detector. A false-alarm budget set on BETH's validation split
+cannot be believed on its test split; every arm is matched at the validation rate, so
+they stay comparable to each other.
+
+*The 1% default is not the best operating point.* Table 4.11(b) sweeps the budget and
+the **tightest setting wins**: J **+0.870 at a 0.1% budget** against +0.843 at 1% and
++0.755 at 10%, with detection flat at 0.993 throughout — all of the movement is in false
+alarms. The same sweep is where the saturation bites hardest: at the 0.1% budget the
+complement arm collapses to **det = 0.000** while surprisal holds 0.993, which is the
+strict-operating-point failure the library docstring predicts and that AUC alone hides.
+
+*Isolation Forest reads as broken at the matched operating point and is not.* It scores
+det=0.001 ± 0.003 at fa=0.021 ± 0.005 — worse than chance by Youden's J — while its
+score-based **AUC is 0.898 ± 0.005**. Its ranking is fine; what fails is threshold
+placement, because `contamination` fixes the cut on the *training* score distribution
+and BETH's test benign rows sit elsewhere. Reporting the two columns together is what
+makes that legible; either alone would mislead.
+
+*A supervised separability probe exists and is deliberately not in the table.* It has to
+train on the only split with positives, and the test split's 188,967 rows hold just
+**4,002 distinct feature vectors (2.12%)**, so an i.i.d. row split trains on a copy of
+nearly every row it scores (AUC 1.000 — a lookup table succeeding). A GroupShuffleSplit
+on feature-vector identity still scores 0.999 AUC because both halves are one capture.
+It is printed to stdout only: a cell that is safe to read only alongside its note is a
+cell that gets quoted without the note.
+
+*Operational note.* `n_jobs=-1` on this 32-core host hung the machine and killed the
+process with SIGSEGV at a nondeterministic seed, with no Python traceback. That was
+thread oversubscription — loky spawns one interpreter per core on Windows and each
+builds its own BLAS pool, against an OpenBLAS compiled for fewer threads — and **not**
+memory: peak resident set was 521 MB of 95.6 GB, and BETH's three frames are 91 MB
+combined. Diagnosing it as memory pressure would have led to downsampling the training
+split, which is precisely what #95 forbids. The generator caps `n_jobs` at 8
+(`REPRO_BETH_N_JOBS`) and BLAS threads at 8 (`REPRO_BLAS_THREADS`, set before the numpy
+import) and completes ten seeds in 1m39s.
+
+**Note 23 — a wall-clock is only a comparison when the work is the same, and
+Table 4.11(c)'s first version was not.** `table_4_11c_beth_feature_reduction.py` swept
+feature count 2→8 and reported a training-time column across four arms. Those arms were
+not doing comparable work: the fuzzy detector was fitted on all **763,144** benign rows,
+the one-class SVM on a **20,000**-row cap (libsvm is O(n²)–O(n³)), and Isolation Forest
+on 763,144 rows nominally but with **`max_samples=256`**, so each tree was built from 256
+rows. Three different experiments, one column. Its flat Isolation Forest line was that
+default, not a property of the algorithm.
+
+`table_4_11d_beth_sample_scaling.py` is the correction: **one subsample per (n, seed),
+handed to all five arms** — same rows, same count — for n = 1,000…20,000. The ceiling is
+20,000 because that is where the SVM's cap sat; going higher would drop it out of the
+comparison and recreate the defect. Isolation Forest deliberately appears **twice**, at
+`max_samples=256` (so (c)'s number stays traceable) and at `max_samples=n` (matched work);
+reporting only the first repeats the mistake, reporting only the second silently changes
+what "Isolation Forest" means between two tables.
+
+*Two claims the matched sweep retracted.* (a) The fuzzy arm was **not** the slowest to
+train — at n=1,000 it fits in 0.081 s against both forests' ~0.15 s, and its 2.63 s in (c)
+was entirely the 763k-row fit. (b) Its inference advantage over the SVM exists **only at
+the SVM's cap**: SVM scoring grows **11×** (0.117 s → 1.280 s) with support-vector count
+while the fuzzy arms and the default forest are flat in n, so at n=1,000 the SVM is
+marginally *faster*. Both statements had been published in an artifact before the
+correction; the artifact now carries the retraction on its face.
+
+*What the correction also revealed.* `max_samples=256` was costing Isolation Forest a
+great deal: at n=20,000 with `max_samples=n` it reaches **AUC 0.978** against 0.896 at the
+default, and the **best operating point measured anywhere in this family is that arm at
+n=2,000, J +0.879** — better than the fuzzy arm's +0.845 and the SVM's +0.833. Its
+apparent uselessness in Tables 4.11 and 4.11(c) was substantially a library default.
+
+*The fuzzy arm needs 1,000 rows.* AUC **0.9903** at n=1,000 against **0.9905** on the full
+763,144-row split. The full-split fit buys nothing measurable, which makes #95's
+"no downsampling" instruction moot for this arm — worth knowing before budgeting compute,
+and an argument for quoting (d) rather than (c) on cost.
+
+*Ten seeds earned their keep again.* At n=1,000 two arms are coin flips, not middling
+detectors: matched-work Isolation Forest reports detection **0.563 ± 0.470** and the
+complement score **0.794 ± 0.419** — some seeds detect nearly everything, others nearly
+nothing. Both settle by n=2,000. A single-seed run would have reported either as a clean
+number, which is the failure mode non-negotiable 2 exists to prevent.
+
+*What (c) is still good for.* Its quality columns stand, and they carry the finding that
+**AUC and the operating point disagree about feature reduction**: AUC says keep all 8
+(0.9905), Youden's J at a 1% budget says keep **6** (+0.914 against +0.843), because
+adding `userId` at k=7 lifts detection 0.933→0.993 while pushing false alarms
+0.019→0.137. Its within-arm timing trend is also valid. Only the cross-arm timing reading
+was wrong, and the emitted table now says so in its own note.
+
+**Note 24 - the boost theta is a threshold parameterisation, and in the one-class
+configuration the norm/conorm choice is inert.** `table_4_11e_beth_boost_sweep.py` asks,
+for each arm's operating-point knob: at a **matched false-alarm rate**, does turning it
+detect more than simply moving the threshold on that arm's own continuous score? On BETH
+the answer is no for all three, and the largest absolute delta-detection across each grid
+sits at or below that arm's own detection seed-spread:
+
+| knob | kind | largest abs delta | detection seed-spread |
+|---|---|---|---|
+| Tribble boost theta | threshold on firing (derived below) | 0.0012 | 0.0006 |
+| iForest `contamination` | pure threshold - the method's control | 0.0003 | 0.0007 |
+| OC-SVM `nu` | **refits per value** | 0.0006 | 0.0000 |
+
+*For theta this is provable, and the table measures the derivation rather than asserting
+it.* `gauss_math._anomaly_argmax` forms the anomaly column as
+`complement(conorm(clip(class_firing + theta, 0, 1)))`. With **one** known class there is
+exactly one class column, and `t_conorm(x, None, ...)` aggregates *column-wise* - so the
+conorm is the **identity**, and the anomaly label wins exactly when
+**`firing < (1 - theta)/2`**. Two consequences the chapter should absorb:
+
+1. **theta is a hard threshold on firing strength** in the one-class setting and cannot
+   express any decision a threshold cannot. Section 4.3 argues the weaker multi-class
+   version - that at theta=0.99 the rule degenerates to a max-membership rejector; the
+   one-class reduction makes it total at **every** theta, not just the shipped default.
+   Describe theta as a threshold parameterisation, not as a mechanism.
+2. **`REPRO_ANOM_CONORM` is inert in this configuration.** There is one column to
+   aggregate, so the conorm family cannot change a single decision. A conorm sweep run on
+   a one-class BETH fit measures nothing - which matters because section 4.3 sweeps conorm
+   families and `table_norm_conorm_matrix.py` exists to do exactly that on multi-class
+   data.
+
+*The Isolation Forest row is a control, not a finding.* `contamination` provably only sets
+`offset_` from a quantile of the training scores and never touches the trees, so its delta
+**must** be ~0. That it comes back 0.0003 is what licenses reading a non-zero delta
+elsewhere as real - and it is why one fit per seed is correct rather than a shortcut.
+
+*`nu` is the informative negative.* It enters libsvm's QP objective, so every value is a
+genuinely different fitted model - the only knob in the table that could have beaten
+thresholding by trading one decision surface for another. It does not: the refit moves the
+surface and buys nothing over sliding along a fixed one.
+
+*Secondary findings.* theta's J is **monotone** (+0.160 at theta=0 rising to +0.769 at
+theta=0.999), so on BETH there is no interior optimum and the shipped 0.99 default is
+near-best. **The proposal's usable band of theta = 0.5-0.8 does not transfer** - it came
+from Glass and RT-IOT2022. This is consistent with note 22's finding that the tightest
+false-alarm budget gave the best J, which is exactly what a threshold-in-disguise would do.
+The best operating point anywhere in this table is **iForest at `contamination=0.005`,
+J +0.864**; `contamination=0.001` is another coin flip (detection **0.464 +/- 0.481**).
+
+*What this does not say.* None of the knobs is useless - choosing an operating point is
+what they are for, and note 22 shows how much that choice is worth. The claim is narrower:
+none of them **adds** discriminative power over a threshold on the same score. Every arm is
+fitted on the same 20,000-row benign subsample per seed, so note 23's sample-count
+confound is not re-introduced, and no wall-clock is reported because this table is about
+decision curves.
 
 **Note 2.** Re-quoted at 10 seeds: 1st order 0.658 → 0.783 (Δ +0.125), 2nd order
 0.796 → 0.829 (Δ +0.033). The table now also carries the CART and Random Forest
@@ -441,9 +644,9 @@ this pass were initially run that way. Use
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| 5.1 The battery | `run_all.py` → `table_5_x_ch5_selection.py` | `outputs/table_5_1_battery.{md,csv}` | **reproduced** — after the note-9 correction |
-| 5.2 Multi-scale recovery | `run_all.py` → `table_5_x_ch5_selection.py` | `outputs/table_5_2_multiscale.{md,csv}` | **reproduced** |
-| 5.3 Selection comparison | `run_all.py` → `table_5_x_ch5_selection.py` | `outputs/table_5_3_selection.{md,csv}` | **reproduced** |
+| 5.1 The battery | `run_all.py` → `table_5_1_3_ch5_tables.py` | `outputs/table_5_1_battery.{md,csv}` | **reproduced** — after the note-9 correction |
+| 5.2 Multi-scale recovery | `run_all.py` → `table_5_1_3_ch5_tables.py` | `outputs/table_5_2_multiscale.{md,csv}` | **reproduced** |
+| 5.3 Selection comparison | `run_all.py` → `table_5_1_3_ch5_tables.py` | `outputs/table_5_3_selection.{md,csv}` | **reproduced** |
 | 5.4 Goal G1 scaling decision rule | `table_5_4_ch5_g1_scaling.py` (own computation) | `outputs/table_5_4_ch5_g1_scaling.{md,csv}` + `_raw.csv` | **reproduced** — two-stage vs. flat only; the decision rule's third arm (one-pass) is unimplemented, stated in the table's own note |
 
 Chapter 5 is the best-behaved chapter in the proposal in design: one deterministic
@@ -465,7 +668,7 @@ of its 17 figures (`fig11_scaling` is behind an opt-in `--scaling` flag), and
 rewrites `results.json` **byte-identical to the 2026-07-20 file** — so the
 chapter's numbers were never wrong, only unreproducible.
 
-**The tables were hand-transcribed.** `reproduce/tables/table_5_x_ch5_selection.py`
+**The tables were hand-transcribed.** `reproduce/tables/table_5_1_3_ch5_tables.py`
 closes that: it does no computation, only renders the JSON, so a stale prose cell
 now shows as a diff.
 

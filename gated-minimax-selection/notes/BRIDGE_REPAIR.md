@@ -58,14 +58,81 @@ experiment here. One caveat recorded in the JSON: at strength 0.6 (mild,
 partially-bridging corruption) q=0.5's repair estimate moved one replicate the
 wrong way (0.97 raw → 0.85 repaired); q=0.75 did not (0.98).
 
-## Relation to prior work
+## Relation to prior work — checked 2026-08-26, and it is mostly known
 
-This is a cheap, one-sided special case of the **metric nearness problem**
-(Brickell, Dhillon, Sra & Tropp, SIAM J. Matrix Anal. 2008; sparse variant:
-Gilbert & Jain, Allerton 2017). Those project onto the full metric cone; this
-lifts only below-lower-bound entries — the only direction the minimax
-transform is sensitive to (NONMETRIC_FINDINGS finding 2). *Citations from
-memory — verify before quoting in a chapter.*
+The earlier version of this section guessed at two citations and flagged them
+unverified. The check came back: **the problem, the operator, and the
+application are all published.** What follows is the corrected account.
+
+**The problem has a name.** Repairing a matrix by only *increasing* entries is
+**Increase Only Metric Repair (IOMR)** — Gilbert & Jain, *"If it ain't broke,
+don't fix it: Sparse metric repair"*, Allerton 2017, 612–619 — equivalently the
+increase-only variant of **Metric Violation Distance** (Fan, Raichel & Van
+Buskirk, SODA 2018, 196–209; *Algorithmica* 84(5):1441–1465, 2022). Brickell,
+Dhillon, Sra & Tropp (*SIAM J. Matrix Anal. Appl.* 30(1):375–396, 2008) had
+already floated it in §7.1 as an open variation of metric nearness. Its
+complexity is settled and unfavourable: **increase-only is NP-complete and
+cannot be approximated better than minimum vertex cover** (Fan et al.).
+
+**The operator is theirs too.** Gilbert & Jain's Algorithm 3 (IOMR) "updates
+D_ik with D_ij − D_jk whenever ijk is broken" — which is the reverse-TI witness
+bound of this module, at a single witness, iterated.
+
+**At q = 1 this reduces to a classical embedding.** Because the witness set
+includes k = i, the bound |D_ii − D_ji| = D_ij is always present, so
+`max(D_ij, max_k |D_ik − D_jk|)` collapses to `max_k |D_ik − D_jk|` =
+‖row_i(D) − row_j(D)‖_∞ — the **Fréchet/Kuratowski isometric embedding of a
+finite metric into ℓ∞**, 1910/1935. Verified numerically here (exact equality
+on Euclidean, DTW and corrupted matrices). All three "properties" this module
+claimed therefore come for free and are classical at q = 1: identity on
+metrics *is* isometry, one-sidedness *is* the IOMR definition, and the output
+is a genuine metric because ℓ∞ is a norm.
+
+**A limitation that fell out of the same check.** That last guarantee holds
+**only at q = 1**. At the recommended default q = 0.5 the output is *not* a
+metric (measured: triangle violations remain). So "repair" is loose language
+for what this does at its recommended setting — it removes shortcuts, it does
+not restore metricity. That is fine for the minimax pipeline, which needs no
+metric, but the name oversells it and the chapter should not use it unguarded.
+
+**The application has an incumbent with the same algebraic shape.** Lifting
+entries one-sidedly to break bridges before single-linkage is exactly the
+**mutual reachability distance** of HDBSCAN — `mrd(a,b) = max(core_k(a),
+core_k(b), d(a,b))` (Campello, Moulavi & Sander, PAKDD 2013) — same
+`max(D_ij, ·)` form, differing only in where the lower bound comes from (kNN
+density vs. reverse-TI witnesses). ConiVAT (Rathore, Bezdek, Santi & Ratti,
+2020) attacks the same failure from the opposite direction, with a
+*decrease*-only minimum-transitive transform.
+
+**And a direct challenge worth engaging.** Etgar & Gilbert, *"Metric repair is
+two problems: Which edges, and what weights"* (arXiv:2608.07715, Aug 2026),
+tests whether repair helps downstream and largely finds it does not —
+"finding the correct set of edges … is critical … setting the weights is not
+an implementation detail; it is half the problem." Any claim that this repair
+helps has to answer that paper.
+
+### What is left unclaimed
+
+Searched and **not found** (which is weak evidence of absence, not proof): the
+**quantile-over-witnesses aggregation** as a robustness knob for repair, the
+**corruption-rate estimator** r̂ from median-witness-bound exceedance, and the
+resulting **auto-tuning + abstention rule**. Nearest precedent for the
+aggregation idea is Moerel & Grootswagers (arXiv:2506.00484, 2025), who take a
+**median over third points** — but to *impute missing* entries, not repair
+corrupted ones.
+
+So the defensible framing, if this is ever written up, is narrow:
+
+> a robust, quantile-aggregated estimator for the increase-only metric repair
+> problem of [Gilbert & Jain 2017; Fan et al. 2018], with an auto-tuning rule
+> and an abstention criterion
+
+— not a new method, and emphatically not a new problem. *Bibliographic note:*
+Brickell 2008, Gilbert & Jain 2017, Fan et al. 2018/2022, the SWAT 2020
+generalisation and Etgar & Gilbert 2026 were verified against primary sources;
+Campello 2013 page numbers and the Vidal/AESA and Dress–Havel bound-smoothing
+references were verified only via search summaries and need a check before
+they enter a bibliography.
 
 ## Reproduction
 

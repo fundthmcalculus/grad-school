@@ -869,9 +869,20 @@ def build_with_latex(md_path, pandoc, engine):
             ]
         )
     print(f"  pandoc + {engine} ...")
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    # encoding/errors are load-bearing, not tidiness. `text=True` alone decodes
+    # the child's output with the console's locale codec, which on a Windows
+    # cp1252 console dies on pandoc's own warning stream -- it echoes the source
+    # characters it cannot typeset (theta, >=, ~=) and those bytes are undecodable
+    # there. The exception is raised inside subprocess's reader THREAD, so
+    # `res.stderr` comes back None and the `res.stderr[-2500:]` below then fails
+    # with a TypeError that masks the real pandoc error completely. Observed
+    # 2026-08-27: a build whose pandoc invocation actually succeeded reported
+    # only "TypeError: 'NoneType' object is not subscriptable".
+    res = subprocess.run(
+        cmd, capture_output=True, text=True, encoding="utf-8", errors="replace"
+    )
     if res.returncode != 0:
-        print(res.stderr[-2500:])
+        print((res.stderr or "<no stderr captured>")[-2500:])
         return None
     return pdf
 
@@ -912,9 +923,12 @@ def build_with_weasyprint(md_path, pandoc):
                 bib_file,
             ]
         )
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    # Same encoding trap as build_with_latex above.
+    res = subprocess.run(
+        cmd, capture_output=True, text=True, encoding="utf-8", errors="replace"
+    )
     if res.returncode != 0:
-        print(res.stderr[-1500:])
+        print((res.stderr or "<no stderr captured>")[-1500:])
         return None
 
     title_html = f"""<div class="titlepage">

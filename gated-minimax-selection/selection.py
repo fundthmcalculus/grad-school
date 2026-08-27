@@ -9,7 +9,25 @@ spending a selection on a noise sliver.
 So selection is reframed from "pick exactly c disjoint clusters" (which starves
 clusters living at unlucky height scales) to a SET-COVER over the dendrogram:
 choose a set of persistent blocks that covers as many points as possible at
-each point's OWN natural scale, tolerating overlap.
+each point's OWN natural scale.
+
+CORRECTION (2026-08-27). This docstring used to say "tolerating overlap", and
+`select_coverage_cover` below said "overlap allowed". **That is false, and
+provably so.** Dendrogram nodes form a LAMINAR family: any two are nested or
+disjoint. Greedy selection by uncovered-point gain therefore always takes a
+MAXIMAL eligible node first (an ancestor is strictly larger, so it wins), after
+which every eligible descendant has gain 0 and is excluded by the "no block
+adds coverage" stop. The output is always a pairwise-disjoint ANTICHAIN.
+Verified empirically: 0 overlapping pairs across 14 datasets, including a real
+5,000-point DTW matrix at k=25.
+
+So what this computes is exactly a LOCAL CUT through the hierarchy in the sense
+of Campello, Moulavi, Zimek & Sander's FOSC framework (DAMI 27(3):344-371,
+2013; HDBSCAN* in ACM TKDD 10(1):5, 2015) -- selecting maximal gated nodes,
+with uncovered points playing the role of noise. The set-cover machinery is an
+expensive way to write "select every eligible node with no eligible ancestor".
+Getting genuine overlap would need a non-laminar candidate family or a gain
+that is not uncovered-count; neither is implemented.
 
 We compare three selectors on varying_density (the case that broke before):
 
@@ -110,7 +128,10 @@ def select_coverage_cover(Dstar, gap_sigma=2.0, max_size_frac=0.6):
     gap, we select nothing (correctly declining to assert structure in noise).
 
     Among eligible blocks (size-capped so the near-root block is excluded),
-    greedy set-cover by uncovered-point gain, overlap allowed.
+    greedy set-cover by uncovered-point gain. NOTE: despite the set-cover
+    framing this cannot return overlapping blocks -- the candidates are
+    dendrogram nodes, hence laminar, so the result is always a disjoint
+    antichain (a "local cut"). See the module docstring's CORRECTION.
     """
     blocks, n = _all_blocks(Dstar)
     ceiling = max_size_frac * n
