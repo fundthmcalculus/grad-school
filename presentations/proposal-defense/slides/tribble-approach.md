@@ -13,14 +13,17 @@ Advisor: Dr Kelly Cohen
 
 * Answer-first construction: $K$ rules for $K$ classes — no grid, no search
 
-| Dataset | Rules | Accuracy / $R^2$ | Train time |
+| Dataset | Rules | Accuracy | Train time |
 |---|---:|---:|---:|
 | PhiUSIIL (235K × 54) | 2 | 0.997 ± 0.001 | ~0.3 s |
 | RT-IOT2022 (123K × 82, 12-class) | 12 | 0.927 ± 0.002 | ~3 s |
-| Glass (214 × 9, 6-class) | 6 | 0.547 ± 0.090 | ~0.3 s |
+| Glass (214 × 9, 6-class) | 6 | 0.665 ± 0.045 | ~1 s |
 
 * Free: the rule-base complement is automatically an open-set / anomaly
   detector, at no extra training cost
+* Glass is small and hard — an optional, deterministic post-fit polish
+  (still no GA, no gradient descent) lifts it from 0.53 to 0.665 in about
+  a second; the other rows above needed no polish at all
 
 </div>
 <div style="flex: 1; padding: 10px;">
@@ -28,7 +31,7 @@ Advisor: Dr Kelly Cohen
 ![mog-classification](img/04-mog-classification.png)
 
 *Right: the actual Glass fit — one rule's membership functions and firing
-strength, from the same construction as the table above*
+strength, from the base (unrefined) construction*
 
 </div>
 </div>
