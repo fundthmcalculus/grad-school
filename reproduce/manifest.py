@@ -167,31 +167,45 @@ EXPERIMENTS = [
         id="table-4-11-beth-anomaly",
         title="BETH host telemetry: one-class anomaly detection on the full 763k training split",
         chapter="Ch4",
-        produces="Table 4.11 + Table 4.11(b) (BETH theta operating curve)",
+        produces="Table 4.11 + Table 4.11(b) (BETH false-alarm operating curve)",
         repo="tribble-fis",
         command=_uv("../reproduce/tables/table_4_11_beth_anomaly.py"),
         hardware="any",
         datasets=["BETH (data/beth/, gitignored -- see data/.gitignore)"],
         outputs=[
             "reproduce/outputs/table_4_11_beth_anomaly.md",
-            "reproduce/outputs/table_4_11_beth_theta_sweep.md",
+            "reproduce/outputs/table_4_11_beth_fa_sweep.md",
         ],
-        notes="VERIFIED RUNNING (10 seeds, 1m37s). This is the BETH experiment "
+        notes="VERIFIED RUNNING (10 seeds, 1m39s). This is the BETH experiment "
         "table_4_4_openset.py could not run: leave-one-class-out needs >=3 classes and "
-        "BETH is binary. ONE-CLASS BY NECESSITY, not by choice -- all 158,432 positives "
-        "are in the test split, the 763,144-row train and 188,967-row val splits are "
-        "100% benign, so a supervised RF fits without error and predicts constant 0. "
-        "Those arms are emitted as N/A WITH THE REASON IN THE CELL. Two columns are "
-        "dropped before any fit: `sus` is BETH's second LABEL (1 for 100% of evil rows; "
-        "keeping it scores the annotator) and `timestamp` separates the three files "
-        "rather than the behaviour -- the same drop beth-anomaly.py makes. Dropped here, "
-        "not in load_beth(), so table_4_4_openset's archived numbers do not move. "
-        "theta is calibrated on the benign val split under REPRO_BETH_FA_BUDGET "
-        "(default 0.01); the finding is that it DOES NOT TRANSFER -- 0.0093 val false "
-        "alarm becomes 0.1498 on test, 16.1x. n_jobs is capped at 8 "
-        "(REPRO_BETH_N_JOBS) and BLAS threads at 8 (REPRO_BLAS_THREADS) because "
+        "BETH is binary. ONE-CLASS BY NECESSITY -- all 158,432 positives are in the "
+        "test split, train (763,144) and val (188,967) are 100% benign, so a supervised "
+        "RF fits without error and predicts constant 0. NO supervised rows are emitted; "
+        "ISOLATION FOREST IS THE RF-FAMILY ONE-CLASS DETECTOR and is the RF-shaped arm "
+        "this task admits. The fuzzy arms use the library API -- "
+        "tribblefis.one_class.TribbleOneClassDetector -- NOT a hand-assembly of the "
+        "multi-class gauss_math path (an earlier revision did that; both give the same "
+        "operating point, but the hand-rolled one could only emit a hard label). "
+        "TWO SCORE MODES ARE REPORTED AND ONLY ONE IS READABLE: score=surprisal gives "
+        "AUC 0.990, score=complement (the library default, and Chapter 4's "
+        "formulation) gives 0.928 on the SAME model -- they are monotone transforms in "
+        "exact arithmetic, so the gap is pure float64 resolution loss. BETH resolves "
+        "4,002 distinct feature vectors; surprisal recovers 3,997 of them, complement "
+        "only 1,508. The library docstring puts complement saturation past ~60 "
+        "features; BETH hits it at 8 because the log-scaled pid/tid columns are "
+        "heavy-tailed. At a 0.1% budget the complement collapses to det=0.000 while "
+        "surprisal holds 0.993. Two columns are dropped before any fit: `sus` is BETH's "
+        "second LABEL (1 for 100% of evil rows) and `timestamp` separates the files, "
+        "not the behaviour -- the drop is here, not in load_beth(), so "
+        "table_4_4_openset's archived numbers do not move. The threshold is the "
+        "(1-budget) quantile of benign-VALIDATION scores (REPRO_BETH_FA_BUDGET, default "
+        "0.01), and the finding is that it DOES NOT TRANSFER: 0.0100 val false alarm "
+        "becomes 0.1500 on test, 15x. Table 4.11(b) sweeps the budget and shows the "
+        "TIGHTEST budget is the best operating point (J +0.870 at 0.1% vs +0.843 at "
+        "1%), so the default is not optimal. n_jobs capped at 8 (REPRO_BETH_N_JOBS) and "
+        "BLAS threads at 8 (REPRO_BLAS_THREADS, set before the numpy import) because "
         "n_jobs=-1 on a 32-core host hung the machine and segfaulted the process; that "
-        "was thread oversubscription, never memory (peak 521 MB).",
+        "was thread oversubscription, never memory (peak RSS 521 MB of 95.6 GB).",
     ),
     Experiment(
         id="table-g5-output-partitioning",

@@ -2,10 +2,9 @@
 
 BETH is the large-scale anomaly-detection set Chapter 4 §4.3.5 names as the
 motivating case for the complement rule: train on benign host telemetry, then be
-shown novel attack behaviour. Table 4.4/4.7 could not run it -- the BETH files
-were absent, and the note in `table_4_4_openset.py` says so -- and its
-leave-one-class-out protocol needs >=3 classes, which a binary set does not have.
-This generator runs the protocol BETH actually supports, on the full set.
+shown novel attack behaviour. Table 4.4/4.7 could not run it -- its
+leave-one-class-out protocol needs >=3 classes and BETH is binary. This generator
+runs the protocol BETH actually supports, on the full set.
 
 WHAT THE SPLITS ARE, AND WHY THIS IS NOT A SUPERVISED TABLE
 -----------------------------------------------------------
@@ -20,65 +19,93 @@ dataset rather than of the harness. Counting `evil` per shipped split:
 **Every positive in BETH is in the test split.** A supervised classifier fitted
 on the training split sees one class and cannot learn a decision boundary at all;
 scikit-learn's Random Forest fits it happily and predicts the constant 0, which
-scores 16.2% accuracy and AUC 0.5 on test while reporting no error. So the
-supervised arms are marked N/A **with the reason in the cell**, which is the
-honest answer; they are not quietly omitted, because an absent row reads as "not
-tried."
+scores 16.2% accuracy and AUC 0.5 on test while reporting no error.
+
+So there are no supervised arms here, and no placeholder rows for them either.
+**The Random-Forest family's answer to this problem is Isolation Forest**, which
+is in the table: a forest of random trees, fitted with no labels, scoring by
+expected isolation depth. It is the tree-ensemble counterpart of the one-class
+SVM, and it is the right RF-shaped comparison for a one-class task. (A literal
+`RandomForestClassifier` can be pressed into one-class service by the
+Shi-Horvath synthetic-contrast trick -- train it to separate the real data from
+a sample of the product of its marginals, then read normality off the predicted
+probability. That is a genuinely different estimator, not a baseline this table
+needs, and it is deliberately not implemented here.)
 
 No arm in this table is fitted on test-split labels. There is a supervised
 feature-separability diagnostic -- it necessarily trains on the only split that
 has positives -- and it is printed to stdout and kept out of the emitted table on
 purpose; `_separability_probe` documents why at length.
 
-This is not a defect in the dataset. BETH ships this way on purpose: it is a
-one-class benchmark, and the benign-only validation split is exactly what you
-need to calibrate a false-alarm budget without ever touching a positive label.
-That is the protocol below.
+WHICH DETECTOR, AND WHY NOT THE HAND-ASSEMBLED ONE
+--------------------------------------------------
+The fuzzy arm is `tribblefis.one_class.TribbleOneClassDetector` -- the library's
+own one-class estimator, an sklearn `OutlierMixin` with `score_samples` /
+`decision_function` / `predict`.
 
-TWO FEATURES ARE DROPPED, AND ONE OF THEM IS A LABEL
-----------------------------------------------------
-`_fuzzy_models.load_beth()` takes X as "every numeric column but the last",
-which keeps `sus` -- BETH's *heuristic suspicion label*, shipped alongside
-`evil` as the second of two annotations. On the test split it is not merely
-correlated with the target, it contains it:
+An earlier version of this generator assembled the same thing by hand out of
+`create_gaussian_membership_dict` + `AnomalyParameters` + `simple_gaussian_predict`,
+i.e. by bending the *multi-class* path into single-class use. The two agree
+exactly on the operating point (det 0.9930 / false alarm 0.1502 either way), so
+this is not a correction of a wrong number -- but a second copy of a library
+capability is how two tables silently drift apart, and the hand-rolled version
+could only emit a hard label, which cost this table a real ROC-AUC. See the
+saturation note below for what that concealed.
 
-    sus=1 for 158,432 / 158,432 evil rows (100.0%), and for 13,027 benign rows
+THE COMPLEMENT SCORE SATURATES ON BETH AT EIGHT FEATURES
+--------------------------------------------------------
+`TribbleOneClassDetector` offers `score="complement"` (`1 - max firing`, the
+formulation Chapter 4 argues for and the library's default) and
+`score="surprisal"` (`sum_j -log membership_j`). Under the product t-norm these
+are monotone transforms of one another, so *in exact arithmetic they have
+identical ROC-AUC*. Measured on BETH they do not:
 
-so `sus` alone is a detector at 1.000 detection / 0.427 false alarm, and any arm
-given it is scoring the annotator, not the telemetry. `timestamp` is a
-within-capture session clock; it separates the three files, not the behaviour.
-Both are dropped by name here, which is what
-`FuzzySystemsExperiments/beth-anomaly.py` -- the script Chapter 4's BETH
-discussion is written from -- has always done. Eight features remain.
+    complement   AUC 0.928     resolves 1,508 distinct scores
+    surprisal    AUC 0.990     resolves 3,997 distinct scores
+    Spearman(complement, surprisal) = 0.812   (exact arithmetic: 1.000)
 
-The drop is done HERE rather than in `load_beth()` on purpose: `load_beth` is
-also called by `table_4_4_openset.py`, and narrowing a shared loader's return
-would silently change what an already-archived generator measures. AGENTS.md
-non-negotiable 4.
+The test split contains 4,002 distinct feature vectors, so ~4,002 is the ceiling
+on distinct scores any detector can produce. The surprisal reaches 3,997 of them;
+the complement collapses them onto 1,508, which is where the AUC goes. (Both
+scores leave most test *rows* tied at the maximum -- 75% and 85% -- but that is
+BETH repeating itself, not a numerical fault, so the distinct-score count is the
+diagnostic and the tied-row fraction is not.)
+
+The library's module docstring puts the onset of this "past roughly 60 features";
+BETH reaches it at **eight**, because the log-scaled process/thread identifiers
+are heavy-tailed enough that a typical point's summed z^2 already exceeds
+float64's resolution against 1.0. So the threshold is a property of the data's
+tails, not of the feature count alone.
+
+Consequence for this table: **surprisal is the arm to read**, and the AUC
+difference between the two rows is a floating-point resolution artifact, not a
+modelling result. Both are reported, because dropping the complement row would
+hide a caveat that Chapter 4's own default walks into.
 
 PROTOCOL
 --------
   fit        benign training split (763,144 rows), UnitScalar fitted on it alone
-  calibrate  theta chosen on the benign VALIDATION split as the grid value with
-             the highest false-alarm rate still inside the budget
-             (REPRO_BETH_FA_BUDGET, default 0.01). No positive label is touched.
+  calibrate  the decision threshold is the (1 - budget) quantile of the
+             detector's anomaly scores on the benign VALIDATION split
+             (REPRO_BETH_FA_BUDGET, default 0.01). Exact, not grid-limited, and
+             it touches no positive label -- which is the whole value of a
+             benign-only validation split.
   test       detection rate on the 158,432 anomalous rows, false-alarm rate on
-             the 30,535 benign rows, Youden's J, and ROC-AUC.
+             the 30,535 benign rows, Youden's J, and ROC-AUC from the continuous
+             score.
 
-  Baselines get the SAME calibration treatment: contamination is set to the
-  complement rule's realized validation false-alarm rate, so the arms sit at a
-  matched operating point rather than at whatever default each ships with. This
-  mirrors `table_4_4_openset.py` except that the matching happens on validation
-  data, which is what having a validation split buys.
+  Baselines get the SAME treatment: contamination/nu is set to the fuzzy arm's
+  realized validation false-alarm rate, so every arm sits at a matched operating
+  point rather than at whatever default it ships with. This mirrors
+  `table_4_4_openset.py`, except that the matching happens on validation data.
 
-SEEDS. The complement rule, its theta calibration and the scaler are
-deterministic given the three fixed files -- there is no train_test_split to
-reseed, so a ten-seed loop over them would report ten identical numbers and a
-+/-0.000 that means "no randomness", not "no spread". They are therefore fitted
-ONCE, and `common.SEEDS` governs only the genuinely stochastic arms (Isolation
-Forest's trees, the one-class SVM's subsample, and the stdout separability
-probe's split). Which cells carry a seed spread and which are exact is stated in
-the note.
+SEEDS. The fuzzy detector, its calibration and the scaler are deterministic given
+the three fixed files -- there is no train_test_split to reseed, so a ten-seed
+loop over them would report ten identical numbers and a +/-0.000 that means "no
+randomness", not "no spread". They are fitted ONCE, and `common.SEEDS` governs
+only the genuinely stochastic arms (Isolation Forest's trees, the one-class SVM's
+subsample, the stdout probe's split). Which cells carry a seed spread and which
+are exact is stated in the note.
 
 Run (from repo root):
     uv run --project tribble-fis python reproduce/tables/table_4_11_beth_anomaly.py
@@ -102,8 +129,9 @@ import warnings
 # native thread setup, not in this script.
 #
 # It was never a memory problem: BETH's three frames are 91 MB combined on a
-# 95.6 GB host. Diagnosing it as one would have led to downsampling the training
-# split, which is exactly what grad-school #95 says not to do.
+# 95.6 GB host, and the measured peak resident set is 521 MB. Diagnosing it as
+# memory pressure would have led to downsampling the training split, which is
+# exactly what grad-school #95 says not to do.
 #
 # The vars must be set before the first numpy import -- BLAS reads them at load
 # time -- which is why they sit above the imports rather than in main().
@@ -125,29 +153,42 @@ sys.path.insert(0, _TABLES)
 import common as C  # noqa: E402
 import _fuzzy_models as F  # noqa: E402
 
-# Columns that are annotations or split identifiers, not telemetry. See the
-# module docstring -- `sus` is a label and dropping it is not optional.
+# Columns that are annotations or split identifiers, not telemetry. `sus` is
+# BETH's *second label* -- it is 1 for 158,432 of 158,432 evil rows, so alone it
+# detects at 1.000/0.427 and any arm given it is scoring the annotator rather
+# than the telemetry. `timestamp` is a per-capture session clock whose ranges
+# separate the three files rather than the behaviour. Both are dropped by
+# `FuzzySystemsExperiments/beth-anomaly.py` too -- the script Chapter 4's BETH
+# discussion is written from.
+#
+# The drop is done HERE rather than in `load_beth()` on purpose: `load_beth` is
+# also called by `table_4_4_openset.py`, and narrowing a shared loader's return
+# would silently change what an already-archived generator measures. AGENTS.md
+# non-negotiable 4.
 LEAKY_COLUMNS = ["sus", "timestamp"]
 
-CONORM = os.environ.get("REPRO_ANOM_CONORM", "hamacher")
+CONORM = os.environ.get("REPRO_ANOM_CONORM", "probability")
 
-# The theta grid the calibration picks from, and the grid the operating curve is
-# reported on. It brackets both the value `beth-anomaly.py` inherited (0.99) and
-# the band Table 4.6's sweep found usable (0.5-0.8), so the curve can be read
-# against both rather than only confirming one.
-THETA_GRID = [
-    float(t)
-    for t in os.environ.get(
-        "REPRO_BETH_THETAS", "0.5,0.6,0.7,0.8,0.9,0.95,0.99,0.999"
+# False-alarm budget the headline operating point is calibrated to, on validation.
+FA_BUDGET = float(os.environ.get("REPRO_BETH_FA_BUDGET", "0.01"))
+
+# Budgets the operating curve is reported at. This is the curve a user actually
+# picks a threshold on, and every point is chosen using benign data only.
+FA_SWEEP = [
+    float(b)
+    for b in os.environ.get(
+        "REPRO_BETH_FA_SWEEP", "0.001,0.005,0.01,0.02,0.05,0.10"
     ).split(",")
 ]
 
-# False-alarm budget the operating point is calibrated to, on validation.
-FA_BUDGET = float(os.environ.get("REPRO_BETH_FA_BUDGET", "0.01"))
+# The two aggregation modes, reported side by side. `surprisal` is the one to
+# read on BETH; `complement` is Chapter 4's formulation and the library default,
+# kept so the saturation artifact is visible rather than argued about.
+SCORES = ["surprisal", "complement"]
 
 # libsvm's fit is O(n^2)-O(n^3); 763k rows is not a fit, it is a hang. Same cap
 # and same reasoning as table_4_4_openset.py, recorded in the note rather than
-# left silent. The complement rule and Isolation Forest see all 763,144 rows.
+# left silent. The fuzzy arm and Isolation Forest see all 763,144 rows.
 OCSVM_TRAIN_CAP = int(os.environ.get("REPRO_OCSVM_TRAIN_CAP", "20000"))
 
 # Isolation Forest's default max_samples=256 already makes its fit cheap on
@@ -166,27 +207,6 @@ def _rates(flagged, is_anom):
     det = float(flagged[is_anom].mean()) if is_anom.any() else float("nan")
     fa = float(flagged[~is_anom].mean()) if (~is_anom).any() else float("nan")
     return det, fa
-
-
-def _trapz(ys, xs):
-    fn = getattr(np, "trapezoid", None) or np.trapz
-    return float(fn(ys, xs))
-
-
-def _sweep_auc(points):
-    """Trapezoidal ROC-AUC from a set of measured (false-alarm, detection) points.
-
-    The complement rule emits a hard label, not a score, so there is no
-    `roc_auc_score` to call on it. Sweeping theta traces its ROC directly, and
-    the area under the resulting operating points is the same quantity -- but
-    computed from ~8 points rather than from every threshold, so it is reported
-    under its own column heading and never presented as interchangeable with the
-    baselines' full-resolution AUC. The (0,0) and (1,1) endpoints are appended
-    because a detector that flags nothing and one that flags everything are both
-    reachable by construction, not by measurement.
-    """
-    pts = sorted(set([(0.0, 0.0), *points, (1.0, 1.0)]))
-    return _trapz([p[1] for p in pts], [p[0] for p in pts])
 
 
 def load_splits():
@@ -225,13 +245,11 @@ def load_splits():
         )
     )
     if n_pos["train"] > 0:
-        # A future BETH release with positives in train would make the supervised
-        # arms legitimate, and this table would then be understating them. Say so
-        # rather than silently keeping the N/A.
+        # A future BETH release with positives in train would make supervised
+        # arms legitimate, and this table would then be understating them.
         print(
-            "  [beth] NOTE: the training split now contains positives -- the "
-            "supervised N/A rows in this table are no longer justified and the "
-            "protocol should be revisited."
+            "  [beth] NOTE: the training split now contains positives -- this "
+            "table's one-class-only protocol should be revisited."
         )
 
     # UnitScalar fitted on TRAIN ONLY and applied to all three. Fitting per file
@@ -241,14 +259,12 @@ def load_splits():
     print(f"  [beth] auto-logged features: {list(sc.log_features_)}")
     Xtr, Xva, Xte = sc.transform(Xtr), sc.transform(Xva), sc.transform(Xte)
 
-    # How many DISTINCT feature vectors the test split actually contains. This
-    # is not a curiosity: system-call telemetry repeats itself, and if the
-    # repetition is heavy then any within-test-split supervised reference is
-    # scoring rows whose exact feature vector it was trained on. Measured, not
-    # assumed, because the answer decides whether that reference means anything.
-    # `pd.factorize` over a MultiIndex of the rows, NOT a per-row string join:
-    # the join built ~1.5M interned Python strings and peaked at 341 MB
-    # (measured) to answer a question that factorize answers in 72 MB.
+    # How many DISTINCT feature vectors the test split holds. Not a curiosity:
+    # system-call telemetry repeats itself, and heavy repetition means any
+    # within-test-split supervised reference is scoring rows whose exact feature
+    # vector it trained on. `pd.factorize` over a row MultiIndex rather than a
+    # per-row string join -- the join built ~1.5M interned strings and peaked at
+    # 341 MB (measured) to answer what factorize answers in 72 MB.
     groups, uniques = pd.factorize(pd.MultiIndex.from_frame(Xte))
     print(
         f"  [beth] test split: {len(Xte):,} rows but only {len(uniques):,} distinct "
@@ -269,79 +285,60 @@ def load_splits():
     return Xtr, Xva, Xte, np.asarray(yva) == 1, np.asarray(yte) == 1, meta
 
 
-def _build_complement_model(Xtr):
-    """Fit the MoG membership base on benign-only data, anomaly rule enabled.
+def _fit_detector(Xtr, score):
+    """The library's one-class detector on benign-only data.
 
-    Single-class fit is the point, not a degenerate case: the complement rule's
-    whole claim is that the fuzzy complement of the known-class aggregate is a
-    detector for whatever is not in the base. With one known class the
-    between-class differentiator scores are all identically zero, so the top-n
-    screen cannot rank features and every feature is kept (top_p=1.0) -- the
-    same choice `beth-anomaly.py` makes, and the honest one here, since a screen
-    with nothing to discriminate on would otherwise pick an arbitrary subset.
+    `TribbleOneClassDetector` is the sanctioned entry point for exactly this
+    setting -- abundant normal data, no anomalies at fit time -- and it handles
+    the single-class case the multi-class classifier cannot: its feature
+    selection is unsupervised (`"all"` here, since with one class there is no
+    separation to rank on) and it exposes a continuous `score_samples` instead
+    of only a hard label.
+
+    `contamination` is passed for the sake of anyone calling `predict()` on the
+    returned object, but this table does NOT use it: the operating point comes
+    from the validation quantile in `_calibrate`, because contamination places
+    the threshold on the *training* score distribution and BETH's validation
+    split is the holdout that exists to be calibrated on.
     """
-    from tribblefis.gauss_data import AnomalyParameters
-    from tribblefis.gauss_math import (
-        calculate_gaussian_correlation,
-        create_gaussian_membership_dict,
-        take_top_features,
-    )
+    from tribblefis.one_class import TribbleOneClassDetector
 
-    y = pd.Series("regular", index=Xtr.index, name="y_value")
-    diffs = calculate_gaussian_correlation(Xtr, y)
-    _, top_vars = take_top_features(diffs, top_p=1.0)
-    memb = create_gaussian_membership_dict(Xtr, y, top_n_var_names=top_vars)
-    params = AnomalyParameters(
-        include_anomaly=True,
-        threshold=THETA_GRID[0],  # overridden per-theta by the sweep
-        label="anomaly",
+    return TribbleOneClassDetector(
+        score=score,
         norm_conorm=CONORM,
-        member_function="gaussian",
-    )
-    return memb.to_simple_model(params), top_vars
+        feature_selection="all",
+        contamination=FA_BUDGET,
+        random_state=42,
+    ).fit(Xtr)
 
 
-def _flag_sweep(model, X, thetas):
-    """{theta: bool 'flagged anomalous'} in one class-firing pass.
+def _anomaly_scores(det, X):
+    """Continuous "higher means more anomalous" score.
 
-    theta enters only at the anomaly step, so the class firing is computed once
-    and reused across the grid -- the same reuse `table_4_4_openset.py` verified
-    bit-identical to a theta-at-a-time loop.
+    `score_samples` follows sklearn's convention -- higher is more NORMAL -- so
+    it is negated once, here, rather than at each of the four call sites.
     """
-    from tribblefis.gauss_math import simple_gaussian_predict_sweep
-
-    preds = simple_gaussian_predict_sweep(X, model, list(thetas))
-    return {
-        th: np.asarray([str(p) == "anomaly" for p in preds[th]], dtype=bool)
-        for th in thetas
-    }
+    return -np.asarray(det.score_samples(X))
 
 
-def _calibrate(val_flags, is_anom_val, budget):
-    """Pick theta on validation under a false-alarm budget.
+def _calibrate(scores_val, budget):
+    """Threshold at the (1 - budget) quantile of the benign validation scores.
 
     The validation split is 100% benign, so there is no detection rate to
     maximize on it and nothing resembling J to tune -- the only thing it can
     measure is the false-alarm rate, which is precisely what a benign-only
-    holdout is for. Among the thetas that stay inside the budget, take the one
-    with the HIGHEST false alarm: within a fixed budget, more flagging is more
-    sensitivity, and picking the quietest theta would throw away detection the
-    budget had already paid for. If none fits, fall back to the single quietest
-    theta and say so -- the alternative is emitting a calibrated-looking cell
-    that never met its budget.
+    holdout is for. A continuous score makes this exact rather than grid-limited:
+    the previous revision picked from an eight-value theta grid and could only
+    land near the budget.
+
+    Ties matter here, which is the saturation story in miniature: with 85% of the
+    complement arm's scores equal, `> threshold` can realize a false-alarm rate
+    well under the budget because the tied mass sits on the boundary. The
+    realized rate is returned and reported rather than the requested one.
     """
-    fa = {th: _rates(f, is_anom_val)[1] for th, f in val_flags.items()}
-    ok = {th: v for th, v in fa.items() if np.isfinite(v) and v <= budget}
-    if ok:
-        theta = max(ok, key=lambda t: ok[t])
-        return theta, fa[theta], True, fa
-    theta = min(fa, key=lambda t: fa[t] if np.isfinite(fa[t]) else np.inf)
-    print(
-        f"  [calibrate] no theta meets the {budget:.1%} validation false-alarm "
-        f"budget; quietest is theta={theta} at {fa[theta]:.3f} -- reported as "
-        f"UNCALIBRATED"
-    )
-    return theta, fa[theta], False, fa
+    thr = float(np.quantile(scores_val, 1.0 - budget))
+    realized = float((scores_val > thr).mean())
+    return thr, realized
 
 
 def _separability_probe(Xte, is_anom_te, meta):
@@ -367,14 +364,10 @@ def _separability_probe(Xte, is_anom_te, meta):
     2. A cell that is only safe to read alongside a long note is a cell that
        gets quoted without the note. `PROVENANCE_MAP.md` records this repository
        doing exactly that more than once, including a generator that emitted one
-       dataset's table under another's filename. The N/A rows with their reason
-       are the honest answer to grad-school #95's request for RF/ANFIS arms;
-       this probe only answers the softer question of whether the eight
-       surviving features separate at all once labels exist, and printing it is
-       sufficient for that.
+       dataset's table under another's filename.
 
-    Returns the grouped result dict for the caller's logging, and nothing enters
-    `rows`.
+    It answers only the softer question of whether the surviving features
+    separate at all once labels exist, and printing it is sufficient for that.
     """
     print(
         "\n  [probe] feature separability -- DIAGNOSTIC ONLY, not a table row and "
@@ -446,70 +439,94 @@ def main():
         f"features={meta['n_feat']} test positives={int(is_anom_te.sum()):,}"
     )
 
-    arms: dict = {}
+    rows = []
+    curve_rows = []
+    target_fa = float("nan")
+    sat = {}
 
-    def add(arm, det, fa, auc=None, secs=None):
-        a = arms.setdefault(arm, {"det": [], "fa": [], "auc": [], "t": []})
-        if np.isfinite(det) and np.isfinite(fa):
-            a["det"].append(det)
-            a["fa"].append(fa)
-        if auc is not None and np.isfinite(auc):
-            a["auc"].append(auc)
-        if secs is not None:
-            a["t"].append(secs)
+    # ---- fuzzy one-class arms: deterministic, fitted once per score ---------
+    for score in SCORES:
+        try:
+            with C.timed() as t_fit:
+                det = _fit_detector(Xtr, score)
+            s_va = _anomaly_scores(det, Xva)
+            s_te = _anomaly_scores(det, Xte)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [tribble:{score}] failed ({exc.__class__.__name__}: {exc})")
+            rows.append([f"Tribble one-class ({score})", C.NA, C.NA, C.NA, C.NA, C.NA])
+            continue
 
-    # ---- complement rule: deterministic, fitted once, calibrated on validation
-    theta = None
-    val_fa = float("nan")
-    calibrated = False
-    curve = []
-    try:
-        with C.timed() as t_fit:
-            model, _top_vars = _build_complement_model(Xtr)
+        thr, realized = _calibrate(s_va, FA_BUDGET)
+        flagged = s_te > thr
+        d, f = _rates(flagged, is_anom_te)
+        auc = roc_auc_score(is_anom_te, s_te)
+
+        # Resolution diagnostic: what fraction of test scores are tied at the
+        # maximum. This is the number that explains the two arms' AUC gap, so it
+        # is measured rather than asserted.
+        sat[score] = {
+            "tied_at_max": float(np.mean(s_te >= s_te.max() - 1e-15)),
+            "distinct": int(len(np.unique(s_te))),
+            "auc": auc,
+        }
         print(
-            f"  [complement] fitted on {meta['n_train']:,} benign rows "
-            f"in {t_fit.seconds:.1f}s"
+            f"  [tribble:{score}] fit={t_fit.seconds:.1f}s thr@val={realized:.4f} "
+            f"det={d:.3f} fa={f:.3f} auc={auc:.4f} "
+            f"tied_at_max={sat[score]['tied_at_max']:.2%} "
+            f"distinct_scores={sat[score]['distinct']:,}"
         )
 
-        val_flags = _flag_sweep(model, Xva, THETA_GRID)
-        theta, val_fa, calibrated, val_fa_all = _calibrate(
-            val_flags, is_anom_va, FA_BUDGET
+        label = (
+            f"**Tribble one-class ({score})**"
+            if score == "surprisal"
+            else (f"Tribble one-class ({score}, saturates — see note)")
         )
-        print(
-            f"  [complement] theta={theta} chosen on validation "
-            f"(false alarm {val_fa:.4f}, budget {FA_BUDGET:.1%})"
+        rows.append(
+            [
+                label,
+                f"{d:.3f}",
+                f"{f:.3f}",
+                f"{d - f:+.3f}",
+                f"{auc:.3f}",
+                f"{t_fit.seconds:.1f} s",
+            ]
         )
 
-        test_flags = _flag_sweep(model, Xte, THETA_GRID)
-        for th in THETA_GRID:
-            d, f = _rates(test_flags[th], is_anom_te)
-            curve.append((th, val_fa_all[th], d, f))
-        sweep_auc = _sweep_auc([(f, d) for _, _, d, f in curve])
+        # The operating curve, from the same fitted model: thresholds chosen on
+        # validation only, consequences read on test.
+        for budget in FA_SWEEP:
+            b_thr, b_real = _calibrate(s_va, budget)
+            bd, bf = _rates(s_te > b_thr, is_anom_te)
+            curve_rows.append(
+                [
+                    score,
+                    f"{budget:.3f}",
+                    f"{b_real:.4f}",
+                    f"{bd:.3f}",
+                    f"{bf:.4f}",
+                    f"{bd - bf:+.3f}",
+                    "**chosen**" if budget == FA_BUDGET else "",
+                ]
+            )
 
-        d, f = _rates(test_flags[theta], is_anom_te)
-        add("**Complement rule (this work)**", d, f, auc=sweep_auc, secs=t_fit.seconds)
-        target_fa = val_fa
-    except Exception as exc:  # noqa: BLE001
-        print(f"  [complement] failed ({exc.__class__.__name__}: {exc}) -> N/A")
-        arms.setdefault(
-            "**Complement rule (this work)**", {"det": [], "fa": [], "auc": [], "t": []}
-        )
-        target_fa = FA_BUDGET
+        if score == "surprisal":
+            target_fa = realized
 
-    # Baselines are matched to the complement rule's VALIDATION false-alarm rate,
-    # clipped to the range sklearn accepts for `contamination` / `nu`.
+    # Baselines matched to the surprisal arm's realized VALIDATION false-alarm
+    # rate, clipped to the range sklearn accepts for `contamination` / `nu`.
     cont = float(
         min(max(target_fa if np.isfinite(target_fa) else FA_BUDGET, 1e-4), 0.5)
     )
     print(f"  [baselines] contamination/nu matched to {cont:.4f}")
 
+    arms: dict = {}
     for seed in C.SEEDS:
         ocsvm_idx = np.random.RandomState(seed).choice(
             len(Xtr), min(OCSVM_TRAIN_CAP, len(Xtr)), replace=False
         )
         for arm, est, Xfit in (
             (
-                "Isolation Forest",
+                "Isolation Forest (the RF-family one-class detector)",
                 IsolationForest(
                     contamination=cont,
                     n_estimators=IF_TREES,
@@ -520,31 +537,24 @@ def main():
             ),
             ("One-class SVM", OneClassSVM(nu=cont, gamma="scale"), Xtr.iloc[ocsvm_idx]),
         ):
+            a = arms.setdefault(arm, {"det": [], "fa": [], "auc": [], "t": []})
             try:
                 with C.timed() as t:
                     est.fit(Xfit)
                 d, f = _rates(est.predict(Xte) == -1, is_anom_te)
-                auc = None
+                a["det"].append(d)
+                a["fa"].append(f)
+                a["t"].append(t.seconds)
                 try:
-                    # -score_samples is "more anomalous = larger", which is the
-                    # orientation roc_auc_score needs against is_anom.
-                    auc = roc_auc_score(is_anom_te, -est.score_samples(Xte))
+                    a["auc"].append(roc_auc_score(is_anom_te, -est.score_samples(Xte)))
                 except Exception:  # noqa: BLE001
                     pass
-                add(arm, d, f, auc=auc, secs=t.seconds)
-                print(
-                    f"    [{arm}] seed {seed}: det={d:.3f} fa={f:.3f} "
-                    f"auc={auc if auc is None else round(auc, 3)} ({t.seconds:.1f}s)"
-                )
+                print(f"    [{arm.split(' (')[0]}] seed {seed}: det={d:.3f} fa={f:.3f}")
             except Exception as exc:  # noqa: BLE001
                 print(f"    [{arm}] seed {seed}: {exc.__class__.__name__}: {exc}")
 
-    # ---- headline table -----------------------------------------------------
-    order = ["**Complement rule (this work)**", "Isolation Forest", "One-class SVM"]
-    rows = []
-    for arm in order:
-        v = arms.get(arm)
-        if not v or not v["det"]:
+    for arm, v in arms.items():
+        if not v["det"]:
             rows.append([arm, C.NA, C.NA, C.NA, C.NA, C.NA])
             continue
         dm, _ = C.agg(v["det"])
@@ -556,61 +566,58 @@ def main():
                 C.cell(v["fa"]),
                 f"{dm - fm:+.3f}",
                 C.cell(v["auc"]) if v["auc"] else C.NA,
-                C.cell(v["t"], fmt="{:.1f}") + " s" if v["t"] else C.NA,
+                C.cell(v["t"], fmt="{:.1f}") + " s",
             ]
         )
 
-    # The supervised arms the issue asked for, marked with WHY they are N/A
-    # rather than silently omitted -- an absent row reads as "not tried".
-    untrainable = (
-        f"N/A -- untrainable (0 positives in the "
-        f"{meta['n_train']:,}-row training split)"
-    )
-    rows.append(
-        [
-            "Random Forest (supervised, BETH protocol)",
-            untrainable,
-            C.NA,
-            C.NA,
-            C.NA,
-            C.NA,
-        ]
-    )
-    rows.append(
-        ["ANFIS (supervised, BETH protocol)", untrainable, C.NA, C.NA, C.NA, C.NA]
-    )
-
-    # Separability probe -- STDOUT ONLY, deliberately not a row. See
-    # `_separability_probe` for why it is not allowed into the table.
     _separability_probe(Xte, is_anom_te, meta)
 
-    cal_txt = (
-        f"theta={theta} calibrated on the benign validation split at a "
-        f"{FA_BUDGET:.1%} false-alarm budget (realized {val_fa:.4f})"
-        if calibrated
-        else f"theta={theta} is the quietest grid value and MISSED the "
-        f"{FA_BUDGET:.1%} validation budget at {val_fa:.4f} -- this operating "
-        f"point is uncalibrated"
-    )
+    sat_txt = ""
+    if "surprisal" in sat and "complement" in sat:
+        sc_, cp = sat["surprisal"], sat["complement"]
+        n_vec = meta["n_distinct_test"]
+        sat_txt = (
+            f" **The two fuzzy rows differ only by floating-point resolution, not by "
+            f"model.** Under the product t-norm the complement and the surprisal are "
+            f"monotone transforms of one another, so in exact arithmetic their ROC-AUC "
+            f"is identical; measured here they are {cp['auc']:.3f} and {sc_['auc']:.3f}. "
+            f"The evidence is score resolution against the ceiling the data itself sets: "
+            f"the test split contains {n_vec:,} distinct feature vectors, so {n_vec:,} is "
+            f"the most distinct scores any detector can produce. The surprisal resolves "
+            f"{sc_['distinct']:,} of them ({sc_['distinct'] / n_vec:.1%}); the complement "
+            f"resolves {cp['distinct']:,} ({cp['distinct'] / n_vec:.1%}), collapsing "
+            f"distinct behaviours onto equal scores so the ordering AUC needs is not "
+            f"there. (Both rows show most test *rows* tied at the maximum — "
+            f"{sc_['tied_at_max']:.0%} and {cp['tied_at_max']:.0%} — but that is BETH "
+            f"repeating itself, not a numerical fault, which is why the distinct-score "
+            f"count is the diagnostic and the tied-row fraction is not.) "
+            f"`tribblefis.one_class`'s docstring puts the onset of complement saturation "
+            f"past ~60 features; BETH reaches it at {meta['n_feat']}, because the "
+            f"log-scaled process and thread identifiers are heavy-tailed enough that a "
+            f"typical point's summed z² already exceeds float64's resolution against "
+            f"1.0 — so the threshold is a property of the tails, not of the feature "
+            f"count alone. Read the surprisal row; the complement row is Chapter 4's "
+            f"default and is kept visible for that reason."
+        )
 
-    # The gap between the calibrated validation false-alarm rate and the one
-    # actually realized on test is the most load-bearing caveat in this table, so
-    # it is computed and stated rather than left for a reader to divide out.
-    cr = arms.get("**Complement rule (this work)**") or {"fa": []}
     transfer = ""
-    if cr["fa"]:
-        test_fa = cr["fa"][0]
-        if np.isfinite(val_fa) and val_fa > 0:
+    if np.isfinite(target_fa) and target_fa > 0:
+        test_fa = None
+        for r in rows:
+            if r[0].startswith("**Tribble one-class (surprisal)"):
+                test_fa = float(r[2])
+        if test_fa is not None:
             transfer = (
-                f" **The calibration does not transfer**: the θ that costs "
-                f"{val_fa:.4f} false alarms on validation costs {test_fa:.4f} on "
-                f"test, {test_fa / val_fa:.1f}× more. Both splits are benign-only "
-                f"draws from the same capture, so this is a property of BETH's "
-                f"benign test rows, not of the rule -- and it means a false-alarm "
-                f"budget set on BETH's validation split cannot be believed on its "
-                f"test split. Every arm here is matched at the validation rate, so "
-                f"they are affected alike and remain comparable to each other."
+                f" **The calibration does not transfer**: the threshold costing "
+                f"{target_fa:.4f} false alarms on validation costs {test_fa:.4f} on "
+                f"test, {test_fa / target_fa:.1f}× more. Both splits are benign-only "
+                f"draws from the same capture, so this is a property of BETH's benign "
+                f"test rows, not of any detector -- and it means a false-alarm budget "
+                f"set on BETH's validation split cannot be believed on its test split. "
+                f"Every arm is matched at the validation rate, so they are affected "
+                f"alike and remain comparable to each other."
             )
+
     C.emit(
         "table_4_11_beth_anomaly",
         "Table 4.11 — BETH host-telemetry anomaly detection (one-class)",
@@ -625,85 +632,78 @@ def main():
         rows,
         note=(
             f"BETH's shipped splits, used as shipped: fit on the full "
-            f"{meta['n_train']:,}-row training split, operating point calibrated on the "
+            f"{meta['n_train']:,}-row training split, threshold calibrated on the "
             f"{meta['n_val']:,}-row validation split, scored on the "
             f"{meta['n_test']:,}-row test split ({int(is_anom_te.sum()):,} anomalous / "
             f"{int((~is_anom_te).sum()):,} benign). No downsampling of the training "
             f"set. **This is a one-class table because BETH is a one-class benchmark: "
             f"all {meta['n_pos']['test']:,} positives are in the test split and the "
-            f"training and validation splits are 100% benign.** The supervised rows are "
-            f"therefore N/A with the reason given, not omitted. **No arm in this table "
-            f"is fitted on test-split labels.** A supervised feature-separability "
-            f"diagnostic is printed to stdout by the generator and deliberately kept out "
-            f"of this table: it would have to train on the only split that has "
-            f"positives, and the test split's {meta['n_test']:,} rows hold just "
-            f"{meta['n_distinct_test']:,} distinct feature vectors "
-            f"({meta['n_distinct_test'] / meta['n_test']:.2%}), so any within-test split "
-            f"is a lookup table or, grouped, an in-capture resubstitution estimate — "
-            f"neither is a number that belongs beside the one-class arms.{transfer} "
+            f"training and validation splits are 100% benign.** A supervised arm is not "
+            f"reported because none can be trained — a Random Forest fitted on the "
+            f"training split predicts the constant 0 without raising anything (16.2% "
+            f"accuracy, AUC 0.5). **Isolation Forest is the Random-Forest family's "
+            f"one-class detector** and is the RF-shaped comparison this task admits: an "
+            f"unlabelled forest of random trees scoring by isolation depth, the "
+            f"tree-ensemble counterpart of the one-class SVM. No arm here is fitted on "
+            f"test-split labels; a supervised separability diagnostic is printed to "
+            f"stdout and deliberately kept out of this table, since the test split's "
+            f"{meta['n_test']:,} rows hold only {meta['n_distinct_test']:,} distinct "
+            f"feature vectors ({meta['n_distinct_test'] / meta['n_test']:.2%}) and any "
+            f"within-test split is therefore a lookup table or an in-capture "
+            f"resubstitution estimate. The fuzzy arms are "
+            f"`tribblefis.one_class.TribbleOneClassDetector`, the library's own "
+            f"one-class estimator, rather than a hand-assembly of the multi-class path; "
+            f"both give the same operating point, and using the library's API is what "
+            f"keeps this table from drifting against it.{sat_txt}{transfer} "
             f"Features: {meta['n_feat']} numeric columns after dropping "
             f"{meta['dropped']} — `sus` is BETH's second *label* (1 for 100% of evil "
-            f"rows) and `timestamp` is a per-capture session clock that separates the "
-            f"files rather than the behaviour; both are dropped in "
+            f"rows) and `timestamp` is a per-capture session clock; both are dropped in "
             f"`FuzzySystemsExperiments/beth-anomaly.py` too. UnitScalar fitted on train "
-            f"alone, auto-logging {meta['logged']}. {cal_txt}; {CONORM} conorm. "
-            f"Baselines' contamination/nu is matched to the complement rule's validation "
-            f"false-alarm rate ({cont:.4f}) so the arms sit at a matched operating point. "
-            f"'Detection − false alarm' is Youden's J. The complement rule emits a hard "
-            f"label, so its ROC-AUC is the trapezoidal area under its measured theta "
-            f"sweep ({len(THETA_GRID)} points, endpoints appended) and is coarser than "
-            f"the baselines' score-based AUC — read it as an operating-curve summary, "
-            f"not as an interchangeable number. The complement rule and its calibration "
-            f"are deterministic given the fixed splits and are fitted once, so their "
-            f"cells carry no ±; the ± on the baseline and reference rows is across "
-            f"common.SEEDS ({C.SEEDS}). One-class SVM is fitted on a random "
-            f"{OCSVM_TRAIN_CAP:,}-row subsample per seed (libsvm is O(n²)–O(n³); "
-            f"{meta['n_train']:,} rows is not a fit), while the complement rule and "
-            f"Isolation Forest see the full training split."
+            f"alone, auto-logging {meta['logged']}. Threshold = the "
+            f"{1 - FA_BUDGET:.3f} quantile of the detector's benign-validation scores "
+            f"(a {FA_BUDGET:.1%} budget; exact, not grid-limited), {CONORM} conorm. "
+            f"Baselines' contamination/nu is matched to the surprisal arm's realized "
+            f"validation false-alarm rate ({cont:.4f}). 'Detection − false alarm' is "
+            f"Youden's J. The fuzzy arms and their calibration are deterministic given "
+            f"the fixed splits and are fitted once, so their cells carry no ±; the ± on "
+            f"the baseline rows is across common.SEEDS ({C.SEEDS}). One-class SVM is "
+            f"fitted on a random {OCSVM_TRAIN_CAP:,}-row subsample per seed (libsvm is "
+            f"O(n²)–O(n³); {meta['n_train']:,} rows is not a fit), while the fuzzy arms "
+            f"and Isolation Forest see the full training split."
         ),
     )
 
-    # ---- operating curve ---------------------------------------------------
-    if curve:
-        print("\n  theta operating curve:")
-        print(
-            f"    {'theta':>8} {'val FA':>10} {'detection':>12} "
-            f"{'test FA':>10} {'J':>8}"
+    if curve_rows:
+        print("\n  operating curve (threshold chosen on validation only):")
+        _resolution_txt = "; ".join(
+            f"{k} resolves {v['distinct']:,} distinct scores" for k, v in sat.items()
         )
-        crows = []
-        for th, vfa, d, f in curve:
-            print(f"    {th:8.3f} {vfa:10.4f} {d:12.3f} {f:10.4f} {d - f:+8.3f}")
-            crows.append(
-                [
-                    f"{th:.3f}",
-                    f"{vfa:.4f}",
-                    f"{d:.3f}",
-                    f"{f:.4f}",
-                    f"{d - f:+.3f}",
-                    "**chosen**" if th == theta else "",
-                ]
-            )
         C.emit(
-            "table_4_11_beth_theta_sweep",
-            "Table 4.11(b) — BETH complement-rule operating curve vs. the boost θ",
+            "table_4_11_beth_fa_sweep",
+            "Table 4.11(b) — BETH operating curve vs. the validation false-alarm budget",
             [
-                "θ",
-                "validation false-alarm rate",
+                "score",
+                "budget",
+                "realized validation false-alarm rate",
                 "test detection rate",
                 "test false-alarm rate",
                 "detection − false alarm",
                 "chosen",
             ],
-            crows,
+            curve_rows,
             note=(
-                f"One model, fitted once on the benign training split; θ enters only at "
-                f"the anomaly step, so the whole curve is one class-firing pass. The "
-                f"validation column is what the operating point is chosen on — it is "
-                f"measurable without any positive label, which is the entire value of "
-                f"BETH's benign-only validation split. The test columns are the "
-                f"consequence of that choice and are NOT used to make it. The marked row "
-                f"is the θ the {FA_BUDGET:.1%} budget selected. Deterministic: no seed "
-                f"averaging, and none is implied."
+                f"One fitted model per score; only the threshold moves. Each threshold "
+                f"is the (1 − budget) quantile of the detector's scores on the "
+                f"benign-only validation split, so every row is selected without any "
+                f"positive label — which is the entire value of BETH shipping a "
+                f"benign validation split. The test columns are the consequence of that "
+                f"choice and are NOT used to make it. Realized validation rates fall "
+                f"below their budget where scores are tied at the threshold, which is "
+                f"why the complement rows plateau and, at the tightest budget, collapse "
+                f"to zero detection while the surprisal holds: {_resolution_txt}. This "
+                f"is the strict-operating-point failure that ROC-AUC alone hides. The "
+                f"marked rows are the {FA_BUDGET:.1%} budget the headline table quotes. "
+                f"Deterministic: no seed averaging, and none is implied."
             ),
         )
 
