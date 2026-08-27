@@ -198,3 +198,96 @@ def test_render_markdown_tolerates_a_missing_summary():
     md = H.render_markdown(_fake_results())
     assert "Flat comparison" in md
     assert "The fair comparison" not in md
+
+
+# ---------------------------------------------------------------------------
+# seeding
+# ---------------------------------------------------------------------------
+
+
+def test_replicate_zero_uses_the_generators_own_defaults():
+    """So --seeds 1 reproduces every number published before seeding existed."""
+    assert H._seed_kwargs(0) == {}
+    assert H._seed_kwargs(1) == {"seed": H.SEED_BASE + 1}
+    assert H._seed_kwargs(9) == {"seed": H.SEED_BASE + 9}
+
+
+def test_replicate_zero_matches_an_unseeded_call():
+    X, y = B.two_gaussians()
+    spec = next(s for s in H._dataset_specs(0) if s["name"] == "two_gaussians")
+    np.testing.assert_array_equal(spec["D"], H._euclid(X))
+    np.testing.assert_array_equal(spec["truths"][0][1], y)
+
+
+def test_later_replicates_produce_different_data():
+    a = next(s for s in H._dataset_specs(0) if s["name"] == "concentric_rings")
+    b = next(s for s in H._dataset_specs(3) if s["name"] == "concentric_rings")
+    assert not np.allclose(a["D"], b["D"])
+    # ...but the same shape and the same ground-truth structure
+    assert a["D"].shape == b["D"].shape
+    assert set(a["truths"][0][1]) == set(b["truths"][0][1])
+
+
+def test_every_dataset_accepts_a_seed_override():
+    """A generator that silently ignored `seed=` would fake the whole spread."""
+    base = {s["name"]: s["D"] for s in H._dataset_specs(0)}
+    other = {s["name"]: s["D"] for s in H._dataset_specs(5)}
+    assert set(base) == set(other)
+    unchanged = [n for n in base if np.allclose(base[n], other[n])]
+    assert not unchanged, f"seed had no effect on: {unchanged}"
+
+
+def test_summarise_across_seeds_averages_whole_batteries():
+    reps = [_fake_results()["datasets"] for _ in range(3)]
+    # make replicate 1 and 2 differ so the spread is non-degenerate
+    reps[1]["a"]["ours_flat"]["levels"]["only"]["ari"] = 0.5
+    reps[2]["a"]["ours_flat"]["levels"]["only"]["ari"] = 0.0
+    across = H.summarise_across_seeds(reps)
+    assert across["n_replicates"] == 3
+    # per-replicate battery means are (1.0+0.5)/2, (0.5+0.5)/2, (0.0+0.5)/2
+    assert across["ours"]["mean"] == pytest.approx((0.75 + 0.5 + 0.25) / 3)
+    assert across["ours"]["min"] == pytest.approx(0.25)
+    assert across["ours"]["max"] == pytest.approx(0.75)
+    assert across["ours"]["std"] > 0
+
+
+def test_summarise_across_seeds_reports_band_stability():
+    """Nested datasets only; the flat ones have a single truth level."""
+    reps = []
+    for grans in ([8, 4, 2], [8, 4, 2], [4, 2]):
+        rep = _fake_results()["datasets"]
+        rep["nested"] = {
+            "family": "hierarchical",
+            "n": 96,
+            "levels": ["fine", "coarse"],
+            "truth_k": [8, 4, 2],
+            "ours_flat": {
+                "k": 2,
+                "coverage": 1.0,
+                "levels": {
+                    lv: {"ari": 1.0, "ari_noise_excluded": 1.0}
+                    for lv in ("fine", "coarse")
+                },
+            },
+            "ours_multiscale": {
+                "n_bands": len(grans),
+                "granularities": grans,
+                "bands": [],
+                "best_ari_per_level": {"fine": 1.0, "coarse": 1.0},
+            },
+            "hdbscan": {"runs": []},
+            "eps_sweep": {
+                "n_distinct_partitions": 7,
+                "k_values_reachable": [2, 4, 8],
+                "oracle_best_ari_per_level": {"fine": 1.0, "coarse": 1.0},
+                "partitions": [],
+            },
+        }
+        reps.append(rep)
+    stab = H.summarise_across_seeds(reps)["band_recovery_stability"]
+    assert set(stab) == {"nested"}
+    row = stab["nested"]
+    assert row["modal_granularities"] == [8, 4, 2]
+    assert row["modal_agreement"] == pytest.approx(2 / 3)
+    assert row["exact_truth_match"] == pytest.approx(2 / 3)
+    assert row["distinct_vectors"] == 2

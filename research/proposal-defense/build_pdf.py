@@ -243,6 +243,19 @@ def substitute_dataset_specs(md, values, filename, unresolved):
     return DATASET_PLACEHOLDER.sub(repl, md)
 
 
+def _known_appendix_sections():
+    """The appendix's top-level section numbers, read from its own headers.
+
+    Returns a set of bare numbers as strings, e.g. {"1", ..., "8"} for `## A.1`
+    through `## A.8`. Empty if the appendix is missing, which makes every
+    `Appendix A.N` reference warn rather than silently pass.
+    """
+    md = read("prose/appendix.md")
+    if not md:
+        return set()
+    return set(re.findall(r"^##\s+A\.(\d+)\b", md, re.M))
+
+
 def build_section_registry(sections_by_file):
     """Build a comprehensive section registry from all files.
 
@@ -364,15 +377,22 @@ def check_cross_references(md, registry, filename, warnings=None, checklist_ids=
         # For now, just ensure the format is valid
         pass
 
-    # Pattern 2: Appendix A.X references
-    # Known appendix sections from appendix.md
-    known_appendices = {"1", "2", "3", "4", "5", "6", "7"}
+    # Pattern 2: Appendix A.X references, validated against the appendix's own
+    # `## A.N` headers rather than a hardcoded set. The set used to be a literal
+    # {"1".."7"}, which silently went stale the moment an A.8 was written: the
+    # reference was real and the checker called it dangling.
+    known_appendices = _known_appendix_sections()
 
     for match in re.finditer(r"Appendix\s+A\.(\d+)", md_for_validation):
         appendix_num = match.group(1)
         if appendix_num not in known_appendices:
+            known = (
+                "A." + ", A.".join(sorted(known_appendices, key=int))
+                if known_appendices
+                else "none found"
+            )
             warnings.append(
-                f"  ⚠ {filename}: Appendix A.{appendix_num} not found (known: A.1–A.7)"
+                f"  ⚠ {filename}: Appendix A.{appendix_num} not found (known: {known})"
             )
 
     # Pattern 3: Goal references like G1, G2, G1a, etc.
