@@ -270,6 +270,8 @@ Isolation forest nominally leads, now by 0.047 where the previous run showed 0.0
 
 **Table 4.7b — Against detectors built for the job, at scale** *(RT-IOT2022, {{dataset.rt_iot2022.shape_full}}, leave-one-class-out, five seeds, θ = 0.99; `table_4_4_openset.csv`, 2026-08-12).*
 
+> **Re-measurement owed (grad-school#184).** These cells were produced before the loader dropped RT-IOT2022's unnamed index column, which encoded the class: the per-class capture counter restarts at zero, so any value above 8,107 identifies one class outright. Unlike Table 4.4 — whose `top_n = 5` screen never selected that column — this table runs the screen over *every* feature and keeps them all, so it consumed the column directly, and its result is known to be sensitive to the screen's *order*, which removing a column perturbs. Two matched single-seed runs, same seed and host, differing only in that column, put the cost at **0.019 $J$** for the complement rule (+0.391 → +0.372), 0.007 for the one-class SVM, and **zero** for Isolation Forest (+0.517 both ways). The gap this table reports therefore widens slightly rather than closing, and every conclusion below survives; the digits in the table are simply not yet from the de-leaked run.
+
 | Method | Detection rate | False-alarm rate | Detection − false alarm | Separate model? |
 |---|---:|---:|---:|:--:|
 | **Complement rule (this work)** | 0.839 ± 0.253 | 0.445 ± 0.091 | +0.394 | no |

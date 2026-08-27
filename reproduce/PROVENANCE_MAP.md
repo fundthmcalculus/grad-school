@@ -1132,3 +1132,23 @@ now fails if any loader returns an index-like column, and cross-checks every
 loader's modelled width against `dataset_specs.yaml`, applying that file's own
 `drop_columns` so a loader may still hand back columns its generator drops (BETH
 returns `sus`/`timestamp` for `table_4_11` to remove).
+
+*Note 25, addendum (2026-08-27) — the RT-IOT2022 index column costs Table 4.7b
+0.019 J, measured rather than assumed.* Two single-seed `table_4_4_openset` runs,
+`REPRO_SEEDS=0`, same host, same day, differing only in whether the loader drops
+the unnamed column:
+
+| Method | with index (82 feat.) | without (81 feat.) | Δ J |
+|---|---|---|---|
+| Complement rule | +0.391 | +0.372 | **−0.019** |
+| One-class SVM | +0.444 | +0.437 | −0.007 |
+| Isolation Forest | +0.517 | +0.517 | 0.000 |
+
+The matched control matters here: neither the prose's five-seed +0.394/+0.537 nor
+the three-seed +0.333/+0.513 sitting in `reproduce/outputs/` is a valid baseline
+for a one-seed probe, and comparing against either would have charged seed
+variance to the fix. Against the control, the deficit to Isolation Forest *widens*
+from 0.126 to 0.145 — close to the 0.143 the prose already reports — so the
+qualitative reading is unchanged and the full re-quote is deferred to #184 rather
+than rushed. One seed is one seed: this bounds the effect, it does not replace the
+five-seed table.
