@@ -17,7 +17,7 @@ Advisor: Dr Kelly Cohen
 |---|---:|---:|---:|
 | PhiUSIIL (235K × 54) | 2 | 0.997 ± 0.001 | 0.28 s |
 | RT-IOT2022 (123K × 82, 12-class) | 12 | 0.927 ± 0.002 | 37.4 s |
-| Concrete (regression) | 3 buckets | $R^2=$ 0.861 ± 0.026 | seconds |
+| Concrete (regression) | 3 buckets | $R^2=$ 0.852 ± 0.030 | 0.44 ± 0.04 s |
 
 * Free: the rule-base complement is automatically an open-set / anomaly
   detector, at no extra training cost
