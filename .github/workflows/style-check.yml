@@ -88,6 +88,19 @@ jobs:
             echo "research/least_action doesn't exist on this branch yet (lands with PR #24) -- nothing to run."
           fi
 
+      # The proposal's assembly-time checks: dataset-spec substitution,
+      # cross-references, the section registry, the bibliography. Runs on the
+      # environment `pip install -e ".[dev]"` produced above, which is the point
+      # -- nothing here ran build_pdf.py before, and two bugs shipped green
+      # because of it. #183 added a hard PyYAML dependency without declaring it,
+      # so the documented install produced an environment where the proposal
+      # died with `[fatal] could not read reproduce/dataset_specs.yaml`; and a
+      # hardcoded appendix-section set reported a valid `Appendix A.8` reference
+      # as dangling. --validate-only stops before the render, so this needs no
+      # pandoc and no LaTeX; it exits non-zero on any fatal.
+      - name: Validate the proposal document assembles
+        run: python research/proposal-defense/build_pdf.py --validate-only
+
       # FuzzySystemsExperiments/, experiments/, and gated-minimax-selection/'s
       # pytest suites transitively import `tribblefis` from the pinned
       # tribble-fis submodule. It's its own independent uv project (own

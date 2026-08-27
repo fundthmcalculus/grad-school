@@ -19,15 +19,19 @@
 **The chapter currently claims four contributions. After this review it has one, plus one methods-section result.** That is a smaller chapter, but a defensible one, and the surviving claim is the one §5.1 already calls "the piece I consider most novel."
 
 The methods-section result is a single claim about an **extraction rule**: a
-persistence-outlier gate inside Campello's FOSC framework that (a) reaches tuned
-HDBSCAN\* accuracy across five kinds of dissimilarity matrix without per-dataset
-tuning, and (b) emits exactly the real scales of a nested hierarchy where a
-cut-distance sweep offers the same partitions with no criterion for choosing among
-them. Contributions 2 and 3 were two framings of that one rule.
+persistence-outlier gate inside Campello's FOSC framework that (a) reaches
+comparable accuracy across five kinds of dissimilarity matrix at one fixed
+threshold, where the baseline needs a per-dataset parameter with no unsupervised
+criterion behind it, (b) is exactly stable on the motivating non-convex case, and
+(c) emits exactly the real scales of a nested hierarchy where a cut-distance sweep
+offers the same partitions with no criterion for choosing among them.
+Contributions 2 and 3 were two framings of that one rule. **It is not an accuracy
+claim** — see §2.
 
 **Revision history.** 2026-08-26 initial review (four parallel prior-art reviews).
 2026-08-27: §2's stability-measure argument withdrawn and §3's open requirement
-discharged, both against `gated-minimax-selection/run_hdbscan_baselines.py`. The
+discharged, both against `gated-minimax-selection/run_hdbscan_baselines.py`; then
+§2's accuracy edge withdrawn as well when that driver was lifted to ten seeds. The
 corrections are marked in place rather than silently applied.
 
 ---
@@ -85,17 +89,27 @@ over {1, 5} — 12 configurations per dataset against our one:
 
 | comparison | ours | baseline | verdict |
 |---|---:|---:|---|
-| mean ARI, 12 flat datasets, **one fixed setting each** | **0.887** | 0.820 (best single config: mpts=5, mcs=3) | ours **+0.067**; +0.105 against the best `mpts=1` config |
-| *k* correct, same | 9/12 | 9/12 | tie |
-| per-dataset, baseline allowed to **tune per dataset** | — | — | flat gate 1 win / 2 losses / 9 ties; band selector 1 / 1 / 10 |
+| mean ARI, 12 flat datasets, one fixed setting each, **10 seeds** | **0.835 ± 0.037** | 0.817 ± 0.019 (best single config) | +0.018, ~½ sd, ranges overlap — **no advantage** |
+| same, replicate 0 only | 0.887 | 0.820 | +0.067 — but 0.887 is our best of ten |
+| per-dataset, baseline **tuned per dataset**, 10 seeds × 12 sets | — | — | flat gate 7 W / 29 L / 84 T; band selector 8 / 19 / 93 |
 
-So on accuracy the honest verdict is **parity with a tuned HDBSCAN\* and a modest
-edge over an untuned one** — one seed per dataset, no spread. What replaces the
-retired stability argument is a **parameter-robustness** result: HDBSCAN's score
-moves by up to **0.802** ARI (concentric_rings) and **1.000** (three_clusters_tree,
-n=30) across `min_cluster_size` alone, a parameter with no unsupervised criterion
-behind it on a bare dissimilarity matrix, while our gate produces its scores at one
-fixed `gap_sigma` on all 17 matrices.
+**There is no accuracy claim here.** The single-seed +0.067 was a favourable
+replicate; over ten seeds the gate and a fixed-setting HDBSCAN\* are
+indistinguishable, and against a per-dataset-tuned baseline the gate loses more
+comparisons than it wins. Two things do survive:
+
+- **Parameter robustness.** HDBSCAN's score moves by up to **0.802** ARI
+  (concentric_rings) and **1.000** (three_clusters_tree, n=30) across
+  `min_cluster_size` alone, while the gate produces its scores at one fixed
+  `gap_sigma` on all 17 matrices. Parameter choice dominates seed noise — battery
+  mean ranges 0.713–0.817 across settings against a per-setting seed sd of
+  0.014–0.037 — so the tuning requirement is a real cost, not a knob.
+- **One stable win, on the motivating case.** `concentric_rings` is **1.000 with
+  zero variance across ten seeds** against a tuned baseline's 0.873 ± 0.175.
+
+And one weakness the single-seed run hid: `cosine_topics` is **0.423 ± 0.387**,
+against a tuned baseline's 0.682 ± 0.183. Replicate 0's 0.803 sits near the top of
+our range. This must be disclosed.
 
 Campello's invitation still applies and is still worth quoting — "the excess of
 mass adopted in this article is by no means the only possible measure for cluster
@@ -103,8 +117,12 @@ stability that can be used in our framework" — but as the *frame* for our gate
 as evidence that ours beats EOM.
 
 **Claimable:** a persistence-outlier stability measure inside Campello's framework
-that reaches tuned-HDBSCAN\* accuracy across five kinds of dissimilarity matrix
-without per-dataset tuning. A methods-section result, not a pillar.
+that reaches comparable accuracy across five kinds of dissimilarity matrix at one
+fixed threshold, where the baseline needs a per-dataset parameter with no
+unsupervised criterion behind it, and that is exactly stable on the motivating
+non-convex case. A methods-section result, not a pillar, and it carries two
+disclosed instabilities (`cosine_topics`, and `density_hierarchy` band recovery at
+7/10 seeds).
 
 ## 3. Multi-scale band discovery — DEAD as framed
 

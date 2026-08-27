@@ -12,10 +12,10 @@ All fifteen are produced today, through `reproduce/figures/`, in PNG for the Mar
 
 ## A.2 Extended results tables
 
-The main text carries twenty-one summary tables (3.1–3.7, 4.1–4.7, 5.1–5.3, 6.1–6.3, 7.1). The seed half of Goal G4 has run, and every numbered table is already quoted at the ten-seed floor with a spread, so what the appendix owes is not a multi-seed version of each one. It is the **per-seed detail** those rows aggregate away, the splits behind each mean, which is how a reader finds the one seed in ten that carries a failure, as Chapter 6's mixture-of-experts divergence did. G4's outstanding half is hardware, which a re-run fixes and a wider table cannot. Most of these tables regenerate from `reproduce/tables/`, so the appendix version is the same data at full width; the rest are named in A.5.
+The main text carries twenty-one summary tables (3.1–3.7, 4.1–4.7, 5.1–5.3, 6.1–6.3, 7.1), and this appendix carries five of its own (A.1–A.5). The seed half of Goal G4 has run, and every numbered table is already quoted at the ten-seed floor with a spread, so what the appendix owes is not a multi-seed version of each one. It is the **per-seed detail** those rows aggregate away, the splits behind each mean, which is how a reader finds the one seed in ten that carries a failure, as Chapter 6's mixture-of-experts divergence did. G4's outstanding half is hardware, which a re-run fixes and a wider table cannot. Most of these tables regenerate from `reproduce/tables/`, so the appendix version is the same data at full width; the rest are named in A.5.
 
 - **A.2.1** Full adversarial-evaluation ARI grids and the complete stitch-ablation grid (all partitions × sizes).
-- **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results.
+- **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results. The HDBSCAN\* head-to-head that belongs with them is written out in **A.8**, because its outcome decides what Chapter 5 claims rather than merely widening a table.
 - **A.2.3** The broadened fuzzy-model benchmark suite (Concrete, PhiUSIIL, turbine, wave-energy, wine, and the IoT sets) with the baseline methods.
 - **A.2.4** The three-arm reorder study behind Chapter 3 §3.3.1 (classical cubic, stage-one priority queue, stage-two compact active set) over the full grid of $N$ and both precisions, in absolute seconds with per-seed spreads. The main text normalizes, wall-clock being unportable between machines and ratios far more so; the seconds live here, with the per-$N$ detail behind Table 3.2's exponent fit. Across five independent runs on the host of record stage two is monotone in $N$ and beats stage one at every size in the grid (Chapter 3 §3.4, `PROVENANCE_MAP.md` note 11). This subsection is also the evidence base for the mergeVAT methods paper's complexity audit (§3.2).
 
@@ -267,7 +267,7 @@ The one row that reads *well* for the construction is also the one not yet under
 | PhiUSIIL phishing URL | {{dataset.phiusiil.shape}}, binary | measured historically (Table 4.1: 0.997 ± 0.001 acc, 0.28–0.64 s) — **but no longer reproducible from a clean checkout.** The repo loader's bundled copy lived at `tribble-fis/gaussian_mixture/phishing_data/`, and `gaussian_mixture/` was deleted upstream (commit `8484fd6`, per `_fuzzy_models.py`'s own comment); `data/` in this repository holds only `Concrete_Data.csv`. A fresh run falls through to a `ucimlrepo` fetch that returns a *different* feature set, which the loader's own comment flags as producing results "not comparable" to every number quoted from it | large / scale — the one role currently filled, on a fragile path |
 | RT-IOT2022 | {{dataset.rt_iot2022.shape_full}} | **in the repository as of 2026-08-12, both roles now measured.** *Open-set* (Table 4.7b, ten seeds, re-measured 2026-08-27 after a leaky feature was removed): the complement rule loses to Isolation Forest at this scale (+0.366 vs +0.535 Youden's $J$). *Classification/timing* (Table 4.4, ten seeds, `table_4_1_mog_baselines.py`): MoG trains in $4.24 \pm 0.68$ s at $0.927 \pm 0.002$ accuracy against Random Forest's $0.998 \pm 0.000$ — the same speed-not-superiority shape as the PhiUSIIL row | large / scale — both roles filled and measured; both favor the reference baseline on accuracy |
 
-**Gap closed, in the "both roles measured" sense — not in the "this work wins" sense.** RT-IOT2022 is present and both of its named claims now have real ten-seed-or-better numbers behind them, and neither favors the construction on accuracy: Random Forest and Isolation Forest both beat the MoG-based arm on their respective tasks. What the numbers do support is the *speed and structural* half of each claim — twelve rules in under 40 seconds, no second model needed for the open-set rule — which is what Chapters 1, 4 and 8 actually claim; "no fuzzy baseline exists to be faster than" (Goal **C1**) is still the open half of that argument. PhiUSIIL's reproduction path is unchanged — its measured numbers are real but sit on a path this pass found to be broken. A.5 states "Concrete, PhiUSIIL and the shuttle set are public and present, a reader can reproduce those results directly" — that sentence is still not accurate for PhiUSIIL and is worth revisiting there.
+**Gap closed, in the "both roles measured" sense — not in the "this work wins" sense.** RT-IOT2022 is present and both of its named claims now have real ten-seed-or-better numbers behind them, and neither favors the construction on accuracy: Random Forest and Isolation Forest both beat the MoG-based arm on their respective tasks. What the numbers do support is the *speed and structural* half of each claim — twelve rules in about four seconds, no second model needed for the open-set rule — which is what Chapters 1, 4 and 8 actually claim; "no fuzzy baseline exists to be faster than" (Goal **C1**) is still the open half of that argument. PhiUSIIL's reproduction path is unchanged — its measured numbers are real but sit on a path this pass found to be broken. A.5 states "Concrete, PhiUSIIL and the shuttle set are public and present, a reader can reproduce those results directly" — that sentence is still not accurate for PhiUSIIL and is worth revisiting there.
 
 ### A.7.3 Anomaly / open-set detection
 
@@ -341,6 +341,157 @@ Sorted by how complete the gap is, not by chapter:
 
 Two categories (A.7.3, A.7.4) are unchanged from the earlier pass. Four (A.7.1, A.7.2, A.7.5, A.7.7) moved, three of them substantially, over one session (2026-08-11/12) — see `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md` for the full run log, every real number, and what was deliberately not attempted. That is still the point of this section: A.5 says which datasets are public and present; this section says, by category, which small/large pairing is real, which is a name, and — now, for four of six categories — what the real pairing actually showed.
 
+## A.8 The HDBSCAN\* head-to-head (Chapter 5)
+
+Chapter 5's selection machinery — the persistence gate of §5.3.2 that makes $k$ an
+output, and the band discovery of §5.3.3 that returns a stack of partitions — is
+described there as machinery and is not claimed as a contribution. This section is
+why. It also discharges the "required before claiming" item raised by the Chapter 5
+prior-art review (`PRIOR_ART_CH5.md` §3), which asked specifically for HDBSCAN
+`leaf` extraction and a `dbscan_clustering(eps)` sweep on the nested [8, 4, 2]
+synthetic.
+
+Generator: `gated-minimax-selection/run_hdbscan_baselines.py`, registered in
+`reproduce/manifest.py` as `table-5-5-7-ch5-hdbscan-baselines`. Seventeen
+dissimilarity matrices (the flat battery, the nested battery, five non-metric
+families, three shortest-path matrices), twelve HDBSCAN\* configurations each
+(`min_samples` ∈ {1, 5} × extraction ∈ {eom, leaf} × `min_cluster_size` ∈
+{3, 5, 10}), ten seeds. Findings and caveats:
+`gated-minimax-selection/notes/HDBSCAN_BASELINES.md`. It needs the `hdbscan`
+contrib package, which is in no repository environment — scikit-learn's `HDBSCAN`
+offers eom and leaf but no cut-distance accessor, and the eps sweep is half the
+point.
+
+The comparison is run at $m_{\mathrm{pts}} = 1$, where mutual reachability equals
+the input dissimilarity and HDBSCAN\* *is* single-linkage on it
+[@campello2015hdbscan, Corollary 3.5]. Both sides therefore consume the **identical
+hierarchy**, and the only thing under test is the extraction rule.
+
+Two design points matter for reading the tables. HDBSCAN\*'s quality on this
+battery is a strong function of `min_cluster_size` — on concentric rings
+excess-of-mass scores 0.061 at `min_cluster_size` = 3 and 0.863 at 10 — so the
+baseline is swept over that parameter rather than run at a default; a mechanism
+inferred from a gap at any single setting would be an artifact of the setting. And
+because the gate runs at one fixed `gap_sigma` everywhere, the baseline is scored at
+one fixed configuration too, with the per-dataset choice reported separately as the
+generous case.
+
+**Table A.3 — one fixed setting per method, ten seeds.** Twelve of the seventeen
+datasets have a flat ground truth. Each replicate gets its own battery mean and
+those are then averaged, so the deviation is across whole batteries rather than
+across datasets.
+
+| method | setting | mean ARI | sd | min | max |
+|---|---|---:|---:|---:|---:|
+| gated set-cover (Ch. 5) | `gap_sigma` = 2.0, identical everywhere | 0.835 | 0.037 | 0.794 | 0.887 |
+| HDBSCAN\* excess-of-mass | $m_{\mathrm{pts}}$ = 5, `min_cluster_size` = 5 | 0.817 | 0.019 | 0.790 | 0.855 |
+| HDBSCAN\* excess-of-mass | $m_{\mathrm{pts}}$ = 1, `min_cluster_size` = 10 | 0.805 | 0.037 | 0.772 | 0.879 |
+| HDBSCAN\* excess-of-mass | $m_{\mathrm{pts}}$ = 1, `min_cluster_size` = 5 | 0.798 | 0.014 | 0.771 | 0.816 |
+| HDBSCAN\* leaf | $m_{\mathrm{pts}}$ = 5, `min_cluster_size` = 10 | 0.713 | 0.024 | 0.674 | 0.747 |
+
+**+0.018 at roughly half a standard deviation, with the ranges overlapping almost
+entirely. There is no accuracy claim here.** A single seed would have suggested
+otherwise: at the generators' default seeds the gate scores 0.887 against the best
+baseline configuration's 0.820, a gap of +0.067 — and 0.887 is the gate's *best of
+ten*. This is what the ten-seed floor (A.5) exists to catch, and it is why Chapter 5
+reports the machinery without advancing it.
+
+Allowing the baseline a per-dataset choice of both parameters makes it worse than a
+wash. Over ten replicates and twelve datasets, scored against the best of
+HDBSCAN\*'s twelve configurations on each dataset (0.02 ARI to count as a verdict),
+the flat gate wins 7, loses 29 and ties 84; the band selector wins 8, loses 19 and
+ties 93.
+
+**Table A.4 — per dataset, against a baseline tuned on that dataset.** Mean ± sd
+over ten seeds.
+
+| Dataset | gated set-cover | HDBSCAN\* tuned | delta |
+|---|---|---|---:|
+| multi_scale_hierarchy | 0.552 ± 0.015 | 1.000 ± 0.000 | −0.448 |
+| cosine_topics | 0.423 ± 0.387 | 0.682 ± 0.183 | −0.259 |
+| graph_communities | 0.095 ± 0.156 | 0.202 ± 0.090 | −0.107 |
+| bridged_gaussians | 0.978 ± 0.040 | 0.987 ± 0.017 | −0.009 |
+| varying_density | 0.976 ± 0.042 | 0.983 ± 0.027 | −0.007 |
+| two_gaussians, dtw_traces, edit_strings, hamming_categorical, three_clusters_tree, chain_then_ring | 1.000 ± 0.000 | 1.000 ± 0.000 | +0.000 |
+| **concentric_rings** | **1.000 ± 0.000** | 0.873 ± 0.175 | **+0.127** |
+
+Three things read off that table. **The one clear win is `concentric_rings`** — the
+non-convex case Chapter 5's motivation rests on — at 1.000 with *zero* variance
+across ten seeds against a tuned baseline's 0.873 ± 0.175, exactly stable where the
+baseline is strongly seed-sensitive. **`multi_scale_hierarchy`'s −0.448 is a
+flat-versus-multiscale artifact rather than a defeat**, since that dataset's flat
+truth is its fine level of six sub-clusters and the band selector recovers bands
+[6, 3] at ARI 1.000. **And `cosine_topics` at 0.423 ± 0.387 is a real weakness**,
+carried forward into Chapter 5 §5.6 rather than averaged away: the gate is unstable
+on cosine dissimilarities, and a single seed puts it at 0.803, near the top of that
+range.
+
+What the comparison does establish is a parameter-sensitivity contrast, and the
+reason it is a cost rather than a knob is that parameter choice dominates seed
+noise. Across configurations the battery mean ranges 0.713–0.817; across seeds at
+any fixed configuration the standard deviation is 0.014–0.037. Choosing
+`min_cluster_size` badly costs an order of magnitude more than the seed does, and on
+individual datasets the swing reaches 0.802 ARI on concentric rings and 1.000 on
+`three_clusters_tree`, where $n$ = 30 makes `min_cluster_size` = 10 a tenth of the
+data.
+
+**Table A.5 — nested structure: whether a baseline can return the whole hierarchy.**
+Per-level ARI at the default seeds, finest level first, with band-recovery stability
+over ten seeds in the last two columns.
+
+| Dataset | truth granularities | bands found | per level | HDBSCAN\* leaf per level | eps-sweep oracle | exact recovery, 10 seeds | distinct vectors |
+|---|---|---|---|---|---|---:|---:|
+| nested_gaussians | [6, 2] | [6, 2] | 1.000, 1.000 | 1.000, 0.324 | 1.000, 1.000 | 100% | 1 |
+| three_level_hierarchy | [8, 4, 2] | [8, 4, 2] | 1.000, 1.000, 1.000 | 1.000, 0.581, 0.236 | 1.000, 1.000, 1.000 | 90% | 2 |
+| density_hierarchy | [4, 2] | [4, 2] | 1.000, 1.000 | 1.000, 0.492 | 1.000, 1.000 | 70% | 4 |
+| relational_nested_hierarchy | [6, 3] | [6, 3] | 1.000, 1.000 | 1.000, 1.000 | 1.000, 1.000 | 100% | 1 |
+
+Two findings, pointing opposite ways. Against a **single-output** extractor the
+structural argument is clean: leaf and excess-of-mass both lock onto the finest
+level and then score 0.24–0.58 on the coarser ones, because one partition cannot be
+two granularities at once. Against a **cut-distance sweep it does not hold.**
+Sweeping `dbscan_clustering(eps)` over 400 cut heights on `three_level_hierarchy`
+yields only **seven** distinct partitions, and three of them are exactly $k$ = 8,
+$k$ = 4 and $k$ = 2 at ARI 1.000 each:
+
+| eps | k | fine | medium | coarse |
+|---:|---:|---:|---:|---:|
+| 0.032 | 0 | 0.000 | 0.000 | 0.000 |
+| 0.553 | 8 | 0.948 | 0.542 | 0.216 |
+| 1.074 | 8 | **1.000** | 0.581 | 0.236 |
+| 3.680 | 7 | 0.862 | 0.702 | 0.300 |
+| 4.201 | 4 | 0.581 | **1.000** | 0.492 |
+| 27.129 | 2 | 0.236 | 0.492 | **1.000** |
+| 193.883 | 1 | 0.000 | 0.000 | 0.000 |
+
+The candidate set is small enough to read the three real scales off by eye, which is
+why §5.3.3 describes band discovery as automatic selection among those candidates
+and not as recovery of the hierarchy.
+
+The last two columns of Table A.5 are the qualification a single-seed run cannot
+supply. The [8, 4, 2] result holds on nine seeds of ten; `density_hierarchy` holds
+on only seven, producing four distinct granularity vectors — consistent with the
+ten-seed scaling study in Chapter 5 §5.4, where `single_scale`'s modal granularity
+agreed in only 5–7 of 10 seeds. Band recovery is not the deterministic property
+Table 5.2 makes it look, and Chapter 5 §5.6 says so.
+
+One further result closes off an argument rather than supporting a claim.
+$m_{\mathrm{pts}} = 5$ engages the $k$NN core distance and mutual-reachability
+machinery, and it **ran without error on all seventeen matrices**, every non-metric
+family included, so a density estimate is computable on a non-metric $D^*$; the
+framing "no density estimator is available here" is false and appears nowhere in
+Chapter 5. It is merely unreliable there: switching it on costs `graph_communities`
+0.253 → 0.011 and `cosine_topics` 0.903 → 0.458, while *helping* on the coordinate
+sets (concentric rings 0.863 → 1.000), and $m_{\mathrm{pts}} = 5$ is in fact the
+best single configuration across the battery as a whole. A narrow empirical
+observation on a few datasets, not a methodological reason.
+
+**Caveats.** `min_cluster_size` is swept over only {3, 5, 10} and `min_samples` over
+only {1, 5}. All seventeen matrices are small, $n$ = 30–160. HDBSCAN's noise flag is
+scored as a label of its own, with the kinder `ari_noise_excluded` also recorded in
+the JSON. Contrib `hdbscan` only, not cross-checked against scikit-learn's
+implementation.
+
 ---
 
-*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility), A.6 (side quests) and A.7 (dataset inventory) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../CHECKLIST.md`.*
+*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility), A.6 (side quests), A.7 (dataset inventory) and A.8 (the Chapter 5 HDBSCAN\* head-to-head) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../CHECKLIST.md`.*

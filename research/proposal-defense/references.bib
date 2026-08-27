@@ -758,3 +758,197 @@
              {\tt ucin156387481300899} surfaced in search; the ETD record was
              unreachable from the drafting environment, so title and year rest
              on index listings (CHECKLIST E11).}}
+
+% ---------------------------------------------------------------------------
+% Chapter 5 prior-art head-to-head (PRIOR_ART_CH5.md, 2026-08-26/27). These
+% entries exist because the review retired three of the chapter's four claimed
+% contributions; each one is the paper that pre-empts a claim. Verification
+% status per entry is in the note field -- several are metadata-verified only.
+% ---------------------------------------------------------------------------
+
+@article{khalilia2014irfcm,
+  author  = {Khalilia, Mohammed A. and Bezdek, James C. and Popescu, Mihail and
+             Keller, James M.},
+  title   = {Improvements to the Relational Fuzzy c-Means Clustering Algorithm},
+  journal = {Pattern Recognition},
+  volume  = {47},
+  number  = {12},
+  pages   = {3920--3930},
+  year    = {2014},
+  doi     = {10.1016/j.patcog.2014.06.021},
+  note    = {Compares five Euclideanizations for relational FCM and finds the
+             subdominant ultrametric -- i.e. the minimax/iVAT transform -- best.
+             Pre-empts Chapter 5's transform claim outright, and is
+             Bezdek-co-authored, as is the beta-spread it displaces.
+             FULL TEXT PAYWALLED AND UNREAD: characterizations here rest on the
+             abstract plus the authors' published iRFCM code (CHECKLIST).}}
+
+@article{campello2013fosc,
+  author  = {Campello, Ricardo J. G. B. and Moulavi, Davoud and Zimek, Arthur and
+             Sander, J{\"o}rg},
+  title   = {A Framework for Semi-Supervised and Unsupervised Optimal Extraction
+             of Clusters from Hierarchies},
+  journal = {Data Mining and Knowledge Discovery},
+  volume  = {27},
+  number  = {3},
+  pages   = {344--371},
+  year    = {2013},
+  doi     = {10.1007/s10618-013-0311-4},
+  note    = {FOSC. Formalizes and globally optimizes exactly the object
+             {\tt select\_coverage\_cover} computes -- a local cut through a
+             cluster hierarchy, with k emergent. Also the source of the
+             invitation this chapter takes up: excess of mass "is by no means
+             the only possible measure for cluster stability that can be used in
+             our framework."}}
+
+@article{campello2015hdbscan,
+  author  = {Campello, Ricardo J. G. B. and Moulavi, Davoud and Zimek, Arthur and
+             Sander, J{\"o}rg},
+  title   = {Hierarchical Density Estimates for Data Clustering, Visualization,
+             and Outlier Detection},
+  journal = {ACM Transactions on Knowledge Discovery from Data},
+  volume  = {10},
+  number  = {1},
+  pages   = {5:1--5:51},
+  year    = {2015},
+  doi     = {10.1145/2733381},
+  note    = {HDBSCAN*. Corollary 3.5 is load-bearing for Chapter 5: at
+             mpts in {1,2} mutual reachability equals the input dissimilarity and
+             HDBSCAN* IS single-linkage on it, so this chapter's hierarchy is a
+             one-parameter special case and the "density-free" distinction is a
+             parameter setting inside the pre-empting paper. Eq. 3 defines the
+             size-weighted excess-of-mass stability. Read directly
+             (institutional-repository PDF).}}
+
+@inproceedings{elkin2020mergegram,
+  author    = {Elkin, Yury and Kurlin, Vitaliy},
+  title     = {The Mergegram of a Dendrogram and Its Stability},
+  booktitle = {45th International Symposium on Mathematical Foundations of
+               Computer Science (MFCS 2020)},
+  series    = {LIPIcs},
+  volume    = {170},
+  pages     = {32:1--32:13},
+  year      = {2020},
+  doi       = {10.4230/LIPIcs.MFCS.2020.32},
+  note      = {Definition 3.4 names the object Chapter 5 enumerates -- every
+               internal dendrogram node with its (birth, death) -- and proves it
+               strictly dominates 0-D persistence and is stable. Cited because
+               the stability theorem comes free. Read directly
+               (arXiv:2007.11278).}}
+
+@article{carlsson2010characterization,
+  author  = {Carlsson, Gunnar and M{\'e}moli, Facundo},
+  title   = {Characterization, Stability and Convergence of Hierarchical
+             Clustering Methods},
+  journal = {Journal of Machine Learning Research},
+  volume  = {11},
+  pages   = {1425--1470},
+  year    = {2010},
+  note    = {Modern axiomatic treatment of single linkage and the subdominant
+             ultrametric; also the source for flat-cannot-represent-nested.}}
+
+@article{johnson1967hierarchical,
+  author  = {Johnson, Stephen C.},
+  title   = {Hierarchical Clustering Schemes},
+  journal = {Psychometrika},
+  volume  = {32},
+  number  = {3},
+  pages   = {241--254},
+  year    = {1967},
+  doi     = {10.1007/BF02289588},
+  note    = {The minimax path distance as the subdominant ultrametric /
+             single-linkage cophenetic distance. Establishes that this chapter's
+             central operator is 1967 machinery.}}
+
+@inproceedings{chehreghani2017minimax,
+  author    = {Chehreghani, Morteza Haghir},
+  title     = {Classification with Minimax Distance Measures},
+  booktitle = {Proceedings of the 31st AAAI Conference on Artificial Intelligence},
+  year      = {2017},
+  doi       = {10.1609/aaai.v31i1.10831},
+  note      = {Theorem 3: the minimax transform of an ARBITRARY non-metric
+             dissimilarity yields a PSD centred Gram matrix. This is the
+             property that makes Chapter 5's pipeline valid on non-metric input,
+             and it is published. Journal version: Machine Learning 109:2063--2097,
+             2020.}}
+
+@article{lemin1985isometric,
+  author  = {Lemin, Alexander Ju.},
+  title   = {Isometric Imbedding of Isosceles (Non-Archimedean) Spaces in
+             Euclidean Spaces},
+  journal = {Soviet Mathematics Doklady},
+  volume  = {32},
+  number  = {3},
+  pages   = {740--744},
+  year    = {1985},
+  note    = {Finite ultrametrics embed isometrically in Euclidean space -- why
+             the beta-spread is inert on D*. SECOND-HAND: transcribed from
+             Fiedler (ELA 3:23--30, 1998) and Faver et al. (Glasgow Math. J.
+             56(3):519--535, 2014), consistent across both; primary not seen.}}
+
+@inproceedings{liu2007vdbscan,
+  author    = {Liu, Peng and Zhou, Dong and Wu, Naijun},
+  title     = {VDBSCAN: Varied Density Based Spatial Clustering of Applications
+               with Noise},
+  booktitle = {2007 International Conference on Service Systems and Service
+               Management (ICSSSM)},
+  year      = {2007},
+  doi       = {10.1109/ICSSSM.2007.4280175},
+  note      = {The structural antecedent to Section 5.3.3: read several density
+             scales off the knees of a sorted k-distance curve, then run the base
+             clusterer once per scale. Band discovery is that recipe on a
+             dendrogram's height axis. Publisher elides the abstract; verified
+             from metadata and secondary descriptions only.}}
+
+@article{leung2000clustering,
+  author  = {Leung, Yee and Zhang, Jiang-She and Xu, Zong-Ben},
+  title   = {Clustering by Scale-Space Filtering},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {22},
+  number  = {12},
+  pages   = {1396--1410},
+  year    = {2000},
+  doi     = {10.1109/34.895974},
+  note    = {Scale count as an OUTPUT, in 2000: "the critical scale is estimated
+             by analyzing the distribution of cluster lifetime in the scale
+             space." Retires the discovering-how-many-scales claim.
+             Metadata-verified; full text not read.}}
+
+@inproceedings{harada2017multidimensional,
+  author    = {Harada, Kazuki and Nishino, Hiroaki},
+  title     = {Multi-Dimensional Fuzzy Set Identification Using Persistent
+               Homology},
+  booktitle = {2017 Joint 17th World Congress of International Fuzzy Systems
+               Association and 9th International Conference on Soft Computing
+               and Intelligent Systems (IFSA-SCIS)},
+  year      = {2017},
+  doi       = {10.1109/IFSA-SCIS.2017.8023281},
+  note      = {Uses persistence to set the threshold defining a fuzzy set's
+             SUPPORT -- support only, not slope, and not as an FIS antecedent.
+             One citation in OpenAlex: easy to miss, easy for a committee member
+             to find, hence cited pre-emptively. FULL TEXT UNREAD; an IEEE Xplore
+             full-text search for "persistent homology" + "membership function"
+             is still owed (Section 5.5).}}
+
+@article{bois2024persistence,
+  author  = {Bois, Alexandre and Tervil, Brian and Oudre, Laurent},
+  title   = {Persistence-Based Clustering with Outlier-Detecting Parameter-Free
+             Method},
+  journal = {Frontiers in Applied Mathematics and Statistics},
+  volume  = {10},
+  year    = {2024},
+  doi     = {10.3389/fams.2024.1260828},
+  note    = {Connectivity-flavoured rather than density-based, auto-thresholded,
+             k an output, with explicit non-coverage. The closest non-HDBSCAN
+             analogue to Section 5.3.2 and the one that must be engaged
+             directly.}}
+
+@inproceedings{achary2024fimvat,
+  author    = {Achary, Thulasi and Kachroo, Sahil and Rathore, Punit},
+  title     = {{FIM-VAT}: Feature Importance-Based Interpretable Clustering
+               with Visual Assessment of Cluster Tendency},
+  booktitle = {2024 International Joint Conference on Neural Networks (IJCNN)},
+  year      = {2024},
+  note      = {The VAT family reaching for interpretability and stopping at
+             post-hoc feature importances -- the best paper to position Chapter 5
+             against, and still a crisp partition. Metadata-verified only.}}

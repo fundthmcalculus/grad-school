@@ -206,9 +206,7 @@ def verify(specs=None):
                 f"features: spec {spec.get('features')} vs derived {d_feats}"
             )
         if spec.get("classes") is not None and d_classes not in (None, spec["classes"]):
-            problems.append(
-                f"classes: spec {spec['classes']} vs derived {d_classes}"
-            )
+            problems.append(f"classes: spec {spec['classes']} vs derived {d_classes}")
 
         if problems:
             bad += 1
