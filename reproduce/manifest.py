@@ -561,6 +561,32 @@ EXPERIMENTS = [
         "only) with the flat baseline, partition-of-unity error, and a ten-seed "
         "spread. Takes ~3 minutes on the 2026-08 workstation.",
     ),
+    Experiment(
+        id="table-5-5-7-ch5-hdbscan-baselines",
+        title="HDBSCAN* head-to-head: gated set-cover and band selector vs. "
+        "excess-of-mass, leaf, and a dbscan_clustering(eps) sweep",
+        chapter="Ch5",
+        produces="Tables 5.5, 5.6, 5.7",
+        repo=".",
+        command=["python", "gated-minimax-selection/run_hdbscan_baselines.py"],
+        hardware="any",
+        outputs=[
+            "gated-minimax-selection/outputs/hdbscan_baselines.json",
+            "gated-minimax-selection/outputs/hdbscan_baselines.md",
+        ],
+        notes="REQUIRES THE `hdbscan` CONTRIB PACKAGE, which is in no repo venv -- "
+        "scikit-learn's HDBSCAN has eom/leaf but no cut-distance accessor, and the "
+        "eps sweep is the whole point. Install it into a throwaway venv rather than "
+        "the root .venv (see AGENTS.md on that venv being hand-built). The "
+        "library-dependent calls import lazily, so test_hdbscan_baselines.py "
+        "collects in CI without it. Discharges the blocking prior-art item in "
+        "research/proposal-defense/PRIOR_ART_CH5.md and corrects that document's "
+        "own EOM numbers, which were its min_cluster_size=3 rows; findings and "
+        "caveats in gated-minimax-selection/notes/HDBSCAN_BASELINES.md. Ten seeds by "
+        "default (--seeds 1 reproduces the original single-seed run byte for "
+        "byte); the ten-seed pass is what removed the apparent accuracy edge. "
+        "Runs in a few minutes.",
+    ),
     # ---- Ch3 pVAT / clustering experiments ----
     Experiment(
         id="ch3-adversarial-eval",
