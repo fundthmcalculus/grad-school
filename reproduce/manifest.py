@@ -274,6 +274,53 @@ EXPERIMENTS = [
         "which n rows are drawn is itself random.",
     ),
     Experiment(
+        id="table-4-11e-beth-boost-sweep",
+        title="BETH: does each arm's operating-point knob beat a plain score threshold?",
+        chapter="Ch4",
+        produces="Table 4.11(e)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_11e_beth_boost_sweep.py"),
+        hardware="any",
+        datasets=["BETH (data/beth/, gitignored)"],
+        outputs=[
+            "reproduce/outputs/table_4_11e_beth_boost_sweep.md",
+            "reproduce/outputs/table_4_11e_beth_boost_sweep.csv",
+        ],
+        notes="VERIFIED RUNNING (10 seeds, ~9 min). Asks the one question that decides "
+        "whether an operating-point knob is a contribution or a reparameterisation: at a "
+        "MATCHED false-alarm rate, does turning it detect more than moving the threshold "
+        "on the same arm's continuous score? ANSWER ON BETH: no, for all three. Largest "
+        "abs delta-detection is 0.0012 (boost theta), 0.0003 (iForest contamination), "
+        "0.0006 (OC-SVM nu) -- each at or below that arm's own detection seed-spread. "
+        "FOR THETA THIS IS PROVABLE, and the table measures the derivation rather than "
+        "asserting it: gauss_math._anomaly_argmax forms the anomaly column as "
+        "complement(conorm(clip(class_firing + theta, 0, 1))), and with ONE known class "
+        "there is exactly one class column while t_conorm(x, None, ...) aggregates "
+        "column-wise -- so the conorm is the IDENTITY, the anomaly label wins exactly "
+        "when firing < (1-theta)/2, and theta is therefore a hard threshold on firing "
+        "strength. TWO CONSEQUENCES FOR CH4: (a) theta should be described as a threshold "
+        "parameterisation, not a mechanism -- Ch4 4.3 argues the weaker multi-class "
+        "version (theta=0.99 degenerates to a max-membership rejector) and the one-class "
+        "reduction makes it total at EVERY theta; (b) REPRO_ANOM_CONORM IS INERT in the "
+        "one-class configuration -- there is one column to aggregate -- so a conorm sweep "
+        "here measures nothing, which matters because table_norm_conorm_matrix.py exists "
+        "to sweep conorms on multi-class data. iForest contamination is the METHOD'S "
+        "CONTROL, not a result: it provably only sets offset_ from a training-score "
+        "quantile and never touches the trees, so its delta MUST be ~0, and that it is "
+        "licenses reading a non-zero delta elsewhere as real (one fit per seed is "
+        "correct, not a shortcut). nu is the informative negative -- it enters libsvm's "
+        "QP objective so every value is a DIFFERENT fitted model, the only knob here that "
+        "could have traded one decision surface for another; it does not. SECONDARY: "
+        "theta's J is MONOTONE (+0.160 at 0 -> +0.769 at 0.999), so on BETH there is no "
+        "interior optimum and the shipped 0.99 default is near-best -- the proposal's "
+        "usable band of theta=0.5-0.8 came from Glass/RT-IOT2022 and does NOT transfer. "
+        "Best operating point in the table is iForest contamination=0.005 at J +0.864; "
+        "contamination=0.001 is a coin flip (detection 0.464 +/- 0.481). Every arm is "
+        "fitted on the SAME 20,000-row benign subsample per seed, so 4.11(d)'s "
+        "sample-count confound is not re-introduced; NO wall-clock is reported -- this "
+        "table is about decision curves and timing belongs to (d).",
+    ),
+    Experiment(
         id="table-g5-output-partitioning",
         title="G5: uniform vs quantile vs hybrid output partitioning",
         chapter="Ch4",

@@ -258,6 +258,7 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.11 BETH anomaly detection *(number reserved; no prose slot yet)* | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95) — note 22 |
 | 4.11(c) BETH feature reduction *(no prose slot yet)* | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95) — note 23 |
 | 4.11(d) BETH matched sample size *(no prose slot yet)* | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing — note 23 |
+| 4.11(e) BETH knob validation *(no prose slot yet)* | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95) - note 24 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
 
 **Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
@@ -402,6 +403,62 @@ number, which is the failure mode non-negotiable 2 exists to prevent.
 adding `userId` at k=7 lifts detection 0.933→0.993 while pushing false alarms
 0.019→0.137. Its within-arm timing trend is also valid. Only the cross-arm timing reading
 was wrong, and the emitted table now says so in its own note.
+
+**Note 24 - the boost theta is a threshold parameterisation, and in the one-class
+configuration the norm/conorm choice is inert.** `table_4_11e_beth_boost_sweep.py` asks,
+for each arm's operating-point knob: at a **matched false-alarm rate**, does turning it
+detect more than simply moving the threshold on that arm's own continuous score? On BETH
+the answer is no for all three, and the largest absolute delta-detection across each grid
+sits at or below that arm's own detection seed-spread:
+
+| knob | kind | largest abs delta | detection seed-spread |
+|---|---|---|---|
+| Tribble boost theta | threshold on firing (derived below) | 0.0012 | 0.0006 |
+| iForest `contamination` | pure threshold - the method's control | 0.0003 | 0.0007 |
+| OC-SVM `nu` | **refits per value** | 0.0006 | 0.0000 |
+
+*For theta this is provable, and the table measures the derivation rather than asserting
+it.* `gauss_math._anomaly_argmax` forms the anomaly column as
+`complement(conorm(clip(class_firing + theta, 0, 1)))`. With **one** known class there is
+exactly one class column, and `t_conorm(x, None, ...)` aggregates *column-wise* - so the
+conorm is the **identity**, and the anomaly label wins exactly when
+**`firing < (1 - theta)/2`**. Two consequences the chapter should absorb:
+
+1. **theta is a hard threshold on firing strength** in the one-class setting and cannot
+   express any decision a threshold cannot. Section 4.3 argues the weaker multi-class
+   version - that at theta=0.99 the rule degenerates to a max-membership rejector; the
+   one-class reduction makes it total at **every** theta, not just the shipped default.
+   Describe theta as a threshold parameterisation, not as a mechanism.
+2. **`REPRO_ANOM_CONORM` is inert in this configuration.** There is one column to
+   aggregate, so the conorm family cannot change a single decision. A conorm sweep run on
+   a one-class BETH fit measures nothing - which matters because section 4.3 sweeps conorm
+   families and `table_norm_conorm_matrix.py` exists to do exactly that on multi-class
+   data.
+
+*The Isolation Forest row is a control, not a finding.* `contamination` provably only sets
+`offset_` from a quantile of the training scores and never touches the trees, so its delta
+**must** be ~0. That it comes back 0.0003 is what licenses reading a non-zero delta
+elsewhere as real - and it is why one fit per seed is correct rather than a shortcut.
+
+*`nu` is the informative negative.* It enters libsvm's QP objective, so every value is a
+genuinely different fitted model - the only knob in the table that could have beaten
+thresholding by trading one decision surface for another. It does not: the refit moves the
+surface and buys nothing over sliding along a fixed one.
+
+*Secondary findings.* theta's J is **monotone** (+0.160 at theta=0 rising to +0.769 at
+theta=0.999), so on BETH there is no interior optimum and the shipped 0.99 default is
+near-best. **The proposal's usable band of theta = 0.5-0.8 does not transfer** - it came
+from Glass and RT-IOT2022. This is consistent with note 22's finding that the tightest
+false-alarm budget gave the best J, which is exactly what a threshold-in-disguise would do.
+The best operating point anywhere in this table is **iForest at `contamination=0.005`,
+J +0.864**; `contamination=0.001` is another coin flip (detection **0.464 +/- 0.481**).
+
+*What this does not say.* None of the knobs is useless - choosing an operating point is
+what they are for, and note 22 shows how much that choice is worth. The claim is narrower:
+none of them **adds** discriminative power over a threshold on the same score. Every arm is
+fitted on the same 20,000-row benign subsample per seed, so note 23's sample-count
+confound is not re-introduced, and no wall-clock is reported because this table is about
+decision curves.
 
 **Note 2.** Re-quoted at 10 seeds: 1st order 0.658 → 0.783 (Δ +0.125), 2nd order
 0.796 → 0.829 (Δ +0.033). The table now also carries the CART and Random Forest
