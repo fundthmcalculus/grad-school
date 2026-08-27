@@ -15,9 +15,15 @@ the whole point:
     wins, and by a lot. So both aggregations are run and both metrics reported;
     reporting only the flattering one would be the mistake.
 
-  * **The virtual channels are not needed.**  Everything here uses the 18 real,
-    physically measurable sensors; dropping the two "virtual" channels the file
-    allows (T40, P30) costs nothing (established on DS02 in `cmapss_ds02_rul.py`).
+  * **Real sensors only, as a deliberate simplification.** Everything here uses
+    the 18 real, physically measurable sensors; the loader (`load_ncmapss`)
+    does not read the file's two "virtual" channels (T40, P30) at all. An
+    earlier docstring here claimed dropping them "costs nothing, established
+    on DS02" -- that was never actually measured for this pipeline, and on
+    DS02 alone it is false: the original design-of-experiments' winning
+    config used T40/P30 and reached a lower RMSE than this real-sensors-only
+    one. See `cmapss_ds02_rul.py`'s docstring and
+    `research/proposal-defense/prose/04-fast-fis-synthesis-mog.md` §4.4.1.
 
 Same engine as the DS02 script -- the reusable `TribblePredictiveHealth`. The
 only twist pooling needs is that condition correction and the RUL cap are fit
@@ -29,7 +35,7 @@ Writes `cmapss_all_datasets_report.md`.
 
 Needs: h5py, numpy, pandas, scikit-learn, tribble-fis.  Run:
 
-    python cmapss_all_datasets.py --h5-dir NASA-CMAPSS
+    python cmapss_all_datasets.py --h5-dir data/nasa-cmapps2
 """
 
 import argparse
@@ -42,14 +48,11 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error
 
-from tribble_predictive_health import TribblePredictiveHealth, load_ncmapss
-from tribble_predictive_health.metrics import nasa_score, rmse
-from tribble_predictive_health.preprocessing import (
-    apply_condition_correction,
-    build_memory_features,
-    build_whole_cycle_features,
-    fit_condition_correction,
+from tribble_predictive_health import (
+    TribblePredictiveHealth,
+    load_or_build_many,
 )
+from tribble_predictive_health.metrics import nasa_score, rmse
 
 REPORT = "FuzzySystemsExperiments/cmapss_all_datasets_report.md"
 
@@ -95,48 +98,37 @@ CONFIGS = {
 }
 
 
-def _featurize(agg, df, sensors):
-    """Per-file feature table for one aggregation. Returns (table, feature_cols)."""
-    if agg == "whole_cycle":
-        return build_whole_cycle_features(df, sensors)
-    return build_memory_features(df, sensors)
-
-
 # ---------------------------------------------------------------------------
 # Load every file once, correct and featurise it, pool the small tables
 # ---------------------------------------------------------------------------
-def gather(h5_dir):
+def gather(h5_dir, rebuild_cache=False):
     """Return pooled {agg -> (train, test, feature_cols)}, plus the lists of
-    processed/skipped datasets. Each file is loaded, corrected against its own
-    baseline, featurised, and freed before the next, so peak memory stays near
-    one dataset."""
+    processed/skipped datasets. Each file's condition-corrected feature tables
+    come from the on-disk cache (`load_or_build_many`); on a cache miss the file
+    is loaded, corrected against its own baseline, featurised for every
+    aggregation from that single load, and cached, so peak memory stays near one
+    dataset and repeat runs skip the load/featurise entirely."""
     pooled = {agg: {"train": [], "test": []} for agg in CONFIGS}
     feature_cols = {}
     processed, skipped = [], []
     for path in sorted(glob.glob(os.path.join(h5_dir, "*.h5"))):
         name = os.path.basename(path).replace("N-CMAPSS_", "").replace(".h5", "")
         try:
-            dev, cond, sensors = load_ncmapss(path, "dev")
-            test, _, _ = load_ncmapss(path, "test")
+            bundles = load_or_build_many(path, list(CONFIGS), rebuild=rebuild_cache)
         except Exception as exc:  # the one truncated file
             skipped.append((name, f"{type(exc).__name__}"))
             continue
-        models = fit_condition_correction(dev, sensors, cond)
-        dev = apply_condition_correction(dev, sensors, cond, models)
-        test = apply_condition_correction(test, sensors, cond, models)
 
         for agg in CONFIGS:
-            tr, cols = _featurize(agg, dev, sensors)
-            te, _ = _featurize(agg, test, sensors)
-            feature_cols[agg] = cols
+            b = bundles[agg]
+            feature_cols[agg] = b.feature_cols
             # Unit numbers repeat across files; make a globally unique engine id.
-            for t in (tr, te):
+            for t in (b.dev, b.test):
                 t["dataset"] = name
                 t["engine"] = name + ":" + t["unit"].astype(str)
-            pooled[agg]["train"].append(tr)
-            pooled[agg]["test"].append(te)
+            pooled[agg]["train"].append(b.dev)
+            pooled[agg]["test"].append(b.test)
         processed.append(name)
-        del dev, test
         gc.collect()
 
     out = {}
@@ -282,10 +274,10 @@ def write_report(results, processed, skipped, blend=None):
         f.write("\n".join(lines) + "\n")
 
 
-def main(h5_dir):
+def main(h5_dir, rebuild_cache=False):
     t0 = time.perf_counter()
     print(f"Loading and pooling N-CMAPSS files from {h5_dir} ...")
-    pooled, processed, skipped = gather(h5_dir)
+    pooled, processed, skipped = gather(h5_dir, rebuild_cache=rebuild_cache)
     print(
         f"  pooled {len(processed)} datasets"
         + (f", skipped {len(skipped)}" if skipped else "")
@@ -321,5 +313,11 @@ def main(h5_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--h5-dir", default="NASA-CMAPSS")
-    main(parser.parse_args().h5_dir)
+    parser.add_argument("--h5-dir", default="data/nasa-cmapps2")
+    parser.add_argument(
+        "--rebuild-cache",
+        action="store_true",
+        help="Rebuild the preprocessing cache instead of reading it.",
+    )
+    args = parser.parse_args()
+    main(args.h5_dir, rebuild_cache=args.rebuild_cache)

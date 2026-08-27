@@ -15,7 +15,6 @@ fit_featurized, so each of the ~80 fits is just cap/scale/solve.
 """
 
 import os
-import sys
 
 import matplotlib
 
@@ -24,7 +23,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, "FuzzySystemsExperiments")
+from _ds02_harness import bootstrap  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments")
 from tribble_predictive_health import (
     TribblePredictiveHealth,
     load_ncmapss,
@@ -35,7 +36,7 @@ from tribble_predictive_health.preprocessing import (  # noqa: E402
     fit_condition_correction,
 )
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5 = "data/nasa-cmapps2/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
 

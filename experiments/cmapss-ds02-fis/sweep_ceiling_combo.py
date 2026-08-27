@@ -14,14 +14,13 @@ import contextlib
 import csv
 import io
 import os
-import sys
 
-sys.path.insert(0, "FuzzySystemsExperiments")
-sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
 
-from _ds02_harness import load_corrected, rmse  # noqa: E402
+from _ds02_harness import bootstrap, load_corrected, rmse  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments", os.path.dirname(__file__))
 from tribble_predictive_health.preprocessing import (  # noqa: E402
     build_memory_features,
     cap_rul,

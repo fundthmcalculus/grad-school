@@ -1,0 +1,6 @@
+Dataset,NERFCM given k (ARI),select_coverage_cover (ARI),select_multiscale (best-band ARI),single-linkage given k (ARI),beta-plateau (ARI),Decision-rule gap
+"ECG5000 (N=5000, k_true=5)",0.593 ± 0.047,"0.715 (k=25, cov=0.94)",0.715 (bands=[25]),0.000,"0.716 (k=23, cov=0.95)","gap=0.122, within 0.05: no"
+"FordA (N=4921, k_true=2)",0.000 ± 0.000,"0.002 (k=18, cov=0.59)",0.002 (bands=[18]),-0.000,"0.001 (k=14, cov=0.61)","gap=0.001, within 0.05: yes"
+"ElectricDevices (N=16637, k_true=7)",0.175 ± 0.000,"0.147 (k=743, cov=0.48)",0.147 (bands=[743]),-0.000,"-0.029 (k=247, cov=0.79)","gap=0.028, within 0.05: yes"
+"StarLightCurves (N=9236, k_true=3)",0.482 ± 0.060,"0.664 (k=7, cov=0.88)",0.664 (bands=[7]),0.000,"0.664 (k=7, cov=0.88)","gap=0.182, within 0.05: no"
+"Crop (N=24000, k_true=24)",0.030 ± 0.012,"0.114 (k=1142, cov=0.60)","0.098 (bands=[934, 892])",n/a (N > bonus cap),N/A,"gap=0.084, within 0.05: no"

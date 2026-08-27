@@ -20,10 +20,10 @@ import contextlib
 import csv
 import io
 import os
-import sys
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _ds02_harness import load, rmse  # noqa: E402
+from _ds02_harness import bootstrap, load, rmse  # noqa: E402
+
+bootstrap(os.path.dirname(__file__))
 
 from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 

@@ -1,0 +1,22 @@
+# Configuration for the generated index page
+---
+index:
+    favicon: example-index-favicon.ico
+
+    nav:
+        - Tribble Approach: tribble-approach.md
+
+    title: PhD Proposal Defense
+
+# Configuration for the slides
+slides:
+    charset: utf-8
+    separator_notes: "^Notes?:"
+    separator_vertical: ^\s*-v-\s*$
+    separator: ^\s*---\s*$
+    theme: white
+
+revealjs:
+    height: 1080
+    width: 1920
+    transition: fade

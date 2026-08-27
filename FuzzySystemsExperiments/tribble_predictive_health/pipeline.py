@@ -82,6 +82,7 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
         member_function="gaussian",
         trapz_method="fast",
         trapz_width_reg=0.0,
+        firing_exponent=1.0,
         max_samples=2000,
         random_state=42,
     ):
@@ -112,6 +113,7 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
         self.member_function = member_function
         self.trapz_method = trapz_method
         self.trapz_width_reg = trapz_width_reg
+        self.firing_exponent = firing_exponent
         self.max_samples = max_samples
         self.random_state = random_state
 
@@ -201,6 +203,7 @@ class TribblePredictiveHealth(BaseEstimator, RegressorMixin):
             member_function=self.member_function,
             trapz_method=self.trapz_method,
             trapz_width_reg=self.trapz_width_reg,
+            firing_exponent=self.firing_exponent,
         )
         with contextlib.redirect_stdout(io.StringIO()):  # TRIBBLE is chatty
             self.regressor_.fit(X_train, y_train)

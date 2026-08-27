@@ -1,0 +1,307 @@
+# Authoritative benchmark dataset specifications.
+#
+# WHY THIS FILE EXISTS
+# --------------------
+# Dataset dimensions were hardcoded in every prose chapter and drifted apart
+# from each other and from the data. At the time this file was written, the
+# repository held FOUR different feature counts for RT-IOT2022 (83 in
+# prose/DATASETS.md, 82 in Appendix A.7, 83 in the loader docstring, 81 actually
+# on disk), two row counts for California Housing (20,433 in A.7 vs the 20,640
+# its own loader documents), and a BETH row count off by more than 3x. See
+# grad-school#92.
+#
+# This file is the single source of truth. `build_pdf.py` substitutes these
+# values into the prose at build time, so a spec change reaches every chapter on
+# the next build and no chapter can drift from another.
+#
+# HOW TO USE IT FROM PROSE
+# ------------------------
+#   {{dataset.concrete.shape}}      ->  1,030 x 8      (x is a real times sign)
+#   {{dataset.concrete.rows}}       ->  1,030
+#   {{dataset.concrete.features}}   ->  8
+#   {{dataset.glass.classes}}       ->  6
+#   {{dataset.beth.rows_approx}}    ->  1.14M
+#   {{dataset.shuttle.name}}        ->  NASA/UCI Statlog Shuttle
+#
+# The full field list, including the derived ones, is documented in
+# `dataset_specs.py`. An unknown dataset key or field FAILS THE BUILD rather
+# than passing the raw braces through to the PDF -- a wrong number in a defense
+# document is the failure this file exists to prevent, so it is not allowed to
+# degrade quietly.
+#
+# HOW TO CHANGE A NUMBER
+# ----------------------
+# Do not hand-edit the numbers. Edit the `verify:` block if the data moved, then
+# run the checker, which re-derives every locally-checkable value from the files
+# themselves and reports disagreements:
+#
+#     uv run --project tribble-fis --with pyyaml python reproduce/dataset_specs.py --verify
+#
+# `features` throughout means FEATURES THAT REACH A MODEL: shipped columns minus
+# the label, minus any second label, minus non-numeric columns the loaders drop,
+# minus index columns. That is the number the prose should quote, and it is not
+# always the count advertised by the dataset's publisher; where the two differ
+# the row carries a `published_features` field and a note saying why.
+#
+# Last full re-derivation: 2026-08-27.
+
+datasets:
+  # --------------------------------------------------------------------- #
+  # Regression
+  # --------------------------------------------------------------------- #
+  concrete:
+    name: UCI Concrete Compressive Strength
+    task: regression
+    rows: 1030
+    features: 8
+    verify:
+      method: csv
+      path: data/Concrete_Data.csv
+      label_column: Strength
+
+  diabetes:
+    name: Diabetes (sklearn)
+    task: regression
+    rows: 442
+    features: 10
+    verify:
+      method: sklearn
+      loader: load_diabetes
+
+  california_housing:
+    name: California Housing (sklearn, canonical)
+    task: regression
+    rows: 20640
+    features: 8
+    note: >-
+      Appendix A.7 carried 20,433 rows until 2026-08-27. The generator's own
+      loader (reproduce/regression_scale/_datasets.py) documents 20,640, and
+      sklearn returns 20,640; the loader applies no filtering, so 20,433 had no
+      source. Corrected here.
+    verify:
+      method: sklearn
+      loader: fetch_california_housing
+
+  bikeshare:
+    name: Bike Sharing Demand (hourly)
+    task: regression
+    rows: 17379
+    features: 12
+    note: >-
+      The CSV ships 17 columns. `instant` is a row counter and `dteday` a date
+      string, both long dropped. `casual` and `registered` were NOT: they are
+      the target's two addends (casual + registered == cnt exactly, on every
+      row), so the model was being handed the answer -- which is why the RF
+      reference on this row read a perfect 1.000. Dropped as of 2026-08-27,
+      leaving the 12 genuine calendar/weather features.
+    verify:
+      method: csv
+      path: data/bikeshare-hour.csv
+      label_column: cnt
+      drop_columns: [instant, dteday, casual, registered]
+
+  superconductivity:
+    name: Superconductivity (UCI id 464)
+    task: regression
+    rows: 21263
+    features: 81
+    note: >-
+      Decorrelated via sklearn.cluster.FeatureAgglomeration before every model;
+      the 81 here is the count as shipped, before that reduction.
+    verify:
+      method: csv
+      path: data/regression_scale/superconduct_train.csv
+      label_column: critical_temp
+      optional: true # gitignored; fetched on first run of the pilot
+
+  # --------------------------------------------------------------------- #
+  # Classification
+  # --------------------------------------------------------------------- #
+  glass:
+    name: Glass (UCI)
+    task: classification
+    rows: 214
+    features: 9
+    classes: 6
+    verify:
+      method: csv
+      path: data/glass.csv
+      label_column: Type
+
+  wine:
+    name: Wine (sklearn)
+    task: classification
+    rows: 178
+    features: 13
+    classes: 3
+    verify:
+      method: sklearn
+      loader: load_wine
+
+  breast_cancer:
+    name: Breast Cancer (sklearn)
+    task: classification
+    rows: 569
+    features: 30
+    classes: 2
+    verify:
+      method: sklearn
+      loader: load_breast_cancer
+
+  digits:
+    name: Digits (sklearn)
+    task: classification
+    rows: 1797
+    features: 64
+    classes: 10
+    verify:
+      method: sklearn
+      loader: load_digits
+
+  phiusiil:
+    name: PhiUSIIL phishing URL
+    task: binary classification
+    rows: 235795
+    features: 50
+    classes: 2
+    published_features: 54
+    note: >-
+      The shipped CSV has 56 columns: one label (`label`) and five non-numeric
+      columns (FILENAME, URL, Domain, TLD, Title) that every loader here drops,
+      leaving 50 that reach a model. The prose quoted 54 -- the count you get by
+      subtracting only the label and FILENAME -- which counts four text columns
+      as modelled features. 50 is the number the measurements were made on.
+    verify:
+      method: csv
+      path: data/PhiUSIIL_Phishing_URL_Dataset.csv
+      label_column: label
+      optional: true # gitignored; recoverable from tribble-fis history
+
+  rt_iot2022:
+    name: RT-IOT2022
+    task: classification
+    rows: 123117
+    features: 81
+    classes: 12
+    published_features: 83
+    note: >-
+      85 shipped columns: an unnamed index column, 83 named non-label columns,
+      and the `Attack_type` label. Two of the 83 (`proto`, `service`) are
+      strings that select_dtypes drops, leaving 81 real features. Until
+      2026-08-27 `load_rt_iot2022` sliced `df.iloc[:, :-1]` and kept every
+      numeric column, so the unnamed index survived as an 82nd feature -- and
+      it is not a row number: the file concatenates the twelve per-class
+      captures and the counter RESTARTS AT ZERO for each, so any value above
+      8,107 identifies `DOS_SYN_Hping` on its own. The loader now drops it.
+    verify:
+      method: csv
+      path: data/RT_IOT2022.csv
+      label_column: Attack_type
+      drop_columns: ["Unnamed: 0", proto, service]
+
+  # --------------------------------------------------------------------- #
+  # Anomaly / open-set detection
+  # --------------------------------------------------------------------- #
+  beth:
+    name: BETH host telemetry
+    task: binary classification
+    rows: 1141078
+    features: 8
+    classes: 2
+    rows_train: 763144
+    rows_val: 188967
+    rows_test: 188967
+    note: >-
+      Row count is the three labelled splits summed (763,144 + 188,967 +
+      188,967). `load_beth`'s docstring claims 3.8M, which is the size of the
+      full BETH capture, not of the labelled subset this work uses; A.7's 1.14M
+      was right. Of the 16 shipped columns, five are non-numeric and dropped,
+      `evil` is the label, and `sus` is BETH's SECOND label (PROVENANCE_MAP note
+      22) which table_4_11 drops alongside `timestamp` as leaky -- leaving the 8
+      features the table is actually fitted on.
+    verify:
+      method: csv
+      paths:
+        - data/beth/labelled_training_data.csv
+        - data/beth/labelled_validation_data.csv
+        - data/beth/labelled_testing_data.csv
+      label_column: evil
+      drop_columns: [sus, timestamp, processName, hostName, eventName, stackAddresses, args]
+      optional: true # ~300 MB, gitignored; see data/.gitignore for the download
+
+  # --------------------------------------------------------------------- #
+  # Clustering / structure discovery
+  # --------------------------------------------------------------------- #
+  shuttle:
+    name: NASA/UCI Statlog Shuttle
+    task: classification
+    rows: 58000
+    features: 9
+    classes: 7
+    note: >-
+      The prose said "seven sensor channels" and A.7 said "58,000 x 7" in two
+      places; the shipped file has nine attributes (atrib1..atrib9) plus the
+      `clase` label, and Statlog Shuttle is a nine-attribute set. The 7 was the
+      CLASS count restated as a feature count. Corrected here.
+    verify:
+      method: csv
+      path: data/shuttle.csv
+      label_column: clase
+
+  psychiatric:
+    name: Psychiatric-evaluation set (private)
+    task: clustering
+    rows: 135000
+    features: 165
+    note: >-
+      Private and not redistributable; feature names were anonymized before the
+      author saw them. NOT independently verifiable and deliberately marked
+      unverifiable rather than given a fake verify block -- the checker reports
+      it as unchecked, which is the honest state.
+    verify:
+      method: none
+
+  # --------------------------------------------------------------------- #
+  # Non-coordinate / relational family (Goal G2)
+  # --------------------------------------------------------------------- #
+  ecg5000:
+    name: ECG5000
+    task: time-series classification
+    rows: 5000
+    features: 140
+    verify:
+      method: none # via aeon.datasets.load_classification, network-fetched
+
+  forda:
+    name: FordA
+    task: time-series classification
+    rows: 4921
+    features: 500
+    classes: 2
+    verify:
+      method: none
+
+  crop:
+    name: Crop
+    task: time-series classification
+    rows: 24000
+    features: 46
+    classes: 24
+    verify:
+      method: none
+
+  electric_devices:
+    name: ElectricDevices
+    task: time-series classification
+    rows: 16637
+    features: 96
+    verify:
+      method: none
+
+  starlight_curves:
+    name: StarLightCurves
+    task: time-series classification
+    rows: 9236
+    features: 1024
+    verify:
+      method: none

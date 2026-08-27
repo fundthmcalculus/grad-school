@@ -1,0 +1,40 @@
+label:       verify-fis1435811-2026-08-23
+generated:   2026-08-23T15:12:44Z
+tribble-fis: 1435811fbc2c1a7fa596317c06cdedf687b0e8b0
+tribble-cluster: 635ed6ed713298b9823ff226de533e68a8917c1b
+grad-school: fc6472843ea20f0b6a7005d68cdd9774fb3a04cb
+seeds:       0,1,2,3,4,5,6,7,8,9
+thetas:      0.5,0.6,0.7,0.8,0.9,0.99,1.1 (table_4_4b operating curve)
+
+machine:
+  host             NEX-210200
+  os               MINGW64_NT-10.0-26200
+  kernel           MINGW64_NT-10.0-26200 3.4.10-2e2ef940.x86_64 x86_64
+  cpu              Intel(R) Core(TM) i9-14900HX
+  cores            32 logical
+  ram              95.6 GiB (102.7 GB decimal)
+  governor         n/a
+  boost            n/a
+  gpu              NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 610.74
+  python           Python 3.13.7
+  numpy            2.4.6  scipy 1.17.1  sklearn 1.9.0  python 3.13.7
+  blas             scipy-openblas 0.3.31.188.0
+
+status:
+  table_concrete_reconciliation          ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_hyperparam_normalization         ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_g5_output_partitioning           ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_g5b_skew_sweep                   ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_1_mog_baselines                ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=10
+  table_6_1_model_family                 ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=3
+  table_norm_conorm_matrix               ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_4_openset                      ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_a1_feature_scoring               ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_8_mf_dedup                     ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_3_1_pvat_scaling                 ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=2
+  table_3_1_reorder_three_arm            ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=10
+  table_3_2_memory_precision             ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_3_4_gpu_speedups                 ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_3_7_g2_dtw_nonmetric             ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_3_7_g2_downstream                ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_5_x_ch5_selection                ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=6

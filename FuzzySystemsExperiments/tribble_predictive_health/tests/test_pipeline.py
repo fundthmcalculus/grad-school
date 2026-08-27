@@ -20,7 +20,10 @@ from tribble_predictive_health import TribblePredictiveHealth  # noqa: E402
 
 # tests/ -> tribble_predictive_health/ -> FuzzySystemsExperiments/ -> repo root
 DS02 = (
-    pathlib.Path(__file__).resolve().parents[3] / "NASA-CMAPSS" / "N-CMAPSS_DS02-006.h5"
+    pathlib.Path(__file__).resolve().parents[3]
+    / "data"
+    / "nasa-cmapps2"
+    / "N-CMAPSS_DS02-006.h5"
 )
 
 
@@ -125,3 +128,26 @@ def test_ds02_end_to_end_on_real_data():
     assert len(engine.predict(test)) == len(frame)
     for _, sub in frame.groupby("unit"):
         assert np.all(np.diff(sub.sort_values("cycle")["rul"].to_numpy()) <= 0)
+
+
+def test_firing_exponent_param_roundtrips():
+    """The new knob is a plain, clonable estimator parameter (default 1.0)."""
+    assert TribblePredictiveHealth().firing_exponent == 1.0
+    eng = TribblePredictiveHealth(firing_exponent=0.5)
+    assert eng.get_params()["firing_exponent"] == 0.5
+
+
+def test_firing_exponent_is_forwarded_to_the_regressor():
+    """It reaches the underlying TribbleRegressor. Skipped on a tribblefis that
+    predates the knob (grad-school pins one that has it)."""
+    import inspect
+
+    from tribblefis.gaussian_regressor import TribbleRegressor
+
+    if "firing_exponent" not in inspect.signature(TribbleRegressor).parameters:
+        pytest.skip("installed tribblefis predates firing_exponent")
+    df = _run_to_failure()
+    eng = TribblePredictiveHealth(
+        aggregation="whole_cycle", firing_exponent=0.5, random_state=0
+    ).fit(df, df["rul"])
+    assert eng.regressor_.firing_exponent == 0.5
