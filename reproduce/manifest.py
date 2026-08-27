@@ -164,6 +164,36 @@ EXPERIMENTS = [
         "zero. Use REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1 for Fig 4.2.",
     ),
     Experiment(
+        id="table-4-x-beth-anomaly",
+        title="BETH host telemetry: one-class anomaly detection on the full 763k training split",
+        chapter="Ch4",
+        produces="Table 4.x + Table 4.x(b) (BETH theta operating curve)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_x_beth_anomaly.py"),
+        hardware="any",
+        datasets=["BETH (data/beth/, gitignored -- see data/.gitignore)"],
+        outputs=[
+            "reproduce/outputs/table_4_x_beth_anomaly.md",
+            "reproduce/outputs/table_4_x_beth_theta_sweep.md",
+        ],
+        notes="VERIFIED RUNNING (10 seeds, 1m37s). This is the BETH experiment "
+        "table_4_4_openset.py could not run: leave-one-class-out needs >=3 classes and "
+        "BETH is binary. ONE-CLASS BY NECESSITY, not by choice -- all 158,432 positives "
+        "are in the test split, the 763,144-row train and 188,967-row val splits are "
+        "100% benign, so a supervised RF fits without error and predicts constant 0. "
+        "Those arms are emitted as N/A WITH THE REASON IN THE CELL. Two columns are "
+        "dropped before any fit: `sus` is BETH's second LABEL (1 for 100% of evil rows; "
+        "keeping it scores the annotator) and `timestamp` separates the three files "
+        "rather than the behaviour -- the same drop beth-anomaly.py makes. Dropped here, "
+        "not in load_beth(), so table_4_4_openset's archived numbers do not move. "
+        "theta is calibrated on the benign val split under REPRO_BETH_FA_BUDGET "
+        "(default 0.01); the finding is that it DOES NOT TRANSFER -- 0.0093 val false "
+        "alarm becomes 0.1498 on test, 16.1x. n_jobs is capped at 8 "
+        "(REPRO_BETH_N_JOBS) and BLAS threads at 8 (REPRO_BLAS_THREADS) because "
+        "n_jobs=-1 on a 32-core host hung the machine and segfaulted the process; that "
+        "was thread oversubscription, never memory (peak 521 MB).",
+    ),
+    Experiment(
         id="table-g5-output-partitioning",
         title="G5: uniform vs quantile vs hybrid output partitioning",
         chapter="Ch4",

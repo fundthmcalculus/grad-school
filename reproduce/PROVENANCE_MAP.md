@@ -255,7 +255,60 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
+| *(no prose table yet — A.7.3)* | `table_4_x_beth_anomaly.py` | `outputs/table_4_x_beth_anomaly.{md,csv}`, `outputs/table_4_x_beth_theta_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95) — note 22 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
+
+**Note 22 — BETH is a one-class benchmark, and the issue that asked for supervised
+baselines on it could not have been satisfied.** grad-school #95 specified "train on
+the BETH training split, report AUC vs. RF / ANFIS." Counting `evil` per shipped
+split settles it: **train 763,144 rows / 0 positives, val 188,967 / 0, test 188,967 /
+158,432.** Every positive BETH ships is in the test split. A supervised RF fits the
+training split without raising anything and predicts the constant 0 — 16.2% accuracy,
+AUC 0.5 — so the failure mode here is a *plausible-looking number*, not a crash, which
+is the class of defect this map exists for. `table_4_x_beth_anomaly.py` therefore runs
+the one-class protocol BETH supports and emits the supervised arms as **N/A with the
+reason in the cell**. No arm in that table is fitted on test-split labels.
+
+*Two of the ten columns `load_beth()` returns are not features.* `sus` is BETH's
+second **label** — the heuristic suspicion annotation — and it is 1 for **158,432 of
+158,432** evil rows, so alone it detects at 1.000/0.427 and any arm given it is scoring
+the annotator. `timestamp` is a per-capture session clock whose ranges separate the
+three files rather than the behaviour. Both are dropped before any fit, matching
+`FuzzySystemsExperiments/beth-anomaly.py`, leaving 8 features. The drop is in the
+generator, **not** in `load_beth()`, because `table_4_4_openset.py` shares that loader
+and narrowing it would silently move an already-archived table.
+
+*The finding worth quoting is that the calibration does not transfer.* θ chosen on the
+benign validation split at a 1% false-alarm budget realizes **0.0093 on validation and
+0.1498 on test — 16.1×**. Both splits are benign-only draws from the same capture, so
+this is a property of BETH's benign test rows, not of the rule. A false-alarm budget
+set on BETH's validation split cannot be believed on its test split; every arm is
+matched at the validation rate, so they stay comparable to each other.
+
+*Isolation Forest reads as broken at the matched operating point and is not.* It scores
+det=0.001 ± 0.002 at fa=0.021 ± 0.005 — worse than chance by Youden's J — while its
+score-based **AUC is 0.898 ± 0.005**. Its ranking is fine; what fails is threshold
+placement, because `contamination` fixes the cut on the *training* score distribution
+and BETH's test benign rows sit elsewhere. Reporting the two columns together is what
+makes that legible; either alone would mislead.
+
+*A supervised separability probe exists and is deliberately not in the table.* It has to
+train on the only split with positives, and the test split's 188,967 rows hold just
+**4,002 distinct feature vectors (2.12%)**, so an i.i.d. row split trains on a copy of
+nearly every row it scores (AUC 1.000 — a lookup table succeeding). A GroupShuffleSplit
+on feature-vector identity still scores 0.999 AUC because both halves are one capture.
+It is printed to stdout only: a cell that is safe to read only alongside its note is a
+cell that gets quoted without the note.
+
+*Operational note.* `n_jobs=-1` on this 32-core host hung the machine and killed the
+process with SIGSEGV at a nondeterministic seed, with no Python traceback. That was
+thread oversubscription — loky spawns one interpreter per core on Windows and each
+builds its own BLAS pool, against an OpenBLAS compiled for fewer threads — and **not**
+memory: peak resident set was 521 MB of 95.6 GB, and BETH's three frames are 91 MB
+combined. Diagnosing it as memory pressure would have led to downsampling the training
+split, which is precisely what #95 forbids. The generator now caps `n_jobs` at 8
+(`REPRO_BETH_N_JOBS`) and BLAS threads at 8 (`REPRO_BLAS_THREADS`, set before the numpy
+import) and completes ten seeds in 1m37s.
 
 **Note 2.** Re-quoted at 10 seeds: 1st order 0.658 → 0.783 (Δ +0.125), 2nd order
 0.796 → 0.829 (Δ +0.033). The table now also carries the CART and Random Forest

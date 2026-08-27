@@ -12,3 +12,12 @@ PhiUSIIL_Phishing_URL_Dataset.csv
 # superconduct_train.csv is ~24 MB, too large to vendor for a pilot that
 # isn't a committed measurement yet.
 regression_scale/
+
+# BETH host telemetry (labelled_{training,validation,testing}_data.csv).
+# ~300 MB across the three files, far over the 5 MB vendoring limit
+# (AGENTS.md non-negotiable 8). Public download:
+#   https://www.kaggle.com/datasets/katehighnam/beth-dataset
+# Place the three labelled_*.csv files in data/beth/. Used by
+# reproduce/tables/table_4_x_beth_anomaly.py; NOTE that `sus` in those files is
+# a second LABEL, not a feature -- see PROVENANCE_MAP.md note 22.
+beth/
