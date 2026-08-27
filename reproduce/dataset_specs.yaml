@@ -169,12 +169,12 @@ datasets:
     note: >-
       85 shipped columns: an unnamed index column, 83 named non-label columns,
       and the `Attack_type` label. Two of the 83 (`proto`, `service`) are
-      strings that select_dtypes drops, leaving 81 real features. KNOWN LOADER
-      BUG, tracked separately and deliberately NOT fixed here: `load_rt_iot2022`
-      slices `df.iloc[:, :-1]` and then keeps every numeric column, so the
-      unnamed index survives and the models are fitted on 82 columns, one of
-      which is the row number. Fixing it changes measured results, so it is a
-      separate change; this row records the true feature count, which is 81.
+      strings that select_dtypes drops, leaving 81 real features. Until
+      2026-08-27 `load_rt_iot2022` sliced `df.iloc[:, :-1]` and kept every
+      numeric column, so the unnamed index survived as an 82nd feature -- and
+      it is not a row number: the file concatenates the twelve per-class
+      captures and the counter RESTARTS AT ZERO for each, so any value above
+      8,107 identifies `DOS_SYN_Hping` on its own. The loader now drops it.
     verify:
       method: csv
       path: data/RT_IOT2022.csv

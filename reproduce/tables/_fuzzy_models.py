@@ -126,9 +126,18 @@ def load_phiusiil(sample_size=20000):
 
 
 def load_rt_iot2022(sample_size=None):
-    """RT-IOT2022: 123k rows × 83 features, 12 classes (open-set detection).
+    """RT-IOT2022: 123,117 rows × 81 features, 12 classes (open-set detection).
 
     Returns (X, y) or None if file not found.
+
+    The shipped CSV leads with an unnamed index column, which pandas reads as
+    `Unnamed: 0`. It is numeric, so slicing off the label and keeping every
+    numeric column kept it as an 82nd FEATURE -- and it is not a harmless row
+    number: the file concatenates the twelve per-class captures and the counter
+    RESTARTS AT ZERO for each one, so it encodes the label. Any value above
+    8,107 belongs to `DOS_SYN_Hping` and to nothing else. `load_bikeshare`
+    already drops `instant` for exactly this reason; this loader did not.
+    Dropping it here changes every RT-IOT2022 number -- see PROVENANCE_MAP.
     """
     local = os.path.join(DATA_DIR, "RT_IOT2022.csv")
     try:
@@ -136,6 +145,9 @@ def load_rt_iot2022(sample_size=None):
         y = df.iloc[:, -1]  # last column is the target
         X = df.iloc[:, :-1]
         X = X.select_dtypes(include=[np.number]).astype(float)
+        leaky_index = [c for c in X.columns if str(c).startswith("Unnamed")]
+        if leaky_index:
+            X = X.drop(columns=leaky_index)
         y = np.asarray(y)
         if sample_size and len(X) > sample_size:
             idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
