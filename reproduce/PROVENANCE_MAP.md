@@ -1152,3 +1152,43 @@ from 0.126 to 0.145 — close to the 0.143 the prose already reports — so the
 qualitative reading is unchanged and the full re-quote is deferred to #184 rather
 than rushed. One seed is one seed: this bounds the effect, it does not replace the
 five-seed table.
+
+---
+
+**Note 26 — D8's Table 4.7b blocker is already cleared by the pin the repository
+is on, and nobody noticed.** *(2026-08-27.)*
+
+Note 21 and CHECKLIST **D8** both say, in terms, *do not overwrite Table 4.7b
+until D8 is settled*: `_kmeans_labels_1d` had swapped sklearn's k-means++ for a
+single uniform-random start (tribble-fis #95), and it reaches the complement rule
+through `create_gaussian_membership_dict → fit_gaussians → fit_gaussian_mixture_1d`.
+Both of the causes that blocked a re-quote have since landed upstream, and **both
+are ancestors of the currently pinned `353162c`**:
+
+| cause | fixed by | in the pin? |
+|---|---|---|
+| B14 — `wasserstein_distance` ignored the CDF gap width | `5253aa0` (#171) | yes |
+| D8 — `_kmeans_labels_1d` single-start init | `353162c` (#191) | **it *is* the pin** |
+
+tribble-fis #191 ("swap safe candidates, keep hot-path ones") put
+`sklearn.cluster.KMeans` back with `n_init="auto"`, restoring k-means++, on
+2026-08-25. Verified in the running environment rather than from the diff: the
+`tribblefis` the harness imports resolves to the submodule source tree, and
+`inspect.getsource(gauss_math._kmeans_labels_1d)` at that pin contains `KMeans(`
+and not `kmeans_1d(`.
+
+**This is the third instance of one failure mode**, and it is worth naming as
+such rather than fixing quietly a third time. §7.3 already records it for BETH:
+`TribbleOneClassDetector` arrived upstream and retired a stated blocker while the
+proposal went on recording it as open. `check_prose.py` watches for *numbers*
+drifting between prose and harness; it cannot see a **capability or a fix**
+arriving in a submodule and silently retiring a recorded blocker. Note 22's
+lesson — a pin bump should ask which recorded blockers the new pin removes — was
+written and then not applied to D8, which the very next pin bump had settled.
+
+Consequence: the ten-seed RT-IOT2022 re-run of `table_4_4_openset` at this pin is
+no longer a "measurement of the current code" to be reported beside the prose. It
+is a legitimate run of record for Table 4.7b, and the D8 hold on re-quoting is
+lifted. What D8 still carries is unrelated to this table: the Chapter 3 compiler
+question (**B15**) and §4.3.2/G5 absorbing the `pin_extremes` default flip
+(**#102**).

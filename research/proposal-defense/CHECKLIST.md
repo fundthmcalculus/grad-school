@@ -434,6 +434,47 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       should move the trapezoid rows and nothing else; if a Gaussian row moves, something else
       changed too and the bump is not the explanation.
 
+      ---
+
+      ### 📌 Standing procedure — every pin bump runs BOTH checks, not just the first
+
+      The check above asks *what did this pin **move**?* That is the half we do. The half we
+      keep missing is *what did this pin **fix**?* — and it has now cost us three times:
+
+      | recorded blocker | retired by | how long it sat open after the fix |
+      |---|---|---|
+      | BETH open-set "needs a one-class protocol, a research decision" | `TribbleOneClassDetector` landing upstream | months; found only when the experiment was attempted anyway (§7.3, note 22) |
+      | **D8** — `wasserstein_distance` CDF-gap defect (B14) | tribble-fis #171 `5253aa0` | in the pin, unnoticed |
+      | **D8** — `_kmeans_labels_1d` single-start init, which blocked re-quoting Table 4.7b | tribble-fis #191 `353162c` — **the pin itself** | 2 days, and note 22's own lesson had already been written (note 26) |
+
+      `check_prose.py` compares prose numbers against harness output, so it sees a number
+      drift. **No check looks in the other direction**: a capability or a defect fix arriving
+      in a submodule, silently retiring a blocker the document still records as open. That is
+      the audit direction with nothing behind it, and a stale blocker is worse than a stale
+      number — it suppresses work that is already unblocked.
+
+      **On every pin bump, before running anything:**
+
+      - [ ] Read the upstream log across the bump for *fixes*, not just changes:
+            `git -C tribble-fis log --oneline <old>..<new>` and flag every commit whose subject
+            is a fix, a restoration, or a new capability.
+      - [ ] Grep this file and `PROVENANCE_MAP.md` for blockers those commits could retire —
+            by function name, class name and defect: e.g. `grep -n "_kmeans_labels_1d\|wasserstein" CHECKLIST.md reproduce/PROVENANCE_MAP.md`.
+      - [ ] For each hit, **verify in the running environment, not from the diff** — a stale
+            wheel will happily serve the old code while the source tree shows the fix:
+            ```
+            uv run --project tribble-fis python -c "import inspect, tribblefis; from tribblefis import gauss_math as G; print(tribblefis.__file__); print(inspect.getsource(G._kmeans_labels_1d))"
+            ```
+            (See the reinstall trap: the dist name is hyphenated and `--no-cache` is required,
+            or `uv` serves the cached wheel and the sweep re-measures the old code.)
+      - [ ] Tick, or annotate with the retiring commit, every blocker the bump has settled —
+            **in the same change as the bump**, not later. An untouched blocker after a bump
+            should be a deliberate decision, not an omission.
+
+      Worth automating rather than remembering: a script that takes the two pins, lists
+      upstream fix-shaped commits, and greps the checklist for each touched symbol would have
+      caught all three of the rows above. Until it exists, this list is the procedure.
+
       Found in `experiments/overlap-modeling` (stage 4);
       `experiments/overlap-modeling/diagnose_trapz_defect.py` regenerates the three
       measurements above, and `experiments/overlap-modeling/RESULTS.md` §"Stage 4" is the full
