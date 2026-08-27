@@ -130,10 +130,10 @@ def md_table(df: pd.DataFrame, cols, headers, fmts) -> str:
         "| " + " | ".join(headers) + " |",
         "|" + "|".join(["---"] + ["---:"] * (len(headers) - 1)) + "|",
     ]
-    for _, r in df.iterrows():
+    for r in df.itertuples(index=False):
         cells = []
         for c, f in zip(cols, fmts):
-            v = r.get(c, np.nan)
+            v = getattr(r, c, np.nan)
             cells.append(
                 "--"
                 if (isinstance(v, float) and not np.isfinite(v))
@@ -365,8 +365,8 @@ def fig_cost_quality(tables, path):
         placed = []  # y positions already used, in data units
         min_gap = 0.045 * span
         offsets = []
-        for _, r in d.iterrows():
-            y = float(r["rmse"])
+        for r in d.itertuples(index=False):
+            y = float(r.rmse)
             # Push *upward* only. Pushing both ways sent the lowest cluster's
             # labels through the bottom spine and over the x-axis title; going
             # one direction keeps every label inside a range we can pad for.
@@ -374,17 +374,19 @@ def fig_cost_quality(tables, path):
                 y += min_gap
             placed.append(y)
             offsets.append(y)
-        d = d.assign(_label_y=offsets)
+        # Named "label_y", not "_label_y": a leading underscore would collide
+        # with itertuples' own field-renaming rules for the loop below.
+        d = d.assign(label_y=offsets)
         ax.set_ylim(
             d.rmse.min() - 0.06 * span, max(d.rmse.max(), max(offsets)) + 0.08 * span
         )
-        for i, r in d.iterrows():
-            y = float(r["_label_y"])
+        for i, r in enumerate(d.itertuples(index=False)):
+            y = float(r.label_y)
             right = i % 2 == 0
             ax.annotate(
-                ARM_LABEL.get(r["arm"], r["arm"]),
-                xy=(r["total_s"], r["rmse"]),
-                xytext=(r["total_s"], y),
+                ARM_LABEL.get(r.arm, r.arm),
+                xy=(r.total_s, r.rmse),
+                xytext=(r.total_s, y),
                 textcoords="data",
                 ha="left" if right else "right",
                 va="center",
@@ -395,12 +397,12 @@ def fig_cost_quality(tables, path):
                     dict(
                         arrowstyle="-", color=GRID, linewidth=0.8, shrinkA=2, shrinkB=4
                     )
-                    if abs(y - r["rmse"]) > 1e-9
+                    if abs(y - r.rmse) > 1e-9
                     else None
                 ),
             )
             # `xytext` in data coords sits *on* the point; nudge it clear.
-            ax.texts[-1].set_position((r["total_s"] * (1.35 if right else 0.74), y))
+            ax.texts[-1].set_position((r.total_s * (1.35 if right else 0.74), y))
         ax.set_xscale("log")
         lo, hi = d.total_s.min(), d.total_s.max()
         ax.set_xlim(lo / 12, hi * 12)  # room for labels on both sides

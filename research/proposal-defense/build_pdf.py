@@ -21,6 +21,7 @@ Outputs:
 
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import shutil
@@ -100,6 +101,30 @@ def _figure_copies():
 
 
 FIGURE_COPIES = _figure_copies()
+
+
+# Benchmark dataset dimensions are substituted into the prose at build time from
+# `reproduce/dataset_specs.yaml`, so that a dimension lives in exactly one place
+# instead of being retyped in every chapter that mentions it. See grad-school#92
+# for the drift this replaced -- four different feature counts for one dataset.
+#
+# Prose writes `{{dataset.<key>.<field>}}`; `dataset_specs.py` documents the
+# field list. Unlike the figure registry above, this one does NOT fall back
+# quietly: an unreadable spec file or an unresolved placeholder aborts the build.
+# A missing figure leaves a visible hole, but a wrong or garbled dataset
+# dimension reads as a real measurement, which is the failure this mechanism
+# exists to prevent.
+def _dataset_values():
+    reproduce_dir = os.path.join(HERE, "..", "..", "reproduce")
+    sys.path.insert(0, os.path.abspath(reproduce_dir))
+    import dataset_specs
+
+    return dataset_specs.template_values()
+
+
+DATASET_PLACEHOLDER = re.compile(
+    r"\{\{\s*dataset\.([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*\}\}"
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -199,6 +224,39 @@ def strip_html_comments(md):
     return re.sub(r"<!--.*?-->", "", md, flags=re.DOTALL)
 
 
+def substitute_dataset_specs(md, values, filename, unresolved):
+    """Replace every `{{dataset.<key>.<field>}}` with its value from the specs.
+
+    Anything that looks like a dataset placeholder but names a key or field the
+    spec file does not define is recorded in `unresolved` and left in place, so
+    the build can report every bad reference at once rather than dying on the
+    first. `assemble()` aborts if that list is non-empty.
+    """
+
+    def repl(match):
+        key, field = match.group(1), match.group(2)
+        dotted = f"{key}.{field}"
+        if dotted not in values:
+            unresolved.append((filename, dotted))
+            return match.group(0)
+        return values[dotted]
+
+    return DATASET_PLACEHOLDER.sub(repl, md)
+
+
+def _known_appendix_sections():
+    """The appendix's top-level section numbers, read from its own headers.
+
+    Returns a set of bare numbers as strings, e.g. {"1", ..., "8"} for `## A.1`
+    through `## A.8`. Empty if the appendix is missing, which makes every
+    `Appendix A.N` reference warn rather than silently pass.
+    """
+    md = read("prose/appendix.md")
+    if not md:
+        return set()
+    return set(re.findall(r"^##\s+A\.(\d+)\b", md, re.M))
+
+
 def build_section_registry(sections_by_file):
     """Build a comprehensive section registry from all files.
 
@@ -243,7 +301,20 @@ def extract_section_headers(md, filename):
     return sections
 
 
-def check_cross_references(md, registry, filename, warnings=None):
+def parse_checklist_ids(checklist_md):
+    """Every checklist item ID defined in CHECKLIST.md, e.g. {"C1", …, "C15", "B6"}.
+
+    An item is defined as a bold ID followed by an em-dash -- ``**C14 — …``.
+    Inline cross-references use double-bold with no dash (``**C10**``), so the
+    dash is what tells a definition from a mention. Parsing the file makes the
+    checklist cross-reference check self-maintaining: adding C16 to the checklist
+    stops it being flagged as a dangling reference, with no second list to keep
+    in sync -- which is exactly what went stale and flagged the real C14/C15.
+    """
+    return set(re.findall(r"\*\*([A-E]\d+)\s*[—-]", checklist_md))
+
+
+def check_cross_references(md, registry, filename, warnings=None, checklist_ids=None):
     """Check for cross-references and warn if targets don't exist.
 
     Looks for patterns like:
@@ -273,8 +344,13 @@ def check_cross_references(md, registry, filename, warnings=None):
         flags=re.MULTILINE,
     )
 
-    # Known checklist items from Chapter 7 Table 7.1 and prose
-    known_checklists = {"c1", "c3", "c5", "c8", "c10"}
+    # Checklist item IDs actually defined in CHECKLIST.md, parsed and passed in.
+    # The fallback list is only for callers that do not supply the parsed set;
+    # it is a lower bound and deliberately not the source of truth, because a
+    # hand-maintained list here is what went stale and flagged the real C14/C15.
+    if checklist_ids is None:
+        checklist_ids = {f"C{n}" for n in range(1, 16)}
+    known_c = {cid for cid in checklist_ids if cid.startswith("C")}
 
     # Build maps of known sections by type for validation
     goal_sections = {}  # "g1" -> section_id
@@ -302,15 +378,22 @@ def check_cross_references(md, registry, filename, warnings=None):
         # For now, just ensure the format is valid
         pass
 
-    # Pattern 2: Appendix A.X references
-    # Known appendix sections from appendix.md
-    known_appendices = {"1", "2", "3", "4", "5", "6", "7"}
+    # Pattern 2: Appendix A.X references, validated against the appendix's own
+    # `## A.N` headers rather than a hardcoded set. The set used to be a literal
+    # {"1".."7"}, which silently went stale the moment an A.8 was written: the
+    # reference was real and the checker called it dangling.
+    known_appendices = _known_appendix_sections()
 
     for match in re.finditer(r"Appendix\s+A\.(\d+)", md_for_validation):
         appendix_num = match.group(1)
         if appendix_num not in known_appendices:
+            known = (
+                "A." + ", A.".join(sorted(known_appendices, key=int))
+                if known_appendices
+                else "none found"
+            )
             warnings.append(
-                f"  ⚠ {filename}: Appendix A.{appendix_num} not found (known: A.1–A.7)"
+                f"  ⚠ {filename}: Appendix A.{appendix_num} not found (known: {known})"
             )
 
     # Pattern 3: Goal references like G1, G2, G1a, etc.
@@ -354,28 +437,15 @@ def check_cross_references(md, registry, filename, warnings=None):
         except ValueError:
             pass
 
-    # Pattern 5: Checklist references like C1, C3, etc.
+    # Pattern 5: Checklist references like C1, C14. Validated against the IDs
+    # actually defined in CHECKLIST.md, so a reference is dangling only when no
+    # item defines it -- not merely because a second list here was not updated.
     for match in re.finditer(r"\bC(\d+)\b", md_for_validation):
-        checklist_num = match.group(1)
-        checklist_key = f"c{checklist_num}"
-        if checklist_key not in known_checklists:
-            # Only warn if it's a clear typo (unusual number)
-            if checklist_num not in [
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "13",
-            ]:
-                warnings.append(
-                    f"  ⚠ {filename}: Checklist item C{checklist_num} not found in Chapter 7"
-                )
+        cid = f"C{match.group(1)}"
+        if cid not in known_c:
+            warnings.append(
+                f"  ⚠ {filename}: Checklist item {cid} not found in {CHECKLIST_FILE}"
+            )
 
     # Pattern 6: Cross-reference links [text](§X.Y) or [text](#section-id)
     for match in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", md_for_validation):
@@ -618,13 +688,42 @@ def assemble():
     sections_by_file = {}  # Accumulate section headers across all files
     raw_by_file = {}  # rel -> raw markdown, read once
 
+    # Dataset dimensions are resolved before anything else looks at the text, so
+    # the anchor registry, the cross-reference checks and the final markdown all
+    # see the same substituted prose. A spec file that cannot be read is fatal:
+    # every dimension in the document comes from it.
+    try:
+        dataset_values = _dataset_values()
+    except Exception as exc:  # noqa: BLE001 -- fatal, but say why first
+        print(
+            f"  [fatal] could not read reproduce/dataset_specs.yaml "
+            f"({exc.__class__.__name__}: {exc})\n"
+            f"          Every dataset dimension in the prose comes from that file, "
+            f"so the build stops rather than emit a document without them."
+        )
+        sys.exit(1)
+    unresolved = []
+
     # First pass: read every file once.
     for rel in SECTIONS:
         md = read(rel)
         if md is None:
             continue
+        md = substitute_dataset_specs(md, dataset_values, rel, unresolved)
         raw_by_file[rel] = md
         sections_by_file[rel] = extract_section_headers(md, rel)
+
+    if unresolved:
+        print("\n  [fatal] unresolved dataset placeholders:")
+        for fn, dotted in unresolved:
+            print(f"    ✗ {fn}: {{{{dataset.{dotted}}}}} is not defined")
+        print(
+            "          Add the key or field to reproduce/dataset_specs.yaml, or fix "
+            "the spelling.\n"
+            "          Run `python reproduce/dataset_specs.py --fields` to list "
+            "every valid placeholder."
+        )
+        sys.exit(1)
 
     # Anchor registry drives both the autolinks and the dangling-reference
     # warnings: a §X.Y / Chapter N / Appendix A.N reference is a hyperlink when
@@ -635,6 +734,14 @@ def assemble():
 
     # Build registry after all files are read
     registry = build_section_registry(sections_by_file)
+
+    # Parse the checklist IDs once, so the cross-reference check validates C-refs
+    # against the items that actually exist rather than a hardcoded list.
+    checklist_path = os.path.join(HERE, CHECKLIST_FILE)
+    checklist_ids = set()
+    if os.path.exists(checklist_path):
+        with open(checklist_path, "r", encoding="utf-8") as f:
+            checklist_ids = parse_checklist_ids(f.read())
 
     # Second pass: anchor headings, strip editorial scaffolding, autolink refs.
     parts = []
@@ -651,7 +758,9 @@ def assemble():
         print(f"  + {rel}")
 
         # Keep the existing goal/checklist cross-reference checks.
-        check_cross_references(raw_by_file[rel], registry, rel, link_warnings)
+        check_cross_references(
+            raw_by_file[rel], registry, rel, link_warnings, checklist_ids
+        )
 
         # Insert References section after bibliography.md but before appendix.md
         # The ::: {#refs} ::: div tells pandoc/citeproc where to place the bibliography
@@ -737,8 +846,10 @@ def assemble():
     bib_file_path = os.path.join(HERE, "references.bib")
     if os.path.exists(bib_file_path):
         bib_size = os.path.getsize(bib_file_path)
+        with open(bib_file_path, encoding="utf-8") as bf:
+            bib_entries = len(re.findall(r"^@", bf.read(), flags=re.MULTILINE))
         print(f"\n  bibliography:")
-        print(f"    ✓ references.bib found ({bib_size} bytes, 70 entries)")
+        print(f"    ✓ references.bib found ({bib_size} bytes, {bib_entries} entries)")
         print(f"    ℹ Bibliography support enabled in PDF build")
 
     return md_path
@@ -852,9 +963,20 @@ def build_with_latex(md_path, pandoc, engine):
             ]
         )
     print(f"  pandoc + {engine} ...")
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    # encoding/errors are load-bearing, not tidiness. `text=True` alone decodes
+    # the child's output with the console's locale codec, which on a Windows
+    # cp1252 console dies on pandoc's own warning stream -- it echoes the source
+    # characters it cannot typeset (theta, >=, ~=) and those bytes are undecodable
+    # there. The exception is raised inside subprocess's reader THREAD, so
+    # `res.stderr` comes back None and the `res.stderr[-2500:]` below then fails
+    # with a TypeError that masks the real pandoc error completely. Observed
+    # 2026-08-27: a build whose pandoc invocation actually succeeded reported
+    # only "TypeError: 'NoneType' object is not subscriptable".
+    res = subprocess.run(
+        cmd, capture_output=True, text=True, encoding="utf-8", errors="replace"
+    )
     if res.returncode != 0:
-        print(res.stderr[-2500:])
+        print((res.stderr or "<no stderr captured>")[-2500:])
         return None
     return pdf
 
@@ -895,9 +1017,12 @@ def build_with_weasyprint(md_path, pandoc):
                 bib_file,
             ]
         )
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    # Same encoding trap as build_with_latex above.
+    res = subprocess.run(
+        cmd, capture_output=True, text=True, encoding="utf-8", errors="replace"
+    )
     if res.returncode != 0:
-        print(res.stderr[-1500:])
+        print((res.stderr or "<no stderr captured>")[-1500:])
         return None
 
     title_html = f"""<div class="titlepage">
@@ -981,7 +1106,20 @@ def page_count(pdf):
     return None
 
 
-def main():
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="Assemble and build the proposal PDF.")
+    ap.add_argument(
+        "--validate-only",
+        action="store_true",
+        help=(
+            "Run every assembly-time check (dataset-spec substitution, "
+            "cross-references, section registry, bibliography) and exit without "
+            "rendering a PDF. Needs no pandoc and no LaTeX, which is what makes "
+            "it runnable in CI."
+        ),
+    )
+    args = ap.parse_args(argv)
+
     print("Copying figures from harness outputs ...")
     n = copy_figures()
     if n > 0:
@@ -989,6 +1127,13 @@ def main():
 
     print("Assembling proposal ...")
     md_path = assemble()
+
+    if args.validate_only:
+        # assemble() has already exited non-zero on any fatal: an unreadable
+        # dataset-spec file, unresolved placeholders, a broken cross-reference.
+        # Reaching here means those all passed.
+        print("\n  validate-only: assembly checks passed, skipping PDF render.")
+        return 0
 
     pandoc = pandoc_bin()
     if not pandoc:
@@ -1044,4 +1189,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

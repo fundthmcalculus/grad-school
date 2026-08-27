@@ -532,20 +532,98 @@ PROV="$DEST/PROVENANCE.txt"
   # boost fields are here for the same reason -- they are the usual culprits.
   echo "machine:"
   printf '  %-16s %s\n' "host"     "$(hostname 2>/dev/null || echo unknown)"
-  printf '  %-16s %s\n' "os"       "$( (. /etc/os-release 2>/dev/null && echo "$PRETTY_NAME") || uname -s )"
-  printf '  %-16s %s\n' "kernel"   "$(uname -srm 2>/dev/null)"
-  printf '  %-16s %s\n' "cpu"      "$(sed -n 's/^model name[[:space:]]*:[[:space:]]*//p' /proc/cpuinfo 2>/dev/null | head -1)"
-  printf '  %-16s %s\n' "cores"    "$(nproc 2>/dev/null) logical$(LC_ALL=C lscpu 2>/dev/null | sed -n 's/^Core(s) per socket:[[:space:]]*/, /p' | tr -d '\n' | sed 's/$/ physical per socket/')"
-  printf '  %-16s %s\n' "ram"      "$(awk '/MemTotal/ {printf "%.1f GiB (%.1f GB decimal)", $2/1048576, $2*1024/1e9}' /proc/meminfo 2>/dev/null)"
-  printf '  %-16s %s\n' "governor" "$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null || echo 'n/a')"
-  printf '  %-16s %s\n' "boost"    "$(cat /sys/devices/system/cpu/cpufreq/boost 2>/dev/null || echo 'n/a')"
+
+  # OS detection: cross-platform
+  _os=""
+  if [ "$(uname -s 2>/dev/null)" = "Darwin" ]; then
+    _os="$(sw_vers -productName 2>/dev/null) $(sw_vers -productVersion 2>/dev/null)"
+  elif [ -f /etc/os-release ]; then
+    _os="$(. /etc/os-release 2>/dev/null && echo "$PRETTY_NAME" || uname -s)"
+  else
+    _os="$(uname -s)"
+  fi
+  printf '  %-16s %s\n' "os"       "$_os"
+  printf '  %-16s %s\n' "kernel"   "$(uname -srm 2>/dev/null || echo 'n/a')"
+
+  # CPU detection: cross-platform
+  _cpu=""
+  if [ -f /proc/cpuinfo ]; then
+    _cpu="$(sed -n 's/^model name[[:space:]]*:[[:space:]]*//p' /proc/cpuinfo 2>/dev/null | head -1)"
+  elif [ "$(uname -s 2>/dev/null)" = "Darwin" ]; then
+    _cpu="$(sysctl -n machdep.cpu.brand_string 2>/dev/null)"
+  elif [ "$(uname -o 2>/dev/null)" = "Msys" ] || [ -n "$MSYSTEM" ]; then
+    _cpu="$(wmic cpu get name /format:list 2>/dev/null | grep -i '^name=' | cut -d= -f2 | head -1)"
+  fi
+  printf '  %-16s %s\n' "cpu"      "${_cpu:-unknown}"
+
+  # Core detection: cross-platform
+  _logical=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || echo "unknown")
+  _physical=""
+  if [ -f /proc/cpuinfo ]; then
+    _cores_per=$(LC_ALL=C lscpu 2>/dev/null | sed -n 's/^Core(s) per socket:[[:space:]]*//p')
+    _sockets=$(LC_ALL=C lscpu 2>/dev/null | sed -n 's/^Socket(s):[[:space:]]*//p' | head -1)
+    if [ -n "$_cores_per" ] && [ -n "$_sockets" ]; then
+      _physical=$((${_cores_per} * ${_sockets}))
+    fi
+  elif [ "$(uname -s 2>/dev/null)" = "Darwin" ]; then
+    _physical=$(sysctl -n hw.physicalcpu 2>/dev/null)
+  elif [ -n "$MSYSTEM" ] || [ -n "$NUMBER_OF_PROCESSORS" ]; then
+    _physical="${NUMBER_OF_PROCESSORS}"
+  fi
+  if [ -n "$_physical" ]; then
+    printf '  %-16s %s\n' "cores"    "$_physical physical, $_logical logical"
+  else
+    printf '  %-16s %s\n' "cores"    "$_logical logical"
+  fi
+
+  # RAM detection: cross-platform
+  _ram=""
+  if [ -f /proc/meminfo ]; then
+    _ram="$(awk '/MemTotal/ {printf "%.1f GiB (%.1f GB decimal)", $2/1048576, $2*1024/1e9}' /proc/meminfo 2>/dev/null)"
+  elif [ "$(uname -s 2>/dev/null)" = "Darwin" ]; then
+    _ram_bytes=$(sysctl -n hw.memsize 2>/dev/null)
+    if [ -n "$_ram_bytes" ]; then
+      _ram=$(awk "BEGIN {printf \"%.1f GiB (%.1f GB decimal)\", $_ram_bytes/1024/1048576, $_ram_bytes/1e9}")
+    fi
+  elif [ -n "$MSYSTEM" ]; then
+    _ram="$(wmic computersystem get totalphysicalmemory /format:list 2>/dev/null | grep -i '^totalphysicalmemory=' | cut -d= -f2)"
+    if [ -n "$_ram" ]; then
+      _ram=$(awk "BEGIN {printf \"%.1f GiB (%.1f GB decimal)\", $_ram/1024/1048576, $_ram/1e9}")
+    fi
+  fi
+  printf '  %-16s %s\n' "ram"      "${_ram:-unknown}"
+
+  # Governor detection: Linux only
+  _gov="n/a"
+  if [ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ]; then
+    _gov="$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null || echo 'n/a')"
+  fi
+  printf '  %-16s %s\n' "governor" "$_gov"
+
+  # Boost detection: Linux only
+  _boost="n/a"
+  if [ -f /sys/devices/system/cpu/cpufreq/boost ]; then
+    _boost="$(cat /sys/devices/system/cpu/cpufreq/boost 2>/dev/null || echo 'n/a')"
+  fi
+  printf '  %-16s %s\n' "boost"    "$_boost"
+
+  # GPU detection: cross-platform
   if command -v nvidia-smi >/dev/null 2>&1; then
     nvidia-smi --query-gpu=name,memory.total,driver_version \
                --format=csv,noheader 2>/dev/null \
       | while IFS= read -r g; do printf '  %-16s %s\n' "gpu" "$g"; done
   else
-    printf '  %-16s %s\n' "gpu" "$(lspci 2>/dev/null | grep -iE 'vga|3d controller' | sed 's/^[^ ]* //' | head -1 || echo 'none detected')"
+    _gpu=""
+    if [ -f /proc/bus/pci/devices ] || command -v lspci >/dev/null 2>&1; then
+      _gpu="$(lspci 2>/dev/null | grep -iE 'vga|3d controller' | sed 's/^[^ ]* //' | head -1)"
+    elif [ "$(uname -s 2>/dev/null)" = "Darwin" ]; then
+      _gpu="$(system_profiler SPDisplaysDataType 2>/dev/null | grep 'Chipset Model' | sed 's/.*Chipset Model: //' | head -1)"
+    elif [ -n "$MSYSTEM" ]; then
+      _gpu="$(wmic path win32_VideoController get name /format:list 2>/dev/null | grep -i '^name=' | cut -d= -f2 | head -1)"
+    fi
+    printf '  %-16s %s\n' "gpu"      "${_gpu:-none detected}"
   fi
+
   printf '  %-16s %s\n' "python"   "$($PY -V 2>&1)"
   # Numeric library versions, from the environment the tables actually ran in --
   # not the host python, which is a different interpreter with different wheels.

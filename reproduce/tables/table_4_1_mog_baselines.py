@@ -117,7 +117,7 @@ def _row(label, metric_name, cols):
         label,
         C.cell(cols["mog"]["t"], fmt="{:.2f}") + " s" if cols["mog"]["t"] else C.NA,
         f"{metric_name}=" + C.cell(cols["mog"]["s"]) if cols["mog"]["s"] else C.NA,
-        *[C.cell(cols[k]["s"]) if k != "mog" else "" for k in order if k != "mog"],
+        *[C.cell(cols[k]["s"]) for k in order if k != "mog"],
     ]
 
 

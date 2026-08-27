@@ -1,0 +1,6 @@
+Dataset,single-linkage on D,NERFCM on raw D,NERFCM on D* (given k),ConiVAT (constrained),"set-cover, covered pts","set-cover, all pts (gated)",k discovered,coverage
+concentric_rings,1.000,0.020,1.000,1.000,1.000,1.000,2,1.000
+bridged_gaussians,0.000,1.000,1.000,1.000,0.982,0.001,3,0.533
+well_separated,1.000,1.000,1.000,1.000,1.000,1.000,2,1.000
+varying_density,0.980,0.980,0.980,0.980,0.980,0.980,3,1.000
+uniform_noise,N/A,N/A,N/A,N/A,N/A,N/A,4,0.125

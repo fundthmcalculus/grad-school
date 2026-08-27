@@ -15,11 +15,6 @@ import numpy as np
 from typing import List, Dict, Tuple, Set
 from dataclasses import dataclass
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
 import battery as B
 import ivat_mf as im
 import selection as S

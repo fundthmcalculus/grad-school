@@ -1,0 +1,12 @@
+# Recoverable on demand — not vendored here.
+# turbine-data.csv is ~23 MB, over the repo's 5 MB data cap (AGENTS.md rule 6),
+# so it is gitignored rather than committed.
+#
+# Source: Kaggle "Wind Power Forecasting"
+#   https://www.kaggle.com/datasets/theforcecoder/wind-power-forecasting
+# Also fetchable via the Google Drive link used in Phillips_Project_Final.ipynb:
+#   https://drive.google.com/file/d/1EA5TGwyZ4QYBocB4Q5s8rBNTdj2vkay8/view?usp=drive_link
+#
+# Restore with:
+#   Download the dataset above and place it at CS6101/turbine-data.csv
+turbine-data.csv

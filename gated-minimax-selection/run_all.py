@@ -1327,98 +1327,24 @@ def fig_scaling(scaling_table):
 
 
 # ---------------------------------------------------------------------------
-def main(high_res=False, svg=False, scaling=False):
-    """Generate analysis, numeric results, and figures.
+def _run_scaling_only():
+    """The `scaling=True` branch of `main`: the heavy, opt-in scaling benchmark.
 
-    Args:
-        high_res (bool): If True, generate figures at 300 dpi for reports (default: 96 dpi for sharing)
-        svg (bool): If True, save as SVG format instead of PNG (for archival)
-        scaling (bool): If True, run ONLY the scaling benchmark (n up to 5000) and
-            write outputs/scaling_results.json + fig11_scaling.png. This is a
-            heavy, opt-in mode; it does not touch results.json.
+    Writes outputs/scaling_results.json + fig11_scaling.png. Does not touch results.json.
     """
-    import os
+    print("Running scaling benchmark (n up to 5000; may take a minute)...")
+    scaling_table = run_scaling_benchmark()
+    fig_scaling(scaling_table)
+    with open(f"{OUT}/scaling_results.json", "w") as f:
+        json.dump({"scaling": scaling_table}, f, indent=2)
+    print(
+        "\nScaling results -> outputs/scaling_results.json, "
+        "figure -> outputs/fig11_scaling.png"
+    )
 
-    os.makedirs(OUT, exist_ok=True)
 
-    if high_res:
-        OUTPUT_CONFIG["dpi"] = 300
-        print("Generating high-resolution figures (300 dpi)...")
-    if svg:
-        OUTPUT_CONFIG["fmt"] = "svg"
-        print("Generating figures in SVG format...")
-
-    if scaling:
-        print("Running scaling benchmark (n up to 5000; may take a minute)...")
-        scaling_table = run_scaling_benchmark()
-        fig_scaling(scaling_table)
-        with open(f"{OUT}/scaling_results.json", "w") as f:
-            json.dump({"scaling": scaling_table}, f, indent=2)
-        print(
-            "\nScaling results -> outputs/scaling_results.json, "
-            "figure -> outputs/fig11_scaling.png"
-        )
-        return
-
-    print("Running numeric analysis (deterministic)...")
-    table = run_numeric()
-    run_mappings_numeric()
-    run_selector_comparison_numeric()
-    print("Running persistence selection-method comparison...")
-    persistence_methods = run_persistence_methods_numeric()
-    run_arity_numeric()
-    print("Running membership-extraction variants (Ruspini / feature-space)...")
-    run_ruspini_numeric()
-    run_feature_space_numeric()
-    relational_table = run_relational_numeric()
-    print("Running multi-scale (Option D) analysis...")
-    multiscale_table = run_multiscale_numeric()
-    run_multiscale_no_regression()
-    run_multiscale_scale_invariance()
-    print("Generating figures...")
-    fig_datasets()
-    fig_transform()
-    fig_methods_ari(table)
-    fig_persistence()
-    fig_membership()
-    fig_conivat_bridge()
-    print("Generating relational data figures...")
-    fig_relational_distances()
-    fig_relational_memberships()
-    fig_relational_ari(relational_table)
-    print("Generating multi-scale (Option D) figure...")
-    fig_multiscale_hierarchy()
-    print("Generating selection-method comparison figures...")
-    fig_selection_comparison(persistence_methods)
-    fig_persistence_thresholds(persistence_methods)
-    # Record the seed sets this run actually used, so a downstream renderer can state
-    # them instead of assuming. `reproduce/tables/table_5_x_ch5_selection.py` does no
-    # computation -- it renders this JSON -- and `reproduce/common.py` was stamping its
-    # own ten-seed default into the footer of all three Chapter 5 tables, over a run
-    # made at five. That is the same defect as a PROVENANCE.txt reporting a seed list
-    # it did not use, and it is worse in a table footer, because the footer is what
-    # gets quoted into a chapter.
-    #
-    # It is a dict rather than a single list because the seeding here is genuinely
-    # heterogeneous, and flattening it to one number would be the same lie in a
-    # different shape.
-    #
-    # The first version of this block asserted a structure instead of reading the code,
-    # and got it wrong twice: it claimed a separate `NERFCM_SEEDS` drove the NERFCM
-    # restarts (that name is local to `fig_relational_memberships`, a *figure*
-    # function, and reaching for it here raised NameError), and it described the
-    # multi-scale generators as merely "fixed per-generator". What the code actually
-    # does: module-scope SEEDS drives `nerfcm_ari` AND `conivat_ari`, which are the only
-    # columns in the battery carrying a spread; everything else is one deterministic
-    # pass. Worth stating, because asserting a seed list rather than deriving it is the
-    # exact bug this block exists to fix.
-    results["seeds"] = {
-        "nerfcm_and_conivat_restarts": list(SEEDS),
-        "set_cover_multiscale_and_selection": "single deterministic run per cell; the generators are seeded per dataset "
-        "and no spread is computed, so these cells have no error bar",
-    }
-    with open(f"{OUT}/results.json", "w") as f:
-        json.dump(results, f, indent=2)
+def _print_summary(table, relational_table, multiscale_table, persistence_methods):
+    """Echo the console summary tables `main` prints after writing results.json."""
     print("Done. Results and figures written to", OUT)
     # echo the main table
     print("\nMAIN TABLE (Euclidean/Synthetic):")
@@ -1486,6 +1412,93 @@ def main(high_res=False, svg=False, scaling=False):
             f"| autoTunedARI={f.get('ari_dissimilarity')} featARI={f.get('ari_feature_space')} "
             f"L2={f.get('surrogate_l2_mean')} rules={f.get('n_rules')}"
         )
+
+
+def main(high_res=False, svg=False, scaling=False):
+    """Generate analysis, numeric results, and figures.
+
+    Args:
+        high_res (bool): If True, generate figures at 300 dpi for reports (default: 96 dpi for sharing)
+        svg (bool): If True, save as SVG format instead of PNG (for archival)
+        scaling (bool): If True, run ONLY the scaling benchmark (n up to 5000) and
+            write outputs/scaling_results.json + fig11_scaling.png. This is a
+            heavy, opt-in mode; it does not touch results.json.
+    """
+    import os
+
+    os.makedirs(OUT, exist_ok=True)
+
+    if high_res:
+        OUTPUT_CONFIG["dpi"] = 300
+        print("Generating high-resolution figures (300 dpi)...")
+    if svg:
+        OUTPUT_CONFIG["fmt"] = "svg"
+        print("Generating figures in SVG format...")
+
+    if scaling:
+        _run_scaling_only()
+        return
+
+    print("Running numeric analysis (deterministic)...")
+    table = run_numeric()
+    run_mappings_numeric()
+    run_selector_comparison_numeric()
+    print("Running persistence selection-method comparison...")
+    persistence_methods = run_persistence_methods_numeric()
+    run_arity_numeric()
+    print("Running membership-extraction variants (Ruspini / feature-space)...")
+    run_ruspini_numeric()
+    run_feature_space_numeric()
+    relational_table = run_relational_numeric()
+    print("Running multi-scale (Option D) analysis...")
+    multiscale_table = run_multiscale_numeric()
+    run_multiscale_no_regression()
+    run_multiscale_scale_invariance()
+    print("Generating figures...")
+    fig_datasets()
+    fig_transform()
+    fig_methods_ari(table)
+    fig_persistence()
+    fig_membership()
+    fig_conivat_bridge()
+    print("Generating relational data figures...")
+    fig_relational_distances()
+    fig_relational_memberships()
+    fig_relational_ari(relational_table)
+    print("Generating multi-scale (Option D) figure...")
+    fig_multiscale_hierarchy()
+    print("Generating selection-method comparison figures...")
+    fig_selection_comparison(persistence_methods)
+    fig_persistence_thresholds(persistence_methods)
+    # Record the seed sets this run actually used, so a downstream renderer can state
+    # them instead of assuming. `reproduce/tables/table_5_1_3_ch5_tables.py` does no
+    # computation -- it renders this JSON -- and `reproduce/common.py` was stamping its
+    # own ten-seed default into the footer of all three Chapter 5 tables, over a run
+    # made at five. That is the same defect as a PROVENANCE.txt reporting a seed list
+    # it did not use, and it is worse in a table footer, because the footer is what
+    # gets quoted into a chapter.
+    #
+    # It is a dict rather than a single list because the seeding here is genuinely
+    # heterogeneous, and flattening it to one number would be the same lie in a
+    # different shape.
+    #
+    # The first version of this block asserted a structure instead of reading the code,
+    # and got it wrong twice: it claimed a separate `NERFCM_SEEDS` drove the NERFCM
+    # restarts (that name is local to `fig_relational_memberships`, a *figure*
+    # function, and reaching for it here raised NameError), and it described the
+    # multi-scale generators as merely "fixed per-generator". What the code actually
+    # does: module-scope SEEDS drives `nerfcm_ari` AND `conivat_ari`, which are the only
+    # columns in the battery carrying a spread; everything else is one deterministic
+    # pass. Worth stating, because asserting a seed list rather than deriving it is the
+    # exact bug this block exists to fix.
+    results["seeds"] = {
+        "nerfcm_and_conivat_restarts": list(SEEDS),
+        "set_cover_multiscale_and_selection": "single deterministic run per cell; the generators are seeded per dataset "
+        "and no spread is computed, so these cells have no error bar",
+    }
+    with open(f"{OUT}/results.json", "w") as f:
+        json.dump(results, f, indent=2)
+    _print_summary(table, relational_table, multiscale_table, persistence_methods)
 
 
 if __name__ == "__main__":
