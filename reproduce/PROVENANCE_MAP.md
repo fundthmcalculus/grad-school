@@ -1070,3 +1070,174 @@ closes the gap) is robust to any plausible D8 shift — the deficit is 0.14–0.
 against an init effect that moved the five-seed headline by ~0.03 — but the exact
 values are not. C4/D8 in `research/proposal-defense/CHECKLIST.md` carry the
 decision.
+
+---
+
+**Note 25 — two loaders were passing label-derived columns as features, and one
+of them was carrying a whole result.** *(2026-08-27, grad-school#92 follow-up.)*
+
+Both were the same mistake in two shapes: a column that is *about* the answer got
+into `X` because it happened to be numeric.
+
+*RT-IOT2022 — the index column.* `load_rt_iot2022` sliced `df.iloc[:, :-1]` and
+kept every numeric column, so the CSV's unnamed leading column survived as an
+82nd feature. It is **not a row number.** The file concatenates the twelve
+per-class captures and the counter restarts at zero for each, so any value above
+8,107 identifies `DOS_SYN_Hping` and nothing else — a decision tree on that column
+alone scores 0.706. What saves Table 4.4 is unrelated luck: that row uses
+`mog_classifier`'s default `top_n = 5` antecedent screen, and the index column
+never ranked in the top five, so the same five features are chosen either way.
+Re-running the generator both ways on the host of record, ten seeds, same day:
+
+| | with index | without | |
+|---|---|---|---|
+| MoG accuracy | 0.927 ± 0.002 | 0.927 ± 0.002 | unchanged |
+| MoG train time | 4.04 ± 0.67 s | 3.68 ± 0.06 s | overlapping |
+| RF reference | 0.999 ± 0.000 | 0.998 ± 0.000 | −0.001 |
+
+**Table 4.7b is the row genuinely at risk, and it is NOT re-quoted here.** It runs
+the screen over *all* features and keeps all of them, so it consumed the leaky
+column directly — and Note 21 / `OPENSET_COST_2026-08-22.md` establish that its
+result is sensitive to the screen's **order**, which removing a column perturbs.
+Its published +0.394 vs +0.537 therefore still measures leaky data. The re-run is
+~82 min at the current pin (down from 3h38m, per Note 21) and is owed.
+
+*Bike Sharing — the target's own addends.* `load_bikeshare` already dropped
+`instant` for exactly the reason above, which is why the RT-IOT2022 miss is a
+lesson learned once and not generalised. But it left `casual` and `registered` in
+`X`, and those two **sum exactly to the target `cnt` on all 17,379 rows.** The
+model was being handed the answer in two pieces. That is why the Random Forest
+reference on this row read a perfect **1.000**, which should have been the tell.
+Re-measured with both dropped, ten seeds:
+
+| | leaked | corrected |
+|---|---|---|
+| MoG R² | 0.962 ± 0.002 | **0.620 ± 0.014** |
+| RF reference | 1.000 ± 0.000 | **0.944 ± 0.004** |
+
+The old numbers are **superseded, not revised**: they measure a model's ability to
+add two columns, not to predict demand. DATASETS.md's "demonstrating fuzzy
+regression scaling on real urban dynamics" was resting on that.
+
+*A separate drift this exposed, which is nobody's leak.* The prose quoted MoG
+train time on RT-IOT2022 as **37.42 ± 0.64 s**. Re-running the *unfixed* loader
+today gives **4.04 ± 0.67 s** on the same host — so the ~10× is pre-existing drift
+between the prose and the current code/pins, not an effect of this change. Table
+4.4's timing is re-quoted from the corrected run of record (**4.24 ± 0.68 s**,
+RF **0.998 ± 0.000**); *which* pin bump bought the 10× is not yet identified, and
+until it is, this note is the only account of it.
+
+*Guarded, so it cannot be a third dataset's turn.* `reproduce/test_dataset_loaders.py`
+now fails if any loader returns an index-like column, and cross-checks every
+loader's modelled width against `dataset_specs.yaml`, applying that file's own
+`drop_columns` so a loader may still hand back columns its generator drops (BETH
+returns `sus`/`timestamp` for `table_4_11` to remove).
+
+*Note 25, addendum (2026-08-27) — the RT-IOT2022 index column costs Table 4.7b
+0.019 J, measured rather than assumed.* Two single-seed `table_4_4_openset` runs,
+`REPRO_SEEDS=0`, same host, same day, differing only in whether the loader drops
+the unnamed column:
+
+| Method | with index (82 feat.) | without (81 feat.) | Δ J |
+|---|---|---|---|
+| Complement rule | +0.391 | +0.372 | **−0.019** |
+| One-class SVM | +0.444 | +0.437 | −0.007 |
+| Isolation Forest | +0.517 | +0.517 | 0.000 |
+
+The matched control matters here: neither the prose's five-seed +0.394/+0.537 nor
+the three-seed +0.333/+0.513 sitting in `reproduce/outputs/` is a valid baseline
+for a one-seed probe, and comparing against either would have charged seed
+variance to the fix. Against the control, the deficit to Isolation Forest *widens*
+from 0.126 to 0.145 — close to the 0.143 the prose already reports — so the
+qualitative reading is unchanged and the full re-quote is deferred to #184 rather
+than rushed. One seed is one seed: this bounds the effect, it does not replace the
+five-seed table.
+
+---
+
+**Note 26 — D8's Table 4.7b blocker is already cleared by the pin the repository
+is on, and nobody noticed.** *(2026-08-27.)*
+
+Note 21 and CHECKLIST **D8** both say, in terms, *do not overwrite Table 4.7b
+until D8 is settled*: `_kmeans_labels_1d` had swapped sklearn's k-means++ for a
+single uniform-random start (tribble-fis #95), and it reaches the complement rule
+through `create_gaussian_membership_dict → fit_gaussians → fit_gaussian_mixture_1d`.
+Both of the causes that blocked a re-quote have since landed upstream, and **both
+are ancestors of the currently pinned `353162c`**:
+
+| cause | fixed by | in the pin? |
+|---|---|---|
+| B14 — `wasserstein_distance` ignored the CDF gap width | `5253aa0` (#171) | yes |
+| D8 — `_kmeans_labels_1d` single-start init | `353162c` (#191) | **it *is* the pin** |
+
+tribble-fis #191 ("swap safe candidates, keep hot-path ones") put
+`sklearn.cluster.KMeans` back with `n_init="auto"`, restoring k-means++, on
+2026-08-25. Verified in the running environment rather than from the diff: the
+`tribblefis` the harness imports resolves to the submodule source tree, and
+`inspect.getsource(gauss_math._kmeans_labels_1d)` at that pin contains `KMeans(`
+and not `kmeans_1d(`.
+
+**This is the third instance of one failure mode**, and it is worth naming as
+such rather than fixing quietly a third time. §7.3 already records it for BETH:
+`TribbleOneClassDetector` arrived upstream and retired a stated blocker while the
+proposal went on recording it as open. `check_prose.py` watches for *numbers*
+drifting between prose and harness; it cannot see a **capability or a fix**
+arriving in a submodule and silently retiring a recorded blocker. Note 22's
+lesson — a pin bump should ask which recorded blockers the new pin removes — was
+written and then not applied to D8, which the very next pin bump had settled.
+
+Consequence: the ten-seed RT-IOT2022 re-run of `table_4_4_openset` at this pin is
+no longer a "measurement of the current code" to be reported beside the prose. It
+is a legitimate run of record for Table 4.7b, and the D8 hold on re-quoting is
+lifted. What D8 still carries is unrelated to this table: the Chapter 3 compiler
+question (**B15**) and §4.3.2/G5 absorbing the `pin_extremes` default flip
+(**#102**).
+
+---
+
+**Note 27 — Table 4.7b re-quoted at ten seeds on the de-leaked loader, and the
+favourable ten-seed result did not survive.** *(2026-08-27, closes the
+substantive half of grad-school#184.)*
+
+`table_4_4_openset.py`, RT-IOT2022, leave-one-class-out, ten seeds, θ = 0.99,
+94 minutes on the host of record, at pin `353162c` with `load_rt_iot2022` no
+longer passing the CSV's unnamed index column as a feature.
+
+| method | archive, 5 seeds | 2026-08-22, 10 seeds | **now, 10 seeds, de-leaked** |
+|---|---:|---:|---:|
+| Complement rule | +0.394 | +0.515 | **+0.366** |
+| One-class SVM | +0.408 | +0.271 | **+0.410** |
+| Isolation Forest | +0.537 | +0.579 | **+0.535** |
+
+Detection / false-alarm for the new column: complement 0.804 ± 0.270 / 0.438 ±
+0.085; one-class SVM 0.845 ± 0.225 / 0.435 ± 0.061; Isolation Forest 0.966 ±
+0.145 / 0.431 ± 0.063.
+
+**The result that disappeared was the flattering one.** CHECKLIST **C4** carried
+the 2026-08-22 column as "the margin narrows sharply" — 0.064 to Isolation Forest,
+and the complement rule *overtaking* the one-class SVM. Neither survives. The
+margin is **0.169**, wider than the five-seed archive's 0.143, and the complement
+rule trails the SVM again. Worth stating plainly because the direction of the
+correction is unusual: the leak and the stale pin were together flattering the
+construction, and removing them costs it the one open-set result that read as a
+win.
+
+**What is and is not attributed.** Two changes separate the 2026-08-22 column
+from this one — the leaky feature is gone, and the pin restored k-means++ in
+`_kmeans_labels_1d` (#191, note 26). A matched single-seed control (same seed,
+host and day, differing only in the column) puts the leak's own cost at **0.019
+$J$**, so most of the −0.149 is most plausibly the init restoration. That is an
+*inference from one seed against a ±0.27 spread, not a measurement*; separating
+them properly needs a matched ten-seed run at the old pin, which is not planned.
+The document does not depend on the split: this column is measured on correct
+data at a settled pin, which is the only claim Table 4.7b makes.
+
+**Unchanged by the re-run:** the spreads (±0.15–±0.27) still mean no separation
+in the table clears its own error bar, exactly as §4.4 already says of Table 4.7,
+and §4.4's reading — the free, no-second-model property survives at scale and
+accuracy parity does not — is strengthened rather than altered.
+
+**Still owed (#184):** the RT-IOT2022 θ-sweep behind Fig 4.2's missing row was not
+regenerated in this pass (`REPRO_THETA_SWEEP` was not set), so §4.4's sentence
+that Table 4.6's sweep "was not run here" still stands, and note 21's ten-seed
+sweep figures remain pre-de-leak.
