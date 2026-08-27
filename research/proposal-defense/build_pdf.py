@@ -121,7 +121,9 @@ def _dataset_values():
     return dataset_specs.template_values()
 
 
-DATASET_PLACEHOLDER = re.compile(r"\{\{\s*dataset\.([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*\}\}")
+DATASET_PLACEHOLDER = re.compile(
+    r"\{\{\s*dataset\.([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*\}\}"
+)
 
 
 # --------------------------------------------------------------------------- #
