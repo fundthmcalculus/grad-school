@@ -256,6 +256,8 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
 | 4.11 BETH anomaly detection *(number reserved; no prose slot yet)* | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95) — note 22 |
+| 4.11(c) BETH feature reduction *(no prose slot yet)* | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95) — note 23 |
+| 4.11(d) BETH matched sample size *(no prose slot yet)* | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing — note 23 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
 
 **Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
@@ -351,6 +353,55 @@ combined. Diagnosing it as memory pressure would have led to downsampling the tr
 split, which is precisely what #95 forbids. The generator caps `n_jobs` at 8
 (`REPRO_BETH_N_JOBS`) and BLAS threads at 8 (`REPRO_BLAS_THREADS`, set before the numpy
 import) and completes ten seeds in 1m39s.
+
+**Note 23 — a wall-clock is only a comparison when the work is the same, and
+Table 4.11(c)'s first version was not.** `table_4_11c_beth_feature_reduction.py` swept
+feature count 2→8 and reported a training-time column across four arms. Those arms were
+not doing comparable work: the fuzzy detector was fitted on all **763,144** benign rows,
+the one-class SVM on a **20,000**-row cap (libsvm is O(n²)–O(n³)), and Isolation Forest
+on 763,144 rows nominally but with **`max_samples=256`**, so each tree was built from 256
+rows. Three different experiments, one column. Its flat Isolation Forest line was that
+default, not a property of the algorithm.
+
+`table_4_11d_beth_sample_scaling.py` is the correction: **one subsample per (n, seed),
+handed to all five arms** — same rows, same count — for n = 1,000…20,000. The ceiling is
+20,000 because that is where the SVM's cap sat; going higher would drop it out of the
+comparison and recreate the defect. Isolation Forest deliberately appears **twice**, at
+`max_samples=256` (so (c)'s number stays traceable) and at `max_samples=n` (matched work);
+reporting only the first repeats the mistake, reporting only the second silently changes
+what "Isolation Forest" means between two tables.
+
+*Two claims the matched sweep retracted.* (a) The fuzzy arm was **not** the slowest to
+train — at n=1,000 it fits in 0.081 s against both forests' ~0.15 s, and its 2.63 s in (c)
+was entirely the 763k-row fit. (b) Its inference advantage over the SVM exists **only at
+the SVM's cap**: SVM scoring grows **11×** (0.117 s → 1.280 s) with support-vector count
+while the fuzzy arms and the default forest are flat in n, so at n=1,000 the SVM is
+marginally *faster*. Both statements had been published in an artifact before the
+correction; the artifact now carries the retraction on its face.
+
+*What the correction also revealed.* `max_samples=256` was costing Isolation Forest a
+great deal: at n=20,000 with `max_samples=n` it reaches **AUC 0.978** against 0.896 at the
+default, and the **best operating point measured anywhere in this family is that arm at
+n=2,000, J +0.879** — better than the fuzzy arm's +0.845 and the SVM's +0.833. Its
+apparent uselessness in Tables 4.11 and 4.11(c) was substantially a library default.
+
+*The fuzzy arm needs 1,000 rows.* AUC **0.9903** at n=1,000 against **0.9905** on the full
+763,144-row split. The full-split fit buys nothing measurable, which makes #95's
+"no downsampling" instruction moot for this arm — worth knowing before budgeting compute,
+and an argument for quoting (d) rather than (c) on cost.
+
+*Ten seeds earned their keep again.* At n=1,000 two arms are coin flips, not middling
+detectors: matched-work Isolation Forest reports detection **0.563 ± 0.470** and the
+complement score **0.794 ± 0.419** — some seeds detect nearly everything, others nearly
+nothing. Both settle by n=2,000. A single-seed run would have reported either as a clean
+number, which is the failure mode non-negotiable 2 exists to prevent.
+
+*What (c) is still good for.* Its quality columns stand, and they carry the finding that
+**AUC and the operating point disagree about feature reduction**: AUC says keep all 8
+(0.9905), Youden's J at a 1% budget says keep **6** (+0.914 against +0.843), because
+adding `userId` at k=7 lifts detection 0.933→0.993 while pushing false alarms
+0.019→0.137. Its within-arm timing trend is also valid. Only the cross-arm timing reading
+was wrong, and the emitted table now says so in its own note.
 
 **Note 2.** Re-quoted at 10 seeds: 1st order 0.658 → 0.783 (Δ +0.125), 2nd order
 0.796 → 0.829 (Δ +0.033). The table now also carries the CART and Random Forest

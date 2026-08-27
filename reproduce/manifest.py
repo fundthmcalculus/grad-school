@@ -208,6 +208,72 @@ EXPERIMENTS = [
         "was thread oversubscription, never memory (peak RSS 521 MB of 95.6 GB).",
     ),
     Experiment(
+        id="table-4-11c-beth-feature-reduction",
+        title="BETH: quality / train / inference time vs feature reduction (2..8 features)",
+        chapter="Ch4",
+        produces="Table 4.11(c)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_11c_beth_feature_reduction.py"),
+        hardware="any",
+        datasets=["BETH (data/beth/, gitignored)"],
+        outputs=[
+            "reproduce/outputs/table_4_11c_beth_feature_reduction.md",
+            "reproduce/outputs/table_4_11c_beth_feature_reduction.csv",
+        ],
+        notes="VERIFIED RUNNING (10 seeds, ~4 min). Sweeps top_n 2..8; k=8 is the "
+        "no-reduction control and is the sweep's own endpoint, not a separate path. "
+        "Feature reduction is TribbleOneClassDetector(feature_selection='variance') -- "
+        "unsupervised, because with one class there is no separation to rank on -- and "
+        "the selected names are read off the fitted detector and handed to the baselines, "
+        "so all arms see IDENTICAL columns at each k. Variance order: eventId, "
+        "mountNamespace, argsNum, parentProcessId, processId, threadId, userId, "
+        "returnValue. Unlike Table 4.11 this uses ONE calibration for every arm (the "
+        "(1-budget) quantile of that arm's own benign-validation scores) instead of "
+        "matching contamination/nu. HEADLINE: AUC and the operating point DISAGREE about "
+        "how many features to keep -- AUC says 8 (0.9905), Youden's J at a 1% budget says "
+        "6 (+0.914 vs +0.843), because adding userId at k=7 lifts detection 0.933->0.993 "
+        "but pushes false alarms 0.019->0.137. Also: the one-class SVM INVERTS under "
+        "reduction (AUC 0.069 at 3 features -- worse than chance, not merely weak), so "
+        "reduction must be re-validated per estimator. DO NOT read this table's train-time "
+        "column across arms -- each arm trains on its own protocol's sample count; "
+        "table-4-11d is the matched comparison and is the one to quote for timing.",
+    ),
+    Experiment(
+        id="table-4-11d-beth-sample-scaling",
+        title="BETH: matched training-set size (1k..20k) across every one-class arm",
+        chapter="Ch4",
+        produces="Table 4.11(d)",
+        repo="tribble-fis",
+        command=_uv("../reproduce/tables/table_4_11d_beth_sample_scaling.py"),
+        hardware="any",
+        datasets=["BETH (data/beth/, gitignored)"],
+        outputs=[
+            "reproduce/outputs/table_4_11d_beth_sample_scaling.md",
+            "reproduce/outputs/table_4_11d_beth_sample_scaling.csv",
+        ],
+        notes="VERIFIED RUNNING (10 seeds, ~8 min). EXISTS TO CORRECT 4.11(c)'s "
+        "training-time column, which compared three different experiments: Tribble on all "
+        "763,144 rows, one-class SVM on a 20,000-row cap, Isolation Forest on 763,144 "
+        "nominally but max_samples=256 so each tree saw 256. Here ONE subsample is drawn "
+        "per (n, seed) and handed to ALL FIVE arms -- same rows, same count, same work. n "
+        "tops out at 20,000 because that is where the SVM's cap sat; higher drops it from "
+        "the comparison. ISOLATION FOREST APPEARS TWICE ON PURPOSE: max_samples=256 (the "
+        "library default, so 4.11(c) stays traceable) and max_samples=n (matched work). "
+        "That default was costing it a lot -- AUC 0.896 -> 0.978 at n=20,000 -- so its "
+        "weak showing in (c) was substantially the default, not the algorithm. FINDINGS: "
+        "(1) Tribble reaches full quality on 1,000 rows (AUC 0.9903 vs 0.9905 on all "
+        "763k), so the full-split fit buys nothing measurable; (2) two earlier claims were "
+        "WRONG -- Tribble is not the slowest to train (0.081s at n=1k vs both forests' "
+        "~0.15s), and its 10x inference advantage over the SVM exists only at the SVM's "
+        "cap, since SVM scoring grows 11x (0.117->1.280s) with support-vector count while "
+        "everyone else is flat in n; (3) best operating point measured anywhere is "
+        "Isolation Forest max_samples=n at n=2,000, J +0.879; (4) at n=1,000 two arms are "
+        "COIN FLIPS -- iForest matched-work detection 0.563 +/- 0.470 and Tribble's "
+        "complement 0.794 +/- 0.419 -- a single-seed run would have reported either as a "
+        "clean number. Every arm is stochastic here, including the fuzzy ones, because "
+        "which n rows are drawn is itself random.",
+    ),
+    Experiment(
         id="table-g5-output-partitioning",
         title="G5: uniform vs quantile vs hybrid output partitioning",
         chapter="Ch4",
