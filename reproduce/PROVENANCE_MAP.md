@@ -1192,3 +1192,52 @@ is a legitimate run of record for Table 4.7b, and the D8 hold on re-quoting is
 lifted. What D8 still carries is unrelated to this table: the Chapter 3 compiler
 question (**B15**) and §4.3.2/G5 absorbing the `pin_extremes` default flip
 (**#102**).
+
+---
+
+**Note 27 — Table 4.7b re-quoted at ten seeds on the de-leaked loader, and the
+favourable ten-seed result did not survive.** *(2026-08-27, closes the
+substantive half of grad-school#184.)*
+
+`table_4_4_openset.py`, RT-IOT2022, leave-one-class-out, ten seeds, θ = 0.99,
+94 minutes on the host of record, at pin `353162c` with `load_rt_iot2022` no
+longer passing the CSV's unnamed index column as a feature.
+
+| method | archive, 5 seeds | 2026-08-22, 10 seeds | **now, 10 seeds, de-leaked** |
+|---|---:|---:|---:|
+| Complement rule | +0.394 | +0.515 | **+0.366** |
+| One-class SVM | +0.408 | +0.271 | **+0.410** |
+| Isolation Forest | +0.537 | +0.579 | **+0.535** |
+
+Detection / false-alarm for the new column: complement 0.804 ± 0.270 / 0.438 ±
+0.085; one-class SVM 0.845 ± 0.225 / 0.435 ± 0.061; Isolation Forest 0.966 ±
+0.145 / 0.431 ± 0.063.
+
+**The result that disappeared was the flattering one.** CHECKLIST **C4** carried
+the 2026-08-22 column as "the margin narrows sharply" — 0.064 to Isolation Forest,
+and the complement rule *overtaking* the one-class SVM. Neither survives. The
+margin is **0.169**, wider than the five-seed archive's 0.143, and the complement
+rule trails the SVM again. Worth stating plainly because the direction of the
+correction is unusual: the leak and the stale pin were together flattering the
+construction, and removing them costs it the one open-set result that read as a
+win.
+
+**What is and is not attributed.** Two changes separate the 2026-08-22 column
+from this one — the leaky feature is gone, and the pin restored k-means++ in
+`_kmeans_labels_1d` (#191, note 26). A matched single-seed control (same seed,
+host and day, differing only in the column) puts the leak's own cost at **0.019
+$J$**, so most of the −0.149 is most plausibly the init restoration. That is an
+*inference from one seed against a ±0.27 spread, not a measurement*; separating
+them properly needs a matched ten-seed run at the old pin, which is not planned.
+The document does not depend on the split: this column is measured on correct
+data at a settled pin, which is the only claim Table 4.7b makes.
+
+**Unchanged by the re-run:** the spreads (±0.15–±0.27) still mean no separation
+in the table clears its own error bar, exactly as §4.4 already says of Table 4.7,
+and §4.4's reading — the free, no-second-model property survives at scale and
+accuracy parity does not — is strengthened rather than altered.
+
+**Still owed (#184):** the RT-IOT2022 θ-sweep behind Fig 4.2's missing row was not
+regenerated in this pass (`REPRO_THETA_SWEEP` was not set), so §4.4's sentence
+that Table 4.6's sweep "was not run here" still stands, and note 21's ten-seed
+sweep figures remain pre-de-leak.
