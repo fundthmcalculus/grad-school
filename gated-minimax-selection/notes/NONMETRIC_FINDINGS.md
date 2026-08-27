@@ -11,14 +11,40 @@
 
 Four findings, in decreasing order of importance:
 
-1. **The minimax transform is a canonical Euclideanizer.** D* = minimax(D) is an
-   ultrametric for *any* symmetric nonnegative dissimilarity — metric or not —
-   and finite ultrametrics embed isometrically in Euclidean space. Empirically:
-   every family tested (DTW, edit, Hamming, graph, cosine, and matrices with up
-   to 82% of pairs corrupted) has raw-D negative-eigenvalue ratios of 0.02–0.90
-   and D* ratios at machine zero (≤1e-16), with ultrametricity checked exactly.
-   **D* statically subsumes NERFCM's beta-spread repair**: beta(D*) = 0 always,
-   by construction rather than by luck.
+1. **The minimax transform is a Euclideanizer — and this is KNOWN, not a
+   finding of ours.** ⚠️ *Corrected 2026-08-26 after a prior-art check; the
+   original wording below claimed this as a discovery. It is not, and the
+   pre-emption is direct.* D* = minimax(D) is the **subdominant ultrametric**
+   (Johnson 1967; Jardine & Sibson 1971; Leclerc 1981), finite ultrametrics
+   embed isometrically in Euclidean space (**Lemin 1985**; Timan & Vestfrid
+   1983; Fiedler 1998; negative-type proof in Faver et al. 2014), and the
+   composition — *minimax D\* of an arbitrary non-metric D yields a PSD
+   centred Gram matrix* — is **Chehreghani, "Classification with Minimax
+   Distance Measures", AAAI-17, Theorem 3** (journal version: *Machine
+   Learning* 109:2063–2097, 2020). Worse for any novelty claim: swapping the
+   subdominant ultrametric in for NERFCM's beta-spread is **Khalilia, Bezdek,
+   Popescu & Keller, "Improvements to the relational fuzzy c-means clustering
+   algorithm", *Pattern Recognition* 47(12):3920–3930, 2014** (their iRFCM),
+   which compares five Euclideanization transforms including beta-spread and
+   finds the subdominant ultrametric best — **co-authored by Bezdek**, who
+   wrote the beta-spread paper being displaced.
+
+   What this repo therefore has here is a **cited design justification, not a
+   contribution**: we use D* and the beta-spread branch is provably inert,
+   *following* Khalilia et al. Note their implementation applies the transform
+   to **squared** dissimilarities (`subdominant_ultrametric(D.^2)`), which is
+   the right form — RFCM needs a *negative-type* / squared-Euclidean matrix,
+   and ultrametrics have strict p-negative type for all p ≥ 0, so both p=1 and
+   p=2 follow from the same theorem. **Our pipeline transforms D, not D².**
+   Whether that difference matters downstream is now an open question worth
+   checking, and is the one genuinely unexamined thing in this item.
+
+   The measurements below still stand as measurements: every family tested
+   (DTW, edit, Hamming, graph, cosine, and matrices with up to 82% of pairs
+   corrupted) has raw-D negative-eigenvalue ratios of 0.02–0.90 and D* ratios
+   at machine zero (≤1e-16), with ultrametricity checked exactly, and
+   beta(D*) = 0 throughout. That is a verification of known theory on this
+   data, which is worth having and is not worth calling a result.
 
 2. **Stretch and shortcut violations hurt different methods — and the split is
    structural, not empirical happenstance.** Inflating distances (stretch: what
@@ -89,13 +115,20 @@ Notes:
 - Beta probed across c ∈ {2,3,4} × 5 restart seeds per cell (and, offline,
   m ∈ {1.5, 2, 3} and c up to 8 on the worst stretched matrix — still 0).
 
-**Theory note** (for the chapter): D*_ij ≤ max(D*_ik, D*_kj) holds for any
-symmetric input because concatenating the bottleneck paths i→k→j gives a path
-whose bottleneck is the max of the two; hence D* is an ultrametric. Finite
-ultrametric spaces embed isometrically into Euclidean space (Lemin's theorem;
-equivalently, ultrametrics are of negative type), so the double-centered Gram
-matrix of D* is PSD and the RFCM relational update can never produce a negative
-distance. `test_nonmetric.py` pins the ultrametricity + admissibility +
+**Theory note** (for the chapter — all of it published; cite, do not claim):
+D*_ij ≤ max(D*_ik, D*_kj) holds for any symmetric input because concatenating
+the bottleneck paths i→k→j gives a path whose bottleneck is the max of the two;
+hence D* is an ultrametric (the subdominant one — Johnson 1967, Leclerc 1981).
+Finite ultrametric spaces embed isometrically into Euclidean space (**Lemin,
+*Soviet Math. Dokl.* 32(3):740–744, 1985**; Fiedler 1998 gives the sharp
+dimension, n for n+1 points; Faver et al. 2014 proves it via strict negative
+type), so the double-centred Gram matrix of D* is PSD and the RFCM relational
+update can never produce a negative distance — stated as **Theorem 3 of
+Chehreghani, AAAI-17**, explicitly for D that need not satisfy the triangle
+inequality. Use Lemin or Faver et al. for the embedding rather than
+Chehreghani's own proof chain, which routes through Varga & Nabben's *strictly*
+ultrametric matrices (those require a_ii > max_{k≠i} a_ik, which a zero-diagonal
+distance matrix violates — the conclusion holds, the cited step is loose). `test_nonmetric.py` pins the ultrametricity + admissibility +
 idempotence (minimax(D*) = D*) invariants across all families, including
 corrupted ones.
 
