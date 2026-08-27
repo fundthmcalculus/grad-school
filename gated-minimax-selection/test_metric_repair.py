@@ -213,3 +213,33 @@ def test_repair_inert_on_geometric_bridge_regimes():
     assert estimate_corruption_rate(D_tail) == 0.0
     R2, _ = auto_repair(D_tail)
     assert np.allclose(R2, D_tail)
+
+
+# ---------------------------------------------------------------------------
+# what the prior-art check established about this operator (2026-08-26)
+# ---------------------------------------------------------------------------
+
+
+def test_q1_is_the_row_linf_embedding():
+    """At q=1 the witness set includes k=i, whose bound |D_ii - D_ji| = D_ij is
+    always present -- so the operator collapses to ||row_i - row_j||_inf, the
+    classical Frechet/Kuratowski embedding of a finite metric into l-infinity.
+    Pinned because it is where this module's 'identity on metrics' and 'output
+    is a metric' properties actually come from; they are not new theorems."""
+    from scipy.spatial.distance import pdist, squareform
+
+    for D in (
+        _euclidean_D(n=20),
+        ND.violate_pairs(_euclidean_D(n=20), 0.3, 1.0, "shortcut", seed=2),
+    ):
+        assert np.allclose(reverse_ti_repair(D, 1.0), squareform(pdist(D, "chebyshev")))
+
+
+def test_metric_guarantee_holds_only_at_q1():
+    """The output is a genuine metric at q=1 (l-inf is a norm) but NOT at the
+    recommended default q=0.5 -- this removes shortcuts, it does not restore
+    metricity. Pinned so the docstring's caution cannot silently rot."""
+    D = ND.violate_pairs(_euclidean_D(n=20), 0.3, 1.0, "shortcut", seed=2)
+    viol = lambda M: ND.triangle_violation_stats(M)["pair_violation_fraction"]
+    assert viol(reverse_ti_repair(D, 1.0)) == 0.0
+    assert viol(reverse_ti_repair(D, 0.5)) > 0.0

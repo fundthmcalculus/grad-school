@@ -40,12 +40,25 @@ q = 0.9, corruption rate 0.2). q = 0.5 (the median witness) lifted zero
 uncorrupted entries in every no-harm test and is the recommended default;
 q = 0.75 repairs harder and is safe up to rate ~0.15.
 
-Related work: this is a cheap, one-sided special case of the metric nearness
-problem (Brickell, Dhillon, Sra & Tropp, SIAM J. Matrix Anal. 2008) /
-sparse metric repair (Gilbert & Jain, Allerton 2017) -- those solve the full
-projection onto the metric cone; this lifts only the below-lower-bound
-entries, which is the only direction the minimax transform cares about.
-(Citations from memory -- verify before quoting in a chapter.)
+PRIOR ART (checked 2026-08-26; see notes/BRIDGE_REPAIR.md for the full
+account). This is NOT a new method. The problem is named -- Increase Only
+Metric Repair, Gilbert & Jain, Allerton 2017; the increase-only variant of
+Metric Violation Distance, Fan, Raichel & Van Buskirk, SODA 2018, which is
+NP-complete and vertex-cover-hard to approximate. The operator is their
+Algorithm 3 at a single witness. At q=1 it collapses to
+||row_i(D) - row_j(D)||_inf, the classical Frechet/Kuratowski embedding of a
+finite metric into l-infinity -- which is where "identity on metrics" and
+"output is a metric" actually come from. The incumbent one-sided anti-bridge
+transform with the same max(D_ij, .) shape is HDBSCAN's mutual reachability
+distance (Campello, Moulavi & Sander, PAKDD 2013).
+
+CAUTION on the name: the metric guarantee holds only at q=1. At the
+recommended default q=0.5 the output still contains triangle violations --
+this removes shortcuts, it does not restore metricity. Fine for the minimax
+pipeline, which needs no metric; do not describe it as "repair" unguarded.
+
+Only the quantile-over-witnesses aggregation, the corruption-rate estimator
+and the abstention rule appear unclaimed, and "not found" is not "novel".
 
 Cost: O(n^3) time, O(n^2) memory (one witness pass per row pair, no
 (n, n, n) tensor), matching the reference minimax transform's budget.
