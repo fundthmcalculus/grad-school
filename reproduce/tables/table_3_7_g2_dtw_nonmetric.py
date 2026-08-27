@@ -172,10 +172,15 @@ def load_dataset(name):
 
 def dtw_matrix(X):
     """All-pairs DTW. REPRO_G2_DTW_IMPL=simd swaps in the OpenMP+SIMD Cython
-    kernel from experiments/dtw-simd (measured 10-12x aeon's single-core
-    numba build; see its bench.py), after VERIFYING it agrees with aeon on a
+    kernel from experiments/dtw-simd, after VERIFYING it agrees with aeon on a
     seeded subsample of THIS X -- the swap must never silently change what
     these tables measure. Any disagreement raises rather than proceeding.
+
+    Speedup, measured one variable at a time (experiments/dtw-simd/fair_bench.py):
+    ~3.3-4.8x at EQUAL core budget. Against aeon's default n_jobs=1 -- which is
+    how every call site here had been invoking it -- the observed wall-clock
+    gain is ~10-12x, but ~3x of that is parallelism aeon offers too and is not
+    attributable to this kernel.
     """
     from aeon.distances import dtw_pairwise_distance
 

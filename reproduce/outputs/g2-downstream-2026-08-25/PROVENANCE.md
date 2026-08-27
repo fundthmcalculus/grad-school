@@ -21,13 +21,28 @@ in the table's own footer.
 **What is different from the 2026-08-12 three-dataset run, and why it is safe:**
 
 1. **DTW kernel**: `REPRO_G2_DTW_IMPL=simd` uses `experiments/dtw-simd`'s
-   OpenMP + AVX-512 Cython kernel instead of aeon's (measured single-threaded)
-   numba build — 10–12× faster, and **equality-verified against aeon on a
+   OpenMP + AVX-512 Cython kernel, **equality-verified against aeon on a
    seeded 300-point subsample of the actual data at every call** (max |diff|
    ≤ 5.7e-13 across all five datasets; the script refuses to substitute on any
-   disagreement). Build times: ECG5000 59 s (was ~630 s), FordA ~15–20 min
-   (was ~2 h), ElectricDevices 347–457 s, StarLightCurves ~4.6–4.7 h (was
-   ~30 h, never attempted), Crop 202–298 s (was ~1,600 s).
+   disagreement).
+
+   **Speedup, decomposed (corrected 2026-08-26).** At *equal core budget* the
+   kernel is **~3.3–4.8×** faster (`fair_bench.py`: 600×96 → 4.8×, 150×1024 →
+   3.3× single-thread-vs-single-thread). The wall-clock gains below are larger,
+   ~10–12×, because every call site in this harness had been invoking
+   `dtw_pairwise_distance` at its default `n_jobs=1`; aeon parallelises when
+   asked, and ~3× of the observed gain is that parallelism rather than this
+   kernel. An earlier version of this file reported the 10–12× figure without
+   that decomposition — it conflated two variables, and the corrected reading
+   is stated here rather than silently replaced.
+
+   Observed build times in this run (vs aeon at n_jobs=1, as previously run):
+   ECG5000 59 s (was ~630 s), FordA ~15–20 min (was ~2 h), ElectricDevices
+   347–457 s, StarLightCurves ~4.6–4.7 h (was ~30 h, never attempted), Crop
+   202–298 s (was ~1,600 s). Against a properly parallelised aeon the same
+   builds would have been roughly 3× the "was" figures divided by three —
+   e.g. StarLightCurves ~10 h, so this kernel's own contribution there is
+   ~10 h → 4.6 h.
 2. **Minimax transform**: the lowmem split-phase dense-Prim implementation in
    `table_3_7_g2_downstream.py`, **equality-verified per call against the
    O(n³) reference `ivat_mf.minimax_transform`** (max |diff| = 0.0 on every
