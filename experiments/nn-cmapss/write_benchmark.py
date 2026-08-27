@@ -88,7 +88,7 @@ def to_target_table(res: dict) -> str:
     for arm, g in df.groupby("arm", sort=False):
         row = {"model": report.ARM_LABEL.get(arm, arm)}
         for t in targets:
-            vals = [r["to_target"].get(t) for _, r in g.iterrows()]
+            vals = [v.get(t) for v in g["to_target"]]
             got = [v["total_seconds"] for v in vals if v]
             row[t] = f"{np.median(got):.3f}" if len(got) > len(vals) / 2 else "never"
         rows.append(row)
@@ -848,7 +848,7 @@ def main():
     A("")
     A(
         "The DS02 HDF5 file is not tracked (2.4 GB); it is the Kaggle N-CMAPSS "
-        "release, expected at `NASA-CMAPSS/N-CMAPSS_DS02-006.h5`."
+        "release, expected at `data/nasa-cmapps2/N-CMAPSS_DS02-006.h5`."
     )
 
     path = os.path.join(OUT, "BENCHMARK.md")

@@ -116,6 +116,16 @@ operating point, and milder across the swept band of §4.3.5's Table 4.6
 written up as settled. What is settled is the observation: deterministic in each
 order, materially different between them, with an identical fitted model.
 
+> **Correction (C16, 2026-08-23): the mechanism above is refuted.** It is *not*
+> floating-point accumulation order in the t-conorm. Holding one fold's boosted
+> matrix fixed and reducing the **same columns** in four associations — the
+> shipped column order, reversed, per-row-sorted, and a balanced pairwise tree —
+> gives **identical predictions at every θ (agreement 1.0000)**. The t-conorm
+> reduction is order-invariant, so §4.3.5's commutative-associative claim holds
+> as written and needs no caveat. The order-sensitivity `profile_openset_cost`
+> measured lives one stage earlier, in the model **build**: see §6.
+> Reproduce with `reproduce/experiments/diagnose_openset_order.py`.
+
 ### Why it matters for the document
 
 - **Table 4.7b's rates depend on the feature ordering the screen happens to
@@ -244,12 +254,60 @@ data before it is worth 70×, not argued from the formula.
 
 ## 5. Owed
 
-1. **Pin down the order mechanism** — instrument the t-conorm chain and confirm
-   (or refute) that accumulation order explains a 2.7× swing in flag rate. If it
-   does not, something less benign is going on.
-2. **State the order dependence in §4.3.5**, or remove it. If the rule is meant
-   to be the algebraic consequence the section describes, evaluation should be
-   order-invariant — sorting the terms, or accumulating in a fixed canonical
-   order, would make it so and would cost nothing.
-3. **Hoist the θ-independent work** out of the sweep, as its own change.
+1. ~~**Pin down the order mechanism**~~ **Done (C16, §6).** It is the dedup
+   representative selection, not the t-conorm.
+2. ~~**State the order dependence in §4.3.5**~~ **Withdrawn.** §4.3.5's rule is
+   order-invariant as measured; the caveat that belongs anywhere belongs to
+   §4.3.1's dedup (§6), and it is latent — the shipped table uses one order.
+3. ~~**Hoist the θ-independent work** out of the sweep~~ **Done (C17).** Not just
+   the screen+memb the estimate below assumed: the whole model build and the
+   class firing are θ-independent (θ enters only at the anomaly step, not at
+   `to_simple_model`). `simple_gaussian_predict_sweep` (tribble-fis #176) runs
+   the firing once — **5.72× on the sweep, bit-identical**, one RT-IOT2022 fold,
+   six θ, two seeds.
 4. Re-read Table 4.7's run-to-run instability against this. It may not be noise.
+
+
+## 6. C16 resolved (2026-08-23): the divergence is in the model build, not the rule
+
+Two measurements, both single-fold, both cheap, run in this order:
+
+**(a) The t-conorm reduction is order-invariant.** Fix one fold's boosted matrix;
+reduce the same columns four ways.
+
+| θ | column *(ships)* | reversed | sorted | pairwise |
+|---|---:|---:|---:|---:|
+| 0.50 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| 0.90 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| 0.99 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+
+Identical predictions at every θ. Float accumulation order (the §3 hypothesis)
+is refuted; §4.3.5's algebra holds.
+
+**(b) The divergence is upstream, in the build.** Build the model with the
+*ranked* feature order and again with plain *column* order, then compare the
+class-firing matrix on the same test rows, label-aligned:
+
+```
+ranked  : 11 rules, 2367 terms
+column  : 11 rules, 2367 terms
+max |class_firing_ranked − class_firing_column| : 8.643e-01
+rows whose class firing differs at all         : 98.49%
+```
+
+0.86 is not float noise; it is a different fitted model. Same rule count, same
+term count, materially different firing. The cause is the $O(T^2)$ cross-feature
+dedup in `to_simple_model` (§4.3.1): it merges membership functions within
+`rtol=1e-2, atol=1e-3` and **the first occurrence wins**, so the surviving
+representative — hence the (μ, σ) actually evaluated on a given column — depends
+on the order features enter the list. Reorder the features, and a clause that
+was its own representative now points at a near-but-not-equal MF from another
+feature.
+
+**What this means for the document.** The order-sensitivity is real but latent:
+the shipped table always uses the screen's ranked order, so it is deterministic
+and reproducible. §4.3.5 needs no caveat. If order-*invariance* is wanted, the
+fix is in §4.3.1's dedup — pick a canonical representative (e.g. smallest
+(μ, σ), or the mean of the merged group) instead of first-seen. That changes
+results, so it is the author's call, not a reproduction fix, and is not made
+here. Reproduce both with `reproduce/experiments/diagnose_openset_order.py`.

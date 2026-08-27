@@ -11,7 +11,7 @@ Department of Aerospace Engineering and Engineering Mechanics, University of Cin
 
 We develop a variational formulation of Takagi–Sugeno–Kang (TSK) [@takagi1985fuzzy; @sugenokang1988structure] fuzzy control in which controller fitting is posed as minimization of an $H^1$ (Sobolev) action functional, and we carry the formulation through to closed-loop control with machine-checked stability certificates.
 
-Four results are analytic. **First**, with antecedents fixed the consequent block is the *global* minimizer of the action in closed form, so the only non-convexity in the problem is the antecedent placement; variable projection then yields an exact reduced gradient via the envelope theorem. **Second**, the natural design question — when does sequential (greedy) rule identification coincide with the joint fit — has the exact answer "iff the $H^1$ Gram matrix is block-diagonal," and for two equal-width Gaussians the slope weight achieving $H^1$ orthogonality has the closed form $\lambda^{*}=3b^{4}/(8c^{2})$, equivalently $\ell^{*}=\sqrt{6}\,w$ with $w$ the crossover width. A factor-of-four obstruction shows no single $\lambda$ can orthogonalize three or more uniformly spaced rules. **Third**, the closed-loop suboptimality gap is *exactly* an integral of a Bregman divergence for any convex control cost, not merely the quadratic case. **Fourth**, switching to $\pi$-shaped (rational) membership functions makes the closed loop a rational vector field, and a sum-of-squares S-procedure certificate for the region of attraction is then verified in exact rational arithmetic, with no floating-point step in the chain.
+Four results are analytic. **First**, with antecedents fixed the consequent block is the *global* minimizer of the action in closed form, so the only non-convexity in the problem is the antecedent placement; variable projection then yields an exact reduced gradient via the envelope theorem. **Second**, the natural design question — when does sequential (greedy) rule identification coincide with the joint fit — has the exact answer "iff the $H^1$ Gram matrix is block-diagonal," and for two equal-width Gaussians the slope weight achieving $H^1$ orthogonality has the closed form $\lambda^{*}=3b^{4}/(8a^{2})$, equivalently $\ell^{*}=\sqrt{6}\,\omega$ with $\omega$ the crossover width. A factor-of-four obstruction shows no single $\lambda$ can orthogonalize three or more uniformly spaced rules. **Third**, the closed-loop suboptimality gap is *exactly* an integral of a Bregman divergence for any convex control cost, not merely the quadratic case. **Fourth**, switching to $\pi$-shaped (rational) membership functions makes the closed loop a rational vector field, and a sum-of-squares S-procedure certificate for the region of attraction is then verified in exact rational arithmetic, with no floating-point step in the chain.
 
 Empirically, on a two-mass–spring benchmark scored jointly on settling time, peak force and energy, the least-action fit converges in two rules (10 parameters; score 0.867 against an LQR baseline of 1.000) and then degrades through distribution shift rather than through any deficiency of the fit. Direct policy optimization warm-started from the least-action fit reaches 0.655, improving all three objectives simultaneously, while a cold start fails outright — the variational fit is the initializer that makes the optimizer reachable.
 
@@ -63,6 +63,8 @@ This is the structural fact the entire paper exploits: the parameters split into
 
 > **Implementation note.** The monomial $x^k$ is replaced by a rescaled monomial $t=(x-\text{mid})/\text{half}$. This spans the identical function space, so the model is unchanged, but it prevents the Gram condition number from reaching $10^{7}$ on a universe such as $[-15,15]$.
 
+> **Notation.** $a_i,b_i$ are reserved throughout for a rule's centre and width; $\theta$ for the (linear) consequent block; $\lambda=\ell^2$ for the $H^1$ slope weight and its correlation length. Stars mark optimality ($\theta^{*}$, $u^{*}$, $V^{*}$) and hats mark estimators of a quantity a solver would otherwise certify exactly ($\hat S$, $\hat\rho$, $\hat r$). $x$ denotes the argument of the TSK map throughout §§2–5, including in the control-affine plant of §5 (there it is the plant state, which is exactly what a feedback controller's argument is); from §6 on, once a specific plant is fixed, we switch to $z=(x_1,x_2,v_1,v_2)$ for its four-dimensional realized state, reserving $x$ for the general theory. A handful of letters are reused for unrelated, well-separated objects, each canonical in its own subfield, and are flagged where introduced rather than renamed against convention: $\sigma$ is the logistic function in §4 and an SOS multiplier polynomial in §7; $\kappa(\cdot)$ is a matrix condition number in §3 while bare $\kappa$ is the calibration constant of §9; $k$ indexes a monomial power in §2 and is a distinct slope constant local to Theorem 5's proof in §4.
+
 ### 2.2 The action
 
 Let $e=y_d-y_c$ be the error field against a target $y_d$. We take as action the squared $H^1$ norm of the error,
@@ -91,16 +93,16 @@ i.e. **Galerkin orthogonality**: the error is $H^1$-orthogonal to the model subs
 
 ### 3.1 Closed form
 
-Define the $H^1$ Gram matrix and right-hand side $G_{mn}=\langle\psi_m,\psi_n\rangle_{H^1}$, $r_m=\langle y_d,\psi_m\rangle_{H^1}$.
+Define the $H^1$ Gram matrix and right-hand side $G_{mn}=\langle\psi_m,\psi_n\rangle_{H^1}$, $\eta_m=\langle y_d,\psi_m\rangle_{H^1}$ ($\eta$, not $r$, to keep this vector distinct from the certified radii of §§8–9).
 
-> **Theorem 1 (Variable projection [@golubpereyra1973differentiation; @golubpereyra2003separable]).** For fixed antecedents $(a,b)$, the action (2) is a convex quadratic in $\theta$ with Hessian $2G\succeq0$, and every minimizer satisfies the normal equations $G\theta=r$. If the regressors are linearly independent in $H^1$ then $G\succ0$ and $\theta^{*}=G^{-1}r$ is the unique global minimizer. The reduced action is
-> $$\widehat S(a,b)=\|y_d\|_{H^1}^{2}-r^{\top}G^{-1}r.\tag{5}$$
+> **Theorem 1 (Variable projection [@golubpereyra1973differentiation; @golubpereyra2003separable]).** For fixed antecedents $(a,b)$, the action (2) is a convex quadratic in $\theta$ with Hessian $2G\succeq0$, and every minimizer satisfies the normal equations $G\theta=\eta$. If the regressors are linearly independent in $H^1$ then $G\succ0$ and $\theta^{*}=G^{-1}\eta$ is the unique global minimizer. The reduced action is
+> $$\widehat S(a,b)=\|y_d\|_{H^1}^{2}-\eta^{\top}G^{-1}\eta.\tag{5}$$
 
-*Proof.* Substituting (1) into (2), $S=\|y_d\|^2_{H^1}-2\theta^\top r+\theta^\top G\theta$. The Hessian $2G$ is a Gram matrix of an inner product, hence positive semidefinite, so $S$ is convex and stationarity is sufficient. Stationarity is $G\theta=r$, which is (4) written out. Substituting $\theta^{*}$ gives (5). $\blacksquare$
+*Proof.* Substituting (1) into (2), $S=\|y_d\|^2_{H^1}-2\theta^\top \eta+\theta^\top G\theta$. The Hessian $2G$ is a Gram matrix of an inner product, hence positive semidefinite, so $S$ is convex and stationarity is sufficient. Stationarity is $G\theta=\eta$, which is (4) written out. Substituting $\theta^{*}$ gives (5). $\blacksquare$
 
 Theorem 1 is the strongest guarantee in the paper and it is free: no iteration, no initialization, no local minima. It also localizes the difficulty precisely — the problem is non-convex **only** in $(a,b)$.
 
-> **Regularization.** Numerically we solve $(G+\varepsilon\,\mathrm{tr}(G)/m\,I)\theta=r$ with $\varepsilon=10^{-9}$. The ridge is trace-relative so it scales with the problem, and it is a ridge rather than a truncating pseudo-inverse deliberately: a rank-flipping SVD makes the map $(a,b)\mapsto\theta$ discontinuous, which destroys the differentiability §3.2 depends on.
+> **Regularization.** Numerically we solve $(G+\varepsilon\,\mathrm{tr}(G)/m\,I)\theta=\eta$ with $\varepsilon=10^{-9}$. The ridge is trace-relative so it scales with the problem, and it is a ridge rather than a truncating pseudo-inverse deliberately: a rank-flipping SVD makes the map $(a,b)\mapsto\theta$ discontinuous, which destroys the differentiability §3.2 depends on.
 
 ### 3.2 Exact reduced gradient
 
@@ -152,22 +154,22 @@ Proposition 4 corrects a claim we initially made in the other direction, obtaine
 
 Proposition 4 raises the constructive question: what value of $\lambda$ achieves cancellation? For two rules it is elementary.
 
-> **Theorem 5 ($\lambda^{*}$).** For two equal-width Gaussian membership functions with centres $\pm c$ and width $b$ on $\mathbb{R}$, the normalized weights collapse to a logistic, $\varphi_1=\sigma(kx)$ with $k=4c/b^{2}$, and
+> **Theorem 5 ($\lambda^{*}$).** For two equal-width Gaussian membership functions with centres $\pm a$ and width $b$ on $\mathbb{R}$ (this $a$ is the symmetric special case of the general rule centre $a_i$ of §2.1), the normalized weights collapse to a logistic, $\varphi_1=\sigma(kx)$ with $k=4a/b^{2}$, and
 > $$\int_{\mathbb{R}}\varphi_0\varphi_1\,dx=\frac1k,\qquad \int_{\mathbb{R}}\varphi_0'\varphi_1'\,dx=-\frac{k}{6},$$
 > so the unique $\lambda$ making the two rules $H^1$-orthogonal is
-> $$\boxed{\ \lambda^{*}=\frac{6}{k^{2}}=\frac{3b^{4}}{8c^{2}}\ }\qquad\Longleftrightarrow\qquad \ell^{*}=\sqrt{6}\,w,\quad w=\frac{1}{k}=\frac{b^{2}}{4c}.$$
+> $$\boxed{\ \lambda^{*}=\frac{6}{k^{2}}=\frac{3b^{4}}{8a^{2}}\ }\qquad\Longleftrightarrow\qquad \ell^{*}=\sqrt{6}\,\omega,\quad \omega=\frac{1}{k}=\frac{b^{2}}{4a}.$$
 
-*Proof.* The log-ratio $\log(\mu_1/\mu_0)=4cx/b^{2}$ is linear in $x$, hence $\varphi_1=\sigma(kx)$ with $k=4c/b^{2}$, and $\varphi_0\varphi_1=\sigma(1-\sigma)=\sigma'(kx)$, $\varphi_i'=\pm k\sigma'$. Substituting $u=kx$ and then $s=\sigma(u)$, $ds=s(1-s)\,du$: $\int\varphi_0\varphi_1\,dx=k^{-1}\int_\mathbb{R}\sigma'(u)\,du=k^{-1}$ and $\int\varphi_0'\varphi_1'\,dx=-k\int_\mathbb{R}\sigma'(u)^2du=-k\int_0^1 s(1-s)\,ds=-k/6$. Setting $k^{-1}-\lambda k/6=0$ gives the result. $\blacksquare$
+*Proof.* The log-ratio $\log(\mu_1/\mu_0)=4ax/b^{2}$ is linear in $x$, hence $\varphi_1=\sigma(kx)$ with $k=4a/b^{2}$, and $\varphi_0\varphi_1=\sigma(1-\sigma)=\sigma'(kx)$, $\varphi_i'=\pm k\sigma'$. Substituting $u=kx$ and then $s=\sigma(u)$, $ds=s(1-s)\,du$: $\int\varphi_0\varphi_1\,dx=k^{-1}\int_\mathbb{R}\sigma'(u)\,du=k^{-1}$ and $\int\varphi_0'\varphi_1'\,dx=-k\int_\mathbb{R}\sigma'(u)^2du=-k\int_0^1 s(1-s)\,ds=-k/6$. Setting $k^{-1}-\lambda k/6=0$ gives the result. $\blacksquare$
 
-**Interpretation.** The target $y_d$ appears nowhere in Theorem 5. Therefore $\lambda^{*}$ is **not** a distinguished correlation length of the data; it is the correlation length of the rule crossover region, fixed entirely by partition geometry. The ratio $\ell^{*}/w=\sqrt{6}\approx2.44949$ was confirmed numerically in every configuration tested.
+**Interpretation.** The target $y_d$ appears nowhere in Theorem 5. Therefore $\lambda^{*}$ is **not** a distinguished correlation length of the data; it is the correlation length of the rule crossover region, fixed entirely by partition geometry. The ratio $\ell^{*}/\omega=\sqrt{6}\approx2.44949$ was confirmed numerically in every configuration tested.
 
-> **Corollary 6 (Why $N\ge3$ fails).** On a uniform partition of pitch $d$, adjacent pairs (separation $d$) and next-nearest pairs (separation $2d$) demand orthogonalizing weights in the ratio $(2d/d)^{2}=4$, since $\lambda^{*}\propto c^{-2}$. A single scalar $\lambda$ therefore cannot orthogonalize three or more uniformly spaced rules.
+> **Corollary 6 (Why $N\ge3$ fails).** On a uniform partition of pitch $\Delta$, adjacent pairs (separation $\Delta$) and next-nearest pairs (separation $2\Delta$) demand orthogonalizing weights in the ratio $(2\Delta/\Delta)^{2}=4$, since $\lambda^{*}\propto a^{-2}$. A single scalar $\lambda$ therefore cannot orthogonalize three or more uniformly spaced rules.
 
 The measured ratio was $4.0000$ in every case, which explains why residual off-block coupling plateaus near $10^{-2}$ for $N\ge3$ rather than approaching zero.
 
 **The price of $\lambda^{*}$.** Choosing $\lambda=\lambda^{*}$ trades $L^2$ accuracy for decoupling. Measured against the $L^2$-optimal ($\lambda=0$) fit of the same partition, target $\tanh(x/3)$:
 
-| $c$ | $b$ | $w$ | $\lambda^{*}$ | $\ell^{*}$ | $L^2$ at $\lambda{=}0$ | $L^2$ at $\lambda^{*}$ | cost |
+| $a$ | $b$ | $\omega$ | $\lambda^{*}$ | $\ell^{*}$ | $L^2$ at $\lambda{=}0$ | $L^2$ at $\lambda^{*}$ | cost |
 |---|---|---|---|---|---|---|---|
 | 5 | 1 | 0.050 | 0.015 | 0.12 | 3.2540 | 3.2542 | 0.01% |
 | 5 | 2 | 0.200 | 0.240 | 0.49 | 1.0992 | 1.1036 | 0.40% |
@@ -176,7 +178,7 @@ The measured ratio was $4.0000$ in every case, which explains why residual off-b
 | 5 | 8 | 3.200 | 61.44 | 7.84 | 0.7769 | 0.8204 | 5.60% |
 | 3 | 4 | 1.333 | 10.67 | 3.27 | 0.1101 | 0.1174 | 6.59% |
 
-The cost stays below 8% across the sweep and below 2% for sharp crossovers. The closed form explains why: $\ell^{*}=\sqrt6\,b^{2}/(4c)$ is sub-rule-scale for any sensible partition, and weighting slopes at a short correlation length barely perturbs the $L^2$ solution.
+The cost stays below 8% across the sweep and below 2% for sharp crossovers. The closed form explains why: $\ell^{*}=\sqrt6\,b^{2}/(4a)$ is sub-rule-scale for any sensible partition, and weighting slopes at a short correlation length barely perturbs the $L^2$ solution.
 
 ### 4.3 The practical alternative
 
@@ -194,7 +196,7 @@ The proof is $\sum_i\varphi_i\equiv1$. We record Theorem 7 because it is the cor
 
 ### 5.2 The exact certificate, for any convex cost
 
-Consider a control-affine plant $\dot x=f(x)+g(x)u$ with running cost $\ell(x,u)=q(x)+c(u)$, optimal value $V^{*}$ and optimal policy $u^{*}$.
+Consider a control-affine plant $\dot x=f(x)+g(x)u$ with running (stage) cost $L(x,u)=q(x)+c(u)$ — capital $L$, to keep this stage cost distinct from the $H^1$ correlation length $\ell$ of §2.2 — optimal value $V^{*}$ and optimal policy $u^{*}$.
 
 > **Theorem 8 (Bregman suboptimality identity).** Let $c$ be convex and differentiable, let $V^{*}$ be differentiable and satisfy the Hamilton–Jacobi–Bellman equation [@kirk1970optimal; @bardicapuzzodolcetta1997optimal], and let $u(\cdot)$ be admissible (the closed loop converges to the origin with $V^{*}(x(t))\to0$). Then
 > $$\boxed{\ J(x_0)-V^{*}(x_0)=\int_0^{\infty} D_c\big(u(t)\,\|\,u^{*}(x(t))\big)\,dt\ }\tag{7}$$
@@ -202,9 +204,9 @@ Consider a control-affine plant $\dot x=f(x)+g(x)u$ with running cost $\ell(x,u)
 
 *Proof.* HJB stationarity gives $c'(u^{*})=-g^{\top}\nabla V^{*\top}$. Hence
 
-$$\ell(x,u)+\nabla V^{*}(f+gu)=q+c(u)+\nabla V^{*}f+\nabla V^{*}gu=c(u)-c(u^{*})-c'(u^{*})(u-u^{*})=D_c(u\|u^{*}),$$
+$$L(x,u)+\nabla V^{*}(f+gu)=q+c(u)+\nabla V^{*}f+\nabla V^{*}gu=c(u)-c(u^{*})-c'(u^{*})(u-u^{*})=D_c(u\|u^{*}),$$
 
-using $q+\nabla V^{*}f+\nabla V^{*}gu^{*}+c(u^{*})=0$ (HJB). The left side is $\ell+\tfrac{d}{dt}V^{*}(x(t))$ along the closed loop; integrating from $0$ to $\infty$ and using admissibility to kill the boundary term gives (7). $\blacksquare$
+using $q+\nabla V^{*}f+\nabla V^{*}gu^{*}+c(u^{*})=0$ (HJB). The left side is $L+\tfrac{d}{dt}V^{*}(x(t))$ along the closed loop; integrating from $0$ to $\infty$ and using admissibility to kill the boundary term gives (7). $\blacksquare$
 
 > **Corollary 9.** For $c(u)=u^{\top}Ru$, $D_c(u\|u^{*})=(u-u^{*})^{\top}R(u-u^{*})$ and (7) reduces to the familiar $J-V^{*}=\int(u-u^{*})^{\top}R(u-u^{*})\,dt$.
 
@@ -228,7 +230,7 @@ Three features deserve emphasis. The identity is **exact** — no constants, no 
 
 ### 6.1 Setup
 
-Two unit masses coupled by a unit spring, force applied to the first mass, saturating at $|u|\le1$; state $z=(x_1,x_2,v_1,v_2)$. This is a simplified nominal instance of the two-mass–spring system long used as a robust-control benchmark [@wiebernstein1992benchmark] — that source's canonical form carries an uncertain spring constant and asymmetric masses, which we do not use here; §12 discusses exercising an uncertainty specification, which we do not currently do.
+Two unit masses coupled by a unit spring, force applied to the first mass, saturating at $|u|\le1$; state $z=(x_1,x_2,v_1,v_2)$, where $x_1,x_2$ are the two mass positions — a standard notational collision with the generic plant state $x$ of §5, avoided by naming the four-vector itself $z$ rather than $x$. This is a simplified nominal instance of the two-mass–spring system long used as a robust-control benchmark [@wiebernstein1992benchmark] — that source's canonical form carries an uncertain spring constant and asymmetric masses, which we do not use here; §12 discusses exercising an uncertainty specification, which we do not currently do.
 
 Controllers are scored by the equal-weight normalized scalarization
 
@@ -287,11 +289,11 @@ This rehabilitates variable projection in a specific role. Its value is not that
 
 ### 7.1 Rational membership functions
 
-Replacing Gaussians with $\pi$-shaped (Cauchy [@viana2021cauchy]) membership functions $\mu_i(z)=\big(1+\|(z-a_i)/b_i\|^{2}\big)^{-1}$ makes every $\mu_i$ rational, hence $\varphi_i$ rational, hence the TSK control law exactly a ratio of polynomials $u(z)=P(z)/Q(z)$ with $Q>0$ structurally. The closed loop is then a rational vector field and the Lyapunov decrease condition becomes a polynomial inequality after clearing denominators — which is what a sum-of-squares (SOS) [@parrilo2000structured; @parrilo2003semidefinite] program can decide.
+Replacing Gaussians with $\pi$-shaped (Cauchy [@viana2021cauchy]) membership functions $\mu_i(z)=\big(1+\|(z-a_i)/b_i\|^{2}\big)^{-1}$ makes every $\mu_i$ rational, hence $\varphi_i$ rational, hence the TSK control law exactly a ratio of polynomials $u(z)=p(z)/Q(z)$ with $Q>0$ structurally (lower-case numerator, so it is not confused with the Lyapunov matrix $P$ of §7.2 below). The closed loop is then a rational vector field and the Lyapunov decrease condition becomes a polynomial inequality after clearing denominators — which is what a sum-of-squares (SOS) [@parrilo2000structured; @parrilo2003semidefinite] program can decide.
 
 ### 7.2 The certificate
 
-With $V(z)=z^{\top}Pz$, we certify $\dot V<0$ on $\{V\le\rho\}\setminus\{0\}$ via the S-procedure [@boyd1994linear]: find $\sigma$ SOS with
+With Lyapunov *candidate* $V(z)=z^{\top}Pz$ — a candidate we construct (from the Riccati solution or the closed-loop linearization, §8.3), not the optimal value function $V^{*}$ of §5, and never asserted equal to it — we certify $\dot V<0$ on $\{V\le\rho\}\setminus\{0\}$ via the S-procedure [@boyd1994linear]: find $\sigma$ SOS (an SOS multiplier polynomial, unrelated to the logistic function $\sigma$ of §4.2) with
 
 $$W(z)-\varepsilon\|z\|^{2}-\sigma(z)\big(\rho-V(z)\big)\ \text{ SOS},\tag{8}$$
 
@@ -435,9 +437,9 @@ All three specifications are met, and **every "yes" is a real SDP certificate**,
 |---|---|---|---|
 | G1 | Consequents globally optimal, closed form | **Proven** | antecedents fixed; independent regressors |
 | G2 | Action convex in function space | **Proven** | $\lambda\ge0$ |
-| G3 | Reduced gradient exact | **Proven** | $\delta$-coverage |
+| G3 | Reduced gradient exact | **Proven** | $G\succ0$ (independent regressors) |
 | G4 | Greedy = joint iff Gram block-diagonal | **Proven** | for all targets |
-| G5 | $\lambda^{*}=3b^{4}/(8c^{2})$ | **Proven** | 2 equal-width Gaussians |
+| G5 | $\lambda^{*}=3b^{4}/(8a^{2})$ | **Proven** | 2 equal-width Gaussians |
 | G9 | TSK reproduces LQR exactly | **Proven** | LTI, quadratic cost (and vacuous) |
 | G10 | Bregman suboptimality identity | **Proven** | control-affine, convex $c$, admissible, $V^{*}$ known |
 | G11 | Local optimality of antecedents | Certified numerically | KKT on critical cone + FD Hessian |
@@ -455,7 +457,7 @@ Two obstructions did not yield and should be stated plainly. **G13** is genuinel
 
 Three tiers of checking, weakest to strongest.
 
-**Tier 1 — symbolic identity checking.** The verification suite checks 21 identities in a computer algebra system as *identities* rather than at sampled points; 16 bear on the results in this paper (the Euler–Lagrange equation, the partition-of-unity consequences, Theorem 7, the Bregman identity of Theorem 8 and its quadratic specialization, the second-derivative identity $D_c''(u)=c''(u)$ underlying non-negativity of $D_c$ for two non-quadratic costs — convexity itself, $c''\ge0$, is not separately checked by this suite — the three $\lambda^{*}$ integrals of Theorem 5, the exact rational form $u=P/Q$ and $Q>0$, the Hessian and stationarity claims of Theorem 1, and the envelope-theorem gradient of Theorem 2). All 21 pass. One subtlety cost two of them for a while: a matrix comparison `Matrix(...) == 0` is `False` even for the zero matrix, and using the correct predicate moved the count from 19/21 to 21/21.
+**Tier 1 — symbolic identity checking.** The verification suite checks 21 identities in a computer algebra system as *identities* rather than at sampled points; 16 bear on the results in this paper (the Euler–Lagrange equation, the partition-of-unity consequences, Theorem 7, the Bregman identity of Theorem 8 and its quadratic specialization, the second-derivative identity $D_c''(u)=c''(u)$ underlying non-negativity of $D_c$ for two non-quadratic costs — convexity itself, $c''\ge0$, is not separately checked by this suite — the three $\lambda^{*}$ integrals of Theorem 5, the exact rational form $u=p/Q$ and $Q>0$, the Hessian and stationarity claims of Theorem 1, and the envelope-theorem gradient of Theorem 2). All 21 pass. One subtlety cost two of them for a while: a matrix comparison `Matrix(...) == 0` is `False` even for the zero matrix, and using the correct predicate moved the count from 19/21 to 21/21.
 
 **Tier 2 — exact rational proof of the SOS certificate**, as described in §7.4: residual exactly zero, all 14 integer leading principal minors positive.
 

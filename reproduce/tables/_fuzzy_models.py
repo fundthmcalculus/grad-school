@@ -126,9 +126,18 @@ def load_phiusiil(sample_size=20000):
 
 
 def load_rt_iot2022(sample_size=None):
-    """RT-IOT2022: 123k rows × 83 features, 12 classes (open-set detection).
+    """RT-IOT2022: 123,117 rows × 81 features, 12 classes (open-set detection).
 
     Returns (X, y) or None if file not found.
+
+    The shipped CSV leads with an unnamed index column, which pandas reads as
+    `Unnamed: 0`. It is numeric, so slicing off the label and keeping every
+    numeric column kept it as an 82nd FEATURE -- and it is not a harmless row
+    number: the file concatenates the twelve per-class captures and the counter
+    RESTARTS AT ZERO for each one, so it encodes the label. Any value above
+    8,107 belongs to `DOS_SYN_Hping` and to nothing else. `load_bikeshare`
+    already drops `instant` for exactly this reason; this loader did not.
+    Dropping it here changes every RT-IOT2022 number -- see PROVENANCE_MAP.
     """
     local = os.path.join(DATA_DIR, "RT_IOT2022.csv")
     try:
@@ -136,6 +145,9 @@ def load_rt_iot2022(sample_size=None):
         y = df.iloc[:, -1]  # last column is the target
         X = df.iloc[:, :-1]
         X = X.select_dtypes(include=[np.number]).astype(float)
+        leaky_index = [c for c in X.columns if str(c).startswith("Unnamed")]
+        if leaky_index:
+            X = X.drop(columns=leaky_index)
         y = np.asarray(y)
         if sample_size and len(X) > sample_size:
             idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)
@@ -156,7 +168,11 @@ def load_rt_iot2022(sample_size=None):
 
 
 def load_beth():
-    """BETH host telemetry: 3.8M rows binary anomaly detection dataset.
+    """BETH host telemetry: 1,141,078 labelled rows, binary anomaly detection.
+
+    The 3.8M figure this docstring used to quote is the size of the full BETH
+    capture, not of the three labelled splits that are actually shipped and
+    used here (763,144 + 188,967 + 188,967).
 
     Returns explicit train/validate/test splits:
       dict with keys 'train', 'val', 'test'; each maps to (X, y).
@@ -237,7 +253,7 @@ def load_shuttle(sample_size=None):
 
 
 def load_bikeshare(target_col="cnt", sample_size=None):
-    """Bike Sharing Demand: 17.4k rows × 16 features, regression (demand prediction).
+    """Bike Sharing Demand: 17,379 rows × 12 features, regression (demand prediction).
 
     Kaggle dataset: https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619
     File: bikeshare-hour.csv (extracted from the Kaggle zip)
@@ -265,7 +281,14 @@ def load_bikeshare(target_col="cnt", sample_size=None):
             columns=[target_col], errors="ignore"
         )
         # Drop obvious ID/index columns if present
-        X = X.drop(columns=["instant"], errors="ignore").astype(float)
+        X = X.drop(columns=["instant"], errors="ignore")
+        # `casual` and `registered` are the target's two ADDENDS, not features:
+        # casual + registered == cnt exactly, on all 17,379 rows. Leaving them in
+        # X asks the model to recover a sum it has already been handed, which is
+        # why the RF reference on this row read a perfect 1.000. They are dropped
+        # for every target, not just `cnt` -- predicting `casual` from
+        # `registered` and `cnt` is the same leak wearing a different hat.
+        X = X.drop(columns=["casual", "registered"], errors="ignore").astype(float)
 
         if sample_size and len(X) > sample_size:
             idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)

@@ -54,7 +54,7 @@ So the name returns to mergeVAT. It is imperfect — neither the priority queue 
 
 ### 3.3.2 Holding it in one matrix
 
-Speed is only half the problem; memory is the other half, and at these sizes it is the wall you hit first. A 135,000-row psychiatric-evaluation dataset I worked with (165 mostly-binary features whose names were anonymized, so the exercise is purely one of scale) is 73 gigabytes as a single-precision distance matrix, and the classical VAT keeps *two* such matrices, the original and the reordered copy, to trade memory for compute. Since mergeVAT no longer needs that trade, I would rather spend the memory budget on a bigger problem.
+Speed is only half the problem; memory is the other half, and at these sizes it is the wall you hit first. A {{dataset.psychiatric.rows}}-row psychiatric-evaluation dataset I worked with ({{dataset.psychiatric.features}} mostly-binary features whose names were anonymized, so the exercise is purely one of scale) is 73 gigabytes as a single-precision distance matrix, and the classical VAT keeps *two* such matrices, the original and the reordered copy, to trade memory for compute. Since mergeVAT no longer needs that trade, I would rather spend the memory budget on a bigger problem.
 
 Two ideas here, and the one that is built has to be kept apart from the one that is not.
 

@@ -62,7 +62,6 @@ long compute" bar, so this ran directly rather than being launched separately.
 from __future__ import annotations
 
 import os
-import statistics
 import sys
 
 import numpy as np

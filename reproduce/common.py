@@ -58,12 +58,18 @@ def timed():
 
 
 def agg(values):
-    """(mean, std) of a list; std=0 for a single value. Returns (None, None) if empty."""
+    """(mean, sample std) of a list; std=0 for a single value, (None, None) if empty.
+
+    Uses the SAMPLE standard deviation (statistics.stdev, ddof=1), not the
+    population one: the chapters read these ± as the seed-to-seed dispersion of an
+    estimate over a finite seed sample, which is an inferential quantity. pstdev
+    (÷n) understated it by ~sqrt(n/(n-1)) (~5% at the ten-seed floor).
+    """
     vals = [v for v in values if v is not None]
     if not vals:
         return None, None
     mean = statistics.fmean(vals)
-    std = statistics.pstdev(vals) if len(vals) > 1 else 0.0
+    std = statistics.stdev(vals) if len(vals) > 1 else 0.0
     return mean, std
 
 
@@ -96,24 +102,46 @@ def machine():
     with one that does.
     """
     cpu = ""
-    for line in _read("/proc/cpuinfo").splitlines():
-        if line.startswith("model name"):
-            cpu = line.split(":", 1)[1].strip()
-            break
+    physical_cores = ""
     mem_kb = 0
-    for line in _read("/proc/meminfo").splitlines():
-        if line.startswith("MemTotal"):
-            mem_kb = int(line.split()[1])
-            break
+    governor = "n/a"
+    boost = "n/a"
 
-    # /proc exists under Git Bash but NOT for a native Windows interpreter, which
-    # is what `uv run` launches -- so on the very host the proposal calls "the
-    # workstation" every table recorded `ram: unknown` and a registry-style CPU
-    # string instead of "i9-14900HX". The machine block is the whole point of
-    # checklist B1/B2; degrading silently on one platform defeats it. The shell
-    # harness already reports these correctly, which is why the gap was invisible
-    # in PROVENANCE.txt while being present in all thirteen emitted tables.
-    if not mem_kb and sys.platform == "win32":
+    if sys.platform.startswith("linux"):
+        for line in _read("/proc/cpuinfo").splitlines():
+            if line.startswith("model name"):
+                cpu = line.split(":", 1)[1].strip()
+                break
+        for line in _read("/proc/meminfo").splitlines():
+            if line.startswith("MemTotal"):
+                mem_kb = int(line.split()[1])
+                break
+        gov_path = _read("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
+        if gov_path:
+            governor = gov_path
+        boost_path = _read("/sys/devices/system/cpu/cpufreq/boost")
+        if boost_path:
+            boost = boost_path
+        try:
+            lscpu = subprocess.run(
+                ["lscpu"], capture_output=True, text=True, timeout=5
+            ).stdout
+            for line in lscpu.splitlines():
+                if line.startswith("Core(s) per socket:"):
+                    cores = line.split(":")[-1].strip()
+                    sockets = 1
+                    for l in lscpu.splitlines():
+                        if l.startswith("Socket(s):"):
+                            sockets = int(l.split(":")[-1].strip())
+                    try:
+                        physical_cores = f"{int(cores) * sockets}"
+                    except ValueError:
+                        pass
+                    break
+        except (OSError, subprocess.SubprocessError):
+            pass
+
+    elif sys.platform == "win32":
         try:
             import ctypes
 
@@ -134,9 +162,9 @@ def machine():
             st.dwLength = ctypes.sizeof(_MemStatus)
             if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(st)):
                 mem_kb = st.ullTotalPhys // 1024
-        except Exception:  # noqa: BLE001 -- identity is best-effort, never fatal
+        except Exception:  # noqa: BLE001
             pass
-    if not cpu and sys.platform == "win32":
+
         try:
             import winreg
 
@@ -147,6 +175,51 @@ def machine():
                 cpu = winreg.QueryValueEx(k, "ProcessorNameString")[0].strip()
         except Exception:  # noqa: BLE001
             pass
+
+        try:
+            num_physical = os.environ.get("NUMBER_OF_PROCESSORS")
+            if num_physical:
+                physical_cores = num_physical
+        except Exception:  # noqa: BLE001
+            pass
+
+    elif sys.platform == "darwin":
+        try:
+            cpu_brand = subprocess.run(
+                ["sysctl", "-n", "machdep.cpu.brand_string"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            ).stdout.strip()
+            if cpu_brand:
+                cpu = cpu_brand
+        except (OSError, subprocess.SubprocessError):
+            pass
+
+        try:
+            mem_bytes = subprocess.run(
+                ["sysctl", "-n", "hw.memsize"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            ).stdout.strip()
+            if mem_bytes:
+                mem_kb = int(mem_bytes) // 1024
+        except (OSError, subprocess.SubprocessError, ValueError):
+            pass
+
+        try:
+            phys_cores = subprocess.run(
+                ["sysctl", "-n", "hw.physicalcpu"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            ).stdout.strip()
+            if phys_cores:
+                physical_cores = phys_cores
+        except (OSError, subprocess.SubprocessError):
+            pass
+
     gpu = ""
     try:
         gpu = (
@@ -165,7 +238,8 @@ def machine():
         )
     except (OSError, subprocess.SubprocessError):
         pass
-    if not gpu:
+
+    if not gpu and sys.platform.startswith("linux"):
         try:
             for line in subprocess.run(
                 ["lspci"], capture_output=True, text=True, timeout=10
@@ -175,15 +249,61 @@ def machine():
                     break
         except (OSError, subprocess.SubprocessError):
             pass
+
+    if not gpu and sys.platform == "darwin":
+        try:
+            output = subprocess.run(
+                ["system_profiler", "SPDisplaysDataType"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            ).stdout
+            for line in output.splitlines():
+                if "Chipset Model" in line:
+                    gpu = line.split(":", 1)[-1].strip()
+                    break
+            if not gpu:
+                for line in output.splitlines():
+                    if "Model" in line and "Memory" in output:
+                        gpu = line.split(":", 1)[-1].strip()
+                        break
+        except (OSError, subprocess.SubprocessError):
+            pass
+
+    if not gpu and sys.platform == "win32":
+        try:
+            output = subprocess.run(
+                [
+                    "wmic",
+                    "path",
+                    "win32_VideoController",
+                    "get",
+                    "name",
+                    "/format:list",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            ).stdout
+            for line in output.splitlines():
+                if line.startswith("Name="):
+                    gpu = line.split("=", 1)[1].strip()
+                    break
+        except (OSError, subprocess.SubprocessError):
+            pass
+
+    cores_str = f"{os.cpu_count()} logical"
+    if physical_cores:
+        cores_str = f"{physical_cores} physical, {os.cpu_count()} logical"
+
     return {
         "host": platform.node() or "unknown",
         "os": platform.platform(terse=True),
         "cpu": cpu or platform.processor() or "unknown",
-        "cores": f"{os.cpu_count()} logical",
+        "cores": cores_str,
         "ram": f"{mem_kb / 1048576:.1f} GiB" if mem_kb else "unknown",
-        "governor": _read(
-            "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", "n/a"
-        ),
+        "governor": governor,
+        "boost": boost,
         "gpu": gpu or "none detected",
         "python": platform.python_version(),
     }
@@ -221,7 +341,7 @@ def write_markdown(path, title, header, rows, note="", seeds=None):
             f.write(f"\n> {note}\n")
         # `seeds` is an override, not a default, and it exists because the footer used
         # to state `SEEDS` unconditionally -- including on tables the harness does not
-        # compute. `table_5_x_ch5_selection.py` does no arithmetic at all: it renders
+        # compute. `table_5_1_3_ch5_tables.py` does no arithmetic at all: it renders
         # `gated-minimax-selection/outputs/results.json`, whose driver runs at
         # `SEEDS = [0, 1, 2, 3, 4]` -- five restarts, and only for the NERFCM and
         # ConiVAT columns, which are the only cells in that battery carrying a
