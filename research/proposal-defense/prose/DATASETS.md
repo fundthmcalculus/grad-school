@@ -66,7 +66,7 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Status:** Publicly available; can be auto-fetched; cached locally to avoid repeated network calls
 
 #### Synthetic Clustering Batteries (Ch 3 Table 3.5, Ch 5 Table 5.1–5.3)
-- **File:** Generated inline by `reproduce/tables/table_5_x_ch5_selection.py` (two_moons, circles, aniso, bridged, etc.)
+- **File:** Generated inline by `reproduce/tables/table_5_1_3_ch5_tables.py` (two_moons, circles, aniso, bridged, etc.)
 - **Size:** 120–1,500 points per construction
 - **Role:** Small-scale validation; ground truth for topological correctness checks
 - **Status:** Already available; generated on-demand
@@ -79,7 +79,7 @@ This appendix documents the location, size, source, and loading strategy for all
 ### Topological Membership Generation (Chapter 5)
 
 #### Synthetic Membership Batteries (Table 5.1–5.3, Fig 5.2)
-- **Files:** Generated inline by `reproduce/tables/table_5_x_ch5_selection.py`
+- **Files:** Generated inline by `reproduce/tables/table_5_1_3_ch5_tables.py`
 - **Size:** 120–5,000 points, hand-constructed (two_gaussians, bridged_gaussians, concentric_rings, varying_density, nested_gaussians, three_level_hierarchy, etc.)
 - **Role:** Validation of band-discovery and membership-generation quality; all ground truth available by construction
 - **Status:** Already available; all stored in `battery_hierarchical.SCALABLE` generator

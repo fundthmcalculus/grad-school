@@ -1471,7 +1471,7 @@ def main(high_res=False, svg=False, scaling=False):
     fig_selection_comparison(persistence_methods)
     fig_persistence_thresholds(persistence_methods)
     # Record the seed sets this run actually used, so a downstream renderer can state
-    # them instead of assuming. `reproduce/tables/table_5_x_ch5_selection.py` does no
+    # them instead of assuming. `reproduce/tables/table_5_1_3_ch5_tables.py` does no
     # computation -- it renders this JSON -- and `reproduce/common.py` was stamping its
     # own ten-seed default into the footer of all three Chapter 5 tables, over a run
     # made at five. That is the same defect as a PROVENANCE.txt reporting a seed list

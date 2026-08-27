@@ -164,17 +164,17 @@ EXPERIMENTS = [
         "zero. Use REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1 for Fig 4.2.",
     ),
     Experiment(
-        id="table-4-x-beth-anomaly",
+        id="table-4-11-beth-anomaly",
         title="BETH host telemetry: one-class anomaly detection on the full 763k training split",
         chapter="Ch4",
-        produces="Table 4.x + Table 4.x(b) (BETH theta operating curve)",
+        produces="Table 4.11 + Table 4.11(b) (BETH theta operating curve)",
         repo="tribble-fis",
-        command=_uv("../reproduce/tables/table_4_x_beth_anomaly.py"),
+        command=_uv("../reproduce/tables/table_4_11_beth_anomaly.py"),
         hardware="any",
         datasets=["BETH (data/beth/, gitignored -- see data/.gitignore)"],
         outputs=[
-            "reproduce/outputs/table_4_x_beth_anomaly.md",
-            "reproduce/outputs/table_4_x_beth_theta_sweep.md",
+            "reproduce/outputs/table_4_11_beth_anomaly.md",
+            "reproduce/outputs/table_4_11_beth_theta_sweep.md",
         ],
         notes="VERIFIED RUNNING (10 seeds, 1m37s). This is the BETH experiment "
         "table_4_4_openset.py could not run: leave-one-class-out needs >=3 classes and "
@@ -398,7 +398,7 @@ EXPERIMENTS = [
         chapter="Ch5",
         produces="Tables 5.1, 5.2, 5.3",
         repo=".",
-        command=["python3", "reproduce/tables/table_5_x_ch5_selection.py"],
+        command=["python3", "reproduce/tables/table_5_1_3_ch5_tables.py"],
         hardware="any",
         outputs=[
             "reproduce/outputs/table_5_1_battery.md",

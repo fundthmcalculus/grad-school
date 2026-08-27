@@ -1,4 +1,4 @@
-"""Table 4.x -- BETH host-telemetry anomaly detection, one-class protocol.
+"""Table 4.11 -- BETH host-telemetry anomaly detection, one-class protocol.
 
 BETH is the large-scale anomaly-detection set Chapter 4 §4.3.5 names as the
 motivating case for the complement rule: train on benign host telemetry, then be
@@ -81,7 +81,7 @@ probe's split). Which cells carry a seed spread and which are exact is stated in
 the note.
 
 Run (from repo root):
-    uv run --project tribble-fis python reproduce/tables/table_4_x_beth_anomaly.py
+    uv run --project tribble-fis python reproduce/tables/table_4_11_beth_anomaly.py
 """
 
 from __future__ import annotations
@@ -435,7 +435,7 @@ def _separability_probe(Xte, is_anom_te, meta):
 
 
 def main():
-    print("Table 4.x -- BETH anomaly detection (one-class, full 763k training split)")
+    print("Table 4.11 -- BETH anomaly detection (one-class, full 763k training split)")
     got = load_splits()
     if got is None:
         print("  BETH unavailable -- nothing emitted")
@@ -612,8 +612,8 @@ def main():
                 f"they are affected alike and remain comparable to each other."
             )
     C.emit(
-        "table_4_x_beth_anomaly",
-        "Table 4.x — BETH host-telemetry anomaly detection (one-class)",
+        "table_4_11_beth_anomaly",
+        "Table 4.11 — BETH host-telemetry anomaly detection (one-class)",
         [
             "Method",
             "Detection rate",
@@ -684,8 +684,8 @@ def main():
                 ]
             )
         C.emit(
-            "table_4_x_beth_theta_sweep",
-            "Table 4.x(b) — BETH complement-rule operating curve vs. the boost θ",
+            "table_4_11_beth_theta_sweep",
+            "Table 4.11(b) — BETH complement-rule operating curve vs. the boost θ",
             [
                 "θ",
                 "validation false-alarm rate",

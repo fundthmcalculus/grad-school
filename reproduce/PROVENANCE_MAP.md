@@ -255,7 +255,7 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
-| *(no prose table yet — A.7.3)* | `table_4_x_beth_anomaly.py` | `outputs/table_4_x_beth_anomaly.{md,csv}`, `outputs/table_4_x_beth_theta_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95) — note 22 |
+| 4.11 BETH anomaly detection *(number reserved; no prose slot yet)* | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_theta_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95) — note 22 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
 
 **Note 22 — BETH is a one-class benchmark, and the issue that asked for supervised
@@ -265,7 +265,7 @@ split settles it: **train 763,144 rows / 0 positives, val 188,967 / 0, test 188,
 158,432.** Every positive BETH ships is in the test split. A supervised RF fits the
 training split without raising anything and predicts the constant 0 — 16.2% accuracy,
 AUC 0.5 — so the failure mode here is a *plausible-looking number*, not a crash, which
-is the class of defect this map exists for. `table_4_x_beth_anomaly.py` therefore runs
+is the class of defect this map exists for. `table_4_11_beth_anomaly.py` therefore runs
 the one-class protocol BETH supports and emits the supervised arms as **N/A with the
 reason in the cell**. No arm in that table is fitted on test-split labels.
 
@@ -494,9 +494,9 @@ this pass were initially run that way. Use
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| 5.1 The battery | `run_all.py` → `table_5_x_ch5_selection.py` | `outputs/table_5_1_battery.{md,csv}` | **reproduced** — after the note-9 correction |
-| 5.2 Multi-scale recovery | `run_all.py` → `table_5_x_ch5_selection.py` | `outputs/table_5_2_multiscale.{md,csv}` | **reproduced** |
-| 5.3 Selection comparison | `run_all.py` → `table_5_x_ch5_selection.py` | `outputs/table_5_3_selection.{md,csv}` | **reproduced** |
+| 5.1 The battery | `run_all.py` → `table_5_1_3_ch5_tables.py` | `outputs/table_5_1_battery.{md,csv}` | **reproduced** — after the note-9 correction |
+| 5.2 Multi-scale recovery | `run_all.py` → `table_5_1_3_ch5_tables.py` | `outputs/table_5_2_multiscale.{md,csv}` | **reproduced** |
+| 5.3 Selection comparison | `run_all.py` → `table_5_1_3_ch5_tables.py` | `outputs/table_5_3_selection.{md,csv}` | **reproduced** |
 | 5.4 Goal G1 scaling decision rule | `table_5_4_ch5_g1_scaling.py` (own computation) | `outputs/table_5_4_ch5_g1_scaling.{md,csv}` + `_raw.csv` | **reproduced** — two-stage vs. flat only; the decision rule's third arm (one-pass) is unimplemented, stated in the table's own note |
 
 Chapter 5 is the best-behaved chapter in the proposal in design: one deterministic
@@ -518,7 +518,7 @@ of its 17 figures (`fig11_scaling` is behind an opt-in `--scaling` flag), and
 rewrites `results.json` **byte-identical to the 2026-07-20 file** — so the
 chapter's numbers were never wrong, only unreproducible.
 
-**The tables were hand-transcribed.** `reproduce/tables/table_5_x_ch5_selection.py`
+**The tables were hand-transcribed.** `reproduce/tables/table_5_1_3_ch5_tables.py`
 closes that: it does no computation, only renders the JSON, so a stale prose cell
 now shows as a diff.
 
