@@ -58,6 +58,8 @@ import selection as S  # noqa: E402
 MIN_CLUSTER_SIZES: Tuple[int, ...] = (3, 5, 10)
 DEFAULT_MIN_CLUSTER_SIZE = 5
 EPS_SWEEP_POINTS = 400
+SEED_BASE = 9000
+DEFAULT_N_SEEDS = 10
 
 
 # ---------------------------------------------------------------------------
@@ -69,17 +71,29 @@ def _euclid(X: np.ndarray) -> np.ndarray:
     return cdist(X, X)
 
 
-def _dataset_specs() -> List[Dict]:
-    """Build the dataset battery.
+def _seed_kwargs(seed_index: int) -> Dict[str, int]:
+    """Seed override for replicate `seed_index`.
+
+    Index 0 passes nothing, so every generator keeps its own module default and
+    replicate 0 reproduces the original single-seed run byte for byte. Later
+    indices force a distinct seed, giving the spread this document's ten-seed
+    floor requires.
+    """
+    return {} if seed_index == 0 else {"seed": SEED_BASE + seed_index}
+
+
+def _dataset_specs(seed_index: int = 0) -> List[Dict]:
+    """Build the dataset battery for one replicate.
 
     Each entry is ``{name, family, D, truths}`` where ``truths`` is a list of
     ``(level_name, y)`` ordered fine -> coarse. ``y`` may contain -1 for points
     with no ground-truth cluster (the bridge); those are dropped when scoring.
     """
     specs: List[Dict] = []
+    sk = _seed_kwargs(seed_index)
 
-    def flat(name: str, family: str, gen: Callable[[], Tuple[np.ndarray, np.ndarray]]):
-        X, y = gen()
+    def flat(name: str, family: str, gen: Callable[..., Tuple[np.ndarray, np.ndarray]]):
+        X, y = gen(**sk)
         specs.append(
             {"name": name, "family": family, "D": _euclid(X), "truths": [("only", y)]}
         )
@@ -92,7 +106,7 @@ def _dataset_specs() -> List[Dict]:
     flat("uniform_noise", "flat", B.uniform_noise)
 
     # -- nested hierarchies (Table 5.2) ------------------------------------
-    X, y_fine, y_coarse = BH.nested_gaussians()
+    X, y_fine, y_coarse = BH.nested_gaussians(**sk)
     specs.append(
         {
             "name": "nested_gaussians",
@@ -101,7 +115,7 @@ def _dataset_specs() -> List[Dict]:
             "truths": [("fine", y_fine), ("coarse", y_coarse)],
         }
     )
-    X, y_f, y_m, y_c = BH.three_level_hierarchy()
+    X, y_f, y_m, y_c = BH.three_level_hierarchy(**sk)
     specs.append(
         {
             "name": "three_level_hierarchy",
@@ -110,7 +124,7 @@ def _dataset_specs() -> List[Dict]:
             "truths": [("fine", y_f), ("medium", y_m), ("coarse", y_c)],
         }
     )
-    X, y_fine, y_coarse = BH.density_hierarchy()
+    X, y_fine, y_coarse = BH.density_hierarchy(**sk)
     specs.append(
         {
             "name": "density_hierarchy",
@@ -128,12 +142,12 @@ def _dataset_specs() -> List[Dict]:
         ("graph_communities", ND.graph_communities),
         ("cosine_topics", ND.cosine_topics),
     ):
-        D, y = gen()
+        D, y = gen(**sk)
         specs.append(
             {"name": name, "family": "non-metric", "D": D, "truths": [("only", y)]}
         )
 
-    D, y_fine, y_coarse = ND.relational_nested_hierarchy()
+    D, y_fine, y_coarse = ND.relational_nested_hierarchy(**sk)
     specs.append(
         {
             "name": "relational_nested_hierarchy",
@@ -149,7 +163,7 @@ def _dataset_specs() -> List[Dict]:
         ("chain_then_ring", RD.chain_then_ring),
         ("multi_scale_hierarchy", RD.multi_scale_hierarchy),
     ):
-        D, y = gen()
+        D, y = gen(**sk)
         specs.append(
             {"name": name, "family": "relational", "D": D, "truths": [("only", y)]}
         )
@@ -482,6 +496,134 @@ def summarise(results: Dict) -> Dict:
     return {"flat_fixed_setting": fixed, "mcs_sensitivity": sensitivity}
 
 
+def summarise_across_seeds(replicates: Sequence[Dict]) -> Dict:
+    """Aggregate the headline comparison over replicates.
+
+    The per-dataset tables stay on replicate 0 (the module-default seeds, so they
+    remain comparable with everything published before seeding existed). This is
+    what lifts the comparison to the ten-seed floor: each replicate's
+    fixed-setting mean is computed independently, then averaged, so the reported
+    standard deviation is across *whole batteries* rather than across datasets.
+
+    Also records band-recovery stability, which is the thing a single seed cannot
+    show: whether `select_multiscale` returns the same granularity vector every
+    time on a nested dataset.
+    """
+    per_rep_ours: List[float] = []
+    per_rep_ours_k: List[float] = []
+    per_setting: Dict[Tuple[int, str, int], List[float]] = {}
+    for rep in replicates:
+        fixed = summarise({"datasets": rep})["flat_fixed_setting"]
+        if not fixed["datasets"]:
+            continue
+        per_rep_ours.append(fixed["ours"]["mean_ari"])
+        per_rep_ours_k.append(fixed["ours"]["k_correct"] / fixed["n_datasets"])
+        for r in fixed["hdbscan"]:
+            key = (r["min_samples"], r["method"], r["min_cluster_size"])
+            per_setting.setdefault(key, []).append(r["mean_ari"])
+
+    def stat(vals: Sequence[float]) -> Dict[str, float]:
+        arr = np.asarray(vals, dtype=float)
+        return {
+            "mean": float(arr.mean()),
+            "std": float(arr.std(ddof=1)) if arr.size > 1 else 0.0,
+            "min": float(arr.min()),
+            "max": float(arr.max()),
+            "n": int(arr.size),
+        }
+
+    hdb = [
+        {
+            "min_samples": k[0],
+            "method": k[1],
+            "min_cluster_size": k[2],
+            **stat(v),
+        }
+        for k, v in per_setting.items()
+    ]
+    hdb.sort(key=lambda r: -r["mean"])
+
+    # band-recovery stability on every dataset with more than one truth level
+    stability: Dict[str, Dict] = {}
+    names = [n for n, e in replicates[0].items() if len(e["levels"]) > 1]
+    for name in names:
+        vectors = [
+            tuple(rep[name]["ours_multiscale"]["granularities"])
+            for rep in replicates
+            if name in rep
+        ]
+        truth = tuple(replicates[0][name]["truth_k"])
+        modal = max(set(vectors), key=vectors.count)
+        stability[name] = {
+            "truth_k": list(truth),
+            "modal_granularities": list(modal),
+            "modal_agreement": vectors.count(modal) / len(vectors),
+            "exact_truth_match": sum(1 for v in vectors if v == truth) / len(vectors),
+            "distinct_vectors": len(set(vectors)),
+            "n_replicates": len(vectors),
+        }
+
+    # Per-dataset: ours vs a baseline allowed to pick its best of all 12
+    # configurations on this very dataset. That is a generous baseline and the
+    # honest one to lose to, so the win/loss tally is reported alongside.
+    tuned: Dict[str, Dict] = {}
+    tally = {"ours": 0, "hdbscan": 0, "tie": 0}
+    tally_ms = {"ours": 0, "hdbscan": 0, "tie": 0}
+    flat_names = [n for n, e in replicates[0].items() if len(e["levels"]) == 1]
+    for name in flat_names:
+        ours_v, best_v, ms_v = [], [], []
+        for rep in replicates:
+            e = rep.get(name)
+            if e is None:
+                continue
+            oa = e["ours_flat"]["levels"]["only"]["ari"]
+            if np.isnan(oa):
+                continue
+            runs = [r for r in e["hdbscan"]["runs"] if "error" not in r]
+            if not runs:
+                continue
+            ba = max(r["levels"]["only"]["ari"] for r in runs)
+            ms = e["ours_multiscale"]["best_ari_per_level"]["only"]
+            ours_v.append(oa)
+            best_v.append(ba)
+            ms_v.append(oa if np.isnan(ms) else max(oa, ms))
+            for val, t in ((oa, tally), (ms_v[-1], tally_ms)):
+                t[
+                    (
+                        "ours"
+                        if val > ba + 0.02
+                        else ("hdbscan" if ba > val + 0.02 else "tie")
+                    )
+                ] += 1
+        if ours_v:
+            tuned[name] = {
+                "ours": stat(ours_v),
+                "hdbscan_tuned": stat(best_v),
+                "delta_mean": float(np.mean(ours_v) - np.mean(best_v)),
+            }
+
+    return {
+        "n_replicates": len(per_rep_ours),
+        "ours": {
+            "setting": "gap_sigma=2.0 (module default, identical everywhere)",
+            **stat(per_rep_ours),
+            "k_correct_fraction": stat(per_rep_ours_k),
+        },
+        "hdbscan": hdb,
+        "band_recovery_stability": stability,
+        "per_dataset_vs_tuned": tuned,
+        "verdict_vs_tuned": {
+            "threshold_ari": 0.02,
+            "flat_gate": tally,
+            "band_selector": tally_ms,
+            "note": (
+                "counts are dataset x replicate comparisons against a baseline "
+                "tuned per dataset over all 12 configurations"
+            ),
+        },
+    }
+
+
 def render_markdown(results: Dict) -> str:
     lines: List[str] = []
     lines.append("# HDBSCAN\\* baselines for the gated selectors")
@@ -645,6 +787,83 @@ def render_markdown(results: Dict) -> str:
             f"| {name} | {eom_range} | {eom_spread} | {leaf_spread} | {ours_cell} |"
         )
     lines.append("")
+
+    across = summ.get("across_seeds")
+    if not across or across["n_replicates"] < 2:
+        return "\n".join(lines)
+
+    n = across["n_replicates"]
+    lines.append(f"## The same comparison over {n} seeds")
+    lines.append("")
+    lines.append(
+        "Every table above is replicate 0, at each generator's module-default "
+        f"seed. Here each of the {n} replicates gets its own fixed-setting mean "
+        "over the whole battery, and those are then averaged -- so the standard "
+        "deviation is across whole batteries, not across datasets."
+    )
+    lines.append("")
+    lines.append("| method | setting | mean ARI | sd | min | max |")
+    lines.append("|---|---|---:|---:|---:|---:|")
+    o = across["ours"]
+    lines.append(
+        f"| **ours (gated set-cover)** | {o['setting']} | **{o['mean']:.3f}** "
+        f"| {o['std']:.3f} | {o['min']:.3f} | {o['max']:.3f} |"
+    )
+    for r in across["hdbscan"][:6]:
+        lines.append(
+            f"| HDBSCAN\\* {r['method']} | mpts={r['min_samples']}, "
+            f"min_cluster_size={r['min_cluster_size']} | {r['mean']:.3f} "
+            f"| {r['std']:.3f} | {r['min']:.3f} | {r['max']:.3f} |"
+        )
+    lines.append("")
+
+    tuned = across.get("per_dataset_vs_tuned")
+    verdict = across.get("verdict_vs_tuned")
+    if tuned and verdict:
+        lines.append("### Per dataset, against a baseline tuned on that dataset")
+        lines.append("")
+        f, b = verdict["flat_gate"], verdict["band_selector"]
+        lines.append(
+            "HDBSCAN\\* picks its best of all 12 configurations on each dataset "
+            "separately -- a deliberately generous baseline. Over "
+            f"{n} replicates x {len(tuned)} datasets, the flat gate wins "
+            f"{f['ours']}, loses {f['hdbscan']}, ties {f['tie']}; the band "
+            f"selector wins {b['ours']}, loses {b['hdbscan']}, ties {b['tie']} "
+            f"(verdict threshold {verdict['threshold_ari']} ARI)."
+        )
+        lines.append("")
+        lines.append("| dataset | ours | HDBSCAN\\* tuned | delta |")
+        lines.append("|---|---|---|---:|")
+        for name, row in sorted(tuned.items(), key=lambda kv: kv[1]["delta_mean"]):
+            o, h = row["ours"], row["hdbscan_tuned"]
+            lines.append(
+                f"| {name} | {o['mean']:.3f} ± {o['std']:.3f} "
+                f"| {h['mean']:.3f} ± {h['std']:.3f} | {row['delta_mean']:+.3f} |"
+            )
+        lines.append("")
+
+    stab = across["band_recovery_stability"]
+    if stab:
+        lines.append("### Band-recovery stability, which one seed cannot show")
+        lines.append("")
+        lines.append(
+            "Whether `select_multiscale` returns the same granularity vector every "
+            "time. `exact truth match` is the fraction of replicates whose "
+            "granularities equal the ground-truth level sizes."
+        )
+        lines.append("")
+        lines.append(
+            "| dataset | truth k | modal granularities | modal agreement "
+            "| exact truth match | distinct vectors |"
+        )
+        lines.append("|---|---|---|---:|---:|---:|")
+        for name, row in stab.items():
+            lines.append(
+                f"| {name} | {row['truth_k']} | {row['modal_granularities']} "
+                f"| {row['modal_agreement']:.0%} | {row['exact_truth_match']:.0%} "
+                f"| {row['distinct_vectors']} |"
+            )
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -658,12 +877,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument(
         "--only", default=None, help="Comma-separated dataset names to restrict to."
     )
+    ap.add_argument(
+        "--seeds",
+        type=int,
+        default=DEFAULT_N_SEEDS,
+        help=(
+            "Number of replicates. Replicate 0 uses each generator's module-default "
+            "seed, so --seeds 1 reproduces the original single-seed run exactly."
+        ),
+    )
     args = ap.parse_args(argv)
 
-    specs = _dataset_specs()
-    if args.only:
-        wanted = {s.strip() for s in args.only.split(",")}
-        specs = [s for s in specs if s["name"] in wanted]
+    wanted = {s.strip() for s in args.only.split(",")} if args.only else None
 
     results: Dict = {
         "config": {
@@ -671,13 +896,46 @@ def main(argv: Sequence[str] | None = None) -> int:
             "default_min_cluster_size": DEFAULT_MIN_CLUSTER_SIZE,
             "eps_sweep_points": EPS_SWEEP_POINTS,
             "hdbscan_impl": "hdbscan (contrib)",
+            "n_seeds": args.seeds,
+            "seed_base": SEED_BASE,
+            "seed_note": (
+                "replicate 0 = generator module defaults; replicate i>0 = "
+                "seed SEED_BASE + i"
+            ),
         },
         "datasets": {},
+        "replicates": [],
     }
 
+    for seed_index in range(args.seeds):
+        specs = _dataset_specs(seed_index)
+        if wanted is not None:
+            specs = [s for s in specs if s["name"] in wanted]
+        rep = _run_one_replicate(specs, seed_index, args.seeds)
+        results["replicates"].append(rep)
+    results["datasets"] = results["replicates"][0]
+
+    results["summary"] = summarise(results)
+    if len(results["replicates"]) > 1:
+        results["summary"]["across_seeds"] = summarise_across_seeds(
+            results["replicates"]
+        )
+
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(results, indent=2, sort_keys=True))
+    md = out.with_suffix(".md")
+    md.write_text(render_markdown(results))
+    print(f"\nwrote {out}\nwrote {md}")
+    return 0
+
+
+def _run_one_replicate(specs: Sequence[Dict], seed_index: int, n_seeds: int) -> Dict:
+    """Run every method on every dataset of one replicate."""
+    rep: Dict[str, Dict] = {}
     for spec in specs:
         name, D, truths = spec["name"], spec["D"], spec["truths"]
-        print(f"[{name}] n={len(D)} ...", flush=True)
+        print(f"[seed {seed_index + 1}/{n_seeds}] [{name}] n={len(D)} ...", flush=True)
         entry = {
             "family": spec["family"],
             "n": int(len(D)),
@@ -688,23 +946,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             "hdbscan": run_hdbscan_grid(D, truths),
             "eps_sweep": run_eps_sweep(D, truths),
         }
-        results["datasets"][name] = entry
+        rep[name] = entry
         print(
             f"    ours flat k={entry['ours_flat']['k']}, "
             f"bands={entry['ours_multiscale']['granularities']}, "
             f"eps partitions={entry['eps_sweep']['n_distinct_partitions']}",
             flush=True,
         )
-
-    results["summary"] = summarise(results)
-
-    out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(results, indent=2, sort_keys=True))
-    md = out.with_suffix(".md")
-    md.write_text(render_markdown(results))
-    print(f"\nwrote {out}\nwrote {md}")
-    return 0
+    return rep
 
 
 if __name__ == "__main__":

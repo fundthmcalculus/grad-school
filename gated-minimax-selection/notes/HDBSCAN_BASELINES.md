@@ -50,32 +50,77 @@ truth:
 | HDBSCAN\* leaf | mpts=1, mcs=10 | 0.680 | 7/12 |
 | HDBSCAN\* leaf | mpts=1, mcs=3 | 0.437 | 3/12 |
 
-**+0.067 over the best single HDBSCAN\* setting** (+0.105 against the best at
-`mpts=1`, where the hierarchies are provably identical), at equal *k*-accuracy.
-Real, but modest, and it is one seed per dataset with no spread — well short of a
-pillar.
+That is +0.067 over the best single HDBSCAN\* setting on **replicate 0 alone**, and
+it does not survive ten seeds. See the next section before quoting it anywhere.
 
-**Allow HDBSCAN\* a per-dataset choice of `min_cluster_size` and `min_samples`, and
-the accuracy advantage disappears entirely.** Scored against the best of its 12
-configurations on each dataset (threshold 0.02 ARI for a verdict):
+### Ten seeds: there is no accuracy advantage
+
+Replicate 0 uses each generator's module-default seed; replicates 1–9 force
+distinct seeds. Each replicate gets its own fixed-setting battery mean, then those
+are averaged, so the standard deviation below is across **whole batteries**:
+
+| method | setting | mean ARI | sd | min | max |
+|---|---|---:|---:|---:|---:|
+| **ours (gated set-cover)** | `gap_sigma`=2.0 everywhere | **0.835** | 0.037 | 0.794 | 0.887 |
+| HDBSCAN\* eom | mpts=5, mcs=5 | 0.817 | 0.019 | 0.790 | 0.855 |
+| HDBSCAN\* eom | mpts=5, mcs=3 | 0.815 | 0.022 | 0.782 | 0.856 |
+| HDBSCAN\* eom | mpts=1, mcs=10 | 0.805 | 0.037 | 0.772 | 0.879 |
+| HDBSCAN\* eom | mpts=1, mcs=5 | 0.798 | 0.014 | 0.771 | 0.816 |
+| HDBSCAN\* leaf | mpts=5, mcs=10 | 0.713 | 0.024 | 0.674 | 0.747 |
+
+**+0.018 at roughly half a standard deviation, with the ranges overlapping almost
+entirely** (ours 0.794–0.887, theirs 0.790–0.855). Replicate 0's 0.887 is our
+*best of ten*, which is exactly why the single-seed +0.067 looked like a result.
+**Do not claim an accuracy advantage over a fixed-setting HDBSCAN\*.**
+
+Against a baseline allowed to tune per dataset it is worse — 10 replicates × 12
+datasets, verdict threshold 0.02 ARI:
 
 | | wins | losses | ties |
 |---|---:|---:|---:|
-| flat gate vs tuned HDBSCAN\* | 1 | 2 | 9 |
-| band selector vs tuned HDBSCAN\* | 1 | 1 | 10 |
+| flat gate vs tuned HDBSCAN\* | 7 | 29 | 84 |
+| band selector vs tuned HDBSCAN\* | 8 | 19 | 93 |
 
-The flat gate's one win is `graph_communities` (0.331 vs 0.253 — though both miss
-the true *k*=3, ours returning 4 and the baseline 6). Its losses are
-`cosine_topics` (0.803 vs 0.903) and `multi_scale_hierarchy` (0.551 vs 1.000) —
-and the second of those is a flat-versus-multiscale artifact, not a defeat: that
-dataset's ground truth is its *fine* level of 6 sub-clusters, and the band selector
-recovers bands [6, 3] at **ARI 1.000**, tying the baseline. `bridged_gaussians` is
-a wash on any reading (ours 0.982 at the wrong count *k*=3; eom at mcs=10 scores
-0.964 at the right *k*=2).
+Per dataset, and this is the useful table:
 
-So the honest summary of accuracy is **parity with a tuned HDBSCAN\*, and a
-+0.067 advantage over an untuned one.** The advantage is in not needing the tuning,
-which is the next section.
+| dataset | ours | HDBSCAN\* tuned | delta |
+|---|---|---|---:|
+| multi_scale_hierarchy | 0.552 ± 0.015 | 1.000 ± 0.000 | −0.448 |
+| cosine_topics | 0.423 ± 0.387 | 0.682 ± 0.183 | −0.259 |
+| graph_communities | 0.095 ± 0.156 | 0.202 ± 0.090 | −0.107 |
+| bridged_gaussians | 0.978 ± 0.040 | 0.987 ± 0.017 | −0.009 |
+| varying_density | 0.976 ± 0.042 | 0.983 ± 0.027 | −0.007 |
+| two_gaussians, dtw_traces, edit_strings, hamming_categorical, three_clusters_tree, chain_then_ring | 1.000 ± 0.000 | 1.000 ± 0.000 | +0.000 |
+| **concentric_rings** | **1.000 ± 0.000** | 0.873 ± 0.175 | **+0.127** |
+
+Three things to take from it.
+
+**One genuine win, and it is the right one.** `concentric_rings` — the non-convex
+case the chapter's motivation rests on — is 1.000 with **zero variance across ten
+seeds**, against a tuned baseline at 0.873 ± 0.175. Perfectly stable versus highly
+seed-sensitive, on the dataset that motivates the whole approach.
+
+**`multi_scale_hierarchy`'s −0.448 is a flat-versus-multiscale artifact, not a
+defeat.** That dataset's flat ground truth is its *fine* level of six
+sub-clusters; the band selector recovers [6, 3] at ARI 1.000 and ties.
+
+**`cosine_topics` at 0.423 ± 0.387 is a real, previously invisible weakness.**
+Replicate 0's 0.803 is near the top of that range. The gate is unstable on cosine
+dissimilarities and this must be disclosed, not averaged away.
+
+### Band-recovery stability
+
+| dataset | truth k | modal granularities | modal agreement | exact truth match | distinct vectors |
+|---|---|---|---:|---:|---:|
+| nested_gaussians | [6, 2] | [6, 2] | 100% | 100% | 1 |
+| three_level_hierarchy | [8, 4, 2] | [8, 4, 2] | 90% | 90% | 2 |
+| density_hierarchy | [4, 2] | [4, 2] | 70% | 70% | 4 |
+| relational_nested_hierarchy | [6, 3] | [6, 3] | 100% | 100% | 1 |
+
+The [8, 4, 2] headline holds on 9 of 10 seeds. `density_hierarchy` holds on only 7,
+producing four distinct granularity vectors — consistent with the ten-seed scaling
+study's finding that granularity recovery is less stable than a single run suggests.
+Both numbers belong next to the claim.
 
 ## Where the durable difference actually is: parameter sensitivity
 
@@ -99,10 +144,15 @@ which it does not target; the band selector is the like-for-like comparison and 
 in the next section.)
 
 This is the claim worth making about the gate, and it is *not* an accuracy claim:
-**one fixed persistence-outlier threshold delivers those scores across 17
-dissimilarity matrices of five different kinds, where matching them with HDBSCAN\*
+**one fixed persistence-outlier threshold reaches comparable accuracy across 17
+dissimilarity matrices of five different kinds, where matching it with HDBSCAN\*
 requires a per-dataset `min_cluster_size` and the wrong choice costs up to 1.000
 ARI.** A methods-section result about parameter robustness.
+
+Parameter choice dominates seed noise, which is what makes that a cost rather than
+a knob: across settings the battery mean ranges 0.713–0.817, while across seeds at
+a fixed setting the standard deviation is 0.014–0.037. Choosing the parameter badly
+costs an order of magnitude more than the seed does.
 
 ## Nested structure — the one place a baseline cannot follow
 
@@ -177,7 +227,9 @@ general result, and should be reported that way.
 ## Net effect on Chapter 5
 
 - Contribution 2's claimed lever (unweighted vs size-weighted stability) is **not
-  supported**; what replaces it is a **parameter-robustness** result.
+  supported**, and neither is any accuracy advantage once ten seeds are run. What
+  replaces it is a **parameter-robustness** result plus **one stable win on
+  concentric rings**, the motivating non-convex case.
 - Contribution 3's claimed lever (recovering a hierarchy of partitions) is
   **pre-empted by a 7-member eps sweep**; what replaces it is **automatic
   selection of which cuts are real**.
@@ -188,8 +240,9 @@ general result, and should be reported that way.
 
 ## Caveats
 
-- **One seed per dataset, no spread.** Every number is a single realisation at the
-  generator's fixed seed. `run_all.py`'s ten-seed floor is not met here.
+- **Ten replicates, `--seeds 10` (the default).** `--seeds 1` reproduces the
+  original single-seed run byte for byte, and every per-dataset table above the
+  ten-seed section is replicate 0.
 - `min_cluster_size` swept over only {3, 5, 10}; `min_samples` over only {1, 5}.
 - Small *n* throughout (30–160). `min_cluster_size=10` on `three_clusters_tree`
   (n=30) is a tenth of the data, which is why its eom spread reaches 1.000.
