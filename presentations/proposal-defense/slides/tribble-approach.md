@@ -16,7 +16,7 @@ Advisor: Dr Kelly Cohen
 | Dataset | Rules | Accuracy | Train time | RF reference |
 |---|---:|---:|---:|---:|
 | PhiUSIIL (235K × 54) | 2 | 0.997 ± 0.001 | ~0.3 s | 1.000 ± 0.000 |
-| RT-IOT2022 (123K × 82, 12-class) | 12 | 0.927 ± 0.002 | ~3 s | 0.999 ± 0.000 |
+| RT-IOT2022 (123K × 82, 12-class) | 12 | 0.927 ± 0.002 | ~4 s | 0.998 ± 0.000 |
 | Glass (214 × 9, 6-class) | 6 | 0.665 ± 0.045 | ~1 s | 0.797 ± 0.035 |
 
 * Free: the rule-base complement is automatically an open-set / anomaly
@@ -43,6 +43,8 @@ strength*
 * One scalar knob ($\theta$) — no second model to train
 * **BETH host telemetry, 1.14M rows, trained on benign traffic only:**
   **99.3% detection at 15% false alarms** ($J=+0.843$)
+* Fits the full 763,144-row benign training split in **~2.6 s** — no
+  downsampling needed
 
 | Method | Detection | False alarm | $J$ |
 |---|---:|---:|---:|
