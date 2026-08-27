@@ -106,10 +106,13 @@ for name, loader, kwargs in LOADERS:
         bad = [
             c
             for c in X.columns
-            if str(c).startswith("Unnamed") or str(c).lower() in ("instant", "index", "id")
+            if str(c).startswith("Unnamed")
+            or str(c).lower() in ("instant", "index", "id")
         ]
         if bad:
-            guard_failures.append(f"{name}: index-like column(s) kept as features: {bad}")
+            guard_failures.append(
+                f"{name}: index-like column(s) kept as features: {bad}"
+            )
 
     if specs and name in SPEC_KEYS:
         spec = specs[SPEC_KEYS[name]]
