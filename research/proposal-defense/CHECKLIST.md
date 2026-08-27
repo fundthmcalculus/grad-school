@@ -1373,7 +1373,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       subsection (possible Kreinovich nod); (c) Ch 5 — consolidate the Options A–D membership
       presentation (recommend leading with D + the persistence ramp, A/B/C supporting);
       (d) engineering debt — de-duplicate the six caller scripts' predict loops in `tribble-fis`.
-      **(a) and (b) are decided as of 2026-08-24** (V&V framing pass; review in
+      **(a), (b), and (c) are decided/done as of 2026-08-27** (V&V framing pass; review in
       `reviews/2026-08-24-prose-review-vv.md`). (a) *Lightly in Ch 1, substantively in Ch 2.*
       §1.1 keeps two clauses and a pointer; the argument itself lives in §2.6's new
       "Verification, validation, and certifiable AI" subsection, so the framing is stated once
@@ -1398,7 +1398,13 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       `arnett2018proposal`, was a proposal *for*: the completed UC dissertation
       *"Iteratively Increasing Complexity During Optimization for Formally Verifiable Fuzzy
       Systems"* (2019). Both are now cited in §2.1, where the `.bib` header had claimed
-      `arnett2018proposal` was cited all along and it was not. **(c) and (d) remain open.**
+      `arnett2018proposal` was cited all along and it was not. 
+      
+      **(c) ✅ §5.3 methodology sections reorganized (2026-08-27)**: Chapter 5's §5.3 now leads with
+      multi-scale approach (band discovery + persistence ramp memberships), supporting with flat
+      set-cover as an alternative. Reordered §5.3.2–5.3.4 with all cross-references updated.
+      
+      **(d) remains open** (engineering debt).
 - [ ] ⬜ **E11 — Verify the two EASA entries at proof stage, and re-check the V&V framing's
       boundary language (2026-08-27: proof-stage audit, owed at final stage).** Two halves.
       
