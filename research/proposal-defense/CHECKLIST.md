@@ -1391,6 +1391,38 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       needs the other five re-read. §7.4 is the load-bearing one: it is where the framing is
       recorded as an exposure with nothing in the runway behind it.
 
+- [ ] 🔒 **E12 — Two Chapter 5 novelty checks the prior-art review could not close (2026-08-27).**
+      `PRIOR_ART_CH5.md` retired three of Chapter 5's four claimed contributions and the
+      HDBSCAN\* baselines (Appendix A.8) took most of the third, leaving one contribution:
+      membership functions whose support width *and* slope both derive from each cluster's own
+      persistence, from a dissimilarity matrix alone, as an FIS antecedent. Two checks against
+      that surviving claim are **owed and unrun**, both recorded in §5.5 and in the relevant
+      `references.bib` note fields:
+      - **The IEEE Xplore *full-text* search** for "persistent homology" + "membership
+        function". This is the higher-value one. Harada & Nishino (`harada2017multidimensional`)
+        surfaced from exactly that corner — a two-page IFSA/FUZZ-IEEE paper with one OpenAlex
+        citation and thin abstract indexing — so one or two more may exist, and a committee
+        member could find one. Neither review pass could reach Xplore full text; the search is
+        cheap for a human with institutional access and is the single most efficient way to
+        either harden or kill the remaining claim. Negative evidence already on record (weak):
+        arXiv API `all:"persistent homology" AND all:"fuzzy membership"` → 0 with a working
+        control query; OpenAlex `"membership function"` + `"persistent homology"` → 0;
+        `"fuzzy inference system"` + `"topological data analysis"` → 0.
+      - **Khalilia et al. 2014 full text** (`khalilia2014irfcm`, *Pattern Recognition*
+        47(12):3920–3930). Paywalled and unread. It is the paper that retires Chapter 5's
+        transform claim, and the chapter cites it on the strength of its abstract plus the
+        authors' own published iRFCM code. That is enough to say "this pre-empts us" but **not**
+        enough to characterize its experiments, and §5.2 makes claims about what it compared
+        (five Euclideanizations, subdominant ultrametric best) that rest on second-hand
+        evidence. Get the PDF before the defense.
+
+      Neither blocks the chapter as written — both would change how confidently the novelty
+      paragraph can be stated. Also open from the same review, in a submodule rather than here:
+      **clustering#89** (`nerfcm.py` documents the beta-spread admissibility condition
+      backwards; `IVATMeans._fit_relational` feeds unsquared distances where the relational
+      fuzzy *c*-means dual needs squared ones — a silent flattening of the geometry). Filed,
+      unfixed.
+
 
 ## Appendix — G2 datasets, verified 2026-07-31
 

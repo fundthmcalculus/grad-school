@@ -21,6 +21,7 @@ Outputs:
 
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import shutil
@@ -1105,7 +1106,20 @@ def page_count(pdf):
     return None
 
 
-def main():
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="Assemble and build the proposal PDF.")
+    ap.add_argument(
+        "--validate-only",
+        action="store_true",
+        help=(
+            "Run every assembly-time check (dataset-spec substitution, "
+            "cross-references, section registry, bibliography) and exit without "
+            "rendering a PDF. Needs no pandoc and no LaTeX, which is what makes "
+            "it runnable in CI."
+        ),
+    )
+    args = ap.parse_args(argv)
+
     print("Copying figures from harness outputs ...")
     n = copy_figures()
     if n > 0:
@@ -1113,6 +1127,13 @@ def main():
 
     print("Assembling proposal ...")
     md_path = assemble()
+
+    if args.validate_only:
+        # assemble() has already exited non-zero on any fatal: an unreadable
+        # dataset-spec file, unresolved placeholders, a broken cross-reference.
+        # Reaching here means those all passed.
+        print("\n  validate-only: assembly checks passed, skipping PDF render.")
+        return 0
 
     pandoc = pandoc_bin()
     if not pandoc:
@@ -1168,4 +1189,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
