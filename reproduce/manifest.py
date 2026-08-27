@@ -566,7 +566,7 @@ EXPERIMENTS = [
         title="HDBSCAN* head-to-head: gated set-cover and band selector vs. "
         "excess-of-mass, leaf, and a dbscan_clustering(eps) sweep",
         chapter="Ch5",
-        produces="Tables 5.5, 5.6, 5.7",
+        produces="Tables A.3, A.4, A.5 (Appendix A.8)",
         repo=".",
         command=["python", "gated-minimax-selection/run_hdbscan_baselines.py"],
         hardware="any",
@@ -579,7 +579,10 @@ EXPERIMENTS = [
         "eps sweep is the whole point. Install it into a throwaway venv rather than "
         "the root .venv (see AGENTS.md on that venv being hand-built). The "
         "library-dependent calls import lazily, so test_hdbscan_baselines.py "
-        "collects in CI without it. Discharges the blocking prior-art item in "
+        "collects in CI without it. Feeds APPENDIX A.8, not the Chapter 5 body: "
+        "the comparison came out at parity, which is why Ch5 reports its "
+        "selection machinery as machinery rather than as a contribution. "
+        "Discharges the blocking prior-art item in "
         "research/proposal-defense/PRIOR_ART_CH5.md and corrects that document's "
         "own EOM numbers, which were its min_cluster_size=3 rows; findings and "
         "caveats in gated-minimax-selection/notes/HDBSCAN_BASELINES.md. Ten seeds by "
