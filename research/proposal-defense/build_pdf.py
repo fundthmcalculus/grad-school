@@ -102,6 +102,28 @@ def _figure_copies():
 FIGURE_COPIES = _figure_copies()
 
 
+# Benchmark dataset dimensions are substituted into the prose at build time from
+# `reproduce/dataset_specs.yaml`, so that a dimension lives in exactly one place
+# instead of being retyped in every chapter that mentions it. See grad-school#92
+# for the drift this replaced -- four different feature counts for one dataset.
+#
+# Prose writes `{{dataset.<key>.<field>}}`; `dataset_specs.py` documents the
+# field list. Unlike the figure registry above, this one does NOT fall back
+# quietly: an unreadable spec file or an unresolved placeholder aborts the build.
+# A missing figure leaves a visible hole, but a wrong or garbled dataset
+# dimension reads as a real measurement, which is the failure this mechanism
+# exists to prevent.
+def _dataset_values():
+    reproduce_dir = os.path.join(HERE, "..", "..", "reproduce")
+    sys.path.insert(0, os.path.abspath(reproduce_dir))
+    import dataset_specs
+
+    return dataset_specs.template_values()
+
+
+DATASET_PLACEHOLDER = re.compile(r"\{\{\s*dataset\.([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*\}\}")
+
+
 # --------------------------------------------------------------------------- #
 # figure copying
 # --------------------------------------------------------------------------- #
@@ -197,6 +219,26 @@ def strip_html_comments(md):
     so it is removed here rather than relied on to stay invisible.
     """
     return re.sub(r"<!--.*?-->", "", md, flags=re.DOTALL)
+
+
+def substitute_dataset_specs(md, values, filename, unresolved):
+    """Replace every `{{dataset.<key>.<field>}}` with its value from the specs.
+
+    Anything that looks like a dataset placeholder but names a key or field the
+    spec file does not define is recorded in `unresolved` and left in place, so
+    the build can report every bad reference at once rather than dying on the
+    first. `assemble()` aborts if that list is non-empty.
+    """
+
+    def repl(match):
+        key, field = match.group(1), match.group(2)
+        dotted = f"{key}.{field}"
+        if dotted not in values:
+            unresolved.append((filename, dotted))
+            return match.group(0)
+        return values[dotted]
+
+    return DATASET_PLACEHOLDER.sub(repl, md)
 
 
 def build_section_registry(sections_by_file):
@@ -623,13 +665,42 @@ def assemble():
     sections_by_file = {}  # Accumulate section headers across all files
     raw_by_file = {}  # rel -> raw markdown, read once
 
+    # Dataset dimensions are resolved before anything else looks at the text, so
+    # the anchor registry, the cross-reference checks and the final markdown all
+    # see the same substituted prose. A spec file that cannot be read is fatal:
+    # every dimension in the document comes from it.
+    try:
+        dataset_values = _dataset_values()
+    except Exception as exc:  # noqa: BLE001 -- fatal, but say why first
+        print(
+            f"  [fatal] could not read reproduce/dataset_specs.yaml "
+            f"({exc.__class__.__name__}: {exc})\n"
+            f"          Every dataset dimension in the prose comes from that file, "
+            f"so the build stops rather than emit a document without them."
+        )
+        sys.exit(1)
+    unresolved = []
+
     # First pass: read every file once.
     for rel in SECTIONS:
         md = read(rel)
         if md is None:
             continue
+        md = substitute_dataset_specs(md, dataset_values, rel, unresolved)
         raw_by_file[rel] = md
         sections_by_file[rel] = extract_section_headers(md, rel)
+
+    if unresolved:
+        print("\n  [fatal] unresolved dataset placeholders:")
+        for fn, dotted in unresolved:
+            print(f"    ✗ {fn}: {{{{dataset.{dotted}}}}} is not defined")
+        print(
+            "          Add the key or field to reproduce/dataset_specs.yaml, or fix "
+            "the spelling.\n"
+            "          Run `python reproduce/dataset_specs.py --fields` to list "
+            "every valid placeholder."
+        )
+        sys.exit(1)
 
     # Anchor registry drives both the autolinks and the dangling-reference
     # warnings: a §X.Y / Chapter N / Appendix A.N reference is a hyperlink when
