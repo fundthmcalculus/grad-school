@@ -12,11 +12,23 @@
 |---|---|---|
 | 1 | The minimax transform as the preprocessing step that makes relational fuzzy clustering succeed on non-convex data | **DEAD.** Published, by Bezdek. |
 | 2 | A selection rule making the cluster count an *output*, by gating persistence and covering the data | **DEAD as framed**, and the "covering" half was factually wrong about our own code. A narrow empirical claim survives. |
-| 3 | A multi-scale extension recovering a hierarchy of partitions and discovering how many scales there are | **DEAD as framed.** One mechanism + one setting survive. |
+| 3 | A multi-scale extension recovering a hierarchy of partitions and discovering how many scales there are | **DEAD as framed**, and the 2026-08-27 baselines killed more of it than this review first thought. Collapses into #2. |
 | 4 | Membership functions extracted natively from each piece of the hierarchy, as FIS antecedents | **NARROWED BUT ALIVE — the only surviving pillar.** |
 | — | "The whole VAT family stops at assessment; nobody turns VAT structure into a model" | **FALSE as written.** A narrower version is true and defensible. |
 
-**The chapter currently claims four contributions. After this review it has one, plus two methods-section results.** That is a smaller chapter, but a defensible one, and the surviving claim is the one §5.1 already calls "the piece I consider most novel."
+**The chapter currently claims four contributions. After this review it has one, plus one methods-section result.** That is a smaller chapter, but a defensible one, and the surviving claim is the one §5.1 already calls "the piece I consider most novel."
+
+The methods-section result is a single claim about an **extraction rule**: a
+persistence-outlier gate inside Campello's FOSC framework that (a) reaches tuned
+HDBSCAN\* accuracy across five kinds of dissimilarity matrix without per-dataset
+tuning, and (b) emits exactly the real scales of a nested hierarchy where a
+cut-distance sweep offers the same partitions with no criterion for choosing among
+them. Contributions 2 and 3 were two framings of that one rule.
+
+**Revision history.** 2026-08-26 initial review (four parallel prior-art reviews).
+2026-08-27: §2's stability-measure argument withdrawn and §3's open requirement
+discharged, both against `gated-minimax-selection/run_hdbscan_baselines.py`. The
+corrections are marked in place rather than silently applied.
 
 ---
 
@@ -55,22 +67,44 @@ Other ingredients, all published:
 
 ### What survives: a measured gate comparison
 
-Run at the setting where HDBSCAN\* reduces to our hierarchy (`min_samples=1`, EOM extraction), on identical inputs:
+> **CORRECTED 2026-08-27.** This section originally reported HDBSCAN EOM at
+> concentric_rings 0.061 / *k*=30, bridged_gaussians 0.452 / *k*=14 and
+> varying_density 0.750 / *k*=9, and concluded that "EOM over-segments badly"
+> because its stability is a size-weighted sum in λ units while ours is unweighted.
+> **Those are all the `min_cluster_size=3` rows** — HDBSCAN's worst setting on this
+> battery. At `min_cluster_size=10` the same extractor scores **0.863 / 3**,
+> **0.964 / 2** and **0.980 / 3** on those three datasets. The size-weighting story
+> is not supported and is withdrawn; it was a baseline reported at an unfavourable
+> configuration, the same error class as the earlier SIMD DTW speedup claim.
+> Full sweep and replacement analysis: `gated-minimax-selection/notes/HDBSCAN_BASELINES.md`,
+> driver `run_hdbscan_baselines.py`.
 
-| dataset | ours (ARI / k) | HDBSCAN EOM (ARI / k) |
-|---|---|---|
-| concentric_rings | **1.000** / 2 | 0.061 / 30 |
-| bridged_gaussians | **0.982** / 3 | 0.452 / 14 |
-| varying_density | **0.980** / 3 | 0.750 / 9 |
-| edit_strings | **1.000** / 3 | 0.647 / 7 |
-| graph_communities | **0.331** / 4 | 0.168 / 8 |
-| two_gaussians, three_clusters_tree, chain_then_ring, dtw_traces, hamming_categorical | 1.000 | 1.000 |
-| multi_scale_hierarchy | 0.551 / 3 | **1.000** / 6 |
-| cosine_topics | 0.803 / 3 | **0.903** / 3 |
+Run at the setting where HDBSCAN\* reduces to our hierarchy (`min_samples=1`), on
+identical inputs, with `min_cluster_size` swept over {3, 5, 10} and `min_samples`
+over {1, 5} — 12 configurations per dataset against our one:
 
-The lever is not "density-free" — it is that EOM's stability is a **size-weighted sum in λ = 1/ε units** (TKDD Eq. 3), while ours is **unweighted persistence in raw dissimilarity units**. EOM over-segments badly here (30 clusters on rings). Campello explicitly invites the substitution: "the excess of mass adopted in this article is by no means the only possible measure for cluster stability that can be used in our framework."
+| comparison | ours | baseline | verdict |
+|---|---:|---:|---|
+| mean ARI, 12 flat datasets, **one fixed setting each** | **0.887** | 0.820 (best single config: mpts=5, mcs=3) | ours **+0.067**; +0.105 against the best `mpts=1` config |
+| *k* correct, same | 9/12 | 9/12 | tie |
+| per-dataset, baseline allowed to **tune per dataset** | — | — | flat gate 1 win / 2 losses / 9 ties; band selector 1 / 1 / 10 |
 
-**Claimable:** an unweighted, absolute-scale, robust-outlier stability measure inside Campello's framework, measured against EOM on non-metric dissimilarities. A methods-section result, not a pillar.
+So on accuracy the honest verdict is **parity with a tuned HDBSCAN\* and a modest
+edge over an untuned one** — one seed per dataset, no spread. What replaces the
+retired stability argument is a **parameter-robustness** result: HDBSCAN's score
+moves by up to **0.802** ARI (concentric_rings) and **1.000** (three_clusters_tree,
+n=30) across `min_cluster_size` alone, a parameter with no unsupervised criterion
+behind it on a bare dissimilarity matrix, while our gate produces its scores at one
+fixed `gap_sigma` on all 17 matrices.
+
+Campello's invitation still applies and is still worth quoting — "the excess of
+mass adopted in this article is by no means the only possible measure for cluster
+stability that can be used in our framework" — but as the *frame* for our gate, not
+as evidence that ours beats EOM.
+
+**Claimable:** a persistence-outlier stability measure inside Campello's framework
+that reaches tuned-HDBSCAN\* accuracy across five kinds of dissimilarity matrix
+without per-dataset tuning. A methods-section result, not a pillar.
 
 ## 3. Multi-scale band discovery — DEAD as framed
 
@@ -82,9 +116,45 @@ Also settled:
 - Birth height ≈ inverse local density: Hartigan, *JASA* 76(374), 1981; Stuetzle & Nugent 2010. (Note Hartigan also proved single linkage is *not* consistent for d > 1 — relevant to how hard we lean on the density reading.)
 - Flat-can't-represent-nested: Kleinberg 2002 / Carlsson & Mémoli 2010; and it is HDBSCAN's own founding motivation ("any choice of cut line is … a single fixed density level").
 
-**What survives:** (a) the specific mechanism — log-relative gaps on the birth heights of the *persistence-significant blocks only*, plus a containment-aware band-merge — no exact match found; (b) exact degeneration to the flat selector on single-scale data and zero bands on noise, a clean checkable property; (c) **the setting**: VDBSCAN/OPTICS/HDBSCAN all require a kNN density estimate in a metric space. On a non-metric D\* where no density estimator is available, birth height is the only density proxy there is. That is a methodological reason rather than a re-derivation, and it is the strongest angle.
+**Required before claiming — DISCHARGED 2026-08-27, and the answer is mostly negative.**
+`run_hdbscan_baselines.py` ran both required baselines. Results in
+`gated-minimax-selection/notes/HDBSCAN_BASELINES.md`:
 
-**Required before claiming:** HDBSCAN `leaf` extraction and a `dbscan_clustering(eps)` sweep on the nested [8,4,2] synthetic. If leaf recovers 8 and an eps sweep recovers 4 and 2, a reviewer will ask why an eps sweep is not the whole contribution. Also position against OPTICS ξ-extraction ("what several DBSCANs would produce at varying density thresholds") and Rolle & Scoccola, *JMLR* 25(258), 2024 (multiparameter persistence — whose scale selection is *human-guided*, which is our opening).
+- **`leaf` recovers 8, and so does EOM** (ARI 1.000, at `mcs` ∈ {5, 10}). Both then
+  score 0.581 and 0.236 on the medium and coarse levels, because each returns
+  exactly one partition. Against a single-output extractor the structural claim
+  holds and is clean.
+- **The eps sweep recovers 4 and 2 — at ARI 1.000 each.** Worse than feared: 400 cut
+  heights on the [8,4,2] synthetic collapse to just **7 distinct partitions**, three
+  of which are exactly *k*=8, *k*=4, *k*=2 at 1.000. The candidate set is small
+  enough that a person reads the three real scales straight off it. **"Recovering a
+  hierarchy of partitions" is therefore not a contribution.**
+- **Angle (c) is dead outright.** `min_samples=5` engages the kNN core distance and
+  mutual-reachability machinery, and it **ran without error on all 17 matrices**,
+  every non-metric family included — a kNN distance is computable from any
+  dissimilarity matrix. "On a non-metric D\* no density estimator is available" is
+  false and must not be written. The survivable version is that the estimate is
+  computable but *unreliable* there: turning it on costs graph_communities
+  0.253 → 0.011 and cosine_topics 0.903 → 0.458, while helping on the coordinate
+  sets. That is a narrow empirical observation, not a methodological reason.
+
+**What survives:** (a) the specific mechanism — log-relative gaps on the birth
+heights of the *persistence-significant blocks only*, plus a containment-aware
+band-merge — no exact match found; (b) exact degeneration to the flat selector on
+single-scale data and zero bands on noise, a clean checkable property; (c) the
+narrowed claim below.
+
+> The eps family *contains* the right three partitions but supplies no criterion for
+> which of its seven members are real, and three of them are degenerate (all-noise,
+> all-one-cluster, and a mixed *k*=7). Band discovery emits exactly three, the right
+> three, with no cut parameter and nothing told to it.
+
+That is **automatic model selection over a candidate set the flat-cut family already
+contains** — a selection claim, not a discovery claim, and the same *shape* as the
+contribution-2 result. **Contributions 2 and 3 are one claim about an extraction
+rule, not two.**
+
+Still to position against: OPTICS ξ-extraction ("what several DBSCANs would produce at varying density thresholds") and Rolle & Scoccola, *JMLR* 25(258), 2024 (multiparameter persistence — whose scale selection is *human-guided*, which is our opening).
 
 ## 4. Membership functions from merge heights — NARROWED, AND THE ONE SURVIVING PILLAR
 
@@ -139,6 +209,7 @@ Read before any of this enters a bibliography.
 | finding | action |
 |---|---|
 | `select_coverage_cover` cannot overlap; docstring said it could | fixed + `test_selection_antichain.py` (14 tests) |
+| §2's HDBSCAN EOM numbers were the `min_cluster_size=3` rows, reported as *the* baseline | corrected in place; `run_hdbscan_baselines.py` + `test_hdbscan_baselines.py` (12 tests) now sweep the parameter |
 | `nerfcm.py` documents the beta-spread condition backwards | filed clustering#89 |
 | `IVATMeans._fit_relational` feeds `u(D)` where the RFCM dual needs squared distances | filed clustering#89 |
 | "canonical Euclideanizer" and "one-sided metric repair" claimed as findings in the notes | corrected with citation trails (PR #179) |
