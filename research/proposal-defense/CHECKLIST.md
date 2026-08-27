@@ -1404,7 +1404,10 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       multi-scale approach (band discovery + persistence ramp memberships), supporting with flat
       set-cover as an alternative. Reordered §5.3.2–5.3.4 with all cross-references updated.
       
-      **(d) remains open** (engineering debt).
+      **(d) ✅ Predict-loop deduplication in tribble-fis (2026-08-27)**: Extracted common model
+      evaluation patterns from four demo scripts into shared `demo_utils.py` module (regressor_report,
+      classifier_report, evaluate_model wrapper). Opened PR #194. ~20 lines of duplication eliminated
+      while maintaining output format and user visibility.
 - [ ] ⬜ **E11 — Verify the two EASA entries at proof stage, and re-check the V&V framing's
       boundary language (2026-08-27: proof-stage audit, owed at final stage).** Two halves.
       
