@@ -91,3 +91,42 @@ into one readable IF–THEN rule.*
 
 </div>
 </div>
+
+---
+
+## Result 2, continued — open-set detection for free
+
+<div style="display: flex;">
+<div style="flex: 1; padding: 10px;">
+
+* Every class rule is an explicit membership function, so the model knows not
+  just how strongly each class fires but how strongly *anything* fires
+* The **complement** of every rule's aggregate is automatically an *"unseen"*
+  rule — one scalar knob ($\theta$), no second model to train
+* Tested the hard way — leave-one-class-out on Glass: hide a whole class,
+  score how well the complement rule flags it as unseen
+* Best operating point ($\theta = 0.8$): **70% detection at 55% false alarms**
+  ($J = +0.154$); the band from $\theta = 0.5$–$0.8$ stays within
+  $J \in [+0.119, +0.154]$, so the knob is forgiving to tune
+
+| Method | Detection | False alarm | $J$ | Separate model? |
+|---|---:|---:|---:|:---:|
+| **Complement rule (this work)** | 0.491 | 0.362 | +0.129 | **no** |
+| Isolation Forest | 0.493 | 0.317 | +0.176 | yes |
+| One-class SVM | 0.399 | 0.288 | +0.111 | yes |
+
+* Comparable to purpose-built detectors — **no separation in the table beats
+  its own error bar** — while riding entirely on rules the model already has
+* Caveat, stated plainly: Glass is 214 samples / 6 classes, a stress test, not
+  a demonstration — the bigger-scale run (BETH host telemetry) is proposed work
+
+</div>
+<div style="flex: 1; padding: 10px;">
+
+![anomaly-sweep](img/04-anomaly-sweep.png)
+
+*Detection vs. false-alarm rate as the anomaly boost $\theta$ sweeps — the
+shaded band is $J$, and it stays wide and flat across most of the range.*
+
+</div>
+</div>
