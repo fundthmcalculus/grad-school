@@ -255,10 +255,10 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
-| 4.11 BETH anomaly detection *(number reserved; no prose slot yet)* | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95) — note 22 |
-| 4.11(c) BETH feature reduction *(no prose slot yet)* | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95) — note 23 |
-| 4.11(d) BETH matched sample size *(no prose slot yet)* | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing — note 23 |
-| 4.11(e) BETH knob validation *(no prose slot yet)* | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95) - note 24 |
+| 4.11 BETH anomaly detection | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95); prose slot at §4.4 — note 22 |
+| 4.11(c) BETH feature reduction | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.4 — note 23 |
+| 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |
+| 4.11(e) BETH knob validation | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.3–§4.4 — note 24 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
 
 **Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
