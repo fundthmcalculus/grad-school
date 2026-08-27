@@ -75,12 +75,13 @@ SPEC_KEYS = {
     "Concrete": "concrete",
     "RT-IOT2022": "rt_iot2022",
     "Shuttle": "shuttle",
+    "Bike Sharing": "bikeshare",
     "BETH": "beth",
 }
 # PhiUSIIL is deliberately absent: from a clean checkout its loader falls
 # through to a ucimlrepo fetch that returns a DIFFERENT feature set, which the
 # loader's own comment flags. Pinning its width here would fail for the wrong
-# reason. Bike Sharing is absent because it has no spec row yet.
+# reason.
 
 guard_failures = []
 try:

@@ -1070,3 +1070,65 @@ closes the gap) is robust to any plausible D8 shift — the deficit is 0.14–0.
 against an init effect that moved the five-seed headline by ~0.03 — but the exact
 values are not. C4/D8 in `research/proposal-defense/CHECKLIST.md` carry the
 decision.
+
+---
+
+**Note 25 — two loaders were passing label-derived columns as features, and one
+of them was carrying a whole result.** *(2026-08-27, grad-school#92 follow-up.)*
+
+Both were the same mistake in two shapes: a column that is *about* the answer got
+into `X` because it happened to be numeric.
+
+*RT-IOT2022 — the index column.* `load_rt_iot2022` sliced `df.iloc[:, :-1]` and
+kept every numeric column, so the CSV's unnamed leading column survived as an
+82nd feature. It is **not a row number.** The file concatenates the twelve
+per-class captures and the counter restarts at zero for each, so any value above
+8,107 identifies `DOS_SYN_Hping` and nothing else — a decision tree on that column
+alone scores 0.706. What saves Table 4.4 is unrelated luck: that row uses
+`mog_classifier`'s default `top_n = 5` antecedent screen, and the index column
+never ranked in the top five, so the same five features are chosen either way.
+Re-running the generator both ways on the host of record, ten seeds, same day:
+
+| | with index | without | |
+|---|---|---|---|
+| MoG accuracy | 0.927 ± 0.002 | 0.927 ± 0.002 | unchanged |
+| MoG train time | 4.04 ± 0.67 s | 3.68 ± 0.06 s | overlapping |
+| RF reference | 0.999 ± 0.000 | 0.998 ± 0.000 | −0.001 |
+
+**Table 4.7b is the row genuinely at risk, and it is NOT re-quoted here.** It runs
+the screen over *all* features and keeps all of them, so it consumed the leaky
+column directly — and Note 21 / `OPENSET_COST_2026-08-22.md` establish that its
+result is sensitive to the screen's **order**, which removing a column perturbs.
+Its published +0.394 vs +0.537 therefore still measures leaky data. The re-run is
+~82 min at the current pin (down from 3h38m, per Note 21) and is owed.
+
+*Bike Sharing — the target's own addends.* `load_bikeshare` already dropped
+`instant` for exactly the reason above, which is why the RT-IOT2022 miss is a
+lesson learned once and not generalised. But it left `casual` and `registered` in
+`X`, and those two **sum exactly to the target `cnt` on all 17,379 rows.** The
+model was being handed the answer in two pieces. That is why the Random Forest
+reference on this row read a perfect **1.000**, which should have been the tell.
+Re-measured with both dropped, ten seeds:
+
+| | leaked | corrected |
+|---|---|---|
+| MoG R² | 0.962 ± 0.002 | **0.620 ± 0.014** |
+| RF reference | 1.000 ± 0.000 | **0.944 ± 0.004** |
+
+The old numbers are **superseded, not revised**: they measure a model's ability to
+add two columns, not to predict demand. DATASETS.md's "demonstrating fuzzy
+regression scaling on real urban dynamics" was resting on that.
+
+*A separate drift this exposed, which is nobody's leak.* The prose quoted MoG
+train time on RT-IOT2022 as **37.42 ± 0.64 s**. Re-running the *unfixed* loader
+today gives **4.04 ± 0.67 s** on the same host — so the ~10× is pre-existing drift
+between the prose and the current code/pins, not an effect of this change. Table
+4.4's timing is re-quoted from the corrected run of record (**4.24 ± 0.68 s**,
+RF **0.998 ± 0.000**); *which* pin bump bought the 10× is not yet identified, and
+until it is, this note is the only account of it.
+
+*Guarded, so it cannot be a third dataset's turn.* `reproduce/test_dataset_loaders.py`
+now fails if any loader returns an index-like column, and cross-checks every
+loader's modelled width against `dataset_specs.yaml`, applying that file's own
+`drop_columns` so a loader may still hand back columns its generator drops (BETH
+returns `sus`/`timestamp` for `table_4_11` to remove).

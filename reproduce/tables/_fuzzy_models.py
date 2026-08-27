@@ -168,7 +168,11 @@ def load_rt_iot2022(sample_size=None):
 
 
 def load_beth():
-    """BETH host telemetry: 3.8M rows binary anomaly detection dataset.
+    """BETH host telemetry: 1,141,078 labelled rows, binary anomaly detection.
+
+    The 3.8M figure this docstring used to quote is the size of the full BETH
+    capture, not of the three labelled splits that are actually shipped and
+    used here (763,144 + 188,967 + 188,967).
 
     Returns explicit train/validate/test splits:
       dict with keys 'train', 'val', 'test'; each maps to (X, y).
@@ -249,7 +253,7 @@ def load_shuttle(sample_size=None):
 
 
 def load_bikeshare(target_col="cnt", sample_size=None):
-    """Bike Sharing Demand: 17.4k rows × 16 features, regression (demand prediction).
+    """Bike Sharing Demand: 17,379 rows × 12 features, regression (demand prediction).
 
     Kaggle dataset: https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619
     File: bikeshare-hour.csv (extracted from the Kaggle zip)
@@ -277,7 +281,14 @@ def load_bikeshare(target_col="cnt", sample_size=None):
             columns=[target_col], errors="ignore"
         )
         # Drop obvious ID/index columns if present
-        X = X.drop(columns=["instant"], errors="ignore").astype(float)
+        X = X.drop(columns=["instant"], errors="ignore")
+        # `casual` and `registered` are the target's two ADDENDS, not features:
+        # casual + registered == cnt exactly, on all 17,379 rows. Leaving them in
+        # X asks the model to recover a sum it has already been handed, which is
+        # why the RF reference on this row read a perfect 1.000. They are dropped
+        # for every target, not just `cnt` -- predicting `casual` from
+        # `registered` and `cnt` is the same leak wearing a different hat.
+        X = X.drop(columns=["casual", "registered"], errors="ignore").astype(float)
 
         if sample_size and len(X) > sample_size:
             idx = np.random.RandomState(42).choice(len(X), sample_size, replace=False)

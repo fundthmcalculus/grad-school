@@ -82,6 +82,24 @@ datasets:
       method: sklearn
       loader: fetch_california_housing
 
+  bikeshare:
+    name: Bike Sharing Demand (hourly)
+    task: regression
+    rows: 17379
+    features: 12
+    note: >-
+      The CSV ships 17 columns. `instant` is a row counter and `dteday` a date
+      string, both long dropped. `casual` and `registered` were NOT: they are
+      the target's two addends (casual + registered == cnt exactly, on every
+      row), so the model was being handed the answer -- which is why the RF
+      reference on this row read a perfect 1.000. Dropped as of 2026-08-27,
+      leaving the 12 genuine calendar/weather features.
+    verify:
+      method: csv
+      path: data/bikeshare-hour.csv
+      label_column: cnt
+      drop_columns: [instant, dteday, casual, registered]
+
   superconductivity:
     name: Superconductivity (UCI id 464)
     task: regression
