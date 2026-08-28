@@ -1501,7 +1501,48 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       **The negative result reproduced**: pairwise distances lose at float64, 0.30× at d=10.
       The datacenter-FP64 prediction remains untested and untestable here; no cell estimates it.
       fp16 and the §9.4 standalone-paper item are still open and unaffected (see **B10**).
-- [ ] ⬜ **E2b — Re-quote Table 3.4 and §3.3.3 from the generator; one row overstates the GPU
+- [ ] 🟨 **E2b — the numbers to re-quote from are now measured (2026-08-27); the re-quote and
+      §3.3.3's wording are what remain.** Full generator run on this host, ten seeds, no `N/A`:
+      `reproduce/outputs/cluster-2026-08-27/table_3_4_gpu_speedups.md` (17 min, 31 rows).
+
+      **The FCM row, both formulations, which is the whole of this item:**
+
+      | N (k=10, d=20) | library CPU arm | **matched CPU arm** | library ÷ matched |
+      |---|---:|---:|---:|
+      | 50,000 | 5.1× | **2.6×** | 1.96 |
+      | 200,000 | 5.9× | **3.3×** | 1.79 |
+      | 500,000 | 9.4× | **5.1×** | 1.84 |
+
+      Against §3.3.3's *"thirty to fifty times over the 32-core CPU"*, the honest figure is
+      **2.6–5.1×** when the CPU runs the same algorithm the GPU does, and **5.1–9.4×** against
+      the library's own arm. Neither is thirty.
+
+      ✅ **E2c's prediction is confirmed, and it is the good news here.** That item warned the
+      device row would move a second time once the gram-identity fix landed, because the ~11×
+      the GPU was borrowing from a slower CPU formulation would evaporate. It has:
+      library ÷ matched is now **1.8–2.0×**, not ~11×. So the CPU-side win E2c measured is real
+      and is now the shipped behaviour — and it still appears in no chapter.
+
+      **Two of this item's three smaller mismatches reproduce; the exactness claim improves.**
+      The device MST is **4.8–6.2×** and again does *not* grow with N — it peaks at N=8,000 and
+      falls to 4.8× at 32,000, as predicted from a dense $O(n^2)$ Prim CPU arm against
+      $O(n^2 \log n)$ Borůvka rounds. The VAT front end reads **5.6× → 10.2×** across
+      N=4,000–32,000 at *unmatched* work, and is labelled as such in the table rather than
+      quoted bare. Ordering is **bit-identical** on every MST and front-end row.
+      **The matched FCM arm is also far more faithful numerically** — max $|\Delta$centre$|$
+      of $10^{-13}$ against $10^{-6}$ for the library arm, which is what running the same
+      algorithm on both sides should look like and is a second reason to quote it.
+
+      ✅ **The negative result reproduces cleanly and is now sharper.** Pairwise distances lose
+      on the GPU in **15 of 16** cells: the CPU is 1.8–3.6× faster at float64 and 1.1–3.2× at
+      float32. The device wins exactly one cell — $d = 784$, float32, native accumulation,
+      1.4× — at max $|\Delta| = 1.4\times10^{-4}$, so it buys 40% by giving up four digits.
+      The earlier 0.30× at $d = 10$ is the same measurement inverted (1/3.6 = 0.28).
+
+      **Still owed:** the prose edit. §3.3.3 has to quote the matched arm or say plainly which
+      comparison it is making, and Table 3.4's caption has to carry the matched/unmatched
+      distinction rather than leave it in the CSV. Both are writing, not measurement.
+      _Original entry:_ **Re-quote Table 3.4 and §3.3.3 from the generator; one row overstates the GPU
       by roughly an order of magnitude.** `PROVENANCE_MAP` now marks Table 3.4 **drifted**.
       **The FCM row is the problem.** The chapter's "thirty to fifty times over the 32-core CPU"
       compares `fcm.fuzzy_c_means` — NumPy broadcasting with (n,k,d) and (n,k,k) temporaries —
