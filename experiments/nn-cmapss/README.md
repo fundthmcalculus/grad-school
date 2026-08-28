@@ -77,7 +77,7 @@ weighted equally — the right one for smoothness). `metrics.py` computes both.
 
 ## Running
 
-Needs `NASA-CMAPSS/N-CMAPSS_DS02-006.h5` (2.4 GB, Kaggle release, not tracked).
+Needs `data/nasa-cmapps2/N-CMAPSS_DS02-006.h5` (2.4 GB, Kaggle release, not tracked).
 Building the cached bundles is ~10 s each; the sweeps dominate runtime (~an hour
 total on 8 CPU cores), everything else is seconds.
 

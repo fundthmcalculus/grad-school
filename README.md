@@ -36,7 +36,7 @@ the TSK ↔ ReLU neural-network equivalence line (`papers/nn-fis-equivalence/`,
 | `WORKINGDOC.md` | Working doc of the reproducibility pass — what was broken, what it surfaced |
 | `tribble-fis/`, `tribble-opt/`, `tribble-cluster/` | **Pinned submodules** — the research code (fuzzy systems, optimizers, clustering) |
 | `ClusteringExperiments/` | VAT/pVAT TSP experiments, iVAT minimax, GPU VAT, DC-VAT |
-| `FuzzySystemsExperiments/` | Per-dataset FIS scripts: Concrete, PhiUSIIL, turbine, WEC, IoT, BETH, CMAPSS RUL, … |
+| `FuzzySystemsExperiments/` | Per-dataset FIS scripts: Concrete, PhiUSIIL, turbine, WEC, IoT, BETH, CMAPSS RUL and CMAPSS failure-mode diagnosis, … |
 | `gated-minimax-selection/` | The Chapter 5 driver (`run_all.py` + seeded `results.json`), NERFCM beta-spread, iVAT/multi-scale membership functions |
 | `fis-tsp-strategy/` | FIS strategies for TSP |
 | `experiments/` | `fis-acceleration`, `fis-to-neural-net`, `nn-cmapss` (each has its own README and results) |

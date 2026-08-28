@@ -28,12 +28,12 @@ import contextlib
 import csv
 import io
 import os
-import sys
 import time
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 import numpy as np  # noqa: E402
-from _ds02_harness import load, rmse  # noqa: E402
+from _ds02_harness import bootstrap, load, rmse  # noqa: E402
+
+bootstrap(os.path.dirname(__file__))
 
 from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 

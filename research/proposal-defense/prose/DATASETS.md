@@ -1,5 +1,16 @@
 # Appendix — Benchmark Datasets
 
+> **Dimensions here are a copy.** The authoritative benchmark dataset
+> specifications live in [`reproduce/dataset_specs.yaml`](../../../reproduce/dataset_specs.yaml),
+> which the proposal PDF substitutes into Appendix A.7 and the chapters at
+> build time. This file is read on GitHub rather than compiled, so it
+> carries literal numbers instead of templates. Re-derive both against the
+> data with:
+>
+> ```
+> uv run --project tribble-fis --with pyyaml python reproduce/dataset_specs.py --verify
+> ```
+
 This appendix documents the location, size, source, and loading strategy for all benchmark datasets cited in the proposal. Datasets are stored in `data/` at the repository root, with structure matching the reproducible harness loaders under `reproduce/tables/_fuzzy_models.py`.
 
 ## Dataset Inventory
@@ -8,7 +19,7 @@ This appendix documents the location, size, source, and loading strategy for all
 
 #### PhiUSIIL Phishing URL (Table 4.1, §4.3.2, Ch 6)
 - **File:** `data/PhiUSIIL_Phishing_URL_Dataset.csv`
-- **Size:** 235,000 rows × 54 features (binary classification)
+- **Size:** 235,795 rows × 50 features (binary classification)
 - **Role:** Large-scale classification benchmark; featured in Table 4.1 (MoG baselines), Table 6.1 (model family), norm/conorm comparisons
 - **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 967
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_phiusiil()`
@@ -16,11 +27,11 @@ This appendix documents the location, size, source, and loading strategy for all
 
 #### RT-IOT2022 (Table 4.4, §4.4, pending)
 - **File:** `data/RT_IOT2022.csv`
-- **Size:** 123,000 rows × 83 features, 12 classes
+- **Size:** 123,117 rows × 81 features, 12 classes
 - **Role:** Open-set detection testbed (planned); intended to replace Glass (214 samples) as the large-scale anomaly/open-set partner
 - **Source:** [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 952
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_rt_iot2022()` (not yet wired)
-- **Status:** In the repository and wired (2026-08-12), both roles measured. Open-set claim at five seeds (Table 4.7b): complement rule loses to Isolation Forest at this scale. Plain classification/timing at ten seeds (Table 4.4, `table_4_1_mog_baselines.py`): MoG trains in 37.42 ± 0.64 s at 92.7 ± 0.2% accuracy against Random Forest's 99.9 ± 0.0%.
+- **Status:** In the repository and wired (2026-08-12), both roles measured. Open-set claim at ten seeds (Table 4.7b, re-measured 2026-08-27 on the de-leaked loader): complement rule loses to Isolation Forest at this scale (+0.366 vs +0.535 Youden's $J$). Plain classification/timing at ten seeds (Table 4.4, `table_4_1_mog_baselines.py`): MoG trains in 4.24 ± 0.68 s at 92.7 ± 0.2% accuracy against Random Forest's 99.8 ± 0.0%.
 
 #### Glass (UCI) (Tables 4.6–4.7, Fig 4.2, §4.4)
 - **File:** Auto-fetched via sklearn or `ucimlrepo` (id 41)
@@ -41,32 +52,32 @@ This appendix documents the location, size, source, and loading strategy for all
 
 #### Bike Sharing Demand (Tables 4.5, 6.1, large regression benchmark)
 - **File:** `data/bikeshare-hour.csv`
-- **Size:** 17,379 rows × 14 numeric features → 1 target (hourly bike rental demand)
+- **Size:** 17,379 rows × 12 numeric features → 1 target (hourly bike rental demand)
 - **Role:** Large-scale regression benchmark; scale partner for Concrete (1,030 rows)
 - **Source:** [Kaggle Bike Sharing Demand](https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619)
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_bikeshare()`
-- **Status:** Measured at ten seeds (2026-08-12), wired into Table 4.1 alongside Concrete and PhiUSIIL; 17.3× larger than Concrete, demonstrating fuzzy regression scaling on real urban dynamics
+- **Status:** Measured at ten seeds, wired into Table 4.1 alongside Concrete and PhiUSIIL; 17.3× larger than Concrete. **Re-measured 2026-08-27 after a target leak was removed**: `casual` and `registered` sum exactly to the target `cnt`, and both were being passed as features. With them dropped, MoG R² falls 0.962 → **0.620** and the Random Forest reference 1.000 → **0.944**. The earlier numbers measured a model's ability to add two columns it had been handed, so they are superseded rather than merely revised.
 
 #### N-CMAPSS DS02 — Turbofan Remaining Useful Life (Table 4.10, §4.4.1)
-- **File:** `NASA-CMAPSS/N-CMAPSS_DS02-006.h5` (HDF5)
+- **File:** `data/nasa-cmapps2/N-CMAPSS_DS02-006.h5` (HDF5)
 - **Size:** 5.3M train + 1.2M test rows at 1 Hz → aggregated per `(unit, cycle)`; RUL regression, physics/prognostics domain
 - **Role:** Large-scale physical-engineering regression **case study** — the domain partner Concrete lacks; demonstrates the §4.3.2 answer-first regression construction against published deep-learning baselines on their own benchmark
 - **Source:** Arias Chao, Kulkarni, Goebel, Fink, *Data* 6(1):5, 2021 (DOI 10.3390/data6010005); [Kaggle mirror](https://www.kaggle.com/datasets/bishals098/nasa-cmapss-2-engine-degradation)
 - **Loading:** `FuzzySystemsExperiments/cmapss_ds02_rul.py` (DS02 best case) / `cmapss_all_datasets.py` (all datasets) (not the `reproduce/` harness)
-- **Status:** **DEMONSTRATED, not measured.** One run on the **dataset's own fixed train/test split** (the held-out engine units — the split the published baselines use), not a random seeded split: DS02 per-sample RMSE 6.48 in ~1 s beats the public-file CNN (7.22) / MLP (8.34) re-runs on their 20-channel input set; real-sensors-only matches the virtual-channel result on DS02. The reproducibility axis for a fixed-split benchmark is the **train-set subsample** seed, not the split — a ten-seed *subsample* variance study is `CHECKLIST` **C14** (future PR). **Not redistributable** — the 10 `.h5` files total ~28 GB and are gitignored; only the scripts and the committed report `cmapss_all_datasets_report.md` are tracked. Primary-source verification of the baseline figures is **C15**.
+- **Status:** **DEMONSTRATED, not measured.** One run on the **dataset's own fixed train/test split** (the held-out engine units — the split the published baselines use), not a random seeded split: DS02 per-sample RMSE **7.23** on the 18 real sensors, in line with the public-file CNN (7.22) and beating the MLP (8.34) — both scored on a 20-channel input set (real sensors + T40/P30) this pipeline deliberately does not use; adding T40/P30 back (the DOE's original config) reaches ~6.5, so real-sensors-only is not free, and an earlier claim that it was is corrected (`CHECKLIST` **C18**). The reproducibility axis for a fixed-split benchmark is the **train-set subsample** seed, not the split — a ten-seed *subsample* variance study is `CHECKLIST` **C14** (future PR). **Not redistributable** — the 10 `.h5` files total ~28 GB and are gitignored; only the scripts and the committed report `cmapss_all_datasets_report.md` are tracked. Primary-source verification of the baseline figures is **C15**.
 
 ### Clustering / Structure Discovery
 
 #### Shuttle (NASA/UCI Statlog) (Ch 3 §3.3.2, §7.3, capstone)
 - **File:** `data/shuttle.csv`
-- **Size:** ~58,000 rows × 7 features, 7 classes (imbalanced: ~80% in one flight condition)
+- **Size:** 58,000 rows × 9 features, 7 classes (imbalanced: ~80% in one flight condition)
 - **Role:** Large-scale clustering flagship; used for the integrated capstone pipeline (Chapter 3 reorder → Chapter 5 memberships → Chapter 6 inference → Ruspini export)
 - **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 148
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_shuttle()` (auto-fetch via `ucimlrepo` if absent)
 - **Status:** Publicly available; can be auto-fetched; cached locally to avoid repeated network calls
 
 #### Synthetic Clustering Batteries (Ch 3 Table 3.5, Ch 5 Table 5.1–5.3)
-- **File:** Generated inline by `reproduce/tables/table_5_x_ch5_selection.py` (two_moons, circles, aniso, bridged, etc.)
+- **File:** Generated inline by `reproduce/tables/table_5_1_3_ch5_tables.py` (two_moons, circles, aniso, bridged, etc.)
 - **Size:** 120–1,500 points per construction
 - **Role:** Small-scale validation; ground truth for topological correctness checks
 - **Status:** Already available; generated on-demand
@@ -79,7 +90,7 @@ This appendix documents the location, size, source, and loading strategy for all
 ### Topological Membership Generation (Chapter 5)
 
 #### Synthetic Membership Batteries (Table 5.1–5.3, Fig 5.2)
-- **Files:** Generated inline by `reproduce/tables/table_5_x_ch5_selection.py`
+- **Files:** Generated inline by `reproduce/tables/table_5_1_3_ch5_tables.py`
 - **Size:** 120–5,000 points, hand-constructed (two_gaussians, bridged_gaussians, concentric_rings, varying_density, nested_gaussians, three_level_hierarchy, etc.)
 - **Role:** Validation of band-discovery and membership-generation quality; all ground truth available by construction
 - **Status:** Already available; all stored in `battery_hierarchical.SCALABLE` generator
@@ -136,9 +147,9 @@ For datasets that cannot be auto-fetched, the file structure is:
 
 ```
 data/
-├── RT_IOT2022.csv                      # 123k × 83, 12 classes
-├── PhiUSIIL_Phishing_URL_Dataset.csv   # 235k × 54, binary
-├── shuttle.csv                         # 58k × 7, 7 classes
+├── RT_IOT2022.csv                      # 123,117 × 81, 12 classes
+├── PhiUSIIL_Phishing_URL_Dataset.csv   # 235,795 × 50, binary
+├── shuttle.csv                         # 58,000 × 9, 7 classes
 └── beth/
     ├── beth_*.csv                      # Host telemetry (one or more files)
     └── (structure to be confirmed)
@@ -200,11 +211,11 @@ The proposal currently has only one regression benchmark (**Concrete**, 1,030 ro
 
 | Category | Small / Fast | Large / Scale | Measured? | Status |
 |---|---|---|---|---|
-| **Regression** | Concrete (1,030) | Bike Sharing (17,379); California Housing (20,433); Superconductivity (21,263); N-CMAPSS DS02 turbofan RUL (6.5M raw) | **Yes** (10 seeds) + **demonstrated** (N-CMAPSS, single-run) | Bike Sharing in Table 4.1; California Housing/Superconductivity in Appendix A.7.1 — RF wins both, flat MoG/HME unstable on Superconductivity; N-CMAPSS a physics/prognostics case study (Table 4.10, §4.4.1) beating public-file CNN/MLP baselines |
-| **Classification** | Glass (214) | PhiUSIIL (235k) | Yes | Fixed; was broken, now working |
-| **Classification (open-set)** | Glass (214) | RT-IOT2022 (123k) | **Yes** (2026-08-12, both roles) | Open-set (5 seeds, Table 4.7b): complement rule loses to Isolation Forest. Classification/timing (10 seeds, Table 4.4): MoG 92.7% / 37.4s vs. RF 99.9% |
-| **Anomaly** | Glass (214) | BETH (3.8M) | No | BETH in place; no measurements yet; still blocked on the one-class-protocol decision (§7.3) |
-| **Clustering** | Synthetic (120–1.5k) | Shuttle (58k) | Demonstrated | Shuttle in place; demo not repeatable |
+| **Regression** | Concrete (1,030) | Bike Sharing (17,379); California Housing (20,640); Superconductivity (21,263); N-CMAPSS DS02 turbofan RUL (6.5M raw) | **Yes** (10 seeds) + **demonstrated** (N-CMAPSS, single-run) | Bike Sharing in Table 4.1; California Housing/Superconductivity in Appendix A.7.1 — RF wins both, flat MoG/HME unstable on Superconductivity; N-CMAPSS a physics/prognostics case study (Table 4.10, §4.4.1) beating public-file CNN/MLP baselines |
+| **Classification** | Glass (214) | PhiUSIIL (236K) | Yes | Fixed; was broken, now working |
+| **Classification (open-set)** | Glass (214) | RT-IOT2022 (123K) | **Yes** (2026-08-12, both roles) | Open-set (10 seeds, Table 4.7b): complement rule loses to Isolation Forest (+0.366 vs +0.535). Classification/timing (10 seeds, Table 4.4, de-leaked loader): MoG 92.7% / 4.2s vs. RF 99.8% |
+| **Anomaly** | Glass (214) | BETH (1.14M) | **Yes** (10 seeds, Table 4.11) | Measured via the one-class protocol (`TribbleOneClassDetector`), not leave-one-class-out — that needs ≥3 classes and BETH is binary. Complement rule reaches parity with a one-class SVM ($J$ +0.843 vs +0.841); Isolation Forest overtakes both once its default is corrected (Table 4.11(d)) |
+| **Clustering** | Synthetic (120–1.5k) | Shuttle (58K) | Demonstrated | Shuttle in place; demo not repeatable |
 | **Membership Gen** | Synthetic (120–160) | Scalable batteries (100–5,000) | **Yes** (2026-08-12, 10 seeds) | `many_scale` solid, `single_scale` less stable than believed, `log_separated` gradual — see Ch5 §5.4, Goal G1 |
 | **Non-coordinate (G2)** | *[unwired]* | ECG5000, FordA, Crop (up to 24k, DTW) | **Partially** (2026-08-12, exactness only) | Exactness = 1.000 on 3 of 5 named datasets; downstream-usefulness threshold not yet met (2 of 3 tested, both low-information) |
 

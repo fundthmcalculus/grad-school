@@ -20,6 +20,13 @@ dependencies = [
     "xlrd",
     "matplotlib~=3.10.1",
     "ucimlrepo",
+    # reproduce/dataset_specs.py reads reproduce/dataset_specs.yaml, and
+    # research/proposal-defense/build_pdf.py treats an unreadable spec file as
+    # FATAL (exit 1) so every reader of the proposal sees the same substituted
+    # prose. Undeclared, that made the proposal build fail on any environment
+    # created by the documented `pip install -e ".[dev]"`. CI never caught it
+    # because no job runs build_pdf.py.
+    "pyyaml",
 ]
 
 [project.optional-dependencies]

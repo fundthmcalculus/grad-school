@@ -11,7 +11,7 @@ correct and featurise every file, then reproduces `TribblePredictiveHealth`'s
 cap -> 30k subsample -> scale before dropping in boosted / staged regressors.
 Train residual is measured on the 30k rows the model actually fits; test is the
 full pooled test set, per-sample RMSE (the report's headline metric). Run from
-the repo root (needs NASA-CMAPSS/):
+the repo root (needs data/nasa-cmapps2/):
 
     python experiments/cmapss-ds02-fis/iterative_pooled.py
 """
@@ -20,16 +20,15 @@ import contextlib
 import csv
 import io
 import os
-import sys
 import time
 
-sys.path.insert(0, "FuzzySystemsExperiments")
-sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
 
+from _ds02_harness import bootstrap, rmse  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments", os.path.dirname(__file__))
 import cmapss_all_datasets as cad  # noqa: E402
-from _ds02_harness import rmse  # noqa: E402
 from tribble_predictive_health.preprocessing import cap_rul, onset_caps  # noqa: E402
 from tribblefis.gaussian_regressor import TribbleRegressor  # noqa: E402
 
@@ -204,5 +203,5 @@ if __name__ == "__main__":
     import argparse
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--h5-dir", default="NASA-CMAPSS")
+    ap.add_argument("--h5-dir", default="data/nasa-cmapps2")
     main(ap.parse_args().h5_dir)

@@ -18,11 +18,6 @@ from dataclasses import dataclass
 from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import squareform
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
 import battery as B
 import ivat_mf as im
 import selection as S

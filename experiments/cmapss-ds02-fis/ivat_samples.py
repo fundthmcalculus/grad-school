@@ -15,7 +15,6 @@ Reuses this repo's iVAT core (gated-minimax-selection/ivat_mf.py).
 """
 
 import os
-import sys
 
 import matplotlib
 
@@ -28,8 +27,9 @@ from scipy.stats import spearmanr
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-sys.path.insert(0, "FuzzySystemsExperiments")
-sys.path.insert(0, "gated-minimax-selection")
+from _ds02_harness import bootstrap  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments", "gated-minimax-selection")
 from ivat_mf import dissimilarity, minimax_transform_fast  # noqa: E402
 from tribble_predictive_health import load_ncmapss  # noqa: E402
 from tribble_predictive_health.preprocessing import (  # noqa: E402
@@ -37,7 +37,7 @@ from tribble_predictive_health.preprocessing import (  # noqa: E402
     fit_condition_correction,
 )
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5 = "data/nasa-cmapps2/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
 N_SUB = 800  # iVAT is O(n^2); a few hundred points is the usual range

@@ -17,11 +17,6 @@ from dataclasses import dataclass
 from scipy.spatial.distance import mahalanobis, euclidean
 from scipy.stats import chi2
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
 import battery as B
 import ivat_mf as im
 import selection as S

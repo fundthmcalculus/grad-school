@@ -73,13 +73,32 @@ def minimax_transform(D):
 def minimax_transform_fast(D):
     """Fast all-pairs minimax (bottleneck) transform. Numerically identical to
     ``minimax_transform`` but O(n^2) instead of the O(n^3) reference Prim loop,
-    which makes n >= ~1000 tractable (validated exact-equal on small n).
+    which makes n >= ~1000 tractable (validated exact-equal on small n, and on
+    real DTW matrices with duplicate points -- see the zero-edge note below).
 
     Bottleneck(i, j) = the largest edge on the MST path between i and j. Build the
     MST, then add its edges in ascending weight with union-find: when an edge of
     weight w first joins components A and B, every cross pair (a in A, b in B) has
     bottleneck w -- all lighter edges are already internal to A or B, so w is the
     max on their path. Each pair is filled exactly once -> O(n^2) total fill.
+
+    ZERO EDGES (grad-school #176). In a sparse matrix a stored zero is an ABSENT
+    edge, so ``csr_matrix(D)`` silently deletes every exact-zero dissimilarity
+    and scipy's MST cannot route through those pairs -- D* came back inflated
+    for them (a hand case: two coincident points 5.0 apart in D* instead of
+    0.0). Synthetic continuous data has no exact ties, which is why this went
+    unseen; real data does. On N-CMAPSS-adjacent UCR DTW matrices,
+    ElectricDevices carries 130 zero-cliques over 1,292 points (unconstrained
+    DTW collapses consecutive repeats, so distinct binary on/off traces are
+    genuinely at distance 0) and Crop carries a couple more.
+
+    The fix is to hand scipy a matrix whose zeros are representable. Zero-weight
+    edges cannot change any bottleneck value -- they are the lightest edges
+    possible, so they only ever merge components at height 0, exactly as the
+    reference does -- which means shifting them to a sentinel strictly below
+    every real edge and mapping it back to 0.0 after the MST is exact, not an
+    approximation. Verified elementwise against ``minimax_transform`` on
+    matrices with duplicate points; see ``test_ivat_mf_zero_edges.py``.
     """
     from scipy.sparse.csgraph import minimum_spanning_tree
     from scipy.sparse import csr_matrix
@@ -89,8 +108,23 @@ def minimax_transform_fast(D):
     if n < 2:
         return np.zeros((n, n))
 
+    # Represent off-diagonal zeros with a sentinel strictly smaller than every
+    # genuine edge, so csr keeps them; undo it on the way out.
+    off = ~np.eye(n, dtype=bool)
+    zero_off = off & (D == 0.0)
+    if zero_off.any():
+        positive = D[off & (D > 0.0)]
+        smallest = positive.min() if positive.size else 1.0
+        sentinel = smallest * 1e-12 if smallest > 0 else 1e-300
+        D = D.copy()
+        D[zero_off] = sentinel
+    else:
+        sentinel = None
+
     coo = minimum_spanning_tree(csr_matrix(D)).tocoo()
     ii, jj, ww = coo.row, coo.col, coo.data
+    if sentinel is not None:
+        ww = np.where(ww <= sentinel, 0.0, ww)
     order = np.argsort(ww, kind="stable")
 
     Dstar = np.zeros((n, n))

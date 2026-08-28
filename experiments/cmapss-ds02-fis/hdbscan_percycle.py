@@ -15,7 +15,6 @@ smooth regressor, not a bank of regime models, is the right tool.
 """
 
 import os
-import sys
 
 import matplotlib
 
@@ -31,7 +30,9 @@ from sklearn.model_selection import cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
 
-sys.path.insert(0, "FuzzySystemsExperiments")
+from _ds02_harness import bootstrap  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments")
 from tribble_predictive_health import load_ncmapss  # noqa: E402
 from tribble_predictive_health.preprocessing import (  # noqa: E402
     apply_condition_correction,
@@ -39,7 +40,7 @@ from tribble_predictive_health.preprocessing import (  # noqa: E402
     fit_condition_correction,
 )
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5 = "data/nasa-cmapps2/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
 VAR_KEEP = 0.90  # PCA variance retained before clustering

@@ -12,10 +12,10 @@ All fifteen are produced today, through `reproduce/figures/`, in PNG for the Mar
 
 ## A.2 Extended results tables
 
-The main text carries twenty-one summary tables (3.1–3.7, 4.1–4.7, 5.1–5.3, 6.1–6.3, 7.1). The seed half of Goal G4 has run, and every numbered table is already quoted at the ten-seed floor with a spread, so what the appendix owes is not a multi-seed version of each one. It is the **per-seed detail** those rows aggregate away, the splits behind each mean, which is how a reader finds the one seed in ten that carries a failure, as Chapter 6's mixture-of-experts divergence did. G4's outstanding half is hardware, which a re-run fixes and a wider table cannot. Most of these tables regenerate from `reproduce/tables/`, so the appendix version is the same data at full width; the rest are named in A.5.
+The main text carries twenty-one summary tables (3.1–3.7, 4.1–4.7, 5.1–5.3, 6.1–6.3, 7.1), and this appendix carries five of its own (A.1–A.5). The seed half of Goal G4 has run, and every numbered table is already quoted at the ten-seed floor with a spread, so what the appendix owes is not a multi-seed version of each one. It is the **per-seed detail** those rows aggregate away, the splits behind each mean, which is how a reader finds the one seed in ten that carries a failure, as Chapter 6's mixture-of-experts divergence did. G4's outstanding half is hardware, which a re-run fixes and a wider table cannot. Most of these tables regenerate from `reproduce/tables/`, so the appendix version is the same data at full width; the rest are named in A.5.
 
 - **A.2.1** Full adversarial-evaluation ARI grids and the complete stitch-ablation grid (all partitions × sizes).
-- **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results.
+- **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results. The HDBSCAN\* head-to-head that belongs with them is written out in **A.8**, because its outcome decides what Chapter 5 claims rather than merely widening a table.
 - **A.2.3** The broadened fuzzy-model benchmark suite (Concrete, PhiUSIIL, turbine, wave-energy, wine, and the IoT sets) with the baseline methods.
 - **A.2.4** The three-arm reorder study behind Chapter 3 §3.3.1 (classical cubic, stage-one priority queue, stage-two compact active set) over the full grid of $N$ and both precisions, in absolute seconds with per-seed spreads. The main text normalizes, wall-clock being unportable between machines and ratios far more so; the seconds live here, with the per-$N$ detail behind Table 3.2's exponent fit. Across five independent runs on the host of record stage two is monotone in $N$ and beats stage one at every size in the grid (Chapter 3 §3.4, `PROVENANCE_MAP.md` note 11). This subsection is also the evidence base for the mergeVAT methods paper's complexity audit (§3.2).
 
@@ -150,7 +150,7 @@ Goal G4a's ten-seed floor has three known violations, named here because a board
 
 #### Datasets, and what a third party can actually obtain
 
-The datasets are not uniformly available, and "public" and "reproducible from this repository" are two different claims. **Concrete, PhiUSIIL, the shuttle set, RT-IOT2022 and BETH are all public and present as of 2026-08-12**; a reader can reproduce Concrete, PhiUSIIL, the shuttle set and RT-IOT2022's results directly. BETH remains the one exception, and the reason is no longer file presence: its data load (1.14M rows), but leave-one-class-out needs at least three classes and BETH is binary, so §4.3.5's open-set study still runs on Glass (214 samples, a stress test) and on RT-IOT2022 (Table 4.7b, a real demonstration) rather than on BETH as originally designed. Obtaining a working one-class protocol, not obtaining the data, would move that comparison the rest of the way — a research decision before a coding one. The 135,000-row psychiatric-evaluation set behind Chapter 3's memory results is **not** public and cannot be redistributed; its feature names were anonymized before I ever saw them, so Chapter 3 treats it purely as a scaling exercise and draws no conclusion from any individual feature. That measurement is therefore not independently reproducible, and the fix is to re-take it on a public dataset of comparable size, not to ask anyone to take it on trust.
+The datasets are not uniformly available, and "public" and "reproducible from this repository" are two different claims. **Concrete, PhiUSIIL, the shuttle set, RT-IOT2022 and BETH are all public and present as of 2026-08-12**; a reader can reproduce Concrete, PhiUSIIL, the shuttle set and RT-IOT2022's results directly. BETH remains the one exception, and the reason is no longer file presence: its data load ({{dataset.beth.rows_approx}} rows), but leave-one-class-out needs at least three classes and BETH is binary, so §4.3.5's open-set study still runs on Glass ({{dataset.glass.rows}} samples, a stress test) and on RT-IOT2022 (Table 4.7b, a real demonstration) rather than on BETH as originally designed. Obtaining a working one-class protocol, not obtaining the data, would move that comparison the rest of the way — a research decision before a coding one. The {{dataset.psychiatric.rows}}-row psychiatric-evaluation set behind Chapter 3's memory results is **not** public and cannot be redistributed; its feature names were anonymized before I ever saw them, so Chapter 3 treats it purely as a scaling exercise and draws no conclusion from any individual feature. That measurement is therefore not independently reproducible, and the fix is to re-take it on a public dataset of comparable size, not to ask anyone to take it on trust.
 
 **What Goal G2 adds, and why it arrives without baselines.** G2's non-coordinate data is identified and verified here: UCR/UEA sets under dynamic time warping through `aeon` (Crop, at 24,000 series and 24 classes, ElectricDevices, StarLightCurves, ECG5000, FordA); TUDataset graphs under a graph kernel; and the Duin–Pękalska collection, distributed *as* distance matrices and so matching Chapter 3's claim most literally. No natural competitor can run on them: Deshpande and Kumar's kd-tree and bounding-box methods need Euclidean coordinates by construction, clusiVAT samples a coordinate space, eVAT's GPU front end computes distances from points, and warped series have no fixed vector embedding, the premise of DTW. That is the seam §3.2 claims, and why "beat the baselines" is unavailable to G2: in the regime the experiment exists to demonstrate, there are no baselines to beat. Chapter 7 gives the four criteria that replace it.
 
@@ -248,13 +248,13 @@ A.5 above answers *is this dataset public, and is it present in this repository.
 
 | Dataset | Size | Status | Role |
 |---|---|---|---|
-| UCI Concrete Compressive Strength | 1,030 × 8 | measured (Ch1, Ch2, Ch4 §4.3.2–4.4, Ch6, every table generator that touches regression) | small / fast — the *only* regression benchmark in the document, at every consequent order |
-| Diabetes (sklearn) | 442 × 10 | measured (Table 4.8, dedup sweep only) | small / fast — chosen for the tolerance sweep, not a modeling flagship |
-| California Housing (sklearn, canonical) | 20,433 × 8 | measured, ten seeds (`table_a7_regression_scale.py`, 2026-08-12): RF $R^2 = 0.809 \pm 0.008$; flat MoG $0.631 \pm 0.020$ | large / scale — first large regression partner |
-| Superconductivity (UCI id 464) | 21,263 × 81, decorrelated | measured, ten seeds, same generator: RF $R^2 = 0.923 \pm 0.004$; flat MoG and HME **unstable** ($-0.261 \pm 1.431$, $-0.766 \pm 2.411$) | large / scale — same generator, second dataset |
-| N-CMAPSS DS02 turbofan RUL | 6.5M raw rows → aggregated | **demonstrated** (one run on the dataset's own fixed split, `FuzzySystemsExperiments/cmapss_all_datasets.py`, not the harness): DS02 per-sample RMSE 6.48 in ~1 s beats public-file CNN 7.22 / MLP 8.34; real-sensors-only matches virtual-channel result on DS02 | large / scale — physics/prognostics domain, §4.4.1 / Table 4.10; fixed-split benchmark, so the variance study reseeds the train subsample not the split (**C14**, future PR); data not redistributable (~28 GB) |
+| UCI Concrete Compressive Strength | {{dataset.concrete.shape}} | measured (Ch1, Ch2, Ch4 §4.3.2–4.4, Ch6, every table generator that touches regression) | small / fast — the *only* regression benchmark in the document, at every consequent order |
+| Diabetes (sklearn) | {{dataset.diabetes.shape}} | measured (Table 4.8, dedup sweep only) | small / fast — chosen for the tolerance sweep, not a modeling flagship |
+| California Housing (sklearn, canonical) | {{dataset.california_housing.shape}} | measured, ten seeds (`table_a7_regression_scale.py`, 2026-08-12): RF $R^2 = 0.809 \pm 0.008$; flat MoG $0.631 \pm 0.020$ | large / scale — first large regression partner |
+| Superconductivity (UCI id 464) | {{dataset.superconductivity.shape}}, decorrelated | measured, ten seeds, same generator: RF $R^2 = 0.923 \pm 0.004$; flat MoG and HME **unstable** ($-0.261 \pm 1.431$, $-0.766 \pm 2.411$) | large / scale — same generator, second dataset |
+| N-CMAPSS DS02 turbofan RUL | 6.5M raw rows → aggregated | **demonstrated** (one run on the dataset's own fixed split, `FuzzySystemsExperiments/cmapss_all_datasets.py`, not the harness): DS02 per-sample RMSE **7.23** on real sensors only, in line with public-file CNN 7.22 and beating MLP 8.34 (both on a 20-channel input this pipeline deliberately excludes); real-sensors-only does *not* match the virtual-channel (T40/P30) result, which reaches ~6.5 — an earlier claim that it did is corrected (**C18**) | large / scale — physics/prognostics domain, §4.4.1 / Table 4.10; fixed-split benchmark, so the variance study reseeds the train subsample not the split (**C14**, future PR); data not redistributable (~28 GB) |
 
-**Gap, narrowed but not closed.** Concrete still carries the entire *small* regression story. A large partner now exists at this document's own ten-seed floor: `reproduce/tables/table_a7_regression_scale.py` (2026-08-12) measures California Housing (`sklearn.fetch_california_housing()`, canonical, 20,433 × 8) and Superconductivity (UCI id 464, direct download, 21,263 × 81, decorrelated via `sklearn.cluster.FeatureAgglomeration` before every model — raw features break the flat MoG's closed-form solve, per the pilot's own finding) across the flat/fuzzy-tree/HME/CART/Random Forest family. Random Forest wins both cleanly (California Housing $R^2 = 0.809 \pm 0.008$; Superconductivity $R^2 = 0.923 \pm 0.004$). The more interesting finding is a caveat, not a win: the flat MoG and HME mixture are **wildly unstable on Superconductivity even after decorrelation** — $R^2 = -0.261 \pm 1.431$ and $-0.766 \pm 2.411$ respectively, occasionally catastrophically negative — echoing the seed-9 HME divergence Chapter 6's `table_concrete_reconciliation` already documents on Concrete. So the *pairing* exists now; what it demonstrates is that the flat/HME instability generalizes to a second, larger, unrelated dataset, which is itself worth a sentence in Chapter 6, not that this construction scales cleanly to large regression data. Superseded: `reproduce/regression_scale/RESULTS_2026-08-05.md`'s single-seed pilot (CHECKLIST **C13**), which this generator formalizes at ten seeds and canonical sourcing for both datasets.
+**Gap, narrowed but not closed.** Concrete still carries the entire *small* regression story. A large partner now exists at this document's own ten-seed floor: `reproduce/tables/table_a7_regression_scale.py` (2026-08-12) measures California Housing (`sklearn.fetch_california_housing()`, canonical, {{dataset.california_housing.shape}}) and Superconductivity (UCI id 464, direct download, {{dataset.superconductivity.shape}}, decorrelated via `sklearn.cluster.FeatureAgglomeration` before every model — raw features break the flat MoG's closed-form solve, per the pilot's own finding) across the flat/fuzzy-tree/HME/CART/Random Forest family. Random Forest wins both cleanly (California Housing $R^2 = 0.809 \pm 0.008$; Superconductivity $R^2 = 0.923 \pm 0.004$). The more interesting finding is a caveat, not a win: the flat MoG and HME mixture are **wildly unstable on Superconductivity even after decorrelation** — $R^2 = -0.261 \pm 1.431$ and $-0.766 \pm 2.411$ respectively, occasionally catastrophically negative — echoing the seed-9 HME divergence Chapter 6's `table_concrete_reconciliation` already documents on Concrete. So the *pairing* exists now; what it demonstrates is that the flat/HME instability generalizes to a second, larger, unrelated dataset, which is itself worth a sentence in Chapter 6, not that this construction scales cleanly to large regression data. Superseded: `reproduce/regression_scale/RESULTS_2026-08-05.md`'s single-seed pilot (CHECKLIST **C13**), which this generator formalizes at ten seeds and canonical sourcing for both datasets.
 
 The one row that reads *well* for the construction is also the one not yet under the harness: **N-CMAPSS turbofan RUL** (§4.4.1, Table 4.10), a large-scale physics/prognostics regression on which the answer-first construction beats the published deep-learning baselines on their own input set in about a second. That is exactly the kind of result the *measured* rows do not supply — so it is precisely the one to be most careful with, and it is recorded as *demonstrated*, one run on the dataset's own fixed split, on non-redistributable data, not *measured*. Note the reproducibility axis differs from every other row here: N-CMAPSS ships a fixed train/test split (the split the baselines are scored on), so the variance study that would promote it re-seeds the **training subsample**, not the split (CHECKLIST **C14**, a future PR). Doing so would give the large-regression category a genuine at-scale win rather than a pair of RF-loses-narrowly rows plus an instability caveat; until then it is a promising single shot and labelled as one.
 
@@ -262,20 +262,20 @@ The one row that reads *well* for the construction is also the one not yet under
 
 | Dataset | Size | Status | Role |
 |---|---|---|---|
-| Glass (UCI) | 214 × 9, 6 classes | measured — also the anomaly substitute (A.7.3) and the Table 4.8/4.9 dedup and correction-pass testbed | small / fast |
-| Wine, Breast Cancer, Digits (sklearn) | 178×13 / 569×30 / 1,797×64 | measured (Table 4.8, dedup sweep only) | small / fast |
-| PhiUSIIL phishing URL | 235,000 × 54, binary | measured historically (Table 4.1: 0.997 ± 0.001 acc, 0.28–0.64 s) — **but no longer reproducible from a clean checkout.** The repo loader's bundled copy lived at `tribble-fis/gaussian_mixture/phishing_data/`, and `gaussian_mixture/` was deleted upstream (commit `8484fd6`, per `_fuzzy_models.py`'s own comment); `data/` in this repository holds only `Concrete_Data.csv`. A fresh run falls through to a `ucimlrepo` fetch that returns a *different* feature set, which the loader's own comment flags as producing results "not comparable" to every number quoted from it | large / scale — the one role currently filled, on a fragile path |
-| RT-IOT2022 | 123,000 × 82, 12 classes | **in the repository as of 2026-08-12, both roles now measured.** *Open-set* (Table 4.7b, five seeds): the complement rule loses to Isolation Forest at this scale (+0.394 vs +0.537 Youden's $J$). *Classification/timing* (Table 4.4, ten seeds, `table_4_1_mog_baselines.py`): MoG trains in $37.42 \pm 0.64$ s at $0.927 \pm 0.002$ accuracy against Random Forest's $0.999 \pm 0.000$ — the same speed-not-superiority shape as the PhiUSIIL row | large / scale — both roles filled and measured; both favor the reference baseline on accuracy |
+| Glass (UCI) | {{dataset.glass.shape_full}} | measured — also the anomaly substitute (A.7.3) and the Table 4.8/4.9 dedup and correction-pass testbed | small / fast |
+| Wine, Breast Cancer, Digits (sklearn) | {{dataset.wine.shape}} / {{dataset.breast_cancer.shape}} / {{dataset.digits.shape}} | measured (Table 4.8, dedup sweep only) | small / fast |
+| PhiUSIIL phishing URL | {{dataset.phiusiil.shape}}, binary | measured historically (Table 4.1: 0.997 ± 0.001 acc, 0.28–0.64 s) — **but no longer reproducible from a clean checkout.** The repo loader's bundled copy lived at `tribble-fis/gaussian_mixture/phishing_data/`, and `gaussian_mixture/` was deleted upstream (commit `8484fd6`, per `_fuzzy_models.py`'s own comment); `data/` in this repository holds only `Concrete_Data.csv`. A fresh run falls through to a `ucimlrepo` fetch that returns a *different* feature set, which the loader's own comment flags as producing results "not comparable" to every number quoted from it | large / scale — the one role currently filled, on a fragile path |
+| RT-IOT2022 | {{dataset.rt_iot2022.shape_full}} | **in the repository as of 2026-08-12, both roles now measured.** *Open-set* (Table 4.7b, ten seeds, re-measured 2026-08-27 after a leaky feature was removed): the complement rule loses to Isolation Forest at this scale (+0.366 vs +0.535 Youden's $J$). *Classification/timing* (Table 4.4, ten seeds, `table_4_1_mog_baselines.py`): MoG trains in $4.24 \pm 0.68$ s at $0.927 \pm 0.002$ accuracy against Random Forest's $0.998 \pm 0.000$ — the same speed-not-superiority shape as the PhiUSIIL row | large / scale — both roles filled and measured; both favor the reference baseline on accuracy |
 
-**Gap closed, in the "both roles measured" sense — not in the "this work wins" sense.** RT-IOT2022 is present and both of its named claims now have real ten-seed-or-better numbers behind them, and neither favors the construction on accuracy: Random Forest and Isolation Forest both beat the MoG-based arm on their respective tasks. What the numbers do support is the *speed and structural* half of each claim — twelve rules in under 40 seconds, no second model needed for the open-set rule — which is what Chapters 1, 4 and 8 actually claim; "no fuzzy baseline exists to be faster than" (Goal **C1**) is still the open half of that argument. PhiUSIIL's reproduction path is unchanged — its measured numbers are real but sit on a path this pass found to be broken. A.5 states "Concrete, PhiUSIIL and the shuttle set are public and present, a reader can reproduce those results directly" — that sentence is still not accurate for PhiUSIIL and is worth revisiting there.
+**Gap closed, in the "both roles measured" sense — not in the "this work wins" sense.** RT-IOT2022 is present and both of its named claims now have real ten-seed-or-better numbers behind them, and neither favors the construction on accuracy: Random Forest and Isolation Forest both beat the MoG-based arm on their respective tasks. What the numbers do support is the *speed and structural* half of each claim — twelve rules in about four seconds, no second model needed for the open-set rule — which is what Chapters 1, 4 and 8 actually claim; "no fuzzy baseline exists to be faster than" (Goal **C1**) is still the open half of that argument. PhiUSIIL's reproduction path is unchanged — its measured numbers are real but sit on a path this pass found to be broken. A.5 states "Concrete, PhiUSIIL and the shuttle set are public and present, a reader can reproduce those results directly" — that sentence is still not accurate for PhiUSIIL and is worth revisiting there.
 
 ### A.7.3 Anomaly / open-set detection
 
 | Dataset | Size | Status | Role |
 |---|---|---|---|
-| Glass, leave-one-class-out | 214 × 9, 6 classes | measured (Tables 4.6–4.7, Fig 4.2) — explicitly called "a stress test, not a demonstration," i.e. a substitute standing in for the missing large set | small / fast |
-| RT-IOT2022, leave-one-class-out | 123K × 82, 12 classes | **measured, 2026-08-12** (Table 4.7b, five seeds): the complement rule loses to Isolation Forest at this scale (+0.394 vs +0.537 Youden's $J$) | large / scale — the missing partner, now filled, unfavorably |
-| BETH (host telemetry) | binary, 1.14M rows | data present locally since 2026-08-12 (`load_beth()` loads train/val/test splits) but blocked by a design constraint, not a missing file: leave-one-class-out requires ≥3 classes and BETH is binary. See Ch 7 §7.3 for the 2027 Q2 decision point. | large — data available, never measured; the *intended* large partner, superseded for now by RT-IOT2022 |
+| Glass, leave-one-class-out | {{dataset.glass.shape_full}} | measured (Tables 4.6–4.7, Fig 4.2) — explicitly called "a stress test, not a demonstration," i.e. a substitute standing in for the missing large set | small / fast |
+| RT-IOT2022, leave-one-class-out | {{dataset.rt_iot2022.shape_full}} | **measured, re-measured 2026-08-27** (Table 4.7b, ten seeds): the complement rule loses to Isolation Forest at this scale (+0.366 vs +0.535 Youden's $J$) | large / scale — the missing partner, now filled, unfavorably |
+| BETH (host telemetry) | binary, {{dataset.beth.rows_approx}} rows | data present locally since 2026-08-12 (`load_beth()` loads train/val/test splits) but blocked by a design constraint, not a missing file: leave-one-class-out requires ≥3 classes and BETH is binary. See Ch 7 §7.3 for the 2027 Q2 decision point. | large — data available, never measured; the *intended* large partner, superseded for now by RT-IOT2022 |
 
 **Gap, closed by RT-IOT2022 rather than by BETH.** This category no longer lacks a large anomaly measurement — Table 4.7b fills exactly the role this section used to say nothing filled — but the result is not favorable, and BETH, the dataset Chapter 4 originally designed this experiment around, is still blocked on the same one-class-protocol decision as before. The small side (Glass) is no longer standing in for a missing large set; it is now one of two, alongside RT-IOT2022, and BETH remains the one genuinely open item in this category.
 
@@ -284,8 +284,8 @@ The one row that reads *well* for the construction is also the one not yet under
 | Dataset | Size | Status | Role |
 |---|---|---|---|
 | Synthetic batteries (circular-cities, two_moons, circles, aniso, bridged) | 120–1,500 pts | measured (Fig 2.2; Tables 3.5–3.7) | small / fast |
-| NASA/UCI Statlog Shuttle | ~58,000 × 7, 7 classes | demonstrated — an exact reorder, "in about a minute," recorded with hardware and precision per §7.2's rule; fetched over the network via `ucimlrepo` (`FuzzySystemsExperiments/nasa.py`), not wired into `reproduce/manifest.py` as a repeatable table cell | large / scale — also the flagship for the Chapter 7 capstone, which notes it *has coordinates* and so does not by itself close Goal G2 |
-| Psychiatric-evaluation set (private) | 135,000 × 165 | demonstrated — same single-shot standard, but **not public and not redistributable**: feature names were anonymized before the author saw them, so no conclusion is drawn from any individual feature, and the measurement is not independently reproducible by anyone else | large / scale |
+| NASA/UCI Statlog Shuttle | {{dataset.shuttle.shape_full}} | demonstrated — an exact reorder, "in about a minute," recorded with hardware and precision per §7.2's rule; fetched over the network via `ucimlrepo` (`FuzzySystemsExperiments/nasa.py`), not wired into `reproduce/manifest.py` as a repeatable table cell | large / scale — also the flagship for the Chapter 7 capstone, which notes it *has coordinates* and so does not by itself close Goal G2 |
+| Psychiatric-evaluation set (private) | {{dataset.psychiatric.shape}} | demonstrated — same single-shot standard, but **not public and not redistributable**: feature names were anonymized before the author saw them, so no conclusion is drawn from any individual feature, and the measurement is not independently reproducible by anyone else | large / scale |
 
 **Gap, again a different shape.** Two large representatives exist, but both are demonstrations rather than measurements — single-shot, no seed spread, by design (§7.2) — and one of the two cannot be handed to anyone else at all. This category has a large *role* filled twice over and a large *measurement* filled zero times; the small/fast side is the only one with the seeded, repeatable evidence the document's own G4a standard asks for.
 
@@ -295,7 +295,7 @@ The one row that reads *well* for the construction is also the one not yet under
 |---|---|---|---|
 | two_gaussians, bridged_gaussians, concentric_rings, varying_density, uniform_noise | 120–160 pts | measured (Table 5.1) | small / fast |
 | nested_gaussians, three_level_hierarchy, density_hierarchy | n = 96–120, single fixed realization | measured, but with no seed spread — "singly-realized" (Table 5.2, Fig 5.2) | small |
-| three_clusters_tree, chain_then_ring, multi_scale_hierarchy | n = 30, 40, 39 | measured — the chapter's only coordinate-free experiment, and it scores NERFCM rather than the chapter's own selector | small |
+| three_clusters_tree, chain_then_ring, multi_scale_hierarchy | n = 30, 40, 45 | measured — the chapter's only coordinate-free experiment; NERFCM plus, since the #160 ground-truth fix, the flat and multi-scale selectors (`run_nonmetric.py` E4) | small |
 | scalable_single_scale, scalable_many_scale, scalable_log_separated | n = 100…5,000, generator-swept | **measured, ten seeds, 2026-08-12** (`table_5_4_ch5_g1_scaling.py`, registered in `reproduce/manifest.py`). `many_scale`: [8,4,2] at ARI 1.00, every seed, every $n$. `single_scale`: granularity mode agrees only 5–7/10 seeds — less stable than the single n=96 run implied. `log_separated`: gradual ARI climb 0.73→0.99 from $n=100$ to $n\ge2{,}000$, not a sharp threshold | large / scale — measured against a flat set-cover baseline, not yet against the one-pass generator (phase five, still unbuilt) |
 
 **Gap, narrowed.** The scaling regime this chapter needed to support its own invariance claim is no longer an unrun generator — it is measured, at ten seeds, with a genuine mixed result: `many_scale` confirms cleanly, `single_scale` turns out less stable than the single-seed study suggested, and `log_separated` shows a gradual rather than sharp size-dependence. What is still missing is timing for the full pipeline at these sizes and the one-pass construction itself (Goal G1's phase five), so this closes the *measurement* gap the chapter's own prose flagged, not the *construction* gap Goal G1 is ultimately about.
@@ -308,11 +308,11 @@ The one row that reads *well* for the construction is also the one not yet under
 
 | Dataset | Size | Status |
 |---|---|---|
-| ECG5000 | 5,000 series × 140 | **measured, 2026-08-12** (`table_3_7_g2_dtw_nonmetric.py`, registered in `reproduce/manifest.py`): exactness 1.000 (N≤1024, 10 seeds), triangle-inequality violations 20.9%. Downstream comparison also run: set-cover beats NERFCM-given-$k$ by 0.122 ARI (0.715 vs 0.593) |
-| FordA | 4,921 × 500 | **measured, same generator**: exactness 1.000, violations 0.4% (below the synthetic proxy). Downstream: every method scores ≈0 ARI (k_true=2 not recoverable from DTW dissimilarities by NERFCM, the set-cover, single-linkage, or beta-plateau) |
-| Crop | 24,000 × 46, 24 classes | **measured, same generator, the scale target**: exactness 1.000, violations 23.6%, matrix build 1,597s + reorder 4.7s. Downstream: NERFCM 0.029 ARI, set-cover 0.064 — both weak in absolute terms, technically within 0.05 of each other |
-| ElectricDevices | 16,637 × 96 | unwired — verified loadable via `aeon.datasets.load_classification`, no run attempted this pass |
-| StarLightCurves | 9,236 × 1,024 | unwired, same status |
+| ECG5000 | {{dataset.ecg5000.rows}} series × {{dataset.ecg5000.features}} | **measured, 2026-08-12** (`table_3_7_g2_dtw_nonmetric.py`, registered in `reproduce/manifest.py`): exactness 1.000 (N≤1024, 10 seeds), triangle-inequality violations 20.9%. Downstream comparison also run: set-cover beats NERFCM-given-$k$ by 0.122 ARI (0.715 vs 0.593) |
+| FordA | {{dataset.forda.shape}} | **measured, same generator**: exactness 1.000, violations 0.4% (below the synthetic proxy). Downstream: every method scores ≈0 ARI (k_true=2 not recoverable from DTW dissimilarities by NERFCM, the set-cover, single-linkage, or beta-plateau) |
+| Crop | {{dataset.crop.shape_full}} | **measured, same generator, the scale target**: exactness 1.000, violations 23.6%, matrix build 1,597s + reorder 4.7s. Downstream: NERFCM 0.029 ARI, set-cover 0.064 — both weak in absolute terms, technically within 0.05 of each other |
+| ElectricDevices | {{dataset.electric_devices.shape}} | unwired — verified loadable via `aeon.datasets.load_classification`, no run attempted this pass |
+| StarLightCurves | {{dataset.starlight_curves.shape}} | unwired, same status |
 | TUDataset graphs (MUTAG, PROTEINS, ENZYMES, NCI1); Duin–Pękalska dissimilarity collection | not stated | unwired, and one step earlier: verification still in progress |
 
 **No longer a gap of the "nothing has been run" kind — it is now a partial-evidence gap, and an honest one.** Exactness holds at 1.000 on every real DTW dataset tested, closing that half of Goal G2's decision rule. The downstream-usefulness half is not closed: the decision rule needs the set-cover within 0.05 ARI of NERFCM-given-$k$ on at least three of the five DTW sets, and while three sets are now measured, only two show the criterion literally met, and both of those passes are low-information — Crop because both methods are weak, FordA because every method tested is at chance level. ECG5000, the one dataset with real recoverable structure, fails the criterion because the set-cover *outperforms* NERFCM by more than the tolerance, not because it underperforms. See §3.4's Table 3.7 and §7.2's Goal G2 entry for the full reading.
@@ -341,6 +341,157 @@ Sorted by how complete the gap is, not by chapter:
 
 Two categories (A.7.3, A.7.4) are unchanged from the earlier pass. Four (A.7.1, A.7.2, A.7.5, A.7.7) moved, three of them substantially, over one session (2026-08-11/12) — see `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md` for the full run log, every real number, and what was deliberately not attempted. That is still the point of this section: A.5 says which datasets are public and present; this section says, by category, which small/large pairing is real, which is a name, and — now, for four of six categories — what the real pairing actually showed.
 
+## A.8 The HDBSCAN\* head-to-head (Chapter 5)
+
+Chapter 5's selection machinery — the persistence gate of §5.3.2 that makes $k$ an
+output, and the band discovery of §5.3.3 that returns a stack of partitions — is
+described there as machinery and is not claimed as a contribution. This section is
+why. It also discharges the "required before claiming" item raised by the Chapter 5
+prior-art review (`PRIOR_ART_CH5.md` §3), which asked specifically for HDBSCAN
+`leaf` extraction and a `dbscan_clustering(eps)` sweep on the nested [8, 4, 2]
+synthetic.
+
+Generator: `gated-minimax-selection/run_hdbscan_baselines.py`, registered in
+`reproduce/manifest.py` as `table-5-5-7-ch5-hdbscan-baselines`. Seventeen
+dissimilarity matrices (the flat battery, the nested battery, five non-metric
+families, three shortest-path matrices), twelve HDBSCAN\* configurations each
+(`min_samples` ∈ {1, 5} × extraction ∈ {eom, leaf} × `min_cluster_size` ∈
+{3, 5, 10}), ten seeds. Findings and caveats:
+`gated-minimax-selection/notes/HDBSCAN_BASELINES.md`. It needs the `hdbscan`
+contrib package, which is in no repository environment — scikit-learn's `HDBSCAN`
+offers eom and leaf but no cut-distance accessor, and the eps sweep is half the
+point.
+
+The comparison is run at $m_{\mathrm{pts}} = 1$, where mutual reachability equals
+the input dissimilarity and HDBSCAN\* *is* single-linkage on it
+[@campello2015hdbscan, Corollary 3.5]. Both sides therefore consume the **identical
+hierarchy**, and the only thing under test is the extraction rule.
+
+Two design points matter for reading the tables. HDBSCAN\*'s quality on this
+battery is a strong function of `min_cluster_size` — on concentric rings
+excess-of-mass scores 0.061 at `min_cluster_size` = 3 and 0.863 at 10 — so the
+baseline is swept over that parameter rather than run at a default; a mechanism
+inferred from a gap at any single setting would be an artifact of the setting. And
+because the gate runs at one fixed `gap_sigma` everywhere, the baseline is scored at
+one fixed configuration too, with the per-dataset choice reported separately as the
+generous case.
+
+**Table A.3 — one fixed setting per method, ten seeds.** Twelve of the seventeen
+datasets have a flat ground truth. Each replicate gets its own battery mean and
+those are then averaged, so the deviation is across whole batteries rather than
+across datasets.
+
+| method | setting | mean ARI | sd | min | max |
+|---|---|---:|---:|---:|---:|
+| gated set-cover (Ch. 5) | `gap_sigma` = 2.0, identical everywhere | 0.835 | 0.037 | 0.794 | 0.887 |
+| HDBSCAN\* excess-of-mass | $m_{\mathrm{pts}}$ = 5, `min_cluster_size` = 5 | 0.817 | 0.019 | 0.790 | 0.855 |
+| HDBSCAN\* excess-of-mass | $m_{\mathrm{pts}}$ = 1, `min_cluster_size` = 10 | 0.805 | 0.037 | 0.772 | 0.879 |
+| HDBSCAN\* excess-of-mass | $m_{\mathrm{pts}}$ = 1, `min_cluster_size` = 5 | 0.798 | 0.014 | 0.771 | 0.816 |
+| HDBSCAN\* leaf | $m_{\mathrm{pts}}$ = 5, `min_cluster_size` = 10 | 0.713 | 0.024 | 0.674 | 0.747 |
+
+**+0.018 at roughly half a standard deviation, with the ranges overlapping almost
+entirely. There is no accuracy claim here.** A single seed would have suggested
+otherwise: at the generators' default seeds the gate scores 0.887 against the best
+baseline configuration's 0.820, a gap of +0.067 — and 0.887 is the gate's *best of
+ten*. This is what the ten-seed floor (A.5) exists to catch, and it is why Chapter 5
+reports the machinery without advancing it.
+
+Allowing the baseline a per-dataset choice of both parameters makes it worse than a
+wash. Over ten replicates and twelve datasets, scored against the best of
+HDBSCAN\*'s twelve configurations on each dataset (0.02 ARI to count as a verdict),
+the flat gate wins 7, loses 29 and ties 84; the band selector wins 8, loses 19 and
+ties 93.
+
+**Table A.4 — per dataset, against a baseline tuned on that dataset.** Mean ± sd
+over ten seeds.
+
+| Dataset | gated set-cover | HDBSCAN\* tuned | delta |
+|---|---|---|---:|
+| multi_scale_hierarchy | 0.552 ± 0.015 | 1.000 ± 0.000 | −0.448 |
+| cosine_topics | 0.423 ± 0.387 | 0.682 ± 0.183 | −0.259 |
+| graph_communities | 0.095 ± 0.156 | 0.202 ± 0.090 | −0.107 |
+| bridged_gaussians | 0.978 ± 0.040 | 0.987 ± 0.017 | −0.009 |
+| varying_density | 0.976 ± 0.042 | 0.983 ± 0.027 | −0.007 |
+| two_gaussians, dtw_traces, edit_strings, hamming_categorical, three_clusters_tree, chain_then_ring | 1.000 ± 0.000 | 1.000 ± 0.000 | +0.000 |
+| **concentric_rings** | **1.000 ± 0.000** | 0.873 ± 0.175 | **+0.127** |
+
+Three things read off that table. **The one clear win is `concentric_rings`** — the
+non-convex case Chapter 5's motivation rests on — at 1.000 with *zero* variance
+across ten seeds against a tuned baseline's 0.873 ± 0.175, exactly stable where the
+baseline is strongly seed-sensitive. **`multi_scale_hierarchy`'s −0.448 is a
+flat-versus-multiscale artifact rather than a defeat**, since that dataset's flat
+truth is its fine level of six sub-clusters and the band selector recovers bands
+[6, 3] at ARI 1.000. **And `cosine_topics` at 0.423 ± 0.387 is a real weakness**,
+carried forward into Chapter 5 §5.6 rather than averaged away: the gate is unstable
+on cosine dissimilarities, and a single seed puts it at 0.803, near the top of that
+range.
+
+What the comparison does establish is a parameter-sensitivity contrast, and the
+reason it is a cost rather than a knob is that parameter choice dominates seed
+noise. Across configurations the battery mean ranges 0.713–0.817; across seeds at
+any fixed configuration the standard deviation is 0.014–0.037. Choosing
+`min_cluster_size` badly costs an order of magnitude more than the seed does, and on
+individual datasets the swing reaches 0.802 ARI on concentric rings and 1.000 on
+`three_clusters_tree`, where $n$ = 30 makes `min_cluster_size` = 10 a tenth of the
+data.
+
+**Table A.5 — nested structure: whether a baseline can return the whole hierarchy.**
+Per-level ARI at the default seeds, finest level first, with band-recovery stability
+over ten seeds in the last two columns.
+
+| Dataset | truth granularities | bands found | per level | HDBSCAN\* leaf per level | eps-sweep oracle | exact recovery, 10 seeds | distinct vectors |
+|---|---|---|---|---|---|---:|---:|
+| nested_gaussians | [6, 2] | [6, 2] | 1.000, 1.000 | 1.000, 0.324 | 1.000, 1.000 | 100% | 1 |
+| three_level_hierarchy | [8, 4, 2] | [8, 4, 2] | 1.000, 1.000, 1.000 | 1.000, 0.581, 0.236 | 1.000, 1.000, 1.000 | 90% | 2 |
+| density_hierarchy | [4, 2] | [4, 2] | 1.000, 1.000 | 1.000, 0.492 | 1.000, 1.000 | 70% | 4 |
+| relational_nested_hierarchy | [6, 3] | [6, 3] | 1.000, 1.000 | 1.000, 1.000 | 1.000, 1.000 | 100% | 1 |
+
+Two findings, pointing opposite ways. Against a **single-output** extractor the
+structural argument is clean: leaf and excess-of-mass both lock onto the finest
+level and then score 0.24–0.58 on the coarser ones, because one partition cannot be
+two granularities at once. Against a **cut-distance sweep it does not hold.**
+Sweeping `dbscan_clustering(eps)` over 400 cut heights on `three_level_hierarchy`
+yields only **seven** distinct partitions, and three of them are exactly $k$ = 8,
+$k$ = 4 and $k$ = 2 at ARI 1.000 each:
+
+| eps | k | fine | medium | coarse |
+|---:|---:|---:|---:|---:|
+| 0.032 | 0 | 0.000 | 0.000 | 0.000 |
+| 0.553 | 8 | 0.948 | 0.542 | 0.216 |
+| 1.074 | 8 | **1.000** | 0.581 | 0.236 |
+| 3.680 | 7 | 0.862 | 0.702 | 0.300 |
+| 4.201 | 4 | 0.581 | **1.000** | 0.492 |
+| 27.129 | 2 | 0.236 | 0.492 | **1.000** |
+| 193.883 | 1 | 0.000 | 0.000 | 0.000 |
+
+The candidate set is small enough to read the three real scales off by eye, which is
+why §5.3.3 describes band discovery as automatic selection among those candidates
+and not as recovery of the hierarchy.
+
+The last two columns of Table A.5 are the qualification a single-seed run cannot
+supply. The [8, 4, 2] result holds on nine seeds of ten; `density_hierarchy` holds
+on only seven, producing four distinct granularity vectors — consistent with the
+ten-seed scaling study in Chapter 5 §5.4, where `single_scale`'s modal granularity
+agreed in only 5–7 of 10 seeds. Band recovery is not the deterministic property
+Table 5.2 makes it look, and Chapter 5 §5.6 says so.
+
+One further result closes off an argument rather than supporting a claim.
+$m_{\mathrm{pts}} = 5$ engages the $k$NN core distance and mutual-reachability
+machinery, and it **ran without error on all seventeen matrices**, every non-metric
+family included, so a density estimate is computable on a non-metric $D^*$; the
+framing "no density estimator is available here" is false and appears nowhere in
+Chapter 5. It is merely unreliable there: switching it on costs `graph_communities`
+0.253 → 0.011 and `cosine_topics` 0.903 → 0.458, while *helping* on the coordinate
+sets (concentric rings 0.863 → 1.000), and $m_{\mathrm{pts}} = 5$ is in fact the
+best single configuration across the battery as a whole. A narrow empirical
+observation on a few datasets, not a methodological reason.
+
+**Caveats.** `min_cluster_size` is swept over only {3, 5, 10} and `min_samples` over
+only {1, 5}. All seventeen matrices are small, $n$ = 30–160. HDBSCAN's noise flag is
+scored as a label of its own, with the kinder `ari_noise_excluded` also recorded in
+the JSON. Contrib `hdbscan` only, not cross-checked against scikit-learn's
+implementation.
+
 ---
 
-*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility), A.6 (side quests) and A.7 (dataset inventory) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../CHECKLIST.md`.*
+*Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility), A.6 (side quests), A.7 (dataset inventory) and A.8 (the Chapter 5 HDBSCAN\* head-to-head) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../CHECKLIST.md`.*

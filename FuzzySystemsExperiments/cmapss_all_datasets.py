@@ -15,9 +15,15 @@ the whole point:
     wins, and by a lot. So both aggregations are run and both metrics reported;
     reporting only the flattering one would be the mistake.
 
-  * **The virtual channels are not needed.**  Everything here uses the 18 real,
-    physically measurable sensors; dropping the two "virtual" channels the file
-    allows (T40, P30) costs nothing (established on DS02 in `cmapss_ds02_rul.py`).
+  * **Real sensors only, as a deliberate simplification.** Everything here uses
+    the 18 real, physically measurable sensors; the loader (`load_ncmapss`)
+    does not read the file's two "virtual" channels (T40, P30) at all. An
+    earlier docstring here claimed dropping them "costs nothing, established
+    on DS02" -- that was never actually measured for this pipeline, and on
+    DS02 alone it is false: the original design-of-experiments' winning
+    config used T40/P30 and reached a lower RMSE than this real-sensors-only
+    one. See `cmapss_ds02_rul.py`'s docstring and
+    `research/proposal-defense/prose/04-fast-fis-synthesis-mog.md` §4.4.1.
 
 Same engine as the DS02 script -- the reusable `TribblePredictiveHealth`. The
 only twist pooling needs is that condition correction and the RUL cap are fit
@@ -29,7 +35,7 @@ Writes `cmapss_all_datasets_report.md`.
 
 Needs: h5py, numpy, pandas, scikit-learn, tribble-fis.  Run:
 
-    python cmapss_all_datasets.py --h5-dir NASA-CMAPSS
+    python cmapss_all_datasets.py --h5-dir data/nasa-cmapps2
 """
 
 import argparse
@@ -307,7 +313,7 @@ def main(h5_dir, rebuild_cache=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--h5-dir", default="NASA-CMAPSS")
+    parser.add_argument("--h5-dir", default="data/nasa-cmapps2")
     parser.add_argument(
         "--rebuild-cache",
         action="store_true",

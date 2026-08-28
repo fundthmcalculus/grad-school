@@ -3,14 +3,16 @@ gap to full-2nd? Each output bucket -> one rule (a piecewise model across RUL
 bands). Swept for 1st, 2nd, full-2nd at top_p=0.99, l2_reg=0.01. Featurise once,
 reuse via fit_featurized. Writes rows incrementally so progress is visible."""
 
-import os, sys, time
+import os, time
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np, pandas as pd
 
-sys.path.insert(0, "FuzzySystemsExperiments")
+from _ds02_harness import bootstrap
+
+bootstrap("FuzzySystemsExperiments")
 from tribble_predictive_health import TribblePredictiveHealth, load_ncmapss
 from tribble_predictive_health.preprocessing import (
     apply_condition_correction,
@@ -18,7 +20,7 @@ from tribble_predictive_health.preprocessing import (
     fit_condition_correction,
 )
 
-H5 = "NASA-CMAPSS/N-CMAPSS_DS02-006.h5"
+H5 = "data/nasa-cmapps2/N-CMAPSS_DS02-006.h5"
 OUT = "outputs/hdbscan-ds02"
 os.makedirs(OUT, exist_ok=True)
 CSV = f"{OUT}/sweep_rules_ds02.csv"

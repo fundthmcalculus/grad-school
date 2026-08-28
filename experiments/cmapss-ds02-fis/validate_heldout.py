@@ -9,21 +9,20 @@ hyperparameter on validation, then reports on the untouched official test
 engines. A gain is only real if the validation-selected setting also wins on
 test.
 
-Run from the repo root (needs NASA-CMAPSS/):
+Run from the repo root (needs data/nasa-cmapps2/):
     python experiments/cmapss-ds02-fis/validate_heldout.py
 """
 
 import contextlib
 import io
 import os
-import sys
 
-sys.path.insert(0, "FuzzySystemsExperiments")
-sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np  # noqa: E402
 
+from _ds02_harness import bootstrap, rmse  # noqa: E402
+
+bootstrap("FuzzySystemsExperiments", os.path.dirname(__file__))
 import cmapss_all_datasets as cad  # noqa: E402
-from _ds02_harness import rmse  # noqa: E402
 from tribble_predictive_health import TribblePredictiveHealth  # noqa: E402
 from tribble_predictive_health.metrics import nasa_score  # noqa: E402
 
@@ -142,5 +141,5 @@ if __name__ == "__main__":
     import argparse
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--h5-dir", default="NASA-CMAPSS")
+    ap.add_argument("--h5-dir", default="data/nasa-cmapps2")
     main(ap.parse_args().h5_dir)
