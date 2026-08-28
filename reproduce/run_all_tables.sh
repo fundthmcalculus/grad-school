@@ -132,6 +132,37 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/reproduce/outputs"
 DEST="$OUT/$LABEL"
 
+# ---------------------------------------------------------------------------
+# One run at a time. Every generator writes to the SAME `reproduce/outputs/*.csv`
+# names before the archive step moves them into $DEST, so two concurrent runs
+# interleave their cells and archive whichever landed last -- silently, and with
+# a PROVENANCE.txt that describes only one of them.
+#
+# This is not hypothetical. On 2026-08-27 two runs of this script raced for
+# twelve minutes before anyone noticed, because on Windows killing the wrapper
+# does not kill the generator: Git Bash's `ps` cannot see native python
+# processes, so a live run looks dead, and the natural response -- relaunch --
+# produces exactly the pair. `Get-CimInstance Win32_Process` is what shows them.
+#
+# `set -o noclobber` gives an atomic create-or-fail with no `flock` dependency
+# (flock is absent from Git Bash). A stale lock from a killed run is detected by
+# checking whether the recorded PID is still alive rather than by age.
+# ---------------------------------------------------------------------------
+LOCK="$OUT/.run_all_tables.lock"
+mkdir -p "$OUT"
+if ! (set -o noclobber; echo "$$" > "$LOCK") 2>/dev/null; then
+  _holder="$(cat "$LOCK" 2>/dev/null || echo "?")"
+  if kill -0 "$_holder" 2>/dev/null; then
+    echo "error: another run_all_tables.sh is already running (pid $_holder)." >&2
+    echo "       Two runs share reproduce/outputs/*.csv and would interleave." >&2
+    echo "       Wait for it, or stop it and remove $LOCK." >&2
+    exit 1
+  fi
+  echo "note: clearing a stale lock from pid $_holder (no such process)" >&2
+  echo "$$" > "$LOCK"
+fi
+trap 'rm -f "$LOCK"' EXIT INT TERM
+
 # Interpreter for the stdlib-only renderers, the seed-list query and the version
 # line in PROVENANCE.txt. `python3` is not universally on PATH -- Windows/Git Bash
 # ships the `py` launcher instead, and Windows also plants a `python` stub that
@@ -520,7 +551,32 @@ PROV="$DEST/PROVENANCE.txt"
   fi
   echo "tribble-fis: $(git -C "$ROOT/tribble-fis" rev-parse HEAD)"
   echo "tribble-cluster: $(git -C "$ROOT/tribble-cluster" rev-parse HEAD)"
+  echo "tribble-opt: $(git -C "$ROOT/tribble-opt" rev-parse HEAD)"
   echo "grad-school: $(git -C "$ROOT" rev-parse HEAD)"
+  # The three lines above are the submodule CHECKOUTS. They are not necessarily
+  # the code that ran. tribble-fis sources tribble-clustering and optimizers from
+  # git URLs with no revision, so `uv run --project tribble-fis` resolves both
+  # from tribble-fis's own uv.lock and never looks at the sibling checkouts --
+  # and for nine days in August 2026 those were five and eleven commits apart
+  # respectively, across seeding and correctness fixes, while this file recorded
+  # only the checkouts (checklist B18). So record what was actually imported,
+  # read from the installed distribution's own direct_url.json. preflight's
+  # PIN-MATCH fails the run when these disagree; this block is what lets a reader
+  # check the claim years later instead of trusting that it was checked.
+  echo "imported:"
+  uv run --project "$ROOT/tribble-fis" python - <<'_PY' 2>/dev/null || echo "  (unavailable)"
+import importlib.metadata as md, json
+for dist in ("tribble-fis", "tribble-clustering", "optimizers"):
+    try:
+        raw = md.distribution(dist).read_text("direct_url.json") or "{}"
+        info = json.loads(raw)
+    except Exception:
+        print(f"  {dist:20s} not installed")
+        continue
+    rev = (info.get("vcs_info") or {}).get("commit_id")
+    src = rev if rev else f"dir {info.get('url', '?')}"
+    print(f"  {dist:20s} {src}")
+_PY
   echo "seeds:       $FULL_SEEDS${REPRO_SEEDS:+ (REPRO_SEEDS override in effect)}"
   echo "thetas:      $REPRO_THETA_SWEEP (table_4_4b operating curve)"
   echo

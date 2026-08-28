@@ -32,6 +32,29 @@
 %   arnett2019iteratively [?], which is the completed dissertation that the
 %   file's oldest [?] (arnett2018proposal) was the proposal for.
 %   Now 82 entries = 53 [V] + 25 [S] + 4 [?].
+% Updated 2026-08-27 (E11 verification pass): no new entries; three moved
+%   [?] -> [V] because the sites that were unreachable during drafting were
+%   reachable on this pass, so these now rest on the source rather than on an
+%   index listing. easa2023airoadmap -- title read from EASA's document
+%   library, and it leads with "EASA", which this file had dropped.
+%   easa2024mlconcept -- EASA's own suggested citation, and the exact date,
+%   6 March 2024, which had been a bare year. arnett2019iteratively -- the
+%   OhioLINK ETD record itself, confirming title, author, degree, department,
+%   year and committee. Two [V] entries re-confirmed against Crossref, the
+%   publisher's deposited record rather than an index: cohen2022whyfuzzy is
+%   exact, and arnett2021formal is exact APART FROM one given name, "Hector"
+%   here against Crossref's "Hugo" -- changed, but on a single source, so it
+%   stays flagged for proof stage. Of the 82 entries this pass started from,
+%   56 [V] + 25 [S] + 1 [?]. The one remaining [?] is arnett2018proposal, the
+%   file's oldest, and it is no longer a mystery: arnett2019iteratively is the
+%   dissertation it was the proposal for. What is unconfirmed about it is only
+%   its own title and date.
+%   Merged with the Chapter 5 prior-art block (PRIOR_ART_CH5.md) on the same
+%   day, which adds 13 entries carrying their verification status in a `note`
+%   field rather than a bracket marker -- so a bracket count now covers 82 of
+%   95 entries, and the two conventions want reconciling at proof stage.
+%   Counted rather than carried forward:
+%     grep -E '^@' references.bib | grep -c '% \[V\]'
 %
 % RESOLVED in 2026-08-08 verification pass:
 %   [V] parveen2013pvat     -- author field resolved from [given name] to Sherin
@@ -684,32 +707,39 @@
   note        = {Approved 13 December 2011. Cited for admitting analysis over
                  the whole input space in place of test sampling.}}
 
-@techreport{easa2023airoadmap,                   % [?] published 10 May 2023 per EASA newsroom; document number not confirmed
+@techreport{easa2023airoadmap,                   % [V] title and date read from EASA's own document-library page, 2026-08-27
   author      = {{European Union Aviation Safety Agency}},
-  title       = {Artificial Intelligence Roadmap 2.0: A Human-Centric Approach
-                 to {AI} in Aviation},
+  title       = {{EASA} Artificial Intelligence Roadmap 2.0: A Human-Centric
+                 Approach to {AI} in Aviation},
   institution = {European Union Aviation Safety Agency},
   address     = {Cologne, Germany},
   year        = {2023}, month = may,
   note        = {Roadmap 1.0 was February 2020; 2.0 published 10 May 2023.
-                 Verify the exact title page and any document number at proof
-                 stage (CHECKLIST E11) -- easa.europa.eu was unreachable from
-                 the drafting environment.}}
+                 Verified 2026-08-27 against easa.europa.eu's document-library
+                 entry, which was reachable on that pass where it had not been
+                 during drafting. The printed title leads with ``EASA'', which
+                 this entry previously dropped. No document number is shown on
+                 the library page.}}
 
-@techreport{easa2024mlconcept,                   % [?] Issue 02 title/date from index listings only, not the title page
+@techreport{easa2024mlconcept,                   % [V] title and 6 Mar 2024 date read from EASA's document library and newsroom, 2026-08-27
   author      = {{European Union Aviation Safety Agency}},
-  title       = {{EASA} Concept Paper: Guidance for Level 1 \& 2 Machine
-                 Learning Applications, Issue 02},
+  title       = {{EASA} Artificial Intelligence {(AI)} Concept Paper Issue 2:
+                 Guidance for Level 1\&2 Machine Learning Applications},
   institution = {European Union Aviation Safety Agency},
   address     = {Cologne, Germany},
-  year        = {2024},
-  note        = {Issue 01 was titled ``First usable guidance for Level 1
-                 machine learning applications''; Issue 02 extends it to
-                 Level 2 and deepens learning assurance, AI explainability and
-                 ethics-based assessment. Exact issue date unconfirmed
-                 (CHECKLIST E11).}}
+  year        = {2024}, month = mar,
+  note        = {Published 6 March 2024. Issue 01 was titled ``First usable
+                 guidance for Level 1 machine learning applications''; Issue 2
+                 extends it to Level 2 and deepens learning assurance, AI
+                 explainability and ethics-based assessment. Verified
+                 2026-08-27: the title above is EASA's own suggested citation
+                 from its document-library entry, and the date is from the
+                 accompanying newsroom item. Note EASA writes ``Issue 2'' in
+                 the citation and ``Issue 02'' in the announcement headline;
+                 this entry follows the citation. Previously ``Issue 02'' with
+                 no month (CHECKLIST E11).}}
 
-@incollection{cohen2022whyfuzzy,                 % [V] metadata from the SpringerLink indexed record (page egress-blocked; two independent listings agree)
+@incollection{cohen2022whyfuzzy,                 % [V] confirmed against Crossref, 2026-08-27 -- title, five authors in order, pages 74--78, LNNS, publisher all match
   author    = {Cohen, Kelly and Bokati, Laxman and Ceberio, Martine and
                Kosheleva, Olga and Kreinovich, Vladik},
   title     = {Why Fuzzy Techniques in Explainable {AI}? Which Fuzzy
@@ -726,9 +756,9 @@
                problem-dependent -- which lands on {\S}4.3.5's untested
                conorm-family question. Re-confirm at proof stage (E11).}}
 
-@incollection{arnett2021formal,                  % [V] metadata from the SpringerLink indexed record (page egress-blocked)
+@incollection{arnett2021formal,                  % [V] metadata confirmed against Crossref, 2026-08-27; ONE given name changed, see note
   author    = {Arnett, Timothy and Ernest, Nicholas and Kunkel, Brandon and
-               Boronat, Hector},
+               Boronat, Hugo},
   title     = {Formal Verification of a Genetic Fuzzy System for Unmanned
                Aerial Vehicle Navigation and Target Capture in a Safety
                Corridor},
@@ -742,22 +772,36 @@
   note      = {A fuzzy controller actually taken through formal verification
                against a behavioural safety specification, in aerospace, on the
                analyzability constraint set {\S}2.1 shares. Conference was
-               NAFIPS 2020; volume published 2021. Re-confirm at proof stage
-               (E11).}}
+               NAFIPS 2020; volume published 2021.
+               Verified 2026-08-27 against Crossref, the publisher's own
+               deposited record: title, author order, page range 361--372 and
+               publisher all confirm. ONE correction -- the fourth author's
+               given name was recorded here as ``Hector'' and Crossref gives
+               ``Hugo''. Changed on that authority, since a hand-entered name
+               with no recorded source does not outrank the publisher's
+               deposit, but flagged rather than settled: search listings show
+               only ``Boronat, H.'', the NAFIPS 2020 program page returns 401,
+               and the SpringerLink chapter page is behind an auth redirect, so
+               this rests on ONE source. Confirm at proof stage (E11).}}
 
-@phdthesis{arnett2019iteratively,                % [?] title/year from search listings + an OhioLINK accession number; the ETD record itself was egress-blocked
+@phdthesis{arnett2019iteratively,                % [V] read from the OhioLINK ETD record itself, 2026-08-27
   author  = {Arnett, Timothy J.},
   title   = {Iteratively Increasing Complexity During Optimization for
              Formally Verifiable Fuzzy Systems},
   school  = {University of Cincinnati},
   type    = {PhD dissertation},
+  address = {Cincinnati, Ohio},
   year    = {2019},
-  note    = {The completed dissertation that {\tt arnett2018proposal} was the
-             April 2018 proposal for -- which is what resolves what that
-             placeholder-titled entry was pointing at. OhioLINK accession
-             {\tt ucin156387481300899} surfaced in search; the ETD record was
-             unreachable from the drafting environment, so title and year rest
-             on index listings (CHECKLIST E11).}}
+  note    = {Department of Engineering and Applied Science: Aerospace
+             Engineering; committee chaired by Kelly Cohen, with David Casbeer,
+             Manish Kumar, Anoop Sathyan and Rajnikant Sharma. OhioLINK
+             accession {\tt ucin156387481300899}. Verified 2026-08-27 by
+             reading the ETD record, which was reachable on that pass where it
+             had not been during drafting; title, author, degree, department
+             and year all confirm. This is the completed dissertation that
+             {\tt arnett2018proposal} was the April 2018 proposal for, so that
+             placeholder-titled entry now points at a real document
+             (CHECKLIST E11).}}
 
 % ---------------------------------------------------------------------------
 % Chapter 5 prior-art head-to-head (PRIOR_ART_CH5.md, 2026-08-26/27). These

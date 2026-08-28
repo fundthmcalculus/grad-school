@@ -114,6 +114,40 @@ datasets:
       label_column: critical_temp
       optional: true # gitignored; fetched on first run of the pilot
 
+  bodyfat:
+    name: Body Fat (StatLib / Johnson 1996)
+    task: regression
+    rows: 252
+    features: 14 # every column except the BodyFat target
+    # NOTE the experiment uses 13 of those 14: it drops `Density`, which is the
+    # target in another coordinate (see the LEAK note below). This field counts
+    # what the FILE holds, not what an arm consumes -- those are different facts
+    # and conflating them is how a spec goes quietly stale.
+    verify:
+      method: csv
+      path: data/bodyfat.csv
+      label_column: BodyFat
+    # Vendored 2026-08-28 (20 KB) for reproduce/experiments/ch5_end_to_end.py,
+    # the C3 end-to-end run. Full provenance, licence, units and errata live in
+    # data/bodyfat.names -- read it first, because three things here bite:
+    #
+    #  1. LEAK. `Density` IS the target in another coordinate: BodyFat was
+    #     computed from it by Siri's equation, 495/D - 450. Measured here that
+    #     identity reproduces BodyFat at R2 0.9773 as shipped, and R2 1.0000
+    #     once the five errata rows are excluded -- deterministic, not merely
+    #     strong. Every arm must drop `Density`; ch5_end_to_end.py does.
+    #  2. MIXED UNITS. Weight is POUNDS and Height is INCHES, while all ten
+    #     circumferences are CENTIMETRES.
+    #  3. ERRATA, uncorrected on purpose so the file stays byte-identical to
+    #     the canonical one. Case 42's Height is 29.50 in at 205 lb and should
+    #     be 69.50; cases 48/76/96 carry wrong densities; case 182's BodyFat
+    #     of .0 is a floor truncation of -3.61%, not a measurement. Case 169
+    #     is in no published errata list and corrupts the TARGET by ~2 pp.
+    #
+    # NOT under the repo's GPL-3.0: the data carry a non-commercial permission
+    # grant from A. Garth Fisher, and GPL-3.0 would grant commercial use he did
+    # not. See data/bodyfat.names.
+
   # --------------------------------------------------------------------- #
   # Classification
   # --------------------------------------------------------------------- #

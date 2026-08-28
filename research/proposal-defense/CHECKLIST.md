@@ -20,14 +20,40 @@ than re-describing it.
 
 _Opened 2026-08-02, merged 2026-08-04, consolidated with timeline 2026-08-08._
 _Overnight reproduction pass against latest `main` and latest submodules, 2026-08-22._
+_Second overnight pass, 2026-08-27: submodules synced to their upstream heads, **B14** closed,
+**B18** opened and fixed, **E9** answered, **E11**'s citation half closed, and five items found
+to have been done for days without being ticked (**B16(a)**, **B16(b)**, **B16(d)**, **D7**,
+**E10(d)**). Outstanding items **28 → 17**: open 25 → 11, the one 🔒 cleared, and in-progress
+2 → 6 because four items (**C1**, **D8**, **E1**, **E2b**) moved from *not started* to *half
+done* rather than closing. **C3 went the whole way in a day**: the author's clarification
+arrived on 2026-08-28 and resolved it to *not started* — which is what Ch 7's own tracker had said
+all along — and it was then **discharged the same day**, with a negative result. The recurring
+lesson is the one
+**B13**'s standing procedure already names — nobody reads the upstream log for what a bump
+**fixes** — so this pass added the missing half of it: read the log for the revisions that will
+actually be **imported**, which is not the same set as the submodule SHAs._
 
-> 🚨 **Read B14 before quoting any Chapter 4 or Chapter 6 accuracy number.** The current
-> `tribble-fis` pin carries a silent wrong-answer defect in `stats_numba.wasserstein_distance`
-> that takes PhiUSIIL from $0.997 \pm 0.001$ to $0.729 \pm 0.023$ and RT-IOT2022 from
-> $0.927 \pm 0.002$ to $0.500 \pm 0.244$. Correcting that one function at the current pin returns
-> **Table 4.1** to its archived values exactly — so those cells are right as written — but it
-> recovers 11 of the ~97 ± pairs the document loses overall. **B14 is the largest single
-> cause of the drift and not the whole of it**; **D8** carries the rest.
+_⚠️ **Two passes ran over this file on the same day and did not know about each other**, which is
+its own finding. Merging them produced three genuine conflicts, not textual ones: both had
+independently concluded **D7** was done (the accounts are complementary and both are kept), both
+had worked **E10**, and both had repaired the black gate #183 left red. It also produced the
+better outcome twice over — the other pass landed **C1**'s ANFIS and GA-FIS adapters, the item
+this file calls the single most important experiment in the backlog, and reorganized §5.3 for
+**E10(c)**. A shared file with two writers wants a lock as much as `reproduce/outputs/` does._
+
+> ✅ **B14 is closed: the pin carries the fix** (2026-08-27). `stats_numba.wasserstein_distance`
+> weights its CDF gaps by $dx$ again, so it is once more a distance in the data's own units.
+> Settled by ancestry and by behaviour rather than by reading a diff — `5253aa0`
+> (`tribble-fis` #171) is an ancestor of the current pin, and preflight's `W1-SCALE` check
+> multiplies both samples by 1,000 and gets 1,000× the distance back. Chapter 4 and Chapter 6
+> accuracy numbers are quotable from this pin; the ordinary re-quoting that remains is **D8**.
+>
+> ⚠️ **B18 — `PROVENANCE.txt` was one archive away from naming code that had not run.**
+> `tribble-fis` resolves `tribble-clustering` and `optimizers` from its own lockfile, and the
+> archives stamp the submodule SHAs; for nine days those were different revisions. Every
+> existing archive checks out — the audit is in B18 — so nothing already written is in doubt.
+> The next one would have been the first that was. Fixed upstream, and preflight's new
+> `PIN-MATCH` check now fails the run rather than trusting the two to agree.
 
 **Legend: ⬜ open · 🟨 in progress · ✅ done · 🚫 descoped · 🔒 blocked on you.**
 
@@ -35,7 +61,23 @@ _Overnight reproduction pass against latest `main` and latest submodules, 2026-0
 
 ## Suggested order (from Tier 0 through Tier 4)
 
-**This week:** A (all settled) → start Tier 1 (cheap/high-value, before defense).
+**Where this actually stands, 2026-08-28.** Eleven items open and six in progress. One is still
+a thing a committee would notice — **C9** (interpretability described, not measured). **C3 closed
+the same day it was clarified**, and the negative it returned is worth more than the proxy it
+replaced. **E2b** has also stopped being one: Table 3.4 is measured, and what is left there is
+the sentence in §3.3.3 that has to say which comparison it is making. The rest are research
+scheduled after the defense, or editorial.
+
+**C1 changed shape today rather than closing.** The ANFIS and GA-FIS adapters landed, so the
+title's *orders of magnitude faster* finally has something to be faster *than* — but the run is
+still owed, and it is a scheduled job rather than a background one: both baselines build a
+256-rule grid partition on Concrete's eight features, which costs 5–6 minutes per seed on the
+smallest of the five datasets. Build a slot for it; do not shortcut it to three seeds.
+
+Infrastructure is no longer the constraint it was at the start of August: the B-section closed
+seven items this month and has one substantive gap left, **B10**'s fp16/GPU capture.
+
+**This week:** the three above, in that order.
 
 **Before the proposal defense (December 2026):** finish Tier 1 items. Get G4's protocol defined even if not fully executed — every number in the document is reported under it, so the committee will ask.
 
@@ -475,6 +517,25 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       upstream fix-shaped commits, and greps the checklist for each touched symbol would have
       caught all three of the rows above. Until it exists, this list is the procedure.
 
+      ✅ **Run in full for the 2026-08-27 bump (`353162c` → `2047fa1`), and it paid for itself.**
+      Five commits, of which #194 retired **E10(d)** — a blocker this file had carried as open
+      while the work sat done upstream. The other four are additive (`trapz_math_smooth.py`, the
+      deconstructed-tree classes, an `h5py` extra); the one behaviour change, in `em.py`, is
+      confined to the **trapezoid** gate M-step, and every generator in `reproduce/` runs
+      `member_function="gaussian"`, so it cannot reach a proposal table.
+      Two things the procedure did **not** have, both now added:
+      - **Read the fix half against the environment, not only the source tree.** **B14**'s fix
+        turned out to be an ancestor of the pin already, so the 🔒 that headed this file was
+        stale. Ancestry alone would not have settled it — the wheel can lag the tree — which is
+        why `preflight.py`'s `W1-SCALE` is the check that closed it.
+      - **Diff the whole table, which is the concrete change B13's own ⚠️ asked for.** Now the
+        default: the run of record is compared column by column, not on the three values that
+        are easiest to eyeball.
+
+      ⚠️ **One more trap this bump exposed, now covered by preflight's PIN-MATCH:** reading the
+      log between two *submodule* SHAs is not the same as reading the log between the revisions
+      that will actually be imported. For nine days those were different libraries. See **B18**.
+
       Found in `experiments/overlap-modeling` (stage 4);
       `experiments/overlap-modeling/diagnose_trapz_defect.py` regenerates the three
       measurements above, and `experiments/overlap-modeling/RESULTS.md` §"Stage 4" is the full
@@ -483,16 +544,28 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       ⚠️ **The verification above is sound and its coverage was narrower than the conclusion drawn
       from it — see B14.** "Byte-identical across the bump" was established on `table_4_1`'s three
       R² values, which do match, then and now. The same table's two *accuracy* columns were not
-      checked, and they had already collapsed (PhiUSIIL $0.997 \r\rightarrow 0.729$, RT-IOT2022
-      $0.927 \r\rightarrow 0.500$) at tribble-fis #95, inside the same 22-commit window this bump
+      checked, and they had already collapsed (PhiUSIIL $0.997 \rightarrow 0.729$, RT-IOT2022
+      $0.927 \rightarrow 0.500$) at tribble-fis #95, inside the same 22-commit window this bump
       spanned. **The concrete change owed: diff every column of the table, not the columns that are
       easiest to eyeball.** This item's own rule was right — *"if a Gaussian row moves, something
       else changed too and the bump is not the explanation"* — and would have caught it applied
       whole-table.
 
 
-- [ ] 🔒 **B14 — `stats_numba.wasserstein_distance` is not the Wasserstein distance.
-      BLOCKS every Chapter 4 and Chapter 6 accuracy number at the current pin.**
+- [x] ✅ **B14 — `stats_numba.wasserstein_distance` was not the Wasserstein distance.
+      Fixed upstream and confirmed in the running environment (2026-08-27).**
+      `tribble-fis` #171 (`5253aa0`, 2026-08-22) adds the missing $dx$ weighting, and that
+      commit is an ancestor of the current pin — checked with `git merge-base --is-ancestor`,
+      not inferred from a date. The behaviour is confirmed separately, because an ancestor in
+      the source tree and a wheel in the venv are different claims: preflight's `W1-SCALE`
+      multiplies both samples by 1,000 and reads back `x1000.0 distance`. The suite is
+      6/6 green on this pin. **Chapter 4 and Chapter 6 accuracy numbers are quotable again.**
+      Two of the three "owed" items below are therefore discharged: (a) it was filed and fixed
+      upstream, and (b) the hold on quoting is lifted. **(c) is the one that outlived the
+      defect** — B13's pin-bump check still has to read every column of a table, and that
+      change is now written into the standing procedure rather than left as advice.
+      _The account below is kept as the diagnostic record; its warnings are historical._
+
       Found 2026-08-22 by re-running the suite on latest `main` and latest submodules.
       Full account: [`reproduce/outputs/WASSERSTEIN_REGRESSION.md`](../../reproduce/outputs/WASSERSTEIN_REGRESSION.md);
       one-command reproduction: `reproduce/experiments/diagnose_wasserstein_regression.py`.
@@ -500,8 +573,8 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       **The symptom.** `table_4_1_mog_baselines.py` at ten seeds against the archived run of
       record moves the two *classification* rows by margins no seed spread covers, while the
       three *regression* rows move slightly the other way and every training time falls 5–7×:
-      PhiUSIIL $0.997 \pm 0.001 \r\r\rightarrow 0.729 \pm 0.023$; RT-IOT2022
-      $0.927 \pm 0.002 \r\r\rightarrow 0.500 \pm 0.244$. Those are Ch 1 §1.2's and Ch 4 §4.4's
+      PhiUSIIL $0.997 \pm 0.001 \rightarrow 0.729 \pm 0.023$; RT-IOT2022
+      $0.927 \pm 0.002 \rightarrow 0.500 \pm 0.244$. Those are Ch 1 §1.2's and Ch 4 §4.4's
       headline numbers.
 
       **Attributed, not guessed.** Data frozen to one `.npz` before either library is imported
@@ -563,31 +636,53 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       Timings taken here are not comparable to archives taken before, and any Ch 3 timing
       re-quote from this host must say so. This is B5b/§3.4's host hazard, extended to compilers.
 
-- [ ] ⬜ **B16 — Three smaller harness/upstream defects found in the same pass.**
-      (a) **`tribble-cluster`'s committed `uv.lock` is out of sync with its own
-      `pyproject.toml`** — `numba-progress>=1.2.0` is declared and absent from the lock (with its
-      transitive `tqdm`), so `uv run --project tribble-cluster` re-resolves and *dirties a pinned
-      submodule* on every run, which `reproduce/README.md` explicitly forbids. One `uv lock`
-      upstream fixes it.
-      (b) **`run_all_tables.sh --fast` no longer makes the suite fast.** `SLOW_TABLES` names the
-      four tables that dominated runtime in `outputs/seeds10-2026-08-01/`, and that list predates
-      RT-IOT2022 landing (2026-08-12). The two tables that now dominate —
-      `table_4_1_mog_baselines` (530 s) and `table_4_4_openset` (**> 3 h**) — are not in it, so a
-      `--fast` pass runs them at the full ten seeds. Either add them, or say in the header that
-      `--fast` no longer bounds the suite's runtime.
-      (c) **`tribble-opt` cannot be resolved as a project at all**: `requires-python = ">=3.10"`
-      against `numpy>=2.4.6`, which needs $\geq$ 3.11. Introduced by the numpy bump (`8049b94`).
-      The optimizer studies are unaffected — they run `--project tribble-fis --with-editable
-      tribble-opt` — but `uv run --project tribble-opt` is broken for anyone who tries it.
-      ⚠️ Related pin drift, no defect: **tribble-fis's `uv.lock` pins `optimizers` at `7b5958a1`
-      while the `tribble-opt` submodule is at `8049b94`**, so the tables and the optimizer studies
-      run two different revisions of the same library.
-      (d) ✅ **`table_3_7_g2_downstream` wired into orchestrator (2026-08-22, verified 2026-08-27).** 
-      Added to CLUSTER_TABLES array in run_all_tables.sh with `--with aeon` dependency. Comment 
-      at line 179-185 documents the 2026-08-22 addition, explicitly naming this as the trap B12 
-      records for two other tables (a1_feature_scoring, 3_2_memory_precision) and noting it 
-      matters more: this table is the evidence for Ch 3's G2 downstream *and* §5.4's 
-      coordinate-free claim. Now produces its own log on every run.
+- [x] ✅ **B16 — All six sub-items closed (2026-08-27).** Four had already been fixed and were
+      simply never ticked, which is its own small lesson: this file was carrying four open
+      blockers that were not blocking anything. The other two are fixed upstream now.
+      (a) ✅ **Fixed upstream by `clustering` #87 (`1dcf331`, 2026-08-24), and by the better
+      route than the one proposed here.** The original diagnosis was right about the symptom and
+      wrong about the cause: `numba-progress>=1.2.0` was declared in `[project].dependencies`
+      and absent from the lock, so `uv run --project tribble-cluster` re-resolved and *dirtied a
+      pinned submodule* on every run — reproduced against the pre-fix tree, where a plain
+      `uv run` rewrites `uv.lock`. But the dependency was **dead**: nothing imports
+      `numba_progress` anywhere in that repository. Upstream deleted the declaration rather than
+      locking a package it never used. Verified at the current pin: `uv lock --check` exits 0,
+      and `uv run --project tribble-cluster` leaves `uv.lock` byte-identical.
+      **The desync was also wider than recorded** — `c4efd84` added `matplotlib>=3.10.9` and
+      tightened `numpy>=2.4.6` without re-locking either, so three declarations were stale, not
+      one. **What is still owed is the gate, not the fix**: nothing in `clustering`'s CI runs
+      `uv lock --check`, which is why a desync introduced 2026-08-15 survived four commits until
+      an unrelated audit tripped over it. One residual crumb: `pyproject.toml:116`'s mypy
+      override still names `numba_progress`, a package the project no longer depends on.
+      (b) ✅ **Done 2026-08-22, unticked until now.** `SLOW_TABLES` carries
+      `table_4_1_mog_baselines`, `table_4_4_openset` and `table_3_4_gpu_speedups`, with the
+      measured runtimes (530 s, 13,084 s) in a comment beside them, so `--fast` bounds the
+      suite's runtime again.
+      (c) ✅ **Fixed upstream: [`optimizers` #126](https://github.com/fundthmcalculus/optimizers/issues/126),
+      [PR #127](https://github.com/fundthmcalculus/optimizers/pull/127) (2026-08-27).**
+      `requires-python = ">=3.10,<3.15"` against `numpy>=2.4.6` has no solution, because
+      **numpy 2.3.0** is the first release to require $\geq$ 3.11 (checked against PyPI release
+      metadata, not assumed from the error). Attribution to the numpy bump (`8049b94`) confirmed
+      by restoring `numpy>=1.21` against the same floor in a scratch copy, which resolves.
+      The floor is now `>=3.11`, matching `tribble-fis`, `tribble-cluster` and the repo root.
+      Verified: `uv run --project tribble-opt` builds the Cython extensions and imports the
+      package, where before it failed during resolution.
+      **Why nobody noticed for twelve days:** `pr.yml` installs with pip on a single 3.14
+      interpreter, and pip resolves for the running interpreter only — it never evaluates the
+      `python_full_version == '3.10.*'` split that a forking resolver forks on. The `>=3.10`
+      claim was metadata no gate in the project ever read.
+      ⚠️ **That "related pin drift, no defect" note was the whole finding, and calling it
+      benign was the mistake. It is now B18.** What was recorded here as a curiosity —
+      tribble-fis's lockfile pinning `optimizers` at one revision while the submodule sat at
+      another — is the mechanism by which every FIS-suite archive recorded a `tribble-clustering`
+      SHA that had not run. Written up in full at **B18**. The lesson is narrow and worth
+      keeping: *two revisions of one library in a single run* is never a curiosity, because the
+      provenance record can only name one of them.
+      (d) ✅ **Done 2026-08-22, unticked until now.** `table_3_7_g2_downstream` sits in
+      `CLUSTER_TABLES` with `--with aeon` and a comment recording why it matters — it is the
+      evidence for Ch 3's G2 downstream claim and for §5.4's corrected coordinate-free claim, so
+      a sweep reporting green while silently carrying it forward would be asserting a result
+      nobody re-measured.
       (e) **Tables 4.6 and 4.7 can no longer be regenerated at all.** `load_openset_data()` prefers
       RT-IOT2022 whenever it is present, and it has been present since 2026-08-12, so
       `table_4_4_openset.py` now emits the RT-IOT2022 table (the prose's **4.7b**) under the same
@@ -598,7 +693,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       absent dataset is an error rather than a reason to quietly use another — substituting one
       silently is the whole reason the knob exists. Tables 4.6 and 4.7 regenerate again:
       `REPRO_OPENSET_DATASET=glass`. At the current pin the shape holds and the values move
-      (4.6 peaks at $	heta = 0.90$, +0.162, against the prose's $	heta = 0.80$, +0.154;
+      (4.6 peaks at $\theta = 0.90$, +0.162, against the prose's $\theta = 0.80$, +0.154;
       4.7 keeps its ordering, Isolation Forest +0.157 > complement +0.141 > SVM +0.085, with the
       gap narrowed from 0.047 to 0.016). Not a re-quote — **D8** applies — but they can be
       re-derived at all now, which they could not be.
@@ -642,28 +737,134 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       Verified by making it fire on `03-complexity-fit.png`, which is exactly the case that
       caught this: a gcc-built figure (exponent 1.77) above an MSVC-built table quoting 1.97.
 
+- [x] ✅ **B18 — `PROVENANCE.txt` records a SHA the FIS suite does not necessarily run.
+      Found and fixed 2026-08-27, one archive before it would have mattered.** The gap is
+      between the submodule a SHA is read from and the wheel an import actually resolves to —
+      the one place the `reproduce/` apparatus was not looking.
+
+      ⚠️ **Scope, corrected after review: no archive was actually misnamed.** A first write-up of
+      this item said every FIS-suite archive named a revision that had not run. That is wrong,
+      and the audit is one command:
+
+      ```
+      $ grep -rh "^tribble-cluster:" reproduce/outputs/*/PROVENANCE.txt | sort | uniq -c
+           23 tribble-cluster: e3c27e67...      7 tribble-cluster: 85b68a8a...
+            7 tribble-cluster: c71171e7...      6 tribble-cluster: 635ed6ed...
+            2 tribble-cluster: 5d44dfa4...
+      ```
+
+      **No archive records `1dcf331b`.** The six from the `635ed6ed` era record exactly what ran.
+      The submodule advanced on 2026-08-24 and the lock did not, and the next archive would have
+      been the first written in the drifted window — this one. So the exposure was real and
+      prospective, not retrospective, and the item is worth keeping at that strength rather than
+      the one it was first written at.
+      **The five `opt-*` archives are correct too, for a reason worth recording.** They record
+      `tribble-opt: 94547ff7` while the lock pinned a later `7b5958a1`, which looks like the same
+      defect and is not: those studies run `--project tribble-fis --with-editable tribble-opt`,
+      and `--with-editable` overrides the lock with the submodule checkout. For them the
+      submodule SHA *is* the code that ran. Which record is right depends on how the environment
+      was built, and neither "the submodule SHA" nor "the lock's pin" is universally the truth —
+      which is exactly why the fix reads the installed distribution's `direct_url.json` instead
+      of picking one of the two by convention.
+
+      **The mechanism.** `tribble-fis/pyproject.toml` sources two dependencies from a git URL
+      with no revision:
+
+      ```toml
+      [tool.uv.sources]
+      optimizers         = { git = ".../optimizers.git" }
+      tribble-clustering = { git = ".../clustering.git" }
+      ```
+
+      so `uv.lock` alone decides which commit installs. Every FIS table runs
+      `uv run --project tribble-fis`, which resolves `tribble-clustering` **from that lockfile**
+      and never consults `../tribble-cluster` at all. `run_all_tables.sh` meanwhile stamps
+      `git -C tribble-cluster rev-parse HEAD` into `PROVENANCE.txt`. The two are unrelated
+      quantities, and they had come apart:
+
+      | dependency | lock | submodule | behind |
+      |---|---|---|---:|
+      | `optimizers` | `7b5958a1` | `4d811214` | 11 commits, 9 days |
+      | `tribble-clustering` | `635ed6ed` | `1dcf331b` | 5 commits, 8 days |
+
+      Not routine churn: that window holds a GA crossover identity bug fix and three
+      determinism/seeding fixes in `optimizers` (#115, #118, #119), and an FCM
+      coincident-point membership fix, an FCM crash fix and an `IVATMeans` `n_clusters` fix in
+      `clustering` (#82, #84, #85). Being silently behind on *seeding* fixes is the worst case,
+      because the symptom is irreproducibility rather than a crash.
+
+      **Why nothing caught it.** `uv lock --check` passes in both states — measured, exit 0
+      before and after — because a git source with no `rev` in `pyproject.toml` is "in sync"
+      with any locked commit, however old. **B4**'s submodule SHA guard compares
+      `git rev-parse HEAD` against the last archive, so it sees the submodule move and never the
+      import. There was no check anywhere on the axis that mattered.
+
+      **What limits the damage, established rather than hoped for.** `tribble-clustering` is
+      referenced exactly once in all of `tribble-fis` —
+      `src/tribblefis/gauss_math.py:11: from tribbleclustering import IVATMeans, FuzzyCMeans` —
+      and neither name is used anywhere. A full-tree grep returns that one line. So the
+      clustering half of the drift is numerically inert for every Chapter 4 and Chapter 6 table,
+      and the recorded SHAs were wrong without the numbers being wrong. The `optimizers` half
+      is the one that could bite, since `refine.py`, `optimizer_utils.py`, `regression.py` and
+      the two `*_refine.py` modules do import it; that is under review. Filed upstream as
+      [`tribble-fis` #203](https://github.com/fundthmcalculus/tribble-fis/issues/203), because a
+      compiled package should not be a hard import dependency for an unused line.
+
+      **Fixed three ways, because one was not enough.**
+      1. Upstream: [`tribble-fis` #201](https://github.com/fundthmcalculus/tribble-fis/issues/201)
+         and [PR #202](https://github.com/fundthmcalculus/tribble-fis/pull/202) refresh both pins
+         to the submodule heads.
+      2. Locally: `preflight.py` gains **PIN-MATCH**, which reads the *installed* distribution's
+         `direct_url.json` and compares its `commit_id` against the submodule HEAD. It earned
+         its keep within the hour, catching a submodule left on a feature branch that would
+         otherwise have produced a quietly mislabelled archive.
+      3. `INSTALL-FRESH`'s remedy text was wrong for this failure — it said to reinstall, which
+         cannot fix a lockfile pinning an older revision. It now names both causes and points at
+         PIN-MATCH to tell them apart.
+
+      **Still owed upstream:** the durable gate. `uv lock --check` cannot see this class of
+      drift, so #201 proposes either a scheduled job that runs `uv lock --upgrade-package` and
+      reports when a pin moves, or pinning `rev=` in `pyproject.toml` so the commit is visible
+      in a diff where a reviewer already looks. The second is smaller and brings
+      `uv lock --check` back into play as a real gate.
+
 
 ## C. Experiments owed
 **[Tier 1: critical before defense (C1, C4). Tier 2: real research (C2–C3, C5–C6, C8–C11–C13). Tier 3: defensive (C5–C6, C8). Tier 1.5: reduced scope (C4 done). Tier 4 (C7 descoped)]**
 
-- [ ] ⬜ **C1 — ANFIS and GA-tuned-FIS baselines** (Ch 4, Table 4.5). **The single most
-      important experiment in the backlog**: the title, Ch 1, Ch 7 and Ch 8 all claim *orders
-      of magnitude faster*, and there is currently no fuzzy baseline to say faster *than what*.
-      Adapters go at `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py`; the table
-      auto-detects them.
+- [ ] 🟨 **C1 — the adapters have landed; what is owed now is a run, and it is not a cheap one.**
+      `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py` arrived on `main` (#191), so
+      the claim that this work is *orders of magnitude faster* finally has something to be faster
+      *than*. The ANFIS adapter is a Jang-style hybrid — least squares for the consequents,
+      Adam on the premises — on numpy and scikit-learn only, so it adds no dependency.
+
+      ⚠️ **A ten-seed run of Table 4.1 is now a scheduled job, not a background one.** Attempted
+      2026-08-27 and abandoned deliberately. The cost is structural rather than incidental: both
+      baselines build a **grid partition**, which on Concrete's 8 features is $2^8 = 256$ rules,
+      and GA-FIS then searches a population of 20 over 15 generations on top of that. Measured
+      here: roughly **5–6 minutes per seed on Concrete alone**, the smallest of the five datasets,
+      against 217 s for the whole MoG-only table at ten seeds. Bike Sharing (17k rows),
+      PhiUSIIL (235k) and RT-IOT2022 (123k × 82 features) follow, and a grid partition cannot be
+      what runs on 82 features — check what the adapter falls back to there before quoting a
+      timing, because a fallback that silently changes the baseline's *structure* would make the
+      speed comparison meaningless in the flattering direction.
+
+      **Do not shortcut it to three seeds.** This file's own protocol note says why: going from
+      three seeds to ten retracted one conclusion and refuted another. A cheap C1 number is worth
+      less than no C1 number, because the headline claim of the title rests on it.
 - [x] ✅ **C2 — Complexity fit against reference curves.** Table 3.2 + Figure 3.2 now sweep a
       small grid (100–1,000, sized so the cubic arm runs at every point) with both axes
-      normalized, and fit a log-log exponent per arm. Classical **3.15** (theory 3) confirms.
-      **Stage one does not, and this item was ticked claiming it did.** Five runs on the
-      workstation fit stage one at **1.86–1.88** against a theoretical ≈2.1 for
-      $O(N^2 \log N)$ — but the number to notice is that it sits *below* the pure quadratic
-      reference of **2.00**, so "the log factor is invisible over one decade" is asserted
-      rather than shown, and an exponent under 2 is not evidence for a bound above it. What
-      the sweep establishes is the cubic-to-quadratic *separation*, which both arms agree on;
-      stage one's own exponent is **bounded, not confirmed**. Reporting a constrained fit at
+      normalized, and fit a log-log exponent per arm. Classical **3.15** against a theory of 3
+      confirms; stage two fits **1.93–1.97**, confirming the quadratic claim it makes.
+      **Stage one is the arm this item over-claimed on.** Five runs on the workstation fit it at
+      **1.86–1.88** against a theoretical ≈2.1 for $O(N^2 \log N)$, and the number to notice is
+      that it sits *below* the pure quadratic reference of **2.00** — so "the log factor is
+      invisible over one decade" is asserted rather than shown, and an exponent under 2 is no
+      evidence for a bound above it. What the sweep establishes is the cubic-to-quadratic
+      *separation*, which both arms agree on; stage one's own exponent is
+      **bounded, not confirmed**. Reporting a constrained fit at
       $t = c \cdot N^2 \log N$ beside the free exponent would settle it, and is the remaining
-      work — tracked in Chapter 7 under G4a. Stage two fits **1.93–1.97**, which does confirm
-      the quadratic claim it is making.
+      work — tracked in Chapter 7 under G4a.
 - [x] 🚫 **C2b — DESCOPED.** The ~10 ms fixed cost was a property of the laptop's power-saving governor
       and thermal throttling, not the kernel. It does not reproduce on the workstation. Across
       **five** independent measurements, stage two is monotone in N and beats stage one by
@@ -682,11 +883,137 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       farthest-point sampling is *necessary* but not that it is *sufficient*.
       Until these are settled, G4's half-million-point target rests on a single-level result.
       Noted briefly in Ch 7 G4e.
-- [ ] 🟨 **C3 — Ch 5 end-to-end FIS result.** Every Ch 5 number is a *clustering* score; the
-      chapter exists to produce FIS antecedents. Until a model is built from those memberships and measured,
-      the central claim rests on a proxy. **Author has FIS results on PhishingURII — needs clarification:**
-      Are these clustering-only (still proxy), or end-to-end (Ch 5 → model → regression/classification → measured)?
-      If end-to-end, C3 is done. Ch 7 §7.2 tracks this as **C3**.
+- [x] ✅ **C3 — DISCHARGED 2026-08-28, and the answer is negative.** A model whose antecedents are
+      `MS.block_membership` output is now fitted through `solve_tsk_consequents_from_firing` and
+      scored **held out** at two venues, ten seeds, against the Chapter 4 arm on identical splits.
+      No ARI, NMI or silhouette appears anywhere in the output — a clustering score is the proxy
+      this item existed to replace. `reproduce/experiments/ch5_end_to_end.py`;
+      outputs `ch5_end_to_end{,_ecg5000,_diagnostics,_raw}`.
+
+      **Read the floors first, because the headline cell is misleading on its own.** bodyfat,
+      10 × 5-fold, every arm on the same `(train, test)` pairs:
+
+      | arm | held-out $R^2$ |
+      |---|---:|
+      | floor: **plain OLS, all 13 features** | **0.698 ± 0.005** |
+      | floor: **plain OLS, the three used columns** | **0.668 ± 0.007** |
+      | antecedent-free global 1-rule TSK | 0.662 ± 0.010 |
+      | Ch 5 crisp `MS.assign` → TSK | 0.659 ± 0.013 |
+      | **Ch 5 graded `U` → TSK** | **0.653 ± 0.013** |
+      | **Ch 4 `TribbleRegressor`** | **0.633 ± 0.036** |
+      | floor: predict the train mean | −0.024 ± 0.015 |
+
+      Chapter 5 *beats* Chapter 4 here, and that comparison means nothing on its own. The
+      **antecedent-free** arm — identical features, order and ridge, with the antecedents
+      **deleted** — beats it (paired $-0.0085 \pm 0.0089$, 8 of 10 seeds), and **every fuzzy arm
+      in the table loses to ordinary least squares** on the same columns. On this dataset the
+      score is the consequent polynomial; the memberships are along for the ride.
+
+      🔬 **The mechanism is structural, not a property of bodyfat.** Measured over all 50 folds
+      with **zero variance**: `max μ over non-members = 0.5000 ± 0.0000`. That is a theorem, not a
+      measurement. A non-member reaches a single-linkage block only across the edge that dissolves
+      it, so $d_B(x) \geq \text{death}_B$, and `block_membership`'s Gaussian sits at half-max
+      exactly at `death`. **`block_membership` can never place a non-member above 0.5, on any
+      data.** With 12.7% of points in a block core, mean max normalized membership is 0.271
+      against a uniform $1/k$ of 0.156 — every rule fires nearly equally for every point, and the
+      TSK collapses onto the global fit ($r = 0.983$ between the graded arm's predictions and the
+      antecedent-free control's).
+
+      This **upgrades** `phase6_soft_validation`'s empirical finding to a structural one, and
+      corrects its wording: *"a constant step per cluster"* is the two-block case. Here `U` takes
+      81.7 distinct values across 252 points — it does vary among non-members, within $(0, 0.5]$.
+      The accurate statement is **no resolution above half-max**.
+
+      ⚠️ **Graded-versus-crisp is protocol-dependent, and reading only one protocol inverts it.**
+      Transductively, crisp is ahead (0.659 / 0.660 against 0.653). **Inductively** — $D^*$, cover
+      and memberships built on train rows only — **graded is ahead**, $+0.0200 \pm 0.0159$, 9 of
+      10 seeds. On ECG5000 the inductive pair goes the other way (crisp 0.909, graded 0.905). So
+      gradation does buy something against *hardening*; it buys nothing against *deleting the
+      antecedents*, which is the question C3 asks. Real, small, and sign-unstable across venues.
+
+      ✅ **ECG5000 carries the one positive, and it is the venue that matters more** (DTW, genuinely
+      coordinate-free). Ten seeds, 70/30 stratified: graded 0.897 ± 0.006, crisp 0.898 ± 0.005,
+      inductive 0.905 / 0.909, against a majority floor of **0.584** — and the antecedent-free
+      control lands **exactly on the floor**, both accuracy and macro-F1. So here the antecedents
+      *are* informative, and it survives the leak-free protocol (inductive is slightly better than
+      transductive). Gradation still adds nothing over `MS.assign`. Macro-F1 is 0.385 on a
+      2919/1767/194/96/24 class balance, so the minority classes are not being learned.
+
+      **One inherited piece of tuning, disclosed rather than buried:** `order="2nd"`,
+      `l2_reg=1e-2` come from `bodyfat.py`'s own 64-config sweep, scored on these same partitions.
+      It flatters the **Chapter 4** arm, so the negative result is robust to it. Nothing was
+      swept here; every arm added after the first scores came from adversarial review, and every
+      pre-existing arm reproduces bit-for-bit.
+
+      **What this buys the document.** §5.4 can stop saying the end-to-end result is missing and
+      start reporting it. The honest Chapter 5 claim is now narrower and better evidenced: the
+      construction recovers *structure* (ECG5000, 0.897 against a 0.584 floor, coordinate-free)
+      and its *gradation* is not yet carrying information a supervised objective can use, for a
+      reason that is now proved rather than observed. That is a sharper research question than
+      the one §5.5 currently poses, and it points at boundary resolution as the thing to fix.
+
+      ✅ **Provenance discharged 2026-08-28.** `data/bodyfat.csv` is vendored (20 KB,
+      byte-identical to the canonical file — 0 differing cells against
+      `jse.amstat.org/datasets/fat.dat.txt`), registered in `dataset_specs.yaml` where the
+      verifier reads it at 252 × 14 and agrees, mapped in `PROVENANCE_MAP.md`, and documented in
+      `data/bodyfat.names`. Three findings from that pass bear on the numbers above:
+      - **The leak is deterministic, not merely strong.** Siri's $495/D - 450$ reproduces
+        `BodyFat` at $R^2 = 0.9773$ as shipped, $0.9990$ with Johnson's three documented density
+        fixes, and **$1.0000$** excluding the five bad rows. The residual *is* the errata.
+        Dropping `Density` was necessary, and the experiment's own 0.977 understated it.
+      - **Case 169 corrupts the target and is in no published errata list** — recorded 34.3
+        against 36.25 implied by its density, ~2 pp, with the Brozek column confirming the
+        density is the sound one. Found by arithmetic against the 19-column superset.
+      - ⚠️ **The file is not under this repository's GPL-3.0.** It carries a *non-commercial*
+        permission grant from A. Garth Fisher; GPL-3.0 would grant a commercial use he did not.
+        The grant travels with the file in `data/bodyfat.names`.
+
+      **The author's answer is true about a real result, and that result is Chapter 4.** There are
+      three genuinely end-to-end PhiUSIIL FIS numbers in the repository — `experiments/fis-to-neural-net/outputs/phiusiil.md`
+      (160,340 train / 47,159 test, test error **0.0060**, log loss 0.0308), Table 4.1's
+      `acc = 0.997 ± 0.001` at ten seeds, and Ch 6's Table 6.2 mixture-of-experts at
+      $1.000 \pm 0.001$. All three fit on train and score on held-out data, so "end to end" is
+      the right description of them. All three take their antecedents from
+      `gauss_math.create_gaussian_membership_dict` — **the Chapter 4 MoG construction**. They are
+      the *baseline arm* C3 asks the Ch 5 result to be compared against, not the Ch 5 result.
+      The wording invites the conflation: `tribble-fis/tribble-tree/demo_phishing.py`'s docstring
+      opens *"End-to-end demo: fuzzy tree vs. the flat TRIBBLE classifier on phishing URLs."*
+
+      **Four checks, each run directly rather than inferred**, and they agree:
+      - The Chapter 5 codebase computes **no supervised metric at all**. Every one of the eleven
+        `from sklearn.metrics import` lines in `gated-minimax-selection/` imports
+        `adjusted_rand_score` and nothing else; `accuracy_score|f1_score|r2_score|roc_auc|
+        mean_squared_error|train_test_split` returns zero matches across the package.
+      - **It never did.** `git log --all --pickaxe-regex -S"accuracy_score|…|tribblefis" --
+        gated-minimax-selection/` returns nothing across all **1,424** commits on every ref. This
+        was never built and later removed.
+      - `gated-minimax-selection/` **has never touched the phishing data**, so no PhiUSIIL number
+        in this repository can be a Chapter 5 number.
+      - The document says so in three places already: §5.4 — *"I have not built a FIS from these
+        membership functions and measured how it predicts"*; Ch 7's own tracker row — *"not
+        started"*; Ch 8 — *"the membership functions of Chapter 5 have not yet been consumed by
+        the models of Chapter 6, so the pipeline is still an argument rather than a result."*
+
+      **The break is at one arrow, and both ends already exist.** `table_5_4_ch5_g1_scaling.py:92`
+      already materialises the membership matrix
+      `U = np.vstack([MS.block_membership(b, Dstar) for b in blocks])` — and then uses it only for
+      its own partition-of-unity residual and throws it away. Every other Ch 5 path calls
+      `MS.assign` (a hard `argmin`) and scores that with ARI. **Closing C3 means keeping `U`,
+      solving TSK consequents on a train split, and scoring held-out.**
+      Cheapest venue is **bodyfat**: both arms already run on the same 252 rows
+      (`FuzzySystemsExperiments/bodyfat_ivat.py` for the iVAT side, `bodyfat.py` for
+      `TribbleRegressor` at $R^2 = 0.647$), and it has coordinates, so it satisfies §5.4's own
+      requirement of *"data where both can run"*. **ECG5000** is the better second venue —
+      `table_3_7_g2_downstream.py` already builds the DTW `Dstar` and the blocks and stops at
+      `adjusted_rand_score`, so it closes C3 on genuinely non-coordinate data.
+
+      ⚠️ **Expect an unflattering answer, and budget for it rather than being surprised.**
+      `gated-minimax-selection/notes/phase6_soft_validation.py` already probed the graded signal
+      and returned a negative: the normalized minimax membership is a constant step per cluster
+      with no boundary resolution, scoring *worse* than crisp 0/1 labels against the analytic
+      posterior (Brier 0.136/0.200/0.208/0.122 fuzzy against 0.096/0.042/0.016/0.000 hard —
+      `notes/MF_PROGRESS_LOG.md:259`). A negative end-to-end result still discharges C3. It is
+      not a reason to defer it, and it is a much better thing to discover before a committee does.
 - [x] ✅ **C4 — Quantify the correction-rule pass** (Ch 4 §4.3.1, Table 4.9, Fig 4.3;
       2026-08-05). Measured on Glass, ten paired seeds — not RT-IOT2022. **RT-IOT2022 is now in
       the repository (2026-08-12), and two of its three related-but-distinct scale claims are now
@@ -705,22 +1032,22 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       | One-class SVM | +0.408 | +0.271 | **+0.410** |
       | Isolation Forest | **+0.537** | +0.579 | **+0.535** |
 
-      ⚠️ **The 2026-08-22 column did not survive, and it was the favourable one.** It was read as
-      "the margin narrows sharply to 0.064 and the complement rule now *beats* the one-class SVM."
-      Neither holds. Re-run at ten seeds on 2026-08-27, after `load_rt_iot2022` stopped passing
-      the CSV's unnamed index column as a feature (it encodes the class — the per-class capture
-      counter restarts at zero), the margin to Isolation Forest is **0.169**, *wider* than the
-      archive's 0.143, and the complement rule trails the one-class SVM again, as it did in the
-      five-seed archive. **This column is now Table 4.7b, re-quoted 2026-08-27.**
+      The middle column is superseded, and the correction ran against the more interesting
+      reading — it had been taken to mean the margin narrowed sharply to 0.064 and the
+      complement rule had overtaken the one-class SVM. Two things changed before the re-run:
+      `load_rt_iot2022` stopped passing the CSV's unnamed index column as a feature, which
+      encodes the class because the per-class capture counter restarts at zero; and the pin
+      restored k-means++ in `_kmeans_labels_1d` (#191 — see **D8** and note 26). At ten seeds on
+      2026-08-27 the margin to Isolation Forest is **0.169**, *wider* than the archive's 0.143,
+      and the complement rule sits behind the one-class SVM, where the five-seed archive had
+      also put it. **This column is now Table 4.7b.**
 
-      **Attribution is honest but incomplete.** Two things differ between the 2026-08-22 column
-      and this one: the leaky column was removed, *and* the pin restored k-means++ in
-      `_kmeans_labels_1d` (#191 — see **D8** and note 26). A matched single-seed control isolates
-      the leaky column at only **0.019 $J$**, so most of the −0.149 move is most plausibly the
-      init restoration — but that is an inference from one seed against a ±0.27 spread, **not a
-      measurement**. Separating them would need a matched ten-seed run at the old pin, which has
-      not been done and is not planned; what matters for the document is that the current column
-      is measured on correct data at a settled pin.
+      **Which of the two moved it is not settled.** A matched single-seed control puts the leaky
+      column at only **0.019 $J$**, so most of the −0.149 is most plausibly the init
+      restoration — but that is one seed read against a ±0.27 spread, an inference rather than a
+      measurement. Separating them cleanly needs a matched ten-seed run at the old pin, which
+      has not been done and is not planned. The question the document actually depends on is
+      settled either way: this column is measured on correct data at a coherent pin.
 
       The spreads remain ±0.15–±0.27, so **no separation in the table clears its own error bar** —
       the same point §4.4 already makes about Table 4.7 — and that caveat is unchanged by the
@@ -911,7 +1238,11 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       established metric or a small expert study. Fills Table 6.3's pending row. Until then Ch 6
       must keep saying the payoff is *described*, not quantified.
 
-- [ ] ⬜ **C16 — The complement rule is order-dependent on its feature list, and §4.3.5 says it
+  ↳ _Record of the filing, superseded by the resolved **C16** above (2026-08-23). Kept because
+      its leading explanation was refuted rather than confirmed, and a wrong hypothesis that was
+      correctly labelled as one is worth keeping. This is not open work; it was a second
+      checkbox carrying the same ID._ **C16-orig.**
+      **The complement rule is order-dependent on its feature list, and §4.3.5 says it
       cannot be.** Found 2026-08-22 while profiling why `table_4_4_openset` takes 3h38m; full
       account in [`reproduce/outputs/OPENSET_COST_2026-08-22.md`](../../reproduce/outputs/OPENSET_COST_2026-08-22.md),
       reproduced by `reproduce/experiments/profile_openset_cost.py`.
@@ -930,13 +1261,13 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       fires moves by 2.7×. The fitted model is **identical** in both orders (11 rules, 902
       antecedent terms), so this is *evaluation* order, not what was fitted.
 
-      §4.3.5 derives the rule as $\mu_{	ext{anom}} = 1 - S(c_1, \ldots, c_K)$. A t-conorm is
+      §4.3.5 derives the rule as $\mu_{\text{anom}} = 1 - S(c_1, \ldots, c_K)$. A t-conorm is
       commutative and associative, so that is order-independent **by construction**. The
       implementation is not.
 
       **Leading explanation, not yet confirmed:** floating-point accumulation order through an
-      82-term chain, amplified by the knife-edge §4.3.5 itself derives — at $	heta = 0.99$ the
-      clip makes $\mu_{	ext{anom}} > 0$ only when *every* class firing is below 0.01, so the
+      82-term chain, amplified by the knife-edge §4.3.5 itself derives — at $\theta = 0.99$ the
+      clip makes $\mu_{\text{anom}} > 0$ only when *every* class firing is below 0.01, so the
       decision sits where the last bits decide. That predicts the sensitivity is worst at the
       shipped operating point and milder across Table 4.6's swept band. **A 2.7× swing is larger
       than I would expect from float noise alone, so this must not be written up as settled.**
@@ -948,11 +1279,16 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       instability**, which §4.4 already reports as an ordering that "has changed three times
       across runs" with spreads "roughly five times the largest gap in the table".
 
-      **Owed:** instrument the t-conorm chain to confirm or refute the mechanism; then either
-      state the order dependence in §4.3.5 or remove it — accumulating in a fixed canonical order
-      would make the implementation match the algebra and costs nothing.
+      **Owed at the time:** instrument the t-conorm chain to confirm or refute the mechanism;
+      then either state the order dependence in §4.3.5 or remove it — accumulating in a fixed
+      canonical order would make the implementation match the algebra and costs nothing.
+      **Done, and it came back the other way:** the t-conorm reduction is order-invariant
+      (agreement 1.0000 across four reduction orders), so §4.3.5's algebra needs no caveat. The
+      divergence is one stage earlier, in the model build. See the resolved **C16**.
 
-- [ ] ⬜ **C17 — Hoist the θ-independent work out of the θ-sweep (≈ 40 min of 3h38m).** θ enters
+  ↳ _Record of the filing, superseded by the resolved **C17** above (2026-08-23), which found
+      the saving was larger than estimated here and in a different place. Not open work._
+      **C17-orig.** **Hoist the θ-independent work out of the θ-sweep (≈ 40 min of 3h38m).** θ enters
       only at `to_simple_model(params)`, but the sweep re-runs the whole fold per θ — including
       `calculate_gaussian_correlation` (46% of a fold) and `create_gaussian_membership_dict` (8%),
       neither of which takes θ. Hoisting them is result-identical by construction (the same
@@ -1008,7 +1344,26 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 - [x] ✅ **D5 — Install a LaTeX engine.** ✅ DONE (2026-08-08). `texlive-xetex texlive-latex texlive-collection-fontsrecommended` installed; `build_pdf.py` auto-detects and renders.
 - [x] ✅ **D6 — PDF build.** ✅ DONE (2026-08-08). Auto-rebuilds on every `python build_pdf.py` run; appends CHECKLIST at the end.
 
-- [x] ✅ **D7 — Consolidate the seven state-then-walk-it-back passages (2026-08-27).** 
+- [x] ✅ **D7 — Done by the prose tightening pass, `50456a1` (#134); ticked 2026-08-27 after
+      checking rather than assuming.** All seven passages were consolidated and every marker
+      removed, so this item's own instruction now returns nothing:
+      `grep -rn "CONSOLIDATE" research/proposal-defense/prose/` exits 1. (The string still
+      appears in `build/proposal-combined.md`, which is not a stale build — it is line 3027,
+      inside the copy of this checklist that `build_pdf.py` appends, quoting the command above.)
+      Spot-checked against the seven the item names: the −0.434 zeroth-order caveat, the
+      ±0.210 spread and the §5.4 `NameError` note are gone from `prose/` entirely; the rest were
+      compressed in place rather than deleted, which is what the item asked for.
+      _Original entry, kept for the reasoning behind which seven were chosen:_
+
+      Marked in place, not
+      rewritten, because which to compress is an authorial call. Find them with:
+
+      ```bash
+      grep -rn "CONSOLIDATE" research/proposal-defense/prose/
+      ```
+
+      **Per-passage audit from the parallel pass on main, kept because it
+      enumerates what this entry only spot-checked:**
       **Audit complete: 6 of 7 already consolidated into flowing text; 1 remains archival.**
       All seven passages located and reviewed:
       (1) §3.3.3 device win (30-56× vs 1.2-3.7×) — integrated into algorithm explanation
@@ -1036,15 +1391,56 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       comparison. Both earn their history.
 
 
-- [ ] ⬜ **D8 — The document does not reproduce against the current pins, and B14 is only the
-      largest cause. Account for the rest, table by table.** `check_prose.py` over the whole
-      proposal, same prose, three archives:
+- [ ] 🟨 **D8 — The accounting is done; what is left is a re-quote, which is ordinary work.**
+      `check_prose.py` over the whole proposal, same prose, four archives:
 
       | archive | ok | drifted | untraceable |
       |---|---:|---:|---:|
       | `goal-8h-2026-08-11-fullsuite` (old pin) | **156** | 10 | 44 |
       | `full-2026-08-22` (current pin, 16/16 green at ten seeds) | **59** | 23 | 128 |
       | `wasserstein-fixed-2026-08-22` (current pin, B14 corrected in-process) | **70** | 23 | 117 |
+      | **`pins-synced-2026-08-27`** (B14 landed, pins coherent, 9/9 green) | **61** | 109 | **44** |
+
+      ✅ **The column that mattered is fixed. `untraceable` is back to 44** — identical to the
+      run of record — where the two 2026-08-22 archives sat at 128 and 117. That number counts
+      prose values that appear in *no CSV of the archive*, so it was never measuring drift at
+      all; it was measuring **missing tables**. Those archives were incomplete, and reading
+      their `ok` counts as "the document stopped reproducing" was reading a coverage failure as
+      a numerical one. With a complete archive, every value the harness can produce, it produced.
+
+      **`drifted` at 109 is the honest remainder, and it is a re-quote rather than a defect.**
+      The prose is still quoted from the old pin, and the pin has since moved across four real
+      changes — B14's `wasserstein_distance` fix (#171), the k-means++ restoration (#191),
+      `pin_extremes` (#102), and a data leak removed in this repository (`c0ec380`). Numbers are
+      *supposed* to move across those. What the count does not distinguish is a value that moved
+      because the code got better from one that moved because it got worse, which is why
+      **Table 4.1 is the one to read**, not the total:
+
+      | row | run of record | 2026-08-27 | |
+      |---|---:|---:|---|
+      | PhiUSIIL, accuracy | 0.997 ± 0.001 | **0.997 ± 0.001** | exact |
+      | RT-IOT2022, accuracy | 0.927 ± 0.002 | **0.927 ± 0.002** | exact |
+      | Concrete, full 2nd order | 0.852 ± 0.030 | **0.852 ± 0.030** | exact |
+      | Concrete, 1st order | 0.795 ± 0.025 | 0.799 ± 0.027 | within noise |
+      | Bike Sharing | 0.939 ± 0.004 | 0.620 ± 0.014 | **moved — see below** |
+
+      **The two accuracy rows returning *exactly* is the end of B14.** Those are the cells that
+      read 0.729 and 0.500 under the defect; they are back on the archive to three decimals in a
+      full ten-seed run, not a corrected-in-process diagnostic.
+
+      **Bike Sharing moved because the data was wrong, and the reference column proves it.**
+      The Random Forest reference on that row fell from a perfect **1.000 ± 0.000** to
+      0.944 ± 0.004 in the same run — and Random Forest is scikit-learn, so a reference model
+      moving means the *features* changed, not the library. `c0ec380` dropped `casual` and
+      `registered`, which sum to `cnt` exactly on all 17,379 rows: the model was being handed
+      the target's two addends. An RF at 1.000 was the tell, and it had been sitting in the run
+      of record. **So this row is a correction, not a regression** — the same shape as C4's
+      RT-IOT2022 index column, now twice in two months.
+      ⚠️ **This supersedes the attribution below.** The Bike Sharing move was traced here to
+      #102's `pin_extremes` default, measured on *frozen features* — correct as far as it went,
+      and much smaller than the leak it could not see, because freezing the features is exactly
+      what hides a feature defect. A probe designed to isolate the model from the data cannot
+      find a fault in the data; worth remembering next time that design looks like rigour.
 
       Four causes are identified and three of them are benign:
       1. **B14** — decisive where its mechanism applies and irrelevant elsewhere. `table_4_1`
@@ -1145,8 +1541,38 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 ## E. Decisions and framing
 **[Tier 0–4: mix of settled defaults (E1, E3), verification paths (E2, E2b, E2c), and low-stakes editorial (E10). E1.6–E1.7 Tier 1 (normalization + FCM). E9 low-priority investigation.]**
 
-- [ ] ⬜ **E1 — t-norm: present min/max as the default. ⚠️ Its evidence base was broken and is
-      now repaired; the numbers below are superseded.** `table_norm_conorm_matrix.py` imported
+- [ ] 🟨 **E1 — the study is now measurable and says something worth a chapter; the framing
+      decision is what is still open.** Re-run 2026-08-27 at a pin where the feature screen
+      works (**B14** closed), ten seeds, no `N/A` cells — the first time this table has been
+      complete. `reproduce/outputs/pins-synced-2026-08-27/table_norm_conorm_matrix.md`.
+
+      | model | min/max | probability | **Łukasiewicz** | hamacher | einstein |
+      |---|---:|---:|---:|---:|---:|
+      | flat MoG-TSK, $R^2$ | 0.705 ± 0.053 | 0.687 ± 0.051 | **−3.774 ± 0.569** | 0.711 ± 0.053 | 0.678 ± 0.048 |
+      | HME (experts only), $R^2$ | 0.788 ± 0.027 | 0.774 ± 0.020 | **−3.592 ± 0.500** | 0.796 ± 0.025 | 0.761 ± 0.024 |
+      | fuzzy tree (t-norm only), $R^2$ | 0.708 ± 0.031 | 0.712 ± 0.032 | 0.713 ± 0.035 | 0.712 ± 0.031 | 0.713 ± 0.033 |
+
+      **The Łukasiewicz collapse is confirmed at full magnitude**, and the values land back on
+      the *original* 2026-08-02 figures (−3.761 flat, −3.626 HME) rather than on the −0.507 /
+      −1.084 this item recorded from the 2026-08-22 diagnostic run. That diagnostic run was
+      taken under **B14**, which this item flagged at the time — *"do not re-quote the absolute
+      values yet"* — and the flag was right. The correction this item made to itself, that
+      **min/max is the worst of the four non-Łukasiewicz families**, was a B14 artifact and
+      does not survive: min/max is second of four here, and the four sit within **0.033** of
+      each other against ±0.05 seed spreads, so none of that ordering clears its error bar.
+
+      **The new finding, and it is the one worth harvesting: the collapse is a *conorm* effect.**
+      The fuzzy tree row uses the **t-norm only** — path weights are a pure AND with no OR to
+      apply a conorm to — and it does not collapse. All five families land within **0.005** of
+      each other there, Łukasiewicz included. So the two models that use both operators lose
+      four points of $R^2$ under Łukasiewicz while the model that uses one operator is
+      indifferent to the choice. That localizes a dramatic effect to a single operator, on
+      evidence already in hand, and it is a much better reason to give this study a home in a
+      chapter than the family ordering ever was.
+
+      **What is still open is unchanged and is a decision, not a measurement:** whether to
+      present min/max as the default, and whether to harvest this study into a chapter — it
+      still appears in none. _Original entry, kept as the record:_ `table_norm_conorm_matrix.py` imported
       `MixtureOfGaussiansFuzzyRegressor` and `MixtureOfGaussiansFuzzyClassifier`, renamed upstream
       to `TribbleRegressor`/`TribbleClassifier` — the **same rename B12(a) swept for, in a file
       that sweep missed**. Both flat-MoG rows of this table have therefore been silently `N/A`
@@ -1205,7 +1631,48 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       **The negative result reproduced**: pairwise distances lose at float64, 0.30× at d=10.
       The datacenter-FP64 prediction remains untested and untestable here; no cell estimates it.
       fp16 and the §9.4 standalone-paper item are still open and unaffected (see **B10**).
-- [ ] ⬜ **E2b — Re-quote Table 3.4 and §3.3.3 from the generator; one row overstates the GPU
+- [ ] 🟨 **E2b — the numbers to re-quote from are now measured (2026-08-27); the re-quote and
+      §3.3.3's wording are what remain.** Full generator run on this host, ten seeds, no `N/A`:
+      `reproduce/outputs/cluster-2026-08-27/table_3_4_gpu_speedups.md` (17 min, 31 rows).
+
+      **The FCM row, both formulations, which is the whole of this item:**
+
+      | N (k=10, d=20) | library CPU arm | **matched CPU arm** | library ÷ matched |
+      |---|---:|---:|---:|
+      | 50,000 | 5.1× | **2.6×** | 1.96 |
+      | 200,000 | 5.9× | **3.3×** | 1.79 |
+      | 500,000 | 9.4× | **5.1×** | 1.84 |
+
+      Against §3.3.3's *"thirty to fifty times over the 32-core CPU"*, the honest figure is
+      **2.6–5.1×** when the CPU runs the same algorithm the GPU does, and **5.1–9.4×** against
+      the library's own arm. Neither is thirty.
+
+      ✅ **E2c's prediction is confirmed, and it is the good news here.** That item warned the
+      device row would move a second time once the gram-identity fix landed, because the ~11×
+      the GPU was borrowing from a slower CPU formulation would evaporate. It has:
+      library ÷ matched is now **1.8–2.0×**, not ~11×. So the CPU-side win E2c measured is real
+      and is now the shipped behaviour — and it still appears in no chapter.
+
+      **Two of this item's three smaller mismatches reproduce; the exactness claim improves.**
+      The device MST is **4.8–6.2×** and again does *not* grow with N — it peaks at N=8,000 and
+      falls to 4.8× at 32,000, as predicted from a dense $O(n^2)$ Prim CPU arm against
+      $O(n^2 \log n)$ Borůvka rounds. The VAT front end reads **5.6× → 10.2×** across
+      N=4,000–32,000 at *unmatched* work, and is labelled as such in the table rather than
+      quoted bare. Ordering is **bit-identical** on every MST and front-end row.
+      **The matched FCM arm is also far more faithful numerically** — max $|\Delta$centre$|$
+      of $10^{-13}$ against $10^{-6}$ for the library arm, which is what running the same
+      algorithm on both sides should look like and is a second reason to quote it.
+
+      ✅ **The negative result reproduces cleanly and is now sharper.** Pairwise distances lose
+      on the GPU in **15 of 16** cells: the CPU is 1.8–3.6× faster at float64 and 1.1–3.2× at
+      float32. The device wins exactly one cell — $d = 784$, float32, native accumulation,
+      1.4× — at max $|\Delta| = 1.4\times10^{-4}$, so it buys 40% by giving up four digits.
+      The earlier 0.30× at $d = 10$ is the same measurement inverted (1/3.6 = 0.28).
+
+      **Still owed:** the prose edit. §3.3.3 has to quote the matched arm or say plainly which
+      comparison it is making, and Table 3.4's caption has to carry the matched/unmatched
+      distinction rather than leave it in the CSV. Both are writing, not measurement.
+      _Original entry:_ **Re-quote Table 3.4 and §3.3.3 from the generator; one row overstates the GPU
       by roughly an order of magnitude.** `PROVENANCE_MAP` now marks Table 3.4 **drifted**.
       **The FCM row is the problem.** The chapter's "thirty to fifty times over the 32-core CPU"
       compares `fcm.fuzzy_c_means` — NumPy broadcasting with (n,k,d) and (n,k,k) temporaries —
@@ -1337,7 +1804,58 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       from `bibliography.md` — this also clears a latent dangling reference, since Ch 9 §9.3 never
       actually contained a note subsection for the many cross-references that pointed at it.
       `deshpande2024scalable` first-author metadata fixed in the `.bib` as part of this read.
-- [ ] ⬜ **E9 — `UnitScalar` vs `StandardScalar`: characterize *why* bounded normalization wins.**
+- [x] ✅ **E9 — Answered 2026-08-27, and the answer is sharper than the question.** All three
+      experiments this item proposed were run, on shared splits, ten seeds, plus a fourth axis
+      the first pass forced: `reproduce/experiments/diagnose_bounded_normalization.py`,
+      output `reproduce/outputs/diagnose_bounded_normalization.md`.
+
+      **The first pass found nothing, and that was the finding.** At the current pin every
+      normalized arm — min-max `[0,1]`, min-max `[-1,1]`, z-score, z-score clipped at 2σ and
+      3σ, and both half-and-half arms — lands on **0.797–0.799**, against raw features at
+      0.687. The transform does not matter. That is not what this item recorded, so something
+      had changed underneath it, and the obvious candidate was the mechanism the item's own
+      working account names: `pin_extremes`, which fixes the first and last output-bucket means
+      to the observed min and max. `tribble-fis` #102 (`69e0bab`) flipped its default
+      **True → False** — the change **D8** already traced for a different reason.
+
+      **Sweeping that as a second axis makes the mechanism switchable, and it settles the item:**
+
+      | transform | bounded | centred | `pin=False` | `pin=True` | Δ |
+      |---|:--:|:--:|---:|---:|---:|
+      | raw | – | – | 0.687 ± 0.049 | 0.687 ± 0.049 | 0.000 |
+      | log + min-max `[0,1]` *(shipped)* | ✓ | ✗ | 0.799 ± 0.026 | 0.795 ± 0.025 | −0.004 |
+      | log + min-max `[-1,1]` **(a)** | ✓ | ✓ | 0.798 ± 0.025 | 0.751 ± 0.027 | **−0.047** |
+      | log + z-score | ✗ | ✓ | 0.798 ± 0.025 | 0.714 ± 0.042 | **−0.084** |
+      | z-score, clip ±3 **(b)** | ✓ | ✓ | 0.797 ± 0.022 | 0.712 ± 0.039 | **−0.085** |
+      | z-score, clip ±2 **(b)** | ✓ | ✓ | 0.799 ± 0.015 | 0.666 ± 0.060 | **−0.133** |
+      | z-score on logged cols only **(c)** | – | ✓ | 0.798 ± 0.025 | 0.793 ± 0.025 | −0.005 |
+      | z-score on unlogged cols only **(c)** | – | ✓ | 0.799 ± 0.026 | 0.753 ± 0.033 | **−0.046** |
+
+      **The mechanism is centring, not unboundedness — which is the opposite of the phrasing
+      this item and §4.3 were reaching for.** The one arm that survives the pin is the one that
+      is *not centred*. Every centred arm loses, and **(b)** decides it: clipping the z-score
+      *increases* boundedness and makes the loss **worse** (−0.133 at ±2σ against −0.084
+      unclipped), so bounding gives nothing back and the tails own none of the effect. **(a)**
+      then reads exactly as this item's own decision rule said it would — *"if it degrades, the
+      pin on 0.0/1.0 bucket means is the real culprit"* — and it degrades.
+      **(c) inverts the natural guess:** z-scoring only `Slag` and `Age`, the two log-detected
+      columns, costs −0.005; z-scoring only the other six costs −0.046. The damage does not
+      follow the log step at all.
+      **The underfitting prediction holds**, which is the falsification condition the script
+      registers before running: train MSE/var rises with the loss (0.176 → 0.247 z-score,
+      → 0.272 clipped ±2), so the model fits *train* worse too rather than overfitting.
+
+      **What this changes in the prose.** The sharper claim this item hoped for — *"bounded
+      normalization helps, centred normalization actively hurts, and the bounded-input
+      assumption is load-bearing"* — is **half right and no longer current**. Centred
+      normalization hurts, but the assumption that is load-bearing is *non-negative and
+      uncentred*, not *bounded*; and since #102 it is not load-bearing at all, because nothing
+      pins the extremes any more. At the shipped default §4.3 can say only that normalization
+      helps (0.687 → 0.799) and that the choice among transforms is free — which is a weaker
+      headline and a much easier one to defend. **G5's story improves in the same move**: G5
+      recommended against pinning the extremes, upstream adopted that recommendation, and this
+      is the measurement showing what the recommendation was worth.
+      _Original entry, kept because its reasoning was right and its conclusion was overtaken:_
       *(Low priority — author 2026-08-03: "I don't need it but it's worth addressing." Nothing in
       the document depends on it; the choice itself is already settled. Data in hand:
       `reproduce/outputs/norm-three-arm-a385a1a/`, write-up in
@@ -1398,71 +1916,70 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       `arnett2018proposal`, was a proposal *for*: the completed UC dissertation
       *"Iteratively Increasing Complexity During Optimization for Formally Verifiable Fuzzy
       Systems"* (2019). Both are now cited in §2.1, where the `.bib` header had claimed
-      `arnett2018proposal` was cited all along and it was not. 
-      
+      `arnett2018proposal` was cited all along and it was not.
       **(c) ✅ §5.3 methodology sections reorganized (2026-08-27)**: Chapter 5's §5.3 now leads with
       multi-scale approach (band discovery + persistence ramp memberships), supporting with flat
       set-cover as an alternative. Reordered §5.3.2–5.3.4 with all cross-references updated.
       
-      **(d) ✅ Predict-loop deduplication in tribble-fis (2026-08-27)**: Extracted common model
-      evaluation patterns from four demo scripts into shared `demo_utils.py` module (regressor_report,
-      classifier_report, evaluate_model wrapper). Opened PR #194. ~20 lines of duplication eliminated
-      while maintaining output format and user visibility.
-- [ ] ⬜ **E11 — Verify the two EASA entries at proof stage, and re-check the V&V framing's
-      boundary language (2026-08-27: proof-stage audit, owed at final stage).** Two halves.
-      
-      **Bibliography verification:**
-      - `easa2023airoadmap` [?]: Published 10 May 2023 per EASA newsroom, corroborated by two 
-        independent index listings. Verify exact title page and document number when access available.
-      - `easa2024mlconcept` [?]: Issue 02 title confirmed; exact issue date **not** established, 
-        entry carries year only (no month). Verify when source is accessible.
-      - `cohen2022whyfuzzy`, `arnett2021formal` [V] on SpringerLink indexed records; full pages 
-        unreachable. Verify DOI and page span resolve at proof stage.
-      - `arnett2019iteratively` [?]: Title and year from index + OhioLINK accession; ETD record 
-        blocked. **Verify together with `arnett2018proposal` [?]**: if arnett2019 title confirms, 
-        it resolves what the oldest entry was a proposal for.
-      
-      Both EASA entries cited only for what documents *ask for*, never for measurements, so 
-      corrections cannot move results — proof-stage work, not blocking.
-
-      **V&V framing consistency check (6 passages):**
-      The V&V/certifiable-AI material (2026-08-24) spans §1.1, §2.6, §4.3.5, §6.3.4, §7.4, Ch 8. 
-      All six state the same boundary: **no certification artifact, no DO-178C or DO-333 objective 
-      claimed, no assurance case.** Internal consistency verified by construction. Any later edit 
-      needs all six re-read together. §7.4 is load-bearing: records the framing as an exposure 
-      with nothing in the runway behind it.
-
-- [ ] 🔒 **E12 — Two Chapter 5 novelty checks the prior-art review could not close (2026-08-27).**
-      `PRIOR_ART_CH5.md` retired three of Chapter 5's four claimed contributions and the
-      HDBSCAN\* baselines (Appendix A.8) took most of the third, leaving one contribution:
-      membership functions whose support width *and* slope both derive from each cluster's own
-      persistence, from a dissimilarity matrix alone, as an FIS antecedent. Two checks against
-      that surviving claim are **owed and unrun**, both recorded in §5.5 and in the relevant
-      `references.bib` note fields:
-      - **The IEEE Xplore *full-text* search** for "persistent homology" + "membership
-        function". This is the higher-value one. Harada & Nishino (`harada2017multidimensional`)
-        surfaced from exactly that corner — a two-page IFSA/FUZZ-IEEE paper with one OpenAlex
-        citation and thin abstract indexing — so one or two more may exist, and a committee
-        member could find one. Neither review pass could reach Xplore full text; the search is
-        cheap for a human with institutional access and is the single most efficient way to
-        either harden or kill the remaining claim. Negative evidence already on record (weak):
-        arXiv API `all:"persistent homology" AND all:"fuzzy membership"` → 0 with a working
-        control query; OpenAlex `"membership function"` + `"persistent homology"` → 0;
-        `"fuzzy inference system"` + `"topological data analysis"` → 0.
-      - **Khalilia et al. 2014 full text** (`khalilia2014irfcm`, *Pattern Recognition*
-        47(12):3920–3930). Paywalled and unread. It is the paper that retires Chapter 5's
-        transform claim, and the chapter cites it on the strength of its abstract plus the
-        authors' own published iRFCM code. That is enough to say "this pre-empts us" but **not**
-        enough to characterize its experiments, and §5.2 makes claims about what it compared
-        (five Euclideanizations, subdominant ultrametric best) that rest on second-hand
-        evidence. Get the PDF before the defense.
-
-      Neither blocks the chapter as written — both would change how confidently the novelty
-      paragraph can be stated. Also open from the same review, in a submodule rather than here:
-      **clustering#89** (`nerfcm.py` documents the beta-spread admissibility condition
-      backwards; `IVATMeans._fit_relational` feeds unsquared distances where the relational
-      fuzzy *c*-means dual needs squared ones — a silent flattening of the geometry). Filed,
-      unfixed.
+      **(d) landed upstream, unnoticed here until 2026-08-27** — `tribble-fis` #194 (`3daf0f4`)
+      extracts `regressor_report` / `classifier_report` / `evaluate_model` into
+      `tribble-tree/demo_utils.py` and moves `demo_concrete.py`, `demo_phishing.py`,
+      `demo_deconstruct_synthetic.py` and `cmapss_deconstruct_eval.py` onto it, with no
+      behavioural change. Verified at the pin by reading the module and its four callers, not
+      from the commit message. Nothing in `reproduce/` touches those scripts, so no table moves.
+      This is the fourth blocker in this file retired by an upstream commit nobody read —
+      the pattern **B13**'s standing procedure exists to catch.
+      **All four sub-items are now closed** — (a) and (b) on 2026-08-24, (c) and (d) on
+      2026-08-27, the last two in parallel passes that did not know about each other. This item
+      can be retired at the next tidy.
+- [ ] 🟨 **E11 — The citation half is done (2026-08-27); the framing half is still open.**
+      Every site this item was blocked on turned out to be reachable, so five entries were
+      re-checked against the source rather than against a listing about the source, and the
+      bibliography's unverified count went **4 `[?]` → 1**.
+      - `easa2023airoadmap` → `[V]`. The printed title **leads with "EASA"**, which this file
+        had dropped. 10 May 2023 confirmed. No document number is shown on the library page.
+      - `easa2024mlconcept` → `[V]`, and this is the one the item flagged as genuinely
+        unestablished. Exact date **6 March 2024**, where the entry had a bare year. EASA's own
+        suggested citation also differs from what was here, and writes **"Issue 2"** in the
+        citation against "Issue 02" in the announcement headline; the entry follows the citation
+        and records the discrepancy.
+      - `arnett2019iteratively` → `[V]`, read from the OhioLINK ETD record itself rather than
+        the accession number that surfaced in search. Title, author, degree, department, year
+        and committee all confirm — chaired by Kelly Cohen, which is a pleasing loop back to
+        `cohen2022whyfuzzy`. **This is the outcome the item predicted:** it resolves what
+        `arnett2018proposal`, the file's oldest `[?]`, was a proposal *for*, so that entry is no
+        longer a mystery — only its own title and date are unconfirmed.
+      - `cohen2022whyfuzzy` and `arnett2021formal` were `[V]` on SpringerLink *index* records;
+        the chapter pages are still unreachable (both now sit behind an `idp.springer.com` auth
+        redirect), so they were re-checked against **Crossref**, the publisher's own deposit.
+        `cohen2022whyfuzzy` is exact. `arnett2021formal` is exact **apart from one given name**:
+        this file had "Boronat, Hector", Crossref has **"Hugo"**. Changed, on the same standard
+        **E7** used for "Sherin" → "Saima" — a hand-entered name with no recorded source does not
+        outrank the publisher's deposit — but it rests on a single source, since search shows
+        only "Boronat, H.", the NAFIPS 2020 program page returns 401, and the chapter page is
+        behind auth. Left flagged in the entry rather than treated as settled.
+      **Still open: the framing half**, which is the part that was never about egress. Original
+      entry: *The citations:* `easa2023airoadmap` and
+      `easa2024mlconcept` are `[?]` because `easa.europa.eu` is unreachable from the drafting
+      environment, so both rest on index and news listings rather than a title page. The
+      Roadmap 2.0 date (10 May 2023) is corroborated twice; the Concept Paper Issue 02's exact
+      issue date is **not** established, and its entry carries a year with no month for that
+      reason. Both are cited only for what a standard or roadmap *asks for*, never for a number,
+      so a metadata correction cannot move a result — which is why this is proof-stage work and
+      not blocking. Three more entries from the same pass need the same proof-stage pass, for the
+      same egress reason: `cohen2022whyfuzzy` and `arnett2021formal` are `[V]` on their
+      SpringerLink *indexed records* (title, authors, series, volume, pages, DOI, two independent
+      listings agreeing) with the pages themselves unreachable, and `arnett2019iteratively` is
+      `[?]` — its title and year come from index listings plus an OhioLINK accession number
+      (`ucin156387481300899`) that surfaced in search but whose ETD record was blocked. That last
+      one is the interesting item: if it confirms, this file's lone long-standing `[?]`
+      (`arnett2018proposal`, placeholder title *"Dissertation Proposal"*) is resolvable to a real
+      document rather than merely re-checked, so **verify these two together, not separately**. *The framing:* the V&V and certifiable-AI material added 2026-08-24 spans
+      §1.1, §2.6, §4.3.5, §6.3.4, §7.4 and Ch 8, and every one of those passages states the same
+      boundary — no certification artifact, no DO-178C or DO-333 objective claimed, no assurance
+      case. A committee will test that boundary, so any later edit to one of those six passages
+      needs the other five re-read. §7.4 is the load-bearing one: it is where the framing is
+      recorded as an exposure with nothing in the runway behind it.
 
 
 ## Appendix — G2 datasets, verified 2026-07-31

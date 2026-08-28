@@ -1,0 +1,2 @@
+Dissimilarity,Metric?,Triangle-inequality violations,Agreement with exact,Timing,Note
+"ECG5000 (DTW, N=5000)",no,20.9%,1.000,610s matrix + 0.2s reorder,exactness checked at N<=1024 (10-seed subsamples); full N ran but has no brute-force reference at this size

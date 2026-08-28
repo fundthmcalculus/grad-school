@@ -1,0 +1,13 @@
+score,budget,realized validation false-alarm rate,test detection rate,test false-alarm rate,detection − false alarm,chosen
+surprisal,0.001,0.0010,0.993,0.1223,+0.870,
+surprisal,0.005,0.0050,0.993,0.1332,+0.860,
+surprisal,0.010,0.0100,0.993,0.1502,+0.843,**chosen**
+surprisal,0.020,0.0199,0.993,0.1824,+0.811,
+surprisal,0.050,0.0499,0.993,0.1884,+0.805,
+surprisal,0.100,0.0997,0.993,0.2385,+0.755,
+complement,0.001,0.0000,0.000,0.0000,+0.000,
+complement,0.005,0.0050,0.993,0.1332,+0.860,
+complement,0.010,0.0100,0.993,0.1502,+0.843,**chosen**
+complement,0.020,0.0199,0.993,0.1824,+0.811,
+complement,0.050,0.0499,0.993,0.1884,+0.805,
+complement,0.100,0.0997,0.993,0.2385,+0.755,

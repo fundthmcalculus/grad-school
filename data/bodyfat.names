@@ -1,0 +1,137 @@
+bodyfat.csv -- percent body fat and thirteen body measurements for 252 men
+==========================================================================
+
+Vendored 2026-08-28 for reproduce/experiments/ch5_end_to_end.py (checklist C3).
+20,001 bytes, 253 lines (header + 252 records, no trailing newline), 15 columns.
+sha256 4da0e256cb3ebd9c4e5591c32131d31a5e81eb5e7d353555c19bb4addded9a55
+
+Committed BYTE-FOR-BYTE as received, including the two leading-dot tokens noted
+below and the missing final newline. Do not reformat it: a full-matrix diff
+against the canonical file gives 0 differing cells, and that is what pins both
+the provenance and the identity of the BodyFat column. A tidy-up would cost the
+only evidence that this is the dataset it claims to be.
+
+
+SOURCE
+------
+StatLib Datasets Archive, "bodyfat", Carnegie Mellon University -- the 252x15
+form whose column order is exactly this header.
+    http://lib.stat.cmu.edu/datasets/bodyfat
+StatLib now returns 403 to non-browser clients. The scholarly archive carries
+the same data as a 252x19 superset, of which this file is the 15-column
+projection:
+    https://jse.amstat.org/datasets/fat.dat.txt
+
+CITATION
+--------
+Johnson, R. W. (1996). "Fitting Percentage of Body Fat to Simple Body
+Measurements." Journal of Statistics Education, 4(1).
+doi:10.1080/10691898.1996.11910505
+
+Measurements supplied by Dr. A. Garth Fisher, Human Performance Research Center,
+Brigham Young University, and first reported in:
+    Penrose, K. W., Nelson, A. G., & Fisher, A. G. (1985). Medicine and Science
+    in Sports and Exercise, 17(2), 189 (abstract).
+    doi:10.1249/00005768-198504000-00037
+
+No page numbers for Johnson: JSE volume 4 was electronic-only and Crossref
+returns no page field. Do not invent one. Penrose and Nelson are initials-only
+in the publisher record -- only Fisher's given name is attested. Do not expand
+them. UCI does not host this dataset; do not cite it or Kaggle as the source.
+
+
+TERMS -- READ BEFORE REDISTRIBUTING
+-----------------------------------
+This file is NOT under the repository's GPL-3.0 licence, and must not be
+treated as though it were. GPL-3.0 grants commercial use; the data owner did
+not. There is no CC, ODbL, OSI licence or public-domain dedication anywhere.
+What exists is a personal permission grant, verbatim from
+https://jse.amstat.org/datasets/fat.txt:
+
+    "The data were generously supplied by Dr. A. Garth Fisher, Human
+    Performance Research Center, Brigham Young University, Provo, Utah 84602,
+    who gave permission to freely distribute the data and use them for
+    non-commercial purposes."
+
+Redistribution inside this non-commercial dissertation harness is expressly
+covered. Commercial use is not granted.
+
+Frequently misquoted as the data licence, and is not: the JSE *article* page
+carries "Copyright (c) 1996 by Roger W. Johnson, all rights reserved..." That
+governs Johnson's prose, not these numbers.
+
+
+COLUMNS -- MIXED UNIT SYSTEM, WHICH IS THE USUAL TRAP
+-----------------------------------------------------
+    Density   body density from underwater weighing, gm/cm^3
+    BodyFat   percent, SIRI's estimate (not Brozek) -- see LEAK below
+    Age       years
+    Weight    POUNDS
+    Height    INCHES
+    Neck, Chest, Abdomen, Hip, Thigh, Knee, Ankle, Biceps, Forearm, Wrist
+              circumferences, CENTIMETRES
+
+Body size is imperial, every circumference is metric. Abdomen is StatLib's
+"Abdomen 2", at the umbilicus and level with the iliac crest; Biceps is
+extended; Wrist is distal to the styloid processes.
+
+
+THE LEAK: Density IS the target, in another coordinate
+------------------------------------------------------
+Siri's two-compartment equation (lean density 1.10, fat density 0.90):
+
+    percent body fat = 495 / Density - 450
+
+BodyFat was COMPUTED from Density by that formula. Any model given both is
+being handed its own answer. Measured on this file:
+
+    as shipped                                  R^2 = 0.9773
+    with Johnson's three density fixes applied  R^2 = 0.9990
+    excluding cases 48, 76, 96, 182, 169        R^2 = 1.0000
+
+The relation is deterministic, not merely strong -- the residual is entirely
+errata. `reproduce/experiments/ch5_end_to_end.py` therefore drops Density in
+every arm, and any future use must do the same.
+
+(Brozek's alternative, which this file does NOT use, is 457/D - 414.2.)
+
+
+ERRATA -- ALL PRESENT AND UNCORRECTED HERE
+------------------------------------------
+Johnson's documented list, from the JSE fat.txt SPECIAL NOTES. He writes "among
+others", so it is explicitly non-exhaustive.
+
+    case  42  Height 29.50 in at 205 lb -> should be 69.50. The only row with
+              Height < 40; implied BMI 165.6. Not re-derivable from this file,
+              because the adiposity column that proves it is not in the
+              15-column projection.
+    case  48  Density 1.0665 -> 1.0865   (fix the density, not the percent)
+    case  76  Density 1.0666 -> 1.0566
+    case  96  Density 1.0991 -> 1.0591   worst row, 17.0 pp discrepancy
+    case 182  BodyFat recorded as .0 -- a floor truncation of Siri = -3.61%,
+              not a measurement. Censored, not zero.
+
+Found by arithmetic against the 19-column superset during the 2026-08-28
+provenance pass, and NOT in any published errata list:
+
+    case 169  the Siri column is wrong: 34.3 recorded, D = 1.0180 implies
+              36.25, and the Brozek column confirms the density is right. This
+              corrupts the regression TARGET by ~2 pp.
+    case 200  same pattern, smaller: 23.6 recorded against 23.14 implied.
+    case   6  both percentages sit below what D = 1.0502 implies, so the
+              density is the suspect column -- but no single-digit change fixes
+              it. Flag, do not fix.
+    case 221  Weight 153.25 lb contradicts both dropped columns; 173.25
+              reproduces adiposity and fat-free weight simultaneously.
+    case 163  unresolved -- listed adiposity contradicts Weight/Height, and no
+              quarter-inch height reconciles it. Flag, do not fix.
+
+NOT errata, despite looking wrong: case 216 (Density .9950, below water, 47.5%)
+and case 39 (363.15 lb) are extreme but internally consistent across all four
+derived columns in the superset.
+
+DO NOT "clean" this file by recomputing BodyFat from Density. It would silently
+alter roughly 33 of 252 rows, including every case the literature analyses.
+
+PARSER NOTE: cases 182 and 216 store leading-dot tokens (`.0`, `.9950`). A
+strict numeric parser must accept them. pandas.read_csv does.

@@ -648,6 +648,28 @@ this pass were initially run that way. Use
 | 5.2 Multi-scale recovery | `run_all.py` → `table_5_1_3_ch5_tables.py` | `outputs/table_5_2_multiscale.{md,csv}` | **reproduced** |
 | 5.3 Selection comparison | `run_all.py` → `table_5_1_3_ch5_tables.py` | `outputs/table_5_3_selection.{md,csv}` | **reproduced** |
 | 5.4 Goal G1 scaling decision rule | `table_5_4_ch5_g1_scaling.py` (own computation) | `outputs/table_5_4_ch5_g1_scaling.{md,csv}` + `_raw.csv` | **reproduced** — two-stage vs. flat only; the decision rule's third arm (one-pass) is unimplemented, stated in the table's own note |
+| C3 end-to-end (no table number yet) | `reproduce/experiments/ch5_end_to_end.py` (own computation) | `outputs/ch5_end_to_end{,_ecg5000,_diagnostics}.{md,csv}` + `_raw.csv` | **reproduced** — 2026-08-28, ten seeds, two venues; NEGATIVE on bodyfat, positive on ECG5000; see the note below |
+
+**bodyfat provenance, added 2026-08-28 with the C3 run.** `data/bodyfat.csv` is now
+vendored (20 KB) with `data/bodyfat.names` beside it and registered in
+`dataset_specs.yaml`; the verifier reads it at 252 × 14 and agrees. Three things
+about it are load-bearing for any number the C3 experiment produces.
+**`Density` is the target in another coordinate** — BodyFat was computed from it by
+Siri's equation, $495/D - 450$, which reproduces the column at $R^2 = 0.9773$ as
+shipped and at **$R^2 = 1.0000$** once the five errata rows are dropped. That is
+deterministic rather than merely strong, so every arm drops it.
+**The units are mixed**: Weight in pounds and Height in inches, against ten
+circumferences in centimetres.
+**The errata are uncorrected on purpose**, so the file stays byte-identical to the
+canonical one — case 42's Height is 29.50 in at 205 lb and should be 69.50, cases
+48/76/96 carry wrong densities, and case 182's BodyFat of `.0` is a floor
+truncation of −3.61% rather than a measurement. Case 169 is in **no published
+errata list** and corrupts the regression target by ~2 pp; it was found by
+arithmetic against the 19-column superset on this pass. Full account, citation and
+terms in `data/bodyfat.names`.
+⚠️ The file is **not** under this repository's GPL-3.0. It carries a
+non-commercial permission grant from A. Garth Fisher, and GPL-3.0 would grant a
+commercial use he did not.
 
 Chapter 5 is the best-behaved chapter in the proposal in design: one deterministic
 driver, one seeded JSON of record, every figure regenerated from it. Two gaps
