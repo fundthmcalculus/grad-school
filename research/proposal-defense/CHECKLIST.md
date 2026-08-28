@@ -62,9 +62,11 @@ proxy), **C9** (interpretability described, not measured) and **E2b** (Table 3.4
 overstates the GPU by roughly an order of magnitude). The rest are research scheduled after the
 defense, or editorial.
 
-**C1 came off that list today** — the ANFIS and GA-FIS adapters landed, so the title's *orders of
-magnitude faster* finally has something to be faster *than*. That was the one item on this list
-with a deadline attached to it.
+**C1 changed shape today rather than closing.** The ANFIS and GA-FIS adapters landed, so the
+title's *orders of magnitude faster* finally has something to be faster *than* — but the run is
+still owed, and it is a scheduled job rather than a background one: both baselines build a
+256-rule grid partition on Concrete's eight features, which costs 5–6 minutes per seed on the
+smallest of the five datasets. Build a slot for it; do not shortcut it to three seeds.
 
 Infrastructure is no longer the constraint it was at the start of August: the B-section closed
 seven items this month and has one substantive gap left, **B10**'s fp16/GPU capture.
@@ -824,11 +826,26 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 ## C. Experiments owed
 **[Tier 1: critical before defense (C1, C4). Tier 2: real research (C2–C3, C5–C6, C8–C11–C13). Tier 3: defensive (C5–C6, C8). Tier 1.5: reduced scope (C4 done). Tier 4 (C7 descoped)]**
 
-- [ ] ⬜ **C1 — ANFIS and GA-tuned-FIS baselines** (Ch 4, Table 4.5). **The single most
-      important experiment in the backlog**: the title, Ch 1, Ch 7 and Ch 8 all claim *orders
-      of magnitude faster*, and there is currently no fuzzy baseline to say faster *than what*.
-      Adapters go at `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py`; the table
-      auto-detects them.
+- [ ] 🟨 **C1 — the adapters have landed; what is owed now is a run, and it is not a cheap one.**
+      `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py` arrived on `main` (#191), so
+      the claim that this work is *orders of magnitude faster* finally has something to be faster
+      *than*. The ANFIS adapter is a Jang-style hybrid — least squares for the consequents,
+      Adam on the premises — on numpy and scikit-learn only, so it adds no dependency.
+
+      ⚠️ **A ten-seed run of Table 4.1 is now a scheduled job, not a background one.** Attempted
+      2026-08-27 and abandoned deliberately. The cost is structural rather than incidental: both
+      baselines build a **grid partition**, which on Concrete's 8 features is $2^8 = 256$ rules,
+      and GA-FIS then searches a population of 20 over 15 generations on top of that. Measured
+      here: roughly **5–6 minutes per seed on Concrete alone**, the smallest of the five datasets,
+      against 217 s for the whole MoG-only table at ten seeds. Bike Sharing (17k rows),
+      PhiUSIIL (235k) and RT-IOT2022 (123k × 82 features) follow, and a grid partition cannot be
+      what runs on 82 features — check what the adapter falls back to there before quoting a
+      timing, because a fallback that silently changes the baseline's *structure* would make the
+      speed comparison meaningless in the flattering direction.
+
+      **Do not shortcut it to three seeds.** This file's own protocol note says why: going from
+      three seeds to ten retracted one conclusion and refuted another. A cheap C1 number is worth
+      less than no C1 number, because the headline claim of the title rests on it.
 - [x] ✅ **C2 — Complexity fit against reference curves.** Table 3.2 + Figure 3.2 now sweep a
       small grid (100–1,000, sized so the cubic arm runs at every point) with both axes
       normalized, and fit a log-log exponent per arm. Classical **3.15** against a theory of 3
