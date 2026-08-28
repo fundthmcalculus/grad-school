@@ -21,11 +21,20 @@ than re-describing it.
 _Opened 2026-08-02, merged 2026-08-04, consolidated with timeline 2026-08-08._
 _Overnight reproduction pass against latest `main` and latest submodules, 2026-08-22._
 _Second overnight pass, 2026-08-27: submodules synced to their upstream heads, **B14** closed,
-**B18** opened and fixed, and five items found to have been done for days without being ticked
-(**B16(a)**, **B16(b)**, **B16(d)**, **D7**, **E10(d)**). Open items: 26 → 21. The recurring
-lesson is the one **B13**'s standing procedure already names — nobody reads the upstream log for
-what a bump **fixes** — so this pass added the missing half of it: read the log for the revisions
-that will actually be **imported**, which is not the same set as the submodule SHAs._
+**B18** opened and fixed, **E9** answered, **E11**'s citation half closed, and five items found
+to have been done for days without being ticked (**B16(a)**, **B16(b)**, **B16(d)**, **D7**,
+**E10(d)**). **13 open · 5 in progress**, down from 26 open. The recurring lesson is the one
+**B13**'s standing procedure already names — nobody reads the upstream log for what a bump
+**fixes** — so this pass added the missing half of it: read the log for the revisions that will
+actually be **imported**, which is not the same set as the submodule SHAs._
+
+_⚠️ **Two passes ran over this file on the same day and did not know about each other**, which is
+its own finding. Merging them produced three genuine conflicts, not textual ones: both had
+independently concluded **D7** was done (the accounts are complementary and both are kept), both
+had worked **E10**, and both had repaired the black gate #183 left red. It also produced the
+better outcome twice over — the other pass landed **C1**'s ANFIS and GA-FIS adapters, the item
+this file calls the single most important experiment in the backlog, and reorganized §5.3 for
+**E10(c)**. A shared file with two writers wants a lock as much as `reproduce/outputs/` does._
 
 > ✅ **B14 is closed: the pin carries the fix** (2026-08-27). `stats_numba.wasserstein_distance`
 > weights its CDF gaps by $dx$ again, so it is once more a distance in the data's own units.
@@ -47,15 +56,20 @@ that will actually be **imported**, which is not the same set as the submodule S
 
 ## Suggested order (from Tier 0 through Tier 4)
 
-**Where this actually stands, 2026-08-27.** Twenty-one items open, and only four of them are
-things a committee would notice: **C1** (no fuzzy baseline behind the title's "orders of
-magnitude faster"), **C3** (Chapter 5's claim still rests on a clustering proxy), **C9**
-(interpretability described, not measured) and **E2b** (Table 3.4's FCM row overstates the GPU
-by roughly an order of magnitude). The rest are either research scheduled after the defense, or
-editorial. Infrastructure is no longer the constraint it was in August: the B-section closed six
-items this month and has one substantive gap left, **B10**'s fp16/GPU capture.
+**Where this actually stands, 2026-08-27.** Thirteen items open and five in progress, and only
+three are things a committee would notice: **C3** (Chapter 5's claim still rests on a clustering
+proxy), **C9** (interpretability described, not measured) and **E2b** (Table 3.4's FCM row
+overstates the GPU by roughly an order of magnitude). The rest are research scheduled after the
+defense, or editorial.
 
-**This week:** the four above, in that order. C1 is the one with a deadline attached to it.
+**C1 came off that list today** — the ANFIS and GA-FIS adapters landed, so the title's *orders of
+magnitude faster* finally has something to be faster *than*. That was the one item on this list
+with a deadline attached to it.
+
+Infrastructure is no longer the constraint it was at the start of August: the B-section closed
+seven items this month and has one substantive gap left, **B10**'s fp16/GPU capture.
+
+**This week:** the three above, in that order.
 
 **Before the proposal defense (December 2026):** finish Tier 1 items. Get G4's protocol defined even if not fully executed — every number in the document is reported under it, so the committee will ask.
 
@@ -671,7 +685,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       absent dataset is an error rather than a reason to quietly use another — substituting one
       silently is the whole reason the knob exists. Tables 4.6 and 4.7 regenerate again:
       `REPRO_OPENSET_DATASET=glass`. At the current pin the shape holds and the values move
-      (4.6 peaks at $	heta = 0.90$, +0.162, against the prose's $	heta = 0.80$, +0.154;
+      (4.6 peaks at $\theta = 0.90$, +0.162, against the prose's $\theta = 0.80$, +0.154;
       4.7 keeps its ordering, Isolation Forest +0.157 > complement +0.141 > SVM +0.085, with the
       gap narrowed from 0.047 to 0.016). Not a re-quote — **D8** applies — but they can be
       re-derived at all now, which they could not be.
@@ -1098,13 +1112,13 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       fires moves by 2.7×. The fitted model is **identical** in both orders (11 rules, 902
       antecedent terms), so this is *evaluation* order, not what was fitted.
 
-      §4.3.5 derives the rule as $\mu_{	ext{anom}} = 1 - S(c_1, \ldots, c_K)$. A t-conorm is
+      §4.3.5 derives the rule as $\mu_{\text{anom}} = 1 - S(c_1, \ldots, c_K)$. A t-conorm is
       commutative and associative, so that is order-independent **by construction**. The
       implementation is not.
 
       **Leading explanation, not yet confirmed:** floating-point accumulation order through an
-      82-term chain, amplified by the knife-edge §4.3.5 itself derives — at $	heta = 0.99$ the
-      clip makes $\mu_{	ext{anom}} > 0$ only when *every* class firing is below 0.01, so the
+      82-term chain, amplified by the knife-edge §4.3.5 itself derives — at $\theta = 0.99$ the
+      clip makes $\mu_{\text{anom}} > 0$ only when *every* class firing is below 0.01, so the
       decision sits where the last bits decide. That predicts the sensitivity is worst at the
       shipped operating point and milder across Table 4.6's swept band. **A 2.7× swing is larger
       than I would expect from float noise alone, so this must not be written up as settled.**
