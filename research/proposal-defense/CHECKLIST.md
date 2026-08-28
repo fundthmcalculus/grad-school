@@ -23,9 +23,11 @@ _Overnight reproduction pass against latest `main` and latest submodules, 2026-0
 _Second overnight pass, 2026-08-27: submodules synced to their upstream heads, **B14** closed,
 **B18** opened and fixed, **E9** answered, **E11**'s citation half closed, and five items found
 to have been done for days without being ticked (**B16(a)**, **B16(b)**, **B16(d)**, **D7**,
-**E10(d)**). Outstanding items **28 → 18**: open 25 → 11, the one 🔒 cleared, and in-progress
-2 → 7 because five items (**C1**, **D8**, **E1**, **E2b**, **E11**) moved from *not started* to
-*half done* rather than closing. The recurring lesson is the one
+**E10(d)**). Outstanding items **28 → 18**: open 25 → 12, the one 🔒 cleared, and in-progress
+2 → 6 because four items (**C1**, **D8**, **E1**, **E2b**) moved from *not started* to *half
+done* rather than closing — while **C3** went the other way. Its clarification arrived on
+2026-08-28 and resolved it to *not started*, which is what Ch 7's own tracker had said all
+along. The recurring lesson is the one
 **B13**'s standing procedure already names — nobody reads the upstream log for what a bump
 **fixes** — so this pass added the missing half of it: read the log for the revisions that will
 actually be **imported**, which is not the same set as the submodule SHAs._
@@ -58,9 +60,9 @@ this file calls the single most important experiment in the backlog, and reorgan
 
 ## Suggested order (from Tier 0 through Tier 4)
 
-**Where this actually stands, 2026-08-27.** Eleven items open and seven in progress. Two are
-still things a committee would notice — **C3** (Chapter 5's claim rests on a clustering proxy)
-and **C9** (interpretability described, not measured) — and a third, **E2b**, has stopped being
+**Where this actually stands, 2026-08-28.** Twelve items open and six in progress. Two are
+still things a committee would notice — **C3** (Chapter 5's claim rests on a clustering proxy,
+now confirmed rather than suspected) and **C9** (interpretability described, not measured) — and a third, **E2b**, has stopped being
 one: Table 3.4 is measured, and what is left there is the sentence in §3.3.3 that has to say
 which comparison it is making. The rest are research scheduled after the defense, or editorial.
 
@@ -879,11 +881,58 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       farthest-point sampling is *necessary* but not that it is *sufficient*.
       Until these are settled, G4's half-million-point target rests on a single-level result.
       Noted briefly in Ch 7 G4e.
-- [ ] 🟨 **C3 — Ch 5 end-to-end FIS result.** Every Ch 5 number is a *clustering* score; the
-      chapter exists to produce FIS antecedents. Until a model is built from those memberships and measured,
-      the central claim rests on a proxy. **Author has FIS results on PhishingURII — needs clarification:**
-      Are these clustering-only (still proxy), or end-to-end (Ch 5 → model → regression/classification → measured)?
-      If end-to-end, C3 is done. Ch 7 §7.2 tracks this as **C3**.
+- [ ] ⬜ **C3 — Ch 5 end-to-end FIS result. The clarification is in and C3 stays open** (author
+      answered 2026-08-28: *"C3 results are end to end"*; verified against the code the same day).
+      Every Ch 5 number is a *clustering* score; the chapter exists to produce FIS antecedents.
+      Until a model is built from those memberships and measured, the central claim rests on a
+      proxy. Ch 7 §7.2 tracks this as **C3**.
+
+      **The author's answer is true about a real result, and that result is Chapter 4.** There are
+      three genuinely end-to-end PhiUSIIL FIS numbers in the repository — `experiments/fis-to-neural-net/outputs/phiusiil.md`
+      (160,340 train / 47,159 test, test error **0.0060**, log loss 0.0308), Table 4.1's
+      `acc = 0.997 ± 0.001` at ten seeds, and Ch 6's Table 6.2 mixture-of-experts at
+      $1.000 \pm 0.001$. All three fit on train and score on held-out data, so "end to end" is
+      the right description of them. All three take their antecedents from
+      `gauss_math.create_gaussian_membership_dict` — **the Chapter 4 MoG construction**. They are
+      the *baseline arm* C3 asks the Ch 5 result to be compared against, not the Ch 5 result.
+      The wording invites the conflation: `tribble-fis/tribble-tree/demo_phishing.py`'s docstring
+      opens *"End-to-end demo: fuzzy tree vs. the flat TRIBBLE classifier on phishing URLs."*
+
+      **Four checks, each run directly rather than inferred**, and they agree:
+      - The Chapter 5 codebase computes **no supervised metric at all**. Every one of the eleven
+        `from sklearn.metrics import` lines in `gated-minimax-selection/` imports
+        `adjusted_rand_score` and nothing else; `accuracy_score|f1_score|r2_score|roc_auc|
+        mean_squared_error|train_test_split` returns zero matches across the package.
+      - **It never did.** `git log --all --pickaxe-regex -S"accuracy_score|…|tribblefis" --
+        gated-minimax-selection/` returns nothing across all **1,424** commits on every ref. This
+        was never built and later removed.
+      - `gated-minimax-selection/` **has never touched the phishing data**, so no PhiUSIIL number
+        in this repository can be a Chapter 5 number.
+      - The document says so in three places already: §5.4 — *"I have not built a FIS from these
+        membership functions and measured how it predicts"*; Ch 7's own tracker row — *"not
+        started"*; Ch 8 — *"the membership functions of Chapter 5 have not yet been consumed by
+        the models of Chapter 6, so the pipeline is still an argument rather than a result."*
+
+      **The break is at one arrow, and both ends already exist.** `table_5_4_ch5_g1_scaling.py:92`
+      already materialises the membership matrix
+      `U = np.vstack([MS.block_membership(b, Dstar) for b in blocks])` — and then uses it only for
+      its own partition-of-unity residual and throws it away. Every other Ch 5 path calls
+      `MS.assign` (a hard `argmin`) and scores that with ARI. **Closing C3 means keeping `U`,
+      solving TSK consequents on a train split, and scoring held-out.**
+      Cheapest venue is **bodyfat**: both arms already run on the same 252 rows
+      (`FuzzySystemsExperiments/bodyfat_ivat.py` for the iVAT side, `bodyfat.py` for
+      `TribbleRegressor` at $R^2 = 0.647$), and it has coordinates, so it satisfies §5.4's own
+      requirement of *"data where both can run"*. **ECG5000** is the better second venue —
+      `table_3_7_g2_downstream.py` already builds the DTW `Dstar` and the blocks and stops at
+      `adjusted_rand_score`, so it closes C3 on genuinely non-coordinate data.
+
+      ⚠️ **Expect an unflattering answer, and budget for it rather than being surprised.**
+      `gated-minimax-selection/notes/phase6_soft_validation.py` already probed the graded signal
+      and returned a negative: the normalized minimax membership is a constant step per cluster
+      with no boundary resolution, scoring *worse* than crisp 0/1 labels against the analytic
+      posterior (Brier 0.136/0.200/0.208/0.122 fuzzy against 0.096/0.042/0.016/0.000 hard —
+      `notes/MF_PROGRESS_LOG.md:259`). A negative end-to-end result still discharges C3. It is
+      not a reason to defer it, and it is a much better thing to discover before a committee does.
 - [x] ✅ **C4 — Quantify the correction-rule pass** (Ch 4 §4.3.1, Table 4.9, Fig 4.3;
       2026-08-05). Measured on Glass, ten paired seeds — not RT-IOT2022. **RT-IOT2022 is now in
       the repository (2026-08-12), and two of its three related-but-distinct scale claims are now
