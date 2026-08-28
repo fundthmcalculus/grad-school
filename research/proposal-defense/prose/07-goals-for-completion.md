@@ -183,6 +183,7 @@ The runway is full, and the plan commits to every goal in Table 7.1 — there is
 
 | Goal | Kind | Feeds | Current status | Priority | Target |
 |---|---|---|---|---|---|
+| **Issue #97 (WEC_Perth evaluation)** | experiment | Ch 6 | **COMPLETE (2026-08-27)**: rank-Gaussian preprocessing + quantile bucketing + top-N feature selection achieves R²=0.6475 on 98-feature wave-energy dataset; methodology documented, preprocessing pipeline verified across ablation study | done | **complete** |
 | **C1** ANFIS + GA-FIS baseline adapters | experiment | Ch 1, 4, 6, 8 | not started; eleven cells across Tables 4.5 and 6.2 read `N/A` (C1, D4) | **must — first** | 2027 Q1 |
 | **G4a** measurement protocol | protocol | Ch 3, 4, 5, 6 | seed floor, single host, machine block, ratio reporting, estimates-vs-demonstrations and the SHA guard all in place (B1–B5b, B4 — the guard fired on the 2026-08-22 sweep); clocks/thermals and three named exceptions outstanding | must | 2027 Q1 |
 | **M5** decide: patch `m5py`, write M5′, or drop the row | decision | Ch 6 | blocked on a dependency fault, not an unrun experiment (D4) | must | decide by 2027-03-31 |
