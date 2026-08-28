@@ -83,6 +83,39 @@ ORDERS = [o.strip() for o in os.environ.get("REPRO_ORDERS", "1st").split(",")]
 N_BUCKETS = 3
 LOG_DYNAMIC_RANGE = 2
 
+# The second axis, and the one that turned out to matter. `pin_extremes` fixes
+# the first and last output-bucket means to the observed min and max. It
+# defaulted to True when E9's numbers were taken and defaults to False now
+# (tribble-fis #102, `69e0bab`), which is the whole reason those numbers do not
+# reproduce. Sweeping it makes the mechanism switchable instead of historical.
+#
+# Added AFTER a first pass over the transform arms alone, which is worth saying
+# plainly: that pass found every normalized arm identical to three decimals and
+# so had no signal at all. The pin axis was not a registered prediction; it was
+# the hypothesis that first pass forced. The 2x2 below is what tests it.
+PINS = [False, True]
+
+
+def _regressor(seed, tsk_order, pin_extremes):
+    """The flat MoG-TSK regressor, with `pin_extremes` exposed.
+
+    Deliberately not `_fuzzy_models.mog_regressor`: that helper is shared with
+    the shipped tables and must keep taking the library default, or this
+    experiment would silently redefine what those tables measure.
+    """
+    try:
+        from tribblefis.gaussian_regressor import TribbleRegressor
+
+        return TribbleRegressor(
+            n_output_buckets=N_BUCKETS,
+            tsk_order=tsk_order,
+            top_n=-1,
+            random_state=seed,
+            pin_extremes=pin_extremes,
+        )
+    except Exception:  # noqa: BLE001
+        return None
+
 
 # --------------------------------------------------------------------------
 # The arms. Each returns a transformed frame plus the logged column names, so
@@ -174,62 +207,71 @@ def main() -> int:
     logged_note = ""
     for order in ORDERS:
         for label, make in ARMS:
-            test_r2, train_mse, test_mse = [], [], []
-            skipped = None
-            for seed in C.SEEDS:
-                Xt, logged = make(X)
-                if Xt is None:
-                    skipped = "no log-detected columns"
-                    break
-                if logged and not logged_note:
-                    logged_note = ", ".join(logged)
-                Xtr, Xte, ytr, yte = train_test_split(
-                    Xt, y, test_size=0.2, random_state=seed
-                )
-                model = F.mog_regressor(seed, tsk_order=order)
-                if model is None:
-                    skipped = "model unavailable"
-                    break
-                try:
-                    model.fit(Xtr, ytr)
-                    p_te = np.asarray(model.predict(Xte), dtype=float)
-                    p_tr = np.asarray(model.predict(Xtr), dtype=float)
-                except Exception as exc:  # noqa: BLE001
-                    skipped = f"{type(exc).__name__}"
-                    break
-                if not np.all(np.isfinite(p_te)) or not np.all(np.isfinite(p_tr)):
-                    skipped = "non-finite predictions"
-                    break
-                test_r2.append(r2_score(yte, p_te))
-                # Normalized so the two normalization arms are comparable at all:
-                # an MSE in target units is identical across arms, but the claim
-                # under test is about FIT quality, so scale by target variance.
-                var = float(np.var(np.asarray(ytr, dtype=float)))
-                train_mse.append(mean_squared_error(ytr, p_tr) / var)
-                test_mse.append(mean_squared_error(yte, p_te) / var)
+            for pin in PINS:
+                test_r2, train_mse, test_mse = [], [], []
+                skipped = None
+                for seed in C.SEEDS:
+                    Xt, logged = make(X)
+                    if Xt is None:
+                        skipped = "no log-detected columns"
+                        break
+                    if logged and not logged_note:
+                        logged_note = ", ".join(logged)
+                    Xtr, Xte, ytr, yte = train_test_split(
+                        Xt, y, test_size=0.2, random_state=seed
+                    )
+                    model = _regressor(seed, order, pin)
+                    if model is None:
+                        skipped = "model unavailable"
+                        break
+                    try:
+                        model.fit(Xtr, ytr)
+                        p_te = np.asarray(model.predict(Xte), dtype=float)
+                        p_tr = np.asarray(model.predict(Xtr), dtype=float)
+                    except Exception as exc:  # noqa: BLE001
+                        skipped = f"{type(exc).__name__}"
+                        break
+                    if not np.all(np.isfinite(p_te)) or not np.all(np.isfinite(p_tr)):
+                        skipped = "non-finite predictions"
+                        break
+                    test_r2.append(r2_score(yte, p_te))
+                    # Normalized so the two normalization arms are comparable at all:
+                    # an MSE in target units is identical across arms, but the claim
+                    # under test is about FIT quality, so scale by target variance.
+                    var = float(np.var(np.asarray(ytr, dtype=float)))
+                    train_mse.append(mean_squared_error(ytr, p_tr) / var)
+                    test_mse.append(mean_squared_error(yte, p_te) / var)
 
-            if skipped or not test_r2:
-                rows.append([order, label, C.NA, C.NA, C.NA])
-                print(f"  {order:8s} {label:36s} SKIP ({skipped})")
-                continue
-            rows.append(
-                [
-                    order,
-                    label,
-                    f"{np.mean(test_r2):.3f} ± {np.std(test_r2):.3f}",
-                    f"{np.mean(train_mse):.3f}",
-                    f"{np.mean(test_mse):.3f}",
-                ]
-            )
-            print(
-                f"  {order:8s} {label:36s} "
-                f"test R2 {np.mean(test_r2):+.3f} ± {np.std(test_r2):.3f}   "
-                f"train MSE/var {np.mean(train_mse):.3f}"
-            )
+                if skipped or not test_r2:
+                    rows.append([order, label, str(pin), C.NA, C.NA, C.NA])
+                    print(f"  {order:8s} {label:36s} pin={pin!s:5s} SKIP ({skipped})")
+                    continue
+                rows.append(
+                    [
+                        order,
+                        label,
+                        str(pin),
+                        f"{np.mean(test_r2):.3f} ± {np.std(test_r2):.3f}",
+                        f"{np.mean(train_mse):.3f}",
+                        f"{np.mean(test_mse):.3f}",
+                    ]
+                )
+                print(
+                    f"  {order:8s} {label:36s} pin={pin!s:5s} "
+                    f"test R2 {np.mean(test_r2):+.3f} ± {np.std(test_r2):.3f}   "
+                    f"train MSE/var {np.mean(train_mse):.3f}"
+                )
 
     C.emit(
         "diagnose_bounded_normalization",
-        header=["order", "arm", "test R²", "train MSE/var", "test MSE/var"],
+        header=[
+            "order",
+            "arm",
+            "pin_extremes",
+            "test R²",
+            "train MSE/var",
+            "test MSE/var",
+        ],
         rows=rows,
         title="E9 — bounded vs centred normalization on Concrete (flat MoG-TSK)",
         note=(

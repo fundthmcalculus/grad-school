@@ -47,7 +47,15 @@ that will actually be **imported**, which is not the same set as the submodule S
 
 ## Suggested order (from Tier 0 through Tier 4)
 
-**This week:** A (all settled) → start Tier 1 (cheap/high-value, before defense).
+**Where this actually stands, 2026-08-27.** Twenty-one items open, and only four of them are
+things a committee would notice: **C1** (no fuzzy baseline behind the title's "orders of
+magnitude faster"), **C3** (Chapter 5's claim still rests on a clustering proxy), **C9**
+(interpretability described, not measured) and **E2b** (Table 3.4's FCM row overstates the GPU
+by roughly an order of magnitude). The rest are either research scheduled after the defense, or
+editorial. Infrastructure is no longer the constraint it was in August: the B-section closed six
+items this month and has one substantive gap left, **B10**'s fp16/GPU capture.
+
+**This week:** the four above, in that order. C1 is the one with a deadline attached to it.
 
 **Before the proposal defense (December 2026):** finish Tier 1 items. Get G4's protocol defined even if not fully executed — every number in the document is reported under it, so the committee will ask.
 
@@ -1187,15 +1195,56 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       comparison. Both earn their history.
 
 
-- [ ] ⬜ **D8 — The document does not reproduce against the current pins, and B14 is only the
-      largest cause. Account for the rest, table by table.** `check_prose.py` over the whole
-      proposal, same prose, three archives:
+- [ ] 🟨 **D8 — The accounting is done; what is left is a re-quote, which is ordinary work.**
+      `check_prose.py` over the whole proposal, same prose, four archives:
 
       | archive | ok | drifted | untraceable |
       |---|---:|---:|---:|
       | `goal-8h-2026-08-11-fullsuite` (old pin) | **156** | 10 | 44 |
       | `full-2026-08-22` (current pin, 16/16 green at ten seeds) | **59** | 23 | 128 |
       | `wasserstein-fixed-2026-08-22` (current pin, B14 corrected in-process) | **70** | 23 | 117 |
+      | **`pins-synced-2026-08-27`** (B14 landed, pins coherent, 9/9 green) | **61** | 109 | **44** |
+
+      ✅ **The column that mattered is fixed. `untraceable` is back to 44** — identical to the
+      run of record — where the two 2026-08-22 archives sat at 128 and 117. That number counts
+      prose values that appear in *no CSV of the archive*, so it was never measuring drift at
+      all; it was measuring **missing tables**. Those archives were incomplete, and reading
+      their `ok` counts as "the document stopped reproducing" was reading a coverage failure as
+      a numerical one. With a complete archive, every value the harness can produce, it produced.
+
+      **`drifted` at 109 is the honest remainder, and it is a re-quote rather than a defect.**
+      The prose is still quoted from the old pin, and the pin has since moved across four real
+      changes — B14's `wasserstein_distance` fix (#171), the k-means++ restoration (#191),
+      `pin_extremes` (#102), and a data leak removed in this repository (`c0ec380`). Numbers are
+      *supposed* to move across those. What the count does not distinguish is a value that moved
+      because the code got better from one that moved because it got worse, which is why
+      **Table 4.1 is the one to read**, not the total:
+
+      | row | run of record | 2026-08-27 | |
+      |---|---:|---:|---|
+      | PhiUSIIL, accuracy | 0.997 ± 0.001 | **0.997 ± 0.001** | exact |
+      | RT-IOT2022, accuracy | 0.927 ± 0.002 | **0.927 ± 0.002** | exact |
+      | Concrete, full 2nd order | 0.852 ± 0.030 | **0.852 ± 0.030** | exact |
+      | Concrete, 1st order | 0.795 ± 0.025 | 0.799 ± 0.027 | within noise |
+      | Bike Sharing | 0.939 ± 0.004 | 0.620 ± 0.014 | **moved — see below** |
+
+      **The two accuracy rows returning *exactly* is the end of B14.** Those are the cells that
+      read 0.729 and 0.500 under the defect; they are back on the archive to three decimals in a
+      full ten-seed run, not a corrected-in-process diagnostic.
+
+      **Bike Sharing moved because the data was wrong, and the reference column proves it.**
+      The Random Forest reference on that row fell from a perfect **1.000 ± 0.000** to
+      0.944 ± 0.004 in the same run — and Random Forest is scikit-learn, so a reference model
+      moving means the *features* changed, not the library. `c0ec380` dropped `casual` and
+      `registered`, which sum to `cnt` exactly on all 17,379 rows: the model was being handed
+      the target's two addends. An RF at 1.000 was the tell, and it had been sitting in the run
+      of record. **So this row is a correction, not a regression** — the same shape as C4's
+      RT-IOT2022 index column, now twice in two months.
+      ⚠️ **This supersedes the attribution below.** The Bike Sharing move was traced here to
+      #102's `pin_extremes` default, measured on *frozen features* — correct as far as it went,
+      and much smaller than the leak it could not see, because freezing the features is exactly
+      what hides a feature defect. A probe designed to isolate the model from the data cannot
+      find a fault in the data; worth remembering next time that design looks like rigour.
 
       Four causes are identified and three of them are benign:
       1. **B14** — decisive where its mechanism applies and irrelevant elsewhere. `table_4_1`
@@ -1296,8 +1345,38 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
 ## E. Decisions and framing
 **[Tier 0–4: mix of settled defaults (E1, E3), verification paths (E2, E2b, E2c), and low-stakes editorial (E10). E1.6–E1.7 Tier 1 (normalization + FCM). E9 low-priority investigation.]**
 
-- [ ] ⬜ **E1 — t-norm: present min/max as the default. ⚠️ Its evidence base was broken and is
-      now repaired; the numbers below are superseded.** `table_norm_conorm_matrix.py` imported
+- [ ] 🟨 **E1 — the study is now measurable and says something worth a chapter; the framing
+      decision is what is still open.** Re-run 2026-08-27 at a pin where the feature screen
+      works (**B14** closed), ten seeds, no `N/A` cells — the first time this table has been
+      complete. `reproduce/outputs/pins-synced-2026-08-27/table_norm_conorm_matrix.md`.
+
+      | model | min/max | probability | **Łukasiewicz** | hamacher | einstein |
+      |---|---:|---:|---:|---:|---:|
+      | flat MoG-TSK, $R^2$ | 0.705 ± 0.053 | 0.687 ± 0.051 | **−3.774 ± 0.569** | 0.711 ± 0.053 | 0.678 ± 0.048 |
+      | HME (experts only), $R^2$ | 0.788 ± 0.027 | 0.774 ± 0.020 | **−3.592 ± 0.500** | 0.796 ± 0.025 | 0.761 ± 0.024 |
+      | fuzzy tree (t-norm only), $R^2$ | 0.708 ± 0.031 | 0.712 ± 0.032 | 0.713 ± 0.035 | 0.712 ± 0.031 | 0.713 ± 0.033 |
+
+      **The Łukasiewicz collapse is confirmed at full magnitude**, and the values land back on
+      the *original* 2026-08-02 figures (−3.761 flat, −3.626 HME) rather than on the −0.507 /
+      −1.084 this item recorded from the 2026-08-22 diagnostic run. That diagnostic run was
+      taken under **B14**, which this item flagged at the time — *"do not re-quote the absolute
+      values yet"* — and the flag was right. The correction this item made to itself, that
+      **min/max is the worst of the four non-Łukasiewicz families**, was a B14 artifact and
+      does not survive: min/max is second of four here, and the four sit within **0.033** of
+      each other against ±0.05 seed spreads, so none of that ordering clears its error bar.
+
+      **The new finding, and it is the one worth harvesting: the collapse is a *conorm* effect.**
+      The fuzzy tree row uses the **t-norm only** — path weights are a pure AND with no OR to
+      apply a conorm to — and it does not collapse. All five families land within **0.005** of
+      each other there, Łukasiewicz included. So the two models that use both operators lose
+      four points of $R^2$ under Łukasiewicz while the model that uses one operator is
+      indifferent to the choice. That localizes a dramatic effect to a single operator, on
+      evidence already in hand, and it is a much better reason to give this study a home in a
+      chapter than the family ordering ever was.
+
+      **What is still open is unchanged and is a decision, not a measurement:** whether to
+      present min/max as the default, and whether to harvest this study into a chapter — it
+      still appears in none. _Original entry, kept as the record:_ `table_norm_conorm_matrix.py` imported
       `MixtureOfGaussiansFuzzyRegressor` and `MixtureOfGaussiansFuzzyClassifier`, renamed upstream
       to `TribbleRegressor`/`TribbleClassifier` — the **same rename B12(a) swept for, in a file
       that sweep missed**. Both flat-MoG rows of this table have therefore been silently `N/A`
@@ -1481,7 +1560,58 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       from `bibliography.md` — this also clears a latent dangling reference, since Ch 9 §9.3 never
       actually contained a note subsection for the many cross-references that pointed at it.
       `deshpande2024scalable` first-author metadata fixed in the `.bib` as part of this read.
-- [ ] ⬜ **E9 — `UnitScalar` vs `StandardScalar`: characterize *why* bounded normalization wins.**
+- [x] ✅ **E9 — Answered 2026-08-27, and the answer is sharper than the question.** All three
+      experiments this item proposed were run, on shared splits, ten seeds, plus a fourth axis
+      the first pass forced: `reproduce/experiments/diagnose_bounded_normalization.py`,
+      output `reproduce/outputs/diagnose_bounded_normalization.md`.
+
+      **The first pass found nothing, and that was the finding.** At the current pin every
+      normalized arm — min-max `[0,1]`, min-max `[-1,1]`, z-score, z-score clipped at 2σ and
+      3σ, and both half-and-half arms — lands on **0.797–0.799**, against raw features at
+      0.687. The transform does not matter. That is not what this item recorded, so something
+      had changed underneath it, and the obvious candidate was the mechanism the item's own
+      working account names: `pin_extremes`, which fixes the first and last output-bucket means
+      to the observed min and max. `tribble-fis` #102 (`69e0bab`) flipped its default
+      **True → False** — the change **D8** already traced for a different reason.
+
+      **Sweeping that as a second axis makes the mechanism switchable, and it settles the item:**
+
+      | transform | bounded | centred | `pin=False` | `pin=True` | Δ |
+      |---|:--:|:--:|---:|---:|---:|
+      | raw | – | – | 0.687 ± 0.049 | 0.687 ± 0.049 | 0.000 |
+      | log + min-max `[0,1]` *(shipped)* | ✓ | ✗ | 0.799 ± 0.026 | 0.795 ± 0.025 | −0.004 |
+      | log + min-max `[-1,1]` **(a)** | ✓ | ✓ | 0.798 ± 0.025 | 0.751 ± 0.027 | **−0.047** |
+      | log + z-score | ✗ | ✓ | 0.798 ± 0.025 | 0.714 ± 0.042 | **−0.084** |
+      | z-score, clip ±3 **(b)** | ✓ | ✓ | 0.797 ± 0.022 | 0.712 ± 0.039 | **−0.085** |
+      | z-score, clip ±2 **(b)** | ✓ | ✓ | 0.799 ± 0.015 | 0.666 ± 0.060 | **−0.133** |
+      | z-score on logged cols only **(c)** | – | ✓ | 0.798 ± 0.025 | 0.793 ± 0.025 | −0.005 |
+      | z-score on unlogged cols only **(c)** | – | ✓ | 0.799 ± 0.026 | 0.753 ± 0.033 | **−0.046** |
+
+      **The mechanism is centring, not unboundedness — which is the opposite of the phrasing
+      this item and §4.3 were reaching for.** The one arm that survives the pin is the one that
+      is *not centred*. Every centred arm loses, and **(b)** decides it: clipping the z-score
+      *increases* boundedness and makes the loss **worse** (−0.133 at ±2σ against −0.084
+      unclipped), so bounding gives nothing back and the tails own none of the effect. **(a)**
+      then reads exactly as this item's own decision rule said it would — *"if it degrades, the
+      pin on 0.0/1.0 bucket means is the real culprit"* — and it degrades.
+      **(c) inverts the natural guess:** z-scoring only `Slag` and `Age`, the two log-detected
+      columns, costs −0.005; z-scoring only the other six costs −0.046. The damage does not
+      follow the log step at all.
+      **The underfitting prediction holds**, which is the falsification condition the script
+      registers before running: train MSE/var rises with the loss (0.176 → 0.247 z-score,
+      → 0.272 clipped ±2), so the model fits *train* worse too rather than overfitting.
+
+      **What this changes in the prose.** The sharper claim this item hoped for — *"bounded
+      normalization helps, centred normalization actively hurts, and the bounded-input
+      assumption is load-bearing"* — is **half right and no longer current**. Centred
+      normalization hurts, but the assumption that is load-bearing is *non-negative and
+      uncentred*, not *bounded*; and since #102 it is not load-bearing at all, because nothing
+      pins the extremes any more. At the shipped default §4.3 can say only that normalization
+      helps (0.687 → 0.799) and that the choice among transforms is free — which is a weaker
+      headline and a much easier one to defend. **G5's story improves in the same move**: G5
+      recommended against pinning the extremes, upstream adopted that recommendation, and this
+      is the measurement showing what the recommendation was worth.
+      _Original entry, kept because its reasoning was right and its conclusion was overtaken:_
       *(Low priority — author 2026-08-03: "I don't need it but it's worth addressing." Nothing in
       the document depends on it; the choice itself is already settled. Data in hand:
       `reproduce/outputs/norm-three-arm-a385a1a/`, write-up in
@@ -1551,8 +1681,34 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       from the commit message. Nothing in `reproduce/` touches those scripts, so no table moves.
       This is the fourth blocker in this file retired by an upstream commit nobody read —
       the pattern **B13**'s standing procedure exists to catch. **(c) remains open.**
-- [ ] ⬜ **E11 — Verify the two EASA entries at proof stage, and re-check the V&V framing's
-      boundary language.** Two halves. *The citations:* `easa2023airoadmap` and
+- [ ] 🟨 **E11 — The citation half is done (2026-08-27); the framing half is still open.**
+      Every site this item was blocked on turned out to be reachable, so five entries were
+      re-checked against the source rather than against a listing about the source, and the
+      bibliography's unverified count went **4 `[?]` → 1**.
+      - `easa2023airoadmap` → `[V]`. The printed title **leads with "EASA"**, which this file
+        had dropped. 10 May 2023 confirmed. No document number is shown on the library page.
+      - `easa2024mlconcept` → `[V]`, and this is the one the item flagged as genuinely
+        unestablished. Exact date **6 March 2024**, where the entry had a bare year. EASA's own
+        suggested citation also differs from what was here, and writes **"Issue 2"** in the
+        citation against "Issue 02" in the announcement headline; the entry follows the citation
+        and records the discrepancy.
+      - `arnett2019iteratively` → `[V]`, read from the OhioLINK ETD record itself rather than
+        the accession number that surfaced in search. Title, author, degree, department, year
+        and committee all confirm — chaired by Kelly Cohen, which is a pleasing loop back to
+        `cohen2022whyfuzzy`. **This is the outcome the item predicted:** it resolves what
+        `arnett2018proposal`, the file's oldest `[?]`, was a proposal *for*, so that entry is no
+        longer a mystery — only its own title and date are unconfirmed.
+      - `cohen2022whyfuzzy` and `arnett2021formal` were `[V]` on SpringerLink *index* records;
+        the chapter pages are still unreachable (both now sit behind an `idp.springer.com` auth
+        redirect), so they were re-checked against **Crossref**, the publisher's own deposit.
+        `cohen2022whyfuzzy` is exact. `arnett2021formal` is exact **apart from one given name**:
+        this file had "Boronat, Hector", Crossref has **"Hugo"**. Changed, on the same standard
+        **E7** used for "Sherin" → "Saima" — a hand-entered name with no recorded source does not
+        outrank the publisher's deposit — but it rests on a single source, since search shows
+        only "Boronat, H.", the NAFIPS 2020 program page returns 401, and the chapter page is
+        behind auth. Left flagged in the entry rather than treated as settled.
+      **Still open: the framing half**, which is the part that was never about egress. Original
+      entry: *The citations:* `easa2023airoadmap` and
       `easa2024mlconcept` are `[?]` because `easa.europa.eu` is unreachable from the drafting
       environment, so both rest on index and news listings rather than a title page. The
       Roadmap 2.0 date (10 May 2023) is corroborated twice; the Concept Paper Issue 02's exact
