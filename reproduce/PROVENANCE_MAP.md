@@ -1241,3 +1241,35 @@ accuracy parity does not — is strengthened rather than altered.
 regenerated in this pass (`REPRO_THETA_SWEEP` was not set), so §4.4's sentence
 that Table 4.6's sweep "was not run here" still stands, and note 21's ten-seed
 sweep figures remain pre-de-leak.
+
+---
+
+**Note 28 — the RT-IOT2022 θ-sweep is now run on the de-leaked loader, and it
+closes #184's open question: tuning θ does not rescue the complement rule.**
+*(2026-08-27, run of record `outputs/rtiot-deleaked-2026-08-27/`.)*
+
+Note 27 left this owed: the ten-seed re-quote of Table 4.7b did not regenerate
+the θ-sweep, so note 21's sweep figures (peak **+0.391** at θ = 0.80, Isolation
+Forest **+0.534**) were still pre-de-leak. They are now superseded. The sweep and
+the Table 4.7b headline were produced in **one** `table_4_4_openset.py`
+invocation (`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1`, 2h09m), so the
+θ = 0.99 sweep row and the headline complement-rule cell agree by construction —
+the internal inconsistency note 21 recorded for the previous `table_4_4b` (sweep
+detection 0.777 vs headline 0.798) cannot recur.
+
+| θ | detection | false alarm | J | | de-leaked vs note 21 |
+|---|---|---|---|---|---|
+| 0.80 (peak) | 0.914 | 0.518 | **+0.396** | | +0.391 → +0.396 |
+| 0.99 (shipped) | 0.804 | 0.438 | +0.366 | | — |
+| Isolation Forest | 0.966 | 0.431 | **+0.535** | | +0.534 → +0.535 |
+
+The correction moved the digits by thousandths and left every conclusion intact.
+The peak is at θ = 0.80 both before and after — the same operating point the
+Glass sweep (Table 4.6) finds — so the knob's best setting transfers across
+datasets. What does not transfer is the verdict: the best tuned J is **0.139
+below Isolation Forest**, which leads at every θ. So the gap Table 4.7b reports is
+**fundamental to this dataset, not an artefact of the shipped operating point** —
+which is the question §4.4 and Fig 4.2's missing row were both waiting on.
+Written into prose as **Table 4.7c** (§4.4). This closes the substantive half of
+grad-school#184; the only remainder is whether to redraw Fig 4.2 with a second
+(RT-IOT2022) panel, a presentation choice, not a measurement gap.
