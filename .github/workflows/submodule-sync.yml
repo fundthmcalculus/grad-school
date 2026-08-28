@@ -11,7 +11,14 @@ name: Submodule Sync
 # SHA bump here can change its numbers -- the PR body flags that explicitly
 # rather than letting a silent submodule bump land unnoticed.
 
+# Each submodule's own repo now pokes this workflow directly on every merge to
+# its `main` (see notify-downstream.yml over there), so a fix propagates in
+# under a minute instead of waiting up to twelve hours for the next poll. The
+# cron stays as a backstop: it covers a lost dispatch, and it is the only path
+# that works at all when DOWNSTREAM_SYNC_TOKEN is absent upstream.
 on:
+  repository_dispatch:
+    types: [upstream-updated]
   schedule:
     - cron: '0 6,18 * * *'
   workflow_dispatch: {}
@@ -19,6 +26,13 @@ on:
 permissions:
   contents: write
   pull-requests: write
+
+# Three submodules can merge at once and each dispatches here. Serialize rather
+# than cancel: every run force-pushes the same branch, and a cancelled run drops
+# that submodule's bump on the floor until the next cron.
+concurrency:
+  group: submodule-sync
+  cancel-in-progress: false
 
 env:
   SYNC_BRANCH: chore/submodule-sync
@@ -31,6 +45,20 @@ jobs:
         with:
           fetch-depth: 0
           submodules: false
+          # A branch pushed with the automatic GITHUB_TOKEN opens a PR that
+          # triggers no `pull_request` workflows -- GitHub suppresses that to
+          # avoid recursion. This PR's whole purpose is to be the one safe
+          # "merge me to get current" button, and a PR with zero checks cannot
+          # serve that. Pushing as the PAT makes PR Checks run on it.
+          token: ${{ secrets.DOWNSTREAM_SYNC_TOKEN || github.token }}
+
+      - name: Warn if the PR will land without CI
+        env:
+          TOKEN: ${{ secrets.DOWNSTREAM_SYNC_TOKEN }}
+        run: |
+          if [ -z "${TOKEN:-}" ]; then
+            echo "::warning::DOWNSTREAM_SYNC_TOKEN is not set. The sync PR will be opened by github-actions, so PR Checks will NOT run on it -- verify it by hand before merging."
+          fi
 
       - name: Configure git identity
         run: |
@@ -61,6 +89,11 @@ jobs:
             echo
             echo "⚠️ These submodules are consumed by \`research/proposal-defense/\`. Please confirm nothing there needs updating (numbers, citations, generated tables) before merging."
             echo
+            echo "Triggered by: \`${{ github.event_name }}\`${{ github.event.client_payload.repo && format(' from `{0}`', github.event.client_payload.repo) || '' }}"
+            echo
+            echo "> This branch is machine-owned and force-pushed on every upstream merge."
+            echo "> Do not commit to it by hand -- your commit will be overwritten."
+            echo
             echo "| Submodule | Old SHA | New SHA |"
             echo "|---|---|---|"
           } > "$BODY_FILE"
@@ -85,14 +118,18 @@ jobs:
         run: |
           set -euo pipefail
           git checkout -B "$SYNC_BRANCH"
-          git add tribble-fis tribble-opt tribble-cluster
+          # Read the paths from .gitmodules rather than hardcoding them, which
+          # is what the detection loop above already does. With a hardcoded
+          # list, adding a fourth submodule would produce a PR whose body
+          # reports a bump it never actually staged -- wrong output, silently.
+          git add $(git config -f .gitmodules --get-regexp '\.path$' | awk '{print $2}')
           git commit -m "chore(submodules): sync to latest main"
           git push --force origin "$SYNC_BRANCH"
 
       - name: Open or update the sync PR
         if: steps.sync.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.DOWNSTREAM_SYNC_TOKEN || github.token }}
         run: |
           set -euo pipefail
           existing=$(gh pr list --head "$SYNC_BRANCH" --state open --json number -q '.[0].number // empty')
