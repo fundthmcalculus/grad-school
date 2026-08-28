@@ -18,6 +18,8 @@ _FSE = pathlib.Path(__file__).resolve().parents[2]
 if str(_FSE) not in sys.path:
     sys.path.insert(0, str(_FSE))
 
+from tribble_predictive_health import cache  # noqa: E402
+
 DS02 = _FSE.parent / "data" / "nasa-cmapps2" / "N-CMAPSS_DS02-006.h5"
 
 
