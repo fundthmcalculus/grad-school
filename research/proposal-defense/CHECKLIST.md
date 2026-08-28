@@ -23,7 +23,9 @@ _Overnight reproduction pass against latest `main` and latest submodules, 2026-0
 _Second overnight pass, 2026-08-27: submodules synced to their upstream heads, **B14** closed,
 **B18** opened and fixed, **E9** answered, **E11**'s citation half closed, and five items found
 to have been done for days without being ticked (**B16(a)**, **B16(b)**, **B16(d)**, **D7**,
-**E10(d)**). **13 open · 5 in progress**, down from 26 open. The recurring lesson is the one
+**E10(d)**). Outstanding items **28 → 18**: open 25 → 12, the one 🔒 cleared, and in-progress
+2 → 6 because four items (**C1**, **D8**, **E1**, **E11**) moved from *not started* to *half
+done* rather than closing. The recurring lesson is the one
 **B13**'s standing procedure already names — nobody reads the upstream log for what a bump
 **fixes** — so this pass added the missing half of it: read the log for the revisions that will
 actually be **imported**, which is not the same set as the submodule SHAs._
@@ -56,7 +58,7 @@ this file calls the single most important experiment in the backlog, and reorgan
 
 ## Suggested order (from Tier 0 through Tier 4)
 
-**Where this actually stands, 2026-08-27.** Thirteen items open and five in progress, and only
+**Where this actually stands, 2026-08-27.** Twelve items open and six in progress, and only
 three are things a committee would notice: **C3** (Chapter 5's claim still rests on a clustering
 proxy), **C9** (interpretability described, not measured) and **E2b** (Table 3.4's FCM row
 overstates the GPU by roughly an order of magnitude). The rest are research scheduled after the
