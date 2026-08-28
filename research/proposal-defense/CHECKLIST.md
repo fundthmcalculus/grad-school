@@ -952,9 +952,21 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       reason that is now proved rather than observed. That is a sharper research question than
       the one §5.5 currently poses, and it points at boundary resolution as the thing to fix.
 
-      **Still owed before quoting:** `data/bodyfat.csv` is untracked and absent from both
-      `reproduce/dataset_specs.yaml` and `PROVENANCE_MAP.md` — 20 KB, well inside the vendoring
-      threshold, and it must be recorded before any number above is cited.
+      ✅ **Provenance discharged 2026-08-28.** `data/bodyfat.csv` is vendored (20 KB,
+      byte-identical to the canonical file — 0 differing cells against
+      `jse.amstat.org/datasets/fat.dat.txt`), registered in `dataset_specs.yaml` where the
+      verifier reads it at 252 × 14 and agrees, mapped in `PROVENANCE_MAP.md`, and documented in
+      `data/bodyfat.names`. Three findings from that pass bear on the numbers above:
+      - **The leak is deterministic, not merely strong.** Siri's $495/D - 450$ reproduces
+        `BodyFat` at $R^2 = 0.9773$ as shipped, $0.9990$ with Johnson's three documented density
+        fixes, and **$1.0000$** excluding the five bad rows. The residual *is* the errata.
+        Dropping `Density` was necessary, and the experiment's own 0.977 understated it.
+      - **Case 169 corrupts the target and is in no published errata list** — recorded 34.3
+        against 36.25 implied by its density, ~2 pp, with the Brozek column confirming the
+        density is the sound one. Found by arithmetic against the 19-column superset.
+      - ⚠️ **The file is not under this repository's GPL-3.0.** It carries a *non-commercial*
+        permission grant from A. Garth Fisher; GPL-3.0 would grant a commercial use he did not.
+        The grant travels with the file in `data/bodyfat.names`.
 
       **The author's answer is true about a real result, and that result is Chapter 4.** There are
       three genuinely end-to-end PhiUSIIL FIS numbers in the repository — `experiments/fis-to-neural-net/outputs/phiusiil.md`
