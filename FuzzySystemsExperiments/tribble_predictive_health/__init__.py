@@ -14,6 +14,7 @@ loaders (`data`) it is built from.
     curve = engine.predict_frame(test)  # deployable RUL trajectory
 """
 
+from . import cache
 from .cache import Bundle, load_or_build, load_or_build_many
 from .data import load_ncmapss
 from .metrics import nasa_score, per_engine_canonical, rmse
@@ -21,6 +22,7 @@ from .pipeline import TribblePredictiveHealth
 
 __all__ = [
     "TribblePredictiveHealth",
+    "cache",
     "load_ncmapss",
     "load_or_build",
     "load_or_build_many",
