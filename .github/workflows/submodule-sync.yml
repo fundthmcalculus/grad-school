@@ -1,0 +1,107 @@
+name: Submodule Sync
+
+# Twice-daily check for new commits on each submodule's own `main` branch.
+# The submodule pins here are otherwise only bumped by hand, so upstream
+# fixes (tribble-fis, optimizers, clustering) silently sit unused until
+# someone remembers to `git submodule update --remote`. This keeps a single
+# moving PR up to date instead: same branch every run, force-pushed, body
+# replaced with whatever changed since the branch was last pushed.
+#
+# research/proposal-defense/ reads results out of these submodules, so any
+# SHA bump here can change its numbers -- the PR body flags that explicitly
+# rather than letting a silent submodule bump land unnoticed.
+
+on:
+  schedule:
+    - cron: '0 6,18 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  SYNC_BRANCH: chore/submodule-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: false
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update submodules to latest main and check for changes
+        id: sync
+        run: |
+          set -euo pipefail
+
+          declare -A OLD_SHA
+          declare -A URL
+
+          while read -r key path; do
+            name=${key#submodule.}
+            name=${name%.path}
+            url=$(git config -f .gitmodules --get "submodule.$name.url")
+            OLD_SHA["$path"]=$(git ls-tree HEAD "$path" | awk '{print $3}')
+            URL["$path"]="$url"
+          done < <(git config -f .gitmodules --get-regexp '\.path$')
+
+          git submodule update --init --remote --merge
+
+          BODY_FILE=$(mktemp)
+          {
+            echo "Automated submodule sync -- checks each submodule's \`main\` branch twice a day and bumps the pin here to match."
+            echo
+            echo "⚠️ These submodules are consumed by \`research/proposal-defense/\`. Please confirm nothing there needs updating (numbers, citations, generated tables) before merging."
+            echo
+            echo "| Submodule | Old SHA | New SHA |"
+            echo "|---|---|---|"
+          } > "$BODY_FILE"
+
+          changed=false
+          for path in "${!OLD_SHA[@]}"; do
+            old="${OLD_SHA[$path]}"
+            new=$(git -C "$path" rev-parse HEAD)
+            if [ "$old" != "$new" ]; then
+              changed=true
+              repo_path=$(echo "${URL[$path]}" | sed -E 's#https://github.com/##; s#\.git$##')
+              compare="https://github.com/$repo_path/compare/$old...$new"
+              echo "| \`$path\` | \`${old:0:7}\` | [\`${new:0:7}\`]($compare) |" >> "$BODY_FILE"
+            fi
+          done
+
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          echo "body_file=$BODY_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Push the moving sync branch
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git checkout -B "$SYNC_BRANCH"
+          git add tribble-fis tribble-opt tribble-cluster
+          git commit -m "chore(submodules): sync to latest main"
+          git push --force origin "$SYNC_BRANCH"
+
+      - name: Open or update the sync PR
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          existing=$(gh pr list --head "$SYNC_BRANCH" --state open --json number -q '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --body-file "${{ steps.sync.outputs.body_file }}"
+          else
+            gh pr create \
+              --title "chore(submodules): sync to latest main" \
+              --body-file "${{ steps.sync.outputs.body_file }}" \
+              --head "$SYNC_BRANCH" \
+              --base main
+          fi
