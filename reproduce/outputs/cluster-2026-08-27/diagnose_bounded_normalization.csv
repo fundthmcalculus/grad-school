@@ -1,0 +1,17 @@
+order,arm,pin_extremes,test R²,train MSE/var,test MSE/var
+1st,raw (no transform),False,0.687 ± 0.049,0.253,0.298
+1st,raw (no transform),True,0.687 ± 0.049,0.254,0.298
+1st,"log + min-max [0,1]  <- shipped",False,0.799 ± 0.026,0.176,0.191
+1st,"log + min-max [0,1]  <- shipped",True,0.795 ± 0.025,0.184,0.195
+1st,"log + min-max [-1,1]  (a)",False,0.798 ± 0.025,0.176,0.192
+1st,"log + min-max [-1,1]  (a)",True,0.751 ± 0.027,0.217,0.237
+1st,log + z-score,False,0.798 ± 0.025,0.176,0.192
+1st,log + z-score,True,0.714 ± 0.042,0.247,0.271
+1st,"log + z-score, clip +/-3  (b)",False,0.797 ± 0.022,0.176,0.193
+1st,"log + z-score, clip +/-3  (b)",True,0.712 ± 0.039,0.246,0.274
+1st,"log + z-score, clip +/-2  (b)",False,0.799 ± 0.015,0.173,0.192
+1st,"log + z-score, clip +/-2  (b)",True,0.666 ± 0.060,0.272,0.317
+1st,z-score on logged cols only  (c),False,0.798 ± 0.025,0.176,0.192
+1st,z-score on logged cols only  (c),True,0.793 ± 0.025,0.182,0.197
+1st,z-score on unlogged cols only  (c),False,0.799 ± 0.026,0.176,0.191
+1st,z-score on unlogged cols only  (c),True,0.753 ± 0.033,0.215,0.236
