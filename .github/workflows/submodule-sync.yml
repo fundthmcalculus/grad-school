@@ -118,7 +118,11 @@ jobs:
         run: |
           set -euo pipefail
           git checkout -B "$SYNC_BRANCH"
-          git add tribble-fis tribble-opt tribble-cluster
+          # Read the paths from .gitmodules rather than hardcoding them, which
+          # is what the detection loop above already does. With a hardcoded
+          # list, adding a fourth submodule would produce a PR whose body
+          # reports a bump it never actually staged -- wrong output, silently.
+          git add $(git config -f .gitmodules --get-regexp '\.path$' | awk '{print $2}')
           git commit -m "chore(submodules): sync to latest main"
           git push --force origin "$SYNC_BRANCH"
 
