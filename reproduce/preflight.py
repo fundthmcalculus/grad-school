@@ -246,8 +246,18 @@ def _pin_match():
     so they go stale quietly. Found 2026-08-27 with `tribble-clustering` five
     commits and `optimizers` eleven commits behind the submodules the archives
     were recording -- across seeding fixes, an FCM membership fix and a GA
-    crossover fix. The numbers were produced by code the provenance record did
-    not name, which is the one failure a provenance record exists to prevent.
+    crossover fix.
+
+    Caught one archive before it mattered: an audit of every existing
+    `PROVENANCE.txt` shows none of them misnamed its code, and the next run
+    would have been the first that did. The check exists because that margin was
+    luck, not design -- nothing was watching this axis at all.
+
+    Note the check is not "submodule SHA equals lock pin". Which record is
+    correct depends on how the environment was built: a study run with
+    `--with-editable tribble-opt` really does run the submodule checkout, and
+    recording its SHA is right. Only the installed distribution knows, so that is
+    what this reads.
 
     A local-directory install cannot drift, so it passes without comment.
     """

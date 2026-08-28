@@ -34,11 +34,12 @@ that will actually be **imported**, which is not the same set as the submodule S
 > multiplies both samples by 1,000 and gets 1,000× the distance back. Chapter 4 and Chapter 6
 > accuracy numbers are quotable from this pin; the ordinary re-quoting that remains is **D8**.
 >
-> 🚨 **Read B18 before trusting any archive's `PROVENANCE.txt`.** For nine days the FIS suite
-> ran `tribble-clustering` and `optimizers` revisions that no archive recorded, because
-> `tribble-fis` resolves both from its own lockfile and the archives stamp the submodule SHAs.
-> Fixed, and preflight now checks it, but archives written before 2026-08-27 name code that
-> did not necessarily run.
+> ⚠️ **B18 — `PROVENANCE.txt` was one archive away from naming code that had not run.**
+> `tribble-fis` resolves `tribble-clustering` and `optimizers` from its own lockfile, and the
+> archives stamp the submodule SHAs; for nine days those were different revisions. Every
+> existing archive checks out — the audit is in B18 — so nothing already written is in doubt.
+> The next one would have been the first that was. Fixed upstream, and preflight's new
+> `PIN-MATCH` check now fails the run rather than trusting the two to agree.
 
 **Legend: ⬜ open · 🟨 in progress · ✅ done · 🚫 descoped · 🔒 blocked on you.**
 
@@ -706,10 +707,35 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       Verified by making it fire on `03-complexity-fit.png`, which is exactly the case that
       caught this: a gcc-built figure (exponent 1.77) above an MSVC-built table quoting 1.97.
 
-- [x] ✅ **B18 — Every FIS-suite archive named a `tribble-clustering` revision that had not run.
-      Found and fixed 2026-08-27.** This is the provenance failure the whole `reproduce/`
-      apparatus exists to prevent, and it hid in the one place nothing was looking: the gap
-      between the submodule a SHA is read from and the wheel an import actually resolves to.
+- [x] ✅ **B18 — `PROVENANCE.txt` records a SHA the FIS suite does not necessarily run.
+      Found and fixed 2026-08-27, one archive before it would have mattered.** The gap is
+      between the submodule a SHA is read from and the wheel an import actually resolves to —
+      the one place the `reproduce/` apparatus was not looking.
+
+      ⚠️ **Scope, corrected after review: no archive was actually misnamed.** A first write-up of
+      this item said every FIS-suite archive named a revision that had not run. That is wrong,
+      and the audit is one command:
+
+      ```
+      $ grep -rh "^tribble-cluster:" reproduce/outputs/*/PROVENANCE.txt | sort | uniq -c
+           23 tribble-cluster: e3c27e67...      7 tribble-cluster: 85b68a8a...
+            7 tribble-cluster: c71171e7...      6 tribble-cluster: 635ed6ed...
+            2 tribble-cluster: 5d44dfa4...
+      ```
+
+      **No archive records `1dcf331b`.** The six from the `635ed6ed` era record exactly what ran.
+      The submodule advanced on 2026-08-24 and the lock did not, and the next archive would have
+      been the first written in the drifted window — this one. So the exposure was real and
+      prospective, not retrospective, and the item is worth keeping at that strength rather than
+      the one it was first written at.
+      **The five `opt-*` archives are correct too, for a reason worth recording.** They record
+      `tribble-opt: 94547ff7` while the lock pinned a later `7b5958a1`, which looks like the same
+      defect and is not: those studies run `--project tribble-fis --with-editable tribble-opt`,
+      and `--with-editable` overrides the lock with the submodule checkout. For them the
+      submodule SHA *is* the code that ran. Which record is right depends on how the environment
+      was built, and neither "the submodule SHA" nor "the lock's pin" is universally the truth —
+      which is exactly why the fix reads the installed distribution's `direct_url.json` instead
+      of picking one of the two by convention.
 
       **The mechanism.** `tribble-fis/pyproject.toml` sources two dependencies from a git URL
       with no revision:
