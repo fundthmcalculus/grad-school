@@ -1,0 +1,5 @@
+Method,Detection rate,False-alarm rate,Detection − false alarm,ROC-AUC,Train time
+**Tribble one-class (surprisal)**,0.993,0.150,+0.843,0.990,3.0 s
+"Tribble one-class (complement, saturates — see note)",0.993,0.150,+0.843,0.928,2.7 s
+Isolation Forest (the RF-family one-class detector),0.001 ± 0.003,0.021 ± 0.005,-0.020,0.898 ± 0.005,3.8 ± 0.0 s
+One-class SVM,0.993,0.152 ± 0.012,+0.841,0.996 ± 0.001,0.1 ± 0.0 s

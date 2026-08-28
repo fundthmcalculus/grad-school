@@ -1,0 +1,20 @@
+preflight (fis)
+--------------------------------------------------------------------------
+  [ok  ] W1-SCALE        x1000 data -> x1000.0 distance
+  [ok  ] SCALER-ALIAS    UnitScalar is MinMaxScaler; StandardScalar is StandardScaler
+  [ok  ] MODEL-NAMES     all three estimator classes present
+  [ok  ] DATASETS        2 required dataset(s) present
+  [ok  ] INSTALL-FRESH   installed builds match the submodule sources
+  [ok  ] PIN-MATCH       tribble-clustering, optimizers match their submodule HEADs
+--------------------------------------------------------------------------
+  6 passed, 0 skipped
+
+preflight (cluster)
+--------------------------------------------------------------------------
+  [ok  ] VAT-MATRIXFREE  ordering elementwise identical to compute_vat
+  [ok  ] DATASETS        2 required dataset(s) present
+  [ok  ] INSTALL-FRESH   installed builds match the submodule sources
+  [skip] PIN-MATCH       no git-sourced vendored dependency installed in this environment
+--------------------------------------------------------------------------
+  3 passed, 1 skipped
+
