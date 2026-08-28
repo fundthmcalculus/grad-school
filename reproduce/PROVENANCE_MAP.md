@@ -255,10 +255,10 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
-| 4.11 BETH anomaly detection *(number reserved; no prose slot yet)* | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95) — note 22 |
-| 4.11(c) BETH feature reduction *(no prose slot yet)* | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95) — note 23 |
-| 4.11(d) BETH matched sample size *(no prose slot yet)* | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing — note 23 |
-| 4.11(e) BETH knob validation *(no prose slot yet)* | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95) - note 24 |
+| 4.11 BETH anomaly detection | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95); prose slot at §4.4 — note 22 |
+| 4.11(c) BETH feature reduction | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.4 — note 23 |
+| 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |
+| 4.11(e) BETH knob validation | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.3–§4.4 — note 24 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
 
 **Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
@@ -1241,3 +1241,35 @@ accuracy parity does not — is strengthened rather than altered.
 regenerated in this pass (`REPRO_THETA_SWEEP` was not set), so §4.4's sentence
 that Table 4.6's sweep "was not run here" still stands, and note 21's ten-seed
 sweep figures remain pre-de-leak.
+
+---
+
+**Note 28 — the RT-IOT2022 θ-sweep is now run on the de-leaked loader, and it
+closes #184's open question: tuning θ does not rescue the complement rule.**
+*(2026-08-27, run of record `outputs/rtiot-deleaked-2026-08-27/`.)*
+
+Note 27 left this owed: the ten-seed re-quote of Table 4.7b did not regenerate
+the θ-sweep, so note 21's sweep figures (peak **+0.391** at θ = 0.80, Isolation
+Forest **+0.534**) were still pre-de-leak. They are now superseded. The sweep and
+the Table 4.7b headline were produced in **one** `table_4_4_openset.py`
+invocation (`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1`, 2h09m), so the
+θ = 0.99 sweep row and the headline complement-rule cell agree by construction —
+the internal inconsistency note 21 recorded for the previous `table_4_4b` (sweep
+detection 0.777 vs headline 0.798) cannot recur.
+
+| θ | detection | false alarm | J | | de-leaked vs note 21 |
+|---|---|---|---|---|---|
+| 0.80 (peak) | 0.914 | 0.518 | **+0.396** | | +0.391 → +0.396 |
+| 0.99 (shipped) | 0.804 | 0.438 | +0.366 | | — |
+| Isolation Forest | 0.966 | 0.431 | **+0.535** | | +0.534 → +0.535 |
+
+The correction moved the digits by thousandths and left every conclusion intact.
+The peak is at θ = 0.80 both before and after — the same operating point the
+Glass sweep (Table 4.6) finds — so the knob's best setting transfers across
+datasets. What does not transfer is the verdict: the best tuned J is **0.139
+below Isolation Forest**, which leads at every θ. So the gap Table 4.7b reports is
+**fundamental to this dataset, not an artefact of the shipped operating point** —
+which is the question §4.4 and Fig 4.2's missing row were both waiting on.
+Written into prose as **Table 4.7c** (§4.4). This closes the substantive half of
+grad-school#184; the only remainder is whether to redraw Fig 4.2 with a second
+(RT-IOT2022) panel, a presentation choice, not a measurement gap.

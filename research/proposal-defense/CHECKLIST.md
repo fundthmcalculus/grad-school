@@ -1004,6 +1004,26 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       committed report and Table 4.10 are regenerated with what this host reproducibly measures now
       (`whole_cycle` 15.44/12.07/320, `raw_memory` 15.58/17.00/655, blend 11.14/216, DS02 solo 7.23),
       and both scripts' docstrings and §4.4.1 say so instead of citing the unreproduced numbers.
+- [x] ✅ **C19 — BETH one-class anomaly detection landed (grad-school #95 / #180), two trackers
+      hadn't caught up** (2026-08-27; Ch 4 §4.4, Table 4.11 and companions 4.11(b)-(e)). The
+      blocker WORKINGDOC.md §6 and Ch 7 §7.3 named — BETH needs a purpose-built one-class
+      training path, not the leave-one-class-out protocol Glass/RT-IOT2022 use — is resolved:
+      `tribblefis.one_class.TribbleOneClassDetector` already existed in the library, and
+      `table_4_11_beth_anomaly.py` plus three companion sweeps (`table_4_11c/d/e_*.py`) now run
+      it on the full 1.14M-row BETH capture. On the configuration §4.3.5 was written for, the
+      complement rule reaches parity with a one-class SVM ($J$ +0.843 vs +0.841), and the
+      "conorm is inert with a single class" algebra §4.3 argues traces correctly into
+      `gauss_math.py`. Landing this updated WORKINGDOC §6 and Ch 7's timeline row, but left two
+      trackers stale: `reproduce/PROVENANCE_MAP.md`'s four Table 4.11 rows still read *"no prose
+      slot yet"* after the prose section existed, and `data/.gitignore` still named the
+      pre-rename `table_4_x_beth_anomaly.py`. Both fixed here. Separately,
+      `table_4_11e_beth_boost_sweep.py`'s θ-sweep "control" model built its Gaussian memberships
+      without threading the loop's `seed` into `create_gaussian_membership_dict`'s own
+      `random_state` (default 42), so for seeds other than 42 it was not provably "the same
+      fitted memberships" its own comment claimed against the seeded `TribbleOneClassDetector`
+      control. Fixed by passing `random_state=seed` through; unlikely to move the table's
+      verdict (the delta-detection metric it reports is the point of the algebraic argument, not
+      dependent on this), but the seeding is now actually as described.
 - [ ] ⬜ **C11 — Benchmark `IVATMeans` against FCM and k-means** *(Ch 7 **G9**,
       Ch 3 §3.3.5).* §3.3.5 now presents `IVATMeans` as a contribution, and every property it
       claims is provable from `ivatmeans.py` rather than measured: initialization-free because
@@ -1178,6 +1198,19 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       ```bash
       grep -rn "CONSOLIDATE" research/proposal-defense/prose/
       ```
+
+      **Per-passage audit from the parallel pass on main, kept because it
+      enumerates what this entry only spot-checked:**
+      **Audit complete: 6 of 7 already consolidated into flowing text; 1 remains archival.**
+      All seven passages located and reviewed:
+      (1) §3.3.3 device win (30-56× vs 1.2-3.7×) — integrated into algorithm explanation
+      (2) §4.3 z-score collapse — framed as caveat on normalization choice
+      (3) §4.4 zeroth-order failure — mechanism explained inline, numbers given once
+      (4) §5.4 NameError reproduction — kept in A.5 Reproducibility section (archival)
+      (5) §5.4 many_scale paragraph — integrated as single statement of measurement
+      (6) §6.4 optimizer comparison — old 2-optimizer vs new 8-optimizer, naturally framed
+      (7) A.6 z-score withdrawal — one sentence suffices; full investigation in A.6.
+      **No HTML `<!-- CONSOLIDATE -->` markers added;** passages flow without archaeology.
 
       `research/proposal-defense/mark_consolidations.py` inserts and re-checks them; the markers
       are HTML comments, which `build_pdf.py` strips, so they are invisible in the PDF and
@@ -1488,21 +1521,28 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       a `converged` flag; until it lands, no single-run FCM timing from this library is
       quotable, since 11-to-100-iteration variance is exactly why every FCM cell in Table 3.4
       carries a spread as large as its mean.
-- [ ] ⬜ **E3 — Schedule or explicitly defer G8.** Ch 7 assigns it 2028 Q1 and one quarter of
-      effort; Ch 10's Gantt and quarter grid omit it entirely. 2028 Q1 already carries the
-      capstone, G6, G7, writing and the defense.
-- [ ] ⬜ **E4 — Bound the Magdalena/G8 tension.** Ch 5 §5.5 and Ch 6 §6.2 both concede joint 2-D
-      memberships approach what Magdalena's condition forbids, and both defer to stretch goals
-      scheduled after the defense. Consider stating in §6.2 that the chapter's claim holds
-      *without* G8, so the hole is bounded rather than pending.
-- [ ] ⬜ **E5 — Decide the SHAP question** (§2.6). The position is argued and explicitly
-      untested, in the section that justifies the dissertation. Either scope a minimal
-      comparison into G6, or reframe from "post-hoc is worse" to "post-hoc answers a different
-      question," which needs no experiment.
-- [ ] ⬜ **E6 — Give the Concrete benchmark one canonical citation.** Ch 4 and Ch 6 now agree
-      cell-for-cell and all 35 values trace to harness CSVs, but no chapter yet *cites* a named
-      table instead of restating values — which is the mechanism that let the numbers drift in
-      the first place.
+- [x] ✅ **E3 — Schedule or explicitly defer G8 (2026-08-27: verified done).** Table 7.1 
+      already records G8 as "retargeted post-defense" and "not in the runway"; §7.2 confirms 
+      "construction is retargeted post-defense, to a journal extension." Decision is locked in 
+      across all three documentation points (Ch 7 table, Ch 7 prose, Ch 10 Gantt).
+- [x] ✅ **E4 — Bound the Magdalena/G8 tension (2026-08-27: done).** Strengthened §6.2 to 
+      explicitly state "This chapter's interpretability argument holds *without* G8." Expanded 
+      passage to list what is complete (solver, trees, mixture, structure spec, Ruspini export) 
+      and clarified that G8 is proposed as post-defense extension, with decision rule clear: 
+      measurement of disjunct-counter frequency decides if G8 is worth building.
+- [x] ✅ **E5 — Decide the SHAP question** (§2.6). **DECIDED: Reframe from "post-hoc is worse" 
+      to "post-hoc answers a different question", no experiment needed (2026-08-27).** The V&V 
+      review (2026-08-24, finding V2) added `rudin2019stop` to the SHAP paragraph, positioning 
+      the choice as: post-hoc attribution answers *"how did this model decide?"* while 
+      interpretable-by-construction answers *"can I understand and edit this model?"* These are 
+      different questions. For high-stakes domains where editability and verifiability matter, 
+      the latter is more valuable — which is what this dissertation chooses. Rudin makes the 
+      same case. No SHAP comparison is owed to G6; §2.6 stands as reframed.
+- [x] ✅ **E6 — Give the Concrete benchmark one canonical citation (2026-08-27).** 
+      Added explicit table citations in both chapters where Concrete Compressive Strength 
+      values are quoted: §4.4 line 195 → "(Table 4.1, full 2nd order)" and §6.3.5 line 103 → 
+      "(Table 6.1)". Both cite the canonical Concrete baseline measurement rather than merely 
+      restating numbers, reducing drift risk by making the provenance explicit on first mention.
 - [x] ✅ **E7 — Two literature searches done; attribution pass done (2026-08-21).** Both searches
       ran and their findings are folded into Ch 6:
       **(1) Knot/breakpoint optimization.** A strong triangular partition of unity *is* the order-2
@@ -1647,7 +1687,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       subsection (possible Kreinovich nod); (c) Ch 5 — consolidate the Options A–D membership
       presentation (recommend leading with D + the persistence ramp, A/B/C supporting);
       (d) engineering debt — de-duplicate the six caller scripts' predict loops in `tribble-fis`.
-      **(a) and (b) are decided as of 2026-08-24** (V&V framing pass; review in
+      **(a), (b), and (c) are decided/done as of 2026-08-27** (V&V framing pass; review in
       `reviews/2026-08-24-prose-review-vv.md`). (a) *Lightly in Ch 1, substantively in Ch 2.*
       §1.1 keeps two clauses and a pointer; the argument itself lives in §2.6's new
       "Verification, validation, and certifiable AI" subsection, so the framing is stated once
@@ -1673,6 +1713,10 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       *"Iteratively Increasing Complexity During Optimization for Formally Verifiable Fuzzy
       Systems"* (2019). Both are now cited in §2.1, where the `.bib` header had claimed
       `arnett2018proposal` was cited all along and it was not.
+      **(c) ✅ §5.3 methodology sections reorganized (2026-08-27)**: Chapter 5's §5.3 now leads with
+      multi-scale approach (band discovery + persistence ramp memberships), supporting with flat
+      set-cover as an alternative. Reordered §5.3.2–5.3.4 with all cross-references updated.
+      
       **(d) landed upstream, unnoticed here until 2026-08-27** — `tribble-fis` #194 (`3daf0f4`)
       extracts `regressor_report` / `classifier_report` / `evaluate_model` into
       `tribble-tree/demo_utils.py` and moves `demo_concrete.py`, `demo_phishing.py`,
@@ -1680,7 +1724,10 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       behavioural change. Verified at the pin by reading the module and its four callers, not
       from the commit message. Nothing in `reproduce/` touches those scripts, so no table moves.
       This is the fourth blocker in this file retired by an upstream commit nobody read —
-      the pattern **B13**'s standing procedure exists to catch. **(c) remains open.**
+      the pattern **B13**'s standing procedure exists to catch.
+      **All four sub-items are now closed** — (a) and (b) on 2026-08-24, (c) and (d) on
+      2026-08-27, the last two in parallel passes that did not know about each other. This item
+      can be retired at the next tidy.
 - [ ] 🟨 **E11 — The citation half is done (2026-08-27); the framing half is still open.**
       Every site this item was blocked on turned out to be reachable, so five entries were
       re-checked against the source rather than against a listing about the source, and the

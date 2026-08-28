@@ -147,12 +147,19 @@ def _det_at_fa(scores, is_anom, target_fa):
     return det, fa
 
 
-def _build_theta_model(Xfit):
+def _build_theta_model(Xfit, seed):
     """Membership model with the anomaly rule enabled, theta swept separately.
 
     theta enters only at the anomaly step, so the model is theta-independent and
     is built once -- the same reuse `table_4_4_openset.py` verified bit-identical
     to a theta-at-a-time loop.
+
+    `seed` is threaded into `create_gaussian_membership_dict`'s own
+    `random_state` (default 42, otherwise fixed regardless of the caller's seed
+    loop) so this fit and the `TribbleOneClassDetector` control built from the
+    same `Xfit` below are seeded identically -- required for the "same fitted
+    memberships" claim on that control to actually hold across seeds, not just
+    at the library default.
     """
     from tribblefis.gauss_data import AnomalyParameters
     from tribblefis.gauss_math import (
@@ -164,7 +171,9 @@ def _build_theta_model(Xfit):
     y = pd.Series("normal", index=Xfit.index, name="y_value")
     diffs = calculate_gaussian_correlation(Xfit, y)
     _, top_vars = take_top_features(diffs, top_p=1.0)
-    memb = create_gaussian_membership_dict(Xfit, y, top_n_var_names=top_vars)
+    memb = create_gaussian_membership_dict(
+        Xfit, y, top_n_var_names=top_vars, random_state=seed
+    )
     params = AnomalyParameters(
         include_anomaly=True,
         threshold=THETAS[0],
@@ -215,7 +224,7 @@ def main():
 
         # ---- arm 1: the boost theta, against a firing-strength threshold ----
         try:
-            model = _build_theta_model(Xfit)
+            model = _build_theta_model(Xfit, seed)
             flags = _theta_flags(model, Xte, THETAS)
             # The control score is the complement, 1 - max firing: a monotone
             # function of the very quantity the theta rule thresholds, from the
