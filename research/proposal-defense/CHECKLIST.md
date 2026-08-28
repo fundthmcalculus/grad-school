@@ -23,11 +23,12 @@ _Overnight reproduction pass against latest `main` and latest submodules, 2026-0
 _Second overnight pass, 2026-08-27: submodules synced to their upstream heads, **B14** closed,
 **B18** opened and fixed, **E9** answered, **E11**'s citation half closed, and five items found
 to have been done for days without being ticked (**B16(a)**, **B16(b)**, **B16(d)**, **D7**,
-**E10(d)**). Outstanding items **28 → 18**: open 25 → 12, the one 🔒 cleared, and in-progress
+**E10(d)**). Outstanding items **28 → 17**: open 25 → 11, the one 🔒 cleared, and in-progress
 2 → 6 because four items (**C1**, **D8**, **E1**, **E2b**) moved from *not started* to *half
-done* rather than closing — while **C3** went the other way. Its clarification arrived on
-2026-08-28 and resolved it to *not started*, which is what Ch 7's own tracker had said all
-along. The recurring lesson is the one
+done* rather than closing. **C3 went the whole way in a day**: the author's clarification
+arrived on 2026-08-28 and resolved it to *not started* — which is what Ch 7's own tracker had said
+all along — and it was then **discharged the same day**, with a negative result. The recurring
+lesson is the one
 **B13**'s standing procedure already names — nobody reads the upstream log for what a bump
 **fixes** — so this pass added the missing half of it: read the log for the revisions that will
 actually be **imported**, which is not the same set as the submodule SHAs._
@@ -60,11 +61,12 @@ this file calls the single most important experiment in the backlog, and reorgan
 
 ## Suggested order (from Tier 0 through Tier 4)
 
-**Where this actually stands, 2026-08-28.** Twelve items open and six in progress. Two are
-still things a committee would notice — **C3** (Chapter 5's claim rests on a clustering proxy,
-now confirmed rather than suspected) and **C9** (interpretability described, not measured) — and a third, **E2b**, has stopped being
-one: Table 3.4 is measured, and what is left there is the sentence in §3.3.3 that has to say
-which comparison it is making. The rest are research scheduled after the defense, or editorial.
+**Where this actually stands, 2026-08-28.** Eleven items open and six in progress. One is still
+a thing a committee would notice — **C9** (interpretability described, not measured). **C3 closed
+the same day it was clarified**, and the negative it returned is worth more than the proxy it
+replaced. **E2b** has also stopped being one: Table 3.4 is measured, and what is left there is
+the sentence in §3.3.3 that has to say which comparison it is making. The rest are research
+scheduled after the defense, or editorial.
 
 **C1 changed shape today rather than closing.** The ANFIS and GA-FIS adapters landed, so the
 title's *orders of magnitude faster* finally has something to be faster *than* — but the run is
@@ -881,11 +883,78 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       farthest-point sampling is *necessary* but not that it is *sufficient*.
       Until these are settled, G4's half-million-point target rests on a single-level result.
       Noted briefly in Ch 7 G4e.
-- [ ] ⬜ **C3 — Ch 5 end-to-end FIS result. The clarification is in and C3 stays open** (author
-      answered 2026-08-28: *"C3 results are end to end"*; verified against the code the same day).
-      Every Ch 5 number is a *clustering* score; the chapter exists to produce FIS antecedents.
-      Until a model is built from those memberships and measured, the central claim rests on a
-      proxy. Ch 7 §7.2 tracks this as **C3**.
+- [x] ✅ **C3 — DISCHARGED 2026-08-28, and the answer is negative.** A model whose antecedents are
+      `MS.block_membership` output is now fitted through `solve_tsk_consequents_from_firing` and
+      scored **held out** at two venues, ten seeds, against the Chapter 4 arm on identical splits.
+      No ARI, NMI or silhouette appears anywhere in the output — a clustering score is the proxy
+      this item existed to replace. `reproduce/experiments/ch5_end_to_end.py`;
+      outputs `ch5_end_to_end{,_ecg5000,_diagnostics,_raw}`.
+
+      **Read the floors first, because the headline cell is misleading on its own.** bodyfat,
+      10 × 5-fold, every arm on the same `(train, test)` pairs:
+
+      | arm | held-out $R^2$ |
+      |---|---:|
+      | floor: **plain OLS, all 13 features** | **0.698 ± 0.005** |
+      | floor: **plain OLS, the three used columns** | **0.668 ± 0.007** |
+      | antecedent-free global 1-rule TSK | 0.662 ± 0.010 |
+      | Ch 5 crisp `MS.assign` → TSK | 0.659 ± 0.013 |
+      | **Ch 5 graded `U` → TSK** | **0.653 ± 0.013** |
+      | **Ch 4 `TribbleRegressor`** | **0.633 ± 0.036** |
+      | floor: predict the train mean | −0.024 ± 0.015 |
+
+      Chapter 5 *beats* Chapter 4 here, and that comparison means nothing on its own. The
+      **antecedent-free** arm — identical features, order and ridge, with the antecedents
+      **deleted** — beats it (paired $-0.0085 \pm 0.0089$, 8 of 10 seeds), and **every fuzzy arm
+      in the table loses to ordinary least squares** on the same columns. On this dataset the
+      score is the consequent polynomial; the memberships are along for the ride.
+
+      🔬 **The mechanism is structural, not a property of bodyfat.** Measured over all 50 folds
+      with **zero variance**: `max μ over non-members = 0.5000 ± 0.0000`. That is a theorem, not a
+      measurement. A non-member reaches a single-linkage block only across the edge that dissolves
+      it, so $d_B(x) \geq \text{death}_B$, and `block_membership`'s Gaussian sits at half-max
+      exactly at `death`. **`block_membership` can never place a non-member above 0.5, on any
+      data.** With 12.7% of points in a block core, mean max normalized membership is 0.271
+      against a uniform $1/k$ of 0.156 — every rule fires nearly equally for every point, and the
+      TSK collapses onto the global fit ($r = 0.983$ between the graded arm's predictions and the
+      antecedent-free control's).
+
+      This **upgrades** `phase6_soft_validation`'s empirical finding to a structural one, and
+      corrects its wording: *"a constant step per cluster"* is the two-block case. Here `U` takes
+      81.7 distinct values across 252 points — it does vary among non-members, within $(0, 0.5]$.
+      The accurate statement is **no resolution above half-max**.
+
+      ⚠️ **Graded-versus-crisp is protocol-dependent, and reading only one protocol inverts it.**
+      Transductively, crisp is ahead (0.659 / 0.660 against 0.653). **Inductively** — $D^*$, cover
+      and memberships built on train rows only — **graded is ahead**, $+0.0200 \pm 0.0159$, 9 of
+      10 seeds. On ECG5000 the inductive pair goes the other way (crisp 0.909, graded 0.905). So
+      gradation does buy something against *hardening*; it buys nothing against *deleting the
+      antecedents*, which is the question C3 asks. Real, small, and sign-unstable across venues.
+
+      ✅ **ECG5000 carries the one positive, and it is the venue that matters more** (DTW, genuinely
+      coordinate-free). Ten seeds, 70/30 stratified: graded 0.897 ± 0.006, crisp 0.898 ± 0.005,
+      inductive 0.905 / 0.909, against a majority floor of **0.584** — and the antecedent-free
+      control lands **exactly on the floor**, both accuracy and macro-F1. So here the antecedents
+      *are* informative, and it survives the leak-free protocol (inductive is slightly better than
+      transductive). Gradation still adds nothing over `MS.assign`. Macro-F1 is 0.385 on a
+      2919/1767/194/96/24 class balance, so the minority classes are not being learned.
+
+      **One inherited piece of tuning, disclosed rather than buried:** `order="2nd"`,
+      `l2_reg=1e-2` come from `bodyfat.py`'s own 64-config sweep, scored on these same partitions.
+      It flatters the **Chapter 4** arm, so the negative result is robust to it. Nothing was
+      swept here; every arm added after the first scores came from adversarial review, and every
+      pre-existing arm reproduces bit-for-bit.
+
+      **What this buys the document.** §5.4 can stop saying the end-to-end result is missing and
+      start reporting it. The honest Chapter 5 claim is now narrower and better evidenced: the
+      construction recovers *structure* (ECG5000, 0.897 against a 0.584 floor, coordinate-free)
+      and its *gradation* is not yet carrying information a supervised objective can use, for a
+      reason that is now proved rather than observed. That is a sharper research question than
+      the one §5.5 currently poses, and it points at boundary resolution as the thing to fix.
+
+      **Still owed before quoting:** `data/bodyfat.csv` is untracked and absent from both
+      `reproduce/dataset_specs.yaml` and `PROVENANCE_MAP.md` — 20 KB, well inside the vendoring
+      threshold, and it must be recorded before any number above is cited.
 
       **The author's answer is true about a real result, and that result is Chapter 4.** There are
       three genuinely end-to-end PhiUSIIL FIS numbers in the repository — `experiments/fis-to-neural-net/outputs/phiusiil.md`

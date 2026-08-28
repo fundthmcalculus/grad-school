@@ -1,0 +1,811 @@
+venue,arm,seed,fold,rmse_or_accuracy,r2_or_macro_f1
+bodyfat,Ch5 graded U -> TSK (trio),0,0,4.022441,0.776281
+bodyfat,Ch5 crisp assign -> TSK (trio),0,0,4.122600,0.765001
+bodyfat,Ch5 crisp argmax U -> TSK (trio),0,0,4.145994,0.762326
+bodyfat,Ch5 graded U inductive -> TSK (trio),0,0,4.147545,0.762148
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),0,0,4.063084,0.771737
+bodyfat,Ch5 graded U -> TSK (all 13),0,0,5.870346,0.523513
+bodyfat,Ch5 crisp assign -> TSK (all 13),0,0,5.217802,0.623557
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",0,0,4.208554,0.755100
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",0,0,4.840443,0.676038
+bodyfat,global 1-rule TSK (trio),0,0,4.321249,0.741808
+bodyfat,global 1-rule TSK (all 13),0,0,3.931043,0.786332
+bodyfat,floor: OLS (trio),0,0,4.284900,0.746134
+bodyfat,"floor: OLS (trio, log1p-scaled)",0,0,5.021400,0.651363
+bodyfat,floor: OLS (all 13),0,0,3.988795,0.780008
+bodyfat,floor: predict train mean,0,0,8.504360,-0.000016
+bodyfat,Ch5 graded U -> TSK (trio),0,1,5.339715,0.369654
+bodyfat,Ch5 crisp assign -> TSK (trio),0,1,5.339962,0.369596
+bodyfat,Ch5 crisp argmax U -> TSK (trio),0,1,5.213292,0.399149
+bodyfat,Ch5 graded U inductive -> TSK (trio),0,1,5.538265,0.321906
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),0,1,5.306310,0.377516
+bodyfat,Ch5 graded U -> TSK (all 13),0,1,5.358192,0.365284
+bodyfat,Ch5 crisp assign -> TSK (all 13),0,1,5.500854,0.331036
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",0,1,5.191167,0.404238
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",0,1,8.138239,-0.464211
+bodyfat,global 1-rule TSK (trio),0,1,5.209134,0.400107
+bodyfat,global 1-rule TSK (all 13),0,1,5.007618,0.445623
+bodyfat,floor: OLS (trio),0,1,4.999784,0.447356
+bodyfat,"floor: OLS (trio, log1p-scaled)",0,1,5.333484,0.371124
+bodyfat,floor: OLS (all 13),0,1,4.596602,0.532893
+bodyfat,floor: predict train mean,0,1,6.909327,-0.055393
+bodyfat,Ch5 graded U -> TSK (trio),0,2,4.714298,0.649953
+bodyfat,Ch5 crisp assign -> TSK (trio),0,2,4.343782,0.702814
+bodyfat,Ch5 crisp argmax U -> TSK (trio),0,2,5.111574,0.588469
+bodyfat,Ch5 graded U inductive -> TSK (trio),0,2,4.584862,0.668911
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),0,2,4.976437,0.609941
+bodyfat,Ch5 graded U -> TSK (all 13),0,2,6.922432,0.245238
+bodyfat,Ch5 crisp assign -> TSK (all 13),0,2,8.091630,-0.031252
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",0,2,4.390877,0.696335
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",0,2,6.652593,0.302933
+bodyfat,global 1-rule TSK (trio),0,2,4.510243,0.679600
+bodyfat,global 1-rule TSK (all 13),0,2,3.944439,0.754945
+bodyfat,floor: OLS (trio),0,2,4.448430,0.688322
+bodyfat,"floor: OLS (trio, log1p-scaled)",0,2,5.533834,0.517669
+bodyfat,floor: OLS (all 13),0,2,3.975415,0.751081
+bodyfat,floor: predict train mean,0,2,8.092427,-0.031455
+bodyfat,Ch5 graded U -> TSK (trio),0,3,5.156199,0.706941
+bodyfat,Ch5 crisp assign -> TSK (trio),0,3,5.301090,0.690239
+bodyfat,Ch5 crisp argmax U -> TSK (trio),0,3,5.026488,0.721500
+bodyfat,Ch5 graded U inductive -> TSK (trio),0,3,5.157046,0.706844
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),0,3,5.344932,0.685094
+bodyfat,Ch5 graded U -> TSK (all 13),0,3,55.784069,-33.301780
+bodyfat,Ch5 crisp assign -> TSK (all 13),0,3,6.555070,0.526357
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",0,3,5.529686,0.662948
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",0,3,12.675884,-0.771139
+bodyfat,global 1-rule TSK (trio),0,3,5.227624,0.698765
+bodyfat,global 1-rule TSK (all 13),0,3,6.080916,0.592400
+bodyfat,floor: OLS (trio),0,3,5.387880,0.680013
+bodyfat,"floor: OLS (trio, log1p-scaled)",0,3,6.002137,0.602892
+bodyfat,floor: OLS (all 13),0,3,4.982661,0.726335
+bodyfat,floor: predict train mean,0,3,9.935082,-0.088026
+bodyfat,Ch5 graded U -> TSK (trio),0,4,4.473739,0.711557
+bodyfat,Ch5 crisp assign -> TSK (trio),0,4,4.416468,0.718895
+bodyfat,Ch5 crisp argmax U -> TSK (trio),0,4,4.395632,0.721541
+bodyfat,Ch5 graded U inductive -> TSK (trio),0,4,4.711994,0.680016
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),0,4,5.300251,0.595133
+bodyfat,Ch5 graded U -> TSK (all 13),0,4,5.243694,0.603728
+bodyfat,Ch5 crisp assign -> TSK (all 13),0,4,5.065238,0.630241
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",0,4,4.451382,0.714433
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",0,4,6.391754,0.411212
+bodyfat,global 1-rule TSK (trio),0,4,4.481414,0.710566
+bodyfat,global 1-rule TSK (all 13),0,4,4.716433,0.679413
+bodyfat,floor: OLS (trio),0,4,4.415687,0.718994
+bodyfat,"floor: OLS (trio, log1p-scaled)",0,4,5.023572,0.636299
+bodyfat,floor: OLS (all 13),0,4,4.762370,0.673137
+bodyfat,floor: predict train mean,0,4,8.333048,-0.000753
+bodyfat,Ch5 graded U -> TSK (trio),1,0,4.448828,0.730910
+bodyfat,Ch5 crisp assign -> TSK (trio),1,0,4.259096,0.753372
+bodyfat,Ch5 crisp argmax U -> TSK (trio),1,0,4.316996,0.746621
+bodyfat,Ch5 graded U inductive -> TSK (trio),1,0,4.472569,0.728030
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),1,0,4.564709,0.716709
+bodyfat,Ch5 graded U -> TSK (all 13),1,0,136.296955,-251.568410
+bodyfat,Ch5 crisp assign -> TSK (all 13),1,0,6.426284,0.438530
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",1,0,4.183257,0.762077
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",1,0,8.588199,-0.002792
+bodyfat,global 1-rule TSK (trio),1,0,4.406844,0.735965
+bodyfat,global 1-rule TSK (all 13),1,0,4.032534,0.778913
+bodyfat,floor: OLS (trio),1,0,4.617246,0.710150
+bodyfat,"floor: OLS (trio, log1p-scaled)",1,0,5.058496,0.652104
+bodyfat,floor: OLS (all 13),1,0,4.377419,0.739479
+bodyfat,floor: predict train mean,1,0,8.633010,-0.013284
+bodyfat,Ch5 graded U -> TSK (trio),1,1,4.499534,0.725911
+bodyfat,Ch5 crisp assign -> TSK (trio),1,1,4.788369,0.689593
+bodyfat,Ch5 crisp argmax U -> TSK (trio),1,1,4.774026,0.691450
+bodyfat,Ch5 graded U inductive -> TSK (trio),1,1,4.819369,0.685561
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),1,1,4.856282,0.680726
+bodyfat,Ch5 graded U -> TSK (all 13),1,1,6.687897,0.394470
+bodyfat,Ch5 crisp assign -> TSK (all 13),1,1,5.369286,0.609708
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",1,1,4.651053,0.707141
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",1,1,7.699542,0.197424
+bodyfat,global 1-rule TSK (trio),1,1,4.499961,0.725859
+bodyfat,global 1-rule TSK (all 13),1,1,4.478909,0.728418
+bodyfat,floor: OLS (trio),1,1,4.670224,0.704722
+bodyfat,"floor: OLS (trio, log1p-scaled)",1,1,4.857189,0.680606
+bodyfat,floor: OLS (all 13),1,1,4.332007,0.745941
+bodyfat,floor: predict train mean,1,1,8.596714,-0.000509
+bodyfat,Ch5 graded U -> TSK (trio),1,2,4.492600,0.599250
+bodyfat,Ch5 crisp assign -> TSK (trio),1,2,4.747838,0.552421
+bodyfat,Ch5 crisp argmax U -> TSK (trio),1,2,4.492764,0.599220
+bodyfat,Ch5 graded U inductive -> TSK (trio),1,2,4.416948,0.612633
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),1,2,5.633872,0.369780
+bodyfat,Ch5 graded U -> TSK (all 13),1,2,6.396191,0.187691
+bodyfat,Ch5 crisp assign -> TSK (all 13),1,2,5.475362,0.404744
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",1,2,4.670840,0.566820
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",1,2,6.226171,0.230302
+bodyfat,global 1-rule TSK (trio),1,2,4.407623,0.614267
+bodyfat,global 1-rule TSK (all 13),1,2,4.730633,0.555659
+bodyfat,floor: OLS (trio),1,2,4.597273,0.580358
+bodyfat,"floor: OLS (trio, log1p-scaled)",1,2,4.650064,0.570665
+bodyfat,floor: OLS (all 13),1,2,4.423822,0.611426
+bodyfat,floor: predict train mean,1,2,7.097524,-0.000212
+bodyfat,Ch5 graded U -> TSK (trio),1,3,4.693301,0.682253
+bodyfat,Ch5 crisp assign -> TSK (trio),1,3,4.517491,0.705613
+bodyfat,Ch5 crisp argmax U -> TSK (trio),1,3,4.763476,0.672680
+bodyfat,Ch5 graded U inductive -> TSK (trio),1,3,4.660001,0.686746
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),1,3,4.392422,0.721688
+bodyfat,Ch5 graded U -> TSK (all 13),1,3,6.905787,0.312060
+bodyfat,Ch5 crisp assign -> TSK (all 13),1,3,7.247027,0.242393
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",1,3,4.556974,0.700445
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",1,3,7.524815,0.183200
+bodyfat,global 1-rule TSK (trio),1,3,4.780359,0.670356
+bodyfat,global 1-rule TSK (all 13),1,3,6.678623,0.356575
+bodyfat,floor: OLS (trio),1,3,4.602745,0.694397
+bodyfat,"floor: OLS (trio, log1p-scaled)",1,3,5.646796,0.540031
+bodyfat,floor: OLS (all 13),1,3,4.559781,0.700076
+bodyfat,floor: predict train mean,1,3,8.364847,-0.009346
+bodyfat,Ch5 graded U -> TSK (trio),1,4,5.564063,0.608037
+bodyfat,Ch5 crisp assign -> TSK (trio),1,4,5.472192,0.620874
+bodyfat,Ch5 crisp argmax U -> TSK (trio),1,4,5.526697,0.613284
+bodyfat,Ch5 graded U inductive -> TSK (trio),1,4,5.622668,0.599737
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),1,4,5.486506,0.618888
+bodyfat,Ch5 graded U -> TSK (all 13),1,4,6.176205,0.517048
+bodyfat,Ch5 crisp assign -> TSK (all 13),1,4,6.321365,0.494079
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",1,4,5.449695,0.623985
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",1,4,5.343765,0.638461
+bodyfat,global 1-rule TSK (trio),1,4,5.657253,0.594798
+bodyfat,global 1-rule TSK (all 13),1,4,4.975752,0.686543
+bodyfat,floor: OLS (trio),1,4,5.224797,0.654379
+bodyfat,"floor: OLS (trio, log1p-scaled)",1,4,6.462222,0.471282
+bodyfat,floor: OLS (all 13),1,4,4.801597,0.708101
+bodyfat,floor: predict train mean,1,4,9.014327,-0.028791
+bodyfat,Ch5 graded U -> TSK (trio),2,0,4.569162,0.679272
+bodyfat,Ch5 crisp assign -> TSK (trio),2,0,4.639277,0.669353
+bodyfat,Ch5 crisp argmax U -> TSK (trio),2,0,4.593942,0.675783
+bodyfat,Ch5 graded U inductive -> TSK (trio),2,0,4.559912,0.680569
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),2,0,4.731564,0.656067
+bodyfat,Ch5 graded U -> TSK (all 13),2,0,6.991506,0.249059
+bodyfat,Ch5 crisp assign -> TSK (all 13),2,0,8.307420,-0.060222
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",2,0,4.515000,0.686830
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",2,0,6.745604,0.300953
+bodyfat,global 1-rule TSK (trio),2,0,4.612565,0.673149
+bodyfat,global 1-rule TSK (all 13),2,0,4.989718,0.617513
+bodyfat,floor: OLS (trio),2,0,4.661707,0.666148
+bodyfat,"floor: OLS (trio, log1p-scaled)",2,0,5.216641,0.581933
+bodyfat,floor: OLS (all 13),2,0,4.513821,0.686994
+bodyfat,floor: predict train mean,2,0,8.161834,-0.023387
+bodyfat,Ch5 graded U -> TSK (trio),2,1,4.847598,0.662503
+bodyfat,Ch5 crisp assign -> TSK (trio),2,1,4.710846,0.681277
+bodyfat,Ch5 crisp argmax U -> TSK (trio),2,1,4.690118,0.684075
+bodyfat,Ch5 graded U inductive -> TSK (trio),2,1,4.680181,0.685413
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),2,1,4.763963,0.674049
+bodyfat,Ch5 graded U -> TSK (all 13),2,1,5.057936,0.632580
+bodyfat,Ch5 crisp assign -> TSK (all 13),2,1,5.173411,0.615612
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",2,1,4.729521,0.678745
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",2,1,6.987387,0.298794
+bodyfat,global 1-rule TSK (trio),2,1,4.797211,0.669483
+bodyfat,global 1-rule TSK (all 13),2,1,4.359774,0.727012
+bodyfat,floor: OLS (trio),2,1,4.807280,0.668094
+bodyfat,"floor: OLS (trio, log1p-scaled)",2,1,5.304155,0.595938
+bodyfat,floor: OLS (all 13),2,1,4.680311,0.685395
+bodyfat,floor: predict train mean,2,1,8.394863,-0.012146
+bodyfat,Ch5 graded U -> TSK (trio),2,2,5.452713,0.561268
+bodyfat,Ch5 crisp assign -> TSK (trio),2,2,5.269306,0.590286
+bodyfat,Ch5 crisp argmax U -> TSK (trio),2,2,5.142506,0.609767
+bodyfat,Ch5 graded U inductive -> TSK (trio),2,2,5.281452,0.588395
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),2,2,5.736587,0.514397
+bodyfat,Ch5 graded U -> TSK (all 13),2,2,5.702995,0.520068
+bodyfat,Ch5 crisp assign -> TSK (all 13),2,2,6.616773,0.353949
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",2,2,5.127082,0.612105
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",2,2,5.569310,0.542304
+bodyfat,global 1-rule TSK (trio),2,2,5.377200,0.573335
+bodyfat,global 1-rule TSK (all 13),2,2,5.340344,0.579164
+bodyfat,floor: OLS (trio),2,2,5.039573,0.625233
+bodyfat,"floor: OLS (trio, log1p-scaled)",2,2,5.969478,0.474168
+bodyfat,floor: OLS (all 13),2,2,5.068332,0.620943
+bodyfat,floor: predict train mean,2,2,8.311558,-0.019387
+bodyfat,Ch5 graded U -> TSK (trio),2,3,4.315452,0.700551
+bodyfat,Ch5 crisp assign -> TSK (trio),2,3,4.080644,0.732251
+bodyfat,Ch5 crisp argmax U -> TSK (trio),2,3,4.298150,0.702947
+bodyfat,Ch5 graded U inductive -> TSK (trio),2,3,4.257354,0.708560
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),2,3,4.383566,0.691023
+bodyfat,Ch5 graded U -> TSK (all 13),2,3,12.137558,-1.368825
+bodyfat,Ch5 crisp assign -> TSK (all 13),2,3,5.256981,0.555632
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",2,3,3.968206,0.746803
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",2,3,8.704521,-0.218317
+bodyfat,global 1-rule TSK (trio),2,3,4.186297,0.718207
+bodyfat,global 1-rule TSK (all 13),2,3,3.827981,0.764381
+bodyfat,floor: OLS (trio),2,3,3.979229,0.745394
+bodyfat,"floor: OLS (trio, log1p-scaled)",2,3,5.000993,0.597855
+bodyfat,floor: OLS (all 13),2,3,3.727290,0.776614
+bodyfat,floor: predict train mean,2,3,7.955336,-0.017624
+bodyfat,Ch5 graded U -> TSK (trio),2,4,4.416941,0.759165
+bodyfat,Ch5 crisp assign -> TSK (trio),2,4,4.559969,0.743315
+bodyfat,Ch5 crisp argmax U -> TSK (trio),2,4,4.458869,0.754571
+bodyfat,Ch5 graded U inductive -> TSK (trio),2,4,4.516197,0.748219
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),2,4,4.553873,0.744001
+bodyfat,Ch5 graded U -> TSK (all 13),2,4,20.293871,-4.084007
+bodyfat,Ch5 crisp assign -> TSK (all 13),2,4,7.051642,0.386158
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",2,4,4.367566,0.764519
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",2,4,6.503661,0.477854
+bodyfat,global 1-rule TSK (trio),2,4,4.632395,0.735097
+bodyfat,global 1-rule TSK (all 13),2,4,5.538379,0.621347
+bodyfat,floor: OLS (trio),2,4,5.010527,0.690085
+bodyfat,"floor: OLS (trio, log1p-scaled)",2,4,5.199580,0.666256
+bodyfat,floor: OLS (all 13),2,4,4.718577,0.725148
+bodyfat,floor: predict train mean,2,4,9.010110,-0.002159
+bodyfat,Ch5 graded U -> TSK (trio),3,0,5.042692,0.689276
+bodyfat,Ch5 crisp assign -> TSK (trio),3,0,5.885362,0.576751
+bodyfat,Ch5 crisp argmax U -> TSK (trio),3,0,5.322567,0.653828
+bodyfat,Ch5 graded U inductive -> TSK (trio),3,0,5.224907,0.666415
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),3,0,5.821319,0.585913
+bodyfat,Ch5 graded U -> TSK (all 13),3,0,7.084846,0.386647
+bodyfat,Ch5 crisp assign -> TSK (all 13),3,0,6.182677,0.532908
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",3,0,6.769201,0.440082
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",3,0,8.728533,0.069038
+bodyfat,global 1-rule TSK (trio),3,0,5.189878,0.670873
+bodyfat,global 1-rule TSK (all 13),3,0,4.948290,0.700801
+bodyfat,floor: OLS (trio),3,0,5.393519,0.644538
+bodyfat,"floor: OLS (trio, log1p-scaled)",3,0,6.022818,0.556750
+bodyfat,floor: OLS (all 13),3,0,4.890850,0.707707
+bodyfat,floor: predict train mean,3,0,9.218434,-0.038398
+bodyfat,Ch5 graded U -> TSK (trio),3,1,4.599014,0.692711
+bodyfat,Ch5 crisp assign -> TSK (trio),3,1,4.653546,0.685381
+bodyfat,Ch5 crisp argmax U -> TSK (trio),3,1,4.623828,0.689386
+bodyfat,Ch5 graded U inductive -> TSK (trio),3,1,4.892177,0.652286
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),3,1,5.128446,0.617889
+bodyfat,Ch5 graded U -> TSK (all 13),3,1,11.734912,-1.000678
+bodyfat,Ch5 crisp assign -> TSK (all 13),3,1,5.837475,0.504929
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",3,1,4.683799,0.681277
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",3,1,8.229568,0.016053
+bodyfat,global 1-rule TSK (trio),3,1,4.389361,0.720089
+bodyfat,global 1-rule TSK (all 13),3,1,9.607725,-0.341092
+bodyfat,floor: OLS (trio),3,1,4.692977,0.680026
+bodyfat,"floor: OLS (trio, log1p-scaled)",3,1,4.781833,0.667795
+bodyfat,floor: OLS (all 13),3,1,4.277305,0.734198
+bodyfat,floor: predict train mean,3,1,8.465646,-0.041209
+bodyfat,Ch5 graded U -> TSK (trio),3,2,4.761185,0.677724
+bodyfat,Ch5 crisp assign -> TSK (trio),3,2,4.684977,0.687959
+bodyfat,Ch5 crisp argmax U -> TSK (trio),3,2,4.673729,0.689455
+bodyfat,Ch5 graded U inductive -> TSK (trio),3,2,4.685248,0.687922
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),3,2,4.607075,0.698249
+bodyfat,Ch5 graded U -> TSK (all 13),3,2,5.977504,0.492031
+bodyfat,Ch5 crisp assign -> TSK (all 13),3,2,6.660791,0.369262
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",3,2,4.680288,0.688583
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",3,2,5.529398,0.565337
+bodyfat,global 1-rule TSK (trio),3,2,4.867065,0.663231
+bodyfat,global 1-rule TSK (all 13),3,2,4.424123,0.721739
+bodyfat,floor: OLS (trio),3,2,4.370044,0.728500
+bodyfat,"floor: OLS (trio, log1p-scaled)",3,2,5.463280,0.575669
+bodyfat,floor: OLS (all 13),3,2,4.539032,0.707097
+bodyfat,floor: predict train mean,3,2,8.419438,-0.007775
+bodyfat,Ch5 graded U -> TSK (trio),3,3,4.882353,0.606697
+bodyfat,Ch5 crisp assign -> TSK (trio),3,3,4.387329,0.682408
+bodyfat,Ch5 crisp argmax U -> TSK (trio),3,3,4.431797,0.675937
+bodyfat,Ch5 graded U inductive -> TSK (trio),3,3,4.562203,0.656586
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),3,3,4.163189,0.714029
+bodyfat,Ch5 graded U -> TSK (all 13),3,3,7.553615,0.058590
+bodyfat,Ch5 crisp assign -> TSK (all 13),3,3,5.103891,0.570195
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",3,3,4.188967,0.710477
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",3,3,7.047097,0.180612
+bodyfat,global 1-rule TSK (trio),3,3,4.364148,0.685755
+bodyfat,global 1-rule TSK (all 13),3,3,4.432034,0.675903
+bodyfat,floor: OLS (trio),3,3,4.301614,0.694696
+bodyfat,"floor: OLS (trio, log1p-scaled)",3,3,5.531580,0.495144
+bodyfat,floor: OLS (all 13),3,3,4.155893,0.715031
+bodyfat,floor: predict train mean,3,3,8.309541,-0.139261
+bodyfat,Ch5 graded U -> TSK (trio),3,4,4.982809,0.566574
+bodyfat,Ch5 crisp assign -> TSK (trio),3,4,5.021532,0.559811
+bodyfat,Ch5 crisp argmax U -> TSK (trio),3,4,5.077791,0.549892
+bodyfat,Ch5 graded U inductive -> TSK (trio),3,4,4.956006,0.571224
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),3,4,4.958269,0.570833
+bodyfat,Ch5 graded U -> TSK (all 13),3,4,5.280611,0.513217
+bodyfat,Ch5 crisp assign -> TSK (all 13),3,4,5.707626,0.431307
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",3,4,4.944857,0.573151
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",3,4,5.637125,0.445270
+bodyfat,global 1-rule TSK (trio),3,4,4.968103,0.569128
+bodyfat,global 1-rule TSK (all 13),3,4,4.733162,0.608917
+bodyfat,floor: OLS (trio),3,4,4.854811,0.588556
+bodyfat,"floor: OLS (trio, log1p-scaled)",3,4,5.132673,0.540110
+bodyfat,floor: OLS (all 13),3,4,4.583113,0.633319
+bodyfat,floor: predict train mean,3,4,7.569845,-0.000324
+bodyfat,Ch5 graded U -> TSK (trio),4,0,4.726232,0.748630
+bodyfat,Ch5 crisp assign -> TSK (trio),4,0,4.709796,0.750375
+bodyfat,Ch5 crisp argmax U -> TSK (trio),4,0,4.768715,0.744090
+bodyfat,Ch5 graded U inductive -> TSK (trio),4,0,4.628313,0.758938
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),4,0,4.786863,0.742139
+bodyfat,Ch5 graded U -> TSK (all 13),4,0,6.324124,0.549925
+bodyfat,Ch5 crisp assign -> TSK (all 13),4,0,4.782795,0.742577
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",4,0,4.526585,0.769418
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",4,0,7.741374,0.325596
+bodyfat,global 1-rule TSK (trio),4,0,4.569104,0.765066
+bodyfat,global 1-rule TSK (all 13),4,0,4.330114,0.789000
+bodyfat,floor: OLS (trio),4,0,4.469571,0.775190
+bodyfat,"floor: OLS (trio, log1p-scaled)",4,0,5.288202,0.685298
+bodyfat,floor: OLS (all 13),4,0,4.526172,0.769460
+bodyfat,floor: predict train mean,4,0,9.498436,-0.015286
+bodyfat,Ch5 graded U -> TSK (trio),4,1,5.115167,0.566114
+bodyfat,Ch5 crisp assign -> TSK (trio),4,1,5.055005,0.576260
+bodyfat,Ch5 crisp argmax U -> TSK (trio),4,1,5.059766,0.575462
+bodyfat,Ch5 graded U inductive -> TSK (trio),4,1,5.159241,0.558605
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),4,1,5.035709,0.579489
+bodyfat,Ch5 graded U -> TSK (all 13),4,1,5.381871,0.519689
+bodyfat,Ch5 crisp assign -> TSK (all 13),4,1,7.252821,0.127692
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",4,1,4.697406,0.634092
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",4,1,4.756802,0.624780
+bodyfat,global 1-rule TSK (trio),4,1,5.030084,0.580428
+bodyfat,global 1-rule TSK (all 13),4,1,4.621948,0.645753
+bodyfat,floor: OLS (trio),4,1,4.664304,0.639231
+bodyfat,"floor: OLS (trio, log1p-scaled)",4,1,5.584773,0.482790
+bodyfat,floor: OLS (all 13),4,1,4.467081,0.669095
+bodyfat,floor: predict train mean,4,1,7.914609,-0.038759
+bodyfat,Ch5 graded U -> TSK (trio),4,2,4.907742,0.605884
+bodyfat,Ch5 crisp assign -> TSK (trio),4,2,4.897424,0.607539
+bodyfat,Ch5 crisp argmax U -> TSK (trio),4,2,4.776588,0.626667
+bodyfat,Ch5 graded U inductive -> TSK (trio),4,2,5.013213,0.588762
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),4,2,5.196795,0.558092
+bodyfat,Ch5 graded U -> TSK (all 13),4,2,7.145216,0.164606
+bodyfat,Ch5 crisp assign -> TSK (all 13),4,2,18.605262,-4.664118
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",4,2,5.006651,0.589838
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",4,2,7.919038,-0.026138
+bodyfat,global 1-rule TSK (trio),4,2,4.904528,0.606400
+bodyfat,global 1-rule TSK (all 13),4,2,6.483059,0.312266
+bodyfat,floor: OLS (trio),4,2,4.989830,0.592589
+bodyfat,"floor: OLS (trio, log1p-scaled)",4,2,5.195029,0.558392
+bodyfat,floor: OLS (all 13),4,2,4.727866,0.634244
+bodyfat,floor: predict train mean,4,2,8.117056,-0.078097
+bodyfat,Ch5 graded U -> TSK (trio),4,3,4.738393,0.662883
+bodyfat,Ch5 crisp assign -> TSK (trio),4,3,4.640169,0.676715
+bodyfat,Ch5 crisp argmax U -> TSK (trio),4,3,4.806301,0.653151
+bodyfat,Ch5 graded U inductive -> TSK (trio),4,3,4.565432,0.687045
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),4,3,4.958106,0.630895
+bodyfat,Ch5 graded U -> TSK (all 13),4,3,10.804510,-0.752785
+bodyfat,Ch5 crisp assign -> TSK (all 13),4,3,5.081751,0.612256
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",4,3,4.514693,0.693962
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",4,3,8.474946,-0.078431
+bodyfat,global 1-rule TSK (trio),4,3,4.807851,0.652927
+bodyfat,global 1-rule TSK (all 13),4,3,3.942046,0.766675
+bodyfat,floor: OLS (trio),4,3,4.454177,0.702112
+bodyfat,"floor: OLS (trio, log1p-scaled)",4,3,5.660164,0.518965
+bodyfat,floor: OLS (all 13),4,3,4.078619,0.750228
+bodyfat,floor: predict train mean,4,3,8.506881,-0.086574
+bodyfat,Ch5 graded U -> TSK (trio),4,4,4.658352,0.651827
+bodyfat,Ch5 crisp assign -> TSK (trio),4,4,4.218888,0.714421
+bodyfat,Ch5 crisp argmax U -> TSK (trio),4,4,4.145071,0.724327
+bodyfat,Ch5 graded U inductive -> TSK (trio),4,4,4.608541,0.659233
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),4,4,4.574670,0.664224
+bodyfat,Ch5 graded U -> TSK (all 13),4,4,24.543451,-8.665003
+bodyfat,Ch5 crisp assign -> TSK (all 13),4,4,5.642110,0.489244
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",4,4,6.604757,0.300086
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",4,4,7.699058,0.048944
+bodyfat,global 1-rule TSK (trio),4,4,4.306103,0.702491
+bodyfat,global 1-rule TSK (all 13),4,4,5.230446,0.561057
+bodyfat,floor: OLS (trio),4,4,4.873538,0.618917
+bodyfat,"floor: OLS (trio, log1p-scaled)",4,4,5.032172,0.593705
+bodyfat,floor: OLS (all 13),4,4,4.485667,0.677162
+bodyfat,floor: predict train mean,4,4,7.916352,-0.005497
+bodyfat,Ch5 graded U -> TSK (trio),5,0,4.679048,0.598275
+bodyfat,Ch5 crisp assign -> TSK (trio),5,0,4.029625,0.702050
+bodyfat,Ch5 crisp argmax U -> TSK (trio),5,0,4.214874,0.674025
+bodyfat,Ch5 graded U inductive -> TSK (trio),5,0,4.295258,0.661473
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),5,0,4.710721,0.592817
+bodyfat,Ch5 graded U -> TSK (all 13),5,0,4.208218,0.675054
+bodyfat,Ch5 crisp assign -> TSK (all 13),5,0,4.572873,0.616299
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",5,0,4.081421,0.694341
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",5,0,3.896182,0.721456
+bodyfat,global 1-rule TSK (trio),5,0,4.174843,0.680188
+bodyfat,global 1-rule TSK (all 13),5,0,3.755807,0.741166
+bodyfat,floor: OLS (trio),5,0,3.956104,0.712823
+bodyfat,"floor: OLS (trio, log1p-scaled)",5,0,4.420269,0.641481
+bodyfat,floor: OLS (all 13),5,0,3.958212,0.712517
+bodyfat,floor: predict train mean,5,0,7.385789,-0.000940
+bodyfat,Ch5 graded U -> TSK (trio),5,1,4.750318,0.682496
+bodyfat,Ch5 crisp assign -> TSK (trio),5,1,4.821127,0.672960
+bodyfat,Ch5 crisp argmax U -> TSK (trio),5,1,4.425608,0.724419
+bodyfat,Ch5 graded U inductive -> TSK (trio),5,1,4.980513,0.650979
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),5,1,4.695884,0.689731
+bodyfat,Ch5 graded U -> TSK (all 13),5,1,8.149151,0.065610
+bodyfat,Ch5 crisp assign -> TSK (all 13),5,1,6.275569,0.445873
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",5,1,4.545508,0.709284
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",5,1,8.878654,-0.109169
+bodyfat,global 1-rule TSK (trio),5,1,4.589199,0.703669
+bodyfat,global 1-rule TSK (all 13),5,1,4.259259,0.744747
+bodyfat,floor: OLS (trio),5,1,4.634256,0.697822
+bodyfat,"floor: OLS (trio, log1p-scaled)",5,1,5.485388,0.576632
+bodyfat,floor: OLS (all 13),5,1,4.374297,0.730772
+bodyfat,floor: predict train mean,5,1,8.468854,-0.009143
+bodyfat,Ch5 graded U -> TSK (trio),5,2,5.113141,0.695279
+bodyfat,Ch5 crisp assign -> TSK (trio),5,2,5.148789,0.691015
+bodyfat,Ch5 crisp argmax U -> TSK (trio),5,2,5.125232,0.693836
+bodyfat,Ch5 graded U inductive -> TSK (trio),5,2,5.038818,0.704073
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),5,2,5.100072,0.696835
+bodyfat,Ch5 graded U -> TSK (all 13),5,2,6.718975,0.473822
+bodyfat,Ch5 crisp assign -> TSK (all 13),5,2,4.949128,0.714514
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",5,2,4.830840,0.727998
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",5,2,5.528385,0.643776
+bodyfat,global 1-rule TSK (trio),5,2,5.110496,0.695594
+bodyfat,global 1-rule TSK (all 13),5,2,4.158545,0.798438
+bodyfat,floor: OLS (trio),5,2,4.741271,0.737991
+bodyfat,"floor: OLS (trio, log1p-scaled)",5,2,5.890347,0.595602
+bodyfat,floor: OLS (all 13),5,2,4.229235,0.791527
+bodyfat,floor: predict train mean,5,2,9.457093,-0.042419
+bodyfat,Ch5 graded U -> TSK (trio),5,3,5.129600,0.605501
+bodyfat,Ch5 crisp assign -> TSK (trio),5,3,5.159210,0.600934
+bodyfat,Ch5 crisp argmax U -> TSK (trio),5,3,5.224622,0.590750
+bodyfat,Ch5 graded U inductive -> TSK (trio),5,3,5.135308,0.604623
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),5,3,5.521346,0.542945
+bodyfat,Ch5 graded U -> TSK (all 13),5,3,30.868125,-13.285624
+bodyfat,Ch5 crisp assign -> TSK (all 13),5,3,7.095585,0.245160
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",5,3,7.300493,0.200933
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",5,3,10.510447,-0.656232
+bodyfat,global 1-rule TSK (trio),5,3,5.199374,0.594696
+bodyfat,global 1-rule TSK (all 13),5,3,5.494994,0.547297
+bodyfat,floor: OLS (trio),5,3,5.773563,0.500234
+bodyfat,"floor: OLS (trio, log1p-scaled)",5,3,5.542086,0.539505
+bodyfat,floor: OLS (all 13),5,3,5.530699,0.541395
+bodyfat,floor: predict train mean,5,3,8.183818,-0.004132
+bodyfat,Ch5 graded U -> TSK (trio),5,4,4.728429,0.669385
+bodyfat,Ch5 crisp assign -> TSK (trio),5,4,4.742273,0.667446
+bodyfat,Ch5 crisp argmax U -> TSK (trio),5,4,4.577061,0.690214
+bodyfat,Ch5 graded U inductive -> TSK (trio),5,4,4.649757,0.680295
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),5,4,4.551310,0.693690
+bodyfat,Ch5 graded U -> TSK (all 13),5,4,8.618232,-0.098311
+bodyfat,Ch5 crisp assign -> TSK (all 13),5,4,11.433456,-0.933053
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",5,4,4.392758,0.714660
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",5,4,7.747091,0.112504
+bodyfat,global 1-rule TSK (trio),5,4,4.628135,0.683261
+bodyfat,global 1-rule TSK (all 13),5,4,7.360251,0.198923
+bodyfat,floor: OLS (trio),5,4,4.570687,0.691076
+bodyfat,"floor: OLS (trio, log1p-scaled)",5,4,5.505758,0.551747
+bodyfat,floor: OLS (all 13),5,4,4.620614,0.684290
+bodyfat,floor: predict train mean,5,4,8.261761,-0.009332
+bodyfat,Ch5 graded U -> TSK (trio),6,0,5.199794,0.642532
+bodyfat,Ch5 crisp assign -> TSK (trio),6,0,5.131539,0.651855
+bodyfat,Ch5 crisp argmax U -> TSK (trio),6,0,5.379767,0.617359
+bodyfat,Ch5 graded U inductive -> TSK (trio),6,0,5.471076,0.604260
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),6,0,5.075305,0.659444
+bodyfat,Ch5 graded U -> TSK (all 13),6,0,21.467242,-5.092799
+bodyfat,Ch5 crisp assign -> TSK (all 13),6,0,6.582406,0.427160
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",6,0,7.031290,0.346366
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",6,0,9.363964,-0.159268
+bodyfat,global 1-rule TSK (trio),6,0,5.247514,0.635941
+bodyfat,global 1-rule TSK (all 13),6,0,5.852513,0.547155
+bodyfat,floor: OLS (trio),6,0,5.495840,0.600669
+bodyfat,"floor: OLS (trio, log1p-scaled)",6,0,6.257266,0.482353
+bodyfat,floor: OLS (all 13),6,0,5.542619,0.593843
+bodyfat,floor: predict train mean,6,0,8.747230,-0.011592
+bodyfat,Ch5 graded U -> TSK (trio),6,1,4.704359,0.708181
+bodyfat,Ch5 crisp assign -> TSK (trio),6,1,4.625502,0.717883
+bodyfat,Ch5 crisp argmax U -> TSK (trio),6,1,4.667322,0.712758
+bodyfat,Ch5 graded U inductive -> TSK (trio),6,1,4.608582,0.719943
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),6,1,4.265998,0.760032
+bodyfat,Ch5 graded U -> TSK (all 13),6,1,11.099038,-0.624362
+bodyfat,Ch5 crisp assign -> TSK (all 13),6,1,5.606761,0.585489
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",6,1,4.355760,0.749827
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",6,1,4.299009,0.756304
+bodyfat,global 1-rule TSK (trio),6,1,4.609748,0.719801
+bodyfat,global 1-rule TSK (all 13),6,1,3.922924,0.797077
+bodyfat,floor: OLS (trio),6,1,4.427151,0.741559
+bodyfat,"floor: OLS (trio, log1p-scaled)",6,1,5.302293,0.629285
+bodyfat,floor: OLS (all 13),6,1,3.788604,0.810735
+bodyfat,floor: predict train mean,6,1,8.858406,-0.034721
+bodyfat,Ch5 graded U -> TSK (trio),6,2,4.070405,0.719308
+bodyfat,Ch5 crisp assign -> TSK (trio),6,2,4.621486,0.638159
+bodyfat,Ch5 crisp argmax U -> TSK (trio),6,2,4.487859,0.658781
+bodyfat,Ch5 graded U inductive -> TSK (trio),6,2,4.216112,0.698853
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),6,2,4.259733,0.692589
+bodyfat,Ch5 graded U -> TSK (all 13),6,2,4.826644,0.605320
+bodyfat,Ch5 crisp assign -> TSK (all 13),6,2,5.537684,0.480470
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",6,2,4.270737,0.690999
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",6,2,5.429228,0.500620
+bodyfat,global 1-rule TSK (trio),6,2,4.179985,0.703992
+bodyfat,global 1-rule TSK (all 13),6,2,3.865429,0.746866
+bodyfat,floor: OLS (trio),6,2,3.950082,0.735658
+bodyfat,"floor: OLS (trio, log1p-scaled)",6,2,5.028664,0.571590
+bodyfat,floor: OLS (all 13),6,2,3.882591,0.744614
+bodyfat,floor: predict train mean,6,2,7.737054,-0.014158
+bodyfat,Ch5 graded U -> TSK (trio),6,3,4.661062,0.610430
+bodyfat,Ch5 crisp assign -> TSK (trio),6,3,4.747842,0.595789
+bodyfat,Ch5 crisp argmax U -> TSK (trio),6,3,4.393113,0.653933
+bodyfat,Ch5 graded U inductive -> TSK (trio),6,3,4.714723,0.601409
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),6,3,4.855320,0.577282
+bodyfat,Ch5 graded U -> TSK (all 13),6,3,8.599241,-0.325976
+bodyfat,Ch5 crisp assign -> TSK (all 13),6,3,8.606512,-0.328219
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",6,3,4.480464,0.640034
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",6,3,8.871566,-0.411289
+bodyfat,global 1-rule TSK (trio),6,3,4.776723,0.590856
+bodyfat,global 1-rule TSK (all 13),6,3,5.565398,0.444597
+bodyfat,floor: OLS (trio),6,3,4.730762,0.598692
+bodyfat,"floor: OLS (trio, log1p-scaled)",6,3,4.978923,0.555485
+bodyfat,floor: OLS (all 13),6,3,4.419935,0.649694
+bodyfat,floor: predict train mean,6,3,7.468382,-0.000158
+bodyfat,Ch5 graded U -> TSK (trio),6,4,5.048288,0.679232
+bodyfat,Ch5 crisp assign -> TSK (trio),6,4,4.825307,0.706942
+bodyfat,Ch5 crisp argmax U -> TSK (trio),6,4,4.927758,0.694366
+bodyfat,Ch5 graded U inductive -> TSK (trio),6,4,5.088402,0.674114
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),6,4,4.995353,0.685923
+bodyfat,Ch5 graded U -> TSK (all 13),6,4,6.697463,0.435422
+bodyfat,Ch5 crisp assign -> TSK (all 13),6,4,6.095203,0.532394
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",6,4,5.005739,0.684616
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",6,4,6.348738,0.492684
+bodyfat,global 1-rule TSK (trio),6,4,4.940636,0.692766
+bodyfat,global 1-rule TSK (all 13),6,4,4.623588,0.730932
+bodyfat,floor: OLS (trio),6,4,4.852179,0.703669
+bodyfat,"floor: OLS (trio, log1p-scaled)",6,4,5.367031,0.637447
+bodyfat,floor: OLS (all 13),6,4,4.652683,0.727535
+bodyfat,floor: predict train mean,6,4,8.914360,-0.000193
+bodyfat,Ch5 graded U -> TSK (trio),7,0,5.194933,0.507663
+bodyfat,Ch5 crisp assign -> TSK (trio),7,0,5.047357,0.535238
+bodyfat,Ch5 crisp argmax U -> TSK (trio),7,0,5.010668,0.541970
+bodyfat,Ch5 graded U inductive -> TSK (trio),7,0,5.217737,0.503331
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),7,0,5.336171,0.480528
+bodyfat,Ch5 graded U -> TSK (all 13),7,0,5.638950,0.419905
+bodyfat,Ch5 crisp assign -> TSK (all 13),7,0,5.888973,0.367324
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",7,0,5.199570,0.506784
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",7,0,6.965344,0.114910
+bodyfat,global 1-rule TSK (trio),7,0,5.219141,0.503064
+bodyfat,global 1-rule TSK (all 13),7,0,4.822767,0.575679
+bodyfat,floor: OLS (trio),7,0,5.015130,0.541154
+bodyfat,"floor: OLS (trio, log1p-scaled)",7,0,5.415537,0.464961
+bodyfat,floor: OLS (all 13),7,0,4.830683,0.574284
+bodyfat,floor: predict train mean,7,0,7.410925,-0.001953
+bodyfat,Ch5 graded U -> TSK (trio),7,1,3.936240,0.745132
+bodyfat,Ch5 crisp assign -> TSK (trio),7,1,4.314268,0.693827
+bodyfat,Ch5 crisp argmax U -> TSK (trio),7,1,4.326857,0.692038
+bodyfat,Ch5 graded U inductive -> TSK (trio),7,1,3.976256,0.739924
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),7,1,4.593315,0.652940
+bodyfat,Ch5 graded U -> TSK (all 13),7,1,7.123555,0.165270
+bodyfat,Ch5 crisp assign -> TSK (all 13),7,1,12.760971,-1.678674
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",7,1,4.119633,0.720830
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",7,1,8.910464,-0.306030
+bodyfat,global 1-rule TSK (trio),7,1,3.877060,0.752738
+bodyfat,global 1-rule TSK (all 13),7,1,4.403038,0.681098
+bodyfat,floor: OLS (trio),7,1,4.017938,0.734442
+bodyfat,"floor: OLS (trio, log1p-scaled)",7,1,4.274141,0.699496
+bodyfat,floor: OLS (all 13),7,1,4.428850,0.677348
+bodyfat,floor: predict train mean,7,1,7.884947,-0.022704
+bodyfat,Ch5 graded U -> TSK (trio),7,2,4.907025,0.741271
+bodyfat,Ch5 crisp assign -> TSK (trio),7,2,4.758745,0.756672
+bodyfat,Ch5 crisp argmax U -> TSK (trio),7,2,5.194928,0.710021
+bodyfat,Ch5 graded U inductive -> TSK (trio),7,2,5.012876,0.729989
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),7,2,4.888747,0.743195
+bodyfat,Ch5 graded U -> TSK (all 13),7,2,6.864380,0.493697
+bodyfat,Ch5 crisp assign -> TSK (all 13),7,2,5.469169,0.678597
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",7,2,4.635121,0.769150
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",7,2,5.286047,0.699759
+bodyfat,global 1-rule TSK (trio),7,2,4.834014,0.748913
+bodyfat,global 1-rule TSK (all 13),7,2,4.744180,0.758159
+bodyfat,floor: OLS (trio),7,2,4.690431,0.763608
+bodyfat,"floor: OLS (trio, log1p-scaled)",7,2,5.887524,0.627545
+bodyfat,floor: OLS (all 13),7,2,4.685675,0.764087
+bodyfat,floor: predict train mean,7,2,9.648348,-0.000262
+bodyfat,Ch5 graded U -> TSK (trio),7,3,4.739295,0.661916
+bodyfat,Ch5 crisp assign -> TSK (trio),7,3,4.840606,0.647308
+bodyfat,Ch5 crisp argmax U -> TSK (trio),7,3,4.643256,0.675480
+bodyfat,Ch5 graded U inductive -> TSK (trio),7,3,4.683975,0.669763
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),7,3,4.803329,0.652719
+bodyfat,Ch5 graded U -> TSK (all 13),7,3,8.372228,-0.055064
+bodyfat,Ch5 crisp assign -> TSK (all 13),7,3,5.282313,0.580004
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",7,3,4.868444,0.643239
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",7,3,5.606118,0.526935
+bodyfat,global 1-rule TSK (trio),7,3,4.728536,0.663450
+bodyfat,global 1-rule TSK (all 13),7,3,4.189158,0.735850
+bodyfat,floor: OLS (trio),7,3,4.617620,0.679053
+bodyfat,"floor: OLS (trio, log1p-scaled)",7,3,5.265498,0.582674
+bodyfat,floor: OLS (all 13),7,3,4.019809,0.756776
+bodyfat,floor: predict train mean,7,3,8.193472,-0.010491
+bodyfat,Ch5 graded U -> TSK (trio),7,4,5.426376,0.595077
+bodyfat,Ch5 crisp assign -> TSK (trio),7,4,4.893582,0.670689
+bodyfat,Ch5 crisp argmax U -> TSK (trio),7,4,4.858653,0.675373
+bodyfat,Ch5 graded U inductive -> TSK (trio),7,4,4.457367,0.726782
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),7,4,4.949370,0.663138
+bodyfat,Ch5 graded U -> TSK (all 13),7,4,26.975657,-9.006838
+bodyfat,Ch5 crisp assign -> TSK (all 13),7,4,6.986622,0.328745
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",7,4,6.532348,0.413198
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",7,4,9.982701,-0.370405
+bodyfat,global 1-rule TSK (trio),7,4,4.861175,0.675036
+bodyfat,global 1-rule TSK (all 13),7,4,5.407596,0.597875
+bodyfat,floor: OLS (trio),7,4,5.085851,0.644303
+bodyfat,"floor: OLS (trio, log1p-scaled)",7,4,5.541703,0.577682
+bodyfat,floor: OLS (all 13),7,4,4.716751,0.694058
+bodyfat,floor: predict train mean,7,4,8.528539,-0.000235
+bodyfat,Ch5 graded U -> TSK (trio),8,0,4.584240,0.599064
+bodyfat,Ch5 crisp assign -> TSK (trio),8,0,4.533603,0.607873
+bodyfat,Ch5 crisp argmax U -> TSK (trio),8,0,4.776931,0.564651
+bodyfat,Ch5 graded U inductive -> TSK (trio),8,0,4.444672,0.623106
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),8,0,4.594568,0.597256
+bodyfat,Ch5 graded U -> TSK (all 13),8,0,11.132769,-1.364539
+bodyfat,Ch5 crisp assign -> TSK (all 13),8,0,5.815705,0.354725
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",8,0,4.357397,0.637762
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",8,0,7.099594,0.038372
+bodyfat,global 1-rule TSK (trio),8,0,4.673417,0.583314
+bodyfat,global 1-rule TSK (all 13),8,0,4.183093,0.666163
+bodyfat,floor: OLS (trio),8,0,3.876583,0.713293
+bodyfat,"floor: OLS (trio, log1p-scaled)",8,0,4.740463,0.571272
+bodyfat,floor: OLS (all 13),8,0,3.771610,0.728610
+bodyfat,floor: predict train mean,8,0,7.442067,-0.056640
+bodyfat,Ch5 graded U -> TSK (trio),8,1,4.706946,0.623787
+bodyfat,Ch5 crisp assign -> TSK (trio),8,1,4.607064,0.639585
+bodyfat,Ch5 crisp argmax U -> TSK (trio),8,1,4.352216,0.678356
+bodyfat,Ch5 graded U inductive -> TSK (trio),8,1,4.635132,0.635180
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),8,1,4.713538,0.622733
+bodyfat,Ch5 graded U -> TSK (all 13),8,1,8.129756,-0.122303
+bodyfat,Ch5 crisp assign -> TSK (all 13),8,1,5.256277,0.530850
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",8,1,4.734061,0.619440
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",8,1,7.694443,-0.005332
+bodyfat,global 1-rule TSK (trio),8,1,4.602184,0.640348
+bodyfat,global 1-rule TSK (all 13),8,1,4.291015,0.687338
+bodyfat,floor: OLS (trio),8,1,4.617812,0.637901
+bodyfat,"floor: OLS (trio, log1p-scaled)",8,1,4.637604,0.634790
+bodyfat,floor: OLS (all 13),8,1,4.287240,0.687888
+bodyfat,floor: predict train mean,8,1,7.750588,-0.020057
+bodyfat,Ch5 graded U -> TSK (trio),8,2,5.611200,0.689555
+bodyfat,Ch5 crisp assign -> TSK (trio),8,2,5.313949,0.721575
+bodyfat,Ch5 crisp argmax U -> TSK (trio),8,2,5.342043,0.718623
+bodyfat,Ch5 graded U inductive -> TSK (trio),8,2,5.466449,0.705365
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),8,2,5.204422,0.732934
+bodyfat,Ch5 graded U -> TSK (all 13),8,2,7.968288,0.373958
+bodyfat,Ch5 crisp assign -> TSK (all 13),8,2,7.804589,0.399416
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",8,2,4.901964,0.763073
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",8,2,6.748252,0.550990
+bodyfat,global 1-rule TSK (trio),8,2,5.179338,0.735502
+bodyfat,global 1-rule TSK (all 13),8,2,4.961482,0.757285
+bodyfat,floor: OLS (trio),8,2,4.792710,0.773517
+bodyfat,"floor: OLS (trio, log1p-scaled)",8,2,6.347946,0.602681
+bodyfat,floor: OLS (all 13),8,2,4.385661,0.810354
+bodyfat,floor: predict train mean,8,2,10.077068,-0.001248
+bodyfat,Ch5 graded U -> TSK (trio),8,3,5.037038,0.612565
+bodyfat,Ch5 crisp assign -> TSK (trio),8,3,5.080864,0.605793
+bodyfat,Ch5 crisp argmax U -> TSK (trio),8,3,5.291975,0.572354
+bodyfat,Ch5 graded U inductive -> TSK (trio),8,3,5.026898,0.614123
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),8,3,5.369753,0.559691
+bodyfat,Ch5 graded U -> TSK (all 13),8,3,17.932465,-3.910534
+bodyfat,Ch5 crisp assign -> TSK (all 13),8,3,6.416228,0.371351
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",8,3,7.023383,0.246746
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",8,3,7.227618,0.202301
+bodyfat,global 1-rule TSK (trio),8,3,5.114689,0.600527
+bodyfat,global 1-rule TSK (all 13),8,3,5.301794,0.570766
+bodyfat,floor: OLS (trio),8,3,5.488890,0.539936
+bodyfat,"floor: OLS (trio, log1p-scaled)",8,3,5.509915,0.536405
+bodyfat,floor: OLS (all 13),8,3,5.026011,0.614259
+bodyfat,floor: predict train mean,8,3,8.150482,-0.014414
+bodyfat,Ch5 graded U -> TSK (trio),8,4,4.501020,0.696433
+bodyfat,Ch5 crisp assign -> TSK (trio),8,4,4.922788,0.636876
+bodyfat,Ch5 crisp argmax U -> TSK (trio),8,4,4.846192,0.648088
+bodyfat,Ch5 graded U inductive -> TSK (trio),8,4,4.550803,0.689681
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),8,4,4.718510,0.666388
+bodyfat,Ch5 graded U -> TSK (all 13),8,4,4.957932,0.631673
+bodyfat,Ch5 crisp assign -> TSK (all 13),8,4,5.809072,0.494355
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",8,4,4.693963,0.669850
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",8,4,5.772776,0.500654
+bodyfat,global 1-rule TSK (trio),8,4,4.668402,0.673436
+bodyfat,global 1-rule TSK (all 13),8,4,4.553995,0.689246
+bodyfat,floor: OLS (trio),8,4,4.656514,0.675097
+bodyfat,"floor: OLS (trio, log1p-scaled)",8,4,5.233036,0.589664
+bodyfat,floor: OLS (all 13),8,4,4.688210,0.670659
+bodyfat,floor: predict train mean,8,4,8.266109,-0.023846
+bodyfat,Ch5 graded U -> TSK (trio),9,0,4.677889,0.692470
+bodyfat,Ch5 crisp assign -> TSK (trio),9,0,4.298873,0.740285
+bodyfat,Ch5 crisp argmax U -> TSK (trio),9,0,4.215173,0.750300
+bodyfat,Ch5 graded U inductive -> TSK (trio),9,0,4.459633,0.720498
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),9,0,5.004185,0.648072
+bodyfat,Ch5 graded U -> TSK (all 13),9,0,21.608663,-5.562103
+bodyfat,Ch5 crisp assign -> TSK (all 13),9,0,8.375482,0.014159
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",9,0,4.534961,0.710976
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",9,0,6.943771,0.322393
+bodyfat,global 1-rule TSK (trio),9,0,4.387280,0.729493
+bodyfat,global 1-rule TSK (all 13),9,0,5.280588,0.608121
+bodyfat,floor: OLS (trio),9,0,4.936448,0.657535
+bodyfat,"floor: OLS (trio, log1p-scaled)",9,0,4.711205,0.688074
+bodyfat,floor: OLS (all 13),9,0,4.425350,0.724778
+bodyfat,floor: predict train mean,9,0,8.466549,-0.007396
+bodyfat,Ch5 graded U -> TSK (trio),9,1,5.409288,0.437109
+bodyfat,Ch5 crisp assign -> TSK (trio),9,1,5.315062,0.456549
+bodyfat,Ch5 crisp argmax U -> TSK (trio),9,1,5.308470,0.457896
+bodyfat,Ch5 graded U inductive -> TSK (trio),9,1,5.412119,0.436520
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),9,1,5.640263,0.388012
+bodyfat,Ch5 graded U -> TSK (all 13),9,1,6.045059,0.297016
+bodyfat,Ch5 crisp assign -> TSK (all 13),9,1,6.047773,0.296385
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",9,1,5.163278,0.487144
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",9,1,5.832830,0.345510
+bodyfat,global 1-rule TSK (trio),9,1,5.240675,0.471654
+bodyfat,global 1-rule TSK (all 13),9,1,5.164045,0.486992
+bodyfat,floor: OLS (trio),9,1,4.993457,0.520325
+bodyfat,"floor: OLS (trio, log1p-scaled)",9,1,5.211803,0.477459
+bodyfat,floor: OLS (all 13),9,1,4.683125,0.578094
+bodyfat,floor: predict train mean,9,1,7.611840,-0.114611
+bodyfat,Ch5 graded U -> TSK (trio),9,2,5.426681,0.664297
+bodyfat,Ch5 crisp assign -> TSK (trio),9,2,5.265046,0.683997
+bodyfat,Ch5 crisp argmax U -> TSK (trio),9,2,5.189795,0.692965
+bodyfat,Ch5 graded U inductive -> TSK (trio),9,2,5.333082,0.675777
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),9,2,5.298519,0.679966
+bodyfat,Ch5 graded U -> TSK (all 13),9,2,10.531288,-0.264300
+bodyfat,Ch5 crisp assign -> TSK (all 13),9,2,5.273963,0.682926
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",9,2,5.003834,0.714575
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",9,2,8.891182,0.098831
+bodyfat,global 1-rule TSK (trio),9,2,5.387463,0.669131
+bodyfat,global 1-rule TSK (all 13),9,2,5.217101,0.689726
+bodyfat,floor: OLS (trio),9,2,5.004578,0.714490
+bodyfat,"floor: OLS (trio, log1p-scaled)",9,2,6.208614,0.560584
+bodyfat,floor: OLS (all 13),9,2,4.762803,0.741410
+bodyfat,floor: predict train mean,9,2,9.371631,-0.001192
+bodyfat,Ch5 graded U -> TSK (trio),9,3,4.586044,0.728099
+bodyfat,Ch5 crisp assign -> TSK (trio),9,3,4.713904,0.712726
+bodyfat,Ch5 crisp argmax U -> TSK (trio),9,3,4.729485,0.710824
+bodyfat,Ch5 graded U inductive -> TSK (trio),9,3,4.845243,0.696495
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),9,3,4.919598,0.687108
+bodyfat,Ch5 graded U -> TSK (all 13),9,3,7.556740,0.261750
+bodyfat,Ch5 crisp assign -> TSK (all 13),9,3,4.833448,0.697971
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",9,3,4.823625,0.699197
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",9,3,4.906307,0.688797
+bodyfat,global 1-rule TSK (trio),9,3,4.810574,0.700823
+bodyfat,global 1-rule TSK (all 13),9,3,4.513387,0.736646
+bodyfat,floor: OLS (trio),9,3,4.856017,0.695144
+bodyfat,"floor: OLS (trio, log1p-scaled)",9,3,5.574900,0.598201
+bodyfat,floor: OLS (all 13),9,3,4.574719,0.729440
+bodyfat,floor: predict train mean,9,3,8.796404,-0.000334
+bodyfat,Ch5 graded U -> TSK (trio),9,4,4.225921,0.675376
+bodyfat,Ch5 crisp assign -> TSK (trio),9,4,4.199279,0.679456
+bodyfat,Ch5 crisp argmax U -> TSK (trio),9,4,4.262653,0.669708
+bodyfat,Ch5 graded U inductive -> TSK (trio),9,4,3.982077,0.711758
+bodyfat,Ch5 crisp assign inductive -> TSK (trio),9,4,4.235387,0.673920
+bodyfat,Ch5 graded U -> TSK (all 13),9,4,9.732292,-0.721744
+bodyfat,Ch5 crisp assign -> TSK (all 13),9,4,7.706071,-0.079454
+bodyfat,"Ch4 TribbleRegressor (trio, log-tuned)",9,4,3.938667,0.718008
+bodyfat,"Ch4 TribbleRegressor (all 13, default)",9,4,6.904368,0.133465
+bodyfat,global 1-rule TSK (trio),9,4,4.118126,0.691726
+bodyfat,global 1-rule TSK (all 13),9,4,3.775253,0.740922
+bodyfat,floor: OLS (trio),9,4,3.950344,0.716333
+bodyfat,"floor: OLS (trio, log1p-scaled)",9,4,5.062281,0.534166
+bodyfat,floor: OLS (all 13),9,4,4.112801,0.692522
+bodyfat,floor: predict train mean,9,4,7.583127,-0.045286
+ECG5000,Ch5 graded U -> TSK (0th),0,0,0.892667,0.367071
+ECG5000,Ch5 crisp assign -> TSK (0th),0,0,0.892667,0.373467
+ECG5000,global 1-rule TSK (0th),0,0,0.584000,0.147475
+ECG5000,floor: majority class,0,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),0,0,0.921333,0.392860
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),0,0,0.920667,0.392221
+ECG5000,Ch5 graded U -> TSK (0th),1,0,0.898667,0.368699
+ECG5000,Ch5 crisp assign -> TSK (0th),1,0,0.899333,0.369039
+ECG5000,global 1-rule TSK (0th),1,0,0.584000,0.147475
+ECG5000,floor: majority class,1,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),1,0,0.915333,0.400825
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),1,0,0.920667,0.436341
+ECG5000,Ch5 graded U -> TSK (0th),2,0,0.898000,0.418400
+ECG5000,Ch5 crisp assign -> TSK (0th),2,0,0.898667,0.418711
+ECG5000,global 1-rule TSK (0th),2,0,0.584000,0.147475
+ECG5000,floor: majority class,2,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),2,0,0.893333,0.378951
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),2,0,0.900000,0.431590
+ECG5000,Ch5 graded U -> TSK (0th),3,0,0.909333,0.423692
+ECG5000,Ch5 crisp assign -> TSK (0th),3,0,0.908667,0.423315
+ECG5000,global 1-rule TSK (0th),3,0,0.584000,0.147475
+ECG5000,floor: majority class,3,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),3,0,0.926000,0.431296
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),3,0,0.929333,0.432515
+ECG5000,Ch5 graded U -> TSK (0th),4,0,0.884667,0.362226
+ECG5000,Ch5 crisp assign -> TSK (0th),4,0,0.888000,0.363807
+ECG5000,global 1-rule TSK (0th),4,0,0.584000,0.147475
+ECG5000,floor: majority class,4,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),4,0,0.886667,0.362703
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),4,0,0.888000,0.363638
+ECG5000,Ch5 graded U -> TSK (0th),5,0,0.898667,0.368768
+ECG5000,Ch5 crisp assign -> TSK (0th),5,0,0.898000,0.375403
+ECG5000,global 1-rule TSK (0th),5,0,0.584000,0.147475
+ECG5000,floor: majority class,5,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),5,0,0.930667,0.487731
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),5,0,0.935333,0.509068
+ECG5000,Ch5 graded U -> TSK (0th),6,0,0.894667,0.366830
+ECG5000,Ch5 crisp assign -> TSK (0th),6,0,0.894667,0.366931
+ECG5000,global 1-rule TSK (0th),6,0,0.584000,0.147475
+ECG5000,floor: majority class,6,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),6,0,0.886000,0.363440
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),6,0,0.894667,0.401093
+ECG5000,Ch5 graded U -> TSK (0th),7,0,0.899333,0.369264
+ECG5000,Ch5 crisp assign -> TSK (0th),7,0,0.899333,0.369264
+ECG5000,global 1-rule TSK (0th),7,0,0.584000,0.147475
+ECG5000,floor: majority class,7,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),7,0,0.899333,0.369093
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),7,0,0.900667,0.369851
+ECG5000,Ch5 graded U -> TSK (0th),8,0,0.897333,0.440208
+ECG5000,Ch5 crisp assign -> TSK (0th),8,0,0.897333,0.412348
+ECG5000,global 1-rule TSK (0th),8,0,0.584000,0.147475
+ECG5000,floor: majority class,8,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),8,0,0.896667,0.417274
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),8,0,0.899333,0.413054
+ECG5000,Ch5 graded U -> TSK (0th),9,0,0.899333,0.369007
+ECG5000,Ch5 crisp assign -> TSK (0th),9,0,0.899333,0.369061
+ECG5000,global 1-rule TSK (0th),9,0,0.584000,0.147475
+ECG5000,floor: majority class,9,0,0.584000,0.147475
+ECG5000,Ch5 graded U inductive -> TSK (0th),9,0,0.896000,0.367484
+ECG5000,Ch5 crisp assign inductive -> TSK (0th),9,0,0.899333,0.369075
