@@ -257,9 +257,7 @@ def theta_sweep(X, y, classes, thetas, seeds=None):
                 Xk, yk, test_size=0.3, random_state=seed
             )
             Xte = pd.concat([Xte_k, X[~known]], ignore_index=True)
-            unk = np.r_[
-                np.zeros(len(Xte_k), bool), np.ones(int((~known).sum()), bool)
-            ]
+            unk = np.r_[np.zeros(len(Xte_k), bool), np.ones(int((~known).sum()), bool)]
             try:
                 memb = _fit_complement(Xtr, ytr)
             except Exception:  # noqa: BLE001
