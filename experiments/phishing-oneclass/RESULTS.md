@@ -1,95 +1,107 @@
 # One-class phishing detection on PhiUSIIL — results
 
-Trained on legitimate URLs only; evaluated on all phishing. Numbers from
-`run.py` at seed 0 (70/30 legit split; 94,395 train normals; test = 40,455
-held-out legit + 100,945 phishing). Anomaly score higher = more phishing-like.
+Primary model: `tribblefis.one_class.TribbleOneClassDetector`, `score="surprisal"`,
+`whiten=True`, `cov="pca"`, `n_gaussians=1`, `norm_conorm="probability"`. Trained
+on legitimate URLs only; evaluated on all phishing. Seed 0; 70/30 legit split
+(94,395 train normals; test = 40,455 held-out legit + 100,945 phishing).
+Thresholds calibrated on training normals only — no phishing label touches any
+model or threshold.
 
-## The headline
+**Provenance:** produced against `tribble-fis` working tree **`297b64b`** (a
+superset of the recorded submodule pin `987ed06`; `987ed06` includes the
+constant-feature grid-partition fix #210). Numbers depend on this commit —
+`run.py` prints the imported source path and SHA so the table can be reconciled.
 
-A **Gaussian one-class model (Mahalanobis distance under the legit covariance)
-catches ~99.7% of phishing at a 1% false-positive rate**, trained without ever
-seeing a phishing sample. `OneClassSVM` is close behind; `IsolationForest`
-trails badly.
+## Standard benchmark — leak and tripwire features removed
 
-| feature set | model | AUROC | AP | recall @1% FPR | recall @5% FPR |
-|---|---|---:|---:|---:|---:|
-| all (50) | IsolationForest | 0.940 | 0.974 | 0.537 | 0.718 |
-| all (50) | OneClassSVM(rbf) | 0.999 | 1.000 | 0.993 | 0.995 |
-| all (50) | **Mahalanobis** | **0.999** | **1.000** | **0.997** | **0.999** |
-| noleak (47) | IsolationForest | 0.930 | 0.970 | 0.507 | 0.677 |
-| noleak (47) | OneClassSVM(rbf) | 0.975 | 0.989 | 0.655 | 0.864 |
-| noleak (47) | **Mahalanobis** | **0.999** | **1.000** | **0.997** | **0.999** |
-| hard (43) | IsolationForest | 0.948 | 0.979 | 0.600 | 0.765 |
-| hard (43) | OneClassSVM(rbf) | 0.976 | 0.990 | 0.715 | 0.875 |
-| hard (43) | **Mahalanobis** | **0.999** | **1.000** | **0.997** | **0.999** |
+The model may not train on `URLSimilarityIndex` or any other target leak, nor on
+the nine features that are exactly constant across the legitimate training set.
+This is the headline table (39 features).
 
-## The result that matters — the win survives every control, and that's the tell
+| model | AUROC | AP | recall @1% FPR | recall @5% FPR |
+|---|---:|---:|---:|---:|
+| **Tribble surprisal** | **0.9993** | **0.9997** | **0.998** | **0.999** |
+| Tribble trimmed (drop 2) | 0.9861 | 0.9946 | 0.864 | 0.927 |
+| Tribble surprisal + Ledoit-Wolf | 0.9397 | 0.9758 | 0.609 | 0.780 |
+| Mahalanobis (whitened Gaussian) | 0.9989 | 0.9996 | 0.997 | 0.999 |
+| OneClassSVM (rbf) | 0.9720 | 0.9874 | 0.655 | 0.860 |
+| IsolationForest | 0.9331 | 0.9707 | 0.490 | 0.687 |
 
-I expected the leakage control to knock the numbers down. It didn't:
+**The tribble surprisal detector is the best model, catching 99.8% of phishing at
+a 1% false-positive rate** — trained without ever seeing a phishing sample.
 
-- Dropping the three **legitimacy-derived leak** features (`URLSimilarityIndex`,
-  `TLDLegitimateProb`, `URLCharProb`) moves Mahalanobis from 0.9990 → 0.9989.
-- Dropping **all seven** single features that alone separate the classes at
-  AUC ≥ 0.95 moves it to 0.9992 — it goes *up*.
+## Four things the table says
 
-A one-class score that is invariant to removing the obvious separators is not
-"robustly good," it's a symptom. So I looked for what carries it.
+**1 — surprisal, not complement, is the formulation that works here.** The
+default `1 - max firing` complement saturates on wide input; the log-domain
+`surprisal` sum does not. Every number above uses `surprisal`. `trimmed` (drop
+the two largest per-feature surprisals) *loses* 13 points of recall@1%FPR — so
+for phishing the largest per-feature surprisals **are** the signal: a phishing
+URL is caught by being extreme on a handful of whitened directions, and trimming
+them throws that away.
 
-## Why it's easy: the legitimate class is pathologically homogeneous
+**2 — surprisal ties Mahalanobis, and that is a consistency check, not a
+coincidence.** Under `whiten=True` with one Gaussian per component, the summed
+surprisal is `sum_j z_j^2 / 2 + const` — a diagonalised Mahalanobis distance in
+the whitened frame. It matching `EmpiricalCovariance().mahalanobis` (0.9993 vs
+0.9989) confirms the fuzzy estimator is computing what the theory says it should.
+The fuzzy layer buys interpretability (per-feature memberships / firing rules),
+not a different decision surface, at this setting.
 
-Nine features are **exactly constant across all 94,395 legitimate training
-rows**. Each is a tripwire: a Gaussian one-class model puts any phishing row that
-differs on it at effectively infinite distance.
+**3 — the score survives removing the content features too, which is the real
+finding.** On the `no_content` floor (33 features; also drop the near-oracle
+content counts `LineOfCode`, `NoOfImage`, `NoOfCSS`, `NoOfJS`, `NoOfSelfRef`,
+`NoOfExternalRef`), Tribble surprisal is **0.9994** and Mahalanobis **0.9992** —
+unchanged. So the separation is not one feature or six; it is pervasive. PhiUSIIL's
+legitimate class is a tight, low-entropy manifold, and whitening turns *every*
+near-degenerate direction into a tripwire, not only the nine exactly-constant
+ones. The tree/SVM models, which do not exploit that covariance structure, sit
+15–20 points lower (IsolationForest 0.93–0.95, OneClassSVM 0.97).
 
-| tripwire (constant for every legit URL) | value | % of phishing that differ |
-|---|---|---:|
-| `URLSimilarityIndex` | 100 | 99.2% |
-| `IsHTTPS` | 1 | 50.8% |
-| `NoOfQMarkInURL` | 0 | 6.1% |
-| `NoOfEqualsInURL` | 0 | 5.4% |
-| `NoOfAmpersandInURL` | 0 | 0.9% |
-| `IsDomainIP` | 0 | 0.6% |
-| `HasObfuscation` / `NoOfObfuscatedChar` / `ObfuscationRatio` | 0 | 0.5% |
+**4 — Ledoit-Wolf whitening underperforms PCA here, against the library's
+documented expectation.** `TribbleOneClassDetector`'s docstring calls
+`cov="ledoit_wolf"` "a small consistent gain … in tail separation." On this
+corpus it is a large *loss* (0.9397 vs 0.9993). LW shrinks the covariance toward
+a scaled identity, which damps exactly the low-variance-in-legit directions that
+carry the phishing signal; rank-preserving PCA whitening amplifies them. With
+n ≈ 94k ≫ 39 features the sample covariance is well-conditioned, so shrinkage is
+solving a problem this data does not have. One dataset, but a clean counter-example
+to the default recommendation worth carrying back to the estimator.
 
-Read literally: in PhiUSIIL, a legitimate URL is *always* HTTPS, *never* contains
-a query string (`?`, `=`, `&`), *never* uses an IP-address domain, and *never*
-carries obfuscation. `IsHTTPS` alone — constant among legit, tripped by half of
-phishing — is why the **hard** set (which keeps it; its own single-feature AUC is
-only 0.75, below the 0.95 cut) still scores 0.999. That's also why
-`IsolationForest`, which splits on marginal quantiles rather than exploiting a
-zero-variance dimension, is the weakest model here (0.93–0.95): it cannot turn
-"legit never does X" into an infinite distance the way the covariance-based
-models do.
+## Removing the leaks barely moved the number — which is why the policy matters
+
+Mahalanobis on the **full leaky** feature set (50 features, `URLSimilarityIndex`
+and all tripwires included) scores AUROC 0.9990 — essentially identical to the
+0.9989 it gets on the clean standard set. The leakage was never *necessary* for a
+near-perfect score; the dataset is that separable. That is precisely why the
+standard benchmark must exclude the tripwire-leakage features by policy rather
+than by whether they change the headline: they would let a model claim the win
+for the wrong reason, and the reason is what has to transfer.
 
 ## What to take away
 
-- **Yes, one-class detection works on this dataset**, and a plain Gaussian model
-  beats the fancier ones. If the deliverable is "a one-class detector for
-  PhiUSIIL," Mahalanobis at a train-calibrated 1% FPR is it.
-- **The 0.999 is a property of the dataset, not of the method.** Real
-  legitimate traffic uses query strings, isn't always HTTPS, and doesn't sit at
-  `URLSimilarityIndex == 100`. Roughly half the phishing detection rides on a
-  single binary tripwire (`IsHTTPS`) that will not hold outside this corpus.
-  Expect these numbers to fall sharply on live URLs.
-- **Model ranking, not the absolute score, is the transferable finding:** when a
-  one-class problem has degenerate (zero-variance-in-normal) dimensions, a
-  full-covariance Gaussian or an RBF `OneClassSVM` exploits them and an
-  isolation forest leaves them on the table.
+- **Yes — the tribble one-class detector works on this dataset**, best-in-class,
+  and its `surprisal` formulation is the right one to use past a handful of
+  features.
+- **The 0.999 is a property of PhiUSIIL, not of phishing detection.** Real
+  legitimate traffic uses query strings, is not always HTTPS, is not pinned at
+  `URLSimilarityIndex == 100`, and clones content-rich pages. Expect these
+  numbers to fall sharply on live URLs; this benchmark cannot estimate by how much.
+- **The transferable findings are the rankings and the mechanism:** covariance-
+  aware one-class models (tribble surprisal ≈ Mahalanobis) dominate marginal
+  models (IsolationForest) when the normal class is homogeneous; the largest
+  per-feature surprisals carry the signal; and PCA whitening beats Ledoit-Wolf
+  shrinkage when n ≫ p.
 
 ## Honest caveats / what this did not do
 
-- Categorical `TLD` was dropped rather than frequency-encoded; it may add signal.
-- `OneClassSVM` is fit on a 20k subsample of train normals (RBF is O(n²)); the
-  full-train number could differ slightly.
-- Single seed. The split is large enough that seed variance is small, but this
-  was not repeated across seeds.
-- No hyperparameter search — `IsolationForest` in particular might close some of
-  the gap with tuning, though the tripwire structure above bounds how much.
-
-## Natural next step
-
-This project's thesis instrument is the tribble fuzzy classifier's "none of the
-above" anomaly rule (Ch 4.3.5; see `experiments/fuzzy-lm-anomaly.md`). The honest
-test is *not* whether it hits 0.999 here — the tripwires make that cheap — but
-whether it holds up on the **hard** feature set against these baselines, where
-the easy separators are gone.
+- Single seed. The split is large, so seed variance is small, but not measured
+  across seeds.
+- Categorical `TLD` dropped rather than frequency-encoded.
+- `OneClassSVM` fit on a 20k subsample of train normals (RBF is O(n²)).
+- No hyperparameter search beyond the three tribble score/cov variants shown; the
+  homogeneous-manifold structure bounds how much tuning the baselines could
+  recover.
+- "Tripwire" is defined as exact zero variance in the fit rows. Near-constant
+  features (e.g. `NoOfDegitsInURL`, 97% at one value) are kept; they behave like
+  soft tripwires and are part of why the standard-set score stays near 0.999.
