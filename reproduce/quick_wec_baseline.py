@@ -5,8 +5,6 @@ import os
 import sys
 import time
 
-import numpy as np
-import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
@@ -14,10 +12,9 @@ from sklearn.metrics import r2_score
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tables"))
 import _fuzzy_models as F  # noqa: E402
 
-df = pd.read_csv(os.path.join(F.DATA_DIR, "WEC_Perth_49.csv"))
-y = df["Total_Power"].astype(float)
-exclude_cols = ["Total_Power", "qW"] + [c for c in df.columns if c.startswith("Power")]
-X = df.drop(columns=exclude_cols).select_dtypes(include=[np.number]).astype(float)
+# Shared loader: drops the per-converter Power* columns and qW as leaks (they
+# are the target's own addends), leaving the converter placement coordinates.
+X, y = F.load_wec("Perth", 49)
 
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
 
