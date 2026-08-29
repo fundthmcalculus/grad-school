@@ -1,0 +1,12 @@
+# Data files are provenance evidence, not source: `bodyfat.names` records a
+# sha256 and asserts a 0-differing-cell match against the canonical file at
+# jse.amstat.org. This repo runs with core.autocrlf=true, which would rewrite
+# LF to CRLF on checkout and make that sha256 fail on a fresh Windows clone --
+# so the bytes have to be pinned.
+#
+# Scoped to bodyfat deliberately. The same argument applies to every file in
+# here, but broadening it would restage the already-tracked datasets for anyone
+# holding a CRLF working copy, and churning six files to make a point is not
+# worth it. Add a line when you vendor the next one.
+bodyfat.csv   -text
+bodyfat.names -text

@@ -1,0 +1,173 @@
+name: Submodule Sync
+
+# Twice-daily check for new commits on each submodule's own `main` branch.
+# The submodule pins here are otherwise only bumped by hand, so upstream
+# fixes (tribble-fis, optimizers, clustering) silently sit unused until
+# someone remembers to `git submodule update --remote`. This keeps a single
+# moving PR up to date instead: same branch every run, force-pushed, body
+# replaced with whatever changed since the branch was last pushed.
+#
+# research/proposal-defense/ reads results out of these submodules, so any
+# SHA bump here can change its numbers -- the PR body flags that explicitly
+# rather than letting a silent submodule bump land unnoticed.
+
+# Each submodule's own repo now pokes this workflow directly on every merge to
+# its `main` (see notify-downstream.yml over there), so a fix propagates in
+# under a minute instead of waiting up to twelve hours for the next poll. The
+# cron stays as a backstop: it covers a lost dispatch, and it is the only path
+# that works at all when DOWNSTREAM_SYNC_TOKEN is absent upstream.
+on:
+  repository_dispatch:
+    types: [upstream-updated]
+  schedule:
+    - cron: '0 6,18 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Three submodules can merge at once and each dispatches here. Serialize rather
+# than cancel: every run force-pushes the same branch, and a cancelled run drops
+# that submodule's bump on the floor until the next cron.
+concurrency:
+  group: submodule-sync
+  cancel-in-progress: false
+
+env:
+  SYNC_BRANCH: chore/submodule-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: false
+          # A branch pushed with the automatic GITHUB_TOKEN opens a PR that
+          # triggers no `pull_request` workflows -- GitHub suppresses that to
+          # avoid recursion. This PR's whole purpose is to be the one safe
+          # "merge me to get current" button, and a PR with zero checks cannot
+          # serve that. Pushing as the PAT makes PR Checks run on it.
+          token: ${{ secrets.DOWNSTREAM_SYNC_TOKEN || github.token }}
+
+      - name: Warn if the PR will land without CI
+        env:
+          TOKEN: ${{ secrets.DOWNSTREAM_SYNC_TOKEN }}
+        run: |
+          if [ -z "${TOKEN:-}" ]; then
+            echo "::warning::DOWNSTREAM_SYNC_TOKEN is not set. The sync PR will be opened by github-actions, so PR Checks will NOT run on it -- verify it by hand before merging."
+          fi
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update submodules to latest main and check for changes
+        id: sync
+        run: |
+          set -euo pipefail
+
+          declare -A OLD_SHA
+          declare -A URL
+
+          while read -r key path; do
+            name=${key#submodule.}
+            name=${name%.path}
+            url=$(git config -f .gitmodules --get "submodule.$name.url")
+            OLD_SHA["$path"]=$(git ls-tree HEAD "$path" | awk '{print $3}')
+            URL["$path"]="$url"
+          done < <(git config -f .gitmodules --get-regexp '\.path$')
+
+          git submodule update --init --remote --merge
+
+          BODY_FILE=$(mktemp)
+          {
+            echo "Automated submodule sync -- checks each submodule's \`main\` branch twice a day and bumps the pin here to match."
+            echo
+            echo "⚠️ These submodules are consumed by \`research/proposal-defense/\`. Please confirm nothing there needs updating (numbers, citations, generated tables) before merging."
+            echo
+            echo "Triggered by: \`${{ github.event_name }}\`${{ github.event.client_payload.repo && format(' from `{0}`', github.event.client_payload.repo) || '' }}"
+            echo
+            echo "> This branch is machine-owned and force-pushed on every upstream merge."
+            echo "> Do not commit to it by hand -- your commit will be overwritten."
+            echo
+            echo "| Submodule | Old SHA | New SHA |"
+            echo "|---|---|---|"
+          } > "$BODY_FILE"
+
+          changed=false
+          for path in "${!OLD_SHA[@]}"; do
+            old="${OLD_SHA[$path]}"
+            new=$(git -C "$path" rev-parse HEAD)
+            if [ "$old" != "$new" ]; then
+              changed=true
+              repo_path=$(echo "${URL[$path]}" | sed -E 's#https://github.com/##; s#\.git$##')
+              compare="https://github.com/$repo_path/compare/$old...$new"
+              echo "| \`$path\` | \`${old:0:7}\` | [\`${new:0:7}\`]($compare) |" >> "$BODY_FILE"
+            fi
+          done
+
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          echo "body_file=$BODY_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Push the moving sync branch
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git checkout -B "$SYNC_BRANCH"
+          # Read the paths from .gitmodules rather than hardcoding them, which
+          # is what the detection loop above already does. With a hardcoded
+          # list, adding a fourth submodule would produce a PR whose body
+          # reports a bump it never actually staged -- wrong output, silently.
+          git add $(git config -f .gitmodules --get-regexp '\.path$' | awk '{print $2}')
+          git commit -m "chore(submodules): sync to latest main"
+          git push --force origin "$SYNC_BRANCH"
+
+      - name: Open or update the sync PR
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DOWNSTREAM_SYNC_TOKEN || github.token }}
+        run: |
+          set -uo pipefail
+          existing=$(gh pr list --head "$SYNC_BRANCH" --state open --json number -q '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --body-file "${{ steps.sync.outputs.body_file }}"
+            exit 0
+          fi
+
+          # Captured rather than run bare, because the likeliest failure here is
+          # a repo setting rather than a bug, and the raw GraphQL error names
+          # neither the setting nor the remedy. Observed in the 2026-08-29
+          # scheduled run: the branch pushed fine and only this step failed, so
+          # the bumps sat on a ref nobody knew to look at.
+          if out=$(gh pr create               --title "chore(submodules): sync to latest main"               --body-file "${{ steps.sync.outputs.body_file }}"               --head "$SYNC_BRANCH"               --base main 2>&1); then
+            echo "$out"
+            exit 0
+          fi
+          echo "$out"
+
+          COMPARE="${{ github.server_url }}/${{ github.repository }}/compare/main...$SYNC_BRANCH?expand=1"
+          if echo "$out" | grep -qi "not permitted to create or approve pull requests"; then
+            {
+              echo "## Submodule sync could not open its PR"
+              echo
+              echo "The branch \`$SYNC_BRANCH\` **was pushed successfully** -- the pins are safe,"
+              echo "only the pull request is missing. [Open it by hand]($COMPARE), or fix one of"
+              echo "these so the next run does it for you:"
+              echo
+              echo "1. **Set the \`DOWNSTREAM_SYNC_TOKEN\` secret** (preferred). A PR opened by a"
+              echo "   PAT is not \"GitHub Actions creating a PR\", so the restriction does not"
+              echo "   apply -- and it separately fixes this PR getting no CI, since one opened"
+              echo "   with the automatic GITHUB_TOKEN triggers no \`pull_request\` workflows."
+              echo "2. **Or** enable Settings -> Actions -> General -> Workflow permissions ->"
+              echo "   \"Allow GitHub Actions to create and approve pull requests\". That works,"
+              echo "   but leaves the sync PR with no checks on it."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::Branch pushed, but GitHub Actions may not open a PR. Set DOWNSTREAM_SYNC_TOKEN, or enable 'Allow GitHub Actions to create and approve pull requests'. Open manually: $COMPARE"
+          else
+            echo "::error::Branch pushed, but opening the sync PR failed. Open manually: $COMPARE"
+          fi
+          exit 1

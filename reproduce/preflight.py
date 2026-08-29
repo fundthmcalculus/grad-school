@@ -26,6 +26,11 @@ property the harness relies on and that a caller cannot see from a signature:
                 looking at the repo root; two returned `None` into silence, so
                 Table 4.8's Glass row and the whole of Table 4.9 went missing
                 from every archive (B16(f)).
+  PIN-MATCH     The revision actually imported is the revision `PROVENANCE.txt`
+                records. `tribble-fis` resolves `tribble-clustering` and
+                `optimizers` from its own lockfile, not from the sibling
+                submodules, so the two drift apart in silence and the archive
+                names code that did not run (B18).
 
 **An unavailable import is reported SKIP, never PASS.** A check that passes
 because it could not run is the bug this file exists to catch.
@@ -217,10 +222,94 @@ def _install_fresh():
     if stale:
         return FAIL, (
             f"installed build is STALE against the submodule source ({', '.join(stale)}). "
-            "A pin bump has not taken effect. Re-run once with "
-            "`uv run --project <submodule> --reinstall-package <package> ...`"
+            "Two different causes, and they need different fixes -- PIN-MATCH below "
+            "tells you which: a cached wheel wants "
+            "`uv run --project <submodule> --no-cache --reinstall-package <dist-name> ...` "
+            "(the DIST name, hyphenated), while a lockfile pinning an older revision "
+            "wants `uv lock --upgrade-package <dist-name>` in the project being run"
         )
     return PASS, "installed builds match the submodule sources"
+
+
+def _pin_match():
+    """The revision actually imported must be the revision the archive records.
+
+    `run_all_tables.sh` stamps `git rev-parse HEAD` of each submodule into
+    `PROVENANCE.txt`. That is only the truth for a package installed *from* the
+    submodule directory. `tribble-fis/pyproject.toml` sources both
+    `tribble-clustering` and `optimizers` from git URLs with no revision, so
+    `uv run --project tribble-fis` resolves them from tribble-fis's own
+    `uv.lock` and never looks at the sibling checkout at all.
+
+    Nothing re-resolves those pins on their own and `uv lock --check` cannot see
+    them drift (a revision-less git source is "in sync" with any locked commit),
+    so they go stale quietly. Found 2026-08-27 with `tribble-clustering` five
+    commits and `optimizers` eleven commits behind the submodules the archives
+    were recording -- across seeding fixes, an FCM membership fix and a GA
+    crossover fix.
+
+    Caught one archive before it mattered: an audit of every existing
+    `PROVENANCE.txt` shows none of them misnamed its code, and the next run
+    would have been the first that did. The check exists because that margin was
+    luck, not design -- nothing was watching this axis at all.
+
+    Note the check is not "submodule SHA equals lock pin". Which record is
+    correct depends on how the environment was built: a study run with
+    `--with-editable tribble-opt` really does run the submodule checkout, and
+    recording its SHA is right. Only the installed distribution knows, so that is
+    what this reads.
+
+    A local-directory install cannot drift, so it passes without comment.
+    """
+    import importlib.metadata as md
+    import json
+    import subprocess
+
+    pairs = [
+        ("tribble-clustering", "tribble-cluster"),
+        ("optimizers", "tribble-opt"),
+        ("tribble-fis", "tribble-fis"),
+    ]
+    bad, seen = [], []
+    for dist_name, sub in pairs:
+        try:
+            direct = md.distribution(dist_name).read_text("direct_url.json")
+        except Exception:  # noqa: BLE001 - not installed in this environment
+            continue
+        if not direct:
+            continue
+        try:
+            info = json.loads(direct)
+        except ValueError:
+            continue
+        commit = (info.get("vcs_info") or {}).get("commit_id")
+        if not commit:
+            continue  # installed from a directory: it is the checkout by definition
+        sub_path = os.path.join(ROOT, sub)
+        try:
+            head = subprocess.run(
+                ["git", "-C", sub_path, "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+        except Exception:  # noqa: BLE001
+            continue
+        seen.append(dist_name)
+        if commit != head:
+            bad.append(
+                f"{dist_name} imports {commit[:7]}, submodule {sub} is {head[:7]}"
+            )
+    if bad:
+        return FAIL, (
+            "; ".join(bad)
+            + " -- PROVENANCE records the submodule SHA, so the archive would name "
+            "code that did not run. Fix with `uv lock --upgrade-package <dist-name>` "
+            "in the project being run, then reinstall"
+        )
+    if not seen:
+        return SKIP, "no git-sourced vendored dependency installed in this environment"
+    return PASS, f"{', '.join(seen)} match their submodule HEADs"
 
 
 CHECKS = [
@@ -230,6 +319,7 @@ CHECKS = [
     ("VAT-MATRIXFREE", "cluster", _vat_matrix_free),
     ("DATASETS", "any", _datasets),
     ("INSTALL-FRESH", "any", _install_fresh),
+    ("PIN-MATCH", "any", _pin_match),
 ]
 
 
