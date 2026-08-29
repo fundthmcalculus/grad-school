@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 from tribblefis.gauss_math import (
     generate_synthetic_data,
     simple_gaussian_predict,
@@ -70,7 +70,7 @@ def main(augment_data=False):
 
     # Initialize and fit the Gaussian Mixture Classifier
     # TODO - top-n=3!
-    clf = MixtureOfGaussiansFuzzyClassifier()
+    clf = TribbleClassifier()
     clf.fit(X_train, y_train)
 
     top_n_todo = clf.top_features_

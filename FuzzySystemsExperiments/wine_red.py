@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 from sklearn.pipeline import make_pipeline
 
-from tribblefis.gaussian_regressor import MixtureOfGaussiansFuzzyRegressor
+from tribblefis.gaussian_regressor import TribbleRegressor
 from tribblefis.scaling import UnitScalar
 from tribblefis.regression import (
     report_regression_performance,
@@ -73,7 +73,7 @@ def main():
         # the test split's min/max never leak into the transform.
         reg = make_pipeline(
             UnitScalar(),
-            MixtureOfGaussiansFuzzyRegressor(
+            TribbleRegressor(
                 n_output_buckets=5,
                 tsk_order=order,
                 optimize_coefficients=True,

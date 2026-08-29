@@ -10,7 +10,7 @@ from tribblefis.gauss_plot import report_figures_of_merit
 # min-max-to-[0,1] behaviour (the name was always a misnomer -- it never
 # z-scored).
 from tribblefis.scaling import UnitScalar
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 
 
 def load_data():
@@ -65,7 +65,7 @@ def main():
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # Initialize and fit the Gaussian Mixture Classifier
-    clf = MixtureOfGaussiansFuzzyClassifier()
+    clf = TribbleClassifier()
     clf.fit(X_train, y_train)
 
     top_n_todo = clf.top_features_

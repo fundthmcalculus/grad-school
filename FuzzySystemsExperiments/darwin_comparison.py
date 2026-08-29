@@ -11,7 +11,7 @@ import time
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 
 
 def load_data():
@@ -101,13 +101,13 @@ def main():
     print("\nNote: Using top_n=10 for faster training (Darwin has 450 features)")
 
     # Train Gaussian classifier
-    clf_gauss = MixtureOfGaussiansFuzzyClassifier(member_function="gaussian", top_n=10)
+    clf_gauss = TribbleClassifier(member_function="gaussian", top_n=10)
     results_gauss = evaluate_classifier(
         clf_gauss, X_train, X_test, y_train, y_test, "Gaussian"
     )
 
     # Train Trapezoid classifier (using fast method by default)
-    clf_trapz = MixtureOfGaussiansFuzzyClassifier(member_function="trap", top_n=10)
+    clf_trapz = TribbleClassifier(member_function="trap", top_n=10)
     results_trapz = evaluate_classifier(
         clf_trapz, X_train, X_test, y_train, y_test, "Trapezoid (Fast)"
     )

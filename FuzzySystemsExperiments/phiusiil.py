@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 from tribblefis.gauss_math import simple_gaussian_predict
 from tribblefis.scaling import UnitScalar
 from tribblefis.gauss_plot import (
@@ -80,7 +80,7 @@ def main():
     X_train, X_test = _scaler.transform(X_train), _scaler.transform(X_test)
 
     # Initialize and fit the Gaussian Mixture Classifier
-    clf = MixtureOfGaussiansFuzzyClassifier(
+    clf = TribbleClassifier(
         top_n=5,
         n_gaussians={
             "LineOfCode": 3,
