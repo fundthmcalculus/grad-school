@@ -48,8 +48,9 @@ leakage into the ranking) and the prefixes genuinely nested (no re-ranking per
 k). The curve is not guaranteed strictly monotone -- a later feature can add
 noise -- so galloping/bisection find the smallest k under a near-monotone
 assumption; `select(..., verify_scan=True)` falls back to a full scan and
-asserts the searched answer matches it, for the datasets where that assumption
-needs checking.
+raises `AssertionError` if the searched answer disagrees with it -- the
+smallest passing k in target mode, the knee in plateau mode -- for the datasets
+where that assumption needs checking.
 
 Run the built-in demonstration from the repo root (needs the `tribble-fis`
 submodule checked out, or `PILOT_TRIBBLE_FIS` pointed at a clone):
@@ -274,6 +275,24 @@ class AgglomerativeFeatureExpansion:
     def _better(self, a, b):
         return a > b if self.greater_is_better else a < b
 
+    def _passes(self, score, target):
+        """Whether `score` clears `target`, respecting the optimization sense."""
+        return score >= target if self.greater_is_better else score <= target
+
+    def _knee(self, plateau_tol):
+        """Smallest cached k whose score is within `plateau_tol` of the best
+        score in the cache. Shared by the plateau search and its verify, so the
+        searched knee and the full-scan knee are computed by identical logic."""
+        best = None
+        for r in self._cache.values():
+            if best is None or self._better(r["score"], best):
+                best = r["score"]
+        threshold = best - plateau_tol if self.greater_is_better else best + plateau_tol
+        for kk in sorted(self._cache):
+            if not self._better(threshold, self._cache[kk]["score"]):
+                return kk
+        return sorted(self._cache)[-1]
+
     # -- ranking ----------------------------------------------------------- #
     def _rank(self, X, y):
         import tribblefis.gauss_math as gm
@@ -389,8 +408,7 @@ class AgglomerativeFeatureExpansion:
         M = self._max_k()
 
         def passes(k):
-            s = self._evaluate(k)["score"]
-            return s >= target if self.greater_is_better else s <= target
+            return self._passes(self._evaluate(k)["score"], target)
 
         # Gallop: 1, 2, 4, ... until one passes or we run out of features.
         hi = 1
@@ -430,16 +448,7 @@ class AgglomerativeFeatureExpansion:
                 break
             k += 1
         # Knee: smallest evaluated k already within tol of the best score seen.
-        evaluated = sorted(self._cache)
-        threshold = (
-            best_score - plateau_tol
-            if self.greater_is_better
-            else best_score + plateau_tol
-        )
-        for kk in evaluated:
-            if not self._better(threshold, self._cache[kk]["score"]):
-                return kk, True
-        return evaluated[-1], True
+        return self._knee(plateau_tol), True
 
     # -- public search ----------------------------------------------------- #
     def select(self, target=None, plateau_tol=1e-3, patience=2, verify_scan=False):
@@ -448,9 +457,12 @@ class AgglomerativeFeatureExpansion:
         target given  -> smallest k reaching it (galloping + bisection).
         target None   -> knee of the plateau (expand-until-flat).
 
-        `verify_scan=True` additionally fits every k up to the cap and asserts
-        the searched k matches a full-scan answer -- a guard for datasets whose
-        score-vs-k curve may not be monotone enough for bisection.
+        `verify_scan=True` additionally fits every k up to the cap and raises
+        `AssertionError` if the searched answer disagrees with the full scan --
+        the smallest passing k in target mode, the knee in plateau mode -- a
+        guard for datasets whose score-vs-k curve may not be monotone enough for
+        the search. It verifies both modes; an unreachable target has no passing
+        k to check and is reported (reached=False) rather than raising.
         """
         if not hasattr(self, "rank_"):
             raise RuntimeError("call fit(X, y) before select()")
@@ -504,23 +516,39 @@ class AgglomerativeFeatureExpansion:
         return result
 
     def _verify_against_scan(self, k_found, target, plateau_tol, patience):
+        """Fit every k and confirm the searched answer equals the full-scan
+        answer, raising on disagreement. Covers both modes: the smallest passing
+        k in target mode, the knee in plateau mode. `AssertionError` is the
+        contract `verify_scan=True` advertises -- an opt-in hard guarantee for
+        datasets whose score-vs-k curve may not be monotone enough for the
+        search, so a mismatch must fail loudly rather than warn."""
         for kk in range(1, self._max_k() + 1):
             self._evaluate(kk)
         if target is not None:
             passing = [
                 kk
                 for kk in range(1, self._max_k() + 1)
-                if (self._cache[kk]["score"] >= target) == self.greater_is_better
-                or (not self.greater_is_better and self._cache[kk]["score"] <= target)
+                if self._passes(self._cache[kk]["score"], target)
             ]
+            # No passing k means the target is unreachable; the search already
+            # reports reached=False and the best k, so there is nothing to check.
             true_k = min(passing) if passing else None
             if true_k is not None and true_k != k_found:
-                print(
-                    f"  [verify] WARNING: bisection returned k={k_found} but full "
-                    f"scan's smallest passing k is {true_k} (non-monotone curve)."
+                raise AssertionError(
+                    f"verify_scan: bisection returned k={k_found} but the full "
+                    f"scan's smallest passing k is {true_k} (non-monotone curve)"
                 )
-            elif self.verbose:
+            if self.verbose:
                 print(f"  [verify] full scan agrees: smallest passing k = {true_k}")
+        else:
+            true_k = self._knee(plateau_tol)
+            if true_k != k_found:
+                raise AssertionError(
+                    f"verify_scan: plateau search returned knee k={k_found} but "
+                    f"the full-scan knee is k={true_k} (non-monotone curve)"
+                )
+            if self.verbose:
+                print(f"  [verify] full scan agrees: plateau knee k = {true_k}")
 
 
 # --------------------------------------------------------------------------- #
@@ -594,10 +622,21 @@ def _demo_phiusiil():
         print("  [skipped: PhiUSIIL data unavailable]")
         return
     X, y = data
+    # PhiUSIIL ships label-leaking features -- URLSimilarityIndex is a URL's
+    # similarity to a whitelist of known-legit URLs, i.e. the answer in disguise
+    # (plus two legitimacy-derived probabilities). Drop them before selecting so
+    # this demo does not showcase finding a leak; with them in, the "smallest
+    # good-enough" set is just the leak. Once the loader drops these on load
+    # (issue #215) this local guard becomes redundant.
+    leak = ["URLSimilarityIndex", "TLDLegitimateProb", "URLCharProb"]
+    dropped = [c for c in leak if c in X.columns]
+    if dropped:
+        print(f"  dropping {len(dropped)} label-leaking feature(s): {dropped}")
+        X = X.drop(columns=dropped)
     seed = int(os.environ.get("FE_SEED", "0"))
     sel = AgglomerativeFeatureExpansion(task="classification", random_state=seed)
     sel.fit(X, y)
-    sel.select(target=0.97)
+    sel.select(target=0.97, verify_scan=True)
 
 
 def _demo_regression():

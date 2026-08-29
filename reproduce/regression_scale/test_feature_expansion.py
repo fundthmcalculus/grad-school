@@ -110,6 +110,32 @@ def test_cache_is_reused_across_calls():
     assert res.n_evaluations == len(set(sel._cache) - set(before))
 
 
+def test_verify_scan_raises_on_target_disagreement():
+    """A non-monotone spike the gallop skips: k=3 clears the bar but the
+    power-of-two probes (1,2,4,8) put bisection at k=8. verify_scan must raise,
+    not warn, because the full scan's smallest passing k (3) differs."""
+    sel = _fitted()
+    M = sel.n_features_survived_
+    curve = {k: 0.50 for k in range(1, M + 1)}
+    curve[3] = 0.99  # the spike the gallop cannot see
+    curve[8] = 0.99  # a power-of-two pass so the gallop brackets high
+    sel._cache = {
+        k: {"k": k, "features": sel.rank_[:k], "score": s, "fit_s": 0.0}
+        for k, s in curve.items()
+    }
+    with pytest.raises(AssertionError, match="smallest passing k is 3"):
+        sel.select(target=0.97, verify_scan=True)
+
+
+def test_verify_scan_plateau_agrees_and_does_not_raise():
+    """Plateau-mode verify_scan is no longer a no-op: it recomputes the knee over
+    the full cache and agrees on the clean synthetic curve."""
+    sel = _fitted()
+    res = sel.select(plateau_tol=0.005, patience=2, verify_scan=True)
+    assert res.reached_target
+    assert res.k <= 4
+
+
 def test_decorrelation_off_keeps_all_features():
     sel = _fitted(decorrelate=False)
     assert sel.n_features_survived_ == 20
