@@ -29,6 +29,7 @@ from .loaders import (
     load_shuttle,
     load_wec,
 )
+from .regression_scale import load_housing, load_superconduct
 
 __all__ = [
     "DATA_DIR",
@@ -42,4 +43,6 @@ __all__ = [
     "load_rt_iot2022",
     "load_shuttle",
     "load_wec",
+    "load_housing",
+    "load_superconduct",
 ]
