@@ -2,7 +2,6 @@ import os
 import time
 
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gauss_math import (
@@ -25,20 +24,20 @@ from tribblefis.regression import (
 
 
 def load_data():
-    data_path = "WEC_Perth_49.csv"
-    if not os.path.exists(data_path):
-        # Try to find it in the same directory as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
+    """WEC farm-total power via the shared loader (``repro_data.load_wec``),
+    reading ``data/WEC_Perth_49.csv`` and dropping every ``Power*`` column and
+    ``qW`` as leaks (they are the farm total's own addends), leaving the
+    converter placement coordinates. The old inline copy read a bare
+    ``WEC_Perth_49.csv`` absent from the repo root; this gives the identical
+    (X, y). y is renamed to "y_value" to preserve the old contract.
+    """
+    import sys
 
-    X = pd.read_csv(data_path)
-    X = X.dropna()
-    y = X["Total_Power"]
-    y.name = "y_value"
-    X.drop(columns=[col for col in X.columns if "Power" in col], inplace=True)
-    X.drop("qW", axis=1, inplace=True)
-    X = X.select_dtypes(include=[np.number])
-    return X, y
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_wec
+
+    X, y = load_wec("Perth", 49)
+    return X, y.rename("y_value")
 
 
 def main():

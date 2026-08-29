@@ -303,20 +303,28 @@ def load_bikeshare(target_col="cnt", sample_size=None):
         return None
 
 
-def load_wec(site="Perth", n_wecs=49, target="Total_Power"):
-    """Wave Energy Converter farm power output (regression).
+def load_wec(site="Perth", n_wecs=49, target="Total_Power", feature_cols=None):
+    """Wave Energy Converter power output (regression).
 
     Files: ``data/WEC_{site}_{n_wecs}.csv`` (site in {Perth, Sydney}, n_wecs in
     {49, 100}). Returns (X, y) or None if the file is missing.
 
-    LEAK. The per-converter power columns are the target's own addends: the farm
-    total ``Total_Power`` is the sum of the individual ``Power1..PowerN``, so
-    handing those to a model that predicts the total is asking it to recover a
-    sum it already holds. Every ``Power*`` column is dropped, along with ``qW``
-    (the aggregate q-factor, another direct function of the outputs). What
-    remains are the converter (X, Y) placement coordinates -- the genuine design
-    features. This is the exact exclusion ``quick_wec_baseline.py`` applied
-    inline; it now lives here so the WEC arms cannot drift apart on it.
+    Two modes, both leak-free:
+
+    * **Farm total** (default, ``feature_cols=None``): predict ``Total_Power``
+      from the converter (X, Y) placement coordinates. Every ``Power*`` column
+      is dropped -- they are the target's own addends, since the farm total is
+      the sum of the individual ``Power1..PowerN`` -- along with ``qW`` (the
+      aggregate q-factor, another direct function of the outputs). Handing those
+      to the model would ask it to recover a sum it already holds.
+
+    * **Single converter** (``target="Power{i}"``, ``feature_cols=["X{i}",
+      "Y{i}"]``): predict one converter's power from only its own coordinates.
+      Passing the other converters' Power columns would leak, so ``feature_cols``
+      pins X to exactly the requested placement columns.
+
+    The default exclusion is the one ``quick_wec_baseline.py`` applied inline; it
+    now lives here so the WEC arms cannot drift apart on it.
     """
     local = os.path.join(DATA_DIR, f"WEC_{site}_{n_wecs}.csv")
     try:
@@ -328,12 +336,15 @@ def load_wec(site="Perth", n_wecs=49, target="Total_Power"):
         print(f"  [wec] target '{target}' not in {os.path.relpath(local, REPO_ROOT)}")
         return None
     y = df[target].astype(float)
-    exclude = [target, "qW"] + [c for c in df.columns if c.startswith("Power")]
-    X = (
-        df.drop(columns=exclude, errors="ignore")
-        .select_dtypes(include=[np.number])
-        .astype(float)
-    )
+    if feature_cols is not None:
+        X = df[list(feature_cols)].select_dtypes(include=[np.number]).astype(float)
+    else:
+        exclude = [target, "qW"] + [c for c in df.columns if c.startswith("Power")]
+        X = (
+            df.drop(columns=exclude, errors="ignore")
+            .select_dtypes(include=[np.number])
+            .astype(float)
+        )
     print(
         f"  [wec] loaded {os.path.relpath(local, REPO_ROOT)}: "
         f"{len(X)} rows × {X.shape[1]} features"
