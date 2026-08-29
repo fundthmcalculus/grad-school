@@ -17,21 +17,22 @@ from tribblefis.gauss_plot import (
 
 
 def load_data():
-    data_path = "phishing_data/PhiUSIIL_Phishing_URL_Dataset.csv"
-    if not os.path.exists(data_path):
-        # Try to find it in the same directory as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
+    """PhiUSIIL via the shared loader (``repro_data.load_phiusiil``), which reads
+    ``data/PhiUSIIL_Phishing_URL_Dataset.csv`` and applies the canonical
+    preprocessing (drop label + the text columns -> 50 features, label mapped to
+    "legit"/"phish"). The old inline copy read a ``phishing_data/`` path absent
+    from the repo, so this script could not run from the repo root.
 
-    X = pd.read_csv(data_path)
-    X = X.dropna()
-    y = X["label"]
+    ``sample_size=None`` keeps all rows; y is returned as a Series indexed like X
+    so the ``.nunique()`` and ``stratify=y`` usage below is unchanged.
+    """
+    import sys
 
-    y = y.map({0: "legit", 1: "phish"})
-    X = X.drop(columns=["label", "FILENAME"])
-    X = X.select_dtypes(include=[np.number])
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_phiusiil
 
-    return X, y
+    X, y = load_phiusiil(sample_size=None)
+    return X, pd.Series(y, index=X.index)
 
 
 def main():

@@ -19,14 +19,22 @@ from tribblefis.scaling import UnitScalar
 
 
 def load_data():
-    rt_iot2022 = pd.read_csv("rt-iot2022/RT_IOT2022.csv")
-    y = rt_iot2022["Attack_type"].copy()
-    X = rt_iot2022.drop(columns=["Attack_type", "id"])
+    """RT-IOT2022 via the shared loader (``repro_data.load_rt_iot2022``), which
+    reads ``data/RT_IOT2022.csv`` and drops the leaky unnamed per-class index
+    column plus the ``proto``/``service`` strings -> 81 features. The old inline
+    copy read an ``rt-iot2022/`` path absent from this repo and dropped a
+    differently-named ``id`` column; per the consolidation policy this unifies
+    onto the canonical leak-free loader. y is returned as a Series indexed like X
+    so the ``.nunique()`` and ``stratify=y`` usage below is unchanged.
+    """
+    import os
+    import sys
 
-    # data (as pandas dataframes)
-    X = X.select_dtypes(include=[np.number])
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_rt_iot2022
 
-    return X, y
+    X, y = load_rt_iot2022()
+    return X, pd.Series(y, index=X.index)
 
 
 def main(augment_data=False):
