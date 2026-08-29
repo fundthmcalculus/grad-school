@@ -1,7 +1,6 @@
 import os
 import time
 
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -11,19 +10,25 @@ from tribblefis.gauss_plot import report_figures_of_merit
 
 
 def load_data():
-    data_path = "beth_data/labelled_testing_data.csv"
-    if not os.path.exists(data_path):
-        # Try to find it in the same directory as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
+    """BETH via the shared loader (``repro_data.load_beth``), reading data/beth/.
 
-    X = pd.read_csv(data_path)
-    X = X.dropna()
-    y = X["sus"]
-    y = y.map({0: "legit", 1: "sus"})
+    UNIFIED TO CANONICAL. The old copy read a single ``beth_data/`` file (absent
+    from this repo) and predicted ``sus`` -- BETH's SECOND label. This predicts
+    the primary ``evil`` label on the canonical test split and drops ``sus`` and
+    ``timestamp`` as leaks (the LEAKY_COLUMNS ``table_4_11`` uses; ``sus`` is a
+    second label). That is a deliberate change of what this script measures, per
+    the consolidation policy, so this script's numbers move. y is a Series so the
+    ``.nunique()`` and ``stratify=y`` usage below is unchanged.
+    """
+    import sys
 
-    X.drop(["sus", "evil"], axis=1, inplace=True)
-    X = X.select_dtypes(include=[np.number])
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_beth
+
+    splits = load_beth()
+    X, y = splits["test"]
+    X = X.drop(columns=["sus", "timestamp"], errors="ignore")
+    y = pd.Series(y, index=X.index).map({0: "legit", 1: "evil"})
     return X, y
 
 

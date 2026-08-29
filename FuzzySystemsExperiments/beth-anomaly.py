@@ -21,21 +21,30 @@ from tribblefis.scaling import UnitScalar
 
 
 def load_data(test: bool = False):
-    # Load the benign traffic for training
-    data = pd.read_csv("beth_data/labelled_training_data.csv")
-    data["Traffic_type"] = "regular"
+    """BETH anomaly framing via the shared loader (``repro_data.load_beth``),
+    reading data/beth/. The old copy read ``beth_data/`` paths absent from this
+    repo; the one-class design is unchanged -- TRAIN is the training split with
+    every row labelled "regular" (benign-only training), TEST is the testing
+    split with ``evil == 1`` rows relabelled "anomaly". ``sus`` and ``timestamp``
+    are dropped as leaks (``args`` is already gone: load_beth keeps only numeric
+    columns), leaving the 8 canonical BETH features.
+    """
+    import os
+    import sys
+
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_beth
+
+    splits = load_beth()
+    X, y_evil = splits["test" if test else "train"]
+    X = X.drop(columns=["sus", "timestamp"], errors="ignore")
     if test:
-        data = pd.read_csv("beth_data/labelled_testing_data.csv")
-        data["Traffic_type"] = "regular"
-        # Only update the "evil" as anomaly.
-        data.loc[data["evil"] == 1, "Traffic_type"] = "anomaly"
-
-    X = data
-
-    y = X["Traffic_type"].copy()
-    X = X.drop(columns=["sus", "evil", "Traffic_type", "args", "timestamp"])
-    # data (as pandas dataframes)
-    X = X.select_dtypes(include=[np.number])
+        # Only the truly-evil rows are anomalies; everything else is regular.
+        tt = np.where(np.asarray(y_evil) == 1, "anomaly", "regular")
+    else:
+        # Benign-only training: every training row is treated as regular.
+        tt = np.full(len(X), "regular")
+    y = pd.Series(tt, index=X.index, name="Traffic_type")
     # The log used to happen here. It has moved to main() -- see the note there.
     return X, y
 
