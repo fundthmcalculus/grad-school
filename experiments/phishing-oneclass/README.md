@@ -4,8 +4,9 @@
 
 Findings are in [`RESULTS.md`](RESULTS.md). Short version: train the tribble fuzzy
 one-class detector on legitimate URLs only and it flags phishing almost perfectly
-on the **leak-free standard benchmark** — **AUROC 0.9993, 99.8% of phishing
-caught at a 1% false-positive rate** — using its `surprisal` formulation (summed
+on the **leak-free standard benchmark** — **AUROC 0.9992 ± 0.0001, 99.8% of
+phishing caught at a 1% false-positive rate** (mean ± std over 5 seeds) — using
+its `surprisal` formulation (summed
 `-log` membership), not the saturating `1 - max firing` complement rule. It ties
 a whitened-Gaussian Mahalanobis baseline, which is the tell that under
 `whiten=True` + one Gaussian per component the surprisal score *is* a diagonalised
@@ -63,5 +64,7 @@ floor. See `data.py` for the exact policy.
 uv run --no-sync python experiments/phishing-oneclass/run.py
 ```
 
-~40 s on CPU, exits 0. Prints the imported `tribblefis` source path and commit
-(numbers depend on the tribble-fis pin), the feature policy, and the full table.
+~3 min on CPU (5 seeds), exits 0. Reports every (model, feature set) as
+mean ± std over `data.SEEDS`. Prints the imported `tribblefis` source path and
+commit (numbers depend on the tribble-fis pin), the feature policy, and the full
+tables.

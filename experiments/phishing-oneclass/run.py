@@ -1,5 +1,5 @@
 """One-class phishing benchmark on PhiUSIIL, primary model = the tribble fuzzy
-one-class detector.
+one-class detector. Multi-seed, with error bars.
 
 Train a one-class ("one-sided") model on legitimate URLs only and measure how
 well it flags phishing as out-of-distribution. The primary estimator is
@@ -14,9 +14,12 @@ are PCA-whitened first because the product-t-norm rule assumes independence.
 Standard benchmark feature policy (see ``data.py``): the model is **not** allowed
 to train on the tripwire-leakage features. ``URLSimilarityIndex`` (a whitelist-
 similarity leak) and the other legitimacy-derived leaks are removed, and so is
-every feature that is exactly constant across the legitimate training set
+every feature that is exactly constant across the legitimate class
 (always-HTTPS, never-a-query-string, ...), since a single such tripwire otherwise
 carries the whole score. sklearn one-class baselines run on the same features.
+
+Every (model, feature set) is run across ``data.SEEDS`` -- each seed reshuffles
+the legit train/test split and reseeds the model -- and reported as mean +/- std.
 
 Run from the repo root:
     uv run --no-sync python experiments/phishing-oneclass/run.py
@@ -53,42 +56,34 @@ from sklearn.svm import OneClassSVM
 import tribblefis
 from tribblefis.one_class import TribbleOneClassDetector
 
-from data import SEED, detection_at_fpr, feature_policy, load, split
+from data import SEEDS, detection_at_fpr, feature_policy, load, split
 
 OCSVM_FIT_N = 20_000  # OneClassSVM is O(n^2); fit on a subsample of train normals
 
 
-# -- models: each returns (fit_on_train_normals) -> anomaly-score function -----
+# -- models: each (X_tr, seed) -> anomaly-score function -----------------------
 # Higher score = more anomalous (phishing-like) in every case.
 
-def m_tribble_surprisal(X_tr):
+def _tribble(X_tr, seed, **kw):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         det = TribbleOneClassDetector(
-            whiten=True, score="surprisal", cov="pca",
-            n_gaussians=1, norm_conorm="probability", random_state=SEED,
+            whiten=True, n_gaussians=1, norm_conorm="probability",
+            random_state=seed, **kw,
         ).fit(X_tr)
     return det.anomaly_score
 
 
-def m_tribble_trimmed(X_tr):
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        det = TribbleOneClassDetector(
-            whiten=True, score="trimmed", trim=2, cov="pca",
-            n_gaussians=1, norm_conorm="probability", random_state=SEED,
-        ).fit(X_tr)
-    return det.anomaly_score
+def m_tribble_surprisal(X_tr, seed):
+    return _tribble(X_tr, seed, score="surprisal", cov="pca")
 
 
-def m_tribble_ledoit(X_tr):
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        det = TribbleOneClassDetector(
-            whiten=True, score="surprisal", cov="ledoit_wolf",
-            n_gaussians=1, norm_conorm="probability", random_state=SEED,
-        ).fit(X_tr)
-    return det.anomaly_score
+def m_tribble_trimmed(X_tr, seed):
+    return _tribble(X_tr, seed, score="trimmed", trim=2, cov="pca")
+
+
+def m_tribble_ledoit(X_tr, seed):
+    return _tribble(X_tr, seed, score="surprisal", cov="ledoit_wolf")
 
 
 def _sklearn_prep(X_tr):
@@ -96,23 +91,23 @@ def _sklearn_prep(X_tr):
     return sc, sc.transform(X_tr.to_numpy(float))
 
 
-def m_mahalanobis(X_tr):
+def m_mahalanobis(X_tr, seed):
     sc, Z = _sklearn_prep(X_tr)
     cov = EmpiricalCovariance().fit(Z)
     return lambda X: cov.mahalanobis(sc.transform(np.asarray(X, float)))
 
 
-def m_ocsvm(X_tr):
+def m_ocsvm(X_tr, seed):
     sc, Z = _sklearn_prep(X_tr)
-    rng = np.random.default_rng(SEED)
+    rng = np.random.default_rng(seed)
     sub = Z if len(Z) <= OCSVM_FIT_N else Z[rng.choice(len(Z), OCSVM_FIT_N, replace=False)]
     m = OneClassSVM(kernel="rbf", gamma="scale", nu=0.05).fit(sub)
     return lambda X: -m.decision_function(sc.transform(np.asarray(X, float)))
 
 
-def m_isoforest(X_tr):
+def m_isoforest(X_tr, seed):
     sc, Z = _sklearn_prep(X_tr)
-    m = IsolationForest(n_estimators=300, random_state=SEED, n_jobs=-1).fit(Z)
+    m = IsolationForest(n_estimators=300, random_state=seed, n_jobs=-1).fit(Z)
     return lambda X: -m.score_samples(sc.transform(np.asarray(X, float)))
 
 
@@ -126,24 +121,36 @@ BASELINES = {
     "OneClassSVM(rbf)": m_ocsvm,
     "IsolationForest": m_isoforest,
 }
+METRICS = ("AUROC", "AP", "recall@1%FPR", "recall@5%FPR")
 
 
-def evaluate(X, y, cols, models, tag):
-    X_tr, X_te, y_te = split(X, y, cols)
-    print(f"\n{'='*78}\n{tag}  ({len(cols)} features)  "
-          f"train_normals={len(X_tr)}  test={len(y_te)} "
-          f"(legit={int((y_te==0).sum())}, phish={int((y_te==1).sum())})")
-    rows = []
+def _one_seed(X, y, cols, build, seed):
+    X_tr, X_te, y_te = split(X, y, cols, seed=seed)
+    score = build(X_tr, seed)
+    s_tr, s_te = np.asarray(score(X_tr)), np.asarray(score(X_te))
+    det = detection_at_fpr(s_tr, s_te, y_te)
+    return {
+        "AUROC": roc_auc_score(y_te, s_te),
+        "AP": average_precision_score(y_te, s_te),
+        "recall@1%FPR": det[0.01][0],
+        "recall@5%FPR": det[0.05][0],
+    }
+
+
+def evaluate(X, y, cols, models, tag, seeds=SEEDS):
+    X_tr0, _, y_te0 = split(X, y, cols, seed=seeds[0])
+    print(f"\n{'='*92}\n{tag}  ({len(cols)} features)  train_normals={len(X_tr0)}  "
+          f"test={len(y_te0)} (legit={int((y_te0==0).sum())}, phish={int((y_te0==1).sum())})  "
+          f"seeds={list(seeds)}")
+    print(f"  {'model':20s} " + "  ".join(f"{m:>16s}" for m in METRICS))
+    rows = {}
     for name, build in models.items():
-        score = build(X_tr)
-        s_tr, s_te = np.asarray(score(X_tr)), np.asarray(score(X_te))
-        auc = roc_auc_score(y_te, s_te)
-        ap = average_precision_score(y_te, s_te)
-        det = detection_at_fpr(s_tr, s_te, y_te)
-        (r1, f1), (r5, f5) = det[0.01], det[0.05]
-        rows.append((name, auc, ap, r1, r5))
-        print(f"  {name:20s} AUROC={auc:.4f}  AP={ap:.4f}  "
-              f"recall@1%FPR={r1:.3f}(fpr {f1:.3f})  recall@5%FPR={r5:.3f}(fpr {f5:.3f})")
+        per = [_one_seed(X, y, cols, build, s) for s in seeds]
+        agg = {m: (float(np.mean([p[m] for p in per])),
+                   float(np.std([p[m] for p in per]))) for m in METRICS}
+        rows[name] = agg
+        cells = "  ".join(f"{agg[m][0]:.4f}±{agg[m][1]:.4f}" for m in METRICS)
+        print(f"  {name:20s} {cells}")
     return rows
 
 
@@ -159,9 +166,9 @@ def main():
 
     X, y = load()
     fp = feature_policy(X, y)
-    print(f"\nquarantined from the standard benchmark:")
+    print("\nquarantined from the standard benchmark:")
     print(f"  leak (target-derived): {fp['leak']}")
-    print(f"  tripwire (constant across all legit-train): {fp['tripwire']}")
+    print(f"  tripwire (constant across all legit): {fp['tripwire']}")
     print(f"  kept but near-oracle content (dropped only in no_content): {fp['near_oracle']}")
 
     models = {**PRIMARY, **BASELINES}
@@ -169,11 +176,10 @@ def main():
     evaluate(X, y, fp["no_content"], models, "ROBUSTNESS FLOOR (also drop near-oracle content)")
 
     # Reference only: the inflation the standard policy exists to prevent.
-    print("\n" + "-" * 78)
+    print("\n" + "-" * 92)
     print("REFERENCE (DO NOT CITE): Mahalanobis on the full leaky feature set --")
     print("shows the score the tripwire-leakage policy is designed to reject.")
-    evaluate(X, y, fp["all_leaky"], {"Mahalanobis": m_mahalanobis},
-             "leaky reference")
+    evaluate(X, y, fp["all_leaky"], {"Mahalanobis": m_mahalanobis}, "leaky reference")
 
 
 if __name__ == "__main__":

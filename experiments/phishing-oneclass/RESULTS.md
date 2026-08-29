@@ -2,10 +2,12 @@
 
 Primary model: `tribblefis.one_class.TribbleOneClassDetector`, `score="surprisal"`,
 `whiten=True`, `cov="pca"`, `n_gaussians=1`, `norm_conorm="probability"`. Trained
-on legitimate URLs only; evaluated on all phishing. Seed 0; 70/30 legit split
-(94,395 train normals; test = 40,455 held-out legit + 100,945 phishing).
-Thresholds calibrated on training normals only — no phishing label touches any
-model or threshold.
+on legitimate URLs only; evaluated on all phishing. **Mean ± std over 5 seeds**
+(0–4); each seed reshuffles the 70/30 legit split (94,395 train normals; test =
+40,455 held-out legit + 100,945 phishing) and reseeds the model. Thresholds
+calibrated on training normals only — no phishing label touches any model or
+threshold. The feature policy is a fixed benchmark definition and does not vary
+by seed (see `data.py`).
 
 **Provenance:** produced against `tribble-fis` working tree **`297b64b`** (a
 superset of the recorded submodule pin `987ed06`; `987ed06` includes the
@@ -20,39 +22,47 @@ This is the headline table (39 features).
 
 | model | AUROC | AP | recall @1% FPR | recall @5% FPR |
 |---|---:|---:|---:|---:|
-| **Tribble surprisal** | **0.9993** | **0.9997** | **0.998** | **0.999** |
-| Tribble trimmed (drop 2) | 0.9861 | 0.9946 | 0.864 | 0.927 |
-| Tribble surprisal + Ledoit-Wolf | 0.9397 | 0.9758 | 0.609 | 0.780 |
-| Mahalanobis (whitened Gaussian) | 0.9989 | 0.9996 | 0.997 | 0.999 |
-| OneClassSVM (rbf) | 0.9720 | 0.9874 | 0.655 | 0.860 |
-| IsolationForest | 0.9331 | 0.9707 | 0.490 | 0.687 |
+| **Tribble surprisal** | **0.9992 ± 0.0001** | **0.9997 ± 0.0001** | **0.9977 ± 0.0004** | **0.9986 ± 0.0000** |
+| Tribble trimmed (drop 2) | 0.9848 ± 0.0008 | 0.9940 ± 0.0004 | 0.8492 ± 0.0075 | 0.9238 ± 0.0020 |
+| Tribble surprisal + Ledoit-Wolf | 0.9390 ± 0.0013 | 0.9756 ± 0.0007 | 0.6094 ± 0.0030 | 0.7772 ± 0.0036 |
+| Mahalanobis (whitened Gaussian) | 0.9988 ± 0.0003 | 0.9995 ± 0.0001 | 0.9974 ± 0.0000 | 0.9986 ± 0.0000 |
+| OneClassSVM (rbf) | 0.9718 ± 0.0012 | 0.9872 ± 0.0003 | 0.6463 ± 0.0079 | 0.8527 ± 0.0039 |
+| IsolationForest | 0.9370 ± 0.0040 | 0.9727 ± 0.0018 | 0.5023 ± 0.0180 | 0.7026 ± 0.0121 |
 
 **The tribble surprisal detector is the best model, catching 99.8% of phishing at
-a 1% false-positive rate** — trained without ever seeing a phishing sample.
+a 1% false-positive rate** — trained without ever seeing a phishing sample. The
+error bars (5 seeds) are tiny because the test set is 141k points: the rankings
+are real, not seed noise. IsolationForest carries the widest bars (±0.004 AUROC,
+±0.018 recall@1%FPR) from tree randomness; the covariance-aware models are stable
+to the fourth decimal. Tribble surprisal edges Mahalanobis on AUROC by ~0.0004
+(about one Mahalanobis std) and is a statistical tie at the 1%-FPR operating
+point — as it must be; see point 2.
 
 ## Four things the table says
 
 **1 — surprisal, not complement, is the formulation that works here.** The
 default `1 - max firing` complement saturates on wide input; the log-domain
 `surprisal` sum does not. Every number above uses `surprisal`. `trimmed` (drop
-the two largest per-feature surprisals) *loses* 13 points of recall@1%FPR — so
-for phishing the largest per-feature surprisals **are** the signal: a phishing
-URL is caught by being extreme on a handful of whitened directions, and trimming
-them throws that away.
+the two largest per-feature surprisals) *loses* ~15 points of recall@1%FPR
+(0.998 → 0.849) — so for phishing the largest per-feature surprisals **are** the
+signal: a phishing URL is caught by being extreme on a handful of whitened
+directions, and trimming them throws that away.
 
 **2 — surprisal ties Mahalanobis, and that is a consistency check, not a
 coincidence.** Under `whiten=True` with one Gaussian per component, the summed
 surprisal is `sum_j z_j^2 / 2 + const` — a diagonalised Mahalanobis distance in
-the whitened frame. It matching `EmpiricalCovariance().mahalanobis` (0.9993 vs
-0.9989) confirms the fuzzy estimator is computing what the theory says it should.
+the whitened frame. It matching `EmpiricalCovariance().mahalanobis` (0.9992 vs
+0.9988, overlapping error bars) confirms the fuzzy estimator is computing what
+the theory says it should.
 The fuzzy layer buys interpretability (per-feature memberships / firing rules),
 not a different decision surface, at this setting.
 
 **3 — the score survives removing the content features too, which is the real
 finding.** On the `no_content` floor (33 features; also drop the near-oracle
 content counts `LineOfCode`, `NoOfImage`, `NoOfCSS`, `NoOfJS`, `NoOfSelfRef`,
-`NoOfExternalRef`), Tribble surprisal is **0.9994** and Mahalanobis **0.9992** —
-unchanged. So the separation is not one feature or six; it is pervasive. PhiUSIIL's
+`NoOfExternalRef`), Tribble surprisal is **0.9994 ± 0.0000** and Mahalanobis
+**0.9991 ± 0.0002** — unchanged. So the separation is not one feature or six; it
+is pervasive. PhiUSIIL's
 legitimate class is a tight, low-entropy manifold, and whitening turns *every*
 near-degenerate direction into a tripwire, not only the nine exactly-constant
 ones. The tree/SVM models, which do not exploit that covariance structure, sit
@@ -61,7 +71,7 @@ ones. The tree/SVM models, which do not exploit that covariance structure, sit
 **4 — Ledoit-Wolf whitening underperforms PCA here, against the library's
 documented expectation.** `TribbleOneClassDetector`'s docstring calls
 `cov="ledoit_wolf"` "a small consistent gain … in tail separation." On this
-corpus it is a large *loss* (0.9397 vs 0.9993). LW shrinks the covariance toward
+corpus it is a large *loss* (0.9390 vs 0.9992). LW shrinks the covariance toward
 a scaled identity, which damps exactly the low-variance-in-legit directions that
 carry the phishing signal; rank-preserving PCA whitening amplifies them. With
 n ≈ 94k ≫ 39 features the sample covariance is well-conditioned, so shrinkage is
@@ -71,8 +81,8 @@ to the default recommendation worth carrying back to the estimator.
 ## Removing the leaks barely moved the number — which is why the policy matters
 
 Mahalanobis on the **full leaky** feature set (50 features, `URLSimilarityIndex`
-and all tripwires included) scores AUROC 0.9990 — essentially identical to the
-0.9989 it gets on the clean standard set. The leakage was never *necessary* for a
+and all tripwires included) scores AUROC 0.9988 ± 0.0003 — identical to the
+0.9988 it gets on the clean standard set. The leakage was never *necessary* for a
 near-perfect score; the dataset is that separable. That is precisely why the
 standard benchmark must exclude the tripwire-leakage features by policy rather
 than by whether they change the headline: they would let a model claim the win

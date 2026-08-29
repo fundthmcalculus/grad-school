@@ -38,6 +38,7 @@ DROP_STR = ["FILENAME", "URL", "Domain", "TLD", "Title", "label"]
 LEAK = ["URLSimilarityIndex", "TLDLegitimateProb", "URLCharProb"]
 NEAR_ORACLE_SEP = 0.95
 SEED = 0
+SEEDS = (0, 1, 2, 3, 4)  # multi-seed error bars
 TRAIN_FRAC = 0.70
 
 
@@ -49,9 +50,9 @@ def load():
     return X, y
 
 
-def train_idx(y):
+def train_idx(y, seed=SEED):
     """Indices of the legit rows used to fit (the model never sees phishing)."""
-    rng = np.random.default_rng(SEED)
+    rng = np.random.default_rng(seed)
     legit = np.flatnonzero(y == 1)
     rng.shuffle(legit)
     return legit[: int(TRAIN_FRAC * len(legit))]
@@ -61,11 +62,14 @@ def feature_policy(X, y):
     """Classify every numeric feature; return the named feature sets.
 
     ``standard`` is the benchmark set: LEAK and tripwires removed, everything
-    else kept. Tripwires are found from the fit rows only, so the policy uses no
-    information the model wouldn't have.
+    else kept. The feature policy is a fixed benchmark *definition*, so it is
+    seed-independent: a tripwire is a feature constant across the whole
+    legitimate class (any 70% subset of it is constant too), and near-oracle
+    status is a property of the full labelled data. Only the train/test split
+    varies by seed.
     """
-    tr = train_idx(y)
-    tripwire = [c for c in X.columns if X[c].to_numpy(float)[tr].std() == 0.0]
+    legit = np.flatnonzero(y == 1)
+    tripwire = [c for c in X.columns if X[c].to_numpy(float)[legit].std() == 0.0]
     near_oracle = []
     for c in X.columns:
         auc = roc_auc_score(y, X[c].to_numpy(float))
@@ -84,16 +88,16 @@ def feature_policy(X, y):
     }
 
 
-def split(X, y, cols):
+def split(X, y, cols, seed=SEED):
     """One-class split: fit on 70% of legit; test = held-out legit + all phish.
 
     Returns raw (unscaled) frames so each model applies its own scaling/whitening.
     ``y_test``: 0 = normal (held-out legit), 1 = anomaly (phishing).
     """
-    tr = train_idx(y)
     legit = np.flatnonzero(y == 1)
-    rng = np.random.default_rng(SEED)
+    rng = np.random.default_rng(seed)
     rng.shuffle(legit)
+    tr = legit[: int(TRAIN_FRAC * len(legit))]
     legit_te = legit[int(TRAIN_FRAC * len(legit)):]
     phish = np.flatnonzero(y == 0)
     test = np.concatenate([legit_te, phish])
