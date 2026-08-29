@@ -2,7 +2,6 @@ import os
 import time
 
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gauss_math import (
@@ -25,23 +24,23 @@ from tribblefis.report import print_membership_details
 
 
 def load_data(idx: int = 1):
-    data_path = "WEC_Perth_49.csv"
-    if not os.path.exists(data_path):
-        # Try to find it in the same directory as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
+    """Single-converter WEC power via the shared loader (``repro_data.load_wec``),
+    reading ``data/WEC_Perth_49.csv``. Predicts converter ``idx``'s power from
+    only its own placement coordinates (``X{idx}``, ``Y{idx}``); passing the
+    other converters' Power columns would leak, so ``feature_cols`` pins X to
+    exactly those two columns. The old inline copy read a bare ``WEC_Perth_49.csv``
+    absent from the repo root; this gives the identical (X, y). y is renamed to
+    "y_value" to preserve the old contract.
+    """
+    import sys
 
-    X = pd.read_csv(data_path)
-    X = X.dropna()
-    y = X[f"Power{idx}"]
-    y.name = "y_value"
-    X.drop(
-        columns=[col for col in X.columns if col != f"X{idx}" and col != f"Y{idx}"],
-        inplace=True,
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_wec
+
+    X, y = load_wec(
+        "Perth", 49, target=f"Power{idx}", feature_cols=[f"X{idx}", f"Y{idx}"]
     )
-    X.drop(columns=[col for col in X.columns if "Power" in col], inplace=True)
-    X = X.select_dtypes(include=[np.number])
-    return X, y
+    return X, y.rename("y_value")
 
 
 def main():
