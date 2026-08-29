@@ -29,6 +29,7 @@ from .loaders import (
     load_powerconsumption,
     load_rt_iot2022,
     load_shuttle,
+    load_turbine,
     load_wec,
     load_wine_quality,
 )
@@ -47,6 +48,7 @@ __all__ = [
     "load_powerconsumption",
     "load_rt_iot2022",
     "load_shuttle",
+    "load_turbine",
     "load_wec",
     "load_wine_quality",
     "load_housing",

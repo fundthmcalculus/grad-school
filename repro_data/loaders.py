@@ -472,3 +472,64 @@ def load_powerconsumption():
         f"{len(X)} rows × {X.shape[1]} features"
     )
     return X, y
+
+
+def _fibonacci_lagged_features(X):
+    """Append Fibonacci-delay lagged copies of every non-time column to X.
+
+    Verbatim from FuzzySystemsExperiments/turbine.py's
+    create_fibonacci_lagged_features -- kept identical so the turbine arm's
+    features do not move.
+    """
+    fibonacci_delays = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    df_list = [X.copy()]
+    for delay in fibonacci_delays:
+        lagged_df = X.shift(delay, fill_value=X.iloc[0, 0])
+        lagged_df.drop(["time"], axis=1, inplace=True)
+        lagged_df.columns = [f"{col}_lag_{delay}" for col in lagged_df.columns]
+        df_list.append(lagged_df)
+    return pd.concat(df_list, axis=1)
+
+
+def load_turbine(folder="train"):
+    """Gas-turbine electrical-power regression, with per-file Fibonacci lags.
+
+    Reads every CSV in ``data/gas_turbine/{folder}/``, applies the per-file
+    pipeline (target ``el_power`` split off, ``time`` origin zeroed, numeric-only,
+    Fibonacci-delay lagged features appended), and concatenates the files.
+    Returns (X, y) or None if the directory is missing or empty.
+
+    The lagging is done PER FILE, before concatenation, because each file is a
+    separate run/time-series -- lagging across the concat boundary would bleed
+    one run's tail into the next run's head. This is the exact pipeline
+    ``FuzzySystemsExperiments/turbine.py`` applied inline (load_all_data +
+    load_data + create_fibonacci_lagged_features), moved here verbatim. Not
+    vendored in the repo (see ``data/README.md``).
+    """
+    base = os.path.join(DATA_DIR, "gas_turbine", folder)
+    if not os.path.isdir(base):
+        print(f"  [turbine] directory not found at {os.path.relpath(base, REPO_ROOT)}")
+        return None
+    files = sorted(f for f in os.listdir(base) if f.endswith(".csv"))
+    if not files:
+        print(f"  [turbine] no CSVs in {os.path.relpath(base, REPO_ROOT)}")
+        return None
+    x_frames, y_series = [], []
+    for filename in files:
+        X = pd.read_csv(os.path.join(base, filename))
+        X = X.dropna()
+        y = X["el_power"]
+        y.name = "y_value"
+        X.drop(["el_power"], axis=1, inplace=True)
+        X["time"] -= X["time"][0]
+        X = X.select_dtypes(include=[np.number])
+        X = _fibonacci_lagged_features(X)
+        x_frames.append(X)
+        y_series.append(y)
+    X = pd.concat(x_frames, ignore_index=True, axis=0)
+    y = pd.concat(y_series, ignore_index=True)
+    print(
+        f"  [turbine] loaded {len(files)} file(s) from "
+        f"{os.path.relpath(base, REPO_ROOT)}: {len(X)} rows × {X.shape[1]} features"
+    )
+    return X, y

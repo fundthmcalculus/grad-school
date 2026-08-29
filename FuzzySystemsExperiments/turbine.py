@@ -24,68 +24,19 @@ from tribblefis.regression import (
 from tribblefis.report import print_membership_details
 
 
-def load_all_data(folder: str = "train") -> tuple[pd.DataFrame, pd.Series]:
-    # Determine the base path (script directory or current working directory)
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    train_path_base = os.path.join(script_dir, "gas_turbine", folder)
+def load_all_data(folder: str = "train"):
+    """Gas-turbine data via the shared loader (``repro_data.load_turbine``),
+    reading ``data/gas_turbine/{folder}/``. The per-file read + time-origin
+    zeroing + Fibonacci-lag pipeline moved there verbatim (load_all_data +
+    load_data + create_fibonacci_lagged_features); the old inline ``gas_turbine/``
+    path was absent from the repo root. See ``data/README.md``.
+    """
+    import sys
 
-    if not os.path.exists(train_path_base):
-        # Try relative to current working directory
-        train_path_base = os.path.join("gas_turbine", folder)
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_turbine
 
-    if not os.path.isdir(train_path_base):
-        raise FileNotFoundError(f"Train directory not found at {train_path_base}")
-
-    all_files = sorted([f for f in os.listdir(train_path_base) if f.endswith(".csv")])
-    if not all_files:
-        raise ValueError(f"No CSV files found in train directory: {train_path_base}")
-
-    X_dataframes = []
-    y_series = []
-    for filename in all_files:
-        filepath = os.path.join(train_path_base, filename)
-        X, y = load_data(filepath)
-        X_dataframes.append(X)
-        y_series.append(y)
-
-    X = pd.concat(X_dataframes, ignore_index=True, axis=0)
-    y: pd.Series = pd.concat(y_series, ignore_index=True)
-    return X, y
-
-
-def load_data(data_path: str = "gas_turbine/test/ex_4.csv"):
-    if not os.path.exists(data_path):
-        # Try to find it in the same directory as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
-
-    X = pd.read_csv(data_path)
-    X = X.dropna()
-    y = X["el_power"]
-    y.name = "y_value"
-    X.drop(["el_power"], axis=1, inplace=True)
-    X["time"] -= X["time"][0]
-    X = X.select_dtypes(include=[np.number])
-    # Create Fibonacci-delayed features
-    X = create_fibonacci_lagged_features(X)
-    return X, y
-
-
-def create_fibonacci_lagged_features(X: pd.DataFrame) -> pd.DataFrame:
-    """Create lagged features using Fibonacci sequence delays."""
-    fibonacci_delays = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-    # fibonacci_delays = [1, 100, 1000]
-    df_list = [X.copy()]
-
-    for delay in fibonacci_delays:
-        lagged_df = X.shift(delay, fill_value=X.iloc[0, 0])
-        lagged_df.drop(["time"], axis=1, inplace=True)
-        lagged_df.columns = [f"{col}_lag_{delay}" for col in lagged_df.columns]
-        df_list.append(lagged_df)
-
-    # Concatenate all features
-    result = pd.concat(df_list, axis=1)
-    return result
+    return load_turbine(folder)
 
 
 def main():
