@@ -8,8 +8,6 @@ and produces a side-by-side comparison of their performance.
 import os
 import time
 
-import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
@@ -17,17 +15,16 @@ from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
 
 
 def load_data():
-    data_path = "darwin.csv"
-    if not os.path.exists(data_path):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
+    """DARWIN via the shared loader (``repro_data.load_darwin``), reading
+    ``data/darwin.csv``. The old inline copy read a bare ``darwin.csv`` absent
+    from the repo root; the dataset is gitignored (see ``data/README.md``).
+    """
+    import sys
 
-    X = pd.read_csv(data_path, delimiter=",")
-    X = X.dropna()
-    y = X["class"]
-    X.drop(["class"], axis=1, inplace=True)
-    X = X.select_dtypes(include=[np.number])
-    return X, y
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_darwin
+
+    return load_darwin()
 
 
 def evaluate_classifier(clf, X_train, X_test, y_train, y_test, name):

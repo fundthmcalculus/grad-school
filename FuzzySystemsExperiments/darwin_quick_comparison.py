@@ -6,8 +6,6 @@ Uses pre-selected features to avoid slow feature ranking on 450-feature dataset.
 
 import os
 import time
-import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 
@@ -15,13 +13,16 @@ from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
 
 
 def load_data():
-    data_path = os.path.join(os.path.dirname(__file__), "darwin.csv")
-    X = pd.read_csv(data_path, delimiter=",")
-    X = X.dropna()
-    y = X["class"]
-    X.drop(["class"], axis=1, inplace=True)
-    X = X.select_dtypes(include=[np.number])
-    return X, y
+    """DARWIN via the shared loader (``repro_data.load_darwin``), reading
+    ``data/darwin.csv``. The old inline copy read a bare ``darwin.csv`` absent
+    from the repo root; the dataset is gitignored (see ``data/README.md``).
+    """
+    import sys
+
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_darwin
+
+    return load_darwin()
 
 
 def main():
