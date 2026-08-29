@@ -22,10 +22,12 @@ from .loaders import (
     CONCRETE_COLS,
     load_beth,
     load_bikeshare,
+    load_bodyfat,
     load_concrete,
     load_phiusiil,
     load_rt_iot2022,
     load_shuttle,
+    load_wec,
 )
 
 __all__ = [
@@ -34,8 +36,10 @@ __all__ = [
     "CONCRETE_COLS",
     "load_beth",
     "load_bikeshare",
+    "load_bodyfat",
     "load_concrete",
     "load_phiusiil",
     "load_rt_iot2022",
     "load_shuttle",
+    "load_wec",
 ]
