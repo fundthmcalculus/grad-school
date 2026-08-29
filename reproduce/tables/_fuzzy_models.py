@@ -39,6 +39,7 @@ from repro_data import (  # noqa: E402,F401 -- re-exported for existing callers
     load_bikeshare,
     load_bodyfat,
     load_concrete,
+    load_glass,
     load_phiusiil,
     load_rt_iot2022,
     load_shuttle,
