@@ -9,11 +9,13 @@ calibrated on training normals only — no phishing label touches any model or
 threshold. The feature policy is a fixed benchmark definition and does not vary
 by seed (see `data.py`).
 
-**Provenance:** the numbers here reproduce **byte-identically** from the recorded
-submodule pin **`987ed06`** (the constant-feature grid-partition fix #210) and
-from the working tree `297b64b` that is ahead of it — verified by running against
-both. `run.py` prints the imported source path and SHA so the table can be
-reconciled. The proposal-defense citation (Table 4.12) uses the pinned `987ed06`.
+**Provenance:** the numbers here reproduce **byte-identically** across three
+`tribble-fis` commits — the current pin **`ef15d6a`**, the earlier `987ed06`
+(the constant-feature grid-partition fix #210), and the working tree `297b64b`
+they were first taken on — because the one-class code path (`one_class.py`,
+`gauss_math.py`, `gauss_data.py`) is unchanged across them. Verified by running
+against each. `run.py` prints the imported source path and SHA so the table can
+be reconciled. The proposal-defense citation (Table 4.12) uses the pin `ef15d6a`.
 
 ## Standard benchmark — leak and tripwire features removed
 
