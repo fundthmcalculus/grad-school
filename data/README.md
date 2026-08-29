@@ -29,6 +29,7 @@ are not currently committed. Drop the file into `data/` (its loader returns
 | `winequality-white.csv` | UCI ML Repository (Wine Quality, id 186) | `repro_data.load_wine_quality` | White-wine physicochemical features → continuous `quality` score (regression). Semicolon-delimited. |
 | `powerconsumption.csv` | UCI / Kaggle (Tetouan City power consumption) | `repro_data.load_powerconsumption` | Environmental features → Zone-1 power (regression). All three `PowerConsumption_Zone{1,2,3}` columns are dropped from X — Zones 2/3 are alternate targets, not features. |
 | `gas_turbine/{train,test}/*.csv` | Gas-turbine sensor runs (one CSV per run) | `repro_data.load_turbine` | Per-run sensor time series → `el_power` (regression). Each run is read, its `time` origin zeroed, and Fibonacci-delay lagged features appended **per file** before the runs are concatenated (lagging across runs would leak). `load_turbine("train")` / `("test")`. |
+| `iot-botnet/{device}/…` | N-BaIoT IoT-botnet traffic captures | `repro_data.load_iot_botnet` | Per-device benign + attack traffic captures for one-class anomaly detection (`benign_traffic.csv` → "regular", an attack capture → "anomaly"). Default device `Danmini_Doorbell`, attack `gafgyt_attacks/combo.csv`. |
 
 ---
 

@@ -25,23 +25,19 @@ gauss_math.MEMBER_FCN = "triangular"
 
 
 def load_data():
-    # Load the benign traffic for training
-    benign_doorbell = pd.read_csv("iot-botnet/Danmini_Doorbell/benign_traffic.csv")
-    benign_doorbell["Traffic_type"] = "regular"
+    """N-BaIoT (Danmini Doorbell) via the shared loader
+    (``repro_data.load_iot_botnet``), reading ``data/iot-botnet/``. Benign
+    traffic is labelled "regular", the gafgyt combo attack "anomaly". The old
+    inline copy read an ``iot-botnet/`` path absent from the repo root (see
+    ``data/README.md``).
+    """
+    import os
+    import sys
 
-    attack_doorbell = pd.read_csv(
-        "iot-botnet/Danmini_Doorbell/gafgyt_attacks/combo.csv"
-    )
-    attack_doorbell["Traffic_type"] = "anomaly"
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_iot_botnet
 
-    X = pd.concat([benign_doorbell, attack_doorbell], ignore_index=True)
-
-    y = X["Traffic_type"].copy()
-    X = X.drop(columns=["Traffic_type"])
-    # data (as pandas dataframes)
-    X = X.select_dtypes(include=[np.number])
-
-    return X, y
+    return load_iot_botnet()
 
 
 def _train_test_split(X, y):

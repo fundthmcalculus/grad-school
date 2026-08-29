@@ -533,3 +533,36 @@ def load_turbine(folder="train"):
         f"{os.path.relpath(base, REPO_ROOT)}: {len(X)} rows × {X.shape[1]} features"
     )
     return X, y
+
+
+def load_iot_botnet(device="Danmini_Doorbell", attack="gafgyt_attacks/combo.csv"):
+    """N-BaIoT IoT-botnet anomaly framing for one device.
+
+    Reads ``data/iot-botnet/{device}/benign_traffic.csv`` (labelled "regular")
+    and one attack capture (default ``gafgyt_attacks/combo.csv``, labelled
+    "anomaly"), concatenates them, and keeps the numeric traffic features.
+    Returns (X, y) with y a Series of "regular"/"anomaly", or None if a file is
+    missing. This is the framing ``FuzzySystemsExperiments/iot-botnet.py`` used
+    inline. Not vendored in the repo (see ``data/README.md``).
+    """
+    base = os.path.join(DATA_DIR, "iot-botnet", device)
+    benign_path = os.path.join(base, "benign_traffic.csv")
+    attack_path = os.path.join(base, attack)
+    if not os.path.exists(benign_path) or not os.path.exists(attack_path):
+        print(
+            f"  [iot-botnet] files not found under "
+            f"{os.path.relpath(base, REPO_ROOT)}"
+        )
+        return None
+    benign = pd.read_csv(benign_path)
+    benign["Traffic_type"] = "regular"
+    attack_df = pd.read_csv(attack_path)
+    attack_df["Traffic_type"] = "anomaly"
+    X = pd.concat([benign, attack_df], ignore_index=True)
+    y = X["Traffic_type"].copy()
+    X = X.drop(columns=["Traffic_type"]).select_dtypes(include=[np.number])
+    print(
+        f"  [iot-botnet] loaded {os.path.relpath(base, REPO_ROOT)}: "
+        f"{len(X)} rows × {X.shape[1]} features"
+    )
+    return X, y
