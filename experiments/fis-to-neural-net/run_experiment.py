@@ -144,23 +144,25 @@ def load_bikeshare_noleak():
 
 
 def load_wec():
-    """Wave Energy Converters (Sydney, 100 buoys): 2,319 x 301 -> total power.
+    """Wave Energy Converters (Sydney, 100 buoys) -> total power, leak-free.
 
-    The high-dimensional partner. TRIBBLE's feature selection does real work
-    here -- it keeps a handful of the 301 columns -- so the converted network is
-    much narrower than the input, which is the regime where "the FIS told us
-    which knots matter" is worth the most.
+    The high-dimensional partner: TRIBBLE's feature selection keeps only a
+    handful of the placement-coordinate columns, the regime where "the FIS told
+    us which knots matter" is worth the most.
+
+    Uses the shared loader (``repro_data.load_wec`` via ``_fuzzy_models``), which
+    drops every per-converter ``Power*`` column and ``qW`` as leaks -- they are
+    ``Total_Power``'s own addends, so selecting any of them trivially
+    reconstructs the target. The old inline copy here KEPT those columns (301
+    "features"); unifying onto the leak-free loader removes them and CHANGES this
+    dataset's numbers by design, per the consolidation policy. y is renamed to
+    "y_value" to preserve the old contract.
     """
-    path = os.path.join(REPO, "data", "WEC_Sydney_100.csv")
-    df = pd.read_csv(path).dropna()
-    y = df["Total_Power"].astype(float)
-    y.name = "y_value"
-    X = (
-        df.drop(columns=["Total_Power"])
-        .select_dtypes(include=[np.number])
-        .astype(float)
-    )
-    return X, y
+    loaded = fm.load_wec("Sydney", 100)
+    if loaded is None:
+        return None
+    X, y = loaded
+    return X, y.rename("y_value")
 
 
 DATASETS["synth1d"]["loader"] = load_synth1d
