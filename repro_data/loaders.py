@@ -566,3 +566,24 @@ def load_iot_botnet(device="Danmini_Doorbell", attack="gafgyt_attacks/combo.csv"
         f"{len(X)} rows × {X.shape[1]} features"
     )
     return X, y
+
+
+def load_glass():
+    """UCI Glass Identification: 9 numeric features -> 6 glass types (`Type`).
+
+    Reads ``data/glass.csv``. Returns (X float, y int) or None if the file is
+    missing. This is the preprocessing the reproduce/ Glass readers applied
+    inline (drop the `Type` label, cast features to float, label to int).
+    """
+    local = os.path.join(DATA_DIR, "glass.csv")
+    if not os.path.exists(local):
+        print(f"  [glass] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    df = pd.read_csv(local).dropna()
+    X = df.drop(columns=["Type"]).astype(float)
+    y = df["Type"].astype(int)
+    print(
+        f"  [glass] loaded {os.path.relpath(local, REPO_ROOT)}: "
+        f"{len(X)} rows × {X.shape[1]} features"
+    )
+    return X, y

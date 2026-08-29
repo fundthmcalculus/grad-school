@@ -36,17 +36,11 @@ import figstyle as F  # noqa: E402
 NAME = "04-mog-classification"
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# Glass lives in data/; the bare repo-root path is where it used to be, and
-# is kept as a fallback rather than assumed gone.
-GLASS = os.path.join(REPO, "data", "glass.csv")
-if not os.path.exists(GLASS):
-    GLASS = os.path.join(REPO, "glass.csv")
 TARGET_CLASS = 1  # building windows, float processed -- the largest class
 N_FEATURES = 3  # "two or three features stacked", per the caption
 
 
 def _fit():
-    import pandas as pd
     from tribblefis.gauss_math import (
         calculate_gaussian_correlation,
         create_gaussian_membership_dict,
@@ -54,9 +48,12 @@ def _fit():
         take_top_features,
     )
 
-    df = pd.read_csv(GLASS).dropna()
-    X = df.drop(columns=["Type"]).astype(float)
-    y = df["Type"].astype(int)
+    sys.path.insert(0, REPO)  # repo root -> `import repro_data`
+    from repro_data import load_glass
+
+    # Glass now comes from the shared loader (reads data/glass.csv); the old
+    # inline read + repo-root fallback lived here and in _mf_dedup.
+    X, y = load_glass()
 
     diffs = calculate_gaussian_correlation(X, y)
     _, features = take_top_features(diffs, top_n=N_FEATURES)

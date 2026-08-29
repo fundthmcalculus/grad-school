@@ -158,18 +158,10 @@ def build_deduped_model(
 def load_glass():
     # Glass moved into data/ when the loaders were refactored; three call sites
     # kept looking for it at the repo root, where it has not been since. The
-    # failure is silent in two of them (load_glass returns None and the rows are
-    # dropped), which is why Table 4.8's Glass row and Table 4.9 -- checklist C4's
-    # headline correction-pass measurement -- have been absent from every archive
-    # since the move. Prefer data/, fall back to the old root path.
-    path = os.path.join(F.DATA_DIR, "glass.csv")
-    if not os.path.exists(path):
-        path = os.path.join(F.REPO_ROOT, "glass.csv")
-    if not os.path.exists(path):
-        print("  [glass] not found in data/ or repo root; rows -> N/A")
-        return None
-    df = pd.read_csv(path).dropna()
-    return df.drop(columns=["Type"]).astype(float), df["Type"].astype(int)
+    # data now lives in data/glass.csv and is loaded by the shared
+    # repro_data.load_glass (via the _fuzzy_models re-export), so this row can no
+    # longer silently vanish from Table 4.8 / 4.9 over a path move.
+    return F.load_glass()
 
 
 def load_wine_ds():

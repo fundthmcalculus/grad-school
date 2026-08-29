@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(REPO_ROOT, "tables"))
 
 from _fuzzy_models import (
     load_concrete,
+    load_glass,
     load_phiusiil,
     load_rt_iot2022,
     load_beth,
@@ -20,6 +21,7 @@ from _fuzzy_models import (
 
 LOADERS = [
     ("Concrete", load_concrete, {}),
+    ("Glass", load_glass, {}),
     ("PhiUSIIL", load_phiusiil, {"sample_size": None}),
     ("RT-IOT2022", load_rt_iot2022, {}),
     ("BETH", load_beth, {}),
@@ -73,6 +75,7 @@ for name, loader, kwargs in LOADERS:
 # `dataset_specs.yaml` unnoticed.
 SPEC_KEYS = {
     "Concrete": "concrete",
+    "Glass": "glass",
     "PhiUSIIL": "phiusiil",
     "RT-IOT2022": "rt_iot2022",
     "Shuttle": "shuttle",
