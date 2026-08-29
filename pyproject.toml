@@ -31,7 +31,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "black",
+    # Pinned to match .github/workflows/style-check.yml: an unpinned
+    # formatter turns "did this branch change?" into "did black release
+    # since the last run?" (that disagreement failed a job on 2026-08-22).
+    "black==26.5.1",
     "flake8",
     "Flake8-pyproject",
     "mypy",

@@ -54,6 +54,16 @@ this file calls the single most important experiment in the backlog, and reorgan
 > existing archive checks out — the audit is in B18 — so nothing already written is in doubt.
 > The next one would have been the first that was. Fixed upstream, and preflight's new
 > `PIN-MATCH` check now fails the run rather than trusting the two to agree.
+>
+> ⚠️ **Environment note (2026-08-28):** `reproduce/preflight.py`'s `INSTALL-FRESH` check
+> failed on this host because the `tribble-fis` environment's `tribbleclustering` build is
+> locked at `635ed6e` while the grad-school submodule pin is `1dcf331` — the harness's
+> Chapter 3 FCM rows would run the pre-fix FCM (the zero-distance crisp-membership fix is
+> missing) while its `PROVENANCE.txt` records the new SHA. That is the 2026-08-22 "cached
+> wheel after a pin move" failure mode in a sibling environment. Resolve the lock (or
+> `uv lock --upgrade-package tribble-clustering --project tribble-fis`), re-sync the
+> environment, re-run preflight, and record the check (B13's pin-bump procedure, extended
+> to *every* environment the harness imports from).
 
 **Legend: ⬜ open · 🟨 in progress · ✅ done · 🚫 descoped · 🔒 blocked on you.**
 
@@ -433,6 +443,15 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       unchanged. Only wall-clock moved (0.14 → 0.15 s), which is machine noise. That is the
       check this item predicted, and it passed.
 
+      **Lesson recorded 2026-08-28 (from B14's audit): that verification was column-blind.**
+      It checked `table_4_1`'s three R² values and the reference columns and concluded
+      "byte-identical across the bump" — while the same table's two *classification* accuracy
+      columns had already collapsed inside the same 22-commit window (PhiUSIIL
+      $0.997 \pm 0.001 \r\rightarrow 0.729$, RT-IOT2022 $0.927 \pm 0.002 \r\rightarrow 0.500$).
+      The bump was safe for the columns checked; it was not checked for the columns that
+      mattered. The concrete change — diff **every column** of an affected table before and
+      after a pin bump — is now part of this procedure (AGENTS.md non-negotiable 5).
+
       **The bump spans 22 upstream commits, not just #170** — the pin was already behind
       `c27e586`. Two that looked risky and are not: #123 renamed the scaling classes but kept
       all four old names as aliases bound to the same class objects (`UnitScalar is
@@ -606,15 +625,22 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       proposal the fix moves `check_prose` from 59 matching pairs to 70, against 156 under the
       old pin. **D8** carries the remainder. `reproduce/experiments/run_with_reference_stats.py`
       re-runs any generator that way, so the question can be settled table by table without
-      waiting on upstream. The three regression rows move identically with and without the fix,
-      so their drift has a separate and smaller cause, still untraced.
+      waiting on upstream. The three regression rows move identically with and without the
+      fix, so they had a separate and smaller cause — since traced at **D8**: the same
+      commit #95 acting through `_kmeans_labels_1d` (k-means++ vs single random start), with
+      the Bike Sharing row specifically the #102 `pin_extremes` default flip.
 
-      **Owed:** (a) file it upstream — *not done here; outward-facing, left to the author*;
-      (b) do not quote the current pin for any Ch 4/Ch 6 accuracy number until it lands;
-      (c) extend B13's pin-bump check to **every column of a table**, which is the concrete
-      change that would have caught this — B13 verified three R² values and concluded
-      "byte-identical", and the two accuracy columns beside them were not looked at. Ch 8's
-      tally already names the lesson: *repetition is not the same thing as coverage.*
+      **What remains (re-baselined 2026-08-28).** (a) Filing upstream is already done —
+      retroactively: the fix landed as `5253aa0` (tribble-fis #171), CI green, and is inside
+      the current pin `353162c`; the "not done here" record above predates it and is corrected
+      here. (b) The re-quote is owed, not the fix: no ten-seed sweep has run at `353162c`
+      since the pin advanced (2026-08-25), so the prose still quotes the pre-bump run. Run
+      `reproduce/run_all_tables.sh <label>` at the current pin, diff against `full-2026-08-22`
+      and the prose, and re-quote what the sweep supports; D8's table-by-table attribution
+      predicts the outcome — the classification rows return, and the rest of the movement is
+      the already-attributed set (Bike Sharing's #102 `pin_extremes` default, the restored
+      rows, the B15 compiler host-bound). (c) The every-column lesson is recorded at B13 and
+      in AGENTS.md non-negotiable 5: *repetition is not the same thing as coverage.*
 
 - [x] ✅ **B15 — The host lost its C toolchain; the harness now bootstraps one.** `reproduce/`
       could not run at all: the `Microsoft Visual Studio/2022` directory is present but empty,
