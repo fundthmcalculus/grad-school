@@ -11,7 +11,6 @@ import os
 import time
 
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gauss_math import (
@@ -37,21 +36,19 @@ from tribblefis.scaling import UnitScalar
 
 
 def load_data():
-    data_path = "Concrete_Data.csv"
-    if not os.path.exists(data_path):
-        # Try to find it in the same directory as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
-
-    X = pd.read_csv(data_path)
-    X = X.dropna()
-    y = X["Strength"]
-    y.name = "y_value"
-    X.drop("Strength", axis=1, inplace=True)
-    X = X.select_dtypes(include=[np.number]).astype(np.float64)
+    """Concrete via the shared loader (``repro_data.load_concrete``), which reads
+    ``data/Concrete_Data.csv`` -- the identical (X, y) every other Concrete arm
+    uses. The old inline copy read a bare ``Concrete_Data.csv`` that exists only
+    under ``data/``, so this script could not find it from the repo root.
+    """
     # Scaling used to happen here (_standardize then _normalize); it has moved to
     # main() so that the log runs first. See the note there.
-    return X, y
+    import sys
+
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_concrete
+
+    return load_concrete()
 
 
 def run_model(
