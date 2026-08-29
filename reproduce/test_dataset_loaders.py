@@ -73,15 +73,17 @@ for name, loader, kwargs in LOADERS:
 # `dataset_specs.yaml` unnoticed.
 SPEC_KEYS = {
     "Concrete": "concrete",
+    "PhiUSIIL": "phiusiil",
     "RT-IOT2022": "rt_iot2022",
     "Shuttle": "shuttle",
     "Bike Sharing": "bikeshare",
     "BETH": "beth",
 }
-# PhiUSIIL is deliberately absent: from a clean checkout its loader falls
-# through to a ucimlrepo fetch that returns a DIFFERENT feature set, which the
-# loader's own comment flags. Pinning its width here would fail for the wrong
-# reason.
+# PhiUSIIL's CSV is gitignored (recoverable from tribble-fis history), so on a
+# clean checkout its loader returns None and the guard skips it. When the file
+# IS present, load_phiusiil now reads data/ directly -- no ucimlrepo fallback,
+# no submodule delegation -- and returns a deterministic 50 features, so it is
+# width-checked against the spec like the others.
 
 guard_failures = []
 try:
