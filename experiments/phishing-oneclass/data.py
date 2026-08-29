@@ -46,7 +46,11 @@ def load():
     """Return (X numeric-feature frame, y) with y: 1 = legit, 0 = phish."""
     df = pd.read_csv(CSV)
     y = df["label"].to_numpy(int)
-    X = df.drop(columns=DROP_STR).select_dtypes(include=[np.number]).reset_index(drop=True)
+    X = (
+        df.drop(columns=DROP_STR)
+        .select_dtypes(include=[np.number])
+        .reset_index(drop=True)
+    )
     return X, y
 
 
@@ -82,8 +86,8 @@ def feature_policy(X, y):
         "leak": list(LEAK),
         "tripwire": tripwire,
         "near_oracle": near_oracle,
-        "standard": standard,       # the benchmark: leak + tripwires removed
-        "no_content": no_content,   # robustness floor: also drop near-oracle content
+        "standard": standard,  # the benchmark: leak + tripwires removed
+        "no_content": no_content,  # robustness floor: also drop near-oracle content
         "all_leaky": list(X.columns),  # reference only -- DO NOT CITE
     }
 
@@ -98,7 +102,7 @@ def split(X, y, cols, seed=SEED):
     rng = np.random.default_rng(seed)
     rng.shuffle(legit)
     tr = legit[: int(TRAIN_FRAC * len(legit))]
-    legit_te = legit[int(TRAIN_FRAC * len(legit)):]
+    legit_te = legit[int(TRAIN_FRAC * len(legit)) :]
     phish = np.flatnonzero(y == 0)
     test = np.concatenate([legit_te, phish])
     y_test = np.concatenate([np.zeros(len(legit_te)), np.ones(len(phish))]).astype(int)

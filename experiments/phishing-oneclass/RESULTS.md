@@ -9,10 +9,11 @@ calibrated on training normals only — no phishing label touches any model or
 threshold. The feature policy is a fixed benchmark definition and does not vary
 by seed (see `data.py`).
 
-**Provenance:** produced against `tribble-fis` working tree **`297b64b`** (a
-superset of the recorded submodule pin `987ed06`; `987ed06` includes the
-constant-feature grid-partition fix #210). Numbers depend on this commit —
-`run.py` prints the imported source path and SHA so the table can be reconciled.
+**Provenance:** the numbers here reproduce **byte-identically** from the recorded
+submodule pin **`987ed06`** (the constant-feature grid-partition fix #210) and
+from the working tree `297b64b` that is ahead of it — verified by running against
+both. `run.py` prints the imported source path and SHA so the table can be
+reconciled. The proposal-defense citation (Table 4.12) uses the pinned `987ed06`.
 
 ## Standard benchmark — leak and tripwire features removed
 

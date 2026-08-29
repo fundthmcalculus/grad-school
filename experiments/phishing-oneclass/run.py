@@ -37,26 +37,31 @@ import os
 # 0xC0000374) once its precompiled NUM_THREADS is exceeded -- harmless to the
 # already-printed results, but it makes the script exit nonzero. Setting these
 # first avoids it and keeps thread use reproducible.
-for _v in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "NUMBA_NUM_THREADS", "MKL_NUM_THREADS"):
+for _v in (
+    "OPENBLAS_NUM_THREADS",
+    "OMP_NUM_THREADS",
+    "NUMBA_NUM_THREADS",
+    "MKL_NUM_THREADS",
+):
     os.environ.setdefault(_v, "8")
 
-import subprocess
-import sys
-import warnings
+import subprocess  # noqa: E402
+import sys  # noqa: E402
+import warnings  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # for sibling data.py
 
-import numpy as np
-from sklearn.covariance import EmpiricalCovariance
-from sklearn.ensemble import IsolationForest
-from sklearn.metrics import average_precision_score, roc_auc_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import OneClassSVM
+import numpy as np  # noqa: E402
+from sklearn.covariance import EmpiricalCovariance  # noqa: E402
+from sklearn.ensemble import IsolationForest  # noqa: E402
+from sklearn.metrics import average_precision_score, roc_auc_score  # noqa: E402
+from sklearn.preprocessing import StandardScaler  # noqa: E402
+from sklearn.svm import OneClassSVM  # noqa: E402
 
-import tribblefis
-from tribblefis.one_class import TribbleOneClassDetector
+import tribblefis  # noqa: E402
+from tribblefis.one_class import TribbleOneClassDetector  # noqa: E402
 
-from data import SEEDS, detection_at_fpr, feature_policy, load, split
+from data import SEEDS, detection_at_fpr, feature_policy, load, split  # noqa: E402
 
 OCSVM_FIT_N = 20_000  # OneClassSVM is O(n^2); fit on a subsample of train normals
 
@@ -64,12 +69,16 @@ OCSVM_FIT_N = 20_000  # OneClassSVM is O(n^2); fit on a subsample of train norma
 # -- models: each (X_tr, seed) -> anomaly-score function -----------------------
 # Higher score = more anomalous (phishing-like) in every case.
 
+
 def _tribble(X_tr, seed, **kw):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         det = TribbleOneClassDetector(
-            whiten=True, n_gaussians=1, norm_conorm="probability",
-            random_state=seed, **kw,
+            whiten=True,
+            n_gaussians=1,
+            norm_conorm="probability",
+            random_state=seed,
+            **kw,
         ).fit(X_tr)
     return det.anomaly_score
 
@@ -100,7 +109,11 @@ def m_mahalanobis(X_tr, seed):
 def m_ocsvm(X_tr, seed):
     sc, Z = _sklearn_prep(X_tr)
     rng = np.random.default_rng(seed)
-    sub = Z if len(Z) <= OCSVM_FIT_N else Z[rng.choice(len(Z), OCSVM_FIT_N, replace=False)]
+    sub = (
+        Z
+        if len(Z) <= OCSVM_FIT_N
+        else Z[rng.choice(len(Z), OCSVM_FIT_N, replace=False)]
+    )
     m = OneClassSVM(kernel="rbf", gamma="scale", nu=0.05).fit(sub)
     return lambda X: -m.decision_function(sc.transform(np.asarray(X, float)))
 
@@ -139,15 +152,19 @@ def _one_seed(X, y, cols, build, seed):
 
 def evaluate(X, y, cols, models, tag, seeds=SEEDS):
     X_tr0, _, y_te0 = split(X, y, cols, seed=seeds[0])
-    print(f"\n{'='*92}\n{tag}  ({len(cols)} features)  train_normals={len(X_tr0)}  "
-          f"test={len(y_te0)} (legit={int((y_te0==0).sum())}, phish={int((y_te0==1).sum())})  "
-          f"seeds={list(seeds)}")
+    print(
+        f"\n{'='*92}\n{tag}  ({len(cols)} features)  train_normals={len(X_tr0)}  "
+        f"test={len(y_te0)} (legit={int((y_te0 == 0).sum())}, phish={int((y_te0 == 1).sum())})  "
+        f"seeds={list(seeds)}"
+    )
     print(f"  {'model':20s} " + "  ".join(f"{m:>16s}" for m in METRICS))
     rows = {}
     for name, build in models.items():
         per = [_one_seed(X, y, cols, build, s) for s in seeds]
-        agg = {m: (float(np.mean([p[m] for p in per])),
-                   float(np.std([p[m] for p in per]))) for m in METRICS}
+        agg = {
+            m: (float(np.mean([p[m] for p in per])), float(np.std([p[m] for p in per])))
+            for m in METRICS
+        }
         rows[name] = agg
         cells = "  ".join(f"{agg[m][0]:.4f}±{agg[m][1]:.4f}" for m in METRICS)
         print(f"  {name:20s} {cells}")
@@ -169,11 +186,21 @@ def main():
     print("\nquarantined from the standard benchmark:")
     print(f"  leak (target-derived): {fp['leak']}")
     print(f"  tripwire (constant across all legit): {fp['tripwire']}")
-    print(f"  kept but near-oracle content (dropped only in no_content): {fp['near_oracle']}")
+    print(
+        f"  kept but near-oracle content (dropped only in no_content): {fp['near_oracle']}"
+    )
 
     models = {**PRIMARY, **BASELINES}
-    evaluate(X, y, fp["standard"], models, "STANDARD BENCHMARK (leak + tripwires removed)")
-    evaluate(X, y, fp["no_content"], models, "ROBUSTNESS FLOOR (also drop near-oracle content)")
+    evaluate(
+        X, y, fp["standard"], models, "STANDARD BENCHMARK (leak + tripwires removed)"
+    )
+    evaluate(
+        X,
+        y,
+        fp["no_content"],
+        models,
+        "ROBUSTNESS FLOOR (also drop near-oracle content)",
+    )
 
     # Reference only: the inflation the standard policy exists to prevent.
     print("\n" + "-" * 92)
