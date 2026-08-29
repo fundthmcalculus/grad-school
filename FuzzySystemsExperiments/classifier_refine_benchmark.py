@@ -41,10 +41,15 @@ def _sk(loader, **kw):
 
 
 def _darwin(**kw):
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "darwin.csv")
-    df = pd.read_csv(path).dropna()
-    y = df["class"]
-    X = df.drop(["class"], axis=1).select_dtypes(include=[np.number])
+    # DARWIN via the shared loader (repro_data.load_darwin), reading
+    # data/darwin.csv -- identical to the four FuzzySystemsExperiments/darwin*
+    # arms. The old inline copy read a sibling darwin.csv absent from the repo.
+    import sys
+
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_darwin
+
+    X, y = load_darwin()
     return X, y, kw
 
 
