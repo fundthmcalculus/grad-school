@@ -17,21 +17,17 @@ from tribblefis.regression import (
 
 
 def load_data():
-    data_path = "winequality-white.csv"
-    if not os.path.exists(data_path):
-        # Try to find it in the same directory as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
+    """Wine Quality via the shared loader (``repro_data.load_wine_quality``),
+    reading ``data/winequality-white.csv`` (quality kept as a continuous
+    target). The old inline copy read a bare ``winequality-white.csv`` absent
+    from the repo root; the dataset is documented in ``data/README.md``.
+    """
+    import sys
 
-    X = pd.read_csv(data_path, delimiter=";")
-    X = X.dropna()
-    # Quality is a continuous score, not a class label, so keep it numeric.
-    y = X["quality"].astype(float)
-    y.name = "y_value"
-    X.drop(["quality"], axis=1, inplace=True)
-    X = X.select_dtypes(include=[np.number])
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_wine_quality
 
-    return X, y
+    return load_wine_quality("white")
 
 
 def main():

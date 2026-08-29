@@ -409,3 +409,66 @@ def load_darwin():
         f"{len(X)} rows × {X.shape[1]} features"
     )
     return X, y
+
+
+def load_wine_quality(color="white"):
+    """UCI Wine Quality (regression): 11 physicochemical features -> `quality`.
+
+    Reads ``data/winequality-{color}.csv`` (semicolon-delimited). Returns (X, y)
+    or None if the file is missing. ``quality`` is kept as a continuous float
+    target (named ``y_value``), not a class label. This is the preprocessing
+    ``FuzzySystemsExperiments/wine_red.py`` applied inline (it reads the WHITE
+    file despite its name).
+
+    Not vendored in the repo (see ``data/README.md``); returns None until placed
+    in ``data/``.
+    """
+    local = os.path.join(DATA_DIR, f"winequality-{color}.csv")
+    if not os.path.exists(local):
+        print(f"  [wine] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    df = pd.read_csv(local, delimiter=";").dropna()
+    y = df["quality"].astype(float)
+    y.name = "y_value"
+    X = df.drop(columns=["quality"]).select_dtypes(include=[np.number])
+    print(
+        f"  [wine] loaded {os.path.relpath(local, REPO_ROOT)}: "
+        f"{len(X)} rows × {X.shape[1]} features"
+    )
+    return X, y
+
+
+def load_powerconsumption():
+    """Tetouan City Power Consumption (regression) -> Zone-1 power.
+
+    Reads ``data/powerconsumption.csv``. Returns (X, y) or None if missing.
+
+    All THREE ``PowerConsumption_Zone{1,2,3}`` columns are dropped from X:
+    Zone-1 is the target (named ``y_value``), and Zones 2/3 are ALTERNATE
+    TARGETS, not features -- the three zones are the same quantity measured at
+    different substations, so feeding 2/3 to a model predicting 1 leaks. This is
+    the exact exclusion ``FuzzySystemsExperiments/powerconsumption.py`` applied
+    inline. Not vendored (see ``data/README.md``).
+    """
+    local = os.path.join(DATA_DIR, "powerconsumption.csv")
+    if not os.path.exists(local):
+        print(
+            f"  [powerconsumption] file not found at "
+            f"{os.path.relpath(local, REPO_ROOT)}"
+        )
+        return None
+    df = pd.read_csv(local).dropna()
+    y = df["PowerConsumption_Zone1"]
+    y.name = "y_value"
+    X = df.drop(
+        columns=[
+            "PowerConsumption_Zone1",
+            "PowerConsumption_Zone2",
+            "PowerConsumption_Zone3",
+        ]
+    ).select_dtypes(include=[np.number])
+    print(
+        f"  [powerconsumption] loaded {os.path.relpath(local, REPO_ROOT)}: "
+        f"{len(X)} rows × {X.shape[1]} features"
+    )
+    return X, y

@@ -26,9 +26,11 @@ from .loaders import (
     load_concrete,
     load_darwin,
     load_phiusiil,
+    load_powerconsumption,
     load_rt_iot2022,
     load_shuttle,
     load_wec,
+    load_wine_quality,
 )
 from .regression_scale import load_housing, load_superconduct
 
@@ -42,9 +44,11 @@ __all__ = [
     "load_concrete",
     "load_darwin",
     "load_phiusiil",
+    "load_powerconsumption",
     "load_rt_iot2022",
     "load_shuttle",
     "load_wec",
+    "load_wine_quality",
     "load_housing",
     "load_superconduct",
 ]
