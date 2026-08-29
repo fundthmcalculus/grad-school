@@ -289,3 +289,74 @@ def load_bikeshare(target_col="cnt", sample_size=None):
     except Exception as exc:  # noqa: BLE001
         print(f"  [bikeshare] failed to load ({exc.__class__.__name__}); column -> N/A")
         return None
+
+
+def load_wec(site="Perth", n_wecs=49, target="Total_Power"):
+    """Wave Energy Converter farm power output (regression).
+
+    Files: ``data/WEC_{site}_{n_wecs}.csv`` (site in {Perth, Sydney}, n_wecs in
+    {49, 100}). Returns (X, y) or None if the file is missing.
+
+    LEAK. The per-converter power columns are the target's own addends: the farm
+    total ``Total_Power`` is the sum of the individual ``Power1..PowerN``, so
+    handing those to a model that predicts the total is asking it to recover a
+    sum it already holds. Every ``Power*`` column is dropped, along with ``qW``
+    (the aggregate q-factor, another direct function of the outputs). What
+    remains are the converter (X, Y) placement coordinates -- the genuine design
+    features. This is the exact exclusion ``quick_wec_baseline.py`` applied
+    inline; it now lives here so the WEC arms cannot drift apart on it.
+    """
+    local = os.path.join(DATA_DIR, f"WEC_{site}_{n_wecs}.csv")
+    try:
+        df = pd.read_csv(local)
+    except FileNotFoundError:
+        print(f"  [wec] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    if target not in df.columns:
+        print(f"  [wec] target '{target}' not in {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    y = df[target].astype(float)
+    exclude = [target, "qW"] + [c for c in df.columns if c.startswith("Power")]
+    X = (
+        df.drop(columns=exclude, errors="ignore")
+        .select_dtypes(include=[np.number])
+        .astype(float)
+    )
+    print(
+        f"  [wec] loaded {os.path.relpath(local, REPO_ROOT)}: "
+        f"{len(X)} rows × {X.shape[1]} features"
+    )
+    return X, y
+
+
+def load_bodyfat(drop_leak=True):
+    """Body Fat (StatLib / Johnson 1996): 13 anthropometric features -> body-fat %.
+
+    File: ``data/bodyfat.csv``. Returns (X, y) or None if the file is missing.
+
+    LEAK. ``Density`` IS the target in another coordinate -- ``BodyFat`` was
+    computed from it by Siri's equation ``495/Density - 450`` -- so it reproduces
+    the target at R2 0.977 as shipped and R2 1.000 once the errata rows are
+    excluded. Both existing arms (``FuzzySystemsExperiments/bodyfat.py`` and
+    ``reproduce/experiments/ch5_end_to_end.py``) drop it; ``drop_leak=True`` (the
+    default and the protocol) does the same here, leaving 13 features.
+
+    ERRATA are NOT filtered, on purpose: the file is kept byte-identical to the
+    canonical one and the errata are counted rather than silently dropped. Full
+    provenance, mixed units (weight lb / height in / circumferences cm) and the
+    per-case errata list live in ``data/bodyfat.names``.
+    """
+    local = os.path.join(DATA_DIR, "bodyfat.csv")
+    if not os.path.exists(local):
+        print(f"  [bodyfat] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    df = pd.read_csv(local)
+    y = df["BodyFat"].astype(float)
+    drop = ["BodyFat"] + (["Density"] if drop_leak else [])
+    X = df.drop(columns=drop)
+    print(
+        f"  [bodyfat] loaded {os.path.relpath(local, REPO_ROOT)}: "
+        f"{len(X)} rows × {X.shape[1]} features"
+        + ("  (Density dropped as a leak)" if drop_leak else "")
+    )
+    return X, y

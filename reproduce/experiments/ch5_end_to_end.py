@@ -277,8 +277,10 @@ _ROOT = os.path.dirname(_REPRO)
 sys.path.insert(0, _REPRO)
 sys.path.insert(0, os.path.join(_REPRO, "tables"))
 sys.path.insert(0, os.path.join(_ROOT, "gated-minimax-selection"))
+sys.path.insert(0, _ROOT)  # repo root -> `import repro_data`
 
 import common as C  # noqa: E402
+from repro_data import load_bodyfat  # noqa: E402
 import ivat_mf as im  # noqa: E402
 import multiscale_persistence as MS  # noqa: E402
 import selection as S  # noqa: E402
@@ -290,14 +292,16 @@ from tribblefis.regression import (  # noqa: E402
 from tribblefis.scaling import MinMaxScaler as FuzzyMinMaxScaler  # noqa: E402
 
 # ---------------------------------------------------------------------------
-# bodyfat: the dataset and the Chapter 4 arm's own constants, restated from
-# FuzzySystemsExperiments/bodyfat.py so the two arms cannot drift apart.
+# bodyfat: the Chapter 4 arm's own constants. The dataset load and the leak
+# drop now live in the shared repro_data.load_bodyfat, so this arm and the
+# Chapter 4 arm cannot drift apart on either. TARGET/LEAKY are retained here for
+# the log line and as documentation of the protocol.
 # ---------------------------------------------------------------------------
 BODYFAT_CSV = os.path.join(_ROOT, "data", "bodyfat.csv")
 TARGET = "BodyFat"  # bodyfat.py:84
 LEAKY = "Density"  # bodyfat.py:85 -- the target in another coordinate:
 # Siri's equation 495/Density - 450 reproduces BodyFat at R2 0.977. Dropped by
-# BOTH existing arms; dropping it here is not a choice, it is the protocol.
+# repro_data.load_bodyfat for every arm; it is not a choice, it is the protocol.
 TRIO = ["Abdomen", "Hip", "Chest"]  # bodyfat.py:121
 TRIO_LOG_TUNED = {  # bodyfat.py:163-168 -- the config behind the reported 0.647
     "n_gaussians": 1,
@@ -530,9 +534,14 @@ def run_bodyfat():
         print(f"  [skip] {BODYFAT_CSV} not found")
         return None
 
-    df = pd.read_csv(BODYFAT_CSV)
-    y = df[TARGET].to_numpy(float)
-    feats13 = [c for c in df.columns if c not in (TARGET, LEAKY)]
+    # Shared loader: drops `Density` (the LEAK) and `BodyFat` (the target),
+    # returning the 13-feature frame this arm fits. `df` here is that frame --
+    # it no longer carries TARGET/LEAKY, and every use below indexes only TRIO
+    # and feats13, so the substitution is exact (verified frame-identical to the
+    # old inline read). See repro_data.load_bodyfat and dataset_specs.yaml.
+    df, y_series = load_bodyfat()
+    y = y_series.to_numpy(float)
+    feats13 = list(df.columns)
     print(f"  bodyfat: {len(df)} rows, target {TARGET}, {LEAKY} dropped as a leak")
     print(f"  trio    = {TRIO}")
     print(f"  all-13  = {feats13}")
