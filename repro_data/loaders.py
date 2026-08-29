@@ -383,3 +383,29 @@ def load_bodyfat(drop_leak=True):
         + ("  (Density dropped as a leak)" if drop_leak else "")
     )
     return X, y
+
+
+def load_darwin():
+    """DARWIN Alzheimer handwriting: numeric handwriting-task features -> `class`.
+
+    Reads ``data/darwin.csv``. Returns (X, y) or None if the file is missing.
+    The ID column (a string like ``id_1``) falls to ``select_dtypes``; ``class``
+    is the label (a Series). This is the exact preprocessing the five
+    ``FuzzySystemsExperiments/darwin*`` copies applied inline; it now lives here
+    so they cannot drift apart.
+
+    ``darwin.csv`` is not vendored in the repo (see ``data/.gitignore`` /
+    ``data/README.md``); this returns None until it is placed in ``data/``.
+    """
+    local = os.path.join(DATA_DIR, "darwin.csv")
+    if not os.path.exists(local):
+        print(f"  [darwin] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
+    df = pd.read_csv(local).dropna()
+    y = df["class"]
+    X = df.drop(columns=["class"]).select_dtypes(include=[np.number])
+    print(
+        f"  [darwin] loaded {os.path.relpath(local, REPO_ROOT)}: "
+        f"{len(X)} rows × {X.shape[1]} features"
+    )
+    return X, y

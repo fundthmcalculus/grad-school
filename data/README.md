@@ -17,6 +17,18 @@ This directory contains datasets used for experiments and reproducible research.
 
 ---
 
+## Expected by a loader but not yet vendored
+
+Small datasets that a shared loader in `repro_data` reads from `data/`, but which
+are not currently committed. Drop the file into `data/` (its loader returns
+`None` and prints a not-found line until then). Commit it once present (<10 MB).
+
+| File | Source | Read by | Description |
+|------|--------|---------|-------------|
+| `darwin.csv` | UCI ML Repository (DARWIN — Alzheimer handwriting) | `repro_data.load_darwin` | Handwriting-task features, binary class (`P` Alzheimer's vs `H` healthy) in a `class` column; the ID column is dropped by `select_dtypes`. Consolidated from five identical `FuzzySystemsExperiments/darwin*` inline loaders. |
+
+---
+
 ## Large Datasets (gitignored, must be downloaded)
 
 These files are >10 MB and sourced from public repositories that may not be accessible from all environments (especially cloud runners). Each is documented with its source and download method.
