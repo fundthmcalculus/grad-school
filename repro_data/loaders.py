@@ -18,12 +18,11 @@ than aborting the whole run.
 from __future__ import annotations
 
 import os
-import sys
 
 import numpy as np
 import pandas as pd
 
-from ._paths import DATA_DIR, FIS, REPO_ROOT
+from ._paths import DATA_DIR, REPO_ROOT
 
 # --- datasets ----------------------------------------------------------------
 CONCRETE_COLS = [
@@ -83,27 +82,40 @@ def load_concrete():
     return X, y
 
 
-def load_phiusiil(sample_size=20000):
-    """PhiUSIIL phishing. Loads from repo loader or data/PhiUSIIL_Phishing_URL_Dataset.csv.
+def load_phiusiil(sample_size=20000, random_state=42):
+    """PhiUSIIL phishing URL: 50 numeric features -> binary {"legit","phish"}.
 
-    Returns (X, y) or None if unavailable.
+    Reads ``data/PhiUSIIL_Phishing_URL_Dataset.csv``. Returns (X, y) with y a
+    numpy array of "legit"/"phish" strings, or None if the file is missing.
+    ``sample_size`` (default 20000) subsamples for speed; pass None for all
+    235,795 rows.
+
+    This preprocessing previously delegated to the tribble-fis submodule's
+    ``demo_phishing.load_data``. It is reimplemented here -- verified
+    byte-identical to that loader for sample_size in {None, 20000} -- so the
+    parent repo owns PhiUSIIL loading and no longer depends on the submodule for
+    it. The five non-numeric columns (FILENAME, URL, Domain, TLD, Title) fall to
+    ``select_dtypes`` alongside the label, leaving the 50 modelled features
+    (``dataset_specs.yaml``'s phiusiil note documents why the prose's 54 was
+    wrong).
     """
     local = os.path.join(DATA_DIR, "PhiUSIIL_Phishing_URL_Dataset.csv")
+    if not os.path.exists(local):
+        print(f"  [phiusiil] file not found at {os.path.relpath(local, REPO_ROOT)}")
+        return None
     try:
-        sys.path.insert(0, os.path.join(FIS, "tribble-tree"))
-        import demo_phishing  # noqa: E402  -- repo loader, exact same features
-
-        if os.path.exists(local):
-            demo_phishing.DATA_PATH = local
-        X, y = demo_phishing.load_data(sample_size=sample_size, random_state=42)
+        df = pd.read_csv(local, encoding="utf-8-sig").dropna()
+        if sample_size and len(df) > sample_size:
+            df = df.sample(n=sample_size, random_state=random_state)
+        y = df["label"].map({0: "legit", 1: "phish"})
+        X = df.drop(columns=["label"]).select_dtypes(include=[np.number]).astype(float)
         print(
-            f"  [phiusiil] repo loader, data from {os.path.relpath(local, REPO_ROOT)}"
-            if os.path.exists(local)
-            else "  [phiusiil] repo loader, bundled path"
+            f"  [phiusiil] loaded {os.path.relpath(local, REPO_ROOT)}: "
+            f"{len(X)} rows × {X.shape[1]} features"
         )
-        return X, np.asarray(y)
+        return X, y.to_numpy()
     except Exception as exc:  # noqa: BLE001
-        print(f"  [phiusiil] unavailable ({exc.__class__.__name__}); column -> N/A")
+        print(f"  [phiusiil] failed to load ({exc.__class__.__name__}); column -> N/A")
         return None
 
 
