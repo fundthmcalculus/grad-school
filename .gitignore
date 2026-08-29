@@ -21,11 +21,15 @@ presentations/node_modules/
 # demand) should be force-added (`git add -f`) rather than moved out of here.
 outputs/
 
-# N-CMAPSS dataset (28GB across 10 .h5 files) -- downloaded from Kaggle, never
-# tracked. The whole directory is the unpacked Kaggle bundle (.h5 plus its own
-# notebook and PDF); nothing in it is repo content. Results and reports derived
-# from it belong under outputs/ or a report .md, force-added if worth keeping.
+# Large datasets from public sources (Kaggle, UCI ML, figshare) -- downloaded,
+# never tracked. Document each in data/README.md with source, size, and description.
+# Results and reports derived from them belong under outputs/ or a report .md,
+# force-added if worth keeping.
 /data/nasa-cmapps2/
+/data/RT_IOT2022.csv
+/data/WEC_Perth_49.csv
+/data/WEC_Perth_100.csv
+/data/WEC_Sydney_49.csv
 
 # Figures the AnalyticalDynamics simulations regenerate on every run. None has
 # ever been tracked; the chapter figures live under research/ instead.
