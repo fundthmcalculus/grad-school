@@ -11,7 +11,7 @@ import time
 
 from sklearn.model_selection import train_test_split
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 from tribblefis.gauss_plot import report_figures_of_merit
 
 
@@ -44,7 +44,7 @@ def main():
 
     # Initialize and fit the TRAPEZOID Mixture Classifier (using fast method by default)
     print("\nTraining trapezoid-based classifier (fast method)...")
-    clf = MixtureOfGaussiansFuzzyClassifier(
+    clf = TribbleClassifier(
         member_function="trap", trapz_method="em"
     )  # trapz_method="fast" is now default
     clf.fit(X_train, y_train)

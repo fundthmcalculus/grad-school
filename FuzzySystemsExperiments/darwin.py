@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 from tribblefis.gauss_plot import report_figures_of_merit
 
 
@@ -37,7 +37,7 @@ def main():
     print(f"Dataset split: Train={len(X_train)}, Test={len(X_test)}")
 
     # Initialize and fit the Gaussian Mixture Classifier
-    clf = MixtureOfGaussiansFuzzyClassifier()
+    clf = TribbleClassifier()
     clf.fit(X_train, y_train)
 
     top_n_todo = clf.top_features_

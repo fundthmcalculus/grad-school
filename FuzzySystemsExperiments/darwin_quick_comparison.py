@@ -9,7 +9,7 @@ import time
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 
 
 def load_data():
@@ -53,13 +53,13 @@ def main():
 
         start = time.time()
         if trapz_method is None:
-            clf = MixtureOfGaussiansFuzzyClassifier(
+            clf = TribbleClassifier(
                 member_function=mf_type,
                 top_n=10,  # Use only top 10 features for speed
                 n_gaussians=1,
             )
         else:
-            clf = MixtureOfGaussiansFuzzyClassifier(
+            clf = TribbleClassifier(
                 member_function=mf_type,
                 trapz_method=trapz_method,
                 top_n=10,  # Use only top 10 features for speed

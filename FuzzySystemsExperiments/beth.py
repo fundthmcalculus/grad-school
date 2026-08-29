@@ -4,7 +4,7 @@ import time
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 from tribblefis.scaling import UnitScalar
 from tribblefis.gauss_plot import report_figures_of_merit
 
@@ -66,7 +66,7 @@ def main():
     X_train, X_test = _scaler.transform(X_train), _scaler.transform(X_test)
 
     # Initialize and fit the Gaussian Mixture Classifier
-    clf = MixtureOfGaussiansFuzzyClassifier(top_n=3)
+    clf = TribbleClassifier(top_n=3)
     clf.fit(X_train, y_train)
 
     top_n_todo = clf.top_features_

@@ -28,7 +28,7 @@ from sklearn.datasets import load_iris, load_wine, load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 from tribblefis.refine import refine_classifier_antecedents
 
 warnings.filterwarnings("ignore")
@@ -72,7 +72,7 @@ def _eval(X, y, kw, method, seed, **extra):
     Xtr = Xtr.reset_index(drop=True)
     ytr = np.asarray(ytr)
     with contextlib.redirect_stdout(io.StringIO()):
-        clf = MixtureOfGaussiansFuzzyClassifier(random_state=seed, **kw)
+        clf = TribbleClassifier(random_state=seed, **kw)
         clf.fit(Xtr, ytr)
         if method != "baseline":
             clf.model_, _ = refine_classifier_antecedents(

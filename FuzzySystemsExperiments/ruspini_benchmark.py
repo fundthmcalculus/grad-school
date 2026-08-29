@@ -30,7 +30,7 @@ from sklearn.datasets import load_iris, load_wine, load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
+from tribblefis.gaussian_classifier import TribbleClassifier
 from tribblefis.ruspini import RuspiniFuzzyClassifier
 
 warnings.filterwarnings("ignore")
@@ -67,7 +67,7 @@ def main():
             ytr = np.asarray(ytr)
             g.append(
                 _acc(
-                    lambda: MixtureOfGaussiansFuzzyClassifier(random_state=s, **kw),
+                    lambda: TribbleClassifier(random_state=s, **kw),
                     Xtr,
                     ytr,
                     Xte,
