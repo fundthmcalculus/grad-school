@@ -1,6 +1,6 @@
 import time
 
-import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gauss_plot import report_figures_of_merit
@@ -14,21 +14,21 @@ from tribblefis.gaussian_classifier import MixtureOfGaussiansFuzzyClassifier
 
 
 def load_data():
-    from ucimlrepo import fetch_ucirepo
+    """Statlog Shuttle via the shared loader (``repro_data.load_shuttle``),
+    reading ``data/shuttle.csv``. The old copy network-fetched via
+    ``ucimlrepo`` (id=148), which named the columns (``Rad Flow`` ...); the
+    canonical file ships ``atrib1..atrib9``, so those sensor names are
+    unavailable downstream -- see the scaling note in ``main()``. y is a Series
+    so the ``.nunique()`` and ``stratify=y`` usage below is unchanged.
+    """
+    import os
+    import sys
 
-    # fetch dataset
-    statlog_shuttle = fetch_ucirepo(id=148)
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_shuttle
 
-    # data (as pandas dataframes)
-    X = statlog_shuttle.data.features.astype(np.float32)
-    y = statlog_shuttle.data.targets["class"].astype(np.str_)
-
-    # metadata
-    print(statlog_shuttle.metadata)
-
-    # variable information
-    print(statlog_shuttle.variables)
-    return X, y
+    X, y = load_shuttle()
+    return X, pd.Series(y, index=X.index)
 
 
 def main():
@@ -39,42 +39,24 @@ def main():
     n_unique = y.nunique()
     print(f"Number of unique values in y: {n_unique}")
 
-    scaled_cols = [
-        "Rad Flow",
-        "Fpv Close",
-        "Fpv Open",
-        "High",
-        "Bypass",
-        "Bpv Close",
-        "Bpv Open",
-    ]
-    # BEHAVIOUR CHANGE, and the reason is structural rather than cosmetic.
+    # SCALING, and why it changed with the loader.
     #
-    # This script was the one sample that normalized BEFORE logging: it min-max
-    # scaled this column subset to [0,1] and then applied np.log1p on top of the
-    # scaled values. UnitScalar's order is fixed at log -> normalize, so it simply
-    # cannot express the old order; the previous code kept it only by disabling the
-    # scaler's log step (`log_dynamic_range=None`) and doing the log1p by hand
-    # afterwards. That is exactly the custom transformation code this migration is
-    # meant to remove, so it is converted to the canonical order instead.
+    # The old copy hand-picked seven sensor columns by name (Rad Flow, Fpv
+    # Close, ...) -- names ucimlrepo attached to Statlog Shuttle -- and min-max
+    # scaled that subset. The canonical data/shuttle.csv ships the same nine
+    # attributes as atrib1..atrib9 with no sensor names and no in-repo map back
+    # to them, so that named subset cannot be reselected. The scaling is
+    # therefore applied canonically across all features via UnitScalar's own
+    # log->normalize with dynamic-range auto-detection -- the custom
+    # per-column transform this migration exists to remove.
     #
-    # ==> THIS SAMPLE'S NUMBERS WILL MOVE, and not by rounding. Both orders are
-    # monotone per feature, so anything rank-based would be unaffected, but
-    # MixtureOfGaussiansFuzzyClassifier fits Gaussian membership functions to
-    # actual values and will see a different distribution. Nothing here reproduces
-    # the old output, and nothing pretends to. Unverified: load_data() fetches
-    # Statlog Shuttle over the network via ucimlrepo, so this cannot be run here.
-    #
-    # `log_dynamic_range=0` forces the log1p onto every column it is handed, which
-    # is how the old code behaved (it logged all seven unconditionally). It is the
-    # only way to say "log exactly these columns" through this API -- there is no
-    # explicit log-column list -- and it is applied to the subset precisely so the
-    # logged set stays the seven columns named above.
-    X[scaled_cols] = (
-        UnitScalar(log_dynamic_range=0)
-        .fit_transform(X[scaled_cols])
-        .astype(X[scaled_cols].dtypes.iloc[0])
-    )
+    # ==> THIS SAMPLE'S NUMBERS MOVE, and not by rounding: a different (and
+    # larger) set of columns is scaled, in the canonical order. Rank-based
+    # quantities are unaffected (the transform is monotone per feature) but a
+    # Gaussian-membership fit sees a different distribution. Nothing here
+    # reproduces the old output, and nothing pretends to.
+    _scaler = UnitScalar().set_output(transform="pandas")
+    X = _scaler.fit_transform(X)
 
     # Split dataset into train/test
     X_train, X_test, y_train, y_test = train_test_split(
