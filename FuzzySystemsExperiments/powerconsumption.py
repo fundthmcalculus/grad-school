@@ -2,7 +2,6 @@ import os
 import time
 
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from tribblefis.gauss_math import (
@@ -25,23 +24,18 @@ from tribblefis.report import print_membership_details
 
 
 def load_data():
-    data_path = "powerconsumption.csv"
-    if not os.path.exists(data_path):
-        # Try to find it in the same directory as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, data_path)
+    """Power Consumption via the shared loader
+    (``repro_data.load_powerconsumption``), reading ``data/powerconsumption.csv``.
+    All three zone columns are dropped from X (Zones 2/3 are alternate targets,
+    not features); Zone-1 is the target. The old inline copy read a bare
+    ``powerconsumption.csv`` absent from the repo root (see ``data/README.md``).
+    """
+    import sys
 
-    X = pd.read_csv(data_path)
-    X = X.dropna()
-    y = X["PowerConsumption_Zone1"]
-    y.name = "y_value"
-    X.drop(
-        ["PowerConsumption_Zone1", "PowerConsumption_Zone2", "PowerConsumption_Zone3"],
-        axis=1,
-        inplace=True,
-    )
-    X = X.select_dtypes(include=[np.number])
-    return X, y
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from repro_data import load_powerconsumption
+
+    return load_powerconsumption()
 
 
 def main():
