@@ -255,6 +255,8 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
+| 4.8 MF deduplication | `table_4_8_mf_dedup.py` (+ `_mf_dedup.py`) | `outputs/table_4_8_mf_dedup.{md,csv}` | **stale** — prose is `mf-dedup-2026-08-05` @ tribble-fis `6ddb8028`; the max-lossless column moved from TWO causes — our own CI correction (#143: Digits 44.2%→56.4% with byte-identical means) and tribble-fis #218 (BreastCancer 0.0%→66.5%, Wine 10×→7×) — with Diabetes 2×→3× unattributed; @1× reduction *percentages* unchanged but BreastCancer's raw MF moved 11.1→16.4 — note 29 |
+| 4.9 Correction-rule pass (Glass) | `table_4_8_mf_dedup.py` | `outputs/table_4_9_correction_pass.{md,csv}` | **stale** — same archive; the gated-cascade gain fell +0.031±0.027 → +0.008±0.011 under #218, its 95% CI now spanning zero. The base arm is byte-identical and only the expert arm moved, which is what localises this one to #218 — note 29 |
 | 4.11 BETH anomaly detection | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95); prose slot at §4.4 — note 22 |
 | 4.11(c) BETH feature reduction | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.4 — note 23 |
 | 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |
@@ -444,6 +446,93 @@ elsewhere as real - and it is why one fit per seed is correct rather than a shor
 genuinely different fitted model - the only knob in the table that could have beaten
 thresholding by trading one decision surface for another. It does not: the refit moves the
 surface and buys nothing over sliding along a fixed one.
+
+**Note 29 — Tables 4.8/4.9 drifted from TWO independent causes, one of them ours,
+and were untracked here until now.** The prose numbers are from `mf-dedup-2026-08-05`
+(tribble-fis `6ddb8028`); the new figures are `bump-ae0ef13-2026-08-30`. Diffing all
+84 rows of `table_4_8_mf_dedup_sweep.csv` between the two archives separates the causes
+cleanly, and they want different responses.
+
+*Cause A — our own statistics correction (#143, `32218a5`, 2026-08-23).* That commit
+replaced `pstdev` with `statistics.stdev` in `common.agg` (ddof 0 → 1) and the normal
+1.96 with Student's `t_{0.975,n-1}` in `table_4_8_mf_dedup._ci_excludes_zero`, widening
+the 95% CI ~22% at ten seeds. `mf-dedup-2026-08-05` predates it by eighteen days. Its
+signature is unmistakable: for **Glass, Digits and Concrete** the dedup-MF means and the
+paired Δ means are *byte-identical at all fourteen multipliers* (Concrete moves in the
+fifth decimal), and only the ± moved — by a factor of 1.053–1.056, against
+`sqrt(10/9) = 1.05409`. Because "max-lossless" is defined as the last multiplier before
+the CI stops containing zero, a wider CI moves the boundary **up**:
+
+- **Digits 44.2% → 56.4%** is *entirely* this. Not one mean changed; the CI at 10×
+  flipped from excluding zero to containing it because the error bar grew.
+- **Glass** flips its CI at 15× the same way, but its reported boundary (5×, first
+  break at 7×) is unmoved.
+
+#143's own commit message predicted exactly this table: *"the old formula declared
+'excludes zero' one grid step early and reported a smaller max-lossless tolerance than
+the data supports."* **This half of the drift is not provisional.** A re-run under any
+pin will not restore 44.2%: the old figure was produced by a formula we have since
+corrected as wrong, and the new one is the number the same data always supported.
+
+*Cause B — tribble-fis #218 (landed in the `ae0ef13` pin bump).* It gave
+`TribbleClassifier` a default `correlation_threshold=0.85` that drops correlated
+features from the top-k before the Gaussian model is built, so on a redundant-feature
+problem a different feature set is selected. `table_4_8_mf_dedup.py` builds
+`TribbleClassifier(top_n=5)`, so this reaches the four classification rows only — and of
+those, only two moved:
+
+- **Breast Cancer 0.0% → 66.5%**, whose **raw** MF count went 11.1 → 16.4. That is the
+  only raw count in the whole table that moved, and a changed raw count can only mean a
+  changed feature set. The 66.5% boundary sits at a paired Δ of −0.055 ± 0.079 —
+  "lossless" only in the CI-contains-zero sense.
+- **Wine 10× → 7×** — weaker evidence than Breast Cancer, but the same direction: the
+  raw count holds at 16.6 while the dedup outcome and the deltas both move (14.6 → 15.0
+  at 10×; a flat +0.0019 across 2×–7× becomes 0.0000/−0.0074). Same number of MFs,
+  different parameters — a different fit, not a different rounding.
+- **Table 4.9** belongs here too, and the localisation is the evidence: the *base* arm
+  is byte-identical (81.4 MF, 0.5323 acc) while the *expert* arm moved (109.0 → 107.4
+  raw MF, 0.5631 → 0.5400 acc), dropping the gated-cascade gain from +0.031 ± 0.027 to
+  **+0.008 ± 0.011**, a 95% CI that now spans zero. The experts are `TribbleClassifier`s
+  fit on routed subsets, whose correlation structure differs from full Glass — which is
+  where a correlation threshold would bite while leaving the full-data base fit alone.
+  The narrowing of that ± is real, not a stats artefact: it narrowed *against* Cause A's
+  widening.
+
+*Unattributed.* **Diabetes 2× → 3×** is neither. It is regression (`TribbleRegressor`,
+which #218 did not touch), its raw and dedup MF counts are byte-identical at every
+multiplier, and yet its R² deltas moved materially (−0.073 → −0.032 at 5×). Identical MF
+counts with moved deltas points at the consequent/prediction path, not premise feature
+selection. **The cause is not identified.** Do not fold it into #218 when re-measuring.
+
+*What is unchanged, and one cell that is not.* The **@1× shipped-tolerance** reduction
+*percentages* (§4's "free money" claim) hold across all six. But Breast Cancer's raw
+count moved, so its `MF @ 1×` moved 11.1 → 16.4 with it; the 0.0% survives only because
+both halves moved together. The prose row transcribes both stale cells.
+
+*Citability.* The `bump-ae0ef13-2026-08-30` archive is stamped NOT CITABLE only because
+the fuzzy-suite preflight flags the tribble-fis→clustering/optimizers pin divergence; no
+dedup number depends on either package (§4.8 imports neither). tribble-fis#221 bumps
+those pins so a re-run comes back citable.
+
+**Follow-up — five §4 sentences move, not two.** In `prose/04-fast-fis-synthesis-mog.md`:
+
+1. **:67** — *"from 2× (Diabetes) to 10× (Wine, Concrete)"* becomes **3× to 50×**.
+2. **:67** — *"0.0% (Breast Cancer, which has almost no redundancy left to remove) to
+   44.2% (Digits)"* becomes **2.4% (Wine) to 66.5% (Breast Cancer)**; the parenthetical
+   about Breast Cancer inverts — it is now the *most* reducible of the six.
+3. **:352** — *"2×–10× and 0.0%–44.2% is not a number this method can report as a single
+   constant"*, the section's conclusion, restates both ranges.
+4. **:352** — *"Breast Cancer's and Digits's sweeps both dip back inside the CI band
+   after their first break (at 15×–20× and 50×–70× respectively)"*. **Breast Cancer no
+   longer has a dip-back at all**: its CI contains zero at every multiplier from 0.1×
+   through 50×, then excludes it at 70× and 100× and never returns. The non-monotone-tail
+   argument loses one of its two examples — a qualitative claim, not a quoted figure.
+5. **:347** — the transcribed Table 4.8 row for Breast Cancer, including the two `@1×`
+   cells the paragraph above flags.
+
+And §4's *"the correction pass does real work, not decoration"* must be revisited against
+4.9's now-zero-spanning CI. Re-measure the Cause-B and unattributed rows under a
+green-preflight archive before re-transcribing; the Cause-A rows need no re-run.
 
 *Secondary findings.* theta's J is **monotone** (+0.160 at theta=0 rising to +0.769 at
 theta=0.999), so on BETH there is no interior optimum and the shipped 0.99 default is
