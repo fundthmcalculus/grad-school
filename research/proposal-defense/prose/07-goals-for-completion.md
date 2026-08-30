@@ -38,9 +38,13 @@ Chapter 3 owes a direct comparison against eVAT [@meng2018evat] and clusiVAT on 
 
 *Decision rule.* Exact VAT ordering on shared datasets across the swept grid, ten seeds, run-of-record host. Metrics: wall clock, peak memory, ordering agreement against the serial reference. Two thresholds, since the competitors fail differently. clusiVAT samples and is approximate: agreement 1.000 where it does not reach it, within one order of magnitude on wall clock. eVAT is already exact on a GPU (§3.2 concedes I am not claiming the first), so the claim is in-place footprint at matched $N$. Refuted if eVAT matches the in-place ceiling, collapsing Chapter 3's memory contribution to a constant factor.
 
-### G4c — The datacenter-GPU re-run (experiment; blocked on hardware)
+### G4c — The device path, if it returns (experiment; blocked on software *and* hardware)
 
-The pairwise-distance kernel loses to the CPU below 1× at low dimension and double precision on a consumer card, and §3.3.3 predicts that full-rate FP64 flips it. Untested, and labeled as such in the chapter and in Table 3.4 (checklist **C8**). Blocked on hardware access rather than effort, so Chapter 10 lists it with its gate instead of a quarter.
+**The GPU work was descoped from the body on 2026-08-30 (Appendix A.9), and this goal now carries its revival.** The gate has two stages, not one.
+
+*First, software.* `tribble-clustering` removed its CuPy back ends and its `[gpu]` extra in `1ec9667`, so `tribbleclustering.gpu` no longer exists; `reproduce/tables/table_3_4_gpu_speedups.py` was deleted with Table 3.4 because it had nothing to import. The device kernels would have to return upstream, or be rebuilt, before any of this is measurable again.
+
+*Then, hardware.* The question that made the path interesting is still open: the pairwise-distance kernel loses to the CPU below 1× at low dimension and double precision on a consumer card, and §3.3.3's reading is that full-rate FP64 flips it. Untested (checklist **C8**). Blocked on access to such a card rather than on effort, so Chapter 10 lists it with its gate instead of a quarter.
 
 *Decision rule.* One kernel, one grid, two cards: the RTX 4080 already measured and one datacenter card, ten seeds, float64 and float32, across the dimensions where the loss is worst. Confirmed if the float64 low-dimensional row reaches ≥ 1× on the datacenter card. Refuted if it stays below 1×, making the loss a property of the *algorithm's* arithmetic intensity rather than the card's throughput ratio, so §3.3.3's caveat becomes a limitation and not a hardware artifact. With no card, §7.4's fallback applies.
 

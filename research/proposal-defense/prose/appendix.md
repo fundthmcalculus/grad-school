@@ -12,7 +12,7 @@ All fifteen are produced today, through `reproduce/figures/`, in PNG for the Mar
 
 ## A.2 Extended results tables
 
-The main text carries twenty-one summary tables (3.1–3.7, 4.1–4.7, 5.1–5.3, 6.1–6.3, 7.1), and this appendix carries five of its own (A.1–A.5). The seed half of Goal G4 has run, and every numbered table is already quoted at the ten-seed floor with a spread, so what the appendix owes is not a multi-seed version of each one. It is the **per-seed detail** those rows aggregate away, the splits behind each mean, which is how a reader finds the one seed in ten that carries a failure, as Chapter 6's mixture-of-experts divergence did. G4's outstanding half is hardware, which a re-run fixes and a wider table cannot. Most of these tables regenerate from `reproduce/tables/`, so the appendix version is the same data at full width; the rest are named in A.5.
+The main text carries twenty summary tables (3.1–3.3 and 3.5–3.7 — 3.4 is retired, see A.9 — plus 4.1–4.7, 5.1–5.3, 6.1–6.3, 7.1), and this appendix carries five of its own (A.1–A.5). The seed half of Goal G4 has run, and every numbered table is already quoted at the ten-seed floor with a spread, so what the appendix owes is not a multi-seed version of each one. It is the **per-seed detail** those rows aggregate away, the splits behind each mean, which is how a reader finds the one seed in ten that carries a failure, as Chapter 6's mixture-of-experts divergence did. G4's outstanding half is hardware, which a re-run fixes and a wider table cannot. Most of these tables regenerate from `reproduce/tables/`, so the appendix version is the same data at full width; the rest are named in A.5.
 
 - **A.2.1** Full adversarial-evaluation ARI grids and the complete stitch-ablation grid (all partitions × sizes).
 - **A.2.2** The full selection-method bake-off across all synthetic datasets, and the relational-data results. The HDBSCAN\* head-to-head that belongs with them is written out in **A.8**, because its outcome decides what Chapter 5 claims rather than merely widening a table.
@@ -42,7 +42,9 @@ Per Chapter 2's recorded design decision, the optimization library is supporting
 
 **Standalone-paper opportunities** (for Dr. Cohen's consideration, not part of the core dissertation): the performance-engineering study on its own; the quality-diversity-over-legacy-solvers layer (CVT-MAP-Elites + Iso+LineDD); and the exact GPU/parallel VAT engine as a systems paper.
 
-That third one is **on hold until Table 3.4 is re-quoted**. Such a paper would be written around a speed envelope, and this envelope is being re-measured. `PROVENANCE_MAP.md` note 15 marks Table 3.4 **drifted**: its Fuzzy C-Means row overstates the GPU by roughly an order of magnitude, because the quoted ratio compares a NumPy broadcasting implementation against one using the gram identity and two GEMMs. That is a difference of *formulation*, not of device. Run the GPU's own formulation on the CPU and most of the ratio goes away. What the paper would rest on, exactness against the serial reference, does reproduce everywhere it is claimed; the speed figures do not read as quoted. So the item stays, envelope marked under re-measurement: proposing a systems paper on a drifted table is how a drifted number gets published.
+That third one is **withdrawn, not merely on hold** — see A.9. Its speed envelope was Table 3.4, that table is removed from the document, and the device back ends it ran on no longer exist upstream. What follows is the record of why, kept in the appendix so the work is not simply deleted.
+
+*Superseded text, retained because it explains the shape of the problem:* the paper was previously described as on hold until Table 3.4 is re-quoted. Such a paper would be written around a speed envelope, and this envelope is being re-measured. `PROVENANCE_MAP.md` note 15 marks Table 3.4 **drifted**: its Fuzzy C-Means row overstates the GPU by roughly an order of magnitude, because the quoted ratio compares a NumPy broadcasting implementation against one using the gram identity and two GEMMs. That is a difference of *formulation*, not of device. Run the GPU's own formulation on the CPU and most of the ratio goes away. What the paper would rest on, exactness against the serial reference, does reproduce everywhere it is claimed; the speed figures do not read as quoted. So the item stays, envelope marked under re-measurement: proposing a systems paper on a drifted table is how a drifted number gets published.
 
 It is also distinct from the mergeVAT methods paper's complexity audit — the sequencing's cost and memory bound and the heap-versus-dense measurement — while a systems paper would cover the parallel and GPU engineering envelope. Neither should absorb the other's claim.
 
@@ -502,3 +504,64 @@ implementation.
 ---
 
 *Draft — Appendix prose. A.3 (optimization engine), A.4 (feature scoring), A.5 (reproducibility), A.6 (side quests), A.7 (dataset inventory) and A.8 (the Chapter 5 HDBSCAN\* head-to-head) are written out; A.1/A.2 are inventories to be filled as the figures and the per-seed detail land. Open items in `../CHECKLIST.md`.*
+
+## A.9 The GPU / Borůvka path, and why it is not in the body
+
+Removed from Chapter 3 on 2026-08-30. This section is a **record of work done, not a
+result**, and nothing in the body cites a number from it.
+
+**What was built.** A device-resident Borůvka front end for mergeVAT: pairwise
+distances, MST construction and the VAT ordering all executed on the card, so the
+data does not shuttle back to the host between stages. It rests on the same property
+§3.3.3 opens with — the ordering depends only on the MST, so any MST builder yields
+the same answer — and it did: the device ordering matched serial VAT elementwise at
+double precision, at every size and seed tested, with a VAT order match of 1.000. The
+one arm that was not 1.000 was a 48,000-point float32 demonstration at 0.99992, four
+positions in forty-eight thousand, with the Prim totals agreeing to every digit
+printed. That is minimum-spanning-tree tie-breaking, not error.
+
+**Why it left the body.** Three reasons, and only the third is fatal on its own.
+
+*The headline number measured the wrong thing.* Table 3.4 had claimed Fuzzy C-Means
+ran thirty to fifty times faster on the device than on the 32-core CPU. The device
+kernel used the gram identity and two GEMMs; the CPU arm it was compared against
+computed distances by NumPy broadcasting. Held to a matched formulation the device
+win was **1.2–3.7×**. The same split, smaller, applied to the VAT front end:
+2.28×–5.02× at matched ordering-only work against 5.52×–12.13× when the two arms were
+allowed to do different amounts of it. A table whose largest entry is a property of
+the baseline's implementation is not a speed table, and correcting it left an
+envelope too modest to carry a chapter section.
+
+*The one genuinely interesting result was uninterpretable without hardware I do not
+have.* Pairwise distances **lose** to the CPU — 0.29–0.64× — at low dimension or in
+double precision, because a consumer card's double-precision throughput is a small
+fraction of its single-precision throughput. Whether that is a fact about this card
+or about the algorithm is precisely what a full-rate-FP64 datacenter card would
+decide, and no such card was available. A negative result nobody can attribute is not
+publishable and is barely quotable.
+
+*The backend was removed upstream.* `tribble-clustering` deleted its CuPy back ends
+and its `[gpu]` extra in `1ec9667` (2026-08-30). `tribbleclustering.gpu` no longer
+exists, so `reproduce/tables/table_3_4_gpu_speedups.py` had nothing left to import
+and was deleted with the table. The measurement could not be repeated today even
+with the card that would have settled the second point.
+
+**What removing it costs, and what it buys.** It costs the exactness demonstration —
+a device path reproducing serial VAT bit-for-bit is a real and slightly surprising
+result, and it now survives only as this paragraph. It buys three things. The chapter
+no longer contains a speed table whose provenance map entry read *drifted*. The
+prior-art collision with Parveen and Sreevalsan-Nair's pVAT — a GPU VAT that also
+swaps Prim for Borůvka, and the one place this work overlapped theirs directly —
+disappears, because the overlapping component is gone. And Chapter 3's argument is
+unaffected: the priority-queue reorder, the in-place memory scheme, the
+divide-and-conquer stitch and the non-metric extension are all CPU results and never
+depended on the device path.
+
+**Reviving it.** Goal **G4c** carries this. It was previously gated on hardware
+alone; it now has a software precondition first — the device kernels would have to
+return to `tribble-clustering`, or be rebuilt — and only then the datacenter card
+that decides the double-precision question. The research scripts remain in
+`ClusteringExperiments/` (`boruvka_gpu.py`, `gpu_vat.py`, `boruvka_dgx_spark.py` and
+the VAT-TSP device studies beside them) and are untouched; `reproduce/manifest.py`
+records the `ch3-boruvka-gpu` entry as descoped rather than deleting it. Nothing
+under `research/proposal-defense/` cites any of it.

@@ -35,9 +35,11 @@ N = 2,000 to 12,000 while the implied matrix grows 36x. So the "no N^2 term"
 column is a measurement now, not arithmetic about it.
 
 Half precision is deliberately out of scope here.  pcvat.pyx ships _64 and _32
-kernels only, and reduced precision below float32 belongs with the Boruvka/GPU
-path of Chapter 3 §3.3.3 rather than with the CPU memory scheme this table is
-about -- that is where a half-precision distance kernel would actually pay.
+kernels only.  This used to defer the question to the Boruvka/GPU path of
+Chapter 3 §3.3.3 -- where a half-precision distance kernel would actually pay --
+but that path was DESCOPED on 2026-08-30 (Appendix A.9, Goal G4c), so the
+question now has no home rather than a different one.  It is out of scope for
+this table either way: the CPU memory scheme is what this table is about.
 
 Run (from repo root):
     uv run --project tribble-cluster python reproduce/tables/table_3_2_memory_precision.py
@@ -243,8 +245,9 @@ def main():
             "e3c27e6, which §3.4's permalinks still cite. Ordering now reads 1.000 at "
             "float64 and 0.999 at float32, the latter being tie-breaking rather than error. "
             "Precision below float32 is out of scope: pcvat.pyx ships "
-            "_64 and _32 kernels only, and half precision belongs with the Borůvka/GPU "
-            "path of §3.3.3, where it would actually pay."
+            "_64 and _32 kernels only. Half precision would pay on a device "
+            "path, and that path is descoped (Appendix A.9, Goal G4c), so the "
+            "question is open rather than deferred."
         ),
     )
 

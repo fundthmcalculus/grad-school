@@ -390,15 +390,19 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       completely different logged set. Check rather than assume that restoring its list is also
       neutral. The remaining four have no local data and cannot be verified either way, which is
       the honest reason to prefer behaviour-preserving lists for them.
-- [ ] ⬜ **B10 — Capture the Borůvka / GPU work properly.** Ch 3 §3.3.3 and Table 3.4 are the
-      thinnest part of the chapter: the GPU rows have no generator of their own history
-      (`PROVENANCE_MAP` marks them ungenerated pre-**E2**, needing a device host), and reduced
-      precision below float32 was deliberately scoped *out* of the CPU memory table (Table 3.3)
-      on the grounds that half precision belongs with the Borůvka/GPU path, where it would
-      actually pay. That makes the GPU side the natural home for: the fp16 distance/MST
-      question, the datacenter-FP64 re-run **C8** already tracks, and the exact-GPU-engine
-      standalone paper flagged in §9.4. Currently none of the fp16 question is captured in the
-      harness.
+- [x] ✅ **B10 — Capture the Borůvka / GPU work properly. CLOSED 2026-08-30 by descoping it.**
+      This item asked for the GPU side to become the natural home for the fp16 distance/MST
+      question, the datacenter-FP64 re-run **C8** tracks, and the exact-GPU-engine standalone
+      paper in §9.4. It is closed the other way: **the GPU work is out of the proposal body.**
+      Table 3.4 is removed, `reproduce/tables/table_3_4_gpu_speedups.py` is deleted, §3.3.3 is
+      rewritten around the MST-agnosticism that made the device path possible, and what was
+      built and measured is recorded in **Appendix A.9**. Three reasons: the headline Fuzzy
+      C-Means row measured the CPU baseline's *formulation* rather than the hardware (1.2–3.7×
+      matched, not 30–50×); the one honest negative result needed a full-rate-FP64 card nobody
+      had; and `tribble-clustering` deleted its CuPy back ends and `[gpu]` extra in `1ec9667`,
+      so there is no device module left to import. The fp16 question therefore has no home
+      rather than a different one — stated as such in `table_3_2_memory_precision.py` — and
+      **G4c** carries any revival, now gated on software before hardware.
 - [x] ✅ **B11 — Reproduction harness in place.** `reproduce/` is the single entry point:
       `run.py` orchestrator plus a growing set of registered experiments across the four
       submodules (command, environment, datasets, hardware tier); `run_all_tables.sh` drives
@@ -1272,7 +1276,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       (`window_size + memory_size` rows of history) in the pinned `tribble-fis`; second
       silent-wrong-answer defect found in an exported API by this project, after `B6`'s
       `vat_prim_mst_seq`.
-- [ ] ⬜ **C8 — Ch 3 datacenter GPU re-run.** The pairwise-distance kernel loses (<1×) at low
+- [x] ✅ **C8 — Ch 3 datacenter GPU re-run. CLOSED 2026-08-30, descoped with the GPU work (B10, Appendix A.9).** Retained below as the open scientific question, now carried by **G4c** and gated on the CuPy back ends returning upstream before any card matters. Original text: The pairwise-distance kernel loses (<1×) at low
       dimension / float64 on a consumer card; the prediction that full-rate FP64 flips it is
       untested and labeled as such.
 - [ ] ⬜ **C9 — Ch 6 interpretability, measured** (G6): rule counts, path lengths, and either an
@@ -1655,7 +1659,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       points to §4.3's actual use of the Hamacher conorm and carries §4.3.2's own "untested" hedge.
       **What remains open in E1:** the min/max-as-default framing decision, and whether to *harvest*
       the norm/conorm study into a chapter (it still appears in none) rather than only reference it.
-- [x] ✅ **E2 — Table 3.4 now has a generator, and it runs on this host.**
+- [x] ✅ **E2 — Table 3.4 now has a generator, and it runs on this host. SUPERSEDED 2026-08-30: the table is removed and the generator deleted (B10, Appendix A.9). Retained as the record of what was measured. Original text:**
       `reproduce/tables/table_3_4_gpu_speedups.py`, 31 rows, ten seeds, each row one CPU arm
       against one GPU arm timed in the same pass, device timings stream-synchronised and all
       JIT warmed first (the first `boruvka_mst_device` call spends ~0.4 s compiling — 13× the
