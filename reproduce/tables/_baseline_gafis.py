@@ -77,12 +77,28 @@ def _evolve(centres0, widths0, X, Y, seed):
     pop[0] = base  # keep the unperturbed seed as one individual
 
     best_fit, best_net = -np.inf, None
+    # Elites carry an UNCHANGED genome into the next generation, but the
+    # scoring loop below re-evaluated every individual regardless -- ELITES/POP
+    # of each generation's fitness evals were solving the same consequents for
+    # a genome already scored last generation. `cache` keys on the genome's
+    # exact bytes (not a tolerance match), so a hit is the same individual, not
+    # merely a similar one -- this skips redundant work, it doesn't change
+    # which genome gets evaluated or how.
+    cache = {}
     for _ in range(GENERATIONS):
         scored = []
+        next_cache = {}
         for g in pop:
-            c, s = unpack(g)
-            fit, net = _score_individual(c, s, X, Y, seed)
+            key = g.tobytes()
+            hit = cache.get(key)
+            if hit is not None:
+                fit, net = hit
+            else:
+                c, s = unpack(g)
+                fit, net = _score_individual(c, s, X, Y, seed)
             scored.append((fit, g, net))
+            next_cache[key] = (fit, net)
+        cache = next_cache
         scored.sort(key=lambda t: t[0], reverse=True)
         if scored[0][0] > best_fit:
             best_fit, best_net = scored[0][0], scored[0][2]
