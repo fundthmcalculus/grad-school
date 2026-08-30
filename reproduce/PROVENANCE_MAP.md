@@ -534,6 +534,49 @@ And §4's *"the correction pass does real work, not decoration"* must be revisit
 4.9's now-zero-spanning CI. Re-measure the Cause-B and unattributed rows under a
 green-preflight archive before re-transcribing; the Cause-A rows need no re-run.
 
+**Note 30 — PhiUSIIL's class labels were inverted in the shared loader, and no
+metric could have told us.** `repro_data.load_phiusiil` mapped `{0: "legit",
+1: "phish"}` until 2026-08-30. It is the other way round: **`label == 1` is
+legitimate (134,850 rows), `label == 0` is phishing (100,945)**. The loader was
+written "verified byte-identical" against
+`tribble-fis/tribble-tree/demo_phishing.py`, and faithfully inherited that file's
+inversion along with everything else.
+
+Four independent checks on the shipped CSV agree, and none is a judgement call:
+the two class counts are the dataset's published legitimate/phishing split *in
+that order*; `URLSimilarityIndex` — a URL's similarity to a whitelist of **known
+legitimate** URLs — is exactly 100.0 with **zero variance** across all 134,850
+`label == 1` rows against 49.6 ± 22.6 on `label == 0`; `IsHTTPS` is 1 on every
+`label == 1` row; and the `label == 1` URLs are `https://www.uni-mainz.de`,
+`https://www.southbankmosaics.com`. `experiments/phishing-oneclass/data.py` has
+its own loader and always had it right (`1 = legit`), which is why the nine
+zero-variance "tripwire" features it detects data-drivenly are exactly the nine
+constant within `label == 1`.
+
+**What moved: nothing numeric.** Accuracy, macro-F1, rule counts and wall-clock
+are invariant under a consistent relabelling of two classes, so **Table 4.5's
+PhiUSIIL row, §4's "two-rule classifier at 0.997", A.1/A.2's feature scoring and
+every timing are unaffected** — the fitted model is identical, only the strings
+naming its two outputs were swapped. That invariance is exactly why this survived
+every sweep: there was no cell for it to move.
+
+**What moved: the one output that names a class.**
+`reproduce/figures/fig_06_fuzzy_tree.py` renders leaves through
+`fuzzytree.render._leaf_label`, so the committed
+`research/proposal-defense/prose/fig/06-fuzzy-tree.png` reads `=> legit` on the
+phishing leaf and `=> phish` on the legitimate one. The figure is **stale** and
+must be regenerated. It is deliberately regenerated *once*, after the leak-free
+loader policy lands, rather than twice: dropping `URLSimilarityIndex` et al.
+changes which features the tree splits on, so a regeneration now would be
+superseded immediately.
+
+`experiments/phishing-oneclass/test_phiusiil_labels.py` pins the polarity in both
+loaders from here. The dataset is gitignored, so those tests SKIP on CI and run
+on any host that can actually produce a PhiUSIIL number — which is the only place
+the assertion means anything, and better than a synthetic fixture that would
+assert the mapping against itself.
+
+
 *Secondary findings.* theta's J is **monotone** (+0.160 at theta=0 rising to +0.769 at
 theta=0.999), so on BETH there is no interior optimum and the shipped 0.99 default is
 near-best. **The proposal's usable band of theta = 0.5-0.8 does not transfer** - it came
