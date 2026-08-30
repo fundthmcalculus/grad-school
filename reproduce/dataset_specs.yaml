@@ -205,6 +205,19 @@ datasets:
       leaving 50 that reach a model. The prose quoted 54 -- the count you get by
       subtracting only the label and FILENAME -- which counts four text columns
       as modelled features. 50 is the number the measurements were made on.
+
+      LABEL POLARITY: `label == 1` is LEGITIMATE (134,850 rows) and
+      `label == 0` is PHISHING (100,945). `repro_data.load_phiusiil` mapped it
+      the other way until 2026-08-30, inheriting the inversion from
+      `tribble-fis/tribble-tree/demo_phishing.py`. Four checks agree on the
+      correct direction: the class counts match the published split in that
+      order; `URLSimilarityIndex` (similarity to a whitelist of known-legitimate
+      URLs) is exactly 100.0 with zero variance on every `label == 1` row and
+      49.6 +/- 22.6 on `label == 0`; `IsHTTPS` is 1 for every `label == 1` row;
+      and the `label == 1` URLs are things like `https://www.uni-mainz.de`.
+      Accuracy-style metrics are invariant under the swap, so no table moved --
+      only outputs that NAME a class, of which fig_06-fuzzy-tree is the one.
+      See PROVENANCE_MAP.md note 30.
     verify:
       method: csv
       path: data/PhiUSIIL_Phishing_URL_Dataset.csv

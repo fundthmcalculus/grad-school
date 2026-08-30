@@ -98,6 +98,35 @@ def load_phiusiil(sample_size=20000, random_state=42):
     ``select_dtypes`` alongside the label, leaving the 50 modelled features
     (``dataset_specs.yaml``'s phiusiil note documents why the prose's 54 was
     wrong).
+
+    LABEL POLARITY. ``label == 1`` is **legitimate** and ``label == 0`` is
+    **phishing**. Until 2026-08-30 this mapped the other way, inheriting the
+    inversion from ``tribble-fis/tribble-tree/demo_phishing.py``, which it was
+    verified byte-identical against. Four independent checks on the shipped CSV
+    settle it, and all four agree:
+
+    * ``label == 1`` has 134,850 rows and ``label == 0`` has 100,945 -- the
+      published legitimate/phishing split of this dataset, in that order.
+    * ``URLSimilarityIndex`` is a URL's similarity to a whitelist of KNOWN
+      LEGITIMATE URLs. It is exactly 100.0 for every one of the 134,850
+      ``label == 1`` rows (std 0.0); on ``label == 0`` it is 49.6 +/- 22.6.
+    * ``IsHTTPS`` is 1 for every ``label == 1`` row and 0.49 on ``label == 0``.
+    * The ``label == 1`` URLs are ``https://www.uni-mainz.de``,
+      ``https://www.southbankmosaics.com``, ...; the ``label == 0`` URLs are
+      ``http://www.f0519141.xsph.ru``, ``http://www.shprakserf.gq``, ...
+
+    ``experiments/phishing-oneclass/data.py`` always had it right (its own
+    loader, ``1 = legit``), which is why the nine zero-variance "tripwire"
+    features it detects are exactly the nine that are constant within
+    ``label == 1`` here.
+
+    WHAT THE INVERSION DID AND DID NOT REACH. Accuracy, macro-F1, rule counts
+    and timings are invariant under a consistent relabelling of two classes, so
+    every table that reports one is unaffected. What moves is anything that
+    NAMES a class: ``reproduce/figures/fig_06_fuzzy_tree.py`` renders leaf
+    labels through ``fuzzytree.render._leaf_label``, so the committed
+    ``prose/fig/06-fuzzy-tree.png`` reads ``=> legit`` on the phishing leaf and
+    vice versa. See ``reproduce/PROVENANCE_MAP.md`` note 30.
     """
     local = os.path.join(DATA_DIR, "PhiUSIIL_Phishing_URL_Dataset.csv")
     if not os.path.exists(local):
@@ -107,7 +136,9 @@ def load_phiusiil(sample_size=20000, random_state=42):
         df = pd.read_csv(local, encoding="utf-8-sig").dropna()
         if sample_size and len(df) > sample_size:
             df = df.sample(n=sample_size, random_state=random_state)
-        y = df["label"].map({0: "legit", 1: "phish"})
+        # 1 = legitimate, 0 = phishing -- see LABEL POLARITY above. Do not
+        # "simplify" this back to {0: "legit", 1: "phish"}.
+        y = df["label"].map({1: "legit", 0: "phish"})
         X = df.drop(columns=["label"]).select_dtypes(include=[np.number]).astype(float)
         print(
             f"  [phiusiil] loaded {os.path.relpath(local, REPO_ROOT)}: "
