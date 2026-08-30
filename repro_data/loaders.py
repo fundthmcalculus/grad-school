@@ -189,20 +189,24 @@ def load_phiusiil(sample_size=20000, random_state=42, drop_leak=True):
         if drop_leak:
             dropped = [c for c in PHIUSIIL_LEAK_COLS if c in X.columns]
             X = X.drop(columns=dropped)
+        # Say which of the three cases happened. The third is the one that
+        # matters: `drop_leak=True` finding NOTHING to drop means this CSV does
+        # not carry the columns the policy was measured on, i.e. it is not the
+        # file we think it is. Silence there would be the worst of the three.
+        if dropped:
+            note = f"  ({len(dropped)} leaks dropped: {', '.join(dropped)})"
+        elif not drop_leak:
+            # A run WITH the leak has to be obvious in its own log a month later.
+            note = "  (LEAKY FEATURES KEPT -- do not quote this run)"
+        else:
+            note = (
+                "  [WARNING] drop_leak=True but none of "
+                f"{', '.join(PHIUSIIL_LEAK_COLS)} is present -- this is not the "
+                "PhiUSIIL file the leak policy was measured on"
+            )
         print(
             f"  [phiusiil] loaded {os.path.relpath(local, REPO_ROOT)}: "
-            f"{len(X)} rows × {X.shape[1]} features"
-            + (
-                f"  ({len(dropped)} leaks dropped: {', '.join(dropped)})"
-                if dropped
-                # A loud line, because a run WITH the leak must be obvious in
-                # its own log a month later.
-                else (
-                    "  (LEAKY FEATURES KEPT -- do not quote this run)"
-                    if not drop_leak
-                    else ""
-                )
-            )
+            f"{len(X)} rows × {X.shape[1]} features" + note
         )
         return X, y.to_numpy()
     except Exception as exc:  # noqa: BLE001

@@ -16,8 +16,11 @@ independent second implementation is worth more as a cross-check than as a
 duplicate to be eliminated. A test that the two agree buys the safety without
 the coupling.
 
-The dataset is gitignored, so these SKIP on CI and run on any host that can
-produce a PhiUSIIL number.
+The dataset is gitignored, so the data-dependent tests here carry
+``@requires_data`` and skip on CI. The two that need no data -- the leak-list
+drift guard and the ``dataset_specs.yaml`` check -- deliberately do NOT, because
+they are the ones that catch a future *edit* rather than a change in the data,
+and those are exactly the ones worth running on every PR.
 
 Run: ``python -m pytest experiments/phishing-oneclass/test_phiusiil_leak_policy.py``
 """
@@ -51,7 +54,12 @@ EXPECTED_SEPARATION = {
 }
 SEPARATION_TOL = 0.002
 
-pytestmark = pytest.mark.skipif(
+# Applied PER TEST, not to the module. Two of the assertions below need no data
+# at all -- and one of them, the drift guard between the two LEAK lists, is the
+# only test here that protects against a future EDIT rather than against the
+# data changing. Under a module-level skip it would be the one assertion that
+# never runs on CI, which is precisely backwards.
+requires_data = pytest.mark.skipif(
     not os.path.exists(CSV),
     reason="data/PhiUSIIL_Phishing_URL_Dataset.csv is gitignored and absent here",
 )
@@ -67,6 +75,7 @@ def leaky():
     return got
 
 
+@requires_data
 def test_leaks_are_dropped_by_default():
     from repro_data import PHIUSIIL_LEAK_COLS, load_phiusiil
 
@@ -78,6 +87,7 @@ def test_leaks_are_dropped_by_default():
     assert X.shape[1] == MODELLED_FEATURES
 
 
+@requires_data
 def test_opt_out_restores_them(leaky):
     """`drop_leak=False` has to actually work -- a leak-aware experiment needs it."""
     from repro_data import PHIUSIIL_LEAK_COLS
@@ -88,6 +98,7 @@ def test_opt_out_restores_them(leaky):
         assert col in X.columns
 
 
+@requires_data
 def test_the_evidence_for_the_drop_still_holds(leaky):
     """The separation AUCs the policy is argued from, re-derived from the data.
 
@@ -105,6 +116,7 @@ def test_the_evidence_for_the_drop_still_holds(leaky):
         ), f"{col} separates at {sep:.4f}, not the documented {expected:.4f}"
 
 
+@requires_data
 def test_url_similarity_index_is_the_strongest_feature_in_the_file(leaky):
     """The headline claim: the single most separating feature IS the leak.
 
@@ -139,18 +151,32 @@ def test_the_two_leak_lists_agree():
     assert set(oneclass.LEAK) == set(PHIUSIIL_LEAK_COLS)
 
 
-def test_dataset_spec_agrees_with_the_loader():
-    """dataset_specs.yaml must say 47, not the 50 the CSV carries."""
+def _phiusiil_spec():
     yaml = pytest.importorskip("yaml", reason="PyYAML not in this environment")
     with open(
         os.path.join(REPO_ROOT, "reproduce", "dataset_specs.yaml"), encoding="utf-8"
     ) as fh:
-        spec = yaml.safe_load(fh)["datasets"]["phiusiil"]
+        return yaml.safe_load(fh)["datasets"]["phiusiil"]
+
+
+def test_dataset_spec_says_47_not_50():
+    """No data needed: the spec is committed, and it must record the drop.
+
+    `features` is what dataset_specs.py's `{{dataset.phiusiil.shape}}`
+    substitution renders into the proposal, so a spec still saying 50 would put
+    a leak-era feature count in the document.
+    """
+    spec = _phiusiil_spec()
     assert spec["features"] == MODELLED_FEATURES
     assert spec["numeric_columns"] == NUMERIC_COLUMNS
+    assert set(spec["verify"]["drop_columns"]) == set(EXPECTED_SEPARATION)
 
+
+@requires_data
+def test_loader_width_matches_the_spec():
+    """And the loader actually returns what the spec promises."""
     from repro_data import load_phiusiil
 
     got = load_phiusiil(sample_size=None)
     assert got is not None
-    assert got[0].shape[1] == spec["features"]
+    assert got[0].shape[1] == _phiusiil_spec()["features"]
