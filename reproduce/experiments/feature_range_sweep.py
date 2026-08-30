@@ -60,11 +60,13 @@ REGRESSION_DATASETS = [
 
 def _make_scaler(feature_range):
     from tribblefis.scaling import MinMaxScaler
+
     return MinMaxScaler(feature_range=feature_range, log_dynamic_range=LOG_DR)
 
 
 def _regressor(seed):
     from tribblefis.gaussian_regressor import TribbleRegressor
+
     return TribbleRegressor(
         n_output_buckets=N_BUCKETS,
         tsk_order=TSK_ORDER,
@@ -78,10 +80,9 @@ def run_one(X, y, seed, feature_range):
     import pandas as pd
 
     scaler = _make_scaler(feature_range)
-    Xt = pd.DataFrame(
-        scaler.fit_transform(X.copy()), index=X.index, columns=X.columns
-    )
+    Xt = pd.DataFrame(scaler.fit_transform(X.copy()), index=X.index, columns=X.columns)
     from tribblefis.scaling import MinMaxScaler as MMS
+
     y_sc = MMS(log_dynamic_range=None)
     yt = y_sc.fit_transform(np.asarray(y, dtype=float).reshape(-1, 1)).ravel()
 
@@ -119,7 +120,11 @@ def main() -> int:
                     r2s.append(r2)
             rows.append([ds_name, label, C.cell(r2s) if r2s else C.NA])
             if r2s:
-                print(f"    {label}  R² = {np.mean(r2s):+.3f} ± {np.std(r2s):.3f}")
+                # ddof=1 via C.agg -- see common.agg's docstring and
+                # PROVENANCE_MAP note 29; np.std (ddof=0) understates by
+                # ~5% at the ten-seed floor.
+                _mean, _std = C.agg(r2s)
+                print(f"    {label}  R² = {_mean:+.3f} ± {_std:.3f}")
             else:
                 print(f"    {label}  FAILED")
 

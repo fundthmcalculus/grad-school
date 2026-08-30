@@ -171,5 +171,3 @@ class EmpiricalCDFScaler(TransformerMixin, BaseEstimator):
         if names is None:
             names = [f"feature_{i}" for i in range(np.asarray(X).shape[1])]
         return pd.DataFrame(np.asarray(X, dtype=float), columns=names)
-
-

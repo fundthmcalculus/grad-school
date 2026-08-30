@@ -68,14 +68,21 @@ def _make_arms():
 
     return [
         ("raw", lambda: None),
-        ("log+minmax", lambda: MinMaxScaler(feature_range=FEATURE_RANGE, log_dynamic_range=LOG_DR)),
-        ("quantile", lambda: QuantileUniformScaler(feature_range=FEATURE_RANGE, n_quantiles=200)),
+        (
+            "log+minmax",
+            lambda: MinMaxScaler(feature_range=FEATURE_RANGE, log_dynamic_range=LOG_DR),
+        ),
+        (
+            "quantile",
+            lambda: QuantileUniformScaler(feature_range=FEATURE_RANGE, n_quantiles=200),
+        ),
         ("ecdf", lambda: EmpiricalCDFScaler(feature_range=FEATURE_RANGE)),
     ]
 
 
 def _regressor(seed):
     from tribblefis.gaussian_regressor import TribbleRegressor
+
     return TribbleRegressor(
         n_output_buckets=N_BUCKETS,
         tsk_order=TSK_ORDER,
@@ -86,6 +93,7 @@ def _regressor(seed):
 
 def _classifier(seed):
     from tribblefis.gaussian_classifier import TribbleClassifier
+
     return TribbleClassifier(top_n=5, random_state=seed)
 
 
@@ -105,6 +113,7 @@ CLASSIFICATION_DATASETS = [
 
 
 # --- Runners -----------------------------------------------------------------
+
 
 def run_regression(X, y, seed, scaler):
     """Fit a flat MoG-TSK regressor and return test R²."""
@@ -151,7 +160,11 @@ def run_classification(X, y, seed, scaler):
     rare = set(classes[counts < 2])
     if rare:
         keep_idx = np.where(~np.isin(y_arr, list(rare)))[0]
-        X = X.iloc[keep_idx].reset_index(drop=True) if hasattr(X, 'iloc') else X[keep_idx]
+        X = (
+            X.iloc[keep_idx].reset_index(drop=True)
+            if hasattr(X, "iloc")
+            else X[keep_idx]
+        )
         y = y_arr[keep_idx]
 
     Xtr_raw, Xte_raw, ytr, yte = train_test_split(
@@ -201,9 +214,15 @@ def sweep_datasets(datasets, runner, metric_name, rows):
             cell = C.cell(scores) if scores else C.NA
             rows.append([ds_name, metric_name, arm_label, cell])
             if scores:
+                # C.agg, not np.std: the emitted table uses C.cell (which is
+                # C.agg, ddof=1) and the console line must not report a
+                # DIFFERENT dispersion for the same numbers. np.std is ddof=0,
+                # the convention PR #143 corrected repo-wide -- PROVENANCE_MAP
+                # note 29 records it moving Table 4.8's max-lossless boundary
+                # on three of six datasets whose means were byte-identical.
+                mean, std = C.agg(scores)
                 print(
-                    f"    {arm_label:14s}  {metric_name} = "
-                    f"{np.mean(scores):+.3f} ± {np.std(scores):.3f}"
+                    f"    {arm_label:14s}  {metric_name} = " f"{mean:+.3f} ± {std:.3f}"
                 )
             else:
                 print(f"    {arm_label:14s}  FAILED")
