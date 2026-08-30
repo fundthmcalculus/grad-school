@@ -41,8 +41,8 @@ guard is not simply throwing accuracy away.
 |---|---|
 | `run.py` | The full 3 × 6 × 10 study (~36 s). Writes `results.json`. |
 | `test_tsk_order_auto.py` | CI-gated slice: diabetes, 3 seeds, ~5 s. Asserts relations between arms, not absolute R², so it cannot flake on a different BLAS. |
-| `RESULTS.md` | Tables, the three findings, and the four tradeoffs. |
-| `results.json` | Per-seed R², timings and `tsk_order_` picks from the run of record. |
+| `RESULTS.md` | Tables, the three findings, and the five tradeoffs. |
+| `results.json` | Per-seed R², timings and `tsk_order_` picks, under a `provenance` block recording the pin SHAs, library versions, host and timestamp that produced them. |
 
 ## Running
 

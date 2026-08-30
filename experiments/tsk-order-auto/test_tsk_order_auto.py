@@ -108,8 +108,14 @@ def test_auto_matches_the_best_hand_picked_order(scores):
     """Safety must not cost accuracy: `auto` has to be a usable default.
 
     A guard that avoided the overfit by always collapsing to `0th` would pass
-    the test above and be useless, so this pins `auto` against the best order a
-    caller could have selected by hand with the labels in front of them.
+    the test above and be useless, so this pins `auto` against the best fixed
+    order.
+
+    That baseline is an ORACLE: it is chosen by TEST R2, which no honest model
+    selection could do. That is deliberate and in the safe direction -- it makes
+    the assertion strictly harder to pass than any achievable baseline would --
+    but it is not a number `auto` is being unfairly compared against by
+    accident.
     """
     r2, _ = scores
     best_order = max(FIXED_ORDERS, key=lambda o: _mean(r2[o]))

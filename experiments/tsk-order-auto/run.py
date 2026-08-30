@@ -64,7 +64,27 @@ sys.path.insert(0, REPO_ROOT)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEST_SIZE = 0.25
-DEFAULT_SEEDS = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+
+def _default_seeds():
+    """The repo's seed list, resolved from ``reproduce/common.py``.
+
+    NOT hardcoded here. ``run_all_tables.sh`` carries a comment about the last
+    time a seed list was duplicated: "this line used to be hardcoded, and when
+    the default moved from five seeds to ten it silently kept recording five."
+    The literal below is only the fallback for a checkout without ``reproduce/``
+    -- the sklearn-only path has to keep working there.
+    """
+    try:
+        sys.path.insert(0, os.path.join(REPO_ROOT, "reproduce"))
+        import common
+
+        return tuple(common.SEEDS)
+    except Exception:  # noqa: BLE001
+        return (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+
+DEFAULT_SEEDS = _default_seeds()
 # Every order tribble-fis's `auto` considers, plus `auto` itself. Keeping the
 # fixed orders in the table is the point: `auto` is only interesting relative to
 # what a caller would otherwise have had to pick by hand.
@@ -187,6 +207,70 @@ def run_dataset(key, seeds, orders):
     return out
 
 
+def _provenance(seeds, orders, keys):
+    """What produced this run, recorded IN the artifact rather than beside it.
+
+    ``RESULTS.md`` states the pin and the host in prose, but prose does not
+    travel with the JSON: re-run this script on a different submodule pin and
+    ``results.json`` is overwritten in place while the markdown still names the
+    old one, with nothing to detect the mismatch. These are the same fields
+    ``reproduce/run_all_tables.sh`` writes into ``PROVENANCE.txt``, and for the
+    same reason.
+    """
+    import platform
+    import subprocess
+    from datetime import datetime, timezone
+
+    def _sha(path):
+        try:
+            out = subprocess.run(
+                ["git", "-C", os.path.join(REPO_ROOT, path), "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                timeout=20,
+            )
+            return out.stdout.strip() or "unknown"
+        except Exception:  # noqa: BLE001
+            return "unknown"
+
+    versions = {"python": platform.python_version(), "numpy": np.__version__}
+    # tribblefis exposes no __version__, so fall back to the installed
+    # distribution metadata -- "unknown" for the package whose SHA this study is
+    # actually about would defeat the point of recording versions at all.
+    for mod, dist in (
+        ("sklearn", None),
+        ("scipy", None),
+        ("tribblefis", "tribble-fis"),
+    ):
+        got = "unknown"
+        try:
+            got = __import__(mod).__version__
+        except Exception:  # noqa: BLE001
+            try:
+                from importlib.metadata import version as _dist_version
+
+                got = _dist_version(dist or mod)
+            except Exception:  # noqa: BLE001
+                got = "unknown"
+        versions[mod] = got
+
+    return {
+        "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generator": "experiments/tsk-order-auto/run.py",
+        "commits": {
+            "grad-school": _sha("."),
+            "tribble-fis": _sha("tribble-fis"),
+        },
+        "seeds": list(seeds),
+        "orders": list(orders),
+        "datasets_requested": list(keys),
+        "test_size": TEST_SIZE,
+        "host": platform.node(),
+        "platform": platform.platform(),
+        "versions": versions,
+    }
+
+
 def main():
     seeds = [
         int(s)
@@ -205,10 +289,14 @@ def main():
         if got is not None:
             results[key] = got
 
+    prov = _provenance(seeds, orders, keys)
     path = os.path.join(HERE, "results.json")
     with open(path, "w", encoding="utf-8") as fh:
-        json.dump({"seeds": seeds, "orders": orders, "datasets": results}, fh, indent=1)
+        json.dump({"provenance": prov, "datasets": results}, fh, indent=1)
     print(f"\nwrote {os.path.relpath(path, REPO_ROOT)}")
+    print(f"  tribble-fis   {prov['commits']['tribble-fis']}")
+    print(f"  grad-school   {prov['commits']['grad-school']}")
+    print(f"  versions      {prov['versions']}")
 
 
 if __name__ == "__main__":

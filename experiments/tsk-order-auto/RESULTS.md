@@ -113,7 +113,23 @@ is the whole of the −0.005), but it means `tsk_order_` should be read as "what
 this fit chose", not as a property of the dataset. On concrete and bikeshare the
 pick was unanimous.
 
-**4. Three datasets, one model family.** These are the three regression problems
+**4. #120 proposed three fixes; this verifies one of them.** The issue's
+"Proposed fix (do separately)" listed (1) automatic order selection, (2)
+*interaction sparsity* — use `select_interactions`/`detect_interactions` (a
+LassoCV screen) instead of the dense all-pairs basis, which would also cut the
+refine cost — and (3) *refinement early-stop* in `refine_knots`. Its acceptance
+criterion is about (1), and (1) is met, so closing it is right.
+
+But Finding 3 above bears on (2) and points the other way. `full-2nd` is beaten
+by `3rd` on every dataset measured here, and by `1st` on the small one — so on
+this evidence the dense all-pairs basis is not so much *worth sparsifying* as
+*not worth reaching for*. A LassoCV screen would make an order nobody should
+select cheaper to select. If (2) is still wanted it needs its own motivating
+measurement, on a problem where the interaction basis is actually on the
+frontier; this study did not find one. (3) is untouched here — `refine_knots` is
+a separate code path and none of these arms enable refinement.
+
+**5. Three datasets, one model family.** These are the three regression problems
 #120 named, measured on `TribbleRegressor` directly. The issue's original numbers
 came from `FuzzySystemsExperiments/ruspini_first_fit.py`, a different first-fit
 model with a refinement pass, which no longer exists in this repo's history (see
