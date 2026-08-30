@@ -260,6 +260,7 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |
 | 4.11(e) BETH knob validation | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.3–§4.4 — note 24 |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
+| *(no prose table)* | `table_tribbletree_tsk_order.py` | `outputs/table_tribbletree_tsk_order.{md,csv}` | new (grad-school, 2026-08-30); sweeps `tsk_order` 0th/1st/2nd across the flat regressor, `FuzzyRegressionTree` and HME, timing `.fit()` alongside R²/RMSE — the tree/HME order axis Table 6.1 and `table_hyperparam_normalization.py` fix at "1st" and `table_concrete_reconciliation.py` sweeps for the flat model only, without timing (note 14) |
 
 **Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
 not have been produced, and the library's default anomaly score is unreadable on it.**

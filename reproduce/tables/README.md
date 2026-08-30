@@ -16,6 +16,7 @@ The fuzzy models live in the `tribble-fis` environment and pVAT in
 uv run --project tribble-fis     python reproduce/tables/table_4_1_mog_baselines.py
 uv run --project tribble-fis     python reproduce/tables/table_6_1_model_family.py
 uv run --project tribble-cluster python reproduce/tables/table_3_1_pvat_scaling.py
+uv run --project tribble-fis     python reproduce/tables/table_tribbletree_tsk_order.py
 ```
 
 Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_1.{md,csv}`.
@@ -37,6 +38,10 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
 - `REPRO_PHIUSIIL_N="20000"` — sample cap for PhiUSIIL in the norm/conorm matrix.
 - `REPRO_N_GRID="256,512,1024,2048,4096"` — the N values for Table 3.1.
 - `REPRO_NAIVE_CAP="1024"` — largest N at which the cubic classical VAT is timed.
+- `REPRO_TSK_ORDERS="0th,1st,2nd"` — which TSK consequent orders
+  `table_tribbletree_tsk_order.py` sweeps.
+- `REPRO_DATASETS="concrete,bodyfat"` — which regression datasets that same table
+  includes; add `bikeshare` for a ~17k-row arm (slow).
 
 ## What each table contains
 
@@ -46,6 +51,7 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
 | `table_4_1_mog_baselines.py` | Table 4.1 | Concrete, PhiUSIIL | MoG FIS (time + accuracy) | sklearn RF; ANFIS/GA-FIS optional |
 | `table_6_1_model_family.py` | Table 6.1 | Concrete, PhiUSIIL | flat / fuzzy tree / HME | sklearn CART & RF; M5 optional |
 | `table_norm_conorm_matrix.py` | Norm/conorm comparison | Concrete, PhiUSIIL | flat / fuzzy tree / HME, swept over the 5 De Morgan pairs | — (the families are compared against each other) |
+| `table_tribbletree_tsk_order.py` | TribbleTree TSK order sweep | Concrete, BodyFat | flat / fuzzy tree / HME, swept over `tsk_order` 0th/1st/2nd (quality + training time) | — (the orders are compared against each other) |
 
 ## Adding the optional baselines (ANFIS, GA-FIS, M5)
 
