@@ -1659,7 +1659,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       points to §4.3's actual use of the Hamacher conorm and carries §4.3.2's own "untested" hedge.
       **What remains open in E1:** the min/max-as-default framing decision, and whether to *harvest*
       the norm/conorm study into a chapter (it still appears in none) rather than only reference it.
-- [x] ✅ **E2 — Table 3.4 now has a generator, and it runs on this host.**
+- [x] ✅ **E2 — Table 3.4 now has a generator, and it runs on this host. SUPERSEDED 2026-08-30: the table is removed and the generator deleted (B10, Appendix A.9). Retained as the record of what was measured. Original text:**
       `reproduce/tables/table_3_4_gpu_speedups.py`, 31 rows, ten seeds, each row one CPU arm
       against one GPU arm timed in the same pass, device timings stream-synchronised and all
       JIT warmed first (the first `boruvka_mst_device` call spends ~0.4 s compiling — 13× the

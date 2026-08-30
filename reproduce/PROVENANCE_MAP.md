@@ -77,7 +77,7 @@ unaffected and reproduce.
 | 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1; re-taken on one host — note 11 |
 | 3.2 Complexity fit | `reproduce/tables/table_3_1_reorder_three_arm.py` | `outputs/table_3_1_complexity_fit.{md,csv}` | **reproduced** — exponents confirm; stage-two plateau does **not** reproduce, note 11 |
 | 3.3 Memory footprint | `reproduce/tables/table_3_2_memory_precision.py` | `outputs/table_3_2_memory_precision.{md,csv}` | **reproduced** — all 32 cells identical to `main-d0efefc` |
-| ~~3.4 GPU speedups~~ | *(generator deleted)* | none | **REMOVED 2026-08-30 — no longer a table in the document.** The GPU work is descoped to Appendix A.9 and Goal G4c. Three reasons, in increasing finality: its headline Fuzzy C-Means row measured the CPU baseline's *formulation* (NumPy broadcasting vs. gram + two GEMMs) rather than the hardware, and corrected to a matched formulation the win was 1.2–3.7× not 30–50×; its one honest negative result (distances losing at float64 / low dimension) needed a full-rate-FP64 card to interpret and never got one; and `tribble-clustering` deleted its CuPy back ends and `[gpu]` extra in `1ec9667`, so `tribbleclustering.gpu` no longer exists and the generator had nothing to import. `reproduce/tables/table_3_4_gpu_speedups.py` is deleted, and its `--with cupy-cuda12x` override plus the TABLE_DEPS_FALLBACK retry machinery it was the sole user of are gone from `run_all_tables.sh` — note 32(a) |
+| ~~3.4 GPU speedups~~ *(number retired, not reused — Ch 3 runs 3.1–3.3, 3.5–3.7)* | *(generator deleted)* | none | **REMOVED 2026-08-30 — no longer a table in the document.** The GPU work is descoped to Appendix A.9 and Goal G4c. Three reasons, in increasing finality: its headline Fuzzy C-Means row measured the CPU baseline's *formulation* (NumPy broadcasting vs. gram + two GEMMs) rather than the hardware, and corrected to a matched formulation the win was 1.2–3.7× not 30–50×; its one honest negative result (distances losing at float64 / low dimension) needed a full-rate-FP64 card to interpret and never got one; and `tribble-clustering` deleted its CuPy back ends and `[gpu]` extra in `1ec9667`, so `tribbleclustering.gpu` no longer exists and the generator had nothing to import. `reproduce/tables/table_3_4_gpu_speedups.py` is deleted, and its `--with cupy-cuda12x` override plus the TABLE_DEPS_FALLBACK retry machinery it was the sole user of are gone from `run_all_tables.sh` — note 32(a) |
 | 3.5 Adversarial ARI | `ClusteringExperiments/adversarial_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — two cells corrected, note 10 |
 | 3.6 Stitch ablation | `ClusteringExperiments/principled_stitch.py` | `ClusteringExperiments/findings/…` | **reproduced** — re-quoted, note 10 |
 | 3.7 Non-metric agreement | `ClusteringExperiments/hardening_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — cells match |
@@ -158,8 +158,12 @@ laptop's 2.12, which the chapter itself calls "right for the wrong reason"
 because the plateau contaminated the fit. **CHECKLIST C2b, which asks what the
 10 ms is, should be rescoped: the thing to explain is why the laptop had it.**
 
-**Note 15 — Table 3.4 is measured now, and the exactness claim survives while
-three of the four speedup rows do not.** `table_3_4_gpu_speedups.py` runs on the
+**Note 15 — SUPERSEDED 2026-08-30: Table 3.4 is removed and its generator deleted
+(see the Chapter 3 map row and Appendix A.9). Retained as the diagnosis that led
+there — it is this note's "three of the four speedup rows do not [survive]" that
+made the table unpublishable, before the back ends were deleted upstream made it
+unmeasurable. Original heading: Table 3.4 is measured now, and the exactness claim
+survives while three of the four speedup rows do not.** `table_3_4_gpu_speedups.py` runs on the
 card §3.4 names (RTX 4080 Laptop, 12 GB, driver 610.74, CuPy 14.1.1 on CUDA
 runtime 12.9, compute capability 8.9) against the same host's CPU — the "32-core
 CPU" of that table is this machine's 32 logical cores, not a separate box. Ten
@@ -753,10 +757,12 @@ alone** — including `bump-ae0ef13-2026-08-30` and `phiusiil-leakfree-2026-08-3
 carries `bb9f401`, *"fix(cfcm): restore the compiled FCM speedup and match
 fcm.py exactly"* — 329 lines of `src/tribbleclustering/cfcm.pyx`, with
 `ivatmeans.py` and `nerfcm.py` alongside. The title says the compiled path did
-**not** match `fcm.py`. Four tables sit on that code: `table_3_4_gpu_speedups`
-(whose FCM arm is `fcm.fuzzy_c_means` vs `gpu.fuzzy_c_means_gpu`),
-`table_3_1_pvat_scaling`, `table_3_7_g2_dtw_nonmetric` and
-`table_3_7_g2_downstream`. **Every Chapter 3 row is therefore UNVERIFIED at this
+**not** match `fcm.py`. Three tables sit on that code: `table_3_1_pvat_scaling`,
+`table_3_7_g2_dtw_nonmetric` and `table_3_7_g2_downstream`. (A fourth,
+`table_3_4_gpu_speedups`, was the clearest case — its FCM arm was literally
+`fcm.fuzzy_c_means` against `gpu.fuzzy_c_means_gpu` — and it is **removed**: the same
+clustering bump that carried this fix also deleted the CuPy back ends, so the table
+lost its device arm entirely. See the Chapter 3 map row and Appendix A.9.) **Every Chapter 3 row is therefore UNVERIFIED at this
 pin** — not known-wrong, not known-right, unmeasured. A Chapter 3 re-sweep is the
 follow-up. Do not quote a Chapter 3 number as reproduced at `d1a97ac` until it
 has been.

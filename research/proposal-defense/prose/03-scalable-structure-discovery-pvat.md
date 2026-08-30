@@ -240,6 +240,13 @@ it measured are recorded in **Appendix A.9**; reviving it is **Goal G4c**. Nothi
 else in this chapter depends on a device: every number above and below is CPU, on the
 host named at the top of §3.4.
 
+*On the numbering.* **Table 3.4's number is retired, not reused.** This chapter runs
+3.1, 3.2, 3.3, 3.5, 3.6, 3.7, and the gap is deliberate: `reproduce/PROVENANCE_MAP.md`
+is indexed by table number and both it and the checklist carry historical entries
+keyed to the current ones, so renumbering the survivors would silently repoint every
+prior citation. A visible gap costs a reader one sentence; a silent shift costs
+every record that came before it.
+
 
 **Clustering quality.** Because mergeVAT is exact single-linkage, it inherits single-linkage's strengths and weaknesses. On non-convex data where k-means fails (two moons, concentric circles) mergeVAT and the stitched version both reach an adjusted Rand index of 1.00, against 0.27 and 0.00 for k-means. On bridged or touching-anisotropic clusters, where a single chain of points connects two real groups, mergeVAT scores 0.00, exactly as single-linkage does. I do not paper over this: it is precisely the failure mode that Chapter 5's metric-learning and persistence work is meant to repair.
 
