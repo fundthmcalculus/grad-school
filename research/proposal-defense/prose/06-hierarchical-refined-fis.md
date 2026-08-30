@@ -140,13 +140,33 @@ The grid also makes a configuration effect visible, and sizes it smaller than un
 
 | Method | Concrete R² | Concrete RMSE | PhiUSIIL accuracy |
 |---|---:|---:|---:|
-| **Fuzzy tree (this work)** | 0.583 ± 0.067 | 10.53 | 0.970 ± 0.003 |
-| **Mixture of experts (this work)** | 0.636 ± 0.087 | 9.79 | 1.000 ± 0.001 |
-| CART | 0.825 ± 0.047 | 6.74 | 1.000 ± 0.000 |
-| Random Forest (reference) | 0.909 ± 0.018 | 4.90 | 1.000 ± 0.000 |
+| **Fuzzy tree (this work)** | 0.583 ± 0.071 | 10.53 | 0.958 ± 0.003 |
+| **Mixture of experts (this work)** | 0.636 ± 0.091 | 9.78 | 0.914 ± 0.039 |
+| CART | 0.825 ± 0.049 | 6.74 | 0.997 ± 0.001 |
+| Random Forest (reference) | 0.909 ± 0.019 | 4.90 | 1.000 ± 0.000 |
 | M5 model tree | N/A (no working M5) | N/A (no working M5) | — |
 | ANFIS | N/A (C1) | N/A (C1) | N/A (C1) |
-| Flat TSK (= Ch 4 flat MoG) | 0.687 ± 0.049 | 9.12 | 0.997 ± 0.001 |
+| Flat TSK (= Ch 4 flat MoG) | 0.687 ± 0.051 | 9.12 | **0.440 ± 0.181** |
+
+**The PhiUSIIL column is leak-free as of 2026-08-30 and it no longer says what it
+used to.** Every cell above previously trained on `URLSimilarityIndex`, a URL's
+similarity to a whitelist of known-legitimate URLs — the label in disguise, and
+the single most separating feature in the dataset at AUC 0.996. `#215` drops it
+and two sibling legitimacy probabilities on load. With them gone the flat MoG
+falls from 0.997 ± 0.001 to **0.440 ± 0.181**, *below* the 0.5755 majority
+baseline, while CART and Random Forest still reach 0.997 and 1.000. The Concrete
+columns are byte-identical across the two runs, which is the control: only the
+PhiUSIIL feature set changed.
+
+That reverses what this table was for. **PhiUSIIL is saturated for trees and not
+for this construction**, so it stops being a dataset on which the hierarchy's
+methods are indistinguishable from the baselines, and starts being one on which
+they are 0.56 behind. The mechanism is measured in `PROVENANCE_MAP.md` note
+31(a): leak-free, the selector's top five are four *binary* flags plus one
+bounded score, and a per-feature Gaussian **mixture** over a two-point support is
+a poor and unstable model — which is also where the ±0.181 comes from. The
+construction's PhiUSIIL win rested on having one strong *continuous* feature, and
+that feature was the answer.
 
 *Reading the empty cells.* Both are blocked for stated reasons rather than unfinished. ANFIS is checklist item **C1**: `table_6_1_model_family.py` emits `N/A` unless an adapter is present, and none is. M5 is a different and more annoying problem — the generator already imports `m5py` optionally and would fill the row automatically, but `m5py` does not load against the scikit-learn in this environment (`ImportError: cannot import name 'DTYPE' from 'sklearn.tree._classes'`, sklearn 1.9.0), and pinning an older scikit-learn to rescue one row would move every other number in the chapter. So the row stays `N/A` until either `m5py` is updated or an M5' implementation is written against a current scikit-learn; it is a dependency fault, not an experiment not yet run.
 
