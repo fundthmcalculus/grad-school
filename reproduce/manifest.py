@@ -520,7 +520,7 @@ EXPERIMENTS = [
         notes="Runs on the root .venv (no submodule pyproject). Deterministic.",
     ),
     Experiment(
-        id="table-5-x-ch5-selection",
+        id="table-5-1-3-ch5-tables",
         title="Ch5 Tables 5.1/5.2/5.3 rendered from the gated-minimax results of record",
         chapter="Ch5",
         produces="Tables 5.1, 5.2, 5.3",
@@ -551,7 +551,7 @@ EXPERIMENTS = [
             "reproduce/outputs/table_5_4_ch5_g1_scaling.csv",
             "reproduce/outputs/table_5_4_ch5_g1_scaling_raw.csv",
         ],
-        notes="Does its OWN computation (unlike table-5-x above) -- imports "
+        notes="Does its OWN computation (unlike table-5-1-3 above) -- imports "
         "ivat_mf/selection/multiscale_persistence/battery_hierarchical directly "
         "from gated-minimax-selection/ on the root .venv. Runs the two arms of "
         "Goal G1's decision rule that exist today (07-goals-for-completion.md: "
