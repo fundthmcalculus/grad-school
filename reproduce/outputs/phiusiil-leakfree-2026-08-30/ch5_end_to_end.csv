@@ -1,0 +1,16 @@
+arm,held-out R²,held-out RMSE,worst fold R²,seeds,folds
+Ch5 graded U -> TSK (trio),0.653 ± 0.013,4.810 ± 0.067,0.370,10,50
+Ch5 crisp assign -> TSK (trio),0.659 ± 0.013,4.774 ± 0.083,0.370,10,50
+Ch5 crisp argmax U -> TSK (trio),0.660 ± 0.015,4.768 ± 0.077,0.399,10,50
+Ch5 graded U inductive -> TSK (trio),0.657 ± 0.015,4.788 ± 0.068,0.322,10,50
+Ch5 crisp assign inductive -> TSK (trio),0.637 ± 0.019,4.913 ± 0.095,0.370,10,50
+Ch5 graded U -> TSK (all 13),-6.581 ± 15.366,13.110 ± 7.114,-251.568,10,50
+Ch5 crisp assign -> TSK (all 13),0.253 ± 0.305,6.620 ± 0.704,-4.664,10,50
+"Ch4 TribbleRegressor (trio, log-tuned)",0.633 ± 0.036,4.909 ± 0.212,0.201,10,50
+"Ch4 TribbleRegressor (all 13, default)",0.208 ± 0.086,7.120 ± 0.309,-0.771,10,50
+global 1-rule TSK (trio),0.662 ± 0.010,4.753 ± 0.040,0.400,10,50
+global 1-rule TSK (all 13),0.628 ± 0.059,4.901 ± 0.280,-0.341,10,50
+floor: OLS (trio),0.668 ± 0.007,4.711 ± 0.024,0.447,10,50
+"floor: OLS (trio, log1p-scaled)",0.576 ± 0.011,5.347 ± 0.038,0.371,10,50
+floor: OLS (all 13),0.698 ± 0.005,4.493 ± 0.040,0.533,10,50
+floor: predict train mean,-0.024 ± 0.015,8.358 ± 0.022,-0.139,10,50

@@ -1,0 +1,2777 @@
+  [skip] m5py unavailable (ModuleNotFoundError); columns ['M5Prime'] -> N/A
+Table 6.1 -- model family vs. baselines
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7472
+ 3. Superplasticizer               - Score: 0.7047
+ 4. Age                            - Score: 0.6224
+ 5. CoarseAgg                      - Score: 0.3548
+ 6. FlyAsh                         - Score: 0.3396
+ 7. Slag                           - Score: 0.3186
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7472
+ 3. Superplasticizer               - Score: 0.7047
+ 4. Age                            - Score: 0.6224
+ 5. CoarseAgg                      - Score: 0.3548
+ 6. FlyAsh                         - Score: 0.3396
+ 7. Slag                           - Score: 0.3186
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7472
+ 3. Superplasticizer               - Score: 0.7047
+ 4. Age                            - Score: 0.6224
+ 5. CoarseAgg                      - Score: 0.3548
+ 6. FlyAsh                         - Score: 0.3396
+ 7. Slag                           - Score: 0.3186
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4070
+ 3. Slag                           - Score: 0.3096
+ 4. Superplasticizer               - Score: 0.3054
+ 5. FlyAsh                         - Score: 0.2385
+ 6. CoarseAgg                      - Score: 0.2299
+ 7. Water                          - Score: 0.1994
+ 8. Cement                         - Score: 0.1766
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7660
+ 3. Slag                           - Score: 0.5558
+ 4. FineAgg                        - Score: 0.4748
+ 5. Age                            - Score: 0.4616
+ 6. Superplasticizer               - Score: 0.4326
+ 7. FlyAsh                         - Score: 0.3141
+ 8. CoarseAgg                      - Score: 0.1968
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.5551
+ 3. FineAgg                        - Score: 0.4663
+ 4. Superplasticizer               - Score: 0.3920
+ 5. Cement                         - Score: 0.3554
+ 6. CoarseAgg                      - Score: 0.3246
+ 7. Water                          - Score: 0.2370
+ 8. FlyAsh                         - Score: 0.2097
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7999
+ 3. Age                            - Score: 0.5768
+ 4. Superplasticizer               - Score: 0.5118
+ 5. CoarseAgg                      - Score: 0.4144
+ 6. FineAgg                        - Score: 0.2068
+ 7. Slag                           - Score: 0.1635
+ 8. FlyAsh                         - Score: 0.1174
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Superplasticizer               - Score: 1.0000
+ 2. CoarseAgg                      - Score: 0.9725
+ 3. FineAgg                        - Score: 0.7657
+ 4. Age                            - Score: 0.7328
+ 5. Cement                         - Score: 0.6989
+ 6. Water                          - Score: 0.6407
+ 7. Slag                           - Score: 0.5214
+ 8. FlyAsh                         - Score: 0.4195
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7941
+ 3. CoarseAgg                      - Score: 0.5801
+ 4. FineAgg                        - Score: 0.5209
+ 5. Age                            - Score: 0.4123
+ 6. FlyAsh                         - Score: 0.2053
+ 7. Slag                           - Score: 0.1063
+ 8. Superplasticizer               - Score: 0.1030
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Slag                           - Score: 0.9172
+ 3. Age                            - Score: 0.9063
+ 4. Superplasticizer               - Score: 0.8603
+ 5. Cement                         - Score: 0.7141
+ 6. CoarseAgg                      - Score: 0.5400
+ 7. FlyAsh                         - Score: 0.4562
+ 8. FineAgg                        - Score: 0.3645
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.3935
+ 3. Slag                           - Score: 0.3917
+ 4. Water                          - Score: 0.3747
+ 5. FlyAsh                         - Score: 0.3394
+ 6. Superplasticizer               - Score: 0.2259
+ 7. CoarseAgg                      - Score: 0.1877
+ 8. FineAgg                        - Score: 0.1634
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7560
+ 3. Superplasticizer               - Score: 0.7115
+ 4. Age                            - Score: 0.6340
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.2740
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7560
+ 3. Superplasticizer               - Score: 0.7115
+ 4. Age                            - Score: 0.6340
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.2740
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7560
+ 3. Superplasticizer               - Score: 0.7115
+ 4. Age                            - Score: 0.6340
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.2740
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.5853
+ 3. FlyAsh                         - Score: 0.5656
+ 4. Water                          - Score: 0.5500
+ 5. FineAgg                        - Score: 0.4098
+ 6. CoarseAgg                      - Score: 0.3238
+ 7. Cement                         - Score: 0.2965
+ 8. Slag                           - Score: 0.1879
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5873
+ 3. Superplasticizer               - Score: 0.4844
+ 4. FlyAsh                         - Score: 0.3281
+ 5. Slag                           - Score: 0.3178
+ 6. FineAgg                        - Score: 0.2207
+ 7. CoarseAgg                      - Score: 0.2172
+ 8. Age                            - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.8048
+ 3. Superplasticizer               - Score: 0.5184
+ 4. FineAgg                        - Score: 0.4723
+ 5. Cement                         - Score: 0.4210
+ 6. CoarseAgg                      - Score: 0.4177
+ 7. Water                          - Score: 0.3004
+ 8. FlyAsh                         - Score: 0.2290
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5661
+ 3. Superplasticizer               - Score: 0.4747
+ 4. Age                            - Score: 0.4029
+ 5. CoarseAgg                      - Score: 0.3587
+ 6. FineAgg                        - Score: 0.2175
+ 7. Slag                           - Score: 0.1774
+ 8. FlyAsh                         - Score: 0.1480
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.7369
+ 3. FineAgg                        - Score: 0.5541
+ 4. CoarseAgg                      - Score: 0.4765
+ 5. Slag                           - Score: 0.3835
+ 6. Cement                         - Score: 0.2161
+ 7. FlyAsh                         - Score: 0.0000
+ 8. Superplasticizer               - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6774
+ 3. Superplasticizer               - Score: 0.6082
+ 4. Age                            - Score: 0.5514
+ 5. FineAgg                        - Score: 0.4855
+ 6. CoarseAgg                      - Score: 0.3874
+ 7. FlyAsh                         - Score: 0.3425
+ 8. Slag                           - Score: 0.2394
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.8860
+ 3. Slag                           - Score: 0.8561
+ 4. Age                            - Score: 0.8144
+ 5. Cement                         - Score: 0.7381
+ 6. CoarseAgg                      - Score: 0.5763
+ 7. FlyAsh                         - Score: 0.3365
+ 8. FineAgg                        - Score: 0.2981
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.4860
+ 3. Slag                           - Score: 0.3048
+ 4. CoarseAgg                      - Score: 0.2583
+ 5. Water                          - Score: 0.2541
+ 6. FlyAsh                         - Score: 0.2499
+ 7. FineAgg                        - Score: 0.2420
+ 8. Superplasticizer               - Score: 0.1911
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7033
+ 3. Superplasticizer               - Score: 0.6242
+ 4. Age                            - Score: 0.5808
+ 5. CoarseAgg                      - Score: 0.3285
+ 6. FlyAsh                         - Score: 0.2729
+ 7. FineAgg                        - Score: 0.2608
+ 8. Slag                           - Score: 0.2473
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7033
+ 3. Superplasticizer               - Score: 0.6242
+ 4. Age                            - Score: 0.5808
+ 5. CoarseAgg                      - Score: 0.3285
+ 6. FlyAsh                         - Score: 0.2729
+ 7. FineAgg                        - Score: 0.2608
+ 8. Slag                           - Score: 0.2473
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7033
+ 3. Superplasticizer               - Score: 0.6242
+ 4. Age                            - Score: 0.5808
+ 5. CoarseAgg                      - Score: 0.3285
+ 6. FlyAsh                         - Score: 0.2729
+ 7. FineAgg                        - Score: 0.2608
+ 8. Slag                           - Score: 0.2473
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7447
+ 3. Superplasticizer               - Score: 0.4949
+ 4. FineAgg                        - Score: 0.4947
+ 5. Water                          - Score: 0.3522
+ 6. Cement                         - Score: 0.2350
+ 7. CoarseAgg                      - Score: 0.2152
+ 8. FlyAsh                         - Score: 0.1784
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.8090
+ 3. Superplasticizer               - Score: 0.7180
+ 4. Cement                         - Score: 0.5189
+ 5. FineAgg                        - Score: 0.4792
+ 6. CoarseAgg                      - Score: 0.4567
+ 7. Water                          - Score: 0.4128
+ 8. FlyAsh                         - Score: 0.2918
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.8667
+ 3. Superplasticizer               - Score: 0.7448
+ 4. FineAgg                        - Score: 0.5575
+ 5. Water                          - Score: 0.4537
+ 6. Cement                         - Score: 0.4471
+ 7. CoarseAgg                      - Score: 0.2317
+ 8. FlyAsh                         - Score: 0.2149
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.4793
+ 3. Age                            - Score: 0.3990
+ 4. Superplasticizer               - Score: 0.3473
+ 5. CoarseAgg                      - Score: 0.2732
+ 6. FineAgg                        - Score: 0.1583
+ 7. Slag                           - Score: 0.1468
+ 8. FlyAsh                         - Score: 0.0924
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.9341
+ 3. Superplasticizer               - Score: 0.8589
+ 4. Cement                         - Score: 0.8479
+ 5. CoarseAgg                      - Score: 0.8405
+ 6. Water                          - Score: 0.8308
+ 7. Slag                           - Score: 0.5483
+ 8. FlyAsh                         - Score: 0.3881
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6807
+ 3. FineAgg                        - Score: 0.5498
+ 4. CoarseAgg                      - Score: 0.5348
+ 5. Age                            - Score: 0.4378
+ 6. Superplasticizer               - Score: 0.2201
+ 7. Slag                           - Score: 0.1101
+ 8. FlyAsh                         - Score: 0.1050
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Slag                           - Score: 0.7713
+ 3. Age                            - Score: 0.7372
+ 4. Superplasticizer               - Score: 0.7309
+ 5. Cement                         - Score: 0.7037
+ 6. FineAgg                        - Score: 0.3547
+ 7. CoarseAgg                      - Score: 0.3306
+ 8. FlyAsh                         - Score: 0.3230
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.3787
+ 3. Cement                         - Score: 0.3512
+ 4. Water                          - Score: 0.3050
+ 5. FlyAsh                         - Score: 0.2863
+ 6. FineAgg                        - Score: 0.1941
+ 7. Superplasticizer               - Score: 0.1693
+ 8. CoarseAgg                      - Score: 0.1493
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7100
+ 3. Superplasticizer               - Score: 0.6209
+ 4. Age                            - Score: 0.5824
+ 5. CoarseAgg                      - Score: 0.3118
+ 6. FlyAsh                         - Score: 0.2938
+ 7. FineAgg                        - Score: 0.2617
+ 8. Slag                           - Score: 0.2457
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7100
+ 3. Superplasticizer               - Score: 0.6209
+ 4. Age                            - Score: 0.5824
+ 5. CoarseAgg                      - Score: 0.3118
+ 6. FlyAsh                         - Score: 0.2938
+ 7. FineAgg                        - Score: 0.2617
+ 8. Slag                           - Score: 0.2457
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7100
+ 3. Superplasticizer               - Score: 0.6209
+ 4. Age                            - Score: 0.5824
+ 5. CoarseAgg                      - Score: 0.3118
+ 6. FlyAsh                         - Score: 0.2938
+ 7. FineAgg                        - Score: 0.2617
+ 8. Slag                           - Score: 0.2457
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.8147
+ 3. Superplasticizer               - Score: 0.5811
+ 4. FineAgg                        - Score: 0.5128
+ 5. CoarseAgg                      - Score: 0.4035
+ 6. Cement                         - Score: 0.3813
+ 7. Water                          - Score: 0.3752
+ 8. FlyAsh                         - Score: 0.1902
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.8459
+ 3. Superplasticizer               - Score: 0.7130
+ 4. Water                          - Score: 0.4726
+ 5. FineAgg                        - Score: 0.4408
+ 6. Cement                         - Score: 0.4315
+ 7. CoarseAgg                      - Score: 0.3748
+ 8. FlyAsh                         - Score: 0.2467
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.9368
+ 3. Superplasticizer               - Score: 0.7388
+ 4. FineAgg                        - Score: 0.6050
+ 5. Cement                         - Score: 0.5143
+ 6. Water                          - Score: 0.4680
+ 7. CoarseAgg                      - Score: 0.3761
+ 8. FlyAsh                         - Score: 0.2139
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5730
+ 3. Age                            - Score: 0.5615
+ 4. Superplasticizer               - Score: 0.4351
+ 5. CoarseAgg                      - Score: 0.2823
+ 6. FineAgg                        - Score: 0.1718
+ 7. Slag                           - Score: 0.1546
+ 8. FlyAsh                         - Score: 0.0838
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. FineAgg                        - Score: 1.0000
+ 2. Age                            - Score: 0.9304
+ 3. Water                          - Score: 0.8902
+ 4. Slag                           - Score: 0.5017
+ 5. CoarseAgg                      - Score: 0.4621
+ 6. Cement                         - Score: 0.2616
+ 7. FlyAsh                         - Score: 0.0000
+ 8. Superplasticizer               - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5570
+ 3. Age                            - Score: 0.4353
+ 4. FineAgg                        - Score: 0.4200
+ 5. Superplasticizer               - Score: 0.3729
+ 6. CoarseAgg                      - Score: 0.2907
+ 7. FlyAsh                         - Score: 0.2102
+ 8. Slag                           - Score: 0.1554
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7199
+ 3. Slag                           - Score: 0.7123
+ 4. Age                            - Score: 0.6986
+ 5. Cement                         - Score: 0.6877
+ 6. FlyAsh                         - Score: 0.3984
+ 7. CoarseAgg                      - Score: 0.3124
+ 8. FineAgg                        - Score: 0.3054
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.3337
+ 3. Water                          - Score: 0.3243
+ 4. Cement                         - Score: 0.3228
+ 5. FlyAsh                         - Score: 0.2481
+ 6. Superplasticizer               - Score: 0.1718
+ 7. FineAgg                        - Score: 0.1559
+ 8. CoarseAgg                      - Score: 0.1462
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6980
+ 3. Superplasticizer               - Score: 0.6469
+ 4. Age                            - Score: 0.5547
+ 5. CoarseAgg                      - Score: 0.3693
+ 6. FlyAsh                         - Score: 0.3215
+ 7. Slag                           - Score: 0.2862
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6980
+ 3. Superplasticizer               - Score: 0.6469
+ 4. Age                            - Score: 0.5547
+ 5. CoarseAgg                      - Score: 0.3693
+ 6. FlyAsh                         - Score: 0.3215
+ 7. Slag                           - Score: 0.2862
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6980
+ 3. Superplasticizer               - Score: 0.6469
+ 4. Age                            - Score: 0.5547
+ 5. CoarseAgg                      - Score: 0.3693
+ 6. FlyAsh                         - Score: 0.3215
+ 7. Slag                           - Score: 0.2862
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.3164
+ 3. CoarseAgg                      - Score: 0.2683
+ 4. FlyAsh                         - Score: 0.2195
+ 5. Water                          - Score: 0.2128
+ 6. FineAgg                        - Score: 0.2109
+ 7. Slag                           - Score: 0.1731
+ 8. Cement                         - Score: 0.1648
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5457
+ 3. Slag                           - Score: 0.4174
+ 4. Age                            - Score: 0.4086
+ 5. FineAgg                        - Score: 0.4037
+ 6. Superplasticizer               - Score: 0.3633
+ 7. FlyAsh                         - Score: 0.3576
+ 8. CoarseAgg                      - Score: 0.2120
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.5362
+ 3. FineAgg                        - Score: 0.4967
+ 4. Superplasticizer               - Score: 0.3391
+ 5. Cement                         - Score: 0.3198
+ 6. CoarseAgg                      - Score: 0.2837
+ 7. Water                          - Score: 0.2747
+ 8. FlyAsh                         - Score: 0.2041
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.5163
+ 3. Water                          - Score: 0.4536
+ 4. CoarseAgg                      - Score: 0.3979
+ 5. Superplasticizer               - Score: 0.3055
+ 6. FineAgg                        - Score: 0.2810
+ 7. Slag                           - Score: 0.2003
+ 8. FlyAsh                         - Score: 0.1311
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. CoarseAgg                      - Score: 0.8320
+ 3. FineAgg                        - Score: 0.7884
+ 4. Water                          - Score: 0.7381
+ 5. Slag                           - Score: 0.6787
+ 6. Cement                         - Score: 0.3160
+ 7. FlyAsh                         - Score: 0.2600
+ 8. Superplasticizer               - Score: 0.1483
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6442
+ 3. FineAgg                        - Score: 0.5353
+ 4. Superplasticizer               - Score: 0.4952
+ 5. Age                            - Score: 0.4834
+ 6. CoarseAgg                      - Score: 0.3828
+ 7. Slag                           - Score: 0.2533
+ 8. FlyAsh                         - Score: 0.2185
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.9995
+ 3. Slag                           - Score: 0.6983
+ 4. FlyAsh                         - Score: 0.6729
+ 5. Superplasticizer               - Score: 0.5186
+ 6. Water                          - Score: 0.4393
+ 7. CoarseAgg                      - Score: 0.4193
+ 8. FineAgg                        - Score: 0.2075
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Slag                           - Score: 0.8561
+ 3. Age                            - Score: 0.8372
+ 4. Superplasticizer               - Score: 0.7921
+ 5. Cement                         - Score: 0.5062
+ 6. CoarseAgg                      - Score: 0.3835
+ 7. FlyAsh                         - Score: 0.3608
+ 8. FineAgg                        - Score: 0.3538
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6995
+ 3. Superplasticizer               - Score: 0.6378
+ 4. Age                            - Score: 0.5758
+ 5. CoarseAgg                      - Score: 0.3260
+ 6. FlyAsh                         - Score: 0.3014
+ 7. Slag                           - Score: 0.2634
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6995
+ 3. Superplasticizer               - Score: 0.6378
+ 4. Age                            - Score: 0.5758
+ 5. CoarseAgg                      - Score: 0.3260
+ 6. FlyAsh                         - Score: 0.3014
+ 7. Slag                           - Score: 0.2634
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6995
+ 3. Superplasticizer               - Score: 0.6378
+ 4. Age                            - Score: 0.5758
+ 5. CoarseAgg                      - Score: 0.3260
+ 6. FlyAsh                         - Score: 0.3014
+ 7. Slag                           - Score: 0.2634
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.5459
+ 3. FineAgg                        - Score: 0.4652
+ 4. Superplasticizer               - Score: 0.4209
+ 5. CoarseAgg                      - Score: 0.3384
+ 6. Water                          - Score: 0.2724
+ 7. Cement                         - Score: 0.2132
+ 8. FlyAsh                         - Score: 0.1530
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Superplasticizer               - Score: 0.7652
+ 3. Water                          - Score: 0.5131
+ 4. CoarseAgg                      - Score: 0.4410
+ 5. Slag                           - Score: 0.4147
+ 6. Cement                         - Score: 0.4109
+ 7. FlyAsh                         - Score: 0.3341
+ 8. FineAgg                        - Score: 0.2052
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7445
+ 3. Superplasticizer               - Score: 0.6147
+ 4. FineAgg                        - Score: 0.5825
+ 5. CoarseAgg                      - Score: 0.3730
+ 6. Cement                         - Score: 0.3701
+ 7. Water                          - Score: 0.3552
+ 8. FlyAsh                         - Score: 0.2306
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5736
+ 3. Superplasticizer               - Score: 0.4654
+ 4. Age                            - Score: 0.4498
+ 5. CoarseAgg                      - Score: 0.2924
+ 6. FineAgg                        - Score: 0.2209
+ 7. Slag                           - Score: 0.1594
+ 8. FlyAsh                         - Score: 0.1277
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.9263
+ 3. CoarseAgg                      - Score: 0.8947
+ 4. FineAgg                        - Score: 0.8058
+ 5. Cement                         - Score: 0.4197
+ 6. Slag                           - Score: 0.2460
+ 7. FlyAsh                         - Score: 0.0000
+ 8. Superplasticizer               - Score: 0.0000
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. FineAgg                        - Score: 0.5837
+ 3. Water                          - Score: 0.5736
+ 4. Age                            - Score: 0.5462
+ 5. Superplasticizer               - Score: 0.5335
+ 6. CoarseAgg                      - Score: 0.3644
+ 7. FlyAsh                         - Score: 0.3423
+ 8. Slag                           - Score: 0.2747
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Slag                           - Score: 0.8925
+ 3. Age                            - Score: 0.8263
+ 4. Superplasticizer               - Score: 0.8035
+ 5. Cement                         - Score: 0.6863
+ 6. CoarseAgg                      - Score: 0.4369
+ 7. FlyAsh                         - Score: 0.3635
+ 8. FineAgg                        - Score: 0.3110
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.3441
+ 3. Slag                           - Score: 0.3180
+ 4. FineAgg                        - Score: 0.2297
+ 5. Water                          - Score: 0.2246
+ 6. FlyAsh                         - Score: 0.1940
+ 7. Superplasticizer               - Score: 0.1526
+ 8. CoarseAgg                      - Score: 0.1040
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7745
+ 3. Superplasticizer               - Score: 0.7169
+ 4. Age                            - Score: 0.6343
+ 5. CoarseAgg                      - Score: 0.3635
+ 6. FineAgg                        - Score: 0.2567
+ 7. Slag                           - Score: 0.2540
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7745
+ 3. Superplasticizer               - Score: 0.7169
+ 4. Age                            - Score: 0.6343
+ 5. CoarseAgg                      - Score: 0.3635
+ 6. FineAgg                        - Score: 0.2567
+ 7. Slag                           - Score: 0.2540
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7745
+ 3. Superplasticizer               - Score: 0.7169
+ 4. Age                            - Score: 0.6343
+ 5. CoarseAgg                      - Score: 0.3635
+ 6. FineAgg                        - Score: 0.2567
+ 7. Slag                           - Score: 0.2540
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.4174
+ 3. Slag                           - Score: 0.3002
+ 4. Water                          - Score: 0.2619
+ 5. CoarseAgg                      - Score: 0.2521
+ 6. Superplasticizer               - Score: 0.2484
+ 7. FlyAsh                         - Score: 0.1491
+ 8. Cement                         - Score: 0.1052
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.7807
+ 3. Age                            - Score: 0.6009
+ 4. Slag                           - Score: 0.5923
+ 5. Superplasticizer               - Score: 0.5154
+ 6. FineAgg                        - Score: 0.5059
+ 7. FlyAsh                         - Score: 0.4820
+ 8. CoarseAgg                      - Score: 0.2430
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.9663
+ 3. Superplasticizer               - Score: 0.7274
+ 4. FineAgg                        - Score: 0.6741
+ 5. Cement                         - Score: 0.5729
+ 6. Water                          - Score: 0.3807
+ 7. CoarseAgg                      - Score: 0.3708
+ 8. FlyAsh                         - Score: 0.1877
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.4630
+ 3. Age                            - Score: 0.4626
+ 4. CoarseAgg                      - Score: 0.3607
+ 5. Superplasticizer               - Score: 0.3435
+ 6. Slag                           - Score: 0.2173
+ 7. FineAgg                        - Score: 0.1857
+ 8. FlyAsh                         - Score: 0.1281
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.7717
+ 3. FineAgg                        - Score: 0.7591
+ 4. CoarseAgg                      - Score: 0.7193
+ 5. Slag                           - Score: 0.5512
+ 6. Cement                         - Score: 0.2685
+ 7. Superplasticizer               - Score: 0.2343
+ 8. FlyAsh                         - Score: 0.1507
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7248
+ 3. FlyAsh                         - Score: 0.5440
+ 4. Cement                         - Score: 0.5129
+ 5. Water                          - Score: 0.3428
+ 6. FineAgg                        - Score: 0.2891
+ 7. Superplasticizer               - Score: 0.2465
+ 8. CoarseAgg                      - Score: 0.1942
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6771
+ 3. Age                            - Score: 0.6387
+ 4. Superplasticizer               - Score: 0.5925
+ 5. FineAgg                        - Score: 0.5403
+ 6. CoarseAgg                      - Score: 0.4537
+ 7. FlyAsh                         - Score: 0.3433
+ 8. Slag                           - Score: 0.2905
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Water                          - Score: 0.9586
+ 3. Slag                           - Score: 0.9572
+ 4. Superplasticizer               - Score: 0.7363
+ 5. Cement                         - Score: 0.7099
+ 6. FineAgg                        - Score: 0.4315
+ 7. CoarseAgg                      - Score: 0.4054
+ 8. FlyAsh                         - Score: 0.3715
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6937
+ 3. Age                            - Score: 0.6465
+ 4. Superplasticizer               - Score: 0.6288
+ 5. CoarseAgg                      - Score: 0.3302
+ 6. Slag                           - Score: 0.3214
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6937
+ 3. Age                            - Score: 0.6465
+ 4. Superplasticizer               - Score: 0.6288
+ 5. CoarseAgg                      - Score: 0.3302
+ 6. Slag                           - Score: 0.3214
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6937
+ 3. Age                            - Score: 0.6465
+ 4. Superplasticizer               - Score: 0.6288
+ 5. CoarseAgg                      - Score: 0.3302
+ 6. Slag                           - Score: 0.3214
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7819
+ 3. FineAgg                        - Score: 0.5635
+ 4. Superplasticizer               - Score: 0.3484
+ 5. CoarseAgg                      - Score: 0.3197
+ 6. Water                          - Score: 0.3064
+ 7. Cement                         - Score: 0.2313
+ 8. FlyAsh                         - Score: 0.1729
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.9722
+ 3. Superplasticizer               - Score: 0.7962
+ 4. Water                          - Score: 0.5226
+ 5. FineAgg                        - Score: 0.4660
+ 6. CoarseAgg                      - Score: 0.4481
+ 7. Cement                         - Score: 0.3908
+ 8. FlyAsh                         - Score: 0.2724
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.9813
+ 3. Superplasticizer               - Score: 0.6231
+ 4. FineAgg                        - Score: 0.6196
+ 5. Cement                         - Score: 0.5161
+ 6. Water                          - Score: 0.4061
+ 7. CoarseAgg                      - Score: 0.3716
+ 8. FlyAsh                         - Score: 0.3467
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.6023
+ 3. Water                          - Score: 0.4889
+ 4. CoarseAgg                      - Score: 0.3441
+ 5. Superplasticizer               - Score: 0.3432
+ 6. FineAgg                        - Score: 0.2807
+ 7. Slag                           - Score: 0.1907
+ 8. FlyAsh                         - Score: 0.1194
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. FineAgg                        - Score: 1.0000
+ 2. Age                            - Score: 0.9356
+ 3. Superplasticizer               - Score: 0.8049
+ 4. CoarseAgg                      - Score: 0.7689
+ 5. Water                          - Score: 0.6548
+ 6. Slag                           - Score: 0.6291
+ 7. Cement                         - Score: 0.5277
+ 8. FlyAsh                         - Score: 0.3455
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. FineAgg                        - Score: 0.7336
+ 3. Water                          - Score: 0.6359
+ 4. CoarseAgg                      - Score: 0.6083
+ 5. Age                            - Score: 0.3662
+ 6. Superplasticizer               - Score: 0.2260
+ 7. FlyAsh                         - Score: 0.2040
+ 8. Slag                           - Score: 0.1006
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.9558
+ 3. Slag                           - Score: 0.8841
+ 4. Superplasticizer               - Score: 0.8346
+ 5. Cement                         - Score: 0.7900
+ 6. CoarseAgg                      - Score: 0.5354
+ 7. FlyAsh                         - Score: 0.4486
+ 8. FineAgg                        - Score: 0.3102
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.3113
+ 3. Water                          - Score: 0.2842
+ 4. Cement                         - Score: 0.2738
+ 5. FlyAsh                         - Score: 0.2407
+ 6. Superplasticizer               - Score: 0.1703
+ 7. FineAgg                        - Score: 0.1575
+ 8. CoarseAgg                      - Score: 0.1420
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6974
+ 3. Superplasticizer               - Score: 0.6340
+ 4. Age                            - Score: 0.5875
+ 5. CoarseAgg                      - Score: 0.3367
+ 6. FineAgg                        - Score: 0.2695
+ 7. Slag                           - Score: 0.2569
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6974
+ 3. Superplasticizer               - Score: 0.6340
+ 4. Age                            - Score: 0.5875
+ 5. CoarseAgg                      - Score: 0.3367
+ 6. FineAgg                        - Score: 0.2695
+ 7. Slag                           - Score: 0.2569
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.6974
+ 3. Superplasticizer               - Score: 0.6340
+ 4. Age                            - Score: 0.5875
+ 5. CoarseAgg                      - Score: 0.3367
+ 6. FineAgg                        - Score: 0.2695
+ 7. Slag                           - Score: 0.2569
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.7414
+ 3. Slag                           - Score: 0.7328
+ 4. Superplasticizer               - Score: 0.4449
+ 5. Water                          - Score: 0.3004
+ 6. Cement                         - Score: 0.2873
+ 7. CoarseAgg                      - Score: 0.1937
+ 8. FlyAsh                         - Score: 0.1368
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Water                          - Score: 0.7809
+ 3. Superplasticizer               - Score: 0.7275
+ 4. Age                            - Score: 0.6629
+ 5. CoarseAgg                      - Score: 0.3761
+ 6. Cement                         - Score: 0.3068
+ 7. FineAgg                        - Score: 0.2751
+ 8. FlyAsh                         - Score: 0.2706
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.9137
+ 3. FineAgg                        - Score: 0.6846
+ 4. Superplasticizer               - Score: 0.6214
+ 5. Cement                         - Score: 0.4716
+ 6. CoarseAgg                      - Score: 0.3669
+ 7. Water                          - Score: 0.3441
+ 8. FlyAsh                         - Score: 0.1693
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.5721
+ 3. Water                          - Score: 0.5206
+ 4. CoarseAgg                      - Score: 0.3983
+ 5. Superplasticizer               - Score: 0.3847
+ 6. FineAgg                        - Score: 0.2186
+ 7. Slag                           - Score: 0.1735
+ 8. FlyAsh                         - Score: 0.0926
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. FineAgg                        - Score: 0.8428
+ 3. Cement                         - Score: 0.8366
+ 4. Superplasticizer               - Score: 0.6756
+ 5. Water                          - Score: 0.6188
+ 6. FlyAsh                         - Score: 0.5179
+ 7. CoarseAgg                      - Score: 0.4887
+ 8. Slag                           - Score: 0.3059
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.5993
+ 3. Age                            - Score: 0.4274
+ 4. CoarseAgg                      - Score: 0.3339
+ 5. Superplasticizer               - Score: 0.2909
+ 6. Slag                           - Score: 0.2116
+ 7. FineAgg                        - Score: 0.2012
+ 8. FlyAsh                         - Score: 0.1911
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.8770
+ 3. Slag                           - Score: 0.8698
+ 4. Cement                         - Score: 0.8057
+ 5. Superplasticizer               - Score: 0.7938
+ 6. CoarseAgg                      - Score: 0.4827
+ 7. FlyAsh                         - Score: 0.3312
+ 8. FineAgg                        - Score: 0.3269
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.4540
+ 3. FlyAsh                         - Score: 0.3166
+ 4. Slag                           - Score: 0.2925
+ 5. Water                          - Score: 0.2814
+ 6. FineAgg                        - Score: 0.2451
+ 7. CoarseAgg                      - Score: 0.1880
+ 8. Superplasticizer               - Score: 0.1751
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7026
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. FlyAsh                         - Score: 0.3322
+ 6. CoarseAgg                      - Score: 0.3198
+ 7. Slag                           - Score: 0.2684
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7026
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. FlyAsh                         - Score: 0.3322
+ 6. CoarseAgg                      - Score: 0.3198
+ 7. Slag                           - Score: 0.2684
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.7026
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. FlyAsh                         - Score: 0.3322
+ 6. CoarseAgg                      - Score: 0.3198
+ 7. Slag                           - Score: 0.2684
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.7621
+ 3. Superplasticizer               - Score: 0.5328
+ 4. FineAgg                        - Score: 0.4546
+ 5. Cement                         - Score: 0.3357
+ 6. CoarseAgg                      - Score: 0.3232
+ 7. Water                          - Score: 0.2796
+ 8. FlyAsh                         - Score: 0.1608
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Slag                           - Score: 0.9957
+ 3. Superplasticizer               - Score: 0.6715
+ 4. Cement                         - Score: 0.6002
+ 5. CoarseAgg                      - Score: 0.4581
+ 6. FineAgg                        - Score: 0.4296
+ 7. Water                          - Score: 0.4152
+ 8. FlyAsh                         - Score: 0.1922
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Slag                           - Score: 1.0000
+ 2. Age                            - Score: 0.6075
+ 3. FineAgg                        - Score: 0.4803
+ 4. Cement                         - Score: 0.4563
+ 5. Superplasticizer               - Score: 0.4094
+ 6. CoarseAgg                      - Score: 0.3276
+ 7. Water                          - Score: 0.2352
+ 8. FlyAsh                         - Score: 0.1572
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.6052
+ 3. Water                          - Score: 0.6051
+ 4. Superplasticizer               - Score: 0.3875
+ 5. CoarseAgg                      - Score: 0.3615
+ 6. Slag                           - Score: 0.1603
+ 7. FineAgg                        - Score: 0.1464
+ 8. FlyAsh                         - Score: 0.1043
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. FineAgg                        - Score: 1.0000
+ 2. Age                            - Score: 0.7976
+ 3. CoarseAgg                      - Score: 0.6606
+ 4. Slag                           - Score: 0.6605
+ 5. Water                          - Score: 0.6144
+ 6. Cement                         - Score: 0.3288
+ 7. FlyAsh                         - Score: 0.1270
+ 8. Superplasticizer               - Score: 0.1270
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Water                          - Score: 0.9361
+ 3. Superplasticizer               - Score: 0.8470
+ 4. Age                            - Score: 0.6768
+ 5. FineAgg                        - Score: 0.5048
+ 6. CoarseAgg                      - Score: 0.4420
+ 7. Slag                           - Score: 0.3655
+ 8. FlyAsh                         - Score: 0.3148
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Water                          - Score: 1.0000
+ 2. Age                            - Score: 0.9933
+ 3. Slag                           - Score: 0.8489
+ 4. Superplasticizer               - Score: 0.8121
+ 5. Cement                         - Score: 0.7082
+ 6. CoarseAgg                      - Score: 0.4493
+ 7. FlyAsh                         - Score: 0.4336
+ 8. FineAgg                        - Score: 0.3252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Age                            - Score: 1.0000
+ 2. Cement                         - Score: 0.5392
+ 3. FlyAsh                         - Score: 0.2993
+ 4. Slag                           - Score: 0.2917
+ 5. FineAgg                        - Score: 0.2573
+ 6. Water                          - Score: 0.2397
+ 7. Superplasticizer               - Score: 0.2284
+ 8. CoarseAgg                      - Score: 0.2030
+================================================================================
+  [phiusiil] loaded data\PhiUSIIL_Phishing_URL_Dataset.csv: 20000 rows × 47 features  (3 leaks dropped: URLSimilarityIndex, TLDLegitimateProb, URLCharProb)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7210
+ 4. DomainTitleMatchScore          - Score: 0.5451
+ 5. HasSubmitButton                - Score: 0.5374
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7210
+ 4. DomainTitleMatchScore          - Score: 0.5451
+ 5. HasSubmitButton                - Score: 0.5374
+ 6. IsHTTPS                        - Score: 0.5312
+ 7. IsResponsive                   - Score: 0.4815
+ 8. URLTitleMatchScore             - Score: 0.4727
+ 9. HasHiddenFields                - Score: 0.4542
+10. SpacialCharRatioInURL          - Score: 0.4435
+11. HasFavicon                     - Score: 0.4269
+12. NoOfJS                         - Score: 0.4010
+13. NoOfCSS                        - Score: 0.3937
+14. CharContinuationRate           - Score: 0.3758
+15. NoOfSelfRef                    - Score: 0.3657
+16. HasTitle                       - Score: 0.3517
+17. NoOfOtherSpecialCharsInURL     - Score: 0.3457
+18. Robots                         - Score: 0.3352
+19. DegitRatioInURL                - Score: 0.3270
+20. LetterRatioInURL               - Score: 0.3035
+21. Pay                            - Score: 0.2971
+22. NoOfImage                      - Score: 0.2505
+23. LineOfCode                     - Score: 0.2294
+24. DomainLength                   - Score: 0.2198
+25. NoOfiFrame                     - Score: 0.2075
+26. NoOfSubDomain                  - Score: 0.1688
+27. NoOfExternalRef                - Score: 0.1684
+28. NoOfDegitsInURL                - Score: 0.1508
+29. Bank                           - Score: 0.1471
+30. HasExternalFormSubmit          - Score: 0.1390
+31. URLLength                      - Score: 0.1205
+32. NoOfQMarkInURL                 - Score: 0.1176
+33. NoOfLettersInURL               - Score: 0.1161
+34. HasPasswordField               - Score: 0.1077
+35. NoOfEmptyRef                   - Score: 0.1035
+36. NoOfEqualsInURL                - Score: 0.0864
+37. Crypto                         - Score: 0.0730
+38. NoOfSelfRedirect               - Score: 0.0638
+39. TLDLength                      - Score: 0.0561
+40. LargestLineLength              - Score: 0.0529
+41. NoOfPopup                      - Score: 0.0507
+42. IsDomainIP                     - Score: 0.0404
+43. NoOfURLRedirect                - Score: 0.0375
+44. HasObfuscation                 - Score: 0.0351
+45. NoOfAmpersandInURL             - Score: 0.0326
+46. ObfuscationRatio               - Score: 0.0279
+47. NoOfObfuscatedChar             - Score: 0.0269
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7210
+ 4. DomainTitleMatchScore          - Score: 0.5451
+ 5. HasSubmitButton                - Score: 0.5374
+ 6. IsHTTPS                        - Score: 0.5312
+ 7. IsResponsive                   - Score: 0.4815
+ 8. URLTitleMatchScore             - Score: 0.4727
+ 9. HasHiddenFields                - Score: 0.4542
+10. SpacialCharRatioInURL          - Score: 0.4435
+11. HasFavicon                     - Score: 0.4269
+12. NoOfJS                         - Score: 0.4010
+13. NoOfCSS                        - Score: 0.3937
+14. CharContinuationRate           - Score: 0.3758
+15. NoOfSelfRef                    - Score: 0.3657
+16. HasTitle                       - Score: 0.3517
+17. NoOfOtherSpecialCharsInURL     - Score: 0.3457
+18. Robots                         - Score: 0.3352
+19. DegitRatioInURL                - Score: 0.3270
+20. LetterRatioInURL               - Score: 0.3035
+21. Pay                            - Score: 0.2971
+22. NoOfImage                      - Score: 0.2505
+23. LineOfCode                     - Score: 0.2294
+24. DomainLength                   - Score: 0.2198
+25. NoOfiFrame                     - Score: 0.2075
+26. NoOfSubDomain                  - Score: 0.1688
+27. NoOfExternalRef                - Score: 0.1684
+28. NoOfDegitsInURL                - Score: 0.1508
+29. Bank                           - Score: 0.1471
+30. HasExternalFormSubmit          - Score: 0.1390
+31. URLLength                      - Score: 0.1205
+32. NoOfQMarkInURL                 - Score: 0.1176
+33. NoOfLettersInURL               - Score: 0.1161
+34. HasPasswordField               - Score: 0.1077
+35. NoOfEmptyRef                   - Score: 0.1035
+36. NoOfEqualsInURL                - Score: 0.0864
+37. Crypto                         - Score: 0.0730
+38. NoOfSelfRedirect               - Score: 0.0638
+39. TLDLength                      - Score: 0.0561
+40. LargestLineLength              - Score: 0.0529
+41. NoOfPopup                      - Score: 0.0507
+42. IsDomainIP                     - Score: 0.0404
+43. NoOfURLRedirect                - Score: 0.0375
+44. HasObfuscation                 - Score: 0.0351
+45. NoOfAmpersandInURL             - Score: 0.0326
+46. ObfuscationRatio               - Score: 0.0279
+47. NoOfObfuscatedChar             - Score: 0.0269
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. DomainTitleMatchScore          - Score: 0.9819
+ 3. IsHTTPS                        - Score: 0.9781
+ 4. NoOfJS                         - Score: 0.8145
+ 5. IsResponsive                   - Score: 0.7821
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.8763
+ 3. HasDescription                 - Score: 0.8682
+ 4. URLTitleMatchScore             - Score: 0.8625
+ 5. IsHTTPS                        - Score: 0.7880
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7684
+ 3. SpacialCharRatioInURL          - Score: 0.6891
+ 4. DegitRatioInURL                - Score: 0.5652
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.5379
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasCopyrightInfo               - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.9102
+ 3. DomainTitleMatchScore          - Score: 0.8351
+ 4. HasDescription                 - Score: 0.8228
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.6969
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8588
+ 3. HasDescription                 - Score: 0.7256
+ 4. HasSubmitButton                - Score: 0.5488
+ 5. DomainTitleMatchScore          - Score: 0.5386
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8588
+ 3. HasDescription                 - Score: 0.7256
+ 4. HasSubmitButton                - Score: 0.5488
+ 5. DomainTitleMatchScore          - Score: 0.5386
+ 6. IsHTTPS                        - Score: 0.5220
+ 7. URLTitleMatchScore             - Score: 0.4694
+ 8. IsResponsive                   - Score: 0.4658
+ 9. HasHiddenFields                - Score: 0.4517
+10. SpacialCharRatioInURL          - Score: 0.4495
+11. HasFavicon                     - Score: 0.4230
+12. NoOfJS                         - Score: 0.3985
+13. NoOfCSS                        - Score: 0.3775
+14. CharContinuationRate           - Score: 0.3750
+15. NoOfSelfRef                    - Score: 0.3622
+16. HasTitle                       - Score: 0.3450
+17. NoOfOtherSpecialCharsInURL     - Score: 0.3423
+18. Robots                         - Score: 0.3309
+19. DegitRatioInURL                - Score: 0.3256
+20. LetterRatioInURL               - Score: 0.2985
+21. Pay                            - Score: 0.2963
+22. NoOfImage                      - Score: 0.2456
+23. DomainLength                   - Score: 0.2187
+24. NoOfiFrame                     - Score: 0.2130
+25. NoOfSubDomain                  - Score: 0.1693
+26. NoOfExternalRef                - Score: 0.1688
+27. LineOfCode                     - Score: 0.1653
+28. NoOfDegitsInURL                - Score: 0.1463
+29. Bank                           - Score: 0.1453
+30. HasExternalFormSubmit          - Score: 0.1391
+31. URLLength                      - Score: 0.1181
+32. NoOfQMarkInURL                 - Score: 0.1161
+33. NoOfLettersInURL               - Score: 0.1141
+34. HasPasswordField               - Score: 0.1085
+35. NoOfEmptyRef                   - Score: 0.1056
+36. NoOfEqualsInURL                - Score: 0.0848
+37. Crypto                         - Score: 0.0709
+38. NoOfSelfRedirect               - Score: 0.0620
+39. TLDLength                      - Score: 0.0596
+40. LargestLineLength              - Score: 0.0506
+41. NoOfPopup                      - Score: 0.0497
+42. IsDomainIP                     - Score: 0.0421
+43. NoOfURLRedirect                - Score: 0.0413
+44. HasObfuscation                 - Score: 0.0366
+45. NoOfAmpersandInURL             - Score: 0.0331
+46. ObfuscationRatio               - Score: 0.0291
+47. NoOfObfuscatedChar             - Score: 0.0275
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8588
+ 3. HasDescription                 - Score: 0.7256
+ 4. HasSubmitButton                - Score: 0.5488
+ 5. DomainTitleMatchScore          - Score: 0.5386
+ 6. IsHTTPS                        - Score: 0.5220
+ 7. URLTitleMatchScore             - Score: 0.4694
+ 8. IsResponsive                   - Score: 0.4658
+ 9. HasHiddenFields                - Score: 0.4517
+10. SpacialCharRatioInURL          - Score: 0.4495
+11. HasFavicon                     - Score: 0.4230
+12. NoOfJS                         - Score: 0.3985
+13. NoOfCSS                        - Score: 0.3775
+14. CharContinuationRate           - Score: 0.3750
+15. NoOfSelfRef                    - Score: 0.3622
+16. HasTitle                       - Score: 0.3450
+17. NoOfOtherSpecialCharsInURL     - Score: 0.3423
+18. Robots                         - Score: 0.3309
+19. DegitRatioInURL                - Score: 0.3256
+20. LetterRatioInURL               - Score: 0.2985
+21. Pay                            - Score: 0.2963
+22. NoOfImage                      - Score: 0.2456
+23. DomainLength                   - Score: 0.2187
+24. NoOfiFrame                     - Score: 0.2130
+25. NoOfSubDomain                  - Score: 0.1693
+26. NoOfExternalRef                - Score: 0.1688
+27. LineOfCode                     - Score: 0.1653
+28. NoOfDegitsInURL                - Score: 0.1463
+29. Bank                           - Score: 0.1453
+30. HasExternalFormSubmit          - Score: 0.1391
+31. URLLength                      - Score: 0.1181
+32. NoOfQMarkInURL                 - Score: 0.1161
+33. NoOfLettersInURL               - Score: 0.1141
+34. HasPasswordField               - Score: 0.1085
+35. NoOfEmptyRef                   - Score: 0.1056
+36. NoOfEqualsInURL                - Score: 0.0848
+37. Crypto                         - Score: 0.0709
+38. NoOfSelfRedirect               - Score: 0.0620
+39. TLDLength                      - Score: 0.0596
+40. LargestLineLength              - Score: 0.0506
+41. NoOfPopup                      - Score: 0.0497
+42. IsDomainIP                     - Score: 0.0421
+43. NoOfURLRedirect                - Score: 0.0413
+44. HasObfuscation                 - Score: 0.0366
+45. NoOfAmpersandInURL             - Score: 0.0331
+46. ObfuscationRatio               - Score: 0.0291
+47. NoOfObfuscatedChar             - Score: 0.0275
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. HasDescription                 - Score: 0.9819
+ 3. IsHTTPS                        - Score: 0.9654
+ 4. NoOfJS                         - Score: 0.8509
+ 5. SpacialCharRatioInURL          - Score: 0.7756
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7791
+ 3. SpacialCharRatioInURL          - Score: 0.7142
+ 4. NoOfOtherSpecialCharsInURL     - Score: 0.5467
+ 5. DegitRatioInURL                - Score: 0.5301
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. SpacialCharRatioInURL          - Score: 1.0000
+ 2. IsResponsive                   - Score: 0.8531
+ 3. HasDescription                 - Score: 0.8413
+ 4. HasCopyrightInfo               - Score: 0.8285
+ 5. HasSubmitButton                - Score: 0.8057
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8595
+ 3. HasDescription                 - Score: 0.7322
+ 4. DomainTitleMatchScore          - Score: 0.5485
+ 5. HasSubmitButton                - Score: 0.5373
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8595
+ 3. HasDescription                 - Score: 0.7322
+ 4. DomainTitleMatchScore          - Score: 0.5485
+ 5. HasSubmitButton                - Score: 0.5373
+ 6. IsHTTPS                        - Score: 0.5294
+ 7. URLTitleMatchScore             - Score: 0.4754
+ 8. IsResponsive                   - Score: 0.4714
+ 9. HasHiddenFields                - Score: 0.4566
+10. SpacialCharRatioInURL          - Score: 0.4480
+11. HasFavicon                     - Score: 0.4191
+12. NoOfJS                         - Score: 0.4002
+13. CharContinuationRate           - Score: 0.3780
+14. NoOfSelfRef                    - Score: 0.3725
+15. NoOfCSS                        - Score: 0.3705
+16. HasTitle                       - Score: 0.3530
+17. NoOfOtherSpecialCharsInURL     - Score: 0.3502
+18. Robots                         - Score: 0.3371
+19. DegitRatioInURL                - Score: 0.3291
+20. LetterRatioInURL               - Score: 0.2999
+21. Pay                            - Score: 0.2964
+22. NoOfImage                      - Score: 0.2429
+23. LineOfCode                     - Score: 0.2256
+24. DomainLength                   - Score: 0.2182
+25. NoOfiFrame                     - Score: 0.2179
+26. NoOfSubDomain                  - Score: 0.1708
+27. NoOfExternalRef                - Score: 0.1698
+28. NoOfDegitsInURL                - Score: 0.1489
+29. Bank                           - Score: 0.1462
+30. HasExternalFormSubmit          - Score: 0.1372
+31. URLLength                      - Score: 0.1189
+32. NoOfQMarkInURL                 - Score: 0.1186
+33. NoOfLettersInURL               - Score: 0.1148
+34. HasPasswordField               - Score: 0.1037
+35. NoOfEmptyRef                   - Score: 0.0987
+36. NoOfEqualsInURL                - Score: 0.0859
+37. Crypto                         - Score: 0.0719
+38. NoOfSelfRedirect               - Score: 0.0618
+39. LargestLineLength              - Score: 0.0556
+40. TLDLength                      - Score: 0.0555
+41. NoOfPopup                      - Score: 0.0523
+42. IsDomainIP                     - Score: 0.0399
+43. NoOfURLRedirect                - Score: 0.0390
+44. HasObfuscation                 - Score: 0.0356
+45. NoOfAmpersandInURL             - Score: 0.0313
+46. ObfuscationRatio               - Score: 0.0284
+47. NoOfObfuscatedChar             - Score: 0.0275
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8595
+ 3. HasDescription                 - Score: 0.7322
+ 4. DomainTitleMatchScore          - Score: 0.5485
+ 5. HasSubmitButton                - Score: 0.5373
+ 6. IsHTTPS                        - Score: 0.5294
+ 7. URLTitleMatchScore             - Score: 0.4754
+ 8. IsResponsive                   - Score: 0.4714
+ 9. HasHiddenFields                - Score: 0.4566
+10. SpacialCharRatioInURL          - Score: 0.4480
+11. HasFavicon                     - Score: 0.4191
+12. NoOfJS                         - Score: 0.4002
+13. CharContinuationRate           - Score: 0.3780
+14. NoOfSelfRef                    - Score: 0.3725
+15. NoOfCSS                        - Score: 0.3705
+16. HasTitle                       - Score: 0.3530
+17. NoOfOtherSpecialCharsInURL     - Score: 0.3502
+18. Robots                         - Score: 0.3371
+19. DegitRatioInURL                - Score: 0.3291
+20. LetterRatioInURL               - Score: 0.2999
+21. Pay                            - Score: 0.2964
+22. NoOfImage                      - Score: 0.2429
+23. LineOfCode                     - Score: 0.2256
+24. DomainLength                   - Score: 0.2182
+25. NoOfiFrame                     - Score: 0.2179
+26. NoOfSubDomain                  - Score: 0.1708
+27. NoOfExternalRef                - Score: 0.1698
+28. NoOfDegitsInURL                - Score: 0.1489
+29. Bank                           - Score: 0.1462
+30. HasExternalFormSubmit          - Score: 0.1372
+31. URLLength                      - Score: 0.1189
+32. NoOfQMarkInURL                 - Score: 0.1186
+33. NoOfLettersInURL               - Score: 0.1148
+34. HasPasswordField               - Score: 0.1037
+35. NoOfEmptyRef                   - Score: 0.0987
+36. NoOfEqualsInURL                - Score: 0.0859
+37. Crypto                         - Score: 0.0719
+38. NoOfSelfRedirect               - Score: 0.0618
+39. LargestLineLength              - Score: 0.0556
+40. TLDLength                      - Score: 0.0555
+41. NoOfPopup                      - Score: 0.0523
+42. IsDomainIP                     - Score: 0.0399
+43. NoOfURLRedirect                - Score: 0.0390
+44. HasObfuscation                 - Score: 0.0356
+45. NoOfAmpersandInURL             - Score: 0.0313
+46. ObfuscationRatio               - Score: 0.0284
+47. NoOfObfuscatedChar             - Score: 0.0275
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9492
+ 3. HasDescription                 - Score: 0.9475
+ 4. NoOfJS                         - Score: 0.7933
+ 5. SpacialCharRatioInURL          - Score: 0.7597
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7480
+ 3. SpacialCharRatioInURL          - Score: 0.7132
+ 4. CharContinuationRate           - Score: 0.5679
+ 5. DegitRatioInURL                - Score: 0.5654
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. NoOfOtherSpecialCharsInURL     - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.9768
+ 3. HasDescription                 - Score: 0.8958
+ 4. DomainTitleMatchScore          - Score: 0.8155
+ 5. IsResponsive                   - Score: 0.7884
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8546
+ 3. HasDescription                 - Score: 0.7176
+ 4. DomainTitleMatchScore          - Score: 0.5467
+ 5. HasSubmitButton                - Score: 0.5368
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8546
+ 3. HasDescription                 - Score: 0.7176
+ 4. DomainTitleMatchScore          - Score: 0.5467
+ 5. HasSubmitButton                - Score: 0.5368
+ 6. IsHTTPS                        - Score: 0.5183
+ 7. URLTitleMatchScore             - Score: 0.4791
+ 8. IsResponsive                   - Score: 0.4720
+ 9. SpacialCharRatioInURL          - Score: 0.4509
+10. HasHiddenFields                - Score: 0.4461
+11. HasFavicon                     - Score: 0.4222
+12. NoOfJS                         - Score: 0.3912
+13. CharContinuationRate           - Score: 0.3791
+14. NoOfCSS                        - Score: 0.3678
+15. NoOfSelfRef                    - Score: 0.3608
+16. NoOfOtherSpecialCharsInURL     - Score: 0.3519
+17. HasTitle                       - Score: 0.3489
+18. Robots                         - Score: 0.3330
+19. DegitRatioInURL                - Score: 0.3263
+20. NoOfExternalRef                - Score: 0.2941
+21. LetterRatioInURL               - Score: 0.2938
+22. Pay                            - Score: 0.2896
+23. NoOfImage                      - Score: 0.2500
+24. DomainLength                   - Score: 0.2184
+25. NoOfiFrame                     - Score: 0.2034
+26. LineOfCode                     - Score: 0.1768
+27. NoOfSubDomain                  - Score: 0.1710
+28. NoOfDegitsInURL                - Score: 0.1490
+29. Bank                           - Score: 0.1396
+30. HasExternalFormSubmit          - Score: 0.1360
+31. NoOfQMarkInURL                 - Score: 0.1194
+32. URLLength                      - Score: 0.1179
+33. NoOfLettersInURL               - Score: 0.1133
+34. NoOfEmptyRef                   - Score: 0.1047
+35. HasPasswordField               - Score: 0.1042
+36. NoOfEqualsInURL                - Score: 0.0872
+37. Crypto                         - Score: 0.0731
+38. NoOfSelfRedirect               - Score: 0.0633
+39. TLDLength                      - Score: 0.0567
+40. LargestLineLength              - Score: 0.0520
+41. NoOfPopup                      - Score: 0.0508
+42. IsDomainIP                     - Score: 0.0400
+43. HasObfuscation                 - Score: 0.0375
+44. NoOfURLRedirect                - Score: 0.0363
+45. NoOfAmpersandInURL             - Score: 0.0330
+46. ObfuscationRatio               - Score: 0.0293
+47. NoOfObfuscatedChar             - Score: 0.0277
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8546
+ 3. HasDescription                 - Score: 0.7176
+ 4. DomainTitleMatchScore          - Score: 0.5467
+ 5. HasSubmitButton                - Score: 0.5368
+ 6. IsHTTPS                        - Score: 0.5183
+ 7. URLTitleMatchScore             - Score: 0.4791
+ 8. IsResponsive                   - Score: 0.4720
+ 9. SpacialCharRatioInURL          - Score: 0.4509
+10. HasHiddenFields                - Score: 0.4461
+11. HasFavicon                     - Score: 0.4222
+12. NoOfJS                         - Score: 0.3912
+13. CharContinuationRate           - Score: 0.3791
+14. NoOfCSS                        - Score: 0.3678
+15. NoOfSelfRef                    - Score: 0.3608
+16. NoOfOtherSpecialCharsInURL     - Score: 0.3519
+17. HasTitle                       - Score: 0.3489
+18. Robots                         - Score: 0.3330
+19. DegitRatioInURL                - Score: 0.3263
+20. NoOfExternalRef                - Score: 0.2941
+21. LetterRatioInURL               - Score: 0.2938
+22. Pay                            - Score: 0.2896
+23. NoOfImage                      - Score: 0.2500
+24. DomainLength                   - Score: 0.2184
+25. NoOfiFrame                     - Score: 0.2034
+26. LineOfCode                     - Score: 0.1768
+27. NoOfSubDomain                  - Score: 0.1710
+28. NoOfDegitsInURL                - Score: 0.1490
+29. Bank                           - Score: 0.1396
+30. HasExternalFormSubmit          - Score: 0.1360
+31. NoOfQMarkInURL                 - Score: 0.1194
+32. URLLength                      - Score: 0.1179
+33. NoOfLettersInURL               - Score: 0.1133
+34. NoOfEmptyRef                   - Score: 0.1047
+35. HasPasswordField               - Score: 0.1042
+36. NoOfEqualsInURL                - Score: 0.0872
+37. Crypto                         - Score: 0.0731
+38. NoOfSelfRedirect               - Score: 0.0633
+39. TLDLength                      - Score: 0.0567
+40. LargestLineLength              - Score: 0.0520
+41. NoOfPopup                      - Score: 0.0508
+42. IsDomainIP                     - Score: 0.0400
+43. HasObfuscation                 - Score: 0.0375
+44. NoOfURLRedirect                - Score: 0.0363
+45. NoOfAmpersandInURL             - Score: 0.0330
+46. ObfuscationRatio               - Score: 0.0293
+47. NoOfObfuscatedChar             - Score: 0.0277
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. HasDescription                 - Score: 0.9747
+ 3. IsHTTPS                        - Score: 0.9565
+ 4. NoOfJS                         - Score: 0.8569
+ 5. SpacialCharRatioInURL          - Score: 0.7893
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.9025
+ 3. HasDescription                 - Score: 0.8657
+ 4. NoOfJS                         - Score: 0.8129
+ 5. IsHTTPS                        - Score: 0.7754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7164
+ 3. SpacialCharRatioInURL          - Score: 0.7107
+ 4. DegitRatioInURL                - Score: 0.5825
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.5502
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. SpacialCharRatioInURL          - Score: 1.0000
+ 2. HasDescription                 - Score: 0.8521
+ 3. DomainTitleMatchScore          - Score: 0.7741
+ 4. IsResponsive                   - Score: 0.6962
+ 5. CharContinuationRate           - Score: 0.6676
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8559
+ 3. HasDescription                 - Score: 0.7214
+ 4. HasSubmitButton                - Score: 0.5354
+ 5. DomainTitleMatchScore          - Score: 0.5346
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8559
+ 3. HasDescription                 - Score: 0.7214
+ 4. HasSubmitButton                - Score: 0.5354
+ 5. DomainTitleMatchScore          - Score: 0.5346
+ 6. IsHTTPS                        - Score: 0.5194
+ 7. IsResponsive                   - Score: 0.4675
+ 8. URLTitleMatchScore             - Score: 0.4655
+ 9. HasHiddenFields                - Score: 0.4480
+10. SpacialCharRatioInURL          - Score: 0.4400
+11. HasFavicon                     - Score: 0.4196
+12. NoOfCSS                        - Score: 0.3898
+13. NoOfJS                         - Score: 0.3897
+14. CharContinuationRate           - Score: 0.3710
+15. NoOfSelfRef                    - Score: 0.3560
+16. NoOfOtherSpecialCharsInURL     - Score: 0.3474
+17. HasTitle                       - Score: 0.3473
+18. Robots                         - Score: 0.3261
+19. DegitRatioInURL                - Score: 0.3213
+20. LetterRatioInURL               - Score: 0.2998
+21. Pay                            - Score: 0.2915
+22. NoOfImage                      - Score: 0.2539
+23. DomainLength                   - Score: 0.2197
+24. NoOfExternalRef                - Score: 0.2094
+25. NoOfiFrame                     - Score: 0.2031
+26. LineOfCode                     - Score: 0.1756
+27. NoOfSubDomain                  - Score: 0.1682
+28. NoOfDegitsInURL                - Score: 0.1452
+29. Bank                           - Score: 0.1428
+30. HasExternalFormSubmit          - Score: 0.1367
+31. URLLength                      - Score: 0.1160
+32. NoOfQMarkInURL                 - Score: 0.1140
+33. NoOfLettersInURL               - Score: 0.1123
+34. HasPasswordField               - Score: 0.1027
+35. NoOfEmptyRef                   - Score: 0.0974
+36. NoOfEqualsInURL                - Score: 0.0813
+37. NoOfPopup                      - Score: 0.0671
+38. Crypto                         - Score: 0.0667
+39. NoOfSelfRedirect               - Score: 0.0598
+40. TLDLength                      - Score: 0.0591
+41. LargestLineLength              - Score: 0.0497
+42. IsDomainIP                     - Score: 0.0408
+43. NoOfURLRedirect                - Score: 0.0337
+44. HasObfuscation                 - Score: 0.0335
+45. NoOfAmpersandInURL             - Score: 0.0313
+46. ObfuscationRatio               - Score: 0.0262
+47. NoOfObfuscatedChar             - Score: 0.0246
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8559
+ 3. HasDescription                 - Score: 0.7214
+ 4. HasSubmitButton                - Score: 0.5354
+ 5. DomainTitleMatchScore          - Score: 0.5346
+ 6. IsHTTPS                        - Score: 0.5194
+ 7. IsResponsive                   - Score: 0.4675
+ 8. URLTitleMatchScore             - Score: 0.4655
+ 9. HasHiddenFields                - Score: 0.4480
+10. SpacialCharRatioInURL          - Score: 0.4400
+11. HasFavicon                     - Score: 0.4196
+12. NoOfCSS                        - Score: 0.3898
+13. NoOfJS                         - Score: 0.3897
+14. CharContinuationRate           - Score: 0.3710
+15. NoOfSelfRef                    - Score: 0.3560
+16. NoOfOtherSpecialCharsInURL     - Score: 0.3474
+17. HasTitle                       - Score: 0.3473
+18. Robots                         - Score: 0.3261
+19. DegitRatioInURL                - Score: 0.3213
+20. LetterRatioInURL               - Score: 0.2998
+21. Pay                            - Score: 0.2915
+22. NoOfImage                      - Score: 0.2539
+23. DomainLength                   - Score: 0.2197
+24. NoOfExternalRef                - Score: 0.2094
+25. NoOfiFrame                     - Score: 0.2031
+26. LineOfCode                     - Score: 0.1756
+27. NoOfSubDomain                  - Score: 0.1682
+28. NoOfDegitsInURL                - Score: 0.1452
+29. Bank                           - Score: 0.1428
+30. HasExternalFormSubmit          - Score: 0.1367
+31. URLLength                      - Score: 0.1160
+32. NoOfQMarkInURL                 - Score: 0.1140
+33. NoOfLettersInURL               - Score: 0.1123
+34. HasPasswordField               - Score: 0.1027
+35. NoOfEmptyRef                   - Score: 0.0974
+36. NoOfEqualsInURL                - Score: 0.0813
+37. NoOfPopup                      - Score: 0.0671
+38. Crypto                         - Score: 0.0667
+39. NoOfSelfRedirect               - Score: 0.0598
+40. TLDLength                      - Score: 0.0591
+41. LargestLineLength              - Score: 0.0497
+42. IsDomainIP                     - Score: 0.0408
+43. NoOfURLRedirect                - Score: 0.0337
+44. HasObfuscation                 - Score: 0.0335
+45. NoOfAmpersandInURL             - Score: 0.0313
+46. ObfuscationRatio               - Score: 0.0262
+47. NoOfObfuscatedChar             - Score: 0.0246
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. DomainTitleMatchScore          - Score: 0.9953
+ 3. IsHTTPS                        - Score: 0.9490
+ 4. NoOfJS                         - Score: 0.8051
+ 5. SpacialCharRatioInURL          - Score: 0.7624
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7147
+ 3. SpacialCharRatioInURL          - Score: 0.7028
+ 4. DegitRatioInURL                - Score: 0.5725
+ 5. CharContinuationRate           - Score: 0.5452
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. SpacialCharRatioInURL          - Score: 1.0000
+ 2. HasDescription                 - Score: 0.8334
+ 3. DomainTitleMatchScore          - Score: 0.6668
+ 4. HasCopyrightInfo               - Score: 0.6584
+ 5. CharContinuationRate           - Score: 0.6506
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8440
+ 3. HasDescription                 - Score: 0.7319
+ 4. DomainTitleMatchScore          - Score: 0.5434
+ 5. HasSubmitButton                - Score: 0.5372
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8440
+ 3. HasDescription                 - Score: 0.7319
+ 4. DomainTitleMatchScore          - Score: 0.5434
+ 5. HasSubmitButton                - Score: 0.5372
+ 6. IsHTTPS                        - Score: 0.5251
+ 7. IsResponsive                   - Score: 0.4773
+ 8. URLTitleMatchScore             - Score: 0.4746
+ 9. HasHiddenFields                - Score: 0.4572
+10. SpacialCharRatioInURL          - Score: 0.4450
+11. HasFavicon                     - Score: 0.4270
+12. NoOfJS                         - Score: 0.3941
+13. CharContinuationRate           - Score: 0.3802
+14. NoOfCSS                        - Score: 0.3675
+15. NoOfSelfRef                    - Score: 0.3527
+16. HasTitle                       - Score: 0.3505
+17. Robots                         - Score: 0.3417
+18. NoOfOtherSpecialCharsInURL     - Score: 0.3399
+19. DegitRatioInURL                - Score: 0.3246
+20. LetterRatioInURL               - Score: 0.2997
+21. Pay                            - Score: 0.2933
+22. NoOfImage                      - Score: 0.2422
+23. NoOfiFrame                     - Score: 0.2279
+24. DomainLength                   - Score: 0.2168
+25. NoOfExternalRef                - Score: 0.1952
+26. NoOfSubDomain                  - Score: 0.1697
+27. LineOfCode                     - Score: 0.1634
+28. NoOfDegitsInURL                - Score: 0.1496
+29. Bank                           - Score: 0.1429
+30. HasExternalFormSubmit          - Score: 0.1390
+31. URLLength                      - Score: 0.1195
+32. NoOfQMarkInURL                 - Score: 0.1176
+33. NoOfLettersInURL               - Score: 0.1151
+34. HasPasswordField               - Score: 0.1041
+35. NoOfEmptyRef                   - Score: 0.0978
+36. NoOfEqualsInURL                - Score: 0.0859
+37. Crypto                         - Score: 0.0685
+38. TLDLength                      - Score: 0.0580
+39. NoOfSelfRedirect               - Score: 0.0561
+40. NoOfPopup                      - Score: 0.0512
+41. LargestLineLength              - Score: 0.0503
+42. IsDomainIP                     - Score: 0.0415
+43. HasObfuscation                 - Score: 0.0354
+44. NoOfAmpersandInURL             - Score: 0.0329
+45. NoOfURLRedirect                - Score: 0.0311
+46. ObfuscationRatio               - Score: 0.0275
+47. NoOfObfuscatedChar             - Score: 0.0264
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8440
+ 3. HasDescription                 - Score: 0.7319
+ 4. DomainTitleMatchScore          - Score: 0.5434
+ 5. HasSubmitButton                - Score: 0.5372
+ 6. IsHTTPS                        - Score: 0.5251
+ 7. IsResponsive                   - Score: 0.4773
+ 8. URLTitleMatchScore             - Score: 0.4746
+ 9. HasHiddenFields                - Score: 0.4572
+10. SpacialCharRatioInURL          - Score: 0.4450
+11. HasFavicon                     - Score: 0.4270
+12. NoOfJS                         - Score: 0.3941
+13. CharContinuationRate           - Score: 0.3802
+14. NoOfCSS                        - Score: 0.3675
+15. NoOfSelfRef                    - Score: 0.3527
+16. HasTitle                       - Score: 0.3505
+17. Robots                         - Score: 0.3417
+18. NoOfOtherSpecialCharsInURL     - Score: 0.3399
+19. DegitRatioInURL                - Score: 0.3246
+20. LetterRatioInURL               - Score: 0.2997
+21. Pay                            - Score: 0.2933
+22. NoOfImage                      - Score: 0.2422
+23. NoOfiFrame                     - Score: 0.2279
+24. DomainLength                   - Score: 0.2168
+25. NoOfExternalRef                - Score: 0.1952
+26. NoOfSubDomain                  - Score: 0.1697
+27. LineOfCode                     - Score: 0.1634
+28. NoOfDegitsInURL                - Score: 0.1496
+29. Bank                           - Score: 0.1429
+30. HasExternalFormSubmit          - Score: 0.1390
+31. URLLength                      - Score: 0.1195
+32. NoOfQMarkInURL                 - Score: 0.1176
+33. NoOfLettersInURL               - Score: 0.1151
+34. HasPasswordField               - Score: 0.1041
+35. NoOfEmptyRef                   - Score: 0.0978
+36. NoOfEqualsInURL                - Score: 0.0859
+37. Crypto                         - Score: 0.0685
+38. TLDLength                      - Score: 0.0580
+39. NoOfSelfRedirect               - Score: 0.0561
+40. NoOfPopup                      - Score: 0.0512
+41. LargestLineLength              - Score: 0.0503
+42. IsDomainIP                     - Score: 0.0415
+43. HasObfuscation                 - Score: 0.0354
+44. NoOfAmpersandInURL             - Score: 0.0329
+45. NoOfURLRedirect                - Score: 0.0311
+46. ObfuscationRatio               - Score: 0.0275
+47. NoOfObfuscatedChar             - Score: 0.0264
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. DomainTitleMatchScore          - Score: 0.9530
+ 3. IsHTTPS                        - Score: 0.9454
+ 4. NoOfJS                         - Score: 0.7997
+ 5. SpacialCharRatioInURL          - Score: 0.7497
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7405
+ 3. SpacialCharRatioInURL          - Score: 0.6853
+ 4. DegitRatioInURL                - Score: 0.5609
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.5369
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. LetterRatioInURL               - Score: 1.0000
+ 2. HasSubmitButton                - Score: 0.7488
+ 3. NoOfSubDomain                  - Score: 0.7146
+ 4. NoOfOtherSpecialCharsInURL     - Score: 0.7063
+ 5. HasHiddenFields                - Score: 0.6603
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.9204
+ 3. HasSubmitButton                - Score: 0.8099
+ 4. HasHiddenFields                - Score: 0.7077
+ 5. NoOfSubDomain                  - Score: 0.5428
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. SpacialCharRatioInURL          - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.9036
+ 3. HasDescription                 - Score: 0.9033
+ 4. NoOfOtherSpecialCharsInURL     - Score: 0.8103
+ 5. IsResponsive                   - Score: 0.7649
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7330
+ 4. DomainTitleMatchScore          - Score: 0.5450
+ 5. HasSubmitButton                - Score: 0.5363
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7330
+ 4. DomainTitleMatchScore          - Score: 0.5450
+ 5. HasSubmitButton                - Score: 0.5363
+ 6. IsHTTPS                        - Score: 0.5253
+ 7. IsResponsive                   - Score: 0.4772
+ 8. URLTitleMatchScore             - Score: 0.4748
+ 9. HasHiddenFields                - Score: 0.4492
+10. SpacialCharRatioInURL          - Score: 0.4473
+11. HasFavicon                     - Score: 0.4236
+12. NoOfJS                         - Score: 0.3929
+13. CharContinuationRate           - Score: 0.3746
+14. NoOfCSS                        - Score: 0.3724
+15. NoOfSelfRef                    - Score: 0.3541
+16. NoOfOtherSpecialCharsInURL     - Score: 0.3539
+17. HasTitle                       - Score: 0.3513
+18. Robots                         - Score: 0.3375
+19. DegitRatioInURL                - Score: 0.3280
+20. LetterRatioInURL               - Score: 0.2981
+21. Pay                            - Score: 0.2933
+22. NoOfImage                      - Score: 0.2459
+23. NoOfLettersInURL               - Score: 0.2349
+24. URLLength                      - Score: 0.2210
+25. DomainLength                   - Score: 0.2180
+26. NoOfDegitsInURL                - Score: 0.2137
+27. NoOfExternalRef                - Score: 0.2085
+28. NoOfiFrame                     - Score: 0.2055
+29. LineOfCode                     - Score: 0.1854
+30. NoOfSubDomain                  - Score: 0.1701
+31. Bank                           - Score: 0.1400
+32. HasExternalFormSubmit          - Score: 0.1371
+33. NoOfQMarkInURL                 - Score: 0.1187
+34. NoOfEmptyRef                   - Score: 0.1041
+35. HasPasswordField               - Score: 0.1008
+36. NoOfEqualsInURL                - Score: 0.0884
+37. Crypto                         - Score: 0.0713
+38. NoOfPopup                      - Score: 0.0645
+39. NoOfSelfRedirect               - Score: 0.0624
+40. TLDLength                      - Score: 0.0591
+41. LargestLineLength              - Score: 0.0553
+42. IsDomainIP                     - Score: 0.0405
+43. HasObfuscation                 - Score: 0.0368
+44. NoOfAmpersandInURL             - Score: 0.0330
+45. NoOfURLRedirect                - Score: 0.0329
+46. ObfuscationRatio               - Score: 0.0287
+47. NoOfObfuscatedChar             - Score: 0.0271
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7330
+ 4. DomainTitleMatchScore          - Score: 0.5450
+ 5. HasSubmitButton                - Score: 0.5363
+ 6. IsHTTPS                        - Score: 0.5253
+ 7. IsResponsive                   - Score: 0.4772
+ 8. URLTitleMatchScore             - Score: 0.4748
+ 9. HasHiddenFields                - Score: 0.4492
+10. SpacialCharRatioInURL          - Score: 0.4473
+11. HasFavicon                     - Score: 0.4236
+12. NoOfJS                         - Score: 0.3929
+13. CharContinuationRate           - Score: 0.3746
+14. NoOfCSS                        - Score: 0.3724
+15. NoOfSelfRef                    - Score: 0.3541
+16. NoOfOtherSpecialCharsInURL     - Score: 0.3539
+17. HasTitle                       - Score: 0.3513
+18. Robots                         - Score: 0.3375
+19. DegitRatioInURL                - Score: 0.3280
+20. LetterRatioInURL               - Score: 0.2981
+21. Pay                            - Score: 0.2933
+22. NoOfImage                      - Score: 0.2459
+23. NoOfLettersInURL               - Score: 0.2349
+24. URLLength                      - Score: 0.2210
+25. DomainLength                   - Score: 0.2180
+26. NoOfDegitsInURL                - Score: 0.2137
+27. NoOfExternalRef                - Score: 0.2085
+28. NoOfiFrame                     - Score: 0.2055
+29. LineOfCode                     - Score: 0.1854
+30. NoOfSubDomain                  - Score: 0.1701
+31. Bank                           - Score: 0.1400
+32. HasExternalFormSubmit          - Score: 0.1371
+33. NoOfQMarkInURL                 - Score: 0.1187
+34. NoOfEmptyRef                   - Score: 0.1041
+35. HasPasswordField               - Score: 0.1008
+36. NoOfEqualsInURL                - Score: 0.0884
+37. Crypto                         - Score: 0.0713
+38. NoOfPopup                      - Score: 0.0645
+39. NoOfSelfRedirect               - Score: 0.0624
+40. TLDLength                      - Score: 0.0591
+41. LargestLineLength              - Score: 0.0553
+42. IsDomainIP                     - Score: 0.0405
+43. HasObfuscation                 - Score: 0.0368
+44. NoOfAmpersandInURL             - Score: 0.0330
+45. NoOfURLRedirect                - Score: 0.0329
+46. ObfuscationRatio               - Score: 0.0287
+47. NoOfObfuscatedChar             - Score: 0.0271
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. DomainTitleMatchScore          - Score: 0.9698
+ 3. IsHTTPS                        - Score: 0.9674
+ 4. NoOfJS                         - Score: 0.8221
+ 5. IsResponsive                   - Score: 0.7772
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. HasDescription                 - Score: 0.9105
+ 3. SpacialCharRatioInURL          - Score: 0.8730
+ 4. IsHTTPS                        - Score: 0.8278
+ 5. NoOfJS                         - Score: 0.7900
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7108
+ 3. SpacialCharRatioInURL          - Score: 0.6944
+ 4. DegitRatioInURL                - Score: 0.5555
+ 5. CharContinuationRate           - Score: 0.5305
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.9401
+ 3. HasCopyrightInfo               - Score: 0.8328
+ 4. DomainTitleMatchScore          - Score: 0.7432
+ 5. IsResponsive                   - Score: 0.7368
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8602
+ 3. HasDescription                 - Score: 0.7121
+ 4. DomainTitleMatchScore          - Score: 0.5393
+ 5. HasSubmitButton                - Score: 0.5373
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8602
+ 3. HasDescription                 - Score: 0.7121
+ 4. DomainTitleMatchScore          - Score: 0.5393
+ 5. HasSubmitButton                - Score: 0.5373
+ 6. IsHTTPS                        - Score: 0.5192
+ 7. NoOfJS                         - Score: 0.4886
+ 8. IsResponsive                   - Score: 0.4705
+ 9. URLTitleMatchScore             - Score: 0.4670
+10. HasHiddenFields                - Score: 0.4489
+11. SpacialCharRatioInURL          - Score: 0.4477
+12. HasFavicon                     - Score: 0.4206
+13. NoOfCSS                        - Score: 0.3871
+14. CharContinuationRate           - Score: 0.3768
+15. NoOfOtherSpecialCharsInURL     - Score: 0.3493
+16. NoOfSelfRef                    - Score: 0.3491
+17. HasTitle                       - Score: 0.3446
+18. Robots                         - Score: 0.3320
+19. DegitRatioInURL                - Score: 0.3223
+20. LetterRatioInURL               - Score: 0.2997
+21. Pay                            - Score: 0.2977
+22. NoOfImage                      - Score: 0.2445
+23. DomainLength                   - Score: 0.2174
+24. NoOfiFrame                     - Score: 0.2052
+25. NoOfExternalRef                - Score: 0.1661
+26. NoOfSubDomain                  - Score: 0.1651
+27. LineOfCode                     - Score: 0.1641
+28. NoOfDegitsInURL                - Score: 0.1481
+29. Bank                           - Score: 0.1422
+30. HasExternalFormSubmit          - Score: 0.1350
+31. NoOfQMarkInURL                 - Score: 0.1210
+32. URLLength                      - Score: 0.1186
+33. NoOfLettersInURL               - Score: 0.1141
+34. HasPasswordField               - Score: 0.1051
+35. NoOfEmptyRef                   - Score: 0.1008
+36. NoOfEqualsInURL                - Score: 0.0873
+37. Crypto                         - Score: 0.0671
+38. TLDLength                      - Score: 0.0634
+39. NoOfPopup                      - Score: 0.0618
+40. NoOfSelfRedirect               - Score: 0.0613
+41. LargestLineLength              - Score: 0.0504
+42. IsDomainIP                     - Score: 0.0391
+43. NoOfURLRedirect                - Score: 0.0388
+44. HasObfuscation                 - Score: 0.0343
+45. NoOfAmpersandInURL             - Score: 0.0330
+46. ObfuscationRatio               - Score: 0.0268
+47. NoOfObfuscatedChar             - Score: 0.0256
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8602
+ 3. HasDescription                 - Score: 0.7121
+ 4. DomainTitleMatchScore          - Score: 0.5393
+ 5. HasSubmitButton                - Score: 0.5373
+ 6. IsHTTPS                        - Score: 0.5192
+ 7. NoOfJS                         - Score: 0.4886
+ 8. IsResponsive                   - Score: 0.4705
+ 9. URLTitleMatchScore             - Score: 0.4670
+10. HasHiddenFields                - Score: 0.4489
+11. SpacialCharRatioInURL          - Score: 0.4477
+12. HasFavicon                     - Score: 0.4206
+13. NoOfCSS                        - Score: 0.3871
+14. CharContinuationRate           - Score: 0.3768
+15. NoOfOtherSpecialCharsInURL     - Score: 0.3493
+16. NoOfSelfRef                    - Score: 0.3491
+17. HasTitle                       - Score: 0.3446
+18. Robots                         - Score: 0.3320
+19. DegitRatioInURL                - Score: 0.3223
+20. LetterRatioInURL               - Score: 0.2997
+21. Pay                            - Score: 0.2977
+22. NoOfImage                      - Score: 0.2445
+23. DomainLength                   - Score: 0.2174
+24. NoOfiFrame                     - Score: 0.2052
+25. NoOfExternalRef                - Score: 0.1661
+26. NoOfSubDomain                  - Score: 0.1651
+27. LineOfCode                     - Score: 0.1641
+28. NoOfDegitsInURL                - Score: 0.1481
+29. Bank                           - Score: 0.1422
+30. HasExternalFormSubmit          - Score: 0.1350
+31. NoOfQMarkInURL                 - Score: 0.1210
+32. URLLength                      - Score: 0.1186
+33. NoOfLettersInURL               - Score: 0.1141
+34. HasPasswordField               - Score: 0.1051
+35. NoOfEmptyRef                   - Score: 0.1008
+36. NoOfEqualsInURL                - Score: 0.0873
+37. Crypto                         - Score: 0.0671
+38. TLDLength                      - Score: 0.0634
+39. NoOfPopup                      - Score: 0.0618
+40. NoOfSelfRedirect               - Score: 0.0613
+41. LargestLineLength              - Score: 0.0504
+42. IsDomainIP                     - Score: 0.0391
+43. NoOfURLRedirect                - Score: 0.0388
+44. HasObfuscation                 - Score: 0.0343
+45. NoOfAmpersandInURL             - Score: 0.0330
+46. ObfuscationRatio               - Score: 0.0268
+47. NoOfObfuscatedChar             - Score: 0.0256
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9907
+ 3. DomainTitleMatchScore          - Score: 0.9901
+ 4. NoOfJS                         - Score: 0.8239
+ 5. SpacialCharRatioInURL          - Score: 0.8046
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.9373
+ 3. HasDescription                 - Score: 0.9318
+ 4. URLTitleMatchScore             - Score: 0.8583
+ 5. IsHTTPS                        - Score: 0.8429
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7810
+ 3. SpacialCharRatioInURL          - Score: 0.7062
+ 4. DegitRatioInURL                - Score: 0.5541
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.5464
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. SpacialCharRatioInURL          - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.9794
+ 3. HasDescription                 - Score: 0.8836
+ 4. NoOfJS                         - Score: 0.8492
+ 5. CharContinuationRate           - Score: 0.7539
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8702
+ 3. HasDescription                 - Score: 0.7345
+ 4. DomainTitleMatchScore          - Score: 0.5510
+ 5. HasSubmitButton                - Score: 0.5416
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8702
+ 3. HasDescription                 - Score: 0.7345
+ 4. DomainTitleMatchScore          - Score: 0.5510
+ 5. HasSubmitButton                - Score: 0.5416
+ 6. IsHTTPS                        - Score: 0.5292
+ 7. URLTitleMatchScore             - Score: 0.4780
+ 8. IsResponsive                   - Score: 0.4761
+ 9. HasHiddenFields                - Score: 0.4561
+10. SpacialCharRatioInURL          - Score: 0.4492
+11. HasFavicon                     - Score: 0.4298
+12. NoOfJS                         - Score: 0.3963
+13. CharContinuationRate           - Score: 0.3789
+14. NoOfCSS                        - Score: 0.3706
+15. NoOfSelfRef                    - Score: 0.3572
+16. HasTitle                       - Score: 0.3516
+17. NoOfOtherSpecialCharsInURL     - Score: 0.3448
+18. Robots                         - Score: 0.3313
+19. DegitRatioInURL                - Score: 0.3266
+20. LetterRatioInURL               - Score: 0.2986
+21. Pay                            - Score: 0.2979
+22. NoOfImage                      - Score: 0.2467
+23. DomainLength                   - Score: 0.2200
+24. NoOfExternalRef                - Score: 0.2103
+25. NoOfiFrame                     - Score: 0.2076
+26. LineOfCode                     - Score: 0.1838
+27. NoOfSubDomain                  - Score: 0.1712
+28. NoOfDegitsInURL                - Score: 0.1493
+29. Bank                           - Score: 0.1490
+30. HasExternalFormSubmit          - Score: 0.1375
+31. URLLength                      - Score: 0.1189
+32. NoOfQMarkInURL                 - Score: 0.1169
+33. NoOfLettersInURL               - Score: 0.1145
+34. NoOfEmptyRef                   - Score: 0.1053
+35. HasPasswordField               - Score: 0.1052
+36. NoOfEqualsInURL                - Score: 0.0852
+37. Crypto                         - Score: 0.0734
+38. NoOfSelfRedirect               - Score: 0.0598
+39. TLDLength                      - Score: 0.0581
+40. LargestLineLength              - Score: 0.0517
+41. NoOfPopup                      - Score: 0.0484
+42. IsDomainIP                     - Score: 0.0433
+43. NoOfURLRedirect                - Score: 0.0372
+44. HasObfuscation                 - Score: 0.0328
+45. NoOfAmpersandInURL             - Score: 0.0311
+46. ObfuscationRatio               - Score: 0.0258
+47. NoOfObfuscatedChar             - Score: 0.0245
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8702
+ 3. HasDescription                 - Score: 0.7345
+ 4. DomainTitleMatchScore          - Score: 0.5510
+ 5. HasSubmitButton                - Score: 0.5416
+ 6. IsHTTPS                        - Score: 0.5292
+ 7. URLTitleMatchScore             - Score: 0.4780
+ 8. IsResponsive                   - Score: 0.4761
+ 9. HasHiddenFields                - Score: 0.4561
+10. SpacialCharRatioInURL          - Score: 0.4492
+11. HasFavicon                     - Score: 0.4298
+12. NoOfJS                         - Score: 0.3963
+13. CharContinuationRate           - Score: 0.3789
+14. NoOfCSS                        - Score: 0.3706
+15. NoOfSelfRef                    - Score: 0.3572
+16. HasTitle                       - Score: 0.3516
+17. NoOfOtherSpecialCharsInURL     - Score: 0.3448
+18. Robots                         - Score: 0.3313
+19. DegitRatioInURL                - Score: 0.3266
+20. LetterRatioInURL               - Score: 0.2986
+21. Pay                            - Score: 0.2979
+22. NoOfImage                      - Score: 0.2467
+23. DomainLength                   - Score: 0.2200
+24. NoOfExternalRef                - Score: 0.2103
+25. NoOfiFrame                     - Score: 0.2076
+26. LineOfCode                     - Score: 0.1838
+27. NoOfSubDomain                  - Score: 0.1712
+28. NoOfDegitsInURL                - Score: 0.1493
+29. Bank                           - Score: 0.1490
+30. HasExternalFormSubmit          - Score: 0.1375
+31. URLLength                      - Score: 0.1189
+32. NoOfQMarkInURL                 - Score: 0.1169
+33. NoOfLettersInURL               - Score: 0.1145
+34. NoOfEmptyRef                   - Score: 0.1053
+35. HasPasswordField               - Score: 0.1052
+36. NoOfEqualsInURL                - Score: 0.0852
+37. Crypto                         - Score: 0.0734
+38. NoOfSelfRedirect               - Score: 0.0598
+39. TLDLength                      - Score: 0.0581
+40. LargestLineLength              - Score: 0.0517
+41. NoOfPopup                      - Score: 0.0484
+42. IsDomainIP                     - Score: 0.0433
+43. NoOfURLRedirect                - Score: 0.0372
+44. HasObfuscation                 - Score: 0.0328
+45. NoOfAmpersandInURL             - Score: 0.0311
+46. ObfuscationRatio               - Score: 0.0258
+47. NoOfObfuscatedChar             - Score: 0.0245
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9979
+ 3. HasDescription                 - Score: 0.9888
+ 4. NoOfJS                         - Score: 0.8322
+ 5. SpacialCharRatioInURL          - Score: 0.8215
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.9483
+ 3. HasDescription                 - Score: 0.8946
+ 4. URLTitleMatchScore             - Score: 0.8591
+ 5. IsHTTPS                        - Score: 0.8286
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.7127
+ 3. SpacialCharRatioInURL          - Score: 0.7105
+ 4. DegitRatioInURL                - Score: 0.5527
+ 5. CharContinuationRate           - Score: 0.5307
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.9893
+ 3. SpacialCharRatioInURL          - Score: 0.9369
+ 4. DomainTitleMatchScore          - Score: 0.9089
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.7577
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8504
+ 3. HasDescription                 - Score: 0.7322
+ 4. DomainTitleMatchScore          - Score: 0.5455
+ 5. HasSubmitButton                - Score: 0.5427
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8504
+ 3. HasDescription                 - Score: 0.7322
+ 4. DomainTitleMatchScore          - Score: 0.5455
+ 5. HasSubmitButton                - Score: 0.5427
+ 6. IsHTTPS                        - Score: 0.5266
+ 7. IsResponsive                   - Score: 0.4783
+ 8. URLTitleMatchScore             - Score: 0.4749
+ 9. HasHiddenFields                - Score: 0.4600
+10. SpacialCharRatioInURL          - Score: 0.4495
+11. HasFavicon                     - Score: 0.4190
+12. NoOfJS                         - Score: 0.4054
+13. CharContinuationRate           - Score: 0.3783
+14. NoOfCSS                        - Score: 0.3768
+15. HasTitle                       - Score: 0.3501
+16. NoOfOtherSpecialCharsInURL     - Score: 0.3497
+17. NoOfSelfRef                    - Score: 0.3460
+18. Robots                         - Score: 0.3379
+19. DegitRatioInURL                - Score: 0.3266
+20. LetterRatioInURL               - Score: 0.3013
+21. Pay                            - Score: 0.2976
+22. NoOfImage                      - Score: 0.2418
+23. LineOfCode                     - Score: 0.2244
+24. DomainLength                   - Score: 0.2215
+25. NoOfiFrame                     - Score: 0.2105
+26. NoOfSubDomain                  - Score: 0.1729
+27. NoOfExternalRef                - Score: 0.1677
+28. NoOfDegitsInURL                - Score: 0.1492
+29. Bank                           - Score: 0.1482
+30. HasExternalFormSubmit          - Score: 0.1368
+31. NoOfQMarkInURL                 - Score: 0.1207
+32. URLLength                      - Score: 0.1198
+33. NoOfLettersInURL               - Score: 0.1158
+34. HasPasswordField               - Score: 0.1070
+35. NoOfEmptyRef                   - Score: 0.1010
+36. NoOfEqualsInURL                - Score: 0.0886
+37. Crypto                         - Score: 0.0706
+38. NoOfSelfRedirect               - Score: 0.0624
+39. TLDLength                      - Score: 0.0558
+40. LargestLineLength              - Score: 0.0511
+41. NoOfPopup                      - Score: 0.0505
+42. IsDomainIP                     - Score: 0.0393
+43. NoOfURLRedirect                - Score: 0.0375
+44. HasObfuscation                 - Score: 0.0339
+45. NoOfAmpersandInURL             - Score: 0.0315
+46. ObfuscationRatio               - Score: 0.0266
+47. NoOfObfuscatedChar             - Score: 0.0256
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8504
+ 3. HasDescription                 - Score: 0.7322
+ 4. DomainTitleMatchScore          - Score: 0.5455
+ 5. HasSubmitButton                - Score: 0.5427
+ 6. IsHTTPS                        - Score: 0.5266
+ 7. IsResponsive                   - Score: 0.4783
+ 8. URLTitleMatchScore             - Score: 0.4749
+ 9. HasHiddenFields                - Score: 0.4600
+10. SpacialCharRatioInURL          - Score: 0.4495
+11. HasFavicon                     - Score: 0.4190
+12. NoOfJS                         - Score: 0.4054
+13. CharContinuationRate           - Score: 0.3783
+14. NoOfCSS                        - Score: 0.3768
+15. HasTitle                       - Score: 0.3501
+16. NoOfOtherSpecialCharsInURL     - Score: 0.3497
+17. NoOfSelfRef                    - Score: 0.3460
+18. Robots                         - Score: 0.3379
+19. DegitRatioInURL                - Score: 0.3266
+20. LetterRatioInURL               - Score: 0.3013
+21. Pay                            - Score: 0.2976
+22. NoOfImage                      - Score: 0.2418
+23. LineOfCode                     - Score: 0.2244
+24. DomainLength                   - Score: 0.2215
+25. NoOfiFrame                     - Score: 0.2105
+26. NoOfSubDomain                  - Score: 0.1729
+27. NoOfExternalRef                - Score: 0.1677
+28. NoOfDegitsInURL                - Score: 0.1492
+29. Bank                           - Score: 0.1482
+30. HasExternalFormSubmit          - Score: 0.1368
+31. NoOfQMarkInURL                 - Score: 0.1207
+32. URLLength                      - Score: 0.1198
+33. NoOfLettersInURL               - Score: 0.1158
+34. HasPasswordField               - Score: 0.1070
+35. NoOfEmptyRef                   - Score: 0.1010
+36. NoOfEqualsInURL                - Score: 0.0886
+37. Crypto                         - Score: 0.0706
+38. NoOfSelfRedirect               - Score: 0.0624
+39. TLDLength                      - Score: 0.0558
+40. LargestLineLength              - Score: 0.0511
+41. NoOfPopup                      - Score: 0.0505
+42. IsDomainIP                     - Score: 0.0393
+43. NoOfURLRedirect                - Score: 0.0375
+44. HasObfuscation                 - Score: 0.0339
+45. NoOfAmpersandInURL             - Score: 0.0315
+46. ObfuscationRatio               - Score: 0.0266
+47. NoOfObfuscatedChar             - Score: 0.0256
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasDescription                 - Score: 1.0000
+ 2. IsHTTPS                        - Score: 0.9790
+ 3. DomainTitleMatchScore          - Score: 0.9689
+ 4. NoOfJS                         - Score: 0.8223
+ 5. SpacialCharRatioInURL          - Score: 0.7737
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. SpacialCharRatioInURL          - Score: 0.9284
+ 3. HasDescription                 - Score: 0.9099
+ 4. URLTitleMatchScore             - Score: 0.8610
+ 5. IsHTTPS                        - Score: 0.8209
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. DomainTitleMatchScore          - Score: 1.0000
+ 2. LetterRatioInURL               - Score: 0.8131
+ 3. SpacialCharRatioInURL          - Score: 0.6981
+ 4. DegitRatioInURL                - Score: 0.5691
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.5633
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. SpacialCharRatioInURL          - Score: 1.0000
+ 2. HasDescription                 - Score: 0.9909
+ 3. HasCopyrightInfo               - Score: 0.9650
+ 4. HasSubmitButton                - Score: 0.8488
+ 5. NoOfOtherSpecialCharsInURL     - Score: 0.7964
+================================================================================
+  wrote C:\personal\grad-school\reproduce\outputs\table_6_1.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_6_1.csv

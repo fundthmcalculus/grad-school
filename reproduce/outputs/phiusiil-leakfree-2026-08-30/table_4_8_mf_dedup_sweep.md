@@ -1,0 +1,96 @@
+**Table 4.8 (detail) — full per-multiplier sweep**
+
+| Dataset | Task | Multiplier | Raw MF | Dedup MF (mean±std) | Delta (mean±std) | CI excludes zero |
+|---|---|---|---|---|---|---|
+| Glass | classification | 0.1 | 81.4 | 72.10 ± 4.58 | +0.00000 ± 0.00000 | no |
+| Glass | classification | 0.3 | 81.4 | 72.10 ± 4.58 | +0.00000 ± 0.00000 | no |
+| Glass | classification | 1 | 81.4 | 71.00 ± 4.27 | +0.00154 ± 0.00487 | no |
+| Glass | classification | 2 | 81.4 | 68.90 ± 4.93 | -0.00154 ± 0.00487 | no |
+| Glass | classification | 3 | 81.4 | 66.50 ± 5.28 | -0.00154 ± 0.00487 | no |
+| Glass | classification | 5 | 81.4 | 61.30 ± 5.77 | +0.00000 ± 0.00725 | no |
+| Glass | classification | 7 | 81.4 | 56.90 ± 5.24 | -0.01077 ± 0.01460 | yes |
+| Glass | classification | 10 | 81.4 | 51.50 ± 5.04 | -0.03077 ± 0.03161 | yes |
+| Glass | classification | 15 | 81.4 | 42.00 ± 4.14 | -0.03538 ± 0.05332 | no |
+| Glass | classification | 20 | 81.4 | 34.10 ± 3.00 | -0.06000 ± 0.06044 | yes |
+| Glass | classification | 30 | 81.4 | 20.80 ± 2.70 | -0.06154 ± 0.08237 | yes |
+| Glass | classification | 50 | 81.4 | 10.90 ± 2.28 | -0.15385 ± 0.14916 | yes |
+| Glass | classification | 70 | 81.4 | 5.40 ± 1.26 | -0.16923 ± 0.06647 | yes |
+| Glass | classification | 100 | 81.4 | 2.10 ± 0.88 | -0.20923 ± 0.04303 | yes |
+| Wine | classification | 0.1 | 16.6 | 16.60 ± 0.70 | +0.00000 ± 0.00000 | no |
+| Wine | classification | 0.3 | 16.6 | 16.60 ± 0.70 | +0.00000 ± 0.00000 | no |
+| Wine | classification | 1 | 16.6 | 16.60 ± 0.70 | +0.00000 ± 0.00000 | no |
+| Wine | classification | 2 | 16.6 | 16.60 ± 0.70 | +0.00000 ± 0.00000 | no |
+| Wine | classification | 3 | 16.6 | 16.60 ± 0.70 | +0.00000 ± 0.00000 | no |
+| Wine | classification | 5 | 16.6 | 16.50 ± 0.71 | -0.00741 ± 0.02342 | no |
+| Wine | classification | 7 | 16.6 | 16.20 ± 0.42 | -0.00741 ± 0.02342 | no |
+| Wine | classification | 10 | 16.6 | 15.00 ± 1.05 | -0.01667 ± 0.02217 | yes |
+| Wine | classification | 15 | 16.6 | 13.60 ± 1.96 | -0.02222 ± 0.01913 | yes |
+| Wine | classification | 20 | 16.6 | 11.60 ± 1.17 | -0.02963 ± 0.03924 | yes |
+| Wine | classification | 30 | 16.6 | 9.60 ± 0.97 | -0.06296 ± 0.05395 | yes |
+| Wine | classification | 50 | 16.6 | 6.10 ± 0.74 | -0.21111 ± 0.14323 | yes |
+| Wine | classification | 70 | 16.6 | 5.00 ± 0.94 | -0.30926 ± 0.20879 | yes |
+| Wine | classification | 100 | 16.6 | 2.10 ± 0.57 | -0.62593 ± 0.01913 | yes |
+| BreastCancer | classification | 0.1 | 16.4 | 16.40 ± 1.90 | +0.00000 ± 0.00000 | no |
+| BreastCancer | classification | 0.3 | 16.4 | 16.40 ± 1.90 | +0.00000 ± 0.00000 | no |
+| BreastCancer | classification | 1 | 16.4 | 16.40 ± 1.90 | +0.00000 ± 0.00000 | no |
+| BreastCancer | classification | 2 | 16.4 | 16.40 ± 1.90 | +0.00000 ± 0.00000 | no |
+| BreastCancer | classification | 3 | 16.4 | 16.20 ± 1.87 | -0.00117 ± 0.00370 | no |
+| BreastCancer | classification | 5 | 16.4 | 16.20 ± 1.87 | -0.00117 ± 0.00370 | no |
+| BreastCancer | classification | 7 | 16.4 | 15.90 ± 1.60 | -0.00117 ± 0.00370 | no |
+| BreastCancer | classification | 10 | 16.4 | 14.40 ± 1.35 | -0.00351 ± 0.00565 | no |
+| BreastCancer | classification | 15 | 16.4 | 12.40 ± 1.51 | -0.00292 ± 0.00925 | no |
+| BreastCancer | classification | 20 | 16.4 | 10.20 ± 0.92 | -0.00117 ± 0.01287 | no |
+| BreastCancer | classification | 30 | 16.4 | 8.20 ± 0.79 | -0.00994 ± 0.01871 | no |
+| BreastCancer | classification | 50 | 16.4 | 5.50 ± 0.53 | -0.05497 ± 0.07881 | no |
+| BreastCancer | classification | 70 | 16.4 | 3.30 ± 0.82 | -0.34854 ± 0.27197 | yes |
+| BreastCancer | classification | 100 | 16.4 | 1.00 ± 0.00 | -0.56374 ± 0.02048 | yes |
+| Digits | classification | 0.1 | 172.2 | 163.60 ± 3.37 | +0.00000 ± 0.00000 | no |
+| Digits | classification | 0.3 | 172.2 | 163.10 ± 3.28 | +0.00019 ± 0.00059 | no |
+| Digits | classification | 1 | 172.2 | 157.50 ± 3.47 | +0.00093 ± 0.00293 | no |
+| Digits | classification | 2 | 172.2 | 148.30 ± 2.98 | -0.00093 ± 0.00279 | no |
+| Digits | classification | 3 | 172.2 | 135.60 ± 4.67 | -0.00167 ± 0.00582 | no |
+| Digits | classification | 5 | 172.2 | 115.30 ± 5.01 | -0.00278 ± 0.01515 | no |
+| Digits | classification | 7 | 172.2 | 96.10 ± 6.24 | -0.01167 ± 0.02227 | no |
+| Digits | classification | 10 | 172.2 | 75.00 ± 4.08 | -0.01889 ± 0.02850 | no |
+| Digits | classification | 15 | 172.2 | 53.10 ± 4.12 | -0.02463 ± 0.03405 | yes |
+| Digits | classification | 20 | 172.2 | 38.40 ± 2.46 | -0.03056 ± 0.02881 | yes |
+| Digits | classification | 30 | 172.2 | 22.60 ± 2.55 | -0.03556 ± 0.04775 | yes |
+| Digits | classification | 50 | 172.2 | 12.90 ± 0.99 | -0.02574 ± 0.06687 | no |
+| Digits | classification | 70 | 172.2 | 10.20 ± 1.14 | -0.02333 ± 0.06496 | no |
+| Digits | classification | 100 | 172.2 | 3.50 ± 1.18 | -0.13389 ± 0.08745 | yes |
+| Concrete | regression | 0.1 | 63.2 | 62.60 ± 3.98 | +0.00000 ± 0.00000 | no |
+| Concrete | regression | 0.3 | 63.2 | 62.60 ± 3.98 | +0.00000 ± 0.00000 | no |
+| Concrete | regression | 1 | 63.2 | 62.60 ± 3.98 | +0.00000 ± 0.00000 | no |
+| Concrete | regression | 2 | 63.2 | 62.50 ± 3.89 | +0.00011 ± 0.00033 | no |
+| Concrete | regression | 3 | 63.2 | 62.10 ± 3.87 | -0.00021 ± 0.00150 | no |
+| Concrete | regression | 5 | 63.2 | 61.20 ± 4.08 | -0.00105 ± 0.00235 | no |
+| Concrete | regression | 7 | 63.2 | 60.40 ± 4.03 | -0.00099 ± 0.00231 | no |
+| Concrete | regression | 10 | 63.2 | 58.40 ± 3.86 | -0.01221 ± 0.03315 | no |
+| Concrete | regression | 15 | 63.2 | 50.40 ± 3.69 | -0.11237 ± 0.09501 | yes |
+| Concrete | regression | 20 | 63.2 | 43.70 ± 3.43 | -0.30295 ± 0.34873 | yes |
+| Concrete | regression | 30 | 63.2 | 32.90 ± 2.85 | -1.18519 ± 0.39908 | yes |
+| Concrete | regression | 50 | 63.2 | 22.80 ± 2.49 | -4.00730 ± 1.25195 | yes |
+| Concrete | regression | 70 | 63.2 | 13.30 ± 2.45 | -5.40043 ± 0.37148 | yes |
+| Concrete | regression | 100 | 63.2 | 6.20 ± 1.32 | -5.41537 ± 0.35775 | yes |
+| Diabetes | regression | 0.1 | 41.6 | 38.40 ± 1.51 | +0.00000 ± 0.00000 | no |
+| Diabetes | regression | 0.3 | 41.6 | 38.40 ± 1.51 | +0.00000 ± 0.00000 | no |
+| Diabetes | regression | 1 | 41.6 | 36.20 ± 1.87 | +0.00568 ± 0.01779 | no |
+| Diabetes | regression | 2 | 41.6 | 31.40 ± 2.41 | +0.00528 ± 0.01603 | no |
+| Diabetes | regression | 3 | 41.6 | 26.80 ± 2.10 | -0.00566 ± 0.02442 | no |
+| Diabetes | regression | 5 | 41.6 | 20.00 ± 1.70 | -0.03231 ± 0.03083 | yes |
+| Diabetes | regression | 7 | 41.6 | 16.60 ± 2.63 | -0.04973 ± 0.03768 | yes |
+| Diabetes | regression | 10 | 41.6 | 13.20 ± 1.62 | -0.05387 ± 0.06115 | yes |
+| Diabetes | regression | 15 | 41.6 | 8.90 ± 1.20 | -0.52005 ± 0.63394 | yes |
+| Diabetes | regression | 20 | 41.6 | 5.80 ± 1.14 | -0.09609 ± 0.09322 | yes |
+| Diabetes | regression | 30 | 41.6 | 2.10 ± 0.74 | -0.51759 ± 0.55590 | yes |
+| Diabetes | regression | 50 | 41.6 | 1.10 ± 0.32 | -0.65141 ± 0.58978 | yes |
+| Diabetes | regression | 70 | 41.6 | 1.00 ± 0.00 | -0.70060 ± 0.56964 | yes |
+| Diabetes | regression | 100 | 41.6 | 1.00 ± 0.00 | -0.70060 ± 0.56964 | yes |
+
+> Full grid behind Table 4.8's summary row per dataset. "CI excludes zero" is the per-step version of the max-lossless rule.
+
+> Generated by `reproduce/`; seeds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]. `N/A` marks a cell whose method/dataset was unavailable.
+
+> **Machine.** host: NEX-210200 · os: Windows-11 · cpu: Intel(R) Core(TM) i9-14900HX · cores: 32 physical, 32 logical · ram: 95.6 GiB · gpu: NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB · python: 3.13.7
+>
+> Wall-clock times are machine-dependent; ratios are not. Markdown tables report normalized ratios where a timing is involved, and the companion CSV carries the absolute seconds.

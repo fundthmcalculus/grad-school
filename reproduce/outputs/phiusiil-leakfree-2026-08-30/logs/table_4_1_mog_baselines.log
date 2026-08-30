@@ -1,0 +1,746 @@
+Table 4.1 -- MoG training time & accuracy vs. baselines
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9399
+ 3. Water                          - Score: 0.7560
+ 4. Superplasticizer               - Score: 0.7115
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.3678
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9505
+ 3. Water                          - Score: 0.7745
+ 4. Superplasticizer               - Score: 0.7169
+ 5. Slag                           - Score: 0.3692
+ 6. CoarseAgg                      - Score: 0.3635
+ 7. FineAgg                        - Score: 0.2567
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9198
+ 3. Water                          - Score: 0.6974
+ 4. Superplasticizer               - Score: 0.6340
+ 5. Slag                           - Score: 0.3815
+ 6. CoarseAgg                      - Score: 0.3367
+ 7. FineAgg                        - Score: 0.2695
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9675
+ 3. Water                          - Score: 0.7472
+ 4. Superplasticizer               - Score: 0.7047
+ 5. Slag                           - Score: 0.4047
+ 6. CoarseAgg                      - Score: 0.3548
+ 7. FlyAsh                         - Score: 0.3396
+ 8. FineAgg                        - Score: 0.2754
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9399
+ 3. Water                          - Score: 0.7560
+ 4. Superplasticizer               - Score: 0.7115
+ 5. CoarseAgg                      - Score: 0.3931
+ 6. Slag                           - Score: 0.3678
+ 7. FlyAsh                         - Score: 0.2489
+ 8. FineAgg                        - Score: 0.2433
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9367
+ 3. Water                          - Score: 0.7033
+ 4. Superplasticizer               - Score: 0.6242
+ 5. Slag                           - Score: 0.3392
+ 6. CoarseAgg                      - Score: 0.3285
+ 7. FlyAsh                         - Score: 0.2729
+ 8. FineAgg                        - Score: 0.2608
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9127
+ 3. Water                          - Score: 0.7100
+ 4. Superplasticizer               - Score: 0.6209
+ 5. Slag                           - Score: 0.3390
+ 6. CoarseAgg                      - Score: 0.3118
+ 7. FlyAsh                         - Score: 0.2938
+ 8. FineAgg                        - Score: 0.2617
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.8268
+ 3. Water                          - Score: 0.6980
+ 4. Superplasticizer               - Score: 0.6469
+ 5. Slag                           - Score: 0.3712
+ 6. CoarseAgg                      - Score: 0.3693
+ 7. FlyAsh                         - Score: 0.3215
+ 8. FineAgg                        - Score: 0.2506
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9200
+ 3. Water                          - Score: 0.6995
+ 4. Superplasticizer               - Score: 0.6378
+ 5. Slag                           - Score: 0.3521
+ 6. CoarseAgg                      - Score: 0.3260
+ 7. FlyAsh                         - Score: 0.3014
+ 8. FineAgg                        - Score: 0.2497
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9505
+ 3. Water                          - Score: 0.7745
+ 4. Superplasticizer               - Score: 0.7169
+ 5. Slag                           - Score: 0.3692
+ 6. CoarseAgg                      - Score: 0.3635
+ 7. FineAgg                        - Score: 0.2567
+ 8. FlyAsh                         - Score: 0.2405
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9793
+ 3. Water                          - Score: 0.6937
+ 4. Superplasticizer               - Score: 0.6288
+ 5. Slag                           - Score: 0.4189
+ 6. CoarseAgg                      - Score: 0.3302
+ 7. FlyAsh                         - Score: 0.3001
+ 8. FineAgg                        - Score: 0.2959
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9198
+ 3. Water                          - Score: 0.6974
+ 4. Superplasticizer               - Score: 0.6340
+ 5. Slag                           - Score: 0.3815
+ 6. CoarseAgg                      - Score: 0.3367
+ 7. FineAgg                        - Score: 0.2695
+ 8. FlyAsh                         - Score: 0.2359
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. Cement                         - Score: 1.0000
+ 2. Age                            - Score: 0.9266
+ 3. Water                          - Score: 0.6824
+ 4. Superplasticizer               - Score: 0.6071
+ 5. Slag                           - Score: 0.3354
+ 6. FlyAsh                         - Score: 0.3322
+ 7. CoarseAgg                      - Score: 0.3198
+ 8. FineAgg                        - Score: 0.2252
+================================================================================
+  [anfis] 824x8: grid partition, 256 rules
+  [gafis] 824x8: grid, 256 rules, pop 20 x 15 gen
+  [bikeshare] loaded data\bikeshare-hour.csv: 17379 rows × 12 features
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. atemp                          - Score: 0.6988
+ 3. temp                           - Score: 0.6973
+ 4. hr                             - Score: 0.6217
+ 5. hum                            - Score: 0.4781
+ 6. mnth                           - Score: 0.3363
+ 7. season                         - Score: 0.3252
+ 8. workingday                     - Score: 0.2826
+ 9. weathersit                     - Score: 0.2806
+10. windspeed                      - Score: 0.1467
+11. weekday                        - Score: 0.1414
+12. holiday                        - Score: 0.1252
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. atemp                          - Score: 0.6988
+ 3. temp                           - Score: 0.6973
+ 4. hr                             - Score: 0.6217
+ 5. hum                            - Score: 0.4781
+ 6. mnth                           - Score: 0.3363
+ 7. season                         - Score: 0.3252
+ 8. workingday                     - Score: 0.2826
+ 9. weathersit                     - Score: 0.2806
+10. windspeed                      - Score: 0.1467
+11. weekday                        - Score: 0.1414
+12. holiday                        - Score: 0.1252
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. atemp                          - Score: 0.7084
+ 3. temp                           - Score: 0.6931
+ 4. hr                             - Score: 0.6072
+ 5. hum                            - Score: 0.4482
+ 6. workingday                     - Score: 0.3446
+ 7. mnth                           - Score: 0.3333
+ 8. season                         - Score: 0.3225
+ 9. weathersit                     - Score: 0.2530
+10. weekday                        - Score: 0.1738
+11. holiday                        - Score: 0.1679
+12. windspeed                      - Score: 0.1209
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. temp                           - Score: 0.7165
+ 3. atemp                          - Score: 0.7105
+ 4. hr                             - Score: 0.6159
+ 5. hum                            - Score: 0.4476
+ 6. workingday                     - Score: 0.3387
+ 7. mnth                           - Score: 0.3205
+ 8. season                         - Score: 0.3050
+ 9. weathersit                     - Score: 0.2640
+10. weekday                        - Score: 0.1599
+11. holiday                        - Score: 0.1408
+12. windspeed                      - Score: 0.1257
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. temp                           - Score: 0.7255
+ 3. atemp                          - Score: 0.7233
+ 4. hr                             - Score: 0.6214
+ 5. hum                            - Score: 0.4711
+ 6. mnth                           - Score: 0.3312
+ 7. season                         - Score: 0.3049
+ 8. workingday                     - Score: 0.2691
+ 9. weathersit                     - Score: 0.2511
+10. weekday                        - Score: 0.1343
+11. holiday                        - Score: 0.1316
+12. windspeed                      - Score: 0.1158
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. temp                           - Score: 0.6878
+ 3. atemp                          - Score: 0.6836
+ 4. hr                             - Score: 0.6024
+ 5. hum                            - Score: 0.4519
+ 6. workingday                     - Score: 0.3304
+ 7. mnth                           - Score: 0.3170
+ 8. season                         - Score: 0.3023
+ 9. weathersit                     - Score: 0.2636
+10. weekday                        - Score: 0.1600
+11. windspeed                      - Score: 0.1270
+12. holiday                        - Score: 0.1254
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. atemp                          - Score: 0.7202
+ 3. temp                           - Score: 0.7158
+ 4. hr                             - Score: 0.6195
+ 5. hum                            - Score: 0.4735
+ 6. mnth                           - Score: 0.3096
+ 7. season                         - Score: 0.3024
+ 8. workingday                     - Score: 0.2896
+ 9. weathersit                     - Score: 0.2637
+10. weekday                        - Score: 0.1513
+11. windspeed                      - Score: 0.1285
+12. holiday                        - Score: 0.1263
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. temp                           - Score: 0.7378
+ 3. atemp                          - Score: 0.7290
+ 4. hr                             - Score: 0.6204
+ 5. hum                            - Score: 0.4582
+ 6. mnth                           - Score: 0.3146
+ 7. workingday                     - Score: 0.3079
+ 8. season                         - Score: 0.2962
+ 9. weathersit                     - Score: 0.2686
+10. weekday                        - Score: 0.1523
+11. holiday                        - Score: 0.1266
+12. windspeed                      - Score: 0.1207
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. temp                           - Score: 0.7057
+ 3. atemp                          - Score: 0.6947
+ 4. hr                             - Score: 0.6150
+ 5. hum                            - Score: 0.4463
+ 6. mnth                           - Score: 0.3631
+ 7. season                         - Score: 0.3581
+ 8. workingday                     - Score: 0.3357
+ 9. weathersit                     - Score: 0.2191
+10. weekday                        - Score: 0.1600
+11. holiday                        - Score: 0.1416
+12. windspeed                      - Score: 0.1256
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. temp                           - Score: 0.7059
+ 3. atemp                          - Score: 0.7032
+ 4. hr                             - Score: 0.6212
+ 5. hum                            - Score: 0.4700
+ 6. mnth                           - Score: 0.3198
+ 7. season                         - Score: 0.3019
+ 8. workingday                     - Score: 0.2991
+ 9. weathersit                     - Score: 0.2409
+10. weekday                        - Score: 0.1515
+11. windspeed                      - Score: 0.1320
+12. holiday                        - Score: 0.1274
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. yr                             - Score: 1.0000
+ 2. temp                           - Score: 0.7189
+ 3. atemp                          - Score: 0.7102
+ 4. hr                             - Score: 0.6359
+ 5. hum                            - Score: 0.4675
+ 6. workingday                     - Score: 0.3384
+ 7. mnth                           - Score: 0.3317
+ 8. season                         - Score: 0.3174
+ 9. weathersit                     - Score: 0.2755
+10. weekday                        - Score: 0.1673
+11. windspeed                      - Score: 0.1493
+12. holiday                        - Score: 0.1252
+================================================================================
+  [anfis] 13903x12: scatter partition, 12 rules
+  [gafis] 13903x12: scatter, 12 rules, pop 20 x 15 gen
+  [phiusiil] loaded data\PhiUSIIL_Phishing_URL_Dataset.csv: 20000 rows × 47 features  (3 leaks dropped: URLSimilarityIndex, TLDLegitimateProb, URLCharProb)
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7210
+ 4. DomainTitleMatchScore          - Score: 0.5451
+ 5. HasSubmitButton                - Score: 0.5374
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7210
+ 4. DomainTitleMatchScore          - Score: 0.5451
+ 5. HasSubmitButton                - Score: 0.5374
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8588
+ 3. HasDescription                 - Score: 0.7256
+ 4. HasSubmitButton                - Score: 0.5488
+ 5. DomainTitleMatchScore          - Score: 0.5386
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8595
+ 3. HasDescription                 - Score: 0.7322
+ 4. DomainTitleMatchScore          - Score: 0.5485
+ 5. HasSubmitButton                - Score: 0.5373
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8546
+ 3. HasDescription                 - Score: 0.7176
+ 4. DomainTitleMatchScore          - Score: 0.5467
+ 5. HasSubmitButton                - Score: 0.5368
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8559
+ 3. HasDescription                 - Score: 0.7214
+ 4. HasSubmitButton                - Score: 0.5354
+ 5. DomainTitleMatchScore          - Score: 0.5346
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8440
+ 3. HasDescription                 - Score: 0.7319
+ 4. DomainTitleMatchScore          - Score: 0.5434
+ 5. HasSubmitButton                - Score: 0.5372
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8553
+ 3. HasDescription                 - Score: 0.7330
+ 4. DomainTitleMatchScore          - Score: 0.5450
+ 5. HasSubmitButton                - Score: 0.5363
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8602
+ 3. HasDescription                 - Score: 0.7121
+ 4. DomainTitleMatchScore          - Score: 0.5393
+ 5. HasSubmitButton                - Score: 0.5373
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8702
+ 3. HasDescription                 - Score: 0.7345
+ 4. DomainTitleMatchScore          - Score: 0.5510
+ 5. HasSubmitButton                - Score: 0.5416
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. HasSocialNet                   - Score: 1.0000
+ 2. HasCopyrightInfo               - Score: 0.8504
+ 3. HasDescription                 - Score: 0.7322
+ 4. DomainTitleMatchScore          - Score: 0.5455
+ 5. HasSubmitButton                - Score: 0.5427
+================================================================================
+  [anfis] 16000x47: scatter partition, 12 rules, 2 classes
+  [gafis] 16000x47: scatter, 12 rules, 2 classes, pop 20 x 15 gen
+  [rt-iot2022] loaded data\RT_IOT2022.csv: 123117 rows × 81 features
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.6712
+ 3. fwd_last_window_size           - Score: 0.6546
+ 4. fwd_pkts_payload.max           - Score: 0.4994
+ 5. flow_pkts_payload.max          - Score: 0.4384
+================================================================================
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.6712
+ 3. fwd_last_window_size           - Score: 0.6546
+ 4. fwd_pkts_payload.max           - Score: 0.4994
+ 5. flow_pkts_payload.max          - Score: 0.4384
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.6809
+ 3. fwd_last_window_size           - Score: 0.6741
+ 4. fwd_pkts_payload.max           - Score: 0.5019
+ 5. flow_pkts_payload.max          - Score: 0.4456
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_init_window_size           - Score: 1.0000
+ 2. fwd_last_window_size           - Score: 0.9603
+ 3. fwd_pkts_payload.avg           - Score: 0.8571
+ 4. fwd_pkts_payload.max           - Score: 0.4575
+ 5. flow_pkts_payload.max          - Score: 0.4092
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.6920
+ 3. fwd_last_window_size           - Score: 0.6617
+ 4. fwd_pkts_payload.max           - Score: 0.5073
+ 5. flow_pkts_payload.max          - Score: 0.4447
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.7047
+ 3. fwd_last_window_size           - Score: 0.6699
+ 4. fwd_pkts_payload.max           - Score: 0.5001
+ 5. flow_pkts_payload.max          - Score: 0.4434
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.6787
+ 3. fwd_last_window_size           - Score: 0.6561
+ 4. fwd_pkts_payload.max           - Score: 0.4992
+ 5. flow_pkts_payload.max          - Score: 0.4433
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.7167
+ 3. fwd_last_window_size           - Score: 0.6552
+ 4. fwd_pkts_payload.max           - Score: 0.5128
+ 5. flow_pkts_payload.max          - Score: 0.4540
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.6849
+ 3. fwd_last_window_size           - Score: 0.6237
+ 4. fwd_pkts_payload.max           - Score: 0.5074
+ 5. flow_pkts_payload.max          - Score: 0.4322
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.5517
+ 3. fwd_last_window_size           - Score: 0.5130
+ 4. fwd_pkts_payload.max           - Score: 0.4878
+ 5. flow_pkts_payload.max          - Score: 0.4442
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+
+Features Ranked by Differentiation Strength:
+================================================================================
+ 1. fwd_pkts_payload.avg           - Score: 1.0000
+ 2. fwd_init_window_size           - Score: 0.6661
+ 3. fwd_last_window_size           - Score: 0.6472
+ 4. fwd_pkts_payload.max           - Score: 0.4801
+ 5. flow_pkts_payload.max          - Score: 0.4227
+================================================================================
+  [anfis] 98493x81: scatter partition, 12 rules, 12 classes
+  [gafis] 98493x81: scatter, 12 rules, 12 classes, pop 20 x 15 gen
+  wrote C:\personal\grad-school\reproduce\outputs\table_4_1.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_4_1.csv
+  wrote C:\personal\grad-school\reproduce\outputs\table_4_1b_baseline_timing.md
+  wrote C:\personal\grad-school\reproduce\outputs\table_4_1b_baseline_timing.csv

@@ -1,0 +1,7 @@
+arm,held-out accuracy,held-out macro-F1,seeds
+Ch5 graded U -> TSK (0th),0.897 ± 0.006,0.385 ± 0.030,10
+Ch5 crisp assign -> TSK (0th),0.898 ± 0.005,0.384 ± 0.024,10
+Ch5 graded U inductive -> TSK (0th),0.905 ± 0.017,0.397 ± 0.040,10
+Ch5 crisp assign inductive -> TSK (0th),0.909 ± 0.016,0.412 ± 0.044,10
+global 1-rule TSK (0th),0.584,0.147,10
+floor: majority class,0.584,0.147,10
