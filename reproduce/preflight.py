@@ -260,6 +260,22 @@ def _pin_match():
     what this reads.
 
     A local-directory install cannot drift, so it passes without comment.
+
+    Note which pairs are actually live, because it changed. tribble-fis#233
+    moved `tribble-clustering` out of tribble-fis's dependencies into an
+    optional extra, so the `fis` suite no longer sees that distribution at all
+    and reports on `optimizers` and `tribble-fis` only. That is not lost
+    coverage: the drift axis it was watching -- tribble-fis pinning a
+    clustering revision different from the submodule the archive records -- no
+    longer exists, because tribble-fis no longer pins one. Where clustering
+    still runs (the `cluster` suite, and the reproduce/optimizers studies via
+    `--with-editable tribble-cluster`) it is a directory install of the
+    submodule, which is the checkout by definition.
+
+    The one way to reintroduce the axis is to install tribble-fis's `clustering`
+    extra instead of the submodule. Do not: it resolves from tribble-fis's lock,
+    while PROVENANCE.txt records the submodule SHA, and those are the two things
+    this check exists to keep equal.
     """
     import importlib.metadata as md
     import json

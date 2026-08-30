@@ -636,12 +636,18 @@ PROV="$DEST/PROVENANCE.txt"
   echo "tribble-opt: $(git -C "$ROOT/tribble-opt" rev-parse HEAD)"
   echo "grad-school: $(git -C "$ROOT" rev-parse HEAD)"
   # The three lines above are the submodule CHECKOUTS. They are not necessarily
-  # the code that ran. tribble-fis sources tribble-clustering and optimizers from
-  # git URLs with no revision, so `uv run --project tribble-fis` resolves both
-  # from tribble-fis's own uv.lock and never looks at the sibling checkouts --
+  # the code that ran. tribble-fis sources optimizers from a git URL, so
+  # `uv run --project tribble-fis` resolves it from tribble-fis's own uv.lock
+  # and never looks at the sibling checkout --
   # and for nine days in August 2026 those were five and eleven commits apart
   # respectively, across seeding and correctness fixes, while this file recorded
-  # only the checkouts (checklist B18). So record what was actually imported,
+  # only the checkouts (checklist B18). tribble-clustering was the other half of
+  # that pair until tribble-fis#233 moved it out of tribble-fis's dependencies
+  # into an optional extra; it is no longer resolved in this environment, so the
+  # probe below reports it "not installed" here and that is the correct record,
+  # not a gap. The runs that use clustering supply the submodule explicitly
+  # (`--with-editable tribble-cluster`), where the checkout SHA above is the
+  # truth. So record what was actually imported,
   # read from the installed distribution's own direct_url.json. preflight's
   # PIN-MATCH fails the run when these disagree; this block is what lets a reader
   # check the claim years later instead of trusting that it was checked.

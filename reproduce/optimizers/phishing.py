@@ -152,6 +152,11 @@ def classical(X, y, features, c, method="kmeans", seed=0, max_samples=None):
 
             labels = KMeans(n_clusters=k, n_init=3, random_state=seed).fit_predict(rows)
         elif method == "fcm":
+            # Supplied by `--with-editable tribble-cluster` on this script's
+            # documented invocation. Not a tribble-fis dependency any more --
+            # tribble-fis#233 moved it to an optional extra, since nothing in
+            # `tribblefis` imports it and it made a C toolchain a hard
+            # requirement of `uv sync`. See `clusterinit._import_fcm`.
             from tribbleclustering.fcm import fuzzy_c_means
 
             _centres, u = fuzzy_c_means(rows, k)

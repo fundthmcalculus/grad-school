@@ -7,6 +7,10 @@ membership functions the model needs.
     uv run --project tribble-fis --with-editable tribble-opt --with scikit-learn \
         python reproduce/optimizers/run_structure_study.py --archive <label>
 
+Add `--with-editable tribble-cluster` if you select an fcm-based init:
+tribble-fis#233 moved `tribble-clustering` to an optional extra, so it is no
+longer in the tribble-fis environment by default. See `clusterinit._import_fcm`.
+
 The antecedent study holds the model's shape fixed and tunes what is inside it.
 This one hands the shape over: output-bucket count (which *is* the rule count
 for a regression MoG-TSK), Gaussians per feature, features retained, consequent

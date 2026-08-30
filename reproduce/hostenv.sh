@@ -5,12 +5,24 @@
 #
 # It is a no-op on Linux/macOS, and a no-op on Windows hosts that still have
 # MSVC. It exists because this host lost its Visual C++ toolchain (the
-# `Microsoft Visual Studio/2022` directory is present but empty), and three of
-# the four environments the harness uses cannot be built without a C compiler:
+# `Microsoft Visual Studio/2022` directory is present but empty), and the
+# environments the harness uses cannot all be built without a C compiler:
 #
 #   tribble-opt      optimizers.combinatorial._tsp_cython, optimizers.benchmarks._bench_cython
 #   tribble-cluster  tribbleclustering.pcvat / .cfcm / .clk
-#   tribble-fis      pulls both of the above in as dependencies
+#
+# `tribble-fis` used to be a third entry here -- it pulled both of the above in
+# as dependencies. It no longer pulls tribble-clustering: tribble-fis#233 moved
+# that to an optional extra, because nothing in `tribblefis` imports it and it
+# was making a working toolchain a precondition for `uv sync` on exactly this
+# kind of host. And `optimizers` builds through hatchling, whose wheel carries
+# no extension -- its setup.py is only ever run by hand, which is what the
+# `--with-editable tribble-opt` invocations in reproduce/optimizers/ do.
+#
+# So a plain `uv run --project tribble-fis` needs no compiler as of that pin
+# bump. The shim is still required for tribble-cluster, for tribble-opt when it
+# is supplied editable, and therefore for most of reproduce/. Source it anyway;
+# it stands down on its own where it is not needed.
 #
 # Without this, every `uv run --project ...` invocation in reproduce/ fails
 # during dependency resolution and no generator gets as far as importing numpy.
