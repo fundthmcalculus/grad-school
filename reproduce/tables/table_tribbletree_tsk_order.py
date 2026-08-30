@@ -131,10 +131,16 @@ DATASET_NAMES = [
 # `table_hyperparam_normalization.py` (see that file's ARMS comment). Only
 # `tsk_order` varies across cells; everything else is held fixed so a moving
 # cell can only be attributed to the order.
-TREE_KWARGS = dict(criterion="variance", max_depth=3, n_terms=2, top_n=4, min_soft_count=20)
+TREE_KWARGS = dict(
+    criterion="variance", max_depth=3, n_terms=2, top_n=4, min_soft_count=20
+)
 HME_KWARGS = dict(
-    criterion="variance", max_depth=2, n_gate_terms=2, top_n=4,
-    min_soft_count=40, min_expert_samples=60,
+    criterion="variance",
+    max_depth=2,
+    n_gate_terms=2,
+    top_n=4,
+    min_soft_count=40,
+    min_expert_samples=60,
 )
 
 # Hand-authored domain topologies for DeconstructedHierarchicalRegressor (see
@@ -198,7 +204,11 @@ def tree_regressor(order, seed):
     import fuzzytree
 
     cls = getattr(fuzzytree, "FuzzyRegressionTree", None)
-    return _fm._try(lambda: cls(tsk_order=order, random_state=seed, **TREE_KWARGS)) if cls else None
+    return (
+        _fm._try(lambda: cls(tsk_order=order, random_state=seed, **TREE_KWARGS))
+        if cls
+        else None
+    )
 
 
 def hme_regressor(order, seed):
@@ -241,7 +251,11 @@ class _DeconstructedAdapter:
         import fuzzytree
 
         self._inner = fuzzytree.DeconstructedHierarchicalRegressor(
-            flat_regressor_kwargs={"n_output_buckets": 3, "top_n": -1, "random_state": self._seed},
+            flat_regressor_kwargs={
+                "n_output_buckets": 3,
+                "top_n": -1,
+                "random_state": self._seed,
+            },
             order=self._order,
         )
         self._inner.fit(X, y, self._topology)
@@ -275,7 +289,10 @@ def models_for(label):
     every other N/A cell in this harness (common.NA)."""
     topology = TOPOLOGIES.get(label)
     return BASE_MODELS + [
-        (DECONSTRUCTED_NAME, lambda order, seed, _t=topology: deconstructed_regressor(order, seed, _t))
+        (
+            DECONSTRUCTED_NAME,
+            lambda order, seed, _t=topology: deconstructed_regressor(order, seed, _t),
+        )
     ]
 
 
@@ -298,7 +315,9 @@ def _warm_up(X, y):
 
 def sweep(label, X, y, models):
     """-> {(model_name, order): {"r2": [...], "rmse": [...], "time": [...]}}"""
-    store = {(m, o): {"r2": [], "rmse": [], "time": []} for m, _ in models for o in ORDERS}
+    store = {
+        (m, o): {"r2": [], "rmse": [], "time": []} for m, _ in models for o in ORDERS
+    }
     complained = set()
     _warm_up(X, y)
     for seed in C.SEEDS:
@@ -363,7 +382,15 @@ def main():
     print(f"  seeds:    {C.SEEDS}")
     print(f"  datasets: {DATASET_NAMES}")
 
-    header = ["Dataset", "Model", "TSK order", "R2", "RMSE", "Train time (s)", "Time vs 0th-order"]
+    header = [
+        "Dataset",
+        "Model",
+        "TSK order",
+        "R2",
+        "RMSE",
+        "Train time (s)",
+        "Time vs 0th-order",
+    ]
     rows = []
     for label, X, y in _load_datasets():
         models = models_for(label)
