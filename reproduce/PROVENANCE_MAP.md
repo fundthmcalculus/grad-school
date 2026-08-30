@@ -843,6 +843,54 @@ describes whatever the bot had pushed when it was generated. Review the ranges
 from `git ls-tree <base> <submodule>` at merge time, or re-derive after merging.
 I did the latter, which is why this correction exists rather than the claim.
 
+**Note 33 — `tribble-clustering` left `tribble-fis`'s default install path, and
+that changes what PIN-MATCH can see.** Pin bump #256 moved `tribble-fis`
+`c6dbd0b` → `d97d6b8`. Derived from the tree, not from the PR body (note 32(a)
+records why that distinction is load-bearing): the merge ref was
+`Merge 4b7fec0 into 2e3be08`, i.e. based on current `main`, and it moved
+`tribble-fis` alone — `tribble-cluster` stayed at `20264b3` and `tribble-opt` at
+`091fe2c`.
+
+**It is one commit and it cannot move a number.** The range is exactly
+`d97d6b8 fix(#231): move tribble-clustering off the default install path (#233)`,
+and `git diff --stat c6dbd0b d97d6b8 -- src/` is **empty**. The change is
+confined to `pyproject.toml`, `uv.lock`, two workflows, `CLAUDE.md`, `README.md`
+and one test. No modelling code path is touched, so no table or quoted figure in
+`research/proposal-defense/` moves. Contrast note 32(a), where the same
+assumption made from a PR description was wrong.
+
+**What it does.** `tribble-clustering` leaves `[project].dependencies` for a
+`clustering` extra. Verified on this host with `CC` unset and without
+`reproduce/hostenv.sh`: `uv sync --project tribble-fis` succeeds and *uninstalls*
+`tribble-clustering`, and `import tribblefis` works while `import
+tribbleclustering` raises. A C toolchain is no longer a precondition for the fis
+environment, which is why grad-school #252 could drop `tribble-fis` from
+`hostenv.sh`'s compiler list.
+
+That sync removed `tribble-clustering==0.2.1 @ 1dcf331` — **two bumps behind the
+`20264b3` the submodule pins.** A live instance of exactly the drift the
+`imported:` probe and PIN-MATCH exist to expose, sitting in the working
+environment while the archives recorded the checkout.
+
+**What PIN-MATCH covers now, and why the narrowing is not lost coverage.** The
+`fis` suite sees `optimizers` and `tribble-fis` only. The axis it used to watch —
+`tribble-fis` pinning a clustering revision different from the recorded submodule
+— *no longer exists*, because `tribble-fis` no longer pins one. Where clustering
+still runs, the invocation supplies the submodule directly
+(`--with-editable tribble-cluster`), so the checkout SHA in `PROVENANCE.txt` is
+the truth by construction. The probe now reporting `tribble-clustering not
+installed` in the fis environment is **the correct record, not a gap**.
+
+**One consequence to watch.** `reproduce/optimizers/{clusterinit,classical,
+phishing}.py` import `tribbleclustering.fcm` on the opt-in `--init fcm` /
+`--init classical-fcm` paths and run under `--project tribble-fis`. They were
+getting the package transitively and no longer do; #252 names the dependency on
+`run_study.py` and `run_structure_study.py`'s invocations and gives
+`clusterinit._import_fcm` a remedy rather than letting a bare
+`ModuleNotFoundError` land partway into a study. A study started between #256 and
+#252 would have hit that.
+
+
 
 
 
