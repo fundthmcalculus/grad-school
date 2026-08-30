@@ -11,8 +11,11 @@ Run (from repo root):  uv run --project tribble-fis python reproduce/tables/tabl
 
 from __future__ import annotations
 
+import multiprocessing as mp
 import os
 import sys
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
@@ -28,6 +31,83 @@ import _fuzzy_models as _fm  # noqa: E402
 # Optional baselines -- resolve once; None => the column renders as N/A.
 (anfis_fit_predict,) = C.optional_import("_baseline_anfis", ["fit_predict"])
 (gafis_fit_predict,) = C.optional_import("_baseline_gafis", ["fit_predict"])
+
+
+def _fit_one_seed(seed, *, kind, X, y, mog_factory, score):
+    """One seed's worth of `_bench`'s inner loop -- everything that used to run
+    inline, unchanged in substance so it can run either in-process or in a
+    worker. Every model here takes an explicit `seed` (or a per-call
+    `RandomState(seed)`, for ANFIS/GA-FIS); nothing depends on shared global
+    state, which is what makes farming this out across seeds safe.
+
+    Returns `(seed, out)`, `out` mapping column -> `(train_seconds, score)` or
+    `None` if that arm didn't produce a prediction (model unavailable, or a
+    guarded fit/predict failure).
+    """
+    out = {"mog": None, "rf": None, "anfis": None, "gafis": None}
+    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
+
+    model = mog_factory(seed)
+    if model is not None:
+        with C.timed() as t:
+            try:
+                p = np.asarray(model.fit(Xtr, ytr).predict(Xte))
+            except Exception:  # noqa: BLE001
+                p = None
+        if p is not None:
+            out["mog"] = (t.seconds, score(yte, p))
+
+    RF = RandomForestRegressor if kind == "reg" else RandomForestClassifier
+    with C.timed() as t:
+        p = RF(n_estimators=200, random_state=seed).fit(Xtr, ytr).predict(Xte)
+    out["rf"] = (t.seconds, score(yte, p))
+
+    for name, fn in (("anfis", anfis_fit_predict), ("gafis", gafis_fit_predict)):
+        if fn is None:
+            continue
+        try:
+            with C.timed() as t:
+                p = np.asarray(fn(Xtr, ytr, Xte, kind=kind, seed=seed))
+            out[name] = (t.seconds, score(yte, p))
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [{name}] failed ({exc.__class__.__name__}); -> N/A")
+    return seed, out
+
+
+def _n_seed_workers():
+    """How many seeds to fit in parallel. `REPRO_SEED_WORKERS=1` (or a single
+    seed) disables the pool and keeps the old in-process loop -- useful for a
+    quick REPRO_SEEDS=0 smoke run, where pool start-up would cost more than it
+    saves."""
+    cap = os.environ.get("REPRO_SEED_WORKERS")
+    n = int(cap) if cap else (os.cpu_count() or 1)
+    return max(1, min(n, len(C.SEEDS)))
+
+
+def _pin_blas_threads_for_workers():
+    """Cap each worker to a small, fixed thread budget before any are spawned.
+
+    Env vars set here are inherited by every child at process-creation time --
+    that happens at the OS level (fork/spawn copy the parent's environment),
+    before any Python code in the child runs, so it is not sensitive to
+    whether the child's own `import numpy` happens before or after its
+    initializer. What matters is that `n_workers` processes, each spinning up
+    its own BLAS thread pool, must not together oversubscribe the machine: at
+    the repo's own default of 8 BLAS threads (table_4_11's convention, tuned
+    for ONE process), 10 seeds in parallel would ask for 80 threads on a
+    32-core host -- the same class of oversubscription NOTE12_THREADING.md
+    traces to a SIGSEGV from a joblib backend spawning one BLAS pool per
+    process without capping any of them. Defaulting to 1 thread/worker and
+    `n_workers` processes is the standard, safe shape for embarrassingly
+    parallel CPU-bound work: parallelism comes from the process count, not
+    from each process's own BLAS calls, which is also appropriate here --
+    these are small-matrix operations (Concrete's dual solve is at most
+    824x824) where BLAS's own threading overhead usually isn't worth paying
+    per call anyway.
+    """
+    n = os.environ.get("REPRO_BLAS_THREADS_PER_WORKER", "1")
+    for var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+        os.environ[var] = n
 
 
 def _bench(kind, X, y, mog_factory, score, norm=False):
@@ -78,36 +158,24 @@ def _bench(kind, X, y, mog_factory, score, norm=False):
         finally:
             np.random.set_state(_rng_state)
 
-    for seed in C.SEEDS:
-        Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
+    worker = partial(_fit_one_seed, kind=kind, X=X, y=y, mog_factory=mog_factory, score=score)
+    n_workers = _n_seed_workers()
+    if n_workers <= 1:
+        results = [worker(seed) for seed in C.SEEDS]
+    else:
+        _pin_blas_threads_for_workers()
+        ctx = mp.get_context("spawn")  # never fork: BLAS's own thread pool does
+        # not survive a fork cleanly (see _pin_blas_threads_for_workers), and
+        # spawn is the only option on Windows anyway -- one code path for both.
+        with ProcessPoolExecutor(max_workers=n_workers, mp_context=ctx) as ex:
+            results = list(ex.map(worker, C.SEEDS))
 
-        model = mog_factory(seed)
-        if model is not None:
-            with C.timed() as t:
-                try:
-                    p = np.asarray(model.fit(Xtr, ytr).predict(Xte))
-                except Exception:  # noqa: BLE001
-                    p = None
-            if p is not None:
-                cols["mog"]["t"].append(t.seconds)
-                cols["mog"]["s"].append(score(yte, p))
-
-        RF = RandomForestRegressor if kind == "reg" else RandomForestClassifier
-        with C.timed() as t:
-            p = RF(n_estimators=200, random_state=seed).fit(Xtr, ytr).predict(Xte)
-        cols["rf"]["t"].append(t.seconds)
-        cols["rf"]["s"].append(score(yte, p))
-
-        for name, fn in (("anfis", anfis_fit_predict), ("gafis", gafis_fit_predict)):
-            if fn is None:
-                continue
-            try:
-                with C.timed() as t:
-                    p = np.asarray(fn(Xtr, ytr, Xte, kind=kind, seed=seed))
-                cols[name]["t"].append(t.seconds)
-                cols[name]["s"].append(score(yte, p))
-            except Exception as exc:  # noqa: BLE001
-                print(f"  [{name}] failed ({exc.__class__.__name__}); -> N/A")
+    for _seed, out in sorted(results, key=lambda r: r[0]):
+        for name in ("mog", "rf", "anfis", "gafis"):
+            if out[name] is not None:
+                t_seconds, s_value = out[name]
+                cols[name]["t"].append(t_seconds)
+                cols[name]["s"].append(s_value)
     return cols
 
 
@@ -162,7 +230,10 @@ def main():
             "reg",
             X,
             y,
-            lambda s: _fm.mog_regressor(s, tsk_order="full-2nd"),
+            # A lambda closure isn't picklable, and _bench's per-seed workers
+            # (when running in a process pool) need to be -- partial() of a
+            # module-level function is, and does the same job.
+            partial(_fm.mog_regressor, tsk_order="full-2nd"),
             r2_score,
             norm=True,
         )

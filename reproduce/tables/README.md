@@ -36,6 +36,18 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
   null result but is really a mis-set knob.
 - `REPRO_PHIUSIIL_N="20000"` — sample cap for PhiUSIIL in the norm/conorm matrix.
 - `REPRO_N_GRID="256,512,1024,2048,4096"` — the N values for Table 3.1.
+- `REPRO_SEED_WORKERS="1"` — `table_4_1_mog_baselines.py` fits each seed
+  independently (every model takes an explicit seed) and runs them in a
+  process pool by default, sized to `min(len(SEEDS), cpu_count())`. Set to `1`
+  to force the old serial loop, e.g. for a `REPRO_SEEDS=0` smoke run where pool
+  start-up costs more than it saves, or for a deterministic single-process
+  trace.
+- `REPRO_BLAS_THREADS_PER_WORKER="1"` (default `1`) — BLAS threads per worker
+  process when `REPRO_SEED_WORKERS` allows more than one. Parallelism here
+  comes from the process count, not from each process's own BLAS calls;
+  raising this without lowering `REPRO_SEED_WORKERS` risks the same
+  thread-oversubscription failure mode `NOTE12_THREADING.md` documents for a
+  different table.
 - `REPRO_NAIVE_CAP="1024"` — largest N at which the cubic classical VAT is timed.
 
 ## What each table contains
