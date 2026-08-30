@@ -123,10 +123,6 @@ declare -A SLOW_TABLES=(
   # it exists to bound. Measured on this host: 530 s and 13,084 s.
   [table_4_1_mog_baselines]=1
   [table_4_4_openset]=1
-  # The GPU table sweeps four N for the MST/front end, three for FCM and eight
-  # (dimension x precision) for distances, with a CPU arm beside every one, so ten
-  # seeds is ~25 min on its own -- the slowest single table in the suite.
-  [table_3_4_gpu_speedups]=1
   # Added with the ROOT_TABLES wiring below. 146 s measured on this host at ten
   # seeds -- slower than table_hyperparam_normalization (112 s), the cheapest
   # entry above -- so by this list's own threshold it belongs here. It honours the
@@ -211,7 +207,6 @@ CLUSTER_TABLES=(
   table_3_1_pvat_scaling
   table_3_1_reorder_three_arm
   table_3_2_memory_precision
-  table_3_4_gpu_speedups
   table_3_7_g2_dtw_nonmetric
   # Added 2026-08-22. Its output sat in every archive with NO LOG beside it,
   # because it had only ever been hand-run -- the same trap B12 records for
@@ -224,28 +219,24 @@ CLUSTER_TABLES=(
 )
 
 # Per-table dependency overrides, for a table needing something the group's
-# EXTRA_DEPS does not carry. table_3_4_gpu_speedups needs CuPy, which is an
-# OPTIONAL extra of tribble-cluster (`[gpu]`) and must not be forced on the other
-# cluster tables -- they run fine without a device, and on a host with no CUDA
-# wheel available the resolution failure would take them down with it.
+# EXTRA_DEPS does not carry.
 #
-# The GPU table is written to survive the absence of a device: it emits N/A cells
-# naming the blocker. That graceful path is only reachable if the interpreter
-# starts at all, so if the CuPy-bearing invocation fails to resolve, run_one
-# retries WITHOUT the GPU dep -- a table that says "no CUDA runtime, here is why"
-# is a real deliverable, and a resolution error that emits nothing is not.
+# This block used to carry `--with cupy-cuda12x` for table_3_4_gpu_speedups, plus
+# a TABLE_DEPS_FALLBACK dict and a retry in run_one, so a host with no CUDA wheel
+# still got the generator's own "no device, here is why" N/A cells rather than a
+# bare resolution error. All three are gone with the GPU work (2026-08-30):
+# tribble-clustering removed the CuPy back ends and the `[gpu]` extra in
+# `1ec9667`, so there is no device module left to depend on, and the fallback
+# machinery existed for that one table alone. Recoverable from git history if the
+# device path is ever revived -- see Appendix A.9 and Goal G4c.
 declare -A TABLE_DEPS=(
-  [table_3_4_gpu_speedups]="--with scipy --with cupy-cuda12x"
   # Goal G2: real non-coordinate (DTW) data via aeon. `uv pip install` does not
   # persist here -- `uv run --project` re-syncs from the lockfile and drops it --
-  # so, like the CuPy row above, the dependency has to ride on the invocation.
-  # This table also downloads UCR/UEA archives on first run (network + disk).
+  # so the dependency has to ride on the invocation. This table also downloads
+  # UCR/UEA archives on first run (network + disk).
   [table_3_7_g2_dtw_nonmetric]="--with aeon"
   # Same DTW datasets, same dependency.
   [table_3_7_g2_downstream]="--with aeon"
-)
-declare -A TABLE_DEPS_FALLBACK=(
-  [table_3_4_gpu_speedups]="--with scipy"
 )
 # Stdlib-only renderers -- no submodule environment, so they run on the host python.
 # table_5_1_3_ch5_tables replaced table_5_x_ch5_selection when the Chapter 5 script
@@ -466,17 +457,6 @@ run_one() {
         "$ROOT/reproduce/tables/$name.py" >"$log" 2>&1
   fi
   rc=$?
-  # An optional dependency that cannot be resolved (no CUDA wheel for this
-  # platform, no network) must not cost the table entirely: the GPU generator
-  # reports its own blocker as N/A cells when the import is missing, so retry
-  # once on the reduced dependency set. Both attempts stay in the one log.
-  if [ $rc -ne 0 ] && [ -n "${TABLE_DEPS_FALLBACK[$name]:-}" ]; then
-    echo "--- retrying without the optional GPU dependency ---" >>"$log"
-    "${env_prefix[@]}" uv run --project "$ROOT/$project" \
-        ${TABLE_DEPS_FALLBACK[$name]} python \
-        "$ROOT/reproduce/tables/$name.py" >>"$log" 2>&1
-    rc=$?
-  fi
   t1=$(date +%s)
   after=$(snapshot_tables)
   if [ $rc -ne 0 ]; then

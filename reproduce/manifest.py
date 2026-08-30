@@ -736,13 +736,21 @@ EXPERIMENTS = [
     ),
     Experiment(
         id="ch3-boruvka-gpu",
-        title="GPU Boruvka MST vs serial Prim",
-        chapter="Ch3",
-        produces="Ch3 GPU numbers",
+        title="GPU Boruvka MST vs serial Prim -- DESCOPED, produces nothing in the document",
+        chapter="App",
+        produces="nothing -- Appendix A.9 only, as a record",
         repo="tribble-cluster",
         command=["python", "ClusteringExperiments/boruvka_gpu.py"],
         hardware="gpu",
-        notes="Requires a CUDA GPU; skipped on CPU-only hosts.",
+        notes="DESCOPED 2026-08-30. The GPU work is out of the proposal body: "
+        "tribble-clustering removed the CuPy back ends and the `[gpu]` extra in "
+        "1ec9667, so `tribbleclustering.gpu` no longer exists and the companion "
+        "generator (reproduce/tables/table_3_4_gpu_speedups.py) was deleted with "
+        "Table 3.4. The script under ClusteringExperiments/ is KEPT as the "
+        "research record and still runs against its own device stack, but it "
+        "produces no numbered table and nothing in research/proposal-defense/ "
+        "cites it. Appendix A.9 records what was built and measured; Goal G4c "
+        "carries the revival. Do not wire this into run_all_tables.sh.",
     ),
     # ---- Appendix A.3 optimization engine ----
     Experiment(

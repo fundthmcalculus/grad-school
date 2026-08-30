@@ -77,7 +77,7 @@ unaffected and reproduce.
 | 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1; re-taken on one host — note 11 |
 | 3.2 Complexity fit | `reproduce/tables/table_3_1_reorder_three_arm.py` | `outputs/table_3_1_complexity_fit.{md,csv}` | **reproduced** — exponents confirm; stage-two plateau does **not** reproduce, note 11 |
 | 3.3 Memory footprint | `reproduce/tables/table_3_2_memory_precision.py` | `outputs/table_3_2_memory_precision.{md,csv}` | **reproduced** — all 32 cells identical to `main-d0efefc` |
-| 3.4 GPU speedups | `reproduce/tables/table_3_4_gpu_speedups.py` | `outputs/table_3_4_gpu_speedups.{md,csv}` | **drifted** — measured twice on the card the chapter names, hours apart and now inside the sweep; the exactness claim holds, three of the four speedup rows do not read as quoted — notes 15, 18 . **SUPERSEDED 2026-08-30**: `tribble-cluster` `1ec9667` removed the CuPy back ends and the `[gpu]` extra, so at the merged pin `20264b3` there is no GPU module for this generator to import (`from tribbleclustering import gpu`) and `run_all_tables.sh` still requests the deleted `--with cupy-cuda12x`. Its N/A path was written for a missing *device*, not a missing *module* — note 32(a) |
+| ~~3.4 GPU speedups~~ | *(generator deleted)* | none | **REMOVED 2026-08-30 — no longer a table in the document.** The GPU work is descoped to Appendix A.9 and Goal G4c. Three reasons, in increasing finality: its headline Fuzzy C-Means row measured the CPU baseline's *formulation* (NumPy broadcasting vs. gram + two GEMMs) rather than the hardware, and corrected to a matched formulation the win was 1.2–3.7× not 30–50×; its one honest negative result (distances losing at float64 / low dimension) needed a full-rate-FP64 card to interpret and never got one; and `tribble-clustering` deleted its CuPy back ends and `[gpu]` extra in `1ec9667`, so `tribbleclustering.gpu` no longer exists and the generator had nothing to import. `reproduce/tables/table_3_4_gpu_speedups.py` is deleted, and its `--with cupy-cuda12x` override plus the TABLE_DEPS_FALLBACK retry machinery it was the sole user of are gone from `run_all_tables.sh` — note 32(a) |
 | 3.5 Adversarial ARI | `ClusteringExperiments/adversarial_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — two cells corrected, note 10 |
 | 3.6 Stitch ablation | `ClusteringExperiments/principled_stitch.py` | `ClusteringExperiments/findings/…` | **reproduced** — re-quoted, note 10 |
 | 3.7 Non-metric agreement | `ClusteringExperiments/hardening_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — cells match |
@@ -810,6 +810,10 @@ Verified at the merged pin: `[project.optional-dependencies]` in
 `tribble-cluster/pyproject.toml` now contains **only `dev`**, and
 `src/tribbleclustering/` contains **no GPU module at all**.
 
+**RESOLVED 2026-08-30: the table and the generator are removed** (see the Chapter 3
+map row). The rest of this paragraph is the finding that led to that call, retained
+as the reasoning.
+
 **`table_3_4_gpu_speedups` therefore has no implementation to measure.** It does
 `from tribbleclustering import gpu as tgpu` and `import gpu_vat as tgpu_vat`
 (lines 231–232), and `run_all_tables.sh` still asks for the deleted extra:
@@ -1355,7 +1359,7 @@ resolved:
 Neither was a defect in the harness. What remains outstanding is narrow:
 
 - **Table 3.1's headline 4,096-point pair** has no in-repo provenance (note 1).
-- **Table 3.4** now has a generator and is **drifted**, not ungenerated (note 15).
+- **Table 3.4** was **drifted** (note 15) and is now **removed** — the GPU work is descoped to Appendix A.9 and Goal G4c, and the generator is deleted. See the 3.4 row above and note 32(a).
   This line previously read "Tables 3.2 and 3.3 have no generator; 3.3 needs a
   GPU host" — the same off-by-one numbering documented above, naming two tables
   that both have generators and reproduce.
