@@ -1,0 +1,21 @@
+preflight (fis)
+--------------------------------------------------------------------------
+  [ok  ] W1-SCALE        x1000 data -> x1000.0 distance
+  [ok  ] SCALER-ALIAS    UnitScalar is MinMaxScaler; StandardScalar is StandardScaler
+  [ok  ] MODEL-NAMES     all three estimator classes present
+  [ok  ] DATASETS        2 required dataset(s) present
+  [FAIL] INSTALL-FRESH   installed build is STALE against the submodule source (tribbleclustering/fcm.py). Two different causes, and they need different fixes -- PIN-MATCH below tells you which: a cached wheel wants `uv run --project <submodule> --no-cache --reinstall-package <dist-name> ...` (the DIST name, hyphenated), while a lockfile pinning an older revision wants `uv lock --upgrade-package <dist-name>` in the project being run
+  [FAIL] PIN-MATCH       tribble-clustering imports 1dcf331, submodule tribble-cluster is 71dbcc3; optimizers imports 4d81121, submodule tribble-opt is 7ba4fc0 -- PROVENANCE records the submodule SHA, so the archive would name code that did not run. Fix with `uv lock --upgrade-package <dist-name>` in the project being run, then reinstall
+--------------------------------------------------------------------------
+  2 FAILED: INSTALL-FRESH, PIN-MATCH
+  Numbers produced under a failed invariant are NOT citable.
+
+preflight (cluster)
+--------------------------------------------------------------------------
+  [ok  ] VAT-MATRIXFREE  ordering elementwise identical to compute_vat
+  [ok  ] DATASETS        2 required dataset(s) present
+  [ok  ] INSTALL-FRESH   installed builds match the submodule sources
+  [skip] PIN-MATCH       no git-sourced vendored dependency installed in this environment
+--------------------------------------------------------------------------
+  3 passed, 1 skipped
+

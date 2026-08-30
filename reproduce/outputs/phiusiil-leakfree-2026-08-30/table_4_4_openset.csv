@@ -1,0 +1,4 @@
+Method,Detection rate,False-alarm rate,Detection − false alarm,Separate model?
+**Complement rule (this work)**,N/A,N/A,N/A,no
+One-class SVM,0.352 ± 0.357,0.140 ± 0.072,+0.211,yes
+Isolation Forest,0.449 ± 0.420,0.100 ± 0.002,+0.349,yes
