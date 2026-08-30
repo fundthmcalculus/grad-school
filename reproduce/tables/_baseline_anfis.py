@@ -110,11 +110,29 @@ class _ANFIS:
         return phi.reshape(X.shape[0], self.R * (self.M + 1))
 
     def _solve_consequents(self, X, Y, wn):
+        """Ridge LSE for the consequents: (phi^T phi + lambda I) beta = phi^T Y.
+
+        Solved in whichever of the two equivalent forms has the smaller matrix
+        to invert. The push-through identity
+            (phi^T phi + lambda I_D)^-1 phi^T == phi^T (phi phi^T + lambda I_N)^-1
+        (D = R*(M+1) consequent params, N = sample count) gives the exact same
+        beta either way, so this is a pure cost trade, not an approximation --
+        but grid partitions with many rules routinely have D > N (Concrete's
+        256-rule grid: D=2304 vs N=824 train rows), where solving the N x N
+        dual system is `(D/N)**3` cheaper than the primal D x D system. This
+        is the arm the fuzzy baselines spend most of their time in (GA-FIS
+        re-solves it every population member, every generation), so the ratio
+        matters far more here than a one-off model fit.
+        """
         phi = self._design(X, wn)
-        # ridge LSE: (phi^T phi + lambda I) beta = phi^T Y
-        A = phi.T @ phi + RIDGE * np.eye(phi.shape[1])
-        B = phi.T @ Y
-        beta = np.linalg.solve(A, B)
+        N, D = phi.shape
+        if N < D:
+            K = phi @ phi.T + RIDGE * np.eye(N)
+            beta = phi.T @ np.linalg.solve(K, Y)
+        else:
+            A = phi.T @ phi + RIDGE * np.eye(D)
+            B = phi.T @ Y
+            beta = np.linalg.solve(A, B)
         self.W = beta.reshape(self.R, self.M + 1, self.n_out)
 
     def _predict_raw(self, X):
