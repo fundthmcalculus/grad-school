@@ -93,7 +93,7 @@ consequent solve sped the GA-FIS arm up by 3.4×: the earlier figure is supersed
 optimisation of the baseline, which is the right direction for it to move.
 
 **The baselines are not strawmen, and the leak-free numbers make that sharper.** They match or
-beat the MoG arm on accuracy in five of six cells — GA-FIS takes Concrete outright at
+beat the MoG arm on accuracy in four of the five rows — GA-FIS takes Concrete outright at
 0.896 ± 0.038, and both take PhiUSIIL at ≈0.999 against 0.440 ± 0.181. That last pair is the
 control for `PROVENANCE_MAP.md` note 31(a): two independently-implemented *fuzzy* systems clear
 0.998 on the same 47 features where this construction sits at the majority baseline, so the

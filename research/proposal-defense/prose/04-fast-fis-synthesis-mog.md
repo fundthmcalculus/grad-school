@@ -238,10 +238,13 @@ and 8 had nothing fuzzy to be faster *than*. Ten seeds, the same splits, the sam
 leak-free features. ANFIS grid-partitions where feasible (Concrete: 2 membership
 functions per input, 256 rules) and scatter-partitions at scale (12 rules); the
 GA-tuned FIS evolves the same premises over 20 individuals × 15 generations.
-They **match or beat the MoG arm on accuracy in five of the six cells** — GA-FIS
+They **match or beat the MoG arm on accuracy in four of the five rows** — GA-FIS
 takes Concrete outright at 0.896 ± 0.038 against the full-2nd MoG's 0.852, and
-both take PhiUSIIL at ≈ 0.999 against 0.440. Whatever the speed table below says,
-it is not bought with a weaker model.
+both take PhiUSIIL at ≈ 0.999 against 0.440. The single row the construction wins
+is **Bike Sharing** (0.620 ± 0.014 against ANFIS's 0.577 ± 0.075 and GA-FIS's
+0.545 ± 0.047) — and that is also the row with the weakest speedup below, so both
+honesties land on the same line. Whatever the speed table says, it is not bought
+with a weaker model.
 
 **Table 4.1b — What the construction buys, in wall-clock.** Training seconds, mean
 ± s.d. over the same ten seeds and splits as Table 4.5. "Speedup" is the ratio of
