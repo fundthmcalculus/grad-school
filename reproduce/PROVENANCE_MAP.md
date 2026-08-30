@@ -77,7 +77,7 @@ unaffected and reproduce.
 | 3.1 Reorder time | `reproduce/tables/table_3_1_pvat_scaling.py`, `table_3_1_reorder_three_arm.py` | `outputs/table_3_1.{md,csv}`, `outputs/table_3_1_three_arm.{md,csv}` | **reproduced** for the swept grid; headline row **cited** — note 1; re-taken on one host — note 11 |
 | 3.2 Complexity fit | `reproduce/tables/table_3_1_reorder_three_arm.py` | `outputs/table_3_1_complexity_fit.{md,csv}` | **reproduced** — exponents confirm; stage-two plateau does **not** reproduce, note 11 |
 | 3.3 Memory footprint | `reproduce/tables/table_3_2_memory_precision.py` | `outputs/table_3_2_memory_precision.{md,csv}` | **reproduced** — all 32 cells identical to `main-d0efefc` |
-| 3.4 GPU speedups | `reproduce/tables/table_3_4_gpu_speedups.py` | `outputs/table_3_4_gpu_speedups.{md,csv}` | **drifted** — measured twice on the card the chapter names, hours apart and now inside the sweep; the exactness claim holds, three of the four speedup rows do not read as quoted — notes 15, 18 |
+| 3.4 GPU speedups | `reproduce/tables/table_3_4_gpu_speedups.py` | `outputs/table_3_4_gpu_speedups.{md,csv}` | **drifted** — measured twice on the card the chapter names, hours apart and now inside the sweep; the exactness claim holds, three of the four speedup rows do not read as quoted — notes 15, 18 . **SUPERSEDED 2026-08-30**: `tribble-cluster` `1ec9667` removed the CuPy back ends and the `[gpu]` extra, so at the merged pin `20264b3` there is no GPU module for this generator to import (`from tribbleclustering import gpu`) and `run_all_tables.sh` still requests the deleted `--with cupy-cuda12x`. Its N/A path was written for a missing *device*, not a missing *module* — note 32(a) |
 | 3.5 Adversarial ARI | `ClusteringExperiments/adversarial_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — two cells corrected, note 10 |
 | 3.6 Stitch ablation | `ClusteringExperiments/principled_stitch.py` | `ClusteringExperiments/findings/…` | **reproduced** — re-quoted, note 10 |
 | 3.7 Non-metric agreement | `ClusteringExperiments/hardening_eval.py` | `ClusteringExperiments/findings/…` | **reproduced** — cells match |
@@ -729,7 +729,9 @@ Whether a continuous-feature budget, a different scorer, or a different
 `n_output_buckets` recovers it is unmeasured and is the obvious next experiment.
 
 **Note 32 — the 2026-08-30 pin bump clears the NOT-CITABLE false alarm and
-leaves Chapter 3 unverified.** PR #243 moves all three submodules:
+leaves Chapter 3 unverified.** *(Superseded in part — read note 32(a)
+first: the SHAs below are the ones PR #243's description named, not the ones
+that merged.)* PR #243 moves all three submodules:
 `tribble-fis` `ae0ef13` → `fdc54ca`, `tribble-cluster` `71dbcc3` → `d1a97ac`,
 `tribble-opt` `7ba4fc0` → `644ba34`. Read the ranges rather than the SHAs and it
 splits cleanly into a fix, a hazard, and a nothing.
@@ -764,6 +766,73 @@ has been.
 algorithm change — though *"compile the Cython kernels into the wheel"* means a
 host may now run compiled kernels where it previously fell back to numba, which
 is a performance-path change and so a **timing** caveat, not an accuracy one.
+
+**Note 32(a) — correction: note 32 named the wrong pins, and the real ones carry
+more.** Note 32 was written from PR #243's description, which listed
+`fdc54ca` / `d1a97ac` / `644ba34`. **Those are not what merged.** That branch is
+machine-owned and force-pushed on every upstream merge, so the bot advanced it
+between the description being written and the merge landing. The pins actually
+recorded on `main` are:
+
+| Submodule | note 32 said | actually merged | extra commits |
+|---|---|---|---|
+| `tribble-fis` | `fdc54ca` | **`c6dbd0b`** | +3 |
+| `tribble-cluster` | `d1a97ac` | **`20264b3`** | +3 |
+| `tribble-opt` | `644ba34` | **`091fe2c`** | — |
+
+Derived with `git ls-tree main tribble-fis tribble-cluster tribble-opt`, not read
+off the PR body. This is the failure mode this file exists to catch, committed in
+this file: a claim about a pin taken from a description rather than from the tree.
+
+**Two of note 32's statements do not survive.**
+
+*"No modelling code path changes" in `tribble-fis` is false.* The real range
+`ae0ef13..c6dbd0b` is eight commits, not five. The three note 32 never saw:
+
+* **#229** `perf(#213): the triangular/trap 4x is model size, not shape` — touches
+  `src/tribblefis/gaussian_classifier.py` and `gaussian_regressor.py`. That is
+  the modelling path, in the two files every Chapter 4 and Chapter 6 table fits
+  through.
+* **#230** `feat(tree): derive a deconstruction topology when none is supplied` —
+  269 new lines in `fuzzytree/auto_topology.py` plus changes to
+  `fuzzytree/deconstruct.py`. Additive, but it is the tree module behind Figure
+  6.1 and Table 6.2.
+* **#228**, a further pin refresh.
+
+*The Chapter 3 hazard is bigger than the cfcm fix.* `tribble-cluster`
+`71dbcc3..20264b3` is six commits, and alongside `bb9f401` (the compiled-FCM
+correctness fix note 32 flagged) and `bc9c2f1` (`fix(cfcm): accept
+non-C-contiguous input`) it carries:
+
+> **`1ec9667 chore: remove the CuPy GPU back ends and the [gpu] extra (#107)`**
+
+Verified at the merged pin: `[project.optional-dependencies]` in
+`tribble-cluster/pyproject.toml` now contains **only `dev`**, and
+`src/tribbleclustering/` contains **no GPU module at all**.
+
+**`table_3_4_gpu_speedups` therefore has no implementation to measure.** It does
+`from tribbleclustering import gpu as tgpu` and `import gpu_vat as tgpu_vat`
+(lines 231–232), and `run_all_tables.sh` still asks for the deleted extra:
+`[table_3_4_gpu_speedups]="--with scipy --with cupy-cuda12x"`. The generator is
+written to degrade gracefully when **no CUDA device** is present — it emits N/A
+cells naming the blocker — but a missing *module* is a different failure from a
+missing *device*, and the graceful path was not written for it. Table 3.4 is
+**superseded, not merely unverified**: its GPU arm no longer exists upstream.
+Whether the table becomes a CPU-only table, moves to a pinned older clustering
+revision, or is retired is a call for the author; what is not available is
+leaving it as-is and expecting the next sweep to reproduce it.
+
+**What note 32 still gets right.** The PIN-MATCH conclusion holds — the point was
+that `tribble-fis`'s resolved clustering/optimizers revisions match this repo's
+submodule pins, and they do at the merged SHAs too. The `tribble-opt` reading
+holds. And the Chapter 3 rows are unverified, only more so.
+
+**Process note, because it is the reusable part.** A machine-owned,
+force-pushed branch cannot be reviewed from its description; the description
+describes whatever the bot had pushed when it was generated. Review the ranges
+from `git ls-tree <base> <submodule>` at merge time, or re-derive after merging.
+I did the latter, which is why this correction exists rather than the claim.
+
 
 
 
