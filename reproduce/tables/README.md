@@ -51,7 +51,7 @@ Outputs: `reproduce/outputs/table_4_1.{md,csv}`, `table_6_1.{md,csv}`, `table_3_
 | `table_4_1_mog_baselines.py` | Table 4.1 | Concrete, PhiUSIIL | MoG FIS (time + accuracy) | sklearn RF; ANFIS/GA-FIS optional |
 | `table_6_1_model_family.py` | Table 6.1 | Concrete, PhiUSIIL | flat / fuzzy tree / HME | sklearn CART & RF; M5 optional |
 | `table_norm_conorm_matrix.py` | Norm/conorm comparison | Concrete, PhiUSIIL | flat / fuzzy tree / HME, swept over the 5 De Morgan pairs | — (the families are compared against each other) |
-| `table_tribbletree_tsk_order.py` | TribbleTree TSK order sweep | Concrete, BodyFat | flat / fuzzy tree / HME, swept over `tsk_order` 0th/1st/2nd (quality + training time) | — (the orders are compared against each other) |
+| `table_tribbletree_tsk_order.py` | TribbleTree TSK order sweep | Concrete, BodyFat | flat / fuzzy tree / HME / deconstructed (hand-authored topology), swept over `tsk_order` 0th/1st/2nd (quality + training time) | — (the orders are compared against each other) |
 
 ## Adding the optional baselines (ANFIS, GA-FIS, M5)
 

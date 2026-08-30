@@ -68,6 +68,26 @@ gap is real and now attributed: most of it is "EM/BIC density-fit vs.
 deterministic quantile split," not a measurement artifact, and not `top_n`
 alone.
 
+A FOURTH ARM -- `DeconstructedHierarchicalRegressor` (`fuzzytree/deconstruct.py`,
+findings in `tribble-fis/DECONSTRUCTED_TREE_FINDINGS.md`). This is a different
+way to get a tree than either of the other two: fit ONE flat `TribbleRegressor`
+on every feature first, then slice its already-fitted antecedents down to a
+tree the CALLER supplies (no re-clustering, no re-fit antecedents) and re-solve
+only the leaf/branch consequents. Unlike `FuzzyRegressionTree`/HME, its
+structure is not discovered from the data at all -- it is only as good as the
+domain topology handed to it, and has no auto-discovery fallback yet if none is
+supplied (tracked as a follow-up, see the repo issue tracker). On the one real
+dataset it has been evaluated against (NASA N-CMAPSS turbofan RUL, a topology
+from turbofan station numbers), it beat both the flat baseline and HME by a
+wide margin (R² 0.593 vs. 0.405 vs. 0.370). Neither Concrete nor BodyFat has a
+topology anywhere in this codebase, so the ones below (`TOPOLOGY_CONCRETE`,
+`TOPOLOGY_BODYFAT`) are new, hand-authored for this table specifically -- a
+domain-informed starting proposal in the same spirit as the C-MAPSS sensor
+grouping (see that file's own caveat), NOT a verified ground truth. Its
+consequent `order` is swept exactly like the other three arms; its own
+internal flat-model fit always uses `top_n=-1` (all features), matching the
+'flat TribbleRegressor (reference)' row so the two are comparable.
+
 Run (from repo root):
     uv run --project tribble-fis python reproduce/tables/table_tribbletree_tsk_order.py
 
@@ -75,7 +95,10 @@ Knobs:
     REPRO_SEEDS="0,1,2,3,4"           seeds (default: common.SEEDS, 0..9)
     REPRO_TSK_ORDERS="0th,1st,2nd"    which TSK orders to sweep
     REPRO_DATASETS="concrete,bodyfat" which regression datasets to include;
-                                      add "bikeshare" for a ~17k-row arm (slow)
+                                      add "bikeshare" for a ~17k-row arm (slow,
+                                      and it has no hand-authored topology, so
+                                      its DeconstructedHierarchicalRegressor
+                                      column is always N/A)
 """
 
 from __future__ import annotations
@@ -113,6 +136,32 @@ HME_KWARGS = dict(
     criterion="variance", max_depth=2, n_gate_terms=2, top_n=4,
     min_soft_count=40, min_expert_samples=60,
 )
+
+# Hand-authored domain topologies for DeconstructedHierarchicalRegressor (see
+# module docstring's "A FOURTH ARM" section). Node names must not collide with
+# a feature column (parse_topology rejects that), which is why the roots below
+# are "Strength"/"BodyFatPct" rather than the datasets' own target-column names.
+#
+# Concrete: binder chemistry (cement + supplementary cementitious materials),
+# water/plasticizer, aggregate packing, and curing time are the textbook
+# groupings for what drives compressive strength.
+TOPOLOGY_CONCRETE = {
+    "Strength": ["Binder", "Fluid", "Aggregate", "Curing"],
+    "Binder": ["Cement", "Slag", "FlyAsh"],
+    "Fluid": ["Water", "Superplasticizer"],
+    "Aggregate": ["CoarseAgg", "FineAgg"],
+    "Curing": ["Age"],
+}
+# BodyFat: demographic basics vs. trunk / upper-limb / lower-limb circumference
+# groups, the standard anthropometric regions used to describe fat distribution.
+TOPOLOGY_BODYFAT = {
+    "BodyFatPct": ["Demographics", "Trunk", "UpperLimb", "LowerLimb"],
+    "Demographics": ["Age", "Weight", "Height"],
+    "Trunk": ["Neck", "Chest", "Abdomen", "Hip"],
+    "UpperLimb": ["Biceps", "Forearm", "Wrist"],
+    "LowerLimb": ["Thigh", "Knee", "Ankle"],
+}
+TOPOLOGIES = {"Concrete": TOPOLOGY_CONCRETE, "BodyFat": TOPOLOGY_BODYFAT}
 
 
 def _rmse(y, p):
@@ -171,11 +220,63 @@ def flat_regressor(order, seed):
     return _fm.mog_regressor(seed, tsk_order=order)
 
 
-MODELS = [
+class _DeconstructedAdapter:
+    """sklearn-style `.fit(X, y)` wrapper around `DeconstructedHierarchicalRegressor`.
+
+    The real class needs a topology dict at FIT time, not construction
+    (`.fit(X, y, topology, leaf_targets=None)`) -- every other model in this
+    sweep is driven by the same uniform `est.fit(Xtr, ytr)` call, so this pins
+    the topology (and `leaf_targets`, unused here: no per-leaf ground truth
+    exists for Concrete/BodyFat the way N-CMAPSS's health parameters do) at
+    construction and forwards a plain 2-arg `.fit`.
+    """
+
+    def __init__(self, topology, order, seed):
+        self._topology = topology
+        self._inner = None
+        self._order = order
+        self._seed = seed
+
+    def fit(self, X, y):
+        import fuzzytree
+
+        self._inner = fuzzytree.DeconstructedHierarchicalRegressor(
+            flat_regressor_kwargs={"n_output_buckets": 3, "top_n": -1, "random_state": self._seed},
+            order=self._order,
+        )
+        self._inner.fit(X, y, self._topology)
+        return self
+
+    def predict(self, X):
+        return self._inner.predict(X)
+
+
+def deconstructed_regressor(order, seed, topology):
+    if topology is None:
+        return None  # no hand-authored topology for this dataset -> N/A, not omitted
+    import fuzzytree
+
+    if not hasattr(fuzzytree, "DeconstructedHierarchicalRegressor"):
+        return None
+    return _fm._try(lambda: _DeconstructedAdapter(topology, order, seed))
+
+
+BASE_MODELS = [
     ("flat TribbleRegressor (reference)", flat_regressor),
     ("FuzzyRegressionTree (TribbleTree)", tree_regressor),
     ("HierarchicalFuzzyExpertsRegressor (HME)", hme_regressor),
 ]
+DECONSTRUCTED_NAME = "DeconstructedHierarchicalRegressor (known topology)"
+
+
+def models_for(label):
+    """All four arms, always -- the deconstructed one reports N/A (not simply
+    omitted) on a dataset with no hand-authored topology, same convention as
+    every other N/A cell in this harness (common.NA)."""
+    topology = TOPOLOGIES.get(label)
+    return BASE_MODELS + [
+        (DECONSTRUCTED_NAME, lambda order, seed, _t=topology: deconstructed_regressor(order, seed, _t))
+    ]
 
 
 def _warm_up(X, y):
@@ -195,15 +296,15 @@ def _warm_up(X, y):
         pass
 
 
-def sweep(label, X, y):
+def sweep(label, X, y, models):
     """-> {(model_name, order): {"r2": [...], "rmse": [...], "time": [...]}}"""
-    store = {(m, o): {"r2": [], "rmse": [], "time": []} for m, _ in MODELS for o in ORDERS}
+    store = {(m, o): {"r2": [], "rmse": [], "time": []} for m, _ in models for o in ORDERS}
     complained = set()
     _warm_up(X, y)
     for seed in C.SEEDS:
         Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed)
         for order in ORDERS:
-            for model_name, build in MODELS:
+            for model_name, build in models:
                 try:
                     est = build(order, seed)
                     if est is None:
@@ -227,7 +328,7 @@ def sweep(label, X, y):
     return store
 
 
-def rows_from(label, store):
+def rows_from(label, store, models):
     """Rows for the emitted table, plus a per-model relative-time view.
 
     The relative-time column reads training time as a MULTIPLE of that model's
@@ -237,7 +338,7 @@ def rows_from(label, store):
     model," not "which model is fastest," so each model is its own baseline.
     """
     rows = []
-    for model_name, _ in MODELS:
+    for model_name, _ in models:
         times = [C.agg(store[(model_name, o)]["time"])[0] for o in ORDERS]
         rel = C.normalized(times)
         for order, rel_i in zip(ORDERS, rel):
@@ -265,13 +366,14 @@ def main():
     header = ["Dataset", "Model", "TSK order", "R2", "RMSE", "Train time (s)", "Time vs 0th-order"]
     rows = []
     for label, X, y in _load_datasets():
+        models = models_for(label)
         if X is None:
-            for model_name, _ in MODELS:
+            for model_name, _ in models:
                 for order in ORDERS:
                     rows.append([label, model_name, order, C.NA, C.NA, C.NA, C.NA])
             continue
         print(f"  [{label}] N={len(X)}  M={X.shape[1]}")
-        rows += rows_from(label, sweep(label, X, y))
+        rows += rows_from(label, sweep(label, X, y, models), models)
 
     C.emit(
         "table_tribbletree_tsk_order",
@@ -294,7 +396,13 @@ def main():
             "reads as +/-60% seed noise). 'Time vs 0th-order' is each model's own "
             "training time as a multiple of ITS OWN 0th-order time -- a "
             "within-model growth-shape reading, not a cross-model speed "
-            "comparison. Higher R2 and lower RMSE are better."
+            "comparison. 'DeconstructedHierarchicalRegressor' fits one flat "
+            "TribbleRegressor then deconstructs it into a HAND-AUTHORED domain "
+            "topology (TOPOLOGY_CONCRETE/TOPOLOGY_BODYFAT in this script) -- a "
+            "starting proposal, not a verified ground truth, in the same spirit "
+            "as the C-MAPSS sensor grouping in DECONSTRUCTED_TREE_FINDINGS.md; "
+            "N/A wherever no topology exists for the dataset (e.g. BikeShare). "
+            "Higher R2 and lower RMSE are better."
         ),
     )
 
