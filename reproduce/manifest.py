@@ -590,6 +590,31 @@ EXPERIMENTS = [
         "byte); the ten-seed pass is what removed the apparent accuracy edge. "
         "Runs in a few minutes.",
     ),
+    # ---- Model-behaviour studies (no chapter table of their own) ----
+    Experiment(
+        id="tsk-order-auto",
+        title="TSK consequent-order selection: every fixed order vs. "
+        'tsk_order="auto", three regression datasets, ten paired seeds',
+        chapter="Ch4",
+        produces="experiments/tsk-order-auto/RESULTS.md (no numbered table)",
+        repo="tribble-fis",
+        command=_uv("../experiments/tsk-order-auto/run.py"),
+        hardware="any",
+        datasets=["Diabetes (sklearn)", "Concrete", "Bike Sharing (n=4000)"],
+        outputs=["experiments/tsk-order-auto/results.json"],
+        notes="Discharges grad-school #120: does tsk_order='auto' (tribble-fis "
+        "#200, already in the ae0ef13 pin) remove the full-2nd overfit without "
+        "costing accuracy? It does -- no negative R2 on diabetes-scale data "
+        "where full-2nd reaches -0.144, and it BEATS every fixed order on the "
+        "two larger sets by reaching '3rd'. Listed here because results.json is "
+        "a committed artifact: an artifact with no recorded command that "
+        "produces it is a hand-run, which is the trap FIS_TABLES in "
+        "run_all_tables.sh names three tables for. NOT in run_all_tables.sh -- "
+        "it produces no numbered table and has no chapter slot. ~36 s. "
+        "Diabetes ships with sklearn; the other two read data/ and report as "
+        "skipped if absent. results.json carries its own provenance block "
+        "(pin SHAs, versions, host, UTC timestamp).",
+    ),
     # ---- Ch3 pVAT / clustering experiments ----
     Experiment(
         id="ch3-adversarial-eval",
