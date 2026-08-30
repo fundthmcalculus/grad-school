@@ -127,6 +127,14 @@ declare -A SLOW_TABLES=(
   # (dimension x precision) for distances, with a CPU arm beside every one, so ten
   # seeds is ~25 min on its own -- the slowest single table in the suite.
   [table_3_4_gpu_speedups]=1
+  # Added with the ROOT_TABLES wiring below. 146 s measured on this host at ten
+  # seeds -- slower than table_hyperparam_normalization (112 s), the cheapest
+  # entry above -- so by this list's own threshold it belongs here. It honours the
+  # reduction: table_5_4_ch5_g1_scaling.py reads `C.SEEDS`, which common.py builds
+  # from REPRO_SEEDS, the variable run_one exports. Its sibling
+  # table_5_1_3_ch5_tables is a pure renderer of an existing results.json and is
+  # deliberately NOT here: it has no seeds of its own to reduce.
+  [table_5_4_ch5_g1_scaling]=1
 )
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/reproduce/outputs"
@@ -178,8 +186,6 @@ if [ -z "$PY" ]; then
   echo "error: no working python interpreter (tried python3, python, py -3)" >&2
   exit 1
 fi
-
-mkdir -p "$DEST/logs"
 
 # (project, script) pairs -- the project is the uv environment the script needs.
 #
@@ -242,9 +248,83 @@ declare -A TABLE_DEPS_FALLBACK=(
   [table_3_4_gpu_speedups]="--with scipy"
 )
 # Stdlib-only renderers -- no submodule environment, so they run on the host python.
+# table_5_1_3_ch5_tables replaced table_5_x_ch5_selection when the Chapter 5 script
+# was split (into it and table_5_4_ch5_g1_scaling); the old name lingered here and
+# every sweep since FAILED on a file that no longer exists while the split's real
+# outputs were carried forward stale from a hand-run -- the exact "archive contains
+# a table the orchestrator did not produce" trap this file warns about elsewhere.
 PLAIN_TABLES=(
-  table_5_x_ch5_selection
+  table_5_1_3_ch5_tables
 )
+
+# Root-.venv tables -- repo="." in manifest.py: they do their own computation and
+# need numpy/sklearn plus modules imported from gated-minimax-selection/ on sys.path,
+# but no submodule package. `run_one .` runs them under `uv run --project <root>`,
+# so they get the synced root environment rather than the bare host python (which on
+# this Windows host is the Store stub and has no numpy).
+#
+# Only table_5_4 is here. manifest.py's third repo="." entry,
+# table-5-5-7-ch5-hdbscan-baselines, is left out ON PURPOSE: it needs the `hdbscan`
+# contrib package, which is in no repo venv (its manifest note says to install it
+# into a throwaway venv), and it feeds Appendix A.8 rather than a numbered table.
+# Wiring it in would fail every sweep on an import this environment cannot satisfy.
+ROOT_TABLES=(
+  table_5_4_ch5_g1_scaling
+)
+
+# Every listed generator must EXIST before the run starts.
+#
+# This check is here because of the bug the PLAIN_TABLES/ROOT_TABLES wiring above
+# fixes: the Chapter 5 script was split in two, this file kept naming the removed
+# `table_5_x_ch5_selection`, and every sweep from then on carried a FAILED table
+# whose replacements never ran -- their stale outputs swept into each archive and
+# presented as part of the current run. Nothing caught it, because a missing script
+# is only discovered when the loop reaches it: for a mid-list FIS table that is
+# hours into a sweep, and the evidence is one `FAILED` line in a status block long
+# enough to scroll past. See outputs/bump-ae0ef13-2026-08-30/PROVENANCE.txt.
+#
+# Checking up front costs milliseconds and turns a silent stale-carry-forward into
+# an abort before any compute is spent.
+_missing=()
+for _t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}" "${ROOT_TABLES[@]}"; do
+  [ -f "$ROOT/reproduce/tables/$_t.py" ] || _missing+=("$_t")
+done
+if [ ${#_missing[@]} -gt 0 ]; then
+  echo "error: these tables are listed in this script but have no generator on disk:" >&2
+  printf '         reproduce/tables/%s.py
+' "${_missing[@]}" >&2
+  echo "       A renamed or split generator leaves the old name behind; the sweep" >&2
+  echo "       then FAILS on it and carries the real outputs forward stale." >&2
+  echo "       Fix the list (or restore the file) before running." >&2
+  exit 1
+fi
+unset _missing
+
+# Same guard for a filtered run. `run_all_tables.sh label tabel_4_8_mf_dedup` used
+# to run zero generators, archive whatever was already loose in outputs/, and exit
+# 0 -- indistinguishable from a successful backfill.
+if [ ${#ONLY[@]} -gt 0 ]; then
+  _unknown=()
+  for _t in "${ONLY[@]}"; do
+    case " ${FIS_TABLES[*]} ${CLUSTER_TABLES[*]} ${PLAIN_TABLES[*]} ${ROOT_TABLES[*]} " in
+      *" $_t "*) ;;
+      *) _unknown+=("$_t") ;;
+    esac
+  done
+  if [ ${#_unknown[@]} -gt 0 ]; then
+    echo "error: not a table this script runs: ${_unknown[*]}" >&2
+    echo "       A filtered run that matches nothing produces no numbers and still" >&2
+    echo "       archives the loose outputs, which reads as a successful backfill." >&2
+    exit 1
+  fi
+  unset _unknown
+fi
+unset _t
+
+# Only now, with the table lists validated, is the archive directory created --
+# a run that aborts on a bad list must not leave an empty archive behind for the
+# next reader to find.
+mkdir -p "$DEST/logs"
 
 declare -A STATUS
 declare -A SEEDS_USED
@@ -474,7 +554,7 @@ echo "=== $LABEL ==="
 if [ $ARCHIVE_ONLY -eq 1 ]; then
   echo "--archive-only: running no generators; snapshotting the loose outputs in"
   echo "                $(basename "$OUT")/ as they stand."
-  for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}"; do
+  for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}" "${ROOT_TABLES[@]}"; do
     STATUS[$t]="archived-not-run"
     SEEDS_USED[$t]="$FULL_SEEDS (not verified -- see the notice in PROVENANCE.txt)"
   done
@@ -487,6 +567,8 @@ else
   EXTRA_DEPS=""
   echo "no submodule env:"
   for t in "${PLAIN_TABLES[@]}"; do run_one - "$t"; done
+  echo "root .venv:"
+  for t in "${ROOT_TABLES[@]}"; do run_one . "$t"; done
 fi
 
 # Archive the tables themselves next to the logs.
@@ -712,7 +794,7 @@ print("blas", blas)
     || printf '  %-16s %s\n' "libs" "unavailable"
   echo
   echo "status:"
-  for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}"; do
+  for t in "${FIS_TABLES[@]}" "${CLUSTER_TABLES[@]}" "${PLAIN_TABLES[@]}" "${ROOT_TABLES[@]}"; do
     # Unset means the filter skipped it; say so rather than claiming a result.
     # The seed set is recorded PER TABLE because --fast makes it vary between
     # them, and a reader must be able to tell which cells are thin.
