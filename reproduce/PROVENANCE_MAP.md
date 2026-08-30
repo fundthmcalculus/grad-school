@@ -251,8 +251,8 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.1 Value of the transform | `table_hyperparam_normalization.py` | `outputs/table_hyperparam_normalization.{md,csv}` | **reproduced** at 10 seeds; **now three arms, and the prose's column label is wrong — note 16** |
 | 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** at three consequent orders; **G5 settled on the 0th-order rows — note 19** |
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
-| 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
-| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **PhiUSIIL row STALE** — trained on the three leaks until #215 dropped them on load; re-derive leak-free before quoting it or §1/§4's "two-rule classifier at 0.997" — note 31. Concrete/Bike Sharing rows **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
+| 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **re-derived leak-free** at 10 seeds, `phiusiil-leakfree-2026-08-30` (5,011 s). PhiUSIIL row 0.997±0.001 → **0.440±0.181** and 235K×54 → 235,795×47; Concrete rows come from `table_hyperparam_normalization`, which was NOT re-run, and RT-IOT2022's accuracy is unchanged — notes 31, 31(a) |
+| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **re-derived leak-free at 10 seeds** AND **ANFIS/GA-FIS filled** — Goal C1 closed, grad-school #190. §1/§4's "two-rule classifier at 0.997" is re-transcribed to 0.440±0.181. The two MoG rows are still from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
 | 4.8 MF deduplication | `table_4_8_mf_dedup.py` (+ `_mf_dedup.py`) | `outputs/table_4_8_mf_dedup.{md,csv}` | **stale** — prose is `mf-dedup-2026-08-05` @ tribble-fis `6ddb8028`; the max-lossless column moved from TWO causes — our own CI correction (#143: Digits 44.2%→56.4% with byte-identical means) and tribble-fis #218 (BreastCancer 0.0%→66.5%, Wine 10×→7×) — with Diabetes 2×→3× unattributed; @1× reduction *percentages* unchanged but BreastCancer's raw MF moved 11.1→16.4 — note 29 |
@@ -261,6 +261,7 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.11(c) BETH feature reduction | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.4 — note 23 |
 | 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |
 | 4.11(e) BETH knob validation | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.3–§4.4 — note 24 |
+| 4.1b Training-time comparison | `table_4_1_mog_baselines.py` | `outputs/table_4_1b_baseline_timing.{md,csv}` | **new**, 10 seeds, `phiusiil-leakfree-2026-08-30`. The Goal C1 deliverable: MoG vs ANFIS/GA-FIS wall-clock, **14×–194×**. The deferred issue's 1-seed preview said ~272× on Concrete; ten seeds plus #237's dual-form solve (a 3.4× speedup of the GA-FIS arm) bring it to 78× — superseded by our own optimisation of the baseline — note 31(a) |
 | *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md`; **re-derived leak-free** at `phiusiil-leakfree-2026-08-30`. The PhiUSIIL flat-MoG row moves 0.997±0.001 → 0.440±0.181 and its t-norm **spread goes 0.000 → 0.243**, so "the norm/conorm choice is inert" does NOT hold there leak-free; HME's pick moves probability → einstein — note 31(a) |
 
 **Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
@@ -673,6 +674,7 @@ is identifiable rather than mysterious.
 | **6.1** PhiUSIIL, fuzzy tree | 0.970 ± 0.003 | 0.958 ± 0.003 | |
 | **6.1** PhiUSIIL, CART / RF | 1.000 / 1.000 | **0.997 / 1.000** | |
 | norm/conorm, PhiUSIIL flat MoG | 0.997 ± 0.001 (spread 0.000) | **0.440 ± 0.181 (spread 0.243)** | |
+| **4.4 / 4.5** PhiUSIIL, flat MoG | 0.997 ± 0.001 | **0.440 ± 0.181** | ANFIS **0.999 ± 0.001**, GA-FIS **0.998 ± 0.001** on the same 47 features |
 | **A.2** one feature, wasserstein | 0.9967 | **0.5733** | |
 
 Concrete's rows in 6.1 are byte-identical across the two runs, which is the
@@ -700,12 +702,21 @@ guard against in the loader: none of the nine tripwires is in the selected five
 under the shipped wasserstein scorer. The tripwire decision stands; this is a
 separate and more interesting failure.
 
+**The ten-seed Table 4.5 pass settles the question the mechanism raised.** If the
+collapse were the dataset getting hard without its dominant feature, every
+method would fall. None does. On the identical 47 features **ANFIS reaches
+0.999 ± 0.001 and a GA-tuned FIS 0.998 ± 0.001**, beside CART's 0.997 ± 0.001
+and the forest's 1.000 ± 0.000. Two independently-implemented *fuzzy* systems
+clear 0.998 where this construction sits at 0.440. They partition the whole
+input space (a 12-rule scatter partition) rather than fitting a Gaussian
+mixture over a top-5, which is exactly the difference the binary-feature
+mechanism above predicts.
+
 **What this obliges.** Chapter 6 says twice that PhiUSIIL is saturated — *"every
 method it tests landing within a fraction of a perfect score"* — and that it
 should therefore carry no weight in a comparison between methods. **Leak-free
 that is no longer true, and it stops being a point in the construction's
-favour**: CART and Random Forest still reach 0.997 and 1.000, while the flat MoG
-is at the majority baseline. The dataset is saturated for trees and not for this
+favour**: it is saturated for everything tested *except* this construction. The dataset is saturated for trees and not for this
 construction. §1's and §4's *"trains a two-rule classifier to 0.997 ± 0.001
 accuracy in 0.64 ± 0.02 seconds"* is the same row and moves with it; the rule
 count and the training time survive, the accuracy does not.

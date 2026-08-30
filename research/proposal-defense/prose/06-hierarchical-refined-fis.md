@@ -158,10 +158,12 @@ baseline, while CART and Random Forest still reach 0.997 and 1.000. The Concrete
 columns are byte-identical across the two runs, which is the control: only the
 PhiUSIIL feature set changed.
 
-That reverses what this table was for. **PhiUSIIL is saturated for trees and not
-for this construction**, so it stops being a dataset on which the hierarchy's
-methods are indistinguishable from the baselines, and starts being one on which
-they are 0.56 behind. The mechanism is measured in `PROVENANCE_MAP.md` note
+That reverses what this table was for. **PhiUSIIL is saturated for everything
+tested except this construction** — Table 4.5's ten-seed pass puts ANFIS at
+0.999 ± 0.001 and a GA-tuned FIS at 0.998 ± 0.001 on the identical 47 features,
+alongside CART's 0.997 and the forest's 1.000. So it stops being a dataset on
+which the hierarchy's methods are indistinguishable from the baselines, and
+starts being one on which the flat arm is 0.56 behind them. The mechanism is measured in `PROVENANCE_MAP.md` note
 31(a): leak-free, the selector's top five are four *binary* flags plus one
 bounded score, and a per-feature Gaussian **mixture** over a two-point support is
 a poor and unstable model — which is also where the ±0.181 comes from. The

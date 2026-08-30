@@ -1,0 +1,6 @@
+Rank,wasserstein,bhattacharyya,composite
+1,HasSocialNet (1.000),IsHTTPS (1.000),IsHTTPS (1.000)
+2,HasCopyrightInfo (0.858),HasSocialNet (0.848),HasSocialNet (0.975)
+3,HasDescription (0.726),NoOfQMarkInURL (0.810),HasTitle (0.827)
+4,DomainTitleMatchScore (0.544),IsDomainIP (0.761),NoOfCSS (0.800)
+5,HasSubmitButton (0.539),NoOfEqualsInURL (0.744),NoOfSelfRef (0.795)

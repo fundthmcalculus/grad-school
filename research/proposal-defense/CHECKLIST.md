@@ -78,11 +78,26 @@ replaced. **E2b** has also stopped being one: Table 3.4 is measured, and what is
 the sentence in §3.3.3 that has to say which comparison it is making. The rest are research
 scheduled after the defense, or editorial.
 
-**C1 changed shape today rather than closing.** The ANFIS and GA-FIS adapters landed, so the
-title's *orders of magnitude faster* finally has something to be faster *than* — but the run is
-still owed, and it is a scheduled job rather than a background one: both baselines build a
-256-rule grid partition on Concrete's eight features, which costs 5–6 minutes per seed on the
-smallest of the five datasets. Build a slot for it; do not shortcut it to three seeds.
+**C1 is CLOSED (2026-08-30).** The ten-seed run landed — `rc=0` in 5,011 s, archive
+`reproduce/outputs/phiusiil-leakfree-2026-08-30/`, seeds 0–9, zero N/A cells — and it ran on the
+leak-free PhiUSIIL feature set, which matters: running it a day earlier would have published
+Table 4.1 with the target leak still in. Table 4.5's ANFIS and GA-FIS columns are filled and
+Table 4.1b is added to Chapter 4.
+
+Two things the run says that the deferred issue's 1-seed preview did not. **The speedup is
+14×–194×, not a flat "two orders of magnitude"** — Bike Sharing at 14× is the weakest cell and
+belongs in the claim, and the random forest is *not* slower than the construction on Concrete or
+Bike Sharing, so the argument is against fuzzy-system induction rather than against trees. And
+**Concrete's ratio fell from the preview's ≈272× to 78×**, because grad-school #237's dual-form
+consequent solve sped the GA-FIS arm up by 3.4×: the earlier figure is superseded by our own
+optimisation of the baseline, which is the right direction for it to move.
+
+**The baselines are not strawmen, and the leak-free numbers make that sharper.** They match or
+beat the MoG arm on accuracy in five of six cells — GA-FIS takes Concrete outright at
+0.896 ± 0.038, and both take PhiUSIIL at ≈0.999 against 0.440 ± 0.181. That last pair is the
+control for `PROVENANCE_MAP.md` note 31(a): two independently-implemented *fuzzy* systems clear
+0.998 on the same 47 features where this construction sits at the majority baseline, so the
+collapse is the construction's and not the dataset's.
 
 Infrastructure is no longer the constraint it was at the start of August: the B-section closed
 seven items this month and has one substantive gap left, **B10**'s fp16/GPU capture.
