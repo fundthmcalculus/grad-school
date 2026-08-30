@@ -39,6 +39,35 @@ n_gate_terms=2, top_n=4, min_soft_count=40, min_expert_samples=60), the same
 provenance `table_hyperparam_normalization.py` documents for its own tree/HME
 arms.
 
+TIMING AUDIT -- why the plain tree is ~8-9x faster than the flat model, and
+~30x faster than HME, at every order (Concrete, 1st order: flat 0.22s, tree
+0.026s, HME 0.82s). This looks suspicious on first read -- surely a tree that
+does MORE work (multiple regions instead of one) can't train faster than the
+flat model it's built from? It can, because `FuzzyRegressionTree.fit()`
+(`regressor.py`) never calls `TribbleRegressor` at all: per the README, "the
+plain FuzzyRegressionTree is exactly the special case where each expert is a
+single TSK consequent instead of a full sub-FIS." Its splits come from
+`splitter.py`'s variance-reduction criterion and `terms.py`'s deterministic
+quantile-knot trapezoid construction -- no density fitting anywhere -- and its
+leaves solve one shared closed-form ridge system (`solve.py`). HME's leaves,
+by contrast, genuinely ARE full `TribbleRegressor` sub-FIS instances
+(`hme.py::HierarchicalFuzzyExpertsRegressor.fit`, `expert = TribbleRegressor(**base_kwargs)`
+per leaf) -- which is exactly why HME is the slow arm here, consistent with
+the intuition that embedding TribbleRegressor must cost more.
+
+`cProfile` on Concrete confirms where the flat model's time actually goes:
+88% of its 0.22s (`create_gaussian_membership_dict`, `gauss_math.py`) is an
+automatic BIC-driven Gaussian-mixture EM search, run independently for every
+(feature, output-bucket) pair -- 8 features x 3 buckets by default
+(`top_n=-1`). The tree's `top_n=4` halves the feature count (flat at
+`top_n=4`: 0.13s), and forcing the flat model's component count instead of
+BIC-searching it (`n_gaussians=1`) roughly halves it again (0.05s) -- landing
+just above the tree's 0.026s, whose remaining edge is that even a
+single-component GMM fit costs more than reading off quantile knots. So the
+gap is real and now attributed: most of it is "EM/BIC density-fit vs.
+deterministic quantile split," not a measurement artifact, and not `top_n`
+alone.
+
 Run (from repo root):
     uv run --project tribble-fis python reproduce/tables/table_tribbletree_tsk_order.py
 
