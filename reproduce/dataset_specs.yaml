@@ -196,15 +196,38 @@ datasets:
     name: PhiUSIIL phishing URL
     task: binary classification
     rows: 235795
-    features: 50
+    features: 47
     classes: 2
     published_features: 54
+    numeric_columns: 50
     note: >-
       The shipped CSV has 56 columns: one label (`label`) and five non-numeric
       columns (FILENAME, URL, Domain, TLD, Title) that every loader here drops,
-      leaving 50 that reach a model. The prose quoted 54 -- the count you get by
+      leaving 50 numeric. The prose quoted 54 -- the count you get by
       subtracting only the label and FILENAME -- which counts four text columns
-      as modelled features. 50 is the number the measurements were made on.
+      as modelled features.
+
+      LEAKY FEATURES DROPPED (2026-08-30, issue #215): of those 50, three are
+      computed from knowledge of the legitimate class and are dropped on load by
+      `repro_data.load_phiusiil` (`drop_leak=True`, the default and the
+      protocol), leaving **47** that reach a model:
+
+        - `URLSimilarityIndex` -- similarity to a whitelist of KNOWN LEGITIMATE
+          URLs. The answer in disguise: exactly 100.0 with zero variance on all
+          134,850 legitimate rows, and single-feature separation AUC 0.9961, the
+          highest of any of the 50.
+        - `URLCharProb` -- empirical character-level legitimacy probability
+          fitted on this corpus's own labels. Separation AUC 0.7679.
+        - `TLDLegitimateProb` -- empirical P(legitimate | TLD), same provenance.
+          Separation AUC 0.6089.
+
+      `drop_leak=False` restores them for an experiment that wants to MEASURE
+      the leak; nothing quoted in the proposal may use it. The nine features
+      that are exactly constant across the legitimate class are NOT dropped
+      here -- they are a one-class hazard, not a supervised one, and
+      `experiments/phishing-oneclass/data.py` detects them from the data at the
+      point of use because which features are tripwires depends on which class
+      you fit. See PROVENANCE_MAP.md note 31.
 
       LABEL POLARITY: `label == 1` is LEGITIMATE (134,850 rows) and
       `label == 0` is PHISHING (100,945). `repro_data.load_phiusiil` mapped it
@@ -222,6 +245,13 @@ datasets:
       method: csv
       path: data/PhiUSIIL_Phishing_URL_Dataset.csv
       label_column: label
+      # The three leaks the loader drops, so the count derived from the raw CSV
+      # is the count that reaches a model (47) rather than the 50 numeric
+      # columns the file happens to carry.
+      drop_columns:
+        - URLSimilarityIndex
+        - TLDLegitimateProb
+        - URLCharProb
       optional: true # gitignored; recoverable from tribble-fis history
 
   rt_iot2022:

@@ -252,7 +252,7 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** at three consequent orders; **G5 settled on the 0th-order rows — note 19** |
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
 | 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
-| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
+| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **PhiUSIIL row STALE** — trained on the three leaks until #215 dropped them on load; re-derive leak-free before quoting it or §1/§4's "two-rule classifier at 0.997" — note 31. Concrete/Bike Sharing rows **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
 | 4.8 MF deduplication | `table_4_8_mf_dedup.py` (+ `_mf_dedup.py`) | `outputs/table_4_8_mf_dedup.{md,csv}` | **stale** — prose is `mf-dedup-2026-08-05` @ tribble-fis `6ddb8028`; the max-lossless column moved from TWO causes — our own CI correction (#143: Digits 44.2%→56.4% with byte-identical means) and tribble-fis #218 (BreastCancer 0.0%→66.5%, Wine 10×→7×) — with Diabetes 2×→3× unattributed; @1× reduction *percentages* unchanged but BreastCancer's raw MF moved 11.1→16.4 — note 29 |
@@ -261,7 +261,7 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.11(c) BETH feature reduction | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.4 — note 23 |
 | 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |
 | 4.11(e) BETH knob validation | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.3–§4.4 — note 24 |
-| *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
+| *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md`; its **PhiUSIIL column is stale** under #215's leak drop — note 31 |
 
 **Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
 not have been produced, and the library's default anomaly score is unreadable on it.**
@@ -575,6 +575,65 @@ loaders from here. The dataset is gitignored, so those tests SKIP on CI and run
 on any host that can actually produce a PhiUSIIL number — which is the only place
 the assertion means anything, and better than a synthetic fixture that would
 assert the mapping against itself.
+
+**Note 31 — PhiUSIIL's three legitimacy-derived features are dropped on load,
+so every PhiUSIIL number in this map is superseded.** Issue #215.
+`repro_data.load_phiusiil` now removes `URLSimilarityIndex`,
+`TLDLegitimateProb` and `URLCharProb` by default (`drop_leak=True`), leaving
+**47** of the 50 numeric columns. All three are computed from knowledge of the
+legitimate class:
+
+| Feature | What it is | Separation AUC (235,795 rows) |
+|---|---|---|
+| `URLSimilarityIndex` | similarity to a whitelist of **known legitimate** URLs | **0.9961** — the highest of all 50, and exactly 100.0 with zero variance on every legitimate row |
+| `URLCharProb` | empirical character-level legitimacy probability, fitted on this corpus's own labels | 0.7679 |
+| `TLDLegitimateProb` | empirical P(legitimate \| TLD), same provenance | 0.6089 |
+
+The first is the answer in disguise, and it is not a marginal case: it is the
+single most separating feature in the file, which is why every PhiUSIIL
+classification result computed with it present has to be re-read as "the model
+found the label column".
+
+**The proposal was already internally inconsistent about this.** Chapter 4's
+Table 4.12 one-class study (`experiments/phishing-oneclass/`) has excluded these
+three by policy since 2026-08-29 and says so in prose — *"the single most
+separating feature, `URLSimilarityIndex` … is removed"* — while every
+classification row on the same dataset trained on them. One PhiUSIIL result in
+the document was leak-free and the rest were not.
+
+**Why the nine "tripwire" features are NOT dropped here.** Nine features are
+exactly constant across the legitimate class (`IsDomainIP`, `HasObfuscation`,
+`NoOfObfuscatedChar`, `ObfuscationRatio`, `NoOfEqualsInURL`, `NoOfQMarkInURL`,
+`NoOfAmpersandInURL`, `IsHTTPS`, and `URLSimilarityIndex`, which goes as a leak
+anyway). The issue asked for a decision; this is it, with three reasons:
+
+1. **The hazard is one-class-specific.** Fit a Gaussian on the legitimate class
+   alone and a zero-variance direction puts any phishing row differing on it at
+   infinite distance, so one feature carries the whole score. A supervised
+   two-class model sees both classes' variance and has no such degeneracy — for
+   it, a strong binary indicator is signal, not leakage.
+2. **They are not label-derived.** `IsHTTPS` is a fact about the site, not a
+   statistic computed from the labels. Dropping it would remove real, causally
+   meaningful evidence for a reason that does not apply.
+3. **The set is not a property of the dataset.** *Which* features are tripwires
+   depends on which class you fit, so a loader that does not know the split
+   cannot hardcode them correctly. `experiments/phishing-oneclass/data.py`
+   detects them from the data at the point of use, which is the right place.
+
+**Every PhiUSIIL row below is stale until re-derived.** The affected generators
+are `table_4_1_mog_baselines.py` (Table 4.5's PhiUSIIL row and §4/§1's "two-rule
+classifier at 0.997"), `table_a1_feature_scoring.py` (Appendix A.1/A.2 — A.2's
+"the answer is 1 feature" is *that* feature, so this row changes most),
+`table_6_1_model_family.py`, `table_norm_conorm_matrix.py`, and
+`figures/fig_06_fuzzy_tree.py` (also stale from note 30's label inversion;
+regenerated once here rather than twice). `experiments/phishing-oneclass/` is
+**unaffected** — it never had them.
+
+`experiments/phishing-oneclass/test_phiusiil_leak_policy.py` pins the drop, the
+opt-out, the separation AUCs the policy is argued from, the claim that
+`URLSimilarityIndex` is the most separating feature in the file, and that the
+shared list and the one-class harness's own `LEAK` list have not drifted apart.
+
 
 
 *Secondary findings.* theta's J is **monotone** (+0.160 at theta=0 rising to +0.769 at
@@ -927,8 +986,8 @@ Table 7.1 is a goals-and-status matrix, not a measurement. No generator applies.
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| A.1 Feature ranking by scorer | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a1_feature_ranking.{md,csv}` | **reproduced** — all 20 cells identical to `main-d0efefc` |
-| A.2 Accuracy and fit time vs features kept | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a2_feature_count.{md,csv}` | **reproduced within a host**; the bhattacharyya accuracies are **not host-portable** — note 12 |
+| A.1 Feature ranking by scorer | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a1_feature_ranking.{md,csv}` | **STALE** — every scorer ranked `URLSimilarityIndex` at or near rank 1, and #215 drops it on load, so the whole ranking is re-derived from a different feature set — note 31. (Was **reproduced**, all 20 cells identical to `main-d0efefc`.) |
+| A.2 Accuracy and fit time vs features kept | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a2_feature_count.{md,csv}` | **STALE** — the appendix's "the answer is 1 feature" *is* the leak, so this row moves most under #215 — note 31. The host-portability caveat on the bhattacharyya accuracies still applies to whatever replaces it — note 12 |
 
 **Note 12 — one arm of A.2 moves between environments, it is the arm the appendix
 is least resting on, and the cause is now measured rather than guessed.** Against

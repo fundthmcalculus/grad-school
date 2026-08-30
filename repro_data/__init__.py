@@ -20,6 +20,7 @@ from __future__ import annotations
 from ._paths import DATA_DIR, REPO_ROOT
 from .loaders import (
     CONCRETE_COLS,
+    PHIUSIIL_LEAK_COLS,
     load_beth,
     load_bikeshare,
     load_bodyfat,
@@ -41,6 +42,7 @@ __all__ = [
     "DATA_DIR",
     "REPO_ROOT",
     "CONCRETE_COLS",
+    "PHIUSIIL_LEAK_COLS",
     "load_beth",
     "load_bikeshare",
     "load_bodyfat",
