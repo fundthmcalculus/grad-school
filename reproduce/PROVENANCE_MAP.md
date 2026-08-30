@@ -728,6 +728,44 @@ PhiUSIIL the leak-free top-five are binary and the model is at chance on them.
 Whether a continuous-feature budget, a different scorer, or a different
 `n_output_buckets` recovers it is unmeasured and is the obvious next experiment.
 
+**Note 32 — the 2026-08-30 pin bump clears the NOT-CITABLE false alarm and
+leaves Chapter 3 unverified.** PR #243 moves all three submodules:
+`tribble-fis` `ae0ef13` → `fdc54ca`, `tribble-cluster` `71dbcc3` → `d1a97ac`,
+`tribble-opt` `7ba4fc0` → `644ba34`. Read the ranges rather than the SHAs and it
+splits cleanly into a fix, a hazard, and a nothing.
+
+**The fix.** `tribble-fis`'s five commits are #221/#227 (its own optimizers /
+tribble-clustering pin refresh), #222 (dependency-sync CI), #223 (abort the test
+session when the venv is not running `src/`) and #225 (uniformity-preserving
+feature scalers — **additive**; the only deletions in `src/tribblefis/scaling.py`
+are three docstring lines). **No modelling code path changes.** After the bump,
+`tribble-fis`'s resolved `optimizers` / `tribble-clustering` revisions equal this
+repo's submodule pins, so `preflight.py`'s PIN-MATCH stops reporting drift and
+fis sweeps stop being stamped NOT CITABLE for a reason that was never about the
+numbers. Note 29 anticipated this: *"tribble-fis#221 bumps those pins so a re-run
+comes back citable."* Every fis archive stamped NOT CITABLE **for that reason
+alone** — including `bump-ae0ef13-2026-08-30` and `phiusiil-leakfree-2026-08-30`
+— is citable on its merits; the stamp was structural.
+
+**The hazard, and it is Chapter 3's.** `tribble-cluster` `71dbcc3` → `d1a97ac`
+carries `bb9f401`, *"fix(cfcm): restore the compiled FCM speedup and match
+fcm.py exactly"* — 329 lines of `src/tribbleclustering/cfcm.pyx`, with
+`ivatmeans.py` and `nerfcm.py` alongside. The title says the compiled path did
+**not** match `fcm.py`. Four tables sit on that code: `table_3_4_gpu_speedups`
+(whose FCM arm is `fcm.fuzzy_c_means` vs `gpu.fuzzy_c_means_gpu`),
+`table_3_1_pvat_scaling`, `table_3_7_g2_dtw_nonmetric` and
+`table_3_7_g2_downstream`. **Every Chapter 3 row is therefore UNVERIFIED at this
+pin** — not known-wrong, not known-right, unmeasured. A Chapter 3 re-sweep is the
+follow-up. Do not quote a Chapter 3 number as reproduced at `d1a97ac` until it
+has been.
+
+**The nothing.** `tribble-opt` `7ba4fc0` → `644ba34` is build and packaging only
+(`hatch_build.py`, the wheel platform matrix, a committed `uv.lock`) with no
+algorithm change — though *"compile the Cython kernels into the wheel"* means a
+host may now run compiled kernels where it previously fell back to numba, which
+is a performance-path change and so a **timing** caveat, not an accuracy one.
+
+
 
 
 
