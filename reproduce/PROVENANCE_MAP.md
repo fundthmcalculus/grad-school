@@ -890,6 +890,40 @@ getting the package transitively and no longer do; #252 names the dependency on
 `ModuleNotFoundError` land partway into a study. A study started between #256 and
 #252 would have hit that.
 
+**Note 34 — `tribble-opt` `091fe2c` → `6122a25`, and why a `src/` change can still
+be inert.** Pin bump #258, derived from `refs/pull/258/merge` (`Merge 5b22df2 into
+85811a1`, based on current `main`): it moves `tribble-opt` alone, leaving
+`tribble-fis` at `d97d6b8` and `tribble-cluster` at `20264b3`.
+
+Unlike #256 this one **does** touch `src/`, so the "no `src/` diff, therefore no
+number moves" shortcut does not apply and the range had to be read. It is one
+commit — `6122a25 refactor: drop the JIT warm-up machinery, now that there is no
+JIT (#142)` — at **+3 / −43** across
+`src/optimizers/combinatorial/{compare,strategy}.py`.
+
+It is dead-code removal, and upstream measured it rather than asserting it
+(N = 300, including fresh processes so the first-call effect is not amortised
+away): `warmup=True` 2.96–3.01 ms against `warmup=False` 2.96–3.11 ms repeated,
+3.47–4.45 ms against 3.59–4.39 ms cold. Indistinguishable, and the extra solves
+made the warm path marginally *slower*. `_warmup` existed for numba's first-call
+compile; numba is gone and the Cython extension is imported at module import,
+well before any timing starts. The `strategy.py` half only inlines
+`_LEGACY_NUMBA`, a one-use constant, leaving the rejected-backend error path
+behaviourally unchanged.
+
+**Inert here, checked two ways.** Nothing in this repository passes `warmup=` to
+optimizers — the `_warmup` hits under `ClusteringExperiments/` are those scripts'
+own private helpers — and `compare_tsp_heuristics` is not called anywhere outside
+the submodule. The only quantity that could move is a timing, and **Appendix
+A.3** already states its numbers are single-run microbenchmarks with no seeds, no
+spreads and no generator, to be read as orders of magnitude.
+
+*The general point, since this is the third pin bump in a day.* "Touches `src/`"
+is a screening question, not a verdict. #256 was answerable by
+`git diff --stat … -- src/` alone; this one needed the diff read and the callers
+checked. Note 32(a) is the case where skipping that step produced a claim that
+had to be withdrawn.
+
 
 
 
