@@ -1,0 +1,4 @@
+Dataset,metric,flat,fuzzy tree,mixture (HME),CART,Random Forest,M5
+Concrete,R2,0.687 ± 0.051,0.583 ± 0.071,0.636 ± 0.091,0.825 ± 0.049,0.909 ± 0.019,N/A
+Concrete,RMSE (MPa),9.117 ± 0.655,10.531 ± 0.937,9.782 ± 1.081,6.744 ± 0.779,4.904 ± 0.324,N/A
+PhiUSIIL,accuracy,0.440 ± 0.181,0.958 ± 0.003,0.914 ± 0.039,0.997 ± 0.001,1.000 ± 0.000,N/A

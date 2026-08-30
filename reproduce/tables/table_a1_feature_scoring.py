@@ -159,11 +159,22 @@ def main():
         header2,
         rows2,
         note=(
-            "A ranking that works reaches ~0.997 on ONE feature; a ranking "
-            "that does not never gets there at any size tested. This is the "
-            "evidence that interpretability is a property of the feature "
-            "ranking rather than of the model architecture -- see Appendix "
-            "A.4 and tribble-fis #49."
+            # This note used to read "A ranking that works reaches ~0.997 on ONE
+            # feature". That was true only while URLSimilarityIndex -- a URL's
+            # similarity to a whitelist of known-legitimate URLs, i.e. the label
+            # in disguise -- was in the feature set. grad-school #215 drops it on
+            # load, and leak-free NO ranking is accurate at a single clause: the
+            # best one-feature cell is 0.79, and the ordering of the scorers
+            # INVERTS (wasserstein was the strongest at one feature and is now
+            # the weakest). A generator that keeps asserting the old conclusion
+            # in its own footnote is worse than one that asserts nothing, so the
+            # note now states the measurement and leaves the conclusion to A.4.
+            "Feature counts are AFTER the leak-free drop (grad-school #215): "
+            "URLSimilarityIndex, TLDLegitimateProb and URLCharProb are not in "
+            "the ranked set. Read the one-feature row against the twenty-feature "
+            "row -- the gap between scorers at a fixed budget is the effect this "
+            "table measures. See Appendix A.4, PROVENANCE_MAP note 31, and "
+            "tribble-fis #49."
         ),
     )
 

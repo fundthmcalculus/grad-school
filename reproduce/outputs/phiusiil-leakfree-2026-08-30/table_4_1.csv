@@ -1,0 +1,6 @@
+Dataset (task),MoG train time,MoG accuracy / R2,ANFIS,GA-tuned FIS,tree / RF ref
+Concrete (regression),0.53 ± 0.05 s,R2=0.799 ± 0.027,0.799 ± 0.112,0.896 ± 0.038,0.909 ± 0.020
+"Concrete (regression, full 2nd order)",0.53 ± 0.04 s,R2=0.852 ± 0.030,0.799 ± 0.112,0.896 ± 0.038,0.909 ± 0.020
+Bike Sharing (regression),0.59 ± 0.07 s,R2=0.620 ± 0.014,0.577 ± 0.075,0.545 ± 0.047,0.944 ± 0.004
+PhiUSIIL (classification),0.13 ± 0.02 s,acc=0.440 ± 0.181,0.999 ± 0.001,0.998 ± 0.001,1.000 ± 0.000
+RT-IOT2022 (12-class),3.64 ± 0.25 s,acc=0.927 ± 0.002,0.983 ± 0.003,0.988 ± 0.002,0.998 ± 0.000

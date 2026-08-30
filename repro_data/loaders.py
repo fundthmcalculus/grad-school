@@ -82,22 +82,67 @@ def load_concrete():
     return X, y
 
 
-def load_phiusiil(sample_size=20000, random_state=42):
-    """PhiUSIIL phishing URL: 50 numeric features -> binary {"legit","phish"}.
+# Features computed from knowledge of the LEGITIMATE class -- the label in
+# disguise. Dropped by `load_phiusiil` unless `drop_leak=False`.
+#
+#   URLSimilarityIndex   similarity to a whitelist of KNOWN LEGITIMATE URLs.
+#                        Exactly 100.0, zero variance, on all 134,850 legitimate
+#                        rows; single-feature separation AUC 0.9961, the highest
+#                        of any of the 50.
+#   TLDLegitimateProb    empirical P(legitimate | TLD), fitted on this corpus's
+#                        own labels. Separation AUC 0.6089.
+#   URLCharProb          empirical character-level legitimacy probability, same
+#                        provenance. Separation AUC 0.7679.
+#
+# These are the three `experiments/phishing-oneclass/data.py` has quarantined by
+# policy since 2026-08-29 (its `LEAK` list). Naming them here is what makes the
+# policy repo-wide rather than one experiment's private convention.
+PHIUSIIL_LEAK_COLS = ("URLSimilarityIndex", "TLDLegitimateProb", "URLCharProb")
+
+
+def load_phiusiil(sample_size=20000, random_state=42, drop_leak=True):
+    """PhiUSIIL phishing URL: 47 numeric features -> binary {"legit","phish"}.
 
     Reads ``data/PhiUSIIL_Phishing_URL_Dataset.csv``. Returns (X, y) with y a
     numpy array of "legit"/"phish" strings, or None if the file is missing.
     ``sample_size`` (default 20000) subsamples for speed; pass None for all
     235,795 rows.
 
+    LEAKY FEATURES. ``drop_leak=True`` (the default and the protocol) removes
+    ``PHIUSIIL_LEAK_COLS`` -- ``URLSimilarityIndex``, ``TLDLegitimateProb``,
+    ``URLCharProb`` -- leaving 47 of the 50 numeric columns. All three are
+    computed from knowledge of the legitimate class, so a model trained on them
+    is reading the answer; ``URLSimilarityIndex`` alone separates the classes at
+    AUC 0.9961 and is exactly 100.0 on every legitimate row. This matches
+    ``load_bodyfat(drop_leak=True)``, which drops ``Density`` for the same
+    reason. ``drop_leak=False`` restores them, for a leak-aware experiment that
+    wants to MEASURE the leak; nothing quoted in the proposal may use it.
+
+    TRIPWIRES ARE NOT DROPPED HERE, ON PURPOSE. Nine features are exactly
+    constant across the legitimate class (``IsDomainIP``, ``HasObfuscation``,
+    ``NoOfObfuscatedChar``, ``ObfuscationRatio``, ``NoOfEqualsInURL``,
+    ``NoOfQMarkInURL``, ``NoOfAmpersandInURL``, ``IsHTTPS``, and
+    ``URLSimilarityIndex``, which goes as a leak anyway). They are a hazard for
+    a ONE-CLASS model -- fit a Gaussian on the legitimate class alone and a
+    zero-variance direction puts any phishing row that differs on it at
+    infinite distance, so one feature carries the whole score -- and not for a
+    supervised two-class model, which sees both classes' variance and for which
+    a strong binary indicator is signal, not leakage. They are also real
+    measured properties of a URL, not label-derived: ``IsHTTPS`` is a fact about
+    the site. And *which* features are tripwires depends on which class you fit,
+    so the set cannot be hardcoded in a loader that does not know -- which is
+    why ``experiments/phishing-oneclass/data.py`` detects them from the data at
+    the point of use. See ``reproduce/PROVENANCE_MAP.md`` note 31.
+
     This preprocessing previously delegated to the tribble-fis submodule's
     ``demo_phishing.load_data``. It is reimplemented here -- verified
     byte-identical to that loader for sample_size in {None, 20000} -- so the
     parent repo owns PhiUSIIL loading and no longer depends on the submodule for
     it. The five non-numeric columns (FILENAME, URL, Domain, TLD, Title) fall to
-    ``select_dtypes`` alongside the label, leaving the 50 modelled features
+    ``select_dtypes`` alongside the label, leaving 50 numeric columns -- of
+    which 47 reach a model once the three leaks above are dropped
     (``dataset_specs.yaml``'s phiusiil note documents why the prose's 54 was
-    wrong).
+    wrong, and now why 50 became 47).
 
     LABEL POLARITY. ``label == 1`` is **legitimate** and ``label == 0`` is
     **phishing**. Until 2026-08-30 this mapped the other way, inheriting the
@@ -140,9 +185,28 @@ def load_phiusiil(sample_size=20000, random_state=42):
         # "simplify" this back to {0: "legit", 1: "phish"}.
         y = df["label"].map({1: "legit", 0: "phish"})
         X = df.drop(columns=["label"]).select_dtypes(include=[np.number]).astype(float)
+        dropped = []
+        if drop_leak:
+            dropped = [c for c in PHIUSIIL_LEAK_COLS if c in X.columns]
+            X = X.drop(columns=dropped)
+        # Say which of the three cases happened. The third is the one that
+        # matters: `drop_leak=True` finding NOTHING to drop means this CSV does
+        # not carry the columns the policy was measured on, i.e. it is not the
+        # file we think it is. Silence there would be the worst of the three.
+        if dropped:
+            note = f"  ({len(dropped)} leaks dropped: {', '.join(dropped)})"
+        elif not drop_leak:
+            # A run WITH the leak has to be obvious in its own log a month later.
+            note = "  (LEAKY FEATURES KEPT -- do not quote this run)"
+        else:
+            note = (
+                "  [WARNING] drop_leak=True but none of "
+                f"{', '.join(PHIUSIIL_LEAK_COLS)} is present -- this is not the "
+                "PhiUSIIL file the leak policy was measured on"
+            )
         print(
             f"  [phiusiil] loaded {os.path.relpath(local, REPO_ROOT)}: "
-            f"{len(X)} rows × {X.shape[1]} features"
+            f"{len(X)} rows × {X.shape[1]} features" + note
         )
         return X, y.to_numpy()
     except Exception as exc:  # noqa: BLE001

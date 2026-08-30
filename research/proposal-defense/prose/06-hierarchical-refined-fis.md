@@ -44,7 +44,7 @@ That also rules out the tidy causal reading of the middle case. The mixture has 
 
 **One configuration mismatch.** Table 6.1 quotes the tree and the mixture under the log-and-min-max preprocessing, the regime that destroys the readability which is the hierarchy's whole payoff. Figure 6.1's "splits on age at *exactly* 28" is a raw-feature property and cannot hold in those cells, where the same boundary reads as a number in $[0,1]$. Quoted accuracy and quoted readability therefore come from **different configurations**, and no single run reported here exhibits both. The reconciliation generator does run both regimes, so the raw-preprocessing accuracy exists and could be quoted alongside; choosing which pair to lead with, and saying what the readable configuration costs in $R^2$, is owed work rather than a missing measurement.
 
-**Figure 6.1 — Trained fuzzy trees, as rules.** The `render_tree_text` output of two real fits. The Concrete tree splits on cement and then on age at *exactly* 28; the PhiUSIIL tree splits on `HasSocialNet`, `HasCopyrightInfo` and `URLSimilarityIndex`. Both are at the `tribble-tree/demo_*.py` configuration (`max_depth=3, n_terms=2`, four or five candidate variables), not library defaults; under the defaults the Concrete tree's second split is superplasticizer and no age boundary lands near 28. The 28-day recovery is a property of the tuned tree, the tree a practitioner would fit, but it is not automatic. It is also a *raw*-feature fit, the third axis flagged above.
+**Figure 6.1 — Trained fuzzy trees, as rules.** The `render_tree_text` output of two real fits. The Concrete tree splits on cement and then on age at *exactly* 28; the PhiUSIIL tree splits on `HasSocialNet` and then `HasCopyrightInfo`, and reads as a rule a practitioner would recognise: a page carrying a social-network link is legitimate (p = 1.00), and a page carrying neither a social-network link nor copyright information is phishing (p = 0.94). It used to take `URLSimilarityIndex` as its third split on *every* branch, and that whole level is gone on purpose — the feature is a URL's similarity to a whitelist of known-legitimate URLs, i.e. the label in disguise, and grad-school #215 now drops it and two sibling legitimacy probabilities on load, so no classification result in this document trains on them. Measured both ways at the same configuration: the leaky tree had **six** leaves and the leak-free one has **three**, so half the apparent structure was the tree reading the answer. Both are at the `tribble-tree/demo_*.py` configuration (`max_depth=3, n_terms=2`, four or five candidate variables), not library defaults; under the defaults the Concrete tree's second split is superplasticizer and no age boundary lands near 28. The 28-day recovery is a property of the tuned tree, the tree a practitioner would fit, but it is not automatic. It is also a *raw*-feature fit, the third axis flagged above.
 `![fuzzy-tree](fig/06-fuzzy-tree.png)`
 
 ### 6.3.3 A hierarchical mixture of fuzzy experts (one-shot built; EM proposed)
@@ -140,13 +140,35 @@ The grid also makes a configuration effect visible, and sizes it smaller than un
 
 | Method | Concrete R² | Concrete RMSE | PhiUSIIL accuracy |
 |---|---:|---:|---:|
-| **Fuzzy tree (this work)** | 0.583 ± 0.067 | 10.53 | 0.970 ± 0.003 |
-| **Mixture of experts (this work)** | 0.636 ± 0.087 | 9.79 | 1.000 ± 0.001 |
-| CART | 0.825 ± 0.047 | 6.74 | 1.000 ± 0.000 |
-| Random Forest (reference) | 0.909 ± 0.018 | 4.90 | 1.000 ± 0.000 |
+| **Fuzzy tree (this work)** | 0.583 ± 0.071 | 10.53 | 0.958 ± 0.003 |
+| **Mixture of experts (this work)** | 0.636 ± 0.091 | 9.78 | 0.914 ± 0.039 |
+| CART | 0.825 ± 0.049 | 6.74 | 0.997 ± 0.001 |
+| Random Forest (reference) | 0.909 ± 0.019 | 4.90 | 1.000 ± 0.000 |
 | M5 model tree | N/A (no working M5) | N/A (no working M5) | — |
 | ANFIS | N/A (C1) | N/A (C1) | N/A (C1) |
-| Flat TSK (= Ch 4 flat MoG) | 0.687 ± 0.049 | 9.12 | 0.997 ± 0.001 |
+| Flat TSK (= Ch 4 flat MoG) | 0.687 ± 0.051 | 9.12 | **0.440 ± 0.181** |
+
+**The PhiUSIIL column is leak-free as of 2026-08-30 and it no longer says what it
+used to.** Every cell above previously trained on `URLSimilarityIndex`, a URL's
+similarity to a whitelist of known-legitimate URLs — the label in disguise, and
+the single most separating feature in the dataset at AUC 0.996. `#215` drops it
+and two sibling legitimacy probabilities on load. With them gone the flat MoG
+falls from 0.997 ± 0.001 to **0.440 ± 0.181**, *below* the 0.5755 majority
+baseline, while CART and Random Forest still reach 0.997 and 1.000. The Concrete
+columns are byte-identical across the two runs, which is the control: only the
+PhiUSIIL feature set changed.
+
+That reverses what this table was for. **PhiUSIIL is saturated for everything
+tested except this construction** — Table 4.5's ten-seed pass puts ANFIS at
+0.999 ± 0.001 and a GA-tuned FIS at 0.998 ± 0.001 on the identical 47 features,
+alongside CART's 0.997 and the forest's 1.000. So it stops being a dataset on
+which the hierarchy's methods are indistinguishable from the baselines, and
+starts being one on which the flat arm is 0.56 behind them. The mechanism is measured in `PROVENANCE_MAP.md` note
+31(a): leak-free, the selector's top five are four *binary* flags plus one
+bounded score, and a per-feature Gaussian **mixture** over a two-point support is
+a poor and unstable model — which is also where the ±0.181 comes from. The
+construction's PhiUSIIL win rested on having one strong *continuous* feature, and
+that feature was the answer.
 
 *Reading the empty cells.* Both are blocked for stated reasons rather than unfinished. ANFIS is checklist item **C1**: `table_6_1_model_family.py` emits `N/A` unless an adapter is present, and none is. M5 is a different and more annoying problem — the generator already imports `m5py` optionally and would fill the row automatically, but `m5py` does not load against the scikit-learn in this environment (`ImportError: cannot import name 'DTYPE' from 'sklearn.tree._classes'`, sklearn 1.9.0), and pinning an older scikit-learn to rescue one row would move every other number in the chapter. So the row stays `N/A` until either `m5py` is updated or an M5' implementation is written against a current scikit-learn; it is a dependency fault, not an experiment not yet run.
 

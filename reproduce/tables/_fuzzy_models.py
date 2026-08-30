@@ -35,6 +35,7 @@ sys.path.insert(0, REPO_ROOT)  # repo root -> `import repro_data`
 from repro_data import (  # noqa: E402,F401 -- re-exported for existing callers
     CONCRETE_COLS,
     DATA_DIR,
+    PHIUSIIL_LEAK_COLS,
     load_beth,
     load_bikeshare,
     load_bodyfat,

@@ -1,0 +1,112 @@
+
+--- backfill 2026-08-30T18:29:04Z: table_a1_feature_scoring table_6_1_model_family table_norm_conorm_matrix ---
+
+########################################################################
+## PREFLIGHT FAILED -- see preflight.txt                             ##
+##                                                                    ##
+## An upstream contract this harness relies on does not hold, so the  ##
+## generators ran on a library that does not behave as they assume.   ##
+## Every number in this archive is suspect. See preflight.txt for     ##
+## which invariant broke and what it reaches.                         ##
+########################################################################
+
+tribble-fis: ae0ef132b786a781819a06168ee66c4247b7ec6b
+tribble-cluster: 71dbcc3853bc48733ee46e5a2d78fd43d8d0af12
+tribble-opt: 7ba4fc02738af7045fa3b271f74dace877bd2d4d
+grad-school: 11b7edf0366af1761eb028341987038866a957cb
+imported:
+  tribble-fis          dir file:///C:/personal/grad-school/tribble-fis
+  tribble-clustering   1dcf331b17b6a455babff953414894d95fbba4c4
+  optimizers           4d81121499a2c718f7d3cbd6566cb8a0604758ee
+seeds:       0,1,2,3,4,5,6,7,8,9
+thetas:      0.5,0.6,0.7,0.8,0.9,0.99,1.1 (table_4_4b operating curve)
+
+machine:
+  host             NEX-210200
+  os               MINGW64_NT-10.0-26200
+  kernel           MINGW64_NT-10.0-26200 3.4.10-2e2ef940.x86_64 x86_64
+  cpu              Intel(R) Core(TM) i9-14900HX
+  cores            32 logical
+  ram              95.6 GiB (102.7 GB decimal)
+  governor         n/a
+  boost            n/a
+  gpu              NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 610.88
+  python           Python 3.13.7
+  numpy            2.4.6  scipy 1.17.1  sklearn 1.9.0  python 3.13.7
+  blas             scipy-openblas 0.3.31.188.0
+
+status:
+  table_concrete_reconciliation          not-run-this-pass seeds=—
+  table_hyperparam_normalization         not-run-this-pass seeds=—
+  table_g5_output_partitioning           not-run-this-pass seeds=—
+  table_g5b_skew_sweep                   not-run-this-pass seeds=—
+  table_4_1_mog_baselines                not-run-this-pass seeds=—
+  table_6_1_model_family                 ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=3
+  table_norm_conorm_matrix               ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_4_openset                      not-run-this-pass seeds=—
+  table_a1_feature_scoring               ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_4_8_mf_dedup                     not-run-this-pass seeds=—
+  table_3_1_pvat_scaling                 not-run-this-pass seeds=—
+  table_3_1_reorder_three_arm            not-run-this-pass seeds=—
+  table_3_2_memory_precision             not-run-this-pass seeds=—
+  table_3_4_gpu_speedups                 not-run-this-pass seeds=—
+  table_3_7_g2_dtw_nonmetric             not-run-this-pass seeds=—
+  table_3_7_g2_downstream                not-run-this-pass seeds=—
+  table_5_1_3_ch5_tables                 not-run-this-pass seeds=—
+  table_5_4_ch5_g1_scaling               not-run-this-pass seeds=—
+
+--- backfill 2026-08-30T19:54:57Z: table_4_1_mog_baselines ---
+
+########################################################################
+## PREFLIGHT FAILED -- see preflight.txt                             ##
+##                                                                    ##
+## An upstream contract this harness relies on does not hold, so the  ##
+## generators ran on a library that does not behave as they assume.   ##
+## Every number in this archive is suspect. See preflight.txt for     ##
+## which invariant broke and what it reaches.                         ##
+########################################################################
+
+tribble-fis: ae0ef132b786a781819a06168ee66c4247b7ec6b
+tribble-cluster: 71dbcc3853bc48733ee46e5a2d78fd43d8d0af12
+tribble-opt: 7ba4fc02738af7045fa3b271f74dace877bd2d4d
+grad-school: dcbdf14f476752f669dc4911339d3b2dad8fa326
+imported:
+  tribble-fis          dir file:///C:/personal/grad-school/tribble-fis
+  tribble-clustering   1dcf331b17b6a455babff953414894d95fbba4c4
+  optimizers           4d81121499a2c718f7d3cbd6566cb8a0604758ee
+seeds:       0,1,2,3,4,5,6,7,8,9
+thetas:      0.5,0.6,0.7,0.8,0.9,0.99,1.1 (table_4_4b operating curve)
+
+machine:
+  host             NEX-210200
+  os               MINGW64_NT-10.0-26200
+  kernel           MINGW64_NT-10.0-26200 3.4.10-2e2ef940.x86_64 x86_64
+  cpu              Intel(R) Core(TM) i9-14900HX
+  cores            32 logical
+  ram              95.6 GiB (102.7 GB decimal)
+  governor         n/a
+  boost            n/a
+  gpu              NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 610.88
+  python           Python 3.13.7
+  numpy            2.4.6  scipy 1.17.1  sklearn 1.9.0  python 3.13.7
+  blas             scipy-openblas 0.3.31.188.0
+
+status:
+  table_concrete_reconciliation          not-run-this-pass seeds=—
+  table_hyperparam_normalization         not-run-this-pass seeds=—
+  table_g5_output_partitioning           not-run-this-pass seeds=—
+  table_g5b_skew_sweep                   not-run-this-pass seeds=—
+  table_4_1_mog_baselines                ok           seeds=0,1,2,3,4,5,6,7,8,9  N/A cells=0
+  table_6_1_model_family                 not-run-this-pass seeds=—
+  table_norm_conorm_matrix               not-run-this-pass seeds=—
+  table_4_4_openset                      not-run-this-pass seeds=—
+  table_a1_feature_scoring               not-run-this-pass seeds=—
+  table_4_8_mf_dedup                     not-run-this-pass seeds=—
+  table_3_1_pvat_scaling                 not-run-this-pass seeds=—
+  table_3_1_reorder_three_arm            not-run-this-pass seeds=—
+  table_3_2_memory_precision             not-run-this-pass seeds=—
+  table_3_4_gpu_speedups                 not-run-this-pass seeds=—
+  table_3_7_g2_dtw_nonmetric             not-run-this-pass seeds=—
+  table_3_7_g2_downstream                not-run-this-pass seeds=—
+  table_5_1_3_ch5_tables                 not-run-this-pass seeds=—
+  table_5_4_ch5_g1_scaling               not-run-this-pass seeds=—

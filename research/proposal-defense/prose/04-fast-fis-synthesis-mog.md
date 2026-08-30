@@ -186,7 +186,9 @@ Novelty detection and open-set recognition are established fields — one-class 
 
 The datasets here are public, so unlike Chapter 3's psychiatric set I can name them freely.
 
-On the **PhiUSIIL phishing URL** dataset the model reaches 0.997 ± 0.001 accuracy in under three-tenths of a second, with two rules and a handful of clauses: a readable, two-rule fuzzy classifier trained in the time it takes to describe it. CART and a random forest both score a perfect 1.000 here, so PhiUSIIL is saturated and cannot separate these methods on accuracy. What the row demonstrates is the *rule count and the training time*.
+On the **PhiUSIIL phishing URL** dataset the model builds two rules and a handful of clauses in $0.13 \pm 0.02$ s — a readable fuzzy classifier trained in the time it takes to describe it. **Its accuracy there is 0.440 ± 0.181.** That row read 0.997 ± 0.001 until 2026-08-30, when `URLSimilarityIndex` and two sibling legitimacy probabilities were dropped from the loader as target leaks (grad-school #215; `PROVENANCE_MAP.md` notes 31 and 31(a)). `URLSimilarityIndex` is a URL's similarity to a whitelist of *known-legitimate* URLs and separates the classes on its own at AUC 0.996; without it the construction sits *below* the 0.5755 majority-class baseline.
+
+This is **not** the dataset becoming hard. On the identical 47 features, ANFIS reaches 0.999 ± 0.001, a GA-tuned FIS 0.998 ± 0.001, CART 0.997 ± 0.001 and a random forest 1.000 ± 0.000. PhiUSIIL is still saturated — for every method tested except this one. The construction's result there rested on a single strong *continuous* feature, and that feature was the label in disguise; leak-free its top five are four binary flags plus one bounded score, and a per-feature Gaussian **mixture** over a two-point support is a poor and unstable model, which is also where the ±0.181 comes from. What this row demonstrates is now the *rule count and the training time* and nothing else — and the training time is the strongest speed ratio in the study, 194× the slowest fuzzy baseline (Table 4.1b).
 
 **RT-IOT2022** ({{dataset.rt_iot2022.rows}} instances, {{dataset.rt_iot2022.features}} features, {{dataset.rt_iot2022.classes}} output classes) is the chapter's scale *target*, and both halves of the claim are now measured. Classification and timing, at the ten-seed protocol (`table_4_1_mog_baselines.py`): the MoG classifier trains in **4.24 ± 0.68 s at 92.7 ± 0.2% accuracy**, against a 200-tree Random Forest reference at 99.8 ± 0.0%. Random Forest wins on accuracy by seven points, so the claim here is speed and rule count — twelve rules trained in about four seconds on {{dataset.rt_iot2022.rows}} rows and {{dataset.rt_iot2022.features}} features (at `top_n = 5`, not the full antecedent screen). The open-set claim is measured separately (§4.3.5's complement rule against purpose-built detectors, at full scale and all {{dataset.rt_iot2022.features}} features): that is Table 4.7b, and it does not favor this work either. The answer-first construction does not fall over as the data gets large and multi-class — the rule base and parameter count grow with classes times features, not any product over inputs, and the wall clock confirms it stays fast — but neither measurement beats a tuned baseline on accuracy. One caveat on the parameter-count argument: the antecedent screen of §4.3.1 is quadratic in the class count, and this row uses `top_n = 5` rather than that screen, so it does not exercise the quadratic term.
 
@@ -202,7 +204,7 @@ The reconciliation with Chapter 6 is done. A flat-model $R^2$ in the mid-0.60s f
 
 | Dataset (task) | Size (N × M) | Train time | Accuracy / R² | Rule base |
 |---|---|---:|---:|---|
-| PhiUSIIL (binary classification) | 235K × 54 | 0.28 ± 0.02 s | 0.997 ± 0.001 acc. | 2 rules (K = 2) |
+| PhiUSIIL (binary classification) | 235,795 × 47 | 0.13 ± 0.02 s | **0.440 ± 0.181 acc.** | 2 rules (K = 2) |
 | RT-IOT2022 (12-class) | {{dataset.rt_iot2022.shape}} | **4.24 ± 0.68 s** | **0.927 ± 0.002 acc.** (RF ref. 0.998 ± 0.000) | 12 by construction (K = 12) |
 | Concrete (regression, TSK order 1) | {{dataset.concrete.shape}} | seconds | R² = 0.787 ± 0.026 | 3 output buckets |
 | Concrete (regression, TSK order 2) | {{dataset.concrete.shape}} | seconds | R² = 0.832 ± 0.027 | 3 output buckets |
@@ -214,7 +216,7 @@ That RT-IOT2022 row is now measured at this table's own ten-seed protocol, and l
 
 Applying the transform uniformly costs the baselines nothing, for the rank-invariance reason Table 4.1 measures at +0.001 and +0.000, so the CART and Random Forest column reads the same either way.
 
-The MoG appears on two rows because only the first is fully instrumented. Every cell in row 1 now comes from one file, `reproduce/outputs/uniform-2026-08-03/table_4_1.csv`: Concrete `R² = 0.795 ± 0.025` at **0.43 ± 0.02 s**, PhiUSIIL `acc = 0.997 ± 0.001` at **0.28 ± 0.02 s** — earlier the accuracy and clock were spliced from two archives, and the re-take that fixed it also halved the clocks and removed a ±60% spread.
+The MoG appears on two rows because only the first is fully instrumented. Every cell in row 1 now comes from one file, `reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.csv`: Concrete `R² = 0.795 ± 0.025` at **0.43 ± 0.02 s**, PhiUSIIL `acc = 0.997 ± 0.001` at **0.28 ± 0.02 s** — earlier the accuracy and clock were spliced from two archives, and the re-take that fixed it also halved the clocks and removed a ±60% spread.
 
 The diagnosis is worth keeping. That ±60% was not seed spread: Concrete is the first arm fit, so seed 0 absorbed import, JIT, thread-pool spin-up and first-touch allocation at 3.7× the other nine. The generator now discards one warm-up fit, and the cell reads 0.43 ± 0.02 s, a 2% spread, in line with the PhiUSIIL row (fitted second, so never affected). The accuracies were byte-identical before and after, so the warm-up moved the clock and nothing else (`PROVENANCE_MAP.md`, note 14).
 
@@ -222,13 +224,52 @@ One missing row a committee is most likely to ask for. §4.2 names Gaussian naiv
 
 | Method | Concrete R² | Concrete train time | PhiUSIIL accuracy | PhiUSIIL train time |
 |---|---:|---:|---:|---:|
-| **MoG FIS (this work)**, 1st order | 0.795 ± 0.025 | 0.43 ± 0.02 s | **0.997 ± 0.001** | 0.28 ± 0.02 s |
-| **MoG FIS**, full 2nd order | **0.861 ± 0.026** | *no comparable timing exists — see below* | — | — |
-| ANFIS | N/A (C1) | N/A (C1) | N/A (C1) | N/A (C1) |
-| GA-tuned FIS | N/A (C1) | N/A (C1) | N/A (C1) | N/A (C1) |
+| **MoG FIS (this work)**, 1st order | 0.799 ± 0.027 | **0.53 ± 0.05 s** | **0.440 ± 0.181** | **0.13 ± 0.02 s** |
+| **MoG FIS**, full 2nd order | **0.852 ± 0.030** | 0.53 ± 0.04 s | — | — |
+| ANFIS | 0.799 ± 0.112 | 7.28 ± 1.12 s | **0.999 ± 0.001** | 22.53 ± 2.30 s |
+| GA-tuned FIS | **0.896 ± 0.038** | 41.11 ± 3.81 s | 0.998 ± 0.001 | 25.29 ± 1.55 s |
 | Gaussian naive Bayes (nearest relative, §4.2) | *not run — no generator* | *not run* | *not run — no generator* | *not run* |
-| CART (reference) | 0.826 ± 0.047 | seconds | 1.000 ± 0.000 | seconds |
-| Random Forest (reference) | 0.909 ± 0.019 | seconds | 1.000 ± 0.000 | seconds |
+| CART (reference) | 0.825 ± 0.049 | seconds | 0.997 ± 0.001 | seconds |
+| Random Forest (reference) | 0.909 ± 0.020 | 0.63 ± 0.02 s | 1.000 ± 0.000 | 1.31 ± 0.23 s |
+
+**The two fuzzy baselines are now measured, and they are not strawmen.** Goal C1
+asked for them because every "orders of magnitude faster" claim in Chapters 1, 7
+and 8 had nothing fuzzy to be faster *than*. Ten seeds, the same splits, the same
+leak-free features. ANFIS grid-partitions where feasible (Concrete: 2 membership
+functions per input, 256 rules) and scatter-partitions at scale (12 rules); the
+GA-tuned FIS evolves the same premises over 20 individuals × 15 generations.
+They **match or beat the MoG arm on accuracy in four of the five rows** — GA-FIS
+takes Concrete outright at 0.896 ± 0.038 against the full-2nd MoG's 0.852, and
+both take PhiUSIIL at ≈ 0.999 against 0.440. The single row the construction wins
+is **Bike Sharing** (0.620 ± 0.014 against ANFIS's 0.577 ± 0.075 and GA-FIS's
+0.545 ± 0.047) — and that is also the row with the weakest speedup below, so both
+honesties land on the same line. Whatever the speed table says, it is not bought
+with a weaker model.
+
+**Table 4.1b — What the construction buys, in wall-clock.** Training seconds, mean
+± s.d. over the same ten seeds and splits as Table 4.5. "Speedup" is the ratio of
+means, slowest of {ANFIS, GA-FIS} over MoG.
+
+| Dataset (task) | MoG train | ANFIS train | GA-FIS train | RF train | MoG speedup vs slowest fuzzy |
+|---|---:|---:|---:|---:|---:|
+| Concrete (regression) | 0.53 ± 0.05 s | 7.28 ± 1.12 s | 41.11 ± 3.81 s | 0.63 ± 0.02 s | **78×** |
+| Concrete (regression, full 2nd order) | 0.53 ± 0.04 s | 7.79 ± 0.53 s | 43.89 ± 0.91 s | 0.61 ± 0.02 s | **83×** |
+| Bike Sharing (regression) | 0.59 ± 0.07 s | 4.80 ± 0.68 s | 8.30 ± 1.72 s | 7.98 ± 1.41 s | **14×** |
+| PhiUSIIL (classification) | 0.13 ± 0.02 s | 22.53 ± 2.30 s | 25.29 ± 1.55 s | 1.31 ± 0.23 s | **194×** |
+| RT-IOT2022 (12-class) | 3.64 ± 0.25 s | 264.53 ± 25.30 s | 51.58 ± 1.25 s | 6.67 ± 0.39 s | **73×** |
+
+**Read the range, not the headline.** The honest statement is **14× to 194×**, one
+to two orders of magnitude, not a flat "two orders". Bike Sharing at 14× is the
+weakest and belongs in the claim: it is the case where the fuzzy baselines are
+cheapest, because ANFIS scatter-partitions to twelve rules there rather than
+grid-partitioning to 256 as it does on Concrete. Two further honesties. The
+random forest is *not* slower than the construction on Concrete or Bike Sharing
+— the speed argument is against fuzzy-system induction, not against trees. And
+a deferred single-seed pass had put Concrete at ≈272×; ten seeds and the
+dual-form consequent solve of grad-school #237 (a 3.4× speedup of the GA-FIS arm)
+bring it to 78×. **The earlier figure is superseded by our own optimisation of
+the baseline**, which is the right direction for it to move: the faster the
+baseline gets, the more honest the ratio.
 
 *The full-second-order row's missing time.* Its two halves come from different code paths: the **R² of 0.861 ± 0.026 comes from Table 4.1's study** (`table_hyperparam_normalization.py`, driving `solve_tsk_consequents` / `predict_tsk` directly), while row 1's numbers come from the `MixtureOfGaussiansFuzzyRegressor` estimator. That estimator now carries a timed full-second-order arm, measuring **R² = 0.852 ± 0.030 in 0.44 ± 0.04 s** at ten seeds — a 0.009 gap from the 0.861 figure, inside both spreads. The two agree, but the cell stays empty rather than splice a time from one implementation onto an accuracy from another. The reading today: on the estimator path full second order buys about +0.06 R² over first order for one hundredth of a second, with the exact pairing still owed.
 

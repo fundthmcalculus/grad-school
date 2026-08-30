@@ -251,8 +251,8 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.1 Value of the transform | `table_hyperparam_normalization.py` | `outputs/table_hyperparam_normalization.{md,csv}` | **reproduced** at 10 seeds; **now three arms, and the prose's column label is wrong — note 16** |
 | 4.2 Output partitioning | `table_g5_output_partitioning.py` | `outputs/table_g5_output_partitioning.{md,csv}` | **reproduced** at three consequent orders; **G5 settled on the 0th-order rows — note 19** |
 | 4.3 Partitioning vs skew | `table_g5b_skew_sweep.py` | `outputs/table_g5b_skew_sweep.{md,csv}` | **reproduced** — hypothesis refuted, note 4 |
-| 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **reproduced** at 10 seeds |
-| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
+| 4.4 What MoG achieves | `table_4_1_mog_baselines.py` + `table_hyperparam_normalization.py` | `outputs/table_4_1.{md,csv}` | **re-derived leak-free** at 10 seeds, `phiusiil-leakfree-2026-08-30` (5,011 s). PhiUSIIL row 0.997±0.001 → **0.440±0.181** and 235K×54 → 235,795×47; Concrete rows come from `table_hyperparam_normalization`, which was NOT re-run, and RT-IOT2022's accuracy is unchanged — notes 31, 31(a) |
+| 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **re-derived leak-free at 10 seeds** AND **ANFIS/GA-FIS filled** — Goal C1 closed, grad-school #190. §1/§4's "two-rule classifier at 0.997" is re-transcribed to 0.440±0.181. The two MoG rows are still from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
 | 4.8 MF deduplication | `table_4_8_mf_dedup.py` (+ `_mf_dedup.py`) | `outputs/table_4_8_mf_dedup.{md,csv}` | **stale** — prose is `mf-dedup-2026-08-05` @ tribble-fis `6ddb8028`; the max-lossless column moved from TWO causes — our own CI correction (#143: Digits 44.2%→56.4% with byte-identical means) and tribble-fis #218 (BreastCancer 0.0%→66.5%, Wine 10×→7×) — with Diabetes 2×→3× unattributed; @1× reduction *percentages* unchanged but BreastCancer's raw MF moved 11.1→16.4 — note 29 |
@@ -261,7 +261,8 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.11(c) BETH feature reduction | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.4 — note 23 |
 | 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |
 | 4.11(e) BETH knob validation | `table_4_11e_beth_boost_sweep.py` | `outputs/table_4_11e_beth_boost_sweep.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.3–§4.4 — note 24 |
-| *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md` |
+| 4.1b Training-time comparison | `table_4_1_mog_baselines.py` | `outputs/table_4_1b_baseline_timing.{md,csv}` | **new**, 10 seeds, `phiusiil-leakfree-2026-08-30`. The Goal C1 deliverable: MoG vs ANFIS/GA-FIS wall-clock, **14×–194×**. The deferred issue's 1-seed preview said ~272× on Concrete; ten seeds plus #237's dual-form solve (a 3.4× speedup of the GA-FIS arm) bring it to 78× — superseded by our own optimisation of the baseline — note 31(a) |
+| *(no prose table)* | `table_norm_conorm_matrix.py` | `outputs/table_norm_conorm_matrix.{md,csv}` | backs `TNORM_REEVALUATION_RESULTS.md`; **re-derived leak-free** at `phiusiil-leakfree-2026-08-30`. The PhiUSIIL flat-MoG row moves 0.997±0.001 → 0.440±0.181 and its t-norm **spread goes 0.000 → 0.243**, so "the norm/conorm choice is inert" does NOT hold there leak-free; HME's pick moves probability → einstein — note 31(a) |
 | *(no prose table)* | `table_tribbletree_tsk_order.py` | `outputs/table_tribbletree_tsk_order.{md,csv}` | new (grad-school, 2026-08-30); sweeps `tsk_order` 0th/1st/2nd across the flat regressor, `FuzzyRegressionTree`, HME and (added 2026-08-30) `DeconstructedHierarchicalRegressor` (`fuzzytree/deconstruct.py`), timing `.fit()` alongside R²/RMSE — the tree/HME order axis Table 6.1 and `table_hyperparam_normalization.py` fix at "1st" and `table_concrete_reconciliation.py` sweeps for the flat model only, without timing (note 14). The tree's ~8-9x speed edge over the flat model (and HME's ~30x slowdown vs. the tree) is audited and attributed in the script's own "TIMING AUDIT" docstring section, not asserted — see that file rather than duplicating the cProfile evidence here. The deconstructed arm runs against hand-authored `TOPOLOGY_CONCRETE`/`TOPOLOGY_BODYFAT` topologies invented for this table (no prior domain topology existed for either dataset in this codebase — `DECONSTRUCTED_TREE_FINDINGS.md`'s only real-data evaluation is N-CMAPSS); `tribble-fis#226` tracks giving the class an automatic fallback for datasets with no hand-authored topology. |
 
 **Note 22 — BETH is a one-class benchmark; the supervised table #95 asked for could
@@ -577,6 +578,158 @@ on any host that can actually produce a PhiUSIIL number — which is the only pl
 the assertion means anything, and better than a synthetic fixture that would
 assert the mapping against itself.
 
+**Note 31 — PhiUSIIL's three legitimacy-derived features are dropped on load,
+so every PhiUSIIL number in this map is superseded.** Issue #215.
+`repro_data.load_phiusiil` now removes `URLSimilarityIndex`,
+`TLDLegitimateProb` and `URLCharProb` by default (`drop_leak=True`), leaving
+**47** of the 50 numeric columns. All three are computed from knowledge of the
+legitimate class:
+
+| Feature | What it is | Separation AUC (235,795 rows) |
+|---|---|---|
+| `URLSimilarityIndex` | similarity to a whitelist of **known legitimate** URLs | **0.9961** — the highest of all 50, and exactly 100.0 with zero variance on every legitimate row |
+| `URLCharProb` | empirical character-level legitimacy probability, fitted on this corpus's own labels | 0.7679 |
+| `TLDLegitimateProb` | empirical P(legitimate \| TLD), same provenance | 0.6089 |
+
+The first is the answer in disguise, and it is not a marginal case: it is the
+single most separating feature in the file, which is why every PhiUSIIL
+classification result computed with it present has to be re-read as "the model
+found the label column".
+
+**The proposal was already internally inconsistent about this.** Chapter 4's
+Table 4.12 one-class study (`experiments/phishing-oneclass/`) has excluded these
+three by policy since 2026-08-29 and says so in prose — *"the single most
+separating feature, `URLSimilarityIndex` … is removed"* — while every
+classification row on the same dataset trained on them. One PhiUSIIL result in
+the document was leak-free and the rest were not.
+
+**Why the nine "tripwire" features are NOT dropped here.** Nine features are
+exactly constant across the legitimate class (`IsDomainIP`, `HasObfuscation`,
+`NoOfObfuscatedChar`, `ObfuscationRatio`, `NoOfEqualsInURL`, `NoOfQMarkInURL`,
+`NoOfAmpersandInURL`, `IsHTTPS`, and `URLSimilarityIndex`, which goes as a leak
+anyway). The issue asked for a decision; this is it, with three reasons:
+
+1. **The hazard is one-class-specific.** Fit a Gaussian on the legitimate class
+   alone and a zero-variance direction puts any phishing row differing on it at
+   infinite distance, so one feature carries the whole score. A supervised
+   two-class model sees both classes' variance and has no such degeneracy — for
+   it, a strong binary indicator is signal, not leakage.
+2. **They are not label-derived.** `IsHTTPS` is a fact about the site, not a
+   statistic computed from the labels. Dropping it would remove real, causally
+   meaningful evidence for a reason that does not apply.
+3. **The set is not a property of the dataset.** *Which* features are tripwires
+   depends on which class you fit, so a loader that does not know the split
+   cannot hardcode them correctly. `experiments/phishing-oneclass/data.py`
+   detects them from the data at the point of use, which is the right place.
+
+**Every PhiUSIIL row below is stale until re-derived.** The affected generators
+are `table_4_1_mog_baselines.py` (Table 4.5's PhiUSIIL row and §4/§1's "two-rule
+classifier at 0.997"), `table_a1_feature_scoring.py` (Appendix A.1/A.2 — A.2's
+"the answer is 1 feature" is *that* feature, so this row changes most),
+`table_6_1_model_family.py`, `table_norm_conorm_matrix.py`, and
+`figures/fig_06_fuzzy_tree.py` (also stale from note 30's label inversion;
+regenerated once here rather than twice). `experiments/phishing-oneclass/` is
+**unaffected** — it never had them.
+
+**Prose that moves, beyond the tables.** Three places name the leak or a number
+derived from it, and all three are re-derived here rather than left for a later
+pass:
+
+* **Figure 6.1's caption** (`prose/06-hierarchical-refined-fis.md`) said *"the
+  PhiUSIIL tree splits on `HasSocialNet`, `HasCopyrightInfo` and
+  `URLSimilarityIndex`."* Measured both ways at the same configuration
+  (`max_depth=3, n_terms=2, top_n=5, min_soft_count=50, random_state=42`,
+  `sample_size=20000`): with the leak the tree has **six** leaves and takes
+  `URLSimilarityIndex` as its third split on *every* branch; without it the tree
+  has **three** leaves and splits on `HasSocialNet` then `HasCopyrightInfo`.
+  Half the apparent structure was the tree reading the answer. The leak-free
+  tree also reads as a rule a practitioner would recognise — a page carrying a
+  social-network link is legitimate (p = 1.00); a page carrying neither a
+  social-network link nor copyright information is phishing (p = 0.94) — which
+  is a second, independent confirmation of note 30's polarity fix, since under
+  the old inverted mapping those two leaves carried the opposite names.
+* **`reproduce/figures/fig_06_fuzzy_tree.py`'s `HIGHLIGHT`** still named
+  `URLSimilarityIndex`. Nothing would have failed: the lookup is
+  `next((v for v in highlight if v in line), None)`, so a name that can no
+  longer appear simply never matches, silently. Corrected, and the figure
+  regenerated into `prose/fig/06-fuzzy-tree.png`.
+* **Appendix A.1's transcribed table** (`prose/appendix.md`) has
+  `URLSimilarityIndex` at **rank 1** for wasserstein and **rank 2** for
+  composite. Re-transcribe from the re-derived
+  `outputs/table_a1_feature_ranking`.
+
+`experiments/phishing-oneclass/test_phiusiil_leak_policy.py` pins the drop, the
+opt-out, the separation AUCs the policy is argued from, the claim that
+`URLSimilarityIndex` is the most separating feature in the file, and that the
+shared list and the one-class harness's own `LEAK` list have not drifted apart.
+
+**Note 31(a) — what the leak was actually holding up, measured.** The
+re-derivation is not a set of small corrections. On PhiUSIIL the MoG
+construction's headline result was the leak almost entirely, and the mechanism
+is identifiable rather than mysterious.
+
+| Table / row | with the leak | leak-free | control |
+|---|---|---|---|
+| **6.1** PhiUSIIL, flat MoG | 0.997 ± 0.001 | **0.440 ± 0.181** | Concrete rows byte-identical |
+| **6.1** PhiUSIIL, HME | 1.000 ± 0.000 | 0.914 ± 0.039 | |
+| **6.1** PhiUSIIL, fuzzy tree | 0.970 ± 0.003 | 0.958 ± 0.003 | |
+| **6.1** PhiUSIIL, CART / RF | 1.000 / 1.000 | **0.997 / 1.000** | |
+| norm/conorm, PhiUSIIL flat MoG | 0.997 ± 0.001 (spread 0.000) | **0.440 ± 0.181 (spread 0.243)** | |
+| **4.4 / 4.5** PhiUSIIL, flat MoG | 0.997 ± 0.001 | **0.440 ± 0.181** | ANFIS **0.999 ± 0.001**, GA-FIS **0.998 ± 0.001** on the same 47 features |
+| **A.2** one feature, wasserstein | 0.9967 | **0.5733** | |
+
+Concrete's rows in 6.1 are byte-identical across the two runs, which is the
+control: only the PhiUSIIL columns moved, and they moved because of the feature
+set rather than anything else in the pipeline.
+
+**The mechanism is the feature *type*, not the tripwires.** Measured at seed 0,
+`TribbleClassifier(top_n=5)`:
+
+* with the leak the selected five are `URLSimilarityIndex` (5,913 distinct
+  values), `HasSocialNet`, `HasCopyrightInfo`, `HasDescription`,
+  `DomainTitleMatchScore` — **accuracy 0.9960** against a majority baseline of
+  0.5755;
+* leak-free they are `HasSocialNet`, `HasCopyrightInfo`, `HasDescription`,
+  `DomainTitleMatchScore`, `HasSubmitButton` — four of the five **binary**, and
+  **accuracy 0.5823 against the same 0.5755 majority.** The classifier has
+  learned essentially nothing.
+
+The MoG construction fits a per-feature Gaussian *mixture*; over a two-point
+support that is a poor and unstable model, which is also why the ten-seed spread
+blows out to ±0.181. So the construction's PhiUSIIL win rested on having one
+strong **continuous** feature, and that feature was the label in disguise.
+Note that this is **not** the zero-variance-tripwire hazard note 31 declines to
+guard against in the loader: none of the nine tripwires is in the selected five
+under the shipped wasserstein scorer. The tripwire decision stands; this is a
+separate and more interesting failure.
+
+**The ten-seed Table 4.5 pass settles the question the mechanism raised.** If the
+collapse were the dataset getting hard without its dominant feature, every
+method would fall. None does. On the identical 47 features **ANFIS reaches
+0.999 ± 0.001 and a GA-tuned FIS 0.998 ± 0.001**, beside CART's 0.997 ± 0.001
+and the forest's 1.000 ± 0.000. Two independently-implemented *fuzzy* systems
+clear 0.998 where this construction sits at 0.440. They partition the whole
+input space (a 12-rule scatter partition) rather than fitting a Gaussian
+mixture over a top-5, which is exactly the difference the binary-feature
+mechanism above predicts.
+
+**What this obliges.** Chapter 6 says twice that PhiUSIIL is saturated — *"every
+method it tests landing within a fraction of a perfect score"* — and that it
+should therefore carry no weight in a comparison between methods. **Leak-free
+that is no longer true, and it stops being a point in the construction's
+favour**: it is saturated for everything tested *except* this construction. The dataset is saturated for trees and not for this
+construction. §1's and §4's *"trains a two-rule classifier to 0.997 ± 0.001
+accuracy in 0.64 ± 0.02 seconds"* is the same row and moves with it; the rule
+count and the training time survive, the accuracy does not.
+
+**Not being asserted here:** that the construction is bad at binary features in
+general. One dataset, one selector, one `top_n`. What is established is that on
+PhiUSIIL the leak-free top-five are binary and the model is at chance on them.
+Whether a continuous-feature budget, a different scorer, or a different
+`n_output_buckets` recovers it is unmeasured and is the obvious next experiment.
+
+
+
 
 *Secondary findings.* theta's J is **monotone** (+0.160 at theta=0 rising to +0.769 at
 theta=0.999), so on BETH there is no interior optimum and the shipped 0.99 default is
@@ -850,7 +1003,7 @@ renderer emits both so the choice is visible rather than implicit.
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7 |
+| 6.1 Model family, one protocol | `table_concrete_reconciliation.py` | `outputs/table_concrete_reconciliation.{md,csv}` | **reproduced** — HME caveat, note 7. The companion `table_6_1_model_family.py` → `outputs/table_6_1` was **re-derived leak-free** at `phiusiil-leakfree-2026-08-30`: Concrete byte-identical, PhiUSIIL flat MoG 0.997±0.001 → **0.440±0.181** — note 31(a) |
 | 6.2 External baselines | `table_6_1_model_family.py` | `outputs/table_6_1.{md,csv}` | **reproduced** at 10 seeds — note 8 |
 | 6.3 Interpretability | *none* | — | **ungenerated** — structural by design; the counts row is checklist C9 / Goal G6 |
 | ~~6.4 Memory augmentation~~ | `AnalyticalDynamics/test_double_pendulum.py`, `AnalyticalDynamics/test_atwood_machine.py` | none | **DESCOPED 2026-08-04 — no longer a table in the document.** §6.3.6, Table 6.4, Figure 6.3 and Goal C7 are removed; that work continues outside the proposal. Notes 13 and 17 stay as the record of why it was never quotable |
@@ -928,8 +1081,8 @@ Table 7.1 is a goals-and-status matrix, not a measurement. No generator applies.
 
 | Table | Generator | Output | Status |
 |---|---|---|---|
-| A.1 Feature ranking by scorer | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a1_feature_ranking.{md,csv}` | **reproduced** — all 20 cells identical to `main-d0efefc` |
-| A.2 Accuracy and fit time vs features kept | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a2_feature_count.{md,csv}` | **reproduced within a host**; the bhattacharyya accuracies are **not host-portable** — note 12 |
+| A.1 Feature ranking by scorer | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a1_feature_ranking.{md,csv}` | **re-derived leak-free** at `phiusiil-leakfree-2026-08-30` and re-transcribed into `prose/appendix.md`. `URLSimilarityIndex` is gone from all three columns; the scorers now disagree at rank 1 (wasserstein `HasSocialNet`, the others `IsHTTPS`) — note 31 |
+| A.2 Accuracy and fit time vs features kept | `reproduce/tables/table_a1_feature_scoring.py` | `outputs/table_a2_feature_count.{md,csv}` | **re-derived leak-free** and A.4 rewritten, not re-quoted: the one-feature row goes 0.9967/0.4267 → **0.5733/0.7924**, the scorer ordering INVERTS, and the section's conclusion that Wasserstein is the better default — the shipped tribble-fis default — is withdrawn. Note 12's specific deltas are withdrawn with it (the numbers they described no longer exist); the do-not-quote-across-machines instruction stands — notes 31, 31(a) |
 
 **Note 12 — one arm of A.2 moves between environments, it is the arm the appendix
 is least resting on, and the cause is now measured rather than guessed.** Against
