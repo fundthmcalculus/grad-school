@@ -505,7 +505,12 @@ EXPERIMENTS = [
         produces="Table 6.4 / Fig 6.3",
         repo="tribble-fis",
         command=_uv("../AnalyticalDynamics/test_double_pendulum.py"),
-        notes="Moved to AnalyticalDynamics/ by grad-school #26. Entry point still unconfirmed.",
+        notes="Moved to AnalyticalDynamics/ by grad-school #26. The file was then "
+        "dropped by the 2026-08-20 history rewrite and this command pointed at "
+        "nothing until it was recovered from the archived pre-rewrite branch on "
+        "2026-08-30. It exists again; the ENTRY POINT is still unconfirmed -- "
+        "nobody has run it since the recovery, and Table 6.4 is descoped anyway "
+        "(PROVENANCE_MAP, the struck-through 6.4 row).",
     ),
     # ---- Ch5 topological membership generation ----
     Experiment(
