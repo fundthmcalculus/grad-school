@@ -40,9 +40,20 @@ REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(0, os.path.join(REPO, "reproduce", "tables"))
 
 # The variables §6.3.2 says each tree recovers, highlighted where they appear.
+#
+# `URLSimilarityIndex` was here until 2026-08-30 and is gone because #215 drops
+# it on load as a target leak. Leaving it would not have failed anything -- the
+# highlight lookup is `next((v for v in highlight if v in line), None)`, so a
+# name that can no longer appear simply never matches, silently, forever. A
+# stale name that fails quietly is the trap this repo has now hit three times;
+# it does not get a fourth.
+#
+# The leak-free tree (verified 2026-08-30 at tribble-fis ae0ef13) splits on
+# HasSocialNet then HasCopyrightInfo and has three leaves, against the four and
+# the third split the leak used to buy.
 HIGHLIGHT = {
     "concrete": ("Cement", "Age"),
-    "phiusiil": ("HasSocialNet", "HasCopyrightInfo", "URLSimilarityIndex"),
+    "phiusiil": ("HasSocialNet", "HasCopyrightInfo"),
 }
 
 _LEAF = re.compile(r"=>\s*y\s*≈\s*([-\d.]+)(.*?)\(soft n=([\d.]+)\)")

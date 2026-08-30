@@ -629,6 +629,33 @@ classifier at 0.997"), `table_a1_feature_scoring.py` (Appendix A.1/A.2 — A.2's
 regenerated once here rather than twice). `experiments/phishing-oneclass/` is
 **unaffected** — it never had them.
 
+**Prose that moves, beyond the tables.** Three places name the leak or a number
+derived from it, and all three are re-derived here rather than left for a later
+pass:
+
+* **Figure 6.1's caption** (`prose/06-hierarchical-refined-fis.md`) said *"the
+  PhiUSIIL tree splits on `HasSocialNet`, `HasCopyrightInfo` and
+  `URLSimilarityIndex`."* Measured both ways at the same configuration
+  (`max_depth=3, n_terms=2, top_n=5, min_soft_count=50, random_state=42`,
+  `sample_size=20000`): with the leak the tree has **six** leaves and takes
+  `URLSimilarityIndex` as its third split on *every* branch; without it the tree
+  has **three** leaves and splits on `HasSocialNet` then `HasCopyrightInfo`.
+  Half the apparent structure was the tree reading the answer. The leak-free
+  tree also reads as a rule a practitioner would recognise — a page carrying a
+  social-network link is legitimate (p = 1.00); a page carrying neither a
+  social-network link nor copyright information is phishing (p = 0.94) — which
+  is a second, independent confirmation of note 30's polarity fix, since under
+  the old inverted mapping those two leaves carried the opposite names.
+* **`reproduce/figures/fig_06_fuzzy_tree.py`'s `HIGHLIGHT`** still named
+  `URLSimilarityIndex`. Nothing would have failed: the lookup is
+  `next((v for v in highlight if v in line), None)`, so a name that can no
+  longer appear simply never matches, silently. Corrected, and the figure
+  regenerated into `prose/fig/06-fuzzy-tree.png`.
+* **Appendix A.1's transcribed table** (`prose/appendix.md`) has
+  `URLSimilarityIndex` at **rank 1** for wasserstein and **rank 2** for
+  composite. Re-transcribe from the re-derived
+  `outputs/table_a1_feature_ranking`.
+
 `experiments/phishing-oneclass/test_phiusiil_leak_policy.py` pins the drop, the
 opt-out, the separation AUCs the policy is argued from, the claim that
 `URLSimilarityIndex` is the most separating feature in the file, and that the
