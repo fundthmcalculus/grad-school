@@ -69,6 +69,48 @@ def _kmeans_1d(values, k, seed):
     return centres, spreads
 
 
+def _import_fcm():
+    """`tribbleclustering.fcm.fuzzy_c_means`, with the remedy named on failure.
+
+    This module runs in the **tribble-fis** environment (see the study runners
+    in this directory), and until tribble-fis#233 it got `tribbleclustering`
+    there for free: tribble-fis declared it in `[project].dependencies` even
+    though nothing in `tribblefis` imports it. #233 moved it to an extra,
+    because that dependency is a git source building three Cython extensions,
+    which made a C toolchain a hard requirement of `uv sync` -- a hard stop on
+    a Windows host without MSVC, which is the state this host is in (see
+    `reproduce/hostenv.sh`).
+
+    So the `fcm` and `classical-fcm` arms now need clustering supplied
+    explicitly. `--with-editable tribble-cluster` is the right way to do that,
+    not tribble-fis's `--extra clustering`: it runs the submodule checkout,
+    which is the revision `PROVENANCE.txt` records and `preflight.py`'s
+    PIN-MATCH checks. The extra would install whatever revision tribble-fis's
+    own lock happens to pin, which is the drift PIN-MATCH exists to catch.
+    Every study here that already reaches clustering
+    (`run_identification_study`, `run_phishing_study`,
+    `check_fit_gaussians_fix`) is documented that way and needs no change.
+
+    Raised, not skipped: an arm that cannot run must not report a number.
+    """
+    try:
+        from tribbleclustering.fcm import fuzzy_c_means
+    except ImportError as exc:  # pragma: no cover - environment-dependent
+        raise ImportError(
+            "the fcm init needs `tribbleclustering`, which the tribble-fis "
+            "environment no longer supplies on its own (tribble-fis#233 moved "
+            "it to an optional extra). Re-run with the submodule supplied "
+            "explicitly:\n\n"
+            "    uv run --project tribble-fis --with-editable tribble-opt \\n"
+            "        --with-editable tribble-cluster \\n"
+            "        python reproduce/optimizers/run_study.py --init fcm\n\n"
+            "Use --with-editable tribble-cluster (the submodule), not "
+            "tribble-fis's `--extra clustering`: PROVENANCE.txt records the "
+            "submodule SHA and preflight's PIN-MATCH checks it."
+        ) from exc
+    return fuzzy_c_means
+
+
 def _fcm_1d(values, k, m=2.0):
     """Author's FCM. Widths are the membership-weighted standard deviations.
 
@@ -76,7 +118,7 @@ def _fcm_1d(values, k, m=2.0):
     different from k-means, so the spread is weighted by u^m — the same weights
     the algorithm uses to place the centre it is being measured around.
     """
-    from tribbleclustering.fcm import fuzzy_c_means
+    fuzzy_c_means = _import_fcm()
 
     centres, u = fuzzy_c_means(values.reshape(-1, 1), k, m)
     centres = np.asarray(centres, dtype=float).ravel()

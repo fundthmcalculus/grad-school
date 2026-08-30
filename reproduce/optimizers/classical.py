@@ -68,6 +68,11 @@ def _cluster_joint(J, c, method, seed):
         km = KMeans(n_clusters=c, n_init=10, random_state=seed).fit(J)
         return km.labels_, km.cluster_centers_
     if method == "fcm":
+        # Supplied by `--with-editable tribble-cluster` on this script's
+        # documented invocation. Not a tribble-fis dependency any more --
+        # tribble-fis#233 moved it to an optional extra, since nothing in
+        # `tribblefis` imports it and it made a C toolchain a hard
+        # requirement of `uv sync`. See `clusterinit._import_fcm`.
         from tribbleclustering.fcm import fuzzy_c_means
 
         centres, u = fuzzy_c_means(J, c)

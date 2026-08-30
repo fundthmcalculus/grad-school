@@ -6,6 +6,14 @@
     uv run --project tribble-fis --with-editable tribble-opt \
         python reproduce/optimizers/run_study.py
 
+The `--init fcm` and `--init classical-fcm` arms additionally need
+`--with-editable tribble-cluster` on the invocation: tribble-fis#233 moved
+`tribble-clustering` out of tribble-fis's dependencies into an optional extra
+(nothing in `tribblefis` imports it, and as a git source with Cython extensions
+it made a C toolchain a hard requirement of `uv sync`), so those arms no longer
+get it for free. `clusterinit._import_fcm` says so if you forget. The other
+inits -- `hot`, `cold`, `kmeans` -- are unaffected.
+
 Every arm starts from the same tribble-fis fit, optimizes the same k-fold
 held-out MSE inside the same box, and is stopped at the same evaluation count.
 What is reported per arm:

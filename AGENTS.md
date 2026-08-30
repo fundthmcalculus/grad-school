@@ -80,6 +80,22 @@ submodules, and four courses of coursework.
       python reproduce/experiments/run_cluster_experiment.py --all   # Chapter 3 figures
   ```
 
+- **`tribble-clustering` is not in the tribble-fis environment.** tribble-fis#233
+  moved it to an optional extra (nothing in `tribblefis` imports it, and as a
+  git source with Cython extensions it made a C compiler a hard requirement of
+  `uv sync` — a hard stop on an MSVC-less Windows host). Scripts that run under
+  `--project tribble-fis` and need clustering pass the submodule explicitly,
+  which every affected runner in `reproduce/optimizers/` already documents:
+
+  ```bash
+  uv run --project tribble-fis --with-editable tribble-opt       --with-editable tribble-cluster       python reproduce/optimizers/run_study.py --init fcm
+  ```
+
+  Use `--with-editable tribble-cluster`, **not** tribble-fis's `--extra
+  clustering`: `PROVENANCE.txt` records the submodule SHA and `preflight.py`'s
+  PIN-MATCH checks it, while the extra resolves whatever revision tribble-fis's
+  lock pins. The Chapter 3 tables and `ClusteringExperiments/` are unaffected —
+  they already run under `--project tribble-cluster`.
 - The Chapter 5 driver is self-contained — `cd gated-minimax-selection &&
   python run_all.py` (it writes `./outputs/results.json` + figures, CWD-relative)
   regenerates everything deterministically from seed. Note that `results.json`
