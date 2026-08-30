@@ -255,6 +255,8 @@ estimates or extrapolates it, and the generator does not model it.
 | 4.5 Baseline comparison | `table_4_1_mog_baselines.py` (+ `table_hyperparam_normalization.py` for the full-2nd row) | `outputs/table_4_1.{md,csv}` | **reproduced**; ANFIS/GA-FIS still absent; the two MoG rows are from two different code paths — note 14 |
 | 4.6 Anomaly operating curve | `table_4_4_openset.py` (`REPRO_THETA_SWEEP=0.5,...,1.1`) | `outputs/table_4_4b_theta_sweep.{md,csv}` | **stale** — every cell moved under tribble-fis #72; the band and the operating point are both superseded — note 18 |
 | 4.7 Vs dedicated detectors | `table_4_4_openset.py` | `outputs/table_4_4_openset.{md,csv}` | **stale** — three of nine cells moved beyond noise under #72; note 6's instruction not to quote a winner still stands — note 18 |
+| 4.8 MF deduplication | `table_4_8_mf_dedup.py` (+ `_mf_dedup.py`) | `outputs/table_4_8_mf_dedup.{md,csv}` | **stale** — prose is `mf-dedup-2026-08-05` @ tribble-fis `6ddb8028`; the max-lossless column moved under tribble-fis #218 (BreastCancer 0.0%→66.5%, Digits 44.2%→56.4%, Wine 10×→7×, Diabetes 2×→3×; @1× reductions unchanged) — note 29 |
+| 4.9 Correction-rule pass (Glass) | `table_4_8_mf_dedup.py` | `outputs/table_4_9_correction_pass.{md,csv}` | **stale** — same archive; the gated-cascade gain fell +0.031±0.027 → +0.008±0.011 under #218, its 95% CI now spanning zero — note 29 |
 | 4.11 BETH anomaly detection | `table_4_11_beth_anomaly.py` | `outputs/table_4_11_beth_anomaly.{md,csv}`, `outputs/table_4_11_beth_fa_sweep.{md,csv}` | **reproduced** at 10 seeds (new, grad-school #95); prose slot at §4.4 — note 22 |
 | 4.11(c) BETH feature reduction | `table_4_11c_beth_feature_reduction.py` | `outputs/table_4_11c_beth_feature_reduction.{md,csv}` | **reproduced** at 10 seeds (new, #95); prose slot at §4.4 — note 23 |
 | 4.11(d) BETH matched sample size | `table_4_11d_beth_sample_scaling.py` | `outputs/table_4_11d_beth_sample_scaling.{md,csv}` | **reproduced** at 10 seeds (new, #95); corrects (c)'s timing; prose slot at §4.4 — note 23 |
@@ -444,6 +446,25 @@ elsewhere as real - and it is why one fit per seed is correct rather than a shor
 genuinely different fitted model - the only knob in the table that could have beaten
 thresholding by trading one decision surface for another. It does not: the refit moves the
 surface and buys nothing over sliding along a fixed one.
+
+**Note 29 — Tables 4.8/4.9 drifted when tribble-fis #218 reached the Type-1 path,
+and were untracked here until now.** The prose numbers are from `mf-dedup-2026-08-05`
+(tribble-fis `6ddb8028`). `table_4_8_mf_dedup.py` builds `TribbleClassifier(top_n=5)`,
+and #218 (landed in the `ae0ef13` pin bump) gave `TribbleClassifier` a default
+`correlation_threshold=0.85` that drops correlated features from the top-k before the
+Gaussian model is built. On the redundant-feature datasets this selects a different
+feature set, so the **max-lossless** dedup column moves — most sharply on Breast Cancer
+(0.0% → 66.5% reducible, at a boundary whose paired Δ is now −0.055 ± 0.079, "lossless"
+only in the CI-contains-zero sense) and Digits (44.2% → 56.4%) — and the Glass
+correction-pass gain in 4.9 falls to +0.008 ± 0.011, a 95% CI that now spans zero. The
+**@1× shipped-tolerance** reductions (§4's "free money" claim) are unchanged. Figures
+above are read off the `bump-ae0ef13-2026-08-30` sweep, whose archive is stamped
+NOT CITABLE only because the fuzzy-suite preflight flags the tribble-fis→
+clustering/optimizers pin divergence — no dedup number depends on either package (§4.8
+imports neither); tribble-fis#221 bumps those pins so a re-run comes back citable.
+**Re-measure under a green-preflight archive before re-transcribing §4 prose, and
+revisit the "Breast Cancer has almost no redundancy left to remove" and "the correction
+pass does real work, not decoration" claims — the new numbers weaken both.**
 
 *Secondary findings.* theta's J is **monotone** (+0.160 at theta=0 rising to +0.769 at
 theta=0.999), so on BETH there is no interior optimum and the shipped 0.99 default is
