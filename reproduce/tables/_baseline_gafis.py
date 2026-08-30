@@ -49,8 +49,8 @@ def _score_individual(centres, widths, X, Y, seed):
     on the same data. No gradient — the GA is the only search here."""
     net = _ANFIS(centres, widths, n_outputs=Y.shape[1], seed=seed)
     wn = net._firing(X)
-    net._solve_consequents(X, Y, wn)
-    pred = net._predict_raw(X)
+    phi = net._solve_consequents(X, Y, wn)
+    pred = net._predict_raw(X, phi=phi)
     return -np.mean((pred - Y) ** 2), net
 
 

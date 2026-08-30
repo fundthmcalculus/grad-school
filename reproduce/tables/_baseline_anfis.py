@@ -123,6 +123,11 @@ class _ANFIS:
         is the arm the fuzzy baselines spend most of their time in (GA-FIS
         re-solves it every population member, every generation), so the ratio
         matters far more here than a one-off model fit.
+
+        Returns `phi`, the design matrix just used, so an immediately-following
+        predict on this same X (the common case: GA-FIS's fitness loop and
+        ANFIS's per-epoch refit both solve then predict on the same X) can
+        reuse it instead of rebuilding it from scratch.
         """
         phi = self._design(X, wn)
         N, D = phi.shape
@@ -134,10 +139,16 @@ class _ANFIS:
             B = phi.T @ Y
             beta = np.linalg.solve(A, B)
         self.W = beta.reshape(self.R, self.M + 1, self.n_out)
+        return phi
 
-    def _predict_raw(self, X):
-        wn = self._firing(X)
-        phi = self._design(X, wn)
+    def _predict_raw(self, X, phi=None):
+        """Predict from the fitted consequents. Pass `phi` from a just-computed
+        `_solve_consequents` on this same X to skip rebuilding the firing and
+        design matrices; omit it (the default) to compute fresh, e.g. for a
+        genuinely different X such as a held-out test split."""
+        if phi is None:
+            wn = self._firing(X)
+            phi = self._design(X, wn)
         beta = self.W.reshape(self.R * (self.M + 1), self.n_out)
         return phi @ beta
 
@@ -152,8 +163,8 @@ class _ANFIS:
 
         for t in range(1, EPOCHS + 1):
             wn = self._firing(X)
-            self._solve_consequents(X, Y, wn)  # forward-optimal consequents
-            pred = self._predict_raw(X)
+            phi = self._solve_consequents(X, Y, wn)  # forward-optimal consequents
+            pred = self._predict_raw(X, phi=phi)
             err = pred - Y  # (N, n_out)
 
             # Numerical gradient on premise params is too slow; use an analytic
