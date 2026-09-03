@@ -1,6 +1,6 @@
 # `reproduce/figures/` — the proposal's figures
 
-Twenty-eight figures are cited in the proposal text (sixteen before the 2026-09 expansion, CHECKLIST D9). This directory produces them.
+Thirty-five figures are cited in the proposal text (sixteen before the 2026-09 expansion, CHECKLIST D9). This directory produces them.
 
 ```bash
 reproduce/figures/make_figures.py --list       # the inventory and what is skipped
