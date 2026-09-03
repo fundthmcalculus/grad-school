@@ -179,7 +179,7 @@ def build():
         body_size=F.FS_SMALL - 1,
     )
     pb.text(
-        24,
+        18,
         9,
         "a caller changes only the weights it\n"
         "stacks into $\Phi$; the solve, its conditioning\n"

@@ -130,7 +130,7 @@ def build():
         ylabel="$\\hat y(x) = \\sum_i \\mu_i(x)\\, m_i$",
     )
     pc.set_xlim(0, 1)
-    F.legend(pc, loc="upper left")
+    F.legend(pc, loc="lower left")
     pc.text(
         0.98,
         0.04,
