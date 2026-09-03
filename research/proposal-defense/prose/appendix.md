@@ -565,3 +565,293 @@ that decides the double-precision question. The research scripts remain in
 the VAT-TSP device studies beside them) and are untouched; `reproduce/manifest.py`
 records the `ch3-boruvka-gpu` entry as descoped rather than deleting it. Nothing
 under `research/proposal-defense/` cites any of it.
+
+## A.10 Analytical derivations
+
+The chapters state results and cite the code that produces them; this appendix derives them. Every derivation below was checked against the shipped implementation it describes, and where the two differ — or where a chapter's sentence claims more than the algebra supports — the derivation says so rather than smoothing it over. The numbering is by chapter, so a reader can go from a claim to its proof and back. Notation follows Chapter 2: $N$ samples, $M$ features, $K$ output classes or buckets, $D$ an $N \times N$ dissimilarity matrix; $T$ and $S$ are a t-norm and its dual t-conorm.
+
+| Derivation | Claim it supports | Where it is used |
+|---|---|---|
+| A.10.1 | TSK output is linear in the consequent coefficients | §2.1, §4.3.2, §6.3.1 |
+| A.10.2 | FCM's alternating updates are closed-form | §2.4 |
+| A.10.3 | The minimax transform is an ultrametric; $u(D^2) = u(D)^2$; the beta-spread is inert on it | §2.2, §5.2, §5.3.1 |
+| A.10.4 | The three reorder arms cost $O(N^3)$, $O(N^2 \log N)$ and $O(N^2)$ | §3.3.1 |
+| A.10.5 | The memory ceilings of Table 3.3 and their $\sqrt{3}$, $\sqrt{2}$ factors | §3.3.2, §3.4 |
+| A.10.6 | The VAT ordering depends only on the MST | §2.2, §3.2, §3.3.3 |
+| A.10.7 | The MST tour bound, and the two preconditions §3.3.6 elides | §3.3.6 |
+| A.10.8 | The classifier is Gaussian naive Bayes with the normalising constants dropped | §4.2, §4.3.1 |
+| A.10.9 | Parameter and screening-cost counts | §4.3.1, §4.3.4 |
+| A.10.10 | The anomaly rule: saturation, the one-class threshold, monotonicity in $\theta$, and why the complement score loses resolution | §4.3.5, §4.4 |
+| A.10.11 | Why pinning the extreme consequents is fatal at zeroth order and harmless above it | §4.3.2 |
+| A.10.12 | Rank invariance of axis-aligned trees, and why Gaussian memberships have none | §4.3, §6.3.2 |
+| A.10.13 | The persistence ramp is crisp on an ultrametric | §5.3.3 |
+| A.10.14 | The gated greedy cover returns a disjoint antichain; the MAD gate's constant | §5.3.4 |
+| A.10.15 | Birth height as an inverse density proxy, and why the axis is logarithmic | §2.3, §5.3.2 |
+| A.10.16 | The ridge-TSK solve, its conditioning, the pinned columns and the $\sqrt{h}$ row weighting | §6.3.1, §6.3.3, §6.4 |
+| A.10.17 | Soft-tree routing weights form a partition of unity and keep the output linear | §6.3.2, §6.3.3 |
+| A.10.18 | The EM refinement of the mixture, step by step | §6.3.3 |
+| A.10.19 | A triangular Ruspini partition is the linear B-spline basis | §6.3.4 |
+
+### A.10.1 TSK inference, and the linearity that everything else uses
+
+A first-order Takagi–Sugeno–Kang system with $R$ rules over inputs $x \in \mathbb{R}^M$ has, for rule $r$, an antecedent firing strength and a consequent:
+
+$$ w_r(x) = \mathop{T}_{j=1}^{M} \mu_{rj}(x_j), \qquad f_r(x) = m_r + \phi(x)^{\top} c_r, $$
+
+where $\mu_{rj}$ is the membership function of rule $r$ on feature $j$, $\phi(x) \in \mathbb{R}^{q}$ is the consequent basis (the raw inputs at first order, their products at second, orthogonal polynomials in §6.3.1), $m_r$ is the rule's constant and $c_r \in \mathbb{R}^q$ its coefficients. Under the product t-norm the antecedent is $w_r(x) = \prod_j \mu_{rj}(x_j)$; the code applies the within-feature t-conorm first when a feature carries several membership functions (§4.3.1), which does not change what follows. Weighted-average defuzzification gives
+
+$$ \hat y(x) = \sum_{r=1}^{R} \bar w_r(x)\, f_r(x), \qquad \bar w_r(x) = \frac{w_r(x)}{\sum_{s=1}^{R} w_s(x)}, $$
+
+with the convention that a row whose total firing is below a floor is left at zero rather than blended uniformly (`_normalize_firing_strengths`). Substituting $f_r$ and collecting the coefficients into one vector $\beta = (m_1, c_1, \ldots, m_R, c_R) \in \mathbb{R}^{R(1+q)}$,
+
+$$ \hat y(x) = \sum_{r} \bar w_r(x)\,\big[\,1 \;\; \phi(x)^{\top}\big] \begin{bmatrix} m_r \\ c_r \end{bmatrix} = \Phi(x)^{\top} \beta, \qquad \Phi(x) = \big(\bar w_1(x)\,[1\;\phi(x)^\top],\; \ldots,\; \bar w_R(x)\,[1\;\phi(x)^\top]\big)^{\top}. $$
+
+For fixed antecedents the map $\beta \mapsto \hat y(x)$ is therefore linear, and over a training set the predictions are $\hat{\mathbf y} = \Phi \beta$ with $\Phi \in \mathbb{R}^{N \times R(1+q)}$ built exactly as `solve_tsk_consequents_from_firing` builds it: the per-rule block $[1 \mid \phi(X)]$ is the same for every rule and only the firing weights differ, so the design is the outer product `norm_fs[:, :, None] * phi[:, None, :]` reshaped. Fitting the consequents is then a linear least-squares problem, which A.10.16 solves. This single fact is why Chapters 4 and 6 need no search for the THEN side of any rule.
+
+Two things the linearity does *not* give. It does not make the model linear in the antecedent parameters — $\bar w_r$ depends on every $\mu$ and every $\sigma$ non-linearly, which is why antecedent refinement (§6.3.5) is a search and the consequent solve is not. And it is linear only because the firing strengths are treated as fixed during the solve; a joint fit of antecedents and consequents is not a least-squares problem, which is the alternation ANFIS uses and the EM of A.10.18 formalizes.
+
+### A.10.2 Fuzzy c-means: the closed-form alternating updates
+
+FCM minimizes $J(W, C) = \sum_{i=1}^{N} \sum_{j=1}^{c} w_{ij}^{m} \lVert x_i - c_j \rVert^2$ subject to $\sum_j w_{ij} = 1$ for every $i$ and $w_{ij} \ge 0$, with $m > 1$. Both updates §2.4 calls "closed form" follow from setting partial derivatives to zero.
+
+*Centroids, memberships fixed.* $J$ is a sum of convex quadratics in each $c_j$ separately; $\partial J / \partial c_j = -2 \sum_i w_{ij}^m (x_i - c_j) = 0$ gives
+
+$$ c_j = \frac{\sum_{i} w_{ij}^{m}\, x_i}{\sum_{i} w_{ij}^{m}}, $$
+
+a weighted mean, which is the only place FCM uses coordinates — and the reason the relational variant NERFCM has to work differently (§2.4, §5.2).
+
+*Memberships, centroids fixed.* Each row $i$ separates. With $d_{ij} = \lVert x_i - c_j \rVert^2$ and a Lagrange multiplier $\lambda_i$ for the row constraint, $\partial/\partial w_{ij}$ of $\sum_j w_{ij}^m d_{ij} - \lambda_i (\sum_j w_{ij} - 1)$ gives $m\, w_{ij}^{m-1} d_{ij} = \lambda_i$, so $w_{ij} = (\lambda_i / m d_{ij})^{1/(m-1)}$. Imposing $\sum_j w_{ij} = 1$ eliminates $\lambda_i$:
+
+$$ w_{ij} = \left( \sum_{k=1}^{c} \left( \frac{d_{ij}}{d_{ik}} \right)^{\frac{1}{m-1}} \right)^{-1}. $$
+
+Because the minimizer of each sub-problem is unique and each step cannot increase $J$, alternating the two is a coordinate-descent that converges to a stationary point — a local optimum, and which one depends on the start. That is the initialization sensitivity §2.4 records and that the VAT front end is meant to remove. At $m \to 1^+$ the memberships harden to nearest-centroid assignment and the scheme is k-means; at $m \to \infty$ every $w_{ij} \to 1/c$, which is why $m$ is kept in $[2, 4]$.
+
+### A.10.3 The minimax transform: ultrametric, MST bottleneck, and two consequences
+
+Let $D$ be any symmetric non-negative dissimilarity on $N$ points (no metric assumption), viewed as a complete weighted graph. Define the *minimax* or *bottleneck path* distance
+
+$$ D^*_{ij} = \min_{p \,:\, i \to j} \; \max_{(u,v) \in p} D_{uv}, $$
+
+the minimum over paths of the largest edge on the path. This is what `minimax_transform` computes with the Prim-style recurrence $D^*_{jk} = \max(D_{ij}, D^*_{ik})$ as vertex $j$ joins the tree through vertex $i$: the recurrence is correct because on a tree the path between two vertices is unique, and the largest edge on the path from $j$ to $k$ is either the attaching edge or the largest edge on the path from $i$ to $k$.
+
+**Claim 1: $D^*$ equals the largest edge on the MST path.** Let $P_T(i,j)$ be the unique path between $i$ and $j$ in a minimum spanning tree $T$ and $e$ its heaviest edge, weight $b$. Removing $e$ from $T$ splits the vertices into two sides with $i$ and $j$ apart; by the cut property every edge crossing that cut weighs at least $b$ (else swapping it for $e$ would give a lighter spanning tree). Any path from $i$ to $j$ must cross the cut, so its maximum edge is at least $b$. The tree path achieves exactly $b$. Hence $D^*_{ij} = b$. This is also the single-linkage cophenetic distance, since single linkage merges $i$'s and $j$'s clusters at exactly the threshold $b$ — the identity §5.2 credits to Johnson [@johnson1967hierarchical] and that makes the iVAT image and the dendrogram two views of one object.
+
+**Claim 2: $D^*$ is an ultrametric.** Concatenate a bottleneck path from $i$ to $k$ with one from $k$ to $j$; the result is a path from $i$ to $j$ whose largest edge is $\max(D^*_{ik}, D^*_{kj})$. Minimizing over paths can only lower it, so
+
+$$ D^*_{ij} \le \max\!\big(D^*_{ik},\, D^*_{kj}\big) \qquad \text{for all } i, j, k, $$
+
+the strong triangle inequality. Symmetry and $D^*_{ii} = 0$ are immediate. Note what was *not* assumed: nothing about $D$ itself. That is why Chapter 3's engine and Chapter 5's selectors run unchanged on fractional-Minkowski, cosine and DTW input (Table 3.7) — the transform manufactures a metric, indeed an ultrametric, out of any dissimilarity at all.
+
+**Consequence (a): $u(D^2) = u(D)^2$.** Write $u(\cdot)$ for the transform. Both $\max$ and $\min$ commute with any monotone non-decreasing map $g$: $g(\max(a,b)) = \max(g(a), g(b))$ and likewise for $\min$. Squaring is monotone on $[0, \infty)$, so $u(D^2)_{ij} = \min_p \max_{e \in p} D_e^2 = \big(\min_p \max_{e \in p} D_e\big)^2 = u(D)^2_{ij}$. This is the remark in §5.2 about iRFCM: squaring before or after the transform is the same operation, and the pipelines differ only in what is fitted around it.
+
+**Consequence (b): the beta-spread is inert on $D^*$.** NERFCM's beta-spread adds $\beta$ to every off-diagonal entry of $D$ until the relational objective's implied squared distances are non-negative; it is needed exactly when $D$ is not the matrix of squared Euclidean distances of any point configuration. A finite ultrametric embeds isometrically in Euclidean space [@lemin1985isometric] — equivalently, an ultrametric is of strict negative type — so $D^*$ needs no spread: $\beta = 0$ already satisfies the admissibility condition, which is the justification §5.3.1 gives for dropping the safeguard on transformed input. On raw non-metric $D$ this does not hold and the spread is doing work, which is why the comparison in Table 5.1 keeps NERFCM on $D$ as a separate column.
+
+### A.10.4 The cost of the three reorder arms
+
+All three arms (§3.3.1, Figure 3.1) share the outer loop: $N - 1$ rounds, in round $r$ one vertex leaves the unplaced set $U_r$ with $|U_r| = N - r$. They differ only in how the next vertex — the unplaced vertex nearest the placed set — is found.
+
+*Classical.* The reference implementations recompute, for every $u \in U_r$, its distance to every placed vertex and take the minimum: $(N - r) \cdot r$ lookups in round $r$. Summed,
+
+$$ \sum_{r=1}^{N-1} r\,(N - r) = \frac{N(N-1)(N+1)}{6} = \frac{N^3 - N}{6} \;\sim\; \frac{N^3}{6}, $$
+
+hence $O(N^3)$. The waste is that the minimum over placed vertices for each $u$ changes by at most one candidate per round and is recomputed from scratch anyway.
+
+*Stage one: priority queue with lazy deletion.* Maintain for each unplaced $u$ its current best key $\kappa(u) = \min_{v \text{ placed}} D_{vu}$. When $v$ joins the tree, relax its row: for each unplaced $u$ with $D_{vu} < \kappa(u)$, set $\kappa(u) \leftarrow D_{vu}$ and push $(\kappa(u), u)$. The next vertex is popped; stale entries (an $u$ already placed, or a key no longer current) are discarded on the way out. Each round pushes at most $N - r$ entries, so the total number of pushes is at most $\sum_r (N - r) = N(N-1)/2$, and so is the number of pops. The heap therefore holds $O(N^2)$ entries, each push or pop costs $O(\log N^2) = O(2 \log N)$, and the total is $O(N^2 \log N)$. The relaxation itself is $O(N)$ per round, $O(N^2)$ in all, so the heap is the only source of the log factor — which is the observation stage two acts on.
+
+*Stage two: compact active set, relaxation fused with selection.* The reorder never needs the queue's full order, only its minimum once per round. Keep the unplaced vertices packed in the first $N - r$ slots of an array with their keys; in one pass over the active slots, update $\kappa(u) \leftarrow \min(\kappa(u), D_{vu})$ and track the running minimum. Removing the selected vertex is a swap with the last active slot, $O(1)$. Round $r$ costs $N - r$ comparisons and no allocation:
+
+$$ \sum_{r=1}^{N-1} (N - r) = \frac{N(N-1)}{2} \;\sim\; \frac{N^2}{2}, $$
+
+with $O(N)$ workspace beyond the matrix. Two sequencing facts make the fusion legal. The argmin for round $r+1$ is over keys as they stand *after* round $r$'s relaxation, and the running minimum is taken over exactly those updated keys; and the swap-removal does not disturb any key. Table 3.2's fitted exponents (3.20, 1.86, 1.97) are the empirical counterparts of the three sums, with the $\log N$ factor of stage one too small to resolve over a decade and a half of $N$.
+
+### A.10.5 Memory ceilings and the $\sqrt{3}$, $\sqrt{2}$ factors
+
+A scheme that holds $k$ dense $N \times N$ matrices at $s$ bytes per entry needs $F(N) = k\,s\,N^2$ bytes. Under a budget $B$ the largest feasible size is
+
+$$ N_{\max} = \left\lfloor \sqrt{\frac{B}{k\,s}} \right\rfloor. $$
+
+The classical VAT keeps $D$, the reordered copy and a work matrix, $k = 3$; the in-place scheme of §3.3.2 keeps $D$ alone, $k = 1$; and the matrix-free path has no $N^2$ term at all. Hence the ratio of reachable sizes between the in-place and classical schemes is $\sqrt{3/1} = \sqrt{3} \approx 1.73$ at any precision and any budget, and halving the precision ($s = 8 \to 4$) buys a further $\sqrt{2}$. These are the two factors §3.3.2 quotes; they are properties of the formula, not of any measurement.
+
+Table 3.3 uses decimal gigabytes, $B = 64 \times 10^9$ and $96 \times 10^9$ bytes: $\lfloor\sqrt{64 \times 10^9 / 24}\rfloor = 51{,}639$ and $\lfloor\sqrt{96 \times 10^9 / 24}\rfloor = 63{,}245$ for the classical scheme at float64, matching the table; $\sqrt{96 \times 10^9 / 4} = 154{,}919$ for the in-place float32 ceiling, the 155,000 §3.4 rounds to. The 135,000-point run sits at $F = 4 \times 135{,}000^2 = 72.9$ GB, inside the machine and outside the cap, as the table says. What the formula does *not* cover is the $O(N)$ workspace of the reorder, the Python process, and the BLAS scratch, which is why the reachable sizes are stated as arithmetic ceilings and the two large runs as demonstrations.
+
+### A.10.6 Why the VAT ordering depends only on the minimum spanning tree
+
+VAT's reorder is Prim's algorithm from a fixed seed, and the ordering is the sequence in which vertices join the tree. The claim §2.2 and §3.2 rest on is that any MST algorithm — Borůvka, Kruskal, a device kernel — yields the same ordering, so the reorder can be composed with whatever MST front end is cheapest.
+
+*Proof, distinct weights.* When all pairwise dissimilarities are distinct the MST $T$ is unique. At each Prim step the placed set $P$ defines a cut $(P, V \setminus P)$; Prim adds the endpoint of the lightest edge crossing it. By the cut property the lightest crossing edge belongs to every MST, hence to $T$. So the next vertex is determined by $T$ and $P$ alone: it is the endpoint of the lightest *tree* edge leaving $P$. Given the seed, induction over the steps shows the whole sequence is a function of $T$. Any algorithm returning $T$ therefore yields the same VAT ordering once the tree is walked from the seed by "lightest tree edge leaving the placed set" — an $O(N \log N)$ post-pass on $N - 1$ edges.
+
+*Ties.* With equal weights there may be several MSTs, and two builders may return different ones; the cut property then only guarantees *some* lightest crossing edge is in each tree. Two constructions can thus produce different but equally valid orderings, and this is exactly what §3.2 records at the largest single-precision size, where float32 rounding turns near-ties into ties (Table 3.3's $0.9996 \pm 0.0012$ row). The reduction "same MST $\Rightarrow$ same ordering" is therefore exact when the MST is unique and holds up to tie-breaking otherwise, which is how §3.2 states it.
+
+*Corollary: the VAT cut is single-linkage.* Cutting the ordered image at a threshold $t$ — declaring consecutive vertices in the same block when the edge that joined them weighs at most $t$ — partitions the vertices exactly as removing all tree edges heavier than $t$ does, and that is the single-linkage partition at level $t$ (the MST is the single-linkage hierarchy [@gower1969mst]). This is the identity `IVATMeans` reads its partition off (§3.3.5), and the one Chapter 5 turns into memberships.
+
+### A.10.7 The MST tour bound, and what §3.3.6 actually has
+
+The standard argument. Let $T$ be an MST of weight $w(T)$ and $\mathrm{OPT}$ the optimal tour. Deleting any edge from $\mathrm{OPT}$ leaves a Hamiltonian path, which is a spanning tree, so $w(T) \le w(\mathrm{OPT})$. A depth-first walk of $T$ traverses every edge twice, a closed walk of length exactly $2 w(T)$; visiting the vertices in first-visit order and skipping repeats gives a Hamiltonian tour, and each skip replaces a sub-walk by the direct edge, which is no longer **if the triangle inequality holds**. So
+
+$$ w(\text{DFS tour}) \;\le\; 2\, w(T) \;\le\; 2\, w(\mathrm{OPT}) \qquad \text{(metric } D \text{ only)}. $$
+
+Two things §3.3.6 states more strongly than this supports, and both are worth naming rather than leaving for a reviewer.
+
+1. **The bound needs a metric.** The whole point of Chapter 3 is exactness on non-metric $D$, and there the shortcutting step fails: a direct edge can be longer than the walk it replaces, so no factor is guaranteed. The 2× statement holds on Euclidean and DTW-with-triangle-inequality inputs and is unsupported on the fractional-Minkowski and cosine rows of Table 3.7.
+
+2. **The bound is for a depth-first walk, not for a Prim order.** The VAT ordering is Prim's visitation order, and a Prim order is not a DFS preorder: consecutive VAT vertices need not be adjacent in the tree, since the next vertex attaches to *whichever* placed vertex is nearest, not to the last one added. The tour that visits the VAT-ordered points in sequence is therefore not the tour the argument bounds. A short random search over small Euclidean instances (a scratch check, not a harness result) finds Prim-order tours longer than $2 w(T)$, so the argument cannot be repaired by appeal to the tree weight alone; whether the ratio to $\mathrm{OPT}$ stays under two is an open question this document does not settle.
+
+The safe statement is that the depth-first walk of the same MST — available at no extra cost, since the tree is already built — is a provable 2-approximation on metric input, while the VAT order is an *empirically* reasonable warm start whose bound is not established. §3.3.6 is amended to say so; nothing else in the chapter depends on the tour bound.
+
+### A.10.8 The classifier is Gaussian naive Bayes with the normalising constants dropped
+
+§4.2 concedes that the classification construction is "closely related to" Gaussian naive Bayes. The relationship is exact and worth having in one line, because it also predicts a systematic difference.
+
+Take the simplest configuration: one Gaussian per retained feature $j$ and class $k$, with centre $\mu_{jk}$ and width $\sigma_{jk}$, product t-norm across features. The rule firing is
+
+$$ w_k(x) = \prod_{j=1}^{M} \exp\!\left( -\tfrac{1}{2} \Big( \tfrac{x_j - \mu_{jk}}{\sigma_{jk}} \Big)^2 \right). $$
+
+Gaussian naive Bayes assigns $\arg\max_k \pi_k\, p_k(x)$ with $p_k(x) = \prod_j \mathcal{N}(x_j; \mu_{jk}, \sigma_{jk}^2) = \prod_j \frac{1}{\sqrt{2\pi}\,\sigma_{jk}} \exp(\cdot)$. Comparing,
+
+$$ \log w_k(x) = \log p_k(x) + \sum_{j=1}^{M} \log\!\big(\sqrt{2\pi}\,\sigma_{jk}\big). $$
+
+So $\arg\max_k w_k(x)$ is the naive-Bayes decision with **uniform priors** and with the per-class term $\sum_j \log \sigma_{jk}$ **added back**: relative to naive Bayes, the construction favours the class whose retained features are *wider*, by exactly that sum. On a class-balanced problem with equal widths the two coincide; on Glass, where the automatic component count produces near-zero widths on some classes (§4.3.1, Figure 4.1), they do not, and the direction of the difference is predictable — a degenerate spike is penalised heavily by naive Bayes's $-\log \sigma$ and not at all here. This is the concrete content of "the missing row a committee will ask for" in Table 4.5: the two models differ by a known additive term, and the row would measure what that term costs.
+
+With several components per feature the correspondence loosens: the within-feature t-conorm $S$ of unnormalised Gaussians is not the mixture density $\sum_c \pi_c \mathcal{N}_c$ — under the probabilistic sum, $S(a, b) = a + b - ab$, it is the mixture's sum minus a product term, and under max it is the dominant component alone. The factorisation across features is the same, so the "naive" half of naive Bayes is retained exactly and the "Gaussian" half approximately.
+
+### A.10.9 Parameter and screening-cost counts
+
+*Grid rule base.* Partitioning input $j$ into $N_{\mu_j}$ sets and forming a rule per combination gives $N_{\text{rules}} = \prod_j N_{\mu_j}$; at a common $c$ sets per input that is $c^M$, and each rule carries its own consequent, so the parameter count is at least $c^M (1 + q)$.
+
+*This construction.* One rule per class or bucket, $K$ rules. Rule $k$ carries, on each retained feature $j$, a mixture of $p_{jk}$ Gaussians with two parameters each, so
+
+$$ N_{\text{params}} = \sum_{k=1}^{K} \sum_{j \in \mathcal{F}_k} 2\, p_{jk} \;\le\; 2\,K\,M\,p_{\max}, $$
+
+linear in $K$, $M$ and the component cap. The consequents add $K(1 + q)$, where $q$ is the basis size: $M$ at first order, $2M$ at second (squares), $M + \binom{M}{2} + M$ for the full second-order basis with cross terms — the one place a quadratic in $M$ enters the *model*, and only when that basis is chosen.
+
+*The screen.* `calculate_gaussian_correlation` compares, per feature, the class-conditional distributions of every pair of classes: $\binom{K}{2} = K(K-1)/2$ comparisons per feature, $M K (K-1)/2$ in all, $O(MK^2)$. For RT-IOT2022 that is $83 \times 66 = 5{,}478$ comparisons, cheap in absolute terms but the only super-linear factor in the fit, which is why §4.3.4 refuses to call the cost "linear in everything".
+
+### A.10.10 The anomaly rule: four facts from the algebra
+
+The rule (§4.3.5) is $\mu_{\text{anom}}(x) = 1 - S(c_1, \ldots, c_K)$ with $c_k = \min(\max(\mu_k(x) + \theta, 0), 1)$, and the decision is $\arg\max$ over the $K$ class firings and this one. `tsk_firing_strengths` and `_anomaly_argmax` implement exactly this.
+
+**(a) One clipped input saturates any t-conorm.** A t-conorm satisfies $S(a, 0) = a$ and is monotone in each argument, so $S(1, y) \ge S(1, 0) = 1$, and $S(1, y) \le 1$ by range; hence $S(1, y) = 1$, and by associativity one argument equal to 1 makes the whole aggregate 1. For the Hamacher conorm the code ships, $S(x, y) = (x + y - 2xy)/(1 - xy)$, at $x = 1$ numerator and denominator are both $1 - y$ (the code returns 1 where the denominator vanishes, at $x = y = 1$). Therefore
+
+$$ \mu_{\text{anom}}(x) > 0 \iff \mu_k(x) < 1 - \theta \;\text{ for every } k. $$
+
+At the inherited $\theta = 0.99$ the bar is a firing of $0.01$; wherever any class clears it the anomaly rule is identically zero and the conorm plays no part in the decision. That is the "total degeneracy at the default" of §4.3.5.
+
+**(b) The multi-class decision.** The anomaly label wins iff $1 - S(c) > \max_k \mu_k(x)$. When no class fires above $1 - \theta$ the clip is inactive, $c_k = \mu_k + \theta$, and the decision genuinely depends on the conorm's aggregation of several boosted firings — the regime Table 4.6's sweep over $\theta \in [0.5, 0.8]$ operates in, where firings of $0.2$–$0.5$ are below the bar.
+
+**(c) The one-class reduction.** With a single known class the column-wise conorm has nothing to aggregate and `t_conorm(x, None, …)` returns $x$ itself, so $\mu_{\text{anom}} = 1 - \min(\mu + \theta, 1)$. The anomaly wins iff $1 - \mu - \theta > \mu$ (the clipped case gives $0 > \mu$, never), i.e.
+
+$$ \text{anomaly} \iff \mu(x) < \frac{1 - \theta}{2}. $$
+
+So on a one-class fit $\theta$ is a threshold on the firing strength and nothing more, the norm family cannot change a prediction, and Table 4.11(e)'s measured $0.0012$ advantage of sweeping $\theta$ over thresholding the score directly is the noise it should be.
+
+**(d) Monotonicity in $\theta$.** Each $c_k$ is non-decreasing in $\theta$, $S$ is non-decreasing in each argument, so $\mu_{\text{anom}}$ is non-increasing in $\theta$ at every $x$. The set of points labelled anomalous therefore shrinks as $\theta$ grows, which makes both the detection rate and the false-alarm rate non-increasing functions of $\theta$ — the shape Table 4.6 and Table 4.7c show, saturating to zero once $\theta \ge 1$ makes every $c_k = 1$.
+
+**(e) Why the complement score loses resolution and the surprisal does not.** For the one-class detector under the product t-norm, the firing is $\prod_j \mu_j(x)$, the *complement* score is $s_c = 1 - \prod_j \mu_j$ and the *surprisal* score is $s_u = \sum_j -\log \mu_j = -\log(1 - s_c)$. The map $s_c \mapsto -\log(1 - s_c)$ is strictly increasing on $[0, 1)$, so the two rankings — and hence the two ROC curves — are identical in exact arithmetic, as §4.4 says. In floating point they are not: $1 - \prod_j \mu_j$ is computed as $1$ minus a small number, and rounds to exactly $1.0$ once $\prod_j \mu_j < 2^{-53} \approx 1.1 \times 10^{-16}$. With Gaussian memberships $\prod_j \mu_j = \exp(-\tfrac{1}{2} \sum_j z_j^2)$, so the collapse begins when $\sum_j z_j^2 > 106 \ln 2 \approx 73.5$ — a point about $8.6\sigma$ out in a single feature, or just over $3\sigma$ in each of eight, which heavy-tailed process identifiers reach routinely. Every such point ties at $s_c = 1$, exactly the 1,508-of-4,002 distinct-score collapse Table 4.11 reports, while $s_u$ keeps summing in the log domain and never rounds. The onset depends on the tails, not the feature count, which is why BETH hits it at eight features when the library's own note expected sixty.
+
+### A.10.11 Pinning the extreme consequents: fatal at zeroth order, absorbed above it
+
+From A.10.1, $\hat y(x) = \sum_r \bar w_r(x) \big(m_r + \phi(x)^\top c_r\big)$. At **zeroth order** $c_r = 0$ and $\hat y(x) = \sum_r \bar w_r(x)\, m_r$: the prediction is a convex combination of the rule constants, so it lies in $[\min_r m_r, \max_r m_r]$ and, for a sample whose firing is concentrated on rule $r$, equals $m_r$ up to the leakage into neighbouring rules. The squared error contributed by the samples of bucket $r$ is then approximately
+
+$$ \sum_{i \in r} (y_i - m_r)^2 = \sum_{i \in r} (y_i - \bar y_r)^2 + n_r\,(m_r - \bar y_r)^2, $$
+
+variance within the bucket plus a bias term that is zero only when $m_r = \bar y_r$, the bucket mean. Pinning $m_1 = y_{\min}$ and $m_R = y_{\max}$ (the `pin_extremes` equality constraint) sets the bias of the two outer rules to $(\bar y_1 - y_{\min})^2$ and $(y_{\max} - \bar y_R)^2$ per sample with nothing to offset it. On Concrete §4.3.2 records the outer buckets' means at $0.195$ and $0.653$ on the unit interval against pinned values of $0$ and $1$, so the bias is $0.038$ and $0.120$ per sample across $687$ of the $1{,}030$ rows — the mechanism behind $R^2 = -0.434$ against $0.394$ unpinned. The unconstrained least-squares solution puts $m_r$ at the firing-weighted mean of the bucket's targets (A.10.16 with $\Phi$ reduced to the weight columns), which is why uniform's "held at their buckets' own means" is the right pin and the extreme observation the wrong one.
+
+At **first order and above** the constraint still fixes $m_1$ and $m_R$, but the consequent $m_r + \phi(x)^\top c_r$ can reproduce any constant offset over the bucket's support as long as $\phi(x)$ is not orthogonal to the constant direction there — and with min-max-scaled inputs on $[0, 1]$ it never is. The solve therefore spends the free $c_r$ to cancel the imposed bias: the fitted intercepts §4.3.2 reports at $-0.38$ and $-1.19$, outside the target's own range, are exactly this compensation. The penalty falls from $0.676$ to $0.005$ in $R^2$ because the bias is absorbed, not because it is absent.
+
+### A.10.12 Rank invariance: why the transform is free for trees and not for Gaussians
+
+Let $\varphi_j : \mathbb{R} \to \mathbb{R}$ be strictly increasing for each feature $j$ (log, min-max, z-score, or their compositions), and $\tilde x_j = \varphi_j(x_j)$.
+
+*Axis-aligned trees.* Every split is a test $x_j \le t$. Since $\varphi_j$ is strictly increasing, $x_j \le t \iff \varphi_j(x_j) \le \varphi_j(t)$: for every split on the original scale there is a split on the transformed scale inducing the same partition of the training set, and conversely. CART's impurity criteria (variance reduction, Gini, entropy) are functions of the *partition* alone, so the greedy criterion takes the same value on corresponding splits, the same split is chosen at every node (up to ties among splits inducing identical partitions), and the induced trees are identical as functions of the training rows. Predictions on test rows agree wherever the chosen threshold falls between the same two training values, which is the usual midpoint convention. A random forest is a fixed set of such trees over bootstrap samples with the same seeds, hence identical too. This is the control Table 4.1 measures at $+0.001$ and $+0.000$.
+
+*Gaussian memberships.* A Gaussian $\mu(x; m, \sigma) = \exp(-\tfrac{1}{2}((x - m)/\sigma)^2)$ satisfies $\mu(\varphi(x); m', \sigma') = \mu(x; m, \sigma)$ for all $x$ only if $\varphi$ is affine: the level sets of the two sides are intervals symmetric about $m'$ and $m$ respectively, and a strictly increasing $\varphi$ maps the symmetric interval $[m - a, m + a]$ onto a symmetric interval for every $a$ only when it is affine. A log transform is not affine, so no re-fit of $(m, \sigma)$ reproduces the original membership on a skewed feature; the fitted Gaussian on the raw scale describes the skew where the one on the log scale describes the structure, and the $+0.10$ in $R^2$ of Table 4.1 is the difference. The soft fuzzy tree inherits the same sensitivity through its sigmoidal splits and its Gaussian-antecedent leaves, which is §6.3.2's point that its raw-feature readability is bought rather than free.
+
+### A.10.13 The persistence ramp is crisp on an ultrametric
+
+Take a block $B$ of the single-linkage hierarchy on $D^*$: a dendrogram node, born at height $h_b$ (the merge that creates it) and dying at $h_d > h_b$ (the merge that absorbs it into a larger node). Define $d_B(x) = \min_{y \in B} D^*_{xy}$, the bottleneck height at which $x$ would join $B$, and the ramp $\mu_B(x) = \mathrm{clip}\big((h_d - d_B(x)) / (h_d - h_b),\, 0,\, 1\big)$.
+
+*Members.* For $x \in B$, $x$ is connected to every other member at threshold $h_b$ (that is what being a node born at $h_b$ means), so $d_B(x) \le h_b$ and $\mu_B(x) = 1$. (Strictly $d_B(x) = 0$ for the trivial self-distance; the code takes the minimum over members including $x$.)
+
+*Non-members.* Suppose $x \notin B$ had $d_B(x) < h_d$. Then at threshold $d_B(x) < h_d$ the point $x$ is connected to some $y \in B$, so the single-linkage component containing $B$ at that threshold also contains $x$ — but $B$ is by definition the maximal component containing its members for all thresholds in $[h_b, h_d)$, and it does not contain $x$. Contradiction; hence $d_B(x) \ge h_d$ and $\mu_B(x) = 0$.
+
+So no point has $h_b < d_B(x) < h_d$: the interval the ramp slopes across is empty, and $\mu_B$ takes only the values $0$ and $1$. This is a property of the ultrametric, not an implementation defect, and it is why `block_membership` defaults to $\mu_B(x) = 2^{-(d_B(x)/h_d)^2} = \exp\!\big(-\ln 2\,(d_B(x)/h_d)^2\big)$, a Gaussian in minimax distance with its half-maximum at the death height: members read $1$, a non-member joining exactly at $h_d$ reads $\tfrac{1}{2}$, and the skirt is graded by how far past the block's dissolution height the point attaches. Both curves are parameterised by merge heights alone; $\arg\max$ over the Gaussian memberships of a band still returns the crisp labels because for any two blocks $B, B'$ in a disjoint antichain and $x \in B$, $d_B(x) = 0 < d_{B'}(x)$. Figure 5.3 draws both.
+
+### A.10.14 The gated greedy cover returns a disjoint antichain
+
+*Setup.* Candidate blocks are dendrogram nodes. Nodes of a hierarchy form a **laminar** family: any two are either nested or disjoint. The gate admits a block iff its persistence $h_d - h_b$ exceeds $\mathrm{med} + \gamma \cdot 1.4826 \cdot \mathrm{MAD}$ over all blocks (`select_coverage_cover`, $\gamma$ = `gap_sigma`), and its size lies in $[3, 0.6\,N]$. Among eligible blocks the cover then repeatedly takes the block with the largest number of still-uncovered members, ties broken toward larger persistence, and stops when the best gain is zero.
+
+*Claim.* The selected blocks are pairwise disjoint.
+
+*Proof.* Suppose two selected blocks intersect; by laminarity one contains the other, say $C \subsetneq A$. Case 1, $A$ selected first: at $C$'s turn every member of $C$ is already covered, so $C$'s gain is zero and the stopping rule excludes it. Case 2, $C$ selected first: at that step $A$ was eligible with $\mathrm{gain}(A) \ge \mathrm{gain}(C)$, because the uncovered members of $C$ are uncovered members of $A$. If the inequality were strict $A$ would have been chosen. If equal, $A \setminus C$ was already covered by earlier selections; each earlier block is nested with or disjoint from $A$, and none contains $A$ (else $C \subset A$ would already be covered and have zero gain), so they are proper subsets of $A$ and together with $C$ cover all of $A$ — giving $A$ zero gain at every later step, so it is never selected. Either way the assumption fails. $\square$
+
+The selected set is therefore an antichain of the hierarchy, i.e. a *local cut* in Campello *et al.*'s sense [@campello2013fosc], which is the framing §5.3.4 adopts; the cover's only freedom is *which* antichain, decided by the stability measure (persistence, here) rather than the excess of mass FOSC uses. The regression test `test_selection_antichain.py` checks the conclusion; the proof says why it can never fail.
+
+*The constant $1.4826$.* For a normal sample the median absolute deviation converges to $\sigma\,\Phi^{-1}(3/4) \approx 0.6745\,\sigma$, so $\mathrm{MAD}/0.6745 = 1.4826\,\mathrm{MAD}$ is a consistent estimate of $\sigma$. The gate is thus "persistence more than $\gamma$ robust standard deviations above the median", with the median and MAD immune to the very outliers it is looking for — which is the reason to prefer them to the mean and standard deviation, where a few real clusters would inflate the threshold that is meant to detect them.
+
+### A.10.15 Birth height as an inverse density proxy, and the logarithmic axis
+
+Consider points drawn from a homogeneous Poisson process of intensity $\rho$ in $\mathbb{R}^d$. The distance $r$ from a point to its nearest neighbour satisfies $\Pr(r > t) = \exp(-\rho V_d t^d)$, with $V_d$ the volume of the unit $d$-ball, so its median is
+
+$$ r_{1/2} = \left( \frac{\ln 2}{\rho\, V_d} \right)^{1/d} \;\propto\; \rho^{-1/d}. $$
+
+Single-linkage merge heights inside a homogeneous region are nearest-neighbour-type distances — a component grows by absorbing the point nearest to it — so a cluster of density $\rho$ is *born* (its members become connected) at a height of order $\rho^{-1/d}$, and two clusters of densities $\rho_1 > \rho_2$ have births separated by
+
+$$ \log h_2 - \log h_1 \approx \frac{1}{d} \log \frac{\rho_1}{\rho_2}. $$
+
+Two consequences. Density ratios appear as *differences on a log axis*, which is why `discover_band_edges` looks for gaps in $\log(\text{birth})$ rather than in birth: a factor of $5.6\times$ or $7.1\times$ in scale (Table 5.2's construction) is the same gap wherever it sits along the axis. And the gap shrinks with dimension as $1/d$, so the well-separated-scales assumption §5.3.2 states gets harder to satisfy as $d$ grows — a density contrast of $10\times$ is a gap of $\log 10 \approx 2.3$ in one dimension and $0.23$ in ten, below the `min_log_gap` of $0.5$ the code requires. That is a limit of the method worth stating alongside Hartigan's result that single linkage is not density-consistent for $d > 1$: the birth-height reading is a proxy, sharpest in low dimension, not an estimator.
+
+### A.10.16 The ridge-TSK solve: normal equations, conditioning, pinned columns, row weights
+
+From A.10.1, $\hat{\mathbf y} = \Phi \beta$ with $\Phi \in \mathbb{R}^{N \times P}$. The solver minimises
+
+$$ J(\beta) = \lVert \mathbf y - \Phi \beta \rVert_2^2 + \lambda\, \beta^{\top} \mathbf D \beta, \qquad \mathbf D = \mathrm{diag}(d_1, \ldots, d_P),\; d_p \in \{0, 1\}, $$
+
+with $d_p = 0$ on each rule's constant column (the bucket mean) and $1$ elsewhere: intercepts are never shrunk, so the rule constants stay at the scale of the target. $J$ is convex and quadratic; $\nabla J = -2\Phi^\top(\mathbf y - \Phi\beta) + 2\lambda \mathbf D \beta = 0$ gives the ridge normal equations
+
+$$ \big(\Phi^{\top}\Phi + \lambda \mathbf D\big)\, \beta = \Phi^{\top} \mathbf y. $$
+
+*Why the code does not form them.* With the singular values $\sigma_1 \ge \ldots \ge \sigma_P$ of $\Phi$, the Gram matrix $\Phi^\top \Phi$ has singular values $\sigma_p^2$, so $\kappa(\Phi^\top\Phi) = \kappa(\Phi)^2$: forming the normal equations squares the condition number. Two rules with nearly collinear firing columns make $\Phi$ ill-conditioned; squaring made it singular to working precision, and `numpy.linalg.solve` returned finite coefficients of order $10^{24}$ — the $10{,}536$ MPa divergence §6.4 records. The fix is to observe that $J(\beta) = \big\lVert \begin{bmatrix} \mathbf y \\ \mathbf 0 \end{bmatrix} - \begin{bmatrix} \Phi \\ \sqrt{\lambda}\, \mathbf D^{1/2} \end{bmatrix} \beta \big\rVert_2^2$, an ordinary least-squares problem on an *augmented* design whose condition number is that of $\Phi$ (improved by the ridge rows) rather than its square. `lstsq` on it, via the SVD, truncates negligible singular values instead of dividing by them. That is what `solve_tsk_consequents_from_firing` does, and why a non-zero default $\lambda$ was the second half of the fix: with $\lambda > 0$ the augmented matrix has full column rank on the penalised columns whatever $\Phi$ does.
+
+*Pinned columns.* `pin_extremes` fixes the constant of the first and last rules at prescribed values $v$. Partition $\beta = (\beta_F, \beta_P)$ into free and pinned coefficients and $\Phi = [\Phi_F \;\; \Phi_P]$ accordingly. With $\beta_P = v$ fixed, $J$ becomes $\lVert (\mathbf y - \Phi_P v) - \Phi_F \beta_F \rVert^2 + \lambda \beta_F^\top \mathbf D_F \beta_F$, the same problem on the residual target $\mathbf y - \Phi_P v$. Its minimiser is the exact solution of the equality-constrained problem (the KKT conditions reduce to it, since the constraint is on coordinates), so pinning costs no accuracy in the *solve* — only, at zeroth order, in the *model* (A.10.11).
+
+*Weighted rows.* Minimising $\sum_i h_i (y_i - \Phi_i \beta)^2$ for non-negative weights $h_i$ equals minimising $\lVert H^{1/2}(\mathbf y - \Phi\beta) \rVert^2$ with $H = \mathrm{diag}(h)$, i.e. the unweighted problem on rows scaled by $\sqrt{h_i}$. This is why the M-step of A.10.18 can reuse the same solver by scaling each row by $\sqrt{h_{i\ell}}$: the responsibility weighting is implemented exactly, not approximated.
+
+### A.10.17 Soft-tree routing weights form a partition of unity
+
+Let each internal node $g$ of a binary tree carry a gate $s_g(x) \in [0, 1]$, the membership of $x$ in the left branch, with $1 - s_g(x)$ for the right (a sigmoid of $x_j - t$ for the soft tree of §6.3.2, a Gaussian partition-of-unity gate for the mixture of §6.3.3). Define the weight of leaf $\ell$ as the product along its root-to-leaf path,
+
+$$ w_\ell(x) = \prod_{g \in \mathrm{path}(\ell)} \big[ s_g(x) \big]^{[\ell \text{ left of } g]} \big[ 1 - s_g(x) \big]^{[\ell \text{ right of } g]}. $$
+
+*Claim.* $\sum_\ell w_\ell(x) = 1$ for every $x$. *Proof by induction on depth.* A single leaf has weight $1$. For a tree rooted at $g$ with subtrees $L$ and $R$, $\sum_\ell w_\ell = s_g \sum_{\ell \in L} w'_\ell + (1 - s_g) \sum_{\ell \in R} w''_\ell = s_g + (1 - s_g) = 1$ by the inductive hypothesis on the subtrees. $\square$
+
+So the tree output $\hat y(x) = \sum_\ell w_\ell(x) f_\ell(x)$ is a convex combination of the leaf models, with the same structure as A.10.1's weighted average but with the normalisation *built in* rather than computed — there is no division and no zero-firing case. Substituting $f_\ell(x) = m_\ell + \phi(x)^\top c_\ell$ shows $\hat y$ is linear in the leaf coefficients for fixed gates, so every leaf (fuzzy tree) or expert (mixture) is fitted by A.10.16 with rows weighted by $w_\ell(x_i)$ — the single shared primitive §6.1 describes. A crisp CART tree is the special case $s_g \in \{0, 1\}$, where exactly one $w_\ell$ is non-zero and the model reduces to one leaf model per region. Because the gates test only original inputs $x_j$, every intermediate quantity is a product of memberships of named variables, which is how the Magdalena condition of §6.2 is met by construction.
+
+### A.10.18 The EM refinement of the hierarchical mixture
+
+Model the mixture of §6.3.3 as a conditional density: with $L$ leaves, gate weights $w_\ell(x)$ from A.10.17 (parameterised by the gate parameters $\gamma$), and Gaussian experts $y \mid x, \ell \sim \mathcal{N}\big(f_\ell(x; \beta_\ell),\, \sigma_\ell^2\big)$,
+
+$$ p(y \mid x) = \sum_{\ell=1}^{L} w_\ell(x; \gamma)\; \mathcal{N}\big(y;\, f_\ell(x; \beta_\ell),\, \sigma_\ell^2\big). $$
+
+The log-likelihood $\sum_i \log p(y_i \mid x_i)$ has a sum inside the log, so it is not separable; EM introduces the latent leaf assignment and maximises the expected complete-data log-likelihood instead.
+
+*E-step.* The responsibility of leaf $\ell$ for sample $i$ is the posterior
+
+$$ h_{i\ell} = \frac{w_\ell(x_i; \gamma)\, \mathcal{N}(y_i; f_\ell(x_i), \sigma_\ell^2)}{\sum_{m=1}^{L} w_m(x_i; \gamma)\, \mathcal{N}(y_i; f_m(x_i), \sigma_m^2)}, $$
+
+computed as $\exp(a_{i\ell} - \mathrm{logsumexp}_m\, a_{im})$ with $a_{i\ell} = \log w_\ell(x_i) - \tfrac{1}{2}\log(2\pi\sigma_\ell^2) - (y_i - f_\ell(x_i))^2 / 2\sigma_\ell^2$, so that a leaf whose density underflows does not divide by zero — the "log-sum-exp accumulation" guard §6.3.3 lists.
+
+*M-step, experts.* The expected complete-data log-likelihood separates over leaves; for leaf $\ell$ the $\beta_\ell$-dependent part is $-\tfrac{1}{2\sigma_\ell^2} \sum_i h_{i\ell} (y_i - f_\ell(x_i; \beta_\ell))^2$. Maximising it is the weighted least-squares problem of A.10.16 with weights $h_{i\ell}$, so each expert is re-solved by the same ridge primitive on rows scaled by $\sqrt{h_{i\ell}}$; the variance update is $\sigma_\ell^2 = \sum_i h_{i\ell} r_{i\ell}^2 / \sum_i h_{i\ell}$ with $r_{i\ell}$ the new residuals, floored below to keep a leaf that captures a handful of points from collapsing its variance and its responsibilities to a spike (the "variance floor").
+
+*M-step, gates.* The $\gamma$-dependent part is $\sum_i \sum_\ell h_{i\ell} \log w_\ell(x_i; \gamma)$, a weighted multinomial log-likelihood. For a Gaussian partition-of-unity gate over one named input, the responsibilities aggregated to each internal node give closed-form weighted mean and variance updates — the standard mixture-of-Gaussians M-step applied at each gate — which is why §6.3.3 can say the gate update is closed form; for sigmoidal gates it is a weighted logistic regression, one Newton step of which is the IRLS update. A leaf whose total responsibility $\sum_i h_{i\ell}$ falls below a floor is pruned (the "starved component" guard).
+
+*Monotonicity.* Each iteration does not decrease the observed log-likelihood, by the usual Jensen argument; the one-shot greedy fit of §6.3.3 is a valid initialisation, so EM can only improve on it in likelihood — which is the reason to run it, and the reason the one-shot result stands as a completed contribution if the EM slips. Nothing in this estimator is new (Jordan and Jacobs [@jordan1994hierarchical]); what is particular is that the expert M-step *is* A.10.16.
+
+### A.10.19 A triangular Ruspini partition is the linear B-spline basis
+
+Given sorted apex knots $c_0 < c_1 < \cdots < c_{k-1}$, `build_triangular_partition` defines term $i$ as the triangle rising from $c_{i-1}$ to $1$ at $c_i$ and falling to $0$ at $c_{i+1}$, with the first term a left shoulder ($1$ for $x \le c_0$) and the last a right shoulder. On the interior interval $[c_i, c_{i+1}]$ exactly two terms are non-zero,
+
+$$ \mu_i(x) = \frac{c_{i+1} - x}{c_{i+1} - c_i}, \qquad \mu_{i+1}(x) = \frac{x - c_i}{c_{i+1} - c_i}, \qquad \mu_i(x) + \mu_{i+1}(x) = 1, $$
+
+and on the two shoulders the single active term equals $1$. So $\sum_i \mu_i(x) = 1$ for every $x \in \mathbb{R}$: a Ruspini partition, or strong fuzzy partition of unity. These hat functions are precisely the linear (order-2) B-splines on the knot vector $(c_i)$ with the end knots repeated, and the sum-to-one identity is the B-spline partition-of-unity property [@deboor2001splines], intrinsic to the basis rather than a constraint imposed on it — which is the point §6.3.4 makes about the export.
+
+Two consequences follow for the refinement. First, moving any apex knot (keeping the order) rebuilds the two adjacent hat functions and preserves the identity automatically, so *apex-only* refinement searches a monotone knot vector and never leaves the space of partitions of unity: it is free-knot linear-spline fitting under a different name. Second, with constant consequents $m_i$ the exported FIS output $\hat y(x) = \sum_i \mu_i(x)\, m_i$ is the piecewise-linear interpolant through the points $(c_i, m_i)$, flat beyond the outer knots — a function a reader can draw by hand from the rule table, which is the interpretability-by-construction claim in its most literal form. `verify_partition_of_unity` checks the identity numerically; this derivation is why it holds to machine precision, as the Chapter 5 hierarchy's partition-of-unity error ($\approx 10^{-16}$, §5.4) also does for the same reason.
