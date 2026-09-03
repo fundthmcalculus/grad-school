@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 2.2 -- a dissimilarity matrix before and after VAT reordering.
+"""Figure 2.4 -- a dissimilarity matrix before and after VAT reordering.
 
 The construction is the one §2.2 names: `circle_random_clusters` from
 `tribbleclustering.util`, five rings of cities spaced around a circle. It is the

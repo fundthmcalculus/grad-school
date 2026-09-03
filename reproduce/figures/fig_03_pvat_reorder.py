@@ -14,7 +14,7 @@ row per arm, with the shared scaffolding (seed at the farthest pair, append the
 argmin, repeat N-1 times) drawn once. Drawing three near-identical flowcharts
 would bury the one box in each that is actually different.
 
-The measured consequence of the difference is Figure 3.2's business, not this
+The measured consequence of the difference is Figure 3.4's business, not this
 one's -- so this is a schematic, and it carries the complexity class of each arm
 rather than a timing. The caption in §3.3.1 asks for an adaptation of
 `presentations/quals/slides/img/vat_prim_mst_block_diagram_v2.svg`; that file is

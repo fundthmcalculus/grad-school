@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 2.3 -- a single-linkage dendrogram and the persistence diagram it implies.
+"""Figure 2.6 -- a single-linkage dendrogram and the persistence diagram it implies.
 
 §2.3 defines a feature's birth as the threshold at which it forms and its death
 as the threshold at which it merges into something larger. That definition is
