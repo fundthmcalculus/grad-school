@@ -1583,6 +1583,29 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       restored rows, both of which are then *expected* moves with a stated reason.
 
 
+- [ ] 🟨 **D9 — Advisor request (2026-09-03): more analytical derivations, many more figures and diagrams.**
+      Landed as a stack of three PRs so each can be reviewed on its own.
+      **(a) Derivations — done in PR 1.** New **Appendix A.10** carries nineteen numbered derivations,
+      each checked against the shipped code (`tribble-fis` `regression.py` / `gauss_math.py`,
+      `gated-minimax-selection/selection.py` / `multiscale_persistence.py` / `ivat_mf.py`), with a
+      table mapping each to the sections that lean on it; Chapters 2–6 gain the load-bearing
+      equations inline (TSK linearity and the design matrix, FCM updates, the minimax ultrametric,
+      the three reorder sums, the memory ceiling formula, the naive-Bayes identity, the anomaly
+      rule's saturation / one-class threshold / monotonicity / float rounding, the pinning bias
+      decomposition, rank invariance, the ridge normal equations and conditioning, soft-tree
+      partition of unity, EM, and the B-spline identity) with a pointer to the full derivation.
+      Two things the derivations *changed* rather than confirmed: **§3.3.6's "provably within a
+      factor of two" is withdrawn** — the standard bound needs a metric and bounds the depth-first
+      walk of the MST, not the Prim order, and a scratch random search finds Prim-order tours over
+      $2\,T_{MST}$ (A.10.7; a harness generator for the ratio is owed if the sentence is ever to
+      carry a number again); and A.10.8 shows the classifier differs from Gaussian naive Bayes by
+      exactly $\sum_j \log \sigma_{jk}$, which makes the missing GNB row of Table 4.5 a
+      measurement of a known term, not a vague kinship. **(b) Figures, Chapters 2–4 — PR 2.**
+      **(c) Figures, Chapters 5–6 — PR 3.** Figure numbering is by order of appearance, so PRs 2
+      and 3 renumber existing figures in the chapters they touch and update every cross-reference
+      in the prose and `reproduce/figures/registry.py`; historical documents (reviews, this file's
+      earlier entries, `REVIEW_FIGURES_2026-08-02.md`) keep the numbers they were written with.
+
 ## E. Decisions and framing
 **[Tier 0–4: mix of settled defaults (E1, E3), verification paths (E2, E2b, E2c), and low-stakes editorial (E10). E1.6–E1.7 Tier 1 (normalization + FCM). E9 low-priority investigation.]**
 
