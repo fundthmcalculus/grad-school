@@ -1600,7 +1600,7 @@ is new, folded in from the former `ACTION_ITEMS.md`'s "needed from author" secti
       $2\,T_{MST}$ (A.10.7; a harness generator for the ratio is owed if the sentence is ever to
       carry a number again); and A.10.8 shows the classifier differs from Gaussian naive Bayes by
       exactly $\sum_j \log \sigma_{jk}$, which makes the missing GNB row of Table 4.5 a
-      measurement of a known term, not a vague kinship. **(b) Figures, Chapters 2–4 — PR 2.**
+      measurement of a known term, not a vague kinship. **(b) Figures, Chapters 2–4 — done in PR 2.** Twelve new generators under `reproduce/figures/`, all in the bare matplotlib environment, seven of them reading an archived CSV or `dataset_specs.yaml` and none typing a number by hand: 2.2 TSK inference and linearity, 2.3 the five norm/conorm surfaces, 2.5 minimax distance (MST path, $D$ vs $D^*$, dendrogram); 3.2 in-place permutation cycles and the $k s N^2$ bars, 3.3 the stitch's representatives and cross edges, 3.5 the three arms in seconds (`full-14900hx-r2`), 3.6 footprint curves with Table 3.3's ceilings as markers; 4.2 output partitioning (Tables 4.2/4.3, `uniform-2026-08-03`), 4.3 rule count against $M$ from the dataset specs, 4.4 anomaly-rule geometry, 4.5 training-time bars (Table 4.1b, `phiusiil-leakfree-2026-08-30`), 4.7 the dedup sweep (Table 4.8, `mf-dedup-2026-08-05`). Renumbered: 2.2→2.4, 2.3→2.6, 3.2→3.4, 4.2→4.6, 4.3→4.8, 4.4→4.9.
       **(c) Figures, Chapters 5–6 — PR 3.** Figure numbering is by order of appearance, so PRs 2
       and 3 renumber existing figures in the chapters they touch and update every cross-reference
       in the prose and `reproduce/figures/registry.py`; historical documents (reviews, this file's

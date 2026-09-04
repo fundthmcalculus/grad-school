@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 4.3 -- the correction-rule pass, quantified on Glass.
+"""Figure 4.8 -- the correction-rule pass, quantified on Glass.
 
 This figure was retargeted, not merely filled in. It was scoped as a
 before/after confusion matrix on RT-IOT2022, and that experiment still cannot

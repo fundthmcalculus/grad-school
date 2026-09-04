@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 4.2 -- the open-set operating curve, plotted from Table 4.6's own CSV.
+"""Figure 4.6 -- the open-set operating curve, plotted from Table 4.6's own CSV.
 
 Reads `table_4_4b_theta_sweep.csv` from the archive of record rather than
 re-running the sweep. That is the right dependency: the table and the figure are

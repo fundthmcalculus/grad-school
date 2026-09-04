@@ -31,7 +31,7 @@ inventory instead of in the environment.
 is not a bug in this harness and must not look like one. A row with a `skip`
 reason keeps its placeholder PNG and is reported as skipped rather than
 failed -- the same discipline the table harness applies when it prints `N/A`
-instead of guessing. Figure 4.3 was the one example of this for most of the
+instead of guessing. Figure 4.8 (4.3 before the 2026-09 renumbering) was the one example of this for most of the
 document's life: it wanted a before/after confusion matrix for a correction
 pass whose effect Chapter 4 said, in as many words, it had not yet isolated.
 That RT-IOT2022 confusion matrix still cannot be drawn -- the dataset is still
@@ -99,16 +99,47 @@ FIGURES = [
         extras=("matplotlib",),
     ),
     Figure(
-        "02-vat-rdi",
+        "02-tsk-inference",
         "2.2",
+        "One-input TSK inference, and the linearity in the consequents",
+        module="fig_02_tsk_inference",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+    ),
+    Figure(
+        "02-norm-surfaces",
+        "2.3",
+        "The five t-norm / t-conorm families the library ships, as surfaces",
+        module="fig_02_norm_surfaces",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+    ),
+    Figure(
+        "02-vat-rdi",
+        "2.4",
         "A dissimilarity matrix before and after VAT reordering",
         module="fig_02_vat_rdi",
         project="tribble-cluster",
         extras=("matplotlib", "scipy"),
     ),
     Figure(
+        "02-minimax-ultrametric",
+        "2.5",
+        "The minimax distance: MST path, ultrametric, dendrogram",
+        module="fig_02_minimax_ultrametric",
+        extras=(
+            "matplotlib",
+            "scipy",
+            "numpy",
+        ),
+    ),
+    Figure(
         "02-persistence",
-        "2.3",
+        "2.6",
         "Single-linkage dendrogram and its persistence diagram",
         module="fig_02_persistence",
         extras=("matplotlib", "scipy", "numpy"),
@@ -122,10 +153,48 @@ FIGURES = [
         extras=("matplotlib",),
     ),
     Figure(
-        "03-complexity-fit",
+        "03-inplace-permutation",
         "3.2",
+        "The in-place permutation as cycles, and the k s N^2 footprint it buys",
+        module="fig_03_inplace_permutation",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+    ),
+    Figure(
+        "03-stitch",
+        "3.3",
+        "The divide-and-conquer stitch: blocks, farthest-point representatives, cross edges",
+        module="fig_03_stitch",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+    ),
+    Figure(
+        "03-complexity-fit",
+        "3.4",
         "Measured reorder growth against the reference complexity curves",
         owner="reproduce/tables/table_3_1_reorder_three_arm.py",
+    ),
+    Figure(
+        "03-three-arm-seconds",
+        "3.5",
+        "The three reorder arms in absolute seconds, and stage two's margin",
+        module="fig_03_three_arm_seconds",
+        extras=("matplotlib",),
+        archive="full-14900hx-r2",
+    ),
+    Figure(
+        "03-memory-ceiling",
+        "3.6",
+        "Dense footprint against N per scheme, with Table 3.3's ceilings as markers",
+        module="fig_03_memory_ceiling",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
     ),
     # -- Chapter 4 ---------------------------------------------------------- #
     Figure(
@@ -137,15 +206,63 @@ FIGURES = [
         extras=("matplotlib",),
     ),
     Figure(
-        "04-anomaly-sweep",
+        "04-output-partitioning",
         "4.2",
+        "Output partitioning: the zeroth-order cliff and quantile's instability (Tables 4.2, 4.3)",
+        module="fig_04_output_partitioning",
+        extras=("matplotlib",),
+        archive="uniform-2026-08-03",
+    ),
+    Figure(
+        "04-rule-count",
+        "4.3",
+        "Rules in the base against features in the data, from the dataset specs",
+        module="fig_04_rule_count",
+        extras=(
+            "matplotlib",
+            "numpy",
+            "pyyaml",
+        ),
+    ),
+    Figure(
+        "04-anomaly-geometry",
+        "4.4",
+        "The geometry of the anomaly rule: saturation, the winning region, the one-class threshold",
+        module="fig_04_anomaly_geometry",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+    ),
+    Figure(
+        "04-speedup",
+        "4.5",
+        "Training time by method and dataset (Table 4.1b)",
+        module="fig_04_speedup",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+        archive="phiusiil-leakfree-2026-08-30",
+    ),
+    Figure(
+        "04-anomaly-sweep",
+        "4.6",
         "The open-set operating curve of Table 4.6",
         module="fig_04_anomaly_sweep",
         extras=("matplotlib",),
     ),
     Figure(
+        "04-mf-dedup-sweep",
+        "4.7",
+        "The membership-function deduplication sweep behind Table 4.8, per problem",
+        module="fig_04_mf_dedup_sweep",
+        extras=("matplotlib",),
+        archive="mf-dedup-2026-08-05",
+    ),
+    Figure(
         "04-rtiot-confusion",
-        "4.3",
+        "4.8",
         "The correction-rule pass, quantified on Glass (MF count and accuracy)",
         module="fig_04_correction_pass",
         extras=("matplotlib",),

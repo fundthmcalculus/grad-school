@@ -1,6 +1,6 @@
 # `reproduce/figures/` — the proposal's figures
 
-Sixteen figures are cited in the proposal text. This directory produces them.
+Twenty-eight figures are cited in the proposal text (sixteen before the 2026-09 expansion, CHECKLIST D9). This directory produces them.
 
 ```bash
 reproduce/figures/make_figures.py --list       # the inventory and what is skipped
@@ -46,13 +46,14 @@ A figure whose underlying experiment has not been run keeps its placeholder and
 carries a `skip` reason in `registry.py`, printed by `--list`. This is the same
 rule the table harness follows when it emits `N/A`: the harness says what it
 could not produce rather than substituting something that looks like an answer.
-Figure 4.3 is the current case — Chapter 4 states that the accuracy contribution
-of the correction-rule pass has not been isolated, so there is no before/after
-to plot.
+Figure 4.8 (4.3 before the 2026-09 renumbering) was the long-running case — Chapter 4
+stated that the accuracy contribution of the correction-rule pass had not been
+isolated, so there was no before/after to plot — until the measurement was taken
+on Glass and the figure retargeted to it.
 
-Figure 3.2 is also not drawn from here. It is produced by
+Figure 3.4 is also not drawn from here. It is produced by
 `reproduce/tables/table_3_1_reorder_three_arm.py`, deliberately: the fitted
-exponents in Table 3.2 and the slopes in Figure 3.2 come from the same sweep, so
+exponents in Table 3.2 and the slopes in Figure 3.4 come from the same sweep, so
 that a table and a figure describing the same measurement cannot disagree.
 
 ## Data, not decoration
