@@ -52,11 +52,14 @@ def build_html(md_file):
             "--variable", "theme=black"
         ]
 
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
         print(f"HTML presentation created: {html_file}")
         return html_file
+    except FileNotFoundError:
+        print("Warning: pandoc not found. Install with: apt-get install pandoc", file=sys.stderr)
+        return None
     except subprocess.CalledProcessError as e:
-        print(f"Error building HTML: {e}", file=sys.stderr)
+        print(f"Error building HTML: {e.stderr}", file=sys.stderr)
         return None
 
 def build_pdf(md_file):
@@ -73,11 +76,14 @@ def build_pdf(md_file):
             "-V", "aspectratio:16:9"
         ]
 
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
         print(f"PDF presentation created: {pdf_file}")
         return pdf_file
+    except FileNotFoundError:
+        print("Warning: pandoc not found. Install with: apt-get install pandoc", file=sys.stderr)
+        return None
     except subprocess.CalledProcessError as e:
-        print(f"Error building PDF: {e}", file=sys.stderr)
+        print(f"Error building PDF: {e.stderr}", file=sys.stderr)
         return None
 
 def main():
@@ -99,8 +105,16 @@ def main():
     # Build PDF
     pdf_result = build_pdf(combined_md)
 
+    # Success if at least one format was built, or if slides were combined
     if html_result or pdf_result:
         print("\n✓ Build completed successfully")
+        if not html_result:
+            print("  Note: HTML presentation not generated (pandoc required)")
+        if not pdf_result:
+            print("  Note: PDF presentation not generated (pandoc + LaTeX required)")
+        return 0
+    elif combined_md:
+        print("\n⚠ Slides combined but presentation formats require pandoc+LaTeX")
         return 0
     else:
         print("\n✗ Build failed")
