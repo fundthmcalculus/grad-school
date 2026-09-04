@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 6.2 -- the hierarchical mixture: gates over named inputs, TSK leaves.
+"""Figure 6.4 -- the hierarchical mixture: gates over named inputs, TSK leaves.
 
 What the caption asks the figure to emphasise is not the tree shape, which is
 unremarkable, but the constraint: **gates split only on original variables.**
@@ -17,7 +17,7 @@ steps.
 
 Schematic. The variable names are Concrete's, matching the tree §6.3.2 actually
 recovers (cement, then age at the 28-day mark), so the illustration is not at
-odds with the fitted model of Figure 6.1 -- but the structure here is drawn, not
+odds with the fitted model of Figure 6.2 -- but the structure here is drawn, not
 fitted, and no number in it is measured.
 """
 

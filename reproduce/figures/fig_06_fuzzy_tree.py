@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 6.1 -- trained fuzzy trees on Concrete and PhiUSIIL, as rules.
+"""Figure 6.2 -- trained fuzzy trees on Concrete and PhiUSIIL, as rules.
 
 §6.3.2's readability claim is that the tree "renders as a short list of IF-THEN
 rules, one per root-to-leaf path, each mentioning only the variables on that

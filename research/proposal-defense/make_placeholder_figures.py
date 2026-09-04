@@ -52,8 +52,15 @@ FIGURES = {
     "05-minimax-transform": "Ch 5: Minimax transform",
     "05-band-discovery": "Ch 5: Band discovery",
     "05-persistence-ramp": "Ch 5: Persistence ramp",
+    "05-persistence-gate": "Ch 5: persistence gate",
+    "05-battery": "Ch 5: battery",
+    "05-scaling": "Ch 5: scaling sweep",
+    "06-ridge-solver": "Ch 6: ridge solver",
     "06-fuzzy-tree": "Ch 6: Fuzzy tree",
+    "06-soft-routing": "Ch 6: soft routing",
     "06-hme-structure": "Ch 6: HME structure",
+    "06-ruspini-export": "Ch 6: Ruspini export",
+    "06-refinement-ladder": "Ch 6: refinement ladder",
     "06-mimo-rollout": "Ch 6: MIMO rollout",
 }
 

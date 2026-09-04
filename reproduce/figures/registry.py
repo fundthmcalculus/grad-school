@@ -290,21 +290,91 @@ FIGURES = [
         module="fig_05_persistence_ramp",
         extras=("matplotlib", "scipy", "numpy"),
     ),
+    Figure(
+        "05-persistence-gate",
+        "5.4",
+        "The persistence gate deciding, and the greedy cover it yields, on rings and bridge",
+        module="fig_05_persistence_gate",
+        extras=(
+            "matplotlib",
+            "scipy",
+            "numpy",
+            "scikit-learn",
+        ),
+    ),
+    Figure(
+        "05-battery",
+        "5.5",
+        "The five battery datasets, coloured by the gated set-cover's blocks",
+        module="fig_05_battery",
+        extras=(
+            "matplotlib",
+            "scipy",
+            "numpy",
+            "scikit-learn",
+        ),
+    ),
+    Figure(
+        "05-scaling",
+        "5.6",
+        "Two-stage selector against a flat set-cover as n grows (Table 5.4)",
+        module="fig_05_scaling",
+        extras=("matplotlib",),
+        archive="full-2026-08-22",
+    ),
     # -- Chapter 6 ---------------------------------------------------------- #
     Figure(
-        "06-fuzzy-tree",
+        "06-ridge-solver",
         "6.1",
+        "The shared ridge-TSK solver: a real design matrix, and the three consumers",
+        module="fig_06_ridge_solver",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+    ),
+    Figure(
+        "06-fuzzy-tree",
+        "6.2",
         "A trained fuzzy tree on Concrete and on PhiUSIIL, as rules",
         module="fig_06_fuzzy_tree",
         project="tribble-fis",
         extras=("matplotlib",),
     ),
     Figure(
+        "06-soft-routing",
+        "6.3",
+        "Soft-tree routing weights as a partition of unity, and the blend they produce",
+        module="fig_06_soft_routing",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+    ),
+    Figure(
         "06-hme-structure",
-        "6.2",
+        "6.4",
         "Hierarchical mixture: gates over named inputs routing to TSK experts",
         module="fig_06_hme_structure",
         extras=("matplotlib",),
+    ),
+    Figure(
+        "06-ruspini-export",
+        "6.5",
+        "The Ruspini export: triangular partition of unity, and apex-only refinement",
+        module="fig_06_ruspini_export",
+        extras=(
+            "matplotlib",
+            "numpy",
+        ),
+    ),
+    Figure(
+        "06-refinement-ladder",
+        "6.6",
+        "Antecedent refinement against consequent order (Table in §6.4)",
+        module="fig_06_refinement_ladder",
+        extras=("matplotlib",),
+        archive="uniform-2026-08-03",
     ),
     # -- The §6.3.5 studies -------------------------------------------------- #
     #
