@@ -13,6 +13,7 @@ SLIDES_DIR = Path(__file__).parent.parent / "slides"
 OUTPUT_DIR = Path(__file__).parent.parent / "output"
 SCRIPT_DIR = Path(__file__).parent
 
+
 def combine_slides():
     """Combine individual markdown slides into a single presentation file."""
     slides_files = sorted(SLIDES_DIR.glob("*.md"))
@@ -24,17 +25,18 @@ def combine_slides():
     combined = []
     for slide_file in slides_files:
         print(f"Adding {slide_file.name}...")
-        with open(slide_file, 'r') as f:
+        with open(slide_file, "r") as f:
             combined.append(f.read())
 
     combined_md = "\n\n".join(combined)
     combined_file = OUTPUT_DIR / "presentation.md"
 
-    with open(combined_file, 'w') as f:
+    with open(combined_file, "w") as f:
         f.write(combined_md)
 
     print(f"Combined slides saved to {combined_file}")
     return combined_file
+
 
 def build_html(md_file):
     """Build HTML presentation using pandoc with reveal.js."""
@@ -44,23 +46,32 @@ def build_html(md_file):
         cmd = [
             "pandoc",
             str(md_file),
-            "-t", "revealjs",
+            "-t",
+            "revealjs",
             "-s",
-            "-o", str(html_file),
-            "--variable", "revealjs-url=https://unpkg.com/reveal.js@4.5.0",
-            "--variable", "transition=slide",
-            "--variable", "theme=black"
+            "-o",
+            str(html_file),
+            "--variable",
+            "revealjs-url=https://unpkg.com/reveal.js@4.5.0",
+            "--variable",
+            "transition=slide",
+            "--variable",
+            "theme=black",
         ]
 
         subprocess.run(cmd, check=True, capture_output=True, text=True)
         print(f"HTML presentation created: {html_file}")
         return html_file
     except FileNotFoundError:
-        print("Warning: pandoc not found. Install with: apt-get install pandoc", file=sys.stderr)
+        print(
+            "Warning: pandoc not found. Install with: apt-get install pandoc",
+            file=sys.stderr,
+        )
         return None
     except subprocess.CalledProcessError as e:
         print(f"Error building HTML: {e.stderr}", file=sys.stderr)
         return None
+
 
 def build_pdf(md_file):
     """Build PDF presentation using pandoc with LaTeX."""
@@ -70,21 +81,29 @@ def build_pdf(md_file):
         cmd = [
             "pandoc",
             str(md_file),
-            "-t", "beamer",
-            "-o", str(pdf_file),
-            "-V", "theme:Madrid",
-            "-V", "aspectratio:16:9"
+            "-t",
+            "beamer",
+            "-o",
+            str(pdf_file),
+            "-V",
+            "theme:Madrid",
+            "-V",
+            "aspectratio:16:9",
         ]
 
         subprocess.run(cmd, check=True, capture_output=True, text=True)
         print(f"PDF presentation created: {pdf_file}")
         return pdf_file
     except FileNotFoundError:
-        print("Warning: pandoc not found. Install with: apt-get install pandoc", file=sys.stderr)
+        print(
+            "Warning: pandoc not found. Install with: apt-get install pandoc",
+            file=sys.stderr,
+        )
         return None
     except subprocess.CalledProcessError as e:
         print(f"Error building PDF: {e.stderr}", file=sys.stderr)
         return None
+
 
 def main():
     """Main build function."""
@@ -119,6 +138,7 @@ def main():
     else:
         print("\n✗ Build failed")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
