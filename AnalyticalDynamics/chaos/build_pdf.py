@@ -185,7 +185,8 @@ def build_with_weasyprint(md_path, pandoc):
         print(res.stderr[-1500:])
         return None
 
-    css = CSS(string="""
+    css = CSS(
+        string="""
     @page { size: letter; margin: 1in;
             @bottom-center { content: counter(page); font-size: 9.5pt; color:#555; } }
     body { font-family: Georgia, "Times New Roman", serif; font-size: 10.8pt;
@@ -193,7 +194,8 @@ def build_with_weasyprint(md_path, pandoc):
     h1 { font-size:17pt; } h2 { font-size:13pt; } h3 { font-size:11.4pt; font-style:italic; }
     table { border-collapse:collapse; width:100%; font-size:9pt; margin:.8em 0 1em; }
     th,td { border-bottom:.6pt solid #ccc; padding:4pt 6pt; vertical-align:top; }
-    """)
+    """
+    )
     pdf = os.path.join(BUILD, "paper.pdf")
     doc = HTML(filename=html_path, base_url=HERE).render(stylesheets=[css])
     doc.write_pdf(pdf)

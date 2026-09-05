@@ -1,0 +1,47 @@
+name: Proposal Defense Artifacts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'proposal-defense/**'
+      - '.github/workflows/proposal-defense.yml'
+
+jobs:
+  build-defense:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-latex-base texlive-latex-extra texlive-fonts-recommended
+
+      - name: Build slides
+        continue-on-error: true
+        run: |
+          if [ -d "proposal-defense/slides" ]; then
+            python3 proposal-defense/scripts/build.py
+          else
+            echo "No slides directory found"
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: proposal-defense-artifacts
+          path: |
+            proposal-defense/output/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Create release (optional)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            proposal-defense/output/*.pdf
+            proposal-defense/output/*.html
