@@ -105,17 +105,17 @@ existing methods do not.
    algorithm and no gradient descent afterward. Because the rules are built per output class instead of by gridding the
    inputs, the rule base does not explode: a $K$-class problem produces on the order of $K$ rules. On the
    {{dataset.phiusiil.rows}}-row PhiUSIIL phishing set this trains a two-rule classifier in $0.13 \pm 0.02$ seconds, ten
-   seeds. **The accuracy on that row is $0.440 \pm 0.181$, and it used to read $0.997 \pm 0.001$.** The difference is a
-   single feature: `URLSimilarityIndex`, a URL's similarity to a whitelist of known-legitimate URLs, which the loader
-   returned until 2026-08-30 and which separates the classes on its own at AUC 0.996. Dropped, along with two sibling
-   probabilities fitted on the corpus's own labels, the construction falls *below* the 0.5755 majority-class baseline.
-   It is not that the task became hard: on the same 47 features ANFIS scores $0.999 \pm 0.001$, a GA-tuned
-   FIS $0.998 \pm 0.001$, CART $0.997 \pm 0.001$, and a random forest $1.000 \pm 0.000$. What the row demonstrates is
-   therefore the rule count and the training time only — and the training time claim survives intact, at $194	imes$
-   the slowest fuzzy baseline on this dataset (Table 4.1b). The scale target is RT-IOT2022 ({{dataset.rt_iot2022.rows}}
-   samples, {{dataset.rt_iot2022.features}} features, {{dataset.rt_iot2022.classes}} classes), where the construction
-   produces twelve rules against a grid form past enumeration: twelve rules train in $4.24 \pm 0.68$ seconds
-   at $0.927 \pm 0.002$ accuracy (Table 4.4), with a 200-tree random forest scoring $0.998 \pm 0.000$ on the same split.
+   seeds, **at an accuracy of $0.440 \pm 0.181$.** The construction's one strong antecedent was `URLSimilarityIndex`, a
+   URL's similarity to a whitelist of known-legitimate URLs, which separates the classes on its own at AUC 0.996 — a
+   target leak. Dropped, along with two sibling probabilities fitted on the corpus's own labels, the construction falls
+   *below* the 0.5755 majority-class baseline. It is not that the task became hard: on the same 47 features ANFIS
+   scores $0.999 \pm 0.001$, a GA-tuned FIS $0.998 \pm 0.001$, CART $0.997 \pm 0.001$, and a random forest
+   $1.000 \pm 0.000$. What the row demonstrates is therefore the rule count and the training time only — and the
+   training time claim survives intact, at $194\times$ the slowest fuzzy baseline on this dataset (Table 4.1b). The
+   scale target is RT-IOT2022 ({{dataset.rt_iot2022.rows}} samples, {{dataset.rt_iot2022.features}} features,
+   {{dataset.rt_iot2022.classes}} classes), where the construction produces twelve rules against a grid form past
+   enumeration: twelve rules train in $3.64 \pm 0.25$ seconds at $0.927 \pm 0.002$ accuracy (Table 4.1b), with a
+   200-tree random forest scoring $0.998 \pm 0.000$ on the same split.
    One consequence I did not set out to obtain, then built deliberately once I saw it: because every class is an
    explicit fuzzy rule, the complement of their aggregate is automatically a *none of the above* rule. That turns the
    classifier into an open-set detector for rare and never-before-seen conditions at no additional training cost — one

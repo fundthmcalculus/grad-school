@@ -31,7 +31,7 @@ This appendix documents the location, size, source, and loading strategy for all
 - **Role:** Open-set detection testbed (planned); intended to replace Glass (214 samples) as the large-scale anomaly/open-set partner
 - **Source:** [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 952
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_rt_iot2022()` (not yet wired)
-- **Status:** In the repository and wired (2026-08-12), both roles measured. Open-set claim at ten seeds (Table 4.7b, re-measured 2026-08-27 on the de-leaked loader): complement rule loses to Isolation Forest at this scale (+0.366 vs +0.535 Youden's $J$). Plain classification/timing at ten seeds (Table 4.4, `table_4_1_mog_baselines.py`): MoG trains in 4.24 ± 0.68 s at 92.7 ± 0.2% accuracy against Random Forest's 99.8 ± 0.0%.
+- **Status:** In the repository and wired (2026-08-12), both roles measured. Open-set claim at ten seeds (Table 4.7b, re-measured 2026-08-27 on the de-leaked loader): complement rule loses to Isolation Forest at this scale (+0.366 vs +0.535 Youden's $J$). Plain classification/timing at ten seeds (Table 4.4, `table_4_1_mog_baselines.py`): MoG trains in 3.64 ± 0.25 s at 92.7 ± 0.2% accuracy against Random Forest's 99.8 ± 0.0%.
 
 #### Glass (UCI) (Tables 4.6–4.7, Fig 4.6, §4.4)
 - **File:** Auto-fetched via sklearn or `ucimlrepo` (id 41)
