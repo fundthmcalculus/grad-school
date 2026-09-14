@@ -16,7 +16,8 @@ A trained FIS is a short list of IF–THEN rules over linguistic terms (*if the 
 low, then risk is elevated*). A domain expert can read and edit them by hand. Given enough rules and membership
 functions, a FIS can approximate any continuous function to an arbitrary degree of accuracy; this model family is not
 intrinsically weak. That position is commonly asymptotic in the rule count, and my approach is at the other end of the
-rule-base count axis — on the order of one rule per output class, three output buckets in Chapter 4 (regression).
+rule-base count axis — on the order of one rule per output class.
+
 Whether capability survives at a readable rule count is a question for measurement, not theory. On Concrete, ten seeds
 under one protocol, the flat model reaches $R^2 = 0.861 \pm 0.026$ with a full second-order consequent, against
 CART's $0.826 \pm 0.047$ and a random forest's $0.909 \pm 0.019$: level with the tree, behind the forest. At zeroth
@@ -46,12 +47,13 @@ are susceptible to numerical conditioning issues, since the FIS can be a stiff, 
 **Scale of the analysis tools.** The tools we use to understand a dataset before modeling it — cluster tendency,
 distance structure — were built for a few thousand points, and real datasets now arrive with hundreds of thousands (or
 millions) of rows. The Visual Assessment of Cluster Tendency (VAT), the starting point for my graduate school journey,
-is a prime example: in textbook (and common library) form it is $O (N^3)$, unusable well before the interesting datasets begin.
+is a prime example: in textbook (and common library) form it is $O (N^3)$, unusable well before the interesting datasets
+begin.
 
 Take a case I return to throughout: a NASA space-shuttle reentry telemetry set, roughly {{dataset.shuttle.rows}} samples
 across {{dataset.shuttle.features}} sensor channels, about 80% of them are in a single flight condition. Before fitting
-anything, I would like to simply *look* at the structure and confirm one dominant regime and a handful of smaller ones. A
-full VAT image of that data is a 58,000 × 58,000 matrix — about 13 gigabytes at single precision to hold once, and the
+anything, I would like to simply *look* at the structure and confirm one dominant regime and a handful of smaller ones.
+A full VAT image of that data is a 58,000 × 58,000 matrix — about 13 gigabytes at single precision to hold once, and the
 common implementation keeps two or three copies. Scaling the cubic algorithm up from a size I can actually time (124
 seconds at 4,096 points, measured in Chapter 3) puts 58,000 points at roughly four days. The structure is sitting right
 there, and the standard toolchain cannot afford to show it to me. The method in Chapter 3 produces the same ordering in
@@ -75,14 +77,13 @@ construction produces on the same data. The structure-first training time is mea
 has no measured baseline yet, so the figure prints the gap rather than a number opposite it.
 `![structure-before-search](fig/01-structure-before-search.png)`
 
-## 1.2 Unique Contributions
+## 1.2 Contributions and Background
 
-The dissertation is organized as a pipeline, and each stage is a contribution. Every individual component I use — VAT,
-iVAT, single-linkage clustering, Fuzzy C-Means, persistence-based clustering, minimax linkage, the mixture-of-experts
-architecture and its EM, Lin–Kernighan local search, the Takagi–Sugeno–Kang rule form — is prior art, and I credit it as
-such, including the cases where a competitor sits uncomfortably close to what I claim. What is new is how the pieces
-compose into a fast, scalable, interpretable modeling pipeline, and the regimes that composition reaches which the
-existing methods do not.
+The dissertation is organized as a pipeline, and each stage is a contribution. Every individual component I use:
+VAT/iVAT, single-linkage clustering, Fuzzy C-Means, persistence-based clustering, minimax linkage, the
+mixture-of-experts architecture and its EM, Lin–Kernighan local search, the Takagi–Sugeno–Kang rule form — has at least
+some prior art. What is new is how the pieces compose into a fast, scalable, interpretable modeling pipeline, and the
+regimes that composition reaches which the existing methods do not.
 
 1. **mergeVAT (priority-queue VAT): exact VAT and iVAT at scale.** The feasible problem size moves from a few thousand
    points to well over a hundred thousand, on ordinary hardware, reproducing the serial reference ordering exactly at
@@ -115,11 +116,10 @@ existing methods do not.
    scale target is RT-IOT2022 ({{dataset.rt_iot2022.rows}} samples, {{dataset.rt_iot2022.features}} features,
    {{dataset.rt_iot2022.classes}} classes), where the construction produces twelve rules against a grid form past
    enumeration: twelve rules train in $3.64 \pm 0.25$ seconds at $0.927 \pm 0.002$ accuracy (Table 4.1b), with a
-   200-tree random forest scoring $0.998 \pm 0.000$ on the same split.
-   One consequence I did not set out to obtain, then built deliberately once I saw it: because every class is an
-   explicit fuzzy rule, the complement of their aggregate is automatically a *none of the above* rule. That turns the
-   classifier into an open-set detector for rare and never-before-seen conditions at no additional training cost — one
-   that can still say *why* it fired.
+   200-tree random forest scoring $0.998 \pm 0.000$ on the same split. One consequence I did not set out to obtain, then
+   built deliberately once I saw it: because every class is an explicit fuzzy rule, the complement of their aggregate is
+   automatically a *none of the above* rule. That turns the classifier into an open-set detector for rare and
+   never-before-seen conditions at no additional training cost — one that can still say *why* it fired.
 
 3. **Membership functions from topological structure** *(proposed, with preliminary results)*. Given only a
    dissimilarity matrix — no coordinates, no Gaussian assumption — I extract fuzzy membership functions, the number of
