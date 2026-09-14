@@ -24,7 +24,6 @@ Run:  python figures_fis.py [--tuned tuned_small.npz] [--scale small]
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 
 import matplotlib
 

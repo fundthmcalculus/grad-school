@@ -1112,7 +1112,7 @@ python run_all.py --dry-run  # the same, plus what the LKH stage would cost
 
 `run_all.py --ladder` adds the full LKH size ladder, which is hours rather than minutes and is
 off by default; `--dry-run` prices it first. Every stage is also a standalone script with
-`--help`, and each writes into `results/`.
+`--help`, and each writes into `results`.
 
 `costmodel.py` must run before `tune_opt.py`, and again after any change to the solver's hot
 path — its fitted coefficients are what the objective spends. `test_invariants.py` runs first,

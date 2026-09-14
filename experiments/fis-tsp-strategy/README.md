@@ -118,15 +118,15 @@ able to tell a reported result from an exploration without reading the code.
 | `figures.py`, `figures_tuning.py`, `figures_fis.py`, `figures_lkh.py`, `figures_aim.py` | `results/figures/*.png` |
 | `summary.py` | `results/summary.csv` — one flat size / quality / time row per (instance, arm) |
 
-**`experiments/`** — superseded, one-off, or illustrative, plus two that produce reported
+**`..`** — superseded, one-off, or illustrative, plus two that produce reported
 findings but re-fit from scratch and so do not belong in `run_all.py`
 (`transfer.py` → §4.2, `profile_kernels.py` → §8). See
 [experiments/README.md](experiments/README.md).
 
-**`results/`** — every artifact any of the above writes, including `results/legacy/` for data
+**`results`** — every artifact any of the above writes, including `results/legacy` for data
 that has been superseded but still backs a claim in FINDINGS.md.
 
-**`references/`** — what the comparable literature measures
+**`references`** — what the comparable literature measures
 ([BENCHMARKS.md](references/BENCHMARKS.md)) and what is actually novel here
 ([PRIOR_ART.md](references/PRIOR_ART.md)). The PDFs themselves are gitignored.
 
@@ -166,7 +166,7 @@ everything it measured. `--skip-lkh` re-measures our arms against an LKH curve a
 
 ## Instances
 
-Instances come from `../ClusteringExperiments/tsplib/`, which already carries 111 TSPLIB files
+Instances come from `../../ClusteringExperiments/tsplib`, which already carries 111 TSPLIB files
 and the published-optimum index. Training, validation and test lists are disjoint —
 `tune_opt.py` asserts it at import rather than trusting the lists to stay right, and
 `lkh_compare.py` refuses outright to measure on an instance the rule base was fitted or

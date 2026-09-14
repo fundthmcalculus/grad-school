@@ -33,7 +33,7 @@ because $S_H$ is the conorm the anomaly rule of §4.3 is built on. One property 
 **Figure 2.3 — The five t-norm and t-conorm families the library ships, as surfaces.** $T(a,b)$ above and $S(a,b)$ below for min/max, probability, Łukasiewicz, Hamacher and Einstein, the five families `table_norm_conorm_matrix.py` sweeps, each with its formula from `gauss_math.py`; dark is 1, light is 0, white contours at 0.25, 0.5 and 0.75. The orange top edge of every conorm panel is the identity $S(1, b) = 1$: one saturated input saturates the aggregate, which is the whole of §4.3.5's degeneracy argument in one line of pixels. The families differ only in the interior of the square, and Table 4.1's norm/conorm sweep measures what that interior is worth on accuracy.
 `![02-norm-surfaces](fig/02-norm-surfaces.png)` It is more aggressive than max about treating two partial matches as strong evidence — which by the algebra should change how readily a model declares something familiar, though whether the choice of family actually shifts that open-set behaviour is left untested there.
 
-The **fuzzy complement** is the negation, standardly $\neg a = 1 - a$. It is the least-used of the three in classical fuzzy modeling and, as it turns out, the one that buys the most in Chapter 4: applying it to the aggregate of every known rule is what produces a *none of the above* detector.
+The **fuzzy complement** is the negation, standardly $\neg a = 1 - a$. It is the foundation of a result in Chapter 4: applying it to the aggregate of every known rule is what produces a *none of the above* detector.
 
 ### Constraints for analyzability
 
