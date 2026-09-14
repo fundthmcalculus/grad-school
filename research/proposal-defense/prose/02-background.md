@@ -1,125 +1,346 @@
 # Chapter 2 — Background and Preliminaries
 
-Everything in this proposal is built from a small number of standard tools, arranged in a particular order. This chapter introduces them so later chapters can lean on them without re-derivation. Throughout, $N$ is the number of samples, $M$ the number of input features, $K$ the number of output classes or output buckets, $c$ the number of clusters when clustering is the task, and $D$ an $N \times N$ dissimilarity matrix. What follows is what I use downstream: the fuzzy inference machinery I am trying to build faster, the cluster-tendency methods that find structure, a little topology to read that structure at multiple scales, the relational clustering that ties the two together, and why the usual optimization is what I am trying to avoid. The chapter closes with interpretability, the property I am unwilling to trade away.
+Everything in this proposal is built from a small number of standard tools, arranged in a particular order. This chapter
+introduces them so later chapters can lean on them without re-derivation. Throughout, $N$ is the number of samples, $M$
+the number of input features, $K$ the number of output classes or output buckets, $c$ the number of clusters when
+clustering is the task, and $D$ an $N \times N$ dissimilarity matrix. What follows is what I use downstream: the fuzzy
+inference machinery I am trying to build faster, the cluster-tendency methods that find structure, a little topology to
+read that structure at multiple scales, the relational clustering that ties the two together, and why the usual
+optimization is what I am trying to avoid. The chapter closes with interpretability, the property I am unwilling to
+trade away.
 
 ## 2.1 Fuzzy Inference Systems
 
-A Fuzzy Inference System replaces the crisp true/false of classical logic with a degree of membership between zero and one, given by a *membership function*. A temperature of 68°F might have membership 0.7 in *comfortable* and 0.3 in *cool*. Rules are written over these fuzzy sets, *if temperature is cool then heater is medium*, and the system combines the active rules to produce an output. Because the rules are written in linguistic terms a person can read them, and given enough sets and rules the system can approximate any continuous function to arbitrary accuracy — a result established for fuzzy systems generally and extended to the hierarchical case by [-@wang1998universal; -@wang1999analysis] and [-@joo2002universal]. That theorem establishes only that the family is not intrinsically weak, and it is asymptotic in the rule count; every model in this dissertation sits at the other end of that axis, on the order of one rule per output class and three output buckets in §4.3. Capability at that rule count is settled by measurement, in Chapters 4 and 6: the flat model on Concrete lands level with CART ($R^2 = 0.861 \pm 0.026$ against $0.826 \pm 0.047$) and behind a random forest ($0.909 \pm 0.019$), and falls to $0.394 \pm 0.065$ if the consequents are constants.
+A Fuzzy Inference System replaces the crisp true/false of classical logic with a degree of membership between zero and
+one, given by a *membership function*. A temperature of 68°F might have membership 0.7 in *comfortable* and 0.3 in
+*cool*. Rules are written over these fuzzy sets, *if temperature is cool then heater is medium*, and the system combines
+the active rules to produce an output. Because the rules are written in linguistic terms a person can read them, and
+given enough sets and rules the system can approximate any continuous function to arbitrary accuracy — a result
+established for fuzzy systems generally and extended to the hierarchical case
+by [-@wang1998universal; -@wang1999analysis] and [-@joo2002universal]. That theorem establishes only that the family is
+not intrinsically weak, and it is asymptotic in the rule count; every model in this dissertation sits at the other end
+of that axis, on the order of one rule per output class and three output buckets in §4.3. Capability at that rule count
+is settled by measurement, in Chapters 4 and 6: the flat model on Concrete lands level with CART
+($R^2 = 0.861 \pm 0.026$ against $0.826 \pm 0.047$) and behind a random forest ($0.909 \pm 0.019$), and falls
+to $0.394 \pm 0.065$ if the consequents are constants.
 
-There are two common flavors. A **Mamdani** system uses fuzzy sets on the output side and requires a defuzzification step to turn the aggregated output set back into a number. A **Takagi–Sugeno–Kang (TSK)** system instead makes each rule's consequent a function of the inputs: a constant (order 0), a linear function (order 1), or a polynomial (higher orders). I use the TSK form throughout, for one reason that matters a great deal later. *For a fixed set of firing strengths, the TSK output is linear in the consequent coefficients.* That linearity is what lets me solve for the consequents in closed form rather than searching for them, and it is the hinge of Chapters 4 and 6. Written out: rule $r$ fires with strength $w_r(x) = \prod_j \mu_{rj}(x_j)$ and answers $f_r(x) = m_r + \phi(x)^{\top} c_r$, and the system returns
+There are two common flavors. A **Mamdani** system uses fuzzy sets on the output side and requires a defuzzification
+step to turn the aggregated output set back into a number. A **Takagi–Sugeno–Kang (TSK)** system instead makes each
+rule's consequent a function of the inputs: a constant (order 0), a linear function (order 1), or a polynomial (higher
+orders). I use the TSK form throughout, for one reason that matters a great deal later. *For a fixed set of firing
+strengths, the TSK output is linear in the consequent coefficients.* That linearity is what lets me solve for the
+consequents in closed form rather than searching for them, and it is the hinge of Chapters 4 and 6. Written out:
+rule $r$ fires with strength $w_r (x) = \prod_j \mu_{rj} (x_j)$ and answers $f_r (x) = m_r + \phi (x)^{\top} c_r$, and
+the system returns
 
-$$ \hat y(x) = \sum_{r=1}^{R} \bar w_r(x)\, f_r(x), \qquad \bar w_r(x) = \frac{w_r(x)}{\sum_{s} w_s(x)}, $$
+$$ \hat y (x) = \sum_{r=1}^{R} \bar w_r (x)\, f_r (x), \qquad \bar w_r (x) = \frac{w_r (x)}{\sum_{s} w_s (x)}, $$
 
-a weighted average whose weights do not depend on $(m_r, c_r)$. So $\hat y$ is linear in the consequent coefficients, and over a training set $\hat{\mathbf y} = \Phi \beta$ for a design matrix $\Phi$ built from the normalized firings and the consequent basis — Appendix A.10.1 writes it out, and Appendix A.10.16 solves it.
+a weighted average whose weights do not depend on $(m_r, c_r)$. So $\hat y$ is linear in the consequent coefficients,
+and over a training set $\hat{\mathbf y} = \Phi \beta$ for a design matrix $\Phi$ built from the normalized firings and
+the consequent basis — Appendix A.10.1 writes it out, and Appendix A.10.16 solves it.
 
-**Figure 2.2 — One-input TSK inference, and the linearity in the consequents.** Three Gaussian antecedents over a single input (top, solid) with their normalized firings (dashed); below, the three affine consequents as the faint local lines they are, and the weighted average that blends them into the output (bold). The dashed output is the same system with one rule's constant shifted by a fixed amount: the gap between the two curves is that rule's normalized firing times the shift, the shape of the middle membership function and nothing else. That is what "linear in the consequent coefficients" looks like, and why the THEN side of every rule in Chapters 4 and 6 is solved in closed form (Appendix A.10.1, A.10.16) while the IF side is not. Illustrative; no proposal number depends on it.
+**Figure 2.2 — One-input TSK inference, and the linearity in the consequents.** Three Gaussian antecedents over a single
+input (top, solid) with their normalized firings (dashed); below, the three affine consequents as the faint local lines
+they are, and the weighted average that blends them into the output (bold). The dashed output is the same system with
+one rule's constant shifted by a fixed amount: the gap between the two curves is that rule's normalized firing times the
+shift, the shape of the middle membership function and nothing else. That is what "linear in the consequent
+coefficients" looks like, and why the THEN side of every rule in Chapters 4 and 6 is solved in closed form (Appendix
+A.10.1, A.10.16) while the IF side is not. Illustrative; no proposal number depends on it.
 `![02-tsk-inference](fig/02-tsk-inference.png)`
 
-**Figure 2.1 — The components of a fuzzy inference system, and which of them this work generates.** Crisp inputs are fuzzified by membership functions, the rule base fires, the results are aggregated, and defuzzification returns a number. Shaded blue: generated from the data by this work — the membership functions (Ch. 4, Ch. 5), the antecedents and their disjunctions (Ch. 4, Ch. 6), and the consequents, solved in closed form rather than searched. Grey: fixed by design — the analyzability constraints set out below (the product t-norm, weighted-average defuzzification).
+**Figure 2.1 — The components of a fuzzy inference system, and which of them this work generates.** Crisp inputs are
+fuzzified by membership functions, the rule base fires, the results are aggregated, and defuzzification returns a
+number. Shaded blue: generated from the data by this work — the membership functions (Ch. 4, Ch. 5), the antecedents and
+their disjunctions (Ch. 4, Ch. 6), and the consequents, solved in closed form rather than searched. Grey: fixed by
+design — the analyzability constraints set out below (the product t-norm, weighted-average defuzzification).
 `![fis-components](fig/02-fis-components.png)`
 
 ### Combining memberships: t-norms, t-conorms, and the complement
 
 Three operations turn individual memberships into a rule. Later chapters lean on all three, so I define them here.
 
-A **t-norm** $T(a,b)$ is the fuzzy AND: it generalizes conjunction to the unit interval, and must be commutative, associative, monotone, and satisfy $T(a,1) = a$. The two I use are the minimum, $T(a,b) = \min(a,b)$, and the product, $T(a,b) = ab$, the latter also called the probabilistic t-norm.
+A **t-norm** $T (a,b)$ is the fuzzy AND: it generalizes conjunction to the unit interval, and must be commutative,
+associative, monotone, and satisfy $T (a,1) = a$. The two I use are the minimum, $T (a,b) = \min (a,b)$, and the
+product, $T (a,b) = ab$, the latter also called the probabilistic t-norm.
 
-A **t-conorm** $S(a,b)$ is the fuzzy OR, the dual notion, with $S(a,0) = a$. The corresponding pair are the maximum, $S(a,b) = \max(a,b)$, and the probabilistic sum, $S(a,b) = a + b - ab$. A t-conorm is how I combine several membership functions that all support the same conclusion: the disjunction at the heart of the rule construction in Chapter 4, and the recombination of blocks in Chapter 5. Beyond min/max and probabilistic there are parameterized families, of which the **Hamacher** pair matters later,
+A **t-conorm** $S (a,b)$ is the fuzzy OR, the dual notion, with $S (a,0) = a$. The corresponding pair are the
+maximum, $S (a,b) = \max (a,b)$, and the probabilistic sum, $S (a,b) = a + b - ab$. A t-conorm is how I combine several
+membership functions that all support the same conclusion: the disjunction at the heart of the rule construction in
+Chapter 4, and the recombination of blocks in Chapter 5. Beyond min/max and probabilistic there are parameterized
+families, of which the **Hamacher** pair matters later,
 
-$$ T_H(a,b) = \frac{ab}{a + b - ab}, \qquad S_H(a,b) = \frac{a + b - 2ab}{1 - ab}, $$
+$$ T_H (a,b) = \frac{ab}{a + b - ab}, \qquad S_H (a,b) = \frac{a + b - 2ab}{1 - ab}, $$
 
-because $S_H$ is the conorm the anomaly rule of §4.3 is built on. One property every t-conorm shares does most of the work there: from $S(a, 0) = a$ and monotonicity, $S(1, b) = 1$ for any $b$, so a single saturated input saturates the whole aggregate (Appendix A.10.10).
+because $S_H$ is the conorm the anomaly rule of §4.3 is built on. One property every t-conorm shares does most of the
+work there: from $S (a, 0) = a$ and monotonicity, $S (1, b) = 1$ for any $b$, so a single saturated input saturates the
+whole aggregate (Appendix A.10.10).
 
-**Figure 2.3 — The five t-norm and t-conorm families the library ships, as surfaces.** $T(a,b)$ above and $S(a,b)$ below for min/max, probability, Łukasiewicz, Hamacher and Einstein, the five families `table_norm_conorm_matrix.py` sweeps, each with its formula from `gauss_math.py`; dark is 1, light is 0, white contours at 0.25, 0.5 and 0.75. The orange top edge of every conorm panel is the identity $S(1, b) = 1$: one saturated input saturates the aggregate, which is the whole of §4.3.5's degeneracy argument in one line of pixels. The families differ only in the interior of the square, and Table 4.1's norm/conorm sweep measures what that interior is worth on accuracy.
-`![02-norm-surfaces](fig/02-norm-surfaces.png)` It is more aggressive than max about treating two partial matches as strong evidence — which by the algebra should change how readily a model declares something familiar, though whether the choice of family actually shifts that open-set behaviour is left untested there.
+**Figure 2.3 — The five t-norm and t-conorm families the library ships, as surfaces.** $T (a,b)$ above and $S (a,b)$
+below for min/max, probability, Łukasiewicz, Hamacher and Einstein, the five families `table_norm_conorm_matrix.py`
+sweeps, each with its formula from `gauss_math.py`; dark is 1, light is 0, white contours at 0.25, 0.5 and 0.75. The
+orange top edge of every conorm panel is the identity $S (1, b) = 1$: one saturated input saturates the aggregate, which
+is the whole of §4.3.5's degeneracy argument in one line of pixels. The families differ only in the interior of the
+square, and Table 4.1's norm/conorm sweep measures what that interior is worth on accuracy.
+`![02-norm-surfaces](fig/02-norm-surfaces.png)` It is more aggressive than max about treating two partial matches as
+strong evidence — which by the algebra should change how readily a model declares something familiar, though whether the
+choice of family actually shifts that open-set behaviour is left untested there.
 
-The **fuzzy complement** is the negation, standardly $\neg a = 1 - a$. It is the foundation of a result in Chapter 4: applying it to the aggregate of every known rule is what produces a *none of the above* detector.
+The **fuzzy complement** is the negation, standardly $\neg a = 1 - a$. It is the foundation of a result in Chapter 4:
+applying it to the aggregate of every known rule is what produces a *none of the above* detector.
 
 ### Constraints for analyzability
 
-Rules combine input memberships by the product t-norm, and the system defuzzifies by a weighted average. Both choices are made for analyzability rather than accuracy — they keep the input–output map one algebraic expression instead of a tree of case splits — and I am not the first to make them for that reason. Arnett's line of work at Cincinnati adopts the same constraint set precisely so that a genetic fuzzy controller can be put through formal verification [@arnett2018proposal; @arnett2019iteratively], and Arnett et al. [@arnett2021formal] carry one through it: a fuzzy UAV navigation controller checked against a behavioural safety specification rather than sampled with test cases. §2.6 takes up what that buys, and what it does not.
+Rules combine input memberships by the product t-norm, and the system defuzzifies by a weighted average. Both choices
+are made for analyzability rather than accuracy — they keep the input–output map one algebraic expression instead of a
+tree of case splits — and I am not the first to make them for that reason. Arnett's line of work at Cincinnati adopts
+the same constraint set precisely so that a genetic fuzzy controller can be put through formal
+verification [@arnett2018proposal; @arnett2019iteratively], and Arnett et al. [@arnett2021formal] carry one through it:
+a fuzzy UAV navigation controller checked against a behavioural safety specification rather than sampled with test
+cases. §2.6 takes up what that buys, and what it does not.
 
-The problem I keep running into is the rule base. If I build a FIS by partitioning each input independently and forming a rule for every combination of sets, the number of rules is the product of the per-input set counts,
+The problem I keep running into is the rule base. If I build a FIS by partitioning each input independently and forming
+a rule for every combination of sets, the number of rules is the product of the per-input set counts,
 
 $$ N_{rules} = \prod_{i=1}^{M} N_{\mu_i}. $$
 
-This is exponential in the number of inputs. Even a modest problem — ten inputs with three sets each — is nearly sixty thousand rules, and the whole interpretability argument collapses the moment a human has to read them. Much of this dissertation is about not building the rule base that way. The classical training methods are the other half of the problem; §2.5 takes them up.
+This is exponential in the number of inputs. Even a modest problem — ten inputs with three sets each — is nearly sixty
+thousand rules, and the whole interpretability argument collapses the moment a human has to read them. Much of this
+dissertation is about not building the rule base that way. The classical training methods are the other half of the
+problem; §2.5 takes them up.
 
-Prior art for the FIS itself: [@takagi1985fuzzy] for the TSK form; [@jang1993anfis] for ANFIS, the standard neuro-fuzzy trainer I compare against; [@wang1992generating] and [@sugeno1993qualitative] for rule generation from data; and [@wu2020optimize] for a modern taxonomy of TSK optimization.
+Prior art for the FIS itself: [@takagi1985fuzzy] for the TSK form; [@jang1993anfis] for ANFIS, the standard neuro-fuzzy
+trainer I compare against; [@wang1992generating] and [@sugeno1993qualitative] for rule generation from data;
+and [@wu2020optimize] for a modern taxonomy of TSK optimization.
 
 ## 2.2 Cluster Tendency: VAT, iVAT, and Single-Linkage
 
-Before I fit a model I want to know whether the data has structure at all, and roughly what it looks like. The **Visual Assessment of cluster Tendency (VAT)** [@bezdek2002vat] is a clean way to do this. Starting from an $N \times N$ dissimilarity matrix $D$, VAT reorders the rows and columns so similar points sit next to one another, and displays the reordered matrix as a grayscale image. Dark blocks along the diagonal are clusters; their number and size tell you how many clusters there are and how big. The reordering is a modified Prim's algorithm: it grows a minimum spanning tree (MST) of the points, seeded at one endpoint of the most-dissimilar pair, and reads off the order in which points are added.
+Before I fit a model I want to know whether the data has structure at all, and roughly what it looks like. The **Visual
+Assessment of cluster Tendency (VAT)** [@bezdek2002vat] is a clean way to do this. Starting from an $N \times N$
+dissimilarity matrix $D$, VAT reorders the rows and columns so similar points sit next to one another, and displays the
+reordered matrix as a grayscale image. Dark blocks along the diagonal are clusters; their number and size tell you how
+many clusters there are and how big. The reordering is a modified Prim's algorithm: it grows a minimum spanning tree
+(MST) of the points, seeded at one endpoint of the most-dissimilar pair, and reads off the order in which points are
+added.
 
-**Figure 2.4 — A dissimilarity matrix before and after VAT reordering.** Panel (a) shows the construction: `circle_random_clusters` from `tribbleclustering.util`, five rings of twenty-four cities. Panel (b) is the dissimilarity matrix in an arbitrary row order: unstructured speckle. Panel (c) is *the same matrix* after VAT, with the five rings standing out as dark blocks on the diagonal. Only the row and column order differs between (b) and (c); no value changes. The rows are shuffled before (b) is drawn — the generator emits points already grouped by cluster, so an unpermuted matrix would give away the answer.
+**Figure 2.4 — A dissimilarity matrix before and after VAT reordering.** Panel (a) shows the construction:
+`circle_random_clusters` from `tribbleclustering.util`, five rings of twenty-four cities. Panel (b) is the dissimilarity
+matrix in an arbitrary row order: unstructured speckle. Panel (c) is *the same matrix* after VAT, with the five rings
+standing out as dark blocks on the diagonal. Only the row and column order differs between (b) and (c); no value
+changes. The rows are shuffled before (b) is drawn — the generator emits points already grouped by cluster, so an
+unpermuted matrix would give away the answer.
 `![vat-rdi](fig/02-vat-rdi.png)`
 
-The single most useful fact about VAT, and the one I exploit repeatedly, is that **the VAT ordering depends only on the MST.** The Prim traversal only ever crosses tree edges, so any method that produces the same MST produces the same VAT ordering: serial Prim, parallel Borůvka, or a GPU kernel (the cut-property argument, and the tie case it excludes, are in Appendix A.10.6). That reduces "make VAT fast" to the well-studied problem of making the MST fast. It also connects VAT directly to clustering: cutting the ordered image at a threshold is exactly single-linkage clustering, since the MST *is* the single-linkage hierarchy [@gower1969mst; @zahn1971graph].
+The single most useful fact about VAT, and the one I exploit repeatedly, is that **the VAT ordering depends only on the
+MST.** The Prim traversal only ever crosses tree edges, so any method that produces the same MST produces the same VAT
+ordering: serial Prim, parallel Borůvka, or a GPU kernel (the cut-property argument, and the tie case it excludes, are
+in Appendix A.10.6). That reduces "make VAT fast" to the well-studied problem of making the MST fast. It also connects
+VAT directly to clustering: cutting the ordered image at a threshold is exactly single-linkage clustering, since the MST
+*is* the single-linkage hierarchy [@gower1969mst; @zahn1971graph].
 
-**iVAT** [@wang2010ivat] sharpens the picture by replacing each dissimilarity with a *path-based minimax* value: the distance between two points becomes the largest edge on the lightest path between them, the bottleneck along the best route,
+**iVAT** [@wang2010ivat] sharpens the picture by replacing each dissimilarity with a *path-based minimax* value: the
+distance between two points becomes the largest edge on the lightest path between them, the bottleneck along the best
+route,
 
-$$ D^*_{ij} = \min_{p\,:\,i \to j}\; \max_{(u,v) \in p} D_{uv}. $$
+$$ D^*_{ij} = \min_{p\,:\,i \to j}\; \max_{ (u,v) \in p} D_{uv}. $$
 
-This equals the heaviest edge on the MST path between $i$ and $j$ and satisfies the strong triangle inequality $D^*_{ij} \le \max(D^*_{ik}, D^*_{kj})$ whatever $D$ was — an ultrametric manufactured from an arbitrary dissimilarity (Appendix A.10.3 proves both) — and it turns fuzzy, washed-out blocks into crisp ones.
+This equals the heaviest edge on the MST path between $i$ and $j$ and satisfies the strong triangle
+inequality $D^*_{ij} \le \max (D^*_{ik}, D^*_{kj})$ whatever $D$ was — an ultrametric manufactured from an arbitrary
+dissimilarity (Appendix A.10.3 proves both) — and it turns fuzzy, washed-out blocks into crisp ones.
 
-**Figure 2.5 — The minimax distance: MST path, ultrametric, dendrogram.** Panel (a): a small point set, its minimum spanning tree, and one far-apart pair $(i, j)$; the direct dissimilarity is the dashed chord, the MST path between them is blue, and its heaviest edge — the bottleneck, which *is* $D^*_{ij}$ — is orange. Panel (b): $D$ and $D^*$ in the same VAT order; $D^*$ is block-constant where $D$ is graded, because inside a cluster every pair shares one bottleneck. Panel (c): the single-linkage dendrogram, on which $i$ and $j$ merge at exactly the bottleneck height, so $D^*_{ij}$ can be read off the tree. The strong triangle inequality is checked over every triple at draw time and the worst violation printed in the caption: zero. Illustrative construction; the three identities it draws are proved in Appendix A.10.3.
-`![02-minimax-ultrametric](fig/02-minimax-ultrametric.png)` [@havens2012efficient] gave an $O(N^2)$ recurrence for it. The catch is cost, and the reason Chapter 3 exists. Textbook VAT is $O(N^3)$ because of a naive argmin in its inner loop, and even the memory needed to hold $D$ and its reordered copy becomes prohibitive well before the datasets get interesting.
+**Figure 2.5 — The minimax distance: MST path, ultrametric, dendrogram.** Panel (a): a small point set, its minimum
+spanning tree, and one far-apart pair $(i, j)$; the direct dissimilarity is the dashed chord, the MST path between them
+is blue, and its heaviest edge — the bottleneck, which *is* $D^*_{ij}$ — is orange. Panel (b): $D$ and $D^*$ in the same
+VAT order; $D^*$ is block-constant where $D$ is graded, because inside a cluster every pair shares one bottleneck. Panel
+(c): the single-linkage dendrogram, on which $i$ and $j$ merge at exactly the bottleneck height, so $D^*_{ij}$ can be
+read off the tree. The strong triangle inequality is checked over every triple at draw time and the worst violation
+printed in the caption: zero. Illustrative construction; the three identities it draws are proved in Appendix A.10.3.
+`![02-minimax-ultrametric](fig/02-minimax-ultrametric.png)` [@havens2012efficient] gave an $O (N^2)$ recurrence for it.
+The catch is cost, and the reason Chapter 3 exists. Textbook VAT is $O (N^3)$ because of a naive argmin in its inner
+loop, and even the memory needed to hold $D$ and its reordered copy becomes prohibitive well before the datasets get
+interesting.
 
-The literature already contains fast VAT variants, and I differentiate against them in Chapter 3: [@kumar2016clusivat] samples and is therefore approximate; [@meng2018evat] is an exact GPU VAT; and [@deshpande2024scalable] attack the ordering itself with k-d-tree search and compute the iVAT index without materializing the full matrix, but require Euclidean coordinates. The regime none of them occupy is the one I target: exact, on an arbitrary and possibly non-metric dissimilarity matrix, at scale.
+The literature already contains fast VAT variants, and I differentiate against them in Chapter 3: [@kumar2016clusivat]
+samples and is therefore approximate; [@meng2018evat] is an exact GPU VAT; and [@deshpande2024scalable] attack the
+ordering itself with k-d-tree search and compute the iVAT index without materializing the full matrix, but require
+Euclidean coordinates. The regime none of them occupy is the one I target: exact, on an arbitrary and possibly
+non-metric dissimilarity matrix, at scale.
 
 ## 2.3 Persistence and a Little Topology
 
-Single-linkage gives me a hierarchy, but it does not tell me where to cut it, and a naive cut is notoriously fragile: a single chain of points can bridge two real clusters and merge them. Persistence is the idea that lets me cut sensibly. As I sweep a threshold from zero upward, connected components appear and then merge into larger ones. Each component has a **birth** (the threshold at which it forms) and a **death** (the threshold at which it merges into something larger), and its **persistence** is the difference. Features with large persistence are stable across a wide range of thresholds and are the ones I trust; features with tiny persistence are noise. Plotting births against deaths gives a persistence diagram, and the persistent features stand off the diagonal.
+Single-linkage gives me a hierarchy, but it does not tell me where to cut it, and a naive cut is notoriously fragile: a
+single chain of points can bridge two real clusters and merge them. Persistence is the idea that lets me cut sensibly.
+As I sweep a threshold from zero upward, connected components appear and then merge into larger ones. Each component has
+a **birth** (the threshold at which it forms) and a **death** (the threshold at which it merges into something larger),
+and its **persistence** is the difference. Features with large persistence are stable across a wide range of thresholds
+and are the ones I trust; features with tiny persistence are noise. Plotting births against deaths gives a persistence
+diagram, and the persistent features stand off the diagonal.
 
-There is a second, quieter fact I make heavy use of in Chapter 5: in single-linkage, **birth height is an inverse proxy for local density.** Points in a dense region are close together and merge at a low threshold, so their clusters are born early; sparse regions merge late. The *scale* of a structure is therefore encoded in where along the birth axis it appears, and I can separate a coarse, diffuse grouping from a tight sub-cluster by looking at gaps in the birth heights. This is what turns a single hierarchy into a genuinely multi-scale one. The proxy has a rate: nearest-neighbour distances in a region of density $\rho$ in $d$ dimensions scale as $\rho^{-1/d}$, so a density ratio appears as a *difference on a log axis* of size $\tfrac{1}{d}\log(\rho_1/\rho_2)$ — which is why Chapter 5 searches for gaps in $\log(\text{birth})$, and why those gaps close as the dimension grows (Appendix A.10.15).
+There is a second, quieter fact I make heavy use of in Chapter 5: in single-linkage, **birth height is an inverse proxy
+for local density.** Points in a dense region are close together and merge at a low threshold, so their clusters are
+born early; sparse regions merge late. The *scale* of a structure is therefore encoded in where along the birth axis it
+appears, and I can separate a coarse, diffuse grouping from a tight sub-cluster by looking at gaps in the birth heights.
+This is what turns a single hierarchy into a genuinely multi-scale one. The proxy has a rate: nearest-neighbour
+distances in a region of density $\rho$ in $d$ dimensions scale as $\rho^{-1/d}$, so a density ratio appears as a
+*difference on a log axis* of size $\tfrac{1}{d}\log (\rho_1/\rho_2)$ — which is why Chapter 5 searches for gaps
+in $\log (\text{birth})$, and why those gaps close as the dimension grows (Appendix A.10.15).
 
-**Figure 2.6 — A single-linkage dendrogram and the persistence diagram it implies.** Two tight clusters with noise scattered outside them. On the left, the dendrogram, with the two long-persistence merges picked out in blue; on the right, every internal node plotted as (birth, death). The two clusters form early and are not absorbed until the merge that joins them, so they stand well off the diagonal; a noise merge is absorbed almost as soon as it forms and sits on it. Births here are *merge heights of hierarchy nodes*, not the singleton births of the standard 0-dimensional barcode — under single linkage every point is born at zero, so that version degenerates to a vertical line. The two clusters are given different spreads deliberately: the tighter one is born lower, the density reading the next paragraph turns into a tool.
+**Figure 2.6 — A single-linkage dendrogram and the persistence diagram it implies.** Two tight clusters with noise
+scattered outside them. On the left, the dendrogram, with the two long-persistence merges picked out in blue; on the
+right, every internal node plotted as (birth, death). The two clusters form early and are not absorbed until the merge
+that joins them, so they stand well off the diagonal; a noise merge is absorbed almost as soon as it forms and sits on
+it. Births here are *merge heights of hierarchy nodes*, not the singleton births of the standard 0-dimensional barcode —
+under single linkage every point is born at zero, so that version degenerates to a vertical line. The two clusters are
+given different spreads deliberately: the tighter one is born lower, the density reading the next paragraph turns into a
+tool.
 `![persistence](fig/02-persistence.png)`
 
-I use only as much topological data analysis as I need for this. The nearest prior work, and the precedent I concede in Chapter 5, is persistence-based clustering: [@chazal2013persistence] (ToMATo) and the beta-plateau method of [@bonis2018fuzzy], which already derive a cluster count from persistence gaps.
+I use only as much topological data analysis as I need for this. The nearest prior work, and the precedent I concede in
+Chapter 5, is persistence-based clustering: [@chazal2013persistence] (ToMATo) and the beta-plateau method
+of [@bonis2018fuzzy], which already derive a cluster count from persistence gaps.
 
 ## 2.4 Fuzzy C-Means and Relational Clustering
 
-**Fuzzy C-Means (FCM)** [@dunn1973fuzzy; @bezdek1981pattern] is the classical soft-clustering method, and it plays two roles here: it is what the VAT machinery of Chapter 3 seeds and accelerates, and it is the baseline the relational methods of Chapter 5 are measured against. The final models are built from the Gaussian-mixture approach of Chapter 4 instead, but FCM is the reference point everything else is positioned relative to, so it is worth stating precisely.
+**Fuzzy C-Means (FCM)** [@dunn1973fuzzy; @bezdek1981pattern] is the classical soft-clustering method, and it plays two
+roles here: it is what the VAT machinery of Chapter 3 seeds and accelerates, and it is the baseline the relational
+methods of Chapter 5 are measured against. The final models are built from the Gaussian-mixture approach of Chapter 4
+instead, but FCM is the reference point everything else is positioned relative to, so it is worth stating precisely.
 
 FCM assigns each point a graded membership in every cluster and minimizes
 
-$$ J(W,C) = \sum_{i=1}^{N} \sum_{j=1}^{c} w_{ij}^{\,m}\, \| \vec{x}_i - \vec{c}_j \|^2, $$
+$$ J (W,C) = \sum_{i=1}^{N} \sum_{j=1}^{c} w_{ij}^{\,m}\, \| \vec{x}_i - \vec{c}_j \|^2, $$
 
-where $c$ is the number of clusters, $\vec c_j$ the $j$-th centroid, $w_{ij}$ the membership of point $i$ in cluster $j$, and $m \in [2,4]$ a fuzzification exponent that controls how soft the partition is. It is minimized by alternately updating the centroids and the memberships, each in closed form given the other:
+where $c$ is the number of clusters, $\vec c_j$ the $j$-th centroid, $w_{ij}$ the membership of point $i$ in
+cluster $j$, and $m \in [2,4]$ a fuzzification exponent that controls how soft the partition is. It is minimized by
+alternately updating the centroids and the memberships, each in closed form given the other:
 
-$$ \vec c_j = \frac{\sum_i w_{ij}^{\,m}\, \vec x_i}{\sum_i w_{ij}^{\,m}}, \qquad w_{ij} = \left( \sum_{k=1}^{c} \left( \frac{\lVert \vec x_i - \vec c_j \rVert^2}{\lVert \vec x_i - \vec c_k \rVert^2} \right)^{\frac{1}{m-1}} \right)^{-1}, $$
+$$ \vec c_j = \frac{\sum_i w_{ij}^{\,m}\, \vec x_i}{\sum_i w_{ij}^{\,m}}, \qquad w_{ij} = \left (\sum_{k=1}^{c} \left (\frac{\lVert \vec x_i - \vec c_j \rVert^2}{\lVert \vec x_i - \vec c_k \rVert^2} \right)^{\frac{1}{m-1}} \right)^{-1}, $$
 
-the first a weighted mean and the second the stationary point of the row-constrained objective (Appendix A.10.2). Each step lowers $J$, so the alternation converges — to a local optimum that depends on where it started.
+the first a weighted mean and the second the stationary point of the row-constrained objective (Appendix A.10.2). Each
+step lowers $J$, so the alternation converges — to a local optimum that depends on where it started.
 
-The algorithm has one well-known weakness that matters here: it is sensitive to initialization, and it needs $c$ specified in advance. Start it from poorly chosen centroids and it converges to a poor local optimum; give it the wrong $c$ and it will confidently partition the data that many ways regardless. Both are what the VAT machinery *could* supply, since the structure read off the reordered image says deterministically how many clusters there are and roughly where they sit. That is the motivation for pairing them, and a small instance of *structure before search* — a motivation, not yet a result, since no experiment here seeds FCM from VAT and scores it against a conventionally initialized FCM. One method in this work takes that route without FCM at all: §3.3.5's `IVATMeans` reads its clusters off the reordered image and so needs no initialization, and it carries one bound that the next paragraph and Chapter 5 both take up.
+The algorithm has one well-known weakness that matters here: it is sensitive to initialization, and it needs $c$
+specified in advance. Start it from poorly chosen centroids and it converges to a poor local optimum; give it the
+wrong $c$ and it will confidently partition the data that many ways regardless. Both are what the VAT machinery *could*
+supply, since the structure read off the reordered image says deterministically how many clusters there are and roughly
+where they sit. That is the motivation for pairing them, and a small instance of *structure before search* — a
+motivation, not yet a result, since no experiment here seeds FCM from VAT and scores it against a conventionally
+initialized FCM. One method in this work takes that route without FCM at all: §3.3.5's `IVATMeans` reads its clusters
+off the reordered image and so needs no initialization, and it carries one bound that the next paragraph and Chapter 5
+both take up.
 
-FCM as written needs coordinates, because it computes Euclidean means. Often I only have a dissimilarity matrix (the data may be sequences, graphs, or otherwise non-vector), and for that there is **relational** FCM, NERFCM [@hathaway1994nerf], which runs the same alternating optimization directly on $D$. That distinction sets the bound I return to in Chapter 5. iVAT finds its clusters in the minimax (ultrametric) geometry, where a cluster is free to be a ring or a filament, and a Euclidean prototype then summarizes each one by a mean. The mean of a ring lies in its hole, so a prototype back end is bounded to clusters a prototype can stand for. That is the limitation `IVATMeans` carries: it reads its partition off the reordered image — the half §3.3.5 presents as a contribution — and labels by nearest Euclidean centre, the half that stops at convex-representable clusters. Chapter 5's method is the complement, not the correction: stay in the minimax geometry and use a relational method that consumes the dissimilarity matrix directly, carrying that structure all the way into the membership functions, while keeping the initialization-free front end that made the pairing attractive to begin with.
+FCM as written needs coordinates, because it computes Euclidean means. Often I only have a dissimilarity matrix (the
+data may be sequences, graphs, or otherwise non-vector), and for that there is **relational** FCM,
+NERFCM [@hathaway1994nerf], which runs the same alternating optimization directly on $D$. That distinction sets the
+bound I return to in Chapter 5. iVAT finds its clusters in the minimax (ultrametric) geometry, where a cluster is free
+to be a ring or a filament, and a Euclidean prototype then summarizes each one by a mean. The mean of a ring lies in its
+hole, so a prototype back end is bounded to clusters a prototype can stand for. That is the limitation `IVATMeans`
+carries: it reads its partition off the reordered image — the half §3.3.5 presents as a contribution — and labels by
+nearest Euclidean centre, the half that stops at convex-representable clusters. Chapter 5's method is the complement,
+not the correction: stay in the minimax geometry and use a relational method that consumes the dissimilarity matrix
+directly, carrying that structure all the way into the membership functions, while keeping the initialization-free front
+end that made the pairing attractive to begin with.
 
 ## 2.5 Why Not Just Optimize? The Bottleneck
 
-It is fair to ask why I go to all this trouble instead of writing down a fuzzy model with free parameters and optimizing it. That is what the field usually does, and the field's own account of that route is what makes it unattractive: slow convergence, acute sensitivity to initialization, and results that differ from run to run, surveyed as such by [@wu2020optimize]. I take that as the literature's finding, not as something I have timed — this document contains no ANFIS or GA-FIS run of my own (Goal G3). The derivative-free stochastic methods (genetic algorithms, ant colony optimization, particle swarm) are attractive because they need only a comparable objective, not a differentiable one, and they parallelize trivially, but they converge slowly, and run one twice and you get two different models. Gradient descent, and ANFIS as its neuro-fuzzy embodiment, is much faster — but only when handed a good initial guess. Without one it settles into whatever local minimum is nearest and reports it with confidence.
+It is fair to ask why I go to all this trouble instead of writing down a fuzzy model with free parameters and optimizing
+it. That is what the field usually does, and the field's own account of that route is what makes it unattractive: slow
+convergence, acute sensitivity to initialization, and results that differ from run to run, surveyed as such
+by [@wu2020optimize]. I take that as the literature's finding, not as something I have timed — this document contains no
+ANFIS or GA-FIS run of my own (Goal G3). The derivative-free stochastic methods (genetic algorithms, ant colony
+optimization, particle swarm) are attractive because they need only a comparable objective, not a differentiable one,
+and they parallelize trivially, but they converge slowly, and run one twice and you get two different models. Gradient
+descent, and ANFIS as its neuro-fuzzy embodiment, is much faster — but only when handed a good initial guess. Without
+one it settles into whatever local minimum is nearest and reports it with confidence.
 
-This is the foil for the entire dissertation, which I summarize as *structure before search.* Recover the structure of the data first and the model synthesis becomes largely closed-form or one-pass; whatever optimization remains is a cheap local polish on an already-good solution, not the engine that has to find the solution from nothing. The refinement study behind §6.3.5 speaks to the size of that polish, not to conventional training: on Concrete at two thousand objective evaluations every optimizer arm ends between +0.017 and +0.025 in $R^2$ above the construction, most of it banked in the first few hundred evaluations. The optimization library that provides the optional polish — metaheuristics, a Lin–Kernighan local search, a quality-diversity layer, and the high-performance kernels behind them — is real and I use it, but it is supporting infrastructure, not a contribution; its details live in Appendix A.
+This is the foil for the entire dissertation, which I summarize as *structure before search.* Recover the structure of
+the data first and the model synthesis becomes largely closed-form or one-pass; whatever optimization remains is a cheap
+local polish on an already-good solution, not the engine that has to find the solution from nothing. The refinement
+study behind §6.3.5 speaks to the size of that polish, not to conventional training: on Concrete at two thousand
+objective evaluations every optimizer arm ends between +0.017 and +0.025 in $R^2$ above the construction, most of it
+banked in the first few hundred evaluations. The optimization library that provides the optional polish —
+metaheuristics, a candidate-restricted local search, a quality-diversity layer, and the high-performance kernels behind
+them — is real and I use it, but it is supporting infrastructure, not a contribution; its details live in Appendix A.
 
 ## 2.6 Interpretability, and the Trade-off I Refuse to Pretend Away
 
-Interpretability is the reason to prefer a fuzzy model in the first place, so I owe it a working definition. I take a deliberately operational view: a model is interpretable to the degree that a person can read its behavior directly off its structure and, if they disagree with it, edit it by hand. For a fuzzy system that means a short rule base written over the original, named variables, few enough rules to hold in one's head, each stated in terms the domain expert already uses. This is not a single scalar — how much structure a reader can absorb, and which explanation they need, depends on who they are and what they are deciding. The thread I hold to is that the explanation should come *from the model's own structure* and not be reconstructed after the fact.
+Interpretability is the reason to prefer a fuzzy model in the first place, so I owe it a working definition. I take a
+deliberately operational view: a model is interpretable to the degree that a person can read its behavior directly off
+its structure and, if they disagree with it, edit it by hand. For a fuzzy system that means a short rule base written
+over the original, named variables, few enough rules to hold in one's head, each stated in terms the domain expert
+already uses. This is not a single scalar — how much structure a reader can absorb, and which explanation they need,
+depends on who they are and what they are deciding. The thread I hold to is that the explanation should come *from the
+model's own structure* and not be reconstructed after the fact.
 
-The cost is real. There is an accuracy–interpretability trade-off, and the hierarchical models in Chapter 6 pay it: a soft fuzzy tree or a mixture of experts is more readable than a flat model but does not beat it on raw accuracy. Where I can defend the trade, I do so on the terms set by the literature: soft splits keep the accuracy of the crisp tree while remaining interpretable [@olaru2003complete], and tuning can raise accuracy while shrinking the rule base [@alcala2007rule]. I take seriously the standing objection, due to [@magdalena2018do], that a hierarchical fuzzy system is not automatically more interpretable, because its intermediate variables can be meaningless. My answer, made good on in Chapter 6, is that the hierarchies I build split only on the *original, named inputs* and never on synthetic intermediates — precisely the condition Magdalena requires. The dominant alternative philosophy deserves naming: train a black box and explain it afterward with an attribution method such as SHAP [@lundberg2017shap]. That is a reasonable approach and often the only available one. My objection is narrow: a post-hoc attribution explains what a model did on a particular input, but it does not give you a model you can *edit*, and in the domains I care about the ability to correct a rule an expert disagrees with is worth as much as the ability to explain it. This is a position I argue rather than test — I run no SHAP comparison here — and a genuine head-to-head between an interpretable-by-construction fuzzy model and a post-hoc-explained black box would be a legitimate experiment, one I am not proposing to do. Rudin [@rudin2019stop] makes the general form of the same argument, and makes it in the setting that matters here: where the decision is high-stakes, prefer a model that is interpretable to one that is explained afterward.
+The cost is real. There is an accuracy–interpretability trade-off, and the hierarchical models in Chapter 6 pay it: a
+soft fuzzy tree is more readable than a flat model but does not beat it on raw accuracy. Where I can defend the trade, I
+do so on the terms set by the literature: soft splits keep the accuracy of the crisp tree while remaining
+interpretable [@olaru2003complete], and tuning can raise accuracy while shrinking the rule base [@alcala2007rule]. I
+take seriously the standing objection, due to [@magdalena2018do], that a hierarchical fuzzy system is not automatically
+more interpretable, because its intermediate variables can be meaningless. My answer, made good on in Chapter 6, is that
+the hierarchies I build split only on the *original, named inputs* and never on synthetic intermediates — precisely the
+condition Magdalena requires. The dominant alternative philosophy deserves naming: train a black box and explain it
+afterward with an attribution method such as SHAP [@lundberg2017shap]. That is a reasonable approach and often the only
+available one. My objection is narrow: a post-hoc attribution explains what a model did on a particular input, but it
+does not give you a model you can *edit*, and in the domains I care about the ability to correct a rule an expert
+disagrees with is worth as much as the ability to explain it. This is a position I argue rather than test — I run no
+SHAP comparison here — and a genuine head-to-head between an interpretable-by-construction fuzzy model and a
+post-hoc-explained black box would be a legitimate experiment, one I am not proposing to do. Rudin [@rudin2019stop]
+makes the general form of the same argument, and makes it in the setting that matters here: where the decision is
+high-stakes, prefer a model that is interpretable to one that is explained afterward.
 
 ### Verification, validation, and certifiable AI
 
-Terminology first, because this document already uses both of those words in a narrower sense than this section needs. Elsewhere in these chapters *verification* means checking an implementation against a reference — the bit-identical agreement between the two reorder kernels in §3.3.1, the elementwise check against serial VAT in §3.3.2 — and *validation* usually means cross-validation, a held-out estimate of generalization. In systems engineering the pair means something larger: verification asks whether the thing was built to its specification, validation whether the specification was the right one. That second sense is the one this section is about, and it is the only place in the document where I use the words that way without saying so again.
+Terminology first, because this document already uses both of those words in a narrower sense than this section needs.
+Elsewhere in these chapters *verification* means checking an implementation against a reference — the bit-identical
+agreement between the two reorder kernels in §3.3.1, the elementwise check against serial VAT in §3.3.2 — and
+*validation* usually means cross-validation, a held-out estimate of generalization. In systems engineering the pair
+means something larger: verification asks whether the thing was built to its specification, validation whether the
+specification was the right one. That second sense is the one this section is about, and it is the only place in the
+document where I use the words that way without saying so again.
 
-The second sense is where interpretability stops being a matter of taste. For airborne software the governing document is DO-178C [@rtca2011do178c], which is not a test suite but a set of *objectives*: requirements traced to design, design traced to code, and evidence that the traceability holds. Its formal-methods supplement DO-333 [@rtca2011do333] admits analysis in place of testing where a mathematically-based argument can be made about the whole input space instead of a sample of it. Machine-learned components fit that framework badly, and the aviation authorities have said so at length rather than in passing: EASA's AI roadmap [@easa2023airoadmap] and its Level 1 & 2 machine-learning concept paper [@easa2024mlconcept] replace the software life cycle with a *learning assurance* one and make explainability an objective in its own right, precisely because a trained network offers no artifact from which a reviewer can read the requirements back.
+The second sense is where interpretability stops being a matter of taste. For airborne software the governing document
+is DO-178C [@rtca2011do178c], which is not a test suite but a set of *objectives*: requirements traced to design, design
+traced to code, and evidence that the traceability holds. Its formal-methods supplement DO-333 [@rtca2011do333] admits
+analysis in place of testing where a mathematically-based argument can be made about the whole input space instead of a
+sample of it. Machine-learned components fit that framework badly, and the aviation authorities have said so at length
+rather than in passing: EASA's AI roadmap [@easa2023airoadmap] and its Level 1 & 2 machine-learning concept
+paper [@easa2024mlconcept] replace the software life cycle with a *learning assurance* one and make explainability an
+objective in its own right, precisely because a trained network offers no artifact from which a reviewer can read the
+requirements back.
 
-A fuzzy rule base over named variables is the unusual case where that artifact already exists. Twelve rules over eighty-two features is a document; so is the triangular partition Chapter 6 §6.3.4 exports. The rules are finite, the membership functions are bounded and closed-form, the aggregation is a fixed algebraic operator chosen for analyzability (§2.1), and the output for a given input can be derived by hand. Two further properties this work reports for other reasons read the same way. The construction is answer-first, so the rule count is a structural consequence — classes, or output buckets — rather than something a search arrived at, which is why §4.4's rule counts can be stated as arithmetic. And where I choose between configurations I have repeatedly preferred the one that fails *predictably* over the one with the better mean (§4.3.2's output partitioning, §4.3's normalization stability), on the grounds that predictability is worth more to a component inside a larger system. That is a V&V argument, and I had been making it without naming it.
+A fuzzy rule base over named variables is the unusual case where that artifact already exists. Twelve rules over
+eighty-two features is a document; so is the triangular partition Chapter 6 §6.3.4 exports. The rules are finite, the
+membership functions are bounded and closed-form, the aggregation is a fixed algebraic operator chosen for analyzability
+(§2.1), and the output for a given input can be derived by hand. Two further properties this work reports for other
+reasons read the same way. The construction is answer-first, so the rule count is a structural consequence — classes, or
+output buckets — rather than something a search arrived at, which is why §4.4's rule counts can be stated as arithmetic.
+And where I choose between configurations I have repeatedly preferred the one that fails *predictably* over the one with
+the better mean (§4.3.2's output partitioning, §4.3's normalization stability), on the grounds that predictability is
+worth more to a component inside a larger system. That is a V&V argument, and I had been making it without naming it.
 
-The fuzzy-systems literature has been making the same case for a while, and the version worth citing is the one about *formal* methods rather than about readability. Cohen, Bokati, Ceberio, Kosheleva and Kreinovich [@cohen2022whyfuzzy] put the general argument — that fuzzy techniques are the appropriate route to explainable AI — and attach a caveat this dissertation should own rather than inherit quietly: *which* fuzzy operations are the right ones is problem-dependent, not settled once and for all. That lands squarely on an open question here, because §4.3.5's open-set behaviour is built on a Hamacher conorm inherited from a script, and that section says outright that whether the family matters to detection has not been tested. The stronger form of the claim, though, has been demonstrated and not merely argued: Arnett et al. [@arnett2021formal] take a genetic fuzzy UAV navigation controller through formal verification against a behavioural safety specification, on the same analyzability constraints §2.1 adopts. So the model family is not reviewable only in principle — someone has verified a member of it. What nobody has verified is one of mine.
+The fuzzy-systems literature has been making the same case for a while, and the version worth citing is the one about
+*formal* methods rather than about readability. Cohen, Bokati, Ceberio, Kosheleva and Kreinovich [@cohen2022whyfuzzy]
+put the general argument — that fuzzy techniques are the appropriate route to explainable AI — and attach a caveat this
+dissertation should own rather than inherit quietly: *which* fuzzy operations are the right ones is problem-dependent,
+not settled once and for all. That lands squarely on an open question here, because §4.3.5's open-set behaviour is built
+on a Hamacher conorm inherited from a script, and that section says outright that whether the family matters to
+detection has not been tested. The stronger form of the claim, though, has been demonstrated and not merely argued:
+Arnett et al. [@arnett2021formal] take a genetic fuzzy UAV navigation controller through formal verification against a
+behavioural safety specification, on the same analyzability constraints §2.1 adopts. So the model family is not
+reviewable only in principle — someone has verified a member of it. What nobody has verified is one of mine.
 
-Now the boundary, because this is exactly the point at which a motivating framing turns into an unearned claim. **This dissertation produces no certification artifact and claims no DO-178C or DO-333 objective as satisfied.** I build no assurance case, I write no requirements, I trace nothing to anything, and no model here has been through any process a certification authority would recognize. Nor does the framing transfer downward: an interpretable rule base makes a review possible, and Arnett et al. show the family admits one, but neither fact is evidence about a model I built. What I claim is structural and nothing more — that the models this pipeline produces are of a kind a V&V process can take as an input rather than having to reconstruct. Turning that into evidence would need an operational design domain, a hazard analysis, coverage of the rule base's behaviour over that domain, and the traceability records the objectives actually ask for; that is a body of work this proposal neither contains nor schedules, and §7.4 records it as an exposure where a committee will look for it.
+Now the boundary, because this is exactly the point at which a motivating framing turns into an unearned claim. **This
+dissertation produces no certification artifact and claims no DO-178C or DO-333 objective as satisfied.** I build no
+assurance case, I write no requirements, I trace nothing to anything, and no model here has been through any process a
+certification authority would recognize. Nor does the framing transfer downward: an interpretable rule base makes a
+review possible, and Arnett et al. show the family admits one, but neither fact is evidence about a model I built. What
+I claim is structural and nothing more — that the models this pipeline produces are of a kind a V&V process can take as
+an input rather than having to reconstruct. Turning that into evidence would need an operational design domain, a hazard
+analysis, coverage of the rule base's behaviour over that domain, and the traceability records the objectives actually
+ask for; that is a body of work this proposal neither contains nor schedules, and §7.4 records it as an exposure where a
+committee will look for it.
 
 ---
 
-*Draft — Chapter 2 prose. Citations shown in bracketed shorthand for now; to be reconciled against the consolidated `references.bib`. Six figures (2.1–2.6) inline.*
+*Draft — Chapter 2 prose. Citations shown in bracketed shorthand for now; to be reconciled against the consolidated
+`references.bib`. Six figures (2.1–2.6) inline.*

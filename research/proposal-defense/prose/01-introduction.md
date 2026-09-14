@@ -81,9 +81,8 @@ has no measured baseline yet, so the figure prints the gap rather than a number 
 
 The dissertation is organized as a pipeline, and each stage is a contribution. Every individual component I use:
 VAT/iVAT, single-linkage clustering, Fuzzy C-Means, persistence-based clustering, minimax linkage, the
-mixture-of-experts architecture and its EM, Lin–Kernighan local search, the Takagi–Sugeno–Kang rule form — has at least
-some prior art. What is new is how the pieces compose into a fast, scalable, interpretable modeling pipeline, and the
-regimes that composition reaches which the existing methods do not.
+Takagi–Sugeno–Kang rule form — has at least some prior art. What is new is how the pieces compose into a fast, scalable,
+interpretable modeling pipeline, and the regimes that composition reaches which the existing methods do not.
 
 1. **mergeVAT (priority-queue VAT): exact VAT and iVAT at scale.** The feasible problem size moves from a few thousand
    points to well over a hundred thousand, on ordinary hardware, reproducing the serial reference ordering exactly at
@@ -134,16 +133,17 @@ regimes that composition reaches which the existing methods do not.
    accuracy.
 
 4. **Hierarchical and refined fuzzy models** *(partly built, partly proposed)*. One closed-form, firing-weighted ridge
-   least-squares solver serves as a shared primitive across a flat FIS, a soft fuzzy decision tree, and a hierarchical
-   mixture of fuzzy experts, and I export the result to an explicit triangular (Ruspini) rule base a person can read and
-   edit. The interpretability–accuracy trade becomes explicit here, and it is not favorable: under one protocol the
-   hierarchy does not beat the flat model on Concrete — tuned, the two are level within their spreads, 0.833 against
-   0.861. What the hierarchy buys is an explicit decision path over named variables, not accuracy.
+   least-squares solver serves as a shared primitive across a flat FIS and a soft fuzzy decision tree, and I export the
+   result to an explicit triangular (Ruspini) rule base a person can read and edit. The interpretability–accuracy trade
+   becomes explicit here, and it is not favorable: under one protocol the fuzzy tree does not beat the flat model on
+   Concrete. What the tree buys is an explicit decision path over named variables, not accuracy. A hierarchical mixture
+   of fuzzy experts reuses the same solver as supporting work, built one-shot with its EM refinement proposed; Appendix
+   A.11 covers it in full.
 
 5. **A supporting optimization engine.** Underneath the pipeline sits a general optimization library — metaheuristics, a
-   dual-backend Lin–Kernighan local search, a quality-diversity layer, high-performance kernels — providing the optional
-   local-polish stage. I treat it as infrastructure, not a headline result; it lives in an appendix, and the point of
-   the dissertation is precisely that this engine is *not* on the critical path.
+   dual-backend candidate-restricted local search, a quality-diversity layer, high-performance kernels — providing the
+   optional local-polish stage. I treat it as infrastructure, not a headline result; it lives in an appendix, and the
+   point of the dissertation is precisely that this engine is *not* on the critical path.
 
 The claim is not that any one of these primitives is new, but that arranging them structure-first lets a fuzzy model
 reproduce like a tribble — cleanly, across orders of magnitude of dataset size, without losing the readability that made
@@ -167,10 +167,11 @@ the pipeline.
 **Part III — Proposed Work and Goals for Completion.** Chapter 5 is the proposed contribution I am most excited about:
 generating fuzzy membership functions from the topological structure of a dissimilarity matrix, including the
 multi-scale case. It already has strong preliminary results, and it is the conceptual bridge from clustering to fuzzy
-modeling. Chapter 6 covers the hierarchical and refined models — the shared ridge-TSK solver, the fuzzy trees, and the
-mixture of experts — some built and some proposed. Chapter 7 lays out the goals for completion: the integrated
-end-to-end pipeline, the experiments that would make the scale and accuracy claims airtight, and a risk register.
-Chapter 8 concludes, Chapter 9 lists publications, and Chapter 10 gives the timeline through the final defense.
+modeling. Chapter 6 covers the hierarchical and refined models — the shared ridge-TSK solver and the fuzzy trees — some
+built and some proposed; Appendix A.11 covers the hierarchical mixture of fuzzy experts as supporting work. Chapter 7
+lays out the goals for completion: the integrated end-to-end pipeline, the experiments that would make the scale and
+accuracy claims airtight, and a risk register. Chapter 8 concludes, Chapter 9 lists publications, and Chapter 10 gives
+the timeline through the final defense.
 
 **Figure 1.2 — The end-to-end pipeline as a roadmap.** Raw data through structure discovery (Ch. 3), membership
 generation (Ch. 5), FIS synthesis (Ch. 4 and Ch. 6), and an optional refinement (Ch. 6, App. A) to an interpretable

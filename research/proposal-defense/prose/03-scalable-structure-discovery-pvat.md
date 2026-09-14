@@ -2,314 +2,736 @@
 
 ## 3.1 Introduction
 
-The first step in the pipeline is to look at the data before modeling it, at the scale the data actually arrives in. I introduced VAT in Chapter 2 as the tool I use for this: it takes a dissimilarity matrix, reorders it so that similar points sit together, and shows me the cluster structure as dark blocks along the diagonal. It is exactly the right tool, with one problem. In its textbook form it is far too slow and far too memory-hungry to run on the datasets I care about. A 58,000-point matrix is already out of reach for the classical algorithm, and I want to go well past that.
+The first step in the pipeline is to look at the data before modeling it, at the scale the data actually arrives in. I
+introduced VAT in Chapter 2 as the tool I use for this: it takes a dissimilarity matrix, reorders it so that similar
+points sit together, and shows me the cluster structure as dark blocks along the diagonal. It is exactly the right tool,
+with one problem. In its textbook form it is far too slow and far too memory-hungry to run on the datasets I care about.
+A 58,000-point matrix is already out of reach for the classical algorithm, and I want to go well past that.
 
-This chapter presents mergeVAT, an accelerated VAT and iVAT engine, and the collection of implementation ideas that make it work. The contributions are: a reordering that replaces the classical cubic inner loop, improved in two stages, first to $O(N^2 \log N)$ with a priority queue (published) and then to $O(N^2)$ with a compact-active-set formulation that removes the heap entirely (unpublished), both detailed in §3.3.1; an in-place memory scheme that holds the whole computation in a single matrix, and beside it a matrix-free path that holds none of it, at a measured 65 MB independent of $N$; a GPU implementation of the underlying minimum spanning tree that reproduces the serial ordering exactly at double precision, and up to tie-breaking at single (§3.2 sets out why that distinction is not a hedge); a divide-and-conquer scheme that splits a large problem and stitches the pieces back together at bounded cost; and, importantly, correctness on an *arbitrary* dissimilarity matrix, including non-metric ones. Together these move the feasible problem size from the few thousand points these implementations are used at to a measured 135,000, with an arithmetic ceiling of 155,000 at single precision for the in-place scheme and no memory ceiling at all for the matrix-free one; §3.4 states each endpoint and which kind of evidence it rests on. The engine also carries a clustering method, presented in §3.3.5 as a contribution and not as a demonstration: `IVATMeans` reads its partition off the reordered image, needs no initialization, and returns assignment and membership from one fit, with the head-to-head against Fuzzy C-Means and k-means still owed as Goal G9. A secondary result fell out of the same machinery: the VAT ordering makes a good hot-start for the Traveling Salesman Problem. I treat that briefly at the end.
+This chapter presents mergeVAT, an accelerated VAT and iVAT engine, and the collection of implementation ideas that make
+it work. The contributions are: a reordering that replaces the classical cubic inner loop, improved in two stages, first
+to $O (N^2 \log N)$ with a priority queue (published) and then to $O (N^2)$ with a compact-active-set formulation that
+removes the heap entirely (unpublished), both detailed in §3.3.1; an in-place memory scheme that holds the whole
+computation in a single matrix, and beside it a matrix-free path that holds none of it, at a measured 65 MB independent
+of $N$; a GPU implementation of the underlying minimum spanning tree that reproduces the serial ordering exactly at
+double precision, and up to tie-breaking at single (§3.2 sets out why that distinction is not a hedge); a
+divide-and-conquer scheme that splits a large problem and stitches the pieces back together at bounded cost; and,
+importantly, correctness on an *arbitrary* dissimilarity matrix, including non-metric ones. Together these move the
+feasible problem size from the few thousand points these implementations are used at to a measured 135,000, with an
+arithmetic ceiling of 155,000 at single precision for the in-place scheme and no memory ceiling at all for the
+matrix-free one; §3.4 states each endpoint and which kind of evidence it rests on. The engine also carries a clustering
+method, presented in §3.3.5 as a contribution and not as a demonstration: `IVATMeans` reads its partition off the
+reordered image, needs no initialization, and returns assignment and membership from one fit, with the head-to-head
+against Fuzzy C-Means and k-means still owed as Goal G9. A secondary result fell out of the same machinery: the VAT
+ordering makes a good hot-start for the Traveling Salesman Problem. I treat that briefly at the end.
 
 ## 3.2 Background and Prior Art
 
-Recall the one fact that everything here rests on: the VAT ordering depends only on the minimum spanning tree of the points. VAT grows an MST with a modified Prim's algorithm, and the reordering is just the order in which points are added. Any method that builds the same MST (serial Prim, parallel Borůvka, or a GPU kernel) produces the same ordering, bit for bit. So "make VAT fast" is really "make the MST fast," and I am free to choose whichever MST construction suits the hardware.
+Recall the one fact that everything here rests on: the VAT ordering depends only on the minimum spanning tree of the
+points. VAT grows an MST with a modified Prim's algorithm, and the reordering is just the order in which points are
+added. Any method that builds the same MST (serial Prim, parallel Borůvka, or a GPU kernel) produces the same ordering,
+bit for bit. So "make VAT fast" is really "make the MST fast," and I am free to choose whichever MST construction suits
+the hardware.
 
-One assumption is buried in that reduction and belongs in the open: the minimum spanning tree is unique only when the pairwise dissimilarities are all distinct. Under exact ties there is a *set* of minimum spanning trees, all of equal total weight and all equally correct, and two constructions may return different members of it. Where that happens the orderings differ while both remain valid VAT orderings. It is not a hypothetical: §3.3.3 reports the one measured case, at the largest single-precision size tested. Reduced precision makes it more likely, since float32 turns near-ties into ties. The reduction above therefore holds exactly when the MST is unique, and holds up to tie-breaking when it is not.
+One assumption is buried in that reduction and belongs in the open: the minimum spanning tree is unique only when the
+pairwise dissimilarities are all distinct. Under exact ties there is a *set* of minimum spanning trees, all of equal
+total weight and all equally correct, and two constructions may return different members of it. Where that happens the
+orderings differ while both remain valid VAT orderings. It is not a hypothetical: §3.3.3 reports the one measured case,
+at the largest single-precision size tested. Reduced precision makes it more likely, since float32 turns near-ties into
+ties. The reduction above therefore holds exactly when the MST is unique, and holds up to tie-breaking when it is not.
 
-There is already work on fast VAT, and mergeVAT belongs against it plainly: these are the comparisons a reviewer asks for first. **clusiVAT** [@kumar2016clusivat] samples the data and is therefore approximate: fast, but not the exact VAT ordering. The **parallel edge-based GPU VAT** of Meng and Yuan [@meng2018evat], sometimes called eVAT, already puts an exact VAT on a GPU, so I cannot claim to be the first to do that, and I do not. **Fast-VAT** [@avinash2025fastvat] is concurrent CPU work in the same spirit, accelerating VAT with compiled kernels and reporting speedups of up to 50×; it addresses VAT only, not iVAT, and it appeared alongside this work rather than before it. **Deshpande and Kumar** [@deshpande2024scalable] is the closest prior art and deserves more than a passing mention. They attack the ordering step itself: BB-VAT, kdT-VAT and TkdT-VAT use bounding-box and k-d-tree nearest-neighbour search to build the VAT spanning tree, aiming *below* $O(N^2)$ by exploiting geometry, and their MST-iVAT computes the iVAT reordered index without materializing the full distance matrix. It is a stronger route to both goals than anything I do: geometry beats a better constant factor. Their constraint is the one that matters for my purposes, though. Those methods need Euclidean coordinates, so they cannot run on a precomputed or non-metric dissimilarity matrix at all — which is the seam I occupy, narrower than I would have claimed before reading them.
+There is already work on fast VAT, and mergeVAT belongs against it plainly: these are the comparisons a reviewer asks
+for first. **clusiVAT** [@kumar2016clusivat] samples the data and is therefore approximate: fast, but not the exact VAT
+ordering. The **parallel edge-based GPU VAT** of Meng and Yuan [@meng2018evat], sometimes called eVAT, already puts an
+exact VAT on a GPU, so I cannot claim to be the first to do that, and I do not. **Fast-VAT** [@avinash2025fastvat] is
+concurrent CPU work in the same spirit, accelerating VAT with compiled kernels and reporting speedups of up to 50×; it
+addresses VAT only, not iVAT, and it appeared alongside this work rather than before it. **Deshpande and
+Kumar** [@deshpande2024scalable] is the closest prior art and deserves more than a passing mention. They attack the
+ordering step itself: BB-VAT, kdT-VAT and TkdT-VAT use bounding-box and k-d-tree nearest-neighbour search to build the
+VAT spanning tree, aiming *below* $O (N^2)$ by exploiting geometry, and their MST-iVAT computes the iVAT reordered index
+without materializing the full distance matrix. It is a stronger route to both goals than anything I do: geometry beats
+a better constant factor. Their constraint is the one that matters for my purposes, though. Those methods need Euclidean
+coordinates, so they cannot run on a precomputed or non-metric dissimilarity matrix at all — which is the seam I occupy.
 
-The regime none of them occupy is the one I target: *exact* VAT **and iVAT**, on a *large, arbitrary, possibly non-metric* dissimilarity matrix, computed with modest memory on ordinary hardware. That is not a corner case. Sequence data under dynamic time warping, strings under edit distance, and graphs under a kernel dissimilarity all land there, and none of them have coordinates. The argument for this niche was structural before it was empirical: §3.4 first reported exactness only on synthetic non-metric matrices, and Table 3.7's last row now extends it to genuinely coordinate-free data — three real DTW time-series datasets, exact ordering at every size tested up to 24,000 points. What Goal G2 still owes is downstream usefulness on that same real data, not exactness.
+The regime none of them occupy is the one I target: *exact* VAT **and iVAT**, on a *large, arbitrary, possibly
+non-metric* dissimilarity matrix, computed with modest memory on ordinary hardware. That is not a corner case. Sequence
+data under dynamic time warping, strings under edit distance, and graphs under a kernel dissimilarity all land there,
+and none of them have coordinates. The argument for this niche is both structural and empirical: §3.4 reports exactness
+on synthetic non-metric matrices, and Table 3.7's last row extends it to genuinely coordinate-free data — three real DTW
+time-series datasets, exact ordering at every size tested up to 24,000 points. What Goal G2 still owes is downstream
+usefulness on that same real data, not exactness.
 
 ## 3.3 Methodology
 
 ### 3.3.1 The reorder, in two stages
 
-The reorder went through two distinct improvements, presented as two stages because they are separate results. The first replaced the implementation I found in the literature and is the published contribution. The second improved on my own first stage and is in preparation as a separate paper.
+The reorder went through two distinct improvements, presented as two stages because they are separate results. The first
+replaced the implementation I found in the literature and is the published contribution. The second improved on my own
+first stage and is in preparation as a separate paper.
 
-**Where the literature starts.** The classical VAT reorder is slow for a mundane reason. At each step it needs the smallest dissimilarity between the tree and any unchosen point, and the usual implementation finds it by re-scanning, for every unchosen point, its distance to every point already in the tree. That is an $O(N)$ search per candidate, across $N$ candidates, across $N$ steps: $O(N^3)$. This is not a strawman. It is what the reference implementations do, and it is the reason VAT is treated as a method for a few thousand points.
+**Where the literature starts.** The classical VAT reorder is slow for a mundane reason. At each step it needs the
+smallest dissimilarity between the tree and any unchosen point, and the usual implementation finds it by re-scanning,
+for every unchosen point, its distance to every point already in the tree. That is an $O (N)$ search per candidate,
+across $N$ candidates, across $N$ steps: $O (N^3)$. This is not a strawman. It is what the reference implementations do,
+and it is the reason VAT is treated as a method for a few thousand points.
 
-**Stage one: the priority queue.** $O(N^3) \rightarrow O(N^2 \log N)$. The wasted work in the classical version is that it recomputes, from scratch, distances it already knew. Instead I keep a priority queue of candidate edges: when a vertex joins the tree I relax its row once, pushing any improved candidate onto the heap, and the next vertex to add is whatever the heap hands back. Each accepted vertex costs one $O(N)$ relaxation plus heap operations, and the $\log$ factor comes from the heap: with lazy deletion the queue can hold $O(N^2)$ entries, so each push and pop is $O(\log N)$. This is the result published at NAFIPS, and it is what took VAT from a few thousand points to the tens of thousands.
+**Stage one: the priority queue.** $O (N^3) \rightarrow O (N^2 \log N)$. The wasted work in the classical version is
+that it recomputes, from scratch, distances it already knew. Instead I keep a priority queue of candidate edges: when a
+vertex joins the tree I relax its row once, pushing any improved candidate onto the heap, and the next vertex to add is
+whatever the heap hands back. Each accepted vertex costs one $O (N)$ relaxation plus heap operations, and the $\log$
+factor comes from the heap: with lazy deletion the queue can hold $O (N^2)$ entries, so each push and pop
+is $O (\log N)$. This is the result published at NAFIPS, and it is what took VAT from a few thousand points to the tens
+of thousands.
 
-**Stage two: the compact active set.** $O(N^2 \log N) \rightarrow O(N^2)$. Having removed the redundant scanning, the remaining overhead is the heap itself, and the insight is that the heap is not needed at all. The reorder does not require a fully ordered queue of candidates: it only ever asks for the current minimum, once per round. So instead of maintaining a heap, I keep the unvisited vertices packed into the first $m$ slots of a small set of parallel arrays holding each candidate's current best key and parent. Two things then fall out:
+**Stage two: the compact active set.** $O (N^2 \log N) \rightarrow O (N^2)$. Having removed the redundant scanning, the
+remaining overhead is the heap itself, and the insight is that the heap is not needed at all. The reorder does not
+require a fully ordered queue of candidates: it only ever asks for the current minimum, once per round. So instead of
+maintaining a heap, I keep the unvisited vertices packed into the first $m$ slots of a small set of parallel arrays
+holding each candidate's current best key and parent. Two things then fall out:
 
-- Removing a vertex is an $O(1)$ swap with the last active slot, so round $r$ scans only $m = N - r$ entries rather than all $N$. The work shrinks as the tree grows.
-- The relaxation and the minimum-selection can be *fused into a single pass*. Walking the active slots once, I update each candidate's key against the newly added row and track the running minimum in the same loop. The round costs one pass, not two, and the sequence of operations is what makes this possible: the argmin for the next round is available as a by-product of the relaxation for this one.
+- Removing a vertex is an $O (1)$ swap with the last active slot, so round $r$ scans only $m = N - r$ entries rather
+  than all $N$. The work shrinks as the tree grows.
+- The relaxation and the minimum-selection can be *fused into a single pass*. Walking the active slots once, I update
+  each candidate's key against the newly added row and track the running minimum in the same loop. The round costs one
+  pass, not two, and the sequence of operations is what makes this possible: the argmin for the next round is available
+  as a by-product of the relaxation for this one.
 
-Summing $N - r$ over all rounds gives $N^2/2$ comparisons, with $O(N)$ workspace beyond the matrix itself and no heap allocation at all. The log factor is gone. The three arms are three sums over the same outer loop —
+Summing $N - r$ over all rounds gives $N^2/2$ comparisons, with $O (N)$ workspace beyond the matrix itself and no heap
+allocation at all. The log factor is gone. The three arms are three sums over the same outer loop —
 
-$$ \sum_{r=1}^{N-1} r\,(N-r) = \frac{N^3 - N}{6}, \qquad \underbrace{\sum_{r=1}^{N-1} (N-r)}_{\text{pushes}} \cdot O(\log N^2), \qquad \sum_{r=1}^{N-1} (N-r) = \frac{N(N-1)}{2} $$
+$$ \sum_{r=1}^{N-1} r\, (N-r) = \frac{N^3 - N}{6}, \qquad \underbrace{\sum_{r=1}^{N-1} (N-r)}_{\text{pushes}} \cdot O (\log N^2), \qquad \sum_{r=1}^{N-1} (N-r) = \frac{N (N-1)}{2} $$
 
-— and Appendix A.10.4 derives each, including why the heap is the *only* source of the log factor in stage one and what makes the fusion in stage two legal.
+— and Appendix A.10.4 derives each, including why the heap is the *only* source of the log factor in stage one and what
+makes the fusion in stage two legal.
 
-The ingredients in stage two are old, and I would rather scope the claim myself than have a reviewer do it for me. Compact active-set dense Prim is classical. Maintaining best-distances-to-tree, removing by swap-with-last, and fusing relaxation with selection are what a competently written dense Prim looks like, and dense Prim has been $O(N^2)$ since 1957. Stage two did not discover a new bound; it reached one available all along that this literature had not been using.
+The ingredients in stage two are old, and I would rather scope the claim myself than have a reviewer do it for me.
+Compact active-set dense Prim is classical. Maintaining best-distances-to-tree, removing by swap-with-last, and fusing
+relaxation with selection are what a competently written dense Prim looks like, and dense Prim has been $O (N^2)$ since
 
-What I cannot claim is that the VAT literature is confused about *time*. The Kumar–Bezdek survey states $O(N^2)$ for VAT in four separate places, and correctly credits Havens and Bezdek with taking iVAT from $O(N^3)$ to $O(N^2)$. The stated complexity is right. What is wrong is the *implementations*: the widely used ones, among them the R **seriation** package, Python's **pyclustertend**, and the reference code accompanying Fast-VAT (2025), do the cubic re-scan while citing the $O(N^2)$ figure. That gap between the stated bound and the shipped code is real, and it is what stage one actually improved on.
+1957. Stage two did not discover a new bound; it reached one available all along that this literature had not been
+      using.
 
-What I can claim, and what survives the search, concerns *space*. The literature repeatedly asserts that the $O(N^2)$ memory footprint is inherent to using Prim: Fast-VAT states an "$O(n^2)$ space complexity for storing $R$"; Kumar's thesis states that constructing the spanning tree "requires $O(n^2)$ time and space to store all the edges"; Deshpande and Kumar's own motivation is that existing methods have "$O(N^2)$ time and space complexity as they use Prim's algorithm." That is incorrect: array-based dense Prim needs only $O(N)$ working memory and never materializes an edge list, exactly what stage two exploits and what lets it compose with the on-demand distance computation of §3.3.2. A misconception that motivated a 2024 *Information Sciences* paper is worth correcting in print.
+What I cannot claim is that the VAT literature is confused about *time*. The Kumar–Bezdek survey states $O (N^2)$ for
+VAT in four separate places, and correctly credits Havens and Bezdek with taking iVAT from $O (N^3)$ to $O (N^2)$. The
+stated complexity is right. What is wrong is the *implementations*: the widely used ones, among them the R **seriation**
+package, Python's **pyclustertend**, and the reference code accompanying Fast-VAT (2025), do the cubic re-scan while
+citing the $O (N^2)$ figure. That gap between the stated bound and the shipped code is real, and it is what stage one
+actually improved on.
 
-The prior art here is close, and I place stage two against it plainly. Bezdek's own group published *"Is VAT really single linkage in disguise?"* [@havens2009disguise], printing Prim's algorithm and the VAT ordering side by side, and Müllner [@mullner2011modern] gives the $O(N)$-memory argument for single-linkage, so the space correction can be assembled from existing work; Deshpande and Kumar have already solved the memory problem outright, by a coordinate-based route mine does not require. What stage two adds is an exact, coordinate-free, in-place $O(N^2)$ reorder in this literature's own idiom, and a correction in print to a space bound the recent papers state wrongly. That correction is an observation the mergeVAT methods paper carries — an audit of what the literature states against what public libraries actually implement — not a novelty claim of its own.
+What I can claim, and what survives the search, concerns *space*. The literature repeatedly asserts that the $O (N^2)$
+memory footprint is inherent to using Prim: Fast-VAT states an "$O (n^2)$ space complexity for storing $R$"; Kumar's
+thesis states that constructing the spanning tree "requires $O (n^2)$ time and space to store all the edges"; Deshpande
+and Kumar's own motivation is that existing methods have "$O (N^2)$ time and space complexity as they use Prim's
+algorithm." That is incorrect: array-based dense Prim needs only $O (N)$ working memory and never materializes an edge
+list, exactly what stage two exploits and what lets it compose with the on-demand distance computation of §3.3.2. A
+misconception that motivated a 2024 *Information Sciences* paper is worth correcting in print.
 
-**Both stages remain in the code, deliberately.** The priority-queue version is the portable path, in pure Python and Numba; the compact-active-set version is the compiled Cython kernel and is preferred whenever the extension is built. They produce bit-identical orderings, so each validates the other. Both are cited by permalink in §3.4 so the complexity claims can be checked against the source.
+The prior art here is close, and I place stage two against it plainly. Bezdek's own group published *"Is VAT really
+single linkage in disguise?"* [@havens2009disguise], printing Prim's algorithm and the VAT ordering side by side, and
+Müllner [@mullner2011modern] gives the $O (N)$-memory argument for single-linkage, so the space correction can be
+assembled from existing work; Deshpande and Kumar have already solved the memory problem outright, by a coordinate-based
+route mine does not require. What stage two adds is an exact, coordinate-free, in-place $O (N^2)$ reorder in this
+literature's own idiom, and a correction in print to a space bound the recent papers state wrongly. That correction is
+an observation the mergeVAT methods paper carries — an audit of what the literature states against what public libraries
+actually implement — not a novelty claim of its own.
 
-**A note on the name.** I first called the method mergeVAT for a two-dimensional-merge-sort idea I was chasing at the time. Vladik Kreinovich pointed out that stage one is really a priority-queue algorithm, so I renamed it *pVAT* — but that name was taken: Parveen and Sreevalsan-Nair published a *parallel* VAT (pVAT) in 2013, on a GPU, likewise swapping Prim for Borůvka [Parveen and Sreevalsan-Nair 2013, BDA, LNCS 8302:151–170]. Close enough in name and subject to cause real confusion, and reading my *p* as *parallel* would collide harder still, since their method is parallel and mine also has a GPU path.
+**Both stages remain in the code, deliberately.** The priority-queue version is the portable path, in pure Python and
+Numba; the compact-active-set version is the compiled Cython kernel and is preferred whenever the extension is built.
+They produce bit-identical orderings, so each validates the other. Both are cited by permalink in §3.4 so the complexity
+claims can be checked against the source.
 
-So the name returns to mergeVAT. It is imperfect — neither the priority queue nor the compact active set is a merge — but it does describe §3.3.4: splitting a problem into blocks, ordering each, and stitching them back into one faithful ordering is a merge in the ordinary sense. That is both the part of the work that reaches past a single machine and the part with the most left in it. The principled stitch works and is measured (Table 3.6 recovers an adjusted Rand index of 1.00 where naive concatenation collapses), but it is a two-way stitch over farthest-point blocks, not a general merge operator, and how it behaves under the repeated application a distributed implementation would need is open work in Chapter 7. I would rather keep an imperfect, stable name than rename the method twice more while the work underneath it settles.
+**A note on the name.** I first called the method mergeVAT for a two-dimensional-merge-sort idea I was chasing at the
+time. Vladik Kreinovich pointed out that stage one is really a priority-queue algorithm, so I renamed it *pVAT* — but
+that name was taken: Parveen and Sreevalsan-Nair published a *parallel* VAT (pVAT) in 2013, on a GPU, likewise swapping
+Prim for Borůvka [Parveen and Sreevalsan-Nair 2013, BDA, LNCS 8302:151–170]. Close enough in name and subject to cause
+real confusion, and reading my *p* as *parallel* would collide harder still, since their method is parallel and mine
+also has a GPU path.
 
-> **Publication status.** Stage two is not yet published. What a write-up could and could not claim is set out in §9.3, after a prior-art search substantially narrowed it.
+So the name returns to mergeVAT. It is imperfect — neither the priority queue nor the compact active set is a merge —
+but it does describe §3.3.4: splitting a problem into blocks, ordering each, and stitching them back into one faithful
+ordering is a merge in the ordinary sense. That is both the part of the work that reaches past a single machine and the
+part with the most left in it. The principled stitch works and is measured (Table 3.6 recovers an adjusted Rand index of
+1.00 where naive concatenation collapses), but it is a two-way stitch over farthest-point blocks, not a general merge
+operator, and how it behaves under the repeated application a distributed implementation would need is open work in
+Chapter 7. I would rather keep an imperfect, stable name than rename the method twice more while the work underneath it
+settles.
 
-**Figure 3.1 — The mergeVAT reorder, against the classical linear scan.** All three arms share one outer loop: seed at the farther endpoint of the most-dissimilar pair, append the nearest unplaced point, repeat $N-1$ times, and emit an ordering that is bit-identical across the three. What differs is the step inside. The classical arm re-scans every (placed, unplaced) pair and recomputes a minimum it has just computed, at $O(N^3)$; stage one pushes each relaxation onto a priority queue and discards stale entries on the way out, at $O(N^2 \log N)$; stage two needs only the *current* minimum, so it fuses relaxation and selection into one pass over a compact active set and drops the heap and the log factor together, at $O(N^2)$. The figure is a schematic; the wall-clock difference is Figure 3.4 and Table 3.1.
+> **Publication status.** Stage two is not yet published. What a write-up could and could not claim is set out in §9.3,
+> after a prior-art search substantially narrowed it.
+
+**Figure 3.1 — The mergeVAT reorder, against the classical linear scan.** All three arms share one outer loop: seed at
+the farther endpoint of the most-dissimilar pair, append the nearest unplaced point, repeat $N-1$ times, and emit an
+ordering that is bit-identical across the three. What differs is the step inside. The classical arm re-scans every
+(placed, unplaced) pair and recomputes a minimum it has just computed, at $O (N^3)$; stage one pushes each relaxation
+onto a priority queue and discards stale entries on the way out, at $O (N^2 \log N)$; stage two needs only the *current*
+minimum, so it fuses relaxation and selection into one pass over a compact active set and drops the heap and the log
+factor together, at $O (N^2)$. The figure is a schematic; the wall-clock difference is Figure 3.4 and Table 3.1.
 `![pvat-reorder](fig/03-pvat-reorder.png)`
 
 ### 3.3.2 Holding it in one matrix
 
-Speed is only half the problem; memory is the other half, and at these sizes it is the wall you hit first. A {{dataset.psychiatric.rows}}-row psychiatric-evaluation dataset I worked with ({{dataset.psychiatric.features}} mostly-binary features whose names were anonymized, so the exercise is purely one of scale) is 73 gigabytes as a single-precision distance matrix, and the classical VAT keeps *two* such matrices, the original and the reordered copy, to trade memory for compute. Since mergeVAT no longer needs that trade, I would rather spend the memory budget on a bigger problem.
+Speed is only half the problem; memory is the other half, and at these sizes it is the wall you hit first. A
+{{dataset.psychiatric.rows}}-row psychiatric-evaluation dataset I worked with ({{dataset.psychiatric.features}}
+mostly-binary features whose names were anonymized, so the exercise is purely one of scale) is 73 gigabytes as a
+single-precision distance matrix, and the classical VAT keeps *two* such matrices, the original and the reordered copy,
+to trade memory for compute. Since mergeVAT no longer needs that trade, I would rather spend the memory budget on a
+bigger problem.
 
 Two ideas here, and the one that is built has to be kept apart from the one that is not.
 
-The idea that is built is doing the reordering permutation *in place*. The VAT ordering, paired with the original index order, forms a set of directed cycles (permutation loops), and I can walk each loop, moving elements into their final positions, masking entries as I visit them and incrementing past the ones already placed. This is a known trick for in-place permutation [Cate and Twigg 1977], and it collapses the two permutation buffers down to one. The net effect: iVAT, which for a 64,000-point float64 problem would need about 98 gigabytes across the classical scheme's three matrices and simply not run, instead fits in about 33 gigabytes, and the largest feasible problem under the 64-gigabyte working cap rises from roughly 52,000 to 89,000 points at double precision, or 126,000 at single, and 155,000 at single on the machine's full 96 gigabytes. Table 3.3 gives the full grid, with two cautions about reading it. The footprints are exact arithmetic on the schemes' matrix counts, not measurements, and the table labels them as such: a scheme holding $k$ matrices at $s$ bytes per entry reaches $N_{\max} = \lfloor \sqrt{B / (k s)} \rfloor$ under a budget $B$, so the in-place scheme ($k = 1$) beats the classical one ($k = 3$) by exactly $\sqrt{3}$ and single precision buys exactly $\sqrt{2}$ more, at any budget (Appendix A.10.5). The cross-precision ordering check *is* a measurement, but it was taken at $N = 2{,}000$ across ten seeds, where the float32 ordering is elementwise identical to the float64 one. One size cannot license treating the whole single-precision column as free, and reduced precision is exactly what creates the near-ties that make a minimum spanning tree non-unique. Repeating the check near the sizes the ceiling is claimed for is part of Goal G4.
+The idea that is built is doing the reordering permutation *in place*. The VAT ordering, paired with the original index
+order, forms a set of directed cycles (permutation loops), and I can walk each loop, moving elements into their final
+positions, masking entries as I visit them and incrementing past the ones already placed. This is a known trick for
+in-place permutation [Cate and Twigg 1977], and it collapses the two permutation buffers down to one. The net effect:
+iVAT, which for a 64,000-point float64 problem would need about 98 gigabytes across the classical scheme's three
+matrices and simply not run, instead fits in about 33 gigabytes, and the largest feasible problem under the 64-gigabyte
+working cap rises from roughly 52,000 to 89,000 points at double precision, or 126,000 at single, and 155,000 at single
+on the machine's full 96 gigabytes. Table 3.3 gives the full grid, with two cautions about reading it. The footprints
+are exact arithmetic on the schemes' matrix counts, not measurements, and the table labels them as such: a scheme
+holding $k$ matrices at $s$ bytes per entry reaches $N_{\max} = \lfloor \sqrt{B / (k s)} \rfloor$ under a budget $B$, so
+the in-place scheme ($k = 1$) beats the classical one ($k = 3$) by exactly $\sqrt{3}$ and single precision buys
+exactly $\sqrt{2}$ more, at any budget (Appendix A.10.5). The cross-precision ordering check *is* a measurement, but it
+was taken at $N = 2{,}000$ across ten seeds, where the float32 ordering is elementwise identical to the float64 one. One
+size cannot license treating the whole single-precision column as free, and reduced precision is exactly what creates
+the near-ties that make a minimum spanning tree non-unique. Repeating the check near the sizes the ceiling is claimed
+for is part of Goal G4.
 
-**Figure 3.2 — The in-place permutation, and what it does to the memory budget.** Panel (a): a permutation decomposes into disjoint cycles, one colour each, and walking every cycle once moves each element to its final slot with a single temporary — so the reordered matrix can overwrite the original instead of being written beside it [Cate and Twigg 1977]. Panel (b): the consequence at $N = 64{,}000$ in float64, the classical three-matrix footprint against the in-place single matrix, each computed from $k\,s\,N^2$ rather than typed (Appendix A.10.5), with the two budgets §3.4 quotes. The $\sqrt{3}$ in reachable $N$ is the ratio of the two bars, square-rooted. Arithmetic, not measurement, as Table 3.3 labels its own cells.
+**Figure 3.2 — The in-place permutation, and what it does to the memory budget.** Panel (a): a permutation decomposes
+into disjoint cycles, one colour each, and walking every cycle once moves each element to its final slot with a single
+temporary — so the reordered matrix can overwrite the original instead of being written beside it [Cate and Twigg 1977].
+Panel (b): the consequence at $N = 64{,}000$ in float64, the classical three-matrix footprint against the in-place
+single matrix, each computed from $k\,s\,N^2$ rather than typed (Appendix A.10.5), with the two budgets §3.4 quotes.
+The $\sqrt{3}$ in reachable $N$ is the ratio of the two bars, square-rooted. Arithmetic, not measurement, as Table 3.3
+labels its own cells.
 `![03-inplace-permutation](fig/03-inplace-permutation.png)`
 
-The second idea is the more ambitious one: never materializing the distance matrix at all, computing each $D_{i,j}$ on demand as the reorder asks for it. It is now built, and this section reports it as a positive result for the first time. The package's matrix-free reorder, `vat_prim_mst_seq`, returned a wrong ordering for most of this project's life — the seed vertex followed by every other vertex in ascending index order, agreeing with the true ordering at chance — and earlier drafts of this chapter, of Table 3.3 and of Appendix A.6 recorded that as a measured negative result. The defect was a distance helper typed for a scalar index and handed an array, so every candidate received the same key and the heap popped in index order. It was repaired upstream, with a regression test, and the repair is inside the commit this chapter pins.
+The second idea is the more ambitious one: never materializing the distance matrix at all, computing each $D_{i,j}$ on
+demand as the reorder asks for it. It is built, and reports as a positive result. The package's matrix-free reorder,
+`vat_prim_mst_seq`, computes the ordering directly rather than materializing $D$; the commit this chapter pins carries a
+regression test guarding the distance helper that once made this path return a wrong ordering (Appendix A.6 has the
+fault and the fix, kept there as a record).
 
-Re-measured here under the decision rule Chapter 7 sets for it. The ordering is elementwise identical to the serial reference at $N = 1{,}000$, $2{,}000$ and $5{,}000$ across ten seeds each — agreement $1.000 \pm 0.000$ against chance levels of $0.001$, $0.0005$ and $0.0002$, with no run showing the old ascending-index signature. Peak working set is flat: **64.7, 64.9, 65.0 and 64.8 MB at $N = 2{,}000$ through $12{,}000$**, while the matrix those sizes imply grows thirty-six-fold and the materialising arm's peak grows with it, 193.6 MB to 4.67 GB. That is the $O(N)$ workspace §3.3.1 argues the literature gets wrong, demonstrated end to end rather than read off the source. It is also *faster*, not slower: 0.14–0.22× the materialising arm's wall clock across the same ladder, both arms starting from samples.
+Re-measured here under the decision rule Chapter 7 sets for it. The ordering is elementwise identical to the serial
+reference at $N = 1{,}000$, $2{,}000$ and $5{,}000$ across ten seeds each — agreement $1.000 \pm 0.000$ against chance
+levels of $0.001$, $0.0005$ and $0.0002$, with no run showing the old ascending-index signature. Peak working set is
+flat: **64.7, 64.9, 65.0 and 64.8 MB at $N = 2{,}000$ through $12{,}000$**, while the matrix those sizes imply grows
+thirty-six-fold and the materialising arm's peak grows with it, 193.6 MB to 4.67 GB. That is the $O (N)$ workspace
+§3.3.1 argues the literature gets wrong, demonstrated end to end rather than read off the source. It is also *faster*,
+not slower: 0.14–0.22× the materialising arm's wall clock across the same ladder, both arms starting from samples.
 
-So the ceiling this chapter reports is no longer a property of the memory scheme. The in-place scheme is what every number here was measured under, and it lifts the reachable size by roughly $\sqrt{3}$ over the classical three-matrix scheme and another $\sqrt{2}$ at single precision; the 135,000-point run sits inside it. But the regime *past* about 155,000 points, which earlier drafts assigned to unwritten future work, is reachable with code that exists. What is owed is no longer the writing — it is verification at that scale, where the arithmetic ceiling stops binding and wall clock takes over. Chapter 7's G4d is re-scoped accordingly, and the matrix-free entry in the prior-art table still belongs to Deshpande and Kumar, who got there first by a coordinate-based route this one does not require.
+So the ceiling this chapter reports is no longer a property of the memory scheme. The in-place scheme is what every
+number here was measured under, and it lifts the reachable size by roughly $\sqrt{3}$ over the classical three-matrix
+scheme and another $\sqrt{2}$ at single precision; the 135,000-point run sits inside it. The regime *past* about 155,000
+points is reachable with code that exists, so what is owed is not writing it but verification at that scale, where the
+arithmetic ceiling stops binding and wall clock takes over. Chapter 7's G4d is scoped accordingly, and the matrix-free
+entry in the prior-art table still belongs to Deshpande and Kumar, who got there first by a coordinate-based route this
+one does not require.
 
-One defect here is worth recording for what it taught me about testing. The first version of my in-place permutation was silently wrong: it coupled each cell with its mirror image across the diagonal, and produced a plausible-looking result that was not the correct ordering. My tests missed it for an embarrassing stretch because they only checked quantities that happen to be invariant under that particular error. I found it, fixed it, and added a test that checks the ordering itself against the serial reference bit for bit. The current implementation is verified identical to serial VAT. The lesson: "the picture looks right" is not a test, and it now informs how I validate everything in this work.
+One methodological point is worth recording. A permutation bug that couples each cell with its mirror image across the
+diagonal produces a plausible-looking but incorrect ordering, and a test suite that only checks quantities invariant
+under that particular error will not catch it. The current implementation's tests check the ordering itself against the
+serial reference bit for bit, and the current implementation is verified identical to serial VAT. The lesson: "the
+picture looks right" is not a test, and it now informs how I validate everything in this work.
 
 ### 3.3.3 Any MST builder will do — and the device path is descoped
 
-Everything in this chapter rests on one fact, stated in §3.1 and worth naming again
-here because it is what makes the rest modular: **the VAT ordering depends only on
-the minimum spanning tree**, not on how the tree was built. Prim, Borůvka,
-Kruskal, a device kernel, a distributed builder — any of them yields the same
-ordering, so the reorder, the in-place memory scheme, the divide-and-conquer stitch
-of §3.3.4 and the non-metric (DTW) extension behind Table 3.7 all compose with
-whatever MST front
-end is cheapest. That is an architectural property of the method and it is
-independent of any particular hardware.
+Everything in this chapter rests on one fact, stated in §3.1 and worth naming again here because it is what makes the
+rest modular: **the VAT ordering depends only on the minimum spanning tree**, not on how the tree was built. Prim,
+Borůvka, Kruskal, a device kernel, a distributed builder — any of them yields the same ordering, so the reorder, the
+in-place memory scheme, the divide-and-conquer stitch of §3.3.4 and the non-metric (DTW) extension behind Table 3.7 all
+compose with whatever MST front end is cheapest. That is an architectural property of the method and it is independent
+of any particular hardware.
 
-**A GPU front end was built on exactly that property, and it is not reported in this
-document.** A device-resident Borůvka path (distances, MST and ordering all on the
-card, so the data does not shuttle back and forth) was implemented and measured, and
-an earlier draft of this chapter carried a Table 3.4 of device-versus-host speedups.
-That table is withdrawn. Three reasons, in increasing order of finality:
-
-1. **Its headline number was a formulation artefact, not a hardware result.** The
-   Fuzzy C-Means row had claimed the device ran thirty to fifty times faster than the
-   32-core CPU. That compared a device kernel using the gram identity and two GEMMs
-   against a CPU arm written with NumPy broadcasting — a difference of *formulation*.
-   Held to a matched formulation the win was 1.2–3.7×. A speed table whose
-   largest entry measures the baseline's implementation is not a speed table.
-2. **The one honest negative result needed hardware I do not have.** Pairwise
-   distances *lose* to the CPU at low dimension or in double precision on a consumer
-   card, because consumer double-precision throughput is a fraction of single. Whether
-   that is a property of the card or of the algorithm is exactly the question a
-   full-rate-FP64 datacenter card would settle, and it stayed unsettled.
-3. **The backend no longer exists.** `tribble-clustering` removed its CuPy back ends
-   and its `[gpu]` extra in `1ec9667` (2026-08-30), so `tribbleclustering.gpu` is gone
-   and the generator behind Table 3.4 has nothing left to import. The table could not
-   be re-measured today even with a card.
-
-What was built and what it measured is preserved in **Appendix A.9** as a record
-rather than a result. Reviving it is **Goal G4c**, which now carries a software
-precondition as well as a hardware one. Removing it also removes a prior-art
-collision: Parveen and Sreevalsan-Nair's pVAT is a GPU VAT that swaps Prim for
-Borůvka, which is the one place this work's device path overlapped theirs
-directly. The CPU contributions this chapter actually argues — the priority-queue
+**A GPU front end was built on exactly that property, and it is not reported in this document.** A device-resident
+Borůvka path (distances, MST and ordering all on the card, so the data does not shuttle back and forth) exists, but its
+speed table is withdrawn from the body: its headline number compared mismatched formulations rather than hardware, its
+one informative negative result needs a datacenter card this project does not have, and the CuPy back end it depended on
+no longer exists upstream. **Appendix A.9** carries the full record and the reasoning; reviving the comparison is **Goal
+G4c**, which now carries a software precondition as well as a hardware one. Withdrawing it also removes a prior-art
+collision: Parveen and Sreevalsan-Nair's pVAT is a GPU VAT that swaps Prim for Borůvka, which is the one place this
+work's device path overlapped theirs directly. The CPU contributions this chapter actually argues — the priority-queue
 reorder, the in-place scheme, the stitch, the non-metric extension — never did.
+
 ### 3.3.4 Splitting the problem
 
-For problems past what fits on one machine, I split the data into blocks, run mergeVAT on each, and stitch the orderings together. The naive version, ordering each block and concatenating, is fast but wrong: it creates seams at the block boundaries that show up as spurious clusters. The fix is a principled stitch. I pick boundary representatives from each block by farthest-point sampling, add the strongest handful of cross-block edges between them, and reconcile the orderings across those edges. The reconciliation is $O(r^2)$ in the number of boundary representatives and independent of block size *by construction*, since it only ever looks at representative-to-representative edges. I have not measured it: Table 3.6 reports ARI, minimum ARI and the fraction of runs above 0.9, and carries no cost column at all, so "bounded cost" here is a property of the algorithm and not a result. As I show below, both ingredients are necessary; neither the farthest-point representatives nor the top cross-edges suffices alone. That ablation runs on two moons across a grid of partition counts and sizes, so what it establishes is that neither ingredient is redundant on that data, not that the stitch is faithful in general.
+For problems past what fits on one machine, I split the data into blocks, run mergeVAT on each, and stitch the orderings
+together. The naive version, ordering each block and concatenating, is fast but wrong: it creates seams at the block
+boundaries that show up as spurious clusters. The fix is a principled stitch. I pick boundary representatives from each
+block by farthest-point sampling, add the strongest handful of cross-block edges between them, and reconcile the
+orderings across those edges. The reconciliation is $O (r^2)$ in the number of boundary representatives and independent
+of block size *by construction*, since it only ever looks at representative-to-representative edges. I have not measured
+it: Table 3.6 reports ARI, minimum ARI and the fraction of runs above 0.9, and carries no cost column at all, so
+"bounded cost" here is a property of the algorithm and not a result. As I show below, both ingredients are necessary;
+neither the farthest-point representatives nor the top cross-edges suffices alone. That ablation runs on two moons
+across a grid of partition counts and sizes, so what it establishes is that neither ingredient is redundant on that
+data, not that the stitch is faithful in general.
 
-**Figure 3.3 — The divide-and-conquer stitch: blocks, representatives, cross edges.** A two-moons construction split into two blocks by a vertical cut that goes through both moons — the case a naive per-block ordering gets wrong, since each moon is severed and the seam reads as spurious structure (Table 3.5's *naive block* row). Panel (b) draws the stitch's two ingredients as the section states them: the farthest-point representatives of each block, computed by the greedy farthest-point rule, and the shortest representative-to-representative edges across the seam. Farthest-point sampling spreads the representatives to each block's extent, so the moons' tips reach the seam and the top edges connect the right halves; random representatives sit in the interior and connect the wrong ones, which is the light-stitch failure of Table 3.6. The reconciliation itself is not run here; the representatives and edges are computed, the moons are synthetic.
+**Figure 3.3 — The divide-and-conquer stitch: blocks, representatives, cross edges.** A two-moons construction split
+into two blocks by a vertical cut that goes through both moons — the case a naive per-block ordering gets wrong, since
+each moon is severed and the seam reads as spurious structure (Table 3.5's *naive block* row). Panel (b) draws the
+stitch's two ingredients as the section states them: the farthest-point representatives of each block, computed by the
+greedy farthest-point rule, and the shortest representative-to-representative edges across the seam. Farthest-point
+sampling spreads the representatives to each block's extent, so the moons' tips reach the seam and the top edges connect
+the right halves; random representatives sit in the interior and connect the wrong ones, which is the light-stitch
+failure of Table 3.6. The reconciliation itself is not run here; the representatives and edges are computed, the moons
+are synthetic.
 `![03-stitch](fig/03-stitch.png)`
 
 ### 3.3.5 Clustering off the reordered image: `IVATMeans`
 
-Everything above is engine. This section is what the engine is used for first, and it is a method rather than a demonstration: `IVATMeans`, the clustering estimator `tribble-cluster` ships alongside the reorder.
+Everything above is engine. This section is what the engine is used for first, and it is a method rather than a
+demonstration: `IVATMeans`, the clustering estimator `tribble-cluster` ships alongside the reorder.
 
-The construction is short enough to state in full. Run iVAT, then read the clusters off the reordered image. The first off-diagonal of the reordered matrix is the profile of merge heights along the ordering, consecutive points in the ordering joining at the largest edge on the minimum spanning tree path between them; its largest values are taken as the cuts, each stretch of the ordering between two cuts is a cluster, and its members are exactly the points that make up one dark block on the diagonal. Each cluster is then summarised by a prototype, the mean of its members, and every point takes the label of its nearest prototype. The interface is scikit-learn's: `n_clusters` in, `fit`, `fit_predict`, `labels_` and `cluster_centers_` out, so it substitutes directly for a k-means or a Fuzzy C-Means call. The properties below are VAT's, inherited rather than added, with one exception flagged where it arises: the bound the Euclidean prototype puts on the back end.
+The construction is short enough to state in full. Run iVAT, then read the clusters off the reordered image. The first
+off-diagonal of the reordered matrix is the profile of merge heights along the ordering, consecutive points in the
+ordering joining at the largest edge on the minimum spanning tree path between them; its largest values are taken as the
+cuts, each stretch of the ordering between two cuts is a cluster, and its members are exactly the points that make up
+one dark block on the diagonal. Each cluster is then summarised by a prototype, the mean of its members, and every point
+takes the label of its nearest prototype. The interface is scikit-learn's: `n_clusters` in, `fit`, `fit_predict`,
+`labels_` and `cluster_centers_` out, so it substitutes directly for a k-means or a Fuzzy C-Means call. The properties
+below are VAT's, inherited rather than added, with one exception flagged where it arises: the bound the Euclidean
+prototype puts on the back end.
 
-The property worth leading with is that the partition can be checked by eye. The reordered image is not an illustration of the answer; it is the object the answer was read from, so a person can set the two side by side and confirm that the cuts fall where the blocks end. Figure 2.4 panel (c) shows what that check looks like at small size: five dark blocks, five clusters, countable by a reader. Neither k-means nor FCM offers an equivalent, since both return labels and centres and leave behind no artifact of the run to audit the partition against. What this chapter adds to the property is that the image covers the whole dataset exactly, rather than a sample as in clusiVAT [Kumar et al. 2016], and that it can be produced at the sizes §3.4 reaches.
+The property worth leading with is that the partition can be checked by eye. The reordered image is not an illustration
+of the answer; it is the object the answer was read from, so a person can set the two side by side and confirm that the
+cuts fall where the blocks end. Figure 2.4 panel (c) shows what that check looks like at small size: five dark blocks,
+five clusters, countable by a reader. Neither k-means nor FCM offers an equivalent, since both return labels and centres
+and leave behind no artifact of the run to audit the partition against. What this chapter adds to the property is that
+the image covers the whole dataset exactly, rather than a sample as in clusiVAT [Kumar et al. 2016], and that it can be
+produced at the sizes §3.4 reaches.
 
-Nothing has to be initialized. The partition comes off the VAT ordering, the ordering is fixed by the minimum spanning tree of the data and by nothing else, and so the same input returns the same answer every run. `random_state` is accepted on the constructor and seeds numpy when passed, but it places no centre and leaving it unset changes no result. Fuzzy C-Means [Dunn 1973; Bezdek 1981] has to be started somewhere, and §2.4 records what that costs: random starts, run-to-run variation, no guarantee of the same partition twice, and a required $c$ before it can begin at all. `IVATMeans` still takes $c$ as `n_clusters`, so it removes the initialization half of that problem and leaves the cluster-count half alone. Making the count an *output* is Chapter 5's business. One fit then yields the label of every point and the roster of every cluster together, so no later step has to turn an ordering into a partition, though those memberships are crisp — one label per point, all a prototype back end can give. Graded memberships are again Chapter 5.
+Nothing has to be initialized. The partition comes off the VAT ordering, the ordering is fixed by the minimum spanning
+tree of the data and by nothing else, and so the same input returns the same answer every run. `random_state` is
+accepted on the constructor and seeds numpy when passed, but it places no centre and leaving it unset changes no result.
+Fuzzy C-Means [Dunn 1973; Bezdek 1981] has to be started somewhere, and §2.4 records what that costs: random starts,
+run-to-run variation, no guarantee of the same partition twice, and a required $c$ before it can begin at all.
+`IVATMeans` still takes $c$ as `n_clusters`, so it removes the initialization half of that problem and leaves the
+cluster-count half alone. Making the count an *output* is Chapter 5's business. One fit then yields the label of every
+point and the roster of every cluster together, so no later step has to turn an ordering into a partition, though those
+memberships are crisp — one label per point, all a prototype back end can give. Graded memberships are again Chapter 5.
 
-Underneath, it runs on the engine this chapter has been building. `distance_backend` selects the pairwise-distance kernel. The API also carries an `on_device` path that keeps the dissimilarity matrix resident on a card through distances, Borůvka MST, ordering and the iVAT recurrence; it is **not exercised anywhere in this document** and its back ends were removed upstream (§3.3.3, Appendix A.9). The compact active set of §3.3.1 and the in-place permutation of §3.3.2 sit below that, and are where the reachable sizes of Table 3.3 come from. That inheritance covers the engine and not the estimator: **nothing in this repository times `IVATMeans` against Fuzzy C-Means or k-means, or scores its partitions against theirs.** §3.4 measures the reorder, the footprint and the device MST, and Table 3.5's clustering-quality rows are exact single-linkage rather than the nearest-prototype labelling described here. The head-to-head, wall clock and partition quality together, is Goal G9 in Chapter 7, and it has not been run.
+Underneath, it runs on the engine this chapter has been building. `distance_backend` selects the pairwise-distance
+kernel. The API also carries an `on_device` path that keeps the dissimilarity matrix resident on a card through
+distances, Borůvka MST, ordering and the iVAT recurrence; it is **not exercised anywhere in this document** and its back
+ends were removed upstream (§3.3.3, Appendix A.9). The compact active set of §3.3.1 and the in-place permutation of
+§3.3.2 sit below that, and are where the reachable sizes of Table 3.3 come from. That inheritance covers the engine and
+not the estimator: **nothing in this repository times `IVATMeans` against Fuzzy C-Means or k-means, or scores its
+partitions against theirs.** §3.4 measures the reorder, the footprint and the device MST, and Table 3.5's
+clustering-quality rows are exact single-linkage rather than the nearest-prototype labelling described here. The
+head-to-head, wall clock and partition quality together, is Goal G9 in Chapter 7, and it has not been run.
 
-The back end is also where the method ends, because a Euclidean prototype cannot stand for a non-convex cluster. The mean of a ring lies in its hole where there are no points; the mean of a filament is off the filament. So the nearest-prototype step is bounded to clusters a prototype can represent, even where the iVAT front end cut them correctly, and no better centroid heuristic lifts that bound, a ring having no good Euclidean prototype at all. Chapter 5's relational method removes that single limitation while keeping this front end: transform once into the minimax geometry, then cluster with a method that consumes a dissimilarity matrix instead of coordinates. The relationship is progression rather than correction, and §5.2 states it in those terms.
+The back end is also where the method ends, because a Euclidean prototype cannot stand for a non-convex cluster. The
+mean of a ring lies in its hole where there are no points; the mean of a filament is off the filament. So the
+nearest-prototype step is bounded to clusters a prototype can represent, even where the iVAT front end cut them
+correctly, and no better centroid heuristic lifts that bound, a ring having no good Euclidean prototype at all. Chapter
+5's relational method removes that single limitation while keeping this front end: transform once into the minimax
+geometry, then cluster with a method that consumes a dissimilarity matrix instead of coordinates. The relationship is
+progression rather than correction, and §5.2 states it in those terms.
 
-None of this is a new idea, and it should be read as a natural extension of the VAT lineage and of the work above it in this chapter. Reading a partition off an iVAT image is what the family does: clusiVAT [@kumar2016clusivat] samples the data, cuts the reordered image at a single-linkage threshold, and extends labels to the rest by nearest prototype, the same shape of method on sampled data. Havens and Bezdek [@havens2012efficient] supplied the $O(N^2)$ iVAT recurrence the image comes from, and Wang et al. [@wang2010ivat] the minimax transform itself. What `IVATMeans` contributes to that lineage is exactness on the whole dataset at the sizes §3.4 reaches, a labelled partition arrived at with no initialization where the methods it substitutes for require one, and a multi-level capability the extraction already carries: it is called at `n_levels = 1`, one level of a routine written for several, and that is the sense in which it begins to advise on tree structure. It is not a finished hierarchy, and the estimator exposes no hierarchy attribute. Making the hierarchy a first-class output is Chapter 5's work and is not claimed here.
+None of this is a new idea, and it should be read as a natural extension of the VAT lineage and of the work above it in
+this chapter. Reading a partition off an iVAT image is what the family does: clusiVAT [@kumar2016clusivat] samples the
+data, cuts the reordered image at a single-linkage threshold, and extends labels to the rest by nearest prototype, the
+same shape of method on sampled data. Havens and Bezdek [@havens2012efficient] supplied the $O (N^2)$ iVAT recurrence
+the image comes from, and Wang et al. [@wang2010ivat] the minimax transform itself. What `IVATMeans` contributes to that
+lineage is exactness on the whole dataset at the sizes §3.4 reaches, a labelled partition arrived at with no
+initialization where the methods it substitutes for require one, and a multi-level capability the extraction already
+carries: it is called at `n_levels = 1`, one level of a routine written for several, and that is the sense in which it
+begins to advise on tree structure. It is not a finished hierarchy, and the estimator exposes no hierarchy attribute.
+Making the hierarchy a first-class output is Chapter 5's work and is not claimed here.
 
 ### 3.3.6 A hot-start for the Traveling Salesman Problem
 
-One more result came out of this, a neat consequence and not a central claim. The MST gives a well-known bound on the optimal tour: a depth-first walk of the tree, shortcut to a Hamiltonian tour, has length at most $2\,T_{MST} \le 2\,T_{OPT}$. That bound rests on two things Appendix A.10.7 sets out, and an earlier draft of this paragraph elided both. The shortcutting step needs the triangle inequality, so the factor of two is a *metric* result and says nothing on the non-metric input this chapter otherwise prizes. And it bounds the depth-first walk, not the Prim order: consecutive VAT points need not be adjacent in the tree, and a quick random search finds Prim-order tours that exceed twice the tree weight, so the VAT sequence as such carries no proven factor. What is provable and free is the depth-first walk of the same tree; what the VAT order gives is an *empirically* reasonable warm start for a stochastic TSP solver, and that is all I claim for it. The limits, though: VAT's raw closed *tour* is a poor starting point for the strongest solvers, since Lin–Kernighan and LKH are largely insensitive to where they start, and a shorter tour does not imply a better clustering. This is a useful engineering connection, not a new optimization result, which is why it sits at the end of the chapter and not the front.
+One more result came out of this, a neat consequence and not a central claim. The MST gives a well-known bound on the
+optimal tour: a depth-first walk of the tree, shortcut to a Hamiltonian tour, has length at
+most $2\,T_{MST} \le 2\,T_{OPT}$. Appendix A.10.7 sets out the two preconditions that bound rests on. The shortcutting
+step needs the triangle inequality, so the factor of two is a *metric* result and says nothing on the non-metric input
+this chapter otherwise prizes. And it bounds the depth-first walk, not the Prim order: consecutive VAT points need not
+be adjacent in the tree, and a quick random search finds Prim-order tours that exceed twice the tree weight, so the VAT
+sequence as such carries no proven factor. What is provable and free is the depth-first walk of the same tree; what the
+VAT order gives is an *empirically* reasonable warm start for a stochastic TSP solver, and that is all I claim for it.
+The limits, though: VAT's raw closed *tour* is a poor starting point for the strongest local-search solvers (Appendix
+A.6), which are largely insensitive to where they start, and a shorter tour does not imply a better clustering. This is
+a useful engineering connection, not a new optimization result, which is why it sits at the end of the chapter and not
+the front.
 
 ## 3.4 Results
 
-*Hardware. Every CPU number in this section comes from one host: a 32-core 14th-generation Intel i9 (i9-14900HX, 32 logical cores) with 96 GB of RAM and a laptop-class RTX 4080 (12 GB), which also produced the memory results, the large-scale reorders (58,000 and 135,000 points) and the GPU rows. Tables 3.1 and 3.2's swept timing grid comes from that same host, the run of record `reproduce/outputs/full-14900hx-r2/` (ten seeds, all thirteen generators green in one pass); §3.4 below measures how far a speedup ratio moves when the host does not. The harness records host, CPU, RAM, GPU, governor and the numeric stack (numpy, scipy, scikit-learn and the BLAS build) in every archive's `PROVENANCE.txt`. Routine runs are held to a self-imposed **64 GB working cap**, so a large reorder cannot quietly start paging and turn a memory measurement into a disk measurement; where a result deliberately exceeds the cap, the table says so. That matters for reading Table 3.3, which reports both ceilings. Every result labeled "exact" is bit-identical to the serial VAT reference.*
+*Hardware. Every CPU number in this section comes from one host: a 32-core 14th-generation Intel i9 (i9-14900HX, 32
+logical cores) with 96 GB of RAM and a laptop-class RTX 4080 (12 GB), which also produced the memory results, the
+large-scale reorders (58,000 and 135,000 points) and the GPU rows. Tables 3.1 and 3.2's swept timing grid comes from
+that same host, the run of record `reproduce/outputs/full-14900hx-r2/` (ten seeds, all thirteen generators green in one
+pass); §3.4 below measures how far a speedup ratio moves when the host does not. The harness records host, CPU, RAM,
+GPU, governor and the numeric stack (numpy, scipy, scikit-learn and the BLAS build) in every archive's `PROVENANCE.txt`.
+Routine runs are held to a self-imposed **64 GB working cap**, so a large reorder cannot quietly start paging and turn a
+memory measurement into a disk measurement; where a result deliberately exceeds the cap, the table says so. That matters
+for reading Table 3.3, which reports both ceilings. Every result labeled "exact" is bit-identical to the serial VAT
+reference.*
 
-> **Reproduction.** Table 3.1 regenerates from two generators under `reproduce/tables/`: `table_3_1_pvat_scaling.py` times the exact mergeVAT reorder against a self-contained classical $O(N^3)$ reference across a configurable grid of $N$, and `table_3_1_reorder_three_arm.py` separates the three complexity regimes and verifies every arm's ordering is bit-identical. Both are multi-seed and emit Markdown and CSV. No cell in this chapter is left unexplained. Table 3.7's non-coordinate-domain row is now generated rather than marked *pending*: `table_3_7_g2_dtw_nonmetric.py` (new, 2026-08-12) fetches UCR/UEA time series via `aeon` and reorders their DTW dissimilarity matrices with the same engine as every other row (`REPRO_G2_DATASETS` selects which; run under `uv run --project tribble-cluster --with aeon`). Its companion, `table_3_7_g2_downstream.py`, adds the set-cover-vs-NERFCM comparison Goal G2's decision rule also asks for, reusing Chapter 5's selectors unmodified. The remaining tables run outside the table harness, in this repository's `ClusteringExperiments/`: Table 3.5 from `adversarial_eval.py`, Table 3.6 from `principled_stitch.py`, and Table 3.7 from `hardening_eval.py`, each writing a findings file under `ClusteringExperiments/findings/` and driven by `reproduce/experiments/run_cluster_experiment.py`, which puts their directory on `sys.path` and redirects the figure destination so regenerating a figure here cannot dirty a pinned submodule. Those three lived in the `tribble-cluster` submodule until grad-school #26 moved them; the old location no longer exists. Table 3.3 is generated by `table_3_2_memory_precision.py`, which pairs exact memory arithmetic with a measured cross-precision ordering check. Table 3.4 is generated by `table_3_4_gpu_speedups.py` and has been measured on the card named above; §3.3.3 and the table itself carry what that measurement changed. Per-cell provenance is tracked in `reproduce/PROVENANCE_MAP.md`. The one number below that the harness does not produce is the 4,096-point pair, carried over from the NAFIPS measurement and discussed where it appears.
+> **Reproduction.** Table 3.1 regenerates from two generators under `reproduce/tables/`: `table_3_1_pvat_scaling.py`
+> times the exact mergeVAT reorder against a self-contained classical $O (N^3)$ reference across a configurable grid
+> of $N$, and `table_3_1_reorder_three_arm.py` separates the three complexity regimes and verifies every arm's ordering
+> is
+> bit-identical. Both are multi-seed and emit Markdown and CSV. No cell in this chapter is left unexplained. Table 3.7's
+> non-coordinate-domain row is generated rather than marked *pending*: `table_3_7_g2_dtw_nonmetric.py` fetches UCR/UEA
+> time series via `aeon` and reorders their DTW dissimilarity matrices with the same engine as every other row
+> (`REPRO_G2_DATASETS` selects which; run under `uv run --project tribble-cluster --with aeon`). Its companion,
+> `table_3_7_g2_downstream.py`, adds the set-cover-vs-NERFCM comparison Goal G2's decision rule also asks for, reusing
+> Chapter 5's selectors unmodified. The remaining tables run outside the table harness, in this repository's
+> `ClusteringExperiments/`: Table 3.5 from `adversarial_eval.py`, Table 3.6 from `principled_stitch.py`, and Table 3.7
+> from `hardening_eval.py`, each writing a findings file under `ClusteringExperiments/findings/` and driven by
+> `reproduce/experiments/run_cluster_experiment.py`, which puts their directory on `sys.path` and redirects the figure
+> destination so regenerating a figure here cannot dirty a pinned submodule. Table 3.3 is generated by
+> `table_3_2_memory_precision.py`, which pairs exact memory arithmetic with a measured cross-precision ordering check.
+> Per-cell provenance is tracked in `reproduce/PROVENANCE_MAP.md`. The one number below that the harness does not
+> produce
+> is the 4,096-point pair, carried over from the NAFIPS measurement and discussed where it appears.
 >
-> **TODO — repeatable performance (board-wide standard):** the CPU numbers in this section are now single-host, ten-seed, with error bars, and reproduced across independent runs (`reproduce/outputs/full-14900hx-r2/`); the thermally throttled laptop is out of the chapter. What remains open is the hardware half of the protocol: pinned clocks and thermals are not yet enforced, and the GPU rows still come from a consumer card whose double-precision throughput is a fraction of its single-precision rate, so §3.3.3 needs a datacenter GPU with full-rate FP64 before it can be cited as a scalability result. This same standard applies to every performance/scaling claim in the dissertation (Ch 5, Ch 6). Tracked as Goal G4 in Chapter 7.
+> **TODO — repeatable performance (board-wide standard):** the CPU numbers in this section are now single-host,
+> ten-seed, with error bars, and reproduced across independent runs (`reproduce/outputs/full-14900hx-r2/`); the
+> thermally
+> throttled laptop is out of the chapter. What remains open is the hardware half of the protocol: pinned clocks and
+> thermals are not yet enforced, and the GPU rows still come from a consumer card whose double-precision throughput is a
+> fraction of its single-precision rate, so §3.3.3 needs a datacenter GPU with full-rate FP64 before it can be cited as
+> a
+> scalability result. This same standard applies to every performance/scaling claim in the dissertation (Ch 5, Ch 6).
+> Tracked as Goal G4 in Chapter 7.
 
-**Scaling.** The published NAFIPS measurement is a 4,096-point problem in which the classical cubic implementation takes 124 seconds and the stage-one priority-queue reorder takes 2.56, a measured factor of about 48. The harness re-measures the same size against the compiled stage-two kernel and gets 0.231 ± 0.011 s, about 11× faster than the published stage-one figure. That gap is not an anomaly, though it looks at first like a contradiction. The three-arm decomposition independently measures stage one against stage two at 7.4–17.5× across its grid, which brackets it, so the published figure and the current code differ by very nearly the amount §3.3.1's second stage predicts. The two numbers are the same result at two points in the method's history, and I report both rather than quietly replacing the published one.
+**Scaling.** The published NAFIPS measurement is a 4,096-point problem in which the classical cubic implementation takes
+124 seconds and the stage-one priority-queue reorder takes 2.56, a measured factor of about 48. The harness re-measures
+the same size against the compiled stage-two kernel and gets 0.231 ± 0.011 s, about 11× faster than the published
+stage-one figure. That gap is not an anomaly, though it looks at first like a contradiction. The three-arm decomposition
+independently measures stage one against stage two at 7.4–17.5× across its grid, which brackets it, so the published
+figure and the current code differ by very nearly the amount §3.3.1's second stage predicts. The two numbers are the
+same result at two points in the method's history, and I report both rather than quietly replacing the published one.
 
-Every ratio above is against a specific baseline, and those have to be kept apart instead of chained together. The 48× is stage one against a cubic reference, as published. Against the same reference implemented in pure Python, the compiled stage-two kernel reads **673–704× at $N = 1{,}024$** across four runs on this host. Against a *numba-compiled* cubic reference, the conservative and implementation-neutral comparison, and the one I would defend under questioning, the three-arm study reads **about 10× at $N = 100$ rising to about 207× at $N = 1{,}000$**. That it rises is the more useful fact: a growing ratio is the signature of a genuine exponent drop, where a constant factor would hold flat. Both are quoted as ranges and not as single values because they are wall-clock ratios, and §3.4 below is about why that distinction matters. A single headline speedup would have to pick one of those baselines and hide the other two.
+Every ratio above is against a specific baseline, and those have to be kept apart instead of chained together. The 48×
+is stage one against a cubic reference, as published. Against the same reference implemented in pure Python, the
+compiled stage-two kernel reads **673–704× at $N = 1{,}024$** across four runs on this host. Against a *numba-compiled*
+cubic reference, the conservative and implementation-neutral comparison, and the one I would defend under questioning,
+the three-arm study reads **about 10× at $N = 100$ rising to about 207× at $N = 1{,}000$**. That it rises is the more
+useful fact: a growing ratio is the signature of a genuine exponent drop, where a constant factor would hold flat. Both
+are quoted as ranges and not as single values because they are wall-clock ratios, and §3.4 below is about why that
+distinction matters. A single headline speedup would have to pick one of those baselines and hide the other two.
 
-Every one of those ratios is a single-host measurement — the qualifier is load-bearing, and the discussion after Table 3.1 shows how far a ratio moves when the host changes. All of them are also measured against the cubic implementations that exist in this literature, not against a tuned $O(N^2)$ dense Prim, which would narrow the gap considerably.
+Every one of those ratios is a single-host measurement — the qualifier is load-bearing, and the discussion after Table
+3.1 shows how far a ratio moves when the host changes. All of them are also measured against the cubic implementations
+that exist in this literature, not against a tuned $O (N^2)$ dense Prim, which would narrow the gap considerably.
 
 So the claim I want to rest on is none of those ratios, and it needs stating once, precisely.
 
-**Measured:** an exact reorder of the NASA shuttle set, 58,000 points, in about a minute (where the paper's title comes from), and of 135,000 points at float32 with the working cap lifted. Both are single-shot demonstrations on a 96 GB host, in the sense of §7.2: they establish that a problem of that size can be reordered at all, a question with no sampling distribution.
+**Measured:** an exact reorder of the NASA shuttle set, 58,000 points, in about a minute (where the paper's title comes
+from), and of 135,000 points at float32 with the working cap lifted. Both are single-shot demonstrations on a 96 GB
+host, in the sense of §7.2: they establish that a problem of that size can be reordered at all, a question with no
+sampling distribution.
 
-**By arithmetic, from Table 3.3:** the in-place scheme's ceiling is 89,000 points at float64 and 126,000 at float32 under the self-imposed 64 GB working cap, and 155,000 at float32 on the full machine. The classical three-matrix scheme's ceilings are 52,000 and 73,000.
+**By arithmetic, from Table 3.3:** the in-place scheme's ceiling is 89,000 points at float64 and 126,000 at float32
+under the self-imposed 64 GB working cap, and 155,000 at float32 on the full machine. The classical three-matrix
+scheme's ceilings are 52,000 and 73,000.
 
-**By measurement, for the matrix-free path:** no memory ceiling in this range at all. Peak working set is flat at about 65 MB from $N = 2{,}000$ to $12{,}000$ while the matrix those sizes imply grows thirty-six-fold, so what binds is wall clock rather than bytes — and there the matrix-free arm is the *faster* of the two, at 0.14–0.22× the materialising arm's time. The reason this is stated as a separate endpoint rather than folded into the one above is that it rests on a different kind of evidence and stops at a different place: measured to 12,000 points, extrapolated beyond on a ratio stable to 1.62× across an 8× change in $N$, and not yet run at the 155,000 the in-place scheme's ceiling names, because on this host the arm it would be compared against does not fit.
+**By measurement, for the matrix-free path:** no memory ceiling in this range at all. Peak working set is flat at about
+65 MB from $N = 2{,}000$ to $12{,}000$ while the matrix those sizes imply grows thirty-six-fold, so what binds is wall
+clock rather than bytes — and there the matrix-free arm is the *faster* of the two, at 0.14–0.22× the materialising
+arm's time. The reason this is stated as a separate endpoint rather than folded into the one above is that it rests on a
+different kind of evidence and stops at a different place: measured to 12,000 points, extrapolated beyond on a ratio
+stable to 1.62× across an 8× change in $N$, and not yet run at the 155,000 the in-place scheme's ceiling names, because
+on this host the arm it would be compared against does not fit.
 
-**The lower endpoint is the soft one.** "Roughly 5,000 points" is where the reference implementations in this literature are actually used, not a measured feasibility threshold: the classical arm is measured here only to $N = 1{,}024$, plus the published 4,096-point pair, and I have not defined what wall-clock counts as infeasible. Read it as the range the tools are used at, not as a number.
+**The lower endpoint is the soft one.** "Roughly 5,000 points" is where the reference implementations in this literature
+are actually used, not a measured feasibility threshold: the classical arm is measured here only to $N = 1{,}024$, plus
+the published 4,096-point pair, and I have not defined what wall-clock counts as infeasible. Read it as the range the
+tools are used at, not as a number.
 
-That is the claim, and it comes from the memory scheme as much as from the reorder. A speedup ratio is a claim about a baseline; a feasible problem size is a claim about what you can actually study.
+That is the claim, and it comes from the memory scheme as much as from the reorder. A speedup ratio is a claim about a
+baseline; a feasible problem size is a claim about what you can actually study.
 
-**Table 3.1 — Reorder time, classical VAT vs. mergeVAT.** Each row is normalized against its slower arm: the classical reference is the 1.0× baseline, and mergeVAT reads as how many times faster. Absolute seconds and per-seed spreads are in the harness CSV. The largest rows are mergeVAT-only; the classical reference is infeasible there, leaving nothing to normalize against.
+**Table 3.1 — Reorder time, classical VAT vs. mergeVAT.** Each row is normalized against its slower arm: the classical
+reference is the 1.0× baseline, and mergeVAT reads as how many times faster. Absolute seconds and per-seed spreads are
+in the harness CSV. The largest rows are mergeVAT-only; the classical reference is infeasible there, leaving nothing to
+normalize against.
 
-| N (points) | classical VAT (cubic) | mergeVAT | basis |
-|---:|---:|---:|---|
-| 256 | 1.0× (worst) | **25× faster** *(noise — see below)* | harness, 10 seeds, stage two |
-| 512 | 1.0× (worst) | **311× faster** | harness, 10 seeds, stage two |
-| 1,024 | 1.0× (worst) | **673× faster** | harness, 10 seeds, stage two |
-| 2,048 | above the reference cap | ran; no reference to normalize against | harness, 10 seeds, stage two |
-| 4,096 | above the reference cap | ran; no reference to normalize against | harness, 10 seeds, stage two |
-| 4,096 | 1.0× (worst) | ~48× faster | **published**, NAFIPS, stage one |
-| 58,000 | infeasible on this hardware | ran (~1 min, workstation) | demonstration |
-| 135,000 | infeasible | ran (float32, 96 GB, cap lifted) | demonstration |
+| N (points) |       classical VAT (cubic) |                               mergeVAT | basis                            |
+|-----------:|----------------------------:|---------------------------------------:|----------------------------------|
+|        256 |                1.0× (worst) |   **25× faster** *(noise — see below)* | harness, 10 seeds, stage two     |
+|        512 |                1.0× (worst) |                        **311× faster** | harness, 10 seeds, stage two     |
+|      1,024 |                1.0× (worst) |                        **673× faster** | harness, 10 seeds, stage two     |
+|      2,048 |     above the reference cap | ran; no reference to normalize against | harness, 10 seeds, stage two     |
+|      4,096 |     above the reference cap | ran; no reference to normalize against | harness, 10 seeds, stage two     |
+|      4,096 |                1.0× (worst) |                            ~48× faster | **published**, NAFIPS, stage one |
+|     58,000 | infeasible on this hardware |              ran (~1 min, workstation) | demonstration                    |
+|    135,000 |                  infeasible |       ran (float32, 96 GB, cap lifted) | demonstration                    |
 
-**Why this table reports ratios, not seconds.** Within one host the ratio is far steadier than the seconds. On a thermally throttled development laptop the 1,024-point classical arm came back at 22.2, 31.7, then 21.3 s across three runs in one afternoon — a nearly 50% swing — while the ratio between the arms held to 1,146×, 1,116×, 1,129×, under 3%. That is the case for quoting ratios. It does not extend to invariance across machines, at least not for this pair of arms: on the workstation the same ratio was 660×, 673×, 700×, roughly 40% below the laptop's, because the classical reference is interpreted Python and mergeVAT is compiled Cython, so a change of host does not scale the two arms by the same factor. The standard this chapter reports under is therefore the weaker, useful one: within a host a ratio is stabler than seconds; across hosts it is more portable than seconds but not invariant. The most portable quantity is the exponent of Table 3.2, invariant to any constant factor — but *portable* is not *invariant*, and the margin is wider than a change of host. Stage two fitted 2.12 on the laptop against 1.97 here; re-taken on this same host with the kernels rebuilt by **gcc instead of MSVC** it fits **1.77**. A compiler change moves the exponent about as far as a change of machine did, on the arm whose quadratic claim the exponent exists to support. What survives every one of those variations is the qualitative separation — cubic against quadratic — and that is the weight the exponent can carry. It cannot carry a *decimal*, and §3.4's stage-two figure should be read as "quadratic to within the spread the toolchain imposes", not as 1.97. Ratios quoted here are this host's measurements; the harness keeps the seconds and their per-seed spreads in the companion CSV.
+**Why this table reports ratios, not seconds.** Within one host the ratio is far steadier than the seconds. On a
+thermally throttled development laptop the 1,024-point classical arm came back at 22.2, 31.7, then 21.3 s across three
+runs in one afternoon — a nearly 50% swing — while the ratio between the arms held to 1,146×, 1,116×, 1,129×, under 3%.
+That is the case for quoting ratios. It does not extend to invariance across machines, at least not for this pair of
+arms: on the workstation the same ratio was 660×, 673×, 700×, roughly 40% below the laptop's, because the classical
+reference is interpreted Python and mergeVAT is compiled Cython, so a change of host does not scale the two arms by the
+same factor. The standard this chapter reports under is therefore the weaker, useful one: within a host a ratio is
+stabler than seconds; across hosts it is more portable than seconds but not invariant. The most portable quantity is the
+exponent of Table 3.2, invariant to any constant factor — but *portable* is not *invariant*, and the margin is wider
+than a change of host. Stage two fitted 2.12 on the laptop against 1.97 here; re-taken on this same host with the
+kernels rebuilt by **gcc instead of MSVC** it fits **1.77**. A compiler change moves the exponent about as far as a
+change of machine did, on the arm whose quadratic claim the exponent exists to support. What survives every one of those
+variations is the qualitative separation — cubic against quadratic — and that is the weight the exponent can carry. It
+cannot carry a *decimal*, and §3.4's stage-two figure should be read as "quadratic to within the spread the toolchain
+imposes", not as 1.97. Ratios quoted here are this host's measurements; the harness keeps the seconds and their per-seed
+spreads in the companion CSV.
 
-The two largest rows are *demonstrations*, not estimates, in the sense of §7.2, recorded with hardware and precision instead of an error bar.
+The two largest rows are *demonstrations*, not estimates, in the sense of §7.2, recorded with hardware and precision
+instead of an error bar.
 
-Two further things about this table. The mergeVAT column below $N = 1{,}024$ is at the edge of what the clock resolves; the 256-point cell has a standard deviation two and a half times its own mean. So the speedup ratios at those sizes are noise, and I quote them only to show the grid. And the classical column is capped at 1,024 by the harness (`REPRO_NAIVE_CAP`) because it is genuinely cubic; the larger rows are mergeVAT-only for that reason, not because mergeVAT is being flattered.
+Two further things about this table. The mergeVAT column below $N = 1{,}024$ is at the edge of what the clock resolves;
+the 256-point cell has a standard deviation two and a half times its own mean. So the speedup ratios at those sizes are
+noise, and I quote them only to show the grid. And the classical column is capped at 1,024 by the harness
+(`REPRO_NAIVE_CAP`) because it is genuinely cubic; the larger rows are mergeVAT-only for that reason, not because
+mergeVAT is being flattered.
 
-**The 135,000-point row is the one place the working cap is lifted deliberately.** That matrix is 72.9 GB at single precision, comfortably inside the machine's 96 GB but well outside the 64 GB cap the other rows respect. Table 3.3 puts the single-precision in-place ceiling at 154,919 points on the full 96 GB, so the run sits inside the scheme's limit with room to spare. It simply cannot be done under the cap, and I lift the cap rather than pretend the smaller number is a hardware fact. Note also what this row does *not* rely on: it is the in-place scheme at float32, not the matrix-free one — which §3.3.2 now reports as built, but measured only to $N = 12{,}000$.
+**The 135,000-point row is the one place the working cap is lifted deliberately.** That matrix is 72.9 GB at single
+precision, comfortably inside the machine's 96 GB but well outside the 64 GB cap the other rows respect. Table 3.3 puts
+the single-precision in-place ceiling at 154,919 points on the full 96 GB, so the run sits inside the scheme's limit
+with room to spare. It simply cannot be done under the cap, and I lift the cap rather than pretend the smaller number is
+a hardware fact. Note also what this row does *not* rely on: it is the in-place scheme at float32, not the matrix-free
+one — which §3.3.2 now reports as built, but measured only to $N = 12{,}000$.
 
-**Against the reference curves.** A speedup ratio says one arm beat another; it does not say either arm has the complexity I claim for it. The direct test is to normalize *both* axes ($N$ against $N_0$ and time against $t_0$, each at the smallest size swept) and plot on log-log axes. A pure $O(N^k)$ arm is then a straight line of slope $k$, regardless of machine, language or constant factor, and the reference curves can be drawn beside it.
+**Against the reference curves.** A speedup ratio says one arm beat another; it does not say either arm has the
+complexity I claim for it. The direct test is to normalize *both* axes ($N$ against $N_0$ and time against $t_0$, each
+at the smallest size swept) and plot on log-log axes. A pure $O (N^k)$ arm is then a straight line of slope $k$,
+regardless of machine, language or constant factor, and the reference curves can be drawn beside it.
 
-The sweep runs on a two-part grid. Every arm runs the base grid, 100 to 1,000 points, whose ceiling is set by the cubic arm: it has to run at every base point so all three exponents are fitted from the same samples, not the cubic one from whatever fits under a cap. The two quadratic arms then continue to 3,000. That extension is not padding: at the base grid they take milliseconds, where the timer dominates rather than the algorithm, and carrying them to a size with a measurable runtime is what makes their exponents mean anything. The cubic arm cannot follow, since 3,000 cubed is hours, and that asymmetry is the reason for the split.
+The sweep runs on a two-part grid. Every arm runs the base grid, 100 to 1,000 points, whose ceiling is set by the cubic
+arm: it has to run at every base point so all three exponents are fitted from the same samples, not the cubic one from
+whatever fits under a cap. The two quadratic arms then continue to 3,000. That extension is not padding: at the base
+grid they take milliseconds, where the timer dominates rather than the algorithm, and carrying them to a size with a
+measurable runtime is what makes their exponents mean anything. The cubic arm cannot follow, since 3,000 cubed is hours,
+and that asymmetry is the reason for the split.
 
-**Figure 3.4 — Reorder growth against the reference complexity curves.** Both axes normalized to their value at the smallest $N$, on log-log scales, so a pure $O(N^k)$ arm is a straight line of slope $k$. Measured arms solid; the $N^2$, $N^2\log N$ and $N^3$ references dashed and labelled inline. Generated by the harness in PNG and EPS.
+**Figure 3.4 — Reorder growth against the reference complexity curves.** Both axes normalized to their value at the
+smallest $N$, on log-log scales, so a pure $O (N^k)$ arm is a straight line of slope $k$. Measured arms solid;
+the $N^2$, $N^2\log N$ and $N^3$ references dashed and labelled inline. Generated by the harness in PNG and EPS.
 `![complexity-fit](fig/03-complexity-fit.png)`
 
-**Table 3.2 — Measured growth against the reference complexity curves.** Every column normalized to its own value at the smallest $N$. The final row is the least-squares slope of $\log(\text{time})$ against $\log N$, the measured exponent, beside the exponent the arm should have.
+**Table 3.2 — Measured growth against the reference complexity curves.** Every column normalized to its own value at the
+smallest $N$. The final row is the least-squares slope of $\log (\text{time})$ against $\log N$, the measured exponent,
+beside the exponent the arm should have.
 
-| N | N (norm.) | classical | stage 1 | stage 2 | $N^2$ | $N^2\log N$ | $N^3$ |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 100 | 1.0× | 1.00× | 1.00× | 1.00× | 1.00× | 1.00× | 1.00× |
-| 200 | 2.0× | 7.58× | 3.23× | 3.36× | 4.00× | 4.60× | 8.00× |
-| 300 | 3.0× | 27.95× | 6.76× | 7.96× | 9.00× | 11.15× | 27.00× |
-| 500 | 5.0× | 140.20× | 18.15× | 21.14× | 25.00× | 33.74× | 125.00× |
-| 750 | 7.5× | 650.33× | 52.25× | 44.34× | 56.25× | 80.86× | 421.88× |
-| 1,000 | 10.0× | 1434.42× | 81.07× | 69.61× | 100.00× | 150.00× | 1000.00× |
-| 1,250 | 12.5× | — | 129.34× | 113.37× | 156.25× | 241.95× | 1953.12× |
-| 1,500 | 15.0× | — | 174.29× | 152.49× | 225.00× | 357.31× | 3375.00× |
-| 2,000 | 20.0× | — | 245.16× | 304.25× | 400.00× | 660.21× | 8000.00× |
-| 2,500 | 25.0× | — | 343.16× | 565.84× | 625.00× | 1061.86× | 15625.00× |
-| 3,000 | 30.0× | — | 474.52× | 952.10× | 900.00× | 1564.70× | 27000.00× |
-| **fitted exponent** | | **3.20** (6 pts) | **1.86** (11 pts) | **1.97** (11 pts) | 2.00 | ≈2.1 | 3.00 |
+|                   N | N (norm.) |        classical |           stage 1 |           stage 2 |   $N^2$ | $N^2\log N$ |     $N^3$ |
+|--------------------:|----------:|-----------------:|------------------:|------------------:|--------:|------------:|----------:|
+|                 100 |      1.0× |            1.00× |             1.00× |             1.00× |   1.00× |       1.00× |     1.00× |
+|                 200 |      2.0× |            7.58× |             3.23× |             3.36× |   4.00× |       4.60× |     8.00× |
+|                 300 |      3.0× |           27.95× |             6.76× |             7.96× |   9.00× |      11.15× |    27.00× |
+|                 500 |      5.0× |          140.20× |            18.15× |            21.14× |  25.00× |      33.74× |   125.00× |
+|                 750 |      7.5× |          650.33× |            52.25× |            44.34× |  56.25× |      80.86× |   421.88× |
+|               1,000 |     10.0× |         1434.42× |            81.07× |            69.61× | 100.00× |     150.00× |  1000.00× |
+|               1,250 |     12.5× |                — |           129.34× |           113.37× | 156.25× |     241.95× |  1953.12× |
+|               1,500 |     15.0× |                — |           174.29× |           152.49× | 225.00× |     357.31× |  3375.00× |
+|               2,000 |     20.0× |                — |           245.16× |           304.25× | 400.00× |     660.21× |  8000.00× |
+|               2,500 |     25.0× |                — |           343.16× |           565.84× | 625.00× |    1061.86× | 15625.00× |
+|               3,000 |     30.0× |                — |           474.52× |           952.10× | 900.00× |    1564.70× | 27000.00× |
+| **fitted exponent** |           | **3.20** (6 pts) | **1.86** (11 pts) | **1.97** (11 pts) |    2.00 |        ≈2.1 |      3.00 |
 
-The exponents come out where they should, and they are stable: across five independent runs of this sweep on one host the classical arm fitted between 3.14 and 3.21, stage one between 1.84 and 1.87, and stage two between 1.93 and 1.97. Classical at 3.20 against a theoretical 3 confirms the cubic baseline directly rather than by assumption, and that is the arm every speedup in this chapter is measured against. **Stage two at 1.97 confirms the quadratic claim of §3.3.1 about as cleanly as this method can.** Stage one at 1.86 sits a little under 2; the $\log N$ factor is not resolvable over a decade and a half of $N$, so what this establishes is that stage one is quadratic-ish rather than cubic, which is the claim that matters.
+The exponents come out where they should, and they are stable: across five independent runs of this sweep on one host
+the classical arm fitted between 3.14 and 3.21, stage one between 1.84 and 1.87, and stage two between 1.93 and 1.97.
+Classical at 3.20 against a theoretical 3 confirms the cubic baseline directly rather than by assumption, and that is
+the arm every speedup in this chapter is measured against. **Stage two at 1.97 confirms the quadratic claim of §3.3.1
+about as cleanly as this method can.** Stage one at 1.86 sits a little under 2; the $\log N$ factor is not resolvable
+over a decade and a half of $N$, so what this establishes is that stage one is quadratic-ish rather than cubic, which is
+the claim that matters.
 
-**Stage two's advantage over stage one holds everywhere in the swept grid.** Across five runs on the host of record it is monotone in $N$ throughout, 0.4 ms at $N = 750$ rising smoothly to 9.6 ms at $N = 3{,}000$, never flat and never non-monotone, and it beats stage one by **7.4× to 17.5× at every size in the grid**, including 17.3× at $N = 1{,}000$ and 17.0× at 1,250. The orderings remain bit-identical to the serial reference at every size, so the difference is a timing difference and nothing more.
+**Stage two's advantage over stage one holds everywhere in the swept grid.** Across five runs on the host of record it
+is monotone in $N$ throughout, 0.4 ms at $N = 750$ rising smoothly to 9.6 ms at $N = 3{,}000$, never flat and never
+non-monotone, and it beats stage one by **7.4× to 17.5× at every size in the grid**, including 17.3× at $N = 1{,}000$
+and 17.0× at 1,250. The orderings remain bit-identical to the serial reference at every size, so the difference is a
+timing difference and nothing more.
 
-**Figure 3.5 — The three arms in absolute seconds, and stage two's margin.** The same sweep as Table 3.2 and Figure 3.4, drawn in seconds rather than normalized, from the archive's own `table_3_1_three_arm.csv` (`full-14900hx-r2`, the run Table 3.2 is quoted from). Panel (a): mean seconds per arm on log-log axes with the ten-seed spread as error bars, the classical arm ending where the harness caps it — the next size is cubic and would take most of an hour to re-derive a constant factor that is not the claim. Panel (b): the stage-one / stage-two ratio size by size, the margin §3.4 quotes as a range because it depends on $N$ and on the host; this archive's range is printed on the panel, and the five-run range in the text brackets it. Cells that read *not run* are skipped, not interpolated.
+**Figure 3.5 — The three arms in absolute seconds, and stage two's margin.** The same sweep as Table 3.2 and Figure 3.4,
+drawn in seconds rather than normalized, from the archive's own `table_3_1_three_arm.csv` (`full-14900hx-r2`, the run
+Table 3.2 is quoted from). Panel (a): mean seconds per arm on log-log axes with the ten-seed spread as error bars, the
+classical arm ending where the harness caps it — the next size is cubic and would take most of an hour to re-derive a
+constant factor that is not the claim. Panel (b): the stage-one / stage-two ratio size by size, the margin §3.4 quotes
+as a range because it depends on $N$ and on the host; this archive's range is printed on the panel, and the five-run
+range in the text brackets it. Cells that read *not run* are skipped, not interpolated.
 `![03-three-arm-seconds](fig/03-three-arm-seconds.png)`
 
-Determinism across runs is not invariance across machines — the ratios are repeatable to 6% on either host yet 40% apart between them — which is why Goal G4 asks for a fixed hardware protocol, not merely error bars, and why this chapter's numbers come from one identified host with its numeric stack recorded.
+Determinism across runs is not invariance across machines — the ratios are repeatable to 6% on either host yet 40% apart
+between them — which is why Goal G4 asks for a fixed hardware protocol, not merely error bars, and why this chapter's
+numbers come from one identified host with its numeric stack recorded.
 
-The 4,096-point row is the NAFIPS measurement, carried over, because the harness caps its cubic reference at $N \leq 1{,}024$ (`REPRO_NAIVE_CAP`): the cubic arm costs roughly sixty-four times as much at four times the size, hours of compute to re-derive a constant factor that is not the claim. The claim is the *scaling* — exponent dropping from cubic to quadratic, and feasible problem size moving from a few thousand points to a measured 135,000. The evidence for it is Table 3.2, which pins both exponents on the host of record, cubic at 3.20 and quadratic at 1.97, each stable across five runs; the 4,096 row only illustrates a ratio at one convenient size.
+The 4,096-point row is the NAFIPS measurement, carried over, because the harness caps its cubic reference
+at $N \leq 1{,}024$ (`REPRO_NAIVE_CAP`): the cubic arm costs roughly sixty-four times as much at four times the size,
+hours of compute to re-derive a constant factor that is not the claim. The claim is the *scaling* — exponent dropping
+from cubic to quadratic, and feasible problem size moving from a few thousand points to a measured 135,000. The evidence
+for it is Table 3.2, which pins both exponents on the host of record, cubic at 3.20 and quadratic at 1.97, each stable
+across five runs; the 4,096 row only illustrates a ratio at one convenient size.
 
-**Implementation, for verification.** The two stages are checkable against the source, at the commit this document pins: `tribble-cluster` **635ed6e**. The stage-two $O(N^2)$ compact-active-set kernel is `_prim_mst_kernel_64` in [`src/tribbleclustering/pcvat.pyx`](https://github.com/fundthmcalculus/clustering/blob/635ed6e/src/tribbleclustering/pcvat.pyx#L22-L117) (lines 22–117; the `float32` twin is `_prim_mst_kernel_32` at line 392), whose fused relax-and-select inner loop is the `for i in range(m)` block. The stage-one $O(N^2 \log N)$ priority-queue implementation is `vat_prim_mst` in [`src/tribbleclustering/pvat.py`](https://github.com/fundthmcalculus/clustering/blob/635ed6e/src/tribbleclustering/pvat.py#L159-L226) (lines 159–226). Earlier drafts pinned these links to `e3c27e6`, which is behind the harness and, more to the point, is the commit at which `vat_prim_mst_seq` had been *removed* rather than repaired — the reason §3.3.2 and A.6 described a matrix-free path that no longer matches the code. The two Cython kernels sit at identical line numbers in both commits; only `pvat.py` moved. The compiled stage-two path is preferred at import time, with stage one as the portable fallback; the two agree bit-for-bit, which is how each validates the other.
+**Implementation, for verification.** The two stages are checkable against the source, at the commit this document pins:
+`tribble-cluster` **635ed6e**. The stage-two $O (N^2)$ compact-active-set kernel is `_prim_mst_kernel_64` in [
+`src/tribbleclustering/pcvat.pyx`](https://github.com/fundthmcalculus/clustering/blob/635ed6e/src/tribbleclustering/pcvat.pyx#L22-L117)
+(lines 22–117; the `float32` twin is `_prim_mst_kernel_32` at line 392), whose fused relax-and-select inner loop is the
+`for i in range(m)` block. The stage-one $O (N^2 \log N)$ priority-queue implementation is `vat_prim_mst` in [
+`src/tribbleclustering/pvat.py`](https://github.com/fundthmcalculus/clustering/blob/635ed6e/src/tribbleclustering/pvat.py#L159-L226)
+(lines 159–226). The compiled stage-two path is preferred at import time, with stage one as the portable fallback; the
+two agree bit-for-bit, which is how each validates the other.
 
 **Memory.** The in-place scheme changes what is possible rather than merely what is fast.
 
-**Table 3.3 — Memory footprint and reachable $N$, by precision and scheme.** The memory columns are exact arithmetic, $N_{max} = \sqrt{\text{budget} / (k \cdot \text{itemsize})}$ for a scheme holding $k$ matrices, and are labeled as such because they are not measurements. Two budgets, because they mean different things: 96 GB is the machine, 64 GB the working cap. The ordering column *is* measured, each cell running the reorder at that precision and scheme on identical points and comparing the permutation elementwise against the float64 in-place reference, so 1.000 means bit-identical.
+**Table 3.3 — Memory footprint and reachable $N$, by precision and scheme.** The memory columns are exact
+arithmetic, $N_{max} = \sqrt{\text{budget} / (k \cdot \text{itemsize})}$ for a scheme holding $k$ matrices, and are
+labeled as such because they are not measurements. Two budgets, because they mean different things: 96 GB is the
+machine, 64 GB the working cap. The ordering column *is* measured, each cell running the reorder at that precision and
+scheme on identical points and comparing the permutation elementwise against the float64 in-place reference, so 1.000
+means bit-identical.
 
-| precision | scheme | bytes/entry | footprint at N = 64,000 | largest N in 64 GB | largest N in 96 GB | ordering vs. float64 |
-|---|---|---:|---:|---:|---:|---:|
-| float64 | classical (D + copy + work) | 8 | 98.3 GB | 51,639 | 63,245 | 1.000 (exact) |
-| float64 | **in-place (D only)** | 8 | **32.8 GB** | **89,442** | **109,544** | 1.000 (exact) |
-| float64 | **on-demand (matrix-free)** | 8 | **~65 MB** — flat, measured to $N = 12{,}000$ | *not memory-bound* | *not memory-bound* | **1.000 (exact)** |
-| float32 | classical (D + copy + work) | 4 | 49.2 GB | 73,029 | 89,442 | 1.000 (exact) |
-| float32 | **in-place (D only)** | 4 | **16.4 GB** | **126,491** | **154,919** | 1.000 (exact) |
-| float32 | **on-demand (matrix-free)** | 4 | **~65 MB** — flat, measured to $N = 12{,}000$ | *not memory-bound* | *not memory-bound* | 0.9996 ± 0.0012 (ties) |
+| precision | scheme                      | bytes/entry |                       footprint at N = 64,000 | largest N in 64 GB | largest N in 96 GB |   ordering vs. float64 |
+|-----------|-----------------------------|------------:|----------------------------------------------:|-------------------:|-------------------:|-----------------------:|
+| float64   | classical (D + copy + work) |           8 |                                       98.3 GB |             51,639 |             63,245 |          1.000 (exact) |
+| float64   | **in-place (D only)**       |           8 |                                   **32.8 GB** |         **89,442** |        **109,544** |          1.000 (exact) |
+| float64   | **on-demand (matrix-free)** |           8 | **~65 MB** — flat, measured to $N = 12{,}000$ | *not memory-bound* | *not memory-bound* |      **1.000 (exact)** |
+| float32   | classical (D + copy + work) |           4 |                                       49.2 GB |             73,029 |             89,442 |          1.000 (exact) |
+| float32   | **in-place (D only)**       |           4 |                                   **16.4 GB** |        **126,491** |        **154,919** |          1.000 (exact) |
+| float32   | **on-demand (matrix-free)** |           4 | **~65 MB** — flat, measured to $N = 12{,}000$ | *not memory-bound* | *not memory-bound* | 0.9996 ± 0.0012 (ties) |
 
-The in-place scheme buys a factor of $\sqrt{3}$ in reachable $N$ over the classical three-matrix scheme, at every precision and under either budget — the memory contribution to §3.4's scale claim. Halving the precision buys another $\sqrt{2}$, and at $N = 2{,}000$ across ten seeds the float32 ordering is elementwise identical to the float64 one, though this is only a check at one size, and the smallest interesting one. Dropping precision collapses near-equal dissimilarities into equal ones, and ties are what make a minimum spanning tree non-unique, so $N = 2{,}000$ is the size least likely to expose the failure. I state the single-precision row as arithmetic plus a small-$N$ ordering check, not as a free doubling, until the check is repeated at scale (Goal G4). The two budget columns bracket the 135,000-point run — impossible under the cap, unremarkable on the full machine — and nothing more sits behind that row in Table 3.1. The on-demand rows are the ones that changed character: earlier drafts printed them as a negative result, ceiling arithmetic about a scheme that did not work, and they are now a positive one. Their *not memory-bound* entries are no longer arithmetic either — the measured peak is flat at about 65 MB from $N = 2{,}000$ to $12{,}000$, against a matrix that grows thirty-six-fold over the same range. The float32 on-demand row is the one cell in this table that is *not* exact, at $0.9996 \pm 0.0012$: about one position in two thousand, and the same tie-breaking §3.2 describes rather than an error, since the totals agree and reduced precision is exactly what turns near-ties into ties. Precision below float32 is deliberately out of scope here: the CPU kernels ship at 64 and 32 bits. Half precision would pay on a device path, and that path is descoped (§3.3.3, Appendix A.9), so the question is open rather than deferred elsewhere.
+The in-place scheme buys a factor of $\sqrt{3}$ in reachable $N$ over the classical three-matrix scheme, at every
+precision and under either budget — the memory contribution to §3.4's scale claim. Halving the precision buys
+another $\sqrt{2}$, and at $N = 2{,}000$ across ten seeds the float32 ordering is elementwise identical to the float64
+one, though this is only a check at one size, and the smallest interesting one. Dropping precision collapses near-equal
+dissimilarities into equal ones, and ties are what make a minimum spanning tree non-unique, so $N = 2{,}000$ is the size
+least likely to expose the failure. I state the single-precision row as arithmetic plus a small-$N$ ordering check, not
+as a free doubling, until the check is repeated at scale (Goal G4). The two budget columns bracket the 135,000-point
+run — impossible under the cap, unremarkable on the full machine — and nothing more sits behind that row in Table 3.1.
+The on-demand rows are a positive result rather than ceiling arithmetic: their *not memory-bound* entries are not
+arithmetic at all — the measured peak is flat at about 65 MB from $N = 2{,}000$ to $12{,}000$, against a matrix that
+grows thirty-six-fold over the same range. The float32 on-demand row is the one cell in this table that is *not* exact,
+at $0.9996 \pm 0.0012$: about one position in two thousand, and the same tie-breaking §3.2 describes rather than an
+error, since the totals agree and reduced precision is exactly what turns near-ties into ties. Precision below float32
+is deliberately out of scope here: the CPU kernels ship at 64 and 32 bits. Half precision would pay on a device path,
+and that path is descoped (§3.3.3, Appendix A.9), so the question is open rather than deferred elsewhere.
 
-**Figure 3.6 — Footprint against $N$ for each dense scheme, and where the budgets bind.** Every curve is $F(N) = k\,s\,N^2$ for a scheme holding $k$ matrices at $s$ bytes per entry (Appendix A.10.5); the two dashed horizontals are the 64 GB working cap and the 96 GB machine. The markers are Table 3.3's reachable-$N$ cells, read from the archived CSV and drawn at their budget line, so a marker off its curve would mean the table and the formula disagree. Along either budget the in-place scheme reaches $\sqrt{3}$ further than the classical one and float32 another $\sqrt{2}$, visible as equal horizontal offsets on the log axis. The two demonstrations §3.4 names are marked as problem sizes. The matrix-free path has no $N^2$ term and is off this chart by construction; its flat, measured footprint is §3.3.2's separate result.
+**Figure 3.6 — Footprint against $N$ for each dense scheme, and where the budgets bind.** Every curve
+is $F (N) = k\,s\,N^2$ for a scheme holding $k$ matrices at $s$ bytes per entry (Appendix A.10.5); the two dashed
+horizontals are the 64 GB working cap and the 96 GB machine. The markers are Table 3.3's reachable-$N$ cells, read from
+the archived CSV and drawn at their budget line, so a marker off its curve would mean the table and the formula
+disagree. Along either budget the in-place scheme reaches $\sqrt{3}$ further than the classical one and float32
+another $\sqrt{2}$, visible as equal horizontal offsets on the log axis. The two demonstrations §3.4 names are marked as
+problem sizes. The matrix-free path has no $N^2$ term and is off this chart by construction; its flat, measured
+footprint is §3.3.2's separate result.
 `![03-memory-ceiling](fig/03-memory-ceiling.png)`
 
-> **Reproduction.** `reproduce/tables/table_3_2_memory_precision.py`, 10 seeds, ordering at $N = 2{,}000$, supplies the memory arithmetic and the classical and in-place ordering cells. The matrix-free rows' flat ~65 MB footprint and their $0.9996 \pm 0.0012$ float32 figure come from `reproduce/experiments/check_matrix_free_reorder.py`, which measures at $N \in \{1{,}000, 2{,}000, 5{,}000\}$. As of the run of record `table_3_2` independently corroborates the matrix-free ordering at $N = 2{,}000$ — float64 exact, float32 $0.999 \pm 0.002$ — where before the upstream repair it printed $0.001$.
+> **Reproduction.** `reproduce/tables/table_3_2_memory_precision.py`, 10 seeds, ordering at $N = 2{,}000$, supplies the
+> memory arithmetic and the classical and in-place ordering cells. The matrix-free rows' flat ~65 MB footprint and
+> their $0.9996 \pm 0.0012$ float32 figure come from `reproduce/experiments/check_matrix_free_reorder.py`, which
+> measures
+> at $N \in \{1{,}000, 2{,}000, 5{,}000\}$. `table_3_2`'s run of record independently corroborates the matrix-free
+> ordering at $N = 2{,}000$: float64 exact, float32 $0.999 \pm 0.002$.
 
-**No GPU results are reported.** An earlier draft carried a Table 3.4 of
-device-versus-host speedups here. It is withdrawn, for the three reasons §3.3.3
-gives: its largest number measured the CPU baseline's *formulation* rather than the
-hardware, its one honest negative result needed a datacenter card to interpret, and
-the CuPy back ends it ran on were removed upstream in `1ec9667`. The build and what
-it measured are recorded in **Appendix A.9**; reviving it is **Goal G4c**. Nothing
-else in this chapter depends on a device: every number above and below is CPU, on the
-host named at the top of §3.4.
+**No GPU results are reported.** A device-versus-host speedup table is withdrawn from the body, for the reasons §3.3.3
+gives: its largest number measured the CPU baseline's *formulation* rather than the hardware, its one honest negative
+result needs a datacenter card to interpret, and the CuPy back ends it ran on no longer exist upstream. The build and
+what it measured are recorded in **Appendix A.9**; reviving it is **Goal G4c**. Nothing else in this chapter depends on
+a device: every number above and below is CPU, on the host named at the top of §3.4.
 
-*On the numbering.* **Table 3.4's number is retired, not reused.** This chapter runs
-3.1, 3.2, 3.3, 3.5, 3.6, 3.7, and the gap is deliberate: `reproduce/PROVENANCE_MAP.md`
-is indexed by table number and both it and the checklist carry historical entries
-keyed to the current ones, so renumbering the survivors would silently repoint every
-prior citation. A visible gap costs a reader one sentence; a silent shift costs
-every record that came before it.
+*On the numbering.* **Table 3.4's number is retired, not reused.** This chapter runs 3.1, 3.2, 3.3, 3.5, 3.6, 3.7, and
+the gap is deliberate: `reproduce/PROVENANCE_MAP.md`
+is indexed by table number and both it and the checklist carry historical entries keyed to the current ones, so
+renumbering the survivors would silently repoint every prior citation. A visible gap costs a reader one sentence; a
+silent shift costs every record that came before it.
 
+**Clustering quality.** Because mergeVAT is exact single-linkage, it inherits single-linkage's strengths and weaknesses.
+On non-convex data where k-means fails (two moons, concentric circles) mergeVAT and the stitched version both reach an
+adjusted Rand index of 1.00, against 0.27 and 0.00 for k-means. On bridged or touching-anisotropic clusters, where a
+single chain of points connects two real groups, mergeVAT scores 0.00, exactly as single-linkage does. I do not paper
+over this: it is precisely the failure mode that Chapter 5's metric-learning and persistence work is meant to repair.
 
-**Clustering quality.** Because mergeVAT is exact single-linkage, it inherits single-linkage's strengths and weaknesses. On non-convex data where k-means fails (two moons, concentric circles) mergeVAT and the stitched version both reach an adjusted Rand index of 1.00, against 0.27 and 0.00 for k-means. On bridged or touching-anisotropic clusters, where a single chain of points connects two real groups, mergeVAT scores 0.00, exactly as single-linkage does. I do not paper over this: it is precisely the failure mode that Chapter 5's metric-learning and persistence work is meant to repair.
+**Table 3.5 — Adversarial clustering quality (adjusted Rand index).** mergeVAT is exact single-linkage: it wins where
+k-means fails and inherits single-linkage's failures.
 
-**Table 3.5 — Adversarial clustering quality (adjusted Rand index).** mergeVAT is exact single-linkage: it wins where k-means fails and inherits single-linkage's failures.
+| Dataset   |  k-means | single-linkage | exact mergeVAT | naive block | principled stitch |
+|-----------|---------:|---------------:|---------------:|------------:|------------------:|
+| two_moons |     0.27 |           1.00 |           1.00 |        0.39 |          **1.00** |
+| circles   |     0.00 |           1.00 |           1.00 |        0.00 |          **1.00** |
+| aniso     |     0.61 |           0.00 |           0.00 |        0.30 |              0.00 |
+| bridged   | **1.00** |           0.00 |           0.00 |        0.08 |              0.00 |
 
-| Dataset | k-means | single-linkage | exact mergeVAT | naive block | principled stitch |
-|---|---:|---:|---:|---:|---:|
-| two_moons | 0.27 | 1.00 | 1.00 | 0.39 | **1.00** |
-| circles | 0.00 | 1.00 | 1.00 | 0.00 | **1.00** |
-| aniso | 0.61 | 0.00 | 0.00 | 0.30 | 0.00 |
-| bridged | **1.00** | 0.00 | 0.00 | 0.08 | 0.00 |
-
-**The stitch.** Ablating the divide-and-conquer stitch on two moons across a grid of partitions and sizes: the light stitch (random representatives, one cross-edge) averages ARI 0.47; farthest-point representatives alone are worse still at 0.37, and top cross-edges alone reach only 0.61; the principled combination of both reaches a mean ARI of 1.00 across every partition tested, at bounded cost. Both ingredients are required together, and neither alone gets close.
+**The stitch.** Ablating the divide-and-conquer stitch on two moons across a grid of partitions and sizes: the light
+stitch (random representatives, one cross-edge) averages ARI 0.47; farthest-point representatives alone are worse still
+at 0.37, and top cross-edges alone reach only 0.61; the principled combination of both reaches a mean ARI of 1.00 across
+every partition tested, at bounded cost. Both ingredients are required together, and neither alone gets close.
 
 **Table 3.6 — Stitch ablation on two moons, over a grid of partitions and sizes.**
 
-| Stitch variant | mean ARI | min ARI | fraction ≥ 0.9 |
-|---|---:|---:|---:|
-| light (random rep, 1 cross-edge) | 0.47 | 0.00 | 0.44 |
-| top-m cross-edges only (m = 8) | 0.61 | 0.00 | 0.60 |
-| farthest-point reps only | 0.37 | 0.00 | 0.32 |
-| **principled (fps + top-m = 8)** | **1.00** | **1.00** | **1.00** |
+| Stitch variant                   | mean ARI |  min ARI | fraction ≥ 0.9 |
+|----------------------------------|---------:|---------:|---------------:|
+| light (random rep, 1 cross-edge) |     0.47 |     0.00 |           0.44 |
+| top-m cross-edges only (m = 8)   |     0.61 |     0.00 |           0.60 |
+| farthest-point reps only         |     0.37 |     0.00 |           0.32 |
+| **principled (fps + top-m = 8)** | **1.00** | **1.00** |       **1.00** |
 
 **Non-metric robustness.** This is the point of the whole exercise, so I test it directly.
 
-**Table 3.7 — Agreement with exact single-linkage under non-metric dissimilarities.** Agreement is the fraction of the ordering reproduced identically; 1.0 means the divide-and-conquer result is indistinguishable from running exact VAT on the whole matrix.
+**Table 3.7 — Agreement with exact single-linkage under non-metric dissimilarities.** Agreement is the fraction of the
+ordering reproduced identically; 1.0 means the divide-and-conquer result is indistinguishable from running exact VAT on
+the whole matrix.
 
-| Dissimilarity | Metric? | Triangle-inequality violations | Agreement with exact |
-|---|:--:|---:|---:|
-| Euclidean (control) | yes | 0% | 1.0 |
-| Fractional Minkowski, $p = 0.5$ | **no** | ≈ 14% of triples | **1.0** |
-| Cosine | no (not a metric) | — | **1.0** |
-| $k$-nearest-neighbour geodesic | no | — | **1.0** |
-| Real non-coordinate domains (DTW, edit distance, graph kernel) | no | 0.4%–23.6% (dataset-dependent) | **1.0** (3 real datasets, up to N = 24,000) |
+| Dissimilarity                                                  |      Metric?      | Triangle-inequality violations |                        Agreement with exact |
+|----------------------------------------------------------------|:-----------------:|-------------------------------:|--------------------------------------------:|
+| Euclidean (control)                                            |        yes        |                             0% |                                         1.0 |
+| Fractional Minkowski, $p = 0.5$                                |      **no**       |               ≈ 14% of triples |                                     **1.0** |
+| Cosine                                                         | no (not a metric) |                              — |                                     **1.0** |
+| $k$-nearest-neighbour geodesic                                 |        no         |                              — |                                     **1.0** |
+| Real non-coordinate domains (DTW, edit distance, graph kernel) |        no         | 0.4%–23.6% (dataset-dependent) | **1.0** (3 real datasets, up to N = 24,000) |
 
-The fractional-Minkowski row is the sharp test: it violates the triangle inequality on roughly one triple in seven, and the method still reproduces exact single-linkage. That is the evidence that mergeVAT does not quietly assume a metric somewhere in its internals, the precondition for the regime I claimed in §3.2.
+The fractional-Minkowski row is the sharp test: it violates the triangle inequality on roughly one triple in seven, and
+the method still reproduces exact single-linkage. That is the evidence that mergeVAT does not quietly assume a metric
+somewhere in its internals, the precondition for the regime I claimed in §3.2.
 
-**The last row closed, on time series under dynamic time warping (2026-08-12), and it is a genuine result rather than a formality — with one honest complication.** DTW pairwise dissimilarity matrices for three UCR/UEA datasets (`aeon.datasets`) were built and reordered: ECG5000 ($N = 5{,}000$), FordA ($N = 4{,}921$), and Crop ($N = 24{,}000$, the scale target named in Chapter 7's decision rule, ≈ 4.6 GB as a float64 matrix). Exactness — the ordering elementwise identical to the classical cubic reference, checked at the reference's own tractable cap of $N \le 1{,}024$ across ten random subsamples per dataset — held at **1.000 on all three**, extending the fractional-Minkowski row's evidence from a synthetic proxy to genuinely coordinate-free data. Crop's full 24,000-point matrix reorders in 4.7 seconds once built, confirming the engine's own cost lives in the distance computation, not the algorithm, even at this scale. The complication is in the triangle-inequality column, which I report exactly as measured rather than only where it flatters the claim: ECG5000 (20.9%) and Crop (23.6%) are indeed harder than the 14% fractional-Minkowski proxy, but FordA (0.4%) is not — its DTW dissimilarities turned out closer to metric than the synthetic stand-in, which the proxy cannot by itself predict. The non-metric claim is dataset-dependent in degree, confirmed in kind: every real DTW matrix tested violates the triangle inequality somewhere, and the engine's ordering is exact on every one regardless of how much it violates.
+**The last row closes on time series under dynamic time warping, and it is a genuine result rather than a formality —
+with one honest complication.** DTW pairwise dissimilarity matrices for three UCR/UEA datasets (`aeon.datasets`) were
+built and reordered: ECG5000 ($N = 5{,}000$), FordA ($N = 4{,}921$), and Crop ($N = 24{,}000$, the scale target named in
+Chapter 7's decision rule, ≈ 4.6 GB as a float64 matrix). Exactness — the ordering elementwise identical to the
+classical cubic reference, checked at the reference's own tractable cap of $N \le 1{,}024$ across ten random subsamples
+per dataset — held at **1.000 on all three**, extending the fractional-Minkowski row's evidence from a synthetic proxy
+to genuinely coordinate-free data. Crop's full 24,000-point matrix reorders in 4.7 seconds once built, confirming the
+engine's own cost lives in the distance computation, not the algorithm, even at this scale. The complication is in the
+triangle-inequality column, which I report exactly as measured rather than only where it flatters the claim: ECG5000
+(20.9%) and Crop (23.6%) are indeed harder than the 14% fractional-Minkowski proxy, but FordA (0.4%) is not — its DTW
+dissimilarities turned out closer to metric than the synthetic stand-in, which the proxy cannot by itself predict. The
+non-metric claim is dataset-dependent in degree, confirmed in kind: every real DTW matrix tested violates the triangle
+inequality somewhere, and the engine's ordering is exact on every one regardless of how much it violates.
 
-What remains open from Goal G2's full decision rule is downstream usefulness, not exactness. Whether the topological set-cover selectors of Chapter 5 (`select_coverage_cover`, `select_multiscale` — themselves run on a real dissimilarity matrix for the first time in this pass, not merely a code capability) land within 0.05 adjusted Rand index of NERFCM-given-$k$ on at least three of the five named DTW sets is **not yet settled**: on ECG5000, the one dataset with real recoverable cluster structure, the set-cover *beats* NERFCM by 0.122 ARI, which fails the criterion in the favorable direction; on Crop and FordA both methods score far lower in absolute terms and happen to land within 0.05 of each other, a pass that reflects two struggling (Crop) or degenerate (FordA, ARI ≈ 0 for every method tested) results rather than two good ones. ElectricDevices and StarLightCurves were not attempted. The honest summary: the set-cover never loses meaningfully to NERFCM on real non-coordinate data, and does better where there is anything to find, but the specific ARI-parity threshold as written is not yet met on the evidence in hand. This detail belongs to Chapter 5 as much as here; see §7.2's Goal G2 entry for the full accounting.
+What remains open from Goal G2's full decision rule is downstream usefulness, not exactness. Whether the topological
+set-cover selectors of Chapter 5 (`select_coverage_cover`, `select_multiscale` — themselves run on a real dissimilarity
+matrix for the first time in this pass, not merely a code capability) land within 0.05 adjusted Rand index of
+NERFCM-given-$k$ on at least three of the five named DTW sets is **not yet settled**: on ECG5000, the one dataset with
+real recoverable cluster structure, the set-cover *beats* NERFCM by 0.122 ARI, which fails the criterion in the
+favorable direction; on Crop and FordA both methods score far lower in absolute terms and happen to land within 0.05 of
+each other, a pass that reflects two struggling (Crop) or degenerate (FordA, ARI ≈ 0 for every method tested) results
+rather than two good ones. ElectricDevices and StarLightCurves were not attempted. The honest summary: the set-cover
+never loses meaningfully to NERFCM on real non-coordinate data, and does better where there is anything to find, but the
+specific ARI-parity threshold as written is not yet met on the evidence in hand. This detail belongs to Chapter 5 as
+much as here; see §7.2's Goal G2 entry for the full accounting.
 
 ## 3.5 Discussion and Contributions
 
-What the composition buys is an engine that is exact, parallel, memory-lean, and correct on arbitrary dissimilarities, all at once, with its error confined to exactly the places where single-linkage itself is known to be unreliable. None of the individual pieces (the priority queue, in-place permutation, the divide-and-conquer stitch) is new on its own. Bringing them together into one engine that reaches the exact-non-metric-at-scale regime is the contribution, and that regime is unoccupied by the existing fast-VAT literature.
+What the composition buys is an engine that is exact, parallel, memory-lean, and correct on arbitrary dissimilarities,
+all at once, with its error confined to exactly the places where single-linkage itself is known to be unreliable. None
+of the individual pieces (the priority queue, in-place permutation, the divide-and-conquer stitch) is new on its own.
+Bringing them together into one engine that reaches the exact-non-metric-at-scale regime is the contribution, and that
+regime is unoccupied by the existing fast-VAT literature.
 
-There is work left before this is airtight as a journal result, and I name it rather than let a committee find it. The CPU timings come from one identified host at ten seeds with error bars, reproduced across independent runs, and §3.4 measures how far a ratio moves when the host changes, which is why the remaining hardware item matters. Clocks and thermals are still not pinned. The GPU story is no longer part of this chapter: it is descoped to Appendix A.9, and separating the algorithm from the consumer card's double-precision penalty would need both the back ends returning upstream and a datacenter card (Goal G4c). The non-metric claim, the heart of the niche, is no longer resting only on synthetic non-metric dissimilarities: Table 3.7's last row now reports exact ordering on three real DTW time-series matrices up to 24,000 points, closing the exactness half of Goal G2. What is not closed is whether the exact ordering is *useful* downstream — the set-cover-vs-NERFCM comparison Chapter 5 owes on the same real matrices — and that half stays a goal for completion in Chapter 7. Finally, I owe the reader two head-to-heads I have not yet run: against eVAT and clusiVAT on identical datasets, the first comparison a reviewer will want (Goal G4b), and against Fuzzy C-Means and k-means for §3.3.5's estimator, on wall clock and partition quality together, since this chapter measures the engine and never the clustering built on it (Goal G9).
+There is work left before this is airtight as a journal result, and I name it rather than let a committee find it. The
+CPU timings come from one identified host at ten seeds with error bars, reproduced across independent runs, and §3.4
+measures how far a ratio moves when the host changes, which is why the remaining hardware item matters. Clocks and
+thermals are still not pinned. The GPU story is no longer part of this chapter: it is descoped to Appendix A.9, and
+separating the algorithm from the consumer card's double-precision penalty would need both the back ends returning
+upstream and a datacenter card (Goal G4c). The non-metric claim, the heart of the niche, is no longer resting only on
+synthetic non-metric dissimilarities: Table 3.7's last row now reports exact ordering on three real DTW time-series
+matrices up to 24,000 points, closing the exactness half of Goal G2. What is not closed is whether the exact ordering is
+*useful* downstream — the set-cover-vs-NERFCM comparison Chapter 5 owes on the same real matrices — and that half stays
+a goal for completion in Chapter 7. Finally, I owe the reader two head-to-heads I have not yet run: against eVAT and
+clusiVAT on identical datasets, the first comparison a reviewer will want (Goal G4b), and against Fuzzy C-Means and
+k-means for §3.3.5's estimator, on wall clock and partition quality together, since this chapter measures the engine and
+never the clustering built on it (Goal G9).
 
 ---
 
-*Draft — Chapter 3 prose. Citations in bracketed shorthand pending the consolidated `references.bib`. Seven tables (3.1–3.7) and six figures (3.1–3.6) inline. Open items in `../CHECKLIST.md`.*
+*Draft — Chapter 3 prose. Citations in bracketed shorthand pending the consolidated `references.bib`. Seven tables (
+3.1–3.7) and six figures (3.1–3.6) inline. Open items in `../CHECKLIST.md`.*
