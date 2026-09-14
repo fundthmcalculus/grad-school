@@ -38,7 +38,7 @@ the TSK ↔ ReLU neural-network equivalence line (`papers/nn-fis-equivalence/`,
 | `ClusteringExperiments/` | VAT/pVAT TSP experiments, iVAT minimax, GPU VAT, DC-VAT |
 | `FuzzySystemsExperiments/` | Per-dataset FIS scripts: Concrete, PhiUSIIL, turbine, WEC, IoT, BETH, CMAPSS RUL and CMAPSS failure-mode diagnosis, … |
 | `gated-minimax-selection/` | The Chapter 5 driver (`run_all.py` + seeded `results.json`), NERFCM beta-spread, iVAT/multi-scale membership functions |
-| `fis-tsp-strategy/` | FIS strategies for TSP |
+| `experiments/fis-tsp-strategy/` | FIS strategies for TSP |
 | `experiments/` | `fis-acceleration`, `fis-to-neural-net`, `nn-cmapss` (each has its own README and results) |
 | `ode_kernels/` | Cython-accelerated embedded Runge–Kutta ODE integrators (`ode12`…`ode78`, `odeexp`) |
 | `data/` | Datasets: Concrete, Glass, shuttle, WEC, bikeshare, … (`data/.gitignore` says what is fetched instead) |
