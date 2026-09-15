@@ -53,7 +53,7 @@ limitations that follow.
 
 ## 5.2 Background and Prior Art
 
-The nearest prior work is very close, and managing the overlap actively is a defensive necessity as much as a scientific
+The nearest prior work is very close, and managing the overlap actively is a necessity as much as a scientific
 one.
 
 **The hierarchy and the transform are published.** The minimax path distance is the *subdominant ultrametric*,
@@ -96,10 +96,9 @@ work reach into it.
 HDBSCAN's soft clustering already derives membership from merge heights, combining a distance-to-exemplar term with
 a $\lambda$ term. Bonis and Oudot [@bonis2018fuzzy] are *explicitly persistence-based and do use birth and death
 heights* — theirs is "a fuzzy generalization of the ToMATo algorithm which relies on the concept of prominence" — so a
-distinction resting only on determinism versus a random-walk hitting probability would concede far too much and would
+distinction resting only on determinism versus a random-walk hitting probability would
 miss the load-bearing difference. And Harada and Nishino use persistence to set the threshold defining a fuzzy set's
-support [@harada2017multidimensional]: a two-page workshop paper with almost no citations, easy to miss and easy for a
-committee member to find.
+support [@harada2017multidimensional]: a two-page workshop paper with almost no citations.
 
 So the distinction has to be made on three axes at once, and the first is the one that matters. **Bonis and Oudot's core
 width is a single global threshold $\tau/2$, identical for every cluster**, where mine is each cluster's own
@@ -331,7 +330,7 @@ contribution.
 
 This gate is not uniformly the best selector available. It is deliberately conservative, declining to assert structure
 it cannot see clearly: the behavior I want on noise, the wrong behavior on a chained "bridge" between two real clusters,
-where a more aggressive selector wins outright. The conservatism is a choice and not a free lunch, defensible because a
+where a more aggressive selector wins outright. The conservatism is a choice and not a free lunch, justified because a
 fuzzy model on spurious antecedents is worse than one that abstains. One qualification narrows the trade-off: it belongs
 to the *flat* gate. The multi-scale selector of §5.3.2, on the same bridged data, does not pay it. §5.4 reports that
 comparison in full, including the case my gate loses, and both runs with which the tables quote.
@@ -490,7 +489,7 @@ The harness's own caption says as much: *"Averaging over ALL ground-truth levels
 bad — a flat cover lands one level exactly and misses the rest, so its per-level scores are recorded in
 `flat_ari_per_level`."*
 
-So here is the defensible version. A flat cover returns one partition; the band stack returns $L$, one per true level.
+So here is the scoped version. A flat cover returns one partition; the band stack returns $L$, one per true level.
 On all three datasets the flat cover returns $k$ = 2 and scores exactly **1.000 on one true level**, the coarsest, and
 much less on the rest. Each band's score vector peaks at a distinct level, one-to-one and in order: on the three-level
 set, band 0 ($k$ = 8) scores [1.000, 0.581, 0.236] across fine/medium/coarse, band 1 ($k$ = 4) [0.581, 1.000, 0.492],
@@ -714,7 +713,7 @@ memberships." It is **use them only where the structure requires it, and let the
 The topological disjunct count of §5.3.5 cannot be the detector for that decision, for two separate reasons. It is not
 available: the component counter reports arity 1 for every block on every dataset in `arity_detection`, under both modes
 the driver runs, so it has never returned any other value. And it is the wrong instrument in principle, as §5.3.5
-concedes, because a ring *is* one connected component. Component counting cannot distinguish a ring from a blob,
+notes, because a ring *is* one connected component. Component counting cannot distinguish a ring from a blob,
 precisely the discrimination this goal needs.
 
 The results file does contain a detector that separates the cases. `results.json` → `feature_space` scores each
@@ -762,8 +761,8 @@ be.
 
 ## 5.6 Discussion and Contributions
 
-The position I am staking out is deliberately narrow: **one contribution**, which I would rather defend than a longer
-list a reviewer can dismantle. §5.1 names what is prior art and §5.2 gives the citations; the boundary between the two
+The scope of this chapter is deliberately narrow: **one contribution**. §5.1 names what is prior art and §5.2 gives
+the citations; the boundary between the two
 was set by the prior-art head-to-head of §5.5 and the HDBSCAN\* baselines of Appendix A.8.
 
 **The contribution.** A fuzzy set whose support width *and* slope are both derived, per cluster and deterministically,

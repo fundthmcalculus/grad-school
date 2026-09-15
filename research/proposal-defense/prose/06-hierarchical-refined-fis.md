@@ -31,13 +31,13 @@ chapter contribution, and Appendix A.11 covers its architecture, background and 
 The closest competitor is Medina-Chico et al. [@medina2001backpropagation], a soft decision tree with *linear* models in
 the leaves. That is very nearly my fuzzy tree, so the difference has to be precise: their leaves are fit by
 backpropagation, mine are the exact firing-weighted ridge solution in closed form. The daylight is "closed-form exact
-leaf" versus "iteratively fit leaf," not the tree idea itself, which I concede. The rest of the lineage is standard:
+leaf" versus "iteratively fit leaf," not the tree idea itself. The rest of the lineage is standard:
 Janikow [@janikow1998fuzzy] and Yuan and Shaw [@yuan1995induction] for fuzzy decision trees and the ambiguity split
 criterion; Olaru and Wehenkel [@olaru2003complete] for soft splits keeping accuracy while staying interpretable.
 Appendix A.11.2 covers the mixture-of-experts-specific lineage (Jordan and Jacobs's EM, and the TSK-mixture-equivalence
 line this chapter's extension has to bound its claim against).
 
-Magdalena [@magdalena2018do] raises the objection a good committee will: a hierarchical fuzzy system is *not*
+Magdalena [@magdalena2018do] raises the standing objection: a hierarchical fuzzy system is *not*
 automatically more interpretable, because the intermediate variables it introduces can be meaningless. My answer, made
 good by construction: every split and every gate in my hierarchies is over an *original, named input*, never a synthetic
 intermediate. That is exactly the condition Magdalena requires for the claim to hold, and I hold to it deliberately.
@@ -360,7 +360,7 @@ the mechanism and the measurement that bounds it inside every seed spread.
 | CART (reference)                          |     0.826 ± 0.047 <br> *6.73 ± 0.74* |                                — |
 | Random Forest (reference)                 | **0.909 ± 0.019** <br> *4.90 ± 0.31* |                                — |
 
-The table is deliberately a grid rather than a ranking, because the honest answer to "does the hierarchy beat the flat
+The table is deliberately a grid rather than a ranking, because the answer to "does the hierarchy beat the flat
 model?" turns entirely on what one holds fixed.
 
 Give the flat model its full second-order basis and it leads the fuzzy tree by a wide margin; add the antecedent
@@ -405,7 +405,7 @@ sklearn 1.9.0), and pinning an older scikit-learn to rescue one row would move e
 row stays `N/A` until either `m5py` is updated or an M5' implementation is written against a current scikit-learn; it is
 a dependency fault, not an experiment not yet run.
 
-This table covers two things Table 6.1 does not: the external baselines a reviewer will demand (M5 and ANFIS, both still
+This table covers two things Table 6.1 does not: the external baselines (M5 and ANFIS, both still
 owed), and the PhiUSIIL column. It runs every model at **raw features and library defaults**, which is why its Concrete
 numbers sit below Table 6.1's throughout. That is the third axis, and the two must not be read as one series: this
 Concrete column says what these models do untuned, Table 6.1 what they do under the tuned, normalized protocol the
@@ -427,9 +427,9 @@ settling it.
 **The scope.** On raw accuracy the tree does not *reliably* beat the flat model, and it does not shrink the rule count
 below the already-compact flat model either. What it buys is an explicit decision hierarchy over named variables and a
 readable path structure, real only at shallow depth and few terms, which is why I cap depth and leaf count. This is an
-interpretability-for-accuracy trade, made deliberately and stated here rather than left for a reviewer to find.
+interpretability-for-accuracy trade, made deliberately.
 
-**What I propose to add.** Three things. Add the baselines a reviewer will demand (ANFIS, CART/C4.5, M5 model trees,
+**What I propose to add.** Three things. Add the external baselines (ANFIS, CART/C4.5, M5 model trees,
 flat TSK, and the recent Fumanal-Idocin (2025) and D-TSK-FC methods) on identical splits. Broaden the benchmark set
 beyond Concrete and PhiUSIIL to the other domains already scaffolded (turbine, wave-energy, wine, and the IoT sets), so
 the accuracy–interpretability trade is characterized across more than two problems. That item is **unscheduled**: it
@@ -445,7 +445,7 @@ reference-attribution fixes are applied.
 
 ## 6.5 Discussion and Contributions
 
-The defensible contribution is architectural, not any single algorithm: one closed-form ridge primitive reused across a
+The contribution is architectural, not any single algorithm: one closed-form ridge primitive reused across a
 flat FIS and a soft fuzzy tree, with a clean export to a triangular rule base and an extension to temporal data. Every
 building block is prior art and I credit each; the integration is the thing. The Magdalena objection is answered by
 construction and enforced by the declarative plan.

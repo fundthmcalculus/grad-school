@@ -42,8 +42,8 @@ claim speed against the methods a structure-first construction displaces; ANFIS 
 neither is measured, so the "faster than" has nothing on the other side of it and the speed claim stands only against
 tree ensembles that were never the target. **The coordinate-free claim rests on synthetic data.** Chapter 3's niche and
 Chapter 5's premise both assume no coordinates, yet the non-metric matrices tested so far were built *from* coordinate
-data; Goal G2 makes that structural argument empirical. **The interpretability payoff is described, not quantified.** I
-have used the word freely and Table 6.3 has an unmeasured row where its counts should be; Goal G6 owes rule counts, path
+data; Goal G2 makes that structural argument empirical. **The interpretability payoff is described, not quantified.**
+Table 6.3 has an unmeasured row where its counts should be; Goal G6 owes rule counts, path
 lengths and either an established metric or a small expert study. Two smaller debts remain. The timing and accuracy
 tables run on one identified host, but the hardware half of the repeatability protocol (pinned clocks, pinned thermals,
 a datacenter card with full double-precision throughput) is not yet run. And the GPU speed envelope is withdrawn from
@@ -56,7 +56,7 @@ positions in forty-eight thousand, equal-weight tie-breaking rather than error.
 The tally from building the reproduction harness: one goal refuted and later settled on a measurement nobody had taken,
 one crossover retracted, one model found to diverge on one split in ten, one headline speedup cut by an order of
 magnitude, and two claims in Chapter 4 traced to an output partition rather than to the thing they were attributed to.
-That last pair is the one I would defend the standard by. A negative $R^2$ read as evidence about consequent order, and
+That last pair is the strongest case for the standard. A negative $R^2$ read as evidence about consequent order, and
 a collapse read as evidence about bounded inputs, were both artifacts of a default nobody was varying, and each had
 survived ten seeds and several archives before the axis was widened. I count the tally as evidence the standard is
 working, and the two artifacts as evidence that repetition is not the same thing as coverage.

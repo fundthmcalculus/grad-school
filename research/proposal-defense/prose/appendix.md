@@ -449,7 +449,7 @@ peak twenty-four-fold, and the matrix-free peak by a factor of 1.00. The wall cl
 arm runs at 0.14–0.22× the materialising arm's time, both starting from samples, so G4d's second threshold — *fails if
 more than an order of magnitude slower* — is passed in the opposite direction from the one it anticipated.
 
-Two honest limits. At float32 the ordering is $0.9996 \pm 0.0012$ rather than exact, the tie-breaking §3.2 describes
+Two limits. At float32 the ordering is $0.9996 \pm 0.0012$ rather than exact, the tie-breaking §3.2 describes
 rather than an error. And the 155,000-point claim is an **extrapolation from a ratio stable to 1.62× across an 8× change
 in $N$**, not a measurement there: the in-place arm cannot be run at that size on this host, its matrix being 96 GB at
 float32. Regenerate with `reproduce/experiments/check_matrix_free_reorder.py`, whose pass/fail outcomes are registered
@@ -562,7 +562,7 @@ labels against true Gaussian posteriors.
 
 #### The mixture's EM, and the answers the document had pre-absorbed (Chapter 6, Goal G3)
 
-G3's prediction is registered in advance because the document had already absorbed every outcome. A.11.2 concedes that a
+G3's prediction is registered in advance because the document had already absorbed every outcome. A.11.2 notes that a
 single-layer TSK system is functionally equivalent to a mixture of experts; §6.3.5 and §6.4 both measure additional
 search buying less as consequent capacity grows, refinement worth 0.914 at zeroth order, 0.072 at first and 0.037 at
 second, a factor of twenty-five; and A.11.1 says that if the EM slips, the one-shot mixture stands as a completed
@@ -721,7 +721,7 @@ A.7.2 above. Appendix A.3's TSP timings reuse the two_moons/circles synthetics f
 | StarLightCurves                                                                           | {{dataset.starlight_curves.shape}}                             | unwired, same status                                                                                                                                                                                                                                                        |
 | TUDataset graphs (MUTAG, PROTEINS, ENZYMES, NCI1); Duin–Pękalska dissimilarity collection | not stated                                                     | unwired, and one step earlier: verification still in progress                                                                                                                                                                                                               |
 
-**No longer a gap of the "nothing has been run" kind — it is now a partial-evidence gap, and an honest one.** Exactness
+**No longer a gap of the "nothing has been run" kind — it is now a partial-evidence gap.** Exactness
 holds at 1.000 on every real DTW dataset tested, closing that half of Goal G2's decision rule. The downstream-usefulness
 half is not closed: the decision rule needs the set-cover within 0.05 ARI of NERFCM-given-$k$ on at least three of the
 five DTW sets, and while three sets are now measured, only two show the criterion literally met, and both of those
@@ -1183,7 +1183,7 @@ longer **if the triangle inequality holds**. So
 
 $$ w (\text{DFS tour}) \;\le\; 2\, w (T) \;\le\; 2\, w (\mathrm{OPT}) \qquad \text{ (metric } D \text{ only)}. $$
 
-Two things §3.3.6 states more strongly than this supports, and both are worth naming rather than leaving for a reviewer.
+Two things §3.3.6 states more strongly than this supports.
 
 1. **The bound needs a metric.** The whole point of Chapter 3 is exactness on non-metric $D$, and there the shortcutting
    step fails: a direct edge can be longer than the walk it replaces, so no factor is guaranteed. The 2× statement holds
@@ -1204,7 +1204,7 @@ whose bound is not established. §3.3.6 is amended to say so; nothing else in th
 
 ### A.10.8 The classifier is Gaussian naive Bayes with the normalising constants dropped
 
-§4.2 concedes that the classification construction is "closely related to" Gaussian naive Bayes. The relationship is
+§4.2 states that the classification construction is "closely related to" Gaussian naive Bayes. The relationship is
 exact and worth having in one line, because it also predicts a systematic difference.
 
 Take the simplest configuration: one Gaussian per retained feature $j$ and class $k$, with centre $\mu_{jk}$ and
@@ -1223,7 +1223,7 @@ term $\sum_j \log \sigma_{jk}$ **added back**: relative to naive Bayes, the cons
 retained features are *wider*, by exactly that sum. On a class-balanced problem with equal widths the two coincide; on
 Glass, where the automatic component count produces near-zero widths on some classes (§4.3.1, Figure 4.1), they do not,
 and the direction of the difference is predictable — a degenerate spike is penalised heavily by naive
-Bayes's $-\log \sigma$ and not at all here. This is the concrete content of "the missing row a committee will ask for"
+Bayes's $-\log \sigma$ and not at all here. This is the concrete content of "the missing row"
 in Table 4.5: the two models differ by a known additive term, and the row would measure what that term costs.
 
 With several components per feature the correspondence loosens: the within-feature t-conorm $S$ of unnormalised

@@ -36,7 +36,7 @@ path to a compact rule base.
 
 A caveat up front. For classification, fitting an independent Gaussian mixture per feature and per class and combining
 them is closely related to a Gaussian naive-Bayes model — a class-conditional density estimate with a
-feature-independence assumption — and I will not pretend otherwise. The relationship is exact rather than loose: with
+feature-independence assumption. The relationship is exact rather than loose: with
 one Gaussian per feature and class and the product
 t-norm, $\log w_k (x) = \log p_k (x) + \sum_j \log (\sqrt{2\pi}\,\sigma_{jk})$, so the rule argmax is the naive-Bayes
 decision with uniform priors *and* the per-class normalising constants added back — it favours the class whose retained
@@ -166,7 +166,7 @@ union every layer's model, deduplicate at exact numeric tolerance, predict by a 
 gates — keeps +0.014 ± 0.061 of that gain at 83.5 membership functions: under half the accuracy benefit survives, for
 almost none of the size penalty. This does not give the per-class confusion detail the original ask specified; that
 finer-grained comparison, and RT-IOT2022 at its intended scale, are still owed. What it does settle is the coarser
-question the concession above was really standing in for: the pass helps, and the gating logic a flattened deployment
+question: the pass helps, and the gating logic a flattened deployment
 discards is doing real work, not decoration, so a deployment that wants the full gain needs the cascade rather than just
 the rules it leaves behind.
 
@@ -601,12 +601,11 @@ noisier. Concrete is the first arm fit, so seed 0 absorbs import, JIT, thread-po
 PhiUSIIL row (fitted second, so never affected by the warm-up cost). Accuracy is unaffected by the warm-up fit either
 way, so the effect is confined to the clock (`PROVENANCE_MAP.md`, note 14).
 
-One missing row a committee is most likely to ask for. §4.2 names Gaussian naive Bayes as this construction's nearest
-acknowledged relative and concedes the resemblance up front, and then it does not appear here, while CART and Random
-Forest do. That asymmetry is not defensible on effort: unlike ANFIS and a GA-tuned FIS, which need adapters written,
-Gaussian naive Bayes is one import from scikit-learn, and no generator under `reproduce/tables/` instantiates it. It is
-listed below as not run because it is a debt, not because it is hard. Until it is filled, this chapter's accuracy
-comparison has no row for the model whose factorization it shares, the single cheapest experiment on the list.
+One missing row. §4.2 names Gaussian naive Bayes as this construction's nearest acknowledged relative, and it does not
+appear in the table, while CART and Random Forest do. The omission is not an effort issue: unlike ANFIS and a GA-tuned FIS,
+which need adapters written, Gaussian naive Bayes is one import from scikit-learn, and no generator under `reproduce/tables/`
+instantiates it. It is listed below as not run, and until it is filled, this chapter's accuracy comparison has no row for
+the model whose factorization it shares — the single cheapest experiment on the list.
 
 | Method                                        |              Concrete R² | Concrete train time |        PhiUSIIL accuracy | PhiUSIIL train time |
 |-----------------------------------------------|-------------------------:|--------------------:|-------------------------:|--------------------:|
@@ -625,7 +624,7 @@ and scatter-partitions at scale (12 rules); the GA-tuned FIS evolves the same pr
 generations. They **match or beat the MoG arm on accuracy in four of the five rows** — GA-FIS takes Concrete outright at
 0.896 ± 0.038 against the full-2nd MoG's 0.852, and both take PhiUSIIL at ≈ 0.999 against 0.440. The single row the
 construction wins is **Bike Sharing** (0.620 ± 0.014 against ANFIS's 0.577 ± 0.075 and GA-FIS's 0.545 ± 0.047) — and
-that is also the row with the weakest speedup below, so both honesties land on the same line. Whatever the speed table
+that is also the row with the weakest speedup below. Whatever the speed table
 says, it is not bought with a weaker model.
 
 **Table 4.1b — What the construction buys, in wall-clock.** Training seconds, mean ± s.d. over the same ten seeds and
@@ -639,19 +638,19 @@ splits as Table 4.5. "Speedup" is the ratio of means, slowest of {ANFIS, GA-FIS}
 | PhiUSIIL (classification)             | 0.13 ± 0.02 s |   22.53 ± 2.30 s | 25.29 ± 1.55 s | 1.31 ± 0.23 s |                     **194×** |
 | RT-IOT2022 (12-class)                 | 3.64 ± 0.25 s | 264.53 ± 25.30 s | 51.58 ± 1.25 s | 6.67 ± 0.39 s |                      **73×** |
 
-**Read the range, not the headline.** The honest statement is **14× to 194×**, one to two orders of magnitude, not a
+**Read the range, not the headline.** The accurate statement is **14× to 194×**, one to two orders of magnitude, not a
 flat "two orders". Bike Sharing at 14× is the weakest and belongs in the claim: it is the case where the fuzzy baselines
 are cheapest, because ANFIS scatter-partitions to twelve rules there rather than grid-partitioning to 256 as it does on
-Concrete. Two further honesties. The random forest is *not* slower than the construction on Concrete or Bike Sharing —
+Concrete. Two further caveats. The random forest is *not* slower than the construction on Concrete or Bike Sharing —
 the speed argument is against fuzzy-system induction, not against trees. And Concrete's ratio is 78×, at ten seeds and
 against a GA-FIS baseline that itself runs the dual-form consequent solve of grad-school #237 (a 3.4× speedup over an
-unoptimised GA-FIS): the faster the baseline gets, the more honest the ratio.
+unoptimised GA-FIS).
 
 **Figure 4.5 — Training time by method and dataset, from Table 4.1b's own CSV.** Grouped bars on a log axis, one group
 per dataset, four arms: the construction, ANFIS, the GA-tuned FIS and the random forest reference, mean seconds with the
 ten-seed spread as error bars, and the table's own speedup column — the construction against the slower of the two fuzzy
 baselines — printed above each group. Drawn from `phiusiil-leakfree-2026-08-30`, the archive Table 4.1b is quoted from,
-so the two cannot disagree. The picture makes the two honesties of the paragraph above visible at once: the ratio is a
+so the two cannot disagree. The picture makes the two caveats of the paragraph above visible at once: the ratio is a
 range spanning an order of magnitude, and the random forest bars are level with or below the construction's on Concrete
 and Bike Sharing, so the argument is against fuzzy-system induction and not against trees.
 `![04-speedup](fig/04-speedup.png)`
@@ -762,8 +761,8 @@ without reversing it. First, the false-alarm rate sits between 43% and 44% for e
 shipped $\theta = 0.99$ — a loose operating point — and Table 4.6's sweep, which found a materially better setting on
 Glass, has now been run here too (Table 4.7c): a different $\theta$ *narrows* the gap but does not close it. Second, the
 detection-rate spread (±0.270) is large enough that individual classes plausibly vary a great deal, information this
-table's per-class average discards. Neither caveat licenses treating +0.366 as competitive with +0.535. The honest
-reading is that the free, no-second-model property survives at scale and the accuracy parity does not, at this operating
+table's per-class average discards. Neither caveat licenses treating +0.366 as competitive with +0.535. The reading:
+the free, no-second-model property survives at scale and the accuracy parity does not, at this operating
 point, on this dataset — and the θ-sweep, now run, shows the gap is **fundamental rather than an artefact of the
 operating point**: over the whole usable range $J$ peaks at +0.396 ($\theta = 0.80$), still 0.139 below Isolation
 Forest. One-class SVM's training was capped at a 20,000-row subsample per fold — libsvm's fit time is superlinear enough
@@ -826,7 +825,7 @@ keeps producing the numbers already archived from it.
 **On the configuration §4.3.5 was written for, the complement rule reaches parity with the one-class SVM.** $J$ of
 +0.843 against +0.841, at 0.993 detection for both. That is the *opposite* of Table 4.7b's verdict, and the two are not
 in conflict: 4.7b is leave-one-class-out on RT-IOT2022, a multi-class surrogate for open-set behaviour, while this is
-the genuine one-class regime on {{dataset.beth.rows_approx}} rows. The honest summary across both is that the
+the genuine one-class regime on {{dataset.beth.rows_approx}} rows. The summary across both is that the
 construction is competitive where it was designed to be used and behind purpose-built detectors on the surrogate
 protocol — which is a better result for the chapter than either table alone, and still not a win: the SVM leads on
 threshold-free ranking (AUC 0.996 against 0.990), and Table 4.11 (d) shows Isolation Forest overtaking both once its own
@@ -839,8 +838,7 @@ convention so the two tables stay comparable. The companion tables replace it wi
 the $(1-\text{budget})$ quantile of each arm's own benign- *validation* scores — under which Isolation Forest is a
 strong arm rather than a broken one, reaching $J$ **+0.864** there and **+0.879** in Table 4.11 (d) once its
 `max_samples` default is corrected too — its best measured showing, and second only to the complement rule's own
-**+0.914** at six features (Table 4.11 (c)), which is the highest $J$ anywhere in this family. Quoting only the row
-above would libel it.
+**+0.914** at six features (Table 4.11 (c)), which is the highest $J$ anywhere in this family.
 
 **The shipped anomaly score costs 0.062 AUC to floating point, at eight features.** The two complement-rule rows are the
 same fitted model at the same operating point, differing only in how per-feature memberships are aggregated:
@@ -1042,11 +1040,9 @@ accuracy for the base classifier, the gated correction-rule cascade, and the cas
 FIS, mean ± s.d. over ten paired seeds. This is a retargeting, not a fill-in. The figure was scoped as a before/after
 confusion matrix on RT-IOT2022, and that comparison still cannot be drawn — RT-IOT2022 is now a dataset the harness
 loads (§4.4, Table 4.7b), but the correction-rule cascade specifically has not been run on it, so the gap is the same
-shape as before with a different cause: an unrun experiment, not a missing file. What closed is the claim the figure was
-standing in for: §4.3.1's concession that the correction pass's accuracy contribution had not been isolated. Once that
-was measured, on Glass, continuing to hold the figure for a dataset that was never going to arrive stopped being honesty
-about a limitation and started being an excuse not to draw the measurement that exists. `reproduce/figures/registry.py`
-records the retargeting and the reasoning behind it.
+shape as before with a different cause: an unrun experiment, not a missing file. The figure's open item — §4.3.1's note that
+the correction pass's accuracy contribution had not been isolated — is closed: it was measured on Glass, and the measurement is
+drawn. `reproduce/figures/registry.py` records the retargeting and the reasoning behind it.
 `![rtiot-confusion](fig/04-rtiot-confusion.png)`
 
 ### 4.4.1 Turbofan Remaining Useful Life: a large-scale regression case study
@@ -1063,7 +1059,7 @@ here is one run on the dataset's own held-out engines, carried on its own script
 (`cmapss_all_datasets_report.md`), not through `reproduce/tables/`. It is *demonstrated* in Appendix A.7's sense, not
 *measured* — and what a genuine variance study would re-seed is not the split but the **training-set subsample** (the
 pooled fit draws 30k of ~221k rows at a fixed seed) together with the model's `random_state`. That train-subsample study
-is the honest reproducibility axis for a fixed-split benchmark, and it is deferred to a future PR (`CHECKLIST` **C14**).
+is the appropriate reproducibility axis for a fixed-split benchmark, and it is deferred to a future PR (`CHECKLIST` **C14**).
 I include the case study now because it exercises the answer-first *regression* construction of §4.3.2 on exactly the
 kind of data the rest of the chapter lacks — a large-scale physical-engineering regression, the partner Concrete has
 never had (§4.4, A.7.1) — and puts the method against published deep-learning baselines on the split they themselves
@@ -1149,8 +1145,8 @@ case where you least want an unexplainable answer.
 What is and is not established. The construction is real and the timings are measured, not estimated, and the run of
 record supplies the headline row's clock and its accuracy from one file. The speed claim is only fully persuasive
 against the right baselines, and I have not run the head-to-head against ANFIS and a genetic-algorithm-tuned FIS on
-identical splits, nor against Gaussian naive Bayes, the cheapest of the three and the one §4.2 concedes the closest
-kinship to. That table is the first thing I owe this chapter, a goal for completion. These numbers are also subject to
+identical splits, nor against Gaussian naive Bayes, the cheapest of the three and the one §4.2 names as its nearest
+relative. That table is the first thing I owe this chapter, a goal for completion. These numbers are also subject to
 the board-wide repeatability standard, with fixed hardware, multiple seeds and error bars. And the accuracy claim's
 scope is bounded by the naive-Bayes-like factorization: where feature interactions matter a great deal, the flat model
 will leave accuracy on the table, precisely the gap the hierarchical models of Chapter 6 exist to close. The bridge in

@@ -5,8 +5,8 @@ is done, with its paper in preparation; Chapters 5 and 6 have working code and p
 finishing, hardening, and connecting the pieces into one system, and the plan uses all fifteen months of runway from the
 proposal defense at the end of 2026 to the final defense in March 2028.
 
-Every goal below carries a named experiment, a metric, a threshold, and the outcome that counts as refutation, because a
-committee cannot approve what it cannot check. Where the likely outcome is a null result, it is predicted in advance.
+Every goal below carries a named experiment, a metric, a threshold, and the outcome that counts as refutation.
+Where the likely outcome is a null result, it is predicted in advance.
 The statuses here are decisions; Appendix A.6 collects the evidence behind them, including the investigations that did
 not work.
 
@@ -97,8 +97,9 @@ and Chapter 10 gives it its own bar.
 *Decision rule.* Exact VAT ordering on shared datasets across the swept grid, ten seeds, run-of-record host. Metrics:
 wall clock, peak memory, ordering agreement against the serial reference. Two thresholds, since the competitors fail
 differently. clusiVAT samples and is approximate: agreement 1.000 where it does not reach it, within one order of
-magnitude on wall clock. eVAT is already exact on a GPU (§3.2 concedes I am not claiming the first), so the claim is
-in-place footprint at matched $N$. Refuted if eVAT matches the in-place ceiling, collapsing Chapter 3's memory
+magnitude on wall clock. eVAT is already exact on a GPU, and Chapter 3 does not claim the first exact
+implementation, so the claim is in-place footprint at matched $N$. Refuted if eVAT matches the in-place
+ceiling, collapsing Chapter 3's memory
 contribution to a constant factor.
 
 ### G4c — The device path, if it returns (experiment; blocked on software *and* hardware)
@@ -305,8 +306,8 @@ above found four that run on a dissimilarity matrix without needing coordinates.
 
 ### G3 — The hierarchical mixture, finished and compared (build + experiment; one-shot built)
 
-Implement the EM refinement of the mixture of experts, and benchmark the family against the baselines a reviewer will
-demand on identical splits. The mixture is supporting work rather than a chapter contribution (Appendix A.11), and this
+Implement the EM refinement of the mixture of experts, and benchmark the family against the external baselines
+on identical splits. The mixture is supporting work rather than a chapter contribution (Appendix A.11), and this
 goal's output extends that appendix section, not Chapter 6.
 
 **The baseline list is narrowed deliberately, and Appendix A.11.3's version should narrow to match.** To be built: ANFIS
@@ -375,7 +376,7 @@ two by design and the phase-2 work already measures one at machine precision, wh
 rather than a new experiment.
 
 **The expert-audience study is dropped**, and stays post-defense work; Appendix A.6 sets out why it would not be
-defensible as things stand. The consequence is stated rather than absorbed. §6.2 lists "whether a rule base mixing one-
+justified as things stand. The consequence is stated rather than absorbed. §6.2 lists "whether a rule base mixing one-
 and two-dimensional antecedents reads coherently to a domain expert" as a question only a person can answer and points
 at G6 as its home; that question is now unanswered here, and §6.2's bound has to hold for the hierarchy as built. §2.6's
 position on post-hoc explanation is reframed instead of tested, since "post-hoc answers a different question" needs no
@@ -454,8 +455,9 @@ which recorded blockers the new pin has removed.
 
 ## 7.4 Risks
 
-One risk has no goal above it: the prior-art overlap in Chapter 5 with Bonis and Oudot. If a reviewer collapses the
-three axes of daylight already stated, the integration and the one-pass membership generation still stand as novel. The
+One risk has no goal above it: the prior-art overlap in Chapter 5 with Bonis and Oudot. If that overlap is pressed
+past the three axes of daylight already stated, the integration and the one-pass membership generation still stand
+as novel.
 EM's fallback is in G3, the GPU's in G4c.
 
 **The baseline tables in Chapters 4 and 6 are the first experiments I owe, which means they are now first in the
@@ -474,12 +476,12 @@ and this is the entry that makes the boundary a tracked item rather than a discl
 the closest goal is **G6**, and G6 measures the exported partition's semantic properties (coverage, distinguishability,
 normality, partition-of-unity error), which is a fuzzy-design criterion and not a certification one. Making the framing
 load-bearing would need an operational design domain, a hazard analysis, behavioural coverage of the rule base over that
-domain, and traceability records; that is a dissertation of its own, and if a committee wants it inside this one,
-something in Table 7.1 has to come out. The honest position for the defense is that this work makes a certifiable model
+domain, and traceability records; that is a dissertation of its own, and if it comes inside this one,
+something in Table 7.1 has to come out. The scope of this work is to make a certifiable model
 family *available* and does not certify anything.
 
-Two exposures a committee will find. My selection gate in Chapter 5 loses outright to more aggressive selectors on the
-bridge case, and Table 5.3's coverage column weakens even the conservatism defence I recorded: bottleneck-bootstrap
+Two weaknesses are stated here. The selection gate in Chapter 5 loses outright to more aggressive selectors on the
+bridge case, and Table 5.3's coverage column weakens even the conservatism position recorded there: bottleneck-bootstrap
 repairs the bridge while still declining three-quarters of the noise. And Chapter 3's non-metric claim rests on
 synthetic matrices built from coordinate data until G2 runs.
 

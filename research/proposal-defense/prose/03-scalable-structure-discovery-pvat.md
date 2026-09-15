@@ -40,7 +40,7 @@ orderings differ while both remain valid VAT orderings. It is not a hypothetical
 at the largest single-precision size tested. Reduced precision makes it more likely, since float32 turns near-ties into
 ties. The reduction above therefore holds exactly when the MST is unique, and holds up to tie-breaking when it is not.
 
-There is already work on fast VAT, and mergeVAT belongs against it plainly: these are the comparisons a reviewer asks
+There is already work on fast VAT, and mergeVAT belongs against it plainly: these are the comparisons asked
 for first. **clusiVAT** [@kumar2016clusivat] samples the data and is therefore approximate: fast, but not the exact VAT
 ordering. The **parallel edge-based GPU VAT** of Meng and Yuan [@meng2018evat], sometimes called eVAT, already puts an
 exact VAT on a GPU, so I cannot claim to be the first to do that, and I do not. **Fast-VAT** [@avinash2025fastvat] is
@@ -104,7 +104,7 @@ $$ \sum_{r=1}^{N-1} r\, (N-r) = \frac{N^3 - N}{6}, \qquad \underbrace{\sum_{r=1}
 — and Appendix A.10.4 derives each, including why the heap is the *only* source of the log factor in stage one and what
 makes the fusion in stage two legal.
 
-The ingredients in stage two are old, and I would rather scope the claim myself than have a reviewer do it for me.
+The ingredients in stage two are old, and the claim is scoped to exactly what stage two adds.
 Compact active-set dense Prim is classical. Maintaining best-distances-to-tree, removing by swap-with-last, and fusing
 relaxation with selection are what a competently written dense Prim looks like, and dense Prim has been $O (N^2)$ since
 
@@ -489,8 +489,8 @@ mergeVAT is being flattered.
 **The 135,000-point row is the one place the working cap is lifted deliberately.** That matrix is 72.9 GB at single
 precision, comfortably inside the machine's 96 GB but well outside the 64 GB cap the other rows respect. Table 3.3 puts
 the single-precision in-place ceiling at 154,919 points on the full 96 GB, so the run sits inside the scheme's limit
-with room to spare. It simply cannot be done under the cap, and I lift the cap rather than pretend the smaller number is
-a hardware fact. Note also what this row does *not* rely on: it is the in-place scheme at float32, not the matrix-free
+with room to spare. It simply cannot be done under the cap, so the cap is lifted and the larger number
+reported. Note also what this row does *not* rely on: it is the in-place scheme at float32, not the matrix-free
 one — which §3.3.2 now reports as built, but measured only to $N = 12{,}000$.
 
 **Against the reference curves.** A speedup ratio says one arm beat another; it does not say either arm has the
@@ -624,7 +624,7 @@ footprint is §3.3.2's separate result.
 > ordering at $N = 2{,}000$: float64 exact, float32 $0.999 \pm 0.002$.
 
 **No GPU results are reported.** A device-versus-host speedup table is withdrawn from the body, for the reasons §3.3.3
-gives: its largest number measured the CPU baseline's *formulation* rather than the hardware, its one honest negative
+gives: its largest number measured the CPU baseline's *formulation* rather than the hardware, its one negative
 result needs a datacenter card to interpret, and the CuPy back ends it ran on no longer exist upstream. The build and
 what it measured are recorded in **Appendix A.9**; reviving it is **Goal G4c**. Nothing else in this chapter depends on
 a device: every number above and below is CPU, on the host named at the top of §3.4.
@@ -684,7 +684,7 @@ the method still reproduces exact single-linkage. That is the evidence that merg
 somewhere in its internals, the precondition for the regime I claimed in §3.2.
 
 **The last row closes on time series under dynamic time warping, and it is a genuine result rather than a formality —
-with one honest complication.** DTW pairwise dissimilarity matrices for three UCR/UEA datasets (`aeon.datasets`) were
+with one complication.** DTW pairwise dissimilarity matrices for three UCR/UEA datasets (`aeon.datasets`) were
 built and reordered: ECG5000 ($N = 5{,}000$), FordA ($N = 4{,}921$), and Crop ($N = 24{,}000$, the scale target named in
 Chapter 7's decision rule, ≈ 4.6 GB as a float64 matrix). Exactness — the ordering elementwise identical to the
 classical cubic reference, checked at the reference's own tractable cap of $N \le 1{,}024$ across ten random subsamples
@@ -704,7 +704,7 @@ NERFCM-given-$k$ on at least three of the five named DTW sets is **not yet settl
 real recoverable cluster structure, the set-cover *beats* NERFCM by 0.122 ARI, which fails the criterion in the
 favorable direction; on Crop and FordA both methods score far lower in absolute terms and happen to land within 0.05 of
 each other, a pass that reflects two struggling (Crop) or degenerate (FordA, ARI ≈ 0 for every method tested) results
-rather than two good ones. ElectricDevices and StarLightCurves were not attempted. The honest summary: the set-cover
+rather than two good ones. ElectricDevices and StarLightCurves were not attempted. Summary: the set-cover
 never loses meaningfully to NERFCM on real non-coordinate data, and does better where there is anything to find, but the
 specific ARI-parity threshold as written is not yet met on the evidence in hand. This detail belongs to Chapter 5 as
 much as here; see §7.2's Goal G2 entry for the full accounting.
@@ -717,7 +717,7 @@ of the individual pieces (the priority queue, in-place permutation, the divide-a
 Bringing them together into one engine that reaches the exact-non-metric-at-scale regime is the contribution, and that
 regime is unoccupied by the existing fast-VAT literature.
 
-There is work left before this is airtight as a journal result, and I name it rather than let a committee find it. The
+There is work left before this is airtight as a journal result, and it is named here. The
 CPU timings come from one identified host at ten seeds with error bars, reproduced across independent runs, and §3.4
 measures how far a ratio moves when the host changes, which is why the remaining hardware item matters. Clocks and
 thermals are still not pinned. The GPU story is no longer part of this chapter: it is descoped to Appendix A.9, and
@@ -726,8 +726,8 @@ upstream and a datacenter card (Goal G4c). The non-metric claim, the heart of th
 synthetic non-metric dissimilarities: Table 3.7's last row now reports exact ordering on three real DTW time-series
 matrices up to 24,000 points, closing the exactness half of Goal G2. What is not closed is whether the exact ordering is
 *useful* downstream — the set-cover-vs-NERFCM comparison Chapter 5 owes on the same real matrices — and that half stays
-a goal for completion in Chapter 7. Finally, I owe the reader two head-to-heads I have not yet run: against eVAT and
-clusiVAT on identical datasets, the first comparison a reviewer will want (Goal G4b), and against Fuzzy C-Means and
+a goal for completion in Chapter 7. Finally, two head-to-heads remain to run: against eVAT and
+clusiVAT on identical datasets (Goal G4b), and against Fuzzy C-Means and
 k-means for §3.3.5's estimator, on wall clock and partition quality together, since this chapter measures the engine and
 never the clustering built on it (Goal G9).
 

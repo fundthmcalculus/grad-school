@@ -105,7 +105,7 @@ no author, title, or DOI, for the kd-tree memory methods that §2.2 and §3.2 no
 reference material misattributes `zhang2023tsk` to "H. Wang et al." when the first author is Zhang. Chapter 6 §6.4 calls
 it "a small attribution fix in the references", which undersells it. The `.bib` entry carries the correct author list
 and an inline comment saying so, so the fix belongs in the prose and README that cite it, not in the file. But a
-misattributed survey citation is what a committee notices; it does not belong alongside an accent check. So: **two open
+misattributed survey citation is a substantive error; it does not belong alongside an accent check. So: **two open
 items, one substantive (E7) and one cosmetic** (confirm the "Kališnik" accent survives the final BibTeX/LaTeX encoding),
 plus the five entry-level gaps above.
 

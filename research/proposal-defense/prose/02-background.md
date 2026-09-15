@@ -194,7 +194,7 @@ given different spreads deliberately: the tighter one is born lower, the density
 tool.
 `![persistence](fig/02-persistence.png)`
 
-I use only as much topological data analysis as I need for this. The nearest prior work, and the precedent I concede in
+I use only as much topological data analysis as I need for this. The nearest prior work, and the precedent recorded in
 Chapter 5, is persistence-based clustering: [@chazal2013persistence] (ToMATo) and the beta-plateau method
 of [@bonis2018fuzzy], which already derive a cluster count from persistence gaps.
 
@@ -305,8 +305,8 @@ analysis in place of testing where a mathematically-based argument can be made a
 sample of it. Machine-learned components fit that framework badly, and the aviation authorities have said so at length
 rather than in passing: EASA's AI roadmap [@easa2023airoadmap] and its Level 1 & 2 machine-learning concept
 paper [@easa2024mlconcept] replace the software life cycle with a *learning assurance* one and make explainability an
-objective in its own right, precisely because a trained network offers no artifact from which a reviewer can read the
-requirements back.
+objective in its own right, precisely because a trained network offers no artifact from which the
+requirements can be read back.
 
 A fuzzy rule base over named variables is the unusual case where that artifact already exists. Twelve rules over
 eighty-two features is a document; so is the triangular partition Chapter 6 §6.3.4 exports. The rules are finite, the
@@ -337,8 +337,8 @@ review possible, and Arnett et al. show the family admits one, but neither fact 
 I claim is structural and nothing more — that the models this pipeline produces are of a kind a V&V process can take as
 an input rather than having to reconstruct. Turning that into evidence would need an operational design domain, a hazard
 analysis, coverage of the rule base's behaviour over that domain, and the traceability records the objectives actually
-ask for; that is a body of work this proposal neither contains nor schedules, and §7.4 records it as an exposure where a
-committee will look for it.
+ask for; that is a body of work this proposal neither contains nor schedules, and §7.4 records it as an
+open exposure.
 
 ---
 
