@@ -2,56 +2,182 @@
 
 ## 1.1 Prelude
 
-The tribble is a small, purring creature from *Star Trek* whose only talent is reproduction. Left alone with enough food, a handful becomes a compartment full, and eventually a problem for the whole ship. I named my software after them for two reasons. A Fuzzy Inference System left to grow naively has exactly this property: its rule base multiplies until it fills the room. I also want the good version of the same trick — take a fuzzy model that works on a few hundred samples and let it reproduce, cleanly, up to a few hundred thousand.
+The tribble is a small, _fuzzy_, purring creature from *Star Trek* whose only talent is reproduction. Left alone with
+enough food, a handful becomes a compartment full, and eventually a problem for the whole ship. I named my software
+after them for two reasons.
 
-Fuzzy Inference Systems (FIS) are worth scaling because they are one of the few genuinely interpretable model families. A trained FIS is a short list of IF–THEN rules over linguistic terms (*if the temperature is high and the pressure is low, then risk is elevated*), and a domain expert can read them, disagree, and edit them by hand. Given enough rules and membership functions a FIS can approximate any continuous function to arbitrary accuracy, so the family is not intrinsically weak. But that theorem is asymptotic in the rule count, and I work at the other end of the axis — on the order of one rule per output class, three output buckets in Chapter 4. Whether capability survives at a readable rule count is a question for measurement, not theory. On Concrete, ten seeds under one protocol, the flat model reaches $R^2 = 0.861 \pm 0.026$ with a full second-order consequent, against CART's $0.826 \pm 0.047$ and a random forest's $0.909 \pm 0.019$: level with the tree, behind the forest. At zeroth order, with constant consequents, it scores $0.394 \pm 0.065$ — usable, and less than half as good. Capability at a readable rule count is real, and it is not free. With regulators and safety engineers increasingly unwilling to accept a black box — and with the aviation authorities now writing guidance that treats the explainability of a machine-learned component as a certification objective rather than a courtesy — the combination is valuable. §2.6 says what that framing does and does not buy: a rule base over named variables is the raw material of a verification and validation argument in a way a weight matrix is not, and building the rest of that argument is not work this dissertation contains.
+1) A Fuzzy Inference System left to grow naively has exactly this property: its rule base multiplies until it fills the
+   room.
+2) I am building the beneficial version of the same trick — take a fuzzy model that works on a few hundred samples and
+   let it scale (reproduce), cleanly, up to hundreds of thousands.
 
-FIS are slow and awkward to build at scale, for three well-understood reasons.
+Fuzzy Inference Systems (FIS) are worth scaling because they are one of the few genuinely interpretable model families.
+A trained FIS is a short list of IF–THEN rules over linguistic terms (*if the temperature is high and the pressure is
+low, then risk is elevated*). A domain expert can read and edit them by hand. Given enough rules and membership
+functions, a FIS can approximate any continuous function to an arbitrary degree of accuracy; this model family is not
+intrinsically weak. That position is commonly asymptotic in the rule count, and my approach is at the other end of the
+rule-base count axis — on the order of one rule per output class.
+
+Whether capability survives at a readable rule count is a question for measurement, not theory. On Concrete, ten seeds
+under one protocol, the flat model reaches $R^2 = 0.861 \pm 0.026$ with a full second-order consequent, against
+CART's $0.826 \pm 0.047$ and a random forest's $0.909 \pm 0.019$: level with the tree, behind the forest. At zeroth
+order, with constant consequents, it scores $0.394 \pm 0.065$ — usable, and less than half as good. Capability at a
+readable rule count is real, and it is not free. With regulators and safety engineers increasingly unwilling to accept a
+black box model — and with the aviation authorities now writing guidance that treats the explainability of a
+machine-learned component as a certification objective rather than a courtesy — the combination is becoming more and
+more valuable. §2.6 says what that framing does and does not buy: a rule base over named variables is the raw material
+of a verification and validation argument in a way a weight matrix is not, and building the rest of that argument is not
+work this dissertation contains.
+
+FIS are often slow and awkward to build at scale, for three well-understood reasons.
 
 **Rule-base explosion.** A naive grid-partitioned FIS has one rule for every combination of fuzzy sets, one per input:
 
 $$ N_{rules} = \prod_{i=1}^{M} N_{\mu_i}, $$
 
-for $M$ input features with $N_{\mu_i}$ fuzzy sets on feature $i$ — exponential in the input dimension. A dozen inputs with three fuzzy sets each is already more than half a million rules. No one reads half a million rules.
+for $M$ input features with $N_{\mu_i}$ fuzzy sets on feature $i$ — exponential in the input dimension. A dozen inputs
+with three fuzzy sets each is already more than half a million rules. No one can read, let alone review, half a million
+rules.
 
-**Stochastic training.** The dominant methods — genetic algorithms, gradient descent, ANFIS-style hybrids — are slow to converge and sensitive to their starting point. A genetic algorithm gets there eventually but slowly; gradient descent is fast only from a good initial guess, and otherwise settles into a poor local minimum and reports it confidently.
+**Stochastic training.** The dominant methods — genetic algorithms, gradient descent, ANFIS-style hybrids — are slow to
+converge and/or sensitive to their starting point. A genetic algorithm gets there eventually but slowly; gradient
+descent is fast only from a good initial guess; otherwise it converges to a poor local minimum. In addition, GD methods
+are susceptible to numerical conditioning issues, since the FIS can be a stiff, nonlinear function of its parameters.
 
-**Scale of the analysis tools.** The tools we use to understand a dataset before modeling it — cluster tendency, distance structure — were built for a few thousand points, and real datasets now arrive with hundreds of thousands of rows. The Visual Assessment of cluster Tendency (VAT), which I lean on throughout, is the example: in textbook form it is $O(N^3)$, unusable well before the interesting datasets begin.
+**Scale of the analysis tools.** The tools we use to understand a dataset before modeling it — cluster tendency,
+distance structure — were built for a few thousand points, and real datasets now arrive with hundreds of thousands (or
+millions) of rows. The Visual Assessment of Cluster Tendency (VAT), the starting point for my graduate school journey,
+is a prime example: in textbook (and common library) form it is $O (N^3)$, unusable well before the interesting datasets
+begin.
 
-Take a case I return to throughout: a NASA space-shuttle reentry telemetry set, roughly {{dataset.shuttle.rows}} samples across {{dataset.shuttle.features}} sensor channels, about 80% of them in a single flight condition. Before fitting anything I would like to simply *look* at the structure and confirm one dominant regime and a handful of smaller ones. A full VAT image of that data is a 58,000 × 58,000 matrix — about 13 gigabytes at single precision to hold once, and the common implementation keeps two or three copies. Scaling the cubic algorithm up from a size I can actually time (124 seconds at 4,096 points, measured in Chapter 3) puts 58,000 points at roughly four days. The structure is sitting right there, and the standard toolchain cannot afford to show it to me. The method in Chapter 3 produces the same ordering in about a minute.
+Take a case I return to throughout: a NASA space-shuttle reentry telemetry set, roughly {{dataset.shuttle.rows}} samples
+across {{dataset.shuttle.features}} sensor channels, about 80% of them are in a single flight condition. Before fitting
+anything, I would like to simply *look* at the structure and confirm one dominant regime and a handful of smaller ones.
+A full VAT image of that data is a 58,000 × 58,000 matrix — about 13 gigabytes at single precision to hold once, and the
+common implementation keeps two or three copies. Scaling the cubic algorithm up from a size I can actually time (124
+seconds at 4,096 points, measured in Chapter 3) puts 58,000 points at roughly four days. The structure is sitting right
+there, and the standard toolchain cannot afford to show it to me. The method in Chapter 3 produces the same ordering in
+about a minute.
 
-This dissertation rests on a single observation I call *structure before search*: most of the expensive stochastic optimization we throw at fuzzy models is spent rediscovering structure already present in the data. Recover that structure cheaply — where the clusters are, how they nest, how dense they are, which features separate them — and the model almost builds itself. The membership functions come from the shape of the data, the rules from how the clusters relate to the labels, and whatever optimization remains is a cheap local polish. The claim of this work is that a structure-first pipeline produces fuzzy models that train in a second or two at the sizes it reaches, with no stochastic search in the fit at all, that scale from hundreds to hundreds of thousands of samples, and that stay interpretable by construction. I state that in absolute terms on purpose: the head-to-head against ANFIS and a GA-tuned FIS on identical splits is proposed work (Goal G3), not yet run, so I quote training times in seconds rather than speedup ratios.
+This dissertation rests on a single observation I call *structure before search*: most of the expensive stochastic
+optimization we throw at fuzzy models is spent rediscovering structure already present in the data. Recover that
+structure cheaply — where the clusters are, how they nest, how dense they are, which features separate them — and the
+model almost builds itself. The membership functions come from the shape of the data, the rules from how the clusters
+relate to the labels, and whatever optimization remains is a cheap, local polish. The claim of this work is that a
+structure-first pipeline produces fuzzy models that train in a second or two at the sizes it reaches, with no stochastic
+search in the fit at all, that scale from hundreds to hundreds of thousands of samples, and that stay interpretable by
+construction. I state that in absolute terms on purpose: the head-to-head against ANFIS and a GA-tuned FIS on identical
+splits is proposed work (Goal G3), not yet run, so I quote training times in seconds rather than speedup ratios.
 
-**Figure 1.1 — The two routes to a trained FIS.** Left, the conventional route: grid-partition every input, then grind a genetic algorithm or gradient descent against the whole model. Right, the structure-first route: recover the structure, read the membership functions and rules off it, treat the polish as optional. The rule counts are exact arithmetic, not measurements — the grid product $\prod_i N_{\mu_i}$ on PhiUSIIL's 54 features against the $K$ rules Chapter 4's construction produces on the same data. The structure-first training time is measured (Table 4.1); the conventional side has no measured baseline yet, so the figure prints the gap rather than a number opposite it.
+**Figure 1.1 — The two routes to a trained FIS.** Left, the conventional route: grid-partition every input, then grind a
+genetic algorithm or gradient descent against the whole model. Right, the structure-first route: recover the structure,
+read the membership functions and rules off it, treat the polish as optional. The rule counts are exact arithmetic, not
+measurements — the grid product $\prod_i N_{\mu_i}$ on PhiUSIIL's 54 features against the $K$ rules Chapter 4's
+construction produces on the same data. The structure-first training time is measured (Table 4.1); the conventional side
+has no measured baseline yet, so the figure prints the gap rather than a number opposite it.
 `![structure-before-search](fig/01-structure-before-search.png)`
 
-## 1.2 Unique Contributions
+## 1.2 Contributions and Background
 
-The dissertation is organized as a pipeline, and each stage is a contribution. Every individual component I use — VAT, iVAT, single-linkage clustering, Fuzzy C-Means, persistence-based clustering, minimax linkage, the mixture-of-experts architecture and its EM, Lin–Kernighan local search, the Takagi–Sugeno–Kang rule form — is prior art, and I credit it as such, including the cases where a competitor sits uncomfortably close to what I claim. What is new is how the pieces compose into a fast, scalable, interpretable modeling pipeline, and the regimes that composition reaches which the existing methods do not.
+The dissertation is organized as a pipeline, and each stage is a contribution. Every individual component I use:
+VAT/iVAT, single-linkage clustering, Fuzzy C-Means, persistence-based clustering, minimax linkage, the
+Takagi–Sugeno–Kang rule form — has at least some prior art. What is new is how the pieces compose into a fast, scalable,
+interpretable modeling pipeline, and the regimes that composition reaches which the existing methods do not.
 
-1. **mergeVAT (priority-queue VAT): exact VAT and iVAT at scale.** The feasible problem size moves from a few thousand points to well over a hundred thousand, on ordinary hardware, reproducing the serial reference ordering exactly at double precision and up to minimum-spanning-tree tie-breaking at single. Three things get it there. The reorder improves on the literature's cubic implementation in two stages: to $O(N^2 \log N)$ by replacing its redundant re-scanning with a priority queue (the published result), then to $O(N^2)$, because the reorder only ever needs the current minimum — a compact active set with relaxation and selection fused into one pass removes the heap and the log factor together. That second stage is unpublished. The memory scheme holds the computation in a single matrix instead of the usual two or three, permuting it in place; this is what actually lifts the size ceiling, by $\sqrt{3}$ over the classical scheme and another $\sqrt{2}$ at single precision, which Chapter 3 shows costs nothing in exactness. A divide-and-conquer scheme splits problems larger than one machine and stitches the pieces back at bounded cost, and the underlying minimum spanning tree runs on a GPU. The engine also carries a clustering method, `IVATMeans`: deterministic and initialization-free, returning assignment and membership from one fit and verifiable against the reordered image it read them off (the head-to-head against Fuzzy C-Means and k-means is owed, Goal G9). Throughout, the method needs only a dissimilarity matrix and assumes no metric — a regime the coordinate-based fast-VAT variants cannot enter at all.
+1. **mergeVAT (priority-queue VAT): exact VAT and iVAT at scale.** The feasible problem size moves from a few thousand
+   points to well over a hundred thousand, on ordinary hardware, reproducing the serial reference ordering exactly at
+   double precision and up to minimum-spanning-tree tiebreaking at single. Three things get it there. The reorder
+   improves on the literature's cubic implementation in two stages: to $O (N^2 \log N)$ by replacing its redundant
+   re-scanning with a priority queue (the published result), then to $O (N^2)$, because the reorder only ever needs the
+   current minimum — a compact active set with relaxation and selection fused into one pass removes the heap and the log
+   factor together. That second stage is unpublished. The memory scheme holds the computation in a single matrix instead
+   of the usual two or three, permuting it in place; this is what actually lifts the size ceiling, by $\sqrt{3}$ over
+   the classical scheme and another $\sqrt{2}$ at single precision, which Chapter 3 shows costs nothing in exactness. A
+   divide-and-conquer scheme splits problems larger than one machine and stitches the pieces back at bounded cost, and
+   the underlying minimum spanning tree runs on a GPU. The engine also carries a clustering method, `IVATMeans`:
+   deterministic and initialization-free, returning assignment and membership from one fit and verifiable against the
+   reordered image it read them off (the head-to-head against Fuzzy C-Means and k-means is owed, Goal G9). Throughout,
+   the method needs only a dissimilarity matrix and assumes no metric — a regime the coordinate-based fast-VAT variants
+   cannot enter at all.
 
-2. **Fast interpretable FIS synthesis from Mixtures of Gaussians.** I generate the membership functions *and* the rules of a fuzzy classifier or regressor directly from the data, using per-feature Gaussian mixtures, with no genetic algorithm and no gradient descent afterward. Because the rules are built per output class instead of by gridding the inputs, the rule base does not explode: a $K$-class problem produces on the order of $K$ rules. On the {{dataset.phiusiil.rows}}-row PhiUSIIL phishing set this trains a two-rule classifier in $0.13 \pm 0.02$ seconds, ten seeds. **The accuracy on that row is $0.440 \pm 0.181$, and it used to read $0.997 \pm 0.001$.** The difference is a single feature: `URLSimilarityIndex`, a URL's similarity to a whitelist of known-legitimate URLs, which the loader returned until 2026-08-30 and which separates the classes on its own at AUC 0.996. Dropped, along with two sibling probabilities fitted on the corpus's own labels, the construction falls *below* the 0.5755 majority-class baseline. It is not that the task became hard: on the same 47 features ANFIS scores $0.999 \pm 0.001$, a GA-tuned FIS $0.998 \pm 0.001$, CART $0.997 \pm 0.001$ and a random forest $1.000 \pm 0.000$. What the row demonstrates is therefore the rule count and the training time only — and the training time claim survives intact, at $194	imes$ the slowest fuzzy baseline on this dataset (Table 4.1b). The scale target is RT-IOT2022 ({{dataset.rt_iot2022.rows}} samples, {{dataset.rt_iot2022.features}} features, {{dataset.rt_iot2022.classes}} classes), where the construction produces twelve rules against a grid form past enumeration: twelve rules train in $4.24 \pm 0.68$ seconds at $0.927 \pm 0.002$ accuracy (Table 4.4), with a 200-tree random forest scoring $0.998 \pm 0.000$ on the same split. One consequence I did not set out to obtain, then built deliberately once I saw it: because every class is an explicit fuzzy rule, the complement of their aggregate is automatically a *none of the above* rule. That turns the classifier into an open-set detector for rare and never-before-seen conditions at no additional training cost — one that can still say *why* it fired.
+2. **Fast interpretable FIS synthesis from Mixtures of Gaussians.** I generate the membership functions *and* the rules
+   of a fuzzy classifier or regressor directly from the data, using per-feature Gaussian mixtures, with no genetic
+   algorithm and no gradient descent afterward. Because the rules are built per output class instead of by gridding the
+   inputs, the rule base does not explode: a $K$-class problem produces on the order of $K$ rules. On the
+   {{dataset.phiusiil.rows}}-row PhiUSIIL phishing set this trains a two-rule classifier in $0.13 \pm 0.02$ seconds, ten
+   seeds, **at an accuracy of $0.440 \pm 0.181$.** The construction's one strong antecedent was `URLSimilarityIndex`, a
+   URL's similarity to a whitelist of known-legitimate URLs, which separates the classes on its own at AUC 0.996 — a
+   target leak. Dropped, along with two sibling probabilities fitted on the corpus's own labels, the construction falls
+   *below* the 0.5755 majority-class baseline. It is not that the task became hard: on the same 47 features ANFIS
+   scores $0.999 \pm 0.001$, a GA-tuned FIS $0.998 \pm 0.001$, CART $0.997 \pm 0.001$, and a random forest
+   $1.000 \pm 0.000$. What the row demonstrates is therefore the rule count and the training time only — and the
+   training time claim survives intact, at $194\times$ the slowest fuzzy baseline on this dataset (Table 4.1b). The
+   scale target is RT-IOT2022 ({{dataset.rt_iot2022.rows}} samples, {{dataset.rt_iot2022.features}} features,
+   {{dataset.rt_iot2022.classes}} classes), where the construction produces twelve rules against a grid form past
+   enumeration: twelve rules train in $3.64 \pm 0.25$ seconds at $0.927 \pm 0.002$ accuracy (Table 4.1b), with a
+   200-tree random forest scoring $0.998 \pm 0.000$ on the same split. One consequence I did not set out to obtain, then
+   built deliberately once I saw it: because every class is an explicit fuzzy rule, the complement of their aggregate is
+   automatically a *none of the above* rule. That turns the classifier into an open-set detector for rare and
+   never-before-seen conditions at no additional training cost — one that can still say *why* it fired.
 
-3. **Membership functions from topological structure** *(proposed, with preliminary results)*. Given only a dissimilarity matrix — no coordinates, no Gaussian assumption — I extract fuzzy membership functions, the number of clusters, and even the number of *scales* directly from the minimax (single-linkage) hierarchy, using a persistence-gated set-cover in which the cluster count is an output, not an input. It recovers nested structure that a flat method cannot represent. A flat cover returns one partition, so on a synthetic hierarchy with two or three true levels it lands one of them exactly (adjusted Rand index 1.000 on the coarse level in all three sets) and necessarily misses the rest, scoring 0.24 to 0.49 on the levels it cannot represent. The band stack returns one partition per true level and scores 1.000 on each. The gap is a difference in what the two methods can *return*, not an accuracy lift. This is the bridge between the clustering and the fuzzy-modeling work, and the part I consider most novel, with the caveat Chapter 5 makes explicit: the results so far are clustering scores, not end-to-end fuzzy-model accuracy.
+3. **Membership functions from topological structure** *(proposed, with preliminary results)*. Given only a
+   dissimilarity matrix — no coordinates, no Gaussian assumption — I extract fuzzy membership functions, the number of
+   clusters, and even the number of *scales* directly from the minimax (single-linkage) hierarchy, using a
+   persistence-gated set-cover in which the cluster count is an output, not an input. It recovers nested structure that
+   a flat method cannot represent. A flat cover returns one partition, so on a synthetic hierarchy with two or three
+   true levels it lands one of them exactly (adjusted Rand index 1.000 on the coarse level in all three sets) and
+   necessarily misses the rest, scoring 0.24 to 0.49 on the levels it cannot represent. The band stack returns one
+   partition per true level and scores 1.000 on each. The gap is a difference in what the two methods can *return*, not
+   an accuracy lift. This is the bridge between the clustering and the fuzzy-modeling work, and the part I consider most
+   novel, with the caveat Chapter 5 makes explicit: the results so far are clustering scores, not end-to-end fuzzy-model
+   accuracy.
 
-4. **Hierarchical and refined fuzzy models** *(partly built, partly proposed)*. One closed-form, firing-weighted ridge least-squares solver serves as a shared primitive across a flat FIS, a soft fuzzy decision tree, and a hierarchical mixture of fuzzy experts, and I export the result to an explicit triangular (Ruspini) rule base a person can read and edit. The interpretability–accuracy trade becomes explicit here, and it is not favorable: under one protocol the hierarchy does not beat the flat model on Concrete — tuned, the two are level within their spreads, 0.833 against 0.861. What the hierarchy buys is an explicit decision path over named variables, not accuracy.
+4. **Hierarchical and refined fuzzy models** *(partly built, partly proposed)*. One closed-form, firing-weighted ridge
+   least-squares solver serves as a shared primitive across a flat FIS and a soft fuzzy decision tree, and I export the
+   result to an explicit triangular (Ruspini) rule base a person can read and edit. The interpretability–accuracy trade
+   becomes explicit here, and it is not favorable: under one protocol the fuzzy tree does not beat the flat model on
+   Concrete. What the tree buys is an explicit decision path over named variables, not accuracy. A hierarchical mixture
+   of fuzzy experts reuses the same solver as supporting work, built one-shot with its EM refinement proposed; Appendix
+   A.11 covers it in full.
 
-5. **A supporting optimization engine.** Underneath the pipeline sits a general optimization library — metaheuristics, a dual-backend Lin–Kernighan local search, a quality-diversity layer, high-performance kernels — providing the optional local-polish stage. I treat it as infrastructure, not a headline result; it lives in an appendix, and the point of the dissertation is precisely that this engine is *not* on the critical path.
+5. **A supporting optimization engine.** Underneath the pipeline sits a general optimization library — metaheuristics, a
+   dual-backend candidate-restricted local search, a quality-diversity layer, high-performance kernels — providing the
+   optional local-polish stage. I treat it as infrastructure, not a headline result; it lives in an appendix, and the
+   point of the dissertation is precisely that this engine is *not* on the critical path.
 
-The claim is not that any one of these primitives is new, but that arranging them structure-first lets a fuzzy model reproduce like a tribble — cleanly, across orders of magnitude of dataset size, without losing the readability that made it worth building.
+The claim is not that any one of these primitives is new, but that arranging them structure-first lets a fuzzy model
+reproduce like a tribble — cleanly, across orders of magnitude of dataset size, without losing the readability that made
+it worth building.
 
 ## 1.3 Dissertation Outline
 
 The remainder follows the pipeline in order, separating work already done from work proposed.
 
-**Part I — Introduction and Preliminaries.** Chapter 2 collects the shared background: fuzzy inference systems and the Takagi–Sugeno–Kang rule form; VAT, iVAT, and their equivalence to single-linkage clustering; persistence and a little topological data analysis; Fuzzy C-Means and relational fuzzy clustering; why the literature treats stochastic optimization as the bottleneck (the foil for *structure before search*); and the accuracy–interpretability trade-off.
+**Part I — Introduction and Preliminaries.** Chapter 2 collects the shared background: fuzzy inference systems and the
+Takagi–Sugeno–Kang rule form; VAT, iVAT, and their equivalence to single-linkage clustering; persistence and a little
+topological data analysis; Fuzzy C-Means and relational fuzzy clustering; why the literature treats stochastic
+optimization as the bottleneck (the foil for *structure before search*); and the accuracy–interpretability trade-off.
 
-**Part II — Completed Work.** Chapter 3 presents mergeVAT: the acceleration, the in-place memory scheme, the divide-and-conquer stitch, the extension to non-metric data, and the VAT-to-TSP hot-start from the same machinery. This work was presented at NAFIPS 2025 (Banff) and NAFIPS 2026 (El Paso); Chapter 9 has the paper-level detail. Chapter 4 presents the Mixture-of-Gaussians approach to synthesizing a fuzzy model directly from data: the fast, no-search core of the pipeline.
+**Part II — Completed Work.** Chapter 3 presents mergeVAT: the acceleration, the in-place memory scheme, the
+divide-and-conquer stitch, the extension to non-metric data, and the VAT-to-TSP hot-start from the same machinery. This
+work was presented at NAFIPS 2025 (Banff) and NAFIPS 2026 (El Paso); Chapter 9 has the paper-level detail. Chapter 4
+presents the Mixture-of-Gaussians approach to synthesizing a fuzzy model directly from data: the fast, no-search core of
+the pipeline.
 
-**Part III — Proposed Work and Goals for Completion.** Chapter 5 is the proposed contribution I am most excited about: generating fuzzy membership functions from the topological structure of a dissimilarity matrix, including the multi-scale case. It already has strong preliminary results, and it is the conceptual bridge from clustering to fuzzy modeling. Chapter 6 covers the hierarchical and refined models — the shared ridge-TSK solver, the fuzzy trees, and the mixture of experts — some built and some proposed. Chapter 7 lays out the goals for completion: the integrated end-to-end pipeline, the experiments that would make the scale and accuracy claims airtight, and a risk register. Chapter 8 concludes, Chapter 9 lists publications, and Chapter 10 gives the timeline through the final defense.
+**Part III — Proposed Work and Goals for Completion.** Chapter 5 is the proposed contribution I am most excited about:
+generating fuzzy membership functions from the topological structure of a dissimilarity matrix, including the
+multi-scale case. It already has strong preliminary results, and it is the conceptual bridge from clustering to fuzzy
+modeling. Chapter 6 covers the hierarchical and refined models — the shared ridge-TSK solver and the fuzzy trees — some
+built and some proposed; Appendix A.11 covers the hierarchical mixture of fuzzy experts as supporting work. Chapter 7
+lays out the goals for completion: the integrated end-to-end pipeline, the experiments that would make the scale and
+accuracy claims airtight, and a risk register. Chapter 8 concludes, Chapter 9 lists publications, and Chapter 10 gives
+the timeline through the final defense.
 
-**Figure 1.2 — The end-to-end pipeline as a roadmap.** Raw data through structure discovery (Ch. 3), membership generation (Ch. 5), FIS synthesis (Ch. 4 and Ch. 6), and an optional refinement (Ch. 6, App. A) to an interpretable fuzzy model, with each stage's claim beside it: the speedup from Table 3.1, the multi-scale ARI from Table 5.2, the accuracy and training time from Table 4.1, refinement's decay from the Concrete reconciliation. Refinement is drawn dashed on purpose — the search everyone else puts on the critical path is not on this one.
+**Figure 1.2 — The end-to-end pipeline as a roadmap.** Raw data through structure discovery (Ch. 3), membership
+generation (Ch. 5), FIS synthesis (Ch. 4 and Ch. 6), and an optional refinement (Ch. 6, App. A) to an interpretable
+fuzzy model, with each stage's claim beside it: the speedup from Table 3.1, the multi-scale ARI from Table 5.2, the
+accuracy and training time from Table 4.1, refinement's decay from the Concrete reconciliation. Refinement is drawn
+dashed on purpose — the search everyone else puts on the critical path is not on this one.
 `![pipeline-roadmap](fig/01-pipeline-roadmap.png)`
 
 ---

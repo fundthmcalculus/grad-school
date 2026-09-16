@@ -1,212 +1,527 @@
 # Chapter 7 — Goals for Completion
 
-This chapter states what remains to turn this proposal into a dissertation. Chapter 3 is done and published; Chapter 4 is done, with its paper in preparation; Chapters 5 and 6 have working code and preliminary results. What is left is finishing, hardening, and connecting the pieces into one system, and the plan uses all fifteen months of runway from the proposal defense at the end of 2026 to the final defense in March 2028.
+This chapter states what remains to turn this proposal into a dissertation. Chapter 3 is done and published; Chapter 4
+is done, with its paper in preparation; Chapters 5 and 6 have working code and preliminary results. What is left is
+finishing, hardening, and connecting the pieces into one system, and the plan uses all fifteen months of runway from the
+proposal defense at the end of 2026 to the final defense in March 2028.
 
-Every goal below carries a named experiment, a metric, a threshold, and the outcome that counts as refutation, because a committee cannot approve what it cannot check. Where the likely outcome is a null result, it is predicted in advance. The statuses here are decisions; Appendix A.6 collects the evidence behind them, including the investigations that did not work.
+Every goal below carries a named experiment, a metric, a threshold, and the outcome that counts as refutation.
+Where the likely outcome is a null result, it is predicted in advance.
+The statuses here are decisions; Appendix A.6 collects the evidence behind them, including the investigations that did
+not work.
 
 ## 7.1 The capstone: the integrated pipeline
 
-The integration deliverable is the pipeline running as one system: Chapter 3's structure discovery, Chapter 5's membership generation, model synthesis from Chapters 4 and 6, refinement from Appendix A, in one reproducible driver over one flagship case study. Two gaps make that more than packaging. Chapter 5's membership functions have never reached Chapter 6's inference machinery, so every Chapter 5 result is a clustering score standing in for the fuzzy-model quality that chapter exists to produce. And the Concrete benchmark is run three ways in three places, so Chapters 4 and 6 cannot be read against each other.
+The integration deliverable is the pipeline running as one system: Chapter 3's structure discovery, Chapter 5's
+membership generation, model synthesis from Chapters 4 and 6, refinement from Appendix A, in one reproducible driver
+over one flagship case study. Two gaps make that more than packaging. Chapter 5's membership functions have never
+reached Chapter 6's inference machinery, so every Chapter 5 result is a clustering score standing in for the fuzzy-model
+quality that chapter exists to produce. And the Concrete benchmark is run three ways in three places, so Chapters 4 and
+6 cannot be read against each other.
 
-It is not first in the logical order. It is an *integration* result, that the stages compose, and two deliverables precede it: the baseline adapters of checklist **C1**, since the speed argument in Chapters 1, 4 and 8 has no conventional fuzzy method measured beside it, and Goal **G2**, since the coordinate-free regime is so far shown only on synthetic non-metric matrices built from coordinate data. All three are must-haves, and C1 and G2 make the two headline claims measurable.
+It is not first in the logical order. It is an *integration* result, that the stages compose, and two deliverables
+precede it: the baseline adapters of checklist **C1**, since the speed argument in Chapters 1, 4 and 8 has no
+conventional fuzzy method measured beside it, and Goal **G2**, since the coordinate-free regime is so far shown only on
+synthetic non-metric matrices built from coordinate data. All three are must-haves, and C1 and G2 make the two headline
+claims measurable.
 
-*Decision rule.* One driver on the UCI shuttle set (Chapter 3's reorder, Chapter 5's memberships, Chapter 6's inference and Ruspini export) at ten seeds on shared splits, plus the *same driver* on one of Goal G2's dynamic-time-warping sets. Metrics: end-to-end accuracy of the FIS built from Chapter 5's memberships, against the Chapter 4 Gaussian construction on identical splits and against CART and a random forest, plus rule and clause counts. Threshold: within 0.02 accuracy of Chapter 4's construction on shuttle, a rule base no more than twice the size, *and* completion on a DTW matrix where Chapter 4's construction cannot run at all.
+*Decision rule.* One driver on the UCI shuttle set (Chapter 3's reorder, Chapter 5's memberships, Chapter 6's inference
+and Ruspini export) at ten seeds on shared splits, plus the *same driver* on one of Goal G2's dynamic-time-warping sets.
+Metrics: end-to-end accuracy of the FIS built from Chapter 5's memberships, against the Chapter 4 Gaussian construction
+on identical splits and against CART and a random forest, plus rule and clause counts. Threshold: within 0.02 accuracy
+of Chapter 4's construction on shuttle, a rule base no more than twice the size, *and* completion on a DTW matrix where
+Chapter 4's construction cannot run at all.
 
-Two failures, each a result rather than a delay. More than 0.02 behind Chapter 4 means §5.4's adjusted-Rand proxy was optimistic and topological memberships are a *worse* antecedent generator than a per-feature Gaussian mixture where both can run; Chapter 5's contribution narrows to the coordinate-free case and §5.4 has to say so. A driver that will not run on a DTW matrix leaves integration shown only inside the regime Chapter 4 already covers, making §7.3's coordinate caveat fatal. Appendix A.6 has the mechanism already on record for the first, which makes it a design change rather than a schedule slip.
+Two failures, each a result rather than a delay. More than 0.02 behind Chapter 4 means §5.4's adjusted-Rand proxy was
+optimistic and topological memberships are a *worse* antecedent generator than a per-feature Gaussian mixture where both
+can run; Chapter 5's contribution narrows to the coordinate-free case and §5.4 has to say so. A driver that will not run
+on a DTW matrix leaves integration shown only inside the regime Chapter 4 already covers, making §7.3's coordinate
+caveat fatal. Appendix A.6 has the mechanism already on record for the first, which makes it a design change rather than
+a schedule slip.
 
 ## 7.2 Proposed studies
 
-Three notes on labels. Goal G4 was one row here and is now five tracked items, **G4a–G4e**: four kinds of work with four statuses, where approving one row meant approving all of them. The TODO notes in Chapters 3 to 6 that say "see Goal G4" mean the family, and the one they point at is **G4a**. One checklist item that was not a goal is promoted: **C1**, the fuzzy baseline adapters, which Chapter 10 was not scheduling. And one goal is new, **G9**: Chapter 3 §3.3.5 now presents the `IVATMeans` estimator as a contribution, and the comparison that would measure it against the two methods it substitutes for has never been run.
+Three notes on labels. Goal G4 was one row here and is now five tracked items, **G4a–G4e**: four kinds of work with four
+statuses, where approving one row meant approving all of them. The TODO notes in Chapters 3 to 6 that say "see Goal G4"
+mean the family, and the one they point at is **G4a**. One checklist item that was not a goal is promoted: **C1**, the
+fuzzy baseline adapters, which Chapter 10 was not scheduling. And one goal is new, **G9**: Chapter 3 §3.3.5 now presents
+the `IVATMeans` estimator as a contribution, and the comparison that would measure it against the two methods it
+substitutes for has never been run.
 
 ### G4a — The measurement protocol (protocol; substantially in place)
 
-One protocol governs every performance and scaling number, for scalability and stability alike: pinned clocks and thermals, one identified host, ten seeds, error bars, the numeric stack recorded. **Most of it is in place, and Table 7.1 says so.** Done: the ten-seed floor, enforced in `reproduce/common.py` and in every provenance file (B1); the machine block on every emitted table (B2); ratios with seconds kept in the companion CSV (B3); Chapter 3's timing grid re-taken on one host as the run of record `reproduce/outputs/full-14900hx-r2/`, with §3.4 and Table 3.2 re-quoted from it (B5, B5b). Also done since: the **submodule-SHA guard** (B4), which is not merely present but was exercised — it fired on the 2026-08-22 sweep, printed both sets of SHAs, and told the operator to verify the change before quoting anything from the run. Outstanding: clocks and thermals, and Table 3.3's cross-precision ordering check, taken at one small size and needing a repeat near the claimed ceiling.
+One protocol governs every performance and scaling number, for scalability and stability alike: pinned clocks and
+thermals, one identified host, ten seeds, error bars, the numeric stack recorded. **Most of it is in place, and Table
+7.1 says so.** Done: the ten-seed floor, enforced in `reproduce/common.py` and in every provenance file (B1); the
+machine block on every emitted table (B2); ratios with seconds kept in the companion CSV (B3); Chapter 3's timing grid
+re-taken on one host as the run of record `reproduce/outputs/full-14900hx-r2/`, with §3.4 and Table 3.2 re-quoted from
+it (B5, B5b). Also done: the **submodule-SHA guard** (B4), which is not merely present but has been exercised — it fires
+on a submodule-SHA change, printing both sets of SHAs and telling the operator to verify the change before quoting
+anything from the run. Outstanding: clocks and thermals, and Table 3.3's cross-precision ordering check, taken at one
+small size and needing a repeat near the claimed ceiling.
 
-**The complexity item is discharged, with one arm of three qualified.** Classical and stage two land where they should and are confirmed. Stage one does not: its exponent falls short of what $O(N^2 \log N)$ predicts and below the pure quadratic reference, and the log factor invoked to explain that is asserted rather than shown, so stage one is **bounded rather than confirmed**, not cubic, which is what §3.3.1's progression needs. Appendix A.2.4 has the per-$N$ exponents and the constrained fit that would settle it.
+**The complexity item is discharged, with one arm of three qualified.** Classical and stage two land where they should
+and are confirmed. Stage one does not: its exponent falls short of what $O (N^2 \log N)$ predicts and below the pure
+quadratic reference, and the log factor invoked to explain that is asserted rather than shown, so stage one is **bounded
+rather than confirmed**, not cubic, which is what §3.3.1's progression needs. Appendix A.2.4 has the per-$N$ exponents
+and the constrained fit that would settle it.
 
-The protocol covers *accuracy* claims too, because an accuracy failure set the floor: moving §4.3.2's sweep from three seeds to ten turned its apparent crossover into a null result and exposed a split diverging far outside the target's range (Chapter 6 §6.4). Ten seeds is the floor for any *estimate*; a mean without a spread, over a sample too small to contain the failure modes, is not evidence. The one deliberate exception, single-shot scale demonstrations recorded with hardware, precision and footprint instead, is stated in Appendix A.5.
+The protocol covers *accuracy* claims too, because an accuracy failure set the floor: moving §4.3.2's sweep from three
+seeds to ten turned its apparent crossover into a null result and exposed a split diverging far outside the target's
+range (Appendix A.11.3). Ten seeds is the floor for any *estimate*; a mean without a spread, over a sample too small to
+contain the failure modes, is not evidence. The one deliberate exception, single-shot scale demonstrations recorded with
+hardware, precision and footprint instead, is stated in Appendix A.5.
 
-Two measurements break that floor: the **§6.3.5 optimizer study**'s undeclared host and **Appendix A.3**'s unseeded speedups. Appendix A.5 names them in full, because a board-wide rule with unnamed violations is worse than a narrower rule stated plainly. One boundary sits inside the rule rather than outside it: Appendix A.4's Table A.2, bit-for-bit reproducible within one host and not portable off it — the protocol working as intended, not a third violation.
+Two measurements break that floor: the **§6.3.5 optimizer study**'s undeclared host and **Appendix A.3**'s unseeded
+speedups. Appendix A.5 names them in full, because a board-wide rule with unnamed violations is worse than a narrower
+rule stated plainly. One boundary sits inside the rule rather than outside it: Appendix A.4's Table A.2, bit-for-bit
+reproducible within one host and not portable off it — the protocol working as intended, not a third violation.
 
-The hardware half is not a formality either, and Chapter 3 §3.4 measures why. The same generator at the same commit and the same ten seeds, on two hosts, agrees to 6% within each and disagrees by 40% between them, because the two arms of that ratio are not scaled by a common factor when the machine changes. **Repeatability establishes that a measurement is not noise; it says nothing about whether it is a property of the code or of the host.** Only a second host distinguishes those, which is why the harness now records the numeric stack (numpy, scipy, scikit-learn and the BLAS build) alongside the CPU and RAM.
+The hardware half is not a formality either, and Chapter 3 §3.4 measures why. The same generator at the same commit and
+the same ten seeds, on two hosts, agrees to 6% within each and disagrees by 40% between them, because the two arms of
+that ratio are not scaled by a common factor when the machine changes. **Repeatability establishes that a measurement is
+not noise; it says nothing about whether it is a property of the code or of the host.** Only a second host distinguishes
+those, which is why the harness now records the numeric stack (numpy, scipy, scikit-learn and the BLAS build) alongside
+the CPU and RAM.
 
-*Decision rule.* Discharged when every numbered table either carries a machine block naming one host at ten seeds, or is labeled a demonstration with hardware, precision and footprint, or is named as an exception in A.5. A table fitting none of the three comes out.
+*Decision rule.* Discharged when every numbered table either carries a machine block naming one host at ten seeds, or is
+labeled a demonstration with hardware, precision and footprint, or is named as an exception in A.5. A table fitting none
+of the three comes out.
 
 ### G4b — The eVAT and clusiVAT head-to-head (experiment; not started)
 
-Chapter 3 owes a direct comparison against eVAT [@meng2018evat] and clusiVAT on identical datasets. Checklist **C5**, not started in a specific sense: neither implementation is in hand, so this is obtain-or-write before it is measurement, and Chapter 10 gives it its own bar.
+Chapter 3 owes a direct comparison against eVAT [@meng2018evat] and clusiVAT on identical datasets. Checklist **C5**,
+not started in a specific sense: neither implementation is in hand, so this is obtain-or-write before it is measurement,
+and Chapter 10 gives it its own bar.
 
-*Decision rule.* Exact VAT ordering on shared datasets across the swept grid, ten seeds, run-of-record host. Metrics: wall clock, peak memory, ordering agreement against the serial reference. Two thresholds, since the competitors fail differently. clusiVAT samples and is approximate: agreement 1.000 where it does not reach it, within one order of magnitude on wall clock. eVAT is already exact on a GPU (§3.2 concedes I am not claiming the first), so the claim is in-place footprint at matched $N$. Refuted if eVAT matches the in-place ceiling, collapsing Chapter 3's memory contribution to a constant factor.
+*Decision rule.* Exact VAT ordering on shared datasets across the swept grid, ten seeds, run-of-record host. Metrics:
+wall clock, peak memory, ordering agreement against the serial reference. Two thresholds, since the competitors fail
+differently. clusiVAT samples and is approximate: agreement 1.000 where it does not reach it, within one order of
+magnitude on wall clock. eVAT is already exact on a GPU, and Chapter 3 does not claim the first exact
+implementation, so the claim is in-place footprint at matched $N$. Refuted if eVAT matches the in-place
+ceiling, collapsing Chapter 3's memory
+contribution to a constant factor.
 
 ### G4c — The device path, if it returns (experiment; blocked on software *and* hardware)
 
-**The GPU work was descoped from the body on 2026-08-30 (Appendix A.9), and this goal now carries its revival.** The gate has two stages, not one.
+**The GPU work is descoped from the body (Appendix A.9), and this goal carries its revival.** The gate has two stages,
+not one.
 
-*First, software.* `tribble-clustering` removed its CuPy back ends and its `[gpu]` extra in `1ec9667`, so `tribbleclustering.gpu` no longer exists; `reproduce/tables/table_3_4_gpu_speedups.py` was deleted with Table 3.4 because it had nothing to import. The device kernels would have to return upstream, or be rebuilt, before any of this is measurable again.
+*First, software.* `tribble-clustering` removed its CuPy back ends and its `[gpu]` extra in `1ec9667`, so
+`tribbleclustering.gpu` no longer exists; `reproduce/tables/table_3_4_gpu_speedups.py` was deleted with Table 3.4
+because it had nothing to import. The device kernels would have to return upstream, or be rebuilt, before any of this is
+measurable again.
 
-*Then, hardware.* The question that made the path interesting is still open: the pairwise-distance kernel loses to the CPU below 1× at low dimension and double precision on a consumer card, and §3.3.3's reading is that full-rate FP64 flips it. Untested (checklist **C8**). Blocked on access to such a card rather than on effort, so Chapter 10 lists it with its gate instead of a quarter.
+*Then, hardware.* The question that made the path interesting is still open: the pairwise-distance kernel loses to the
+CPU below 1× at low dimension and double precision on a consumer card, and §3.3.3's reading is that full-rate FP64 flips
+it. Untested (checklist **C8**). Blocked on access to such a card rather than on effort, so Chapter 10 lists it with its
+gate instead of a quarter.
 
-*Decision rule.* One kernel, one grid, two cards: the RTX 4080 already measured and one datacenter card, ten seeds, float64 and float32, across the dimensions where the loss is worst. Confirmed if the float64 low-dimensional row reaches ≥ 1× on the datacenter card. Refuted if it stays below 1×, making the loss a property of the *algorithm's* arithmetic intensity rather than the card's throughput ratio, so §3.3.3's caveat becomes a limitation and not a hardware artifact. With no card, §7.4's fallback applies.
+*Decision rule.* One kernel, one grid, two cards: the RTX 4080 already measured and one datacenter card, ten seeds,
+float64 and float32, across the dimensions where the loss is worst. Confirmed if the float64 low-dimensional row
+reaches ≥ 1× on the datacenter card. Refuted if it stays below 1×, making the loss a property of the *algorithm's*
+arithmetic intensity rather than the card's throughput ratio, so §3.3.3's caveat becomes a limitation and not a hardware
+artifact. With no card, §7.4's fallback applies.
 
 ### G4d — The matrix-free reorder (build; **the build is done, and the decision rule passes**)
 
-This goal was written when the package's only matrix-free implementation did not produce the VAT ordering at all. Upstream repaired it (`tribble-cluster c9be437`, with a regression test), and the pin this harness runs contains the repair, so what was a *build* is now an *integrate-and-verify*. G4d does *not* include a dense-Prim baseline: per §3.2 the compiled kernel already is one.
+This goal was written when the package's only matrix-free implementation did not produce the VAT ordering at all.
+Upstream repaired it (`tribble-cluster c9be437`, with a regression test), and the pin this harness runs contains the
+repair, so what was a *build* is now an *integrate-and-verify*. G4d does *not* include a dense-Prim baseline: per §3.2
+the compiled kernel already is one.
 
-*Decision rule.* Compute each $D_{i,j}$ on demand, verify the ordering elementwise against the serial reference at $N \in \{1{,}000, 2{,}000, 5{,}000\}$ across ten seeds, then report the reachable $N$ under the 64 GB working cap. Succeeds if the ordering is exact at every size and the ceiling moves past Table 3.3's 154,919-point single-precision figure. Second threshold, a wall clock: if the matrix-free path at 155,000 points is more than an order of magnitude slower than the in-place path there, the memory wall was the wrong wall to attack next and this becomes future work.
+*Decision rule.* Compute each $D_{i,j}$ on demand, verify the ordering elementwise against the serial reference
+at $N \in \{1{,}000, 2{,}000, 5{,}000\}$ across ten seeds, then report the reachable $N$ under the 64 GB working cap.
+Succeeds if the ordering is exact at every size and the ceiling moves past Table 3.3's 154,919-point single-precision
+figure. Second threshold, a wall clock: if the matrix-free path at 155,000 points is more than an order of magnitude
+slower than the in-place path there, the memory wall was the wrong wall to attack next and this becomes future work.
 
-*Result (2026-08-22).* The ordering is $1.000 \pm 0.000$ at all three sizes, ten seeds each, against chance levels of $0.001$/$0.0005$/$0.0002$. Peak working set is flat at about 65 MB from $N = 2{,}000$ to $12{,}000$ while the implied matrix grows thirty-six-fold, so the reachable $N$ is not memory-bound at all and the 154,919-point ceiling is passed by not applying. The wall clock passes in the opposite direction from the one the rule anticipated: matrix-free runs at **0.14–0.22×** the materialising arm's time, both starting from samples. Two limits stated rather than smoothed over: float32 gives $0.9996 \pm 0.0012$, the tie-breaking of §3.2 rather than an error; and the 155,000-point figure is an **extrapolation from a ratio stable to 1.62× across an 8× change in $N$**, since the in-place arm cannot be run there on this host. What remains owed is that one measurement at scale, on hardware where the comparison arm fits. Appendix A.6 has the full account; `reproduce/experiments/check_matrix_free_reorder.py` regenerates it.
+*Result.* The ordering is $1.000 \pm 0.000$ at all three sizes, ten seeds each, against chance levels
+of $0.001$/$0.0005$/$0.0002$. Peak working set is flat at about 65 MB from $N = 2{,}000$ to $12{,}000$ while the implied
+matrix grows thirty-six-fold, so the reachable $N$ is not memory-bound at all and the 154,919-point ceiling is passed by
+not applying. The wall clock passes in the opposite direction from the one the rule anticipated: matrix-free runs at
+**0.14–0.22×** the materialising arm's time, both starting from samples. Two limits stated rather than smoothed over:
+float32 gives $0.9996 \pm 0.0012$, the tie-breaking of §3.2 rather than an error; and the 155,000-point figure is an
+**extrapolation from a ratio stable to 1.62× across an 8× change in $N$**, since the in-place arm cannot be run there on
+this host. What remains owed is that one measurement at scale, on hardware where the comparison arm fits. Appendix A.6
+has the full account; `reproduce/experiments/check_matrix_free_reorder.py` regenerates it.
 
 ### G4e — The general merge operator (open question; partially measured)
 
-The method is named after the merge, and **the merge itself is unfinished.** §3.3.4's divide-and-conquer stitch works and is measured: Table 3.6 has the principled version recovering an adjusted Rand index of 1.00 across every partition tested, where naive concatenation collapses to 0.47. But it is a two-way stitch over blocks chosen by farthest-point sampling, not a general operator. Three unknowns bear on a distributed implementation: whether the stitch composes, how the reconstruction-error bound grows under repeated application, and how to choose block boundaries when the data does not partition cleanly, farthest-point sampling being a heuristic the ablation shows necessary and not sufficient. G4b, G4c and G4d are engineering; this one is a question. Checklist **C10**.
+The method is named after the merge, and **the merge itself is unfinished.** §3.3.4's divide-and-conquer stitch works
+and is measured: Table 3.6 has the principled version recovering an adjusted Rand index of 1.00 across every partition
+tested, where naive concatenation collapses to 0.47. But it is a two-way stitch over blocks chosen by farthest-point
+sampling, not a general operator. Three unknowns bear on a distributed implementation: whether the stitch composes, how
+the reconstruction-error bound grows under repeated application, and how to choose block boundaries when the data does
+not partition cleanly, farthest-point sampling being a heuristic the ablation shows necessary and not sufficient. G4b,
+G4c and G4d are engineering; this one is a question. Checklist **C10**.
 
-*Decision rule.* Composition is cheap to settle and goes first. Order four blocks, merge them pairwise in both orders and all at once, and compare the three orderings elementwise on the two-moons and circles constructions of Table 3.5 across ten seeds and a grid of partition counts. The operator composes if all three agree exactly and does not if any pair disagrees. If it does not, the half-million-point distributed target is withdrawn, the error-growth question is moot, and Chapter 3 says the merge is a single-level operator, which is what Table 3.6 measures. The error-growth bound and the block-boundary question stay open either way, named as future work.
+*Decision rule.* Composition is cheap to settle and goes first. Order four blocks, merge them pairwise in both orders
+and all at once, and compare the three orderings elementwise on the two-moons and circles constructions of Table 3.5
+across ten seeds and a grid of partition counts. The operator composes if all three agree exactly and does not if any
+pair disagrees. If it does not, the half-million-point distributed target is withdrawn, the error-growth question is
+moot, and Chapter 3 says the merge is a single-level operator, which is what Table 3.6 measures. The error-growth bound
+and the block-boundary question stay open either way, named as future work.
 
 ### G9 — `IVATMeans` against FCM and k-means (experiment; not started)
 
-§3.3.5 presents `IVATMeans` as a contribution: a partition read off the exact iVAT image, arrived at with no initialization, returning assignment and membership from one fit. What Chapter 3 measures is the *engine* underneath it, the reorder, the footprint and the device MST. It never measures the estimator. Nothing in this repository times `IVATMeans` against Fuzzy C-Means or k-means, and nothing scores its partitions against theirs, so a stated contribution currently rests on properties provable from the code and on no measurement at all. Both halves are owed: performance at scale, and quality of construction.
+§3.3.5 presents `IVATMeans` as a contribution: a partition read off the exact iVAT image, arrived at with no
+initialization, returning assignment and membership from one fit. What Chapter 3 measures is the *engine* underneath it,
+the reorder, the footprint and the device MST. It never measures the estimator. Nothing in this repository times
+`IVATMeans` against Fuzzy C-Means or k-means, and nothing scores its partitions against theirs, so a stated contribution
+currently rests on properties provable from the code and on no measurement at all. Both halves are owed: performance at
+scale, and quality of construction.
 
 *Decision rule.* Three arms on the run-of-record host, `IVATMeans` against Fuzzy C-Means and k-means, ten seeds.
 
-1. **Performance at scale.** Wall clock across the size ladder Chapter 3 already exercises, $N$ at 1,000, 2,000, 5,000, 16,000, 32,000 and 58,000, the top rung being the shuttle set of §7.3, with the CPU kernel and the whole-pipeline-on-device path (`distance_backend`, `on_device`) reported as separate rows rather than pooled. The ladder stops where Table 3.3 says it must: `IVATMeans` holds an $N \times N$ matrix and the prototype baselines do not, so the size at which it becomes infeasible while they keep running is part of the result and not an omission. Threshold: within one order of magnitude of FCM at every size all three arms can run. Past that, §3.3.5's scale property belongs to the engine and not to the estimator, and the section has to say so.
-2. **Quality of construction.** Adjusted Rand index against ground truth on Table 3.5's four constructions, two moons, circles, aniso and bridged, plus one blob set where a prototype is the right model, at matched $c$. Threshold on the blob case: within 0.05 ARI of the better of FCM and k-means. **The suite must include the sets where §3.3.5's envelope predicts a loss.** A benchmark run only where the method wins is not a benchmark, and the predicted loss is where the refutation condition sits.
-3. **The determinism asymmetry, stated in the protocol.** FCM and k-means have to be restarted and are reported as a spread over their restarts. `IVATMeans` has no spread to report over seeds, and that is the result rather than a missing column: the protocol verifies the labelling elementwise identical across the ten seeds and prints the zero, instead of quoting a mean with no error bar and leaving a reader to work out which kind of zero it is.
+1. **Performance at scale.** Wall clock across the size ladder Chapter 3 already exercises, $N$ at 1,000, 2,000, 5,000,
+   16,000, 32,000 and 58,000, the top rung being the shuttle set of §7.3, with the CPU kernel and the
+   whole-pipeline-on-device path (`distance_backend`, `on_device`) reported as separate rows rather than pooled. The
+   ladder stops where Table 3.3 says it must: `IVATMeans` holds an $N \times N$ matrix and the prototype baselines do
+   not, so the size at which it becomes infeasible while they keep running is part of the result and not an omission.
+   Threshold: within one order of magnitude of FCM at every size all three arms can run. Past that, §3.3.5's scale
+   property belongs to the engine and not to the estimator, and the section has to say so.
+2. **Quality of construction.** Adjusted Rand index against ground truth on Table 3.5's four constructions, two moons,
+   circles, aniso and bridged, plus one blob set where a prototype is the right model, at matched $c$. Threshold on the
+   blob case: within 0.05 ARI of the better of FCM and k-means. **The suite must include the sets where §3.3.5's
+   envelope predicts a loss.** A benchmark run only where the method wins is not a benchmark, and the predicted loss is
+   where the refutation condition sits.
+3. **The determinism asymmetry, stated in the protocol.** FCM and k-means have to be restarted and are reported as a
+   spread over their restarts. `IVATMeans` has no spread to report over seeds, and that is the result rather than a
+   missing column: the protocol verifies the labelling elementwise identical across the ten seeds and prints the zero,
+   instead of quoting a mean with no error bar and leaving a reader to work out which kind of zero it is.
 
-**The refutation condition is the predicted loss.** §3.3.5 and §5.2 both rest on the claim that a Euclidean prototype costs something on non-convex data, so the prediction is that `IVATMeans` lands near Table 3.5's k-means row on two moons and circles, about 0.27 and 0.00, and not near exact mergeVAT's 1.00: the iVAT front end cuts the rings correctly and the nearest-prototype step then re-merges them. If it reaches 1.00 there, the prototype bound is not a bound, §5.2's argument for the relational method loses its motivating case, and Chapter 5 has to be re-argued on the coordinate-free property alone.
+**The refutation condition is the predicted loss.** §3.3.5 and §5.2 both rest on the claim that a Euclidean prototype
+costs something on non-convex data, so the prediction is that `IVATMeans` lands near Table 3.5's k-means row on two
+moons and circles, about 0.27 and 0.00, and not near exact mergeVAT's 1.00: the iVAT front end cuts the rings correctly
+and the nearest-prototype step then re-merges them. If it reaches 1.00 there, the prototype bound is not a bound, §5.2's
+argument for the relational method loses its motivating case, and Chapter 5 has to be re-argued on the coordinate-free
+property alone.
 
-**Estimated effort: about three weeks.** The estimator, both baselines and the timing harness all exist; what is missing is a driver, a size ladder and two tables.
+**Estimated effort: about three weeks.** The estimator, both baselines and the timing harness all exist; what is missing
+is a driver, a size ladder and two tables.
 
-**Timeline:** Ch 10 shows 2027 Q2 (three-week bar). **Status:** in scope; it is the only measurement behind a stated contribution.
+**Timeline:** Ch 10 shows 2027 Q2 (three-week bar). **Status:** in scope; it is the only measurement behind a stated
+contribution.
 
 ### G1 — Direct one-pass membership generation (build + experiment; partly built)
 
-Collapse Chapter 5's two-stage select-then-fit pipeline into a single pass: each block emits its native membership function, the disjunction recombines them, the surviving envelope is the model. The differentiator, and it feeds the capstone.
+Collapse Chapter 5's two-stage select-then-fit pipeline into a single pass: each block emits its native membership
+function, the disjunction recombines them, the surviving envelope is the model. The differentiator, and it feeds the
+capstone.
 
-Phases one to three of `MEMBERSHIP_ROADMAP.md` are built: memberships come straight from the persistence structure at no accuracy cost, the argmax of the generated partition reproduces the hard labels at every scale, each scale is a valid Ruspini partition of unity. Phase five, the one-pass refactor, is plumbing and unattempted. Phase four, the soft kernel-weighted band membership meant to fix small-sample over-segmentation, is the research-interesting piece, and **it has been attempted once, on `feat/mf-phase4-bands`, and it did not fix it**: `log_separated` at small $n$ moves from an adjusted Rand index of 0 to roughly 0.57, against the flat set-cover's 1.00. Appendix A.6 has the mechanism and the finding that the cause is not sampling density. The expectation has been tested and it is losing.
+Phases one to three of `MEMBERSHIP_ROADMAP.md` are built: memberships come straight from the persistence structure at no
+accuracy cost, the argmax of the generated partition reproduces the hard labels at every scale, each scale is a valid
+Ruspini partition of unity. Phase five, the one-pass refactor, is plumbing and unattempted. Phase four, the soft
+kernel-weighted band membership meant to fix small-sample over-segmentation, is the research-interesting piece, and **it
+has been attempted once, on `feat/mf-phase4-bands`, and it did not fix it**: `log_separated` at small $n$ moves from an
+adjusted Rand index of 0 to roughly 0.57, against the flat set-cover's 1.00. Appendix A.6 has the mechanism and the
+finding that the cause is not sampling density. The expectation has been tested and it is losing.
 
-*Decision rule.* Three fixed-structure families from `battery_hierarchical.SCALABLE` — `single_scale`, `many_scale`, `log_separated` — at $n$ = 100, 250, 500, 1,000, 2,000 and 5,000, the one-pass generator against both the two-stage selector and the flat set-cover on identical data. Metrics: recovered granularity vector, per-level adjusted Rand index of the defuzzified partition against each ground-truth level, partition-of-unity error under Ruspini normalization. Thresholds: `many_scale` must not regress from granularities [8, 4, 2] at ARI 1.00 at any $n$; partition-of-unity error must stay at machine precision; `log_separated` at $n \le 500$ must reach ARI ≥ 0.95 with a single band of three clusters, the flat cover's answer and the number phase four failed to reach. Below 0.95 is *not* fixed, leaving no room for partial success.
+*Decision rule.* Three fixed-structure families from `battery_hierarchical.SCALABLE` — `single_scale`, `many_scale`,
+`log_separated` — at $n$ = 100, 250, 500, 1,000, 2,000 and 5,000, the one-pass generator against both the two-stage
+selector and the flat set-cover on identical data. Metrics: recovered granularity vector, per-level adjusted Rand index
+of the defuzzified partition against each ground-truth level, partition-of-unity error under Ruspini normalization.
+Thresholds: `many_scale` must not regress from granularities [8, 4, 2] at ARI 1.00 at any $n$; partition-of-unity error
+must stay at machine precision; `log_separated` at $n \le 500$ must reach ARI ≥ 0.95 with a single band of three
+clusters, the flat cover's answer and the number phase four failed to reach. Below 0.95 is *not* fixed, leaving no room
+for partial success.
 
-If soft bands land where phase four landed, the conclusion is not that the kernel needs tuning. It is that birth height is a clean band coordinate only where each cluster occupies a narrow birth range, that the flat set-cover is simply correct for single-level widely-varying-spread data, and that the deliverable is a **single-versus-multi-level gate** detecting one antichain and deferring to the flat cover. G1 then ships as phases one to three plus five, the fix relabelled a gate; Chapter 5 §5.5 needs the same correction.
+If soft bands land where phase four landed, the conclusion is not that the kernel needs tuning. It is that birth height
+is a clean band coordinate only where each cluster occupies a narrow birth range, that the flat set-cover is simply
+correct for single-level widely-varying-spread data, and that the deliverable is a **single-versus-multi-level gate**
+detecting one antichain and deferring to the flat cover. G1 then ships as phases one to three plus five, the fix
+relabelled a gate; Chapter 5 §5.5 needs the same correction.
 
-**The decision rule itself is still not evaluable — phase five, the one-pass generator, remains unbuilt — but the comparison arms it needs are now measured (2026-08-12), at this document's ten-seed floor rather than the single seed the earlier scaling study used.** `reproduce/tables/table_5_4_ch5_g1_scaling.py` runs the *existing* two-stage selector against the flat set-cover across all three families at the full $n$ grid. `many_scale` recovers [8, 4, 2] at ARI 1.00 on every seed and every $n$ — the two-stage selector's own half of the decision rule's first threshold holds cleanly, which the one-pass generator will need to match or beat once built. `single_scale` is the new finding: granularity agrees across only 5–7 of 10 seeds, a real instability the single-seed study could not have shown, so "must not regress" needs a distribution to regress *from*, not a point estimate. `log_separated`'s two-stage selector reaches ARI 0.73 ± 0.20 at $n=100$, short of the 0.95 threshold quoted above — but that threshold names the *one-pass generator*, not the two-stage selector, so this is not itself a G1 failure; it is the baseline the one-pass generator, once built, has to beat.
+**The decision rule itself is still not evaluable — phase five, the one-pass generator, remains unbuilt — but the
+comparison arms it needs are now measured at this document's ten-seed floor rather than the single seed the earlier
+scaling study used.** `reproduce/tables/table_5_4_ch5_g1_scaling.py` runs the *existing* two-stage selector against the
+flat set-cover across all three families at the full $n$ grid. `many_scale` recovers [8, 4, 2] at ARI 1.00 on every seed
+and every $n$ — the two-stage selector's own half of the decision rule's first threshold holds cleanly, which the
+one-pass generator will need to match or beat once built. `single_scale` is the new finding: granularity agrees across
+only 5–7 of 10 seeds, a real instability the single-seed study could not have shown, so "must not regress" needs a
+distribution to regress *from*, not a point estimate. `log_separated`'s two-stage selector reaches ARI 0.73 ± 0.20
+at $n=100$, short of the 0.95 threshold quoted above — but that threshold names the *one-pass generator*, not the
+two-stage selector, so this is not itself a G1 failure; it is the baseline the one-pass generator, once built, has to
+beat.
 
-**Timeline:** Ch 10 grid shows 2027 Q2. **Evidence:** Appendix A.6 has the phase-four investigation and findings; `reproduce/outputs/table_5_4_ch5_g1_scaling.md` has the ten-seed scaling measurement.
+**Timeline:** Ch 10 grid shows 2027 Q2. **Evidence:** Appendix A.6 has the phase-four investigation and findings;
+`reproduce/outputs/table_5_4_ch5_g1_scaling.md` has the ten-seed scaling measurement.
 
 ### G2 — Real non-coordinate benchmarks (experiment; not started, datasets verified)
 
-Everything topological is so far demonstrated on synthetic data with known ground truth. The core niche, working where there are no coordinates, has to be shown on genuinely non-metric domains: time series under dynamic time warping, sequences under edit distance, graphs under a kernel dissimilarity. The single most important credibility gap to close, serving Chapters 3 and 5 both.
+Everything topological is so far demonstrated on synthetic data with known ground truth. The core niche, working where
+there are no coordinates, has to be shown on genuinely non-metric domains: time series under dynamic time warping,
+sequences under edit distance, graphs under a kernel dissimilarity. The single most important credibility gap to close,
+serving Chapters 3 and 5 both.
 
-**"Beat the baselines" is not available as a success criterion here**, because in the regime the experiment exists to demonstrate there are no baselines to beat: the natural competitors all require coordinates the data does not have. Appendix A.5 lists the verified datasets and derives that unavailability. A criterion that cannot fail is not a criterion, so the criterion is four other things.
+**"Beat the baselines" is not available as a success criterion here**, because in the regime the experiment exists to
+demonstrate there are no baselines to beat: the natural competitors all require coordinates the data does not have.
+Appendix A.5 lists the verified datasets and derives that unavailability. A criterion that cannot fail is not a
+criterion, so the criterion is four other things.
 
 *Decision rule.* Four thresholds on the DTW, graph-kernel and Duin–Pękalska families of A.5.
 
-1. **Exactness under real non-metricity — MET (2026-08-12).** The ordering on each real dissimilarity matrix must be elementwise identical to the serial reference at every size and seed, which Table 3.7's synthetic rows establish and its last row now also does: agreement is **1.000 on all three real DTW datasets tested** (ECG5000 $N=5{,}000$, FordA $N=4{,}921$, Crop $N=24{,}000$), checked at the classical reference's own tractable cap ($N \le 1{,}024$, ten random subsamples per dataset). §3.2's regime claim survives its first real test.
-2. **Harder non-metricity than the proxy it replaces — met on two of three, not uniformly.** Triangle-inequality violation rates: ECG5000 20.9%, Crop 23.6% — both above the 14% fractional-Minkowski proxy, as hoped. **FordA is 0.4%**, well below the proxy: its DTW dissimilarities turned out closer to metric than the synthetic stand-in predicts. The threshold is met dataset-by-dataset, not universally; report both directions.
-3. **Downstream usefulness against the baselines that can run — measurement now COMPLETE on all five named sets (2026-08-26); NOT MET on the letter of the threshold, and the direction is now unambiguous.** The two previously unattempted sets are measured at full N — ElectricDevices ($N=16{,}637$) and, first time it has been feasible at all, StarLightCurves ($N=9{,}236$, series length 1,024; its full DTW build was ~30 hours until an OpenMP+SIMD kernel in `experiments/dtw-simd`, equality-verified against aeon per run, brought it to ~4.6 h). Two of five land within 0.05 ARI of NERFCM-given-$k$: FordA (0.002 vs 0.000, a degenerate near-zero tie) and ElectricDevices (0.147 vs 0.175, both weak on 7 classes). The other three all fail the band **on the favorable side**: on every dataset where either method finds real structure, `select_coverage_cover` *beats* NERFCM-given-$k$ — ECG5000 0.715 vs 0.593 (+0.122), StarLightCurves 0.664 vs 0.482 (+0.182), Crop 0.114 vs 0.030 (+0.084) — while discovering $k$ itself. So the parity count is two of five, the item stays open as written, and the refutation condition (missing 0.05 on *every* real set) still plainly does not hold; what the completed measurement actually argues is that ARI-*parity* with NERFCM-given-$k$ was the wrong shape for the criterion, since the set-cover does not track that baseline — it dominates it wherever there is signal. Amending the rule to a one-sided criterion is a deliberate decision to make in front of this data, not a footnote; until then the letter stands. Two provenance notes: this run also re-measured ECG5000/FordA/Crop on a **corrected minimax transform** (the fast CSR implementation silently drops exact-zero distances, i.e. duplicate points — ElectricDevices carries 40 such pairs in its verification subsample, Crop 2; ECG5000 and FordA carry none and reproduce their 2026-08-12 rows exactly, while Crop's set-cover moved 0.064 → 0.114); and every DTW matrix and transform in the run is equality-gated per call (kernel vs aeon; transform vs the $O(n^3)$ reference). Archive: `reproduce/outputs/g2-downstream-2026-08-25/`.
-4. **Reachable size on real relational data — MET.** Crop's full 24,000-point, ≈4.6 GB matrix was built (1,597 s) and reordered (**4.7 s**), confirming the engine's cost lives in the distance computation, not the algorithm, at the named scale target.
+1. **Exactness under real non-metricity — MET.** The ordering on each real dissimilarity matrix must be elementwise
+   identical to the serial reference at every size and seed, which Table 3.7's synthetic rows establish and its last row
+   now also does: agreement is **1.000 on all three real DTW datasets tested** (ECG5000 $N=5{,}000$, FordA $N=4{,}921$,
+   Crop $N=24{,}000$), checked at the classical reference's own tractable cap ($N \le 1{,}024$, ten random subsamples
+   per dataset). §3.2's regime claim survives its first real test.
+2. **Harder non-metricity than the proxy it replaces — met on two of three, not uniformly.** Triangle-inequality
+   violation rates: ECG5000 20.9%, Crop 23.6% — both above the 14% fractional-Minkowski proxy, as hoped. **FordA is
+   0.4%**, well below the proxy: its DTW dissimilarities turned out closer to metric than the synthetic stand-in
+   predicts. The threshold is met dataset-by-dataset, not universally; report both directions.
+3. **Downstream usefulness against the baselines that can run — measurement is COMPLETE on all five named sets; NOT MET
+   on the letter of the threshold, and the direction is unambiguous.** The two previously unattempted sets are measured
+   at full N — ElectricDevices ($N=16{,}637$) and, first time it has been feasible at all, StarLightCurves ($N=9{,}236$,
+   series length 1,024; its full DTW build was ~30 hours until an OpenMP+SIMD kernel in `experiments/dtw-simd`,
+   equality-verified against aeon per run, brought it to ~4.6 h). Two of five land within 0.05 ARI of NERFCM-given-$k$:
+   FordA (0.002 vs 0.000, a degenerate near-zero tie) and ElectricDevices (0.147 vs 0.175, both weak on 7 classes). The
+   other three all fail the band **on the favorable side**: on every dataset where either method finds real structure,
+   `select_coverage_cover` *beats* NERFCM-given-$k$ — ECG5000 0.715 vs 0.593 (+0.122), StarLightCurves 0.664 vs 0.482
+   (+0.182), Crop 0.114 vs 0.030 (+0.084) — while discovering $k$ itself. So the parity count is two of five, the item
+   stays open as written, and the refutation condition (missing 0.05 on *every* real set) still plainly does not hold;
+   what the completed measurement actually argues is that ARI- *parity* with NERFCM-given-$k$ was the wrong shape for
+   the criterion, since the set-cover does not track that baseline — it dominates it wherever there is signal. Amending
+   the rule to a one-sided criterion is a deliberate decision to make in front of this data, not a footnote; until then
+   the letter stands. Two provenance notes: this run also re-measured ECG5000/FordA/Crop on a **corrected minimax
+   transform** (the fast CSR implementation silently drops exact-zero distances, i.e. duplicate points — ElectricDevices
+   carries 40 such pairs in its verification subsample, Crop 2; ECG5000 and FordA carry none and reproduce their earlier
+   rows exactly, while Crop's set-cover moved 0.064 → 0.114); and every DTW matrix and transform in the run is
+   equality-gated per call (kernel vs aeon; transform vs the $O (n^3)$ reference). Archive:
+   `reproduce/outputs/g2-downstream-2026-08-25/`.
+4. **Reachable size on real relational data — MET.** Crop's full 24,000-point, ≈4.6 GB matrix was built (1,597 s) and
+   reordered (**4.7 s**), confirming the engine's cost lives in the distance computation, not the algorithm, at the
+   named scale target.
 
-**Net: three of four decision-rule items are settled; the fourth (downstream usefulness) is now fully measured — five of five named sets, full N — and stays open only on the letter of a parity band that every structured dataset fails in this work's favor.** Full numbers, including the ones that do not flatter the claim (FordA's low violation rate, the three favorable overshoots that still count as misses), are in Table 3.7, Appendix A.7.7, `reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`, and `reproduce/outputs/g2-downstream-2026-08-25/`.
+**Net: three of four decision-rule items are settled; the fourth (downstream usefulness) is now fully measured — five of
+five named sets, full N — and stays open only on the letter of a parity band that every structured dataset fails in this
+work's favor.** Full numbers, including the ones that do not flatter the claim (FordA's low violation rate, the three
+favorable overshoots that still count as misses), are in Table 3.7, Appendix A.7.7,
+`reproduce/outputs/SESSION_FINDINGS_2026-08-12.md`, and `reproduce/outputs/g2-downstream-2026-08-25/`.
 
-**Timeline:** Ch 10 shows 2027 Q2–Q3 (two-quarter run). **Datasets:** Appendix A.7.7 lists verified loadable datasets, all five named DTW sets now measured; A.5 explains why there are no baseline competitors for exactness, though item 3 above found four that run on a dissimilarity matrix without needing coordinates.
+**Timeline:** Ch 10 shows 2027 Q2–Q3 (two-quarter run). **Datasets:** Appendix A.7.7 lists verified loadable datasets,
+all five named DTW sets now measured; A.5 explains why there are no baseline competitors for exactness, though item 3
+above found four that run on a dissimilarity matrix without needing coordinates.
 
 ### G3 — The hierarchical mixture, finished and compared (build + experiment; one-shot built)
 
-Implement the EM refinement of the mixture of experts, and benchmark the family against the baselines a reviewer will demand on identical splits.
+Implement the EM refinement of the mixture of experts, and benchmark the family against the external baselines
+on identical splits. The mixture is supporting work rather than a chapter contribution (Appendix A.11), and this
+goal's output extends that appendix section, not Chapter 6.
 
-**The baseline list is narrowed deliberately, and Chapter 6 §6.4's version should narrow to match.** To be built: ANFIS and a genetic-algorithm-tuned FIS (checklist **C1**, first in the schedule), CART, Random Forest, flat TSK, and M5 model trees *if* the M5 decision goes that way. Not to be built: Fumanal-Idocin et al. (2025) or the deep TSK fuzzy classifier, for the reasons Appendix A.6 sets out. Reimplementing one, the closest being Fumanal-Idocin et al., would displace G3b; that is the price.
+**The baseline list is narrowed deliberately, and Appendix A.11.3's version should narrow to match.** To be built: ANFIS
+and a genetic-algorithm-tuned FIS (checklist **C1**, first in the schedule), CART, Random Forest, flat TSK, and M5 model
+trees *if* the M5 decision goes that way. Not to be built: Fumanal-Idocin et al. (2025) or the deep TSK fuzzy
+classifier, for the reasons Appendix A.6 sets out. Reimplementing one, the closest being Fumanal-Idocin et al., would
+displace G3b; that is the price.
 
-**M5 decision:** A dependency fault (m5py incompatible with current scikit-learn) requires a go/no-go decision by **31 March 2027**, before G3's suite is built. See Appendix A.6 for the fault details and three resolution branches (patch, write M5′, or drop the row).
+**M5 decision:** A dependency fault (m5py incompatible with current scikit-learn) requires a go/no-go decision by **31
+March 2027**, before G3's suite is built. See Appendix A.6 for the fault details and three resolution branches (patch,
+write M5′, or drop the row).
 
-*Decision rule for the EM, stated in advance because otherwise every outcome is a win.* The prediction goes first. **I expect EM ≈ one-shot at second order on Concrete, and I expect what it buys to be stability rather than level.** Metric: $R^2$ and its ten-seed standard deviation at matched capacity on shared splits, plus the divergence rate, the fraction of seeds whose predictions leave the target's observed range, the failure the seed-9 episode exposed. Threshold: a positive result moves the mean by at least 0.02 $R^2$ over the one-shot fit *or* cuts the ten-seed spread by at least a third, with zero divergent seeds. Anything inside that band is the predicted null result, reported as a confirmed prediction: a third instance of *structure before search*, beside §6.3.5's population-method finding and §6.4's refinement decay.
+*Decision rule for the EM, stated in advance because otherwise every outcome is a win.* The prediction goes first. **I
+expect EM ≈ one-shot at second order on Concrete, and I expect what it buys to be stability rather than level.**
+Metric: $R^2$ and its ten-seed standard deviation at matched capacity on shared splits, plus the divergence rate, the
+fraction of seeds whose predictions leave the target's observed range, the failure the seed-9 episode exposed.
+Threshold: a positive result moves the mean by at least 0.02 $R^2$ over the one-shot fit *or* cuts the ten-seed spread
+by at least a third, with zero divergent seeds. Anything inside that band is the predicted null result, reported as a
+confirmed prediction: a third instance of *structure before search*, beside §6.3.5's population-method finding and
+§6.4's refinement decay.
 
 **Timeline:** Ch 10 shows 2027 Q3–Q4. **Critical path:** M5 decision dates it; see Ch 10 §10.4 dependencies.
 
 ### G5 — Output partitioning: settled (decision; four studies run)
 
-**The recommendation is uniform, equal-width cuts with per-bucket centroids, and a monotone target transform where the target is badly skewed.** `partition_output` now defaults to it, warns when a bucket holds fewer than three samples, and keeps `method="quantile"` for reproducing the earlier measurements. Chapter 4 §4.3.2 carries the evidence.
+**The recommendation is uniform, equal-width cuts with per-bucket centroids, and a monotone target transform where the
+target is badly skewed.** `partition_output` now defaults to it, warns when a bucket holds fewer than three samples, and
+keeps `method="quantile"` for reproducing the earlier measurements. Chapter 4 §4.3.2 carries the evidence.
 
-The goal was open for three studies because all three ran at first and second order, where the choice does not matter: the three arms span 0.009 in $R^2$ against seed spreads of ±0.018 to ±0.027. Adding zeroth order settled it in one run. `solve_tsk_consequents` holds the extreme rules' constant terms at the centroids it is handed, and at zeroth order that constant is a rule's whole output, so the arms span **0.828**: uniform at 0.394 ± 0.065 against the old pinned-quantile default at −0.434 ± 0.241, with the ordering holding at three, four and six buckets and every separation clearing both arms' error bars. Decomposed, the boundary scheme is worth 0.152 of that and the pinning 0.676.
+The goal was open for three studies because all three ran at first and second order, where the choice does not matter:
+the three arms span 0.009 in $R^2$ against seed spreads of ±0.018 to ±0.027. Adding zeroth order settled it in one run.
+`solve_tsk_consequents` holds the extreme rules' constant terms at the centroids it is handed, and at zeroth order that
+constant is a rule's whole output, so the arms span **0.828**: uniform at 0.394 ± 0.065 against the old pinned-quantile
+default at −0.434 ± 0.241, with the ordering holding at three, four and six buckets and every separation clearing both
+arms' error bars. Decomposed, the boundary scheme is worth 0.152 of that and the pinning 0.676.
 
-Two things follow that were not visible before. The pinned arm was never the compromise it was designed as; it was the worst of the three, because pinning a rule's consequent to a single most extreme observation makes it unrepresentative of the 343 points it labels. And the "z-score collapse" of §4.1 was an interaction with that pinning rather than a property of the feature transform, which removes a claim this document made about boundedness being load-bearing. A.6 has both investigations.
+Two things follow that were not visible before. The pinned arm was never the compromise it was designed as; it was the
+worst of the three, because pinning a rule's consequent to a single most extreme observation makes it unrepresentative
+of the 343 points it labels. And the "z-score collapse" of §4.1 was an interaction with that pinning rather than a
+property of the feature transform, which removes a claim this document made about boundedness being load-bearing. A.6
+has both investigations.
 
-The residual risk is uniform's own failure mode, and it is bounded rather than eliminated: on a heavily skewed target equal-width bins starve, the smallest falling to one sample by skew 1.8 and to zero past skew 14. That is why the recommendation carries the transform clause, and why the warning exists: a starved bucket barely moves an aggregate error, so it is precisely the failure an accuracy check cannot see. Quantile's failure at the same skews is worse for being quieter: deviations of ±0.99, ±4.45 and ±21.2 where uniform degrades smoothly toward zero.
+The residual risk is uniform's own failure mode, and it is bounded rather than eliminated: on a heavily skewed target
+equal-width bins starve, the smallest falling to one sample by skew 1.8 and to zero past skew 14. That is why the
+recommendation carries the transform clause, and why the warning exists: a starved bucket barely moves an aggregate
+error, so it is precisely the failure an accuracy check cannot see. Quantile's failure at the same skews is worse for
+being quieter: deviations of ±0.99, ±4.45 and ±21.2 where uniform degrades smoothly toward zero.
 
-**Effort spent: about a day, against an estimate of three weeks.** The estimate assumed the answer needed a new guard mechanism on the quantile path and a confirming sweep. It needed neither: the missing measurement was an axis the existing generator already supported. That is worth recording as the more useful lesson, since the same generator had run 126 cells over three schemes and six configurations without touching the regime where its own question had an answer.
+**Effort spent: about a day, against an estimate of three weeks.** The estimate assumed the answer needed a new guard
+mechanism on the quantile path and a confirming sweep. It needed neither: the missing measurement was an axis the
+existing generator already supported. That is worth recording as the more useful lesson, since the same generator had
+run 126 cells over three schemes and six configurations without touching the regime where its own question had an
+answer.
 
 ### G6 — Interpretability, measured (experiment; not started, and now scoped down)
 
-The interpretability claim should be measured, not asserted, and the earlier disjunction ("an established interpretability metric or a small expert-audience study") named no metric anywhere in the document.
+The interpretability claim should be measured, not asserted, and the earlier disjunction ("an established
+interpretability metric or a small expert-audience study") named no metric anywhere in the document.
 
-**What G6 is.** Rule counts, clause counts and root-to-leaf path lengths at matched accuracy, filling Table 6.3's pending row; those are read off a fitted model and owed regardless. Plus a *named* metric family, both already cited here: Valente de Oliveira's semantic constraints on membership functions, and the interpretability criteria of Guillaume and Charnomordic's partition-generation and FisPro work, evaluated on the Ruspini export of §6.3.4. Concretely coverage, distinguishability, normality and partition-of-unity error, per model, alongside the counts. The construction satisfies two by design and the phase-2 work already measures one at machine precision, which makes the report a check on a claim rather than a new experiment.
+**What G6 is.** Rule counts, clause counts and root-to-leaf path lengths at matched accuracy, filling Table 6.3's
+pending row; those are read off a fitted model and owed regardless. Plus a *named* metric family, both already cited
+here: Valente de Oliveira's semantic constraints on membership functions, and the interpretability criteria of Guillaume
+and Charnomordic's partition-generation and FisPro work, evaluated on the Ruspini export of §6.3.4. Concretely coverage,
+distinguishability, normality and partition-of-unity error, per model, alongside the counts. The construction satisfies
+two by design and the phase-2 work already measures one at machine precision, which makes the report a check on a claim
+rather than a new experiment.
 
-**The expert-audience study is dropped**, and stays post-defense work; Appendix A.6 sets out why it would not be defensible as things stand. The consequence is stated rather than absorbed. §6.2 lists "whether a rule base mixing one- and two-dimensional antecedents reads coherently to a domain expert" as a question only a person can answer and points at G6 as its home; that question is now unanswered here, and §6.2's bound has to hold for the hierarchy as built. §2.6's position on post-hoc explanation is reframed instead of tested, since "post-hoc answers a different question" needs no experiment.
+**The expert-audience study is dropped**, and stays post-defense work; Appendix A.6 sets out why it would not be
+justified as things stand. The consequence is stated rather than absorbed. §6.2 lists "whether a rule base mixing one-
+and two-dimensional antecedents reads coherently to a domain expert" as a question only a person can answer and points
+at G6 as its home; that question is now unanswered here, and §6.2's bound has to hold for the hierarchy as built. §2.6's
+position on post-hoc explanation is reframed instead of tested, since "post-hoc answers a different question" needs no
+experiment.
 
-*Decision rule.* Counts and the four semantic criteria on the flat FIS, the fuzzy tree, the mixture and the Ruspini export, on Concrete and one G3b dataset, at matched accuracy. Threshold, for the claim that the hierarchy buys a readable path at comparable accuracy: at accuracies within one pooled standard deviation of each other, the hierarchy's mean root-to-leaf path must mention strictly fewer variables than the flat model's rules do, and the Ruspini export must satisfy coverage and partition-of-unity exactly. Refuted if the paths are no shorter at matched accuracy, in which case the interpretability-for-accuracy trade is a loss and not a trade, and §6.5 has to say so.
+*Decision rule.* Counts and the four semantic criteria on the flat FIS, the fuzzy tree, the mixture and the Ruspini
+export, on Concrete and one G3b dataset, at matched accuracy. Threshold, for the claim that the hierarchy buys a
+readable path at comparable accuracy: at accuracies within one pooled standard deviation of each other, the hierarchy's
+mean root-to-leaf path must mention strictly fewer variables than the flat model's rules do, and the Ruspini export must
+satisfy coverage and partition-of-unity exactly. Refuted if the paths are no shorter at matched accuracy, in which case
+the interpretability-for-accuracy trade is a loss and not a trade, and §6.5 has to say so.
 
-**Timeline:** Ch 10 shows 2028 Q1. **Scoping:** narrowed to counts and named semantic criteria; the expert-study half is dropped.
+**Timeline:** Ch 10 shows 2028 Q1. **Scoping:** narrowed to counts and named semantic criteria; the expert-study half is
+dropped.
 
 ### G7 — Adaptive multi-scale (open question; stretch)
 
-Replace Chapter 5's gap heuristic for band discovery with a model-based criterion, a change-point or barcode-stability test, so that overlapping density scales become tractable. Explicitly a stretch goal. "Tractable" needs a criterion, and the evidence to beat exists.
+Replace Chapter 5's gap heuristic for band discovery with a model-based criterion, a change-point or barcode-stability
+test, so that overlapping density scales become tractable. Explicitly a stretch goal. "Tractable" needs a criterion, and
+the evidence to beat exists.
 
-*Decision rule.* The same three scaling families as G1, plus one purpose-built family with deliberately overlapping log-birth ranges. Metrics: recovered scale count and per-level adjusted Rand index. Threshold: the correct scale count at every $n$ from 100 to 5,000 — one band for `log_separated`, three for `many_scale`, one for `single_scale`, where the gap heuristic reports a spurious extra coarse band — and per-level ARI ≥ 0.95, against the gap heuristic's granularities of [1, 1, 1] and ARI 0.00 at $n$ = 100 and 500, and 0.57 at $n$ = 250, which is the phase-four kernel band's ceiling too.
+*Decision rule.* The same three scaling families as G1, plus one purpose-built family with deliberately overlapping
+log-birth ranges. Metrics: recovered scale count and per-level adjusted Rand index. Threshold: the correct scale count
+at every $n$ from 100 to 5,000 — one band for `log_separated`, three for `many_scale`, one for `single_scale`, where the
+gap heuristic reports a spurious extra coarse band — and per-level ARI ≥ 0.95, against the gap heuristic's granularities
+of [1, 1, 1] and ARI 0.00 at $n$ = 100 and 500, and 0.57 at $n$ = 250, which is the phase-four kernel band's ceiling
+too.
 
-Refuted if a change-point or stability criterion cannot beat the flat set-cover's 1.00 on single-level widely-varying-spread data. The phase-four diagnosis of Appendix A.6 would then be the right one, birth height unusable as a band coordinate, and the deliverable is again the single-versus-multi-level gate. A smaller result, still worth reporting: its likeliest outcome is a negative result G1 would also produce.
+Refuted if a change-point or stability criterion cannot beat the flat set-cover's 1.00 on single-level
+widely-varying-spread data. The phase-four diagnosis of Appendix A.6 would then be the right one, birth height unusable
+as a band coordinate, and the deliverable is again the single-versus-multi-level gate. A smaller result, still worth
+reporting: its likeliest outcome is a negative result G1 would also produce.
 
 ### G8 — Joint memberships where the structure requires them (retargeted post-defense)
 
-Every membership function here is one-dimensional, which keeps the rule count linear and the clauses readable, and is a hard expressive limit: a ring is not the intersection of per-axis intervals. The proposal extends to joint two-feature memberships *only* for clusters with no faithful axis-aligned description, using the topological disjunct count of §5.3.5 as the detector.
+Every membership function here is one-dimensional, which keeps the rule count linear and the clauses readable, and is a
+hard expressive limit: a ring is not the intersection of per-axis intervals. The proposal extends to joint two-feature
+memberships *only* for clusters with no faithful axis-aligned description, using the topological disjunct count of
+§5.3.5 as the detector.
 
-**The construction is retargeted post-defense, to a journal extension**, for the reasons Appendix A.6 sets out: the construction spends interpretability, and the §5.3.5 detector that would justify building it has never fired.
+**The construction is retargeted post-defense, to a journal extension**, for the reasons Appendix A.6 sets out: the
+construction spends interpretability, and the §5.3.5 detector that would justify building it has never fired.
 
-**What stays in scope is the measurement, not the construction.** *Decision rule.* Run the disjunct counter over G2's real datasets and report how often a class has no faithful axis-aligned description; it folds into G2's sweep at almost no cost and decides G8's fate. Common such clusters mean this construction is the wrong tool for that data, a limit on scope; rare ones make G8 worth building afterwards. Either way §6.2's claim should hold *without* G8, so the hole is bounded rather than pending.
+**What stays in scope is the measurement, not the construction.** *Decision rule.* Run the disjunct counter over G2's
+real datasets and report how often a class has no faithful axis-aligned description; it folds into G2's sweep at almost
+no cost and decides G8's fate. Common such clusters mean this construction is the wrong tool for that data, a limit on
+scope; rare ones make G8 worth building afterwards. Either way §6.2's claim should hold *without* G8, so the hole is
+bounded rather than pending.
 
 ## 7.3 Application showcases
 
-The flagship case study is the **UCI shuttle set**, the same {{dataset.shuttle.rows}}-point NASA reentry telemetry Chapter 3 uses to demonstrate scale: one dataset carried from the reordering through membership generation and model synthesis to the final rule base, public where the psychiatric set of §3.3.2 is not, and imbalanced the way the complement rule of §4.3.5 was built for ({{dataset.shuttle.classes}} classes, roughly 80% of records in one flight condition).
+The flagship case study is the **UCI shuttle set**, the same {{dataset.shuttle.rows}}-point NASA reentry telemetry
+Chapter 3 uses to demonstrate scale: one dataset carried from the reordering through membership generation and model
+synthesis to the final rule base, public where the psychiatric set of §3.3.2 is not, and imbalanced the way the
+complement rule of §4.3.5 was built for ({{dataset.shuttle.classes}} classes, roughly 80% of records in one flight
+condition).
 
-One limitation belongs here. The shuttle set **has coordinates**, {{dataset.shuttle.features}} sensor channels, so a capstone built on it does *not* exercise the coordinate-free regime Chapter 5's premise rests on. The capstone and Goal G2 answer different questions, which is why §7.1 requires the *same driver* to complete on one of G2's DTW matrices.
+One limitation belongs here. The shuttle set **has coordinates**, {{dataset.shuttle.features}} sensor channels, so a
+capstone built on it does *not* exercise the coordinate-free regime Chapter 5's premise rests on. The capstone and Goal
+G2 answer different questions, which is why §7.1 requires the *same driver* to complete on one of G2's DTW matrices.
 
-The **BETH** host-telemetry set is **closed**, and how it closed is the lesson. This gap read, through 2026-08, that Chapter 4 named BETH as the testbed for the open-set claim while no open-set number there was measured on it, and that the obstacle was "a research decision before a coding one": leave-one-class-out needs at least three classes and BETH is binary, so it needed its own one-class path. The path already existed. `tribblefis.one_class.TribbleOneClassDetector` is a scikit-learn `OutlierMixin` written for precisely this setting, and the decision had been taken upstream in the pinned library while the proposal went on recording it as open. The experiment is now measured at {{dataset.beth.rows_approx}} rows — Table 4.11 and companions 4.11(b)–(e), `PROVENANCE_MAP.md` notes 22–24 — and on the one-class configuration the complement rule reaches parity with a one-class SVM ($J$ +0.843 against +0.841), which is the opposite of Table 4.7b's verdict on the multi-class surrogate. So the fallback this paragraph used to name is not needed: the open-set claim no longer stands on Glass alone, and Glass at {{dataset.glass.rows}} samples reverts to what it always was, a stress test rather than a demonstration. **The transferable failure is the audit direction.** `reproduce/check_prose.py` watches for numbers drifting between prose and harness; it cannot see a *capability* arriving in a submodule and silently retiring a stated blocker. A submodule pin bump is already an event with a checklist (B13); this says the event should also ask which recorded blockers the new pin has removed.
+The **BETH** host-telemetry set is **closed**, and how it closed is the lesson. This gap read, through 2026-08, that
+Chapter 4 named BETH as the testbed for the open-set claim while no open-set number there was measured on it, and that
+the obstacle was "a research decision before a coding one": leave-one-class-out needs at least three classes and BETH is
+binary, so it needed its own one-class path. The path already existed. `tribblefis.one_class.TribbleOneClassDetector` is
+a scikit-learn `OutlierMixin` written for precisely this setting, and the decision had been taken upstream in the pinned
+library while the proposal went on recording it as open. The experiment is now measured at {{dataset.beth.rows_approx}}
+rows — Table 4.11 and companions 4.11 (b)– (e), `PROVENANCE_MAP.md` notes 22–24 — and on the one-class configuration the
+complement rule reaches parity with a one-class SVM ($J$ +0.843 against +0.841), which is the opposite of Table 4.7b's
+verdict on the multi-class surrogate. So the fallback this paragraph used to name is not needed: the open-set claim no
+longer stands on Glass alone, and Glass at {{dataset.glass.rows}} samples reverts to what it always was, a stress test
+rather than a demonstration. **The transferable failure is the audit direction.** `reproduce/check_prose.py` watches for
+numbers drifting between prose and harness; it cannot see a *capability* arriving in a submodule and silently retiring a
+stated blocker. A submodule pin bump is already an event with a checklist (B13); this says the event should also ask
+which recorded blockers the new pin has removed.
 
 ## 7.4 Risks
 
-One risk has no goal above it: the prior-art overlap in Chapter 5 with Bonis and Oudot. If a reviewer collapses the three axes of daylight already stated, the integration and the one-pass membership generation still stand as novel. The EM's fallback is in G3, the GPU's in G4c.
+One risk has no goal above it: the prior-art overlap in Chapter 5 with Bonis and Oudot. If that overlap is pressed
+past the three axes of daylight already stated, the integration and the one-pass membership generation still stand
+as novel.
+EM's fallback is in G3, the GPU's in G4c.
 
-**The baseline tables in Chapters 4 and 6 are the first experiments I owe, which means they are now first in the schedule.** Chapter 10 had buried those adapters inside Goal G3 in the final quarters with no bar of their own, the largest single inconsistency between the two chapters. Eleven cells across Tables 4.5 and 6.2 (eight and three) read `N/A` until the adapters exist. Chapter 1 §1.1 meanwhile states the speed claim as an absolute, seconds measured with no ratio quoted, and §7.1's "orders of magnitude" phrasing is brought into line with it.
+**The baseline tables in Chapters 4 and 6 are the first experiments I owe, which means they are now first in the
+schedule.** Chapter 10 had buried those adapters inside Goal G3 in the final quarters with no bar of their own, the
+largest single inconsistency between the two chapters. Eleven cells across Tables 4.5 and 6.2 (eight and three) read
+`N/A` until the adapters exist. Chapter 1 §1.1 meanwhile states the speed claim as an absolute, seconds measured with no
+ratio quoted, and §7.1's "orders of magnitude" phrasing is brought into line with it.
 
-**The verification-and-validation framing is motivation with nothing measured behind it, and it is invoked in seven places.** §1.1, §2.6 and Chapter 8 argue that an interpretable rule base is the raw material of a V&V or certification argument in a way a trained network is not; §4.3.5 reads the complement rule as an operational-design-domain monitor and §6.3.4 the Ruspini export as the artifact such an argument would take as its input; §2.1 credits the constraint set this work shares with the one fuzzy controller that has actually been formally verified; this entry is the seventh. §2.6 states the boundary explicitly — no certification artifact, no DO-178C or DO-333 objective claimed, no assurance case — and this is the entry that makes the boundary a tracked item rather than a disclaimer. Nothing in the runway moves it: the closest goal is **G6**, and G6 measures the exported partition's semantic properties (coverage, distinguishability, normality, partition-of-unity error), which is a fuzzy-design criterion and not a certification one. Making the framing load-bearing would need an operational design domain, a hazard analysis, behavioural coverage of the rule base over that domain, and traceability records; that is a dissertation of its own, and if a committee wants it inside this one, something in Table 7.1 has to come out. The honest position for the defense is that this work makes a certifiable model family *available* and does not certify anything.
+**The verification-and-validation framing is motivation with nothing measured behind it, and it is invoked in seven
+places.** §1.1, §2.6 and Chapter 8 argue that an interpretable rule base is the raw material of a V&V or certification
+argument in a way a trained network is not; §4.3.5 reads the complement rule as an operational-design-domain monitor and
+§6.3.4 the Ruspini export as the artifact such an argument would take as its input; §2.1 credits the constraint set this
+work shares with the one fuzzy controller that has actually been formally verified; this entry is the seventh. §2.6
+states the boundary explicitly — no certification artifact, no DO-178C or DO-333 objective claimed, no assurance case —
+and this is the entry that makes the boundary a tracked item rather than a disclaimer. Nothing in the runway moves it:
+the closest goal is **G6**, and G6 measures the exported partition's semantic properties (coverage, distinguishability,
+normality, partition-of-unity error), which is a fuzzy-design criterion and not a certification one. Making the framing
+load-bearing would need an operational design domain, a hazard analysis, behavioural coverage of the rule base over that
+domain, and traceability records; that is a dissertation of its own, and if it comes inside this one,
+something in Table 7.1 has to come out. The scope of this work is to make a certifiable model
+family *available* and does not certify anything.
 
-Two exposures a committee will find. My selection gate in Chapter 5 loses outright to more aggressive selectors on the bridge case, and Table 5.3's coverage column weakens even the conservatism defence I recorded: bottleneck-bootstrap repairs the bridge while still declining three-quarters of the noise. And Chapter 3's non-metric claim rests on synthetic matrices built from coordinate data until G2 runs.
+Two weaknesses are stated here. The selection gate in Chapter 5 loses outright to more aggressive selectors on the
+bridge case, and Table 5.3's coverage column weakens even the conservatism position recorded there: bottleneck-bootstrap
+repairs the bridge while still declining three-quarters of the noise. And Chapter 3's non-metric claim rests on
+synthetic matrices built from coordinate data until G2 runs.
 
-The runway is full, and the plan commits to every goal in Table 7.1 — there is no reserved de-scoping order. The load-bearing four are the **C1** adapters, **G2**, **G4a**, and the capstone: they carry the two headline claims and the pipeline argument. **G9** matters for its own reason — three weeks on machinery that already exists, and the only measurement behind a contribution §3.3.5 now claims, so if it slipped the claim would narrow to the properties provable from the code and Chapter 3 would say so. Chapters 3 and 4 remain the floor: done, and defensible on their own.
+The runway is full, and the plan commits to every goal in Table 7.1 — there is no reserved de-scoping order. The
+load-bearing four are the **C1** adapters, **G2**, **G4a**, and the capstone: they carry the two headline claims and the
+pipeline argument. **G9** matters for its own reason — three weeks on machinery that already exists, and the only
+measurement behind a contribution §3.3.5 now claims, so if it slipped the claim would narrow to the properties provable
+from the code and Chapter 3 would say so. Chapters 3 and 4 remain the floor: done, and defensible on their own.
 
 ## 7.5 Goals, mapped
 
-**Table 7.1 — Goals for completion, mapped.** Read the **Kind** column first: it says what "done" means. A *protocol* is discharged when every table complies or is named as an exception; an *experiment* by a measurement against §7.2's threshold, and can be refuted; a *build* by working, verified code; an *open question* may end in a negative result, and two of them probably will. Quarters are relative to the confirmed December 2026 proposal, with the final defense in March 2028 (Chapter 10); rows are ordered by target quarter. Items are also tracked in `CHECKLIST.md`, with the identifier in each status cell.
+**Table 7.1 — Goals for completion, mapped.** Read the **Kind** column first: it says what "done" means. A *protocol* is
+discharged when every table complies or is named as an exception; an *experiment* by a measurement against §7.2's
+threshold, and can be refuted; a *build* by working, verified code; an *open question* may end in a negative result, and
+two of them probably will. Quarters are relative to the confirmed December 2026 proposal, with the final defense in
+March 2028 (Chapter 10); rows are ordered by target quarter. Items are also tracked in `CHECKLIST.md`, with the
+identifier in each status cell.
 
-| Goal | Kind | Feeds | Current status | Priority | Target |
-|---|---|---|---|---|---|
-| **Issue #97 (WEC_Perth evaluation)** | experiment | Ch 6 | **COMPLETE (2026-08-27)**: rank-Gaussian preprocessing + quantile bucketing + top-N feature selection achieves R²=0.6475 on 98-feature wave-energy dataset; methodology documented, preprocessing pipeline verified across ablation study | done | **complete** |
-| **C1** ANFIS + GA-FIS baseline adapters | experiment | Ch 1, 4, 6, 8 | not started; eleven cells across Tables 4.5 and 6.2 read `N/A` (C1, D4) | **must — first** | 2027 Q1 |
-| **G4a** measurement protocol | protocol | Ch 3, 4, 5, 6 | seed floor, single host, machine block, ratio reporting, estimates-vs-demonstrations and the SHA guard all in place (B1–B5b, B4 — the guard fired on the 2026-08-22 sweep); clocks/thermals and three named exceptions outstanding | must | 2027 Q1 |
-| **M5** decide: patch `m5py`, write M5′, or drop the row | decision | Ch 6 | blocked on a dependency fault, not an unrun experiment (D4) | must | decide by 2027-03-31 |
-| **G4b** eVAT + clusiVAT head-to-head | experiment | Ch 3 | not started; neither implementation in hand (C5) | must | 2027 Q1–Q2 |
-| **G1** one-pass membership generation | build + experiment | Ch 5, capstone | phases 1–3 built; phase 4 attempted once and did **not** fix the target failure; phase 5 not attempted. Comparison-arm data now measured at 10 seeds (2026-08-12): `many_scale` solid, `single_scale` less stable than believed | differentiator | 2027 Q2 |
-| **G5** output partitioning (**settled** — see §7.2) | decision | Ch 4 | four studies run; uniform recommended, shipped as the default | should | **done** |
-| **G2** real non-coordinate benchmarks (DTW/edit/graph) | experiment | Ch 3, 5 | items 1, 2 (partly) and 4 of the decision rule MET (2026-08-12): exactness 1.000 on 3 real DTW sets up to N=24,000; item 3 (downstream usefulness) open — 2/3 tested sets pass but both low-information | **must — top credibility item** | 2027 Q2–Q3 |
-| ~~**BETH** one-class path, or stand on Glass~~ | decision + experiment | Ch 4 | **done** — the path already existed upstream (`TribbleOneClassDetector`); measured as Table 4.11 + 4.11(b)–(e) | — | closed |
-| **G9** `IVATMeans` against FCM and k-means | experiment | Ch 3, 5 | not started; the estimator is built and shipped, its wall clock and partition quality never measured against either baseline | should | 2027 Q2 |
-| **C3** Ch 5 → Ch 6 minimal end-to-end | experiment | Ch 5, 6, capstone | not started; pulled forward out of the 2028 Q1 capstone (C3) | must | 2027 Q3 |
-| **G3** HME EM + narrowed baseline suite | build + experiment | Ch 6 | one-shot built; EM designed, not implemented; baseline list narrowed in §7.2 | must | 2027 Q3–Q4 |
-| **G4e** general merge operator — composition test | open question | Ch 3 | two-way stitch measured (Table 3.6); composition, error growth and block choice untested (C10) | should | 2027 Q4 |
-| **G3b** broadened dataset suite | experiment | Ch 6, App A.2.3 | not started; no loaders wired | should | 2027 Q4 |
-| **capstone** integrated end-to-end pipeline | integration | Ch 3→5→6 | not started; depends on G1 and C3 | must | 2028 Q1 |
-| **G6** interpretability: counts + named criteria | experiment | Ch 6 | not started; counts computable from a fitted model today; expert study **dropped**, see §7.2 (C9) | should | 2028 Q1 |
-| **G7** adaptive multi-scale (overlapping scales) | open question | Ch 5 | not started; phase-4 evidence says birth height is the wrong band coordinate | stretch | 2028 Q1 |
-| **G4d** matrix-free reorder | build → verify | Ch 3 | **decision rule passed 2026-08-22**: ordering exact at ten seeds, workspace flat at ~65 MB, 0.14–0.22× the wall clock; the 155k figure is an extrapolation, so one at-scale run is still owed (B6) | could | **substantially done** |
-| **G4c** datacenter-GPU re-run | experiment | Ch 3 | **blocked on hardware access**, not on effort (C8) | should | gated, not scheduled |
-| **G8** joint memberships for non-axis-aligned clusters | open question | Ch 5, 6 | detector exists but has never returned a value other than 1; **retargeted post-defense**, see §7.2 (E3, E4) | post-defense | not in the runway |
+| Goal                                                    | Kind                  | Feeds             | Current status                                                                                                                                                                                                                       | Priority                        | Target                 |
+|---------------------------------------------------------|-----------------------|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|------------------------|
+| **Issue #97 (WEC_Perth evaluation)**                    | experiment            | Ch 6              | **COMPLETE**: rank-Gaussian preprocessing + quantile bucketing + top-N feature selection achieves R²=0.6475 on 98-feature wave-energy dataset; methodology documented, preprocessing pipeline verified across ablation study         | done                            | **complete**           |
+| **C1** ANFIS + GA-FIS baseline adapters                 | experiment            | Ch 1, 4, 6, 8     | not started; eleven cells across Tables 4.5 and 6.2 read `N/A` (C1, D4)                                                                                                                                                              | **must — first**                | 2027 Q1                |
+| **G4a** measurement protocol                            | protocol              | Ch 3, 4, 5, 6     | seed floor, single host, machine block, ratio reporting, estimates-vs-demonstrations and the SHA guard all in place (B1–B5b, B4 — the guard fires on a submodule-SHA change); clocks/thermals and three named exceptions outstanding | must                            | 2027 Q1                |
+| **M5** decide: patch `m5py`, write M5′, or drop the row | decision              | Ch 6              | blocked on a dependency fault, not an unrun experiment (D4)                                                                                                                                                                          | must                            | decide by 2027-03-31   |
+| **G4b** eVAT + clusiVAT head-to-head                    | experiment            | Ch 3              | not started; neither implementation in hand (C5)                                                                                                                                                                                     | must                            | 2027 Q1–Q2             |
+| **G1** one-pass membership generation                   | build + experiment    | Ch 5, capstone    | phases 1–3 built; phase 4 attempted once and did **not** fix the target failure; phase 5 not attempted. Comparison-arm data is now measured at 10 seeds: `many_scale` solid, `single_scale` less stable than believed                | differentiator                  | 2027 Q2                |
+| **G5** output partitioning (**settled** — see §7.2)     | decision              | Ch 4              | four studies run; uniform recommended, shipped as the default                                                                                                                                                                        | should                          | **done**               |
+| **G2** real non-coordinate benchmarks (DTW/edit/graph)  | experiment            | Ch 3, 5           | items 1, 2 (partly) and 4 of the decision rule MET: exactness 1.000 on 3 real DTW sets up to N=24,000; item 3 (downstream usefulness) open — 2/3 tested sets pass but both low-information                                           | **must — top credibility item** | 2027 Q2–Q3             |
+| ~~**BETH** one-class path, or stand on Glass~~          | decision + experiment | Ch 4              | **done** — the path already existed upstream (`TribbleOneClassDetector`); measured as Table 4.11 + 4.11(b)–(e)                                                                                                                       | —                               | closed                 |
+| **G9** `IVATMeans` against FCM and k-means              | experiment            | Ch 3, 5           | not started; the estimator is built and shipped, its wall clock and partition quality never measured against either baseline                                                                                                         | should                          | 2027 Q2                |
+| **C3** Ch 5 → Ch 6 minimal end-to-end                   | experiment            | Ch 5, 6, capstone | not started; pulled forward out of the 2028 Q1 capstone (C3)                                                                                                                                                                         | must                            | 2027 Q3                |
+| **G3** HME EM + narrowed baseline suite                 | build + experiment    | Ch 6              | one-shot built; EM designed, not implemented; baseline list narrowed in §7.2                                                                                                                                                         | must                            | 2027 Q3–Q4             |
+| **G4e** general merge operator — composition test       | open question         | Ch 3              | two-way stitch measured (Table 3.6); composition, error growth and block choice untested (C10)                                                                                                                                       | should                          | 2027 Q4                |
+| **G3b** broadened dataset suite                         | experiment            | Ch 6, App A.2.3   | not started; no loaders wired                                                                                                                                                                                                        | should                          | 2027 Q4                |
+| **capstone** integrated end-to-end pipeline             | integration           | Ch 3→5→6          | not started; depends on G1 and C3                                                                                                                                                                                                    | must                            | 2028 Q1                |
+| **G6** interpretability: counts + named criteria        | experiment            | Ch 6              | not started; counts computable from a fitted model today; expert study **dropped**, see §7.2 (C9)                                                                                                                                    | should                          | 2028 Q1                |
+| **G7** adaptive multi-scale (overlapping scales)        | open question         | Ch 5              | not started; phase-4 evidence says birth height is the wrong band coordinate                                                                                                                                                         | stretch                         | 2028 Q1                |
+| **G4d** matrix-free reorder                             | build → verify        | Ch 3              | **decision rule passed**: ordering exact at ten seeds, workspace flat at ~65 MB, 0.14–0.22× the wall clock; the 155k figure is an extrapolation, so one at-scale run is still owed (B6)                                              | could                           | **substantially done** |
+| **G4c** datacenter-GPU re-run                           | experiment            | Ch 3              | **blocked on hardware access**, not on effort (C8)                                                                                                                                                                                   | should                          | gated, not scheduled   |
+| **G8** joint memberships for non-axis-aligned clusters  | open question         | Ch 5, 6           | detector exists but has never returned a value other than 1; **retargeted post-defense**, see §7.2 (E3, E4)                                                                                                                          | post-defense                    | not in the runway      |
 
 ---
 

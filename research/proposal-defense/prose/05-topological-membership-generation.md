@@ -1,314 +1,837 @@
 # Chapter 5 — Membership Functions from Topological Structure (Proposed)
 
-*This is proposed work. The construction and the preliminary results below are real and reproducible today; the extensions in Section 5.5 are what I propose to complete for the dissertation.*
+*This is proposed work. The construction and the preliminary results below are real and reproducible today; the
+extensions in Section 5.5 are what I propose to complete for the dissertation.*
 
 ## 5.1 Introduction
 
-Chapter 4 builds a fuzzy model fast, on two assumptions not always available: that the data has coordinates, so a Gaussian can be fit, and that the structure is roughly blob-shaped, so a Gaussian is the right fit. Plenty of real data satisfies neither. Sequences under dynamic time warping, strings under edit distance, graphs under a kernel arrive as a dissimilarity matrix and nothing else, with no coordinates to average and no natural notion of a Gaussian. And plenty of structure is not blob-shaped. Two concentric rings are the textbook case where every centroid method fails, because the mean of a ring sits in the hole.
+Chapter 4 builds a fuzzy model fast, on two assumptions not always available: that the data has coordinates, so a
+Gaussian can be fit, and that the structure is roughly blob-shaped, so a Gaussian is the right fit. Plenty of real data
+satisfies neither. Sequences under dynamic time warping, strings under edit distance, graphs under a kernel arrive as a
+dissimilarity matrix and nothing else, with no coordinates to average and no natural notion of a Gaussian. And plenty of
+structure is not blob-shaped. Two concentric rings are the textbook case where every centroid method fails, because the
+mean of a ring sits in the hole.
 
-VAT, from Chapter 3, works on exactly a dissimilarity matrix and finds structure of any shape, being built on single-linkage connectivity instead of centroids. The VAT family does not stop at assessment: CLODD extracts an aligned crisp partition from the VAT image; DBE, CCE, aVAT and HaVAT automate the cluster count; clusiVAT [@kumar2016clusivat], FensiVAT and ConiVAT [@rathore2020conivat] are end-to-end clustering algorithms on VAT orderings. **But every one of them outputs a crisp partition.** Bezdek's own framing of cluster analysis asks which objects belong to which cluster *and to what degree* [@havens2012efficient], and no work in this family answers the second half, let alone turns the answer into a fuzzy inference system. FIM-VAT [@achary2024fimvat] is the family reaching for interpretability and stopping at post-hoc feature importances.
+VAT, from Chapter 3, works on exactly a dissimilarity matrix and finds structure of any shape, being built on
+single-linkage connectivity instead of centroids. The VAT family does not stop at assessment: CLODD extracts an aligned
+crisp partition from the VAT image; DBE, CCE, aVAT and HaVAT automate the cluster count; clusiVAT [@kumar2016clusivat],
+FensiVAT and ConiVAT [@rathore2020conivat] are end-to-end clustering algorithms on VAT orderings. **But every one of
+them outputs a crisp partition.** Bezdek's own framing of cluster analysis asks which objects belong to which cluster
+*and to what degree* [@havens2012efficient], and no work in this family answers the second half, let alone turns the
+answer into a fuzzy inference system. FIM-VAT [@achary2024fimvat] is the family reaching for interpretability and
+stopping at post-hoc feature importances.
 
-That second half is this chapter. I take the minimax hierarchy VAT and iVAT produce and read off it the membership functions themselves, with no coordinates and no Gaussian assumption. My target is that object, membership functions for a fuzzy inference system, not a clustering: the bridge between the dissertation's clustering and fuzzy-modeling halves.
+That second half is this chapter. I take the minimax hierarchy VAT and iVAT produce and read off it the membership
+functions themselves, with no coordinates and no Gaussian assumption. My target is that object, membership functions for
+a fuzzy inference system, not a clustering: the bridge between the dissertation's clustering and fuzzy-modeling halves.
 
-**What is prior art, stated up front.** Three machinery-level ideas this chapter uses are published, and §5.2 gives the citations in full. The minimax transform as the preprocessing step that makes relational fuzzy clustering work on non-convex data is Khalilia, Bezdek, Popescu and Keller, who compared five Euclideanizations for relational fuzzy *c*-means and found the subdominant ultrametric — which is exactly the minimax transform — best of them [@khalilia2014irfcm]. Selection with the cluster count as an output is a **local cut through a cluster hierarchy** in the sense Campello *et al.* formalized and optimized [@campello2013fosc], and at $m_{\mathrm{pts}} = 1$ HDBSCAN\* provably *is* single-linkage on the input dissimilarities [@campello2015hdbscan, Corollary 3.5], so the hierarchy here is a one-parameter special case of published machinery. Reading several density scales off a curve and clustering within each is VDBSCAN [@liu2007vdbscan], and scale-count-as-an-output dates to at least 2000 [@leung2000clustering]. None of those is claimed.
+**What is prior art, stated up front.** Three machinery-level ideas this chapter uses are published, and §5.2 gives the
+citations in full. The minimax transform as the preprocessing step that makes relational fuzzy clustering work on
+non-convex data is Khalilia, Bezdek, Popescu and Keller, who compared five Euclideanizations for relational fuzzy *c*
+-means and found the subdominant ultrametric — which is exactly the minimax transform — best of
+them [@khalilia2014irfcm]. Selection with the cluster count as an output is a **local cut through a cluster hierarchy**
+in the sense Campello *et al.* formalized and optimized [@campello2013fosc], and at $m_{\mathrm{pts}} = 1$ HDBSCAN\*
+provably *is* single-linkage on the input dissimilarities [@campello2015hdbscan, Corollary 3.5], so the hierarchy here
+is a one-parameter special case of published machinery. Reading several density scales off a curve and clustering within
+each is VDBSCAN [@liu2007vdbscan], and scale-count-as-an-output dates to at least 2000 [@leung2000clustering]. None of
+those is claimed.
 
 What I claim is one contribution.
 
-It is **membership functions read off the merge heights of a dissimilarity-only hierarchy, as FIS antecedents.** Stated precisely enough to defend: *a fuzzy set whose support width and slope are both derived, per cluster and deterministically, from that cluster's own persistence, computed from a dissimilarity matrix alone and consumed as an FIS antecedent.* Every clause in that sentence is load-bearing, and §5.2 says which prior work each one separates this from.
+It is **membership functions read off the merge heights of a dissimilarity-only hierarchy, as FIS antecedents.** Stated
+precisely enough to defend: *a fuzzy set whose support width and slope are both derived, per cluster and
+deterministically, from that cluster's own persistence, computed from a dissimilarity matrix alone and consumed as an
+FIS antecedent.* Every clause in that sentence is load-bearing, and §5.2 says which prior work each one separates this
+from.
 
-The selection machinery of §5.3.4 and §5.3.2 — the persistence gate that makes $k$ an output, and the band discovery that recovers a stack of partitions — is **not** claimed as a contribution. It is described because the membership functions are read off the blocks it selects, so the chapter cannot proceed without it, and because its behaviour bounds what those memberships can do. Measured against HDBSCAN\* over ten seeds it is at parity on accuracy rather than ahead; Appendix A.8 reports that comparison in full, including the two datasets where it is unstable, and §5.6 carries the limitations that follow.
+The selection machinery of §5.3.4 and §5.3.2 — the persistence gate that makes $k$ an output, and the band discovery
+that recovers a stack of partitions — is **not** claimed as a contribution. It is described because the membership
+functions are read off the blocks it selects, so the chapter cannot proceed without it, and because its behaviour bounds
+what those memberships can do. Measured against HDBSCAN\* over ten seeds it is at parity on accuracy rather than ahead;
+Appendix A.8 reports that comparison in full, including the two datasets where it is unstable, and §5.6 carries the
+limitations that follow.
 
 ## 5.2 Background and Prior Art
 
-The nearest prior work is very close, and managing the overlap actively is a defensive necessity as much as a scientific one.
+The nearest prior work is very close, and managing the overlap actively is a necessity as much as a scientific
+one.
 
-**The hierarchy and the transform are published.** The minimax path distance is the *subdominant ultrametric*, equivalently the single-linkage cophenetic distance and the MST bottleneck [@johnson1967hierarchical], with the modern axiomatic treatment in Carlsson and Mémoli [@carlsson2010characterization]. Finite ultrametrics embed isometrically in Euclidean space [@lemin1985isometric], and Chehreghani proved the composition directly: the minimax transform of an *arbitrary* non-metric dissimilarity yields a positive-semidefinite centred Gram matrix [@chehreghani2017minimax]. Khalilia *et al.* then put exactly this to work inside relational fuzzy *c*-means, comparing five Euclideanizations and finding the subdominant ultrametric best [@khalilia2014irfcm]. Two Bezdek-co-authored lines — iVAT's minimax recurrence and iRFCM's Euclideanization — converge on the same max–min operator without either citing the other's use of it, which is worth stating but is an observation, not a contribution.
+**The hierarchy and the transform are published.** The minimax path distance is the *subdominant ultrametric*,
+equivalently the single-linkage cophenetic distance and the MST bottleneck [@johnson1967hierarchical], with the modern
+axiomatic treatment in Carlsson and Mémoli [@carlsson2010characterization]. Finite ultrametrics embed isometrically in
+Euclidean space [@lemin1985isometric], and Chehreghani proved the composition directly: the minimax transform of an
+*arbitrary* non-metric dissimilarity yields a positive-semidefinite centred Gram matrix [@chehreghani2017minimax].
+Khalilia *et al.* then put exactly this to work inside relational fuzzy *c*-means, comparing five Euclideanizations and
+finding the subdominant ultrametric best [@khalilia2014irfcm]. Two Bezdek-co-authored lines — iVAT's minimax recurrence
+and iRFCM's Euclideanization — converge on the same max–min operator without either citing the other's use of it, which
+is worth stating but is an observation, not a contribution.
 
-One point about how that paper is often summarized: iRFCM does **not** replace $D$ with the ultrametric. It uses it as the *spread matrix* in a generalized-spread construction, $\hat{D} = D^2 + \gamma\delta$ with $\delta = u(D^2)$. And $u(D^2) = u(D)^2$ exactly — the bottleneck transform is a max–min composition, and monotone non-decreasing maps commute with both max and min — so squaring before or after the transform is equivalent, though the surrounding pipeline is not invariant because $\gamma$ is fitted against $D^2$.
+One point about how that paper is often summarized: iRFCM does **not** replace $D$ with the ultrametric. It uses it as
+the *spread matrix* in a generalized-spread construction, $\hat{D} = D^2 + \gamma\delta$ with $\delta = u (D^2)$.
+And $u (D^2) = u (D)^2$ exactly — the bottleneck transform is a max–min composition, and monotone non-decreasing maps
+commute with both max and min — so squaring before or after the transform is equivalent, though the surrounding pipeline
+is not invariant because $\gamma$ is fitted against $D^2$.
 
-**Selection with $k$ as an output is a solved problem in a literature I have to cite.** What §5.3.4 computes is a *local cut* through a cluster hierarchy, and Campello *et al.* formalized that object and solved it globally, with $k$ emergent, in FOSC [@campello2013fosc]; HDBSCAN\* is the density-based instance [@campello2015hdbscan]. Density-freeness is not a distinction from that framework but a parameter setting *inside* it: at $m_{\mathrm{pts}} \in \{1,2\}$ mutual reachability equals the input dissimilarity and HDBSCAN\* is single-linkage on it [@campello2015hdbscan, Corollary 3.5]. Enumerating every internal node with its birth and death heights also has a published name, the **mergegram** [@elkin2020mergegram], which I cite gladly because it comes with a stability theorem I would otherwise have to prove. Persistence-gap selection of $k$ is ToMATo [@chazal2013persistence] and its automated descendants [@automato2024], with a connectivity-flavoured variant that is the closest non-HDBSCAN analogue [@bois2024persistence].
+**Selection with $k$ as an output is a solved problem in a literature I have to cite.** What §5.3.4 computes is a *local
+cut* through a cluster hierarchy, and Campello *et al.* formalized that object and solved it globally, with $k$
+emergent, in FOSC [@campello2013fosc]; HDBSCAN\* is the density-based instance [@campello2015hdbscan]. Density-freeness
+is not a distinction from that framework but a parameter setting *inside* it: at $m_{\mathrm{pts}} \in \{1,2\}$ mutual
+reachability equals the input dissimilarity and HDBSCAN\* is single-linkage on it [@campello2015hdbscan, Corollary 3.5].
+Enumerating every internal node with its birth and death heights also has a published name, the
+**mergegram** [@elkin2020mergegram], which I cite gladly because it comes with a stability theorem I would otherwise
+have to prove. Persistence-gap selection of $k$ is ToMATo [@chazal2013persistence] and its automated
+descendants [@automato2024], with a connectivity-flavoured variant that is the closest non-HDBSCAN
+analogue [@bois2024persistence].
 
-**Multi-scale recovery is likewise antecedent.** Reading several density scales off the knees of a sorted distance curve and running the base clusterer once per scale is VDBSCAN [@liu2007vdbscan]; §5.3.2 is that recipe on a dendrogram's height axis. Estimating how many scales exist by analyzing cluster lifetime in scale space dates to Leung *et al.* [@leung2000clustering], and gap-in-merge-heights as a cut rule is textbook. Birth height as an inverse proxy for local density is Hartigan's observation, and Hartigan also proved single linkage is not consistent for $d > 1$, which bounds how hard that reading can be leaned on.
+**Multi-scale recovery is likewise antecedent.** Reading several density scales off the knees of a sorted distance curve
+and running the base clusterer once per scale is VDBSCAN [@liu2007vdbscan]; §5.3.2 is that recipe on a dendrogram's
+height axis. Estimating how many scales exist by analyzing cluster lifetime in scale space dates to Leung *et
+al.* [@leung2000clustering], and gap-in-merge-heights as a cut rule is textbook. Birth height as an inverse proxy for
+local density is Hartigan's observation, and Hartigan also proved single linkage is not consistent for $d > 1$, which
+bounds how hard that reading can be leaned on.
 
-**Membership from merge heights is where the overlap is tightest, and where the claim survives.** Three pieces of prior work reach into it.
+**Membership from merge heights is where the overlap is tightest, and where the claim survives.** Three pieces of prior
+work reach into it.
 
-HDBSCAN's soft clustering already derives membership from merge heights, combining a distance-to-exemplar term with a $\lambda$ term. Bonis and Oudot [@bonis2018fuzzy] are *explicitly persistence-based and do use birth and death heights* — theirs is "a fuzzy generalization of the ToMATo algorithm which relies on the concept of prominence" — so a distinction resting only on determinism versus a random-walk hitting probability would concede far too much and would miss the load-bearing difference. And Harada and Nishino use persistence to set the threshold defining a fuzzy set's support [@harada2017multidimensional]: a two-page workshop paper with almost no citations, easy to miss and easy for a committee member to find.
+HDBSCAN's soft clustering already derives membership from merge heights, combining a distance-to-exemplar term with
+a $\lambda$ term. Bonis and Oudot [@bonis2018fuzzy] are *explicitly persistence-based and do use birth and death
+heights* — theirs is "a fuzzy generalization of the ToMATo algorithm which relies on the concept of prominence" — so a
+distinction resting only on determinism versus a random-walk hitting probability would
+miss the load-bearing difference. And Harada and Nishino use persistence to set the threshold defining a fuzzy set's
+support [@harada2017multidimensional]: a two-page workshop paper with almost no citations.
 
-So the distinction has to be made on three axes at once, and the first is the one that matters. **Bonis and Oudot's core width is a single global threshold $\tau/2$, identical for every cluster**, where mine is each cluster's own lifetime $h_d - h_b$, so a long-lived cluster and a marginal one get differently shaped fuzzy sets from the same run. Second, their graded part is a stochastic process with a temperature parameter, not a deterministic slope. Third, their memberships form a partition of unity, where mine are independent fuzzy sets combinable by a t-conorm — which is what an FIS antecedent has to be.
+So the distinction has to be made on three axes at once, and the first is the one that matters. **Bonis and Oudot's core
+width is a single global threshold $\tau/2$, identical for every cluster**, where mine is each cluster's own
+lifetime $h_d - h_b$, so a long-lived cluster and a marginal one get differently shaped fuzzy sets from the same run.
+Second, their graded part is a stochastic process with a temperature parameter, not a deterministic slope. Third, their
+memberships form a partition of unity, where mine are independent fuzzy sets combinable by a t-conorm — which is what an
+FIS antecedent has to be.
 
-Against HDBSCAN's soft clustering the distinction is sharper still, and it is the library's own: **it cannot run on a dissimilarity matrix.** Asked for membership vectors on precomputed input it refuses, reporting that access to the source data rather than mere distances is required. With coordinates it returns a membership matrix; with the same data as a distance matrix it fails, while the construction of §5.3.3 runs. That is the gap, stated by the pre-empting implementation.
+Against HDBSCAN's soft clustering the distinction is sharper still, and it is the library's own: **it cannot run on a
+dissimilarity matrix.** Asked for membership vectors on precomputed input it refuses, reporting that access to the
+source data rather than mere distances is required. With coordinates it returns a membership matrix; with the same data
+as a distance matrix it fails, while the construction of §5.3.3 runs. That is the gap, stated by the pre-empting
+implementation.
 
-The remaining prior art is relational: NERFCM [@hathaway1994nerf], fuzzy *c*-means run directly on a dissimilarity matrix with a beta-spread safeguard for badly non-metric input; and ConiVAT [@rathore2020conivat], which repairs single-linkage's chaining failure with constraint-based metric learning. Because §5.3.1 transforms to $D^*$, which is an ultrametric and therefore of strict negative type, the beta-spread is provably inert on my input — following Khalilia *et al.*, and one reason to prefer the transform over the safeguard.
+The remaining prior art is relational: NERFCM [@hathaway1994nerf], fuzzy *c*-means run directly on a dissimilarity
+matrix with a beta-spread safeguard for badly non-metric input; and ConiVAT [@rathore2020conivat], which repairs
+single-linkage's chaining failure with constraint-based metric learning. Because §5.3.1 transforms to $D^*$, which is an
+ultrametric and therefore of strict negative type, the beta-spread is provably inert on my input — following Khalilia
+*et al.*, and one reason to prefer the transform over the safeguard.
 
 ### The concrete version of this problem, in my own code
 
 The boundary this chapter extends past is not hypothetical; it sits in my own library.
-`tribble-cluster` ships `IVATMeans`, a scikit-learn-style wrapper that uses iVAT to
-find clusters and hands them to a Euclidean back end. The front half is why I reach
-for it. The iVAT recurrence $D'[r,c] = \max(D^*[r,j], D'[j,c])$ computes the minimax
-path distance, equivalently the single-linkage distance, the largest edge on the MST
-path between two points. Minimax distances form an **ultrametric**, hence VAT and iVAT
-handle elongated, chained and non-convex structure: they never assume a cluster is a
-blob. The ordering is also deterministic, so the wrapper needs no seeding, where
-Fuzzy C-Means has to be started somewhere and its random starts give run-to-run
-variation with no guarantee of the same partition twice (§2.4). And the merge heights
-behind the reordered image suggest a hierarchy rather than only a flat partition, so
-the same call begins to advise on tree structure.
+`tribble-cluster` ships `IVATMeans`, a scikit-learn-style wrapper that uses iVAT to find clusters and hands them to a
+Euclidean back end. The front half is why I reach for it. The iVAT recurrence $D'[r,c] = \max (D^*[r,j], D'[j,c])$
+computes the minimax path distance, equivalently the single-linkage distance, the largest edge on the MST path between
+two points. Minimax distances form an **ultrametric**, hence VAT and iVAT handle elongated, chained and non-convex
+structure: they never assume a cluster is a blob. The ordering is also deterministic, so the wrapper needs no seeding,
+where Fuzzy C-Means has to be started somewhere and its random starts give run-to-run variation with no guarantee of the
+same partition twice (§2.4). And the merge heights behind the reordered image suggest a hierarchy rather than only a
+flat partition, so the same call begins to advise on tree structure.
 
-The back half is where the applicability ends. `IVATMeans` represents each recovered
-cluster by `np.mean(points, axis=0)` and labels every point by nearest Euclidean centre. A
-mean is a Euclidean prototype and $c$-means assigns by Euclidean distance, so both are
-confined to convex regions. The mean of a ring is at its centre, where there are no
-points; the mean of a filament is off the filament. That bounds the mean-based back end
-to clusters a prototype can stand for, and no better centroid heuristic lifts the
-bound, no good Euclidean prototype for a ring existing. What lifts it is staying in the
-minimax geometry: transform the dissimilarities once, then use a method consuming a
-dissimilarity matrix instead of coordinates, as relational FCM does and §5.4 measures.
-This chapter's method is the complement that removes that one limitation while keeping
-the initialization-free front end. Chapter 3 makes the transform affordable at scale.
+The back half is where the applicability ends. `IVATMeans` represents each recovered cluster by
+`np.mean(points, axis=0)` and labels every point by nearest Euclidean centre. A mean is a Euclidean prototype and $c$
+-means assigns by Euclidean distance, so both are confined to convex regions. The mean of a ring is at its centre, where
+there are no points; the mean of a filament is off the filament. That bounds the mean-based back end to clusters a
+prototype can stand for, and no better centroid heuristic lifts the bound, no good Euclidean prototype for a ring
+existing. What lifts it is staying in the minimax geometry: transform the dissimilarities once, then use a method
+consuming a dissimilarity matrix instead of coordinates, as relational FCM does and §5.4 measures. This chapter's method
+is the complement that removes that one limitation while keeping the initialization-free front end. Chapter 3 makes the
+transform affordable at scale.
 
-This also locates the work precisely, and the location is narrower than "the gap
-between two lineages." The VAT lineage has stayed crisp and visual (clusiVAT, aVAT,
-SpecVAT, ML-aVAT, kernel-iVAT). The relational-fuzzy lineage did adopt the minimax
-operator — iRFCM uses exactly it, as the best of five Euclideanizations
-[@khalilia2014irfcm] — but took the operator without the hierarchy, using $u(D^2)$
-as a spread matrix and still requiring $c$ as an input. What is unoccupied is
-this: nobody consumes the *merge heights themselves* as fuzzy set parameters.
-`IVATMeans` reaches toward that from the coordinate side, as far as a Euclidean
-prototype can go, which is the boundary the rest of this chapter crosses.
+This also locates the work precisely, and the location is narrower than "the gap between two lineages." The VAT lineage
+has stayed crisp and visual (clusiVAT, aVAT, SpecVAT, ML-aVAT, kernel-iVAT). The relational-fuzzy lineage did adopt the
+minimax operator — iRFCM uses exactly it, as the best of five Euclideanizations
+[@khalilia2014irfcm] — but took the operator without the hierarchy, using $u (D^2)$
+as a spread matrix and still requiring $c$ as an input. What is unoccupied is this: nobody consumes the *merge heights
+themselves* as fuzzy set parameters.
+`IVATMeans` reaches toward that from the coordinate side, as far as a Euclidean prototype can go, which is the boundary
+the rest of this chapter crosses.
 
 ## 5.3 Methodology
 
 ### 5.3.1 The minimax transform does the heavy lifting
 
-The single most important step is Chapter 2's minimax (iVAT) transform, replacing each dissimilarity with the bottleneck value along the best path between two points. On concentric rings, relational Fuzzy C-Means on the raw matrix scores an adjusted Rand index of about 0.02. It fails completely. Run the *same* algorithm on the minimax-transformed matrix and it scores 1.00. The transform, not the selection machinery below, carries that result.
+The single most important step is Chapter 2's minimax (iVAT) transform, replacing each dissimilarity with the bottleneck
+value along the best path between two points. On concentric rings, relational Fuzzy C-Means on the raw matrix scores an
+adjusted Rand index of about 0.02. It fails completely. Run the *same* algorithm on the minimax-transformed matrix and
+it scores 1.00. The transform, not the selection machinery below, carries that result.
 
-This step is **not mine**. Khalilia *et al.* established the subdominant ultrametric as the best of five Euclideanizations for relational fuzzy *c*-means [@khalilia2014irfcm], and Chehreghani proved the property that makes it work on arbitrary non-metric input [@chehreghani2017minimax]. What the ARI 0.02 → 1.00 measurement contributes is a demonstration *on this battery* that the published choice is the right one here, and a justification for dropping the beta-spread safeguard: $D^*$ is an ultrametric, hence of strict negative type, hence the safeguard is inert. Appendix A.10.3 carries the proofs — that $D^*$ is the MST bottleneck, that it satisfies $D^*_{ij} \le \max(D^*_{ik}, D^*_{kj})$ with no assumption on $D$, that $u(D^2) = u(D)^2$, and why an ultrametric needs no spread. The rest of the chapter adds how to choose clusters from the resulting hierarchy and turn them into membership functions without being told how many there are.
+This step is **not mine**. Khalilia *et al.* established the subdominant ultrametric as the best of five
+Euclideanizations for relational fuzzy *c*-means [@khalilia2014irfcm], and Chehreghani proved the property that makes it
+work on arbitrary non-metric input [@chehreghani2017minimax]. What the ARI 0.02 → 1.00 measurement contributes is a
+demonstration *on this battery* that the published choice is the right one here, and a justification for dropping the
+beta-spread safeguard: $D^*$ is an ultrametric, hence of strict negative type, hence the safeguard is inert. Appendix
+A.10.3 carries the proofs — that $D^*$ is the MST bottleneck, that it satisfies $D^*_{ij} \le \max (D^*_{ik}, D^*_{kj})$
+with no assumption on $D$, that $u (D^2) = u (D)^2$, and why an ultrametric needs no spread. The rest of the chapter
+adds how to choose clusters from the resulting hierarchy and turn them into membership functions without being told how
+many there are.
 
-**Figure 5.1 — Raw and minimax-transformed dissimilarity on concentric rings.** The rings as raw $D$ and as minimax-transformed $D^*$, with the relational-FCM ARI from Table 5.1 on each. Same points and algorithm; only the dissimilarity changes, and the score moves from 0.02 to 1.00. Under $D$ the *inner* ring does read as a block; the outer does not, its within-ring distances reaching 8.4 against a nearest inner-to-outer distance of 2.6.
+**Figure 5.1 — Raw and minimax-transformed dissimilarity on concentric rings.** The rings as raw $D$ and as
+minimax-transformed $D^*$, with the relational-FCM ARI from Table 5.1 on each. Same points and algorithm; only the
+dissimilarity changes, and the score moves from 0.02 to 1.00. Under $D$ the *inner* ring does read as a block; the outer
+does not, its within-ring distances reaching 8.4 against a nearest inner-to-outer distance of 2.6.
 `![minimax-transform](fig/05-minimax-transform.png)`
 
 ### 5.3.2 Multi-scale persistence: recovering the whole hierarchy
 
-The headline case is nested structure: clusters within clusters, each level real. A single flat cut stops at whichever granularity covers the data first. Chapter 2's density observation unlocks it: birth height in single-linkage is an inverse proxy for local density, so structures at different densities are born at different heights. I look for gaps along the log-birth axis — logarithmic because a density ratio $\rho_1/\rho_2$ appears as a birth-height gap of $\tfrac{1}{d}\log(\rho_1/\rho_2)$, the same size wherever it sits on the axis and shrinking with dimension (Appendix A.10.15) — split the hierarchy into density *bands* at them, and run the same gated set-cover *within each band*. The result is a stack of partitions, a fuzzy hierarchy, with the number of scales itself discovered.
+The headline case is nested structure: clusters within clusters, each level real. A single flat cut stops at whichever
+granularity covers the data first. Chapter 2's density observation unlocks it: birth height in single-linkage is an
+inverse proxy for local density, so structures at different densities are born at different heights. I look for gaps
+along the log-birth axis — logarithmic because a density ratio $\rho_1/\rho_2$ appears as a birth-height gap
+of $\tfrac{1}{d}\log (\rho_1/\rho_2)$, the same size wherever it sits on the axis and shrinking with dimension (Appendix
+A.10.15) — split the hierarchy into density *bands* at them, and run the same gated set-cover *within each band*. The
+result is a stack of partitions, a fuzzy hierarchy, with the number of scales itself discovered.
 
-**What this mechanism is not.** It is VDBSCAN's recipe — several density scales read off a curve, base clusterer per scale [@liu2007vdbscan] — moved from a sorted $k$-distance curve to a dendrogram's height axis, and scale-count-as-an-output is older still [@leung2000clustering]. Neither is claimed. Nor is recovering the hierarchy itself: §5.4's baseline sweep shows that a flat cut at a swept threshold recovers all three levels of the nested [8, 4, 2] synthetic at ARI 1.000, and that the entire sweep collapses to only **seven** distinct partitions, three of which are the three real scales. A reader handed those seven picks the right three without help.
+**What this mechanism is not.** It is VDBSCAN's recipe — several density scales read off a curve, base clusterer per
+scale [@liu2007vdbscan] — moved from a sorted $k$-distance curve to a dendrogram's height axis, and
+scale-count-as-an-output is older still [@leung2000clustering]. Neither is claimed. Nor is recovering the hierarchy
+itself: §5.4's baseline sweep shows that a flat cut at a swept threshold recovers all three levels of the
+nested [8, 4, 2] synthetic at ARI 1.000, and that the entire sweep collapses to only **seven** distinct partitions,
+three of which are the three real scales. A reader handed those seven picks the right three without help.
 
-One tempting methodological argument is also unavailable, and it is worth closing off explicitly because it looks strong. It would run: VDBSCAN, OPTICS and HDBSCAN all need a $k$NN density estimate in a metric space, so on a non-metric $D^*$ birth height is the only density proxy there is. It is false. A $k$NN distance is computable from *any* dissimilarity matrix, and HDBSCAN\* with $m_{\mathrm{pts}} = 5$ runs without error on all seventeen matrices in §5.4's battery, every non-metric family included. The estimate is available; it is merely unreliable there, which is a much smaller and purely empirical point.
+One tempting methodological argument is also unavailable, and it is worth closing off explicitly because it looks
+strong. It would run: VDBSCAN, OPTICS and HDBSCAN all need a $k$NN density estimate in a metric space, so on a
+non-metric $D^*$ birth height is the only density proxy there is. It is false. A $k$NN distance is computable from *any*
+dissimilarity matrix, and HDBSCAN\* with $m_{\mathrm{pts}} = 5$ runs without error on all seventeen matrices in §5.4's
+battery, every non-metric family included. The estimate is available; it is merely unreliable there, which is a much
+smaller and purely empirical point.
 
-**What the band selector provides is a selection property, not a discovery one, and it is machinery rather than a claim.** The cut-distance family *contains* the right partitions but supplies no criterion for which of its members are real — on [8, 4, 2] three of its seven are degenerate, being all-noise, all-one-cluster, and a mixed seven-way split. Band discovery emits exactly three partitions, the right three, with no cut parameter and nothing told to it about how many levels exist. That is automatic model selection over a candidate set the flat-cut family already contains, which is what makes the band stack usable as a source of membership functions without a human choosing a threshold first. Appendix A.8 reports how often that recovery is exact across seeds, and it is not always.
+**What the band selector provides is a selection property, not a discovery one, and it is machinery rather than a
+claim.** The cut-distance family *contains* the right partitions but supplies no criterion for which of its members are
+real — on [8, 4, 2] three of its seven are degenerate, being all-noise, all-one-cluster, and a mixed seven-way split.
+Band discovery emits exactly three partitions, the right three, with no cut parameter and nothing told to it about how
+many levels exist. That is automatic model selection over a candidate set the flat-cut family already contains, which is
+what makes the band stack usable as a source of membership functions without a human choosing a threshold first.
+Appendix A.8 reports how often that recovery is exact across seeds, and it is not always.
 
-**Figure 5.2 — Band discovery on the three-level hierarchy.** `select_multiscale` on the same dataset and through the same call as Table 5.2's `three_level_hierarchy` row, so the band edges drawn are the ones the algorithm found. Left: every persistence-significant block at its birth height on a log axis, the two separating gaps marked and the bands shaded. Right: the partition each band recovers, at granularities 8, 4 and 2, samples ordered by the finest ground-truth label so a recovered cluster is a contiguous run of colour. Each level scores ARI 1.00 against its own truth. The partitions are strips, not scatters: the construction offsets its levels by 200, 28 and 5 in data units at $\sigma = 0.35$, so in a scatter the fine structure would be smaller than the marker.
+**Figure 5.2 — Band discovery on the three-level hierarchy.** `select_multiscale` on the same dataset and through the
+same call as Table 5.2's `three_level_hierarchy` row, so the band edges drawn are the ones the algorithm found. Left:
+every persistence-significant block at its birth height on a log axis, the two separating gaps marked and the bands
+shaded. Right: the partition each band recovers, at granularities 8, 4 and 2, samples ordered by the finest ground-truth
+label so a recovered cluster is a contiguous run of colour. Each level scores ARI 1.00 against its own truth. The
+partitions are strips, not scatters: the construction offsets its levels by 200, 28 and 5 in data units
+at $\sigma = 0.35$, so in a scatter the fine structure would be smaller than the marker.
 `![band-discovery](fig/05-band-discovery.png)`
 
-I do not claim this beats a flat method on varying-density data. A flat cover appears to hold up across a wide range of cluster widths, though the experiment meant to establish that is inconclusive as run (see the falsification result below). And the claim that a flat method structurally cannot recover nested structure needs splitting, because it is true of one kind of baseline and false of another. A single-output extractor genuinely cannot: HDBSCAN\* with either excess-of-mass or leaf extraction returns exactly one partition, locks onto the finest level of every nested dataset in §5.4's battery, and then necessarily scores 0.24–0.58 on the coarser levels, because one partition cannot be two granularities at once. A *swept* flat cut can, and does. So the structural argument holds only against methods that return a single answer.
+I do not claim this beats a flat method on varying-density data. A flat cover appears to hold up across a wide range of
+cluster widths, though the experiment meant to establish that is inconclusive as run (see the falsification result
+below). And the claim that a flat method structurally cannot recover nested structure needs splitting, because it is
+true of one kind of baseline and false of another. A single-output extractor genuinely cannot: HDBSCAN\* with either
+excess-of-mass or leaf extraction returns exactly one partition, locks onto the finest level of every nested dataset in
+§5.4's battery, and then necessarily scores 0.24–0.58 on the coarser levels, because one partition cannot be two
+granularities at once. A *swept* flat cut can, and does. So the structural argument holds only against methods that
+return a single answer.
 
-The multi-scale method is close to a strict generalization, and the "close to" needs stating precisely. On the five single-scale battery datasets, band discovery finds **exactly one band on four of them** and **no bands at all on pure noise** (`multiscale_no_regression.ms_n_bands`). Within that band the cover matches the flat selector exactly on three (two_gaussians, concentric_rings, varying_density: same $k$, same ARI to three decimals) and *differs* on bridged_gaussians, returning $k$ = 2 at ARI 1.000 against the flat selector's $k$ = 3 at 0.982. So band discovery does not reduce exactly to the flat selector on single-scale data; it is a near-reduction, departing on the two datasets where the flat selector was wrong: no structure in noise where the flat gate reports four blocks, the right count on the bridge where it misses it. §5.4 reports that disagreement in full.
+The multi-scale method is close to a strict generalization, and the "close to" needs stating precisely. On the five
+single-scale battery datasets, band discovery finds **exactly one band on four of them** and **no bands at all on pure
+noise** (`multiscale_no_regression.ms_n_bands`). Within that band the cover matches the flat selector exactly on three
+(two_gaussians, concentric_rings, varying_density: same $k$, same ARI to three decimals) and *differs* on
+bridged_gaussians, returning $k$ = 2 at ARI 1.000 against the flat selector's $k$ = 3 at 0.982. So band discovery does
+not reduce exactly to the flat selector on single-scale data; it is a near-reduction, departing on the two datasets
+where the flat selector was wrong: no structure in noise where the flat gate reports four blocks, the right count on the
+bridge where it misses it. §5.4 reports that disagreement in full.
 
 ### 5.3.3 Membership functions, read off the hierarchy
 
-Each selected block carries its own membership function, with no medoid and no Gaussian fit. The natural one is a persistence ramp. Let $d_B(x)$ be the minimax distance from $x$ to block $B$: the bottleneck height at which $x$ would join $B$, the quantity §5.3.1's transform computes. Membership falls linearly from one, for a point joining as early as the block was born, to zero, for one joining only when the block dies:
+Each selected block carries its own membership function, with no medoid and no Gaussian fit. The natural one is a
+persistence ramp. Let $d_B (x)$ be the minimax distance from $x$ to block $B$: the bottleneck height at which $x$ would
+join $B$, the quantity §5.3.1's transform computes. Membership falls linearly from one, for a point joining as early as
+the block was born, to zero, for one joining only when the block dies:
 
-$$ \mu_B(x) = \mathrm{clip}\!\left(\frac{\text{death}_B - d_B(x)}{\text{death}_B - \text{birth}_B},\, 0,\, 1\right). $$
+$$ \mu_B (x) = \mathrm{clip}\!\left (\frac{\text{death}_B - d_B (x)}{\text{death}_B - \text{birth}_B},\, 0,\, 1\right). $$
 
-Every term is a merge height the hierarchy already gives me, so the membership function is *read off* the structure rather than fitted to it. Hence no coordinates are needed: no mean to compute, no shape to assume. The denominator is exactly the block's persistence, so §5.3.4's gate and the membership function are two uses of one quantity; a long-persistence block is both likelier to be admitted and gentler in its falloff.
+Every term is a merge height the hierarchy already gives me, so the membership function is *read off* the structure
+rather than fitted to it. Hence no coordinates are needed: no mean to compute, no shape to assume. The denominator is
+exactly the block's persistence, so §5.3.4's gate and the membership function are two uses of one quantity; a
+long-persistence block is both likelier to be admitted and gentler in its falloff.
 
-There is a catch. **On an ultrametric the ramp is crisp.** For a member of $B$, $d_B(x)$ is at most $\text{birth}_B$; for a non-member it is at least $\text{death}_B$, since $\text{death}_B$ is by definition the height at which $B$ first absorbs anything outside itself. Nothing lands strictly between, so the sloped part is empty by construction and $\mu_B$ takes only the values one and zero (Appendix A.10.13 gives the two-case proof: a member is connected to $B$ by height $\text{birth}_B$, and a non-member attaching below $\text{death}_B$ would contradict the maximality that defines the block). That is the geometry, not an implementation defect, and the shipped code accounts for it: the default kernel in `multiscale_persistence.block_membership` is a Gaussian in minimax distance with half-maximum at the block's death height, grading the non-member skirt and genuinely fuzzy, while `argmax` over it still reproduces the crisp labels. The ramp is kept alongside it, and every parameter of both is a merge height rather than a fitted quantity.
+There is a catch. **On an ultrametric the ramp is crisp.** For a member of $B$, $d_B (x)$ is at most $\text{birth}_B$;
+for a non-member it is at least $\text{death}_B$, since $\text{death}_B$ is by definition the height at which $B$ first
+absorbs anything outside itself. Nothing lands strictly between, so the sloped part is empty by construction and $\mu_B$
+takes only the values one and zero (Appendix A.10.13 gives the two-case proof: a member is connected to $B$ by
+height $\text{birth}_B$, and a non-member attaching below $\text{death}_B$ would contradict the maximality that defines
+the block). That is the geometry, not an implementation defect, and the shipped code accounts for it: the default kernel
+in `multiscale_persistence.block_membership` is a Gaussian in minimax distance with half-maximum at the block's death
+height, grading the non-member skirt and genuinely fuzzy, while `argmax` over it still reproduces the crisp labels. The
+ramp is kept alongside it, and every parameter of both is a merge height rather than a fitted quantity.
 
-**Figure 5.3 — The membership function, read off the hierarchy.** One selected block's $\mu_B(x)$ against minimax distance, annotated with its birth and death heights, beside the fuzzy partition the whole band produces. Both curves are drawn: the persistence ramp above, and the kernel the code ships. Every sample sits at its own $d_B$ along the axis. The interval the ramp slopes across contains no data, so the ramp is a step and the Gaussian does the grading. Neither is fitted; both are parameterized entirely by merge heights the dendrogram supplies.
+**Figure 5.3 — The membership function, read off the hierarchy.** One selected block's $\mu_B (x)$ against minimax
+distance, annotated with its birth and death heights, beside the fuzzy partition the whole band produces. Both curves
+are drawn: the persistence ramp above, and the kernel the code ships. Every sample sits at its own $d_B$ along the axis.
+The interval the ramp slopes across contains no data, so the ramp is a step and the Gaussian does the grading. Neither
+is fitted; both are parameterized entirely by merge heights the dendrogram supplies.
 `![persistence-ramp](fig/05-persistence-ramp.png)`
 
-Several variants exist: a Ruspini partition-of-unity form where memberships sum to one exactly, a spread-aware auto-tuned form, and an interpretable feature-space form that works when coordinates *are* available and fails on rings, which is the point of having the others. Blocks are combined into a rule by disjunction, a t-conorm, as the OR of antecedents in Chapter 4.
+Several variants exist: a Ruspini partition-of-unity form where memberships sum to one exactly, a spread-aware
+auto-tuned form, and an interpretable feature-space form that works when coordinates *are* available and fails on rings,
+which is the point of having the others. Blocks are combined into a rule by disjunction, a t-conorm, as the OR of
+antecedents in Chapter 4.
 
-**Why this is the one part of the chapter that prior art does not reach.** Deriving membership from merge heights is not new — HDBSCAN's soft clustering does it, and Bonis and Oudot do it from persistence explicitly [@bonis2018fuzzy]. Three things separate the construction above, and they should be read together because no one of them carries the claim alone.
+**Why this is the one part of the chapter that prior art does not reach.** Deriving membership from merge heights is not
+new — HDBSCAN's soft clustering does it, and Bonis and Oudot do it from persistence explicitly [@bonis2018fuzzy]. Three
+things separate the construction above, and they should be read together because no one of them carries the claim alone.
 
-The first is the strongest and it is not an argument but an observation about the pre-empting implementation: **HDBSCAN's soft clustering cannot consume a dissimilarity matrix.** Asked for membership vectors on precomputed input, the library declines, reporting that access to the source data rather than mere distances is required, and then raises when the membership call is made anyway. Given coordinates it returns a full membership matrix; given the identical data as a distance matrix it cannot, while `block_membership` runs. Since a bare dissimilarity matrix is the entire premise of this chapter, that is the gap, and it is stated by the thing that would otherwise close it.
+The first is the strongest and it is not an argument but an observation about the pre-empting implementation:
+**HDBSCAN's soft clustering cannot consume a dissimilarity matrix.** Asked for membership vectors on precomputed input,
+the library declines, reporting that access to the source data rather than mere distances is required, and then raises
+when the membership call is made anyway. Given coordinates it returns a full membership matrix; given the identical data
+as a distance matrix it cannot, while `block_membership` runs. Since a bare dissimilarity matrix is the entire premise
+of this chapter, that is the gap, and it is stated by the thing that would otherwise close it.
 
-The second is per-cluster parameterization. Bonis and Oudot's core width is a single **global** threshold, identical for every cluster; every parameter of $\mu_B$ above is that block's *own* birth and death height, so a long-lived block and a marginal one get differently shaped fuzzy sets out of one run, with nothing fitted and nothing shared between them.
+The second is per-cluster parameterization. Bonis and Oudot's core width is a single **global** threshold, identical for
+every cluster; every parameter of $\mu_B$ above is that block's *own* birth and death height, so a long-lived block and
+a marginal one get differently shaped fuzzy sets out of one run, with nothing fitted and nothing shared between them.
 
-The third is the target object. Their memberships form a partition of unity and their graded part is a stochastic process with a temperature parameter; these are independent fuzzy sets with a deterministic slope, combinable by a t-conorm, which is what an FIS antecedent has to be. Harada and Nishino [@harada2017multidimensional] use persistence to set a fuzzy set's support threshold and stop there — support only, not slope, and not as an antecedent.
+The third is the target object. Their memberships form a partition of unity and their graded part is a stochastic
+process with a temperature parameter; these are independent fuzzy sets with a deterministic slope, combinable by a
+t-conorm, which is what an FIS antecedent has to be. Harada and Nishino [@harada2017multidimensional] use persistence to
+set a fuzzy set's support threshold and stop there — support only, not slope, and not as an antecedent.
 
 ### 5.3.4 Selection as gated set-cover, with k as an output
 
-The usual question given the minimax hierarchy is "where do I cut it?", presupposing I know how many clusters to look for. I reframe it.
+The usual question given the minimax hierarchy is "where do I cut it?", presupposing I know how many clusters to look
+for. I reframe it.
 
-By a **block** I mean a candidate cluster in the hierarchy: a set of points merging into one connected group at some threshold and later merging into something larger. It is a node of the single-linkage dendrogram, and a dark square on the diagonal of Chapter 2's reordered VAT image, hence the name. Every block has a birth height (where it forms) and a death height (where it is absorbed). The hierarchy holds many more blocks than real clusters; selection decides which to believe.
+By a **block** I mean a candidate cluster in the hierarchy: a set of points merging into one connected group at some
+threshold and later merging into something larger. It is a node of the single-linkage dendrogram, and a dark square on
+the diagonal of Chapter 2's reordered VAT image, hence the name. Every block has a birth height (where it forms) and a
+death height (where it is absorbed). The hierarchy holds many more blocks than real clusters; selection decides which to
+believe.
 
-Each block has a persistence, its death height minus its birth height, from Chapter 2, and I admit only blocks whose persistence is a statistical outlier, above the median by a robust multiple of the median absolute deviation — $\text{med} + \gamma \cdot 1.4826\,\text{MAD}$, the constant being $1/\Phi^{-1}(3/4)$ so that the scale reads as a standard deviation the outliers themselves cannot inflate (Appendix A.10.14). Among those I greedily cover the data, taking at each step the block covering the most still-uncovered points. The cluster count falls out of this; it is an output, not an input. Coverage rather than "pick exactly $k$", because the errors are asymmetric: under a fixed disjunction one too many blocks is cheap, uncovered data expensive.
+Each block has a persistence, its death height minus its birth height, from Chapter 2, and I admit only blocks whose
+persistence is a statistical outlier, above the median by a robust multiple of the median absolute
+deviation — $\text{med} + \gamma \cdot 1.4826\,\text{MAD}$, the constant being $1/\Phi^{-1} (3/4)$ so that the scale
+reads as a standard deviation the outliers themselves cannot inflate (Appendix A.10.14). Among those I greedily cover
+the data, taking at each step the block covering the most still-uncovered points. The cluster count falls out of this;
+it is an output, not an input. Coverage rather than "pick exactly $k$", because the errors are asymmetric: under a fixed
+disjunction one too many blocks is cheap, uncovered data expensive.
 
-**Two properties of this rule need making explicit, because the set-cover framing invites the wrong reading of both.** First, despite the name it **cannot return overlapping blocks.** Dendrogram nodes form a **laminar** family, so greedy-by-uncovered-gain always takes a maximal eligible node, after which every eligible descendant has gain zero and is dropped by the stopping rule; the result is always a disjoint antichain. That is proved (Appendix A.10.14 — the case analysis turns on the code's own tie-break and stopping rule), measured at zero overlapping pairs across fourteen datasets, and pinned by a regression test. Second, and following from it, what the rule computes is exactly a **local cut through the hierarchy** — precisely the object FOSC formalizes and optimizes globally [@campello2013fosc]. This is therefore not a new kind of selection. It is a different *stability measure* inside a published framework, and Campello explicitly invites the substitution: the excess of mass adopted there "is by no means the only possible measure for cluster stability that can be used in our framework."
+**Two properties of this rule need making explicit, because the set-cover framing invites the wrong reading of both.**
+First, despite the name it **cannot return overlapping blocks.** Dendrogram nodes form a **laminar** family, so
+greedy-by-uncovered-gain always takes a maximal eligible node, after which every eligible descendant has gain zero and
+is dropped by the stopping rule; the result is always a disjoint antichain. That is proved (Appendix A.10.14 — the case
+analysis turns on the code's own tie-break and stopping rule), measured at zero overlapping pairs across fourteen
+datasets, and pinned by a regression test. Second, and following from it, what the rule computes is exactly a **local
+cut through the hierarchy** — precisely the object FOSC formalizes and optimizes globally [@campello2013fosc]. This is
+therefore not a new kind of selection. It is a different *stability measure* inside a published framework, and Campello
+explicitly invites the substitution: the excess of mass adopted there "is by no means the only possible measure for
+cluster stability that can be used in our framework."
 
-Framed that way the rule is testable against the framework's own default, and Appendix A.8 reports that test rather than this chapter, because the outcome does not support a claim: over ten seeds the gate and a fixed-setting HDBSCAN\* are indistinguishable on accuracy, and a per-dataset-tuned HDBSCAN\* wins more comparisons than it loses. The gate is used here for a different reason — it produces its results at one fixed threshold on every matrix in the battery, where HDBSCAN\*'s quality is a strong function of `min_cluster_size`, a parameter with no unsupervised criterion behind it on a bare dissimilarity matrix. That is a convenience for a pipeline whose output is a set of membership functions, not a contribution.
+Framed that way the rule is testable against the framework's own default, and Appendix A.8 reports that test rather than
+this chapter, because the outcome does not support a claim: over ten seeds the gate and a fixed-setting HDBSCAN\* are
+indistinguishable on accuracy, and a per-dataset-tuned HDBSCAN\* wins more comparisons than it loses. The gate is used
+here for a different reason — it produces its results at one fixed threshold on every matrix in the battery, where
+HDBSCAN\*'s quality is a strong function of `min_cluster_size`, a parameter with no unsupervised criterion behind it on
+a bare dissimilarity matrix. That is a convenience for a pipeline whose output is a set of membership functions, not a
+contribution.
 
-This gate is not uniformly the best selector available. It is deliberately conservative, declining to assert structure it cannot see clearly: the behavior I want on noise, the wrong behavior on a chained "bridge" between two real clusters, where a more aggressive selector wins outright. The conservatism is a choice and not a free lunch, defensible because a fuzzy model on spurious antecedents is worse than one that abstains. One qualification narrows the trade-off: it belongs to the *flat* gate. The multi-scale selector of §5.3.2, on the same bridged data, does not pay it. §5.4 reports that comparison in full, including the case my gate loses, and both runs with which the tables quote.
+This gate is not uniformly the best selector available. It is deliberately conservative, declining to assert structure
+it cannot see clearly: the behavior I want on noise, the wrong behavior on a chained "bridge" between two real clusters,
+where a more aggressive selector wins outright. The conservatism is a choice and not a free lunch, justified because a
+fuzzy model on spurious antecedents is worse than one that abstains. One qualification narrows the trade-off: it belongs
+to the *flat* gate. The multi-scale selector of §5.3.2, on the same bridged data, does not pay it. §5.4 reports that
+comparison in full, including the case my gate loses, and both runs with which the tables quote.
 
-**Figure 5.4 — The persistence gate and the greedy cover, deciding.** Two battery datasets through the same calls as Table 5.1's set-cover column. Top row: every dendrogram node as a persistence-diagram point, the MAD gate drawn as the diagonal offset it is — a block is admitted when its death exceeds its birth by more than $\text{med} + 2 \cdot 1.4826\,\text{MAD}$ — with blocks outside the size window crossed out, admitted blocks ringed and the ones the greedy cover takes filled. Bottom row: the points, coloured by covering block, uncovered points hollow, with the discovered $k$ and coverage computed at draw time. On the rings two blocks stand far off the diagonal and the cover takes exactly those. On the bridge no persistent block spans a whole cluster, so the gate admits three pure fragments, discovers $k = 3$ against a true $2$ and covers half the data — the failure Table 5.1 reports, visible here as a diagram with nothing far from the gate line. The cover is a disjoint antichain in both panels, as Appendix A.10.14 says it must be.
+**Figure 5.4 — The persistence gate and the greedy cover, deciding.** Two battery datasets through the same calls as
+Table 5.1's set-cover column. Top row: every dendrogram node as a persistence-diagram point, the MAD gate drawn as the
+diagonal offset it is — a block is admitted when its death exceeds its birth by more
+than $\text{med} + 2 \cdot 1.4826\,\text{MAD}$ — with blocks outside the size window crossed out, admitted blocks ringed
+and the ones the greedy cover takes filled. Bottom row: the points, coloured by covering block, uncovered points hollow,
+with the discovered $k$ and coverage computed at draw time. On the rings two blocks stand far off the diagonal and the
+cover takes exactly those. On the bridge no persistent block spans a whole cluster, so the gate admits three pure
+fragments, discovers $k = 3$ against a true $2$ and covers half the data — the failure Table 5.1 reports, visible here
+as a diagram with nothing far from the gate line. The cover is a disjoint antichain in both panels, as Appendix A.10.14
+says it must be.
 `![05-persistence-gate](fig/05-persistence-gate.png)`
 
 ### 5.3.5 Counting disjuncts topologically
 
-One further consequence closes a question Chapter 4 left open. Chapter 4's rules are disjunctions (a class fires if *this* Gaussian does or *that* one does) and the number of terms in that OR was a parameter I chose. Here the construction determines it: a class occupying two separated regions appears in the minimax structure as two connected components at the relevant threshold, so the arity of the disjunction is a component count and not a hyperparameter.
+One further consequence closes a question Chapter 4 left open. Chapter 4's rules are disjunctions (a class fires if
+*this* Gaussian does or *that* one does) and the number of terms in that OR was a parameter I chose. Here the
+construction determines it: a class occupying two separated regions appears in the minimax structure as two connected
+components at the relevant threshold, so the arity of the disjunction is a component count and not a hyperparameter.
 
-That is a construction-level claim, not a measured one; no recorded run has exercised it. `results.json` → `arity_detection` reports arity 1 for every ground-truth block on every battery dataset, under both modes the driver runs (`dstar` and `geometric`), including both 80-point blocks of the concentric rings. The counter has never returned any other value, so nothing in the results establishes that it discriminates a two-piece class from a one-piece class, only that it does not hallucinate extra disjuncts. Exercising it needs a dataset with a genuinely disconnected class, which the battery lacks.
+That is a construction-level claim, not a measured one; no recorded run has exercised it. `results.json` →
+`arity_detection` reports arity 1 for every ground-truth block on every battery dataset, under both modes the driver
+runs (`dstar` and `geometric`), including both 80-point blocks of the concentric rings. The counter has never returned
+any other value, so nothing in the results establishes that it discriminates a two-piece class from a one-piece class,
+only that it does not hallucinate extra disjuncts. Exercising it needs a dataset with a genuinely disconnected class,
+which the battery lacks.
 
-The same question is ill-posed geometrically. How many convex pieces a ring consists of has no good answer: a ring is one connected object that no finite set of blobs covers naturally, hence §5.3.3's feature-space variant fails on rings. How many connected components it has is well-posed, and returns one.
+The same question is ill-posed geometrically. How many convex pieces a ring consists of has no good answer: a ring is
+one connected object that no finite set of blobs covers naturally, hence §5.3.3's feature-space variant fails on rings.
+How many connected components it has is well-posed, and returns one.
 
 ## 5.4 Preliminary Results
 
-> **Reproduction.** This section regenerates from one deterministic driver, `gated-minimax-selection/run_all.py`, which writes `outputs/results.json` (the JSON of record for every number below *except* the scaling paragraph) and its figures, and is registered in `reproduce/manifest.py`. Tables 5.1–5.3 are rendered from that JSON by `reproduce/tables/table_5_1_3_ch5_tables.py`, which computes nothing itself, so a table drifting from the results of record shows up as a diff. The scaling paragraph's numbers come from a separate, ten-seed generator, `reproduce/tables/table_5_4_ch5_g1_scaling.py` (`python reproduce/tables/table_5_4_ch5_g1_scaling.py` from the repo root; no submodule environment needed), which does not read or write `results.json` and is registered in `reproduce/manifest.py` as `table-5-4-ch5-g1-scaling`.
+> **Reproduction.** This section regenerates from one deterministic driver, `gated-minimax-selection/run_all.py`, which
+> writes `outputs/results.json` (the JSON of record for every number below *except* the scaling paragraph) and its
+> figures, and is registered in `reproduce/manifest.py`. Tables 5.1–5.3 are rendered from that JSON by
+> `reproduce/tables/table_5_1_3_ch5_tables.py`, which computes nothing itself, so a table drifting from the results of
+> record shows up as a diff. The scaling paragraph's numbers come from a separate, ten-seed generator,
+> `reproduce/tables/table_5_4_ch5_g1_scaling.py` (`python reproduce/tables/table_5_4_ch5_g1_scaling.py` from the repo
+> root; no submodule environment needed), which does not read or write `results.json` and is registered in
+> `reproduce/manifest.py` as `table-5-4-ch5-g1-scaling`.
 >
-> The driver runs to completion and rewrites `results.json` byte-identical to its 2026-07-20 contents, regenerating **16 of its 17 figures** (`fig11_scaling` is behind an opt-in `--scaling` flag); a reproducibility note in A.5 records why that byte-identity was, for a stretch, unverifiable. Audit trail in `reproduce/PROVENANCE_MAP.md`, Chapter 5.
+> The driver runs to completion and rewrites `results.json` byte-identical to its recorded contents, regenerating **16
+of its 17 figures** (`fig11_scaling` is behind an opt-in `--scaling` flag); Appendix A.5 records the reproducibility
+> note behind that byte-identity check. Audit trail in `reproduce/PROVENANCE_MAP.md`, Chapter 5.
 >
-> **TODO — repeatable performance (board-wide standard):** the scaling paragraph below has no output artifact on disk at all (see **Scaling**, and the A.5 note). When generated it stays a single-machine point estimate, and must be reproduced under the fixed protocol (Ch 7 Goal G4) before citation.
+> **TODO — repeatable performance (board-wide standard):** the scaling paragraph below has no output artifact on disk at
+> all (see **Scaling**, and the A.5 note). When generated it stays a single-machine point estimate, and must be reproduced
+> under the fixed protocol (Ch 7 Goal G4) before citation.
 
-The results here are on synthetic data with known ground truth: their strength and, per §5.5, their limitation. A second limit bounds the chapter's central claim, that this construction works with no coordinates: nothing in Tables 5.1–5.3 measures it. All three tables use coordinate-generated 2-D point sets with Euclidean dissimilarity matrices, so those matrices came *from* coordinates even though the method never looks at them. The one genuinely relational block *in this chapter* — shortest-path matrices on trees and graphs, no coordinates anywhere — evaluates **only NERFCM**, on $D$ and $D^*$, with no coverage, no discovered $k$, and no bands recorded.
+The results here are on synthetic data with known ground truth: their strength and, per §5.5, their limitation. A second
+limit bounds the chapter's central claim, that this construction works with no coordinates: nothing in Tables 5.1–5.3
+measures it. All three tables use coordinate-generated 2-D point sets with Euclidean dissimilarity matrices, so those
+matrices came *from* coordinates even though the method never looks at them. The one genuinely relational block *in this
+chapter* — shortest-path matrices on trees and graphs, no coordinates anywhere — evaluates **only NERFCM**, on $D$
+and $D^*$, with no coverage, no discovered $k$, and no bands recorded.
 
-**That claim is no longer only a code-reading argument, and the correction came from Chapter 3.** `select_coverage_cover` and `select_multiscale` now run, unmodified, on three real DTW dissimilarity matrices — ECG5000, Crop and FordA — as the companion to Table 3.7. The obstacle was never a code limitation: both selectors were already matrix-only and already discovered $k$; what was missing was a call site that handed them a matrix no coordinates stood behind. On ECG5000, the one of the three with recoverable structure, the set-cover reaches ARI **0.715** against NERFCM-given-$k$'s **0.593**. So the no-coordinates property is now a measurement and not a proof obligation.
+**That claim is no longer only a code-reading argument, and the correction came from Chapter 3.**
+`select_coverage_cover` and `select_multiscale` now run, unmodified, on three real DTW dissimilarity matrices — ECG5000,
+Crop and FordA — as the companion to Table 3.7. The obstacle was never a code limitation: both selectors were already
+matrix-only and already discovered $k$; what was missing was a call site that handed them a matrix no coordinates stood
+behind. On ECG5000, the one of the three with recoverable structure, the set-cover reaches ARI **0.715** against
+NERFCM-given-$k$'s **0.593**. So the no-coordinates property is now a measurement and not a proof obligation.
 
-What is still owed here is smaller and more local: the three `relationdata.py` tree-and-graph matrices already sitting in this chapter's own harness have still never been through the selectors, so Table 5.1's relational block remains a NERFCM-only column. That is the cheap step, and it needs no new data.
+What is still owed here is smaller and more local: the three `relationdata.py` tree-and-graph matrices already sitting
+in this chapter's own harness have still never been through the selectors, so Table 5.1's relational block remains a
+NERFCM-only column. That is the cheap step, and it needs no new data.
 
-**The transform.** Concentric rings score ARI ≈ 0.02 on the raw matrix, 1.00 on the minimax-transformed one. On bridged Gaussians plain single-linkage scores 0.00 (the chaining failure) and ConiVAT's metric learning repairs it to 1.00. Across the battery of five the gated set-cover, discovering $k$ with no constraints, matches NERFCM-given-$k$ and ConiVAT at 0.98–1.00 on three; on uniform noise it reports four blocks covering 12.5% of the points, a near-abstention rather than a refusal; on bridged Gaussians it fails, taken up below.
+**The transform.** Concentric rings score ARI ≈ 0.02 on the raw matrix, 1.00 on the minimax-transformed one. On bridged
+Gaussians plain single-linkage scores 0.00 (the chaining failure) and ConiVAT's metric learning repairs it to 1.00.
+Across the battery of five the gated set-cover, discovering $k$ with no constraints, matches NERFCM-given-$k$ and
+ConiVAT at 0.98–1.00 on three; on uniform noise it reports four blocks covering 12.5% of the points, a near-abstention
+rather than a refusal; on bridged Gaussians it fails, taken up below.
 
-**Table 5.1 — The battery (adjusted Rand index), with the discovery columns the renderer emits.** The four accuracy baselines are all *given* $k$ (both NERFCM columns, ConiVAT, and, below, $k$-means) while the set-cover discovers it, so the discovered-$k$ column reads next to the accuracy, not instead of it.
+**Table 5.1 — The battery (adjusted Rand index), with the discovery columns the renderer emits.** The four accuracy
+baselines are all *given* $k$ (both NERFCM columns, ConiVAT, and, below, $k$-means) while the set-cover discovers it, so
+the discovered-$k$ column reads next to the accuracy, not instead of it.
 
-| Dataset | single-linkage on $D$ | NERFCM on raw $D$ | NERFCM on $D^*$ (given $k$) | ConiVAT (constrained) | set-cover, covered pts | set-cover, all pts (gated) | $k$ discovered | true $k$ | coverage |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| concentric_rings | 1.000 | 0.020 | **1.000** | 1.000 | 1.000 | **1.000** | **2** | 2 | 1.000 |
-| bridged_gaussians | 0.000 (chaining) | 1.000 | 1.000 | **1.000** | 0.982 | 0.001 | 3 | 2 | 0.533 |
-| well_separated | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | **1.000** | **2** | 2 | 1.000 |
-| varying_density | 0.980 | 0.980 | 0.980 | 0.980 | 0.980 | **0.980** | **3** | 3 | 1.000 |
-| uniform_noise | N/A | N/A | N/A | N/A | N/A | N/A | 4 | none | 0.125 |
+| Dataset           | single-linkage on $D$ | NERFCM on raw $D$ | NERFCM on $D^*$ (given $k$) | ConiVAT (constrained) | set-cover, covered pts | set-cover, all pts (gated) | $k$ discovered | true $k$ | coverage |
+|-------------------|----------------------:|------------------:|----------------------------:|----------------------:|-----------------------:|---------------------------:|---------------:|---------:|---------:|
+| concentric_rings  |                 1.000 |             0.020 |                   **1.000** |                 1.000 |                  1.000 |                  **1.000** |          **2** |        2 |    1.000 |
+| bridged_gaussians |      0.000 (chaining) |             1.000 |                       1.000 |             **1.000** |                  0.982 |                      0.001 |              3 |        2 |    0.533 |
+| well_separated    |                 1.000 |             1.000 |                       1.000 |                 1.000 |                  1.000 |                  **1.000** |          **2** |        2 |    1.000 |
+| varying_density   |                 0.980 |             0.980 |                       0.980 |                 0.980 |                  0.980 |                  **0.980** |          **3** |        3 |    1.000 |
+| uniform_noise     |                   N/A |               N/A |                         N/A |                   N/A |                    N/A |                        N/A |              4 |     none |    0.125 |
 
-*Caption, continued — the simplest baseline, which the results file has and the table does not.* `results.json` → `main_table.kmeans_ari` records plain $k$-means given $k$ on the same data: **1.00** on well_separated, **1.00** on bridged_gaussians, **0.98** on varying_density, **0.017** on concentric_rings (null on noise, which has no partition). So $k$-means given $k$ ties the field on three of four datasets and collapses only on the rings, which changes how §5.1's motivation reads. "Every centroid method fails" is not true of this battery; it is true of the rings, where the geometric argument (the mean of a ring is in the hole) applies. Confining the claim to the rings is checkable; implying it holds everywhere is not.
+*Caption, continued — the simplest baseline, which the results file has and the table does not.* `results.json` →
+`main_table.kmeans_ari` records plain $k$-means given $k$ on the same data: **1.00** on well_separated, **1.00** on
+bridged_gaussians, **0.98** on varying_density, **0.017** on concentric_rings (null on noise, which has no partition).
+So $k$-means given $k$ ties the field on three of four datasets and collapses only on the rings, which changes how
+§5.1's motivation reads. "Every centroid method fails" is not true of this battery; it is true of the rings, where the
+geometric argument (the mean of a ring is in the hole) applies. Confining the claim to the rings is checkable; implying
+it holds everywhere is not.
 
-**Figure 5.5 — The five battery datasets, and what the gated set-cover makes of each.** Every panel runs the three calls behind Table 5.1's set-cover column — Euclidean dissimilarity, the minimax transform, `select_coverage_cover` at the driver's defaults — and colours each point by the block that covers it, uncovered points hollow, marker shape the ground-truth class. The discovered $k$, coverage and ARI on covered points in each title are computed at draw time, not copied from the table, so the two cannot disagree. The rings are the case that needs the transform and no centroid method can do; the bridge is the gate's recorded failure; on uniform noise the gate claims an eighth of the points rather than none, which is the near-abstention the table's coverage column records.
+**Figure 5.5 — The five battery datasets, and what the gated set-cover makes of each.** Every panel runs the three calls
+behind Table 5.1's set-cover column — Euclidean dissimilarity, the minimax transform, `select_coverage_cover` at the
+driver's defaults — and colours each point by the block that covers it, uncovered points hollow, marker shape the
+ground-truth class. The discovered $k$, coverage and ARI on covered points in each title are computed at draw time, not
+copied from the table, so the two cannot disagree. The rings are the case that needs the transform and no centroid
+method can do; the bridge is the gate's recorded failure; on uniform noise the gate claims an eighth of the points
+rather than none, which is the near-abstention the table's coverage column records.
 `![05-battery](fig/05-battery.png)`
 
-The gate gets $k$ right on **three of the four datasets with a ground-truth $k$** (2 on the rings, 2 on well_separated, 3 on varying_density) and wrong on bridged_gaussians: **$k$ = 3 against a true 2, at 53.3% coverage**, where both beta-plateau and bottleneck-bootstrap return the correct 2, at 98.3% and 97.5% coverage (Table 5.3). So "the baselines are handed $k$ and mine finds it" is fair against NERFCM, ConiVAT and $k$-means, unfair against the persistence selectors, which discover $k$ too. That is a real loss. Wrong count and low coverage are one fault: `selector_comparison.bridged_gaussians.coverage_cover` records three blocks of sizes **58, 3, 3**, purity 1.000, coverage 0.533. Every admitted block is pure; it took one half of the data plus two three-point fragments and never the other half. The count is wrong *because* the second real cluster is missing, not because a spurious cluster was invented.
+The gate gets $k$ right on **three of the four datasets with a ground-truth $k$** (2 on the rings, 2 on well_separated,
+3 on varying_density) and wrong on bridged_gaussians: **$k$ = 3 against a true 2, at 53.3% coverage**, where both
+beta-plateau and bottleneck-bootstrap return the correct 2, at 98.3% and 97.5% coverage (Table 5.3). So "the baselines
+are handed $k$ and mine finds it" is fair against NERFCM, ConiVAT and $k$-means, unfair against the persistence
+selectors, which discover $k$ too. That is a real loss. Wrong count and low coverage are one fault:
+`selector_comparison.bridged_gaussians.coverage_cover` records three blocks of sizes **58, 3, 3**, purity 1.000,
+coverage 0.533. Every admitted block is pure; it took one half of the data plus two three-point fragments and never the
+other half. The count is wrong *because* the second real cluster is missing, not because a spurious cluster was
+invented.
 
-The uniform-noise row is where declining is the right answer, which no accuracy-style metric rewards. `N/A` is not an omission: uniform noise has no ground-truth partition, so ARI is undefined against it for every method. But the gate does not report nothing. `main_table.uniform_noise` records `cover_nblocks` = **4** and `cover_coverage` = **0.125**: four blocks, an eighth of the points. The near-abstention is in the coverage, not the block count.
+The uniform-noise row is where declining is the right answer, which no accuracy-style metric rewards. `N/A` is not an
+omission: uniform noise has no ground-truth partition, so ARI is undefined against it for every method. But the gate
+does not report nothing. `main_table.uniform_noise` records `cover_nblocks` = **4** and `cover_coverage` = **0.125**:
+four blocks, an eighth of the points. The near-abstention is in the coverage, not the block count.
 
-The bridged row looks contradictory without a word on scoring. The set-cover there reaches ARI 0.982 *on the points it claims*, but claims only 53.3% of them; scored over the whole dataset, everything uncovered counted as unassigned, it is 0.001. Both numbers describe the same cover and both are in the JSON (`main_table.cover_ari` and `persistence_methods.bridged_gaussians.methods.persistence_gap.ari`); the table carries both, and the prose quotes the all-points figure, the conservative reading that makes the row a genuine failure rather than a partial success.
+The bridged row looks contradictory without a word on scoring. The set-cover there reaches ARI 0.982 *on the points it
+claims*, but claims only 53.3% of them; scored over the whole dataset, everything uncovered counted as unassigned, it is
+0.001. Both numbers describe the same cover and both are in the JSON (`main_table.cover_ari` and
+`persistence_methods.bridged_gaussians.methods.persistence_gap.ari`); the table carries both, and the prose quotes the
+all-points figure, the conservative reading that makes the row a genuine failure rather than a partial success.
 
-I am also reporting the bridge as a failure while a different run in the same results file solves it. `multiscale_no_regression.bridged_gaussians` runs the **multi-scale selector** on that same dataset and records `ms_n_bands` = 1, `ms_finest_k` = **2**, the correct count, and `ms_finest_ari` = **1.000**. Scoring there is apples-to-apples: that row's `flat_ari` (0.982, at `flat_k` = 3) and its `ms_finest_ari` both use `multiscale_persistence.assign`, which assigns every point to the nearest block rather than leaving uncovered points out. So under one consistent scoring the flat gate gets 0.982 with the wrong $k$, the multi-scale selector 1.000 with the right one.
+I am also reporting the bridge as a failure while a different run in the same results file solves it.
+`multiscale_no_regression.bridged_gaussians` runs the **multi-scale selector** on that same dataset and records
+`ms_n_bands` = 1, `ms_finest_k` = **2**, the correct count, and `ms_finest_ari` = **1.000**. Scoring there is
+apples-to-apples: that row's `flat_ari` (0.982, at `flat_k` = 3) and its `ms_finest_ari` both use
+`multiscale_persistence.assign`, which assigns every point to the nearest block rather than leaving uncovered points
+out. So under one consistent scoring the flat gate gets 0.982 with the wrong $k$, the multi-scale selector 1.000 with
+the right one.
 
-I am not quietly upgrading the row. Tables 5.1 and 5.3 report the flat gate throughout, because the bake-off's competitors, beta-plateau and bottleneck-bootstrap, are flat selectors; swapping in my multi-scale result while leaving theirs flat is the asymmetric comparison this section exists to avoid. And `multiscale_no_regression` records no coverage for the multi-scale band, so I cannot state its all-points score under the tables' conservative scoring, and will not quote a number I do not have. This narrows §5.3.4's trade-off: the noise-conservatism-versus-bridge-robustness tension belongs to the flat gate, not the pipeline the chapter proposes as its headline. Establishing that means running the multi-scale selector through the same bake-off with coverage recorded, a cheap addition to `run_persistence_methods_numeric()` listed in §5.5.
+I am not quietly upgrading the row. Tables 5.1 and 5.3 report the flat gate throughout, because the bake-off's
+competitors, beta-plateau and bottleneck-bootstrap, are flat selectors; swapping in my multi-scale result while leaving
+theirs flat is the asymmetric comparison this section exists to avoid. And `multiscale_no_regression` records no
+coverage for the multi-scale band, so I cannot state its all-points score under the tables' conservative scoring, and
+will not quote a number I do not have. This narrows §5.3.4's trade-off: the noise-conservatism-versus-bridge-robustness
+tension belongs to the flat gate, not the pipeline the chapter proposes as its headline. Establishing that means running
+the multi-scale selector through the same bake-off with coverage recorded, a cheap addition to
+`run_persistence_methods_numeric()` listed in §5.5.
 
-**Multi-scale, the headline, and the aggregation that inflates it.** The claim here is structural, not an accuracy gain, and the averaged form of it invites the wrong reading. Averaged over all ground-truth levels, the multi-scale method lifts nested Gaussians from 0.66 to 1.00, a three-level hierarchy from 0.58 to 1.00, and a density hierarchy from 0.75 to 1.00. Those means are correct — `multiscale_hierarchy.*.flat_mean_ari` is 0.662, 0.576 and 0.746, `ms_mean_ari` 1.000 in all three — but compare unlike things. The flat column is **one partition scored against every level and averaged**; the multi-scale column is a **per-level maximum over the bands** (`ms_best_ari_per_level`, computed as `max` over band assignments for each level), then averaged. A flat partition cannot beat roughly $1/L$ on an $L$-level average, because $L-1$ of its scores are against granularities it does not have. Most of the 0.576 → 1.000 gap is that asymmetry, not the method.
+**Multi-scale, the headline, and the aggregation that inflates it.** The claim here is structural, not an accuracy gain,
+and the averaged form of it invites the wrong reading. Averaged over all ground-truth levels, the multi-scale method
+lifts nested Gaussians from 0.66 to 1.00, a three-level hierarchy from 0.58 to 1.00, and a density hierarchy from 0.75
+to 1.00. Those means are correct — `multiscale_hierarchy.*.flat_mean_ari` is 0.662, 0.576 and 0.746, `ms_mean_ari` 1.000
+in all three — but compare unlike things. The flat column is **one partition scored against every level and averaged**;
+the multi-scale column is a **per-level maximum over the bands** (`ms_best_ari_per_level`, computed as `max` over band
+assignments for each level), then averaged. A flat partition cannot beat roughly $1/L$ on an $L$-level average,
+because $L-1$ of its scores are against granularities it does not have. Most of the 0.576 → 1.000 gap is that asymmetry,
+not the method.
 
-The harness's own caption says as much: *"Averaging over ALL ground-truth levels is what makes the flat column look bad — a flat cover lands one level exactly and misses the rest, so its per-level scores are recorded in `flat_ari_per_level`."*
+The harness's own caption says as much: *"Averaging over ALL ground-truth levels is what makes the flat column look
+bad — a flat cover lands one level exactly and misses the rest, so its per-level scores are recorded in
+`flat_ari_per_level`."*
 
-So here is the defensible version. A flat cover returns one partition; the band stack returns $L$, one per true level. On all three datasets the flat cover returns $k$ = 2 and scores exactly **1.000 on one true level**, the coarsest, and much less on the rest. Each band's score vector peaks at a distinct level, one-to-one and in order: on the three-level set, band 0 ($k$ = 8) scores [1.000, 0.581, 0.236] across fine/medium/coarse, band 1 ($k$ = 4) [0.581, 1.000, 0.492], band 2 ($k$ = 2) [0.236, 0.492, 1.000]. The maximum falling to a *different* band per level, in monotone order, is what makes the per-level max other than an oracle trick. But it is still a max, and the **0.58 → 1.00 pair must not be read as an accuracy gain**. What was measured is that the partitions returned went from one to three, each correct at its own granularity, with no one telling the method there were three levels.
+So here is the scoped version. A flat cover returns one partition; the band stack returns $L$, one per true level.
+On all three datasets the flat cover returns $k$ = 2 and scores exactly **1.000 on one true level**, the coarsest, and
+much less on the rest. Each band's score vector peaks at a distinct level, one-to-one and in order: on the three-level
+set, band 0 ($k$ = 8) scores [1.000, 0.581, 0.236] across fine/medium/coarse, band 1 ($k$ = 4) [0.581, 1.000, 0.492],
+band 2 ($k$ = 2) [0.236, 0.492, 1.000]. The maximum falling to a *different* band per level, in monotone order, is what
+makes the per-level max other than an oracle trick. But it is still a max, and the **0.58 → 1.00 pair must not be read
+as an accuracy gain**. What was measured is that the partitions returned went from one to three, each correct at its own
+granularity, with no one telling the method there were three levels.
 
-**Table 5.2 — Multi-scale recovery (adjusted Rand index), with the per-level breakdown and the flat $k$ the summary drops.**
+**Table 5.2 — Multi-scale recovery (adjusted Rand index), with the per-level breakdown and the flat $k$ the summary
+drops.**
 
-| Dataset | levels (fine→coarse) | flat $k$ | flat, per level | flat mean | multi-scale, per-level best | multi-scale mean | granularities recovered |
-|---|:--|---:|:--|---:|:--|---:|:--:|
-| nested_gaussians | 6 / 2 | 2 | 0.324, **1.000** | 0.662 | 1.000, 1.000 | **1.000** | [6, 2] |
-| three_level_hierarchy | 8 / 4 / 2 | 2 | 0.236, 0.492, **1.000** | 0.576 | 1.000, 1.000, 1.000 | **1.000** | [8, 4, 2] |
-| density_hierarchy | 4 / 2 | 2 | 0.492, **1.000** | 0.746 | 1.000, 1.000 | **1.000** | [4, 2] |
+| Dataset               | levels (fine→coarse) | flat $k$ | flat, per level         | flat mean | multi-scale, per-level best | multi-scale mean | granularities recovered |
+|-----------------------|:---------------------|---------:|:------------------------|----------:|:----------------------------|-----------------:|:-----------------------:|
+| nested_gaussians      | 6 / 2                |        2 | 0.324, **1.000**        |     0.662 | 1.000, 1.000                |        **1.000** |         [6, 2]          |
+| three_level_hierarchy | 8 / 4 / 2            |        2 | 0.236, 0.492, **1.000** |     0.576 | 1.000, 1.000, 1.000         |        **1.000** |        [8, 4, 2]        |
+| density_hierarchy     | 4 / 2                |        2 | 0.492, **1.000**        |     0.746 | 1.000, 1.000                |        **1.000** |         [4, 2]          |
 
-*Caption — how easy this data makes the problem.* Band discovery has exactly one stated assumption: that the density scales are well separated. The dataset demonstrating it satisfies that by one to three orders of magnitude. `battery_hierarchical.three_level_hierarchy` uses `sigma` = 0.35 with `l3_sep` = 5.0, `l2_sep` = 28.0 and `l1_sep` = 200.0: separations of **14σ, 80σ and 571σ**, consecutive scales differing by factors of **5.6×** and **7.1×**. The discovered band edges sit at birth heights **1.593** and **10.311**, the gap those factors produce. It is also small and singly-realized: `n_per` = 12 over 8 leaves gives **n = 96** points at a **fixed `seed` = 11**, with no spread reported over seeds anywhere in `multiscale_hierarchy`. So Table 5.2 establishes that the **mechanism works** (gaps on the log-birth axis do separate genuine scale levels, and the gated cover within each band recovers that level exactly) and not that it is robust. Where it stops working is not measured; §5.5 proposes the experiment that would.
+*Caption — how easy this data makes the problem.* Band discovery has exactly one stated assumption: that the density
+scales are well separated. The dataset demonstrating it satisfies that by one to three orders of magnitude.
+`battery_hierarchical.three_level_hierarchy` uses `sigma` = 0.35 with `l3_sep` = 5.0, `l2_sep` = 28.0 and `l1_sep` =
+200.0: separations of **14σ, 80σ and 571σ**, consecutive scales differing by factors of **5.6×** and **7.1×**. The
+discovered band edges sit at birth heights **1.593** and **10.311**, the gap those factors produce. It is also small and
+singly-realized: `n_per` = 12 over 8 leaves gives **n = 96** points at a **fixed `seed` = 11**, with no spread reported
+over seeds anywhere in `multiscale_hierarchy`. So Table 5.2 establishes that the **mechanism works** (gaps on the
+log-birth axis do separate genuine scale levels, and the gated cover within each band recovers that level exactly) and
+not that it is robust. Where it stops working is not measured; §5.5 proposes the experiment that would.
 
-**The falsification experiment, inconclusive as run.** The intent was to check that a flat cover already handles single-level varying density. `multiscale_scale_invariance` sweeps six contrast settings: contrast 1.5 → 8.0 is `spread_ratio` **1:1.5:2.25 up to 1:8:64**, a **64-fold** spread between the narrowest and widest cluster at the top setting. At every one of the six settings the flat cover returns `flat_k` = **3** and `flat_ari` = **0.983**.
+**The falsification experiment, inconclusive as run.** The intent was to check that a flat cover already handles
+single-level varying density. `multiscale_scale_invariance` sweeps six contrast settings: contrast 1.5 → 8.0 is
+`spread_ratio` **1:1.5:2.25 up to 1:8:64**, a **64-fold** spread between the narrowest and widest cluster at the top
+setting. At every one of the six settings the flat cover returns `flat_k` = **3** and `flat_ari` = **0.983**.
 
-An identical score to three decimals at all six settings is either a very clean invariance or a sign that the swept parameter did not change what is being scored, and the recorded output cannot tell me which, because **nothing recorded moves**. The JSON stores three fields per setting (`spread_ratio`, `flat_k`, `flat_ari`) and two of the three are constant. Worse, the generator scales the inter-cluster separation *with* the spread (`xs[-1] + sep * (sig[j-1] + sig[j]) / 2` at `sep` = 6.0), so every cluster's separation-to-spread ratio is fixed by construction and each configuration is close to a rescaling of the last: a good reason for a scale-relative selector not to move, and equally a reason the experiment cannot distinguish invariance from a no-op.
+An identical score to three decimals at all six settings is either a very clean invariance or a sign that the swept
+parameter did not change what is being scored, and the recorded output cannot tell me which, because **nothing recorded
+moves**. The JSON stores three fields per setting (`spread_ratio`, `flat_k`, `flat_ari`) and two of the three are
+constant. Worse, the generator scales the inter-cluster separation *with* the spread
+(`xs[-1] + sep * (sig[j-1] + sig[j]) / 2` at `sep` = 6.0), so every cluster's separation-to-spread ratio is fixed by
+construction and each configuration is close to a rescaling of the last: a good reason for a scale-relative selector not
+to move, and equally a reason the experiment cannot distinguish invariance from a no-op.
 
-This repository holds itself to that standard elsewhere: `PROVENANCE_MAP.md` note 12 downgrades a result to inconclusive because its manipulation check failed, and this one has no manipulation check at all. So the status is **inconclusive**. The fix is cheap and specific: record, per contrast setting, a quantity that *should* move with contrast (the number of bands `select_multiscale` finds, the range of block birth heights on the log axis) and show whether it does. If those move while `flat_ari` holds, the invariance is real and the claim stands; if they do not, the sweep is not varying what it purports to and has to be redesigned. Until then §5.3.2's "flat methods already handle single-level varying density" rests on 0.983 at one setting, not a demonstrated invariance across six.
+This repository holds itself to that standard elsewhere: `PROVENANCE_MAP.md` note 12 downgrades a result to inconclusive
+because its manipulation check failed, and this one has no manipulation check at all. So the status is **inconclusive**.
+The fix is cheap and specific: record, per contrast setting, a quantity that *should* move with contrast (the number of
+bands `select_multiscale` finds, the range of block birth heights on the log axis) and show whether it does. If those
+move while `flat_ari` holds, the invariance is real and the claim stands; if they do not, the sweep is not varying what
+it purports to and has to be redesigned. Until then §5.3.2's "flat methods already handle single-level varying density"
+rests on 0.983 at one setting, not a demonstrated invariance across six.
 
-**Scaling — measured (2026-08-12), and the invariance claim is qualified rather than confirmed.** `results.json`'s absent `scaling` key and the un-run `--scaling` flag described above are as they were when that was written; what closes the gap is a new generator, `reproduce/tables/table_5_4_ch5_g1_scaling.py`, run at this document's ten-seed floor rather than the opt-in benchmark's single fixed seed. It sweeps `battery_hierarchical.SCALABLE`'s three fixed-structure families — `single_scale`, `many_scale` (a nested, multi-granularity family), `log_separated` — at $n \in \{100, 250, 500, 1{,}000, 2{,}000, 5{,}000\}$, comparing the two-stage selector against a flat set-cover baseline, and adding the partition-of-unity error neither prior study reported. Full results: `reproduce/outputs/table_5_4_ch5_g1_scaling.md`; ran in 3m6s on the workstation named in Chapter 3.
+**Scaling — measured, and the invariance claim is qualified rather than confirmed.** `results.json`'s `scaling` key
+stays absent and the `--scaling` flag above stays un-run; what closes the gap instead is a separate generator,
+`reproduce/tables/table_5_4_ch5_g1_scaling.py`, run at this document's ten-seed floor rather than the opt-in benchmark's
+single fixed seed. It sweeps `battery_hierarchical.SCALABLE`'s three fixed-structure families — `single_scale`,
+`many_scale` (a nested, multi-granularity family), `log_separated` —
+at $n \in \{100, 250, 500, 1{,}000, 2{,}000, 5{,}000\}$, comparing the two-stage selector against a flat set-cover
+baseline, and adding the partition-of-unity error neither prior study reported. Full results:
+`reproduce/outputs/table_5_4_ch5_g1_scaling.md`; ran in 3m6s on the workstation named in Chapter 3.
 
-**`many_scale`: clean multi-granularity recovery at every scale.** Across all ten seeds and every $n$ from 100 to 5,000, the two-stage selector recovers granularities **[8, 4, 2] at ARI 1.00**, with zero exceptions. The flat set-cover baseline, run on the same data for the first time, finds only $k = 2$ at every size, ARI climbing from 0.25 at $n=100$ to 1.00 at $n=5{,}000$ — it eventually reaches the coarsest level by luck of scale, not by discriminating the finer ones, which is exactly the failure mode multi-scale recovery exists to avoid.
+**`many_scale`: clean multi-granularity recovery at every scale.** Across all ten seeds and every $n$ from 100 to 5,000,
+the two-stage selector recovers granularities **[8, 4, 2] at ARI 1.00**, with zero exceptions. The flat set-cover
+baseline, run on the same data for the first time, finds only $k = 2$ at every size, ARI climbing from 0.25 at $n=100$
+to 1.00 at $n=5{,}000$ — it eventually reaches the coarsest level by luck of scale, not by discriminating the finer
+ones, which is exactly the failure mode multi-scale recovery exists to avoid.
 
-**`single_scale` is where the ten-seed floor earns its keep.** The recovered granularity's modal value agrees with the single-seed baseline in only 5–7 of 10 seeds at any given $n$ — an instability the n = 96, seed = 11 run could not have shown. Fine-level ARI stays high (≈0.98–1.00) even when the granularity vector disagrees, so the *partition* is usually still good while the *reported structure* is less stable than a single run suggests. §5.5's invariance claims should accordingly read "usually recovers the same granularity" rather than "recovers the granularity," pending a characterization of what drives the disagreement.
+**`single_scale` is where the ten-seed floor earns its keep.** The recovered granularity's modal value agrees with the
+single-seed baseline in only 5–7 of 10 seeds at any given $n$ — an instability the n = 96, seed = 11 run could not have
+shown. Fine-level ARI stays high (≈0.98–1.00) even when the granularity vector disagrees, so the *partition* is usually
+still good while the *reported structure* is less stable than a single run suggests. §5.5's invariance claims should
+accordingly read "usually recovers the same granularity" rather than "recovers the granularity," pending a
+characterization of what drives the disagreement.
 
-**`log_separated` shows the messier, n-sensitive transition §5.5 predicts, not a clean threshold.** The two-stage selector's ARI rises from 0.73 ± 0.20 at $n=100$ to 0.99 ± 0.01 at $n \ge 2{,}000$ — real n-dependence, but a gradual climb, not a sharp crossover. The flat set-cover stays strong throughout (0.85–0.99), consistent with the phase-four finding elsewhere in this chapter that flat coverage is the right tool for small-sample single-level data.
+**`log_separated` shows the messier, n-sensitive transition §5.5 predicts, not a clean threshold.** The two-stage
+selector's ARI rises from 0.73 ± 0.20 at $n=100$ to 0.99 ± 0.01 at $n \ge 2{,}000$ — real n-dependence, but a gradual
+climb, not a sharp crossover. The flat set-cover stays strong throughout (0.85–0.99), consistent with the phase-four
+finding elsewhere in this chapter that flat coverage is the right tool for small-sample single-level data.
 
-**Partition-of-unity error holds at machine precision (≈1e-16–1e-17) across every family, every $n$, and every seed** — the one figure this pass measured that needed no qualification.
+**Partition-of-unity error holds at machine precision (≈1e-16–1e-17) across every family, every $n$, and every seed** —
+the one figure this pass measured that needed no qualification.
 
-**Figure 5.6 — The two-stage selector against a flat set-cover as $n$ grows.** Table 5.4's three families from the archive's own CSV (`full-2026-08-22`): adjusted Rand index against $n$ for the two-stage selector and the flat cover, ten-seed spreads as error bars. On `many_scale` the flat column is one partition scored against three granularities, so it is drawn as three faint lines while the two-stage selector's three values coincide at $1.00$. Along the bottom of each panel is the table's agreement fraction — how many seeds of ten returned the modal granularity vector — which is the instability the `single_scale` paragraph is about and which no ARI axis can show: the partition is good at every $n$ while the reported structure agrees on five to seven seeds of ten. `log_separated` climbs with $n$ rather than crossing a threshold.
+**Figure 5.6 — The two-stage selector against a flat set-cover as $n$ grows.** Table 5.4's three families from the
+archive's own CSV (`full-2026-08-22`): adjusted Rand index against $n$ for the two-stage selector and the flat cover,
+ten-seed spreads as error bars. On `many_scale` the flat column is one partition scored against three granularities, so
+it is drawn as three faint lines while the two-stage selector's three values coincide at $1.00$. Along the bottom of
+each panel is the table's agreement fraction — how many seeds of ten returned the modal granularity vector — which is
+the instability the `single_scale` paragraph is about and which no ARI axis can show: the partition is good at every $n$
+while the reported structure agrees on five to seven seeds of ten. `log_separated` climbs with $n$ rather than crossing
+a threshold.
 `![05-scaling](fig/05-scaling.png)`
 
-What Goal G1's decision rule still owes: the one-pass generator itself (phase five of `MEMBERSHIP_ROADMAP.md`) remains "plumbing and unattempted," so this measurement compares the *existing* two-stage selector against a flat baseline, not the one-pass construction against either. Timing for the full pipeline at these sizes, and the scale-invariance figure (`fig11_scaling.png`), are still not produced by this pass — it answers the granularity-recovery question the decision rule asks first, not the wall-clock question.
+What Goal G1's decision rule still owes: the one-pass generator itself (phase five of `MEMBERSHIP_ROADMAP.md`) remains
+"plumbing and unattempted," so this measurement compares the *existing* two-stage selector against a flat baseline, not
+the one-pass construction against either. Timing for the full pipeline at these sizes, and the scale-invariance figure
+(`fig11_scaling.png`), are still not produced by this pass — it answers the granularity-recovery question the decision
+rule asks first, not the wall-clock question.
 
-**The selection bake-off.** Against beta-plateau and bottleneck-bootstrap there is no universal winner. My gate fails a deliberately adversarial "bridge" case (ARI 0.001, $k$ = 3 against a true 2, coverage 0.533) but claims only an eighth of the noise; beta-plateau and bottleneck-bootstrap fix the bridge (0.927 and 0.891, both at the correct $k$ = 2, at 98.3% and 97.5% coverage) but are less conservative on noise, both reporting seven clusters where there are none.
+**The selection bake-off.** Against beta-plateau and bottleneck-bootstrap there is no universal winner. My gate fails a
+deliberately adversarial "bridge" case (ARI 0.001, $k$ = 3 against a true 2, coverage 0.533) but claims only an eighth
+of the noise; beta-plateau and bottleneck-bootstrap fix the bridge (0.927 and 0.891, both at the correct $k$ = 2, at
+98.3% and 97.5% coverage) but are less conservative on noise, both reporting seven clusters where there are none.
 
-That comparison needs the coverage column, and adding it costs me part of my own claim. Abstention here is not reporting no clusters, since my gate *does* report four on uniform noise; it is how much of the data a method will commit to. Mine claims 12.5% of the noise points. Beta-plateau claims 95.8%, genuine over-firing. But bottleneck-bootstrap claims only 25%, far closer to my gate than to beta-plateau, while also repairing the bridge. So the bridge-robustness/noise-conservatism trade-off is real but a *gradient*, not the dichotomy I first described, and bottleneck-bootstrap is the serious competitor: it does both at once, less cleanly than I do one and beta-plateau the other.
+That comparison needs the coverage column, and adding it costs me part of my own claim. Abstention here is not reporting
+no clusters, since my gate *does* report four on uniform noise; it is how much of the data a method will commit to. Mine
+claims 12.5% of the noise points. Beta-plateau claims 95.8%, genuine over-firing. But bottleneck-bootstrap claims only
+25%, far closer to my gate than to beta-plateau, while also repairing the bridge. So the
+bridge-robustness/noise-conservatism trade-off is real but a *gradient*, not the dichotomy I first described, and
+bottleneck-bootstrap is the serious competitor: it does both at once, less cleanly than I do one and beta-plateau the
+other.
 
-**Table 5.3 — Selection-method comparison, with the bridge $k$ and bridge coverage columns the renderer emits.** Noise has no ground-truth partition, so ARI is undefined there for every method, and the behavior reads off $k$ and coverage.
+**Table 5.3 — Selection-method comparison, with the bridge $k$ and bridge coverage columns the renderer emits.** Noise
+has no ground-truth partition, so ARI is undefined there for every method, and the behavior reads off $k$ and coverage.
 
-| Selection method | bridge ARI | bridge $k$ (true 2) | bridge coverage | noise $k$ (true: none) | noise coverage | noise behavior |
-|---|---:|---:|---:|---:|---:|---|
-| persistence-gap gate (ours) | 0.001 | 3 | 0.533 | 4 | **0.125** | near-abstention by coverage: four blocks, an eighth of the points |
-| beta-plateau [Bonis–Oudot] | 0.927 | **2** | 0.983 | 7 | **0.958** | over-fires: seven clusters spanning 96% of the data |
-| bottleneck-bootstrap [AuToMATo] | 0.891 | **2** | 0.975 | 7 | **0.250** | intermediate: seven clusters, but only a quarter of the data |
+| Selection method                | bridge ARI | bridge $k$ (true 2) | bridge coverage | noise $k$ (true: none) | noise coverage | noise behavior                                                    |
+|---------------------------------|-----------:|--------------------:|----------------:|-----------------------:|---------------:|-------------------------------------------------------------------|
+| persistence-gap gate (ours)     |      0.001 |                   3 |           0.533 |                      4 |      **0.125** | near-abstention by coverage: four blocks, an eighth of the points |
+| beta-plateau [Bonis–Oudot]      |      0.927 |               **2** |           0.983 |                      7 |      **0.958** | over-fires: seven clusters spanning 96% of the data               |
+| bottleneck-bootstrap [AuToMATo] |      0.891 |               **2** |           0.975 |                      7 |      **0.250** | intermediate: seven clusters, but only a quarter of the data      |
 
-The two restored columns cost me the cleanest version of my framing. On the bridge my gate is not merely less accurate: it gets the *count* wrong while both competitors get it right, and does so while committing to half the data. Across the four labeled battery datasets they discover $k$ correctly four times out of four; my gate manages three. My one unambiguous advantage is noise coverage, and even there bottleneck-bootstrap is much closer to me than to beta-plateau.
+The two restored columns cost me the cleanest version of my framing. On the bridge my gate is not merely less accurate:
+it gets the *count* wrong while both competitors get it right, and does so while committing to half the data. Across the
+four labeled battery datasets they discover $k$ correctly four times out of four; my gate manages three. My one
+unambiguous advantage is noise coverage, and even there bottleneck-bootstrap is much closer to me than to beta-plateau.
 
-**Against HDBSCAN\*.** The bake-off above is against two persistence selectors. The comparison a reader who knows the density-clustering literature will ask for is against HDBSCAN\*, and it has been run: seventeen dissimilarity matrices, twelve HDBSCAN\* configurations each, ten seeds, at $m_{\mathrm{pts}} = 1$ where HDBSCAN\* is provably single-linkage on the input dissimilarity [@campello2015hdbscan, Corollary 3.5] so that both sides consume the identical hierarchy. **Appendix A.8 carries it in full.** The result does not belong in the chapter's argument, which is why it sits there: the gate is at parity with HDBSCAN\* on accuracy, not ahead of it, and the selection machinery of §5.3.4 and §5.3.2 is therefore reported as machinery rather than advanced as a contribution. Two limitations from that appendix do bear on this chapter and are carried in §5.6: the gate is unstable on cosine dissimilarities, and band recovery is not deterministic across seeds.
+**Against HDBSCAN\*.** The bake-off above is against two persistence selectors. The comparison a reader who knows the
+density-clustering literature will ask for is against HDBSCAN\*, and it has been run: seventeen dissimilarity matrices,
+twelve HDBSCAN\* configurations each, ten seeds, at $m_{\mathrm{pts}} = 1$ where HDBSCAN\* is provably single-linkage on
+the input dissimilarity [@campello2015hdbscan, Corollary 3.5] so that both sides consume the identical hierarchy.
+**Appendix A.8 carries it in full.** The result does not belong in the chapter's argument, which is why it sits there:
+the gate is at parity with HDBSCAN\* on accuracy, not ahead of it, and the selection machinery of §5.3.4 and §5.3.2 is
+therefore reported as machinery rather than advanced as a contribution. Two limitations from that appendix do bear on
+this chapter and are carried in §5.6: the gate is unstable on cosine dissimilarities, and band recovery is not
+deterministic across seeds.
 
-**Relational-only data.** This is the one experiment *in this chapter* with no coordinates. On the three dissimilarity-matrix-only datasets built from tree and graph shortest paths, NERFCM already solves the simple cases (`three_clusters_tree`, n = 30, ARI 1.000 on both $D$ and $D^*$; `chain_then_ring`, n = 40, 1.000 on both). The third case is a cautionary tale about ground truth rather than about methods: `multi_scale_hierarchy` stood for weeks at ARI **0.285** and was named here as the hard open problem, until an audit found the generator was assigning ~18% of its own labels at random (repo issue #160, since fixed) — the number was substantially measuring label noise. Against the corrected truth (n = 45), NERFCM at $c{=}3$ scores **0.551** on both $D$ and $D^*$, which is the ceiling for *any* three-cluster partition scored against six sub-clusters: what remains is a granularity mismatch, not a method failure. And the multi-scale selector of §5.3, run on this same matrix (`run_nonmetric.py`, E4), discovers bands [6, 3] and recovers **both** truth levels at ARI 1.000 — so the gated machinery has now been through this block, and the formerly open problem decomposes entirely into the two confounds above. The full non-Euclidean account, including where the transform genuinely fails (deflation-type corruption), is in `gated-minimax-selection/notes/NONMETRIC_FINDINGS.md`.
+**Relational-only data.** This is the one experiment *in this chapter* with no coordinates. On the three
+dissimilarity-matrix-only datasets built from tree and graph shortest paths, NERFCM already solves the simple cases
+(`three_clusters_tree`, n = 30, ARI 1.000 on both $D$ and $D^*$; `chain_then_ring`, n = 40, 1.000 on both). The third
+case is a cautionary tale about ground truth rather than about methods: `multi_scale_hierarchy`'s original ARI of 0.285
+substantially measured label noise, since the generator assigned about 18% of its own labels at random (repo issue #160,
+fixed). Against the corrected truth (n = 45), NERFCM at $c{=}3$ scores **0.551** on both $D$ and $D^*$, which is the
+ceiling for *any* three-cluster partition scored against six sub-clusters: what remains is a granularity mismatch, not a
+method failure. And the multi-scale selector of §5.3, run on this same matrix (`run_nonmetric.py`, E4), discovers
+bands [6, 3] and recovers **both** truth levels at ARI 1.000 — so the gated machinery has been through this block, and
+the once-open problem decomposes entirely into the two confounds above. The full non-Euclidean account, including where
+the transform genuinely fails (deflation-type corruption), is in `gated-minimax-selection/notes/NONMETRIC_FINDINGS.md`.
 
-Every number above is a *clustering* score, while the chapter's purpose is generating membership functions for a fuzzy inference system. The result that would most directly support the claim is therefore missing: I have not built a FIS from these membership functions and measured how it predicts. ARI against a known partition is a reasonable proxy, since antecedents that carve the space correctly precede a good model, but a proxy is what it is. §5.5 puts closing that gap first.
+Every number above is a *clustering* score, while the chapter's purpose is generating membership functions for a fuzzy
+inference system. The result that would most directly support the claim is therefore missing: I have not built a FIS
+from these membership functions and measured how it predicts. ARI against a known partition is a reasonable proxy, since
+antecedents that carve the space correctly precede a good model, but a proxy is what it is. §5.5 puts closing that gap
+first.
 
 ## 5.5 Proposed Work
 
-What turns this into a dissertation chapter is the following. The goal labels refer to Chapter 7, where these are scheduled.
+What turns this into a dissertation chapter is the following. The goal labels refer to Chapter 7, where these are
+scheduled.
 
-**Real non-coordinate data (G2)** came first, and the expensive half of it is done. Both selectors now run unmodified on three real DTW dissimilarity matrices (ECG5000, Crop, FordA) as the companion to Table 3.7, so the chapter's central claim is a measurement rather than a property of the construction.
+**Real non-coordinate data (G2)** came first, and the expensive half of it is done. Both selectors now run unmodified on
+three real DTW dissimilarity matrices (ECG5000, Crop, FordA) as the companion to Table 3.7, so the chapter's central
+claim is a measurement rather than a property of the construction.
 
-It split into a cheap step and a real one, and — against the order I expected — the real one landed first. That run also showed the obstacle had never been the code: both selectors were already matrix-only and already discovered $k$; every existing call site simply fed them matrices built from coordinates.
+It split into a cheap step and a real one, and — against the order I expected — the real one landed first. That run also
+showed the obstacle had never been the code: both selectors were already matrix-only and already discovered $k$; every
+existing call site simply fed them matrices built from coordinates.
 
-One thing remains, and it is not the cheap step: the `relationdata.py` matrices have now been through the selectors (`run_nonmetric.py`, E4 — flat set-cover and the multi-scale selector both), and multi-scale relational structure is no longer open — `multi_scale_hierarchy`'s ARI 0.285 turned out to be ~18% generator label noise plus a granularity mismatch (issue #160, fixed; §5.4), and the multi-scale selector recovers the corrected dataset at ARI 1.000 on both levels. What still stands is that the **decision rule's threshold is not met as written** — and the measurement is now complete rather than partial: all five named DTW sets have run at full N (ElectricDevices and StarLightCurves for the first time, the latter feasible only after a SIMD DTW kernel cut the harness wall clock by 10–12× — of which 3.3–4.8× is the kernel at equal core budget and the rest is parallelising a call site that had been single-threaded). Two of five land within the 0.05 band, both degenerate-or-weak ties; the other three fail it on the favourable side, the set-cover beating NERFCM-given-$k$ by 0.08–0.18 ARI on every dataset with recoverable structure while discovering $k$ itself. §7.2's G2 entry carries the full accounting, including the corrected-transform re-measurement behind the Crop row.
+One thing remains, and it is not the cheap step: the `relationdata.py` matrices have now been through the selectors
+(`run_nonmetric.py`, E4 — flat set-cover and the multi-scale selector both), and multi-scale relational structure is no
+longer open — `multi_scale_hierarchy`'s ARI 0.285 turned out to be ~18% generator label noise plus a granularity
+mismatch (issue #160, fixed; §5.4), and the multi-scale selector recovers the corrected dataset at ARI 1.000 on both
+levels. What still stands is that the **decision rule's threshold is not met as written** — and the measurement is now
+complete rather than partial: all five named DTW sets have run at full N (ElectricDevices and StarLightCurves for the
+first time, the latter feasible only after a SIMD DTW kernel cut the harness wall clock by 10–12× — of which 3.3–4.8× is
+the kernel at equal core budget and the rest is parallelising a call site that had been single-threaded). Two of five
+land within the 0.05 band, both degenerate-or-weak ties; the other three fail it on the favourable side, the set-cover
+beating NERFCM-given-$k$ by 0.08–0.18 ARI on every dataset with recoverable structure while discovering $k$ itself.
+§7.2's G2 entry carries the full accounting, including the corrected-transform re-measurement behind the Crop row.
 
-Equally load-bearing is the **end-to-end integration**, the deliverable §5.4 named as its missing evidence. The whole point is to feed a fuzzy model, so the closing result has to be a FIS built from these membership functions, evaluated end to end from a bare dissimilarity matrix to a working, readable rule base, and compared against the Chapter 4 Gaussian construction on data where both can run. Until then the chapter's other central claim rests on a clustering proxy. This feeds the capstone of Chapter 7.
+Equally load-bearing is the **end-to-end integration**, the deliverable §5.4 named as its missing evidence. The whole
+point is to feed a fuzzy model, so the closing result has to be a FIS built from these membership functions, evaluated
+end to end from a bare dissimilarity matrix to a working, readable rule base, and compared against the Chapter 4
+Gaussian construction on data where both can run. Until then the chapter's other central claim rests on a clustering
+proxy. This feeds the capstone of Chapter 7.
 
-The pipeline today selects clusters and then fits membership functions in two stages. **Direct, one-pass membership generation (G1)** collapses that into a single pass: every block emits its native ramp membership, the disjunction recombines them, and the surviving envelope simply *is* the fuzzy model. The research-interesting piece is a soft, kernel-weighted band membership, which I expect to fix the over-segmentation at small sample sizes.
+The pipeline today selects clusters and then fits membership functions in two stages. **Direct, one-pass membership
+generation (G1)** collapses that into a single pass: every block emits its native ramp membership, the disjunction
+recombines them, and the surviving envelope simply *is* the fuzzy model. The research-interesting piece is a soft,
+kernel-weighted band membership, which I expect to fix the over-segmentation at small sample sizes.
 
-The **prior-art head-to-head is done**, and it is why this chapter claims one contribution rather than four. Four parallel reviews, one per claimed contribution, each required to verify citations against primary sources; the full record, including which sources were read directly and which only in metadata, is in `research/proposal-defense/PRIOR_ART_CH5.md`. Three claims were retired to published work (§5.1), the HDBSCAN\* comparison the reviews demanded was then run and is reported in Appendix A.8, and two claims made in my own notes were withdrawn with citation trails. It also caught two defects in my own library — `nerfcm.py` documents the beta-spread admissibility condition backwards, and `IVATMeans` feeds unsquared distances where the relational fuzzy *c*-means dual needs squared ones, a silent flattening of the geometry — both filed against `tribble-cluster`.
+The **prior-art head-to-head is done**, and it is why this chapter claims one contribution rather than four. Four
+parallel reviews, one per claimed contribution, each required to verify citations against primary sources; the full
+record, including which sources were read directly and which only in metadata, is in
+`research/proposal-defense/PRIOR_ART_CH5.md`. Three claims were retired to published work (§5.1), the HDBSCAN\*
+comparison the reviews demanded was then run and is reported in Appendix A.8, and two claims made in my own notes were
+withdrawn with citation trails. It also caught two defects in my own library — `nerfcm.py` documents the beta-spread
+admissibility condition backwards, and `IVATMeans` feeds unsquared distances where the relational fuzzy *c*-means dual
+needs squared ones, a silent flattening of the geometry — both filed against `tribble-cluster`.
 
-Three items from that review remain open and are cheap. The Khalilia *et al.* full text is paywalled and unread; the claims this chapter makes about it come from its abstract and the authors' own published code, which is enough to cite it as pre-empting but not enough to characterize its experiments. An IEEE Xplore *full-text* search for "persistent homology" together with "membership function" has not been run, and it is the highest-value remaining check: Harada and Nishino surfaced from exactly that corner of short workshop papers with thin abstract indexing, so one or two more may exist. And §5.4's HDBSCAN\* comparison is one seed per dataset, short of this document's ten-seed floor.
+Three items from that review remain open and are cheap. The Khalilia *et al.* full text is paywalled and unread; the
+claims this chapter makes about it come from its abstract and the authors' own published code, which is enough to cite
+it as pre-empting but not enough to characterize its experiments. An IEEE Xplore *full-text* search for "persistent
+homology" together with "membership function" has not been run, and it is the highest-value remaining check: Harada and
+Nishino surfaced from exactly that corner of short workshop papers with thin abstract indexing, so one or two more may
+exist. And §5.4's HDBSCAN\* comparison is one seed per dataset, short of this document's ten-seed floor.
 
-Two goals are stretch: **joint memberships where the data demands them (G8)** and **band discovery for overlapping scales (G7)**. Both are extensions whose justification is not yet built, and both go first if time runs short.
+Two goals are stretch: **joint memberships where the data demands them (G8)** and **band discovery for overlapping
+scales (G7)**. Both are extensions whose justification is not yet built, and both go first if time runs short.
 
-Take G8. Every membership function in this dissertation is one-dimensional: Chapter 4 fits an independent Gaussian per feature and combines them with a t-conorm, and §5.3.3's ramps are read off a single axis at a time. That factorization keeps the rule count linear rather than exponential and is most of why the models are fast. It is also a hard expressive limit, and the ring makes it visible: a ring is not the intersection of per-axis intervals, so *no* collection of 1-D memberships describes one, at any resolution. This is the same bound §5.2's Euclidean prototype meets, reached from the membership side instead of the prototype side.
+Take G8. Every membership function in this dissertation is one-dimensional: Chapter 4 fits an independent Gaussian per
+feature and combines them with a t-conorm, and §5.3.3's ramps are read off a single axis at a time. That factorization
+keeps the rule count linear rather than exponential and is most of why the models are fast. It is also a hard expressive
+limit, and the ring makes it visible: a ring is not the intersection of per-axis intervals, so *no* collection of 1-D
+memberships describes one, at any resolution. This is the same bound §5.2's Euclidean prototype meets, reached from the
+membership side instead of the prototype side.
 
-The obvious response is a membership defined jointly over two features, and it needs proposing carefully, because it spends what this dissertation is selling. "Age is high AND cement is high" is a clause a person reads; a joint membership over an annulus in (cement, water) space is a picture. Worse, Chapter 6 commits explicitly to Magdalena's condition — every gate and split over an original, named input, never a synthetic intermediate — and an unrestricted joint membership is close to the construction that condition exists to forbid. So the proposal is not "use 2-D memberships." It is **use them only where the structure requires it, and let the data decide where.** A cluster whose 1-D projections already separate it stays readable on 1-D memberships; one that exists only jointly, the ring, gets a 2-D membership.
+The obvious response is a membership defined jointly over two features, and it needs proposing carefully, because it
+spends what this dissertation is selling. "Age is high AND cement is high" is a clause a person reads; a joint
+membership over an annulus in (cement, water) space is a picture. Worse, Chapter 6 commits explicitly to Magdalena's
+condition — every gate and split over an original, named input, never a synthetic intermediate — and an unrestricted
+joint membership is close to the construction that condition exists to forbid. So the proposal is not "use 2-D
+memberships." It is **use them only where the structure requires it, and let the data decide where.** A cluster whose
+1-D projections already separate it stays readable on 1-D memberships; one that exists only jointly, the ring, gets a
+2-D membership.
 
-The topological disjunct count of §5.3.5 cannot be the detector for that decision, for two separate reasons. It is not available: the component counter reports arity 1 for every block on every dataset in `arity_detection`, under both modes the driver runs, so it has never returned any other value. And it is the wrong instrument in principle, as §5.3.5 concedes, because a ring *is* one connected component. Component counting cannot distinguish a ring from a blob, precisely the discrimination this goal needs.
+The topological disjunct count of §5.3.5 cannot be the detector for that decision, for two separate reasons. It is not
+available: the component counter reports arity 1 for every block on every dataset in `arity_detection`, under both modes
+the driver runs, so it has never returned any other value. And it is the wrong instrument in principle, as §5.3.5
+notes, because a ring *is* one connected component. Component counting cannot distinguish a ring from a blob,
+precisely the discrimination this goal needs.
 
-The results file does contain a detector that separates the cases. `results.json` → `feature_space` scores each dataset's blocks twice, once with memberships in dissimilarity space and once with a feature-space surrogate fitted to each block's own coordinates, and records the gap. On **concentric rings** it is total: `ari_dissimilarity` **1.0000** against `ari_feature_space` **0.0000**, `ari_gap` **1.0000**. On **bridged Gaussians** it is large: **0.8352** against **0.0864**, gap **0.7488**. On **varying density**, where a coordinate description is adequate, there is **no gap at all**, 0.9799 against 0.9799, gap **0.0000**, and the same on well_separated (1.0000 / 1.0000 / 0.0000). Large where the structure is only relational, zero where coordinates suffice: the shape a detector needs.
+The results file does contain a detector that separates the cases. `results.json` → `feature_space` scores each
+dataset's blocks twice, once with memberships in dissimilarity space and once with a feature-space surrogate fitted to
+each block's own coordinates, and records the gap. On **concentric rings** it is total: `ari_dissimilarity` **1.0000**
+against `ari_feature_space` **0.0000**, `ari_gap` **1.0000**. On **bridged Gaussians** it is large: **0.8352** against
+**0.0864**, gap **0.7488**. On **varying density**, where a coordinate description is adequate, there is **no gap at
+all**, 0.9799 against 0.9799, gap **0.0000**, and the same on well_separated (1.0000 / 1.0000 / 0.0000). Large where the
+structure is only relational, zero where coordinates suffice: the shape a detector needs.
 
-Two qualifications. The surrogate is a full-covariance Mahalanobis Gaussian per block (`feature_space_mf.evaluate_feature_space_membership`), not the per-axis product Chapter 4 uses, so it is *more* expressive than an axis-aligned family; its failure is therefore a conservative bound on what per-axis memberships can do, and its success does not by itself prove an axis-aligned form would succeed. And the surrogate's L2 fidelity is *not* the discriminating statistic: `surrogate_l2_mean` is 0.2915 on rings but 0.1041 on varying density against 0.0777 on the bridge, so it would rank varying density above the bridge. The ARI gap separates the cases; the L2 error does not.
+Two qualifications. The surrogate is a full-covariance Mahalanobis Gaussian per block
+(`feature_space_mf.evaluate_feature_space_membership`), not the per-axis product Chapter 4 uses, so it is *more*
+expressive than an axis-aligned family; its failure is therefore a conservative bound on what per-axis memberships can
+do, and its success does not by itself prove an axis-aligned form would succeed. And the surrogate's L2 fidelity is
+*not* the discriminating statistic: `surrogate_l2_mean` is 0.2915 on rings but 0.1041 on varying density against 0.0777
+on the bridge, so it would rank varying density above the bridge. The ARI gap separates the cases; the L2 error does
+not.
 
-Building that into a decision rule (thresholding the per-block ARI gap or its per-block equivalent, promoting only blocks above threshold to a joint membership) is **proposed work, not existing machinery.** What exists is the diagnostic showing the signal is there: enough to make the decision a measured property of the data rather than a modelling preference, not enough to call the detector built. Two things would have to be shown for G8 to be a contribution rather than an escape hatch. That joint memberships are *rare* on real data, since if most clusters need one the interpretability claim collapses and this construction is the wrong tool for that data. And that a rule base mixing 1-D and 2-D antecedents is still readable end to end, a question for a person, not a metric. The joint memberships are a modest extension; the detector has to be built; the case that either is worth having is empirical and not yet made.
+Building that into a decision rule (thresholding the per-block ARI gap or its per-block equivalent, promoting only
+blocks above threshold to a joint membership) is **proposed work, not existing machinery.** What exists is the
+diagnostic showing the signal is there: enough to make the decision a measured property of the data rather than a
+modelling preference, not enough to call the detector built. Two things would have to be shown for G8 to be a
+contribution rather than an escape hatch. That joint memberships are *rare* on real data, since if most clusters need
+one the interpretability claim collapses and this construction is the wrong tool for that data. And that a rule base
+mixing 1-D and 2-D antecedents is still readable end to end, a question for a person, not a metric. The joint
+memberships are a modest extension; the detector has to be built; the case that either is worth having is empirical and
+not yet made.
 
-G7 splits in two, because Table 5.2's caption makes its assumption the chapter's largest unmeasured one. The gap heuristic on the log-birth axis assumes the density scales are well separated; that caption shows how far apart the demonstrating dataset puts them, and nothing measures what happens closer in. The *fix*, a model-based discovery via a change-point or barcode-stability criterion, stays a stretch goal and is still the piece most likely to be cut. The *measurement* should not be, being cheap and what a reader will ask for.
+G7 splits in two, because Table 5.2's caption makes its assumption the chapter's largest unmeasured one. The gap
+heuristic on the log-birth axis assumes the density scales are well separated; that caption shows how far apart the
+demonstrating dataset puts them, and nothing measures what happens closer in. The *fix*, a model-based discovery via a
+change-point or barcode-stability criterion, stays a stretch goal and is still the piece most likely to be cut. The
+*measurement* should not be, being cheap and what a reader will ask for.
 
-**The cheap experiment: narrow the separations until band discovery breaks, and report the breaking point.** `three_level_hierarchy` exposes `l3_sep`, `l2_sep` and `sigma`, so the sweep is a loop over one generator at n = 96: hold σ = 0.35, walk the consecutive-scale ratios down from 5.6× and 7.1× toward 1, and record how many bands `discover_band_edges` returns at each setting and the per-level ARI of each. A threshold exists in the code, a boundary being placed only where a consecutive log-birth gap exceeds both `3.0 ×` the median gap and `min_log_gap` = 0.5, about a factor of 1.65 in height; the experiment finds where that floor bites, and whether failure is graceful (bands merge, coarser level still recovered) or catastrophic (band count collapses to one). Ten seeds also supplies the spread Table 5.2 lacks. The deliverable is one figure, recovered levels against scale ratio with the breaking point marked, turning the band-separation assumption into a **measured limit of the method** worth more than the model-based replacement would be.
+**The cheap experiment: narrow the separations until band discovery breaks, and report the breaking point.**
+`three_level_hierarchy` exposes `l3_sep`, `l2_sep` and `sigma`, so the sweep is a loop over one generator at n = 96:
+hold σ = 0.35, walk the consecutive-scale ratios down from 5.6× and 7.1× toward 1, and record how many bands
+`discover_band_edges` returns at each setting and the per-level ARI of each. A threshold exists in the code, a boundary
+being placed only where a consecutive log-birth gap exceeds both `3.0 ×` the median gap and `min_log_gap` = 0.5, about a
+factor of 1.65 in height; the experiment finds where that floor bites, and whether failure is graceful (bands merge,
+coarser level still recovered) or catastrophic (band count collapses to one). Ten seeds also supplies the spread Table
+5.2 lacks. The deliverable is one figure, recovered levels against scale ratio with the breaking point marked, turning
+the band-separation assumption into a **measured limit of the method** worth more than the model-based replacement would
+be.
 
 ## 5.6 Discussion and Contributions
 
-The position I am staking out is deliberately narrow: **one contribution**, which I would rather defend than a longer list a reviewer can dismantle. §5.1 names what is prior art and §5.2 gives the citations; the boundary between the two was set by the prior-art head-to-head of §5.5 and the HDBSCAN\* baselines of Appendix A.8.
+The scope of this chapter is deliberately narrow: **one contribution**. §5.1 names what is prior art and §5.2 gives
+the citations; the boundary between the two
+was set by the prior-art head-to-head of §5.5 and the HDBSCAN\* baselines of Appendix A.8.
 
-**The contribution.** A fuzzy set whose support width *and* slope are both derived, per cluster and deterministically, from that cluster's own persistence, computed from a dissimilarity matrix alone and consumed as an FIS antecedent. Every clause does work. *Per cluster*, because Bonis and Oudot's comparable construction uses one global core width for every cluster [@bonis2018fuzzy]. *Support and slope*, because Harada and Nishino derive only the support threshold [@harada2017multidimensional]. *From a dissimilarity matrix alone*, because HDBSCAN's soft clustering — the closest thing in wide use — declines precomputed input outright, needing the source data rather than mere distances. *As an FIS antecedent*, because nothing in the persistence or VAT literatures produces one: every VAT-derived partition I could find, across eleven papers and most of them Bezdek-co-authored, is crisp, while Bezdek's own framing of cluster analysis asks which objects belong to a cluster *and to what degree* [@havens2012efficient].
+**The contribution.** A fuzzy set whose support width *and* slope are both derived, per cluster and deterministically,
+from that cluster's own persistence, computed from a dissimilarity matrix alone and consumed as an FIS antecedent. Every
+clause does work. *Per cluster*, because Bonis and Oudot's comparable construction uses one global core width for every
+cluster [@bonis2018fuzzy]. *Support and slope*, because Harada and Nishino derive only the support
+threshold [@harada2017multidimensional]. *From a dissimilarity matrix alone*, because HDBSCAN's soft clustering — the
+closest thing in wide use — declines precomputed input outright, needing the source data rather than mere distances. *As
+an FIS antecedent*, because nothing in the persistence or VAT literatures produces one: every VAT-derived partition I
+could find, across eleven papers and most of them Bezdek-co-authored, is crisp, while Bezdek's own framing of cluster
+analysis asks which objects belong to a cluster *and to what degree* [@havens2012efficient].
 
-**What is deliberately not claimed.** The selection machinery is a different stability measure inside Campello's FOSC framework [@campello2013fosc], and over ten seeds it is indistinguishable from a fixed-setting HDBSCAN\* on accuracy, while a per-dataset-tuned HDBSCAN\* wins more comparisons than it loses. Two of its properties are real and are recorded in Appendix A.8 rather than argued here: it needs no per-dataset parameter, where the baseline's `min_cluster_size` swings results by up to 1.000 ARI, and it is exactly stable on concentric rings at 1.000 with zero variance across ten seeds. Neither is load-bearing for this chapter, and advancing a parity result as a contribution would put the weight in the wrong place.
+**What is deliberately not claimed.** The selection machinery is a different stability measure inside Campello's FOSC
+framework [@campello2013fosc], and over ten seeds it is indistinguishable from a fixed-setting HDBSCAN\* on accuracy,
+while a per-dataset-tuned HDBSCAN\* wins more comparisons than it loses. Two of its properties are real and are recorded
+in Appendix A.8 rather than argued here: it needs no per-dataset parameter, where the baseline's `min_cluster_size`
+swings results by up to 1.000 ARI, and it is exactly stable on concentric rings at 1.000 with zero variance across ten
+seeds. Neither is load-bearing for this chapter, and advancing a parity result as a contribution would put the weight in
+the wrong place.
 
-Everything the method needs is a merge height the hierarchy already computed, which lets it work with no coordinates and no assumed shape. That clause was, until recently, a property of the construction verified by reading code rather than a measured result. It is now measured on two fronts: the selectors run on five real coordinate-free DTW dissimilarity matrices (§7.2's G2 entry carries the numbers), and on this chapter's own relational block, where the multi-scale selector recovers both truth levels at ARI 1.000. What remains unmeasured is not the coordinate-free claim but the *fuzzy-model* one, below.
+Everything the method needs is a merge height the hierarchy already computed, which lets it work with no coordinates and
+no assumed shape. That clause is measured on two fronts, not merely verified by reading code: the selectors run on five
+real coordinate-free DTW dissimilarity matrices (§7.2's G2 entry carries the numbers), and on this chapter's own
+relational block, where the multi-scale selector recovers both truth levels at ARI 1.000. What remains unmeasured is not
+the coordinate-free claim but the *fuzzy-model* one, below.
 
-Several boundaries got worse when I checked the results file line by line against the prose. The transform carries the result, not the selection machinery. Plain $k$-means given $k$ ties the field on three of four battery datasets and fails only the rings, so the rings, not the battery, demonstrate the non-convexity argument. My conservative gate, on the bridge, discovers the wrong count (3 against 2, at 53% coverage) where both persistence competitors discover the right one; across the four labeled datasets they get $k$ right four times against my three. The multi-scale selector on that same data returns $k$ = 2 at ARI 1.000, so the trade-off belongs to the flat gate rather than the pipeline, and the two runs have not been compared under one scoring; hence I report the flat result and disclose the other. The trade-off is a gradient, not a dichotomy: bottleneck-bootstrap repairs the bridge *and* declines three-quarters of the noise, so one competitor is currently better on both axes.
+Several boundaries got worse when I checked the results file line by line against the prose. The transform carries the
+result, not the selection machinery. Plain $k$-means given $k$ ties the field on three of four battery datasets and
+fails only the rings, so the rings, not the battery, demonstrate the non-convexity argument. My conservative gate, on
+the bridge, discovers the wrong count (3 against 2, at 53% coverage) where both persistence competitors discover the
+right one; across the four labeled datasets they get $k$ right four times against my three. The multi-scale selector on
+that same data returns $k$ = 2 at ARI 1.000, so the trade-off belongs to the flat gate rather than the pipeline, and the
+two runs have not been compared under one scoring; hence I report the flat result and disclose the other. The trade-off
+is a gradient, not a dichotomy: bottleneck-bootstrap repairs the bridge *and* declines three-quarters of the noise, so
+one competitor is currently better on both axes.
 
-The multi-scale headline is structural, one partition becoming $L$ each correct at its own granularity, not the accuracy gain the averaged column suggests; most of that gap is aggregation. And it is structural only against a baseline that returns *one* answer: a swept flat cut returns all three levels of the nested synthetic at ARI 1.000, from a candidate set of only seven partitions. The falsification experiment is inconclusive as run, nothing recorded moving with the swept parameter. Band discovery assumes separated scales, is ill-posed when they overlap, and is demonstrated on 96 points at one seed with the scales 5.6× and 7.1× apart. The coverage floor can drop a small real cluster. Every result *in this section* is synthetic, and every metric anywhere in the chapter is still a clustering proxy for the fuzzy-model quality I care about — the second half of that sentence is the one that has not moved, and it is the more important half.
+The multi-scale headline is structural, one partition becoming $L$ each correct at its own granularity, not the accuracy
+gain the averaged column suggests; most of that gap is aggregation. And it is structural only against a baseline that
+returns *one* answer: a swept flat cut returns all three levels of the nested synthetic at ARI 1.000, from a candidate
+set of only seven partitions. The falsification experiment is inconclusive as run, nothing recorded moving with the
+swept parameter. Band discovery assumes separated scales, is ill-posed when they overlap, and is demonstrated on 96
+points at one seed with the scales 5.6× and 7.1× apart. The coverage floor can drop a small real cluster. Every result
+*in this section* is synthetic, and every metric anywhere in the chapter is still a clustering proxy for the fuzzy-model
+quality I care about — the second half of that sentence is the one that has not moved, and it is the more important
+half.
 
-Two limitations are specific enough to name. The gate is **unstable on cosine dissimilarities**, 0.423 ± 0.387 over ten seeds where a tuned HDBSCAN\* holds 0.682 ± 0.183, and I have no account of why. And **band recovery is not deterministic**: the [8, 4, 2] stack comes back on nine seeds of ten, but `density_hierarchy` recovers its true granularities on only seven, producing four distinct vectors. Table 5.2's exact-recovery rows are single-seed and read as cleaner than the method is.
+Two limitations are specific enough to name. The gate is **unstable on cosine dissimilarities**, 0.423 ± 0.387 over ten
+seeds where a tuned HDBSCAN\* holds 0.682 ± 0.183, and I have no account of why. And **band recovery is not
+deterministic**: the [8, 4, 2] stack comes back on nine seeds of ten, but `density_hierarchy` recovers its true
+granularities on only seven, producing four distinct vectors. Table 5.2's exact-recovery rows are single-seed and read
+as cleaner than the method is.
 
-A methodological rule sits behind §5.4's design and is worth stating, because the alternative is a trap this comparison could easily have fallen into. A baseline must be swept over its parameters before any mechanism is inferred from a gap: `min_cluster_size` alone moves HDBSCAN\* by up to 1.000 ARI on these datasets, so a gap measured at one setting supports no claim about *why* the methods differ. The same rule applies to seeds — the accuracy edge in this comparison was an artifact of a favourable single realisation, and ten seeds removed it.
+A methodological rule sits behind §5.4's design and is worth stating, because the alternative is a trap this comparison
+could easily have fallen into. A baseline must be swept over its parameters before any mechanism is inferred from a gap:
+`min_cluster_size` alone moves HDBSCAN\* by up to 1.000 ARI on these datasets, so a gap measured at one setting supports
+no claim about *why* the methods differ. The same rule applies to seeds — the accuracy edge in this comparison was an
+artifact of a favourable single realisation, and ten seeds removed it.
 
-The overlap with Bonis and Oudot needs active management rather than waving away. A distinction resting only on determinism versus a random-walk hitting probability would not be enough, since theirs is explicitly persistence-based and does use birth and death heights. The load-bearing difference is that their core width is one global threshold where mine is each cluster's own lifetime, which is why that is the first of the three axes in §5.2.
+The overlap with Bonis and Oudot needs active management rather than waving away. A distinction resting only on
+determinism versus a random-walk hitting probability would not be enough, since theirs is explicitly persistence-based
+and does use birth and death heights. The load-bearing difference is that their core width is one global threshold where
+mine is each cluster's own lifetime, which is why that is the first of the three axes in §5.2.
 
-None of those limitations is fatal, and stating them is not hedging. This is proposed work; the measure of it is whether the open problems are the interesting ones, and nested structure in relational data and one-pass membership generation are exactly that.
+None of those limitations is fatal, and stating them is not hedging. This is proposed work; the measure of it is whether
+the open problems are the interesting ones, and nested structure in relational data and one-pass membership generation
+are exactly that.
 
 ---
 
-*Draft — Chapter 5 prose; proposed work with preliminary results front-loaded. Citations in bracketed shorthand pending the consolidated `references.bib`. Three tables (5.1–5.3) and six figures (5.1–5.6) inline. Open items tracked in `../CHECKLIST.md`.*
+*Draft — Chapter 5 prose; proposed work with preliminary results front-loaded. Citations in bracketed shorthand pending
+the consolidated `references.bib`. Three tables (5.1–5.3) and six figures (5.1–5.6) inline. Open items tracked in
+`../CHECKLIST.md`.*

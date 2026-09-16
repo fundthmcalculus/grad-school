@@ -2,463 +2,1159 @@
 
 ## 4.1 Introduction
 
-In *The Hitchhiker's Guide to the Galaxy*, the supercomputer Deep Thought is asked for the Answer to the Ultimate Question of Life, the Universe, and Everything. It thinks for seven and a half million years and returns 42. Only then does anyone realize they never worked out what the Question was. The rest of the story is a search, backward, for a Question that fits the Answer.
+In *The Hitchhiker's Guide to the Galaxy*, the supercomputer Deep Thought is asked for the Answer to the Ultimate
+Question of Life, the Universe, and Everything. It thinks for seven and a half million years and returns 42. Only then
+does anyone realize they never worked out what the Question was. The rest of the story is a search, backward, for a
+Question that fits the Answer.
 
-This chapter is built on the same inversion, and that is why it is fast. A fuzzy rule has an antecedent (the IF part, a question about the inputs) and a consequent (the THEN part, the answer). The conventional way to build a fuzzy model lays out the questions first: partition every input into fuzzy sets, form a rule for every combination, then search for consequents that fit. I do the opposite. I commit to the answers first, the output classes or a set of output values spread across the range, and only then work backward to the antecedents that select them. That collapses most of the work: the answers are few and known, the space of possible questions enormous. And unlike Deep Thought, the method finishes in seconds instead of geological time, fast enough that the Vogons cannot demolish the Earth before it is done.
+This chapter is built on the same inversion, and that is why it is fast. A fuzzy rule has an antecedent (the IF part, a
+question about the inputs) and a consequent (the THEN part, the answer). The conventional way to build a fuzzy model
+lays out the questions first: partition every input into fuzzy sets, form a rule for every combination, then search for
+consequents that fit. I do the opposite. I commit to the answers first, the output classes or a set of output values
+spread across the range, and only then work backward to the antecedents that select them. That collapses most of the
+work: the answers are few and known, the space of possible questions enormous. And unlike Deep Thought, the method
+finishes in seconds instead of geological time, fast enough that the Vogons cannot demolish the Earth before it is done.
 
-The problem is the one I set up in Chapter 1. A fuzzy model built by gridding the inputs has a rule count that is the product of the per-input set counts, which is exponential, and the usual way to fit it (a genetic algorithm, gradient descent, or ANFIS) is either slow to converge or dependent on an initial guess it cannot supply for itself. My claim is that a Mixture-of-Gaussians construction generates both the membership functions and the rules directly from the data, produces on the order of one rule per output class instead of an exponential blowup, and needs no post-hoc genetic search or gradient descent. The contributions: an answer-first (consequent-first) construction for classification and regression; a per-feature, per-class Gaussian-mixture antecedent generator whose parameter count grows linearly, not exponentially; an automatically synthesized *anomaly* rule, the complement of the t-conorm of every explicit rule, giving open-set behavior and a handle on rare classes at no extra training cost; and a demonstration that this trains competitive models in seconds on datasets with hundreds of thousands of rows.
+The problem is the one I set up in Chapter 1. A fuzzy model built by gridding the inputs has a rule count that is the
+product of the per-input set counts, which is exponential, and the usual way to fit it (a genetic algorithm, gradient
+descent, or ANFIS) is either slow to converge or dependent on an initial guess it cannot supply for itself. My claim is
+that a Mixture-of-Gaussians construction generates both the membership functions and the rules directly from the data,
+produces on the order of one rule per output class instead of an exponential blowup, and needs no post-hoc genetic
+search or gradient descent. The contributions: an answer-first (consequent-first) construction for classification and
+regression; a per-feature, per-class Gaussian-mixture antecedent generator whose parameter count grows linearly, not
+exponentially; an automatically synthesized *anomaly* rule, the complement of the t-conorm of every explicit rule,
+giving open-set behavior and a handle on rare classes at no extra training cost; and a demonstration that this trains
+competitive models in seconds on datasets with hundreds of thousands of rows.
 
 ## 4.2 Background and Prior Art
 
-Building a model from the output side is not new. Sugeno and Yasukawa [@sugeno1993qualitative] proposed identifying a fuzzy model by first clustering the *output* and working back to the input structure; that is the instinct I follow. Wang and Mendel [@wang1992generating] generate rules from data by a different route, and Chiu [@chiu1994fuzzy] uses subtractive clustering to place rules. What I add is a specific, cheap factorization of the antecedents and an explicit path to a compact rule base.
+Building a model from the output side is not new. Sugeno and Yasukawa [@sugeno1993qualitative] proposed identifying a
+fuzzy model by first clustering the *output* and working back to the input structure; that is the instinct I follow.
+Wang and Mendel [@wang1992generating] generate rules from data by a different route, and Chiu [@chiu1994fuzzy] uses
+subtractive clustering to place rules. What I add is a specific, cheap factorization of the antecedents and an explicit
+path to a compact rule base.
 
-A caveat up front. For classification, fitting an independent Gaussian mixture per feature and per class and combining them is closely related to a Gaussian naive-Bayes model — a class-conditional density estimate with a feature-independence assumption — and I will not pretend otherwise. The relationship is exact rather than loose: with one Gaussian per feature and class and the product t-norm, $\log w_k(x) = \log p_k(x) + \sum_j \log(\sqrt{2\pi}\,\sigma_{jk})$, so the rule argmax is the naive-Bayes decision with uniform priors *and* the per-class normalising constants added back — it favours the class whose retained features are wider, by exactly that sum (Appendix A.10.8). What I claim is not a new density estimator. It is that this construction produces an *interpretable fuzzy inference system* (real membership functions, real linguistic rules, editable by hand) extremely fast, and that the naive-Bayes-like factorization is what keeps it so. Where the independence assumption costs accuracy, I recover it with a few correction rules rather than abandoning the factorization. That pass is now measured on Glass (§4.3.1, Table 4.9): +0.031 ± 0.027 accuracy for the gated cascade over the flat base, of which +0.014 ± 0.061 survives collapsing the cascade into one deployable FIS. The mechanism claim — that the pass helps, and that deploying it costs something identifiable — holds. The *scale* claim, that it earns its keep at RT-IOT2022's twelve classes and eighty-three features, remains a design intention: the correction pass has not yet been run on that dataset (the open-set complement rule has, Table 4.7b, but that is a different mechanism).
+A caveat up front. For classification, fitting an independent Gaussian mixture per feature and per class and combining
+them is closely related to a Gaussian naive-Bayes model — a class-conditional density estimate with a
+feature-independence assumption. The relationship is exact rather than loose: with
+one Gaussian per feature and class and the product
+t-norm, $\log w_k (x) = \log p_k (x) + \sum_j \log (\sqrt{2\pi}\,\sigma_{jk})$, so the rule argmax is the naive-Bayes
+decision with uniform priors *and* the per-class normalising constants added back — it favours the class whose retained
+features are wider, by exactly that sum (Appendix A.10.8). What I claim is not a new density estimator. It is that this
+construction produces an *interpretable fuzzy inference system* (real membership functions, real linguistic rules,
+editable by hand) extremely fast, and that the naive-Bayes-like factorization is what keeps it so. Where the
+independence assumption costs accuracy, I recover it with a few correction rules rather than abandoning the
+factorization. That pass is now measured on Glass (§4.3.1, Table 4.9): +0.031 ± 0.027 accuracy for the gated cascade
+over the flat base, of which +0.014 ± 0.061 survives collapsing the cascade into one deployable FIS. The mechanism
+claim — that the pass helps, and that deploying it costs something identifiable — holds. The *scale* claim, that it
+earns its keep at RT-IOT2022's twelve classes and eighty-three features, remains a design intention: the correction pass
+has not yet been run on that dataset (the open-set complement rule has, Table 4.7b, but that is a different mechanism).
 
 ## 4.3 Methodology
 
 ### Preparing the inputs, and why the transform is not optional
 
-Before either construction, the inputs are transformed: features whose dynamic range spans more than a couple of orders of magnitude are log-scaled automatically, and every feature is then min-max scaled to $[0,1]$. On Concrete the automatic detector selects two, `Slag` and `Age`. `Age` is the unsurprising one, since curing time runs from one day to a year while most features live within a factor of a few.
+Before either construction, the inputs are transformed: features whose dynamic range spans more than a couple of orders
+of magnitude are log-scaled automatically, and every feature is then min-max scaled to $[0,1]$. On Concrete the
+automatic detector selects two, `Slag` and `Age`. `Age` is the unsurprising one, since curing time runs from one day to
+a year while most features live within a factor of a few.
 
-One naming hazard before the numbers. This step is easy to call "standardization," and it is not: it computes $(x - \min)/(\max - \min)$, min-max scaling onto the unit interval, not z-scoring. `tribble-fis` now names it accordingly — `MinMaxScaler` for this transform, `StandardScaler` for genuine z-scoring — reproducing the earlier helper's behaviour bit for bit. Throughout I write "min-max scaled to $[0,1]$" or "unit scaled" and never the bare contraction, because Chapter 5 uses "minimax" for an unrelated bottleneck ultrametric and the two words differ by one character.
+One naming hazard before the numbers. This step is easy to call "standardization," and it is not: it
+computes $(x - \min)/ (\max - \min)$, min-max scaling onto the unit interval, not z-scoring. `tribble-fis` now names it
+accordingly — `MinMaxScaler` for this transform, `StandardScaler` for genuine z-scoring — reproducing the earlier
+helper's behaviour bit for bit. Throughout I write "min-max scaled to $[0,1]$" or "unit scaled" and never the bare
+contraction, because Chapter 5 uses "minimax" for an unrelated bottleneck ultrametric and the two words differ by one
+character.
 
-The transform is worth more than most of the modeling choices in this chapter, and *which* transform it is matters more than the fact that there is one. Measured across ten seeds on identical splits:
+The transform is worth more than most of the modeling choices in this chapter, and *which* transform it is matters more
+than the fact that there is one. Measured across ten seeds on identical splits:
 
-**Table 4.1 — What the transform is worth, by model, and what a centred transform costs.** All nine rows the generator emits; the pattern is the point, not any single row. Provenance: `reproduce/outputs/uniform-2026-08-03/table_hyperparam_normalization.csv`, the run of record. The z-score column was first measured by the three-arm side study (`outputs/norm-three-arm-a385a1a/`); every figure in it has since moved, for the reason given below.
+**Table 4.1 — What the transform is worth, by model, and what a centred transform costs.** All nine rows the generator
+emits; the pattern is the point, not any single row. Provenance:
+`reproduce/outputs/uniform-2026-08-03/table_hyperparam_normalization.csv`, the run of record. The z-score column was
+first measured by the three-arm side study (`outputs/norm-three-arm-a385a1a/`); every figure in it has since moved, for
+the reason given below.
 
-| Model | Hyperparameters | raw features | log + min-max to $[0,1]$ | log + z-score | Δ min-max − raw | Δ z-score − min-max |
-|---|---|---:|---:|---:|---:|---:|
-| flat MoG-TSK, 1st order | pipeline default | 0.695 ± 0.030 | 0.796 ± 0.018 | 0.713 ± 0.035 | **+0.101** | −0.083 |
-| flat MoG-TSK, 2nd order | pipeline default | 0.804 ± 0.030 | 0.841 ± 0.021 | 0.827 ± 0.028 | +0.037 | −0.015 |
-| flat MoG-TSK, full 2nd | pipeline default | 0.830 ± 0.025 | 0.861 ± 0.026 | 0.809 ± 0.115 | +0.030 | −0.051 |
-| fuzzy tree | demo-tuned | 0.712 ± 0.030 | 0.740 ± 0.051 | 0.740 ± 0.051 | +0.028 | −0.000 |
-| fuzzy tree | library default | 0.583 ± 0.067 | 0.689 ± 0.056 | 0.691 ± 0.055 | +0.106 | +0.002 |
-| mixture of experts | demo-tuned | 0.774 ± 0.025 | 0.834 ± 0.027 | 0.806 ± 0.031 | +0.060 | −0.028 |
-| mixture of experts | library default | 0.648 ± 0.093 | 0.756 ± 0.059 | 0.744 ± 0.066 | +0.108 | −0.012 |
-| CART (reference) | sklearn default | 0.825 ± 0.047 | 0.826 ± 0.047 | 0.826 ± 0.046 | +0.001 | −0.000 |
-| Random Forest (reference) | sklearn default | 0.909 ± 0.018 | 0.909 ± 0.019 | 0.909 ± 0.018 | +0.000 | −0.000 |
+| Model                     | Hyperparameters  |  raw features | log + min-max to $[0,1]$ | log + z-score | Δ min-max − raw | Δ z-score − min-max |
+|---------------------------|------------------|--------------:|-------------------------:|--------------:|----------------:|--------------------:|
+| flat MoG-TSK, 1st order   | pipeline default | 0.695 ± 0.030 |            0.796 ± 0.018 | 0.713 ± 0.035 |      **+0.101** |              −0.083 |
+| flat MoG-TSK, 2nd order   | pipeline default | 0.804 ± 0.030 |            0.841 ± 0.021 | 0.827 ± 0.028 |          +0.037 |              −0.015 |
+| flat MoG-TSK, full 2nd    | pipeline default | 0.830 ± 0.025 |            0.861 ± 0.026 | 0.809 ± 0.115 |          +0.030 |              −0.051 |
+| fuzzy tree                | demo-tuned       | 0.712 ± 0.030 |            0.740 ± 0.051 | 0.740 ± 0.051 |          +0.028 |              −0.000 |
+| fuzzy tree                | library default  | 0.583 ± 0.067 |            0.689 ± 0.056 | 0.691 ± 0.055 |          +0.106 |              +0.002 |
+| mixture of experts        | demo-tuned       | 0.774 ± 0.025 |            0.834 ± 0.027 | 0.806 ± 0.031 |          +0.060 |              −0.028 |
+| mixture of experts        | library default  | 0.648 ± 0.093 |            0.756 ± 0.059 | 0.744 ± 0.066 |          +0.108 |              −0.012 |
+| CART (reference)          | sklearn default  | 0.825 ± 0.047 |            0.826 ± 0.047 | 0.826 ± 0.046 |          +0.001 |              −0.000 |
+| Random Forest (reference) | sklearn default  | 0.909 ± 0.018 |            0.909 ± 0.019 | 0.909 ± 0.018 |          +0.000 |              −0.000 |
 
 Three things fall out.
 
-A **bounded** transform is worth ten points of $R^2$ to the Gaussian models. A first-order model goes from 0.695 to 0.796 on nothing but a log and a rescale onto $[0,1]$, and the library-default fuzzy tree and mixture gain 0.106 and 0.108. Any comparison that omits it is not measuring the method.
+A **bounded** transform is worth ten points of $R^2$ to the Gaussian models. A first-order model goes from 0.695 to
+0.796 on nothing but a log and a rescale onto $[0,1]$, and the library-default fuzzy tree and mixture gain 0.106 and
+0.108. Any comparison that omits it is not measuring the method.
 
-**The transform is worth essentially nothing to CART and Random Forest**: +0.001 and +0.000. That is not a rounding artifact; it is the control that licenses reading anything else in the table. An axis-aligned decision tree splits on rank, so a monotone transform cannot change whether a feature exceeds a threshold and the induced tree is identical (Appendix A.10.12 gives the two-line proof, and shows why a Gaussian membership has no such invariance: only an *affine* map can be absorbed into a re-fitted centre and width). Min-max and z-score are both strictly monotone per feature, and across CART, Random Forest and both fuzzy-tree rows the largest movement between the two normalized arms is **0.002**, against their own seed spreads of ±0.018 to ±0.056. Column-wise Spearman correlation between the two scalers' outputs is 1.000000000000 on every feature. So when a fuzzy row moves between those columns, it is the model responding, not the plumbing. A Gaussian membership function has no such immunity: defined by a location and a width in the feature's own units, it fits a skewed feature's skew instead of its structure.
+**The transform is worth essentially nothing to CART and Random Forest**: +0.001 and +0.000. That is not a rounding
+artifact; it is the control that licenses reading anything else in the table. An axis-aligned decision tree splits on
+rank, so a monotone transform cannot change whether a feature exceeds a threshold and the induced tree is identical
+(Appendix A.10.12 gives the two-line proof, and shows why a Gaussian membership has no such invariance: only an *affine*
+map can be absorbed into a re-fitted centre and width). Min-max and z-score are both strictly monotone per feature, and
+across CART, Random Forest and both fuzzy-tree rows the largest movement between the two normalized arms is **0.002**,
+against their own seed spreads of ±0.018 to ±0.056. Column-wise Spearman correlation between the two scalers' outputs is
+1.000000000000 on every feature. So when a fuzzy row moves between those columns, it is the model responding, not the
+plumbing. A Gaussian membership function has no such immunity: defined by a location and a width in the feature's own
+units, it fits a skewed feature's skew instead of its structure.
 
-**Boundedness is a preference, not a cliff, and the size of it is worth being precise about.** Under real z-scoring to $\mu = 0$, $\sigma = 1$, the first-order flat MoG-TSK reaches 0.713 ± 0.035 against min-max's 0.796 ± 0.018, a cost of 0.083, roughly two of its own seed spreads and still 0.018 *above* its raw-feature score. At second order the cost falls to 0.015, inside the spread. So bounding the inputs buys real ground at first order and almost nothing once the consequent can bend.
+**Boundedness is a preference, not a cliff, and the size of it is worth being precise about.** Under real z-scoring
+to $\mu = 0$, $\sigma = 1$, the first-order flat MoG-TSK reaches 0.713 ± 0.035 against min-max's 0.796 ± 0.018, a cost
+of 0.083, roughly two of its own seed spreads and still 0.018 *above* its raw-feature score. At second order the cost
+falls to 0.015, inside the spread. So bounding the inputs buys real ground at first order and almost nothing once the
+consequent can bend.
 
-Where z-scoring does hurt unambiguously is in *stability*, and only at the top of the order ladder. The full-second-order arm reaches 0.809 with a spread of **±0.115**, against ±0.026 under min-max: the same mean to within 0.05, with four times the seed-to-seed variance, and an RMSE spread of ±1.718 MPa against ±0.512. That is the same shape of failure the output partition turns out to have (§4.3.2) and it is worth naming as such: an unbounded input domain does not make this construction worse on average so much as it makes it *less predictable*, which for a component inside a larger pipeline is the more expensive property.
+Where z-scoring does hurt unambiguously is in *stability*, and only at the top of the order ladder. The
+full-second-order arm reaches 0.809 with a spread of **±0.115**, against ±0.026 under min-max: the same mean to within
+0.05, with four times the seed-to-seed variance, and an RMSE spread of ±1.718 MPa against ±0.512. That is the same shape
+of failure the output partition turns out to have (§4.3.2) and it is worth naming as such: an unbounded input domain
+does not make this construction worse on average so much as it makes it *less predictable*, which for a component inside
+a larger pipeline is the more expensive property.
 
-The mechanism behind this is the output partition, not the feature transform: pinning the extreme bucket centroids to the target's global minimum and maximum leaves the outer rules no slack, so unbounded features must widen their linear terms to compensate — switching to uniform output cuts removes the effect entirely (A.6).
+The mechanism behind this is the output partition, not the feature transform: pinning the extreme bucket centroids to
+the target's global minimum and maximum leaves the outer rules no slack, so unbounded features must widen their linear
+terms to compensate — switching to uniform output cuts removes the effect entirely (A.6).
 
-The claim the data supports: *bounded* normalization is worth about a tenth of $R^2$ to this construction at first order, and *centred* normalization costs little on average while costing a great deal in variance. A non-negative input domain on $[0,1]$ remains the domain the construction is designed for; it is a well-supported default rather than a load-bearing assumption.
+The claim the data supports: *bounded* normalization is worth about a tenth of $R^2$ to this construction at first
+order, and *centred* normalization costs little on average while costing a great deal in variance. A non-negative input
+domain on $[0,1]$ remains the domain the construction is designed for; it is a well-supported default rather than a
+load-bearing assumption.
 
-The asymmetry also explains why my pipeline requires preprocessing the baselines do not, which would otherwise look like an inconsistency between chapters. Chapter 6's fuzzy tree is deliberately fit on *raw* features so its split thresholds stay physically meaningful ("cement ≥ 350", not "cement ≥ 0.42"), and it can afford to be, for the rank-invariance reason above. Nor does the transform smuggle information in: the strongest baseline is unmoved by either arm, so the rescaled features hold no signal the raw ones did not.
+The asymmetry also explains why my pipeline requires preprocessing the baselines do not, which would otherwise look like
+an inconsistency between chapters. Chapter 6's fuzzy tree is deliberately fit on *raw* features so its split thresholds
+stay physically meaningful ("cement ≥ 350", not "cement ≥ 0.42"), and it can afford to be, for the rank-invariance
+reason above. Nor does the transform smuggle information in: the strongest baseline is unmoved by either arm, so the
+rescaled features hold no signal the raw ones did not.
 
 ### 4.3.1 Classification: one rule per answer
 
-For a classification problem with $N$ samples, $M$ features, and $K$ output classes, the construction runs answer-first. I segment the data by output class (the answers) and for each class I ask which features actually distinguish it, by comparing the per-feature statistics across classes, discarding features with no discriminative signal.
+For a classification problem with $N$ samples, $M$ features, and $K$ output classes, the construction runs answer-first.
+I segment the data by output class (the answers) and for each class I ask which features actually distinguish it, by
+comparing the per-feature statistics across classes, discarding features with no discriminative signal.
 
-The cost needs stating correctly. `calculate_gaussian_correlation` runs once per feature and, inside each feature, compares the class-conditional distributions for every *pair* of classes, a double loop over $ij < jk$. The number of distribution comparisons is therefore $\mathcal{O}(M \cdot K^2)$: linear in the features and **quadratic in the class count**. It is the one cost here that grows quadratically, along the very axis RT-IOT2022 ($K = 12$) is invoked to showcase. On these sizes it is not the bottleneck, since the comparisons are cheap and $K$ is small, but it would bite first on a many-class problem. Being only a screen, it can be subsampled or restricted to one-versus-rest without touching the rule base.
+The cost needs stating correctly. `calculate_gaussian_correlation` runs once per feature and, inside each feature,
+compares the class-conditional distributions for every *pair* of classes, a double loop over $ij < jk$. The number of
+distribution comparisons is therefore $\mathcal{O} (M \cdot K^2)$: linear in the features and **quadratic in the class
+count**. It is the one cost here that grows quadratically, along the very axis RT-IOT2022 ($K = 12$) is invoked to
+showcase. On these sizes it is not the bottleneck, since the comparisons are cheap and $K$ is small, but it would bite
+first on a many-class problem. Being only a screen, it can be subsampled or restricted to one-versus-rest without
+touching the rule base.
 
-For each retained feature and class I fit a one-dimensional Gaussian mixture of up to a few components, and that becomes the membership function for that feature under that class. The combination happens at two levels. *Within* a feature, the mixture's components are combined by a fuzzy OR, a t-conorm, so the class is recognized if this Gaussian fires or that one does. *Across* features, those results are combined by a t-norm. The rule for a class is therefore a conjunction of disjunctions, not a single disjunction, which is what `simple_gaussian_predict` implements and what Figure 4.1 draws. Repeating over the $K$ classes gives $K$ rules, each built from at most $M \times p$ Gaussian terms. There is no grid, so there is no exponential rule base.
+For each retained feature and class I fit a one-dimensional Gaussian mixture of up to a few components, and that becomes
+the membership function for that feature under that class. The combination happens at two levels. *Within* a feature,
+the mixture's components are combined by a fuzzy OR, a t-conorm, so the class is recognized if this Gaussian fires or
+that one does. *Across* features, those results are combined by a t-norm. The rule for a class is therefore a
+conjunction of disjunctions, not a single disjunction, which is what `simple_gaussian_predict` implements and what
+Figure 4.1 draws. Repeating over the $K$ classes gives $K$ rules, each built from at most $M \times p$ Gaussian terms.
+There is no grid, so there is no exponential rule base.
 
-Finally I evaluate the confusion matrix and add a second, small pass of correction rules where two classes are being confused, the place where the feature-independence assumption is costing me. These corrections are targeted and few, and they keep the rule base readable. What that pass buys is now measured — on Glass rather than RT-IOT2022, since the correction-rule cascade has not yet been run on RT-IOT2022, which is now loadable but was not the dataset this particular measurement targeted (Table 4.9, Figure 4.8). `MixtureOfGaussiansFuzzySequenceClassifier` implements the pass as a cascade: the flat base plus a small binary "expert" classifier for each confused pair, gated by anomaly level and confidence margin. Over ten paired seeds on Glass, the gated cascade gains +0.031 ± 0.027 accuracy over the base at the cost of raising the raw membership-function count from 81.4 to 109.0. Collapsing the cascade into one deployable FIS — union every layer's model, deduplicate at exact numeric tolerance, predict by a single argmax instead of routing through gates — keeps +0.014 ± 0.061 of that gain at 83.5 membership functions: under half the accuracy benefit survives, for almost none of the size penalty. This does not give the per-class confusion detail the original ask specified; that finer-grained comparison, and RT-IOT2022 at its intended scale, are still owed. What it does settle is the coarser question the concession above was really standing in for: the pass helps, and the gating logic a flattened deployment discards is doing real work, not decoration, so a deployment that wants the full gain needs the cascade rather than just the rules it leaves behind.
+Finally I evaluate the confusion matrix and add a second, small pass of correction rules where two classes are being
+confused, the place where the feature-independence assumption is costing me. These corrections are targeted and few, and
+they keep the rule base readable. What that pass buys is now measured — on Glass rather than RT-IOT2022, since the
+correction-rule cascade has not yet been run on RT-IOT2022, which is now loadable but was not the dataset this
+particular measurement targeted (Table 4.9, Figure 4.8). `MixtureOfGaussiansFuzzySequenceClassifier` implements the pass
+as a cascade: the flat base plus a small binary "expert" classifier for each confused pair, gated by anomaly level and
+confidence margin. Over ten paired seeds on Glass, the gated cascade gains +0.031 ± 0.027 accuracy over the base at the
+cost of raising the raw membership-function count from 81.4 to 109.0. Collapsing the cascade into one deployable FIS —
+union every layer's model, deduplicate at exact numeric tolerance, predict by a single argmax instead of routing through
+gates — keeps +0.014 ± 0.061 of that gain at 83.5 membership functions: under half the accuracy benefit survives, for
+almost none of the size penalty. This does not give the per-class confusion detail the original ask specified; that
+finer-grained comparison, and RT-IOT2022 at its intended scale, are still owed. What it does settle is the coarser
+question: the pass helps, and the gating logic a flattened deployment
+discards is doing real work, not decoration, so a deployment that wants the full gain needs the cascade rather than just
+the rules it leaves behind.
 
-Deduplication turns out to be a more general question than this one flattening, and worth separating from it. `simple_gaussian_predict`'s tolerance for treating two Gaussian membership functions as the same one is a hardcoded constant inside the library (`rtol=1e-2, atol=1e-3`) rather than a choice this construction makes, and Table 4.8 measures what varying it costs across six datasets — Glass, Wine, Breast Cancer, and Digits for classification, Concrete and Diabetes for regression, ten paired seeds each. Two things hold across every one of the six. First, the library's shipped tolerance is free money everywhere it was tested: at that tolerance, membership-function reduction ranges from 0.0% (Wine, Breast Cancer) to 13.0% (Diabetes), and on none of the six does the paired accuracy-or-R² delta's 95% confidence interval exclude zero. Second, a *lossless* tolerance past the shipped one exists for every problem, at a boundary that is a property of the problem rather than a universal constant: from 2× (Diabetes) to 10× (Wine, Concrete), with the reduction available at that boundary ranging from 0.0% (Breast Cancer, which has almost no redundancy left to remove) to 44.2% (Digits). The shipped default is a safe floor, not a ceiling — a deployment willing to search the multiplier, the max-lossless preset `tribble-fis` issue #85 asks the library to expose, can do substantially better on a problem whose membership functions turn out to be more redundant than the shipped tolerance assumes.
+Deduplication turns out to be a more general question than this one flattening, and worth separating from it.
+`simple_gaussian_predict`'s tolerance for treating two Gaussian membership functions as the same one is a hardcoded
+constant inside the library (`rtol=1e-2, atol=1e-3`) rather than a choice this construction makes, and Table 4.8
+measures what varying it costs across six datasets — Glass, Wine, Breast Cancer, and Digits for classification, Concrete
+and Diabetes for regression, ten paired seeds each. Two things hold across every one of the six. First, the library's
+shipped tolerance is free money everywhere it was tested: at that tolerance, membership-function reduction ranges from
+0.0% (Wine, Breast Cancer) to 13.0% (Diabetes), and on none of the six does the paired accuracy-or-R² delta's 95%
+confidence interval exclude zero. Second, a *lossless* tolerance past the shipped one exists for every problem, at a
+boundary that is a property of the problem rather than a universal constant: from 2× (Diabetes) to 10× (Wine, Concrete),
+with the reduction available at that boundary ranging from 0.0% (Breast Cancer, which has almost no redundancy left to
+remove) to 44.2% (Digits). The shipped default is a safe floor, not a ceiling — a deployment willing to search the
+multiplier, the max-lossless preset `tribble-fis` issue #85 asks the library to expose, can do substantially better on a
+problem whose membership functions turn out to be more redundant than the shipped tolerance assumes.
 
-**Figure 4.1 — Per-feature Gaussian mixtures, and the rule they combine into.** A real fit from the same three calls the harness uses: the top three features for Glass Type 1, each feature's mixture components dashed and their t-conorm bold, the class's own samples a rug against everything else's. The lower panel is the rule's firing strength over every sample, the rule written underneath in the form the construction produces. A single rule is not a classifier, since prediction is the argmax over all $K$ rules, so the overlap is expected. Nor are the degenerate components an artifact of the drawing: a zero-width Gaussian on a single observation is what the automatic component count produces on a 214-sample dataset, visible because the figure fits the model rather than illustrating it.
+**Figure 4.1 — Per-feature Gaussian mixtures, and the rule they combine into.** A real fit from the same three calls the
+harness uses: the top three features for Glass Type 1, each feature's mixture components dashed and their t-conorm bold,
+the class's own samples a rug against everything else's. The lower panel is the rule's firing strength over every
+sample, the rule written underneath in the form the construction produces. A single rule is not a classifier, since
+prediction is the argmax over all $K$ rules, so the overlap is expected. Nor are the degenerate components an artifact
+of the drawing: a zero-width Gaussian on a single observation is what the automatic component count produces on a
+214-sample dataset, visible because the figure fits the model rather than illustrating it.
 `![mog-classification](fig/04-mog-classification.png)`
 
 ### 4.3.2 Regression: place the answers, regress the questions
 
-For regression the answer-first construction is even more literal. I partition the output range first, and only then find the antecedents. Where to place that partition took three experiments to settle, and the answer is uniform.
+For regression the answer-first construction is even more literal. I partition the output range first, and only then
+find the antecedents. Where to place that partition took three experiments to settle, and the answer is uniform.
 
-Two natural choices trade against each other. **Uniform** partitioning spreads buckets at equal width across the output range. That gives the more natural function approximation: every rule owns an equal span of the output, so consequents interpolate evenly and the extremes stay covered. But on a skewed target some buckets contain very few samples, and a bucket with almost no data yields a badly estimated rule or none at all. **Quantile** partitioning cuts the output into equal-frequency buckets instead, guaranteeing every rule enough data. The cost is that boundaries crowd where the data is dense and under-resolve where it is sparse, which for a regression target is often precisely the extremes, the values one usually cares most about. A third arm suggests itself and was the shipped default until this study: equal-frequency boundaries with the two extreme centroids **pinned** to the observed minimum and maximum, keeping quantile's occupancy guarantee while restoring the reach uniform gets for free.
+Two natural choices trade against each other. **Uniform** partitioning spreads buckets at equal width across the output
+range. That gives the more natural function approximation: every rule owns an equal span of the output, so consequents
+interpolate evenly and the extremes stay covered. But on a skewed target some buckets contain very few samples, and a
+bucket with almost no data yields a badly estimated rule or none at all. **Quantile** partitioning cuts the output into
+equal-frequency buckets instead, guaranteeing every rule enough data. The cost is that boundaries crowd where the data
+is dense and under-resolve where it is sparse, which for a regression target is often precisely the extremes, the values
+one usually cares most about. A third arm suggests itself and was the shipped default until this study: equal-frequency
+boundaries with the two extreme centroids **pinned** to the observed minimum and maximum, keeping quantile's occupancy
+guarantee while restoring the reach uniform gets for free.
 
-Which wins should depend on the target's skew, the bucket count, and, as it turned out decisively, the consequent order. I measured all three.
+Which wins should depend on the target's skew, the bucket count, and, as it turned out decisively, the consequent order.
+I measured all three.
 
-**Table 4.2 — Output partitioning on Concrete** (target skew +0.42; three buckets; 10 seeds; tail RMSE over the true bottom and top deciles; "min bucket" is the smallest training-bucket occupancy). From `reproduce/outputs/uniform-2026-08-03/table_g5_output_partitioning.csv`, which also carries the four- and six-bucket blocks discussed below.
+**Table 4.2 — Output partitioning on Concrete** (target skew +0.42; three buckets; 10 seeds; tail RMSE over the true
+bottom and top deciles; "min bucket" is the smallest training-bucket occupancy). From
+`reproduce/outputs/uniform-2026-08-03/table_g5_output_partitioning.csv`, which also carries the four- and six-bucket
+blocks discussed below.
 
-| order | scheme | R² | tail RMSE | max err | min bucket |
-|---|---|---:|---:|---:|---:|
-| **0th** | **uniform** | **0.394 ± 0.065** | **18.55** | **38.2** | 132 |
-| **0th** | quantile | 0.242 ± 0.070 | 22.15 | 40.9 | 343 |
-| **0th** | quantile + pinned | **−0.434 ± 0.241** | 20.70 | 56.3 | 343 |
-| 1st | uniform | 0.796 ± 0.018 | 8.10 | 29.2 | 132 |
-| 1st | quantile | 0.789 ± 0.026 | 8.08 | 28.5 | 343 |
-| 1st | quantile + pinned | 0.787 ± 0.026 | 7.93 | 28.6 | 343 |
-| 2nd | uniform | 0.841 ± 0.021 | 6.50 | 28.5 | 132 |
-| 2nd | quantile | 0.836 ± 0.025 | 6.59 | 28.4 | 343 |
-| 2nd | quantile + pinned | 0.832 ± 0.027 | 6.68 | 29.1 | 343 |
+| order   | scheme            |                 R² | tail RMSE |  max err | min bucket |
+|---------|-------------------|-------------------:|----------:|---------:|-----------:|
+| **0th** | **uniform**       |  **0.394 ± 0.065** | **18.55** | **38.2** |        132 |
+| **0th** | quantile          |      0.242 ± 0.070 |     22.15 |     40.9 |        343 |
+| **0th** | quantile + pinned | **−0.434 ± 0.241** |     20.70 |     56.3 |        343 |
+| 1st     | uniform           |      0.796 ± 0.018 |      8.10 |     29.2 |        132 |
+| 1st     | quantile          |      0.789 ± 0.026 |      8.08 |     28.5 |        343 |
+| 1st     | quantile + pinned |      0.787 ± 0.026 |      7.93 |     28.6 |        343 |
+| 2nd     | uniform           |      0.841 ± 0.021 |      6.50 |     28.5 |        132 |
+| 2nd     | quantile          |      0.836 ± 0.025 |      6.59 |     28.4 |        343 |
+| 2nd     | quantile + pinned |      0.832 ± 0.027 |      6.68 |     29.1 |        343 |
 
-**At first and second order this is a null result; at zeroth order it is decisive.** The three arms span 0.009 and 0.009 in the lower two blocks, against seed spreads of ±0.018 to ±0.027; no configuration clears its own noise floor, and the ordering is not stable enough to read. The same three arms span **0.828** at zeroth order, twelve times the widest spread involved. The ordering holds at every bucket count: uniform 0.394 / 0.416 / 0.541 against pinned quantile's −0.434 / 0.048 / 0.326 at three, four and six buckets, each separation clearing both arms' error bars. Worst-case error tells the same story, 56.3 MPa against 38.2 on a target spanning about 80.
+**At first and second order this is a null result; at zeroth order it is decisive.** The three arms span 0.009 and 0.009
+in the lower two blocks, against seed spreads of ±0.018 to ±0.027; no configuration clears its own noise floor, and the
+ordering is not stable enough to read. The same three arms span **0.828** at zeroth order, twelve times the widest
+spread involved. The ordering holds at every bucket count: uniform 0.394 / 0.416 / 0.541 against pinned quantile's
+−0.434 / 0.048 / 0.326 at three, four and six buckets, each separation clearing both arms' error bars. Worst-case error
+tells the same story, 56.3 MPa against 38.2 on a target spanning about 80.
 
-The mechanism explains why the two regimes disagree, and it is not subtle once located. `solve_tsk_consequents` holds the first and last rules' *constant* terms at whatever centroids it is handed, as an exact equality constraint. At zeroth order that constant is a rule's entire output, so a pinned centroid becomes prediction error with nothing available to offset it: the bottom rule emits the target's global minimum for a bucket of 344 points whose mean is 0.195, and the top rule emits the global maximum for 343 points whose mean is 0.653. Extrema standing in for representative values. At first and second order the same two ends stay pinned, but the free interior constants run to $-0.38$ and $-1.19$ — outside the target's own $[0,1]$ range, because the solve is spending intercepts as free parameters and paying the bias back through the linear terms. That compensation is why the penalty there is 0.005 instead of 0.676. Appendix A.10.11 writes the mechanism down: at zeroth order the squared error of bucket $r$ decomposes as its within-bucket variance plus $n_r (m_r - \bar y_r)^2$, a bias the pinned constant fixes at $(\bar y_r - y_{\min})^2$ per sample with nothing to offset it, while at first order the free coefficients can reproduce any constant offset over the bucket's support and do.
+The mechanism explains why the two regimes disagree, and it is not subtle once located. `solve_tsk_consequents` holds
+the first and last rules' *constant* terms at whatever centroids it is handed, as an exact equality constraint. At
+zeroth order that constant is a rule's entire output, so a pinned centroid becomes prediction error with nothing
+available to offset it: the bottom rule emits the target's global minimum for a bucket of 344 points whose mean is
+0.195, and the top rule emits the global maximum for 343 points whose mean is 0.653. Extrema standing in for
+representative values. At first and second order the same two ends stay pinned, but the free interior constants run
+to $-0.38$ and $-1.19$ — outside the target's own $[0,1]$ range, because the solve is spending intercepts as free
+parameters and paying the bias back through the linear terms. That compensation is why the penalty there is 0.005
+instead of 0.676. Appendix A.10.11 writes the mechanism down: at zeroth order the squared error of bucket $r$ decomposes
+as its within-bucket variance plus $n_r (m_r - \bar y_r)^2$, a bias the pinned constant fixes
+at $(\bar y_r - y_{\min})^2$ per sample with nothing to offset it, while at first order the free coefficients can
+reproduce any constant offset over the bucket's support and do.
 
-Decomposing the 0.828 separates the two things the third arm changes: **the boundary scheme is worth 0.152 and the pinning is worth 0.676.** So pinning is more than four times the effect of equal-frequency-versus-equal-width, and it runs the wrong way. The compromise arm was not a compromise; it was the worst of the three, and the reason is that it pinned to the wrong quantity. Pinning the extreme rules' consequents *inside* the data range is worth doing: it stops an unconstrained solve from writing "THEN output is $-0.81$" for a quantity that never goes below zero, which for a model whose justification is that a person can read its rules is a real defect no accuracy metric catches. What is not worth doing is pinning them to a single most extreme observation. Under uniform the ends are held at their buckets' own means, 0.206 and 0.788 on Concrete: inside the range, representative of what they label, and still fixed so the rule base cannot drift outside the data.
+Decomposing the 0.828 separates the two things the third arm changes: **the boundary scheme is worth 0.152 and the
+pinning is worth 0.676.** So pinning is more than four times the effect of equal-frequency-versus-equal-width, and it
+runs the wrong way. The compromise arm was not a compromise; it was the worst of the three, and the reason is that it
+pinned to the wrong quantity. Pinning the extreme rules' consequents *inside* the data range is worth doing: it stops an
+unconstrained solve from writing "THEN output is $-0.81$" for a quantity that never goes below zero, which for a model
+whose justification is that a person can read its rules is a real defect no accuracy metric catches. What is not worth
+doing is pinning them to a single most extreme observation. Under uniform the ends are held at their buckets' own means,
+0.206 and 0.788 on Concrete: inside the range, representative of what they label, and still fixed so the rule base
+cannot drift outside the data.
 
-Uniform also holds the tails at zeroth order, which is what the geometry predicted all along: 18.55 MPa against 22.15 and 20.70, and again at four and six buckets. That advantage washes out with the rest once the linear terms come in.
+Uniform also holds the tails at zeroth order, which is what the geometry predicted all along: 18.55 MPa against 22.15
+and 20.70, and again at four and six buckets. That advantage washes out with the rest once the linear terms come in.
 
-The starvation mechanism is real regardless, and it is the reason uniform must eventually fail. Uniform's smallest bucket falls from 132 samples to 75 to 39 as the partition refines, while quantile's floor stays high by construction: 343, 257, 171. Concrete's skew of +0.42 is too mild for it to bite in the range tested, which is why the next experiment isolates skew directly.
+The starvation mechanism is real regardless, and it is the reason uniform must eventually fail. Uniform's smallest
+bucket falls from 132 samples to 75 to 39 as the partition refines, while quantile's floor stays high by construction:
+343, 257, 171. Concrete's skew of +0.42 is too mild for it to bite in the range tested, which is why the next experiment
+isolates skew directly.
 
-That still leaves the question the argument started from, because Concrete's skew is only +0.42 and the hypothesis was about skew. No collection of real datasets settles it cleanly either: they differ in dimensionality, noise, and sample size at once, so a gap between two of them is not attributable to skew. So I isolated it. A fixed linear signal is pushed through the strictly monotone map $y = \mathrm{expm1}(\lambda z)/\lambda$, which changes the *shape* of the target while leaving the information in $X$ untouched. A perfect learner would score identically at every $\lambda$; whatever degrades is what the partitioning fails to absorb.
+That still leaves the question the argument started from, because Concrete's skew is only +0.42 and the hypothesis was
+about skew. No collection of real datasets settles it cleanly either: they differ in dimensionality, noise, and sample
+size at once, so a gap between two of them is not attributable to skew. So I isolated it. A fixed linear signal is
+pushed through the strictly monotone map $y = \mathrm{expm1} (\lambda z)/\lambda$, which changes the *shape* of the
+target while leaving the information in $X$ untouched. A perfect learner would score identically at every $\lambda$;
+whatever degrades is what the partitioning fails to absorb.
 
-**Table 4.3 — Partitioning against target skew** (synthetic, skew isolated; 4 buckets, 2nd order, 10 seeds; `uniform-2026-08-03/table_g5b_skew_sweep.csv`).
+**Table 4.3 — Partitioning against target skew** (synthetic, skew isolated; 4 buckets, 2nd order, 10 seeds;
+`uniform-2026-08-03/table_g5b_skew_sweep.csv`).
 
-| target skew | uniform R² | quantile R² | Q − U | uniform tail RMSE | quantile tail RMSE | uniform min bucket |
-|---:|---:|---:|---:|---:|---:|---:|
-| +0.05 | 0.912 ± 0.009 | 0.911 ± 0.010 | −0.001 | 0.052 | **0.051** | 11 |
-| +1.84 | **0.884 ± 0.016** | 0.876 ± 0.035 | −0.008 | 0.066 | **0.062** | 1 |
-| +5.32 | **0.731 ± 0.083** | 0.728 ± 0.169 | −0.003 | 0.092 | **0.066** | 1 |
-| +10.44 | **0.297 ± 0.126** | 0.183 ± 0.813 | −0.114 | 0.118 | **0.064** | 1 |
-| +14.71 | **0.168 ± 0.073** | −2.106 ± 4.274 | −2.274 | 0.111 | **0.062** | 0 |
-| +17.71 | **0.084 ± 0.016** | −12.562 ± 24.000 | −12.646 | 0.132 | **0.060** | 0 |
+| target skew |        uniform R² |      quantile R² |   Q − U | uniform tail RMSE | quantile tail RMSE | uniform min bucket |
+|------------:|------------------:|-----------------:|--------:|------------------:|-------------------:|-------------------:|
+|       +0.05 |     0.912 ± 0.009 |    0.911 ± 0.010 |  −0.001 |             0.052 |          **0.051** |                 11 |
+|       +1.84 | **0.884 ± 0.016** |    0.876 ± 0.035 |  −0.008 |             0.066 |          **0.062** |                  1 |
+|       +5.32 | **0.731 ± 0.083** |    0.728 ± 0.169 |  −0.003 |             0.092 |          **0.066** |                  1 |
+|      +10.44 | **0.297 ± 0.126** |    0.183 ± 0.813 |  −0.114 |             0.118 |          **0.064** |                  1 |
+|      +14.71 | **0.168 ± 0.073** |   −2.106 ± 4.274 |  −2.274 |             0.111 |          **0.062** |                  0 |
+|      +17.71 | **0.084 ± 0.016** | −12.562 ± 24.000 | −12.646 |             0.132 |          **0.060** |                  0 |
 
-Quantile's mean $R^2$ trails uniform's in every row, and past skew 5 the gap opens hard against it: −0.008, −0.003, −0.114, −2.274, −12.646. That is not a case for "uniform wins" either, and reading the means is the wrong way to read this table.
+Quantile's mean $R^2$ trails uniform's in every row, and past skew 5 the gap opens hard against it: −0.008, −0.003,
+−0.114, −2.274, −12.646. That is not a case for "uniform wins" either, and reading the means is the wrong way to read
+this table.
 
-The finding is that quantile becomes unstable, not inaccurate. Read the standard deviations instead. Quantile's spread explodes: ±0.169 at skew 5, ±0.813 at skew 10, ±4.274 and ±24.000 beyond, while uniform's stays bounded and its mean degrades smoothly toward zero. A mean of −12.6 with a deviation of ±24.0 is not typical behaviour. It is a small number of catastrophic splits dragging an otherwise reasonable distribution. Quantile on a heavily skewed target sometimes produces a usable model and sometimes a disaster, and the three-seed run missed the disasters. Uniform fails, but *predictably*, which for a component inside a larger pipeline is often the more valuable property.
+The finding is that quantile becomes unstable, not inaccurate. Read the standard deviations instead. Quantile's spread
+explodes: ±0.169 at skew 5, ±0.813 at skew 10, ±4.274 and ±24.000 beyond, while uniform's stays bounded and its mean
+degrades smoothly toward zero. A mean of −12.6 with a deviation of ±24.0 is not typical behaviour. It is a small number
+of catastrophic splits dragging an otherwise reasonable distribution. Quantile on a heavily skewed target sometimes
+produces a usable model and sometimes a disaster, and the three-seed run missed the disasters. Uniform fails, but
+*predictably*, which for a component inside a larger pipeline is often the more valuable property.
 
-The starvation mechanism survives, and it is still the reason uniform degrades. The last column collapses exactly as predicted: 11 samples at symmetry, *one* by skew 1.8, *zero* past skew 14. Equal-width buckets on a skewed target put nearly every point in the first bucket and leave the rest to estimate rules from almost nothing, which is why uniform's $R^2$ falls from 0.912 to 0.084 across the sweep. What that mechanism does *not* license is the inference that quantile's guaranteed occupancy therefore makes it the better choice: it removes one failure mode and introduces another.
+The starvation mechanism survives, and it is still the reason uniform degrades. The last column collapses exactly as
+predicted: 11 samples at symmetry, *one* by skew 1.8, *zero* past skew 14. Equal-width buckets on a skewed target put
+nearly every point in the first bucket and leave the rest to estimate rules from almost nothing, which is why
+uniform's $R^2$ falls from 0.912 to 0.084 across the sweep. What that mechanism does *not* license is the inference that
+quantile's guaranteed occupancy therefore makes it the better choice: it removes one failure mode and introduces
+another.
 
-The tails go the other way from the geometry. Even coverage of the output range should hold the *tails* better, and consistently, with small spreads, it does not: uniform's tail error grows from 0.052 to 0.132 while quantile's actually *falls*, 0.051 to 0.060. Coverage of the range is worthless without coverage of the *samples*.
+The tails go the other way from the geometry. Even coverage of the output range should hold the *tails* better, and
+consistently, with small spreads, it does not: uniform's tail error grows from 0.052 to 0.132 while quantile's actually
+*falls*, 0.051 to 0.060. Coverage of the range is worthless without coverage of the *samples*.
 
-Past skew 14 both schemes fail, quantile's $R^2$ going sharply negative with standard deviations of ±4.3 and ±24.0, so the apparent uniform "win" there is noise between two broken models. At that point the target is so compressed that uniform's smallest bucket is empty outright and the problem needs a target transform, not a better partition.
+Past skew 14 both schemes fail, quantile's $R^2$ going sharply negative with standard deviations of ±4.3 and ±24.0, so
+the apparent uniform "win" there is noise between two broken models. At that point the target is so compressed that
+uniform's smallest bucket is empty outright and the problem needs a target transform, not a better partition.
 
-**The recommendation is uniform, with a monotone target transform when the target is badly skewed.** Three experiments converge on it. Uniform is the only arm that leaves a zeroth-order model usable at all, which matters because the flat consequent is the most interpretable one the construction can produce. It costs nothing measurable at first or second order. And its failure mode is the better one to own: starvation is visible in the bucket occupancy *at fit time*, whereas quantile's instability shows up as a bad seed somewhere in a run, which is exactly the failure an aggregate error cannot see. `partition_output` now defaults to equal-width cuts and raises a warning when a bucket holds fewer than three samples; `method="quantile"` reproduces the old behaviour for anyone who wants to re-take these measurements.
+**The recommendation is uniform, with a monotone target transform when the target is badly skewed.** Three experiments
+converge on it. Uniform is the only arm that leaves a zeroth-order model usable at all, which matters because the flat
+consequent is the most interpretable one the construction can produce. It costs nothing measurable at first or second
+order. And its failure mode is the better one to own: starvation is visible in the bucket occupancy *at fit time*,
+whereas quantile's instability shows up as a bad seed somewhere in a run, which is exactly the failure an aggregate
+error cannot see. `partition_output` now defaults to equal-width cuts and raises a warning when a bucket holds fewer
+than three samples; `method="quantile"` reproduces the old behaviour for anyone who wants to re-take these measurements.
 
-The caveat is the one Table 4.3 earns. Neither scheme survives a heavily skewed target, so on a target whose range is discontinuous or badly non-uniform the fix is not a different partition but a different target: apply a monotone map (log, Box-Cox, or a rank transform) before fitting, and invert it for reporting. Monotonicity is what makes this safe rather than merely convenient, because it preserves bucket *order*, so nothing downstream that reasons about which bucket is higher than which changes. Switching back to quantile instead trades a loud bounded failure for a quiet unbounded one.
+The caveat is the one Table 4.3 earns. Neither scheme survives a heavily skewed target, so on a target whose range is
+discontinuous or badly non-uniform the fix is not a different partition but a different target: apply a monotone map
+(log, Box-Cox, or a rank transform) before fitting, and invert it for reporting. Monotonicity is what makes this safe
+rather than merely convenient, because it preserves bucket *order*, so nothing downstream that reasons about which
+bucket is higher than which changes. Switching back to quantile instead trades a loud bounded failure for a quiet
+unbounded one.
 
 Chapter 7 carries G5 as settled on this basis.
 
-**Figure 4.2 — Output partitioning: the zeroth-order cliff, and quantile's instability.** Tables 4.2 and 4.3 plotted from their own CSVs. Panel (a): Concrete at three buckets, test $R^2$ by consequent order for the three schemes, error bars the ten-seed spread — the arms sit on top of one another at first and second order and fan apart at zeroth, where the pinned-extreme arm goes negative for the reason Appendix A.10.11 derives. Panel (b): the synthetic skew sweep, uniform against quantile, on a symmetric-log axis because quantile's mean reaches $-12.6$ with a spread of $\pm 24$ and a linear axis would show either the interesting region or the failure, not both. The point of the panel is the error bars, not the means: quantile does not become inaccurate, it becomes unstable.
+**Figure 4.2 — Output partitioning: the zeroth-order cliff, and quantile's instability.** Tables 4.2 and 4.3 plotted
+from their own CSVs. Panel (a): Concrete at three buckets, test $R^2$ by consequent order for the three schemes, error
+bars the ten-seed spread — the arms sit on top of one another at first and second order and fan apart at zeroth, where
+the pinned-extreme arm goes negative for the reason Appendix A.10.11 derives. Panel (b): the synthetic skew sweep,
+uniform against quantile, on a symmetric-log axis because quantile's mean reaches $-12.6$ with a spread of $\pm 24$ and
+a linear axis would show either the interesting region or the failure, not both. The point of the panel is the error
+bars, not the means: quantile does not become inaccurate, it becomes unstable.
 `![04-output-partitioning](fig/04-output-partitioning.png)`
 
-Having placed the output partition, I use the same per-feature Gaussian-mixture approach for the antecedents and apply linear regression to obtain first-order Takagi–Sugeno–Kang consequents. That is the Deep Thought move made concrete: answers before questions.
+Having placed the output partition, I use the same per-feature Gaussian-mixture approach for the antecedents and apply
+linear regression to obtain first-order Takagi–Sugeno–Kang consequents. That is the Deep Thought move made concrete:
+answers before questions.
 
-Two empirical observations shape this. Consequent order matters: moving from first to second order and then to the full second-order basis is worth several points of $R^2$ apiece on Concrete (Table 4.4). First order is a floor here, not a sufficient choice. Second, the *antecedent* refinement Chapter 6 §6.4 measures buys progressively less as consequent capacity grows, and almost nothing at the top of the range. That decay is the *structure before search* thesis in miniature: the better the structure-derived model already is, the less a subsequent search finds. The closed-form solve for these consequents is a shared primitive across several model types, deferred to Chapter 6.
+Two empirical observations shape this. Consequent order matters: moving from first to second order and then to the full
+second-order basis is worth several points of $R^2$ apiece on Concrete (Table 4.4). First order is a floor here, not a
+sufficient choice. Second, the *antecedent* refinement Chapter 6 §6.4 measures buys progressively less as consequent
+capacity grows, and almost nothing at the top of the range. That decay is the *structure before search* thesis in
+miniature: the better the structure-derived model already is, the less a subsequent search finds. The closed-form solve
+for these consequents is a shared primitive across several model types, deferred to Chapter 6.
 
 ### 4.3.3 Inference
 
-Inference is ordinary fuzzy evaluation. For classification I take the class whose rule fires most strongly, $\arg\max_k$, and for regression I defuzzify by the weighted average as usual. Nothing exotic happens at inference; the leverage is all in how cheaply the model was built.
+Inference is ordinary fuzzy evaluation. For classification I take the class whose rule fires most
+strongly, $\arg\max_k$, and for regression I defuzzify by the weighted average as usual. Nothing exotic happens at
+inference; the leverage is all in how cheaply the model was built.
 
-One structural consequence matters for the discussion. Each class rule is estimated from that class's own data and nothing else; no joint fit couples the classes. So new labeled data for one class updates that class's densities without touching any other rule, and a new class can be added by fitting one more rule instead of retraining. That is what makes the construction naturally incremental and semi-supervised-friendly. I have not run a controlled streaming or semi-supervised benchmark, so I state it as a property of the construction and not a measured result.
+One structural consequence matters for the discussion. Each class rule is estimated from that class's own data and
+nothing else; no joint fit couples the classes. So new labeled data for one class updates that class's densities without
+touching any other rule, and a new class can be added by fitting one more rule instead of retraining. That is what makes
+the construction naturally incremental and semi-supervised-friendly. I have not run a controlled streaming or
+semi-supervised benchmark, so I state it as a property of the construction and not a measured result.
 
 ### 4.3.4 Why the parameters grow linearly
 
-The whole thing stays fast and small because of the factorization: instead of partitioning the joint input space, I condition on the output (for regression, equal-width buckets across the output range) and fit an independent one-dimensional Gaussian mixture per feature within each bucket or class. Gridding the inputs instead gives a rule count that is a product over the inputs,
+The whole thing stays fast and small because of the factorization: instead of partitioning the joint input space, I
+condition on the output (for regression, equal-width buckets across the output range) and fit an independent
+one-dimensional Gaussian mixture per feature within each bucket or class. Gridding the inputs instead gives a rule count
+that is a product over the inputs,
 
-$$ N_{rules}^{\text{grid}} = \prod_{i=1}^{M} N_{\mu_i} \sim \mathcal{O}(c^{M}), $$
+$$ N_{rules}^{\text{grid}} = \prod_{i=1}^{M} N_{\mu_i} \sim \mathcal{O} (c^{M}), $$
 
 exponential in the number of features $M$. Conditioning on the output gives
 
-$$ N_{rules}^{\text{MoG}} = K, \qquad N_{params} \sim \mathcal{O}(K \cdot M \cdot p), $$
+$$ N_{rules}^{\text{MoG}} = K, \qquad N_{params} \sim \mathcal{O} (K \cdot M \cdot p), $$
 
-one rule per class (or output bucket) $K$, with parameters growing *linearly* in the number of features $M$ and the components per mixture $p$ — exactly $\sum_k \sum_{j} 2\,p_{jk} \le 2KMp_{\max}$ antecedent parameters plus $K(1 + q)$ consequent ones for a basis of size $q$ (Appendix A.10.9). Two things about that second expression. It counts **parameters**, the size of the fitted model, and that is the only quantity for which $\mathcal{O}(K \cdot M \cdot p)$ is the right answer. It is *not* the cost of fitting: the antecedent screen of §4.3.1 compares class-conditional distributions pairwise and so carries a $\mathcal{O}(M \cdot K^2)$ term, quadratic in the class count, the one place this construction is not linear in anything. For twelve classes and eighty-three features (RT-IOT2022, below) the grid form is astronomically large while the factored form is a few thousand parameters and twelve rules, the screen's 66 class pairs per feature still cheap. That choice sidesteps the rule-base explosion: the naive-Bayes instinct traded deliberately for speed and interpretability.
+one rule per class (or output bucket) $K$, with parameters growing *linearly* in the number of features $M$ and the
+components per mixture $p$ — exactly $\sum_k \sum_{j} 2\,p_{jk} \le 2KMp_{\max}$ antecedent parameters plus $K (1 + q)$
+consequent ones for a basis of size $q$ (Appendix A.10.9). Two things about that second expression. It counts
+**parameters**, the size of the fitted model, and that is the only quantity for which $\mathcal{O} (K \cdot M \cdot p)$
+is the right answer. It is *not* the cost of fitting: the antecedent screen of §4.3.1 compares class-conditional
+distributions pairwise and so carries a $\mathcal{O} (M \cdot K^2)$ term, quadratic in the class count, the one place
+this construction is not linear in anything. For twelve classes and eighty-three features (RT-IOT2022, below) the grid
+form is astronomically large while the factored form is a few thousand parameters and twelve rules, the screen's 66
+class pairs per feature still cheap. That choice sidesteps the rule-base explosion: the naive-Bayes instinct traded
+deliberately for speed and interpretability.
 
-**Figure 4.3 — Rules in the base against features in the data.** The grid's $c^M$ at two and three sets per input, the smallest partitions anyone uses, against this construction's $K$ rules, one per class or output bucket, with every dataset the document models placed by its feature and class count from `reproduce/dataset_specs.yaml` — the file the prose itself is built from, so the markers cannot drift from the chapters. Concrete's $K$ is the three output buckets §4.3.2 settles on rather than a class count and is labelled as such. The dotted drop from each grid curve to its marker is the rule-base explosion the answer-first factorization sidesteps; the parameter count grows as $2KMp$ and the only quadratic term in the fit is the $MK(K-1)/2$ antecedent screen (Appendix A.10.9). Arithmetic and specifications; nothing here is measured.
+**Figure 4.3 — Rules in the base against features in the data.** The grid's $c^M$ at two and three sets per input, the
+smallest partitions anyone uses, against this construction's $K$ rules, one per class or output bucket, with every
+dataset the document models placed by its feature and class count from `reproduce/dataset_specs.yaml` — the file the
+prose itself is built from, so the markers cannot drift from the chapters. Concrete's $K$ is the three output buckets
+§4.3.2 settles on rather than a class count and is labelled as such. The dotted drop from each grid curve to its marker
+is the rule-base explosion the answer-first factorization sidesteps; the parameter count grows as $2KMp$ and the only
+quadratic term in the fit is the $MK (K-1)/2$ antecedent screen (Appendix A.10.9). Arithmetic and specifications;
+nothing here is measured.
 `![04-rule-count](fig/04-rule-count.png)`
 
 ### 4.3.5 The rule for everything else: anomalies and rare classes
 
-The construction has a consequence I did not set out to obtain and then built deliberately. Because every class rule is an explicit fuzzy membership over the input space, I know not just how strongly each class fires but how strongly *anything* fires. So I can synthesize one more rule, automatically: *none of the above*.
+The construction has a consequence I did not set out to obtain and then built deliberately. Because every class rule is
+an explicit fuzzy membership over the input space, I know not just how strongly each class fires but how strongly
+*anything* fires. So I can synthesize one more rule, automatically: *none of the above*.
 
-Let $\mu_k(x)$ be the firing strength of the rule for class $k$. Aggregating the known classes with the t-conorm $S$ gives the degree to which the model recognizes $x$ as something it has seen; the fuzzy complement of that is the degree to which it does not:
+Let $\mu_k (x)$ be the firing strength of the rule for class $k$. Aggregating the known classes with the t-conorm $S$
+gives the degree to which the model recognizes $x$ as something it has seen; the fuzzy complement of that is the degree
+to which it does not:
 
-$$ \mu_{\text{anom}}(x) = 1 - S\big(c_1,\; c_2,\; \ldots,\; c_K\big), \qquad c_k = \min\big(\max(\mu_k(x) + \theta,\; 0),\; 1\big). $$
+$$ \mu_{\text{anom}} (x) = 1 - S\big (c_1,\; c_2,\; \ldots,\; c_K\big), \qquad c_k = \min\big (\max (\mu_k (x) + \theta,\; 0),\; 1\big). $$
 
-The clip is not decoration. What `gauss_math.tsk_firing_strengths` computes is `np.clip(rule_firing[:, :-1] + threshold, 0.0, 1.0)` and then the complement of the conorm over that.
+The clip is not decoration. What `gauss_math.tsk_firing_strengths` computes is
+`np.clip(rule_firing[:, :-1] + threshold, 0.0, 1.0)` and then the complement of the conorm over that.
 
-The $\theta$ term is a boost applied to each known-class firing before aggregation, and the single knob that sets how eager the anomaly rule is. A large $\theta$ inflates the known classes, shrinks the complement, and makes the model reluctant to cry anomaly; a small $\theta$ makes it suspicious of anything less than a confident match. Inference is unchanged, since I take the $\arg\max$ over the $K$ class firings *plus* this one extra, so the anomaly rule wins whenever no known rule fires strongly enough to beat it.
+The $\theta$ term is a boost applied to each known-class firing before aggregation, and the single knob that sets how
+eager the anomaly rule is. A large $\theta$ inflates the known classes, shrinks the complement, and makes the model
+reluctant to cry anomaly; a small $\theta$ makes it suspicious of anything less than a confident match. Inference is
+unchanged, since I take the $\arg\max$ over the $K$ class firings *plus* this one extra, so the anomaly rule wins
+whenever no known rule fires strongly enough to beat it.
 
-**What the clip does to the rule.** Every t-conorm satisfies $S(1, \cdot) = 1$. For the Hamacher branch used here, $S(x,y) = (x + y - 2xy)/(1 - xy)$, so at $x = 1$ numerator and denominator are both $1 - y$ and the value is exactly 1. One clipped input saturates the aggregate, so $\mu_{\text{anom}}(x) > 0$ only when **every** class firing is below $1 - \theta$. Wherever some class reaches $1 - \theta$, this construction is *exactly* a rejection threshold on $\max_k \mu_k(x)$, and the conorm has no effect on the decision. At $\theta = 0.99$ (the default this chapter inherits from `FuzzySystemsExperiments/beth-anomaly.py`, not the library's own default of 0.5) the bar is a firing of 0.01, essentially always cleared on real data, so the shipped anomaly rule is a max-membership rejector and nothing more. Across the band Table 4.6 sweeps, $\theta = 0.5$ to $0.8$, the clip bites only at firings of 0.5 down to 0.2, so there the conorm value genuinely acts on samples whose every class firing is small. The degeneracy is *total at the default and partial across the sweep*, a reason to prefer an operating point in the swept band over the inherited one, independently of the $J$ argument in §4.4. The saturation is not a Hamacher property but a t-conorm one — $S(1, b) = 1$ follows from the boundary condition and monotonicity for every conorm — and the same algebra gives the monotonicity of Table 4.6's curve in $\theta$: each boosted firing is non-decreasing in $\theta$, so $\mu_{\text{anom}}$ is non-increasing and both rates can only fall as the boost rises (Appendix A.10.10).
+**What the clip does to the rule.** Every t-conorm satisfies $S (1, \cdot) = 1$. For the Hamacher branch used
+here, $S (x,y) = (x + y - 2xy)/ (1 - xy)$, so at $x = 1$ numerator and denominator are both $1 - y$ and the value is
+exactly 1. One clipped input saturates the aggregate, so $\mu_{\text{anom}} (x) > 0$ only when **every** class firing is
+below $1 - \theta$. Wherever some class reaches $1 - \theta$, this construction is *exactly* a rejection threshold
+on $\max_k \mu_k (x)$, and the conorm has no effect on the decision. At $\theta = 0.99$ (the default this chapter
+inherits from `FuzzySystemsExperiments/beth-anomaly.py`, not the library's own default of 0.5) the bar is a firing of
+0.01, essentially always cleared on real data, so the shipped anomaly rule is a max-membership rejector and nothing
+more. Across the band Table 4.6 sweeps, $\theta = 0.5$ to $0.8$, the clip bites only at firings of 0.5 down to 0.2, so
+there the conorm value genuinely acts on samples whose every class firing is small. The degeneracy is *total at the
+default and partial across the sweep*, a reason to prefer an operating point in the swept band over the inherited one,
+independently of the $J$ argument in §4.4. The saturation is not a Hamacher property but a t-conorm one — $S (1, b) = 1$
+follows from the boundary condition and monotonicity for every conorm — and the same algebra gives the monotonicity of
+Table 4.6's curve in $\theta$: each boosted firing is non-decreasing in $\theta$, so $\mu_{\text{anom}}$ is
+non-increasing and both rates can only fall as the boost rises (Appendix A.10.10).
 
-**In the one-class configuration the degeneracy is total at every $\theta$, and the conorm is inert.** The argument above turns on several class firings competing inside the conorm. With a single known class there is exactly one class column, and `t_conorm(x, None, …)` aggregates column-wise, so the conorm *is the identity* — there is nothing to aggregate. `_anomaly_argmax` then reduces to: the anomaly label wins exactly when $1 - \min(\mu(x) + \theta, 1) > \mu(x)$, i.e. when $\mu(x) < (1 - \theta)/2$ (Appendix A.10.10(c)). So on a one-class fit $\theta$ is a hard threshold on firing strength, it cannot express any decision a threshold cannot, and the choice of norm/conorm family cannot change a single prediction. Table 4.11(e) measures this rather than resting on the algebra: sweeping $\theta$ buys at most **0.0012** detection over simply thresholding the score at the same false-alarm rate, against a seed-to-seed spread of 0.0006 in the same column. Two consequences. First, $\theta$ should be described as a threshold *parameterisation* rather than as a mechanism — which is a claim about the construction, not about its usefulness, since choosing an operating point is exactly what it is for. Second, a conorm sweep on a one-class fit measures nothing, so the open question below is a strictly multi-class one.
+**In the one-class configuration the degeneracy is total at every $\theta$, and the conorm is inert.** The argument
+above turns on several class firings competing inside the conorm. With a single known class there is exactly one class
+column, and `t_conorm(x, None, …)` aggregates column-wise, so the conorm *is the identity* — there is nothing to
+aggregate. `_anomaly_argmax` then reduces to: the anomaly label wins exactly
+when $1 - \min (\mu (x) + \theta, 1) > \mu (x)$, i.e. when $\mu (x) < (1 - \theta)/2$ (Appendix A.10.10 (c)). So on a
+one-class fit $\theta$ is a hard threshold on firing strength, it cannot express any decision a threshold cannot, and
+the choice of norm/conorm family cannot change a single prediction. Table 4.11 (e) measures this rather than resting on
+the algebra: sweeping $\theta$ buys at most **0.0012** detection over simply thresholding the score at the same
+false-alarm rate, against a seed-to-seed spread of 0.0006 in the same column. Two consequences. First, $\theta$ should
+be described as a threshold *parameterisation* rather than as a mechanism — which is a claim about the construction, not
+about its usefulness, since choosing an operating point is exactly what it is for. Second, a conorm sweep on a one-class
+fit measures nothing, so the open question below is a strictly multi-class one.
 
-**Figure 4.4 — The geometry of the anomaly rule: where it can fire, and where it wins.** Computed from the formula `tsk_firing_strengths` evaluates, with the shipped Hamacher conorm. Panels (a) and (b): two known classes, $\mu_{\text{anom}}$ over the unit square of $(\mu_1, \mu_2)$ at $\theta = 0.5$ and at the inherited default $\theta = 0.99$; the dashed lines are $\mu_k = 1 - \theta$, past which one input clips to 1 and the aggregate saturates, so the rule is identically zero, and the orange region is where the anomaly label wins the argmax. At $0.99$ that region is a sliver in the corner and the conorm never enters the decision; at $0.5$ it acts on samples whose firings are all small, the regime Table 4.6's sweep operates in. Panel (c): the one-class case, where the conorm has nothing to aggregate and the anomaly wins exactly when $\mu(x) < (1 - \theta)/2$ — a threshold, and no choice of norm family can move it (Appendix A.10.10).
+**Figure 4.4 — The geometry of the anomaly rule: where it can fire, and where it wins.** Computed from the formula
+`tsk_firing_strengths` evaluates, with the shipped Hamacher conorm. Panels (a) and (b): two known
+classes, $\mu_{\text{anom}}$ over the unit square of $(\mu_1, \mu_2)$ at $\theta = 0.5$ and at the inherited
+default $\theta = 0.99$; the dashed lines are $\mu_k = 1 - \theta$, past which one input clips to 1 and the aggregate
+saturates, so the rule is identically zero, and the orange region is where the anomaly label wins the argmax. At $0.99$
+that region is a sliver in the corner and the conorm never enters the decision; at $0.5$ it acts on samples whose
+firings are all small, the regime Table 4.6's sweep operates in. Panel (c): the one-class case, where the conorm has
+nothing to aggregate and the anomaly wins exactly when $\mu (x) < (1 - \theta)/2$ — a threshold, and no choice of norm
+family can move it (Appendix A.10.10).
 `![04-anomaly-geometry](fig/04-anomaly-geometry.png)`
 
-The choice of t-conorm is a parameter. The tables here run the **Hamacher** family, inherited with $\theta$ from the BETH script. Whether the family matters for open-set behaviour is **untested**: `table_norm_conorm_matrix.py` sweeps the five De Morgan families on *accuracy* only, and the open-set comparison across families has not been run. So the family ordering by how readily a partial match counts as recognition is a property of the algebra, and no measurement here supports a claim about detection or false alarms. The question is now known to be *multi-class only*: on the one-class BETH fit of Table 4.11 the conorm provably cannot matter (above), so that run cannot answer it and `REPRO_ANOM_CONORM` is inert there.
+The choice of t-conorm is a parameter. The tables here run the **Hamacher** family, inherited with $\theta$ from the
+BETH script. Whether the family matters for open-set behaviour is **untested**: `table_norm_conorm_matrix.py` sweeps the
+five De Morgan families on *accuracy* only, and the open-set comparison across families has not been run. So the family
+ordering by how readily a partial match counts as recognition is a property of the algebra, and no measurement here
+supports a claim about detection or false alarms. The question is now known to be *multi-class only*: on the one-class
+BETH fit of Table 4.11 the conorm provably cannot matter (above), so that run cannot answer it and `REPRO_ANOM_CONORM`
+is inert there.
 
 Three properties make it worth building.
 
-It is **free**. No second model, no separately trained detector, no extra pass over the data. The anomaly rule is an algebraic consequence of the rules I already have, so it costs one add-and-clip, one t-conorm and one subtraction at inference time. Contrast bolting a one-class SVM or isolation forest alongside a classifier and reconciling their disagreements.
+It is **free**. No second model, no separately trained detector, no extra pass over the data. The anomaly rule is an
+algebraic consequence of the rules I already have, so it costs one add-and-clip, one t-conorm and one subtraction at
+inference time. Contrast bolting a one-class SVM or isolation forest alongside a classifier and reconciling their
+disagreements.
 
-It is **interpretable in exactly the way the rest of the model is**, and this, not the decision rule, is what the construction actually adds. Given the clip, at the shipped $\theta$ the *rule* is a threshold on the maximum class membership, which is not a new idea and I will not present it as one. What a bare max-membership rejector cannot supply is the explanation. When it fires, the answer is not an opaque outlier score and not a bare "below threshold." It is "none of the known rules matched this, and here is how close each one came," each near-miss itself a readable linguistic rule over named features, so an operator sees *which* clauses failed and by how much.
+It is **interpretable in exactly the way the rest of the model is**, and this, not the decision rule, is what the
+construction actually adds. Given the clip, at the shipped $\theta$ the *rule* is a threshold on the maximum class
+membership, which is not a new idea and I will not present it as one. What a bare max-membership rejector cannot supply
+is the explanation. When it fires, the answer is not an opaque outlier score and not a bare "below threshold." It is
+"none of the known rules matched this, and here is how close each one came," each near-miss itself a readable linguistic
+rule over named features, so an operator sees *which* clauses failed and by how much.
 
-It addresses **rare classes**, the failure mode that motivated it. A class with a handful of examples is nearly invisible to accuracy-driven training: a model that ignores it entirely still scores well. But rare and unseen events are frequently the ones that matter, a novel intrusion, an off-nominal flight condition, a failure mode absent from the training set. The complement rule catches these *as a category*, without needing examples of them, which a supervised class rule can never do.
+It addresses **rare classes**, the failure mode that motivated it. A class with a handful of examples is nearly
+invisible to accuracy-driven training: a model that ignores it entirely still scores well. But rare and unseen events
+are frequently the ones that matter, a novel intrusion, an off-nominal flight condition, a failure mode absent from the
+training set. The complement rule catches these *as a category*, without needing examples of them, which a supervised
+class rule can never do.
 
-There is a verification-and-validation reading of this, and it is worth stating with its limits attached. A component that can say *this input is not one of the conditions I was built for* is close to what the aviation guidance of §2.6 asks for when it requires an operational design domain and some means of detecting departure from it, and here that means is part of the model rather than bolted alongside it, and arrives already explained. That is a claim about the *mechanism*, on exactly the terms §4.4 sets and no better ones: at the shipped $\theta$ the decision reduces to a max-membership rejector, the detection performance measured on Glass is level with an isolation forest rather than ahead of it, and the 214-sample testbed supports no runtime-monitoring claim at all. The structural property — a monitor that is a consequence of the rule base instead of a second model to be argued for separately — is what the section adds; a measured advantage is not.
+There is a verification-and-validation reading of this, and it is worth stating with its limits attached. A component
+that can say *this input is not one of the conditions I was built for* is close to what the aviation guidance of §2.6
+asks for when it requires an operational design domain and some means of detecting departure from it, and here that
+means is part of the model rather than bolted alongside it, and arrives already explained. That is a claim about the
+*mechanism*, on exactly the terms §4.4 sets and no better ones: at the shipped $\theta$ the decision reduces to a
+max-membership rejector, the detection performance measured on Glass is level with an isolation forest rather than ahead
+of it, and the 214-sample testbed supports no runtime-monitoring claim at all. The structural property — a monitor that
+is a consequence of the rule base instead of a second model to be argued for separately — is what the section adds; a
+measured advantage is not.
 
-Novelty detection and open-set recognition are established fields — one-class SVMs, isolation forests, Mahalanobis novelty scores, the open-set recognition line — and I do not claim to beat them. My claim is narrower: in a fuzzy inference system built this way, open-set behavior is a *consequence*, not an addition, written in the same t-conorm and complement the model already uses and inheriting its interpretability for free. The *rule* reduces to the threshold above, so its novelty is small; what is not reducible is that the rejection arrives already explained. §4.4 runs the comparison against dedicated one-class detectors on the same data.
+Novelty detection and open-set recognition are established fields — one-class SVMs, isolation forests, Mahalanobis
+novelty scores, the open-set recognition line — and I do not claim to beat them. My claim is narrower: in a fuzzy
+inference system built this way, open-set behavior is a *consequence*, not an addition, written in the same t-conorm and
+complement the model already uses and inheriting its interpretability for free. The *rule* reduces to the threshold
+above, so its novelty is small; what is not reducible is that the rejection arrives already explained. §4.4 runs the
+comparison against dedicated one-class detectors on the same data.
 
 ## 4.4 Results
 
 The datasets here are public, so unlike Chapter 3's psychiatric set I can name them freely.
 
-On the **PhiUSIIL phishing URL** dataset the model builds two rules and a handful of clauses in $0.13 \pm 0.02$ s — a readable fuzzy classifier trained in the time it takes to describe it. **Its accuracy there is 0.440 ± 0.181.** That row read 0.997 ± 0.001 until 2026-08-30, when `URLSimilarityIndex` and two sibling legitimacy probabilities were dropped from the loader as target leaks (grad-school #215; `PROVENANCE_MAP.md` notes 31 and 31(a)). `URLSimilarityIndex` is a URL's similarity to a whitelist of *known-legitimate* URLs and separates the classes on its own at AUC 0.996; without it the construction sits *below* the 0.5755 majority-class baseline.
+On the **PhiUSIIL phishing URL** dataset the model builds two rules and a handful of clauses in $0.13 \pm 0.02$ s — a
+readable fuzzy classifier trained in the time it takes to describe it. **Its accuracy there is 0.440 ± 0.181.** The
+loader drops `URLSimilarityIndex` and two sibling legitimacy probabilities as target leaks (grad-school #215;
+`PROVENANCE_MAP.md` notes 31 and 31 (a)). `URLSimilarityIndex` is a URL's similarity to a whitelist of
+*known-legitimate* URLs and separates the classes on its own at AUC 0.996; without it the construction sits *below* the
+0.5755 majority-class baseline.
 
-This is **not** the dataset becoming hard. On the identical 47 features, ANFIS reaches 0.999 ± 0.001, a GA-tuned FIS 0.998 ± 0.001, CART 0.997 ± 0.001 and a random forest 1.000 ± 0.000. PhiUSIIL is still saturated — for every method tested except this one. The construction's result there rested on a single strong *continuous* feature, and that feature was the label in disguise; leak-free its top five are four binary flags plus one bounded score, and a per-feature Gaussian **mixture** over a two-point support is a poor and unstable model, which is also where the ±0.181 comes from. What this row demonstrates is now the *rule count and the training time* and nothing else — and the training time is the strongest speed ratio in the study, 194× the slowest fuzzy baseline (Table 4.1b).
+This is **not** the dataset becoming hard. On the identical 47 features, ANFIS reaches 0.999 ± 0.001, a GA-tuned FIS
+0.998 ± 0.001, CART 0.997 ± 0.001 and a random forest 1.000 ± 0.000. PhiUSIIL is still saturated — for every method
+tested except this one. The construction's result there rested on a single strong *continuous* feature, and that feature
+was the label in disguise; leak-free its top five are four binary flags plus one bounded score, and a per-feature
+Gaussian **mixture** over a two-point support is a poor and unstable model, which is also where the ±0.181 comes from.
+What this row demonstrates is now the *rule count and the training time* and nothing else — and the training time is the
+strongest speed ratio in the study, 194× the slowest fuzzy baseline (Table 4.1b).
 
-**RT-IOT2022** ({{dataset.rt_iot2022.rows}} instances, {{dataset.rt_iot2022.features}} features, {{dataset.rt_iot2022.classes}} output classes) is the chapter's scale *target*, and both halves of the claim are now measured. Classification and timing, at the ten-seed protocol (`table_4_1_mog_baselines.py`): the MoG classifier trains in **4.24 ± 0.68 s at 92.7 ± 0.2% accuracy**, against a 200-tree Random Forest reference at 99.8 ± 0.0%. Random Forest wins on accuracy by seven points, so the claim here is speed and rule count — twelve rules trained in about four seconds on {{dataset.rt_iot2022.rows}} rows and {{dataset.rt_iot2022.features}} features (at `top_n = 5`, not the full antecedent screen). The open-set claim is measured separately (§4.3.5's complement rule against purpose-built detectors, at full scale and all {{dataset.rt_iot2022.features}} features): that is Table 4.7b, and it does not favor this work either. The answer-first construction does not fall over as the data gets large and multi-class — the rule base and parameter count grow with classes times features, not any product over inputs, and the wall clock confirms it stays fast — but neither measurement beats a tuned baseline on accuracy. One caveat on the parameter-count argument: the antecedent screen of §4.3.1 is quadratic in the class count, and this row uses `top_n = 5` rather than that screen, so it does not exercise the quadratic term.
+**RT-IOT2022** ({{dataset.rt_iot2022.rows}} instances, {{dataset.rt_iot2022.features}} features,
+{{dataset.rt_iot2022.classes}} output classes) is the chapter's scale *target*, and both halves of the claim are now
+measured. Classification and timing, at the ten-seed protocol (`table_4_1_mog_baselines.py`): the MoG classifier trains
+in **3.64 ± 0.25 s at 92.7 ± 0.2% accuracy**, against a 200-tree Random Forest reference at 99.8 ± 0.0%. Random Forest
+wins on accuracy by seven points, so the claim here is speed and rule count — twelve rules trained in about 3.6 seconds
+on {{dataset.rt_iot2022.rows}} rows and {{dataset.rt_iot2022.features}} features (at `top_n = 5`, not the full
+antecedent screen). The open-set claim is measured separately (§4.3.5's complement rule against purpose-built detectors,
+at full scale and all {{dataset.rt_iot2022.features}} features): that is Table 4.7b, and it does not favor this work
+either. The answer-first construction does not fall over as the data gets large and multi-class — the rule base and
+parameter count grow with classes times features, not any product over inputs, and the wall clock confirms it stays
+fast — but neither measurement beats a tuned baseline on accuracy. One caveat on the parameter-count argument: the
+antecedent screen of §4.3.1 is quadratic in the class count, and this row uses `top_n = 5` rather than that screen, so
+it does not exercise the quadratic term.
 
-The **BETH** host-telemetry set is where the anomaly rule of §4.3.5 is tested in its hardest configuration: train on *benign traffic only*, then show the model a test set containing malicious activity it has never seen. Nothing about the malicious class is available at training time, so there is no "attack" rule to fire and detection comes from the complement rule alone. That is open-set recognition, not classification, and where the construction should earn its keep. **This is now measured** — Table 4.11 and its companion sweeps 4.11(b)–(e), from `table_4_11_beth_anomaly.py` and the three generators beside it — and the paragraph that stood here through 2026-08 said it could not be, so the reason it was wrong is worth recording. The recorded blocker was that leave-one-class-out needs at least three classes while BETH is binary, so the experiment needed "a purpose-built one-class training path, a research decision before a coding one" (`WORKINGDOC.md` §6). The path already existed: `tribblefis.one_class.TribbleOneClassDetector` is a scikit-learn `OutlierMixin` built for exactly this setting — abundant normal data, no anomalies at fit time, unsupervised feature selection, a continuous `score_samples` — and its own docstring names the gap it fills. The decision had been taken upstream in the library and the proposal did not notice, which is pin-versus-prose drift of the kind `reproduce/check_prose.py` exists to catch, arriving from a direction that check does not look: a *capability* appearing in a submodule rather than a number changing. BETH's data have been present locally since 2026-08-12 (`load_beth()` loads {{dataset.beth.rows_approx}} rows across train/validation/test splits).
+The **BETH** host-telemetry set is where the anomaly rule of §4.3.5 is tested in its hardest configuration: train on
+*benign traffic only*, then show the model a test set containing malicious activity it has never seen. Nothing about the
+malicious class is available at training time, so there is no "attack" rule to fire and detection comes from the
+complement rule alone. That is open-set recognition, not classification, and where the construction should earn its
+keep. **This is measured** — Table 4.11 and its companion sweeps 4.11 (b)– (e), from `table_4_11_beth_anomaly.py` and
+the three generators beside it. Leave-one-class-out needs at least three classes and BETH is binary, so the experiment
+needs a purpose-built one-class training path, a research decision rather than a coding one (`WORKINGDOC.md` §6).
+`tribblefis.one_class.TribbleOneClassDetector`, a scikit-learn `OutlierMixin` built for exactly this setting — abundant
+normal data, no anomalies at fit time, unsupervised feature selection, a continuous `score_samples` — supplies that
+path; its own docstring names the gap it fills. `load_beth()` loads {{dataset.beth.rows_approx}} rows across
+train/validation/test splits.
 
-On the **UCI Concrete Compressive Strength** regression set (Table 4.1, full 2nd order), the flat model's test $R^2$ is 0.394, 0.796, and 0.841 at TSK orders zero, one, and two, rising to 0.861 ± 0.026 with the full second-order basis. That is a capacity ladder rather than a threshold: constant consequents give a usable if unimpressive model, the first-order affine term buys most of the remaining ground, and the two second-order variants add 0.045 and 0.065 more. Where the returns fall off is between first and second order, not between zeroth and first.
+On the **UCI Concrete Compressive Strength** regression set (Table 4.1, full 2nd order), the flat model's test $R^2$ is
+0.394, 0.796, and 0.841 at TSK orders zero, one, and two, rising to 0.861 ± 0.026 with the full second-order basis. That
+is a capacity ladder rather than a threshold: constant consequents give a usable if unimpressive model, the first-order
+affine term buys most of the remaining ground, and the two second-order variants add 0.045 and 0.065 more. Where the
+returns fall off is between first and second order, not between zeroth and first.
 
-The zeroth-order figure carries a caveat: it is measured under equal-width output cuts, and is unusually sensitive to that choice. With constant consequents a rule's output *is* its bucket centroid, so under the pinned-extreme partition of §4.3.2 the outer rules emit the target's global min and max with nothing to absorb the error, and the arm goes negative (A.6). The negative score is the partition, not the consequent order — first-order consequents are a refinement here, not a requirement.
+The zeroth-order figure carries a caveat: it is measured under equal-width output cuts, and is unusually sensitive to
+that choice. With constant consequents a rule's output *is* its bucket centroid, so under the pinned-extreme partition
+of §4.3.2 the outer rules emit the target's global min and max with nothing to absorb the error, and the arm goes
+negative (A.6). The negative score is the partition, not the consequent order — first-order consequents are a refinement
+here, not a requirement.
 
-The reconciliation with Chapter 6 is done. A flat-model $R^2$ in the mid-0.60s from the tree-and-mixture experiment reads as a contradiction of the figures above; under one protocol, with identical splits, seeds, and preprocessing, the flat model scores 0.862 ± 0.033 with refinement (`uniform-2026-08-03/table_concrete_reconciliation.csv`), and the discrepancy was configuration and not disagreement. Chapter 6 Table 6.1 and the table above are the same measurement from two chapters. The remaining trap is Chapter 6's Table 6.2, which deliberately runs everything untuned at raw features and reports the flat model at 0.687 ± 0.049 (`table_6_1.csv`): a different question, not a different answer.
+The reconciliation with Chapter 6 is done. A flat-model $R^2$ in the mid-0.60s from the tree-and-mixture experiment
+reads as a contradiction of the figures above; under one protocol, with identical splits, seeds, and preprocessing, the
+flat model scores 0.862 ± 0.033 with refinement (`uniform-2026-08-03/table_concrete_reconciliation.csv`), and the
+discrepancy was configuration and not disagreement. Chapter 6 Table 6.1 and the table above are the same measurement
+from two chapters. The remaining trap is Chapter 6's Table 6.2, which deliberately runs everything untuned at raw
+features and reports the flat model at 0.687 ± 0.049 (`table_6_1.csv`): a different question, not a different answer.
 
-**Table 4.4 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation except where a cell is marked *not run*; the baseline comparison is Table 4.5. The rule-base column is structural, not a measurement, as the row with no timing is labelled.
+**Table 4.4 — What the Mixture-of-Gaussians construction achieves.** Measured on a single workstation except where a
+cell is marked *not run*; the baseline comparison is Table 4.5. The rule-base column is structural, not a measurement,
+as the row with no timing is labelled.
 
-| Dataset (task) | Size (N × M) | Train time | Accuracy / R² | Rule base |
-|---|---|---:|---:|---|
-| PhiUSIIL (binary classification) | 235,795 × 47 | 0.13 ± 0.02 s | **0.440 ± 0.181 acc.** | 2 rules (K = 2) |
-| RT-IOT2022 (12-class) | {{dataset.rt_iot2022.shape}} | **4.24 ± 0.68 s** | **0.927 ± 0.002 acc.** (RF ref. 0.998 ± 0.000) | 12 by construction (K = 12) |
-| Concrete (regression, TSK order 1) | {{dataset.concrete.shape}} | seconds | R² = 0.787 ± 0.026 | 3 output buckets |
-| Concrete (regression, TSK order 2) | {{dataset.concrete.shape}} | seconds | R² = 0.832 ± 0.027 | 3 output buckets |
-| Concrete (regression, full 2nd) | {{dataset.concrete.shape}} | seconds | **R² = 0.861 ± 0.026** | 3 output buckets |
+| Dataset (task)                     | Size (N × M)                 |        Train time |                                  Accuracy / R² | Rule base                   |
+|------------------------------------|------------------------------|------------------:|-----------------------------------------------:|-----------------------------|
+| PhiUSIIL (binary classification)   | 235,795 × 47                 |     0.13 ± 0.02 s |                         **0.440 ± 0.181 acc.** | 2 rules (K = 2)             |
+| RT-IOT2022 (12-class)              | {{dataset.rt_iot2022.shape}} | **3.64 ± 0.25 s** | **0.927 ± 0.002 acc.** (RF ref. 0.998 ± 0.000) | 12 by construction (K = 12) |
+| Concrete (regression, TSK order 1) | {{dataset.concrete.shape}}   |           seconds |                             R² = 0.787 ± 0.026 | 3 output buckets            |
+| Concrete (regression, TSK order 2) | {{dataset.concrete.shape}}   |           seconds |                             R² = 0.832 ± 0.027 | 3 output buckets            |
+| Concrete (regression, full 2nd)    | {{dataset.concrete.shape}}   |           seconds |                         **R² = 0.861 ± 0.026** | 3 output buckets            |
 
-That RT-IOT2022 row is now measured at this table's own ten-seed protocol, and labels its rule count a structural consequence because it is one: for classification the count is the number of classes, for regression the number of output buckets, never a product over inputs. A grid over {{dataset.rt_iot2022.features}} features would be beyond enumeration while this model carries twelve rules, trained in 4.2 seconds — the arithmetic the row makes is now backed by a wall clock, not asserted from parameter counts alone. Random Forest's 99.8% against the MoG's 92.7% is the same shape of result as the PhiUSIIL row above: the reference model wins on accuracy, and what this row demonstrates is that the answer-first construction does not become intractable at this scale, not that it is the more accurate choice here.
+That RT-IOT2022 row is now measured at this table's own ten-seed protocol, and labels its rule count a structural
+consequence because it is one: for classification the count is the number of classes, for regression the number of
+output buckets, never a product over inputs. A grid over {{dataset.rt_iot2022.features}} features would be beyond
+enumeration while this model carries twelve rules, trained in 3.6 seconds — the arithmetic the row makes is now backed
+by a wall clock, not asserted from parameter counts alone. Random Forest's 99.8% against the MoG's 92.7% is the same
+shape of result as the PhiUSIIL row above: the reference model wins on accuracy, and what this row demonstrates is that
+the answer-first construction does not become intractable at this scale, not that it is the more accurate choice here.
 
-**Table 4.5 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method runs on identical splits, multi-seed with error bars, under the Goal G4 protocol, and every arm in the Concrete column runs on the log-and-min-max-scaled features of §4.3.
+**Table 4.5 — Baseline comparison** *(structure fixed; cells to be filled by the reproduction harness).* The speed claim
+is only persuasive against the methods it displaces, so this is the first experiment owed to the chapter. Every method
+runs on identical splits, multi-seed with error bars, under the Goal G4 protocol, and every arm in the Concrete column
+runs on the log-and-min-max-scaled features of §4.3.
 
-Applying the transform uniformly costs the baselines nothing, for the rank-invariance reason Table 4.1 measures at +0.001 and +0.000, so the CART and Random Forest column reads the same either way.
+Applying the transform uniformly costs the baselines nothing, for the rank-invariance reason Table 4.1 measures at
++0.001 and +0.000, so the CART and Random Forest column reads the same either way.
 
-The MoG appears on two rows because only the first is fully instrumented. Every cell in row 1 now comes from one file, `reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.csv`: Concrete `R² = 0.795 ± 0.025` at **0.43 ± 0.02 s**, PhiUSIIL `acc = 0.997 ± 0.001` at **0.28 ± 0.02 s** — earlier the accuracy and clock were spliced from two archives, and the re-take that fixed it also halved the clocks and removed a ±60% spread.
+The MoG appears on two rows because only the first is fully instrumented. Every cell in row 1 comes from one file,
+`reproduce/outputs/phiusiil-leakfree-2026-08-30/table_4_1.csv`: Concrete `R² = 0.795 ± 0.025` at **0.43 ± 0.02 s**,
+PhiUSIIL `acc = 0.997 ± 0.001` at **0.28 ± 0.02 s**.
 
-The diagnosis is worth keeping. That ±60% was not seed spread: Concrete is the first arm fit, so seed 0 absorbed import, JIT, thread-pool spin-up and first-touch allocation at 3.7× the other nine. The generator now discards one warm-up fit, and the cell reads 0.43 ± 0.02 s, a 2% spread, in line with the PhiUSIIL row (fitted second, so never affected). The accuracies were byte-identical before and after, so the warm-up moved the clock and nothing else (`PROVENANCE_MAP.md`, note 14).
+The 2% spread on the Concrete clock is worth explaining, since a naive first pass through the ten seeds reads far
+noisier. Concrete is the first arm fit, so seed 0 absorbs import, JIT, thread-pool spin-up and first-touch allocation at
+3.7× the other nine; the generator discards that one warm-up fit, leaving the cell at 0.43 ± 0.02 s, in line with the
+PhiUSIIL row (fitted second, so never affected by the warm-up cost). Accuracy is unaffected by the warm-up fit either
+way, so the effect is confined to the clock (`PROVENANCE_MAP.md`, note 14).
 
-One missing row a committee is most likely to ask for. §4.2 names Gaussian naive Bayes as this construction's nearest acknowledged relative and concedes the resemblance up front, and then it does not appear here, while CART and Random Forest do. That asymmetry is not defensible on effort: unlike ANFIS and a GA-tuned FIS, which need adapters written, Gaussian naive Bayes is one import from scikit-learn, and no generator under `reproduce/tables/` instantiates it. It is listed below as not run because it is a debt, not because it is hard. Until it is filled, this chapter's accuracy comparison has no row for the model whose factorization it shares, the single cheapest experiment on the list.
+One missing row. §4.2 names Gaussian naive Bayes as this construction's nearest acknowledged relative, and it does not
+appear in the table, while CART and Random Forest do. The omission is not an effort issue: unlike ANFIS and a GA-tuned FIS,
+which need adapters written, Gaussian naive Bayes is one import from scikit-learn, and no generator under `reproduce/tables/`
+instantiates it. It is listed below as not run, and until it is filled, this chapter's accuracy comparison has no row for
+the model whose factorization it shares — the single cheapest experiment on the list.
 
-| Method | Concrete R² | Concrete train time | PhiUSIIL accuracy | PhiUSIIL train time |
-|---|---:|---:|---:|---:|
-| **MoG FIS (this work)**, 1st order | 0.799 ± 0.027 | **0.53 ± 0.05 s** | **0.440 ± 0.181** | **0.13 ± 0.02 s** |
-| **MoG FIS**, full 2nd order | **0.852 ± 0.030** | 0.53 ± 0.04 s | — | — |
-| ANFIS | 0.799 ± 0.112 | 7.28 ± 1.12 s | **0.999 ± 0.001** | 22.53 ± 2.30 s |
-| GA-tuned FIS | **0.896 ± 0.038** | 41.11 ± 3.81 s | 0.998 ± 0.001 | 25.29 ± 1.55 s |
-| Gaussian naive Bayes (nearest relative, §4.2) | *not run — no generator* | *not run* | *not run — no generator* | *not run* |
-| CART (reference) | 0.825 ± 0.049 | seconds | 0.997 ± 0.001 | seconds |
-| Random Forest (reference) | 0.909 ± 0.020 | 0.63 ± 0.02 s | 1.000 ± 0.000 | 1.31 ± 0.23 s |
+| Method                                        |              Concrete R² | Concrete train time |        PhiUSIIL accuracy | PhiUSIIL train time |
+|-----------------------------------------------|-------------------------:|--------------------:|-------------------------:|--------------------:|
+| **MoG FIS (this work)**, 1st order            |            0.799 ± 0.027 |   **0.53 ± 0.05 s** |        **0.440 ± 0.181** |   **0.13 ± 0.02 s** |
+| **MoG FIS**, full 2nd order                   |        **0.852 ± 0.030** |       0.53 ± 0.04 s |                        — |                   — |
+| ANFIS                                         |            0.799 ± 0.112 |       7.28 ± 1.12 s |        **0.999 ± 0.001** |      22.53 ± 2.30 s |
+| GA-tuned FIS                                  |        **0.896 ± 0.038** |      41.11 ± 3.81 s |            0.998 ± 0.001 |      25.29 ± 1.55 s |
+| Gaussian naive Bayes (nearest relative, §4.2) | *not run — no generator* |           *not run* | *not run — no generator* |           *not run* |
+| CART (reference)                              |            0.825 ± 0.049 |             seconds |            0.997 ± 0.001 |             seconds |
+| Random Forest (reference)                     |            0.909 ± 0.020 |       0.63 ± 0.02 s |            1.000 ± 0.000 |       1.31 ± 0.23 s |
 
-**The two fuzzy baselines are now measured, and they are not strawmen.** Goal C1
-asked for them because every "orders of magnitude faster" claim in Chapters 1, 7
-and 8 had nothing fuzzy to be faster *than*. Ten seeds, the same splits, the same
-leak-free features. ANFIS grid-partitions where feasible (Concrete: 2 membership
-functions per input, 256 rules) and scatter-partitions at scale (12 rules); the
-GA-tuned FIS evolves the same premises over 20 individuals × 15 generations.
-They **match or beat the MoG arm on accuracy in four of the five rows** — GA-FIS
-takes Concrete outright at 0.896 ± 0.038 against the full-2nd MoG's 0.852, and
-both take PhiUSIIL at ≈ 0.999 against 0.440. The single row the construction wins
-is **Bike Sharing** (0.620 ± 0.014 against ANFIS's 0.577 ± 0.075 and GA-FIS's
-0.545 ± 0.047) — and that is also the row with the weakest speedup below, so both
-honesties land on the same line. Whatever the speed table says, it is not bought
-with a weaker model.
+**The two fuzzy baselines are now measured, and they are not strawmen.** Goal C1 asked for them because every "orders of
+magnitude faster" claim in Chapters 1, 7 and 8 had nothing fuzzy to be faster *than*. Ten seeds, the same splits, the
+same leak-free features. ANFIS grid-partitions where feasible (Concrete: 2 membership functions per input, 256 rules)
+and scatter-partitions at scale (12 rules); the GA-tuned FIS evolves the same premises over 20 individuals × 15
+generations. They **match or beat the MoG arm on accuracy in four of the five rows** — GA-FIS takes Concrete outright at
+0.896 ± 0.038 against the full-2nd MoG's 0.852, and both take PhiUSIIL at ≈ 0.999 against 0.440. The single row the
+construction wins is **Bike Sharing** (0.620 ± 0.014 against ANFIS's 0.577 ± 0.075 and GA-FIS's 0.545 ± 0.047) — and
+that is also the row with the weakest speedup below. Whatever the speed table
+says, it is not bought with a weaker model.
 
-**Table 4.1b — What the construction buys, in wall-clock.** Training seconds, mean
-± s.d. over the same ten seeds and splits as Table 4.5. "Speedup" is the ratio of
-means, slowest of {ANFIS, GA-FIS} over MoG.
+**Table 4.1b — What the construction buys, in wall-clock.** Training seconds, mean ± s.d. over the same ten seeds and
+splits as Table 4.5. "Speedup" is the ratio of means, slowest of {ANFIS, GA-FIS} over MoG.
 
-| Dataset (task) | MoG train | ANFIS train | GA-FIS train | RF train | MoG speedup vs slowest fuzzy |
-|---|---:|---:|---:|---:|---:|
-| Concrete (regression) | 0.53 ± 0.05 s | 7.28 ± 1.12 s | 41.11 ± 3.81 s | 0.63 ± 0.02 s | **78×** |
-| Concrete (regression, full 2nd order) | 0.53 ± 0.04 s | 7.79 ± 0.53 s | 43.89 ± 0.91 s | 0.61 ± 0.02 s | **83×** |
-| Bike Sharing (regression) | 0.59 ± 0.07 s | 4.80 ± 0.68 s | 8.30 ± 1.72 s | 7.98 ± 1.41 s | **14×** |
-| PhiUSIIL (classification) | 0.13 ± 0.02 s | 22.53 ± 2.30 s | 25.29 ± 1.55 s | 1.31 ± 0.23 s | **194×** |
-| RT-IOT2022 (12-class) | 3.64 ± 0.25 s | 264.53 ± 25.30 s | 51.58 ± 1.25 s | 6.67 ± 0.39 s | **73×** |
+| Dataset (task)                        |     MoG train |      ANFIS train |   GA-FIS train |      RF train | MoG speedup vs slowest fuzzy |
+|---------------------------------------|--------------:|-----------------:|---------------:|--------------:|-----------------------------:|
+| Concrete (regression)                 | 0.53 ± 0.05 s |    7.28 ± 1.12 s | 41.11 ± 3.81 s | 0.63 ± 0.02 s |                      **78×** |
+| Concrete (regression, full 2nd order) | 0.53 ± 0.04 s |    7.79 ± 0.53 s | 43.89 ± 0.91 s | 0.61 ± 0.02 s |                      **83×** |
+| Bike Sharing (regression)             | 0.59 ± 0.07 s |    4.80 ± 0.68 s |  8.30 ± 1.72 s | 7.98 ± 1.41 s |                      **14×** |
+| PhiUSIIL (classification)             | 0.13 ± 0.02 s |   22.53 ± 2.30 s | 25.29 ± 1.55 s | 1.31 ± 0.23 s |                     **194×** |
+| RT-IOT2022 (12-class)                 | 3.64 ± 0.25 s | 264.53 ± 25.30 s | 51.58 ± 1.25 s | 6.67 ± 0.39 s |                      **73×** |
 
-**Read the range, not the headline.** The honest statement is **14× to 194×**, one
-to two orders of magnitude, not a flat "two orders". Bike Sharing at 14× is the
-weakest and belongs in the claim: it is the case where the fuzzy baselines are
-cheapest, because ANFIS scatter-partitions to twelve rules there rather than
-grid-partitioning to 256 as it does on Concrete. Two further honesties. The
-random forest is *not* slower than the construction on Concrete or Bike Sharing
-— the speed argument is against fuzzy-system induction, not against trees. And
-a deferred single-seed pass had put Concrete at ≈272×; ten seeds and the
-dual-form consequent solve of grad-school #237 (a 3.4× speedup of the GA-FIS arm)
-bring it to 78×. **The earlier figure is superseded by our own optimisation of
-the baseline**, which is the right direction for it to move: the faster the
-baseline gets, the more honest the ratio.
+**Read the range, not the headline.** The accurate statement is **14× to 194×**, one to two orders of magnitude, not a
+flat "two orders". Bike Sharing at 14× is the weakest and belongs in the claim: it is the case where the fuzzy baselines
+are cheapest, because ANFIS scatter-partitions to twelve rules there rather than grid-partitioning to 256 as it does on
+Concrete. Two further caveats. The random forest is *not* slower than the construction on Concrete or Bike Sharing —
+the speed argument is against fuzzy-system induction, not against trees. And Concrete's ratio is 78×, at ten seeds and
+against a GA-FIS baseline that itself runs the dual-form consequent solve of grad-school #237 (a 3.4× speedup over an
+unoptimised GA-FIS).
 
-**Figure 4.5 — Training time by method and dataset, from Table 4.1b's own CSV.** Grouped bars on a log axis, one group per dataset, four arms: the construction, ANFIS, the GA-tuned FIS and the random forest reference, mean seconds with the ten-seed spread as error bars, and the table's own speedup column — the construction against the slower of the two fuzzy baselines — printed above each group. Drawn from `phiusiil-leakfree-2026-08-30`, the archive Table 4.1b is quoted from, so the two cannot disagree. The picture makes the two honesties of the paragraph above visible at once: the ratio is a range spanning an order of magnitude, and the random forest bars are level with or below the construction's on Concrete and Bike Sharing, so the argument is against fuzzy-system induction and not against trees.
+**Figure 4.5 — Training time by method and dataset, from Table 4.1b's own CSV.** Grouped bars on a log axis, one group
+per dataset, four arms: the construction, ANFIS, the GA-tuned FIS and the random forest reference, mean seconds with the
+ten-seed spread as error bars, and the table's own speedup column — the construction against the slower of the two fuzzy
+baselines — printed above each group. Drawn from `phiusiil-leakfree-2026-08-30`, the archive Table 4.1b is quoted from,
+so the two cannot disagree. The picture makes the two caveats of the paragraph above visible at once: the ratio is a
+range spanning an order of magnitude, and the random forest bars are level with or below the construction's on Concrete
+and Bike Sharing, so the argument is against fuzzy-system induction and not against trees.
 `![04-speedup](fig/04-speedup.png)`
 
-*The full-second-order row's missing time.* Its two halves come from different code paths: the **R² of 0.861 ± 0.026 comes from Table 4.1's study** (`table_hyperparam_normalization.py`, driving `solve_tsk_consequents` / `predict_tsk` directly), while row 1's numbers come from the `MixtureOfGaussiansFuzzyRegressor` estimator. That estimator now carries a timed full-second-order arm, measuring **R² = 0.852 ± 0.030 in 0.44 ± 0.04 s** at ten seeds — a 0.009 gap from the 0.861 figure, inside both spreads. The two agree, but the cell stays empty rather than splice a time from one implementation onto an accuracy from another. The reading today: on the estimator path full second order buys about +0.06 R² over first order for one hundredth of a second, with the exact pairing still owed.
+*The full-second-order row's missing time.* Its two halves come from different code paths: the **R² of 0.861 ± 0.026
+comes from Table 4.1's study** (`table_hyperparam_normalization.py`, driving `solve_tsk_consequents` / `predict_tsk`
+directly), while row 1's numbers come from the `MixtureOfGaussiansFuzzyRegressor` estimator. That estimator now carries
+a timed full-second-order arm, measuring **R² = 0.852 ± 0.030 in 0.44 ± 0.04 s** at ten seeds — a 0.009 gap from the
+0.861 figure, inside both spreads. The two agree, but the cell stays empty rather than splice a time from one
+implementation onto an accuracy from another. The reading today: on the estimator path full second order buys about
++0.06 R² over first order for one hundredth of a second, with the exact pairing still owed.
 
-*Reading the empty cells.* `N/A (C1)` is not a number withheld; it is a measurement that cannot be taken with what is in the repository. `table_4_1_mog_baselines.py` looks for `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py` and emits `N/A` when they are absent, which they are. Writing those two adapters is checklist item **C1**, the single most important experiment still owed, because the *orders of magnitude faster* claim in the title and in Chapters 1, 7 and 8 has no fuzzy baseline to be faster **than** until they exist. The eight cells are the shape of that hole, marked rather than filled with a plausible figure.
+*Reading the empty cells.* `N/A (C1)` is not a number withheld; it is a measurement that cannot be taken with what is in
+the repository. `table_4_1_mog_baselines.py` looks for `reproduce/tables/_baseline_anfis.py` and `_baseline_gafis.py`
+and emits `N/A` when they are absent, which they are. Writing those two adapters is checklist item **C1**, the single
+most important experiment still owed, because the *orders of magnitude faster* claim in the title and in Chapters 1, 7
+and 8 has no fuzzy baseline to be faster **than** until they exist. The eight cells are the shape of that hole, marked
+rather than filled with a plausible figure.
 
-**The mechanism, measured.** Two protocols now run, and they answer different questions. Tables 4.6 and 4.7 use leave-one-class-out on public multi-class data — each class withheld from training in turn and treated as unseen, averaged over held-out classes and seeds — which is what a *multi-class* complement rule can be tested with. Table 4.11 runs the genuine one-class protocol on BETH, which is the configuration §4.3.5 was written for. The Glass sweep below establishes the mechanism; BETH establishes what it is worth at scale against detectors built for the job. Sweeping the boost gives the operating curve the section promised.
+**The mechanism, measured.** Two protocols now run, and they answer different questions. Tables 4.6 and 4.7 use
+leave-one-class-out on public multi-class data — each class withheld from training in turn and treated as unseen,
+averaged over held-out classes and seeds — which is what a *multi-class* complement rule can be tested with. Table 4.11
+runs the genuine one-class protocol on BETH, which is the configuration §4.3.5 was written for. The Glass sweep below
+establishes the mechanism; BETH establishes what it is worth at scale against detectors built for the job. Sweeping the
+boost gives the operating curve the section promised.
 
-**Table 4.6 — The anomaly operating curve.** Detection and false alarm as functions of $\theta$, on Glass (6 classes, leave-one-class-out); Hamacher conorm, 10 seeds, from `reproduce/outputs/uniform-2026-08-03/table_4_4b_theta_sweep.csv`.
+**Table 4.6 — The anomaly operating curve.** Detection and false alarm as functions of $\theta$, on Glass (6 classes,
+leave-one-class-out); Hamacher conorm, 10 seeds, from `reproduce/outputs/uniform-2026-08-03/table_4_4b_theta_sweep.csv`.
 
 | $\theta$ | detection rate | false-alarm rate | detection − false alarm |
-|---:|---:|---:|---:|
-| 0.50 | 0.838 | 0.719 | +0.119 |
-| 0.60 | 0.815 | 0.664 | +0.151 |
-| 0.70 | 0.762 | 0.616 | +0.146 |
-| **0.80** | 0.700 | 0.546 | **+0.154** |
-| 0.90 | 0.625 | 0.475 | +0.150 |
-| 0.99 | 0.491 | 0.362 | +0.129 |
-| 1.10 | 0.000 | 0.000 | 0.000 |
+|---------:|---------------:|-----------------:|------------------------:|
+|     0.50 |          0.838 |            0.719 |                  +0.119 |
+|     0.60 |          0.815 |            0.664 |                  +0.151 |
+|     0.70 |          0.762 |            0.616 |                  +0.146 |
+| **0.80** |          0.700 |            0.546 |              **+0.154** |
+|     0.90 |          0.625 |            0.475 |                  +0.150 |
+|     0.99 |          0.491 |            0.362 |                  +0.129 |
+|     1.10 |          0.000 |            0.000 |                   0.000 |
 
-The curve behaves exactly as §4.3.5 says it should. Raising $\theta$ inflates the known-class firings, shrinks the complement, and monotonically reduces both detection and false alarms; past $\theta = 1.1$ the boost saturates the aggregate and the anomaly rule stops firing altogether. The knob is real and monotone: an operator trades sensitivity against nuisance alarms by turning one scalar, which was the design claim.
+The curve behaves exactly as §4.3.5 says it should. Raising $\theta$ inflates the known-class firings, shrinks the
+complement, and monotonically reduces both detection and false alarms; past $\theta = 1.1$ the boost saturates the
+aggregate and the anomaly rule stops firing altogether. The knob is real and monotone: an operator trades sensitivity
+against nuisance alarms by turning one scalar, which was the design claim.
 
-Three observations follow, and the first is that this curve has moved. `tribble-fis` PR #72 now scores each candidate component count off the k-means partition it implies instead of fitting and discarding four EM mixtures, and every $\theta$ here moved with it: detection up 0.084 to 0.152, false alarms up 0.151 to 0.221, so the net separation *fell* throughout. The band the previous run put at +0.222…+0.239 peaking at $\theta = 0.60$ now reads +0.119…+0.154 peaking at $\theta = 0.80$. About 35% of the achievable separation is gone and the operating point has moved two steps along the sweep.
+Three observations follow. First, `tribble-fis` PR #72 scores each candidate component count off the k-means partition
+it implies, rather than fitting and discarding four EM mixtures, which sets the band this curve reports: $J$ peaks at
++0.154 at $\theta = 0.80$, against a floor of +0.119 across the sweep.
 
-Second, the default of $\theta = 0.99$ inherited from the BETH configuration is still *not* a good operating point on this data: it gives about five-sixths of the separation available and sits well down the low-sensitivity end of the curve. Report the curve, and tune $\theta$ per deployment. Third, there is still no sharp optimum to tune *to*: $J$ sits between +0.119 and +0.154 across the whole range from 0.5 to 0.8, so the choice within that band is nearly free and the knob forgiving. That qualitative claim survives the move — but **it does not generalise off Glass, and should not be read as a property of the knob.** On BETH (Table 4.11(e), the same sweep on a {{dataset.beth.rows_approx}}-row one-class problem) $J$ is *monotone* in $\theta$, running +0.160 at $\theta = 0$ to +0.769 at $\theta = 0.999$: no interior optimum, no forgiving band, and the inherited default of 0.99 is close to the best available rather than a poor choice. The knob is forgiving on a {{dataset.glass.rows}}-sample stress test and decisive on the dataset the chapter actually cares about, which is an argument for reporting the curve per deployment rather than for any particular $\theta$. The absolute performance does not: at the best setting the rule detects 70% of unseen points at a 55% false-alarm rate, a weaker signal than the previous run suggested and further from a deployable detector, not closer.
+Second, the default of $\theta = 0.99$ inherited from the BETH configuration is *not* a good operating point on this
+data: it gives about five-sixths of the separation available and sits well down the low-sensitivity end of the curve.
+Report the curve, and tune $\theta$ per deployment. Third, there is no sharp optimum to tune *to*: $J$ sits between
++0.119 and +0.154 across the whole range from 0.5 to 0.8, so the choice within that band is nearly free and the knob
+forgiving — but **that does not generalise off Glass, and should not be read as a property of the knob.** On BETH (Table
+4.11 (e), the same sweep on a {{dataset.beth.rows_approx}}-row one-class problem) $J$ is *monotone* in $\theta$, running
++0.160 at $\theta = 0$ to +0.769 at $\theta = 0.999$: no interior optimum, no forgiving band, and the inherited default
+of 0.99 is close to the best available rather than a poor choice. The knob is forgiving on a
+{{dataset.glass.rows}}-sample stress test and decisive on the dataset the chapter actually cares about, which is an
+argument for reporting the curve per deployment rather than for any particular $\theta$. The absolute performance does
+not: at the best setting the rule detects 70% of unseen points at a 55% false-alarm rate, a weaker signal than the
+previous run suggested and further from a deployable detector, not closer.
 
-Nor should that be over-read in either direction. Glass has 214 samples across six classes, several with fewer than a dozen members, so withholding a class removes much of the little data there is and asks the model to be confident about a space it has barely seen. It is a stress test, not a demonstration. It establishes that the mechanism works as described, not that the complement rule is *competitive*; that requires BETH or a comparable dataset.
+Nor should that be over-read in either direction. Glass has 214 samples across six classes, several with fewer than a
+dozen members, so withholding a class removes much of the little data there is and asks the model to be confident about
+a space it has barely seen. It is a stress test, not a demonstration. It establishes that the mechanism works as
+described, not that the complement rule is *competitive*; that requires BETH or a comparable dataset.
 
-**Table 4.7 — Against detectors built for the job** *(θ = 0.99, matched operating points; `uniform-2026-08-03/table_4_4_openset.csv`).* The baselines' contamination is set to the complement rule's observed false-alarm rate, so all three are compared at the same point on their curves.
+**Table 4.7 — Against detectors built for the job** *(θ = 0.99, matched operating points;
+`uniform-2026-08-03/table_4_4_openset.csv`).* The baselines' contamination is set to the complement rule's observed
+false-alarm rate, so all three are compared at the same point on their curves.
 
-| Method | Detection rate | False-alarm rate | Detection − false alarm | Separate model? |
-|---|---:|---:|---:|:--:|
-| **Complement rule (this work)** | 0.491 ± 0.359 | 0.362 ± 0.262 | +0.129 | no |
-| Isolation Forest | 0.493 ± 0.341 | 0.317 ± 0.160 | **+0.176** | yes |
-| One-class SVM | 0.399 ± 0.300 | 0.288 ± 0.166 | +0.111 | yes |
+| Method                          | Detection rate | False-alarm rate | Detection − false alarm | Separate model? |
+|---------------------------------|---------------:|-----------------:|------------------------:|:---------------:|
+| **Complement rule (this work)** |  0.491 ± 0.359 |    0.362 ± 0.262 |                  +0.129 |       no        |
+| Isolation Forest                |  0.493 ± 0.341 |    0.317 ± 0.160 |              **+0.176** |       yes       |
+| One-class SVM                   |  0.399 ± 0.300 |    0.288 ± 0.166 |                  +0.111 |       yes       |
 
-Isolation forest nominally leads, now by 0.047 where the previous run showed 0.002, and nothing should be read into that either. The ordering has changed three times across runs: a five-seed run put isolation forest ahead by 0.038, ten seeds made the two level to within a fifth of a percent, and this run separates them again. The standard deviations across held-out classes are roughly five times the *largest* gap in the table and seven times the smallest, so every one of those orderings is noise read as signal. What the table supports is the cheaper claim that motivated the section: the complement rule performs *comparably to purpose-built detectors while requiring no second model*. Three of the nine cells moved beyond noise this run, and no separation in the table now exceeds its own error bar, the one-class SVM's +0.111 included. More than parity needs a testbed larger than 214 samples, and is a goal for completion.
+Isolation forest nominally leads by 0.047, and nothing should be read into that: the standard deviations across held-out
+classes are roughly five times the *largest* gap in the table and seven times the smallest, so an ordering at this
+sample size is noise read as signal. What the table supports is the cheaper claim that motivated the section: the
+complement rule performs *comparably to purpose-built detectors while requiring no second model*. No separation in the
+table exceeds its own error bar, the one-class SVM's +0.111 included. More than parity needs a testbed larger than 214
+samples, and is a goal for completion.
 
-**That larger testbed now exists, and the parity claim does not survive it.** RT-IOT2022's leave-one-class-out protocol (12 classes, θ = 0.99, Hamacher conorm) is now measured at **ten seeds**, this document's own floor: an earlier pass reported five, a session-length compromise it named rather than absorbed, and the full protocol has since been re-taken in 94 minutes. Two corrections arrived with it. The loader had been passing the shipped CSV's unnamed index column as an 82nd feature, and that column is not a row number — the file concatenates the twelve per-class captures and the counter restarts at zero for each, so it encodes the label; it is now dropped, leaving the {{dataset.rt_iot2022.features}} real features. The library's 1-D mixture initialization also returned to k-means++ from a single random start. The re-run is *less* favourable to the construction than the interim ten-seed figures suggested, which is the direction worth stating plainly: the deficit to Isolation Forest widens rather than narrows, and an interim reading in which the complement rule overtook the one-class SVM does not survive either correction. The θ-sweep of Table 4.6 has now also been run on RT-IOT2022 (Table 4.7c), and it settles the question that sweep was owed to answer: tuning θ does *not* rescue the construction — the best operating point improves $J$ by 0.030 over the shipped default and still trails Isolation Forest by 0.139.
+**That larger testbed exists, and the parity claim does not survive it.** RT-IOT2022's leave-one-class-out protocol (12
+classes, θ = 0.99, Hamacher conorm) is measured at **ten seeds**, this document's own floor, in 94 minutes. Two
+corrections apply to the loader: the shipped CSV's unnamed index column is not a row number — the file concatenates the
+twelve per-class captures and the counter restarts at zero for each, so it encodes the label — and is dropped, leaving
+the {{dataset.rt_iot2022.features}} real features; the library's 1-D mixture initialization uses k-means++ rather than a
+single random start. Under this protocol the deficit to Isolation Forest is real: the complement rule does not overtake
+the one-class SVM. The θ-sweep of Table 4.6 also runs on RT-IOT2022 (Table 4.7c), and it settles the question that sweep
+exists to answer: tuning θ does *not* rescue the construction — the best operating point improves $J$ by 0.030 over the
+shipped default and still trails Isolation Forest by 0.139.
 
-**Table 4.7b — Against detectors built for the job, at scale** *(RT-IOT2022, {{dataset.rt_iot2022.shape_full}}, leave-one-class-out, ten seeds, θ = 0.99; `table_4_4_openset.csv`, 2026-08-27).*
+**Table 4.7b — Against detectors built for the job, at scale** *(RT-IOT2022, {{dataset.rt_iot2022.shape_full}},
+leave-one-class-out, ten seeds, θ = 0.99; `table_4_4_openset.csv`, 2026-08-27).*
 
-| Method | Detection rate | False-alarm rate | Detection − false alarm | Separate model? |
-|---|---:|---:|---:|:--:|
-| **Complement rule (this work)** | 0.804 ± 0.270 | 0.438 ± 0.085 | +0.366 | no |
-| One-class SVM | 0.845 ± 0.225 | 0.435 ± 0.061 | +0.410 | yes |
-| Isolation Forest | 0.966 ± 0.145 | 0.431 ± 0.063 | **+0.535** | yes |
+| Method                          | Detection rate | False-alarm rate | Detection − false alarm | Separate model? |
+|---------------------------------|---------------:|-----------------:|------------------------:|:---------------:|
+| **Complement rule (this work)** |  0.804 ± 0.270 |    0.438 ± 0.085 |                  +0.366 |       no        |
+| One-class SVM                   |  0.845 ± 0.225 |    0.435 ± 0.061 |                  +0.410 |       yes       |
+| Isolation Forest                |  0.966 ± 0.145 |    0.431 ± 0.063 |              **+0.535** |       yes       |
 
-At scale, isolation forest does not merely nominally lead — it beats the complement rule by 0.169 in Youden's $J$, a gap approaching two-thirds of the complement rule's own seed-to-seed spread and larger than any gap Table 4.7 could distinguish from noise on Glass. One-class SVM edges the complement rule too. **The parity claim from Table 4.7 was earned on {{dataset.glass.rows}} samples and does not transfer to {{dataset.rt_iot2022.rows}}.** Two things temper this without reversing it. First, the false-alarm rate sits between 43% and 44% for every arm at the shipped $\theta = 0.99$ — a loose operating point — and Table 4.6's sweep, which found a materially better setting on Glass, has now been run here too (Table 4.7c): a different $\theta$ *narrows* the gap but does not close it. Second, the detection-rate spread (±0.270) is large enough that individual classes plausibly vary a great deal, information this table's per-class average discards. Neither caveat licenses treating +0.366 as competitive with +0.535. The honest reading is that the free, no-second-model property survives at scale and the accuracy parity does not, at this operating point, on this dataset — and the θ-sweep, now run, shows the gap is **fundamental rather than an artefact of the operating point**: over the whole usable range $J$ peaks at +0.396 ($\theta = 0.80$), still 0.139 below Isolation Forest. One-class SVM's training was capped at a 20,000-row subsample per fold — libsvm's fit time is superlinear enough that the full ~86,000-row fold made the ten-seed × twelve-class grid intractable — while the complement rule and isolation forest see the full training set; this advantages the complement rule's *speed* comparison, not its accuracy one, since the SVM cell above is if anything a slight underestimate of what a fully-trained SVM would score.
+At scale, isolation forest does not merely nominally lead — it beats the complement rule by 0.169 in Youden's $J$, a gap
+approaching two-thirds of the complement rule's own seed-to-seed spread and larger than any gap Table 4.7 could
+distinguish from noise on Glass. One-class SVM edges the complement rule too. **The parity claim from Table 4.7 was
+earned on {{dataset.glass.rows}} samples and does not transfer to {{dataset.rt_iot2022.rows}}.** Two things temper this
+without reversing it. First, the false-alarm rate sits between 43% and 44% for every arm at the
+shipped $\theta = 0.99$ — a loose operating point — and Table 4.6's sweep, which found a materially better setting on
+Glass, has now been run here too (Table 4.7c): a different $\theta$ *narrows* the gap but does not close it. Second, the
+detection-rate spread (±0.270) is large enough that individual classes plausibly vary a great deal, information this
+table's per-class average discards. Neither caveat licenses treating +0.366 as competitive with +0.535. The reading:
+the free, no-second-model property survives at scale and the accuracy parity does not, at this operating
+point, on this dataset — and the θ-sweep, now run, shows the gap is **fundamental rather than an artefact of the
+operating point**: over the whole usable range $J$ peaks at +0.396 ($\theta = 0.80$), still 0.139 below Isolation
+Forest. One-class SVM's training was capped at a 20,000-row subsample per fold — libsvm's fit time is superlinear enough
+that the full ~86,000-row fold made the ten-seed × twelve-class grid intractable — while the complement rule and
+isolation forest see the full training set; this advantages the complement rule's *speed* comparison, not its accuracy
+one, since the SVM cell above is if anything a slight underestimate of what a fully-trained SVM would score.
 
-**Table 4.7c — The complement rule's operating curve on RT-IOT2022** *(leave-one-class-out, 12 classes, ten seeds, Hamacher conorm; the boost $\theta$ swept from 0.5 to 1.1; `rtiot-deleaked-2026-08-27/table_4_4b_theta_sweep.csv`, same run as Table 4.7b so the $\theta = 0.99$ row matches its complement-rule cell exactly).*
+**Table 4.7c — The complement rule's operating curve on RT-IOT2022** *(leave-one-class-out, 12 classes, ten seeds,
+Hamacher conorm; the boost $\theta$ swept from 0.5 to 1.1; `rtiot-deleaked-2026-08-27/table_4_4b_theta_sweep.csv`, same
+run as Table 4.7b so the $\theta = 0.99$ row matches its complement-rule cell exactly).*
 
-| θ | Detection rate | False-alarm rate | Detection − false alarm |
-|---:|---:|---:|---:|
-| 0.50 | 0.975 | 0.713 | +0.263 |
-| 0.60 | 0.958 | 0.626 | +0.332 |
-| 0.70 | 0.934 | 0.592 | +0.342 |
-| **0.80** | 0.914 | 0.518 | **+0.396** |
-| 0.90 | 0.842 | 0.485 | +0.358 |
-| 0.99 | 0.804 | 0.438 | +0.366 |
-| 1.10 | 0.000 | 0.000 | +0.000 |
+|        θ | Detection rate | False-alarm rate | Detection − false alarm |
+|---------:|---------------:|-----------------:|------------------------:|
+|     0.50 |          0.975 |            0.713 |                  +0.263 |
+|     0.60 |          0.958 |            0.626 |                  +0.332 |
+|     0.70 |          0.934 |            0.592 |                  +0.342 |
+| **0.80** |          0.914 |            0.518 |              **+0.396** |
+|     0.90 |          0.842 |            0.485 |                  +0.358 |
+|     0.99 |          0.804 |            0.438 |                  +0.366 |
+|     1.10 |          0.000 |            0.000 |                  +0.000 |
 
-This is the row §4.3.5 and the Table 4.7b discussion above were both waiting on, and it closes the argument rather than reopening it. Youden's $J$ rises to a shallow peak of **+0.396 at $\theta = 0.80$** — a real but small improvement of 0.030 over the shipped $\theta = 0.99$ — then falls, saturating to zero past $\theta = 1.1$ where the boost admits no points. The best operating point the sweep can find is still **0.139 below Isolation Forest's +0.535**, which leads the complement rule at *every* $\theta$ in the table. So the gap Table 4.7b reports is not an accident of a poorly-chosen threshold that tuning would remove; it survives the entire usable range of the one knob available. Notably the peak sits at $\theta = 0.80$, exactly where the Glass sweep of Table 4.6 put its own — the operating point transfers across datasets even though the verdict does not. The earlier, leak-contaminated ten-seed sweep found the same peak location and the same non-closure (peak +0.391, gap 0.143), so the correction moved the digits by thousandths and left the conclusion intact.
+This is the row §4.3.5 and the Table 4.7b discussion above were both waiting on, and it closes the argument rather than
+reopening it. Youden's $J$ rises to a shallow peak of **+0.396 at $\theta = 0.80$** — a real but small improvement of
+0.030 over the shipped $\theta = 0.99$ — then falls, saturating to zero past $\theta = 1.1$ where the boost admits no
+points. The best operating point the sweep can find is still **0.139 below Isolation Forest's +0.535**, which leads the
+complement rule at *every* $\theta$ in the table. So the gap Table 4.7b reports is not an accident of a poorly-chosen
+threshold that tuning would remove; it survives the entire usable range of the one knob available. Notably the peak sits
+at $\theta = 0.80$, exactly where the Glass sweep of Table 4.6 put its own — the operating point transfers across
+datasets even though the verdict does not. The earlier, leak-contaminated ten-seed sweep found the same peak location
+and the same non-closure (peak +0.391, gap 0.143), so the correction moved the digits by thousandths and left the
+conclusion intact.
+
+**Table 4.11 — BETH, in the one-class configuration the rule was designed for** *(763,144 benign training rows / 188,967
+benign validation / 188,967 test of which 158,432 anomalous; 8 features; threshold calibrated on the benign validation
+split at a 1% false-alarm budget; ten seeds on the stochastic arms; `table_4_11_beth_anomaly.csv`).*
+
+| Method                                                  | Detection rate | False-alarm rate | Detection − false alarm |       ROC-AUC |
+|---------------------------------------------------------|---------------:|-----------------:|------------------------:|--------------:|
+| **Complement rule, surprisal score (this work)**        |          0.993 |            0.150 |              **+0.843** |         0.990 |
+| Complement rule, complement score (the shipped default) |          0.993 |            0.150 |                  +0.843 |         0.928 |
+| One-class SVM                                           |          0.993 |    0.152 ± 0.012 |                  +0.841 |     **0.996** |
+| Isolation Forest *(contamination-matched — see below)*  |  0.001 ± 0.003 |    0.021 ± 0.005 |                  −0.020 | 0.898 ± 0.005 |
+
+**BETH admits no supervised arm at all, and that is a property of the dataset.** Counting `evil` per shipped split:
+train 763,144 rows with **0** positives, validation 188,967 with **0**, test 188,967 with **158,432**. Every positive
+BETH ships is in the test split. A Random Forest fitted on the training split therefore sees one class, raises nothing,
+and predicts the constant 0 — 16.2% accuracy and AUC 0.5 on test. So the table carries no RF or ANFIS row, not because
+they were skipped but because they cannot be trained; the emitted table marks them `N/A` with that reason rather than
+omitting them, since an absent row reads as *not tried*. The Random-Forest family's answer to a one-class problem is
+Isolation Forest, which is in the table.
+
+**Two of the ten numeric columns `load_beth()` returns are not features, and one of them is a label.** `sus` is BETH's
+*second* annotation — a heuristic suspicion flag — and it is 1 for **158,432 of 158,432** anomalous rows. Alone it
+detects at 1.000 with a 0.427 false-alarm rate, so any arm given it is scoring the annotator rather than the telemetry.
+`timestamp` is a per-capture session clock whose ranges separate the three split files rather than benign from malicious
+behaviour. Both are dropped before any fit, matching `FuzzySystemsExperiments/beth-anomaly.py`, leaving eight features.
+The drop lives in the generator rather than in `load_beth()` so that `table_4_4_openset.py`, which shares the loader,
+keeps producing the numbers already archived from it.
+
+**On the configuration §4.3.5 was written for, the complement rule reaches parity with the one-class SVM.** $J$ of
++0.843 against +0.841, at 0.993 detection for both. That is the *opposite* of Table 4.7b's verdict, and the two are not
+in conflict: 4.7b is leave-one-class-out on RT-IOT2022, a multi-class surrogate for open-set behaviour, while this is
+the genuine one-class regime on {{dataset.beth.rows_approx}} rows. The summary across both is that the
+construction is competitive where it was designed to be used and behind purpose-built detectors on the surrogate
+protocol — which is a better result for the chapter than either table alone, and still not a win: the SVM leads on
+threshold-free ranking (AUC 0.996 against 0.990), and Table 4.11 (d) shows Isolation Forest overtaking both once its own
+default is corrected.
+
+**The Isolation Forest row understates it, and the reason is instructive.** Its $J$ is *negative* while its AUC is
+0.898 — its ranking is fine and its threshold lands wrong, because `contamination` places the cut on the *training*
+score distribution and BETH's benign test rows sit elsewhere. That row keeps Table 4.7's contamination-matching
+convention so the two tables stay comparable. The companion tables replace it with one uniform procedure — threshold at
+the $(1-\text{budget})$ quantile of each arm's own benign- *validation* scores — under which Isolation Forest is a
+strong arm rather than a broken one, reaching $J$ **+0.864** there and **+0.879** in Table 4.11 (d) once its
+`max_samples` default is corrected too — its best measured showing, and second only to the complement rule's own
+**+0.914** at six features (Table 4.11 (c)), which is the highest $J$ anywhere in this family.
+
+**The shipped anomaly score costs 0.062 AUC to floating point, at eight features.** The two complement-rule rows are the
+same fitted model at the same operating point, differing only in how per-feature memberships are aggregated:
+`complement` ($1 - \max$ firing, the library default and this chapter's formulation) against `surprisal`
+($\sum_j -\log \mu_j$). Under the product t-norm these are monotone transforms of one
+another — $s_u = -\log (1 - s_c)$ — so *in exact arithmetic their ROC-AUC is identical*. Measured, they are 0.928 and
+0.990. The reason is arithmetic, not statistical: $1 - \prod_j \mu_j$ rounds to exactly $1.0$
+once $\prod_j \mu_j < 2^{-53}$, which for Gaussian memberships is $\sum_j z_j^2 > 106 \ln 2 \approx 73.5$ — a single
+feature $8.6\sigma$ out, or eight features each a little over $3\sigma$ — while the log-domain sum never rounds
+(Appendix A.10.10 (e)). The diagnostic is score resolution against the ceiling the data sets: BETH's test split holds
+4,002 distinct feature vectors, so 4,002 is the most distinct scores anything can produce, and `surprisal` recovers
+3,997 of them against `complement`'s 1,508. `tribblefis.one_class`'s own docstring puts the onset of this "past roughly
+60 features"; BETH reaches it at **eight**, because the log-scaled process and thread identifiers are heavy-tailed
+enough that a typical point's summed $z^2$ already exceeds float64's resolution against 1.0. So the saturation threshold
+is a property of the tails, not of the feature count — and at a 0.1% false-alarm budget the complement score collapses
+to **0.000** detection while `surprisal` holds 0.993, which is the strict-operating-point failure that AUC alone hides.
+**Report the surprisal score on any problem with heavy-tailed inputs; the default is not safe there.**
+
+**A false-alarm budget set on BETH's validation split cannot be believed on its test split.** The threshold costing
+0.0100 false alarms on validation costs **0.1500** on test — 15× more (`table_4_11_beth_fa_sweep.csv`). Both splits are
+benign-only draws from the same capture, so this is a property of BETH's benign test rows rather than of any detector,
+and every arm is calibrated identically so they remain comparable to each other. It does mean the 1% figure in the table
+caption describes the calibration, not the delivered false-alarm rate. The same sweep shows the *tightest* budget is the
+best operating point — $J$ +0.870 at 0.1% against +0.843 at 1% and +0.755 at 10%, with detection flat at 0.993
+throughout, so all of the movement is in false alarms.
+
+**Three companion sweeps, and what each retracts or establishes.** Table 4.11 (b) is the false-alarm operating curve
+above. Table 4.11 (c) sweeps feature count 2→8 and finds that **AUC and the operating point disagree about feature
+reduction**: AUC says keep all eight (0.9905), $J$ at a 1% budget says keep **six** (+0.914 against +0.843), because
+adding `userId` at seven features lifts detection 0.933→0.993 while pushing false alarms 0.019→0.137. It also finds the
+one-class SVM *inverts* under reduction — AUC **0.069** at three features, worse than chance rather than merely weak —
+so feature reduction has to be re-validated per estimator rather than adopted once. Table 4.11 (d) exists because (c)'s
+training-time column was not a comparison: the fuzzy arm was fitted on all 763,144 rows, the SVM on a 20,000-row cap,
+and Isolation Forest on 763,144 nominally but with `max_samples=256`, so each tree saw 256. Refitting every arm on the
+*same* subsample retracts two claims — the fuzzy arm is **not** the slowest to train (0.081 s at n=1,000 against both
+forests' ~0.15 s) and its inference advantage over the SVM exists only at the SVM's cap, since SVM scoring grows 11×
+with support-vector count while the fuzzy arms are flat in $n$ — and it establishes two more: **the fuzzy detector
+reaches its full AUC on 1,000 rows** (0.9903 against 0.9905 on all 763,144, so the full-split fit buys nothing
+measurable), and `max_samples=256` had been costing Isolation Forest 0.08 AUC. Table 4.11 (e) is the $\theta$ validation
+discussed in §4.3. All five are recorded in `reproduce/PROVENANCE_MAP.md` notes 22–24.
+
+**What BETH does not settle.** Feature selection here is unsupervised — highest-variance columns — because a
+single-class training split offers no separation to rank on, so none of these curves is an upper bound on what a
+supervised selector could reach; that comparison is not available on this dataset. The test split's 188,967 rows carry
+only 4,002 distinct feature vectors, so any within-test supervised reference is a lookup table rather than a
+generalisation estimate, and the harness prints one to stdout while deliberately keeping it out of the table. And a
+detector at 0.993 detection with a 15% false-alarm rate on 30,535 benign test rows is roughly 4,600 false alarms;
+whether that is deployable is an operations question this chapter does not answer.
+
+**Table 4.12 — PhiUSIIL, the purpose-built one-class detector at scale.** A second genuine one-class regime, and the one
+the surprisal lesson of Table 4.11 predicts on a wider feature set. `TribbleOneClassDetector` is trained on legitimate
+URLs only — never a phishing sample — and scores phishing by how far it sits from the normal manifold. Every arm uses
+`whiten=True` with one Gaussian per whitened component; the threshold is calibrated on the training normals alone, so no
+phishing label reaches a model or a threshold, and recall @1% FPR is the detection rate at the 1% false-alarm budget
+Table 4.11 also reports. Mean ± std over five seeds, each reshuffling the 70/30 legitimate split (94,395 train normals;
+test = 40,455 held-out legitimate + all 100,945 phishing). The feature policy is leak-free by construction (below).
+Produced by `experiments/phishing-oneclass/run.py` against `tribble-fis` at the pinned `ef15d6a`; the one-class code
+path is unchanged since `987ed06`, so the numbers are byte-identical at both commits and at the working-tree `297b64b`
+they were first taken on. *This result lives outside the `reproduce/` harness and is owed a home there — Goal G4.*
+
+| Method                                               |               AUROC |              AP |      Recall @1% FPR |  Recall @5% FPR |
+|------------------------------------------------------|--------------------:|----------------:|--------------------:|----------------:|
+| **Tribble one-class, surprisal score (this work)**   | **0.9992 ± 0.0001** | 0.9997 ± 0.0001 | **0.9977 ± 0.0004** | 0.9986 ± 0.0000 |
+| Tribble one-class, surprisal trimmed (drop 2)        |     0.9848 ± 0.0008 | 0.9940 ± 0.0004 |     0.8492 ± 0.0075 | 0.9238 ± 0.0020 |
+| Tribble one-class, surprisal + Ledoit-Wolf whitening |     0.9390 ± 0.0013 | 0.9756 ± 0.0007 |     0.6094 ± 0.0030 | 0.7772 ± 0.0036 |
+| Mahalanobis (whitened Gaussian)                      |     0.9988 ± 0.0003 | 0.9995 ± 0.0001 |     0.9974 ± 0.0000 | 0.9986 ± 0.0000 |
+| One-class SVM (RBF)                                  |     0.9718 ± 0.0012 | 0.9872 ± 0.0003 |     0.6463 ± 0.0079 | 0.8527 ± 0.0039 |
+| Isolation Forest                                     |     0.9370 ± 0.0040 | 0.9727 ± 0.0018 |     0.5023 ± 0.0180 | 0.7026 ± 0.0121 |
+
+**The purpose-built detector clears PhiUSIIL almost perfectly, and the number is the dataset's, not the method's.**
+Tribble surprisal catches 99.8% of phishing at a 1% false-alarm rate having never seen a phishing URL, edging whitened
+Mahalanobis — which it *must*, since under `whiten=True` with one Gaussian per component the summed
+surprisal $\sum_j -\log \mu_j$ is a diagonalised Mahalanobis distance; the two agreeing to the fourth decimal is a
+consistency check on the fuzzy estimator, not a second win. The classification rows already found PhiUSIIL saturated —
+CART and a random forest both score a perfect 1.000 — and it is saturated in the one-class regime too: dropping the six
+near-oracle content features that mark empty phishing crawls leaves Tribble surprisal unchanged at 0.9994, because the
+legitimate class is a tight, low-entropy manifold and whitening turns *every* near-degenerate direction into a tripwire,
+not only the exactly-constant ones the feature policy already removed. The 0.999 is a property of this corpus — its
+legitimate URLs are always HTTPS, never carry a query string, and sit at URL-similarity exactly 100 — and it will not
+survive contact with live traffic. What transfers is the ranking, where the covariance-aware arms lead Isolation Forest
+by six points of AUROC and half of recall at the 1% budget, and the two library findings below.
+
+**Leak-free by construction, which is the whole point of quoting it.** The single most separating feature,
+`URLSimilarityIndex`, is a URL's similarity to a whitelist of known-legitimate URLs — a label in disguise, and it alone
+separates the classes at AUC 0.996; it is removed, as are the two other legitimacy-derived probabilities. So are the
+nine features that are *exactly constant across the legitimate class*, detected from the data rather than hand-listed:
+one such feature otherwise sends any phishing row that differs on it to infinite Gaussian distance and carries the whole
+score by itself, the same failure the BETH `sus`/`timestamp` drop guards against. Two findings survive the corpus being
+easy. First, the surprisal lesson of Table 4.11 recurs here on 39 features rather than eight: the trimmed surprisal
+loses ~15 points of recall @1% FPR, so the largest per-feature surprisals *are* the signal, and the shipped `1 − max`
+complement — which saturates well before this width — is not the score to run. Second, Ledoit-Wolf whitening *loses* to
+plain PCA whitening here (0.939 against 0.999), the opposite of the small gain `tribblefis.one_class`'s docstring
+reports: with 94,395 training rows against 39 features the sample covariance is well-conditioned, so shrinkage damps
+exactly the low-variance-in-legit directions the phishing signal lives in. A clean counter-example to the estimator's
+default, worth carrying upstream.
 
 
-**Table 4.11 — BETH, in the one-class configuration the rule was designed for** *(763,144 benign training rows / 188,967 benign validation / 188,967 test of which 158,432 anomalous; 8 features; threshold calibrated on the benign validation split at a 1% false-alarm budget; ten seeds on the stochastic arms; `table_4_11_beth_anomaly.csv`).*
-
-| Method | Detection rate | False-alarm rate | Detection − false alarm | ROC-AUC |
-|---|---:|---:|---:|---:|
-| **Complement rule, surprisal score (this work)** | 0.993 | 0.150 | **+0.843** | 0.990 |
-| Complement rule, complement score (the shipped default) | 0.993 | 0.150 | +0.843 | 0.928 |
-| One-class SVM | 0.993 | 0.152 ± 0.012 | +0.841 | **0.996** |
-| Isolation Forest *(contamination-matched — see below)* | 0.001 ± 0.003 | 0.021 ± 0.005 | −0.020 | 0.898 ± 0.005 |
-
-**BETH admits no supervised arm at all, and that is a property of the dataset.** Counting `evil` per shipped split: train 763,144 rows with **0** positives, validation 188,967 with **0**, test 188,967 with **158,432**. Every positive BETH ships is in the test split. A Random Forest fitted on the training split therefore sees one class, raises nothing, and predicts the constant 0 — 16.2% accuracy and AUC 0.5 on test. So the table carries no RF or ANFIS row, not because they were skipped but because they cannot be trained; the emitted table marks them `N/A` with that reason rather than omitting them, since an absent row reads as *not tried*. The Random-Forest family's answer to a one-class problem is Isolation Forest, which is in the table.
-
-**Two of the ten numeric columns `load_beth()` returns are not features, and one of them is a label.** `sus` is BETH's *second* annotation — a heuristic suspicion flag — and it is 1 for **158,432 of 158,432** anomalous rows. Alone it detects at 1.000 with a 0.427 false-alarm rate, so any arm given it is scoring the annotator rather than the telemetry. `timestamp` is a per-capture session clock whose ranges separate the three split files rather than benign from malicious behaviour. Both are dropped before any fit, matching `FuzzySystemsExperiments/beth-anomaly.py`, leaving eight features. The drop lives in the generator rather than in `load_beth()` so that `table_4_4_openset.py`, which shares the loader, keeps producing the numbers already archived from it.
-
-**On the configuration §4.3.5 was written for, the complement rule reaches parity with the one-class SVM.** $J$ of +0.843 against +0.841, at 0.993 detection for both. That is the *opposite* of Table 4.7b's verdict, and the two are not in conflict: 4.7b is leave-one-class-out on RT-IOT2022, a multi-class surrogate for open-set behaviour, while this is the genuine one-class regime on {{dataset.beth.rows_approx}} rows. The honest summary across both is that the construction is competitive where it was designed to be used and behind purpose-built detectors on the surrogate protocol — which is a better result for the chapter than either table alone, and still not a win: the SVM leads on threshold-free ranking (AUC 0.996 against 0.990), and Table 4.11(d) shows Isolation Forest overtaking both once its own default is corrected.
-
-**The Isolation Forest row understates it, and the reason is instructive.** Its $J$ is *negative* while its AUC is 0.898 — its ranking is fine and its threshold lands wrong, because `contamination` places the cut on the *training* score distribution and BETH's benign test rows sit elsewhere. That row keeps Table 4.7's contamination-matching convention so the two tables stay comparable. The companion tables replace it with one uniform procedure — threshold at the $(1-\text{budget})$ quantile of each arm's own benign-*validation* scores — under which Isolation Forest is a strong arm rather than a broken one, reaching $J$ **+0.864** there and **+0.879** in Table 4.11(d) once its `max_samples` default is corrected too — its best measured showing, and second only to the complement rule's own **+0.914** at six features (Table 4.11(c)), which is the highest $J$ anywhere in this family. Quoting only the row above would libel it.
-
-**The shipped anomaly score costs 0.062 AUC to floating point, at eight features.** The two complement-rule rows are the same fitted model at the same operating point, differing only in how per-feature memberships are aggregated: `complement` ($1 - \max$ firing, the library default and this chapter's formulation) against `surprisal` ($\sum_j -\log \mu_j$). Under the product t-norm these are monotone transforms of one another — $s_u = -\log(1 - s_c)$ — so *in exact arithmetic their ROC-AUC is identical*. Measured, they are 0.928 and 0.990. The reason is arithmetic, not statistical: $1 - \prod_j \mu_j$ rounds to exactly $1.0$ once $\prod_j \mu_j < 2^{-53}$, which for Gaussian memberships is $\sum_j z_j^2 > 106 \ln 2 \approx 73.5$ — a single feature $8.6\sigma$ out, or eight features each a little over $3\sigma$ — while the log-domain sum never rounds (Appendix A.10.10(e)). The diagnostic is score resolution against the ceiling the data sets: BETH's test split holds 4,002 distinct feature vectors, so 4,002 is the most distinct scores anything can produce, and `surprisal` recovers 3,997 of them against `complement`'s 1,508. `tribblefis.one_class`'s own docstring puts the onset of this "past roughly 60 features"; BETH reaches it at **eight**, because the log-scaled process and thread identifiers are heavy-tailed enough that a typical point's summed $z^2$ already exceeds float64's resolution against 1.0. So the saturation threshold is a property of the tails, not of the feature count — and at a 0.1% false-alarm budget the complement score collapses to **0.000** detection while `surprisal` holds 0.993, which is the strict-operating-point failure that AUC alone hides. **Report the surprisal score on any problem with heavy-tailed inputs; the default is not safe there.**
-
-**A false-alarm budget set on BETH's validation split cannot be believed on its test split.** The threshold costing 0.0100 false alarms on validation costs **0.1500** on test — 15× more (`table_4_11_beth_fa_sweep.csv`). Both splits are benign-only draws from the same capture, so this is a property of BETH's benign test rows rather than of any detector, and every arm is calibrated identically so they remain comparable to each other. It does mean the 1% figure in the table caption describes the calibration, not the delivered false-alarm rate. The same sweep shows the *tightest* budget is the best operating point — $J$ +0.870 at 0.1% against +0.843 at 1% and +0.755 at 10%, with detection flat at 0.993 throughout, so all of the movement is in false alarms.
-
-**Three companion sweeps, and what each retracts or establishes.** Table 4.11(b) is the false-alarm operating curve above. Table 4.11(c) sweeps feature count 2→8 and finds that **AUC and the operating point disagree about feature reduction**: AUC says keep all eight (0.9905), $J$ at a 1% budget says keep **six** (+0.914 against +0.843), because adding `userId` at seven features lifts detection 0.933→0.993 while pushing false alarms 0.019→0.137. It also finds the one-class SVM *inverts* under reduction — AUC **0.069** at three features, worse than chance rather than merely weak — so feature reduction has to be re-validated per estimator rather than adopted once. Table 4.11(d) exists because (c)'s training-time column was not a comparison: the fuzzy arm was fitted on all 763,144 rows, the SVM on a 20,000-row cap, and Isolation Forest on 763,144 nominally but with `max_samples=256`, so each tree saw 256. Refitting every arm on the *same* subsample retracts two claims — the fuzzy arm is **not** the slowest to train (0.081 s at n=1,000 against both forests' ~0.15 s) and its inference advantage over the SVM exists only at the SVM's cap, since SVM scoring grows 11× with support-vector count while the fuzzy arms are flat in $n$ — and it establishes two more: **the fuzzy detector reaches its full AUC on 1,000 rows** (0.9903 against 0.9905 on all 763,144, so the full-split fit buys nothing measurable), and `max_samples=256` had been costing Isolation Forest 0.08 AUC. Table 4.11(e) is the $\theta$ validation discussed in §4.3. All five are recorded in `reproduce/PROVENANCE_MAP.md` notes 22–24.
-
-**What BETH does not settle.** Feature selection here is unsupervised — highest-variance columns — because a single-class training split offers no separation to rank on, so none of these curves is an upper bound on what a supervised selector could reach; that comparison is not available on this dataset. The test split's 188,967 rows carry only 4,002 distinct feature vectors, so any within-test supervised reference is a lookup table rather than a generalisation estimate, and the harness prints one to stdout while deliberately keeping it out of the table. And a detector at 0.993 detection with a 15% false-alarm rate on 30,535 benign test rows is roughly 4,600 false alarms; whether that is deployable is an operations question this chapter does not answer.
-
-**Table 4.12 — PhiUSIIL, the purpose-built one-class detector at scale.** A second genuine one-class regime, and the one the surprisal lesson of Table 4.11 predicts on a wider feature set. `TribbleOneClassDetector` is trained on legitimate URLs only — never a phishing sample — and scores phishing by how far it sits from the normal manifold. Every arm uses `whiten=True` with one Gaussian per whitened component; the threshold is calibrated on the training normals alone, so no phishing label reaches a model or a threshold, and recall @1% FPR is the detection rate at the 1% false-alarm budget Table 4.11 also reports. Mean ± std over five seeds, each reshuffling the 70/30 legitimate split (94,395 train normals; test = 40,455 held-out legitimate + all 100,945 phishing). The feature policy is leak-free by construction (below). Produced by `experiments/phishing-oneclass/run.py` against `tribble-fis` at the pinned `ef15d6a`; the one-class code path is unchanged since `987ed06`, so the numbers are byte-identical at both commits and at the working-tree `297b64b` they were first taken on. *This result lives outside the `reproduce/` harness and is owed a home there — Goal G4.*
-
-| Method | AUROC | AP | Recall @1% FPR | Recall @5% FPR |
-|---|---:|---:|---:|---:|
-| **Tribble one-class, surprisal score (this work)** | **0.9992 ± 0.0001** | 0.9997 ± 0.0001 | **0.9977 ± 0.0004** | 0.9986 ± 0.0000 |
-| Tribble one-class, surprisal trimmed (drop 2) | 0.9848 ± 0.0008 | 0.9940 ± 0.0004 | 0.8492 ± 0.0075 | 0.9238 ± 0.0020 |
-| Tribble one-class, surprisal + Ledoit-Wolf whitening | 0.9390 ± 0.0013 | 0.9756 ± 0.0007 | 0.6094 ± 0.0030 | 0.7772 ± 0.0036 |
-| Mahalanobis (whitened Gaussian) | 0.9988 ± 0.0003 | 0.9995 ± 0.0001 | 0.9974 ± 0.0000 | 0.9986 ± 0.0000 |
-| One-class SVM (RBF) | 0.9718 ± 0.0012 | 0.9872 ± 0.0003 | 0.6463 ± 0.0079 | 0.8527 ± 0.0039 |
-| Isolation Forest | 0.9370 ± 0.0040 | 0.9727 ± 0.0018 | 0.5023 ± 0.0180 | 0.7026 ± 0.0121 |
-
-**The purpose-built detector clears PhiUSIIL almost perfectly, and the number is the dataset's, not the method's.** Tribble surprisal catches 99.8% of phishing at a 1% false-alarm rate having never seen a phishing URL, edging whitened Mahalanobis — which it *must*, since under `whiten=True` with one Gaussian per component the summed surprisal $\sum_j -\log \mu_j$ is a diagonalised Mahalanobis distance; the two agreeing to the fourth decimal is a consistency check on the fuzzy estimator, not a second win. The classification rows already found PhiUSIIL saturated — CART and a random forest both score a perfect 1.000 — and it is saturated in the one-class regime too: dropping the six near-oracle content features that mark empty phishing crawls leaves Tribble surprisal unchanged at 0.9994, because the legitimate class is a tight, low-entropy manifold and whitening turns *every* near-degenerate direction into a tripwire, not only the exactly-constant ones the feature policy already removed. The 0.999 is a property of this corpus — its legitimate URLs are always HTTPS, never carry a query string, and sit at URL-similarity exactly 100 — and it will not survive contact with live traffic. What transfers is the ranking, where the covariance-aware arms lead Isolation Forest by six points of AUROC and half of recall at the 1% budget, and the two library findings below.
-
-**Leak-free by construction, which is the whole point of quoting it.** The single most separating feature, `URLSimilarityIndex`, is a URL's similarity to a whitelist of known-legitimate URLs — a label in disguise, and it alone separates the classes at AUC 0.996; it is removed, as are the two other legitimacy-derived probabilities. So are the nine features that are *exactly constant across the legitimate class*, detected from the data rather than hand-listed: one such feature otherwise sends any phishing row that differs on it to infinite Gaussian distance and carries the whole score by itself, the same failure the BETH `sus`/`timestamp` drop guards against. Two findings survive the corpus being easy. First, the surprisal lesson of Table 4.11 recurs here on 39 features rather than eight: the trimmed surprisal loses ~15 points of recall @1% FPR, so the largest per-feature surprisals *are* the signal, and the shipped `1 − max` complement — which saturates well before this width — is not the score to run. Second, Ledoit-Wolf whitening *loses* to plain PCA whitening here (0.939 against 0.999), the opposite of the small gain `tribblefis.one_class`'s docstring reports: with 94,395 training rows against 39 features the sample covariance is well-conditioned, so shrinkage damps exactly the low-variance-in-legit directions the phishing signal lives in. A clean counter-example to the estimator's default, worth carrying upstream.
-
-
-> **Reproduction.** Each table has its own generator under `reproduce/tables/`, emitting Markdown and CSV with mean ± standard deviation across a fixed seed set: Table 4.1 from `table_hyperparam_normalization.py`, Table 4.2 from `table_g5_output_partitioning.py`, Table 4.3 from `table_g5b_skew_sweep.py`, Tables 4.4 and 4.5 from `table_4_1_mog_baselines.py`, Tables 4.6, 4.7 and 4.7b from `table_4_4_openset.py` — the same generator, `load_openset_data()` preferring RT-IOT2022 over BETH over Glass, so Table 4.7b is what that generator produces once RT-IOT2022 is present rather than a separate script. The operating curve is emitted whenever `REPRO_THETA_SWEEP` holds a θ *list*, and `run_all_tables.sh` now defaults it to `0.5,0.6,0.7,0.8,0.9,0.99,1.1`. Note that `=1` is a valid list of *one* and emits a single saturated row of zeros, which reads exactly like a null result. Table 4.7b's run set `REPRO_THETA_SWEEP=""` deliberately, to keep the RT-IOT2022 run inside its time budget, which is why Table 4.6 and Figure 4.6 still show only Glass — the sweep at RT-IOT2022 scale is real future work, not an oversight. No cell here is left a bare *pending*: every unfilled cell names what blocks it, and any checklist item tracking it. The harness prints exactly what it could not run rather than substituting a guess. But the guesses this pass removed from Table 4.4 were *hand-authored into the prose*, so the guarantee held for the harness and not the transcription: that is the failure mode to watch where a table mixes generated and hand-entered cells, and why Tables 4.4 and 4.5 now name each cell's archive. Table 4.11 comes from `table_4_11_beth_anomaly.py`, which also emits the false-alarm operating curve as 4.11(b); the three companion sweeps are `table_4_11c_beth_feature_reduction.py` (feature count), `table_4_11d_beth_sample_scaling.py` (matched training-set size) and `table_4_11e_beth_boost_sweep.py` (the θ validation). BETH's three CSVs are ~300 MB and gitignored, with the download recorded in `data/.gitignore`; the generators skip cleanly and emit nothing when they are absent. Per-cell provenance and reconciliation status are tracked in `reproduce/PROVENANCE_MAP.md`.
+> **Reproduction.** Each table has its own generator under `reproduce/tables/`, emitting Markdown and CSV with mean ±
+> standard deviation across a fixed seed set: Table 4.1 from `table_hyperparam_normalization.py`, Table 4.2 from
+> `table_g5_output_partitioning.py`, Table 4.3 from `table_g5b_skew_sweep.py`, Tables 4.4 and 4.5 from
+> `table_4_1_mog_baselines.py`, Tables 4.6, 4.7 and 4.7b from `table_4_4_openset.py` — the same generator,
+> `load_openset_data()` preferring RT-IOT2022 over BETH over Glass, so Table 4.7b is what that generator produces once
+> RT-IOT2022 is present rather than a separate script. The operating curve is emitted whenever `REPRO_THETA_SWEEP` holds a
+> θ *list*, and `run_all_tables.sh` now defaults it to `0.5,0.6,0.7,0.8,0.9,0.99,1.1`. Note that `=1` is a valid list of
+> *one* and emits a single saturated row of zeros, which reads exactly like a null result. Table 4.7b's run set
+> `REPRO_THETA_SWEEP=""` deliberately, to keep the RT-IOT2022 run inside its time budget, which is why Table 4.6 and
+> Figure 4.6 still show only Glass — the sweep at RT-IOT2022 scale is real future work, not an oversight. No cell here is
+> left a bare *pending*: every unfilled cell names what blocks it, and any checklist item tracking it. The harness prints
+> exactly what it could not run rather than substituting a guess. But the guesses this pass removed from Table 4.4 were
+> *hand-authored into the prose*, so the guarantee held for the harness and not the transcription: that is the failure
+> mode to watch where a table mixes generated and hand-entered cells, and why Tables 4.4 and 4.5 now name each cell's
+> archive. Table 4.11 comes from `table_4_11_beth_anomaly.py`, which also emits the false-alarm operating curve as 4.11
+> (b); the three companion sweeps are `table_4_11c_beth_feature_reduction.py` (feature count),
+> `table_4_11d_beth_sample_scaling.py` (matched training-set size) and `table_4_11e_beth_boost_sweep.py` (the θ
+> validation). BETH's three CSVs are ~300 MB and gitignored, with the download recorded in `data/.gitignore`; the
+> generators skip cleanly and emit nothing when they are absent. Per-cell provenance and reconciliation status are tracked
+> in `reproduce/PROVENANCE_MAP.md`.
 >
-> **TODO — repeatable performance (board-wide standard):** the numbers above are single-machine point estimates. Reproduce under the fixed protocol, with pinned clocks and thermals, multiple seeds and reported error bars, before citation. See Chapter 7, Goal G4.
+> **TODO — repeatable performance (board-wide standard):** the numbers above are single-machine point estimates.
+> Reproduce under the fixed protocol, with pinned clocks and thermals, multiple seeds and reported error bars, before
+> citation. See Chapter 7, Goal G4.
 
-**Table 4.8 — Membership-function deduplication, across six problems.** Ten paired seeds each; `Δ` is the dedup arm's accuracy or R² minus the raw arm's, same seed and split. "Max-lossless ×" is the largest tolerance multiplier reachable by an unbroken run of "the paired delta's 95% CI contains zero," starting from the tightest multiplier tested (0.1×) — the *first* break, not a later point that happens to look safe in a tail that is not monotone. From `reproduce/outputs/mf-dedup-2026-08-05/table_4_8_mf_dedup.csv`; the full per-multiplier sweep (14 multipliers × 6 problems) is in the sibling `_sweep.csv`.
+**Table 4.8 — Membership-function deduplication, across six problems.** Ten paired seeds each; `Δ` is the dedup arm's
+accuracy or R² minus the raw arm's, same seed and split. "Max-lossless ×" is the largest tolerance multiplier reachable
+by an unbroken run of "the paired delta's 95% CI contains zero," starting from the tightest multiplier tested (0.1×) —
+the *first* break, not a later point that happens to look safe in a tail that is not monotone. From
+`reproduce/outputs/mf-dedup-2026-08-05/table_4_8_mf_dedup.csv`; the full per-multiplier sweep (14 multipliers × 6
+problems) is in the sibling `_sweep.csv`.
 
-| Dataset | Task | Raw MF | MF @ 1× (Δ) | Reduction @ 1× | Max-lossless × | MF @ max-lossless (Δ) | Reduction @ max-lossless |
-|---|---|---:|---:|---:|---:|---:|---:|
-| Glass | classification | 81.4 | 71.0 (+0.0015 ± 0.0046 acc) | 12.8% | 5× | 61.3 (+0.0000 ± 0.0069 acc) | 24.7% |
-| Wine | classification | 16.6 | 16.6 (+0.0000 ± 0.0000 acc) | 0.0% | 10× | 14.6 (−0.0037 ± 0.0161 acc) | 12.0% |
-| Breast Cancer | classification | 11.1 | 11.1 (+0.0000 ± 0.0000 acc) | 0.0% | 5× | 11.1 (+0.0000 ± 0.0000 acc) | 0.0% |
-| Digits | classification | 172.2 | 157.5 (+0.0009 ± 0.0028 acc) | 8.5% | 7× | 96.1 (−0.0117 ± 0.0211 acc) | 44.2% |
-| Concrete | regression | 63.2 | 62.6 (+0.0000 ± 0.0000 R²) | 0.9% | 10× | 58.4 (−0.0118 ± 0.0305 R²) | 7.6% |
-| Diabetes | regression | 41.6 | 36.2 (+0.0059 ± 0.0167 R²) | 13.0% | 2× | 31.4 (+0.0011 ± 0.0168 R²) | 24.5% |
+| Dataset       | Task           | Raw MF |                  MF @ 1× (Δ) | Reduction @ 1× | Max-lossless × |       MF @ max-lossless (Δ) | Reduction @ max-lossless |
+|---------------|----------------|-------:|-----------------------------:|---------------:|---------------:|----------------------------:|-------------------------:|
+| Glass         | classification |   81.4 |  71.0 (+0.0015 ± 0.0046 acc) |          12.8% |             5× | 61.3 (+0.0000 ± 0.0069 acc) |                    24.7% |
+| Wine          | classification |   16.6 |  16.6 (+0.0000 ± 0.0000 acc) |           0.0% |            10× | 14.6 (−0.0037 ± 0.0161 acc) |                    12.0% |
+| Breast Cancer | classification |   11.1 |  11.1 (+0.0000 ± 0.0000 acc) |           0.0% |             5× | 11.1 (+0.0000 ± 0.0000 acc) |                     0.0% |
+| Digits        | classification |  172.2 | 157.5 (+0.0009 ± 0.0028 acc) |           8.5% |             7× | 96.1 (−0.0117 ± 0.0211 acc) |                    44.2% |
+| Concrete      | regression     |   63.2 |   62.6 (+0.0000 ± 0.0000 R²) |           0.9% |            10× |  58.4 (−0.0118 ± 0.0305 R²) |                     7.6% |
+| Diabetes      | regression     |   41.6 |   36.2 (+0.0059 ± 0.0167 R²) |          13.0% |             2× |  31.4 (+0.0011 ± 0.0168 R²) |                    24.5% |
 
-Three things the six rows agree on, and one they do not. They agree the shipped tolerance never costs anything measurable: every "Reduction @ 1×" cell pairs with a delta whose 95% CI contains zero. They agree a lossless tolerance strictly past 1× exists for all six, so 1× is a floor nobody needs to treat as a ceiling. And they agree the tails are genuinely non-monotone, not just noisy in one direction — Breast Cancer's and Digits's sweeps both dip back inside the CI band after their first break (at 15×–20× and 50×–70× respectively), which is exactly the shape "first break, not a later lucky point" is written to survive. What they do not agree on is *where* the boundary sits or how much it is worth: 2×–10× and 0.0%–44.2% is not a number this method can report as a single constant, and reporting one would misrepresent every problem except whichever one happened to be measured last.
+Three things the six rows agree on, and one they do not. They agree the shipped tolerance never costs anything
+measurable: every "Reduction @ 1×" cell pairs with a delta whose 95% CI contains zero. They agree a lossless tolerance
+strictly past 1× exists for all six, so 1× is a floor nobody needs to treat as a ceiling. And they agree the tails are
+genuinely non-monotone, not just noisy in one direction — Breast Cancer's and Digits's sweeps both dip back inside the
+CI band after their first break (at 15×–20× and 50×–70× respectively), which is exactly the shape "first break, not a
+later lucky point" is written to survive. What they do not agree on is *where* the boundary sits or how much it is
+worth: 2×–10× and 0.0%–44.2% is not a number this method can report as a single constant, and reporting one would
+misrepresent every problem except whichever one happened to be measured last.
 
-**Figure 4.7 — The deduplication sweep behind Table 4.8, per problem.** Fourteen tolerance multipliers on six problems, from the archive's own `table_4_8_mf_dedup_sweep.csv`: the paired delta (deduplicated minus raw, same seed and split) as a line with the ten-seed spread as a band, the shipped $1\times$ dotted, and the first multiplier at which the table's own *CI excludes zero* column reads yes drawn as the orange rule. Everything left of the rule is the lossless region Table 4.8's *max-lossless* column names, and it sits at a different multiplier on every panel — $3\times$ on Diabetes, $15\times$ on Wine and Concrete — which is the table's point that the boundary is a property of the problem. Where a tail dips back inside the band after the first break the panel shows it; the table's rule of taking the *first* break rather than a later lucky point is written to survive exactly that.
+**Figure 4.7 — The deduplication sweep behind Table 4.8, per problem.** Fourteen tolerance multipliers on six problems,
+from the archive's own `table_4_8_mf_dedup_sweep.csv`: the paired delta (deduplicated minus raw, same seed and split) as
+a line with the ten-seed spread as a band, the shipped $1\times$ dotted, and the first multiplier at which the table's
+own *CI excludes zero* column reads yes drawn as the orange rule. Everything left of the rule is the lossless region
+Table 4.8's *max-lossless* column names, and it sits at a different multiplier on every panel — $3\times$ on
+Diabetes, $15\times$ on Wine and Concrete — which is the table's point that the boundary is a property of the problem.
+Where a tail dips back inside the band after the first break the panel shows it; the table's rule of taking the *first*
+break rather than a later lucky point is written to survive exactly that.
 `![04-mf-dedup-sweep](fig/04-mf-dedup-sweep.png)`
 
-**Table 4.9 — The correction-rule pass, quantified on Glass.** Same protocol as Table 4.8, ten paired seeds; "Paired Δ vs. base" is each arm's accuracy minus the base arm's on the same seed and split. From `reproduce/outputs/mf-dedup-2026-08-05/table_4_9_correction_pass.csv`.
+**Table 4.9 — The correction-rule pass, quantified on Glass.** Same protocol as Table 4.8, ten paired seeds; "Paired Δ
+vs. base" is each arm's accuracy minus the base arm's on the same seed and split. From
+`reproduce/outputs/mf-dedup-2026-08-05/table_4_9_correction_pass.csv`.
 
-| Arm | MF count | Accuracy | Paired Δ vs. base |
-|---|---:|---:|---:|
-| Base (no correction pass) | 81.4 ± 2.3 | 0.5323 ± 0.0408 | — |
-| Gated cascade (base + experts, routed) | 109.0 ± 9.5 raw | 0.5631 ± 0.0568 | +0.0308 ± 0.0266 |
-| Cascade → one flat FIS (union, dedup @ exact tol., argmax) | 83.5 ± 5.4 deduped | 0.5462 ± 0.0511 | +0.0138 ± 0.0609 |
+| Arm                                                        |           MF count |        Accuracy | Paired Δ vs. base |
+|------------------------------------------------------------|-------------------:|----------------:|------------------:|
+| Base (no correction pass)                                  |         81.4 ± 2.3 | 0.5323 ± 0.0408 |                 — |
+| Gated cascade (base + experts, routed)                     |    109.0 ± 9.5 raw | 0.5631 ± 0.0568 |  +0.0308 ± 0.0266 |
+| Cascade → one flat FIS (union, dedup @ exact tol., argmax) | 83.5 ± 5.4 deduped | 0.5462 ± 0.0511 |  +0.0138 ± 0.0609 |
 
-The flattened arm dedups at `rtol = atol = 0` — exact matches only, no numeric tolerance — deliberately, so the table separates two costs that a single "cascade vs. flat" number would conflate: the *mechanism* cost of removing the gates (this table) from the *tolerance* cost of merging near-identical membership functions (Table 4.8). Table 4.8 does not include Glass's cascade arms for the same reason; running them together at a shared tolerance would blend a cost this table isolates.
+The flattened arm dedups at `rtol = atol = 0` — exact matches only, no numeric tolerance — deliberately, so the table
+separates two costs that a single "cascade vs. flat" number would conflate: the *mechanism* cost of removing the gates
+(this table) from the *tolerance* cost of merging near-identical membership functions (Table 4.8). Table 4.8 does not
+include Glass's cascade arms for the same reason; running them together at a shared tolerance would blend a cost this
+table isolates.
 
-> **Reproduction.** Table 4.8 and Table 4.9 are both emitted by `reproduce/tables/table_4_8_mf_dedup.py`, sharing dataset loaders and the tolerance sweep in `reproduce/tables/_mf_dedup.py`. Measured against `tribble-fis` at the commit this repository pins (`6ddb8028`), after catching and resolving a mismatch against a later commit the first pass of this measurement had run against by mistake — the exact failure mode CHECKLIST B4 flags as open elsewhere in this document, caught here by hand; the full account, including the byte-identical re-verification, is in `reproduce/outputs/mf-dedup-2026-08-05/PROVENANCE.txt`. Filed upstream as [`tribble-fis` #85](https://github.com/fundthmcalculus/tribble-fis/issues/85), which asks the library to expose the dedup tolerance as a parameter rather than a hardcoded constant, extend deduplication to the cascade classifier and the regressor, and add a unit test pinning the exact-tolerance behaviour Table 4.9's flattened arm depends on.
+> **Reproduction.** Table 4.8 and Table 4.9 are both emitted by `reproduce/tables/table_4_8_mf_dedup.py`, sharing
+> dataset loaders and the tolerance sweep in `reproduce/tables/_mf_dedup.py`. Measured against `tribble-fis` at the commit
+> this repository pins (`6ddb8028`), after catching and resolving a mismatch against a later commit the first pass of this
+> measurement had run against by mistake — the exact failure mode CHECKLIST B4 flags as open elsewhere in this document,
+> caught here by hand; the full account, including the byte-identical re-verification, is in
+> `reproduce/outputs/mf-dedup-2026-08-05/PROVENANCE.txt`. Filed upstream as [
+`tribble-fis` #85](https://github.com/fundthmcalculus/tribble-fis/issues/85), which asks the library to expose the dedup
+> tolerance as a parameter rather than a hardcoded constant, extend deduplication to the cascade classifier and the
+> regressor, and add a unit test pinning the exact-tolerance behaviour Table 4.9's flattened arm depends on.
 
-**Figure 4.6 — The open-set operating curve.** Table 4.6 plotted: detection and false-alarm rate against the boost $\theta$, with $J$, their difference, as the shaded band between them, and the inherited default $\theta = 0.99$ and the saturation past $\theta = 1.1$ marked. Drawn from the table's own CSV, not a second run of the sweep, so the two cannot disagree; regenerate the table with a θ list (`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1`) and the figure follows. Still on Glass, not RT-IOT2022: Table 4.7b measured one operating point (θ = 0.99) at scale and found the complement rule behind both baselines there, which makes the sweep more urgent, not less, since Glass's sweep found a materially better θ than the shipped default and RT-IOT2022 has not been given the chance to. The BETH version of this curve is no longer future work: both conditions this caption used to name — the data, and a one-class training path — are met, and the curve is emitted as Table 4.11(b) with the θ sweep as 4.11(e). It is not plotted as a second figure because §4.3 shows θ to be a threshold parameterisation on a one-class fit, so the BETH curve carries the same information as the budget sweep already tabulated; the Glass figure stays because there the conorm is doing work the threshold reading cannot account for.
+**Figure 4.6 — The open-set operating curve.** Table 4.6 plotted: detection and false-alarm rate against the
+boost $\theta$, with $J$, their difference, as the shaded band between them, and the inherited default $\theta = 0.99$
+and the saturation past $\theta = 1.1$ marked. Drawn from the table's own CSV, not a second run of the sweep, so the two
+cannot disagree; regenerate the table with a θ list (`REPRO_THETA_SWEEP=0.5,0.6,0.7,0.8,0.9,0.99,1.1`) and the figure
+follows. Still on Glass, not RT-IOT2022: Table 4.7b measured one operating point (θ = 0.99) at scale and found the
+complement rule behind both baselines there, which makes the sweep more urgent, not less, since Glass's sweep found a
+materially better θ than the shipped default and RT-IOT2022 has not been given the chance to. The BETH version of this
+curve is emitted as Table 4.11 (b) with the θ sweep as 4.11 (e). It is not plotted as a second figure because §4.3 shows
+θ to be a threshold parameterisation on a one-class fit, so the BETH curve carries the same information as the budget
+sweep already tabulated; the Glass figure stays because there the conorm is doing work the threshold reading cannot
+account for.
 `![anomaly-sweep](fig/04-anomaly-sweep.png)`
 
-**Figure 4.8 — The correction-rule pass, quantified on Glass.** Table 4.9 plotted: membership-function count and accuracy for the base classifier, the gated correction-rule cascade, and the cascade collapsed into one flat deployable FIS, mean ± s.d. over ten paired seeds. This is a retargeting, not a fill-in. The figure was scoped as a before/after confusion matrix on RT-IOT2022, and that comparison still cannot be drawn — RT-IOT2022 is now a dataset the harness loads (§4.4, Table 4.7b), but the correction-rule cascade specifically has not been run on it, so the gap is the same shape as before with a different cause: an unrun experiment, not a missing file. What closed is the claim the figure was standing in for: §4.3.1's concession that the correction pass's accuracy contribution had not been isolated. Once that was measured, on Glass, continuing to hold the figure for a dataset that was never going to arrive stopped being honesty about a limitation and started being an excuse not to draw the measurement that exists. `reproduce/figures/registry.py` records the retargeting and the reasoning behind it.
+**Figure 4.8 — The correction-rule pass, quantified on Glass.** Table 4.9 plotted: membership-function count and
+accuracy for the base classifier, the gated correction-rule cascade, and the cascade collapsed into one flat deployable
+FIS, mean ± s.d. over ten paired seeds. This is a retargeting, not a fill-in. The figure was scoped as a before/after
+confusion matrix on RT-IOT2022, and that comparison still cannot be drawn — RT-IOT2022 is now a dataset the harness
+loads (§4.4, Table 4.7b), but the correction-rule cascade specifically has not been run on it, so the gap is the same
+shape as before with a different cause: an unrun experiment, not a missing file. The figure's open item — §4.3.1's note that
+the correction pass's accuracy contribution had not been isolated — is closed: it was measured on Glass, and the measurement is
+drawn. `reproduce/figures/registry.py` records the retargeting and the reasoning behind it.
 `![rtiot-confusion](fig/04-rtiot-confusion.png)`
 
 ### 4.4.1 Turbofan Remaining Useful Life: a large-scale regression case study
 
-Everything above measures the construction under the ten-seed reproduction harness. This subsection does not, and says so before it says anything else — but the reason is specific, and it is not the usual one. The other datasets have no canonical split, so the harness manufactures one and re-seeds it ten times; the spread that produces is what those tables report. N-CMAPSS does not work that way. It ships a **fixed train/test split defined by the dataset itself** — particular engine units held out for test (DS02: units 11, 14, 15), the rest for training — the same split the published baselines are scored on, and the only split on which a comparison to them is meaningful. So there is no split seed to vary, and a "ten-seed reproduction" in the sense the other tables mean would be measuring the wrong thing. The result here is one run on the dataset's own held-out engines, carried on its own scripts (`FuzzySystemsExperiments/cmapss_ds02_rul.py`, `cmapss_all_datasets.py`) and committed report (`cmapss_all_datasets_report.md`), not through `reproduce/tables/`. It is *demonstrated* in Appendix A.7's sense, not *measured* — and what a genuine variance study would re-seed is not the split but the **training-set subsample** (the pooled fit draws 30k of ~221k rows at a fixed seed) together with the model's `random_state`. That train-subsample study is the honest reproducibility axis for a fixed-split benchmark, and it is deferred to a future PR (`CHECKLIST` **C14**). I include the case study now because it exercises the answer-first *regression* construction of §4.3.2 on exactly the kind of data the rest of the chapter lacks — a large-scale physical-engineering regression, the partner Concrete has never had (§4.4, A.7.1) — and puts the method against published deep-learning baselines on the split they themselves use.
+Everything above measures the construction under the ten-seed reproduction harness. This subsection does not, and says
+so before it says anything else — but the reason is specific, and it is not the usual one. The other datasets have no
+canonical split, so the harness manufactures one and re-seeds it ten times; the spread that produces is what those
+tables report. N-CMAPSS does not work that way. It ships a **fixed train/test split defined by the dataset itself** —
+particular engine units held out for test (DS02: units 11, 14, 15), the rest for training — the same split the published
+baselines are scored on, and the only split on which a comparison to them is meaningful. So there is no split seed to
+vary, and a "ten-seed reproduction" in the sense the other tables mean would be measuring the wrong thing. The result
+here is one run on the dataset's own held-out engines, carried on its own scripts
+(`FuzzySystemsExperiments/cmapss_ds02_rul.py`, `cmapss_all_datasets.py`) and committed report
+(`cmapss_all_datasets_report.md`), not through `reproduce/tables/`. It is *demonstrated* in Appendix A.7's sense, not
+*measured* — and what a genuine variance study would re-seed is not the split but the **training-set subsample** (the
+pooled fit draws 30k of ~221k rows at a fixed seed) together with the model's `random_state`. That train-subsample study
+is the appropriate reproducibility axis for a fixed-split benchmark, and it is deferred to a future PR (`CHECKLIST` **C14**).
+I include the case study now because it exercises the answer-first *regression* construction of §4.3.2 on exactly the
+kind of data the rest of the chapter lacks — a large-scale physical-engineering regression, the partner Concrete has
+never had (§4.4, A.7.1) — and puts the method against published deep-learning baselines on the split they themselves
+use.
 
-The task is NASA's **N-CMAPSS** turbofan run-to-failure dataset under real flight conditions [@ariaschao2021ncmapss], subset DS02: predict each engine's remaining useful life in flight cycles from its sensor stream. This is the flat-tabular collapse of §4.1 made literal and made large — the raw file is 5.3M training and 1.2M test rows at 1 Hz, which no rule base reads directly, so each `(unit, cycle)` flight is reduced to a row of summary statistics exactly as the chapter's opening describes. The answer-first regression construction then runs unchanged: partition the RUL range into uniform output buckets (§4.3.2's settled default), fit a per-feature Gaussian mixture per bucket, and solve the Takagi–Sugeno–Kang consequents in closed form.
+The task is NASA's **N-CMAPSS** turbofan run-to-failure dataset under real flight conditions [@ariaschao2021ncmapss],
+subset DS02: predict each engine's remaining useful life in flight cycles from its sensor stream. This is the
+flat-tabular collapse of §4.1 made literal and made large — the raw file is 5.3M training and 1.2M test rows at 1 Hz,
+which no rule base reads directly, so each `(unit, cycle)` flight is reduced to a row of summary statistics exactly as
+the chapter's opening describes. The answer-first regression construction then runs unchanged: partition the RUL range
+into uniform output buckets (§4.3.2's settled default), fit a per-feature Gaussian mixture per bucket, and solve the
+Takagi–Sugeno–Kang consequents in closed form.
 
-The headline is that the construction is competitive with the published deep-learning baselines, at seconds-scale training, using a strictly smaller input than they do. On DS02, evaluated per sample over the full test trajectories — the continuous-prognostics protocol the N-CMAPSS literature uses, not the classic single-RUL-per-engine one — the model reaches **RMSE 7.23 in about one second** on the 18 real, physically measurable sensors alone (`W` operating conditions + `X_s` physical sensors), against a re-run published CNN at 7.22 and MLP at 8.34 on their full 20-channel "condition-monitoring" input set, which also includes two channels (`T40`, `P30`) the file groups as virtual but the literature treats as measurable. This pipeline deliberately does not read those two channels (`CHECKLIST` **C18**): re-running the design-of-experiments' original config with them reaches ~6.5, so the fair reading is "competitive on a smaller input," not "beats them outright" — 7.23 is a hair above the CNN's 7.22 and clearly below the MLP's 8.34. Those baseline figures are Custode et al.'s re-runs on the public DS02 file [@custode2022evolutionary], corroborated but not verified here from the paper's own table (`CHECKLIST` **C15**); Arias Chao et al.'s own CNN scores 4.95, but on a pre-release, lower-noise cut of DS02 [@ariaschao2022fusing], not a fair target on the public data. The comparison the chapter can stand behind is against the public-file re-runs, and there the interpretable model is in the same range on less input, not a clean win.
+The headline is that the construction is competitive with the published deep-learning baselines, at seconds-scale
+training, using a strictly smaller input than they do. On DS02, evaluated per sample over the full test trajectories —
+the continuous-prognostics protocol the N-CMAPSS literature uses, not the classic single-RUL-per-engine one — the model
+reaches **RMSE 7.23 in about one second** on the 18 real, physically measurable sensors alone (`W` operating
+conditions + `X_s` physical sensors), against a re-run published CNN at 7.22 and MLP at 8.34 on their full 20-channel
+"condition-monitoring" input set, which also includes two channels (`T40`, `P30`) the file groups as virtual but the
+literature treats as measurable. This pipeline deliberately does not read those two channels (`CHECKLIST` **C18**):
+re-running the design-of-experiments' original config with them reaches ~6.5, so the fair reading is "competitive on a
+smaller input," not "beats them outright" — 7.23 is a hair above the CNN's 7.22 and clearly below the MLP's 8.34. Those
+baseline figures are Custode et al.'s re-runs on the public DS02 file [@custode2022evolutionary], corroborated but not
+verified here from the paper's own table (`CHECKLIST` **C15**); Arias Chao et al.'s own CNN scores 4.95, but on a
+pre-release, lower-noise cut of DS02 [@ariaschao2022fusing], not a fair target on the public data. The comparison the
+chapter can stand behind is against the public-file re-runs, and there the interpretable model is in the same range on
+less input, not a clean win.
 
-As everywhere else in this chapter, the preprocessing is worth more than the model. The single largest accuracy driver was **condition correction**: each sensor is regressed against the operating-condition channels using only each engine's early healthy cycles, and the *residual* — not the raw reading — is fed to the model. Raw per-cycle sensor means are dominated by flight-to-flight operating-condition swings, not the smaller degradation trend; removing that confound up front mattered more than any hyperparameter, the same lesson §4.3's normalization study reaches by a different route.
+As everywhere else in this chapter, the preprocessing is worth more than the model. The single largest accuracy driver
+was **condition correction**: each sensor is regressed against the operating-condition channels using only each engine's
+early healthy cycles, and the *residual* — not the raw reading — is fed to the model. Raw per-cycle sensor means are
+dominated by flight-to-flight operating-condition swings, not the smaller degradation trend; removing that confound up
+front mattered more than any hyperparameter, the same lesson §4.3's normalization study reaches by a different route.
 
-Two findings are worth carrying forward. First, **the virtual channels are not free, and are deliberately not used.** An earlier version of this section claimed dropping the two virtual channels `T40`/`P30` "costs nothing"; that was asserted, not measured, and is wrong — re-running the design-of-experiments' original config with them reaches ~6.5 versus 7.23 without (`CHECKLIST` **C18**). Every row of Table 4.10, DS02 and pooled alike, still uses real sensors only, but as a deliberate simplicity-over-the-last-0.7-RMSE choice, not a free one. Second, **the scoring convention decides the winner.** On the canonical per-engine metric (one prediction per test engine at its last cycle, the standard C-MAPSS protocol) the simplest real-sensor model — whole-cycle aggregation in Table 4.10 — is best of the two pooled models at per-engine RMSE 12.07 and a NASA score of 320; the raw-memory model leads only on the per-sample density metric. Reporting both, rather than the flattering one, is the point.
+Two findings are worth carrying forward. First, **the virtual channels are not free, and are deliberately not used.**
+Re-running the design-of-experiments' original config with the two virtual channels `T40`/`P30` reaches ~6.5 versus 7.23
+without them (`CHECKLIST` **C18**), so dropping them costs about 0.7 RMSE, measured rather than assumed. Every row of
+Table 4.10, DS02 and pooled alike, still uses real sensors only, as a deliberate simplicity-over-the-last-0.7-RMSE
+choice, not a free one. Second, **the scoring convention decides the winner.** On the canonical per-engine metric (one
+prediction per test engine at its last cycle, the standard C-MAPSS protocol) the simplest real-sensor model —
+whole-cycle aggregation in Table 4.10 — is best of the two pooled models at per-engine RMSE 12.07 and a NASA score of
+320; the raw-memory model leads only on the per-sample density metric. Reporting both, rather than the flattering one,
+is the point.
 
-**Table 4.10 — Turbofan RUL, N-CMAPSS DS02 and pooled** *(demonstrated; one run on the dataset's own fixed train/test split, regenerated by `FuzzySystemsExperiments/cmapss_all_datasets.py` into `cmapss_all_datasets_report.md`; train-subsample variance study deferred, `CHECKLIST` C14; these numbers were regenerated 2026-08-23 after `CHECKLIST` **C18** found the previously-committed figures were not reproducible from the scripts that claim to produce them).* Top block: DS02 alone, per-sample over full test trajectories, against the published baselines on their 20-channel input set. Bottom block: all nine usable files pooled into one model (each file contributing its own official train/test units), both scoring conventions; "real only" = the 18 physically measurable channels, virtual `T40`/`P30` excluded by the loader.
+**Table 4.10 — Turbofan RUL, N-CMAPSS DS02 and pooled** *(demonstrated; one run on the dataset's own fixed train/test
+split, regenerated by `FuzzySystemsExperiments/cmapss_all_datasets.py` into `cmapss_all_datasets_report.md`, reproducing
+the numbers below from that script; train-subsample variance study deferred, `CHECKLIST` C14).* Top block: DS02 alone,
+per-sample over full test trajectories, against the published baselines on their 20-channel input set. Bottom block: all
+nine usable files pooled into one model (each file contributing its own official train/test units), both scoring
+conventions; "real only" = the 18 physically measurable channels, virtual `T40`/`P30` excluded by the loader.
 
-| Model | input | per-sample RMSE | per-engine RMSE | note |
-|---|---|---:|---:|---|
-| Published MLP (Custode re-run) | 20 ch | 8.34 | — | public DS02 file |
-| Published CNN (Custode re-run) | 20 ch | 7.22 | — | public DS02 file |
-| **This work — DS02** | 18 real | **7.23** | — | ~1 s fit; real sensors only; ~6.5 with T40/P30 added back (**C18**) |
-| — pooled, all 9 files (18 real sensors) — | | | | |
-| `raw_memory` | 18 real | **15.58** | 17.00 | memory features; best per-sample |
-| `whole_cycle` | 18 real | 15.44 | **12.07** | one summary row per cycle; best per-engine |
+| Model                                     | input   | per-sample RMSE | per-engine RMSE | note                                                                |
+|-------------------------------------------|---------|----------------:|----------------:|---------------------------------------------------------------------|
+| Published MLP (Custode re-run)            | 20 ch   |            8.34 |               — | public DS02 file                                                    |
+| Published CNN (Custode re-run)            | 20 ch   |            7.22 |               — | public DS02 file                                                    |
+| **This work — DS02**                      | 18 real |        **7.23** |               — | ~1 s fit; real sensors only; ~6.5 with T40/P30 added back (**C18**) |
+| — pooled, all 9 files (18 real sensors) — |         |                 |                 |                                                                     |
+| `raw_memory`                              | 18 real |       **15.58** |           17.00 | memory features; best per-sample                                    |
+| `whole_cycle`                             | 18 real |           15.44 |       **12.07** | one summary row per cycle; best per-engine                          |
 
-**Figure 4.9 — Predicted versus true RUL, per engine, DS02.** The `honest` real-sensor model's one-prediction-per-cycle RUL (blue for training engines, orange for the held-out test engines) overlaid on each engine's true run-to-failure descent (grey), every DS02 engine drawn. A single interpretable fuzzy model, fit on real sensors alone, tracking degradation to end-of-life. Generated from the DS02 pipeline (`FuzzySystemsExperiments/cmapss_ds02_rul.py`); one run on the dataset's fixed held-out engines, not a seeded aggregate (the train-subsample variance study is `CHECKLIST` C14).
+**Figure 4.9 — Predicted versus true RUL, per engine, DS02.** The `honest` real-sensor model's one-prediction-per-cycle
+RUL (blue for training engines, orange for the held-out test engines) overlaid on each engine's true run-to-failure
+descent (grey), every DS02 engine drawn. A single interpretable fuzzy model, fit on real sensors alone, tracking
+degradation to end-of-life. Generated from the DS02 pipeline (`FuzzySystemsExperiments/cmapss_ds02_rul.py`); one run on
+the dataset's fixed held-out engines, not a seeded aggregate (the train-subsample variance study is `CHECKLIST` C14).
 `![cmapss-rul](fig/04-cmapss-rul.png)`
 
 ## 4.5 Discussion and Contributions
 
-The method is fast because it replaces a global search over a huge space of possible rules with a handful of local density fits keyed to the known answers, plus a closed-form consequent solve. It stays interpretable because there are only a few rules, written over named features in linguistic terms, and a person can read and edit them. And because each class rule is fit independently, as §4.3.3 noted, the construction is naturally incremental, new data updating one class's densities without disturbing the others, which suits a semi-supervised, keep-learning setting.
+The method is fast because it replaces a global search over a huge space of possible rules with a handful of local
+density fits keyed to the known answers, plus a closed-form consequent solve. It stays interpretable because there are
+only a few rules, written over named features in linguistic terms, and a person can read and edit them. And because each
+class rule is fit independently, as §4.3.3 noted, the construction is naturally incremental, new data updating one
+class's densities without disturbing the others, which suits a semi-supervised, keep-learning setting.
 
-The anomaly rule deserves a closing word, because it is the part of this chapter I expect to matter most outside the dissertation. Taking the complement of the aggregate turns a closed-set classifier into an open-set one for the cost of one operation. At the shipped boost that decision is the maximum-membership threshold §4.3.5 works out, and I would rather say so than let the algebra imply more. What it does not give up is the property that made the model worth building: when it flags something it can say why, in the rules it already had. An unexpected condition is exactly the case where you least want an unexplainable answer.
+The anomaly rule deserves a closing word, because it is the part of this chapter I expect to matter most outside the
+dissertation. Taking the complement of the aggregate turns a closed-set classifier into an open-set one for the cost of
+one operation. At the shipped boost that decision is the maximum-membership threshold §4.3.5 works out, and I would
+rather say so than let the algebra imply more. What it does not give up is the property that made the model worth
+building: when it flags something it can say why, in the rules it already had. An unexpected condition is exactly the
+case where you least want an unexplainable answer.
 
-What is and is not established. The construction is real and the timings are measured, not estimated, and the run of record now supplies the headline row's clock and its accuracy from one file, which is the re-take Table 4.5 used to owe. The speed claim is only fully persuasive against the right baselines, and I have not run the head-to-head against ANFIS and a genetic-algorithm-tuned FIS on identical splits, nor against Gaussian naive Bayes, the cheapest of the three and the one §4.2 concedes the closest kinship to. That table is the first thing I owe this chapter, a goal for completion. These numbers are also subject to the board-wide repeatability standard, with fixed hardware, multiple seeds and error bars. And the accuracy claim's scope is bounded by the naive-Bayes-like factorization: where feature interactions matter a great deal, the flat model will leave accuracy on the table, precisely the gap the hierarchical models of Chapter 6 exist to close. The bridge in the other direction, where the membership functions come from when the data has no coordinates and no Gaussian shape to fit, is Chapter 5.
+What is and is not established. The construction is real and the timings are measured, not estimated, and the run of
+record supplies the headline row's clock and its accuracy from one file. The speed claim is only fully persuasive
+against the right baselines, and I have not run the head-to-head against ANFIS and a genetic-algorithm-tuned FIS on
+identical splits, nor against Gaussian naive Bayes, the cheapest of the three and the one §4.2 names as its nearest
+relative. That table is the first thing I owe this chapter, a goal for completion. These numbers are also subject to
+the board-wide repeatability standard, with fixed hardware, multiple seeds and error bars. And the accuracy claim's
+scope is bounded by the naive-Bayes-like factorization: where feature interactions matter a great deal, the flat model
+will leave accuracy on the table, precisely the gap the hierarchical models of Chapter 6 exist to close. The bridge in
+the other direction, where the membership functions come from when the data has no coordinates and no Gaussian shape to
+fit, is Chapter 5.
 
 ---
 
-*Draft — Chapter 4 prose, opening on the Hitchhiker's Guide / consequent-first motif to match the tribble motif of Ch 1. Citations in bracketed shorthand pending the consolidated `references.bib`. Tables 4.1–4.10 (4.10 a demonstrated, single-run turbofan-RUL case study, §4.4.1) and figures 4.1–4.9 inline. Open items in `../CHECKLIST.md`.*
+*Draft — Chapter 4 prose, opening on the Hitchhiker's Guide / consequent-first motif to match the tribble motif of Ch 1.
+Citations in bracketed shorthand pending the consolidated `references.bib`. Tables 4.1–4.10 (4.10 a demonstrated,
+single-run turbofan-RUL case study, §4.4.1) and figures 4.1–4.9 inline. Open items in `../CHECKLIST.md`.*

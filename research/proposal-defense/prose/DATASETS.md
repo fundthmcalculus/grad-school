@@ -11,29 +11,40 @@
 > uv run --project tribble-fis --with pyyaml python reproduce/dataset_specs.py --verify
 > ```
 
-This appendix documents the location, size, source, and loading strategy for all benchmark datasets cited in the proposal. Datasets are stored in `data/` at the repository root, with structure matching the reproducible harness loaders under `reproduce/tables/_fuzzy_models.py`.
+This appendix documents the location, size, source, and loading strategy for all benchmark datasets cited in the
+proposal. Datasets are stored in `data/` at the repository root, with structure matching the reproducible harness
+loaders under `reproduce/tables/_fuzzy_models.py`.
 
 ## Dataset Inventory
 
 ### Classification
 
 #### PhiUSIIL Phishing URL (Table 4.1, §4.3.2, Ch 6)
+
 - **File:** `data/PhiUSIIL_Phishing_URL_Dataset.csv`
 - **Size:** 235,795 rows × 50 features (binary classification)
-- **Role:** Large-scale classification benchmark; featured in Table 4.1 (MoG baselines), Table 6.1 (model family), norm/conorm comparisons
+- **Role:** Large-scale classification benchmark; featured in Table 4.1 (MoG baselines), Table 6.1 (model family),
+  norm/conorm comparisons
 - **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 967
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_phiusiil()`
-- **Status:** Repaired in this pass; previous loader path was broken (tribble-fis/gaussian_mixture/ deleted upstream); now loads from local CSV
+- **Status:** Loads from the local CSV; the earlier path through `tribble-fis/gaussian_mixture/` no longer resolves
+  upstream
 
 #### RT-IOT2022 (Table 4.4, §4.4, pending)
+
 - **File:** `data/RT_IOT2022.csv`
 - **Size:** 123,117 rows × 81 features, 12 classes
-- **Role:** Open-set detection testbed (planned); intended to replace Glass (214 samples) as the large-scale anomaly/open-set partner
+- **Role:** Open-set detection testbed (planned); intended to replace Glass (214 samples) as the large-scale
+  anomaly/open-set partner
 - **Source:** [UC Irvine Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 952
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_rt_iot2022()` (not yet wired)
-- **Status:** In the repository and wired (2026-08-12), both roles measured. Open-set claim at ten seeds (Table 4.7b, re-measured 2026-08-27 on the de-leaked loader): complement rule loses to Isolation Forest at this scale (+0.366 vs +0.535 Youden's $J$). Plain classification/timing at ten seeds (Table 4.4, `table_4_1_mog_baselines.py`): MoG trains in 4.24 ± 0.68 s at 92.7 ± 0.2% accuracy against Random Forest's 99.8 ± 0.0%.
+- **Status:** In the repository and wired (2026-08-12), both roles measured. Open-set claim at ten seeds (Table 4.7b,
+  re-measured 2026-08-27 on the de-leaked loader): complement rule loses to Isolation Forest at this scale (+0.366 vs
+  +0.535 Youden's $J$). Plain classification/timing at ten seeds (Table 4.4, `table_4_1_mog_baselines.py`): MoG trains
+  in 3.64 ± 0.25 s at 92.7 ± 0.2% accuracy against Random Forest's 99.8 ± 0.0%.
 
 #### Glass (UCI) (Tables 4.6–4.7, Fig 4.6, §4.4)
+
 - **File:** Auto-fetched via sklearn or `ucimlrepo` (id 41)
 - **Size:** 214 rows × 9 features, 6 classes
 - **Role:** Small anomaly-detection baseline; also used as open-set stress test
@@ -42,88 +53,133 @@ This appendix documents the location, size, source, and loading strategy for all
 ### Regression
 
 #### Concrete Compressive Strength (Tables 4.1–4.5, Ch 6, every regression table)
+
 - **File:** `data/Concrete_Data.csv` (auto-built from `AEEM6097/project-data/Concrete_Data.xls` if absent)
 - **Size:** 1,030 rows × 8 features → 1 target
 - **Role:** Small-scale regression benchmark; the *only* measured regression dataset in the proposal
 - **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 165
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_concrete()`
-- **Status:** Measured at ten seeds; Chapter 4 §4.3.2 decision rule runs on Concrete; Chapter 6 model family runs on Concrete
-- **Gap:** Concrete carries the *measured* small-regression story alone. Large partners now exist at the ten-seed floor (California Housing, Superconductivity; see A.7.1), and a large-scale *physics/prognostics* case study (N-CMAPSS turbofan RUL, below) is demonstrated single-run. Chapter 7 A.7.1 tracks what remains.
+- **Status:** Measured at ten seeds; Chapter 4 §4.3.2 decision rule runs on Concrete; Chapter 6 model family runs on
+  Concrete
+- **Gap:** Concrete carries the *measured* small-regression story alone. Large partners now exist at the ten-seed floor
+  (California Housing, Superconductivity; see A.7.1), and a large-scale *physics/prognostics* case study (N-CMAPSS
+  turbofan RUL, below) is demonstrated single-run. Chapter 7 A.7.1 tracks what remains.
 
 #### Bike Sharing Demand (Tables 4.5, 6.1, large regression benchmark)
+
 - **File:** `data/bikeshare-hour.csv`
 - **Size:** 17,379 rows × 12 numeric features → 1 target (hourly bike rental demand)
 - **Role:** Large-scale regression benchmark; scale partner for Concrete (1,030 rows)
 - **Source:** [Kaggle Bike Sharing Demand](https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619)
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_bikeshare()`
-- **Status:** Measured at ten seeds, wired into Table 4.1 alongside Concrete and PhiUSIIL; 17.3× larger than Concrete. **Re-measured 2026-08-27 after a target leak was removed**: `casual` and `registered` sum exactly to the target `cnt`, and both were being passed as features. With them dropped, MoG R² falls 0.962 → **0.620** and the Random Forest reference 1.000 → **0.944**. The earlier numbers measured a model's ability to add two columns it had been handed, so they are superseded rather than merely revised.
+- **Status:** Measured at ten seeds, wired into Table 4.1 alongside Concrete and PhiUSIIL; 17.3× larger than Concrete.
+  `casual` and `registered` sum exactly to the target `cnt`, so the loader excludes both as target leaks: MoG R² is
+  **0.620** and the Random Forest reference **0.944**, leak-free.
 
 #### N-CMAPSS DS02 — Turbofan Remaining Useful Life (Table 4.10, §4.4.1)
+
 - **File:** `data/nasa-cmapps2/N-CMAPSS_DS02-006.h5` (HDF5)
-- **Size:** 5.3M train + 1.2M test rows at 1 Hz → aggregated per `(unit, cycle)`; RUL regression, physics/prognostics domain
-- **Role:** Large-scale physical-engineering regression **case study** — the domain partner Concrete lacks; demonstrates the §4.3.2 answer-first regression construction against published deep-learning baselines on their own benchmark
-- **Source:** Arias Chao, Kulkarni, Goebel, Fink, *Data* 6(1):5, 2021 (DOI 10.3390/data6010005); [Kaggle mirror](https://www.kaggle.com/datasets/bishals098/nasa-cmapss-2-engine-degradation)
-- **Loading:** `FuzzySystemsExperiments/cmapss_ds02_rul.py` (DS02 best case) / `cmapss_all_datasets.py` (all datasets) (not the `reproduce/` harness)
-- **Status:** **DEMONSTRATED, not measured.** One run on the **dataset's own fixed train/test split** (the held-out engine units — the split the published baselines use), not a random seeded split: DS02 per-sample RMSE **7.23** on the 18 real sensors, in line with the public-file CNN (7.22) and beating the MLP (8.34) — both scored on a 20-channel input set (real sensors + T40/P30) this pipeline deliberately does not use; adding T40/P30 back (the DOE's original config) reaches ~6.5, so real-sensors-only is not free, and an earlier claim that it was is corrected (`CHECKLIST` **C18**). The reproducibility axis for a fixed-split benchmark is the **train-set subsample** seed, not the split — a ten-seed *subsample* variance study is `CHECKLIST` **C14** (future PR). **Not redistributable** — the 10 `.h5` files total ~28 GB and are gitignored; only the scripts and the committed report `cmapss_all_datasets_report.md` are tracked. Primary-source verification of the baseline figures is **C15**.
+- **Size:** 5.3M train + 1.2M test rows at 1 Hz → aggregated per `(unit, cycle)`; RUL regression, physics/prognostics
+  domain
+- **Role:** Large-scale physical-engineering regression **case study** — the domain partner Concrete lacks; demonstrates
+  the §4.3.2 answer-first regression construction against published deep-learning baselines on their own benchmark
+- **Source:** Arias Chao, Kulkarni, Goebel, Fink, *Data* 6 (1):5, 2021 (DOI
+  10.3390/data6010005); [Kaggle mirror](https://www.kaggle.com/datasets/bishals098/nasa-cmapss-2-engine-degradation)
+- **Loading:** `FuzzySystemsExperiments/cmapss_ds02_rul.py` (DS02 best case) / `cmapss_all_datasets.py` (all datasets)
+  (not the `reproduce/` harness)
+- **Status:** **DEMONSTRATED, not measured.** One run on the **dataset's own fixed train/test split** (the held-out
+  engine units — the split the published baselines use), not a random seeded split: DS02 per-sample RMSE **7.23** on the
+  18 real sensors, in line with the public-file CNN (7.22) and beating the MLP (8.34) — both scored on a 20-channel
+  input set (real sensors + T40/P30) this pipeline deliberately does not use; adding T40/P30 back (the DOE's original
+  config) reaches ~6.5, so real-sensors-only is measurably not free (`CHECKLIST` **C18**). The reproducibility axis for
+  a fixed-split benchmark is the **train-set subsample** seed, not the split — a ten-seed *subsample* variance study is
+  `CHECKLIST` **C14** (future PR). **Not redistributable** — the 10 `.h5` files total ~28 GB and are gitignored; only
+  the scripts and the committed report `cmapss_all_datasets_report.md` are tracked. Primary-source verification of the
+  baseline figures is **C15**.
 
 ### Clustering / Structure Discovery
 
 #### Shuttle (NASA/UCI Statlog) (Ch 3 §3.3.2, §7.3, capstone)
+
 - **File:** `data/shuttle.csv`
 - **Size:** 58,000 rows × 9 features, 7 classes (imbalanced: ~80% in one flight condition)
-- **Role:** Large-scale clustering flagship; used for the integrated capstone pipeline (Chapter 3 reorder → Chapter 5 memberships → Chapter 6 inference → Ruspini export)
+- **Role:** Large-scale clustering flagship; used for the integrated capstone pipeline (Chapter 3 reorder → Chapter 5
+  memberships → Chapter 6 inference → Ruspini export)
 - **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/datasets), dataset ID 148
 - **Loading:** `reproduce/tables/_fuzzy_models.py::load_shuttle()` (auto-fetch via `ucimlrepo` if absent)
 - **Status:** Publicly available; can be auto-fetched; cached locally to avoid repeated network calls
 
 #### Synthetic Clustering Batteries (Ch 3 Table 3.5, Ch 5 Table 5.1–5.3)
+
 - **File:** Generated inline by `reproduce/tables/table_5_1_3_ch5_tables.py` (two_moons, circles, aniso, bridged, etc.)
 - **Size:** 120–1,500 points per construction
 - **Role:** Small-scale validation; ground truth for topological correctness checks
 - **Status:** Already available; generated on-demand
 
 #### Psychiatric-Evaluation Set (Ch 3 §3.3.2, §3.4, Table 3.3)
+
 - **Size:** 135,000 rows × 165 features
 - **Role:** Large-scale memory-footprint demonstration (not independent reproducible by third parties)
-- **Status:** **PRIVATE — not redistributable.** Feature names anonymized before author access. Measurement demonstrates scale only; no individual-feature conclusion is drawn. Chapter 7 names a fallback: re-take this measurement on a public dataset of comparable size.
+- **Status:** **PRIVATE — not redistributable.** Feature names anonymized before author access. Measurement demonstrates
+  scale only; no individual-feature conclusion is drawn. Chapter 7 names a fallback: re-take this measurement on a
+  public dataset of comparable size.
 
 ### Topological Membership Generation (Chapter 5)
 
 #### Synthetic Membership Batteries (Table 5.1–5.3, Fig 5.2)
+
 - **Files:** Generated inline by `reproduce/tables/table_5_1_3_ch5_tables.py`
-- **Size:** 120–5,000 points, hand-constructed (two_gaussians, bridged_gaussians, concentric_rings, varying_density, nested_gaussians, three_level_hierarchy, etc.)
+- **Size:** 120–5,000 points, hand-constructed (two_gaussians, bridged_gaussians, concentric_rings, varying_density,
+  nested_gaussians, three_level_hierarchy, etc.)
 - **Role:** Validation of band-discovery and membership-generation quality; all ground truth available by construction
 - **Status:** Already available; all stored in `battery_hierarchical.SCALABLE` generator
 
 #### Scalable Membership Batteries (Goal G1, §7.2)
-- **Status:** **Measured at ten seeds (2026-08-12)** across `single_scale`/`many_scale`/`log_separated` at $n=100$–$5{,}000$ (see Chapter 7 §7.2 Goal G1, and `reproduce/tables/table_5_4_ch5_g1_scaling.py`). `many_scale` confirmed solid (ARI 1.00 every seed/n); `single_scale` less stable than the earlier single-seed run implied (granularity agrees only 5–7/10 seeds); `log_separated` shows a gradual, not sharp, size transition. The one-pass generator itself (Goal G1's phase five) remains unbuilt, so this measures the existing two-stage selector, not the construction G1 is ultimately about.
+
+- **Status:** **Measured at ten seeds (2026-08-12)** across `single_scale`/`many_scale`/`log_separated`
+  at $n=100$–$5{,}000$ (see Chapter 7 §7.2 Goal G1, and `reproduce/tables/table_5_4_ch5_g1_scaling.py`). `many_scale`
+  confirmed solid (ARI 1.00 every seed/n); `single_scale` less stable than the earlier single-seed run implied
+  (granularity agrees only 5–7/10 seeds); `log_separated` shows a gradual, not sharp, size transition. The one-pass
+  generator itself (Goal G1's phase five) remains unbuilt, so this measures the existing two-stage selector, not the
+  construction G1 is ultimately about.
 - **Role:** Evidence for the one-pass membership claim; needed for integration capstone
 
 ### Non-Coordinate / Relational Data (Goal G2, Chapter 7 §7.2, A.5)
 
-Goal G2 requires demonstration on genuinely non-metric domains: time series under dynamic time warping, sequences under edit distance, graphs under a kernel dissimilarity. Three of the UCR/UEA time-series datasets below are now **measured** (2026-08-12); the rest remain verified loadable but unwired.
+Goal G2 requires demonstration on genuinely non-metric domains: time series under dynamic time warping, sequences under
+edit distance, graphs under a kernel dissimilarity. Three of the UCR/UEA time-series datasets below are now **measured**
+(2026-08-12); the rest remain verified loadable but unwired.
 
 #### UCR/UEA Time Series (via `aeon`)
+
 - **Files:** Auto-fetched via `aeon.datasets.load_classification()`
 - **Source:** [UCR/UEA Time Series Archive](https://www.cs.ucr.edu/~eamonn/time_series_data_2018/)
 - **Measured (`reproduce/tables/table_3_7_g2_dtw_nonmetric.py` + `table_3_7_g2_downstream.py`, 2026-08-12):**
-  - **ECG5000:** 5,000 series × 140 timesteps — exactness 1.000, triangle-inequality violations 20.9%, downstream set-cover beats NERFCM-given-k by 0.122 ARI (fails the ±0.05 parity threshold in the favorable direction)
-  - **FordA:** 4,921 × 500 — exactness 1.000, violations 0.4% (below the synthetic proxy), downstream: every method scores ≈0 ARI (degenerate)
-  - **Crop:** 24,000 × 46, 24 classes (the large-scale target, ≈4.6 GB as float64 dissimilarity matrix) — exactness 1.000, violations 23.6%, matrix build 1,597 s + reorder **4.7 s**, downstream both methods weak (NERFCM 0.029, set-cover 0.064 ARI)
+    - **ECG5000:** 5,000 series × 140 timesteps — exactness 1.000, triangle-inequality violations 20.9%, downstream
+      set-cover beats NERFCM-given-k by 0.122 ARI (fails the ±0.05 parity threshold in the favorable direction)
+    - **FordA:** 4,921 × 500 — exactness 1.000, violations 0.4% (below the synthetic proxy), downstream: every method
+      scores ≈0 ARI (degenerate)
+    - **Crop:** 24,000 × 46, 24 classes (the large-scale target, ≈4.6 GB as float64 dissimilarity matrix) — exactness
+      1.000, violations 23.6%, matrix build 1,597 s + reorder **4.7 s**, downstream both methods weak (NERFCM 0.029,
+      set-cover 0.064 ARI)
 - **Verified loadable, not yet attempted:**
-  - **ElectricDevices:** 16,637 × 96
-  - **StarLightCurves:** 9,236 × 1,024
+    - **ElectricDevices:** 16,637 × 96
+    - **StarLightCurves:** 9,236 × 1,024
 - **Distance metric:** Dynamic Time Warping (DTW)
 - **Status:** Three of five wired and measured; two verified loadable, unattempted
-- **Role:** Core to Goal G2 — demonstrates coordinate-free regime on real non-metric data; exactness (decision-rule item 1) now confirmed on all three attempted, downstream usefulness (item 3) partially evidenced, not yet closed
+- **Role:** Core to Goal G2 — demonstrates coordinate-free regime on real non-metric data; exactness (decision-rule item
+  1) now confirmed on all three attempted, downstream usefulness (item 3) partially evidenced, not yet closed
 
 #### Graph Kernels (TUDataset, via `aeon`)
-- **Source:** [TUDataset](https://www.tu-dortmund.de/en/university/news/2023/the-turing-university-graph-kernel-benchmarks-dataset/)
+
+-
+**Source:** [TUDataset](https://www.tu-dortmund.de/en/university/news/2023/the-turing-university-graph-kernel-benchmarks-dataset/)
 - **Candidate datasets:** MUTAG, PROTEINS, ENZYMES, NCI1
 - **Status:** Verification in progress (A.5 notes "to confirm")
 - **Role:** Goal G2 — demonstrates structure discovery on graph-structured data
 
 #### Duin–Pękalska Dissimilarity Collection
+
 - **Source:** [Duin & Pękalska dissimilarity data repository](https://www.prtools.org/gallery/duin_pkalska/)
 - **Role:** Goal G2 — already distributed as distance matrices, matching the coordinate-free claim most literally
 - **Status:** Verification in progress
@@ -168,9 +224,11 @@ uv run --project tribble-fis python reproduce/tables/table_4_1_mog_baselines.py
 
 ## Regression Dataset Selection
 
-The proposal currently has only one regression benchmark (**Concrete**, 1,030 rows). A large-scale regression partner is needed to support the claims in Chapter 4 and 6 (see Chapter 7 §7.2, Appendix A.7.1).
+The proposal currently has only one regression benchmark (**Concrete**, 1,030 rows). A large-scale regression partner is
+needed to support the claims in Chapter 4 and 6 (see Chapter 7 §7.2, Appendix A.7.1).
 
 ### Selection Criteria
+
 - **Size:** 5,000–20,000 rows (to balance Concrete's 1,030)
 - **Features:** 8–20 input features (similar complexity to Concrete's 8)
 - **Availability:** Public, no license restrictions, downloadable as CSV
@@ -179,19 +237,20 @@ The proposal currently has only one regression benchmark (**Concrete**, 1,030 ro
 
 ### Candidates
 
-| Dataset | Source | Rows | Features | Notes |
-|---|---|---|---|---|
-| **Combined Cycle Power Plant Energy Efficiency** | [UCI 165](https://archive.ics.uci.edu/datasets) | 9,568 | 4 | Sensors from a power plant; similar physical domain to Concrete |
-| **Airfoil Self-Noise** | [UCI 291](https://archive.ics.uci.edu/datasets) | 1,503 | 5 | Aeroacoustic; smaller than ideal but clean domain |
-| **Real Estate Valuation** | [UCI 477](https://archive.ics.uci.edu/datasets) | 414 | 7 | Too small; similar domain (structural property prediction) |
-| **Energy Efficiency (Building Physics)** | [UCI 242](https://archive.ics.uci.edu/datasets) | 768 | 8 | Similar to Concrete; smaller than ideal |
-| **Bike Sharing Demand** | [Kaggle](https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619/bike-sharing-demand) | 17,379 | 16+ | Urban dynamics; slightly more features than target; well-established benchmark |
-| **House Prices (Advanced)** | [Kaggle](https://www.kaggle.com/c/house-prices-advanced-regression-techniques) | 1,460 | 81 | Too many features; test split is withheld |
-| **Wine Quality (Red)** | [UCI 186](https://archive.ics.uci.edu/datasets) | 1,599 | 11 | Physicochemical; similar domain; already loaded in `reproduce/tables/_fuzzy_models.py` |
+| Dataset                                          | Source                                                                                                 | Rows   | Features | Notes                                                                                  |
+|--------------------------------------------------|--------------------------------------------------------------------------------------------------------|--------|----------|----------------------------------------------------------------------------------------|
+| **Combined Cycle Power Plant Energy Efficiency** | [UCI 165](https://archive.ics.uci.edu/datasets)                                                        | 9,568  | 4        | Sensors from a power plant; similar physical domain to Concrete                        |
+| **Airfoil Self-Noise**                           | [UCI 291](https://archive.ics.uci.edu/datasets)                                                        | 1,503  | 5        | Aeroacoustic; smaller than ideal but clean domain                                      |
+| **Real Estate Valuation**                        | [UCI 477](https://archive.ics.uci.edu/datasets)                                                        | 414    | 7        | Too small; similar domain (structural property prediction)                             |
+| **Energy Efficiency (Building Physics)**         | [UCI 242](https://archive.ics.uci.edu/datasets)                                                        | 768    | 8        | Similar to Concrete; smaller than ideal                                                |
+| **Bike Sharing Demand**                          | [Kaggle](https://www.kaggle.com/datasets/c1730b3c7d4311e6a6202040f0db4ec7b826f619/bike-sharing-demand) | 17,379 | 16+      | Urban dynamics; slightly more features than target; well-established benchmark         |
+| **House Prices (Advanced)**                      | [Kaggle](https://www.kaggle.com/c/house-prices-advanced-regression-techniques)                         | 1,460  | 81       | Too many features; test split is withheld                                              |
+| **Wine Quality (Red)**                           | [UCI 186](https://archive.ics.uci.edu/datasets)                                                        | 1,599  | 11       | Physicochemical; similar domain; already loaded in `reproduce/tables/_fuzzy_models.py` |
 
 ### Recommendation
 
 **Combined Cycle Power Plant Energy Efficiency** (UCI 165, 9,568 rows × 4 features) is the strongest candidate:
+
 - **Balanced size:** 9.3× larger than Concrete, demonstrating scale without being overwhelming
 - **Clean domain:** Direct analogue to Concrete's physical measurement domain
 - **Minimal features:** 4 inputs maintain interpretability parallel to Concrete's 8
@@ -199,26 +258,29 @@ The proposal currently has only one regression benchmark (**Concrete**, 1,030 ro
 - **Existing precedent:** This dataset class is standard for fuzzy regression benchmarks
 
 **Wine Quality (Red)** (UCI 186, 1,599 × 11) is the second choice:
+
 - Already has a loader in `_fuzzy_models.py`
 - Slightly larger than Concrete; physicochemical domain is similar
 - 11 features are on the high side for interpretability claims but acceptable
 
-**Bike Sharing** is the highest-risk choice (most features, most complex feature interactions), but if you want to demonstrate scaling past Concrete's ~1K rows, it's a strong practical benchmark.
+**Bike Sharing** is the highest-risk choice (most features, most complex feature interactions), but if you want to
+demonstrate scaling past Concrete's ~1K rows, it's a strong practical benchmark.
 
 ---
 
 ## Status Summary
 
-| Category | Small / Fast | Large / Scale | Measured? | Status |
-|---|---|---|---|---|
-| **Regression** | Concrete (1,030) | Bike Sharing (17,379); California Housing (20,640); Superconductivity (21,263); N-CMAPSS DS02 turbofan RUL (6.5M raw) | **Yes** (10 seeds) + **demonstrated** (N-CMAPSS, single-run) | Bike Sharing in Table 4.1; California Housing/Superconductivity in Appendix A.7.1 — RF wins both, flat MoG/HME unstable on Superconductivity; N-CMAPSS a physics/prognostics case study (Table 4.10, §4.4.1) beating public-file CNN/MLP baselines |
-| **Classification** | Glass (214) | PhiUSIIL (236K) | Yes | Fixed; was broken, now working |
-| **Classification (open-set)** | Glass (214) | RT-IOT2022 (123K) | **Yes** (2026-08-12, both roles) | Open-set (10 seeds, Table 4.7b): complement rule loses to Isolation Forest (+0.366 vs +0.535). Classification/timing (10 seeds, Table 4.4, de-leaked loader): MoG 92.7% / 4.2s vs. RF 99.8% |
-| **Anomaly** | Glass (214) | BETH (1.14M) | **Yes** (10 seeds, Table 4.11) | Measured via the one-class protocol (`TribbleOneClassDetector`), not leave-one-class-out — that needs ≥3 classes and BETH is binary. Complement rule reaches parity with a one-class SVM ($J$ +0.843 vs +0.841); Isolation Forest overtakes both once its default is corrected (Table 4.11(d)) |
-| **Clustering** | Synthetic (120–1.5k) | Shuttle (58K) | Demonstrated | Shuttle in place; demo not repeatable |
-| **Membership Gen** | Synthetic (120–160) | Scalable batteries (100–5,000) | **Yes** (2026-08-12, 10 seeds) | `many_scale` solid, `single_scale` less stable than believed, `log_separated` gradual — see Ch5 §5.4, Goal G1 |
-| **Non-coordinate (G2)** | *[unwired]* | ECG5000, FordA, Crop (up to 24k, DTW) | **Partially** (2026-08-12, exactness only) | Exactness = 1.000 on 3 of 5 named datasets; downstream-usefulness threshold not yet met (2 of 3 tested, both low-information) |
+| Category                      | Small / Fast         | Large / Scale                                                                                                         | Measured?                                                    | Status                                                                                                                                                                                                                                                                                         |
+|-------------------------------|----------------------|-----------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Regression**                | Concrete (1,030)     | Bike Sharing (17,379); California Housing (20,640); Superconductivity (21,263); N-CMAPSS DS02 turbofan RUL (6.5M raw) | **Yes** (10 seeds) + **demonstrated** (N-CMAPSS, single-run) | Bike Sharing in Table 4.1; California Housing/Superconductivity in Appendix A.7.1 — RF wins both, flat MoG/HME unstable on Superconductivity; N-CMAPSS a physics/prognostics case study (Table 4.10, §4.4.1) beating public-file CNN/MLP baselines                                             |
+| **Classification**            | Glass (214)          | PhiUSIIL (236K)                                                                                                       | Yes                                                          | Fixed; was broken, now working                                                                                                                                                                                                                                                                 |
+| **Classification (open-set)** | Glass (214)          | RT-IOT2022 (123K)                                                                                                     | **Yes** (2026-08-12, both roles)                             | Open-set (10 seeds, Table 4.7b): complement rule loses to Isolation Forest (+0.366 vs +0.535). Classification/timing (10 seeds, Table 4.4, de-leaked loader): MoG 92.7% / 4.2s vs. RF 99.8%                                                                                                    |
+| **Anomaly**                   | Glass (214)          | BETH (1.14M)                                                                                                          | **Yes** (10 seeds, Table 4.11)                               | Measured via the one-class protocol (`TribbleOneClassDetector`), not leave-one-class-out — that needs ≥3 classes and BETH is binary. Complement rule reaches parity with a one-class SVM ($J$ +0.843 vs +0.841); Isolation Forest overtakes both once its default is corrected (Table 4.11(d)) |
+| **Clustering**                | Synthetic (120–1.5k) | Shuttle (58K)                                                                                                         | Demonstrated                                                 | Shuttle in place; demo not repeatable                                                                                                                                                                                                                                                          |
+| **Membership Gen**            | Synthetic (120–160)  | Scalable batteries (100–5,000)                                                                                        | **Yes** (2026-08-12, 10 seeds)                               | `many_scale` solid, `single_scale` less stable than believed, `log_separated` gradual — see Ch5 §5.4, Goal G1                                                                                                                                                                                  |
+| **Non-coordinate (G2)**       | *[unwired]*          | ECG5000, FordA, Crop (up to 24k, DTW)                                                                                 | **Partially** (2026-08-12, exactness only)                   | Exactness = 1.000 on 3 of 5 named datasets; downstream-usefulness threshold not yet met (2 of 3 tested, both low-information)                                                                                                                                                                  |
 
 ---
 
-*Appendix — benchmark dataset locations and loading strategy. Tracking in `CHECKLIST.md` under **D1** (data infrastructure).*
+*Appendix — benchmark dataset locations and loading strategy. Tracking in `CHECKLIST.md` under **D1** (data
+infrastructure).*

@@ -1,218 +1,476 @@
 # Chapter 6 — Hierarchical and Refined Fuzzy Models
 
-*Partly built and partly proposed, and I mark which is which. The shared solver, the fuzzy trees, the one-shot hierarchical mixture, the declarative structure specification and the Ruspini export are implemented and evaluated. The antecedent refinement is built but still being broadened. The EM refinement of the mixture and the full comparison suite are proposed for completion.*
+*Partly built and partly proposed, and I mark which is which. The shared solver, the fuzzy trees, the declarative
+structure specification and the Ruspini export are implemented and evaluated. The antecedent refinement is built but
+still being broadened. The full comparison suite is proposed for completion. A hierarchical-mixture-of-experts variant,
+built one-shot with its EM refinement designed but not implemented, is supporting work rather than a chapter
+contribution and lives in Appendix A.11.*
 
 ## 6.1 Introduction
 
-The flat model of Chapter 4 is fast and readable, but it is flat: every rule sees every feature, and no decision comes before another. That is fine for some problems. For others I want two things it lacks. First, an explicit *hierarchy* of decisions over named variables, the "first check this, then within that check that" structure a domain expert reasons with. Second, more accuracy where the relationship is genuinely local, by letting different regions of the input space go to different experts. And I may want to refine whatever model I build.
+The flat model of Chapter 4 is fast and readable, but it is flat: every rule sees every feature, and no decision comes
+before another. That is fine for some problems. For others I want two things it lacks. First, an explicit *hierarchy* of
+decisions over named variables, the "first check this, then within that check that" structure a domain expert reasons
+with. Second, more accuracy where the relationship is genuinely local, by letting different regions of the input space
+route to different sub-models. And I may want to refine whatever model I build.
 
-All three rest on one technical observation, this chapter's organizing idea. For a Takagi–Sugeno–Kang system with fixed firing strengths, the output is *linear in the consequent coefficients*. So the consequents need no search: given the antecedents, the best ones are the closed-form solution of a regularized weighted least-squares problem. I use that one solver, a firing-weighted ridge least-squares, everywhere: the flat FIS of Chapter 4, the leaves of a soft fuzzy tree, the experts of a hierarchical mixture.
+Both rest on one technical observation, this chapter's organizing idea. For a Takagi–Sugeno–Kang system with fixed
+firing strengths, the output is *linear in the consequent coefficients*. So the consequents need no search: given the
+antecedents, the best ones are the closed-form solution of a regularized weighted least-squares problem. I use that one
+solver, a firing-weighted ridge least-squares, everywhere it applies in this pipeline, including the flat FIS of Chapter
+4 and the leaves of a soft fuzzy tree.
 
-The contributions: the shared ridge-TSK consequent solver (built); soft fuzzy trees with exact ridge-TSK leaves (built); a hierarchical mixture of fuzzy experts, fit one-shot today and by EM as proposed; a declarative way to specify and steer the structure, plus an export to an explicit triangular rule base (built); an antecedent-refinement stage reusing the solver as its inner objective (built; being extended).
+The contributions: the shared ridge-TSK consequent solver (built); soft fuzzy trees with exact ridge-TSK leaves (built);
+a declarative way to specify and steer the structure, plus an export to an explicit triangular rule base (built); an
+antecedent-refinement stage reusing the solver as its inner objective (built; being extended). A
+hierarchical-mixture-of-experts extension reuses the same solver and is built one-shot; it is supporting work, not a
+chapter contribution, and Appendix A.11 covers its architecture, background and measured results in full.
 
 ## 6.2 Background and Prior Art
 
-The closest competitor is Medina-Chico et al. [@medina2001backpropagation], a soft decision tree with *linear* models in the leaves. That is very nearly my fuzzy tree, so the difference has to be precise: their leaves are fit by backpropagation, mine are the exact firing-weighted ridge solution in closed form. The daylight is "closed-form exact leaf" versus "iteratively fit leaf," not the tree idea itself, which I concede. Wu et al. [@wu2020functional] show that a single-layer TSK system is already equivalent to a mixture of experts, which narrows what I can claim for a *hierarchical* mixture, and I engage it directly; their equivalence is stated for the flat layer only, and hierarchical TSK fusion is surveyed as stacking or widening rather than recursive gating [@zhang2023tsk]. The rest of the lineage is standard: Jordan and Jacobs [@jordan1994hierarchical] for the hierarchical mixture of experts and its EM; Janikow [@janikow1998fuzzy] and Yuan and Shaw [@yuan1995induction] for fuzzy decision trees and the ambiguity split criterion; Olaru and Wehenkel [@olaru2003complete] for soft splits keeping accuracy while staying interpretable.
+The closest competitor is Medina-Chico et al. [@medina2001backpropagation], a soft decision tree with *linear* models in
+the leaves. That is very nearly my fuzzy tree, so the difference has to be precise: their leaves are fit by
+backpropagation, mine are the exact firing-weighted ridge solution in closed form. The daylight is "closed-form exact
+leaf" versus "iteratively fit leaf," not the tree idea itself. The rest of the lineage is standard:
+Janikow [@janikow1998fuzzy] and Yuan and Shaw [@yuan1995induction] for fuzzy decision trees and the ambiguity split
+criterion; Olaru and Wehenkel [@olaru2003complete] for soft splits keeping accuracy while staying interpretable.
+Appendix A.11.2 covers the mixture-of-experts-specific lineage (Jordan and Jacobs's EM, and the TSK-mixture-equivalence
+line this chapter's extension has to bound its claim against).
 
-Magdalena [@magdalena2018do] raises the objection a good committee will: a hierarchical fuzzy system is *not* automatically more interpretable, because the intermediate variables it introduces can be meaningless. My answer, made good by construction: every split and every gate in my hierarchies is over an *original, named input*, never a synthetic intermediate. That is exactly the condition Magdalena requires for the claim to hold, and I hold to it deliberately.
+Magdalena [@magdalena2018do] raises the standing objection: a hierarchical fuzzy system is *not*
+automatically more interpretable, because the intermediate variables it introduces can be meaningless. My answer, made
+good by construction: every split and every gate in my hierarchies is over an *original, named input*, never a synthetic
+intermediate. That is exactly the condition Magdalena requires for the claim to hold, and I hold to it deliberately.
 
-**An unresolved tension.** Chapter 5 proposes as a stretch goal (G8) admitting *joint* two-feature membership functions for clusters with no faithful axis-aligned description, a ring being the standard case, since it is not the intersection of per-axis intervals. Taken literally, a joint membership is close to what the Magdalena condition exists to forbid: a derived region rather than a statement about one named input, and "this point lies in an annulus in (cement, water) space" is not a clause an engineer reads the way "cement ≥ 350" is.
+**An unresolved tension.** Chapter 5 proposes as a stretch goal (G8) admitting *joint* two-feature membership functions
+for clusters with no faithful axis-aligned description, a ring being the standard case, since it is not the intersection
+of per-axis intervals. Taken literally, a joint membership is close to what the Magdalena condition exists to forbid: a
+derived region rather than a statement about one named input, and "this point lies in an annulus in (cement, water)
+space" is not a clause an engineer reads the way "cement ≥ 350" is.
 
-The two are probably reconcilable, but I have not done the work. The distinction I expect to rest on is that Magdalena objects to *synthetic intermediate variables*, quantities invented by the hierarchy with no meaning outside it, whereas a joint membership is still over original named inputs, just two at once, and only where the data demonstrably has no axis-aligned description. That is weaker than the claim this section makes, and it needs stating precisely.
+The two are probably reconcilable, but I have not done the work. The distinction I expect to rest on is that Magdalena
+objects to *synthetic intermediate variables*, quantities invented by the hierarchy with no meaning outside it, whereas
+a joint membership is still over original named inputs, just two at once, and only where the data demonstrably has no
+axis-aligned description. That is weaker than the claim this section makes, and it needs stating precisely.
 
-Three things would settle it: whether a two-feature membership over named inputs satisfies Magdalena's condition or merely evades it, a question about the literature and not my code; whether such clusters are rare enough that the exception stays an exception, since if most clusters need one the interpretability argument does not survive and G8 should be abandoned; and whether a rule base mixing 1-D and 2-D antecedents reads coherently to a domain expert, which only a person can answer and which Goal G6's study is the place to ask. **This chapter's interpretability argument holds *without* G8.** Everything built and measured here — the shared ridge solver, the soft fuzzy trees, the one-shot hierarchical mixture, the declarative structure specification, the Ruspini export — is complete and functional over single-feature gating and axis-aligned clusters. G8 is proposed as a post-defense journal extension (§7.2), and its measurement — whether such clusters are rare or common in practice — is what decides whether it is worth building at all. Until that measurement, G8 is flagged as the one place the dissertation *proposes* to spend interpretability in the future, but the interpretability of this chapter does not depend on it.
+Three things would settle it: whether a two-feature membership over named inputs satisfies Magdalena's condition or
+merely evades it, a question about the literature and not my code; whether such clusters are rare enough that the
+exception stays an exception, since if most clusters need one the interpretability argument does not survive and G8
+should be abandoned; and whether a rule base mixing 1-D and 2-D antecedents reads coherently to a domain expert, which
+only a person can answer and which Goal G6's study is the place to ask. **This chapter's interpretability argument holds
+*without* G8.** Everything built and measured here — the shared ridge solver, the soft fuzzy trees, the declarative
+structure specification, the Ruspini export — is complete and functional over single-feature gating and axis-aligned
+clusters. G8 is proposed as a post-defense journal extension (§7.2), and its measurement — whether such clusters are
+rare or common in practice — is what decides whether it is worth building at all. Until that measurement, G8 is flagged
+as the one place the dissertation *proposes* to spend interpretability in the future, but the interpretability of this
+chapter does not depend on it.
 
-One caution. I do **not** motivate the ridge solver by claiming that ANFIS's least-squares step overfits; that premise did not survive verification. The motivation is numerical conditioning and the value of one reusable primitive, not a deficiency in ANFIS.
+One caution. I do **not** motivate the ridge solver by claiming that ANFIS's least-squares step overfits; that premise
+did not survive verification. The motivation is numerical conditioning and the value of one reusable primitive, not a
+deficiency in ANFIS.
 
 ## 6.3 Methodology
 
 ### 6.3.1 The shared ridge-TSK solver (built)
 
-Because the TSK output is linear in the consequent coefficients for fixed firing strengths, fitting the consequents is a weighted least-squares problem. With $\hat{\mathbf y} = \Phi\beta$ as Appendix A.10.1 constructs it, the solver minimises
+Because the TSK output is linear in the consequent coefficients for fixed firing strengths, fitting the consequents is a
+weighted least-squares problem. With $\hat{\mathbf y} = \Phi\beta$ as Appendix A.10.1 constructs it, the solver
+minimises
 
-$$ J(\beta) = \lVert \mathbf y - \Phi\beta \rVert_2^2 + \lambda\,\beta^{\top}\mathbf D\beta, \qquad \text{so} \qquad \big(\Phi^{\top}\Phi + \lambda\mathbf D\big)\beta = \Phi^{\top}\mathbf y, $$
+$$ J (\beta) = \lVert \mathbf y - \Phi\beta \rVert_2^2 + \lambda\,\beta^{\top}\mathbf D\beta, \qquad \text{so} \qquad \big (\Phi^{\top}\Phi + \lambda\mathbf D\big)\beta = \Phi^{\top}\mathbf y, $$
 
-with $\mathbf D$ a 0/1 diagonal that leaves the intercept and bucket-mean columns unpenalized. The normal equations are the *statement* of the solve, not its implementation: forming $\Phi^{\top}\Phi$ squares the condition number, so the code solves the equivalent least-squares problem on the augmented design $[\Phi;\ \sqrt{\lambda}\,\mathbf D^{1/2}]$ by SVD instead, and pins the extreme rules' constants by moving their columns to the right-hand side, which is the exact constrained minimiser (Appendix A.10.16). Two details matter. The polynomial basis is orthogonal (Legendre or Chebyshev) instead of raw monomials, which conditions the problem far better at higher orders, and I select the order and the regularization strength by cross-validation. This solver replaces the per-bucket pseudo-inverse and iterative L-BFGS fit that came before, and is the primitive the next two subsections reuse.
+with $\mathbf D$ a 0/1 diagonal that leaves the intercept and bucket-mean columns unpenalized. The normal equations are
+the *statement* of the solve, not its implementation: forming $\Phi^{\top}\Phi$ squares the condition number, so the
+code solves the equivalent least-squares problem on the augmented design $[\Phi;\ \sqrt{\lambda}\,\mathbf D^{1/2}]$ by
+SVD instead, and pins the extreme rules' constants by moving their columns to the right-hand side, which is the exact
+constrained minimiser (Appendix A.10.16). Two details matter. The polynomial basis is orthogonal (Legendre or Chebyshev)
+instead of raw monomials, which conditions the problem far better at higher orders, and I select the order and the
+regularization strength by cross-validation. This solver replaces the per-bucket pseudo-inverse and iterative L-BFGS fit
+that came before, and is the primitive the next two subsections reuse.
 
-**Figure 6.1 — The shared ridge-TSK solver: the design matrix it builds, and who calls it.** Panel (a) is a real $\Phi$, computed from the one-input toy of Figure 2.2: forty points, three Gaussian rules and a first-order basis, so one $\bar w_r\,[1 \mid x]$ block per rule, rows sorted by $x$ so each rule lights up the rows it covers. The columns the ridge never shrinks — each rule's constant — are marked, and the rows $\sqrt{\lambda}\,\mathbf{D}^{1/2}$ the code appends are drawn beneath the orange line: that augmentation is how `lstsq` sees $\kappa(\Phi)$ rather than $\kappa(\Phi)^2$ (Appendix A.10.16; $\lambda$ exaggerated here so the rows are visible). Panel (b) is the architectural claim as a diagram: the flat FIS, the tree's leaves and the mixture's experts each hand the solver their own weights and get consequents back from one solve. Panel (a) is computed from the toy; panel (b) is drawn.
+**Figure 6.1 — The shared ridge-TSK solver: the design matrix it builds, and who calls it.** Panel (a) is a real $\Phi$,
+computed from the one-input toy of Figure 2.2: forty points, three Gaussian rules and a first-order basis, so
+one $\bar w_r\,[1 \mid x]$ block per rule, rows sorted by $x$ so each rule lights up the rows it covers. The columns the
+ridge never shrinks — each rule's constant — are marked, and the rows $\sqrt{\lambda}\,\mathbf{D}^{1/2}$ the code
+appends are drawn beneath the orange line: that augmentation is how `lstsq` sees $\kappa (\Phi)$ rather
+than $\kappa (\Phi)^2$ (Appendix A.10.16; $\lambda$ exaggerated here so the rows are visible). Panel (b) is the
+architectural claim as a diagram: the flat FIS and the tree's leaves each hand the solver their own weights and get
+consequents back from one solve — the same holds for Appendix A.11's mixture experts. Panel (a) is computed from the
+toy; panel (b) is drawn.
 `![06-ridge-solver](fig/06-ridge-solver.png)`
 
-**Preprocessing caveat for high-dimensional, noisy data.** On datasets with tightly clustered targets or weak feature-target correlations in high dimensions—notably WEC_Perth wave-energy regression—the solver's Gaussian membership functions can degenerate. A rank-Gaussian preprocessing transform (mapping target values to quantiles, then to standard normal) recovers viability; coupled with quantile-based output bucketing and aggressive feature selection (top-N most predictive features), Tribble achieves usable accuracy (R²=0.6475 on WEC_Perth's 98-feature, 2,318-sample dataset) in under 4 seconds. The limitation is acknowledged: FIS methods remain suboptimal for high-dimensional regression compared to tree ensembles, which achieve R²=0.80 on the same split. However, this preprocessing pipeline enables Tribble's interpretability on realistic engineering datasets. See Issue #97 evaluation memo for full methodology and ablation study.
+**Preprocessing caveat for high-dimensional, noisy data.** On datasets with tightly clustered targets or weak
+feature-target correlations in high dimensions—notably WEC_Perth wave-energy regression—the solver's Gaussian membership
+functions can degenerate. A rank-Gaussian preprocessing transform (mapping target values to quantiles, then to standard
+normal) recovers viability; coupled with quantile-based output bucketing and aggressive feature selection (top-N most
+predictive features), Tribble achieves usable accuracy (R²=0.6475 on WEC_Perth's 98-feature, 2,318-sample dataset) in
+under 4 seconds. The limitation is acknowledged: FIS methods remain suboptimal for high-dimensional regression compared
+to tree ensembles, which achieve R²=0.80 on the same split. However, this preprocessing pipeline enables Tribble's
+interpretability on realistic engineering datasets. See Issue #97 evaluation memo for full methodology and ablation
+study.
 
 ### 6.3.2 Soft fuzzy trees (built)
 
-The fuzzy tree is a CART-style recursive partition with two differences. The splits are soft, so a point flows down multiple paths with graded membership instead of going left or right, and each leaf holds a full ridge-TSK model, not a constant. A leaf's weight is the product of the gate memberships along its path, and because each gate's two branches sum to one those weights form a partition of unity at every $x$ — so the tree output is a convex combination of leaf models, linear in their coefficients, and every leaf is fitted by the same solver with rows weighted by the leaf's routing weight (Appendix A.10.17). The split criterion is firing-weighted variance reduction for regression, and a fuzzy ambiguity or information-gain measure for classification. The payoff is readability: the tree renders as a short list of IF–THEN rules, one per root-to-leaf path, each mentioning only the variables on that path and ordered by importance. On Concrete it splits first on cement content and then on age, right at the standard 28-day curing mark. It recovers domain knowledge nobody told it, and a materials engineer can read that and nod.
+The fuzzy tree is a CART-style recursive partition with two differences. The splits are soft, so a point flows down
+multiple paths with graded membership instead of going left or right, and each leaf holds a full ridge-TSK model, not a
+constant. A leaf's weight is the product of the gate memberships along its path, and because each gate's two branches
+sum to one those weights form a partition of unity at every $x$ — so the tree output is a convex combination of leaf
+models, linear in their coefficients, and every leaf is fitted by the same solver with rows weighted by the leaf's
+routing weight (Appendix A.10.17). The split criterion is firing-weighted variance reduction for regression, and a fuzzy
+ambiguity or information-gain measure for classification. The payoff is readability: the tree renders as a short list of
+IF–THEN rules, one per root-to-leaf path, each mentioning only the variables on that path and ordered by importance. On
+Concrete it splits first on cement content and then on age, right at the standard 28-day curing mark. It recovers domain
+knowledge nobody told it, and a materials engineer can read that and nod.
 
-That readability is why the tree is fit on *raw*, untransformed features while the flat model of Chapter 4 is not — a threshold of "cement ≥ 350 kg/m³" is something an engineer can check; "cement ≥ 0.42" after min-max scaling to the unit interval is not, and there is no further justification beyond that.
+That readability is why the tree is fit on *raw*, untransformed features while the flat model of Chapter 4 is not — a
+threshold of "cement ≥ 350 kg/m³" is something an engineer can check; "cement ≥ 0.42" after min-max scaling to the unit
+interval is not, and there is no further justification beyond that.
 
-But raw features are not *free* here, the way they are for CART. Rank invariance is a property of CART, to which the transform is worth nothing, against as much as +0.12 $R^2$ to the Gaussian models (§4.3). It is not a property of *this* tree: its soft splits make branch membership depend on a threshold's position relative to a width in the feature's own units, and its leaves are ridge-TSK models over those features, inheriting the flat model's sensitivity. The harness bears that out — the fuzzy tree gains an order of magnitude more from the transform than CART does. So raw features cost this tree accuracy, and its readability is *bought* with that loss, not inherited from a rank-invariance it does not have.
+But raw features are not *free* here, the way they are for CART. Rank invariance is a property of CART, to which the
+transform is worth nothing, against as much as +0.12 $R^2$ to the Gaussian models (§4.3). It is not a property of *this*
+tree: its soft splits make branch membership depend on a threshold's position relative to a width in the feature's own
+units, and its leaves are ridge-TSK models over those features, inheriting the flat model's sensitivity. The harness
+bears that out — the fuzzy tree gains an order of magnitude more from the transform than CART does. So raw features cost
+this tree accuracy, and its readability is *bought* with that loss, not inherited from a rank-invariance it does not
+have.
 
-That also rules out the tidy causal reading of the middle case. The mixture has tree-like gates and Gaussian experts and gains +0.071 from the transform at library defaults, which would suggest a spectrum with rank-based gates at one end and location-and-width experts at the other. The fuzzy tree, which that account puts at the rank-based end, gains *more* from the transform than the mixture does. Whatever explains these two rows, it is not a clean division of labour, and this chapter offers none.
+**One configuration mismatch.** Table 6.1 quotes the tree under the log-and-min-max preprocessing, the regime that
+destroys the readability which is the hierarchy's whole payoff. Figure 6.2's "splits on age at *exactly* 28" is a
+raw-feature property and cannot hold in those cells, where the same boundary reads as a number in $[0,1]$. Quoted
+accuracy and quoted readability therefore come from **different configurations**, and no single run reported here
+exhibits both. The reconciliation generator does run both regimes, so the raw-preprocessing accuracy exists and could be
+quoted alongside; choosing which pair to lead with, and saying what the readable configuration costs in $R^2$, is owed
+work rather than a missing measurement.
 
-**One configuration mismatch.** Table 6.1 quotes the tree and the mixture under the log-and-min-max preprocessing, the regime that destroys the readability which is the hierarchy's whole payoff. Figure 6.2's "splits on age at *exactly* 28" is a raw-feature property and cannot hold in those cells, where the same boundary reads as a number in $[0,1]$. Quoted accuracy and quoted readability therefore come from **different configurations**, and no single run reported here exhibits both. The reconciliation generator does run both regimes, so the raw-preprocessing accuracy exists and could be quoted alongside; choosing which pair to lead with, and saying what the readable configuration costs in $R^2$, is owed work rather than a missing measurement.
-
-**Figure 6.2 — Trained fuzzy trees, as rules.** The `render_tree_text` output of two real fits. The Concrete tree splits on cement and then on age at *exactly* 28; the PhiUSIIL tree splits on `HasSocialNet` and then `HasCopyrightInfo`, and reads as a rule a practitioner would recognise: a page carrying a social-network link is legitimate (p = 1.00), and a page carrying neither a social-network link nor copyright information is phishing (p = 0.94). It used to take `URLSimilarityIndex` as its third split on *every* branch, and that whole level is gone on purpose — the feature is a URL's similarity to a whitelist of known-legitimate URLs, i.e. the label in disguise, and grad-school #215 now drops it and two sibling legitimacy probabilities on load, so no classification result in this document trains on them. Measured both ways at the same configuration: the leaky tree had **six** leaves and the leak-free one has **three**, so half the apparent structure was the tree reading the answer. Both are at the `tribble-tree/demo_*.py` configuration (`max_depth=3, n_terms=2`, four or five candidate variables), not library defaults; under the defaults the Concrete tree's second split is superplasticizer and no age boundary lands near 28. The 28-day recovery is a property of the tuned tree, the tree a practitioner would fit, but it is not automatic. It is also a *raw*-feature fit, the third axis flagged above.
+**Figure 6.2 — Trained fuzzy trees, as rules.** The `render_tree_text` output of two real fits. The Concrete tree splits
+on cement and then on age at *exactly* 28; the PhiUSIIL tree splits on `HasSocialNet` and then `HasCopyrightInfo`, and
+reads as a rule a practitioner would recognise: a page carrying a social-network link is legitimate (p = 1.00), and a
+page carrying neither a social-network link nor copyright information is phishing (p = 0.94). It used to take
+`URLSimilarityIndex` as its third split on *every* branch, and that whole level is gone on purpose — the feature is a
+URL's similarity to a whitelist of known-legitimate URLs, i.e. the label in disguise, and grad-school #215 now drops it
+and two sibling legitimacy probabilities on load, so no classification result in this document trains on them. Measured
+both ways at the same configuration: the leaky tree had **six** leaves and the leak-free one has **three**, so half the
+apparent structure was the tree reading the answer. Both are at the `tribble-tree/demo_*.py` configuration
+(`max_depth=3, n_terms=2`, four or five candidate variables), not library defaults; under the defaults the Concrete
+tree's second split is superplasticizer and no age boundary lands near 28. The 28-day recovery is a property of the
+tuned tree, the tree a practitioner would fit, but it is not automatic. It is also a *raw*-feature fit, the third axis
+flagged above.
 `![fuzzy-tree](fig/06-fuzzy-tree.png)`
 
-**Figure 6.3 — Soft-tree routing: leaf weights that sum to one, and what they buy.** A one-input, depth-two tree with sigmoidal gates. Panel (a): the four leaf weights, each the product of the two gate memberships on its path, stacked so that their summing to one at every $x$ is the flat top of the stack rather than a claim (Appendix A.10.17). Panel (b): the tree's output with linear leaves. Crisp splits give the discontinuous staircase of a CART-with-linear-leaves; the soft gates give the convex blend of the same four leaf models, continuous, and still linear in the leaf coefficients for fixed gates — which is why every leaf is fitted by Figure 6.1's solver with rows weighted by its routing weight. Every gate tests one named input, so every weight is a product of memberships of original variables: the Magdalena condition of §6.2, enforced by the construction. Illustrative; no proposal number depends on it.
+**Figure 6.3 — Soft-tree routing: leaf weights that sum to one, and what they buy.** A one-input, depth-two tree with
+sigmoidal gates. Panel (a): the four leaf weights, each the product of the two gate memberships on its path, stacked so
+that their summing to one at every $x$ is the flat top of the stack rather than a claim (Appendix A.10.17). Panel (b):
+the tree's output with linear leaves. Crisp splits give the discontinuous staircase of a CART-with-linear-leaves; the
+soft gates give the convex blend of the same four leaf models, continuous, and still linear in the leaf coefficients for
+fixed gates — which is why every leaf is fitted by Figure 6.1's solver with rows weighted by its routing weight. Every
+gate tests one named input, so every weight is a product of memberships of original variables: the Magdalena condition
+of §6.2, enforced by the construction. Illustrative; no proposal number depends on it.
 `![06-soft-routing](fig/06-soft-routing.png)`
 
-### 6.3.3 A hierarchical mixture of fuzzy experts (one-shot built; EM proposed)
+### 6.3.3 A hierarchical mixture of fuzzy experts (supporting work; see Appendix A.11)
 
-The mixture generalizes the tree: instead of a single model per leaf, a tree of fuzzy partition-of-unity gates routes each point, softly, to leaves that are themselves full multi-rule TSK sub-models, with overlapping (soft-inclusion) training sets so the experts share boundary data.
-
-Today I fit this greedily, in one shot: the gates are chosen by the same split criteria as the tree, then each expert is fit to the points that reach it. That is fast and it works, but it is not a joint optimum, because the gates never reconsider themselves in light of how well the experts they created perform. Closing that loop is the point of the EM refinement, and the chapter's main proposed deliverable.
-
-I have designed it but not implemented it. The E-step assigns each point a responsibility $h_{i\ell}$ for expert $\ell$, proportional to its gate probability times its likelihood under the expert's own model. The M-step re-solves each expert by the same ridge primitive as §6.3.1, every row scaled by $\sqrt{h_{i\ell}}$ so that a weighted least-squares solve implements the responsibility weighting exactly — minimising $\sum_i h_{i\ell} r_i^2$ is minimising $\lVert H^{1/2} \mathbf r \rVert^2$ — and updates the Gaussian gate parameters in closed form. Appendix A.10.18 writes the E-step, both M-steps and the monotonicity argument out in full. It includes the usual guards: log-sum-exp accumulation against underflow, variance floors, pruning of starved components. I expect a better-conditioned fit than the greedy pass and a principled treatment of the boundary overlap that soft-inclusion now handles by heuristic.
-
-The novelty here does **not** rest on the EM estimator, which is entirely standard since Jordan and Jacobs. It rests on the composition: the M-step reduces to the same shared ridge primitive used everywhere else. The EM is a proposed deliverable, and if it slips, the one-shot mixture and the trees stand as completed contributions.
-
-**Figure 6.4 — The hierarchical mixture of fuzzy experts.** A tree of fuzzy partition-of-unity gates over named inputs, routing to leaves that are themselves full ridge-TSK sub-models. The routing is *soft*: a point reaches every leaf with a weight that is the product of the gate memberships along its path, and the output is the weighted average, which separates this from a decision tree with extra steps. And every gate names an *original* input, because the declarative plan of §6.3.4 cannot express a synthetic intermediate; that is how the Magdalena condition is enforced, not merely respected. The structure is schematic; the variable names are Concrete's, matching §6.3.2's tree.
-`![hme-structure](fig/06-hme-structure.png)`
+The tree of §6.3.2 generalizes to a hierarchical mixture of fuzzy experts, built one-shot today with an EM refinement
+designed but not implemented. It reuses the shared ridge-TSK solver of §6.3.1 throughout, and its architecture, prior
+art, and measured results — including the catastrophic single-seed divergence that motivates this dissertation's
+ten-seed floor (Goal G4a) — are Appendix A.11's subject rather than this chapter's, since the mixture is supporting work
+and not a chapter contribution.
 
 ### 6.3.4 Declarative structure and Ruspini export (built)
 
-The structure of a tree or mixture can be specified declaratively, as a serializable plan with a precedence order in which a pinned path beats a level ordering, which beats an automatic criterion. A domain expert can dictate which variable gates where without touching code. This is also what *enforces* the Magdalena condition: the plan can name only original inputs, so no synthetic intermediate can enter a gate even by accident.
+The structure of a tree or mixture can be specified declaratively, as a serializable plan with a precedence order in
+which a pinned path beats a level ordering, which beats an automatic criterion. A domain expert can dictate which
+variable gates where without touching code. This is also what *enforces* the Magdalena condition: the plan can name only
+original inputs, so no synthetic intermediate can enter a gate even by accident.
 
-Separately, a trained model can be exported to an explicit Ruspini partition. The input is the per-class Gaussian mixture of Chapter 4, not the tree: the export applies to the flat model, easy to assume otherwise in a chapter about hierarchies. The implicit mixture becomes a shared triangular strong partition of unity; I then refine only the apex knots, a partition-preserving, piecewise-linear tuning that keeps the memberships summing to one throughout. I place this against its lineage rather than claim the mechanism as new: a strong triangular partition of unity is the order-2 (linear) B-spline basis, so refining the apex knots is free-knot linear-spline fitting [@deboor2001splines], and the sum-to-one property is intrinsic to that form rather than a constraint I impose (on each knot interval exactly two hat functions are live and they sum to one identically — Appendix A.10.19); de Oliveira [@deoliveira1999semantic] is the nearest fuzzy precedent, tuning membership parameters under an explicit sum-to-one semantic constraint. What is particular here is the setting — apex-only refinement of an *exported* rule base, so the partition holds exactly by construction — not the tuning itself. The result is the interpretable-by-construction artifact of the dissertation: a triangular rule base over named variables a person can read, check, and edit by hand — and, on §2.6's terms, the one output of this pipeline a verification and validation process could take as an input instead of having to reconstruct it from weights. No such process has been run on it, and Goal G6 measures the partition's semantic properties, not its reviewability.
+Separately, a trained model can be exported to an explicit Ruspini partition. The input is the per-class Gaussian
+mixture of Chapter 4, not the tree: the export applies to the flat model, easy to assume otherwise in a chapter about
+hierarchies. The implicit mixture becomes a shared triangular strong partition of unity; I then refine only the apex
+knots, a partition-preserving, piecewise-linear tuning that keeps the memberships summing to one throughout. I place
+this against its lineage rather than claim the mechanism as new: a strong triangular partition of unity is the order-2
+(linear) B-spline basis, so refining the apex knots is free-knot linear-spline fitting [@deboor2001splines], and the
+sum-to-one property is intrinsic to that form rather than a constraint I impose (on each knot interval exactly two hat
+functions are live and they sum to one identically — Appendix A.10.19); de Oliveira [@deoliveira1999semantic] is the
+nearest fuzzy precedent, tuning membership parameters under an explicit sum-to-one semantic constraint. What is
+particular here is the setting — apex-only refinement of an *exported* rule base, so the partition holds exactly by
+construction — not the tuning itself. The result is the interpretable-by-construction artifact of the dissertation: a
+triangular rule base over named variables a person can read, check, and edit by hand — and, on §2.6's terms, the one
+output of this pipeline a verification and validation process could take as an input instead of having to reconstruct it
+from weights. No such process has been run on it, and Goal G6 measures the partition's semantic properties, not its
+reviewability.
 
-**Figure 6.5 — The Ruspini export: a triangular partition of unity, and apex-only refinement.** The construction `build_triangular_partition` states, drawn: a left shoulder, a right shoulder, and a triangle at every interior apex rising from the previous knot and falling to the next. Panel (a): the exported partition on one axis, with $\sum_i \mu_i(x)$ drawn as the flat line it is. Panel (b): two apex knots moved — the refinement step — and the sum still identically one, because moving a knot rebuilds only the two adjacent hats (Appendix A.10.19). Panel (c): what the exported rule base computes with constant consequents, before and after the move: the piecewise-linear interpolant through (knot, consequent), flat beyond the outer knots, a function a reader can draw from the rule table by hand. Illustrative knots and consequents; the rule is the library's.
+**Figure 6.4 — The Ruspini export: a triangular partition of unity, and apex-only refinement.** The construction
+`build_triangular_partition` states, drawn: a left shoulder, a right shoulder, and a triangle at every interior apex
+rising from the previous knot and falling to the next. Panel (a): the exported partition on one axis,
+with $\sum_i \mu_i (x)$ drawn as the flat line it is. Panel (b): two apex knots moved — the refinement step — and the
+sum still identically one, because moving a knot rebuilds only the two adjacent hats (Appendix A.10.19). Panel (c): what
+the exported rule base computes with constant consequents, before and after the move: the piecewise-linear interpolant
+through (knot, consequent), flat beyond the outer knots, a function a reader can draw from the rule table by hand.
+Illustrative knots and consequents; the rule is the library's.
 `![06-ruspini-export](fig/06-ruspini-export.png)`
 
 ### 6.3.5 Antecedent refinement, and what it taught me (built; being extended)
 
-The fast construction leaves the antecedent parameters untuned: the centers and widths of the membership functions. I refine them against a held-out-fold objective, using the ridge solver from §6.3.1 as the inner fitness, and I tried the obvious population methods, differential evolution and a real-valued genetic algorithm, with an optional gradient-descent polish. This machinery runs and produces the improvement quoted in §6.4. What remains is broadening it beyond the one dataset and re-verifying the number under the repeatability protocol, hence built rather than finished.
+The fast construction leaves the antecedent parameters untuned: the centers and widths of the membership functions. I
+refine them against a held-out-fold objective, using the ridge solver from §6.3.1 as the inner fitness, and I tried the
+obvious population methods, differential evolution and a real-valued genetic algorithm, with an optional
+gradient-descent polish. This machinery runs and produces the improvement quoted in §6.4. What remains is broadening it
+beyond the one dataset and re-verifying the number under the repeatability protocol, hence built rather than finished.
 
-The optimizer arms do not order themselves. A two-optimizer comparison put a plain local optimizer (L-BFGS-B) ahead of the population methods, attributed to their overfitting the cross-validation estimate; `reproduce/optimizers/run_study.py` supersedes that comparison and does not support it. In `reproduce/outputs/opt-hotcold-kmbic-2026-08-03/`, eight arms (L-BFGS-B, Powell, differential evolution, a genetic algorithm, particle swarm, ant colony and plain gradient descent, plus a do-nothing arm that just scores the construction) run to a fixed budget of 2,000 objective evaluations on Concrete at ten seeds, and **no arm separates from any other**: every arm-versus-arm paired difference in held-out $R^2$ is smaller than its own spread, the widest pair falling just short of the bar. The ordering is unresolved, not reversed. The cross-validation-overfitting signature points the other way too: the two arms that drive the objective hardest, plain gradient descent and L-BFGS-B, reach the lowest cross-validated MSE in that table but are *not* the arms with the best held-out $R^2$, and they carry the widest seed spreads of the eight. It is the local methods that fail to convert the objective into generalization.
+The optimizer arms do not order themselves. A two-optimizer comparison put a plain local optimizer (L-BFGS-B) ahead of
+the population methods, attributed to their overfitting the cross-validation estimate;
+`reproduce/optimizers/run_study.py` supersedes that comparison and does not support it. In
+`reproduce/outputs/opt-hotcold-kmbic-2026-08-03/`, eight arms (L-BFGS-B, Powell, differential evolution, a genetic
+algorithm, particle swarm, ant colony and plain gradient descent, plus a do-nothing arm that just scores the
+construction) run to a fixed budget of 2,000 objective evaluations on Concrete at ten seeds, and **no arm separates from
+any other**: every arm-versus-arm paired difference in held-out $R^2$ is smaller than its own spread, the widest pair
+falling just short of the bar. The ordering is unresolved, not reversed. The cross-validation-overfitting signature
+points the other way too: the two arms that drive the objective hardest, plain gradient descent and L-BFGS-B, reach the
+lowest cross-validated MSE in that table but are *not* the arms with the best held-out $R^2$, and they carry the widest
+seed spreads of the eight. It is the local methods that fail to convert the objective into generalization.
 
-The claim that a global search "has very little left to find" needs qualifying too. Every arm improves on the construction, by roughly +0.016 to +0.025 in $R^2$, on eight to nine of the ten seeds. Small, but consistent, and found by *everything*, which is not the shape of noise.
+The claim that a global search "has very little left to find" needs qualifying too. Every arm improves on the
+construction, by roughly +0.016 to +0.025 in $R^2$, on eight to nine of the ten seeds. Small, but consistent, and found
+by *everything*, which is not the shape of noise.
 
-The study supports a stronger version: the construction supplies for free what a cold global search has to pay for. Starting from a uniform random point in the same parameter box, a population method needs only a handful of evaluations to match the objective value the construction hands over at zero cost, 3 ± 4 for differential evolution and 10 ± 18 for the genetic algorithm, particle swarm and ant colony, while a local method needs hundreds, 188 ± 440 for Powell and 398 ± 594 for both L-BFGS-B and gradient descent. That is the price of not having the construction, in the one currency that transfers between machines. Past the first few hundred evaluations the trajectories flatten: the local arms drive the objective roughly three times further than the population arms and arrive in the same place. So *structure before search* here does not mean "search finds nothing." It means the construction reaches in one fit a level that search reaches slowly and then cannot meaningfully pass.
+The study supports a stronger version: the construction supplies for free what a cold global search has to pay for.
+Starting from a uniform random point in the same parameter box, a population method needs only a handful of evaluations
+to match the objective value the construction hands over at zero cost, 3 ± 4 for differential evolution and 10 ± 18 for
+the genetic algorithm, particle swarm and ant colony, while a local method needs hundreds, 188 ± 440 for Powell and
+398 ± 594 for both L-BFGS-B and gradient descent. That is the price of not having the construction, in the one currency
+that transfers between machines. Past the first few hundred evaluations the trajectories flatten: the local arms drive
+the objective roughly three times further than the population arms and arrive in the same place. So *structure before
+search* here does not mean "search finds nothing." It means the construction reaches in one fit a level that search
+reaches slowly and then cannot meaningfully pass.
 
-Three qualifications, none small. The study ran on a **different host** from this document's run of record, a four-core 2.10 GHz Xeon virtual machine under Linux, not the workstation every numbered table here was measured on, and it is not in the run-of-record generator list, so it has missed the single-host discipline the rest of the chapter is held to. Its budget is 2,000 evaluations where the configuration this section describes would consume roughly twenty-three times that, and at 2,000 the differential-evolution arm gets under two generations, so on this evidence differential evolution has not really been run as differential evolution; the budget sweep that would settle it has not been run. And the improvement quoted in §6.4 is **not** this study. That comes from `refine_antecedents_coordinate` inside the reconciliation generator, a different code path against a different objective, and the two must not be read as one experiment.
+Three qualifications, none small. The study ran on a **different host** from this document's run of record, a four-core
+2.10 GHz Xeon virtual machine under Linux, not the workstation every numbered table here was measured on, and it is not
+in the run-of-record generator list, so it has missed the single-host discipline the rest of the chapter is held to. Its
+budget is 2,000 evaluations where the configuration this section describes would consume roughly twenty-three times
+that, and at 2,000 the differential-evolution arm gets under two generations, so on this evidence differential evolution
+has not really been run as differential evolution; the budget sweep that would settle it has not been run. And the
+improvement quoted in §6.4 is **not** this study. That comes from `refine_antecedents_coordinate` inside the
+reconciliation generator, a different code path against a different objective, and the two must not be read as one
+experiment.
 
 ## 6.4 Results and Proposed Experiments
 
-> **Reproduction.** Table 6.1 is assembled from *two* generators. `reproduce/tables/table_concrete_reconciliation.py` produces the flat-model rows, including the antecedent-refinement arm; `table_hyperparam_normalization.py` produces the demo-tuned column for the tree and the mixture, read from its **`log + min-max`** arm — the same transform Chapter 4 §4.3 measures, and named the way that section insists on, since the one thing it is not is standardization — not its `log + z-score` arm. Each of those arms runs in only one of the two. Combining them is safe, not merely convenient: the two share splits and seeds and agree to three decimals on four of the five rows they both compute (flat 2nd order, the fuzzy tree at library defaults, CART and Random Forest), and to 0.002 on the fifth, the mixture, so the join is **consistency-checked** rather than assumed. That is weaker than cross-validated: two generators agreeing within one run on one host checks the plumbing, not the numbers. `PROVENANCE_MAP.md` note 12 is the counterexample: cells that agree *exactly* across two independent full sweeps on this host move by as much as 0.043 on another. The run of record for both is `reproduce/outputs/uniform-2026-08-03/`, the archive to read these cells against. Not the similarly named `table_6_1_model_family.py` either: that runs the fuzzy arms at raw preprocessing and library defaults by design, and supplies Table 6.2's external baselines (CART, Random Forest, an optional M5 adapter). Table 6.3 is structural and has no generator. Both harness scripts emit Markdown and CSV with mean ± standard deviation across a fixed seed set, and no cell is left as a bare *pending*: every unfilled one carries the reason and the checklist item tracking it, the harness reporting what it could not run instead of guessing. Per-cell provenance is in `reproduce/PROVENANCE_MAP.md`.
+> **Reproduction.** Table 6.1 is assembled from *two* generators. `reproduce/tables/table_concrete_reconciliation.py`
+> produces the flat-model rows, including the antecedent-refinement arm; `table_hyperparam_normalization.py` produces the
+> demo-tuned column for the tree, read from its **`log + min-max`** arm — the same transform Chapter 4 §4.3 measures, and
+> named the way that section insists on, since the one thing it is not is standardization — not its `log + z-score` arm.
+> Each of those arms runs in only one of the two. Combining them is safe, not merely convenient: the two share splits and
+> seeds and agree to three decimals on the rows they both compute (flat 2nd order, the fuzzy tree at library defaults,
+> CART and Random Forest), so the join is **consistency-checked** rather than assumed. That is weaker than
+> cross-validated: two generators agreeing within one run on one host checks the plumbing, not the numbers.
+> `PROVENANCE_MAP.md` note 12 is the counterexample: cells that agree *exactly* across two independent full sweeps on this
+> host move by as much as 0.043 on another. The run of record for both is `reproduce/outputs/uniform-2026-08-03/`, the
+> archive to read these cells against. Not the similarly named `table_6_1_model_family.py` either: that runs the fuzzy
+> arms at raw preprocessing and library defaults by design, and supplies Table 6.2's external baselines (CART, Random
+> Forest, an optional M5 adapter). Table 6.3 is structural and has no generator. Both harness scripts emit Markdown and
+> CSV with mean ± standard deviation across a fixed seed set, and no cell is left as a bare *pending*: every unfilled one
+> carries the reason and the checklist item tracking it, the harness reporting what it could not run instead of guessing.
+> Per-cell provenance is in `reproduce/PROVENANCE_MAP.md`. Appendix A.11.3 reports the hierarchical-mixture variant on the
+> same benchmark.
 >
-> **The arms in Table 6.1 are not under one protocol, and its caption should not claim they are.** In `table_concrete_reconciliation.py` the flat-model arms carry a preprocessing step the others do not. `prepare()` runs `F.unit_scale` on the target and then `partition_output` on the result, both over the **full 1,030 rows**, and `train_test_split` is not reached until some thirty lines later. The quantile bucket boundaries and the interior bucket mean are therefore functions of every target in the dataset, test rows included. That bucket mean goes to `solve_tsk_consequents`, comes back as `ybm`, and is passed straight into `predict_tsk`: it reaches the prediction path. `preprocess_for_others`, serving the tree, the mixture, CART and the random forest, does no target partition at all.
+> **The arms in Table 6.1 are not under one protocol, and its caption should not claim they are.** In
+> `table_concrete_reconciliation.py` the flat-model arms carry a preprocessing step the others do not. `prepare()` runs
+> `F.unit_scale` on the target and then `partition_output` on the result, both over the **full 1,030 rows**, and
+> `train_test_split` is not reached until some thirty lines later. The quantile bucket boundaries and the interior bucket
+> mean are therefore functions of every target in the dataset, test rows included. That bucket mean goes to
+> `solve_tsk_consequents`, comes back as `ybm`, and is passed straight into `predict_tsk`: it reaches the prediction path.
+> `preprocess_for_others`, serving the tree, CART and the random forest, does no target partition at all.
 >
-> The two halves are not equally serious. `unit_scale` is **affine**, and $R^2$ is invariant under an affine map of the target, so that half moves no $R^2$ cell; the generator's own comment says so at the call site. `partition_output` is a **data-dependent nonlinear discretization**: boundaries that are quantiles of the full target, an interior bucket mean averaged over the full target, and an output that reaches prediction. That half is a genuine leak. The *feature* scaler is fit on the full frame in both code paths, per `_fuzzy_models.py`'s own comment: it "is FIT ON THE FULL FRAME, before the train/test split … This is transductive and would be wrong in a deployment pipeline, but reproducing the archive means reproducing it." So the feature half is symmetric across arms; the target half is not, and that is the asymmetry.
+> The two halves are not equally serious. `unit_scale` is **affine**, and $R^2$ is invariant under an affine map of the
+> target, so that half moves no $R^2$ cell; the generator's own comment says so at the call site. `partition_output` is a
+> **data-dependent nonlinear discretization**: boundaries that are quantiles of the full target, an interior bucket mean
+> averaged over the full target, and an output that reaches prediction. That half is a genuine leak. The *feature* scaler
+> is fit on the full frame in both code paths, per `_fuzzy_models.py`'s own comment: it "is FIT ON THE FULL FRAME, before
+> the train/test split … This is transductive and would be wrong in a deployment pipeline, but reproducing the archive
+> means reproducing it." So the feature half is symmetric across arms; the target half is not, and that is the asymmetry.
 >
-> This does not invalidate Table 6.1, and the asymmetry is now measured. `REPRO_SPLIT_FIRST=1` refits the target scale, the output partition and the feature scaler inside each training fold; `outputs/splitfirst-2026-08-03/` is that run, read in `outputs/SPLIT_FIRST_LEAK.md`. Every exposed row moves inside its own seed spread, and the three closed-form arms move *upward* when the leak is removed, by +0.005, +0.005 and +0.018, the direction an inflating artifact cannot take. All eight control rows move by exactly 0.000, which is what makes the rest mean anything: they never touch the output partition, so anything else would indict the variant. The largest single move is −0.032, on the 1st-order refined arm, inside one standard deviation but not zero and the same order as gaps this chapter reasons from. So the row ordering still reads as **level rather than as a ranking**, now on the seed spreads alone. It does not rehabilitate the control this chapter leaned on: Chapter 4 §4.3 offers CART's and Random Forest's invariance to the transform as evidence that the preprocessing is "not smuggling information into the problem," and that control does not transfer here. A rank-invariant model is *precisely* the control that cannot detect leakage through a monotone scaler or a target partition, so its silence is uninformative.
+> This does not invalidate Table 6.1, and the asymmetry is now measured. `REPRO_SPLIT_FIRST=1` refits the target scale,
+> the output partition and the feature scaler inside each training fold; `outputs/splitfirst-2026-08-03/` is that run,
+> read in `outputs/SPLIT_FIRST_LEAK.md`. Every exposed row moves inside its own seed spread, and the three closed-form
+> arms move *upward* when the leak is removed, by +0.005, +0.005 and +0.018, the direction an inflating artifact cannot
+> take. All eight control rows move by exactly 0.000, which is what makes the rest mean anything: they never touch the
+> output partition, so anything else would indict the variant. The largest single move is −0.032, on the 1st-order refined
+> arm, inside one standard deviation but not zero and the same order as gaps this chapter reasons from. So the row
+> ordering still reads as **level rather than as a ranking**, now on the seed spreads alone. It does not rehabilitate the
+> control this chapter leaned on: Chapter 4 §4.3 offers CART's and Random Forest's invariance to the transform as evidence
+> that the preprocessing is "not smuggling information into the problem," and that control does not transfer here. A
+> rank-invariant model is *precisely* the control that cannot detect leakage through a monotone scaler or a target
+> partition, so its silence is uninformative.
 >
-> **TODO — repeatable performance (board-wide standard):** the training-time, accuracy, and speedup numbers here need the fixed reproducibility protocol and the full baseline suite before citation (see Ch 7 Goal G4/G3).
+> **TODO — repeatable performance (board-wide standard):** the training-time, accuracy, and speedup numbers here need
+> the fixed reproducibility protocol and the full baseline suite before citation (see Ch 7 Goal G4/G3).
 
-**What is measured today.** Table 6.1 compares the three models on Concrete, on shared splits and seeds but *not* under a single protocol, and the table takes up what that licenses. On PhiUSIIL classification the mixture now reaches 1.000 ± 0.001 accuracy, level with CART and the random forest, the flat model 0.997 ± 0.001 and the tree 0.970 on interpretable splits, though as Table 6.2 notes the gaps there carry no weight. And the memory result above.
+**What is measured today.** Table 6.1 compares the flat model and the fuzzy tree on Concrete, on shared splits and seeds
+but *not* under a single protocol, and the table takes up what that licenses. On PhiUSIIL classification the flat model
+reaches 0.997 ± 0.001 and the tree 0.970 on interpretable splits, though as Table 6.2 notes the gaps there carry no
+weight. And the memory result above.
 
-**Antecedent refinement, measured.** §6.3.5 described refining the membership-function parameters against a held-out objective; the harness now runs it.
+**Antecedent refinement, measured.** §6.3.5 described refining the membership-function parameters against a held-out
+objective; the harness now runs it.
 
-| TSK order | closed-form only | refined | Δ |
-|---|---:|---:|---:|
-| 0th | 0.394 ± 0.065 | **0.720 ± 0.037** | **+0.326** |
-| 1st | 0.796 ± 0.018 | **0.834 ± 0.045** | +0.038 |
-| 2nd | 0.841 ± 0.021 | **0.862 ± 0.033** | +0.021 |
+| TSK order | closed-form only |           refined |          Δ |
+|-----------|-----------------:|------------------:|-----------:|
+| 0th       |    0.394 ± 0.065 | **0.720 ± 0.037** | **+0.326** |
+| 1st       |    0.796 ± 0.018 | **0.834 ± 0.045** |     +0.038 |
+| 2nd       |    0.841 ± 0.021 | **0.862 ± 0.033** |     +0.021 |
 
-Refinement helps most where the consequent model has least capacity, and the gradient across the range is the finding: +0.326 at zeroth order against +0.038 and +0.021, a factor of nine. A flat consequent can only place a constant per rule, so moving the membership functions is the only way left to improve the fit; once the consequent carries linear and quadratic terms it can absorb most of what better-placed antecedents would have bought. The zeroth-order gain dwarfs its spread; the higher-order gains are within a spread of it.
+Refinement helps most where the consequent model has least capacity, and the gradient across the range is the finding:
++0.326 at zeroth order against +0.038 and +0.021, a factor of nine. A flat consequent can only place a constant per
+rule, so moving the membership functions is the only way left to improve the fit; once the consequent carries linear and
+quadratic terms it can absorb most of what better-placed antecedents would have bought. The zeroth-order gain dwarfs its
+spread; the higher-order gains are within a spread of it.
 
-**Figure 6.6 — What refining the antecedents buys, by consequent order.** The table above, plotted from the archive it is quoted from (`table_concrete_reconciliation.csv`, `uniform-2026-08-03`): test $R^2$ for the closed-form construction and the refined arm at each TSK order, ten-seed spreads as error bars, the paired gain printed between them. The gradient across the ladder is the finding — a factor of nine from zeroth to second order — and at second order the two arms sit inside each other's spread. Refinement is a search over the membership-function centres and widths with the closed-form solve as its inner objective (§6.3.5); the better the structure-derived model already is, the less that search finds.
+**Figure 6.5 — What refining the antecedents buys, by consequent order.** The table above, plotted from the archive it
+is quoted from (`table_concrete_reconciliation.csv`, `uniform-2026-08-03`): test $R^2$ for the closed-form construction
+and the refined arm at each TSK order, ten-seed spreads as error bars, the paired gain printed between them. The
+gradient across the ladder is the finding — a factor of nine from zeroth to second order — and at second order the two
+arms sit inside each other's spread. Refinement is a search over the membership-function centres and widths with the
+closed-form solve as its inner objective (§6.3.5); the better the structure-derived model already is, the less that
+search finds.
 `![06-refinement-ladder](fig/06-refinement-ladder.png)`
 
-A lift from roughly 0.88 to 0.92 does not reproduce, and 0.92 appears nowhere in a controlled run. On the Concrete regression benchmark (Table 6.1), the refined second-order arm's 0.862 ± 0.033 and the full-second-order basis's 0.861 ± 0.026 are this chapter's two best fuzzy $R^2$ values and they are the same number to within a thousandth, so the chapter has two routes to the same ceiling rather than a best one.
+On the Concrete regression benchmark (Table 6.1), the refined second-order arm's 0.862 ± 0.033 and the full-second-order
+basis's 0.861 ± 0.026 are this chapter's two best fuzzy $R^2$ values and they are the same number to within a
+thousandth, so the chapter has two routes to the same ceiling rather than a best one.
 
-§6.3.5 reports the same direction for the optimizer arms: they do not order themselves at all, and what that study establishes is that a cold search slowly reaches a level the construction supplies at once, then flattens. They are separate measurements on separate code paths and hosts, as §6.3.5 records, so they corroborate a direction without being one experiment. Nor does refinement actively *hurt* at high capacity under this protocol: its contribution shrinks toward zero but stays positive at every order measured, and the one negative row on record, a full-second-order arm losing 0.027, came from a configuration outside the uniform sweep. The argument here is diminishing returns, not damage.
+§6.3.5 reports the same direction for the optimizer arms: they do not order themselves at all, and what that study
+establishes is that a cold search slowly reaches a level the construction supplies at once, then flattens. They are
+separate measurements on separate code paths and hosts, as §6.3.5 records, so they corroborate a direction without being
+one experiment. Nor does refinement actively *hurt* at high capacity under this protocol: its contribution shrinks
+toward zero but stays positive at every order measured, and the one negative row on record, a full-second-order arm
+losing 0.027, came from a configuration outside the uniform sweep. The argument here is diminishing returns, not damage.
 
-**Table 6.1 — The model family on Concrete: architecture × configuration.** All arms at the log-and-min-max preprocessing of Chapter 4 §4.3; 10 seeds, shared splits. Each cell is $R^2$ with RMSE in MPa beneath it, both as mean ± standard deviation. Columns are the hyperparameter setting; the flat model has one pipeline configuration, so its rows vary the consequent basis. **Shared splits, but not one protocol**: the flat rows carry a target transform and an output partition computed over all 1,030 rows *before* the split, the tree/mixture/CART/RF rows none; the reproduction note above gives the mechanism and the measurement that bounds it inside every seed spread.
+**Table 6.1 — The model family on Concrete: architecture × configuration.** All arms at the log-and-min-max
+preprocessing of Chapter 4 §4.3; 10 seeds, shared splits. Each cell is $R^2$ with RMSE in MPa beneath it, both as mean ±
+standard deviation. Columns are the hyperparameter setting; the flat model has one pipeline configuration, so its rows
+vary the consequent basis. **Shared splits, but not one protocol**: the flat rows carry a target transform and an output
+partition computed over all 1,030 rows *before* the split, the tree/CART/RF rows none; the reproduction note above gives
+the mechanism and the measurement that bounds it inside every seed spread.
 
-| Model | default settings | demo-tuned |
-|---|---:|---:|
-| Flat MoG-TSK, 2nd order | 0.841 ± 0.021 <br> *6.50 ± 0.43 MPa* | — |
-| Flat MoG-TSK, full 2nd order | 0.861 ± 0.026 <br> *6.07 ± 0.51* | — |
-| Flat MoG-TSK, 2nd + antecedent refinement | **0.862 ± 0.033** <br> *6.00 ± 0.52* | — |
-| Mixture of experts (HME) | 0.756 ± 0.059 <br> *8.02 ± 0.75* | **0.834 ± 0.027** <br> *6.65 ± 0.47* |
-| Fuzzy tree | 0.689 ± 0.056 <br> *9.07 ± 0.57* | 0.740 ± 0.051 <br> *8.29 ± 0.63* |
-| CART (reference) | 0.826 ± 0.047 <br> *6.73 ± 0.74* | — |
-| Random Forest (reference) | **0.909 ± 0.019** <br> *4.90 ± 0.31* | — |
+| Model                                     |                     default settings |                       demo-tuned |
+|-------------------------------------------|-------------------------------------:|---------------------------------:|
+| Flat MoG-TSK, 2nd order                   | 0.841 ± 0.021 <br> *6.50 ± 0.43 MPa* |                                — |
+| Flat MoG-TSK, full 2nd order              |     0.861 ± 0.026 <br> *6.07 ± 0.51* |                                — |
+| Flat MoG-TSK, 2nd + antecedent refinement | **0.862 ± 0.033** <br> *6.00 ± 0.52* |                                — |
+| Fuzzy tree                                |     0.689 ± 0.056 <br> *9.07 ± 0.57* | 0.740 ± 0.051 <br> *8.29 ± 0.63* |
+| CART (reference)                          |     0.826 ± 0.047 <br> *6.73 ± 0.74* |                                — |
+| Random Forest (reference)                 | **0.909 ± 0.019** <br> *4.90 ± 0.31* |                                — |
 
-These supersede the figures this chapter previously carried (flat 0.658, tree 0.746, mixture 0.791), which came from three different configurations and could not be read against one another. The table is deliberately a grid rather than a ranking, because the honest answer to "does the hierarchy beat the flat model?" turns entirely on what one holds fixed.
+The table is deliberately a grid rather than a ranking, because the answer to "does the hierarchy beat the flat
+model?" turns entirely on what one holds fixed.
 
-Matched on architecture alone (the same second-order consequents, no post-hoc refinement) the two are indistinguishable: 0.841 for the flat model against 0.834 for the tuned mixture, a difference of 0.007 against standard deviations of 0.021 and 0.027. Give the flat model its full second-order basis and it leads by 0.027; add the antecedent refinement of §6.3.5, which the tree and mixture lack, and it leads by 0.028. Neither clears both spreads. So the reading does not depend on insisting the comparison be matched: **the hierarchy and the flat model are level on this problem, and the hierarchy additionally produces a readable decision structure.** That is better supported than either "hierarchy improves accuracy" or "hierarchy loses," and it holds whether or not one hands the flat model the extra machinery. The fuzzy tree stays clearly behind both, and a random forest still beats all of it.
+Give the flat model its full second-order basis and it leads the fuzzy tree by a wide margin; add the antecedent
+refinement of §6.3.5, which the tree lacks, and the gap widens further. **The hierarchy and the flat model are not level
+on this problem for the fuzzy tree**, and the fuzzy tree's value is the readable decision structure it produces, not
+accuracy. A random forest beats everything in the fuzzy family. Appendix A.11.3 reports the hierarchical-mixture variant
+on the same benchmark — tuned, it is indistinguishable from the flat model within spread — along with a rare
+catastrophic single-seed failure mode that is the concrete argument behind Goal G4a's ten-seed floor.
 
-The right-hand column carries a second finding. Tuning cuts the mixture's standard deviation from 0.060 to 0.022, nearly a factor of three, while raising the mean from 0.760 to 0.829. That leaves the tuned mixture and the flat model's full second-order basis as the steadiest *fuzzy* arms in the table (±0.022 against ±0.020), **both behind the random forest**, whose spread is tighter. The fuzzy tree shows nothing comparable (0.056 to 0.051). What `demo_concrete.py`'s settings mostly buy the mixture is reliability: at library defaults it is an erratic model, not a slightly worse one. The divergence described next *looks* like the extreme tail of that behaviour, and the paragraph after it explains why that connection is not established.
+**Table 6.2 — External baselines** *(structure fixed; cells to be filled by the reproduction harness: Goal G3).* Run on
+identical splits, multi-seed with error bars.
 
-**The mixture had a rare catastrophic failure mode, and finding it is why this table can be quoted at all.** At ten seeds one split (seed 9, under normalized features) produced predictions running to 10,536 MPa on a target that never exceeds about 82. The other nine were unremarkable. A five-seed protocol missed the offending split and reported a clean $0.813 \pm 0.039$; the failure was always there and simply had not been sampled.
+| Method                     |         Concrete R² |       Concrete RMSE | PhiUSIIL accuracy |
+|----------------------------|--------------------:|--------------------:|------------------:|
+| **Fuzzy tree (this work)** |       0.583 ± 0.071 |               10.53 |     0.958 ± 0.003 |
+| CART                       |       0.825 ± 0.049 |                6.74 |     0.997 ± 0.001 |
+| Random Forest (reference)  |       0.909 ± 0.019 |                4.90 |     1.000 ± 0.000 |
+| M5 model tree              | N/A (no working M5) | N/A (no working M5) |                 — |
+| ANFIS                      |            N/A (C1) |            N/A (C1) |          N/A (C1) |
+| Flat TSK (= Ch 4 flat MoG) |       0.687 ± 0.051 |                9.12 | **0.440 ± 0.181** |
 
-The cause was in the consequent solver, not the hierarchy: the closed-form ridge solve formed the normal equations, which squares the condition number ($\kappa(\Phi^{\top}\Phi) = \kappa(\Phi)^2$, Appendix A.10.16), and applied no regularization to the rule intercepts — so two rules with nearly collinear firing strengths left a singular, unregularized block. `numpy.linalg.solve` does not raise on that; it returns finite coefficients of order $10^{24}$. Both halves are now fixed upstream, by solving least squares on the design rather than the normal equations and by giving the ridge term a non-zero default, and the row above is a clean ten-seed mean with no divergence.
+**The PhiUSIIL column is leak-free.** `URLSimilarityIndex` — a URL's similarity to a whitelist of known-legitimate URLs,
+the label in disguise and the single most separating feature in the dataset at AUC 0.996 — and two sibling legitimacy
+probabilities are dropped on load (`#215`). Without them the flat MoG scores **0.440 ± 0.181**, *below* the 0.5755
+majority baseline, while CART and Random Forest still reach 0.997 and 1.000. The Concrete columns are byte-identical to
+the leaked-feature run, which is the control: only the PhiUSIIL feature set changed.
 
-One caveat on that clean row. The upstream fixes precede the commit this harness is pinned to, so "no divergence" is substantively right — but the harness emits only `mean ± std`, so no archived per-seed evidence records it. What is owed is the per-seed $R^2$ range and the worst seed's maximum prediction in MPa printed beside the row, so the claim is checkable rather than promised; that is a change to `reproduce/common.py`, not a re-run. Marked **owed** until it lands.
+That reverses what this table was for. **PhiUSIIL is saturated for everything tested except this construction** — Table
+4.5's ten-seed pass puts ANFIS at 0.999 ± 0.001 and a GA-tuned FIS at 0.998 ± 0.001 on the identical 47 features,
+alongside CART's 0.997 and the forest's 1.000. So it stops being a dataset on which the fuzzy family is
+indistinguishable from the baselines, and starts being one on which the flat arm is 0.56 behind them. The mechanism is
+measured in `PROVENANCE_MAP.md` note 31 (a): leak-free, the selector's top five are four *binary* flags plus one bounded
+score, and a per-feature Gaussian **mixture** over a two-point support is a poor and unstable model — which is also
+where the ±0.181 comes from. The construction's PhiUSIIL win rested on having one strong *continuous* feature, and that
+feature was the answer.
 
-One attribution also needs weakening. I called the residual spread at library defaults the extreme tail of the divergence, but the divergence was diagnosed *in the consequent solve*, the solve is fixed, and the spread survived the fix. Whatever drives a wide spread at library defaults is therefore **not established** to be the mechanism that produced 10,536 MPa. These are two findings about the same row, and I keep them separate.
+*Reading the empty cells.* Both are blocked for stated reasons rather than unfinished. ANFIS is checklist item **C1**:
+`table_6_1_model_family.py` emits `N/A` unless an adapter is present, and none is. M5 is a different and more annoying
+problem — the generator already imports `m5py` optionally and would fill the row automatically, but `m5py` does not load
+against the scikit-learn in this environment (`ImportError: cannot import name 'DTYPE' from 'sklearn.tree._classes'`,
+sklearn 1.9.0), and pinning an older scikit-learn to rescue one row would move every other number in the chapter. So the
+row stays `N/A` until either `m5py` is updated or an M5' implementation is written against a current scikit-learn; it is
+a dependency fault, not an experiment not yet run.
 
-I keep the episode because the lesson outlived the bug. A five-seed mean passed as stable a model that fails one time in ten, and no care in the *reporting* would have caught it: the failing configuration was never run. That is the argument for the seed floor in Goal G4, worth more to this dissertation than the corrected cell.
+This table covers two things Table 6.1 does not: the external baselines (M5 and ANFIS, both still
+owed), and the PhiUSIIL column. It runs every model at **raw features and library defaults**, which is why its Concrete
+numbers sit below Table 6.1's throughout. That is the third axis, and the two must not be read as one series: this
+Concrete column says what these models do untuned, Table 6.1 what they do under the tuned, normalized protocol the
+chapter argues for. On PhiUSIIL every method saturates, the tree baseline reaching a near-perfect score, the other fuzzy
+models a fraction behind, so that dataset discriminates hardly at all and should carry no weight.
 
-The grid also makes a configuration effect visible, and sizes it smaller than unmatched configurations suggest. Read across configurations the swing between a default and a tuned mixture looks like more than 0.22 in $R^2$; under one protocol it is **0.069** at fixed preprocessing, 0.760 to 0.829 both normalized, and about half of what looks like hyperparameters is really the normalization, worth +0.071 to the library-default mixture and +0.059 to the demo-tuned one. End to end, from library defaults on raw features to tuned settings on normalized ones, the swing is 0.140, split almost exactly evenly between the two. A comparison that leaves a model at its defaults is still measuring the defaults, but the effect is smaller than that and differently caused. The same caution applies to CART and the random forest, at *their* defaults.
+**Table 6.3 — The interpretability side of the trade** *(structural today; the counts are not yet measured: checklist
+C9, Goal G6).* The intent is to make the trade-off legible rather than asserted: the hierarchy's value is the readable
+decision path, not a smaller rule base. As it stands the table describes the *shape* of each model without measuring it;
+the numbers that would make it an argument are the pending row, so until they exist it sets up the claim rather than
+settling it.
 
-**Table 6.2 — External baselines** *(structure fixed; cells to be filled by the reproduction harness: Goal G3).* Run on identical splits, multi-seed with error bars.
+| Model                                | Rules / leaves                | Variables per rule            | Reads as               |
+|--------------------------------------|-------------------------------|-------------------------------|------------------------|
+| Flat FIS (Concrete)                  | 3 output buckets              | all 8                         | one weighted rule set  |
+| Fuzzy tree (Concrete)                | shallow, depth-capped         | only the path variables       | root→leaf IF–THEN path |
+| **Exact counts at matched accuracy** | *not measured (C9 / Goal G6)* | *not measured (C9 / Goal G6)* | —                      |
 
-| Method | Concrete R² | Concrete RMSE | PhiUSIIL accuracy |
-|---|---:|---:|---:|
-| **Fuzzy tree (this work)** | 0.583 ± 0.071 | 10.53 | 0.958 ± 0.003 |
-| **Mixture of experts (this work)** | 0.636 ± 0.091 | 9.78 | 0.914 ± 0.039 |
-| CART | 0.825 ± 0.049 | 6.74 | 0.997 ± 0.001 |
-| Random Forest (reference) | 0.909 ± 0.019 | 4.90 | 1.000 ± 0.000 |
-| M5 model tree | N/A (no working M5) | N/A (no working M5) | — |
-| ANFIS | N/A (C1) | N/A (C1) | N/A (C1) |
-| Flat TSK (= Ch 4 flat MoG) | 0.687 ± 0.051 | 9.12 | **0.440 ± 0.181** |
+**The scope.** On raw accuracy the tree does not *reliably* beat the flat model, and it does not shrink the rule count
+below the already-compact flat model either. What it buys is an explicit decision hierarchy over named variables and a
+readable path structure, real only at shallow depth and few terms, which is why I cap depth and leaf count. This is an
+interpretability-for-accuracy trade, made deliberately.
 
-**The PhiUSIIL column is leak-free as of 2026-08-30 and it no longer says what it
-used to.** Every cell above previously trained on `URLSimilarityIndex`, a URL's
-similarity to a whitelist of known-legitimate URLs — the label in disguise, and
-the single most separating feature in the dataset at AUC 0.996. `#215` drops it
-and two sibling legitimacy probabilities on load. With them gone the flat MoG
-falls from 0.997 ± 0.001 to **0.440 ± 0.181**, *below* the 0.5755 majority
-baseline, while CART and Random Forest still reach 0.997 and 1.000. The Concrete
-columns are byte-identical across the two runs, which is the control: only the
-PhiUSIIL feature set changed.
-
-That reverses what this table was for. **PhiUSIIL is saturated for everything
-tested except this construction** — Table 4.5's ten-seed pass puts ANFIS at
-0.999 ± 0.001 and a GA-tuned FIS at 0.998 ± 0.001 on the identical 47 features,
-alongside CART's 0.997 and the forest's 1.000. So it stops being a dataset on
-which the hierarchy's methods are indistinguishable from the baselines, and
-starts being one on which the flat arm is 0.56 behind them. The mechanism is measured in `PROVENANCE_MAP.md` note
-31(a): leak-free, the selector's top five are four *binary* flags plus one
-bounded score, and a per-feature Gaussian **mixture** over a two-point support is
-a poor and unstable model — which is also where the ±0.181 comes from. The
-construction's PhiUSIIL win rested on having one strong *continuous* feature, and
-that feature was the answer.
-
-*Reading the empty cells.* Both are blocked for stated reasons rather than unfinished. ANFIS is checklist item **C1**: `table_6_1_model_family.py` emits `N/A` unless an adapter is present, and none is. M5 is a different and more annoying problem — the generator already imports `m5py` optionally and would fill the row automatically, but `m5py` does not load against the scikit-learn in this environment (`ImportError: cannot import name 'DTYPE' from 'sklearn.tree._classes'`, sklearn 1.9.0), and pinning an older scikit-learn to rescue one row would move every other number in the chapter. So the row stays `N/A` until either `m5py` is updated or an M5' implementation is written against a current scikit-learn; it is a dependency fault, not an experiment not yet run.
-
-This table covers two things Table 6.1 does not: the external baselines a reviewer will demand (M5 and ANFIS, both still owed), and the PhiUSIIL column. It runs every model at **raw features and library defaults**, which is why its Concrete numbers sit below Table 6.1's throughout. That is the third axis, and the two must not be read as one series: this Concrete column says what these models do untuned, Table 6.1 what they do under the tuned, normalized protocol the chapter argues for. On PhiUSIIL every method saturates, the two tree baselines and the mixture reaching a perfect score, the other two fuzzy models a fraction behind, so that dataset discriminates hardly at all and should carry no weight.
-
-**Table 6.3 — The interpretability side of the trade** *(structural today; the counts are not yet measured: checklist C9, Goal G6).* The intent is to make the trade-off legible rather than asserted: the hierarchy's value is the readable decision path, not a smaller rule base. As it stands the table describes the *shape* of each model without measuring it; the numbers that would make it an argument are the pending row, so until they exist it sets up the claim rather than settling it.
-
-| Model | Rules / leaves | Variables per rule | Reads as |
-|---|---|---|---|
-| Flat FIS (Concrete) | 3 output buckets | all 8 | one weighted rule set |
-| Fuzzy tree (Concrete) | shallow, depth-capped | only the path variables | root→leaf IF–THEN path |
-| Mixture of experts | one sub-FIS per gate leaf | path gates + expert inputs | gated hierarchy |
-| **Exact counts at matched accuracy** | *not measured (C9 / Goal G6)* | *not measured (C9 / Goal G6)* | — |
-
-**The scope.** On raw accuracy the tree and mixture do not *reliably* beat the flat model, and they do not shrink the rule count below the already-compact flat model either. What they buy is an explicit decision hierarchy over named variables and a readable path structure, real only at shallow depth and few terms, which is why I cap depth and leaf count. This is an interpretability-for-accuracy trade, made deliberately and stated here rather than left for a reviewer to find.
-
-**What I propose to add.** Four things. Implement and evaluate the EM refinement of the mixture. Add the baselines a reviewer will demand (ANFIS, CART/C4.5, M5 model trees, flat TSK, and the recent Fumanal-Idocin (2025) and D-TSK-FC methods) on identical splits. Broaden the benchmark set beyond Concrete and PhiUSIIL to the other domains already scaffolded (turbine, wave-energy, wine, and the IoT sets), so the accuracy–interpretability trade is characterized across more than two problems. That item is **unscheduled**: it appears in no goal in Chapter 7 and no quarter of Chapter 10's timeline, so as written it is an intention with nothing behind it. Either it gets a slot or it stops being listed. Fourth, cutting across all of it, run the single consistent Concrete benchmark that makes every number here comparable with Chapter 4's. This chapter's audit adds two more, one now discharged: the train-fold-only variant of the reconciliation preprocessing has been run, leaving only `preprocess_for_others`, still fitting the feature scaler on the full frame, symmetric across arms but transductive. The other stands: per-seed harness output, so "no divergence" can be checked instead of asserted. The two literature searches I owed — on knot/breakpoint optimization and on fuzzy mixtures-of-experts — are now done: §6.3.4 credits the free-knot-spline lineage (de Boor; de Oliveira) behind the apex-knot refinement, and §6.2 credits the TSK-mixture-equivalence line (Wu et al.'s *functional-equivalence* paper, corrected from a prior miscitation) and bounds the hierarchical claim against it. The reference-attribution fixes are applied.
+**What I propose to add.** Three things. Add the external baselines (ANFIS, CART/C4.5, M5 model trees,
+flat TSK, and the recent Fumanal-Idocin (2025) and D-TSK-FC methods) on identical splits. Broaden the benchmark set
+beyond Concrete and PhiUSIIL to the other domains already scaffolded (turbine, wave-energy, wine, and the IoT sets), so
+the accuracy–interpretability trade is characterized across more than two problems. That item is **unscheduled**: it
+appears in no goal in Chapter 7 and no quarter of Chapter 10's timeline, so as written it is an intention with nothing
+behind it. Either it gets a slot or it stops being listed. Third, cutting across all of it, run the single consistent
+Concrete benchmark that makes every number here comparable with Chapter 4's. This chapter's audit adds two more, one now
+discharged: the train-fold-only variant of the reconciliation preprocessing has been run, leaving only
+`preprocess_for_others`, still fitting the feature scaler on the full frame, symmetric across arms but transductive. The
+other stands: per-seed harness output, so "no divergence" can be checked instead of asserted. The literature search I
+owed on knot/breakpoint optimization is now done: §6.3.4 credits the free-knot-spline lineage (de Boor; de Oliveira)
+behind the apex-knot refinement. Appendix A.11.2 covers the corresponding search on fuzzy mixtures-of-experts. The
+reference-attribution fixes are applied.
 
 ## 6.5 Discussion and Contributions
 
-The defensible contribution is architectural, not any single algorithm: one closed-form ridge primitive reused across a flat FIS, a soft fuzzy tree, and a hierarchical mixture, with a clean export to a triangular rule base and an extension to temporal data. Every building block is prior art and I credit each; the integration is the thing. The Magdalena objection is answered by construction and enforced by the declarative plan.
+The contribution is architectural, not any single algorithm: one closed-form ridge primitive reused across a
+flat FIS and a soft fuzzy tree, with a clean export to a triangular rule base and an extension to temporal data. Every
+building block is prior art and I credit each; the integration is the thing. The Magdalena objection is answered by
+construction and enforced by the declarative plan.
 
-This chapter is also where the pipeline closes. Chapter 3 finds the structure at scale. Chapter 5 turns that structure into antecedents where no coordinates exist. Here those antecedents become a working model: the ridge solver supplies the consequents, the tree or mixture the hierarchy, the Ruspini export the readable artifact. That handoff, Chapter 5's membership functions consumed by this chapter's inference machinery, is the integration Chapter 7 names as the capstone, and the one link I have specified but not yet demonstrated.
+This chapter is also where the pipeline closes. Chapter 3 finds the structure at scale. Chapter 5 turns that structure
+into antecedents where no coordinates exist. Here those antecedents become a working model: the ridge solver supplies
+the consequents, the tree the hierarchy, the Ruspini export the readable artifact. That handoff, Chapter 5's membership
+functions consumed by this chapter's inference machinery, is the integration Chapter 7 names as the capstone, and the
+one link I have specified but not yet demonstrated.
 
-The interpretability claim needs the same care. The trade against accuracy is stated above and the mechanism is real, but Table 6.3 shows the *quantification* is still pending: I have described why the hierarchy is more readable and not measured it, and calling that quantified would be overstating.
+The interpretability claim needs the same care. The trade against accuracy is stated above and the mechanism is real,
+but Table 6.3 shows the *quantification* is still pending: I have described why the hierarchy is more readable and not
+measured it, and calling that quantified would be overstating.
 
-That warning has to be honoured elsewhere, and is not. Chapter 8 describes the accuracy-for-interpretability trade as one "the reproduction harness now measures rather than asserts," and only half of that is true. The harness measures what the trade **costs**: Table 6.1 is precisely that measurement, and the reason the "hierarchy improves accuracy" claim came out of this chapter. It measures nothing about what the trade **buys**: Table 6.3's counts row is empty and marked C9, and no generator stands behind that table. The claim the two chapters should share is that the cost is measured and the benefit is still asserted. What remains, the EM, the baselines, the interpretability counts, and the end-to-end demonstration, is the subject of Chapter 7.
+That warning has to be honoured elsewhere, and is not. Chapter 8 describes the accuracy-for-interpretability trade as
+one "the reproduction harness now measures rather than asserts," and only half of that is true. The harness measures
+what the trade **costs**: Table 6.1 is precisely that measurement, and the reason the "hierarchy improves accuracy"
+claim came out of this chapter. It measures nothing about what the trade **buys**: Table 6.3's counts row is empty and
+marked C9, and no generator stands behind that table. The claim the two chapters should share is that the cost is
+measured and the benefit is still asserted. What remains, the baselines, the interpretability counts, and the end-to-end
+demonstration, is the subject of Chapter 7; the hierarchical-mixture EM is tracked there too, against Appendix A.11's
+prototype.
 
 ---
 
-*Draft — Chapter 6 prose; built vs. proposed marked throughout. Citations in bracketed shorthand pending the consolidated `references.bib`. Three tables (6.1–6.3) and six figures (6.1–6.6) inline. Open items in `../CHECKLIST.md`.*
+*Draft — Chapter 6 prose; built vs. proposed marked throughout. Citations in bracketed shorthand pending the
+consolidated `references.bib`. Three tables (6.1–6.3) and five figures (6.1–6.5) inline. The hierarchical mixture of
+fuzzy experts is covered in Appendix A.11, not here. Open items in `../CHECKLIST.md`.*
