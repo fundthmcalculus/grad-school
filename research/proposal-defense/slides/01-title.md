@@ -1,18 +1,12 @@
-# Graduate Research Proposal Defense
+# Reproducing Like Tribbles
 
-## Your Research Title Here
+**Scaling Fuzzy Inference Systems from Hundreds to Hundreds of Thousands**
 
-**Presented by:** Your Name  
-**Date:** September 4, 2026  
-**Institution:** Your University
+&nbsp;
 
----
+Scott Phillips
 
-## Overview
+Department of Aerospace Engineering and Engineering Mechanics
+University of Cincinnati
 
-This presentation outlines your graduate research proposal, including:
-- Research motivation and background
-- Problem statement
-- Proposed methodology
-- Expected contributions
-- Timeline and resources
+Proposal Defense — December 2026
