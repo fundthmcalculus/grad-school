@@ -62,11 +62,72 @@ As mentioned earlier, the approach is designed around a Takagi Sugeno Kang (TSK)
 $$ output_{defuzzified} = {{\sum_{1}^{N_{rules}} z_i \times w_i}\over{\sum_{1}^{N_{rules}} w_i}}$$
 where $z_i$ is the crisp consequent rule and $w_i$ is the firing-weight of the $i$th rule.
 
-Since this is a type-1 model, the consequent rules are typically polynomials. These polynomials can be fit using common least-squares techniques. Since the firing weights $w_i$ are already known, the defuzzification step can be expanded to be linear in the consequent terms. For simplicity, define $W_{all}=\sum w_i$. From there, define $z_i = a_0 + a_1 x_1 + ... a_n x_n$ for linear (TSK order-1) consequent equations. The other polynomial orders follow naturally. The consequent equations then become as follows:
+Since this is a type-1 model, the consequent rules are typically polynomials. These polynomials can be fit using common least-squares techniques. Since the firing weights $w_i$ are already known, the defuzzification step can be expanded to be linear in the consequent terms.
+
+### Derivation
+For simplicity, define $W_{all}=\sum w_i$. From there, define $z_i = a_0 + a_1 x_1 + ... a_n x_n$ for linear (TSK order-1) consequent equations. Define $y$ is the crisp output variable, $a_{rule-num,coeff-num}$ is the coefficient of the $n$th crisp consequent rule and $x_i$ is the $i$th crisp input variable. The other polynomial orders follow naturally. The consequent equations then become as follows:
 
 $$ y = {1 \over W_{sum}} \left ( w_1 (a_{0,0}+a_{0,1}x_1+...+a_{0,N}x_N) + w_2 (a_{1,0}+a_{1,1}x_1+...+a_{1,N}x_N)+... \right ) $$
 
-where $y$ is the crisp output variable, $a_{rule-num,coeff-num}$ is the coefficient of the $n$th crisp consequent rule and $x_i$ is the $i$th crisp input variable.
+Define normalized weights, with $x_0=1$ for convenience:
+$$ W_{sum} = \sum_{j=1}^{R} w_j, \qquad \bar w_j = \frac{w_j}{W_{sum}}, \qquad x_0 \equiv 1 $$
+
+Pull $1 / W_{sum}$ inside, write as double-sum
+$$ y = \sum_{j=1}^{R} \bar w_j \sum_{i=0}^{N} a_{j-1,i}\, x_i $$
+
+Group known terms ($\bar w_j w_i$) from unknowns ($a$)
+$$ y = \sum_{j=1}^{R}\sum_{i=0}^{N} \left(\bar w_j\, x_i\right) a_{j-1,i} $$
+
+Dot-product form for sample $m$
+$$ y^{(m)} = {\boldsymbol\varphi^{(m)}}^{\!\top} \boldsymbol\theta,
+\quad
+\boldsymbol\varphi^{(m)} = \begin{bmatrix}
+\bar w_1^{(m)} \\ \bar w_1^{(m)}x_1^{(m)} \\ \vdots \\ \bar w_R^{(m)}x_N^{(m)}
+\end{bmatrix},
+\quad
+\boldsymbol\theta = \begin{bmatrix}
+a_{0,0} \\ a_{0,1} \\ \vdots \\ a_{R-1,N}
+\end{bmatrix}
+$$
+
+Stack $M$ samples (where $ M \gte R(N+1) $):
+$$
+\underbrace{\begin{bmatrix}
+{\boldsymbol\varphi^{(1)}}^{\!\top} \\
+{\boldsymbol\varphi^{(2)}}^{\!\top} \\
+\vdots \\
+{\boldsymbol\varphi^{(M)}}^{\!\top}
+\end{bmatrix}}_{\Phi \in \mathbb{R}^{M \times R(N+1)}}
+\boldsymbol\theta
+=
+\underbrace{\begin{bmatrix}
+y^{(1)} \\ y^{(2)} \\ \vdots \\ y^{(M)}
+\end{bmatrix}}_{\mathbf{y}}
+##
+
+Expand $\phi$ explicitly:
+$$
+\Phi =
+\begin{bmatrix}
+\bar w_1^{(1)} & \bar w_1^{(1)}x_1^{(1)} & \cdots & \bar w_1^{(1)}x_N^{(1)} & \bar w_2^{(1)} & \cdots & \bar w_R^{(1)}x_N^{(1)} \\
+\bar w_1^{(2)} & \bar w_1^{(2)}x_1^{(2)} & \cdots & \bar w_1^{(2)}x_N^{(2)} & \bar w_2^{(2)} & \cdots & \bar w_R^{(2)}x_N^{(2)} \\
+\vdots & \vdots & & \vdots & \vdots & & \vdots \\
+\bar w_1^{(M)} & \bar w_1^{(M)}x_1^{(M)} & \cdots & \bar w_1^{(M)}x_N^{(M)} & \bar w_2^{(M)} & \cdots & \bar w_R^{(M)}x_N^{(M)}
+\end{bmatrix}
+$$
+
+Least-squares solution (cost->gradient->normal equations)
+$$
+J(\boldsymbol\theta) = \lVert \Phi\boldsymbol\theta - \mathbf{y} \rVert_2^2
+\;\;\Rightarrow\;\;
+\nabla_{\boldsymbol\theta} J = 2\Phi^\top(\Phi\boldsymbol\theta - \mathbf{y}) = 0
+\;\;\Rightarrow\;\;
+\Phi^\top\Phi\,\boldsymbol\theta = \Phi^\top\mathbf{y}
+$$
+$$ \boldsymbol\theta = (\Phi^\top\Phi)^{-1}\Phi^\top\mathbf{y} = \Phi^{+}\mathbf{y} $$
+
+Ridge variant (rank-deficient $\phi$)
+$$ \boldsymbol\theta = (\Phi^\top\Phi + \lambda I)^{-1}\Phi^\top\mathbf{y} $$
 
 As is clearly evident, this is a system of linear equations. The solution for the optimal consequent coefficients can be solved using any number of common numerical techniques. Our testing has found that regularization is helpful, since some of the training data can be numerically ill-conditioned. Pre-scaling all data to be approximately zero mean and unity variance or approximately $[0, 1]$ reduces this issue. This is not a specific limitation of this training method, but rather a limitation of FIS's in general. Other machine learning techniques also benefit from similar variable pre-conditioning.
 
