@@ -25,22 +25,35 @@ We propose a shift in the construction to an output-first clustering. The cleare
 2. For each input variable, compute the membership functions using Gaussian Mixture Modeling (GMM) to identify not only the number of clusters, but also the exact parameters for this collection of membership functions. The weight parameter is discarded so that the resultant membership function follows the common form.
 3. These per-input membership functions are then `t-conorm`d together because they all belong to the same output class.
 4. Once all membership functions for each variable are computed for a given output class, `t-norm` the variables together as is common practice.
-5. An optional post-processing step $O(N)=N^2$ is to deduplicate the repeated membership functions since the membership functions for each variable are computed individually and independently for each output label.
+5. An optional $O(N)=N^2$ post-processing step is to deduplicate the repeated membership functions since the membership functions for each variable are computed individually and independently for each output label. This is not required, but it does increase interpretability, as well as return the model to a more common form.
 
-This backwards approach provides several clear advantages:
+**Advantages**
 1. Fixed number of rules: $N_{output}=N_{class}$ thereby _eliminating_ all possible rulebase explosion. Because of this construction method, it is not possible to simplify the FIS to have fewer rules.
-2. Individual membership extraction: By extracting memberships and utilizing `t-conorm`, the model can easily handle disjoint membership in a given input variable.
+2. Individual membership extraction: By extracting memberships and utilizing `t-conorm` to combine them, the model can easily handle disjoint membership in a given input variable.
 3. Gaussian membership: The gaussian membership, due to its infinite support, continuity, and differentiability, provides additional convenience in optimization. For classification, this is less important, but it will be extremely useful in regression later.
 
 **Drawbacks**
 1. Because the admissibility of any rule is defined as the cartesian product of the input variable regions, it is possible to construct a region that will be admitted without training support.
+2. Membership function and t-norm/t-conorm pairs are fixed, which reduces flexibility. **TODO: Future work to show that we can shift from this model to a Ruspini partition**
+3. Training data requirement. Unlike a forward training approach, which only requires a fitness/scoring function, this approach _requires_ a large amount of sample data to partition. For instance, it cannot be used to tune a fuzzy controller.
+
+### Our Approach - Feature Engineering
+For large scale problems with numerous variables, it is important to reduce the number contributing input variables as much as possible. This not only reduces the model size, but also increases the model interpretability. Various methods can be applied, but the method we have chosen is as follows:
+1. For each output class (from above):
+2. Compute the gaussian correlation between a given input variable and the output class using a combination of `wasserstein` and `bhattacharyya`.
+  1. This is done because `bhattacharya` is parametric and works for approximately gaussian data while `wasserstein` is nonparametric.
+  2. The composition is done by averaging the arithmetic _and_ geometric mean of the two metrics. This provides a stronger test that an input is correlated to the output.
+3. Sort the variables by output correlation in descending order
+4. Take up to the top `n` variables, skipping those input variables which have a Pearson correlation coefficient less than a defined threshold (usually $<0.85$).
+
+This allows input feature reduction while preserving output discrimination.
 
 ### Our Approach - Anomaly Detection
 Anomaly detection is specifically important in certifiable AI. If the model is making a decision, the model needs to also have clear and accurate repoerted confidence in the answer. Triangular/trapezoidal membership functions solve this by having finite support. Gaussian membership functions have infinite support, and will therefore cause the output rules to fire, albeit at a low level, even in regions where no training input data exists. For example, with the **TODO: PhiURII dataset** phishing dataset, it is important to know not only if the sample is valid or malicious, but also if model has seen a sample like that before. We propose an anomaly detection rule construction as follows.
 
 $$ \mu_{anomaly} = complement(tconorm(\forall rules)) + boost$$
 
-This approach provides a general definition for anomaly detection independent of the choice of `t-norm`/`tconorm` pair provided that the choice is a **De Morgan Triplet**. The $boost$ parameter is a sensitivity parameter that can be used to adjust the threshold for anomaly detection. It is formulated this way so that the anomaly rule can be directly compared with the classification rules. The anomaly sensitivity parameter can be tuned independently of model training, but our experience **TODO evidence**) indicates a value $0.95 \in [0.9,0.99]$ is a good starting point. Because anomaly is a strict classification, the degree of membership can exceed unity. This is not a problem, since defuzzification for classification is just an `argmax` operator.
+This approach provides a general definition for anomaly detection independent of the choice of `t-norm`/`t-conorm` pair provided that the choice is a **De Morgan Triplet**. The $boost$ parameter is a sensitivity parameter that can be used to adjust the threshold for anomaly detection. It is formulated this way so that the anomaly rule can be directly compared with the classification rules. The anomaly sensitivity parameter can be tuned independently of model training, but our experience **TODO evidence**) indicates a value $0.95 \in [0.9,0.99]$ is a good starting point. Because anomaly is a strict classification, the degree of membership can exceed unity. This is not a problem, since defuzzification for classification is just an `argmax` operator. This same anomaly rule can be used with regression to identify if the test data is well outside the training set.
 
 ### Our Approach - Regression
 Similar to classification, regression is a natural extension by assigning a cardinal order to the output labels. To select the output labels, an additional parameter is set, the number of output bins: $N_{output}$. The range of each bin can be selected by multiple different means, but our testing has indicated that a simple uniform binning is sufficient. Quantile binning is prone to bias error by over-paritioning common outputs. Once the output bins have been selected, bin labels are assigned to each variable. After the bin labels have been assigned, the same approach to membership function selection and combination applies to this method.
@@ -55,17 +68,16 @@ $$ y = {1 \over W_{sum}} \left ( w_1 (a_{0,0}+a_{0,1}x_1+...+a_{0,N}x_N) + w_2 (
 
 where $y$ is the crisp output variable, $a_{rule-num,coeff-num}$ is the coefficient of the $n$th crisp consequent rule and $x_i$ is the $i$th crisp input variable.
 
-As is clearly evident, this is a system of linear equations. The solution for the optimal consequent coefficients can be solved using any number of common numerical techniques.
+As is clearly evident, this is a system of linear equations. The solution for the optimal consequent coefficients can be solved using any number of common numerical techniques. Our testing has found that regularization is helpful, since some of the training data can be numerically ill-conditioned. Pre-scaling all data to be approximately zero mean and unity variance or approximately $[0, 1]$ reduces this issue. This is not a specific limitation of this training method, but rather a limitation of FIS's in general. Other machine learning techniques also benefit from similar variable pre-conditioning.
+
+### Key Results
+
+**TODO: Show the example data results and timing**
 
 ### Conclusions and Future Work
 This approach has substantial performance improvements for large-scale FIS construction. It creates an excellent initial guess for the model to be further refined by existing techniques while simultaneously eliminating rulebase explosion by construction. It does not sacrifice interpretability like ANFIS approaches in doing so.
 
-Future work consists of extending this to handle Fuzzy Trees (**TODO: develop additional paper with Hugo**) as well as type-2 FISs It creates an excellent initial guess for the model to be further refined by existing techniques while simultaneously eliminating rulebase explosion by construction. It does not sacrifice interpretability like ANFIS approaches in doing so.
-
-Future work consists of extending this to handle Fuzzy Trees (**TODO: develop additional paper with Hugo**) as well as type-2 FISs. T2-FIS have achieved common use, and so would benefit from a similar performance enhancements. Fuzzy Trees are used in the engineering community, and would likewise benefit from faster construction and evaluation vs common Genetic Algorithm based approaches.  
-
-
-**TODO: feature engineering and the need to combine methods**
+Future work consists of extending this to handle Fuzzy Trees (**TODO: develop additional paper with Hugo**) as well as type-2 FISs. T2-FIS have achieved common use, and so would benefit from a similar performance enhancements. Fuzzy Trees are used in the engineering community, and would likewise benefit from faster construction and evaluation vs common Genetic Algorithm based approaches.
 
 **TODO Show quantile bin issues**
 
