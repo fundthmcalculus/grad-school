@@ -234,3 +234,25 @@ complete single-platform grids. The laptop's chains skip the old grids via
   GPU number is quoted beside a CPU one.
 * GPU wall-clock and chars/s are not comparable to the CPU timing columns and are not
   reported against them.
+
+### `h9` outcome (2026-10-09): 16 cells, H9b scored
+
+Mean val BPC; frlm-acc over seeds 0–2, frlm-delta seed 0. "Recovers" is the fraction of
+the (sum, sum) → (mean, mean) gain that each single-layer change achieves.
+
+| arm | sum/sum | mean/sum (mixer) | sum/mean (FFN) | mean/mean | full gain | mixer-only | FFN-only |
+|---|---|---|---|---|---|---|---|
+| frlm-acc (3 seeds) | 1.858 ± 0.006 | 1.860 ± 0.023 | **1.752 ± 0.014** | 1.759 ± 0.003 | 0.099 | −2% | **107%** |
+| frlm-delta (1 seed) | 1.862 | 1.840 | **1.738** | 1.753 | 0.109 | 20% | **114%** |
+
+* **H9b refuted** in both arms. It predicted that the gain lives in the mixer; it lives
+  in the TSK FFN. This confirms the correction above.
+* The (sum, sum) and (mean, mean) seed-0 cells reproduced exactly (determinism check).
+* **Unregistered observation, not acted on:** FFN-only HTSK is slightly better than HTSK
+  on both layers in both arms (−0.007 acc, −0.015 delta). The `-htsk` arms in
+  `scaling2` use HTSK on both layers, so they may be marginally off the best
+  configuration. Selecting FFN-only now would be a further round of fuzzy-only search.
+  It is left as a candidate for a later, disclosed iteration.
+* Mechanism, as a reading rather than a test: the FFN's antecedent dimension is 32, the
+  mixer's per-head dimension 16. Saturation grows with dimension (Cui, Wu & Xu 2021,
+  Fig. 1), so the wider FFN rule base is where saturation bites.
