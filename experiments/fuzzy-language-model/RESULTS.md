@@ -167,3 +167,47 @@ a 2×2 of exponent normalization on the recurrent mixer × on the TSK FFN (`--ex
   every single-seed comparison above is suspect.
 * The seed spread of the `frlm-acc` cells gives the first noise estimate for the
   single-seed `fuzzyfix` gains.
+
+### v2 tune (2026-10-09): the HTSK arms on the shared 12-cell grid
+
+| arm | best lr / sc | val BPC | 1e-2/4 | 3e-2/4 | 6e-2/4 | 1e-1/4 |
+|---|---|---|---|---|---|---|
+| frlm-delta-htsk | 6e-2 / 4 | **1.747** | 1.880 | 1.753 | 1.747 | 1.791 |
+| frlm-acc-htsk | 3e-2 / 4 | **1.756** | 1.823 | 1.756 | 1.761 | 1.801 |
+
+* Both optima are interior; the edge check passed and `scaling2` started 11:25.
+* **Determinism, observed:** each lr = 3e-2 / sc4 cell has exactly the configuration of
+  the corresponding `fuzzyfix` mean/random cell, run independently. They reproduce:
+  1.7555 against 1.756 for acc (the same number at different rounding), and 1.753
+  against 1.753 for delta.
+* On the provisional d = 32, one-seed tune table, the tuned FRLMs now sit between the
+  neural linear-cost arms (linear 1.742, gla 1.729, delta 1.699) and softmax (1.763).
+  That would put H7 (FRLM within 0.10 of the best neural linear-cost arm) inside its
+  margin. **Not scored here**; `scaling2` and `headline2` decide it.
+
+### ⚠ CORRECTION, 2026-10-09: the `fuzzyfix` attribution was wrong (`h9`, partial)
+
+The `fuzzyfix` section above concluded **"H9 refuted, the gain is in the recurrent rule
+base"**. That inference was made across arms (the FLM did not improve). **The direct
+test overturns it.** Seed 0, frlm-acc, tuned lr/sc, d = 32, 10M chars:
+
+| mixer exp-norm | FFN exp-norm | val BPC |
+|---|---|---|
+| sum | sum | 1.864 |
+| mean | sum | 1.882 |
+| sum | **mean** | **1.755** |
+| mean | mean | 1.756 |
+
+* **The whole HTSK gain is in the TSK FFN.** HTSK on the mixer alone does nothing (+0.018).
+  **H9 as registered ("the gain comes mostly from the TSK FFN") is supported.** The
+  earlier "refuted" verdict is withdrawn.
+* Why the FLM did not improve with an FFN-side fix is now an open question. The
+  cross-arm inference assumed that the FFN behaves the same whatever the mixer, and it
+  does not.
+* **Determinism check passed:** the (sum, sum) and (mean, mean) seed-0 cells reproduce
+  the tune and fuzzyfix values (1.86395 against 1.864, 1.75555 against 1.756).
+* First noise estimate: (sum, sum) at seed 1 gives 1.853, against 1.864 at seed 0. The
+  ~0.11 gain is about 10× that spread. The frlm-acc 3-seed cells and the frlm-delta row
+  are still running, and H9b is scored when they finish.
+* **Lesson, the one AGENTS.md already states:** attribute changes to one variable at a
+  time. Inference across arms is a hypothesis, not an attribution.
