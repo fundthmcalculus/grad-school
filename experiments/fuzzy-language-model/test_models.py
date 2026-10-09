@@ -4,8 +4,11 @@ import math
 
 import numpy as np
 import pytest
-import torch
-import torch.nn.functional as F
+
+# CI collects every experiments/ suite in an environment without torch; skip, don't
+# error -- a collection error interrupts the whole pytest run and hides other suites.
+torch = pytest.importorskip("torch")
+import torch.nn.functional as F  # noqa: E402
 
 from flm.data import EOT, decode, encode
 from flm.models import (
@@ -19,7 +22,15 @@ from flm.models import (
     apply_rope,
 )
 
-torch.set_default_dtype(torch.float64)
+
+@pytest.fixture(autouse=True, scope="module")
+def _float64():
+    """The identities are checked in float64; restore the default so a shared pytest
+    session's other torch suites are unaffected."""
+    prev = torch.get_default_dtype()
+    torch.set_default_dtype(torch.float64)
+    yield
+    torch.set_default_dtype(prev)
 
 
 def cfg(**kw):
