@@ -64,7 +64,7 @@ def register(name, jobs):
     GRIDS[name] = jobs
 
 
-def run_job(sweep, name, argv):
+def run_job(sweep, name, argv, device="cpu", threads=1):
     out = OUT / sweep / f"{name}.json"
     if out.exists():
         return name, "skip", 0.0
@@ -79,7 +79,9 @@ def run_job(sweep, name, argv):
                 "flm.train",
                 *argv,
                 "--threads",
-                "1",
+                str(threads),
+                "--device",
+                device,
                 "--out",
                 str(out),
             ],
@@ -102,8 +104,19 @@ def main():
     p.add_argument("sweep", choices=sorted(GRIDS))
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--list", action="store_true")
+    p.add_argument(
+        "--device", default="cpu", help="training device passed to every job"
+    )
+    p.add_argument("--threads", type=int, default=1, help="torch threads per job")
     a = p.parse_args()
     jobs = GRIDS[a.sweep]
+    skip = OUT / a.sweep / "SKIP"
+    if skip.exists() and not a.list:
+        # a grid assigned to another machine; see the marker for where it runs
+        print(
+            f"{a.sweep}: SKIPPED on this host -- {skip.read_text().strip()}", flush=True
+        )
+        return
     if a.list:
         for n, argv in jobs:
             print(n, " ".join(argv))
@@ -115,7 +128,7 @@ def main():
         flush=True,
     )
     with ThreadPoolExecutor(a.workers) as ex:
-        futs = [ex.submit(run_job, a.sweep, *j) for j in todo]
+        futs = [ex.submit(run_job, a.sweep, *j, a.device, a.threads) for j in todo]
         for i, f in enumerate(as_completed(futs), 1):
             name, status, dt = f.result()
             print(f"[{i}/{len(todo)}] {status} {name} {dt:.0f}s", flush=True)

@@ -88,5 +88,19 @@ VIRTUAL_ENV=.venv uv pip install numpy pandas pyarrow huggingface_hub tokenizers
 .venv/bin/python -m flm.analyze scaling --threshold 2.0
 ```
 
+### On a GPU host (the ten-seed headline grids)
+
+```bash
+VIRTUAL_ENV=.venv uv pip install torch --index-url https://download.pytorch.org/whl/cu130   # CUDA wheel instead of CPU
+.venv/bin/python -m flm.data
+.venv/bin/python -m flm.sweep headline10   --device cuda --workers 8   # 80 runs, seeds 0-9 at d=32
+.venv/bin/python -m flm.sweep headline10v2 --device cuda --workers 8   # 20 runs, the HTSK FRLM arms
+git add -f outputs/headline10/*.json outputs/headline10v2/*.json        # records only, not logs
+```
+
+The models are tiny, so one GPU holds many workers; raise `--workers` until the GPU is
+busy. Hyperparameters come from the committed CPU `tune` records. Every run records
+`device`/`host`, and `flm.analyze` never pools devices into one cell.
+
 Outputs land in `outputs/` (gitignored, regenerable). Run records worth keeping
 are force-added (`git add -f`), as AGENTS.md describes.

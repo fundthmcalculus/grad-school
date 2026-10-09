@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta-htsk_lr6e-2_sc0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 0,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28136,
+ "params_nonemb": 25000,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.83692,
+ "evals": [
+  [
+   305,
+   2.29173
+  ],
+  [
+   610,
+   2.07158
+  ],
+  [
+   915,
+   1.91704
+  ],
+  [
+   1220,
+   1.83621
+  ],
+  [
+   1221,
+   1.83692
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8262
+  ],
+  [
+   50,
+   5.3592
+  ],
+  [
+   100,
+   3.9954
+  ],
+  [
+   150,
+   3.3051
+  ],
+  [
+   200,
+   2.8727
+  ],
+  [
+   250,
+   2.6205
+  ],
+  [
+   300,
+   2.4313
+  ],
+  [
+   350,
+   2.3243
+  ],
+  [
+   400,
+   2.2439
+  ],
+  [
+   450,
+   2.1981
+  ],
+  [
+   500,
+   2.1605
+  ],
+  [
+   550,
+   2.1154
+  ],
+  [
+   600,
+   2.0781
+  ],
+  [
+   650,
+   2.0574
+  ],
+  [
+   700,
+   2.032
+  ],
+  [
+   750,
+   2.0113
+  ],
+  [
+   800,
+   1.9845
+  ],
+  [
+   850,
+   1.9637
+  ],
+  [
+   900,
+   1.943
+  ],
+  [
+   950,
+   1.925
+  ],
+  [
+   1000,
+   1.8953
+  ],
+  [
+   1050,
+   1.8847
+  ],
+  [
+   1100,
+   1.8685
+  ],
+  [
+   1150,
+   1.8581
+  ],
+  [
+   1200,
+   1.8591
+  ],
+  [
+   1220,
+   1.8582
+  ]
+ ],
+ "train_seconds": 1341.59,
+ "wall_seconds": 1714.9,
+ "chars_per_sec": 7456,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there were he was to be something said, \"Do also well be special came be to day. He with man in the on decided to she sse liked a started to she readed, \"Ben, you rippling and Ben an this meagink in the red. Tom said, \"That the ball a big said. Ben and have at the scared.\n<|eot|>\n\n\nMax was smiled. Max and",
+ "rule_init": {}
+}

@@ -63,6 +63,7 @@ def load(sweeps):
                 bpc=r["val_bpc"],
                 secs=r["train_seconds"],
                 cps=r["chars_per_sec"],
+                device=r.get("device", "cpu"),
             )
         )
     return rows
@@ -71,9 +72,10 @@ def load(sweeps):
 def summarize(rows):
     groups = defaultdict(list)
     for r in rows:
-        groups[(r["arm"], r["d"], r["L"])].append(r)
+        # device is part of the key: CPU and GPU runs are never pooled into one cell
+        groups[(r["arm"], r["d"], r["L"], r["device"])].append(r)
     out = []
-    for (arm, d, L), g in groups.items():
+    for (arm, d, L, device), g in groups.items():
         b = np.array([x["bpc"] for x in g], dtype=float)
         ok = np.isfinite(b)
         out.append(
@@ -81,6 +83,7 @@ def summarize(rows):
                 arm=arm,
                 d=d,
                 L=L,
+                device=device,
                 params=g[0]["params"],
                 params_nonemb=g[0]["params_nonemb"],
                 n_seeds=len(g),

@@ -12,6 +12,8 @@ import argparse
 import json
 import math
 import os
+import platform
+import socket
 import time
 from pathlib import Path
 
@@ -47,6 +49,9 @@ def get_args(argv=None):
     p.add_argument("--warmup", type=int, default=200)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--threads", type=int, default=1)
+    p.add_argument(
+        "--device", default="cpu", help="cpu | cuda | cuda:N (recorded in the run JSON)"
+    )
     p.add_argument("--eval-chars", type=int, default=1_000_000)
     p.add_argument(
         "--eval-every", type=int, default=0, help="steps between evals (0 = 4 evals)"
@@ -100,12 +105,13 @@ def evaluate(
     """Mean bits per character over non-overlapping windows of the validation slice."""
     model.eval()
     n_win = eval_chars // (ctx + 1)
+    dev = next(model.parameters()).device
     data = torch.from_numpy(np.asarray(val[: n_win * (ctx + 1)], dtype=np.int64)).view(
         n_win, ctx + 1
     )
     tot, cnt = 0.0, 0
     for i in range(0, n_win, batch):
-        xb = data[i : i + batch]
+        xb = data[i : i + batch].to(dev)
         logits = model(xb[:, :-1])
         loss = F.cross_entropy(
             logits.reshape(-1, logits.shape[-1]), xb[:, 1:].reshape(-1), reduction="sum"
@@ -114,6 +120,16 @@ def evaluate(
         cnt += xb[:, 1:].numel()
     model.train()
     return tot / cnt / LN2
+
+
+def cpu_name() -> str:
+    try:
+        for line in open("/proc/cpuinfo"):
+            if line.startswith("model name"):
+                return line.split(":", 1)[1].strip()
+    except OSError:
+        pass
+    return platform.processor() or platform.machine()
 
 
 def main(argv=None):
@@ -132,6 +148,10 @@ def main(argv=None):
             np.stack([train[i : i + a.ctx] for i in starts]).astype(np.int64)
         )
         rule_init = init_rules_from_data(model, idx0, generator=g)
+    # init (incl. data-driven rule init) happens on CPU, so initial weights are identical
+    # on every platform; batch sampling is numpy-seeded, so the data order is too
+    device = torch.device(a.device)
+    model.to(device)
 
     steps = int(math.ceil(a.chars / (a.batch * a.ctx)))
     eval_every = a.eval_every or max(1, steps // 4)
@@ -168,7 +188,7 @@ def main(argv=None):
         starts = rng.integers(0, hi, a.batch)
         xb = torch.from_numpy(
             np.stack([train[i : i + a.ctx + 1] for i in starts]).astype(np.int64)
-        )
+        ).to(device)
         for g in opt.param_groups:
             g["lr"] = lr_at(s)
         logits = model(xb[:, :-1])
@@ -196,6 +216,7 @@ def main(argv=None):
     final = (
         evals[-1][1] if evals and math.isfinite(ema or float("nan")) else float("nan")
     )
+    model.cpu()  # sample and checkpoint on CPU, whatever the training device
     g = torch.Generator().manual_seed(1234)
     prompt = torch.from_numpy(encode("Once upon a time").astype(np.int64))[None]
     sample = (
@@ -219,6 +240,11 @@ def main(argv=None):
         "chars_per_sec": round(steps * a.batch * a.ctx / max(train_time, 1e-9)),
         "torch": torch.__version__,
         "threads": a.threads,
+        "device": a.device,
+        "device_name": (
+            torch.cuda.get_device_name(device) if device.type == "cuda" else cpu_name()
+        ),
+        "host": socket.gethostname(),
         "sample": sample,
         "rule_init": rule_init,
     }

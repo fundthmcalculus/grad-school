@@ -211,3 +211,26 @@ test overturns it.** Seed 0, frlm-acc, tuned lr/sc, d = 32, 10M chars:
   are still running, and H9b is scored when they finish.
 * **Lesson, the one AGENTS.md already states:** attribute changes to one variable at a
   time. Inference across arms is a hypothesis, not an attribution.
+
+### Protocol amendment 3, 2026-10-09: ten-seed headline offloaded to a GPU host
+
+The user asked for this to speed up the run. The planned `headline`/`headline2` grids
+(CPU seeds 3–9, to merge with the CPU `scaling` seeds 0–2) are **replaced** by
+`headline10`/`headline10v2`: all ten seeds 0–9 at d = 32, run on the GPU host as
+complete single-platform grids. The laptop's chains skip the old grids via
+`outputs/<grid>/SKIP` markers.
+
+* **No table cell mixes platforms.** Every run JSON now records `device`,
+  `device_name` and `host`, and `flm.analyze` keys cells on device. Hyperparameters
+  still come from the CPU `tune`; that is a choice, not a measurement, so it is
+  platform-free.
+* The CPU path of the device change was verified **bit-identical end to end** before it
+  was swapped in: same val BPC, every eval, the train curve and the sample text, on a
+  fuzzydelta + HTSK + data-init run.
+* **Free reproducibility check:** GPU seeds 0–2 at d = 32 repeat CPU `scaling` cells.
+  CPU and GPU floating point differ, so per-seed values will not match exactly. The
+  registered expectation is that the 3-seed means agree within the larger of the two
+  seed stds. A larger gap is a platform effect, and it must be reported before any
+  GPU number is quoted beside a CPU one.
+* GPU wall-clock and chars/s are not comparable to the CPU timing columns and are not
+  reported against them.

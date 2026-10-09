@@ -272,3 +272,23 @@ def _h9():
 
 
 register("h9", _h9())
+
+
+# ----------------------------------------------------------------------------- GPU offload
+# Added 2026-10-09 at the user's request to speed up the run. The ten-seed headline cell
+# runs as a complete, single-platform grid (seeds 0-9 at d=32) on the GPU host:
+#     .venv/bin/python -m flm.sweep headline10 --device cuda --workers 8
+#     .venv/bin/python -m flm.sweep headline10v2 --device cuda --workers 8
+# The laptop's planned seeds-3..9 `headline`/`headline2` grids (meant to merge with CPU
+# seeds 0-2) are disabled with SKIP markers, so no table cell mixes platforms. GPU seeds
+# 0-2 duplicate the CPU `scaling` cells: a free CPU-vs-GPU reproducibility check.
+def _headline10():
+    try:
+        arms = {a: v + best_tune(a) for a, v in ARMS.items()}
+    except RuntimeError:
+        return []
+    return scaling_grid([32], [2], list(range(10)), "30e6", arms=arms)
+
+
+register("headline10", _headline10())
+register("headline10v2", _v2([32], list(range(10))))
