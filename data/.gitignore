@@ -22,3 +22,11 @@ regression_scale/
 # companion sweeps); NOTE that `sus` in those files is a second LABEL, not a
 # feature -- see PROVENANCE_MAP.md note 22.
 beth/
+
+# TinyStories V2 (GPT-4 split), ~2.2 GB raw + ~2.2 GB derived .bin, far over the
+# 5 MB vendoring limit. Used by experiments/fuzzy-language-model/. Fetched from
+# Hugging Face roneneldan/TinyStories at pinned revision
+# f54c09fd23315a6f9c86f9dc80f725de7d8f9c64 and converted to the 98-symbol
+# character stream (train.bin / valid.bin) by:
+#   cd experiments/fuzzy-language-model && .venv/bin/python -m flm.data
+tinystories/

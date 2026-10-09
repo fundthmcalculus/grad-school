@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/delta-mlp_lr3e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 20200,
+ "params_nonemb": 17064,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.89889,
+ "evals": [
+  [
+   305,
+   2.31073
+  ],
+  [
+   610,
+   2.03559
+  ],
+  [
+   915,
+   1.93713
+  ],
+  [
+   1220,
+   1.89865
+  ],
+  [
+   1221,
+   1.89889
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8728
+  ],
+  [
+   50,
+   6.1858
+  ],
+  [
+   100,
+   4.8269
+  ],
+  [
+   150,
+   3.7983
+  ],
+  [
+   200,
+   3.152
+  ],
+  [
+   250,
+   2.7562
+  ],
+  [
+   300,
+   2.5154
+  ],
+  [
+   350,
+   2.3681
+  ],
+  [
+   400,
+   2.259
+  ],
+  [
+   450,
+   2.1959
+  ],
+  [
+   500,
+   2.1446
+  ],
+  [
+   550,
+   2.0898
+  ],
+  [
+   600,
+   2.055
+  ],
+  [
+   650,
+   2.0354
+  ],
+  [
+   700,
+   2.0173
+  ],
+  [
+   750,
+   2.0051
+  ],
+  [
+   800,
+   1.9844
+  ],
+  [
+   850,
+   1.9711
+  ],
+  [
+   900,
+   1.9596
+  ],
+  [
+   950,
+   1.9493
+  ],
+  [
+   1000,
+   1.9234
+  ],
+  [
+   1050,
+   1.9211
+  ],
+  [
+   1100,
+   1.9142
+  ],
+  [
+   1150,
+   1.9117
+  ],
+  [
+   1200,
+   1.9148
+  ],
+  [
+   1220,
+   1.9147
+  ]
+ ],
+ "train_seconds": 891.22,
+ "wall_seconds": 1104.29,
+ "chars_per_sec": 11223,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for the smell worm asked the wated told be sad said, \"Mom saw the bear it. He sind friends. They limle. As his go as scared to she ream and her by liked to to help, and her flew fun and Lily in the small brittoy in a time, there was a near the park with exent watch the lide, there in",
+ "rule_init": {}
+}

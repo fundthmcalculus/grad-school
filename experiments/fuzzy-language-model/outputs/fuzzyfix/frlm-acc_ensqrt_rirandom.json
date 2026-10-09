@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/fuzzyfix/frlm-acc_ensqrt_rirandom.json",
+  "save_model": false,
+  "exp_norm": "sqrt",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sqrt",
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.78469,
+ "evals": [
+  [
+   305,
+   2.17363
+  ],
+  [
+   610,
+   1.97995
+  ],
+  [
+   915,
+   1.84298
+  ],
+  [
+   1220,
+   1.78551
+  ],
+  [
+   1221,
+   1.78469
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8515
+  ],
+  [
+   50,
+   5.5225
+  ],
+  [
+   100,
+   4.0791
+  ],
+  [
+   150,
+   3.2425
+  ],
+  [
+   200,
+   2.7672
+  ],
+  [
+   250,
+   2.4896
+  ],
+  [
+   300,
+   2.3289
+  ],
+  [
+   350,
+   2.2291
+  ],
+  [
+   400,
+   2.1534
+  ],
+  [
+   450,
+   2.114
+  ],
+  [
+   500,
+   2.0728
+  ],
+  [
+   550,
+   2.0207
+  ],
+  [
+   600,
+   1.9934
+  ],
+  [
+   650,
+   1.9742
+  ],
+  [
+   700,
+   1.9526
+  ],
+  [
+   750,
+   1.9367
+  ],
+  [
+   800,
+   1.9107
+  ],
+  [
+   850,
+   1.8929
+  ],
+  [
+   900,
+   1.8761
+  ],
+  [
+   950,
+   1.8592
+  ],
+  [
+   1000,
+   1.8318
+  ],
+  [
+   1050,
+   1.8231
+  ],
+  [
+   1100,
+   1.8119
+  ],
+  [
+   1150,
+   1.8036
+  ],
+  [
+   1200,
+   1.8049
+  ],
+  [
+   1220,
+   1.8026
+  ]
+ ],
+ "train_seconds": 722.68,
+ "wall_seconds": 944.42,
+ "chars_per_sec": 13841,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for the steel when she went to the wall be loved to bit learing agreed it. He sad started his better she saw a gonause he sit on the ame. The dog all is, got a rug, the blast angry. They were very toy. They were poond the big load and shared said, \"Yus't peys what it something and sp",
+ "rule_init": {}
+}

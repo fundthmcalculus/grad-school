@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "gru",
+  "ffn": "none",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/gru_lr1e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gru",
+  "ffn": "none",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 15840,
+ "params_nonemb": 12704,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.61187,
+ "evals": [
+  [
+   305,
+   3.2168
+  ],
+  [
+   610,
+   2.783
+  ],
+  [
+   915,
+   2.65249
+  ],
+  [
+   1220,
+   2.61193
+  ],
+  [
+   1221,
+   2.61187
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9078
+  ],
+  [
+   50,
+   6.69
+  ],
+  [
+   100,
+   5.8461
+  ],
+  [
+   150,
+   5.0507
+  ],
+  [
+   200,
+   4.3958
+  ],
+  [
+   250,
+   3.8524
+  ],
+  [
+   300,
+   3.503
+  ],
+  [
+   350,
+   3.2838
+  ],
+  [
+   400,
+   3.1307
+  ],
+  [
+   450,
+   3.028
+  ],
+  [
+   500,
+   2.9438
+  ],
+  [
+   550,
+   2.8731
+  ],
+  [
+   600,
+   2.8235
+  ],
+  [
+   650,
+   2.788
+  ],
+  [
+   700,
+   2.759
+  ],
+  [
+   750,
+   2.733
+  ],
+  [
+   800,
+   2.705
+  ],
+  [
+   850,
+   2.6896
+  ],
+  [
+   900,
+   2.6724
+  ],
+  [
+   950,
+   2.657
+  ],
+  [
+   1000,
+   2.6365
+  ],
+  [
+   1050,
+   2.6307
+  ],
+  [
+   1100,
+   2.6241
+  ],
+  [
+   1150,
+   2.6202
+  ],
+  [
+   1200,
+   2.6233
+  ],
+  [
+   1220,
+   2.6215
+  ]
+ ],
+ "train_seconds": 187.77,
+ "wall_seconds": 196.88,
+ "chars_per_sec": 53269,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time same. Fur nime fored, bex tleed mall ane happet on sleare and saiked halk the her baw the mare a rit. One whand and sades all govas to sheid wis was meaw free bealird on be the for an the fleaplunde, the toigens to pear, the to small are peallaw a and and theit the sceep. Tupy ad the lids, the was ",
+ "rule_init": {}
+}

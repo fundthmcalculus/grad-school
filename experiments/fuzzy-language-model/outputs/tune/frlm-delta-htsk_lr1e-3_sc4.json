@@ -1,0 +1,183 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-delta-htsk_lr1e-3_sc4.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "max_len": 256
+ },
+ "params_total": 28392,
+ "params_nonemb": 25256,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.61936,
+ "evals": [
+  [
+   305,
+   3.34953
+  ],
+  [
+   610,
+   2.81587
+  ],
+  [
+   915,
+   2.66663
+  ],
+  [
+   1220,
+   2.61952
+  ],
+  [
+   1221,
+   2.61936
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9668
+  ],
+  [
+   50,
+   6.7202
+  ],
+  [
+   100,
+   5.8522
+  ],
+  [
+   150,
+   5.0801
+  ],
+  [
+   200,
+   4.6586
+  ],
+  [
+   250,
+   4.1658
+  ],
+  [
+   300,
+   3.7245
+  ],
+  [
+   350,
+   3.4416
+  ],
+  [
+   400,
+   3.2511
+  ],
+  [
+   450,
+   3.1228
+  ],
+  [
+   500,
+   3.0192
+  ],
+  [
+   550,
+   2.9344
+  ],
+  [
+   600,
+   2.8724
+  ],
+  [
+   650,
+   2.8282
+  ],
+  [
+   700,
+   2.7949
+  ],
+  [
+   750,
+   2.7642
+  ],
+  [
+   800,
+   2.7329
+  ],
+  [
+   850,
+   2.713
+  ],
+  [
+   900,
+   2.6936
+  ],
+  [
+   950,
+   2.6756
+  ],
+  [
+   1000,
+   2.6513
+  ],
+  [
+   1050,
+   2.6468
+  ],
+  [
+   1100,
+   2.6373
+  ],
+  [
+   1150,
+   2.6324
+  ],
+  [
+   1200,
+   2.6357
+  ],
+  [
+   1220,
+   2.6342
+  ]
+ ],
+ "train_seconds": 1279.11,
+ "wall_seconds": 1464.77,
+ "chars_per_sec": 7820,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time mame. Fresh Ben very, be somed to sseige to wat day, Tim and hime day with had agre watter herid fous cathig bet was in sail dlon saided sig with rither, freig yol rim, soed hus to to her flay, und saw the ise said and bley and stall and cas. The mad haw a sait the sceer. They ad the lids, the was ",
+ "rule_init": {}
+}

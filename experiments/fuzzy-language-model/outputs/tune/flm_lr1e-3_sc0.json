@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/flm_lr1e-3_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 25856,
+ "params_nonemb": 22720,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.55348,
+ "evals": [
+  [
+   305,
+   3.20308
+  ],
+  [
+   610,
+   2.72538
+  ],
+  [
+   915,
+   2.59026
+  ],
+  [
+   1220,
+   2.55322
+  ],
+  [
+   1221,
+   2.55348
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.6917
+  ],
+  [
+   50,
+   6.4101
+  ],
+  [
+   100,
+   5.6781
+  ],
+  [
+   150,
+   4.9656
+  ],
+  [
+   200,
+   4.3393
+  ],
+  [
+   250,
+   3.8395
+  ],
+  [
+   300,
+   3.4985
+  ],
+  [
+   350,
+   3.2696
+  ],
+  [
+   400,
+   3.1033
+  ],
+  [
+   450,
+   2.9916
+  ],
+  [
+   500,
+   2.9044
+  ],
+  [
+   550,
+   2.8314
+  ],
+  [
+   600,
+   2.7776
+  ],
+  [
+   650,
+   2.7358
+  ],
+  [
+   700,
+   2.7024
+  ],
+  [
+   750,
+   2.6736
+  ],
+  [
+   800,
+   2.6465
+  ],
+  [
+   850,
+   2.6321
+  ],
+  [
+   900,
+   2.6137
+  ],
+  [
+   950,
+   2.6011
+  ],
+  [
+   1000,
+   2.5805
+  ],
+  [
+   1050,
+   2.5743
+  ],
+  [
+   1100,
+   2.5676
+  ],
+  [
+   1150,
+   2.5645
+  ],
+  [
+   1200,
+   2.5693
+  ],
+  [
+   1220,
+   2.5676
+  ]
+ ],
+ "train_seconds": 307.97,
+ "wall_seconds": 350.66,
+ "chars_per_sec": 32478,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time pante samen he for tot the lith mad the the wat day, Tim's dex and the were, ther and to pork in the on the save was in say help and cer sit with righel, fride palirker git the for and Mim madg. The leed thisenssting ilbet bout smadze wentes. Twnay, shally saited run't poy ureard the lits, the was ",
+ "rule_init": {}
+}

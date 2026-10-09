@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/frlm-acc_lr3e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 28260,
+ "params_nonemb": 25124,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.06135,
+ "evals": [
+  [
+   305,
+   2.55223
+  ],
+  [
+   610,
+   2.22079
+  ],
+  [
+   915,
+   2.09995
+  ],
+  [
+   1220,
+   2.06095
+  ],
+  [
+   1221,
+   2.06135
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8605
+  ],
+  [
+   50,
+   6.2214
+  ],
+  [
+   100,
+   5.0947
+  ],
+  [
+   150,
+   4.1042
+  ],
+  [
+   200,
+   3.4374
+  ],
+  [
+   250,
+   3.0318
+  ],
+  [
+   300,
+   2.775
+  ],
+  [
+   350,
+   2.6126
+  ],
+  [
+   400,
+   2.4911
+  ],
+  [
+   450,
+   2.4164
+  ],
+  [
+   500,
+   2.3542
+  ],
+  [
+   550,
+   2.2926
+  ],
+  [
+   600,
+   2.2513
+  ],
+  [
+   650,
+   2.227
+  ],
+  [
+   700,
+   2.2029
+  ],
+  [
+   750,
+   2.183
+  ],
+  [
+   800,
+   2.1567
+  ],
+  [
+   850,
+   2.1404
+  ],
+  [
+   900,
+   2.1244
+  ],
+  [
+   950,
+   2.1123
+  ],
+  [
+   1000,
+   2.0866
+  ],
+  [
+   1050,
+   2.0838
+  ],
+  [
+   1100,
+   2.075
+  ],
+  [
+   1150,
+   2.0703
+  ],
+  [
+   1200,
+   2.0734
+  ],
+  [
+   1220,
+   2.0733
+  ]
+ ],
+ "train_seconds": 532.88,
+ "wall_seconds": 605.94,
+ "chars_per_sec": 18770,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not was toyby. It dog and Lee her alloow looke and said, \"Max was doggred to nink tround some could them his saylly liats clousit with thane. The did all spoling the frower this more. The leener in the sort bekether in watch placiled was and she said,\" \"Lece poland and the little launed ",
+ "rule_init": {}
+}

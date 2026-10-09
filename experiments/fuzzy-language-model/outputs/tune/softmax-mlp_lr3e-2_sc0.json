@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 0,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/softmax-mlp_lr3e-2_sc0.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 0,
+  "max_len": 256
+ },
+ "params_total": 19680,
+ "params_nonemb": 16544,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.83812,
+ "evals": [
+  [
+   305,
+   2.18775
+  ],
+  [
+   610,
+   2.01043
+  ],
+  [
+   915,
+   1.88814
+  ],
+  [
+   1220,
+   1.83769
+  ],
+  [
+   1221,
+   1.83812
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7136
+  ],
+  [
+   50,
+   5.2365
+  ],
+  [
+   100,
+   3.8956
+  ],
+  [
+   150,
+   3.1202
+  ],
+  [
+   200,
+   2.6793
+  ],
+  [
+   250,
+   2.4437
+  ],
+  [
+   300,
+   2.3078
+  ],
+  [
+   350,
+   2.2334
+  ],
+  [
+   400,
+   2.1665
+  ],
+  [
+   450,
+   2.1284
+  ],
+  [
+   500,
+   2.0962
+  ],
+  [
+   550,
+   2.0535
+  ],
+  [
+   600,
+   2.0296
+  ],
+  [
+   650,
+   2.0103
+  ],
+  [
+   700,
+   1.9937
+  ],
+  [
+   750,
+   1.9799
+  ],
+  [
+   800,
+   1.9538
+  ],
+  [
+   850,
+   1.9398
+  ],
+  [
+   900,
+   1.9255
+  ],
+  [
+   950,
+   1.9089
+  ],
+  [
+   1000,
+   1.8805
+  ],
+  [
+   1050,
+   1.8731
+  ],
+  [
+   1100,
+   1.8624
+  ],
+  [
+   1150,
+   1.854
+  ],
+  [
+   1200,
+   1.8565
+  ],
+  [
+   1220,
+   1.8552
+  ]
+ ],
+ "train_seconds": 177.41,
+ "wall_seconds": 197.67,
+ "chars_per_sec": 56380,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for the she little boy get back and slow that he was share firemegushed the park!\nOne day, when them sad.s all Tim saw he sighed flayed away a greatir pretty the flower toys mom sun smiled to gets to play, the good. At they was away and a big a time, there was happy a play detperap a",
+ "rule_init": {}
+}

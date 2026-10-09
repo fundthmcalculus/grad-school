@@ -1,0 +1,181 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 32,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.001,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "/home/scott/PycharmProjects/grad-school/experiments/fuzzy-language-model/outputs/tune/delta-mlp_lr1e-3_sc4.json",
+  "save_model": false,
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 32,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "max_len": 256
+ },
+ "params_total": 20200,
+ "params_nonemb": 17064,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 2.16489,
+ "evals": [
+  [
+   305,
+   2.78351
+  ],
+  [
+   610,
+   2.33681
+  ],
+  [
+   915,
+   2.20179
+  ],
+  [
+   1220,
+   2.16492
+  ],
+  [
+   1221,
+   2.16489
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8728
+  ],
+  [
+   50,
+   6.5377
+  ],
+  [
+   100,
+   5.5565
+  ],
+  [
+   150,
+   4.6048
+  ],
+  [
+   200,
+   3.8788
+  ],
+  [
+   250,
+   3.3868
+  ],
+  [
+   300,
+   3.0606
+  ],
+  [
+   350,
+   2.8501
+  ],
+  [
+   400,
+   2.6944
+  ],
+  [
+   450,
+   2.5937
+  ],
+  [
+   500,
+   2.5104
+  ],
+  [
+   550,
+   2.4332
+  ],
+  [
+   600,
+   2.3769
+  ],
+  [
+   650,
+   2.3404
+  ],
+  [
+   700,
+   2.3101
+  ],
+  [
+   750,
+   2.2859
+  ],
+  [
+   800,
+   2.2592
+  ],
+  [
+   850,
+   2.2417
+  ],
+  [
+   900,
+   2.2265
+  ],
+  [
+   950,
+   2.215
+  ],
+  [
+   1000,
+   2.189
+  ],
+  [
+   1050,
+   2.187
+  ],
+  [
+   1100,
+   2.1784
+  ],
+  [
+   1150,
+   2.1734
+  ],
+  [
+   1200,
+   2.1786
+  ],
+  [
+   1220,
+   2.1785
+  ]
+ ],
+ "train_seconds": 846.22,
+ "wall_seconds": 1011.67,
+ "chars_per_sec": 11820,
+ "torch": "2.14.1+cpu",
+ "threads": 1,
+ "sample": "Once upon a time, there was not for the smell doge asked the was veryle boy do new day, \"What dogg and to play in the good then them sad sail book and her it with reag tood together and git the for a she follow. The leved time, the plice together.\nAt She cas. Twhard and ball at the scee on udlaad the liked. Max pis",
+ "rule_init": {}
+}
