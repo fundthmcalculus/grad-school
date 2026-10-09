@@ -48,9 +48,9 @@ class ModelConfig:
     n_rules: int = 16  # rules per head for the fuzzy mixer
     decay: str = "fixed"  # none | fixed | data  (recurrent mixers only)
     shortconv: int = 0  # causal depthwise conv width on mixer input (0 = off)
-    exp_norm: str = (
-        "sum"  # Gaussian exponent over antecedent dims: sum (classic TSK) | mean (HTSK) | sqrt
-    )
+    # Gaussian exponent over antecedent dims: sum (classic TSK) | mean (HTSK) | sqrt
+    exp_norm: str = "sum"
+    ffn_exp_norm: str = ""  # override for the TSK FFN only ("" = same as exp_norm)
     max_len: int = 256
 
     def to_dict(self) -> dict:
@@ -443,7 +443,7 @@ class TSKFFN(nn.Module):
         da = cfg.tsk_dim or d
         R = max(1, int(round(cfg.ffn_mult * d)))
         self.R, self.da = R, da
-        self.exp_scale = exp_scale(cfg.exp_norm, da)
+        self.exp_scale = exp_scale(cfg.ffn_exp_norm or cfg.exp_norm, da)
         self.ante = nn.Linear(d, da, bias=False)
         self.centers = nn.Parameter(torch.randn(R, da))
         self.log_width = nn.Parameter(torch.zeros(R, da))

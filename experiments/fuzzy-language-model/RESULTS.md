@@ -151,3 +151,19 @@ uniform 0.016. sqrt (1/√D) is the midpoint.
 did not receive. The fixed arms therefore enter the comparison as separately labelled
 arms (`frlm-acc-htsk`, `frlm-delta-htsk`) with the *same* 12-cell lr × short-conv tune
 as every other arm. Any comparison against them must quote this disclosure.
+
+### Registered 2026-10-09, before `h9`: direct test of where the HTSK gain lives
+
+The `fuzzyfix` attribution (H9 refuted) was inferred *across arms*. `h9` tests it directly:
+a 2×2 of exponent normalization on the recurrent mixer × on the TSK FFN (`--exp-norm`,
+`--ffn-exp-norm`). It runs at each arm's tuned lr/short-conv, d = 32, 10M chars.
+`frlm-acc` runs seeds 0–2, `frlm-delta` seed 0.
+
+* **H9b.** Mixer-only HTSK (mean, sum) recovers ≥ 80% of the full (mean, mean) gain over
+  (sum, sum), and FFN-only HTSK (sum, mean) recovers ≤ 20%.
+* **Determinism check, a pass/fail precondition.** The seed-0 (sum, sum) and (mean, mean)
+  cells repeat the existing `tune` and `fuzzyfix` cells and must reproduce their val BPC
+  exactly (1.864 / 1.756 for frlm-acc; 1.862 / 1.753 for frlm-delta). If they do not,
+  every single-seed comparison above is suspect.
+* The seed spread of the `frlm-acc` cells gives the first noise estimate for the
+  single-seed `fuzzyfix` gains.

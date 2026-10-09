@@ -181,3 +181,9 @@ def test_htsk_is_geometric_mean_of_memberships():
     )  # (5,R,D)
     g = mu.prod(-1) ** (1.0 / f.da)
     assert torch.allclose(f.firing(x), g / g.sum(-1, keepdim=True), atol=1e-10)
+
+
+def test_ffn_exp_norm_override_is_ffn_only():
+    m = TinyLM(cfg(mixer="fuzzy", ffn="tsk", exp_norm="mean", ffn_exp_norm="sum"))
+    assert m.blocks[0].mix.exp_scale == 1.0 / 8  # dh = 16 / 2 heads
+    assert m.blocks[0].ffn.exp_scale == 1.0

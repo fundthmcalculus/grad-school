@@ -60,6 +60,12 @@ def get_args(argv=None):
         help="TSK exponent over dims: sum | mean (HTSK) | sqrt",
     )
     p.add_argument(
+        "--ffn-exp-norm",
+        default="",
+        choices=["", "sum", "mean", "sqrt"],
+        help="override --exp-norm for the TSK FFN only",
+    )
+    p.add_argument(
         "--rule-init",
         default="random",
         choices=["random", "data"],
@@ -83,6 +89,7 @@ def make_config(a) -> ModelConfig:
         shortconv=a.shortconv,
         max_len=a.ctx,
         exp_norm=a.exp_norm,
+        ffn_exp_norm=a.ffn_exp_norm,
     )
 
 

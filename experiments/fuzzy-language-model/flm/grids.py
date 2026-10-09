@@ -237,3 +237,38 @@ def _v2(widths, seeds):
 
 register("scaling2", _v2([16, 24, 32, 48, 64, 96], [0, 1, 2]))
 register("headline2", _v2([32], list(range(3, 10))))
+
+
+def _h9():
+    """Direct one-variable test of H9 (where does the HTSK gain live?), registered in
+    RESULTS.md before running: 2x2 of exponent normalization on the recurrent mixer x on
+    the TSK FFN, at each arm's tuned lr/shortconv, d=32, 10M chars. frlm-acc at seeds 0-2
+    (also a first seed-noise estimate for the fuzzyfix gain); frlm-delta at seed 0."""
+    try:
+        arms = {a: ARMS[a] + best_tune(a) for a in ("frlm-acc", "frlm-delta")}
+    except RuntimeError:
+        return []
+    jobs = []
+    for arm, argv in arms.items():
+        for seed in (0, 1, 2) if arm == "frlm-acc" else (0,):
+            for mx in ("sum", "mean"):
+                for ff in ("sum", "mean"):
+                    jobs.append(
+                        (
+                            f"{arm}_mx{mx}_ff{ff}_s{seed}",
+                            argv
+                            + ["--d", "32", "--layers", "2", "--seed", str(seed)]
+                            + [
+                                "--chars",
+                                "10e6",
+                                "--exp-norm",
+                                mx,
+                                "--ffn-exp-norm",
+                                ff,
+                            ],
+                        )
+                    )
+    return jobs
+
+
+register("h9", _h9())
