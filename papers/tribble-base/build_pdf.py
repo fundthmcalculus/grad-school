@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Wrapper: render AnalyticalDynamics/chaos/paper.md via the shared converter.
+"""Wrapper: render papers/tribble-base/paper.md via the shared converter.
 
 The shared converter lives in papers/tribble-pdf/build_pdf.py; this script is a
-thin delegate so the chaos paper can build its PDF with a one-liner.
+thin delegate so the tribble-base paper can build its PDF with a one-liner.
 """
 
 import os
