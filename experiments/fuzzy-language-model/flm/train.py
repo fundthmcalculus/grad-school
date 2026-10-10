@@ -208,6 +208,11 @@ def cpu_name() -> str:
 
 def main(argv=None):
     a = get_args(argv)
+    if a.ngram_init and a.tok:
+        raise SystemExit(
+            "--ngram-init is defined for the 98-symbol character stream only (its statistics, "
+            "aligned embedding and decoded consequents assume that vocabulary); drop --tok or --ngram-init"
+        )
     torch.set_num_threads(a.threads)
     torch.manual_seed(a.seed)
     rng = np.random.default_rng(a.seed)
