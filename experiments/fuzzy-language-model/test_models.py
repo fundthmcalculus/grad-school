@@ -229,3 +229,118 @@ def test_shared_depth_reuses_blocks():
     assert not torch.allclose(m(idx), one(idx))
     # runs with shared blocks (needs >= R distinct tokens to place R rules)
     init_rules_from_data(m, torch.randint(0, 98, (4, 16)))
+
+
+def test_tap_linear_is_a_causal_multitap_map():
+    from flm.models import TapLinear
+
+    torch.manual_seed(11)
+    m = TapLinear(6, 5, taps=3)
+    x = torch.randn(2, 9, 6)
+    want = torch.zeros(2, 9, 5)
+    for t in range(9):
+        for j in range(3):
+            if t - j >= 0:
+                want[:, t] += x[:, t - j] @ m.weight[j].T
+    assert torch.allclose(m(x), want, atol=1e-12)
+    x2 = x.clone()
+    x2[:, 5:] += 1.0
+    assert torch.allclose(m(x)[:, :5], m(x2)[:, :5], atol=1e-12)  # causal
+
+
+@pytest.mark.parametrize("taps", [2, 3])
+def test_ante_taps_keeps_parallel_equals_recurrent_and_causality(taps):
+    torch.manual_seed(12)
+    m = TinyLM(
+        cfg(
+            mixer="fuzzydelta", ffn="tsk", decay="data", ante_taps=taps, exp_norm="mean"
+        )
+    )
+    idx = torch.randint(0, 98, (2, 14))
+    assert torch.allclose(m(idx), m(idx, step=True), atol=1e-10)
+    idx2 = idx.clone()
+    idx2[0, 9:] = (idx2[0, 9:] + 1) % 98
+    assert torch.allclose(m(idx)[:, :9], m(idx2)[:, :9], atol=1e-10)
+    # only block 0 gets the extra taps
+    assert m.blocks[0].ffn.ante.weight.shape[0] == taps
+    assert isinstance(m.blocks[1].ffn.ante, torch.nn.Linear)
+
+
+def _markov_chain(n, seed=0, n_states=30, rank=4, scale=1.0):
+    """A first-order chain over 30 symbols whose log-transition matrix has rank <= 4, so a
+    16-dim readout can represent it and 32 rules can cover every context."""
+    rng = np.random.default_rng(seed)
+    logits = (
+        scale * rng.normal(size=(n_states, rank)) @ rng.normal(size=(rank, n_states))
+    )
+    T = np.exp(logits - logits.max(-1, keepdims=True))
+    cum = (T / T.sum(-1, keepdims=True)).cumsum(-1)
+    out = np.zeros(n, dtype=np.uint8)
+    u = rng.random(n)
+    for i in range(1, n):
+        out[i] = min(int(np.searchsorted(cum[out[i - 1]], u[i])), n_states - 1)
+    return out
+
+
+def test_ngram_counts_match_bruteforce_and_conditionals_normalise():
+    from flm.ngram import conditionals, count_tables
+
+    a = np.random.default_rng(1).integers(0, 98, 5000).astype(np.uint8)
+    tabs = count_tables(n_chars=len(a) - 2, max_k=2, chunk=1000, train=a)
+    ref2 = np.zeros((98, 98, 98), dtype=np.int64)
+    for t in range(len(a) - 2):
+        ref2[a[t], a[t + 1], a[t + 2]] += 1
+    assert np.array_equal(tabs[2], ref2)
+    probs = conditionals(tabs)
+    for p in probs:
+        assert np.allclose(p.sum(-1), 1.0)
+
+
+def test_ngram_init_makes_a_fuzzy_bigram_model():
+    """On a synthetic low-rank Markov chain the init must start the model far below a random
+    init and near the exact bigram model, with the rules (not the embedding alone) carrying it.
+    """
+    from flm.ngram import (
+        _bpc,
+        conditionals,
+        count_tables,
+        init_rules_from_ngrams,
+        window_bpc,
+    )
+
+    chain = _markov_chain(150_000)
+    tabs = count_tables(n_chars=len(chain) - 3, max_k=2, chunk=50_000, train=chain)
+    probs = conditionals(tabs)
+    rng = np.random.default_rng(2)
+
+    def win(n):
+        s = rng.integers(0, len(chain) - 258, n)
+        return torch.from_numpy(
+            np.stack([chain[i : i + 257] for i in s]).astype(np.int64)
+        )
+
+    stats, calib, held = win(64), win(32), win(32)
+    kw = dict(mixer="fuzzydelta", ffn="tsk", decay="data", exp_norm="mean", max_len=256)
+    torch.manual_seed(13)
+    base = TinyLM(cfg(**kw))
+    random_bpc = _bpc(base, held)
+
+    centers_before = base.blocks[0].ffn.centers.detach().clone()
+    info = init_rules_from_ngrams(base, stats, calib, 1, tabs, probs, mode="emb")
+    assert (
+        torch.equal(base.blocks[0].ffn.centers, centers_before)
+        and info["mode"] == "emb"
+    )
+
+    torch.manual_seed(13)
+    m = TinyLM(cfg(**kw))
+    info = init_rules_from_ngrams(m, stats, calib, 1, tabs, probs, mode="full")
+    full = _bpc(m, held)
+    exact = window_bpc(probs, 1, held.numpy())
+    assert full < random_bpc - 3.0, (random_bpc, full, info)
+    assert full < exact + 0.6, (exact, full)
+    with torch.no_grad():  # removing the rules must hurt: they carry the readout
+        m.blocks[0].ffn.conseq.zero_()
+    assert _bpc(m, held) > full + 1.0
+    E = m.emb.weight.detach()  # the embedding is an orthonormal, aligned basis
+    assert torch.allclose(E.T @ E, torch.eye(E.shape[1]), atol=1e-4)

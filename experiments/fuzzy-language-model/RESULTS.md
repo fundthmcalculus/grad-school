@@ -398,3 +398,82 @@ All sweeps were stopped at the user's request. Complete: `tune` 120/120, `fuzzyf
 `minsize` 0/24, `lean` 0/12. In-flight runs were killed before writing a record, so no
 partial records exist. **H10a, H11 and H12 are unscored.** The write-up is
 [`WRITEUP.md`](WRITEUP.md).
+
+## Architecture screen: n-gram rule initialisation (registered 2026-10-10, before any `screen` run)
+
+**This is a fast screen, not a regression test.** It runs at d = 16 (~8.6K params, the
+~2 BPC regime) at the 10M-char tune budget, seed 0 (the baseline also seed 1, for a noise
+estimate), at `frlm-delta-htsk`'s tuned lr 6e-2 for every variant. Nothing here is citable;
+a variant that looks promising is promoted to 3 seeds and its own lr check before it counts
+for anything. The ~0.012 seed std at d = 16 (3 seeds, `scaling2`) is the yardstick.
+
+### What was built, and what was seen while building it
+
+A count-based n-gram LM is a crisp zero-order TSK system ("IF the last k characters are g
+THEN p(next | g)"). `flm/ngram.py` initialises layer 0's TSK FFN from those statistics:
+rule r ↔ one of the R − 1 most frequent length-k contexts (plus one wide background rule
+that falls back to the unigram), antecedent centre = mean of the rule's own input over the
+sample positions with that context, consequent decoded through the tied embedding so that
+its logit lens reads log p(next | g). `--ante-taps 2` lets layer 0's antecedent read the
+previous position too, which trigram rules need.
+
+Seen **before** registering (manipulation checks and ceilings, none of it a training result):
+* Reference count models on this data (1M valid chars): unigram 4.42, bigram **3.30**,
+  trigram **2.39**, four-gram **1.82** BPC. The 8.6K-param FRLM (1.96) sits between trigram
+  and four-gram.
+* **A random d = 16 embedding cannot represent n-gram distributions:** the rank-16 readout
+  of the bigram log-probs scores 7.5 BPC (worse than uniform, 6.6). With the embedding
+  aligned to the top-16 principal directions of the conditional log-probs it scores 3.57
+  (bigram) / 3.37 (trigram). A first init attempt without the aligned embedding failed
+  (6.62 → 6.32) for exactly this reason, and the embedding alignment was added.
+* **A 32-rule bank is the limit for trigrams:** the top-31 trigram contexts cover 43% of
+  positions (ceiling 4.04 BPC) against 98% for bigrams (ceiling 3.59). Clustering contexts
+  into 32 rules does not beat top-k (4.02 / 3.59).
+* Init BPC with the full init, held out: bigram **3.70**, trigram+1 tap 4.21, trigram+2
+  taps **4.16** (random init 6.62). Rule accuracy (the winning rule is the position's own
+  context): bigram 0.77, trigram 0.53 with 1 tap, **0.87 with 2 taps**. Zeroing layer 0's
+  consequents sends BPC to 12–40, so the rules carry the readout. The calibrated output
+  gain (final-norm weight) reaches 16 on real data.
+
+### Variants (one change from the base unless noted; all at d = 16, 10M chars)
+
+| id | what | flags beyond the base |
+|---|---|---|
+| A | `frlm-delta-htsk` (both-layer HTSK) | — (seeds 0 and 1) |
+| B | aligned embedding only | `--ngram-init 1 --ngram-mode emb` |
+| C | + bigram rule placement | `--ngram-init 1 --ngram-mode placement` |
+| D | + decoded consequents and output gain | `--ngram-init 1 --ngram-mode full` |
+| E | 2-tap antecedent, random init | `--ante-taps 2` |
+| F | trigram rules, 2 taps, full | `--ante-taps 2 --ngram-init 2 --ngram-mode full` |
+| G | trigram placement only (F's control) | `--ante-taps 2 --ngram-init 2 --ngram-mode placement` |
+| H | HTSK on the FFN only (h9's best) | `--exp-norm sum --ffn-exp-norm mean` |
+| I | one block applied 3× (−41% params) | `--layers 3 --n-unique 1` |
+| J | widths shared per dimension (−17% params) | `--width-share dim` |
+
+B → C → D is the attribution chain for the n-gram init (embedding, then rule placement,
+then consequents). E is the architecture control for F.
+
+### Predictions (final val BPC at 10M chars unless stated; Δ = variant − A, seed 0)
+
+* **P1. D is not better than A by more than 0.03.** The n-gram information is learned in
+  the first few hundred steps anyway; the init removes that part of training, not the
+  capacity limit. (My own probability of a > 0.03 gain: ~25%.)
+* **P2. D reaches 3.0 BPC in at most half of A's steps** (curve evaluated every 100 steps,
+  plus step 0). This is the effect I expect.
+* **P3. B is within ±0.03 of A.** An aligned embedding basis is learned quickly.
+* **P4. C is not better than A by more than 0.03,** and D − C is the consequent decoding's
+  effect.
+* **P5. E improves on A by ≥ 0.03,** more than the +3% parameter effect (≈ 0.009 from the
+  `scaling2` slope of ~0.29 BPC per e-fold of params). Reading the previous position inside
+  the FFN antecedent should help. (~50%.)
+* **P6. F is not better than D.** At 32 rules the trigram rule bank starts worse (4.16 vs
+  3.70) and covers less.
+* **P7. H beats or matches A** by ≥ 0.01 (`h9` saw −0.007 / −0.015 at d = 32).
+* **P8. I is worse than A by > 0.05** (41% fewer parameters). Exploratory.
+* **P9. J is within +0.03 of A** with 17% fewer parameters.
+
+**Promising** = better than A by more than max(0.03, 2·|A₀ − A₁|), or a faster early curve
+with no worse final BPC. Promising variants go to seeds 1–2 and a 3-point lr check.
+Caveats stated up front: one seed per variant; every variant uses A's lr, and the n-gram
+variants start with a large output gain, so an lr effect could mask or fake a result;
+the `placement` and `full` modes calibrate (kappa, alpha, gain) on 64 *training* windows.

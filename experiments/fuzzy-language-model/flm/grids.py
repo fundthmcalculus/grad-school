@@ -370,3 +370,47 @@ def _lean():
 
 register("minsize", _minsize())
 register("lean", _lean())
+
+
+# ----------------------------------------------------------------------------- screens
+# Fast architecture screens at d=16 (the ~2 BPC regime). Not part of any registered
+# head-to-head; see RESULTS.md "Architecture screen".
+
+SCREEN_VARIANTS = {
+    "A-base": [],
+    "B-embonly": ["--ngram-init", "1", "--ngram-mode", "emb"],
+    "C-biplace": ["--ngram-init", "1", "--ngram-mode", "placement"],
+    "D-bifull": ["--ngram-init", "1", "--ngram-mode", "full"],
+    "E-taps2": ["--ante-taps", "2"],
+    "F-trifull": ["--ante-taps", "2", "--ngram-init", "2", "--ngram-mode", "full"],
+    "G-triplace": [
+        "--ante-taps",
+        "2",
+        "--ngram-init",
+        "2",
+        "--ngram-mode",
+        "placement",
+    ],
+    "H-ffnonly": ["--exp-norm", "sum", "--ffn-exp-norm", "mean"],
+    "I-share3": ["--layers", "3", "--n-unique", "1"],
+    "J-wdim": ["--width-share", "dim"],
+}
+
+
+def _screen(seeds_for=None, chars="10e6"):
+    """Stage 1: A at seeds 0 and 1 (noise estimate), every other variant at seed 0."""
+    try:
+        base = ARMS_V2["frlm-delta-htsk"] + best_tune("frlm-delta-htsk")
+    except RuntimeError:
+        return []
+    common = ["--d", "16", "--layers", "2", "--chars", chars, "--eval-chars", "300000"]
+    common += ["--eval-every", "100", "--eval-at-start"]
+    seeds_for = seeds_for or {"A-base": (0, 1)}
+    jobs = []
+    for v, extra in SCREEN_VARIANTS.items():
+        for s in seeds_for.get(v, (0,)):
+            jobs.append((f"{v}_d16_s{s}", base + common + ["--seed", str(s)] + extra))
+    return jobs
+
+
+register("screen", _screen())
