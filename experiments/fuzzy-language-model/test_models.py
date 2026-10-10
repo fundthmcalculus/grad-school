@@ -344,3 +344,126 @@ def test_ngram_init_makes_a_fuzzy_bigram_model():
     assert _bpc(m, held) > full + 1.0
     E = m.emb.weight.detach()  # the embedding is an orthonormal, aligned basis
     assert torch.allclose(E.T @ E, torch.eye(E.shape[1]), atol=1e-4)
+
+
+def test_ngram_init_on_first_order_raw_firing_ffn_with_surplus_rules():
+    """The goal-track feed-forward (first-order, raw firing, tied widths) has R = 108 rules, more
+    than the 98 bigram contexts: surplus rules must stay inert, and the init must still start
+    the model far below a random init."""
+    from flm.ngram import _bpc, conditionals, count_tables, init_rules_from_ngrams
+
+    chain = _markov_chain(150_000)
+    tabs = count_tables(n_chars=len(chain) - 3, max_k=2, chunk=50_000, train=chain)
+    probs = conditionals(tabs)
+    rng = np.random.default_rng(3)
+
+    def win(n):
+        s = rng.integers(0, len(chain) - 258, n)
+        return torch.from_numpy(
+            np.stack([chain[i : i + 257] for i in s]).astype(np.int64)
+        )
+
+    stats, calib, held = win(64), win(32), win(32)
+    kw = dict(
+        mixer="fuzzydelta",
+        ffn="tsk",
+        decay="data",
+        exp_norm="mean",
+        max_len=256,
+        d_model=48,
+        ffn_order=1,
+        ffn_norm="none",
+        tsk_dim=16,
+        ffn_mult=2.25,
+        ffn_width="rule",
+    )
+    torch.manual_seed(14)
+    m = TinyLM(cfg(**kw))
+    assert m.blocks[0].ffn.R == 108
+    random_bpc = _bpc(m, held)
+    info = init_rules_from_ngrams(m, stats, calib, 1, tabs, probs, mode="full")
+    assert info["n_context_rules"] == 98
+    assert _bpc(m, held) < random_bpc - 2.0, (random_bpc, _bpc(m, held), info)
+    ffn = m.blocks[0].ffn
+    assert torch.all(ffn.conseq[98:107] == 0)  # surplus rules are inert
+    assert torch.all(ffn.slope.weight == 0) and torch.all(
+        ffn.slope.bias == 1
+    )  # zero-order at init
+
+
+def test_matched_neural_references_have_the_fuzzy_models_parameter_count():
+    import json
+    from pathlib import Path
+
+    mm = json.loads((Path(__file__).parent / "flm" / "matched_mults.json").read_text())
+    for key, p in mm["params"].items():
+        _, _, d, L = key.split("|")
+        # the 3-layer d=56 reference is matched to D at d=72 (97.5K), not to D at d=56
+        target = mm["target"]["d72|L2" if L == "L3" else f"{d}|L2"]
+        assert abs(p - target) / target < 0.005, (key, p, target)
+
+
+def test_v4_grids_select_winners_from_records(tmp_path, monkeypatch):
+    """final10 and scale are empty until v4-ref-tune exists, then read its winners; D's lr is
+    the lowest-mean v3 cell with both seeds."""
+    import json
+
+    import flm.grids_v4 as g
+
+    monkeypatch.setattr(g, "OUT", tmp_path)
+    assert g._final10() == [] and g._scale() == []
+    assert g.best_d_lr() == "3e-2"  # no records: the documented default
+
+    (tmp_path / "v4-ref-tune").mkdir()
+    bpc = {
+        "delta-h8-sc8-lr3e-2": 1.30,
+        "gla-h4-sc4-lr4e-2": 1.31,
+        "delta-h8-L3-sc4-lr3e-2": 1.29,
+    }
+    for job, v in bpc.items():
+        (tmp_path / "v4-ref-tune" / f"{job}.json").write_text(
+            json.dumps({"val_bpc": v})
+        )
+    (tmp_path / "v4-ref-tune" / "gru-sc4-lr2e-2.json").write_text(
+        json.dumps({"val_bpc": float("nan")})
+    )
+    assert g.best_refs(2) == ["delta-h8-L3-sc4-lr3e-2", "delta-h8-sc8-lr3e-2"]
+    assert g.best_refs(1, l2_only=True) == ["delta-h8-sc8-lr3e-2"]
+
+    for sub, name, lr, seed, v in [
+        ("v3-final", "D_30M_s0", 0.03, 0, 1.28),
+        ("v3-final", "D_30M_s1", 0.03, 1, 1.28),
+        ("v3-lr", "D_lr2e-2_30M_s0", 0.02, 0, 1.25),
+        ("v3-lr", "D_lr2e-2_30M_s1", 0.02, 1, 1.25),
+        ("v3-lr", "D_lr6e-2_30M_s0", 0.06, 0, 1.10),  # only one seed: must not win
+    ]:
+        (tmp_path / sub).mkdir(exist_ok=True)
+        (tmp_path / sub / f"{name}.json").write_text(
+            json.dumps({"val_bpc": v, "args": {"lr": lr, "seed": seed}})
+        )
+    assert g.best_d_lr() == "0.02"
+
+    jobs = g._final10()
+    assert (
+        len(jobs) == 40 and len({n for n, _ in jobs}) == 40
+    )  # 10 seeds x (D, 2 refs, old ref)
+    assert len(g._scale()) == 36  # 3 widths x 3 seeds x (D, ref) x 2 lrs
+    assert all("--device" in argv for _, argv in jobs)
+
+
+def test_compare_verdict_and_screen_report_names():
+    import numpy as np
+
+    from flm.compare import verdict
+    from flm.screen_report import NAME
+
+    ref = np.array([1.27, 1.28, 1.26, 1.27, 1.28])
+    assert verdict(ref, ref + 0.05)[2] == "ref better, real"
+    assert verdict(ref, ref - 0.05)[2] == "arm better, real"
+    assert verdict(ref, ref + 0.0005)[2] == "within noise"
+    assert verdict(ref, np.array([1.3]))[2].startswith("no verdict")
+    assert (
+        NAME.match("A-base_d16_s3")["variant"] == "A-base"
+        and NAME.match("base_s2")["seed"] == "2"
+    )
+    assert NAME.match("taps2_s0")["variant"] == "taps2"
