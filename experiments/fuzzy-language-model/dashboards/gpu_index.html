@@ -47,7 +47,7 @@
   </section>
   <section class="fl-card" id="overview-ladder">
     <h2>Validation bits per character, models under 100K parameters</h2>
-    <p class="fl-note">Lower is better. Bars start at 1.0 so that differences are visible; whiskers are one standard deviation over seeds where there are several. At equal characters, not equal steps.</p>
+    <p class="fl-note">Lower is better. Bars start at 1.0 so that differences are visible; whiskers are one standard deviation over seeds where there are several (the 100M and 300M runs are single seeds). At equal characters, not equal steps.</p>
     <div class="fl-chart" id="chart-ladder" data-source="arm_stats"></div>
   </section>
 </template>
@@ -284,6 +284,7 @@
         ['Neural delta-mlp, characters', 'v3-final', 'delta-mlp-d64_100M', C[7], '100M characters'],
         ['Fuzzy D, characters', 'v3-final', 'D_100M', C[0], '100M characters'],
         ['Fuzzy D, BPE1024', 'v5-final100k', 'D-d48-bpe1024_100M', C[2], '100M characters'],
+        ['Fuzzy D, BPE1024', 'v5-long', 'D-d48-bpe1024_300M_lr3e-2', C[2], '300M characters'],
       ].map(([l, g, a, c, grp]) => item(l, arm(g, a), { color: c, group: grp })).filter(Boolean);
       F.bars(el, spec, { xDomain: [1.0, 1.4], xFmt: F.f2, valueFmt: F.f3 });
     },
@@ -447,12 +448,12 @@
       const el = root.querySelector('#chart-subcurves');
       const cv = dash.data('gpu_curves');
       if (F.pending(el, cv.status)) return;
-      const spec = [['v5-final100k', 'D-d48-bpe1024_30M', 'BPE1024 D, 30M run', C[2], 3], ['v5-final100k', 'D-d48-bpe1024_100M', 'BPE1024 D, 100M run', C[1], 2], ['v3-final', 'D_30M', 'Character D, 30M run', C[0], 2], ['v3-final', 'D_100M', 'Character D, 100M run', C[7], 2]];
+      const spec = [['v5-final100k', 'D-d48-bpe1024_30M', 'BPE1024 D, 30M run', C[2], 3], ['v5-final100k', 'D-d48-bpe1024_100M', 'BPE1024 D, 100M run', C[1], 2], ['v3-final', 'D_30M', 'Character D, 30M run', C[0], 2], ['v3-final', 'D_100M', 'Character D, 100M run', C[7], 2], ['v5-long', 'D-d48-bpe1024_300M_lr3e-2', 'BPE1024 D, 300M run', C[3], 2]];
       const series = spec.map(([g, a, l, c, w]) => {
         const byX = d3.group(cv.data.filter((r) => r.grid === g && r.arm === a), (r) => r.chars_m);
         return { name: l, color: c, width: w, points: [...byX].map(([x, rs]) => ({ x: Number(x), y: d3.mean(rs.map((r) => Number(r.val_bpc))), label: `${F.f2(Number(x))}M characters · ${F.f3(d3.mean(rs.map((r) => Number(r.val_bpc))))} bits/char` })).sort((p, q) => p.x - q.x) };
       });
-      F.lines(el, { series, xLog: true, height: 260, xLabel: 'characters seen (millions)', yFmt: F.f2, xFmt: d3.format('d'), xTickValues: [5, 10, 25, 50, 100], yDomain: [1.0, 1.7] });
+      F.lines(el, { series, xLog: true, height: 260, xLabel: 'characters seen (millions)', yFmt: F.f2, xFmt: d3.format('d'), xTickValues: [5, 10, 25, 50, 100, 300], yDomain: [1.0, 1.7] });
     },
 
     text(root) {

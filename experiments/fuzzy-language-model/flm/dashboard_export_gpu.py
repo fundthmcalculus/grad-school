@@ -34,8 +34,17 @@ GRIDS = [
     "v5-sub100k",
     "v5-spend",
     "v5-final100k",
+    "v5-long",
 ]
-CURVE_GRIDS = ["v3-final", "v3-ref", "v3-big", "v5-bpe30", "v5-sub100k", "v5-final100k"]
+CURVE_GRIDS = [
+    "v3-final",
+    "v3-ref",
+    "v3-big",
+    "v5-bpe30",
+    "v5-sub100k",
+    "v5-final100k",
+    "v5-long",
+]
 
 # (grid, run) -> label for the generated-text page
 SAMPLES = [
@@ -58,6 +67,11 @@ SAMPLES = [
         "D-d48-bpe1024_100M_s0",
         "Fuzzy D, BPE1024 d = 48 (93K), 100M chars",
     ),
+    (
+        "v5-long",
+        "D-d48-bpe1024_300M_lr3e-2_s0",
+        "Fuzzy D, BPE1024 d = 48 (93K), 300M chars",
+    ),
 ]
 
 GAPS = [
@@ -77,10 +91,10 @@ GAPS = [
     ),
     (
         "D's learning rate on subwords",
-        "Only 3e-2 was ever run; the neural control gets a 4-lr search",
+        "Only 3e-2 and 2e-2 were run (at 300M characters, one seed, within 0.002 of each other); the neural control gets a 4-lr search",
         "open",
         "v6-d-lr",
-        "Part of the subword control set",
+        "Partly closed: 2e-2 vs 3e-2 is a tie at 300M; 4e-2 and 6e-2 not run",
     ),
     (
         "Ten seeds",
