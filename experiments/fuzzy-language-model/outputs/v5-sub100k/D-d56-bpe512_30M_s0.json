@@ -1,0 +1,235 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-sub100k\\D-d56-bpe512_30M_s0.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 86496,
+ "params_nonemb": 57824,
+ "steps": 1528,
+ "chars_seen": 30016615,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.1964,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   382,
+   1.46382
+  ],
+  [
+   764,
+   1.32303
+  ],
+  [
+   1146,
+   1.23831
+  ],
+  [
+   1528,
+   1.1964
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.3706
+  ],
+  [
+   50,
+   7.7924
+  ],
+  [
+   100,
+   5.8769
+  ],
+  [
+   150,
+   4.8311
+  ],
+  [
+   200,
+   4.3087
+  ],
+  [
+   250,
+   4.0007
+  ],
+  [
+   300,
+   3.8136
+  ],
+  [
+   350,
+   3.678
+  ],
+  [
+   400,
+   3.5785
+  ],
+  [
+   450,
+   3.5108
+  ],
+  [
+   500,
+   3.4609
+  ],
+  [
+   550,
+   3.3965
+  ],
+  [
+   600,
+   3.3425
+  ],
+  [
+   650,
+   3.3049
+  ],
+  [
+   700,
+   3.2721
+  ],
+  [
+   750,
+   3.2286
+  ],
+  [
+   800,
+   3.1991
+  ],
+  [
+   850,
+   3.1698
+  ],
+  [
+   900,
+   3.142
+  ],
+  [
+   950,
+   3.1156
+  ],
+  [
+   1000,
+   3.0839
+  ],
+  [
+   1050,
+   3.0624
+  ],
+  [
+   1100,
+   3.036
+  ],
+  [
+   1150,
+   3.0014
+  ],
+  [
+   1200,
+   2.9737
+  ],
+  [
+   1250,
+   2.9606
+  ],
+  [
+   1300,
+   2.9444
+  ],
+  [
+   1350,
+   2.9238
+  ],
+  [
+   1400,
+   2.92
+  ],
+  [
+   1450,
+   2.9055
+  ],
+  [
+   1500,
+   2.9079
+  ],
+  [
+   1527,
+   2.892
+  ]
+ ],
+ "train_seconds": 307.23,
+ "wall_seconds": 323.74,
+ "chars_per_sec": 40742,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a prince. On thinking yellow came and drinks, there lived in a big tree with a big net. The man was time to go down to behaking the pretty. He was scared and princess onto the print. He saw a big tree and rolled it in the water.\nBut then, something unique hot. It was a nice of smile. The hint would make a great time and cold him its dog, displaying. Then, Tim was the prince. He was sad because he was like the print.\nOne princess, Tim and Sam were going to her friends. They said, \"You need to a young!\" Tim said, \"Okay, let's follow it!\"\nTimmy smiled and said, \"I lost a cold place with your discoverych?\" Tim was happy again and then he was not late thought for angry.\nTim and Sue went to the",
+ "rule_init": {},
+ "ngram_init": {}
+}
