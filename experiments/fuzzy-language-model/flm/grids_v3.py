@@ -396,3 +396,12 @@ for s in (0, 1):
 c = cell("D-d48-bpe1024_100M_s0", D, d=48, sc="8", chars="100e6", seed=0)
 jobs.append((c[0], c[1] + ["--tok", "bpe1024", "--warmup", "100", "--save-model"]))
 register("v5-final100k", jobs)
+
+
+# v5-long (H24/H25): BPE1024 D d=48 at 300M chars, two learning rates, seed 0, saved
+jobs = []
+for lr in ("3e-2", "2e-2"):
+    n_ = f"D-d48-bpe1024_300M_lr{lr}_s0"
+    c = cell(n_, D, d=48, sc="8", chars="300e6", seed=0, lr=lr)
+    jobs.append((n_, c[1] + ["--tok", "bpe1024", "--warmup", "100", "--save-model"]))
+register("v5-long", jobs)

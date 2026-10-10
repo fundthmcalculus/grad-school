@@ -796,6 +796,35 @@ character model scored 1.208 at 100M, and the 280K character teacher 1.115 at 60
 as simple TinyStories prose but loops ("They did not like the box. They did not like the box.") and loses the plot, so
 low temperature trades invented words for repetition (repeated-sentence share 2.9%, measured on 12 samples).
 
+## Registered 2026-10-10 (late), before `v5-long`: does more data keep paying for the 93K subword model?
+
+BPE1024 d = 48 (93,344 params). 100M chars scored 1.0548 (seed 0, lr 3e-2); 30M scored 1.129 (2 seeds): −0.074 per
+3.3× data. Cells: 300M chars, seed 0, lr ∈ {3e-2, 2e-2}, warm-up 100, saved. Training throughput is ~112K chars/s alone,
+so each cell is ~45 min of GPU; two run concurrently. Not decided: ten seeds, or any coherence claim.
+* **H24.** 300M chars scores ≤ 1.00 BPC at the better lr. *(~50%.)* *Basis:* the 30M → 100M step was −0.074;
+  a 3× step again at a decaying return gives ~−0.04 to −0.06, i.e. 0.995–1.015, so this is close to a coin flip.
+* **H25.** The better lr at 300M is 2e-2, not 3e-2. *(~55%.)* *Basis:* optimal lr usually falls with token count.
+* **Stopping rule:** if 300M is ≥ 1.03, further data is not the lever and the next step is the architecture (rules, heads),
+  not more compute.
+
+**Limitation, added 2026-10-10 (night; raised by the CPU session).** "The best model under 100K is a fuzzy subword model" is a
+statement about **subwords**, not yet about **fuzziness**: no neural model on the same BPE1024 tokenizer at 93,344
+parameters has been run, and D's learning rate on subwords was only ever 3e-2 (2e-2 is running in `v5-long`). The earlier
+fuzzy-vs-neural comparisons are character-level, 2–3 seeds, and below the ten-seed protocol. The neural BPE control is
+defined in `flm/grids_v6.py` (`v6-d-lr`, `v6-ref-tune`, `v6-final10`, ~2–3 GPU-hours; needs the user's go-ahead).
+
+### Outcome `v5-long` (BPE1024 D d = 48, 93,344 params, seed 0, 300M chars, ~19 min each, two cells concurrent)
+
+| lr | val BPC at 25 / 50 / 75 / 100% | final |
+|---|---|---|
+| 3e-2 | 1.1206 / 1.0773 / 1.0420 / 1.0212 | **1.0212** |
+| 2e-2 | 1.1178 / 1.0730 / 1.0401 / 1.0227 | 1.0227 |
+
+**H24 refuted (narrowly):** 1.021 is not ≤ 1.00. **H25 refuted:** the two learning rates differ by 0.0015, inside seed noise
+(the lower lr leads until the last quarter and loses at the end of the cosine). Returns on data are shrinking: 30M → 100M gave
+−0.074, 100M → 300M gave −0.034 (one seed each), so 1B characters would be expected to give about −0.02 (≈ 1.00) for ~1 h of GPU.
+The registered stopping rule (≥ 1.03 means data is not the lever) did not trigger: more data still helps, with diminishing return.
+Single seed, so differences under ~0.01 are not established.
 ### Screen stage 2 outcome (CPU session, 2026-10-10 evening; 8 more runs, 0 failures)
 
 Merged with stage 1 (`outputs/screen-all/summary.md`; `python -m flm.screen_report screen screen2`).
