@@ -414,3 +414,29 @@ def _screen(seeds_for=None, chars="10e6"):
 
 
 register("screen", _screen())
+
+
+def _screen2():
+    """Stage 2 of the d=16 screen: more seeds where stage 1 could not separate signal from
+    noise (n-gram init D, 2-tap antecedent E, FFN-only HTSK H), plus two more base seeds.
+    """
+    try:
+        base = ARMS_V2["frlm-delta-htsk"] + best_tune("frlm-delta-htsk")
+    except RuntimeError:
+        return []
+    common = ["--d", "16", "--layers", "2", "--chars", "10e6", "--eval-chars", "300000"]
+    common += ["--eval-every", "100", "--eval-at-start"]
+    plan = {
+        "A-base": (2, 3),
+        "D-bifull": (1, 2),
+        "E-taps2": (1, 2),
+        "H-ffnonly": (1, 2),
+    }
+    return [
+        (f"{v}_d16_s{s}", base + common + ["--seed", str(s)] + SCREEN_VARIANTS[v])
+        for v, seeds in plan.items()
+        for s in seeds
+    ]
+
+
+register("screen2", _screen2())

@@ -477,3 +477,68 @@ with no worse final BPC. Promising variants go to seeds 1–2 and a 3-point lr c
 Caveats stated up front: one seed per variant; every variant uses A's lr, and the n-gram
 variants start with a large output gain, so an lr effect could mask or fake a result;
 the `placement` and `full` modes calibrate (kappa, alpha, gain) on 64 *training* windows.
+
+### Screen stage 1 outcome (2026-10-10, 11 runs, 0 failures)
+
+Final val BPC at 10M chars, d = 16, seed 0 (A also seed 1). Table: `outputs/screen/summary.md`.
+
+| id | variant | params | final BPC | Δ vs A (seed 0) | steps to 3.0 / 2.5 / 2.2 |
+|---|---|---|---|---|---|
+| A | base | 8,568 | 2.1025 (seed 1: 2.0526) | | 200 / 300 / 800 |
+| B | aligned embedding only | 8,568 | 2.0816 | −0.021 | 200 / 300 / 800 |
+| C | + bigram placement | 8,568 | 2.0669 | −0.036 | 200 / 300 / 700 |
+| D | + decoded consequents (bigram, full) | 8,568 | 2.0523 | −0.050 | 200 / 400 / 700 |
+| E | 2-tap antecedent | 8,824 | 2.0600 | −0.043 | 200 / 300 / 800 |
+| F | trigram, 2 taps, full | 8,824 | 2.0960 | −0.007 | 100 / 400 / 800 |
+| G | trigram placement only | 8,824 | 2.1366 | +0.034 | 200 / 300 / 1000 |
+| H | HTSK on the FFN only | 8,568 | 2.0361 | −0.066 | 200 / 300 / 700 |
+| I | one block ×3 (−41% params) | 5,076 | 2.2050 | +0.102 | 200 / 400 / never |
+| J | widths shared per dimension (−17%) | 7,096 | 2.1641 | +0.062 | 200 / 300 / 1000 |
+
+**The noise.** The two base seeds differ by **0.050** (std ≈ 0.035), about three times the
+0.012 I had taken from the 30M-char `scaling2` runs and used to set the 0.03 thresholds in
+the registration above. **That was my error:** the noise at the 10M-char screen budget and
+lr 6e-2 is much larger than at 30M, and I should have measured it before registering. It
+makes the screen under-powered for the effects the predictions were about.
+
+**The learning curves** (evaluated every 100 steps) show the n-gram init's head start is
+gone almost at once: every variant, the base included, reaches 3.0–3.2 BPC by step 100.
+D starts at 3.70 and is ahead at step 100 (3.01 against 3.18), **behind** at steps 200–300
+(2.77 against 2.68, 2.52 against 2.47), and indistinguishable from the base from step ~500.
+The rest of the base's early curve (6.6 → 3.2 in 100 steps) means n-gram statistics are
+learned within the first ~100 of 1221 steps.
+
+**Predictions, scored literally against the registered Δ (seed 0):**
+
+| | prediction | outcome |
+|---|---|---|
+| P1 | D not better than A by > 0.03 | **not met as written** (−0.050), but the base's own seeds differ by 0.050, so it cannot be distinguished from noise |
+| P2 | D reaches 3.0 in ≤ half of A's steps | **refuted** (200 vs 200; head start ≈ 100 steps at most) |
+| P3 | B within ±0.03 of A | met (−0.021) |
+| P4 | C not better than A by > 0.03 | **not met as written** (−0.036), within noise |
+| P5 | E better than A by ≥ 0.03 | met as written (−0.043; −0.034 after the +3% parameter effect), within noise |
+| P6 | F not better than D | met (F − D = +0.044) |
+| P7 | H beats or matches A by ≥ 0.01 | met (−0.066, the largest) |
+| P8 | I worse than A by > 0.05 | met (+0.102) |
+| P9 | J within +0.03 of A | **refuted** (+0.062), but that is what its 17% parameter loss predicts from the `scaling2` slope (≈ +0.055): no free lunch from sharing widths |
+
+Readings that are safe at this power: **I and J are worse, in line with (I: slightly
+better than) what their parameter counts predict; the trigram variants are not better than
+the bigram ones; the n-gram init does not speed up training beyond its first ~100 steps.**
+Everything among A, B, C, D, E, H is within the noise of one another. Under the registered
+promotion rule (> max(0.03, 2 × noise) = 0.10) **nothing was promoted.**
+
+### Registered 2026-10-10, before `screen2` (stage 2): resolve what stage 1 could not
+
+Same protocol. New runs: A seeds 2, 3; D, E, H seeds 1, 2. After it: A has 4 seeds; D, E,
+H have 3 each. The verdict is computed by `flm.screen_report` (se = pooled base std ·
+√(1/n_variant + 1/n_base); "real" if |Δ of means| > 2 se).
+
+* **P10.** D's mean is within the noise of A's. *(My expectation; the n-gram knowledge is
+  learned in the first ~100 steps either way.)* If D comes out "real, better", the init is
+  worth keeping, since the curves already say it is not a speed-up.
+* **P11.** E (2-tap antecedent) is better than A by ≥ 0.03 and "real". *(~40%.)*
+* **P12.** H (FFN-only HTSK) is better than A by ≥ 0.02 and "real". *(~50%; `h9` saw 0.007
+  and 0.015 at d = 32.)*
+* **A finding is only called promising if it is "real, better" by this rule and the
+  improvement is at least 0.03.** Anything else is reported as a null at this power.
