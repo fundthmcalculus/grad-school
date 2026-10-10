@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn3\\o1r-da16-htsk-m2.5_s2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 92996,
+ "params_nonemb": 86724,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.49294,
+ "evals": [
+  [
+   305,
+   1.94815
+  ],
+  [
+   610,
+   1.70544
+  ],
+  [
+   915,
+   1.56348
+  ],
+  [
+   1220,
+   1.4931
+  ],
+  [
+   1221,
+   1.49294
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8931
+  ],
+  [
+   50,
+   4.908
+  ],
+  [
+   100,
+   3.5087
+  ],
+  [
+   150,
+   2.781
+  ],
+  [
+   200,
+   2.4059
+  ],
+  [
+   250,
+   2.1906
+  ],
+  [
+   300,
+   2.065
+  ],
+  [
+   350,
+   1.972
+  ],
+  [
+   400,
+   1.9048
+  ],
+  [
+   450,
+   1.8464
+  ],
+  [
+   500,
+   1.8116
+  ],
+  [
+   550,
+   1.7798
+  ],
+  [
+   600,
+   1.7492
+  ],
+  [
+   650,
+   1.716
+  ],
+  [
+   700,
+   1.6924
+  ],
+  [
+   750,
+   1.6654
+  ],
+  [
+   800,
+   1.6427
+  ],
+  [
+   850,
+   1.6148
+  ],
+  [
+   900,
+   1.5912
+  ],
+  [
+   950,
+   1.5768
+  ],
+  [
+   1000,
+   1.5647
+  ],
+  [
+   1050,
+   1.5371
+  ],
+  [
+   1100,
+   1.522
+  ],
+  [
+   1150,
+   1.5097
+  ],
+  [
+   1200,
+   1.502
+  ],
+  [
+   1220,
+   1.5005
+  ]
+ ],
+ "train_seconds": 60.08,
+ "wall_seconds": 68.33,
+ "chars_per_sec": 166487,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He wanted to snam together. Max was suge preplied for watch the sun.\nOne day, the big boney with his toy home. The bird in the grass faces. The sky and brings toy what looked with his other and said, \"Lily, let's ball town.\nLily met it and drawing how on his mom's",
+ "rule_init": {}
+}

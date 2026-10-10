@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-mix\\delta_s0.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 87752,
+ "params_nonemb": 81480,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.51081,
+ "evals": [
+  [
+   305,
+   1.93099
+  ],
+  [
+   610,
+   1.71352
+  ],
+  [
+   915,
+   1.58159
+  ],
+  [
+   1220,
+   1.51047
+  ],
+  [
+   1221,
+   1.51081
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.2787
+  ],
+  [
+   50,
+   5.0345
+  ],
+  [
+   100,
+   3.5386
+  ],
+  [
+   150,
+   2.7806
+  ],
+  [
+   200,
+   2.4024
+  ],
+  [
+   250,
+   2.1925
+  ],
+  [
+   300,
+   2.0611
+  ],
+  [
+   350,
+   1.9774
+  ],
+  [
+   400,
+   1.906
+  ],
+  [
+   450,
+   1.8684
+  ],
+  [
+   500,
+   1.8283
+  ],
+  [
+   550,
+   1.7769
+  ],
+  [
+   600,
+   1.7469
+  ],
+  [
+   650,
+   1.7212
+  ],
+  [
+   700,
+   1.6981
+  ],
+  [
+   750,
+   1.6796
+  ],
+  [
+   800,
+   1.6529
+  ],
+  [
+   850,
+   1.6329
+  ],
+  [
+   900,
+   1.6144
+  ],
+  [
+   950,
+   1.5953
+  ],
+  [
+   1000,
+   1.5641
+  ],
+  [
+   1050,
+   1.555
+  ],
+  [
+   1100,
+   1.5409
+  ],
+  [
+   1150,
+   1.53
+  ],
+  [
+   1200,
+   1.5304
+  ],
+  [
+   1220,
+   1.529
+  ]
+ ],
+ "train_seconds": 91.62,
+ "wall_seconds": 112.65,
+ "chars_per_sec": 109177,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was shoes and water. He ride to help her fly from two let and lessons and tear the stripped and sleeping, a long to the way and push the box win around inside up and saw Anna looked at the cat is good at the modered and play in the stad dog, and they should sta",
+ "rule_init": {}
+}

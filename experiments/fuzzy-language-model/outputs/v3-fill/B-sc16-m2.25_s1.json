@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "shortconv": 16,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-fill\\B-sc16-m2.25_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.25,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 16,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 96000,
+ "params_nonemb": 89728,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.40119,
+ "evals": [
+  [
+   305,
+   1.82223
+  ],
+  [
+   610,
+   1.60702
+  ],
+  [
+   915,
+   1.47477
+  ],
+  [
+   1220,
+   1.40165
+  ],
+  [
+   1221,
+   1.40119
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.086
+  ],
+  [
+   50,
+   4.9963
+  ],
+  [
+   100,
+   3.5535
+  ],
+  [
+   150,
+   2.7244
+  ],
+  [
+   200,
+   2.3027
+  ],
+  [
+   250,
+   2.0869
+  ],
+  [
+   300,
+   1.9565
+  ],
+  [
+   350,
+   1.8701
+  ],
+  [
+   400,
+   1.8028
+  ],
+  [
+   450,
+   1.7494
+  ],
+  [
+   500,
+   1.7088
+  ],
+  [
+   550,
+   1.6714
+  ],
+  [
+   600,
+   1.6452
+  ],
+  [
+   650,
+   1.6169
+  ],
+  [
+   700,
+   1.5929
+  ],
+  [
+   750,
+   1.5696
+  ],
+  [
+   800,
+   1.553
+  ],
+  [
+   850,
+   1.5233
+  ],
+  [
+   900,
+   1.5031
+  ],
+  [
+   950,
+   1.4806
+  ],
+  [
+   1000,
+   1.4622
+  ],
+  [
+   1050,
+   1.4428
+  ],
+  [
+   1100,
+   1.4334
+  ],
+  [
+   1150,
+   1.4216
+  ],
+  [
+   1200,
+   1.4247
+  ],
+  [
+   1220,
+   1.4204
+  ]
+ ],
+ "train_seconds": 245.19,
+ "wall_seconds": 288.83,
+ "chars_per_sec": 40795,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Max. He wanted to climb a rest high and said, \"I can fly help you?\"\nMia says, \"What are you for you?\" Mia said, \"I will go to the bear. Do you want to play with you?\"\nMax said, \"Are you we owary it?\" Tim asked the little boy with the mean, said, \"Your thank you. I can ",
+ "rule_init": {}
+}

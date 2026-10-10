@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-mix\\gauss_s1.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "gauss",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 83200,
+ "params_nonemb": 76928,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.47038,
+ "evals": [
+  [
+   305,
+   1.90784
+  ],
+  [
+   610,
+   1.69436
+  ],
+  [
+   915,
+   1.54282
+  ],
+  [
+   1220,
+   1.47039
+  ],
+  [
+   1221,
+   1.47038
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.2719
+  ],
+  [
+   50,
+   5.1595
+  ],
+  [
+   100,
+   3.624
+  ],
+  [
+   150,
+   2.7943
+  ],
+  [
+   200,
+   2.3711
+  ],
+  [
+   250,
+   2.1618
+  ],
+  [
+   300,
+   2.0321
+  ],
+  [
+   350,
+   1.9484
+  ],
+  [
+   400,
+   1.8818
+  ],
+  [
+   450,
+   1.8247
+  ],
+  [
+   500,
+   1.7869
+  ],
+  [
+   550,
+   1.7455
+  ],
+  [
+   600,
+   1.7217
+  ],
+  [
+   650,
+   1.6953
+  ],
+  [
+   700,
+   1.6695
+  ],
+  [
+   750,
+   1.644
+  ],
+  [
+   800,
+   1.6286
+  ],
+  [
+   850,
+   1.5997
+  ],
+  [
+   900,
+   1.5766
+  ],
+  [
+   950,
+   1.5517
+  ],
+  [
+   1000,
+   1.5317
+  ],
+  [
+   1050,
+   1.5125
+  ],
+  [
+   1100,
+   1.5052
+  ],
+  [
+   1150,
+   1.4921
+  ],
+  [
+   1200,
+   1.493
+  ],
+  [
+   1220,
+   1.4865
+  ]
+ ],
+ "train_seconds": 48.12,
+ "wall_seconds": 55.09,
+ "chars_per_sec": 207848,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog balloon. The other had a new paper in his friend, but he didn't let the see things and water them and he asked her book and started to heep and said, \"I can found a kite.\"\nThey said, \"Anna look out that came to get a slee. I will walked and draw many doll, and anything ic tr",
+ "rule_init": {}
+}

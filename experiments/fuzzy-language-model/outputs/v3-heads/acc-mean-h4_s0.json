@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-heads\\acc-mean-h4_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 87752,
+ "params_nonemb": 81480,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.43895,
+ "evals": [
+  [
+   305,
+   1.87783
+  ],
+  [
+   610,
+   1.64072
+  ],
+  [
+   915,
+   1.50649
+  ],
+  [
+   1220,
+   1.43885
+  ],
+  [
+   1221,
+   1.43895
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.2274
+  ],
+  [
+   50,
+   5.1031
+  ],
+  [
+   100,
+   3.5884
+  ],
+  [
+   150,
+   2.7794
+  ],
+  [
+   200,
+   2.3771
+  ],
+  [
+   250,
+   2.1519
+  ],
+  [
+   300,
+   2.0086
+  ],
+  [
+   350,
+   1.92
+  ],
+  [
+   400,
+   1.843
+  ],
+  [
+   450,
+   1.7991
+  ],
+  [
+   500,
+   1.7567
+  ],
+  [
+   550,
+   1.7047
+  ],
+  [
+   600,
+   1.6731
+  ],
+  [
+   650,
+   1.6502
+  ],
+  [
+   700,
+   1.6275
+  ],
+  [
+   750,
+   1.6078
+  ],
+  [
+   800,
+   1.5825
+  ],
+  [
+   850,
+   1.5602
+  ],
+  [
+   900,
+   1.5436
+  ],
+  [
+   950,
+   1.5231
+  ],
+  [
+   1000,
+   1.4937
+  ],
+  [
+   1050,
+   1.4846
+  ],
+  [
+   1100,
+   1.4693
+  ],
+  [
+   1150,
+   1.4593
+  ],
+  [
+   1200,
+   1.4591
+  ],
+  [
+   1220,
+   1.4573
+  ]
+ ],
+ "train_seconds": 109.62,
+ "wall_seconds": 134.15,
+ "chars_per_sec": 91243,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was so happy and presside. But when then, they fell their seelless to play together. They saw the explain and his dull discess in the word. They are brave.\nTom said, \"Tom, wish his own. Tim and Sam were so happy. They looked very happy to help. They had lots of",
+ "rule_init": {}
+}

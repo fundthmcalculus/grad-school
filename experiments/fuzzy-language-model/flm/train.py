@@ -95,6 +95,9 @@ def get_args(argv=None):
     p.add_argument(
         "--n-unique", type=int, default=0, help="distinct blocks (0 = --layers)"
     )
+    p.add_argument("--ffn-order", type=int, default=0, choices=[0, 1])
+    p.add_argument("--ffn-width", default="", choices=["", "dim", "rule", "shared"])
+    p.add_argument("--ffn-norm", default="softmax", choices=["softmax", "none"])
     p.add_argument(
         "--rule-init",
         default="random",
@@ -122,13 +125,21 @@ def make_config(a) -> ModelConfig:
         ffn_exp_norm=a.ffn_exp_norm,
         width_share=a.width_share,
         n_unique=a.n_unique,
+        ffn_order=a.ffn_order,
+        ffn_width=a.ffn_width,
+        ffn_norm=a.ffn_norm,
         ante_taps=a.ante_taps,
     )
 
 
 @torch.no_grad()
 def evaluate(
-    model, val: np.ndarray, ctx: int, eval_chars: int, batch: int = 64
+    model,
+    val: np.ndarray,
+    ctx: int,
+    eval_chars: int,
+    batch: int = 64,
+    device: torch.device = torch.device("cpu"),
 ) -> float:
     """Mean bits per character over non-overlapping windows of the validation slice."""
     model.eval()
@@ -137,6 +148,7 @@ def evaluate(
     data = torch.from_numpy(np.asarray(val[: n_win * (ctx + 1)], dtype=np.int64)).view(
         n_win, ctx + 1
     )
+    data = data.to(device)
     tot, cnt = 0.0, 0
     for i in range(0, n_win, batch):
         xb = data[i : i + batch].to(dev)
@@ -186,6 +198,7 @@ def main(argv=None):
     # on every platform; batch sampling is numpy-seeded, so the data order is too
     device = torch.device(a.device)
     model.to(device)
+    on_gpu = device.type == "cuda"
 
     steps = int(math.ceil(a.chars / (a.batch * a.ctx)))
     eval_every = a.eval_every or max(1, steps // 4)
@@ -220,6 +233,7 @@ def main(argv=None):
     t0 = time.perf_counter()
     train_time = 0.0
     ema = None
+    diverged_step = None
     for s in range(steps):
         ts = time.perf_counter()
         starts = rng.integers(0, hi, a.batch)
@@ -236,22 +250,34 @@ def main(argv=None):
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         opt.step()
+        if on_gpu:  # CUDA is asynchronous: without this, train_time times launches
+            torch.cuda.synchronize()
         train_time += time.perf_counter() - ts
         li = loss.item() / LN2
         if not math.isfinite(li):
+            diverged_step = s + 1
             break
         ema = li if ema is None else 0.98 * ema + 0.02 * li
         if s % 50 == 0 or s == steps - 1:
             curve.append((s, round(ema, 4)))
         if (s + 1) % eval_every == 0 or s == steps - 1:
-            evals.append((s + 1, round(evaluate(model, val, a.ctx, a.eval_chars), 5)))
+            evals.append(
+                (
+                    s + 1,
+                    round(evaluate(model, val, a.ctx, a.eval_chars, device=device), 5),
+                )
+            )
             print(
                 f"step {s + 1}/{steps} train {ema:.4f} val {evals[-1][1]:.4f} t={train_time:.0f}s",
                 flush=True,
             )
 
+    # A diverged run has no final value. Reporting the last finite eval would let a
+    # truncated run compete in `best_tune` as if it had finished.
     final = (
-        evals[-1][1] if evals and math.isfinite(ema or float("nan")) else float("nan")
+        evals[-1][1]
+        if evals and diverged_step is None and math.isfinite(evals[-1][1])
+        else float("nan")
     )
     model.cpu()  # sample and checkpoint on CPU, whatever the training device
     g = torch.Generator().manual_seed(1234)
@@ -276,6 +302,7 @@ def main(argv=None):
         "wall_seconds": round(time.perf_counter() - t0, 2),
         "chars_per_sec": round(steps * a.batch * a.ctx / max(train_time, 1e-9)),
         "torch": torch.__version__,
+        "diverged_step": diverged_step,
         "threads": a.threads,
         "device": a.device,
         "device_name": (
@@ -291,7 +318,10 @@ def main(argv=None):
     out.write_text(json.dumps(rec, indent=1))
     if a.save_model:
         torch.save(
-            {"config": cfg.to_dict(), "state": model.state_dict()},
+            {
+                "config": cfg.to_dict(),
+                "state": {k: v.cpu() for k, v in model.state_dict().items()},
+            },
             out.with_suffix(".pt"),
         )
     print(

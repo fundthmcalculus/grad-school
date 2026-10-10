@@ -57,6 +57,11 @@ class ModelConfig:
     n_unique: int = (
         0  # distinct blocks; n_layers applications cycle through them (0 = n_layers)
     )
+    # TSK FFN variants (defaults = the original zero-order, per-dim-width, softmax FFN)
+    ffn_order: int = 0  # 0: constant consequent a_r | 1: + rank-one slope (v_r.x) o_r
+    # FFN-only width override: "" = follow width_share | dim: (R,da) | rule: one per rule | shared: one per dim
+    ffn_width: str = ""
+    ffn_norm: str = "softmax"  # softmax: fuzzy partition over rules | none: raw firing
     ante_taps: int = (
         1  # layer-0 TSK FFN antecedent reads the last `ante_taps` positions
     )
@@ -479,10 +484,15 @@ class TapLinear(nn.Module):
 
 
 class TSKFFN(nn.Module):
-    """Zero-order TSK channel mixer.
+    """TSK channel mixer.
 
     u = P x (antecedent space, dim da);  w_r(u) = softmax_r(-||(u - c_r)/s_r||^2 / 2)
-    y = sum_r w_r(u) a_r      (a_r in R^d: rule consequent)
+    order 0:  y = sum_r w_r(u) a_r                       (a_r in R^d: rule consequent)
+    order 1:  y = sum_r w_r(u) (v_r . x) o_r             (rank-one first-order consequent:
+              rule r's output is linear in x with slope o_r v_r^T; this is a GLU whose
+              gate is the fuzzy membership)
+    ``ffn_norm="none"`` drops the softmax (raw Gaussian firing, an RBF layer);
+    ``ffn_width`` ties the Gaussian widths to save parameters.
     """
 
     def __init__(self, cfg: ModelConfig, taps: int = 1):
@@ -491,24 +501,39 @@ class TSKFFN(nn.Module):
         da = cfg.tsk_dim or d
         R = max(1, int(round(cfg.ffn_mult * d)))
         self.R, self.da = R, da
+        self.order, self.norm = cfg.ffn_order, cfg.ffn_norm
+        assert self.order in (0, 1) and self.norm in ("softmax", "none")
         self.exp_scale = exp_scale(cfg.ffn_exp_norm or cfg.exp_norm, da)
         self.ante = (
             nn.Linear(d, da, bias=False) if taps == 1 else TapLinear(d, da, taps)
         )
         self.centers = nn.Parameter(torch.randn(R, da))
-        self.log_width = nn.Parameter(torch.zeros(*width_shape(cfg.width_share, R, da)))
+        if cfg.ffn_width:
+            ws = {"dim": "full", "rule": "rule", "shared": "dim"}[cfg.ffn_width]
+        else:
+            ws = cfg.width_share
+        self.log_width = nn.Parameter(torch.zeros(*width_shape(ws, R, da)))
         self.conseq = nn.Parameter(torch.zeros(R, d))
         nn.init.normal_(self.conseq, std=0.02)
+        if self.order == 1:
+            self.slope = nn.Linear(d, R, bias=True)
+            nn.init.normal_(self.conseq, std=1.0 / math.sqrt(R))
 
     def firing(self, x):
         u = self.ante(x)
         a = torch.exp(-2.0 * self.log_width).expand_as(self.centers)  # (R,da)
         ca = self.centers * a
         quad = (u * u) @ a.T - 2.0 * (u @ ca.T) + (self.centers * ca).sum(-1)
-        return torch.softmax(-0.5 * self.exp_scale * quad, dim=-1)
+        logit = -0.5 * self.exp_scale * quad
+        if self.norm == "none":
+            return torch.exp(logit)
+        return torch.softmax(logit, dim=-1)
 
     def forward(self, x):
-        return self.firing(x) @ self.conseq
+        w = self.firing(x)
+        if self.order == 1:
+            w = w * self.slope(x)
+        return w @ self.conseq
 
 
 # ----------------------------------------------------------------------------- model

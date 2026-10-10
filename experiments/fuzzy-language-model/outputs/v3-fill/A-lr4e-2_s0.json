@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.4,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-fill\\A-lr4e-2_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.4,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 98196,
+ "params_nonemb": 91924,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.39412,
+ "evals": [
+  [
+   305,
+   1.81675
+  ],
+  [
+   610,
+   1.60712
+  ],
+  [
+   915,
+   1.4655
+  ],
+  [
+   1220,
+   1.39396
+  ],
+  [
+   1221,
+   1.39412
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8791
+  ],
+  [
+   50,
+   4.847
+  ],
+  [
+   100,
+   3.4549
+  ],
+  [
+   150,
+   2.6716
+  ],
+  [
+   200,
+   2.2883
+  ],
+  [
+   250,
+   2.0667
+  ],
+  [
+   300,
+   1.942
+  ],
+  [
+   350,
+   1.8617
+  ],
+  [
+   400,
+   1.7945
+  ],
+  [
+   450,
+   1.7518
+  ],
+  [
+   500,
+   1.7163
+  ],
+  [
+   550,
+   1.6672
+  ],
+  [
+   600,
+   1.6371
+  ],
+  [
+   650,
+   1.615
+  ],
+  [
+   700,
+   1.5894
+  ],
+  [
+   750,
+   1.5692
+  ],
+  [
+   800,
+   1.544
+  ],
+  [
+   850,
+   1.5239
+  ],
+  [
+   900,
+   1.5043
+  ],
+  [
+   950,
+   1.483
+  ],
+  [
+   1000,
+   1.4518
+  ],
+  [
+   1050,
+   1.4421
+  ],
+  [
+   1100,
+   1.4271
+  ],
+  [
+   1150,
+   1.4163
+  ],
+  [
+   1200,
+   1.4147
+  ],
+  [
+   1220,
+   1.4131
+  ]
+ ],
+ "train_seconds": 245.19,
+ "wall_seconds": 288.79,
+ "chars_per_sec": 40795,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He loved to see what was inside and shim. Then, the clear that she went to the bug. The new rain with the other bathturtle was green for weirl friends.\nOne day, Tom saw the bug was not gentle. He is good at the mode. They went to the park to the day.\nMom was happy",
+ "rule_init": {}
+}

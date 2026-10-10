@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "mlp",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-attrib\\fuzzy-mlp_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "max_len": 256
+ },
+ "params_total": 76996,
+ "params_nonemb": 70724,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.51249,
+ "evals": [
+  [
+   305,
+   1.90776
+  ],
+  [
+   610,
+   1.6991
+  ],
+  [
+   915,
+   1.5758
+  ],
+  [
+   1220,
+   1.51309
+  ],
+  [
+   1221,
+   1.51249
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.7222
+  ],
+  [
+   50,
+   5.0996
+  ],
+  [
+   100,
+   3.6369
+  ],
+  [
+   150,
+   2.8354
+  ],
+  [
+   200,
+   2.4182
+  ],
+  [
+   250,
+   2.1791
+  ],
+  [
+   300,
+   2.0378
+  ],
+  [
+   350,
+   1.9525
+  ],
+  [
+   400,
+   1.8814
+  ],
+  [
+   450,
+   1.8378
+  ],
+  [
+   500,
+   1.8003
+  ],
+  [
+   550,
+   1.7494
+  ],
+  [
+   600,
+   1.718
+  ],
+  [
+   650,
+   1.6989
+  ],
+  [
+   700,
+   1.6775
+  ],
+  [
+   750,
+   1.6618
+  ],
+  [
+   800,
+   1.6373
+  ],
+  [
+   850,
+   1.6193
+  ],
+  [
+   900,
+   1.6032
+  ],
+  [
+   950,
+   1.5862
+  ],
+  [
+   1000,
+   1.5569
+  ],
+  [
+   1050,
+   1.5496
+  ],
+  [
+   1100,
+   1.5371
+  ],
+  [
+   1150,
+   1.5284
+  ],
+  [
+   1200,
+   1.5301
+  ],
+  [
+   1220,
+   1.5288
+  ]
+ ],
+ "train_seconds": 56.79,
+ "wall_seconds": 69.55,
+ "chars_per_sec": 176120,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was she saw a door mommy felt so much fun day, for with the sky. \n\nThe cat taught she cared and rest. He was sad, but now despeciase the box with his wings. They fell something his own. Tim and had a bad laughed. The moral and the best toy bird took his friendl",
+ "rule_init": {}
+}
