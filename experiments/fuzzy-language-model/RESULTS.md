@@ -795,3 +795,20 @@ BPE1024 d = 48 (93,344 params), 100M chars, seed 0: **val BPC 1.0548** (H23 ≤ 
 character model scored 1.208 at 100M, and the 280K character teacher 1.115 at 60M. At T 0.5 / top-k 10 the text reads
 as simple TinyStories prose but loops ("They did not like the box. They did not like the box.") and loses the plot, so
 low temperature trades invented words for repetition (repeated-sentence share 2.9%, measured on 12 samples).
+
+## Registered 2026-10-10 (late), before `v5-long`: does more data keep paying for the 93K subword model?
+
+BPE1024 d = 48 (93,344 params). 100M chars scored 1.0548 (seed 0, lr 3e-2); 30M scored 1.129 (2 seeds): −0.074 per
+3.3× data. Cells: 300M chars, seed 0, lr ∈ {3e-2, 2e-2}, warm-up 100, saved. Training throughput is ~112K chars/s alone,
+so each cell is ~45 min of GPU; two run concurrently. Not decided: ten seeds, or any coherence claim.
+* **H24.** 300M chars scores ≤ 1.00 BPC at the better lr. *(~50%.)* *Basis:* the 30M → 100M step was −0.074;
+  a 3× step again at a decaying return gives ~−0.04 to −0.06, i.e. 0.995–1.015, so this is close to a coin flip.
+* **H25.** The better lr at 300M is 2e-2, not 3e-2. *(~55%.)* *Basis:* optimal lr usually falls with token count.
+* **Stopping rule:** if 300M is ≥ 1.03, further data is not the lever and the next step is the architecture (rules, heads),
+  not more compute.
+
+**Limitation, added 2026-10-10 (night; raised by the CPU session).** "The best model under 100K is a fuzzy subword model" is a
+statement about **subwords**, not yet about **fuzziness**: no neural model on the same BPE1024 tokenizer at 93,344
+parameters has been run, and D's learning rate on subwords was only ever 3e-2 (2e-2 is running in `v5-long`). The earlier
+fuzzy-vs-neural comparisons are character-level, 2–3 seeds, and below the ten-seed protocol. The neural BPE control is
+defined in `flm/grids_v6.py` (`v6-d-lr`, `v6-ref-tune`, `v6-final10`, ~2–3 GPU-hours; needs the user's go-ahead).
