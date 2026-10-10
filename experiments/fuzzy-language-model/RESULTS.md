@@ -896,3 +896,14 @@ read rule by rule; it does not show the readings are faithful to the full comput
 114K chars/s)". The 114K figure is the *smaller* 73K delta-mlp at 100M chars. Against the size-near reference (d72, 8 heads)
 the recorded speeds are 50K / 56K / 85K chars/s on the shared GPU, so the gap is roughly 1.5–2.5× and noisy. The dashboards
 and `WRITEUP.md` show the range. This file is the GPU session's, so the sentence there is left for it to fix.
+
+## Registered 2026-10-11, before `v6-final10`: the ten-seed comparison on the same tokenizer
+
+Arms (30M chars, seeds 0–9, BPE1024, ~93.3K params, warm-up 100): D at lr 6e-2; ref1 = delta h8 sc4 lr 4e-2 (93,392); ref2 =
+delta h4 sc4 lr 6e-2 (93,376). Both references are the two best of the 24-cell tune (10M chars, seed 0, so the selection has a
+winner's-curse bias *against* nothing here: it favours the references). Decision rule from `flm.compare`: a lead is **real**
+if |Δ of means| > 2 standard errors. Cost: 30 cells ≈ 1 h with 4 workers; run under the user's standing "free reign to design and
+run experiments" instruction, one sweep at a time.
+* **H26.** D's ten-seed mean is lower than both references' by a *real* margin. Predicted lead **0.01–0.02 BPC** over the better
+  reference. *(~60% it stays real: the 10M lead was 0.016 with a one-seed reference and the lead usually shrinks with training.)*
+  A null ("within noise") would be reported as the result, with the 1.5× throughput cost.
