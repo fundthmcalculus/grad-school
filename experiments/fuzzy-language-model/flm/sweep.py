@@ -99,6 +99,7 @@ def run_job(sweep, name, argv, device="cpu", threads=1):
 def main():
     import flm.grids  # noqa: F401  (registers grids into the *imported* flm.sweep)
     import flm.grids_v3  # noqa: F401
+    import flm.grids_v4  # noqa: F401
     from flm.sweep import GRIDS
 
     p = argparse.ArgumentParser()

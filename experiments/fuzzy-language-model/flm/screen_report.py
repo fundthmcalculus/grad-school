@@ -25,7 +25,7 @@ from pathlib import Path
 import numpy as np
 
 OUT = Path(__file__).resolve().parents[1] / "outputs"
-NAME = re.compile(r"^(?P<variant>.+?)_d(?P<d>\d+)(?:_L\d+)?_s(?P<seed>\d+)$")
+NAME = re.compile(r"^(?P<variant>.+?)(?:_d\d+)?(?:_L\d+)?_s(?P<seed>\d+)$")
 THRESHOLDS = (3.0, 2.5, 2.2)
 
 

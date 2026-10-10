@@ -125,18 +125,24 @@ def init_rules_from_ngrams(
 ) -> dict:
     """Make layer 0's TSK feed-forward a fuzzy version of the order-k n-gram model.
 
-    The R-1 most frequent length-k contexts g each get a rule: its antecedent centre is the
-    mean of the rule's own antecedent input u over the sample positions whose context is g
-    (placed empirically through the real forward pass, so it is right whatever the layer
-    sees), and its consequent a_r is decoded through the pseudo-inverse of the tied
-    embedding so that the logit lens of a_r reads log p(next | g). Rule R-1 is a wide
-    background rule falling back to the unigram. Rule width (kappa) and consequent scale
-    (alpha) are calibrated on the init BPC of ``calib_windows``.
+    The n_ctx = min(R - 1, V**k) most frequent length-k contexts g each get a rule: its
+    antecedent centre is the mean of the rule's own antecedent input u over the sample
+    positions whose context is g (placed empirically through the real forward pass, so it is
+    right whatever the layer sees), and its consequent a_r is decoded through the pseudo-
+    inverse of the tied embedding so that the logit lens of a_r reads log p(next | g). Rule
+    R - 1 is a wide background rule falling back to the unigram. Any rules in between (when
+    R - 1 > V**k) keep their random centres and get a zero consequent, so they are inert.
+    Rule width (kappa), consequent scale (alpha) and the final-norm gain are calibrated on
+    the init BPC of ``calib_windows``.
 
     The tied embedding is first aligned to the n-gram statistics: its columns become the
     top-d principal directions of the frequency-weighted conditional log-probs, so the d-dim
     readout can represent n-gram distributions at all (a random d=16 embedding cannot: its
     rank-16 readout of the bigram log-probs scores 7.5 BPC, the aligned one 3.57).
+
+    A first-order feed-forward (ffn_order = 1, output = firing * (slope . x) * a_r) is made
+    zero-order-equivalent at init (slope weight 0, bias 1) so the decoded consequents mean
+    what they say; the first-order terms then grow from zero under training.
 
     ``mode``: "emb" = aligned embedding only; "placement" = that plus rule placement and
     widths, with consequents and output gain left at their random init; "full" = everything.
@@ -160,6 +166,9 @@ def init_rules_from_ngrams(
     model.emb.weight.copy_(torch.from_numpy(Q[:, ::-1][:, :d].copy()).float())
     if mode == "emb":
         return {"k": k, "mode": mode, "init_bpc": round(_bpc(model, calib_windows), 4)}
+    if getattr(ffn, "order", 0) == 1:
+        ffn.slope.weight.zero_()
+        ffn.slope.bias.fill_(1.0)
 
     idx = stats_windows[:, :-1]
     x = model.emb(idx)
@@ -173,10 +182,11 @@ def init_rules_from_ngrams(
         )
     )
 
+    n_ctx = min(R - 1, V**k)
     ctx_counts = torch.from_numpy(tabs[k].reshape(-1, V).sum(-1))
-    top = torch.topk(ctx_counts, R - 1).indices
+    top = torch.topk(ctx_counts, n_ctx).indices
     rule_of_ctx = torch.full((V**k,), -1, dtype=torch.long)
-    rule_of_ctx[top] = torch.arange(R - 1)
+    rule_of_ctx[top] = torch.arange(n_ctx)
     pos_rule = torch.where(
         ctx >= 0, rule_of_ctx[ctx.clamp(min=0)], torch.full_like(ctx, -1)
     )
@@ -186,22 +196,31 @@ def init_rules_from_ngrams(
     n = torch.bincount(r_flat[valid], minlength=R).float()
     centers = sums / n.clamp(min=1)[:, None]
     for r in (
-        torch.nonzero(n[: R - 1] < 3).flatten().tolist()
+        torch.nonzero(n[:n_ctx] < 3).flatten().tolist()
     ):  # a context the sample barely saw
         centers[r] = u_flat[torch.randint(len(u_flat), (1,))][0]
-    centers[R - 1] = u_flat.mean(0)  # the background rule sits at the overall mean
-    ffn.centers.copy_(centers)
+    new_centers = (
+        ffn.centers.detach().clone()
+    )  # rules between n_ctx and R-1 keep their init
+    new_centers[:n_ctx] = centers[:n_ctx]
+    new_centers[R - 1] = u_flat.mean(0)  # the background rule sits at the overall mean
+    ffn.centers.copy_(new_centers)
     std = u_flat.std(0)
 
-    logp = np.log(probs[k].reshape(-1, V)[top.numpy()])  # (R-1, V)
+    logp = np.log(probs[k].reshape(-1, V)[top.numpy()])  # (n_ctx, V)
+    uni = np.log(probs[0])[None]
     target = np.concatenate(
-        [logp, np.log(probs[0])[None]], 0
-    )  # last row: unigram, for the else rule
+        [logp, uni], 0
+    )  # last row: unigram, for the background rule
     target = torch.from_numpy(target - target.mean(-1, keepdims=True)).to(
         model.emb.weight.dtype
     )
-    base = target @ torch.linalg.pinv(model.emb.weight).T  # (R, d): E a_r ~ log p_r
-
+    coef = (
+        target @ torch.linalg.pinv(model.emb.weight).T
+    )  # (n_ctx + 1, d): E a_r ~ log p_r
+    base = torch.zeros(R, d, dtype=coef.dtype)
+    base[:n_ctx] = coef[:n_ctx]
+    base[R - 1] = coef[n_ctx]
     old_gain = model.norm.weight.detach().clone()
 
     def set_widths(kappa):
@@ -235,8 +254,7 @@ def init_rules_from_ngrams(
 
     # manipulation check: does the winning rule at a covered position have that position's context?
     fire = ffn.firing(blk.n2(x)).reshape(-1, R)
-    covered = valid
-    rule_acc = (fire.argmax(-1)[covered] == r_flat[covered]).float().mean().item()
+    rule_acc = (fire.argmax(-1)[valid] == r_flat[valid]).float().mean().item()
     return {
         "k": k,
         "kappa": kappa,
@@ -247,6 +265,7 @@ def init_rules_from_ngrams(
         "coverage": round(valid.float().mean().item(), 4),
         "rule_acc": round(rule_acc, 4),
         "rules_winning": int((torch.bincount(fire.argmax(-1), minlength=R) > 0).sum()),
+        "n_context_rules": n_ctx,
         "mode": mode,
     }
 
