@@ -256,3 +256,68 @@ the (sum, sum) → (mean, mean) gain that each single-layer change achieves.
 * Mechanism, as a reading rather than a test: the FFN's antecedent dimension is 32, the
   mixer's per-head dimension 16. Saturation grows with dimension (Cui, Wu & Xu 2021,
   Fig. 1), so the wider FFN rule base is where saturation bites.
+
+## `scaling` + `scaling2` outcome (2026-10-10): 180 runs, 0 failures, 3 seeds per cell
+
+Full table: [`outputs/scaling-all/summary.md`](outputs/scaling-all/summary.md) (CSV beside it).
+Plot: `outputs/scaling-all/bpc_vs_params.png`. CPU (i7-1185G7), 30M chars per run,
+each arm at its d = 32 tune setting applied at every width.
+
+**Smallest model reaching a mean val BPC threshold** (total params, log-interpolated;
+`≤` means the smallest grid size already reaches it, so the number is an upper bound):
+
+| arm | ≤ 2.0 | ≤ 1.8 | ≤ 1.6 | ≤ 1.4 |
+|---|---|---|---|---|
+| softmax-mlp | 7,435 | 12,496 | 26,701 | 70,210 |
+| linear-mlp | 6,547 | 11,714 | 26,013 | 70,048 |
+| gla-mlp | 6,369 | 11,493 | 25,211 | 66,560 |
+| delta-mlp | ≤ 6,008 | 10,961 | 23,677 | 68,432 |
+| gru | 5,850 | 10,268 | not reached | not reached |
+| flm | 11,413 | 22,027 | 125,627 | not reached |
+| frlm-acc / frlm-delta | ≤ 8,500 | ≈18,200 | not reached | not reached |
+| frlm-acc-htsk † | ≤ 8,500 | 15,705 | 35,406 | 167,725 |
+| frlm-delta-htsk † | ≤ 8,568 | 14,931 | 34,846 | 140,947 |
+
+† post-hoc arms that received extra search (see the `fuzzyfix` disclosure).
+
+### Scored hypotheses
+
+* **H1: refuted.** Softmax does *not* beat linear attention at every width ≥ 32.
+  - Mean ± std: d32 1.6726 ± .0022 vs 1.6599 ± .0018 (linear better); d48 1.4863 ± .0041
+    vs 1.4911 ± .0029 (softmax better by about 1 std); d64 1.3942 vs 1.3935 (tie); d96
+    1.2916 vs 1.2886 (linear better).
+  - The ordering delta < gla < linear < softmax holds clearly only at d ≤ 32. From
+    d = 48 up, all four are within about 0.01.
+  - **At these sizes, quadratic attention buys nothing per parameter.** It does cost a KV
+    cache larger than the whole model after about 150 characters (`flm/state.py`).
+* **H5: refuted as stated (every width).** Delta beats accumulation from d = 32 (sum
+  forms) or d = 48 (HTSK forms) upward. At d = 16 and 24 they are within seed noise or
+  reversed.
+* **H6: half supported.** Softmax reaches 2.0 BPC at 7,435 params (< 15K, as predicted).
+  The linear-cost arms need **fewer**, not as many: DeltaNet ≤ 6,008 and GRU 5,850.
+* **H7: refuted for the registered FRLMs; post-hoc HTSK arms inside the margin.** Gap to
+  the best neural linear-cost arm at matched params, interpolated on the neural curve
+  with no extrapolation past 158K:
+
+  | params ≈ | 17K | 28K | 59K | 102K |
+  |---|---|---|---|---|
+  | frlm-acc (registered) | +0.13 | +0.17 | +0.27 | +0.32 |
+  | frlm-delta (registered) | +0.14 | +0.16 | +0.25 | +0.30 |
+  | frlm-acc-htsk † | +0.10 | +0.08 | +0.09 | +0.11 |
+  | frlm-delta-htsk † | +0.08 | +0.08 | +0.07 | +0.08 |
+
+  The registered arms fail H7. The HTSK FRLM (delta) stays 0.07–0.08 behind across the
+  range, which is inside H7's 0.10 margin. Because of the extra search, that is a
+  **post-hoc** observation, not a pass of H7.
+
+### Not hypotheses, but must be read before quoting anything above
+
+* **The LR does not transfer for gru, flm or the sum-form FRLMs.** Each was tuned at
+  d = 32 and gets *worse* at large widths (gru 1.68 @15K → 1.81 @121K; frlm-acc 1.665
+  @102K → 1.756 @220K). That is an optimisation failure, not a capacity measurement, so
+  their large-width points do not mean "this architecture doesn't scale". The HTSK
+  FRLMs scale cleanly, which suggests HTSK also conditions training, not only the rule
+  saturation. **Owed:** a per-width LR check for every arm alike before any
+  large-width claim about these arms.
+* Timing columns come from 4–7 concurrent jobs on 4 cores. They show relative cost
+  only (delta-rule arms ≈ 3–5× softmax per char at this T = 256), not throughput.

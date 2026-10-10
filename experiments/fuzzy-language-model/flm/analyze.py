@@ -1,6 +1,6 @@
 """Aggregate a sweep: mean +/- std val BPC per (arm, width, layers) across seeds.
 
-    .venv/bin/python -m flm.analyze scaling [headline ...] [--name merged] [--threshold 2.0]
+    .venv/bin/python -m flm.analyze scaling [headline ...] [--name merged] [--threshold 2.0 1.8 1.6]
 
 Writes outputs/<sweep>/summary.{csv,md} and outputs/<sweep>/bpc_vs_params.png.
 Every row states its seed count; a cell with fewer seeds than the sweep's maximum
@@ -31,6 +31,18 @@ PALETTE = [
     "#4a3aa7",
     "#e34948",
 ]
+# arms drawn in the plot: 8 slots of the validated palette, fixed order (never cycled).
+# The saturated (sum) FRLMs stay in the tables; their HTSK versions are plotted.
+PLOT_ARMS = [
+    "softmax-mlp",
+    "linear-mlp",
+    "gla-mlp",
+    "delta-mlp",
+    "gru",
+    "flm",
+    "frlm-acc-htsk",
+    "frlm-delta-htsk",
+]
 ARM_ORDER = [
     "softmax-mlp",
     "linear-mlp",
@@ -40,6 +52,8 @@ ARM_ORDER = [
     "flm",
     "frlm-acc",
     "frlm-delta",
+    "frlm-acc-htsk",
+    "frlm-delta-htsk",
 ]
 NAME_RE = re.compile(r"^(?P<arm>.+)_d(?P<d>\d+)_L(?P<L>\d+)_s(?P<s>\d+)$")
 
@@ -100,7 +114,10 @@ def summarize(rows):
 
 
 def smallest_reaching(summary, threshold):
-    """Per arm: smallest param count whose mean BPC <= threshold (interpolated in log-params)."""
+    """Per arm: (params, kind) for the first crossing of mean BPC <= threshold, scanning sizes
+    upward and interpolating in log-params. kind is "interp" for a crossing between two grid
+    sizes, "below-grid" if the smallest size already reaches the threshold (so params is only
+    an upper bound), or None if no size reaches it."""
     res = {}
     for arm in {s["arm"] for s in summary}:
         pts = sorted(
@@ -108,19 +125,22 @@ def smallest_reaching(summary, threshold):
             for s in summary
             if s["arm"] == arm and np.isfinite(s["bpc_mean"])
         )
-        hit = None
+        res[arm] = (None, None)
+        if pts and pts[0][1] <= threshold:
+            res[arm] = (pts[0][0], "below-grid")
+            continue
         for (p0, b0), (p1, b1) in zip(pts, pts[1:]):
             if b0 > threshold >= b1:
                 f = (b0 - threshold) / (b0 - b1)
-                hit = math.exp(math.log(p0) + f * (math.log(p1) - math.log(p0)))
+                res[arm] = (
+                    math.exp(math.log(p0) + f * (math.log(p1) - math.log(p0))),
+                    "interp",
+                )
                 break
-        if pts and pts[0][1] <= threshold:
-            hit = pts[0][0]
-        res[arm] = hit
     return res
 
 
-def write_tables(sweep, summary, threshold):
+def write_tables(sweep, summary, thresholds):
     d = OUT / sweep
     cols = [
         "arm",
@@ -152,18 +172,32 @@ def write_tables(sweep, summary, threshold):
             f"| {s['arm']} | {s['d']} | {s['L']} | {s['params']:,} | {s['params_nonemb']:,} | {s['n_seeds']}{flag}{div} "
             f"| {s['bpc_mean']:.4f} ± {s['bpc_std']:.4f} | {s['secs_mean']:.0f} | {s['cps_mean']:,.0f} |"
         )
-    if threshold:
+    if thresholds:
+        res = {t: smallest_reaching(summary, t) for t in thresholds}
+        arms = sorted(
+            {x["arm"] for x in summary},
+            key=lambda a: ARM_ORDER.index(a) if a in ARM_ORDER else 99,
+        )
         lines += [
             "",
-            f"## Smallest model reaching mean val BPC ≤ {threshold} (log-interpolated between sizes)",
+            "## Smallest model reaching a mean val BPC threshold (total params)",
             "",
+            "Log-interpolated between adjacent grid sizes at the first crossing. `≤ N` means the",
+            "smallest grid size already reaches the threshold, so N is only an upper bound.",
+            "",
+            "| arm | " + " | ".join(f"BPC ≤ {t}" for t in thresholds) + " |",
+            "|---|" + "---|" * len(thresholds),
         ]
-        for arm, p in sorted(
-            smallest_reaching(summary, threshold).items(),
-            key=lambda kv: (kv[1] is None, kv[1] or 0),
-        ):
+
+        def cell(v):
+            p, kind = v
+            if p is None:
+                return "not reached"
+            return f"≤ {p:,.0f}" if kind == "below-grid" else f"{p:,.0f}"
+
+        for arm in arms:
             lines.append(
-                f"- {arm}: {'not reached in grid' if p is None else f'{p:,.0f} params'}"
+                f"| {arm} | " + " | ".join(cell(res[t][arm]) for t in thresholds) + " |"
             )
     (d / "summary.md").write_text("\n".join(lines) + "\n")
     return d / "summary.md"
@@ -176,7 +210,7 @@ def plot(sweep, summary, nonemb=False):
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(figsize=(8, 5), dpi=150)
-    arms = [a for a in ARM_ORDER if any(s["arm"] == a for s in summary)]
+    arms = [a for a in PLOT_ARMS if any(s["arm"] == a for s in summary)]
     pkey = "params_nonemb" if nonemb else "params"
     for i, arm in enumerate(arms):
         pts = sorted(
@@ -194,20 +228,13 @@ def plot(sweep, summary, nonemb=False):
         ax.fill_between(
             x, y - np.nan_to_num(e), y + np.nan_to_num(e), color=c, alpha=0.15, lw=0
         )
-        ax.annotate(
-            arm,
-            (x[-1], y[-1]),
-            xytext=(4, 0),
-            textcoords="offset points",
-            fontsize=8,
-            color="#52514e",
-            va="center",
-        )
+        # no end-of-line labels: 8 series converge at the right edge and collide;
+        # the legend carries identity
     ax.set_xscale("log")
     ax.set_xlabel(("non-embedding" if nonemb else "total") + " parameters")
     ax.set_ylabel("validation bits per character")
     ax.set_title(
-        f"TinyStories char-level LM, CPU-trained ({sweep})",
+        f"TinyStories char-level LM, CPU-trained ({sweep}): mean ± std over seeds",
         fontsize=10,
         color="#0b0b0b",
     )
@@ -231,7 +258,13 @@ def main():
         default=None,
         help="output dir for the merged summary (default: first sweep)",
     )
-    p.add_argument("--threshold", type=float, default=0.0)
+    p.add_argument(
+        "--threshold",
+        type=float,
+        nargs="*",
+        default=[],
+        help="BPC thresholds for the smallest-model table",
+    )
     a = p.parse_args()
     name = a.name or a.sweeps[0]
     (OUT / name).mkdir(parents=True, exist_ok=True)
