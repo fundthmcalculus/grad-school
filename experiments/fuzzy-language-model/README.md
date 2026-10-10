@@ -1,6 +1,6 @@
 # Experiment: how small can a CPU-trained language model be — and can it be a fuzzy system?
 
-**Status:** in progress: tune complete, scaling running · **Started:** 2026-10-08
+**Status:** CPU phase stopped 2026-10-10 and written up in [`WRITEUP.md`](WRITEUP.md); to be repeated on a GPU host · **Started:** 2026-10-08
 
 ## Questions
 

@@ -390,3 +390,11 @@ embedding 18%, qkv 18%, consequents 12%.
   d = 64, and the cost grows with width, which is the saturation pattern Cui, Wu & Xu
   predict. Combined with `h9` (HTSK on the FFN carries the whole FRLM gain), the obvious
   next arm is **FLM with an HTSK FFN**. It is not run yet.
+
+## CPU phase stopped, 2026-10-10 15:30 (user decision; repeat on the GPU host)
+
+All sweeps were stopped at the user's request. Complete: `tune` 120/120, `fuzzyfix` 15/15,
+`h9` 16/16, `scaling` 144/144, `scaling2` 36/36. Incomplete: `ablate` 24/36, `lrwidth` 6/20,
+`minsize` 0/24, `lean` 0/12. In-flight runs were killed before writing a record, so no
+partial records exist. **H10a, H11 and H12 are unscored.** The write-up is
+[`WRITEUP.md`](WRITEUP.md).
