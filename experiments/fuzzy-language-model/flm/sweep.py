@@ -124,7 +124,13 @@ def main():
             print(n, " ".join(argv))
         print(len(jobs), "jobs")
         return
-    todo = [(n, v) for n, v in jobs if not (OUT / a.sweep / f"{n}.json").exists()]
+    todo = [
+        (n, v)
+        for n, v in jobs
+        if not (
+            OUT / {"v3-big-rev": "v3-big"}.get(a.sweep, a.sweep) / f"{n}.json"
+        ).exists()
+    ]
     print(
         f"{a.sweep}: {len(jobs)} jobs, {len(todo)} to run, {a.workers} workers",
         flush=True,

@@ -1,0 +1,216 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 72,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.003,
+  "wd": 0.01,
+  "warmup": 50,
+  "seed": 100,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-post\\D-d72_ema_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": true,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-big\\D-d72_30M_s0.pt",
+  "ema_decay": 0.999,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 72,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 97520,
+ "params_nonemb": 90464,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.25482,
+ "val_bpc_ema": 1.2543,
+ "evals": [
+  [
+   0,
+   1.282
+  ],
+  [
+   305,
+   1.27592
+  ],
+  [
+   610,
+   1.26764
+  ],
+  [
+   915,
+   1.25913
+  ],
+  [
+   1220,
+   1.25482
+  ],
+  [
+   1221,
+   1.25482
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   1.2608
+  ],
+  [
+   50,
+   1.2729
+  ],
+  [
+   100,
+   1.2773
+  ],
+  [
+   150,
+   1.2775
+  ],
+  [
+   200,
+   1.2879
+  ],
+  [
+   250,
+   1.2835
+  ],
+  [
+   300,
+   1.2828
+  ],
+  [
+   350,
+   1.2832
+  ],
+  [
+   400,
+   1.2821
+  ],
+  [
+   450,
+   1.2812
+  ],
+  [
+   500,
+   1.2793
+  ],
+  [
+   550,
+   1.2779
+  ],
+  [
+   600,
+   1.2743
+  ],
+  [
+   650,
+   1.2724
+  ],
+  [
+   700,
+   1.2773
+  ],
+  [
+   750,
+   1.2697
+  ],
+  [
+   800,
+   1.266
+  ],
+  [
+   850,
+   1.271
+  ],
+  [
+   900,
+   1.2663
+  ],
+  [
+   950,
+   1.2609
+  ],
+  [
+   1000,
+   1.2692
+  ],
+  [
+   1050,
+   1.2612
+  ],
+  [
+   1100,
+   1.264
+  ],
+  [
+   1150,
+   1.2616
+  ],
+  [
+   1200,
+   1.2631
+  ],
+  [
+   1220,
+   1.2667
+  ]
+ ],
+ "train_seconds": 260.8,
+ "wall_seconds": 309.42,
+ "chars_per_sec": 38353,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a fun day, Jane lived in a girl named Lily.\nOne day, Lily was very hard. It was a silly book when she was anysort. The stars was a shut. She would go all day and she found a little girl named Mr. She started to play in the sky. She asked Lily in her big leceed. \"No, Lily. You should weig",
+ "rule_init": {},
+ "ngram_init": {}
+}

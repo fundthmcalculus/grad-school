@@ -548,6 +548,58 @@ Caveats stated up front: one seed per variant; every variant uses A's lr, and th
 variants start with a large output gain, so an lr effect could mask or fake a result;
 the `placement` and `full` modes calibrate (kappa, alpha, gain) on 64 *training* windows.
 
+## Registered 2026-10-10, before `v3-big` and `v3-post`: bigger fuzzy models and post-training
+
+**Scope change (user, 2026-10-10):** "look at post training and maybe a slightly bigger model". The 100K cap is
+relaxed to ≤ 165K parameters for this track; the 97.5K model `D` (fuzzy delta mixer, first-order raw-firing HTSK
+FFN, 8 heads) stays the reference. Interpretation of "post-training": stages that run *after* pretraining from
+a saved checkpoint, each compared against the control of continuing the same training for the same extra characters.
+Seen before registering: `D` at 30M chars = 1.274 ± 0.009 (3 seeds), 100M = 1.208 (1 seed); nothing from any
+bigger width or any post-training stage.
+
+* **H13 (bigger).** `D` at d = 80 / 88 / 96 (117K / 139K / 162K params), 30M chars, lr 3e-2, 2 seeds: val BPC falls
+  monotonically with params, by ≥ 0.03 BPC per +40K params, with no seed diverging. *Basis:* the neural curves
+  fall ~0.1 per doubling at this size; the fuzzy arms' large-width failures were the old FFN, not the width.
+* **H14 (continuation control).** Resuming `D` (30M) for +10M chars at lr 3e-3 (warmup 50, cosine to 0.1×)
+  improves val BPC by ≥ 0.02. This is the control for H15–H16, not a post-training method.
+* **H15 (EMA).** Weight EMA (decay 0.999) during the +10M continuation improves on the continuation's raw weights
+  by < 0.01 BPC (the cosine decay already averages).
+* **H16 (distillation).** Distilling from a larger neural teacher (delta-mlp d = 128, 280K params, 60M chars;
+  logit KL, weight 0.5, T = 1) during the +10M continuation beats the continuation control by ≥ 0.02 BPC.
+  *Risk:* at char level with ~1.2 BPC the teacher's soft targets carry little beyond the data, so failure is plausible.
+* **Not tested here:** fine-tuning on a curated subset (no quality labels exist), RL, quantization, and
+  dynamic evaluation (it changes the evaluation protocol and would need its own label).
+* **Protocol.** Base models are trained with `--save-model`; continuation uses a different data-order seed
+  (100 + base seed). Raw `val_bpc` is always the headline; EMA is reported as `val_bpc_ema`. Seeds: 2 per cell.
+
+**Incident, 2026-10-10 17:15 (LR study).** The four `v3-lr` `lr1e-2` cells each trained ~1 h on a contended GPU and then
+crashed at the final sample generation (`index on cuda, other tensors on cpu`): they had been launched before the
+`train.py` merge-seam fix and Python had already loaded the old file. No record was written, so the cells are lost and
+rerun when `v3-lr` is resumed. The `lr2e-2` cells (launched after the fix) are running. The `v3-lr` launcher was stopped
+after that batch so the GPU serves `v3-big` / `v3-post`; `v3-lr` is **incomplete** (resume with `--workers 2`).
+Lesson: a train script should write its numeric record *before* any optional post-step (sampling) that can crash.
+
+### Outcomes, 2026-10-10 (`v3-big`, `v3-post`; CUDA, 2 seeds unless noted)
+
+| model | params | 30M val BPC | +10M continuation | + EMA 0.999 | + distillation (w 0.5) |
+|---|---|---|---|---|---|
+| D d = 72 | 97,520 | 1.2753 (1.282 / 1.269) | **1.2486** (1.2548 / 1.2423) | 1.2481 | 1.2496 (1.2556 / 1.2436) |
+| D d = 80 | 117,312 | 1.2485 | – | – | – |
+| D d = 88 | 138,896 | 1.2351 | – | – | – |
+| D d = 96 (1 seed post) | 162,272 | 1.2170 (1.222 / 1.212) | 1.1951 | 1.1948 | – |
+| teacher: delta-mlp d = 128, 60M chars | 280,480 | 1.1153 (1 seed) | | | |
+
+* **H13 supported.** BPC falls monotonically with size, no divergence: −0.040 from 97K to 139K (+41K), −0.032 from
+  117K to 162K (+45K), but only −0.018 for the last +23K (139K → 162K): the gain per parameter is tapering.
+* **H14 supported.** +10M chars at lr 3e-3 gives −0.027 / −0.026 at 97K and −0.027 at 162K. This is the control.
+* **H15 supported** (gain < 0.01): EMA adds −0.0005 at 97K and −0.0003 at 162K. It is not worth carrying.
+* **H16 refuted.** Distillation from a 280K-parameter teacher that is 0.15 BPC better does **not** beat plain
+  continuation (+0.001 on both seeds, i.e. no effect). The teacher's samples are no more coherent than the student's.
+* **Everything that "helped" post-training is more training.** The 0.027 gain equals what the 30M → 100M pretraining
+  curve already predicts for +10M chars. No post-training method here adds anything beyond compute.
+* **Generated text** (`flm/gen_samples.py`, `report/samples.json`): at 1.1–1.28 BPC all models write locally fluent
+  TinyStories-style prose with real words (non-word rate 0.4–0.9% at T 0.7 / top-k 20, 2.4–3.7% at T 1.0) but with
+  grammar slips, drifting characters and no narrative consistency. The failure is syntax and semantics, not spelling.
 ### Screen stage 1 outcome (2026-10-10, 11 runs, 0 failures)
 
 Final val BPC at 10M chars, d = 16, seed 0 (A also seed 1). Table: `outputs/screen/summary.md`.
@@ -612,3 +664,49 @@ H have 3 each. The verdict is computed by `flm.screen_report` (se = pooled base 
   and 0.015 at d = 32.)*
 * **A finding is only called promising if it is "real, better" by this rule and the
   improvement is at least 0.03.** Anything else is reported as a null at this power.
+
+## Registered 2026-10-10 (evening), before `v5-bpe-probe`: do subwords help the fuzzy LM at equal parameters?
+
+User goal: coherent text generation. At ~1.2 BPC every model writes real words but loses characters and plot
+(see "Generated text" above). A 512-token byte-level BPE (`flm/bpe.py`; 2.40 chars/token; BPC is still bits per
+character of the same validation text: the per-token character lengths sum exactly to the stream length) lets a
+256-token window cover ~600 characters instead of 256. Probe: 3 cells, seed 0, 10M chars, lr 3e-2, D architecture.
+
+* **H17.** The BPE d = 80 cell (≈150K params, embedding 41K) beats the character d = 96 cell (162K) by ≥ 0.03 BPC.
+  *(~50%.)* *Basis:* characters spend capacity on spelling, but a 512×80 embedding is 27% of the parameters, and
+  the ~2.4× fewer positions make the delta-rule state's job easier. A null or a loss is plausible and would say
+  the embedding tax eats the gain at this size.
+* Not decided by this probe: ten seeds, the 100K-parameter regime, or any claim about coherence (that needs the
+  samples and a grader, not BPC).
+
+### Outcome `v5-bpe-probe` (seed 0, 10M chars, lr 3e-2; one seed each, a screen)
+
+| cell | params | val BPC | steps | chars/s |
+|---|---|---|---|---|
+| char D d = 96 | 162,272 | 1.3380 | 1221 | 90K |
+| BPE512 D d = 72 | 127,328 | 1.2671 | 510 | 53K |
+| BPE512 D d = 80 | 150,432 | **1.2479** | 510 | 53K |
+
+**H17 supported (single seed).** BPE d = 80 beats character d = 96 by 0.090 BPC (predicted ≥ 0.03) with 7% fewer
+parameters; even BPE d = 72 (127K) beats the 162K character model by 0.071. It does so in 510 optimizer steps against
+1221, with the warm-up (200 steps) a large part of that budget, so the recipe is not tuned for it. The 10M-char sample is
+syntactically better but contains invented words ("feop", "nide"): BPE pieces recombine into non-words, so the
+non-word rate must be measured, not assumed. Registered next: **H18** (`v5-bpe30`, 2 seeds, 30M chars, d = 80, saved):
+val BPC ≤ 1.15 (char D d = 96 at 30M is 1.217); and the non-word rate of its samples at T 0.7 / top-k 20 is ≤ 2%.
+
+### Outcome `v5-bpe30` (H18; D d = 80, BPE512, 30M chars, 2 seeds, lr 3e-2)
+
+| model | params | val BPC |
+|---|---|---|
+| **BPE512 D d = 80** | 150,432 | **1.1028 ± 0.0054** (1.108 / 1.097) |
+| char D d = 96 (`v3-big`) | 162,272 | 1.2170 ± 0.0054 |
+| neural delta-mlp d = 128, char, 60M chars (teacher) | 280,480 | 1.1153 (1 seed) |
+
+**H18 supported on both parts.** BPC 1.103 ≤ 1.15, and the non-word rate of seed-0 samples at T 0.7 / top-k 20 is 1.5%
+(≤ 2%; the character models are at 0.4–0.9%, so the subword model trades more invented words for better structure;
+at T 1.0 it is 5.9% against 2.4–3.7%). The subword model beats a 280K character model that trained twice as long.
+Samples: more story structure (dialogue, "something unexpected happened") but still semantic errors (a girl named Lily
+"wants to play with Lily"), so BPC is not coherence. **Caveats:** two seeds; one tokenizer size (512) and one model
+size; the comparison is at equal *characters*, not equal steps or wall-clock (BPE sees 2.4× more characters per step,
+runs at 53K chars/s against the character model's 34K for D); the 150K model is over the original 100K cap.
+Not yet tried: BPE vocabularies 256 / 1024, d = 72 at 30M (127K), longer training, any coherence grader.

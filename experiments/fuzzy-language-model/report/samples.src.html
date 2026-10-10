@@ -1,0 +1,156 @@
+<title>Fuzzy LM Writing Samples</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a reading desk. Controls on top, three model columns of generated prose, then evidence and next steps. */
+:root {
+  --bg: #f6f7f8; --surface: #ffffff; --ink: #14181d; --ink2: #4a5360; --ink3: #7b8491;
+  --rule: #dfe3e8; --fuzzy: #2a78d6; --fuzzy-bg: #e8f0fb; --neural: #eb6834; --old: #1baf7a;
+  --bad: #c2312f; --badbg: #fbe5e4; --good: #1a7f4b; --warn: #9a6200; --warnbg: #fbf1dc; --prompt: #6250d6;
+  --display: "Newsreader", Georgia, serif; --body: "Instrument Sans", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1317; --surface: #171c22; --ink: #eceff3; --ink2: #b4bcc7; --ink3: #8a94a1; --rule: #2a323b;
+    --fuzzy: #3987e5; --fuzzy-bg: #14263d; --neural: #d95926; --old: #199e70; --bad: #ff8a87; --badbg: #3a1d1d;
+    --good: #4cc58a; --warn: #e9b44c; --warnbg: #2c2412; --prompt: #9085e9; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1317; --surface: #171c22; --ink: #eceff3; --ink2: #b4bcc7; --ink3: #8a94a1; --rule: #2a323b;
+  --fuzzy: #3987e5; --fuzzy-bg: #14263d; --neural: #d95926; --old: #199e70; --bad: #ff8a87; --badbg: #3a1d1d;
+  --good: #4cc58a; --warn: #e9b44c; --warnbg: #2c2412; --prompt: #9085e9; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 28px 64px; }
+main { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+h1, h2 { font-family: var(--display); font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.08; }
+h2 { font-size: 24px; }
+p { margin: 0; max-width: 70ch; }
+.kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink3); }
+.lede { font-size: 17px; color: var(--ink2); }
+section { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.verdict { background: var(--warnbg); border-radius: 6px; padding: 14px 16px; max-width: 78ch; }
+.verdict b { color: var(--warn); }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; }
+.controls label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink2); font-family: var(--mono); letter-spacing: .03em; text-transform: uppercase; }
+select { font: inherit; font-size: 14px; background: var(--surface); color: var(--ink); border: 1px solid var(--rule); border-radius: 5px; padding: 7px 10px; min-width: 0; max-width: 100%; }
+select:focus-visible, button:focus-visible { outline: 2px solid var(--fuzzy); outline-offset: 2px; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
+.col { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; display: flex; flex-direction: column; min-width: 0; }
+.col header { padding: 12px 16px; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 2px; }
+.col header b { font-size: 14px; }
+.col header span { font-family: var(--mono); font-size: 12px; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.col.fz header b { color: var(--fuzzy); }
+.col.nn header b { color: var(--neural); }
+.text { font-family: var(--display); font-size: 17px; line-height: 1.6; padding: 14px 16px 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.text .p { color: var(--prompt); font-style: italic; }
+.text mark { background: var(--badbg); color: var(--bad); border-radius: 2px; padding: 0 1px; }
+.foot { padding: 8px 16px 12px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink2); font-family: var(--mono); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-size: 12px; font-weight: 600; color: var(--ink2); text-transform: uppercase; letter-spacing: .03em; }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; }
+.yes { color: var(--good); font-weight: 600; } .no { color: var(--bad); font-weight: 600; }
+ol.steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; max-width: 74ch; }
+ol.steps li b { font-weight: 600; }
+.cost { font-family: var(--mono); font-size: 12px; color: var(--ink3); }
+.note { font-size: 13px; color: var(--ink2); }
+code { font-family: var(--mono); font-size: .9em; }
+</style>
+
+<main>
+  <header style="display:flex;flex-direction:column;gap:14px">
+    <div class="kicker">fuzzy-language-model · text review · 2026-10-10</div>
+    <h1>What the fuzzy model writes</h1>
+    <p class="lede">Switching to subword tokens cut loss from 1.22 to 1.10 bits per character at about the same size, and the stories look more like stories. They are still not coherent. Read the samples, then see what moved and what did not.</p>
+  </header>
+
+  <div class="verdict"><b>Verdict.</b> The new subword model (150K parameters, 1.103 BPC) writes dialogue and plot-turn sentences the character models do not, and beats the 280K neural teacher on loss. It still loses track of who is who ("Lily wanted to play with Lily"), and it invents more words (1.5% against under 1%). Loss improved by 0.11 and coherence by far less. Judging that needs a grader, not a loss.</div>
+
+  <section>
+    <h2>Read the samples</h2>
+    <div class="controls">
+      <label>Prompt<select id="sel-prompt"></select></label>
+      <label>Sampling<select id="sel-set"></select></label>
+      <label>Seed<select id="sel-seed"><option value="0">0</option><option value="1">1</option></select></label>
+    </div>
+    <div class="cols" id="cols"></div>
+    <p class="note">Prompt text is in violet. <mark style="background:var(--badbg);color:var(--bad)">Red</mark> words never appear in the training text (or appear fewer than 5 times). 400 characters, generated on CPU from the saved checkpoints with the full 256-character window.</p>
+  </section>
+
+  <section>
+    <h2>What is wrong with the text</h2>
+    <div class="scroll"><table id="t-stats"></table></div>
+    <ul style="margin:0;padding-left:18px;max-width:72ch;display:flex;flex-direction:column;gap:6px">
+      <li><b>Spelling is mostly solved.</b> At temperature 0.7 with top-k 20, under 1% of words are non-words for the character models and 1.5% for the subword model, whose pieces sometimes recombine into words that do not exist ("groceri", "bretty").</li>
+      <li><b>Reference errors remain.</b> "Lily and her mom were both very happy" follows "She wanted to play with Lily" in a story about Lily; the character models bring in a new character from nowhere or swap names mid-story. Subwords fixed word shapes and sentence rhythm, not who is who.</li>
+      <li><b>Higher temperature trades coherence for variety.</b> Temperature 1.0 triples the non-word rate and makes the grammar worse, so use the lower setting for any review.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Did post-training or size help?</h2>
+    <div class="scroll"><table id="t-res"></table></div>
+    <p class="note">Validation bits per character, first 1M characters of TinyStories V2 validation. 2 seeds for the 97K model. The only thing that helped is more training and more parameters.</p>
+    <ul style="margin:0;padding-left:18px;max-width:72ch;display:flex;flex-direction:column;gap:6px">
+      <li><b>Continuing training:</b> +10M characters at a low learning rate gives −0.027 BPC. That is exactly what the pretraining curve predicts, so it is not a separate technique.</li>
+      <li><b>Weight averaging (EMA):</b> −0.0005. No effect.</li>
+      <li><b>Distillation from the 280K teacher:</b> no effect (+0.001). The teacher is better by 0.15 BPC but its soft labels carry little beyond the text itself at this scale.</li>
+      <li><b>Bigger models:</b> 162K reaches 1.217 against 1.275 at 97K. Gains taper: the last +23K parameters bought −0.018.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Getting to coherent text</h2>
+    <p>Coherence is about holding a story together across a few hundred characters: who is in it, what they own, what happens next. A character-level model spends most of its capacity on spelling and word boundaries. Here is what I would try, in order of expected value per hour of GPU.</p>
+    <ol class="steps">
+      <li><b>Subword tokens: done, and it worked on loss.</b> A 512-token vocabulary gave 1.103 BPC at 150K parameters against 1.217 for characters at 162K (2 seeds, 30M characters, same validation text and the same per-character metric). Next: try 256 and 1,024 tokens, and repeat at the 97K size. <span class="cost">~30 min per vocabulary size</span></li>
+      <li><b>Train much longer on the 160K model.</b> 100M characters took the 97K model from 1.275 to 1.208. The subword model is the one to scale, since the character model already shows the gain from 30M to 100M characters (1.275 to 1.208 at 97K). Whether it reaches coherent text is unmeasured. <span class="cost">estimated ~1 h per 300M-character run if the GPU is otherwise idle</span></li>
+      <li><b>Measure coherence, not just loss.</b> Score samples for grammar, consistency and plot with a model-based grader, the way the TinyStories paper did, so the effect of each change is visible. Loss alone cannot show the gap above. <span class="cost">~30 min to build, needs an LLM API key</span></li>
+      <li><b>Test the long-range memory directly.</b> Check whether the fuzzy rule state remembers a character name 200 characters later with a copy task. Fix that before scaling if it fails. <span class="cost">~1 h</span></li>
+      <li><b>Drop distillation and EMA.</b> Both are measured null results.</li>
+    </ol>
+  </section>
+</main>
+
+<script>
+const D = /*DATA*/;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const label = { "D-d80-bpe512_30M_s0": ["Fuzzy D, subword, 150K", "fz"], "D-d72_30M_s0": ["Fuzzy D, 97K", "fz"], "D-d96_30M_s0": ["Fuzzy D, 162K", "fz"], "teacher-delta-d128_60M_s0": ["Neural teacher, 280K", "nn"] };
+const prompts = [...new Set(D[0].samples.map((s) => s.prompt))];
+const settings = [...new Set(D[0].samples.map((s) => s.temp + "|" + s.top_k))];
+$("sel-prompt").innerHTML = prompts.map((p, i) => `<option value="${i}">${esc(p)}</option>`).join("");
+$("sel-set").innerHTML = settings.map((k, i) => { const [t, tk] = k.split("|"); return `<option value="${i}">temperature ${t}${tk !== "null" ? ", top-k " + tk : ", no top-k"}</option>`; }).join("");
+
+function render() {
+  const p = prompts[+$("sel-prompt").value], [t, tk] = settings[+$("sel-set").value].split("|"), seed = +$("sel-seed").value;
+  $("cols").innerHTML = D.map((m) => {
+    const s = m.samples.find((x) => x.prompt === p && String(x.temp) === t && String(x.top_k) === tk && x.seed === seed);
+    const bad = new Set(s.bad);
+    let body = esc(s.text.slice(p.length)).replace(/[A-Za-z']+/g, (w) => (bad.has(w.toLowerCase()) ? `<mark>${w}</mark>` : w));
+    const [name, kind] = label[m.name] || [m.name, "fz"];
+    return `<article class="col ${kind}"><header><b>${name}</b><span>${m.params.toLocaleString()} params · ${m.val_bpc.toFixed(3)} BPC</span></header><div class="text"><span class="p">${esc(p)}</span>${body}</div><div class="foot">${s.bad.length} unusual word${s.bad.length === 1 ? "" : "s"}${s.bad.length ? ": " + esc(s.bad.join(", ")) : ""}</div></article>`;
+  }).join("");
+}
+["sel-prompt", "sel-set", "sel-seed"].forEach((id) => $(id).addEventListener("change", render));
+render();
+
+$("t-stats").innerHTML = `<tr><th>model</th><th class="n">params</th><th class="n">val BPC</th><th class="n">non-words, T 0.7 / top-k 20</th><th class="n">non-words, T 1.0</th></tr>` +
+  D.map((m) => `<tr><td>${(label[m.name] || [m.name])[0]}</td><td class="n">${m.params.toLocaleString()}</td><td class="n">${m.val_bpc.toFixed(3)}</td><td class="n">${(m["nonword_0.7"] * 100).toFixed(1)}%</td><td class="n">${(m["nonword_1.0"] * 100).toFixed(1)}%</td></tr>`).join("");
+
+const R = [
+  ["Fuzzy D, d 72", "97,520", "1.275", "1.249", "1.248", "1.250"],
+  ["Fuzzy D, d 80", "117,312", "1.249", "–", "–", "–"],
+  ["Fuzzy D, d 88", "138,896", "1.235", "–", "–", "–"],
+  ["Fuzzy D, d 96", "162,272", "1.217", "1.195", "1.195", "–"],
+  ["Fuzzy D, subword (512 tokens), d 80", "150,432", "1.103", "–", "–", "–"],
+  ["Neural teacher, d 128 (60M chars)", "280,480", "1.115", "", "", ""],
+];
+$("t-res").innerHTML = `<tr><th>model</th><th class="n">params</th><th class="n">30M chars</th><th class="n">+10M continued</th><th class="n">+ EMA</th><th class="n">+ distillation</th></tr>` +
+  R.map((r) => `<tr><td>${r[0]}</td>${r.slice(1).map((c) => `<td class="n">${c}</td>`).join("")}</tr>`).join("");
+</script>

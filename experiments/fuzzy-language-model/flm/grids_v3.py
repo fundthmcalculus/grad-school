@@ -6,7 +6,7 @@ iteration (one seed): a variant earns a place only after a multi-seed confirmati
 
 from __future__ import annotations
 
-from flm.sweep import register
+from flm.sweep import GRIDS, OUT, register
 
 GPU = ["--device", "cuda"]
 
@@ -289,3 +289,73 @@ for lr in LRS:
             )
         )
 register("v3-lr", jobs)
+
+
+# ---------------------------------------------------------------- bigger models + post-training
+# Registered in RESULTS.md ("bigger fuzzy models and post-training"). Bases are saved (.pt) so the
+# post-training grid can resume from them.
+jobs = []
+for d in (72, 80, 88, 96):
+    for s in (0, 1):
+        name, argv = cell(f"D-d{d}_30M_s{s}", D, d=d, sc="8", chars="30e6", seed=s)
+        jobs.append((name, argv + ["--save-model"]))
+name, argv = cell(
+    "teacher-delta-d128_60M_s0",
+    REF + ["--heads", "8"],
+    d=128,
+    sc="4",
+    chars="60e6",
+    seed=0,
+)
+jobs.append((name, argv + ["--save-model"]))
+register("v3-big", jobs[-1:] + jobs[:-1])  # teacher first: it gates the KD arms
+
+_POST = ["--lr", "3e-3", "--warmup", "50", "--chars", "10e6", "--eval-at-start"]
+_TEACH = str(OUT / "v3-big" / "teacher-delta-d128_60M_s0.pt")
+jobs = []
+for d, seeds in ((72, (0, 1)), (96, (0,))):
+    for s in seeds:
+        base = str(OUT / "v3-big" / f"D-d{d}_30M_s{s}.pt")
+        common = ["--init-from", base, "--seed", str(100 + s)]
+        arms = {
+            "cont": [],
+            "ema": ["--ema-decay", "0.999"],
+            "kd": ["--teacher", _TEACH, "--kd-weight", "0.5"],
+            "kd-ema": [
+                "--teacher",
+                _TEACH,
+                "--kd-weight",
+                "0.5",
+                "--ema-decay",
+                "0.999",
+            ],
+        }
+        for k, extra in arms.items():
+            if d == 96 and k.startswith("kd"):
+                continue  # the teacher comparison is run at the 97.5K size only
+            c = cell(f"D-d{d}_{k}_s{s}", D, d=d, sc="8", chars="10e6", seed=s)
+            jobs.append((c[0], c[1] + common + _POST + extra))
+register("v3-post", jobs)
+
+# same jobs as v3-big, large widths first, writing into v3-big: a second worker group that
+# meets the first in the middle (a job whose record exists is skipped)
+GRIDS_BIG = [j for j in GRIDS["v3-big"] if not j[0].startswith("teacher")]
+register("v3-big-rev", GRIDS_BIG[::-1])
+
+
+# v5-bpe-probe: subword vs character D at similar parameter counts, 10M chars, seed 0 (RESULTS.md H17)
+jobs = []
+for d, tok in ((72, "bpe512"), (80, "bpe512"), (96, "")):
+    name = f"D-d{d}-{tok or 'char'}_10M_s0"
+    c = cell(name, D, d=d, sc="8", chars="10e6", seed=0)
+    jobs.append((name, c[1] + (["--tok", tok] if tok else [])))
+register("v5-bpe-probe", jobs)
+
+
+# v5-bpe30 (H18): subword D d=80 at 30M chars, 2 seeds, saved for sampling
+jobs = []
+for s in (0, 1):
+    name = f"D-d80-bpe512_30M_s{s}"
+    c = cell(name, D, d=80, sc="8", chars="30e6", seed=s)
+    jobs.append((name, c[1] + ["--tok", "bpe512", "--save-model"]))
+register("v5-bpe30", jobs)
