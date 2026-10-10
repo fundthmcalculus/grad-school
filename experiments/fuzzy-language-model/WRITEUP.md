@@ -366,8 +366,9 @@ The filled configuration **D** (d = 72, 8 heads, 16 rules per head, FFN width 1.
 | delta-mlp, d 74, 2 heads | 96,430 | 1.3426 ± 0.007 |
 | original FLM, d 64 (the CPU-phase design) | 97,280 | 1.6231 ± 0.008 |
 
-At 100M chars (seed 0, one run each): D **1.2080** vs a *smaller* (73K) delta-mlp 1.3270. D trains at ≈ 3× lower
-throughput (34K vs 114K chars/s). **The lead over the closest reference is 0.019 BPC = 2.85 standard errors at
+At 100M chars (seed 0, one run each): D **1.2080** vs a *smaller* (73K) delta-mlp 1.3270. D trained at 34K chars/s. The size-near reference's three runs recorded 50K, 56K and 85K
+chars/s on the shared GPU (the 114K figure quoted in `RESULTS.md` is the *smaller* 73K delta-mlp at
+100M chars), so the speed gap is roughly 1.5–2.5×, not a precise ratio. **The lead over the closest reference is 0.019 BPC = 2.85 standard errors at
 3 seeds (CPU-session calculation) and is not yet a citable claim:** the reference has 4.6% fewer parameters
 (≈ 0.006 BPC of the lead from the `scaling2` slope), D's search covered heads, rules, antecedent size, short-conv,
 depth, FFN shape and lr while the reference got heads and one lr, and ten seeds are the protocol (§12).

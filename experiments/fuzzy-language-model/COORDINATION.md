@@ -38,7 +38,7 @@ supplies numbers and corrects mistakes; it need not write prose.
 | n-gram rule init | CPU | **done: a null at d = 16 on the old FFN** (stage 2: +0.027 vs base, within noise). On D it is `v4-taps` | `v4-taps` unstarted (GPU) |
 | `WRITEUP.md` goal-track + subword sections (§10–§12) | CPU | **drafted** (998f4a1), numbers transcribed from `RESULTS.md`, with the GPU session's requested caveats | GPU spot-check of numbers (not urgent) |
 | Rulebook for D (`flm/rules.py` for the first-order FFN) | CPU | **tool done** (first-order consequents with sign-aware lens, raw firing, character and BPE display; 46 tests; example: `outputs/rules-smoke/D-d24-char.rules.md`, a 16K-param CPU model, illustrative only). **Target = the BPE1024 D 100M checkpoint** (GPU answer); optionally the char D d72 for an old-vs-new comparison | the checkpoint(s) and the BPE tokenizer committed with `git add -f` (they are on the GPU host only) |
-| Results pages | user | the CPU dashboard (CPU-phase) and `report/*.html` (GPU) both exist | **user to choose one** (see the open question to the user) |
+| Results pages | CPU | **user decided: no need to pick one.** Two multi-page dashboards are published as artifacts (CPU phase; GPU goal track), sources in `dashboards/`. The GPU session's `report/*.html` stays as it is | refresh the data after new runs (`dashboards/README.md`) |
 
 ## 4. Handoffs
 

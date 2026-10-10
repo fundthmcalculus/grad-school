@@ -1,0 +1,491 @@
+<link rel="stylesheet" href="app.css">
+<div class="fl">
+  <header class="fl-head">
+    <h1 class="fl-title" id="top">Fuzzy language models: the goal track</h1>
+    <p class="fl-takeaway">Redesigning the fuzzy feed-forward layer gives a fuzzy model of
+      <span data-source="lead" data-field="d_params_txt" data-row="0" class="dash-skeleton">—</span> parameters that scores
+      <span data-source="lead" data-field="d_txt" data-row="0" class="dash-skeleton">—</span> bits per character, against
+      <span data-source="lead" data-field="r_txt" data-row="0" class="dash-skeleton">—</span> for the size-near neural reference. The lead is not yet citable: see the open gaps.
+      A subword version of about the same size reaches <span data-source="lead" data-field="sub30_txt" data-row="0" class="dash-skeleton">—</span>.</p>
+  </header>
+
+  <nav class="fl-tabs" role="tablist" aria-label="Pages">
+    <button class="fl-tab" id="tab-overview" data-page="overview" role="tab" aria-selected="true">Overview</button>
+    <button class="fl-tab" id="tab-deficit" data-page="deficit" role="tab" aria-selected="false">Where the deficit was</button>
+    <button class="fl-tab" id="tab-comparison" data-page="comparison" role="tab" aria-selected="false">The comparison</button>
+    <button class="fl-tab" id="tab-bigger" data-page="bigger" role="tab" aria-selected="false">Bigger models and post-training</button>
+    <button class="fl-tab" id="tab-subwords" data-page="subwords" role="tab" aria-selected="false">Subwords</button>
+    <button class="fl-tab" id="tab-text" data-page="text" role="tab" aria-selected="false">Generated text</button>
+    <button class="fl-tab" id="tab-gaps" data-page="gaps" role="tab" aria-selected="false">Open gaps</button>
+  </nav>
+
+  <main id="fl-main"></main>
+</div>
+
+<template id="tpl-overview">
+  <section class="fl-tiles" id="overview-tiles" aria-label="Headline numbers">
+    <div class="fl-tile">
+      <span class="fl-tile-label">Fuzzy D, character model</span>
+      <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="d_txt" data-row="0">—</span>
+      <span class="fl-tile-note"><span data-source="lead" data-field="d_params_txt" data-row="0">—</span> params, <span data-source="lead" data-field="d_n_txt" data-row="0">—</span> seeds</span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">Size-near neural reference</span>
+      <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="r_txt" data-row="0">—</span>
+      <span class="fl-tile-note"><span data-source="lead" data-field="r_params_txt" data-row="0">—</span> params, <span data-source="lead" data-field="r_n_txt" data-row="0">—</span> seeds</span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">Lead of the fuzzy model</span>
+      <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="lead_txt" data-row="0">—</span>
+      <span class="fl-tile-note"><span data-source="lead" data-field="ratio_txt" data-row="0">—</span> standard errors; not citable yet</span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">Subword fuzzy model, 100M characters</span>
+      <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="sub100_txt" data-row="0">—</span>
+      <span class="fl-tile-note"><span data-source="lead" data-field="sub_params_txt" data-row="0">—</span> params, one seed, no neural control yet</span>
+    </div>
+  </section>
+  <section class="fl-card" id="overview-ladder">
+    <h2>Validation bits per character, models under 100K parameters</h2>
+    <p class="fl-note">Lower is better. Bars start at 1.0 so that differences are visible; whiskers are one standard deviation over seeds where there are several. At equal characters, not equal steps.</p>
+    <div class="fl-chart" id="chart-ladder" data-source="arm_stats"></div>
+  </section>
+</template>
+
+<template id="tpl-deficit">
+  <section class="fl-card" id="deficit-attrib">
+    <h2>Every mixer with each feed-forward layer</h2>
+    <p class="fl-note">One width (64), one seed, best of two learning rates. Swapping the attention mixer for a fuzzy one costs nothing; the old fuzzy feed-forward layer (zero-order, softmax-normalised rules) carries the whole deficit.</p>
+    <div class="fl-chart" id="chart-attrib" data-source="attrib"></div>
+  </section>
+  <section class="fl-card" id="deficit-ffn">
+    <h2>Redesigning the feed-forward layer</h2>
+    <p class="fl-note">Mixer and width fixed, three seeds. o1 = first-order consequents, r = raw (un-normalised) firing, da = antecedent dimension, HTSK = exponent averaged over dimensions, wdim = tied widths.</p>
+    <div class="fl-chart" id="chart-ffn" data-source="arm_stats"></div>
+  </section>
+  <div class="fl-grid">
+    <section class="fl-card" id="deficit-heads">
+      <h2>Head count</h2>
+      <p class="fl-note">Validation bits per character against the number of heads, two seeds. More heads help the accumulating mixer most; the delta form overtakes it from four heads up.</p>
+      <div class="fl-chart fl-short" id="chart-heads" data-source="arm_stats"></div>
+    </section>
+    <section class="fl-card" id="deficit-fill">
+      <h2>Filling the parameter budget</h2>
+      <p class="fl-note">Variants of the chosen shape just under the parameter cap, two seeds. The best one is D.</p>
+      <div class="fl-chart fl-short" id="chart-fill" data-source="arm_stats"></div>
+    </section>
+  </div>
+</template>
+
+<template id="tpl-comparison">
+  <section class="fl-tiles" id="comparison-tiles" aria-label="The lead">
+    <div class="fl-tile">
+      <span class="fl-tile-label">Lead of fuzzy D over the neural reference</span>
+      <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="lead_txt" data-row="0">—</span>
+      <span class="fl-tile-note">bits per character, <span data-source="lead" data-field="ratio_txt" data-row="0">—</span> standard errors</span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">Parameter difference</span>
+      <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="pgap_txt" data-row="0">—</span>
+      <span class="fl-tile-note">the reference is smaller, which favours the fuzzy model</span>
+    </div>
+    <div class="fl-tile">
+      <span class="fl-tile-label">Training speed, characters per second</span>
+      <span class="fl-tile-value dash-skeleton" data-source="lead" data-field="thr_txt" data-row="0">—</span>
+      <span class="fl-tile-note">fuzzy D against the reference's three runs; the GPU was shared, so speed varies between runs</span>
+    </div>
+  </section>
+  <section class="fl-card" id="comparison-bars">
+    <h2>Character models at 30M characters</h2>
+    <p class="fl-note">Mean over three seeds, whiskers one standard deviation. Bars start at 1.0.</p>
+    <div class="fl-chart fl-short" id="chart-compare" data-source="arm_stats"></div>
+  </section>
+  <section class="fl-card" id="comparison-curves">
+    <h2>Validation curves</h2>
+    <p class="fl-note">Mean over seeds at each evaluation, against characters seen.</p>
+    <div class="fl-chips" id="chips-compare" role="group" aria-label="Models shown"></div>
+    <div class="fl-chart" id="chart-curves" data-source="gpu_curves"></div>
+  </section>
+  <section class="fl-card" id="comparison-table">
+    <h2>The runs</h2>
+    <p class="fl-note">Why this is not yet a claim: the reference has fewer parameters and was tuned less (heads and one learning rate), and there are three seeds, not ten.</p>
+    <div class="fl-tablewrap">
+      <table class="fl-table" id="table-compare" data-source="arm_stats" data-row-key="key">
+        <thead><tr>
+          <th data-field="arm">Model</th><th data-field="params">Parameters</th><th data-field="n">Seeds</th>
+          <th data-field="mean">Val bits/char</th><th data-field="std">Std</th><th data-field="cps">Chars/s</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-bigger">
+  <section class="fl-card" id="bigger-size">
+    <h2>Bigger fuzzy models</h2>
+    <p class="fl-note">Fuzzy D at four widths, 30M characters, two seeds; the neural teacher is a single run on 60M characters. The gain per parameter tapers.</p>
+    <div class="fl-chart" id="chart-size" data-source="arm_stats"></div>
+  </section>
+  <section class="fl-card" id="bigger-post">
+    <h2>Post-training adds nothing beyond compute</h2>
+    <p class="fl-note">Each stage resumes the saved model for 10M more characters. The continuation row is the control: it is just more training. EMA and distillation from a 280K-parameter teacher do not beat it. Bars start at 1.15.</p>
+    <div class="fl-chart" id="chart-post" data-source="arm_stats"></div>
+  </section>
+</template>
+
+<template id="tpl-subwords">
+  <section class="fl-card" id="subwords-150k">
+    <h2>About 150K parameters, 30M characters</h2>
+    <p class="fl-note">Bits per character are computed on the same validation text for every model, so character and subword models are comparable. Bars start at 1.0.</p>
+    <div class="fl-chart fl-short" id="chart-sub150" data-source="arm_stats"></div>
+  </section>
+  <section class="fl-card" id="subwords-100k">
+    <h2>Under 100K parameters, 30M characters</h2>
+    <p class="fl-note">A richer vocabulary beats a wider model at this size. Two seeds each; bars start at 1.0.</p>
+    <div class="fl-chart fl-short" id="chart-sub100" data-source="arm_stats"></div>
+  </section>
+  <div class="fl-grid">
+    <section class="fl-card" id="subwords-vocab">
+      <h2>Vocabulary sweep, 10M characters</h2>
+      <p class="fl-note">Roughly constant parameters; more FFN rules or a wider antecedent buy nothing, a bigger vocabulary buys the most. Bars start at 1.2.</p>
+      <div class="fl-chart fl-short" id="chart-vocab" data-source="arm_stats"></div>
+    </section>
+    <section class="fl-card" id="subwords-curves">
+      <h2>Validation curves of the best subword model</h2>
+      <p class="fl-note">Against characters seen, with the character model of the same size for scale.</p>
+      <div class="fl-chart fl-short" id="chart-subcurves" data-source="gpu_curves"></div>
+    </section>
+  </div>
+  <p class="fl-note">Caveats: the subword result has few seeds and, so far, no neural control on the same tokenizer; D's learning rate was never tuned on subwords. Bits per character is not coherence.</p>
+</template>
+
+<template id="tpl-text">
+  <section class="fl-card" id="text-samples">
+    <h2>Saved samples from the prompt "Once upon a time"</h2>
+    <p class="fl-note">One sample per model (temperature 0.8, fixed sampler seed), so differences in single words are luck. Subword models write 300 tokens, so their samples cover more text. ↵ marks a line break and ⏎⏎ the story separator. Better bits per character shows up as better syntax and spelling, not as a coherent story.</p>
+    <div class="fl-samples" id="samples-list" data-source="gpu_samples"></div>
+  </section>
+</template>
+
+<template id="tpl-gaps">
+  <section class="fl-card" id="gaps-table">
+    <h2>What stands between these results and a citable claim</h2>
+    <p class="fl-note">Nothing on this dashboard should be quoted in the proposal until the first rows close. Seeds, tuning effort and tokenizer controls are the issues.</p>
+    <div class="fl-tablewrap">
+      <table class="fl-table fl-text" id="table-gaps" data-source="gaps" data-row-key="key">
+        <thead><tr>
+          <th data-field="gap">Gap</th><th data-field="status">Status</th><th data-field="why">Why it matters</th>
+          <th data-field="how">How it closes</th><th data-field="state">State</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</template>
+
+<script src="lib.js"></script>
+<script>
+  dash.calc('arm_stats', {
+    inputs: ['gpu_runs'],
+    title: 'Mean and spread per arm',
+    description: 'Groups runs by grid and arm: seeds, mean and sample standard deviation of validation bits per character (the EMA mean for EMA runs), parameters and mean training speed.',
+    fn: (gpu_runs) => {
+      const g = new Map();
+      for (const r of gpu_runs) {
+        const k = r.grid + '|' + r.arm;
+        if (!g.has(k)) g.set(k, []);
+        g.get(k).push(r);
+      }
+      const mean = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : NaN);
+      const sd = (a) => {
+        if (a.length < 2) return NaN;
+        const m = mean(a);
+        return Math.sqrt(a.reduce((s, x) => s + (x - m) ** 2, 0) / (a.length - 1));
+      };
+      const out = [];
+      for (const [k, rs] of g) {
+        const v = rs.map((r) => (r.val_bpc === '' ? NaN : Number(r.val_bpc))).filter(Number.isFinite);
+        const e = rs.map((r) => (r.val_bpc_ema === '' ? NaN : Number(r.val_bpc_ema))).filter(Number.isFinite);
+        out.push({
+          key: k, grid: rs[0].grid, arm: rs[0].arm, n: v.length, mean: mean(v), std: sd(v), ema_mean: mean(e),
+          params: Number(rs[0].params), tok: rs[0].tok, chars_m: Number(rs[0].chars_m), cps: Math.round(mean(rs.map((r) => Number(r.cps)))),
+        });
+      }
+      return out;
+    },
+  });
+
+  dash.calc('lead', {
+    inputs: ['gpu_runs'],
+    title: 'The fuzzy lead, in words',
+    description: 'Fuzzy D against the size-near neural reference at 30M characters: means, lead, standard error of the difference, parameter gap, speed range; plus the subword headline.',
+    fn: (gpu_runs) => {
+      const pick = (grid, arm) => gpu_runs.filter((r) => r.grid === grid && r.arm === arm);
+      const vals = (a) => a.map((r) => Number(r.val_bpc));
+      const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
+      const sd = (a) => Math.sqrt(a.reduce((s, x) => s + (x - mean(a)) ** 2, 0) / (a.length - 1));
+      const D = pick('v3-final', 'D_30M');
+      const R = pick('v3-ref', 'delta-mlp-d72-h8_30M');
+      const dv = vals(D), rv = vals(R);
+      const se = Math.sqrt(sd(dv) ** 2 / dv.length + sd(rv) ** 2 / rv.length);
+      const lead = mean(rv) - mean(dv);
+      const cps = (a) => mean(a.map((r) => Number(r.cps)));
+      const S30 = pick('v5-final100k', 'D-d48-bpe1024_30M');
+      const S100 = pick('v5-final100k', 'D-d48-bpe1024_100M');
+      const f3 = (x) => x.toFixed(3);
+      const pd = Number(D[0].params), pr = Number(R[0].params);
+      return [{
+        d_txt: f3(mean(dv)) + ' ± ' + f3(sd(dv)), r_txt: f3(mean(rv)) + ' ± ' + f3(sd(rv)),
+        d_params_txt: pd.toLocaleString('en'), r_params_txt: pr.toLocaleString('en'),
+        d_n_txt: String(dv.length), r_n_txt: String(rv.length),
+        lead_txt: f3(lead), ratio_txt: (lead / se).toFixed(2),
+        pgap_txt: ((pd / pr - 1) * 100).toFixed(1) + '% more for the fuzzy model',
+        thr_txt: Math.round(cps(D) / 1000) + 'K vs ' + Math.round(Math.min(...R.map((r) => Number(r.cps))) / 1000) + 'K–' + Math.round(Math.max(...R.map((r) => Number(r.cps))) / 1000) + 'K',
+        sub30_txt: f3(mean(vals(S30))) + ' (' + Number(S30[0].params).toLocaleString('en') + ' params, 30M characters)',
+        sub100_txt: f3(mean(vals(S100))), sub_params_txt: Number(S100[0].params).toLocaleString('en'),
+      }];
+    },
+  });
+
+  dash.calc('attrib', {
+    inputs: ['gpu_runs'],
+    title: 'Mixer by feed-forward, best learning rate',
+    description: 'For each attention mixer and feed-forward kind in the attribution grid, the lower validation bits per character of its two learning rates.',
+    fn: (gpu_runs) => {
+      const best = new Map();
+      for (const r of gpu_runs) {
+        if (r.grid !== 'v3-attrib') continue;
+        const m = r.arm.split('-')[0];
+        const f = r.arm.split('-')[1].split('_')[0];
+        const k = m + '|' + f;
+        const b = Number(r.val_bpc);
+        if (!best.has(k) || b < best.get(k).bpc) best.set(k, { key: k, mixer: m, ffn: f, bpc: b, params: Number(r.params), lr: r.lr });
+      }
+      return [...best.values()];
+    },
+  });
+
+  const C = dash.colors;
+  const F = window.FL;
+  const arm = (grid, name) => F.get('arm_stats').rows.find((r) => r.grid === grid && r.arm === name);
+  const item = (label, row, extra) => (row ? { label: `${label} · ${F.fmtInt(row.params)}`, value: row.mean, err: row.std || 0, ...extra } : null);
+
+  const pagesSpec = {
+    overview(root) {
+      const el = root.querySelector('#chart-ladder');
+      const st = dash.data('arm_stats');
+      if (F.pending(el, st.status)) return;
+      const spec = [
+        ['Neural delta-mlp, characters', 'v3-ref', 'delta-mlp-d72-h8_30M', C[7], '30M characters'],
+        ['Fuzzy D, characters', 'v3-final', 'D_30M', C[0], '30M characters'],
+        ['Fuzzy D, BPE512', 'v5-sub100k', 'D-d56-bpe512_30M', C[2], '30M characters'],
+        ['Fuzzy D, BPE1024', 'v5-final100k', 'D-d48-bpe1024_30M', C[2], '30M characters'],
+        ['Neural delta-mlp, characters', 'v3-final', 'delta-mlp-d64_100M', C[7], '100M characters'],
+        ['Fuzzy D, characters', 'v3-final', 'D_100M', C[0], '100M characters'],
+        ['Fuzzy D, BPE1024', 'v5-final100k', 'D-d48-bpe1024_100M', C[2], '100M characters'],
+      ].map(([l, g, a, c, grp]) => item(l, arm(g, a), { color: c, group: grp })).filter(Boolean);
+      F.bars(el, spec, { xDomain: [1.0, 1.4], xFmt: F.f2, valueFmt: F.f3 });
+    },
+
+    deficit(root) {
+      // attribution: grouped bars (MLP vs old TSK FFN) per mixer
+      let el = root.querySelector('#chart-attrib');
+      let st = dash.data('attrib');
+      if (!F.pending(el, st.status)) {
+        const names = { softmax: 'Softmax attention', gauss: 'Gaussian-TSK attention', linear: 'Linear attention', fuzzy: 'Fuzzy recurrent (accumulating)', fuzzydelta: 'Fuzzy recurrent (delta)' };
+        const items = [];
+        for (const m of Object.keys(names)) {
+          for (const f of ['mlp', 'tsk']) {
+            const r = st.data.find((x) => x.mixer === m && x.ffn === f);
+            if (r) items.push({ group: names[m], label: f === 'mlp' ? 'GELU MLP feed-forward' : 'Old fuzzy (TSK) feed-forward', value: r.bpc, color: f === 'mlp' ? C[0] : C[7], note: F.fmtInt(r.params) + ' params' });
+          }
+        }
+        F.bars(el, items, { xDomain: [1.0, 2.0], xFmt: F.f2, valueFmt: F.f3, rowH: 24 });
+      }
+      // FFN redesign
+      el = root.querySelector('#chart-ffn');
+      st = dash.data('arm_stats');
+      if (!F.pending(el, st.status)) {
+        const spec = [
+          ['GELU MLP feed-forward (reference)', 'fuzzy-mlp', C[0]],
+          ['First-order, raw firing', 'o1r-da16', C[7]],
+          ['+ HTSK, 8-dim antecedent', 'o1r-da8-htsk', C[1]],
+          ['+ HTSK, 16-dim antecedent', 'o1r-da16-htsk', C[1]],
+          ['+ HTSK, 2.5× rules', 'o1r-da16-htsk-m2.5', C[1]],
+          ['+ HTSK, tied widths', 'o1r-da16-htsk-wdim', C[2]],
+        ].map(([l, a, c]) => item(l, arm('v3-ffn3', a), { color: c })).filter(Boolean);
+        F.bars(el, spec, { xDomain: [1.4, 1.65], xFmt: F.f2, valueFmt: F.f3 });
+      }
+      // heads
+      el = root.querySelector('#chart-heads');
+      if (!F.pending(el, st.status)) {
+        const mk = (name, color, pts) => ({
+          name, color, width: 2,
+          points: pts.map(([h, g, a]) => ({ h, r: arm(g, a) })).filter((p) => p.r).map((p) => ({
+            x: p.h, y: p.r.mean, lo: p.r.mean - (p.r.std || 0), hi: p.r.mean + (p.r.std || 0),
+            label: `${p.h} heads · ${F.f3(p.r.mean)} bits/char · ${F.fmtInt(p.r.params)} params`,
+          })),
+        });
+        const series = [
+          mk('Accumulating mixer', C[0], [[1, 'v3-mix', 'acc-h1'], [2, 'v3-mix', 'acc'], [4, 'v3-mix', 'acc-h4'], [8, 'v3-heads', 'acc-h8']]),
+          mk('Delta mixer', C[2], [[2, 'v3-mix', 'delta-mean'], [4, 'v3-heads', 'delta-mean-h4'], [8, 'v3-heads', 'delta-mean-h8']]),
+        ];
+        F.lines(el, { series, xLog: true, height: 240, xLabel: 'heads', yFmt: F.f2, xFmt: d3.format('d'), xTickValues: [1, 2, 4, 8] });
+      }
+      // budget fill
+      el = root.querySelector('#chart-fill');
+      if (!F.pending(el, st.status)) {
+        const rows = st.data.filter((r) => r.grid === 'v3-fill').sort((a, b) => a.mean - b.mean);
+        F.bars(el, rows.map((r) => ({ label: r.arm, value: r.mean, err: r.std || 0, color: r.arm.startsWith('D-') ? C[2] : 'var(--cds-chart-muted)', note: F.fmtInt(r.params) })), { xDomain: [1.3, 1.45], xFmt: F.f2, valueFmt: F.f3 });
+      }
+    },
+
+    comparison(root) {
+      const st = dash.data('arm_stats');
+      const names = [
+        ['v3-final', 'D_30M', 'Fuzzy D', C[0]],
+        ['v3-ref', 'delta-mlp-d72-h8_30M', 'Neural delta-mlp, 8 heads', C[7]],
+        ['v3-ref', 'delta-mlp-d72-h4_30M', 'Neural delta-mlp, 4 heads', C[5]],
+        ['v3-ref', 'delta-mlp-d74-h2_30M', 'Neural delta-mlp, 2 heads', C[4]],
+      ];
+      let el = root.querySelector('#chart-compare');
+      if (!F.pending(el, st.status)) {
+        const items = names.map(([g, a, l, c]) => item(l, arm(g, a), { color: c })).filter(Boolean);
+        F.bars(el, items, { xDomain: [1.0, 1.4], xFmt: F.f2, valueFmt: F.f3, rowH: 32 });
+      }
+      const tb = root.querySelector('#table-compare tbody');
+      if (st.status === 'ok') {
+        const rows = names.map(([g, a, l]) => ({ r: arm(g, a), l })).filter((x) => x.r).map((x) => ({ ...x.r, _key: x.r.key, _focus: x.r.arm === 'D_30M', label: x.l }));
+        F.table(tb, rows, ['label', 'params', 'n', 'mean', 'std', 'cps'], {
+          params: (r) => F.fmtInt(r.params), mean: (r) => F.f4(r.mean), std: (r) => F.f4(r.std), cps: (r) => F.fmtInt(r.cps),
+        });
+      } else tb.textContent = '';
+      // curves
+      el = root.querySelector('#chart-curves');
+      const cv = dash.data('gpu_curves');
+      const chips = root.querySelector('#chips-compare');
+      if (F.pending(el, cv.status)) return;
+      const shown = (window.__cmpShown = window.__cmpShown || new Set(names.map((n) => n[1])));
+      if (!chips.childElementCount) {
+        for (const [, a, l, c] of names) {
+          const b = document.createElement('button');
+          b.type = 'button'; b.className = 'fl-chip'; b.setAttribute('aria-pressed', String(shown.has(a)));
+          const sw = document.createElement('span'); sw.className = 'fl-sw'; sw.style.background = c;
+          b.append(sw, document.createTextNode(l));
+          b.addEventListener('click', () => { shown.has(a) ? shown.delete(a) : shown.add(a); b.setAttribute('aria-pressed', String(shown.has(a))); pagesSpec.comparison(root); });
+          chips.append(b);
+        }
+      }
+      const series = names.filter((n) => shown.has(n[1])).map(([g, a, l, c]) => {
+        const byX = d3.group(cv.data.filter((r) => r.arm === a && r.grid === g), (r) => r.chars_m);
+        const pts = [...byX].map(([x, rs]) => {
+          const v = rs.map((r) => Number(r.val_bpc));
+          return { x: Number(x), y: d3.mean(v), label: `${F.f2(Number(x))}M characters · ${F.f3(d3.mean(v))} bits/char · ${rs.length} seeds` };
+        }).sort((p, q) => p.x - q.x);
+        return { name: l, color: c, width: a === 'D_30M' ? 3 : 2, points: pts };
+      });
+      F.lines(el, { series, height: 300, xLabel: 'characters seen (millions)', yFmt: F.f2, xFmt: d3.format('d'), yDomain: [1.25, 1.65] });
+    },
+
+    bigger(root) {
+      const st = dash.data('arm_stats');
+      let el = root.querySelector('#chart-size');
+      if (!F.pending(el, st.status)) {
+        const widths = ['D-d72_30M', 'D-d80_30M', 'D-d88_30M', 'D-d96_30M'];
+        const pts = widths.map((a) => arm('v3-big', a)).filter(Boolean).map((r) => ({
+          x: r.params, y: r.mean, lo: r.mean - (r.std || 0), hi: r.mean + (r.std || 0), label: `${F.fmtInt(r.params)} params · ${F.f3(r.mean)} bits/char`,
+        }));
+        const t = arm('v3-big', 'teacher-delta-d128_60M');
+        const series = [{ name: 'Fuzzy D', color: C[0], width: 3, points: pts }];
+        if (t) series.push({ name: 'Neural teacher (60M characters)', color: C[7], width: 2, points: [{ x: t.params, y: t.mean, label: `${F.fmtInt(t.params)} params · ${F.f3(t.mean)} bits/char · 60M characters` }] });
+        F.lines(el, { series, height: 280, xLabel: 'total parameters', yFmt: F.f2, xFmt: d3.format('~s'), xTickValues: [1e5, 1.5e5, 2e5, 2.5e5], yDomain: [1.1, 1.3] });
+      }
+      el = root.querySelector('#chart-post');
+      if (!F.pending(el, st.status)) {
+        const g = (grid, a, field) => { const r = arm(grid, a); return r ? { v: r[field || 'mean'], n: r.n, p: r.params } : null; };
+        const rows = [
+          ['Pretraining only', 'v3-big', 'D-d72_30M', 'mean', 'D at 97K'],
+          ['+10M characters (control)', 'v3-post', 'D-d72_cont', 'mean', 'D at 97K'],
+          ['+10M with weight averaging', 'v3-post', 'D-d72_ema', 'ema_mean', 'D at 97K'],
+          ['+10M with distillation', 'v3-post', 'D-d72_kd', 'mean', 'D at 97K'],
+          ['Pretraining only', 'v3-big', 'D-d96_30M', 'mean', 'D at 162K'],
+          ['+10M characters (control)', 'v3-post', 'D-d96_cont', 'mean', 'D at 162K'],
+          ['+10M with weight averaging', 'v3-post', 'D-d96_ema', 'ema_mean', 'D at 162K'],
+        ];
+        const items = rows.map(([l, gr, a, f, grp]) => { const x = g(gr, a, f); return x && { group: grp, label: l, value: x.v, note: `${x.n} seed${x.n > 1 ? 's' : ''}`, color: l.includes('control') ? C[0] : l.startsWith('Pretraining') ? 'var(--cds-chart-muted)' : C[7] }; }).filter(Boolean);
+        F.bars(el, items, { xDomain: [1.15, 1.3], xFmt: F.f2, valueFmt: F.f3, rowH: 24 });
+      }
+    },
+
+    subwords(root) {
+      const st = dash.data('arm_stats');
+      const bar = (id, spec, domain) => {
+        const el = root.querySelector(id);
+        if (F.pending(el, st.status)) return;
+        const items = spec.map(([l, g, a, c]) => item(l, arm(g, a), { color: c })).filter(Boolean);
+        F.bars(el, items, { xDomain: domain, xFmt: F.f2, valueFmt: F.f3, rowH: 30 });
+      };
+      bar('#chart-sub150', [
+        ['Fuzzy D, characters', 'v3-big', 'D-d96_30M', C[0]],
+        ['Fuzzy D, BPE512', 'v5-bpe30', 'D-d80-bpe512_30M', C[2]],
+        ['Neural delta-mlp, characters, 60M chars', 'v3-big', 'teacher-delta-d128_60M', C[7]],
+      ], [1.0, 1.3]);
+      bar('#chart-sub100', [
+        ['Fuzzy D, characters', 'v3-big', 'D-d72_30M', C[0]],
+        ['Fuzzy D, BPE384', 'v5-sub100k', 'D-d64-bpe384_30M', C[2]],
+        ['Fuzzy D, BPE512', 'v5-sub100k', 'D-d56-bpe512_30M', C[2]],
+        ['Fuzzy D, BPE1024', 'v5-final100k', 'D-d48-bpe1024_30M', C[2]],
+      ], [1.0, 1.35]);
+      bar('#chart-vocab', [
+        ['BPE512, d 56 (baseline)', 'v5-spend', 'a-512-d56_10M', 'var(--cds-chart-muted)'],
+        ['BPE512, FFN 2.0× rules', 'v5-spend', 'b-512-d56-m2.0_10M', 'var(--cds-chart-muted)'],
+        ['BPE512, 24-dim antecedent', 'v5-spend', 'c-512-d56-da24_10M', 'var(--cds-chart-muted)'],
+        ['BPE768, d 48', 'v5-spend', 'd-768-d48_10M', C[1]],
+        ['BPE1024, d 48', 'v5-spend', 'e-1024-d48_10M', C[2]],
+      ], [1.2, 1.4]);
+      const el = root.querySelector('#chart-subcurves');
+      const cv = dash.data('gpu_curves');
+      if (F.pending(el, cv.status)) return;
+      const spec = [['v5-final100k', 'D-d48-bpe1024_30M', 'BPE1024 D, 30M run', C[2], 3], ['v5-final100k', 'D-d48-bpe1024_100M', 'BPE1024 D, 100M run', C[1], 2], ['v3-final', 'D_30M', 'Character D, 30M run', C[0], 2], ['v3-final', 'D_100M', 'Character D, 100M run', C[7], 2]];
+      const series = spec.map(([g, a, l, c, w]) => {
+        const byX = d3.group(cv.data.filter((r) => r.grid === g && r.arm === a), (r) => r.chars_m);
+        return { name: l, color: c, width: w, points: [...byX].map(([x, rs]) => ({ x: Number(x), y: d3.mean(rs.map((r) => Number(r.val_bpc))), label: `${F.f2(Number(x))}M characters · ${F.f3(d3.mean(rs.map((r) => Number(r.val_bpc))))} bits/char` })).sort((p, q) => p.x - q.x) };
+      });
+      F.lines(el, { series, xLog: true, height: 260, xLabel: 'characters seen (millions)', yFmt: F.f2, xFmt: d3.format('d'), xTickValues: [5, 10, 25, 50, 100], yDomain: [1.0, 1.7] });
+    },
+
+    text(root) {
+      const el = root.querySelector('#samples-list');
+      const st = dash.data('gpu_samples');
+      if (F.pending(el, st.status)) return;
+      el.textContent = '';
+      for (const r of st.data) {
+        const box = document.createElement('div'); box.className = 'fl-sample';
+        const head = document.createElement('div'); head.className = 'fl-sample-head';
+        head.textContent = `${r.label} · ${F.fmtInt(Number(r.params))} params · ${Number(r.val_bpc).toFixed(3)} bits/char`;
+        const p = document.createElement('p'); p.className = 'fl-sample-text'; p.textContent = r.sample;
+        box.append(head, p); el.append(box);
+      }
+    },
+
+    gaps(root) {
+      const st = dash.data('gaps');
+      const tb = root.querySelector('#table-gaps tbody');
+      if (st.status !== 'ok') { tb.textContent = ''; return; }
+      tb.textContent = '';
+      for (const r of st.data) {
+        const tr = document.createElement('tr'); tr.dataset.key = r.key;
+        for (const c of ['gap', 'status', 'why', 'how', 'state']) {
+          const td = document.createElement('td');
+          if (c === 'status') { const s = document.createElement('span'); s.className = 'fl-pill'; s.dataset.status = r.status; s.textContent = r.status; td.append(s); }
+          else td.textContent = r[c];
+          tr.append(td);
+        }
+        tb.append(tr);
+      }
+    },
+  };
+
+  F.pages(pagesSpec);
+</script>
