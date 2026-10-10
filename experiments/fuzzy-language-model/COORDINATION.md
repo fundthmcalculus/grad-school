@@ -32,12 +32,12 @@ supplies numbers and corrects mistakes; it need not write prose.
 
 | item | owner | state | blocked on |
 |---|---|---|---|
-| Char-level claim: D vs equal-effort neural reference, ten seeds (`v4-*`, `PLAN_GPU.md`) | GPU | grids ready and tested; **not started** | GPU session's user approving ~7–20 GPU-h |
-| **Subword fairness controls** (`v6-ref-tune` 24 cells, `v6-d-lr` 8, then `v6-final10` 30): a neural model on BPE1024 at D's 93,344 params, tuned as hard as D | GPU | grids ready, arg-parsed, matched sizes verified; **not run** (needs the BPE stream: run one cell first) | start; cheap (~2–3 GPU-h) |
+| Char-level claim: D vs equal-effort neural reference, ten seeds (`v4-*`, `PLAN_GPU.md`) | GPU | grids ready and tested; **not started** | GPU session's user approving ~7–20 GPU-h. GPU is running `v5-long` (BPE1024 D, 300M chars) first and will not merge until it ends |
+| **Subword fairness controls** (`v6-ref-tune` 24 cells, `v6-d-lr` 8, then `v6-final10` 30): a neural model on BPE1024 at D's 93,344 params, tuned as hard as D | GPU | grids ready, arg-parsed, matched sizes verified; GPU accepts the gap and will smoke-run **one cell of each** after merging (~20 min, within its user's existing probe approval) | the **full** set (~2–3 GPU-h) needs the GPU session's user's go-ahead |
 | BPE1024 D d48 (93,344 params): 1.1292 ± 0.0031 @ 30M (2 seeds), 1.0548 @ 100M (1 seed) | GPU | done, in `RESULTS.md` | **no neural control on the same tokenizer; D's lr was only ever 3e-2 on subwords** |
 | n-gram rule init | CPU | **done: a null at d = 16 on the old FFN** (stage 2: +0.027 vs base, within noise). On D it is `v4-taps` | `v4-taps` unstarted (GPU) |
-| `WRITEUP.md` goal-track + subword sections | CPU | drafting from `RESULTS.md` | GPU review of numbers |
-| Rulebook for D (`flm/rules.py` for the first-order FFN) | CPU | not started | a D checkpoint (GPU: which one is the readable one, char or BPE?) |
+| `WRITEUP.md` goal-track + subword sections (§10–§12) | CPU | **drafted** (998f4a1), numbers transcribed from `RESULTS.md`, with the GPU session's requested caveats | GPU spot-check of numbers (not urgent) |
+| Rulebook for D (`flm/rules.py` for the first-order FFN) | CPU | not started; **target = the BPE1024 D 100M checkpoint** (GPU answer); optionally the char D d72 for an old-vs-new comparison | the checkpoint(s) and the BPE tokenizer committed with `git add -f` (they are on the GPU host only) |
 | Results pages | user | the CPU dashboard (CPU-phase) and `report/*.html` (GPU) both exist | **user to choose one** (see the open question to the user) |
 
 ## 4. Handoffs
