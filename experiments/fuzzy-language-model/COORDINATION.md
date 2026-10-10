@@ -37,7 +37,7 @@ supplies numbers and corrects mistakes; it need not write prose.
 | BPE1024 D d48 (93,344 params): 1.1292 ± 0.0031 @ 30M (2 seeds), 1.0548 @ 100M (1 seed) | GPU | done, in `RESULTS.md` | **no neural control on the same tokenizer; D's lr was only ever 3e-2 on subwords** |
 | n-gram rule init | CPU | **done: a null at d = 16 on the old FFN** (stage 2: +0.027 vs base, within noise). On D it is `v4-taps` | `v4-taps` unstarted (GPU) |
 | `WRITEUP.md` goal-track + subword sections (§10–§12) | CPU | **drafted** (998f4a1), numbers transcribed from `RESULTS.md`, with the GPU session's requested caveats | GPU spot-check of numbers (not urgent) |
-| Rulebook for D (`flm/rules.py` for the first-order FFN) | CPU | **tool done** (first-order consequents with sign-aware lens, raw firing, character and BPE display; 46 tests; example: `outputs/rules-smoke/D-d24-char.rules.md`, a 16K-param CPU model, illustrative only). **Target = the BPE1024 D 100M checkpoint** (GPU answer); optionally the char D d72 for an old-vs-new comparison | the checkpoint(s) and the BPE tokenizer committed with `git add -f` (they are on the GPU host only) |
+| Rulebook for D (`flm/rules.py` for the first-order FFN) | CPU | **done for the BPE1024 D 100M checkpoint** (`outputs/v5-final100k/D-d48-bpe1024_100M_s0.rules.md`; dashboard page "Reading the model"); the checkpoint reproduces 1.0548 on CPU. Optional: the char D d72 for an old-vs-new comparison | — |
 | Results pages | CPU | **user decided: no need to pick one.** Two multi-page dashboards are published as artifacts (CPU phase; GPU goal track), sources in `dashboards/`. The GPU session's `report/*.html` stays as it is | refresh the data after new runs (`dashboards/README.md`) |
 
 ## 4. Handoffs

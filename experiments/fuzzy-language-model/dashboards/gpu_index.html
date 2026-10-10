@@ -16,6 +16,7 @@
     <button class="fl-tab" id="tab-bigger" data-page="bigger" role="tab" aria-selected="false">Bigger models and post-training</button>
     <button class="fl-tab" id="tab-subwords" data-page="subwords" role="tab" aria-selected="false">Subwords</button>
     <button class="fl-tab" id="tab-text" data-page="text" role="tab" aria-selected="false">Generated text</button>
+    <button class="fl-tab" id="tab-rules" data-page="rules" role="tab" aria-selected="false">Reading the model</button>
     <button class="fl-tab" id="tab-gaps" data-page="gaps" role="tab" aria-selected="false">Open gaps</button>
   </nav>
 
@@ -165,6 +166,23 @@
     <h2>Saved samples from the prompt "Once upon a time"</h2>
     <p class="fl-note">One sample per model (temperature 0.8, fixed sampler seed), so differences in single words are luck. Subword models write 300 tokens, so their samples cover more text. ↵ marks a line break and ⏎⏎ the story separator. Better bits per character shows up as better syntax and spelling, not as a coherent story.</p>
     <div class="fl-samples" id="samples-list" data-source="gpu_samples"></div>
+  </section>
+</template>
+
+<template id="tpl-rules">
+  <section class="fl-card" id="rules-table-card">
+    <h2>The most-used feed-forward rules of the best sub-100K model</h2>
+    <p class="fl-note">Each rule is a fuzzy region of the model's internal state. It fires when the text so far looks like the rule's centre, and its output is gated by a signed gain: a positive gain pushes the next token towards the "raises" list, a negative gain towards the "when the gain is negative" list. Readings use only the direct path to the output (the final norm and the tied embedding), so later layers can change the effect, and many rules are word-piece completions. · marks a space, ↵ a line break. The model is the subword fuzzy model; rules are over word pieces, not characters.</p>
+    <div class="fl-chips" id="chips-rules" role="group" aria-label="Layer"></div>
+    <div class="fl-tablewrap">
+      <table class="fl-table fl-text" id="table-rules" data-source="rulebook" data-row-key="key">
+        <thead><tr>
+          <th data-field="rule">Rule</th><th data-field="wins_pct">Wins (% of positions)</th><th data-field="fires_on">Fires on contexts ending in</th>
+          <th data-field="gain">Gain where it wins</th><th data-field="raises">Raises (positive gain)</th><th data-field="raises_neg">Raises when the gain is negative</th><th data-field="examples">Strongest context</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </section>
 </template>
 
@@ -468,6 +486,32 @@
         const p = document.createElement('p'); p.className = 'fl-sample-text'; p.textContent = r.sample;
         box.append(head, p); el.append(box);
       }
+    },
+
+    rules(root) {
+      const redraw = () => pagesSpec.rules(root);
+      const layers = { 0: 'Layer 0 (reads the embedding)', 1: 'Layer 1 (reads layer 0)' };
+      const set = (window.__ruleLayer = window.__ruleLayer || new Set([0]));
+      const box = root.querySelector('#chips-rules');
+      if (!box.childElementCount) {
+        for (const l of [0, 1]) {
+          const b = document.createElement('button');
+          b.type = 'button'; b.className = 'fl-chip'; b.setAttribute('aria-pressed', String(set.has(l)));
+          b.append(document.createTextNode(layers[l]));
+          b.addEventListener('click', () => { set.has(l) ? set.delete(l) : set.add(l); b.setAttribute('aria-pressed', String(set.has(l))); redraw(); });
+          box.append(b);
+        }
+      }
+      const st = dash.data('rulebook');
+      const tb = root.querySelector('#table-rules tbody');
+      tb.textContent = '';
+      if (st.status !== 'ok') return;
+      const rows = st.data.filter((r) => set.has(Number(r.layer))).map((r) => ({ ...r, _key: r.key }));
+      F.table(tb, rows, ['rule', 'wins_pct', 'fires_on', 'gain', 'raises', 'raises_neg', 'examples'], {
+        rule: (r) => `L${r.layer} · rule ${r.rule}`, wins_pct: (r) => F.f2(Number(r.wins_pct)),
+        gain: (r) => (r.gain === '' ? '' : `${Number(r.gain) >= 0 ? '+' : ''}${r.gain} ± ${r.gain_sd}`),
+        raises: (r) => r.raises.replaceAll('`', ''), raises_neg: (r) => r.raises_neg.replaceAll('`', ''), examples: (r) => '…' + r.examples.split(' ¦ ')[0],
+      });
     },
 
     gaps(root) {

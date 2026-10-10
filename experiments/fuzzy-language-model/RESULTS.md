@@ -850,3 +850,26 @@ parameters. D's FFN (first-order, raw firing) has far lower seed noise (0.0003�
 same ideas are testable there at 0.01 (`v4-taps`, `PLAN_GPU.md` §7); this stage-2 result is a prior for the
 sign and size of E, not evidence about D. Lesson recorded: with 2 base seeds the noise estimate was
 off by 35%, and a 1-seed variant ranking is not usable at this design's noise.
+
+## CPU-session notes, 2026-10-11 (rulebook of the best sub-100K model; a cross-platform check)
+
+**Cross-platform check (not a hypothesis).** The GPU session's BPE1024 D checkpoint (`outputs/v5-final100k/
+D-d48-bpe1024_100M_s0.pt`, 93,344 params) was loaded on the CPU laptop with the committed tokenizer
+(`data/tinystories/bpe1024.json`) and a validation token stream rebuilt from it (`flm.bpe.encode_stream`; token character
+lengths sum to the 22,115,781-character stream, 3.162 chars/token). `flm.train.evaluate` returns **1.0548**, identical to
+the recorded GPU value to four decimals. So that record reproduces across platforms, and the tokenizer and stream are the
+same as the GPU session's.
+
+**Rulebook** (`flm/rules.py`, `outputs/v5-final100k/D-d48-bpe1024_100M_s0.rules.md`; 400 validation windows). In layer 0, 63
+of the 72 first-order feed-forward rules win at more than 0.1% of positions, so the rule bank is not collapsed. A
+rule's output is gated by a signed gain, and the sign flips what it pushes. Readable examples: rule 30 fires after
+sentence-ending punctuation (`.`, `!`, `?`) and, at positive gain (+3.97 ± 1.46), raises sentence starters (`·Th`, `↵`,
+`·He`, `·Lucy`); rule 49 fires after `·very`, `'m`, `·up` and, at negative gain, raises `·surprised` and `·not`.
+Limits, stated plainly: the logit lens reads only the direct path (final norm, tied embedding), many rules are word-piece
+completions (`gener` → `ous`) whose reading is partial, and not every rule is interpretable. This shows the model *can* be
+read rule by rule; it does not show the readings are faithful to the full computation.
+
+**Correction to a transcribed number.** `RESULTS.md` (goal-track section 4) says D trains "at 3× lower throughput (34K vs
+114K chars/s)". The 114K figure is the *smaller* 73K delta-mlp at 100M chars. Against the size-near reference (d72, 8 heads)
+the recorded speeds are 50K / 56K / 85K chars/s on the shared GPU, so the gap is roughly 1.5–2.5× and noisy. The dashboards
+and `WRITEUP.md` show the range. This file is the GPU session's, so the sentence there is left for it to fix.

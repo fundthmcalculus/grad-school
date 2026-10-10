@@ -251,7 +251,62 @@ def main(out: Path) -> None:
         w.writerow(["key", "gap", "why", "status", "how", "state"])
         for i, row in enumerate(GAPS):
             w.writerow([f"gap{i}", *row])
-    print(f"wrote 4 CSVs ({len(recs)} runs) to {out}")
+    rulebook(out)
+    print(f"wrote 5 CSVs ({len(recs)} runs) to {out}")
+
+
+RULEBOOK_CKPT = OUT / "v5-final100k" / "D-d48-bpe1024_100M_s0.pt"
+
+
+def rulebook(out: Path, windows: int = 400, per_layer: int = 15) -> None:
+    """The first-layer and second-layer FFN rules of the best sub-100K model, as rows (needs the BPE
+    tokenizer and a rebuilt validation token stream: see flm/bpe.py)."""
+    from flm.rules import ffn_rule_rows, load_model, make_codec
+
+    model, tok = load_model(RULEBOOK_CKPT)
+    codec = make_codec(tok)
+    rows = ffn_rule_rows(
+        model,
+        codec.windows(windows, model.cfg.max_len),
+        codec,
+        top=3,
+        max_rules=per_layer,
+    )
+    with open(out / "rulebook.csv", "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(
+            [
+                "key",
+                "layer",
+                "rule",
+                "wins_pct",
+                "firing",
+                "gain",
+                "gain_sd",
+                "fires_on",
+                "examples",
+                "raises",
+                "raises_neg",
+            ]
+        )
+        for r in rows:
+            fmt = lambda x, n: "" if x is None else round(x, n)  # noqa: E731
+            w.writerow(
+                [
+                    f"L{r['layer']}R{r['rule']}",
+                    r["layer"],
+                    r["rule"],
+                    fmt(100 * r["wins"], 2),
+                    fmt(r["firing"], 3),
+                ]
+                + [
+                    fmt(r["gain"], 2),
+                    fmt(r["gain_sd"], 2),
+                    " · ".join(r["fires_on"]),
+                    " ¦ ".join(r["examples"]),
+                ]
+                + [r["raises"], r["raises_neg"] or ""]
+            )
 
 
 if __name__ == "__main__":
