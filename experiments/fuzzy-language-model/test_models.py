@@ -520,3 +520,68 @@ def test_v6_subword_controls_match_d_and_select_from_records(tmp_path, monkeypat
     for _, argv in jobs:
         get_args(argv + ["--out", "unused.json"])  # every flag parses
     assert len(g.REF_JOBS) == 24
+
+
+class _FakeCodec:
+    kind = "char"
+
+    def piece(self, ids):
+        return "".join(chr(97 + int(i) % 26) for i in ids)
+
+
+def _rule_model(**kw):
+    base = dict(
+        mixer="fuzzydelta",
+        ffn="tsk",
+        decay="data",
+        exp_norm="mean",
+        n_heads=2,
+        ffn_mult=2.0,
+    )
+    torch.manual_seed(15)
+    return TinyLM(cfg(**{**base, **kw}))
+
+
+@pytest.mark.parametrize("first_order", [False, True])
+def test_rulebook_reads_both_ffn_kinds_without_changing_the_model(first_order):
+    from flm.rules import rulebook
+
+    kw = dict(ffn_order=1, ffn_norm="none", tsk_dim=8) if first_order else {}
+    m = _rule_model(**kw)
+    windows = torch.randint(0, 98, (12, 24))
+    before = m(windows)
+    text = rulebook(m, "", windows, _FakeCodec(), top=3, max_rules=4)
+    assert torch.equal(before, m(windows))  # capture hooks left the model as it was
+    assert (
+        "first-order, raw firing" if first_order else "zero-order, normalised firing"
+    ) in text
+    assert "sequence mixer, head 1" in text and "THEN raise" in text
+    assert ("gain where it wins" in text) == first_order
+    assert text.count("- **rule") >= 4
+
+
+def test_bpe_codec_renders_pieces_visibly():
+    from types import SimpleNamespace
+
+    from tokenizers import Tokenizer, decoders, models, pre_tokenizers, trainers
+
+    from flm.rules import BPECodec
+
+    tok = Tokenizer(models.BPE())
+    tok.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
+    tok.decoder = decoders.ByteLevel()
+    tr = trainers.BpeTrainer(
+        vocab_size=300,
+        special_tokens=["\x1f"],
+        initial_alphabet=pre_tokenizers.ByteLevel.alphabet(),
+        show_progress=False,
+    )
+    tok.train_from_iterator(
+        ["once upon a time there was a little dog\n"] * 50, trainer=tr
+    )
+    codec = BPECodec.__new__(BPECodec)
+    codec.bpe, codec.eot_ch = SimpleNamespace(tok=tok), "\x1f"
+    ids = tok.encode("once upon a time\n").ids
+    shown = codec.piece(ids)
+    assert "·" in shown and "↵" in shown and " " not in shown and "\n" not in shown
+    assert codec.piece([tok.token_to_id("\x1f")]) == "⏎⏎"
