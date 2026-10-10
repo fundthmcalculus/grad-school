@@ -812,3 +812,16 @@ statement about **subwords**, not yet about **fuzziness**: no neural model on th
 parameters has been run, and D's learning rate on subwords was only ever 3e-2 (2e-2 is running in `v5-long`). The earlier
 fuzzy-vs-neural comparisons are character-level, 2–3 seeds, and below the ten-seed protocol. The neural BPE control is
 defined in `flm/grids_v6.py` (`v6-d-lr`, `v6-ref-tune`, `v6-final10`, ~2–3 GPU-hours; needs the user's go-ahead).
+
+### Outcome `v5-long` (BPE1024 D d = 48, 93,344 params, seed 0, 300M chars, ~19 min each, two cells concurrent)
+
+| lr | val BPC at 25 / 50 / 75 / 100% | final |
+|---|---|---|
+| 3e-2 | 1.1206 / 1.0773 / 1.0420 / 1.0212 | **1.0212** |
+| 2e-2 | 1.1178 / 1.0730 / 1.0401 / 1.0227 | 1.0227 |
+
+**H24 refuted (narrowly):** 1.021 is not ≤ 1.00. **H25 refuted:** the two learning rates differ by 0.0015, inside seed noise
+(the lower lr leads until the last quarter and loses at the end of the cosine). Returns on data are shrinking: 30M → 100M gave
+−0.074, 100M → 300M gave −0.034 (one seed each), so 1B characters would be expected to give about −0.02 (≈ 1.00) for ~1 h of GPU.
+The registered stopping rule (≥ 1.03 means data is not the lever) did not trigger: more data still helps, with diminishing return.
+Single seed, so differences under ~0.01 are not established.
