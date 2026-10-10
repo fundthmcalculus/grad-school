@@ -187,3 +187,45 @@ def test_ffn_exp_norm_override_is_ffn_only():
     m = TinyLM(cfg(mixer="fuzzy", ffn="tsk", exp_norm="mean", ffn_exp_norm="sum"))
     assert m.blocks[0].mix.exp_scale == 1.0 / 8  # dh = 16 / 2 heads
     assert m.blocks[0].ffn.exp_scale == 1.0
+
+
+@pytest.mark.parametrize("share", ["dim", "rule"])
+@pytest.mark.parametrize("mixer", ["fuzzy", "fuzzydelta"])
+def test_width_share_parallel_equals_recurrent(share, mixer):
+    torch.manual_seed(9)
+    m = TinyLM(
+        cfg(mixer=mixer, ffn="tsk", decay="data", width_share=share, exp_norm="mean")
+    )
+    with torch.no_grad():
+        for p in m.parameters():
+            if p.dim() == 3 and p.shape[1] == 1 or p.shape[-1] == 1:
+                p.uniform_(-0.3, 0.3)  # make shared widths non-trivial
+    idx = torch.randint(0, 98, (2, 13))
+    assert torch.allclose(m(idx), m(idx, step=True), atol=1e-10)
+
+
+def test_width_share_param_counts():
+    full = TinyLM(cfg(mixer="fuzzydelta", ffn="tsk", decay="data")).n_params()
+    dim = TinyLM(
+        cfg(mixer="fuzzydelta", ffn="tsk", decay="data", width_share="dim")
+    ).n_params()
+    rule = TinyLM(
+        cfg(mixer="fuzzydelta", ffn="tsk", decay="data", width_share="rule")
+    ).n_params()
+    assert full > rule > dim
+
+
+def test_shared_depth_reuses_blocks():
+    from flm.models import init_rules_from_data
+
+    torch.manual_seed(10)
+    m = TinyLM(cfg(mixer="fuzzydelta", ffn="tsk", decay="data", n_layers=4, n_unique=1))
+    one = TinyLM(cfg(mixer="fuzzydelta", ffn="tsk", decay="data", n_layers=1))
+    assert len(m.blocks) == 1 and m.n_params() == one.n_params()
+    idx = torch.randint(0, 98, (2, 11))
+    assert torch.allclose(m(idx), m(idx, step=True), atol=1e-10)
+    # applying the shared block 4x is not the same function as applying it once
+    one.load_state_dict(m.state_dict())
+    assert not torch.allclose(m(idx), one(idx))
+    # runs with shared blocks (needs >= R distinct tokens to place R rules)
+    init_rules_from_data(m, torch.randint(0, 98, (4, 16)))

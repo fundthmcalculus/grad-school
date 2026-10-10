@@ -70,6 +70,10 @@ def get_args(argv=None):
         choices=["", "sum", "mean", "sqrt"],
         help="override --exp-norm for the TSK FFN only",
     )
+    p.add_argument("--width-share", default="full", choices=["full", "dim", "rule"])
+    p.add_argument(
+        "--n-unique", type=int, default=0, help="distinct blocks (0 = --layers)"
+    )
     p.add_argument(
         "--rule-init",
         default="random",
@@ -95,6 +99,8 @@ def make_config(a) -> ModelConfig:
         max_len=a.ctx,
         exp_norm=a.exp_norm,
         ffn_exp_norm=a.ffn_exp_norm,
+        width_share=a.width_share,
+        n_unique=a.n_unique,
     )
 
 

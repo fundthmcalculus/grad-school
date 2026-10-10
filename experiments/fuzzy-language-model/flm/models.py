@@ -51,6 +51,12 @@ class ModelConfig:
     # Gaussian exponent over antecedent dims: sum (classic TSK) | mean (HTSK) | sqrt
     exp_norm: str = "sum"
     ffn_exp_norm: str = ""  # override for the TSK FFN only ("" = same as exp_norm)
+    # Gaussian widths: full (per rule per dim) | dim (shared across rules, one fuzzy
+    # partition per input) | rule (one isotropic width per rule)
+    width_share: str = "full"
+    n_unique: int = (
+        0  # distinct blocks; n_layers applications cycle through them (0 = n_layers)
+    )
     max_len: int = 256
 
     def to_dict(self) -> dict:
@@ -282,19 +288,33 @@ def exp_scale(exp_norm: str, dim: int) -> float:
     return {"sum": 1.0, "mean": 1.0 / dim, "sqrt": dim**-0.5}[exp_norm]
 
 
+def width_shape(share: str, R: int, D: int) -> tuple[int, int]:
+    """Shape of a rule base's log-width parameter, broadcast to (R, D) when used."""
+    return {"full": (R, D), "dim": (1, D), "rule": (R, 1)}[share]
+
+
+@torch.no_grad()
+def set_widths_from_std(log_width: torch.Tensor, std: torch.Tensor) -> None:
+    """Write log(std) (one value per dim) into a (R|1, D|1) log-width slice."""
+    ls = torch.log(std.clamp(min=1e-3))
+    log_width.copy_(
+        (ls.mean() if log_width.shape[-1] == 1 else ls).expand(log_width.shape)
+    )
+
+
 class _FuzzyRules(nn.Module):
     """R Gaussian rules per head; phi(u) = normalized memberships (a fuzzy partition)."""
 
-    def init_rules(self, H, R, dh, exp_norm="sum"):
+    def init_rules(self, H, R, dh, exp_norm="sum", width_share="full"):
         self.R = R
         self.exp_scale = exp_scale(exp_norm, dh)
         self.centers = nn.Parameter(torch.randn(H, R, dh) * 0.5)
-        self.log_width = nn.Parameter(torch.zeros(H, R, dh))
+        self.log_width = nn.Parameter(torch.zeros(H, *width_shape(width_share, R, dh)))
 
     def log_membership(self, x):  # (B,H,T,dh) -> (B,H,T,R)
         # sum_j (x_j - c_rj)^2 a_rj with a = 1/s^2, expanded into matmuls:
         #   (x^2) a_r - 2 x (c_r a_r) + sum_j c_rj^2 a_rj
-        a = torch.exp(-2.0 * self.log_width)  # (H,R,dh)
+        a = torch.exp(-2.0 * self.log_width).expand_as(self.centers)  # (H,R,dh)
         ca = self.centers * a
         quad = (x * x) @ a.transpose(-1, -2) - 2.0 * (x @ ca.transpose(-1, -2))
         quad = quad + (self.centers * ca).sum(-1)[:, None, :]
@@ -325,7 +345,7 @@ class FuzzyRecurrentMixer(_FuzzyRules, _KernelLinearMixer):
 
     def __init__(self, cfg: ModelConfig):
         _KernelLinearMixer.__init__(self, cfg)
-        self.init_rules(self.H, cfg.n_rules, self.dh, cfg.exp_norm)
+        self.init_rules(self.H, cfg.n_rules, self.dh, cfg.exp_norm, cfg.width_share)
 
 
 class _DeltaMixer(_RecurrentMixerBase):
@@ -402,7 +422,7 @@ class FuzzyDeltaMixer(_FuzzyRules, _DeltaMixer):
 
     def __init__(self, cfg: ModelConfig):
         _DeltaMixer.__init__(self, cfg)
-        self.init_rules(self.H, cfg.n_rules, self.dh, cfg.exp_norm)
+        self.init_rules(self.H, cfg.n_rules, self.dh, cfg.exp_norm, cfg.width_share)
 
 
 class GRUModelCore(nn.Module):
@@ -446,13 +466,13 @@ class TSKFFN(nn.Module):
         self.exp_scale = exp_scale(cfg.ffn_exp_norm or cfg.exp_norm, da)
         self.ante = nn.Linear(d, da, bias=False)
         self.centers = nn.Parameter(torch.randn(R, da))
-        self.log_width = nn.Parameter(torch.zeros(R, da))
+        self.log_width = nn.Parameter(torch.zeros(*width_shape(cfg.width_share, R, da)))
         self.conseq = nn.Parameter(torch.zeros(R, d))
         nn.init.normal_(self.conseq, std=0.02)
 
     def firing(self, x):
         u = self.ante(x)
-        a = torch.exp(-2.0 * self.log_width)  # (R,da)
+        a = torch.exp(-2.0 * self.log_width).expand_as(self.centers)  # (R,da)
         ca = self.centers * a
         quad = (u * u) @ a.T - 2.0 * (u @ ca.T) + (self.centers * ca).sum(-1)
         return torch.softmax(-0.5 * self.exp_scale * quad, dim=-1)
@@ -506,7 +526,9 @@ class TinyLM(nn.Module):
             self.blocks = nn.ModuleList()
         else:
             self.core = None
-            self.blocks = nn.ModuleList([Block(cfg) for _ in range(cfg.n_layers)])
+            # weight-shared depth: n_layers applications cycling through n_unique blocks
+            n_unique = cfg.n_unique or cfg.n_layers
+            self.blocks = nn.ModuleList([Block(cfg) for _ in range(n_unique)])
         self.norm = nn.RMSNorm(cfg.d_model)
         # tied unembedding
 
@@ -514,8 +536,8 @@ class TinyLM(nn.Module):
         x = self.emb(idx)
         if self.core is not None:
             x = self.core(x)
-        for b in self.blocks:
-            x = b(x, step=step)
+        for i in range(len(self.blocks) and self.cfg.n_layers):
+            x = self.blocks[i % len(self.blocks)](x, step=step)
         return self.norm(x) @ self.emb.weight.T
 
     def n_params(self, exclude_embedding=False):
@@ -570,9 +592,7 @@ def init_rules_from_data(
             for hh in range(mix.H):
                 pick = torch.randperm(k.shape[0], generator=generator)[: mix.R]
                 mix.centers[hh] = k[pick, hh]
-                mix.log_width[hh] = torch.log(k[:, hh].std(0).clamp(min=1e-3)).expand(
-                    mix.R, -1
-                )
+                set_widths_from_std(mix.log_width[hh], k[:, hh].std(0))
             done[f"L{li}.mix"] = mix.R * mix.H
         x = x + mix(blk.mixer_in(x))
         if isinstance(blk.ffn, TSKFFN):
@@ -580,6 +600,6 @@ def init_rules_from_data(
             u = ffn.ante(blk.n2(x)).reshape(-1, ffn.da)
             pick = torch.randperm(u.shape[0], generator=generator)[: ffn.R]
             ffn.centers.copy_(u[pick])
-            ffn.log_width.copy_(torch.log(u.std(0).clamp(min=1e-3)).expand(ffn.R, -1))
+            set_widths_from_std(ffn.log_width, u.std(0))
             done[f"L{li}.ffn"] = ffn.R
     return done

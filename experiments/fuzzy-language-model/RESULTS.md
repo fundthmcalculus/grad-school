@@ -335,3 +335,26 @@ Every arm (all 10) at d = 96, seed 0, 30M chars, with its tuned LR ÷ 3 and ÷ 1
 * **Consequence, decided before the data:** if H10a holds, the large-width rows of
   those four arms are reported as LR-limited and are re-run at the transferred LR
   before any architecture conclusion is drawn from them.
+
+## The ~2 BPC FRLM (registered 2026-10-10, before `minsize` and `lean`)
+
+The user asked to focus on the smallest fuzzy recurrent model. At d = 16 (8,568 params)
+`frlm-delta-htsk` scores 1.961 ± 0.012, already below 2.0, so its real crossing is
+below the grid. Its parameters at d = 16: Gaussian widths 18%, rule centers 18%,
+embedding 18%, qkv 18%, consequents 12%.
+
+* **H11 (`minsize`, widths 8/10/12/14, 3 seeds, with delta-mlp as the reference).**
+  `frlm-delta-htsk` crosses 2.0 BPC between 5K and 8.5K params. delta-mlp crosses it
+  at fewer params (its 6K cell is at 1.996), so the fuzzy model's
+  parameters-to-reach-2.0 ratio stays at or above the ~1.3× seen at 1.8 / 1.6 BPC.
+* **H12 (`lean`: one-variable screen at d = 16, seeds 0–1, frlm-delta-htsk's tuned
+  lr/sc; reference = its 3 `scaling2` seeds). This is design iteration, disclosed.**
+  * `ffnonly` (HTSK on the FFN only; h9's best): ≤ base BPC.
+  * `wdim` / `wrule` (widths shared across rules / one width per rule; −17% params):
+    within +0.03 of base, i.e. better BPC *per parameter* than base.
+  * `share2/3/4` (one block applied 2/3/4×, 5,076 params, −41%): `share2` is worse
+    than base, and BPC improves monotonically with the number of applications.
+  * **What counts as a winner:** a variant that is better than base *at matched
+    params*. That means below the log-param interpolation of the base FRLM scaling
+    curve, not merely below base's raw BPC. Winners get the standard 12-cell tune
+    before they enter any comparison.

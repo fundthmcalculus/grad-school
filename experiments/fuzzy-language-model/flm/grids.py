@@ -320,3 +320,53 @@ def _lrwidth():
 
 
 register("lrwidth", _lrwidth())
+
+
+# ----------------------------------------------------------------------------- the ~2 BPC FRLM
+# Added 2026-10-10 (user: "focus on the 2 bpc fuzzy recurrent model"). See RESULTS.md.
+
+
+def _minsize():
+    """Where does the best FRLM actually cross 2.0 BPC? Widths below the scaling grid,
+    with DeltaNet (the best neural arm at small size) as the reference. Tuned settings as in
+    `scaling`; seeds 0-2."""
+    try:
+        arms = {
+            "frlm-delta-htsk": ARMS_V2["frlm-delta-htsk"]
+            + best_tune("frlm-delta-htsk"),
+            "delta-mlp": ARMS["delta-mlp"] + best_tune("delta-mlp"),
+        }
+    except RuntimeError:
+        return []
+    return scaling_grid([8, 10, 12, 14], [2], [0, 1, 2], "30e6", arms=arms)
+
+
+LEAN_VARIANTS = {
+    # each changes ONE thing relative to frlm-delta-htsk at d=16 (later flags override)
+    "ffnonly": ["--exp-norm", "sum", "--ffn-exp-norm", "mean"],
+    "wdim": ["--width-share", "dim"],
+    "wrule": ["--width-share", "rule"],
+    "share2": ["--layers", "2", "--n-unique", "1"],
+    "share3": ["--layers", "3", "--n-unique", "1"],
+    "share4": ["--layers", "4", "--n-unique", "1"],
+}
+
+
+def _lean():
+    """Design-iteration screen at d=16 (the ~2 BPC regime), seeds 0-1, at frlm-delta-htsk's
+    tuned lr/shortconv. The reference is the existing scaling2 frlm-delta-htsk_d16 cells.
+    """
+    try:
+        base = ARMS_V2["frlm-delta-htsk"] + best_tune("frlm-delta-htsk")
+    except RuntimeError:
+        return []
+    common = ["--d", "16", "--layers", "2", "--chars", "30e6"]
+    return [
+        (f"frlm-delta-htsk-{v}_d16_L2_s{s}", base + common + ["--seed", str(s)] + extra)
+        for v, extra in LEAN_VARIANTS.items()
+        for s in (0, 1)
+    ]
+
+
+register("minsize", _minsize())
+register("lean", _lean())
