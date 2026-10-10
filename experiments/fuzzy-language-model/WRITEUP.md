@@ -44,8 +44,8 @@ this document and `RESULTS.md` differ, `RESULTS.md` is the record.
    fuzzy model that scores **1.274** vs **1.293** for the size-near neural reference at 30M
    characters (3 seeds; a 2.85-standard-error lead that is **not yet citable**: the reference
    is 4.6% smaller and less tuned). A BPE1024 version (93K params) reaches **1.129** at 30M
-   (2 seeds) and **1.055** at 100M (1 seed), **with no neural control on the same tokenizer
-   yet**. Post-training adds nothing beyond compute. The open fairness gaps are listed in §12.
+   (2 seeds), **1.055** at 100M and **1.021** at 300M (1 seed each), **with no neural control on the
+   same tokenizer yet**. Post-training adds nothing beyond compute. The open fairness gaps are listed in §12.
 
 ## 2. Questions
 
@@ -366,8 +366,9 @@ The filled configuration **D** (d = 72, 8 heads, 16 rules per head, FFN width 1.
 | delta-mlp, d 74, 2 heads | 96,430 | 1.3426 ± 0.007 |
 | original FLM, d 64 (the CPU-phase design) | 97,280 | 1.6231 ± 0.008 |
 
-At 100M chars (seed 0, one run each): D **1.2080** vs a *smaller* (73K) delta-mlp 1.3270. D trains at ≈ 3× lower
-throughput (34K vs 114K chars/s). **The lead over the closest reference is 0.019 BPC = 2.85 standard errors at
+At 100M chars (seed 0, one run each): D **1.2080** vs a *smaller* (73K) delta-mlp 1.3270. D trained at 34K chars/s. The size-near reference's three runs recorded 50K, 56K and 85K
+chars/s on the shared GPU (the 114K figure quoted in `RESULTS.md` is the *smaller* 73K delta-mlp at
+100M chars), so the speed gap is roughly 1.5–2.5×, not a precise ratio. **The lead over the closest reference is 0.019 BPC = 2.85 standard errors at
 3 seeds (CPU-session calculation) and is not yet a citable claim:** the reference has 4.6% fewer parameters
 (≈ 0.006 BPC of the lead from the `scaling2` slope), D's search covered heads, rules, antecedent size, short-conv,
 depth, FFN shape and lr while the reference got heads and one lr, and ten seeds are the protocol (§12).
@@ -412,6 +413,7 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 | | BPE512 D d = 56, 24-dim antecedent | 90,080 | 1.3413 |
 | `v5-final100k` | **BPE1024 D d = 48**, 30M, 2 seeds | 93,344 | **1.1292 ± 0.0031** |
 | | BPE1024 D d = 48, 100M, 1 seed | 93,344 | **1.0548** |
+| `v5-long` (300M, 1 seed) | BPE1024 D d = 48, lr 3e-2 / lr 2e-2 | 93,344 | **1.0212** / 1.0227 |
 
 * **Caveats the GPU session asked to be stated:** the subword result is **2 seeds at 30M and 1 seed at 100M**;
   there is **no neural control on the same tokenizer yet**; and the 150K-vs-162K comparisons are at equal
@@ -420,6 +422,7 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 * A larger vocabulary buys the most at roughly constant parameters (512 < 768 < 1024, monotone); more FFN rules
   or a wider antecedent buy ≈ 0 (inside the 0.01 noise). The trend is untested above 1024.
 * The 93K subword model at 30M chars (1.129) beats the 97.5K character model at 100M (1.208).
+* **Returns on data shrink:** 30M → 100M gave −0.074 and 100M → 300M gave −0.034 (single seeds), so 1B characters would be expected to give about −0.02. The two learning rates tried at 300M (3e-2 and 2e-2) differ by 0.0015, inside seed noise.
 * **Text is better but not coherent.** At T 0.7 / top-k 20 the BPE1024 model invents more non-words (2.2%) than
   the character models (0.4–0.9%); sampling at T 0.5 / top-k 10 drops that to 0.65% at the price of looping
   ("They did not like the box. They did not like the box.", repeated-sentence share 2.9%). Samples show
@@ -432,7 +435,7 @@ the text's probability, so the reported BPC is, if anything, conservative for th
 |---|---|---|
 | **Char-level D vs the reference at equal effort** | 4.6% parameter mismatch; D searched far more than the reference; 3 seeds | `v4-ref-tune`, `v3-lr`, `v4-final10` (`PLAN_GPU.md`) |
 | **No neural control on the same tokenizer** | the subword headline is a statement about subwords until a neural BPE1024 model of the same size is tuned equally | `v6-d-lr`, `v6-ref-tune`, `v6-final10` (`flm/grids_v6.py`, ~2–3 GPU-h) |
-| **D's lr on subwords** was only ever 3e-2 | the neural control gets a 4-lr search | `v6-d-lr` |
+| **D's lr on subwords**: only 3e-2 and 2e-2 were run (300M chars, 1 seed, a tie within 0.002) | the neural control gets a 4-lr search | `v6-d-lr` (4e-2 and 6e-2 not run) |
 | **Ten seeds** | every cell is 1–3 seeds; AGENTS.md makes ten the protocol | `v4-final10`, `v6-final10` |
 | **LR transfer (H10a) and `v3-lr`** | incomplete: the 1e-2 cells were lost to a crash from a stale `train.py`, the 2e-2 cells were killed for VRAM contention | resume `v3-lr`, `lrwidth` |
 | **Coherence** | BPC is not coherence; text loops at low temperature | a coherence grader, or longer context and larger models |

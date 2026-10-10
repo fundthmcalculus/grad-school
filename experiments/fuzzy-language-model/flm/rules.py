@@ -232,6 +232,48 @@ def rulebook(model, tok, windows, codec, top=6, max_rules=20) -> str:
     return "\n".join(lines) + "\n"
 
 
+def ffn_rule_rows(model, windows, codec, top=3, max_rules=15) -> list[dict]:
+    """Structured form of the FFN part of the rulebook: one dict per rule (most used first, per layer).
+
+    Keys: layer, rule, wins (share of positions where it wins), firing (mean), gain / gain_sd (first-order
+    only, else None), fires_on (its most common context endings), examples (strongest contexts), raises
+    and raises_neg (logit-lens readings; raises_neg is None for zero-order rules)."""
+    rec = capture(model, windows)
+    rows = []
+    for (kind, li), m in sorted(rec.items(), key=lambda kv: (kv[0][1], kv[0][0])):
+        if kind != "ffn":
+            continue
+        N, T, R = m.shape
+        ffn = model.blocks[li].ffn
+        first = getattr(ffn, "order", 0) == 1
+        win_idx = m.argmax(-1)
+        win = torch.bincount(win_idx.reshape(-1), minlength=R).float() / (N * T)
+        gain = ffn.slope(rec[("ffn_x", li)]) if first else None
+        for r in torch.argsort(-win).tolist()[:max_rules]:
+            ex, end = describe_rule(m[..., r], windows, codec, top)
+            o = ffn.conseq[r].detach()
+            g = gd = None
+            if first:
+                wh = win_idx == r
+                g = gain[..., r][wh].mean().item() if wh.any() else None
+                gd = gain[..., r][wh].std().item() if wh.sum() > 1 else None
+            rows.append(
+                {
+                    "layer": li,
+                    "rule": r,
+                    "wins": win[r].item(),
+                    "firing": m[..., r].mean().item(),
+                    "gain": g,
+                    "gain_sd": gd,
+                    "fires_on": [s for s, _ in end],
+                    "examples": [e.strip("`") for e in ex],
+                    "raises": lens(model, o, codec),
+                    "raises_neg": lens(model, -o, codec) if first else None,
+                }
+            )
+    return rows
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("checkpoint")

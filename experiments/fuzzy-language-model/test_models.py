@@ -585,3 +585,23 @@ def test_bpe_codec_renders_pieces_visibly():
     shown = codec.piece(ids)
     assert "·" in shown and "↵" in shown and " " not in shown and "\n" not in shown
     assert codec.piece([tok.token_to_id("\x1f")]) == "⏎⏎"
+
+
+@pytest.mark.parametrize("first_order", [False, True])
+def test_ffn_rule_rows_structure(first_order):
+    from flm.rules import ffn_rule_rows
+
+    kw = dict(ffn_order=1, ffn_norm="none", tsk_dim=8) if first_order else {}
+    m = _rule_model(**kw)
+    windows = torch.randint(0, 98, (12, 24))
+    rows = ffn_rule_rows(m, windows, _FakeCodec(), top=3, max_rules=5)
+    assert len(rows) == 2 * 5  # two layers, five rules each
+    r = rows[0]
+    assert {"layer", "rule", "wins", "firing", "fires_on", "examples", "raises"} <= set(
+        r
+    )
+    assert (r["gain"] is not None) == first_order and (
+        r["raises_neg"] is not None
+    ) == first_order
+    assert rows[0]["wins"] >= rows[1]["wins"]  # most used first within a layer
+    assert abs(sum(x["wins"] for x in rows if x["layer"] == 0)) <= 1.0 + 1e-9
