@@ -1,22 +1,28 @@
 """Read a trained FLM/FRLM as a rulebook.
 
-    .venv/bin/python -m flm.rules outputs/<sweep>/<run>.pt [--windows 400] [--top 8]
+    .venv/bin/python -m flm.rules outputs/<grid>/<run>.pt [--windows 400] [--top 6] [--max-rules 20]
 
-For every TSK component in the model:
+Works on character models and on subword (``--tok bpeN``) checkpoints, on the zero-order softmax-normalised
+TSK FFN and on the goal-track first-order raw-firing one. For every TSK component:
 
-* **Sequence-mixer rules** (``fuzzy`` / ``fuzzydelta`` mixers, per head): the antecedent
-  of rule r is a Gaussian region of key/query space. It is described by the text
-  contexts whose *key* membership in r is highest on validation data (the write side:
-  "what gets stored in rule r"). The consequent is in-context state, so it has no
-  fixed reading; we report how often and how crisply the rule fires instead.
-* **Channel-mixer rules** (``tsk`` FFN): antecedent as above (the contexts that fire the
-  rule most); the constant consequent a_r is read through the logit lens, i.e. the
-  final RMSNorm and the tied unembedding, as "THEN raise these next characters".
-  The lens ignores later layers, so it is a direct-path reading, not the whole effect.
+* **Sequence-mixer rules** (``fuzzy`` / ``fuzzydelta``, per head): a Gaussian region of key/query space,
+  described by the contexts whose *key* membership is highest on held-out text (the write side, "what gets
+  stored in rule r"). The consequent is in-context state, so it has no fixed reading; usage and crispness
+  are reported instead.
+* **Channel-mixer (FFN) rules**: the antecedent is described by the contexts that fire the rule most. The
+  consequent is read through the logit lens (the final RMSNorm and the tied unembedding), as "THEN raise
+  these next tokens".
+  * *zero-order:* output = sum_r w_r a_r, so the lens of a_r is the whole consequent.
+  * *first-order:* output = sum_r w_r (v_r . x + b_r) a_r. The rule pushes the next-token logits along
+    +a_r when its gain g_r = v_r . x + b_r is positive and along -a_r when it is negative, so both lenses are
+    shown with the mean gain over the positions where the rule wins. With raw firing (``ffn_norm=none``) the
+    firings are not a distribution: "firing" is reported, not "membership".
 
-Statistics per rule: mean firing (usage), share of positions where it is the winning
-rule, and mean max-membership over all positions (partition crispness, 1/R = uniform,
-1 = crisp).
+The lens ignores later layers, so it is a direct-path reading, not the whole effect.
+
+Statistics per rule: share of positions where it wins, mean firing (usage), and per component the mean
+max-membership over all positions (crispness; 1/R = uniform, 1 = crisp, for normalised firing only).
+Tokens are shown as pieces: ``·`` is a space, ``↵`` a newline, ``⏎⏎`` the story separator.
 """
 
 from __future__ import annotations
@@ -28,22 +34,68 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from flm.data import decode, load
+from flm.data import decode as char_decode
+from flm.data import load as char_load
 from flm.models import FuzzyDeltaMixer, FuzzyRecurrentMixer, ModelConfig, TinyLM, TSKFFN
+
+
+class CharCodec:
+    kind = "char"
+
+    def piece(self, ids) -> str:
+        return _vis(char_decode(ids))
+
+    def windows(self, n: int, T: int, start: int = 2_000_000) -> torch.Tensor:
+        val = char_load("valid")
+        return torch.from_numpy(
+            np.asarray(val[start : start + n * T], dtype=np.int64)
+        ).view(n, T)
+
+
+class BPECodec:
+    kind = "bpe"
+
+    def __init__(self, v: int):
+        from flm.bpe import EOT_CH, BPE
+
+        self.bpe, self.eot_ch = BPE(v), EOT_CH
+
+    def piece(self, ids) -> str:
+        out = []
+        for i in ids:
+            i = int(i)
+            tok = self.bpe.tok.id_to_token(i)
+            out.append("⏎⏎" if tok == self.eot_ch else self.bpe.tok.decode([i]))
+        return _vis("".join(out))
+
+    def windows(self, n: int, T: int, start: int = 900_000) -> torch.Tensor:
+        val = self.bpe.load("valid")
+        return torch.from_numpy(
+            np.asarray(val[start : start + n * T], dtype=np.int64)
+        ).view(n, T)
+
+
+def _vis(s: str) -> str:
+    return s.replace("\n<|eot|>\n", "⏎⏎").replace("\n", "↵").replace(" ", "·")
+
+
+def make_codec(tok: str):
+    return BPECodec(int(tok.removeprefix("bpe"))) if tok else CharCodec()
 
 
 def load_model(path):
     ck = torch.load(path, map_location="cpu", weights_only=False)
     m = TinyLM(ModelConfig(**ck["config"]))
     m.load_state_dict(ck["state"])
-    return m.eval()
+    return m.eval(), ck.get("tok", "") or ""
 
 
+@torch.no_grad()
 def capture(model, windows):
-    """Run windows through the model, recording key-side memberships and FFN firing."""
-    rec = {}
-    handles = []
-    for li, blk in enumerate(getattr(model, "blocks", [])):
+    """Run windows through the model, recording key-side memberships (mixers) and, for each TSK FFN, its
+    firing and its input (needed for the first-order gains)."""
+    rec, undo = {}, []
+    for li, blk in enumerate(model.blocks):
         mix = blk.mix
         if isinstance(mix, (FuzzyRecurrentMixer, FuzzyDeltaMixer)):
             orig = mix.features
@@ -54,9 +106,14 @@ def capture(model, windows):
                 return fq, fk, v
 
             mix.features = feats
-            handles.append((mix, "features", orig))
+            undo.append((mix, "features", orig))
         if isinstance(blk.ffn, TSKFFN):
             ffn = blk.ffn
+
+            def pre(_m, args, _li=li):
+                rec.setdefault(("ffn_x", _li), []).append(args[0].detach())  # (B,T,d)
+
+            h = ffn.register_forward_pre_hook(pre)
             orig_f = ffn.firing
 
             def firing(x, _orig=orig_f, _li=li):
@@ -65,45 +122,114 @@ def capture(model, windows):
                 return w
 
             ffn.firing = firing
-            handles.append((ffn, "firing", orig_f))
-    with torch.no_grad():
-        for i in range(0, len(windows), 32):
-            model(windows[i : i + 32])
-    for obj, name, orig in handles:
-        setattr(obj, name, orig)
+            undo.append((ffn, "firing", orig_f))
+            undo.append((h, None, None))
+    for i in range(0, len(windows), 32):
+        model(windows[i : i + 32])
+    for obj, name, orig in undo:
+        obj.remove() if name is None else setattr(obj, name, orig)
     return {k: torch.cat(v, 0) for k, v in rec.items()}
 
 
-def show(ctx_ids):
-    s = decode(ctx_ids).replace("\n<|eot|>\n", "⏎⏎").replace("\n", "⏎")
-    return s
-
-
-def describe_rule(memb, windows, top, ctx_len=14):
-    """memb: (N, T) membership of one rule over all positions."""
+def describe_rule(memb, windows, codec, top, ctx_len=14):
+    """memb: (N, T) activation of one rule over all positions -> strongest contexts and common endings."""
     flat = memb.reshape(-1)
     T = memb.shape[1]
-    idx = torch.topk(flat, top * 20).indices
-    examples, suffixes = [], Counter()
+    idx = torch.topk(flat, min(len(flat), top * 20)).indices
+    examples, endings = [], Counter()
     for j in idx.tolist():
         n, t = divmod(j, T)
-        lo = max(0, t - ctx_len + 1)
-        ctx = windows[n, lo : t + 1].tolist()
-        suffixes[show(ctx[-2:])] += 1
+        ctx = windows[n, max(0, t - ctx_len + 1) : t + 1].tolist()
+        endings[codec.piece(ctx[-1:])] += 1
         if len(examples) < top:
-            examples.append(f"`{show(ctx)}`")
-    return examples, suffixes.most_common(3)
+            examples.append(f"`{codec.piece(ctx)}`")
+    return examples, endings.most_common(3)
 
 
-def logit_lens(model, vec, k=6):
-    with torch.no_grad():
-        logits = model.norm(vec[None]) @ model.emb.weight.T
-        p = torch.softmax(logits[0], -1)
+@torch.no_grad()
+def lens(model, vec, codec, k=6):
+    """Top-k next tokens the vector pushes towards (final norm, tied unembedding)."""
+    p = torch.softmax(model.norm(vec[None]) @ model.emb.weight.T, -1)[0]
     top = torch.topk(p, k)
     return ", ".join(
-        f"`{show([i])}` {v:.2f}"
+        f"`{codec.piece([i])}` {v:.2f}"
         for v, i in zip(top.values.tolist(), top.indices.tolist())
     )
+
+
+def rulebook(model, tok, windows, codec, top=6, max_rules=20) -> str:
+    rec = capture(model, windows)
+    lines = [
+        f"config: `{model.cfg.to_dict()}`",
+        f"tokenizer: `{tok or 'character'}`",
+        "",
+    ]
+    for (kind, li), m in sorted(rec.items(), key=lambda kv: (kv[0][1], kv[0][0])):
+        if kind == "mix":
+            N, H, T, R = m.shape
+            for h in range(H):
+                mh = m[:, h]
+                crisp = mh.max(-1).values.mean().item()
+                win = torch.bincount(mh.argmax(-1).reshape(-1), minlength=R).float() / (
+                    N * T
+                )
+                lines += [
+                    f"## Layer {li} sequence mixer, head {h}: {R} rules (crispness {crisp:.2f}; uniform = {1 / R:.2f})",
+                    "",
+                ]
+                for r in torch.argsort(-win).tolist()[: max_rules or R]:
+                    ex, end = describe_rule(mh[..., r], windows, codec, top)
+                    lines.append(
+                        f"- **rule {r}**: wins {win[r]:.1%} of positions, mean membership {mh[..., r].mean():.3f}"
+                    )
+                    lines.append(
+                        f"  - stores contexts ending in: {', '.join(f'`{s}` ({c})' for s, c in end)}"
+                    )
+                    lines.append(f"  - strongest: {' · '.join(ex)}")
+                lines.append("")
+        elif kind == "ffn":
+            N, T, R = m.shape
+            ffn = model.blocks[li].ffn
+            first = getattr(ffn, "order", 0) == 1
+            raw = getattr(ffn, "norm", "softmax") == "none"
+            win_idx = m.argmax(-1)
+            win = torch.bincount(win_idx.reshape(-1), minlength=R).float() / (N * T)
+            alive = int((win > 0.001).sum())
+            head = f"## Layer {li} TSK feed-forward ({'first' if first else 'zero'}-order, {'raw' if raw else 'normalised'} firing): {R} rules, {alive} win > 0.1% of positions"
+            if not raw:
+                head += f" (crispness {m.max(-1).values.mean().item():.2f}; uniform = {1 / R:.3f})"
+            lines += [head, ""]
+            gain = None
+            if first:
+                x_in = rec[("ffn_x", li)]
+                gain = ffn.slope(x_in)  # (N,T,R): rule r's gain at every position
+            for r in torch.argsort(-win).tolist()[: max_rules or R]:
+                ex, end = describe_rule(m[..., r], windows, codec, top)
+                head_r = f"- **rule {r}**: wins {win[r]:.1%}, mean firing {m[..., r].mean():.3f}"
+                lines.append(head_r)
+                lines.append(
+                    f"  - fires on contexts ending in {', '.join(f'`{s}`' for s, _ in end)}; strongest: {' · '.join(ex)}"
+                )
+                o = ffn.conseq[r].detach()
+                if first:
+                    wins_here = win_idx == r
+                    g = (
+                        gain[..., r][wins_here].mean().item()
+                        if wins_here.any()
+                        else float("nan")
+                    )
+                    sd = (
+                        gain[..., r][wins_here].std().item()
+                        if wins_here.sum() > 1
+                        else float("nan")
+                    )
+                    lines.append(
+                        f"  - gain where it wins: {g:+.2f} ± {sd:.2f}; THEN raise {lens(model, o, codec)}; when the gain is negative, raise {lens(model, -o, codec)}"
+                    )
+                else:
+                    lines.append(f"  - THEN raise {lens(model, o, codec)}")
+            lines.append("")
+    return "\n".join(lines) + "\n"
 
 
 def main():
@@ -112,73 +238,17 @@ def main():
     ap.add_argument("--windows", type=int, default=400)
     ap.add_argument("--top", type=int, default=6)
     ap.add_argument(
-        "--max-rules",
-        type=int,
-        default=0,
-        help="limit rules shown per component (0 = all)",
+        "--max-rules", type=int, default=20, help="rules shown per component (0 = all)"
     )
     a = ap.parse_args()
-    model = load_model(a.checkpoint)
-    T = model.cfg.max_len
-    val = load("valid")
-    # second half of the validation slice: disjoint from the 1M chars used for val BPC
-    start = 2_000_000
-    w = torch.from_numpy(
-        np.asarray(val[start : start + a.windows * T], dtype=np.int64)
-    ).view(a.windows, T)
-    rec = capture(model, w)
-    lines = [
-        f"# Rulebook: `{Path(a.checkpoint).name}`",
-        "",
-        f"config: `{model.cfg.to_dict()}`",
-        "",
-    ]
-    for (kind, li), m in sorted(rec.items(), key=lambda kv: (kv[0][1], kv[0][0])):
-        if kind == "mix":
-            N, H, Tt, R = m.shape
-            for h in range(H):
-                mh = m[:, h]  # (N,T,R)
-                crisp = mh.max(-1).values.mean().item()
-                win = torch.bincount(mh.argmax(-1).reshape(-1), minlength=R).float() / (
-                    N * Tt
-                )
-                lines += [
-                    f"## Layer {li} sequence mixer, head {h}: {R} rules (crispness {crisp:.2f}; uniform = {1 / R:.2f})",
-                    "",
-                ]
-                order = torch.argsort(-win).tolist()
-                for r in order[: a.max_rules or R]:
-                    ex, suf = describe_rule(mh[..., r], w, a.top)
-                    lines.append(
-                        f"- **rule {r}** — wins {win[r]:.1%} of positions, mean membership {mh[..., r].mean():.3f}"
-                    )
-                    lines.append(
-                        f"  - stores contexts ending in: {', '.join(f'`{s}` ({c})' for s, c in suf)}"
-                    )
-                    lines.append(f"  - strongest: {' · '.join(ex)}")
-                lines.append("")
-        else:
-            N, Tt, R = m.shape
-            ffn = model.blocks[li].ffn
-            crisp = m.max(-1).values.mean().item()
-            win = torch.bincount(m.argmax(-1).reshape(-1), minlength=R).float() / (
-                N * Tt
-            )
-            alive = int((win > 0.001).sum())
-            lines += [
-                f"## Layer {li} TSK channel mixer: {R} rules, {alive} win >0.1% of positions (crispness {crisp:.2f}; uniform = {1 / R:.3f})",
-                "",
-            ]
-            order = torch.argsort(-win).tolist()
-            for r in order[: a.max_rules or R]:
-                ex, suf = describe_rule(m[..., r], w, a.top)
-                lines.append(
-                    f"- **rule {r}** — wins {win[r]:.1%}; IF context ends like {', '.join(f'`{s}`' for s, _ in suf)} THEN raise {logit_lens(model, ffn.conseq[r])}"
-                )
-                lines.append(f"  - strongest: {' · '.join(ex)}")
-            lines.append("")
+    model, tok = load_model(a.checkpoint)
+    codec = make_codec(tok)
+    windows = codec.windows(a.windows, model.cfg.max_len)
     out = Path(a.checkpoint).with_suffix(".rules.md")
-    out.write_text("\n".join(lines) + "\n")
+    out.write_text(
+        f"# Rulebook: `{Path(a.checkpoint).name}`\n\n"
+        + rulebook(model, tok, windows, codec, a.top, a.max_rules)
+    )
     print(out)
 
 

@@ -1,11 +1,13 @@
 # Tiny fuzzy language models: linear vs quadratic attention, and a recurrent TSK language model
 
-**Status:** CPU phase stopped 2026-10-10, to be repeated and extended on a GPU host ·
+**Status:** CPU phase stopped 2026-10-10; GPU phase in progress (§10–§12, transcribed from the GPU session's records) ·
 **Experiment:** `experiments/fuzzy-language-model/` · **PR:** #272 · **Dashboard:**
 https://claude.ai/artifact/XGJzPWz5T5i2wQvVE6C3Y4 (private until shared)
 
-This write-up summarises 365 completed training runs (≈235 CPU-hours on a 4-core laptop,
-2026-10-08 → 10). The laboratory record behind it is [`RESULTS.md`](RESULTS.md): every
+§1–§9 summarise 365 completed CPU training runs (≈235 CPU-hours on a 4-core laptop, 2026-10-08 → 10)
+and the d = 16 n-gram screen (§5.6). §10–§12 summarise the GPU session's goal-track and subword work,
+**transcribed by the CPU session from `RESULTS.md` and not re-run; the GPU session should check every
+number** (the open fairness gaps are in §12). The laboratory record behind it is [`RESULTS.md`](RESULTS.md): every
 hypothesis as registered before its run, every protocol amendment, every correction. Where
 this document and `RESULTS.md` differ, `RESULTS.md` is the record.
 
@@ -35,7 +37,15 @@ this document and `RESULTS.md` differ, `RESULTS.md` is the record.
    inference said the opposite and is corrected.
 5. **Negative results:** data-driven rule initialisation hurts or does nothing; the
    learning rate tuned at width 32 transfers to width 96 for attention mixers (checked) and
-   is suspected not to for GRU / FLM / classic FRLM (not yet checked).
+   is suspected not to for GRU / FLM / classic FRLM (not yet checked). Rule initialisation
+   from n-gram statistics is a null at d = 16 on that old FFN (§5.6).
+6. **GPU phase (§10–§12, transcribed, not re-run):** redesigning the TSK feed-forward
+   (first-order consequents, un-normalised firing, HTSK) and adding heads gives a 97.5K-parameter
+   fuzzy model that scores **1.274** vs **1.293** for the size-near neural reference at 30M
+   characters (3 seeds; a 2.85-standard-error lead that is **not yet citable**: the reference
+   is 4.6% smaller and less tuned). A BPE1024 version (93K params) reaches **1.129** at 30M
+   (2 seeds) and **1.055** at 100M (1 seed), **with no neural control on the same tokenizer
+   yet**. Post-training adds nothing beyond compute. The open fairness gaps are listed in §12.
 
 ## 2. Questions
 
@@ -213,6 +223,30 @@ For attention mixers the tuned lr transfers to 3× the width within 0.01 (H10b s
 (GRU 1.68 → 1.81; frlm-acc 1.665 → 1.756). Until their cells run, their large-width points
 are treated as LR-limited and say nothing about capacity.
 
+### 5.6 Initialising the fuzzy rules from n-gram statistics (CPU screen, d = 16)
+
+A count-based n-gram language model is a crisp zero-order TSK system ("IF the last k characters are g THEN
+p(next | g)"), so the fuzzy rules can start from it. `flm/ngram.py` places one rule per frequent context
+(centres found empirically through the forward pass), decodes the consequents through the tied embedding and
+calibrates rule width, consequent scale and output gain on training windows.
+
+* **Reference points on this data** (1M validation chars): unigram 4.42, **bigram 3.30, trigram 2.39,
+  four-gram 1.82** bits/char. The 8.6K-parameter FRLM (1.96) sits between trigram and four-gram quality.
+* **A random d = 16 embedding cannot represent n-gram distributions:** its rank-16 readout of the bigram
+  log-probs scores 7.5 BPC (worse than uniform, 6.6); an embedding aligned to the top-16 principal
+  directions of the conditional log-probs scores 3.57. The first init attempt failed for exactly this reason.
+* **A 32-rule bank covers 98% of positions with bigram rules but only 43% with trigram rules** (ceilings 3.59
+  and 4.04 BPC); clustering contexts into rules does not beat top-k.
+* **The init works as an init:** held-out starting BPC 3.70 (bigram) and 4.16 (trigram, 2-tap antecedent)
+  against 6.62 for a random start; zeroing the layer-0 consequents sends BPC to 12+, so the rules carry it.
+* **It does not survive training.** Every variant (d = 16, 10M chars, 4 baseline seeds, mean 2.077, std 0.026):
+  n-gram init **+0.027**, 2-tap antecedent **−0.030**, FFN-only HTSK **−0.025**, none beyond 2 standard
+  errors. The head start is gone within ~100 of 1221 steps. A lesson from this screen: with 2 baseline seeds the
+  noise estimate was off by 35%, and a one-seed variant ranking is not usable at this design's noise.
+* **Scope:** a null for the *old zero-order FFN* at 8.6K parameters. The GPU session's FFN (§10) has seed noise
+  ~10× smaller, so the same ideas are testable there (`v4-taps`); the init now runs on that FFN (starting BPC
+  3.94 bigram / 3.47 trigram + 2 taps on D) but has not been trained.
+
 ## 6. Hypothesis scorecard
 
 | | hypothesis (abridged; registered text in `RESULTS.md`) | outcome |
@@ -227,7 +261,8 @@ are treated as LR-limited and say nothing about capacity.
 | H8 | an HTSK / data-init variant beats classic | **supported** for FRLMs (predicted winner wrong); not for FLM |
 | H9 / H9b | where the HTSK gain lives | **gain is in the FFN** (H9 supported; H9b refuted) |
 | H10 | tuned lr transfers to d = 96 | **H10b supported so far**; H10a open |
-| H11 / H12 | true minimum size; leaner rules / shared depth | **not run** (stopped) |
+| H11 / H12 | true minimum size; leaner rules / shared depth | **not run** (stopped); shared depth and shared widths screened at d = 16: worse, in line with their parameter counts |
+| P1–P12 | n-gram init screen (`RESULTS.md`) | init is a null (§5.6); GPU-phase hypotheses H13–H23 are scored in §10–§11 |
 
 ## 7. Limitations
 
@@ -244,6 +279,11 @@ are treated as LR-limited and say nothing about capacity.
 * **Unfinished grids:** `ablate` (12 cells), `lrwidth` (14), `minsize` (24), `lean` (12).
 
 ## 8. Repeating and extending on the GPU host
+
+> **Partly superseded.** The GPU session ran its own track (§10–§11) rather than this repeat. The
+> unfinished CPU grids (`ablate`, `lrwidth`, `minsize`, `lean`) and the ten-seed `headline10*` grids
+> concern the old zero-order FFN and have not run. What to run next, in priority order, is in
+> [`PLAN_GPU.md`](PLAN_GPU.md); who owns what is in [`COORDINATION.md`](COORDINATION.md).
 
 Everything is resumable. Grids skip finished records, hyperparameters come from the
 committed `outputs/tune/*.json`, and every record carries `device` / `host`.
@@ -284,6 +324,121 @@ would silently go empty.
 by `flm/analyze.py` (tables) and `flm/dashboard_export.py` (the dashboard's six datasets,
 verified byte-identical to the published ones). Tests (32) pin the identities in §3:
 `.venv/bin/python -m pytest -q`.
+
+## 10. GPU phase: a fuzzy LM that leads the size-near neural reference (transcribed, not re-run)
+
+*Source: `RESULTS.md`, "Goal track" and the `v3-*` records, by the GPU session. Objective: best val BPC at < 100K
+total parameters, embedding included, on CUDA, 30M chars unless stated. Nothing here was pre-registered before its
+screen; each stage was chosen after seeing the last, so none of it is a hypothesis test.*
+
+**10.1 Where the fuzzy deficit was** (`v3-attrib`, d = 64, seed 0). Every mixer × FFN pairing:
+
+| mixer | MLP FFN | TSK FFN (the old design) |
+|---|---|---|
+| softmax | 1.512 (72.6K) | 1.826 (97.2K) |
+| Gaussian-TSK attention | 1.492 | 1.781 |
+| linear | 1.503 | 1.720 |
+| FRLM, accumulating | 1.507 | ≈ 1.715 (101.6K) |
+
+The fuzzy *mixers* cost nothing; the whole ≈ 0.3 BPC fuzzy deficit and ≈ 25K of the parameters were the
+zero-order, softmax-normalised TSK FFN. This independently confirms the CPU finding (§5.2–5.3) at a larger size.
+
+**10.2 The FFN redesign** (`v3-ffn*`, fuzzy-accumulating mixer, d = 64). In order of effect: tied per-rule Gaussian
+widths (fewer parameters); fewer antecedent dimensions (16); **first-order consequents** (rule output
+(vᵣ·x)·oᵣ, a GLU whose gate is the fuzzy membership); **un-normalised firing** (no softmax across rules); the
+HTSK exponent. Raw firing with the summed exponent is unstable (3 seeds: 1.517 / 1.588 / 1.557); with HTSK it is
+stable (seed std 0.0003–0.002). At 3 seeds, 10M chars: the fuzzy FFN **1.4675 ± 0.0003** (87.5K) vs the same mixer
+with a GELU MLP **1.4957 ± 0.0086** (77.0K). *Rejected:* raw firing with 32-dim antecedents (1.685), lr 6e-2.
+
+**10.3 Mixer and shape** (2 seeds). The gain is mostly **head count** (1 / 2 / 4 / 8 heads: 1.534 / 1.464 / 1.441 /
+1.420); the delta form overtakes accumulation from 4 heads up; 16 rules per head beat 8, 32 is no better;
+short-conv 8 > 4; depth (3 layers at d = 48, 4 at d = 40) is no better than 2 at d = 64; lr 3e-2 ≈ 4e-2 > 2e-2.
+The filled configuration **D** (d = 72, 8 heads, 16 rules per head, FFN width 1.5× rules, short-conv 8) has
+**97,520 parameters**.
+
+**10.4 The comparison** (CUDA, 30M chars, 3 seeds):
+
+| model | params | val BPC |
+|---|---|---|
+| **fuzzy D** | 97,520 | **1.2735 ± 0.009** |
+| delta-mlp, d 72, 8 heads | 93,272 | 1.2929 ± 0.004 |
+| delta-mlp, d 72, 4 heads | 92,104 | 1.3108 ± 0.006 |
+| delta-mlp, d 74, 2 heads | 96,430 | 1.3426 ± 0.007 |
+| original FLM, d 64 (the CPU-phase design) | 97,280 | 1.6231 ± 0.008 |
+
+At 100M chars (seed 0, one run each): D **1.2080** vs a *smaller* (73K) delta-mlp 1.3270. D trains at ≈ 3× lower
+throughput (34K vs 114K chars/s). **The lead over the closest reference is 0.019 BPC = 2.85 standard errors at
+3 seeds (CPU-session calculation) and is not yet a citable claim:** the reference has 4.6% fewer parameters
+(≈ 0.006 BPC of the lead from the `scaling2` slope), D's search covered heads, rules, antecedent size, short-conv,
+depth, FFN shape and lr while the reference got heads and one lr, and ten seeds are the protocol (§12).
+
+**10.5 Bigger models and post-training** (`v3-big`, `v3-post`; registered before running; 2 seeds unless noted).
+
+| D at | params | 30M val BPC | +10M continuation | + EMA | + distillation |
+|---|---|---|---|---|---|
+| d = 72 | 97,520 | 1.2753 | **1.2486** | 1.2481 | 1.2496 |
+| d = 80 | 117,312 | 1.2485 | | | |
+| d = 88 | 138,896 | 1.2351 | | | |
+| d = 96 | 162,272 | 1.2170 | 1.1951 | 1.1948 | |
+
+BPC falls monotonically with size (H13 supported), but the gain per parameter is tapering (−0.018 for the last
++23K). **Post-training is a null:** +10M chars at lr 3e-3 gives −0.027 (this is just more training and equals
+what the 30M → 100M curve predicts), weight EMA adds −0.0005, and distilling from a 280K-parameter neural teacher
+that is 0.15 BPC better adds +0.001. Everything that "helped" was compute.
+
+## 11. Subwords: the best model under 100K is a BPE1024 fuzzy model (transcribed, not re-run)
+
+*Source: `RESULTS.md`, `v5-*`. The user's goal is coherent text; at ≈ 1.2 BPC every character model writes real
+words but loses characters and plot. A byte-level BPE (`flm/bpe.py`) lets a 256-token window cover ≈ 600 characters.
+BPC is still bits per character of the same validation text (token character lengths sum exactly to the stream
+length). CPU-session note: the model is scored on the canonical tokenisation only, which is a lower bound on
+the text's probability, so the reported BPC is, if anything, conservative for the subword models.*
+
+| experiment | model | params | val BPC |
+|---|---|---|---|
+| `v5-bpe-probe` (10M, seed 0) | char D d = 96 | 162,272 | 1.3380 |
+| | BPE512 D d = 72 | 127,328 | 1.2671 |
+| | BPE512 D d = 80 | 150,432 | 1.2479 |
+| `v5-bpe30` (30M, 2 seeds) | **BPE512 D d = 80** | 150,432 | **1.1028 ± 0.0054** |
+| | char D d = 96 | 162,272 | 1.2170 |
+| | neural delta-mlp char d = 128 (60M chars) | 280,480 | 1.1153 |
+| `v5-sub100k` (30M, 2 seeds) | **BPE512 D d = 56** | 86,496 | **1.2054 ± 0.0090** |
+| | BPE384 D d = 64 | 97,824 | 1.2260 ± 0.0024 |
+| | char D d = 72 | 97,520 | 1.2753 |
+| `v5-spend` (10M, 2 seeds, warm-up 100) | **BPE1024 D d = 48** | 93,344 | **1.2604 ± 0.0050** |
+| | BPE768 D d = 48 | 81,056 | 1.3080 |
+| | BPE512 D d = 56, FFN 2.0× | 94,616 | 1.3271 |
+| | BPE512 D d = 56 (baseline) | 86,496 | 1.3335 |
+| | BPE512 D d = 56, 24-dim antecedent | 90,080 | 1.3413 |
+| `v5-final100k` | **BPE1024 D d = 48**, 30M, 2 seeds | 93,344 | **1.1292 ± 0.0031** |
+| | BPE1024 D d = 48, 100M, 1 seed | 93,344 | **1.0548** |
+
+* **Caveats the GPU session asked to be stated:** the subword result is **2 seeds at 30M and 1 seed at 100M**;
+  there is **no neural control on the same tokenizer yet**; and the 150K-vs-162K comparisons are at equal
+  *characters*, not equal steps (BPE sees ≈ 2.4× more characters per step, so it takes fewer optimizer steps and
+  its warm-up is a larger share of training).
+* A larger vocabulary buys the most at roughly constant parameters (512 < 768 < 1024, monotone); more FFN rules
+  or a wider antecedent buy ≈ 0 (inside the 0.01 noise). The trend is untested above 1024.
+* The 93K subword model at 30M chars (1.129) beats the 97.5K character model at 100M (1.208).
+* **Text is better but not coherent.** At T 0.7 / top-k 20 the BPE1024 model invents more non-words (2.2%) than
+  the character models (0.4–0.9%); sampling at T 0.5 / top-k 10 drops that to 0.65% at the price of looping
+  ("They did not like the box. They did not like the box.", repeated-sentence share 2.9%). Samples show
+  dialogue and a story arc of sorts, then semantic errors (a girl named Lily "wants to play with Lily"). BPC is
+  not coherence, and no coherence grader exists.
+
+## 12. What stands between these results and a citable claim
+
+| gap | why it matters | how it closes |
+|---|---|---|
+| **Char-level D vs the reference at equal effort** | 4.6% parameter mismatch; D searched far more than the reference; 3 seeds | `v4-ref-tune`, `v3-lr`, `v4-final10` (`PLAN_GPU.md`) |
+| **No neural control on the same tokenizer** | the subword headline is a statement about subwords until a neural BPE1024 model of the same size is tuned equally | `v6-d-lr`, `v6-ref-tune`, `v6-final10` (`flm/grids_v6.py`, ~2–3 GPU-h) |
+| **D's lr on subwords** was only ever 3e-2 | the neural control gets a 4-lr search | `v6-d-lr` |
+| **Ten seeds** | every cell is 1–3 seeds; AGENTS.md makes ten the protocol | `v4-final10`, `v6-final10` |
+| **LR transfer (H10a) and `v3-lr`** | incomplete: the 1e-2 cells were lost to a crash from a stale `train.py`, the 2e-2 cells were killed for VRAM contention | resume `v3-lr`, `lrwidth` |
+| **Coherence** | BPC is not coherence; text loops at low temperature | a coherence grader, or longer context and larger models |
+| **One GPU, one tokenizer family** | unreplicated | `COORDINATION.md` |
+
+Nothing in §10–§11 may be quoted in the proposal until the first three rows have closed.
 
 ## References
 

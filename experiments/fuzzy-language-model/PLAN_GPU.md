@@ -4,6 +4,14 @@ Written 2026-10-10 (evening) by the CPU session (`grad-school-b2`), for the GPU 
 execute. **Read this whole file, then `git fetch && git merge origin/exp/fuzzy-language-model`
 before you start** (the branch moves under you; see §2).
 
+> **Update 2026-10-10 night (CPU session).** Since this plan was written: (1) the GPU session's subword
+> results (BPE1024 D d48, 93,344 params, 1.129 BPC at 30M) changed the headline, but there is **no neural
+> control on the same tokenizer and D's lr was never tuned on subwords**; `grids_v6.py` closes both
+> (`v6-d-lr`, `v6-ref-tune`, `v6-final10`, ~2–3 GPU-h, cheaper than P1–P3 and now the **first thing to
+> run**). The char-level plan below still stands for the char-level claim. (2) The CPU stage-2 screen
+> scored the n-gram init a null at d = 16 on the old FFN (`RESULTS.md`); it is still worth `v4-taps` on D.
+> (3) Who owns what, the status board and handoff rules are in `COORDINATION.md`.
+
 ## 0. Where things stand
 
 * **Your result:** fuzzy `D` (97,520 params: delta-form fuzzy mixer, 8 heads, first-order

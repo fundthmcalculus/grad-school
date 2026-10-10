@@ -467,3 +467,121 @@ def test_compare_verdict_and_screen_report_names():
         and NAME.match("base_s2")["seed"] == "2"
     )
     assert NAME.match("taps2_s0")["variant"] == "taps2"
+
+
+def test_ngram_init_refuses_subword_streams():
+    from flm.train import main
+
+    with pytest.raises(SystemExit, match="character stream"):
+        main(["--tok", "bpe512", "--ngram-init", "1", "--out", "unused.json"])
+
+
+def test_v6_subword_controls_match_d_and_select_from_records(tmp_path, monkeypatch):
+    import json
+
+    import flm.grids_v6 as g
+    from flm.grids_v3 import D
+    from flm.match_mults import n_params
+    from flm.ref_space import NEURAL
+    from flm.train import get_args
+
+    d_argv = D + ["--d", "48", "--layers", "2", "--shortconv", "8"]
+    target = n_params(d_argv, 1024)
+    assert target == 93_344  # the GPU session's recorded count for BPE1024 D d48
+    for (name, sc), mult in g.MULT.items():
+        argv = NEURAL[name] + [
+            "--d",
+            "48",
+            "--layers",
+            "2",
+            "--shortconv",
+            str(sc),
+            "--ffn-mult",
+            str(mult),
+        ]
+        assert abs(n_params(argv, 1024) - target) / target < 0.002, (name, sc)
+
+    monkeypatch.setattr(g, "OUT", tmp_path)
+    assert g._final10() == [] and g.best_d_lr() == "3e-2"
+    (tmp_path / "v6-ref-tune").mkdir()
+    for job, v in {"delta-h8-sc8-lr3e-2": 1.20, "gla-h8-sc4-lr4e-2": 1.21}.items():
+        (tmp_path / "v6-ref-tune" / f"{job}.json").write_text(
+            json.dumps({"val_bpc": v})
+        )
+    (tmp_path / "v6-d-lr").mkdir()
+    for lr, v in ((0.02, 1.3), (0.04, 1.25)):
+        for s in (0, 1):
+            (tmp_path / "v6-d-lr" / f"D-lr{lr:g}_10M_s{s}.json").write_text(
+                json.dumps({"val_bpc": v, "args": {"lr": lr, "seed": s}})
+            )
+    assert g.best_d_lr() == "0.04"
+    jobs = g._final10()
+    assert len(jobs) == 30 and len({n for n, _ in jobs}) == 30  # 10 seeds x (D, 2 refs)
+    for _, argv in jobs:
+        get_args(argv + ["--out", "unused.json"])  # every flag parses
+    assert len(g.REF_JOBS) == 24
+
+
+class _FakeCodec:
+    kind = "char"
+
+    def piece(self, ids):
+        return "".join(chr(97 + int(i) % 26) for i in ids)
+
+
+def _rule_model(**kw):
+    base = dict(
+        mixer="fuzzydelta",
+        ffn="tsk",
+        decay="data",
+        exp_norm="mean",
+        n_heads=2,
+        ffn_mult=2.0,
+    )
+    torch.manual_seed(15)
+    return TinyLM(cfg(**{**base, **kw}))
+
+
+@pytest.mark.parametrize("first_order", [False, True])
+def test_rulebook_reads_both_ffn_kinds_without_changing_the_model(first_order):
+    from flm.rules import rulebook
+
+    kw = dict(ffn_order=1, ffn_norm="none", tsk_dim=8) if first_order else {}
+    m = _rule_model(**kw)
+    windows = torch.randint(0, 98, (12, 24))
+    before = m(windows)
+    text = rulebook(m, "", windows, _FakeCodec(), top=3, max_rules=4)
+    assert torch.equal(before, m(windows))  # capture hooks left the model as it was
+    assert (
+        "first-order, raw firing" if first_order else "zero-order, normalised firing"
+    ) in text
+    assert "sequence mixer, head 1" in text and "THEN raise" in text
+    assert ("gain where it wins" in text) == first_order
+    assert text.count("- **rule") >= 4
+
+
+def test_bpe_codec_renders_pieces_visibly():
+    from types import SimpleNamespace
+
+    from tokenizers import Tokenizer, decoders, models, pre_tokenizers, trainers
+
+    from flm.rules import BPECodec
+
+    tok = Tokenizer(models.BPE())
+    tok.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
+    tok.decoder = decoders.ByteLevel()
+    tr = trainers.BpeTrainer(
+        vocab_size=300,
+        special_tokens=["\x1f"],
+        initial_alphabet=pre_tokenizers.ByteLevel.alphabet(),
+        show_progress=False,
+    )
+    tok.train_from_iterator(
+        ["once upon a time there was a little dog\n"] * 50, trainer=tr
+    )
+    codec = BPECodec.__new__(BPECodec)
+    codec.bpe, codec.eot_ch = SimpleNamespace(tok=tok), "\x1f"
+    ids = tok.encode("once upon a time\n").ids
+    shown = codec.piece(ids)
+    assert "·" in shown and "↵" in shown and " " not in shown and "\n" not in shown
+    assert codec.piece([tok.token_to_id("\x1f")]) == "⏎⏎"

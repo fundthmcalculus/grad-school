@@ -22,15 +22,20 @@ from flm.train import get_args, make_config
 OUT = Path(__file__).resolve().parent / "matched_mults.json"
 
 
-def n_params(argv: list[str]) -> int:
-    return TinyLM(make_config(get_args(argv + ["--out", "unused.json"]))).n_params()
+def n_params(argv: list[str], vocab: int = 0) -> int:
+    """Parameters of the model ``argv`` describes; ``vocab`` > 0 sets a subword vocabulary size
+    (what ``--tok`` does inside train.py) so the tied embedding is counted correctly."""
+    a = get_args(argv + ["--out", "unused.json"])
+    if vocab:
+        a.vocab_size = vocab
+    return TinyLM(make_config(a)).n_params()
 
 
-def match(argv: list[str], target: int) -> tuple[float, int]:
+def match(argv: list[str], target: int, vocab: int = 0) -> tuple[float, int]:
     best = None
     for i in range(100, 700):
         mult = i / 100
-        p = n_params(argv + ["--ffn-mult", str(mult)])
+        p = n_params(argv + ["--ffn-mult", str(mult)], vocab)
         if best is None or abs(p - target) < abs(best[1] - target):
             best = (mult, p)
     return best
