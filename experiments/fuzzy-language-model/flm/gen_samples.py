@@ -21,7 +21,7 @@ PROMPTS = [
     "The little dog was sad because",
     "One day, a girl named Mia found",
 ]
-SETTINGS = [(0.7, 20), (1.0, None)]
+SETTINGS = [(0.5, 10), (0.7, 20), (1.0, None)]
 
 
 def main():

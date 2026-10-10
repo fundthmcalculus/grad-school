@@ -66,10 +66,10 @@ code { font-family: var(--mono); font-size: .9em; }
   <header style="display:flex;flex-direction:column;gap:14px">
     <div class="kicker">fuzzy-language-model · text review · 2026-10-10</div>
     <h1>What the fuzzy model writes</h1>
-    <p class="lede">Switching to subword tokens cut loss from 1.22 to 1.10 bits per character at about the same size, and the stories look more like stories. They are still not coherent. Read the samples, then see what moved and what did not.</p>
+    <p class="lede">A 93K-parameter fuzzy model with a 1,024-token vocabulary now scores 1.05 bits per character after 100M characters, and it fits under the 100K cap. The stories look like stories and still are not coherent. Read the samples, then see what moved and what did not.</p>
   </header>
 
-  <div class="verdict"><b>Verdict.</b> The new subword model (150K parameters, 1.103 BPC) writes dialogue and plot-turn sentences the character models do not, and beats the 280K neural teacher on loss. It still loses track of who is who ("Lily wanted to play with Lily"), and it invents more words (1.5% against under 1%). Loss improved by 0.11 and coherence by far less. Judging that needs a grader, not a loss.</div>
+  <div class="verdict"><b>Verdict.</b> The 93K subword model (1.055 BPC at 100M characters; the 30M checkpoint is shown) and the 150K one writes dialogue and plot-turn sentences the character models do not, and beats the 280K neural teacher on loss. It still loses track of who is who ("Lily wanted to play with Lily"), and it invents more words (1.5% against under 1%). Loss improved by 0.11 and coherence by far less. Judging that needs a grader, not a loss.</div>
 
   <section>
     <h2>Read the samples</h2>
@@ -121,7 +121,7 @@ code { font-family: var(--mono); font-size: .9em; }
 const D = /*DATA*/;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-const label = { "D-d80-bpe512_30M_s0": ["Fuzzy D, subword, 150K", "fz"], "D-d72_30M_s0": ["Fuzzy D, 97K", "fz"], "D-d96_30M_s0": ["Fuzzy D, 162K", "fz"], "teacher-delta-d128_60M_s0": ["Neural teacher, 280K", "nn"] };
+const label = { "D-d48-bpe1024_30M_s0": ["Fuzzy D, subword 1024, 93K", "fz"], "D-d80-bpe512_30M_s0": ["Fuzzy D, subword, 150K", "fz"], "D-d72_30M_s0": ["Fuzzy D, 97K", "fz"], "D-d96_30M_s0": ["Fuzzy D, 162K", "fz"], "teacher-delta-d128_60M_s0": ["Neural teacher, 280K", "nn"] };
 const prompts = [...new Set(D[0].samples.map((s) => s.prompt))];
 const settings = [...new Set(D[0].samples.map((s) => s.temp + "|" + s.top_k))];
 $("sel-prompt").innerHTML = prompts.map((p, i) => `<option value="${i}">${esc(p)}</option>`).join("");
@@ -140,14 +140,15 @@ function render() {
 ["sel-prompt", "sel-set", "sel-seed"].forEach((id) => $(id).addEventListener("change", render));
 render();
 
-$("t-stats").innerHTML = `<tr><th>model</th><th class="n">params</th><th class="n">val BPC</th><th class="n">non-words, T 0.7 / top-k 20</th><th class="n">non-words, T 1.0</th></tr>` +
-  D.map((m) => `<tr><td>${(label[m.name] || [m.name])[0]}</td><td class="n">${m.params.toLocaleString()}</td><td class="n">${m.val_bpc.toFixed(3)}</td><td class="n">${(m["nonword_0.7"] * 100).toFixed(1)}%</td><td class="n">${(m["nonword_1.0"] * 100).toFixed(1)}%</td></tr>`).join("");
+$("t-stats").innerHTML = `<tr><th>model</th><th class="n">params</th><th class="n">val BPC</th><th class="n">non-words, T 0.5 / k 10</th><th class="n">non-words, T 0.7 / k 20</th><th class="n">non-words, T 1.0</th></tr>` +
+  D.map((m) => `<tr><td>${(label[m.name] || [m.name])[0]}</td><td class="n">${m.params.toLocaleString()}</td><td class="n">${m.val_bpc.toFixed(3)}</td><td class="n">${(m["nonword_0.5"] * 100).toFixed(1)}%</td><td class="n">${(m["nonword_0.7"] * 100).toFixed(1)}%</td><td class="n">${(m["nonword_1.0"] * 100).toFixed(1)}%</td></tr>`).join("");
 
 const R = [
   ["Fuzzy D, d 72", "97,520", "1.275", "1.249", "1.248", "1.250"],
   ["Fuzzy D, d 80", "117,312", "1.249", "–", "–", "–"],
   ["Fuzzy D, d 88", "138,896", "1.235", "–", "–", "–"],
   ["Fuzzy D, d 96", "162,272", "1.217", "1.195", "1.195", "–"],
+  ["Fuzzy D, subword (1,024 tokens), d 48", "93,344", "1.129", "–", "–", "–"],
   ["Fuzzy D, subword (512 tokens), d 80", "150,432", "1.103", "–", "–", "–"],
   ["Neural teacher, d 128 (60M chars)", "280,480", "1.115", "", "", ""],
 ];

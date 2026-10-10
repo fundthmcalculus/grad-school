@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-spend\\d-768-d48_10M_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe768",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 768
+ },
+ "config": {
+  "vocab_size": 768,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 81056,
+ "params_nonemb": 44192,
+ "steps": 424,
+ "chars_seen": 10003770,
+ "chars_per_token": 2.8801024,
+ "val_bpc": 1.30643,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   106,
+   1.65377
+  ],
+  [
+   212,
+   1.46318
+  ],
+  [
+   318,
+   1.36018
+  ],
+  [
+   424,
+   1.30643
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.9677
+  ],
+  [
+   50,
+   8.1578
+  ],
+  [
+   100,
+   6.1955
+  ],
+  [
+   150,
+   5.1827
+  ],
+  [
+   200,
+   4.6606
+  ],
+  [
+   250,
+   4.3539
+  ],
+  [
+   300,
+   4.1427
+  ],
+  [
+   350,
+   3.989
+  ],
+  [
+   400,
+   3.8817
+  ],
+  [
+   423,
+   3.8542
+  ]
+ ],
+ "train_seconds": 85.57,
+ "wall_seconds": 99.63,
+ "chars_per_sec": 40592,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a little dog named Tom. He was a owduget place. He was very taughty. Tom did not know what behind a tree. He was too zeet. He thought held him, \"fter you, dog.\"\nBen was surprised and said, \"I am ormrave in towel, Sam. We were a sad boy from the garden. It had a tear with heart that was ables. He was very excited and agreed. He got a bird pine and he heard a big, red dog.\nMom smiled, \"I want to play and jump!\" Sue was so happy and were very happy.\nAfter playing, Tim played with the shore and all all day long, so he went to the park to play with the forest. Tim was so happy and thanked the hill and expenly fairy were best friends.\n<|eot|>\nOnce upon a time, there was a little girl named Pacle. Grandma loved to play outside. One day, Kitty near the poepy up in the sand with her ball. She bed its gass up the tree. Rebly smiled and said, \"No, she made her pond. C",
+ "rule_init": {},
+ "ngram_init": {}
+}

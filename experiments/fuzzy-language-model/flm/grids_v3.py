@@ -359,3 +359,40 @@ for s in (0, 1):
     c = cell(name, D, d=80, sc="8", chars="30e6", seed=s)
     jobs.append((name, c[1] + ["--tok", "bpe512", "--save-model"]))
 register("v5-bpe30", jobs)
+
+
+# v5-sub100k (H19/H20): subword D under 100K parameters, 30M chars, 2 seeds, saved
+jobs = []
+for tok, d in (("bpe384", 64), ("bpe512", 56)):
+    for s in (0, 1):
+        name = f"D-d{d}-{tok}_30M_s{s}"
+        c = cell(name, D, d=d, sc="8", chars="30e6", seed=s)
+        jobs.append((name, c[1] + ["--tok", tok, "--save-model"]))
+register("v5-sub100k", jobs)
+
+
+# v5-spend (H21): subword D variants under 100K, 10M chars, 2 seeds, warm-up 100
+_SP = {
+    "a-512-d56": ("bpe512", 56, []),
+    "b-512-d56-m2.0": ("bpe512", 56, ["--ffn-mult", "2.0"]),
+    "c-512-d56-da24": ("bpe512", 56, ["--tsk-dim", "24"]),
+    "d-768-d48": ("bpe768", 48, []),
+    "e-1024-d48": ("bpe1024", 48, []),
+}
+jobs = []
+for k, (tok, d, extra) in _SP.items():
+    for s in (0, 1):
+        c = cell(f"{k}_10M_s{s}", D, d=d, sc="8", chars="10e6", seed=s)
+        jobs.append((c[0], c[1] + extra + ["--tok", tok, "--warmup", "100"]))
+register("v5-spend", jobs)
+
+
+# v5-final100k (H22/H23): BPE1024 D d=48 (93.3K), the best model under 100K
+jobs = []
+for s in (0, 1):
+    n_ = f"D-d48-bpe1024_30M_s{s}"
+    c = cell(n_, D, d=48, sc="8", chars="30e6", seed=s)
+    jobs.append((n_, c[1] + ["--tok", "bpe1024", "--warmup", "100", "--save-model"]))
+c = cell("D-d48-bpe1024_100M_s0", D, d=48, sc="8", chars="100e6", seed=0)
+jobs.append((c[0], c[1] + ["--tok", "bpe1024", "--warmup", "100", "--save-model"]))
+register("v5-final100k", jobs)

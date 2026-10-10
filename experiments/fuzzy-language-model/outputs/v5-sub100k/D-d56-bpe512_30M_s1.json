@@ -1,0 +1,235 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 56,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-sub100k\\D-d56-bpe512_30M_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 56,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 86496,
+ "params_nonemb": 57824,
+ "steps": 1528,
+ "chars_seen": 30016615,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.21447,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   382,
+   1.48125
+  ],
+  [
+   764,
+   1.34696
+  ],
+  [
+   1146,
+   1.25991
+  ],
+  [
+   1528,
+   1.21447
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.4351
+  ],
+  [
+   50,
+   7.8764
+  ],
+  [
+   100,
+   5.9279
+  ],
+  [
+   150,
+   4.8564
+  ],
+  [
+   200,
+   4.3205
+  ],
+  [
+   250,
+   4.0032
+  ],
+  [
+   300,
+   3.8267
+  ],
+  [
+   350,
+   3.7005
+  ],
+  [
+   400,
+   3.6107
+  ],
+  [
+   450,
+   3.5383
+  ],
+  [
+   500,
+   3.4786
+  ],
+  [
+   550,
+   3.4249
+  ],
+  [
+   600,
+   3.3931
+  ],
+  [
+   650,
+   3.3522
+  ],
+  [
+   700,
+   3.3086
+  ],
+  [
+   750,
+   3.2791
+  ],
+  [
+   800,
+   3.2515
+  ],
+  [
+   850,
+   3.2257
+  ],
+  [
+   900,
+   3.1889
+  ],
+  [
+   950,
+   3.1582
+  ],
+  [
+   1000,
+   3.131
+  ],
+  [
+   1050,
+   3.0979
+  ],
+  [
+   1100,
+   3.078
+  ],
+  [
+   1150,
+   3.0517
+  ],
+  [
+   1200,
+   3.0324
+  ],
+  [
+   1250,
+   3.0108
+  ],
+  [
+   1300,
+   2.9873
+  ],
+  [
+   1350,
+   2.9744
+  ],
+  [
+   1400,
+   2.9675
+  ],
+  [
+   1450,
+   2.9531
+  ],
+  [
+   1500,
+   2.9342
+  ],
+  [
+   1527,
+   2.9287
+  ]
+ ],
+ "train_seconds": 306.93,
+ "wall_seconds": 323.48,
+ "chars_per_sec": 40782,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big, block. It was okay. It was curious. One day, a little bird showed around.\nAt the beautiful tree, there was a big car. The bird was sad. It was a big blue picnicer. It was a careleve. The cable mide and the toy laugh.\nBut then, some stubbive back. The great nose saw a big room that the car would make a big tree. The bird came and saw its cake down. The cat was sad. The cat was the dog went. The dog looked at the sun and saw the dog. The cat looked at the cat and the dog started to run. The dog saw a big cat and the cat became again. The cat saw the cat and a little cat named Tom. Tom wanted to play with Tom.ch the ball and wanted to play with it.\nAmy and Tom found a big tree. They saw a big dog and shared the red ball. He wanted to help the trink around and the cat's sad. The fisherman had an idea. The bird wished he had",
+ "rule_init": {},
+ "ngram_init": {}
+}

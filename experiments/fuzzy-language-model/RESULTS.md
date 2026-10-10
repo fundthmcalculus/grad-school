@@ -710,3 +710,88 @@ Samples: more story structure (dialogue, "something unexpected happened") but st
 size; the comparison is at equal *characters*, not equal steps or wall-clock (BPE sees 2.4× more characters per step,
 runs at 53K chars/s against the character model's 34K for D); the 150K model is over the original 100K cap.
 Not yet tried: BPE vocabularies 256 / 1024, d = 72 at 30M (127K), longer training, any coherence grader.
+
+## Registered 2026-10-10 (night), before `v5-sub100k`: the best subword model that fits under 100K parameters
+
+The 1.103-BPC subword model (150K) is over the original cap. Two subword configurations fit: BPE384 d = 64 (97,824
+params, 1.97 chars/token) and BPE512 d = 56 (86,496 params, 2.40 chars/token). (BPE256 is the byte alphabet with no
+merges, 1.00 chars/token, so it is the character model; dropped.) D architecture, 8 heads, 30M chars, lr 3e-2, seeds 0–1, saved.
+Seen before registering: the 150K result only; nothing at these sizes.
+
+* **H19.** The better of the two beats the sub-100K *character* D (97,520 params, 1.2753 at 30M, 2 seeds) by ≥ 0.08 BPC.
+  *(~65%.)* *Basis:* the gain at 150K was 0.114 over the 162K character model; shrinking the width lowers the benefit, and
+  the embedding is a larger share of a small model.
+* **H20.** The 384-vocabulary d = 64 model beats the 512-vocabulary d = 56 model (the wider model wins over the
+  richer vocabulary at equal budget). *(~55%.)*
+* Not covered: ten seeds; BPE vocabularies other than these; any claim about coherence.
+
+### Outcome `v5-sub100k` (30M chars, 2 seeds)
+
+| model | params | chars/token | val BPC |
+|---|---|---|---|
+| **BPE512 D d = 56** | 86,496 | 2.40 | **1.2054 ± 0.0090** (1.196 / 1.214) |
+| BPE384 D d = 64 | 97,824 | 1.97 | 1.2260 ± 0.0024 |
+| char D d = 72 (previous best under 100K) | 97,520 | 1.00 | 1.2753 |
+
+**H19 refuted, narrowly:** the gain is 0.070, not ≥ 0.08. **H20 refuted:** the richer vocabulary beats the wider model
+(1.205 vs 1.226). The practical result stands: an 86.5K-parameter subword model at 30M characters (1.205) matches the
+97.5K character model after 100M characters (1.208, one seed), and 13.5K parameters remain unspent.
+
+## Registered 2026-10-10 (night), before `v5-spend`: spending the last of the 100K budget on subwords (screen)
+
+10M chars, seeds 0–1, lr 3e-2, **warm-up 100 steps for every arm** (at 2.4–3.2 chars/token, 10M chars is only 380–510
+steps, so the default 200-step warm-up would dominate; the baseline gets the same). All arms < 100K params:
+(a) BPE512 d = 56 (86.5K, baseline), (b) same with FFN rules 2.0× d (94.6K), (c) same with 24-dim antecedent (90.1K),
+(d) BPE768 d = 48 (81.1K), (e) BPE1024 d = 48 (93.3K).
+* **H21.** At least one of (b)–(e) beats (a) by ≥ 0.02 BPC (seed noise at this stage is ~0.01). *(~60%.)* My lean is (e):
+  a bigger vocabulary shortens the sequence further and 94K params still fits. A winner is re-run at 30M chars, 2 seeds,
+  before it is quoted.
+
+### Outcome `v5-spend` (10M chars, 2 seeds, warm-up 100)
+
+| arm | params | val BPC |
+|---|---|---|
+| (e) BPE1024 d = 48 | 93,344 | **1.2604 ± 0.0050** |
+| (d) BPE768 d = 48 | 81,056 | 1.3080 |
+| (b) BPE512 d = 56, FFN 2.0× | 94,616 | 1.3271 |
+| (a) BPE512 d = 56 (baseline) | 86,496 | 1.3335 |
+| (c) BPE512 d = 56, 24-dim antecedent | 90,080 | 1.3413 |
+
+**H21 supported:** (e) beats the baseline by 0.073 (both seeds). More FFN rules or a wider antecedent buy ≈ 0 (b: −0.006,
+c: +0.008, inside the 0.01 noise); a larger vocabulary buys the most, and the ordering 512 < 768 < 1024 is monotone
+in vocabulary at roughly constant parameters. The trend is untested above 1024 (a 2048 vocabulary at d = 40 would
+exceed the cap).
+
+## Registered 2026-10-10 (night), before `v5-final100k`: confirm the best sub-100K subword model
+
+BPE1024 d = 48 (93,344 params), lr 3e-2, warm-up 100, saved. Cells: 30M chars seeds 0–1; 100M chars seed 0.
+* **H22.** At 30M chars it scores ≤ 1.15 BPC (the 87K BPE512 model scored 1.205; the 10M gain was 0.073 and shrinks
+  with training). *(~55%.)*
+* **H23.** At 100M chars it scores ≤ 1.08. *(~50%.)* For scale: the 280K character teacher scored 1.115 at 60M chars.
+* Samples from the 30M checkpoint are scored for non-words (≤ 2% at T 0.7 / top-k 20 as before) before any claim about text.
+
+### Outcome `v5-final100k`, 30M part (BPE1024 d = 48, 93,344 params, 2 seeds)
+
+**H22: BPC part supported, non-word part not met.** 30M-char val BPC **1.1292 ± 0.0031** (1.126 / 1.132) at 93,344 params,
+against 1.2753 for the previous best under 100K (character D) and 1.2054 for BPE512 d = 56. The non-word rate of
+its samples is **2.2%** at T 0.7 / top-k 20, above the registered ≤ 2%: a larger vocabulary invents more words
+("pursess", "cractor"). Sampling settings fix it without changing the model (seed-0 checkpoint, 12 samples × 300 tokens):
+
+| setting | non-word rate | repeated-sentence share |
+|---|---|---|
+| T 0.7, top-k 20 | 2.15% | 0.0% |
+| T 0.7, top-k 5 | 1.33% | 0.9% |
+| T 0.6, top-k 10 | 0.94% | 1.1% |
+| **T 0.5, top-k 10** | **0.65%** | 2.9% |
+| T 0.4, no top-k | 0.66% | 3.7% |
+
+At T 0.5 / top-k 10 the subword model's non-word rate is below the character models' (0.4–0.9% at T 0.7), with a
+small repetition cost. Text is still not coherent (the 30M sample at T 0.7 shows a story arc of sorts, "Mia found a big
+red ball … put the ball in the park", then incoherent speech).
+
+### Outcome `v5-final100k`, 100M part (H23)
+
+BPE1024 d = 48 (93,344 params), 100M chars, seed 0: **val BPC 1.0548** (H23 ≤ 1.08: met, one seed). For scale: the 97.5K
+character model scored 1.208 at 100M, and the 280K character teacher 1.115 at 60M. At T 0.5 / top-k 10 the text reads
+as simple TinyStories prose but loops ("They did not like the box. They did not like the box.") and loses the plot, so
+low temperature trades invented words for repetition (repeated-sentence share 2.9%, measured on 12 samples).
