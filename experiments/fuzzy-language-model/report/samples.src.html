@@ -65,11 +65,11 @@ code { font-family: var(--mono); font-size: .9em; }
 <main>
   <header style="display:flex;flex-direction:column;gap:14px">
     <div class="kicker">fuzzy-language-model · text review · 2026-10-10</div>
-    <h1>What the fuzzy model writes at 1.2 bits per character</h1>
-    <p class="lede">The fuzzy model now scores as well as neural models of its size, but it does not yet write coherent stories. Read the samples, then see why more post-training will not fix that and what might.</p>
+    <h1>What the fuzzy model writes</h1>
+    <p class="lede">Switching to subword tokens cut loss from 1.22 to 1.10 bits per character at about the same size, and the stories look more like stories. They are still not coherent. Read the samples, then see what moved and what did not.</p>
   </header>
 
-  <div class="verdict"><b>Verdict.</b> Every model here writes real words in plausible sentences. None keeps a character, an object or a plot consistent for more than a sentence or two. The 280K neural teacher, which is 0.1 BPC better than the best fuzzy model, has the same flaw. Loss at this level buys fluency, not coherence.</div>
+  <div class="verdict"><b>Verdict.</b> The new subword model (150K parameters, 1.103 BPC) writes dialogue and plot-turn sentences the character models do not, and beats the 280K neural teacher on loss. It still loses track of who is who ("Lily wanted to play with Lily"), and it invents more words (1.5% against under 1%). Loss improved by 0.11 and coherence by far less. Judging that needs a grader, not a loss.</div>
 
   <section>
     <h2>Read the samples</h2>
@@ -86,8 +86,8 @@ code { font-family: var(--mono); font-size: .9em; }
     <h2>What is wrong with the text</h2>
     <div class="scroll"><table id="t-stats"></table></div>
     <ul style="margin:0;padding-left:18px;max-width:72ch;display:flex;flex-direction:column;gap:6px">
-      <li><b>Spelling is solved.</b> At temperature 0.7 with top-k 20, under 1% of generated words are non-words for every model.</li>
-      <li><b>Syntax slips and drift remain.</b> Typical failures: "did not like it. One day, she found a toy with her friend, a long boy named Tim" (a new character from nowhere), "the dog watched the microscope as the park would make his bug", and names that swap mid-story.</li>
+      <li><b>Spelling is mostly solved.</b> At temperature 0.7 with top-k 20, under 1% of words are non-words for the character models and 1.5% for the subword model, whose pieces sometimes recombine into words that do not exist ("groceri", "bretty").</li>
+      <li><b>Reference errors remain.</b> "Lily and her mom were both very happy" follows "She wanted to play with Lily" in a story about Lily; the character models bring in a new character from nowhere or swap names mid-story. Subwords fixed word shapes and sentence rhythm, not who is who.</li>
       <li><b>Higher temperature trades coherence for variety.</b> Temperature 1.0 triples the non-word rate and makes the grammar worse, so use the lower setting for any review.</li>
     </ul>
   </section>
@@ -108,8 +108,8 @@ code { font-family: var(--mono); font-size: .9em; }
     <h2>Getting to coherent text</h2>
     <p>Coherence is about holding a story together across a few hundred characters: who is in it, what they own, what happens next. A character-level model spends most of its capacity on spelling and word boundaries. Here is what I would try, in order of expected value per hour of GPU.</p>
     <ol class="steps">
-      <li><b>Give the model words, not letters.</b> Train on a 512–1,024 token subword vocabulary and report bits per character so the number stays comparable. A story is about 4× fewer positions, so the same 256-token window sees a full story, and the recurrent state tracks characters instead of letters. The embedding costs 37–74K parameters at d = 72, so this needs the 160K size. <span class="cost">~2 h to build a tokenizer and run a 30M-character comparison</span></li>
-      <li><b>Train much longer on the 160K model.</b> 100M characters took the 97K model from 1.275 to 1.208. At 162K, 300M characters might approach the teacher's 1.115 (an extrapolation, not a measurement), and more data costs nothing. <span class="cost">estimated ~1 h per 300M-character run if the GPU is otherwise idle</span></li>
+      <li><b>Subword tokens: done, and it worked on loss.</b> A 512-token vocabulary gave 1.103 BPC at 150K parameters against 1.217 for characters at 162K (2 seeds, 30M characters, same validation text and the same per-character metric). Next: try 256 and 1,024 tokens, and repeat at the 97K size. <span class="cost">~30 min per vocabulary size</span></li>
+      <li><b>Train much longer on the 160K model.</b> 100M characters took the 97K model from 1.275 to 1.208. The subword model is the one to scale, since the character model already shows the gain from 30M to 100M characters (1.275 to 1.208 at 97K). Whether it reaches coherent text is unmeasured. <span class="cost">estimated ~1 h per 300M-character run if the GPU is otherwise idle</span></li>
       <li><b>Measure coherence, not just loss.</b> Score samples for grammar, consistency and plot with a model-based grader, the way the TinyStories paper did, so the effect of each change is visible. Loss alone cannot show the gap above. <span class="cost">~30 min to build, needs an LLM API key</span></li>
       <li><b>Test the long-range memory directly.</b> Check whether the fuzzy rule state remembers a character name 200 characters later with a copy task. Fix that before scaling if it fails. <span class="cost">~1 h</span></li>
       <li><b>Drop distillation and EMA.</b> Both are measured null results.</li>
@@ -121,7 +121,7 @@ code { font-family: var(--mono); font-size: .9em; }
 const D = /*DATA*/;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-const label = { "D-d72_30M_s0": ["Fuzzy D, 97K", "fz"], "D-d96_30M_s0": ["Fuzzy D, 162K", "fz"], "teacher-delta-d128_60M_s0": ["Neural teacher, 280K", "nn"] };
+const label = { "D-d80-bpe512_30M_s0": ["Fuzzy D, subword, 150K", "fz"], "D-d72_30M_s0": ["Fuzzy D, 97K", "fz"], "D-d96_30M_s0": ["Fuzzy D, 162K", "fz"], "teacher-delta-d128_60M_s0": ["Neural teacher, 280K", "nn"] };
 const prompts = [...new Set(D[0].samples.map((s) => s.prompt))];
 const settings = [...new Set(D[0].samples.map((s) => s.temp + "|" + s.top_k))];
 $("sel-prompt").innerHTML = prompts.map((p, i) => `<option value="${i}">${esc(p)}</option>`).join("");
@@ -148,6 +148,7 @@ const R = [
   ["Fuzzy D, d 80", "117,312", "1.249", "–", "–", "–"],
   ["Fuzzy D, d 88", "138,896", "1.235", "–", "–", "–"],
   ["Fuzzy D, d 96", "162,272", "1.217", "1.195", "1.195", "–"],
+  ["Fuzzy D, subword (512 tokens), d 80", "150,432", "1.103", "–", "–", "–"],
   ["Neural teacher, d 128 (60M chars)", "280,480", "1.115", "", "", ""],
 ];
 $("t-res").innerHTML = `<tr><th>model</th><th class="n">params</th><th class="n">30M chars</th><th class="n">+10M continued</th><th class="n">+ EMA</th><th class="n">+ distillation</th></tr>` +

@@ -341,3 +341,21 @@ register("v3-post", jobs)
 # meets the first in the middle (a job whose record exists is skipped)
 GRIDS_BIG = [j for j in GRIDS["v3-big"] if not j[0].startswith("teacher")]
 register("v3-big-rev", GRIDS_BIG[::-1])
+
+
+# v5-bpe-probe: subword vs character D at similar parameter counts, 10M chars, seed 0 (RESULTS.md H17)
+jobs = []
+for d, tok in ((72, "bpe512"), (80, "bpe512"), (96, "")):
+    name = f"D-d{d}-{tok or 'char'}_10M_s0"
+    c = cell(name, D, d=d, sc="8", chars="10e6", seed=0)
+    jobs.append((name, c[1] + (["--tok", tok] if tok else [])))
+register("v5-bpe-probe", jobs)
+
+
+# v5-bpe30 (H18): subword D d=80 at 30M chars, 2 seeds, saved for sampling
+jobs = []
+for s in (0, 1):
+    name = f"D-d80-bpe512_30M_s{s}"
+    c = cell(name, D, d=80, sc="8", chars="30e6", seed=s)
+    jobs.append((name, c[1] + ["--tok", "bpe512", "--save-model"]))
+register("v5-bpe30", jobs)

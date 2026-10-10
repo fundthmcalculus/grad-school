@@ -11,7 +11,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from flm.data import decode, encode
+from flm.data import decode as char_decode
+from flm.data import encode as char_encode
 from flm.models import ModelConfig, TinyLM
 
 PROMPTS = [
@@ -32,6 +33,13 @@ def main():
         m = TinyLM(ModelConfig(**ck["config"]))
         m.load_state_dict(ck["state"])
         m.eval()
+        if ck.get("tok"):  # subword checkpoint
+            from flm.bpe import BPE
+
+            bp = BPE(int(ck["tok"].removeprefix("bpe")))
+            encode, decode = bp.encode, bp.decode
+        else:
+            encode, decode = char_encode, char_decode
         meta = json.loads(Path(c).with_suffix(".json").read_text())
         item = {
             "name": Path(c).stem,

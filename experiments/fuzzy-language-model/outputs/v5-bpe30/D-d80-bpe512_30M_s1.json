@@ -1,0 +1,235 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 80,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 30000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v5-bpe30\\D-d80-bpe512_30M_s1.json",
+  "save_model": true,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe512",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 512
+ },
+ "config": {
+  "vocab_size": 512,
+  "d_model": 80,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 150432,
+ "params_nonemb": 109472,
+ "steps": 1528,
+ "chars_seen": 30016615,
+ "chars_per_token": 2.3979958,
+ "val_bpc": 1.09746,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   382,
+   1.38793
+  ],
+  [
+   764,
+   1.2393
+  ],
+  [
+   1146,
+   1.14411
+  ],
+  [
+   1528,
+   1.09746
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   9.6023
+  ],
+  [
+   50,
+   7.5923
+  ],
+  [
+   100,
+   5.6491
+  ],
+  [
+   150,
+   4.6422
+  ],
+  [
+   200,
+   4.1391
+  ],
+  [
+   250,
+   3.8278
+  ],
+  [
+   300,
+   3.644
+  ],
+  [
+   350,
+   3.5072
+  ],
+  [
+   400,
+   3.4045
+  ],
+  [
+   450,
+   3.326
+  ],
+  [
+   500,
+   3.2578
+  ],
+  [
+   550,
+   3.202
+  ],
+  [
+   600,
+   3.163
+  ],
+  [
+   650,
+   3.1097
+  ],
+  [
+   700,
+   3.0621
+  ],
+  [
+   750,
+   3.0256
+  ],
+  [
+   800,
+   2.9976
+  ],
+  [
+   850,
+   2.968
+  ],
+  [
+   900,
+   2.9249
+  ],
+  [
+   950,
+   2.889
+  ],
+  [
+   1000,
+   2.8574
+  ],
+  [
+   1050,
+   2.8248
+  ],
+  [
+   1100,
+   2.8022
+  ],
+  [
+   1150,
+   2.7776
+  ],
+  [
+   1200,
+   2.7555
+  ],
+  [
+   1250,
+   2.7365
+  ],
+  [
+   1300,
+   2.7084
+  ],
+  [
+   1350,
+   2.6923
+  ],
+  [
+   1400,
+   2.6914
+  ],
+  [
+   1450,
+   2.6783
+  ],
+  [
+   1500,
+   2.6566
+  ],
+  [
+   1527,
+   2.6517
+  ]
+ ],
+ "train_seconds": 155.38,
+ "wall_seconds": 165.22,
+ "chars_per_sec": 80562,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big, block and threw it was very special. The blocks was lost and sharing a house. This is time to go fast and because they had flower. It was a big bag of boat.\nOne day, the old man saw the toy he had a people. He wanted to eat the floor. He was scared, but he was very happy. He thanked the rock and gave him home around. He said goodbye and said goodbye, dangerous, \"I can help you can it. You are bandy?\"\nThey liked the yellow plane picked upset's things and hawicer. The toy was so happy that it was not always comfortt the toys. When you find someone towels us, the lion, they were very happy and clever.\nOne day, the mean boy said, \"No, a magic boat! Can I think it is time to play back!\" The sand started",
+ "rule_init": {},
+ "ngram_init": {}
+}
