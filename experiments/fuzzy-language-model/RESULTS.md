@@ -795,3 +795,29 @@ BPE1024 d = 48 (93,344 params), 100M chars, seed 0: **val BPC 1.0548** (H23 ≤ 
 character model scored 1.208 at 100M, and the 280K character teacher 1.115 at 60M. At T 0.5 / top-k 10 the text reads
 as simple TinyStories prose but loops ("They did not like the box. They did not like the box.") and loses the plot, so
 low temperature trades invented words for repetition (repeated-sentence share 2.9%, measured on 12 samples).
+
+### Screen stage 2 outcome (CPU session, 2026-10-10 evening; 8 more runs, 0 failures)
+
+Merged with stage 1 (`outputs/screen-all/summary.md`; `python -m flm.screen_report screen screen2`).
+d = 16, 10M chars, final val BPC. The base now has **4 seeds: mean 2.0767, std 0.0258** (the two-seed
+spread of 0.050 in stage 1 overstated it). "Real" = |Δ of means| > 2 standard errors.
+
+| variant | seeds | final BPC (mean ± std) | Δ vs base | verdict |
+|---|---|---|---|---|
+| A base | 4 | 2.0767 ± 0.026 | | |
+| **D** bigram n-gram init, full | 3 | 2.1041 ± 0.045 | **+0.027** | within noise (2 se = 0.039) |
+| **E** 2-tap antecedent | 3 | 2.0466 ± 0.012 | −0.030 | within noise (just under the bar) |
+| **H** HTSK on the FFN only | 3 | 2.0520 ± 0.017 | −0.025 | within noise |
+
+**P10 (D within noise of A): supported.** D's stage-1 "−0.050" was one lucky seed; its three-seed mean
+is nominally *worse* than the base. **P11 (E real and ≥ 0.03): not met** (−0.030, but not real). **P12 (H real
+and ≥ 0.02): not met** (−0.025, not real). Under the registered promotion rule, **nothing at d = 16 on the
+zero-order FFN is promoted.** The n-gram initialisation is a null here: its starting-BPC advantage (3.70 vs
+6.62) is gone within ~100 steps and the final BPC is no better; E and H are consistent with small gains
+(≈ 0.025–0.03) that this design cannot resolve (se of a 3-vs-4-seed difference ≈ 0.02).
+
+What this does and does not say: it is a result for the **old zero-order, softmax-normalised FFN** at 8.6K
+parameters. D's FFN (first-order, raw firing) has far lower seed noise (0.0003–0.002 at 10M chars), so the
+same ideas are testable there at 0.01 (`v4-taps`, `PLAN_GPU.md` §7); this stage-2 result is a prior for the
+sign and size of E, not evidence about D. Lesson recorded: with 2 base seeds the noise estimate was
+off by 35%, and a 1-seed variant ranking is not usable at this design's noise.
