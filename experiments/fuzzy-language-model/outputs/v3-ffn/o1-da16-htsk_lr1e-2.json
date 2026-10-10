@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn\\o1-da16-htsk_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 83652,
+ "params_nonemb": 77380,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.59484,
+ "evals": [
+  [
+   305,
+   2.05202
+  ],
+  [
+   610,
+   1.791
+  ],
+  [
+   915,
+   1.65408
+  ],
+  [
+   1220,
+   1.59543
+  ],
+  [
+   1221,
+   1.59484
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9722
+  ],
+  [
+   50,
+   5.43
+  ],
+  [
+   100,
+   3.9311
+  ],
+  [
+   150,
+   3.1245
+  ],
+  [
+   200,
+   2.6732
+  ],
+  [
+   250,
+   2.3991
+  ],
+  [
+   300,
+   2.2217
+  ],
+  [
+   350,
+   2.1109
+  ],
+  [
+   400,
+   2.0173
+  ],
+  [
+   450,
+   1.9572
+  ],
+  [
+   500,
+   1.9096
+  ],
+  [
+   550,
+   1.8517
+  ],
+  [
+   600,
+   1.815
+  ],
+  [
+   650,
+   1.7897
+  ],
+  [
+   700,
+   1.7641
+  ],
+  [
+   750,
+   1.746
+  ],
+  [
+   800,
+   1.7216
+  ],
+  [
+   850,
+   1.7026
+  ],
+  [
+   900,
+   1.6853
+  ],
+  [
+   950,
+   1.6677
+  ],
+  [
+   1000,
+   1.6382
+  ],
+  [
+   1050,
+   1.6318
+  ],
+  [
+   1100,
+   1.6185
+  ],
+  [
+   1150,
+   1.6105
+  ],
+  [
+   1200,
+   1.6115
+  ],
+  [
+   1220,
+   1.6107
+  ]
+ ],
+ "train_seconds": 59.18,
+ "wall_seconds": 70.75,
+ "chars_per_sec": 169004,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was she saw a different him. They put the dove fell the balls of the girl. She lyese named Max. \"It mado, a in the park was special fast all his friends cont. They sleed Anna was very sad. The flag and cold run and thalked and drager!\"\nMom said, \"Okay, Max!\" TV",
+ "rule_init": {}
+}

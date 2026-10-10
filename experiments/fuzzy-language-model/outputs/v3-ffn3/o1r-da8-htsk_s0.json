@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 8,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn3\\o1r-da8-htsk_s0.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 8,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "rule",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 80580,
+ "params_nonemb": 74308,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.50325,
+ "evals": [
+  [
+   305,
+   1.94372
+  ],
+  [
+   610,
+   1.71299
+  ],
+  [
+   915,
+   1.57548
+  ],
+  [
+   1220,
+   1.50242
+  ],
+  [
+   1221,
+   1.50325
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.2454
+  ],
+  [
+   50,
+   5.0323
+  ],
+  [
+   100,
+   3.542
+  ],
+  [
+   150,
+   2.7973
+  ],
+  [
+   200,
+   2.4252
+  ],
+  [
+   250,
+   2.2025
+  ],
+  [
+   300,
+   2.0695
+  ],
+  [
+   350,
+   1.9836
+  ],
+  [
+   400,
+   1.9041
+  ],
+  [
+   450,
+   1.8595
+  ],
+  [
+   500,
+   1.8201
+  ],
+  [
+   550,
+   1.77
+  ],
+  [
+   600,
+   1.7367
+  ],
+  [
+   650,
+   1.7156
+  ],
+  [
+   700,
+   1.6917
+  ],
+  [
+   750,
+   1.6707
+  ],
+  [
+   800,
+   1.645
+  ],
+  [
+   850,
+   1.6247
+  ],
+  [
+   900,
+   1.6052
+  ],
+  [
+   950,
+   1.5871
+  ],
+  [
+   1000,
+   1.5542
+  ],
+  [
+   1050,
+   1.5455
+  ],
+  [
+   1100,
+   1.5309
+  ],
+  [
+   1150,
+   1.5196
+  ],
+  [
+   1200,
+   1.5196
+  ],
+  [
+   1220,
+   1.5177
+  ]
+ ],
+ "train_seconds": 59.96,
+ "wall_seconds": 71.65,
+ "chars_per_sec": 166821,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was so happy and promised. Ben was good and very happy. They looked some inter the stragh and his explore and started to lue. He did not know why had a long outside on the wind. He put the cat is good at the moden and look at the car thanked a thought it off to",
+ "rule_init": {}
+}

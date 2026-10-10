@@ -134,3 +134,11 @@ them automatically. If you train an arm by hand, use:
 
 Outputs land in `outputs/` (gitignored, regenerable). Run records worth keeping
 are force-added (`git add -f`), as AGENTS.md describes.
+
+### Goal track: most capable fuzzy LM under 100K parameters
+
+`RESULTS.md` ("Goal track, 2026-10-10") records the design iteration: the TSK feed-forward layer was the whole
+fuzzy deficit; a first-order, raw-firing, HTSK TSK FFN plus 8 heads gives a 97.5K-parameter fully fuzzy model at
+1.274 BPC (30M chars, 3 seeds) vs 1.293 for the best size-matched neural reference. Grids: `flm/grids_v3.py`
+(run with `--device cuda`, at most ~4 workers: more can overflow 12 GB VRAM). Summaries: `python -m flm.screen <sweep> [--seeds]`.
+Report page: `python -m flm.report_data && python report/build.py` writes `report/report.html`.

@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-attrib\\softmax-tsk_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "max_len": 256
+ },
+ "params_total": 97216,
+ "params_nonemb": 90944,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.8258,
+ "evals": [
+  [
+   305,
+   2.30969
+  ],
+  [
+   610,
+   2.03244
+  ],
+  [
+   915,
+   1.88841
+  ],
+  [
+   1220,
+   1.82552
+  ],
+  [
+   1221,
+   1.8258
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.3992
+  ],
+  [
+   50,
+   5.7632
+  ],
+  [
+   100,
+   4.2304
+  ],
+  [
+   150,
+   3.393
+  ],
+  [
+   200,
+   2.9529
+  ],
+  [
+   250,
+   2.6693
+  ],
+  [
+   300,
+   2.491
+  ],
+  [
+   350,
+   2.3781
+  ],
+  [
+   400,
+   2.2746
+  ],
+  [
+   450,
+   2.2078
+  ],
+  [
+   500,
+   2.152
+  ],
+  [
+   550,
+   2.0897
+  ],
+  [
+   600,
+   2.0536
+  ],
+  [
+   650,
+   2.0273
+  ],
+  [
+   700,
+   2.0012
+  ],
+  [
+   750,
+   1.9839
+  ],
+  [
+   800,
+   1.9519
+  ],
+  [
+   850,
+   1.932
+  ],
+  [
+   900,
+   1.9139
+  ],
+  [
+   950,
+   1.8972
+  ],
+  [
+   1000,
+   1.8695
+  ],
+  [
+   1050,
+   1.861
+  ],
+  [
+   1100,
+   1.8487
+  ],
+  [
+   1150,
+   1.843
+  ],
+  [
+   1200,
+   1.8458
+  ],
+  [
+   1220,
+   1.8441
+  ]
+ ],
+ "train_seconds": 30.01,
+ "wall_seconds": 34.67,
+ "chars_per_sec": 333345,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog bag out. They and she saw and and slide. But on the pots diffle. It we day, they see was ear the banny ran the little bird ball down, there much with it. They are and could up and took a little girl. The put the bird old ruch. The wlooped in the stad dog in the woodd. It so ",
+ "rule_init": {}
+}

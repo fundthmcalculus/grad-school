@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-attrib\\softmax-mlp_lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "max_len": 256
+ },
+ "params_total": 72640,
+ "params_nonemb": 66368,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.51175,
+ "evals": [
+  [
+   305,
+   1.93002
+  ],
+  [
+   610,
+   1.73057
+  ],
+  [
+   915,
+   1.58057
+  ],
+  [
+   1220,
+   1.51147
+  ],
+  [
+   1221,
+   1.51175
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9289
+  ],
+  [
+   50,
+   5.0313
+  ],
+  [
+   100,
+   3.6208
+  ],
+  [
+   150,
+   2.8083
+  ],
+  [
+   200,
+   2.4037
+  ],
+  [
+   250,
+   2.1795
+  ],
+  [
+   300,
+   2.0498
+  ],
+  [
+   350,
+   1.9717
+  ],
+  [
+   400,
+   1.9018
+  ],
+  [
+   450,
+   1.8605
+  ],
+  [
+   500,
+   1.8259
+  ],
+  [
+   550,
+   1.7784
+  ],
+  [
+   600,
+   1.7475
+  ],
+  [
+   650,
+   1.7247
+  ],
+  [
+   700,
+   1.7041
+  ],
+  [
+   750,
+   1.684
+  ],
+  [
+   800,
+   1.6573
+  ],
+  [
+   850,
+   1.6375
+  ],
+  [
+   900,
+   1.6187
+  ],
+  [
+   950,
+   1.5983
+  ],
+  [
+   1000,
+   1.5655
+  ],
+  [
+   1050,
+   1.5553
+  ],
+  [
+   1100,
+   1.5407
+  ],
+  [
+   1150,
+   1.5309
+  ],
+  [
+   1200,
+   1.5304
+  ],
+  [
+   1220,
+   1.5304
+  ]
+ ],
+ "train_seconds": 26.49,
+ "wall_seconds": 31.61,
+ "chars_per_sec": 377629,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog inside with a big bird, and they went home and the candy dad. The true was so happy to have his momn? Lily could be house, but the cat was proud a kind on his mom, \"You do you fell outside in the burked.\"\nMax's get a clew. She saw always happy the cut who ave for his friend ",
+ "rule_init": {}
+}

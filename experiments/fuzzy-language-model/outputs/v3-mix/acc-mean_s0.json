@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-mix\\acc-mean_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "tsk",
+  "ffn_mult": 2.0,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 87492,
+ "params_nonemb": 81220,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.46275,
+ "evals": [
+  [
+   305,
+   1.90082
+  ],
+  [
+   610,
+   1.66668
+  ],
+  [
+   915,
+   1.52808
+  ],
+  [
+   1220,
+   1.46319
+  ],
+  [
+   1221,
+   1.46275
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.138
+  ],
+  [
+   50,
+   5.0177
+  ],
+  [
+   100,
+   3.5536
+  ],
+  [
+   150,
+   2.7732
+  ],
+  [
+   200,
+   2.3812
+  ],
+  [
+   250,
+   2.154
+  ],
+  [
+   300,
+   2.0175
+  ],
+  [
+   350,
+   1.9323
+  ],
+  [
+   400,
+   1.8551
+  ],
+  [
+   450,
+   1.8124
+  ],
+  [
+   500,
+   1.7732
+  ],
+  [
+   550,
+   1.7218
+  ],
+  [
+   600,
+   1.6919
+  ],
+  [
+   650,
+   1.6713
+  ],
+  [
+   700,
+   1.647
+  ],
+  [
+   750,
+   1.6278
+  ],
+  [
+   800,
+   1.6013
+  ],
+  [
+   850,
+   1.5817
+  ],
+  [
+   900,
+   1.5637
+  ],
+  [
+   950,
+   1.5446
+  ],
+  [
+   1000,
+   1.5139
+  ],
+  [
+   1050,
+   1.5039
+  ],
+  [
+   1100,
+   1.4912
+  ],
+  [
+   1150,
+   1.4794
+  ],
+  [
+   1200,
+   1.4788
+  ],
+  [
+   1220,
+   1.4786
+  ]
+ ],
+ "train_seconds": 58.68,
+ "wall_seconds": 70.3,
+ "chars_per_sec": 170468,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was sing, and they moved it fish. He said, \"Of food, the dogs of your play together. It had a big together, in the park wheel and saw a soon, \"Yes, Ben and the sky. It was so like out of Tim. Tim was very happy and thanked them and said, \"Yes, that shiny organt",
+ "rule_init": {}
+}

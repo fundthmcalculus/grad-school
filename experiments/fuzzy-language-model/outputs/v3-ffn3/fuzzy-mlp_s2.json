@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzy",
+  "ffn": "mlp",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 2,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-ffn3\\fuzzy-mlp_s2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 0,
+  "ffn_width": "dim",
+  "ffn_norm": "softmax",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "fuzzy",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ffn_order": 0,
+  "ffn_width": "dim",
+  "ffn_norm": "softmax",
+  "max_len": 256
+ },
+ "params_total": 76996,
+ "params_nonemb": 70724,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.48765,
+ "evals": [
+  [
+   305,
+   1.91809
+  ],
+  [
+   610,
+   1.70083
+  ],
+  [
+   915,
+   1.55985
+  ],
+  [
+   1220,
+   1.48808
+  ],
+  [
+   1221,
+   1.48765
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.8046
+  ],
+  [
+   50,
+   4.8247
+  ],
+  [
+   100,
+   3.4045
+  ],
+  [
+   150,
+   2.6741
+  ],
+  [
+   200,
+   2.3229
+  ],
+  [
+   250,
+   2.1269
+  ],
+  [
+   300,
+   2.0216
+  ],
+  [
+   350,
+   1.9433
+  ],
+  [
+   400,
+   1.8774
+  ],
+  [
+   450,
+   1.8284
+  ],
+  [
+   500,
+   1.7956
+  ],
+  [
+   550,
+   1.7681
+  ],
+  [
+   600,
+   1.7398
+  ],
+  [
+   650,
+   1.7097
+  ],
+  [
+   700,
+   1.691
+  ],
+  [
+   750,
+   1.6631
+  ],
+  [
+   800,
+   1.6416
+  ],
+  [
+   850,
+   1.6159
+  ],
+  [
+   900,
+   1.5909
+  ],
+  [
+   950,
+   1.5737
+  ],
+  [
+   1000,
+   1.5614
+  ],
+  [
+   1050,
+   1.5343
+  ],
+  [
+   1100,
+   1.5187
+  ],
+  [
+   1150,
+   1.507
+  ],
+  [
+   1200,
+   1.4997
+  ],
+  [
+   1220,
+   1.4996
+  ]
+ ],
+ "train_seconds": 53.02,
+ "wall_seconds": 63.92,
+ "chars_per_sec": 188649,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Tom. He was so happy and pressone. But who got her daddy and does and learned that the byelftule was childer. How always to the walk. He thanked her his friends to the flower and have me. So, they can it all day.\nBut then was looking me. He saw don't want to share to t",
+ "rule_init": {}
+}

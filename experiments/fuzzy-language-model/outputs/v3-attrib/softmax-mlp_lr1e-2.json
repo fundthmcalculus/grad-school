@@ -1,0 +1,189 @@
+{
+ "args": {
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "rules": 16,
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "fixed",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.01,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-attrib\\softmax-mlp_lr1e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 2,
+  "mixer": "softmax",
+  "ffn": "mlp",
+  "ffn_mult": 2.0,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "fixed",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "max_len": 256
+ },
+ "params_total": 72640,
+ "params_nonemb": 66368,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.5261,
+ "evals": [
+  [
+   305,
+   1.92242
+  ],
+  [
+   610,
+   1.70681
+  ],
+  [
+   915,
+   1.58384
+  ],
+  [
+   1220,
+   1.5261
+  ],
+  [
+   1221,
+   1.5261
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   6.9289
+  ],
+  [
+   50,
+   5.3508
+  ],
+  [
+   100,
+   3.8887
+  ],
+  [
+   150,
+   3.0317
+  ],
+  [
+   200,
+   2.5204
+  ],
+  [
+   250,
+   2.2302
+  ],
+  [
+   300,
+   2.0666
+  ],
+  [
+   350,
+   1.9727
+  ],
+  [
+   400,
+   1.8952
+  ],
+  [
+   450,
+   1.8509
+  ],
+  [
+   500,
+   1.8143
+  ],
+  [
+   550,
+   1.7611
+  ],
+  [
+   600,
+   1.7297
+  ],
+  [
+   650,
+   1.711
+  ],
+  [
+   700,
+   1.6897
+  ],
+  [
+   750,
+   1.6765
+  ],
+  [
+   800,
+   1.6505
+  ],
+  [
+   850,
+   1.6331
+  ],
+  [
+   900,
+   1.6163
+  ],
+  [
+   950,
+   1.598
+  ],
+  [
+   1000,
+   1.5696
+  ],
+  [
+   1050,
+   1.5623
+  ],
+  [
+   1100,
+   1.5494
+  ],
+  [
+   1150,
+   1.5409
+  ],
+  [
+   1200,
+   1.543
+  ],
+  [
+   1220,
+   1.5418
+  ]
+ ],
+ "train_seconds": 26.51,
+ "wall_seconds": 31.61,
+ "chars_per_sec": 377325,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a girl girl named Spot. He was so happy and promiser. But when the man was happy to dance, but she saw a his momn's right. He looked around the big, bear said, \"We don, \"Your do you do.\" \nThe little bird his mom. They put her farm. I will help me on a very cars. He looked around all to t",
+ "rule_init": {}
+}

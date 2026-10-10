@@ -398,3 +398,74 @@ All sweeps were stopped at the user's request. Complete: `tune` 120/120, `fuzzyf
 `minsize` 0/24, `lean` 0/12. In-flight runs were killed before writing a record, so no
 partial records exist. **H10a, H11 and H12 are unscored.** The write-up is
 [`WRITEUP.md`](WRITEUP.md).
+
+## Goal track, 2026-10-10: the most capable fuzzy LM under 100K parameters (design iteration)
+
+**Not part of the registered head-to-head (H1–H9).** This is development work with a different
+objective (best val BPC at < 100,000 total parameters, embedding included), run on CUDA. All
+screens are d ≥ 64, L = 2, 10M chars, 1–3 seeds, and each stage was chosen after seeing the last;
+nothing here was pre-registered, so none of it is a hypothesis test. Reproduce with
+`python -m flm.sweep <v3-grid> --workers 4`; read with `python -m flm.screen <grid> [--seeds]`.
+Do not run more than ~4 workers: 6 concurrent 16-head delta cells overflowed 12 GB VRAM
+and stalled 40+ minutes with no output (killed; the 16-head cells were dropped, **not tested**).
+
+**1. Where the deficit is (`v3-attrib`, d = 64, seed 0, lr 1e-2/3e-2 best).** Every mixer × FFN pairing:
+
+| mixer | MLP FFN | TSK FFN (original) |
+|---|---|---|
+| softmax | 1.512 (72.6K) | 1.826 (97.2K) |
+| gauss (FLM mixer) | 1.492 | 1.781 |
+| linear | 1.503 | 1.720 |
+| fuzzy (FRLM-acc) | 1.507 | ~1.715 (101.6K) |
+| fuzzydelta | 1.514 | — |
+
+The fuzzy mixers cost nothing against softmax/linear. The whole ~0.3 BPC fuzzy deficit, and
+~25K of the parameters, was the zero-order, softmax-normalized TSK FFN.
+
+**2. FFN redesign (`v3-ffn`, `v3-ffn2`, `v3-ffn3`; fuzzy-acc mixer, d = 64).** What helped, in order of effect:
+tied per-rule Gaussian widths (saves params); fewer antecedent dims (`tsk_dim` 16); **first-order
+consequents** (rule output `(v_r·x) o_r`, a GLU whose gate is the fuzzy membership);
+**un-normalized firing** (no softmax across rules); HTSK exponent (`mean`). Raw firing with the
+`sum` exponent is unstable (3 seeds: 1.517/1.588/1.557, std 0.029); with the HTSK exponent it is
+stable (std 0.0003–0.002). 3 seeds, 10M chars: `o1r-da16-htsk-wdim` **1.4675 ± 0.0003**
+(87.5K) vs the same mixer with a GELU MLP **1.4957 ± 0.0086** (77.0K) — the fuzzy FFN now beats the MLP.
+Rejected: raw firing at `tsk_dim` 32 (1.685), lr 6e-2 (worse).
+
+**3. Mixer and shape (`v3-mix`, `v3-heads`, `v3-spend`, `v3-fill`; 2 seeds).** The gain is
+mostly **head count**: 1 head 1.534, 2 heads 1.464, 4 heads 1.441, 8 heads 1.420 (acc form).
+The delta form with the HTSK mixer exponent overtakes accumulation once heads ≥ 4
+(delta-mean h8 1.4065 vs acc-mean h8 1.4249). 16 rules/head beat 8 (1.4138 vs 1.4065)
+and 32 is no better than 16 (1.4029). Short-conv 8 > 4 (1.3986 vs 1.4065). Depth: 3 layers
+at d = 48 and 4 layers at d = 40 were no better than 2 layers at d = 64; 1 layer at d = 80 was
+much worse (1.585). lr 3e-2 ≈ 4e-2 > 2e-2. Filling the budget gave 1.386 ± 0.004
+(`D`: d = 72, 8 heads, 16 rules, FFN 1.5× rules, shortconv 8, 97,520 params); the
+differences among the filled configs (1.386–1.402) are within ~3 seed-stds.
+Not tried: 16 heads (see above), d = 64 with 3 layers under the budget, rule-count > 32.
+
+**4. Final comparison (`v3-final`, `v3-ref`; CUDA, 30M characters, 3 seeds).**
+
+| model | params | val BPC |
+|---|---|---|
+| fuzzy `D` | 97,520 | **1.2735 ± 0.009** (1.286 / 1.268 / 1.267) |
+| neural delta-mlp, d 72, 8 heads | 93,272 | 1.2929 ± 0.004 |
+| neural delta-mlp, d 72, 4 heads | 92,104 | 1.3108 ± 0.006 |
+| neural delta-mlp, d 74, 2 heads | 96,430 | 1.3426 ± 0.007 |
+| original FLM, d 64 (`scaling-gpu`) | 97,280 | 1.6231 ± 0.008 |
+
+At 100M characters (seed 0, one run each): fuzzy `D` **1.2080**; neural delta-mlp d 64 (73K params, *smaller*, so not
+matched) 1.3270. The fuzzy model leads the best matched neural reference by 0.019 BPC (about two fuzzy-model seed
+stds), at 3× lower throughput (34K vs 114K chars/s). Disclosure: the fuzzy design got a search over heads, rules,
+antecedent size, short-conv and lr that the neural reference got only for heads (and lr 3e-2 rather than its d = 32
+tune pick of 6e-2); the LR study below was meant to close that and is **not finished**.
+
+**5. Learning-rate study (`v3-lr`, `lrwidth`): INCOMPLETE at merge time.** Registered before running: fuzzy `D` and the
+neural 8-head reference over lr ∈ {1e-2, 2e-2, 3e-2, 4e-2, 6e-2}, 30M chars, seeds 0–1 (3e-2 exists), plus the 14
+unfinished upstream `lrwidth` cells (H10a) on CUDA. Running both at once with 8 concurrent jobs made each job ~4×
+slower; at merge time `v3-lr` had 0/16 cells and `lrwidth` 13/20. **No LR conclusion is drawn here; H10a stays open.**
+Resume with `python -m flm.sweep v3-lr --device cuda --workers 4` (and `lrwidth`); the sweeps skip finished cells.
+Note `flm.sweep` appends `--device` after each job's argv, so `--device cuda` must be passed on the command line.
+
+**Code changes in this track.** `ffn_order`, `ffn_width`, `ffn_norm` on the TSK FFN (defaults reproduce the previous
+FFN exactly; `ffn_width` defaults to following upstream's `width_share`); grids in `flm/grids_v3.py`; `flm/screen.py`
+(per-sweep summaries); `flm/report_data.py` + `report/` (the results page). `train.py` also now reports a diverged run
+as NaN instead of its last finite eval and times CUDA steps with a synchronize.

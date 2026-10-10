@@ -1,0 +1,195 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 64,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.4,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 200,
+  "seed": 1,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v3-fill\\A-lr2e-2_s1.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "rule_init": "random"
+ },
+ "config": {
+  "vocab_size": 98,
+  "d_model": 64,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 2.4,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ffn_order": 1,
+  "ffn_width": "dim",
+  "ffn_norm": "none",
+  "max_len": 256
+ },
+ "params_total": 98196,
+ "params_nonemb": 91924,
+ "steps": 1221,
+ "chars_seen": 10002432,
+ "val_bpc": 1.40147,
+ "evals": [
+  [
+   305,
+   1.81885
+  ],
+  [
+   610,
+   1.59573
+  ],
+  [
+   915,
+   1.46407
+  ],
+  [
+   1220,
+   1.40226
+  ],
+  [
+   1221,
+   1.40147
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   7.252
+  ],
+  [
+   50,
+   5.1815
+  ],
+  [
+   100,
+   3.6768
+  ],
+  [
+   150,
+   2.8179
+  ],
+  [
+   200,
+   2.341
+  ],
+  [
+   250,
+   2.1002
+  ],
+  [
+   300,
+   1.9564
+  ],
+  [
+   350,
+   1.8644
+  ],
+  [
+   400,
+   1.7905
+  ],
+  [
+   450,
+   1.7327
+  ],
+  [
+   500,
+   1.6934
+  ],
+  [
+   550,
+   1.6553
+  ],
+  [
+   600,
+   1.6301
+  ],
+  [
+   650,
+   1.6041
+  ],
+  [
+   700,
+   1.579
+  ],
+  [
+   750,
+   1.5579
+  ],
+  [
+   800,
+   1.5436
+  ],
+  [
+   850,
+   1.5146
+  ],
+  [
+   900,
+   1.497
+  ],
+  [
+   950,
+   1.4746
+  ],
+  [
+   1000,
+   1.4578
+  ],
+  [
+   1050,
+   1.442
+  ],
+  [
+   1100,
+   1.4337
+  ],
+  [
+   1150,
+   1.4224
+  ],
+  [
+   1200,
+   1.4246
+  ],
+  [
+   1220,
+   1.4204
+  ]
+ ],
+ "train_seconds": 244.5,
+ "wall_seconds": 288.83,
+ "chars_per_sec": 40910,
+ "torch": "2.14.1+cu130",
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "diverged_step": null,
+ "threads": 1,
+ "sample": "Once upon a time, there was a little dog named Max. Sam named Lucy. She present her from her cheeds friends. Sue saw a big special bug. She needed a big tree of a voice.\nOne day, a minust dog named Sue. But then, surprised of her laughook to dream it and said, \"Okay, you will lit you can held your thank you.\"\nSuso ",
+ "rule_init": {}
+}
