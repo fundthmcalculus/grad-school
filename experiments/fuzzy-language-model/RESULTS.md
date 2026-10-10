@@ -358,3 +358,35 @@ embedding 18%, qkv 18%, consequents 12%.
     params*. That means below the log-param interpolation of the base FRLM scaling
     curve, not merely below base's raw BPC. Winners get the standard 12-cell tune
     before they enter any comparison.
+
+### Partial outcomes, 2026-10-10 15:30: `ablate` 24/36, `lrwidth` 6/20
+
+**`lrwidth` (d = 96, seed 0, compared with the existing ×1 `scaling` seed-0 cell)**, attention arms only so far:
+
+| arm | ×1 (tuned) | ÷3 | ÷10 |
+|---|---|---|---|
+| softmax-mlp | 1.3000 | 1.3068 (+0.007) | 1.3326 (+0.033) |
+| linear-mlp | 1.2921 | 1.2828 (−0.009) | 1.3084 (+0.016) |
+| gla-mlp | 1.2925 | 1.2841 (−0.008) | 1.3153 (+0.023) |
+
+* **H10b holds so far:** for these arms, the d = 32 learning rate is still within 0.01 of the
+  best of {×1, ÷3, ÷10} at three times the width. A lower LR does not rescue anything here.
+* **H10a is still open.** The arms that degraded with width (gru, flm, frlm-acc,
+  frlm-delta) are queued.
+
+**`ablate` (3 seeds, compared with the `scaling` cells at the same width):**
+
+| comparison | d = 32 | d = 64 | hypothesis |
+|---|---|---|---|
+| gauss-mlp − softmax-mlp (mixer only) | **−0.013** (1.6595 ± .0013 vs 1.6726 ± .0022) | **−0.008** (1.3858 vs 1.3942) | **H2 supported** (\|Δ\| < 0.02). The Gaussian-TSK mixer is slightly *better* |
+| softmax-tsk − softmax-mlp (FFN only) | **+0.118** (1.7910 vs 1.6726) | **+0.315** (1.7093 vs 1.3942) | **H3 supported**, strongly |
+| softmax-tsk+datainit − softmax-tsk | +0.132 | −0.017 (within std ≈ 0.02) | H4 |
+| flm+datainit − flm | +0.078 | +0.023 | H4 |
+
+* **H4 refuted so far.** Data-driven rule init hurts or is neutral in every completed pair.
+  The frlm-* datainit cells are still running.
+* **The FLM's poor scaling is the TSK FFN, not the attention.** Fuzzy attention matches
+  softmax (H2). The classic (sum-exponent) TSK FFN costs +0.12 at d = 32 and +0.32 at
+  d = 64, and the cost grows with width, which is the saturation pattern Cui, Wu & Xu
+  predict. Combined with `h9` (HTSK on the FFN carries the whole FRLM gain), the obvious
+  next arm is **FLM with an HTSK FFN**. It is not run yet.

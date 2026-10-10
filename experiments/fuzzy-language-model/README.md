@@ -105,5 +105,32 @@ The models are tiny, so one GPU holds many workers; raise `--workers` until the 
 busy. Hyperparameters come from the committed CPU `tune` records. Every run records
 `device`/`host`, and `flm.analyze` never pools devices into one cell.
 
+### Learning rates (for any host)
+
+Every arm's LR and short-conv come from the CPU `tune` grid: d = 32, seed 0, 10M chars,
+`best_tune()` in `flm/grids.py`, reading the committed `outputs/tune/*.json`. The grids pick
+them automatically. If you train an arm by hand, use:
+
+| arm | lr | short-conv | tune val BPC |
+|---|---|---|---|
+| softmax-mlp | 3e-2 | 4 | 1.7628 |
+| linear-mlp | 3e-2 | 4 | 1.7421 |
+| gla-mlp | 3e-2 | 4 | 1.7286 |
+| delta-mlp | 6e-2 | 4 | 1.6994 |
+| gru | 6e-2 | – (no-op) | 1.7326 |
+| flm | 1e-2 | 4 | 1.9243 |
+| frlm-acc | 3e-2 | 4 | 1.8639 |
+| frlm-delta | 3e-2 | 4 | 1.8621 |
+| frlm-acc-htsk | 3e-2 | 4 | 1.7555 |
+| frlm-delta-htsk | 6e-2 | 4 | 1.7468 |
+
+**Width transfer** (`lrwidth`, see `RESULTS.md`):
+* For softmax, linear and gla, the d = 32 LR stays within 0.01 of the best of {×1, ÷3, ÷10}
+  at d = 96. Keep it.
+* gru, flm and the classic frlm arms get *worse* at large width with this LR. Their
+  ÷3 / ÷10 cells are still running, so treat their large-width numbers as LR-limited
+  until those land.
+* The headline grids run at d = 32, where the tune was done, so no transfer is involved.
+
 Outputs land in `outputs/` (gitignored, regenerable). Run records worth keeping
 are force-added (`git add -f`), as AGENTS.md describes.
