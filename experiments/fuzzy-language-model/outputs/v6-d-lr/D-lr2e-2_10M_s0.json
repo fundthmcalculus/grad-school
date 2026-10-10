@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "outputs/v6-d-lr/D-lr2e-2_10M_s0.json",
+  "save_model": false,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "fuzzydelta",
+  "ffn": "tsk",
+  "ffn_mult": 1.5,
+  "tsk_dim": 16,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "mean",
+  "ffn_exp_norm": "mean",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 1,
+  "ffn_width": "",
+  "ffn_norm": "none",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93344,
+ "params_nonemb": 44192,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.27648,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.61393
+  ],
+  [
+   192,
+   1.4156
+  ],
+  [
+   288,
+   1.3231
+  ],
+  [
+   384,
+   1.27775
+  ],
+  [
+   387,
+   1.27648
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3326
+  ],
+  [
+   50,
+   8.6241
+  ],
+  [
+   100,
+   6.5648
+  ],
+  [
+   150,
+   5.4623
+  ],
+  [
+   200,
+   4.8993
+  ],
+  [
+   250,
+   4.5686
+  ],
+  [
+   300,
+   4.3435
+  ],
+  [
+   350,
+   4.1885
+  ],
+  [
+   386,
+   4.1352
+  ]
+ ],
+ "train_seconds": 26.61,
+ "wall_seconds": 32.88,
+ "chars_per_sec": 119120,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl named Mia. Mia loved to meet a special storm at. One day she was a friendly that the girl was very happy.\nLily and Mia played together all day. They had a surprise and loved to go inside. They were dark and playing. They put the plane box and see how to slide, and they could glow.\nLily and Mred the frog were not happy. They each other was not hurt anymore. They both knew they would enough a family with a new friend and Sue and Lily. They were happy and had lots of fun.\n<|eot|>\nOnce upon a time, there was a little girl named Mr. She liked to play with her toys all day, even exaring and jumpch with all day.\nOne day, while something unexpected happened. Ann saw a beautiful box of a spotter. But the box was sad. He thought it was a stuck and found a long bucket. The parenti decided to make it up up on it.\nThe bird flew up and saw green, but it was so happy. The box was very happy, but his toy was not fun anymore. The dear was happy to play with. The promomised that the other is not.\" And the other plane were all sad because they all played together.\n<|eot|>\nOnce upon a time, there was a little boy who loved to play.",
+ "rule_init": {},
+ "ngram_init": {}
+}
