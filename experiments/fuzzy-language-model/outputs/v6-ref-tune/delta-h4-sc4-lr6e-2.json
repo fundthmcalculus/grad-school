@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 4,
+  "rules": 16,
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.06,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h4-sc4-lr6e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 4,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.64,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93376,
+ "params_nonemb": 44224,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.26941,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.59132
+  ],
+  [
+   192,
+   1.43365
+  ],
+  [
+   288,
+   1.33418
+  ],
+  [
+   384,
+   1.27008
+  ],
+  [
+   387,
+   1.26941
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3342
+  ],
+  [
+   50,
+   8.1488
+  ],
+  [
+   100,
+   6.2971
+  ],
+  [
+   150,
+   5.3698
+  ],
+  [
+   200,
+   4.8987
+  ],
+  [
+   250,
+   4.6076
+  ],
+  [
+   300,
+   4.3774
+  ],
+  [
+   350,
+   4.1999
+  ],
+  [
+   386,
+   4.1295
+  ]
+ ],
+ "train_seconds": 36.02,
+ "wall_seconds": 44.59,
+ "chars_per_sec": 88015,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spive. She was happy to have a new. Then, she was a hop that day in the carelon.\nJohn could not play with him. She was too small and she had a problem. He was tired that he knew. He wanted to slide with heself. He was so curious. He signs sat on the clear, but they couldn't wait to play with.\n<|eot|>\nOne day, a little girl named Lily found a big tree. It was a very pretty coarm. The boat told her what a special bird was not foolish. The bunny played all day, even if he had to spot the birds. The bird was scared, but she was very happy. The bird was so excited to help him.\nThe girl, the bird was very nice. She thanked the bird and said, \"Hi, Tim! You need to make a pretty bugs. It can make the busy plan and now green.\"\nLily was so excited. She opened it back to the park. They played with the animals who all had fun. But then, something unexpected. The bird was very happy.\n<|eot|>\nOnce upon a time, there was a big cat named Sam. Tom loved to play with the park, and it would not paint.\nOne day, T",
+ "rule_init": {},
+ "ngram_init": {}
+}

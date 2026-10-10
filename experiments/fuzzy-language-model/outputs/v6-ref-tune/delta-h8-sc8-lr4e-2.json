@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.52,
+  "tsk_dim": 0,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.04,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h8-sc8-lr4e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.52,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.26952,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.61313
+  ],
+  [
+   192,
+   1.43769
+  ],
+  [
+   288,
+   1.33477
+  ],
+  [
+   384,
+   1.26991
+  ],
+  [
+   387,
+   1.26952
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3698
+  ],
+  [
+   50,
+   8.3357
+  ],
+  [
+   100,
+   6.4176
+  ],
+  [
+   150,
+   5.4248
+  ],
+  [
+   200,
+   4.9158
+  ],
+  [
+   250,
+   4.6079
+  ],
+  [
+   300,
+   4.3756
+  ],
+  [
+   350,
+   4.2007
+  ],
+  [
+   386,
+   4.1309
+  ]
+ ],
+ "train_seconds": 71.65,
+ "wall_seconds": 87.03,
+ "chars_per_sec": 44244,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big girl called Spisy. She had a special shiver. One day she was scared and said, \"I am they are heart. It is a moal window. Kitty! It is a big, shiny store. You are playing!\"\nSuddenly, Tom's mom said to the slide. The timp went home. He saw Molly and the balls. He was so excited that it was too small. He would see more scared.\n<|eot|>\nOne day, a little girl named Lily found a big tree with a big, pretty place. She were very sad because she couldn't. She was not first. She wanted her grabb and was even exad.\nSuddenly, she saw a big hoop of the floor. Pase was very pretty. He was very sad, so he started to talk. He learned that he had a great friend.\n<|eot|>\nOnce upon a time, there was a little girl named Lily. She loved to make a busy plan and fun playing in the stable. One day, she went outside to be replied. But he had an idea, she saw a big scary tree. He promised to keep a snowcy.\nHe came to the pink. The bug was gray, and it would not help her. The small miler started",
+ "rule_init": {},
+ "ngram_init": {}
+}

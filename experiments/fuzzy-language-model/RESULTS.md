@@ -454,7 +454,7 @@ Not tried: 16 heads (see above), d = 64 with 3 layers under the budget, rule-cou
 
 At 100M characters (seed 0, one run each): fuzzy `D` **1.2080**; neural delta-mlp d 64 (73K params, *smaller*, so not
 matched) 1.3270. The fuzzy model leads the best matched neural reference by 0.019 BPC (about two fuzzy-model seed
-stds), at 3× lower throughput (34K vs 114K chars/s). Disclosure: the fuzzy design got a search over heads, rules,
+stds), at lower throughput (34K vs 50K chars/s for the size-matched d = 72 / 8-head reference, ≈ 1.5×; **corrected 2026-10-10: the 114K chars/s originally quoted here was the smaller 73K delta-mlp d = 64 at 100M chars, not the matched reference**; speeds are from a shared GPU and noisy). Disclosure: the fuzzy design got a search over heads, rules,
 antecedent size, short-conv and lr that the neural reference got only for heads (and lr 3e-2 rather than its d = 32
 tune pick of 6e-2); the LR study below was meant to close that and is **not finished**.
 
@@ -850,3 +850,27 @@ parameters. D's FFN (first-order, raw firing) has far lower seed noise (0.0003�
 same ideas are testable there at 0.01 (`v4-taps`, `PLAN_GPU.md` §7); this stage-2 result is a prior for the
 sign and size of E, not evidence about D. Lesson recorded: with 2 base seeds the noise estimate was
 off by 35%, and a 1-seed variant ranking is not usable at this design's noise.
+
+## 2026-10-10 (late): running the neural BPE control's tuning grids (`v6-d-lr`, `v6-ref-tune`)
+
+Smoke cells (D lr 2e-2 and delta h4 sc4 lr 2e-2, 10M chars, seed 0) ran end to end: 93,344 vs 93,376 params (0.03% apart),
+1.2765 vs 1.2854 BPC, ~30 s per cell. At this speed the two tuning grids (8 + 24 cells) are ~15 min of GPU, so they are
+run now. Predictions (set by the CPU session's plan, not changed): none scored here until the grids finish. `v6-final10`
+(30 cells × 30M chars, ten seeds; about an hour) is **not** started and waits for the user's go-ahead.
+
+### Outcome `v6-d-lr` and `v6-ref-tune` (BPE1024, 93.3K params, 10M chars; D seeds 0–1, reference seed 0; warm-up 100)
+
+| arm | best cell | val BPC |
+|---|---|---|
+| D (fuzzy) | lr **6e-2** (4e-2: 1.2542, 3e-2: 1.2604, 2e-2: 1.2809) | **1.2502 ± 0.0013** |
+| neural, tuned over 24 cells (delta/gla × heads × short-conv × lr) | delta, 8 heads, short-conv 4, lr 4e-2 (93,392 params) | **1.2666** |
+| neural, 2nd best | delta, 4 heads, short-conv 4, lr 6e-2 | 1.2694 |
+
+At 10M chars the tuned fuzzy model leads the tuned neural model on the same tokenizer by **0.016 BPC** (D's two seeds differ by
+0.002, so this is well outside D's seed noise; the reference is one seed). **Two caveats before anyone quotes it:** (1) D's best
+lr (6e-2) is the **edge** of this grid, so D is not yet tuned; the grid is extended to 8e-2 and 1e-1 (`v6-d-lr-edge`) before
+this is read; (2) it is 10M chars, not the 30M / ten-seed protocol, so `v6-final10` (30 cells, ~1 h, needs the user) is still the
+citable comparison. Also noted: the neural reference's lr optimum (4e-2) is inside its grid.
+
+**Edge check `v6-d-lr-edge` (2 seeds, 10M chars):** lr 8e-2 → 1.2519 ± 0.0013, lr 1e-1 → 1.2628 ± 0.0055. Both are worse than 6e-2 (1.2502),
+so D's optimum is interior and D is tuned at 10M chars. The 0.016 lead over the tuned neural reference stands at 10M chars.

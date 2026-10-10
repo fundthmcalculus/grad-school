@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.52,
+  "tsk_dim": 0,
+  "shortconv": 8,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.03,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h8-sc8-lr3e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.52,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 8,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.274,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.6153
+  ],
+  [
+   192,
+   1.43387
+  ],
+  [
+   288,
+   1.33672
+  ],
+  [
+   384,
+   1.27434
+  ],
+  [
+   387,
+   1.274
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3698
+  ],
+  [
+   50,
+   8.4657
+  ],
+  [
+   100,
+   6.4886
+  ],
+  [
+   150,
+   5.4553
+  ],
+  [
+   200,
+   4.9257
+  ],
+  [
+   250,
+   4.6094
+  ],
+  [
+   300,
+   4.3795
+  ],
+  [
+   350,
+   4.207
+  ],
+  [
+   386,
+   4.1388
+  ]
+ ],
+ "train_seconds": 71.71,
+ "wall_seconds": 87.24,
+ "chars_per_sec": 44209,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and the bird. The bugquet had a special girl named Lily. They would play together in the park.\nAnna and Lily were very happy. They played together all day. They had fun together. They loved to go back home together. They all had many fun table.\nOne day, Lily saw a big cat with a timproy chair. The bird was very happy. The cat was a clear, but they found the birds. The dog saw a big box of next for a walk and watch it. The bird found the man to a door. The bird got there, and the ant came an idea. Tim wanted to play with her dad.\nThe dog looked around and saw a small cat. The bird was hooed and didn't listen to the big tree. It was now a nice dog. The dog had a big tree on the toys. It made the blell and explore it he loved to parent.\n\"Thank you, Tim!\" said the busy man. He was green and saw it was so excited.\nMia behind the picture to go inside and say good things, and her best friend was scared of. The bird was very happy. They wanted to help them. But Max thought about Sam and Sam pulled food together. They were an ugly wise old own. They were curi",
+ "rule_init": {},
+ "ngram_init": {}
+}

@@ -405,3 +405,12 @@ for lr in ("3e-2", "2e-2"):
     c = cell(n_, D, d=48, sc="8", chars="300e6", seed=0, lr=lr)
     jobs.append((n_, c[1] + ["--tok", "bpe1024", "--warmup", "100", "--save-model"]))
 register("v5-long", jobs)
+
+
+# v6-d-lr-edge: D's best lr was the top of the v6-d-lr grid (6e-2), so extend it (same cells otherwise)
+_ed = []
+for lr in ("8e-2", "1e-1"):
+    for s in (0, 1):
+        c = cell(f"D-lr{lr}_10M_s{s}", D, d=48, sc="8", chars="10e6", seed=s, lr=lr)
+        _ed.append((c[0], c[1] + ["--tok", "bpe1024", "--warmup", "100"]))
+register("v6-d-lr-edge", _ed)

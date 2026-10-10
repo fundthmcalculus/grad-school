@@ -1,0 +1,147 @@
+{
+ "args": {
+  "mixer": "delta",
+  "ffn": "mlp",
+  "d": 48,
+  "layers": 2,
+  "heads": 8,
+  "rules": 16,
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "shortconv": 4,
+  "decay": "data",
+  "ctx": 256,
+  "batch": 32,
+  "chars": 10000000.0,
+  "lr": 0.02,
+  "wd": 0.01,
+  "warmup": 100,
+  "seed": 0,
+  "threads": 1,
+  "device": "cuda",
+  "eval_chars": 1000000,
+  "eval_every": 0,
+  "out": "C:\\personal\\grad-school\\experiments\\fuzzy-language-model\\outputs\\v6-ref-tune\\delta-h8-sc4-lr2e-2.json",
+  "save_model": false,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "ante_taps": 1,
+  "ngram_init": 0,
+  "ngram_mode": "full",
+  "eval_at_start": false,
+  "width_share": "full",
+  "n_unique": 0,
+  "init_from": "",
+  "ema_decay": 0.0,
+  "teacher": "",
+  "kd_weight": 0.5,
+  "kd_temp": 1.0,
+  "tok": "bpe1024",
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "rule_init": "random",
+  "vocab_size": 1024
+ },
+ "config": {
+  "vocab_size": 1024,
+  "d_model": 48,
+  "n_layers": 2,
+  "n_heads": 8,
+  "mixer": "delta",
+  "ffn": "mlp",
+  "ffn_mult": 2.56,
+  "tsk_dim": 0,
+  "n_rules": 16,
+  "decay": "data",
+  "shortconv": 4,
+  "exp_norm": "sum",
+  "ffn_exp_norm": "",
+  "width_share": "full",
+  "n_unique": 0,
+  "ffn_order": 0,
+  "ffn_width": "",
+  "ffn_norm": "softmax",
+  "ante_taps": 1,
+  "max_len": 256
+ },
+ "params_total": 93392,
+ "params_nonemb": 44240,
+ "steps": 387,
+ "chars_seen": 10012315,
+ "chars_per_token": 3.1581564,
+ "val_bpc": 1.27818,
+ "val_bpc_ema": null,
+ "evals": [
+  [
+   96,
+   1.63414
+  ],
+  [
+   192,
+   1.43902
+  ],
+  [
+   288,
+   1.33403
+  ],
+  [
+   384,
+   1.27904
+  ],
+  [
+   387,
+   1.27818
+  ]
+ ],
+ "train_curve": [
+  [
+   0,
+   10.3553
+  ],
+  [
+   50,
+   8.6762
+  ],
+  [
+   100,
+   6.6372
+  ],
+  [
+   150,
+   5.5144
+  ],
+  [
+   200,
+   4.949
+  ],
+  [
+   250,
+   4.6189
+  ],
+  [
+   300,
+   4.3821
+  ],
+  [
+   350,
+   4.2121
+  ],
+  [
+   386,
+   4.1501
+  ]
+ ],
+ "train_seconds": 51.11,
+ "wall_seconds": 63.39,
+ "chars_per_sec": 62023,
+ "torch": "2.14.1+cu130",
+ "diverged_step": null,
+ "threads": 1,
+ "device": "cuda",
+ "device_name": "NVIDIA GeForce RTX 4080 Laptop GPU",
+ "host": "NEX-210200",
+ "sample": "Once upon a time, there was a big and strong. Poppy saw a big vaz at her house. \nHacrozo day they saw the cat pushed the box. Anna felt better and beautiful. But then, a big, a little bird's friend, a little girl named Lucy wanted to play. The next day, \"Don't worry, Lily.\" Tim thought Marge sleepy sand and the chair. But, the bear saw a big dog's a big box. The cat had a small cat and a bate. It was a very pretty door.\nThe sun wanted to tired and the anxather. The sun said, \"I'm not even exarful. I can't help it?\" The cat said, \"What???re we we come with the food now you!\"\nMax mongged on the black ball in the store and found a long bucket. The parents decided to have a long door. The bird was sad and said, \"Look, Tuna!\" And they walked up to the mixer if they were sad. They played together until they had to buy ever away.\n<|eot|>\nOnce upon a time, there was a little cat named Fos. Sam loved to pink his food to her friend, an an towet with her toys. She was not big and wa",
+ "rule_init": {},
+ "ngram_init": {}
+}
