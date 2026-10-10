@@ -21,7 +21,14 @@ from flm.models import ModelConfig, TinyLM
 
 
 def state_floats(
-    mixer: str, d: int, L: int, H: int, R: int, t: int, shortconv: int = 0
+    mixer: str,
+    d: int,
+    L: int,
+    H: int,
+    R: int,
+    t: int,
+    shortconv: int = 0,
+    ante_taps: int = 1,
 ) -> int:
     dh = d // H
     conv = (shortconv - 1) * d if shortconv > 1 else 0
@@ -34,7 +41,9 @@ def state_floats(
         "fuzzydelta": H * R * dh,
         "gru": d,
     }[mixer]
-    return L * (per_layer + (0 if mixer == "gru" else conv))
+    # the multi-tap antecedent buffers the last (taps-1) inputs, in layer 0 only
+    taps_buffer = (ante_taps - 1) * d
+    return L * (per_layer + (0 if mixer == "gru" else conv)) + taps_buffer
 
 
 def main():

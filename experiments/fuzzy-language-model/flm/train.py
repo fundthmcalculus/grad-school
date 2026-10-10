@@ -70,6 +70,27 @@ def get_args(argv=None):
         choices=["", "sum", "mean", "sqrt"],
         help="override --exp-norm for the TSK FFN only",
     )
+    p.add_argument(
+        "--ante-taps", type=int, default=1, help="layer-0 TSK FFN antecedent taps"
+    )
+    p.add_argument(
+        "--ngram-init",
+        type=int,
+        default=0,
+        choices=[0, 1, 2],
+        help="init layer-0 FFN rules from order-k n-gram stats (1 bigram, 2 trigram)",
+    )
+    p.add_argument(
+        "--ngram-mode",
+        default="full",
+        choices=["emb", "placement", "full"],
+        help="emb: aligned embedding only; placement: + rule placement; full: + decoded consequents",
+    )
+    p.add_argument(
+        "--eval-at-start",
+        action="store_true",
+        help="also evaluate before the first step",
+    )
     p.add_argument("--width-share", default="full", choices=["full", "dim", "rule"])
     p.add_argument(
         "--n-unique", type=int, default=0, help="distinct blocks (0 = --layers)"
@@ -107,6 +128,7 @@ def make_config(a) -> ModelConfig:
         ffn_order=a.ffn_order,
         ffn_width=a.ffn_width,
         ffn_norm=a.ffn_norm,
+        ante_taps=a.ante_taps,
     )
 
 
@@ -166,6 +188,12 @@ def main(argv=None):
             np.stack([train[i : i + a.ctx] for i in starts]).astype(np.int64)
         )
         rule_init = init_rules_from_data(model, idx0, generator=g)
+    ngram_info = {}
+    if a.ngram_init:
+        from flm.ngram import ngram_init_for_model
+
+        ngram_info = ngram_init_for_model(model, a.ngram_init, a.seed, a.ngram_mode)
+        print("ngram init:", ngram_info, flush=True)
     # init (incl. data-driven rule init) happens on CPU, so initial weights are identical
     # on every platform; batch sampling is numpy-seeded, so the data order is too
     device = torch.device(a.device)
@@ -199,6 +227,9 @@ def main(argv=None):
 
     hi = len(train) - a.ctx - 2
     curve, evals = [], []
+    if a.eval_at_start:
+        evals.append((0, round(evaluate(model, val, a.ctx, a.eval_chars), 5)))
+        print(f"step 0 val {evals[-1][1]:.4f}", flush=True)
     t0 = time.perf_counter()
     train_time = 0.0
     ema = None
@@ -280,6 +311,7 @@ def main(argv=None):
         "host": socket.gethostname(),
         "sample": sample,
         "rule_init": rule_init,
+        "ngram_init": ngram_info,
     }
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)

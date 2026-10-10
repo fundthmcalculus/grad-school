@@ -62,6 +62,9 @@ class ModelConfig:
     # FFN-only width override: "" = follow width_share | dim: (R,da) | rule: one per rule | shared: one per dim
     ffn_width: str = ""
     ffn_norm: str = "softmax"  # softmax: fuzzy partition over rules | none: raw firing
+    ante_taps: int = (
+        1  # layer-0 TSK FFN antecedent reads the last `ante_taps` positions
+    )
     max_len: int = 256
 
     def to_dict(self) -> dict:
@@ -455,6 +458,31 @@ class MLP(nn.Module):
         return self.proj(F.gelu(self.fc(x)))
 
 
+class TapLinear(nn.Module):
+    """Causal multi-tap linear map: u_t = sum_j W_j x_{t-j}, zero-padded before the start.
+
+    With taps=2 a rule's antecedent is a conjunction over the current and the previous
+    position ("IF c_{t-1} is A AND c_t is B ..."), which is what a trigram rule needs.
+    """
+
+    def __init__(self, d_in: int, d_out: int, taps: int):
+        super().__init__()
+        self.taps = taps
+        bound = 1.0 / math.sqrt(d_in * taps)
+        self.weight = nn.Parameter(
+            torch.empty(taps, d_out, d_in).uniform_(-bound, bound)
+        )
+
+    def forward(self, x):  # (B, T, d_in)
+        T = x.shape[-2]
+        xp = F.pad(x, (0, 0, self.taps - 1, 0))
+        out = 0
+        for j in range(self.taps):
+            lo = self.taps - 1 - j
+            out = out + xp[..., lo : lo + T, :] @ self.weight[j].T
+        return out
+
+
 class TSKFFN(nn.Module):
     """TSK channel mixer.
 
@@ -467,7 +495,7 @@ class TSKFFN(nn.Module):
     ``ffn_width`` ties the Gaussian widths to save parameters.
     """
 
-    def __init__(self, cfg: ModelConfig):
+    def __init__(self, cfg: ModelConfig, taps: int = 1):
         super().__init__()
         d = cfg.d_model
         da = cfg.tsk_dim or d
@@ -476,7 +504,9 @@ class TSKFFN(nn.Module):
         self.order, self.norm = cfg.ffn_order, cfg.ffn_norm
         assert self.order in (0, 1) and self.norm in ("softmax", "none")
         self.exp_scale = exp_scale(cfg.ffn_exp_norm or cfg.exp_norm, da)
-        self.ante = nn.Linear(d, da, bias=False)
+        self.ante = (
+            nn.Linear(d, da, bias=False) if taps == 1 else TapLinear(d, da, taps)
+        )
         self.centers = nn.Parameter(torch.randn(R, da))
         if cfg.ffn_width:
             ws = {"dim": "full", "rule": "rule", "shared": "dim"}[cfg.ffn_width]
@@ -520,13 +550,16 @@ FFNS = {"mlp": MLP, "tsk": TSKFFN}
 
 
 class Block(nn.Module):
-    def __init__(self, cfg: ModelConfig):
+    def __init__(self, cfg: ModelConfig, idx: int = 0):
         super().__init__()
         self.n1 = nn.RMSNorm(cfg.d_model)
         self.conv = ShortConv(cfg.d_model, cfg.shortconv) if cfg.shortconv > 1 else None
         self.mix = MIXERS[cfg.mixer](cfg)
         self.n2 = nn.RMSNorm(cfg.d_model) if cfg.ffn != "none" else None
-        self.ffn = FFNS[cfg.ffn](cfg) if cfg.ffn != "none" else None
+        if cfg.ffn == "tsk":  # multi-tap antecedent applies to the first block only
+            self.ffn = TSKFFN(cfg, taps=cfg.ante_taps if idx == 0 else 1)
+        else:
+            self.ffn = FFNS[cfg.ffn](cfg) if cfg.ffn != "none" else None
 
     def mixer_in(self, x):
         h = self.n1(x)
@@ -553,7 +586,7 @@ class TinyLM(nn.Module):
             self.core = None
             # weight-shared depth: n_layers applications cycling through n_unique blocks
             n_unique = cfg.n_unique or cfg.n_layers
-            self.blocks = nn.ModuleList([Block(cfg) for _ in range(n_unique)])
+            self.blocks = nn.ModuleList([Block(cfg, i) for i in range(n_unique)])
         self.norm = nn.RMSNorm(cfg.d_model)
         # tied unembedding
 
